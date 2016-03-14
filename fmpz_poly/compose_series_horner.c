@@ -83,7 +83,7 @@ fmpz_poly_compose_series_horner(fmpz_poly_t res,
     {
         flint_printf("Exception (fmpz_poly_compose_series_horner). Inner polynomial \n"
                "must have zero constant term.\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || n == 0)

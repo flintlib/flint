@@ -78,7 +78,7 @@ nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, slong n)
     if (hlen > 0 && h->coeffs[0] != 0)
     {
         flint_printf("Exception (nmod_poly_exp_series_basecase). Constant term != 0.\n");
-        abort();
+        flint_abort();
     }
 
     if (n <= 1 || hlen <= 1)

@@ -40,14 +40,14 @@ nmod_poly_mat_set_perm(nmod_poly_mat_t X, const slong * perm,
     if (X == B)
     {
         /* Not implemented */
-        abort();
+        flint_abort();
     }
     else
     {
         slong i, j;
 
         if (perm == NULL)
-            abort();
+            flint_abort();
 
         for (i = 0; i < nmod_poly_mat_nrows(B); i++)
             for (j = 0; j < nmod_poly_mat_ncols(B); j++)

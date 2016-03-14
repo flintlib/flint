@@ -55,7 +55,7 @@ void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
     if (lenB == 0)
     {
         flint_printf("Exception (fmpz_poly_rem). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (lenA < lenB)

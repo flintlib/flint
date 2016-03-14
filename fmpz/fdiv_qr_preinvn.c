@@ -179,7 +179,7 @@ fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
     if (fmpz_is_zero(h))
     {
         flint_printf("Exception (fmpz_fdiv_q). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */

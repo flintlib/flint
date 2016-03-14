@@ -132,6 +132,6 @@ arith_sum_of_squares(fmpz_t r, ulong k, const fmpz_t n)
     else
     {
         flint_printf("Exception (arith_sum_of_squares). n is too large.\n");
-        abort();
+        flint_abort();
     }
 }

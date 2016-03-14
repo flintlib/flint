@@ -107,7 +107,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
         mp_limb_t mod = n_powmod2(UWORD(2), exp, n);
         if (mod == n - 1) return 1;
         flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-        abort();
+        flint_abort();
     }
     else
     {
@@ -119,10 +119,10 @@ int n_is_prime_pseudosquare(mp_limb_t n)
             if (mod != 1)
             {
                 flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-                abort();
+                flint_abort();
             }
         }
         flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-        abort();
+        flint_abort();
     }
 }

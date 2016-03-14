@@ -47,7 +47,7 @@ void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len,
     if (!fmpz_is_one(g))
     {
         flint_printf("Exception (_fmpz_mod_poly_scalar_div_fmpz). Impossible inverse.\n");
-        abort();
+        flint_abort();
     }
 
     _fmpz_vec_scalar_mul_fmpz(res, poly, len, xinv);

@@ -64,7 +64,7 @@ int nmod_poly_invmod(nmod_poly_t A,
     if (lenP < 2)
     {
         printf("Exception (nmod_poly_invmod). lenP < 2.\n");
-        abort();
+        flint_abort();
     }
     if (lenB == 0)
     {

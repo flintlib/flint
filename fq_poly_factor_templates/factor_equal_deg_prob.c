@@ -51,7 +51,7 @@ TEMPLATE(T, poly_factor_equal_deg_prob) (TEMPLATE(T, poly_t) factor,
     {
         TEMPLATE_PRINTF("Exception (%s_poly_factor_equal_deg_prob): \n", T);
         flint_printf("Input polynomial is linear.\n");
-        abort();
+        flint_abort();
     }
 
     fmpz_init(q);

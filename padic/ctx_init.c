@@ -31,7 +31,7 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max,
     if (!(0 <= min && min <= max))
     {
         flint_printf("Exception (padic_ctx_init).  Require 0 <= min <= max.");
-        abort();
+        flint_abort();
     }
 
     fmpz_init_set(ctx->p, p);

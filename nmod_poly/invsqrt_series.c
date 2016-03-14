@@ -84,13 +84,13 @@ void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     if (n == 0 || h->length == 0 || h->coeffs[0] == 0)
     {
         flint_printf("Exception (nmod_poly_invsqrt). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (h->coeffs[0] != UWORD(1))
     {
         flint_printf("Exception (nmod_poly_invsqrt_series). Constant term != 1.\n");
-        abort();
+        flint_abort();
     }
 
     if (hlen < n)

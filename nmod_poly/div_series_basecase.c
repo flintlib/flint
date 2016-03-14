@@ -87,7 +87,7 @@ nmod_poly_div_series_basecase(nmod_poly_t Q, const nmod_poly_t A,
     if (n == 0 || Blen == 0 || B->coeffs[0] == 0)
     {
         flint_printf("Exception (nmod_poly_div_series_basecase). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     Alen = A->length;

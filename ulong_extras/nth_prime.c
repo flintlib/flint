@@ -36,7 +36,7 @@ mp_limb_t n_nth_prime(ulong n)
     if (n == 0)
     {
         flint_printf("Exception (n_nth_prime). n_nth_prime(0) is undefined.\n");
-        abort();
+        flint_abort();
     }
 
     return n_primes_arr_readonly(n)[n-1];

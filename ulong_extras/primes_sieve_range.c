@@ -89,7 +89,7 @@ n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
     if (a < 3 || b < a || len > FLINT_SIEVE_SIZE)
     {
         flint_printf("invalid sieve range %wu,%wu!\n", a, b);
-        abort();
+        flint_abort();
     }
 
     bound = n_sqrt(b) + 1;

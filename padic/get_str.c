@@ -90,7 +90,7 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
             if (!str)
             {
                 flint_printf("Exception (padic_get_str).  Memory allocation failed.\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -178,7 +178,7 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
             if (!str)
             {
                 flint_printf("Exception (padic_get_str).  Memory allocation failed.\n");
-                abort();
+                flint_abort();
             }
         }
 

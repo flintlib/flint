@@ -110,7 +110,7 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
     if (fmpz_bits(order) > FLINT_BITS)
     {
         flint_printf("Exception (fq_zech_ctx_init_nmod_ctx). Requires q < 2^FLINT_BITS\n");
-        abort();
+        flint_abort();
     }
 
     q = fmpz_get_ui(order);

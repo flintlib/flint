@@ -35,7 +35,7 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
     if (fmpz_sgn(m) <= 0)
     {
         flint_printf("Exception (fmpz_powm_ui). Modulus is less than 1.\n");
-        abort();
+        flint_abort();
     }
 
     if (fmpz_is_one(m))

@@ -63,7 +63,7 @@ fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
     if (Qlen == 0)
     {
         flint_printf("Exception (fmpz_poly_inv_series_basecase). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (Qinv != Q)

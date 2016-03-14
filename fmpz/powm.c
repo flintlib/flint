@@ -34,7 +34,7 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
     if (fmpz_sgn(m) <= 0)
     {
         flint_printf("Exception (fmpz_powm). Modulus is less than 1.\n");
-        abort();
+        flint_abort();
     }
     else if (!COEFF_IS_MPZ(*e))  /* e is small */
     {

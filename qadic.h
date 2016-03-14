@@ -284,7 +284,7 @@ QADIC_INLINE void qadic_gen(qadic_t x, const qadic_ctx_t ctx)
     else
     {
         flint_printf("Exception (qadic_gen).  Extension degree d = 1.\n");
-        abort();
+        flint_abort();
     }
 }
 

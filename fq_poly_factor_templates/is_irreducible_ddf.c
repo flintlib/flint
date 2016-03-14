@@ -51,7 +51,7 @@ TEMPLATE(T, poly_is_irreducible_ddf) (const TEMPLATE(T, poly_t) f,
     {
         TEMPLATE_PRINTF("Exception (%s_poly_is_irreducible_ddf): \n", T);
         flint_printf("Not enough memory.\n");
-        abort();
+        flint_abort();
     }
 
     TEMPLATE(T, poly_factor_init) (dist_deg, ctx);

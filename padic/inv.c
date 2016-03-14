@@ -103,7 +103,7 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     if (padic_is_zero(op))
     {
         flint_printf("Exception (padic_inv).  Zero is not invertible.\n");
-        abort();
+        flint_abort();
     }
 
     /*

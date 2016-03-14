@@ -60,7 +60,7 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
     if (B->length == 0)
     {
         flint_printf("Exception (fmpq_poly_div_series). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (Q == A || Q == B)

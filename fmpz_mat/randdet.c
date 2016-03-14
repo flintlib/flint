@@ -38,7 +38,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     if (n != mat->c)
     {
         flint_printf("Exception (fmpz_mat_randdet). Non-square matrix.\n");
-        abort();
+        flint_abort();
     }
 
     if (n < 1)

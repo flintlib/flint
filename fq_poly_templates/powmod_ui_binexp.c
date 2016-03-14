@@ -95,7 +95,7 @@ TEMPLATE(T, poly_powmod_ui_binexp) (TEMPLATE(T, poly_t) res,
     {
         TEMPLATE_PRINTF
             ("Exception: %s_poly_powmod_ui_binexp: divide by zero\n", T);
-        abort();
+        flint_abort();
     }
 
     if (len >= lenf)

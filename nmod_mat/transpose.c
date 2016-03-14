@@ -40,7 +40,7 @@ nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
     if (B->r != A->c || B->c != A->r)
     {
         flint_printf("Exception (nmod_mat_transpose). Incompatible dimensions.\n");
-        abort();
+        flint_abort();
     }
 
     if (A == B) /* In-place, guaranteed to be square */

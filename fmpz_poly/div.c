@@ -45,7 +45,7 @@ fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
     if (B->length == 0)
     {
         flint_printf("Exception (fmpz_poly_div). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (A->length < B->length)

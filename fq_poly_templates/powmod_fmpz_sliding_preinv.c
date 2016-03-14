@@ -159,14 +159,14 @@ TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (TEMPLATE(T, poly_t) res,
     {
         TEMPLATE_PRINTF("Exception: %s_poly_powmod_fmpz_sliding_preinv", T);
         flint_printf(": divide by zero\n");
-        abort();
+        flint_abort();
     }
 
     if (fmpz_sgn(e) < 0)
     {
         TEMPLATE_PRINTF("Exception: %s_poly_powmod_fmpz_sliding_preinv:", T);
         flint_printf(" negative exp not implemented\n");
-        abort();
+        flint_abort();
     }
 
     if (len >= lenf)

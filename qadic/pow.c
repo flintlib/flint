@@ -128,7 +128,7 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
     if (fmpz_sgn(e) < 0)
     {
         flint_printf("Exception (qadic_pow).  e < 0.\n");
-        abort();
+        flint_abort();
     }
 
     if (fmpz_is_zero(e))
