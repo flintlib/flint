@@ -1435,6 +1435,86 @@ int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A,
 
 *******************************************************************************
 
+    Minpoly
+
+*******************************************************************************
+
+slong _fmpz_mod_poly_minpoly_bm(fmpz* poly, 
+                                const fmpz* seq, slong len, const fmpz_t p)
+    
+    Sets \code{poly} to the coefficients of a minimal generating
+    polynomial for sequence \code{(seq, len)} modulo $p$.
+
+    The return value equals the length of \code{poly}.
+
+    It is assumed that $p$ is prime and \code{poly} has space for at least 
+    $len+1$ coefficients. No aliasing between inputs and outputs is
+    allowed.
+
+void fmpz_mod_poly_minpoly_bm(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+
+    Sets \code{poly} to a minimal generating polynomial for sequence
+    \code{seq} of length \code{len}.
+
+    Assumes that the modulus is prime.
+
+    This version uses the Berlekamp-Massey algorithm, whose running time
+    is proportional to \code{len} times the size of the minimal generator.
+
+slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly, 
+                 const fmpz* seq, slong len, const fmpz_t p)
+    
+    Sets \code{poly} to the coefficients of a minimal generating
+    polynomial for sequence \code{(seq, len)} modulo $p$.
+
+    The return value equals the length of \code{poly}.
+
+    It is assumed that $p$ is prime and \code{poly} has space for at least 
+    $len+1$ coefficients. No aliasing between inputs and outputs is
+    allowed.
+
+void fmpz_mod_poly_minpoly_hgcd(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+
+    Sets \code{poly} to a minimal generating polynomial for sequence
+    \code{seq} of length \code{len}.
+
+    Assumes that the modulus is prime.
+
+    This version uses the HGCD algorithm, whose running time is
+    $O(n \log^2 n)$ field operations, regardless of the actual size of
+    the minimal generator.
+
+slong _fmpz_mod_poly_minpoly(fmpz* poly, const fmpz* seq, slong len, const fmpz_t p)
+
+    Sets \code{poly} to the coefficients of a minimal generating
+    polynomial for sequence \code{(seq, len)} modulo $p$.
+
+    The return value equals the length of \code{poly}.
+
+    It is assumed that $p$ is prime and \code{poly} has space for at least 
+    $len+1$ coefficients. No aliasing between inputs and outputs is
+    allowed.
+
+void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+
+    Sets \code{poly} to a minimal generating polynomial for sequence
+    \code{seq} of length \code{len}.
+
+    A minimal generating polynomial is a monic polynomial
+    $f = x^d + c_{d-1}x^{d-1} + \cdots + c_1 x + c_0$,
+    of minimal degree $d$, that annihilates any consecutive $d+1$ terms
+    in \code{seq}. That is, for any $i < len - d$,
+
+    $seq_i = -\sum_{j=0}^{d-1} seq_{i+j}*f_j.$
+
+    Assumes that the modulus is prime.
+
+    This version automatically chooses the fastest underlying
+    implementation based on \code{len} and the size of the modulus.
+
+
+*******************************************************************************
+
     Resultant
 
 *******************************************************************************
