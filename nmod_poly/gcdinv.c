@@ -54,7 +54,7 @@ void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
     if (lenB < 2)
     {
         printf("Exception (nmod_poly_gcdinv). lenB < 2.\n");
-        abort();
+        flint_abort();
     }
     if (lenA >= lenB)
     {

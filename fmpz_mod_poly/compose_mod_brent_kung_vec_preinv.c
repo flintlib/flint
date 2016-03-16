@@ -126,7 +126,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
                 ("Exception (fmpz_mod_poly_compose_mod_brent_kung_vec_preinv)."
                  "The degree of the first polynomial must be smaller than that of the "
                  " modulus\n");
-            abort();
+            flint_abort();
         }
     }
 
@@ -135,7 +135,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
         flint_printf
             ("Exception (fmpz_mod_poly_compose_mod_brent_kung_vec_preinv)."
              "n is larger than the length of polys\n");
-        abort();
+        flint_abort();
     }
 
     if (n == 0)

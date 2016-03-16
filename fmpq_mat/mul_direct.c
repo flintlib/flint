@@ -32,7 +32,7 @@ void fmpq_mat_mul_direct(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
     if (A == C || B == C)
     {
         flint_printf("Exception (fmpq_mat_mul_direct). Aliasing not implemented.\n");
-        abort();
+        flint_abort();
     }
 
     if (A->c == 0)

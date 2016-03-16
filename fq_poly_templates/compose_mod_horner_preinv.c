@@ -105,7 +105,7 @@ TEMPLATE(T, poly_compose_mod_horner_preinv) (
     {
         TEMPLATE_PRINTF
             ("Exception: division by zero in %s_poly_compose_mod_horner\n", T);
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || len3 == 1)

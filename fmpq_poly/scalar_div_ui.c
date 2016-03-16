@@ -63,7 +63,7 @@ void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
     if (c == UWORD(0))
     {
         flint_printf("Exception (fmpq_poly_scalar_div_ui). Division by zero.\n");
-        abort();
+        flint_abort();
     }
     
     if (fmpq_poly_is_zero(op))

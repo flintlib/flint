@@ -37,7 +37,7 @@ fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
     if (c != r + 1)
     {
         flint_printf("Exception (fmpz_mat_randintrel).  c != r + 1.\n");
-        abort();
+        flint_abort();
     }
 
     for (i = 0; i < r; i++)

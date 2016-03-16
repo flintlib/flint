@@ -85,7 +85,7 @@ nmod_poly_compose_mod_horner(nmod_poly_t res,
     if (len3 == 0)
     {
         flint_printf("Exception (nmod_poly_compose_mod_horner). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || len3 == 1)

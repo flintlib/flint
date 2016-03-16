@@ -228,7 +228,7 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     if (Blen == 0)
     {
         flint_printf("Exception (nmod_poly_div_base). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     Alen = A->length;

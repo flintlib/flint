@@ -59,7 +59,7 @@ TEMPLATE(T, poly_divides) (TEMPLATE(T, poly_t) Q,
     if (TEMPLATE(T, poly_is_zero) (B, ctx))
     {
         TEMPLATE_PRINTF("Exception (%s_poly_divides).  B is zero.\n", T);
-        abort();
+        flint_abort();
     }
 
     if (TEMPLATE(T, poly_is_zero) (A, ctx))

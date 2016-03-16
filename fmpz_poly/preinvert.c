@@ -93,7 +93,7 @@ fmpz_poly_preinvert(fmpz_poly_t B_inv, const fmpz_poly_t B)
     if (n == 0)
     {
         flint_printf("Exception (fmpz_poly_preinvert). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (B == B_inv)

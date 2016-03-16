@@ -61,7 +61,7 @@ void __flint_set_memory_functions_init()
 static void flint_memory_error(size_t size)
 {
     flint_printf("Exception (FLINT memory_manager). Unable to allocate memory (%ld).\n", size);
-    abort();
+    flint_abort();
 }
 
 void __flint_set_memory_functions(void *(*alloc_func) (size_t),

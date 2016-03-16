@@ -89,7 +89,7 @@ nmod_poly_revert_series_newton(nmod_poly_t Qinv,
     {
         flint_printf("Exception (nmod_poly_revert_series_newton). Input must have \n"
                "zero constant and an invertible coefficient of x^1.\n");
-        abort();
+        flint_abort();
     }
 
     if (Qlen < n)

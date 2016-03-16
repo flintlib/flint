@@ -119,14 +119,14 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
     {
         flint_printf("Exception (fmpz_mod_poly_precompute_matrix)."
                      "Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (A->r != m || A->c != len)
     {
         flint_printf("Exception (fmpz_mod_poly_precompute_matrix)."
                      " Wrong dimensions.\n");
-        abort();
+        flint_abort();
     }
 
     if (len2 == 1)
@@ -310,7 +310,7 @@ fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
     {
         flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv)."
                      "Division by zero\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 >= len3)
@@ -318,7 +318,7 @@ fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
         flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv)."
                "The degree of the first polynomial must be smaller than that of the "
                " modulus\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || len3 == 1)

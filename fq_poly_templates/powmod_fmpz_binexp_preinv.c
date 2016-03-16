@@ -93,7 +93,7 @@ TEMPLATE(T, poly_powmod_fmpz_binexp_preinv) (TEMPLATE(T, poly_t) res,
         TEMPLATE_PRINTF
             ("Exception: %s_poly_powmod_fmpz_binexp_preinv: divide by zero\n",
              T);
-        abort();
+        flint_abort();
     }
 
     if (fmpz_sgn(e) < 0)
@@ -101,7 +101,7 @@ TEMPLATE(T, poly_powmod_fmpz_binexp_preinv) (TEMPLATE(T, poly_t) res,
         TEMPLATE_PRINTF
             ("Exception: %s_poly_powmod_fmpz_binexp_preinv: negative exp not implemented\n",
              T);
-        abort();
+        flint_abort();
     }
 
     if (len >= lenf)

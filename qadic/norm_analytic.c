@@ -109,7 +109,7 @@ void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         if ((w < 2 && *p == WORD(2)) || w < 1)
         {
             flint_printf("ERROR (qadic_norm_analytic).  w = %wd.\n", w);
-            abort();
+            flint_abort();
         }
 
         _qadic_norm_analytic(padic_unit(rop), y, w, op->length,

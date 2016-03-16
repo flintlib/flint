@@ -43,7 +43,7 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     {
         flint_printf("Exception (nmod_poly_factor_equal_deg_prob). \n");
         flint_printf("Input polynomial is linear.\n");
-        abort();
+        flint_abort();
     }
 
     nmod_poly_init_preinv(a, pol->mod.n, pol->mod.ninv);

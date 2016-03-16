@@ -72,7 +72,7 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly)
     {
         flint_printf("Exception (fmpz_mod_poly_is_irreducible_ddf): \n");
         flint_printf("Not enough memory.\n");
-        abort();
+        flint_abort();
     }
     H = h + (l + 1);
     I = H + m;

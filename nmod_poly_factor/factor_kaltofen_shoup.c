@@ -49,7 +49,7 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
     {
         flint_printf("Exception (nmod_poly_factor_kaltofen_shoup): \n");
         flint_printf("Not enough memory.\n");
-        abort();
+        flint_abort();
     }
 
     /* compute squarefree factorisation */

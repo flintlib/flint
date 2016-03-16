@@ -84,7 +84,7 @@ fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
     if (bits == 0)
     {
         flint_printf("Exception (fmpz_randtest_not_zero). bits == 0.\n");
-        abort();
+        flint_abort();
     }
 
     fmpz_randtest(f, state, bits);

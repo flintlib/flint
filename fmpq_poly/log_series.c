@@ -64,7 +64,7 @@ fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
     if (flen < 1 || !fmpz_equal(f->coeffs, f->den))
     {
         flint_printf("Exception (fmpq_poly_log_series). Constant term != 1.\n");
-        abort();
+        flint_abort();
     }
 
     if (flen == 1 || n < 2)

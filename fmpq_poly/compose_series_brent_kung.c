@@ -177,7 +177,7 @@ fmpq_poly_compose_series_brent_kung(fmpq_poly_t res,
     {
         flint_printf("Exception (fmpq_poly_compose_series_brent_kung). \n"
                "Inner polynomial must have zero constant term.\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || n == 0)

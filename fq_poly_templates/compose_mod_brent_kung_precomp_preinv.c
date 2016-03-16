@@ -96,14 +96,14 @@ TEMPLATE(T, poly_precompute_matrix) (TEMPLATE(T, mat_t) A,
     {
         flint_printf
             ("Exception (nmod_poly_compose_mod_brent_kung). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (A->r != m || A->c != len)
     {
         flint_printf
             ("Exception (nmod_poly_compose_mod_brent_kung). Wrong dimensions.\n");
-        abort();
+        flint_abort();
     }
 
     if (len2 == 1)
@@ -221,7 +221,7 @@ TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv) (
         TEMPLATE_PRINTF
             ("Exception (%s_poly_compose_mod_brent_kung). Division by zero.\n",
              T);
-        abort();
+        flint_abort();
     }
 
     if (len1 >= len3)
@@ -231,7 +231,7 @@ TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv) (
              T);
         flint_printf
             ("first polynomial must be smaller than that of the modulus.\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || len3 == 1)

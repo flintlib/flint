@@ -37,7 +37,7 @@ fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_b
     if (c != r)
     {
         flint_printf("Exception (fmpz_mat_randsimdioph). Ill-formed matrix.\n");
-        abort();
+        flint_abort();
     }
 
     fmpz_one(mat->rows[0]);

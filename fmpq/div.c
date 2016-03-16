@@ -54,7 +54,7 @@ void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
     if (fmpq_is_zero(op2))
     {
         flint_printf("Exception (fmpq_div). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     _fmpq_div(fmpq_numref(res), fmpq_denref(res),

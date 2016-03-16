@@ -95,7 +95,7 @@ void fmpq_poly_rem(fmpq_poly_t R,
     if (fmpq_poly_is_zero(poly2))
     {
         flint_printf("Exception (fmpq_poly_rem). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (poly1->length < poly2->length)

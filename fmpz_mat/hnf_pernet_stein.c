@@ -64,7 +64,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
     {
         flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
                 "Nullspace was not dimension one.\n");
-        abort();
+        flint_abort();
     }
 
     bits = fmpz_mat_max_bits(B1);
@@ -92,7 +92,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
     {
         flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
                 "Singular input matrix for solve.");
-        abort();
+        flint_abort();
     }
 
     /* fix final row */

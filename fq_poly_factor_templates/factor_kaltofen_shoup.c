@@ -47,7 +47,7 @@ TEMPLATE(T, poly_factor_kaltofen_shoup) (TEMPLATE(T, poly_factor_t) res,
     {
         TEMPLATE_PRINTF("Exception (%s_poly_factor_kaltofen_shoup): \n", T);
         flint_printf("Not enough memory.\n");
-        abort();
+        flint_abort();
     }
 
     TEMPLATE(T, poly_init) (v, ctx);

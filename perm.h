@@ -57,7 +57,7 @@ PERM_INLINE slong * _perm_init(slong n)
     if (!vec)
     {
         flint_printf("ERROR (_perm_init).\n\n");
-        abort();
+        flint_abort();
     }
 
     for (i = 0; i < n; i++)
@@ -112,7 +112,7 @@ PERM_INLINE void
         if (!t)
         {
             flint_printf("ERROR (_perm_inv).\n\n");
-            abort();
+            flint_abort();
         }
 
         for (i = 0; i < n; i++)

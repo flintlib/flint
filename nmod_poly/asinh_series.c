@@ -57,7 +57,7 @@ nmod_poly_asinh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     if (h_len > 0 && h->coeffs[0] != UWORD(0))
     {
         flint_printf("Exception (nmod_poly_asinh_series). Constant term != 0.\n");
-        abort();
+        flint_abort();
     }
 
     if (h_len == 1 || n < 2)

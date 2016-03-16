@@ -33,7 +33,7 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
     if (fmpz_poly_q_is_zero(op2))
     {
         flint_printf("Exception (fmpz_poly_q_div). Division by zero.\n");
-        abort();
+        flint_abort();
     }
     if (fmpz_poly_q_is_zero(op1))
     {

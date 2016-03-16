@@ -44,7 +44,7 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
     {
         flint_printf("Exception (fmpz_mod_poly_factor_equal_deg_prob): \n");
         flint_printf("Input polynomial is linear.\n");
-        abort();
+        flint_abort();
     }
 
     fmpz_init_set(p, &pol->p);

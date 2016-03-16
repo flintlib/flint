@@ -41,7 +41,7 @@ fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
     if (c == 0)
     {
         flint_printf("Exception (fmpz_mat_CRT_ui). m1 not invertible modulo m2.\n");
-        abort();
+        flint_abort();
     }
 
     fmpz_init(m1m2);

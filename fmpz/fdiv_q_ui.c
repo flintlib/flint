@@ -39,7 +39,7 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
     if (h == 0)
     {
         flint_printf("Exception (fmpz_fdiv_q_ui). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
