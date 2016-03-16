@@ -534,6 +534,18 @@ this option is selected. It is disabled by default (\code{--disable-cxx})
 because some \code{C++} compilers internally segfault when compiling the
 tests, or exhaust memory due to the complexity of the \code{C++} code.
 
+\chapter{Excecptions}
+
+When FLINT encounters a problem, mostly illegal input, it currently aborts.
+There is an experimental interface for generating proper exceptions
+\code{flint_throw}, but this is almost no-where used (currently) and
+experimental - you should expect for this to change.
+
+At the end, all of FLINT's exceptions call \code{abort();} to terminate
+the programme. Using \code{flint_set_abort(voud (*abort_func)(void))}, the
+user can install a function that will be called instead. Similar
+to the exceptions, this should be regarded as experimental.
+
 \chapter{Garbage collection}
 
 If building FLINT as part of an application that uses the

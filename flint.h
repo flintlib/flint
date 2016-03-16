@@ -56,8 +56,6 @@
 #include <assert.h>
 #endif
 
-void flint_abort(void);
-
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -109,6 +107,15 @@ FLINT_DLL void flint_cleanup(void);
 FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
      void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
                                                               void (*free_func) (void *));
+
+void flint_abort(void);
+void flint_set_abort(void (*func)(void));
+  /* flint_abort is calling abort by default
+   * if flint_set_abort is used, then instead of abort this function
+   * is called. EXPERIMENTALLY use at your own risk!
+   * May disappear in future versions.
+   */
+
 
 #if defined(_WIN64) || defined(__mips64)
 #if defined(__MINGW64__)

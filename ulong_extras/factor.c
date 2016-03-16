@@ -88,7 +88,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
         {
                flint_printf("Exception (n_factor). Failed to factor %wd.\n", n);
                flint_abort();
-	    }
+        }
          } else
      {
         n_factor_insert(factors, factor, exp_arr[factors_left - 1]);
