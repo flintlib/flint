@@ -79,7 +79,7 @@ FUNC_HEAD
             {
                 flint_printf
                     ("Exception (fmpz_lll_d*). Incompatible dimensions of capturing matrix.\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -441,7 +441,7 @@ FUNC_HEAD
             {
                 flint_printf
                     ("Exception (fmpz_lll_d*). Incompatible dimensions of capturing matrix.\n");
-                abort();
+                flint_abort();
             }
             else if (U->c == d && n > d && fmpz_mat_is_one(U))
             {

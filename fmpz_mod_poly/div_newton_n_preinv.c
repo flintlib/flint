@@ -70,7 +70,7 @@ void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
     if (lenB == 0)
     {
         flint_printf("Exception (fmpz_mod_poly_div_newton_n_preinv). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (lenA < lenB)

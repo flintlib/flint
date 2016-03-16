@@ -48,7 +48,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
            fmpz_clear(u);
            fmpz_clear(d);
                
-           abort();
+           flint_abort();
        }
     } else
        fmpz_set_ui(u, 1);
@@ -128,7 +128,7 @@ void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
     if (Blen == 0)
     {
         flint_printf("Exception (fmpz_mod_poly_div_series). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (Alen == 0)

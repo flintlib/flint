@@ -33,7 +33,7 @@ fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
     if (dim != A->c)
     {
         flint_printf("Exception (fmpz_mat_det). Non-square matrix.\n");
-        abort();
+        flint_abort();
     }
 
     if (dim < 5)

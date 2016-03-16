@@ -109,7 +109,7 @@ void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
     if (len == 0)
     {
         flint_printf("Exception (padic_poly_randtest_not_zero).  len == 0.\n");
-        abort();
+        flint_abort();
     }
 
     padic_poly_randtest(f, state, len, ctx);

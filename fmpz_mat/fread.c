@@ -45,7 +45,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     {
         flint_printf("Exception (fmpz_mat_fread). "
                "Number of rows does not fit into a slong.\n");
-        abort();
+        flint_abort();
     }
     r = flint_mpz_get_si(t);
 
@@ -61,7 +61,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     {
         flint_printf("Exception (fmpz_mat_fread). "
                "Number of columns does not fit into a slong.\n");
-        abort();
+        flint_abort();
     }
     c = flint_mpz_get_si(t);
     mpz_clear(t);
@@ -76,7 +76,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     {
         flint_printf("Exception (fmpz_mat_fread). \n"
                "Dimensions are non-zero and do not match input dimensions.\n");
-        abort();
+        flint_abort();
     }
 
     for (i = 0; i < r; i++)

@@ -27,6 +27,39 @@
 #include <stdarg.h>
 #include "flint.h"
 
+#if FLINT_REENTRANT && !HAVE_TLS
+#include <pthread.h>
+
+static pthread_once_t abort_func_init = PTHREAD_ONCE_INIT;
+pthread_mutex_t abort_func_lock;
+
+void __flint_set_abort_init()
+{
+   pthread_mutex_init(&abort_func_lock, NULL);
+}
+#endif
+
+void (*abort_func)(void) = abort;
+
+void flint_set_abort(void (*func)(void))
+{
+#if FLINT_REENTRANT && !HAVE_TLS
+    pthread_once(&abort_func_init, __flint_set_abort_init);
+    pthread_mutex_lock(&abort_func_lock);
+#endif
+
+  abort_func = func;
+
+#if FLINT_REENTRANT && !HAVE_TLS
+    pthread_mutex_unlock(&abort_func_lock);
+#endif
+}
+
+void flint_abort()
+{
+    (*abort_func)();
+}
+
 void flint_throw(flint_err_t exc, const char * msg, ...)
 {
     va_list ap;
@@ -58,5 +91,5 @@ void flint_throw(flint_err_t exc, const char * msg, ...)
      flint_vprintf(msg, ap);
      va_end(ap);
 
-     abort();
+     flint_abort();
 }

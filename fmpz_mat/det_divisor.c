@@ -62,7 +62,7 @@ fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
             {
                 flint_printf("Exception (fmpz_mat_det_divisor): "
                        "Rational reconstruction failed.\n");
-                abort();
+                flint_abort();
             }
 
             fmpz_mul(d, v, d);

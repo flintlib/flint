@@ -142,7 +142,7 @@ void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
     if (lenB == 0)
     {
         flint_printf("Exception (nmod_poly_divrem_divconquer). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (lenA < lenB)

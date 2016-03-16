@@ -249,7 +249,7 @@ slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
          {
             flint_printf("Error: too many duplicate relations!\n");
             flint_printf("s = %wd, bits = %wd\n", qs_inf->s, qs_inf->bits);
-            abort();
+            flint_abort();
          }
 
          goto cleanup;

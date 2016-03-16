@@ -53,7 +53,7 @@ fmpq_poly_revert_series(fmpq_poly_t res,
     {
         flint_printf("Exception (fmpq_poly_revert_series). Input must have \n"
                "zero constant term and nonzero coefficient of x^1.\n");
-        abort();
+        flint_abort();
     }
 
     if (n < 2)

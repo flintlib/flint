@@ -302,13 +302,13 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     if (B->length == 0)
     {
         flint_printf("Exception (fmpz_poly_pseudo_divrem_divconquer). Division by zero.\n");
-        abort();
+        flint_abort();
     }
     if (Q == R)
     {
         flint_printf("Exception (fmpz_poly_pseudo_divrem_divconquer). \n"
                "Output arguments Q and R may not be aliased.\n");
-        abort();
+        flint_abort();
     }
     if (A->length < B->length)
     {

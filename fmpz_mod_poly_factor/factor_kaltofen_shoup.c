@@ -50,7 +50,7 @@ fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
     {
         flint_printf("Exception (fmpz_mod_poly_factor_kaltofen_shoup): \n");
         flint_printf("Not enough memory.\n");
-        abort();
+        flint_abort();
     }
 
     /* compute squarefree factorisation */

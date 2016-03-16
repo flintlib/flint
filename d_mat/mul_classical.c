@@ -53,7 +53,7 @@ d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B)
     {
         flint_printf
             ("Exception (d_mat_mul_classical). Incompatible dimensions.\n");
-        abort();
+        flint_abort();
     }
 
     if (br == 0)

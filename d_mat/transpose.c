@@ -36,7 +36,7 @@ d_mat_transpose(d_mat_t B, const d_mat_t A)
     {
         flint_printf
             ("Exception (d_mat_transpose). Incompatible dimensions.\n");
-        abort();
+        flint_abort();
     }
 
     if (B == A)

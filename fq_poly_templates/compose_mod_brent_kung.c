@@ -128,7 +128,7 @@ TEMPLATE(T, poly_compose_mod_brent_kung) (TEMPLATE(T, poly_t) res,
     {
         flint_printf("Exception: division by zero in");
         TEMPLATE_PRINTF("%s_poly_compose_mod_brent_kung\n", T);
-        abort();
+        flint_abort();
     }
 
     if (len1 >= len3)
@@ -137,7 +137,7 @@ TEMPLATE(T, poly_compose_mod_brent_kung) (TEMPLATE(T, poly_t) res,
             ("Exception: %s_poly_compose_brent_kung: the degree of the", T);
         flint_printf
             (" first polynomial must be smaller than that of the modulus\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || len3 == 1)

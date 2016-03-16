@@ -113,7 +113,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
     {
         flint_printf("Exception (nmod_poly_factor_distinct_deg):\n");
         flint_printf("Not enough memory.\n");
-        abort();
+        flint_abort();
     }
     H = h + (l + 1);
     I = H + m;

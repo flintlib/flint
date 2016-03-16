@@ -62,7 +62,7 @@ nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A)
     {
         flint_printf("Exception (nmod_poly_mat_sqr_interpolate). \n"
                "Characteristic is too small.\n");
-        abort();
+        flint_abort();
     }
 
     xs = _nmod_vec_init(len);

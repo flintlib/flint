@@ -74,7 +74,7 @@ void fmpq_mat_charpoly(fmpq_poly_t pol, const fmpq_mat_t mat)
    if (mat->r != mat->c)
    {
        flint_printf("Exception (fmpq_mat_charpoly).  Non-square matrix.\n");
-       abort();
+       flint_abort();
    }
 
    fmpq_poly_fit_length(pol, n + 1);

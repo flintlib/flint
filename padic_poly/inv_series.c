@@ -40,13 +40,13 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
     if (Q->length == 0 || fmpz_is_zero(Q->coeffs + 0))
     {
         flint_printf("Exception (padic_poly_inv_series):  Constant term is zero.\n");
-        abort();
+        flint_abort();
     }
     if (fmpz_divisible(Q->coeffs + 0, ctx->p))
     {
         flint_printf("Exception (padic_poly_inv_series):\n");
         flint_printf("Valuation of constant term is not minimal.\n");
-        abort();
+        flint_abort();
     }
 
     if (- Q->val >= Qinv->N)

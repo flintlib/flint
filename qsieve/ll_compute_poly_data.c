@@ -272,7 +272,7 @@ void try_compute_A(qs_t qs_inf)
 
 out_of_polys:
    flint_printf("Out of polynomials, s = %wd\n", qs_inf->s);
-   abort();
+   flint_abort();
 }
 
 void qsieve_ll_compute_A(qs_t qs_inf)

@@ -257,7 +257,7 @@ _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n)
     {
         /* overflow */
         if ((slong) n < 0)
-            abort();
+            flint_abort();
 
         harmonic_odd_balanced(num, den, 1, n + 1, n, 1);
         _fmpq_canonicalise(num, den);

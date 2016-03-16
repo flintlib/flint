@@ -85,7 +85,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
     else if (ctx->mode == PADIC_SERIES)
     {
         flint_printf("ERROR (_padic_mat_fprint).  Mode PADIC_SERIES not implemented yet.\n");
-        abort();
+        flint_abort();
     }
     else if (ctx->mode == PADIC_VAL_UNIT)
     {
@@ -134,7 +134,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
     else
     {
         flint_printf("ERROR (_padic_mat_fprint).  Unknown print mode.\n");
-        abort();
+        flint_abort();
     }
 
     return 1;

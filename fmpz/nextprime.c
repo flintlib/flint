@@ -80,7 +80,7 @@ void fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved)
         else if (proof < 0)
         {
             flint_printf("Exception in fmpz_nextprime: Proof requested but couldn't be found\n");
-            abort();
+            flint_abort();
         }
     }
 }

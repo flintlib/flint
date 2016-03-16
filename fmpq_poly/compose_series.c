@@ -56,7 +56,7 @@ fmpq_poly_compose_series(fmpq_poly_t res,
     {
         flint_printf("Exception (fmpq_poly_compose_series). Inner polynomial \n"
                "must have zero constant term,\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || n == 0)

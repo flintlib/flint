@@ -116,7 +116,7 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state,
     if ((bits == 0) | (len == 0))
     {
         flint_printf("Exception (fmpq_poly_randtest_not_zeo). bits == 0.\n");
-        abort();
+        flint_abort();
     }
 
     fmpq_poly_randtest(f, state, len, bits);

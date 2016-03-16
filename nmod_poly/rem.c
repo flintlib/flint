@@ -67,7 +67,7 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
     if (lenB == 0)
     {
         flint_printf("Exception (nmod_poly_rem). Division by zero.\n");
-        abort();
+        flint_abort();
     }
     if (lenA < lenB)
     {

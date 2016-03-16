@@ -56,6 +56,8 @@
 #include <assert.h>
 #endif
 
+void flint_abort(void);
+
 #ifdef __cplusplus
  extern "C" {
 #endif

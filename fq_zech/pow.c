@@ -32,7 +32,7 @@ fq_zech_pow(fq_zech_t rop, const fq_zech_t op, const fmpz_t e,
     if (fmpz_sgn(e) < 0)
     {
         flint_printf("Exception (fq_zech_pow).  e < 0.\n");
-        abort();
+        flint_abort();
     }
     if (fmpz_is_zero(e))
     {

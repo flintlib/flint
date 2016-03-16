@@ -90,7 +90,7 @@ nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
     {
         flint_printf("Exception (nmod_poly_log_series_monomial_ui). \n"
                "Constant term != 1.\n");
-        abort();
+        flint_abort();
     }
 
     if (coeff != UWORD(1))

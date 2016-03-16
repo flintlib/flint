@@ -32,7 +32,7 @@
 namespace flint {
 // This is the common flintxx exception class, which is raised whenever the
 // C++ layer diagnoses a problem.
-// Note that the C layer will sometimes abort() with a message (in this case
+// Note that the C layer will sometimes flint_abort() with a message (in this case
 // no exception is thrown).
 class flint_exception
     : public std::domain_error // ?

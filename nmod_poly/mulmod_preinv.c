@@ -77,13 +77,13 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
     if (lenf == 0)
     {
         flint_printf("Exception (nmod_poly_mulmod_preinv). Divide by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (lenf <= len1 || lenf <= len2)
     {
         flint_printf("Exception (nmod_poly_mulmod_preinv). Input larger than modulus.\n");
-        abort();
+        flint_abort();
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)

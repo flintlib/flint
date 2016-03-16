@@ -172,7 +172,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
         {
             flint_printf("Exception (fmpz_poly_factor_zassenhaus). r > cutoff.\n");
             nmod_poly_factor_clear(fac);
-            abort();
+            flint_abort();
         }
         else if (r == 1)
         {

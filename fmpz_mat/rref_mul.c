@@ -91,7 +91,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
             {
                 flint_printf("Exception (fmpz_mat_rref_mul). "
                              "Singular input matrix for solve.");
-                abort();
+                flint_abort();
             }
         }
         else                        /* larger matrices use dixon */
@@ -101,7 +101,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
             {
                 flint_printf("Exception (fmpz_mat_rref_mul). "
                              "Singular input matrix for solve.");
-                abort();
+                flint_abort();
             }
             fmpq_mat_init(E2_q, rank, n - rank);
             /* TODO can be changed to one step */

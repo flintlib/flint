@@ -31,7 +31,7 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
 	
 	if(B->r != A->r || B->c != A->r) {
 		flint_printf("Exception (fmpz_mat_gram). Incompatible dimensions.\n");
-		abort();
+		flint_abort();
 	}
 	
 	if(B == A) {

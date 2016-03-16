@@ -124,7 +124,7 @@ nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
     if (lenf == 0)
     {
         flint_printf("Exception (nmod_poly_powmod_x_ui_preinv). Divide by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (lenf == 1)

@@ -96,7 +96,7 @@ nmod_poly_compose_series_brent_kung(nmod_poly_t res,
     {
         flint_printf("Exception (nmod_poly_compose_series_brent_kung). Inner \n"
                "polynomial must have zero constant term.\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || n == 0)
