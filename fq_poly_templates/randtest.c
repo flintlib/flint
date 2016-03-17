@@ -55,7 +55,7 @@ TEMPLATE(T, poly_randtest_not_zero) (TEMPLATE(T, poly_t) f, flint_rand_t state,
     {
         TEMPLATE_PRINTF("Exception (%s_poly_randtest_not_zero).  len = 0.\n",
                         T);
-        abort();
+        flint_abort();
     }
 
     TEMPLATE(T, poly_randtest) (f, state, len, ctx);

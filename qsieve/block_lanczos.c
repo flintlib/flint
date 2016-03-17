@@ -960,7 +960,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	}
 	if (i < ncols) {
 		flint_printf("lanczos error: dependencies don't work %wd\n",i);
-		abort();
+		flint_abort();
 	}
 	
 	flint_free(v[0]);

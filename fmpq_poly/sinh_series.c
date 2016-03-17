@@ -55,7 +55,7 @@ void fmpq_poly_sinh_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
     if (poly->length && !fmpz_is_zero(poly->coeffs))
     {
         flint_printf("Exception (fmpq_poly_sinh_series). Constant term != 0.\n");
-        abort();
+        flint_abort();
     }
 
     if (poly->length == 0 || n < 2)

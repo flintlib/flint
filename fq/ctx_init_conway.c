@@ -83,7 +83,7 @@ fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
     {
         flint_printf("Exception (fq_ctx_init_conway).  Conway polynomials \n");
         flint_printf("are only available for primes up to 109987.\n");
-        abort();
+        flint_abort();
     }
 
     result = _fq_ctx_init_conway(ctx, p, d, var);
@@ -93,6 +93,6 @@ fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
             ("Exception (fq_ctx_init_conway).  The polynomial for \n(p,d) = (");
         fmpz_print(p);
         flint_printf(",%wd) is not present in the database.\n", d);
-        abort();
+        flint_abort();
     }
 }

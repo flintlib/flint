@@ -143,7 +143,7 @@ void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
     if (G == S || G == T || S == T)
     {
         flint_printf("Exception (fmpq_poly_xgcd). Output arguments aliased.\n");
-        abort();
+        flint_abort();
     }
 
     if (A->length < B->length)

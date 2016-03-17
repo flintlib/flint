@@ -51,7 +51,7 @@ int main(void)
         if (!polyfile)
         {
             flint_printf("Error.  Could not read P1 from file.\n");
-            abort();
+            flint_abort();
         }
         fmpz_poly_fread(polyfile, f);
     }

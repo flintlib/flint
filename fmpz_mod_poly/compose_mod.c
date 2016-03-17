@@ -57,7 +57,7 @@ fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     {
         flint_printf("Exception (fmpz_mod_poly_compose_mod)."
                      "Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || len3 == 1)

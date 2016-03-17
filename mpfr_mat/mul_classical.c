@@ -53,7 +53,7 @@ mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B,
     {
         flint_printf
             ("Exception (mpfr_mat_mul_classical). Incompatible dimensions.\n");
-        abort();
+        flint_abort();
     }
 
     if (br == 0)

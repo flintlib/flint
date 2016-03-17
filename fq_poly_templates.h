@@ -1225,7 +1225,7 @@ void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
    if (A->r != A->c)
    {
        flint_printf("Exception (fq_mat_charpoly).  Non-square matrix.\n");
-       abort();
+       flint_abort();
    }
 
    TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);

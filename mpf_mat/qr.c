@@ -36,7 +36,7 @@ mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
     if (Q->r != A->r || Q->c != A->c || R->r != A->c || R->c != A->c)
     {
         flint_printf("Exception (mpf_mat_qr). Incompatible dimensions.\n");
-        abort();
+        flint_abort();
     }
 
     if (Q == A)

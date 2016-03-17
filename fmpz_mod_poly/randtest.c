@@ -68,7 +68,7 @@ fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
     if (len == 0)
     {
         flint_printf("Exception (fmpz_mod_poly_randtest_irreducible). len == 0.\n");
-        abort();
+        flint_abort();
     }
 
     fmpz_mod_poly_randtest(f, state, len);
@@ -83,7 +83,7 @@ fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
     if (len == 0)
     {
         flint_printf("Exception (fmpz_mod_poly_randtest_monic_irreducible). len == 0.\n");
-        abort();
+        flint_abort();
     }
 
     fmpz_mod_poly_randtest_monic(f, state, len);
@@ -98,7 +98,7 @@ fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
     if (len == 0)
     {
         flint_printf("Exception (fmpz_mod_poly_randtest_not_zero). len == 0.\n");
-        abort();
+        flint_abort();
     }
 
     fmpz_mod_poly_randtest(f, state, len);

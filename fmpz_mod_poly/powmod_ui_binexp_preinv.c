@@ -99,7 +99,7 @@ fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
     {
         flint_printf("Exception (fmpz_mod_poly_powmod_ui_binexp_preinv)."
                      "Divide by zero\n");
-        abort();
+        flint_abort();
     }
 
     if (len >= lenf)

@@ -127,7 +127,7 @@ fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
     if (fmpz_sgn(e) < 0)
     {
         flint_printf("Exception (fq_pow).  e < 0.\n");
-        abort();
+        flint_abort();
     }
 
     if (fmpz_is_zero(e))

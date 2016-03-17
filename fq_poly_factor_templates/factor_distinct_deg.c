@@ -76,7 +76,7 @@ TEMPLATE(T, poly_factor_distinct_deg) (TEMPLATE(T, poly_factor_t) res,
     {
         TEMPLATE_PRINTF("Exception (%s_poly_factor_distinct_deg):\n", T);
         flint_printf("Not enough memory.\n");
-        abort();
+        flint_abort();
     }
     H = h + (l + 1);
     I = H + m;

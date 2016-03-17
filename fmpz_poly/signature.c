@@ -77,7 +77,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
 		{
 			flint_printf("Exception (fmpz_poly_signature). Non-squarefree polynomial detected.\n");
             _fmpz_vec_clear(w, 2 * len + 2);
-			abort();
+			flint_abort();
 		}
       
         if ((fmpz_sgn(B + (lenB - 1)) > 0) || (delta & WORD(1)))

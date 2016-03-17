@@ -116,14 +116,14 @@ nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
     if (len3 == 0)
     {
         flint_printf("Exception (nmod_poly_compose_mod_brent_kung_preinv). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 >= len3)
     {
         flint_printf("Exception (nmod_poly_compose_mod_brent_kung_preinv). The degree of the \n"
                "first polynomial must be smaller than that of the modulus.\n");
-        abort();
+        flint_abort();
     }
 
     if (len1 == 0 || len3 == 1)

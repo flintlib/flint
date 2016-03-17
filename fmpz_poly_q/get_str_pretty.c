@@ -56,7 +56,7 @@ char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
     if (!str)
     {
         flint_printf("Exception (fmpz_poly_q_get_str_pretty). Memory allocation failed.\n");
-        abort();
+        flint_abort();
     }
     
     i = 0;

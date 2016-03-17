@@ -74,7 +74,7 @@ void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv,
     if (poly->length == 0)
     {
         flint_printf("Exception (fmpz_poly_powers_precompute). Division by zero.\n");
-        abort();
+        flint_abort();
     }
 
     pinv->powers = _fmpq_poly_powers_precompute(fmpq_poly_numref(poly), 

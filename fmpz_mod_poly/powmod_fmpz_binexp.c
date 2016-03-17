@@ -90,13 +90,13 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
     if (lenf == 0)
     {
         flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp). Divide by zero\n");
-        abort();
+        flint_abort();
     }
 
     if (fmpz_sgn(e) < 0)
     {
         flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp). negative exp not implemented\n");
-        abort();
+        flint_abort();
     }
 
     if (len >= lenf)

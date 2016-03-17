@@ -41,7 +41,7 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
    if (X->r != X->c)
    {
        flint_printf("Exception (fq_mat_charpoly).  Non-square matrix.\n");
-       abort();
+       flint_abort();
    }
 
    if (n == 0)

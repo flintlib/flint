@@ -73,12 +73,12 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, slong start, slong n)
             if      (m < WORD(1444))       prodsize = 6;
             else if (m < WORD(2097148))    prodsize = 3;
             else if (m < WORD(3037000495)) prodsize = 2;  /* not very likely... */
-            else abort();
+            else flint_abort();
 #else
             if      (m < WORD(32))    prodsize = 6;
             else if (m < WORD(1286))  prodsize = 3;
             else if (m < WORD(46336)) prodsize = 2;
-            else abort();
+            else flint_abort();
 #endif
         }
 

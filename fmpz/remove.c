@@ -120,7 +120,7 @@ slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
     if ((fmpz_sgn(f) <= 0) || fmpz_is_one(f))
     {
         flint_printf("Exception (fmpz_remove). factor f <= 1.\n");
-        abort();
+        flint_abort();
     }
 
     if (rop == f)

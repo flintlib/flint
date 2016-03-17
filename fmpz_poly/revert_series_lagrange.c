@@ -71,7 +71,7 @@ fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
     {
         flint_printf("Exception (fmpz_poly_revert_series_lagrange). Input must have \n"
                "zero constant term and +1 or -1 as coefficient of x^1\n.");
-        abort();
+        flint_abort();
     }
 
     if (Qinv != Q)

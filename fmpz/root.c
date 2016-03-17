@@ -41,7 +41,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
     if (n == 0)
     {
         flint_printf("Exception (fmpz_root). Unable to take 0-th root.\n");
-        abort();
+        flint_abort();
     }
 
     if (n == 1)
@@ -57,7 +57,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
             if (c < WORD(0))
             {
                 flint_printf("Exception (fmpz_root). Unable to take square root of negative value.\n");
-                abort();
+                flint_abort();
             }
 
             fmpz_set_ui(r, n_sqrt(c));

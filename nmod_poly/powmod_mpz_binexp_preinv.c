@@ -120,13 +120,13 @@ nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
     if (lenf == 0)
     {
         flint_printf("Exception (nmod_poly_powmod_mpz_binexp_preinv). Divide by zero.\n");
-        abort();
+        flint_abort();
     }
 
     if (mpz_sgn(e) < 0)
     {
         flint_printf("Exception (nmod_poly_powmod_mpz_binexp_preinv). Negative exp not implemented.\n");
-        abort();
+        flint_abort();
     }
 
     if (len >= lenf)

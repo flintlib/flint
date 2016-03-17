@@ -61,7 +61,7 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("mh = %wu, ml = %wu, sh = %wu, sl = %wu\n", mh, ml, sh, sl); 
          flint_printf("dh2 = %wu, dh1 = %wu, dl2 = %wu, dl1 = %wu\n", dh2, dh1, dl2, dl1);
-         abort();
+         flint_abort();
       }
    }
 

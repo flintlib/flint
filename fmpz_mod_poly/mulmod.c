@@ -73,7 +73,7 @@ fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     if (lenf == 0)
     {
         flint_printf("Exception (fmpz_mod_poly_mulmod). Divide by zero\n");
-        abort();
+        flint_abort();
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)

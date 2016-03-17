@@ -34,7 +34,7 @@ fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
     {
         flint_printf
             ("Exception (fmpz_mat_chol_d). Incompatible dimensions.\n");
-        abort();
+        flint_abort();
     }
 
     if (A->r == 0)
