@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#ifndef MFPR_MAT_H
+#ifndef MPFR_MAT_H
 #define MPFR_MAT_H
 
 #ifdef MPFR_MAT_INLINES_C
