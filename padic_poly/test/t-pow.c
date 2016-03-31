@@ -45,7 +45,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
         slong e;
@@ -86,7 +86,7 @@ main(void)
     }
 
     /* Compare with the computation over QQ */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
         fmpq_poly_t aQQ, bQQ;

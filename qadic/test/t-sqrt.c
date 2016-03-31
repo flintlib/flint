@@ -47,7 +47,7 @@ int main(void)
 /* PRIME p = 2 ***************************************************************/
 
     /* Check Artin Schreier preimages */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
         slong d;
@@ -99,7 +99,7 @@ int main(void)
     }
 
     /* Check aliasing: a = sqrt(a) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
         slong d, N;
@@ -142,7 +142,7 @@ int main(void)
     }
 
     /* Test random squares over finite fields */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
         slong deg, N;
@@ -211,7 +211,7 @@ int main(void)
     }
 
     /* Test random elements over finite fields */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
         slong d, N;
@@ -266,7 +266,7 @@ int main(void)
     }
 
     /* Test random squares */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
         slong deg, N;
@@ -348,7 +348,7 @@ int main(void)
     }
 
     /* Test random elements */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
         slong d, N;
@@ -405,7 +405,7 @@ int main(void)
 /* PRIME p != 2 **************************************************************/
 
     /* Check aliasing: a = sqrt(a) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N, q;
@@ -453,7 +453,7 @@ int main(void)
     }
 
     /* Test random squares over finite fields */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong deg, N, q;
@@ -526,7 +526,7 @@ int main(void)
     }
 
     /* Test random elements over finite fields */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N, q;
@@ -586,7 +586,7 @@ int main(void)
     }
 
     /* Test random squares */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong deg, N, q;
@@ -658,7 +658,7 @@ int main(void)
     }
 
     /* Test random elements */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N, q;

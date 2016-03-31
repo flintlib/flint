@@ -46,7 +46,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Check sigma^e(x) == x^{p^e}  */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c;
@@ -129,7 +129,7 @@ main(void)
     }
 
     /* Check sigma^e(x + y) = sigma^e(x) + sigma^e(y) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -183,7 +183,7 @@ main(void)
     }
 
     /* Check sigma^e(x * y) = sigma^e(x) * sigma^e(y) on Zq */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -219,7 +219,7 @@ main(void)
             flint_printf("s = "), TEMPLATE(T, print_pretty)(s, ctx), flint_printf("\n");
             flint_printf("s1 = "), TEMPLATE(T, print_pretty)(s1, ctx), flint_printf("\n");
             flint_printf("s2 = "), TEMPLATE(T, print_pretty)(s2, ctx), flint_printf("\n");
-            flint_printf("lhs = "), TEMPLATE(T, print_pretty)(lhs, ctx), flint_printf("\n");
+            flint_print * flint_test_multiplier()f("lhs = "), TEMPLATE(T, print_pretty)(lhs, ctx), flint_printf("\n");
             flint_printf("rhs = "), TEMPLATE(T, print_pretty)(rhs, ctx), flint_printf("\n");
             flint_printf("e = %wd\n", e);
             abort();

@@ -46,7 +46,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing: a = a^e */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b;
@@ -81,7 +81,7 @@ main(void)
     }
 
     /* Compare with multiplication, for integral values */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 

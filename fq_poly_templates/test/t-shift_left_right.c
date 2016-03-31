@@ -46,7 +46,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing for left shift */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len = n_randint(state, 100);
         TEMPLATE(T, ctx_t) ctx;
@@ -87,7 +87,7 @@ main(void)
     }
 
     /* Check aliasing for right shift */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len = n_randint(state, 100);
         TEMPLATE(T, ctx_t) ctx;
@@ -129,7 +129,7 @@ main(void)
     }
 
     /* Check shift left then right does nothing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len = n_randint(state, 100);
         TEMPLATE(T, ctx_t) ctx;

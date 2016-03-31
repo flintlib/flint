@@ -45,7 +45,7 @@ main(void)
     /* Generic case, most likely co-prime arguments ******************************/
 
     /* Check s*a == g mod b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, g, s, u;
@@ -91,7 +91,7 @@ main(void)
     /* Special case, arguments share a factor ********************************/
 
     /* Check s*a == g mod b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, f, g, s, u;

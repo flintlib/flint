@@ -48,7 +48,7 @@ main(void)
     fflush(stdout);    
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
 
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
 
@@ -122,7 +122,7 @@ main(void)
     }
 
     /* Check (b * c) + (b * d) = b * (c + d) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_poly_t a1, a2, b, c, d, t;
         slong v;
@@ -187,7 +187,7 @@ main(void)
     }
 
     /* Compare with Q */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c, d;
         fmpq_poly_t x, y, z;

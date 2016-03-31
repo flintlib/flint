@@ -54,7 +54,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing of res and f */
-    for (i = 0; i < 250; i++)
+    for (i = 0; i < 25 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t res, f, finv;
         fmpz_mod_poly_frobenius_powers_2exp_t pow;
@@ -96,7 +96,7 @@ main(void)
     }
 
     /* Compare powers_2exp and powers */
-    for (i = 0; i < 250; i++)
+    for (i = 0; i < 25 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t res, f, finv;
         fmpz_mod_poly_frobenius_powers_t pow;

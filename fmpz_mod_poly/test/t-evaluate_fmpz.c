@@ -44,7 +44,7 @@ main(void)
     
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, p;
         fmpz_mod_poly_t f;
@@ -79,7 +79,7 @@ main(void)
     }
 
     /* Check that the result agrees with Z[X] */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c, p;
         fmpz_mod_poly_t f;

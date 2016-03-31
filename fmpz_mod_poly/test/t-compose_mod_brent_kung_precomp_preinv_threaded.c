@@ -54,7 +54,7 @@ main(void)
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
 
     /* check precomputation */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c, cinv, * tmp;
         fmpz_t p;
@@ -152,7 +152,7 @@ main(void)
     }
 
     /* check composition */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c, cinv, d, *res;
         fmpz_t p;

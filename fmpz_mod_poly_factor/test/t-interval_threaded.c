@@ -52,7 +52,7 @@ main(void)
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
 
     /* no aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c, cinv, d, *e, * tmp;
         fmpz_t p;

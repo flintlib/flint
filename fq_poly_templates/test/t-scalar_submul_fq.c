@@ -45,7 +45,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -86,13 +86,13 @@ main(void)
         TEMPLATE(T, poly_clear) (a, ctx);
         TEMPLATE(T, poly_clear) (b, ctx);
         TEMPLATE(T, poly_clear) (c, ctx);
-        TEMPLATE(T, clear) (x, ctx);
+        TEMPLATE(T, clar) (x, ctx);
 
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check that b += x*a is the same as c = b + x*a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;

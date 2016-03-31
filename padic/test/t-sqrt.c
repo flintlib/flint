@@ -40,7 +40,7 @@ int main(void)
 /* PRIME p = 2 ***************************************************************/
 
     /* Check aliasing: a = sqrt(a) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -80,7 +80,7 @@ int main(void)
     }
 
     /* Test random elements */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -156,7 +156,7 @@ int main(void)
     }
 
     /* Test random squares */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -239,7 +239,7 @@ int main(void)
 /* PRIME p > 2 ***************************************************************/
 
     /* Check aliasing: a = sqrt(a) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -278,7 +278,7 @@ int main(void)
     }
 
     /* Test random elements */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -354,7 +354,7 @@ int main(void)
     }
 
     /* Test random squares */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;

@@ -44,7 +44,7 @@ main(void)
 
     TEMPLATE(T, poly_init) (a, ctx);
     for (len = 0; len < 100; len++)
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < 1 * flint_test_multiplier(); i++)
         {
             TEMPLATE(T, poly_randtest) (a, state, len, ctx);
             str = TEMPLATE(T, poly_get_str) (a, ctx);

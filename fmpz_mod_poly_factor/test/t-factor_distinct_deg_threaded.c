@@ -43,7 +43,7 @@ int main(void)
 
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
 
-    for (iter = 0; iter < 200; iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         fmpz_mod_poly_t poly1, poly, q, r, product;
         fmpz_mod_poly_factor_t res;

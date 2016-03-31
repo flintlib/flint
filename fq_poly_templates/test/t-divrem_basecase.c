@@ -45,7 +45,7 @@ main(void)
     fflush(stdout);
 
     /* Check q*b + r == a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -93,7 +93,7 @@ main(void)
     }
 
     /* Check aliasing: a and r */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -136,7 +136,7 @@ main(void)
     }
 
     /* Check aliasing: b and r */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -179,7 +179,7 @@ main(void)
     }
 
     /* Check aliasing: a and q */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -222,7 +222,7 @@ main(void)
     }
 
     /* Check aliasing: b and q */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 

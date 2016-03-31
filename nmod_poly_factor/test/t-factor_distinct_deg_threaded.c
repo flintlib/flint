@@ -44,7 +44,7 @@ main(void)
 
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
 
-    for (iter = 0; iter < 200; iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t poly1, poly, q, r, product;
         nmod_poly_factor_t res;

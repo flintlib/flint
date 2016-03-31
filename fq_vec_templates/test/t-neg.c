@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, struct) * a, *b;
@@ -72,7 +72,7 @@ main(void)
     }
 
     /* Check -(-a) == a */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, struct) * a, *b;

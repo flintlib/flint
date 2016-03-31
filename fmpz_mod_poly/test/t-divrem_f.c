@@ -44,7 +44,7 @@ main(void)
     
 
     /* Check q*b + r = a when gcd(lead(B),p) = 1, no aliasing */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_t f, p;
         fmpz_mod_poly_t a, b, q, r, t;
@@ -104,7 +104,7 @@ main(void)
     }
 
     /* Check f | p when gcd(lead(B),p) > 1 */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_t f, p, q1, q2;
         fmpz_mod_poly_t a, b, q, r, t;

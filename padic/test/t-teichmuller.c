@@ -38,7 +38,7 @@ main(void)
     
 
     /* Check aliasing (x 1,000) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -79,7 +79,7 @@ main(void)
     }
 
     /* Check x^p == x for word-sized p (x 10,000)*/
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong prime, N;

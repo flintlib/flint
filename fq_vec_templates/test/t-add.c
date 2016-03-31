@@ -43,7 +43,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* Check aliasing of b and c */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 

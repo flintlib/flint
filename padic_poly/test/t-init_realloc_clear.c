@@ -43,7 +43,7 @@ main(void)
 
     
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_poly_t a;
 
@@ -51,7 +51,7 @@ main(void)
         padic_poly_clear(a);
     }
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         slong N;
         fmpz_t p;
@@ -69,7 +69,7 @@ main(void)
         fmpz_clear(p);
     }
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_ctx_t ctx;
         fmpz_t p;

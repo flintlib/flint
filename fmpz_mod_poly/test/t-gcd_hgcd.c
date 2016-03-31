@@ -43,7 +43,7 @@ main(void)
     /* Generic case, most likely co-prime arguments ******************************/
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 300; i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;
@@ -77,7 +77,7 @@ main(void)
     }
 
     /* Check aliasing of b and c */
-    for (i = 0; i < 300; i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;
@@ -114,7 +114,7 @@ main(void)
         Check that g = GCD(a,b) divides a and b, 
         and that 1 == GCD(a/g, b/g)
      */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c, d, g, h, s, t;
@@ -178,7 +178,7 @@ main(void)
     /* Special case, arguments share a factor ********************************/
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 300; i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c, f;
@@ -217,7 +217,7 @@ main(void)
     }
 
     /* Check aliasing of b and c */
-    for (i = 0; i < 300; i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c, f;
@@ -259,7 +259,7 @@ main(void)
         Check that g = GCD(a,b) divides a and b, 
         and that 1 == GCD(a/g, b/g)
      */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c, d, f, g, h, s, t;

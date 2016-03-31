@@ -39,7 +39,7 @@ main(void)
     
 
     /* Check aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Compare with multiplication for e >= 0 and val(a) >= 0 */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -133,7 +133,7 @@ main(void)
     }
 
     /* Compare with fmpq, check precision */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N, N2;
@@ -191,7 +191,7 @@ main(void)
     }
 
     /* Check precision */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N_lo, N_hi, N_res;

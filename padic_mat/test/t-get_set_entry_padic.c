@@ -47,7 +47,7 @@ main(void)
     flint_printf("get/ set_entry_padic... ");
     fflush(stdout);    
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_mat_t a;
         padic_t x, y;

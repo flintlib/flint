@@ -45,7 +45,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing of the first argument */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check aliasing of the second argument */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -121,7 +121,7 @@ main(void)
     }
 
     /* Compare with the naive method */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 

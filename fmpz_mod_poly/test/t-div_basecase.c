@@ -44,7 +44,7 @@ main(void)
     
 
     /* Compare to divrem_basecase */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, q, q2, r2;
@@ -100,7 +100,7 @@ main(void)
     }
 
     /* Alias a and q */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, q;
@@ -150,7 +150,7 @@ main(void)
     }
 
     /* Alias b and q */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, q;

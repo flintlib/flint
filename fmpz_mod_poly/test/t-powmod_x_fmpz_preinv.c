@@ -54,7 +54,7 @@ main(void)
     fflush(stdout);
 
     /* No aliasing */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, res1, res2, f, finv;
         fmpz_t p;
@@ -105,7 +105,7 @@ main(void)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 250; i++)
+    for (i = 0; i < 25 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t res, f, finv;
         fmpz_t p;
@@ -148,7 +148,7 @@ main(void)
     }
 
     /* Aliasing of res and finv */
-    for (i = 0; i < 250; i++)
+    for (i = 0; i < 25 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t res, f, finv;
         fmpz_t p;
@@ -192,7 +192,7 @@ main(void)
     }
 
     /* Check that x^(b+c) = x^b * x^c */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t res1, res2, res3, res4, f, finv;
         fmpz_t p;

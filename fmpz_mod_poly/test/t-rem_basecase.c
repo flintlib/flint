@@ -44,7 +44,7 @@ main(void)
     
 
     /* Check q*b + r = a, no aliasing */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, q, r, t;
@@ -100,7 +100,7 @@ main(void)
     }
 
     /* Alias b and r */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, r;
@@ -150,7 +150,7 @@ main(void)
     }
 
     /* a and r */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, r;

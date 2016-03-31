@@ -45,7 +45,7 @@ main(void)
     flint_printf("is_irreducible_ddf....");
     fflush(stdout);
 
-    for (iter = 0; iter < 50; iter++)
+    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) poly1, poly2;

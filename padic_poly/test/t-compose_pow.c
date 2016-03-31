@@ -44,7 +44,7 @@ main(void)
     fflush(stdout);    
 
     /* Aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
         slong k;
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Compare with usual composition */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_poly_t f, g, h1, h2;
         slong k;

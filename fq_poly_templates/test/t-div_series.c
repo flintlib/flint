@@ -40,7 +40,7 @@ main(void)
     fflush(stdout);
 
     /* Check A*B^{-1} * B is congruent A mod t^n */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, d;

@@ -66,7 +66,7 @@ int main(void)
 
     
 
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t f, r;

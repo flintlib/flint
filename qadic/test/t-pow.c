@@ -42,7 +42,7 @@ main(void)
     
 
     /* Check aliasing: a = a^e */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Compare with multiplication, for integral values */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;

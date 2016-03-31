@@ -42,7 +42,7 @@ main(void)
     
 
     /* Check aliasing: a = ~a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Check a * ~a == 1 for units */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;

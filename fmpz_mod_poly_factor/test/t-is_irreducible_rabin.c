@@ -42,7 +42,7 @@ main(void)
     flint_printf("is_irreducible_rabin....");
     fflush(stdout);
 
-    for (iter = 0; iter < 100; iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         fmpz_mod_poly_t poly1, poly2;
         fmpz_t modulus;

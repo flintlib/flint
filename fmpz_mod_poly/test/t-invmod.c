@@ -45,7 +45,7 @@ main(void)
     /* Test aliasing *************************************************************/
 
     /* Aliasing c and a */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Aliasing c and b */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;
@@ -125,7 +125,7 @@ main(void)
     }
 
     /* Compare with result from XGCD */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, g, s, t, u;
@@ -178,7 +178,7 @@ main(void)
     /* Special case, arguments share a factor ********************************/
 
     /* Check correctness */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, f, u;

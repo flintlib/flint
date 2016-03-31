@@ -44,7 +44,7 @@ main(void)
     
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;
@@ -79,7 +79,7 @@ main(void)
     }
 
     /* Check constants have derivative zero */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b;
@@ -109,7 +109,7 @@ main(void)
     }
 
     /* Check (f g)' = f' g + f g' */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c, d, lhs, rhs;

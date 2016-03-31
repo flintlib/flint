@@ -17,7 +17,7 @@ main(void)
     
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_q_t a, b, c;
 
@@ -47,7 +47,7 @@ main(void)
     }
 
     /* Check aliasing of b and c */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_q_t a, b, c;
 

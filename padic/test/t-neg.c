@@ -39,7 +39,7 @@ main(void)
     
 
     /* Check aliasing: a = - a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -77,7 +77,7 @@ main(void)
     }
 
     /* Check that - (- a) == a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -115,7 +115,7 @@ main(void)
     }
 
     /* Check that a + (-a) == 0 */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;

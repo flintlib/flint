@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing of res and f */
-    for (i = 0; i < 25; i++)
+    for (i = 0; i < 2.5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) res, t, f, finv;
@@ -89,7 +89,7 @@ main(void)
     }
 
     /* No aliasing -- compare with binexp */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, t, f, finv;

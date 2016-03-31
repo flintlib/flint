@@ -44,7 +44,7 @@ main(void)
     fflush(stdout);    
 
     /* Compare with the computation over QQ */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         padic_poly_t f;
         fmpq_poly_t fQQ;

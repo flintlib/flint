@@ -39,7 +39,7 @@ main(void)
 
     
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;

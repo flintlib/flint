@@ -51,7 +51,7 @@ main(void)
     fflush(stdout);
 
     /* no aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c, cinv, d, e;
         fmpz_t p;
@@ -99,7 +99,7 @@ main(void)
     }
 
     /* Test aliasing of res and a */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c, cinv, d;
         fmpz_t p;
@@ -143,7 +143,7 @@ main(void)
     }
 
     /* Test aliasing of res and b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c, cinv, d;
         fmpz_t p;
@@ -187,7 +187,7 @@ main(void)
     }
 
     /* Test aliasing of res and c */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c, cinv, d;
         fmpz_t p;
@@ -231,7 +231,7 @@ main(void)
     }
 
     /* Test aliasing of res and cinv */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c, cinv, d;
         fmpz_t p;

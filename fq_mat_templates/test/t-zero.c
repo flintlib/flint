@@ -40,7 +40,7 @@ main(void)
     printf("zero/is_zero....");
     fflush(stdout);
 
-    for (iter = 0; iter < 100; iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, mat_t) A;

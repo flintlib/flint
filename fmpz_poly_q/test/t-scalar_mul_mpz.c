@@ -18,7 +18,7 @@ main(void)
     
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_q_t a, b;
         fmpz_t x;
@@ -52,7 +52,7 @@ main(void)
     }
 
     /* Check that x (a + b) == x * a + x * b */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_q_t a, b, c, d;
         fmpz_t x;

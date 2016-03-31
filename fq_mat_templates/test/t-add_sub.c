@@ -41,7 +41,7 @@ main(void)
     printf("add/sub/neg....");
     fflush(stdout);
 
-    for (rep = 0; rep < 500; rep++)
+    for (rep = 0; rep < 50 * flint_test_multiplier(); rep++)
     {
         TEMPLATE(T, ctx_t) ctx;
 

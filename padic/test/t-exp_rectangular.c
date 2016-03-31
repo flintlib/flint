@@ -40,7 +40,7 @@ main(void)
 /** p == 2 *******************************************************************/
 
     /* Check aliasing: a = exp(a) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Functional equation: exp(a + b) == exp(a) exp(b) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -146,7 +146,7 @@ main(void)
 /** p > 2 ********************************************************************/
 
     /* Check aliasing: a = exp(a) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -189,7 +189,7 @@ main(void)
     }
 
     /* Functional equation: exp(a + b) == exp(a) exp(b) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;

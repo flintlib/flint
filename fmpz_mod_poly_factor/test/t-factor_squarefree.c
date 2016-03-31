@@ -45,7 +45,7 @@ main(void)
     flint_printf("factor_squarefree....");
     fflush(stdout);
 
-    for (iter = 0; iter < 300; iter++)
+    for (iter = 0; iter < 30 * flint_test_multiplier(); iter++)
     {
         int result = 1;
         fmpz_mod_poly_t pol1, poly, quot, rem;

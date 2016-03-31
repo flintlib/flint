@@ -54,7 +54,7 @@ main(void)
     
 
     /* Check q*b + r = a, no aliasing */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, binv, q, r, t, q2, r2;
@@ -139,7 +139,7 @@ main(void)
     }
 
     /* Alias a and q, b and r */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, binv, q, r;
@@ -201,7 +201,7 @@ main(void)
     }
 
     /* Alias b and q, a and r */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, binv, q, r;
@@ -263,7 +263,7 @@ main(void)
     }
 
     /* Alias binv and q, a and r*/
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, binv, q, r;
@@ -326,7 +326,7 @@ main(void)
     }
 
     /* Alias binv and q, b and r*/
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, binv, q, r;
@@ -389,7 +389,7 @@ main(void)
     }
 
     /* Alias a and q, binv and r*/
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, binv, q, r;
@@ -452,7 +452,7 @@ main(void)
     }
 
     /* Alias b and q, binv and r*/
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, binv, q, r;

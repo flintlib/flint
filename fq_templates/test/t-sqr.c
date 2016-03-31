@@ -46,7 +46,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing: a = a * a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* Check a^2 + a^2 = a(a + a) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c, d;

@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c;
         fmpz_t p;
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Check powering against naive method */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, c;
         fmpz_t p;

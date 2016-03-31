@@ -44,7 +44,7 @@ main(void)
     
 
     /* Check aliasing of a and b for left shift */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b;
@@ -76,7 +76,7 @@ main(void)
     }
 
     /* Check aliasing of a and b for right shift */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b;
@@ -110,7 +110,7 @@ main(void)
     }
 
     /* Check shift left then right does nothing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;

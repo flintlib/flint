@@ -36,7 +36,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing for padic_val_fac() */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c, p;
 
@@ -70,7 +70,7 @@ main(void)
     }
 
     /* Check correctness for padic_val_fac_ui(), p == 2 */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, p;
 
@@ -106,7 +106,7 @@ main(void)
     }
 
     /* Check correctness for padic_val_fac_ui(), any p */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, p;
 
@@ -142,7 +142,7 @@ main(void)
     }
 
     /* Compare padic_val_fac_ui() with padic_val_fac() */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, p, t, z;
 

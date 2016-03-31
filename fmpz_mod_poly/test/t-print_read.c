@@ -45,12 +45,14 @@ extern FILE * fdopen(int fildes, const char *mode);
 
 int main(void)
 {
-    int i, j, n = 1000, result;
+    int i, j, n, result;
 
     FILE *in, *out;
     int fd[2];
     pid_t childpid;
     fmpz_t two;
+
+    n = 100 * flint_test_multiplier();
 
     FLINT_TEST_INIT(state);
 

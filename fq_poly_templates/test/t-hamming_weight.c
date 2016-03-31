@@ -46,7 +46,7 @@ main(void)
     fflush(stdout);
 
     /* Check consistency */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Check that wt(a+b) \leq wt(a) + wt(b) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;

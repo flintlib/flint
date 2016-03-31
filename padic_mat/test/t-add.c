@@ -47,7 +47,7 @@ int main(void)
     fflush(stdout);    
 
     /* Check aliasing: a = a + b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_mat_t a, b, d;
 
@@ -88,7 +88,7 @@ int main(void)
     }
 
     /* Check aliasing: b = a + b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_mat_t a, b, d;
 
@@ -129,7 +129,7 @@ int main(void)
     }
 
     /* Check aliasing: a = a + a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_mat_t a, b, c;
 
@@ -172,7 +172,7 @@ int main(void)
     }
 
     /* Check commutativity: a + b == b + a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_mat_t a, b, c, d;
 
@@ -216,7 +216,7 @@ int main(void)
     }
 
     /* Check zero element: a + 0 == a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_mat_t a, b;
 

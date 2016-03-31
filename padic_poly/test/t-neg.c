@@ -45,7 +45,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
 
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check that --a = a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
 

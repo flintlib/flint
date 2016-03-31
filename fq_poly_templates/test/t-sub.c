@@ -46,7 +46,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing: a = a - b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -86,7 +86,7 @@ main(void)
     }
 
     /* Check aliasing: b = a - b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -126,7 +126,7 @@ main(void)
     }
 
     /* Check aliasing: a = a - a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -161,7 +161,7 @@ main(void)
     }
 
     /* Check that a - b == -(b - a) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;

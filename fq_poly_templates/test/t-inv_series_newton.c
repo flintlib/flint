@@ -40,7 +40,7 @@ main(void)
     fflush(stdout);
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, one;

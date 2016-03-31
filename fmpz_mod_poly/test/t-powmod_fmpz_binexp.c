@@ -44,7 +44,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing of res and a */
-    for (i = 0; i < 250; i++)
+    for (i = 0; i < 25 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, res, t, f;
         fmpz_t p;
@@ -86,7 +86,7 @@ main(void)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 250; i++)
+    for (i = 0; i < 25 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, res, t, f;
         fmpz_t p;
@@ -128,7 +128,7 @@ main(void)
     }
 
     /* No aliasing */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, res1, res2, t, f;
         fmpz_t p;
@@ -173,7 +173,7 @@ main(void)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, res1, res2, res3, res4, t, f;
         fmpz_t p;

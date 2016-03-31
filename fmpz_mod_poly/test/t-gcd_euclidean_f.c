@@ -44,7 +44,7 @@ main(void)
         N.B.  I checked by hand that this test shows both outcomes, 
         i.e. trivial and non-trivial factors, sufficiently frequently.
      */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p, f;
         fmpz_mod_poly_t a, b, c, d;

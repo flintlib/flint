@@ -17,7 +17,7 @@ main(void)
     
 
     /* Equal polynomials */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_q_t a, b;
 
@@ -40,7 +40,7 @@ main(void)
         fmpz_poly_q_clear(b);
     }
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_q_t a, b;
         slong coeff = n_randint(state, 50);

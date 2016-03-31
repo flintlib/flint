@@ -45,7 +45,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -91,7 +91,7 @@ main(void)
     }
 
     /* Check (f + g)(a) == f(a) + g(a) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;

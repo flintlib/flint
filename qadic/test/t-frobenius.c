@@ -42,7 +42,7 @@ main(void)
     
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;
@@ -87,7 +87,7 @@ main(void)
     }
 
     /* Check sigma^e(x) == x^{p^e} mod p for integral values */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;
@@ -147,7 +147,7 @@ main(void)
     }
 
     /* Check sigma^e(x + y) = sigma^e(x) + sigma^e(y) on Zq */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;
@@ -207,7 +207,7 @@ main(void)
     }
 
     /* Check sigma^e(x * y) = sigma^e(x) * sigma^e(y) on Zq */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;

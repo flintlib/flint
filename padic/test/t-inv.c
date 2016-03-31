@@ -45,7 +45,7 @@ main(void)
 /* PRIME p = 2 ***************************************************************/
 
     /* Check aliasing: a = a^{-1} (mod p^N) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Check that correct only mod p^{N} */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -139,7 +139,7 @@ main(void)
 /* PRIME p > 2 ***************************************************************/
 
     /* Check aliasing: a = a^{-1} (mod p^N) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -179,7 +179,7 @@ main(void)
     }
 
     /* Check that correct only mod p^{N} */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;

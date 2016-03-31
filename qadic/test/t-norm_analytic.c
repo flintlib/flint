@@ -41,7 +41,7 @@ main(void)
     
 
     /* Compare with product of Galois conjugates */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;

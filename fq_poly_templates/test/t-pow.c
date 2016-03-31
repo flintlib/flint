@@ -46,7 +46,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing  */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -88,7 +88,7 @@ main(void)
     }
 
     /* Compare with repeated multiplications by the base */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;

@@ -42,7 +42,7 @@ main(void)
     
 
     /* Check aliasing */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Check x^q == x for units */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_t p, q;
         slong d, N;

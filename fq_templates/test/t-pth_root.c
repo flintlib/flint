@@ -45,7 +45,7 @@ main(void)
     fflush(stdout);
 
     /* Compare with sum of Galois conjugates */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b;

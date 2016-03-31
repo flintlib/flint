@@ -44,7 +44,7 @@ main(void)
     
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c, one;

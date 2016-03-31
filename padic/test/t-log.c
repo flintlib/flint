@@ -54,7 +54,7 @@ main(void)
 /** p == 2 *******************************************************************/
 
     /* Check aliasing: a = log(a) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
         slong N;
@@ -93,7 +93,7 @@ main(void)
     }
 
     /* Check: log(a) + log(b) == log(a * b) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
         slong N;
@@ -154,7 +154,7 @@ main(void)
     }
 
     /* Check: log(exp(x)) == x */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p = {WORD(2)};
         slong N;
@@ -198,7 +198,7 @@ main(void)
 /** p > 2 ********************************************************************/
 
     /* Check aliasing: a = log(a) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -239,7 +239,7 @@ main(void)
     }
 
     /* Check: log(a) + log(b) == log(a * b) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -308,7 +308,7 @@ main(void)
     }
 
     /* Check: log(exp(x)) == x */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;

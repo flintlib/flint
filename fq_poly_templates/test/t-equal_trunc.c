@@ -46,7 +46,7 @@ main(void)
     fflush(stdout);
 
     /* Compare equal polys */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
@@ -90,7 +90,7 @@ main(void)
     }
 
     /* Compare unequal polys */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 

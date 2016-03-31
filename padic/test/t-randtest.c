@@ -39,7 +39,7 @@ main(void)
     
 
     /* Check randtest() */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong lo, hi, N;
@@ -87,7 +87,7 @@ main(void)
     }
 
     /* Check randtest_not_zero() */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong lo, hi, N;

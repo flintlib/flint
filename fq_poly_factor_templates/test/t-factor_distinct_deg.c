@@ -44,7 +44,7 @@ main(void)
     flint_printf("factor_distinct_deg....");
     fflush(stdout);
 
-    for (iter = 0; iter < 200; iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) poly1, poly, q, r, product;

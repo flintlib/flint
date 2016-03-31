@@ -44,7 +44,7 @@ main(void)
     
 
     /* Check a - b = a + neg(b) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c, d;
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;
@@ -118,7 +118,7 @@ main(void)
     }
 
     /* Check aliasing of b and c */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;

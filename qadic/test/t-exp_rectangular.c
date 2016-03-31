@@ -40,7 +40,7 @@ main(void)
     
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong d, N;
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Functional equation: exp(a + b) == exp(a) exp(b) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong deg, N;

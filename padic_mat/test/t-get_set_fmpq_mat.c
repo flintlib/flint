@@ -48,7 +48,7 @@ main(void)
     fflush(stdout);
 
     /* Qp -> QQ -> Qp */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_mat_t a, c;
         fmpq_mat_t b;

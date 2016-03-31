@@ -45,7 +45,7 @@ main(void)
     flint_printf("ctx_init... ");
     fflush(stdout);
 
-    for (i = 0; i < 30; i++) {
+    for (i = 0; i < 3 * flint_test_multiplier(); i++) {
         fmpz_t p;
         slong d;
         TEMPLATE(T, ctx_t) ctx;
@@ -59,7 +59,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    for (i = 0; i < 30; i++) {
+    for (i = 0; i < 3 * flint_test_multiplier(); i++) {
         fmpz_t p;
         slong d;
         TEMPLATE(T, ctx_t) ctx_conway, ctx_mod;

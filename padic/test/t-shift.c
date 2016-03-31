@@ -39,7 +39,7 @@ main(void)
     
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check that (a * b) * c == a * (b * c), correct only mod p^{N-v} */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         slong N;

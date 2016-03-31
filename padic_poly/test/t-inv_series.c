@@ -44,7 +44,7 @@ main(void)
     fflush(stdout);    
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
         slong n;
@@ -98,7 +98,7 @@ main(void)
         and we will have a b = 1 mod p^{N-|v|}.  Thus, require 
         that N - |v| > 0.
      */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
         slong n, N2;

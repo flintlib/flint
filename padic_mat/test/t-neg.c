@@ -48,7 +48,7 @@ main(void)
     fflush(stdout);    
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_mat_t a, b;
 
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Check a + (-a) == 0 */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_mat_t a, b, c;
 

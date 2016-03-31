@@ -17,7 +17,7 @@ main(void)
     
 
     /* Check aliasing */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         int ans1, ans2;
         mpq_t a, b;

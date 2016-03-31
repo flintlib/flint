@@ -37,7 +37,7 @@ main(void)
     flint_printf("factor_equal_deg_prob....");
     fflush(stdout);
 
-    for (iter = 0; iter < 200; iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         fmpz_mod_poly_t poly1, poly2, q, r;
         fmpz_t modulus;

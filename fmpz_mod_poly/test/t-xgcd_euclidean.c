@@ -45,7 +45,7 @@ main(void)
     /* Generic case, most likely co-prime arguments ******************************/
 
     /* Compare with result from GCD and check correctness */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, d, g, s, t, v, w;
@@ -100,7 +100,7 @@ main(void)
     /* Special case, arguments share a factor ********************************/
 
     /* Compare with result from GCD and check correctness */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, d, f, g, s, t, v, w;

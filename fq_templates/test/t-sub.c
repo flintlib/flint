@@ -46,7 +46,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing: a = a - b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c;
@@ -81,7 +81,7 @@ main(void)
     }
 
     /* Check aliasing: b = a - b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c;
@@ -116,7 +116,7 @@ main(void)
     }
 
     /* Check aliasing: a = a - a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, c;
@@ -147,7 +147,7 @@ main(void)
     }
 
     /* Check that a - b == -(b - a) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c1, c2;
@@ -186,7 +186,7 @@ main(void)
     }
 
     /* Check that (a - b) - c == a - (b + c) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 

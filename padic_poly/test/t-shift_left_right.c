@@ -45,7 +45,7 @@ main(void)
     fflush(stdout);    
 
     /* Aliasing for left shift */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
         slong shift = n_randint(state, 100);
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Aliasing for shift right */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
         slong shift = n_randint(state, 100);
@@ -123,7 +123,7 @@ main(void)
     }
 
     /* Check shift left then right does nothing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_poly_t a, b, c;
         slong shift = n_randint(state, 100);

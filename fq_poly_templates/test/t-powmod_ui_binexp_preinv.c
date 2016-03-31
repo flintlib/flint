@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing of res and a */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, t, f, finv;
@@ -91,7 +91,7 @@ main(void)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, t, f, finv;
@@ -141,7 +141,7 @@ main(void)
     }
 
     /* No aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, t, f, finv;
@@ -201,7 +201,7 @@ main(void)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, res3, res4, t, f, finv;
