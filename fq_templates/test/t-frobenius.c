@@ -219,7 +219,7 @@ main(void)
             flint_printf("s = "), TEMPLATE(T, print_pretty)(s, ctx), flint_printf("\n");
             flint_printf("s1 = "), TEMPLATE(T, print_pretty)(s1, ctx), flint_printf("\n");
             flint_printf("s2 = "), TEMPLATE(T, print_pretty)(s2, ctx), flint_printf("\n");
-            flint_print * flint_test_multiplier()f("lhs = "), TEMPLATE(T, print_pretty)(lhs, ctx), flint_printf("\n");
+            flint_printf("lhs = "), TEMPLATE(T, print_pretty)(lhs, ctx), flint_printf("\n");
             flint_printf("rhs = "), TEMPLATE(T, print_pretty)(rhs, ctx), flint_printf("\n");
             flint_printf("e = %wd\n", e);
             abort();

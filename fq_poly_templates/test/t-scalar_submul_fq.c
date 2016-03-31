@@ -86,7 +86,7 @@ main(void)
         TEMPLATE(T, poly_clear) (a, ctx);
         TEMPLATE(T, poly_clear) (b, ctx);
         TEMPLATE(T, poly_clear) (c, ctx);
-        TEMPLATE(T, clar) (x, ctx);
+        TEMPLATE(T, clear) (x, ctx);
 
         TEMPLATE(T, ctx_clear) (ctx);
     }
