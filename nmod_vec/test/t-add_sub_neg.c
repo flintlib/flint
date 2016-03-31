@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Check (a + b) - b == a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         slong len = n_randint(state, 100) + 1;
         nmod_t mod;
@@ -73,7 +73,7 @@ main(void)
     }
 
     /* Check (a + -b) == a - b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         slong len = n_randint(state, 100) + 1;
         mp_limb_t n = n_randtest_not_zero(state);

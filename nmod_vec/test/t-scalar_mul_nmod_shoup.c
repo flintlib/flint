@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check (a + b)*c == a*c + b*c */
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         slong len = n_randint(state, 100) + 1;
         mp_limb_t n = n_randtest_not_zero(state) / 2 + 1;

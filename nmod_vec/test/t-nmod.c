@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* nmod_add */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
         mp_limb_t m, a, b, c;
@@ -77,7 +77,7 @@ main(void)
     }
 
     /* nmod_sub */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
         mp_limb_t m, a, b, c;
@@ -113,7 +113,7 @@ main(void)
     }
 
     /* nmod_mul */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
         mp_limb_t m, a, b, c;
@@ -149,7 +149,7 @@ main(void)
     }
 
     /* nmod_div */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
         mp_limb_t m, a, b, c;
@@ -188,7 +188,7 @@ main(void)
     }
 
     /* nmod_inv */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
         mp_limb_t m, b, c;
@@ -221,7 +221,7 @@ main(void)
     }
 
     /* nmod_pow_ui */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
         mp_limb_t m, b, c;

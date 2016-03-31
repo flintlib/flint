@@ -40,7 +40,7 @@ main(void)
     flint_printf("dot_bound_limbs....");
     fflush(stdout);
 
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
         slong len;
         nmod_t mod;

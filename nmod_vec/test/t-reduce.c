@@ -40,7 +40,7 @@ main(void)
     flint_printf("reduce....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         slong j, len = n_randint(state, 100) + 1;
         mp_ptr vec = _nmod_vec_init(len);
