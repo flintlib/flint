@@ -33,12 +33,13 @@ int main(void)
     fmpz_t prime1, prime2, primeprod, fac, modval;
     int i, j, k, fails;
 
+    FLINT_TEST_INIT(state);
+
     fmpz_init(prime1);
     fmpz_init(prime2);
     fmpz_init(primeprod);
     fmpz_init(fac);
     fmpz_init(modval);
-    FLINT_TEST_INIT(state);
 
     fails = 0;
 
@@ -81,13 +82,12 @@ int main(void)
         abort();
     }
 
-    FLINT_TEST_CLEANUP(state);
     fmpz_clear(prime1);
     fmpz_clear(prime2);
     fmpz_clear(primeprod);
     fmpz_clear(fac);
     fmpz_clear(modval);
-
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }
