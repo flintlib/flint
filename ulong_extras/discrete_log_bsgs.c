@@ -98,6 +98,7 @@ n_discrete_log_bsgs_table(const bsgs_t t, ulong b)
     }
     flint_printf("Exception (n_discrete_log_bsgs).  discrete log not found.\n");
     flint_abort();
+    return 0; /* not reached, but silence the compiler */
 }
 
 ulong

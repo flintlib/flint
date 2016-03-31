@@ -92,6 +92,7 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
     {
         printf("Exception (fmpz_mat_jacobsthal). Not an odd prime power.\n");
         flint_abort();
+        p = 0; /* not reached, but silence compiler warning */
     }
 
     fmpz_init_set_ui(pp, p);

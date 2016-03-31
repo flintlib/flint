@@ -125,4 +125,6 @@ int n_is_prime_pseudosquare(mp_limb_t n)
         flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
         flint_abort();
     }
+
+    return 0;  /* not reached, but silence the compiler */
 }

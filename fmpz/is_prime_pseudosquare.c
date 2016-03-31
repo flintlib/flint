@@ -236,6 +236,8 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
     int ret;
     const mp_limb_t * primes;
 
+    ret = -1; /* silence compiler warning (not set when aborting) */
+
     if (fmpz_sgn(n) <= 0) 
        return 0;
 
