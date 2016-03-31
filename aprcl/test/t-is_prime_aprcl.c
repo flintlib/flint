@@ -37,7 +37,7 @@ int main(void)
     flint_printf("is_prime....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         int pbprime, cycloprime;
         fmpz_t n;

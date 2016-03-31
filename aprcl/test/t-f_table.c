@@ -37,7 +37,7 @@ int main(void)
     flint_printf("f_table....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong len, q, p, g;
         mp_ptr table;

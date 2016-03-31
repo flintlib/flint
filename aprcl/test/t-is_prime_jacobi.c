@@ -164,7 +164,7 @@ int main(void)
 
     /* Test is_prime_jacobi. */
     {
-        for (i = 0; i < 10000; i++)
+        for (i = 0; i < 200 * flint_test_multiplier(); i++)
         {
             int pbprime, cycloprime;
             fmpz_t n;

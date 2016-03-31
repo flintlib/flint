@@ -43,7 +43,7 @@ int main(void)
         fmpz_init(t[i]);
 
     /* test multiplication in Z[\zeta_2^2] */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, k;
         fmpz_t n;
@@ -102,7 +102,7 @@ int main(void)
     }
 
     /* test multiplication in Z[\zeta_2^3] */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, k;
         fmpz_t n;
@@ -161,7 +161,7 @@ int main(void)
     }
 
     /* test multiplication in Z[\zeta_2^4] */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, k;
         fmpz_t n;

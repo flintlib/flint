@@ -43,7 +43,7 @@ int main(void)
         fmpz_init(t[i]);
 
     /* test squaring in Z[\zeta_4] */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, k;
         fmpz_t n;
@@ -94,7 +94,7 @@ int main(void)
     }
 
     /* test squaring in Z[\zeta_8] */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, k;
         fmpz_t n;
@@ -145,7 +145,7 @@ int main(void)
     }
 
     /* test squaring in Z[\zeta_16] */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, k;
         fmpz_t n;

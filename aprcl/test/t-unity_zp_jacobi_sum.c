@@ -41,7 +41,7 @@ int main(void)
         test computation of
         j(\chi_{p, q}, \chi_{p, q})
     */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong ind, q, p, k;
         fmpz_t n;
@@ -94,7 +94,7 @@ int main(void)
         test computation of
         j(\chi_{2, q}^{2^{k - 3}}, \chi_{2, q}^{3 * 2^{k - 3}}))^2
     */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong q, p, k;
         fmpz_t n;
@@ -146,7 +146,7 @@ int main(void)
         test computation of
         j(\chi_{2, q}, \chi_{2, q}, \chi_{2, q})
     */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong a, b, q, p, k;
         fmpz_t n;

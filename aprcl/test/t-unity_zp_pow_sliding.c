@@ -37,7 +37,7 @@ int main(void)
     flint_printf("unity_zp_pow_sliding....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p;
         fmpz_t n, pow;

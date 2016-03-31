@@ -37,7 +37,7 @@ int main(void)
     flint_printf("unity_zp_reduce_cyclotomic....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t cyclo_poly;
         ulong p, exp;

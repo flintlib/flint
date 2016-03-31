@@ -38,7 +38,7 @@ int main(void)
     fflush(stdout);
 
     /* test that \zeta_p^i * \zeta_p^j computest correctly */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, ind1, ind2;
         fmpz_t n;
@@ -80,7 +80,7 @@ int main(void)
     }
 
     /* test commutative */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p;
         fmpz_t n;

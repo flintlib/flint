@@ -37,7 +37,7 @@ int main(void)
     flint_printf("unity_zp_aut_inv....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong ind, q, p, k, x;
         fmpz_t n;

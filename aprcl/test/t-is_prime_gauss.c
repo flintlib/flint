@@ -37,7 +37,7 @@ int main(void)
     flint_printf("is_prime_gauss....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         int pbprime, cycloprime;
         fmpz_t n;
@@ -78,10 +78,14 @@ int main(void)
         if (is_prime_gauss(n) == 0)
             result = 0;
 
-        /* 5991810554633396517767024967580894321153 % 4 == 1 */
-        fmpz_set_str(n, "5991810554633396517767024967580894321153", 10);
-        if (is_prime_gauss(n) == 0)
-            result = 0;
+        /* Very slow. */
+        if (flint_test_multiplier() > 10)
+        {
+            /* 5991810554633396517767024967580894321153 % 4 == 1 */
+            fmpz_set_str(n, "5991810554633396517767024967580894321153", 10);
+            if (is_prime_gauss(n) == 0)
+                result = 0;
+        }
 
         /* Test big composite. */
         /* 1500450271 * 5915587277 */

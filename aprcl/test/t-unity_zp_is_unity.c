@@ -37,11 +37,12 @@ int main(void)
     flint_printf("unity_zp_is_unity....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, exp;
         fmpz_t n;
         unity_zp f;
+        ulong ind;
 
         p = n_randprime(state, 2 + n_randint(state, 4), 0);
         exp =  n_randint(state, 5);        
@@ -55,7 +56,7 @@ int main(void)
 
         unity_zp_init(f, p, 1, n);
 
-        ulong ind = n_randint(state, n_pow(p, exp));
+        ind = n_randint(state, n_pow(p, exp));
 
         unity_zp_coeff_set_ui(f, ind, 1);
 

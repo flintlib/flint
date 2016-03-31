@@ -37,27 +37,27 @@ int main(void)
     flint_printf("unity_zpq_pow....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, q, pow;
         fmpz_t n;
         unity_zpq f, g, h1, h2;
 
-        p = n_randprime(state, 2 + n_randint(state, 6), 0);
-        q = n_randprime(state, 2 + n_randint(state, 6), 0);
+        p = n_randprime(state, 2 + n_randint(state, 5), 0);
+        q = n_randprime(state, 2 + n_randint(state, 5), 0);
 
-        pow =  n_randint(state, 32);        
+        pow =  n_randint(state, 32);
 
-        fmpz_randtest_unsigned(n, state, 200);
+        fmpz_randtest_unsigned(n, state, 100);
         while (fmpz_equal_ui(n, 0) != 0)
-            fmpz_randtest_unsigned(n, state, 200);
+            fmpz_randtest_unsigned(n, state, 100);
 
         unity_zpq_init(f, q, p, n);
         unity_zpq_init(g, q, p, n);
         unity_zpq_init(h1, q, p, n);
         unity_zpq_init(h2, q, p, n);
 
-        for (j = 0; j < 100; j++)
+        for (j = 0; j < 50; j++)
         {
             ulong x, y;
             fmpz_t val;
@@ -67,7 +67,7 @@ int main(void)
             x = n_randint(state, p);
             y = n_randint(state, q);
             
-            fmpz_randtest_not_zero(val, state, 200);
+            fmpz_randtest_not_zero(val, state, 100);
 
             unity_zpq_coeff_set_fmpz(h1, y, x, val);
 
@@ -77,10 +77,13 @@ int main(void)
         unity_zpq_copy(h2, h1);
 
         unity_zpq_pow_ui(f, h2, pow);
+
         if (pow == 0)
         {
             unity_zpq_coeff_set_ui(g, 0, 0, 1);
-        } else {
+        }
+        else
+        {
             for (j = 0; j < pow; j++)
             {
                 unity_zpq_mul(g, h1, h2);

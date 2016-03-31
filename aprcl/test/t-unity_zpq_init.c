@@ -37,7 +37,7 @@ int main(void)
     flint_printf("unity_zpq_init....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, q;
         fmpz_t n;
