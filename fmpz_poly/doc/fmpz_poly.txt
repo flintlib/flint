@@ -3028,7 +3028,7 @@ void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
     $$
     2 \max \left(
         \left|\frac{a_{n-1}}{a_n}\right|,
-        \left|\frac{a_{n-2}}{a_n}\right|^{\frac{1}{2}}, \dots
+        \left|\frac{a_{n-2}}{a_n}\right|^{\frac{1}{2}}, \dotsc
         \left|\frac{a_1}{a_n}\right|^{\frac{1}{n-1}},
         \left|\frac{a_0}{2a_n}\right|^{\frac{1}{n}}
     \right)
