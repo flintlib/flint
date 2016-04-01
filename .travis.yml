@@ -4,6 +4,27 @@ addons:
   apt:
     packages:
       - texinfo
+
+os:
+  - osx
+  - linux
+
+compiler:
+  - gcc
+  - clang
+
+cache:
+  directories:
+  - $HOME/deps
+
 script:
-  - ./.build_dependencies && ./configure --with-mpir=mpir-2.7.0 --with-mpfr=mpfr-3.1.4 && make && make check
+  - if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${CC}" == "gcc" ]]; then
+        export CC=gcc-4.8;
+        export CXX=g++-4.8;
+    fi
+  - echo "int flint_test_multiplier(){return 1;}" > test_helpers.c
+  - if [ ! -d "$HOME/deps" ]; then 
+        ./.build_dependencies;
+    fi
+  - ./configure --with-mpir=$HOME/deps --with-mpfr=$HOME/deps && make && make check
 
