@@ -28,7 +28,7 @@
 void
 _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
 {
-    fmpz_t c, two;
+    fmpz_t c;
     ulong fac = 1;
 
     if (n == 0)
@@ -45,10 +45,8 @@ _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
     }
 
     fmpz_init(c);
-    fmpz_init(two);
-    fmpz_set_ui(two, 2);
-    fmpz_pow_ui(c, two, n);
-    fmpz_clear(two);
+    fmpz_one(c);
+    fmpz_mul_2exp(c, c, n);
 
     while (1)
     {
