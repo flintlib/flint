@@ -3149,6 +3149,14 @@ void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
     defined by $(n+1) U_n(x) = T'_{n+1}(x)$.
     The coefficients are calculated using a hypergeometric recurrence.
 
+void _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
+
+void fmpz_poly_hermite_h(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Hermite polynomial $H_n(x)$,
+    defined by $H'_n(x) = 2nH_{n-1}(x)$. The coefficients are
+    calculated using a hypergeometric recurrence.
+
 *******************************************************************************
 
     Fibonacci polynomials
