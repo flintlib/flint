@@ -51,13 +51,13 @@ _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
     while (1)
     {
         fmpz_set(coeffs + n, c);
-        fmpz_divexact_si(c, c, -4);
-        fmpz_mul_ui(c, c, n);
         if (--n == 0)
             break;
 
         fmpz_zero(coeffs + n);
-        fmpz_mul_ui(c, c, n);
+        fmpz_neg(c, c);
+        fmpz_mul2_uiui(c, c, n+1, n);
+        fmpz_fdiv_q_2exp(c, c, 2);
         fmpz_divexact_ui(c, c, fac);
         ++fac;
         if (--n == 0)
