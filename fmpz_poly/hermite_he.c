@@ -19,14 +19,14 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Ralf Stephan
+    Copyright (C) 2016 Ralf Stephan
 
 ******************************************************************************/
 
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
+_fmpz_poly_hermite_he(fmpz * coeffs, ulong n)
 {
     fmpz_t c;
     ulong fac = 1;
@@ -40,13 +40,12 @@ _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
     if (n == 1)
     {
         fmpz_zero(coeffs);
-        fmpz_set_ui(coeffs + 1, 2);
+        fmpz_one(coeffs + 1);
         return;
     }
 
     fmpz_init(c);
     fmpz_one(c);
-    fmpz_mul_2exp(c, c, n);
 
     while (1)
     {
@@ -55,9 +54,9 @@ _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
             break;
 
         fmpz_zero(coeffs + n);
-        fmpz_neg(c, c);
         fmpz_mul2_uiui(c, c, n+1, n);
-        fmpz_fdiv_q_2exp(c, c, 2);
+        fmpz_neg(c, c);
+        fmpz_fdiv_q_2exp(c, c, 1);
         fmpz_divexact_ui(c, c, fac);
         ++fac;
         if (--n == 0)
@@ -71,9 +70,9 @@ _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
 }
 
 void
-fmpz_poly_hermite_h(fmpz_poly_t poly, ulong n)
+fmpz_poly_hermite_he(fmpz_poly_t poly, ulong n)
 {
     fmpz_poly_fit_length(poly, n + 1);
-    _fmpz_poly_hermite_h(poly->coeffs, n);
+    _fmpz_poly_hermite_he(poly->coeffs, n);
     _fmpz_poly_set_length(poly, n + 1);
 }

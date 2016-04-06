@@ -1241,6 +1241,10 @@ FLINT_DLL void _fmpz_poly_hermite_h(fmpz * coeffs, ulong n);
 
 FLINT_DLL void fmpz_poly_hermite_h(fmpz_poly_t poly, ulong n);
 
+FLINT_DLL void _fmpz_poly_hermite_he(fmpz * coeffs, ulong n);
+
+FLINT_DLL void fmpz_poly_hermite_he(fmpz_poly_t poly, ulong n);
+
 FLINT_DLL void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n);
 
 FLINT_DLL void fmpz_poly_fibonacci(fmpz_poly_t poly, ulong n);
