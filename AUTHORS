@@ -125,14 +125,38 @@ functions.
 
 $\bullet$ Kushagra Singh contributed fast cube root and nth root code for word
 sized integers, including magic number, Newton iteration, Kahan iteration and
-Chebyshev approximation code.
+Chebyshev approximation code, he also contributed ECM and Pollard's Rho
+factoring algorithm implementations as part of a Google Summer of Code.
 
 $\bullet$ Andreas Enge help with a port to MIPS64.
 
-$\bullet$ Tommy Hofmann supplied some inline functions.
+$\bullet$ Tommy Hofmann implemented Howell and strong echelon form and supplied 
+some inline functions.
 
 $\bullet$ Ashish Kedia contributed an implementation of the Paterson-Stockmeyer
 algorithm
+
+$\bullet$ Nitin Kumar contributed under a Google Summer of Code project to the
+quadratic sieve
+
+$\bullet$ Vladimir Glazachev contributed an implementation of the APRCL
+primality testing algorithm and Shoup multiplication as part of a Google Summer
+of Code
+
+$\bullet$ Dan Roche contributed randprime and nextprime functions for the fmpz
+module
+
+$\bullet$ Shivin Shrivastava contributed Fibonacci polynomials and some Taylor
+shift improvements
+
+$\bullet$ Alex Griffing contributed integer factor refinement and numerous small
+patches
+
+$\bullet$ Vincent Delecroix contributed power sums and some patches
+
+$\bullet$ Aaditya Thakkar contributed Strassen multiplication over Z
+
+$\bullet$ Ralf Stephan contributed Hermite polynomials
 
 $\bullet$ Patches and bug reports have been made by Michael Abshoff, 
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
@@ -142,7 +166,8 @@ Fr\'{e}d\'{e}ric Chyzak, Julien Puydt, Dana Jacobsen, Michael Jacobson Jr.,
 Mike Stillman, Jan Englehardt, Jean-Pierre Flori, Jeroen Demeyer, Shi Bai,
 Qingwen Guan, Frithjof Schulze, Robert Baillie, Oleksandr Motsak, Hans
 Schoenemann, Janko Boehm, Ahmed Soliman, Francois Bissey, Anton Mellit, Daniel
-Roche, Denis Kryskov, Vladimir Glazachev, Daniel Fabian, Julien Ospald, mgkurtz, Max Goldfar, Vincent Delecroix and others.
+Roche, Denis Kryskov, Daniel Fabian, Julien Ospald, mgkurtz, Max Goldfar, Max
+Horn, lzmths, Claus Fieker, Volker Braun, Pascal Molin and others.
 
 $\bullet$ In addition Michael Abshoff, William Stein and Robert Bradshaw have
 contributed to the build system of FLINT.
