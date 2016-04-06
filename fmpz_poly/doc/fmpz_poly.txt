@@ -3157,6 +3157,14 @@ void fmpz_poly_hermite_h(fmpz_poly_t poly, ulong n)
     defined by $H'_n(x) = 2nH_{n-1}(x)$. The coefficients are
     calculated using a hypergeometric recurrence.
 
+void _fmpz_poly_hermite_he(fmpz * coeffs, ulong n)
+
+void fmpz_poly_hermite_he(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Hermite polynomial $He_n(x)$,
+    defined by $He_n(x) = 2^{-\tfrac{n}{2}}H_n\left(\frac{x}{\sqrt2}\right)$.
+    The coefficients are calculated using a hypergeometric recurrence.
+
 *******************************************************************************
 
     Fibonacci polynomials
