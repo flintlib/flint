@@ -3138,7 +3138,7 @@ void _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n)
 void fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n)
 
     Sets \code{poly} to the Chebyshev polynomial of the first kind $T_n(x)$,
-    defined by $T_n(x) = \cos(n \cos^{-1}(x))$. The coefficients are
+    defined by $T_n(x) = \cos(n \cos^{-1}(x))$, for $n\ge0$. The coefficients are
     calculated using a hypergeometric recurrence.
 
 void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n)
@@ -3146,34 +3146,49 @@ void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n)
 void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
 
     Sets \code{poly} to the Chebyshev polynomial of the first kind $U_n(x)$,
-    defined by $(n+1) U_n(x) = T'_{n+1}(x)$.
+    defined by $(n+1) U_n(x) = T'_{n+1}(x)$, for $n\ge0$.
     The coefficients are calculated using a hypergeometric recurrence.
+
+void _fmpz_poly_legendre_pt(fmpz * coeffs, ulong n)
+
+    Sets \code{coeffs} to the coefficient array of the shifted Legendre
+    polynomial $\tilde{P_n}(x)$, defined by $\tilde{P_n(x)} = P_n(2x-1)$, for $n\ge0$.
+    The coefficients are calculated using a hypergeometric recurrence.
+    The length of the array will be \code{n+1}.
+    See \code{fmpq_poly} for the Legendre polynomials.
+
+void fmpz_poly_legendre_pt(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the shifted Legendre polynomial $\tilde{P_n}(x)$,
+    defined by $\tilde{P_n(x)} = P_n(2x-1)$, for $n\ge0$. The coefficients are
+    calculated using a hypergeometric recurrence. See \code{fmpq_poly}
+    for the Legendre polynomials.
 
 void _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
 
     Sets \code{coeffs} to the coefficient array of the Hermite
-    polynomial $H_n(x)$, defined by $H'_n(x) = 2nH_{n-1}(x)$.
+    polynomial $H_n(x)$, defined by $H'_n(x) = 2nH_{n-1}(x)$, for $n\ge0$.
     The coefficients are calculated using a hypergeometric recurrence.
     The length of the array will be \code{n+1}.
 
 void fmpz_poly_hermite_h(fmpz_poly_t poly, ulong n)
 
     Sets \code{poly} to the Hermite polynomial $H_n(x)$,
-    defined by $H'_n(x) = 2nH_{n-1}(x)$. The coefficients are
+    defined by $H'_n(x) = 2nH_{n-1}(x)$, for $n\ge0$. The coefficients are
     calculated using a hypergeometric recurrence.
 
 void _fmpz_poly_hermite_he(fmpz * coeffs, ulong n)
 
     Sets \code{coeffs} to the coefficient array of the Hermite
     polynomial $He_n(x)$, defined by
-    $He_n(x) = 2^{-\tfrac{n}{2}}H_n\left(\frac{x}{\sqrt2}\right)$.
+    $He_n(x) = 2^{-\tfrac{n}{2}}H_n\left(\frac{x}{\sqrt2}\right)$, for $n\ge0$.
     The coefficients are calculated using a hypergeometric recurrence.
     The length of the array will be \code{n+1}.
 
 void fmpz_poly_hermite_he(fmpz_poly_t poly, ulong n)
 
     Sets \code{poly} to the Hermite polynomial $He_n(x)$,
-    defined by $He_n(x) = 2^{-\tfrac{n}{2}}H_n\left(\frac{x}{\sqrt2}\right)$.
+    defined by $He_n(x) = 2^{-\tfrac{n}{2}}H_n\left(\frac{x}{\sqrt2}\right)$, for $n\ge0$.
     The coefficients are calculated using a hypergeometric recurrence.
 
 *******************************************************************************
