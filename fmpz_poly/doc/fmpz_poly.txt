@@ -3151,9 +3151,10 @@ void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
 
 void _fmpz_poly_legendre_pt(fmpz * coeffs, ulong n)
 
-    Sets \code{poly} to the coeficient array of the shifted Legendre
+    Sets \code{coeffs} to the coeficient array of the shifted Legendre
     polynomial $\tilde{P_n}(x)$, defined by $\tilde{P_n(x)} = P_n(2x-1)$.
     The coefficients are calculated using a hypergeometric recurrence.
+    The length of the array will be \code{n+1}.
     See \code{fmpq_poly} for the Legendre polynomials.
 
 void fmpz_poly_legendre_pt(fmpz_poly_t poly, ulong n)
