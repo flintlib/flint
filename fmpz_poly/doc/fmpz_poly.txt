@@ -3149,6 +3149,20 @@ void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
     defined by $(n+1) U_n(x) = T'_{n+1}(x)$.
     The coefficients are calculated using a hypergeometric recurrence.
 
+void _fmpz_poly_legendre_pt(fmpz * coeffs, ulong n)
+
+    Sets \code{poly} to the coeficient array of the shifted Legendre
+    polynomial $\tilde{P_n}(x)$, defined by $\tilde{P_n(x)} = P_n(2x-1)$.
+    The coefficients are calculated using a hypergeometric recurrence.
+    See \code{fmpq_poly} for the Legendre polynomials.
+
+void fmpz_poly_legendre_pt(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the shifted Legendre polynomial $\tilde{P_n}(x)$,
+    defined by $\tilde{P_n(x)} = P_n(2x-1)$. The coefficients are
+    calculated using a hypergeometric recurrence. See \code{fmpq_poly}
+    for the Legendre polynomials.
+
 void _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
 
     Sets \code{coeffs} to the coefficient array of the Hermite
