@@ -649,6 +649,10 @@ FLINT_DLL void _fmpq_poly_tanh_series(fmpz * g, fmpz_t gden,
 
 FLINT_DLL void fmpq_poly_tanh_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 
+/* Orthogonal polynomials  ***************************************************/
+
+FLINT_DLL void fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n);
+
 /*  Evaluation  **************************************************************/
 
 FLINT_DLL void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
