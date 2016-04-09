@@ -40,7 +40,7 @@ main(void)
     {
         mp_limb_t n;
         nmod_poly_t a, b, c, d, e;
-        n = 53;                 /* TODO: a random number not divisible by small primes! */
+        n = n_randprime(state, 10, 1);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

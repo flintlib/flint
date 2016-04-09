@@ -32,8 +32,6 @@ main(void)
 {
     int l, result;
     mp_limb_t i, j, k, tot;
-    nmod_t mod;
-    mp_limb_t n;
 
     FLINT_TEST_INIT(state);
 
@@ -41,16 +39,22 @@ main(void)
 
     /* Check that it is valid in degree 3 with integer roots, ie */
     /* for polynomials of the form (x-i)(x-j)(x-k)               */
-    n = 101;                    /* TODO: a random number not divisible by small primes! */
-    nmod_init(&mod, n);
     for (i = 0; i < 4; i++)
         for (j = 0; j < 4; j++)
             for (k = 0; k < 4; k++)
             {
-                nmod_poly_t a, b, c;
+                mp_limb_t n;
+                nmod_t mod;
+                nmod_poly_t a, b, c, d;
+
+                n = 20 + n_randbits(state, 8);
+                n = n_nextprime(n, 1);
+                nmod_init(&mod, n);
+
                 nmod_poly_init(a, n);
                 nmod_poly_init(b, n);
                 nmod_poly_init(c, n);
+                nmod_poly_init(d, n);
 
                 nmod_poly_set_coeff_ui(a, 0, n - i * j * k);
                 nmod_poly_set_coeff_ui(a, 1, i * j + i * k + j * k);
@@ -58,6 +62,8 @@ main(void)
                 nmod_poly_set_coeff_ui(a, 3, 1);
 
                 nmod_poly_power_sums_schoenhage(b, a, 20);
+                nmod_poly_set(d, a);
+                nmod_poly_power_sums_naive(d, d, 20);
 
                 for (l = 0; l < FLINT_MIN(20, nmod_poly_length(b)); l++)
                 {
@@ -65,17 +71,26 @@ main(void)
                                    nmod_pow_ui(j, l, mod), mod);
                     tot = nmod_add(tot, nmod_pow_ui(k, l, mod), mod);
 
-                    result = nmod_poly_get_coeff_ui(b, l) == tot;
+                    result = nmod_poly_get_coeff_ui(b, l) == tot &&
+                        nmod_poly_get_coeff_ui(d, l) == tot;
                     if (!result)
                     {
                         flint_printf("FAIL: power sums integral root\n");
                         flint_printf("%d %d %d %d\n", i, j, k, l);
+                        flint_printf("a = "), nmod_poly_print(a),
+                            flint_printf("\n");
+                        flint_printf("b = "), nmod_poly_print(b),
+                            flint_printf("\n");
+                        flint_printf("d = "), nmod_poly_print(d),
+                            flint_printf("\n");
                         abort();
                     }
                 }
 
                 nmod_poly_power_sums_to_poly_schoenhage(c, b);
-                result = nmod_poly_equal(a, c);
+                nmod_poly_set(d, b);
+                nmod_poly_power_sums_to_poly_schoenhage(d, d);
+                result = nmod_poly_equal(a, c) && nmod_poly_equal(a, d);
                 if (!result)
                 {
                     flint_printf("FAIL: power sums to poly schoenhage\n");
@@ -91,17 +106,22 @@ main(void)
                 nmod_poly_clear(a);
                 nmod_poly_clear(b);
                 nmod_poly_clear(c);
+                nmod_poly_clear(d);
             }
 
     /* Check that going back and forth between the power sums representation gives the identity */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        nmod_poly_t a, b, c;
-        n = 5003;               /* TODO: a random number not divisible by small primes! */
+        nmod_poly_t a, b, c, d;
+        mp_limb_t n;
+
+        n = 35 + n_randbits(state, 8);
+        n = n_nextprime(n, 1);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
+        nmod_poly_init(d, n);
 
         nmod_poly_randtest_not_zero(a, state, 1 + n_randint(state, 20));
         nmod_poly_make_monic(a, a);
@@ -109,7 +129,11 @@ main(void)
         nmod_poly_power_sums_schoenhage(b, a, 30);
         nmod_poly_power_sums_to_poly_schoenhage(c, b);
 
-        result = nmod_poly_equal(a, c);
+        nmod_poly_set(d, a);
+        nmod_poly_power_sums_schoenhage(d, d, 30);
+        nmod_poly_power_sums_to_poly_schoenhage(d, d);
+
+        result = nmod_poly_equal(a, c) && nmod_poly_equal(a, d);
         if (!result)
         {
             flint_printf("FAIL: power sums - power sums to poly\n");
@@ -125,15 +149,18 @@ main(void)
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(c);
+        nmod_poly_clear(d);
     }
 
 
     /* Check that the product of polynomials correspond to the sum of Power sums series */
-    /* (and aliasing of nmod_poly_power_sums)                                           */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        n = 5003;               /* TODO: a random number not divisible by small primes! */
+        mp_limb_t n;
+        n = n_randprime(state, 10, 1);
+        n = 25 + n_randbits(state, 8);
+        n = n_nextprime(n, 1);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

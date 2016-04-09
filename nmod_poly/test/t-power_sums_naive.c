@@ -32,8 +32,6 @@ main(void)
 {
     int l, result;
     mp_limb_t i, j, k, tot;
-    nmod_t mod;
-    mp_limb_t n;
 
     FLINT_TEST_INIT(state);
 
@@ -41,13 +39,18 @@ main(void)
 
     /* Check that it is valid in degree 3 with integer roots, ie */
     /* for polynomials of the form (x-i)(x-j)(x-k)               */
-    n = 101;                    /* TODO: a random number not divisible by small primes! */
-    nmod_init(&mod, n);
     for (i = 0; i < 4; i++)
         for (j = 0; j < 4; j++)
             for (k = 0; k < 4; k++)
             {
+                mp_limb_t n;
+                nmod_t mod;
                 nmod_poly_t a, b, c, d;
+
+                n = 20 + n_randbits(state, 8);
+                n = n_nextprime(n, 1);
+                nmod_init(&mod, n);
+
                 nmod_poly_init(a, n);
                 nmod_poly_init(b, n);
                 nmod_poly_init(c, n);
@@ -112,7 +115,10 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        n = 5003;               /* TODO: a random number not divisible by small primes! */
+        mp_limb_t n;
+
+        n = 35 + n_randbits(state, 8);
+        n = n_nextprime(n, 1);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -151,7 +157,10 @@ main(void)
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        n = 5003;               /* TODO: a random number not divisible by small primes! */
+        mp_limb_t n;
+        n = n_randprime(state, 10, 1);
+        n = 25 + n_randbits(state, 8);
+        n = n_nextprime(n, 1);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
