@@ -145,7 +145,9 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
     \code{len}, but thinking of it as a polynomial of length~\code{m},
     notionally zero-padded if necessary. The length~\code{m} must be
     non-negative, but there are no other restrictions. The polynomial
-    \code{output} must have space for \code{m} coefficients.
+    \code{output} must have space for \code{m} coefficients. Supports
+    aliasing of \code{output} and \code{input}, but the behaviour is
+    undefined in case of partial overlap.
 
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m)
 
@@ -1299,7 +1301,7 @@ void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, slong len, nmod_t mod)
     The constant term of \code{x_int} is set to zero.
     It is assumed that \code{len > 0}. The result is only well-defined
     if the modulus is a prime number strictly larger than the degree of
-    \code{x}.
+    \code{x}. Supports aliasing between the two polynomials.
 
 void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x)
 
@@ -2401,6 +2403,74 @@ int nmod_poly_sqrt(nmod_poly_t s, const nmod_poly_t p)
 
     If $p$ is a perfect square, sets $s$ to a square root of $p$
     and returns 1. Otherwise returns 0.
+
+*******************************************************************************
+
+    Power sums
+
+*******************************************************************************
+
+void _nmod_poly_power_sums_naive(mp_ptr res, mp_srcptr poly, slong len, slong n, nmod_t mod)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{(poly,len)} up to length $n$ using Newton identities.
+
+void nmod_poly_power_sums_naive(nmod_poly_t res, const nmod_poly_t poly, slong n)
+
+    Compute the (truncated) power sum series of the polynomial
+    \code{poly} up to length $n$ using Newton identities.
+
+void _nmod_poly_power_sums_schoenhage(mp_ptr res, mp_srcptr poly, slong len, slong n, nmod_t mod)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{(poly,len)} up to length $n$ using a series expansion
+    (a formula due to Schoenhage).
+
+void nmod_poly_power_sums_schoenhage(nmod_poly_t res, const nmod_poly_t poly, slong n)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{(poly,len)} up to length $n$ using a series expansion
+    (a formula due to Schoenhage).
+
+void _nmod_poly_power_sums(mp_ptr res, mp_srcptr poly, slong len, slong n, nmod_t mod)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{(poly,len)} up to length $n$.
+
+void nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{(poly,len)} up to length $n$.
+
+void _nmod_poly_power_sums_to_poly_naive(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{(poly,len)} using Newton identities.
+
+void nmod_poly_power_sums_to_poly_naive(nmod_poly_t res, const nmod_poly_t Q)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{(poly,len)} using Newton identities.
+
+void _nmod_poly_power_sums_to_poly_schoenhage(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{(poly,len)} using series expansion (a formula due to Schoenhage).
+
+void nmod_poly_power_sums_to_poly_schoenhage(nmod_poly_t res, const nmod_poly_t Q)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{(poly,len)} using series expansion (a formula due to Schoenhage).
+
+void _nmod_poly_power_sums_to_poly(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{(poly,len)}.
+
+void nmod_poly_power_sums_to_poly(nmod_poly_t res, const nmod_poly_t Q)
+
+     Compute the (monic) polynomial given by its power sums series
+    \code{(poly,len)}.
 
 *******************************************************************************
 
