@@ -45,6 +45,8 @@ _fmpq_poly_legendre_p(fmpz * coeffs, fmpz_t den, ulong n)
 
     fmpz_init(c);
     fmpz_bin_uiui(c, 2*n, n);
+    fmpz_zero(coeffs);
+    fmpz_one(den);
     fmpz_set(coeffs + n, c);
     for (k = 1; k <= n/2; k++)
     {
