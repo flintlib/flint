@@ -190,6 +190,7 @@ main(void)
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
         fmpq_poly_clear(c);
+        fmpq_poly_clear(d);
     }
 
     FLINT_TEST_CLEANUP(state);

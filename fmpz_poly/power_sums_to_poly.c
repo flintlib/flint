@@ -46,13 +46,12 @@ _fmpz_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, slong len)
     }
     for (k = len; k <= d; k++)
     {
-        fmpz_set(res + d - k, poly + k);
+        fmpz_zero(res + d - k);
         for (i = 1; i < len; i++)
             fmpz_addmul(res + d - k, res + d - k + i, poly + i);
         fmpz_divexact_si(res + d - k, res + d - k, k);
         fmpz_neg(res + d - k, res + d - k);
     }
-
 }
 
 void
