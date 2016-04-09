@@ -32,7 +32,7 @@ void
 _nmod_poly_power_sums_to_poly(mp_ptr res, mp_srcptr poly, slong len,
                               nmod_t mod)
 {
-    if (len <= 10)
+    if (mod.n <= 12 || poly[0] <= 10)
         _nmod_poly_power_sums_to_poly_naive(res, poly, len, mod);
     else
         _nmod_poly_power_sums_to_poly_schoenhage(res, poly, len, mod);
