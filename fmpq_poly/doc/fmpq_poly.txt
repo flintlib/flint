@@ -1337,6 +1337,35 @@ void fmpq_poly_tanh_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
 
 *******************************************************************************
 
+    Orthogonal polynomials
+
+*******************************************************************************
+
+void _fmpq_poly_legendre_p(fmpq * coeffs, ulong n)
+
+    Sets \code{coeffs} to the coefficient array of the Legendre polynomial
+    $P_n(x)$, defined by $(n+1) P_{n+1}(x) = (2n+1) x P_n(x) - n P_{n-1}(x)$, for $n\ge0$.
+    The coefficients are calculated using a hypergeometric recurrence.
+    The length of the array will be \code{n+1}.
+    To improve performance, the common denominator is computed in one step
+    and the coefficients are evaluated using integer arithmetic. The
+    denominator is given by
+    $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
+    See \code{fmpz_poly} for the shifted Legendre polynomials.
+
+void fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Legendre polynomial $P_n(x)$, defined
+    by $(n+1) P_{n+1}(x) = (2n+1) x P_n(x) - n P_{n-1}(x)$, for $n\ge0$.
+    The coefficients are calculated using a hypergeometric recurrence.
+    To improve performance, the common denominator is computed in one step
+    and the coefficients are evaluated using integer arithmetic. The
+    denominator is given by
+    $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
+    See \code{fmpz_poly} for the shifted Legendre polynomials.
+
+*******************************************************************************
+
     Evaluation
 
 *******************************************************************************

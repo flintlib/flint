@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "arith.h"
+#include "fmpq_poly.h"
 
 static __inline__ void __legendre_denom(fmpz_t den, ulong n)
 {
@@ -40,12 +40,27 @@ static __inline__ void __legendre_denom(fmpz_t den, ulong n)
     fmpz_mul_2exp(den, den, d);
 }
 
-void _arith_legendre_polynomial(fmpz * coeffs, fmpz_t den, ulong n)
+void _fmpq_poly_legendre_p(fmpz * coeffs, fmpz_t den, ulong n)
 {
     fmpz * r;
     int odd;
     slong k;
     ulong L;
+
+    if (n == 0)
+    {
+        fmpz_one(coeffs);
+        fmpz_one(den);
+        return;
+    }
+
+    if (n == 1)
+    {
+        fmpz_zero(coeffs);
+        fmpz_one(coeffs + 1);
+        fmpz_one(den);
+        return;
+    }
 
     L = n / 2;
     odd = n % 2;
@@ -74,24 +89,11 @@ void _arith_legendre_polynomial(fmpz * coeffs, fmpz_t den, ulong n)
         fmpz_zero(coeffs + k);
 }
 
-void arith_legendre_polynomial(fmpq_poly_t poly, ulong n)
+void
+fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n)
 {
-    if (n == 0)
-    {
-        fmpq_poly_set_ui(poly, UWORD(1));
-        return;
-    }
-
     fmpq_poly_fit_length(poly, n + 1);
-
-    if (n == 1)
-    {
-        fmpz_zero(poly->coeffs);
-        fmpz_one(poly->coeffs + 1);
-        fmpz_one(poly->den);
-    }
-    else
-        _arith_legendre_polynomial(poly->coeffs, poly->den, n);
-
+    _fmpq_poly_legendre_p(poly->coeffs, poly->den, n);
     _fmpq_poly_set_length(poly, n + 1);
 }
+
