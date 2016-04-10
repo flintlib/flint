@@ -26,5 +26,5 @@ script:
   - if [ ! -d "$HOME/deps" ]; then 
         ./.build_dependencies;
     fi
-  - ./configure --with-mpir=$HOME/deps --with-mpfr=$HOME/deps && make -j4 && make check
+  - ./configure --with-mpir=$HOME/deps --with-mpfr=$HOME/deps && make -j4 && make -j4 check
 
