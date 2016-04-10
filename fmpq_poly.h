@@ -653,6 +653,8 @@ FLINT_DLL void fmpq_poly_tanh_series(fmpq_poly_t res, const fmpq_poly_t poly, sl
 
 FLINT_DLL void fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n);
 
+FLINT_DLL void fmpq_poly_laguerre_l(fmpq_poly_t poly, ulong n);
+
 /*  Evaluation  **************************************************************/
 
 FLINT_DLL void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
