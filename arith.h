@@ -187,7 +187,7 @@ FLINT_DLL void arith_cos_minpoly(fmpz_poly_t poly, ulong n);
 #define _arith_chebyshev_u_polynomial _fmpz_poly_chebyshev_u
 #define arith_chebyshev_u_polynomial fmpz_poly_chebyshev_u
 
-#define arith_legendre_polynomial fmpz_poly_legendre_p
+#define arith_legendre_polynomial fmpq_poly_legendre_p
 
 /* Swinnerton-Dyer polynomials ***********************************************/
 
