@@ -68,7 +68,11 @@ int main(void)
         }
     }
 
+#if FLINT64
     if (fails > flint_test_multiplier())
+#else
+    if (fails > 2 * flint_test_multiplier())
+#endif
     {
         printf("FAIL : Pollard Rho - Brent failed too many times (%d times)\n", fails);
         abort();
