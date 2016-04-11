@@ -1,0 +1,27 @@
+version: 1.0.{build}
+build:
+  verbosity: minimal
+  
+environment:
+  matrix:
+    - BUILD_TYPE: Release
+      COMPILER: MSVC15
+      PLATFORM: x64
+    - COMPILER: MinGW-w64
+      ABI: 32
+    - COMPILER: MinGW-w64
+      ABI: 64
+    - BUILD_TYPE: Release
+      COMPILER: MSVC15
+      PLATFORM: Win32
+ 
+build_script:
+  - if [%COMPILER%]==[MSVC15] call .build_dependencies.cmd
+
+  - if [%COMPILER%]==[MinGW-w64] C:\msys64\usr\bin\sh.exe --login /c/projects/flint2/.appveyor_msys_build.sh
+
+  - if [%COMPILER%]==[MSVC15] cd build.vc14 
+  - if [%COMPILER%]==[MSVC15] msbuild.exe dll_flint/dll_flint.vcxproj /p:Configuration=Release /p:Platform=%PLATFORM% /p:PlatformToolset=v140 /verbosity:minimal
+
+on_failure:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
