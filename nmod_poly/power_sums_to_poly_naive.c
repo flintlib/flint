@@ -25,63 +25,64 @@
 
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-
+#include "nmod_vec.h"
+#include "nmod_poly.h"
 
 void
-_fmpz_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, slong len)
+_nmod_poly_power_sums_to_poly_naive(mp_ptr res, mp_srcptr poly, slong len,
+                                    nmod_t mod)
 {
     slong i, k;
-    slong d = fmpz_get_ui(poly);
+    slong d = poly[0];
 
-    fmpz_one(res + d);
+    res[d] = 1;
     for (k = 1; k < FLINT_MIN(d + 1, len); k++)
     {
-        fmpz_set(res + d - k, poly + k);
+        res[d - k] = poly[k];
         for (i = 1; i < k; i++)
-            fmpz_addmul(res + d - k, res + d - k + i, poly + i);
-        fmpz_divexact_si(res + d - k, res + d - k, k);
-        fmpz_neg(res + d - k, res + d - k);
+            res[d - k] += nmod_mul(res[d - k + i], poly[i], mod);
+        res[d - k] = nmod_div(res[d - k], k, mod);
+        res[d - k] = nmod_neg(res[d - k], mod);
     }
     for (k = len; k <= d; k++)
     {
-        fmpz_zero(res + d - k);
+        res[d - k] = 0;
         for (i = 1; i < len; i++)
-            fmpz_addmul(res + d - k, res + d - k + i, poly + i);
-        fmpz_divexact_si(res + d - k, res + d - k, k);
-        fmpz_neg(res + d - k, res + d - k);
+            res[d - k] += nmod_mul(res[d - k + i], poly[i], mod);
+        res[d - k] = nmod_div(res[d - k], k, mod);
+        res[d - k] = nmod_neg(res[d - k], mod);
     }
 }
 
 void
-fmpz_poly_power_sums_to_poly(fmpz_poly_t res, const fmpz_poly_t Q)
+nmod_poly_power_sums_to_poly_naive(nmod_poly_t res, const nmod_poly_t Q)
 {
     if (Q->length == 0)
     {
-        fmpz_poly_fit_length(res, 1);
-        fmpz_one(res->coeffs);
-        _fmpz_poly_set_length(res, 1);
+        nmod_poly_fit_length(res, 1);
+        res->coeffs[0] = 1;
+        _nmod_poly_set_length(res, 1);
     }
     else
     {
-        slong d;
-        d = fmpz_get_ui(Q->coeffs);
+        slong d = Q->coeffs[0];
         if (Q == res)
         {
-            fmpz_poly_t t;
-            fmpz_poly_init(t);
-            fmpz_poly_fit_length(t, d + 1);
-            _fmpz_poly_power_sums_to_poly(t->coeffs, Q->coeffs, Q->length);
-            fmpz_poly_swap(res, t);
-            fmpz_poly_clear(t);
+            nmod_poly_t t;
+            nmod_poly_init_preinv(t, Q->mod.n, Q->mod.ninv);
+            nmod_poly_fit_length(t, d + 1);
+            _nmod_poly_power_sums_to_poly_naive(t->coeffs, Q->coeffs,
+                                                Q->length, Q->mod);
+            nmod_poly_swap(res, t);
+            nmod_poly_clear(t);
         }
         else
         {
-            fmpz_poly_fit_length(res, d + 1);
-            _fmpz_poly_power_sums_to_poly(res->coeffs, Q->coeffs, Q->length);
+            nmod_poly_fit_length(res, d + 1);
+            _nmod_poly_power_sums_to_poly_naive(res->coeffs, Q->coeffs,
+                                                Q->length, Q->mod);
         }
-        _fmpz_poly_set_length(res, d + 1);
-        _fmpz_poly_normalise(res);
+        _nmod_poly_set_length(res, d + 1);
+        _nmod_poly_normalise(res);
     }
 }

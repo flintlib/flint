@@ -45,7 +45,10 @@ _fmpq_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, const fmpz_t den,
     fmpz_one(f);
     for (k = 1; k <= d; k++)
     {
-        fmpz_mul(res + d - k, poly + k, f);
+        if(k < len)
+			fmpz_mul(res + d - k, poly + k, f);
+		else
+			fmpz_zero(res + d - k);
         for (i = 1; i < FLINT_MIN(k, len); i++)
             fmpz_addmul(res + d - k, res + d - k + i, poly + i);
 
