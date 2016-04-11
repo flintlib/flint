@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
-#include "arith.h"
 #include "profiler.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -55,7 +54,7 @@ int main()
 
     for (n = 0; n <= 500; n++)
     {
-        arith_legendre_polynomial(R, n);
+        fmpq_poly_legendre_p(R, n);
 
         if (!fmpq_poly_equal(Pn, R))
         {
