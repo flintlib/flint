@@ -1364,6 +1364,20 @@ void fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n)
     $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
     See \code{fmpz_poly} for the shifted Legendre polynomials.
 
+void _fmpq_poly_laguerre_l(fmpq * coeffs, ulong n)
+
+    Sets \code{coeffs} to the coefficient array of the Laguerre polynomial
+    $L_n(x)$, defined by $(n+1) L_{n+1}(x) = (2n+1-x) L_n(x) - n L_{n-1}(x)$,
+    for $n\ge0$.
+    The coefficients are calculated using a hypergeometric recurrence.
+    The length of the array will be \code{n+1}.
+
+void fmpq_poly_laguerre_l(fmpq_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Laguerre polynomial $L_n(x)$, defined by
+    $(n+1) L_{n+1}(x) = (2n+1-x) L_n(x) - n L_{n-1}(x)$, for $n\ge0$.
+    The coefficients are calculated using a hypergeometric recurrence.
+
 *******************************************************************************
 
     Evaluation
