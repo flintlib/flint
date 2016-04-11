@@ -4,6 +4,19 @@ addons:
   apt:
     packages:
       - texinfo
+
+os:
+  - osx
+  - linux
+
+compiler:
+  - gcc
+  - clang
+
 script:
-  - ./.build_dependencies && ./configure --with-mpir=mpir-2.7.0 --with-mpfr=mpfr-3.1.4 && make && make check
+  - if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${CC}" == "gcc" ]]; then
+        export CC=gcc-4.8;
+        export CXX=g++-4.8;
+    fi
+  - ./.build_dependencies && ./configure --with-mpir=mpir-2.7.0 --with-mpfr=mpfr-3.1.4 && make -j4 && make -j4 check
 
