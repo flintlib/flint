@@ -22,6 +22,3 @@ build_script:
 
   - if [%COMPILER%]==[MinGW-w64] C:\msys64\usr\bin\sh.exe --login /c/projects/flint2/.appveyor_msys_build.sh
   - if [%COMPILER%]==[MSVC15] call .appveyor_msvc_build.cmd
-
-on_failure:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
