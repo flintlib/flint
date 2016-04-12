@@ -40,7 +40,9 @@ _nmod_poly_power_sums_to_poly_naive(mp_ptr res, mp_srcptr poly, slong len,
     {
         res[d - k] = poly[k];
         for (i = 1; i < k; i++)
-            res[d - k] += nmod_mul(res[d - k + i], poly[i], mod);
+            res[d - k] = nmod_add(res[d - k],
+                    nmod_mul(res[d - k + i], poly[i], mod),
+                    mod);
         res[d - k] = nmod_div(res[d - k], k, mod);
         res[d - k] = nmod_neg(res[d - k], mod);
     }
@@ -48,7 +50,9 @@ _nmod_poly_power_sums_to_poly_naive(mp_ptr res, mp_srcptr poly, slong len,
     {
         res[d - k] = 0;
         for (i = 1; i < len; i++)
-            res[d - k] += nmod_mul(res[d - k + i], poly[i], mod);
+            res[d - k] = nmod_add(res[d - k],
+                    nmod_mul(res[d - k + i], poly[i], mod),
+                    mod);
         res[d - k] = nmod_div(res[d - k], k, mod);
         res[d - k] = nmod_neg(res[d - k], mod);
     }
