@@ -17,23 +17,11 @@ environment:
  
 build_script:
   - if [%COMPILER%]==[MSVC15] call .build_dependencies.cmd
-  - set PATH=C:\Python35-x64;%PATH%
+  - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] set PATH=C:\Python35-x64;%PATH%
+  - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] set PATH=C:\Python35;%PATH%
 
   - if [%COMPILER%]==[MinGW-w64] C:\msys64\usr\bin\sh.exe --login /c/projects/flint2/.appveyor_msys_build.sh
-  - ps: >-
-        if ($env:COMPILER -eq "MSVC15") {
-            cd build.vc14\flint_config
-            python $pwd\flint_config.py --build-lib True --build-tests False --build-profiles False
-            cd ..
-            msbuild.exe lib_flint/lib_flint.vcxproj /p:Configuration=Release /p:Platform=$env:PLATFORM /p:PlatformToolset=v140 /verbosity:minimal
-            copy lib_flint\$env:PLATFORM\Release\lib_flint.lib ..\lib\$env:PLATFORM\Release\lib_flint.lib
-            cd build_tests
-            $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-            python $pwd\build_tests.py --interfaces-tests False --platform $env:PLATFORM
-            cd ..\run_tests
-            python $pwd\run_tests.py
-            cd ..
-        }
+  - if [%COMPILER%]==[MSVC15] call .appveyor_msvc_build.cmd
 
 on_failure:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
