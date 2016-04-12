@@ -18,12 +18,27 @@ from uuid import uuid4
 from time import sleep
 
 from _msvccompiler import MSVCCompiler
-   
-# for script debugging
-debug = False
 
-# add user choice
-flib_type = 'single' # ('gc', 'reentrant', 'single')
+import argparse
+parser = argparse.ArgumentParser(description='Build flint tests')
+
+# for script debugging
+parser.add_argument('--debug', choices=["True", "False"], default="False")
+
+# what to build
+parser.add_argument('--platform', default="x64")
+parser.add_argument('--configuration', default="Release")
+parser.add_argument('--library-type', choices=["dll", "lib"], default="lib")
+parser.add_argument('--interfaces-tests', choices=["True", "False"], default="True")
+
+args = parser.parse_args()
+
+print(args)
+
+debug = args.debug == "True"
+intd = '\\%s\\%s\\' % (args.platform, args.configuration)
+library_type = args.library_type
+build_interfaces_tests = args.interfaces_tests == "True"
 
 # The path to flint, solution and project directories
 script_dir = dirname(__file__)
@@ -120,33 +135,39 @@ c, h, cx, hx, t, tx, p = find_src(flint_dir)
 #       export_symbols=None, debug=0, extra_preargs=None,
 #       extra_postargs=None, build_temp=None, target_lang=None):
 
-intd = '\\x64\\Release\\'
 
 cc = MSVCCompiler()
 error_list = []
+inc_dirs = [
+  '..\\',
+  '..\\..\\',
+  '..\\..\\..\\mpir\\' + library_type + intd,
+  '..\\..\\..\\mpfr\\' + library_type + intd,
+  '..\\..\\..\\pthreads\\' + library_type + intd
+]
+libs = [
+  '..\\..\\' + library_type + intd + library_type + '_flint',
+  '..\\..\\..\\mpir\\' + library_type + intd + 'mpir',
+  '..\\..\\..\\mpfr\\' + library_type + intd + 'mpfr',
+  '..\\..\\..\\pthreads\\' + library_type + intd + 'pthreads'
+]
+if (library_type == "lib"):
+  macros = [('PTW32_STATIC_LIB',1)]
+else:
+  macros = [('PTW32_BUILD',1)]
+
 for l2, fp in t:
   fdn, fx = splitext(fp)
   fd, fn = split(fdn)
+  if (not build_interfaces_tests and "interface" in fn):
+    continue
   source = [join('..\\..\\', fp)]
-  inc_dirs = [
-    '..\\',
-    '..\\..\\',
-    '..\\..\\..\\mpir\\lib' + intd,
-    '..\\..\\..\\mpfr\\lib' + intd,
-    '..\\..\\..\\pthreads\\lib' + intd
-    ]
-  libs = [
-    '..\\..\\lib' + intd + 'lib_flint',
-    '..\\..\\..\\mpir\\lib' + intd + 'mpir',
-    '..\\..\\..\\mpfr\\lib' + intd + 'mpfr',
-    '..\\..\\..\\pthreads\\lib' + intd + 'pthreads'
-    ]
   p = fd.rfind('test')
   assert p >= 0
   tmp_dir = 'test\\test'
   outd = '..\\tests\\' + fd[:p] + intd
   try:
-    obj = cc.compile(source, output_dir=tmp_dir, include_dirs=inc_dirs,macros=[('PTW32_STATIC_LIB',1)])
+    obj = cc.compile(source, output_dir=tmp_dir, include_dirs=inc_dirs,macros=macros)
     cc.link("executable", obj, fn + '.exe', output_dir=outd, libraries=libs)
   except:
     error_list += [(l2, fp)]

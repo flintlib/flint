@@ -22,13 +22,13 @@ import argparse
 parser = argparse.ArgumentParser(description='Configure flint msvc build')
 
 # for script debugging
-parser.add_argument('--debug', type=bool, default=False)
+parser.add_argument('--debug', choices=["True", "False"], default="False")
 
 # what to build
-parser.add_argument('--build-lib', type=bool, default=False)
-parser.add_argument('--build-dll', type=bool, default=False)
-parser.add_argument('--build-tests', type=bool, default=True)
-parser.add_argument('--build-profiles', type=bool, default=True)
+parser.add_argument('--build-lib', choices=["True", "False"], default="False")
+parser.add_argument('--build-dll', choices=["True", "False"], default="False")
+parser.add_argument('--build-tests', choices=["True", "False"], default="True")
+parser.add_argument('--build-profiles', choices=["True", "False"], default="True")
 
 # add user choice
 parser.add_argument('--flib-type', choices=('gc', 'reentrant', 'single'), default="single")
@@ -36,11 +36,11 @@ parser.add_argument('--flib-type', choices=('gc', 'reentrant', 'single'), defaul
 args = parser.parse_args()
 print(args)
 
-debug = args.debug
-build_lib = args.build_lib
-build_dll = args.build_dll
-build_tests = args.build_tests
-build_profiles = args.build_profiles
+debug = args.debug == "True"
+build_lib = args.build_lib == "True"
+build_dll = args.build_dll == "True"
+build_tests = args.build_tests == "True"
+build_profiles = args.build_profiles == "True"
 
 flib_type = args.flib_type
 

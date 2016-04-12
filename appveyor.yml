@@ -23,12 +23,13 @@ build_script:
   - ps: >-
         if ($env:COMPILER -eq "MSVC15") {
             cd build.vc14\flint_config
-            python $pwd\flint_config.py --build-lib True
+            python $pwd\flint_config.py --build-lib True --build-tests False --build-profiles False
             cd ..
             msbuild.exe lib_flint/lib_flint.vcxproj /p:Configuration=Release /p:Platform=$env:PLATFORM /p:PlatformToolset=v140 /verbosity:minimal
             copy lib_flint\$env:PLATFORM\Release\lib_flint.lib ..\lib\$env:PLATFORM\Release\lib_flint.lib
             cd build_tests
-            python $pwd\build_tests.py
+            $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+            python $pwd\build_tests.py --interfaces-tests False --platform $env:PLATFORM
             cd ..\run_tests
             python $pwd\run_tests.py
             cd ..
