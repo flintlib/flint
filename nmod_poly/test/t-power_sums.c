@@ -25,6 +25,7 @@
 
 #include <gmp.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 
 int
@@ -40,7 +41,10 @@ main(void)
     {
         mp_limb_t n;
         nmod_poly_t a, b, c, d, e;
-        n = n_randprime(state, 10, 1);
+
+        do{
+            n = n_randtest_prime(state, 1);
+        }while(n < 10);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

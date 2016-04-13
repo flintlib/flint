@@ -25,6 +25,7 @@
 
 #include <gmp.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 
 int
@@ -47,14 +48,19 @@ main(void)
                 nmod_t mod;
                 nmod_poly_t a, b, c, d;
 
-                n = 20 + n_randbits(state, 8);
-                n = n_nextprime(n, 1);
+                do{
+                    n = n_randtest_prime(state, 1);
+                }while(n < 4);
                 nmod_init(&mod, n);
 
                 nmod_poly_init(a, n);
                 nmod_poly_init(b, n);
                 nmod_poly_init(c, n);
                 nmod_poly_init(d, n);
+
+                nmod_poly_randtest(b, state, 40);
+                nmod_poly_randtest(c, state, 40);
+                nmod_poly_randtest(d, state, 40);
 
                 nmod_poly_set_coeff_ui(a, 0, n - i * j * k);
                 nmod_poly_set_coeff_ui(a, 1, i * j + i * k + j * k);
@@ -117,13 +123,17 @@ main(void)
         nmod_poly_t a, b, c, d;
         mp_limb_t n;
 
-        n = 35 + n_randbits(state, 8);
-        n = n_nextprime(n, 1);
+        do{
+            n = n_randtest_prime(state, 1);
+        }while(n < 50);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
         nmod_poly_init(d, n);
+
+        nmod_poly_randtest(c, state, 50);
+        nmod_poly_randtest(d, state, 50);
 
         nmod_poly_randtest_not_zero(a, state, 1 + n_randint(state, 20));
         nmod_poly_make_monic(a, a);
@@ -158,9 +168,10 @@ main(void)
     {
         nmod_poly_t a, b, c, d;
         mp_limb_t n;
-        n = n_randprime(state, 10, 1);
-        n = 25 + n_randbits(state, 8);
-        n = n_nextprime(n, 1);
+
+        do{
+            n = n_randtest_prime(state, 1);
+        }while(n < 20);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -169,6 +180,8 @@ main(void)
 
         nmod_poly_randtest_not_zero(a, state, 1 + n_randint(state, 10));
         nmod_poly_randtest_not_zero(b, state, 1 + n_randint(state, 10));
+        nmod_poly_randtest(c, state, 30);
+        nmod_poly_randtest(d, state, 30);
 
         nmod_poly_mul(c, a, b);
         nmod_poly_power_sums_naive(c, c, 20);
