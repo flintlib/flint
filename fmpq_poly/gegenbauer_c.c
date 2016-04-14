@@ -58,9 +58,14 @@ void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, fmpq_t a)
 
     fmpz_set(nu, fmpq_numref(a));
     fmpz_set(de, fmpq_denref(a));
-    fmpz_one(p);
+    fmpz_pow_ui(den, de, n);
+    fmpz_fac_ui(t, n);
+    fmpz_mul(den, den, t);
+    fmpz_fac_ui(p, n/2);
+    fmpz_divexact(p, t, p);
+
     if (n%2)
-        fmpz_set_si(p, 2);
+        fmpz_mul_2exp(p, p, 1);
     if (n&2)
         fmpz_neg(p, p);
 
@@ -72,8 +77,6 @@ void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, fmpq_t a)
 
     fmpz_pow_ui(t, de, n/2);
     fmpz_mul(p, p, t);
-    fmpz_fac_ui(t, n/2);
-    fmpz_divexact(p, p, t);
     fmpz_set(coeffs + (n%2), p);
 
     for (kk = n/2 - 1; kk >= 0; --kk)
@@ -87,7 +90,6 @@ void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, fmpq_t a)
         fmpz_set(coeffs + n - 2*kk, p);
         fmpz_add(nu, nu, de);
     }
-    fmpz_pow_ui(den, de, n);
 
     fmpz_clear(t);
     fmpz_clear(p);
