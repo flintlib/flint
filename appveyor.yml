@@ -14,9 +14,14 @@ environment:
       PLATFORM: Win32
     - COMPILER: MinGW-w64
       ABI: 64
+
+cache:
+- C:\projects\mpir -> .build_dependencies.cmd
+- C:\projects\mpfr -> .build_dependencies.cmd
+- C:\projects\pthreads -> .build_dependencies.cmd
  
 build_script:
-  - if [%COMPILER%]==[MSVC15] call .build_dependencies.cmd
+  - if [%COMPILER%]==[MSVC15] if not exist C:\projects\mpir .build_dependencies.cmd
   - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] set PATH=C:\Python35-x64;%PATH%
   - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] set PATH=C:\Python35;%PATH%
 
