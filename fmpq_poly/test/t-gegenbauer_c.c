@@ -25,11 +25,15 @@
 
 #include "fmpq_poly.h"
 
+#define NRATS 50
+
 int main()
 {
     fmpq_poly_t T0, T1, T2, t, tt;
     fmpq_t a, rat;
+    fmpq *rats;
     slong n, d;
+    flint_rand_t rand_state;
 
     FLINT_TEST_INIT(state);
 
@@ -38,20 +42,29 @@ int main()
 
     fmpq_poly_init(T0);
     fmpq_poly_init(T1);
+    fmpq_poly_init(T2);
     fmpq_poly_init(t);
     fmpq_poly_init(tt);
     fmpq_init(a);
     fmpq_init(rat);
 
-    for (d = 1; d < 11; d++)
+    rats = _fmpq_vec_init(NRATS);
+    fmpq_set_si(rats, 0, 1);
+    for (d = 1; d < 16; d++)
+        fmpq_set_si(rats + d, 1, d);
+    flint_randinit(rand_state);
+    for (d = 16; d < NRATS; d++)
+        fmpq_randtest_not_zero(rats + d, rand_state, 32);
+    flint_randclear(rand_state);
+
+    for (d = 0; d < NRATS; d++)
     {
-        fmpq_set_si(a, 1, d);
+        fmpq_set(a, rats + d);
         fmpq_poly_gegenbauer_c(T0, 0, a);
         fmpq_poly_gegenbauer_c(T1, 1, a);
 
         for (n = 1; n <= 500; n++)
         {
-            fmpq_poly_init(T2);
             fmpq_poly_gegenbauer_c(T2, n+1, a);
             fmpq_poly_set(t, T1);
 
@@ -69,8 +82,6 @@ int main()
             fmpq_poly_sub(t, t, tt);
             fmpq_poly_scalar_mul_si(tt, T2, n+1);
 
-            fmpq_poly_canonicalise(t);
-            fmpq_poly_canonicalise(tt);
             if (!fmpq_poly_equal(t, tt))
             {
                 flint_printf("\nFAIL: n = %wd, a = ", n);
@@ -80,13 +91,8 @@ int main()
                 abort();
             }
 
-            fmpq_poly_clear(T0);
-            fmpq_poly_init(T0);
             fmpq_poly_swap(T0, T1);
-            fmpq_poly_clear(T1);
-            fmpq_poly_init(T1);
             fmpq_poly_swap(T1, T2);
-            fmpq_poly_clear(T2);
         }
     }
 
@@ -95,6 +101,7 @@ int main()
     fmpq_poly_clear(T2);
     fmpq_poly_clear(t);
     fmpq_poly_clear(tt);
+    _fmpq_vec_clear(rats, NRATS);
     fmpq_clear(a);
     fmpq_clear(rat);
 

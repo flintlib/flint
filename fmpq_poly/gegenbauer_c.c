@@ -25,7 +25,7 @@
 
 #include "fmpq_poly.h"
 
-void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, fmpq_t a)
+void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, const fmpq_t a)
 {
     fmpq_t c;
     fmpz_t t, p, nu, de;
@@ -44,7 +44,6 @@ void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, fmpq_t a)
         fmpq_init(c);
         fmpz_zero(coeffs);
         fmpq_mul_2exp(c, a, 1);
-        fmpq_canonicalise(c);
         fmpz_set(coeffs + 1, fmpq_numref(c));
         fmpz_set(den, fmpq_denref(c));
         fmpq_clear(c);
@@ -77,19 +76,21 @@ void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, fmpq_t a)
 
     fmpz_pow_ui(t, de, n/2);
     fmpz_mul(p, p, t);
+    fmpz_zero(coeffs);
     fmpz_set(coeffs + (n%2), p);
 
     for (kk = n/2 - 1; kk >= 0; --kk)
     {
         fmpz_mul(p, p, nu);
+        fmpz_mul_ui(p, p, 4*(kk+1));
         fmpz_divexact(p, p, de);
         fmpz_divexact2_uiui(p, p, n-2*kk-1, n-2*kk);
-        fmpz_mul_ui(p, p, kk+1);
-        fmpz_mul_2exp(p, p, 2);
         fmpz_neg(p, p);
         fmpz_set(coeffs + n - 2*kk, p);
+        fmpz_zero(coeffs + n - 2*kk - 1);
         fmpz_add(nu, nu, de);
     }
+    _fmpq_poly_canonicalise(coeffs, den, n);
 
     fmpz_clear(t);
     fmpz_clear(p);
@@ -98,10 +99,10 @@ void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, fmpq_t a)
 }
 
 void
-fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, fmpq_t a)
+fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, const fmpq_t a)
 {
     fmpq_poly_fit_length(poly, n + 1);
     _fmpq_poly_gegenbauer_c(poly->coeffs, poly->den, n, a);
-    _fmpq_poly_set_length(poly, n + 1);
+    _fmpq_poly_normalise(poly);
 }
 

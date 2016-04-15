@@ -1379,7 +1379,7 @@ void fmpq_poly_laguerre_l(fmpq_poly_t poly, ulong n)
     $(n+1) L_{n+1}(x) = (2n+1-x) L_n(x) - n L_{n-1}(x)$, for $n\ge0$.
     The coefficients are calculated using a hypergeometric recurrence.
 
-void _fmpq_poly_gegenbauer_c(fmpq * coeffs, fmpz_t den, ulong n, fmpq_t a)
+void _fmpq_poly_gegenbauer_c(fmpq * coeffs, fmpz_t den, ulong n, const fmpq_t a)
 
     Sets \code{coeffs} to the coefficient array of the Gegenbauer
     (ultraspherical) polynomial
@@ -1388,7 +1388,7 @@ void _fmpq_poly_gegenbauer_c(fmpq * coeffs, fmpz_t den, ulong n, fmpq_t a)
     $\alpha>0$. Sets \code{den} to the overall denominator.
     The coefficients are calculated using a hypergeometric recurrence.
 
-void fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, fmpq_t a)
+void fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, const fmpq_t a)
 
     Sets \code{poly} to the Gegenbauer (ultraspherical) polynomial
     $C^{(\alpha)}_n(x) = \frac{(2\alpha)_n}{n!}{}_2F_1\left(-n,2\alpha+n;
