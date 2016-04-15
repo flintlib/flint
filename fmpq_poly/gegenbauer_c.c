@@ -103,6 +103,7 @@ fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, const fmpq_t a)
 {
     fmpq_poly_fit_length(poly, n + 1);
     _fmpq_poly_gegenbauer_c(poly->coeffs, poly->den, n, a);
+    _fmpq_poly_set_length(poly, n + 1);
     _fmpq_poly_normalise(poly);
 }
 
