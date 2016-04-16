@@ -90,7 +90,6 @@ void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, const fmpq_t a)
         fmpz_zero(coeffs + n - 2*kk - 1);
         fmpz_add(nu, nu, de);
     }
-    _fmpq_poly_canonicalise(coeffs, den, n);
 
     fmpz_clear(t);
     fmpz_clear(p);
@@ -105,5 +104,6 @@ fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, const fmpq_t a)
     _fmpq_poly_gegenbauer_c(poly->coeffs, poly->den, n, a);
     _fmpq_poly_set_length(poly, n + 1);
     _fmpq_poly_normalise(poly);
+    fmpq_poly_canonicalise(poly);
 }
 
