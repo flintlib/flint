@@ -27,7 +27,6 @@
 
 void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, const fmpq_t a)
 {
-    fmpq_t c;
     fmpz_t t, p, nu, de;
     ulong k;
     slong kk;
@@ -41,12 +40,17 @@ void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, const fmpq_t a)
 
     if (n == 1)
     {
-        fmpq_init(c);
         fmpz_zero(coeffs);
-        fmpq_mul_2exp(c, a, 1);
-        fmpz_set(coeffs + 1, fmpq_numref(c));
-        fmpz_set(den, fmpq_denref(c));
-        fmpq_clear(c);
+        if (fmpz_is_even(fmpq_denref(a)))
+        {
+            fmpz_tdiv_q_2exp(den, fmpq_denref(a), 1);
+            fmpz_set(coeffs + 1, fmpq_numref(a));
+        }
+        else
+        {
+            fmpz_set(den, fmpq_denref(a));
+            fmpz_mul_2exp(coeffs + 1, fmpq_numref(a), 1);
+        }
         return;
     }
 
