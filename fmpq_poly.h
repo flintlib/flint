@@ -655,6 +655,8 @@ FLINT_DLL void fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n);
 
 FLINT_DLL void fmpq_poly_laguerre_l(fmpq_poly_t poly, ulong n);
 
+FLINT_DLL void fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, const fmpq_t a);
+
 /*  Evaluation  **************************************************************/
 
 FLINT_DLL void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
