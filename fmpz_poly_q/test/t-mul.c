@@ -1,4 +1,6 @@
 /*
+    Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2013 William Hart
     Copyright (C) 2011 Sebastian Pancratz
 
     This file is part of FLINT.
