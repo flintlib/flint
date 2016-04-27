@@ -561,14 +561,14 @@ mp_limb_t n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp,
 
     Returns $w t \bmod{p}$ given a precomputed scaled approximation of $w / p$ 
     computed by \code{n_mulmod_precomp_shoup()}. The value of $p$ should be 
-    less than $2^{\code{FLINT_BITS} - 1}$. $w$ and $t$ should be less than $p$. 
+    less than $2^{\mathtt{FLINT_BITS} - 1}$. $w$ and $t$ should be less than $p$. 
     Works faster than \code{n_mulmod2_preinv()} if $w$ fixed and $t$ from array
     (for example, scalar multiplication of vector).
 
 mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
 
     Returns $w'$, scaled approximation of $w / p$. $w'$  is equal to the integer 
-    part of $w * 2^{\code{FLINT_BITS}} / p$.
+    part of $w * 2^{\mathtt{FLINT_BITS}} / p$.
 
 *******************************************************************************
 
@@ -1377,7 +1377,7 @@ ulong n_discrete_log_bsgs(ulong b, ulong a, ulong n)
 
 *******************************************************************************
 
-    Elliptic curve method for factorization of mp_limb_t
+    Elliptic curve method for factorization of \code{mp_limb_t}
 
 *******************************************************************************
 
