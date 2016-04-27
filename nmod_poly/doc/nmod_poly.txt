@@ -2559,7 +2559,7 @@ void nmod_poly_exp_series_basecase(nmod_poly_t g, const nmod_poly_t h, slong n)
 
 void _nmod_poly_exp_series2(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
-    Set $f = \exp(h) + O(x^n)$ where \poly{(h, hlen}) is a polynomial. Assume
+    Set $f = \exp(h) + O(x^n)$ where \code{h} is a polynomial. Assume
     $n > 0$. Aliasing of $g$ and $h$ is not allowed.
 
     Uses Newton iteration (the version given in \cite{HanZim2004}).
