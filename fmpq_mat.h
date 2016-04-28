@@ -71,6 +71,8 @@ slong fmpq_mat_ncols(const fmpq_mat_t mat)
 
 FLINT_DLL void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols);
 
+FLINT_DLL void fmpq_mat_init_set(fmpq_mat_t mat1, const fmpq_mat_t mat2);
+
 FLINT_DLL void fmpq_mat_clear(fmpq_mat_t mat);
 
 FLINT_DLL void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2);
@@ -131,6 +133,8 @@ FLINT_DLL int fmpq_mat_equal(const fmpq_mat_t mat1, const fmpq_mat_t mat2);
 FLINT_DLL int fmpq_mat_is_integral(const fmpq_mat_t mat);
 
 FLINT_DLL int fmpq_mat_is_zero(const fmpq_mat_t mat);
+
+FLINT_DLL int fmpq_mat_is_one(const fmpq_mat_t mat);
 
 FMPQ_MAT_INLINE
 int fmpq_mat_is_empty(const fmpq_mat_t mat)

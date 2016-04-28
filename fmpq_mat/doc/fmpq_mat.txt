@@ -19,6 +19,10 @@ void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
 
     Initialises a matrix with the given number of rows and columns for use.
 
+void fmpq_mat_init_set(fmpq_mat_t mat1, const fmpq_mat_t mat2)
+
+    Initialises \code{mat1} and sets it equal to \code{mat2}.
+
 void fmpq_mat_clear(fmpq_mat_t mat)
 
     Frees all memory associated with the matrix. The matrix must be
@@ -236,6 +240,11 @@ int fmpq_mat_is_zero(const fmpq_mat_t mat)
 
     Returns nonzero if all entries in \code{mat} are zero, and returns
     zero otherwise.
+
+int fmpq_mat_is_one(const fmpq_mat_t mat)
+
+    Returns nonzero if \code{mat} ones along the diagonal and zeros elsewhere,
+    and returns zero otherwise.
 
 int fmpq_mat_is_empty(const fmpq_mat_t mat)
 
