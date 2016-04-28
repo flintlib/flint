@@ -13,3 +13,8 @@ contain algorithms for algebraic number theory and other number theoretic
 functionality.
 
 William Hart -- 16 Jan 2011.
+
+License
+-------
+This version is distributed under LGPL 2.1 (GNU Lesser General Public License).
+See the LICENSE file.
