@@ -38,32 +38,32 @@ slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly,
     int i;
 
     M[0] = poly;
-    buflen = 7*len + 5; /* for f, g, A, B, M[1], M[2], M[3] */
+    buflen = 7 * len + 5; /* for f, g, A, B, M[1], M[2], M[3] */
     buf = _fmpz_vec_init(buflen);
     f = buf;
-    g = f + (len+1);
+    g = f + (len + 1);
     A = g + len;
-    B = A + (len+1);
+    B = A + (len + 1);
     M[1] = B + len;
-    M[2] = M[1] + (len+1);
-    M[3] = M[2] + (len+1);
+    M[2] = M[1] + (len + 1);
+    M[3] = M[2] + (len + 1);
 
     /* f = x^len */
-    fmpz_one(f+len);
+    fmpz_one(f + len);
     /* g = reversal of seq */
-    for (i=0; i<len; ++i) fmpz_set(g+i, seq+(len-i-1));
+    for (i = 0; i < len; ++i) fmpz_set(g + i, seq + (len - i - 1));
     leng = len;
     FMPZ_VEC_NORM(g, leng);
 
     _fmpz_mod_poly_hgcd(M, lenM, 
-            A, &lenA, B, &lenB, f, len+1, g, leng, p);
+            A, &lenA, B, &lenB, f, len + 1, g, leng, p);
     len_poly = lenM[0];
 
     /* one more step may be necessary */
     if (len_poly <= lenB)
     {
         slong quo_len = lenA - lenB + 1;
-        fmpz_invmod(buf, B + (lenB-1), p);
+        fmpz_invmod(buf, B + (lenB - 1), p);
         _fmpz_mod_poly_divrem(M[2], M[3], A, lenA, B, lenB, buf, p); 
 
         if (len_poly >= quo_len) 
@@ -80,7 +80,7 @@ slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly,
     }
 
     /* make poly monic */
-    fmpz_invmod(buf, poly + (len_poly-1), p);
+    fmpz_invmod(buf, poly + (len_poly - 1), p);
     _fmpz_mod_poly_scalar_mul_fmpz(poly, poly, len_poly, buf, p);
 
     _fmpz_vec_clear(buf, buflen);
