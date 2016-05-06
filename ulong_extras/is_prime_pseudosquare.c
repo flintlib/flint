@@ -1,27 +1,13 @@
-/*=============================================================================
+/*
+    Copyright (C) 2009 William Hart
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2009 William Hart
-   
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -107,7 +93,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
         mp_limb_t mod = n_powmod2(UWORD(2), exp, n);
         if (mod == n - 1) return 1;
         flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-        abort();
+        flint_abort();
     }
     else
     {
@@ -119,10 +105,12 @@ int n_is_prime_pseudosquare(mp_limb_t n)
             if (mod != 1)
             {
                 flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-                abort();
+                flint_abort();
             }
         }
         flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-        abort();
+        flint_abort();
     }
+
+    return 0;  /* not reached, but silence the compiler */
 }

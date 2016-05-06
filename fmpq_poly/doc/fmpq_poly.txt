@@ -1,29 +1,15 @@
-/*=============================================================================
-
-    This file is part of FLINT.
-
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 *******************************************************************************
 
@@ -1334,6 +1320,67 @@ void fmpq_poly_tanh_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
 
     Sets \code{res} to the series expansion of the hyperbolic tangent of
     \code{f} to order \code{n > 0}. Requires \code{f} to have constant term 0.
+
+*******************************************************************************
+
+    Orthogonal polynomials
+
+*******************************************************************************
+
+void _fmpq_poly_legendre_p(fmpq * coeffs, fmpz_t den, ulong n)
+
+    Sets \code{coeffs} to the coefficient array of the Legendre polynomial
+    $P_n(x)$, defined by $(n+1) P_{n+1}(x) = (2n+1) x P_n(x) - n P_{n-1}(x)$,
+    for $n\ge0$. Sets \code{den} to the overall denominator.
+    The coefficients are calculated using a hypergeometric recurrence.
+    The length of the array will be \code{n+1}.
+    To improve performance, the common denominator is computed in one step
+    and the coefficients are evaluated using integer arithmetic. The
+    denominator is given by
+    $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
+    See \code{fmpz_poly} for the shifted Legendre polynomials.
+
+void fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Legendre polynomial $P_n(x)$, defined
+    by $(n+1) P_{n+1}(x) = (2n+1) x P_n(x) - n P_{n-1}(x)$, for $n\ge0$.
+    The coefficients are calculated using a hypergeometric recurrence.
+    To improve performance, the common denominator is computed in one step
+    and the coefficients are evaluated using integer arithmetic. The
+    denominator is given by
+    $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
+    See \code{fmpz_poly} for the shifted Legendre polynomials.
+
+void _fmpq_poly_laguerre_l(fmpq * coeffs, fmpz_t den, ulong n)
+
+    Sets \code{coeffs} to the coefficient array of the Laguerre polynomial
+    $L_n(x)$, defined by $(n+1) L_{n+1}(x) = (2n+1-x) L_n(x) - n L_{n-1}(x)$,
+    for $n\ge0$. Sets \code{den} to the overall denominator.
+    The coefficients are calculated using a hypergeometric recurrence.
+    The length of the array will be \code{n+1}.
+
+void fmpq_poly_laguerre_l(fmpq_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Laguerre polynomial $L_n(x)$, defined by
+    $(n+1) L_{n+1}(x) = (2n+1-x) L_n(x) - n L_{n-1}(x)$, for $n\ge0$.
+    The coefficients are calculated using a hypergeometric recurrence.
+
+void _fmpq_poly_gegenbauer_c(fmpq * coeffs, fmpz_t den, ulong n, const fmpq_t a)
+
+    Sets \code{coeffs} to the coefficient array of the Gegenbauer
+    (ultraspherical) polynomial
+    $C^{(\alpha)}_n(x) = \frac{(2\alpha)_n}{n!}{}_2F_1\left(-n,2\alpha+n;
+    \alpha+\frac12;\frac{1-x}{2}\right)$, for integer $n\ge0$ and rational
+    $\alpha>0$. Sets \code{den} to the overall denominator.
+    The coefficients are calculated using a hypergeometric recurrence.
+
+void fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, const fmpq_t a)
+
+    Sets \code{poly} to the Gegenbauer (ultraspherical) polynomial
+    $C^{(\alpha)}_n(x) = \frac{(2\alpha)_n}{n!}{}_2F_1\left(-n,2\alpha+n;
+    \alpha+\frac12;\frac{1-x}{2}\right)$, for integer $n\ge0$ and rational
+    $\alpha>0$.
+    The coefficients are calculated using a hypergeometric recurrence.
 
 *******************************************************************************
 

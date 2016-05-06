@@ -1,27 +1,15 @@
-/*=============================================================================
+/*
+    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2015 Kushagra Singh
+    Copyright (C) 2016 Ralf Stephan
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2011 Fredrik Johansson
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 *******************************************************************************
 
@@ -145,145 +133,135 @@ int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, fmpz_t n,
     suggested by Richard Brent. It can be found in the paper availible at
     http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
 
-************************************ ECM FUNCTIONS  ***********************************
+*******************************************************************************
 
-typedef struct ecm_s {
+    Elliptic curve (ECM) method
 
-  mp_ptr t, u, v, w;  /* temp variables */
-  mp_ptr x, z;    /* the coordinates */
-  mp_ptr a24;     /* value (a + 2)/4 */
-  mp_ptr ninv;    /* invere of n */
-  mp_ptr one;     /* one shifted */
+    Factoring of \code{fmpz} integers using ECM
 
-    unsigned char *GCD_table; /* checks whether baby step int is
-                           coprime to Primorial or not */
-
-    unsigned char **prime_table;
-
-    mp_limb_t n_size;
-    mp_limb_t normbits;
-
-} ecm_s;
+*******************************************************************************
 
 void fmpz_factor_ecm_init(ecm_t ecm_inf, mp_limb_t sz)
     
-    Initializes the ecm struct
+    Initializes the \code{ecm_t} struct. This is needed in some functions
+    and carries data between subsequent calls.
 
 void fmpz_factor_ecm_clear(ecm_t ecm_inf)
 
-    Clears the ecm struct
+    Clears the \code{ecm_t} struct.
 
-void fmpz_factor_ecm_addmod(mp_ptr a, mp_ptr b, mp_ptr c, mp_ptr n, mp_limb_t n_size)
+void fmpz_factor_ecm_addmod(mp_ptr a, mp_ptr b, mp_ptr c, mp_ptr n,
+        mp_limb_t n_size)
 
-    Sets a to (b + c) % n
+    Sets $a$ to $(b + c)$ \code{%} $n$. This is not a normal add mod function,
+    it assumes~$n$ is normalized (highest bit set) and~$b$ and~$c$ are reduced
+    modulo~$n$.
 
-    Not a normal add mod function, assumes n is normalized (higest bit set) 
-    and b and c are reduced modulo n.
+    Used for arithmetic operations in \code{fmpz_factor_ecm}.
 
-    Used for arithmetic operations in fmpz_factor_ecm.
+void fmpz_factor_ecm_addmod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n,
+        mp_limb_t n_size)
 
-void fmpz_factor_ecm_addmod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
+    Sets $x$ to $(a - b)$ \code{%} $n$. This is not a normal subtract mod
+    function, it assumes~$n$ is normalized (highest bit set)
+    and~$b$ and~$c$ are reduced modulo~$n$.
 
-    Sets x to (a - b) % n
-
-    Not a normal subtract mod function, assumes n is normalized (higest bit set) 
-    and b and c are reduced modulo n.
-
-    Used for arithmetic operations in fmpz_factor_ecm.
+    Used for arithmetic operations in \code{fmpz_factor_ecm}.
 
 void fmpz_factor_ecm_double(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0, mp_ptr n,
                             ecm_t ecm_inf)
 
-    Sets the point [x :: z] to two times [x0 :: z0] according to the formula
+    Sets the point $(x : z)$ to two times $(x_0 : z_0)$ modulo $n$ according
+    to the formula
 
-        x = (x0 + z0)^2 * (x0 - z0)^2 mod n
-        z = 4 * x0 * z0 * ((x0 - z0)^2 + a24 * 4 * x0 * z0) mod n
+    $$x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,$$
 
-    ecm_inf is used just to use temp mp_ptr's in the structure. This group doubling
-    is valid only for points expressed in MONTGOMERY PROJECTIVE coordinates.
+    $$z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.$$
+
+    \code{ecm_inf} is used just to use temporary \code{mp_ptr}'s in the
+    structure. This group doubling is valid only for points expressed in
+    Montgomery projective coordinates.
 
 void fmpz_factor_ecm_add(mp_ptr x, mp_ptr z, mp_ptr x1, mp_ptr z1,
                          mp_ptr x2, mp_ptr z2, mp_ptr x0, mp_ptr z0, mp_ptr n,
                          ecm_t ecm_inf)
 
-    Sets the point [x :: z] to the sum of [x1 :: z1] and [x2 :: z2], given the
-    difference [x0 :: z0] according to the formula
+    Sets the point $(x : z)$ to the sum of $(x_1 : z_1)$ and $(x_2 : z_2)$
+    modulo~$n$, given the difference~$(x_0 : z_0)$ according to the formula
 
-        x = 4 * z0 * (x1 * x2 - z1 * z2)^2 mod n
-        z = 4 * x0 * (x2 * z1 - x1 * z2)^2 mod n
+    $$x = 4z_0(x_1x_2 - z_1z_2)^2 \mod n, z = 4x_0(x_2z_1 - x_1z_2)^2 \mod n.$$
 
-    ecm_inf is used just to use temp mp_ptr's in the structure. This group 
-    addition is valid only for points expressed in MONTGOMERY PROJECTIVE 
-    coordinates.
+    \code{ecm_inf} is used just to use temporary \code{mp_ptr}'s in the
+    structure. This group addition is valid only for points expressed in
+    Montgomery projective coordinates.
 
-void fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0, 
-                                           mp_limb_t k, mp_ptr n, ecm_t ecm_inf)
+void fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0,
+        mp_ptr z0, mp_limb_t k, mp_ptr n, ecm_t ecm_inf)
 
     Montgomery ladder algorithm for scalar multiplication of elliptic points. 
 
-    Sets the point [x :: z] to k[x0 :: z0] (mod n).
+    Sets the point $(x : z)$ to $k(x_0 : z_0)$ modulo $n$.
 
-    ecm_inf is used just to use temp mp_ptr's in the structure. Valid only for 
-    points expressed in MONTGOMERY PROJECTIVE coordinates.
+    \code{ecm_inf} is used just to use temporary \code{mp_ptr}'s in the
+    structure. Valid only for points expressed in Montgomery projective
+    coordinates.
 
-int fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
+int fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sigma, mp_ptr n, ecm_t ecm_inf)
 
-    Selects a random elliptic curve given a random integer sigma, according to 
-    Suyama's parameterization. If in case factor is found while selecting the 
-    curve, the number of limbs required to store the factor is returned,
-    otherwise 0.
+    Selects a random elliptic curve given a random integer \code{sigma},
+    according to Suyama's parameterization. If the factor is found while
+    selecting the curve, the number of limbs required to store the factor
+    is returned, otherwise~$0$.
 
     It could be possible that the selected curve is unsuitable for further
-    computations, in such a case, -1 is returned.
+    computations, in such a case,~$-1$ is returned.
 
-    Also selects the initial point x0, and the value of a24 (a + 2)/4, where a 
-    is a curve parameter. Sets z0 as 1. All these are stored in the ecm struct.
+    Also selects the initial point $x_0$, and the value of $(a + 2)/4$, where~$a$
+    is a curve parameter. Sets~$z_0$ as~$1$. All these are stored in the
+    \code{ecm_t} struct.
 
-    The curve selected is of montgomery form, the points selected satisfy the
+    The curve selected is of Montgomery form, the points selected satisfy the
     curve and are projective coordinates.
 
 int fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array, mp_limb_t num,
                             mp_limb_t B1, mp_ptr n, ecm_t ecm_inf)
 
-    Stage I implementation of the ECM algorithm.
-    
-    f is set as the factor if found. 
-    num is number of prime numbers <= the bound B1.
-    prime_array is an array of first B1 primes.
-    n is the number being factored.
+    Stage\ I implementation of the ECM algorithm.
 
-    If the factor is found, number of words required to store the factor is returned,
-    otherwise 0.
+    \code{f} is set as the factor if found. \code{num} is number of prime numbers
+    $<=$ the bound \code{B1}. \code{prime_array} is an array of first \code{B1}
+    primes. $n$~is the number being factored.
+
+    If the factor is found, number of words required to store the factor is
+    returned, otherwise~$0$.
 
 int fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
                              mp_ptr n, ecm_t ecm_inf)
 
-    Stage II implementation of the ECM algorithm
+    Stage\ II implementation of the ECM algorithm.
 
-    f is set as the factor if found. 
-    B1, B2 are the two bounds.
-    P is the primorial (approximately equal to B2^0.5).
-    n is the number being factored.
+    \code{f} is set as the factor if found. \code{B1}, \code{B2} are the two
+    bounds. \code{P} is the primorial (approximately equal to~$\sqrt{B2}$).
+    $n$~is the number being factored.
 
-    If the factor is found, number of words required to store the factor is returned,
-    otherwise 0.
+    If the factor is found, number of words required to store the factor is
+    returned, otherwise~$0$.
 
 int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
                     flint_rand_t state, fmpz_t n_in);
 
-    Outer wrapper function for the ECM algorithm. In case f can fit in a single
-    unsigned word, a call to n_factor_ecm is made. 
+    Outer wrapper function for the ECM algorithm. In case \code{f} can fit
+    in a single unsigned word, a call to \code{n_factor_ecm} is made. 
 
-    Calls stage I and II, and
-    the precomputations (builds prime_array for stage I, GCD_table and
-    prime_table for stage II).
+    The function calls stage\ I and\ II, and
+    the precomputations (builds \code{prime_array} for stage\ I,
+    \code{GCD_table} and \code{prime_table} for stage\ II).
 
-    f is set as the factor if found.
-    curves is the number of random curves being tried.
-    B1, B2 are the two bounds or stage I and stage II.
-    n is the number being factored.
+    \code{f} is set as the factor if found. \code{curves} is the number of
+    random curves being tried. \code{B1}, \code{B2} are the two bounds or
+    stage\ I and stage\ II. $n$~is the number being factored.
 
-    If a factor is found in stage I, 1 is returned. 
-    If a factor is found in stage II, 2 is returned. 
-    If a factor is found while selecting the curve, -1 is returned. 
-    Otherwise 0 is returned.
+    If a factor is found in stage\ I, $1$ is returned. 
+    If a factor is found in stage\ II, $2$~is returned. 
+    If a factor is found while selecting the curve, $-1$~is returned. 
+    Otherwise~$0$ is returned.

@@ -1,27 +1,13 @@
-/*=============================================================================
+/*
+    Copyright (C) 2014, 2015 Alex J. Best
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2014, 2015 Alex J. Best
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
@@ -64,7 +50,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
     {
         flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
                 "Nullspace was not dimension one.\n");
-        abort();
+        flint_abort();
     }
 
     bits = fmpz_mat_max_bits(B1);
@@ -92,7 +78,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
     {
         flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
                 "Singular input matrix for solve.");
-        abort();
+        flint_abort();
     }
 
     /* fix final row */

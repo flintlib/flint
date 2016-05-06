@@ -1,27 +1,13 @@
-/*=============================================================================
+/*
+    Copyright (C) 2013 William Hart
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2013 William Hart
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -431,7 +417,7 @@ void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
 {
    if (exp >= (UWORD(1) << 32)) {
       printf("Exception (flint_mpz_pow_ui). Power too large.\n");
-      abort();
+      flint_abort();
    }
    
    mpz_pow_ui(r, b, (unsigned long) exp);
@@ -442,7 +428,7 @@ void flint_mpz_fac_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
       printf("Exception (flint_mpz_fac_ui). Value n too large.\n");
-      abort();
+      flint_abort();
    }
    
    mpz_fac_ui(r, (unsigned long) n);
@@ -453,12 +439,12 @@ void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
 {
    if (n >= (UWORD(1) << 32)) {
       printf("Exception (flint_mpz_bin_uiui). Value n too large.\n");
-      abort();
+      flint_abort();
    }
    
    if (k >= (UWORD(1) << 32)) {
       printf("Exception (flint_mpz_bin_uiui). Value k too large.\n");
-      abort();
+      flint_abort();
    }
    
    mpz_bin_uiui(r, (unsigned long) n, (unsigned long) k);
@@ -469,7 +455,7 @@ void flint_mpz_fib_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
       printf("Exception (flint_mpz_fib_ui). Value n too large.\n");
-      abort();
+      flint_abort();
    }
    
    mpz_fib_ui(r, (unsigned long) n);

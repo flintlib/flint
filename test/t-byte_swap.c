@@ -1,27 +1,13 @@
-/*=============================================================================
+/*
+    Copyright (C) 2015 William Hart
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2015 William Hart
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #include <gmp.h>
 #include "flint.h"
@@ -69,7 +55,7 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("byte_swap(byte_swap(n)) != n\n");
          flint_printf("n = %wx, r1 = %wx, r2 = %wx\n", n, r1, r2);
-         abort();
+         flint_abort();
       }
    }
 
@@ -91,7 +77,7 @@ int main(void)
          flint_printf("FAIL:\n");
          flint_printf("byte_swap(n) != byte_swap_naive(n)\n");
          flint_printf("n = %wx, r1 = %wx, r2 = %wx\n", n, r1, r2);
-         abort();
+         flint_abort();
       }
    }
 

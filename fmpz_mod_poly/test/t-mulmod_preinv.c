@@ -1,30 +1,16 @@
-/*=============================================================================
-
-    This file is part of FLINT.
-
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2011, 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
     Copyright (C) 2013 Martin Lee
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #undef ulong
 #define ulong ulongxx/* interferes with system includes */
@@ -55,7 +41,7 @@ main(void)
     
 
     /* Check aliasing of res and a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, res, f, finv;
@@ -103,7 +89,7 @@ main(void)
     }
 
     /* Check aliasing of res and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, f, finv, res;
@@ -151,7 +137,7 @@ main(void)
     }
 
     /* Check aliasing of res and f */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, f, finv, res;
@@ -199,7 +185,7 @@ main(void)
     }
 
     /* Check aliasing of res and finv */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, f, finv, res;
@@ -248,7 +234,7 @@ main(void)
     }
 
     /* No aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, res1, res2, f, finv;

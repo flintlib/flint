@@ -1,29 +1,15 @@
-/*=============================================================================
-
-    This file is part of FLINT.
-
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -83,7 +69,7 @@ fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
     {
         flint_printf("Exception (fq_ctx_init_conway).  Conway polynomials \n");
         flint_printf("are only available for primes up to 109987.\n");
-        abort();
+        flint_abort();
     }
 
     result = _fq_ctx_init_conway(ctx, p, d, var);
@@ -93,6 +79,6 @@ fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
             ("Exception (fq_ctx_init_conway).  The polynomial for \n(p,d) = (");
         fmpz_print(p);
         flint_printf(",%wd) is not present in the database.\n", d);
-        abort();
+        flint_abort();
     }
 }

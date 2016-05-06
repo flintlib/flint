@@ -1,27 +1,13 @@
-/*=============================================================================
+/*
+    Copyright (C) 2015 Kushagra Singh
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2015 Kushagra Singh
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #include <gmp.h>
 #include "flint.h"
@@ -33,12 +19,13 @@ int main(void)
     fmpz_t prime1, prime2, primeprod, fac, modval;
     int i, j, k, fails;
 
+    FLINT_TEST_INIT(state);
+
     fmpz_init(prime1);
     fmpz_init(prime2);
     fmpz_init(primeprod);
     fmpz_init(fac);
     fmpz_init(modval);
-    FLINT_TEST_INIT(state);
 
     fails = 0;
 
@@ -81,13 +68,12 @@ int main(void)
         abort();
     }
 
-    FLINT_TEST_CLEANUP(state);
     fmpz_clear(prime1);
     fmpz_clear(prime2);
     fmpz_clear(primeprod);
     fmpz_clear(fac);
     fmpz_clear(modval);
-
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

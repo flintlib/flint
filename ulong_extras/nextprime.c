@@ -1,30 +1,16 @@
-/*=============================================================================
-
-    This file is part of FLINT.
-
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2007, 2008 William Hart
     Copyright (C) 2008 Peter Shrimpton
     Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2015 Dana Jacobsen
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
@@ -97,7 +83,7 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
     if (n >= UWORD_MAX_PRIME)
     {
         flint_printf("Exception (n_nextprime). No larger single-limb prime exists.\n");
-        abort();
+        flint_abort();
     }
 
     index = n % 30;

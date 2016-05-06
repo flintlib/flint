@@ -1,29 +1,15 @@
-/*=============================================================================
+/*
+    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Lina Kulakova
+    Copyright (C) 2014 Martin Lee
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-   Copyright (C) 2011 Fredrik Johansson
-   Copyright (C) 2012 Lina Kulakova
-   Copyright (C) 2014 Martin Lee
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #include <gmp.h>
 #include <pthread.h>
@@ -195,7 +181,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
                 ("Exception (fmpz_mod_poly_compose_mod_brent_kung_vec_preinv)."
                  "The degree of the first polynomial must be smaller than that of the "
                  " modulus\n");
-            abort();
+            flint_abort();
         }
     }
 
@@ -204,7 +190,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
         flint_printf
             ("Exception (fmpz_mod_poly_compose_mod_brent_kung_vec_preinv)."
              "n is larger than the length of polys\n");
-        abort();
+        flint_abort();
     }
 
     if (n == 0)

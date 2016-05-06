@@ -1,30 +1,16 @@
-/*=============================================================================
-
-    This file is part of FLINT.
-
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2014 Ashish Kedia
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 *******************************************************************************
 
@@ -145,7 +131,9 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
     \code{len}, but thinking of it as a polynomial of length~\code{m},
     notionally zero-padded if necessary. The length~\code{m} must be
     non-negative, but there are no other restrictions. The polynomial
-    \code{output} must have space for \code{m} coefficients.
+    \code{output} must have space for \code{m} coefficients. Supports
+    aliasing of \code{output} and \code{input}, but the behaviour is
+    undefined in case of partial overlap.
 
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m)
 
@@ -1299,7 +1287,7 @@ void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, slong len, nmod_t mod)
     The constant term of \code{x_int} is set to zero.
     It is assumed that \code{len > 0}. The result is only well-defined
     if the modulus is a prime number strictly larger than the degree of
-    \code{x}.
+    \code{x}. Supports aliasing between the two polynomials.
 
 void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x)
 
@@ -1328,11 +1316,11 @@ mp_limb_t nmod_poly_evaluate_nmod(nmod_poly_t poly, mp_limb_t c)
     the modulus. The algorithm used is Horner's method.
 
 void nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const nmod_poly_t poly,
-						const nmod_mat_t c)
+                        const nmod_mat_t c)
 
     Evaluates \code{poly} with matrix as an argument at the value \code{c}
     and stores the result in \code{dest}. The dimension and modulus of
-    \code{dest} is assumed to be same as that of \code{c}. \code{dest} and 
+    \code{dest} is assumed to be same as that of \code{c}. \code{dest} and
     \code{c} may be aliased. Horner's Method is used to compute the result.
 
 void nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest,
@@ -1340,7 +1328,7 @@ void nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest,
 
     Evaluates \code{poly} with matrix as an argument at the value \code{c}
     and stores the result in \code{dest}. The dimension and modulus of
-    \code{dest} is assumed to be same as that of \code{c}. \code{dest} and 
+    \code{dest} is assumed to be same as that of \code{c}. \code{dest} and
     \code{c} may be aliased. Paterson-Stockmeyer algorithm is used to compute
     the result. The algorithm is described in \cite{Paterson1973}.
 
@@ -1349,7 +1337,7 @@ void nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
 
     Evaluates \code{poly} with matrix as an argument at the value \code{c}
     and stores the result in \code{dest}. The dimension and modulus of
-    \code{dest} is assumed to be same as that of \code{c}. \code{dest} and 
+    \code{dest} is assumed to be same as that of \code{c}. \code{dest} and
     \code{c} may be aliased. This function automatically switches between
     Horner's method and the Paterson-Stockmeyer algorithm.
 
@@ -2013,10 +2001,10 @@ _nmod_poly_resultant_hgcd(mp_srcptr poly1, slong len1,
     the Euclidean algorithm which do not require the low $m$ coefficients of
     $a$ and $b$.
 
-    This performs quotients in exactly the same order as the ordinary 
+    This performs quotients in exactly the same order as the ordinary
     Euclidean algorithm except that the low $m$ coefficients of the polynomials
-    in the remainder sequence are not computed. A correction step after hgcd 
-    has been called computes these low $m$ coefficients (by matrix 
+    in the remainder sequence are not computed. A correction step after hgcd
+    has been called computes these low $m$ coefficients (by matrix
     multiplication by a transformation matrix also computed by hgcd).
 
     This means that from the point of view of the resultant, all but the last
@@ -2027,8 +2015,8 @@ _nmod_poly_resultant_hgcd(mp_srcptr poly1, slong len1,
 
     To compute the adjustments to the resultant coming from this corrected
     quotient, we save the relevant information in an \code{nmod_poly_res_t}
-    struct at the time the quotient is performed so that when the correction 
-    step is performed later, the adjustments to the resultant can be computed 
+    struct at the time the quotient is performed so that when the correction
+    step is performed later, the adjustments to the resultant can be computed
     at that time also.
 
     The only time an adjustment to the resultant is not required after a
@@ -2199,7 +2187,7 @@ void nmod_poly_compose_series_brent_kung(nmod_poly_t res,
 
 void _nmod_poly_compose_series_divconquer(mp_ptr res,
            mp_srcptr poly1, slong len1,
-	   mp_srcptr poly2, slong len2, slong N, nmod_t mod)
+       mp_srcptr poly2, slong len2, slong N, nmod_t mod)
 
     Composes \code{poly1} of length $\ell_1$ with \code{poly2} of
     length $\ell_2$ modulo $x^N$ and sets \code{res} to the result,
@@ -2404,6 +2392,74 @@ int nmod_poly_sqrt(nmod_poly_t s, const nmod_poly_t p)
 
 *******************************************************************************
 
+    Power sums
+
+*******************************************************************************
+
+void _nmod_poly_power_sums_naive(mp_ptr res, mp_srcptr poly, slong len, slong n, nmod_t mod)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{(poly,len)} up to length $n$ using Newton identities.
+
+void nmod_poly_power_sums_naive(nmod_poly_t res, const nmod_poly_t poly, slong n)
+
+    Compute the (truncated) power sum series of the polynomial
+    \code{poly} up to length $n$ using Newton identities.
+
+void _nmod_poly_power_sums_schoenhage(mp_ptr res, mp_srcptr poly, slong len, slong n, nmod_t mod)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{(poly,len)} up to length $n$ using a series expansion
+    (a formula due to Schoenhage).
+
+void nmod_poly_power_sums_schoenhage(nmod_poly_t res, const nmod_poly_t poly, slong n)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{poly} up to length $n$ using a series expansion
+    (a formula due to Schoenhage).
+
+void _nmod_poly_power_sums(mp_ptr res, mp_srcptr poly, slong len, slong n, nmod_t mod)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{(poly,len)} up to length $n$.
+
+void nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
+
+    Compute the (truncated) power sums series of the polynomial
+    \code{poly} up to length $n$.
+
+void _nmod_poly_power_sums_to_poly_naive(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{(poly,len)} using Newton identities.
+
+void nmod_poly_power_sums_to_poly_naive(nmod_poly_t res, const nmod_poly_t Q)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{Q} using Newton identities.
+
+void _nmod_poly_power_sums_to_poly_schoenhage(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{(poly,len)} using series expansion (a formula due to Schoenhage).
+
+void nmod_poly_power_sums_to_poly_schoenhage(nmod_poly_t res, const nmod_poly_t Q)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{Q} using series expansion (a formula due to Schoenhage).
+
+void _nmod_poly_power_sums_to_poly(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod)
+
+    Compute the (monic) polynomial given by its power sums series
+    \code{(poly,len)}.
+
+void nmod_poly_power_sums_to_poly(nmod_poly_t res, const nmod_poly_t Q)
+
+     Compute the (monic) polynomial given by its power sums series
+    \code{Q}.
+
+*******************************************************************************
+
     Transcendental functions
 
     The elementary transcendental functions of a formal power series $h$
@@ -2487,13 +2543,19 @@ void nmod_poly_exp_series_basecase(nmod_poly_t g, const nmod_poly_t h, slong n)
 
     Set $g = \exp(h) + O(x^n)$ using a simple $O(n^2)$ algorithm.
 
-void _nmod_poly_exp_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+void _nmod_poly_exp_series2(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
-    Set $g = \exp(h) + O(x^n)$. Assumes $n > 0$ and that $h$ is zero-padded
-    as necessary to length $n$. Aliasing of $g$ and $h$ is not allowed.
+    Set $f = \exp(h) + O(x^n)$ where \code{h} is a polynomial. Assume
+    $n > 0$. Aliasing of $g$ and $h$ is not allowed.
 
     Uses Newton iteration (the version given in \cite{HanZim2004}).
     For small $n$, falls back to the basecase algorithm.
+
+void _nmod_poly_exp_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+
+    Deprecated version of \code{_nmod_poly_exp_series2} in which the result
+    \code{(g,n)} and the input \code{(h,n)} must have the same length
+    (zero-padded if necessary).
 
 void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h,
         slong n, nmod_t mod)

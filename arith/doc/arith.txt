@@ -1,27 +1,13 @@
-/*=============================================================================
+/*
+    Copyright (C) 2010, 2011 Fredrik Johansson
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2010, 2011 Fredrik Johansson
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 *******************************************************************************
 
@@ -394,23 +380,6 @@ void _arith_euler_number_zeta(fmpz_t res, ulong n)
     uses the relation $$|E_n| = \frac{2^{n+2} n!}{\pi^{n+1}} L(n+1)$$
     where $L(n+1)$ denotes the Dirichlet $L$-function with character
     $\chi = \{ 0, 1, 0, -1 \}$.
-
-*******************************************************************************
-
-    Legendre polynomials
-
-*******************************************************************************
-
-void arith_legendre_polynomial(fmpq_poly_t poly, ulong n)
-
-    Sets \code{poly} to the $n$-th Legendre polynomial
-    $$P_n(x) = \frac{1}{2^n n!} \frac{d^n}{dx^n} \left[
-        \left(x^2-1\right)^n \right].$$
-    The coefficients are calculated using a hypergeometric recurrence.
-    To improve performance, the common denominator is computed in one step
-    and the coefficients are evaluated using integer arithmetic. The
-    denominator is given by
-    $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
 
 *******************************************************************************
 

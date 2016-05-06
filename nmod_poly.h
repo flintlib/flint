@@ -1,31 +1,17 @@
-/*=============================================================================
-
-    This file is part of FLINT.
-
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2007, David Howden
     Copyright (C) 2010, 2011 William Hart
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Ashish Kedia
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef NMOD_POLY_H
 #define NMOD_POLY_H
@@ -1143,6 +1129,32 @@ FLINT_DLL int _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, slong len, nmod_t mod);
 
 FLINT_DLL int nmod_poly_sqrt(nmod_poly_t b, const nmod_poly_t a);
 
+/* Power sums ****************************************************************/
+
+FLINT_DLL void _nmod_poly_power_sums_naive(mp_ptr res, mp_srcptr poly, slong len, slong n, nmod_t mod);
+
+FLINT_DLL void nmod_poly_power_sums_naive(nmod_poly_t res, const nmod_poly_t poly, slong n);
+
+FLINT_DLL void _nmod_poly_power_sums_schoenhage(mp_ptr res, mp_srcptr poly, slong len, slong n, nmod_t mod);
+
+FLINT_DLL void nmod_poly_power_sums_schoenhage(nmod_poly_t res, const nmod_poly_t poly, slong n);
+
+FLINT_DLL void _nmod_poly_power_sums(mp_ptr res, mp_srcptr poly, slong len, slong n, nmod_t mod);
+
+FLINT_DLL void nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n);
+
+FLINT_DLL void _nmod_poly_power_sums_to_poly_naive(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod);
+
+FLINT_DLL void nmod_poly_power_sums_to_poly_naive(nmod_poly_t res, const nmod_poly_t Q);
+
+FLINT_DLL void _nmod_poly_power_sums_to_poly_schoenhage(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod);
+
+FLINT_DLL void nmod_poly_power_sums_to_poly_schoenhage(nmod_poly_t res, const nmod_poly_t Q);
+
+FLINT_DLL void _nmod_poly_power_sums_to_poly(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod);
+
+FLINT_DLL void nmod_poly_power_sums_to_poly(nmod_poly_t res, const nmod_poly_t Q);
+
 /* Transcendental functions **************************************************/
 
 FLINT_DLL void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
@@ -1196,6 +1208,8 @@ FLINT_DLL void nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h,
 FLINT_DLL void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
 
 FLINT_DLL void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod);
+FLINT_DLL void _nmod_poly_exp_series2(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod);
+
 FLINT_DLL void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n);
 
 /* Products  *****************************************************************/
@@ -1230,7 +1244,7 @@ void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M)
    if (A->r != A->c)
    {
        flint_printf("Exception (nmod_mat_charpoly).  Non-square matrix.\n");
-       abort();
+       flint_abort();
    }
 
    nmod_mat_charpoly_danilevsky(p, A);
