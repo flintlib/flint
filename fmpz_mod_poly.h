@@ -821,6 +821,45 @@ FLINT_DLL int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
 FLINT_DLL int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A, 
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P);
 
+/*  Minpoly  *****************************************************************/
+
+FLINT_DLL slong _fmpz_mod_poly_minpoly_bm(fmpz* poly, 
+                 const fmpz* seq, slong len, const fmpz_t p);
+
+FMPZ_MOD_POLY_INLINE void 
+fmpz_mod_poly_minpoly_bm(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+{
+    fmpz_mod_poly_fit_length(poly, len+1);
+    poly->length = _fmpz_mod_poly_minpoly_bm(poly->coeffs, seq, len, &poly->p);
+}
+
+FLINT_DLL slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly, 
+                 const fmpz* seq, slong len, const fmpz_t p);
+
+FMPZ_MOD_POLY_INLINE void 
+fmpz_mod_poly_minpoly_hgcd(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+{
+    fmpz_mod_poly_fit_length(poly, len+1);
+    poly->length = _fmpz_mod_poly_minpoly_hgcd(poly->coeffs, seq, len, &poly->p);
+}
+
+FMPZ_MOD_POLY_INLINE slong 
+_fmpz_mod_poly_minpoly(fmpz* poly, const fmpz* seq, slong len, const fmpz_t p)
+{
+    if (len < FLINT_MAX(200, 530-22*fmpz_size(p))) 
+    {
+        return _fmpz_mod_poly_minpoly_bm(poly, seq, len, p);
+    }
+    else return _fmpz_mod_poly_minpoly_hgcd(poly, seq, len, p);
+}
+
+FMPZ_MOD_POLY_INLINE void 
+fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+{
+    fmpz_mod_poly_fit_length(poly, len+1);
+    poly->length = _fmpz_mod_poly_minpoly(poly->coeffs, seq, len, &poly->p);
+}
+
 /*  Resultant  ***************************************************************/
 
 FLINT_DLL void _fmpz_mod_poly_resultant_euclidean(fmpz_t res, 
