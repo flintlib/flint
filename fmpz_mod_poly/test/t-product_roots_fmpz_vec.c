@@ -17,6 +17,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
+#include "fmpz_mod_poly.h"
 
 int
 main(void)
