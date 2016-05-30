@@ -28,6 +28,7 @@ void
 nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
 {
     slong len = poly->length;
+    size_t i = 0;
 
     if (len == 0)
     {
@@ -35,7 +36,6 @@ nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
             ("Exception (nmod_poly_power_sums_naive). Zero polynomial.\n");
         abort();
     }
-    size_t i = 0;
     while (poly->coeffs[i] == 0)
         i++;
 
@@ -80,5 +80,4 @@ nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
         _nmod_poly_set_length(res, n);
         _nmod_poly_normalise(res);
     }
-
 }

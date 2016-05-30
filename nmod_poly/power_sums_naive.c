@@ -19,7 +19,6 @@ _nmod_poly_power_sums_naive(mp_ptr res, mp_srcptr poly, slong len, slong n,
                             nmod_t mod)
 {
     slong i, k;
-    mp_limb_t tmp;
 
     NMOD_RED(res[0], len - 1, mod);
     for (k = 1; k < FLINT_MIN(n, len); k++)
