@@ -50,15 +50,15 @@ int main()
     for (i = 0; i < 100; i++)
     {
         fmpz_set_ui(mmin, 1);
-        fmpz_mul_2exp(mmin, mmin, i * 64);
+        fmpz_mul_2exp(mmin, mmin, i * FLINT_BITS);
 
         for (j = 0; j < 100; j++)
         {
             fmpz_set_ui(b, 0);
 
-            k = n_randint(state, 64);
-            k += 1;                     /* 1 <= k <= 64 */
-            k += (i * 64);              /* 2^(i*64) + 1 <= k <= 2^((i + 1)*64) */
+            k = n_randint(state, FLINT_BITS);
+            k += 1;                     /* 1 <= k <= FLINT_BITS */
+            k += (i * FLINT_BITS);              /* 2^(i*FLINT_BITS) + 1 <= k <= 2^((i + 1)*FLINT_BITS) */
 
             fmpz_randtest_unsigned(a, state, k);
             fmpz_add(a, a, mmin);
@@ -70,7 +70,7 @@ int main()
                 fmpz_add_ui(b, b, mpna[k - 1]);
 
                 if (k - 1)
-                    fmpz_mul_2exp(b, b, 64);
+                    fmpz_mul_2exp(b, b, FLINT_BITS);
 
                 k -= 1;
             }
