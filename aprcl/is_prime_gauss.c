@@ -163,7 +163,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
 
         If (Lp), then lambdas_p = 3.
     */
-    lambdas = (int*) malloc(sizeof(int) * config->rs.num);
+    lambdas = (int*) flint_malloc(sizeof(int) * config->rs.num);
     for (i = 0; i < config->rs.num; i++)
         lambdas[i] = 0;
 
@@ -347,7 +347,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
             result = COMPOSITE;
     }
 
-    free(lambdas);
+    flint_free(lambdas);
 
     return result;
 }

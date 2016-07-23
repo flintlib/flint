@@ -37,7 +37,7 @@ nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest, const nmod_poly_t po
         return;
     }
 
-    temp = malloc((lim + 1) * sizeof(nmod_mat_t));
+    temp = flint_malloc((lim + 1) * sizeof(nmod_mat_t));
     nmod_mat_init(temp[0], c->r, c->c, c->mod.n);
     nmod_mat_one(temp[0]);
     nmod_mat_init(temp[1], c->r, c->c, c->mod.n);
@@ -77,5 +77,5 @@ nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest, const nmod_poly_t po
         nmod_mat_clear(temp[i]);
     }
     nmod_mat_clear(tmat);
-    free(temp);
+    flint_free(temp);
 }
