@@ -80,6 +80,8 @@ _config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
         n_factor_init(&q_factors);
         n_factor(&q_factors, q - 1, 1);
 
+        w[i] = 0;
+
         for (j = 0; j < q_factors.num; j++)
         {
             ulong p, euler_phi;
