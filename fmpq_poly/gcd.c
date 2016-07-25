@@ -53,7 +53,7 @@ void _fmpq_poly_gcd(fmpz *G, fmpz_t denG,
         }
         else
         {
-            if (fmpz_is_one(s))
+            if (fmpz_is_one(t))
             {
                 primA = _fmpz_vec_init(lenA);
                 primB = (fmpz *) B;
