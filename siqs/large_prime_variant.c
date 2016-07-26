@@ -26,6 +26,7 @@
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #undef ulong
 #define ulong mp_limb_t
@@ -33,7 +34,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "qsieve.h"
+#include "siqs.h"
 #include "fmpz.h"
 
 #define HASH_MULT (UWORD(2654435761))       /* hash function, taken from 'msieve' */
@@ -169,7 +170,7 @@ int qsieve_is_relation2(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
 
 void qsieve_write_to_file2(qs_t qs_inf, relation_t r)
 {
-    slong i, j;
+    slong i;
 
     flint_fprintf(qs_inf->siqs, "%wu ", r.lp);  /* write large prime */
 
@@ -191,7 +192,7 @@ void qsieve_write_to_file2(qs_t qs_inf, relation_t r)
 /* write partial or full relation to file */
 void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
 {
-    slong i, j;
+    slong i;
     char * str = NULL;
     slong num_factors = qs_inf->num_factors;
     slong * small = qs_inf->small;
@@ -587,11 +588,12 @@ void qsieve_process_relation(qs_t qs_inf)
 {
     char buf[1024];
     char * str;
-    slong i, j, k, num_relations = 0, full = 0;
+    slong i, j, num_relations = 0, full = 0;
     mp_limb_t prime;
     hash_t * entry;
     mp_limb_t * hash_table = qs_inf->hash_table;
     relation_t * rel_list = flint_malloc(50000 * sizeof(relation_t));
+    relation_t * rlist;
     qs_inf->siqs = fopen("siqs.dat", "r");
 
     while (fgets(buf, sizeof(buf), qs_inf->siqs) != NULL)
@@ -609,7 +611,7 @@ void qsieve_process_relation(qs_t qs_inf)
 
     fclose(qs_inf->siqs);
     num_relations = qsieve_remove_duplicates(rel_list, num_relations);
-    relation_t * rlist = flint_malloc(num_relations * sizeof(relation_t));
+    rlist = flint_malloc(num_relations * sizeof(relation_t));
     memset(hash_table, 0, (1 << 22) * sizeof(mp_limb_t));
     qs_inf->vertices = 0;
 

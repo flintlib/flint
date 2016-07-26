@@ -25,7 +25,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "qsieve.h"
+#include "siqs.h"
 
 #include <inttypes.h>
 #define _STDC_FORMAT_MACROS
@@ -40,11 +40,11 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 {
     clock_t start = clock(), diff;
     qs_t qs_inf;
-    mp_limb_t small_factor, factor = 0, t, delta;
+    mp_limb_t small_factor, delta;
     ulong exp = 0;
     unsigned char * sieve;
-    slong ncols, nrows, i, j, k = 0, count, relation = 0, num_primes;
-    uint64_t * nullrows;
+    slong ncols, nrows, i, j = 0, count, relation = 0, num_primes;
+    uint64_t * nullrows = NULL;
     uint64_t mask;
     flint_rand_t state;
     fmpz_t temp, X, Y;

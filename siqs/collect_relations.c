@@ -26,13 +26,14 @@
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #undef ulong
 #define ulong mp_limb_t
 
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "qsieve.h"
+#include "siqs.h"
 #include "fmpz.h"
 
 #include <time.h>
@@ -46,10 +47,11 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
    mp_limb_t * soln2 = qs_inf->soln2;
    prime_t * factor_base = qs_inf->factor_base;
    mp_limb_t p;
-   char * end = sieve + qs_inf->sieve_size;
-   register char * pos1;
-   register char * pos2;
-   register char * bound;
+
+   unsigned char * end = sieve + qs_inf->sieve_size;
+   register unsigned char * pos1;
+   register unsigned char * pos2;
+   register unsigned char * bound;
    slong size;
    slong diff;
    slong pind;
@@ -100,7 +102,7 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
 
 void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 {
-    slong b, d1, d2, i, j;
+    slong b, d1, d2, i;
     slong pind, size;
     mp_limb_t p;
     slong num_primes = qs_inf->num_primes;

@@ -23,10 +23,15 @@
 
 ******************************************************************************/
 
+#define ulong ulongxx /* interferes with system includes */
+#include <string.h>
+#undef ulong
+#define ulong mp_limb_t
+
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "qsieve.h"
+#include "siqs.h"
 #include "fmpz.h"
 
 void qsieve_linalg_init(qs_t qs_inf)

@@ -26,7 +26,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "qsieve.h"
+#include "siqs.h"
 #include "fmpz.h"
 
 void qsieve_linalg_clear(qs_t qs_inf)

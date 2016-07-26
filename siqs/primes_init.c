@@ -26,7 +26,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "qsieve.h"
+#include "siqs.h"
 
 prime_t *
 compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
@@ -36,11 +36,12 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
     mp_limb_t k = qs_inf->k;
     slong num = qs_inf->num_primes;
     slong fb_prime = 2;
-    prime_t * factor_base;
+    prime_t * factor_base = NULL;
     int * sqrts;
     int kron;
+    n_primes_t iter;
 
-    /* (re)allocate space for factor base */
+/* (re)allocate space for factor base */
     if (num == 0)
         factor_base = (prime_t *) flint_malloc(num_primes*sizeof(prime_t));
     else
@@ -65,7 +66,6 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
     }
     else p = factor_base[num - 1].p;
 
-    n_primes_t iter;
     n_primes_init(iter);
     n_primes_jump_after(iter, p);
 

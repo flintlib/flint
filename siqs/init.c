@@ -27,7 +27,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "qsieve.h"
+#include "siqs.h"
 
 void qsieve_init(qs_t qs_inf, fmpz_t n)
 {

@@ -33,7 +33,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "qsieve.h"
+#include "siqs.h"
 #include "fmpz.h"
 
 void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,

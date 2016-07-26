@@ -32,7 +32,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "qsieve.h"
+#include "siqs.h"
 #include "fmpz.h"
 
 
@@ -54,7 +54,6 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
     slong i, j, mid;
     slong s = qs_inf->s;
     slong low = qs_inf->low;
-    slong high = qs_inf->high;
     slong span = qs_inf->span;
     slong h = qs_inf->h;
     slong m = qs_inf->m;
@@ -422,7 +421,7 @@ void qsieve_init_A0(qs_t qs_inf)
 
 void qsieve_compute_pre_data(qs_t qs_inf)
 {
-    slong i, j;
+    slong i;
     slong s = qs_inf->s;
     mp_limb_t * A_ind = qs_inf->A_ind;
     mp_limb_t * A0_inv = qs_inf->A0_inv;
@@ -569,7 +568,11 @@ void qsieve_init_poly_first(qs_t qs_inf)
     for (i = 3; i < qs_inf->num_primes; i++)
     {
         if (soln1[i] > soln2[i])
-            soln1[i] = (soln1[i] + soln2[i]) - (soln2[i] = soln1[i]);
+        {
+           mp_limb_t t = soln1[i];
+           soln1[i] = soln2[i];
+           soln2[i] = t;
+        }
     }
 
     for (i = 0; i < s; i++)
@@ -596,7 +599,8 @@ void qsieve_init_poly_next(qs_t qs_inf)
     mp_limb_t * soln2 = qs_inf->soln2;
     mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
     mp_limb_t sign, p;
-    fmpz_t temp;
+    fmpz_t temp, temp2;
+    
     fmpz_init(temp);
 
     /* we have $b_i$, calculating $b_{i+1}$ using gray code formula */
@@ -617,7 +621,6 @@ void qsieve_init_poly_next(qs_t qs_inf)
     fmpz_mul(temp, qs_inf->B, qs_inf->B);
     fmpz_mod(temp, temp, qs_inf->A);
 
-    fmpz_t temp2;
     fmpz_init_set(temp2, qs_inf->kn);
     fmpz_mod(temp2, temp2, qs_inf->A);
 
@@ -641,7 +644,11 @@ void qsieve_init_poly_next(qs_t qs_inf)
         if (soln2[j] >= p) soln2[j] -= p;
 
         if (soln1[j] > soln2[j])
-            soln1[j] = (soln1[j] + soln2[j]) - (soln2[j] = soln1[j]);
+        {
+           mp_limb_t t = soln1[j];
+           soln1[j] = soln2[j];
+           soln2[j] = t;
+        }
     }
 
     i++;

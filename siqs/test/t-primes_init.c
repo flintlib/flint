@@ -29,7 +29,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "qsieve.h"
+#include "siqs.h"
 
 int main(void)
 {
@@ -38,11 +38,12 @@ int main(void)
    mp_limb_t small_factor, pmod;
    qs_t qs_inf;
    fmpz_t n, x, y;
+
+   FLINT_TEST_INIT(state);
+
    fmpz_init(n);
    fmpz_init(x);
    fmpz_init(y);
-
-   FLINT_TEST_INIT(state);
 
    flint_printf("primes_init....");
    fflush(stdout);
