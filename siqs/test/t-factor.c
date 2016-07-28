@@ -31,6 +31,24 @@
 #include "fmpz.h"
 #include "siqs.h"
 
+void randprime(fmpz_t p, flint_rand_t state)
+{
+    fmpz_randbits(p, state, 100);
+
+    fmpz_print(p); printf("\n");
+ 
+    if (fmpz_sgn(p) < 0)
+       fmpz_neg(p, p);
+
+    if (fmpz_is_even(p))
+       fmpz_add_ui(p, p, 1);
+
+    fmpz_print(p); printf("\n");
+ 
+    while (!fmpz_is_probabprime(p))
+       fmpz_add_ui(p, p, 2);
+}
+
 int main(void)
 {
    slong i;
@@ -45,167 +63,14 @@ int main(void)
    flint_printf("factor....");
    fflush(stdout);
 
-
-
-   for (i = 0; i < 1; i++) /* Test random n */
+   for (i = 0; i < 1000; i++) /* Test random n */
    {
-      b = a = n_randprime(state, 20, 1);
-
-      while (b == a)
-        b = n_randprime(state, 20, 1);
-
-      fmpz_init_set_ui(n, a);
-      fmpz_mul_ui(n, n, b);
-
-    /*  fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-   /*   fmpz_set_str(x, "282174488599599500573849980909", 10);  
-
-      fmpz_set_str(y, "280829369862134719390036617067", 10);
+      randprime(x, state);
+      randprime(y, state);
 
       fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-  /*    fmpz_set_str(x, "513821217024129243948411056803", 10); 
-
-      fmpz_set_str(y, "521419622856657689423872613771", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-   /*   fmpz_set_str(x, "341427877364219557396646723561", 10);
-
-      fmpz_set_str(y, "359916012598740083996400089999", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-    /*  fmpz_set_str(x, "564819669946735512444543556507", 10); 
-
-      fmpz_set_str(y, "590872612825179551336102196593", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-    /*  fmpz_set_str(x, "341427877364219557396646723561", 10);
-
-      fmpz_set_str(y, "359916012598740083996400089999", 10);   
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-   /*   fmpz_set_str(x, "666666777777788888888999999999", 10);  
-
-      fmpz_set_str(y, "671998030559713968361666935769", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-    /*  fmpz_set_str(x, "1291713871775387910289126481863", 10); 
-
-      fmpz_set_str(y, "1317313773719779779173773137131", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-   /*   fmpz_set_str(x, "3111111111111111111111111111113", 10);   
-
-      fmpz_set_str(y, "3113113113113113113113113113113", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-      fmpz_set_str(x, "1011313133831810181383313131101", 10);   
-
-      fmpz_set_str(y, "1124495649695212998778414534811", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
 
       qsieve_factor(n, factors);
-
-   /*   fmpz_set_str(x, "909090909090909090909090909091", 10);
-
-      fmpz_set_str(y, "811451682377384625400019885321", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-   /*   fmpz_set_str(x, "1000000000000000000000000000057", 10);   
-
-      fmpz_set_str(y, "1000000000000066600000000000001", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
-
-   /*   fmpz_set_str(x, "1717171717171717171717171717171", 10);
-
-      fmpz_set_str(y, "2771826449193354891007108898387", 10);
-
-      fmpz_mul(n, x, y);
-
-      fmpz_print(n);
-
-      flint_printf("\n");
-
-      qsieve_factor(n, factors); */
    }
 
    fmpz_clear(n);

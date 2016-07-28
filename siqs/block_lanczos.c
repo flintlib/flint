@@ -11,16 +11,13 @@
 */
 
 /*-------------------------------------------------------------------
+
 Optionally, please be nice and tell me if you find this source to be
 useful. Again optionally, if you add to the functionality present here
 please consider making those additions public too, so that others may 
 benefit from your work.	
        				   --jasonp@boo.net 9/8/06
-       				   
-The following modifications were made by William Hart:
-    -added the utility function get_null_entry
-    -reformatted original code so it would operate as a standalone 
-     filter and block Lanczos module
+
 --------------------------------------------------------------------*/
 
 

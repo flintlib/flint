@@ -1,27 +1,14 @@
-/*=============================================================================
+/*
+    Copyright (C) 2006, 2011, 2016 William Hart
+    Copyright (C) 2015 Nitin Kumar
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2015 Nitin Kumar
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -39,7 +26,6 @@
 
 #define HASH_MULT (UWORD(2654435761))       /* hash function, taken from 'msieve' */
 #define HASH(a) (((a) * HASH_MULT) >> (10))
-
 
 /* some helper function, used for debugging */
 
@@ -60,7 +46,6 @@ void qsieve_display_relation(qs_t qs_inf, relation_t a)
     fmpz_print(a.Y);
     flint_printf("\n");
 }
-
 
 void qsieve_display_relation2(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
 {
@@ -87,7 +72,7 @@ int qsieve_is_relation(qs_t qs_inf, relation_t a)
     slong i;
     fmpz_t temp, temp2;
     fmpz_init(temp);
-    fmpz_init_set_ui(temp2, UWORD(1));
+    fmpz_init_set_ui(temp2, 1);
 
     for (i = 0; i < qs_inf->small_primes; i++)
     {
@@ -187,8 +172,6 @@ void qsieve_write_to_file2(qs_t qs_inf, relation_t r)
     flint_fprintf(qs_inf->siqs, "\n");
 }
 
-
-
 /* write partial or full relation to file */
 void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
 {
@@ -234,8 +217,6 @@ void qsieve_copy_relation(qs_t qs_inf, relation_t a)
     main function starts here
 **********************************************************/
 
-
-
 /*
    hash table used to keep count of large prime, idea is taken from "msieve" implementation
    each new prime is filled at last unoccupied position in array and primes which have same
@@ -254,7 +235,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
     mp_limb_t * hash_table =  qs_inf->hash_table;
     hash_t * table = qs_inf->table;
 
-    first_offset = HASH(prime);
+    first_offset = HASH(prime)%qs_inf->table_size;
     offset = hash_table[first_offset];
 
     while (offset != 0)
@@ -274,7 +255,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
         entry->count = 0;
         hash_table[first_offset] = qs_inf->vertices;
     }
-
+    
     return entry;
 }
 
@@ -289,7 +270,7 @@ void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
     slong table_size = qs_inf->table_size;
     hash_t * table = qs_inf->table;
 
-    if (qs_inf->vertices + WORD(1) >= table_size)
+    if (qs_inf->vertices + 1 >= table_size)
     {
         table_size *= 1.1;
         table = flint_realloc(table, table_size * sizeof(hash_t));

@@ -1,27 +1,14 @@
-/*=============================================================================
+/*
+    Copyright (C) 2006, 2011, 2016 William Hart
+    Copyright (C) 2015 Nitin Kumar
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2015 Nitin Kumar
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef QSIEVE_H
 #define QSIEVE_H
@@ -42,8 +29,7 @@
    #include <stdint.h>
 #endif
 
-
-#define QS_DEBUG 0
+#define QS_DEBUG 1
 
 typedef struct prime_t
 {
@@ -51,7 +37,6 @@ typedef struct prime_t
    int p;              /* prime */
    char size;
 } prime_t;
-
 
 typedef struct fac_t    /* struct for factors of relations */
 {
@@ -61,26 +46,26 @@ typedef struct fac_t    /* struct for factors of relations */
 
 typedef struct la_col_t  /* matrix column */
 {
-	slong * data;		/* The list of occupied rows in this column */
-	slong weight;		/* Number of nonzero entries in this column */
-	slong orig;         /* Original relation number */
+   slong * data;		/* The list of occupied rows in this column */
+   slong weight;		/* Number of nonzero entries in this column */
+   slong orig;         /* Original relation number */
 } la_col_t;
 
 
 typedef struct hash_t   /* entry in hash table */
 {
-    mp_limb_t prime;    /* value of prime */
-    mp_limb_t next;     /* next prime which have same hash value as 'prime' */
-    mp_limb_t count;    /* number of occurrence of 'prime' */
+   mp_limb_t prime;    /* value of prime */
+   mp_limb_t next;     /* next prime which have same hash value as 'prime' */
+   mp_limb_t count;    /* number of occurrence of 'prime' */
 } hash_t;
 
 typedef struct relation_t  /* format for relation */
 {
-    mp_limb_t lp;          /* large prime, is 1, if relation is full */
-    slong num_factors;     /* number of factors, excluding small factor */
-    slong * small;         /* exponent of small factors */
-    fac_t * factor;        /* factor of relation */
-    fmpz_t Y;              /* square root of sieve value for relation */
+   mp_limb_t lp;          /* large prime, is 1, if relation is full */
+   slong num_factors;     /* number of factors, excluding small factor */
+   slong * small;         /* exponent of small factors */
+   fac_t * factor;        /* factor of relation */
+   fmpz_t Y;              /* square root of sieve value for relation */
 } relation_t;
 
 typedef struct qs_s
@@ -261,8 +246,8 @@ void qsieve_clear(qs_t qs_inf);
 
 mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors);
 
-prime_t *
-compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes);
+prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
+                                                             slong num_primes);
 
 mp_limb_t qsieve_primes_init(qs_t qs_inf);
 
@@ -328,10 +313,10 @@ int qsieve_compare_relation(const void * a, const void * b);
 
 int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations);
 
-void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list, slong num_relations);
+void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list,
+                                                          slong num_relations);
 
 void qsieve_process_relation(qs_t qs_inf);
-
 
 static __inline__ void insert_col_entry(la_col_t * col, slong entry)
 {
@@ -389,7 +374,6 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 
 void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
    uint64_t * nullrows, slong ncols, slong l, fmpz_t N);
-
 
 #ifdef __cplusplus
 }

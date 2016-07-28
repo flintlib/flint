@@ -1,27 +1,14 @@
-/*=============================================================================
+/*
+    Copyright (C) 2016 William Hart
+    Copyright (C) 2015 Nitin Kumar
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2015 Nitin Kumar
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -35,19 +22,18 @@
 #include "siqs.h"
 #include "fmpz.h"
 
-
 /*
     try to compute A0, which will remain fixed, for A = q0 * A0
     goal is to make sure that,
     (i) A is close to it's ideal value which is, sqrt(2 * kn) / M,
         where kn is the number to be factored and M is the size of sieve
-   (ii) A should not contain too many small primes factor,
+   (ii) A should not contain too many small prime factors,
         it will decrease number of relation
-  (iii) A should not contain too large primes factor for reason (i)
-   (iv) A should have as many factor as possible, to obtain large number of
-        polynomial
+  (iii) A should not contain primes factor that are too large, or (i) will be
+        difficult
+   (iv) A should have as many factors as possible, to obtain large number of
+        polynomials
 */
-
 
 mp_limb_t qsieve_next_A0(qs_t qs_inf)
 {
@@ -108,17 +94,17 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
             for (j = 1; j <= h; j++)
                 curr_subset[s + j - h - 2] = m + j;
 
-            fmpz_set_ui(prod, UWORD(1));
+            fmpz_set_ui(prod, 1);
 
             for (j = 0; j < s - 1; j++)
                 fmpz_mul_ui(prod, prod, factor_base[2 * curr_subset[j] - 1 + low - 1].p);
 
             i = 1;
-            j = qs_inf->num_primes - 1;
+            j = qs_inf->num_primes/2 - 1;
 
             while (i < j)
             {
-                mid = i + (j - i) / 2;
+                mid = i + (j - i + 1) / 2;
 
                 fmpz_mul_ui(temp, prod, factor_base[2 * mid - 1 + low].p);
 
@@ -208,20 +194,26 @@ void qsieve_init_A0(qs_t qs_inf)
     slong i, j = 0;
     slong s, low, high, span, m, h;
     mp_limb_t bits, num_factor, rem, mid;
-    mp_limb_t * factor_bound = flint_malloc(32 * sizeof(mp_limb_t));
+    mp_limb_t factor_bound[40];
     mp_limb_t * A_ind;
     mp_limb_t * curr_subset;
     prime_t * factor_base = qs_inf->factor_base;
     fmpz_t target, prod, temp, temp2, upper_bound, lower_bound;
+
     fmpz_init(target);
     fmpz_init(temp);
     fmpz_init(temp2);
     fmpz_init(upper_bound);
     fmpz_init(lower_bound);
-    fmpz_init_set_ui(prod, UWORD(1));
-    fmpz_fdiv_q_ui(target, qs_inf->target_A, UWORD(2) * factor_base[qs_inf->q_idx].p);
-    fmpz_fdiv_q_ui(lower_bound, target, UWORD(5));
-    fmpz_mul_ui(upper_bound, target, UWORD(5));
+    fmpz_init_set_ui(prod, 1);
+
+    for (i = 0; i < 40; i++)
+       factor_bound[i] = 0;
+
+    fmpz_fdiv_q_ui(target, qs_inf->target_A, 2*factor_base[qs_inf->q_idx - 1].p);
+    fmpz_fdiv_q_ui(lower_bound, target, 5);
+    fmpz_mul_ui(upper_bound, target, 5);
+
     bits = fmpz_bits(target);
 
     for (i = qs_inf->small_primes; i < qs_inf->num_primes; i++)
@@ -249,7 +241,9 @@ void qsieve_init_A0(qs_t qs_inf)
         num_factor = bits / i;
         rem = bits % i;
 
-        if (factor_bound[i] == 0 || num_factor == 1) continue;
+        if (factor_bound[i] == 0 || num_factor == 1)
+            continue;
+
         if (rem == 0 && num_factor > 2 && factor_bound[i + 1] > 0)
         {
             low = factor_bound[i - 1];
@@ -277,7 +271,6 @@ void qsieve_init_A0(qs_t qs_inf)
         }
     }
 
-
     if (i == 7)
     {
         num_factor = (bits >= 15) ? 3 : 2;
@@ -288,21 +281,28 @@ void qsieve_init_A0(qs_t qs_inf)
     s = num_factor;
     qs_inf->s = s;
 
+#if QS_DEBUG
+    flint_printf("s = %wd\n", s);
+    flint_printf("high = %wd\n", high);
+    flint_printf("low = %wd\n", low);
+    flint_printf("span = %wd\n", high - low);
+#endif
+
     qsieve_poly_init(qs_inf);
+
     A_ind = qs_inf->A_ind;
     curr_subset = qs_inf->curr_subset;
 
     span = high - low;
 
-
     /*
-       factor of 'A0' :
-       if number of factor is less than 3 just generate 3-subset of
+       factors of 'A0' :
+       if number of factor is less at most 3 just generate 3-subset of
        possible range from factor base lexicographically
        else generate (s - 1) - subset of odd indices from possible
        range from factor base lexicographically and choose last factor
        from even index so that product of values is close to the
-       approximated value of hyper-cube
+       approximate optimal value for hypercube
     */
 
     if (s <= 3)
@@ -313,7 +313,7 @@ void qsieve_init_A0(qs_t qs_inf)
         for (j = 1; j <= h; j++)
             curr_subset[s + j - h - 1] = m + j;
 
-        fmpz_set_ui(prod, UWORD(1));
+        fmpz_set_ui(prod, 1);
 
         for (j = 0; j < s; j++)
             fmpz_mul_ui(prod, prod, factor_base[curr_subset[j] + low - 1].p);
@@ -331,22 +331,23 @@ void qsieve_init_A0(qs_t qs_inf)
 
         while (curr_subset[0] != span - s + 2)
         {
-            fmpz_set_ui(prod, UWORD(1));
+            fmpz_set_ui(prod, 1);
 
             for (j = 0; j < s - 1; j++)
             {
                 fmpz_mul_ui(prod, prod, factor_base[2 * curr_subset[j] - 1 + low - 1].p);
             }
 
+            /* binary search for final prime */
             i = 1;
-            j = qs_inf->num_primes - 1;
-
+            j = qs_inf->num_primes/2 - 1;
+            
             while (i < j)
             {
-                mid = i + (j - i) / 2;
-
+                mid = i + (j - i + 1) / 2;
+                
                 fmpz_mul_ui(temp, prod, factor_base[2 * mid - 1 + low].p);
-
+ 
                 if (fmpz_cmp(lower_bound, temp) > 0)
                 {
                     i = mid;
@@ -361,7 +362,7 @@ void qsieve_init_A0(qs_t qs_inf)
                     break;
                 }
             }
-
+            
             if (j < qs_inf->num_primes) break;
 
             h = (m >= span - h) ? h + 1 : 1;
@@ -386,8 +387,11 @@ void qsieve_init_A0(qs_t qs_inf)
     qs_inf->low = low;
     qs_inf->high = high;
     qs_inf->span = span;
+
     fmpz_set(qs_inf->A0, prod);
+
     fmpz_set(qs_inf->low_bound, lower_bound);
+
     fmpz_set(qs_inf->upp_bound, upper_bound);
 
 #if QS_DEBUG
@@ -414,7 +418,6 @@ void qsieve_init_A0(qs_t qs_inf)
     fmpz_clear(temp2);
     fmpz_clear(upper_bound);
     fmpz_clear(lower_bound);
-    flint_free(factor_bound);
 }
 
 /* precompute data associated with A0 which will remain fixed */
@@ -429,7 +432,7 @@ void qsieve_compute_pre_data(qs_t qs_inf)
     mp_limb_t * B0_terms = qs_inf->B0_terms;
     prime_t * factor_base = qs_inf->factor_base;
     int * sqrts = qs_inf->sqrts;
-    mp_limb_t p, pinv, temp, temp2;
+    mp_limb_t p, pinv, temp;
 
     /*
        calculate $A0 / p$ and $B0_i = \sqrt{kn} * (A0 / p)^{-1} modulo p$
@@ -441,18 +444,17 @@ void qsieve_compute_pre_data(qs_t qs_inf)
         pinv = factor_base[A_ind[i]].pinv;
 
         fmpz_divexact_ui(A0_divp[i], qs_inf->A0, p);
-        temp2 = fmpz_fdiv_ui(A0_divp[i], p);
-        temp2 = n_invmod(temp2, p);
-        temp2 = n_mulmod2_preinv(temp2, sqrts[A_ind[i]], p, pinv);
-        B0_terms[i] = temp2;
+        temp = fmpz_fdiv_ui(A0_divp[i], p);
+        temp = n_invmod(temp, p);
+        B0_terms[i] = n_mulmod2_preinv(temp, sqrts[A_ind[i]], p, pinv);
     }
-
-    /* calculate $A0^{-1} modulo p$ where $p \in factor_base$ */
+    
+    /* calculate $A0^{-1} modulo p$ for $p$ in the factor base */
     for (i = 3; i < qs_inf->num_primes; i++)
     {
         p = factor_base[i].p;
         temp = fmpz_fdiv_ui(qs_inf->A0, p);
-        A0_inv[i] = n_invmod(temp, p);
+        A0_inv[i] = temp == 0 ? 0 : n_invmod(temp, p);
     }
 }
 
@@ -479,9 +481,11 @@ void qsieve_init_poly_first(qs_t qs_inf)
     int * sqrts = qs_inf->sqrts;
     mp_limb_t q, qinv, qsqrt, p, pinv, temp, temp2, pmod, mod_inv, Ainv;
     fmpz_t temp3;
+
     fmpz_init(temp3);
 
     q = factor_base[qs_inf->q_idx].p;
+
     fmpz_zero(qs_inf->B);
     fmpz_mul_ui(qs_inf->A, qs_inf->A0, q);
 
@@ -521,7 +525,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     fmpz_add(qs_inf->B, qs_inf->B, temp3);
 
     /*
-        calculating $A^(-1) modulo p$, $p \in factor_base$,
+        calculating $A^(-1) modulo p$, for $p$ in factor base,
         calculate A_inv2B[j][i] = $2 * B_j * A^(-1) modulo p$
         for factor base prime 'p',
         compute roots of base polynomial modulo factor base prime

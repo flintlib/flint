@@ -1,27 +1,14 @@
-/*=============================================================================
+/*
+    Copyright (C) 2006, 2011, 2016 William Hart
+    Copyright (C) 2015 Nitin Kumar
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-   Copyright (C) 2015 Nitin Kumar
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -212,6 +199,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
    slong j, k;
 
    fmpz_t X, Y, res, p;
+
    fmpz_init(X);
    fmpz_init(Y);
    fmpz_init(res);
@@ -310,7 +298,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
                factor[num_factors++].exp = 1;
             }
          }
-
+         
          factor[num_factors].ind = qs_inf->q_idx;
          factor[num_factors++].exp = 1;
 
@@ -319,15 +307,16 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
          qsieve_write_to_file(qs_inf, UWORD(1), Y);
 
          qs_inf->full_relation++;
+         
+         /* relations += qsieve_insert_relation(qs_inf, Y); */  /* Insert the relation in the matrix */
 
-        /* relations += qsieve_insert_relation(qs_inf, Y); */  /* Insert the relation in the matrix */
-
-       /*  if (qs_inf->num_relations >= qs_inf->buffer_size)
+         /*  if (qs_inf->num_relations >= qs_inf->buffer_size)
          {
             flint_printf("Error: too many duplicate relations!\n");
             flint_printf("s = %wd, bits = %wd\n", qs_inf->s, qs_inf->bits);
             abort();
-         } */
+         } 
+         */
       }
       else
       {
@@ -345,7 +334,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 
               if (prime > factor_base[qs_inf->q_idx].p && prime < 60 * factor_base[qs_inf->num_primes - 1].p && n_is_prime(prime))
               {
-
                   for (k = 0; k < qs_inf->s; k++)  /* commit any outstanding A factor */
                   {
                       if (A_ind[k] >= j)
@@ -382,7 +370,6 @@ cleanup:
 
    return relations;
 }
-
 
 /* scan sieve array for possible candidate for smooth relations */
 
@@ -435,9 +422,9 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
     {
         qsieve_compute_C(qs_inf);
         qsieve_do_sieving2(qs_inf, sieve);
-
+        
         relation += qsieve_evaluate_sieve(qs_inf, sieve);
-
+        
         if (qs_inf->curr_poly == (1 << qs_inf->s))
             break;
 

@@ -1,27 +1,14 @@
-/*=============================================================================
+/*
+    Copyright (C) 2006, 2011, 2016 William Hart
+    Copyright (C) 2015 Nitin Kumar
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2015 Nitin Kumar
-
-******************************************************************************/
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
 
 #include <stdio.h>
 #include <gmp.h>
@@ -49,8 +36,7 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
     float weights[KS_MULTIPLIERS]; /* array of Knuth-Schroeppel weights */
     float best_weight = -10.0f; /* best weight so far */
 
-    ulong i;
-    ulong num_primes, max;
+    ulong i, num_primes, max;
     float logpdivp;
     mp_limb_t nmod8, mod8, p, nmod, pinv, mult;
     int kron, jac;
@@ -92,9 +78,9 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
         if (nmod == 0) return p; /* we found a small factor */
 
         kron = 1; /* n mod p is even, not handled by n_jacobi */
-        while ((nmod % 2) == 0)
+        while (nmod % 2 == 0)
         {
-            if ((p % 8) == 3 || (p % 8) == 5) kron *= -1;
+            if (p % 8 == 3 || p % 8 == 5) kron *= -1;
             nmod /= 2;
         }
 
@@ -109,9 +95,9 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
             else
             {
                 jac = 1;
-                while ((mult % 2) == 0) /* k mod p is even, not handled by n_jacobi */
+                while (mult % 2 == 0) /* k mod p is even, not handled by n_jacobi */
                 {
-                    if ((p % 8) == 3 || (p % 8) == 5) jac *= -1;
+                    if (p % 8 == 3 || p % 8 == 5) jac *= -1;
                     mult /= 2;
                 }
 
@@ -121,7 +107,6 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
         }
 
         p = n_primes_next(iter);
-
     }
 
     n_primes_clear(iter);
@@ -135,6 +120,10 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
             qs_inf->k = multipliers[i];
         }
     }
+
+#if QS_DEBUG
+    flint_printf("Using Knuth-Schroeppel multiplier %wd\n", qs_inf->k);
+#endif
 
     return 0; /* we didn't find any small factors */
 }
