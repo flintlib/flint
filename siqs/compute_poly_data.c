@@ -210,9 +210,9 @@ void qsieve_init_A0(qs_t qs_inf)
     for (i = 0; i < 40; i++)
        factor_bound[i] = 0;
 
-    fmpz_fdiv_q_ui(target, qs_inf->target_A, 2*factor_base[qs_inf->q_idx - 1].p);
-    fmpz_fdiv_q_ui(lower_bound, target, 5);
-    fmpz_mul_ui(upper_bound, target, 5);
+    fmpz_fdiv_q_ui(target, qs_inf->target_A, factor_base[qs_inf->q_idx - 1].p);
+    fmpz_fdiv_q_ui(lower_bound, target, 2);
+    fmpz_mul_ui(upper_bound, target, 2);
 
     bits = fmpz_bits(target);
 

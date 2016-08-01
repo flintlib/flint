@@ -275,7 +275,7 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve);
 
 void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve);
 
-slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve);
+slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve);
 
 slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve);
 

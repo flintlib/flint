@@ -24,8 +24,8 @@
 #include "siqs.h"
 #include "fmpz.h"
 
-#define HASH_MULT (UWORD(2654435761))       /* hash function, taken from 'msieve' */
-#define HASH(a) (((a) * HASH_MULT) >> (10))
+#define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
+#define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (10)))
 
 /* some helper function, used for debugging */
 
@@ -65,7 +65,7 @@ void qsieve_display_relation2(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
     flint_printf("\n");
 }
 
-/* check in relation is valid */
+/* check relation is valid */
 
 int qsieve_is_relation(qs_t qs_inf, relation_t a)
 {
@@ -186,7 +186,7 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
     for (i = 0; i < qs_inf->small_primes; i++)   /* write small primes */
         flint_fprintf(qs_inf->siqs, "%X ", small[i]);
 
-    flint_fprintf(qs_inf->siqs, "%X ", num_factors);  /* write number of factor */
+    flint_fprintf(qs_inf->siqs, "%X ", num_factors);  /* write number of factors */
 
     for (i = 0; i < num_factors; i++)               /* write factor along with exponent */
         flint_fprintf(qs_inf->siqs, "%X %X ", factor[i].ind, factor[i].exp);
@@ -224,7 +224,7 @@ void qsieve_copy_relation(qs_t qs_inf, relation_t a)
 */
 
 /*
-   return a pointer to location of 'prime' in table if it exist else
+   return a pointer to location of 'prime' in table if it exists else
    create an entry for it and return pointer to that
 */
 
@@ -235,9 +235,9 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
     mp_limb_t * hash_table =  qs_inf->hash_table;
     hash_t * table = qs_inf->table;
 
-    first_offset = HASH(prime)%qs_inf->table_size;
+    first_offset = HASH(prime);
     offset = hash_table[first_offset];
-
+    
     while (offset != 0)
     {
         entry = table + offset;
@@ -283,7 +283,7 @@ void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
 }
 
 /*
-   given a string, representing a relation, parse it to
+   given a string representing a relation, parse it to
    obtain relation
 */
 
@@ -426,8 +426,8 @@ relation_t  qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
 }
 
 /*
-   compare two relation in following order,
-   large_prime, number of factor, factor, small_prime
+   compare two relations in the following order,
+   large_prime, number of factors, factor, small_prime
 */
 
 int qsieve_compare_relation(const void * a, const void * b)
@@ -472,7 +472,7 @@ int qsieve_compare_relation(const void * a, const void * b)
 }
 
 /*
-   given a list of relation, remove duplicates relation from it
+   given a list of relations, remove duplicate relations from it
 */
 
 int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations)
@@ -506,7 +506,7 @@ int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations)
 }
 
 /*
-   give a list of relations, add those relation to matrix
+   give a list of relations, add those relations to matrix
 */
 
 void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list, slong num_relations)

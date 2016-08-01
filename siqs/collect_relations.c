@@ -87,6 +87,10 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
    each block, for whole factor base at once
 */
 
+/* 
+   WARNING: CURRENTLY CAUSES SEGFAULT IN EVALUATE_SIEVE
+   due to 0xC0 not present after end of sieve
+*/
 void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 {
     slong b, d1, d2, i;
@@ -182,7 +186,7 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 
 /* check position 'i' in sieve array for smoothness */
 
-slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
+slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
 {
    slong bits, exp, extra_bits;
    mp_limb_t modp, prime;
@@ -196,6 +200,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
    mp_limb_t pinv;
    slong num_factors = 0;
    slong relations = 0;
+   static slong rel_count = 0;
    slong j, k;
 
    fmpz_t X, Y, res, p;
@@ -209,14 +214,20 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 
    fmpz_mul(Y, X, qs_inf->A);
    fmpz_add(Y, Y, qs_inf->B); /* Y = AX+B */
-   fmpz_add(res, Y, qs_inf->B);
+   fmpz_add(res, Y, qs_inf->B); /* Y = AX+2B */
 
    fmpz_mul(res, res, X);
    fmpz_add(res, res, qs_inf->C); /* res = AX^2 + 2BX + C */
 
+#if QS_DEBUG & 128
+   flint_printf("Poly: "); fmpz_print(qs_inf->A); flint_printf("*x^2 + 2*");
+   fmpz_print(qs_inf->B); flint_printf("*x + "); fmpz_print(qs_inf->C); printf("\n");
+   flint_printf("x = %wd\n", i - qs_inf->sieve_size / 2);
+#endif
+
    bits = FLINT_ABS(fmpz_bits(res));
    bits -= BITS_ADJUST;
-   extra_bits = 0;
+   extra_bits = 20;
 
    if (factor_base[0].p != 1) /* divide out powers of the multiplier */
    {
@@ -224,11 +235,19 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
       exp = fmpz_remove(res, res, p);
       if (exp) extra_bits += exp*qs_inf->factor_base[0].size;
       small[0] = exp;
+#if QS_DEBUG & 128
+      if (exp)
+          flint_printf("%ld^%ld ", factor_base[0].p, exp);
+#endif
    }
    else small[0] = 0;
 
    fmpz_set_ui(p, 2); /* divide out by powers of 2 */
    exp = fmpz_remove(res, res, p);
+#if QS_DEBUG & 128
+   if (exp)
+       flint_printf("%ld^%ld ", 2, exp);
+#endif
 
    extra_bits += exp;
    small[1] = exp;
@@ -239,12 +258,16 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
       pinv = factor_base[j].pinv;
       modp = n_mod2_preinv(i, prime, pinv);
 
-      if ((modp == soln1[j]) || (modp == soln2[j]))
+      if (modp == soln1[j] || modp == soln2[j])
       {
          fmpz_set_ui(p, prime);
          exp = fmpz_remove(res, res, p);
          if (exp) extra_bits += qs_inf->factor_base[j].size;
          small[j] = exp;
+#if QS_DEBUG & 128
+         if (exp)
+            flint_printf("%ld^%ld ", prime, exp);
+#endif
       }
       else small[j] = 0;
    }
@@ -262,7 +285,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 
          if (soln2[j] != 0)
          {
-            if ((modp == soln1[j]) || (modp == soln2[j]))
+            if (modp == soln1[j] || modp == soln2[j])
             {
                fmpz_set_ui(p, prime);
                exp = fmpz_remove(res, res, p);
@@ -272,6 +295,11 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
                   factor[num_factors].ind = j;
                   factor[num_factors++].exp = exp;
                }
+#if QS_DEBUG & 128
+              if (exp)
+                  flint_printf("%ld^%ld ", prime, exp);
+#endif
+
             }
          }
          else
@@ -280,11 +308,24 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
             exp = fmpz_remove(res, res, p);
             factor[num_factors].ind = j;
             factor[num_factors++].exp = exp + 1;
+#if QS_DEBUG & 128
+            if (exp)
+               flint_printf("%ld^%ld ", prime, exp);
+#endif
+
          }
       }
 
+#if QS_DEBUG & 128
+      if (num_factors > 0)
+         flint_printf("\n");
+#endif
       if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
       {
+         rel_count++;
+         if (rel_count % 10 == 0)
+            printf("%ld relations\n", rel_count);
+         
          if (fmpz_cmp_si(res, -1) == 0)
             small[2] = 1;
          else
@@ -304,10 +345,11 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 
          qs_inf->num_factors = num_factors;
 
-         qsieve_write_to_file(qs_inf, UWORD(1), Y);
-
-         qs_inf->full_relation++;
+         qsieve_write_to_file(qs_inf, 1, Y);
          
+         qs_inf->full_relation++;
+         relations++;
+
          /* relations += qsieve_insert_relation(qs_inf, Y); */  /* Insert the relation in the matrix */
 
          /*  if (qs_inf->num_relations >= qs_inf->buffer_size)
@@ -382,7 +424,6 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
 
     while (j < qs_inf->sieve_size / sizeof(ulong))
     {
-
 #if FLINT64
         while ((sieve2[j] & UWORD(0xC0C0C0C0C0C0C0C0)) == 0)
 #else
@@ -391,7 +432,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
         {
             j++;
         }
-
+        
         i = j * sizeof(ulong);
 
         while (i < (j + 1) * sizeof(ulong) && i < qs_inf->sieve_size)
@@ -403,10 +444,10 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
 
             i++;
         }
-
+        
         j++;
     }
-
+    
     return rels;
 }
 
@@ -414,16 +455,16 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
 
 slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
 {
-    slong relation = 0;
+    slong relations = 0;
 
     qsieve_init_poly_first(qs_inf);
 
     while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels)
     {
         qsieve_compute_C(qs_inf);
-        qsieve_do_sieving2(qs_inf, sieve);
+        qsieve_do_sieving(qs_inf, sieve);
         
-        relation += qsieve_evaluate_sieve(qs_inf, sieve);
+        relations += qsieve_evaluate_sieve(qs_inf, sieve);
         
         if (qs_inf->curr_poly == (1 << qs_inf->s))
             break;
@@ -431,5 +472,5 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
         qsieve_init_poly_next(qs_inf);
     }
 
-    return relation;
+    return relations;
 }

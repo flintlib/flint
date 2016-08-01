@@ -110,7 +110,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     flint_printf("\nCompute factor-base\n");
 #endif
 
-    /* compute factor base primes and associated data*/
+    /* compute factor base primes and associated data */
     small_factor = qsieve_primes_init(qs_inf);
 
     if (small_factor)
@@ -185,11 +185,19 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
             
             for (j = qs_inf->num_primes; j < qs_inf->num_primes + qs_inf->ks_primes; j++)
             {
+                printf("j = %ld, num_primes + ks_primes = %ld\n", j, qs_inf->num_primes + qs_inf->ks_primes);
                 qs_inf->q_idx  = j;
                 relation += qsieve_collect_relations(qs_inf, sieve);
-
+                
                 qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
 
+#if QS_DEBUG
+                flint_printf("full relations = %wd, num cycles = %wd, ks_primes = %wd, "
+                              "extra rels = %wd\n", qs_inf->full_relation,
+                              qs_inf->num_cycles, qs_inf->ks_primes,
+                              qs_inf->extra_rels);
+#endif
+ 
                 if (qs_inf->full_relation + qs_inf->num_cycles >= 
                    (qs_inf->num_primes + qs_inf->ks_primes + 1.5 * qs_inf->extra_rels))
                 {
@@ -207,9 +215,9 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
                     ncols = qs_inf->num_primes + qs_inf->extra_rels;
                     nrows = qs_inf->num_primes;
-/*
+
                     reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
-*/
+
 
    /**************************************************************************
         BLOCK LANCZOS:
@@ -220,25 +228,25 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                     flint_printf("\nBlock Lanczos\n");
 #endif
  
-/*
-                    flint_randinit(state); / initialise the random generator /
 
-                    do / repeat block lanczos until it succeeds /
+                    flint_randinit(state); /* initialise the random generator */
+
+                    do /* repeat block lanczos until it succeeds */
                     {
                         nullrows = block_lanczos(state, nrows, 0, ncols, qs_inf->matrix);
                     } while (nullrows == NULL);
 
-                    for (i = 0, mask = 0; i < ncols; i++) / create mask of nullspace vectors /
+                    for (i = 0, mask = 0; i < ncols; i++) /* create mask of nullspace vectors */
                         mask |= nullrows[i];
 
-                    for (i = count = 0; i < 64; i++) / count nullspace vectors found /
+                    for (i = count = 0; i < 64; i++) /* count nullspace vectors found */
                     {
                         if (mask & ((uint64_t)(1) << i))
                             count++;
                     }
 
-                    flint_randclear(state); / clean up random state /
-*/
+                    flint_randclear(state); /* clean up random state */
+
 
     /**************************************************************************
         SQUARE ROOT:
@@ -249,7 +257,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                     flint_printf("\nSquare Root\n");
 #endif
 
-/*
                     for (count = 0; count < 64; count++)
                     {
                         if (mask & ((uint64_t)(1) << count))
@@ -260,10 +267,10 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                             fmpz_sub(X, X, Y);
                             fmpz_gcd(X, X, qs_inf->n);
 
-                            if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) / have a factor /
+                            if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
                             {
                                 if (fmpz_size(X)!= 1)
-                                    fmpz_fdiv_q(X, qs_inf->n, X); / take smaller of two factors /
+                                    fmpz_fdiv_q(X, qs_inf->n, X); /* take smaller of two factors */
 
                                 diff = clock() - start;
                                 flint_printf("factor found = ");
@@ -273,7 +280,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                             }
                         }
                     }
-*/
+
                     qs_inf->siqs = fopen("siqs.dat", "w");
                     qsieve_linalg_re_init(qs_inf);
                     qs_inf->num_primes = num_primes;
@@ -283,6 +290,10 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
             }
 
         } while (qsieve_next_A0(qs_inf));
+
+#if QS_DEBUG
+        printf("Increasing factor base.\n");
+#endif
 
         delta = qs_inf->num_primes / 10;
         num_primes = qs_inf->num_primes + delta;
@@ -305,8 +316,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
         qsieve_linalg_re_alloc(qs_inf);
         relation = 0;
-
-        break; /* remove this !!!!!!!!!!!!!!!!!! */
     }
 
     /**************************************************************************
