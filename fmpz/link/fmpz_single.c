@@ -23,6 +23,7 @@
 FLINT_TLS_PREFIX __mpz_struct ** mpz_free_arr = NULL;
 FLINT_TLS_PREFIX ulong mpz_free_num = 0;
 FLINT_TLS_PREFIX ulong mpz_free_alloc = 0;
+#pragma omp threadprivate(mpz_free_arr, mpz_free_num, mpz_free_alloc)
 
 __mpz_struct * _fmpz_new_mpz(void)
 {

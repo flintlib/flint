@@ -165,7 +165,7 @@ _fmpz_poly_multi_taylor_shift_threaded(mp_ptr * residues, slong len,
 }
 
 void
-_fmpz_poly_taylor_shift_multi_mod(fmpz * poly, const fmpz_t c, slong len)
+_fmpz_poly_taylor_shift_multi_mod_threaded(fmpz * poly, const fmpz_t c, slong len)
 {
     slong xbits, ybits, num_primes, i;
     mp_ptr primes;
@@ -214,13 +214,3 @@ _fmpz_poly_taylor_shift_multi_mod(fmpz * poly, const fmpz_t c, slong len)
     flint_free(residues);
     flint_free(primes);
 }
-
-void
-fmpz_poly_taylor_shift_multi_mod(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)
-{
-    if (f != g)
-        fmpz_poly_set(g, f);
-
-    _fmpz_poly_taylor_shift_multi_mod(g->coeffs, c, g->length);
-}
-
