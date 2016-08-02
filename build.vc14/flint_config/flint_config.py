@@ -18,16 +18,31 @@ from collections import defaultdict
 from uuid import uuid4
 from time import sleep
 
+import argparse
+parser = argparse.ArgumentParser(description='Configure flint msvc build')
+
 # for script debugging
-debug = False
+parser.add_argument('--debug', choices=["True", "False"], default="False")
+
 # what to build
-build_lib = False
-build_dll = False
-build_tests = True
-build_profiles = True
+parser.add_argument('--build-lib', choices=["True", "False"], default="False")
+parser.add_argument('--build-dll', choices=["True", "False"], default="False")
+parser.add_argument('--build-tests', choices=["True", "False"], default="True")
+parser.add_argument('--build-profiles', choices=["True", "False"], default="True")
 
 # add user choice
-flib_type = 'single' # ('gc', 'reentrant', 'single')
+parser.add_argument('--flib-type', choices=('gc', 'reentrant', 'single'), default="single")
+
+args = parser.parse_args()
+print(args)
+
+debug = args.debug == "True"
+build_lib = args.build_lib == "True"
+build_dll = args.build_dll == "True"
+build_tests = args.build_tests == "True"
+build_profiles = args.build_profiles == "True"
+
+flib_type = args.flib_type
 
 # The path to flint, solution and project directories
 script_dir = dirname(__file__)

@@ -1,0 +1,31 @@
+version: 1.0.{build}
+build:
+  verbosity: minimal
+  
+environment:
+  matrix:
+    - BUILD_TYPE: Release
+      COMPILER: MSVC15
+      PLATFORM: x64
+    - COMPILER: MinGW-w64
+      ABI: 32
+    - BUILD_TYPE: Release
+      COMPILER: MSVC15
+      PLATFORM: Win32
+    - COMPILER: MinGW-w64
+      ABI: 64
+
+cache:
+- C:\projects\mpir -> .build_dependencies.cmd
+- C:\projects\mpfr -> .build_dependencies.cmd
+- C:\projects\pthreads -> .build_dependencies.cmd
+- C:\projects\flint2\mpir-2.7.0 -> .build_dependencies
+- C:\projects\flint2\mpfr-3.1.4 -> .build_dependencies
+ 
+build_script:
+  - if [%COMPILER%]==[MSVC15] if not exist C:\projects\mpir .build_dependencies.cmd
+  - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] set PATH=C:\Python35-x64;%PATH%
+  - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] set PATH=C:\Python35;%PATH%
+
+  - if [%COMPILER%]==[MinGW-w64] C:\msys64\usr\bin\sh.exe --login /c/projects/flint2/.appveyor_msys_build.sh
+  - if [%COMPILER%]==[MSVC15] call .appveyor_msvc_build.cmd
