@@ -76,9 +76,9 @@ _fmpz_stab(fmpz_t t, const fmpz_t a, const fmpz_t b, const fmpz_t N)
     fmpz_gcd(gg, g, N);
 
     fmpz_divexact(bb, N, gg);
-    
+
     fmpz_divexact(aa, a, gg);
-    
+
     _fmpz_ppio(s, t, bb, aa);
 
     fmpz_clear(g);
@@ -114,13 +114,44 @@ _fmpz_unit(fmpz_t u, fmpz_t a, const fmpz_t N)
         fmpz_add(u, u, s);
         fmpz_mod(u, u, N);
     }
-    
+
     fmpz_clear(g);
     fmpz_clear(s);
     fmpz_clear(t);
     fmpz_clear(l);
     fmpz_clear(d);
     fmpz_clear(k);
+}
+
+/* test wether q*a = b mod N has a solution */
+static int
+_fmpz_is_divisible_mod(fmpz_t q, fmpz_t b, fmpz_t a, const fmpz_t N)
+{
+    fmpz_t g, e, t;
+
+    fmpz_init(g);
+    fmpz_init(e);
+    fmpz_init(t);
+
+    fmpz_xgcd(g, e, t, a, N);
+
+    if (fmpz_divisible(b, g))
+    {
+        fmpz_divexact(g, b, g);
+        fmpz_mul(g, e, g);
+        fmpz_mod(q, g, N);
+
+        fmpz_clear(g);
+        fmpz_clear(e);
+        fmpz_clear(t);
+        return 1;
+    }
+
+    fmpz_clear(g);
+    fmpz_clear(e);
+    fmpz_clear(t);
+
+    return 0;
 }
 
 void
@@ -170,21 +201,38 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
         }
         for (i = row + 1; i < n; i++)
         {
-            fmpz_xgcd(g, s, t, fmpz_mat_entry(A, row, col), fmpz_mat_entry(A, i, col));
-            fmpz_divexact(u, fmpz_mat_entry(A, i, col), g);
-            fmpz_neg(u, u);
-            fmpz_divexact(v, fmpz_mat_entry(A, row, col), g);
-            
-            for (k = col; k < m; k++)
+            if (fmpz_is_zero(fmpz_mat_entry(A, i, col)))
             {
-                fmpz_mul(t1, s, fmpz_mat_entry(A, row, k));
-                fmpz_addmul(t1, t, fmpz_mat_entry(A, i, k));
-                fmpz_mod(t1, t1, mod);
-                fmpz_mul(t2, u, fmpz_mat_entry(A, row, k));
-                fmpz_addmul(t2, v, fmpz_mat_entry(A, i, k));
-                fmpz_mod(t2, t2, mod);
-                fmpz_set(fmpz_mat_entry(A, row, k), t1);
-                fmpz_set(fmpz_mat_entry(A, i, k), t2);
+                continue;
+            }
+            if ( _fmpz_is_divisible_mod(s, fmpz_mat_entry(A, i, col), fmpz_mat_entry(A, row, col), mod))
+            {
+                for (k = col; k < m; k++)
+                {
+                    fmpz_set(t1, fmpz_mat_entry(A, i, k));
+                    fmpz_submul(t1, s, fmpz_mat_entry(A, row, k));
+                    fmpz_mod(t1, t1, mod);
+                    fmpz_set(fmpz_mat_entry(A, i, k), t1);
+                }
+            }
+            else
+            {
+                fmpz_xgcd(g, s, t, fmpz_mat_entry(A, row, col), fmpz_mat_entry(A, i, col));
+                fmpz_divexact(u, fmpz_mat_entry(A, i, col), g);
+                fmpz_neg(u, u);
+                fmpz_divexact(v, fmpz_mat_entry(A, row, col), g);
+
+                for (k = col; k < m; k++)
+                {
+                    fmpz_mul(t1, s, fmpz_mat_entry(A, row, k));
+                    fmpz_addmul(t1, t, fmpz_mat_entry(A, i, k));
+                    fmpz_mod(t1, t1, mod);
+                    fmpz_mul(t2, u, fmpz_mat_entry(A, row, k));
+                    fmpz_addmul(t2, v, fmpz_mat_entry(A, i, k));
+                    fmpz_mod(t2, t2, mod);
+                    fmpz_set(fmpz_mat_entry(A, row, k), t1);
+                    fmpz_set(fmpz_mat_entry(A, i, k), t2);
+                }
             }
         }
         for (i = row - 1; i >= 0; i--)
@@ -243,7 +291,7 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
             fmpz_divexact(u, extra_row + row, g);
             fmpz_neg(u, u);
             fmpz_divexact(v, fmpz_mat_entry(A, row, row), g);
-            
+
             for (k = row; k < m; k++)
             {
                 fmpz_mul(t1, s, fmpz_mat_entry(A, row, k));
