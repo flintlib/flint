@@ -85,6 +85,22 @@ _n_unit(mp_limb_t a, nmod_t N)
     }
 }
 
+/* test wether q*a = b mod N has a solution */
+static int
+_n_is_divisible(mp_ptr q, mp_limb_t b, mp_limb_t a, nmod_t N)
+{
+    mp_limb_t e, g;
+    g = n_gcdinv(&e, a, N.n);
+
+    if (( b % g ) == 0)
+    {
+        *q = nmod_mul(e, b/g, N);
+        return 1;
+    }
+
+    return 0;
+}
+
 void
 nmod_mat_strong_echelon_form(nmod_mat_t A)
 {
@@ -115,35 +131,51 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
         }
         for (i = row + 1; i < n; i++)
         {
-            if (nmod_mat_entry(A, row, col) >= nmod_mat_entry(A, i, col))
+            if (nmod_mat_entry(A, i, col) == 0)
             {
-                g = n_xgcd(&s, &t, nmod_mat_entry(A, row, col), nmod_mat_entry(A, i, col));
+                continue;
+            }
+
+            if (_n_is_divisible(&s, nmod_mat_entry(A, i, col), nmod_mat_entry(A, row, col), mod))
+            {
+                 for (k = col; k < m; k++)
+                 {
+                     t1 = nmod_sub(nmod_mat_entry(A, i, k), nmod_mul(s, nmod_mat_entry(A, row, k), mod), mod);
+                     nmod_mat_entry(A, i, k) = t1;
+                 }
             }
             else
             {
-                g = n_xgcd(&t, &s, nmod_mat_entry(A, i, col), nmod_mat_entry(A, row, col));
-            }
+                if (nmod_mat_entry(A, row, col) >= nmod_mat_entry(A, i, col))
+                {
+                    g = n_xgcd(&s, &t, nmod_mat_entry(A, row, col), nmod_mat_entry(A, i, col));
+                }
+                else
+                {
+                    g = n_xgcd(&t, &s, nmod_mat_entry(A, i, col), nmod_mat_entry(A, row, col));
+                }
 
-            /* now g = a*x - b*y 
-             a,b < x < mod.n */
-            t = nmod_neg(t, mod);
-            u = (nmod_mat_entry(A, i, col))/g;
-            u = nmod_neg(u, mod);
-            v = (nmod_mat_entry(A, row, col))/g;
-            /* now g = a*x + b*y and 0 = sv - tu = 1 modulo mod.n */
-            
-            for (k = col; k < m; k++)
-            {
-                t1 = nmod_add(nmod_mul(s, nmod_mat_entry(A, row, k), mod), nmod_mul(t, nmod_mat_entry(A, i, k), mod), mod);
-                t2 = nmod_add(nmod_mul(u, nmod_mat_entry(A, row, k), mod), nmod_mul(v, nmod_mat_entry(A, i, k), mod), mod);
-                nmod_mat_entry(A, row, k) = t1;
-                nmod_mat_entry(A, i, k) = t2;
+                /* now g = a*x - b*y
+                 a,b < x < mod.n */
+                t = nmod_neg(t, mod);
+                u = (nmod_mat_entry(A, i, col))/g;
+                u = nmod_neg(u, mod);
+                v = (nmod_mat_entry(A, row, col))/g;
+                /* now g = a*x + b*y and 0 = sv - tu = 1 modulo mod.n */
+
+                for (k = col; k < m; k++)
+                {
+                    t1 = nmod_add(nmod_mul(s, nmod_mat_entry(A, row, k), mod), nmod_mul(t, nmod_mat_entry(A, i, k), mod), mod);
+                    t2 = nmod_add(nmod_mul(u, nmod_mat_entry(A, row, k), mod), nmod_mul(v, nmod_mat_entry(A, i, k), mod), mod);
+                    nmod_mat_entry(A, row, k) = t1;
+                    nmod_mat_entry(A, i, k) = t2;
+                }
             }
         }
         row++;
         col++;
     }
-    
+
     for (col = 0; col < m; col++)
     {
         if (nmod_mat_entry(A, col, col) != 0)
@@ -155,8 +187,7 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
             }
             for (row = 0; row < col ; row++)
             {
-                
-                
+
                 q = nmod_mat_entry(A, row, col)/nmod_mat_entry(A, col, col);
 
                 for (l = row; l< m; l++)
@@ -198,7 +229,7 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
             u = nmod_neg(u, mod);
             v = (nmod_mat_entry(A, row, row))/g;
             /* now g = a*x + b*y and 0 = sv - tu = 1 modulo mod.n */
-            
+
             for (k = row; k < m; k++)
             {
                 t1 = nmod_add(nmod_mul(s, nmod_mat_entry(A, row, k), mod), nmod_mul(t, extra_row[k], mod), mod);
