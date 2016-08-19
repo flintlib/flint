@@ -41,3 +41,24 @@ void _fmpq_vec_dot(fmpq_t res, const fmpq * vec1, const fmpq * vec2, slong len)
 
     Sets \code{res} to the dot product of the vectors \code{(vec1, len)} and 
     \code{(vec2, len)}.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len)
+
+    Prints the vector of given length to the stream \code{file}. The
+    format is the length followed by two spaces, then a space separated
+    list of coefficients. If the length is zero, only $0$ is printed.
+
+    In case of success, returns a positive value. In case of failure,
+    returns a non-positive value.
+
+int _fmpq_vec_print(const fmpq * vec, slong len)
+
+    Prints the vector of given length to \code{stdout}.
+
+    For further details, see \code{_fmpq_vec_fprint()}.

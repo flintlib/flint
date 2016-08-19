@@ -185,18 +185,18 @@ FLINT_DLL char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t
 
 FLINT_DLL char * fmpq_get_str(char * str, int b, const fmpq_t x);
 
-FLINT_DLL void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den);
+FLINT_DLL int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den);
 
-FLINT_DLL void fmpq_fprint(FILE * file, const fmpq_t x);
+FLINT_DLL int fmpq_fprint(FILE * file, const fmpq_t x);
 
-FMPQ_INLINE void _fmpq_print(const fmpz_t num, const fmpz_t den)
+FMPQ_INLINE int _fmpq_print(const fmpz_t num, const fmpz_t den)
 {
-    _fmpq_fprint(stdout, num, den);
+    return _fmpq_fprint(stdout, num, den);
 }
 
-FMPQ_INLINE void fmpq_print(const fmpq_t x)
+FMPQ_INLINE int fmpq_print(const fmpq_t x)
 {
-    fmpq_fprint(stdout, x);
+    return fmpq_fprint(stdout, x);
 }
 
 FLINT_DLL void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
