@@ -12,21 +12,40 @@
 
 #include "fmpq.h"
 
-void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
+/*
+    Recall the return value conventions for fputc (of type int)
+
+    ``If there are no errors, the same character that has been written is
+    returned.  If an error occurs, EOF is returned and the error indicator
+    is set''
+
+    where the EOF macro expands to a negative int, and flint_fprintf (of type int)
+
+    ``On success, the total number of characters written is returned.
+    On failure, a negative number is returned.''
+ */
+
+FLINT_DLL int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
 {
     if (fmpz_is_one(den))
     {
-        fmpz_fprint(file, num);
+        return fmpz_fprint(file, num);
     }
     else
     {
-        fmpz_fprint(file, num);
-        fputc('/', file);
-        fmpz_fprint(file, den);
+        int r;
+        r = fmpz_fprint(file, num);
+        if (r > 0)
+        {
+            r = fputc('/', file);
+            if (r > 0)
+                r = fmpz_fprint(file, den);
+        }
+        return r;
     }
 }
 
-void fmpq_fprint(FILE * file, const fmpq_t x)
+int fmpq_fprint(FILE * file, const fmpq_t x)
 {
-    _fmpq_fprint(file, &x->num, &x->den);
+    return _fmpq_fprint(file, &x->num, &x->den);
 }
