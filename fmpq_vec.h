@@ -26,6 +26,16 @@
  extern "C" {
 #endif
 
+/*  Memory management  *******************************************************/
+
+FLINT_DLL fmpq * _fmpq_vec_init(slong len);
+
+FMPQ_VEC_INLINE
+void _fmpq_vec_clear(fmpq * vec, slong len)
+{
+    _fmpz_vec_clear((fmpz *) vec, 2 * len);
+}
+
 /*  Randomisation  ***********************************************************/
 
 FLINT_DLL void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, 
