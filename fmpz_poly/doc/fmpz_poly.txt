@@ -190,6 +190,11 @@ void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 
     Sets \code{res} to a copy of \code{poly}, truncated to length \code{n}.
 
+void fmpz_poly_set_rational_roots(fmpz_poly_t pol, fmpq * vec, slong len)
+
+    Sets \code{pol} to be a polynomial with integer coefficient whose
+    roots are given by the array \code{(vec, len)}.
+
 *******************************************************************************
 
     Randomisation

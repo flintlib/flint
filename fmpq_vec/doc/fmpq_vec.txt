@@ -11,6 +11,24 @@
 
 *******************************************************************************
 
+    Memory management
+
+*******************************************************************************
+
+fmpq * _fmpq_vec_init(slong n)
+
+    Initialises a vector of \code{fmpq} values of length $n$ and sets
+    all values to 0. This is equivalent to generating a \code{fmpz} vector
+    of length $2n$ with \code{_fmpz_vec_init} and setting all denominators
+    to 1.
+
+void _fmpq_vec_clear(fmpq * vec, slong n)
+
+    Frees an \code{fmpq} vector.
+
+
+*******************************************************************************
+
     Randomisation
 
 *******************************************************************************
