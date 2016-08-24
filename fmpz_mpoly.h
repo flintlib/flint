@@ -152,6 +152,61 @@ FLINT_DLL void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
 FLINT_DLL void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i,
                                                          fmpz_mpoly_ctx_t ctx);
 
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_swap(fmpz_mpoly_t poly1, 
+                                      fmpz_mpoly_t poly2, fmpz_mpoly_ctx_t ctx)
+{
+   fmpz * t1;
+   ulong * t2;
+   slong t3;
+
+   t1 = poly1->coeffs;
+   poly1->coeffs = poly2->coeffs;
+   poly2->coeffs = t1;
+
+   t2 = poly1->exps;
+   poly1->exps = poly2->exps;
+   poly2->exps = t2;
+
+   t3 = poly1->length;
+   poly1->length = poly2->length;
+   poly2->length = t3;
+
+   t3 = poly1->alloc;
+   poly1->alloc = poly2->alloc;
+   poly2->alloc = t3;
+}
+
+/* Arithmetic ****************************************************************/
+
+FLINT_DLL slong _fmpz_mpoly_add1(fmpz * poly1, ulong * exps1,
+                      fmpz * poly2, ulong * exps2, slong len2,
+                      fmpz * poly3, ulong * exps3, slong len3,
+                                        slong bits, slong n, int deg, int rev);
+
+FLINT_DLL void fmpz_mpoly_add(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
+                                     fmpz_mpoly_t poly3, fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong _fmpz_mpoly_sub1(fmpz * poly1, ulong * exps1,
+                      fmpz * poly2, ulong * exps2, slong len2,
+                      fmpz * poly3, ulong * exps3, slong len3,
+                                        slong bits, slong n, int deg, int rev);
+
+FLINT_DLL void fmpz_mpoly_sub(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
+                                     fmpz_mpoly_t poly3, fmpz_mpoly_ctx_t ctx);
+
+void _fmpz_mpoly_scalar_mul_fmpz(fmpz * poly1, ulong * exps1,
+                   fmpz * poly2, ulong * exps2, slong len2, slong N, fmpz_t c);
+
+void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
+                                               fmpz_t c, fmpz_mpoly_ctx_t ctx);
+
+void _fmpz_mpoly_scalar_mul_si(fmpz * poly1, ulong * exps1,
+                    fmpz * poly2, ulong * exps2, slong len2, slong N, slong c);
+
+void fmpz_mpoly_scalar_mul_si(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
+                                                slong c, fmpz_mpoly_ctx_t ctx);
+
 /* Input/output **************************************************************/
 
 FLINT_DLL void _exp_get_degrees1(ulong * expvec, ulong v, slong bits,
