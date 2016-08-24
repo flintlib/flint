@@ -21,7 +21,7 @@ BUILD_DIRS = aprcl ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
    fq fq_vec fq_mat fq_poly fq_poly_factor\
    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor \
    fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor \
-   $(EXTRA_BUILD_DIRS)
+   fmpz_mpoly $(EXTRA_BUILD_DIRS)
 
 TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
    fq_poly_factor_templates fq_templates
