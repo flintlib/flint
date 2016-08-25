@@ -1219,6 +1219,8 @@ FLINT_DLL void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len
 
 FLINT_DLL void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
 
+FLINT_DLL slong _fmpz_poly_num_real_roots_sturm(fmpz * pol, slong len);
+
 FLINT_DLL slong fmpz_poly_num_real_roots_sturm(fmpz_poly_t poly);
 
 /* Special polynomials */

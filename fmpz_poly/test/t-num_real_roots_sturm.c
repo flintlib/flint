@@ -23,22 +23,22 @@ int main()
     /* we check on products of the form               */
     /*   Prod (X - r_i) x  R                          */
     /* where r_i are rationals and R has no real root */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         slong k, n;
         fmpz_poly_t p,q;
         fmpq * vec;
 
-        n = 1 + n_randint(state, 20);
+        n = 1 + n_randint(state, 10);
 
         vec = _fmpq_vec_init(n);
-        _fmpq_vec_randtest_uniq_sorted(vec, state, n, 30);
+        _fmpq_vec_randtest_uniq_sorted(vec, state, n, 80);
 
         fmpz_poly_init(p);
         fmpz_poly_init(q);
         fmpz_poly_set_rational_roots(p, vec, n);
-        fmpz_poly_randtest_no_real_root(q, state, 1 + n_randint(state, 10), 50);
-        /* note: here there is no need to check that q is squarefree (Sturm remains valid) */
+        fmpz_poly_randtest_no_real_root(q, state, 1 + n_randint(state, 5), 80);
+        /* note: here there is no need to check that q is squarefree (Sturm test remains valid) */
         fmpz_poly_mul(p, p, q);
 
         k = fmpz_poly_num_real_roots_sturm(p);
@@ -51,6 +51,7 @@ int main()
             abort();
         }
 
+        _fmpq_vec_clear(vec, n);
         fmpz_poly_clear(p);
         fmpz_poly_clear(q);
     }

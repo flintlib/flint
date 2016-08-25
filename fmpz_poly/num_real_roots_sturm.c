@@ -11,65 +11,125 @@
 
 #include "fmpz_poly.h"
 
-slong fmpz_poly_num_real_roots_sturm(fmpz_poly_t pol)
+
+slong _fmpz_poly_num_real_roots_sturm(fmpz * pol, slong len)
 {
-    fmpz_poly_t p0, p1;
-    slong i;
-    ulong d;
-    fmpz_t c;
+    fmpz_t a, b, g, h;
+    fmpz *A, *B, *W;
+    slong lenA, lenB;
     int s, s0a, s0b, t;
 
-    if (fmpz_poly_is_zero(pol))
-    {
-        fprintf(stderr, "ERROR (fmpz_poly_num_real_roots_sturm): zero polynomial\n");
-        flint_abort();
-    }
+    fmpz_init(a);
+    fmpz_init(b);
+    fmpz_init(g);
+    fmpz_init(h);
 
-    fmpz_init(c);
-    fmpz_poly_init(p0);
-    fmpz_poly_init(p1);
+    A = W = _fmpz_vec_init(2*len - 1);
+    B = W + len;
+    lenA = len;
+    lenB = len - 1;
 
-    fmpz_poly_set(p0, pol);
-    fmpz_poly_derivative(p1, p0);
+    _fmpz_poly_content(a, pol, lenA);
+    _fmpz_vec_scalar_divexact_fmpz(A, pol, lenA, a);
+    _fmpz_poly_derivative(B, A, lenA);
+    _fmpz_poly_content(b, B, lenB);
+    _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
 
-    s0a = s0b = fmpz_sgn(pol->coeffs + pol->length - 1);
-    if (pol->length % 2 == 0)
-        s0b = -s0b;
+    fmpz_one(g);
+    fmpz_one(h);
 
     t = 0;
-    while (!fmpz_poly_is_zero(p1))
+    s0a = s0b = fmpz_sgn(A + (lenA - 1));
+    if (lenA % 2 == 0)
+        s0b = -s0b;
+    while (1)
     {
+        const slong delta = lenA - lenB;
+
         /* sign change at + infinity */
-        s = fmpz_sgn(p1->coeffs + p1->length - 1);
+        s = fmpz_sgn(B + (lenB - 1));
         if (s != s0a)
         {
             t--;
             s0a = s;
         }
-
         /* sign change at - infinity */
-        if (p1->length % 2 == 0) s = -s;
+        if (lenB % 2 == 0) s = -s;
         if (s != s0b)
         {
             t++;
             s0b = s;
         }
 
-        fmpz_poly_swap(p0, p1);
-        fmpz_poly_pseudo_rem(p1, &d, p1, p0);
-        if ((d%2 == 0) || (fmpz_sgn(p0->coeffs + p0->length - 1) == 1))
-            fmpz_poly_neg(p1, p1);
-        fmpz_poly_content(c, p1);
-        if (!fmpz_is_one(c))
+        _fmpz_poly_pseudo_rem_cohen(A, A, lenA, B, lenB);
+        if ((fmpz_sgn(B + (lenB - 1)) > 0) || ((lenA ^ lenB) & 1))
         {
-            for (i = 0; i < p1->length; i++)
-                fmpz_divexact(p1->coeffs + i, p1->coeffs + i, c);
+            _fmpz_vec_neg(A, A, lenA);
+        }
+        FMPZ_VEC_NORM(A, lenA);
+
+        if (lenA <= 1)
+            break;
+
+        {
+            fmpz *T;
+            slong len;
+            T = A, A = B, B = T, len = lenA, lenA = lenB, lenB = len;
+        }
+
+        if (delta == 1)
+        {
+            fmpz_mul(b, g, h);
+            if (fmpz_sgn(b) < 0) fmpz_neg(b, b);
+            _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
+            fmpz_set(g, A + (lenA - 1));
+            fmpz_set(h, g);
+        }
+        else
+        {
+            fmpz_pow_ui(a, h, delta);
+            fmpz_mul(b, g, a);
+            if (fmpz_sgn(b) < 0) fmpz_neg(b, b);
+            _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
+            fmpz_pow_ui(b, A + (lenA - 1), delta);
+            fmpz_mul(g, h, b);
+            fmpz_divexact(h, g, a);
+            fmpz_set(g, A + (lenA - 1));
         }
     }
+    if (lenA)
+    {
+        /* sign change at + infinity */
+        s = fmpz_sgn(A);
+        if (s != s0a)
+            t--;
+        /* sign change at - infinity */
+        if (s != s0b)
+            t++;
+    }
 
-    fmpz_poly_clear(p0);
-    fmpz_poly_clear(p1);
-    fmpz_clear(c);
+    fmpz_clear(a);
+    fmpz_clear(b);
+    fmpz_clear(g);
+    fmpz_clear(h);
+
+    _fmpz_vec_clear(W, 2*len - 1);
 
     return t;
+}
+
+
+slong fmpz_poly_num_real_roots_sturm(fmpz_poly_t pol)
+{
+    if (fmpz_poly_is_zero(pol))
+    {
+        printf("ERROR (fmpz_poly_num_real_roots_sturm): zero polynomial\n");
+        flint_abort();
+    }
+    if (pol->length == 1)
+        return 0;
+    if (pol->length == 2)
+        return 1;
+
+    return _fmpz_poly_num_real_roots_sturm(pol->coeffs, pol->length);
 }
