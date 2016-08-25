@@ -1223,6 +1223,8 @@ FLINT_DLL slong _fmpz_poly_num_real_roots_sturm(fmpz * pol, slong len);
 
 FLINT_DLL slong fmpz_poly_num_real_roots_sturm(fmpz_poly_t poly);
 
+FLINT_DLL slong fmpz_poly_num_real_roots(fmpz_poly_t poly);
+
 /* Special polynomials */
 
 FLINT_DLL void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
