@@ -3036,12 +3036,17 @@ void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
 
     where the coefficients of the polynomial are $a_0, \ldots, a_n$.
 
-slong _fmpz_poly_num_real_roots_sturm(fmpz * pol, slong len)
+void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos,
+            fmpz * pol, slong len)
 
-    Returns the number of real roots of the squarefree polynomial
-    \code{(pol, len)} using Sturm sequence.
+    Sets \code{n_neg} and \code{n_pos} to the number of negative and
+    positive roots of the polynomial \code{(pol, len)} using Sturm
+    sequence. The Sturm sequence is computed via subresultant
+    remainders obtained by repeated call to the function
+    _fmpz_poly_pseudo_rem_cohen.
 
-    The polynomial is assumed to be squarefree and of degree larger than 1.
+    The polynomial is assumed to be squarefree, of degree larger than 1
+    and with non-zero constant coefficient.
 
 slong fmpz_poly_num_real_roots_sturm(fmpz_poly_t pol)
 

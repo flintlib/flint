@@ -12,12 +12,12 @@
 #include "fmpz_poly.h"
 
 
-slong _fmpz_poly_num_real_roots_sturm(fmpz * pol, slong len)
+void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, fmpz * pol, slong len)
 {
     fmpz_t a, b, g, h;
     fmpz *A, *B, *W;
     slong lenA, lenB;
-    int s, s0a, s0b, t;
+    int s, s0a, s0, s0b;
 
     fmpz_init(a);
     fmpz_init(b);
@@ -38,10 +38,11 @@ slong _fmpz_poly_num_real_roots_sturm(fmpz * pol, slong len)
     fmpz_one(g);
     fmpz_one(h);
 
-    t = 0;
     s0a = s0b = fmpz_sgn(A + (lenA - 1));
     if (lenA % 2 == 0)
         s0b = -s0b;
+    s0 = fmpz_sgn(A);
+    (*n_neg) = (*n_pos) = 0;
     while (1)
     {
         const slong delta = lenA - lenB;
@@ -50,17 +51,26 @@ slong _fmpz_poly_num_real_roots_sturm(fmpz * pol, slong len)
         s = fmpz_sgn(B + (lenB - 1));
         if (s != s0a)
         {
-            t--;
+            (*n_pos)--;
             s0a = s;
         }
         /* sign change at - infinity */
         if (lenB % 2 == 0) s = -s;
         if (s != s0b)
         {
-            t++;
+            (*n_neg)++;
             s0b = s;
         }
+        /* sign change at 0 */
+        s = fmpz_sgn(B);
+        if (s && (s != s0))
+        {
+            (*n_neg)--;
+            (*n_pos)++;
+            s0 = s;
+        }
 
+        /* now compute the next element of the remainder sequence */
         _fmpz_poly_pseudo_rem_cohen(A, A, lenA, B, lenB);
         if ((fmpz_sgn(B + (lenB - 1)) > 0) || ((lenA ^ lenB) & 1))
         {
@@ -102,10 +112,16 @@ slong _fmpz_poly_num_real_roots_sturm(fmpz * pol, slong len)
         /* sign change at + infinity */
         s = fmpz_sgn(A);
         if (s != s0a)
-            t--;
+            (*n_pos)--;
         /* sign change at - infinity */
         if (s != s0b)
-            t++;
+            (*n_neg)++;
+        /* sign change at 0 */
+        if (s != s0)
+        {
+            (*n_neg)--;
+            (*n_pos)++;
+        }
     }
 
     fmpz_clear(a);
@@ -114,13 +130,15 @@ slong _fmpz_poly_num_real_roots_sturm(fmpz * pol, slong len)
     fmpz_clear(h);
 
     _fmpz_vec_clear(W, 2*len - 1);
-
-    return t;
 }
 
 
 slong fmpz_poly_num_real_roots_sturm(fmpz_poly_t pol)
 {
+    slong i;
+    slong n_neg = 0;
+    slong n_pos = 0;
+
     if (fmpz_poly_is_zero(pol))
     {
         printf("ERROR (fmpz_poly_num_real_roots_sturm): zero polynomial\n");
@@ -131,5 +149,9 @@ slong fmpz_poly_num_real_roots_sturm(fmpz_poly_t pol)
     if (pol->length == 2)
         return 1;
 
-    return _fmpz_poly_num_real_roots_sturm(pol->coeffs, pol->length);
+    for (i = 0; (i < pol->length) && fmpz_is_zero(pol->coeffs + i); i++);
+
+    _fmpz_poly_num_real_roots_sturm(&n_neg, &n_pos, pol->coeffs + i, pol->length - i);
+
+    return i + n_neg + n_pos;
 }

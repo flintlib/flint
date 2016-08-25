@@ -133,8 +133,20 @@ slong _fmpz_poly_num_real_roots(fmpz * pol, slong len)
         else
             return len - 3;
     }
+    else
+    {
+        slong n_zero, n_neg, n_pos;
+        if (fmpz_is_zero(pol))
+            n_zero = 1;
+        else
+            n_zero = 0;
 
-    return _fmpz_poly_num_real_roots_sturm(pol, len);
+        _fmpz_poly_num_real_roots_sturm(&n_neg, &n_pos, pol + n_zero, len - n_zero);
+        return n_zero + n_neg + n_pos;
+    }
+
+    /* unreachable! */
+    return -1;
 }
 
 slong fmpz_poly_num_real_roots(fmpz_poly_t pol)

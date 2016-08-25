@@ -25,7 +25,7 @@ int main()
     /* where r_i are rationals and R has no real root */
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
-        slong k, n;
+        slong k, k_neg, k_pos, n;
         fmpz_poly_t p,q;
         fmpq * vec;
 
@@ -49,6 +49,21 @@ int main()
             printf("vec = "); _fmpq_vec_print(vec, n); printf("\n");
             printf("p = "); fmpz_poly_print(p); printf("\n");
             abort();
+        }
+
+        if (!fmpz_is_zero(p->coeffs))
+        {
+            _fmpz_poly_num_real_roots_sturm(&k_neg, &k_pos, p->coeffs, p->length);
+            for (k = 0; (k < n) && (fmpq_sgn(vec + k) < 0); k++);
+            if ((k_neg + k_pos != n) || (k != k_neg))
+            {
+                printf("ERROR:\n");
+                flint_printf("found k_neg = %wd and k_pos = %wd instead of %wd and %wd\n",
+                        k_neg, k_pos, k, n - k);
+                printf("vec = "); _fmpq_vec_print(vec, n); printf("\n");
+                printf("p = "); fmpz_poly_print(p); printf("\n");
+                abort();
+            }
         }
 
         _fmpq_vec_clear(vec, n);
