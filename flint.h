@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h> /* for alloca on FreeBSD */
-#if !defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)
+#if (!defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)) || defined(__GNU__)
 /* MinGW and FreeBSD have alloca, but not alloca.h */
 #include <alloca.h>
 #endif
