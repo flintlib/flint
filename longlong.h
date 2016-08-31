@@ -334,6 +334,39 @@
 
 #endif
 
+/* MIPS and ARM - Use clz builtins */
+#if (defined (__mips__) || defined (__arm__))
+
+#ifdef _LONG_LONG_LIMB
+#define count_leading_zeros(count,x)            \
+  do {                                          \
+    FLINT_ASSERT ((x) != 0);                    \
+    (count) = __builtin_clzll (x);              \
+  } while (0)
+#else
+#define count_leading_zeros(count,x)            \
+  do {                                          \
+    FLINT_ASSERT ((x) != 0);                    \
+    (count) = __builtin_clzl (x);               \
+  } while (0)
+#endif
+
+#ifdef _LONG_LONG_LIMB
+#define count_trailing_zeros(count,x)           \
+  do {                                          \
+    FLINT_ASSERT ((x) != 0);                    \
+    (count) = __builtin_ctzll (x);              \
+  } while (0)
+#else
+#define count_trailing_zeros(count,x)           \
+  do {                                          \
+    FLINT_ASSERT ((x) != 0);                    \
+    (count) = __builtin_ctzl (x);               \
+  } while (0)
+#endif
+
+#endif /* MIPS, ARM */
+
 #define udiv_qrnnd_int(q, r, n1, n0, d)                                \
   do {									                                      \
     mp_limb_t __d1, __d0, __q1, __q0, __r1, __r0, __m;			        \
@@ -374,6 +407,7 @@
     (r) = __r0;								                                \
   } while (0)
 
+#ifndef count_leading_zeros
 #define count_leading_zeros(count, x)                        \
   do {									                            \
     mp_limb_t __xr = (x);							                \
@@ -396,9 +430,11 @@
 									                                  \
     (count) = GMP_LIMB_BITS + 1 - __a - __flint_clz_tab[__xr >> __a]; \
   } while (0)
+#endif
 
 #if !(GMP_LIMB_BITS == 64 && defined (__ia64))
 
+#ifndef count_trailing_zeros
 #define count_trailing_zeros(count, x)                 \
   do {									                      \
     mp_limb_t __ctz_x = (x);						          \
@@ -407,6 +443,7 @@
     count_leading_zeros (__ctz_c, __ctz_x & -__ctz_x); \
     (count) = GMP_LIMB_BITS - 1 - __ctz_c;	 \
   } while (0)
+#endif
 
 #endif
 
