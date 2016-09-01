@@ -28,13 +28,8 @@
 
 /*  Memory management  *******************************************************/
 
-FLINT_DLL fmpq * _fmpq_vec_init(slong len);
-
-FMPQ_VEC_INLINE
-void _fmpq_vec_clear(fmpq * vec, slong len)
-{
-    _fmpz_vec_clear((fmpz *) vec, 2 * len);
-}
+/* _fmpq_vec_init and _fmpq_vec_clear are declared in fmpq.h for backward
+   compatibility */
 
 /*  Randomisation  ***********************************************************/
 
