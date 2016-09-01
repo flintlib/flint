@@ -339,6 +339,14 @@ FLINT_DLL void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
 
 FLINT_DLL void fmpq_harmonic_ui(fmpq_t x, ulong n);
 
+FLINT_DLL fmpq * _fmpq_vec_init(slong len);
+
+FMPQ_INLINE
+void _fmpq_vec_clear(fmpq * vec, slong len)
+{
+    _fmpz_vec_clear((fmpz *) vec, 2 * len);
+}
+
 #ifdef __cplusplus
 }
 #endif
