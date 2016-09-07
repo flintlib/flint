@@ -16,7 +16,7 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, slong start, slong n)
 {
     fmpz_t t, c, d, cden;
     slong j, k, m, mcase;
-    int prodsize;
+    int prodsize = 0;
 
     if (start >= n)
         return;

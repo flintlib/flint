@@ -43,7 +43,9 @@ void foo()
 
 int main(void)
 {
+#ifdef _OPENMP
     int i, result;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("omp_cleanup....");
