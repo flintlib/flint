@@ -36,6 +36,13 @@
 FLINT_DLL void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, 
                         slong len, mp_bitcnt_t bits);
 
+FLINT_DLL void _fmpq_vec_randtest_uniq_sorted(fmpq * vec,
+                        flint_rand_t state, slong len, mp_bitcnt_t bits);
+
+/* Sorting  ******************************************************************/
+
+FLINT_DLL void _fmpq_vec_sort(fmpq * vec, slong len);
+
 /*  Conversions  *************************************************************/
 
 FLINT_DLL void _fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len);

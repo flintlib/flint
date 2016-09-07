@@ -183,6 +183,9 @@ FLINT_DLL void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state,
 FLINT_DLL void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
                                                 slong len, mp_bitcnt_t bits);
 
+FLINT_DLL void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state,
+                                                slong len, mp_bitcnt_t bits);
+
 /*  Getting and setting coefficients  ****************************************/
 
 FLINT_DLL slong fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n);
@@ -1215,6 +1218,14 @@ void fmpz_poly_get_coeff_mpz(mpz_t x, const fmpz_poly_t poly, slong n)
 FLINT_DLL void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len);
 
 FLINT_DLL void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
+
+FLINT_DLL void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len);
+
+FLINT_DLL slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t poly);
+
+FLINT_DLL slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len);
+
+FLINT_DLL slong fmpz_poly_num_real_roots(const fmpz_poly_t poly);
 
 /* Special polynomials */
 
