@@ -39,5 +39,5 @@ void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, m
                 do_again = 1;
             }
         }
-    }while(do_again);
+    } while (do_again);
 }

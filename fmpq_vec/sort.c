@@ -16,4 +16,3 @@ void _fmpq_vec_sort(fmpq * vec, slong len)
 {
     qsort(vec, len, sizeof(fmpq), (__compar_fn_t) fmpq_cmp);
 }
-

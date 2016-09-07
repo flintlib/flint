@@ -31,7 +31,7 @@ int main()
         do
         {
             fmpz_poly_randtest_not_zero(p, state, 1 + n_randint(state, 5), 100);
-        }while (!fmpz_poly_is_squarefree(p));
+        } while (!fmpz_poly_is_squarefree(p));
 
         k1 = fmpz_poly_num_real_roots_sturm(p);
         k2 = fmpz_poly_num_real_roots(p);

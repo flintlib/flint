@@ -3037,7 +3037,7 @@ void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
     where the coefficients of the polynomial are $a_0, \ldots, a_n$.
 
 void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos,
-            fmpz * pol, slong len)
+            const fmpz * pol, slong len)
 
     Sets \code{n_neg} and \code{n_pos} to the number of negative and
     positive roots of the polynomial \code{(pol, len)} using Sturm
@@ -3048,14 +3048,21 @@ void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos,
     The polynomial is assumed to be squarefree, of degree larger than 1
     and with non-zero constant coefficient.
 
-slong fmpz_poly_num_real_roots_sturm(fmpz_poly_t pol)
+slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
 
     Returns the number of real roots of the squarefree polynomial \code{pol}
     using Sturm sequence.
 
     The polynomial is assumed to be squarefree.
 
-slong fmpz_poly_num_real_roots(fmpz_poly_t pol)
+slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
+
+    Returns the number of real roots of the squarefree polynomial
+    \code{(pol, len)}.
+
+    The polynomial is assumed to be squarefree.
+
+slong fmpz_poly_num_real_roots(const fmpz_poly_t pol)
 
     Returns the number of real roots of the squarefree polynomial \code{pol}.
 

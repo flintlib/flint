@@ -12,7 +12,7 @@
 #include "fmpz_poly.h"
 
 static __inline__
-slong _fmpz_poly_num_real_roots_quadratic(fmpz * pol, slong len)
+slong _fmpz_poly_num_real_roots_quadratic(const fmpz * pol, slong len)
 {
     if ((fmpz_sgn(pol) * fmpz_sgn(pol + 2) < 0) ||
         (2*fmpz_bits(pol + 1) > fmpz_bits(pol) + fmpz_bits(pol + 2) + 3))
@@ -41,7 +41,7 @@ slong _fmpz_poly_num_real_roots_quadratic(fmpz * pol, slong len)
 }
 
 static __inline__
-slong _num_roots_quartic_positive_discriminant(fmpz * p)
+slong _num_roots_quartic_positive_discriminant(const fmpz * p)
 {
     /* more delicate quartic case */
     fmpz_t d, a;
@@ -57,7 +57,7 @@ slong _num_roots_quartic_positive_discriminant(fmpz * p)
     fmpz_mul_ui(a, a, 3);
     fmpz_sub(d, d, a);
 
-    if (fmpz_cmp_ui(d, 0) < 0)
+    if (fmpz_sgn(d) < 0)
     {
         /* D = 64 a^3 e - 16 a^2 c^2 + 16 a b^2 c - 16 a^2 b d - 3 b^4 */
         fmpz_mul(d, p + 4, p + 4);
@@ -89,7 +89,7 @@ slong _num_roots_quartic_positive_discriminant(fmpz * p)
         fmpz_mul_ui(a, a, 3);
         fmpz_sub(d, d, a);
 
-        if (fmpz_cmp_ui(d, 0) < 0)
+        if (fmpz_sgn(d) < 0)
             res = 4;
         else
             res = 0;
@@ -101,7 +101,7 @@ slong _num_roots_quartic_positive_discriminant(fmpz * p)
 }
 
 
-slong _fmpz_poly_num_real_roots(fmpz * pol, slong len)
+slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
 {
     if (len == 1)
         return 0;
@@ -114,6 +114,7 @@ slong _fmpz_poly_num_real_roots(fmpz * pol, slong len)
         int s;
         fmpz_t disc;
 
+        fmpz_init(disc);
         _fmpz_poly_discriminant(disc, pol, len);
         s = fmpz_sgn(disc);
         fmpz_clear(disc);
@@ -149,7 +150,7 @@ slong _fmpz_poly_num_real_roots(fmpz * pol, slong len)
     return -1;
 }
 
-slong fmpz_poly_num_real_roots(fmpz_poly_t pol)
+slong fmpz_poly_num_real_roots(const fmpz_poly_t pol)
 {
     if (fmpz_poly_is_zero(pol))
     {

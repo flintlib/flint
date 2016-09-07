@@ -12,7 +12,7 @@
 #include "fmpz_poly.h"
 
 
-void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, fmpz * pol, slong len)
+void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len)
 {
     fmpz_t a, b, g, h;
     fmpz *A, *B, *W;
@@ -133,7 +133,7 @@ void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, fmpz * pol, s
 }
 
 
-slong fmpz_poly_num_real_roots_sturm(fmpz_poly_t pol)
+slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
 {
     slong i;
     slong n_neg = 0;
