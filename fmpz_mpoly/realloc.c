@@ -15,8 +15,11 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_realloc(fmpz_mpoly_t poly, slong alloc, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_realloc(fmpz_mpoly_t poly,
+                                       slong alloc, const fmpz_mpoly_ctx_t ctx)
 {
+    slong N;
+
     if (alloc == 0)             /* Clear up, reinitialise */
     {
         fmpz_mpoly_clear(poly, ctx);
@@ -25,25 +28,27 @@ void fmpz_mpoly_realloc(fmpz_mpoly_t poly, slong alloc, fmpz_mpoly_ctx_t ctx)
         return;
     }
 
+    N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+
     if (poly->alloc != 0)            /* Realloc */
     {
         fmpz_mpoly_truncate(poly, alloc, ctx);
 
         poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, alloc*sizeof(fmpz));
-        poly->exps = (ulong *) flint_realloc(poly->exps, alloc*ctx->N*sizeof(ulong));
+        poly->exps = (ulong *) flint_realloc(poly->exps, alloc*N*sizeof(ulong));
 
         if (alloc > poly->alloc)
         {
            flint_mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
                      alloc - poly->alloc);
-           flint_mpn_zero((mp_ptr) (poly->exps + poly->alloc*ctx->N),
-                     (alloc - poly->alloc)*ctx->N);
+           flint_mpn_zero((mp_ptr) (poly->exps + poly->alloc*N),
+                     (alloc - poly->alloc)*N);
         }
     }
     else                        /* Nothing allocated already so do it now */
     {
         poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
-        poly->exps   = (ulong *) flint_calloc(alloc*ctx->N, sizeof(ulong));
+        poly->exps   = (ulong *) flint_calloc(alloc*N, sizeof(ulong));
     }
 
     poly->alloc = alloc;

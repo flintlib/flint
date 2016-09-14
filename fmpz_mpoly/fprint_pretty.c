@@ -43,8 +43,9 @@ void _exp_get_degrees1(ulong * expvec, ulong v, slong bits,
 }
 
 int
-_fmpz_mpoly_fprint_pretty1(FILE * file, fmpz * poly, ulong * exps, slong len,
-                              char ** x, slong bits, slong n, int deg, int rev)
+_fmpz_mpoly_fprint_pretty1(FILE * file, const fmpz * poly, 
+                        const ulong * exps, slong len, const char ** x,
+                                         slong bits, slong n, int deg, int rev)
 {
    slong i, j;
    ulong * degs;
@@ -124,17 +125,19 @@ _fmpz_mpoly_fprint_pretty1(FILE * file, fmpz * poly, ulong * exps, slong len,
 }
 
 int
-fmpz_mpoly_fprint_pretty(FILE * file, fmpz_mpoly_t poly, char ** x, 
-                                                          fmpz_mpoly_ctx_t ctx)
+fmpz_mpoly_fprint_pretty(FILE * file, const fmpz_mpoly_t poly,
+                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
 {
    int deg, rev;
 
-   if (ctx->N == 1)
+   slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+
+   if (N == 1)
    {
       degrev_from_ord(deg, rev, ctx->ord);
 
       return _fmpz_mpoly_fprint_pretty1(file, poly->coeffs, poly->exps,
-                                 poly->length, x, ctx->bits, ctx->n, deg, rev);
+                                 poly->length, x, poly->bits, ctx->n, deg, rev);
    } else
       flint_throw(FLINT_ERROR, "Not implemented yet");
 

@@ -14,11 +14,9 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, slong N, slong bits,
-                                                   slong nvars, ordering_t ord)
+void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx,
+                                             slong nvars, const ordering_t ord)
 {
-   ctx->N = N;
-   ctx->bits = bits;
    ctx->n = (ord == ORD_DEGLEX || ord == ORD_DEGREVLEX) ? nvars + 1 : nvars;
    ctx->ord = ord;
 }

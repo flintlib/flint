@@ -18,8 +18,8 @@
 #include "fmpz_mpoly.h"
 
 char *
-_fmpz_mpoly_get_str_pretty1(fmpz * poly, ulong * exps, slong len,
-                              char ** x, slong bits, slong n, int deg, int rev)
+_fmpz_mpoly_get_str_pretty1(const fmpz * poly, const ulong * exps, slong len,
+                        const char ** x, slong bits, slong n, int deg, int rev)
 {
    char * str;
    slong i, j, bound, off;
@@ -112,16 +112,18 @@ _fmpz_mpoly_get_str_pretty1(fmpz * poly, ulong * exps, slong len,
 }
 
 char *
-fmpz_mpoly_get_str_pretty(fmpz_mpoly_t poly, char ** x, fmpz_mpoly_ctx_t ctx)
+fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
 {
    int deg, rev;
 
-   if (ctx->N == 1)
+   slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+
+   if (N == 1)
    {
       degrev_from_ord(deg, rev, ctx->ord);
 
       return _fmpz_mpoly_get_str_pretty1(poly->coeffs, poly->exps,
-                                 poly->length, x, ctx->bits, ctx->n, deg, rev);
+                                 poly->length, x, poly->bits, ctx->n, deg, rev);
    } else
       flint_throw(FLINT_ERROR, "Not implemented yet");
 

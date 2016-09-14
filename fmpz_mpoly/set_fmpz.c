@@ -15,16 +15,26 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
+                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 {
-   if (poly->coeffs != NULL)
+   slong m, i;
+
+   if (fmpz_is_zero(c))
    {
-      slong i;
-
-      for (i = 0; i < poly->alloc; i++)
-         _fmpz_demote(poly->coeffs + i);
-
-      flint_free(poly->coeffs);
-      flint_free(poly->exps);
+      _fmpz_mpoly_set_length(poly, 0, ctx);
+      return;
    }
+
+   fmpz_mpoly_fit_length(poly, 1, ctx);
+
+   fmpz_set(poly->coeffs, c);
+
+   m = FLINT_BITS/poly->bits;
+   m = (ctx->n - 1)/m + 1;
+
+   for (i = 0; i < m; i++)
+      poly->exps[i] = 0;
+
+   _fmpz_mpoly_set_length(poly, 1, ctx);
 }

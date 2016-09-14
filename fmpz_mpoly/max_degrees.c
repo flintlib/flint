@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-ulong * _fmpz_mpoly_max_degrees1(ulong * exps, slong len, slong bits, slong n, int deg, int rev)
+ulong * _fmpz_mpoly_max_degrees1(const ulong * exps, slong len, slong bits, slong n, int deg, int rev)
 {
    slong i, j, k = FLINT_BITS/bits, shift;
    ulong * maxdegs = (ulong *) flint_malloc(n*sizeof(ulong));
@@ -64,16 +64,19 @@ ulong * _fmpz_mpoly_max_degrees1(ulong * exps, slong len, slong bits, slong n, i
    return maxdegs;
 }
 
-ulong * fmpz_mpoly_max_degrees(fmpz_mpoly_t poly, fmpz_mpoly_ctx_t ctx)
+ulong * fmpz_mpoly_max_degrees(const fmpz_mpoly_t poly,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
    int deg, rev;
 
-   if (ctx->N == 1)
+   slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+
+   if (N == 1)
    {
       degrev_from_ord(deg, rev, ctx->ord);
 
       return _fmpz_mpoly_max_degrees1(poly->exps, poly->length,
-                                                  ctx->bits, ctx->n, deg, rev);
+                                                  poly->bits, ctx->n, deg, rev);
    } else
       flint_throw(FLINT_ERROR, "Not implemented yet");
 

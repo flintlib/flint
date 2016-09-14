@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2008, 2009, 2016 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -14,14 +15,9 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void
-fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len, const fmpz_mpoly_ctx_t ctx)
+slong
+fmpz_mpoly_get_coeff_si(const fmpz_mpoly_t poly,
+                                           slong n, const fmpz_mpoly_ctx_t ctx)
 {
-    if (len > poly->alloc)
-    {
-        /* At least double number of allocated coeffs */
-        if (len < 2 * poly->alloc)
-            len = 2 * poly->alloc;
-        fmpz_mpoly_realloc(poly, len, ctx);
-    }
+    return (n < poly->length) ? fmpz_get_si(poly->coeffs + n) : WORD(0);
 }

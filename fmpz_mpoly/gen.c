@@ -30,18 +30,20 @@ void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
        exps[0] |= (UWORD(1) << ((k - 1)*bits));
 }
 
-void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 {
    int deg, rev;
 
+   slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+
    fmpz_mpoly_fit_length(poly, 1, ctx);
 
-   if (ctx->N == 1)
+   if (N == 1)
    {
       degrev_from_ord(deg, rev, ctx->ord);
 
       _fmpz_mpoly_gen1(poly->coeffs, poly->exps, i, 
-                                                  ctx->bits, ctx->n, deg, rev);
+                                                  poly->bits, ctx->n, deg, rev);
       _fmpz_mpoly_set_length(poly, 1, ctx);
    } else
       flint_throw(FLINT_ERROR, "Not implemented yet");

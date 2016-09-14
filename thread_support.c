@@ -15,9 +15,7 @@
 #endif
 
 FLINT_TLS_PREFIX int _flint_num_threads = 1;
-#if WANT_OPENMP
 #pragma omp threadprivate(_flint_num_threads)
-#endif
 
 int flint_get_num_threads()
 {

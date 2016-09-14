@@ -15,21 +15,28 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_init(fmpz_mpoly_t poly, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
    poly->coeffs = NULL;
    poly->exps = NULL;
 
    poly->alloc = 0;
    poly->length = 0;
+   poly->bits = 8;   /* default to 8 bits per exponent */
 }
 
-void fmpz_mpoly_init2(fmpz_mpoly_t poly, slong alloc, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_init2(fmpz_mpoly_t poly,
+                                       slong alloc, const fmpz_mpoly_ctx_t ctx)
 {
+   slong N;
+
    if (alloc != 0)
    {
+      /* default to 8 bits per exponent */
+      N = (8*ctx->n - 1)/FLINT_BITS + 1;
+
       poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
-      poly->exps   = (ulong *) flint_calloc(alloc*ctx->N, sizeof(ulong));
+      poly->exps   = (ulong *) flint_calloc(alloc*N, sizeof(ulong));
    } else
    {
       poly->coeffs = NULL;
@@ -38,5 +45,6 @@ void fmpz_mpoly_init2(fmpz_mpoly_t poly, slong alloc, fmpz_mpoly_ctx_t ctx)
 
    poly->alloc = alloc;
    poly->length = 0;
+   poly->bits = 8;      /* default to 8 bits per exponent */
 }
 

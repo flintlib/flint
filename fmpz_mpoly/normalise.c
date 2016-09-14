@@ -15,7 +15,7 @@
 #include "fmpz_mpoly.h"
 
 void
-_fmpz_mpoly_normalise(fmpz_mpoly_t poly, fmpz_mpoly_ctx_t ctx)
+_fmpz_mpoly_normalise(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
 

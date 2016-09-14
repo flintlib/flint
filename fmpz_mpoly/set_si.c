@@ -10,18 +10,30 @@
 */
 
 #include <gmp.h>
+#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void
-fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_set_si(fmpz_mpoly_t poly, slong c, const fmpz_mpoly_ctx_t ctx)
 {
-    if (len > poly->alloc)
-    {
-        /* At least double number of allocated coeffs */
-        if (len < 2 * poly->alloc)
-            len = 2 * poly->alloc;
-        fmpz_mpoly_realloc(poly, len, ctx);
-    }
+   slong m, i;
+
+   if (c == 0)
+   {
+      _fmpz_mpoly_set_length(poly, 0, ctx);
+      return;
+   }
+
+   fmpz_mpoly_fit_length(poly, 1, ctx);
+
+   fmpz_set_si(poly->coeffs, c);
+
+   m = FLINT_BITS/poly->bits;
+   m = (ctx->n - 1)/m + 1;
+
+   for (i = 0; i < m; i++)
+      poly->exps[i] = 0;
+
+   _fmpz_mpoly_set_length(poly, 1, ctx);
 }

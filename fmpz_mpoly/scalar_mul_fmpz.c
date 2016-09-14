@@ -16,7 +16,7 @@
 #include "fmpz_mpoly.h"
 
 void _fmpz_mpoly_scalar_mul_fmpz(fmpz * poly1, ulong * exps1,
-                    fmpz * poly2, ulong * exps2, slong len2, slong N, fmpz_t c)
+  const fmpz * poly2, const ulong * exps2, slong len2, slong N, const fmpz_t c)
 {
    slong i;
 
@@ -27,19 +27,23 @@ void _fmpz_mpoly_scalar_mul_fmpz(fmpz * poly1, ulong * exps1,
       mpn_copyi(exps1, exps2, N*len2);
 }
 
-void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
-                                                fmpz_t c, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 {
+   slong N;
+
    if (fmpz_is_zero(c))
    {
       _fmpz_mpoly_set_length(poly1, 0, ctx);
       return;
    }
 
+   N = (poly2->bits*ctx->n - 1)/FLINT_BITS + 1;
+
    fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
 
    _fmpz_mpoly_scalar_mul_fmpz(poly1->coeffs, poly1->exps, 
-                         poly2->coeffs, poly2->exps, poly2->length, ctx->N, c);
+                         poly2->coeffs, poly2->exps, poly2->length, N, c);
       
    _fmpz_mpoly_set_length(poly1, poly2->length, ctx);
 }
