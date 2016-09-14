@@ -26,17 +26,6 @@ void fmpq_clear(fmpq_t x)
     Clears the \code{fmpq_t} variable \code{x}. To use the variable again,
     it must be re-initialised with \code{fmpq_init}.
 
-fmpq * _fmpq_vec_init(slong n)
-
-    Initialises a vector of \code{fmpq} values of length $n$ and sets
-    all values to 0. This is equivalent to generating a \code{fmpz} vector
-    of length $2n$ with \code{_fmpz_vec_init} and setting all denominators
-    to 1.
-
-void _fmpq_vec_clear(fmpq * vec, slong n)
-
-    Frees an \code{fmpq} vector.
-
 *******************************************************************************
 
     Canonicalisation
@@ -264,27 +253,39 @@ void fmpq_clear_readonly(fmpq_t f)
 
 *******************************************************************************
 
-void fmpq_fprint(FILE * file, const fmpq_t x)
+int fmpq_fprint(FILE * file, const fmpq_t x)
 
     Prints \code{x} as a fraction to the stream \code{file}.   
     The numerator and denominator are printed verbatim as integers, 
     with a forward slash (/) printed in between.
 
-void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
+    In case of success, returns a positive number. In case of failure,
+    returns a non-positive number.
+
+int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
 
     Does the same thing as \code{fmpq_fprint}, but for numerator
     and denominator given explicitly as \code{fmpz_t} variables. 
 
-void fmpq_print(const fmpq_t x)
+    In case of success, returns a positive number. In case of failure,
+    returns a non-positive number.
+
+int fmpq_print(const fmpq_t x)
 
     Prints \code{x} as a fraction. The numerator and denominator are
     printed verbatim as integers, with a forward slash (/) printed in
     between.
 
-void _fmpq_print(const fmpz_t num, const fmpz_t den)
+    In case of success, returns a positive number. In case of failure,
+    returns a non-positive number.
+
+int _fmpq_print(const fmpz_t num, const fmpz_t den)
 
     Does the same thing as \code{fmpq_print}, but for numerator
     and denominator given explicitly as \code{fmpz_t} variables. 
+
+    In case of success, returns a positive number. In case of failure,
+    returns a non-positive number.
 
 *******************************************************************************
 

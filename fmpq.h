@@ -48,7 +48,6 @@ typedef fmpq fmpq_t[1];
 #define fmpq_numref(__x) (&(__x)->num)
 #define fmpq_denref(__y) (&(__y)->den)
 
-
 FMPQ_INLINE void fmpq_init(fmpq_t x)
 {
     x->num = WORD(0);
@@ -59,22 +58,6 @@ FMPQ_INLINE void fmpq_clear(fmpq_t x)
 {
     fmpz_clear(fmpq_numref(x));
     fmpz_clear(fmpq_denref(x));
-}
-
-FMPQ_INLINE fmpq * _fmpq_vec_init(slong n)
-{
-    fmpq * v = (fmpq *) flint_malloc(sizeof(fmpq) * n);
-    slong i;
-
-    for (i = 0; i < n; i++)
-        fmpq_init(v + i);
-
-    return v;
-}
-
-FMPQ_INLINE void _fmpq_vec_clear(fmpq * vec, slong n)
-{
-    _fmpz_vec_clear((fmpz *) vec, 2 * n);
 }
 
 FMPQ_INLINE void fmpq_zero(fmpq_t res)
@@ -355,6 +338,14 @@ FLINT_DLL void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 FLINT_DLL void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
 
 FLINT_DLL void fmpq_harmonic_ui(fmpq_t x, ulong n);
+
+FLINT_DLL fmpq * _fmpq_vec_init(slong len);
+
+FMPQ_INLINE
+void _fmpq_vec_clear(fmpq * vec, slong len)
+{
+    _fmpz_vec_clear((fmpz *) vec, 2 * len);
+}
 
 #ifdef __cplusplus
 }

@@ -190,6 +190,11 @@ void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 
     Sets \code{res} to a copy of \code{poly}, truncated to length \code{n}.
 
+void fmpz_poly_set_rational_roots(fmpz_poly_t pol, fmpq * vec, slong len)
+
+    Sets \code{pol} to be a polynomial with integer coefficient whose
+    roots are given by the array \code{(vec, len)}.
+
 *******************************************************************************
 
     Randomisation
@@ -217,6 +222,15 @@ void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
     As for \code{fmpz_poly_randtest()} except that \code{len} and bits may 
     not be zero and the polynomial generated is guaranteed not to be the 
     zero polynomial.  One must call \code{flint_randinit()} before 
+    calling this function.
+
+FLINT_DLL void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state,
+                                                slong len, mp_bitcnt_t bits)
+
+
+    Sets \code{p} to a random polynomial without any real root, whose
+    length is up to \code{len} and where each coefficient has up to the
+    given number of bits. One must call \code{flint_randinit()} before
     calling this function.
 
 *******************************************************************************
@@ -3021,6 +3035,38 @@ void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
     $$
 
     where the coefficients of the polynomial are $a_0, \ldots, a_n$.
+
+void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos,
+            const fmpz * pol, slong len)
+
+    Sets \code{n_neg} and \code{n_pos} to the number of negative and
+    positive roots of the polynomial \code{(pol, len)} using Sturm
+    sequence. The Sturm sequence is computed via subresultant
+    remainders obtained by repeated call to the function
+    _fmpz_poly_pseudo_rem_cohen.
+
+    The polynomial is assumed to be squarefree, of degree larger than 1
+    and with non-zero constant coefficient.
+
+slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
+
+    Returns the number of real roots of the squarefree polynomial \code{pol}
+    using Sturm sequence.
+
+    The polynomial is assumed to be squarefree.
+
+slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
+
+    Returns the number of real roots of the squarefree polynomial
+    \code{(pol, len)}.
+
+    The polynomial is assumed to be squarefree.
+
+slong fmpz_poly_num_real_roots(const fmpz_poly_t pol)
+
+    Returns the number of real roots of the squarefree polynomial \code{pol}.
+
+    The polynomial is assumed to be squarefree.
 
 *******************************************************************************
 

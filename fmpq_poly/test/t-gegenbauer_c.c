@@ -10,6 +10,7 @@
 */
 
 #include "fmpq_poly.h"
+#include "fmpq_vec.h"
 
 #define NRATS 50
 
