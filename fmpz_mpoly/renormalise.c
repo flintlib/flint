@@ -28,8 +28,7 @@ void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
    if (i != 0)
    {
-      m = FLINT_BITS/poly->bits;
-      m = (ctx->n - 1)/m + 1;
+      m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;;
 
       TMP_START;
 

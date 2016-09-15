@@ -18,9 +18,7 @@
 void fmpz_mpoly_sub_si(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, m = FLINT_BITS/poly2->bits;
-
-   m = (ctx->n - 1)/m + 1;
+   slong i, m = (poly2->bits*ctx->n - 1)/FLINT_BITS + 1;
 
    if (poly2->length == 0)
    {

@@ -29,12 +29,7 @@ int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly,
 
    degrev_from_ord(deg, rev, ctx->ord);
 
-   if (deg)
-   {
-      m = FLINT_BITS/poly->bits;
-      m = (ctx->n - 1)/m + 1;
-   } else
-      m = 1;
+   m = deg ? (poly->bits*ctx->n - 1)/FLINT_BITS + 1 : 1;
 
    for (i = 0; i < m; i++)
    {

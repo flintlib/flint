@@ -29,8 +29,7 @@ void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
 
    fmpz_set_ui(poly->coeffs, c);
 
-   m = FLINT_BITS/poly->bits;
-   m = (ctx->n - 1)/m + 1;
+   m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
    for (i = 0; i < m; i++)
       poly->exps[i] = 0;

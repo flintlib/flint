@@ -32,8 +32,7 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
       return (poly->exps[0] >> (FLINT_BITS - poly->bits)) == 1;
    else
    {
-      slong m = FLINT_BITS/poly->bits;
-      m = (ctx->n - 1)/m + 1;
+      slong m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
       for (i = 0; i < m; i++)
       {

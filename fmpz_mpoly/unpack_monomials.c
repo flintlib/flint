@@ -331,8 +331,7 @@ ulong * _fmpz_mpoly_unpack_monomials(slong bits1, const ulong * exps2,
    if (bits1 == bits2)
       return (ulong *) exps2;
 
-   k = FLINT_BITS/bits1; /* number of exponents per word */
-   N = (n + k - 1)/k;    /* number of words per exponent vector */
+   N = (n*bits1 - 1)/FLINT_BITS + 1; /* number of words per exponent vector */
 
    exps1 = (ulong *) flint_malloc(N*len*sizeof(ulong));
 
