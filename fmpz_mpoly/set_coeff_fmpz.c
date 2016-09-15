@@ -22,7 +22,7 @@ fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly,
     if (fmpz_is_zero(x))
     {
        fmpz ptr;
-       slong i;
+       slong i, m;
 
        if (n >= poly->length)
           return;
@@ -31,9 +31,14 @@ fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly,
        ptr = poly->coeffs[n];
 
        for (i = n; i < poly->length - 1; i++)
-          poly->coeffs[i] = poly->coeffs[i + 1];
+          poly->coeffs[i] = poly->coeffs[i + 1];       
 
        poly->coeffs[i] = ptr;
+
+       m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+
+       for (i = n*m; i < (poly->length - 1)*m; i++)
+          poly->exps[i] = poly->exps[i + m];
 
        poly->length--;
     }

@@ -326,7 +326,7 @@ ulong * _fmpz_mpoly_unpack_monomials(slong bits1, const ulong * exps2,
                                                slong bits2, slong n, slong len)
 {
    ulong * exps1;
-   slong k, N;
+   slong N;
 
    if (bits1 == bits2)
       return (ulong *) exps2;
