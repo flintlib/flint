@@ -293,13 +293,48 @@ FLINT_DLL void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly,
 FLINT_DLL void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
                       slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx);
 
+FMPZ_MPOLY_INLINE
+int _fmpz_mpoly_monomial_is_zero(const ulong * exps, slong m)
+{
+   slong i;
+
+   for (i = 0; i < m; i++)
+   {
+      if (exps[i] != 0)
+         return 0;
+   }
+
+   return 1;
+}
+
 #define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
 
 #define fmpz_mpoly_get_monomial_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->exps + (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
 
+FLINT_DLL void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 /* Arithmetic ****************************************************************/
+
+FLINT_DLL void fmpz_mpoly_add_ui(fmpz_mpoly_t poly1,
+                const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_add_si(fmpz_mpoly_t poly1,
+                const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_add_fmpz(fmpz_mpoly_t poly1,
+         const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_sub_ui(fmpz_mpoly_t poly1,
+                const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_sub_si(fmpz_mpoly_t poly1,
+                const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t poly1,
+         const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _fmpz_mpoly_add1(fmpz * poly1, ulong * exps1,
                 const fmpz * poly2, const ulong * exps2, slong len2,
