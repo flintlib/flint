@@ -370,6 +370,24 @@ void _fmpz_mpoly_scalar_mul_ui(fmpz * poly1, ulong * exps1,
 void fmpz_mpoly_scalar_mul_ui(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                           ulong c, const fmpz_mpoly_ctx_t ctx);
 
+void _fmpz_mpoly_scalar_divexact_fmpz(fmpz * poly1, ulong * exps1,
+ const fmpz * poly2, const ulong * exps2, slong len2, slong N, const fmpz_t c);
+
+void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t poly1,
+         const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+void _fmpz_mpoly_scalar_divexact_si(fmpz * poly1, ulong * exps1,
+        const fmpz * poly2, const ulong * exps2, slong len2, slong N, slong c);
+
+void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t poly1,
+                const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx);
+
+void _fmpz_mpoly_scalar_divexact_ui(fmpz * poly1, ulong * exps1,
+        const fmpz * poly2, const ulong * exps2, slong len2, slong N, ulong c);
+
+void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1,
+                const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx);
+
 /* Input/output **************************************************************/
 
 FLINT_DLL void _exp_get_degrees1(ulong * expvec, ulong v, slong bits,
