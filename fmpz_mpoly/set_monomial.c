@@ -375,7 +375,7 @@ void _fmpz_mpoly_set_monomial_32_32(ulong * exp1, const ulong * exp2,
 
 #endif
 
-void fmpz_mpoly_set_exps(fmpz_mpoly_t poly, 
+void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
                        slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx)
 {
    slong m, i, bits, max_bits;

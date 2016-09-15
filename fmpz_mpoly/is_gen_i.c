@@ -42,7 +42,7 @@ int fmpz_mpoly_is_gen_i(const fmpz_mpoly_t poly,
 
    exps = (ulong *) TMP_ALLOC((ctx->n - deg)*sizeof(ulong));
 
-   fmpz_mpoly_get_exps(exps, poly, 0, ctx);
+   fmpz_mpoly_get_monomial(exps, poly, 0, ctx);
 
    for (i = 0; i < k; i++)
    {

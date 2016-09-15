@@ -287,7 +287,7 @@ void _fmpz_mpoly_get_monomial_32_32(ulong * exp1, const ulong * exp2,
 
 #endif
 
-void fmpz_mpoly_get_exps(ulong * exps, const fmpz_mpoly_t poly, 
+void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
                                            slong n, const fmpz_mpoly_ctx_t ctx)
 {
    slong m;

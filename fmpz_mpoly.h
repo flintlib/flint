@@ -287,16 +287,16 @@ FLINT_DLL void fmpz_mpoly_set_coeff_ui(fmpz_mpoly_t poly,
 FLINT_DLL void fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
                                  slong n, slong x, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_get_exps(ulong * exps, const fmpz_mpoly_t poly, 
+FLINT_DLL void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
                                           slong n, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_set_exps(fmpz_mpoly_t poly, 
+FLINT_DLL void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
                       slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx);
 
 #define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
 
-#define fmpz_mpoly_get_exps_ptr(poly, n, ctx) \
+#define fmpz_mpoly_get_monomial_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->exps + (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
 
 /* Arithmetic ****************************************************************/
