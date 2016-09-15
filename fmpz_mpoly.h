@@ -192,6 +192,24 @@ FLINT_DLL void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
 FLINT_DLL void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_set_ui(fmpz_mpoly_t poly,
+                                          ulong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_si(fmpz_mpoly_t poly,
+                                          slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
+                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly,
+                                          ulong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly,
+                                          slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
+                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_swap(fmpz_mpoly_t poly1, 
                                 fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
@@ -220,24 +238,6 @@ void fmpz_mpoly_swap(fmpz_mpoly_t poly1,
    poly1->bits = poly2->bits;
    poly2->bits = t3;
 }
-
-FLINT_DLL void fmpz_mpoly_set_ui(fmpz_mpoly_t poly,
-                                          ulong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_set_si(fmpz_mpoly_t poly,
-                                          slong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
-                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly,
-                                          ulong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly,
-                                          slong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
-                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_zero(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
@@ -328,6 +328,14 @@ FLINT_DLL void _fmpz_mpoly_neg(fmpz * poly1, ulong * exps1,
                     const fmpz * poly2, const ulong * exps2, slong n, slong m);
 
 FLINT_DLL void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+/* Comparison */
+
+FLINT_DLL int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
+                    const fmpz * poly2, const ulong * exps2, slong n, slong m);
+
+FLINT_DLL int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 /* Arithmetic ****************************************************************/
