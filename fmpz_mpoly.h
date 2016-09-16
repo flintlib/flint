@@ -59,6 +59,14 @@ typedef struct
 
 typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
 
+typedef struct fmpz_mpoly_heap_s
+{
+   ulong exp;
+   slong i;
+   slong j;
+   struct fmpz_mpoly_heap_s * next;
+} fmpz_mpoly_heap_s;
+
 /* Macros ********************************************************************/
 
 #define degrev_from_ord(deg, rev, ord)                                \
