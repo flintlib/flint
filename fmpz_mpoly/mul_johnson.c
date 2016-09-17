@@ -248,7 +248,7 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    k++;
 
-   (*poly1) = (fmpz *) p1;
+   (*poly1) = p1;
    (*exp1) = e1;
    
    flint_free(heap);
