@@ -15,13 +15,13 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-int _fmpz_mpoly_fits_si(const fmpz * poly, slong len)
+int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
 {
    slong i;
 
    for (i = 0; i < len; i++)
    {
-      if (!fmpz_fits_si(poly + i))
+      if (COEFF_IS_MPZ(poly[i]))
          return 0;
    }
 
@@ -233,7 +233,7 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
       negate = 0;
 
-      if (0 > (slong) c[1])
+      if (0 > (slong) c[2])
       {
          c[0] = ~c[0];
          c[1] = ~c[1];
@@ -269,7 +269,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                             const fmpz * poly3, const ulong * exp3, slong len3)
 {
-   if (_fmpz_mpoly_fits_si(poly2, len2) && _fmpz_mpoly_fits_si(poly3, len3))
+   if (_fmpz_mpoly_fits_small(poly2, len2) && _fmpz_mpoly_fits_small(poly3, len3))
       return _fmpz_mpoly_mul_johnson1_si(poly1, exp1, alloc,
                      (slong *) poly2, exp2, len2, (slong *) poly3, exp3, len3);
    else
