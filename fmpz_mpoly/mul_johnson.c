@@ -68,31 +68,11 @@ fmpz_mpoly_heap_t * _fmpz_mpoly_heap_pop(fmpz_mpoly_heap_s * heap, slong * heap_
    return x; 
 }
 
-void _fmpz_mpoly_heap_push(fmpz_mpoly_heap_s * heap, ulong exp, fmpz_mpoly_heap_t * x, slong * heap_len)
-{
-   slong j, i;
-   
-   i = *heap_len;
-      
-   (*heap_len)++;
-   
-   while ((j = HEAP_PARENT(i)) >= 1)
-   {
-      if (exp < heap[j].exp)
-      {
-         heap[i] = heap[j];
-         i = j;
-      } else
-         break;
-   }
-
-   HEAP_ASSIGN(heap[i], exp, x);
-}
-
 void _fmpz_mpoly_heap_insert(fmpz_mpoly_heap_s * heap, ulong exp, fmpz_mpoly_heap_t * x, slong * heap_len)
 {
    slong i = *heap_len, j, n = *heap_len;
-   
+   static slong next_loc = 0;
+
    if (i != 1 && exp == heap[1].exp)
    {
       x->next = heap[1].next;
@@ -101,12 +81,23 @@ void _fmpz_mpoly_heap_insert(fmpz_mpoly_heap_s * heap, ulong exp, fmpz_mpoly_hea
       return;
    }
 
+   if (next_loc != 0 && next_loc < *heap_len)
+   {
+      if (exp == heap[next_loc].exp)
+      {
+         x->next = heap[next_loc].next;
+         heap[next_loc].next = x;
+         return;
+      }
+   }
+
    while ((j = HEAP_PARENT(i)) >= 1)
    {
       if (exp == heap[j].exp)
       {
          x->next = heap[j].next;
          heap[j].next = x;
+         next_loc = j;
 
          return;
       } else if (exp < heap[j].exp)
@@ -130,25 +121,28 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
 {
-   slong i, k;
+   slong k;
    slong next_free, Q_len = 0, heap_len = 2; /* heap zero index unused */
-   fmpz_mpoly_heap_s * heap = (fmpz_mpoly_heap_s *) flint_malloc((len2 + 1)*sizeof(fmpz_mpoly_heap_s));
-   fmpz_mpoly_heap_t * chain = (fmpz_mpoly_heap_t *) flint_malloc(len2*sizeof(fmpz_mpoly_heap_t));
-   fmpz_mpoly_heap_t ** free_list = (fmpz_mpoly_heap_t **) flint_malloc(len2*sizeof(fmpz_mpoly_heap_t *));
-   fmpz_mpoly_heap_t ** Q = (fmpz_mpoly_heap_t **) flint_malloc(len2*sizeof(fmpz_mpoly_heap_t *));
+   fmpz_mpoly_heap_s * heap;
+   fmpz_mpoly_heap_t * chain;
+   fmpz_mpoly_heap_t ** Q;
    fmpz_mpoly_heap_t * x;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
    ulong exp, cy;
    ulong c[3], p[2]; /* for accumulating coefficients */
    int first, negate;
+   TMP_INIT;
 
-   for (i = 0; i < len2; i++)
-      free_list[i] = chain + i;
+   TMP_START;
 
+   heap = (fmpz_mpoly_heap_s *) TMP_ALLOC((len2 + 1)*sizeof(fmpz_mpoly_heap_s));
+   chain = (fmpz_mpoly_heap_t *) TMP_ALLOC(len2*sizeof(fmpz_mpoly_heap_t));
+   Q = (fmpz_mpoly_heap_t **) TMP_ALLOC(len2*sizeof(fmpz_mpoly_heap_t *));
+   
    next_free = 0;
 
-   x = free_list[next_free++];
+   x = chain + next_free++;
    x->i = 0;
    x->j = 0;
    x->next = NULL;
@@ -193,8 +187,6 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
       
          if (x->j < len3 - 1)
             Q[Q_len++] = x;
-         else
-            free_list[--next_free] = x;
 
          while ((x = x->next) != NULL)
          {
@@ -207,29 +199,27 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
             if (x->j < len3 - 1)
                Q[Q_len++] = x;
-            else
-               free_list[--next_free] = x;
+         }
+      }
+      
+      while (Q_len > 0)
+      {
+         x = Q[--Q_len];
+     
+         if (x->j == 0 && x->i < len2 - 1)
+         {
+            fmpz_mpoly_heap_t * x2 = chain + next_free++;
+            x2->i = x->i + 1;
+            x2->j = 0;
+            x2->next = NULL;
+
+            _fmpz_mpoly_heap_insert(heap, exp2[x->i + 1] + exp3[0], x2, &heap_len);
          }
 
-         while (Q_len > 0)
-         {
-            x = Q[--Q_len];
-     
-            if (x->j == 0 && x->i < len2 - 1)
-            {
-               fmpz_mpoly_heap_t * x2 = free_list[next_free++];
-               x2->i = x->i + 1;
-               x2->j = 0;
-               x2->next = NULL;
-
-               _fmpz_mpoly_heap_push(heap, exp2[x->i + 1] + exp3[0], x2, &heap_len);
-            }
-
-            x->j++;
-            x->next = NULL;
-            _fmpz_mpoly_heap_insert(heap, exp2[x->i] + exp3[x->j], x, &heap_len);
-         }     
-      }
+         x->j++;
+         x->next = NULL;
+         _fmpz_mpoly_heap_insert(heap, exp2[x->i] + exp3[x->j], x, &heap_len);
+      }     
 
       negate = 0;
 
@@ -257,10 +247,7 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
    (*poly1) = p1;
    (*exp1) = e1;
    
-   flint_free(heap);
-   flint_free(chain);
-   flint_free(free_list);
-   flint_free(Q);
+   TMP_END;
 
    return k;
 }
