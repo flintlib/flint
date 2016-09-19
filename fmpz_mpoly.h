@@ -72,6 +72,12 @@ typedef struct fmpz_mpoly_heap1_s
    struct fmpz_mpoly_heap_t * next;
 } fmpz_mpoly_heap1_s;
 
+typedef struct fmpz_mpoly_heap_s
+{
+   ulong * exp;
+   struct fmpz_mpoly_heap_t * next;
+} fmpz_mpoly_heap_s;
+
 /* Macros ********************************************************************/
 
 #define degrev_from_ord(deg, rev, ord)                                \
