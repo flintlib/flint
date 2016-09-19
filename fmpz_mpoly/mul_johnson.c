@@ -38,7 +38,7 @@ int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
       (h).next = (c2);                 \
    } while (0)
 
-fmpz_mpoly_heap_t * _fmpz_mpoly_heap_pop(fmpz_mpoly_heap_s * heap, slong * heap_len)
+fmpz_mpoly_heap_t * _fmpz_mpoly_heap_pop1(fmpz_mpoly_heap1_s * heap, slong * heap_len)
 {
    ulong exp;
    slong l, j, r, i = 1, len;
@@ -68,7 +68,7 @@ fmpz_mpoly_heap_t * _fmpz_mpoly_heap_pop(fmpz_mpoly_heap_s * heap, slong * heap_
    return x; 
 }
 
-void _fmpz_mpoly_heap_insert(fmpz_mpoly_heap_s * heap, ulong exp, fmpz_mpoly_heap_t * x, slong * heap_len)
+void _fmpz_mpoly_heap_insert1(fmpz_mpoly_heap1_s * heap, ulong exp, fmpz_mpoly_heap_t * x, slong * heap_len)
 {
    slong i = *heap_len, j, n = *heap_len;
    static slong next_loc = 0;
@@ -117,13 +117,13 @@ void _fmpz_mpoly_heap_insert(fmpz_mpoly_heap_s * heap, ulong exp, fmpz_mpoly_hea
    HEAP_ASSIGN(heap[i], exp, x);
 }
 
-slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
-                 const slong * poly2, const ulong * exp2, slong len2,
-                           const slong * poly3, const ulong * exp3, slong len3)
+slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
+                 const fmpz * poly2, const ulong * exp2, slong len2,
+                           const fmpz * poly3, const ulong * exp3, slong len3)
 {
    slong k;
    slong next_free, Q_len = 0, heap_len = 2; /* heap zero index unused */
-   fmpz_mpoly_heap_s * heap;
+   fmpz_mpoly_heap1_s * heap;
    fmpz_mpoly_heap_t * chain;
    fmpz_mpoly_heap_t ** Q;
    fmpz_mpoly_heap_t * x;
@@ -131,12 +131,14 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
    ulong * e1 = *exp1;
    ulong exp, cy;
    ulong c[3], p[2]; /* for accumulating coefficients */
-   int first, negate;
+   int first, negate, small;
    TMP_INIT;
 
    TMP_START;
 
-   heap = (fmpz_mpoly_heap_s *) TMP_ALLOC((len2 + 1)*sizeof(fmpz_mpoly_heap_s));
+   small = _fmpz_mpoly_fits_small(poly2, len2) && _fmpz_mpoly_fits_small(poly3, len3);
+
+   heap = (fmpz_mpoly_heap1_s *) TMP_ALLOC((len2 + 1)*sizeof(fmpz_mpoly_heap1_s));
    chain = (fmpz_mpoly_heap_t *) TMP_ALLOC(len2*sizeof(fmpz_mpoly_heap_t));
    Q = (fmpz_mpoly_heap_t **) TMP_ALLOC(len2*sizeof(fmpz_mpoly_heap_t *));
    
@@ -170,35 +172,59 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
       while (heap_len > 1 && heap[1].exp == exp)
       {
-         x = _fmpz_mpoly_heap_pop(heap, &heap_len);
+         x = _fmpz_mpoly_heap_pop1(heap, &heap_len);
          
-         if (first)
+         if (small)
          {
-            smul_ppmm(c[1], c[0], poly2[x->i], poly3[x->j]);
-            c[2] = -(c[1] >> (FLINT_BITS - 1));
-            e1[k] = exp;
-            first = 0; 
-         } else
-         {
-            smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
-            add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-            c[2] = (p[1] >= 0) ? cy : (1 - cy);
-         }
+            if (first)
+            {
+               smul_ppmm(c[1], c[0], poly2[x->i], poly3[x->j]);
+               c[2] = -(c[1] >> (FLINT_BITS - 1));
+               e1[k] = exp;
+               first = 0; 
+            } else
+            {
+               smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
+               add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
+               c[2] = (p[1] >= 0) ? cy : (1 - cy);
+            }
       
-         if (x->j < len3 - 1)
-            Q[Q_len++] = x;
-
-         while ((x = x->next) != NULL)
-         {
-            smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
-            add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-            if (p[1] >= 0)
-               c[2] += cy;
-            else
-               c[2] -= (1 - cy);
-
             if (x->j < len3 - 1)
                Q[Q_len++] = x;
+
+            while ((x = x->next) != NULL)
+            {
+               smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
+               add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
+               if (p[1] >= 0)
+                  c[2] += cy;
+               else
+                  c[2] -= (1 - cy);
+
+               if (x->j < len3 - 1)
+                  Q[Q_len++] = x;
+            }
+         } else
+         {
+            if (first)
+            {
+               fmpz_mul(p1 + k, poly2 + x->i, poly3 + x->j);
+               
+               e1[k] = exp;
+               first = 0; 
+            } else
+               fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
+      
+            if (x->j < len3 - 1)
+               Q[Q_len++] = x;
+
+            while ((x = x->next) != NULL)
+            {
+               fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
+
+               if (x->j < len3 - 1)
+                  Q[Q_len++] = x;
+            }
          }
       }
       
@@ -213,33 +239,36 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x2->j = 0;
             x2->next = NULL;
 
-            _fmpz_mpoly_heap_insert(heap, exp2[x->i + 1] + exp3[0], x2, &heap_len);
+            _fmpz_mpoly_heap_insert1(heap, exp2[x->i + 1] + exp3[0], x2, &heap_len);
          }
 
          x->j++;
          x->next = NULL;
-         _fmpz_mpoly_heap_insert(heap, exp2[x->i] + exp3[x->j], x, &heap_len);
+         _fmpz_mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &heap_len);
       }     
 
-      negate = 0;
-
-      if (0 > (slong) c[2])
+      if (small)
       {
-         c[0] = ~c[0];
-         c[1] = ~c[1];
-         c[2] = ~c[2];
-         add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, 1);
-         negate = 1;
-      } 
+         negate = 0;
 
-      fmpz_set_ui(p1 + k, c[2]);
-      fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
-      fmpz_add_ui(p1 + k, p1 + k, c[1]);
-      fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
-      fmpz_add_ui(p1 + k, p1 + k, c[0]);
+         if (0 > (slong) c[2])
+         {
+            c[0] = ~c[0];
+            c[1] = ~c[1];
+            c[2] = ~c[2];
+            add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, 1);
+            negate = 1;
+         } 
+
+         fmpz_set_ui(p1 + k, c[2]);
+         fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
+         fmpz_add_ui(p1 + k, p1 + k, c[1]);
+         fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
+         fmpz_add_ui(p1 + k, p1 + k, c[0]);
       
-      if (negate)
-         fmpz_neg(p1 + k, p1 + k);
+         if (negate)
+            fmpz_neg(p1 + k, p1 + k);
+      }
    }
 
    k++;
@@ -250,19 +279,6 @@ slong _fmpz_mpoly_mul_johnson1_si(fmpz ** poly1, ulong ** exp1, slong * alloc,
    TMP_END;
 
    return k;
-}
-
-slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
-                 const fmpz * poly2, const ulong * exp2, slong len2,
-                            const fmpz * poly3, const ulong * exp3, slong len3)
-{
-   if (_fmpz_mpoly_fits_small(poly2, len2) && _fmpz_mpoly_fits_small(poly3, len3))
-      return _fmpz_mpoly_mul_johnson1_si(poly1, exp1, alloc,
-                     (slong *) poly2, exp2, len2, (slong *) poly3, exp3, len3);
-   else
-      flint_throw(FLINT_ERROR, "Not implemented yet!");
-
-   return 0;
 }
 
 void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
@@ -320,7 +336,12 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
          fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
 
-         len = _fmpz_mpoly_mul_johnson1(&temp->coeffs, &temp->exps, &temp->alloc,
+         if (poly2->length >= poly3->length)
+            len = _fmpz_mpoly_mul_johnson1(&temp->coeffs, &temp->exps, &temp->alloc,
+                                      poly3->coeffs, exp3, poly3->length,
+                                           poly2->coeffs, exp2, poly2->length);
+         else
+            len = _fmpz_mpoly_mul_johnson1(&temp->coeffs, &temp->exps, &temp->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                            poly3->coeffs, exp3, poly3->length);
 
@@ -333,7 +354,12 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
          fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
 
-         len = _fmpz_mpoly_mul_johnson1(&poly1->coeffs, &poly1->exps, &poly1->alloc,
+         if (poly2->length >= poly3->length)
+            len = _fmpz_mpoly_mul_johnson1(&poly1->coeffs, &poly1->exps, &poly1->alloc,
+                                      poly3->coeffs, exp3, poly3->length,
+                                           poly2->coeffs, exp2, poly2->length);
+         else
+            len = _fmpz_mpoly_mul_johnson1(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                            poly3->coeffs, exp3, poly3->length);
       }

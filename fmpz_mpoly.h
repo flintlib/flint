@@ -66,11 +66,11 @@ typedef struct fmpz_mpoly_heap_t
    struct fmpz_mpoly_heap_t * next;
 } fmpz_mpoly_heap_t;
 
-typedef struct fmpz_mpoly_heap_s
+typedef struct fmpz_mpoly_heap1_s
 {
    ulong exp;
    struct fmpz_mpoly_heap_t * next;
-} fmpz_mpoly_heap_s;
+} fmpz_mpoly_heap1_s;
 
 /* Macros ********************************************************************/
 
