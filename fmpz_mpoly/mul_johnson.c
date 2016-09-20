@@ -315,7 +315,8 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             {
                smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
                add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-               c[2] = (p[1] >= 0) ? cy : (1 - cy);
+               c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
+
             }
       
             if (x->j < len3 - 1)
@@ -325,10 +326,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             {
                smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
                add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-               if (p[1] >= 0)
-                  c[2] += cy;
-               else
-                  c[2] -= (1 - cy);
+               c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
 
                if (x->j < len3 - 1)
                   Q[Q_len++] = x;
@@ -495,7 +493,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
             {
                smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
                add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-               c[2] = (p[1] >= 0) ? cy : (1 - cy);
+               c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
             }
       
             if (x->j < len3 - 1)
@@ -505,10 +503,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
             {
                smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
                add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-               if (p[1] >= 0)
-                  c[2] += cy;
-               else
-                  c[2] -= (1 - cy);
+               c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
 
                if (x->j < len3 - 1)
                   Q[Q_len++] = x;
