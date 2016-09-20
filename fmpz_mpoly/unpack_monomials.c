@@ -107,7 +107,7 @@ void _fmpz_mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2,
 void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
-   slong i, j, q, r, r1, k1 = 0, k2 = 0;
+   slong i, j, q, r, r2, k1 = 0, k2 = 0;
    ulong v;
 
    q = n/8;
@@ -124,23 +124,24 @@ void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2,
          exps1[k1++] = ((v << 24) & UWORD(0xFF00000000)) + (v & UWORD(0xFF));
       }
       
-      if (r > 0)
+      r2 = r;
+
+      if (r2 > 0)
       {
          v = exps2[k2++];
       
-         if (r >= 4)
+         if (r2 >= 4)
          {
             exps1[k1++] = ((v >> 56) << 32) + ((v >> 48) & UWORD(0xFF));
             exps1[k1++] = ((v >> 8) & UWORD(0xFF00000000)) + ((v >> 32) & UWORD(0xFF));
-            r1 = r - 4;
+            r2 -= 4;
             v <<= 32;
-         } else
-            r1 = r;
+         }
 
-         for (j = 0; j + 1 < r1; j += 2)
+         for (j = 0; j + 1 < r2; j += 2)
             exps1[k1++] = ((v >> (24 - 8*j)) & UWORD(0xFF00000000)) + ((v >> (56 - 8*j)) & UWORD(0xFF));
 
-         if (r1 & 1)
+         if (r2 & 1)
             exps1[k1++] = ((v >> (24 - 8*j)) & UWORD(0xFF00000000));
       }
    }
@@ -183,7 +184,7 @@ void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2,
 void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
-   slong i, j, q, r, k1 = 0, k2 = 0;
+   slong i, j, q, r, r2, k1 = 0, k2 = 0;
    ulong v;
 
    q = n/8;
@@ -200,26 +201,29 @@ void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
                     + ((v << 8) & UWORD(0xFF0000)) + (v & UWORD(0xFF));
       }
       
-      if (r > 0)
+      r2 = r;
+
+      if (r2 > 0)
       {
          v = exps2[k2++];
       
-         if (r >= 4)
+         if (r2 >= 4)
          {
             exps1[k1++] = ((v >> 56) << 48) + ((v >> 16) & UWORD(0xFF00000000))
                     + ((v >> 24) & UWORD(0xFF0000)) + ((v >> 32) & UWORD(0xFF));
             v <<= 32;
+            r2 -= 4;
          }
 
-         if (r > 4)
+         if (r2 > 0)
          {
             exps1[k1] = ((v >> 56) << 48);
 
-            if (r > 5)
+            if (r2 > 1)
             {
                exps1[k1] += ((v >> 16) & UWORD(0xFF00000000));
 
-               if (r > 6)
+               if (r2 > 2)
                   exps1[k1] += ((v >> 24) & UWORD(0xFF0000));
             }
             
@@ -287,7 +291,7 @@ void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2,
 void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
-   slong i, j, q, r, r1, k1 = 0, k2 = 0;
+   slong i, j, q, r, r2, k1 = 0, k2 = 0;
    ulong v;
 
    q = n/4;
@@ -302,20 +306,21 @@ void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
          exps1[k1++] = ((v << 8) & UWORD(0xFF0000)) + (v & UWORD(0xFF));
       }
       
-      if (r > 0)
+      r2 = r;
+
+      if (r2 > 0)
       {
          v = exps2[k2++];
       
-         if (r >= 2)
+         if (r2 >= 2)
          {
             exps1[k1++] = ((v >> 24) << 16) + ((v >> 16) & UWORD(0xFF0000));
 
-            r1 = r - 2;
+            r2 -= 2;
             v <<= 16;
-         } else
-            r1 = r;
+         }
 
-         if (r1 > 0)
+         if (r2 > 0)
             exps1[k1++] = (v >> 8);
       }
    }
