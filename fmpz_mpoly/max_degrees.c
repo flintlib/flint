@@ -64,21 +64,51 @@ ulong * _fmpz_mpoly_max_degrees1(const ulong * exps, slong len, slong bits, slon
    return maxdegs;
 }
 
+ulong * _fmpz_mpoly_max_degrees(const ulong * poly_exps,
+                              slong len, slong bits, slong n, int deg, int rev)
+{
+   slong i, j, N;
+   ulong * exps, * max_exps;
+   TMP_INIT;
+   
+   TMP_START;
+     
+   N = (bits*n - 1)/FLINT_BITS + 1;
+
+   exps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+   max_exps = (ulong *) flint_calloc(n, sizeof(ulong));
+
+   for (i = 0; i < len; i++)
+   {
+      _fmpz_mpoly_get_monomial(exps, poly_exps + i*N, bits, n, deg, rev);
+
+      for (j = 0; j < n; j++)
+      {
+         if (exps[j] > max_exps[j])
+            max_exps[j] = exps[j];
+      }
+   }
+
+   TMP_END;
+
+   return max_exps;
+}
+
 ulong * fmpz_mpoly_max_degrees(const fmpz_mpoly_t poly,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
    int deg, rev;
-
+   
    slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
-   if (N == 1)
-   {
-      degrev_from_ord(deg, rev, ctx->ord);
+   degrev_from_ord(deg, rev, ctx->ord);
 
+   if (N == 1)
       return _fmpz_mpoly_max_degrees1(poly->exps, poly->length,
                                                   poly->bits, ctx->n, deg, rev);
-   } else
-      flint_throw(FLINT_ERROR, "Not implemented yet");
-
+   else
+      return _fmpz_mpoly_max_degrees(poly->exps, poly->length,
+                                                  poly->bits, ctx->n, deg, rev);
+   
    return NULL;
 }

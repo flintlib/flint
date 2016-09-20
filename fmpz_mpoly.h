@@ -306,6 +306,9 @@ FLINT_DLL void fmpz_mpoly_set_coeff_ui(fmpz_mpoly_t poly,
 FLINT_DLL void fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
                                  slong n, slong x, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void _fmpz_mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
+                                        slong bits, slong n, int deg, int rev);
+
 FLINT_DLL void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
                                           slong n, const fmpz_mpoly_ctx_t ctx);
 

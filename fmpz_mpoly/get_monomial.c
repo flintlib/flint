@@ -287,49 +287,48 @@ void _fmpz_mpoly_get_monomial_32_32(ulong * exp1, const ulong * exp2,
 
 #endif
 
+void _fmpz_mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
+                                         slong bits, slong n, int deg, int rev)
+{
+#if FLINT64
+   switch (bits)
+   {
+   case 8:
+      _fmpz_mpoly_get_monomial_8_64(exps, poly_exps, n, deg, rev);
+   break;
+   case 16:
+      _fmpz_mpoly_get_monomial_16_64(exps, poly_exps, n, deg, rev);
+   break;
+   case 32:
+      _fmpz_mpoly_get_monomial_32_64(exps, poly_exps, n, deg, rev);
+   break;
+   case 64:
+      _fmpz_mpoly_get_monomial_64_64(exps, poly_exps, n, deg, rev);
+   break;
+   }
+#else
+   switch (bits)
+   {
+   case 8:
+      _fmpz_mpoly_get_monomial_8_32(exps, poly_exps, n, deg, rev);
+   break;
+   case 16:
+      _fmpz_mpoly_get_monomial_16_32(exps, poly_exps, n, deg, rev);
+   break;
+   case 32:
+      _fmpz_mpoly_get_monomial_32_32(exps, poly_exps, n, deg, rev);
+   break;
+   }
+#endif
+}
+
 void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
                                            slong n, const fmpz_mpoly_ctx_t ctx)
 {
-   slong m;
+   slong m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
    int deg, rev;
 
    degrev_from_ord(deg, rev, ctx->ord);
 
-#if FLINT64
-   switch (poly->bits)
-   {
-   case 8:
-      m = (ctx->n - 1)/8 + 1;
-      _fmpz_mpoly_get_monomial_8_64(exps, poly->exps + m*n, ctx->n, deg, rev);
-   break;
-   case 16:
-      m = (ctx->n - 1)/4 + 1;
-      _fmpz_mpoly_get_monomial_16_64(exps, poly->exps + m*n, ctx->n, deg, rev);
-   break;
-   case 32:
-      m = (ctx->n - 1)/2 + 1;
-      _fmpz_mpoly_get_monomial_32_64(exps, poly->exps + m*n, ctx->n, deg, rev);
-   break;
-   case 64:
-      m = ctx->n;
-      _fmpz_mpoly_get_monomial_64_64(exps, poly->exps + m*n, ctx->n, deg, rev);
-   break;
-   }
-#else
-   switch (poly->bits)
-   {
-   case 8:
-      m = (ctx->n - 1)/4 + 1;
-      _fmpz_mpoly_get_monomial_8_32(exps, poly->exps + m*n, ctx->n, deg, rev);
-   break;
-   case 16:
-      m = (ctx->n - 1)/2 + 1;
-      _fmpz_mpoly_get_monomial_16_32(exps, poly->exps + m*n, ctx->n, deg, rev);
-   break;
-   case 32:
-      m = ctx->n;
-      _fmpz_mpoly_get_monomial_32_32(exps, poly->exps + m*n, ctx->n, deg, rev);
-   break;
-   }
-#endif
+   _fmpz_mpoly_get_monomial(exps, poly->exps + m*n, poly->bits, ctx->n, deg, rev);
 }

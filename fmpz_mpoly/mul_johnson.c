@@ -437,10 +437,10 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
    heap = (fmpz_mpoly_heap_s *) TMP_ALLOC((len2 + 1)*sizeof(fmpz_mpoly_heap_s));
    chain = (fmpz_mpoly_heap_t *) TMP_ALLOC(len2*sizeof(fmpz_mpoly_heap_t));
    Q = (fmpz_mpoly_heap_t **) TMP_ALLOC(len2*sizeof(fmpz_mpoly_heap_t *));
-   exps = (ulong *) TMP_ALLOC((len2 + 1)*N*sizeof(ulong));
-   exp_list = (ulong **) TMP_ALLOC((len2 + 1)*sizeof(ulong *));
+   exps = (ulong *) TMP_ALLOC(len2*N*sizeof(ulong));
+   exp_list = (ulong **) TMP_ALLOC(len2*sizeof(ulong *));
 
-   for (i = 0; i <= len2; i++)
+   for (i = 0; i < len2; i++)
       exp_list[i] = exps + i*N;
 
    next_free = 0;
