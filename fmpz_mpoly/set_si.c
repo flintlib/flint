@@ -27,7 +27,7 @@ void fmpz_mpoly_set_si(fmpz_mpoly_t poly, slong c, const fmpz_mpoly_ctx_t ctx)
 
    fmpz_mpoly_fit_length(poly, 1, ctx);
 
-   fmpz_set_si(poly->coeffs, c);
+   fmpz_set_si(poly->coeffs + 0, c);
 
    m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 

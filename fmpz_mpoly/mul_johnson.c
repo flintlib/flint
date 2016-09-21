@@ -383,6 +383,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    ulong * max_degs3;
    ulong max2 = 0, max3 = 0, max;
    ulong * exp2, * exp3;
+   int free2, free3;
 
    TMP_INIT;
 
@@ -423,9 +424,13 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    exp2 = _fmpz_mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->bits, ctx->n, poly2->length);
 
+   free2 = exp2 != poly2->exps;
+
    exp3 = _fmpz_mpoly_unpack_monomials(exp_bits, poly3->exps, 
                                            poly3->bits, ctx->n, poly3->length);
    
+   free3 = exp3 != poly3->exps;
+
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
    if (poly1 == poly2 || poly1 == poly3)
@@ -488,10 +493,10 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       }
    }
 
-   if (exp2 != poly2->exps)
+   if (free2)
       flint_free(exp2);
 
-   if (exp3 != poly3->exps)
+   if (free3)
       flint_free(exp3);
 
    _fmpz_mpoly_set_length(poly1, len, ctx);

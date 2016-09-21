@@ -120,6 +120,7 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 {
    slong len = 0, max_bits, N;
    ulong * ptr1, * ptr2;
+   int free2, free3;
 
    max_bits = FLINT_MAX(poly2->bits, poly3->bits);
    N = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
@@ -127,8 +128,12 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    ptr1 = _fmpz_mpoly_unpack_monomials(max_bits, poly2->exps, 
                                            poly2->bits, ctx->n, poly2->length);
 
+   free2 = ptr1 != poly2->exps;
+
    ptr2 = _fmpz_mpoly_unpack_monomials(max_bits, poly3->exps, 
                                            poly3->bits, ctx->n, poly3->length);
+
+   free3 = ptr2 != poly3->exps;
 
    if (poly1 == poly2 || poly1 == poly3)
    {
@@ -154,10 +159,10 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                        poly3->coeffs, ptr2, poly3->length, N);
    }
       
-   if (ptr1 != poly2->exps)
+   if (free2)
       flint_free(ptr1);
 
-   if (ptr2 != poly3->exps)
+   if (free3)
       flint_free(ptr2);
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
