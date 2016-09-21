@@ -26,6 +26,8 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
    ulong * degs;
    int first;
 
+   TMP_INIT;
+
    if (len == 0)
    {
       str = flint_malloc(2);
@@ -34,11 +36,15 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
       return str;
    }
 
+   TMP_START;
+
    bound = 1;
    for (i = 0; i < len; i++) /* for each term */
       bound += fmpz_sizeinbase(poly + i, 10) + 1;
+
+   degs = (ulong *) TMP_ALLOC(n*sizeof(ulong));
       
-   degs = _fmpz_mpoly_max_degrees1(exps, len, bits, n, deg, rev);
+   _fmpz_mpoly_max_degrees1(degs, exps, len, bits, n, deg, rev);
 
    for (i = deg; i < n; i++) /* for each max degree */
    {
@@ -98,7 +104,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
          off += flint_sprintf(str + off, "1"); 
    }     
    
-   flint_free(degs);
+   TMP_END;
 
    return str;
 }

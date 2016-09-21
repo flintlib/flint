@@ -275,11 +275,14 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
 
 /*  Basic manipulation *******************************************************/
 
-FLINT_DLL ulong * _fmpz_mpoly_max_degrees1(const ulong * exps, slong len, 
-                                        slong bits, slong n, int deg, int rev);
+FLINT_DLL void _fmpz_mpoly_max_degrees1(ulong * max_degs, const ulong * exps,
+                             slong len, slong bits, slong n, int deg, int rev);
 
-FLINT_DLL ulong * fmpz_mpoly_max_degrees(const fmpz_mpoly_t poly, 
-                                                   const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
+                    slong len, slong bits, slong n, int deg, int rev, slong N);
+
+FLINT_DLL void fmpz_mpoly_max_degrees(ulong * max_degs,
+                          const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
                                         slong bits, slong n, int deg, int rev);

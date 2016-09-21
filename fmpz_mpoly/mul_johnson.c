@@ -556,6 +556,8 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    ulong max2 = 0, max3 = 0, max;
    ulong * exp2, * exp3;
 
+   TMP_INIT;
+
    if (poly2->length == 0 || poly3->length == 0)
    {
       fmpz_mpoly_zero(poly1, ctx);
@@ -563,8 +565,13 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       return;
    }
 
-   max_degs2 = fmpz_mpoly_max_degrees(poly2, ctx);
-   max_degs3 = fmpz_mpoly_max_degrees(poly3, ctx);
+   TMP_START;
+
+   max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+   max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+
+   fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
+   fmpz_mpoly_max_degrees(max_degs3, poly3, ctx);
 
    for (i = 0; i < ctx->n; i++)
    {
@@ -659,8 +666,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    if (exp3 != poly3->exps)
       flint_free(exp3);
 
-   flint_free(max_degs2);
-   flint_free(max_degs3);
-
    _fmpz_mpoly_set_length(poly1, len, ctx);
+
+   TMP_END;
 }
