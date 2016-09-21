@@ -59,82 +59,7 @@ typedef struct
 
 typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
 
-typedef struct fmpz_mpoly_heap_t
-{
-   ulong i;
-   ulong j;
-   struct fmpz_mpoly_heap_t * next;
-} fmpz_mpoly_heap_t;
-
-typedef struct fmpz_mpoly_heap1_s
-{
-   ulong exp;
-   struct fmpz_mpoly_heap_t * next;
-} fmpz_mpoly_heap1_s;
-
-typedef struct fmpz_mpoly_heap_s
-{
-   ulong * exp;
-   struct fmpz_mpoly_heap_t * next;
-} fmpz_mpoly_heap_s;
-
-/* Macros ********************************************************************/
-
-#define degrev_from_ord(deg, rev, ord)                                \
-   (deg) = (rev) = 0;                                                 \
-   do {                                                               \
-      switch (ord)                                                    \
-      {                                                               \
-      case ORD_LEX:                                                   \
-         break;                                                       \
-      case ORD_DEGLEX:                                                \
-         (deg) = 1; break;                                            \
-      case ORD_REVLEX:                                                \
-         (rev) = 1; break;                                            \
-      case ORD_DEGREVLEX:                                             \
-         (deg) = (rev) = 1; break;                                    \
-      default:                                                        \
-         flint_throw(FLINT_ERROR, "Invalid ordering in fmpz_mpoly");  \
-      }                                                               \
-   } while (0)
-
-/* Context object ************************************************************/
-
-FLINT_DLL void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
-                                            slong nvars, const ordering_t ord);
-
-FMPZ_MPOLY_INLINE
-void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx)
-{
-   /* nothing to be done at the moment */
-}
-
-/* Monomials *****************************************************************/
-
-#if FLINT64
-
-void _fmpz_mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2, 
-                                                           slong n, slong len);
-
-void _fmpz_mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2, 
-                                                           slong n, slong len);
-
-void _fmpz_mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2, 
-                                                           slong n, slong len);
-
-#endif
-
-void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
-                                                           slong n, slong len);
-
-void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
-                                                           slong n, slong len);
-
-void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
-                                                           slong n, slong len);
-
-ulong * _fmpz_mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
-                                              slong bits2, slong n, slong len);
+/*  mpoly and heap ***********************************************************/
 
 FMPZ_MPOLY_INLINE
 void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
@@ -211,6 +136,259 @@ int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3, slong N)
 
    return 0;
 }
+
+typedef struct mpoly_heap_t
+{
+   ulong i;
+   ulong j;
+   struct mpoly_heap_t * next;
+} mpoly_heap_t;
+
+typedef struct mpoly_heap1_s
+{
+   ulong exp;
+   struct mpoly_heap_t * next;
+} mpoly_heap1_s;
+
+typedef struct mpoly_heap_s
+{
+   ulong * exp;
+   struct mpoly_heap_t * next;
+} mpoly_heap_s;
+
+#define HEAP_LEFT(i) (2*(i))
+#define HEAP_RIGHT(i) (2*(i) + 1)
+#define HEAP_PARENT(i) ((i)/2)
+
+#define HEAP_ASSIGN(h, c1, c2) \
+   do {                                \
+      (h).exp = (c1);                  \
+      (h).next = (c2);                 \
+   } while (0)
+
+FMPZ_MPOLY_INLINE
+mpoly_heap_t * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
+{
+   ulong exp;
+   slong l, j, r, i = 1, len;
+   mpoly_heap_t * x = heap[1].next;
+
+   (*heap_len)--;
+
+   if ((len = *heap_len) > 1)
+   {
+      exp = heap[len].exp;
+
+      while ((l = HEAP_LEFT(i)) <= len)
+      {
+         r = HEAP_RIGHT(i);
+         j = r > len || heap[l].exp < heap[r].exp ? l : r;
+         if (heap[j].exp < exp)
+         {
+            heap[i] = heap[j];
+            i = j;
+         } else
+            break;
+       }
+
+       heap[i] = heap[len];
+   }
+
+   return x; 
+}
+
+FMPZ_MPOLY_INLINE
+void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, mpoly_heap_t * x, slong * heap_len)
+{
+   slong i = *heap_len, j, n = *heap_len;
+   static slong next_loc = 0;
+
+   if (i != 1 && exp == heap[1].exp)
+   {
+      x->next = heap[1].next;
+      heap[1].next = x;
+
+      return;
+   }
+
+   if (next_loc != 0 && next_loc < *heap_len)
+   {
+      if (exp == heap[next_loc].exp)
+      {
+         x->next = heap[next_loc].next;
+         heap[next_loc].next = x;
+         return;
+      }
+   }
+
+   while ((j = HEAP_PARENT(i)) >= 1)
+   {
+      if (exp == heap[j].exp)
+      {
+         x->next = heap[j].next;
+         heap[j].next = x;
+         next_loc = j;
+
+         return;
+      } else if (exp < heap[j].exp)
+         i = j;
+      else
+         break;
+   }
+
+   (*heap_len)++;
+
+   while (n > i)
+   {
+      heap[n] = heap[HEAP_PARENT(n)];
+      n = HEAP_PARENT(n);
+   }
+
+   HEAP_ASSIGN(heap[i], exp, x);
+}
+
+FMPZ_MPOLY_INLINE
+mpoly_heap_t * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
+{
+   ulong * exp;
+   slong l, j, r, i = 1, len;
+   mpoly_heap_t * x = heap[1].next;
+
+   (*heap_len)--;
+
+   if ((len = *heap_len) > 1)
+   {
+      exp = heap[len].exp;
+
+      while ((l = HEAP_LEFT(i)) <= len)
+      {
+         r = HEAP_RIGHT(i);
+         j = r > len || mpoly_monomial_lt(heap[l].exp, heap[r].exp, N) ? l : r;
+         if (mpoly_monomial_lt(heap[j].exp, exp, N))
+         {
+            heap[i] = heap[j];
+            i = j;
+         } else
+            break;
+       }
+
+       heap[i] = heap[len];
+   }
+
+   return x; 
+}
+
+FMPZ_MPOLY_INLINE
+int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, mpoly_heap_t * x, slong * heap_len, slong N)
+{
+   slong i = *heap_len, j, n = *heap_len;
+   static slong next_loc = 0;
+
+   if (i != 1 && mpoly_monomial_equal(exp, heap[1].exp, N))
+   {
+      x->next = heap[1].next;
+      heap[1].next = x;
+
+      return 0;
+   }
+
+   if (next_loc != 0 && next_loc < *heap_len)
+   {
+      if (mpoly_monomial_equal(exp, heap[next_loc].exp, N))
+      {
+         x->next = heap[next_loc].next;
+         heap[next_loc].next = x;
+         return 0;
+      }
+   }
+
+   while ((j = HEAP_PARENT(i)) >= 1)
+   {
+      if (!mpoly_monomial_lt(exp, heap[j].exp, N))
+         break;
+
+      i = j;
+   }
+
+   if (j >= 1 && mpoly_monomial_equal(exp, heap[j].exp, N))
+   {
+      x->next = heap[j].next;
+      heap[j].next = x;
+      next_loc = j;
+
+      return 0;
+   }
+
+   (*heap_len)++;
+
+   while (n > i)
+   {
+      heap[n] = heap[HEAP_PARENT(n)];
+      n = HEAP_PARENT(n);
+   }
+
+   HEAP_ASSIGN(heap[i], exp, x);
+
+   return 1;
+}
+
+/* Macros ********************************************************************/
+
+#define degrev_from_ord(deg, rev, ord)                                \
+   (deg) = (rev) = 0;                                                 \
+   do {                                                               \
+      switch (ord)                                                    \
+      {                                                               \
+      case ORD_LEX:                                                   \
+         break;                                                       \
+      case ORD_DEGLEX:                                                \
+         (deg) = 1; break;                                            \
+      case ORD_REVLEX:                                                \
+         (rev) = 1; break;                                            \
+      case ORD_DEGREVLEX:                                             \
+         (deg) = (rev) = 1; break;                                    \
+      default:                                                        \
+         flint_throw(FLINT_ERROR, "Invalid ordering in fmpz_mpoly");  \
+      }                                                               \
+   } while (0)
+
+/* Context object ************************************************************/
+
+FLINT_DLL void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
+                                            slong nvars, const ordering_t ord);
+
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx)
+{
+   /* nothing to be done at the moment */
+}
+
+/* Monomials *****************************************************************/
+
+#if FLINT64
+
+void _fmpz_mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2, 
+                                                           slong n, slong len);
+
+void _fmpz_mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2, 
+                                                           slong n, slong len);
+
+void _fmpz_mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2, 
+                                                           slong n, slong len);
+
+#endif
+
+void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
+                                                           slong n, slong len);
+
+void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
+                                                           slong n, slong len);
+
+void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
+                                                           slong n, slong len);
+
+ulong * _fmpz_mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
+                                              slong bits2, slong n, slong len);
 
 /*  Memory management ********************************************************/
 
