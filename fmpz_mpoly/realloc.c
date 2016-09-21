@@ -41,14 +41,12 @@ void fmpz_mpoly_realloc(fmpz_mpoly_t poly,
         {
            flint_mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
                      alloc - poly->alloc);
-           flint_mpn_zero((mp_ptr) (poly->exps + poly->alloc*N),
-                     (alloc - poly->alloc)*N);
         }
     }
     else                        /* Nothing allocated already so do it now */
     {
         poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
-        poly->exps   = (ulong *) flint_calloc(alloc*N, sizeof(ulong));
+        poly->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
     }
 
     poly->alloc = alloc;

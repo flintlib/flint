@@ -36,7 +36,7 @@ void fmpz_mpoly_init2(fmpz_mpoly_t poly,
       N = (8*ctx->n - 1)/FLINT_BITS + 1;
 
       poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
-      poly->exps   = (ulong *) flint_calloc(alloc*N, sizeof(ulong));
+      poly->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
    } else
    {
       poly->coeffs = NULL;
