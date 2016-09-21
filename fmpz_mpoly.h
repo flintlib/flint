@@ -153,6 +153,19 @@ void mpoly_monomial_set(ulong * exp2, const ulong * exp3, slong N)
 }
 
 FMPZ_MPOLY_INLINE
+int mpoly_monomial_is_zero(const ulong * exp, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+   {
+      if (exp[i] != 0)
+         return 0;
+   }
+
+   return 1;
+}
+
+FMPZ_MPOLY_INLINE
 int mpoly_monomial_equal(const ulong * exp2, const ulong * exp3, slong N)
 {
    slong i;
@@ -503,19 +516,16 @@ FLINT_DLL void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1,
 
 /* Input/output **************************************************************/
 
-FLINT_DLL void _exp_get_degrees1(ulong * expvec, ulong v, slong bits,
-                                                    slong n, int deg, int rev);
-
-FLINT_DLL char * _fmpz_mpoly_get_str_pretty1(const fmpz * poly,
+FLINT_DLL char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
                           const ulong * exps, slong len, const char ** x, 
-                                        slong bits, slong n, int deg, int rev);
+                               slong bits, slong n, int deg, int rev, slong N);
 
 FLINT_DLL char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int _fmpz_mpoly_fprint_pretty1(FILE * file, const fmpz * poly, 
+FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                            const ulong * exps, slong len, const char ** x,
-                                        slong bits, slong n, int deg, int rev);
+                               slong bits, slong n, int deg, int rev, slong N);
 
 FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file, 
          const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx);

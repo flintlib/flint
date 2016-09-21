@@ -18,13 +18,12 @@
 #include "fmpz_mpoly.h"
 
 char *
-_fmpz_mpoly_get_str_pretty1(const fmpz * poly, const ulong * exps, slong len,
-                        const char ** x, slong bits, slong n, int deg, int rev)
+_fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
+               const char ** x, slong bits, slong n, int deg, int rev, slong N)
 {
    char * str;
    slong i, j, bound, off;
    ulong * degs;
-   ulong v;
    int first;
 
    if (len == 0)
@@ -41,10 +40,7 @@ _fmpz_mpoly_get_str_pretty1(const fmpz * poly, const ulong * exps, slong len,
       
    degs = _fmpz_mpoly_max_degrees1(exps, len, bits, n, deg, rev);
 
-   if (deg) /* skip degree exponent */
-      degs += 1;
-
-   for (i = 0; i < n - deg; i++) /* for each max degree */
+   for (i = deg; i < n; i++) /* for each max degree */
    {
       ulong d10 = 1;
       slong b = 0;
@@ -55,7 +51,7 @@ _fmpz_mpoly_get_str_pretty1(const fmpz * poly, const ulong * exps, slong len,
          b++;
       }
 
-      bound += (b + strlen(x[i]) + 3)*len;
+      bound += (b + strlen(x[i - deg]) + 3)*len;
    }
 
    str = flint_malloc(bound);
@@ -75,9 +71,8 @@ _fmpz_mpoly_get_str_pretty1(const fmpz * poly, const ulong * exps, slong len,
             off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(poly[i]));
       }
 
-      v = exps[i];
-      
-      _exp_get_degrees1(degs, v, bits, n, deg, rev);
+      /* code below expects monomials in opposite order */
+      _fmpz_mpoly_get_monomial(degs, exps + i*N, bits, n, deg, 1 - rev);
 
       first = 1;
 
@@ -99,13 +94,10 @@ _fmpz_mpoly_get_str_pretty1(const fmpz * poly, const ulong * exps, slong len,
           }
       }
 
-      if (v == 0 && (poly[i] == WORD(1) || poly[i] == WORD(-1)))
+      if (mpoly_monomial_is_zero(exps + i*N, N) && (poly[i] == WORD(1) || poly[i] == WORD(-1)))
          off += flint_sprintf(str + off, "1"); 
    }     
    
-   if (deg)
-      degs -= 1;
-
    flint_free(degs);
 
    return str;
@@ -118,14 +110,10 @@ fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly, const char ** x, const fmpz_m
 
    slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
-   if (N == 1)
-   {
-      degrev_from_ord(deg, rev, ctx->ord);
+   degrev_from_ord(deg, rev, ctx->ord);
 
-      return _fmpz_mpoly_get_str_pretty1(poly->coeffs, poly->exps,
-                                 poly->length, x, poly->bits, ctx->n, deg, rev);
-   } else
-      flint_throw(FLINT_ERROR, "Not implemented yet");
+   return _fmpz_mpoly_get_str_pretty(poly->coeffs, poly->exps,
+                             poly->length, x, poly->bits, ctx->n, deg, rev, N);
 
    return 0; 
 }

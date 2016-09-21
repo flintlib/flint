@@ -17,40 +17,16 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void _exp_get_degrees1(ulong * expvec, ulong v, slong bits,
-                                                     slong n, int deg, int rev)
-{
-   slong i, k = FLINT_BITS/bits;
-   ulong mask = bits == FLINT_BITS ? ~UWORD(0) : (UWORD(1) << bits) - UWORD(1);
-
-   v >>= (k - n)*bits;
-
-   if (rev)
-   {
-      for (i = 0; i < n - deg; i++)
-      {
-         expvec[i] = (v & mask);
-         v >>= bits;
-      }
-   } else
-   {
-      for (i = 0; i < n - deg; i++)
-      {
-         expvec[n - deg - i - 1] = (v & mask);
-         v >>= bits;
-      }
-   }
-}
-
 int
-_fmpz_mpoly_fprint_pretty1(FILE * file, const fmpz * poly, 
+_fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                         const ulong * exps, slong len, const char ** x,
-                                         slong bits, slong n, int deg, int rev)
+                                slong bits, slong n, int deg, int rev, slong N)
 {
    slong i, j;
    ulong * degs;
-   ulong v;
    int r, first;
+
+   TMP_INIT;
 
    if (len == 0)
    {
@@ -59,7 +35,9 @@ _fmpz_mpoly_fprint_pretty1(FILE * file, const fmpz * poly,
         return r;
    }
 
-   degs = (ulong *) flint_malloc((n - deg)*sizeof(ulong));
+   TMP_START;
+
+   degs = (ulong *) TMP_ALLOC((n - deg)*sizeof(ulong));
    
    r = 1;
    for (i = len - 1; r > 0 && i >= 0; i--)
@@ -81,8 +59,8 @@ _fmpz_mpoly_fprint_pretty1(FILE * file, const fmpz * poly,
 
       if (r > 0)
       {
-         v = exps[i];
-         _exp_get_degrees1(degs, v, bits, n, deg, rev);
+         /* code below expects monomials in opposite order */
+         _fmpz_mpoly_get_monomial(degs, exps + i*N, bits, n, deg, 1 - rev);
       }
 
       first = 1;
@@ -113,13 +91,14 @@ _fmpz_mpoly_fprint_pretty1(FILE * file, const fmpz * poly,
          }
       }
 
-      if (r > 0 && v == 0 && (poly[i] == WORD(1) || poly[i] == WORD(-1)))
+      if (r > 0 && mpoly_monomial_is_zero(exps + i*N, N) &&
+                  (poly[i] == WORD(1) || poly[i] == WORD(-1)))
       {
          r = flint_fprintf(file, "1");
       } 
    }     
    
-   flint_free(degs);
+   TMP_END;
 
    return r;
 }
@@ -132,14 +111,10 @@ fmpz_mpoly_fprint_pretty(FILE * file, const fmpz_mpoly_t poly,
 
    slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
-   if (N == 1)
-   {
-      degrev_from_ord(deg, rev, ctx->ord);
+   degrev_from_ord(deg, rev, ctx->ord);
 
-      return _fmpz_mpoly_fprint_pretty1(file, poly->coeffs, poly->exps,
-                                 poly->length, x, poly->bits, ctx->n, deg, rev);
-   } else
-      flint_throw(FLINT_ERROR, "Not implemented yet");
+   return _fmpz_mpoly_fprint_pretty(file, poly->coeffs, poly->exps,
+                             poly->length, x, poly->bits, ctx->n, deg, rev, N);
 
    return 0; 
 }
