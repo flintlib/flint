@@ -136,6 +136,69 @@ void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 ulong * _fmpz_mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
                                               slong bits2, slong n, slong len);
 
+FMPZ_MPOLY_INLINE
+void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp_ptr[i] = exp2[i] + exp3[i];
+}
+
+FMPZ_MPOLY_INLINE
+void mpoly_monomial_set(ulong * exp2, const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp2[i] = exp3[i];
+}
+
+FMPZ_MPOLY_INLINE
+int mpoly_monomial_equal(const ulong * exp2, const ulong * exp3, slong N)
+{
+   slong i;
+
+   for (i = 0; i < N; i++)
+   {
+      if (exp2[i] != exp3[i])
+         return 0;
+   }
+
+   return 1;
+}
+
+FMPZ_MPOLY_INLINE
+int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3, slong N)
+{
+   slong i;
+
+   for (i = 0; i < N; i++)
+   {
+      if (exp2[i] != exp3[i])
+         return exp2[i] < exp3[i];
+   }
+
+   return 0;
+}
+
+FMPZ_MPOLY_INLINE
+int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3, slong N)
+{
+   slong i;
+
+   for (i = 0; i < N; i++)
+   {
+      if (exp2[i] != exp3[i])
+      {
+         if (exp2[i] > exp3[i])
+            return 1;
+         else
+            return -1;
+      }
+   }
+
+   return 0;
+}
+
 /*  Memory management ********************************************************/
 
 FLINT_DLL void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx);
@@ -382,16 +445,22 @@ FLINT_DLL void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t poly1,
 
 FLINT_DLL slong _fmpz_mpoly_add1(fmpz * poly1, ulong * exps1,
                 const fmpz * poly2, const ulong * exps2, slong len2,
-                const fmpz * poly3, const ulong * exps3, slong len3,
-                                        slong bits, slong n, int deg, int rev);
+                          const fmpz * poly3, const ulong * exps3, slong len3);
+
+FLINT_DLL slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1,
+                 const fmpz * poly2, const ulong * exps2, slong len2,
+                 const fmpz * poly3, const ulong * exps3, slong len3, slong N);
 
 FLINT_DLL void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _fmpz_mpoly_sub1(fmpz * poly1, ulong * exps1,
                 const fmpz * poly2, const ulong * exps2, slong len2,
-                const fmpz * poly3, const ulong * exps3, slong len3,
-                                        slong bits, slong n, int deg, int rev);
+                          const fmpz * poly3, const ulong * exps3, slong len3);
+
+FLINT_DLL slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
+                 const fmpz * poly2, const ulong * exps2, slong len2,
+                 const fmpz * poly3, const ulong * exps3, slong len3, slong N);
 
 FLINT_DLL void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
