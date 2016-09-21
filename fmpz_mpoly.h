@@ -284,6 +284,9 @@ FLINT_DLL ulong * fmpz_mpoly_max_degrees(const fmpz_mpoly_t poly,
 FLINT_DLL void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
                                         slong bits, slong n, int deg, int rev);
 
+FLINT_DLL void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
+                               slong bits, slong n, int deg, int rev, slong N);
+
 FLINT_DLL void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i,
                                                    const fmpz_mpoly_ctx_t ctx);
 
@@ -387,6 +390,9 @@ FLINT_DLL void _fmpz_mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
 
 FLINT_DLL void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
                                           slong n, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_set_monomial(ulong * exp1, const ulong * exp2,
+                                        slong bits, slong n, int deg, int rev);
 
 FLINT_DLL void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
                       slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx);

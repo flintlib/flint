@@ -30,6 +30,37 @@ void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
        exps[0] |= (UWORD(1) << ((k - 1)*bits));
 }
 
+void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
+                                slong bits, slong n, int deg, int rev, slong N)
+{
+    slong j;
+    ulong * mon;
+
+    TMP_INIT;
+
+    if (N == 1)
+    {
+       _fmpz_mpoly_gen1(poly, exps, i, bits, n, deg, rev);
+
+       return;
+    }
+    
+    fmpz_set_ui(poly + 0, 1);
+    
+    TMP_START;
+
+    mon = (ulong *) TMP_ALLOC((n - deg)*sizeof(ulong));
+    
+    for (j = 0; j < n - deg; j++)
+       mon[j] = 0;
+
+    mon[i] = 1;
+
+    _fmpz_mpoly_set_monomial(exps, mon, bits, n, deg, rev);
+
+    TMP_END;
+}
+
 void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 {
    int deg, rev;
@@ -38,13 +69,10 @@ void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 
    fmpz_mpoly_fit_length(poly, 1, ctx);
 
-   if (N == 1)
-   {
-      degrev_from_ord(deg, rev, ctx->ord);
+   degrev_from_ord(deg, rev, ctx->ord);
 
-      _fmpz_mpoly_gen1(poly->coeffs, poly->exps, i, 
-                                                  poly->bits, ctx->n, deg, rev);
-      _fmpz_mpoly_set_length(poly, 1, ctx);
-   } else
-      flint_throw(FLINT_ERROR, "Not implemented yet");
+   _fmpz_mpoly_gen(poly->coeffs, poly->exps, i, poly->bits,
+                                                          ctx->n, deg, rev, N);
+      
+   _fmpz_mpoly_set_length(poly, 1, ctx);
 }

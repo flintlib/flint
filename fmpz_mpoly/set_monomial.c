@@ -375,10 +375,54 @@ void _fmpz_mpoly_set_monomial_32_32(ulong * exp1, const ulong * exp2,
 
 #endif
 
+void _fmpz_mpoly_set_monomial(ulong * exp1, const ulong * exp2,
+                                         slong bits, slong n, int deg, int rev)
+{
+   slong i;
+   ulong degree = 0;
+
+   if (deg)
+   {
+      for (i = 0; i < n - deg; i++)
+         degree += exp2[i];
+   }
+   
+#if FLINT64
+   switch (bits)
+   {
+   case 8:
+      _fmpz_mpoly_set_monomial_8_64(exp1, exp2, degree, n, deg, rev);
+   break;
+   case 16:
+      _fmpz_mpoly_set_monomial_16_64(exp1, exp2, degree, n, deg, rev);
+   break;
+   case 32:
+      _fmpz_mpoly_set_monomial_32_64(exp1, exp2, degree, n, deg, rev);
+   break;
+   case 64:
+      _fmpz_mpoly_set_monomial_64_64(exp1, exp2, degree, n, deg, rev);
+   break;
+   }
+#else
+   switch (poly->bits)
+   {
+   case 8:
+      _fmpz_mpoly_set_monomial_8_32(exp1, exp2, degree, n, deg, rev);
+   break;
+   case 16:
+      _fmpz_mpoly_set_monomial_16_32(exp1, exp2, degree, n, deg, rev);
+   break;
+   case 32:
+      _fmpz_mpoly_set_monomial_32_32(exp1, exp2, degree, n, deg, rev);
+   break;
+   }
+#endif
+}
+
 void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
                        slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx)
 {
-   slong m, i, bits, max_bits;
+   slong i, bits, max_bits, N;
    ulong maxdeg = 0;
    ulong * ptr;
    int deg, rev;
@@ -405,7 +449,7 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
       max_bits *= 2;
 
    ptr = _fmpz_mpoly_unpack_monomials(max_bits, poly->exps, 
-                                           poly->bits, ctx->n, poly->length);
+                                             poly->bits, ctx->n, poly->length);
 
    if (ptr != poly->exps)
    {
@@ -416,43 +460,10 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
 
    fmpz_mpoly_fit_length(poly, n + 1, ctx);
 
-#if FLINT64
-   switch (poly->bits)
-   {
-   case 8:
-      m = (ctx->n - 1)/8 + 1;
-      _fmpz_mpoly_set_monomial_8_64(poly->exps + m*n, exps, maxdeg, ctx->n, deg, rev);
-   break;
-   case 16:
-      m = (ctx->n - 1)/4 + 1;
-      _fmpz_mpoly_set_monomial_16_64(poly->exps + m*n, exps, maxdeg, ctx->n, deg, rev);
-   break;
-   case 32:
-      m = (ctx->n - 1)/2 + 1;
-      _fmpz_mpoly_set_monomial_32_64(poly->exps + m*n, exps, maxdeg, ctx->n, deg, rev);
-   break;
-   case 64:
-      m = ctx->n;
-      _fmpz_mpoly_set_monomial_64_64(poly->exps + m*n, exps, maxdeg, ctx->n, deg, rev);
-   break;
-   }
-#else
-   switch (poly->bits)
-   {
-   case 8:
-      m = (ctx->n - 1)/4 + 1;
-      _fmpz_mpoly_set_monomial_8_32(poly->exps + m*n, exps, maxdeg, ctx->n, deg, rev);
-   break;
-   case 16:
-      m = (ctx->n - 1)/2 + 1;
-      _fmpz_mpoly_set_monomial_16_32(poly->exps + m*n, exps, maxdeg, ctx->n, deg, rev);
-   break;
-   case 32:
-      m = ctx->n;
-      _fmpz_mpoly_set_monomial_32_32(poly->exps + m*n, exps, maxdeg, ctx->n, deg, rev);
-   break;
-   }
-#endif
+   N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+   
+   _fmpz_mpoly_set_monomial(poly->exps + n*N, exps, poly->bits,
+                                                             ctx->n, deg, rev);
 
    if (n + 1 > poly->length)
       _fmpz_mpoly_set_length(poly, n + 1, ctx);
