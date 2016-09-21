@@ -41,9 +41,11 @@ void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t poly1,
    N = (poly2->bits*ctx->n - 1)/FLINT_BITS + 1;
 
    fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
+   fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
 
    _fmpz_mpoly_scalar_divexact_fmpz(poly1->coeffs, poly1->exps, 
                          poly2->coeffs, poly2->exps, poly2->length, N, c);
       
    _fmpz_mpoly_set_length(poly1, poly2->length, ctx);
+   poly1->bits = poly2->bits;
 }

@@ -39,6 +39,7 @@ void fmpz_mpoly_set(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    slong m = (poly2->bits*ctx->n - 1)/FLINT_BITS + 1;
 
    fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
+   fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
 
    _fmpz_mpoly_set(poly1->coeffs, poly1->exps,
                    poly2->coeffs, poly2->exps, poly2->length, m);

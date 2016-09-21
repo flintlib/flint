@@ -34,6 +34,7 @@ void fmpz_mpoly_add_si(fmpz_mpoly_t poly1,
          if (poly1 != poly2)
          {
             fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
+            fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
 
             for (i = 1; i < poly2->length; i++)
                fmpz_set(poly1->coeffs + i, poly2->coeffs + i);
@@ -55,9 +56,11 @@ void fmpz_mpoly_add_si(fmpz_mpoly_t poly1,
       } else
       {
          fmpz_mpoly_fit_length(poly1, poly2->length + 1, ctx);
-
+         
          if (poly1 != poly2)
          {
+            fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
+
             for (i = poly2->length - 1; i >= 0; i--)
                fmpz_set(poly1->coeffs + i + 1, poly2->coeffs + i);
 
