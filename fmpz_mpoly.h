@@ -493,29 +493,9 @@ FMPZ_MPOLY_INLINE
 void fmpz_mpoly_swap(fmpz_mpoly_t poly1, 
                                 fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
-   fmpz * t1;
-   ulong * t2;
-   slong t3;
-
-   t1 = poly1->coeffs;
-   poly1->coeffs = poly2->coeffs;
-   poly2->coeffs = t1;
-
-   t2 = poly1->exps;
-   poly1->exps = poly2->exps;
-   poly2->exps = t2;
-
-   t3 = poly1->length;
-   poly1->length = poly2->length;
-   poly2->length = t3;
-
-   t3 = poly1->alloc;
-   poly1->alloc = poly2->alloc;
-   poly2->alloc = t3;
-
-   t3 = poly1->bits;
-   poly1->bits = poly2->bits;
-   poly2->bits = t3;
+   fmpz_mpoly_struct t = *poly1;
+   *poly1 = *poly2;
+   *poly2 = t;
 }
 
 FMPZ_MPOLY_INLINE
