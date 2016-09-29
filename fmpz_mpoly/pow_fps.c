@@ -15,77 +15,26 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_set_mpn_signed(fmpz_t f, ulong * c, slong n)
-{
-    int neg = 0 > (slong) c[n - 1];
-
-    if (neg)
-      mpn_neg_n(c, c, n);
-
-    while (n > 0 && c[n - 1] == 0)
-       n--;
-
-    if (n <= 1)
-       fmpz_set_ui(f, c[0]);
-    else
-    {
-       __mpz_struct * mpz = _fmpz_promote(f);
-
-       mpz_realloc2(mpz, n*FLINT_BITS);
-
-       mpn_copyi(mpz->_mp_d, c, n);
-       mpz->_mp_size = n;
-    }
-
-    if (neg)
-       fmpz_neg(f, f);
-}
-
-void fmpz_get_mpn_signed(mp_ptr a, fmpz_t c, slong n)
-{
-    mp_ptr temp;
-    slong i, n_size = fmpz_size(c);
-    
-    if (!COEFF_IS_MPZ(*c))
-    {
-        a[0] = FLINT_ABS((slong) *c);
-        n_size = 1;
-    }
-    else
-    {
-        temp = COEFF_TO_PTR(*c)->_mp_d;
-        mpn_copyi(a, temp, n_size);
-    }
-
-    for (i = n_size; i < n; i++)
-       a[i] = 0;
-
-    if (fmpz_sgn(c) < 0)
-       mpn_neg_n(a, a, n);
-}
-
 slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2, slong k)
 {
    const slong topbit = (WORD(1) << (FLINT_BITS - 1));
    const slong mask = ~topbit;
-   slong i, rnext, g_alloc, gnext, maxbits = 0, bits, n = 0;
+   slong i, rnext, g_alloc, gnext;
    slong next_free, Q_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap1_s * heap;
    mpoly_heap_t * chain;
    mpoly_heap_t ** Q, ** reuse;
    mpoly_heap_t * x;
    fmpz * p1 = *poly1, * gc = NULL;
-   ulong * e1 = *exp1, * ge, * fik, * t1n, * Sn, * gn = NULL;
+   ulong * e1 = *exp1, * ge, * fik;
    ulong exp, finalexp, temp2;
    slong * largest;
    fmpz_t t1, C, S, temp1;
-   int first, small;
+   int first;
    TMP_INIT;
 
    TMP_START;
-
-   small = 0; /*_fmpz_mpoly_fits_small(poly2, len2); */
 
    heap = (mpoly_heap1_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap1_s));
    /* 2x as we pull from heap and insert more before processing pulled ones */
@@ -112,34 +61,9 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    e1[0] = exp2[0]*k;
 
-   if (small)
-   {
-      fmpz_pow_ui(t1, poly2 + 0, k - 1);
-      fmpz_mul(p1 + 0, t1, poly2 + 0);
-
-      for (i = 0; i < len2; i++)
-      {
-         bits = FLINT_BIT_COUNT(FLINT_ABS((slong) poly2[i]));
-         if (bits > maxbits)
-            maxbits = bits;
-      }
-
-      bits = maxbits*k + FLINT_BIT_COUNT(len2)*(k - 1);
-
-      n = bits/FLINT_BITS + 1;
-
-      gn = (ulong *) flint_malloc(n*g_alloc*sizeof(ulong));
-
-      fmpz_get_mpn_signed(gn + 0, t1, n);
-      
-      t1n = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-      Sn = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-   } else
-   {
-      gc = (fmpz *) flint_calloc(g_alloc, sizeof(fmpz));
-      fmpz_pow_ui(gc + 0, poly2 + 0, k - 1);
-      fmpz_mul(p1 + 0, gc + 0, poly2 + 0);
-   }
+   gc = (fmpz *) flint_calloc(g_alloc, sizeof(fmpz));
+   fmpz_pow_ui(gc + 0, poly2 + 0, k - 1);
+   fmpz_mul(p1 + 0, gc + 0, poly2 + 0);
 
    next_free = 0;
 
@@ -179,13 +103,8 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
       if (gnext >= g_alloc)
       {
          ge = (ulong *) flint_realloc(ge, 2*sizeof(ulong)*g_alloc);
-         if (small)
-            gn = (ulong *) flint_realloc(gn, 2*sizeof(ulong)*g_alloc*n);
-         else
-         {
-            gc = (fmpz *) flint_realloc(gc, 2*sizeof(fmpz)*g_alloc);
-            flint_mpn_zero(gc + g_alloc, g_alloc);
-         }
+         gc = (fmpz *) flint_realloc(gc, 2*sizeof(fmpz)*g_alloc);
+         flint_mpn_zero(gc + g_alloc, g_alloc);
          g_alloc *= 2;
       }
 
@@ -194,33 +113,14 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
       fmpz_zero(C);
       fmpz_zero(S);
 
-      if (small)
-         mpn_zero(Sn, n);
-
       while (heap_len > 1 && heap[1].exp == exp)
       {
          x = _mpoly_heap_pop1(heap, &heap_len);
 
          largest[x->i] |= topbit;
 
-         if (small)
-         {
-            if ((slong) poly2[x->i] < 0)
-            {
-               mpn_mul_1(t1n, gn + x->j*n, n, -(ulong) poly2[x->i]);
-               mpn_sub_n(Sn, Sn, t1n, n);
-            } else
-            {
-               mpn_mul_1(t1n, gn + x->j*n, n, (ulong) poly2[x->i]);
-               mpn_add_n(Sn, Sn, t1n, n);
-            }
-
-            fmpz_set_mpn_signed(t1, t1n, n);
-         } else
-         {
-            fmpz_mul(t1, poly2 + x->i, gc + x->j);
-            fmpz_add(S, S, t1);
-         }
+         fmpz_mul(t1, poly2 + x->i, gc + x->j);
+         fmpz_add(S, S, t1);
 
          if (exp <= finalexp)
          {
@@ -243,24 +143,8 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
          {
             largest[x->i] |= topbit;
 
-            if (small)
-            {
-               if ((slong) poly2[x->i] < 0)
-               {
-                  mpn_mul_1(t1n, gn + x->j*n, n, -(ulong) poly2[x->i]);
-                  mpn_sub_n(Sn, Sn, t1n, n);
-               } else
-               {
-                  mpn_mul_1(t1n, gn + x->j*n, n, (ulong) poly2[x->i]);
-                  mpn_add_n(Sn, Sn, t1n, n);
-               }
-
-               fmpz_set_mpn_signed(t1, t1n, n);
-            } else
-            {
-               fmpz_mul(t1, poly2 + x->i, gc + x->j);
-               fmpz_add(S, S, t1);
-            }
+            fmpz_mul(t1, poly2 + x->i, gc + x->j);
+            fmpz_add(S, S, t1);
 
             if (exp <= finalexp)
             {
@@ -306,25 +190,11 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
          }
       }
 
-      if (small)
-            fmpz_set_mpn_signed(S, Sn, n);
-
       if (!fmpz_is_zero(C))
       {
          fmpz_divexact_ui(temp1, C, exp - k*exp2[0]);
          fmpz_add(S, S, temp1);
-         if (small)
-         {
-            if (fmpz_sgn(poly2 + 0) < 0)
-            {
-               fmpz_divexact_ui(temp1, temp1, -(ulong) poly2[0]);
-               fmpz_neg(temp1, temp1);
-            } else
-               fmpz_divexact_ui(temp1, temp1, (ulong) poly2[0]);
-
-            fmpz_get_mpn_signed(gn + gnext*n, temp1, n);
-         } else
-            fmpz_divexact(gc + gnext, temp1, poly2 + 0);
+         fmpz_divexact(gc + gnext, temp1, poly2 + 0);
 
          if ((largest[1] & topbit) != 0)
          {
@@ -361,14 +231,9 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    fmpz_clear(temp1);
 
    flint_free(ge);
-   if (small)
-      flint_free(gn);
-   else
-   {
-      for (i = 0; i < g_alloc; i++)
-         fmpz_clear(gc + i);
-      flint_free(gc);
-   }
+   for (i = 0; i < g_alloc; i++)
+      fmpz_clear(gc + i);
+   flint_free(gc);
 
    TMP_END;
 
