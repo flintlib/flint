@@ -67,7 +67,9 @@ void fmpz_get_mpn_signed(mp_ptr a, fmpz_t c, slong n)
 slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2, slong k)
 {
-   slong i, rnext, g_alloc, gnext, mask, topbit, maxbits = 0, bits, n = 0;
+   const slong topbit = (WORD(1) << (FLINT_BITS - 1));
+   const slong mask = ~topbit;
+   slong i, rnext, g_alloc, gnext, maxbits = 0, bits, n = 0;
    slong next_free, Q_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap1_s * heap;
    mpoly_heap_t * chain;
@@ -83,14 +85,12 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    TMP_START;
 
-   topbit = (WORD(1) << (FLINT_BITS - 1));
-   mask = ~topbit;
-
-   small = _fmpz_mpoly_fits_small(poly2, len2); 
+   small = 0; /*_fmpz_mpoly_fits_small(poly2, len2); */
 
    heap = (mpoly_heap1_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap1_s));
-   chain = (mpoly_heap_t *) TMP_ALLOC(len2*sizeof(mpoly_heap_t));
-   reuse = (mpoly_heap_t **) TMP_ALLOC(len2*sizeof(mpoly_heap_t *));
+   /* 2x as we pull from heap and insert more before processing pulled ones */
+   chain = (mpoly_heap_t *) TMP_ALLOC(2*len2*sizeof(mpoly_heap_t));
+   reuse = (mpoly_heap_t **) TMP_ALLOC(2*len2*sizeof(mpoly_heap_t *));
    Q = (mpoly_heap_t **) TMP_ALLOC(len2*sizeof(mpoly_heap_t *));
    /* we add 1 to all entries of largest to free up the value 0 */
    largest = (slong *) TMP_ALLOC(len2*sizeof(slong));
@@ -100,7 +100,7 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    fmpz_init(S);
    fmpz_init(temp1);
 
-   for (i = 0; i < len2; i++)
+   for (i = 0; i < 2*len2; i++)
       reuse[i] = chain + i;
 
    g_alloc = k*(len2 - 1) + 1;
