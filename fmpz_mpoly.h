@@ -70,11 +70,36 @@ void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2, const ulong * exp3,
 }
 
 FMPZ_MPOLY_INLINE
+void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
+{
+   slong i;
+   ulong bw = 0;
+   for (i = N - 1; i >= 0; i--)
+      sub_ddmmss(bw, exp_ptr[i], WORD(0), exp2[i], WORD(0), exp3[i] - bw);  
+}
+
+FMPZ_MPOLY_INLINE
+void mpoly_monomial_sub_no_borrow(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp_ptr[i] = exp2[i] - exp3[i];
+}
+
+FMPZ_MPOLY_INLINE
 void mpoly_monomial_set(ulong * exp2, const ulong * exp3, slong N)
 {
    slong i;
    for (i = 0; i < N; i++)
       exp2[i] = exp3[i];
+}
+
+FMPZ_MPOLY_INLINE
+void mpoly_monomial_mul_si(ulong * exp2, const ulong * exp3, slong N, slong c)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp2[i] = exp3[i]*c;
 }
 
 FMPZ_MPOLY_INLINE
