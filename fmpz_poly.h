@@ -169,7 +169,7 @@ void fmpz_poly_truncate(fmpz_poly_t poly, slong newlen)
 
 FLINT_DLL void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n);
 
-FLINT_DLL void fmpz_poly_set_rational_roots(fmpz_poly_t pol, fmpq * vec, slong len);
+FLINT_DLL void fmpz_poly_set_rational_roots(fmpz_poly_t pol, const fmpq * vec, slong len);
 
 
 /*  Randomisation  ***********************************************************/

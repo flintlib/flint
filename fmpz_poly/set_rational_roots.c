@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_set_rational_roots(fmpz_poly_t p, fmpq * vec, slong len)
+void fmpz_poly_set_rational_roots(fmpz_poly_t p, const fmpq * vec, slong len)
 {
     fmpz_poly_t q;
     slong i;
