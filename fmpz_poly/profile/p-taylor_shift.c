@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include <ctype.h>
 #include "fmpz_poly.h"
 #include "profiler.h"
 
@@ -18,7 +19,8 @@ main(int argc, char * argv[])
 {
     fmpz_poly_t f, g;
     fmpz_t c, d;
-    slong bits, len, k, nthreads;
+    slong bits, len, k, nthreads, minlen, maxlen, minbits, maxbits;
+    double incbits, inclen;
     flint_rand_t state;
 
     flint_randinit(state);
@@ -32,20 +34,48 @@ main(int argc, char * argv[])
 
     nthreads = 1;
 
+    minlen = 32;
+    maxlen = 100000;
+    inclen = 1.5;
+
+    minbits = 32;
+    maxbits = 400000;
+    incbits = 2.0;
+
     for (k = 0; k < argc - 1; k++)
     {
-        if (strcmp(argv[k], "-threads") == 0)
+        if (strcmp(argv[k], "-len") == 0)
         {
-            nthreads = atoi(argv[k + 1]);
+            minlen = maxlen = atoi(argv[k + 1]);
+            if (k + 2 < argc && isdigit(argv[k + 2][0])) maxlen = atoi(argv[k + 2]);
+            if (k + 3 < argc && isdigit(argv[k + 3][0])) inclen = atof(argv[k + 3]);
         }
+
+        if (strcmp(argv[k], "-bits") == 0)
+        {
+            minbits = maxbits = atoi(argv[k + 1]);
+            if (k + 2 < argc && isdigit(argv[k + 2][0])) maxbits = atoi(argv[k + 2]);
+            if (k + 3 < argc && isdigit(argv[k + 3][0])) incbits = atof(argv[k + 3]);
+        }
+
+        if (strcmp(argv[k], "-threads") == 0)
+            nthreads = atoi(argv[k + 1]);
     }
 
-    flint_printf("using up to %wd threads\n\n", nthreads);
+    flint_printf("len sizes: ");
+    for (len = minlen; len < maxlen; len = FLINT_MAX(len + 1, len * inclen))
+        flint_printf("%wd ", len);
+
+    flint_printf("\nbit sizes: ");
+    for (bits = minbits; bits < maxbits; bits = FLINT_MAX(bits + 1, bits * incbits))
+        flint_printf("%wd ", bits);
+
+    flint_printf("\nusing up to %wd threads\n\n", nthreads);
     flint_set_num_threads(nthreads);
 
-    for (len = 32; len < 100000; len = len * 1.25)
+    for (len = minlen; len < maxlen; len = FLINT_MAX(len + 1, len * inclen))
     {
-        for (bits = 32; bits < 200000; bits *= 4)
+        for (bits = minbits; bits < maxbits; bits = FLINT_MAX(bits + 1, bits * incbits))
         {
             fmpz_poly_zero(f);
 
