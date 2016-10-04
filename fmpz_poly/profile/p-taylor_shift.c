@@ -63,19 +63,19 @@ main(int argc, char * argv[])
     }
 
     flint_printf("len sizes: ");
-    for (len = minlen; len < maxlen; len = FLINT_MAX(len + 1, len * inclen))
+    for (len = minlen; len <= maxlen; len = FLINT_MAX(len + 1, len * inclen))
         flint_printf("%wd ", len);
 
     flint_printf("\nbit sizes: ");
-    for (bits = minbits; bits < maxbits; bits = FLINT_MAX(bits + 1, bits * incbits))
+    for (bits = minbits; bits <= maxbits; bits = FLINT_MAX(bits + 1, bits * incbits))
         flint_printf("%wd ", bits);
 
     flint_printf("\nusing up to %wd threads\n\n", nthreads);
     flint_set_num_threads(nthreads);
 
-    for (len = minlen; len < maxlen; len = FLINT_MAX(len + 1, len * inclen))
+    for (len = minlen; len <= maxlen; len = FLINT_MAX(len + 1, len * inclen))
     {
-        for (bits = minbits; bits < maxbits; bits = FLINT_MAX(bits + 1, bits * incbits))
+        for (bits = minbits; bits <= maxbits; bits = FLINT_MAX(bits + 1, bits * incbits))
         {
             fmpz_poly_zero(f);
 
