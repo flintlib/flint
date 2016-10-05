@@ -17,7 +17,7 @@
 int
 main(int argc, char * argv[])
 {
-    fmpz_poly_t f, g;
+    fmpz_poly_t f, g, h;
     fmpz_t c, d;
     slong bits, len, k, nthreads, minlen, maxlen, minbits, maxbits;
     double incbits, inclen;
@@ -27,6 +27,7 @@ main(int argc, char * argv[])
 
     fmpz_poly_init(f);
     fmpz_poly_init(g);
+    fmpz_poly_init(h);
     fmpz_init(c);
     fmpz_init(d);
 
@@ -71,7 +72,6 @@ main(int argc, char * argv[])
         flint_printf("%wd ", bits);
 
     flint_printf("\nusing up to %wd threads\n\n", nthreads);
-    flint_set_num_threads(nthreads);
 
     for (len = minlen; len <= maxlen; len = FLINT_MAX(len + 1, len * inclen))
     {
@@ -85,19 +85,38 @@ main(int argc, char * argv[])
                 fmpz_poly_set_coeff_fmpz(f, k, c);
             }
 
-            flint_printf("%wd  %wd  h     ", len, bits);
+            flint_printf("%wd  %wd  default ", len, bits);
+            TIMEIT_START
+            fmpz_poly_taylor_shift(g, f, d);
+            TIMEIT_STOP
+
+            /*
+            flint_printf("%wd  %wd  compose ", len, bits);
+            TIMEIT_START
+            fmpz_poly_one(h);
+            fmpz_poly_set_coeff_si(h, 1, 1);
+            fmpz_poly_compose_divconquer(h, f, h);
+            TIMEIT_STOP
+            */
+
+            flint_printf("%wd  %wd  horner  ", len, bits);
             TIMEIT_START
             fmpz_poly_taylor_shift_horner(g, f, d);
             TIMEIT_STOP
 
-            flint_printf("%wd  %wd  dc    ", len, bits);
-            TIMEIT_START
-            fmpz_poly_taylor_shift_divconquer(g, f, d);
-            TIMEIT_STOP
+            for (k = 1; k <= nthreads; k *= 2)
+            {
+                flint_printf("%wd  %wd  dc%wd     ", len, bits, k);
+                flint_set_num_threads(k);
+                TIMEIT_START
+                fmpz_poly_taylor_shift_divconquer(g, f, d);
+                TIMEIT_STOP
+                flint_set_num_threads(1);
+            }
 
             for (k = 1; k <= nthreads; k *= 2)
             {
-                flint_printf("%wd  %wd  mm%wd   ", len, bits, k);
+                flint_printf("%wd  %wd  mm%wd     ", len, bits, k);
                 flint_set_num_threads(k);
                 TIMEIT_START
                 fmpz_poly_taylor_shift_multi_mod(g, f, d);
@@ -111,6 +130,7 @@ main(int argc, char * argv[])
 
     fmpz_poly_clear(f);
     fmpz_poly_clear(g);
+    fmpz_poly_clear(h);
     fmpz_clear(c);
     fmpz_clear(d);
 
