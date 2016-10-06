@@ -163,7 +163,8 @@ void fmpz_poly_CLD_bound(fmpz_t res, fmpz_poly_t f, slong n)
             else
                max_eval = lo_eval;
 
-            fmpz_set_d(res, max_eval*(f->length - 1)*(1.0 + ldexp(2.0, -51)));
+            /* we adjust due to rounding errors in horner's evaluation */
+            fmpz_set_d(res, max_eval*(f->length - 1)*(1.0 + f->length*ldexp(2.0, -51)));
 
             goto cleanup;
          }
@@ -195,10 +196,12 @@ void fmpz_poly_CLD_bound(fmpz_t res, fmpz_poly_t f, slong n)
             r = pow(2, rpow);
             break;
          case 1:
-            fmpz_set_d_2exp(res, hi_eval*(f->length - 1)*(1.0 + ldexp(2.0, -51)), hi_exp);
+            /* we adjust due to rounding errors in horner's evaluation */
+            fmpz_set_d_2exp(res, hi_eval*(f->length - 1)*(1.0 + f->length*ldexp(2.0, -51)), hi_exp);
             goto cleanup;
          case -1:
-            fmpz_set_d_2exp(res, lo_eval*(f->length - 1)*(1.0 + ldexp(2.0, -51)), lo_exp);
+            /* we adjust due to rounding errors in horner's evaluation */
+            fmpz_set_d_2exp(res, lo_eval*(f->length - 1)*(1.0 + f->length*ldexp(2.0, -51)), lo_exp);
             goto cleanup;
          }
       }
