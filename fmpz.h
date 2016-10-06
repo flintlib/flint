@@ -576,6 +576,8 @@ FLINT_DLL void fmpz_preinvn_clear(fmpz_preinvn_t inv);
 
 FLINT_DLL double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
 
+FLINT_DLL void fmpz_set_d_2exp(fmpz_t f, double m, slong exp);
+
 FMPZ_INLINE void
 fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
 {

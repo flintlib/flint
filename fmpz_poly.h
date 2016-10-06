@@ -270,7 +270,9 @@ FLINT_DLL void fmpz_poly_sub_series(fmpz_poly_t res, const fmpz_poly_t poly1,
 
 FLINT_DLL void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly);
 
-/*  Scalar multiplication and division  **************************************/
+/*  Scalar absolute value multiplication and division  ***********************/
+
+FLINT_DLL void fmpz_poly_scalar_abs(fmpz_poly_t res, const fmpz_poly_t poly);
 
 FLINT_DLL void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, 
                              const fmpz_poly_t poly2, ulong x);
@@ -867,29 +869,42 @@ FLINT_DLL void _fmpz_poly_evaluate_horner_fmpq(fmpz_t rnum, fmpz_t rden,
                                     const fmpz_t anum, const fmpz_t aden);
 
 FLINT_DLL void fmpz_poly_evaluate_horner_fmpq(fmpq_t res, const fmpz_poly_t f, 
-                                                                const fmpq_t a);
+                                                               const fmpq_t a);
 
 FLINT_DLL void _fmpz_poly_evaluate_divconquer_fmpq(fmpz_t rnum, fmpz_t rden, 
                                     const fmpz * f, slong len, 
                                     const fmpz_t anum, const fmpz_t aden);
 
-FLINT_DLL void fmpz_poly_evaluate_divconquer_fmpq(fmpq_t res, const fmpz_poly_t f, 
-                                                                const fmpq_t a);
+FLINT_DLL void fmpz_poly_evaluate_divconquer_fmpq(fmpq_t res,
+                                          const fmpz_poly_t f, const fmpq_t a);
 
 FLINT_DLL void _fmpz_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden, 
                                     const fmpz * f, slong len, 
                                     const fmpz_t anum, const fmpz_t aden);
 
-FLINT_DLL void fmpz_poly_evaluate_fmpq(fmpq_t res, const fmpz_poly_t f, const fmpq_t a);
+FLINT_DLL void fmpz_poly_evaluate_fmpq(fmpq_t res,
+                                          const fmpz_poly_t f, const fmpq_t a);
 
 
-FLINT_DLL void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a);
+FLINT_DLL void fmpz_poly_evaluate_mpq(mpq_t res,
+                                           const fmpz_poly_t f, const mpq_t a);
 
-FLINT_DLL mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len, mp_limb_t a, 
-                                  mp_limb_t n, mp_limb_t ninv);
+FLINT_DLL mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len,
+                                     mp_limb_t a, mp_limb_t n, mp_limb_t ninv);
 
 FLINT_DLL mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
                                  mp_limb_t n);
+
+FLINT_DLL double _fmpz_poly_evaluate_horner_d(const fmpz * poly, slong n,
+                                                                     double d);
+
+FLINT_DLL double fmpz_poly_evaluate_horner_d(const fmpz_poly_t poly, double d);
+
+FLINT_DLL double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, 
+                                         const fmpz * poly, slong n, double d);
+
+FLINT_DLL double fmpz_poly_evaluate_horner_d_2exp(slong * exp, 
+                                             const fmpz_poly_t poly, double d);
 
 /*  Composition  *************************************************************/
 
@@ -1226,6 +1241,10 @@ FLINT_DLL slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t poly);
 FLINT_DLL slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len);
 
 FLINT_DLL slong fmpz_poly_num_real_roots(const fmpz_poly_t poly);
+
+/* CLD bounds */
+
+FLINT_DLL void fmpz_poly_CLD_bound(fmpz_t res, fmpz_poly_t f, slong n);
 
 /* Special polynomials */
 

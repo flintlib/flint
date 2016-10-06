@@ -389,9 +389,14 @@ void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 
 *******************************************************************************
 
-    Scalar multiplication and division
+    Scalar absolute value, multiplication and division
 
 *******************************************************************************
+
+void fmpz_poly_scalar_abs(fmpz_poly_t res, const fmpz_poly_t poly)
+
+    Sets \code{poly1} to the polynomial whose coefficients are the absolute
+    value of those of \code{poly2}.
 
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const fmpz_t x)
@@ -2142,6 +2147,38 @@ void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
     Evaluates \code{f} at the $n$ values given in the vector \code{f},
     writing the results to \code{res}.
 
+double _fmpz_poly_evaluate_horner_d(const fmpz * poly, slong n, double d)
+
+    Evaluate \code{(poly, n)} at the double $d$. No attempt is made to do this
+    efficiently or in a numerically stable way. It is currently only used in
+    Flint for quick and dirty evaluations of polynomials with all coefficients
+    positive.
+
+double fmpz_poly_evaluate_horner_d(const fmpz_poly_t poly, double d)
+
+    Evaluate \code{poly} at the double $d$. No attempt is made to do this
+    efficiently or in a numerically stable way. It is currently only used in
+    Flint for quick and dirty evaluations of polynomials with all coefficients
+    positive.
+
+double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, 
+                                         const fmpz * poly, slong n, double d)
+
+    Evaluate \code{(poly, n)} at the double $d$. Return the result as a double
+    and an exponent \code{exp} combination. No attempt is made to do this
+    efficiently or in a numerically stable way. It is currently only used in
+    Flint for quick and dirty evaluations of polynomials with all coefficients
+    positive.
+
+double fmpz_poly_evaluate_horner_d_2exp(slong * exp, 
+                                             const fmpz_poly_t poly, double d)
+
+    Evaluate \code{poly} at the double $d$. Return the result as a double
+    and an exponent \code{exp} combination. No attempt is made to do this
+    efficiently or in a numerically stable way. It is currently only used in
+    Flint for quick and dirty evaluations of polynomials with all coefficients
+    positive.
+
 *******************************************************************************
 
     Newton basis
@@ -3278,3 +3315,13 @@ void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n)
     This function uses sparse formulas for $r = 1, 2$
     and otherwise reduces to those cases using power series arithmetic.
 
+*******************************************************************************
+
+    CLD bounds
+
+*******************************************************************************
+
+void fmpz_poly_CLD_bound(fmpz_t res, fmpz_poly_t f, slong n)
+
+    Compute a bound on the $n$ coefficient of $fg'/g$ where $g$ is any
+    factor of $f$.

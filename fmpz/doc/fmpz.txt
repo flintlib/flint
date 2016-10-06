@@ -182,6 +182,14 @@ void fmpz_set_ui(fmpz_t f, ulong val)
 
     Sets $f$ to the given \code{ulong} value.
 
+void fmpz_set_d(fmpz_t f, double d)
+
+   Sets $f$ to the integer nearest to the given double.
+
+void fmpz_set_d_2exp(fmpz_t f, double d, slong exp)
+
+   Sets $f$ to the nearest integer to \code{d*2^(exp)}.
+
 void fmpz_neg_ui(fmpz_t f, ulong val)
 
     Sets $f$ to the given \code{ulong} value, and then negates $f$.
