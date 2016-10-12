@@ -96,6 +96,22 @@ void _fmpz_poly_set_length(fmpz_poly_t poly, slong newlen)
     poly->length = newlen;
 }
 
+FMPZ_POLY_INLINE
+void fmpz_poly_attach_truncate(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+{
+   trunc->coeffs = poly->coeffs;
+   trunc->alloc = poly->alloc;
+   trunc->length = FLINT_MIN(poly->length, n);
+}
+ 
+FMPZ_POLY_INLINE
+void fmpz_poly_attach_shift(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+{
+   trunc->coeffs = poly->coeffs + n;
+   trunc->alloc = poly->alloc - n;
+   trunc->length = FLINT_MAX(poly->length - n, 0);
+}
+ 
 /*  Polynomial parameters  ***************************************************/
 
 FMPZ_POLY_INLINE
@@ -827,17 +843,23 @@ void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R,
     fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, B);
 }
 
-FLINT_DLL void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, slong lenA, 
-                         const fmpz * B, slong lenB, const fmpz_preinvn_t inv);
+FLINT_DLL void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A,
+             slong lenA, const fmpz * B, slong lenB, const fmpz_preinvn_t inv);
 
-FLINT_DLL void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A, 
-                                                          const fmpz_poly_t B);
+FLINT_DLL void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d,
+                                     const fmpz_poly_t A, const fmpz_poly_t B);
 
-FLINT_DLL void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA, 
-                         const fmpz * B, slong lenB, const fmpz_preinvn_t inv);
+FLINT_DLL void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A,
+             slong lenA, const fmpz * B, slong lenB, const fmpz_preinvn_t inv);
 
-FLINT_DLL void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A, 
-                                                          const fmpz_poly_t B);
+FLINT_DLL void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, 
+                                     const fmpz_poly_t A, const fmpz_poly_t B);
+
+FLINT_DLL void fmpz_poly_divlow_smodp(fmpz * res,
+            const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_t p, slong n);
+
+FLINT_DLL void fmpz_poly_divhigh_smodp(fmpz * res,
+            const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_t p, slong n);
 
 /*  Derivative  **************************************************************/
 

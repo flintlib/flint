@@ -65,6 +65,21 @@ void _fmpz_poly_set_length(fmpz_poly_t poly, slong newlen)
     Demotes the coefficients of \code{poly} beyond \code{newlen} and sets 
     the length of \code{poly} to \code{newlen}.
 
+void fmpz_poly_attach_truncate(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+
+    This function sets the uninitialised polynomial \code{trunc} to the low
+    $n$ coefficients of \code{poly}, or to \code{poly} if the latter doesn't
+    have $n$ coefficients. The polynomial \code{trunc} not be cleared or used
+    as the output of any Flint functions. 
+
+void fmpz_poly_attach_shift(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+
+    This function sets the uninitialised polynomial \code{trunc} to the
+    high coefficients of \code{poly}, i.e. the coefficients not among the low
+    $n$ coefficients of \code{poly}. If the latter doesn't have $n$
+    coefficients \code{trunc} is set to the zero polynomial. The polynomial
+    \code{trunc} not be cleared or used as the output of any Flint functions. 
+
 *******************************************************************************
 
     Polynomial parameters
@@ -1794,6 +1809,33 @@ int fmpz_poly_divides(fmpz_poly_t Q,
 
     This function is currently unoptimised and provided for convenience
     only.
+
+
+*******************************************************************************
+
+    Division mod p
+
+*******************************************************************************
+
+void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
+                                  const fmpz_poly_t g, const fmpz_t p, slong n)
+
+    Compute the $n$ lowest coefficients of $f$ divided by $g$, assuming the
+    division is exact modulo $p$. The computed coefficients are reduced modulo
+    $p$ using the symmetric remainder system. We require $f$ to be at least $n$
+    in length. The function can handle trailing zeroes, but the low nonzero
+    coefficient of $g$ must be coprime to $p$. This is a bespoke function used
+    by factoring.
+
+void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f,
+                                  const fmpz_poly_t g, const fmpz_t p, slong n)
+
+    Compute the $n$ highest coefficients of $f$ divided by $g$, assuming the
+    division is exact modulo $p$. The computed coefficients are reduced modulo
+    $p$ using the symmetric remainder system. We require $f$ to be as output
+    by \code{fmpz_poly_mulhigh_n} given polynomials $g$ and a polynomial of
+    length $n$ as inputs. The leading coefficient of $g$ must be coprime to
+    $p$. This is a bespoke function used by factoring.
 
 *******************************************************************************
 
