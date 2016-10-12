@@ -81,9 +81,9 @@ extern char version[];
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
 
-void * flint_malloc(size_t size);
-void * flint_realloc(void * ptr, size_t size);
-void * flint_calloc(size_t num, size_t size);
+FLINT_DLL void * flint_malloc(size_t size);
+FLINT_DLL void * flint_realloc(void * ptr, size_t size);
+FLINT_DLL void * flint_calloc(size_t num, size_t size);
 FLINT_DLL void flint_free(void * ptr);
 
 typedef void (*flint_cleanup_function_t)(void);
@@ -94,8 +94,8 @@ FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
      void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
                                                               void (*free_func) (void *));
 
-void flint_abort(void);
-void flint_set_abort(void (*func)(void));
+FLINT_DLL void flint_abort(void);
+FLINT_DLL void flint_set_abort(void (*func)(void));
   /* flint_abort is calling abort by default
    * if flint_set_abort is used, then instead of abort this function
    * is called. EXPERIMENTALLY use at your own risk!
