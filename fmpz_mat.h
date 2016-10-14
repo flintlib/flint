@@ -47,6 +47,13 @@ typedef struct
 
 typedef fmpz_mat_struct fmpz_mat_t[1];
 
+/* used for column partitioning, used by van Hoeij poly factoring */
+typedef struct
+{
+   ulong col;
+   ulong hash;
+} col_hash_t;
+
 /* Memory management  ********************************************************/
 
 FMPZ_MAT_INLINE
@@ -82,6 +89,34 @@ int
 fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
 {
     return _fmpz_vec_is_zero(mat->rows[i], mat->c);
+}
+
+FMPZ_MAT_INLINE
+int fmpz_mat_col_equal(fmpz_mat_t M, slong m, slong n)
+{
+   slong i;
+
+   for (i = 0; i < M->r; i++)
+   {
+      if (!fmpz_equal(M->rows[i] + m, M->rows[i] + n))
+         return 0;
+   }
+
+   return 1;
+}
+
+FMPZ_MAT_INLINE
+int fmpz_mat_row_equal(fmpz_mat_t M, slong m, slong n)
+{
+   slong i;
+
+   for (i = 0; i < M->c; i++)
+   {
+      if (!fmpz_equal(M->rows[m] + i, M->rows[n] + i))
+         return 0;
+   }
+
+   return 1;
 }
 
 FMPZ_MAT_INLINE
@@ -449,21 +484,32 @@ FLINT_DLL void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A);
 
 /* LLL ***********************************************************************/
 
-FLINT_DLL int fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta);
+FLINT_DLL int fmpz_mat_is_reduced(const fmpz_mat_t A,
+                                                     double delta, double eta);
 
-FLINT_DLL int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta);
+FLINT_DLL int fmpz_mat_is_reduced_gram(const fmpz_mat_t A,
+                                                     double delta, double eta);
 
-FLINT_DLL int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta, const fmpz_t gs_B, int newd);
+FLINT_DLL int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A,
+                        double delta, double eta, const fmpz_t gs_B, int newd);
 
-FLINT_DLL int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta, double eta, const fmpz_t gs_B, int newd);
+FLINT_DLL int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A,
+                        double delta, double eta, const fmpz_t gs_B, int newd);
 
 /* Classical LLL *************************************************************/
 
-FLINT_DLL void fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta);
+FLINT_DLL void fmpz_mat_lll_original(fmpz_mat_t A,
+                                         const fmpq_t delta, const fmpq_t eta);
 
 /* Modified LLL **************************************************************/
 
-FLINT_DLL void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta);
+FLINT_DLL void fmpz_mat_lll_storjohann(fmpz_mat_t A,
+                                         const fmpq_t delta, const fmpq_t eta);
+
+/* Colum partitioning ********************************************************/
+
+FLINT_DLL int fmpz_mat_col_partition(slong * part, 
+                                              fmpz_mat_t M, int short_circuit);
 
 #ifdef __cplusplus
 }
