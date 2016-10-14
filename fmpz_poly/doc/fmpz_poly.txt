@@ -190,11 +190,6 @@ void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 
     Sets \code{res} to a copy of \code{poly}, truncated to length \code{n}.
 
-void fmpz_poly_set_rational_roots(fmpz_poly_t pol, fmpq * vec, slong len)
-
-    Sets \code{pol} to be a polynomial with integer coefficient whose
-    roots are given by the array \code{(vec, len)}.
-
 *******************************************************************************
 
     Randomisation
@@ -2993,6 +2988,20 @@ void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
     Sets \code{poly} to the monic polynomial which is the product
     of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
     given by \code{xs}.
+
+void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly, const fmpq * xs, slong n)
+
+    Sets \code{(poly, n + 1)} to the product of
+    $(q_0 x - p_0)(q_1 x - p_1) \cdots (q_{n-1} x - p_{n-1})$, the roots
+    $p_i/q_i$ being given by \code{xs}.
+
+void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
+        const fmpq * xs, slong n)
+
+    Sets \code{poly} to the polynomial which is the product
+    of $(q_0 x - p_0)(q_1 x - p_1) \cdots (q_{n-1} x - p_{n-1})$, the roots
+    $p_i/q_i$ being given by \code{xs}.
+
 
 *******************************************************************************
 

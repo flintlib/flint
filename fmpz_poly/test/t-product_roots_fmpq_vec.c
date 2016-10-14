@@ -19,7 +19,7 @@ int main()
 
     FLINT_TEST_INIT(state);
 
-    printf("set_rational_roots....");
+    printf("product_roots_fmpq_vec....");
 
     for (iter = 0; iter < 100; iter++)
     {
@@ -33,7 +33,7 @@ int main()
         _fmpq_vec_randtest(vec, state, n, 100);
 
         fmpz_poly_init(p);
-        fmpz_poly_set_rational_roots(p, vec, n);
+        fmpz_poly_product_roots_fmpq_vec(p, vec, n);
 
         if (fmpz_poly_degree(p) != n)
         {
@@ -58,6 +58,7 @@ int main()
                 printf(" is not zero");
                 printf("vec = "); _fmpq_vec_print(vec, n); printf("\n");
                 printf("p = "); fmpz_poly_print(p); printf("\n");
+                abort();
             }
         }
 
