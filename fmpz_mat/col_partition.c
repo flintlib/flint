@@ -49,7 +49,8 @@ int fmpz_mat_col_hash_compare(const void * a, const void * b)
 
 int fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit)
 {
-   slong start = 0, new_start = 0, upto = 1, p = 0, i;
+   slong start = 0, new_start = 0, upto = 1, p = 0, i, count;
+   ulong hash;
    col_hash_t * col_h;
    TMP_INIT;
 
@@ -60,6 +61,24 @@ int fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit)
    
    qsort(col_h, M->c, sizeof(col_hash_t), fmpz_mat_col_hash_compare);
    
+   if (short_circuit)
+   {
+      hash = col_h[0].hash;
+      count = 1;
+
+      for (i = 1; i < M->c; i++)
+      {
+         if (col_h[i].hash != hash)
+         {
+            count++;
+            hash = col_h[i].hash;
+         }
+      }
+
+      if (count > M->r)
+         goto cleanup;
+   }
+
    for (i = 0; i < M->c; i++)
       part[i] = -WORD(1);
 
