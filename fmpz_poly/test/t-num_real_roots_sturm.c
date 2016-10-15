@@ -36,7 +36,7 @@ int main()
 
         fmpz_poly_init(p);
         fmpz_poly_init(q);
-        fmpz_poly_set_rational_roots(p, vec, n);
+        fmpz_poly_product_roots_fmpq_vec(p, vec, n);
         fmpz_poly_randtest_no_real_root(q, state, 1 + n_randint(state, 5), 80);
         /* note: here there is no need to check that q is squarefree (Sturm test remains valid) */
         fmpz_poly_mul(p, p, q);
