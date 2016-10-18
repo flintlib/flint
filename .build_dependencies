@@ -18,9 +18,9 @@ cd mpir-2.7.0
 ./configure ABI=$ABI --enable-gmpcompat
 make -j4 > /dev/null 2>&1
 cd ..
-wget http://www.mpfr.org/mpfr-current/mpfr-3.1.4.tar.bz2
-tar -xf mpfr-3.1.4.tar.bz2
-cd mpfr-3.1.4
+wget http://www.mpfr.org/mpfr-current/mpfr-3.1.5.tar.bz2
+tar -xf mpfr-3.1.5.tar.bz2
+cd mpfr-3.1.5
 ./configure ABI=$ABI --with-gmp-build=$(absolute_path "../mpir-2.7.0")
 make -j4 > /dev/null 2>&1
 cd ..
