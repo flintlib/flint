@@ -3363,7 +3363,7 @@ void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n)
 
 *******************************************************************************
 
-void fmpz_poly_CLD_bound(fmpz_t res, fmpz_poly_t f, slong n)
+void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
 
     Compute a bound on the $n$ coefficient of $fg'/g$ where $g$ is any
     factor of $f$.

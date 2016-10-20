@@ -28,10 +28,10 @@
 #define ulong mp_limb_t
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "nmod_mat.h"
 #include "d_mat.h"
 #include "mpf_mat.h"
-#include "fmpz_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -224,6 +224,7 @@ FLINT_DLL void fmpz_mat_scalar_divexact_ui(fmpz_mat_t B, const fmpz_mat_t A, ulo
 
 FLINT_DLL void fmpz_mat_scalar_mul_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
 FLINT_DLL void fmpz_mat_scalar_tdiv_q_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
+FLINT_DLL void fmpz_mat_scalar_smod(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t P);
 
 FLINT_DLL void fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m);
 
@@ -331,6 +332,8 @@ FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 /* Transforms */
 
 void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
+
+#include "fmpz_poly.h"
 
 /* Characteristic polynomial ************************************************/
 
@@ -506,10 +509,15 @@ FLINT_DLL void fmpz_mat_lll_original(fmpz_mat_t A,
 FLINT_DLL void fmpz_mat_lll_storjohann(fmpz_mat_t A,
                                          const fmpq_t delta, const fmpq_t eta);
 
-/* Colum partitioning ********************************************************/
+/* Column partitioning *******************************************************/
 
 FLINT_DLL int fmpz_mat_col_partition(slong * part, 
                                               fmpz_mat_t M, int short_circuit);
+
+/* Van Hoeij helper function *************************************************/
+
+FLINT_DLL int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
+                                       fmpz_mat_t col, slong exp, slong U_exp);
 
 #ifdef __cplusplus
 }

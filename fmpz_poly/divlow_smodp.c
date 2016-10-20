@@ -24,7 +24,7 @@ void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
 
    fmpz_init(d);
    fmpz_init(cinv);
-
+   
    while (fmpz_is_zero(g->coeffs + i))
       i++;
 
@@ -34,7 +34,20 @@ void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
 
    fmpz_poly_set(tf, f);
 
-   fmpz_gcdinv(d, cinv, g->coeffs + zeroes, p);
+   if (fmpz_sgn(g->coeffs + zeroes) >= 0)
+      fmpz_gcdinv(d, cinv, g->coeffs + zeroes, p);
+   else
+   {
+      fmpz_t temp;
+
+      fmpz_init(temp);
+
+      fmpz_add(temp, g->coeffs + zeroes, p);
+      fmpz_gcdinv(d, cinv, temp, p);
+
+      fmpz_clear(temp);
+   }
+
    if (!fmpz_is_one(d))
    {
       flint_printf("Exception (fmpz_poly_divlow_smodp). Impossible inverse.\n");

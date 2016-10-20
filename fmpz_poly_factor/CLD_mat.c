@@ -16,14 +16,15 @@
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 
-slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, fmpz_poly_t f, fmpz_poly_factor_t lifted_fac, fmpz_t P, ulong k)
+slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
+                              fmpz_poly_factor_t lifted_fac, fmpz_t P, ulong k)
 {
    /*
       The product of the lifted factors g is equal to f modulo P. Here P = p^a.
       We will compute the top k and bottom k coefficients of each logarithmic
       derivative fg'/g. The results are stored in res, along with an extra
       row for the CLD bounds for that column. The matrix res is required to be
-      initialised to be of size (r + 1, 2n).
+      initialised to be of size (r + 1, 2k).
    */
 
    slong i, zeroes, bound, lo_n, hi_n, r = lifted_fac->num;
@@ -100,15 +101,16 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, fmpz_poly_t f, fmpz_poly_factor_
          if (len < 0)
          {
             fmpz_poly_shift_left(temp, lifted_fac->p + i, -len);
-            fmpz_poly_derivative(gd, trunc_fac);
+            fmpz_poly_derivative(gd, temp);
+            fmpz_poly_mulhigh_n(gcld, trunc_f, gd, hi_n);
+            fmpz_poly_divhigh_smodp(res->rows[i] + lo_n, gcld, temp, P, hi_n);
          } else
          {
             fmpz_poly_attach_shift(trunc_fac, lifted_fac->p + i, len);
             fmpz_poly_derivative(gd, trunc_fac);
+            fmpz_poly_mulhigh_n(gcld, trunc_f, gd, hi_n);
+            fmpz_poly_divhigh_smodp(res->rows[i] + lo_n, gcld, trunc_fac, P, hi_n);
          }
-         
-         fmpz_poly_mulhigh_n(gcld, trunc_f, gd, hi_n);
-         fmpz_poly_divhigh_smodp(res->rows[i] + lo_n, gcld, trunc_fac, P, hi_n);
       }
 
       fmpz_poly_clear(temp);      

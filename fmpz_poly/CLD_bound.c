@@ -64,7 +64,7 @@ int _d_cmp_2exp(double a, slong a_exp, double b, slong b_exp)
    }
 }
 
-void fmpz_poly_CLD_bound(fmpz_t res, fmpz_poly_t f, slong n)
+void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
 {
    /*
       Given: f = a_0 + ... + a_N x^N and n in {0, 1, ..., N - 1}

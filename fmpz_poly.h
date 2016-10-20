@@ -97,7 +97,8 @@ void _fmpz_poly_set_length(fmpz_poly_t poly, slong newlen)
 }
 
 FMPZ_POLY_INLINE
-void fmpz_poly_attach_truncate(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+void fmpz_poly_attach_truncate(fmpz_poly_t trunc,
+                                               const fmpz_poly_t poly, slong n)
 {
    trunc->coeffs = poly->coeffs;
    trunc->alloc = poly->alloc;
@@ -105,7 +106,7 @@ void fmpz_poly_attach_truncate(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
 }
  
 FMPZ_POLY_INLINE
-void fmpz_poly_attach_shift(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+void fmpz_poly_attach_shift(fmpz_poly_t trunc, const fmpz_poly_t poly, slong n)
 {
    trunc->coeffs = poly->coeffs + n;
    trunc->alloc = poly->alloc - n;
@@ -1266,7 +1267,7 @@ FLINT_DLL slong fmpz_poly_num_real_roots(const fmpz_poly_t poly);
 
 /* CLD bounds */
 
-FLINT_DLL void fmpz_poly_CLD_bound(fmpz_t res, fmpz_poly_t f, slong n);
+FLINT_DLL void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n);
 
 /* Special polynomials */
 

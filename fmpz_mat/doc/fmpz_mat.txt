@@ -493,6 +493,11 @@ void fmpz_mat_scalar_tdiv_q_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
     Set the matrix \code{B} to the matrix \code{A}, of the same dimensions,
     divided by $2^{exp}$, rounding down towards zero.
 
+void fmpz_mat_scalar_smod(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t P)
+
+    Set the matrix \code{B} to the matrix \code{A}, of the same dimensions,
+    with each entry reduced modulo $P$ in the symmetric moduli system. We
+    require $P > 0$.
 
 *******************************************************************************
 
