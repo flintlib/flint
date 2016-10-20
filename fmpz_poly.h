@@ -186,9 +186,6 @@ void fmpz_poly_truncate(fmpz_poly_t poly, slong newlen)
 
 FLINT_DLL void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n);
 
-FLINT_DLL void fmpz_poly_set_rational_roots(fmpz_poly_t pol, fmpq * vec, slong len);
-
-
 /*  Randomisation  ***********************************************************/
 
 FLINT_DLL void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
@@ -1131,6 +1128,13 @@ FLINT_DLL void _fmpz_poly_product_roots_fmpz_vec(fmpz * poly,
 
 FLINT_DLL void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
                                         const fmpz * xs, slong n);
+
+FLINT_DLL void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly,
+                                        const fmpq * xs, slong n);
+
+FLINT_DLL void fmpz_poly_product_roots_fmpq_vec(fmpz_poly_t poly,
+                                        const fmpq * xs, slong n);
+
 
 /* Newton basis *************************************************************/
 
