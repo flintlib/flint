@@ -78,7 +78,7 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
    fmpz_t P_trunc;
 
    fmpz_init(P_trunc);
-   fmpz_mat_init(x, s, 1);
+   fmpz_mat_init(x, r, 1);
    fmpz_mat_init(y, s, 1);
 
    /* find U, the combinatorial part of M */
