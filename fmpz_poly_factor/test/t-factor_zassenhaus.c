@@ -43,7 +43,6 @@ main(void)
         for (j = 0; j < n; j++)
         {
             fmpz_poly_randtest(g, state, n_randint(state, 5) + 2, n_randint(state, 40));
-            printf("poly %ld: ", j); fmpz_poly_print(g); printf("\n");
             fmpz_poly_mul(f, f, g);
         }
 
@@ -70,8 +69,6 @@ main(void)
             flint_printf("fac = "), fmpz_poly_factor_print(fac), flint_printf("\n\n");
             abort();
         }
-
-        printf("factored poly %ld!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n", i);
 
         fmpz_clear(c);
         fmpz_poly_clear(f);

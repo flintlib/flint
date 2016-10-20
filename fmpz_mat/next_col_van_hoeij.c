@@ -114,6 +114,7 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
       fmpz_set(M->rows[j] + M->c - 1, y->rows[j - 1]);
 
    /* cleanup */
+   fmpz_mat_clear(x);
    fmpz_mat_clear(y);
    fmpz_clear(P_trunc);
 

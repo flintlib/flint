@@ -48,12 +48,10 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    slong U_exp, a, next_col, num_coeffs, prev_num_coeffs, prev_exp, N, worst_exp;
    ulong sqN;
    fmpz_poly_t * v, * w;
-   fmpz_mat_t col, data, U;
+   fmpz_mat_t col, data;
    slong * link;
    int hensel_loops;
    fmpz_lll_t fl;
-
-   printf("made it 1\n");
 
    /* set to identity */
    fmpz_mat_init(M, r, r);
@@ -114,12 +112,8 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    fmpz_mat_init(col, r, 1);
    fmpz_lll_context_init_default(fl);
 
-   printf("made it 2\n");
-
    while (!fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
    {
-      printf("made it 3\n");
-
       if (hensel_loops < 3 && 3*r > N + 1)
          num_coeffs = r > 200 ? 50 : 30;
       else
@@ -127,8 +121,6 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
       num_coeffs = FLINT_MIN(num_coeffs, (N + 1)/2);
       prev_num_coeffs = 0;
-
-      printf("made it 4\n");
 
       do {
          fmpz_mat_init(data, r + 1, 2*num_coeffs);
@@ -152,52 +144,37 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
             
             fmpz_mat_next_col_van_hoeij(M, P, col, worst_exp, U_exp);
 
-            fmpz_mat_init(U, M->r, M->r);
-            fmpz_lll_wrapper_with_removal_knapsack(M, U, B, fl);
-            fmpz_mat_clear(U);
-
-            printf("made it 5\n");
-
+            fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
+            
             if (fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
             {
                fmpz_mat_clear(data);
                goto cleanup;
             }
-            printf("made it 6\n");
          }
 
          prev_num_coeffs = num_coeffs;
          num_coeffs = FLINT_MIN(2*num_coeffs, (N + 1)/2);
          fmpz_mat_clear(data);
 
-         printf("made it 7\n");
       } while (num_coeffs != prev_num_coeffs);
    
-      printf("made it 8\n");
-
       hensel_loops++;
-
-      fmpz_mat_clear(data);
       
-      printf("made it 9\n");
-
       prev_exp = _fmpz_poly_hensel_continue_lift(lifted_fac, link, v, w, f, prev_exp, a, 2*a, fp);
 
       a = 2*a;
       fmpz_pow_ui(P, fp, a);
-
-      printf("made it 10\n");
    }
-   
 
 cleanup:
-   printf("made it 11\n");
 
    fmpz_clear(lc);
    fmpz_clear(fp);
    fmpz_clear(P);
    fmpz_clear(B);
    fmpz_mat_clear(col);
+   fmpz_mat_clear(M);
    fmpz_clear(bound_sum);
    fmpz_poly_factor_clear(lifted_fac);
   
@@ -209,6 +186,4 @@ cleanup:
    flint_free(v);
    flint_free(w);
    flint_free(link);
-
-   printf("made it 12\n");
 }
