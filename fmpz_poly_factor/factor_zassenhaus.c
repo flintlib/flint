@@ -270,7 +270,7 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 
         /* Factor each square-free part */
         for (j = 0; j < sq_fr_fac->num; j++)
-            _fmpz_poly_factor_zassenhaus(fac, sq_fr_fac->exp[j], sq_fr_fac->p + j, 5, 1);
+            _fmpz_poly_factor_zassenhaus(fac, sq_fr_fac->exp[j], sq_fr_fac->p + j, 10, 0);
 
         fmpz_poly_factor_clear(sq_fr_fac);
     }

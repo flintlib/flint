@@ -232,7 +232,7 @@ FUNC_HEAD
                         2 * d_mat_entry(mu, kappa,
                                         kappa - 1) * d_mat_entry(r, kappa,
                                                                  kappa - 1);
-                    fmpz_set_d(rii, ldexp(s[kappa - 1] - tmp, 2 * expo[kappa]));    /* using a heuristic lower bound on the final GS norm */
+                    fmpz_set_d_2exp(rii, s[kappa - 1] - tmp, 2 * expo[kappa]);    /* using a heuristic lower bound on the final GS norm */
                     if (fmpz_cmp(rii, gs_B) > 0)
                     {
                         d--;
