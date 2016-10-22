@@ -39,8 +39,11 @@ void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
       {
          slong diff = (slong) (M->rows[i] - old_entries);
          
+         if (M->rows[i] >= old_entries + M->c*M->r)
+            abort();
+
          j = diff/M->c;
-         M->rows[i + 1] = M->entries + j*c;
+         M->rows[i + 1] = M->entries + (j + 1)*c;
       }
 
       M->rows[0] = M->entries;
@@ -73,10 +76,14 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
                                         fmpz_mat_t col, slong exp, slong U_exp)
 {
    slong j, k, r = col->r;
+   slong bit_r = FLINT_MAX(r, 20);
    slong s = M->r;
    fmpz_mat_t U, x, y;
    fmpz_t P_trunc;
+   int res = 1;
 
+   k = fmpz_bits(P) - bit_r - bit_r/2;
+   
    fmpz_init(P_trunc);
    fmpz_mat_init(x, r, 1);
    fmpz_mat_init(y, s, 1);
@@ -85,8 +92,7 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
    fmpz_mat_window_init(U, M, 0, 0, s, r);
 
    /* find scale factor 2^k */
-   k = fmpz_bits(P) - exp - r - r/2;
-   k -= U_exp; /* we've already shifted everything by U_exp */
+   k -= U_exp; /* we want this many bits beyond the radix point */
    
    if (k >= 0)
    {
@@ -101,7 +107,8 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
    /* multiply column by U */
    fmpz_mat_mul(y, U, x);
 
-   fmpz_mat_scalar_tdiv_q_2exp(y, y, U_exp);
+   /* everything in U was already scaled by U_exp, so divide out scaling */
+   fmpz_mat_scalar_tdiv_q_2exp(y, y, U_exp); 
    fmpz_mat_scalar_smod(y, y, P_trunc);
 
    /* resize M */
@@ -113,12 +120,11 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
    for (j = 1; j < M->r; j++)
       fmpz_set(M->rows[j] + M->c - 1, y->rows[j - 1]);
 
-   /* cleanup */
    fmpz_mat_clear(x);
    fmpz_mat_clear(y);
    fmpz_clear(P_trunc);
 
    fmpz_mat_window_clear(U);
 
-   return 1;
+   return res;
 }

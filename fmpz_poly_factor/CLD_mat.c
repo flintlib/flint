@@ -16,6 +16,8 @@
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 
+#include "fmpz_mod_poly.h"
+
 slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
                               fmpz_poly_factor_t lifted_fac, fmpz_t P, ulong k)
 {
@@ -28,6 +30,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
    */
 
    slong i, zeroes, bound, lo_n, hi_n, r = lifted_fac->num;
+   slong bit_r = FLINT_MAX(r, 20);
    fmpz_poly_t gd, gcld, temp;
    fmpz_poly_t trunc_f, trunc_fac; /* don't initialise trunc_f, trunc_fac */
    fmpz_t t;
@@ -44,7 +47,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
 
    fmpz_init(t);
 
-   bound = fmpz_bits(P) - r - r/2; /* log_2(p^a * 2^{1.5r}) */
+   bound = fmpz_bits(P) - bit_r - bit_r/2; /* log_2(p^a / 2^{1.5r}) */
 
    for (lo_n = 0; lo_n < k; lo_n++)
    {
@@ -58,7 +61,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
 
    for (hi_n = 0; hi_n < k; hi_n++)
    {
-      fmpz_mul_ui(t, res->rows[r] + 2*hi_n - i - 1, (slong) sqrt(f->length));
+      fmpz_mul_ui(t, res->rows[r] + 2*k - hi_n - 1, (slong) sqrt(f->length));
 
       if (fmpz_bits(t) > bound)
          break;
@@ -114,6 +117,13 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
       }
 
       fmpz_poly_clear(temp);      
+   }
+
+   if (hi_n > 0)
+   {
+      /* move bounds into correct columns */
+      for (i = 0; i < hi_n; i++)
+         fmpz_set(res->rows[r] + lo_n + i, res->rows[r] + 2*k - hi_n + i);
    }
 
    /* do not clear trunc_fac */

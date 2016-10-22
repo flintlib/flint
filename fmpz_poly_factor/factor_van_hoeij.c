@@ -15,6 +15,10 @@
 #include "fmpz_lll.h"
 #include "fmpz_poly.h"
 
+#include "fmpq.h"
+#include "fmpq_vec.h"
+#include "fmpq_mat.h"
+
 slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f, 
                                                             slong r, ulong p)
 {
@@ -45,7 +49,8 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    fmpz_t fp, P, B, lc, bound_sum;
    slong i, r = fac->num;
    slong bit_r = FLINT_MAX(r, 20);
-   slong U_exp, a, next_col, num_coeffs, prev_num_coeffs, prev_exp, N, worst_exp;
+   slong U_exp, a, next_col, num_data_cols, num_coeffs;
+   slong prev_num_coeffs, prev_exp, N, worst_exp, num_rows;
    ulong sqN;
    fmpz_poly_t * v, * w;
    fmpz_mat_t col, data;
@@ -74,7 +79,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
                 
    /* compute heuristic starting precision */
    a = FLINT_MIN(a, _heuristic_van_hoeij_starting_precision(f, r, p));
-
+   
    /* start Hensel lift */
    fmpz_poly_factor_init(lifted_fac);
 
@@ -93,8 +98,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    /* compute bound */
    fmpz_set_ui(B, r + 1);
    fmpz_mul_2exp(B, B, 2*U_exp);
-   fmpz_sqrt(B, B);
-
+   
    /* compute leading coefficient */
    N = f->length - 1;
    sqN = (ulong) sqrt(N);
@@ -124,9 +128,9 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
       do {
          fmpz_mat_init(data, r + 1, 2*num_coeffs);
-         _fmpz_poly_factor_CLD_mat(data, f, lifted_fac, P, num_coeffs);
+         num_data_cols = _fmpz_poly_factor_CLD_mat(data, f, lifted_fac, P, num_coeffs);
 
-         for (next_col = prev_num_coeffs; next_col < 2*num_coeffs - prev_num_coeffs; next_col++)
+         for (next_col = prev_num_coeffs; next_col < num_data_cols - prev_num_coeffs; next_col++)
          {
             /* we alternate taking columns from the right and left */
             slong alt_col, diff = next_col - prev_num_coeffs;
@@ -134,17 +138,28 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
             if ((diff % 2) == 0)
                alt_col = prev_num_coeffs + diff/2;
             else
-               alt_col = 2*num_coeffs - prev_num_coeffs - (diff + 1)/2;
+               alt_col = num_data_cols - prev_num_coeffs - (diff + 1)/2;
 
             fmpz_mul_ui(bound_sum, data->rows[r] + alt_col, sqN);
             worst_exp = fmpz_bits(bound_sum);   
             
             for (i = 0; i < r; i++)
                fmpz_set(col->rows[i], data->rows[i] + alt_col);
-            
+
             fmpz_mat_next_col_van_hoeij(M, P, col, worst_exp, U_exp);
 
-            fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
+            num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
+            
+            {
+               fmpz_mat_t M2;
+               slong old_rows = M->r;
+               fmpz_mat_init(M2, num_rows, M->c);
+               M->r = num_rows;
+               fmpz_mat_set(M2, M);
+               fmpz_mat_swap(M2, M);
+               M2->r = old_rows;
+               fmpz_mat_clear(M2);
+            }
             
             if (fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
             {
