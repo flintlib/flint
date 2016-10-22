@@ -15,10 +15,6 @@
 #include "fmpz_lll.h"
 #include "fmpz_poly.h"
 
-#include "fmpq.h"
-#include "fmpq_vec.h"
-#include "fmpq_mat.h"
-
 slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f, 
                                                             slong r, ulong p)
 {
@@ -39,6 +35,58 @@ slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
    fmpz_clear(lead_b);
 
    return a;
+}
+
+/*
+   resize the matrix M to num_rows, where num_rows <= M->r
+   the algorithm assumes rows have been permuted in memory by LLL
+*/
+void fmpz_mat_van_hoeij_resize_matrix(fmpz_mat_t M, slong num_rows)
+{
+   slong i, j;
+   fmpz ** empty_rows;
+   slong num_empty = 0;
+   fmpz * end;
+   TMP_INIT;
+
+   if (M->r == num_rows)
+      return; /* nothing to be done */
+
+   TMP_START;
+
+   /* space to record empty rows within bounds of new matrix */
+   empty_rows = (fmpz **) TMP_ALLOC(M->r*sizeof(fmpz *));
+
+   /* end of new matrix in memory */
+   end = M->entries + num_rows*M->c;
+
+   /* clear rows that aren't needed */
+   for (i = num_rows; i < M->r; i++)
+   {
+      _fmpz_vec_zero(M->rows[i], M->c);
+      
+      /* this row can be repopulated */
+      if (M->rows[i] < end)
+         empty_rows[num_empty++] = M->rows[i];
+   }
+
+   for (i = 0; i < num_rows; i++)
+   {
+      if (M->rows[i] >= end) /* this row must be moved back to empty spot */
+      {
+         fmpz * old_row = M->rows[i];
+         fmpz * new_row = empty_rows[--num_empty];
+
+         for (j = 0; j < M->c; j++)
+            fmpz_swap(old_row + j, new_row + j);
+
+         M->rows[i] = new_row;
+      }
+   }
+
+   M->r = num_rows;
+
+   TMP_END;   
 }
 
 void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
@@ -150,7 +198,8 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
             num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
             
-            {
+            fmpz_mat_van_hoeij_resize_matrix(M, num_rows);
+            /*{
                fmpz_mat_t M2;
                slong old_rows = M->r;
                fmpz_mat_init(M2, num_rows, M->c);
@@ -159,7 +208,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
                fmpz_mat_swap(M2, M);
                M2->r = old_rows;
                fmpz_mat_clear(M2);
-            }
+            }*/
             
             if (fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
             {
