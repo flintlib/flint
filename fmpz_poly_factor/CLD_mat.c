@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2011, 2016 William Hart
+    Copyright (C) 2011 Andy Novocin
 
     This file is part of FLINT.
 
