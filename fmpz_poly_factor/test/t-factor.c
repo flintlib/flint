@@ -15,6 +15,14 @@
 #include "flint.h"
 #include "fmpz_poly.h"
 
+#define LONG_FAC_TEST 0 /* run an extra long test */
+
+#if LONG_FAC_TEST
+#define FAC_MULT 5
+#else
+#define FAC_MULT 1
+#endif
+
 int
 main(void)
 {
@@ -29,7 +37,7 @@ main(void)
         fmpz_t c;
         fmpz_poly_t f, g, h, t;
         fmpz_poly_factor_t fac;
-        slong j, k, n = n_randint(state, 10);
+        slong j, k, n = n_randint(state, 10*FAC_MULT);
         slong facs1 = 0, facs2 = 0;
 
         fmpz_init(c);
