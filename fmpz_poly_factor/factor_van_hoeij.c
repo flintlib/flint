@@ -199,16 +199,6 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
             num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
             
             fmpz_mat_van_hoeij_resize_matrix(M, num_rows);
-            /*{
-               fmpz_mat_t M2;
-               slong old_rows = M->r;
-               fmpz_mat_init(M2, num_rows, M->c);
-               M->r = num_rows;
-               fmpz_mat_set(M2, M);
-               fmpz_mat_swap(M2, M);
-               M2->r = old_rows;
-               fmpz_mat_clear(M2);
-            }*/
             
             if (fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
             {

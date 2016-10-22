@@ -18,9 +18,42 @@
 #define LONG_FAC_TEST 0 /* run an extra long test */
 
 #if LONG_FAC_TEST
+#include <sys/time.h>
 #define FAC_MULT 5
 #else
 #define FAC_MULT 1
+#endif
+
+#if LONG_FAC_TEST
+void factor_poly(const char * file_str, const char * name)
+{
+   FILE * file;
+   fmpz_poly_t f;
+   fmpz_poly_factor_t fac;
+   struct timeval start, stop;
+   ulong ms;
+
+   fmpz_poly_init(f);
+
+   file = fopen(file_str, "rw");
+       
+   fmpz_poly_fread(file, f);
+       
+   fmpz_poly_factor_init(fac);
+
+   gettimeofday(&start, NULL);
+   fmpz_poly_factor(fac, f);
+   gettimeofday(&stop, NULL);
+   ms = (stop.tv_sec - start.tv_sec)*1000 + (stop.tv_usec - start.tv_usec) / 1000;
+
+   flint_printf("%s has %wd factors\n", name, fac->num);
+   flint_printf("Time to factor %s: %ld ms\n\n", name, ms);
+
+   fmpz_poly_factor_clear(fac);
+   fclose(file);
+
+   fmpz_poly_clear(f);
+}
 #endif
 
 int
@@ -31,6 +64,28 @@ main(void)
 
     flint_printf("factor....");
     fflush(stdout);
+
+#if LONG_FAC_TEST
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P1_flint", "P1");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P2_flint", "P2");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P3_flint", "P3");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P4_flint", "P4");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P5_flint", "P5");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P6_flint", "P6");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P7_flint", "P7");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P8_flint", "P8");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/M12_5_flint", "M12_5");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/M12_6_flint", "M12_6");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/T1_flint", "T1");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/T2_flint", "T2");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/T3_flint", "T3");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/H1_flint", "H1");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/H2_flint", "H2");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/S7_flint", "S7");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/S8_flint", "S8");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/S9_flint", "S9");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/S10_flint", "S10");
+#endif
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
