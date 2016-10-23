@@ -16,6 +16,7 @@
 #include "fmpz_poly.h"
 
 #define LONG_FAC_TEST 0 /* run an extra long test */
+#define TEST_HARD 0 /* test hard polynomials */
 
 #if LONG_FAC_TEST
 #include <sys/time.h>
@@ -24,7 +25,7 @@
 #define FAC_MULT 1
 #endif
 
-#if LONG_FAC_TEST
+#if TEST_HARD
 void factor_poly(const char * file_str, const char * name)
 {
    FILE * file;
@@ -65,7 +66,7 @@ main(void)
     flint_printf("factor....");
     fflush(stdout);
 
-#if LONG_FAC_TEST
+#if TEST_HARD
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P1_flint", "P1");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P2_flint", "P2");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P3_flint", "P3");
@@ -80,11 +81,11 @@ main(void)
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/T2_flint", "T2");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/T3_flint", "T3");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/H1_flint", "H1");
-    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/H2_flint", "H2");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/S7_flint", "S7");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/S8_flint", "S8");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/S9_flint", "S9");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/S10_flint", "S10");
+    factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/H2_flint", "H2");
 #endif
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)

@@ -103,7 +103,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    fmpz_poly_t * v, * w;
    fmpz_mat_t col, data;
    slong * link;
-   int hensel_loops;
+   int hensel_loops, do_lll;
    fmpz_lll_t fl;
 
    /* set to identity */
@@ -113,7 +113,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
       fmpz_set_ui(M->rows[i] + i, 1);
 
    /* we prescale the identity matrix by 2^U_exp */
-   U_exp = bit_r;
+   U_exp = (slong) FLINT_BIT_COUNT(bit_r);
    
    fmpz_mat_scalar_mul_2exp(M, M, U_exp);
  
@@ -142,7 +142,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    }
 
    prev_exp = _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, fac, a);
-
+   
    /* compute bound */
    fmpz_set_ui(B, r + 1);
    fmpz_mul_2exp(B, B, 2*U_exp);
@@ -194,16 +194,19 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
             for (i = 0; i < r; i++)
                fmpz_set(col->rows[i], data->rows[i] + alt_col);
 
-            fmpz_mat_next_col_van_hoeij(M, P, col, worst_exp, U_exp);
+            do_lll = fmpz_mat_next_col_van_hoeij(M, P, col, worst_exp, U_exp);
 
-            num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
-            
-            fmpz_mat_van_hoeij_resize_matrix(M, num_rows);
-            
-            if (fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
+            if (do_lll)
             {
-               fmpz_mat_clear(data);
-               goto cleanup;
+               num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
+
+               fmpz_mat_van_hoeij_resize_matrix(M, num_rows);
+
+               if (fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
+               {
+                  fmpz_mat_clear(data);
+                  goto cleanup;
+               }
             }
          }
 

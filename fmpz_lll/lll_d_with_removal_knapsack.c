@@ -28,7 +28,7 @@
 #define FUNC_HEAD int fmpz_lll_d_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
 #define CALL_BABAI(NFF, BO, HF)                                        \
 do {                                                                   \
-    if (NFF < 50)                                                      \
+    if (NFF < 150)                                                      \
     {                                                                  \
         BO =                                                           \
             fmpz_lll_check_babai(kappa, B, U, mu, r, s, appB, expo, A, \

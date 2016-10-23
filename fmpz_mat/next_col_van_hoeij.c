@@ -80,10 +80,13 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
    slong s = M->r;
    fmpz_mat_t U, x, y;
    fmpz_t P_trunc;
-   int res = 1;
 
    k = fmpz_bits(P) - bit_r - bit_r/2;
    
+   /* check if LLL justified */
+   if (k < exp + FLINT_BIT_COUNT(r + 1))
+      return 0;
+
    fmpz_init(P_trunc);
    fmpz_mat_init(x, r, 1);
    fmpz_mat_init(y, s, 1);
@@ -126,5 +129,5 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
 
    fmpz_mat_window_clear(U);
 
-   return res;
+   return 1;
 }
