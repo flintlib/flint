@@ -19,13 +19,14 @@
 #define TEST_HARD 0 /* test hard polynomials */
 
 #if LONG_FAC_TEST
-#include <sys/time.h>
 #define FAC_MULT 5
 #else
 #define FAC_MULT 1
 #endif
 
 #if TEST_HARD
+#include <sys/time.h>
+
 void factor_poly(const char * file_str, const char * name)
 {
    FILE * file;
