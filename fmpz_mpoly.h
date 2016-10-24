@@ -280,29 +280,33 @@ FMPZ_MPOLY_INLINE
 mpoly_heap_t * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
 {
    ulong * exp;
-   slong l, j, r, i = 1, len;
+   slong i, j, s = --(*heap_len);
    mpoly_heap_t * x = heap[1].next;
 
-   (*heap_len)--;
+   i = 1;
+   j = 2;
 
-   if ((len = *heap_len) > 1)
+   while (j < s)
    {
-      exp = heap[len].exp;
-
-      while ((l = HEAP_LEFT(i)) <= len)
-      {
-         r = HEAP_RIGHT(i);
-         j = r > len || mpoly_monomial_lt(heap[l].exp, heap[r].exp, N) ? l : r;
-         if (mpoly_monomial_lt(heap[j].exp, exp, N))
-         {
-            heap[i] = heap[j];
-            i = j;
-         } else
-            break;
-       }
-
-       heap[i] = heap[len];
+      if (mpoly_monomial_lt(heap[j + 1].exp, heap[j].exp, N))
+         j++;
+      heap[i] = heap[j];
+      i = j;
+      j = HEAP_LEFT(j);
    }
+
+   /* insert last element into heap[i] */
+   exp = heap[s].exp;
+   j = HEAP_PARENT(i);
+
+   while (i > 1 && mpoly_monomial_lt(exp, heap[j].exp, N))
+   {
+      heap[i] = heap[j];
+      i = j;
+      j = HEAP_PARENT(j);
+   }
+
+   heap[i] = heap[s];
 
    return x; 
 }
