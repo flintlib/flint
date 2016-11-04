@@ -124,14 +124,14 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             } else
                fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
       
-            if (x->j < len3 - 1)
+            if (x->j < len3 - 1 || x->j == 0)
                Q[Q_len++] = x;
 
             while ((x = x->next) != NULL)
             {
                fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
 
-               if (x->j < len3 - 1)
+               if (x->j < len3 - 1 || x->j == 0)
                   Q[Q_len++] = x;
             }
          }
@@ -151,9 +151,12 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             _mpoly_heap_insert1(heap, exp2[x->i + 1] + exp3[0], x2, &heap_len);
          }
 
-         x->j++;
-         x->next = NULL;
-         _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &heap_len);
+         if (x->j < len3 - 1)
+         {
+            x->j++;
+            x->next = NULL;
+            _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &heap_len);
+         }
       }     
 
       if (small)
