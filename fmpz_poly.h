@@ -1156,7 +1156,7 @@ FLINT_DLL void fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
 FLINT_DLL void fmpz_poly_hensel_build_tree(slong * link, fmpz_poly_t *v, fmpz_poly_t *w, 
                                  const nmod_poly_factor_t fac);
 
-void fmpz_poly_hensel_lift(fmpz_poly_t Gout, fmpz_poly_t Hout, 
+FLINT_DLL void fmpz_poly_hensel_lift(fmpz_poly_t Gout, fmpz_poly_t Hout, 
     fmpz_poly_t Aout, fmpz_poly_t Bout, 
     const fmpz_poly_t f, 
     const fmpz_poly_t g, const fmpz_poly_t h, 

@@ -340,7 +340,7 @@ FLINT_DLL void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p);
 
 /* Input and output **********************************************************/
 
-char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
+FLINT_DLL char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
 FLINT_DLL int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx);
 

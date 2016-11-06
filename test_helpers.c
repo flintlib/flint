@@ -9,7 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-int flint_test_multiplier()
+#include "flint.h"
+
+FLINT_DLL int flint_test_multiplier()
 {
     return 10;
 }
