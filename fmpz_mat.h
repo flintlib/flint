@@ -331,7 +331,7 @@ FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
 /* Transforms */
 
-void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
+FLINT_DLL void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
 
 #include "fmpz_poly.h"
 
