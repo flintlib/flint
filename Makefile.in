@@ -28,10 +28,10 @@ TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
 
 export
 
-SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c thread_support.c exception.c
+SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c thread_support.c exception.c hashmap.c
 LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
