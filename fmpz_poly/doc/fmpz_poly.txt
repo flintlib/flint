@@ -3131,7 +3131,7 @@ void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos,
     positive roots of the polynomial \code{(pol, len)} using Sturm
     sequence. The Sturm sequence is computed via subresultant
     remainders obtained by repeated call to the function
-    _fmpz_poly_pseudo_rem_cohen.
+    \code{_fmpz_poly_pseudo_rem_cohen}.
 
     The polynomial is assumed to be squarefree, of degree larger than 1
     and with non-zero constant coefficient.
