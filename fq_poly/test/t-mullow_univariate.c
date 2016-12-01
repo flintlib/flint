@@ -1,6 +1,5 @@
 /*
     Copyright (C) 2012 Sebastian Pancratz 
-    Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -21,6 +20,6 @@
 
 #define T fq
 #define CAP_T FQ
-#include "fq_poly_templates/test/t-mul_univariate.c"
+#include "fq_poly_templates/test/t-mullow_univariate.c"
 #undef CAP_T
 #undef T

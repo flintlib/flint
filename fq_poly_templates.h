@@ -402,6 +402,18 @@ FLINT_DLL void TEMPLATE(T, poly_mullow_KS)(TEMPLATE(T, poly_t) rop,
                             slong n,
                             const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL void _TEMPLATE(T, poly_mullow_univariate)(TEMPLATE(T, struct) *rop,
+                             const TEMPLATE(T, struct) *op1, slong len1,
+                             const TEMPLATE(T, struct) *op2, slong len2,
+                             slong n,
+                             const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, poly_mullow_univariate)(TEMPLATE(T, poly_t) rop,
+                            const TEMPLATE(T, poly_t) op1,
+                            const TEMPLATE(T, poly_t) op2,
+                            slong n,
+                            const TEMPLATE(T, ctx_t) ctx);
+
 FLINT_DLL void _TEMPLATE(T, poly_mullow)(TEMPLATE(T, struct) *rop,
                           const TEMPLATE(T, struct) *op1, slong len1,
                           const TEMPLATE(T, struct) *op2, slong len2,
