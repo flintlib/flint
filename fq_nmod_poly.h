@@ -47,16 +47,6 @@
 #undef CAP_T
 #undef T
 
-FLINT_DLL void _fq_nmod_poly_mul_univariate(fq_nmod_struct *rop,
-                          const fq_nmod_struct *op1, slong len1,
-                          const fq_nmod_struct *op2, slong len2,
-                          const fq_nmod_ctx_t ctx);
-
-FLINT_DLL void fq_nmod_poly_mul_univariate(fq_nmod_poly_t rop,
-                         const fq_nmod_poly_t op1,
-                         const fq_nmod_poly_t op2,
-                         const fq_nmod_ctx_t ctx);
-
 #include "fq_nmod_poly_factor.h"
 
 #endif
