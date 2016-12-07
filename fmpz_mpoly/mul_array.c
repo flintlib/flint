@@ -412,13 +412,13 @@ slong _fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    bits1 = FLINT_ABS(bits2) + FLINT_ABS(bits3) +
           FLINT_BIT_COUNT(FLINT_MIN(poly2->length, poly3->length)) + sign;
 
-   small = FLINT_ABS(bits2) <= 64 && FLINT_ABS(bits3) <= 64;
+   small = FLINT_ABS(bits2) <= 62 && FLINT_ABS(bits3) <= 62;
 
    prod = 1;
    for (i = 0; i < N; i++)
       prod *= mults[i];
 
-   if (bits1 <= FLINT_BITS)
+   if (small && bits1 <= FLINT_BITS)
    {
       ulong * p1 = (ulong *) TMP_ALLOC(prod*sizeof(ulong));
 
@@ -431,7 +431,7 @@ slong _fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       len = _fmpz_mpoly_from_ulong_array1(&poly1->coeffs, &poly1->exps, &poly1->alloc, 
                                                         p1, mults, N, bits, 0);
-   } else if (bits1 <= 2*FLINT_BITS)
+   } else if (small && bits1 <= 2*FLINT_BITS)
    {
       ulong * p1 = (ulong *) TMP_ALLOC(2*prod*sizeof(ulong));
 
