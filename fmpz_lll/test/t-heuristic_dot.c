@@ -17,7 +17,7 @@
 #include "fmpz_lll.h"
 #include "ulong_extras.h"
 
-#define FMPZ_LLL_HD_EPS (1.0E-14)
+#define FMPZ_LLL_HD_EPS (1.0E-13)
 
 int
 main(void)

@@ -9,18 +9,22 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#ifndef EXCEPTION_H
-#define EXCEPTION_H
+#include <gmp.h>
+#include <stdlib.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_mpoly.h"
 
-typedef enum
+void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
-   FLINT_ERROR,  /* general error */
-   FLINT_IMPINV, /* impossible inverse */
-   FLINT_DOMERR, /* domain error */
-   FLINT_DIVZERO, /* divide by zero */
-   FLINT_EXPOF   /* exponent overflow */
-} flint_err_t;
+   if (poly->coeffs != NULL)
+   {
+      slong i;
 
-FLINT_DLL void flint_throw(flint_err_t exc, const char * msg, ...);
+      for (i = 0; i < poly->alloc; i++)
+         _fmpz_demote(poly->coeffs + i);
 
-#endif
+      flint_free(poly->coeffs);
+      flint_free(poly->exps);
+   }
+}
