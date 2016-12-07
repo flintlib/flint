@@ -16,19 +16,30 @@
 #include "fmpz_mpoly.h"
 #include "hashmap.h"
 
+/* improve locality */
+#define BLOCK 64
+
 void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
 {
-   slong i, j;
+   slong ii, i, jj, j;
    ulong * c2;
 
-   for (i = 0; i < len2; i++)
+   for (ii = 0; ii < len2 + BLOCK; ii += BLOCK)
    {
-      c2 = poly1 + (slong) exp2[i];
+      for (jj = 0; jj < len3 + BLOCK; jj += BLOCK)
+      {
+         for (i = ii; i < FLINT_MIN(ii + BLOCK, len2); i++)
+         {
+            c2 = poly1 + (slong) exp2[i];
 
-      for (j = 0; j < len3; j++)
-         c2[(slong) exp3[j]] += poly2[i]*poly3[j];
+            for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+            {
+               c2[(slong) exp3[j]] += poly2[i]*poly3[j];
+            }
+         }
+      }
    }
 }
 
@@ -36,22 +47,28 @@ void _fmpz_mpoly_addmul_array1_slong(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
 {
-   slong i, j;
+   slong ii, i, jj, j;
    ulong cy;
    ulong p[2]; /* for products of coefficients */
    ulong * c2, * c;
 
-   for (i = 0; i < len2; i++)
+   for (ii = 0; ii < len2 + BLOCK; ii += BLOCK)
    {
-      c2 = poly1 + 3*((slong) exp2[i]);
-
-      for (j = 0; j < len3; j++)
+      for (jj = 0; jj < len3 + BLOCK; jj += BLOCK)
       {
-         c = c2 + 3*((slong) exp3[j]);
+         for (i = ii; i < FLINT_MIN(ii + BLOCK, len2); i++)
+         {
+            c2 = poly1 + 3*((slong) exp2[i]);
 
-         smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
-         add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-         c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
+            for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+            {
+               c = c2 + 3*((slong) exp3[j]);
+
+               smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
+               add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
+               c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
+            }
+         }
       }
    }
 }
@@ -60,20 +77,26 @@ void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
 {
-   slong i, j;
+   slong ii, i, jj, j;
    ulong p[2]; /* for products of coefficients */
    ulong * c2, * c;
 
-   for (i = 0; i < len2; i++)
+   for (ii = 0; ii < len2 + BLOCK; ii += BLOCK)
    {
-      c2 = poly1 + 2*((slong) exp2[i]);
-
-      for (j = 0; j < len3; j++)
+      for (jj = 0; jj < len3 + BLOCK; jj += BLOCK)
       {
-         c = c2 + 2*((slong) exp3[j]);
+         for (i = ii; i < FLINT_MIN(ii + BLOCK, len2); i++)
+         {
+            c2 = poly1 + 2*((slong) exp2[i]);
 
-         smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
-         add_ssaaaa(c[1], c[0], c[1], c[0], p[1], p[0]);
+            for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+            {
+               c = c2 + 2*((slong) exp3[j]);
+
+               smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
+               add_ssaaaa(c[1], c[0], c[1], c[0], p[1], p[0]);
+            }
+         }
       }
    }
 }
@@ -82,18 +105,23 @@ void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                            const fmpz * poly3, const ulong * exp3, slong len3)
 {
-   slong i, j;
+   slong ii, i, jj, j;
    fmpz * c2, * c;
 
-   for (i = 0; i < len2; i++)
+   for (ii = 0; ii < len2 + BLOCK; ii += BLOCK)
    {
-      c2 = poly1 + (slong) exp2[i];
-
-      for (j = 0; j < len3; j++)
+      for (jj = 0; jj < len3 + BLOCK; jj += BLOCK)
       {
-         c = c2 + (slong) exp3[j];
+         for (i = ii; i < FLINT_MIN(ii + BLOCK, len2); i++)
+         {
+            c2 = poly1 + (slong) exp2[i];
 
-         fmpz_addmul(c, poly2 + i, poly3 + i);
+            for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+            {
+               c = c2 + (slong) exp3[j];
+               fmpz_addmul(c, poly2 + i, poly3 + i);
+            }
+         }
       }
    }
 }
@@ -412,7 +440,8 @@ slong _fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    bits1 = FLINT_ABS(bits2) + FLINT_ABS(bits3) +
           FLINT_BIT_COUNT(FLINT_MIN(poly2->length, poly3->length)) + sign;
 
-   small = FLINT_ABS(bits2) <= 62 && FLINT_ABS(bits3) <= 62;
+   small = FLINT_ABS(bits2) <= (FLINT_BITS - 2) &&
+           FLINT_ABS(bits3) <= (FLINT_BITS - 2);
 
    prod = 1;
    for (i = 0; i < N; i++)
