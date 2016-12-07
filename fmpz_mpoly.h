@@ -476,6 +476,14 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
    }   
 }
 
+FLINT_DLL int _fmpz_mpoly_fits_small(const fmpz * poly, slong len);
+
+FMPZ_MPOLY_INLINE
+slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
+{
+    return _fmpz_vec_max_bits(poly->coeffs, poly->length);
+}
+
 /*  Basic manipulation *******************************************************/
 
 FLINT_DLL void _fmpz_mpoly_max_degrees1(ulong * max_degs, const ulong * exps,
@@ -715,6 +723,9 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                            const fmpz * poly3, const ulong * exp3, slong len3);
 
 void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                         const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
+
+int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
 
 slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
