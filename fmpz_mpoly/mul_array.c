@@ -17,7 +17,7 @@
 #include "hashmap.h"
 
 /* improve locality */
-#define BLOCK 64
+#define BLOCK 128
 
 void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,
