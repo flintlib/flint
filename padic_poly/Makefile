@@ -35,7 +35,7 @@ $(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
 
 $(MOD_LOBJ): $(LOBJS)
-	$(CC) $(ABI_FLAG) -r $^ -o $@ -nostdlib
+	$(CC) $(ABI_FLAG) -fno-pie -Wl,-r $^ -o $@ -nostdlib
 
 $(BUILD_DIR)/%.lo: %.c
 	$(CC) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@
