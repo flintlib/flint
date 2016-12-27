@@ -29,25 +29,16 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
     }
     else if (n == 2)
     {
-        fmpz_t t, u;
+        fmpz_add(E(B, 0, 0), E(A, 0, 0), E(A, 1, 1));
 
-        fmpz_init(t);
-        fmpz_init(u);
-
-        fmpz_add(t, E(A, 0, 0), E(A, 1, 1));
-        fmpz_mul(u, E(A, 0, 1), E(A, 1, 0));
+        fmpz_mul(E(B, 0, 1), E(A, 0, 1), E(B, 0, 0));
+        fmpz_mul(E(B, 1, 0), E(A, 1, 0), E(B, 0, 0));
 
         fmpz_mul(E(B, 0, 0), E(A, 0, 0), E(A, 0, 0));
-        fmpz_add(E(B, 0, 0), E(B, 0, 0), u);
+        fmpz_mul(E(B, 1, 1), E(A, 0, 1), E(A, 1, 0));
+        fmpz_add(E(B, 0, 0), E(B, 0, 0), E(B, 1, 1));
 
-        fmpz_mul(E(B, 1, 1), E(A, 1, 1), E(A, 1, 1));
-        fmpz_add(E(B, 1, 1), E(B, 1, 1), u);
-
-        fmpz_mul(E(B, 0, 1), E(A, 0, 1), t);
-        fmpz_mul(E(B, 1, 0), E(A, 1, 0), t);
-
-        fmpz_clear(t);
-        fmpz_clear(u);
+        fmpz_addmul(E(B, 1, 1), E(A, 1, 1), E(A, 1, 1));
     }
     else if (n == 3)
     {
