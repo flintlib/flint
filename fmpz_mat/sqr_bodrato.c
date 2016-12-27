@@ -93,13 +93,10 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         fmpz_mat_t s1, s2, s3;
         fmpz_mat_t p1, p2, p3, p5, p6;
 
-        slong m = n, x, iseven = 1; 
+        slong m, x, isodd; 
 
-        if (n % 2 == 1)
-        {
-            m = n - 1;
-            iseven = 0;
-        }
+        isodd = n % 2;
+        m = n - isodd;
 
         fmpz_mat_init(s1, m/2, m/2);
         fmpz_mat_init(s2, m/2, m/2);
@@ -132,7 +129,7 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         fmpz_mat_add(s1, p3, p5);
         fmpz_mat_sub(s2, p1, s1);
 
-        if (iseven == 1)
+        if (isodd == 0)
         {
             for (i = n/2; i < n; i++)
             {
