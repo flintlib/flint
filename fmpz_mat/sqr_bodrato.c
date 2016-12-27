@@ -131,64 +131,64 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
         if (isodd == 0)
         {
-            for (i = n/2; i < n; i++)
-            {
-                for (j = 0; j < n/2; j++)
-                {
-                    fmpz_sub(E(B, i, j), E(s2, i - n/2, j), E(s3, i - n/2, j));
-                }
-            }
+            i = m/2 - 1;
+            do {
+                j = m/2 - 1;
+                do {
+                    fmpz_sub(E(B, i + m/2, j), E(s2, i, j), E(s3, i, j));
+                } while (--j >= 0);
+            } while (--i >= 0);
 
             fmpz_mat_sub(s3, s1, p2);
             fmpz_mat_sqr(s1, window11);
 
-            for (i = 0; i < n/2; i++)
-            {
-                for (j = 0; j < n/2; j++)
-                {
+            i = m/2 - 1;
+            do {
+                j = m/2 - 1;
+                do {
                     fmpz_add(E(B, i, j), E(s1, i, j), E(p5, i, j));
                     fmpz_add(E(B, i + m/2, j + m/2), E(p2, i, j), E(s2, i, j));
                     fmpz_sub(E(B, i, j + m/2), E(s3, i, j), E(p6, i, j) );
-               }
-            }
+                } while (--j >= 0);
+            } while (--i >= 0);
         }
         else
         {
-            for (i = 0; i < n; i++)
-            {
+            i = m;
+            do {
                 fmpz_mul(E(B, n - 1, i), E(A, n - 1, 0), E(A, 0, i));
                 fmpz_mul(E(B, i, n - 1), E(A, 0, n - 1), E(A, i, 0));
-                for (x = 1; x < n; x++)
-                {
+                x = m;
+                do {
                     fmpz_addmul(E(B, n - 1, i), E(A, n - 1, x), E(A, x, i));
                     fmpz_addmul(E(B, i, n - 1), E(A, x, n - 1), E(A, i, x));
-                }
-            }
+                } while (--x > 0);
+            } while (--i >= 0);
 
-            for (i = m/2; i < m; i++)
-            {
-                for (j = 0; j < m/2; j++)
-                {
+            i = m/2;
+            do {
+                j = m/2 - 1;
+                do {
                     fmpz_sub(E(B, i, j), E(s2, i - m/2, j), E(s3, i - m/2, j)); 
                     fmpz_addmul(E(B, i, j), E(A, i, n - 1), E(A, n - 1, j));
-                }
-            }
+                } while (--j >= 0);
+            } while (++i < m);
 
             fmpz_mat_sub(s3, s1, p2);
             fmpz_mat_sqr(s1, window11);
 
-            for (i = 0; i < m/2; i++)
-            {
-                for (j = 0; j < m/2; j++)
-                {
+            i = m/2 - 1;
+            do {
+                j = m/2 - 1;
+                do {
                     fmpz_add(E(B, i, j), E(s1, i, j), E(p5, i, j)); 
                     fmpz_addmul(E(B, i, j), E(A, i, n - 1), E(A, n - 1, j));
                     fmpz_add(E(B, i + m/2, j + m/2), E(p2, i, j), E(s2, i, j));
                     fmpz_addmul(E(B, i + m/2, j + m/2), E(A, i + m/2, n - 1), E(A, n - 1, j + m/2));
                     fmpz_sub(E(B, i, j + m/2), E(s3, i, j), E(p6, i, j));
                     fmpz_addmul(E(B, i, j + m/2), E(A, i, n - 1), E(A, n - 1, j + m/2));
-                }
-            }
+                } while (--j >= 0);
+            } while (--i >= 0);
         }
 
         fmpz_mat_window_clear(window11);
