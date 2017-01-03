@@ -31,6 +31,10 @@
 
 #define QS_DEBUG 1
 
+#define BITS_ADJUST 10 /* added to sieve entries to compensate for approximations */
+
+#define BLOCK_SIZE 65536 /* size of sieving cache block */
+
 typedef struct prime_t
 {
    mp_limb_t pinv;     /* precomputed inverse */
@@ -86,7 +90,7 @@ typedef struct qs_s
    int * sqrts;            /* square roots of kn mod factor base primes */
 
    slong small_primes;     /* number of primes to not sieve with */
-   slong second_prime;
+   slong second_prime;     /* index of first prime bigger than block size */
    slong sieve_size;       /* size of sieve to use */
 
    unsigned char sieve_bits;  /* sieve threshold */
@@ -97,8 +101,7 @@ typedef struct qs_s
     **************************************************************************/
 
    fmpz_t A;                /* current value of coefficient A */
-   fmpz_t A0;               /* possible candidate for A0 i.e. value of
-                               coefficient A excluding the non-factor-base
+   fmpz_t A0;               /* coefficient A excluding the non-factor-base
                                prime  */
    slong q_idx;             /* offset of q0 in factor base */
 
@@ -106,19 +109,19 @@ typedef struct qs_s
    fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
    mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
    fmpz_t * A0_divp;        /* (A0 / p) for each prime dividing A0 */
-   fmpz_t * B_terms;        /* B_terms[i] = A_divp[i] * (B0_terms[i] * q0^(-1))%p,
+   fmpz_t * B_terms;        /* B_terms[i] = A_divp[i] * (B0_terms[i] * q0^(-1)) % p,
                                where 'p' is a prime factor of 'A0' */
 
    mp_limb_t * B0_terms;    /* B0_terms[i] = (sqrt(kn) * (A0_divp[i])^(-1)) modulo p,
                                where 'p' is a prime factor of 'A0' */
 
-   mp_limb_t * A0_inv;      /* A0^(-1) mod p, for factor base prime p */
+   mp_limb_t * A0_inv;      /* A0^(-1) mod p, for factor base primes p */
    mp_limb_t ** A_inv2B;    /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
    mp_limb_t * soln1;       /* first root of poly */
    mp_limb_t * soln2;       /* second root of poly */
 
-   mp_limb_t * posn1;
-   mp_limb_t * posn2;
+   mp_limb_t * posn1;       /* position 1 to start sieving, for each prime p */ 
+   mp_limb_t * posn2;       /* position 2 to start sieving, for each prime p */ 
 
    fmpz_t target_A;         /* approximate target value for A coeff of poly */
 
@@ -127,13 +130,13 @@ typedef struct qs_s
 
    slong curr_poly;         /* rank of polynomial according to gray-code
                                formula */
-   slong s;                 /* number of prime factor of A0 */
+   slong s;                 /* number of prime factors of A0 */
    slong low;               /* minimum offset in factor base,
-                               for possible factor of 'A0'*/
+                               for possible factors of 'A0' */
 
    slong high;              /* maximum offset in factor base,
-                               for possible factor of 'A0' */
-   slong span;              /* total number of possible factor for 'A0' */
+                               for possible factors of 'A0' */
+   slong span;              /* total number of possible factors for 'A0' */
 
    /* parameters for calculating next subset of possible factor of 'A0' */
 
@@ -147,11 +150,11 @@ typedef struct qs_s
 
    FILE * siqs;          /* pointer to file for storing relations */
 
-   slong full_relation;  /* number of full relation */
-   slong num_cycles;     /* number of possible full relation from partials */
+   slong full_relation;  /* number of full relations */
+   slong num_cycles;     /* number of possible full relations from partials */
 
-   slong vertices;       /* number of different prime in partials */
-   slong components;     /* equals to 1 */
+   slong vertices;       /* number of different primes in partials */
+   slong components;     /* equal to 1 */
    slong edges;          /* total number of partials */
 
    slong table_size;     /* size of table */
@@ -233,10 +236,6 @@ static const mp_limb_t qsieve_tune[][5] =
 
 /* number of entries in the tuning table */
 #define QS_TUNE_SIZE (sizeof(qsieve_tune)/(5*sizeof(mp_limb_t)))
-
-#define BITS_ADJUST 10
-
-#define BLOCK_SIZE 65536
 
 void qsieve_init(qs_t qs_inf, fmpz_t n);
 

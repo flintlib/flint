@@ -51,8 +51,7 @@ void randprime(fmpz_t p, flint_rand_t state)
 
 int main(void)
 {
-   slong i;
-   mp_limb_t a, b;
+   slong i, j;
    fmpz_t n, x, y;
    fmpz_factor_t factors;
    FLINT_TEST_INIT(state);
@@ -70,7 +69,18 @@ int main(void)
 
       fmpz_mul(n, x, y);
 
+      fmpz_factor_init(factors);
+
       qsieve_factor(n, factors);
+
+      printf("num_factors = %ld\n", factors->num);
+      for (j = 0; j < factors->num; j++)
+      {
+         fmpz_print(factors->p + j);
+         printf("\n\n");
+      }
+
+      fmpz_factor_clear(factors);
    }
 
    fmpz_clear(n);
