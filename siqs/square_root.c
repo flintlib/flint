@@ -67,7 +67,7 @@ void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
          fmpz_mul(X, X, pow);
       }
 
-      if (i%10 == 0 || i == num_primes - 1) fmpz_mod(X, X, N);
+      if (i % 10 == 0 || i == num_primes - 1) fmpz_mod(X, X, N);
    }
 
    fmpz_clear(pow);

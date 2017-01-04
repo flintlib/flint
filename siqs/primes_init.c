@@ -41,6 +41,8 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
 
     /* compute the last prime in factor base */
     p = num == 0 ? 2 : factor_base[num - 1].p;
+    if (num == 0)
+       num = 3;
 
     n_primes_init(iter);
     n_primes_jump_after(iter, p);

@@ -37,6 +37,14 @@ void qsieve_init(qs_t qs_inf, fmpz_t n)
     qs_inf->ks_primes  = qsieve_tune[i][1]; /* number of Knuth-Schroeppel primes */
     qs_inf->qsort_rels = qsieve_tune[i][1];
     qs_inf->num_primes  = 0;
+    qs_inf->num_relations = 0;
+    qs_inf->full_relation = 0;
+    qs_inf->num_cycles = 0;
+    qs_inf->num_unmerged = 0;
+    qs_inf->columns = 0;
+    qs_inf->vertices = 0;
+    qs_inf->components = 0;
+    qs_inf->edges = 0;
 
     fmpz_init(qs_inf->kn); /* initialise kn */
 

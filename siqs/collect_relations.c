@@ -108,6 +108,7 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
     register unsigned char * pos;
 
     memset(sieve, qs_inf->sieve_fill, qs_inf->sieve_size + sizeof(ulong));
+    sieve[qs_inf->sieve_size] = (char) 255;
 
     for (i = 0; i < num_primes; i++)
     {
@@ -128,10 +129,10 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
             size = factor_base[pind].size;
             d1 = posn2[pind];
             d2 = p - d1;
-            Bp = (B - 2 * (d1 + d2));
+            Bp = B - 2*d1 - d2;
             pos = sieve + posn1[pind];
 
-            while (pos <= Bp)
+            while (pos < Bp)
             {
                 (*pos) += size, pos += d1, (*pos) += size, pos += d2;
                 (*pos) += size, pos += d1, (*pos) += size, pos += d2;
@@ -139,13 +140,13 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 
             Bp = B - d1;
 
-            while (pos <= Bp)
+            while (pos < Bp)
             {
                 (*pos) += size, pos += d1;
                 (*pos) += size, pos += d2;
             }
 
-            if (pos <= B)
+            if (pos < B)
             {
                 (*pos) += size, pos += d1;
                 posn2[pind] = d2;
@@ -165,12 +166,12 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
             size = factor_base[pind].size;
             pos = sieve + posn1[pind];
 
-            if (pos <= B)
+            if (pos < B)
             {
                 (*pos) += size;
                 pos += posn2[pind];
 
-                if (pos <= B)
+                if (pos < B)
                 {
                     (*pos) += size;
                     pos += p - posn2[pind];
@@ -200,7 +201,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
    mp_limb_t pinv;
    slong num_factors = 0;
    slong relations = 0;
-   static slong rel_count = 0;
    slong j, k;
 
    fmpz_t X, Y, res, p;
@@ -322,9 +322,8 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
 #endif
       if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
       {
-         rel_count++;
-         if (rel_count % 10 == 0)
-            printf("%ld relations\n", rel_count);
+         if (qs_inf->full_relation % 100 == 0)
+            printf("%ld relations\n", qs_inf->full_relation);
          
          if (fmpz_cmp_si(res, -1) == 0)
             small[2] = 1;
@@ -350,6 +349,31 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
          qs_inf->full_relation++;
          relations++;
 
+#if 0
+         if (small[2] != 0)
+            flint_printf("-");
+
+         if (small[0] != 0)
+            flint_printf("%wd^%d * ", qs_inf->k, small[0]);
+
+         if (small[1] != 0)
+            flint_printf("%wd^%d * ", WORD(2), small[1]);
+
+         for (k = 3; k < qs_inf->small_primes; k++)
+         {
+            if (small[k] != 0)
+               flint_printf("%wd^%d * ", factor_base[k].p, small[k]);
+         }
+
+         for (k = 0; k < num_factors - 1; k++)
+            flint_printf("%wd^%d * ", factor_base[factor[k].ind].p, factor[k].exp);
+
+         if (num_factors > 0)
+            flint_printf("%wd^%d\n", factor_base[factor[k].ind].p, factor[k].exp);
+         else
+            flint_printf("\n");
+#endif
+
          /* relations += qsieve_insert_relation(qs_inf, Y); */  /* Insert the relation in the matrix */
 
          /*  if (qs_inf->num_relations >= qs_inf->buffer_size)
@@ -362,13 +386,12 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
       }
       else
       {
-          small[2] = 0;
-
-          if (fmpz_cmp_si(res, WORD(0)) < 0)
+          if (fmpz_sgn(res) < 0)
           {
-              fmpz_abs(res, res);
+              fmpz_neg(res, res);
               small[2] = 1;
-          }
+          } else
+              small[2] = 0;
 
           if (fmpz_bits(res) <= 23)
           {
@@ -462,8 +485,11 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
     while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels)
     {
         qsieve_compute_C(qs_inf);
-        qsieve_do_sieving(qs_inf, sieve);
-        
+        if (qs_inf->sieve_size < BLOCK_SIZE)
+           qsieve_do_sieving(qs_inf, sieve);
+        else
+           qsieve_do_sieving2(qs_inf, sieve);
+
         relations += qsieve_evaluate_sieve(qs_inf, sieve);
         
         if (qs_inf->curr_poly == (1 << qs_inf->s))

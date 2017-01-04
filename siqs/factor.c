@@ -139,13 +139,13 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     **************************************************************************/
 
 #if QS_DEBUG
-    flint_printf("\nInitializing Relations and Linear Algbera\n");
+    flint_printf("\nInitializing Relations and Linear Algebra\n");
 #endif
 
     qsieve_linalg_init(qs_inf);
 
     /**************************************************************************
-        POLYNOMIAL INITIALIZATION AND SIEVEING:
+        POLYNOMIAL INITIALIZATION AND SIEVING:
         Sieve for relations
     **************************************************************************/
 
@@ -155,8 +155,8 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
-    qs_inf->sieve_bits = 64;
-    qs_inf->sieve_fill = 8;
+    qs_inf->sieve_bits = 80;
+    qs_inf->sieve_fill = 0;
     qs_inf->q_idx = qs_inf->num_primes;
     qs_inf->siqs = fopen("siqs.dat", "w");
 
@@ -185,7 +185,9 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
             
             for (j = qs_inf->num_primes; j < qs_inf->num_primes + qs_inf->ks_primes; j++)
             {
+#if QS_DEBUG
                 printf("j = %ld, num_primes + ks_primes = %ld\n", j, qs_inf->num_primes + qs_inf->ks_primes);
+#endif
                 qs_inf->q_idx  = j;
                 relation += qsieve_collect_relations(qs_inf, sieve);
                 
@@ -269,7 +271,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
                             if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
                             {
-                                if (fmpz_size(X)!= 1)
+                                if (fmpz_size(X) != 1)
                                     fmpz_fdiv_q(X, qs_inf->n, X); /* take smaller of two factors */
 
                                 diff = clock() - start;
@@ -328,12 +330,11 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 #endif
 
 cleanup:
-/*
+
     flint_free(nullrows);
     flint_free(sieve);
     qsieve_clear(qs_inf);
-*/
-    fclose(qs_inf->siqs);
+    remove("siqs.dat");
     fmpz_clear(X);
     fmpz_clear(Y);
     fmpz_clear(temp);

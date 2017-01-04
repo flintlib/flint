@@ -29,9 +29,9 @@
    #include <stdint.h>
 #endif
 
-#define QS_DEBUG 1
+#define QS_DEBUG 0
 
-#define BITS_ADJUST 10 /* added to sieve entries to compensate for approximations */
+#define BITS_ADJUST 5 /* added to sieve entries to compensate for approximations */
 
 #define BLOCK_SIZE 65536 /* size of sieving cache block */
 
@@ -67,6 +67,7 @@ typedef struct relation_t  /* format for relation */
 {
    mp_limb_t lp;          /* large prime, is 1, if relation is full */
    slong num_factors;     /* number of factors, excluding small factor */
+   slong small_primes;   /* number of small factors */
    slong * small;         /* exponent of small factors */
    fac_t * factor;        /* factor of relation */
    fmpz_t Y;              /* square root of sieve value for relation */
@@ -223,15 +224,15 @@ static const mp_limb_t qsieve_tune[][5] =
    {160, 150,  2000,  8,   2 *  40000}, /* */
    {170, 150,  2200,  9,   2 *  64000}, /* 50 digits */
    {180, 150,  2400,  9,   2 *  64000}, /* */
-   {190, 150,  4000, 10,   2 *  65536}, /* */
-   {200, 150,  4000, 10,   2 *  65536}, /* 60 digits */
-   {210, 150,  6000, 12,   2 *  64000}, /* */
-   {220, 200,  7500, 15,   2 *  64000}, /* */
-   {230, 200,  8500, 17,   2 *  64000}, /* 70 digits */
-   {240, 200, 18000, 19,   2 *  64000}, /* */
-   {250, 200, 24000, 19,   2 *  64000}, /* 75 digits */
-   {260, 200, 55000, 25,   2 * 128000}, /* 80 digits */
-   {270, 200, 64000, 27,   2 * 128000}
+   {190, 150,  9000, 13,   2 *  65536}, /* */
+   {200, 150,  9000, 13,   2 *  65536}, /* 60 digits */
+   {210, 150,  6000, 12,   2 *  65536}, /* */
+   {220, 200,  7500, 15,   2 *  65536}, /* */
+   {230, 200,  8500, 17,   2 *  65536}, /* 70 digits */
+   {240, 200, 18000, 19,   2 *  65536}, /* */
+   {250, 200, 24000, 19,   2 *  65536}, /* 75 digits */
+   {260, 200, 55000, 25,   2 * 131072}, /* 80 digits */
+   {270, 200, 64000, 27,   2 * 131072}
 };
 
 /* number of entries in the tuning table */

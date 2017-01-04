@@ -28,7 +28,7 @@
     (i) A is close to it's ideal value which is, sqrt(2 * kn) / M,
         where kn is the number to be factored and M is the size of sieve
    (ii) A should not contain too many small prime factors,
-        it will decrease number of relation
+        it will decrease number of relations
   (iii) A should not contain primes factor that are too large, or (i) will be
         difficult
    (iv) A should have as many factors as possible, to obtain large number of
@@ -236,7 +236,7 @@ void qsieve_init_A0(qs_t qs_inf)
     else if (bits > 180) i = 12;
     else i = 11;
 
-    for (num_factor = rem = 0; i > 7; i--)
+    for ( ; i > 7; i--)
     {
         num_factor = bits / i;
         rem = bits % i;
@@ -297,7 +297,7 @@ void qsieve_init_A0(qs_t qs_inf)
 
     /*
        factors of 'A0' :
-       if number of factor is less at most 3 just generate 3-subset of
+       if number of factors is less at most 3 just generate 3-subset of
        possible range from factor base lexicographically
        else generate (s - 1) - subset of odd indices from possible
        range from factor base lexicographically and choose last factor
@@ -395,7 +395,7 @@ void qsieve_init_A0(qs_t qs_inf)
     fmpz_set(qs_inf->upp_bound, upper_bound);
 
 #if QS_DEBUG
-    flint_printf("number of factor in hypercube = %wd\n", qs_inf->s);
+    flint_printf("number of factors in hypercube = %wd\n", qs_inf->s);
     flint_printf("factor base size = %wd max prime = %wu\n", qs_inf->num_primes, qs_inf->factor_base[qs_inf->num_primes - 1].p);
     flint_printf("possible candidate in range [ %wd, %wd ]\n", qs_inf->low, qs_inf->high);
     flint_printf("optimal value of hypercube = ");
@@ -492,7 +492,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     /*
        compute $(A/p) = (A0 / p) * q0$, and
        $B_i = (A / p) * \sqrt{kn} (A / p)^(-1) modulo p$
-       where 'p' are prime factor of 'A0';
+       where 'p' are prime factors of 'A0';
     */
 
     for (i = 0; i < s; i++)

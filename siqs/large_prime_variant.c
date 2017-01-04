@@ -310,6 +310,7 @@ relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
         str++;
 
     rel.num_factors = strtoul(str, &next, 16);
+    rel.small_primes = qs_inf->small_primes;
     str = next;
 
     for (i = 0; i < rel.num_factors; i++)
@@ -407,6 +408,7 @@ relation_t  qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
     }
 
     c.num_factors = k;
+    c.small_primes = qs_inf->small_primes;
 
     fmpz_init_set_ui(temp, a.lp);
 
@@ -457,8 +459,7 @@ int qsieve_compare_relation(const void * a, const void * b)
             return -1;
     }
 
-    /*
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < r1->small_primes; i++)
     {
         if (r1->small[i] > r2->small[i])
             return 1;
@@ -466,7 +467,6 @@ int qsieve_compare_relation(const void * a, const void * b)
         if (r1->small[i] < r2->small[i])
             return -1;
     }
-    */
 
     return 0;
 }
