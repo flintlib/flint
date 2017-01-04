@@ -194,6 +194,7 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
     str = fmpz_get_str(str, 16, Y);    /* converting value of 'Y'  to hex */
 
     flint_fprintf(qs_inf->siqs, "%s\n", str);   /* write value of 'Y' */
+    flint_free(str);
 }
 
 void qsieve_copy_relation(qs_t qs_inf, relation_t a)
@@ -565,7 +566,7 @@ void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list, slong num_relat
    process relations from the file
 */
 
-void qsieve_process_relation(qs_t qs_inf)
+int qsieve_process_relation(qs_t qs_inf)
 {
     char buf[1024];
     char * str;
@@ -575,6 +576,8 @@ void qsieve_process_relation(qs_t qs_inf)
     mp_limb_t * hash_table = qs_inf->hash_table;
     relation_t * rel_list = flint_malloc(50000 * sizeof(relation_t));
     relation_t * rlist;
+    int done = 0;
+    
     qs_inf->siqs = fopen("siqs.dat", "r");
 
     while (fgets(buf, sizeof(buf), qs_inf->siqs) != NULL)
@@ -591,6 +594,7 @@ void qsieve_process_relation(qs_t qs_inf)
     }
 
     fclose(qs_inf->siqs);
+
     num_relations = qsieve_remove_duplicates(rel_list, num_relations);
     rlist = flint_malloc(num_relations * sizeof(relation_t));
     memset(hash_table, 0, (1 << 22) * sizeof(mp_limb_t));
@@ -615,7 +619,27 @@ void qsieve_process_relation(qs_t qs_inf)
     }
 
     num_relations = j;
-    qsort(rlist, (size_t) num_relations, sizeof(relation_t), qsieve_compare_relation);
-    qsieve_insert_relation2(qs_inf, rlist, num_relations);
+
+    if (j < qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels)
+    {
+       qs_inf->edges -= 100;
+       done = 0;
+       qs_inf->siqs = fopen("siqs.dat", "a");
+    } else
+    {
+       done = 1;
+       qsort(rlist, (size_t) num_relations, sizeof(relation_t), qsieve_compare_relation);
+       qsieve_insert_relation2(qs_inf, rlist, num_relations);
+    }
+
+    for (i = 0; i < num_relations; i++)
+    {
+       flint_free(rel_list[i].small);
+       flint_free(rel_list[i].factor);
+    }
+    flint_free(rel_list);
+    flint_free(rlist);
+
+    return done;
 }
 

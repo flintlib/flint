@@ -33,7 +33,7 @@
 
 void randprime(fmpz_t p, flint_rand_t state)
 {
-    fmpz_randbits(p, state, 100);
+    fmpz_randbits(p, state, 30);
 
     fmpz_print(p); printf("\n");
  
@@ -58,11 +58,12 @@ int main(void)
 
    fmpz_init(x);
    fmpz_init(y);
+   fmpz_init(n);
 
    flint_printf("factor....");
    fflush(stdout);
 
-   for (i = 0; i < 1000; i++) /* Test random n */
+   for (i = 0; i < 100; i++) /* Test random n */
    {
       randprime(x, state);
       randprime(y, state);

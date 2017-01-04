@@ -155,8 +155,8 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
-    qs_inf->sieve_bits = 80;
-    qs_inf->sieve_fill = 0;
+    qs_inf->sieve_bits = 64;
+    qs_inf->sieve_fill = 20;
     qs_inf->q_idx = qs_inf->num_primes;
     qs_inf->siqs = fopen("siqs.dat", "w");
 
@@ -205,20 +205,21 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                 {
                     fclose(qs_inf->siqs);
 
-                    qsieve_process_relation(qs_inf);
+                    if (qsieve_process_relation(qs_inf))
+                    {
 
     /**************************************************************************
         REDUCE MATRIX:
         Perform some light filtering on the matrix
     **************************************************************************/
 
-                    num_primes = qs_inf->num_primes;
-                    qs_inf->num_primes += qs_inf->ks_primes;
+                       num_primes = qs_inf->num_primes;
+                       qs_inf->num_primes += qs_inf->ks_primes;
 
-                    ncols = qs_inf->num_primes + qs_inf->extra_rels;
-                    nrows = qs_inf->num_primes;
+                       ncols = qs_inf->num_primes + qs_inf->extra_rels;
+                       nrows = qs_inf->num_primes;
 
-                    reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
+                       reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
 
 
    /**************************************************************************
@@ -227,27 +228,27 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     **************************************************************************/
 
 #if QS_DEBUG
-                    flint_printf("\nBlock Lanczos\n");
+                       flint_printf("\nBlock Lanczos\n");
 #endif
  
 
-                    flint_randinit(state); /* initialise the random generator */
+                       flint_randinit(state); /* initialise the random generator */
 
-                    do /* repeat block lanczos until it succeeds */
-                    {
-                        nullrows = block_lanczos(state, nrows, 0, ncols, qs_inf->matrix);
-                    } while (nullrows == NULL);
+                       do /* repeat block lanczos until it succeeds */
+                       {
+                           nullrows = block_lanczos(state, nrows, 0, ncols, qs_inf->matrix);
+                       } while (nullrows == NULL);
 
-                    for (i = 0, mask = 0; i < ncols; i++) /* create mask of nullspace vectors */
-                        mask |= nullrows[i];
+                       for (i = 0, mask = 0; i < ncols; i++) /* create mask of nullspace vectors */
+                           mask |= nullrows[i];
 
-                    for (i = count = 0; i < 64; i++) /* count nullspace vectors found */
-                    {
-                        if (mask & ((uint64_t)(1) << i))
-                            count++;
-                    }
+                       for (i = count = 0; i < 64; i++) /* count nullspace vectors found */
+                       {
+                           if (mask & ((uint64_t)(1) << i))
+                               count++;
+                       }
 
-                    flint_randclear(state); /* clean up random state */
+                       flint_randclear(state); /* clean up random state */
 
 
     /**************************************************************************
@@ -256,38 +257,38 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     **************************************************************************/
 
 #if QS_DEBUG
-                    flint_printf("\nSquare Root\n");
+                       flint_printf("\nSquare Root\n");
 #endif
 
-                    for (count = 0; count < 64; count++)
-                    {
-                        if (mask & ((uint64_t)(1) << count))
-                        {
+                       for (count = 0; count < 64; count++)
+                       {
+                           if (mask & ((uint64_t)(1) << count))
+                           {
 
-                            qsieve_square_root(X, Y, qs_inf, nullrows, ncols, count, qs_inf->kn);
+                               qsieve_square_root(X, Y, qs_inf, nullrows, ncols, count, qs_inf->kn);
 
-                            fmpz_sub(X, X, Y);
-                            fmpz_gcd(X, X, qs_inf->n);
+                               fmpz_sub(X, X, Y);
+                               fmpz_gcd(X, X, qs_inf->n);
 
-                            if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
-                            {
-                                if (fmpz_size(X) != 1)
-                                    fmpz_fdiv_q(X, qs_inf->n, X); /* take smaller of two factors */
+                               if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
+                               {
+                                   if (fmpz_size(X) != 1)
+                                       fmpz_fdiv_q(X, qs_inf->n, X); /* take smaller of two factors */
 
-                                diff = clock() - start;
-                                flint_printf("factor found = ");
-                                fmpz_print(X);
-                                flint_printf(" time taken = %f \n", diff / 1000.0);
-                                goto cleanup;
-                            }
-                        }
+                                   diff = clock() - start;
+                                   flint_printf("factor found = ");
+                                   fmpz_print(X);
+                                   flint_printf(" time taken = %f \n", diff / 1000.0);
+                                   goto cleanup;
+                               }
+                           }
+                       }
+
+                       qs_inf->siqs = fopen("siqs.dat", "w");
+                       qsieve_linalg_re_init(qs_inf);
+                       qs_inf->num_primes = num_primes;
+                       relation = 0;
                     }
-
-                    qs_inf->siqs = fopen("siqs.dat", "w");
-                    qsieve_linalg_re_init(qs_inf);
-                    qs_inf->num_primes = num_primes;
-                    relation = 0;
-
                 }
             }
 
@@ -334,6 +335,8 @@ cleanup:
     flint_free(nullrows);
     flint_free(sieve);
     qsieve_clear(qs_inf);
+    qsieve_linalg_clear(qs_inf);
+    qsieve_poly_clear(qs_inf);
     remove("siqs.dat");
     fmpz_clear(X);
     fmpz_clear(Y);

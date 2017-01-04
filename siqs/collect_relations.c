@@ -485,7 +485,7 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
     while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels)
     {
         qsieve_compute_C(qs_inf);
-        if (qs_inf->sieve_size < BLOCK_SIZE)
+        if (qs_inf->sieve_size < 2*BLOCK_SIZE)
            qsieve_do_sieving(qs_inf, sieve);
         else
            qsieve_do_sieving2(qs_inf, sieve);
