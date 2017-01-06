@@ -75,7 +75,7 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
 
             for (j = 0; j < s; j++)
             {
-                if (A_ind[j] >= qs_inf->high)
+                if (A_ind[j] >= qs_inf->num_primes)
                 {
                     flint_printf("index out of bound !!");
                     abort();
@@ -104,6 +104,13 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
 
             while (i < j)
             {
+                if (j < low)
+                {
+                   j = low + 1;
+                   ret = 0;
+                   break;
+                }
+
                 mid = i + (j - i + 1) / 2;
 
                 fmpz_mul_ui(temp, prod, factor_base[2 * mid - 1 + low].p);
@@ -122,7 +129,7 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
                     break;
                 }
             }
-
+            
             if (j >= qs_inf->num_primes)
             {
                 flint_printf("A0 doesn't fit in bounds\n");
@@ -131,9 +138,10 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
 
             A_ind[s - 1] = j;
 
+            fmpz_mul_ui(prod, prod, qs_inf->factor_base[j].p);
+
             for (j = 0; j < s - 1; j++)
                 A_ind[j] = 2 * curr_subset[j] - 1 + low - 1;
-            fmpz_set(prod, temp);
 
          }
          else { ret = 0; }
@@ -189,7 +197,7 @@ void qsieve_re_init_A0(qs_t qs_inf)
     fmpz_clear(prod);
 }
 
-void qsieve_init_A0(qs_t qs_inf)
+int qsieve_init_A0(qs_t qs_inf)
 {
     slong i, j = 0;
     slong s, low, high, span, m, h;
@@ -344,6 +352,9 @@ void qsieve_init_A0(qs_t qs_inf)
             
             while (i < j)
             {
+                if (j < low)
+                   return 0;
+
                 mid = i + (j - i + 1) / 2;
                 
                 fmpz_mul_ui(temp, prod, factor_base[2 * mid - 1 + low].p);
@@ -376,10 +387,11 @@ void qsieve_init_A0(qs_t qs_inf)
 
         A_ind[s - 1] = (j == qs_inf->num_primes) ? j - 1 : j;
 
+        fmpz_mul_ui(prod, prod, qs_inf->factor_base[A_ind[s - 1]].p);
+
         for (j = 0; j < s - 1; j++)
             A_ind[j] = 2 * curr_subset[j] - 1 + low - 1;
 
-        fmpz_set(prod, temp);
     }
 
     qs_inf->h = h;
@@ -418,6 +430,8 @@ void qsieve_init_A0(qs_t qs_inf)
     fmpz_clear(temp2);
     fmpz_clear(upper_bound);
     fmpz_clear(lower_bound);
+
+    return 1;
 }
 
 /* precompute data associated with A0 which will remain fixed */
@@ -438,6 +452,7 @@ void qsieve_compute_pre_data(qs_t qs_inf)
        calculate $A0 / p$ and $B0_i = \sqrt{kn} * (A0 / p)^{-1} modulo p$
        where 'p' is prime factor of 'A0'
     */
+
     for (i = 0; i < s; i++)
     {
         p = factor_base[A_ind[i]].p;
@@ -518,7 +533,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     qinv = factor_base[qs_inf->q_idx].pinv;
     pmod = fmpz_fdiv_ui(qs_inf->A0, q);
     mod_inv = n_invmod(pmod, q);
-
+    
     qsqrt = sqrts[qs_inf->q_idx];
     pmod = n_mulmod2_preinv(mod_inv, qsqrt, q, qinv);
     fmpz_mul_ui(temp3, qs_inf->A0, pmod);

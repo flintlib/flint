@@ -12,6 +12,7 @@
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
+#include <math.h>
 #undef ulong
 #define ulong mp_limb_t
 
@@ -35,13 +36,14 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     clock_t start = clock(), diff;
     qs_t qs_inf;
     mp_limb_t small_factor, delta;
-    ulong exp = 0;
+    ulong expt = 0;
     unsigned char * sieve;
     slong ncols, nrows, i, j = 0, count, relation = 0, num_primes;
     uint64_t * nullrows = NULL;
     uint64_t mask;
     flint_rand_t state;
     fmpz_t temp, X, Y;
+    slong bits;
 
     fmpz_init(temp);
     fmpz_init(X);
@@ -63,6 +65,8 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     fmpz_print(qs_inf->n);
     flint_printf(" of %wu bits\n", qs_inf->bits);
 #endif
+
+    bits = exp(1.27*pow(log((double) qs_inf->bits), 0.755));
 
     /**************************************************************************
         KNUTH SCHROEPPEL:
@@ -88,10 +92,10 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         {
 	    fmpz_divexact_ui(temp, qs_inf->n, small_factor);
 	    fmpz_init_set(qs_inf->n, temp);
-	    exp++;
+	    expt++;
         }
 
-        _fmpz_factor_append_ui(factors, small_factor, exp);
+        _fmpz_factor_append_ui(factors, small_factor, expt);
         
         return 0;
     }
@@ -124,11 +128,11 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         {
             fmpz_divexact_ui(temp, qs_inf->n, small_factor);
             fmpz_init_set(qs_inf->n, temp);
-            exp++;
+            expt++;
         }
 
-        _fmpz_factor_append_ui(factors, small_factor, exp);
-        exp = 0;
+        _fmpz_factor_append_ui(factors, small_factor, expt);
+        expt = 0;
 
         return 0;
     }
@@ -155,8 +159,16 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
-    qs_inf->sieve_bits = 64;
-    qs_inf->sieve_fill = 20;
+    if (bits >= 64)
+    {
+       qs_inf->sieve_bits = bits;
+       qs_inf->sieve_fill = 0;
+    } else
+    {
+       qs_inf->sieve_bits = 64;
+       qs_inf->sieve_fill = 64 - bits;
+    }
+
     qs_inf->q_idx = qs_inf->num_primes;
     qs_inf->siqs = fopen("siqs.dat", "w");
 
@@ -177,7 +189,10 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         if (qs_inf->s)
             qsieve_re_init_A0(qs_inf);
         else
-            qsieve_init_A0(qs_inf);
+        {
+            if (!qsieve_init_A0(qs_inf))
+                break;
+        }
 
         do
         {
@@ -201,7 +216,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 #endif
  
                 if (qs_inf->full_relation + qs_inf->num_cycles >= 
-                   (qs_inf->num_primes + qs_inf->ks_primes + 1.5 * qs_inf->extra_rels))
+                   ((slong) (1.015*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
                 {
                     fclose(qs_inf->siqs);
 
@@ -231,7 +246,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                        flint_printf("\nBlock Lanczos\n");
 #endif
  
-
                        flint_randinit(state); /* initialise the random generator */
 
                        do /* repeat block lanczos until it succeeds */
@@ -250,7 +264,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
                        flint_randclear(state); /* clean up random state */
 
-
     /**************************************************************************
         SQUARE ROOT:
         Compute the square root and take the GCD of X-Y with N
@@ -258,14 +271,15 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
 #if QS_DEBUG
                        flint_printf("\nSquare Root\n");
+                       flint_printf("Found %ld kernel vectors\n", count);
 #endif
 
-                       for (count = 0; count < 64; count++)
+                       for (i = 0; i < 64; i++)
                        {
-                           if (mask & ((uint64_t)(1) << count))
+                           if (mask & ((uint64_t)(1) << i))
                            {
 
-                               qsieve_square_root(X, Y, qs_inf, nullrows, ncols, count, qs_inf->kn);
+                               qsieve_square_root(X, Y, qs_inf, nullrows, ncols, i, qs_inf->kn);
 
                                fmpz_sub(X, X, Y);
                                fmpz_gcd(X, X, qs_inf->n);
@@ -285,28 +299,43 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                        }
 
                        qs_inf->siqs = fopen("siqs.dat", "w");
-                       qsieve_linalg_re_init(qs_inf);
-                       qs_inf->num_primes = num_primes;
-                       relation = 0;
+                       qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
+                       goto more_primes; /* need more primes */
                     }
                 }
             }
-
         } while (qsieve_next_A0(qs_inf));
+
+more_primes:
 
 #if QS_DEBUG
         printf("Increasing factor base.\n");
 #endif
 
         delta = qs_inf->num_primes / 10;
-        num_primes = qs_inf->num_primes + delta;
-        qs_inf->num_primes += qs_inf->ks_primes;
-
+        delta = FLINT_MAX(delta, 100);
+        
 #if QS_DEBUG
         flint_printf("\nfactor base increment\n");
 #endif
+        qsieve_poly_clear(qs_inf);
+
         small_factor = qsieve_primes_increment(qs_inf, delta);
-        qs_inf->num_primes = num_primes;
+
+        for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
+        {
+            if (qs_inf->factor_base[j].p > BLOCK_SIZE)
+               break;
+        }
+
+        qs_inf->second_prime = j;
+        qs_inf->q_idx = qs_inf->num_primes;
+
+        qs_inf->s = 0; /* indicate polynomials need setting up again */
+
+#if QS_DEBUG
+        printf("Now %ld primes\n", qs_inf->num_primes);
+#endif
 
         if (small_factor)
         {

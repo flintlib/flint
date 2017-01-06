@@ -33,17 +33,13 @@
 
 void randprime(fmpz_t p, flint_rand_t state)
 {
-    fmpz_randbits(p, state, 30);
-
-    fmpz_print(p); printf("\n");
+    fmpz_randbits(p, state, 50);
  
     if (fmpz_sgn(p) < 0)
        fmpz_neg(p, p);
 
     if (fmpz_is_even(p))
        fmpz_add_ui(p, p, 1);
-
-    fmpz_print(p); printf("\n");
  
     while (!fmpz_is_probabprime(p))
        fmpz_add_ui(p, p, 2);
@@ -51,7 +47,7 @@ void randprime(fmpz_t p, flint_rand_t state)
 
 int main(void)
 {
-   slong i, j;
+   slong i;
    fmpz_t n, x, y;
    fmpz_factor_t factors;
    FLINT_TEST_INIT(state);
@@ -63,7 +59,7 @@ int main(void)
    flint_printf("factor....");
    fflush(stdout);
 
-   for (i = 0; i < 100; i++) /* Test random n */
+   for (i = 0; i < 50; i++) /* Test random n */
    {
       randprime(x, state);
       randprime(y, state);
@@ -73,13 +69,6 @@ int main(void)
       fmpz_factor_init(factors);
 
       qsieve_factor(n, factors);
-
-      printf("num_factors = %ld\n", factors->num);
-      for (j = 0; j < factors->num; j++)
-      {
-         fmpz_print(factors->p + j);
-         printf("\n\n");
-      }
 
       fmpz_factor_clear(factors);
    }

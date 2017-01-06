@@ -25,7 +25,7 @@
 #include "fmpz.h"
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
-#define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (10)))
+#define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (7)))
 
 /* some helper function, used for debugging */
 
@@ -189,7 +189,7 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
     flint_fprintf(qs_inf->siqs, "%X ", num_factors);  /* write number of factors */
 
     for (i = 0; i < num_factors; i++)               /* write factor along with exponent */
-        flint_fprintf(qs_inf->siqs, "%X %X ", factor[i].ind, factor[i].exp);
+        flint_fprintf(qs_inf->siqs, "%wx %X ", factor[i].ind, factor[i].exp);
 
     str = fmpz_get_str(str, 16, Y);    /* converting value of 'Y'  to hex */
 
@@ -235,6 +235,15 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
     hash_t * entry;
     mp_limb_t * hash_table =  qs_inf->hash_table;
     hash_t * table = qs_inf->table;
+    slong table_size = qs_inf->table_size;
+
+    if (qs_inf->vertices + 1 >= table_size)
+    {
+        table_size *= 1.1;
+        table = flint_realloc(table, table_size*sizeof(hash_t));
+        qs_inf->table_size = table_size;
+        qs_inf->table = table;
+    }
 
     first_offset = HASH(prime);
     offset = hash_table[first_offset];
@@ -268,17 +277,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
 void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
 {
     hash_t * entry;
-    slong table_size = qs_inf->table_size;
-    hash_t * table = qs_inf->table;
-
-    if (qs_inf->vertices + 1 >= table_size)
-    {
-        table_size *= 1.1;
-        table = flint_realloc(table, table_size * sizeof(hash_t));
-        qs_inf->table_size = table_size;
-        qs_inf->table = table;
-    }
-
+ 
     entry = qsieve_get_table_entry(qs_inf, prime);
     entry->count++;
 }
@@ -343,7 +342,7 @@ relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
    obtain a full relation
 */
 
-relation_t  qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
+relation_t  qsieve_merge_relation(qs_t qs_inf, relation_t a, relation_t b)
 {
     slong i = 0, j = 0, k = 0;
     relation_t  c;
@@ -458,6 +457,12 @@ int qsieve_compare_relation(const void * a, const void * b)
 
         if (r1->factor[i].ind < r2->factor[i].ind)
             return -1;
+
+        if (r1->factor[i].exp > r2->factor[i].exp)
+            return 1;
+
+        if (r1->factor[i].exp < r2->factor[i].exp)
+            return -1;
     }
 
     for (i = 0; i < r1->small_primes; i++)
@@ -518,6 +523,8 @@ void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list, slong num_relat
     fac_t * factor;
     la_col_t * matrix = qs_inf->matrix;
 
+    qs_inf->num_relations = 0;
+
     for (j = 0; j < num_relations; j++)
     {
         small = rel_list[j].small;
@@ -556,7 +563,6 @@ void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list, slong num_relat
 
         qs_inf->curr_rel += qs_inf->max_factors*2;
         qs_inf->num_relations++;
-
     }
 
     qs_inf->columns = qs_inf->num_relations;
@@ -570,22 +576,33 @@ int qsieve_process_relation(qs_t qs_inf)
 {
     char buf[1024];
     char * str;
-    slong i, j, num_relations = 0, full = 0;
+    slong i, j, num_relations = 0, num_relations2, full = 0;
     mp_limb_t prime;
     hash_t * entry;
     mp_limb_t * hash_table = qs_inf->hash_table;
-    relation_t * rel_list = flint_malloc(50000 * sizeof(relation_t));
+    slong rel_size = 50000;
+    relation_t * rel_list = (relation_t *) flint_malloc(rel_size * sizeof(relation_t));
     relation_t * rlist;
     int done = 0;
-    
+  
     qs_inf->siqs = fopen("siqs.dat", "r");
+
+#if QS_DEBUG & 64
+    printf("Getting relations\n");
+#endif
 
     while (fgets(buf, sizeof(buf), qs_inf->siqs) != NULL)
     {
         prime = strtoul(buf, &str, 16);
         entry = qsieve_get_table_entry(qs_inf, prime);
 
-        if (prime == 1  || entry->count >= 2)
+        if (num_relations == rel_size)
+        {
+           rel_list = (relation_t *) flint_realloc(rel_list, 2*rel_size * sizeof(relation_t));
+           rel_size *= 2;
+        }
+        
+        if (prime == 1 || entry->count >= 2)
         {
             rel_list[num_relations] = qsieve_parse_relation(qs_inf, str);
             rel_list[num_relations].lp = prime;
@@ -595,9 +612,18 @@ int qsieve_process_relation(qs_t qs_inf)
 
     fclose(qs_inf->siqs);
 
+#if QS_DEBUG & 64
+    printf("Removing duplicates\n");
+#endif
+
     num_relations = qsieve_remove_duplicates(rel_list, num_relations);
+
+#if QS_DEBUG & 64
+    printf("Merging relations\n");
+#endif
+
     rlist = flint_malloc(num_relations * sizeof(relation_t));
-    memset(hash_table, 0, (1 << 22) * sizeof(mp_limb_t));
+    memset(hash_table, 0, (1 << 25) * sizeof(mp_limb_t));
     qs_inf->vertices = 0;
 
     for (i = 0, j = 0; i < num_relations; i++)
@@ -620,6 +646,10 @@ int qsieve_process_relation(qs_t qs_inf)
 
     num_relations = j;
 
+#if QS_DEBUG & 64
+    printf("Sorting relations\n");
+#endif
+
     if (j < qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels)
     {
        qs_inf->edges -= 100;
@@ -628,8 +658,9 @@ int qsieve_process_relation(qs_t qs_inf)
     } else
     {
        done = 1;
-       qsort(rlist, (size_t) num_relations, sizeof(relation_t), qsieve_compare_relation);
-       qsieve_insert_relation2(qs_inf, rlist, num_relations);
+       num_relations2 = qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels;
+       qsort(rlist, (size_t) num_relations2, sizeof(relation_t), qsieve_compare_relation);
+       qsieve_insert_relation2(qs_inf, rlist, num_relations2);
     }
 
     for (i = 0; i < num_relations; i++)

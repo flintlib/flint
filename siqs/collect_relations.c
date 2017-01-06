@@ -322,8 +322,10 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
 #endif
       if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
       {
+#if QS_DEBUG
          if (qs_inf->full_relation % 100 == 0)
             printf("%ld relations\n", qs_inf->full_relation);
+#endif
          
          if (fmpz_cmp_si(res, -1) == 0)
             small[2] = 1;
@@ -393,11 +395,11 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
           } else
               small[2] = 0;
 
-          if (fmpz_bits(res) <= 23)
+          if (fmpz_bits(res) <= 30)
           {
               prime = fmpz_get_ui(res);
-
-              if (prime > factor_base[qs_inf->q_idx].p && prime < 60 * factor_base[qs_inf->num_primes - 1].p && n_is_prime(prime))
+              
+              if (prime < 60 * factor_base[qs_inf->num_primes - 1].p && n_gcd(prime, qs_inf->k) == 1)
               {
                   for (k = 0; k < qs_inf->s; k++)  /* commit any outstanding A factor */
                   {
@@ -482,7 +484,7 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
 
     qsieve_init_poly_first(qs_inf);
 
-    while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels)
+    while (1)
     {
         qsieve_compute_C(qs_inf);
         if (qs_inf->sieve_size < 2*BLOCK_SIZE)

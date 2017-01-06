@@ -162,7 +162,6 @@ typedef struct qs_s
    hash_t * table;       /* store 'prime' occurring in partial */
    mp_limb_t * hash_table;  /* to keep track of location of primes in 'table' */
 
-   slong qsort_rels; /* number of relations to accumulate before sorting */
    slong extra_rels; /* number of extra relations beyond num_primes */
    slong max_factors; /* maximum number of factors a relation can have */
 
@@ -209,30 +208,33 @@ typedef qs_s qs_t[1];
 */
 static const mp_limb_t qsieve_tune[][5] =
 {
-   {40,   50,   200,  5,   2 *   3000}, /* 12 digits */
-   {50,   80,   300,  5,   2 *   3500}, /* 15 digits */
-   {60,  100,   500,  5,   2 *   4000}, /* 18 digits */
-   {70,  100,   800,  6,   2 *   6000}, /* 21 digits */
-   {80,  150,  1000,  6,   2 *   8000}, /* 24 digits */
-   {90,  150,  1000,  7,   2 *  10000}, /* */
-   {100, 150,  1500,  7,   2 *  32000}, /* */
-   {110, 150,  1500,  7,   2 *  32000}, /* 31 digits */
-   {120, 150,  1500,  7,   2 *  32000}, /* */
-   {130, 100,  1200,  9,   2 *  32000}, /* 41 digits */
-   {140, 100,  2000,  8,   2 *  28000}, /* */
-   {150, 100,  3000,  8,   2 *  32000}, /* 45 digit */
-   {160, 150,  4000,  8,   2 *  40000}, /* */
-   {170, 150,  6000,  9,   2 *  65536}, /* 50 digits */
-   {180, 150,  7000,  9,   2 *  65536}, /* */
+   {10,   50,   100,  5,   2 *   2000}, /* */
+   {40,   50,   120,  6,   2 *   2500}, /* */
+   {40,   50,   150,  7,   2 *   2000}, /* */
+   {40,   50,   200,  8,   2 *   3000}, /* 12 digits */
+   {50,   80,   200,  8,   2 *   3500}, /* 15 digits */
+   {60,  100,   200,  8,   2 *   4000}, /* 18 digits */
+   {70,  100,   200,  9,   2 *   7000}, /* 21 digits */
+   {80,  100,  400,  9,   2 *   8000}, /* 24 digits */
+   {90,  100,  600, 10,   2 *  12000}, /* */
+   {100, 100,  900, 10,   2 *  25000}, /* */
+   {110, 100,  1200, 10,   2 *  32000}, /* 31 digits */
+   {120, 100,  1500, 10,   2 *  32000}, /* */
+   {130, 100,  2000, 11,   2 *  40000}, /* 41 digits */
+   {140, 100,  2000, 11,   2 *  50000}, /* */
+   {150, 100,  3000, 11,   2 *  65536}, /* 45 digit */
+   {160, 150,  4000, 11,   2 *  65536}, /* */
+   {170, 150,  5000, 12,   2 *  65536}, /* 50 digits */
+   {180, 150,  7000, 12,   2 *  65536}, /* */
    {190, 150,  9000, 13,   2 *  65536}, /* */
    {200, 150,  9000, 13,   2 *  65536}, /* 60 digits */
-   {210, 150,  10000, 12,   2 *  65536}, /* */
-   {220, 200,  12000, 15,   2 *  65536}, /* */
-   {230, 200,  15000, 17,   2 *  65536}, /* 70 digits */
-   {240, 200, 18000, 19,   2 *  65536}, /* */
-   {250, 200, 24000, 19,   2 *  65536}, /* 75 digits */
-   {260, 200, 55000, 25,   2 * 131072}, /* 80 digits */
-   {270, 200, 64000, 27,   2 * 131072}
+   {210, 150, 10000, 13,   2 *  65536}, /* */
+   {220, 300, 12000, 15,   2 *  65536}, /* */
+   {230, 350, 40000, 17,   3 *  65536}, /* 70 digits */
+   {240, 400, 60000, 19,   4 *  65536}, /* */
+   {250, 500, 90000, 19,   4 *  65536}, /* 75 digits */
+   {260, 600, 100000, 25,   5 *  65536}, /* 80 digits */
+   {270, 800, 150000, 27,   6 * 65536}
 };
 
 /* number of entries in the tuning table */
@@ -259,7 +261,7 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf);
 
 void qsieve_re_init_A0(qs_t qs_inf);
 
-void qsieve_init_A0(qs_t qs_inf);
+int qsieve_init_A0(qs_t qs_inf);
 
 void qsieve_compute_pre_data(qs_t qs_inf);
 
@@ -329,13 +331,6 @@ static __inline__ void insert_col_entry(la_col_t * col, slong entry)
 
    col->data[col->weight] = entry;
    col->weight++;
-}
-
-static __inline__ void copy_col(la_col_t * col2, la_col_t * col1)
-{
-   col2->weight = col1->weight;
-   col2->data = col1->data;
-   col2->orig = col1->orig;
 }
 
 static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)

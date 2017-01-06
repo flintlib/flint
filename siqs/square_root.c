@@ -60,6 +60,13 @@ void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
 
    for (i = 0; i < num_primes; i++)
    {
+#if QS_DEBUG
+      if (prime_count[i] & 1)
+      {
+         flint_printf("Not a square in square root, %ld^%ld\n", factor_base[i].p, prime_count[i]);
+         flint_printf("This is prime %ld of %ld factor base primes and %ld ks primes\n", i, qs_inf->num_primes, qs_inf->ks_primes);
+      }
+#endif
       if (prime_count[i])
       {
          fmpz_set_si(pow, factor_base[i].p);

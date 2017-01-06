@@ -59,9 +59,9 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
 
     /*
         maximum number of primes to try
-        may not exceed number of factor base primes (recall k and 2 are factor base primes)
+        may not exceed number of factor base primes (recall k and 2 and -1 are factor base primes)
     */
-    max = FLINT_MIN(qs_inf->ks_primes, qs_inf->num_primes - 2);
+    max = FLINT_MIN(qs_inf->ks_primes, qs_inf->num_primes - 3);
 
     n_primes_init(iter);
     n_primes_next(iter);

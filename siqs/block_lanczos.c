@@ -162,18 +162,29 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 
 	} while (r != reduced_rows);
 
-#if (QS_DEBUG & 128)
+#if QS_DEBUG
 	flint_printf("reduce to %wd x %wd in %wd passes\n", 
 			reduced_rows, reduced_cols, passes);
 #endif
 
+        for (i = 0, j = 0; i < *nrows; i++)
+        {
+           if (counts[i] > 0)
+              counts[i] = j++;
+        }
+
+        for (i = 0; i < reduced_cols; i++)
+        {
+           la_col_t *col = cols + i;
+				
+           for (j = 0; j < col->weight; j++)
+              col->data[j] = counts[col->data[j]];
+        }
+
 	flint_free(counts);
     
-	/* record the final matrix size. Note that we can't touch
-	   nrows because all the column data (and the sieving relations
-	   that produced it) would have to be updated */
-
 	*ncols = reduced_cols;
+        *nrows = reduced_rows;
 }
 
 /*-------------------------------------------------------------------*/
@@ -425,7 +436,7 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 		}
 				
 		if (j == 64) {
-#if (QS_DEBUG & 128)
+#if QS_DEBUG
 			flint_printf("lanczos error: submatrix "
 					"is not invertible\n");
 #endif
@@ -464,7 +475,7 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 		mask |= bitmask[last_s[i]];
 
 	if (mask != (uint64_t)(-1)) {
-#if (QS_DEBUG & 128)
+#if QS_DEBUG
 		flint_printf("lanczos error: not all columns used\n");
 #endif
 		return 0;
@@ -894,14 +905,13 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 		dim1 = dim0;
 	}
 
-#if (QS_DEBUG & 128)
+#if QS_DEBUG
 	flint_printf("lanczos halted after %wd iterations\n", iter);
 #endif
 
 	/* free unneeded storage */
 
-    
-    flint_free(vnext);
+        flint_free(vnext);
 	flint_free(scratch);
 	flint_free(v0);
 	flint_free(vt_a_v[0]);
@@ -920,7 +930,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	   over again */
 
 	if (dim0 == 0) {
-#if (QS_DEBUG & 128)
+#if QS_DEBUG
 		flint_printf("linear algebra failed; retrying...\n");
 #endif
 		flint_free(x);
