@@ -13,6 +13,7 @@
 #define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #undef ulong
 #define ulong mp_limb_t
 
@@ -20,20 +21,29 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_factor.h"
 #include "siqs.h"
 
 #include <inttypes.h>
 #define _STDC_FORMAT_MACROS
 #include <time.h>
 
+int compare_facs(const void * a, const void * b)
+{
+   fmpz * x = (fmpz *) a;
+   fmpz * y = (fmpz *) b;
+
+   return fmpz_cmp(x, y);
+}
+
 /*
    Returns a factor of n.
    Assumes n is not prime and not a perfect power.
 */
 
-mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
+void qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 {
-    clock_t start = clock(), diff;
     qs_t qs_inf;
     mp_limb_t small_factor, delta;
     ulong expt = 0;
@@ -43,12 +53,34 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     uint64_t mask;
     flint_rand_t state;
     fmpz_t temp, X, Y;
-    slong bits;
+    slong bits, num_facs;
+    fmpz * facs;
+
+    if (fmpz_sgn(n) < 0)
+    {
+       fmpz_t n2;
+
+       fmpz_init(n2);
+       fmpz_abs(n2, n);
+
+       factors->sign *= -1;
+       
+       qsieve_factor(n2, factors);
+
+       fmpz_clear(n2);
+       
+       return;
+    }
+
+    if (fmpz_is_probabprime(n))
+    {
+       _fmpz_factor_append(factors, n, 1);
+
+       return;
+    }
 
     fmpz_init(temp);
-    fmpz_init(X);
-    fmpz_init(Y);
-
+       
     /**************************************************************************
         INITIALISATION:
         Initialise the qs_t structure.
@@ -97,7 +129,13 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
         _fmpz_factor_append_ui(factors, small_factor, expt);
         
-        return 0;
+        qsieve_clear(qs_inf);
+
+        qsieve_factor(temp, factors);
+
+        fmpz_clear(temp);
+        
+        return;
     }
 
     /* compute kn */
@@ -132,10 +170,18 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         }
 
         _fmpz_factor_append_ui(factors, small_factor, expt);
-        expt = 0;
+        
+        qsieve_clear(qs_inf);
 
-        return 0;
+        qsieve_factor(temp, factors);
+
+        fmpz_clear(temp);
+
+        return;
     }
+
+    fmpz_init(X);
+    fmpz_init(Y);
 
     /**************************************************************************
         INITIALISE RELATION/LINEAR ALGEBRA DATA:
@@ -274,6 +320,9 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                        flint_printf("Found %ld kernel vectors\n", count);
 #endif
 
+                       facs = _fmpz_vec_init(100);
+                       num_facs = 0;
+
                        for (i = 0; i < 64; i++)
                        {
                            if (mask & ((uint64_t)(1) << i))
@@ -285,18 +334,45 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                                fmpz_gcd(X, X, qs_inf->n);
 
                                if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
-                               {
-                                   if (fmpz_size(X) != 1)
-                                       fmpz_fdiv_q(X, qs_inf->n, X); /* take smaller of two factors */
-
-                                   diff = clock() - start;
-                                   flint_printf("factor found = ");
-                                   fmpz_print(X);
-                                   flint_printf(" time taken = %f \n", diff / 1000.0);
-                                   goto cleanup;
-                               }
+                                   fmpz_set(facs + num_facs++, X);
                            }
                        }
+
+                       if (num_facs > 0)
+                       {
+                          fmpz_t temp, temp2;
+
+                          fmpz_init(temp);
+                          fmpz_init(temp2);
+
+                          _fmpz_factor_append(factors, qs_inf->n, 1);
+
+                          qsort((void *) facs, num_facs, sizeof(fmpz), compare_facs);
+
+                          for (i = 0; i < num_facs; i++)
+                          {
+                             fmpz_gcd(temp, factors->p + factors->num - 1, facs + i);
+                             if (!fmpz_is_one(temp))
+                             {
+                                factors->exp[factors->num - 1] = fmpz_remove(temp2, factors->p + factors->num - 1, temp);
+                                fmpz_set(factors->p + factors->num - 1, temp);
+                                
+                                if (fmpz_is_one(temp2))
+                                   break;
+                                else
+                                   _fmpz_factor_append(factors, temp2, 1);
+                             }  
+                          }
+
+                          fmpz_clear(temp);
+                          fmpz_clear(temp2);
+
+                          _fmpz_vec_clear(facs, 100);
+
+                          goto cleanup;
+                       }
+
+                       _fmpz_vec_clear(facs, 100);
 
                        qs_inf->siqs = fopen("siqs.dat", "w");
                        qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
@@ -343,6 +419,18 @@ more_primes:
 #if QS_DEBUG
             flint_printf("found small factor %wu while incrementing factor base\n, small_factor");
 #endif
+
+            while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
+            {
+               fmpz_divexact_ui(temp, qs_inf->n, small_factor);
+               fmpz_init_set(qs_inf->n, temp);
+               expt++;
+            }
+
+            _fmpz_factor_append_ui(factors, small_factor, expt);
+        
+            qsieve_factor(temp, factors);
+            
             goto cleanup;
         }
 
@@ -370,6 +458,4 @@ cleanup:
     fmpz_clear(X);
     fmpz_clear(Y);
     fmpz_clear(temp);
-    
-    return 1;
 }

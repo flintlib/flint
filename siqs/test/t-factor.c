@@ -31,9 +31,9 @@
 #include "fmpz.h"
 #include "siqs.h"
 
-void randprime(fmpz_t p, flint_rand_t state)
+void randprime(fmpz_t p, flint_rand_t state, slong bits)
 {
-    fmpz_randbits(p, state, 50);
+    fmpz_randbits(p, state, bits);
  
     if (fmpz_sgn(p) < 0)
        fmpz_neg(p, p);
@@ -48,21 +48,22 @@ void randprime(fmpz_t p, flint_rand_t state)
 int main(void)
 {
    slong i;
-   fmpz_t n, x, y;
+   fmpz_t n, x, y, z;
    fmpz_factor_t factors;
    FLINT_TEST_INIT(state);
 
    fmpz_init(x);
    fmpz_init(y);
+   fmpz_init(z);
    fmpz_init(n);
 
    flint_printf("factor....");
    fflush(stdout);
 
-   for (i = 0; i < 50; i++) /* Test random n */
+   for (i = 0; i < 20; i++) /* Test random n */
    {
-      randprime(x, state);
-      randprime(y, state);
+      randprime(x, state, 50);
+      randprime(y, state, 50);
 
       fmpz_mul(n, x, y);
 
@@ -70,12 +71,66 @@ int main(void)
 
       qsieve_factor(n, factors);
 
+      if (factors->num < 2)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("%ld factors found\n", factors->num);
+         abort();
+      }
+
+      fmpz_factor_clear(factors);
+   }
+
+   for (i = 0; i < 20; i++) /* Test random n */
+   {
+      randprime(x, state, 40);
+      randprime(y, state, 40);
+      randprime(z, state, 40);
+
+      fmpz_mul(n, x, y);
+      fmpz_mul(n, n, z);
+
+      fmpz_factor_init(factors);
+
+      qsieve_factor(n, factors);
+
+      if (factors->num < 3)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("%ld factors found\n", factors->num);
+         abort();
+      }
+
+      fmpz_factor_clear(factors);
+   }
+
+   for (i = 0; i < 20; i++) /* Test random n */
+   {
+      randprime(x, state, 10);
+      randprime(y, state, 10);
+      randprime(z, state, 40);
+
+      fmpz_mul(n, x, y);
+      fmpz_mul(n, n, z);
+
+      fmpz_factor_init(factors);
+
+      qsieve_factor(n, factors);
+
+      if (factors->num < 3)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("%ld factors found\n", factors->num);
+         abort();
+      }
+
       fmpz_factor_clear(factors);
    }
 
    fmpz_clear(n);
    fmpz_clear(x);
    fmpz_clear(y);
+   fmpz_clear(z);
 
    FLINT_TEST_CLEANUP(state);
 

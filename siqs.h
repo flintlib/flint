@@ -246,7 +246,7 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
 
 void qsieve_clear(qs_t qs_inf);
 
-mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors);
+void qsieve_factor(fmpz_t n, fmpz_factor_t factors);
 
 prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
                                                              slong num_primes);
