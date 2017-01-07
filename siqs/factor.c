@@ -80,6 +80,17 @@ void qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     }
 
     fmpz_init(temp);
+
+    if (fmpz_is_square(n))
+    {
+       fmpz_sqrt(temp, n);
+
+       _fmpz_factor_append(factors, temp, 2);
+
+       fmpz_clear(temp);
+
+       return;       
+    }
        
     /**************************************************************************
         INITIALISATION:
@@ -327,7 +338,6 @@ void qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                        {
                            if (mask & ((uint64_t)(1) << i))
                            {
-
                                qsieve_square_root(X, Y, qs_inf, nullrows, ncols, i, qs_inf->kn);
 
                                fmpz_sub(X, X, Y);
