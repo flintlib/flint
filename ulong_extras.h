@@ -332,6 +332,8 @@ FLINT_DLL ulong n_cbrtrem(ulong* remainder, ulong n);
 
 FLINT_DLL int n_is_perfect_power235(ulong n);
 
+FLINT_DLL int n_is_perfect_power(ulong * root, ulong n);
+
 FLINT_DLL int n_is_oddprime_small(ulong n);
 
 FLINT_DLL int n_is_oddprime_binary(ulong n);

@@ -954,6 +954,12 @@ int n_is_perfect_power235(ulong n)
     root can be taken, if indicated, to determine whether the power
     of that root is exactly equal to $n$.
 
+int n_is_perfect_power(ulong * root, ulong n)
+
+    If $n = r^k$, return $k$ and set \code{root} to $r$. Note that $0$ and
+    $1$ are considered squares. No guarantees are made about $r$ or $k$
+    being the minimum possible value.
+
 ulong n_rootrem(ulong* remainder, ulong n, ulong root)
 
     This function uses the Newton iteration method to calculate the nth root of
