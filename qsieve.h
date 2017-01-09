@@ -17,6 +17,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -26,14 +27,6 @@
 
 #ifdef __cplusplus
  extern "C" {
-#endif
-
-#if FLINT_BITS==64
-   #ifndef uint64_t
-   #define uint64_t ulong
-   #endif
-#else
-   #include <stdint.h>
 #endif
 
 #define QS_DEBUG 0
