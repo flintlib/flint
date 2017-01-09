@@ -10,10 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "siqs.h"
+#include "qsieve.h"
 
 prime_t *
 compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)

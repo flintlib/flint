@@ -10,20 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#undef ulong
-#define ulong mp_limb_t
-
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_factor.h"
-#include "siqs.h"
+#include "qsieve.h"
 
 #include <inttypes.h>
 #define _STDC_FORMAT_MACROS

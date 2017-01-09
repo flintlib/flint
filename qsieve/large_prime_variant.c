@@ -10,19 +10,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
-#undef ulong
-#define ulong mp_limb_t
-
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "siqs.h"
-#include "fmpz.h"
+#include "qsieve.h"
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
 #define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (7)))

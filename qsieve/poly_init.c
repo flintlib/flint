@@ -10,10 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "siqs.h"
+#include "qsieve.h"
 
 mp_limb_t qsieve_poly_init(qs_t qs_inf)
 {

@@ -29,7 +29,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "siqs.h"
+#include "qsieve.h"
 
 void randprime(fmpz_t p, flint_rand_t state, slong bits)
 {
