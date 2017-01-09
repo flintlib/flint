@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2009 Thomas Boothby
-    Copyright (C) 2009, 2016 William Hart
+    Copyright (C) 2009, 2017 William Hart
 
     This file is part of FLINT.
 

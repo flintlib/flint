@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2017 William Hart
 
     This file is part of FLINT.
 
@@ -22,7 +22,7 @@ int main(void)
    mp_limb_t d;
    FLINT_TEST_INIT(state);
    
-   flint_printf("is_perfect_power235....");
+   flint_printf("is_perfect_power....");
    fflush(stdout);
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that squares pass the test */
