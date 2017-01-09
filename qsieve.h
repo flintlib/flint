@@ -240,13 +240,13 @@ static const mp_limb_t qsieve_tune[][5] =
 /* number of entries in the tuning table */
 #define QS_TUNE_SIZE (sizeof(qsieve_tune)/(5*sizeof(mp_limb_t)))
 
-void qsieve_init(qs_t qs_inf, fmpz_t n);
+void qsieve_init(qs_t qs_inf, const fmpz_t n);
 
 mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
 
 void qsieve_clear(qs_t qs_inf);
 
-void qsieve_factor(fmpz_t n, fmpz_factor_t factors);
+void qsieve_factor(fmpz_factor_t factors, const fmpz_t n);
 
 prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
                                                              slong num_primes);

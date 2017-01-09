@@ -47,11 +47,16 @@ FLINT_DLL void fmpz_factor_print(const fmpz_factor_t factor);
 
 FLINT_DLL void _fmpz_factor_fit_length(fmpz_factor_t factor, slong len);
 
-FLINT_DLL void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp);
+FLINT_DLL void _fmpz_factor_append_ui(fmpz_factor_t factor,
+                                                       mp_limb_t p, ulong exp);
 
-FLINT_DLL void _fmpz_factor_append(fmpz_factor_t factor, fmpz_t p, ulong exp);
+FLINT_DLL void _fmpz_factor_append(fmpz_factor_t factor,
+                                                    const fmpz_t p, ulong exp);
 
 FLINT_DLL void _fmpz_factor_set_length(fmpz_factor_t factor, slong newlen);
+
+FLINT_DLL void _fmpz_factor_concat(fmpz_factor_t factor1,
+                                             fmpz_factor_t factor2, ulong exp);
 
 /* Factoring *****************************************************************/
 
@@ -61,6 +66,8 @@ FLINT_DLL int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n,
                                        ulong start, ulong num_primes);
 
 FLINT_DLL void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
+
+FLINT_DLL void fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n);
 
 FLINT_DLL void fmpz_factor_si(fmpz_factor_t factor, slong n);
 

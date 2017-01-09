@@ -16,10 +16,17 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_factor_append(fmpz_factor_t factor, const fmpz_t p, ulong exp)
+_fmpz_factor_concat(fmpz_factor_t factor1, fmpz_factor_t factor2, ulong exp)
 {
-    _fmpz_factor_fit_length(factor, factor->num + 1);
-    fmpz_set(factor->p + factor->num, p);
-    factor->exp[factor->num] = exp;
-    factor->num++;
+    slong i;
+
+    _fmpz_factor_fit_length(factor1, factor1->num + factor2->num);
+    
+    for (i = 0; i < factor2->num; i++)
+    {
+       fmpz_set(factor1->p + factor1->num + i, factor2->p + i);
+       factor1->exp[factor1->num + i] = factor2->exp[i]*exp;
+    }
+
+    factor1->num += factor2->num;
 }

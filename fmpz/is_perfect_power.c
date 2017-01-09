@@ -64,7 +64,7 @@ static const unsigned short primes[] =
 };
 #define SMALLEST_OMITTED_PRIME 1009
 
-int fmpz_is_perfect_power(fmpz_t root, fmpz_t f)
+int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
 {
    ulong prime, n, n2, rem;
    mpz_t u2, q;

@@ -12,7 +12,7 @@
 
 #include "qsieve.h"
 
-void qsieve_init(qs_t qs_inf, fmpz_t n)
+void qsieve_init(qs_t qs_inf, const fmpz_t n)
 {
     slong i;
 

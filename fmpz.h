@@ -485,7 +485,7 @@ FLINT_DLL int fmpz_is_square(const fmpz_t f);
 
 FLINT_DLL void fmpz_root(fmpz_t r, const fmpz_t f, slong n);
 
-FLINT_DLL int fmpz_is_perfect_power(fmpz_t root, fmpz_t f);
+FLINT_DLL int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f);
 
 FLINT_DLL void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 

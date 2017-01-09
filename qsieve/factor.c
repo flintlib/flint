@@ -11,6 +11,7 @@
 */
 
 #include "qsieve.h"
+#include "fmpz_factor.h"
 
 #include <inttypes.h>
 #define _STDC_FORMAT_MACROS
@@ -29,7 +30,7 @@ int compare_facs(const void * a, const void * b)
    Assumes n is not prime and not a perfect power.
 */
 
-void qsieve_factor(fmpz_t n, fmpz_factor_t factors)
+void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 {
     qs_t qs_inf;
     mp_limb_t small_factor, delta;
@@ -52,32 +53,14 @@ void qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
        factors->sign *= -1;
        
-       qsieve_factor(n2, factors);
+       qsieve_factor(factors, n2);
 
        fmpz_clear(n2);
        
        return;
     }
 
-    if (fmpz_is_probabprime(n))
-    {
-       _fmpz_factor_append(factors, n, 1);
-
-       return;
-    }
-
     fmpz_init(temp);
-
-    if (fmpz_is_square(n))
-    {
-       fmpz_sqrt(temp, n);
-
-       _fmpz_factor_append(factors, temp, 2);
-
-       fmpz_clear(temp);
-
-       return;       
-    }
        
     /**************************************************************************
         INITIALISATION:
@@ -129,7 +112,7 @@ void qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         
         qsieve_clear(qs_inf);
 
-        qsieve_factor(temp, factors);
+        fmpz_factor_no_trial(factors, temp);
 
         fmpz_clear(temp);
         
@@ -171,7 +154,7 @@ void qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         
         qsieve_clear(qs_inf);
 
-        qsieve_factor(temp, factors);
+        fmpz_factor_no_trial(factors, temp);
 
         fmpz_clear(temp);
 
@@ -426,7 +409,7 @@ more_primes:
 
             _fmpz_factor_append_ui(factors, small_factor, expt);
         
-            qsieve_factor(temp, factors);
+            fmpz_factor_no_trial(factors, temp);
             
             goto cleanup;
         }
