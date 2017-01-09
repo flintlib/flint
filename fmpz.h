@@ -61,7 +61,7 @@ typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
 
 #define COEFF_IS_MPZ(x) (((x) >> (FLINT_BITS - 2)) == WORD(1))  /* is x a pointer not an integer */
 
-__mpz_struct * _fmpz_new_mpz(void);
+FLINT_DLL __mpz_struct * _fmpz_new_mpz(void);
 
 FLINT_DLL void _fmpz_clear_mpz(fmpz f);
 
@@ -69,9 +69,9 @@ FLINT_DLL void _fmpz_cleanup_mpz_content(void);
 
 FLINT_DLL void _fmpz_cleanup(void);
 
-__mpz_struct * _fmpz_promote(fmpz_t f);
+FLINT_DLL __mpz_struct * _fmpz_promote(fmpz_t f);
 
-__mpz_struct * _fmpz_promote_val(fmpz_t f);
+FLINT_DLL __mpz_struct * _fmpz_promote_val(fmpz_t f);
 
 FMPZ_INLINE
 void _fmpz_demote(fmpz_t f)
@@ -349,7 +349,7 @@ FLINT_DLL size_t fmpz_out_raw( FILE *fout, const fmpz_t x );
 
 FLINT_DLL size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
-char * fmpz_get_str(char * str, int b, const fmpz_t f);
+FLINT_DLL char * fmpz_get_str(char * str, int b, const fmpz_t f);
 
 FMPZ_INLINE
 void fmpz_swap(fmpz_t f, fmpz_t g)
@@ -416,8 +416,8 @@ fmpz_neg(fmpz_t f1, const fmpz_t f2)
     else                        /* coeff is large */
     {
         /* No need to retain value in promotion, as if aliased, both already large */
-        __mpz_struct *mpz_ptr = _fmpz_promote(f1);
-        mpz_neg(mpz_ptr, COEFF_TO_PTR(*f2));
+        __mpz_struct *mpz_res = _fmpz_promote(f1);
+        mpz_neg(mpz_res, COEFF_TO_PTR(*f2));
     }
 }
 
@@ -485,6 +485,8 @@ FLINT_DLL int fmpz_is_square(const fmpz_t f);
 
 FLINT_DLL void fmpz_root(fmpz_t r, const fmpz_t f, slong n);
 
+FLINT_DLL int fmpz_is_perfect_power(fmpz_t root, fmpz_t f);
+
 FLINT_DLL void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 
 FLINT_DLL ulong fmpz_fdiv_ui(const fmpz_t g, ulong h);
@@ -493,7 +495,7 @@ FLINT_DLL ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h);
+FLINT_DLL void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FMPZ_INLINE void
 fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)
@@ -575,6 +577,8 @@ FLINT_DLL void fmpz_preinvn_init(fmpz_preinvn_t inv, fmpz_t f);
 FLINT_DLL void fmpz_preinvn_clear(fmpz_preinvn_t inv);
 
 FLINT_DLL double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
+
+FLINT_DLL void fmpz_set_d_2exp(fmpz_t f, double m, slong exp);
 
 FMPZ_INLINE void
 fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)

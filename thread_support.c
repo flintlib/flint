@@ -10,8 +10,12 @@
 */
 
 #include "flint.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 FLINT_TLS_PREFIX int _flint_num_threads = 1;
+#pragma omp threadprivate(_flint_num_threads)
 
 int flint_get_num_threads()
 {
@@ -21,5 +25,17 @@ int flint_get_num_threads()
 void flint_set_num_threads(int num_threads)
 {
     _flint_num_threads = num_threads;
+#ifdef _OPENMP
+    omp_set_num_threads(num_threads);
+#endif
 }
 
+void flint_parallel_cleanup()
+{
+    int needs_cleanup = 1;
+#pragma omp master
+    needs_cleanup = 0;
+
+    if (needs_cleanup)
+        flint_cleanup();
+}

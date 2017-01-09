@@ -234,6 +234,10 @@ void arith_bernoulli_number(fmpq_t x, ulong n)
     equivalent to\\ \code{_arith_bernoulli_number} apart from the output
     being a single \code{fmpq_t} variable.
 
+    Warning: this function does not use proven precision bounds, and
+    could return the wrong results for very large $n$.
+    It is recommended to use the Bernoulli number functions in Arb instead.
+
 void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, slong n)
 
     Sets the elements of \code{num} and \code{den} to the reduced
@@ -285,6 +289,10 @@ void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
     and multiplies by the denominator to to obtain a real number
     that rounds to the exact numerator. For tiny $n$, the numerator
     is looked up from a table to avoid unnecessary overhead.
+
+    Warning: this function does not use proven precision bounds, and
+    could return the wrong results for very large $n$.
+    It is recommended to use the Bernoulli number functions in Arb instead.
 
 void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, slong n)
 
@@ -347,6 +355,10 @@ void arith_euler_number(fmpz_t res, ulong n)
     Sets \code{res} to the Euler number $E_n$. Currently calls
     \code{_arith_euler_number_zeta}.
 
+    Warning: this function does not use proven precision bounds, and
+    could return the wrong results for very large $n$.
+    It is recommended to use the Euler number functions in Arb instead.
+
 void arith_euler_number_vec(fmpz * res, slong n)
 
     Computes the Euler numbers $E_0, E_1, \dotsc, E_{n-1}$ for $n \geq 0$
@@ -380,6 +392,10 @@ void _arith_euler_number_zeta(fmpz_t res, ulong n)
     uses the relation $$|E_n| = \frac{2^{n+2} n!}{\pi^{n+1}} L(n+1)$$
     where $L(n+1)$ denotes the Dirichlet $L$-function with character
     $\chi = \{ 0, 1, 0, -1 \}$.
+
+    Warning: this function does not use proven precision bounds, and
+    could return the wrong results for very large $n$.
+    It is recommended to use the Euler number functions in Arb instead.
 
 *******************************************************************************
 

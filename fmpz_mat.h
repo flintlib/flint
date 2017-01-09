@@ -28,10 +28,10 @@
 #define ulong mp_limb_t
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "nmod_mat.h"
 #include "d_mat.h"
 #include "mpf_mat.h"
-#include "fmpz_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -46,6 +46,13 @@ typedef struct
 } fmpz_mat_struct;
 
 typedef fmpz_mat_struct fmpz_mat_t[1];
+
+/* used for column partitioning, used by van Hoeij poly factoring */
+typedef struct
+{
+   ulong col;
+   ulong hash;
+} col_hash_t;
 
 /* Memory management  ********************************************************/
 
@@ -82,6 +89,34 @@ int
 fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
 {
     return _fmpz_vec_is_zero(mat->rows[i], mat->c);
+}
+
+FMPZ_MAT_INLINE
+int fmpz_mat_col_equal(fmpz_mat_t M, slong m, slong n)
+{
+   slong i;
+
+   for (i = 0; i < M->r; i++)
+   {
+      if (!fmpz_equal(M->rows[i] + m, M->rows[i] + n))
+         return 0;
+   }
+
+   return 1;
+}
+
+FMPZ_MAT_INLINE
+int fmpz_mat_row_equal(fmpz_mat_t M, slong m, slong n)
+{
+   slong i;
+
+   for (i = 0; i < M->c; i++)
+   {
+      if (!fmpz_equal(M->rows[m] + i, M->rows[n] + i))
+         return 0;
+   }
+
+   return 1;
 }
 
 FMPZ_MAT_INLINE
@@ -189,6 +224,7 @@ FLINT_DLL void fmpz_mat_scalar_divexact_ui(fmpz_mat_t B, const fmpz_mat_t A, ulo
 
 FLINT_DLL void fmpz_mat_scalar_mul_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
 FLINT_DLL void fmpz_mat_scalar_tdiv_q_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
+FLINT_DLL void fmpz_mat_scalar_smod(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t P);
 
 FLINT_DLL void fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m);
 
@@ -295,7 +331,9 @@ FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
 /* Transforms */
 
-void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
+FLINT_DLL void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
+
+#include "fmpz_poly.h"
 
 /* Characteristic polynomial ************************************************/
 
@@ -449,21 +487,37 @@ FLINT_DLL void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A);
 
 /* LLL ***********************************************************************/
 
-FLINT_DLL int fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta);
+FLINT_DLL int fmpz_mat_is_reduced(const fmpz_mat_t A,
+                                                     double delta, double eta);
 
-FLINT_DLL int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta);
+FLINT_DLL int fmpz_mat_is_reduced_gram(const fmpz_mat_t A,
+                                                     double delta, double eta);
 
-FLINT_DLL int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta, const fmpz_t gs_B, int newd);
+FLINT_DLL int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A,
+                        double delta, double eta, const fmpz_t gs_B, int newd);
 
-FLINT_DLL int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta, double eta, const fmpz_t gs_B, int newd);
+FLINT_DLL int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A,
+                        double delta, double eta, const fmpz_t gs_B, int newd);
 
 /* Classical LLL *************************************************************/
 
-FLINT_DLL void fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta);
+FLINT_DLL void fmpz_mat_lll_original(fmpz_mat_t A,
+                                         const fmpq_t delta, const fmpq_t eta);
 
 /* Modified LLL **************************************************************/
 
-FLINT_DLL void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta);
+FLINT_DLL void fmpz_mat_lll_storjohann(fmpz_mat_t A,
+                                         const fmpq_t delta, const fmpq_t eta);
+
+/* Column partitioning *******************************************************/
+
+FLINT_DLL int fmpz_mat_col_partition(slong * part, 
+                                              fmpz_mat_t M, int short_circuit);
+
+/* Van Hoeij helper function *************************************************/
+
+FLINT_DLL int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
+                                       fmpz_mat_t col, slong exp, slong U_exp);
 
 #ifdef __cplusplus
 }

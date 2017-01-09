@@ -35,118 +35,116 @@
 #include "fq.h"
 #include "fq_poly.h"
 
-NTL_CLIENT
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* 
+/*
    Converts an NTL ZZ to an fmpz_t.
 
    Assumes the fmpz_t has already been allocated to have sufficient space.
 */
-FLINT_DLL void fmpz_set_ZZ(fmpz_t rop, const ZZ& op);
+FLINT_DLL void fmpz_set_ZZ(fmpz_t rop, const NTL_NNS ZZ& op);
 
-/* 
+/*
    Converts an fmpz_t to an NTL ZZ. Allocation is automatically handled.
  */
-FLINT_DLL void fmpz_get_ZZ(ZZ& rop, const fmpz_t op);
+FLINT_DLL void fmpz_get_ZZ(NTL_NNS ZZ& rop, const fmpz_t op);
 
 
-/* 
+/*
    Converts an NTL ZZ_p to an fmpz_t.
 
    Assumes the fmpz_t has already been allocated to have sufficient space.
 */
-FLINT_DLL void fmpz_set_ZZ_p(fmpz_t rop, const ZZ_p& op);
+FLINT_DLL void fmpz_set_ZZ_p(fmpz_t rop, const NTL_NNS ZZ_p& op);
 
-/* 
+/*
    Converts an fmpz_t to an NTL ZZ_p. Allocation is automatically handled.
  */
-FLINT_DLL void fmpz_get_ZZ_p(ZZ_p& rop, const fmpz_t op);
+FLINT_DLL void fmpz_get_ZZ_p(NTL_NNS ZZ_p& rop, const fmpz_t op);
 
-/* 
+/*
    Converts an NTL zz_p to an fmpz_t.
 */
-FLINT_DLL void fmpz_set_zz_p(fmpz_t rop, const zz_p& op);
+FLINT_DLL void fmpz_set_zz_p(fmpz_t rop, const NTL_NNS zz_p& op);
 
-/* 
+/*
    Converts an fmpz_t to an NTL zz_p.
  */
-FLINT_DLL void fmpz_get_zz_p(zz_p& rop, const fmpz_t op);
+FLINT_DLL void fmpz_get_zz_p(NTL_NNS zz_p& rop, const fmpz_t op);
 
 /*
   Converts an fmpz_poly_t to an NTL ZZX.
 */
-FLINT_DLL     void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op);
+FLINT_DLL     void fmpz_poly_get_ZZX(NTL_NNS ZZX& rop, const fmpz_poly_t op);
 
 /*
   Converts an NTL ZZX to an fmpz_poly_t.
 */
-FLINT_DLL     void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op);
+FLINT_DLL     void fmpz_poly_set_ZZX(fmpz_poly_t rop, const NTL_NNS ZZX& op);
 
 /*
   Converts an fmpz_mod_poly_t to an NTL ZZ_pX.
 */
-FLINT_DLL void fmpz_mod_poly_get_ZZ_pX(ZZ_pX& rop, const fmpz_mod_poly_t op);
+FLINT_DLL void fmpz_mod_poly_get_ZZ_pX(NTL_NNS ZZ_pX& rop, const fmpz_mod_poly_t op);
 
 /*
   Converts an NTL ZZ_pX to an fmpz_poly_t.
 */
-FLINT_DLL void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op);
+FLINT_DLL void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const NTL_NNS ZZ_pX& op);
 
 /*
   Converts an fq_t to an NTL ZZ_pE.
 */
-FLINT_DLL void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op, const fq_ctx_t ctx);
+FLINT_DLL void fq_get_ZZ_pE(NTL_NNS ZZ_pE& rop, const fq_t op, const fq_ctx_t ctx);
 
 /*
   Converts an NTL ZZ_pE to an fq_t.
 */
-FLINT_DLL void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op, const fq_ctx_t ctx);
+FLINT_DLL void fq_set_ZZ_pE(fq_t rop, const NTL_NNS ZZ_pE& op, const fq_ctx_t ctx);
 
 
 /*
   Converts an fq_poly_t to an NTL ZZ_pEX.
 */
-FLINT_DLL void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx);
+FLINT_DLL void fq_poly_get_ZZ_pEX(NTL_NNS ZZ_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*
   Converts an NTL ZZ_pEX to an fq_poly_t.
 */
-FLINT_DLL void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op, const fq_ctx_t ctx);
+FLINT_DLL void fq_poly_set_ZZ_pEX(fq_poly_t rop, const NTL_NNS ZZ_pEX& op, const fq_ctx_t ctx);
 
 /*
   Converts an fmpz_mod_poly_t to an NTL zz_pX.
 */
-FLINT_DLL void fmpz_mod_poly_get_zz_pX(zz_pX& rop, const fmpz_mod_poly_t op);
+FLINT_DLL void fmpz_mod_poly_get_zz_pX(NTL_NNS zz_pX& rop, const fmpz_mod_poly_t op);
 
 /*
   Converts an NTL zz_pX to an fmpz_poly_t.
 */
-FLINT_DLL void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const zz_pX& op);
+FLINT_DLL void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const NTL_NNS zz_pX& op);
 
 /*
   Converts an fq_t to an NTL zz_pE.
 */
-FLINT_DLL void fq_get_zz_pE(zz_pE& rop, const fq_t op, const fq_ctx_t ctx);
+FLINT_DLL void fq_get_zz_pE(NTL_NNS zz_pE& rop, const fq_t op, const fq_ctx_t ctx);
 
 /*
   Converts an NTL zz_pE to an fq_t.
 */
-FLINT_DLL void fq_set_zz_pE(fq_t rop, const zz_pE& op, const fq_ctx_t ctx);
+FLINT_DLL void fq_set_zz_pE(fq_t rop, const NTL_NNS zz_pE& op, const fq_ctx_t ctx);
 
 
 /*
   Converts an fq_poly_t to an NTL zz_pEX.
 */
-FLINT_DLL void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx);
+FLINT_DLL void fq_poly_get_zz_pEX(NTL_NNS zz_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*
   Converts an NTL zz_pEX to an fq_poly_t.
 */
-FLINT_DLL void fq_poly_set_zz_pEX(fq_poly_t rop, const zz_pEX& op, const fq_ctx_t ctx);
+FLINT_DLL void fq_poly_set_zz_pEX(fq_poly_t rop, const NTL_NNS zz_pEX& op, const fq_ctx_t ctx);
 
 #ifdef __cplusplus
 }

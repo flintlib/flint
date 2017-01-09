@@ -16,7 +16,7 @@
 #include "ulong_extras.h"
 #include "long_extras.h"
 
-extern int 
+FLINT_DLL extern int
 _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len, 
                          const fmpz *a, const slong *j, slong lena);
 

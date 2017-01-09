@@ -33,6 +33,7 @@ void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
 
     prec = arith_bernoulli_number_size(n) + fmpz_bits(den);
     prec += 10 + 2*FLINT_BIT_COUNT(n);
+    prec = prec * 1.001;
     pi_prec = prec;
 
     mpz_init(r);

@@ -759,7 +759,7 @@ int n_is_prime_pseudosquare(ulong n)
 
     Next we compute $N/B$ and find the next pseudosquare $L_p$ above
     this value, using a static table as per
-    \url{http://research.att.com/~njas/sequences/b002189.txt}.
+    \url{http://oeis.org/A002189/b002189.txt}.
 
     As noted in the text, if $p$ is prime then Step~3 will pass. This
     test rejects many composites, and so by this time we suspect
@@ -953,6 +953,12 @@ int n_is_perfect_power235(ulong n)
     square root test is performed. Similarly a cube root or fifth 
     root can be taken, if indicated, to determine whether the power
     of that root is exactly equal to $n$.
+
+int n_is_perfect_power(ulong * root, ulong n)
+
+    If $n = r^k$, return $k$ and set \code{root} to $r$. Note that $0$ and
+    $1$ are considered squares. No guarantees are made about $r$ or $k$
+    being the minimum possible value.
 
 ulong n_rootrem(ulong* remainder, ulong n, ulong root)
 

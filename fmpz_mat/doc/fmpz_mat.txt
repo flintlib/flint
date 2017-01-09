@@ -291,6 +291,16 @@ int fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
 
     Returns a non-zero value if row $i$ of \code{mat} is zero.
 
+int fmpz_mat_col_equal(fmpz_mat_t M, slong m, slong n)
+
+    Returns $1$ if columns $m$ and $n$ of the matrix $M$ are equal, otherwise
+    returns $0$.
+
+int fmpz_mat_row_equal(fmpz_mat_t M, slong m, slong n)
+
+    Returns $1$ if rows $m$ and $n$ of the matrix $M$ are equal, otherwise
+    returns $0$.
+
 *******************************************************************************
 
     Transpose
@@ -483,6 +493,11 @@ void fmpz_mat_scalar_tdiv_q_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
     Set the matrix \code{B} to the matrix \code{A}, of the same dimensions,
     divided by $2^{exp}$, rounding down towards zero.
 
+void fmpz_mat_scalar_smod(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t P)
+
+    Set the matrix \code{B} to the matrix \code{A}, of the same dimensions,
+    with each entry reduced modulo $P$ in the symmetric moduli system. We
+    require $P > 0$.
 
 *******************************************************************************
 
@@ -784,6 +799,20 @@ slong fmpz_mat_rank(const fmpz_mat_t A)
     (equivalently, rows), of $A$. The rank is computed by row reducing
     a copy of $A$.
 
+*******************************************************************************
+
+    Column partitioning
+
+*******************************************************************************
+
+int fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit)
+
+    Returns the number $p$ of distinct columns of $M$ (or $0$ if the flag 
+    \code{short_circuit} is set and this number is greater than the number
+    of rows of $M$). The entries of array \code{part} are set to values in
+    $[0, p)$ such that two entries of part are equal iff the corresponding
+    columns of $M$ are equal. This function is used in van Hoeij polynomial
+    factoring.
 
 *******************************************************************************
 

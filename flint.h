@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h> /* for alloca on FreeBSD */
-#if !defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)
+#if (!defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)) || defined(__GNU__)
 /* MinGW and FreeBSD have alloca, but not alloca.h */
 #include <alloca.h>
 #endif
@@ -81,9 +81,9 @@ extern char version[];
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
 
-void * flint_malloc(size_t size);
-void * flint_realloc(void * ptr, size_t size);
-void * flint_calloc(size_t num, size_t size);
+FLINT_DLL void * flint_malloc(size_t size);
+FLINT_DLL void * flint_realloc(void * ptr, size_t size);
+FLINT_DLL void * flint_calloc(size_t num, size_t size);
 FLINT_DLL void flint_free(void * ptr);
 
 typedef void (*flint_cleanup_function_t)(void);
@@ -94,8 +94,8 @@ FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
      void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
                                                               void (*free_func) (void *));
 
-void flint_abort(void);
-void flint_set_abort(void (*func)(void));
+FLINT_DLL void flint_abort(void);
+FLINT_DLL void flint_set_abort(void (*func)(void));
   /* flint_abort is calling abort by default
    * if flint_set_abort is used, then instead of abort this function
    * is called. EXPERIMENTALLY use at your own risk!
@@ -149,8 +149,17 @@ void flint_set_abort(void (*func)(void));
 #define FLINT_TLS_PREFIX
 #endif
 
+#ifdef _OPENMP
+#define FLINT_PREFER_OMP 1
+#elif HAVE_PTHREAD
+#define FLINT_PREFER_OMP 0
+#else
+#define FLINT_PREFER_OMP 1
+#endif
+
 FLINT_DLL int flint_get_num_threads(void);
 FLINT_DLL void flint_set_num_threads(int num_threads);
+FLINT_DLL void flint_parallel_cleanup(void);
 
 FLINT_DLL int flint_test_multiplier(void);
 

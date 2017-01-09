@@ -65,6 +65,21 @@ void _fmpz_poly_set_length(fmpz_poly_t poly, slong newlen)
     Demotes the coefficients of \code{poly} beyond \code{newlen} and sets 
     the length of \code{poly} to \code{newlen}.
 
+void fmpz_poly_attach_truncate(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+
+    This function sets the uninitialised polynomial \code{trunc} to the low
+    $n$ coefficients of \code{poly}, or to \code{poly} if the latter doesn't
+    have $n$ coefficients. The polynomial \code{trunc} not be cleared or used
+    as the output of any Flint functions. 
+
+void fmpz_poly_attach_shift(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+
+    This function sets the uninitialised polynomial \code{trunc} to the
+    high coefficients of \code{poly}, i.e. the coefficients not among the low
+    $n$ coefficients of \code{poly}. If the latter doesn't have $n$
+    coefficients \code{trunc} is set to the zero polynomial. The polynomial
+    \code{trunc} not be cleared or used as the output of any Flint functions. 
+
 *******************************************************************************
 
     Polynomial parameters
@@ -217,6 +232,15 @@ void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
     As for \code{fmpz_poly_randtest()} except that \code{len} and bits may 
     not be zero and the polynomial generated is guaranteed not to be the 
     zero polynomial.  One must call \code{flint_randinit()} before 
+    calling this function.
+
+FLINT_DLL void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state,
+                                                slong len, mp_bitcnt_t bits)
+
+
+    Sets \code{p} to a random polynomial without any real root, whose
+    length is up to \code{len} and where each coefficient has up to the
+    given number of bits. One must call \code{flint_randinit()} before
     calling this function.
 
 *******************************************************************************
@@ -375,9 +399,14 @@ void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 
 *******************************************************************************
 
-    Scalar multiplication and division
+    Scalar absolute value, multiplication and division
 
 *******************************************************************************
+
+void fmpz_poly_scalar_abs(fmpz_poly_t res, const fmpz_poly_t poly)
+
+    Sets \code{poly1} to the polynomial whose coefficients are the absolute
+    value of those of \code{poly2}.
 
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const fmpz_t x)
@@ -1776,6 +1805,33 @@ int fmpz_poly_divides(fmpz_poly_t Q,
     This function is currently unoptimised and provided for convenience
     only.
 
+
+*******************************************************************************
+
+    Division mod p
+
+*******************************************************************************
+
+void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
+                                  const fmpz_poly_t g, const fmpz_t p, slong n)
+
+    Compute the $n$ lowest coefficients of $f$ divided by $g$, assuming the
+    division is exact modulo $p$. The computed coefficients are reduced modulo
+    $p$ using the symmetric remainder system. We require $f$ to be at least $n$
+    in length. The function can handle trailing zeroes, but the low nonzero
+    coefficient of $g$ must be coprime to $p$. This is a bespoke function used
+    by factoring.
+
+void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f,
+                                  const fmpz_poly_t g, const fmpz_t p, slong n)
+
+    Compute the $n$ highest coefficients of $f$ divided by $g$, assuming the
+    division is exact modulo $p$. The computed coefficients are reduced modulo
+    $p$ using the symmetric remainder system. We require $f$ to be as output
+    by \code{fmpz_poly_mulhigh_n} given polynomials $g$ and a polynomial of
+    length $n$ as inputs. The leading coefficient of $g$ must be coprime to
+    $p$. This is a bespoke function used by factoring.
+
 *******************************************************************************
 
     Power series division
@@ -2127,6 +2183,38 @@ void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
 
     Evaluates \code{f} at the $n$ values given in the vector \code{f},
     writing the results to \code{res}.
+
+double _fmpz_poly_evaluate_horner_d(const fmpz * poly, slong n, double d)
+
+    Evaluate \code{(poly, n)} at the double $d$. No attempt is made to do this
+    efficiently or in a numerically stable way. It is currently only used in
+    Flint for quick and dirty evaluations of polynomials with all coefficients
+    positive.
+
+double fmpz_poly_evaluate_horner_d(const fmpz_poly_t poly, double d)
+
+    Evaluate \code{poly} at the double $d$. No attempt is made to do this
+    efficiently or in a numerically stable way. It is currently only used in
+    Flint for quick and dirty evaluations of polynomials with all coefficients
+    positive.
+
+double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, 
+                                         const fmpz * poly, slong n, double d)
+
+    Evaluate \code{(poly, n)} at the double $d$. Return the result as a double
+    and an exponent \code{exp} combination. No attempt is made to do this
+    efficiently or in a numerically stable way. It is currently only used in
+    Flint for quick and dirty evaluations of polynomials with all coefficients
+    positive.
+
+double fmpz_poly_evaluate_horner_d_2exp(slong * exp, 
+                                             const fmpz_poly_t poly, double d)
+
+    Evaluate \code{poly} at the double $d$. Return the result as a double
+    and an exponent \code{exp} combination. No attempt is made to do this
+    efficiently or in a numerically stable way. It is currently only used in
+    Flint for quick and dirty evaluations of polynomials with all coefficients
+    positive.
 
 *******************************************************************************
 
@@ -2980,6 +3068,20 @@ void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
     of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
     given by \code{xs}.
 
+void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly, const fmpq * xs, slong n)
+
+    Sets \code{(poly, n + 1)} to the product of
+    $(q_0 x - p_0)(q_1 x - p_1) \cdots (q_{n-1} x - p_{n-1})$, the roots
+    $p_i/q_i$ being given by \code{xs}.
+
+void fmpz_poly_product_roots_fmpq_vec(fmpz_poly_t poly,
+        const fmpq * xs, slong n)
+
+    Sets \code{poly} to the polynomial which is the product
+    of $(q_0 x - p_0)(q_1 x - p_1) \cdots (q_{n-1} x - p_{n-1})$, the roots
+    $p_i/q_i$ being given by \code{xs}.
+
+
 *******************************************************************************
 
     Newton basis conversion
@@ -3021,6 +3123,38 @@ void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
     $$
 
     where the coefficients of the polynomial are $a_0, \ldots, a_n$.
+
+void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos,
+            const fmpz * pol, slong len)
+
+    Sets \code{n_neg} and \code{n_pos} to the number of negative and
+    positive roots of the polynomial \code{(pol, len)} using Sturm
+    sequence. The Sturm sequence is computed via subresultant
+    remainders obtained by repeated call to the function
+    \code{_fmpz_poly_pseudo_rem_cohen}.
+
+    The polynomial is assumed to be squarefree, of degree larger than 1
+    and with non-zero constant coefficient.
+
+slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
+
+    Returns the number of real roots of the squarefree polynomial \code{pol}
+    using Sturm sequence.
+
+    The polynomial is assumed to be squarefree.
+
+slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
+
+    Returns the number of real roots of the squarefree polynomial
+    \code{(pol, len)}.
+
+    The polynomial is assumed to be squarefree.
+
+slong fmpz_poly_num_real_roots(const fmpz_poly_t pol)
+
+    Returns the number of real roots of the squarefree polynomial \code{pol}.
+
+    The polynomial is assumed to be squarefree.
 
 *******************************************************************************
 
@@ -3232,3 +3366,13 @@ void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n)
     This function uses sparse formulas for $r = 1, 2$
     and otherwise reduces to those cases using power series arithmetic.
 
+*******************************************************************************
+
+    CLD bounds
+
+*******************************************************************************
+
+void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
+
+    Compute a bound on the $n$ coefficient of $fg'/g$ where $g$ is any
+    factor of $f$.
