@@ -24,3 +24,7 @@ void fmpz_poly_factor_get_fmpz_poly(fmpz_poly_t z, const fmpz_poly_factor_t F, s
     fmpz_poly_set(z, F->p + i);
 }
 
+void fmpz_poly_factor_get_fmpz(fmpz_t z, const fmpz_poly_factor_t F)
+{
+    fmpz_set(z, &(F->c));
+}
