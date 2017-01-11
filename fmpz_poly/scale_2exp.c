@@ -17,7 +17,7 @@ void _fmpz_poly_scale_2exp(fmpz * pol, slong len, slong k)
     slong i;
     ulong p, z;
 
-    if ((k == 0) || (len <= 1))
+    if (k == 0 || len <= 1)
         return;
     else if (k > 0)
     {
