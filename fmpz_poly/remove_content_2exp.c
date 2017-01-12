@@ -16,12 +16,12 @@ slong _fmpz_poly_remove_content_2exp(fmpz * pol, slong len)
 {
     slong cont, i, z;
 
-    if (len == 0)
-        return 0;
-
     i = 0;
-    while (fmpz_is_zero(pol + i))
+    while (i < len && fmpz_is_zero(pol + i))
         i++;
+
+    if (i == len)
+        return 0;
 
     cont = fmpz_val2(pol + i);
 
