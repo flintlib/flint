@@ -512,7 +512,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
         {
             if (sieve[i] > bits)
             {
-#if 0/*QS_DEBUG */
+#if QS_DEBUG
                 qs_inf->num_candidates += 1;
                 if (qs_inf->num_candidates % 100 == 0)
                    flint_printf("num_candidates = %wd\n", qs_inf->num_candidates);
