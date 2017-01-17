@@ -36,7 +36,6 @@ typedef struct
 
 typedef fmpz_factor_struct fmpz_factor_t[1];
 
-
 /* Utility functions *********************************************************/
 
 FLINT_DLL void fmpz_factor_init(fmpz_factor_t factor);
@@ -110,11 +109,11 @@ FLINT_DLL void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ul
 
 typedef struct ecm_s {
 
-  mp_ptr t, u, v, w;  /* temp variables */
-  mp_ptr x, z;    /* the coordinates */
-  mp_ptr a24;     /* value (a + 2)/4 */
-  mp_ptr ninv;    /* invere of n */
-  mp_ptr one;     /* one shifted */
+    mp_ptr t, u, v, w;  /* temp variables */
+    mp_ptr x, z;    /* the coordinates */
+    mp_ptr a24;     /* value (a + 2)/4 */
+    mp_ptr ninv;    /* invere of n */
+    mp_ptr one;     /* one shifted */
 
     unsigned char *GCD_table; /* checks whether baby step int is
                            coprime to Primorial or not */

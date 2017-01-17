@@ -374,6 +374,10 @@ void fmpz_poly_scalar_smod_fmpz(fmpz_poly_t poly1,
     }
 }
 
+FLINT_DLL slong _fmpz_poly_remove_content_2exp(fmpz * pol, slong len);
+
+FLINT_DLL void _fmpz_poly_scale_2exp(fmpz * pol, slong len, slong k);
+
 /*  Bit packing  *************************************************************/
 
 FLINT_DLL void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,

@@ -128,7 +128,9 @@ __TEMPLATE(T, poly_factor_deflation) (TEMPLATE(T, poly_factor_t) result,
     {
         TEMPLATE(T, poly_factor_t) def_res;
         TEMPLATE(T, poly_t) def;
+        TEMPLATE(T, t) lc_dummy;
 
+        TEMPLATE(T, init) (lc_dummy, ctx);
         TEMPLATE(T, poly_init) (def, ctx);
         TEMPLATE(T, poly_deflate) (def, input, deflation, ctx);
         TEMPLATE(T, poly_factor_init) (def_res, ctx);
@@ -145,13 +147,13 @@ __TEMPLATE(T, poly_factor_deflation) (TEMPLATE(T, poly_factor_t) result,
 
             /* Factor inflation */
             if (def_res->exp[i] == 1)
-                __TEMPLATE(T, poly_factor) (result, leading_coeff, pol,
+                __TEMPLATE(T, poly_factor) (result, lc_dummy, pol,
                                             algorithm, ctx);
             else
             {
                 TEMPLATE(T, poly_factor_t) t;
                 TEMPLATE(T, poly_factor_init) (t, ctx);
-                __TEMPLATE(T, poly_factor) (t, leading_coeff, pol, algorithm,
+                __TEMPLATE(T, poly_factor) (t, lc_dummy, pol, algorithm,
                                             ctx);
                 TEMPLATE(T, poly_factor_pow) (t, def_res->exp[i], ctx);
                 TEMPLATE(T, poly_factor_concat) (result, t, ctx);
@@ -160,6 +162,7 @@ __TEMPLATE(T, poly_factor_deflation) (TEMPLATE(T, poly_factor_t) result,
             TEMPLATE(T, poly_clear) (pol, ctx);
         }
 
+        TEMPLATE(T, clear) (lc_dummy, ctx);
         TEMPLATE(T, poly_factor_clear) (def_res, ctx);
     }
 }

@@ -524,6 +524,19 @@ void fmpz_poly_scalar_smod_fmpz(fmpz_poly_t poly1,
     each coefficient modulo $p > 0$, that is, choosing the unique 
     representative in the interval $(-p/2, p/2]$.
 
+slong _fmpz_poly_remove_content_2exp(fmpz * pol, slong len)
+
+    Remove the 2-content of \code{pol} and return the number $k$
+    that is the maximal non-negative integer so that $2^k$ divides
+    all coefficients of the polynomial. For the zero polynomial,
+    $0$ is returned.
+
+void _fmpz_poly_scale_2exp(fmpz * pol, slong len, slong k)
+
+    Scale \code{(pol, len)} to $p(2^k X)$ inplace and divide by the
+    2-content (so that the gcd of coefficients is odd). If \code{k}
+    is negative the polynomial is multiplied by $2^{kd}$.
+
 *******************************************************************************
 
     Bit packing
