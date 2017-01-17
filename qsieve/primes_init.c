@@ -96,7 +96,8 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     slong i;
     mp_limb_t k = qs_inf->k;
     mp_limb_t small_factor = 0;
- 
+    slong bits;
+
     prime_t * factor_base;
 
     /* determine which index in the tuning table n corresponds to */
@@ -117,6 +118,17 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
 
     qs_inf->sieve_size = qsieve_tune[i][4]; /* size of sieve to use */
     qs_inf->small_primes = qsieve_tune[i][3]; /* number of primes to not sieve with */
+    
+    bits = qsieve_tune[i][5];
+    if (bits >= 64)
+    {
+       qs_inf->sieve_bits = bits;
+       qs_inf->sieve_fill = 0;
+    } else
+    {
+       qs_inf->sieve_bits = 64;
+       qs_inf->sieve_fill = 64 - bits;
+    }
 
     if (qs_inf->small_primes > num_primes)
     {
@@ -135,7 +147,7 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     fmpz_init(qs_inf->target_A);
     fmpz_mul_2exp(qs_inf->target_A, qs_inf->kn, 1);
     fmpz_sqrt(qs_inf->target_A, qs_inf->target_A);
-    fmpz_tdiv_q_ui(qs_inf->target_A, qs_inf->target_A, qs_inf->sieve_size); 
+    fmpz_tdiv_q_ui(qs_inf->target_A, qs_inf->target_A, qs_inf->sieve_size/2); 
 
     /* consider k and 2 and -1 as factor base primes */
     factor_base[0].p = k;
@@ -161,7 +173,7 @@ mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta)
     fmpz_init(qs_inf->target_A);
     fmpz_mul_2exp(qs_inf->target_A, qs_inf->kn, 1);
     fmpz_sqrt(qs_inf->target_A, qs_inf->target_A);
-    fmpz_tdiv_q_ui(qs_inf->target_A, qs_inf->target_A, qs_inf->sieve_size); 
+    fmpz_tdiv_q_ui(qs_inf->target_A, qs_inf->target_A, qs_inf->sieve_size/2); 
 
     qs_inf->num_primes = num_primes;
     

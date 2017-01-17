@@ -31,7 +31,7 @@
 
 #define QS_DEBUG 0
 
-#define BITS_ADJUST 5 /* added to sieve entries to compensate for approximations */
+#define BITS_ADJUST 25 /* added to sieve entries to compensate for approximations */
 
 #define BLOCK_SIZE 65536 /* size of sieving cache block */
 
@@ -118,11 +118,11 @@ typedef struct qs_s
 
    mp_limb_t * A0_inv;      /* A0^(-1) mod p, for factor base primes p */
    mp_limb_t ** A_inv2B;    /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
-   mp_limb_t * soln1;       /* first root of poly */
-   mp_limb_t * soln2;       /* second root of poly */
+   int * soln1;       /* first root of poly */
+   int * soln2;       /* second root of poly */
 
-   mp_limb_t * posn1;       /* position 1 to start sieving, for each prime p */ 
-   mp_limb_t * posn2;       /* position 2 to start sieving, for each prime p */ 
+   int * posn1;       /* position 1 to start sieving, for each prime p */ 
+   int * posn2;       /* position 2 to start sieving, for each prime p */ 
 
    fmpz_t target_A;         /* approximate target value for A coeff of poly */
 
@@ -144,6 +144,11 @@ typedef struct qs_s
    slong h;
    slong m;
    mp_limb_t * curr_subset;
+
+#if QS_DEBUG
+   slong poly_count;         /* keep track of the number of polynomials used */
+   slong num_candidates;     /* keep track of the number of candidates */
+#endif
 
    /***************************************************************************
                        RELATION DATA
@@ -205,40 +210,41 @@ typedef qs_s qs_t[1];
      * fb_primes is the number of factor base primes to use (including k and 2)
      * small_primes is the number of small primes to not factor with (including k and 2)
      * sieve_size is the size of the sieve to use
+     * sieve_bits - sieve_fill
 */
-static const mp_limb_t qsieve_tune[][5] =
+static const mp_limb_t qsieve_tune[][6] =
 {
-   {10,   50,   100,  5,   2 *   2000}, /* */
-   {40,   50,   120,  6,   2 *   2500}, /* */
-   {40,   50,   150,  7,   2 *   2000}, /* */
-   {40,   50,   200,  8,   2 *   3000}, /* 12 digits */
-   {50,   80,   200,  8,   2 *   3500}, /* 15 digits */
-   {60,  100,   200,  8,   2 *   4000}, /* 18 digits */
-   {70,  100,   200,  9,   2 *   7000}, /* 21 digits */
-   {80,  100,  400,  9,   2 *   8000}, /* 24 digits */
-   {90,  100,  600, 10,   2 *  12000}, /* */
-   {100, 100,  900, 10,   2 *  25000}, /* */
-   {110, 100,  1200, 10,   2 *  32000}, /* 31 digits */
-   {120, 100,  1500, 10,   2 *  32000}, /* */
-   {130, 100,  2000, 11,   2 *  40000}, /* 41 digits */
-   {140, 100,  2000, 11,   2 *  50000}, /* */
-   {150, 100,  3000, 11,   2 *  65536}, /* 45 digit */
-   {160, 150,  4000, 11,   2 *  65536}, /* */
-   {170, 150,  5000, 12,   2 *  65536}, /* 50 digits */
-   {180, 150,  7000, 12,   2 *  65536}, /* */
-   {190, 150,  9000, 13,   2 *  65536}, /* */
-   {200, 150,  9000, 13,   2 *  65536}, /* 60 digits */
-   {210, 150, 10000, 13,   2 *  65536}, /* */
-   {220, 300, 12000, 15,   2 *  65536}, /* */
-   {230, 350, 40000, 17,   3 *  65536}, /* 70 digits */
-   {240, 400, 60000, 19,   4 *  65536}, /* */
-   {250, 500, 90000, 19,   4 *  65536}, /* 75 digits */
-   {260, 600, 100000, 25,   5 *  65536}, /* 80 digits */
-   {270, 800, 150000, 27,   6 * 65536}
+   {10,   50,   100,  5,   2 *  2000,  30}, /* */
+   {20,   50,   120,  6,   2 *  2500,  30}, /* */
+   {30,   50,   150,  6,   2 *  2000,  31}, /* */
+   {40,   50,   150,  8,   2 *  3000,  32}, /* 12 digits */
+   {50,   50,   150,  8,   2 *  3000,  34}, /* 15 digits */
+   {60,   50,   150,  9,   2 *  3500,  36}, /* 18 digits */
+   {70,  100,   200,  9,   2 *  4000,  42}, /* 21 digits */
+   {80,  100,   200,  9,   2 *  6000,  44}, /* 24 digits */
+   {90,  100,   200,  9,   2 *  6000,  50}, /* */
+   {100, 100,   300,  9,   2 *  7000,  54}, /* */
+   {110, 100,   500,  9,   2 *  25000, 62}, /* 31 digits */
+   {120, 100,   800,  9,   2 *  30000, 64}, /* */
+   {130, 100,  1000,  9,   2 *  30000, 64}, /* 41 digits */
+   {140, 100,  1200,  9,   2 *  30000, 66}, /* */
+   {150, 100,  1500, 10,   2 *  32000, 68}, /* 45 digit */
+   {160, 150,  1800, 11,   2 *  32000, 70}, /* */
+   {170, 150,  2000, 12,   2 *  32000, 72}, /* 50 digits */
+   {180, 150,  2500, 12,   2 *  32000, 73}, /* */
+   {190, 150,  2800, 12,   2 *  32000, 76}, /* */
+   {200, 200,  4000, 12,   2 *  32000, 80}, /* 60 digits */
+   {210, 100,  3600, 12,   2 *  32000, 83}, /* */
+   {220, 300,  6000, 15,   2 *  65536, 87}, /* */
+   {230, 350,  8500, 17,   3 *  65536, 90}, /* 70 digits */
+   {240, 400, 10000, 19,   4 *  65536, 93}, /* */
+   {250, 500, 15000, 19,   4 *  65536, 97}, /* 75 digits */
+   {260, 600, 25000, 25,   4 *  65536, 100}, /* 80 digits */
+   {270, 800, 35000, 27,   5 *  65536, 104}  /* */
 };
 
 /* number of entries in the tuning table */
-#define QS_TUNE_SIZE (sizeof(qsieve_tune)/(5*sizeof(mp_limb_t)))
+#define QS_TUNE_SIZE (sizeof(qsieve_tune)/(6*sizeof(mp_limb_t)))
 
 void qsieve_init(qs_t qs_inf, const fmpz_t n);
 

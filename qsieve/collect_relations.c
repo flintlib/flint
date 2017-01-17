@@ -14,13 +14,79 @@
 
 #include <time.h>
 
-/* sieving routine, taken from FLINT2 */
+void qsieve_do_sieving_old(qs_t qs_inf, unsigned char * sieve)
+{
+   unsigned long num_primes = qs_inf->num_primes;
+   int * soln1 = qs_inf->soln1;
+   int * soln2 = qs_inf->soln2;
+   prime_t * factor_base = qs_inf->factor_base;
+   ulong sieve_size = qs_inf->sieve_size;
+   unsigned char * end = sieve + sieve_size;
+   ulong sieve_fill = qs_inf->sieve_fill;
+   ulong small_primes = qs_inf->small_primes;
+   unsigned char * bound;
+   unsigned char * pos1;
+   unsigned char * pos2;
+   unsigned long size;
+   ulong p;
+   ulong prime;
+
+   const ulong second_prime = qs_inf->second_prime;
+   
+   memset(sieve, sieve_fill, sieve_size);
+   *end = 255;
+   
+   for (prime = small_primes; prime < second_prime; prime++) 
+   {
+      if (soln2[prime] == 0) continue;
+      
+      p = factor_base[prime].p;
+      size = factor_base[prime].size;
+      pos1 = sieve + soln1[prime];
+      pos2 = sieve + soln2[prime];
+      bound = end - p;
+        
+      while (bound - pos1 > 0)  
+      {  
+         (*pos1)+=size, pos1+=p, (*pos2)+=size, pos2+=p;
+      }
+      if ((end - pos1 > 0) && (end - pos2 > 0))
+      { 
+         (*pos1)+=size, pos1+=p, (*pos2)+=size, pos2+=p;
+      }
+      if (end - pos2 > 0)
+      { 
+         (*pos2)+=size;
+      }
+      if (end - pos1 > 0)
+      { 
+         (*pos1)+=size;
+      }
+   }
+   
+   for (prime = second_prime; prime < num_primes; prime++) 
+   {
+      p = factor_base[prime].p;
+      size = factor_base[prime].size;
+      pos1 = sieve + soln1[prime];
+      pos2 = sieve + soln2[prime];
+        
+      if (end - pos2 > 0)
+      { 
+         (*pos2)+=size;
+      }
+      if (end - pos1 > 0)
+      { 
+         (*pos1)+=size;
+      }
+   }
+}
 
 void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
 {
    slong num_primes = qs_inf->num_primes;
-   mp_limb_t * soln1 = qs_inf->soln1;
-   mp_limb_t * soln2 = qs_inf->soln2;
+   int * soln1 = qs_inf->soln1;
+   int * soln2 = qs_inf->soln2;
    prime_t * factor_base = qs_inf->factor_base;
    mp_limb_t p;
 
@@ -76,20 +142,16 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
    each block, for whole factor base at once
 */
 
-/* 
-   WARNING: CURRENTLY CAUSES SEGFAULT IN EVALUATE_SIEVE
-   due to 0xC0 not present after end of sieve
-*/
 void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 {
     slong b, d1, d2, i;
     slong pind, size;
     mp_limb_t p;
     slong num_primes = qs_inf->num_primes;
-    mp_limb_t * soln1 = qs_inf->soln1;
-    mp_limb_t * soln2 = qs_inf->soln2;
-    mp_limb_t * posn1 = qs_inf->posn1;
-    mp_limb_t * posn2 = qs_inf->posn2;
+    int * soln1 = qs_inf->soln1;
+    int * soln2 = qs_inf->soln2;
+    int * posn1 = qs_inf->posn1;
+    int * posn2 = qs_inf->posn2;
     prime_t * factor_base = qs_inf->factor_base;
 
     unsigned char * B;
@@ -123,16 +185,16 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 
             while (pos < Bp)
             {
-                (*pos) += size, pos += d1, (*pos) += size, pos += d2;
-                (*pos) += size, pos += d1, (*pos) += size, pos += d2;
+                (*pos) += size, (*(pos + d1)) += size, pos += p;
+                (*pos) += size, (*(pos + d1)) += size, pos += p;
             }
 
             Bp = B - d1;
 
             while (pos < Bp)
             {
-                (*pos) += size, pos += d1;
-                (*pos) += size, pos += d2;
+                (*pos) += size, 
+                (*(pos + d1)) += size, pos += p;
             }
 
             if (pos < B)
@@ -183,14 +245,17 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
    slong num_primes = qs_inf->num_primes;
    prime_t * factor_base = qs_inf->factor_base;
    fac_t * factor = qs_inf->factor;
-   mp_limb_t * soln1 = qs_inf->soln1;
-   mp_limb_t * soln2 = qs_inf->soln2;
+   int * soln1 = qs_inf->soln1;
+   int * soln2 = qs_inf->soln2;
    mp_limb_t * A_ind = qs_inf->A_ind;
    slong * small = qs_inf->small;
    mp_limb_t pinv;
    slong num_factors = 0;
    slong relations = 0;
    slong j, k;
+#if QS_DEBUG
+   static slong count_accept = 0;
+#endif
 
    fmpz_t X, Y, res, p;
 
@@ -199,7 +264,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
    fmpz_init(res);
    fmpz_init(p);
 
-   fmpz_set_ui(X, i - qs_inf->sieve_size / 2); /* X */
+   fmpz_set_si(X, i - qs_inf->sieve_size / 2); /* X */
 
    fmpz_mul(Y, X, qs_inf->A);
    fmpz_add(Y, Y, qs_inf->B); /* Y = AX+B */
@@ -209,14 +274,16 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
    fmpz_add(res, res, qs_inf->C); /* res = AX^2 + 2BX + C */
 
 #if QS_DEBUG & 128
+   printf("res = "); fmpz_print(res); printf("\n");
    flint_printf("Poly: "); fmpz_print(qs_inf->A); flint_printf("*x^2 + 2*");
    fmpz_print(qs_inf->B); flint_printf("*x + "); fmpz_print(qs_inf->C); printf("\n");
    flint_printf("x = %wd\n", i - qs_inf->sieve_size / 2);
 #endif
 
+   sieve[i] -= qs_inf->sieve_fill;
    bits = FLINT_ABS(fmpz_bits(res));
    bits -= BITS_ADJUST;
-   extra_bits = 20;
+   extra_bits = 0;
 
    if (factor_base[0].p != 1) /* divide out powers of the multiplier */
    {
@@ -263,6 +330,12 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
 
    if (extra_bits + sieve[i] > bits)
    {
+#if QS_DEBUG
+      count_accept += 1;
+      if (count_accept % 100 == 0)
+         printf("count_accept = %ld\n", count_accept);
+#endif
+
       sieve[i] += extra_bits;
 
       /* pull out remaining primes */
@@ -278,14 +351,10 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
             {
                fmpz_set_ui(p, prime);
                exp = fmpz_remove(res, res, p);
-               if (exp)
-               {
-                  extra_bits += qs_inf->factor_base[j].size;
-                  factor[num_factors].ind = j;
-                  factor[num_factors++].exp = exp;
-               }
+               extra_bits += qs_inf->factor_base[j].size*exp;
+               factor[num_factors].ind = j;
+               factor[num_factors++].exp = exp;
 #if QS_DEBUG & 128
-              if (exp)
                   flint_printf("%ld^%ld ", prime, exp);
 #endif
 
@@ -364,16 +433,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
          else
             flint_printf("\n");
 #endif
-
-         /* relations += qsieve_insert_relation(qs_inf, Y); */  /* Insert the relation in the matrix */
-
-         /*  if (qs_inf->num_relations >= qs_inf->buffer_size)
-         {
-            flint_printf("Error: too many duplicate relations!\n");
-            flint_printf("s = %wd, bits = %wd\n", qs_inf->s, qs_inf->bits);
-            abort();
-         } 
-         */
       }
       else
       {
@@ -453,6 +512,11 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
         {
             if (sieve[i] > bits)
             {
+#if 0/*QS_DEBUG */
+                qs_inf->num_candidates += 1;
+                if (qs_inf->num_candidates % 100 == 0)
+                   flint_printf("num_candidates = %wd\n", qs_inf->num_candidates);
+#endif
                 rels += qsieve_evaluate_candidate(qs_inf, i, sieve);
             }
 

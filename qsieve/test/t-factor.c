@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2015 Nitin Kumar
+    Copyright (C) 2016 William Hart
 
 ******************************************************************************/
 
@@ -60,11 +61,15 @@ int main(void)
    flint_printf("factor....");
    fflush(stdout);
 
-   for (i = 0; i < 20; i++) /* Test random n, two factors */
+   for (i = 0; i < 30; i++) /* Test random n, two factors */
    {
-      randprime(x, state, 50);
-      randprime(y, state, 50);
+      slong bits = 40;
 
+      randprime(x, state, bits);
+      do {
+         randprime(y, state, bits);
+      } while (fmpz_equal(x, y));
+      
       fmpz_mul(n, x, y);
 
       fmpz_factor_init(factors);
@@ -81,11 +86,15 @@ int main(void)
       fmpz_factor_clear(factors);
    }
 
-   for (i = 0; i < 20; i++) /* Test random n, three factors */
+   for (i = 0; i < 30; i++) /* Test random n, three factors */
    {
       randprime(x, state, 40);
-      randprime(y, state, 40);
-      randprime(z, state, 40);
+      do {
+         randprime(y, state, 40);
+      } while (fmpz_equal(x, y));
+      do {
+         randprime(z, state, 40);
+      } while (fmpz_equal(x, z) || fmpz_equal(y, z));
 
       fmpz_mul(n, x, y);
       fmpz_mul(n, n, z);
@@ -104,10 +113,12 @@ int main(void)
       fmpz_factor_clear(factors);
    }
 
-   for (i = 0; i < 20; i++) /* Test random n, small factors */
+   for (i = 0; i < 30; i++) /* Test random n, small factors */
    {
       randprime(x, state, 10);
-      randprime(y, state, 10);
+      do {
+         randprime(y, state, 10);
+      } while (fmpz_equal(x, y));
       randprime(z, state, 40);
 
       fmpz_mul(n, x, y);

@@ -41,7 +41,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     uint64_t mask;
     flint_rand_t state;
     fmpz_t temp, X, Y;
-    slong bits, num_facs;
+    slong num_facs;
     fmpz * facs;
 
     if (fmpz_sgn(n) < 0)
@@ -78,8 +78,6 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     fmpz_print(qs_inf->n);
     flint_printf(" of %wu bits\n", qs_inf->bits);
 #endif
-
-    bits = exp(1.27*pow(log((double) qs_inf->bits), 0.755));
 
     /**************************************************************************
         KNUTH SCHROEPPEL:
@@ -124,6 +122,10 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
     /* refine qs_inf->bits */
     qs_inf->bits = fmpz_bits(qs_inf->kn);
+
+#if QS_DEBUG
+    flint_printf("kn bits = %wd\n", qs_inf->bits);
+#endif
 
     /**************************************************************************
         COMPUTE FACTOR BASE:
@@ -186,16 +188,6 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
-    if (bits >= 64)
-    {
-       qs_inf->sieve_bits = bits;
-       qs_inf->sieve_fill = 0;
-    } else
-    {
-       qs_inf->sieve_bits = 64;
-       qs_inf->sieve_fill = 64 - bits;
-    }
-
     qs_inf->q_idx = qs_inf->num_primes;
     qs_inf->siqs = fopen("siqs.dat", "w");
 
@@ -218,7 +210,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
         else
         {
             if (!qsieve_init_A0(qs_inf))
-                break;
+                goto more_primes;
         }
 
         do
@@ -237,13 +229,13 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
 #if QS_DEBUG
                 flint_printf("full relations = %wd, num cycles = %wd, ks_primes = %wd, "
-                              "extra rels = %wd\n", qs_inf->full_relation,
+                              "extra rels = %wd, poly_count = %wd\n", qs_inf->full_relation,
                               qs_inf->num_cycles, qs_inf->ks_primes,
-                              qs_inf->extra_rels);
+                              qs_inf->extra_rels, qs_inf->poly_count);
 #endif
  
                 if (qs_inf->full_relation + qs_inf->num_cycles >= 
-                   ((slong) (1.015*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
+                   ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
                 {
                     fclose(qs_inf->siqs);
 

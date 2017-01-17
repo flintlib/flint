@@ -211,7 +211,7 @@ int qsieve_init_A0(qs_t qs_inf)
     fmpz_fdiv_q_ui(target, qs_inf->target_A, factor_base[qs_inf->q_idx - 1].p);
     fmpz_fdiv_q_ui(lower_bound, target, 2);
     fmpz_mul_ui(upper_bound, target, 2);
-
+    
     bits = fmpz_bits(target);
 
     for (i = qs_inf->small_primes; i < qs_inf->num_primes; i++)
@@ -252,7 +252,7 @@ int qsieve_init_A0(qs_t qs_inf)
         {
             if (num_factor > 2 && factor_bound[i + 1] > 0 && factor_bound[i + 2] > 0)
             {
-                low = factor_bound[i - 1];
+                low = factor_bound[i];
                 high = factor_bound[i + 2];
                 break;
             }
@@ -476,8 +476,8 @@ void qsieve_init_poly_first(qs_t qs_inf)
     slong s = qs_inf->s;
     mp_limb_t * A_ind = qs_inf->A_ind;
     mp_limb_t * A0_inv = qs_inf->A0_inv;
-    mp_limb_t * soln1 = qs_inf->soln1;
-    mp_limb_t * soln2 = qs_inf->soln2;
+    int * soln1 = qs_inf->soln1;
+    int * soln2 = qs_inf->soln2;
     mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
     fmpz_t * B_terms = qs_inf->B_terms;
     mp_limb_t * B0_terms = qs_inf->B0_terms;
@@ -488,6 +488,10 @@ void qsieve_init_poly_first(qs_t qs_inf)
     fmpz_t temp3;
 
     fmpz_init(temp3);
+
+#if QS_DEBUG
+    qs_inf->poly_count += 1;
+#endif
 
     q = factor_base[qs_inf->q_idx].p;
 
@@ -526,6 +530,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     
     qsqrt = sqrts[qs_inf->q_idx];
     pmod = n_mulmod2_preinv(mod_inv, qsqrt, q, qinv);
+    if (pmod > q/2) pmod = q - pmod;
     fmpz_mul_ui(temp3, qs_inf->A0, pmod);
     fmpz_add(qs_inf->B, qs_inf->B, temp3);
 
@@ -604,13 +609,17 @@ void qsieve_init_poly_next(qs_t qs_inf)
     slong i, j, v;
     slong s = qs_inf->s;
     prime_t * factor_base = qs_inf->factor_base;
-    mp_limb_t * soln1 = qs_inf->soln1;
-    mp_limb_t * soln2 = qs_inf->soln2;
+    int * soln1 = qs_inf->soln1;
+    int * soln2 = qs_inf->soln2;
     mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
     mp_limb_t sign, p;
     fmpz_t temp, temp2;
     
     fmpz_init(temp);
+
+#if QS_DEBUG
+    qs_inf->poly_count += 1;
+#endif
 
     /* we have $b_i$, calculating $b_{i+1}$ using gray code formula */
     i = qs_inf->curr_poly;
@@ -671,6 +680,19 @@ void qsieve_compute_C(qs_t qs_inf)
 {
     fmpz_mul(qs_inf->C, qs_inf->B, qs_inf->B);
     fmpz_sub(qs_inf->C, qs_inf->C, qs_inf->kn);
+#if QS_DEBUG
+    {
+       fmpz_t r;
+       fmpz_init(r);
+       fmpz_mod(r, qs_inf->C, qs_inf->A);
+       if (!fmpz_is_zero(r))
+       {
+          flint_printf("B^2 - kn not divisible by A\n");
+          flint_abort();
+       }
+       fmpz_clear(r);
+    }
+#endif
     fmpz_divexact(qs_inf->C, qs_inf->C, qs_inf->A);
 }
 
