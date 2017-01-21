@@ -604,7 +604,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     gray-code formula, for current value of 'A'
 */
 
-void qsieve_init_poly_next(qs_t qs_inf)
+void qsieve_init_poly_next(qs_t qs_inf, qs_poly_t poly)
 {
     slong i, j, v;
     slong s = qs_inf->s;
@@ -676,7 +676,7 @@ void qsieve_init_poly_next(qs_t qs_inf)
 }
 
 /* calculate coefficient 'C' for current 'A' and 'B' */
-void qsieve_compute_C(fmpz_t C, qs_t qs_inf)
+void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly)
 {
     fmpz_t r;
        

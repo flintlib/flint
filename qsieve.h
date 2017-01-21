@@ -77,6 +77,17 @@ typedef struct relation_t  /* format for relation */
    fmpz_t Y;              /* square root of sieve value for relation */
 } relation_t;
 
+typedef struct qs_poly_s
+{
+   fmpz_t B;
+   int * soln1;
+   int * soln2;
+   int * posn1;
+   int * posn2;
+} qs_poly_s;
+
+typedef qs_poly_s qs_poly_t[1];
+
 typedef struct qs_s
 {
    fmpz_t n;               /* Number to factor */
@@ -124,9 +135,6 @@ typedef struct qs_s
    int * soln1;       /* first root of poly */
    int * soln2;       /* second root of poly */
 
-   int * posn1;       /* position 1 to start sieving, for each prime p */ 
-   int * posn2;       /* position 2 to start sieving, for each prime p */ 
-
    fmpz_t target_A;         /* approximate target value for A coeff of poly */
 
    fmpz_t upp_bound;
@@ -150,8 +158,9 @@ typedef struct qs_s
 
 #if QS_DEBUG
    slong poly_count;         /* keep track of the number of polynomials used */
-   slong num_candidates;     /* keep track of the number of candidates */
 #endif
+
+   qs_poly_s * poly;         /* poly data per thread */
 
    /***************************************************************************
                        RELATION DATA
@@ -276,19 +285,19 @@ void qsieve_compute_pre_data(qs_t qs_inf);
 
 void qsieve_init_poly_first(qs_t qs_inf);
 
-void qsieve_init_poly_next(qs_t qs_inf);
+void qsieve_init_poly_next(qs_t qs_inf, qs_poly_t poly);
 
-void qsieve_compute_C(fmpz_t C, qs_t qs_inf);
+void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly);
 
 void qsieve_poly_clear(qs_t qs_inf);
 
-void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve);
+void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
-void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve);
+void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
-slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve);
+slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_poly_t poly);
 
-slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve);
+slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
 slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve);
 

@@ -36,8 +36,6 @@ void qsieve_poly_clear(qs_t qs_inf)
    flint_free(qs_inf->A0_inv);
    flint_free(qs_inf->soln1);
    flint_free(qs_inf->soln2);
-   flint_free(qs_inf->posn1);
-   flint_free(qs_inf->posn2);
    flint_free(qs_inf->curr_subset);
 
    if (qs_inf->A_inv2B != NULL)
@@ -50,6 +48,23 @@ void qsieve_poly_clear(qs_t qs_inf)
 
    flint_free(qs_inf->A_inv2B);
 
+#if HAVE_OPENMP
+   for (i = 0; i < omp_num_threads(); i++)
+   {
+      fmpz_clear(qs_inf->poly[i].B);
+      flint_free(qs_inf->poly[i].posn1);
+      flint_free(qs_inf->poly[i].posn2);
+      flint_free(qs_inf->poly[i].soln1);
+      flint_free(qs_inf->poly[i].soln2);
+   }
+#else
+   fmpz_clear(qs_inf->poly[0].B);
+   flint_free(qs_inf->poly[0].posn1);
+   flint_free(qs_inf->poly[0].posn2);
+   flint_free(qs_inf->poly[0].soln1);
+   flint_free(qs_inf->poly[0].soln2);
+#endif
+
    qs_inf->B_terms = NULL;
    qs_inf->A_ind = NULL;
    qs_inf->A0_divp = NULL;
@@ -57,8 +72,6 @@ void qsieve_poly_clear(qs_t qs_inf)
    qs_inf->A0_inv = NULL;
    qs_inf->soln1 = NULL;
    qs_inf->soln2 = NULL;
-   qs_inf->posn1 = NULL;
-   qs_inf->posn2 = NULL;
    qs_inf->A_inv2B = NULL;
    qs_inf->curr_subset = NULL;
 

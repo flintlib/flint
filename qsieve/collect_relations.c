@@ -14,7 +14,7 @@
 
 #include <time.h>
 
-void qsieve_do_sieving_old(qs_t qs_inf, unsigned char * sieve)
+void qsieve_do_sieving_old(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 {
    unsigned long num_primes = qs_inf->num_primes;
    int * soln1 = qs_inf->soln1;
@@ -82,7 +82,7 @@ void qsieve_do_sieving_old(qs_t qs_inf, unsigned char * sieve)
    }
 }
 
-void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
+void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 {
    slong num_primes = qs_inf->num_primes;
    int * soln1 = qs_inf->soln1;
@@ -142,7 +142,7 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
    each block, for whole factor base at once
 */
 
-void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
+void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 {
     slong b, d1, d2, i;
     slong pind, size;
@@ -150,8 +150,8 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
     slong num_primes = qs_inf->num_primes;
     int * soln1 = qs_inf->soln1;
     int * soln2 = qs_inf->soln2;
-    int * posn1 = qs_inf->posn1;
-    int * posn2 = qs_inf->posn2;
+    int * posn1 = poly->posn1;
+    int * posn2 = poly->posn2;
     prime_t * factor_base = qs_inf->factor_base;
 
     unsigned char * B;
@@ -238,7 +238,7 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 
 /* check position 'i' in sieve array for smoothness */
 
-slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
+slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_poly_t poly)
 {
    slong bits, exp, extra_bits;
    mp_limb_t modp, prime;
@@ -253,9 +253,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
    slong num_factors = 0;
    slong relations = 0;
    slong j, k;
-#if QS_DEBUG
-   static slong count_accept = 0;
-#endif
 
    fmpz_t X, Y, C, res, p;
 
@@ -265,7 +262,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
    fmpz_init(p);
    fmpz_init(C);
 
-   qsieve_compute_C(C, qs_inf);   
+   qsieve_compute_C(C, qs_inf, poly);   
       
    fmpz_set_si(X, i - qs_inf->sieve_size / 2); /* X */
 
@@ -333,12 +330,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
 
    if (extra_bits + sieve[i] > bits)
    {
-#if QS_DEBUG
-      count_accept += 1;
-      if (count_accept % 100 == 0)
-         printf("count_accept = %ld\n", count_accept);
-#endif
-
       sieve[i] += extra_bits;
 
       /* pull out remaining primes */
@@ -492,7 +483,7 @@ cleanup:
 
 /* scan sieve array for possible candidate for smooth relations */
 
-slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
+slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 {
     slong i = 0, j = 0;
     ulong * sieve2 = (ulong *) sieve;
@@ -515,14 +506,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
         while (i < (j + 1) * sizeof(ulong) && i < qs_inf->sieve_size)
         {
             if (sieve[i] > bits)
-            {
-#if QS_DEBUG
-                qs_inf->num_candidates += 1;
-                if (qs_inf->num_candidates % 100 == 0)
-                   flint_printf("num_candidates = %wd\n", qs_inf->num_candidates);
-#endif
-                rels += qsieve_evaluate_candidate(qs_inf, i, sieve);
-            }
+                rels += qsieve_evaluate_candidate(qs_inf, i, sieve, poly);
 
             i++;
         }
@@ -545,21 +529,23 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
     {
 #if HAVE_OPENMP
         unsigned char * thread_sieve = sieve + qs_inf->sieve_size*omp_get_thread_num();
+        qs_poly_s * thread_poly = qs_inf->poly + omp_get_thread_num();
 #else
         unsigned char * thread_sieve = sieve;
+        qs_poly_s * thread_poly = qs_inf->poly;
 #endif
 
         if (qs_inf->sieve_size < 2*BLOCK_SIZE)
-           qsieve_do_sieving(qs_inf, thread_sieve);
+           qsieve_do_sieving(qs_inf, thread_sieve, thread_poly);
         else
-           qsieve_do_sieving2(qs_inf, thread_sieve);
+           qsieve_do_sieving2(qs_inf, thread_sieve, thread_poly);
 
-        relations += qsieve_evaluate_sieve(qs_inf, thread_sieve);
+        relations += qsieve_evaluate_sieve(qs_inf, thread_sieve, thread_poly);
         
         if (qs_inf->curr_poly == (1 << qs_inf->s))
             break;
 
-        qsieve_init_poly_next(qs_inf);
+        qsieve_init_poly_next(qs_inf, thread_poly);
     }
 
     return relations;

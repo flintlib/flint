@@ -42,7 +42,6 @@ void qsieve_init(qs_t qs_inf, const fmpz_t n)
     qs_inf->edges = 0;
 #if QS_DEBUG
     qs_inf->poly_count = 0;
-    qs_inf->num_candidates = 0;
 #endif
 
     fmpz_init(qs_inf->kn); /* initialise kn */
