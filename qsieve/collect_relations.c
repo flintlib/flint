@@ -17,8 +17,8 @@
 void qsieve_do_sieving_old(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 {
    unsigned long num_primes = qs_inf->num_primes;
-   int * soln1 = qs_inf->soln1;
-   int * soln2 = qs_inf->soln2;
+   int * soln1 = poly->soln1;
+   int * soln2 = poly->soln2;
    prime_t * factor_base = qs_inf->factor_base;
    ulong sieve_size = qs_inf->sieve_size;
    unsigned char * end = sieve + sieve_size;
@@ -85,8 +85,8 @@ void qsieve_do_sieving_old(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 {
    slong num_primes = qs_inf->num_primes;
-   int * soln1 = qs_inf->soln1;
-   int * soln2 = qs_inf->soln2;
+   int * soln1 = poly->soln1;
+   int * soln2 = poly->soln2;
    prime_t * factor_base = qs_inf->factor_base;
    mp_limb_t p;
 
@@ -148,8 +148,8 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
     slong pind, size;
     mp_limb_t p;
     slong num_primes = qs_inf->num_primes;
-    int * soln1 = qs_inf->soln1;
-    int * soln2 = qs_inf->soln2;
+    int * soln1 = poly->soln1;
+    int * soln2 = poly->soln2;
     int * posn1 = poly->posn1;
     int * posn2 = poly->posn2;
     prime_t * factor_base = qs_inf->factor_base;
@@ -245,8 +245,8 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    slong num_primes = qs_inf->num_primes;
    prime_t * factor_base = qs_inf->factor_base;
    fac_t * factor = qs_inf->factor;
-   int * soln1 = qs_inf->soln1;
-   int * soln2 = qs_inf->soln2;
+   int * soln1 = poly->soln1;
+   int * soln2 = poly->soln2;
    mp_limb_t * A_ind = qs_inf->A_ind;
    slong * small = qs_inf->small;
    mp_limb_t pinv;
@@ -267,8 +267,8 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    fmpz_set_si(X, i - qs_inf->sieve_size / 2); /* X */
 
    fmpz_mul(Y, X, qs_inf->A);
-   fmpz_add(Y, Y, qs_inf->B); /* Y = AX+B */
-   fmpz_add(res, Y, qs_inf->B); /* Y = AX+2B */
+   fmpz_add(Y, Y, poly->B); /* Y = AX+B */
+   fmpz_add(res, Y, poly->B); /* Y = AX+2B */
 
    fmpz_mul(res, res, X);
    fmpz_add(res, res, C); /* res = AX^2 + 2BX + C */
@@ -276,7 +276,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 #if QS_DEBUG & 128
    printf("res = "); fmpz_print(res); printf("\n");
    flint_printf("Poly: "); fmpz_print(qs_inf->A); flint_printf("*x^2 + 2*");
-   fmpz_print(qs_inf->B); flint_printf("*x + "); fmpz_print(C); printf("\n");
+   fmpz_print(poly->B); flint_printf("*x + "); fmpz_print(C); printf("\n");
    flint_printf("x = %wd\n", i - qs_inf->sieve_size / 2);
 #endif
 
@@ -506,7 +506,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
         while (i < (j + 1) * sizeof(ulong) && i < qs_inf->sieve_size)
         {
             if (sieve[i] > bits)
-                rels += qsieve_evaluate_candidate(qs_inf, i, sieve, poly);
+               rels += qsieve_evaluate_candidate(qs_inf, i, sieve, poly);
 
             i++;
         }
@@ -521,31 +521,42 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 
 slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
 {
-    slong relations = 0;
+    slong relations = 0, i, j = 0;
 
     qsieve_init_poly_first(qs_inf);
 
-    while (1)
+#pragma omp parallel for
+    for (i = 0; i < (1 << qs_inf->s); i++)
     {
 #if HAVE_OPENMP
-        unsigned char * thread_sieve = sieve + qs_inf->sieve_size*omp_get_thread_num();
+        unsigned char * thread_sieve = sieve + (qs_inf->sieve_size + sizeof(ulong) + 64)*omp_get_thread_num();
         qs_poly_s * thread_poly = qs_inf->poly + omp_get_thread_num();
 #else
         unsigned char * thread_sieve = sieve;
         qs_poly_s * thread_poly = qs_inf->poly;
 #endif
 
+#pragma omp critical
+        {
+           if (j == 0)
+              qsieve_poly_copy(thread_poly, qs_inf);
+           else
+           {
+              qsieve_init_poly_next(qs_inf, j);
+              qsieve_poly_copy(thread_poly, qs_inf);
+           }
+           j++;
+        }
+
         if (qs_inf->sieve_size < 2*BLOCK_SIZE)
            qsieve_do_sieving(qs_inf, thread_sieve, thread_poly);
         else
            qsieve_do_sieving2(qs_inf, thread_sieve, thread_poly);
 
-        relations += qsieve_evaluate_sieve(qs_inf, thread_sieve, thread_poly);
-        
-        if (qs_inf->curr_poly == (1 << qs_inf->s))
-            break;
-
-        qsieve_init_poly_next(qs_inf, thread_poly);
+#pragma omp critical
+        {
+           relations += qsieve_evaluate_sieve(qs_inf, thread_sieve, thread_poly);
+        }
     }
 
     return relations;

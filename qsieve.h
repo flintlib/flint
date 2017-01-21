@@ -33,7 +33,7 @@
  extern "C" {
 #endif
 
-#define QS_DEBUG 1
+#define QS_DEBUG 0
 
 #define BITS_ADJUST 25 /* added to sieve entries to compensate for approximations */
 
@@ -140,8 +140,6 @@ typedef struct qs_s
    fmpz_t upp_bound;
    fmpz_t low_bound;
 
-   slong curr_poly;         /* rank of polynomial according to gray-code
-                               formula */
    slong s;                 /* number of prime factors of A0 */
    slong low;               /* minimum offset in factor base,
                                for possible factors of 'A0' */
@@ -285,9 +283,11 @@ void qsieve_compute_pre_data(qs_t qs_inf);
 
 void qsieve_init_poly_first(qs_t qs_inf);
 
-void qsieve_init_poly_next(qs_t qs_inf, qs_poly_t poly);
+void qsieve_init_poly_next(qs_t qs_inf, slong i);
 
 void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly);
+
+void qsieve_poly_copy(qs_poly_t poly, qs_t qs_inf);
 
 void qsieve_poly_clear(qs_t qs_inf);
 

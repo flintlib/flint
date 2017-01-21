@@ -49,7 +49,7 @@ void qsieve_poly_clear(qs_t qs_inf)
    flint_free(qs_inf->A_inv2B);
 
 #if HAVE_OPENMP
-   for (i = 0; i < omp_num_threads(); i++)
+   for (i = 0; i < omp_get_max_threads(); i++)
    {
       fmpz_clear(qs_inf->poly[i].B);
       flint_free(qs_inf->poly[i].posn1);
@@ -74,7 +74,6 @@ void qsieve_poly_clear(qs_t qs_inf)
    qs_inf->soln2 = NULL;
    qs_inf->A_inv2B = NULL;
    qs_inf->curr_subset = NULL;
-
 }
 
 

@@ -38,9 +38,9 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf)
    qs_inf->soln2 = flint_malloc(num_primes * sizeof(mp_limb_t));
 
 #if HAVE_OPENMP
-   qs_inf->poly = flint_malloc(omp_num_threads() * sizeof(qs_poly_s));
+   qs_inf->poly = flint_malloc(omp_get_max_threads() * sizeof(qs_poly_s));
 
-   for (i = 0; i < omp_num_threads(); i++)
+   for (i = 0; i < omp_get_max_threads(); i++)
    {
       fmpz_init(qs_inf->poly[i].B);
       qs_inf->poly[i].posn1 = flint_malloc((num_primes + 16)*sizeof(mp_limb_t));

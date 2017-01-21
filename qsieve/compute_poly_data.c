@@ -594,8 +594,6 @@ void qsieve_init_poly_first(qs_t qs_inf)
         soln1[A_ind[i]] = soln2[A_ind[i]] = 0;
     }
 
-    qs_inf->curr_poly = 1;
-
     fmpz_clear(temp3);
 }
 
@@ -604,9 +602,9 @@ void qsieve_init_poly_first(qs_t qs_inf)
     gray-code formula, for current value of 'A'
 */
 
-void qsieve_init_poly_next(qs_t qs_inf, qs_poly_t poly)
+void qsieve_init_poly_next(qs_t qs_inf, slong i)
 {
-    slong i, j, v;
+    slong j, v;
     slong s = qs_inf->s;
     prime_t * factor_base = qs_inf->factor_base;
     int * soln1 = qs_inf->soln1;
@@ -622,7 +620,6 @@ void qsieve_init_poly_next(qs_t qs_inf, qs_poly_t poly)
 #endif
 
     /* we have $b_i$, calculating $b_{i+1}$ using gray code formula */
-    i = qs_inf->curr_poly;
 
     for (v = 0; v < s; v++)
     {
@@ -669,10 +666,20 @@ void qsieve_init_poly_next(qs_t qs_inf, qs_poly_t poly)
         }
     }
 
-    i++;
-    qs_inf->curr_poly = i;
-
     fmpz_clear(temp);
+}
+
+void qsieve_poly_copy(qs_poly_t poly, qs_t qs_inf)
+{
+   slong i;
+
+   fmpz_set(poly->B, qs_inf->B);
+   
+   for (i = 0; i < qs_inf->num_primes; i++)
+   {
+      poly->soln1[i] = qs_inf->soln1[i];
+      poly->soln2[i] = qs_inf->soln2[i];
+   }
 }
 
 /* calculate coefficient 'C' for current 'A' and 'B' */
@@ -682,7 +689,7 @@ void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly)
        
     fmpz_init(r);
        
-    fmpz_mul(C, qs_inf->B, qs_inf->B);
+    fmpz_mul(C, poly->B, poly->B);
     fmpz_sub(C, C, qs_inf->kn);
 
 #if QS_DEBUG

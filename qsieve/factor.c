@@ -186,9 +186,9 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     flint_printf("\nPolynomial Initialisation and Sieving\n");
 #endif
 
-#if WANT_OPENMP
+#if HAVE_OPENMP
     /* ensure cache lines don't overlap */
-    sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulong) + 64)*omp_num_threads());
+    sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulong) + 64)*omp_get_max_threads());
 #else
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 #endif
