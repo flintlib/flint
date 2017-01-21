@@ -25,11 +25,15 @@
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
 
+#if HAVE_OPENMP
+#include <omp.h> /* must include flint.h first */
+#endif
+
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#define QS_DEBUG 0
+#define QS_DEBUG 1
 
 #define BITS_ADJUST 25 /* added to sieve entries to compensate for approximations */
 
@@ -107,7 +111,6 @@ typedef struct qs_s
    slong q_idx;             /* offset of q0 in factor base */
 
    fmpz_t B;                /* B values corresponding to current value of A */
-   fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
    mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
    fmpz_t * A0_divp;        /* (A0 / p) for each prime dividing A0 */
    fmpz_t * B_terms;        /* B_terms[i] = A_divp[i] * (B0_terms[i] * q0^(-1)) % p,
@@ -275,7 +278,7 @@ void qsieve_init_poly_first(qs_t qs_inf);
 
 void qsieve_init_poly_next(qs_t qs_inf);
 
-void qsieve_compute_C(qs_t qs_inf);
+void qsieve_compute_C(fmpz_t C, qs_t qs_inf);
 
 void qsieve_poly_clear(qs_t qs_inf);
 

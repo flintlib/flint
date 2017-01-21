@@ -22,7 +22,6 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf)
    fmpz_init(qs_inf->A);
    fmpz_init(qs_inf->A0);
    fmpz_init(qs_inf->B);
-   fmpz_init(qs_inf->C);
    fmpz_init(qs_inf->upp_bound);
    fmpz_init(qs_inf->low_bound);
 

@@ -676,23 +676,26 @@ void qsieve_init_poly_next(qs_t qs_inf)
 }
 
 /* calculate coefficient 'C' for current 'A' and 'B' */
-void qsieve_compute_C(qs_t qs_inf)
+void qsieve_compute_C(fmpz_t C, qs_t qs_inf)
 {
-    fmpz_mul(qs_inf->C, qs_inf->B, qs_inf->B);
-    fmpz_sub(qs_inf->C, qs_inf->C, qs_inf->kn);
+    fmpz_t r;
+       
+    fmpz_init(r);
+       
+    fmpz_mul(C, qs_inf->B, qs_inf->B);
+    fmpz_sub(C, C, qs_inf->kn);
+
 #if QS_DEBUG
+    fmpz_mod(r, C, qs_inf->A);
+    if (!fmpz_is_zero(r))
     {
-       fmpz_t r;
-       fmpz_init(r);
-       fmpz_mod(r, qs_inf->C, qs_inf->A);
-       if (!fmpz_is_zero(r))
-       {
-          flint_printf("B^2 - kn not divisible by A\n");
-          flint_abort();
-       }
-       fmpz_clear(r);
+       flint_printf("B^2 - kn not divisible by A\n");
+       flint_abort();
     }
 #endif
-    fmpz_divexact(qs_inf->C, qs_inf->C, qs_inf->A);
+       
+    fmpz_divexact(C, C, qs_inf->A);
+
+    fmpz_clear(r);
 }
 

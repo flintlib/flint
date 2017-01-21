@@ -61,9 +61,9 @@ int main(void)
    flint_printf("factor....");
    fflush(stdout);
 
-   for (i = 0; i < 30; i++) /* Test random n, two factors */
+   for (i = 0; i < 1; i++) /* Test random n, two factors */
    {
-      slong bits = 40;
+      slong bits = 115;
 
       randprime(x, state, bits);
       do {
@@ -86,7 +86,7 @@ int main(void)
       fmpz_factor_clear(factors);
    }
 
-   for (i = 0; i < 30; i++) /* Test random n, three factors */
+   for (i = 0; i < 0; i++) /* Test random n, three factors */
    {
       randprime(x, state, 40);
       do {
@@ -113,7 +113,7 @@ int main(void)
       fmpz_factor_clear(factors);
    }
 
-   for (i = 0; i < 30; i++) /* Test random n, small factors */
+   for (i = 0; i < 0; i++) /* Test random n, small factors */
    {
       randprime(x, state, 10);
       do {

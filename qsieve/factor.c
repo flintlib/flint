@@ -186,7 +186,12 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     flint_printf("\nPolynomial Initialisation and Sieving\n");
 #endif
 
+#if WANT_OPENMP
+    /* ensure cache lines don't overlap */
+    sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulong) + 64)*omp_num_threads());
+#else
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
+#endif
 
     qs_inf->q_idx = qs_inf->num_primes;
     qs_inf->siqs = fopen("siqs.dat", "w");

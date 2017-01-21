@@ -257,13 +257,16 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
    static slong count_accept = 0;
 #endif
 
-   fmpz_t X, Y, res, p;
+   fmpz_t X, Y, C, res, p;
 
    fmpz_init(X);
    fmpz_init(Y);
    fmpz_init(res);
    fmpz_init(p);
+   fmpz_init(C);
 
+   qsieve_compute_C(C, qs_inf);   
+      
    fmpz_set_si(X, i - qs_inf->sieve_size / 2); /* X */
 
    fmpz_mul(Y, X, qs_inf->A);
@@ -271,12 +274,12 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
    fmpz_add(res, Y, qs_inf->B); /* Y = AX+2B */
 
    fmpz_mul(res, res, X);
-   fmpz_add(res, res, qs_inf->C); /* res = AX^2 + 2BX + C */
+   fmpz_add(res, res, C); /* res = AX^2 + 2BX + C */
 
 #if QS_DEBUG & 128
    printf("res = "); fmpz_print(res); printf("\n");
    flint_printf("Poly: "); fmpz_print(qs_inf->A); flint_printf("*x^2 + 2*");
-   fmpz_print(qs_inf->B); flint_printf("*x + "); fmpz_print(qs_inf->C); printf("\n");
+   fmpz_print(qs_inf->B); flint_printf("*x + "); fmpz_print(C); printf("\n");
    flint_printf("x = %wd\n", i - qs_inf->sieve_size / 2);
 #endif
 
@@ -480,6 +483,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve)
 cleanup:
    fmpz_clear(X);
    fmpz_clear(Y);
+   fmpz_clear(C);
    fmpz_clear(res);
    fmpz_clear(p);
 
@@ -539,13 +543,18 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
 
     while (1)
     {
-        qsieve_compute_C(qs_inf);
-        if (qs_inf->sieve_size < 2*BLOCK_SIZE)
-           qsieve_do_sieving(qs_inf, sieve);
-        else
-           qsieve_do_sieving2(qs_inf, sieve);
+#if HAVE_OPENMP
+        unsigned char * thread_sieve = sieve + qs_inf->sieve_size*omp_get_thread_num();
+#else
+        unsigned char * thread_sieve = sieve;
+#endif
 
-        relations += qsieve_evaluate_sieve(qs_inf, sieve);
+        if (qs_inf->sieve_size < 2*BLOCK_SIZE)
+           qsieve_do_sieving(qs_inf, thread_sieve);
+        else
+           qsieve_do_sieving2(qs_inf, thread_sieve);
+
+        relations += qsieve_evaluate_sieve(qs_inf, thread_sieve);
         
         if (qs_inf->curr_poly == (1 << qs_inf->s))
             break;
