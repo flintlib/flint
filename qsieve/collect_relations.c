@@ -244,11 +244,11 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    mp_limb_t modp, prime;
    slong num_primes = qs_inf->num_primes;
    prime_t * factor_base = qs_inf->factor_base;
-   fac_t * factor = qs_inf->factor;
+   slong * small = poly->small;
+   fac_t * factor = poly->factor;
    int * soln1 = poly->soln1;
    int * soln2 = poly->soln2;
    mp_limb_t * A_ind = qs_inf->A_ind;
-   slong * small = qs_inf->small;
    mp_limb_t pinv;
    slong num_factors = 0;
    slong relations = 0;
@@ -396,11 +396,14 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
          factor[num_factors].ind = qs_inf->q_idx;
          factor[num_factors++].exp = 1;
 
-         qs_inf->num_factors = num_factors;
+         poly->num_factors = num_factors;
 
-         qsieve_write_to_file(qs_inf, 1, Y);
+#pragma omp critical
+         {
+            qsieve_write_to_file(qs_inf, 1, Y, poly);
          
-         qs_inf->full_relation++;
+            qs_inf->full_relation++;
+         }
          relations++;
 
 #if 0
@@ -455,15 +458,18 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
                   factor[num_factors].ind = qs_inf->q_idx;
                   factor[num_factors++].exp = 1;
 
-                  qs_inf->num_factors = num_factors;
+                  poly->num_factors = num_factors;
 
-                  /* store this partial in file */
+#pragma omp critical
+                  {
+                     /* store this partial in file */
 
-                  qsieve_write_to_file(qs_inf, prime, Y);
+                     qsieve_write_to_file(qs_inf, prime, Y, poly);
 
-                  qs_inf->edges++;
+                     qs_inf->edges++;
 
-                  qsieve_add_to_hashtable(qs_inf, prime);
+                     qsieve_add_to_hashtable(qs_inf, prime);
+                  }
               }
           }
       }
@@ -521,7 +527,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 
 slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
 {
-    slong relations = 0, i, j = 0;
+    slong relations = 0, rels, i, j = 0;
 
     qsieve_init_poly_first(qs_inf);
 
@@ -553,10 +559,10 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
         else
            qsieve_do_sieving2(qs_inf, thread_sieve, thread_poly);
 
-#pragma omp critical
-        {
-           relations += qsieve_evaluate_sieve(qs_inf, thread_sieve, thread_poly);
-        }
+        rels = qsieve_evaluate_sieve(qs_inf, thread_sieve, thread_poly);
+
+#pragma omp atomic
+        relations += rels;
     }
 
     return relations;

@@ -79,11 +79,14 @@ typedef struct relation_t  /* format for relation */
 
 typedef struct qs_poly_s
 {
-   fmpz_t B;
-   int * soln1;
-   int * soln2;
-   int * posn1;
-   int * posn2;
+   fmpz_t B;          /* current B coeff of poly */
+   int * soln1;       /* first start position in sieve per prime */
+   int * soln2;       /* second start position in sieve per prime */
+   int * posn1;       /* temp space for sieving */
+   int * posn2;       /* temp space for sieving */
+   slong * small;     /* exponents of small prime factors in relations */
+   fac_t * factor;    /* factors for a relation */
+   slong num_factors; /* number of factors found in a relation */
 } qs_poly_s;
 
 typedef qs_poly_s qs_poly_t[1];
@@ -180,16 +183,12 @@ typedef struct qs_s
    slong extra_rels; /* number of extra relations beyond num_primes */
    slong max_factors; /* maximum number of factors a relation can have */
 
-   slong * small; /* exponents of small prime factors in relations */
-   fac_t * factor; /* factors for a relation */
    fmpz * Y_arr; /* array of Y's corresponding to relations */
    slong * curr_rel; /* current relation in array of relations */
    slong * relation; /* relation array */
 
    slong buffer_size; /* size of buffer of relations */
    slong num_relations; /* number of relations so far */
-
-   slong num_factors; /* number of factors found in a relation */
 
    /***************************************************************************
                        LINEAR ALGEBRA DATA
@@ -311,15 +310,11 @@ void qsieve_linalg_clear(qs_t qs_inf);
 
 int qsieve_relations_cmp(const void * a, const void * b);
 
-int qsieve_relations_cmp2(const void * a, const void * b);
-
-slong qsieve_merge_sort(qs_t qs_inf);
-
 slong qsieve_merge_relations(qs_t qs_inf);
 
 slong qsieve_insert_relation(qs_t qs_inf, fmpz_t Y);
 
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y);
+void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly);
 
 hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 

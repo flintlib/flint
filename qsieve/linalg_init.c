@@ -24,8 +24,6 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->num_primes += qs_inf->ks_primes;
 
     qs_inf->buffer_size = 2*(qs_inf->num_primes + qs_inf->extra_rels);
-    qs_inf->small = flint_malloc(qs_inf->small_primes*sizeof(mp_limb_t));
-    qs_inf->factor = flint_malloc(qs_inf->max_factors*sizeof(fac_t));
     qs_inf->matrix = flint_malloc((qs_inf->buffer_size)*sizeof(la_col_t));
     qs_inf->unmerged = qs_inf->matrix + qs_inf->buffer_size;
     qs_inf->Y_arr = flint_malloc(qs_inf->buffer_size*sizeof(fmpz));

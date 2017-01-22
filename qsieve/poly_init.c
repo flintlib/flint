@@ -47,6 +47,9 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf)
       qs_inf->poly[i].posn2 = flint_malloc((num_primes + 16)*sizeof(mp_limb_t));
       qs_inf->poly[i].soln1 = flint_malloc((num_primes + 16)*sizeof(mp_limb_t));
       qs_inf->poly[i].soln2 = flint_malloc((num_primes + 16)*sizeof(mp_limb_t));
+      qs_inf->poly[i].small = flint_malloc(qs_inf->small_primes*sizeof(mp_limb_t));
+      qs_inf->poly[i].factor = flint_malloc(qs_inf->max_factors*sizeof(fac_t));
+
    }
 #else
    qs_inf->poly = flint_malloc(sizeof(qs_poly_s));
@@ -55,6 +58,8 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf)
    qs_inf->poly[0].posn2 = flint_malloc(num_primes * sizeof(mp_limb_t));
    qs_inf->poly[0].soln1 = flint_malloc(num_primes * sizeof(mp_limb_t));
    qs_inf->poly[0].soln2 = flint_malloc(num_primes * sizeof(mp_limb_t));
+   qs_inf->poly[0].small = flint_malloc(qs_inf->small_primes*sizeof(mp_limb_t));
+   qs_inf->poly[0].factor = flint_malloc(qs_inf->max_factors*sizeof(fac_t));
 #endif
 
    A_inv2B = qs_inf->A_inv2B;

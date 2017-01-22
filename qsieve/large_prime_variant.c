@@ -36,24 +36,6 @@ void qsieve_display_relation(qs_t qs_inf, relation_t a)
     flint_printf("\n");
 }
 
-void qsieve_display_relation2(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
-{
-    slong i;
-
-    flint_printf("%wu ", prime);
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-        flint_printf("%wd ", qs_inf->small[i]);
-
-    flint_printf("%wd ", qs_inf->num_factors);
-
-    for (i = 0; i < qs_inf->num_factors; i++)
-        flint_printf("%wd %wu ", qs_inf->factor[i].ind, qs_inf->factor[i].exp);
-
-    fmpz_print(Y);
-    flint_printf("\n");
-}
-
 /* check relation is valid */
 
 int qsieve_is_relation(qs_t qs_inf, relation_t a)
@@ -98,77 +80,14 @@ int qsieve_is_relation(qs_t qs_inf, relation_t a)
     return 1;
 }
 
-int qsieve_is_relation2(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
-{
-    slong i;
-    fmpz_t temp, temp2;
-    fmpz_init(temp);
-    fmpz_init_set_ui(temp2, UWORD(1));
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-    {
-        fmpz_set_si(temp, qs_inf->factor_base[i].p);
-        fmpz_pow_ui(temp, temp, qs_inf->small[i]);
-        fmpz_mul(temp2, temp2, temp);
-    }
-
-    if (qs_inf->num_factors > qs_inf->max_factors)
-    {
-        return 0;
-    }
-
-    for (i = 0; i < qs_inf->num_factors; i++)
-    {
-        fmpz_set_ui(temp, qs_inf->factor_base[qs_inf->factor[i].ind].p);
-        fmpz_pow_ui(temp, temp, qs_inf->factor[i].exp);
-        fmpz_mul(temp2, temp2, temp);
-    }
-
-    fmpz_mul_ui(temp2, temp2, prime);
-    fmpz_pow_ui(temp, Y, UWORD(2));
-    fmpz_mod(temp, temp, qs_inf->kn);
-    fmpz_mod(temp2, temp2, qs_inf->kn);
-
-    if (fmpz_cmp(temp, temp2) != 0)
-    {
-        return 0;
-    }
-
-    fmpz_clear(temp);
-    fmpz_clear(temp2);
-
-    return 1;
-}
-
-/* write a relation 'r' to the file */
-
-void qsieve_write_to_file2(qs_t qs_inf, relation_t r)
-{
-    slong i;
-
-    flint_fprintf(qs_inf->siqs, "%wu ", r.lp);  /* write large prime */
-
-    for (i = 0; i < qs_inf->small_primes; i++)   /* write small primes */
-        flint_fprintf(qs_inf->siqs, "%wd ", r.small[i]);
-
-    flint_fprintf(qs_inf->siqs, "%wd ", r.num_factors);  /* write number of factor */
-
-    for (i = 0; i < r.num_factors; i++)               /* write factor along with exponent */
-        flint_fprintf(qs_inf->siqs, "%wd %wu ", r.factor[i].ind, r.factor[i].exp);
-
-    fmpz_fprint(qs_inf->siqs, r.Y);             /* write value of 'Y' */
-
-    flint_fprintf(qs_inf->siqs, "\n");
-}
-
 /* write partial or full relation to file */
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
+void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly)
 {
     slong i;
     char * str = NULL;
-    slong num_factors = qs_inf->num_factors;
-    slong * small = qs_inf->small;
-    fac_t * factor = qs_inf->factor;
+    slong num_factors = poly->num_factors;
+    slong * small = poly->small;
+    fac_t * factor = poly->factor;
 
     flint_fprintf(qs_inf->siqs, "%X ", prime);  /* write large prime */
 
@@ -184,23 +103,6 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
 
     flint_fprintf(qs_inf->siqs, "%s\n", str);   /* write value of 'Y' */
     flint_free(str);
-}
-
-void qsieve_copy_relation(qs_t qs_inf, relation_t a)
-{
-    slong i;
-    qs_inf->num_factors = a.num_factors;
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-    {
-        qs_inf->small[i] = a.small[i];
-    }
-
-    for (i = 0; i < qs_inf->num_factors; i++)
-    {
-        qs_inf->factor[i].ind = a.factor[i].ind;
-        qs_inf->factor[i].exp = a.factor[i].exp;
-    }
 }
 
 /*********************************************************
