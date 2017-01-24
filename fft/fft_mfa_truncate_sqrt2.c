@@ -228,33 +228,39 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
    mp_size_t limbs = (n*w)/FLINT_BITS;
    mp_bitcnt_t depth = 0;
    mp_bitcnt_t depth2 = 0;
-   
+   int k = 0;
+
    while ((UWORD(1)<<depth) < n2) depth++;
    while ((UWORD(1)<<depth2) < n1) depth2++;
 
    /* first half matrix fourier FFT : n2 rows, n1 cols */
    
    /* FFTs on columns */
+
+#pragma omp parallel for private(i, j, k)
    for (i = 0; i < n1; i++)
    {   
+#if HAVE_OPENMP
+      k = omp_get_thread_num();
+#endif
       /* relevant part of first layer of full sqrt2 FFT */
       if (w & 1)
       {
          for (j = i; j < trunc - 2*n; j+=n1) 
          {   
             if (j & 1)
-               fft_butterfly_sqrt2(*t1, *t2, ii[j], ii[2*n+j], j, limbs, w, *temp);
+               fft_butterfly_sqrt2(t1[k], t2[k], ii[j], ii[2*n+j], j, limbs, w, temp[k]);
             else
-               fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j/2, limbs, w);     
+               fft_butterfly(t1[k], t2[k], ii[j], ii[2*n+j], j/2, limbs, w);     
 
-            SWAP_PTRS(ii[j],     *t1);
-            SWAP_PTRS(ii[2*n+j], *t2);
+            SWAP_PTRS(ii[j],     t1[k]);
+            SWAP_PTRS(ii[2*n+j], t2[k]);
          }
 
          for ( ; j < 2*n; j+=n1)
          {
              if (i & 1)
-                fft_adjust_sqrt2(ii[j + 2*n], ii[j], j, limbs, w, *temp); 
+                fft_adjust_sqrt2(ii[j + 2*n], ii[j], j, limbs, w, temp[k]); 
              else
                 fft_adjust(ii[j + 2*n], ii[j], j/2, limbs, w); 
          }
@@ -262,10 +268,10 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
       {
          for (j = i; j < trunc - 2*n; j+=n1) 
          {   
-            fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j, limbs, w/2);
+            fft_butterfly(t1[k], t2[k], ii[j], ii[2*n+j], j, limbs, w/2);
    
-            SWAP_PTRS(ii[j],     *t1);
-            SWAP_PTRS(ii[2*n+j], *t2);
+            SWAP_PTRS(ii[j],     t1[k]);
+            SWAP_PTRS(ii[2*n+j], t2[k]);
          }
 
          for ( ; j < 2*n; j+=n1)
@@ -277,7 +283,7 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
          of 1 starting at row 0, where z => w bits
       */
       
-      fft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1);
+      fft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1 + k, t2 + k, w, 0, i, 1);
       for (j = 0; j < n2; j++)
       {
          mp_size_t s = n_revbin(j, depth);
@@ -289,14 +295,19 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
    ii += 2*n;
 
    /* FFTs on columns */
+
+#pragma omp parallel for private(i, j, k)
    for (i = 0; i < n1; i++)
    {   
+#if HAVE_OPENMP
+      k = omp_get_thread_num();
+#endif
       /*
          FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
          of 1 starting at row 0, where z => w bits
       */
       
-      fft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1, trunc2);
+      fft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1 + k, t2 + k, w, 0, i, 1, trunc2);
       for (j = 0; j < n2; j++)
       {
          mp_size_t s = n_revbin(j, depth);
