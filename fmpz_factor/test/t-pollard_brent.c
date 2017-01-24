@@ -19,6 +19,8 @@ int main(void)
     fmpz_t prime1, prime2, prime3, prime4, primeprod, fac, modval;
     int i, j, k, fails;
 
+    FLINT_TEST_INIT(state);
+
     fmpz_init(prime1);
     fmpz_init(prime2);
     fmpz_init(prime3);
@@ -26,7 +28,6 @@ int main(void)
     fmpz_init(primeprod);
     fmpz_init(fac);
     fmpz_init(modval);
-    FLINT_TEST_INIT(state);
 
     fails = 0;
 

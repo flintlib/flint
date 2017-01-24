@@ -232,7 +232,7 @@ FUNC_HEAD
                         2 * d_mat_entry(mu, kappa,
                                         kappa - 1) * d_mat_entry(r, kappa,
                                                                  kappa - 1);
-                    fmpz_set_d(rii, ldexp(s[kappa - 1] - tmp, 2 * expo[kappa]));    /* using a heuristic lower bound on the final GS norm */
+                    fmpz_set_d_2exp(rii, s[kappa - 1] - tmp, 2 * expo[kappa]);    /* using a heuristic lower bound on the final GS norm */
                     if (fmpz_cmp(rii, gs_B) > 0)
                     {
                         d--;
@@ -367,7 +367,7 @@ FUNC_HEAD
             for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
                 /* rii is the G-S length of ith vector divided by 2 */
-                fmpz_set_d(rii, ldexp(d_mat_entry(r, i, i), 2 * expo[i] - 1));
+                fmpz_set_d_2exp(rii, d_mat_entry(r, i, i), 2 * expo[i] - 1);
                 if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                 {
                     newd--;

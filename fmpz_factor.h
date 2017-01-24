@@ -36,7 +36,6 @@ typedef struct
 
 typedef fmpz_factor_struct fmpz_factor_t[1];
 
-
 /* Utility functions *********************************************************/
 
 FLINT_DLL void fmpz_factor_init(fmpz_factor_t factor);
@@ -47,11 +46,16 @@ FLINT_DLL void fmpz_factor_print(const fmpz_factor_t factor);
 
 FLINT_DLL void _fmpz_factor_fit_length(fmpz_factor_t factor, slong len);
 
-FLINT_DLL void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp);
+FLINT_DLL void _fmpz_factor_append_ui(fmpz_factor_t factor,
+                                                       mp_limb_t p, ulong exp);
 
-FLINT_DLL void _fmpz_factor_append(fmpz_factor_t factor, fmpz_t p, ulong exp);
+FLINT_DLL void _fmpz_factor_append(fmpz_factor_t factor,
+                                                    const fmpz_t p, ulong exp);
 
 FLINT_DLL void _fmpz_factor_set_length(fmpz_factor_t factor, slong newlen);
+
+FLINT_DLL void _fmpz_factor_concat(fmpz_factor_t factor1,
+                                             fmpz_factor_t factor2, ulong exp);
 
 /* Factoring *****************************************************************/
 
@@ -61,6 +65,8 @@ FLINT_DLL int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n,
                                        ulong start, ulong num_primes);
 
 FLINT_DLL void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
+
+FLINT_DLL void fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n);
 
 FLINT_DLL void fmpz_factor_si(fmpz_factor_t factor, slong n);
 
@@ -103,11 +109,11 @@ FLINT_DLL void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ul
 
 typedef struct ecm_s {
 
-  mp_ptr t, u, v, w;  /* temp variables */
-  mp_ptr x, z;    /* the coordinates */
-  mp_ptr a24;     /* value (a + 2)/4 */
-  mp_ptr ninv;    /* invere of n */
-  mp_ptr one;     /* one shifted */
+    mp_ptr t, u, v, w;  /* temp variables */
+    mp_ptr x, z;    /* the coordinates */
+    mp_ptr a24;     /* value (a + 2)/4 */
+    mp_ptr ninv;    /* invere of n */
+    mp_ptr one;     /* one shifted */
 
     unsigned char *GCD_table; /* checks whether baby step int is
                            coprime to Primorial or not */

@@ -14,10 +14,11 @@
 
 #include "flint.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 
-mp_limb_t z_randint(flint_rand_t state, mp_limb_t limit) 
+mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit)
 {
-    mp_limb_t z;
+    mp_limb_signed_t z;
 
     if ((limit == UWORD(0)) || (limit > WORD_MAX))
         limit = WORD_MAX;

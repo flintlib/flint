@@ -23,8 +23,6 @@ main(void)
     flint_printf("zassenhaus....");
     fflush(stdout);
 
-    
-
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t c;
@@ -47,7 +45,6 @@ main(void)
             fmpz_poly_randtest(g, state, n_randint(state, 5) + 2, n_randint(state, 40));
             fmpz_poly_mul(f, f, g);
         }
-/*        fmpz_poly_set_str(f, "6  0 -1 0 0 0 1");*/
 
         fmpz_poly_factor_zassenhaus(fac, f);
 

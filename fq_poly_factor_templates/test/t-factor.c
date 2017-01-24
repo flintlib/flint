@@ -33,11 +33,16 @@ main(void)
         TEMPLATE(T, poly_t) pol1, poly, quot, rem, product;
         TEMPLATE(T, poly_factor_t) res;
         TEMPLATE(T, ctx_t) ctx;
+        TEMPLATE(T, t) randlead;
         TEMPLATE(T, t) lead;
         slong length, num, i, j;
         ulong exp[5], prod1;
 
         TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, init) (randlead, ctx);
+
+        TEMPLATE(T, randtest_not_zero) (randlead, state, ctx);
 
         TEMPLATE(T, poly_init) (pol1, ctx);
         TEMPLATE(T, poly_init) (poly, ctx);
@@ -45,7 +50,7 @@ main(void)
         TEMPLATE(T, poly_init) (rem, ctx);
 
         TEMPLATE(T, poly_zero) (pol1, ctx);
-        TEMPLATE(T, poly_one) (pol1, ctx);
+        TEMPLATE3(T, poly_set, T) (pol1, randlead, ctx);
 
         length = n_randint(state, 4) + 2;
         TEMPLATE(T, poly_randtest_irreducible) (poly, state, length, ctx);
@@ -136,6 +141,7 @@ main(void)
         TEMPLATE(T, poly_clear) (poly, ctx);
         TEMPLATE(T, poly_factor_clear) (res, ctx);
         TEMPLATE(T, clear) (lead, ctx);
+        TEMPLATE(T, clear) (randlead, ctx);
         TEMPLATE(T, ctx_clear) (ctx);
     }
 

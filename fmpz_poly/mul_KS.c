@@ -16,6 +16,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fft.h"
 
 void
 _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, slong len1,
@@ -83,11 +84,24 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, slong len1,
     arr3 = (mp_limb_t *) flint_malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
 
     if (limbs1 == limbs2)
-        mpn_mul_n(arr3, arr1, arr2, limbs1);
-    else if (limbs1 > limbs2)
-        mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
-    else
-        mpn_mul(arr3, arr2, limbs2, arr1, limbs1);
+    {
+       if (limbs1 < 2000)
+          mpn_mul_n(arr3, arr1, arr2, limbs1);
+       else
+          flint_mpn_mul_fft_main(arr3, arr1, limbs1, arr2, limbs2);
+    } else if (limbs1 > limbs2)
+    {
+       if (limbs2 < 1000)
+          mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
+       else
+          flint_mpn_mul_fft_main(arr3, arr1, limbs1, arr2, limbs2);
+    } else
+    {
+       if (limbs1 < 1000)
+          mpn_mul(arr3, arr2, limbs2, arr1, limbs1);
+       else
+          flint_mpn_mul_fft_main(arr3, arr2, limbs2, arr1, limbs1);
+    }
 
     if (sign)
         _fmpz_poly_bit_unpack(res, len1 + len2 - 1, arr3, bits, neg1 ^ neg2);

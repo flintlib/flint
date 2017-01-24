@@ -204,6 +204,11 @@ void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, slong len2)
 
     Negates \code{(vec2, len2)} and places it into \code{vec1}.
 
+void _fmpz_vec_scalar_abs(fmpz * vec1, const fmpz * vec2, slong len2)
+
+    Takes the absolute value of entries in \code{(vec2, len2)} and places the
+    result into \code{vec1}.
+
 *******************************************************************************
 
     Comparison

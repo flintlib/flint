@@ -416,8 +416,8 @@ fmpz_neg(fmpz_t f1, const fmpz_t f2)
     else                        /* coeff is large */
     {
         /* No need to retain value in promotion, as if aliased, both already large */
-        __mpz_struct *mpz_ptr = _fmpz_promote(f1);
-        mpz_neg(mpz_ptr, COEFF_TO_PTR(*f2));
+        __mpz_struct *mpz_res = _fmpz_promote(f1);
+        mpz_neg(mpz_res, COEFF_TO_PTR(*f2));
     }
 }
 
@@ -484,6 +484,8 @@ FLINT_DLL void fmpz_sqrt(fmpz_t f, const fmpz_t g);
 FLINT_DLL int fmpz_is_square(const fmpz_t f);
 
 FLINT_DLL void fmpz_root(fmpz_t r, const fmpz_t f, slong n);
+
+FLINT_DLL int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f);
 
 FLINT_DLL void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 
@@ -575,6 +577,8 @@ FLINT_DLL void fmpz_preinvn_init(fmpz_preinvn_t inv, fmpz_t f);
 FLINT_DLL void fmpz_preinvn_clear(fmpz_preinvn_t inv);
 
 FLINT_DLL double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
+
+FLINT_DLL void fmpz_set_d_2exp(fmpz_t f, double m, slong exp);
 
 FMPZ_INLINE void
 fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)

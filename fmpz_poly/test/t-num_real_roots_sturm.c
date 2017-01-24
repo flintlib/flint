@@ -20,6 +20,23 @@ int main()
 
     printf("num_real_roots_sturm....");
 
+    /* call with random nonzero polynomials */
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        slong k;
+        fmpz_poly_t p;
+
+        fmpz_poly_randtest_not_zero(p, state, 20, 10 + n_randint(state, 100));
+        k = fmpz_poly_num_real_roots_sturm(p);
+        if (k < 0 || k > fmpz_poly_degree(p))
+        {
+            printf("ERROR:\n");
+            flint_printf("got k in wrong range k = %wd\n", k);
+            printf("p = "); fmpz_poly_print(p); printf("\n");
+            abort();
+        }
+    }
+
     /* we check on products of the form               */
     /*   Prod (X - r_i) x  R                          */
     /* where r_i are rationals and R has no real root */
@@ -36,7 +53,7 @@ int main()
 
         fmpz_poly_init(p);
         fmpz_poly_init(q);
-        fmpz_poly_set_rational_roots(p, vec, n);
+        fmpz_poly_product_roots_fmpq_vec(p, vec, n);
         fmpz_poly_randtest_no_real_root(q, state, 1 + n_randint(state, 5), 80);
         /* note: here there is no need to check that q is squarefree (Sturm test remains valid) */
         fmpz_poly_mul(p, p, q);

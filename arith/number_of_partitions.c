@@ -15,7 +15,7 @@
 /* This nice round number precisely fits on 32 bits */
 #define NUMBER_OF_SMALL_PARTITIONS 128
 
-const unsigned int
+FLINT_DLL const unsigned int
 partitions_lookup[NUMBER_OF_SMALL_PARTITIONS] = 
 {
     UWORD(1),UWORD(1),UWORD(2),UWORD(3),UWORD(5),UWORD(7),UWORD(11),UWORD(15),UWORD(22),UWORD(30),UWORD(42),UWORD(56),UWORD(77),UWORD(101),UWORD(135),

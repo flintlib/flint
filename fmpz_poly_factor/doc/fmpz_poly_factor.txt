@@ -109,7 +109,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t
     \code{F^exp} to the factor structure \code{final_fac}.
 
 void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
-                                  slong exp, fmpz_poly_t f, slong cutoff)
+                     slong exp, fmpz_poly_t f, slong cutoff, int use_van_hoeij)
 
     This is the internal wrapper of Zassenhaus.
 
@@ -127,6 +127,10 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     this can be easily achieved by taking out factors of the form $x^k$ 
     before calling this routine.
 
+    If the final flag is set, the function will use the van Hoeij factorisation
+    algorithm with gradual feeding and mod $2^k$ data truncation to find
+    factors when the number of local factors is large.
+
 void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t F)
 
     A wrapper of the Zassenhaus factoring algorithm, which takes as input 
@@ -135,3 +139,8 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t F)
     The complexity will be exponential in the number of local factors 
     we find for the components of a squarefree factorization of $F$.
 
+void fmpz_poly_factor(fmpz_poly_factor_t final_fac, fmpz_poly_t F)
+
+    A wrapper of the Zassenhaus and van Hoeij factoring algorithms, which takes
+    as input any polynomial $F$, and stores a factorization in
+    \code{final_fac}.
