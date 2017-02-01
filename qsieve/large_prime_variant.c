@@ -233,7 +233,7 @@ relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
    obtain a full relation
 */
 
-relation_t  qsieve_merge_relation(qs_t qs_inf, relation_t a, relation_t b)
+relation_t qsieve_merge_relation(qs_t qs_inf, relation_t a, relation_t b)
 {
     slong i = 0, j = 0, k = 0;
     relation_t  c;
@@ -527,9 +527,17 @@ int qsieve_process_relation(qs_t qs_inf)
         else
         {
             entry = qsieve_get_table_entry(qs_inf, rel_list[i].lp);
+
             if (entry->count == 0) entry->count = i;
             else
             {
+                if (fmpz_fdiv_ui(qs_inf->kn, rel_list[i].lp) == 0)
+                {
+                   qs_inf->small_factor = rel_list[i].lp;
+                   
+                   done = -1;
+                   goto cleanup;
+                }
                 rlist[j++] = qsieve_merge_relation(qs_inf, rel_list[i], rel_list[entry->count]);
             }
         }
@@ -553,6 +561,8 @@ int qsieve_process_relation(qs_t qs_inf)
        qsort(rlist, (size_t) num_relations2, sizeof(relation_t), qsieve_compare_relation);
        qsieve_insert_relation2(qs_inf, rlist, num_relations2);
     }
+
+cleanup:
 
     for (i = 0; i < num_relations; i++)
     {

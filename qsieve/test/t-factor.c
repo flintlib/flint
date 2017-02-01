@@ -61,6 +61,24 @@ int main(void)
    flint_printf("factor....");
    fflush(stdout);
 
+   /* Test n with large prime factor */
+   {
+      fmpz_set_str(n, "12387192837918273918723981291837121933111751252512531193171", 10);
+    
+      fmpz_factor_init(factors);
+
+      qsieve_factor(factors, n);
+
+      if (factors->num < 5)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("%ld factors found\n", factors->num);
+         abort();
+      }
+
+      fmpz_factor_clear(factors);
+   }
+
    for (i = 0; i < 30; i++) /* Test random n, two factors */
    {
       slong bits = 40;

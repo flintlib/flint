@@ -242,9 +242,22 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                 if (qs_inf->full_relation + qs_inf->num_cycles >= 
                    ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
                 {
+                    int ok;
+
                     fclose(qs_inf->siqs);
 
-                    if (qsieve_process_relation(qs_inf))
+                    ok = qsieve_process_relation(qs_inf);
+
+                    if (ok == -1)
+                    {
+                       small_factor = qs_inf->small_factor;
+#if QS_DEBUG
+                       flint_printf("found small factor %wu while incrementing factor base\n, small_factor");
+#endif
+                       goto found_small_factor;
+                    }
+
+                    if (ok)
                     {
 
     /**************************************************************************
@@ -396,6 +409,8 @@ more_primes:
 #if QS_DEBUG
             flint_printf("found small factor %wu while incrementing factor base\n, small_factor");
 #endif
+
+found_small_factor:
 
             while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
             {
