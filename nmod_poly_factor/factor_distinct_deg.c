@@ -26,6 +26,13 @@
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
                                    const nmod_poly_t poly, slong * const *degs)
 {
+  return nmod_poly_factor_distinct_deg_limit(res, poly, degs, nmod_poly_degree(poly));
+}
+
+void nmod_poly_factor_distinct_deg_limit(nmod_poly_factor_t res,
+                                   const nmod_poly_t poly, slong * const *degs,
+                                   slong limit)
+{
     nmod_poly_t f, g, v, vinv, tmp;
     nmod_poly_t *h, *H, *I;
     slong i, j, l, m, n, index, d;
@@ -43,6 +50,15 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
         nmod_poly_clear(v);
         return;
     }
+    if (limit<1) 
+    {
+        nmod_poly_factor_insert(res, v, 1);
+        (*degs)[0] = n;
+        nmod_poly_clear(v);
+        return;
+    }
+    n = limit < n ? limit : n;
+
     beta = 0.5 * (1. - (log(2) / log(n)));
     l = ceil(pow(n, beta));
     m = ceil(0.5 * n / l);

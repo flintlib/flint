@@ -91,6 +91,10 @@ FLINT_DLL int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
 FLINT_DLL void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
                                    const nmod_poly_t poly, slong * const *degs);
 
+FLINT_DLL void nmod_poly_factor_distinct_deg_limit(nmod_poly_factor_t res,
+                                   const nmod_poly_t poly, slong * const *degs,
+                                   const slong limit);
+
 FLINT_DLL ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
 FLINT_DLL void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
