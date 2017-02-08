@@ -133,6 +133,14 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
 
     Requires that \code{degs} has enough space for $(n/2)+1 * sizeof(slong)$.
 
+void nmod_poly_factor_distinct_deg_limit(nmod_poly_factor_t res,
+                                   const nmod_poly_t poly, slong * const *degs,
+                                   const slong limit)
+
+    Performs the same as nmod_poly_factor_distinct_deg above, but only up to 
+    factors of degree bounded by limit. The non-decomposed part is returned
+    as the last entry in \code{res}.
+
 void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                                    const nmod_poly_t poly, slong * const *degs)
 

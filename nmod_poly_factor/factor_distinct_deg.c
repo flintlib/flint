@@ -50,7 +50,7 @@ void nmod_poly_factor_distinct_deg_limit(nmod_poly_factor_t res,
         nmod_poly_clear(v);
         return;
     }
-    if (limit<1) 
+    if (limit < 1) 
     {
         nmod_poly_factor_insert(res, v, 1);
         (*degs)[0] = n;
