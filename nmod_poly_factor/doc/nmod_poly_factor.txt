@@ -138,8 +138,13 @@ void nmod_poly_factor_distinct_deg_limit(nmod_poly_factor_t res,
                                    const slong limit)
 
     Performs the same as nmod_poly_factor_distinct_deg above, but only up to 
-    factors of degree bounded by limit. The non-decomposed part is returned
-    as the last entry in \code{res}.
+    factors of degree bounded by limit. That is if \code{degs[i] <= limit}
+    in \code{res[i]} is the product of all factors of degree \code{degs[i]}.
+    The last entry is simply the product of all remaining factors.
+    If \code{limit<1} then the polynomial is simply returned, if \code{limit}
+    is too large, this is equivalent to the above function.
+
+    All other requirements are as above.
 
 void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                                    const nmod_poly_t poly, slong * const *degs)
