@@ -26,6 +26,7 @@ int main()
         slong k;
         fmpz_poly_t p;
 
+        fmpz_poly_init(p);
         fmpz_poly_randtest_not_zero(p, state, 20, 10 + n_randint(state, 100));
         k = fmpz_poly_num_real_roots_sturm(p);
         if (k < 0 || k > fmpz_poly_degree(p))
@@ -35,6 +36,8 @@ int main()
             printf("p = "); fmpz_poly_print(p); printf("\n");
             abort();
         }
+
+        fmpz_poly_clear(p);
     }
 
     /* we check on products of the form               */
