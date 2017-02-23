@@ -29,19 +29,19 @@ main(void)
     
     _flint_rand_init_gmp(state);
 
-    for (depth = 11; depth <= 11; depth++)
+    for (depth = 6; depth <= 12; depth++)
     {
-        w = 1;
+        for (w = 1; w <= 3 - (depth >= 12); w++)
         {
-            mp_size_t n = (UWORD(1)<<depth);
-            mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
-            mp_size_t len1 = 2*n + n_randint(state, 2*n) + 1;
-            mp_size_t len2 = len1;
-
-            int iter, i;
+            int iter = 1 + 200*(depth <= 8) + 80*(depth <= 9) + 10*(depth <= 10), i;
             
-            for (i = 0; i < 1; i++)
+            for (i = 0; i < iter; i++)
             {
+               mp_size_t n = (UWORD(1)<<depth);
+               mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
+               mp_size_t len1 = 2*n + n_randint(state, 2*n) + 1;
+               mp_size_t len2 = 2*n + 2 - len1 + n_randint(state, 2*n);
+
                mp_bitcnt_t b1 = len1*bits1, b2;
                mp_size_t n1, n2;
                mp_size_t j;
@@ -73,19 +73,17 @@ main(void)
                flint_mpn_urandomb(i1, state->gmp_state, b1);
                flint_mpn_urandomb(i2, state->gmp_state, b2);
   
-               /*mpn_mul(r2, i1, n1, i2, n2);*/
-               if (i == 0) printf("n1 = %ld, n2 = %ld\n", n1, n2);
-
+               mpn_mul(r2, i1, n1, i2, n2);
                flint_mpn_mul_fft_main(r1, i1, n1, i2, n2);
            
-               /*for (j = 0; j < n1 + n2; j++)
+               for (j = 0; j < n1 + n2; j++)
                {
                    if (r1[j] != r2[j]) 
                    {
                        flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                        abort();
                    }
-               }*/
+               }
 
                flint_free(i1);
             }
