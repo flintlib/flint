@@ -38,7 +38,7 @@ void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp)
     Append a factor $p$ to the given exponent to the 
     \code{fmpz_factor_t} structure \code{factor}.
 
-void _fmpz_factor_append(fmpz_factor_t factor, fmpz_t p, ulong exp)
+void _fmpz_factor_append(fmpz_factor_t factor, const fmpz_t p, ulong exp)
 
     Append a factor $p$ to the given exponent to the 
     \code{fmpz_factor_t} structure \code{factor}.

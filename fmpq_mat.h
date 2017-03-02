@@ -208,7 +208,7 @@ FLINT_DLL int fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
 
 FLINT_DLL int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
-int fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A,
+FLINT_DLL int fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A,
     const fmpz_mat_t B);
 
 /* Inverse *******************************************************************/
@@ -231,7 +231,7 @@ FLINT_DLL void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A);
 
 /* Characteristic polynomial *************************************************/
 
-void fmpq_mat_similarity(fmpq_mat_t A, slong r, fmpq_t d);
+FLINT_DLL void fmpq_mat_similarity(fmpq_mat_t A, slong r, fmpq_t d);
 
 /* Characteristic polynomial *************************************************/
 
@@ -242,9 +242,9 @@ FLINT_DLL void fmpq_mat_charpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
 
 /* Minimal polynomial ********************************************************/
 
-slong _fmpq_mat_minpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat);
+FLINT_DLL slong _fmpq_mat_minpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat);
 
-void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
+FLINT_DLL void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
 
 #ifdef __cplusplus
 }

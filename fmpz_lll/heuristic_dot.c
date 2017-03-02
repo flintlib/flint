@@ -17,10 +17,14 @@ double
 fmpz_lll_heuristic_dot(const double *vec1, const double *vec2, slong len2,
                        const fmpz_mat_t B, slong k, slong j, slong exp_adj)
 {
-    double err;
-    double sum = _d_vec_dot_heuristic(vec1, vec2, len2, &err);
+   double sum = _d_vec_dot(vec1, vec2, len2);
+   double tmp = _d_vec_norm(vec1, len2);
+   double tmp2 = _d_vec_norm(vec2, len2);
 
-    if (err > ldexp(1, -D_BITS / 2))
+   tmp = ldexp(tmp*tmp2, -70);
+   tmp2 = sum*sum;
+
+   if (tmp2 <= tmp)
     {
         slong exp;
         fmpz_t sp;

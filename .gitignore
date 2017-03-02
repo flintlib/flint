@@ -22,6 +22,16 @@ libflint*
 *.suo
 *.pyc
 /build.vc14/build_tests/arith/test/*.obj
+dll/*
+lib/*
+build.vc14/flint-tests*.sln
+build.vc14/dll_flint/x64
+build.vc14/dll_flint/Win32
+build.vc14/lib_flint/x64
+build.vc14/lib_flint/Win32
+build.vc14/tests
+build.vc14/flint-profiles
+build.vc14/flint-profiles*.sln
 *.manifest
 *.obj
 *.log

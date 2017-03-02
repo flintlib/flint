@@ -260,7 +260,7 @@ FLINT_DLL slong nmod_mat_howell_form(nmod_mat_t A);
 
 /* Transforms */
 
-void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
+FLINT_DLL void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 
 /* Characteristic polynomial and minimal polynomial */
 

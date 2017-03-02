@@ -182,6 +182,14 @@ void fmpz_set_ui(fmpz_t f, ulong val)
 
     Sets $f$ to the given \code{ulong} value.
 
+void fmpz_set_d(fmpz_t f, double d)
+
+    Sets $f$ to the integer nearest to the given double.
+
+void fmpz_set_d_2exp(fmpz_t f, double d, slong exp)
+
+    Sets $f$ to the nearest integer to \code{d*2^(exp)}.
+
 void fmpz_neg_ui(fmpz_t f, ulong val)
 
     Sets $f$ to the given \code{ulong} value, and then negates $f$.
@@ -806,6 +814,13 @@ void fmpz_root(fmpz_t r, const fmpz_t f, slong n)
     Set $r$ to the integer part of the $n$-th root of $f$. Requires that
     $n > 0$ and that if $n$ is even then $f$ be non-negative, otherwise an 
     exception is raised.
+
+int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
+
+    If $f$ is a perfect power $r^k$ set \code{root} to $r$ and return $k$,
+    otherwise return $0$. Note that $-1, 0, 1$ are all considered perfect
+    powers. No guarantee is made about $r$ or $k$ being the smallest
+    possible value. Negative values of $f$ are permitted.
 
 void fmpz_fac_ui(fmpz_t f, ulong n)
 

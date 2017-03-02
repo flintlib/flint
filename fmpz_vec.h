@@ -118,6 +118,9 @@ FLINT_DLL void _fmpz_vec_zero(fmpz * vec, slong len);
 
 FLINT_DLL void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, slong len2);
 
+FLINT_DLL void _fmpz_vec_scalar_abs(fmpz * vec1, 
+                                                const fmpz * vec2, slong len2);
+
 /*  Comparison  **************************************************************/
 
 FLINT_DLL int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len);

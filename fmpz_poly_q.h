@@ -163,8 +163,8 @@ FLINT_DLL int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t
 
 FLINT_DLL int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s);
 
-char * fmpz_poly_q_get_str(const fmpz_poly_q_t op);
-char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x);
+FLINT_DLL char * fmpz_poly_q_get_str(const fmpz_poly_q_t op);
+FLINT_DLL char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x);
 
 FLINT_DLL int fmpz_poly_q_print(const fmpz_poly_q_t op);
 FLINT_DLL int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x);

@@ -29,6 +29,10 @@
 #include "flint.h"
 #include "mpn_extras.h"
 
+#if HAVE_OPENMP
+#include <omp.h> /* must come after flint.h */
+#endif
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -232,7 +236,7 @@ FLINT_DLL void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
 
 FLINT_DLL void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, 
             mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
-                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt);
+                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt);
 
 FLINT_DLL void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
                         mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
@@ -260,7 +264,7 @@ FLINT_DLL void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
 
 FLINT_DLL void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, 
                                  slong limbs, slong trunc, mp_limb_t ** t1, 
-                                mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt);
+                                mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
 
 #ifdef __cplusplus
 }

@@ -448,6 +448,26 @@ void fq_nmod_poly_mul_reorder(fq_nmod_poly_t rop,
     multiplication routines in the $Y$-direction where the polynomial
     degree~$n$ is large.
 
+void _fq_nmod_poly_mul_univariate(fq_nmod_struct *rop,
+                                  const fq_nmod_struct *op1, slong len1,
+                                  const fq_nmod_struct *op2, slong len2,
+                                  const fq_nmod_ctx_t ctx)
+
+    Sets \code{(rop, len1 + len2 - 1)} to the product of \code{(op1, len1)}
+    and \code{(op2, len2)}.
+
+    Permits zero padding and places no assumptions on the
+    lengths \code{len1} and \code{len2}.  Supports aliasing.
+
+void fq_nmod_poly_mul_univariate(fq_nmod_poly_t rop,
+                                 const fq_nmod_poly_t op1,
+                                 const fq_nmod_poly_t op2,
+                                 const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op1} and \code{op2}
+    using a bivariate to univariate transformation and reducing
+    this problem to multiplying two univariate polynomials.
+
 void _fq_nmod_poly_mul_KS(fq_nmod_struct *rop, const fq_nmod_struct *op1,
                           slong len1, const fq_nmod_struct *op2, slong len2,
                           const fq_nmod_ctx_t ctx)
@@ -499,6 +519,28 @@ void fq_nmod_poly_mullow_classical(fq_nmod_poly_t rop,
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2},
     computed using the classical or schoolbook method.
+
+void _fq_nmod_poly_mullow_univariate(fq_nmod_struct *rop,
+                             const fq_nmod_struct *op1, slong len1,
+                             const fq_nmod_struct *op2, slong len2, slong n,
+                             const fq_nmod_ctx_t ctx)
+
+    Sets \code{(res, n)} to the lowest $n$ coefficients of the product of
+    \code{(poly1, len1)} and \code{(poly2, len2)}, computed using a
+    bivariate to univariate transformation.
+
+    Assumes that \code{len1} and \code{len2} are positive, but does allow
+    for the polynomials to be zero-padded.  The polynomials may be zero,
+    too.  Assumes $n$ is positive.  Supports aliasing between \code{res},
+    \code{poly1} and \code{poly2}.
+
+void fq_nmod_poly_mullow_univariate(fq_nmod_poly_t rop,
+                            const fq_nmod_poly_t op1, const fq_nmod_poly_t op2,
+                            slong n, const fq_nmod_ctx_t ctx)
+
+    Sets \code{res} to the lowest $n$ coefficients of the product of
+    \code{poly1} and \code{poly2}, computed using a bivariate to
+    univariate transformation.
 
 void _fq_nmod_poly_mullow_KS(fq_nmod_struct *rop,
                              const fq_nmod_struct *op1, slong len1,
