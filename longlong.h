@@ -42,12 +42,12 @@
          "1"  ((mp_limb_t)(am)), "rme" ((mp_limb_t)(bm)),  \
          "2"  ((mp_limb_t)(al)), "rme" ((mp_limb_t)(bl)))  \
 
-#define sub_dddmmmsss(sh, sm, sl, ah, am, al, bh, bm, bl)  \
+#define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)  \
   __asm__ ("subq %8,%q2\n\tsbbq %6,%q1\n\tsbbq %4,%q0"     \
-       : "=r" (sh), "=r" (sm), "=&r" (sl)                  \
-       : "0"  ((mp_limb_t)(ah)), "rme" ((mp_limb_t)(bh)),  \
-         "1"  ((mp_limb_t)(am)), "rme" ((mp_limb_t)(bm)),  \
-         "2"  ((mp_limb_t)(al)), "rme" ((mp_limb_t)(bl)))  \
+       : "=r" (dh), "=r" (dm), "=&r" (dl)                  \
+       : "0"  ((mp_limb_t)(mh)), "rme" ((mp_limb_t)(sh)),  \
+         "1"  ((mp_limb_t)(mm)), "rme" ((mp_limb_t)(sm)),  \
+         "2"  ((mp_limb_t)(ml)), "rme" ((mp_limb_t)(sl)))  \
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)                 \
   __asm__ ("addq %5,%q1\n\tadcq %3,%q0"                    \
@@ -111,12 +111,12 @@
          "1"  ((mp_limb_t)(am)), "g" ((mp_limb_t)(bm)),    \
          "2"  ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))    \
 
-#define sub_dddmmmsss(sh, sm, sl, ah, am, al, bh, bm, bl)  \
+#define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)  \
   __asm__ ("subl %8,%k2\n\tsbbl %6,%k1\n\tsbbl %4,%k0"     \
-       : "=r" (sh), "=r" (sm), "=&r" (sl)                  \
-       : "0"  ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),    \
-         "1"  ((mp_limb_t)(am)), "g" ((mp_limb_t)(bm)),    \
-         "2"  ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))    \
+       : "=r" (dh), "=r" (dm), "=&r" (dl)                  \
+       : "0"  ((mp_limb_t)(mh)), "g" ((mp_limb_t)(sh)),    \
+         "1"  ((mp_limb_t)(mm)), "g" ((mp_limb_t)(sm)),    \
+         "2"  ((mp_limb_t)(ml)), "g" ((mp_limb_t)(sl)))    \
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)               \
   __asm__ ("addl %5,%k1\n\tadcl %3,%k0"                  \
@@ -348,12 +348,12 @@
 
 #endif
 
-#define sub_dddmmmsss(sh, sm, sl, ah, am, al, bh, bm, bl)           \
+#define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)           \
   do {                                                              \
     mp_limb_t __t, __u;                                             \
-    sub_ddmmss(__t, sl, (mp_limb_t) 0, al, (mp_limb_t) 0, bl);      \
-    add_ssaaaasub_ddmmss(__u, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);      \
-    sub_ddmmss(sh, sm, ah - bh, sm, __u, __t);                      \
+    sub_ddmmss(__t, dl, (mp_limb_t) 0, ml, (mp_limb_t) 0, sl);      \
+    sub_ddmmss(__u, dm, (mp_limb_t) 0, mm, (mp_limb_t) 0, sm);      \
+    sub_ddmmss(dh, dm, mh - sh, dm, __u, __t);                      \
   } while (0)
 
 /* MIPS and ARM - Use clz builtins */
