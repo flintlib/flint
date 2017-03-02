@@ -35,9 +35,12 @@ void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1,
          {
             c2 = poly1 + (slong) exp2[i];
 
-            for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+            if (poly2[i] != 0)
             {
-               c2[(slong) exp3[j]] += poly2[i]*poly3[j];
+               for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+               {
+                  c2[(slong) exp3[j]] += poly2[i]*poly3[j];
+               }
             }
          }
       }
@@ -61,13 +64,16 @@ void _fmpz_mpoly_addmul_array1_slong(ulong * poly1,
          {
             c2 = poly1 + 3*((slong) exp2[i]);
 
-            for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+            if (poly2[i] != 0)
             {
-               c = c2 + 3*((slong) exp3[j]);
+               for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+               {
+                  c = c2 + 3*((slong) exp3[j]);
 
-               smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
-               add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-               c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
+                  smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
+                  add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
+                  c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
+               }
             }
          }
       }
@@ -90,12 +96,15 @@ void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
          {
             c2 = poly1 + 2*((slong) exp2[i]);
 
-            for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+            if (poly2[i] != 0)
             {
-               c = c2 + 2*((slong) exp3[j]);
+               for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+               {
+                  c = c2 + 2*((slong) exp3[j]);
 
-               smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
-               add_ssaaaa(c[1], c[0], c[1], c[0], p[1], p[0]);
+                  smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
+                  add_ssaaaa(c[1], c[0], c[1], c[0], p[1], p[0]);
+               }
             }
          }
       }
@@ -117,10 +126,13 @@ void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1,
          {
             c2 = poly1 + (slong) exp2[i];
 
-            for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+            if (poly2[i] != 0)
             {
-               c = c2 + (slong) exp3[j];
-               fmpz_addmul(c, poly2 + i, poly3 + i);
+               for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
+               {
+                  c = c2 + (slong) exp3[j];
+                  fmpz_addmul(c, poly2 + i, poly3 + i);
+               }
             }
          }
       }
