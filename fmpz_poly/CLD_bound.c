@@ -118,7 +118,7 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
    while (1)
    {
       /* compute approx max_exp that evaluation will use */
-      rbits = ceil(abs(_log2(r)));
+      rbits = ceil(fabs(_log2(r)));
       max_exp = rbits*hi->length + size_f + 1;
 
       /* if max exponent may overwhelm a double (with safety margin) */
