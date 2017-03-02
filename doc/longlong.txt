@@ -74,6 +74,11 @@ sub_ddmmss(high_difference, low_difference, high_minuend, low_minuend,
     \code{HIGH_DIFFERENCE} and \code{LOW_DIFFERENCE}.  Overflow, i.e.\ 
     carry out is not stored anywhere, and is lost.
 
+sub_dddmmmsss(high_diff, mid_diff, low_diff, high_minuend_1, mid_minuend_1,
+          low_minuend_1, high_subtrahend_2, mid_subtrahend_2, low_subtrahend_2)
+
+    Subtracts two three limb integers. Borrow out is lost.
+
 byte_swap(x)
 
     Swap the order of the bytes in the word $x$, i.e. most significant byte
