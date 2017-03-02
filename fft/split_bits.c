@@ -17,12 +17,19 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
                 mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
 {
    mp_size_t i, skip, length = (total_limbs - 1)/coeff_limbs + 1;
-   
-   for (skip = 0, i = 0; skip + coeff_limbs <= total_limbs; skip += coeff_limbs, i++)
+   mp_size_t num = total_limbs/coeff_limbs;
+
+#pragma omp parallel for private(i, skip)
+   for (i = 0; i < num; i++)
    {
+      skip = i*coeff_limbs;
+
       flint_mpn_zero(poly[i], output_limbs + 1);
       flint_mpn_copyi(poly[i], limbs + skip, coeff_limbs);
    }
+
+   i = num;
+   skip = i*coeff_limbs;
    
    if (i < length) 
       flint_mpn_zero(poly[i], output_limbs + 1);
@@ -49,10 +56,14 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
    shift_bits = WORD(0);
    limb_ptr = limbs;                      
     
+#pragma omp parallel for private(i, limb_ptr, shift_bits)
    for (i = 0; i < length - 1; i++)
    {
       flint_mpn_zero(poly[i], output_limbs + 1);
       
+      limb_ptr = limbs + i*(coeff_limbs - 1) + (i*top_bits)/FLINT_BITS;
+      shift_bits = (i*top_bits) % FLINT_BITS;
+
       if (!shift_bits)
       {
          flint_mpn_copyi(poly[i], limb_ptr, coeff_limbs);
@@ -73,10 +84,13 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
          }
          
          poly[i][coeff_limbs - 1] &= mask;
-         
       } 
    }
    
+   i = length - 1;
+   limb_ptr = limbs + i*(coeff_limbs - 1) + (i*top_bits)/FLINT_BITS;
+   shift_bits = (i*top_bits) % FLINT_BITS;
+
    flint_mpn_zero(poly[i], output_limbs + 1);
    
    limbs_left = total_limbs - (limb_ptr - limbs);

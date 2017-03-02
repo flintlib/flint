@@ -108,16 +108,26 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
         }
         else
         {
-            /* Insert primality test, perfect power test, other factoring
-               algorithms here... */
-            trial_start = trial_stop;
-            trial_stop = trial_start + 1000;
+            fmpz_t n2;
+            __mpz_struct * data;
+
+            fmpz_init2(n2, FLINT_BITS*xsize);
+
+            data = _fmpz_promote(n2);
+            mpn_copyi(data->_mp_d, xd, xsize);
+            data->_mp_size = xsize;
+            
+            fmpz_factor_no_trial(factor, n2);
+
+            goto cleanup;
         }
     }
 
     /* Any single-limb factor left? */
     if (xd[0] != 1)
         _fmpz_factor_extend_factor_ui(factor, xd[0]);
+
+cleanup:
 
     TMP_END;
     return;

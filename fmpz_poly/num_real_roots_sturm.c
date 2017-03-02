@@ -135,7 +135,7 @@ void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * 
 
 slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
 {
-    slong i;
+    slong i, len;
     slong n_neg = 0;
     slong n_pos = 0;
 
@@ -144,14 +144,17 @@ slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
         printf("ERROR (fmpz_poly_num_real_roots_sturm): zero polynomial\n");
         flint_abort();
     }
-    if (pol->length == 1)
-        return 0;
-    if (pol->length == 2)
-        return 1;
 
     for (i = 0; (i < pol->length) && fmpz_is_zero(pol->coeffs + i); i++);
+    len = pol->length - i;
 
-    _fmpz_poly_num_real_roots_sturm(&n_neg, &n_pos, pol->coeffs + i, pol->length - i);
-
-    return i + n_neg + n_pos;
+    if (len == 1)
+        return i;
+    else if (len == 2)
+        return i + 1;
+    else
+    {
+        _fmpz_poly_num_real_roots_sturm(&n_neg, &n_pos, i + pol->coeffs, len);
+        return i + n_neg + n_pos;
+    }
 }

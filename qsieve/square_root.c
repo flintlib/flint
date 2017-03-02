@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2006, 2011 William Hart
+    Copyright (C) 2006, 2011, 2016 William Hart
+    Copyright (C) 2015 Nitin Kumar
 
     This file is part of FLINT.
 
@@ -9,20 +10,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#define ulong mp_limb_t 
-
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "qsieve.h"
-#include "fmpz.h"
 
-void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf, 
+void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
    uint64_t * nullrows, slong ncols, slong l, fmpz_t N)
 {
    slong position, i, j;
@@ -30,28 +20,28 @@ void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
    prime_t * factor_base = qs_inf->factor_base;
    slong * prime_count = qs_inf->prime_count;
    slong num_primes = qs_inf->num_primes;
-   fmpz * Y_arr = qs_inf->Y_arr; 
+   fmpz * Y_arr = qs_inf->Y_arr;
    fmpz_t pow;
 
    fmpz_init(pow);
-      
+
    memset(prime_count, 0, num_primes*sizeof(slong));
-      
+
    fmpz_one(X);
    fmpz_one(Y);
-   
+
    for (i = 0; i < ncols; i++)
    {
-      if (get_null_entry(nullrows, i, l)) 
+      if (get_null_entry(nullrows, i, l))
       {
          position = qs_inf->matrix[i].orig*2*qs_inf->max_factors;
-         
+
          for (j = 0; j < relation[position]; j++)
          {
             prime_count[relation[position+2*j+1]] +=
                (relation[position+2*j+2]);
          }
-         
+
          fmpz_mul(Y, Y, Y_arr + qs_inf->matrix[i].orig);
          if (i % 10 == 0) fmpz_mod(Y, Y, N);
       }
@@ -59,20 +49,22 @@ void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
 
    for (i = 0; i < num_primes; i++)
    {
-      if (prime_count[i]) 
+#if QS_DEBUG
+      if (prime_count[i] & 1)
       {
-         fmpz_set_ui(pow, factor_base[i].p);
+         flint_printf("Not a square in square root, %ld^%ld\n", factor_base[i].p, prime_count[i]);
+         flint_printf("This is prime %ld of %ld factor base primes and %ld ks primes\n", i, qs_inf->num_primes, qs_inf->ks_primes);
+      }
+#endif
+      if (prime_count[i])
+      {
+         fmpz_set_si(pow, factor_base[i].p);
          fmpz_powm_ui(pow, pow, prime_count[i]/2, N);
          fmpz_mul(X, X, pow);
-      } 
+      }
 
-      if (i%10 == 0 || i == num_primes - 1) fmpz_mod(X, X, N);
+      if (i % 10 == 0 || i == num_primes - 1) fmpz_mod(X, X, N);
    }
-
-#if QS_DEBUG
-   for (i = 0; i < num_primes; i++)
-      if ((prime_count[i] %2) != 0) flint_printf("Error %wd, %wd, %wd\n", l, i, prime_count[i]);
-#endif
 
    fmpz_clear(pow);
 }

@@ -20,6 +20,26 @@ int main()
 
     printf("num_real_roots....");
 
+    /* call with random nonzero polynomials */
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    {
+        slong k;
+        fmpz_poly_t p;
+
+        fmpz_poly_init(p);
+        fmpz_poly_randtest_not_zero(p, state, 20, 10 + n_randint(state, 100));
+        k = fmpz_poly_num_real_roots(p);
+        if (k < 0 || k > fmpz_poly_degree(p))
+        {
+            printf("ERROR:\n");
+            flint_printf("got k in wrong range k = %wd\n", k);
+            printf("p = "); fmpz_poly_print(p); printf("\n");
+            abort();
+        }
+
+        fmpz_poly_clear(p);
+    }
+
     for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
     {
         slong k1, k2;

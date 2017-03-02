@@ -19,6 +19,8 @@
 #include "ulong_extras.h"
 #include "flint.h"
 
+#define MAX_DEG 7
+
 int main(void)
 {
     int iter;
@@ -36,6 +38,10 @@ int main(void)
         fmpz_t modulus;
         slong i, length, num;
         slong *degs;
+        slong num_of_deg[MAX_DEG + 1];
+
+        for (i = 0; i < MAX_DEG + 1; i++)
+            num_of_deg[i] = 0;
 
         fmpz_init(modulus);
         fmpz_set_ui(modulus, n_randtest_prime(state, 0));
@@ -50,7 +56,7 @@ int main(void)
         fmpz_mod_poly_zero(poly1);
         fmpz_mod_poly_set_coeff_ui(poly1, 0, 1);
 
-        length = n_randint(state, 7) + 2;
+        length = n_randint(state, MAX_DEG) + 2;
         do
         {
             fmpz_mod_poly_randtest(poly, state, length);
@@ -61,13 +67,15 @@ int main(void)
 
         fmpz_mod_poly_mul(poly1, poly1, poly);
 
+        num_of_deg[fmpz_mod_poly_degree(poly)]++;
+
         num = n_randint(state, 5) + 1;
 
         for (i = 1; i < num; i++)
         {
             do
             {
-                length = n_randint(state, 7) + 2;
+                length = n_randint(state, MAX_DEG) + 2;
                 fmpz_mod_poly_randtest(poly, state, length);
                 if (poly->length)
                 {
@@ -79,6 +87,7 @@ int main(void)
                    || (r->length == 0));
 
             fmpz_mod_poly_mul(poly1, poly1, poly);
+            num_of_deg[fmpz_mod_poly_degree(poly)]++;
         }
 
         if (!(degs = flint_malloc((poly1->length - 1) * sizeof(slong))))
@@ -92,7 +101,16 @@ int main(void)
         fmpz_mod_poly_init(product, &poly1->p);
         fmpz_mod_poly_set_coeff_ui(product, 0, 1);
         for (i = 0; i < res->num; i++)
+        {
             fmpz_mod_poly_mul(product, product, res->poly + i);
+
+            if (fmpz_mod_poly_degree(res->poly + i) != degs[i]*num_of_deg[degs[i]])
+            {
+               flint_printf("Error: product of factors of degree %w incorrect\n", degs[i]);
+               flint_printf("Degree %w != %w * %w\n", fmpz_mod_poly_degree(res->poly + i), degs[i], num_of_deg[degs[i]]);
+               flint_abort();
+            }
+        }
 
         fmpz_mod_poly_scalar_mul_fmpz(product, product,
                                       &(poly1->coeffs[poly1->length - 1]));

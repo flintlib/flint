@@ -815,6 +815,13 @@ void fmpz_root(fmpz_t r, const fmpz_t f, slong n)
     $n > 0$ and that if $n$ is even then $f$ be non-negative, otherwise an 
     exception is raised.
 
+int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
+
+    If $f$ is a perfect power $r^k$ set \code{root} to $r$ and return $k$,
+    otherwise return $0$. Note that $-1, 0, 1$ are all considered perfect
+    powers. No guarantee is made about $r$ or $k$ being the smallest
+    possible value. Negative values of $f$ are permitted.
+
 void fmpz_fac_ui(fmpz_t f, ulong n)
 
     Sets $f$ to the factorial $n!$ where $n$ is an \code{ulong}.

@@ -103,12 +103,17 @@ slong _num_roots_quartic_positive_discriminant(const fmpz * p)
 
 slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
 {
+    slong i = 0;
+    while (i < len && fmpz_is_zero(pol + i)) i++;
+    pol = pol + i;
+    len = len - i;
+
     if (len == 1)
-        return 0;
+        return i;
     if (len == 2)
-        return 1;
+        return i + 1;
     if (len == 3)
-        return _fmpz_poly_num_real_roots_quadratic(pol, len);
+        return i + _fmpz_poly_num_real_roots_quadratic(pol, len);
     if (len <= 5)
     {
         int s;
@@ -127,12 +132,12 @@ slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
         else if (s > 0)
         {
             if (len == 5)
-                return _num_roots_quartic_positive_discriminant(pol);
+                return i + _num_roots_quartic_positive_discriminant(pol);
             else
-                return len - 1;
+                return i + len - 1;
         }
         else
-            return len - 3;
+            return i + len - 3;
     }
     else
     {
@@ -143,7 +148,7 @@ slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
             n_zero = 0;
 
         _fmpz_poly_num_real_roots_sturm(&n_neg, &n_pos, pol + n_zero, len - n_zero);
-        return n_zero + n_neg + n_pos;
+        return i + n_zero + n_neg + n_pos;
     }
 
     /* unreachable! */

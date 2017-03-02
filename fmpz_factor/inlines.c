@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2008, 2009 William Hart
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2017 Tommy Hofmann 
 
     This file is part of FLINT.
 
@@ -10,16 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#define FMPZ_FACTOR_INLINES_C
+
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#include <stdio.h>
+#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 
-void
-_fmpz_factor_append(fmpz_factor_t factor, const fmpz_t p, ulong exp)
+void fmpz_factor_get_fmpz(fmpz_t z, const fmpz_factor_t factor, slong i)
 {
-    _fmpz_factor_fit_length(factor, factor->num + 1);
-    fmpz_set(factor->p + factor->num, p);
-    factor->exp[factor->num] = exp;
-    factor->num++;
+    fmpz_set(z, factor->p + i);
 }
+
