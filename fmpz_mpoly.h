@@ -722,28 +722,40 @@ FLINT_DLL void _fmpz_mpoly_scalar_divexact_ui(fmpz * poly1, ulong * exps1,
 FLINT_DLL void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1,
                 const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx);
 
-slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
-                 const fmpz * poly2, const ulong * exp2, slong len2,
+FLINT_DLL void _fmpz_mpoly_pack_exponents_tight(ulong * exp1,
+                  const ulong * exp2, slong len, const slong * mults, 
+                                             slong N, slong extra, slong bits);
+
+
+FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1,
+        slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
                   const fmpz * poly3, const ulong * exp3, slong len3, slong N);
 
-slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
-                 const fmpz * poly2, const ulong * exp2, slong len2,
+FLINT_DLL slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1,
+        slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
                            const fmpz * poly3, const ulong * exp3, slong len3);
 
-void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                         const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
+                                                   const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                         const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, 
+                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
 
-slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
-                  const fmpz * poly2, const ulong * exp2, slong len2, slong k);
+FLINT_DLL slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1,
+   slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, slong k);
 
-slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
-         const fmpz * poly2, const ulong * exp2, slong len2, slong k, slong N);
+FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
+                slong * alloc, const fmpz * poly2, const ulong * exp2, 
+                                                 slong len2, slong k, slong N);
 
-void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                           slong k, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
+                                                   const fmpz_mpoly_ctx_t ctx);
 
 /* Input/output **************************************************************/
 

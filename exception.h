@@ -18,7 +18,8 @@ typedef enum
    FLINT_IMPINV, /* impossible inverse */
    FLINT_DOMERR, /* domain error */
    FLINT_DIVZERO, /* divide by zero */
-   FLINT_EXPOF   /* exponent overflow */
+   FLINT_EXPOF,   /* exponent overflow */
+   FLINT_INEXACT /* inexact error */
 } flint_err_t;
 
 FLINT_DLL void flint_throw(flint_err_t exc, const char * msg, ...);
