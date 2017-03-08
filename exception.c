@@ -68,6 +68,9 @@ void flint_throw(flint_err_t exc, const char * msg, ...)
         case FLINT_DIVZERO:
             flint_printf("Divide by zero");
             break;
+        case FLINT_INEXACT:
+            flint_printf("Inexact");
+            break;
         default:
             flint_printf("Unknown exception");
      }
