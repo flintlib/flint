@@ -17,7 +17,7 @@ void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, slong len,
 {
     const slong d = fq_nmod_ctx_degree(ctx);
 
-    ulong i, l;
+    slong i, l;
     mp_limb_t *t, rop;
 
     t = _nmod_vec_init(d);

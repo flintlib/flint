@@ -2,7 +2,7 @@
    Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 2002, 2003,
    2004, 2005 Free Software Foundation, Inc.
 
-   Copyright 2009, 2015 William Hart
+   Copyright 2009, 2015, 2016 William Hart
    Copyright 2011 Fredrik Johansson
 
    This file is free software; you can redistribute it and/or modify
@@ -41,6 +41,13 @@
        : "0"  ((mp_limb_t)(ah)), "rme" ((mp_limb_t)(bh)),  \
          "1"  ((mp_limb_t)(am)), "rme" ((mp_limb_t)(bm)),  \
          "2"  ((mp_limb_t)(al)), "rme" ((mp_limb_t)(bl)))  \
+
+#define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)  \
+  __asm__ ("subq %8,%q2\n\tsbbq %6,%q1\n\tsbbq %4,%q0"     \
+       : "=r" (dh), "=r" (dm), "=&r" (dl)                  \
+       : "0"  ((mp_limb_t)(mh)), "rme" ((mp_limb_t)(sh)),  \
+         "1"  ((mp_limb_t)(mm)), "rme" ((mp_limb_t)(sm)),  \
+         "2"  ((mp_limb_t)(ml)), "rme" ((mp_limb_t)(sl)))  \
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)                 \
   __asm__ ("addq %5,%q1\n\tadcq %3,%q0"                    \
@@ -103,6 +110,13 @@
        : "0"  ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),    \
          "1"  ((mp_limb_t)(am)), "g" ((mp_limb_t)(bm)),    \
          "2"  ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))    \
+
+#define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)  \
+  __asm__ ("subl %8,%k2\n\tsbbl %6,%k1\n\tsbbl %4,%k0"     \
+       : "=r" (dh), "=r" (dm), "=&r" (dl)                  \
+       : "0"  ((mp_limb_t)(mh)), "g" ((mp_limb_t)(sh)),    \
+         "1"  ((mp_limb_t)(mm)), "g" ((mp_limb_t)(sm)),    \
+         "2"  ((mp_limb_t)(ml)), "g" ((mp_limb_t)(sl)))    \
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)               \
   __asm__ ("addl %5,%k1\n\tadcl %3,%k0"                  \
@@ -333,6 +347,14 @@
   } while (0)
 
 #endif
+
+#define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)           \
+  do {                                                              \
+    mp_limb_t __t, __u;                                             \
+    sub_ddmmss(__t, dl, (mp_limb_t) 0, ml, (mp_limb_t) 0, sl);      \
+    sub_ddmmss(__u, dm, (mp_limb_t) 0, mm, (mp_limb_t) 0, sm);      \
+    sub_ddmmss(dh, dm, mh - sh, dm, __u, __t);                      \
+  } while (0)
 
 /* MIPS and ARM - Use clz builtins */
 #if (defined (__mips__) || defined (__arm__))
