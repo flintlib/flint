@@ -84,7 +84,7 @@ ulong hash_word(ulong val)
 static __inline__
 ulong hash_word(ulong a)
 {
-   int b = c = 0;
+   int b = 0, c = 0;
 
    hash_mix(a, b, c);
    
