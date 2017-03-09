@@ -726,6 +726,21 @@ FLINT_DLL void _fmpz_mpoly_pack_exponents_tight(ulong * exp1,
                   const ulong * exp2, slong len, const slong * mults, 
                                              slong N, slong extra, slong bits);
 
+FLINT_DLL slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1,
+                         ulong ** exp1, slong * alloc, ulong * poly2,
+                            const slong * mults, slong N, slong bits, slong k);
+
+FLINT_DLL slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1,
+                         ulong ** exp1, slong * alloc, ulong * poly2, 
+                            const slong * mults, slong N, slong bits, slong k);
+
+FLINT_DLL slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1,
+                         ulong ** exp1, slong * alloc, ulong * poly2,
+                            const slong * mults, slong N, slong bits, slong k);
+
+FLINT_DLL slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1,
+                         ulong ** exp1, slong * alloc, fmpz * poly2,
+                            const slong * mults, slong N, slong bits, slong k);
 
 FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1,
         slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
