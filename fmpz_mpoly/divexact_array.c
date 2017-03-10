@@ -314,7 +314,8 @@ slong _fmpz_mpoly_divexact_array_tight(fmpz ** poly1, ulong ** exp1,
 
    bits2 = _fmpz_vec_max_bits(poly2, len2);
    bits3 = _fmpz_vec_max_bits(poly3, len3);
-   bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(len3);
+   /* we assume a bound of FLINT_BITS - 2 for coefficients of the quotient */
+   bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(len3) - 2;
 
    small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
    bits1++; /* incr. so difference of poly2 and q*poly3 doesn't overflow */
@@ -643,7 +644,8 @@ slong _fmpz_mpoly_divexact_array_univariate(fmpz_mpoly_t poly1,
 
    bits2 = fmpz_mpoly_max_bits(poly2);
    bits3 = fmpz_mpoly_max_bits(poly3);
-   bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(poly3->length);
+   /* we assume a bound of FLINT_BITS - 2 for coefficients of the quotient */
+   bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(poly3->length) - 2;
 
    small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
    bits1++; /* incr. so difference of poly2 and q*poly3 doesn't overflow */
