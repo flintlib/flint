@@ -19,9 +19,6 @@ void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
    slong i = 0, j;
    slong m;
-   fmpz * tmp;
-
-   TMP_INIT;
 
    while (i < poly->length && fmpz_is_zero(poly->coeffs + i))
       i++;
@@ -30,20 +27,11 @@ void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
    {
       m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;;
 
-      TMP_START;
-
-      tmp = (fmpz *) TMP_ALLOC(i*sizeof(fmpz));
-
-      for (j = 0; j < i; j++)
-         tmp[j] = poly->coeffs[j];
-
       for (j = i; j < poly->length; j++)
          poly->coeffs[j - i] = poly->coeffs[j];
 
-      for (j = 0; j < i; j++)
-         poly->coeffs[j + i] = tmp[j];
-
-      TMP_END;
+      for (j = poly->length - i; j < poly->length; j++)
+         poly->coeffs[j] = 0;
 
       for (j = i*m; j < poly->length*m; j++)
          poly->exps[j - i*m] = poly->exps[j];
