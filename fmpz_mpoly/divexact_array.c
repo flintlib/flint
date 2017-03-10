@@ -318,7 +318,7 @@ slong _fmpz_mpoly_divexact_array_tight(fmpz ** poly1, ulong ** exp1,
    bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(len3) - 2;
 
    small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
-   bits1++; /* incr. so difference of poly2 and q*poly3 doesn't overflow */
+   bits1 += 2; /* incr. so poly2 - q*poly3 doesn't overflow and for sign */
 
    if (small && bits1 <= 2*FLINT_BITS)
    {
@@ -648,7 +648,7 @@ slong _fmpz_mpoly_divexact_array_univariate(fmpz_mpoly_t poly1,
    bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(poly3->length) - 2;
 
    small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
-   bits1++; /* incr. so difference of poly2 and q*poly3 doesn't overflow */
+   bits1 += 2; /* incr. so poly2 - q*poly3 doesn't overflow and for sign */
 
    /* make copy of first "coefficient" of poly2 */
 
