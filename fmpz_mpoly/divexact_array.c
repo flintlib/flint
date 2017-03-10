@@ -691,7 +691,7 @@ slong _fmpz_mpoly_divexact_array_univariate(fmpz_mpoly_t poly1,
 
             i1[i] = len;
             
-            if (n2[i] != 0)
+            if (tlen != 0)
             {
                n1[i] = _fmpz_mpoly_divexact_array_tight(&poly1->coeffs,
                         &poly1->exps, &poly1->alloc, len, temp, texp, tlen,
@@ -772,7 +772,7 @@ slong _fmpz_mpoly_divexact_array_univariate(fmpz_mpoly_t poly1,
 
             i1[i] = len;
             
-            if (n2[i] != 0)
+            if (tlen != 0)
             {
                n1[i] = _fmpz_mpoly_divexact_array_tight(&poly1->coeffs,
                         &poly1->exps, &poly1->alloc, len, temp, texp, tlen,
@@ -858,7 +858,7 @@ big:
 
             i1[i] = len;
             
-            if (n2[i] != 0)
+            if (tlen != 0)
             {
                n1[i] = _fmpz_mpoly_divexact_array_tight(&poly1->coeffs,
                         &poly1->exps, &poly1->alloc, len, temp, texp, tlen,
