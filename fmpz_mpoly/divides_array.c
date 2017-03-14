@@ -285,7 +285,7 @@ int _fmpz_mpoly_exponent_divides_tight(slong e1, slong e2,
    return 1;
 }
 
-slong _fmpz_mpoly_divexact_array_tight(fmpz ** poly1, ulong ** exp1,
+slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                                            slong * alloc, slong len1, 
                       const fmpz * poly2, const ulong * exp2, slong len2,
                       const fmpz * poly3, const ulong * exp3, slong len3,
@@ -311,6 +311,9 @@ slong _fmpz_mpoly_divexact_array_tight(fmpz ** poly1, ulong ** exp1,
       prods[i] = mults[i - 1]*prods[i - 1];
 
    prod = prods[N];
+
+   if (!_fmpz_mpoly_exponent_divides_tight(exp2[len2 - 1], exp3[len3 - 1], prods, N))
+      goto cleanup;
 
    bits2 = _fmpz_vec_max_bits(poly2, len2);
    bits3 = _fmpz_vec_max_bits(poly3, len3);
@@ -573,7 +576,7 @@ cleanup:
    classical exact division in main variable, array multiplication (submul)
    for multivariate coefficients
 */
-slong _fmpz_mpoly_divexact_array_univariate(fmpz_mpoly_t poly1,
+slong _fmpz_mpoly_divides_array_univariate(fmpz_mpoly_t poly1,
                     const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                             slong * mults, slong bits, slong N)
 {
@@ -693,7 +696,7 @@ slong _fmpz_mpoly_divexact_array_univariate(fmpz_mpoly_t poly1,
             
             if (tlen != 0)
             {
-               n1[i] = _fmpz_mpoly_divexact_array_tight(&poly1->coeffs,
+               n1[i] = _fmpz_mpoly_divides_array_tight(&poly1->coeffs,
                         &poly1->exps, &poly1->alloc, len, temp, texp, tlen,
                                    poly3->coeffs, exp3, n3[0], mults, bits, N);
 
@@ -774,7 +777,7 @@ slong _fmpz_mpoly_divexact_array_univariate(fmpz_mpoly_t poly1,
             
             if (tlen != 0)
             {
-               n1[i] = _fmpz_mpoly_divexact_array_tight(&poly1->coeffs,
+               n1[i] = _fmpz_mpoly_divides_array_tight(&poly1->coeffs,
                         &poly1->exps, &poly1->alloc, len, temp, texp, tlen,
                                    poly3->coeffs, exp3, n3[0], mults, bits, N);
 
@@ -860,7 +863,7 @@ big:
             
             if (tlen != 0)
             {
-               n1[i] = _fmpz_mpoly_divexact_array_tight(&poly1->coeffs,
+               n1[i] = _fmpz_mpoly_divides_array_tight(&poly1->coeffs,
                         &poly1->exps, &poly1->alloc, len, temp, texp, tlen,
                                    poly3->coeffs, exp3, n3[0], mults, bits, N);
 
@@ -926,7 +929,7 @@ cleanup:
    a list of multipliers to tightly pack exponents and a number of bits for the
    fields of the exponents of the result, assuming no aliasing
 */
-slong _fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+slong _fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                   const fmpz_mpoly_t poly3, slong * mults, slong bits, slong N)
 {
    slong i;
@@ -939,7 +942,7 @@ slong _fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       prod *= mults[i];
 
    if (prod > MAX_ARRAY_SIZE)
-      return _fmpz_mpoly_divexact_array_univariate(poly1, poly2, poly3,
+      return _fmpz_mpoly_divides_array_univariate(poly1, poly2, poly3,
                                                                mults, bits, N - 1);
 
    TMP_START;
@@ -953,7 +956,7 @@ slong _fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    _fmpz_mpoly_pack_exponents_tight(exp3, poly3->exps, poly3->length,
                                                      mults, N, 0, poly3->bits);
 
-   len = _fmpz_mpoly_divexact_array_tight(&poly1->coeffs, &poly1->exps,
+   len = _fmpz_mpoly_divides_array_tight(&poly1->coeffs, &poly1->exps,
                      &poly1->alloc, 0,  poly2->coeffs, exp2, poly2->length,
                            poly3->coeffs, exp3, poly3->length, mults, bits, N);
 
@@ -965,18 +968,18 @@ slong _fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    return len;
 }
 
-int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
    slong i, bits, exp_bits, N, len = 0, array_size;
-   ulong * max_degs2;
+   ulong * max_degs2, * max_degs3;
    ulong max = 0;
-   int res = 1;
+   int res = -1;
 
    TMP_INIT;
 
    if (poly3->length == 0)
-      flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divexact_monagan_pearce");
+      flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divides_array");
 
    if (poly2->length == 0)
    {
@@ -988,13 +991,18 @@ int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    TMP_START;
 
    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+   max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
 
    fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
+   fmpz_mpoly_max_degrees(max_degs3, poly3, ctx);
 
    for (i = 0; i < ctx->n; i++)
    {
       if (max_degs2[i] > max)
          max = max_degs2[i];
+
+      if (max_degs2[i] < max_degs3[i])
+         goto cleanup;
    }
 
    bits = FLINT_BIT_COUNT(max);
@@ -1006,10 +1014,7 @@ int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
    if (N != 1)
-   {
-      res = 0;
       goto cleanup;
-   }
 
    array_size = 1;
    for (i = 0; i < ctx->n - 1; i++)
@@ -1020,14 +1025,7 @@ int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    max_degs2[ctx->n - 1]++;
    
    if (array_size > MAX_ARRAY_SIZE)
-   {
-      res = 0;
-
       goto cleanup;
-   }
-
-   if (poly2->exps[poly2->length - 1] < poly3->exps[poly3->length - 1])
-      goto inexact;
 
    if (poly1 == poly2 || poly1 == poly3)
    {
@@ -1036,7 +1034,7 @@ int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       fmpz_mpoly_init2(temp, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
 
-      len = _fmpz_mpoly_divexact_array(temp, poly2, poly3,
+      len = _fmpz_mpoly_divides_array(temp, poly2, poly3,
                                         (slong *) max_degs2, exp_bits, ctx->n);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
@@ -1047,20 +1045,13 @@ int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       fmpz_mpoly_fit_length(poly1, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
 
-      len = _fmpz_mpoly_divexact_array(poly1, poly2, poly3,
+      len = _fmpz_mpoly_divides_array(poly1, poly2, poly3,
                                         (slong *) max_degs2, exp_bits, ctx->n);
    }
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
 
-inexact:
-
-   if (len == 0)
-   {
-      TMP_END;
-
-      flint_throw(FLINT_INEXACT, "Not an exact division in fmpz_mpoly_divexact_array");
-   }
+   res = len != 0;
 
 cleanup:
 

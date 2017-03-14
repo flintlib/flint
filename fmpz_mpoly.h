@@ -804,9 +804,18 @@ FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
 FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                           slong k, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1,
+FLINT_DLL slong _fmpz_mpoly_divides_array(fmpz_mpoly_t poly1,
+                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                           slong * mults, slong bits, slong N);
+
+FLINT_DLL int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
                                                    const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1,
+                     ulong ** exp1, slong * alloc, const fmpz * poly2, 
+                       const ulong * exp2, slong len2, const fmpz * poly3,
+                                   const ulong * exp3, slong len3, slong bits);
 
 FLINT_DLL slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
                      ulong ** exp1, slong * alloc, const fmpz * poly2, 

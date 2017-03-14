@@ -647,14 +647,15 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
    slong i, bits, exp_bits, N, len = 0;
-   ulong * max_degs2;
+   ulong * max_degs2, * max_degs3;
    ulong max = 0;
-   ulong * exp2, * exp3;
+   ulong * exp2, * exp3, * expq;
    int free2 = 0, free3 = 0;
+   ulong mask = 0;
    TMP_INIT;
 
    if (poly3->length == 0)
-      flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divexact_monagan_pearce");
+      flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divides_monagan_pearce");
 
    if (poly2->length == 0)
    {
@@ -666,13 +667,22 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    TMP_START;
 
    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+   max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
 
    fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
+   fmpz_mpoly_max_degrees(max_degs3, poly3, ctx);
 
    for (i = 0; i < ctx->n; i++)
    {
       if (max_degs2[i] > max)
          max = max_degs2[i];
+
+      if (max_degs2[i] < max_degs3[i])
+      {
+         len = 0;
+
+         goto cleanup;
+      }
    }
 
    bits = FLINT_BIT_COUNT(max);
@@ -681,7 +691,12 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    while (bits >= exp_bits)
       exp_bits *= 2;
 
+   exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+   exp_bits = FLINT_MAX(exp_bits, poly3->bits);
+
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+
+   expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
    if (poly2->exps[poly2->length - 1] < poly3->exps[poly3->length - 1])
       goto cleanup;
@@ -695,6 +710,18 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                                            poly3->bits, ctx->n, poly3->length);
    
    free3 = exp3 != poly3->exps;
+
+   for (i = 0; i < FLINT_BITS/exp_bits; i++)
+      mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
+
+   /* check leading monomial divides */
+   if (!mpoly_monomial_divides(expq, exp2 + (poly2->length - 1)*N,
+                                        exp3 + (poly3->length - 1)*N, N, mask))
+   {
+      len = 0;
+
+      goto cleanup;
+   }
 
    if (poly1 == poly2 || poly1 == poly3)
    {
