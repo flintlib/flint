@@ -87,6 +87,32 @@ void mpoly_monomial_sub_no_borrow(ulong * exp_ptr, const ulong * exp2, const ulo
 }
 
 FMPZ_MPOLY_INLINE
+int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N, ulong mask)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+   {
+      exp_ptr[i] = exp2[i] - exp3[i];
+
+      if (((exp2[i] - exp3[i]) & mask) != 0)
+         return 0;
+   }
+
+   return 1;
+}
+
+FMPZ_MPOLY_INLINE
+int mpoly_monomial_divides1(ulong * exp_ptr, const ulong exp2, const ulong exp3, ulong mask)
+{
+   (*exp_ptr) = exp2 - exp3;
+
+   if (((exp2 - exp3) & mask) != 0)
+      return 0;
+
+   return 1;
+}
+
+FMPZ_MPOLY_INLINE
 void mpoly_monomial_set(ulong * exp2, const ulong * exp3, slong N)
 {
    slong i;
@@ -484,7 +510,17 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
    }   
 }
 
-FLINT_DLL int _fmpz_mpoly_fits_small(const fmpz * poly, slong len);
+FMPZ_MPOLY_INLINE
+int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
+{
+   slong i;
+   for (i = 0; i < len; i++)
+   {
+      if (COEFF_IS_MPZ(poly[i]))
+         return 0;
+   }
+   return 1;
+}
 
 FMPZ_MPOLY_INLINE
 slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
@@ -771,6 +807,15 @@ FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 FLINT_DLL int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
                                                    const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
+                     ulong ** exp1, slong * alloc, const fmpz * poly2, 
+                       const ulong * exp2, slong len2, const fmpz * poly3,
+                          const ulong * exp3, slong len3, slong N, slong bits);
+
+FLINT_DLL int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx);
 
 /* Input/output **************************************************************/
 

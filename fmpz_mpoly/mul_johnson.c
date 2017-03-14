@@ -15,19 +15,6 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
-{
-   slong i;
-
-   for (i = 0; i < len; i++)
-   {
-      if (COEFF_IS_MPZ(poly[i]))
-         return 0;
-   }
-
-   return 1;
-}
-
 slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                            const fmpz * poly3, const ulong * exp3, slong len3)

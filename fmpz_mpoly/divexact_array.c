@@ -975,7 +975,10 @@ int fmpz_mpoly_divexact_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_INIT;
 
-   if (poly2->length == 0 || poly3->length == 0)
+   if (poly3->length == 0)
+      flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divexact_monagan_pearce");
+
+   if (poly2->length == 0)
    {
       fmpz_mpoly_zero(poly1, ctx);
 
