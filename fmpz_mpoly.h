@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2016-2017 William Hart
 
     This file is part of FLINT.
 
@@ -118,6 +118,19 @@ void mpoly_monomial_set(ulong * exp2, const ulong * exp3, slong N)
    slong i;
    for (i = 0; i < N; i++)
       exp2[i] = exp3[i];
+}
+
+FMPZ_MPOLY_INLINE
+void mpoly_monomial_swap(ulong * exp2, ulong * exp3, slong N)
+{
+   slong i;
+   ulong t;
+   for (i = 0; i < N; i++)
+   {
+      t = exp2[i];
+      exp2[i] = exp3[i];
+      exp3[i] = t;
+   }
 }
 
 FMPZ_MPOLY_INLINE
@@ -680,6 +693,17 @@ FLINT_DLL int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
 FLINT_DLL int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+/* Reverse *******************************************************************/
+
+FLINT_DLL void _fmpz_mpoly_reverse1(fmpz * poly1, ulong * exp1,
+                            const fmpz * poly2, const ulong * exp2, slong len);
+
+FLINT_DLL void _fmpz_mpoly_reverse(fmpz * poly1, ulong * exp1,
+                   const fmpz * poly2, const ulong * exp2, slong len, slong N);
+
+FLINT_DLL void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
+                               fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx);
+
 /* Arithmetic ****************************************************************/
 
 FLINT_DLL void fmpz_mpoly_add_ui(fmpz_mpoly_t poly1,
@@ -824,7 +848,24 @@ FLINT_DLL slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
 
 FLINT_DLL int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                                    const fmpz_mpoly_ctx_t ctx);
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
+        fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
+  ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
+            slong len2, const fmpz * poly3, const ulong * exp3, slong len3,
+                                                       slong bits, ulong maxn);
+
+FLINT_DLL slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
+       fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
+  ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
+    slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong N,
+                                                     slong bits, ulong * maxn);
+
+FLINT_DLL void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 
 /* Input/output **************************************************************/
 

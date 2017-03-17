@@ -58,7 +58,7 @@ void _fmpz_mpoly_set_monomial_8_64(ulong * exp1, const ulong * exp2,
       }
    } else
    {
-      k2 = q;
+      k2 = n - 1;
       if (r > 0)
       {
          if (deg && q == 0)
@@ -128,7 +128,7 @@ void _fmpz_mpoly_set_monomial_16_64(ulong * exp1, const ulong * exp2,
       }
    } else
    {
-      k2 = q;
+      k2 = n - 1;
       if (r > 0)
       {
          if (deg && q == 0)
@@ -187,7 +187,7 @@ void _fmpz_mpoly_set_monomial_32_64(ulong * exp1, const ulong * exp2,
       }
    } else
    {
-      k2 = q;
+      k2 = n - 1;
       if (r != 0)
       {
          if (deg && q == 0)
@@ -270,7 +270,7 @@ void _fmpz_mpoly_set_monomial_8_32(ulong * exp1, const ulong * exp2,
       }
    } else
    {
-      k2 = q;
+      k2 = n - 1;
       if (r > 0)
       {
          if (deg && q == 0)
@@ -329,7 +329,7 @@ void _fmpz_mpoly_set_monomial_16_32(ulong * exp1, const ulong * exp2,
       }
    } else
    {
-      k2 = q;
+      k2 = n - 1;
       if (r != 0)
       {
          if (deg && q == 0)
