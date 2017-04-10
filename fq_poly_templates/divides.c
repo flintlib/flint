@@ -23,7 +23,7 @@ _TEMPLATE(T, poly_divides) (
     const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, struct) * R;
-    slong lenR = lenA - lenB + 1;
+    slong lenR = lenB - 1;
 
     R = _TEMPLATE(T, vec_init) (lenA, ctx);
 
