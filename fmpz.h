@@ -572,7 +572,7 @@ FLINT_DLL ulong fmpz_tdiv_ui(const fmpz_t g, ulong h);
 
 FLINT_DLL void fmpz_tdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
-FLINT_DLL void fmpz_preinvn_init(fmpz_preinvn_t inv, fmpz_t f);
+FLINT_DLL void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f);
 
 FLINT_DLL void fmpz_preinvn_clear(fmpz_preinvn_t inv);
 
