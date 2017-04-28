@@ -208,16 +208,24 @@ typedef struct mpoly_heap_t
    struct mpoly_heap_t * next;
 } mpoly_heap_t;
 
+typedef struct mpoly_nheap_t
+{
+   ulong i;
+   ulong j;
+   slong p;
+   struct mpoly_nheap_t * next;
+} mpoly_nheap_t;
+
 typedef struct mpoly_heap1_s
 {
    ulong exp;
-   struct mpoly_heap_t * next;
+   void * next;
 } mpoly_heap1_s;
 
 typedef struct mpoly_heap_s
 {
    ulong * exp;
-   struct mpoly_heap_t * next;
+   void * next;
 } mpoly_heap_s;
 
 #define HEAP_LEFT(i) (2*(i))
@@ -231,11 +239,11 @@ typedef struct mpoly_heap_s
    } while (0)
 
 FMPZ_MPOLY_INLINE
-mpoly_heap_t * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
+void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
 {
    ulong exp;
    slong i, j, s = --(*heap_len);
-   mpoly_heap_t * x = heap[1].next;
+   void * x = heap[1].next;
 
    i = 1;
    j = 2;
@@ -266,14 +274,14 @@ mpoly_heap_t * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
 }
 
 FMPZ_MPOLY_INLINE
-void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, mpoly_heap_t * x, slong * heap_len)
+void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x, slong * heap_len)
 {
    slong i = *heap_len, j, n = *heap_len;
    static slong next_loc = 0;
 
    if (i != 1 && exp == heap[1].exp)
    {
-      x->next = heap[1].next;
+      ((mpoly_heap_t *) x)->next = heap[1].next;
       heap[1].next = x;
 
       return;
@@ -283,7 +291,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, mpoly_heap_t * x, slon
    {
       if (exp == heap[next_loc].exp)
       {
-         x->next = heap[next_loc].next;
+         ((mpoly_heap_t *) x)->next = heap[next_loc].next;
          heap[next_loc].next = x;
          return;
       }
@@ -293,7 +301,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, mpoly_heap_t * x, slon
    {
       if (exp == heap[j].exp)
       {
-         x->next = heap[j].next;
+         ((mpoly_heap_t *) x)->next = heap[j].next;
          heap[j].next = x;
          next_loc = j;
 
@@ -316,7 +324,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, mpoly_heap_t * x, slon
 }
 
 FMPZ_MPOLY_INLINE
-mpoly_heap_t * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
+void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
 {
    ulong * exp;
    slong i, j, s = --(*heap_len);
@@ -351,14 +359,14 @@ mpoly_heap_t * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
 }
 
 FMPZ_MPOLY_INLINE
-int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, mpoly_heap_t * x, slong * heap_len, slong N)
+int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x, slong * heap_len, slong N)
 {
    slong i = *heap_len, j, n = *heap_len;
    static slong next_loc = 0;
 
    if (i != 1 && mpoly_monomial_equal(exp, heap[1].exp, N))
    {
-      x->next = heap[1].next;
+      ((mpoly_heap_t *) x)->next = heap[1].next;
       heap[1].next = x;
 
       return 0;
@@ -368,7 +376,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, mpoly_heap_t * x, slong
    {
       if (mpoly_monomial_equal(exp, heap[next_loc].exp, N))
       {
-         x->next = heap[next_loc].next;
+         ((mpoly_heap_t *) x)->next = heap[next_loc].next;
          heap[next_loc].next = x;
          return 0;
       }
@@ -384,7 +392,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, mpoly_heap_t * x, slong
 
    if (j >= 1 && mpoly_monomial_equal(exp, heap[j].exp, N))
    {
-      x->next = heap[j].next;
+      ((mpoly_heap_t *) x)->next = heap[j].next;
       heap[j].next = x;
       next_loc = j;
 
