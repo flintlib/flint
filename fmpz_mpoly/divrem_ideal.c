@@ -87,7 +87,7 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
    x = chain + next_free++;
    x->i = -WORD(1);
    x->j = 0;
-   x->p = 0;
+   x->p = -WORD(1);
    x->next = NULL;
 
    HEAP_ASSIGN(heap[1], maxn - exp2[len2 - 1], x);
@@ -110,7 +110,8 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
       while (heap_len > 1 && heap[1].exp == exp)
       {
          x = _mpoly_heap_pop1(heap, &heap_len);
-         n3 = poly3[x->p]->length;
+
+         n3 = x->i == -WORD(1) ? 0 : poly3[x->p]->length;
                
          if (small)
          {
@@ -156,7 +157,7 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
 
          while ((x = x->next) != NULL)
          {
-            n3 = poly3[x->p]->length;
+            n3 = x->i == -WORD(1) ? 0 : poly3[x->p]->length;
 
             if (small)
             {
@@ -205,7 +206,7 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
       while (Q_len > 0)
       {
          x = Q[--Q_len];
-         n3 = poly3[x->p]->length;
+         n3 = x->i == -WORD(1) ? 0 : poly3[x->p]->length;
 
          if (x->i == -WORD(1))
          {
@@ -213,13 +214,13 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
             x->next = NULL;
 
             _mpoly_heap_insert1(heap, maxn - exp2[len2 - x->j - 1], x, &heap_len);
-         } else if (x->j < k[x->p] - 1)
+         } else if (x->j < k[x->p])
          {
             x->j++;
             x->next = NULL;
 
             _mpoly_heap_insert1(heap, maxn - exp3[x->p][n3 - x->i - 1] - polyq[x->p]->exps[x->j], x, &heap_len);
-         } else if (x->j == k[x->p] - 1)
+         } else if (x->j == k[x->p])
          {
             s[x->p]++;
             reuse[reuse_len++] = x;

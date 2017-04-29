@@ -212,8 +212,8 @@ typedef struct mpoly_nheap_t
 {
    ulong i;
    ulong j;
-   slong p;
    struct mpoly_nheap_t * next;
+   slong p;
 } mpoly_nheap_t;
 
 typedef struct mpoly_heap1_s
