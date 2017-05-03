@@ -70,7 +70,7 @@ void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2, const ulong * exp3,
 }
 
 FMPZ_MPOLY_INLINE
-void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
+void mpoly_monomial_sub_with_borrow(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 {
    slong i;
    ulong bw = 0;
@@ -79,7 +79,7 @@ void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2, const ulong * exp3,
 }
 
 FMPZ_MPOLY_INLINE
-void mpoly_monomial_sub_no_borrow(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
+void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 {
    slong i;
    for (i = 0; i < N; i++)
@@ -94,7 +94,7 @@ int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2, const ulong * ex
    {
       exp_ptr[i] = exp2[i] - exp3[i];
 
-      if (((exp2[i] - exp3[i]) & mask) != 0)
+      if ((exp_ptr[i] & mask) != 0)
          return 0;
    }
 
@@ -874,6 +874,21 @@ FLINT_DLL void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq,
+       fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, 
+          const ulong * exp2, slong len2, const fmpz_mpoly_struct ** poly3,
+                                 ulong * const * exp3, slong len, slong bits, 
+                                       ulong maxn, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, 
+       fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
+          const ulong * exp2, slong len2, const fmpz_mpoly_struct ** poly3,
+                        ulong * const * exp3, slong len, slong N, slong bits,
+                                     ulong * maxn, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
+         const fmpz_mpoly_t poly2, const fmpz_mpoly_struct ** poly3, slong len,
+                                                   const fmpz_mpoly_ctx_t ctx);
 
 /* Input/output **************************************************************/
 

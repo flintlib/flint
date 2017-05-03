@@ -439,7 +439,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
          if (!mpoly_monomial_lt(finalexp, exp, N))
          {
-            mpoly_monomial_sub(temp2, fik + x->i*N, ge + x->j*N, N);
+            mpoly_monomial_sub_with_borrow(temp2, fik + x->i*N, ge + x->j*N, N);
             fmpz_set_mpn_signed(t2, temp2, N);
 
             fmpz_addmul(C, t1, t2);
@@ -447,7 +447,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
          if (first)
          {
-            mpoly_monomial_sub_no_borrow(ge + gnext*N, exp, exp2 + 0, N);
+            mpoly_monomial_sub(ge + gnext*N, exp, exp2 + 0, N);
             first = 0; 
          }
       
@@ -462,7 +462,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
             if (!mpoly_monomial_lt(finalexp, exp, N))
             {
-               mpoly_monomial_sub(temp2, fik + x->i*N, ge + x->j*N, N);
+               mpoly_monomial_sub_with_borrow(temp2, fik + x->i*N, ge + x->j*N, N);
                fmpz_set_mpn_signed(t2, temp2, N);
 
                fmpz_addmul(C, t1, t2);
@@ -514,7 +514,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
       if (!fmpz_is_zero(C))
       {
          mpoly_monomial_mul_si(temp2, exp2 + 0, N, k); 
-         mpoly_monomial_sub(temp2, exp, temp2, N);
+         mpoly_monomial_sub_with_borrow(temp2, exp, temp2, N);
          fmpz_set_mpn(t2, temp2, N);
 
          fmpz_divexact(temp1, C, t2);
