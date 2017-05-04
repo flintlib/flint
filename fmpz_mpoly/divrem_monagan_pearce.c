@@ -20,7 +20,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
    fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
   ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
             slong len2, const fmpz * poly3, const ulong * exp3, slong len3,
-                                                        slong bits, ulong maxn)
+                                                        ulong maxn, slong bits)
 {
    slong i, k, l, s;
    slong next_free, Q_len = 0, reuse_len = 0, heap_len = 2; /* heap zero index unused */
@@ -385,10 +385,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
 }
 
 slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
-   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
-  ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
-    slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong N,
-                                                      slong bits, ulong * maxn)
+  fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
+                  ulong ** expr, slong * allocr, const fmpz * poly2,
+   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
+                                 slong len3, ulong * maxn, slong bits, slong N)
 {
    slong i, k, l, s;
    slong next_free, Q_len = 0, reuse_len = 0, heap_len = 2; /* heap zero index unused */
@@ -410,6 +410,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
    slong bits2, bits3;
    int d1;
    TMP_INIT;
+
+   if (N == 1)
+      return _fmpz_mpoly_divrem_monagan_pearce1(lenr, polyq, expq, allocq,
+       polyr, expr, allocr, poly2, exp2, len2, poly3, exp3, len3, *maxn, bits);
 
    TMP_START;
 
@@ -868,19 +872,9 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
       tr = r;
    }
 
-   if (N == 1)
-   {
-      lenq = _fmpz_mpoly_divrem_monagan_pearce1(&lenr, &tq->coeffs, &tq->exps,
-                            &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc,
-                               poly2->coeffs, exp2, poly2->length,
-                          poly3->coeffs, exp3, poly3->length, exp_bits, *maxn);
-   } else
-   {
-      lenq = _fmpz_mpoly_divrem_monagan_pearce(&lenr, &tq->coeffs, &tq->exps,
-                            &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc,
-                             poly2->coeffs, exp2, poly2->length,
-                        poly3->coeffs, exp3, poly3->length, N, exp_bits, maxn);
-   }
+   lenq = _fmpz_mpoly_divrem_monagan_pearce(&lenr, &tq->coeffs, &tq->exps,
+         &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2, 
+         poly2->length, poly3->coeffs, exp3, poly3->length, maxn, exp_bits, N);
 
    if (q == poly2 || q == poly3)
    {
