@@ -31,7 +31,7 @@ void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t poly1,
 
    if (c != 0)
    {
-      if (_fmpz_mpoly_monomial_is_zero(poly2->exps + 0, m))
+      if (mpoly_monomial_is_zero(poly2->exps + 0, m))
       {
          if (poly1 != poly2)
          {

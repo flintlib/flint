@@ -644,20 +644,6 @@ FLINT_DLL void _fmpz_mpoly_set_monomial(ulong * exp1, const ulong * exp2,
 FLINT_DLL void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
                       slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx);
 
-FMPZ_MPOLY_INLINE
-int _fmpz_mpoly_monomial_is_zero(const ulong * exps, slong m)
-{
-   slong i;
-
-   for (i = 0; i < m; i++)
-   {
-      if (exps[i] != 0)
-         return 0;
-   }
-
-   return 1;
-}
-
 #define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
 
