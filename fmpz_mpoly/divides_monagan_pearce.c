@@ -701,12 +701,12 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    if (poly2->exps[poly2->length - 1] < poly3->exps[poly3->length - 1])
       goto cleanup;
 
-   exp2 = _fmpz_mpoly_unpack_monomials(exp_bits, poly2->exps, 
+   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->bits, ctx->n, poly2->length);
 
    free2 = exp2 != poly2->exps;
 
-   exp3 = _fmpz_mpoly_unpack_monomials(exp_bits, poly3->exps, 
+   exp3 = mpoly_unpack_monomials(exp_bits, poly3->exps, 
                                            poly3->bits, ctx->n, poly3->length);
    
    free3 = exp3 != poly3->exps;

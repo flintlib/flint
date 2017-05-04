@@ -218,6 +218,9 @@ int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3, slong N)
    return 0;
 }
 
+ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
+                                              slong bits2, slong n, slong len);
+
 typedef struct mpoly_heap_t
 {
    ulong i;
@@ -461,11 +464,6 @@ void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx)
 {
    /* nothing to be done at the moment */
 }
-
-/* Monomials *****************************************************************/
-
-ulong * _fmpz_mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
-                                              slong bits2, slong n, slong len);
 
 /*  Memory management ********************************************************/
 

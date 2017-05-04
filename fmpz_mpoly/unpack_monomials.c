@@ -17,7 +17,7 @@
 
 #if FLINT64
 
-void _fmpz_mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2, 
+void mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
@@ -51,7 +51,7 @@ void _fmpz_mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2, 
+void mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
@@ -81,7 +81,7 @@ void _fmpz_mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2, 
+void mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
@@ -104,7 +104,7 @@ void _fmpz_mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
+void mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
    slong i, j, q, r, r2, k1 = 0, k2 = 0;
@@ -147,7 +147,7 @@ void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
+void mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
@@ -181,7 +181,7 @@ void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
+void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
    slong i, j, q, r, r2, k1 = 0, k2 = 0;
@@ -235,7 +235,7 @@ void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 
 #else
 
-void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
+void mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
@@ -265,7 +265,7 @@ void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
+void mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
@@ -288,7 +288,7 @@ void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
+void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
                                                             slong n, slong len)
 {
    slong i, j, q, r, r2, k1 = 0, k2 = 0;
@@ -328,7 +328,7 @@ void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 
 #endif
 
-ulong * _fmpz_mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
+ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
                                                slong bits2, slong n, slong len)
 {
    ulong * exps1;
@@ -345,21 +345,21 @@ ulong * _fmpz_mpoly_unpack_monomials(slong bits1, const ulong * exps2,
    if (bits1 == 64)
    {
       if (bits2 == 8)
-         _fmpz_mpoly_unpack_monomials_8to64(exps1, exps2, n, len);
+         mpoly_unpack_monomials_8to64(exps1, exps2, n, len);
       else if (bits2 == 16)
-         _fmpz_mpoly_unpack_monomials_16to64(exps1, exps2, n, len);
+         mpoly_unpack_monomials_16to64(exps1, exps2, n, len);
       else /* bits2 == 32 */
-         _fmpz_mpoly_unpack_monomials_32to64(exps1, exps2, n, len);
+         mpoly_unpack_monomials_32to64(exps1, exps2, n, len);
    } else 
 #endif
    if (bits1 == 32)
    {
       if (bits2 == 8)
-         _fmpz_mpoly_unpack_monomials_8to32(exps1, exps2, n, len);
+         mpoly_unpack_monomials_8to32(exps1, exps2, n, len);
       else /* bits2 == 16 */
-         _fmpz_mpoly_unpack_monomials_16to32(exps1, exps2, n, len);
+         mpoly_unpack_monomials_16to32(exps1, exps2, n, len);
    } else  /* bits1 == 16, bits2 = 8 */
-         _fmpz_mpoly_unpack_monomials_8to16(exps1, exps2, n, len);
+         mpoly_unpack_monomials_8to16(exps1, exps2, n, len);
 
    return exps1;
 }

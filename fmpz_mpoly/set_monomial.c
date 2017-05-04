@@ -448,7 +448,7 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
    while (bits >= max_bits)
       max_bits *= 2;
 
-   ptr = _fmpz_mpoly_unpack_monomials(max_bits, poly->exps, 
+   ptr = mpoly_unpack_monomials(max_bits, poly->exps, 
                                              poly->bits, ctx->n, poly->length);
 
    if (ptr != poly->exps)

@@ -828,12 +828,12 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
 
    _fmpz_mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, deg, rev);
 
-   exp2 = _fmpz_mpoly_unpack_monomials(exp_bits, poly2->exps, 
+   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->bits, ctx->n, poly2->length);
 
    free2 = exp2 != poly2->exps;
 
-   exp3 = _fmpz_mpoly_unpack_monomials(exp_bits, poly3->exps, 
+   exp3 = mpoly_unpack_monomials(exp_bits, poly3->exps, 
                                            poly3->bits, ctx->n, poly3->length);
    
    free3 = exp3 != poly3->exps;

@@ -628,7 +628,7 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    while (bits >= exp_bits)
       exp_bits *= 2;
 
-   exp2 = _fmpz_mpoly_unpack_monomials(exp_bits, poly2->exps, 
+   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->bits, ctx->n, poly2->length);
 
    free2 = exp2 != poly2->exps;

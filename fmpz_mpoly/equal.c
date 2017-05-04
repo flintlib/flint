@@ -57,10 +57,10 @@ int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    max_bits = FLINT_MAX(poly1->bits, poly2->bits);
    m = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
 
-   ptr1 = _fmpz_mpoly_unpack_monomials(max_bits, poly1->exps, 
+   ptr1 = mpoly_unpack_monomials(max_bits, poly1->exps, 
                                            poly1->bits, ctx->n, poly1->length);
 
-   ptr2 = _fmpz_mpoly_unpack_monomials(max_bits, poly2->exps, 
+   ptr2 = mpoly_unpack_monomials(max_bits, poly2->exps, 
                                            poly2->bits, ctx->n, poly2->length);
 
    r = _fmpz_mpoly_equal(poly1->coeffs, ptr1,

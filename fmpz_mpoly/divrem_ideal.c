@@ -854,14 +854,14 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
 
    _fmpz_mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, deg, rev);
 
-   exp2 = _fmpz_mpoly_unpack_monomials(exp_bits, poly2->exps, 
+   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->bits, ctx->n, poly2->length);
 
    free2 = exp2 != poly2->exps;
 
    for (i = 0; i < len; i++)
    {
-      exp3[i] = _fmpz_mpoly_unpack_monomials(exp_bits, poly3[i]->exps, 
+      exp3[i] = mpoly_unpack_monomials(exp_bits, poly3[i]->exps, 
                                            poly3[i]->bits, ctx->n, poly3[i]->length);
    
       free3[i] = exp3[i] != poly3[i]->exps;
