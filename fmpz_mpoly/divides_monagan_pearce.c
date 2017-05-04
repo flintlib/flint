@@ -320,10 +320,11 @@ cleanup:
 
 slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-       const fmpz * poly3, const ulong * exp3, slong len3, slong N, slong bits)
+       const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N)
 {
    slong i, k, s;
-   slong next_free, Q_len = 0, reuse_len = 0, heap_len = 2; /* heap zero index unused */
+   slong next_free, Q_len = 0;
+   slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap_s * heap;
    mpoly_heap_t * chain;
    mpoly_heap_t ** Q, ** reuse;
@@ -340,6 +341,10 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
    int small;
    slong bits2, bits3;
    TMP_INIT;
+
+   if (N == 1)
+      return _fmpz_mpoly_divides_monagan_pearce1(poly1, exp1, alloc,
+                                    poly2, exp2, len2, poly3, exp3, len3, bits);
 
    TMP_START;
 
@@ -730,17 +735,9 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
       fmpz_mpoly_init2(temp, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
 
-      if (N == 1)
-      {
-         len = _fmpz_mpoly_divides_monagan_pearce1(&temp->coeffs, &temp->exps,
+      len = _fmpz_mpoly_divides_monagan_pearce(&temp->coeffs, &temp->exps,
                             &temp->alloc, poly2->coeffs, exp2, poly2->length,
-                                 poly3->coeffs, exp3, poly3->length, exp_bits);
-      } else
-      {
-         len = _fmpz_mpoly_divides_monagan_pearce(&temp->coeffs, &temp->exps,
-                            &temp->alloc, poly2->coeffs, exp2, poly2->length,
-                              poly3->coeffs, exp3, poly3->length, N, exp_bits);
-      }
+                              poly3->coeffs, exp3, poly3->length, exp_bits, N);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -750,17 +747,9 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
       fmpz_mpoly_fit_length(poly1, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
 
-      if (N == 1)
-      {
-         len = _fmpz_mpoly_divides_monagan_pearce1(&poly1->coeffs, &poly1->exps,
+      len = _fmpz_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
                             &poly1->alloc, poly2->coeffs, exp2, poly2->length,
-                                 poly3->coeffs, exp3, poly3->length, exp_bits);
-      } else
-      {
-         len = _fmpz_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
-                            &poly1->alloc, poly2->coeffs, exp2, poly2->length,
-                              poly3->coeffs, exp3, poly3->length, N, exp_bits);
-      }
+                              poly3->coeffs, exp3, poly3->length, exp_bits, N);
    }
 
 cleanup:
