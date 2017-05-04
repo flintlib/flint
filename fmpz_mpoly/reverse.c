@@ -45,6 +45,13 @@ void _fmpz_mpoly_reverse(fmpz * poly1, ulong * exp1, const fmpz * poly2,
 {
    slong i;
 
+   if (N == 1)
+   {
+      _fmpz_mpoly_reverse1(poly1, exp1, poly2, exp2, len);
+
+      return;
+   }
+
    if (poly1 == poly2)
    {
       for (i = 0; i < len/2; i++)
@@ -73,11 +80,7 @@ void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
       fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
    }
 
-   if (N == 1)
-      _fmpz_mpoly_reverse1(poly1->coeffs, poly1->exps, poly2->coeffs,
-                                                   poly2->exps, poly2->length);
-   else
-      _fmpz_mpoly_reverse(poly1->coeffs, poly1->exps, poly2->coeffs,
+   _fmpz_mpoly_reverse(poly1->coeffs, poly1->exps, poly2->coeffs,
                                                 poly2->exps, poly2->length, N);
 
    _fmpz_mpoly_set_length(poly1, poly2->length, ctx);

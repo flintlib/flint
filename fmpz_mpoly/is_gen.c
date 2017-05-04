@@ -15,10 +15,14 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
+                                           slong k, const fmpz_mpoly_ctx_t ctx)
 {
    int deg, rev;
    slong i;
+   ulong * exps;
+
+   TMP_INIT;
 
    if (poly->length != 1)
       return 0;
@@ -29,8 +33,40 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
    degrev_from_ord(deg, rev, ctx->ord);
 
    if (deg)
-      return (poly->exps[0] >> (FLINT_BITS - poly->bits)) == 1;
-   else
+   {
+      if (k >= 0)
+      {
+         if ((poly->exps[0] >> (FLINT_BITS - poly->bits)) != 1)
+            return 0;
+      } else
+         return (poly->exps[0] >> (FLINT_BITS - poly->bits)) == 1;
+   }
+
+   if (k >= 0)
+   {
+      TMP_START;
+
+      exps = (ulong *) TMP_ALLOC((ctx->n - deg)*sizeof(ulong));
+
+      fmpz_mpoly_get_monomial(exps, poly, 0, ctx);
+
+      for (i = 0; i < k; i++)
+      {
+         if (exps[i] != 0)
+            return 0;
+      }
+
+      if (exps[i++] != 1)
+         return 0;
+
+      for ( ; i < ctx->n - deg; i++)
+      {
+         if (exps[i] != 0)
+            return 0;
+      }   
+
+      TMP_END;
+   } else
    {
       slong m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
@@ -58,4 +94,6 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
       return 0;
    }
+   
+   return 1;
 }
