@@ -576,16 +576,16 @@ cleanup:
    classical exact division in main variable, array multiplication (submul)
    for multivariate coefficients
 */
-slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
-                    const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
+         slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
+                        const fmpz * poly3, const ulong * exp3, slong len3,
                                             slong * mults, slong bits, slong N)
 {
-   slong i, j, k, prod, len = 0, len1, len2, len3, bits1, bits2, bits3, tlen, talloc;
-   slong shift2 = FLINT_BITS - poly2->bits;
-   slong shift3 = FLINT_BITS - poly3->bits;
+   slong i, j, k, prod, len = 0, l1, l2, l3;
+   slong bits1, bits2, bits3, tlen, talloc;
    slong shift = FLINT_BITS - bits;
    slong * i1, * i2, * i3, * n1, * n2, * n3;
-   ulong * exp2, * exp3, * texp;
+   ulong * e2, * e3, * texp;
    fmpz * temp;
    int small;
    TMP_INIT;
@@ -594,61 +594,59 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
    for (i = 0; i < N; i++)
       prod *= mults[i];
 
-   len2 = 1 + (slong) (poly2->exps[poly2->length - 1] >> shift2);
-   len3 = 1 + (slong) (poly3->exps[poly3->length - 1] >> shift3);
+   l2 = 1 + (slong) (exp2[len2 - 1] >> shift);
+   l3 = 1 + (slong) (exp3[len3 - 1] >> shift);
 
-   len1 = len2 - len3 + 1;
+   l1 = l2 - l3 + 1;
 
    TMP_START;
 
    /* compute indices and lengths of coefficients of polys in main variable */
 
-   i1 = (slong *) TMP_ALLOC(len1*sizeof(slong));
-   n1 = (slong *) TMP_ALLOC(len1*sizeof(slong));
-   i2 = (slong *) TMP_ALLOC(len2*sizeof(slong));
-   n2 = (slong *) TMP_ALLOC(len2*sizeof(slong));
-   i3 = (slong *) TMP_ALLOC(len3*sizeof(slong));
-   n3 = (slong *) TMP_ALLOC(len3*sizeof(slong));
+   i1 = (slong *) TMP_ALLOC(l1*sizeof(slong));
+   n1 = (slong *) TMP_ALLOC(l1*sizeof(slong));
+   i2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
+   n2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
+   i3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
+   n3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
 
    i2[0] = 0;
    j = 0;
-   for (i = 0; i < len2 - 1; i++)
+   for (i = 0; i < l2 - 1; i++)
    {
-      while (j < poly2->length && i == (slong) (poly2->exps[j] >> shift2))
+      while (j < len2 && i == (slong) (exp2[j] >> shift))
          j++;
 
       i2[i + 1] = j;
       n2[i] = j - i2[i];
    }
-   n2[len2 - 1] = poly2->length - j;
+   n2[l2 - 1] = len2 - j;
 
    i3[0] = 0;
    j = 0;
-   for (i = 0; i < len3 - 1; i++)
+   for (i = 0; i < l3 - 1; i++)
    {
-      while (j < poly3->length && i == (slong) (poly3->exps[j] >> shift3))
+      while (j < len3 && i == (slong) (exp3[j] >> shift))
          j++;
 
       i3[i + 1] = j;
       n3[i] = j - i3[i];
    }
-   n3[len3 - 1] = poly3->length - j;
+   n3[l3 - 1] = len3 - j;
 
    /* pack input coefficients tightly */
 
-   exp2 = (ulong *) TMP_ALLOC(poly2->length*sizeof(ulong));
-   exp3 = (ulong *) TMP_ALLOC(poly3->length*sizeof(ulong));
+   e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
+   e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   _fmpz_mpoly_pack_exponents_tight(exp2, poly2->exps, poly2->length,
-                                                        mults, N, 1, poly2->bits);
+   _fmpz_mpoly_pack_exponents_tight(e2, exp2, len2, mults, N, 1, bits);
 
-   _fmpz_mpoly_pack_exponents_tight(exp3, poly3->exps, poly3->length,
-                                                        mults, N, 1, poly3->bits);
+   _fmpz_mpoly_pack_exponents_tight(e3, exp3, len3, mults, N, 1, bits);
 
-   bits2 = fmpz_mpoly_max_bits(poly2);
-   bits3 = fmpz_mpoly_max_bits(poly3);
+   bits2 = _fmpz_vec_max_bits(poly2, len2);
+   bits3 = _fmpz_vec_max_bits(poly3, len3);
    /* we assume a bound of FLINT_BITS - 2 for coefficients of the quotient */
-   bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(poly3->length) - 2;
+   bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(len3) - 2;
 
    small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
    bits1 += 2; /* incr. so poly2 - q*poly3 doesn't overflow and for sign */
@@ -663,30 +661,28 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
    {
       ulong * p2 = (ulong *) TMP_ALLOC(2*prod*sizeof(ulong));
 
-      for (i = 0; i < len2; i++)
+      for (i = 0; i < l2; i++)
       {
          for (j = 0; j < 2*prod; j++)
             p2[j] = 0;
 
-         _fmpz_mpoly_to_ulong_array2(p2, poly2->coeffs + i2[i],
-                                                          exp2 + i2[i], n2[i]);
+         _fmpz_mpoly_to_ulong_array2(p2, poly2 + i2[i], e2 + i2[i], n2[i]);
 
          /* submuls */
 
-         for (j = 0; j < i && j < len1; j++)
+         for (j = 0; j < i && j < l1; j++)
          {
             k = i - j;
 
-            if (k < len3)
-               _fmpz_mpoly_submul_array1_slong2(p2, poly1->coeffs + i1[j],
-                          poly1->exps + i1[j], n1[j], poly3->coeffs + i3[k], 
-                                                          exp3 + i3[k], n3[k]);
+            if (k < l3)
+               _fmpz_mpoly_submul_array1_slong2(p2, (*poly1) + i1[j],
+                     (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
          }
 
          tlen = _fmpz_mpoly_from_ulong_array2(&temp, &texp, &talloc, 
                                                         p2, mults, N, bits, 0);
 
-         if (i < len1)
+         if (i < l1)
          {
 
             _fmpz_mpoly_pack_exponents_tight(texp, texp, tlen, mults,
@@ -696,14 +692,14 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
             
             if (tlen != 0)
             {
-               n1[i] = _fmpz_mpoly_divides_array_tight(&poly1->coeffs,
-                        &poly1->exps, &poly1->alloc, len, temp, texp, tlen,
-                                   poly3->coeffs, exp3, n3[0], mults, bits, N);
+               n1[i] = _fmpz_mpoly_divides_array_tight(poly1,
+                                  exp1, alloc, len, temp, texp, tlen,
+                                             poly3, e3, n3[0], mults, bits, N);
 
                if (n1[i] == 0) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
-                     _fmpz_demote(poly1->coeffs + j);
+                     _fmpz_demote((*poly1) + j);
                   len = 0;
 
                   goto cleanup;
@@ -712,11 +708,11 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
                n1[i] = 0;
 
             /* check the quotient didn't have large coefficients */
-            if (FLINT_ABS(_fmpz_vec_max_bits(poly1->coeffs + len, n1[i])) >
+            if (FLINT_ABS(_fmpz_vec_max_bits((*poly1) + len, n1[i])) >
                                                                 FLINT_BITS - 2)
             {
                for (j = 0; j < len; j++)
-                  _fmpz_demote(poly1->coeffs + j);
+                  _fmpz_demote((*poly1) + j);
                len = 0;
 
                goto big;
@@ -730,7 +726,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
                if (!fmpz_is_zero(temp + j)) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
-                     _fmpz_demote(poly1->coeffs + j);
+                     _fmpz_demote((*poly1) + j);
                   len = 0;
 
                   goto cleanup;
@@ -744,30 +740,28 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
    {
       ulong * p2 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
 
-      for (i = 0; i < len2; i++)
+      for (i = 0; i < l2; i++)
       {
          for (j = 0; j < 3*prod; j++)
             p2[j] = 0;
 
-         _fmpz_mpoly_to_ulong_array(p2, poly2->coeffs + i2[i],
-                                                          exp2 + i2[i], n2[i]);
+         _fmpz_mpoly_to_ulong_array(p2, poly2 + i2[i], e2 + i2[i], n2[i]);
 
          /* submuls */
 
-         for (j = 0; j < i && j < len1; j++)
+         for (j = 0; j < i && j < l1; j++)
          {
             k = i - j;
 
-            if (k < len3)
-               _fmpz_mpoly_submul_array1_slong(p2, poly1->coeffs + i1[j],
-                          poly1->exps + i1[j], n1[j], poly3->coeffs + i3[k], 
-                                                          exp3 + i3[k], n3[k]);
+            if (k < l3)
+               _fmpz_mpoly_submul_array1_slong(p2, (*poly1) + i1[j],
+                   (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
          }
 
          tlen = _fmpz_mpoly_from_ulong_array(&temp, &texp, &talloc, 
                                                         p2, mults, N, bits, 0);
 
-         if (i < len1)
+         if (i < l1)
          {
 
             _fmpz_mpoly_pack_exponents_tight(texp, texp, tlen, mults,
@@ -777,14 +771,14 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
             
             if (tlen != 0)
             {
-               n1[i] = _fmpz_mpoly_divides_array_tight(&poly1->coeffs,
-                        &poly1->exps, &poly1->alloc, len, temp, texp, tlen,
-                                   poly3->coeffs, exp3, n3[0], mults, bits, N);
+               n1[i] = _fmpz_mpoly_divides_array_tight(poly1,
+                                   exp1, alloc, len, temp, texp, tlen,
+                                             poly3, e3, n3[0], mults, bits, N);
 
                if (n1[i] == 0) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
-                     _fmpz_demote(poly1->coeffs + j);
+                     _fmpz_demote((*poly1) + j);
                   len = 0;
 
                   goto cleanup;
@@ -793,11 +787,11 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
                n1[i] = 0;
 
             /* check the quotient didn't have large coefficients */
-            if (FLINT_ABS(_fmpz_vec_max_bits(poly1->coeffs + len, n1[i])) >
+            if (FLINT_ABS(_fmpz_vec_max_bits((*poly1) + len, n1[i])) >
                                                                 FLINT_BITS - 2)
             {
                for (j = 0; j < len; j++)
-                  _fmpz_demote(poly1->coeffs + j);
+                  _fmpz_demote((*poly1) + j);
                len = 0;
 
                goto big;
@@ -811,7 +805,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
                if (!fmpz_is_zero(temp + j)) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
-                     _fmpz_demote(poly1->coeffs + j);
+                     _fmpz_demote((*poly1) + j);
                   len = 0;
 
                   goto cleanup;
@@ -830,30 +824,28 @@ big:
       for (j = 0; j < prod; j++)
             fmpz_init(p2 + j);
       
-      for (i = 0; i < len2; i++)
+      for (i = 0; i < l2; i++)
       {
          for (j = 0; j < prod; j++)
             fmpz_zero(p2 + j);
 
-         _fmpz_mpoly_to_fmpz_array(p2, poly2->coeffs + i2[i],
-                                                          exp2 + i2[i], n2[i]);
+         _fmpz_mpoly_to_fmpz_array(p2, poly2 + i2[i], e2 + i2[i], n2[i]);
 
          /* submuls */
 
-         for (j = 0; j < i && j < len1; j++)
+         for (j = 0; j < i && j < l1; j++)
          {
             k = i - j;
 
-            if (k < len3)
-               _fmpz_mpoly_submul_array1_fmpz(p2, poly1->coeffs + i1[j],
-                          poly1->exps + i1[j], n1[j], poly3->coeffs + i3[k], 
-                                                          exp3 + i3[k], n3[k]);
+            if (k < l3)
+               _fmpz_mpoly_submul_array1_fmpz(p2, (*poly1) + i1[j],
+                     (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
          }
 
          tlen = _fmpz_mpoly_from_fmpz_array(&temp, &texp, &talloc, 
                                                         p2, mults, N, bits, 0);
 
-         if (i < len1)
+         if (i < l1)
          {
 
             _fmpz_mpoly_pack_exponents_tight(texp, texp, tlen, mults,
@@ -863,14 +855,14 @@ big:
             
             if (tlen != 0)
             {
-               n1[i] = _fmpz_mpoly_divides_array_tight(&poly1->coeffs,
-                        &poly1->exps, &poly1->alloc, len, temp, texp, tlen,
-                                   poly3->coeffs, exp3, n3[0], mults, bits, N);
+               n1[i] = _fmpz_mpoly_divides_array_tight(poly1,
+                                   exp1, alloc, len, temp, texp, tlen,
+                                             poly3, e3, n3[0], mults, bits, N);
 
                if (n1[i] == 0) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
-                     _fmpz_demote(poly1->coeffs + j);
+                     _fmpz_demote((*poly1) + j);
                   len = 0;
 
                   goto cleanup2;
@@ -886,7 +878,7 @@ big:
                if (!fmpz_is_zero(temp + j)) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
-                     _fmpz_demote(poly1->coeffs + j);
+                     _fmpz_demote((*poly1) + j);
                   len = 0;
 
                   goto cleanup2;
@@ -903,14 +895,14 @@ cleanup2:
 
    if (len != 0)
    {
-      _fmpz_mpoly_unpack_exponents_tight(poly1->exps, poly1->exps, len,
+      _fmpz_mpoly_unpack_exponents_tight((*exp1), (*exp1), len,
                                                             mults, N, 1, bits);
 
       /* put main variable back in */
-      for (i = 0; i < len1; i++)
+      for (i = 0; i < l1; i++)
       {
          for (j = 0; j < n1[i]; j++)
-            poly1->exps[i1[i] + j] += (i << shift);
+            (*exp1)[i1[i] + j] += (i << shift);
       }
    }
 
@@ -929,11 +921,13 @@ cleanup:
    a list of multipliers to tightly pack exponents and a number of bits for the
    fields of the exponents of the result, assuming no aliasing
 */
-slong _fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                  const fmpz_mpoly_t poly3, slong * mults, slong bits, slong N)
+slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
+                           const fmpz * poly2, const ulong * exp2, slong len2,
+                           const fmpz * poly3, const ulong * exp3, slong len3,
+                                            slong * mults, slong bits, slong N)
 {
    slong i;
-   ulong * exp2, * exp3;
+   ulong * e2, * e3;
    slong len, prod;
    TMP_INIT;
 
@@ -942,26 +936,23 @@ slong _fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       prod *= mults[i];
 
    if (prod > MAX_ARRAY_SIZE)
-      return _fmpz_mpoly_divides_array_chunked(poly1, poly2, poly3,
-                                                               mults, bits, N - 1);
+      return _fmpz_mpoly_divides_array_chunked(poly1, exp1, alloc,
+                     poly2, exp2, len2, poly3, exp3, len3, mults, bits, N - 1);
 
    TMP_START;
 
-   exp2 = (ulong *) TMP_ALLOC(poly2->length*sizeof(ulong));
-   exp3 = (ulong *) TMP_ALLOC(poly3->length*sizeof(ulong));
+   e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
+   e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   _fmpz_mpoly_pack_exponents_tight(exp2, poly2->exps, poly2->length,
-                                                     mults, N, 0, poly2->bits);
+   _fmpz_mpoly_pack_exponents_tight(e2, exp2, len2, mults, N, 0, bits);
 
-   _fmpz_mpoly_pack_exponents_tight(exp3, poly3->exps, poly3->length,
-                                                     mults, N, 0, poly3->bits);
+   _fmpz_mpoly_pack_exponents_tight(e3, exp3, len3, mults, N, 0, bits);
 
-   len = _fmpz_mpoly_divides_array_tight(&poly1->coeffs, &poly1->exps,
-                     &poly1->alloc, 0,  poly2->coeffs, exp2, poly2->length,
-                           poly3->coeffs, exp3, poly3->length, mults, bits, N);
+   len = _fmpz_mpoly_divides_array_tight(poly1, exp1,
+                  alloc, 0,  poly2, e2, len2, poly3, e3, len3, mults, bits, N);
 
-   _fmpz_mpoly_unpack_exponents_tight(poly1->exps, poly1->exps, len,
-                                                            mults, N, 0, bits);
+   _fmpz_mpoly_unpack_exponents_tight((*exp1), (*exp1), len, mults,
+                                                                   N, 0, bits);
 
    TMP_END;
 
@@ -974,6 +965,8 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    slong i, bits, exp_bits, N, len = 0, array_size;
    ulong * max_degs2, * max_degs3;
    ulong max = 0;
+   ulong * exp2, * exp3;
+   int free2 = 0, free3 = 0;
    int res = -1;
 
    TMP_INIT;
@@ -1027,6 +1020,16 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    if (array_size > MAX_ARRAY_SIZE)
       goto cleanup;
 
+   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
+                                           poly2->bits, ctx->n, poly2->length);
+
+   free2 = exp2 != poly2->exps;
+
+   exp3 = mpoly_unpack_monomials(exp_bits, poly3->exps, 
+                                           poly3->bits, ctx->n, poly3->length);
+   
+   free3 = exp3 != poly3->exps;
+
    if (poly1 == poly2 || poly1 == poly3)
    {
       fmpz_mpoly_t temp;
@@ -1034,7 +1037,9 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       fmpz_mpoly_init2(temp, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
 
-      len = _fmpz_mpoly_divides_array(temp, poly2, poly3,
+      len = _fmpz_mpoly_divides_array(&temp->coeffs, &temp->exps,
+                &temp->alloc, poly2->coeffs, poly2->exps, poly2->length,
+                              poly3->coeffs, poly3->exps, poly3->length,
                                         (slong *) max_degs2, exp_bits, ctx->n);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
@@ -1045,13 +1050,21 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       fmpz_mpoly_fit_length(poly1, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
 
-      len = _fmpz_mpoly_divides_array(poly1, poly2, poly3,
+      len = _fmpz_mpoly_divides_array(&poly1->coeffs, &poly1->exps,
+               &poly1->alloc, poly2->coeffs, poly2->exps, poly2->length,
+                              poly3->coeffs, poly3->exps, poly3->length,
                                         (slong *) max_degs2, exp_bits, ctx->n);
    }
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
 
    res = len != 0;
+
+   if (free2)
+      flint_free(exp2);
+
+   if (free3)
+      flint_free(exp3);
 
 cleanup:
 
