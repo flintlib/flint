@@ -576,7 +576,7 @@ cleanup:
    classical exact division in main variable, array multiplication (submul)
    for multivariate coefficients
 */
-slong _fmpz_mpoly_divides_array_univariate(fmpz_mpoly_t poly1,
+slong _fmpz_mpoly_divides_array_chunked(fmpz_mpoly_t poly1,
                     const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                             slong * mults, slong bits, slong N)
 {
@@ -942,7 +942,7 @@ slong _fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       prod *= mults[i];
 
    if (prod > MAX_ARRAY_SIZE)
-      return _fmpz_mpoly_divides_array_univariate(poly1, poly2, poly3,
+      return _fmpz_mpoly_divides_array_chunked(poly1, poly2, poly3,
                                                                mults, bits, N - 1);
 
    TMP_START;

@@ -427,7 +427,7 @@ void _fmpz_mpoly_pack_exponents_tight(ulong * exp1, const ulong * exp2,
    classical multiplication in main variable, array multiplication for
    multivariate coefficients
 */
-slong _fmpz_mpoly_mul_array_univariate(fmpz ** poly1, ulong ** exp1,
+slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
         slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
                        const fmpz * poly3, const ulong * exp3, slong len3, 
                                             slong * mults, slong bits, slong N)
@@ -641,7 +641,7 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
       prod *= mults[i];
 
    if (prod > MAX_ARRAY_SIZE)
-      return _fmpz_mpoly_mul_array_univariate(poly1, exp1, alloc,
+      return _fmpz_mpoly_mul_array_chunked(poly1, exp1, alloc,
                      poly2, exp2, len2, poly3, exp3, len3, mults, bits, N - 1);
 
    TMP_START;
