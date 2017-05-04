@@ -335,6 +335,9 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
    int first;
    TMP_INIT;
 
+   if (N == 1)
+      return _fmpz_mpoly_pow_fps1(poly1, exp1, alloc, poly2, exp2, len2, k);
+
    TMP_START;
 
    heap = (mpoly_heap_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap_s));
@@ -654,15 +657,8 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       fmpz_mpoly_init2(temp, k*(poly2->length - 1) + 1, ctx);
       fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
 
-      if (N == 1)
-      {
-         len = _fmpz_mpoly_pow_fps1(&temp->coeffs, &temp->exps, &temp->alloc,
-                                      poly2->coeffs, exp2, poly2->length, k);
-      } else
-      {
-         len = _fmpz_mpoly_pow_fps(&temp->coeffs, &temp->exps, &temp->alloc,
+      len = _fmpz_mpoly_pow_fps(&temp->coeffs, &temp->exps, &temp->alloc,
                                      poly2->coeffs, exp2, poly2->length, k, N);
-      }
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -672,15 +668,8 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       fmpz_mpoly_fit_length(poly1, k*(poly2->length - 1) + 1, ctx);
       fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
 
-      if (N == 1)
-      {
-         len = _fmpz_mpoly_pow_fps1(&poly1->coeffs, &poly1->exps, &poly1->alloc,
-                                      poly2->coeffs, exp2, poly2->length, k);
-      } else
-      {
-         len = _fmpz_mpoly_pow_fps(&poly1->coeffs, &poly1->exps, &poly1->alloc,
+      len = _fmpz_mpoly_pow_fps(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                      poly2->coeffs, exp2, poly2->length, k, N);
-      }
    }
 
 cleanup:

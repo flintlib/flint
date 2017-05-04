@@ -200,9 +200,14 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
    int first, negate, small;
    TMP_INIT;
 
+   if (N == 1)
+      return _fmpz_mpoly_mul_johnson1(poly1, exp1, alloc,
+                                         poly2, exp2, len2, poly3, exp3, len3);
+
    TMP_START;
 
-   small = _fmpz_mpoly_fits_small(poly2, len2) && _fmpz_mpoly_fits_small(poly3, len3);
+   small = _fmpz_mpoly_fits_small(poly2, len2) &&
+                                           _fmpz_mpoly_fits_small(poly3, len3);
 
    heap = (mpoly_heap_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap_s));
    chain = (mpoly_heap_t *) TMP_ALLOC(len2*sizeof(mpoly_heap_t));
@@ -429,27 +434,14 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
       fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
 
-      if (N == 1)
-      {
-         if (poly2->length >= poly3->length)
-            len = _fmpz_mpoly_mul_johnson1(&temp->coeffs, &temp->exps, &temp->alloc,
-                                      poly3->coeffs, exp3, poly3->length,
-                                           poly2->coeffs, exp2, poly2->length);
-         else
-            len = _fmpz_mpoly_mul_johnson1(&temp->coeffs, &temp->exps, &temp->alloc,
-                                      poly2->coeffs, exp2, poly2->length,
-                                           poly3->coeffs, exp3, poly3->length);
-      } else
-      {
-         if (poly2->length >= poly3->length)
-            len = _fmpz_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
+      if (poly2->length >= poly3->length)
+         len = _fmpz_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                            poly2->coeffs, exp2, poly2->length, N);
-         else
-            len = _fmpz_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
+      else
+         len = _fmpz_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                            poly3->coeffs, exp3, poly3->length, N);
-      }
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -459,27 +451,14 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
       fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
 
-      if (N == 1)
-      {
-         if (poly2->length >= poly3->length)
-            len = _fmpz_mpoly_mul_johnson1(&poly1->coeffs, &poly1->exps, &poly1->alloc,
-                                      poly3->coeffs, exp3, poly3->length,
-                                           poly2->coeffs, exp2, poly2->length);
-         else
-            len = _fmpz_mpoly_mul_johnson1(&poly1->coeffs, &poly1->exps, &poly1->alloc,
-                                      poly2->coeffs, exp2, poly2->length,
-                                           poly3->coeffs, exp3, poly3->length);
-      } else
-      {
-         if (poly2->length >= poly3->length)
-            len = _fmpz_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
+      if (poly2->length >= poly3->length)
+         len = _fmpz_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                            poly2->coeffs, exp2, poly2->length, N);
-         else
-            len = _fmpz_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
+      else
+         len = _fmpz_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                            poly3->coeffs, exp3, poly3->length, N);
-      }
    }
 
    if (free2)
