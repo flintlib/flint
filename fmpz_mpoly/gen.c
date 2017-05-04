@@ -56,7 +56,7 @@ void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
 
     mon[i] = 1;
 
-    _fmpz_mpoly_set_monomial(exps, mon, bits, n, deg, rev);
+    mpoly_set_monomial(exps, mon, bits, n, deg, rev);
 
     TMP_END;
 }

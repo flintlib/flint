@@ -221,6 +221,12 @@ int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3, slong N)
 ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
                                               slong bits2, slong n, slong len);
 
+FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
+                                        slong bits, slong n, int deg, int rev);
+
+FLINT_DLL void mpoly_set_monomial(ulong * exp1, const ulong * exp2,
+                                        slong bits, slong n, int deg, int rev);
+
 typedef struct mpoly_heap_t
 {
    ulong i;
@@ -630,14 +636,8 @@ FLINT_DLL void fmpz_mpoly_set_coeff_ui(fmpz_mpoly_t poly,
 FLINT_DLL void fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
                                  slong n, slong x, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
-                                        slong bits, slong n, int deg, int rev);
-
 FLINT_DLL void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
                                           slong n, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_set_monomial(ulong * exp1, const ulong * exp2,
-                                        slong bits, slong n, int deg, int rev);
 
 FLINT_DLL void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
                       slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx);

@@ -78,7 +78,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
       }
 
       /* code below expects monomials in opposite order */
-      _fmpz_mpoly_get_monomial(degs, exps + i*N, bits, n, deg, 1 - rev);
+      mpoly_get_monomial(degs, exps + i*N, bits, n, deg, 1 - rev);
 
       first = 1;
 

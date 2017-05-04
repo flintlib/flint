@@ -60,7 +60,7 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
       if (r > 0)
       {
          /* code below expects monomials in opposite order */
-         _fmpz_mpoly_get_monomial(degs, exps + i*N, bits, n, deg, 1 - rev);
+         mpoly_get_monomial(degs, exps + i*N, bits, n, deg, 1 - rev);
       }
 
       first = 1;

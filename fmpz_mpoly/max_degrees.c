@@ -84,7 +84,7 @@ void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
    {
       ulong s = 0;
 
-      _fmpz_mpoly_get_monomial(exps, poly_exps + i*N, bits, n, deg, rev);
+      mpoly_get_monomial(exps, poly_exps + i*N, bits, n, deg, rev);
 
       for (j = 0; j < n - deg; j++)
       {

@@ -17,7 +17,7 @@
 
 #if FLINT64
 
-void _fmpz_mpoly_set_monomial_8_64(ulong * exp1, const ulong * exp2, 
+void mpoly_set_monomial_8_64(ulong * exp1, const ulong * exp2, 
                                        ulong degree, slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -91,7 +91,7 @@ void _fmpz_mpoly_set_monomial_8_64(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_set_monomial_16_64(ulong * exp1, const ulong * exp2, 
+void mpoly_set_monomial_16_64(ulong * exp1, const ulong * exp2, 
                                        ulong degree, slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -157,7 +157,7 @@ void _fmpz_mpoly_set_monomial_16_64(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_set_monomial_32_64(ulong * exp1, const ulong * exp2,
+void mpoly_set_monomial_32_64(ulong * exp1, const ulong * exp2,
                                        ulong degree, slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -209,7 +209,7 @@ void _fmpz_mpoly_set_monomial_32_64(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_set_monomial_64_64(ulong * exp1, const ulong * exp2,
+void mpoly_set_monomial_64_64(ulong * exp1, const ulong * exp2,
                                        ulong degree, slong n, int deg, int rev)
 {
    slong k1 = 0;
@@ -233,7 +233,7 @@ void _fmpz_mpoly_set_monomial_64_64(ulong * exp1, const ulong * exp2,
 
 #else
 
-void _fmpz_mpoly_set_monomial_8_32(ulong * exp1, const ulong * exp2,
+void mpoly_set_monomial_8_32(ulong * exp1, const ulong * exp2,
                                        ulong degree, slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -299,7 +299,7 @@ void _fmpz_mpoly_set_monomial_8_32(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_set_monomial_16_32(ulong * exp1, const ulong * exp2,
+void mpoly_set_monomial_16_32(ulong * exp1, const ulong * exp2,
                                        ulong degree, slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -351,7 +351,7 @@ void _fmpz_mpoly_set_monomial_16_32(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_set_monomial_32_32(ulong * exp1, const ulong * exp2,
+void mpoly_set_monomial_32_32(ulong * exp1, const ulong * exp2,
                                        ulong degree, slong n, int deg, int rev)
 {
    slong k1 = 0;
@@ -375,7 +375,7 @@ void _fmpz_mpoly_set_monomial_32_32(ulong * exp1, const ulong * exp2,
 
 #endif
 
-void _fmpz_mpoly_set_monomial(ulong * exp1, const ulong * exp2,
+void mpoly_set_monomial(ulong * exp1, const ulong * exp2,
                                          slong bits, slong n, int deg, int rev)
 {
    slong i;
@@ -391,29 +391,29 @@ void _fmpz_mpoly_set_monomial(ulong * exp1, const ulong * exp2,
    switch (bits)
    {
    case 8:
-      _fmpz_mpoly_set_monomial_8_64(exp1, exp2, degree, n, deg, rev);
+      mpoly_set_monomial_8_64(exp1, exp2, degree, n, deg, rev);
    break;
    case 16:
-      _fmpz_mpoly_set_monomial_16_64(exp1, exp2, degree, n, deg, rev);
+      mpoly_set_monomial_16_64(exp1, exp2, degree, n, deg, rev);
    break;
    case 32:
-      _fmpz_mpoly_set_monomial_32_64(exp1, exp2, degree, n, deg, rev);
+      mpoly_set_monomial_32_64(exp1, exp2, degree, n, deg, rev);
    break;
    case 64:
-      _fmpz_mpoly_set_monomial_64_64(exp1, exp2, degree, n, deg, rev);
+      mpoly_set_monomial_64_64(exp1, exp2, degree, n, deg, rev);
    break;
    }
 #else
    switch (poly->bits)
    {
    case 8:
-      _fmpz_mpoly_set_monomial_8_32(exp1, exp2, degree, n, deg, rev);
+      mpoly_set_monomial_8_32(exp1, exp2, degree, n, deg, rev);
    break;
    case 16:
-      _fmpz_mpoly_set_monomial_16_32(exp1, exp2, degree, n, deg, rev);
+      mpoly_set_monomial_16_32(exp1, exp2, degree, n, deg, rev);
    break;
    case 32:
-      _fmpz_mpoly_set_monomial_32_32(exp1, exp2, degree, n, deg, rev);
+      mpoly_set_monomial_32_32(exp1, exp2, degree, n, deg, rev);
    break;
    }
 #endif
@@ -462,7 +462,7 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
 
    N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
    
-   _fmpz_mpoly_set_monomial(poly->exps + n*N, exps, poly->bits,
+   mpoly_set_monomial(poly->exps + n*N, exps, poly->bits,
                                                              ctx->n, deg, rev);
 
    if (n + 1 > poly->length)

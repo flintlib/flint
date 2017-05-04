@@ -826,7 +826,7 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
 
    maxn = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
-   _fmpz_mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, deg, rev);
+   mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, deg, rev);
 
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->bits, ctx->n, poly2->length);

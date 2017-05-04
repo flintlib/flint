@@ -16,7 +16,7 @@
 
 #if FLINT64
 
-void _fmpz_mpoly_get_monomial_8_64(ulong * exp1, const ulong * exp2,
+void mpoly_get_monomial_8_64(ulong * exp1, const ulong * exp2,
                                                      slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -75,7 +75,7 @@ void _fmpz_mpoly_get_monomial_8_64(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_get_monomial_16_64(ulong * exp1, const ulong * exp2,
+void mpoly_get_monomial_16_64(ulong * exp1, const ulong * exp2,
                                                      slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -126,7 +126,7 @@ void _fmpz_mpoly_get_monomial_16_64(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_get_monomial_32_64(ulong * exp1, const ulong * exp2,
+void mpoly_get_monomial_32_64(ulong * exp1, const ulong * exp2,
                                                      slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -163,7 +163,7 @@ void _fmpz_mpoly_get_monomial_32_64(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_get_monomial_64_64(ulong * exp1, const ulong * exp2,
+void mpoly_get_monomial_64_64(ulong * exp1, const ulong * exp2,
                                                      slong n, int deg, int rev)
 {
    slong i;
@@ -181,7 +181,7 @@ void _fmpz_mpoly_get_monomial_64_64(ulong * exp1, const ulong * exp2,
 
 #else
 
-void _fmpz_mpoly_get_monomial_8_32(ulong * exp1, const ulong * exp2,
+void mpoly_get_monomial_8_32(ulong * exp1, const ulong * exp2,
                                                      slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -232,7 +232,7 @@ void _fmpz_mpoly_get_monomial_8_32(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_get_monomial_16_32(ulong * exp1, const ulong * exp2,
+void mpoly_get_monomial_16_32(ulong * exp1, const ulong * exp2,
                                                      slong n, int deg, int rev)
 {
    slong q, r, j, k1 = 0, k2 = 0;
@@ -269,7 +269,7 @@ void _fmpz_mpoly_get_monomial_16_32(ulong * exp1, const ulong * exp2,
    }
 }
 
-void _fmpz_mpoly_get_monomial_32_32(ulong * exp1, const ulong * exp2,
+void mpoly_get_monomial_32_32(ulong * exp1, const ulong * exp2,
                                                      slong n, int deg, int rev)
 {
    slong i;
@@ -287,36 +287,36 @@ void _fmpz_mpoly_get_monomial_32_32(ulong * exp1, const ulong * exp2,
 
 #endif
 
-void _fmpz_mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
+void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                          slong bits, slong n, int deg, int rev)
 {
 #if FLINT64
    switch (bits)
    {
    case 8:
-      _fmpz_mpoly_get_monomial_8_64(exps, poly_exps, n, deg, rev);
+      mpoly_get_monomial_8_64(exps, poly_exps, n, deg, rev);
    break;
    case 16:
-      _fmpz_mpoly_get_monomial_16_64(exps, poly_exps, n, deg, rev);
+      mpoly_get_monomial_16_64(exps, poly_exps, n, deg, rev);
    break;
    case 32:
-      _fmpz_mpoly_get_monomial_32_64(exps, poly_exps, n, deg, rev);
+      mpoly_get_monomial_32_64(exps, poly_exps, n, deg, rev);
    break;
    case 64:
-      _fmpz_mpoly_get_monomial_64_64(exps, poly_exps, n, deg, rev);
+      mpoly_get_monomial_64_64(exps, poly_exps, n, deg, rev);
    break;
    }
 #else
    switch (bits)
    {
    case 8:
-      _fmpz_mpoly_get_monomial_8_32(exps, poly_exps, n, deg, rev);
+      mpoly_get_monomial_8_32(exps, poly_exps, n, deg, rev);
    break;
    case 16:
-      _fmpz_mpoly_get_monomial_16_32(exps, poly_exps, n, deg, rev);
+      mpoly_get_monomial_16_32(exps, poly_exps, n, deg, rev);
    break;
    case 32:
-      _fmpz_mpoly_get_monomial_32_32(exps, poly_exps, n, deg, rev);
+      mpoly_get_monomial_32_32(exps, poly_exps, n, deg, rev);
    break;
    }
 #endif
@@ -330,5 +330,5 @@ void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly,
 
    degrev_from_ord(deg, rev, ctx->ord);
 
-   _fmpz_mpoly_get_monomial(exps, poly->exps + m*n, poly->bits, ctx->n, deg, rev);
+   mpoly_get_monomial(exps, poly->exps + m*n, poly->bits, ctx->n, deg, rev);
 }
