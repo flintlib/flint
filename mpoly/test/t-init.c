@@ -9,18 +9,30 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mpoly.h"
+#include "mpoly.h"
+#include "ulong_extras.h"
 
-void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
-                                           slong n, const fmpz_mpoly_ctx_t ctx)
+int
+main(void)
 {
-   slong m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
-   int deg, rev;
+    int i;
+    FLINT_TEST_INIT(state);
 
-   degrev_from_ord(deg, rev, ctx->ord);
+    flint_printf("void....");
+    fflush(stdout);
 
-   mpoly_get_monomial(exps, poly->exps + m*n, poly->bits, ctx->n, deg, rev);
+    /* Check aliasing of a and c */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+    }
+
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
+    return 0;
 }
+
