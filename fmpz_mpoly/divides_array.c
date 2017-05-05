@@ -238,36 +238,6 @@ void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
       fmpz_set(p + (slong) exps[i], coeffs + i);
 }
 
-void _fmpz_mpoly_unpack_exponents_tight(ulong * e1, ulong * e2, slong len,
-                               slong * mults, slong N, slong extra, slong bits)
-{
-   slong i, j;
-   ulong exp;
-   slong shift = FLINT_BITS - (N + extra)*bits;
-   slong * prods;
-   TMP_INIT;
-
-   TMP_START;
-
-   prods = (slong *) TMP_ALLOC((N + 1)*sizeof(slong));
-
-   prods[0] = 1;
-   for (i = 1; i <= N; i++)
-      prods[i] = mults[i - 1]*prods[i - 1];
-
-   for (i = 0; i < len; i++)
-   {
-      exp = 0;
-         
-      for (j = 0; j < N; j++)
-         exp += (e2[i] % prods[j + 1])/prods[j] << bits*j;
-
-      e1[i] = exp << shift;
-   }
-
-   TMP_END;
-}
-
 int _fmpz_mpoly_exponent_divides_tight(slong e1, slong e2,
                                                         slong * prods, slong N)
 {
@@ -639,9 +609,9 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   _fmpz_mpoly_pack_exponents_tight(e2, exp2, len2, mults, num, 1, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 1, bits);
 
-   _fmpz_mpoly_pack_exponents_tight(e3, exp3, len3, mults, num, 1, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 1, bits);
 
    bits2 = _fmpz_vec_max_bits(poly2, len2);
    bits3 = _fmpz_vec_max_bits(poly3, len3);
@@ -685,7 +655,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
          if (i < l1)
          {
 
-            _fmpz_mpoly_pack_exponents_tight(texp, texp, tlen, mults,
+            mpoly_pack_monomials_tight(texp, texp, tlen, mults,
                                                                  num, 0, bits);
 
             i1[i] = len;
@@ -764,7 +734,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
          if (i < l1)
          {
 
-            _fmpz_mpoly_pack_exponents_tight(texp, texp, tlen, mults,
+            mpoly_pack_monomials_tight(texp, texp, tlen, mults,
                                                                  num, 0, bits);
 
             i1[i] = len;
@@ -848,7 +818,7 @@ big:
          if (i < l1)
          {
 
-            _fmpz_mpoly_pack_exponents_tight(texp, texp, tlen, mults,
+            mpoly_pack_monomials_tight(texp, texp, tlen, mults,
                                                                  num, 0, bits);
 
             i1[i] = len;
@@ -895,7 +865,7 @@ cleanup2:
 
    if (len != 0)
    {
-      _fmpz_mpoly_unpack_exponents_tight((*exp1), (*exp1), len,
+      mpoly_unpack_monomials_tight((*exp1), (*exp1), len,
                                                           mults, num, 1, bits);
 
       /* put main variable back in */
@@ -944,14 +914,14 @@ slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   _fmpz_mpoly_pack_exponents_tight(e2, exp2, len2, mults, num, 0, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 0, bits);
 
-   _fmpz_mpoly_pack_exponents_tight(e3, exp3, len3, mults, num, 0, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 0, bits);
 
    len = _fmpz_mpoly_divides_array_tight(poly1, exp1,
                 alloc, 0,  poly2, e2, len2, poly3, e3, len3, mults, num, bits);
 
-   _fmpz_mpoly_unpack_exponents_tight((*exp1), (*exp1), len, mults,
+   mpoly_unpack_monomials_tight((*exp1), (*exp1), len, mults,
                                                                  num, 0, bits);
 
    TMP_END;

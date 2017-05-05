@@ -229,14 +229,21 @@ int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3, slong N)
 
 /* Monomial arrays ***********************************************************/
 
-FLINT_DLL ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
-                                            slong len, slong num, slong bits2);
-
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                         slong bits, slong n, int deg, int rev);
 
 FLINT_DLL void mpoly_set_monomial(ulong * exp1, const ulong * exp2,
                                         slong bits, slong n, int deg, int rev);
+
+FLINT_DLL ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
+                                            slong len, slong num, slong bits2);
+
+FLINT_DLL void mpoly_pack_monomials_tight(ulong * exp1,
+                  const ulong * exp2, slong len, const slong * mults, 
+                                           slong num, slong extra, slong bits);
+
+FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
+                            slong * mults, slong num, slong extra, slong bits);
 
 /* Heap **********************************************************************/
 

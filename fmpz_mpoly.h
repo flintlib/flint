@@ -462,10 +462,6 @@ FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file,
 
 /* Internal packing and conversion */
 
-FLINT_DLL void _fmpz_mpoly_pack_exponents_tight(ulong * exp1,
-                  const ulong * exp2, slong len, const slong * mults, 
-                                             slong N, slong extra, slong bits);
-
 FLINT_DLL slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1,
                          ulong ** exp1, slong * alloc, ulong * poly2,
                             const slong * mults, slong N, slong bits, slong k);

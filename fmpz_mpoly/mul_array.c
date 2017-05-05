@@ -397,29 +397,6 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    return k;
 }
 
-void _fmpz_mpoly_pack_exponents_tight(ulong * exp1, const ulong * exp2,
-                   slong len, const slong * mults, slong N, slong extra, slong bits)
-{
-   slong i, j;
-   ulong e1, e2;
-   ulong mask = (UWORD(1) << bits) - 1;
-   slong shift = FLINT_BITS - (N + extra)*bits;
-
-   for (i = 0; i < len; i++)
-   {
-      e2 = exp2[i] >> shift;
-      e1 = ((e2 >> (N - 1)*bits) & mask);
-      
-      for (j = N - 2; j >= 0; j--)
-      {
-         e1 *= mults[j];
-         e1 += ((e2 >> j*bits) & mask);
-      }
-
-      exp1[i] = e1;
-   }
-}
-
 /*
    use array multiplication to set poly1 to poly2*poly3 in num + 1 variables,
    given a list of multipliers to tightly pack exponents and a number of bits
@@ -484,9 +461,9 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   _fmpz_mpoly_pack_exponents_tight(e2, exp2, len2, mults, num, 1, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 1, bits);
 
-   _fmpz_mpoly_pack_exponents_tight(e3, exp3, len3, mults, num, 1, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 1, bits);
 
    bits2 = _fmpz_vec_max_bits(poly2, len2);
    bits3 = _fmpz_vec_max_bits(poly3, len3);
@@ -649,9 +626,9 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   _fmpz_mpoly_pack_exponents_tight(e2, exp2, len2, mults, num, 0, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 0, bits);
 
-   _fmpz_mpoly_pack_exponents_tight(e3, exp3, len3, mults, num, 0, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 0, bits);
 
    bits2 = _fmpz_vec_max_bits(poly2, len2);
    bits3 = _fmpz_vec_max_bits(poly3, len3);
