@@ -126,12 +126,12 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    N = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
    
    ptr1 = mpoly_unpack_monomials(max_bits, poly2->exps, 
-                                           poly2->bits, ctx->n, poly2->length);
+                                           poly2->length, ctx->n, poly2->bits);
 
    free2 = ptr1 != poly2->exps;
 
    ptr2 = mpoly_unpack_monomials(max_bits, poly3->exps, 
-                                           poly3->bits, ctx->n, poly3->length);
+                                           poly3->length, ctx->n, poly3->bits);
 
    free3 = ptr2 != poly3->exps;
 

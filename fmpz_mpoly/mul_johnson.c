@@ -416,12 +416,12 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       exp_bits *= 2;
 
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
-                                           poly2->bits, ctx->n, poly2->length);
+                                           poly2->length, ctx->n, poly2->bits);
 
    free2 = exp2 != poly2->exps;
 
    exp3 = mpoly_unpack_monomials(exp_bits, poly3->exps, 
-                                           poly3->bits, ctx->n, poly3->length);
+                                           poly3->length, ctx->n, poly3->bits);
    
    free3 = exp3 != poly3->exps;
 

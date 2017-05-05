@@ -45,7 +45,7 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
       max_bits *= 2;
 
    ptr = mpoly_unpack_monomials(max_bits, poly->exps, 
-                                             poly->bits, ctx->n, poly->length);
+                                             poly->length, ctx->n, poly->bits);
 
    if (ptr != poly->exps)
    {
@@ -58,8 +58,7 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
 
    N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
    
-   mpoly_set_monomial(poly->exps + n*N, exps, poly->bits,
-                                                             ctx->n, deg, rev);
+   mpoly_set_monomial(poly->exps + n*N, exps, poly->bits, ctx->n, deg, rev);
 
    if (n + 1 > poly->length)
       _fmpz_mpoly_set_length(poly, n + 1, ctx);
