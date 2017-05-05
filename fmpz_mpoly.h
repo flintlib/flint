@@ -258,7 +258,8 @@ FLINT_DLL void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
 
 #define fmpz_mpoly_get_monomial_ptr(poly, n, ctx) \
-    ((n) < (poly)->length ? (poly)->exps + (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
+    ((n) < (poly)->length ? (poly)->exps + \
+                     (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
 
 FLINT_DLL void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -266,13 +267,13 @@ FLINT_DLL void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly,
 /* Set and negate */
 
 FLINT_DLL void _fmpz_mpoly_set(fmpz * poly1, ulong * exps1,
-                    const fmpz * poly2, const ulong * exps2, slong n, slong m);
+                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
 
 FLINT_DLL void fmpz_mpoly_set(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mpoly_neg(fmpz * poly1, ulong * exps1,
-                    const fmpz * poly2, const ulong * exps2, slong n, slong m);
+                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
 
 FLINT_DLL void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -280,7 +281,7 @@ FLINT_DLL void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 /* Comparison */
 
 FLINT_DLL int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
-                    const fmpz * poly2, const ulong * exps2, slong n, slong m);
+                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
 
 FLINT_DLL int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                    const fmpz_mpoly_ctx_t ctx);
