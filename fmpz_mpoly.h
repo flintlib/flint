@@ -379,7 +379,7 @@ FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
 FLINT_DLL slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1,
           slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, 
                          const fmpz * poly3, const ulong * exp3, slong len3, 
-                                           slong * mults, slong bits, slong N);
+                                         slong * mults, slong num, slong bits);
 
 FLINT_DLL int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, 
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
@@ -399,7 +399,7 @@ FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 FLINT_DLL slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
                         const fmpz * poly3, const ulong * exp3, slong len3,
-                                           slong * mults, slong bits, slong N);
+                                         slong * mults, slong num, slong bits);
 
 FLINT_DLL int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 

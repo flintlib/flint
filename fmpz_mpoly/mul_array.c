@@ -430,7 +430,7 @@ void _fmpz_mpoly_pack_exponents_tight(ulong * exp1, const ulong * exp2,
 slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
         slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
                        const fmpz * poly3, const ulong * exp3, slong len3, 
-                                          slong * mults, slong bits, slong num)
+                                          slong * mults, slong num, slong bits)
 {
    slong i, j, k = 0, len, l1, l2, l3, prod, bits1, bits2, bits3;
    slong shift = FLINT_BITS - bits;
@@ -628,7 +628,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
                          const fmpz * poly2, const ulong * exp2, slong len2, 
                          const fmpz * poly3, const ulong * exp3, slong len3, 
-                                          slong * mults, slong bits, slong num)
+                                          slong * mults, slong num, slong bits)
 {
    slong i, bits1, bits2, bits3;
    ulong * e2, * e3;
@@ -642,7 +642,7 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    if (prod > MAX_ARRAY_SIZE)
       return _fmpz_mpoly_mul_array_chunked(poly1, exp1, alloc,
-                   poly2, exp2, len2, poly3, exp3, len3, mults, bits, num - 1);
+                   poly2, exp2, len2, poly3, exp3, len3, mults, num - 1, bits);
 
    TMP_START;
 
@@ -808,12 +808,12 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          len = _fmpz_mpoly_mul_array(&temp->coeffs, &temp->exps, &temp->alloc, 
                                            poly3->coeffs, exp3, poly3->length,
                                            poly2->coeffs, exp2, poly2->length,
-                                        (slong *) max_degs2, exp_bits, ctx->n);
+                                        (slong *) max_degs2, ctx->n, exp_bits);
       else
          len = _fmpz_mpoly_mul_array(&temp->coeffs, &temp->exps, &temp->alloc, 
                                            poly2->coeffs, exp2, poly2->length,
                                            poly3->coeffs, exp3, poly3->length,
-                                        (slong *) max_degs2, exp_bits, ctx->n);
+                                        (slong *) max_degs2, ctx->n, exp_bits);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -827,12 +827,12 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          len = _fmpz_mpoly_mul_array(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                             poly3->coeffs, exp3, poly3->length,
                                             poly2->coeffs, exp2, poly2->length,
-                                        (slong *) max_degs2, exp_bits, ctx->n);
+                                        (slong *) max_degs2, ctx->n, exp_bits);
       else
          len = _fmpz_mpoly_mul_array(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                             poly2->coeffs, exp2, poly2->length, 
                                             poly3->coeffs, exp3, poly3->length,
-                                        (slong *) max_degs2, exp_bits, ctx->n);
+                                        (slong *) max_degs2, ctx->n, exp_bits);
    }
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
