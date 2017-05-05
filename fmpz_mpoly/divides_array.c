@@ -238,23 +238,6 @@ void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
       fmpz_set(p + (slong) exps[i], coeffs + i);
 }
 
-int _fmpz_mpoly_exponent_divides_tight(slong e1, slong e2,
-                                                        slong * prods, slong N)
-{
-   slong j;
-
-   for (j = 0; j < N; j++)
-   {
-      slong d1 = (e1 % prods[j + 1])/prods[j];
-      slong d2 = (e2 % prods[j + 1])/prods[j];
-
-      if (d1 < d2)
-         return 0;
-   }
-
-   return 1;
-}
-
 slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                                            slong * alloc, slong len1, 
                       const fmpz * poly2, const ulong * exp2, slong len2,
@@ -282,7 +265,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
 
    prod = prods[num];
 
-   if (!_fmpz_mpoly_exponent_divides_tight(exp2[len2 - 1], exp3[len3 - 1], prods, num))
+   if (!mpoly_monomial_divides_tight(exp2[len2 - 1], exp3[len3 - 1], prods, num))
       goto cleanup;
 
    bits2 = _fmpz_vec_max_bits(poly2, len2);
@@ -335,7 +318,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             }
 
             if (r != 0 || /* not an exact division */
-               !_fmpz_mpoly_exponent_divides_tight(i, min3, prods, num))
+               !mpoly_monomial_divides_tight(i, min3, prods, num))
             {
                for (j = len1; j < len; j++)
                   _fmpz_demote(p1 + j);
@@ -417,7 +400,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             }
 
             if (r != 0 || /* not an exact division */
-               !_fmpz_mpoly_exponent_divides_tight(i, min3, prods, num)) 
+               !mpoly_monomial_divides_tight(i, min3, prods, num)) 
             {
                for (j = len1; j < len; j++)
                   _fmpz_demote(p1 + j);
@@ -481,7 +464,7 @@ big:
             fmpz_fdiv_qr(fq, fr, p2 + i, poly2 + 0);
 
             if (!fmpz_is_zero(fr) || /* not an exact division */
-               !_fmpz_mpoly_exponent_divides_tight(i, min3, prods, num))
+               !mpoly_monomial_divides_tight(i, min3, prods, num))
             {
                for (j = len1; j < len; j++)
                   _fmpz_demote(p1 + j);

@@ -227,6 +227,23 @@ int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3, slong N)
    return 0;
 }
 
+MPOLY_INLINE
+int mpoly_monomial_divides_tight(slong e1, slong e2, slong * prods, slong num)
+{
+   slong j;
+
+   for (j = 0; j < num; j++)
+   {
+      slong d1 = (e1 % prods[j + 1])/prods[j];
+      slong d2 = (e2 % prods[j + 1])/prods[j];
+
+      if (d1 < d2)
+         return 0;
+   }
+
+   return 1;
+}
+
 /* Monomial arrays ***********************************************************/
 
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
