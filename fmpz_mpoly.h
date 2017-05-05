@@ -464,19 +464,19 @@ FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file,
 
 FLINT_DLL slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1,
                          ulong ** exp1, slong * alloc, ulong * poly2,
-                            const slong * mults, slong N, slong bits, slong k);
+                          const slong * mults, slong num, slong bits, slong k);
 
 FLINT_DLL slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1,
                          ulong ** exp1, slong * alloc, ulong * poly2, 
-                            const slong * mults, slong N, slong bits, slong k);
+                          const slong * mults, slong num, slong bits, slong k);
 
 FLINT_DLL slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1,
                          ulong ** exp1, slong * alloc, ulong * poly2,
-                            const slong * mults, slong N, slong bits, slong k);
+                          const slong * mults, slong num, slong bits, slong k);
 
 FLINT_DLL slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1,
                          ulong ** exp1, slong * alloc, fmpz * poly2,
-                            const slong * mults, slong N, slong bits, slong k);
+                          const slong * mults, slong num, slong bits, slong k);
 
 #ifdef __cplusplus
 }

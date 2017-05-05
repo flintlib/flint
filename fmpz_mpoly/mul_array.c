@@ -216,7 +216,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
 /* this function destroys poly2 and starts writing at index k */
 slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc, 
-              ulong * poly2, const slong * mults, slong N, slong bits, slong k)
+              ulong * poly2, const slong * mults, slong num, slong bits, slong k)
 {
    slong i, j;
    ulong exp;
@@ -225,18 +225,18 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
    int negate;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
-   slong shift = FLINT_BITS - N*bits;
+   slong shift = FLINT_BITS - num*bits;
    TMP_INIT;
 
    TMP_START;
 
-   prods = (slong *) TMP_ALLOC((N + 1)*sizeof(slong));
+   prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
    prods[0] = 1;
-   for (i = 1; i <= N; i++)
+   for (i = 1; i <= num; i++)
      prods[i] = mults[i - 1]*prods[i - 1];
    
-   for (i = 0; i < prods[N]; i++)
+   for (i = 0; i < prods[num]; i++)
    {
       c = poly2 + i*2;
 
@@ -252,7 +252,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
          exp = 0;
          
-         for (j = 0; j < N; j++)
+         for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          e1[k] = exp << shift;
@@ -288,7 +288,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
 /* this function destroys poly2 and starts writing at index k */
 slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc, 
-              ulong * poly2, const slong * mults, slong N, slong bits, slong k)
+              ulong * poly2, const slong * mults, slong num, slong bits, slong k)
 {
    slong i, j;
    ulong exp;
@@ -296,18 +296,18 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
-   slong shift = FLINT_BITS - N*bits;
+   slong shift = FLINT_BITS - num*bits;
    TMP_INIT;
 
    TMP_START;
 
-   prods = (slong *) TMP_ALLOC((N + 1)*sizeof(slong));
+   prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
    prods[0] = 1;
-   for (i = 1; i <= N; i++)
+   for (i = 1; i <= num; i++)
      prods[i] = mults[i - 1]*prods[i - 1];
    
-   for (i = 0; i < prods[N]; i++)
+   for (i = 0; i < prods[num]; i++)
    {
       c = poly2 + i;
 
@@ -323,7 +323,7 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
          exp = 0;
          
-         for (j = 0; j < N; j++)
+         for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          e1[k] = exp << shift;
@@ -343,7 +343,7 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 }
 
 slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc, 
-               fmpz * poly2, const slong * mults, slong N, slong bits, slong k)
+               fmpz * poly2, const slong * mults, slong num, slong bits, slong k)
 {
    slong i, j;
    ulong exp;
@@ -351,18 +351,18 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
-   slong shift = FLINT_BITS - N*bits;
+   slong shift = FLINT_BITS - num*bits;
    TMP_INIT;
 
    TMP_START;
 
-   prods = (slong *) TMP_ALLOC((N + 1)*sizeof(slong));
+   prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
    prods[0] = 1;
-   for (i = 1; i <= N; i++)
+   for (i = 1; i <= num; i++)
       prods[i] = mults[i - 1]*prods[i - 1];
 
-   for (i = 0; i < prods[N]; i++)
+   for (i = 0; i < prods[num]; i++)
    {
       c = poly2 + i;
 
@@ -378,7 +378,7 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
          exp = 0;
          
-         for (j = 0; j < N; j++)
+         for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          e1[k] = exp << shift;
