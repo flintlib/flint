@@ -17,13 +17,13 @@
 #if FLINT64
 
 void mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2, 
-                                                            slong len, slong n)
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/8;
-   r = n%8;
+   q = num/8;
+   r = num%8;
 
    for (i = 0; i < len; i++)
    {
@@ -51,13 +51,13 @@ void mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2,
 }
 
 void mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2, 
-                                                            slong len, slong n)
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/4;
-   r = n%4;
+   q = num/4;
+   r = num%4;
 
    for (i = 0; i < len; i++)
    {
@@ -81,13 +81,13 @@ void mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2,
 }
 
 void mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2, 
-                                                            slong len, slong n)
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/2;
-   r = n%2;
+   q = num/2;
+   r = num%2;
 
    for (i = 0; i < len; i++)
    {
@@ -104,13 +104,13 @@ void mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2,
 }
 
 void mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
-                                                            slong len, slong n)
+                                                          slong len, slong num)
 {
    slong i, j, q, r, r2, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/8;
-   r = n%8;
+   q = num/8;
+   r = num%8;
 
    for (i = 0; i < len; i++)
    {
@@ -147,13 +147,13 @@ void mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2,
 }
 
 void mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
-                                                            slong len, slong n)
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/4;
-   r = n%4;
+   q = num/4;
+   r = num%4;
 
    for (i = 0; i < len; i++)
    {
@@ -181,13 +181,13 @@ void mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2,
 }
 
 void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
-                                                            slong len, slong n)
+                                                          slong len, slong num)
 {
    slong i, j, q, r, r2, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/8;
-   r = n%8;
+   q = num/8;
+   r = num%8;
 
    for (i = 0; i < len; i++)
    {
@@ -235,13 +235,13 @@ void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 #else
 
 void mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
-                                                            slong len, slong n)
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/4;
-   r = n%4;
+   q = num/4;
+   r = num%4;
 
    for (i = 0; i < len; i++)
    {
@@ -265,13 +265,13 @@ void mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2,
 }
 
 void mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
-                                                            slong len, slong n)
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/2;
-   r = n%2;
+   q = num/2;
+   r = num%2;
 
    for (i = 0; i < len; i++)
    {
@@ -288,13 +288,13 @@ void mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2,
 }
 
 void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
-                                                            slong len, slong n)
+                                                          slong len, slong num)
 {
    slong i, j, q, r, r2, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/4;
-   r = n%4;
+   q = num/4;
+   r = num%4;
 
    for (i = 0; i < len; i++)
    {
@@ -328,7 +328,7 @@ void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 #endif
 
 ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
-                                               slong len, slong n, slong bits2)
+                                             slong len, slong num, slong bits2)
 {
    ulong * exps1;
    slong N;
@@ -336,7 +336,7 @@ ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2,
    if (bits1 == bits2)
       return (ulong *) exps2;
 
-   N = (n*bits1 - 1)/FLINT_BITS + 1; /* number of words per exponent vector */
+   N = (num*bits1 - 1)/FLINT_BITS + 1; /* no. of words per exponent vector */
 
    exps1 = (ulong *) flint_malloc(N*len*sizeof(ulong));
 
@@ -344,21 +344,21 @@ ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2,
    if (bits1 == 64)
    {
       if (bits2 == 8)
-         mpoly_unpack_monomials_8to64(exps1, exps2, len, n);
+         mpoly_unpack_monomials_8to64(exps1, exps2, len, num);
       else if (bits2 == 16)
-         mpoly_unpack_monomials_16to64(exps1, exps2, len, n);
+         mpoly_unpack_monomials_16to64(exps1, exps2, len, num);
       else /* bits2 == 32 */
-         mpoly_unpack_monomials_32to64(exps1, exps2, len, n);
+         mpoly_unpack_monomials_32to64(exps1, exps2, len, num);
    } else 
 #endif
    if (bits1 == 32)
    {
       if (bits2 == 8)
-         mpoly_unpack_monomials_8to32(exps1, exps2, len, n);
+         mpoly_unpack_monomials_8to32(exps1, exps2, len, num);
       else /* bits2 == 16 */
-         mpoly_unpack_monomials_16to32(exps1, exps2, len, n);
+         mpoly_unpack_monomials_16to32(exps1, exps2, len, num);
    } else  /* bits1 == 16, bits2 = 8 */
-         mpoly_unpack_monomials_8to16(exps1, exps2, len, n);
+         mpoly_unpack_monomials_8to16(exps1, exps2, len, num);
 
    return exps1;
 }

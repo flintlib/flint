@@ -460,30 +460,6 @@ FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file,
 
 ******************************************************************************/
 
-/* Internal monomial unpacking */
-
-#if FLINT64
-
-void _fmpz_mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2, 
-                                                           slong len, slong n);
-
-void _fmpz_mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2, 
-                                                           slong len, slong n);
-
-void _fmpz_mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2, 
-                                                           slong len, slong n);
-
-#endif
-
-void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
-                                                           slong len, slong n);
-
-void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
-                                                           slong len, slong n);
-
-void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
-                                                           slong len, slong n);
-
 /* Internal packing and conversion */
 
 FLINT_DLL void _fmpz_mpoly_pack_exponents_tight(ulong * exp1,
