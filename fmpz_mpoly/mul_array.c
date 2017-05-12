@@ -18,7 +18,7 @@
 
 /* improve locality */
 #define BLOCK 128
-#define MAX_ARRAY_SIZE (WORD(3000000))
+#define MAX_ARRAY_SIZE (WORD(300000))
 
 void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,
@@ -409,11 +409,12 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
                        const fmpz * poly3, const ulong * exp3, slong len3, 
                                           slong * mults, slong num, slong bits)
 {
-   slong i, j, k = 0, len, l1, l2, l3, prod, bits1, bits2, bits3;
+   slong i, j, k = 0, len, l1, l2, l3, prod, bits1, bits2 = 0, bits3 = 0;
    slong shift = FLINT_BITS - bits;
-   slong * i2, * i3, * n2, * n3;
-   ulong * e2, * e3;
-   int sign, small;
+   slong * i2, * i3, * n2, * n3, * b2, * maxb2, * b3, * maxb3;
+   ulong * e2, * e3, * p1;
+   ulong hi, lo;
+   int small;
    TMP_INIT;
 
    prod = 1;
@@ -429,9 +430,13 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
    i2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
    n2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
+   b2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
    i3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
    n3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
-
+   b3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
+   maxb2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
+   maxb3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
+   
    i2[0] = 0;
    j = 0;
    for (i = 0; i < l2 - 1; i++)
@@ -456,7 +461,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
    }
    n3[l3 - 1] = len3 - j;
 
-   /* pack input coefficients tightly */
+   /* pack input exponents tightly */
 
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
@@ -465,103 +470,158 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
    mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 1, bits);
 
-   bits2 = _fmpz_vec_max_bits(poly2, len2);
-   bits3 = _fmpz_vec_max_bits(poly3, len3);
+   /* work out max bits for each coeff and optimal bits */
 
-   sign = (bits2 < 0) || (bits3 < 0);
+   for (i = 0; i < l2; i++)
+   {
+      hi = lo = 0;
 
-   bits1 = FLINT_ABS(bits2) + FLINT_ABS(bits3) +
-          FLINT_BIT_COUNT(FLINT_MIN(len2, len3)) + sign;
+      maxb2[i] = 0;
 
-   small = FLINT_ABS(bits2) <= (FLINT_BITS - 2) &&
-           FLINT_ABS(bits3) <= (FLINT_BITS - 2);
+      for (j = 0; j < n2[i]; j++)
+      {
+         slong bit2 = fmpz_get_si(poly2 + i2[i] + j);
+         ulong u2 = (ulong) FLINT_ABS(bit2);
+
+         if (FLINT_BIT_COUNT(u2) > maxb2[i])
+            maxb2[i] = FLINT_BIT_COUNT(u2);
+
+         add_ssaaaa(hi, lo, hi, lo, UWORD(0), u2);
+      }
+
+      if (bits2 < maxb2[i])
+         bits2 = maxb2[i];
+
+      if (hi != 0)
+         b2[i] = FLINT_BIT_COUNT(hi) + FLINT_BITS;
+      else
+         b2[i] = FLINT_BIT_COUNT(lo);
+   }
+
+   for (i = 0; i < l3; i++)
+   {
+      hi = lo = 0;
+
+      maxb3[i] = 0;
+
+      for (j = 0; j < n3[i]; j++)
+      {
+         slong bit3 = fmpz_get_si(poly3 + i3[i] + j);
+         ulong u3 = (ulong) FLINT_ABS(bit3);
+
+         if (FLINT_BIT_COUNT(u3) > maxb3[i])
+            maxb3[i] = FLINT_BIT_COUNT(u3);
+
+         add_ssaaaa(hi, lo, hi, lo, UWORD(0), u3);
+      }
+
+      if (bits3 < maxb3[i])
+         bits3 = maxb3[i];
+
+      if (hi != 0)
+         b3[i] = FLINT_BIT_COUNT(hi) + FLINT_BITS;
+      else
+         b3[i] = FLINT_BIT_COUNT(lo);
+   }
+
+   small = bits2 <= (FLINT_BITS - 2) &&
+           bits3 <= (FLINT_BITS - 2);
+
+   /* classical multiplication one output coeff at a time */
 
    l1 = l2 + l3 - 1;
 
-   if (small && bits1 <= FLINT_BITS)
+   if (small) /* not used in large case */
    {
-      ulong * p1 = (ulong *) TMP_ALLOC(prod*sizeof(ulong));
+      p1 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
 
       for (i = 0; i < l1; i++)
       {
-         for (j = 0; j < prod; j++)
-            p1[j] = 0;
+         slong num1 = 0;
+         bits1 = 0;
 
          for (j = 0; j < l2 && j <= i; j++)
          {
             if (i - j < l3)
             {
-               _fmpz_mpoly_addmul_array1_slong1(p1, 
-                   (slong *) poly2 + i2[j], e2 + i2[j], n2[j],
-                   (slong *) poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
+               bits1 = FLINT_MAX(bits1, FLINT_MAX(b2[j] + maxb3[i - j], b3[j] + maxb2[i - j]));
+               num1++;
+            }
+         }
 
-             }
-          }
+         bits1 += FLINT_BIT_COUNT(num1) + 1; /* includes one bit for sign */
 
-          len = _fmpz_mpoly_from_ulong_array1(poly1, exp1, alloc, 
-                                                      p1, mults, num, bits, k) - k;
-
-          for (j = 0; j < len; j++)
-             (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
-
-          k += len;
-       }
-   } else if (small && bits1 <= 2*FLINT_BITS)
-   {
-      ulong * p1 = (ulong *) TMP_ALLOC(2*prod*sizeof(ulong));
-
-      for (i = 0; i < l1; i++)
-      {
-         for (j = 0; j < 2*prod; j++)
-            p1[j] = 0;
-
-         for (j = 0; j < l2 && j <= i; j++)
+         if (bits1 <= FLINT_BITS)
          {
-            if (i - j < l3)
+            for (j = 0; j < prod; j++)
+               p1[j] = 0;
+
+            for (j = 0; j < l2 && j <= i; j++)
             {
-               _fmpz_mpoly_addmul_array1_slong2(p1, 
-                   (slong *) poly2 + i2[j], e2 + i2[j], n2[j],
-                   (slong *) poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
+               if (i - j < l3)
+               {
+                  _fmpz_mpoly_addmul_array1_slong1(p1, 
+                     (slong *) poly2 + i2[j], e2 + i2[j], n2[j],
+                     (slong *) poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
 
-             }
-          }
+               }
+            }
 
-          len = _fmpz_mpoly_from_ulong_array2(poly1, exp1, alloc, 
+            len = _fmpz_mpoly_from_ulong_array1(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, k) - k;
 
-          for (j = 0; j < len; j++)
-             (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
+            for (j = 0; j < len; j++)
+               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
 
-          k += len;
-       }
-   } else if (small)
-   {
-      ulong * p1 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
-
-      for (i = 0; i < l1; i++)
-      {
-         for (j = 0; j < 3*prod; j++)
-            p1[j] = 0;
-
-         for (j = 0; j < l2 && j <= i; j++)
+            k += len;
+         } else if (bits1 <= 2*FLINT_BITS)
          {
-            if (i - j < l3)
+            for (j = 0; j < 2*prod; j++)
+               p1[j] = 0;
+
+            for (j = 0; j < l2 && j <= i; j++)
             {
-               _fmpz_mpoly_addmul_array1_slong(p1, 
-                   (slong *) poly2 + i2[j], e2 + i2[j], n2[j],
-                   (slong *) poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
+               if (i - j < l3)
+               {
+                  _fmpz_mpoly_addmul_array1_slong2(p1, 
+                     (slong *) poly2 + i2[j], e2 + i2[j], n2[j],
+                     (slong *) poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
 
-             }
-          }
+               }
+            }
 
-          len = _fmpz_mpoly_from_ulong_array(poly1, exp1, alloc, 
+            len = _fmpz_mpoly_from_ulong_array2(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, k) - k;
 
-          for (j = 0; j < len; j++)
-             (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
+            for (j = 0; j < len; j++)
+               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
 
-          k += len;
-       }
+            k += len;
+         } else
+         {
+            for (j = 0; j < 3*prod; j++)
+               p1[j] = 0;
+
+            for (j = 0; j < l2 && j <= i; j++)
+            {
+               if (i - j < l3)
+               {
+                  _fmpz_mpoly_addmul_array1_slong(p1, 
+                     (slong *) poly2 + i2[j], e2 + i2[j], n2[j],
+                     (slong *) poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
+
+               }
+            }
+
+            len = _fmpz_mpoly_from_ulong_array(poly1, exp1, alloc, 
+                                                      p1, mults, num, bits, k) - k;
+
+            for (j = 0; j < len; j++)
+               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
+
+            k += len;
+         }
+      }
    } else
    {
       fmpz * p1 = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
@@ -611,6 +671,7 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    ulong * e2, * e3;
    slong prod, len;
    int small, sign;
+   ulong hi = 0, lo = 0; /* two words to count bits */
    TMP_INIT;
 
    prod = 1;
@@ -635,11 +696,40 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    sign = (bits2 < 0) || (bits3 < 0);
 
-   bits1 = FLINT_ABS(bits2) + FLINT_ABS(bits3) +
-          FLINT_BIT_COUNT(FLINT_MIN(len2, len3)) + sign;
-
    small = FLINT_ABS(bits2) <= (FLINT_BITS - 2) &&
            FLINT_ABS(bits3) <= (FLINT_BITS - 2);
+
+   bits1 = -1; /* not used in large case */
+
+   if (small)
+   {
+      if (len2 < len3)
+      {
+         for (i = 0; i < len2; i++)
+         {
+            slong b2 = fmpz_get_si(poly2 + i);
+
+            add_ssaaaa(hi, lo, hi, lo, UWORD(0), (ulong) FLINT_ABS(b2));
+         }
+
+         bits1 = FLINT_ABS(bits3) + sign;
+      } else
+      {
+         for (i = 0; i < len3; i++)
+         {
+            slong b3 = fmpz_get_si(poly3 + i);
+
+            add_ssaaaa(hi, lo, hi, lo, UWORD(0), (ulong) FLINT_ABS(b3));
+         }
+
+         bits1 = FLINT_ABS(bits2) + sign;
+      }
+
+      if (hi != 0)
+         bits1 += FLINT_BIT_COUNT(hi) + FLINT_BITS;
+      else
+         bits1 += FLINT_BIT_COUNT(lo);
+   } 
 
    if (small && bits1 <= FLINT_BITS)
    {
