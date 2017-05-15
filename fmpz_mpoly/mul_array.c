@@ -544,7 +544,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
          {
             if (i - j < l3)
             {
-               bits1 = FLINT_MAX(bits1, FLINT_MAX(b2[j] + maxb3[i - j], b3[j] + maxb2[i - j]));
+               bits1 = FLINT_MAX(bits1, FLINT_MIN(b2[j] + maxb3[i - j], b3[j] + maxb2[i - j]));
                num1++;
             }
          }
