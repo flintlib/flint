@@ -384,7 +384,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    slong i, bits, exp_bits, N, len = 0;
    ulong * max_degs2;
    ulong * max_degs3;
-   ulong max2 = 0, max3 = 0, max;
+   ulong max;
    ulong * exp2, * exp3;
    int free2, free3;
 
@@ -405,18 +405,17 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
    fmpz_mpoly_max_degrees(max_degs3, poly3, ctx);
 
+   max = 0;
+
    for (i = 0; i < ctx->n; i++)
    {
-      if (max_degs2[i] > max2)
-         max2 = max_degs2[i];
+      max_degs3[i] += max_degs2[i];
+      if (max_degs3[i] < max_degs2[i] || 0 > (slong) max_degs3[i]) 
+         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_johnson");
 
-      if (max_degs3[i] > max3)
-         max3 = max_degs3[i];
+      if (max_degs3[i] > max)
+         max = max_degs3[i];
    }
-
-   max = max2 + max3;
-   if (max < max2 || 0 > (slong) max)
-      flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_johnson");
 
    bits = FLINT_BIT_COUNT(max);
 
