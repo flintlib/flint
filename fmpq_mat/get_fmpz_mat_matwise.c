@@ -18,7 +18,10 @@ fmpq_mat_get_fmpz_mat_matwise(fmpz_mat_t num, fmpz_t den, const fmpq_mat_t mat)
     slong i, j;
 
     if (fmpq_mat_is_empty(mat))
+    {
+        fmpz_one(den);
         return;
+    }
 
     fmpz_init(t);
     fmpz_init(lcm);
