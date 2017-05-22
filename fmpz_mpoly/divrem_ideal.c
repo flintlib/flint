@@ -253,28 +253,7 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
 
                   if (d[2] != 0 || ub[w] < d[1] || (ub[w] == 0 && 0 > (slong) d[0])) /* quotient not a small */
                   {
-                     int negate = 0;
-
-                     /* get absolute value */
-                     if (0 > (slong) c[2])
-                     {
-                        c[0] = ~c[0];
-                        c[1] = ~c[1];
-                        c[2] = ~c[2];
-                        add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, 1);
-                        negate = 1;
-                     }
-
-                     /* set qc to abs(c) */
-                     fmpz_set_ui(qc, c[2]);
-                     fmpz_mul_2exp(qc, qc, FLINT_BITS);
-                     fmpz_add_ui(qc, qc, c[1]);
-                     fmpz_mul_2exp(qc, qc, FLINT_BITS);
-                     fmpz_add_ui(qc, qc, c[0]);
-
-                     /* correct sign */
-                     if (negate)
-                        fmpz_neg(qc, qc);
+                     fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
 
                      small = 0;
                   } else /* quotient fits a small */
@@ -648,28 +627,7 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
 
                   if (d[2] != 0 || ub[w] < d[1] || (ub[w] == 0 && 0 > (slong) d[0])) /* quotient not a small */
                   {
-                     int negate = 0;
-
-                     /* get absolute value */
-                     if (0 > (slong) c[2])
-                     {
-                        c[0] = ~c[0];
-                        c[1] = ~c[1];
-                        c[2] = ~c[2];
-                        add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, 1);
-                        negate = 1;
-                     }
-
-                     /* set qc to abs(c) */
-                     fmpz_set_ui(qc, c[2]);
-                     fmpz_mul_2exp(qc, qc, FLINT_BITS);
-                     fmpz_add_ui(qc, qc, c[1]);
-                     fmpz_mul_2exp(qc, qc, FLINT_BITS);
-                     fmpz_add_ui(qc, qc, c[0]);
-
-                     /* correct sign */
-                     if (negate)
-                        fmpz_neg(qc, qc);
+                     fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
 
                      small = 0;
                   } else /* quotient fits a small */

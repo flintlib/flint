@@ -228,28 +228,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
 
             if (d[2] != 0 || ub < d[1] || (ub == 0 && 0 > (slong) d[0])) /* quotient not a small */
             {
-               int negate = 0;
-
-               /* get absolute value */
-               if (0 > (slong) c[2])
-               {
-                  c[0] = ~c[0];
-                  c[1] = ~c[1];
-                  c[2] = ~c[2];
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, 1);
-                  negate = 1;
-               }
-
-               /* set qc to abs(c) */
-               fmpz_set_ui(qc, c[2]);
-               fmpz_mul_2exp(qc, qc, FLINT_BITS);
-               fmpz_add_ui(qc, qc, c[1]);
-               fmpz_mul_2exp(qc, qc, FLINT_BITS);
-               fmpz_add_ui(qc, qc, c[0]);
-
-               /* correct sign */
-               if (negate)
-                  fmpz_neg(qc, qc);
+               fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
 
                /* continue in non-small case from now on */
                fmpz_fdiv_qr(p1 + k, r, qc, mb);
@@ -554,28 +533,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
 
             if (d[2] != 0 || ub < d[1] || (ub == 0 && 0 > (slong) d[0])) /* quotient not a small */
             {
-               int negate = 0;
-
-               /* get absolute value */
-               if (0 > (slong) c[2])
-               {
-                  c[0] = ~c[0];
-                  c[1] = ~c[1];
-                  c[2] = ~c[2];
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, 1);
-                  negate = 1;
-               }
-
-               /* set qc to abs(c) */
-               fmpz_set_ui(qc, c[2]);
-               fmpz_mul_2exp(qc, qc, FLINT_BITS);
-               fmpz_add_ui(qc, qc, c[1]);
-               fmpz_mul_2exp(qc, qc, FLINT_BITS);
-               fmpz_add_ui(qc, qc, c[0]);
-
-               /* correct sign */
-               if (negate)
-                  fmpz_neg(qc, qc);
+               fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
 
                /* continue in non-small case from now on */
                fmpz_fdiv_qr(p1 + k, r, qc, mb);

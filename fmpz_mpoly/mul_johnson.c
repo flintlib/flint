@@ -29,7 +29,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    ulong * e1 = *exp1;
    ulong exp, cy;
    ulong c[3], p[2]; /* for accumulating coefficients */
-   int first, negate, small;
+   int first, small;
    TMP_INIT;
 
    TMP_START;
@@ -147,27 +147,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
       }     
 
       if (small)
-      {
-         negate = 0;
-
-         if (0 > (slong) c[2])
-         {
-            c[0] = ~c[0];
-            c[1] = ~c[1];
-            c[2] = ~c[2];
-            add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, 1);
-            negate = 1;
-         } 
-
-         fmpz_set_ui(p1 + k, c[2]);
-         fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
-         fmpz_add_ui(p1 + k, p1 + k, c[1]);
-         fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
-         fmpz_add_ui(p1 + k, p1 + k, c[0]);
-      
-         if (negate)
-            fmpz_neg(p1 + k, p1 + k);
-      }
+         fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
    }
 
    k++;
@@ -197,7 +177,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
    ulong * exp, * exps;
    ulong ** exp_list;
    slong exp_next;
-   int first, negate, small;
+   int first, small;
    TMP_INIT;
 
    if (N == 1)
@@ -337,27 +317,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
       }     
    
       if (small)
-      {
-         negate = 0;
-
-         if (0 > (slong) c[2])
-         {
-            c[0] = ~c[0];
-            c[1] = ~c[1];
-            c[2] = ~c[2];
-            add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, 1);
-            negate = 1;
-         } 
-
-         fmpz_set_ui(p1 + k, c[2]);
-         fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
-         fmpz_add_ui(p1 + k, p1 + k, c[1]);
-         fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
-         fmpz_add_ui(p1 + k, p1 + k, c[0]);
-      
-         if (negate)
-            fmpz_neg(p1 + k, p1 + k);
-      }
+         fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
    }
 
    k++;

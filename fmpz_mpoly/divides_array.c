@@ -579,31 +579,6 @@ cleanup:
    return len - len1;
 }
 
-void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
-                           const fmpz * poly1, slong * i1, slong * n1, slong i)
-{
-   slong j;
-   ulong hi = 0, lo = 0;
-
-   maxb1[i] = 0;
-
-   for (j = 0; j < n1[i]; j++)
-   {
-      slong bits = fmpz_get_si(poly1 + i1[i] + j);
-      ulong ubits = (ulong) FLINT_ABS(bits);
-
-      if (FLINT_BIT_COUNT(ubits) > maxb1[i])
-         maxb1[i] = FLINT_BIT_COUNT(ubits);
-
-      add_ssaaaa(hi, lo, hi, lo, UWORD(0), ubits);
-   }
-
-   if (hi != 0)
-      b1[i] = FLINT_BIT_COUNT(hi) + FLINT_BITS;
-   else
-      b1[i] = FLINT_BIT_COUNT(lo);
-}
-
 /*
    use array exact division to set poly1 to poly2/poly3 in num + 1 variables,
    given a list of multipliers to tightly pack exponents and a number of bits

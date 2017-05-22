@@ -14,7 +14,6 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "hashmap.h"
 
 /* improve locality */
 #define BLOCK 128
@@ -147,7 +146,6 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    ulong exp;
    ulong * c;
    slong * prods;
-   int negate;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
    slong shift = FLINT_BITS - N*bits;
@@ -181,26 +179,8 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          e1[k] = exp << shift;
-         
-         negate = 0;
 
-         if (0 > (slong) c[2])
-         {
-            c[0] = ~c[0];
-            c[1] = ~c[1];
-            c[2] = ~c[2];
-            add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, 1);
-            negate = 1;
-         } 
-
-         fmpz_set_ui(p1 + k, c[2]);
-         fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
-         fmpz_add_ui(p1 + k, p1 + k, c[1]);
-         fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
-         fmpz_add_ui(p1 + k, p1 + k, c[0]);
-      
-         if (negate)
-            fmpz_neg(p1 + k, p1 + k);
+         fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
          
          k++;
       }
@@ -222,7 +202,6 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
    ulong exp;
    ulong * c;
    slong * prods;
-   int negate;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
    slong shift = FLINT_BITS - num*bits;
@@ -256,23 +235,8 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          e1[k] = exp << shift;
-         
-         negate = 0;
 
-         if (0 > (slong) c[1])
-         {
-            c[0] = ~c[0];
-            c[1] = ~c[1];
-            add_ssaaaa(c[1], c[0], c[1], c[0], 0, 1);
-            negate = 1;
-         } 
-
-         fmpz_set_ui(p1 + k, c[1]);
-         fmpz_mul_2exp(p1 + k, p1 + k, FLINT_BITS);
-         fmpz_add_ui(p1 + k, p1 + k, c[0]);
-         
-         if (negate)
-            fmpz_neg(p1 + k, p1 + k);
+         fmpz_set_signed_uiui(p1 + k, c[1], c[0]);
          
          k++;
       }
@@ -397,6 +361,31 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    return k;
 }
 
+void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
+                           const fmpz * poly1, slong * i1, slong * n1, slong i)
+{
+   slong j;
+   ulong hi = 0, lo = 0;
+
+   maxb1[i] = 0;
+
+   for (j = 0; j < n1[i]; j++)
+   {
+      slong bits = fmpz_get_si(poly1 + i1[i] + j);
+      ulong ubits = (ulong) FLINT_ABS(bits);
+
+      if (FLINT_BIT_COUNT(ubits) > maxb1[i])
+         maxb1[i] = FLINT_BIT_COUNT(ubits);
+
+      add_ssaaaa(hi, lo, hi, lo, UWORD(0), ubits);
+   }
+
+   if (hi != 0)
+      b1[i] = FLINT_BIT_COUNT(hi) + FLINT_BITS;
+   else
+      b1[i] = FLINT_BIT_COUNT(lo);
+}
+
 /*
    use array multiplication to set poly1 to poly2*poly3 in num + 1 variables,
    given a list of multipliers to tightly pack exponents and a number of bits
@@ -413,7 +402,6 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
    slong shift = FLINT_BITS - bits;
    slong * i2, * i3, * n2, * n3, * b2, * maxb2, * b3, * maxb3;
    ulong * e2, * e3, * p1;
-   ulong hi, lo;
    int small;
    TMP_INIT;
 
@@ -474,54 +462,18 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
    for (i = 0; i < l2; i++)
    {
-      hi = lo = 0;
-
-      maxb2[i] = 0;
-
-      for (j = 0; j < n2[i]; j++)
-      {
-         slong bit2 = fmpz_get_si(poly2 + i2[i] + j);
-         ulong u2 = (ulong) FLINT_ABS(bit2);
-
-         if (FLINT_BIT_COUNT(u2) > maxb2[i])
-            maxb2[i] = FLINT_BIT_COUNT(u2);
-
-         add_ssaaaa(hi, lo, hi, lo, UWORD(0), u2);
-      }
+      _fmpz_mpoly_chunk_max_bits(b2, maxb2, poly2, i2, n2, i);
 
       if (bits2 < maxb2[i])
          bits2 = maxb2[i];
-
-      if (hi != 0)
-         b2[i] = FLINT_BIT_COUNT(hi) + FLINT_BITS;
-      else
-         b2[i] = FLINT_BIT_COUNT(lo);
    }
 
    for (i = 0; i < l3; i++)
    {
-      hi = lo = 0;
-
-      maxb3[i] = 0;
-
-      for (j = 0; j < n3[i]; j++)
-      {
-         slong bit3 = fmpz_get_si(poly3 + i3[i] + j);
-         ulong u3 = (ulong) FLINT_ABS(bit3);
-
-         if (FLINT_BIT_COUNT(u3) > maxb3[i])
-            maxb3[i] = FLINT_BIT_COUNT(u3);
-
-         add_ssaaaa(hi, lo, hi, lo, UWORD(0), u3);
-      }
+      _fmpz_mpoly_chunk_max_bits(b3, maxb3, poly3, i3, n3, i);
 
       if (bits3 < maxb3[i])
          bits3 = maxb3[i];
-
-      if (hi != 0)
-         b3[i] = FLINT_BIT_COUNT(hi) + FLINT_BITS;
-      else
-         b3[i] = FLINT_BIT_COUNT(lo);
    }
 
    small = bits2 <= (FLINT_BITS - 2) &&

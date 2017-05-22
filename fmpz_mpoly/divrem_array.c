@@ -88,11 +88,7 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
                   (*allocr) *= 2;
                }
 
-               fmpz_set_ui(p2 + l, p[1]);
-               fmpz_mul_2exp(p2 + l, p2 + l, FLINT_BITS);
-               fmpz_add_ui(p2 + l, p2 + l, p[0]);
-               if (0 > (slong) ptr[1])
-                  fmpz_neg(p2 + l, p2 + l);
+               fmpz_set_signed_uiui(p2 + l, p[1], p[0]);
 
                e2[l++] = i;
             } else /* monomials can be divided exactly */
@@ -169,11 +165,7 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
                (*allocr) *= 2;
             }
 
-            fmpz_set_ui(p2 + l, ptr[1]);
-            fmpz_mul_2exp(p2 + l, p2 + l, FLINT_BITS);
-            fmpz_add_ui(p2 + l, p2 + l, ptr[0]);
-            if (0 > (slong) ptr[1])
-               fmpz_neg(p2 + l, p2 + l);
+            fmpz_set_signed_uiui(p2 + l, ptr[1], ptr[0]);
 
             e2[l++] = i;
          }
@@ -212,13 +204,7 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
                   (*allocr) *= 2;
                }
 
-               fmpz_set_ui(p2 + l, p[2]);
-               fmpz_mul_2exp(p2 + l, p2 + l, FLINT_BITS);
-               fmpz_add_ui(p2 + l, p2 + l, p[1]);
-               fmpz_mul_2exp(p2 + l, p2 + l, FLINT_BITS);
-               fmpz_add_ui(p2 + l, p2 + l, p[0]);
-               if (0 > (slong) ptr[2])
-                  fmpz_neg(p2 + l, p2 + l);
+               fmpz_set_signed_uiuiui(p2 + l, p[2], p[1], p[0]);
 
                e2[l++] = i;
             } else /* monomials can be divided exact */
@@ -297,13 +283,7 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
                (*allocr) *= 2;
             }
 
-            fmpz_set_ui(p2 + l, ptr[2]);
-            fmpz_mul_2exp(p2 + l, p2 + l, FLINT_BITS);
-            fmpz_add_ui(p2 + l, p2 + l, ptr[1]);
-            fmpz_mul_2exp(p2 + l, p2 + l, FLINT_BITS);
-            fmpz_add_ui(p2 + l, p2 + l, ptr[0]);
-            if (0 > (slong) ptr[2])
-               fmpz_neg(p2 + l, p2 + l);
+            fmpz_set_signed_uiuiui(p2 + l, ptr[2], ptr[1], ptr[0]);
 
             e2[l++] = i;
          }
