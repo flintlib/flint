@@ -31,7 +31,7 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
    fmpz * p2 = *polyr;
    ulong * e2 = *expr;
    ulong exp, texp;
-   ulong c[3], p[2]; /* for accumulating coefficients */
+   ulong c[3]; /* for accumulating coefficients */
    ulong mask = 0;
    ulong * ub;
    slong * k, * s;
@@ -115,39 +115,18 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
                
          if (small)
          {
-            fmpz fc = poly2[len2 - x->j - 1];
-
             if (x->i == -WORD(1))
-            {
-               if (!COEFF_IS_MPZ(fc))
-               {
-                  if (fc >= 0)
-                     sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
-                  else
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
-               } else
-               {
-                  slong size = fmpz_size(poly2 + len2 - x->j - 1);
-                  __mpz_struct * m = COEFF_TO_PTR(fc);
-                  if (fmpz_sgn(poly2 + len2 - x->j - 1) < 0)
-                     mpn_add(c, c, 3, m->_mp_d, size);
-                  else
-                     mpn_sub(c, c, 3, m->_mp_d, size);
-               }
-            } else
-            {
-               smul_ppmm(p[1], p[0], poly3[x->p]->coeffs[n3 - x->i - 1], polyq[x->p]->coeffs[x->j]);
-               if (0 > (slong) p[1])
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], ~WORD(0), p[1], p[0]);
-               else
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
-            }
+               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+            else
+               _fmpz_mpoly_submul_uiuiui_fmpz(c,
+                poly3[x->p]->coeffs[n3 - x->i - 1], polyq[x->p]->coeffs[x->j]);
          } else
          {
             if (x->i == -WORD(1))
                fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
             else
-               fmpz_addmul(qc, poly3[x->p]->coeffs + n3 - x->i - 1, polyq[x->p]->coeffs + x->j);
+               fmpz_addmul(qc, poly3[x->p]->coeffs + n3 - x->i - 1,
+                                                   polyq[x->p]->coeffs + x->j);
          }
 
          if (x->i != -WORD(1) || x->j < len2 - 1)
@@ -161,39 +140,18 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
 
             if (small)
             {
-               fmpz fc = poly2[len2 - x->j - 1];
-
                if (x->i == -WORD(1))
-               {
-                  if (!COEFF_IS_MPZ(fc))
-                  {
-                     if (fc >= 0)
-                        sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
-                     else
-                        add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
-                  } else
-                  {
-                     slong size = fmpz_size(poly2 + len2 - x->j - 1);
-                     __mpz_struct * m = COEFF_TO_PTR(fc);
-                     if (fmpz_sgn(poly2 + len2 - x->j - 1) < 0)
-                        mpn_add(c, c, 3, m->_mp_d, size);
-                     else
-                        mpn_sub(c, c, 3, m->_mp_d, size);
-                  }
-               } else
-               {
-                  smul_ppmm(p[1], p[0], poly3[x->p]->coeffs[n3 - x->i - 1], polyq[x->p]->coeffs[x->j]);
-                  if (0 > (slong) p[1])
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], ~WORD(0), p[1], p[0]);
-                  else
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
-               }
+                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+               else
+                  _fmpz_mpoly_submul_uiuiui_fmpz(c,
+                poly3[x->p]->coeffs[n3 - x->i - 1], polyq[x->p]->coeffs[x->j]);
             } else
             {
                if (x->i == -WORD(1))
                   fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
                else
-                  fmpz_addmul(qc, poly3[x->p]->coeffs + n3 - x->i - 1, polyq[x->p]->coeffs + x->j);
+                  fmpz_addmul(qc, poly3[x->p]->coeffs + n3 - x->i - 1,
+                                                   polyq[x->p]->coeffs + x->j);
             }
 
             if (x->i != -WORD(1) || x->j < len2 - 1)
@@ -219,7 +177,8 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
             x->j++;
             x->next = NULL;
 
-            _mpoly_heap_insert1(heap, maxn - exp3[x->p][n3 - x->i - 1] - polyq[x->p]->exps[x->j], x, &heap_len);
+            _mpoly_heap_insert1(heap, maxn - exp3[x->p][n3 - x->i - 1] -
+                                        polyq[x->p]->exps[x->j], x, &heap_len);
          } else if (x->j == k[x->p])
          {
             s[x->p]++;
@@ -227,7 +186,8 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
          }
       }
 
-      if ((small && (c[2] != 0 || c[1] != 0 || c[0] != 0)) || (!small && !fmpz_is_zero(qc)))
+      if ((small && (c[2] != 0 || c[1] != 0 || c[0] != 0)) ||
+                                                 (!small && !fmpz_is_zero(qc)))
       {
          slong w;
 
@@ -236,7 +196,8 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
          for (w = 0; w < len; w++)
          {
             n3 = poly3[w]->length;
-            d1 = mpoly_monomial_divides1(&texp, maxn - exp3[w][n3 - 1], exp, mask);
+            d1 = mpoly_monomial_divides1(&texp, maxn - 
+                                                   exp3[w][n3 - 1], exp, mask);
 
             if (d1)
             {
@@ -251,7 +212,8 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
                   else
                      flint_mpn_copyi(d, c, 3);
 
-                  if (d[2] != 0 || ub[w] < d[1] || (ub[w] == 0 && 0 > (slong) d[0])) /* quotient not a small */
+                  if (d[2] != 0 || ub[w] < d[1] ||
+                   (ub[w] == 0 && 0 > (slong) d[0])) /* quotient not a small */
                   {
                      fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
 
@@ -314,7 +276,8 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
                      x2->p = w;
                      x2->next = NULL;
 
-                     _mpoly_heap_insert1(heap, maxn - exp3[w][n3 - i - 1] - polyq[w]->exps[k[w]], x2, &heap_len);
+                     _mpoly_heap_insert1(heap, maxn - exp3[w][n3 - i - 1] -
+                                          polyq[w]->exps[k[w]], x2, &heap_len);
                   }
                   s[w] = 1;
                   break;
@@ -375,7 +338,7 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
    ulong * e2 = *expr;
    ulong * exp, * exps, * texp;
    ulong ** exp_list;
-   ulong c[3], p[2]; /* for accumulating coefficients */
+   ulong c[3]; /* for accumulating coefficients */
    slong exp_next;
    ulong mask = 0;
    ulong * ub;
@@ -473,40 +436,20 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
                
          if (small)
          {
-            fmpz fc = poly2[len2 - x->j - 1];
-
             if (x->i == -WORD(1))
-            {
-               if (!COEFF_IS_MPZ(fc))
-               {
-                  if (fc >= 0)
-                     sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
-                  else
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
-               } else
-               {
-                  slong size = fmpz_size(poly2 + len2 - x->j - 1);
-                  __mpz_struct * m = COEFF_TO_PTR(fc);
-                  if (fmpz_sgn(poly2 + len2 - x->j - 1) < 0)
-                     mpn_add(c, c, 3, m->_mp_d, size);
-                  else
-                     mpn_sub(c, c, 3, m->_mp_d, size);
-               }
-            } else
-            {
-               smul_ppmm(p[1], p[0], poly3[x->p]->coeffs[n3 - x->i - 1], polyq[x->p]->coeffs[x->j]);
-               if (0 > (slong) p[1])
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], ~WORD(0), p[1], p[0]);
-               else
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
-            }
+               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+            else
+               _fmpz_mpoly_submul_uiuiui_fmpz(c,
+                poly3[x->p]->coeffs[n3 - x->i - 1], polyq[x->p]->coeffs[x->j]);
          } else
          {
             if (x->i == -WORD(1))
                fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
             else
-               fmpz_addmul(qc, poly3[x->p]->coeffs + n3 - x->i - 1, polyq[x->p]->coeffs + x->j);
+               fmpz_addmul(qc, poly3[x->p]->coeffs + n3 - x->i - 1,
+                                                   polyq[x->p]->coeffs + x->j);
          }
+
 
          if (x->i != -WORD(1) || x->j < len2 - 1)
             Q[Q_len++] = x;
@@ -519,39 +462,18 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
 
             if (small)
             {
-               fmpz fc = poly2[len2 - x->j - 1];
-
                if (x->i == -WORD(1))
-               {
-                  if (!COEFF_IS_MPZ(fc))
-                  {
-                     if (fc >= 0)
-                        sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
-                     else
-                        add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
-                  } else
-                  {
-                     slong size = fmpz_size(poly2 + len2 - x->j - 1);
-                     __mpz_struct * m = COEFF_TO_PTR(fc);
-                     if (fmpz_sgn(poly2 + len2 - x->j - 1) < 0)
-                        mpn_add(c, c, 3, m->_mp_d, size);
-                     else
-                        mpn_sub(c, c, 3, m->_mp_d, size);
-                  }
-               } else
-               {
-                  smul_ppmm(p[1], p[0], poly3[x->p]->coeffs[n3 - x->i - 1], polyq[x->p]->coeffs[x->j]);
-                  if (0 > (slong) p[1])
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], ~WORD(0), p[1], p[0]);
-                  else
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
-               }
+                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+               else
+                  _fmpz_mpoly_submul_uiuiui_fmpz(c,
+                poly3[x->p]->coeffs[n3 - x->i - 1], polyq[x->p]->coeffs[x->j]);
             } else
             {
                if (x->i == -WORD(1))
                   fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
                else
-                  fmpz_addmul(qc, poly3[x->p]->coeffs + n3 - x->i - 1, polyq[x->p]->coeffs + x->j);
+                  fmpz_addmul(qc, poly3[x->p]->coeffs + n3 - x->i - 1,
+                                                   polyq[x->p]->coeffs + x->j);
             }
 
             if (x->i != -WORD(1) || x->j < len2 - 1)
@@ -571,9 +493,11 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
             x->j++;
             x->next = NULL;
 
-            mpoly_monomial_sub(exp_list[exp_next], maxn, exp2 + (len2 - x->j - 1)*N, N);
+            mpoly_monomial_sub(exp_list[exp_next], maxn, 
+                                                exp2 + (len2 - x->j - 1)*N, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                                                 &heap_len, N))
                exp_next--;
          } else if (x->j < k[x->p])
          {
@@ -581,9 +505,11 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
             x->next = NULL;
 
             mpoly_monomial_sub(texp, maxn, exp3[x->p] + (n3 - x->i - 1)*N, N);
-            mpoly_monomial_sub(exp_list[exp_next], texp, polyq[x->p]->exps + x->j*N, N);
+            mpoly_monomial_sub(exp_list[exp_next],
+                                          texp, polyq[x->p]->exps + x->j*N, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, 
+                                                                 &heap_len, N))
                exp_next--;
          } else if (x->j == k[x->p])
          {
@@ -592,7 +518,8 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
          }
       }
 
-      if ((small && (c[2] != 0 || c[1] != 0 || c[0] != 0)) || (!small && !fmpz_is_zero(qc)))
+      if ((small && (c[2] != 0 || c[1] != 0 || c[0] != 0)) ||
+                                                 (!small && !fmpz_is_zero(qc)))
       {
          slong w;
 
@@ -619,7 +546,8 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
                   else
                      flint_mpn_copyi(d, c, 3);
 
-                  if (d[2] != 0 || ub[w] < d[1] || (ub[w] == 0 && 0 > (slong) d[0])) /* quotient not a small */
+                  if (d[2] != 0 || ub[w] < d[1] ||
+                   (ub[w] == 0 && 0 > (slong) d[0])) /* quotient not a small */
                   {
                      fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
 
@@ -682,10 +610,13 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
                      x2->p = w;
                      x2->next = NULL;
 
-                     mpoly_monomial_sub(texp, maxn, exp3[w] + (n3 - i - 1)*N, N);
-                     mpoly_monomial_sub(exp_list[exp_next], texp, polyq[w]->exps + k[w]*N, N);
+                     mpoly_monomial_sub(texp, maxn, exp3[w] + 
+                                                            (n3 - i - 1)*N, N);
+                     mpoly_monomial_sub(exp_list[exp_next], texp, 
+                                                   polyq[w]->exps + k[w]*N, N);
 
-                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2, &heap_len, N))
+                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++],
+                                                             x2, &heap_len, N))
                         exp_next--;
                   }
                   s[w] = 1;

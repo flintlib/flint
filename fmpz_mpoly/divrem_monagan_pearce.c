@@ -33,7 +33,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
    ulong * e1 = *expq;
    ulong * e2 = *expr;
    ulong exp;
-   ulong c[3], p[2]; /* for accumulating coefficients */
+   ulong c[3]; /* for accumulating coefficients */
    ulong mask = 0, ub;
    fmpz_t mb, qc, r;
    int small;
@@ -93,33 +93,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
          
          if (small)
          {
-            fmpz fc = poly2[len2 - x->j - 1];
-
             if (x->i == -WORD(1))
-            {
-               if (!COEFF_IS_MPZ(fc))
-               {
-                  if (fc >= 0)
-                     sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
-                  else
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
-               } else
-               {
-                  slong size = fmpz_size(poly2 + len2 - x->j - 1);
-                  __mpz_struct * m = COEFF_TO_PTR(fc);
-                  if (fmpz_sgn(poly2 + len2 - x->j - 1) < 0)
-                     mpn_add(c, c, 3, m->_mp_d, size);
-                  else
-                     mpn_sub(c, c, 3, m->_mp_d, size);
-               }
-            } else
-            {
-               smul_ppmm(p[1], p[0], poly3[len3 - x->i - 1], p1[x->j]);
-               if (0 > (slong) p[1])
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], ~WORD(0), p[1], p[0]);
-               else
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
-            }
+               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+            else
+               _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
          } else
          {
             if (x->i == -WORD(1))
@@ -137,33 +114,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
          {
             if (small)
             {
-               fmpz fc = poly2[len2 - x->j - 1];
-
                if (x->i == -WORD(1))
-               {
-                  if (!COEFF_IS_MPZ(fc))
-                  {
-                     if (fc >= 0)
-                        sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
-                     else
-                        add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
-                  } else
-                  {
-                     slong size = fmpz_size(poly2 + len2 - x->j - 1);
-                     __mpz_struct * m = COEFF_TO_PTR(fc);
-                     if (fmpz_sgn(poly2 + len2 - x->j - 1) < 0)
-                        mpn_add(c, c, 3, m->_mp_d, size);
-                     else
-                        mpn_sub(c, c, 3, m->_mp_d, size);
-                  }
-               } else
-               {
-                  smul_ppmm(p[1], p[0], poly3[len3 - x->i - 1], p1[x->j]);
-                  if (0 > (slong) p[1])
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], ~WORD(0), p[1], p[0]);
-                  else
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
-               }
+                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+               else
+                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
             } else
             {
                if (x->i == -WORD(1))
@@ -337,7 +291,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
    ulong * e2 = *expr;
    ulong * exp, * exps, * texp;
    ulong ** exp_list;
-   ulong c[3], p[2]; /* for accumulating coefficients */
+   ulong c[3]; /* for accumulating coefficients */
    slong exp_next;
    ulong mask = 0, ub;
    fmpz_t mb, qc, r;
@@ -415,33 +369,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
 
          if (small)
          {
-            fmpz fc = poly2[len2 - x->j - 1];
-
             if (x->i == -WORD(1))
-            {
-               if (!COEFF_IS_MPZ(fc))
-               {
-                  if (fc >= 0)
-                     sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
-                  else
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
-               } else
-               {
-                  slong size = fmpz_size(poly2 + len2 - x->j - 1);
-                  __mpz_struct * m = COEFF_TO_PTR(fc);
-                  if (fmpz_sgn(poly2 + len2 - x->j - 1) < 0)
-                     mpn_add(c, c, 3, m->_mp_d, size);
-                  else
-                     mpn_sub(c, c, 3, m->_mp_d, size);
-               }
-            } else
-            {
-               smul_ppmm(p[1], p[0], poly3[len3 - x->i - 1], p1[x->j]);
-               if (0 > (slong) p[1])
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], ~WORD(0), p[1], p[0]);
-               else
-                  add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
-            }
+               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+            else
+               _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
          } else
          {
             if (x->i == -WORD(1))
@@ -459,33 +390,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
          {
             if (small)
             {
-               fmpz fc = poly2[len2 - x->j - 1];
-
                if (x->i == -WORD(1))
-               {
-                  if (!COEFF_IS_MPZ(fc))
-                  {
-                     if (fc >= 0)
-                        sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
-                     else
-                        add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
-                  } else
-                  {
-                     slong size = fmpz_size(poly2 + len2 - x->j - 1);
-                     __mpz_struct * m = COEFF_TO_PTR(fc);
-                     if (fmpz_sgn(poly2 + len2 - x->j - 1) < 0)
-                        mpn_add(c, c, 3, m->_mp_d, size);
-                     else
-                        mpn_sub(c, c, 3, m->_mp_d, size);
-                  }
-               } else
-               {
-                  smul_ppmm(p[1], p[0], poly3[len3 - x->i - 1], p1[x->j]);
-                  if (0 > (slong) p[1])
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], ~WORD(0), p[1], p[0]);
-                  else
-                     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
-               }
+                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+               else
+                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
             } else
             {
                if (x->i == -WORD(1))

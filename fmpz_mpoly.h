@@ -547,6 +547,40 @@ FLINT_DLL void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
 FLINT_DLL void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
                           const fmpz * poly1, slong * i1, slong * n1, slong i);
 
+FMPZ_MPOLY_INLINE
+void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d)
+{
+   fmpz fc = *d;
+
+   if (!COEFF_IS_MPZ(fc))
+   {
+      if (fc >= 0)
+         sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
+      else
+         add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
+   } else
+   {
+      slong size = fmpz_size(d);
+      __mpz_struct * m = COEFF_TO_PTR(fc);
+      if (fmpz_sgn(d) < 0)
+         mpn_add(c, c, 3, m->_mp_d, size);
+      else
+         mpn_sub(c, c, 3, m->_mp_d, size);
+   }
+}
+
+FMPZ_MPOLY_INLINE
+void _fmpz_mpoly_submul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
+{
+   ulong p[2];
+
+   smul_ppmm(p[1], p[0], d1, d2);
+   if (0 > (slong) p[1])
+      add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], ~WORD(0), p[1], p[0]);
+   else
+      add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
+}
+
 #ifdef __cplusplus
 }
 #endif
