@@ -14,6 +14,17 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
+void _fmpz_mpoly_fit_length(fmpz ** poly,
+                              ulong ** exps, slong * alloc, slong len, slong N)
+{
+    if (len > *alloc)
+    {
+        /* at least double size */
+        len = FLINT_MAX(len, 2*(*alloc));
+        _fmpz_mpoly_realloc(poly, exps, alloc, len, N);
+    }
+}
+
 void
 fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len, const fmpz_mpoly_ctx_t ctx)
 {

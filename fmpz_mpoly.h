@@ -90,8 +90,14 @@ FLINT_DLL void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL void fmpz_mpoly_init2(fmpz_mpoly_t poly, slong alloc, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void _fmpz_mpoly_realloc(fmpz ** poly, ulong ** exps,
+                                            slong * alloc, slong len, slong N);
+
 FLINT_DLL void fmpz_mpoly_realloc(fmpz_mpoly_t poly, slong alloc, 
                                                    const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_fit_length(fmpz ** poly,
+                             ulong ** exps, slong * alloc, slong len, slong N);
 
 FLINT_DLL void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len, 
                                                    const fmpz_mpoly_ctx_t ctx);

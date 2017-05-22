@@ -140,7 +140,7 @@ void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1,
 
 /* this function destroys poly2 and starts writing at index k */
 slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc, 
-              ulong * poly2, const slong * mults, slong N, slong bits, slong k)
+              ulong * poly2, const slong * mults, slong num, slong bits, slong k)
 {
    slong i, j;
    ulong exp;
@@ -148,34 +148,28 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
-   slong shift = FLINT_BITS - N*bits;
+   slong shift = FLINT_BITS - num*bits;
    TMP_INIT;
 
    TMP_START;
 
-   prods = (slong *) TMP_ALLOC((N + 1)*sizeof(slong));
+   prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
    prods[0] = 1;
-   for (i = 1; i <= N; i++)
+   for (i = 1; i <= num; i++)
      prods[i] = mults[i - 1]*prods[i - 1];
    
-   for (i = 0; i < prods[N]; i++)
+   for (i = 0; i < prods[num]; i++)
    {
       c = poly2 + i*3;
 
       if (c[0] != 0 || c[1] != 0 || c[2] != 0)
       {
-         if (k >= *alloc)
-         {
-            p1 = (fmpz *) flint_realloc(p1, 2*(*alloc)*sizeof(fmpz));
-            e1 = (ulong *) flint_realloc(e1, 2*(*alloc)*sizeof(ulong));
-            flint_mpn_zero(p1 + *alloc, *alloc);
-            (*alloc) *= 2;
-         }
+         _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
          
-         for (j = 0; j < N; j++)
+         for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          e1[k] = exp << shift;
@@ -221,13 +215,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
       if (c[0] != 0 || c[1] != 0)
       {
-         if (k >= *alloc)
-         {
-            p1 = (fmpz *) flint_realloc(p1, 2*(*alloc)*sizeof(fmpz));
-            e1 = (ulong *) flint_realloc(e1, 2*(*alloc)*sizeof(ulong));
-            flint_mpn_zero(p1 + *alloc, *alloc);
-            (*alloc) *= 2;
-         }
+         _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
          
@@ -277,13 +265,7 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
       if (c[0] != 0)
       {
-         if (k >= *alloc)
-         {
-            p1 = (fmpz *) flint_realloc(p1, 2*(*alloc)*sizeof(fmpz));
-            e1 = (ulong *) flint_realloc(e1, 2*(*alloc)*sizeof(ulong));
-            flint_mpn_zero(p1 + *alloc, *alloc);
-            (*alloc) *= 2;
-         }
+         _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
          
@@ -332,13 +314,7 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
       if (!fmpz_is_zero(c))
       {
-         if (k >= *alloc)
-         {
-            p1 = (fmpz *) flint_realloc(p1, 2*(*alloc)*sizeof(fmpz));
-            e1 = (ulong *) flint_realloc(e1, 2*(*alloc)*sizeof(ulong));
-            flint_mpn_zero(p1 + *alloc, *alloc);
-            (*alloc) *= 2;
-         }
+         _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
          

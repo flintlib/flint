@@ -326,13 +326,7 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
          {
             l++;
 
-            if (l >= *allocr)
-            {
-               p2 = (fmpz *) flint_realloc(p2, 2*sizeof(fmpz)*(*allocr));
-               e2 = (ulong *) flint_realloc(e2, 2*sizeof(ulong)*(*allocr));
-               flint_mpn_zero(p2 + *allocr, *allocr);
-               (*allocr) *= 2;
-            }
+            _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
 
             if (small)
             {
@@ -704,13 +698,7 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
          {
             l++;
 
-            if (l >= *allocr)
-            {
-               p2 = (fmpz *) flint_realloc(p2, 2*sizeof(fmpz)*(*allocr));
-               e2 = (ulong *) flint_realloc(e2, 2*N*sizeof(ulong)*(*allocr));
-               flint_mpn_zero(p2 + *allocr, *allocr);
-               (*allocr) *= 2;
-            }
+            _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
 
             if (small)
             {

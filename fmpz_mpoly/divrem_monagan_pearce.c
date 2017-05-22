@@ -83,13 +83,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
       exp = heap[1].exp;
       k++;
 
-      if (k >= *allocq)
-      {
-         p1 = (fmpz *) flint_realloc(p1, 2*sizeof(fmpz)*(*allocq));
-         e1 = (ulong *) flint_realloc(e1, 2*sizeof(ulong)*(*allocq));
-         flint_mpn_zero(p1 + *allocq, *allocq);
-         (*allocq) *= 2;
-      }
+      _fmpz_mpoly_fit_length(&p1, &e1, allocq, k + 1, 1);
 
       c[0] = c[1] = c[2] = 0;
 
@@ -218,13 +212,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
          {
             l++;
 
-            if (l >= *allocr)
-            {
-               p2 = (fmpz *) flint_realloc(p2, 2*sizeof(fmpz)*(*allocr));
-               e2 = (ulong *) flint_realloc(e2, 2*sizeof(ulong)*(*allocr));
-               flint_mpn_zero(p2 + *allocr, *allocr);
-               (*allocr) *= 2;
-            }
+            _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
 
             if (small)
             {
@@ -262,13 +250,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                   {
                      l++;
 
-                     if (l >= *allocr)
-                     {
-                        p2 = (fmpz *) flint_realloc(p2, 2*sizeof(fmpz)*(*allocr));
-                        e2 = (ulong *) flint_realloc(e2, 2*sizeof(ulong)*(*allocr));
-                        flint_mpn_zero(p2 + *allocr, *allocr);
-                        (*allocr) *= 2;
-                     }
+                     _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
 
                      p2[l] = -r1;
 
@@ -286,13 +268,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                {
                   l++;
 
-                  if (l >= *allocr)
-                  {
-                     p2 = (fmpz *) flint_realloc(p2, 2*sizeof(fmpz)*(*allocr));
-                     e2 = (ulong *) flint_realloc(e2, 2*sizeof(ulong)*(*allocr));
-                     flint_mpn_zero(p2 + *allocr, *allocr);
-                     (*allocr) *= 2;
-                  }
+                  _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
 
                   fmpz_neg(p2 + l, r);
                      
@@ -427,13 +403,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
       mpoly_monomial_set(exp, heap[1].exp, N);
       k++;
 
-      if (k >= *allocq)
-      {
-         p1 = (fmpz *) flint_realloc(p1, 2*sizeof(fmpz)*(*allocq));
-         e1 = (ulong *) flint_realloc(e1, 2*N*sizeof(ulong)*(*allocq));
-         flint_mpn_zero(p1 + *allocq, *allocq);
-         (*allocq) *= 2;
-      }
+      _fmpz_mpoly_fit_length(&p1, &e1, allocq, k + 1, N);
 
       c[0] = c[1] = c[2] = 0;
 
@@ -573,13 +543,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
          {
             l++;
 
-            if (l >= *allocr)
-            {
-               p2 = (fmpz *) flint_realloc(p2, 2*sizeof(fmpz)*(*allocr));
-               e2 = (ulong *) flint_realloc(e2, 2*N*sizeof(ulong)*(*allocr));
-               flint_mpn_zero(p2 + *allocr, *allocr);
-               (*allocr) *= 2;
-            }
+            _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
 
             if (small)
             {
@@ -617,13 +581,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                   {
                      l++;
 
-                     if (l >= *allocr)
-                     {
-                        p2 = (fmpz *) flint_realloc(p2, 2*sizeof(fmpz)*(*allocr));
-                        e2 = (ulong *) flint_realloc(e2, 2*N*sizeof(ulong)*(*allocr));
-                        flint_mpn_zero(p2 + *allocr, *allocr);
-                        (*allocr) *= 2;
-                     }
+                     _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
 
                      p2[l] = -r1;
 
@@ -641,13 +599,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                {
                   l++;
 
-                  if (l >= *allocr)
-                  {
-                     p2 = (fmpz *) flint_realloc(p2, 2*sizeof(fmpz)*(*allocr));
-                     e2 = (ulong *) flint_realloc(e2, 2*N*sizeof(ulong)*(*allocr));
-                     flint_mpn_zero(p2 + *allocr, *allocr);
-                     (*allocr) *= 2;
-                  }
+                  _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
 
                   fmpz_neg(p2 + l, r);
                      

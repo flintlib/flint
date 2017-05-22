@@ -387,13 +387,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             _fmpz_mpoly_submul_array1_slong2_1(p2, q, i - min3,
                                                             poly3, exp3, len3);
 
-            if (len >= *alloc)
-            {
-               p1 = (fmpz *) flint_realloc(p1, 2*(*alloc)*sizeof(fmpz));
-               e1 = (ulong *) flint_realloc(e1, 2*(*alloc)*sizeof(ulong));
-               flint_mpn_zero(p1 + *alloc, *alloc);
-               (*alloc) *= 2;
-            }
+            _fmpz_mpoly_fit_length(&p1, &e1, alloc, len + 1, 1);
             
             p1[len] = q;
             e1[len++] = i - min3;         
@@ -469,13 +463,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             _fmpz_mpoly_submul_array1_slong_1(p2, q, i - min3,
                                                             poly3, exp3, len3);
 
-            if (len >= *alloc)
-            {
-               p1 = (fmpz *) flint_realloc(p1, 2*(*alloc)*sizeof(fmpz));
-               e1 = (ulong *) flint_realloc(e1, 2*(*alloc)*sizeof(ulong));
-               flint_mpn_zero(p1 + *alloc, *alloc);
-               (*alloc) *= 2;
-            }
+            _fmpz_mpoly_fit_length(&p1, &e1, alloc, len + 1, 1);
             
             p1[len] = q;
             e1[len++] = i - min3;
@@ -533,13 +521,7 @@ big:
             _fmpz_mpoly_submul_array1_fmpz_1(p2, fq, i - min3,
                                                             poly3, exp3, len3);
 
-            if (len >= *alloc)
-            {
-               p1 = (fmpz *) flint_realloc(p1, 2*(*alloc)*sizeof(fmpz));
-               e1 = (ulong *) flint_realloc(e1, 2*(*alloc)*sizeof(ulong));
-               flint_mpn_zero(p1 + *alloc, *alloc);
-               (*alloc) *= 2;
-            }
+            _fmpz_mpoly_fit_length(&p1, &e1, alloc, len + 1, 1);
             
             fmpz_set(p1 + len, fq);
             e1[len++] = i - min3;

@@ -78,13 +78,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
       exp = heap[1].exp;
       k++;
 
-      if (k >= *allocq)
-      {
-         p1 = (fmpz *) flint_realloc(p1, 2*sizeof(fmpz)*(*allocq));
-         e1 = (ulong *) flint_realloc(e1, 2*sizeof(ulong)*(*allocq));
-         flint_mpn_zero(p1 + *allocq, *allocq);
-         (*allocq) *= 2;
-      }
+      _fmpz_mpoly_fit_length(&p1, &e1, allocq, k + 1, 1);
 
       c[0] = c[1] = c[2] = 0;
 
@@ -368,13 +362,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
       mpoly_monomial_set(exp, heap[1].exp, N);
       k++;
 
-      if (k >= *allocq)
-      {
-         p1 = (fmpz *) flint_realloc(p1, 2*sizeof(fmpz)*(*allocq));
-         e1 = (ulong *) flint_realloc(e1, 2*N*sizeof(ulong)*(*allocq));
-         flint_mpn_zero(p1 + *allocq, *allocq);
-         (*allocq) *= 2;
-      }
+      _fmpz_mpoly_fit_length(&p1, &e1, allocq, k + 1, N);
 
       c[0] = c[1] = c[2] = 0;
 

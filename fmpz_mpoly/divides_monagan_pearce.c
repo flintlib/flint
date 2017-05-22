@@ -78,13 +78,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
       exp = heap[1].exp;
       k++;
 
-      if (k >= *alloc)
-      {
-         p1 = (fmpz *) flint_realloc(p1, 2*sizeof(fmpz)*(*alloc));
-         e1 = (ulong *) flint_realloc(e1, 2*sizeof(ulong)*(*alloc));
-         flint_mpn_zero(p1 + *alloc, *alloc);
-         (*alloc) *= 2;
-      }
+      _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
       first = 1;
       d1 = 0;
@@ -375,13 +369,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
       exp = heap[1].exp;
       k++;
 
-      if (k >= *alloc)
-      {
-         p1 = (fmpz *) flint_realloc(p1, 2*sizeof(fmpz)*(*alloc));
-         e1 = (ulong *) flint_realloc(e1, 2*N*sizeof(ulong)*(*alloc));
-         flint_mpn_zero(p1 + *alloc, *alloc);
-         (*alloc) *= 2;
-      }
+      _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, N);
 
       first = 1;
       d1 = 0;
