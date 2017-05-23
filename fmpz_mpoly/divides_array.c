@@ -607,29 +607,8 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
    b3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
    maxb3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
 
-   i2[0] = 0;
-   j = 0;
-   for (i = 0; i < l2 - 1; i++)
-   {
-      while (j < len2 && i == (slong) (exp2[j] >> shift))
-         j++;
-
-      i2[i + 1] = j;
-      n2[i] = j - i2[i];
-   }
-   n2[l2 - 1] = len2 - j;
-
-   i3[0] = 0;
-   j = 0;
-   for (i = 0; i < l3 - 1; i++)
-   {
-      while (j < len3 && i == (slong) (exp3[j] >> shift))
-         j++;
-
-      i3[i + 1] = j;
-      n3[i] = j - i3[i];
-   }
-   n3[l3 - 1] = len3 - j;
+   mpoly_main_variable_terms1(i2, n2, exp2, l2, len2, num + 1, num + 1, bits);
+   mpoly_main_variable_terms1(i3, n3, exp3, l3, len3, num + 1, num + 1, bits);
 
    /* work out max bits for each coeff and optimal bits */
 

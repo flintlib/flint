@@ -450,6 +450,33 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
    return 1;
 }
 
+/* chunking */
+
+/*
+   Set i1[i] to the index of the i-th "coefficient" in variable k of num
+   variables, each taking the given number of bits in the exponent. This
+   assumes there are l1 "coefficients" in a list of len1 exponents.
+   Note this doesn't currently mask the relevant bits.
+*/ 
+MPOLY_INLINE
+void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
+                          slong l1, slong len1, slong k, slong num, slong bits)
+{
+   slong i, j = 0;
+   slong shift = FLINT_BITS - (num - k + 1)*bits;
+
+   i1[0] = 0;
+   for (i = 0; i < l1 - 1; i++)
+   {
+      while (j < len1 && i == (slong) (exp1[j] >> shift))
+         j++;
+
+      i1[i + 1] = j;
+      n1[i] = j - i1[i];
+   }
+   n1[l1 - 1] = len1 - j;
+}
+
 #ifdef __cplusplus
 }
 #endif
