@@ -59,36 +59,35 @@ void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     X1->c = anc;
 
-    fmpz_mat_sub(X1, A11, A21);
-    fmpz_mat_sub(X2, B22, B12);
+    fmpz_mat_add(X1, A22, A12);
+    fmpz_mat_add(X2, B22, B12);
     fmpz_mat_mul(C21, X1, X2);
 
-    fmpz_mat_add(X1, A21, A22);
-    fmpz_mat_sub(X2, B12, B11);
+    fmpz_mat_sub(X1, A22, A21);
+    fmpz_mat_sub(X2, B22, B21);
     fmpz_mat_mul(C22, X1, X2);
 
-    fmpz_mat_sub(X1, X1, A11);
-    fmpz_mat_sub(X2, B22, X2);
-    fmpz_mat_mul(C12, X1, X2);
+    fmpz_mat_add(X1, X1, A12);
+    fmpz_mat_add(X2, X2, B12);
+    fmpz_mat_mul(C11, X1, X2);
 
-    fmpz_mat_sub(X1, A12, X1);
-    fmpz_mat_mul(C11, X1, B22);
+    fmpz_mat_sub(X1, X1, A11);
+    fmpz_mat_mul(C12, X1, B12);
+    fmpz_mat_add(C12, C12, C22);
 
     X1->c = bnc;
-    fmpz_mat_mul(X1, A11, B11);
-    fmpz_mat_add(C12, X1, C12);
-    fmpz_mat_add(C21, C12, C21);
-    fmpz_mat_add(C12, C12, C22);
-    fmpz_mat_add(C22, C21, C22);
-    fmpz_mat_add(C12, C12, C11);
-    fmpz_mat_sub(X2, X2, B21);
-    fmpz_mat_mul(C11, A22, X2);
+    fmpz_mat_mul(X1, A12, B21);
+    fmpz_mat_add(C11, C11, X1);
+    fmpz_mat_sub(C12, C11, C12);
+    fmpz_mat_sub(C11, C21, C11);
+    fmpz_mat_sub(X2, X2, B11);
+    fmpz_mat_mul(C21, A21, X2);
 
     fmpz_mat_clear(X2);
 
-    fmpz_mat_sub(C21, C21, C11);
-    fmpz_mat_mul(C11, A12, B21);
-
+    fmpz_mat_sub(C21, C11, C21);
+    fmpz_mat_add(C22, C22, C11);
+    fmpz_mat_mul(C11, A11, B11);
     fmpz_mat_add(C11, X1, C11);
 
     fmpz_mat_clear(X1);
