@@ -29,233 +29,161 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
     }
     else if (n == 2)
     {
-        fmpz_t t, u;
+        fmpz_add(E(B, 0, 0), E(A, 0, 0), E(A, 1, 1));
 
-        fmpz_init(t);
-        fmpz_init(u);
-
-        fmpz_add(t, E(A, 0, 0), E(A, 1, 1));
-        fmpz_mul(u, E(A, 0, 1), E(A, 1, 0));
+        fmpz_mul(E(B, 0, 1), E(A, 0, 1), E(B, 0, 0));
+        fmpz_mul(E(B, 1, 0), E(A, 1, 0), E(B, 0, 0));
 
         fmpz_mul(E(B, 0, 0), E(A, 0, 0), E(A, 0, 0));
-        fmpz_add(E(B, 0, 0), E(B, 0, 0), u);
+        fmpz_mul(E(B, 1, 1), E(A, 0, 1), E(A, 1, 0));
+        fmpz_add(E(B, 0, 0), E(B, 0, 0), E(B, 1, 1));
 
-        fmpz_mul(E(B, 1, 1), E(A, 1, 1), E(A, 1, 1));
-        fmpz_add(E(B, 1, 1), E(B, 1, 1), u);
-
-        fmpz_mul(E(B, 0, 1), E(A, 0, 1), t);
-        fmpz_mul(E(B, 1, 0), E(A, 1, 0), t);
-
-        fmpz_clear(t);
-        fmpz_clear(u);
+        fmpz_addmul(E(B, 1, 1), E(A, 1, 1), E(A, 1, 1));
     }
     else if (n == 3)
     {
-        fmpz_t temp13, temp12, temp23;
+        fmpz_t temp23;
         
-        fmpz_init(temp13);
-        fmpz_init(temp12);
         fmpz_init(temp23);
        
-        fmpz_mul(temp13, E(A, 0, 2), E(A, 2, 0));
-        fmpz_mul(temp12, E(A, 0, 1), E(A, 1, 0));
+        fmpz_mul(E(B, 2, 2), E(A, 0, 2), E(A, 2, 0));
+        fmpz_mul(E(B, 1, 1), E(A, 0, 1), E(A, 1, 0));
         fmpz_mul(temp23, E(A, 1, 2), E(A, 2, 1));
 
-        fmpz_add(E(B, 0, 0), temp13, temp12);
+        fmpz_add(E(B, 0, 0), E(B, 2, 2), E(B, 1, 1));
         fmpz_addmul(E(B, 0, 0), E(A, 0, 0), E(A, 0, 0));
        
-        fmpz_add(E(B, 1, 1), temp23, temp12);
+        fmpz_add(E(B, 1, 1), E(B, 1, 1), temp23);
         fmpz_addmul(E(B, 1, 1), E(A, 1, 1), E(A, 1, 1));
         
-        fmpz_add(E(B, 2, 2), temp13, temp23);
+        fmpz_add(E(B, 2, 2), E(B, 2, 2), temp23);
         fmpz_addmul(E(B, 2, 2), E(A, 2, 2), E(A, 2, 2));
       
         
-        fmpz_add(temp12, E(A, 0, 0), E(A, 1, 1));
-        fmpz_add(temp13, E(A, 0, 0), E(A, 2, 2));
+        fmpz_add(E(B, 1, 2), E(A, 0, 0), E(A, 1, 1));
+        fmpz_add(E(B, 2, 1), E(A, 0, 0), E(A, 2, 2));
         fmpz_add(temp23, E(A, 1, 1), E(A, 2, 2));
         
-        fmpz_mul(E(B, 0, 1), temp12, E(A, 0, 1));
+        fmpz_mul(E(B, 0, 1), E(B, 1, 2), E(A, 0, 1));
         fmpz_addmul(E(B, 0, 1), E(A, 0, 2), E(A, 2, 1));
 
-        fmpz_mul(E(B, 0, 2), temp13, E(A, 0, 2));
+        fmpz_mul(E(B, 0, 2), E(B, 2, 1), E(A, 0, 2));
         fmpz_addmul(E(B, 0, 2), E(A, 0, 1), E(A, 1, 2));     
  
-        fmpz_mul(E(B, 1, 0), temp12, E(A, 1, 0));
+        fmpz_mul(E(B, 1, 0), E(B, 1, 2), E(A, 1, 0));
         fmpz_addmul(E(B, 1, 0), E(A, 2, 0), E(A, 1, 2));
 
         fmpz_mul(E(B, 1, 2), temp23, E(A, 1, 2));
         fmpz_addmul(E(B, 1, 2), E(A, 1, 0), E(A, 0, 2));
  
-        fmpz_mul(E(B, 2, 0), temp13, E(A, 2, 0));
+        fmpz_mul(E(B, 2, 0), E(B, 2, 1), E(A, 2, 0));
         fmpz_addmul(E(B, 2, 0), E(A, 2, 1), E(A, 1, 0));
  
         fmpz_mul(E(B, 2, 1), temp23, E(A, 2, 1));
         fmpz_addmul(E(B, 2, 1), E(A, 0, 1), E(A, 2, 0));
 
-        fmpz_clear(temp13);
         fmpz_clear(temp23);
-        fmpz_clear(temp12);
     }
     else
     {
+    slong a;
+    slong anr;
 
-        slong i,j;
+    fmpz_mat_t A11, A12, A21, A22;
+    fmpz_mat_t C11, C12, C21, C22;
+    fmpz_mat_t X1, X2;
 
-        fmpz_mat_t window11, window12, window21, window22;
-        fmpz_mat_t s1, s2, s3;
-        fmpz_mat_t p1, p2, p3, p5, p6;
+    a = A->r;
 
-        slong m = n, x, iseven = 1; 
+    anr = a / 2;
 
-        if (n % 2 == 1)
-        {
-            m = n - 1;
-            iseven = 0;
-        }
+    fmpz_mat_window_init(A11, A, 0, 0, anr, anr);
+    fmpz_mat_window_init(A12, A, 0, anr, anr, 2*anr);
+    fmpz_mat_window_init(A21, A, anr, 0, 2*anr, anr);
+    fmpz_mat_window_init(A22, A, anr, anr, 2*anr, 2*anr);
 
-        fmpz_mat_init(s1, m/2, m/2);
-        fmpz_mat_init(s2, m/2, m/2);
-        fmpz_mat_init(s3, m/2, m/2);
-        fmpz_mat_init(p1, m/2, m/2);
-        fmpz_mat_init(p2, m/2, m/2);
-        fmpz_mat_init(p3, m/2, m/2);
-        fmpz_mat_init(p5, m/2, m/2);
-        fmpz_mat_init(p6, m/2, m/2);
+    fmpz_mat_window_init(C11, B, 0, 0, anr, anr);
+    fmpz_mat_window_init(C12, B, 0, anr, anr, 2*anr);
+    fmpz_mat_window_init(C21, B, anr, 0, 2*anr, anr);
+    fmpz_mat_window_init(C22, B, anr, anr, 2*anr, 2*anr);
 
-        fmpz_mat_window_init(window11, A, 0, 0, m/2, m/2);
-        fmpz_mat_window_init(window12, A, 0, m/2, m/2, m);
-        fmpz_mat_window_init(window21, A, m/2, 0, m, m/2);
-        fmpz_mat_window_init(window22, A, m/2, m/2, m, m);
+    fmpz_mat_init(X1, anr, anr);
+    fmpz_mat_init(X2, anr, anr);
 
-        fmpz_mat_add(s1, window22, window12);
-        fmpz_mat_sqr(p1, s1);
+    fmpz_mat_add(X1, A22, A12);
+    fmpz_mat_sqr(C21, X1);
 
-        fmpz_mat_sub(s2, window22, window21);
-        fmpz_mat_sqr(p2, s2);
+    fmpz_mat_sub(X1, A22, A21);
+    fmpz_mat_sqr(C22, X1);
 
-        fmpz_mat_add(s3, s2, window12);
-        fmpz_mat_sqr(p3, s3);    
+    fmpz_mat_add(X1, X1, A12);
+    fmpz_mat_sqr(C11, X1);
 
-        fmpz_mat_sub(s1, s3, window11);
-        fmpz_mat_mul(p6, s1, window12);
-        fmpz_mat_mul(s3, window21, s1);
+    fmpz_mat_sub(X1, X1, A11);
+    fmpz_mat_mul(C12, X1, A12);
+    fmpz_mat_add(C12, C12, C22);
 
-        fmpz_mat_mul(p5, window12, window21);
-        fmpz_mat_add(s1, p3, p5);
-        fmpz_mat_sub(s2, p1, s1);
+    fmpz_mat_mul(X2, A12, A21);
+    fmpz_mat_add(C11, C11, X2);
+    fmpz_mat_sub(C12, C11, C12);
+    fmpz_mat_sub(C11, C21, C11);
+    fmpz_mat_mul(C21, A21, X1);
 
-        if (iseven == 1)
-        {
-            for (i = n/2; i < n; i++)
-            {
-                for (j = 0; j < n/2; j++)
-                {
-                    fmpz_sub(E(B, i, j), E(s2, i - n/2, j), E(s3, i - n/2, j));
-                }
-            }
+    fmpz_mat_clear(X1);
 
-            fmpz_mat_sub(s3, s1, p2);
-            fmpz_mat_sqr(s1, window11);
+    fmpz_mat_sub(C21, C11, C21);
+    fmpz_mat_add(C22, C22, C11);
+    fmpz_mat_sqr(C11, A11);
+    fmpz_mat_add(C11, C11, X2); /* C11 = P4 + P5 */
 
-            for (i = 0; i < n/2; i++)
-            {
-                for (j = 0; j < n/2; j++)
-                {
-                    fmpz_add(E(B, i, j), E(s1, i, j), E(p5, i, j));
-                }
-            }
+    fmpz_mat_clear(X2);
 
-            for (i = n/2; i < n; i++)
-            {
-                for (j = n/2; j < n; j++)
-                {
-                    fmpz_add(E(B, i, j), E(p2, i - n/2, j - n/2), E(s2, i - n/2, j - n/2));
-                }
-            }
+    fmpz_mat_window_clear(A11);
+    fmpz_mat_window_clear(A12);
+    fmpz_mat_window_clear(A21);
+    fmpz_mat_window_clear(A22);
 
-            for (i = 0; i < n/2; i++)
-            {
-                for (j = n/2; j < n; j++)
-                {
-                    fmpz_sub(E(B, i, j), E(s3, i, j - n/2), E(p6, i, j - n/2) );
-                }
-            }
-        }
-        else
-        {
-            for (i = 0; i < n; i++)
-            {
-                fmpz_mul(E(B, n - 1, i), E(A, n - 1, 0), E(A, 0, i));
-                for (x = 1; x < n; x++)
-                {
-                    fmpz_addmul(E(B, n - 1, i), E(A, n - 1, x), E(A, x, i));
-                }
-            }
+    fmpz_mat_window_clear(C11);
+    fmpz_mat_window_clear(C12);
+    fmpz_mat_window_clear(C21);
+    fmpz_mat_window_clear(C22);
 
-            for (i = 0; i < n; i++)
-            {
-                fmpz_mul(E(B, i, n - 1), E(A, 0, n - 1), E(A, i, 0));
-                for (x = 1; x < n; x++)
-                {
-                    fmpz_addmul(E(B, i, n - 1), E(A, x, n - 1), E(A, i, x));
-                }
-            }
+    if (a > 2*anr)
+    {
+        fmpz_mat_t Bc, Cc;
+        fmpz_mat_window_init(Bc, A, 0, 2*anr, a, a);
+        fmpz_mat_window_init(Cc, B, 0, 2*anr, a, a);
+        fmpz_mat_mul(Cc, A, Bc);
+        fmpz_mat_window_clear(Bc);
+        fmpz_mat_window_clear(Cc);
+    }
 
+    if (a > 2*anr)
+    {
+        fmpz_mat_t Ar, Cr;
+        fmpz_mat_window_init(Ar, A, 2*anr, 0, a, a-1);
+        fmpz_mat_window_init(Cr, B, 2*anr, 0, a, a-1);
+        fmpz_mat_mul(Cr, Ar, A);
+        fmpz_mat_window_clear(Ar);
+        fmpz_mat_window_clear(Cr);
+    }
 
-            for (i = m/2; i < m; i++)
-            {
-                for (j = 0; j < m/2; j++)
-                {
-                    fmpz_sub(E(B, i, j), E(s2, i - m/2, j), E(s3, i - m/2, j)); 
-                    fmpz_addmul(E(B, i, j), E(A, i, n - 1), E(A, n - 1, j));
-                }
-            }
+    if (a > 2*anr)
+    {
+        fmpz_mat_t Ac, Br, Cb, tmp;
 
-            fmpz_mat_sub(s3, s1, p2);
-            fmpz_mat_sqr(s1, window11);
+        fmpz_mat_window_init(Ac, A, 0, 2*anr, 2*anr, a);
+        fmpz_mat_window_init(Br, A, 2*anr, 0, a, 2*anr);
+        fmpz_mat_window_init(Cb, B, 0, 0, 2*anr, 2*anr);
 
+        fmpz_mat_init(tmp, 2*anr, 2*anr);
+        fmpz_mat_mul(tmp, Ac, Br);
+        fmpz_mat_add(Cb, Cb, tmp);
+        fmpz_mat_clear(tmp);
+        fmpz_mat_window_clear(Ac);
+        fmpz_mat_window_clear(Br);
+        fmpz_mat_window_clear(Cb);
+    }
 
-            for (i = 0; i < m/2; i++)
-            {
-                for (j = 0; j < m/2; j++)
-                {
-                    fmpz_add(E(B, i, j), E(s1, i, j), E(p5, i, j)); 
-                    fmpz_addmul(E(B, i, j), E(A, i, n - 1), E(A, n - 1, j));
-                }
-            }
-
-            for (i = m/2; i < m; i++)
-            {
-                for (j = m/2; j < m; j++)
-                {
-                    fmpz_add(E(B, i, j), E(p2, i - m/2, j - m/2), E(s2, i - m/2, j - m/2)); 
-                    fmpz_addmul(E(B, i, j), E(A, i, n - 1), E(A, n - 1, j));
-                }
-            }
-
-            for (i = 0; i < m/2; i++)
-            {
-                for (j = m/2; j < m; j++)
-                {
-                    fmpz_sub(E(B, i, j), E(s3, i, j - m/2), E(p6, i, j - m/2)); 
-                    fmpz_addmul(E(B, i, j), E(A, i, n - 1), E(A, n - 1, j));
-                }
-            }
-
-        }
-
-        fmpz_mat_window_clear(window11);
-        fmpz_mat_window_clear(window12);
-        fmpz_mat_window_clear(window21);
-        fmpz_mat_window_clear(window22);
-        fmpz_mat_clear(s1);
-        fmpz_mat_clear(s2);
-        fmpz_mat_clear(s3);
-        fmpz_mat_clear(p1);
-        fmpz_mat_clear(p2);
-        fmpz_mat_clear(p3);
-        fmpz_mat_clear(p5);
-        fmpz_mat_clear(p6);
     }
 }
