@@ -19,6 +19,19 @@
 #define BLOCK 128
 #define MAX_ARRAY_SIZE (WORD(300000))
 
+/*
+   Addmul into a dense array poly1, given polys with coefficients
+   fitting into a word, and exponents tightly packed with mixed
+   bases equal to the largest exponent for each variable, e.g.
+   the input polys have exponents of the form
+   a_0 + a_1*b1 + a_2*b_2*b_2 + .... where b_0, b_1, b_2, etc, are
+   the bases, which are equal to the largest possible exponent for
+   each of the respective variables in the exponent. These exponents
+   are use as array indices in the output polynomial. The
+   output poly is assumed to fit into one word per coefficient.
+   The input polynomials are broken into blocks to improve
+   cache efficiency.
+*/
 void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
@@ -46,6 +59,19 @@ void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1,
    }
 }
 
+/*
+   Addmul into a dense array poly1, given polys with coefficients
+   fitting into a word, and exponents tightly packed with mixed
+   bases equal to the largest exponent for each variable, e.g.
+   the input polys have exponents of the form
+   a_0 + a_1*b1 + a_2*b_2*b_2 + .... where b_0, b_1, b_2, etc, are
+   the bases, which are equal to the largest possible exponent for
+   each of the respective variables in the exponent. These exponents
+   are use as array indices in the output polynomial. The
+   output poly is assumed to fit into three words per coefficient.
+   The input polynomials are broken into blocks to improve
+   cache efficiency.
+*/
 void _fmpz_mpoly_addmul_array1_slong(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
@@ -79,6 +105,19 @@ void _fmpz_mpoly_addmul_array1_slong(ulong * poly1,
    }
 }
 
+/*
+   Addmul into a dense array poly1, given polys with coefficients
+   fitting into a word, and exponents tightly packed with mixed
+   bases equal to the largest exponent for each variable, e.g.
+   the input polys have exponents of the form
+   a_0 + a_1*b1 + a_2*b_2*b_2 + .... where b_0, b_1, b_2, etc, are
+   the bases, which are equal to the largest possible exponent for
+   each of the respective variables in the exponent. These exponents
+   are use as array indices in the output polynomial. The
+   output poly is assumed to fit into two words per coefficient.
+   The input polynomials are broken into blocks to improve
+   cache efficiency.
+*/
 void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
@@ -110,6 +149,19 @@ void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
    }
 }
 
+/*
+   Addmul into a dense array poly1, given polys with coefficients
+   fitting into a word, and exponents tightly packed with mixed
+   bases equal to the largest exponent for each variable, e.g.
+   the input polys have exponents of the form
+   a_0 + a_1*b1 + a_2*b_2*b_2 + .... where b_0, b_1, b_2, etc, are
+   the bases, which are equal to the largest possible exponent for
+   each of the respective variables in the exponent. These exponents
+   are use as array indices in the output polynomial. The
+   output poly is unrestricted, having multiprecision coefficients.
+   The input polynomials are broken into blocks to improve
+   cache efficiency.
+*/
 void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1, 
                  const fmpz * poly2, const ulong * exp2, slong len2,
                            const fmpz * poly3, const ulong * exp3, slong len3)
@@ -138,7 +190,16 @@ void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1,
    }
 }
 
-/* this function destroys poly2 and starts writing at index k */
+/* 
+   Convert a polynomial in dense array format to an fmpz_mpoly with
+   the given number of bits per exponent field. This function destroys
+   poly2 and starts writing poly1 at index k. The function may reallocate
+   its output. The array "mults" is a list of bases uses in encoding
+   the array indices from the exponents. The value num is the number of
+   fields in the output exponent vectors, also the number of entries in
+   mults. Exponents are assumed to be packed into a single word. The
+   array, poly2 is assumed to have three words per coefficient.
+*/
 slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc, 
               ulong * poly2, const slong * mults, slong num, slong bits, slong k)
 {
@@ -148,6 +209,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
+   /* exponents take up this many bits */
    slong shift = FLINT_BITS - num*bits;
    TMP_INIT;
 
@@ -155,25 +217,34 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
+   /*
+      compute products 1, b0, b0*b1, b0*b1*b2 ...
+      from list of bases b0, b1, b2, ...
+   */
    prods[0] = 1;
    for (i = 1; i <= num; i++)
      prods[i] = mults[i - 1]*prods[i - 1];
    
+   /* for each coeff in array */
    for (i = 0; i < prods[num]; i++)
    {
       c = poly2 + i*3;
 
+      /* if coeff is nonzero */
       if (c[0] != 0 || c[1] != 0 || c[2] != 0)
       {
          _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
          
+         /* compute exponent from index */
          for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
+         /* shift exponent vector into place */
          e1[k] = exp << shift;
 
+         /* set coefficient */
          fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
          
          k++;
@@ -188,7 +259,16 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    return k;
 }
 
-/* this function destroys poly2 and starts writing at index k */
+/*
+   Convert a polynomial in dense array format to an fmpz_mpoly with
+   the given number of bits per exponent field. This function destroys
+   poly2 and starts writing poly1 at index k. The function may reallocate
+   its output. The array "mults" is a list of bases uses in encoding
+   the array indices from the exponents. The value num is the number of
+   fields in the output exponent vectors, also the number of entries in
+   mults. Exponents are assumed to be packed into a single word. The
+   array, poly2 is assumed to have two words per coefficient.
+*/
 slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc, 
               ulong * poly2, const slong * mults, slong num, slong bits, slong k)
 {
@@ -198,6 +278,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
+   /* exponents take up this many bits */
    slong shift = FLINT_BITS - num*bits;
    TMP_INIT;
 
@@ -205,25 +286,34 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
+   /*
+      compute products 1, b0, b0*b1, b0*b1*b2 ...
+      from list of bases b0, b1, b2, ...
+   */
    prods[0] = 1;
    for (i = 1; i <= num; i++)
      prods[i] = mults[i - 1]*prods[i - 1];
    
+   /* for each coeff in array */
    for (i = 0; i < prods[num]; i++)
    {
       c = poly2 + i*2;
 
+      /* if coeff is nonzero */
       if (c[0] != 0 || c[1] != 0)
       {
          _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
          
+         /* compute exponent from index */
          for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
+         /* shift exponent vector into place */
          e1[k] = exp << shift;
 
+         /* set coefficient */
          fmpz_set_signed_uiui(p1 + k, c[1], c[0]);
          
          k++;
@@ -238,7 +328,16 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
    return k;
 }
 
-/* this function destroys poly2 and starts writing at index k */
+/*
+   Convert a polynomial in dense array format to an fmpz_mpoly with
+   the given number of bits per exponent field. This function destroys
+   poly2 and starts writing poly1 at index k. The function may reallocate
+   its output. The array "mults" is a list of bases uses in encoding
+   the array indices from the exponents. The value num is the number of
+   fields in the output exponent vectors, also the number of entries in
+   mults. Exponents are assumed to be packed into a single word. The
+   array, poly2 is assumed to have three words per coefficient.
+*/
 slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc, 
               ulong * poly2, const slong * mults, slong num, slong bits, slong k)
 {
@@ -248,6 +347,7 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
+   /* exponents take up this many bits */
    slong shift = FLINT_BITS - num*bits;
    TMP_INIT;
 
@@ -255,25 +355,34 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
+   /*
+      compute products 1, b0, b0*b1, b0*b1*b2 ...
+      from list of bases b0, b1, b2, ...
+   */
    prods[0] = 1;
    for (i = 1; i <= num; i++)
      prods[i] = mults[i - 1]*prods[i - 1];
    
+   /* for each coeff in array */
    for (i = 0; i < prods[num]; i++)
    {
       c = poly2 + i;
 
+      /* if coeff is nonzero */
       if (c[0] != 0)
       {
          _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
          
+         /* compute exponent from index */
          for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
+         /* shift exponent vector into place */
          e1[k] = exp << shift;
          
+         /* set coefficient */
          fmpz_set_si(p1 + k, c[0]);
          
          k++;
@@ -288,6 +397,17 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    return k;
 }
 
+/*
+   Convert a polynomial in dense array format to an fmpz_mpoly with
+   the given number of bits per exponent field. This function destroys
+   poly2 and starts writing poly1 at index k. The function may reallocate
+   its output. The array "mults" is a list of bases uses in encoding
+   the array indices from the exponents. The value num is the number of
+   fields in the output exponent vectors, also the number of entries in
+   mults. Exponents are assumed to be packed into a single word. The
+   array, poly2 has no restrictions with respect to coefficients; they
+   may be multiprecision integers.
+*/
 slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc, 
                fmpz * poly2, const slong * mults, slong num, slong bits, slong k)
 {
@@ -297,6 +417,7 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
+   /* exponents take up this many bits */
    slong shift = FLINT_BITS - num*bits;
    TMP_INIT;
 
@@ -304,25 +425,34 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
+   /*
+      compute products 1, b0, b0*b1, b0*b1*b2 ...
+      from list of bases b0, b1, b2, ...
+   */
    prods[0] = 1;
    for (i = 1; i <= num; i++)
       prods[i] = mults[i - 1]*prods[i - 1];
 
+   /* for each coeff in array */
    for (i = 0; i < prods[num]; i++)
    {
       c = poly2 + i;
 
+      /* if coeff is nonzero */
       if (!fmpz_is_zero(c))
       {
          _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
          
+         /* compute exponent from index */
          for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
+         /* shift exponent vector into place */
          e1[k] = exp << shift;
          
+         /* set coefficient */
          fmpz_set(p1 + k, poly2 + i);
          
          k++;
@@ -337,6 +467,16 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    return k;
 }
 
+/*
+   Compute two bounds for the i-th multivariate "coefficient" (chunk) of
+   the chunked polynomial. The first bound, stored at the i-th location
+   in the  array b1 is the number of bits of the sum of the absolute value
+   of the coefficients of the chunk. The second, stored in maxb1 is the
+   maximum absolute value of the coefficients in the chunk. The array i1
+   contains the starting indices of the chunks within the polynomial poly1,
+   and the array n1 contains the corresponding lengths. Thus the i-th chunk
+   starts at index i1[i] and has length n1[i].
+*/
 void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
                            const fmpz * poly1, slong * i1, slong * n1, slong i)
 {
@@ -345,17 +485,21 @@ void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
 
    maxb1[i] = 0;
 
+   /* for each coeff in the chunk */
    for (j = 0; j < n1[i]; j++)
    {
-      slong bits = fmpz_get_si(poly1 + i1[i] + j);
-      ulong ubits = (ulong) FLINT_ABS(bits);
+      slong c = fmpz_get_si(poly1 + i1[i] + j);
+      ulong uc = (ulong) FLINT_ABS(c);
 
-      if (FLINT_BIT_COUNT(ubits) > maxb1[i])
-         maxb1[i] = FLINT_BIT_COUNT(ubits);
+      /* compute max abs value of the coeff */
+      if (FLINT_BIT_COUNT(uc) > maxb1[i])
+         maxb1[i] = FLINT_BIT_COUNT(uc);
 
-      add_ssaaaa(hi, lo, hi, lo, UWORD(0), ubits);
+      /* sum the absolute values of the coeffs */
+      add_ssaaaa(hi, lo, hi, lo, UWORD(0), uc);
    }
 
+   /* write out the number of bits */
    if (hi != 0)
       b1[i] = FLINT_BIT_COUNT(hi) + FLINT_BITS;
    else
@@ -363,11 +507,13 @@ void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
 }
 
 /*
-   use array multiplication to set poly1 to poly2*poly3 in num + 1 variables,
-   given a list of multipliers to tightly pack exponents and a number of bits
-   for the fields of the exponents of the result, assuming no aliasing
-   classical multiplication in main variable, array multiplication for
-   multivariate coefficients
+   Use dense array multiplication to set poly1 to poly2*poly3 in num + 1
+   variables, given a list of multipliers to tightly pack exponents and a
+   number of bits for the fields of the exponents of the result, assuming
+   no aliasing. Classical multiplication in main variable, array
+   multiplication for multivariate coefficients in remaining num variables.
+   The array "mults" is a list of bases to be used in encoding the array
+   indices from the exponents. The function reallocates its output. 
 */
 slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
         slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
@@ -381,10 +527,15 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
    int small;
    TMP_INIT;
 
+   /*
+      compute products 1, b0, b0*b1, b0*b1*b2 ...
+      from list of bases b0, b1, b2, ...
+   */
    prod = 1;
    for (i = 0; i < num; i++)
       prod *= mults[i];
 
+   /* compute lengths of poly2 and poly3 in chunks */
    l2 = 1 + (slong) (exp2[len2 - 1] >> shift);
    l3 = 1 + (slong) (exp3[len3 - 1] >> shift);
 
@@ -401,19 +552,20 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
    maxb2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
    maxb3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
    
+   /* compute chunks of the input polys with respect to the main variable */
+
    mpoly_main_variable_terms1(i2, n2, exp2, l2, len2, num + 1, num + 1, bits);
    mpoly_main_variable_terms1(i3, n3, exp3, l3, len3, num + 1, num + 1, bits);
 
-   /* pack input exponents tightly */
+   /* pack input exponents tightly with mixed bases specified by "mults" */
 
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
    mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 1, bits);
-
    mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 1, bits);
 
-   /* work out max bits for each coeff and optimal bits */
+   /* work out max bits for each chunk and optimal bits */
 
    for (i = 0; i < l2; i++)
    {
@@ -431,24 +583,29 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
          bits3 = maxb3[i];
    }
 
+   /* whether the output coefficients are "small" */
    small = bits2 <= (FLINT_BITS - 2) &&
            bits3 <= (FLINT_BITS - 2);
 
-   /* classical multiplication one output coeff at a time */
+   /* classical multiplication one output chunk at a time */
 
-   l1 = l2 + l3 - 1;
+   l1 = l2 + l3 - 1; /* length of output in chunks */
 
-   if (small) /* not used in large case */
+   if (small)
    {
       p1 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
 
+      /* for each output chunk */
       for (i = 0; i < l1; i++)
       {
          slong num1 = 0;
          bits1 = 0;
 
+         /* compute bound on coeffs of output chunk */
+         
          for (j = 0; j < l2 && j <= i; j++)
          {
+            /* for each cross product of chunks */
             if (i - j < l3)
             {
                bits1 = FLINT_MAX(bits1, FLINT_MIN(b2[j] + maxb3[i - j], b3[j] + maxb2[i - j]));
@@ -458,11 +615,13 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
          bits1 += FLINT_BIT_COUNT(num1) + 1; /* includes one bit for sign */
 
+         /* output coeffs fit in one word */
          if (bits1 <= FLINT_BITS)
          {
             for (j = 0; j < prod; j++)
                p1[j] = 0;
 
+            /* addmuls for each cross product of chunks */
             for (j = 0; j < l2 && j <= i; j++)
             {
                if (i - j < l3)
@@ -474,18 +633,21 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
                }
             }
 
+            /* convert array to fmpz_poly */
             len = _fmpz_mpoly_from_ulong_array1(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, k) - k;
 
+            /* insert main variable into exponents */
             for (j = 0; j < len; j++)
                (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
 
             k += len;
-         } else if (bits1 <= 2*FLINT_BITS)
+         } else if (bits1 <= 2*FLINT_BITS) /* output coeffs fit in two words */        
          {
             for (j = 0; j < 2*prod; j++)
                p1[j] = 0;
 
+            /* addmuls for each cross product of chunks */
             for (j = 0; j < l2 && j <= i; j++)
             {
                if (i - j < l3)
@@ -497,18 +659,21 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
                }
             }
 
+            /* convert array to fmpz_poly */
             len = _fmpz_mpoly_from_ulong_array2(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, k) - k;
 
+            /* insert main variable into exponents */
             for (j = 0; j < len; j++)
                (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
 
             k += len;
-         } else
+         } else /* output coeffs fit in three words */
          {
             for (j = 0; j < 3*prod; j++)
                p1[j] = 0;
 
+            /* addmuls for each cross product of chunks */
             for (j = 0; j < l2 && j <= i; j++)
             {
                if (i - j < l3)
@@ -520,24 +685,28 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
                }
             }
 
+            /* convert array to fmpz_poly */
             len = _fmpz_mpoly_from_ulong_array(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, k) - k;
 
+            /* insert main variable into exponents */
             for (j = 0; j < len; j++)
                (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
 
             k += len;
          }
       }
-   } else
+   } else /* output coeffs may be arbitrary size */
    {
       fmpz * p1 = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
      
+      /* for each output chunk */
       for (i = 0; i < l1; i++)
       {
          for (j = 0; j < prod; j++)
             p1[j] = 0;
 
+         /* addmuls for each cross product of chunks */
          for (j = 0; j < l2 && j <= i; j++)
          {
             if (i - j < l3)
@@ -549,9 +718,11 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
              }
           }
 
+          /* convert array to fmpz_poly */
           len = _fmpz_mpoly_from_fmpz_array(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, k) - k;
 
+          /* insert main variable into exponents */
           for (j = 0; j < len; j++)
              (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
 
@@ -565,9 +736,11 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 }
 
 /*
-   use array multiplication to set poly1 to poly2*poly3 in num variables, given
+   Use array multiplication to set poly1 to poly2*poly3 in num variables, given
    a list of multipliers to tightly pack exponents and a number of bits for the
-   fields of the exponents of the result, assuming no aliasing
+   fields of the exponents of the result, assuming no aliasing. The array "mults"
+   is a list of bases to be used in encoding the array indices from the exponents.
+   The function reallocates its output.
 */
 slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
                          const fmpz * poly2, const ulong * exp2, slong len2, 
@@ -581,23 +754,30 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    ulong hi = 0, lo = 0; /* two words to count bits */
    TMP_INIT;
 
+   /*
+      compute products 1, b0, b0*b1, b0*b1*b2 ...
+      from list of bases b0, b1, b2, ...
+   */
    prod = 1;
    for (i = 0; i < num; i++)
       prod *= mults[i];
 
+   /* if array size will be too large, chunk the polynomials */
    if (prod > MAX_ARRAY_SIZE)
       return _fmpz_mpoly_mul_array_chunked(poly1, exp1, alloc,
                    poly2, exp2, len2, poly3, exp3, len3, mults, num - 1, bits);
 
    TMP_START;
 
+   /* pack input exponents tightly with mixed bases specified by "mults" */
+   
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
    mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 0, bits);
-
    mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 0, bits);
 
+   /* compute bound on output bits and whether they are "small" */
    bits2 = _fmpz_vec_max_bits(poly2, len2);
    bits3 = _fmpz_vec_max_bits(poly3, len3);
 
@@ -608,8 +788,10 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    bits1 = -1; /* not used in large case */
 
+   /* if output coeffs are "small" */
    if (small)
    {
+      /* compute bound : sum of absolute value of coeffs of shorter poly */
       if (len2 < len3)
       {
          for (i = 0; i < len2; i++)
@@ -632,12 +814,14 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
          bits1 = FLINT_ABS(bits2) + sign;
       }
 
+      /* compute number of bits of sum of absolute values */
       if (hi != 0)
          bits1 += FLINT_BIT_COUNT(hi) + FLINT_BITS;
       else
          bits1 += FLINT_BIT_COUNT(lo);
    } 
 
+   /* output coeffs fit in one word */
    if (small && bits1 <= FLINT_BITS)
    {
       ulong * p1 = (ulong *) TMP_ALLOC(prod*sizeof(ulong));
@@ -645,44 +829,52 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
       for (i = 0; i < prod; i++)
          p1[i] = 0;
 
+      /* array multiplication */
       _fmpz_mpoly_addmul_array1_slong1(p1, 
                          (slong *) poly2, e2, len2, (slong *) poly3, e3, len3);
 
+      /* convert to fmpz_poly */
       len = _fmpz_mpoly_from_ulong_array1(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, 0);
-   } else if (small && bits1 <= 2*FLINT_BITS)
+   } else if (small && bits1 <= 2*FLINT_BITS) /* output coeffs in two words */
    {
       ulong * p1 = (ulong *) TMP_ALLOC(2*prod*sizeof(ulong));
 
       for (i = 0; i < 2*prod; i++)
          p1[i] = 0;
 
+      /* array multiplication */
       _fmpz_mpoly_addmul_array1_slong2(p1, 
                          (slong *) poly2, e2, len2, (slong *) poly3, e3, len3);
 
+      /* convert to fmpz_poly */
       len = _fmpz_mpoly_from_ulong_array2(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, 0);
-   } else if (small)
+   } else if (small) /* three words per output coeff */
    {
       ulong * p1 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
 
       for (i = 0; i < 3*prod; i++)
          p1[i] = 0;
 
+      /* array multiplication */
       _fmpz_mpoly_addmul_array1_slong(p1, 
                          (slong *) poly2, e2, len2, (slong *) poly3, e3, len3);
 
+      /* convert to fmpz_poly */
       len = _fmpz_mpoly_from_ulong_array(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, 0);      
-   } else
+   } else /* multiprecision output coeffs */
    {
       fmpz * p1 = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
 
       for (i = 0; i < prod; i++)
          p1[i] = 0;
 
+      /* array multiplication */
       _fmpz_mpoly_addmul_array1_fmpz(p1, poly2, e2, len2, poly3, e3, len3);
 
+      /* convert to fmpz_poly */
       len = _fmpz_mpoly_from_fmpz_array(poly1, exp1, alloc, 
                                                       p1, mults, num, bits, 0);
    }
@@ -705,6 +897,7 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_INIT;
 
+   /* input poly is zero */
    if (poly2->length == 0 || poly3->length == 0)
    {
       fmpz_mpoly_zero(poly1, ctx);
@@ -714,6 +907,7 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_START;
 
+   /* compute maximum exponents for each variable */
    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
    max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
 
@@ -729,24 +923,29 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          max3 = max_degs3[i];
    }
 
+   /* check that exponents won't overflow a word */
    max = max2 + max3;
    if (max < max2 || 0 > (slong) max)
       flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_array");
 
+   /* compute number of bits required for output exponents */
    bits = FLINT_BIT_COUNT(max);
 
    exp_bits = 8;
    while (bits >= exp_bits)
       exp_bits *= 2;
 
+   /* number of words for exponents */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
+   /* array multiplication expects each exponent vector in one word */
    if (N != 1)
    {
       res = 0;
       goto cleanup;
    }
 
+   /* compute bounds on output exps, used as mixed bases for packing exps */
    array_size = 1;
    for (i = 0; i < ctx->n - 1; i++)
    {
@@ -755,12 +954,14 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    }
    max_degs2[ctx->n - 1] += max_degs3[ctx->n - 1] + 1;
 
+   /* if exponents too large for array multiplication, exit silently */
    if (array_size > MAX_ARRAY_SIZE)
    {
       res = 0;
       goto cleanup;
    }
 
+   /* expand input exponents to same number of bits as output */
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->length, ctx->n, poly2->bits);
 
@@ -771,6 +972,7 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    
    free3 = exp3 != poly3->exps;
 
+   /* handle aliasing and do array multiplication */
    if (poly1 == poly2 || poly1 == poly3)
    {
       fmpz_mpoly_t temp;
