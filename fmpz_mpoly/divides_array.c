@@ -436,7 +436,9 @@ void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
    the bases, which are equal to the largest possible exponent for
    each of the respective variables in the exponent. There are assumed to
    be "num" variables and the bases b_i are passed in the array "mults".
-   The function reallocates its output.
+   The function reallocates its output. The quotient poly is not assumed
+   to be zero on input. The quotient are appended to the existing terms in
+   that polys.
 */
 slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                                            slong * alloc, slong len1, 
@@ -755,9 +757,9 @@ cleanup:
    aliasing. Classical exact division in main variable, array multiplication
    (submul) for multivariate coefficients in remaining num variables. 
    The array "mults" is a list of bases to be used in encoding the array
-   indices from the exponents. The function reallocates its output. 
-   The function reallocates its output and returns the length of its output if
-   the quotient is exact, or zero if not. It is assumed that poly2 is not zero.
+   indices from the exponents. The function reallocates its output and returns
+   the length of its output if the quotient is exact, or zero if not. It is
+   assumed that poly2 is not zero.
 */
 slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
@@ -832,7 +834,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
    small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
-   /* make copy of first coeff/chunk of poly2 */
+   /* alloc space for copy of coeff/chunk of poly2 */
 
    temp = (fmpz *) flint_calloc(n2[0] + 1, sizeof(fmpz));
    texp = (ulong *) flint_malloc((n2[0] + 1)*sizeof(ulong));
@@ -893,7 +895,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
             }
 
-            /* convert quotient chunk from array format */
+            /* convert chunk from array format */
             tlen = _fmpz_mpoly_from_ulong_array1(&temp, &texp, &talloc, 
                                                       p2, mults, num, bits, 0);
          } else if (bits1 <= 2*FLINT_BITS) /* intermed comps fit two words */
@@ -915,7 +917,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
             }
 
-            /* convert quotient chunk from array format */
+            /* convert chunk from array format */
             tlen = _fmpz_mpoly_from_ulong_array2(&temp, &texp, &talloc, 
                                                       p2, mults, num, bits, 0);
          } else /* intermed comps fit three words */
@@ -1121,12 +1123,13 @@ cleanup:
 }
 
 /*
-   Use array exact division to set poly1 to poly2/poly3 in num variables, given
-   a list of multipliers to tightly pack exponents and a number of bits for the
-   fields of the exponents of the result, assuming no aliasing. The array "mults"
-   is a list of bases to be used in encoding the array indices from the exponents.
-   The function reallocates its output and returns the length of its output if
-   the quotient is exact, or zero if not. It is assumed that poly2 is not zero.
+   Use dense array exact division to set poly1 to poly2/poly3 in num variables,
+   given a list of multipliers to tightly pack exponents and a number of bits
+   for the fields of the exponents of the result, assuming no aliasing. The
+   array "mults" is a list of bases to be used in encoding the array indices
+   from the exponents. The function reallocates its output and returns the
+   length of its output if the quotient is exact, or zero if not. It is assumed
+   that poly2 is not zero.
 */
 slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
                            const fmpz * poly2, const ulong * exp2, slong len2,
@@ -1238,7 +1241,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    /* number of words for exponents */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
-   /* array multiplication expects each exponent vector in one word */
+   /* array division expects each exponent vector in one word */
    if (N != 1)
       goto cleanup;
 
