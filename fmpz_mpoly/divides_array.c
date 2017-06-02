@@ -20,6 +20,19 @@
 #define BLOCK 128
 #define MAX_ARRAY_SIZE (WORD(300000))
 
+/*
+   Submul into a dense array poly1, given polys with coefficients
+   fitting into a word, and exponents tightly packed with mixed
+   bases equal to the largest exponent for each variable, e.g.
+   the input polys have exponents of the form
+   a_0 + a_1*b1 + a_2*b_2*b_2 + .... where b_0, b_1, b_2, etc, are
+   the bases, which are equal to the largest possible exponent for
+   each of the respective variables in the exponent. These exponents
+   are use as array indices in the output polynomial. The
+   output poly is assumed to fit into three words per coefficient.
+   The input polynomials are broken into blocks to improve
+   cache efficiency.
+*/
 void _fmpz_mpoly_submul_array1_slong(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
@@ -53,6 +66,19 @@ void _fmpz_mpoly_submul_array1_slong(ulong * poly1,
    }
 }
 
+/*
+   Submul into a dense array poly1, given polys with coefficients
+   fitting into a word, and exponents tightly packed with mixed
+   bases equal to the largest exponent for each variable, e.g.
+   the input polys have exponents of the form
+   a_0 + a_1*b1 + a_2*b_2*b_2 + .... where b_0, b_1, b_2, etc, are
+   the bases, which are equal to the largest possible exponent for
+   each of the respective variables in the exponent. These exponents
+   are use as array indices in the output polynomial. The
+   output poly is assumed to fit into two words per coefficient.
+   The input polynomials are broken into blocks to improve
+   cache efficiency.
+*/
 void _fmpz_mpoly_submul_array1_slong2(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
@@ -84,6 +110,19 @@ void _fmpz_mpoly_submul_array1_slong2(ulong * poly1,
    }
 }
 
+/*
+   Submul into a dense array poly1, given polys with coefficients
+   fitting into a word, and exponents tightly packed with mixed
+   bases equal to the largest exponent for each variable, e.g.
+   the input polys have exponents of the form
+   a_0 + a_1*b1 + a_2*b_2*b_2 + .... where b_0, b_1, b_2, etc, are
+   the bases, which are equal to the largest possible exponent for
+   each of the respective variables in the exponent. These exponents
+   are use as array indices in the output polynomial. The
+   output poly is assumed to fit into one word per coefficient.
+   The input polynomials are broken into blocks to improve
+   cache efficiency.
+*/
 void _fmpz_mpoly_submul_array1_slong1(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
@@ -113,6 +152,19 @@ void _fmpz_mpoly_submul_array1_slong1(ulong * poly1,
    }
 }
 
+/*
+   Addmul into a dense array poly1, given polys with coefficients
+   fitting into a word, and exponents tightly packed with mixed
+   bases equal to the largest exponent for each variable, e.g.
+   the input polys have exponents of the form
+   a_0 + a_1*b1 + a_2*b_2*b_2 + .... where b_0, b_1, b_2, etc, are
+   the bases, which are equal to the largest possible exponent for
+   each of the respective variables in the exponent. These exponents
+   are use as array indices in the output polynomial. The
+   output poly is unrestricted, having multiprecision coefficients.
+   The input polynomials are broken into blocks to improve
+   cache efficiency.
+*/
 void _fmpz_mpoly_submul_array1_fmpz(fmpz * poly1, 
                  const fmpz * poly2, const ulong * exp2, slong len2,
                             const fmpz * poly3, const ulong * exp3, slong len3)
@@ -141,6 +193,18 @@ void _fmpz_mpoly_submul_array1_fmpz(fmpz * poly1,
    }
 }
 
+/*
+   Polynomial by monomial submul into a dense array poly1, given
+   an input poly and monomial with coefficients fitting into a word,
+   and exponents tightly packed with mixed bases equal to the
+   largest exponent for each variable, e.g. the input poly and monomial
+   have exponents of the form a_0 + a_1*b1 + a_2*b_2*b_2 + ....
+   where b_0, b_1, b_2, etc, are the bases, which are equal to the
+   largest possible exponent for each of the respective variables in
+   the exponent. These exponents are use as array indices in the output
+   polynomial. The output poly is assumed to fit into three words per
+   coefficient.
+*/
 void _fmpz_mpoly_submul_array1_slong_1(ulong * poly1, 
                           slong d, const ulong exp2,
                            const slong * poly3, const ulong * exp3, slong len3)
@@ -165,6 +229,18 @@ void _fmpz_mpoly_submul_array1_slong_1(ulong * poly1,
    }
 }
 
+/*
+   Polynomial by monomial submul into a dense array poly1, given
+   an input poly and monomial with coefficients fitting into a word,
+   and exponents tightly packed with mixed bases equal to the
+   largest exponent for each variable, e.g. the input poly and monomial
+   have exponents of the form a_0 + a_1*b1 + a_2*b_2*b_2 + ....
+   where b_0, b_1, b_2, etc, are the bases, which are equal to the
+   largest possible exponent for each of the respective variables in
+   the exponent. These exponents are use as array indices in the output
+   polynomial. The output poly is assumed to fit into two words per
+   coefficient.
+*/
 void _fmpz_mpoly_submul_array1_slong2_1(ulong * poly1, 
                            slong d, const ulong exp2,
                            const slong * poly3, const ulong * exp3, slong len3)
@@ -187,6 +263,18 @@ void _fmpz_mpoly_submul_array1_slong2_1(ulong * poly1,
    }
 }
 
+/*
+   Polynomial by monomial submul into a dense array poly1, given
+   an input poly and monomial with coefficients fitting into a word,
+   and exponents tightly packed with mixed bases equal to the
+   largest exponent for each variable, e.g. the input poly and monomial
+   have exponents of the form a_0 + a_1*b1 + a_2*b_2*b_2 + ....
+   where b_0, b_1, b_2, etc, are the bases, which are equal to the
+   largest possible exponent for each of the respective variables in
+   the exponent. These exponents are use as array indices in the output
+   polynomial. The output poly is unrestricted, having multiprecision
+   coefficients.
+*/
 void _fmpz_mpoly_submul_array1_fmpz_1(fmpz * poly1, 
                           const fmpz_t d, ulong exp2,
                            const fmpz * poly3, const ulong * exp3, slong len3)
@@ -206,11 +294,22 @@ void _fmpz_mpoly_submul_array1_fmpz_1(fmpz * poly1,
    }
 }
 
+/*
+   Convert an fmpz_mpoly to dense array format, where the exponents
+   of the input poly are tightly packed with mixed bases equal to the
+   largest exponent for each variable, e.g. the input polys have
+   exponents of the form a_0 + a_1*b1 + a_2*b_2*b_2 + .... where
+   b_0, b_1, b_2, etc, are the bases, which are equal to the largest
+   possible exponent for each of the respective variables in the
+   exponent. The output array is assumed to have two words per
+   coefficient.
+*/
 void _fmpz_mpoly_to_ulong_array2(ulong * p, const fmpz * coeffs,
                                                  const ulong * exps, slong len)
 {
    slong i, j;
    
+   /* for each term of the input poly */
    for (i = 0; i < len; i++)
    {
       ulong * ptr = p + 2*((slong) exps[i]);
@@ -232,6 +331,16 @@ void _fmpz_mpoly_to_ulong_array2(ulong * p, const fmpz * coeffs,
    }
 }
 
+/*
+   Convert an fmpz_mpoly to dense array format, where the exponents
+   of the input poly are tightly packed with mixed bases equal to the
+   largest exponent for each variable, e.g. the input polys have
+   exponents of the form a_0 + a_1*b1 + a_2*b_2*b_2 + .... where
+   b_0, b_1, b_2, etc, are the bases, which are equal to the largest
+   possible exponent for each of the respective variables in the
+   exponent. The output array is assumed to have one word per
+   coefficient.
+*/
 void _fmpz_mpoly_to_ulong_array1(ulong * p, const fmpz * coeffs,
                                                  const ulong * exps, slong len)
 {
@@ -260,6 +369,16 @@ void _fmpz_mpoly_to_ulong_array1(ulong * p, const fmpz * coeffs,
    }
 }
 
+/*
+   Convert an fmpz_mpoly to dense array format, where the exponents
+   of the input poly are tightly packed with mixed bases equal to the
+   largest exponent for each variable, e.g. the input polys have
+   exponents of the form a_0 + a_1*b1 + a_2*b_2*b_2 + .... where
+   b_0, b_1, b_2, etc, are the bases, which are equal to the largest
+   possible exponent for each of the respective variables in the
+   exponent. The output array is assumed to have three words per
+   coefficient.
+*/
 void _fmpz_mpoly_to_ulong_array(ulong * p, const fmpz * coeffs,
                                                  const ulong * exps, slong len)
 {
@@ -286,6 +405,16 @@ void _fmpz_mpoly_to_ulong_array(ulong * p, const fmpz * coeffs,
    }
 }
 
+/*
+   Convert an fmpz_mpoly to dense array format, where the exponents
+   of the input poly are tightly packed with mixed bases equal to the
+   largest exponent for each variable, e.g. the input polys have
+   exponents of the form a_0 + a_1*b1 + a_2*b_2*b_2 + .... where
+   b_0, b_1, b_2, etc, are the bases, which are equal to the largest
+   possible exponent for each of the respective variables in the
+   exponent. The output array is unrestricted, having multiprecision
+   coefficients.
+*/
 void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
                                                  const ulong * exps, slong len)
 {
@@ -295,18 +424,33 @@ void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
       fmpz_set(p + (slong) exps[i], coeffs + i);
 }
 
+/*
+   Set poly1 to the quotient of poly2 by poly3 if the quotient is exact,
+   and return the length of the quotient. If the quotient is not exact,
+   return 0. The algorithm aborts as early as possible if the quotient is
+   not exact. It is assumed that poly2 is nonzero so that the quotient is
+   either exact and nonzero, or inexact. The polynomials have their
+   exponents tightly packed,  with mixed bases equal to the largest
+   exponent for each variable, e.g. the input polys have exponents of the
+   form a_0 + a_1*b1 + a_2*b_2*b_2 + .... where b_0, b_1, b_2, etc, are
+   the bases, which are equal to the largest possible exponent for
+   each of the respective variables in the exponent. There are assumed to
+   be "num" variables and the bases b_i are passed in the array "mults".
+   The function reallocates its output.
+*/
 slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                                            slong * alloc, slong len1, 
                       const fmpz * poly2, const ulong * exp2, slong len2,
                       const fmpz * poly3, const ulong * exp3, slong len3,
-                                          slong * mults, slong num, slong bits)
+                                                      slong * mults, slong num)
 {
    slong i, j, q, r, prod, bits1, bits2, bits3, len = len1;
    slong max3 = (slong) exp3[len3 - 1]; /* largest exponent in poly3 */
    slong min3 = (slong) exp3[0]; /* smallest exponent in poly3 */
    slong * prods;
    fmpz c3 = poly3[0];
-   ulong u3 = ((ulong) FLINT_ABS(c3)) >> 1;
+   /* abs val of trailing coeff of poly3 */
+   ulong u3 = ((ulong) FLINT_ABS(c3)) >> 1; 
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
    int small;
@@ -316,15 +460,21 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
 
    prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
+   /*
+      compute products 1, b0, b0*b1, b0*b1*b2 ...
+      from list of bases b0, b1, b2, ...
+   */
    prods[0] = 1;
    for (i = 1; i <= num; i++)
       prods[i] = mults[i - 1]*prods[i - 1];
 
    prod = prods[num];
 
+   /* quick check leading terms divide */
    if (!mpoly_monomial_divides_tight(exp2[len2 - 1], exp3[len3 - 1], prods, num))
       goto cleanup;
 
+   /* compute bound on poly2 - q*poly3 assuming quotient remains small */
    bits2 = _fmpz_vec_max_bits(poly2, len2);
    bits3 = _fmpz_vec_max_bits(poly3, len3);
    /* we assume a bound of FLINT_BITS - 2 for coefficients of the quotient */
@@ -333,6 +483,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
    small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
    bits1 += 2; /* incr. so poly2 - q*poly3 doesn't overflow and for sign */
 
+   /* input coeffs small and intermediate computations fit two words */
    if (small && bits1 <= 2*FLINT_BITS)
    {
       ulong * p2 = (ulong *) TMP_ALLOC(2*prod*sizeof(ulong));
@@ -340,13 +491,16 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
       for (i = 0; i < 2*prod; i++)
          p2[i] = 0;
 
+      /* poly2 to array format */
       _fmpz_mpoly_to_ulong_array2(p2, poly2, exp2, len2);
 
+      /* for each term of poly2 array relevant to exact quotient */
       for (i = 0; i + max3 < prod; i++)
       {
          ulong * ptr = p2 + 2*i;
          ulong p[2];
 
+         /* if coeff is nonzero */
          if (ptr[0] != 0 || ptr[1] != 0)
          {
             if (0 > (slong) ptr[1])
@@ -354,6 +508,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             else
                flint_mpn_copyi(p, ptr, 2);
 
+            /* check quotient won't overflow a word */
             if (u3 < p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
             {
                for (j = len1; j < len; j++)
@@ -363,8 +518,10 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                goto big;
             }
 
+            /* quotient and remainder of coeffs */
             sdiv_qrnnd(q, r, ptr[1], ptr[0], c3);
 
+            /* check coefficient is small, else restart with multiprec code */
             if (COEFF_IS_MPZ(q))
             {
                for (j = len1; j < len; j++) /* quotient too large */
@@ -374,6 +531,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                goto big;
             }
 
+            /* check coeff and monomial quotients were exact */
             if (r != 0 || /* not an exact division */
                !mpoly_monomial_divides_tight(i, min3, prods, num))
             {
@@ -384,20 +542,25 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                goto cleanup;
             }
 
+            /* submul q*poly3 */
             _fmpz_mpoly_submul_array1_slong2_1(p2, q, i - min3,
                                                             poly3, exp3, len3);
 
+            /* reallocate quotient */
             _fmpz_mpoly_fit_length(&p1, &e1, alloc, len + 1, 1);
             
+            /* write quotient term */
             p1[len] = q;
             e1[len++] = i - min3;         
          }
       }
 
+      /* check there are no nonzero terms left in array */
       for ( ; i < prod; i++)
       {
          ulong * ptr = p2 + 2*i;
 
+         /* if coeff nonzero */
          if (ptr[0] != 0 || ptr[1] != 0)  /* not an exact division */
          {
             for (j = len1; j < len; j++)
@@ -409,6 +572,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
       }
    }
 
+   /* not done, coeffs small, intermediate computations fit three words */
    if (len == len1 && small)
    {
       ulong * p2 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
@@ -416,13 +580,16 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
       for (i = 0; i < 3*prod; i++)
          p2[i] = 0;
 
+      /* poly2 to array format */
       _fmpz_mpoly_to_ulong_array(p2, poly2, exp2, len2);
 
+      /* for each term of poly2 array relevant to exact quotient */
       for (i = 0; i + max3 < prod; i++)
       {
          ulong * ptr = p2 + 3*i;
          ulong p[3];
 
+         /* if coeff is nonzero */
          if (ptr[0] != 0 || ptr[1] != 0 || ptr[2] != 0)
          {
             if (0 > (slong) ptr[2])
@@ -430,6 +597,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             else
                flint_mpn_copyi(p, ptr, 3);
 
+            /* check quotient won't overflow a word */
             if (p[2] > 0 || u3 < p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
             {
                for (j = len1; j < len; j++)
@@ -439,8 +607,10 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                goto big;
             }
 
+            /* quotient and remainder of coeffs */
             sdiv_qrnnd(q, r, ptr[1], ptr[0], c3);
 
+            /* check coefficient is small, else restart with multiprec code */
             if (COEFF_IS_MPZ(q))
             {
                for (j = len1; j < len; j++) /* quotient too large */
@@ -450,6 +620,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                goto big;
             }
 
+            /* check coeff and monomial quotients were exact */
             if (r != 0 || /* not an exact division */
                !mpoly_monomial_divides_tight(i, min3, prods, num)) 
             {
@@ -460,20 +631,25 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                goto cleanup;
             }
 
+            /* submul q*poly3 */
             _fmpz_mpoly_submul_array1_slong_1(p2, q, i - min3,
                                                             poly3, exp3, len3);
 
+            /* reallocate quotient */
             _fmpz_mpoly_fit_length(&p1, &e1, alloc, len + 1, 1);
             
+            /* write quotient term */
             p1[len] = q;
             e1[len++] = i - min3;
          }
       }
 
+      /* check there are no nonzero terms left in array */
       for ( ; i < prod; i++)
       {
          ulong * ptr = p2 + 3*i;
 
+         /* if coeff nonzero */
          if (ptr[0] != 0 || ptr[1] != 0 || ptr[2] != 0) 
          {
             /* not an exact division */
@@ -489,6 +665,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
 
 big:
 
+   /* if not done, use multiprecision coeffs instead */
    if (len == len1)
    {
       fmpz * p2 = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
@@ -500,14 +677,19 @@ big:
       for (i = 0; i < prod; i++)
          fmpz_init(p2 + i);
 
+      /* poly2 to array format */
       _fmpz_mpoly_to_fmpz_array(p2, poly2, exp2, len2);
       
+      /* for each term of poly2 array relevant to exact quotient */
       for (i = 0; i + max3 < prod; i++)
       {
+         /* if coeff is nonzero */
          if (!fmpz_is_zero(p2 + i))
          {
+            /* quotient and remainder of coeffs */
             fmpz_fdiv_qr(fq, fr, p2 + i, poly2 + 0);
 
+            /* check coeff and monomial quotients were exact */
             if (!fmpz_is_zero(fr) || /* not an exact division */
                !mpoly_monomial_divides_tight(i, min3, prods, num))
             {
@@ -518,18 +700,23 @@ big:
                goto cleanup2;
             }
 
+            /* submul q*poly3 */
             _fmpz_mpoly_submul_array1_fmpz_1(p2, fq, i - min3,
                                                             poly3, exp3, len3);
 
+            /* reallocate quotient */
             _fmpz_mpoly_fit_length(&p1, &e1, alloc, len + 1, 1);
             
+            /* write quotient term */
             fmpz_set(p1 + len, fq);
             e1[len++] = i - min3;
          }
       }
 
+      /* check there are no nonzero terms left in array */
       for ( ; i < prod; i++)
       {
+         /* if coeff nonzero */
          if (!fmpz_is_zero(p2 + i))
          {
             /* not an exact division */
@@ -562,11 +749,15 @@ cleanup:
 }
 
 /*
-   use array exact division to set poly1 to poly2/poly3 in num + 1 variables,
-   given a list of multipliers to tightly pack exponents and a number of bits
-   for the fields of the exponents of the result, assuming no aliasing
-   classical exact division in main variable, array multiplication (submul)
-   for multivariate coefficients
+   Use dense array exact division to set poly1 to poly2/poly3 in num + 1
+   variables, given a list of multipliers to tightly pack exponents and a
+   number of bits for the fields of the exponents of the result, assuming no
+   aliasing. Classical exact division in main variable, array multiplication
+   (submul) for multivariate coefficients in remaining num variables. 
+   The array "mults" is a list of bases to be used in encoding the array
+   indices from the exponents. The function reallocates its output. 
+   The function reallocates its output and returns the length of its output if
+   the quotient is exact, or zero if not. It is assumed that poly2 is not zero.
 */
 slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
@@ -583,10 +774,15 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
    int small;
    TMP_INIT;
 
+   /*
+      compute products 1, b0, b0*b1, b0*b1*b2 ...
+      from list of bases b0, b1, b2, ...
+   */
    prod = 1;
    for (i = 0; i < num; i++)
       prod *= mults[i];
 
+   /* lengths of poly2, poly3 in chunks, and poly1 assuming exact division */
    l2 = 1 + (slong) (exp2[len2 - 1] >> shift);
    l3 = 1 + (slong) (exp3[len3 - 1] >> shift);
 
@@ -594,7 +790,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
    TMP_START;
 
-   /* compute indices and lengths of coefficients of polys in main variable */
+   /* indices and lengths of coefficients/chunks of polys in main variable */
 
    i1 = (slong *) TMP_ALLOC(l1*sizeof(slong));
    n1 = (slong *) TMP_ALLOC(l1*sizeof(slong));
@@ -610,7 +806,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
    mpoly_main_variable_terms1(i2, n2, exp2, l2, len2, num + 1, num + 1, bits);
    mpoly_main_variable_terms1(i3, n3, exp3, l3, len3, num + 1, num + 1, bits);
 
-   /* work out max bits for each coeff and optimal bits */
+   /* work out max bits for each coeff/chunk and optimal bits */
 
    for (i = 0; i < l3; i++)
    {
@@ -629,29 +825,35 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
    mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 1, bits);
 
+   /* bound poly2 coeffs and check input/output coeffs likely small */
    bits2 = _fmpz_vec_max_bits(poly2, len2);
    /* we assume a bound of FLINT_BITS - 2 for coefficients of the quotient */
    bits1 = FLINT_ABS(bits3) + FLINT_BITS + FLINT_BIT_COUNT(len3) - 2;
 
    small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
-   /* make copy of first "coefficient" of poly2 */
+   /* make copy of first coeff/chunk of poly2 */
 
    temp = (fmpz *) flint_calloc(n2[0] + 1, sizeof(fmpz));
    texp = (ulong *) flint_malloc((n2[0] + 1)*sizeof(ulong));
    talloc = n2[0] + 1;
 
+   /* enough space for three words per coeff, even if only one or two needed */
    p2 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
 
+   /* coefficients likely to be small */
    if (small)
    {
+      /* for each chunk of poly2 */
       for (i = 0; i < l2; i++)
       {
          slong num1 = 0;
          bits1 = 0;
 
+         /* if there are already quotient terms */
          if (i != 0)
          {
+            /* compute bound on intermediate computations a - q*b */
             for (j = 0; j < i && j < l1; j++)
             {
                k = i - j;
@@ -671,11 +873,13 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
          } else
             bits1 = FLINT_ABS(bits2) + 1; /* extra bit for sign */
 
+         /* intermediate computations fit in one word */
          if (bits1 <= FLINT_BITS)
          {
             for (j = 0; j < prod; j++)
                p2[j] = 0;
 
+            /* convert relevant coeff/chunk of poly2 to array format */
             _fmpz_mpoly_to_ulong_array1(p2, poly2 + i2[i], e2 + i2[i], n2[i]);
 
             /* submuls */
@@ -689,13 +893,15 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
             }
 
+            /* convert quotient chunk from array format */
             tlen = _fmpz_mpoly_from_ulong_array1(&temp, &texp, &talloc, 
                                                       p2, mults, num, bits, 0);
-         } else if (bits1 <= 2*FLINT_BITS)
+         } else if (bits1 <= 2*FLINT_BITS) /* intermed comps fit two words */
          {
             for (j = 0; j < 2*prod; j++)
                p2[j] = 0;
 
+            /* convert relevant coeff/chunk of poly2 to array format */
             _fmpz_mpoly_to_ulong_array2(p2, poly2 + i2[i], e2 + i2[i], n2[i]);
 
             /* submuls */
@@ -709,13 +915,15 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
             }
 
+            /* convert quotient chunk from array format */
             tlen = _fmpz_mpoly_from_ulong_array2(&temp, &texp, &talloc, 
                                                       p2, mults, num, bits, 0);
-         } else /* <= 3*FLINT_BITS */
+         } else /* intermed comps fit three words */
          {
             for (j = 0; j < 3*prod; j++)
                p2[j] = 0;
 
+            /* convert relevant coeff/chunk of poly2 to array format */
             _fmpz_mpoly_to_ulong_array(p2, poly2 + i2[i], e2 + i2[i], n2[i]);
 
             /* submuls */
@@ -729,22 +937,29 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
             }
 
+            /* convert chunk from array format */
             tlen = _fmpz_mpoly_from_ulong_array(&temp, &texp, &talloc, 
                                                       p2, mults, num, bits, 0);
          }
 
+         /* for terms where there may be a nonzero quotient if exact */
          if (i < l1)
          {
+            /* tightly pack chunk exponents */
             mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, 0, bits);
 
+            /* set starting index for quotient chunk we are about to compute */
             i1[i] = len;
             
+            /* if chunk is nonzero */
             if (tlen != 0)
             {
+               /* compute quotient chunk and set length of quotient chunk */
                n1[i] = _fmpz_mpoly_divides_array_tight(poly1,
                                    exp1, alloc, len, temp, texp, tlen,
-                                           poly3, e3, n3[0], mults, num, bits);
+                                                 poly3, e3, n3[0], mults, num);
 
+               /* check quotient was exact */
                if (n1[i] == 0) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
@@ -756,7 +971,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
             } else
                n1[i] = 0;
 
-            /* check the quotient didn't have large coefficients */
+            /* check the quotient chunk didn't have large coefficients */
             if (FLINT_ABS(_fmpz_vec_max_bits((*poly1) + len, n1[i])) >
                                                              FLINT_BITS - 2)
             {
@@ -767,13 +982,17 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                goto big;
             }
 
+            /* abs bound and sum of abs vals of coeffs of quotient chunk */
             _fmpz_mpoly_chunk_max_bits(b1, maxb1, *poly1, i1, n1, i);
 
+            /* update length of output quotient poly */
             len += n1[i];
-         } else /* check coefficient is zero */
+         } else /* should be zero quotient, check coefficient is zero */
          {
+            /* for each coeff in chunk */
             for (j = 0; j < tlen; j++)
             {
+               /* if coeff is nonzero */
                if (!fmpz_is_zero(temp + j)) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
@@ -789,6 +1008,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
 big:
 
+   /* if not done, use multiprecision coeffs instead */
    if (len == 0)
    {
       fmpz * p2 = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
@@ -796,11 +1016,13 @@ big:
       for (j = 0; j < prod; j++)
             fmpz_init(p2 + j);
       
+      /* for each chunk of poly2 */
       for (i = 0; i < l2; i++)
       {
          for (j = 0; j < prod; j++)
             fmpz_zero(p2 + j);
 
+         /* convert relevant coeff/chunk of poly2 to array format */
          _fmpz_mpoly_to_fmpz_array(p2, poly2 + i2[i], e2 + i2[i], n2[i]);
 
          /* submuls */
@@ -814,23 +1036,30 @@ big:
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
          }
 
+         /* convert chunk from array format */
          tlen = _fmpz_mpoly_from_fmpz_array(&temp, &texp, &talloc, 
                                                       p2, mults, num, bits, 0);
 
+         /* for terms where there may be a nonzero quotient if exact */
          if (i < l1)
          {
 
+            /* tightly pack chunk exponents */
             mpoly_pack_monomials_tight(texp, texp, tlen, mults,
                                                                  num, 0, bits);
 
+            /* set starting index of quotient chunk we are about to compute */
             i1[i] = len;
             
+            /* if chunk is nonzero */
             if (tlen != 0)
             {
+               /* compute quotient chunk and set length of quotient chunk */
                n1[i] = _fmpz_mpoly_divides_array_tight(poly1,
                                    exp1, alloc, len, temp, texp, tlen,
-                                           poly3, e3, n3[0], mults, num, bits);
+                                                 poly3, e3, n3[0], mults, num);
 
+               /* check quotient was exact */
                if (n1[i] == 0) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
@@ -842,9 +1071,11 @@ big:
             } else
                n1[i] = 0;
 
+            /* update length of output quotient poly */
             len += n1[i];
-         } else /* check coefficient is zero */
+         } else /* should be zero quotient, check coefficient is zero */
          {
+            /* for each coeff in chunk */
             for (j = 0; j < tlen; j++)
             {
                if (!fmpz_is_zero(temp + j)) /* not an exact division */
@@ -865,12 +1096,13 @@ cleanup2:
             fmpz_clear(p2 + j);
    }
 
+   /* if quotient was exact */
    if (len != 0)
    {
-      mpoly_unpack_monomials_tight((*exp1), (*exp1), len,
-                                                          mults, num, 1, bits);
+      /* unpack monomials of quotient */
+      mpoly_unpack_monomials_tight((*exp1), (*exp1), len, mults, num, 1, bits);
 
-      /* put main variable back in */
+      /* put main variable back in quotient */
       for (i = 0; i < l1; i++)
       {
          for (j = 0; j < n1[i]; j++)
@@ -889,9 +1121,12 @@ cleanup:
 }
 
 /*
-   use array exact division to set poly1 to poly2/poly3 in num variables, given
+   Use array exact division to set poly1 to poly2/poly3 in num variables, given
    a list of multipliers to tightly pack exponents and a number of bits for the
-   fields of the exponents of the result, assuming no aliasing
+   fields of the exponents of the result, assuming no aliasing. The array "mults"
+   is a list of bases to be used in encoding the array indices from the exponents.
+   The function reallocates its output and returns the length of its output if
+   the quotient is exact, or zero if not. It is assumed that poly2 is not zero.
 */
 slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
                            const fmpz * poly2, const ulong * exp2, slong len2,
@@ -903,10 +1138,15 @@ slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong len, prod;
    TMP_INIT;
 
+   /*
+      compute products 1, b0, b0*b1, b0*b1*b2 ...
+      from list of bases b0, b1, b2, ...
+   */
    prod = 1;
    for (i = 0; i < num; i++)
       prod *= mults[i];
 
+   /* if array size will be too large, chunk the polynomials */
    if (prod > MAX_ARRAY_SIZE)
       return _fmpz_mpoly_divides_array_chunked(poly1, exp1, alloc,
                    poly2, exp2, len2, poly3, exp3, len3, mults, num - 1, bits);
@@ -916,13 +1156,17 @@ slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
+   /* pack input exponents tightly with mixed bases specified by "mults" */
+   
    mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 0, bits);
 
    mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 0, bits);
 
+   /* do exact quotient with divisibility test on tightly packed polys */
    len = _fmpz_mpoly_divides_array_tight(poly1, exp1,
-                alloc, 0,  poly2, e2, len2, poly3, e3, len3, mults, num, bits);
+                      alloc, 0,  poly2, e2, len2, poly3, e3, len3, mults, num);
 
+   /* unpack output quotient exponents */
    mpoly_unpack_monomials_tight((*exp1), (*exp1), len, mults,
                                                                  num, 0, bits);
 
@@ -931,6 +1175,10 @@ slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    return len;
 }
 
+/* 
+   Return 1 if exact quotient and set poly1 to poly2/poly3, else return 0
+   if not exact quotient or -1 if array method not suitable.
+*/
 int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
@@ -943,9 +1191,11 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_INIT;
 
+   /* check divisor is not zero */
    if (poly3->length == 0)
       flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divides_array");
 
+   /* dividend is zero */
    if (poly2->length == 0)
    {
       fmpz_mpoly_zero(poly1, ctx);
@@ -955,6 +1205,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_START;
 
+   /* compute maximum exponents for each variable */
    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
    max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
 
@@ -966,21 +1217,32 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       if (max_degs2[i] > max)
          max = max_degs2[i];
 
+      /* 
+         cannot be an exact division if variable in dividend has smaller degree
+         than corresponding variable in divisor
+      */
       if (max_degs2[i] < max_degs3[i])
+      {
+         res = 0;
          goto cleanup;
+      }
    }
 
+   /* compute number of bits required for output exponents */
    bits = FLINT_BIT_COUNT(max);
 
    exp_bits = 8;
    while (bits >= exp_bits)
       exp_bits *= 2;
 
+   /* number of words for exponents */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
+   /* array multiplication expects each exponent vector in one word */
    if (N != 1)
       goto cleanup;
 
+   /* compute bounds on output exps, used as mixed bases for packing exps */
    array_size = 1;
    for (i = 0; i < ctx->n - 1; i++)
    {
@@ -989,9 +1251,11 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    }  
    max_degs2[ctx->n - 1]++;
    
+   /* if exponents too large for array multiplication, exit silently */
    if (array_size > MAX_ARRAY_SIZE)
       goto cleanup;
 
+   /* expand input exponents to same number of bits as output */
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->length, ctx->n, poly2->bits);
 
@@ -1002,6 +1266,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    
    free3 = exp3 != poly3->exps;
 
+   /* handle aliasing and do array division */
    if (poly1 == poly2 || poly1 == poly3)
    {
       fmpz_mpoly_t temp;
@@ -1030,6 +1295,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
 
+   /* len will be nonzero if quotient was exact */
    res = len != 0;
 
    if (free2)
