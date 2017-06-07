@@ -16,6 +16,11 @@
 #include "fmpz_mpoly.h"
 #include "longlong.h"
 
+/*
+   As for divrem_monagan_pearce1 except that an array of divisor polynomials is
+   passed and an array of quotient polynomials is returned. These are not in
+   low level format.
+*/
 slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
   ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
  slong len2, const fmpz_mpoly_struct ** poly3, ulong * const * exp3, slong len,
@@ -322,6 +327,11 @@ slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
    return l + 1;
 }
 
+/*
+   As for divrem_monagan_pearce except that an array of divisor polynomials is
+   passed and an array of quotient polynomials is returned. These are not in
+   low level format.
+*/
 slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
   ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
  slong len2, const fmpz_mpoly_struct ** poly3, ulong * const * exp3, slong len,
@@ -662,6 +672,7 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
    return l + 1;
 }
 
+/* Assumes divisor polys don't alias any output polys */
 void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
        const fmpz_mpoly_t poly2, const fmpz_mpoly_struct ** poly3, slong len,
                                                     const fmpz_mpoly_ctx_t ctx)
@@ -679,6 +690,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
    int deg, rev;
    TMP_INIT;
 
+   /* check none of the divisor polynomials is zero */
    for (i = 0; i < len; i++)
    {  
       if (poly3[i]->length == 0)
@@ -687,6 +699,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
       len3 = FLINT_MAX(len3, poly3[i]->length);
    }
 
+   /* dividend is zero, write out quotients and remainder */
    if (poly2->length == 0)
    {
       for (i = 0; i < len; i++)
@@ -715,6 +728,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
    
    exp_bits = poly2->bits;
 
+   /* compute maximum degrees that can occur in any input or output polys */
    for (i = 0; i < len; i++)
    {
       fmpz_mpoly_max_degrees(max_degs3, poly3[i], ctx);
@@ -725,12 +739,15 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
       exp_bits = FLINT_MAX(exp_bits, poly3[i]->bits);
    }
 
+   /* number of words in exponent vector */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
+   /* pack maxexp monomial vector */
    maxn = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
    mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, deg, rev);
 
+   /* ensure input exponents packed to same size as output exponents */
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->length, ctx->n, poly2->bits);
 
@@ -747,6 +764,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
       fmpz_mpoly_fit_bits(q[i], exp_bits, ctx);
    }
 
+   /* take care of aliasing */
    if (r == poly2)
    {
       fmpz_mpoly_init2(temp2, len3, ctx);
@@ -761,6 +779,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
       tr = r;
    }
 
+   /* do division with remainder */
    if (N == 1)
    {
       lenr = _fmpz_mpoly_divrem_ideal1(q, &tr->coeffs, &tr->exps,
@@ -773,6 +792,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
                                      poly3, exp3, len, N, exp_bits, maxn, ctx);
    }
 
+   /* take care of aliasing */
    if (r == poly2)
    {
       fmpz_mpoly_swap(temp2, r, ctx);
@@ -782,6 +802,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
 
    _fmpz_mpoly_set_length(r, lenr, ctx);
 
+   /* quotient polys and remainder poly are reversed, so correct order */
    for (i = 0; i < len; i++)
       fmpz_mpoly_reverse(q[i], q[i], ctx);
    fmpz_mpoly_reverse(r, r, ctx);
