@@ -224,7 +224,8 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
       }
 
       /* if accumulated coeff is zero, no output coeff to be written */
-      if ((small && (c[2] == 0 && c[1] == 0 && c[0] == 0)) || (!small && fmpz_is_zero(qc)))
+      if ((small && (c[2] == 0 && c[1] == 0 && c[0] == 0)) ||
+          (!small && fmpz_is_zero(qc)))
          k--;
       else /* accumulated coeff is nonzero */
       {
@@ -689,10 +690,11 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 
    TMP_START;
 
-   /* compute maximum degree appearing in inputs and outputs */
    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
    max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
 
+   /* compute maximum degree appearing in inputs and outputs */
+   
    fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
    fmpz_mpoly_max_degrees(max_degs3, poly3, ctx);
 
