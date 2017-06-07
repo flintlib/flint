@@ -143,11 +143,11 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
          {
             if (x->i == -WORD(1))
             {
-               /* subtract poly2[j] from accumulated three word coeff */
+               /* subtract poly2[j] from accumulated coeff */
                fmpz_sub(qc, qc, poly2 + x->j);
             } else
             {
-               /* subtract poly3[i]*q[j] from accumulated three word coeff */
+               /* subtract poly3[i]*q[j] from accumulated coeff */
                fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
             }
          }
@@ -177,11 +177,11 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
             {
                if (x->i == -WORD(1))
                {
-                  /* subtract poly2[j] from accumulated three word coeff */
+                  /* subtract poly2[j] from accumulated coeff */
                      fmpz_sub(qc, qc, poly2 + x->j);
                } else
                {
-                  /* subtract poly3[i]*q[j] from accum. three word coeff */
+                  /* subtract poly3[i]*q[j] from accum. coeff */
                   fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
                }
             }
@@ -475,11 +475,11 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
          {
             if (x->i == -WORD(1))
             {
-               /* subtract poly2[j] from accumulated three word coeff */
+               /* subtract poly2[j] from accumulated coeff */
                fmpz_sub(qc, qc, poly2 + x->j);
             } else
             {
-               /* subtract poly3[i]*q[j] from accumulated three word coeff */
+               /* subtract poly3[i]*q[j] from accumulated coeff */
                fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
             }
          }
@@ -509,11 +509,11 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             {
                if (x->i == -WORD(1))
                {
-                  /* subtract poly2[j] from accumulated three word coeff */
+                  /* subtract poly2[j] from accumulated coeff */
                   fmpz_sub(qc, qc, poly2 + x->j);
                } else
                {
-                  /* subtract poly3[i]*q[j] from accum. three word coeff */
+                  /* subtract poly3[i]*q[j] from accum. coeff */
                   fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
                }
             }

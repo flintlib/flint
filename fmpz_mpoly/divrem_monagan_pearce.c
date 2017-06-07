@@ -141,11 +141,11 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
          {
             if (x->i == -WORD(1))
             {
-               /* subtract poly2 coeff from accum. three word coeff */
+               /* subtract poly2 coeff from accum. coeff */
                fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
             } else
             {
-               /* subtract q[j]*poly3 coeff from accum. three word coeff */
+               /* subtract q[j]*poly3 coeff from accum. coeff */
                fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
             }
          }
@@ -176,11 +176,11 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
             {
                if (x->i == -WORD(1))
                {
-                  /* subtract poly2 coeff from accum. three word coeff */
+                  /* subtract poly2 coeff from accum. coeff */
                   fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
                } else
                {
-                  /* subtract q[j]*poly3 coeff from accum. three word coeff */
+                  /* subtract q[j]*poly3 coeff from accum. coeff */
                   fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
                }
             }
@@ -223,7 +223,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
          }
       }
 
-      /* if accumulated coeff is zero, no output coeffs to be written */
+      /* if accumulated coeff is zero, no quotient coeff to be written */
       if ((small && (c[2] == 0 && c[1] == 0 && c[0] == 0)) ||
           (!small && fmpz_is_zero(qc)))
          k--;
@@ -292,7 +292,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                      _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
 
                      /* write out remainder coeff and negate */
-                     fmpz_set_si(p2 + l, -r1);
+                     p2[l] = -r1;
 
                      /* write out remainder exponent */
                      e2[l] = maxn - exp;
@@ -522,11 +522,11 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
          {
             if (x->i == -WORD(1))
             {
-               /* subtract poly2 coeff from accum. three word coeff */
+               /* subtract poly2 coeff from accum. coeff */
                fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
             } else
             {
-               /* subtract q[j]*poly3 coeff from accum. three word coeff */
+               /* subtract q[j]*poly3 coeff from accum. coeff */
                fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
             }
          }
@@ -544,18 +544,24 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
             if (small)
             {
                if (x->i == -WORD(1))
-                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
-               else
-                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
-            } else
-            {
-               if (x->i == -WORD(1))
                {
-                  /* subtract poly2 coeff from accum. three word coeff */
-                  fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
+                  /* subtract poly2 coeff from accumulated three word coeff */
+                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
                } else
                {
                   /* subtract q[j]*poly3 coeff from accum. three word coeff */
+                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1],
+                                                                     p1[x->j]);
+               }
+            } else /* accumulated coeffs are multiprecision */
+            {
+               if (x->i == -WORD(1))
+               {
+                  /* subtract poly2 coeff from accum. coeff */
+                  fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
+               } else
+               {
+                  /* subtract q[j]*poly3 coeff from accum. coeff */
                   fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
                }
             }
@@ -674,7 +680,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                      _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
 
                      /* write out remainder coeff and negate */
-                     fmpz_set_si(p2 + l, -r1);
+                     p2[l] = -r1;
 
                      /* write out remainder exponent */
                      mpoly_monomial_sub(e2 + l*N, maxn, exp, N);
@@ -701,6 +707,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                }
             }
 
+            /* if quotient coefficient nonzero */
             if (!fmpz_is_zero(p1 + k))
             {
                /* see paper */
