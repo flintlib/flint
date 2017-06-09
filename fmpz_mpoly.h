@@ -132,8 +132,6 @@ void fmpz_mpoly_truncate(fmpz_mpoly_t poly, slong newlen,
             _fmpz_demote(poly->coeffs + i);
 
         poly->length = newlen;
-
-        _fmpz_mpoly_normalise(poly, ctx);
     }  
 }
 
@@ -149,6 +147,8 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
       poly->bits = bits;
    }   
 }
+
+/*  Basic manipulation *******************************************************/
 
 FMPZ_MPOLY_INLINE
 int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
@@ -167,8 +167,6 @@ slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
 {
     return _fmpz_vec_max_bits(poly->coeffs, poly->length);
 }
-
-/*  Basic manipulation *******************************************************/
 
 FLINT_DLL void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
                     slong len, slong bits, slong n, int deg, int rev, slong N);
@@ -270,7 +268,7 @@ FLINT_DLL void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
 FLINT_DLL void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-/* Set and negate */
+/* Set and negate ************************************************************/
 
 FLINT_DLL void _fmpz_mpoly_set(fmpz * poly1, ulong * exps1,
                     const fmpz * poly2, const ulong * exps2, slong n, slong N);
@@ -284,7 +282,7 @@ FLINT_DLL void _fmpz_mpoly_neg(fmpz * poly1, ulong * exps1,
 FLINT_DLL void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-/* Comparison */
+/* Comparison ****************************************************************/
 
 FLINT_DLL int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
                     const fmpz * poly2, const ulong * exps2, slong n, slong N);
@@ -461,7 +459,7 @@ FLINT_DLL slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq,
                                      ulong * maxn, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
-         const fmpz_mpoly_t poly2, const fmpz_mpoly_struct ** poly3, slong len,
+    const fmpz_mpoly_t poly2, const fmpz_mpoly_struct ** poly3, slong len,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 /* Input/output **************************************************************/

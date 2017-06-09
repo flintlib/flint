@@ -1,0 +1,864 @@
+/*
+    Copyright (C) 2017 William Hart
+    
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+*******************************************************************************
+
+    Context object
+
+*******************************************************************************
+
+void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
+                                             slong nvars, const ordering_t ord)
+
+    Initialise a context object for a polynomial ring with the given number of
+    variables and the given ordering. The possibilities for the ordering are
+    \code{ORD_LEX}, \code{ORD_REVLEX}, \code{ORD_DEGLEX} and
+    \code{ORD_DEGREVLEX}.
+
+void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx)
+
+    Release up any space allocated by an \code{fmpz_mpoly_ctx_t}.
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Initialise an \code{fmpz_mpoly_t} for use, given an initialised context
+    object.
+
+void fmpz_mpoly_init2(fmpz_mpoly_t poly, slong alloc, 
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Initialise an \code{fmpz_mpoly_t} for use, with space for at least
+    \code{alloc} terms, given an initialised context. By default, fields of 8
+    bits are allocated for the exponents in each exponent vector.
+
+void _fmpz_mpoly_realloc(fmpz ** poly, ulong ** exps,
+                                             slong * alloc, slong len, slong N)
+
+    Reallocate a low level \code{fmpz_mpoly} to the given length, assuming
+    exponent vectors each consist of $N$ words. Assumes the current length of
+    the polynomial is not greater than \code{len}.
+
+void fmpz_mpoly_realloc(fmpz_mpoly_t poly, slong len, 
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Reallocate an \code{fmpz_mpoly_t} to have space for \code{alloc} terms. 
+    Assumes the current length of the polynomial is not greater than
+    \code{len}.
+
+void _fmpz_mpoly_fit_length(fmpz ** poly,
+                              ulong ** exps, slong * alloc, slong len, slong N)
+
+    Reallocate a low level \code{fmpz_mpoly} to have space for at least
+    \code{len} terms. No truncation is performed if \code{len} is less than
+    the currently allocated number of terms; the allocated space can only grow.
+    Assumes exponent vectors each consist of $N$ words.
+
+void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len, 
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Reallocate a low level \code{fmpz_mpoly} to have space for at least
+    \code{len} terms. No truncation is performed if \code{len} is less than
+    the currently allocated number of terms; the allocated space can only grow.
+
+void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Release any space allocated for an \code{fmpz_mpoly_t}.
+
+void _fmpz_mpoly_normalise(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Internal use only. Sets the length of the given polynomial to exclude any
+    leading zero terms. Note that all other functions assume leading
+    coefficients of \code{fmpz_mpoly_t} polynomials are nonzero.
+
+void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Internal use only. Removes any trailing zero terms from the given
+    polynomial. Note that all other function assume trailing coefficients of
+    \code{fmpz_mpoly_t} polynomials are nonzero.
+
+void _fmpz_mpoly_set_length(fmpz_mpoly_t poly, slong newlen, 
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set the number of terms of the given polynomial to the given length. 
+    Assumes the polynomial has at least \code{newlen} allocated and initialised
+    terms.
+
+void fmpz_mpoly_truncate(fmpz_mpoly_t poly, slong newlen, 
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    If the given polynomial is larger than the given number of terms, truncate
+    to that number of terms.
+
+void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
+                                         slong bits, const fmpz_mpoly_ctx_t ctx)
+
+    Reallocate the polynomial to have space for exponent fields of the given
+    number of bits. The number of bits must be either 8, 16, 32, or 64 (on a 64
+    bit machine). This function can increase the number of bits only.
+
+*******************************************************************************
+
+    Basic manipulation
+
+*******************************************************************************
+
+int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
+
+    Return 1 if the array of coefficients of length \code{len} consists
+    entirely of values that are small \code{fmpz} values, i.e. of at most
+    \code{FLINT_BITS - 2} bits plus a sign bit.
+
+slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
+
+    Computer the maximum number of bits $b$ required to represent the absolute
+    values of the coefficients of \code{poly}. If all of the coefficients are
+    positive, $b$ is returned, otherwise $-b$ is returned.
+
+void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
+                     slong len, slong bits, slong n, int deg, int rev, slong N)
+
+    Given an exponent array \code{exps} of length \code{len}, with $n$ fields
+    per exponent vector, each consisting of the given number of bits, fill a
+    preallocated array \code{max_degs} of length $n$ with the maximum degrees
+    encountered for each of the $n$ fields throughout \code{exps}. The
+    parameter \code{deg} should be set to 1 if the polynomial is deglex or
+    degrevlex, and \code{rev} should be set to 1 if the polynomial is revlex or
+    degrevlex. Each exponent vector is assumed to consist of $N$ words. The
+    variable with greatest significance with respect to the ordering
+    corresponds to the lowest index entry of the output array, after a possible
+    degree field in the case of deglex and degrevlex, i.e. the degree field if
+    it exists, corresponds to index 0 of the output array \code{max_degs}.
+
+void fmpz_mpoly_max_degrees(ulong * max_degs,
+                           const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Given a polynomial with $n$ fields per exponent vector, fill a
+    preallocated array \code{max_degs} with the maximum degrees encountered
+    for each of the $n$ fields throughout the exponent array of \code{poly}.
+    The variable with greatest significance with respect to the ordering
+    corresponds to the lowest index entry of the output array, after a possible
+    degree field in the case of deglex and degrevlex, i.e. the degree field if
+    it exists, corresponds to index 0 of the output array \code{max_degs}.
+
+void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
+                                slong bits, slong n, int deg, int rev, slong N)
+
+    Set the low level \code{fmpz_mpoly} to the $i$-th generator (variable),
+    where $i = 0$ corresponds to the variable with the greatest significance
+    with respect to the ordering. The ordering is specified by whether it is
+    a degree ordering or a reverse ordering via \code{deg} and \code{rev}. Each
+    exponent vector is assumed to fit in $N$ words and consist of $n$ fields,
+    each of the given number of bits.
+
+void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpz_mpoly_t} to the $i$-th generator (variable),
+    where $i = 0$ corresponds to the variable with the greatest significance
+    with respect to the ordering. 
+
+void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpz_mpoly_t} to the constant polynomial corresponding
+    to the unsigned integer $c$.
+
+void fmpz_mpoly_set_si(fmpz_mpoly_t poly, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpz_mpoly_t} to the constant polynomial corresponding
+    to the signed integer $c$.
+
+void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
+                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpz_mpoly_t} to the constant polynomial corresponding
+    to the multiprecision integer $c$.
+
+int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly,
+                                           ulong c, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpz_mpoly_t} is equal to the constant
+    polynomial represented by the unsigned integer $c$, else return 0.
+
+int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly,
+                                           slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpz_mpoly_t} is equal to the constant
+    polynomial represented by the signed integer $c$, else return 0.
+
+int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
+                                          fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpz_mpoly_t} is equal to the constant
+    polynomial represented by the multiprecision integer $c$, else return 0.
+
+void fmpz_mpoly_swap(fmpz_mpoly_t poly1, 
+                                 fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Efficiently swap the contents of the two given polynomials. No copying is
+    performed; the swap is accomplished by swapping pointers.
+
+void fmpz_mpoly_zero(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpz_mpoly_t} to the zero polynomial.
+
+void fmpz_mpoly_one(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpz_mpoly_t} to the constant polynomial with value 1.
+
+int fmpz_mpoly_is_zero(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpz_mpoly_t} is equal to the zero polynomial,
+    else return 0.
+
+int fmpz_mpoly_is_one(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpz_mpoly_t} is equal to the constant
+    polynomial with coefficient 1, else return 0.
+
+int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpz_mpoly_t} is equal to the $i$-th generator
+    of the polynomial ring, otherwise return 0. The generator corresponding to
+    the variable with the greatest significance corresponds to $i = 0$. If
+    $i < 0$ the function returns 1 if the polynomial is equal to any generator
+    of the polynomial ring, otherwise it returns 0.
+
+void fmpz_mpoly_get_coeff_fmpz(fmpz_t x,
+                  const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set $x$ to coefficient of the given polynomial with index $i$, starting
+    with $i = 0$ for the term with least significance.
+
+ulong fmpz_mpoly_get_coeff_ui(const fmpz_mpoly_t poly, 
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Return the coefficient of the given polynomial with index $i$, starting
+    with $i = 0$ for the term with least significance. The coefficient is
+    assumed to be unsigned and to fit in a \code{ulong}.
+
+slong fmpz_mpoly_get_coeff_si(const fmpz_mpoly_t poly, 
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Return the coefficient of the given polynomial with index $i$, starting
+    with $i = 0$ for the term with least significance. The coefficient may be
+    signed and is assumed to fit in an \code{slong}.
+
+void fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly, 
+                           slong i, const fmpz_t x, const fmpz_mpoly_ctx_t ctx)
+
+    Set the coefficient of the given polynomial with index $i$ to the given
+    value $x$, starting with $i = 0$ for the term with least signifance. Any
+    existing term at that index is overwritten.
+
+void fmpz_mpoly_set_coeff_ui(fmpz_mpoly_t poly,
+                                  slong i, ulong x, const fmpz_mpoly_ctx_t ctx)
+
+    Set the coefficient of the given polynomial with index $i$ to the given
+    unsigned integer $x$, starting with $i = 0$ for the term with least
+    signifance. Any existing term at that index is overwritten.
+
+void fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
+                                  slong i, slong x, const fmpz_mpoly_ctx_t ctx)
+
+    Set the coefficient of the given polynomial with index $i$ to the given
+    signed integer $x$, starting with $i = 0$ for the term with least
+    signifance. Any existing term at that index is overwritten.
+
+void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Get the exponent vector of the given polynomial with index $i$. The output
+    is written in the array \code{exps} which is assumed to have space for $n$
+    entries, where $n$ is the number of variable of the polynomial. If the
+    polynomial is either deglex or degrevlex, the degree field of the exponent
+    vector is ignored. The entry with index 0 in the array corresponds to the
+    variable with the greatest significance with respect to the polynomial
+    ordering.
+
+void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
+                       slong i, const ulong * exps, const fmpz_mpoly_ctx_t ctx)
+
+    Set the exponent vector of the given polynomial with index $i$. The
+    exponent is specified by the values in the array \code{exps} which is
+    assumed to have $n$ entries, where $n$ is the number of variable of the
+    polynomial. If the polynomial is either deglex or degrevlex, the degree
+    field of the exponent should not be included in \code{exps}. It is
+    calculated by the function. The entry with index 0 in the array corresponds
+    to the variable with the greatest significance with respect to the
+    polynomial ordering.
+
+fmpz * fmpz_mpoly_get_coeff_ptr(fmpz_mpoly_t poly,
+                                                 slong i, fmpz_mpoly_ctx_t ctx)
+
+    Return a pointer into the array of coefficients of \code{poly} at index
+    $i$. The function is implemented as a macro and returns \code{NULL} if the
+    index is beyond the current number of terms of the polynomial. It is
+    assumed that $i \geq 0$.
+
+ulong * fmpz_mpoly_get_monomial_ptr(fmpz_mpoly_t poly,
+                                                  slong i, fmpz_mpoly_ctx_t ctx)
+
+    Return a pointer into the exponent array of \code{poly} at index $i$. The
+    function is implemented as a macro and returns \code{NULL} if the index is 
+    beyond the current number of terms of the polynomial. It is assumed that
+    $i \geq 0$.
+
+*******************************************************************************
+
+    Set and negate
+
+*******************************************************************************
+
+void _fmpz_mpoly_set(fmpz * poly1, ulong * exps1,
+                   const fmpz * poly2, const ulong * exps2, slong len, slong N)
+
+    Set the \code{(poly1, exps1, len)} to \code{(poly2, exps2, len)}$ assuming
+    the exponent vectors each take $N$ words. The polynomial
+    \code{(poly1, exps1, len)} is assumed to have enough space allocated for
+    \code{len} terms.
+
+void fmpz_mpoly_set(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                                    const fmpz_mpoly_ctx_t ctx)
+    
+    Set \code{poly1} to \code{poly2}.
+
+void _fmpz_mpoly_neg(fmpz * poly1, ulong * exps1,
+                   const fmpz * poly2, const ulong * exps2, slong len, slong N)
+
+    Set the \code{(poly1, exps1, len)} to the negation of
+    \code{(poly2, exps2, len)}$ assuming the exponent vectors each take $N$
+    words. The polynomial \code{(poly1, exps1, len)} is assumed to have enough
+    space allocated for \code{len} terms.
+
+void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                                    const fmpz_mpoly_ctx_t ctx)
+    
+    Set \code{poly1} to $-$\code{poly2}.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
+                   const fmpz * poly2, const ulong * exps2, slong len, slong N)
+
+    Return 1 if \code{(poly1, exps1, len)} is equal to
+    \code{(poly2, exps2, len)}, else return 0. Assumes the exponent vectors
+    each take $N$ words.
+
+int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly1} is equal to \code{poly2}, else return 0.
+
+*******************************************************************************
+
+    Reverse
+
+*******************************************************************************
+
+void _fmpz_mpoly_reverse(fmpz * poly1, ulong * exp1,
+                    const fmpz * poly2, const ulong * exp2, slong len, slong N)
+
+    Set the \code{(poly1, exps1, len)} to the reverse of
+    \code{(poly2, exps2, len)}$ assuming the exponent vectors each take $N$
+    words. The polynomial \code{(poly1, exps1, len)} is assumed to have enough
+    space allocated for \code{len} terms. This is mainly for internal use,
+    the ordering of the terms in a polynomial is assumed to be correct in all
+    other functions.
+
+void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
+                                fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Reverse the terms in \code{poly2} and set \code{poly1} to the result. This
+    function is mainly for internal use, since applying it to a polynomial with
+    terms in correct order will result in terms with incorrect order. The
+    function serves merely as a version of \code{_fmpz_mpoly_reverse} which
+    takes care of memory management.
+
+*******************************************************************************
+
+    Basic arithmetic
+
+*******************************************************************************
+
+void fmpz_mpoly_add_ui(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus the constant polynomial given by the
+    unsigned integer $c$.
+
+void fmpz_mpoly_add_si(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus the constant polynomial given by the
+    signed integer $c$.
+
+void fmpz_mpoly_add_fmpz(fmpz_mpoly_t poly1,
+                const fmpz_mpoly_t poly2, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus the constant polynomial given by the
+    multiprecision integer $c$.
+
+void fmpz_mpoly_sub_ui(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} minus the constant polynomial given by the
+    unsigned integer $c$.
+
+void fmpz_mpoly_sub_si(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} minus the constant polynomial given by the
+    signed integer $c$.
+
+void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t poly1,
+                const fmpz_mpoly_t poly2, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} minus the constant polynomial given by the
+    multiprecision integer $c$.
+
+slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1,
+                  const fmpz * poly2, const ulong * exps2, slong len2,
+                  const fmpz * poly3, const ulong * exps3, slong len3, slong N)
+
+    Set \code{(poly1, exps1)} to \code{(poly2, exps2, len2)} plus
+    \code{(poly3, exps3, len3)}, assuming exponent vectors are each $N$ words.
+    The output \code{(poly1, exps1)} is assumed to have space for
+    \code{len2 + len3} terms, but the actual number of terms used is returned.
+    No aliasing is allowed.
+
+void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus \code{poly3}.
+
+slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
+                  const fmpz * poly2, const ulong * exps2, slong len2,
+                  const fmpz * poly3, const ulong * exps3, slong len3, slong N)
+
+    Set \code{(poly1, exps1)} to \code{(poly2, exps2, len2)} minus
+    \code{(poly3, exps3, len3)}, assuming exponent vectors are each $N$ words.
+    The output \code{(poly1, exps1)} is assumed to have space for
+    \code{len2 + len3} terms, but the actual number of terms used is returned.
+    No aliasing is allowed.
+
+void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} minus \code{poly3}.
+
+*******************************************************************************
+
+    Scalar operations
+
+*******************************************************************************
+
+void _fmpz_mpoly_scalar_mul_ui(fmpz * poly1, ulong * exps1,
+          const fmpz * poly2, const ulong * exps2, slong len, slong N, ulong c)
+
+    Set \code{(poly1, exps1, len)} to \code{(poly2, exps2, len)} times the
+    unsigned integer $c$. The exponents vectors are assumed to each consist of
+    $N$ words. The ouput polynomial is assumed to have space for \code{len}
+    terms.
+
+void fmpz_mpoly_scalar_mul_ui(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times the unsigned integer $c$.
+
+void _fmpz_mpoly_scalar_mul_si(fmpz * poly1, ulong * exps1,
+          const fmpz * poly2, const ulong * exps2, slong len, slong N, slong c)
+
+    Set \code{(poly1, exps1, len)} to \code{(poly2, exps2, len)} times the
+    signed integer $c$. The exponents vectors are assumed to each consist of
+    $N$ words. The ouput polynomial is assumed to have space for \code{len}
+    terms.
+
+void fmpz_mpoly_scalar_mul_si(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times the signed integer $c$.
+
+void _fmpz_mpoly_scalar_mul_fmpz(fmpz * poly1, ulong * exps1,
+         const fmpz * poly2, const ulong * exps2, slong len, slong N, fmpz_t c)
+
+    Set \code{(poly1, exps1, len)} to \code{(poly2, exps2, len)} times the
+    multiprecision integer $c$. The exponents vectors are assumed to each
+    consist of $N$ words. The ouput polynomial is assumed to have space for
+    \code{len} terms.
+
+void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t poly1,
+          const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times the multiprecision integer $c$.
+
+void _fmpz_mpoly_scalar_divexact_ui(fmpz * poly1, ulong * exps1,
+          const fmpz * poly2, const ulong * exps2, slong len, slong N, ulong c)
+
+    Set \code{(poly1, exps1, len)} to \code{(poly2, exps2, len)} divided by the
+    unsigned integer $c$. The exponents vectors are assumed to each consist of
+    $N$ words. The ouput polynomial is assumed to have space for \code{len}
+    terms. The division is assumed to be exact.
+
+void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} divided by the unsigned integer $c$. The
+    division is assumed to be exact.
+
+void _fmpz_mpoly_scalar_divexact_si(fmpz * poly1, ulong * exps1,
+          const fmpz * poly2, const ulong * exps2, slong len, slong N, slong c)
+
+    Set \code{(poly1, exps1, len)} to \code{(poly2, exps2, len)} divided by the
+    signed integer $c$. The exponents vectors are assumed to each consist of
+    $N$ words. The ouput polynomial is assumed to have space for \code{len}
+    terms. The division is assumed to be exact.
+
+void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} divided by the signed integer $c$. The
+    division is assumed to be exact.
+
+void _fmpz_mpoly_scalar_divexact_fmpz(fmpz * poly1, ulong * exps1,
+         const fmpz * poly2, const ulong * exps2, slong len, slong N, fmpz_t c)
+
+    Set \code{(poly1, exps1, len)} to \code{(poly2, exps2, len)} divided by the
+    multiprecision integer $c$. The exponents vectors are assumed to each
+    consist of $N$ words. The ouput polynomial is assumed to have space for
+    \code{len} terms. The division is assumed to be exact.
+
+void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t poly1,
+          const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} divided by the multiprecision integer $c$.
+     The division is assumed to be exact.
+
+*******************************************************************************
+
+    Multiplication
+
+*******************************************************************************
+
+slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1,
+       slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
+                   const fmpz * poly3, const ulong * exp3, slong len3, slong N)
+
+   Set \code{(poly1, exp1, alloc)} to \code{(poly2, exps2, len2)} times
+   \code{(poly3, exps3, len3)} using Johnson's heap method (see papers by
+   Michael Monagan and Roman Pearce). The function realocates its output, hence
+   the double indirection, and returns the length of the product. The function
+   assumes the exponent vectors take N words. No aliasing is allowed.
+
+void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times \code{poly3} using the Johnson heap
+    based method. See the numerous papers by Michael Monagan and Roman Pearce.
+
+slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1,
+          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, 
+                         const fmpz * poly3, const ulong * exp3, slong len3, 
+                                          slong * mults, slong num, slong bits)
+
+   Set \code{(poly1, exp1, alloc)} to \code{(poly2, exps2, len2)} times
+   \code{(poly3, exps3, len3)} by accumulating coefficients in a big, dense
+   array. The function realocates its output, hence the double indirection, and
+   returns the length of the product. The array \code{mults} is a list of bases
+   to be used in encoding the array indices from the exponents. They should
+   exceed the maximum exponent for each field of the exponent vectors of the
+   output. The output exponent vectors will be packed with fields of the given
+   number of bits. The number of variables is given by \code{num}$. No aliasing
+   is allowed.
+
+int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, 
+                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times \code{poly3} using a big array to
+    accumulate coefficients. If the array will be larger than some internally
+    set parameter, the function fails silently and returns 0 so that some other
+    method may be called. This function is most efficient on dense inputs.
+
+*******************************************************************************
+
+    Powering
+
+*******************************************************************************
+
+slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
+              slong * alloc, const fmpz * poly2, const ulong * exp2, 
+                                                  slong len2, slong k, slong N)
+
+    Set \code{(poly2, exp1, alloc)} \code{(poly2, exp2, len2)} raised to the
+    power of $k$. The function reallocates its output, hence the double
+    indirection. Assumes that exponents vectors each take $N$ words. Uses the
+    FPS algorithm of Monagan and Pearce. No aliasing is allowed.
+
+void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                           slong k, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} raised to the $k$-th power, using the
+    Monagan and Pearce FPS algorithm. It is assumed that $k \geq 0$.
+
+*******************************************************************************
+
+    Divisibility testing
+
+*******************************************************************************
+
+slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1,
+         slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
+                        const fmpz * poly3, const ulong * exp3, slong len3,
+                                          slong * mults, slong num, slong bits)
+
+    Use dense array exact division to set \code{(poly1, exp1, alloc)} to
+    \code{(poly2, exp3, len2)} divided by \code{(poly3, exp3, len3)} in
+    \code{num} variables, given a list of multipliers to tightly pack exponents
+    and a number of bits for the fields of the exponents of the result. The
+    array "mults" is a list of bases to be used in encoding the array indices
+    from the exponents. The function reallocates its output, hence the double
+    indirection and returns the length of its output if the quotient is exact,
+    or zero if not. It is assumed that \code{poly2} is not zero. No aliasing is
+    allowed.
+
+int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} divided by \code{poly3}, using a big dense
+    array to accumulate coefficients and return 1 if the quotient is exact.
+    Otherwise, return 0 if the quotient is not exact. If the array will be
+    larger than some internally set parameter, the function fails silently and
+    returns $-1$ so that some other method may be called. This function is most
+    efficient on dense inputs. Note that the function 
+    \code{fmpz_mpoly_div_monagan_pearce} below may be much faster if the
+    quotient is known to be exact.
+
+slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
+                      ulong ** exp1, slong * alloc, const fmpz * poly2,
+                    const ulong * exp2, slong len2, const fmpz * poly3,
+                           const ulong * exp3, slong len3, slong bits, slong N)
+
+    Set \code{(poly1, exp1, alloc)} to \code{(poly2, exp3, len2)} divided by
+    \code{(poly3, exp3, len3)} and return 1 if the quotient is exact. Otherwise
+    return 0. The function assumes exponent vectors that each fit in $N$ words,
+    and are packed into fields of the given number of bits. Assumes input polys
+    are nonzero. Implements ``Polynomial division using dynamic arrays, heaps
+    and packed exponents'' by Michael Monagan and Roman Pearce, except that we
+    divide from right to left and use a heap with smallest exponent at head.
+    No aliasing is allowed.
+
+int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} divided by \code{poly3} and return 1 if
+    the quotient is exact. Otherwise return 0. The function uses the algorithm
+    of Michael Monagan and Roman Pearce. Note that the function
+    \code{fmpz_mpoly_div_monagan_pearce} below may be much faster if the
+    quotient is known to be exact.
+
+*******************************************************************************
+
+    Division
+
+*******************************************************************************
+
+slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
+           ulong ** expq, slong * allocq, const fmpz * poly2,
+   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
+                                 slong len3, ulong * maxn, slong bits, slong N)
+
+    Set \code{(polyq, expq, allocq)} to the quotient of
+    \code{(poly2, exp2, len2)} by \code{(poly3, exp3, len3)} discarding
+    remainder (with notional remainder coefficients reduced modulo the leading
+    coefficient of \code{(poly3, exp3, len3)}), and return the length of the
+    quotient. The function reallocates its output, hence the double
+    indirection. The function assumes the exponent vectors all fit in $N$
+    words. The exponent vectors are assumed to have fields with the given
+    number of bits. Assumes input polynomials are nonzero. Implements
+    "Polynomial division using dynamic arrays, heaps and packed exponents" by
+    Michael Monagan and Roman Pearce, except that we use a heap with smallest
+    exponent at head. Note that if $a < b$ then $(n - b) < (n - b)$ where $n$
+    is the maximum value $a$ and $b$ can take. The word \code{maxn} is set to
+    an exponent vector whose fields are all set to such a value $n$. This
+    allows division from left to right with a heap with smallest exponent at
+    the head. The quotient polynomial is written in reverse order. No aliasing
+    is allowed.
+
+void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q,
+                     const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{polyq} to the quotient of \code{poly2} by \code{poly3},
+    discarding the remainder (with notional remainder coefficients reduced
+    modulo the leading coefficient of \code{poly3}). Implements "Polynomial
+    division using dynamic arrays, heaps and packed exponents" by Michael
+    Monagan and Roman Pearce, except that we use a heap with smallest exponent
+    at head. This function is exceptionally efficient if the division is known
+    to be exact.
+
+slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
+  fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
+                  ulong ** expr, slong * allocr, const fmpz * poly2,
+   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
+                                 slong len3, ulong * maxn, slong bits, slong N)
+
+    Set \code{(polyq, expq, allocq)} and \code{(polyr, expr, allocr)} to the
+    quotient and remainder of \code{(poly2, exp2, len2)} by
+    \code{(poly3, exp3, len3)} (with remainder coefficients reduced modulo the
+    leading coefficient of \code{(poly3, exp3, len3)}), and return the length
+    of the quotient. The function reallocates its outputs, hence the double
+    indirection. The function assumes the exponent vectors all fit in $N$
+    words. The exponent vectors are assumed to have fields with the given
+    number of bits. Assumes input polynomials are nonzero. Implements
+    "Polynomial division using dynamic arrays, heaps and packed exponents" by
+    Michael Monagan and Roman Pearce, except that we use a heap with smallest
+    exponent at head. Note that if $a < b$ then $(n - b) < (n - b)$ where $n$
+    is the maximum value $a$ and $b$ can take. The word \code{maxn} is set to
+    an exponent vector whose fields are all set to such a value $n$. This
+    allows division from left to right with a heap with smallest exponent at
+    the head. The quotient and remainder polynomials are written in reverse
+    order. No aliasing is allowed.
+
+void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{polyq} and \code{polyr} to the quotient and remainder of
+    \code{poly2} divided by \code{poly3}, (with remainder coefficients reduced
+    modulo the leading coefficient of \code{poly3}). Implements "Polynomial
+    division using dynamic arrays, heaps and packed exponents" by Michael
+    Monagan and Roman Pearce, except that we use a heap with smallest exponent
+    at head.
+
+slong _fmpz_mpoly_divrem_array(slong * lenr,
+       fmpz ** polyq, ulong ** expq, slong * allocq,
+              fmpz ** polyr, ulong ** expr, slong * allocr, 
+                const fmpz * poly2, const ulong * exp2, slong len2, 
+        const fmpz * poly3, const ulong * exp3, slong len3, slong * mults, 
+                                                         slong num, slong bits)
+
+    Use dense array division to set \code{(polyq, expq, allocq)} and
+    \code{(polyr, expr, allocr)} to the quotient and remainder of
+    \code{(poly2, exp2, len2)} divided by \code{(poly3, exp3, len3)} in
+    \code{num} variables, given a list of multipliers to tightly pack
+    exponents and a number of bits for the fields of the exponents of the
+    result. The function reallocates its outputs, hence the double indirection.
+    The array \code{mults} is a list of bases to be used in encoding the array
+    indices from the exponents. The function returns the length of the
+    quotient. It is assumed that the input polynomials are not zero. The
+    quotient and remainder are written in reverse order. No aliasing is
+    allowed.
+
+int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
+                    const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{polyq} and \code{polyr} to the quotient and remainder of
+    \code{poly2} divided by \code{poly3}, (with remainder coefficients reduced
+    modulo the leading coefficient of \code{poly3}). The function is
+    implemented using dense arrays, and is efficient when the inputs are fairly
+    dense. If the array will be larger than some internally set parameter, the
+    function silently returns 0 so that another function can be called,
+    otherwise it returns 1.
+
+*******************************************************************************
+
+    Reduction
+
+*******************************************************************************
+
+slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, 
+       fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
+          const ulong * exp2, slong len2, const fmpz_mpoly_struct ** poly3,
+                        ulong * const * exp3, slong len, slong N, slong bits,
+                                      ulong * maxn, const fmpz_mpoly_ctx_t ctx)
+
+    This function is as per \code{_fmpz_mpoly_divrem_monagan_pearce} except
+    that it takes an array of divisor polynomials \code{poly3} and an array of
+    repacked exponent arrays \code{exp3}, which may alias the exponent arrays
+    of \code{poly3}, and it returns an array of quotient polynomials
+    \code{polyq}. The number of divisor (and hence quotient) polynomials, is
+    given by \code{len}. The function computes polynomials $q_i$ such that
+    $r = a - \sum_{i=0}^{\mbox{len - 1}} q_ib_i$, where the $q_i$ are the
+    quotient polynomials and the $b_i$ are the divisor polynomials.
+
+void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
+    const fmpz_mpoly_t poly2, const fmpz_mpoly_struct ** poly3, slong len,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    This function is as per \code{fmpz_mpoly_divrem_monagan_pearce} except
+    that it takes an array of divisor polynomials \code{poly3}, and it returns
+    an array of quotient polynomials \code{q}. The number of divisor (and hence
+    quotient) polynomials, is given by \code{len}. The function computes
+    polynomials $q_i = q[i]$ such that \code{poly2} is
+    $r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i$, where $b_i =$ \code{poly3[i]}.
+
+*******************************************************************************
+
+    Input/Output
+
+*******************************************************************************
+
+char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
+                          const ulong * exps, slong len, const char ** x, 
+                                slong bits, slong n, int deg, int rev, slong N)
+
+    Returns a string (which the user is responsible for cleaning up),
+    representing \code{(poly, exps, len)} in $n$ variables, exponent fields
+    of the given number of bits and exponent vectors taking $N$ words each,
+    given an array of $n$ variable strings, starting with the variable of
+    greatest significance with respect to the ordering. The ordering is
+    specified by the values \code{deg}, which is set to 1 if the polynomial
+    is deglex or degrevlex, and \code{rev}, which is set to 1 if the
+    polynomial is revlex or degrevlex.
+
+char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly,
+                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
+
+    Return a string (which the user is responsible for cleaning up),
+    representing \code{poly}, given an array of variable strings, starting
+    with the variable of greatest significance with respect to the ordering. 
+
+int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
+                           const ulong * exps, slong len, const char ** x,
+                                slong bits, slong n, int deg, int rev, slong N)
+
+    Print to the given stream, a string representing \code{(poly, exps, len)}
+    in $n$ variables, exponent fields of the given number of bits and exponent
+    vectors taking $N$ words each, given an array of $n$ variable strings,
+    starting with the variable of greatest significance with respect to the
+    ordering. The ordering is specified by the values \code{deg}, which is set
+    to 1 if the polynomial is deglex or degrevlex, and \code{rev}, which is set
+    to 1 if the polynomial is revlex or degrevlex. The number of characters
+    written is returned.
+
+int fmpz_mpoly_fprint_pretty(FILE * file, 
+          const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
+
+    Print to the given stream, a string (which the user is responsible for
+    cleaning up), representing \code{poly}, given an array of variable strings,
+    starting with the variable of greatest significance with respect to the
+    ordering. The number of characters
+    written is returned.
+
