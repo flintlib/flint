@@ -37,10 +37,6 @@
 
 /*  Type definitions *********************************************************/
 
-typedef enum {
-   ORD_LEX, ORD_REVLEX, ORD_DEGLEX, ORD_DEGREVLEX
-} ordering_t;
-
 typedef struct
 {
    slong n;        /* number of elements in exponent vector (including deg) */
