@@ -310,12 +310,23 @@ fmpz * fmpz_mpoly_get_coeff_ptr(fmpz_mpoly_t poly,
     assumed that $i \geq 0$.
 
 ulong * fmpz_mpoly_get_monomial_ptr(fmpz_mpoly_t poly,
-                                                  slong i, fmpz_mpoly_ctx_t ctx)
+                                                 slong i, fmpz_mpoly_ctx_t ctx)
 
     Return a pointer into the exponent array of \code{poly} at index $i$. The
     function is implemented as a macro and returns \code{NULL} if the index is 
     beyond the current number of terms of the polynomial. It is assumed that
     $i \geq 0$.
+
+void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
+                       ulong const * exp, const fmpz_t c, fmpz_mpoly_ctx_t ctx)
+
+    Set the term of \code{poly} with the given monomial to the given
+    coefficient. The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If a term with that
+    monomial already exists in the polynomial, it is overwritten. The term is
+    removed if the coefficient is zero. If a term with that monomial doesn't
+    exist, one is inserted at the appropriate position.
 
 *******************************************************************************
 
@@ -862,3 +873,16 @@ int fmpz_mpoly_fprint_pretty(FILE * file,
     ordering. The number of characters
     written is returned.
 
+*******************************************************************************
+
+    Random generation
+
+*******************************************************************************
+
+void fmpz_mpoly_randtest(fmpz_mpoly_t poly, flint_rand_t state,
+    slong length, slong exp_bound, slong coeff_bits, const fmpz_mpoly_ctx_t ctx)
+
+    Generate a random polynomial with the number of variables and ordering
+    specified by \code{ctx}, and with length up to the given length, exponents
+    which don't exceed the given bound and with signed coefficients of the
+    given number of bits.

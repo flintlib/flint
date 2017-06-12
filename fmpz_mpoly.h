@@ -261,6 +261,9 @@ FLINT_DLL void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
     ((n) < (poly)->length ? (poly)->exps + \
                      (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
 
+void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
+                ulong const * exp, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly,
                                                    const fmpz_mpoly_ctx_t ctx);
 
@@ -473,6 +476,11 @@ FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
 
 FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file, 
          const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx);
+
+/* Random generation *********************************************************/
+
+void fmpz_mpoly_randtest(fmpz_mpoly_t poly, flint_rand_t state,
+   slong length, slong exp_bound, slong coeff_bits, const fmpz_mpoly_ctx_t ctx);
 
 /******************************************************************************
 

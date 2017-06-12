@@ -27,6 +27,7 @@
 #define ulong mp_limb_t
 
 #include "flint.h"
+#include "ulong_extras.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -35,6 +36,8 @@
 typedef enum {
    ORD_LEX, ORD_REVLEX, ORD_DEGLEX, ORD_DEGREVLEX
 } ordering_t;
+
+#define MPOLY_NUM_ORDERINGS 4
 
 typedef struct mpoly_heap_t
 {
@@ -82,6 +85,14 @@ typedef struct mpoly_heap_s
          flint_throw(FLINT_ERROR, "Invalid ordering in fmpz_mpoly");  \
       }                                                               \
    } while (0)
+
+/* Orderings *****************************************************************/
+
+MPOLY_INLINE
+ordering_t mpoly_ordering_randtest(flint_rand_t state)
+{
+   return (ordering_t) n_randint(state, MPOLY_NUM_ORDERINGS);
+}
 
 /*  Monomials ****************************************************************/
 
@@ -264,6 +275,9 @@ FLINT_DLL void mpoly_pack_monomials_tight(ulong * exp1,
 
 FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
                             slong * mults, slong num, slong extra, slong bits);
+
+FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
+                                        const ulong * exp, slong len, slong N);
 
 /* Heap **********************************************************************/
 

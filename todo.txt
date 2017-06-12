@@ -105,8 +105,6 @@ fmpz_mpoly
   require an extra bit for either q or r in signed integer division in
   small case. This is probably why C division is normalised the way it is.
 
-* Move the ordering enum from fmpz_mpoly.h to mpoly.h and rename.
-
 * Move _fmpz_mpoly_max_degrees to mpoly module and rename.
 
 * Implement fmpz_mpoly_ui/si/fmpz_sub functions for Nemo.
