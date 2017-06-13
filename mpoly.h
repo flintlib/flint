@@ -250,7 +250,7 @@ int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3, slong N)
    for (i = 0; i < N; i++)
    {
       if (exp2[i] != exp3[i])
-         return exp2[i] < exp3[i];
+         return exp3[i] < exp2[i];
    }
 
    return 0;

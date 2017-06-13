@@ -21,7 +21,7 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
    slong i, N, index, bits, exp_bits;
    int exists;
    ulong sum = 0, max_exp = 0;
-   ulong * packed_exp;
+   ulong * packed_exp, * exps;
    int deg, rev;
 
    TMP_INIT;
@@ -63,7 +63,25 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
    while (bits >= exp_bits) /* extra bit required for signs */
       exp_bits *= 2;
        
-   fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
+   /* reallocate the number of bits of the exponents of the polynomial */
+   if (exp_bits > poly->bits)
+   {
+      exps = mpoly_unpack_monomials(exp_bits, poly->exps,
+                                             poly->length, ctx->n, poly->bits);
+
+      N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+
+      if (exps != poly->exps)
+      {
+         flint_free(poly->exps);
+
+         if (poly->alloc > poly->length)
+            exps = (ulong *) flint_realloc(exps, poly->alloc*N*sizeof(ulong));
+      }
+
+      poly->exps = exps;
+      poly->bits = exp_bits;
+   }
           
    N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
@@ -93,6 +111,9 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
          mpoly_monomial_set(poly->exps + N*index, packed_exp, N);
 
          poly->length++; /* safe because length is increasing */
+
+         /* set coeff */
+         fmpz_mpoly_set_coeff_fmpz(poly, index, c, ctx);
       }
    } else if (fmpz_is_zero(c)) /* zero coeff, remove term */
    {
