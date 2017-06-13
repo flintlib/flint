@@ -51,6 +51,7 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
       }
    }
       
+      
    if (0 > (slong) max_exp)
       flint_throw(FLINT_EXPOF,
                               "Exponent overflow in fmpz_mpoly_set_term_fmpz");
@@ -61,16 +62,16 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
    exp_bits = 8;
    while (bits >= exp_bits) /* extra bit required for signs */
       exp_bits *= 2;
-
+       
    fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
-   
+          
    N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
    /* pack exponent vector */
    mpoly_set_monomial(packed_exp, exp, poly->bits, ctx->n, deg, rev);
-
+       
    /* work out at what index term should be placed */
    exists = mpoly_monomial_exists(&index, poly->exps,
                                                   packed_exp, poly->length, N);
@@ -78,7 +79,7 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
    if (!exists) /* term with that exponent doesn't exist */
    {
       if (!fmpz_is_zero(c)) /* only set if coeff is nonzero */
-      {
+      {       
          fmpz_mpoly_fit_length(poly, poly->length + 1, ctx);
 
          /* shift coeffs and exps by one to make space */

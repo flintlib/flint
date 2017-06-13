@@ -94,6 +94,40 @@ ordering_t mpoly_ordering_randtest(flint_rand_t state)
    return (ordering_t) n_randint(state, MPOLY_NUM_ORDERINGS);
 }
 
+MPOLY_INLINE
+int mpoly_ordering_isdeg(ordering_t ord)
+{
+   return ord == ORD_DEGLEX || ord == ORD_DEGREVLEX;
+}
+
+MPOLY_INLINE
+int mpoly_ordering_isrev(ordering_t ord)
+{
+   return ord == ORD_REVLEX || ord == ORD_DEGREVLEX;
+}
+
+MPOLY_INLINE
+void mpoly_ordering_print(ordering_t ord)
+{
+   switch (ord)
+   {
+   case ORD_LEX:
+      printf("lex");
+      break;
+   case ORD_DEGLEX:
+      printf("deglex");
+      break;
+   case ORD_REVLEX:
+      printf("revlex");
+      break;
+   case ORD_DEGREVLEX:
+      printf("degrevlex");
+      break;
+   default:
+      printf("Unknown ordering in mpoly_ordering_print.");
+   }
+}
+
 /*  Monomials ****************************************************************/
 
 MPOLY_INLINE

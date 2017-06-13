@@ -137,9 +137,15 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
 {
    if (bits > poly->bits)
    {
-      slong N = (bits*ctx->n - 1)/FLINT_BITS + 1;
+      slong N;
 
-      poly->exps = flint_realloc(poly->exps, N*poly->alloc*sizeof(ulong));
+      if (poly->alloc != 0)
+      {
+         N = (bits*ctx->n - 1)/FLINT_BITS + 1;
+
+         poly->exps = flint_realloc(poly->exps, N*poly->alloc*sizeof(ulong));
+      }
+
       poly->bits = bits;
    }   
 }
