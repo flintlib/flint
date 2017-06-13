@@ -328,6 +328,16 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
     removed if the coefficient is zero. If a term with that monomial doesn't
     exist, one is inserted at the appropriate position.
 
+void fmpz_mpoly_get_term_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
+                                 ulong const * exp, const fmpz_mpoly_ctx_t ctx)
+
+    Get the coefficient $c$ of the term of \code{poly} with the given monomial.
+    The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If no term with that
+    monomial exists in the polynomial, zero is returned. This includes the case
+    where the monomial is larger than that of the leading term of \code{poly}.
+
 *******************************************************************************
 
     Set and negate
