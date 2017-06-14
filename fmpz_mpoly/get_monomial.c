@@ -17,10 +17,10 @@
 void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
                                            slong n, const fmpz_mpoly_ctx_t ctx)
 {
-   slong m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+   slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
    int deg, rev;
 
    degrev_from_ord(deg, rev, ctx->ord);
 
-   mpoly_get_monomial(exps, poly->exps + m*n, poly->bits, ctx->n, deg, rev);
+   mpoly_get_monomial(exps, poly->exps + N*n, poly->bits, ctx->n, deg, rev);
 }

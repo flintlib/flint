@@ -38,12 +38,12 @@ void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
 
     TMP_INIT;
 
-    if (N == 1)
+    /*if (N == 1)
     {
        _fmpz_mpoly_gen1(poly, exps, i, bits, n, deg, rev);
 
        return;
-    }
+    }*/
     
     fmpz_set_ui(poly + 0, 1);
     

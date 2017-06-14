@@ -23,7 +23,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("set_ui....");
+    flint_printf("gen/is_gen....");
     fflush(stdout);
 
     /* Set to random integer and compare */
@@ -32,9 +32,7 @@ main(void)
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f;
        ordering_t ord;
-       ulong c, d;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits, j;
-       ulong * exp;
+       slong nvars, len, exp_bound, coeff_bits, exp_bits, k;
 
        ord = mpoly_ordering_randtest(state);
        nvars = n_randint(state, 20) + 1;
@@ -52,19 +50,12 @@ main(void)
 
        fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
 
-       c = n_randtest(state);
+       k = n_randint(state, nvars);
 
-       fmpz_mpoly_set_ui(f, c, ctx);
+       fmpz_mpoly_gen(f, k, ctx);
 
-       exp = (ulong *) flint_malloc(nvars*sizeof(ulong));
-
-       for (j = 0; j < nvars; j++)
-          exp[j] = 0;
-
-       d = fmpz_mpoly_get_term_ui(f, exp, ctx);
-
-       result = c == d &&
-                ((c == 0 && f->length == 0) || f->length == 1);
+       result = fmpz_mpoly_is_gen(f, k, ctx) &&
+                fmpz_mpoly_is_gen(f, -WORD(1), ctx);
 
        if (!result)
        {
@@ -82,10 +73,8 @@ main(void)
                                     "coeff_bits = %ld, nvars = %ld\n\n",
                                   len, exp_bits, exp_bound, coeff_bits, nvars);
 
-          flint_printf("c = %wu\n", c); 
-          flint_printf("d = %wu\n", d);
-
-          fmpz_mpoly_print_pretty(f, vars, ctx);
+          fmpz_mpoly_print_pretty(f, vars, ctx); printf("\n\n");
+          flint_printf("k = %wd\n", k);
 
           flint_abort();
        }
