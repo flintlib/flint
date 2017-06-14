@@ -15,8 +15,8 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
-                 ulong const * exp, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_set_term_si(fmpz_mpoly_t poly,
+                        ulong const * exp, slong c, const fmpz_mpoly_ctx_t ctx)
 {
    slong i, N, index, bits, exp_bits;
    int exists;
@@ -50,7 +50,7 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
             max_exp = exp[i];
       }
    }
-            
+        
    if (0 > (slong) max_exp)
       flint_throw(FLINT_EXPOF,
                               "Exponent overflow in fmpz_mpoly_set_term_fmpz");
@@ -95,7 +95,7 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
 
    if (!exists) /* term with that exponent doesn't exist */
    {
-      if (!fmpz_is_zero(c)) /* only set if coeff is nonzero */
+      if (c != 0) /* only set if coeff is nonzero */
       {       
          fmpz_mpoly_fit_length(poly, poly->length + 1, ctx);
 
@@ -112,9 +112,9 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
          poly->length++; /* safe because length is increasing */
 
          /* set coeff */
-         fmpz_mpoly_set_coeff_fmpz(poly, index, c, ctx);
+         fmpz_mpoly_set_coeff_si(poly, index, c, ctx);
       }
-   } else if (fmpz_is_zero(c)) /* zero coeff, remove term */
+   } else if (c == 0) /* zero coeff, remove term */
    {
       /* shift coeffs and exps by one to make space */
       for (i = index; i < poly->length - 1; i++)
@@ -125,7 +125,7 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
 
       _fmpz_mpoly_set_length(poly, poly->length - 1, ctx);
    } else /* term with that monomial exists, coeff is nonzero */
-      fmpz_mpoly_set_coeff_fmpz(poly, index, c, ctx);  
+      fmpz_mpoly_set_coeff_si(poly, index, c, ctx);  
 
    TMP_END; 
 }
