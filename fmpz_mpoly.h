@@ -486,6 +486,22 @@ FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
 FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file, 
          const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx);
 
+FMPZ_MPOLY_INLINE
+int _fmpz_mpoly_print_pretty(const fmpz * poly, 
+                const ulong * exps, slong len, const char ** x,
+                                slong bits, slong n, int deg, int rev, slong N)
+{
+   return _fmpz_mpoly_fprint_pretty(stdout, poly, exps, len,
+                                                      x, bits, n, deg, rev, N);
+}
+
+FMPZ_MPOLY_INLINE
+int fmpz_mpoly_print_pretty(const fmpz_mpoly_t poly,
+                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
+{
+   return fmpz_mpoly_fprint_pretty(stdout, poly, x, ctx);
+}
+
 /* Random generation *********************************************************/
 
 void fmpz_mpoly_randtest(fmpz_mpoly_t poly, flint_rand_t state,

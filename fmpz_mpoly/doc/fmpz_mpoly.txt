@@ -877,10 +877,30 @@ int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
 int fmpz_mpoly_fprint_pretty(FILE * file, 
           const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
 
-    Print to the given stream, a string (which the user is responsible for
-    cleaning up), representing \code{poly}, given an array of variable strings,
+    Print to the given stream, a string representing \code{poly}, given an
+    array of variable strings, starting with the variable of greatest
+    significance with respect to the ordering. The number of characters
+    written is returned.
+
+int _fmpz_mpoly_print_pretty(const fmpz * poly, 
+                const ulong * exps, slong len, const char ** x,
+                                slong bits, slong n, int deg, int rev, slong N)
+
+    Print to stdout, a string representing \code{(poly, exps, len)}
+    in $n$ variables, exponent fields of the given number of bits and exponent
+    vectors taking $N$ words each, given an array of $n$ variable strings,
     starting with the variable of greatest significance with respect to the
-    ordering. The number of characters
+    ordering. The ordering is specified by the values \code{deg}, which is set
+    to 1 if the polynomial is deglex or degrevlex, and \code{rev}, which is set
+    to 1 if the polynomial is revlex or degrevlex. The number of characters
+    written is returned.
+
+int fmpz_mpoly_print_pretty(const fmpz_mpoly_t poly,
+                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
+
+    Print to the given stream, a string representing \code{poly}, given an
+    array of variable strings, starting with the variable of greatest
+    significance with respect to the ordering. The number of characters
     written is returned.
 
 *******************************************************************************

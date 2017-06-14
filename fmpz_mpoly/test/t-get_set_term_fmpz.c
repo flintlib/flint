@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2017 William Hart
 
     This file is part of FLINT.
 
@@ -26,7 +26,7 @@ main(void)
     flint_printf("get/set_term_fmpz....");
     fflush(stdout);
 
-    /* Check aliasing of a and c */
+    /* Set term and get term and compare */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
@@ -62,7 +62,7 @@ main(void)
           {
              slong bits = n_randint(state, FLINT_BITS -
                      mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-             exp[k] = n_randbits(state, exp_bits);
+             exp[k] = n_randbits(state, bits);
           }
 
           fmpz_randtest(c, state, n_randint(state, 200));

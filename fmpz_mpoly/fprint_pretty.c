@@ -75,7 +75,7 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
                r = (r != EOF) ? 1 : EOF;
             }
             if (r > 0)
-               r = flint_fprintf(file, "*%s^%wd", x[j], degs[j]);
+               r = flint_fprintf(file, "%s^%wd", x[j], degs[j]);
             first = 0;
          }
          if (degs[j] == 1)
@@ -86,7 +86,7 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
                r = (r != EOF) ? 1 : EOF;
             }
             if (r > 0)
-               r = flint_fprintf(file, "*%s", x[j]);
+               r = flint_fprintf(file, "%s", x[j]);
             first = 0;
          }
       }
