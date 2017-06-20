@@ -67,8 +67,12 @@ void fmpz_mpoly_sub_ui(fmpz_mpoly_t poly1,
             poly1->bits = poly2->bits;
          } else
          {
+            fmpz t = poly2->coeffs[poly2->length];
+
             for (i = poly2->length - 1; i >= 0; i--)
                poly1->coeffs[i + 1] = poly2->coeffs[i];
+
+            poly2->coeffs[0] = t;
          }
 
          for (i = poly2->length*m - 1; i >= 0; i--)
@@ -82,5 +86,6 @@ void fmpz_mpoly_sub_ui(fmpz_mpoly_t poly1,
          fmpz_set_ui(poly1->coeffs + 0, c);
          fmpz_neg(poly1->coeffs + 0, poly1->coeffs + 0);
       }
-   }
+   } else if (poly1 != poly2)
+      fmpz_mpoly_set(poly1, poly2, ctx);
 }
