@@ -20,20 +20,20 @@
 int
 main(void)
 {
-    int i, j, k, result;
+    int i, j, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get/set_term_fmpz....");
+    flint_printf("get/set_coeff_fmpz....");
     fflush(stdout);
 
-    /* Set term and get term and compare */
+    /* Set coeff and get coeff and compare */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f;
        ordering_t ord;
        fmpz_t c, d;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits;
+       slong nvars, len, exp_bound, coeff_bits, exp_bits, index;
 
        fmpz_init(c);
        fmpz_init(d);
@@ -56,22 +56,21 @@ main(void)
 
        for (j = 0; j < 10; j++)
        {
-          ulong * exp = (ulong *) flint_malloc(nvars*sizeof(ulong));
-
-          for (k = 0; k < nvars; k++)
-          {
-             slong bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-             exp[k] = n_randbits(state, bits);
-          }
+          len = f->length;
 
           fmpz_randtest(c, state, n_randint(state, 200));
 
-          fmpz_mpoly_set_term_fmpz(f, exp, c, ctx);
+          index = n_randint(state, f->length + 1);
 
-          fmpz_mpoly_get_term_fmpz(d, f, exp, ctx);
+          fmpz_mpoly_set_coeff_fmpz(f, index, c, ctx);
 
-          result = fmpz_equal(c, d);
+          if (!fmpz_is_zero(c))
+          {
+             fmpz_mpoly_get_coeff_fmpz(d, f, index, ctx);
+
+             result = fmpz_equal(c, d);
+          } else
+             result = (index >= len) || (f->length == len - 1);
 
           if (!result)
           {
@@ -84,11 +83,10 @@ main(void)
 
              printf("c = "); fmpz_print(c); printf("\n");
              printf("d = "); fmpz_print(d); printf("\n");
+             flint_printf("index = %wd\n", index);
 
              flint_abort();
           }
-
-          flint_free(exp);
        }
 
        fmpz_mpoly_clear(f, ctx);  

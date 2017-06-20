@@ -20,23 +20,20 @@
 int
 main(void)
 {
-    int i, j, k, result;
+    int i, j, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get/set_term_fmpz....");
+    flint_printf("get/set_coeff_ui....");
     fflush(stdout);
 
-    /* Set term and get term and compare */
+    /* Set coeff and get coeff and compare */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f;
        ordering_t ord;
-       fmpz_t c, d;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits;
-
-       fmpz_init(c);
-       fmpz_init(d);
+       ulong c, d;
+       slong nvars, len, exp_bound, coeff_bits, exp_bits, index;
 
        ord = mpoly_ordering_randtest(state);
        nvars = n_randint(state, 20) + 1;
@@ -56,22 +53,25 @@ main(void)
 
        for (j = 0; j < 10; j++)
        {
-          ulong * exp = (ulong *) flint_malloc(nvars*sizeof(ulong));
+          len = f->length;
 
-          for (k = 0; k < nvars; k++)
+          c = n_randtest(state);
+
+          index = n_randint(state, f->length + 1);
+
+          fmpz_mpoly_set_coeff_ui(f, index, c, ctx);
+
+          if (c != 0)
           {
-             slong bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-             exp[k] = n_randbits(state, bits);
+             d = fmpz_mpoly_get_coeff_ui(f, index, ctx);
+
+             result = c == d;
+          } else
+          {
+             d = 0;
+
+             result = (index >= len) || (f->length == len - 1);
           }
-
-          fmpz_randtest(c, state, n_randint(state, 200));
-
-          fmpz_mpoly_set_term_fmpz(f, exp, c, ctx);
-
-          fmpz_mpoly_get_term_fmpz(d, f, exp, ctx);
-
-          result = fmpz_equal(c, d);
 
           if (!result)
           {
@@ -82,19 +82,15 @@ main(void)
                                       "coeff_bits = %ld, nvars = %ld\n\n",
                                   len, exp_bits, exp_bound, coeff_bits, nvars);
 
-             printf("c = "); fmpz_print(c); printf("\n");
-             printf("d = "); fmpz_print(d); printf("\n");
+             flint_printf("c = %wu\n", c);
+             flint_printf("d = %wu\n", d);
+             flint_printf("index = %wd\n", index);
 
              flint_abort();
           }
-
-          flint_free(exp);
        }
 
        fmpz_mpoly_clear(f, ctx);  
-
-       fmpz_clear(c);      
-       fmpz_clear(d);      
     }
 
     FLINT_TEST_CLEANUP(state);

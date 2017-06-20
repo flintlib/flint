@@ -85,6 +85,8 @@ main(void)
 
              flint_abort();
           }
+
+          flint_free(exp);
        }
 
        fmpz_mpoly_clear(f, ctx);  
