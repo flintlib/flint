@@ -51,8 +51,10 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
    {
       flint_free(poly->exps);   
       poly->exps = ptr;
-      poly->bits = max_bits;
+      poly->alloc = poly->length;
    }
+
+   poly->bits = max_bits;
 
    fmpz_mpoly_fit_length(poly, n + 1, ctx);
 
