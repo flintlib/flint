@@ -26,7 +26,7 @@ void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,
    {
       e2 = exp2[i] >> shift;
       e1 = ((e2 >> (num - 1)*bits) & mask);
-      
+
       for (j = num - 2; j >= 0; j--)
       {
          e1 *= mults[j];

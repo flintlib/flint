@@ -138,7 +138,7 @@ void mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2,
          }
 
          for (j = 0; j + 1 < r2; j += 2)
-            exps1[k1++] = ((v >> (24 - 8*j)) & UWORD(0xFF00000000)) + ((v >> (56 - 8*j)) & UWORD(0xFF));
+            exps1[k1++] = ((v >> (24 - 8*j)) & UWORD(0xFF00000000)) + ((v >> (48 - 8*j)) & UWORD(0xFF));
 
          if (r2 & 1)
             exps1[k1++] = ((v >> (24 - 8*j)) & UWORD(0xFF00000000));

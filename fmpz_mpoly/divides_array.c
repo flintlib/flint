@@ -185,7 +185,7 @@ void _fmpz_mpoly_submul_array1_fmpz(fmpz * poly1,
                for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
                {
                   c = c2 + (slong) exp3[j];
-                  fmpz_submul(c, poly2 + i, poly3 + i);
+                  fmpz_submul(c, poly2 + i, poly3 + j);
                }
             }
          }

@@ -22,7 +22,7 @@ void _fmpz_mpoly_realloc(fmpz ** poly, ulong ** exps,
     (*exps) = (ulong *) flint_realloc(*exps, len*N*sizeof(ulong));
 
     if (len > *alloc)
-        flint_mpn_zero((mp_ptr) (poly + *alloc), len - *alloc);
+        flint_mpn_zero((mp_ptr) (*poly + *alloc), len - *alloc);
     
     (*alloc) = len;
 }

@@ -35,7 +35,7 @@ main(void)
        slong nvars, len, exp_bound, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 2) + 1;
+       nvars = n_randint(state, 20) + 1;
 
        fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
@@ -105,7 +105,7 @@ main(void)
        slong nvars, len, exp_bound, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 2) + 1;
+       nvars = n_randint(state, 20) + 1;
 
        fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
@@ -176,7 +176,7 @@ main(void)
        slong nvars, len, exp_bound, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 2) + 1;
+       nvars = n_randint(state, 20) + 1;
 
        fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
@@ -248,7 +248,7 @@ main(void)
        slong nvars, len, exp_bound, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 2) + 1;
+       nvars = n_randint(state, 20) + 1;
 
        fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
@@ -325,7 +325,7 @@ main(void)
        slong nvars, len, exp_bound, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 2) + 1;
+       nvars = n_randint(state, 20) + 1;
 
        fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
