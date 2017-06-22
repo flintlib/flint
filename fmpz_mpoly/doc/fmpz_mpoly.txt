@@ -676,7 +676,8 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
     Set \code{(poly2, exp1, alloc)} \code{(poly2, exp2, len2)} raised to the
     power of $k$. The function reallocates its output, hence the double
     indirection. Assumes that exponents vectors each take $N$ words. Uses the
-    FPS algorithm of Monagan and Pearce. No aliasing is allowed.
+    FPS algorithm of Monagan and Pearce. No aliasing is allowed. Assumes
+    \code{len2 > 1}.
 
 void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                            slong k, const fmpz_mpoly_ctx_t ctx)
