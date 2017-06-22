@@ -59,14 +59,12 @@ main(void)
 
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-       fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
-       fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
-       fmpz_mpoly_randtest(k, state, len, exp_bound, coeff_bits, ctx);
-
        for (j = 0; j < 4; j++)
        {
-          len = f->length;
+          fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+          fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+          fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
+          fmpz_mpoly_randtest(k, state, len, exp_bound, coeff_bits, ctx);
 
           ok1 = fmpz_mpoly_mul_array(h, f, g, ctx);
              
@@ -144,11 +142,10 @@ main(void)
 
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(k1, state, len, exp_bound, coeff_bits, ctx);
-       fmpz_mpoly_randtest(k2, state, len, exp_bound, coeff_bits, ctx);
-
        for (j = 0; j < 4; j++)
        {
+          fmpz_mpoly_randtest(k1, state, len, exp_bound, coeff_bits, ctx);
+          fmpz_mpoly_randtest(k2, state, len, exp_bound, coeff_bits, ctx);
           fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
           fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
           fmpz_mpoly_randtest(h, state, len2, exp_bound2, coeff_bits, ctx);
@@ -236,13 +233,11 @@ main(void)
 
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-       fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
-       fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
-
        for (j = 0; j < 4; j++)
        {
-          len = f->length;
+          fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+          fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+          fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
 
           ok1 = fmpz_mpoly_mul_array(h, f, g, ctx);
              
@@ -315,13 +310,11 @@ main(void)
 
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-       fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
-       fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
-
        for (j = 0; j < 4; j++)
        {
-          len = f->length;
+          fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+          fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+          fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
 
           ok1 = fmpz_mpoly_mul_array(h, f, g, ctx);
              
