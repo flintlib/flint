@@ -179,6 +179,9 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
       /* set output poly coeff from temporary accumulation, if not multiprec */
       if (small)
          fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
+
+      if (fmpz_is_zero(p1 + k))
+         k--;
    }
 
    k++;
@@ -386,6 +389,9 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
       /* set output poly coeff from temporary accumulation, if not multiprec */
       if (small)
          fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
+
+      if (fmpz_is_zero(p1 + k))
+         k--;
    }
 
    k++;
@@ -442,10 +448,15 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    /* compute number of bits to store maximum degree */
    bits = FLINT_BIT_COUNT(max);
+   if (bits >= FLINT_BITS)
+      flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_johnson");
 
    exp_bits = 8;
    while (bits >= exp_bits) /* extra bit required for signs */
       exp_bits *= 2;
+
+   exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+   exp_bits = FLINT_MAX(exp_bits, poly3->bits);
 
    /* ensure input exponents are packed into same sized fields as output */
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
@@ -468,6 +479,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
       fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
+      temp->bits = exp_bits;
 
       /* algorithm more efficient if smaller poly first */
       if (poly2->length >= poly3->length)
@@ -486,6 +498,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    {
       fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
       fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
+      poly1->bits = exp_bits;
 
       /* algorithm more efficient if smaller poly first */
       if (poly2->length >= poly3->length)

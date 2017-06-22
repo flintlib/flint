@@ -40,7 +40,6 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
             flint_throw(FLINT_EXPOF,
                               "Exponent overflow in fmpz_mpoly_set_term_fmpz");
       }
-
       max_exp = sum;
    } else
    {

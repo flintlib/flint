@@ -426,7 +426,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
 
    while (j < s)
    {
-      if (mpoly_monomial_lt(heap[j + 1].exp, heap[j].exp, N))
+      if (!mpoly_monomial_lt(heap[j + 1].exp, heap[j].exp, N))
          j++;
       heap[i] = heap[j];
       i = j;
@@ -437,7 +437,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
    exp = heap[s].exp;
    j = HEAP_PARENT(i);
 
-   while (i > 1 && mpoly_monomial_lt(exp, heap[j].exp, N))
+   while (i > 1 && mpoly_monomial_lt(heap[j].exp, exp, N))
    {
       heap[i] = heap[j];
       i = j;
@@ -476,7 +476,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    while ((j = HEAP_PARENT(i)) >= 1)
    {
-      if (!mpoly_monomial_lt(exp, heap[j].exp, N))
+      if (!mpoly_monomial_lt(heap[j].exp, exp, N))
          break;
 
       i = j;
