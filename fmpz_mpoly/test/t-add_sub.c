@@ -77,13 +77,6 @@ main(void)
 
           if (!result)
           {
-             const char * vars[20];
-             vars[0] = "x1", vars[1] = "x2", vars[2] = "x3", vars[3] = "x4",
-             vars[4] = "x5", vars[5] = "x6", vars[6] = "x7", vars[7] = "x8",
-             vars[8] = "x9", vars[9] = "x10", vars[10] = "x11", vars[11] = "x12",
-             vars[12] = "x13", vars[13] = "x14", vars[14] = "x15", vars[15] = "x16",
-             vars[16] = "x17", vars[17] = "x18", vars[18] = "x19", vars[19] = "x20";
-
              printf("FAIL\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
@@ -94,10 +87,10 @@ main(void)
                        len, exp_bits, exp_bound, len1, exp_bits1, exp_bound1,
                                len2, exp_bits2, exp_bound2, coeff_bits, nvars);
 
-             fmpz_mpoly_print_pretty(f, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(h, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(k, vars, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(h, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(k, NULL, ctx); printf("\n\n");
           
              flint_abort();
           }
@@ -160,13 +153,6 @@ main(void)
 
           if (!result)
           {
-             const char * vars[20];
-             vars[0] = "x1", vars[1] = "x2", vars[2] = "x3", vars[3] = "x4",
-             vars[4] = "x5", vars[5] = "x6", vars[6] = "x7", vars[7] = "x8",
-             vars[8] = "x9", vars[9] = "x10", vars[10] = "x11", vars[11] = "x12",
-             vars[12] = "x13", vars[13] = "x14", vars[14] = "x15", vars[15] = "x16",
-             vars[16] = "x17", vars[17] = "x18", vars[18] = "x19", vars[19] = "x20";
-
              printf("FAIL\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
@@ -177,10 +163,10 @@ main(void)
                        len, exp_bits, exp_bound, len1, exp_bits1, exp_bound1,
                                len2, exp_bits2, exp_bound2, coeff_bits, nvars);
 
-             fmpz_mpoly_print_pretty(f, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(h, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(k, vars, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(h, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(k, NULL, ctx); printf("\n\n");
           
              flint_abort();
           }
@@ -244,13 +230,6 @@ main(void)
 
           if (!result)
           {
-             const char * vars[20];
-             vars[0] = "x1", vars[1] = "x2", vars[2] = "x3", vars[3] = "x4",
-             vars[4] = "x5", vars[5] = "x6", vars[6] = "x7", vars[7] = "x8",
-             vars[8] = "x9", vars[9] = "x10", vars[10] = "x11", vars[11] = "x12",
-             vars[12] = "x13", vars[13] = "x14", vars[14] = "x15", vars[15] = "x16",
-             vars[16] = "x17", vars[17] = "x18", vars[18] = "x19", vars[19] = "x20";
-
              printf("FAIL\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
@@ -262,10 +241,10 @@ main(void)
                                len2, exp_bits2, exp_bound2, coeff_bits, nvars);
 
 
-             fmpz_mpoly_print_pretty(f, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(h, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(k, vars, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(h, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(k, NULL, ctx); printf("\n\n");
           
              flint_abort();
           }
@@ -332,13 +311,6 @@ main(void)
 
           if (!result)
           {
-             const char * vars[20];
-             vars[0] = "x1", vars[1] = "x2", vars[2] = "x3", vars[3] = "x4",
-             vars[4] = "x5", vars[5] = "x6", vars[6] = "x7", vars[7] = "x8",
-             vars[8] = "x9", vars[9] = "x10", vars[10] = "x11", vars[11] = "x12",
-             vars[12] = "x13", vars[13] = "x14", vars[14] = "x15", vars[15] = "x16",
-             vars[16] = "x17", vars[17] = "x18", vars[18] = "x19", vars[19] = "x20";
-
              printf("FAIL\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
@@ -349,11 +321,11 @@ main(void)
                        len, exp_bits, exp_bound, len1, exp_bits1, exp_bound1,
                                len2, exp_bits2, exp_bound2, coeff_bits, nvars);
 
-             fmpz_mpoly_print_pretty(f, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(h, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(k1, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(k2, vars, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(h, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(k1, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(k2, NULL, ctx); printf("\n\n");
           
              flint_abort();
           }
@@ -423,13 +395,6 @@ main(void)
 
           if (!result)
           {
-             const char * vars[20];
-             vars[0] = "x1", vars[1] = "x2", vars[2] = "x3", vars[3] = "x4",
-             vars[4] = "x5", vars[5] = "x6", vars[6] = "x7", vars[7] = "x8",
-             vars[8] = "x9", vars[9] = "x10", vars[10] = "x11", vars[11] = "x12",
-             vars[12] = "x13", vars[13] = "x14", vars[14] = "x15", vars[15] = "x16",
-             vars[16] = "x17", vars[17] = "x18", vars[18] = "x19", vars[19] = "x20";
-
              printf("FAIL\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
@@ -440,11 +405,11 @@ main(void)
                        len, exp_bits, exp_bound, len1, exp_bits1, exp_bound1,
                                len2, exp_bits2, exp_bound2, coeff_bits, nvars);
 
-             fmpz_mpoly_print_pretty(f, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(h, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(k1, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(k2, vars, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(h, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(k1, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(k2, NULL, ctx); printf("\n\n");
           
              flint_abort();
           }
@@ -505,13 +470,6 @@ main(void)
 
           if (!result)
           {
-             const char * vars[20];
-             vars[0] = "x1", vars[1] = "x2", vars[2] = "x3", vars[3] = "x4",
-             vars[4] = "x5", vars[5] = "x6", vars[6] = "x7", vars[7] = "x8",
-             vars[8] = "x9", vars[9] = "x10", vars[10] = "x11", vars[11] = "x12",
-             vars[12] = "x13", vars[13] = "x14", vars[14] = "x15", vars[15] = "x16",
-             vars[16] = "x17", vars[17] = "x18", vars[18] = "x19", vars[19] = "x20";
-
              printf("FAIL\n");
              
              printf("Aliasing test1\n");
@@ -522,9 +480,9 @@ main(void)
                                     len1, exp_bits1, exp_bound1,
                                len2, exp_bits2, exp_bound2, coeff_bits, nvars);
 
-             fmpz_mpoly_print_pretty(f, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(h, vars, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(h, NULL, ctx); printf("\n\n");
 
              flint_abort();
           }
@@ -595,13 +553,6 @@ main(void)
 
           if (!result)
           {
-             const char * vars[20];
-             vars[0] = "x1", vars[1] = "x2", vars[2] = "x3", vars[3] = "x4",
-             vars[4] = "x5", vars[5] = "x6", vars[6] = "x7", vars[7] = "x8",
-             vars[8] = "x9", vars[9] = "x10", vars[10] = "x11", vars[11] = "x12",
-             vars[12] = "x13", vars[13] = "x14", vars[14] = "x15", vars[15] = "x16",
-             vars[16] = "x17", vars[17] = "x18", vars[18] = "x19", vars[19] = "x20";
-
              printf("FAIL\n");
              
              printf("Aliasing test2\n");
@@ -613,9 +564,9 @@ main(void)
                        len, exp_bits, exp_bound, len1, exp_bits1, exp_bound1,
                                len2, exp_bits2, exp_bound2, coeff_bits, nvars);
 
-             fmpz_mpoly_print_pretty(f, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, vars, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(h, vars, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+             fmpz_mpoly_print_pretty(h, NULL, ctx); printf("\n\n");
 
              flint_abort();
           }

@@ -19,12 +19,13 @@
 
 int
 _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
-                        const ulong * exps, slong len, const char ** x,
+                        const ulong * exps, slong len, const char ** x_in,
                                 slong bits, slong n, int deg, int rev, slong N)
 {
    slong i, j;
    ulong * degs;
    int r, first;
+   char ** x = (char **) x_in;
 
    TMP_INIT;
 
@@ -36,6 +37,17 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
    }
 
    TMP_START;
+
+   if (x == NULL)
+   {
+      x = (char **) TMP_ALLOC((n - deg)*sizeof(char *));
+
+      for (i = 0; i < n - deg; i++)
+      {
+         x[i] = TMP_ALLOC(22);
+         flint_sprintf(x[i], "x%wd", i + 1);
+      }
+   }
 
    degs = (ulong *) TMP_ALLOC((n - deg)*sizeof(ulong));
    
