@@ -44,7 +44,7 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
 
       for (i = 0; i < n - deg; i++)
       {
-         x[i] = TMP_ALLOC(22);
+         x[i] = (char *) TMP_ALLOC(22*sizeof(char));
          flint_sprintf(x[i], "x%wd", i + 1);
       }
    }

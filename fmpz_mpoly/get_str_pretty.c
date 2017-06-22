@@ -19,9 +19,9 @@
 
 char *
 _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
-               const char ** x, slong bits, slong n, int deg, int rev, slong N)
+            const char ** x_in, slong bits, slong n, int deg, int rev, slong N)
 {
-   char * str;
+   char * str, ** x = (char **) x_in;
    slong i, j, bound, off;
    ulong * degs;
    int first;
@@ -37,6 +37,17 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
    }
 
    TMP_START;
+
+   if (x == NULL)
+   {
+      x = (char **) TMP_ALLOC((n - deg)*sizeof(char *));
+
+      for (i = 0; i < n - deg; i++)
+      {
+         x[i] = (char *) TMP_ALLOC(22*sizeof(char));
+         flint_sprintf(x[i], "x%wd", i + 1);
+      }
+   }
 
    bound = 1;
    for (i = 0; i < len; i++) /* for each term */
