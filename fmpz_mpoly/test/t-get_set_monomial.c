@@ -66,8 +66,6 @@ main(void)
              exp[k] = n_randbits(state, bits);
           }
 
-          len = f->length;
-
           index = n_randint(state, f->length + 1);
 
           fmpz_mpoly_set_monomial(f, index, exp, ctx);

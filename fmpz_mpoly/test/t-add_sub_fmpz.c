@@ -27,7 +27,7 @@ main(void)
     fflush(stdout);
 
     /* Check (f + a) - a = f */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f, g, h;
@@ -53,13 +53,11 @@ main(void)
        exp_bound = n_randbits(state, exp_bits);
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
-       fmpz_mpoly_randtest(g, state, len, exp_bound, coeff_bits, ctx);
-       fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
-
        for (j = 0; j < 10; j++)
        {
-          len = f->length;
+          fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+          fmpz_mpoly_randtest(g, state, len, exp_bound, coeff_bits, ctx);
+          fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
 
           fmpz_randtest(c, state, n_randint(state, 200));
 
@@ -103,7 +101,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f, g;
@@ -128,12 +126,10 @@ main(void)
        exp_bound = n_randbits(state, exp_bits);
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
-       fmpz_mpoly_set(g, f, ctx);
-
        for (j = 0; j < 10; j++)
        {
-          len = f->length;
+          fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+          fmpz_mpoly_set(g, f, ctx);
 
           fmpz_randtest(c, state, n_randint(state, 200));
 
