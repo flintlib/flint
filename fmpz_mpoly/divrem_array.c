@@ -116,7 +116,7 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
             } else /* monomials can be divided exactly */
             {
                /* check quotient won't overflow a word */
-               if (u3 < p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
+               if (u3 <= p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
                {
                   for (j = len0; j < k; j++)
                      _fmpz_demote(p1 + j);
@@ -233,7 +233,7 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
             } else /* monomials can be divided exact */
             {
                /* check quotient won't overflow a word */
-               if (p[2] > 0 || u3 < p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
+               if (p[2] > 0 || u3 <= p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
                {
                   for (j = len0; j < k; j++)
                      _fmpz_demote(p1 + j);
@@ -943,6 +943,7 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
       fmpz_mpoly_init2(temp1, FLINT_MAX(poly2->length/poly3->length + 1, 1),
                                                                           ctx);
       fmpz_mpoly_fit_bits(temp1, exp_bits, ctx);
+      temp1->bits = exp_bits;
 
       tq = temp1;
    } else
@@ -950,6 +951,7 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
       fmpz_mpoly_fit_length(q, FLINT_MAX(poly2->length/poly3->length + 1, 1),
                                                                           ctx);
       fmpz_mpoly_fit_bits(q, exp_bits, ctx);
+      q->bits = exp_bits;
 
       tq = q;
    }
@@ -958,12 +960,14 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
    {
       fmpz_mpoly_init2(temp2, poly3->length, ctx);
       fmpz_mpoly_fit_bits(temp2, exp_bits, ctx);
+      temp2->bits = exp_bits;
 
       tr = temp2;
    } else
    {
       fmpz_mpoly_fit_length(r, poly3->length, ctx);
       fmpz_mpoly_fit_bits(r, exp_bits, ctx);
+      r->bits = exp_bits;
 
       tr = r;
    }

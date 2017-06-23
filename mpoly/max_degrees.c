@@ -51,7 +51,7 @@ void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
       max_degs[i] = 0;
 
    N = (bits*n - 1)/FLINT_BITS + 1;
-   
+  
    if (N == 1)
    {
        mpoly_max_degrees1(max_degs, poly_exps, len, bits, n);
@@ -62,10 +62,10 @@ void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
    TMP_START;
      
    exps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-   
+
    for (i = 0; i < len; i++)
    {
-      mpoly_get_monomial(exps, poly_exps + i*N, bits, n, 0, 0);
+      mpoly_get_monomial(exps, poly_exps + i*N, bits, n, 0, 1);
 
       for (j = 0; j < n; j++)
       {

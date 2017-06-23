@@ -962,12 +962,13 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    /* compute number of bits required for output exponents */
    bits = FLINT_BIT_COUNT(max);
-   bits = FLINT_MAX(bits, poly2->bits);
-   bits = FLINT_MAX(bits, poly3->bits);
    
    exp_bits = 8;
    while (bits >= exp_bits)
       exp_bits *= 2;
+
+   exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+   exp_bits = FLINT_MAX(exp_bits, poly3->bits);
 
    /* number of words for exponents */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
@@ -976,6 +977,7 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    if (N != 1)
    {
       res = 0;
+
       goto cleanup;
    }
 

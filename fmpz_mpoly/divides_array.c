@@ -58,7 +58,7 @@ void _fmpz_mpoly_submul_array1_slong(ulong * poly1,
 
                   smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
                   sub_dddmmmsss(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-                  c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
+                  c[2] += (0 <= (slong) p[1]) ? cy : cy + 1;
                }
             }
          }
@@ -221,10 +221,9 @@ void _fmpz_mpoly_submul_array1_slong_1(ulong * poly1,
       for (j = 0; j < len3; j++)
       {
          c = c2 + 3*((slong) exp3[j]);
-
          smul_ppmm(p[1], p[0], d, poly3[j]);
          sub_dddmmmsss(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
-         c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
+         c[2] += (0 <= (slong) p[1]) ? cy : cy + 1;
       }
    }
 }
@@ -317,17 +316,20 @@ void _fmpz_mpoly_to_ulong_array2(ulong * p, const fmpz * coeffs,
       fmpz c = coeffs[i];
 
       if (!COEFF_IS_MPZ(c))
-         ptr[0] = (ulong) c > 0 ? c : -c;
+      {
+         ptr[0] = (ulong) c;
+         ptr[1] = (ulong) (c > 0 ? 0 : -WORD(1));
+      }
       else
       {
          __mpz_struct * m = COEFF_TO_PTR(c);
 
          for (j = 0; j < size; j++)
             ptr[j] = m->_mp_d[j];
+
+         if (fmpz_sgn(coeffs + i) < 0)
+            mpn_neg(ptr, ptr, 2);
       }
-      
-      if (fmpz_sgn(coeffs + i) < 0)
-         mpn_neg(ptr, ptr, 2);
    }
 }
 
@@ -391,17 +393,28 @@ void _fmpz_mpoly_to_ulong_array(ulong * p, const fmpz * coeffs,
       fmpz c = coeffs[i];
 
       if (!COEFF_IS_MPZ(c))
-         ptr[0] = (ulong) c > 0 ? c : -c;
+      {
+         ptr[0] = (ulong) c;
+         if (c > 0)
+         {
+            ptr[1] = 0;
+            ptr[2] = 0;
+         } else
+         {
+            ptr[1] = (ulong) -WORD(1);
+            ptr[2] = (ulong) -WORD(1);
+         }
+      }
       else
       {
          __mpz_struct * m = COEFF_TO_PTR(c);
 
          for (j = 0; j < size; j++)
             ptr[j] = m->_mp_d[j];
+
+         if (fmpz_sgn(coeffs + i) < 0)
+            mpn_neg(ptr, ptr, 3);
       }
-      
-      if (fmpz_sgn(coeffs + i) < 0)
-         mpn_neg(ptr, ptr, 3);
    }
 }
 
@@ -460,6 +473,10 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
 
    TMP_START;
 
+   /* check there are at least as many zero exponents in dividend as divisor */
+   if (exp2[0] < min3)
+      goto cleanup; /* not an exact quotient */
+
    prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
 
    /*
@@ -497,7 +514,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
       _fmpz_mpoly_to_ulong_array2(p2, poly2, exp2, len2);
 
       /* for each term of poly2 array relevant to exact quotient */
-      for (i = 0; i + max3 < prod; i++)
+      for (i = min3; i + max3 - min3 < prod; i++)
       {
          ulong * ptr = p2 + 2*i;
          ulong p[2];
@@ -511,7 +528,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                flint_mpn_copyi(p, ptr, 2);
 
             /* check quotient won't overflow a word */
-            if (u3 < p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
+            if (u3 <= p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
             {
                for (j = len1; j < len; j++)
                   _fmpz_demote(p1 + j);
@@ -524,7 +541,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             sdiv_qrnnd(q, r, ptr[1], ptr[0], c3);
 
             /* check coefficient is small, else restart with multiprec code */
-            if (COEFF_IS_MPZ(q))
+            if (COEFF_IS_MPZ(FLINT_ABS(q)))
             {
                for (j = len1; j < len; j++) /* quotient too large */
                   _fmpz_demote(p1 + j);
@@ -586,7 +603,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
       _fmpz_mpoly_to_ulong_array(p2, poly2, exp2, len2);
 
       /* for each term of poly2 array relevant to exact quotient */
-      for (i = 0; i + max3 < prod; i++)
+      for (i = min3; i + max3 - min3 < prod; i++)
       {
          ulong * ptr = p2 + 3*i;
          ulong p[3];
@@ -600,7 +617,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                flint_mpn_copyi(p, ptr, 3);
 
             /* check quotient won't overflow a word */
-            if (p[2] > 0 || u3 < p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
+            if (p[2] > 0 || u3 <= p[1] || (u3 == 0 && 0 > (slong) p[0])) /* quotient too large */
             {
                for (j = len1; j < len; j++)
                   _fmpz_demote(p1 + j);
@@ -613,7 +630,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             sdiv_qrnnd(q, r, ptr[1], ptr[0], c3);
 
             /* check coefficient is small, else restart with multiprec code */
-            if (COEFF_IS_MPZ(q))
+            if (COEFF_IS_MPZ(FLINT_ABS(q)))
             {
                for (j = len1; j < len; j++) /* quotient too large */
                   _fmpz_demote(p1 + j);
@@ -681,15 +698,15 @@ big:
 
       /* poly2 to array format */
       _fmpz_mpoly_to_fmpz_array(p2, poly2, exp2, len2);
-      
+
       /* for each term of poly2 array relevant to exact quotient */
-      for (i = 0; i + max3 < prod; i++)
+      for (i = min3; i + max3 - min3 < prod; i++)
       {
          /* if coeff is nonzero */
          if (!fmpz_is_zero(p2 + i))
          {
             /* quotient and remainder of coeffs */
-            fmpz_fdiv_qr(fq, fr, p2 + i, poly2 + 0);
+            fmpz_fdiv_qr(fq, fr, p2 + i, poly3);
 
             /* check coeff and monomial quotients were exact */
             if (!fmpz_is_zero(fr) || /* not an exact division */
@@ -711,6 +728,7 @@ big:
             
             /* write quotient term */
             fmpz_set(p1 + len, fq);
+
             e1[len++] = i - min3;
          }
       }
@@ -767,7 +785,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                                           slong * mults, slong num, slong bits)
 {
    slong i, j, k, prod, len = 0, l1, l2, l3;
-   slong bits1, bits2, bits3 = 0, tlen, talloc;
+   slong bits1, bits2, bits3 = 0, tlen, talloc, skip;
    slong shift = FLINT_BITS - bits;
    slong * i1, * i2, * i3, * n1, * n2, * n3;
    slong * b1, * b3, * maxb1, * maxb3;
@@ -808,6 +826,24 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
    mpoly_main_variable_terms1(i2, n2, exp2, l2, len2, num + 1, num + 1, bits);
    mpoly_main_variable_terms1(i3, n3, exp3, l3, len3, num + 1, num + 1, bits);
 
+   /* alloc space for copy of coeff/chunk of poly2 */
+
+   temp = (fmpz *) flint_calloc(n2[0] + 1, sizeof(fmpz));
+   texp = (ulong *) flint_malloc((n2[0] + 1)*sizeof(ulong));
+   talloc = n2[0] + 1;
+
+   /* figure out how many trailing zero chunks poly3 has */
+   skip = 0;
+   while (n3[skip] == 0)
+   {
+      /* check poly2 has at least as many trailing zero chunks */
+      if (n2[skip] != 0) /* not an exact quotient */
+      {
+         goto cleanup;
+      }
+      skip++;
+   }
+
    /* work out max bits for each coeff/chunk and optimal bits */
 
    for (i = 0; i < l3; i++)
@@ -834,12 +870,6 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
    small = FLINT_ABS(bits2) <= bits1 && FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
-   /* alloc space for copy of coeff/chunk of poly2 */
-
-   temp = (fmpz *) flint_calloc(n2[0] + 1, sizeof(fmpz));
-   texp = (ulong *) flint_malloc((n2[0] + 1)*sizeof(ulong));
-   talloc = n2[0] + 1;
-
    /* enough space for three words per coeff, even if only one or two needed */
    p2 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
 
@@ -847,16 +877,16 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
    if (small)
    {
       /* for each chunk of poly2 */
-      for (i = 0; i < l2; i++)
+      for (i = skip; i < l2; i++)
       {
          slong num1 = 0;
          bits1 = 0;
 
          /* if there are already quotient terms */
-         if (i != 0)
+         if (i != skip)
          {
             /* compute bound on intermediate computations a - q*b */
-            for (j = 0; j < i && j < l1; j++)
+            for (j = 0; j < i - skip && j < l1; j++)
             {
                k = i - j;
 
@@ -886,7 +916,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
             /* submuls */
 
-            for (j = 0; j < i && j < l1; j++)
+            for (j = 0; j < i - skip && j < l1; j++)
             {
                k = i - j;
 
@@ -908,7 +938,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
             /* submuls */
 
-            for (j = 0; j < i && j < l1; j++)
+            for (j = 0; j < i - skip && j < l1; j++)
             {
                k = i - j;
 
@@ -930,7 +960,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
             /* submuls */
 
-            for (j = 0; j < i && j < l1; j++)
+            for (j = 0; j < i - skip && j < l1; j++)
             {
                k = i - j;
 
@@ -945,24 +975,24 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
          }
 
          /* for terms where there may be a nonzero quotient if exact */
-         if (i < l1)
+         if (i < l1 + skip)
          {
             /* tightly pack chunk exponents */
             mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, 0, bits);
 
             /* set starting index for quotient chunk we are about to compute */
-            i1[i] = len;
+            i1[i - skip] = len;
             
             /* if chunk is nonzero */
             if (tlen != 0)
             {
                /* compute quotient chunk and set length of quotient chunk */
-               n1[i] = _fmpz_mpoly_divides_array_tight(poly1,
+               n1[i - skip] = _fmpz_mpoly_divides_array_tight(poly1,
                                    exp1, alloc, len, temp, texp, tlen,
-                                                 poly3, e3, n3[0], mults, num);
+                        poly3 + i3[skip], e3 + i3[skip], n3[skip], mults, num);
 
                /* check quotient was exact */
-               if (n1[i] == 0) /* not an exact division */
+               if (n1[i - skip] == 0) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
                      _fmpz_demote((*poly1) + j);
@@ -971,10 +1001,10 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                   goto cleanup;
                }
             } else
-               n1[i] = 0;
+               n1[i - skip] = 0;
 
             /* check the quotient chunk didn't have large coefficients */
-            if (FLINT_ABS(_fmpz_vec_max_bits((*poly1) + len, n1[i])) >
+            if (FLINT_ABS(_fmpz_vec_max_bits((*poly1) + len, n1[i - skip])) >
                                                              FLINT_BITS - 2)
             {
                for (j = 0; j < len; j++)
@@ -985,10 +1015,10 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
             }
 
             /* abs bound and sum of abs vals of coeffs of quotient chunk */
-            _fmpz_mpoly_chunk_max_bits(b1, maxb1, *poly1, i1, n1, i);
+            _fmpz_mpoly_chunk_max_bits(b1, maxb1, *poly1, i1, n1, i - skip);
 
             /* update length of output quotient poly */
-            len += n1[i];
+            len += n1[i - skip];
          } else /* should be zero quotient, check coefficient is zero */
          {
             /* for each coeff in chunk */
@@ -1019,7 +1049,7 @@ big:
             fmpz_init(p2 + j);
       
       /* for each chunk of poly2 */
-      for (i = 0; i < l2; i++)
+      for (i = skip; i < l2; i++)
       {
          for (j = 0; j < prod; j++)
             fmpz_zero(p2 + j);
@@ -1029,13 +1059,15 @@ big:
 
          /* submuls */
 
-         for (j = 0; j < i && j < l1; j++)
+         for (j = 0; j < i - skip && j < l1; j++)
          {
             k = i - j;
 
             if (k < l3)
-               _fmpz_mpoly_submul_array1_fmpz(p2, (*poly1) + i1[j],
+            {
+                _fmpz_mpoly_submul_array1_fmpz(p2, (*poly1) + i1[j],
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
+            }
          }
 
          /* convert chunk from array format */
@@ -1043,26 +1075,24 @@ big:
                                                       p2, mults, num, bits, 0);
 
          /* for terms where there may be a nonzero quotient if exact */
-         if (i < l1)
+         if (i < l1 + skip)
          {
-
             /* tightly pack chunk exponents */
-            mpoly_pack_monomials_tight(texp, texp, tlen, mults,
-                                                                 num, 0, bits);
+            mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, 0, bits);
 
             /* set starting index of quotient chunk we are about to compute */
-            i1[i] = len;
+            i1[i - skip] = len;
             
             /* if chunk is nonzero */
             if (tlen != 0)
             {
                /* compute quotient chunk and set length of quotient chunk */
-               n1[i] = _fmpz_mpoly_divides_array_tight(poly1,
+               n1[i - skip] = _fmpz_mpoly_divides_array_tight(poly1,
                                    exp1, alloc, len, temp, texp, tlen,
-                                                 poly3, e3, n3[0], mults, num);
+                        poly3 + i3[skip], e3 + i3[skip], n3[skip], mults, num);
 
                /* check quotient was exact */
-               if (n1[i] == 0) /* not an exact division */
+               if (n1[i - skip] == 0) /* not an exact division */
                {
                   for (j = 0; j < len; j++)
                      _fmpz_demote((*poly1) + j);
@@ -1071,10 +1101,10 @@ big:
                   goto cleanup2;
                }
             } else
-               n1[i] = 0;
+               n1[i - skip] = 0;
 
             /* update length of output quotient poly */
-            len += n1[i];
+            len += n1[i - skip];
          } else /* should be zero quotient, check coefficient is zero */
          {
             /* for each coeff in chunk */
@@ -1170,8 +1200,7 @@ slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
                       alloc, 0,  poly2, e2, len2, poly3, e3, len3, mults, num);
 
    /* unpack output quotient exponents */
-   mpoly_unpack_monomials_tight((*exp1), (*exp1), len, mults,
-                                                                 num, 0, bits);
+   mpoly_unpack_monomials_tight((*exp1), (*exp1), len, mults, num, 0, bits);
 
    TMP_END;
 
@@ -1212,8 +1241,8 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
    max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
 
-   fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
-   fmpz_mpoly_max_degrees(max_degs3, poly3, ctx);
+   mpoly_max_degrees(max_degs2, poly2->exps, poly2->length, poly2->bits, ctx->n);
+   mpoly_max_degrees(max_degs3, poly3->exps, poly3->length, poly3->bits, ctx->n);
 
    for (i = 0; i < ctx->n; i++)
    {
@@ -1224,9 +1253,11 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          cannot be an exact division if variable in dividend has smaller degree
          than corresponding variable in divisor
       */
+
       if (max_degs2[i] < max_degs3[i])
       {
          res = 0;
+
          goto cleanup;
       }
    }
@@ -1237,6 +1268,9 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    exp_bits = 8;
    while (bits >= exp_bits)
       exp_bits *= 2;
+
+   exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+   exp_bits = FLINT_MAX(exp_bits, poly3->bits);
 
    /* number of words for exponents */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
@@ -1276,6 +1310,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       fmpz_mpoly_init2(temp, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
+      temp->bits = exp_bits;
 
       len = _fmpz_mpoly_divides_array(&temp->coeffs, &temp->exps,
                      &temp->alloc, poly2->coeffs, exp2, poly2->length,
@@ -1289,6 +1324,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    {
       fmpz_mpoly_fit_length(poly1, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
+      poly1->bits = exp_bits;
 
       len = _fmpz_mpoly_divides_array(&poly1->coeffs, &poly1->exps,
                      &poly1->alloc, poly2->coeffs, exp2, poly2->length,
