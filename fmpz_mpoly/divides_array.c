@@ -1300,7 +1300,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
    slong i, bits, exp_bits, N, len = 0, array_size;
-   ulong * max_degs2, * max_degs3;
+   ulong * max_degs1, * max_degs2, * max_degs3;
    ulong max = 0;
    ulong * exp2, * exp3;
    int free2 = 0, free3 = 0;
@@ -1323,6 +1323,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    TMP_START;
 
    /* compute maximum exponents for each variable */
+   max_degs1 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
    max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
 
@@ -1418,6 +1419,30 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    }
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
+
+   /*
+      Check that the maximum degrees for each variable are correct. This can
+      only happen if there was an overflow in the tightly packed exponents,
+      which can only happen if the division was not exact. If no overflow
+      is detected here, none happened and the division was provably exact.
+   */  
+   if (len != 0)
+   {
+      mpoly_max_degrees(max_degs1, poly1->exps,
+                                           poly1->length, poly1->bits, ctx->n);
+
+      for (i = 0; i < ctx->n; i++)
+      {
+         /* we incrementeded max_degs2[i] by 1 previously, so add 1 here */
+         if (max_degs2[i] != max_degs1[i] + max_degs3[i] + 1)
+         {
+            fmpz_mpoly_zero(poly1, ctx);
+
+            len = 0;
+            break;
+         }
+      }
+   }
 
    /* len will be nonzero if quotient was exact */
    res = len != 0;
