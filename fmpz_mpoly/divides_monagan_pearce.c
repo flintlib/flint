@@ -38,7 +38,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
    mpoly_heap_t * x, * x2;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
-   ulong exp;
+   ulong exp, maxexp = exp2[len2 - 1];
    ulong c[3]; /* for accumulating coefficients */
    int first, d1, d2;
    ulong mask = 0, ub;
@@ -93,13 +93,24 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
    fmpz_neg(mb, poly3 + 0);
 
    ub = ((ulong) FLINT_ABS(*mb)) >> 1; /* abs(poly3[0])/2 */
-   
+ 
    /* while heap is nonempty */
    while (heap_len > 1)
    {
       /* get exponent field of heap top */
       exp = heap[1].exp;
       
+      /* check for overflow in exponent: not an exact division */
+      if (mpoly_monomial_overflows1(exp, mask))
+      {
+            for (i = 0; i < k; i++)
+               _fmpz_demote(p1 + i);
+
+            k = 0;
+
+            goto cleanup;
+      }
+
       /* realloc output poly ready for next quotient term */
       k++;
       _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
@@ -241,7 +252,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                flint_mpn_copyi(d, c, 3);
 
             /* check quotient of accumulated coeff by -poly3[0] is small */
-            if (d[2] != 0 || ub < d[1] || 
+            if (d[2] != 0 || ub <= d[1] || 
                (ub == 0 && 0 > (slong) d[0])) /* quotient not a small */
             {
                /* convert three words to multiprecision value */
@@ -254,13 +265,22 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                d2 = fmpz_is_zero(r);
 
                small = 0;
-            } else /* quotient fits a small */
+            } else /* quotient may fit a small */
             {
-               ulong r1;
+               ulong q, r1;
 
                /* write out quotient and compute remainder */
-               sdiv_qrnnd(p1[k], r1, c[1], c[0], *mb);
+               sdiv_qrnnd(q, r1, c[1], c[0], *mb);
                
+               /* check quotient really fit a small */
+               if (!COEFF_IS_MPZ(FLINT_ABS((slong) q)))
+                  p1[k] = q;
+               else
+               {
+                  fmpz_set_si(p1 + k, q);
+                  small = 0;
+               }
+
                /* coeff division exact if remainder zero */
                d2 = r1 == 0;
             }
@@ -273,8 +293,8 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
             d2 = fmpz_is_zero(r);
          }
 
-         /* if coeffs or monomials don't divide */
-         if (!d1 || !d2) /* not an exact division */
+         /* if coeffs or monomials don't divide or exponent too large */
+         if (!d1 || !d2 || exp > maxexp) /* not an exact division */
          {
             for (i = 0; i <= k; i++)
                _fmpz_demote(p1 + i);
@@ -428,6 +448,17 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
    {
       /* get pointer to exponent field of heap top */
       exp = heap[1].exp;
+
+      /* check for overflow in exponent: not an exact division */
+      if (mpoly_monomial_overflows(exp, N, mask))
+      {
+            for (i = 0; i < k; i++)
+               _fmpz_demote(p1 + i);
+
+            k = 0;
+
+            goto cleanup;
+      }
       
       /* realloc output poly ready for next quotient term */
       k++;
@@ -578,7 +609,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                flint_mpn_copyi(d, c, 3);
 
             /* check quotient of accumulated coeff by -poly3[0] is small */
-            if (d[2] != 0 || ub < d[1] || (ub == 0 && 0 > (slong) d[0])) /* quotient not a small */
+            if (d[2] != 0 || ub <= d[1] || (ub == 0 && 0 > (slong) d[0])) /* quotient not a small */
             {
                /* convert three words to multiprecision value */
                fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
@@ -590,13 +621,21 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                d2 = fmpz_is_zero(r);
 
                small = 0;
-            } else /* quotient fits a small */
+            } else /* quotient may fit a small */
             {
-               ulong r1;
+               ulong q, r1;
 
-               /* write out quotient and compute remainder */
-               sdiv_qrnnd(p1[k], r1, c[1], c[0], *mb);
+               sdiv_qrnnd(q, r1, c[1], c[0], *mb);
                
+               /* check quotient really fit a small */
+               if (!COEFF_IS_MPZ(FLINT_ABS((slong) q)))
+                  p1[k] = q;
+               else
+               {
+                  fmpz_set_si(p1 + k, q);
+                  small = 0;
+               }
+
                /* coeff division exact if remainder zero */
                d2 = r1 == 0;
             }
@@ -609,8 +648,9 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             d2 = fmpz_is_zero(r);
          }
 
-         /* if coeffs or monomials don't divide */
-         if (!d1 || !d2) /* not an exact division */
+         /* if coeffs or monomials don't divide, or exponent too large */
+         if (!d1 || !d2 ||
+          mpoly_monomial_lt(exp, exp2 + (len2 - 1)*N, N)) /* inexact division */
          {
             for (i = 0; i <= k; i++)
                _fmpz_demote(p1 + i);
@@ -729,8 +769,11 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
    /* quick check for easy case of inexact division of leading monomials */
-   if (poly2->exps[poly2->length - 1] < poly3->exps[poly3->length - 1])
+   if (poly2->bits == poly3->bits && N == 1 && 
+       poly2->exps[poly2->length - 1] < poly3->exps[poly3->length - 1])
+   {
       goto cleanup;
+   }
 
    /* ensure input exponents packed to same size as output exponents */
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
@@ -763,6 +806,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 
       fmpz_mpoly_init2(temp, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
+      temp->bits = exp_bits;
 
       len = _fmpz_mpoly_divides_monagan_pearce(&temp->coeffs, &temp->exps,
                             &temp->alloc, poly2->coeffs, exp2, poly2->length,
@@ -775,6 +819,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    {
       fmpz_mpoly_fit_length(poly1, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
+      poly1->bits = exp_bits;
 
       len = _fmpz_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
                             &poly1->alloc, poly2->coeffs, exp2, poly2->length,

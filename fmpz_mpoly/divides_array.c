@@ -165,6 +165,7 @@ void _fmpz_mpoly_submul_array1_slong1(ulong * poly1,
    The input polynomials are broken into blocks to improve
    cache efficiency.
 */
+
 void _fmpz_mpoly_submul_array1_fmpz(fmpz * poly1, 
                  const fmpz * poly2, const ulong * exp2, slong len2,
                             const fmpz * poly3, const ulong * exp3, slong len3)
@@ -785,10 +786,10 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                                           slong * mults, slong num, slong bits)
 {
    slong i, j, k, prod, len = 0, l1, l2, l3;
-   slong bits1, bits2, bits3 = 0, tlen, talloc, skip;
+   slong bits1, bits2, bits3 = 0, tlen, talloc, skip, max_exp;
    slong shift = FLINT_BITS - bits;
    slong * i1, * i2, * i3, * n1, * n2, * n3;
-   slong * b1, * b3, * maxb1, * maxb3;
+   slong * b1, * b3, * maxb1, * maxb3, * max_exp1, * max_exp3;
    ulong * e2, * e3, * texp, * p2;
    fmpz * temp;
    int small;
@@ -822,6 +823,8 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
    maxb1 = (slong *) TMP_ALLOC(l1*sizeof(slong));
    b3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
    maxb3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
+   max_exp1 = (slong *) TMP_ALLOC(l1*sizeof(slong));
+   max_exp3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
 
    mpoly_main_variable_terms1(i2, n2, exp2, l2, len2, num + 1, num + 1, bits);
    mpoly_main_variable_terms1(i3, n3, exp3, l3, len3, num + 1, num + 1, bits);
@@ -844,7 +847,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
       skip++;
    }
 
-   /* work out max bits for each coeff/chunk and optimal bits */
+   /* work out max bits for each coeff/chunk, optimal bits */
 
    for (i = 0; i < l3; i++)
    {
@@ -862,6 +865,20 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
    mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 1, bits);
 
    mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 1, bits);
+
+   /* work out maximum packed exponent for each chunk */
+   for (i = 0; i < l3; i++)
+   {
+      max_exp = 0;
+
+      for (j = 0; j < n3[i]; j++)
+      {
+         if (e3[i3[i] + j] > max_exp)
+            max_exp = e3[i3[i] + j];
+      }
+
+      max_exp3[i] = max_exp;
+   }
 
    /* bound poly2 coeffs and check input/output coeffs likely small */
    bits2 = _fmpz_vec_max_bits(poly2, len2);
@@ -921,8 +938,20 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                k = i - j;
 
                if (k < l3)
+               {
+                  /* check for exponent overflow: not exact division */
+                  if (max_exp1[j] + max_exp3[k] >= prod)
+                  {
+                     for (j = 0; j < len; j++)
+                        _fmpz_demote((*poly1) + j);
+                     len = 0;
+
+                     goto cleanup;
+                  }
+
                   _fmpz_mpoly_submul_array1_slong1(p2, (*poly1) + i1[j],
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
+               }
             }
 
             /* convert chunk from array format */
@@ -943,8 +972,20 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                k = i - j;
 
                if (k < l3)
+               {
+                  /* check for exponent overflow: not exact division */
+                  if (max_exp1[j] + max_exp3[k] >= prod)
+                  {
+                     for (j = 0; j < len; j++)
+                        _fmpz_demote((*poly1) + j);
+                     len = 0;
+
+                     goto cleanup;
+                  }
+
                   _fmpz_mpoly_submul_array1_slong2(p2, (*poly1) + i1[j],
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
+               }
             }
 
             /* convert chunk from array format */
@@ -965,8 +1006,20 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                k = i - j;
 
                if (k < l3)
+               {
+                  /* check for exponent overflow: not exact division */
+                  if (max_exp1[j] + max_exp3[k] >= prod)
+                  {
+                     for (j = 0; j < len; j++)
+                        _fmpz_demote((*poly1) + j);
+                     len = 0;
+
+                     goto cleanup;
+                  }
+
                   _fmpz_mpoly_submul_array1_slong(p2, (*poly1) + i1[j],
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
+               }
             }
 
             /* convert chunk from array format */
@@ -1002,6 +1055,17 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                }
             } else
                n1[i - skip] = 0;
+
+            /* compute maximum packed exponent for chunk */
+            max_exp = 0;
+
+            for (j = 0; j < n1[i - skip]; j++)
+            {
+               if ((*exp1)[i1[i - skip] + j] > max_exp)
+                  max_exp = (*exp1)[i1[i - skip] + j];
+            }
+
+            max_exp1[i - skip] = max_exp;
 
             /* check the quotient chunk didn't have large coefficients */
             if (FLINT_ABS(_fmpz_vec_max_bits((*poly1) + len, n1[i - skip])) >
@@ -1065,7 +1129,17 @@ big:
 
             if (k < l3)
             {
-                _fmpz_mpoly_submul_array1_fmpz(p2, (*poly1) + i1[j],
+               /* check for exponent overflow: not exact division */
+               if (max_exp1[j] + max_exp3[k] >= prod)
+               {
+                  for (j = 0; j < len; j++)
+                     _fmpz_demote((*poly1) + j);
+                  len = 0;
+
+                  goto cleanup;
+               }
+
+               _fmpz_mpoly_submul_array1_fmpz(p2, (*poly1) + i1[j],
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
             }
          }
@@ -1102,6 +1176,17 @@ big:
                }
             } else
                n1[i - skip] = 0;
+
+            /* compute maximum packed exponent for chunk */
+            max_exp = 0;
+
+            for (j = 0; j < n1[i - skip]; j++)
+            {
+               if ((*exp1)[i1[i - skip] + j] > max_exp)
+                  max_exp = (*exp1)[i1[i - skip] + j];
+            }
+
+            max_exp1[i - skip] = max_exp;
 
             /* update length of output quotient poly */
             len += n1[i - skip];

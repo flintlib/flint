@@ -159,6 +159,24 @@ void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2,
 }
 
 MPOLY_INLINE
+int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+   {
+      if ((exp2[i] & mask) != 0)
+         return 1;
+   }
+   return 0;
+}
+
+MPOLY_INLINE
+int mpoly_monomial_overflows1(ulong exp, ulong mask)
+{
+   return (exp & mask) != 0;
+}
+
+MPOLY_INLINE
 int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2,
                                        const ulong * exp3, slong N, ulong mask)
 {
