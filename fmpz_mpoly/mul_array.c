@@ -454,7 +454,6 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
          
          /* set coefficient */
          fmpz_set(p1 + k, poly2 + i);
-         
          k++;
       }
    }

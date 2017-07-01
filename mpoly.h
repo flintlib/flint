@@ -310,6 +310,27 @@ int mpoly_monomial_divides_tight(slong e1, slong e2, slong * prods, slong num)
    return 1;
 }
 
+MPOLY_INLINE
+void mpoly_max_degrees_tight(slong * max_exp,
+                             ulong * exps, slong len, slong * prods, slong num)
+{
+   slong i, j;
+   
+   for (j = 0; j < num; j++)
+      max_exp[j] = 0;
+	  
+   for (i = 0; i < len; i++)
+   {
+      for (j = 0; j < num; j++)
+	  {
+	     slong d1 = (exps[i] % prods[j + 1])/prods[j];
+      
+	     if (d1 > max_exp[j])
+		    max_exp[j] = d1;
+	  }
+   }
+}
+
 /* Monomial arrays ***********************************************************/
 
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
