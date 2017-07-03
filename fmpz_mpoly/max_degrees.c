@@ -27,7 +27,7 @@ void _fmpz_mpoly_max_degrees1(ulong * max_degs, const ulong * exps,
    {
       ulong v = (exps[i] >> shift); /* shift unused exponents */
 
-      if (rev)
+      if (!rev)
       {
          for (j = 0; j < n - deg; j++) /* for each exponent except degree */
          {

@@ -44,7 +44,7 @@ void fmpz_mpoly_set_term_si(fmpz_mpoly_t poly,
       max_exp = sum;
    } else
    {
-      for (i = 0; i < ctx->n - 1; i++)
+      for (i = 0; i < ctx->n; i++)
       {
          if (exp[i] > max_exp)
             max_exp = exp[i];

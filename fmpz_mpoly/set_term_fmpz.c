@@ -43,7 +43,7 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
       max_exp = sum;
    } else
    {
-      for (i = 0; i < ctx->n - 1; i++)
+      for (i = 0; i < ctx->n; i++)
       {
          if (exp[i] > max_exp)
             max_exp = exp[i];
@@ -60,7 +60,7 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
    exp_bits = 8;
    while (bits >= exp_bits) /* extra bit required for signs */
       exp_bits *= 2;
-       
+
    /* reallocate the number of bits of the exponents of the polynomial */
    if (exp_bits > poly->bits)
    {
@@ -86,8 +86,9 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
    /* pack exponent vector */
+
    mpoly_set_monomial(packed_exp, exp, poly->bits, ctx->n, deg, rev);
-       
+
    /* work out at what index term should be placed */
    exists = mpoly_monomial_exists(&index, poly->exps,
                                                   packed_exp, poly->length, N);
