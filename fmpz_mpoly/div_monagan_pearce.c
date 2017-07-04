@@ -44,13 +44,13 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
    mpoly_heap_t * x, * x2;
    fmpz * p1 = *polyq;
    ulong * e1 = *expq;
-   ulong exp, exp_diff, tmp = 0;
+   ulong exp, exp_diff, exp3_diff, tmp = 0;
    ulong c[3]; /* for accumulating coefficients */
    ulong mask = 0, ub;
    fmpz_t mb, qc;
    int small;
    slong bits2, bits3;
-   int d1;
+   int d1, divides;
    TMP_INIT;
 
    TMP_START;
@@ -99,12 +99,29 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
 
    ub = ((ulong) FLINT_ABS(*mb)) >> 1; /* abs(lc(poly3))/2 */
    
+   /* precompute leading exponent of poly3 */
+   exp3_diff = maxn - exp3[len3 - 1];
+
    /* while heap is nonempty */
    while (heap_len > 1)
    {
       /* get exponent field of heap top */
       exp = heap[1].exp;
       
+      /* check there has been no overflow */
+      if ((exp & mask) != 0)
+      {
+         for (i = 0; i < k; i++)
+            _fmpz_demote(p1 + i);
+
+         k = -WORD(1);
+
+         goto cleanup;
+      }
+
+      /* only do arithmetic for monomials that divide */
+      divides = mpoly_monomial_divides1(&tmp, maxn - exp3[len3 - 1], exp, mask);
+
       /* realloc quotient poly ready for next quotient term */
       k++;
       _fmpz_mpoly_fit_length(&p1, &e1, allocq, k + 1, 1);
@@ -118,46 +135,14 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
          /* pop chain from heap */
          x = _mpoly_heap_pop1(heap, &heap_len);
          
-         /* if accumulated coeffs will fit in three words */
-         if (small)
-         {
-            if (x->i == -WORD(1))
-            {
-               /* subtract poly2 coeff from accumulated three word coeff */
-               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
-            } else
-            {
-               /* subtract q[j]*poly3 coeff from accum. three word coeff */
-               _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
-            }
-         } else /* accumulated coeffs are multiprecision */
-         {
-            if (x->i == -WORD(1))
-            {
-               /* subtract poly2 coeff from accum. coeff */
-               fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
-            } else
-            {
-               /* subtract q[j]*poly3 coeff from accum. coeff */
-               fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
-            }
-         }
-
-         /* temporarily store pointer to this node, or designate for reuse */
-         if (x->i != -WORD(1) || x->j < len2 - 1)
-            Q[Q_len++] = x;
-         else
-            reuse[reuse_len++] = x;
-
-         /* for every node in this chain */
-         while ((x = x->next) != NULL)
+         if (divides)
          {
             /* if accumulated coeffs will fit in three words */
             if (small)
             {
                if (x->i == -WORD(1))
                {
-                  /* subtract poly2 coeff from accum. three word coeff */
+                  /* subtract poly2 coeff from accumulated three word coeff */
                   _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
                } else
                {
@@ -174,6 +159,44 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                {
                   /* subtract q[j]*poly3 coeff from accum. coeff */
                   fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
+               }
+            }
+         }
+
+         /* temporarily store pointer to this node, or designate for reuse */
+         if (x->i != -WORD(1) || x->j < len2 - 1)
+            Q[Q_len++] = x;
+         else
+            reuse[reuse_len++] = x;
+
+         /* for every node in this chain */
+         while ((x = x->next) != NULL)
+         {
+            if (divides)
+            {
+               /* if accumulated coeffs will fit in three words */
+               if (small)
+               {
+                  if (x->i == -WORD(1))
+                  {
+                     /* subtract poly2 coeff from accum. three word coeff */
+                     _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+                  } else
+                  {
+                     /* subtract q[j]*poly3 coeff from accum. three word coeff */
+                     _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
+                  }
+               } else /* accumulated coeffs are multiprecision */
+               {
+                  if (x->i == -WORD(1))
+                  {
+                     /* subtract poly2 coeff from accum. coeff */
+                     fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
+                  } else
+                  {
+                     /* subtract q[j]*poly3 coeff from accum. coeff */
+                     fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
+                  }
                }
             }
 
@@ -199,9 +222,8 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
             /* insert (x->i, x->j + 1, maxn - exp2[len2 - x->j - 1]) in heap */
             exp_diff = maxn - exp2[len2 - x->j - 1];
 
-            /* but only if the resulting exponent will lead to quotient term */
-            if (mpoly_monomial_divides1(&tmp, maxn - exp3[len3 - 1], 
-                                                               exp_diff, mask))
+            /* but only if monomial is big enough */
+            if (exp3_diff >= exp_diff)
                _mpoly_heap_insert1(heap, exp_diff, x, &heap_len);
          } else if (x->j < k - 1)
          {
@@ -211,9 +233,8 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
             /* insert (x->i, x->j + 1, maxn - exp3[len3 - x->i - 1]) in heap */
             exp_diff = maxn - exp3[len3 - x->i - 1] - e1[x->j];
 
-            /* but only if the resulting exponent will lead to quotient term */
-            if (mpoly_monomial_divides1(&tmp, maxn - exp3[len3 - 1],
-                                                               exp_diff, mask))
+            /* but only if monomial is big enough */
+            if (exp3_diff >= exp_diff)
                _mpoly_heap_insert1(heap, exp_diff, x, &heap_len);
          } else if (x->j == k - 1)
          {
@@ -251,7 +272,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                   flint_mpn_copyi(d, c, 3);
 
                /* check quotient of accumulated coeff by lc(poly3) is small */
-               if (d[2] != 0 || ub < d[1] ||
+               if (d[2] != 0 || ub <= d[1] ||
                   (ub == 0 && 0 > (slong) d[0])) /* quotient not a small */
                {
                   /* upgrade to multiprecision accumulated coeffs */
@@ -260,10 +281,20 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                   small = 0;
                } else /* quotient fits a small */
                {
-                  ulong r1;
+                  ulong q, r1;
 
                   /* compute quotient and discard remainder coeff */
-                  sdiv_qrnnd(p1[k], r1, c[1], c[0], *mb);
+                  sdiv_qrnnd(q, r1, c[1], c[0], *mb);
+
+                  fmpz_set_si(p1 + k, q);
+
+                  if (COEFF_IS_MPZ(FLINT_ABS(q))) /* quotient too large */
+                  {
+                     /* upgrade to multiprecision accumulated coeffs */
+                     fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
+
+                     small = 0;
+                  }
                }
             } 
 
@@ -293,9 +324,8 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                   /* insert (i, k, maxn - exp3[len3 - i - 1] - e1[k]) */
                   exp_diff = maxn - exp3[len3 - i - 1] - e1[k];
 
-                  /* but only if resulting exp corresponds to quotient term */
-                  if (mpoly_monomial_divides1(&tmp, maxn - exp3[len3 - 1],
-                                                               exp_diff, mask))
+                  /* but only if monomial is big enough */
+                  if (exp3_diff >= exp_diff)
                      _mpoly_heap_insert1(heap, exp_diff, x2, &heap_len);
                }
                s = 1;
@@ -309,6 +339,8 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
    }
 
    k++;
+
+cleanup:
 
    fmpz_clear(mb);
    fmpz_clear(qc);
@@ -358,7 +390,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
    fmpz_t mb, qc;
    int small;
    slong bits2, bits3;
-   int d1;
+   int d1, divides;
    TMP_INIT;
 
    /* if exponent vectors fit in one word, call specialised version */
@@ -439,6 +471,19 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
       /* make temporary copy of exponent at top of heap */
       mpoly_monomial_set(exp, heap[1].exp, N);
       
+      /* check there has been no overflow */
+      if (mpoly_monomial_overflows(exp, N, mask))
+      {
+         for (i = 0; i < k; i++)
+            _fmpz_demote(p1 + i);
+
+         k = -WORD(1);
+
+         goto cleanup2;
+      }
+
+      divides = mpoly_monomial_divides(tmp, texp2, exp, N, mask);
+
       /* realloc quotient poly, for next quotient term */
       k++;
       _fmpz_mpoly_fit_length(&p1, &e1, allocq, k + 1, N);
@@ -455,38 +500,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
          /* pop chain from heap */
          x = _mpoly_heap_pop(heap, &heap_len, N);
 
-         /* if accumulated coeffs will fit in three words */
-         if (small)
-         {
-            if (x->i == -WORD(1))
-            {
-               /* subtract poly2 coeff from accumulated three word coeff */
-               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
-            } else
-            {
-               /* subtract q[j]*poly3 coeff from accum. three word coeff */
-               _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
-            }
-         } else /* accumulated coeffs are multiprecision */
-         {
-            if (x->i == -WORD(1))
-            {
-               /* subtract poly2 coeff from accum. coeff */
-               fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
-            } else
-            {
-               /* subtract q[j]*poly3 coeff from accum. coeff */
-               fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
-            }
-         }
-
-         /* temporarily store pointer to this node, or designate for reuse */
-         if (x->i != -WORD(1) || x->j < len2 - 1)
-            Q[Q_len++] = x;
-         else
-            reuse[reuse_len++] = x;
-
-         while ((x = x->next) != NULL)
+         if (divides)
          {
             /* if accumulated coeffs will fit in three words */
             if (small)
@@ -502,7 +516,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                }
             } else /* accumulated coeffs are multiprecision */
             {
-               if (x->i == -WORD(1))
+              if (x->i == -WORD(1))
                {
                   /* subtract poly2 coeff from accum. coeff */
                   fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
@@ -510,6 +524,43 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                {
                   /* subtract q[j]*poly3 coeff from accum. coeff */
                   fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
+               }
+            }
+         }
+
+         /* temporarily store pointer to this node, or designate for reuse */
+         if (x->i != -WORD(1) || x->j < len2 - 1)
+            Q[Q_len++] = x;
+         else
+            reuse[reuse_len++] = x;
+
+         while ((x = x->next) != NULL)
+         {
+            if (divides)
+            {
+               /* if accumulated coeffs will fit in three words */
+               if (small)
+               {
+                  if (x->i == -WORD(1))
+                  {
+                     /* subtract poly2 coeff from accumulated three word coeff */
+                     _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+                  } else
+                  {
+                     /* subtract q[j]*poly3 coeff from accum. three word coeff */
+                     _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
+                  }
+               } else /* accumulated coeffs are multiprecision */
+               {
+                  if (x->i == -WORD(1))
+                  {
+                     /* subtract poly2 coeff from accum. coeff */
+                     fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
+                  } else
+                  {
+                     /* subtract q[j]*poly3 coeff from accum. coeff */
+                     fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
+                  }
                }
             }
 
@@ -536,11 +587,8 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
             mpoly_monomial_sub(exp_list[exp_next], maxn,
                                                 exp2 + (len2 - x->j - 1)*N, N);
 
-            /* but only if the exponent corresponds to a quotient term */
-            if (!mpoly_monomial_divides(tmp, texp2, exp_list[exp_next],
-                                                                      N, mask))
-               exp_next--;
-            else
+            /* but only if the exponent is big enough */
+            if (!mpoly_monomial_lt(exp_list[exp_next], texp2, N))
             {
                if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                                                  &heap_len, N))
@@ -555,10 +603,8 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
             mpoly_monomial_sub(texp, maxn, exp3 + (len3 - x->i - 1)*N, N);
             mpoly_monomial_sub(exp_list[exp_next], texp, e1 + x->j*N, N);
 
-            /* but only if exponent corresponds to quotient term */
-            if (!mpoly_monomial_divides(tmp, texp2, exp_list[exp_next], N, mask))
-               exp_next--;
-            else
+            /* but only if exponent is big enough */
+            if (!mpoly_monomial_lt(exp_list[exp_next], texp2, N))
             {
                if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N))
                exp_next--;
@@ -598,7 +644,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                   flint_mpn_copyi(d, c, 3);
 
                /* check quotient of accumulated coeff by lc(poly3) is small */
-               if (d[2] != 0 || ub < d[1] ||
+               if (d[2] != 0 || ub <= d[1] ||
                   (ub == 0 && 0 > (slong) d[0])) /* quotient not a small */
                {
                   /* upgrade to multiprecision accumulated coeffs */
@@ -607,10 +653,20 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                   small = 0;
                } else /* quotient fits a small */
                {
-                  ulong r1;
+                  ulong q, r1;
 
                   /* write out quotient coefficient and discard remainder */
-                  sdiv_qrnnd(p1[k], r1, c[1], c[0], *mb);
+                  sdiv_qrnnd(q, r1, c[1], c[0], *mb);
+
+                  fmpz_set_si(p1 + k, q);
+
+                  if (COEFF_IS_MPZ(FLINT_ABS(q))) /* quotient too large */
+                  {
+                     /* upgrade to multiprecision accumulated coeffs */
+                     fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
+
+                     small = 0;
+                  }
                }
             } 
 
@@ -641,10 +697,8 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                   mpoly_monomial_sub(texp, maxn, exp3 + (len3 - i - 1)*N, N);
                   mpoly_monomial_sub(exp_list[exp_next], texp, e1 + k*N, N);
 
-                  /* but only if exponent corresponds to quotient term */
-                  if (!mpoly_monomial_divides(tmp, texp2, exp_list[exp_next], N, mask))
-                     exp_next--;
-                  else
+                  /* but only if exponent is big enough */
+                  if (!mpoly_monomial_lt(exp_list[exp_next], texp2, N))
                   {
                      if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2, &heap_len, N))
                         exp_next--;
@@ -661,6 +715,8 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
    }
 
    k++;
+
+cleanup2:
 
    fmpz_clear(mb);
    fmpz_clear(qc);
@@ -679,12 +735,10 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
 {
    slong i, exp_bits, N, lenq = 0;
    ulong * exp2, * exp3;
-   ulong * max_degs2, * max_degs3;
    int free2 = 0, free3 = 0;
    fmpz_mpoly_t temp1;
    fmpz_mpoly_struct * tq;
    ulong * maxn, * maxexp;
-   int deg, rev;
    TMP_INIT;
 
    /* check divisor is nonzero */
@@ -701,32 +755,22 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
 
    TMP_START;
 
-   degrev_from_ord(deg, rev, ctx->ord);
-
    maxexp = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-
-   max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-   max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-
-   /* compute maximum degree appearing in inputs */
-   
-   fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
-   fmpz_mpoly_max_degrees(max_degs3, poly3, ctx);
-
-   /* compute maximum degrees appearing in inputs and output for each var */
-   for (i = 0; i < ctx->n; i++)
-      maxexp[i] = FLINT_MAX(max_degs2[i], max_degs3[i]);
 
    /* maximum bits in quotient exps and inputs is max for poly2 and poly3 */
    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
+
+   /* compute bound on degrees appearing in inputs and output for each var */
+   for (i = 0; i < ctx->n; i++)
+      maxexp[i] = (UWORD(1) << (exp_bits - 1)) - UWORD(1);
 
    /* number of words required for exponent vectors */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
    /* pack maxexp vector into fields of given number of bits */
-   maxn = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+   maxn = (ulong *) TMP_ALLOC(8*N*sizeof(ulong));
 
-   mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, deg, rev);
+   mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, 0, 0);
 
    /* ensure input exponents packed to same size as output exponents */
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
@@ -739,12 +783,22 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    
    free3 = exp3 != poly3->exps;
 
+   /* check divisor leading monomial is at most that of the dividend */
+   if (mpoly_monomial_lt(exp3 + (poly3->length - 1)*N, 
+                         exp2 + (poly2->length - 1)*N, N))
+   {
+      fmpz_mpoly_zero(q, ctx);
+
+      goto cleanup3;
+   }
+
    /* take care of aliasing */
    if (q == poly2 || q == poly3)
    {
       fmpz_mpoly_init2(temp1, FLINT_MAX(poly2->length/poly3->length + 1, 1),
                                                                           ctx);
       fmpz_mpoly_fit_bits(temp1, exp_bits, ctx);
+      temp1->bits = exp_bits;
 
       tq = temp1;
    } else
@@ -752,14 +806,49 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
       fmpz_mpoly_fit_length(q, FLINT_MAX(poly2->length/poly3->length + 1, 1),
                                                                           ctx);
       fmpz_mpoly_fit_bits(q, exp_bits, ctx);
+      q->bits = exp_bits;
 
       tq = q;
    }
 
    /* do division with remainder */
-   lenq = _fmpz_mpoly_div_monagan_pearce(&tq->coeffs, &tq->exps,
+   while ((lenq = _fmpz_mpoly_div_monagan_pearce(&tq->coeffs, &tq->exps,
                          &tq->alloc, poly2->coeffs, exp2, poly2->length, 
-                        poly3->coeffs, exp3, poly3->length, maxn, exp_bits, N);
+            poly3->coeffs, exp3, poly3->length, maxn, exp_bits, N)) == -WORD(1)
+            && exp_bits < FLINT_BITS)
+   {
+      ulong * old_exp2 = exp2, * old_exp3 = exp3;
+
+      exp2 = mpoly_unpack_monomials(2*exp_bits, old_exp2, 
+                                              poly2->length, ctx->n, exp_bits);
+
+      exp3 = mpoly_unpack_monomials(2*exp_bits, old_exp3, 
+                                              poly3->length, ctx->n, exp_bits);
+   
+      exp_bits *= 2;
+
+      if (free2)
+         flint_free(old_exp2);
+
+      if (free3)
+         flint_free(old_exp3);
+
+      free2 = free3 = 1; 
+
+      for (i = 0; i < ctx->n; i++)
+         maxexp[i] = (UWORD(1) << (exp_bits - 1)) - UWORD(1);
+
+      mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, 0, 0);
+
+      N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+
+      fmpz_mpoly_fit_bits(tq, exp_bits, ctx);
+      tq->bits = exp_bits;
+   }
+
+   if (lenq == -WORD(1))
+      flint_throw(FLINT_EXPOF,
+                      "Exponent overflow in fmpz_mpoly_div_monagan_pearce");
 
    /* take care of aliasing */
    if (q == poly2 || q == poly3)
@@ -773,6 +862,8 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
 
    /* quotient polynomial is written in reverse order, so correct order */
    fmpz_mpoly_reverse(q, q, ctx);
+
+cleanup3:
 
    if (free2)
       flint_free(exp2);
