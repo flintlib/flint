@@ -472,13 +472,15 @@ FLINT_DLL int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
 
 /* Reduction *****************************************************************/
 
-FLINT_DLL slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, 
+FLINT_DLL slong
+_fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq, 
        fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
           const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
                         ulong * const * exp3, slong len, slong N, slong bits,
                                      ulong * maxn, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
+FLINT_DLL void
+fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
     const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3, slong len,
                                                    const fmpz_mpoly_ctx_t ctx);
 

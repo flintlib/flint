@@ -21,7 +21,7 @@
    passed and an array of quotient polynomials is returned. These are not in
    low level format.
 */
-slong _fmpz_mpoly_divrem_ideal1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
+slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
   ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
     slong len2, fmpz_mpoly_struct * const * poly3, ulong * const * exp3,
                  slong len, slong bits, ulong maxn, const fmpz_mpoly_ctx_t ctx)
@@ -361,7 +361,7 @@ cleanup:
    passed and an array of quotient polynomials is returned. These are not in
    low level format.
 */
-slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
+slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
   ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
     slong len2, fmpz_mpoly_struct * const * poly3, ulong * const * exp3, 
       slong len, slong N, slong bits, ulong * maxn, const fmpz_mpoly_ctx_t ctx)
@@ -390,7 +390,7 @@ slong _fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** polyq, fmpz ** polyr,
    TMP_INIT;
 
    if (N == 1)
-      return _fmpz_mpoly_divrem_ideal1(polyq, polyr, expr, allocr,
+      return _fmpz_mpoly_divrem_ideal_monagan_pearce1(polyq, polyr, expr, allocr,
                         poly2, exp2, len2, poly3, exp3, len, bits, *maxn, ctx);
 
    TMP_START;
@@ -733,7 +733,7 @@ cleanup2:
 }
 
 /* Assumes divisor polys don't alias any output polys */
-void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
+void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
     const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3, slong len,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
@@ -752,7 +752,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
    for (i = 0; i < len; i++)
    {  
       if (poly3[i]->length == 0)
-         flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divrem_ideal");
+         flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divrem_ideal_monagan_pearce");
 
       len3 = FLINT_MAX(len3, poly3[i]->length);
    }
@@ -853,7 +853,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
    {
       ulong * old_exp2 = exp2, * old_exp3;
 
-      lenr = _fmpz_mpoly_divrem_ideal(q, &tr->coeffs, &tr->exps,
+      lenr = _fmpz_mpoly_divrem_ideal_monagan_pearce(q, &tr->coeffs, &tr->exps,
                          &tr->alloc, poly2->coeffs, exp2, poly2->length,
                                      poly3, exp3, len, N, exp_bits, maxn, ctx);
 
@@ -903,7 +903,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
    }
 
    if (lenr < 0)
-      flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_divrem_ideal");
+      flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_divrem_ideal_monagan_pearce");
 
    /* take care of aliasing */
    if (r == poly2)
