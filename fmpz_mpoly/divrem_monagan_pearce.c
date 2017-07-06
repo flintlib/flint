@@ -849,7 +849,7 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
    /* maximum bits in quotient and remainder exps is max for poly2 and poly3 */
    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
 
-   /* compute maximum degrees appearing in inputs and outputs for each var */
+   /* compute bound for degrees appearing in inputs and outputs for each var */
    for (i = 0; i < ctx->n; i++)
       maxexp[i] = (UWORD(1) << (exp_bits - 1)) - UWORD(1);
 
