@@ -100,9 +100,6 @@ FLINT_DLL void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len,
 
 FLINT_DLL void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_normalise(fmpz_mpoly_t poly,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
 FMPZ_MPOLY_INLINE
 void _fmpz_mpoly_set_length(fmpz_mpoly_t poly, slong newlen, 
                                                    const fmpz_mpoly_ctx_t ctx)
@@ -284,9 +281,6 @@ FLINT_DLL ulong fmpz_mpoly_get_term_ui(const fmpz_mpoly_t poly,
 
 FLINT_DLL slong fmpz_mpoly_get_term_si(const fmpz_mpoly_t poly,
                                 ulong const * exp, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly,
-                                                   const fmpz_mpoly_ctx_t ctx);
 
 /* Set and negate ************************************************************/
 

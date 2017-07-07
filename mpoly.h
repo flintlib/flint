@@ -275,6 +275,20 @@ int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3, slong N)
 }
 
 MPOLY_INLINE
+int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3, slong N)
+{
+   slong i;
+
+   for (i = 0; i < N; i++)
+   {
+      if (exp2[i] != exp3[i])
+         return exp3[i] > exp2[i];
+   }
+
+   return 0;
+}
+
+MPOLY_INLINE
 int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3, slong N)
 {
    slong i;
@@ -379,7 +393,7 @@ void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
 
    while (j < s)
    {
-      if (heap[j].exp >= heap[j + 1].exp)
+      if (heap[j].exp <= heap[j + 1].exp)
          j++;
       heap[i] = heap[j];
       i = j;
@@ -390,7 +404,7 @@ void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
    exp = heap[s].exp;
    j = HEAP_PARENT(i);
 
-   while (i > 1 && exp < heap[j].exp)
+   while (i > 1 && exp > heap[j].exp)
    {
      heap[i] = heap[j];
      i = j;
@@ -436,7 +450,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
          next_loc = j;
 
          return;
-      } else if (exp < heap[j].exp)
+      } else if (exp > heap[j].exp)
          i = j;
       else
          break;
@@ -465,7 +479,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
 
    while (j < s)
    {
-      if (!mpoly_monomial_lt(heap[j + 1].exp, heap[j].exp, N))
+      if (!mpoly_monomial_gt(heap[j + 1].exp, heap[j].exp, N))
          j++;
       heap[i] = heap[j];
       i = j;
@@ -476,7 +490,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
    exp = heap[s].exp;
    j = HEAP_PARENT(i);
 
-   while (i > 1 && mpoly_monomial_lt(heap[j].exp, exp, N))
+   while (i > 1 && mpoly_monomial_gt(heap[j].exp, exp, N))
    {
       heap[i] = heap[j];
       i = j;
@@ -515,7 +529,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    while ((j = HEAP_PARENT(i)) >= 1)
    {
-      if (!mpoly_monomial_lt(heap[j].exp, exp, N))
+      if (!mpoly_monomial_gt(heap[j].exp, exp, N))
          break;
 
       i = j;
@@ -559,7 +573,7 @@ void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
    slong shift = FLINT_BITS - (num - k + 1)*bits;
 
    i1[0] = 0;
-   for (i = 0; i < l1 - 1; i++)
+   for (i = l1 - 1; i >= 0; i--)
    {
       while (j < len1 && i == (slong) (exp1[j] >> shift))
          j++;

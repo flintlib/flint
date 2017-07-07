@@ -22,7 +22,7 @@ fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly,
     if (fmpz_is_zero(x))
     {
        fmpz ptr;
-       slong i, m;
+       slong i, N;
 
        if (n >= poly->length)
           return;
@@ -35,10 +35,10 @@ fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly,
 
        poly->coeffs[i] = ptr;
 
-       m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+       N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
-       for (i = n*m; i < (poly->length - 1)*m; i++)
-          poly->exps[i] = poly->exps[i + m];
+       for (i = n*N; i < (poly->length - 1)*N; i++)
+          poly->exps[i] = poly->exps[i + N];
 
        poly->length--;
     }
@@ -46,15 +46,11 @@ fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly,
     {
         fmpz_mpoly_fit_length(poly, n + 1, ctx);
 
-        if (n + 1 > poly->length)
-        {
-           slong i;
-           
-           for (i = poly->length; i < n; i++)
-               fmpz_zero(poly->coeffs + i);
-           
-           poly->length = n + 1;
-        }
+        if (n == poly->length)
+           poly->length++;
+        else if (n > poly->length)
+           flint_throw(FLINT_ERROR,
+                                 "Invalid index in fmpz_mpoly_set_coeff_fmpz");
 
         fmpz_set(poly->coeffs + n, x);
     }

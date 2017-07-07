@@ -18,7 +18,7 @@
 int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
                                     const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 {
-   slong m, i;
+   slong N, i;
    int deg, rev;
 
    if (fmpz_is_zero(c))
@@ -29,9 +29,9 @@ int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
 
    degrev_from_ord(deg, rev, ctx->ord);
 
-   m = deg ? (poly->bits*ctx->n - 1)/FLINT_BITS + 1 : 1;
+   N = deg ? (poly->bits*ctx->n - 1)/FLINT_BITS + 1 : 1;
 
-   for (i = 0; i < m; i++)
+   for (i = 0; i < N; i++)
    {
       if (poly->exps[i] != 0)
          return 0;

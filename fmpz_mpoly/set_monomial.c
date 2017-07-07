@@ -56,12 +56,15 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
 
    poly->bits = max_bits;
 
+   if (n > poly->length)
+      flint_throw(FLINT_ERROR, "Invalid index in fmpz_mpoly_set_monomial");
+
    fmpz_mpoly_fit_length(poly, n + 1, ctx);
 
    N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
    
    mpoly_set_monomial(poly->exps + n*N, exps, poly->bits, ctx->n, deg, rev);
 
-   if (n + 1 > poly->length)
+   if (n == poly->length)
       _fmpz_mpoly_set_length(poly, n + 1, ctx);
 }

@@ -78,18 +78,6 @@ void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
     Release any space allocated for an \code{fmpz_mpoly_t}.
 
-void _fmpz_mpoly_normalise(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Internal use only. Sets the length of the given polynomial to exclude any
-    leading zero terms. Note that all other functions assume leading
-    coefficients of \code{fmpz_mpoly_t} polynomials are nonzero.
-
-void _fmpz_mpoly_renormalise(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Internal use only. Removes any trailing zero terms from the given
-    polynomial. Note that all other function assume trailing coefficients of
-    \code{fmpz_mpoly_t} polynomials are nonzero.
-
 void _fmpz_mpoly_set_length(fmpz_mpoly_t poly, slong newlen, 
                                                     const fmpz_mpoly_ctx_t ctx)
 

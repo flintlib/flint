@@ -46,15 +46,11 @@ fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
     {
         fmpz_mpoly_fit_length(poly, n + 1, ctx);
 
-        if (n + 1 > poly->length)
-        {
-           slong i;
-           
-           for (i = poly->length; i < n; i++)
-               fmpz_zero(poly->coeffs + i);
-           
-           poly->length = n + 1;
-        }
+        if (n == poly->length)
+           poly->length++;
+        else if (n > poly->length)
+           flint_throw(FLINT_ERROR,
+                                   "Invalid index in fmpz_mpoly_set_coeff_si");
 
         fmpz_set_si(poly->coeffs + n, x);
     }

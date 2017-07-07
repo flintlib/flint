@@ -68,9 +68,9 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
       TMP_END;
    } else
    {
-      slong m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+      slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
-      for (i = 0; i < m; i++)
+      for (i = 0; i < N; i++)
       {
          if (poly->exps[i] != 0)
          {
@@ -82,7 +82,7 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
             if (poly->exps[i] != s)
                return 0;
 
-            for (i++; i < m; i++)
+            for (i++; i < N; i++)
             {
                if (poly->exps[i] != 0)
                   return 0;

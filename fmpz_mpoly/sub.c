@@ -23,7 +23,7 @@ slong _fmpz_mpoly_sub1(fmpz * poly1, ulong * exps1,
 
    while (i < len2 && j < len3)
    {
-      if (exps2[i] < exps3[j])
+      if (exps2[i] > exps3[j])
       {
          fmpz_set(poly1 + k, poly2 + i);
          exps1[k] = exps2[i];
@@ -74,7 +74,7 @@ slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
    {
       int cmp = mpoly_monomial_cmp(exps2 + i*N, exps3 + j*N, N);
 
-      if (cmp < 0)
+      if (cmp > 0)
       {
          fmpz_set(poly1 + k, poly2 + i);
          mpoly_monomial_set(exps1 + k*N, exps2 + i*N, N);

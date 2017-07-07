@@ -20,7 +20,7 @@ int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
    slong n = len;
    slong i = 0;
 
-   if (exp < poly_exps[0]) /* less than first term */
+   if (exp > poly_exps[0]) /* greater than first term */
    {
       (*index) = 0;
       return 0;
@@ -31,7 +31,7 @@ int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
       slong half = n/2;
 
       /* if in first half */
-      if (exp < poly_exps[i + half]) 
+      if (exp > poly_exps[i + half]) 
          n = half;
       else /* in second half */
       {
@@ -45,7 +45,7 @@ int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
    {
       (*index) = i;
       return 1;
-   } else /* greater than term at index i, but doesn't exist */
+   } else /* less than term at index i, but doesn't exist */
    {
       (*index) = i + 1;
       return 0;
@@ -68,7 +68,7 @@ int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
    if (N == 1)
       return mpoly_monomial_exists1(index, poly_exps, *exp, len);
 
-   if (mpoly_monomial_lt(poly_exps, exp, N)) /* less than first term */
+   if (mpoly_monomial_gt(poly_exps, exp, N)) /* greater than first term */
    {
       (*index) = 0;
       return 0;
@@ -79,7 +79,7 @@ int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
       slong half = n/2;
 
       /* if in first half */
-      if (mpoly_monomial_lt(poly_exps + (i + half)*N, exp, N)) 
+      if (mpoly_monomial_gt(poly_exps + (i + half)*N, exp, N)) 
          n = half;
       else /* in second half */
       {
@@ -93,7 +93,7 @@ int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
    {
       (*index) = i;
       return 1;
-   } else /* greater than term at index i, but doesn't exist */
+   } else /* less than term at index i, but doesn't exist */
    {
       (*index) = i + 1;
       return 0;
