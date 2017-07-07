@@ -294,7 +294,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
          }
 
          /* if coeffs or monomials don't divide or exponent too large */
-         if (!d1 || !d2 || exp > maxexp) /* not an exact division */
+         if (!d1 || !d2 || exp < maxexp) /* not an exact division */
          {
             for (i = 0; i <= k; i++)
                _fmpz_demote(p1 + i);
@@ -650,7 +650,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
 
          /* if coeffs or monomials don't divide, or exponent too large */
          if (!d1 || !d2 ||
-          mpoly_monomial_lt(exp, exp2 + (len2 - 1)*N, N)) /* inexact division */
+          mpoly_monomial_gt(exp, exp2 + (len2 - 1)*N, N)) /* inexact division */
          {
             for (i = 0; i <= k; i++)
                _fmpz_demote(p1 + i);
