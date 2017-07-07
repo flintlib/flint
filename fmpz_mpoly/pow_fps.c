@@ -83,7 +83,7 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    for (i = 0; i < len2; i++)
       fik[i] = exp2[i]*(k - 1);
 
-   finalexp = exp2[len2 - 1]*(k - 1) + exp2[0];
+   finalexp = exp2[0];
 
    while (heap_len > 1)
    {
@@ -122,9 +122,10 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
          fmpz_mul(t1, poly2 + x->i, gc + x->j);
          fmpz_add(S, S, t1);
 
-         if (exp <= finalexp)
+         if (exp >= finalexp)
          {
             temp2 = fik[x->i] - ge[x->j];
+
             if ((slong) temp2 < 0)
                fmpz_submul_ui(C, t1, -temp2);
             else
@@ -146,10 +147,11 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             fmpz_mul(t1, poly2 + x->i, gc + x->j);
             fmpz_add(S, S, t1);
 
-            if (exp <= finalexp)
+            if (exp >= finalexp)
             {
                temp2 = fik[x->i] - ge[x->j];
-               if ((slong) temp2 < 0)
+
+               if (0 > (slong) temp2)
                   fmpz_submul_ui(C, t1, -temp2);
                else
                   fmpz_addmul_ui(C, t1, temp2);
@@ -192,7 +194,15 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
       if (!fmpz_is_zero(C))
       {
-         fmpz_divexact_ui(temp1, C, exp - k*exp2[0]);
+         slong t2 = exp - k*exp2[0];
+
+         if (t2 < 0)
+         {
+            fmpz_divexact_ui(temp1, C, -t2);
+            fmpz_neg(temp1, temp1);
+         } else
+            fmpz_divexact_ui(temp1, C, t2);
+
          fmpz_add(S, S, temp1);
          fmpz_divexact(gc + gnext, temp1, poly2 + 0);
 
@@ -205,6 +215,7 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->next = NULL;
 
             _mpoly_heap_insert1(heap, exp2[1] + ge[gnext], x, &heap_len);
+
             largest[1] = gnext + 1;
          }
       }
@@ -401,8 +412,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
    for (i = 0; i < len2; i++)
       mpoly_monomial_mul_si(fik + i*N, exp2 + i*N, N, k - 1);
 
-   mpoly_monomial_mul_si(finalexp, exp2 + (len2 - 1)*N, N, k - 1);
-   mpoly_monomial_add(finalexp, finalexp, exp2 + 0, N);
+   mpoly_monomial_set(finalexp, exp2, N);
 
    while (heap_len > 1)
    {
@@ -443,7 +453,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
          fmpz_mul(t1, poly2 + x->i, gc + x->j);
          fmpz_add(S, S, t1);
 
-         if (!mpoly_monomial_lt(exp, finalexp, N))
+         if (!mpoly_monomial_gt(exp, finalexp, N))
          {
             mpoly_monomial_sub_with_borrow(temp2, fik + x->i*N, ge + x->j*N, N);
             fmpz_set_mpn_signed(t2, temp2, N);
@@ -466,7 +476,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
             fmpz_mul(t1, poly2 + x->i, gc + x->j);
             fmpz_add(S, S, t1);
 
-            if (!mpoly_monomial_lt(exp, finalexp, N))
+            if (!mpoly_monomial_gt(exp, finalexp, N))
             {
                mpoly_monomial_sub_with_borrow(temp2, fik + x->i*N, ge + x->j*N, N);
                fmpz_set_mpn_signed(t2, temp2, N);
@@ -521,7 +531,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
       {
          mpoly_monomial_mul_si(temp2, exp2 + 0, N, k); 
          mpoly_monomial_sub_with_borrow(temp2, exp_copy, temp2, N);
-         fmpz_set_mpn(t2, temp2, N);
+         fmpz_set_mpn_signed(t2, temp2, N);
 
          fmpz_divexact(temp1, C, t2);
          fmpz_add(S, S, temp1);

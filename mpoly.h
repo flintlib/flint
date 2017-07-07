@@ -573,9 +573,9 @@ void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
    slong shift = FLINT_BITS - (num - k + 1)*bits;
 
    i1[0] = 0;
-   for (i = l1 - 1; i >= 0; i--)
+   for (i = 0; i < l1 - 1; i++)
    {
-      while (j < len1 && i == (slong) (exp1[j] >> shift))
+      while (j < len1 && (l1 - i - 1) == (slong) (exp1[j] >> shift))
          j++;
 
       i1[i + 1] = j;

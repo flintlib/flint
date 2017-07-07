@@ -226,7 +226,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
      prods[i] = mults[i - 1]*prods[i - 1];
    
    /* for each coeff in array */
-   for (i = 0; i < prods[num]; i++)
+   for (i = prods[num] - 1; i >= 0; i--)
    {
       c = poly2 + i*3;
 
@@ -295,7 +295,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
      prods[i] = mults[i - 1]*prods[i - 1];
    
    /* for each coeff in array */
-   for (i = 0; i < prods[num]; i++)
+   for (i = prods[num] - 1; i >= 0; i--)
    {
       c = poly2 + i*2;
 
@@ -364,7 +364,7 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
      prods[i] = mults[i - 1]*prods[i - 1];
 
    /* for each coeff in array */
-   for (i = 0; i < prods[num]; i++)
+   for (i = prods[num] - 1; i >= 0; i--)
    {
       c = poly2 + i;
 
@@ -434,7 +434,7 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
       prods[i] = mults[i - 1]*prods[i - 1];
 
    /* for each coeff in array */
-   for (i = 0; i < prods[num]; i++)
+   for (i = prods[num] - 1; i >= 0; i--)
    {
       c = poly2 + i;
 
@@ -562,8 +562,8 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
       prod *= mults[i];
 
    /* compute lengths of poly2 and poly3 in chunks */
-   l2 = 1 + (slong) (exp2[len2 - 1] >> shift);
-   l3 = 1 + (slong) (exp3[len3 - 1] >> shift);
+   l2 = 1 + (slong) (exp2[0] >> shift);
+   l3 = 1 + (slong) (exp3[0] >> shift);
 
    TMP_START;
 
@@ -665,7 +665,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
             /* insert main variable into exponents */
             for (j = 0; j < len; j++)
-               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
+               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + ((l1 - i - 1) << shift);
 
             k += len;
          } else if (bits1 <= 2*FLINT_BITS) /* output coeffs fit in two words */        
@@ -691,7 +691,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
             /* insert main variable into exponents */
             for (j = 0; j < len; j++)
-               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
+               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + ((l1 - i - 1) << shift);
 
             k += len;
          } else /* output coeffs fit in three words */
@@ -717,7 +717,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
             /* insert main variable into exponents */
             for (j = 0; j < len; j++)
-               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
+               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + ((l1 - i - 1) << shift);
 
             k += len;
          }
@@ -750,7 +750,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
           /* insert main variable into exponents */
           for (j = 0; j < len; j++)
-             (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + (i << shift);
+             (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + ((l1 - i - 1) << shift);
 
           for (j = 0; j < prod; j++)
              _fmpz_demote(p1 + j);
