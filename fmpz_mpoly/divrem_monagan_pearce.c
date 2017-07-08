@@ -36,10 +36,11 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
    fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
   ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
             slong len2, const fmpz * poly3, const ulong * exp3, slong len3,
-                                                        ulong maxn, slong bits)
+                                                                    slong bits)
 {
    slong i, k, l, s;
-   slong next_free, Q_len = 0, reuse_len = 0, heap_len = 2; /* heap zero index unused */
+   slong next_free, Q_len = 0;
+   slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap1_s * heap;
    mpoly_heap_t * chain;
    mpoly_heap_t ** Q, ** reuse;
@@ -97,11 +98,11 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
    x->j = 0;
    x->next = NULL;
 
-   /* insert (-1, 0, maxn - exp2[len2 - 1]) into heap */
-   HEAP_ASSIGN(heap[1], maxn - exp2[len2 - 1], x);
+   /* insert (-1, 0, exp2[0]) into heap */
+   HEAP_ASSIGN(heap[1], exp2[0], x);
 
    /* precompute -c_n where c_n is the leading coeff of poly3 */
-   fmpz_neg(mb, poly3 + len3 - 1);
+   fmpz_neg(mb, poly3);
 
    ub = ((ulong) FLINT_ABS(*mb)) >> 1; /* abs(lc(poly3))/2 */
   
@@ -144,23 +145,22 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
             if (x->i == -WORD(1))
             {
                /* subtract poly2 coeff from accumulated three word coeff */
-               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
             } else
             {
                /* subtract q[j]*poly3 coeff from accum. three word coeff */
-               _fmpz_mpoly_submul_uiuiui_fmpz(c,
-                                             poly3[len3 - x->i - 1], p1[x->j]);
+               _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
             }
          } else /* accumulated coeffs are multiprecision */
          {
             if (x->i == -WORD(1))
             {
                /* subtract poly2 coeff from accum. coeff */
-               fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
+               fmpz_sub(qc, qc, poly2 + x->j);
             } else
             {
                /* subtract q[j]*poly3 coeff from accum. coeff */
-               fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
+               fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
             }
          }
 
@@ -179,23 +179,22 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                if (x->i == -WORD(1))
                {
                   /* subtract poly2 coeff from accum. three word coeff */
-                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
                } else
                {
                   /* subtract q[j]*poly3 coeff from accum. three word coeff */
-                  _fmpz_mpoly_submul_uiuiui_fmpz(c,
-                                             poly3[len3 - x->i - 1], p1[x->j]);
+                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
                }
             } else /* accumulated coeffs are multiprecision */
             {
                if (x->i == -WORD(1))
                {
                   /* subtract poly2 coeff from accum. coeff */
-                  fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
+                  fmpz_sub(qc, qc, poly2 + x->j);
                } else
                {
                   /* subtract q[j]*poly3 coeff from accum. coeff */
-                  fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
+                  fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
                }
             }
 
@@ -218,16 +217,15 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
             x->j++;
             x->next = NULL;
 
-            /* insert (x->i, x->j + 1, maxn - exp2[len2 - x->j - 1]) in heap */
-            _mpoly_heap_insert1(heap, maxn - exp2[len2 - x->j - 1], x, &heap_len);
+            /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
+            _mpoly_heap_insert1(heap, exp2[x->j], x, &heap_len);
          } else if (x->j < k - 1)
          {
             x->j++;
             x->next = NULL;
 
-            /* insert (x->i, x->j + 1, maxn - exp3[len3 - x->i - 1]) in heap */
-            _mpoly_heap_insert1(heap, maxn - exp3[len3 - x->i - 1] - e1[x->j],
-                                                                 x, &heap_len);
+            /* insert (x->i, x->j + 1, exp3[x->i] + e1[x->j]) in heap */
+            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x, &heap_len);
          } else if (x->j == k - 1)
          {
             s++;
@@ -244,7 +242,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
       else /* accumulated coeff is nonzero */
       {
          /* check current exp divisible by leading exp of poly3... */
-         d1 = mpoly_monomial_divides1(e1 + k, maxn - exp3[len3 - 1], exp, mask);
+         d1 = mpoly_monomial_divides1(e1 + k, exp, exp3[0], mask);
 
          /* ... if not, remainder term */
          if (!d1)
@@ -266,7 +264,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
             } 
  
             /* write out remainder exponent */
-            e2[l] = maxn - exp;
+            e2[l] = exp;
 
             /* no quotient term in this case */
             k--;
@@ -319,7 +317,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                         fmpz_set_si(p2 + l, -r1);
 
                         /* write out remainder exponent */
-                        e2[l] = maxn - exp;
+                        e2[l] = exp;
                      }
                   }
                }
@@ -342,7 +340,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                   fmpz_neg(p2 + l, r);
                      
                   /* write out remainder exponent */
-                  e2[l] = maxn - exp;
+                  e2[l] = exp;
                }
             }
 
@@ -362,9 +360,8 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                   x2->j = k;
                   x2->next = NULL;
 
-                  /* insert (i, k, maxn - exp3[len3 - i - 1] - e1[k]) */
-                  _mpoly_heap_insert1(heap, maxn - exp3[len3 - i - 1] - e1[k],
-                                                                x2, &heap_len);
+                  /* insert (i, k, exp3[i] + e1[k]) */
+                  _mpoly_heap_insert1(heap, exp3[i] + e1[k], x2, &heap_len);
                }
                s = 1;
             } else /* quotient coeff was zero, nothing to write out */
@@ -419,10 +416,11 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
                   ulong ** expr, slong * allocr, const fmpz * poly2,
    const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
-                                 slong len3, ulong * maxn, slong bits, slong N)
+                                               slong len3, slong bits, slong N)
 {
    slong i, k, l, s;
-   slong next_free, Q_len = 0, reuse_len = 0, heap_len = 2; /* heap zero index unused */
+   slong next_free, Q_len = 0;
+   slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap_s * heap;
    mpoly_heap_t * chain;
    mpoly_heap_t ** Q, ** reuse;
@@ -431,7 +429,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
    fmpz * p2 = *polyr;
    ulong * e1 = *expq;
    ulong * e2 = *expr;
-   ulong * exp, * exps, * texp;
+   ulong * exp, * exps;
    ulong ** exp_list;
    ulong c[3]; /* for accumulating coefficients */
    slong exp_next;
@@ -445,7 +443,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
    /* if exponent vectors fit in one word, call specialised version */
    if (N == 1)
       return _fmpz_mpoly_divrem_monagan_pearce1(lenr, polyq, expq, allocq,
-       polyr, expr, allocr, poly2, exp2, len2, poly3, exp3, len3, *maxn, bits);
+       polyr, expr, allocr, poly2, exp2, len2, poly3, exp3, len3, bits);
 
    TMP_START;
 
@@ -471,8 +469,6 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
    exps = (ulong *) TMP_ALLOC(len3*N*sizeof(ulong));
    /* array of pointers to unused exponent vectors */
    exp_list = (ulong **) TMP_ALLOC(len3*sizeof(ulong *));
-   /* space for temporary exponent vector, for exponent computations */
-   texp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
    /* space to save copy of current exponent vector */
    exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
@@ -495,7 +491,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
    /* see description of divisor heap division in paper */
    s = len3;
    
-   /* insert (-1, 0, maxn - exp2[len2 - 1]) into heap */
+   /* insert (-1, 0, exp2[0]) into heap */
    x = chain + next_free++;
    x->i = -WORD(1);
    x->j = 0;
@@ -504,10 +500,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
    heap[1].next = x;
    heap[1].exp = exp_list[exp_next++];
 
-   mpoly_monomial_sub(heap[1].exp, maxn, exp2 + (len2 - 1)*N, N);
+   mpoly_monomial_set(heap[1].exp, exp2, N);
 
    /* precompute -c_n where c_n is the leading coeff of poly3 */
-   fmpz_neg(mb, poly3 + len3 - 1);
+   fmpz_neg(mb, poly3);
 
    ub = ((ulong) FLINT_ABS(*mb)) >> 1; /* abs(lc(poly3))/2 */
    
@@ -553,22 +549,22 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
             if (x->i == -WORD(1))
             {
                /* subtract poly2 coeff from accumulated three word coeff */
-               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
             } else /* accumulated coeffs are multiprecision */
             {
                /* subtract q[j]*poly3 coeff from accum. three word coeff */
-               _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1], p1[x->j]);
+               _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
             }
          } else
          {
             if (x->i == -WORD(1))
             {
                /* subtract poly2 coeff from accum. coeff */
-               fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
+               fmpz_sub(qc, qc, poly2 + x->j);
             } else
             {
                /* subtract q[j]*poly3 coeff from accum. coeff */
-               fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
+               fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
             }
          }
 
@@ -587,23 +583,22 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                if (x->i == -WORD(1))
                {
                   /* subtract poly2 coeff from accumulated three word coeff */
-                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + len2 - x->j - 1);
+                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
                } else
                {
                   /* subtract q[j]*poly3 coeff from accum. three word coeff */
-                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[len3 - x->i - 1],
-                                                                     p1[x->j]);
+                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
                }
             } else /* accumulated coeffs are multiprecision */
             {
                if (x->i == -WORD(1))
                {
                   /* subtract poly2 coeff from accum. coeff */
-                  fmpz_sub(qc, qc, poly2 + len2 - x->j - 1);
+                  fmpz_sub(qc, qc, poly2 + x->j);
                } else
                {
                   /* subtract q[j]*poly3 coeff from accum. coeff */
-                  fmpz_addmul(qc, poly3 + len3 - x->i - 1, p1 + x->j);
+                  fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
                }
             }
 
@@ -626,9 +621,9 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
             x->j++;
             x->next = NULL;
 
-            mpoly_monomial_sub(exp_list[exp_next], maxn, exp2 + (len2 - x->j - 1)*N, N);
+            mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
 
-            /* insert (x->i, x->j + 1, maxn - exp2[len2 - x->j - 1]) in heap */
+            /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N))
                exp_next--;
          } else if (x->j < k - 1)
@@ -636,10 +631,9 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
             x->j++;
             x->next = NULL;
 
-            mpoly_monomial_sub(texp, maxn, exp3 + (len3 - x->i - 1)*N, N);
-            mpoly_monomial_sub(exp_list[exp_next], texp, e1 + x->j*N, N);
+            mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
 
-            /* insert (x->i, x->j + 1, maxn - exp3[len3 - x->i - 1]) in heap */
+            /* insert (x->i, x->j + 1, exp3[x->i] + e1[x->j]) in heap */
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N))
                exp_next--;
          } else if (x->j == k - 1)
@@ -658,8 +652,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
       else /* accumulated coeff is nonzero */
       {
          /* check current exp divisible by leading exp of poly3... */
-         mpoly_monomial_sub(texp, maxn, exp3 + (len3 - 1)*N, N);
-         d1 = mpoly_monomial_divides(e1 + k*N, texp, exp, N, mask);
+         d1 = mpoly_monomial_divides(e1 + k*N, exp, exp3, N, mask);
 
          /* ... if not, remainder term */
          if (!d1)
@@ -681,7 +674,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
             }
 
             /* write out remainder exponent */
-            mpoly_monomial_sub(e2 + l*N, maxn, exp, N);
+            mpoly_monomial_set(e2 + l*N, exp, N);
 
             /* no quotient term in this case */
             k--;
@@ -734,7 +727,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                         fmpz_set_si(p2 + l, -r1);
 
                         /* write out remainder exponent */
-                        mpoly_monomial_sub(e2 + l*N, maxn, exp, N);
+                        mpoly_monomial_set(e2 + l*N, exp, N);
                      }
                   }
                }
@@ -755,7 +748,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
 
                   fmpz_neg(p2 + l, r);
                      
-                  mpoly_monomial_sub(e2 + l*N, maxn, exp, N);
+                  mpoly_monomial_set(e2 + l*N, exp, N);
                }
             }
 
@@ -775,10 +768,9 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                   x2->j = k;
                   x2->next = NULL;
 
-                  mpoly_monomial_sub(texp, maxn, exp3 + (len3 - i - 1)*N, N);
-                  mpoly_monomial_sub(exp_list[exp_next], texp, e1 + k*N, N);
+                  mpoly_monomial_add(exp_list[exp_next], exp3 + i*N, e1 + k*N, N);
 
-                  /* insert (i, k, maxn - exp3[len3 - i - 1] - e1[k]) */
+                  /* insert (i, k, exp3[i] + e1[k]) */
                   if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2, &heap_len, N))
                      exp_next--;
                }
@@ -819,13 +811,11 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, exp_bits, N, lenq = 0, lenr = 0;
+   slong exp_bits, N, lenq = 0, lenr = 0;
    ulong * exp2, * exp3;
    int free2 = 0, free3 = 0;
    fmpz_mpoly_t temp1, temp2;
    fmpz_mpoly_struct * tq, * tr;
-   ulong * maxn, * maxexp;
-   TMP_INIT;
 
    /* check divisor is nonzero */
    if (poly3->length == 0)
@@ -840,26 +830,13 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
       return;
    }
 
-   TMP_START;
-
-   maxexp = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-
    /* compute maximum degree appearing in inputs */
 
    /* maximum bits in quotient and remainder exps is max for poly2 and poly3 */
    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
 
-   /* compute bound for degrees appearing in inputs and outputs for each var */
-   for (i = 0; i < ctx->n; i++)
-      maxexp[i] = (UWORD(1) << (exp_bits - 1)) - UWORD(1);
-
    /* number of words required for exponent vectors */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
-
-   /* pack maxexp vector into fields of given number of bits */
-   maxn = (ulong *) TMP_ALLOC(8*N*sizeof(ulong));
-
-   mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, 0, 0);
 
    /* ensure input exponents packed to same size as output exponents */
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
@@ -873,8 +850,7 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
    free3 = exp3 != poly3->exps;
 
    /* check divisor leading monomial is at most that of the dividend */
-   if (mpoly_monomial_lt(exp3 + (poly3->length - 1)*N, 
-                         exp2 + (poly2->length - 1)*N, N))
+   if (mpoly_monomial_lt(exp3, exp2, N))
    {
       fmpz_mpoly_set(r, poly2, ctx);
       fmpz_mpoly_zero(q, ctx);
@@ -920,7 +896,7 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
    /* do division with remainder */
    while ((lenq = _fmpz_mpoly_divrem_monagan_pearce(&lenr, &tq->coeffs, &tq->exps,
          &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2, 
-         poly2->length, poly3->coeffs, exp3, poly3->length, maxn, exp_bits, N)) == 0
+         poly2->length, poly3->coeffs, exp3, poly3->length, exp_bits, N)) == 0
          && lenr == 0 && exp_bits < FLINT_BITS)
    {
       ulong * old_exp2 = exp2, * old_exp3 = exp3;
@@ -940,11 +916,6 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
          flint_free(old_exp3);
 
       free2 = free3 = 1; 
-
-      for (i = 0; i < ctx->n; i++)
-         maxexp[i] = (UWORD(1) << (exp_bits - 1)) - UWORD(1);
-
-      mpoly_set_monomial(maxn, maxexp, exp_bits, ctx->n, 0, 0);
 
       N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
@@ -977,10 +948,6 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
    _fmpz_mpoly_set_length(q, lenq, ctx);
    _fmpz_mpoly_set_length(r, lenr, ctx);
 
-   /* quotient and remainder are written in reverse, so correct order */
-   fmpz_mpoly_reverse(q, q, ctx);
-   fmpz_mpoly_reverse(r, r, ctx);
-
 cleanup3:
 
    if (free2)
@@ -988,6 +955,4 @@ cleanup3:
 
    if (free3)
       flint_free(exp3);
-
-   TMP_END;
 }
