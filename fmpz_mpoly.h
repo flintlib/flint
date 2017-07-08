@@ -471,7 +471,7 @@ _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
        fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
           const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
                         ulong * const * exp3, slong len, slong N, slong bits,
-                                     ulong * maxn, const fmpz_mpoly_ctx_t ctx);
+                                                   const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void
 fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
