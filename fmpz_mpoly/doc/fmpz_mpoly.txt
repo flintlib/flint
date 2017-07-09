@@ -310,7 +310,7 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
 
     Set the term of \code{poly} with the given monomial to the given
     coefficient. The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The least significant variable with
+    many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If a term with that
     monomial already exists in the polynomial, it is overwritten. The term is
     removed if the coefficient is zero. If a term with that monomial doesn't
@@ -321,7 +321,7 @@ void fmpz_mpoly_set_term_ui(fmpz_mpoly_t poly,
 
     Set the term of \code{poly} with the given monomial to the given
     coefficient. The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The least significant variable with
+    many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If a term with that
     monomial already exists in the polynomial, it is overwritten. The term is
     removed if the coefficient is zero. If a term with that monomial doesn't
@@ -332,7 +332,7 @@ void fmpz_mpoly_set_term_si(fmpz_mpoly_t poly,
 
     Set the term of \code{poly} with the given monomial to the given
     coefficient. The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The least significant variable with
+    many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If a term with that
     monomial already exists in the polynomial, it is overwritten. The term is
     removed if the coefficient is zero. If a term with that monomial doesn't
@@ -343,20 +343,20 @@ void fmpz_mpoly_get_term_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
 
     Get the coefficient $c$ of the term of \code{poly} with the given monomial.
     The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The least significant variable with
+    many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If no term with that
     monomial exists in the polynomial, zero is returned. This includes the case
-    where the monomial is larger than that of the leading term of \code{poly}.
+    where the monomial is smaller than that of the trailing term of \code{poly}.
 
 ulong fmpz_mpoly_get_term_ui(const fmpz_mpoly_t poly,
                                  ulong const * exp, const fmpz_mpoly_ctx_t ctx)
 
     Get the coefficient $c$ of the term of \code{poly} with the given monomial.
     The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The least significant variable with
+    many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If no term with that
     monomial exists in the polynomial, zero is returned. This includes the case
-    where the monomial is larger than that of the leading term of \code{poly}.
+    where the monomial is smaller than that of the trailing term of \code{poly}.
     The coeffcient is assumed to be unsigned and to fit in a \code{ulong}.
 
 slong fmpz_mpoly_get_term_si(const fmpz_mpoly_t poly,
@@ -364,10 +364,10 @@ slong fmpz_mpoly_get_term_si(const fmpz_mpoly_t poly,
 
     Get the coefficient $c$ of the term of \code{poly} with the given monomial.
     The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The least significant variable with
+    many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If no term with that
     monomial exists in the polynomial, zero is returned. This includes the case
-    where the monomial is larger than that of the leading term of \code{poly}.
+    where the monomial is smaller than that of the trailing term of \code{poly}.
     The coeffcient is assumed to fit in an \code{slong}.
 
 *******************************************************************************
@@ -717,9 +717,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
     return 0. The function assumes exponent vectors that each fit in $N$ words,
     and are packed into fields of the given number of bits. Assumes input polys
     are nonzero. Implements ``Polynomial division using dynamic arrays, heaps
-    and packed exponents'' by Michael Monagan and Roman Pearce, except that we
-    divide from right to left and use a heap with smallest exponent at head.
-    No aliasing is allowed.
+    and packed exponents'' by Michael Monagan and Roman Pearce. No aliasing is
+    allowed.
 
 int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
@@ -740,7 +739,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
            ulong ** expq, slong * allocq, const fmpz * poly2,
    const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
-                                 slong len3, ulong * maxn, slong bits, slong N)
+                                               slong len3, slong bits, slong N)
 
     Set \code{(polyq, expq, allocq)} to the quotient of
     \code{(poly2, exp2, len2)} by \code{(poly3, exp3, len3)} discarding
@@ -751,13 +750,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
     words. The exponent vectors are assumed to have fields with the given
     number of bits. Assumes input polynomials are nonzero. Implements
     "Polynomial division using dynamic arrays, heaps and packed exponents" by
-    Michael Monagan and Roman Pearce, except that we use a heap with smallest
-    exponent at head. Note that if $a < b$ then $(n - b) < (n - b)$ where $n$
-    is the maximum value $a$ and $b$ can take. The word \code{maxn} is set to
-    an exponent vector whose fields are all set to such a value $n$. This
-    allows division from left to right with a heap with smallest exponent at
-    the head. The quotient polynomial is written in reverse order. No aliasing
-    is allowed.
+    Michael Monagan and Roman Pearce. No aliasing is allowed.
 
 void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q,
                      const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
@@ -767,15 +760,14 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q,
     discarding the remainder (with notional remainder coefficients reduced
     modulo the leading coefficient of \code{poly3}). Implements "Polynomial
     division using dynamic arrays, heaps and packed exponents" by Michael
-    Monagan and Roman Pearce, except that we use a heap with smallest exponent
-    at head. This function is exceptionally efficient if the division is known
-    to be exact.
+    Monagan and Roman Pearce. This function is exceptionally efficient if the
+    division is known to be exact.
 
 slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
                   ulong ** expr, slong * allocr, const fmpz * poly2,
    const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
-                                 slong len3, ulong * maxn, slong bits, slong N)
+                                               slong len3, slong bits, slong N)
 
     Set \code{(polyq, expq, allocq)} and \code{(polyr, expr, allocr)} to the
     quotient and remainder of \code{(poly2, exp2, len2)} by
@@ -786,13 +778,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
     words. The exponent vectors are assumed to have fields with the given
     number of bits. Assumes input polynomials are nonzero. Implements
     "Polynomial division using dynamic arrays, heaps and packed exponents" by
-    Michael Monagan and Roman Pearce, except that we use a heap with smallest
-    exponent at head. Note that if $a < b$ then $(n - b) < (n - b)$ where $n$
-    is the maximum value $a$ and $b$ can take. The word \code{maxn} is set to
-    an exponent vector whose fields are all set to such a value $n$. This
-    allows division from left to right with a heap with smallest exponent at
-    the head. The quotient and remainder polynomials are written in reverse
-    order. No aliasing is allowed.
+    Michael Monagan and Roman Pearce. No aliasing is allowed.
 
 void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
@@ -802,8 +788,7 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
     \code{poly2} divided by \code{poly3}, (with remainder coefficients reduced
     modulo the leading coefficient of \code{poly3}). Implements "Polynomial
     division using dynamic arrays, heaps and packed exponents" by Michael
-    Monagan and Roman Pearce, except that we use a heap with smallest exponent
-    at head.
+    Monagan and Roman Pearce.
 
 slong _fmpz_mpoly_divrem_array(slong * lenr,
        fmpz ** polyq, ulong ** expq, slong * allocq,
@@ -820,9 +805,8 @@ slong _fmpz_mpoly_divrem_array(slong * lenr,
     result. The function reallocates its outputs, hence the double indirection.
     The array \code{mults} is a list of bases to be used in encoding the array
     indices from the exponents. The function returns the length of the
-    quotient. It is assumed that the input polynomials are not zero. The
-    quotient and remainder are written in reverse order. No aliasing is
-    allowed.
+    quotient. It is assumed that the input polynomials are not zero. No
+    aliasing is allowed.
 
 int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
                     const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
@@ -846,7 +830,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
        fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
           const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
                         ulong * const * exp3, slong len, slong N, slong bits,
-                                      ulong * maxn, const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t ctx)
 
     This function is as per \code{_fmpz_mpoly_divrem_monagan_pearce} except
     that it takes an array of divisor polynomials \code{poly3} and an array of
