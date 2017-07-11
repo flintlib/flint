@@ -198,6 +198,16 @@ FLINT_DLL int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
+void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+{
+   slong N = (ctx->n*poly->bits - 1)/FLINT_BITS + 1;
+
+   if (!mpoly_monomials_test(poly->exps, poly->length, N))
+      flint_throw(FLINT_ERROR, "Polynomial invalid");
+
+}
+
+FMPZ_MPOLY_INLINE
 void fmpz_mpoly_swap(fmpz_mpoly_t poly1, 
                                 fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 {

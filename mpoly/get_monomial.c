@@ -24,7 +24,7 @@ void mpoly_get_monomial_8_64(ulong * exp1, const ulong * exp2,
    q = n/8;
    r = n%8;
 
-   if (rev)
+   if (!rev)
    {
       for (j = 0; j < q; j++)
       {
@@ -84,7 +84,7 @@ void mpoly_get_monomial_16_64(ulong * exp1, const ulong * exp2,
    q = n/4;
    r = n%4;
 
-   if (rev)
+   if (!rev)
    {
       for (j = 0; j < q; j++)
       {
@@ -136,7 +136,7 @@ void mpoly_get_monomial_32_64(ulong * exp1, const ulong * exp2,
    q = n/2;
    r = n%2;
 
-   if (rev)
+   if (!rev)
    {
       for (j = 0; j < q; j++)
       {
@@ -171,7 +171,7 @@ void mpoly_get_monomial_64_64(ulong * exp1, const ulong * exp2,
 {
    slong i;
 
-   if (rev)
+   if (!rev)
    {
       for (i = deg; i < n; i++)
          exp1[i - deg] = exp2[i];
@@ -193,7 +193,7 @@ void mpoly_get_monomial_8_32(ulong * exp1, const ulong * exp2,
    q = n/4;
    r = n%4;
 
-   if (rev)
+   if (!rev)
    {
       for (j = 0; j < q; j++)
       {
@@ -245,7 +245,7 @@ void mpoly_get_monomial_16_32(ulong * exp1, const ulong * exp2,
    q = n/2;
    r = n%2;
 
-   if (rev)
+   if (!rev)
    {
       for (j = 0; j < q; j++)
       {
@@ -280,7 +280,7 @@ void mpoly_get_monomial_32_32(ulong * exp1, const ulong * exp2,
 {
    slong i;
 
-   if (rev)
+   if (!rev)
    {
       for (i = deg; i < n; i++)
          exp1[i - deg] = exp2[i];

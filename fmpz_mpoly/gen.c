@@ -21,7 +21,7 @@ void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
     slong k = FLINT_BITS/bits;
 
     fmpz_set_ui(poly + 0, 1);
-    if (rev)
+    if (!rev)
        exps[0] = (UWORD(1) << ((k - i - deg - 1)*bits));
     else
        exps[0] = (UWORD(1) << ((k - n + i)*bits));
