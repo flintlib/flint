@@ -20,7 +20,6 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
 {
    slong i, bits, max_bits, N;
    ulong maxdeg = 0;
-   ulong * ptr;
    int deg, rev;
 
    degrev_from_ord(deg, rev, ctx->ord);
@@ -44,17 +43,8 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
    while (bits >= max_bits)
       max_bits *= 2;
 
-   ptr = mpoly_unpack_monomials(max_bits, poly->exps, 
-                                             poly->length, ctx->n, poly->bits);
-
-   if (ptr != poly->exps)
-   {
-      flint_free(poly->exps);   
-      poly->exps = ptr;
-      poly->alloc = poly->length;
-   }
-
-   poly->bits = max_bits;
+   /* reallocate the number of bits of the exponents of the polynomial */
+   fmpz_mpoly_fit_bits(poly, max_bits, ctx);
 
    if (n > poly->length)
       flint_throw(FLINT_ERROR, "Invalid index in fmpz_mpoly_set_monomial");

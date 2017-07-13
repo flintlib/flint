@@ -362,3 +362,48 @@ ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2,
 
    return exps1;
 }
+
+
+/*
+    b = packed vectors to unpack
+    b_len = number of pack vectors to unpack
+    b_bits = bits per field in b
+    b_nfields = number of elements in each vector
+    a = destination for unpacked vector
+    a_bits = number of bits desired in return packed vector
+*/
+void mpoly_unpack_monomials_noalloc(ulong * a, slong a_bits,
+                   const ulong * b, slong b_bits, slong b_len, slong b_nfields)
+{
+    FLINT_ASSERT(a_bits >= b_bits);
+
+    if (a_bits == b_bits) {
+
+        slong i, N = (b_bits*b_nfields - 1)/FLINT_BITS + 1;
+
+        for (i = 0; i < N*b_len; i++)
+            a[i] = b[i];
+
+        return;
+    }
+
+#if FLINT64
+   if (a_bits == 64)
+   {
+      if (b_bits == 8)
+         mpoly_unpack_monomials_8to64(a, b, b_len, b_nfields);
+      else if (b_bits == 16)
+         mpoly_unpack_monomials_16to64(a, b, b_len, b_nfields);
+      else /* b_bits == 32 */
+         mpoly_unpack_monomials_32to64(a, b, b_len, b_nfields);
+   } else
+#endif
+   if (a_bits == 32)
+   {
+      if (b_bits == 8)
+         mpoly_unpack_monomials_8to32(a, b, b_len, b_nfields);
+      else /* b_bits == 16 */
+         mpoly_unpack_monomials_16to32(a, b, b_len, b_nfields);
+   } else  /* a_bits == 16, b_bits = 8 */
+         mpoly_unpack_monomials_8to16(a, b, b_len, b_nfields);
+}
