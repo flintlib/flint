@@ -155,7 +155,7 @@ void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
 void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 
     Set the given \code{fmpz_mpoly_t} to the $i$-th generator (variable),
-    where $i = 0$ corresponds to the variable with the least significance
+    where $i = 0$ corresponds to the variable with the most significance
     with respect to the ordering. 
 
 void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
@@ -221,7 +221,7 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
 
     Return 1 if the given \code{fmpz_mpoly_t} is equal to the $i$-th generator
     of the polynomial ring, otherwise return 0. The generator corresponding to
-    the variable with the least significance corresponds to $i = 0$. If
+    the variable with the most significance corresponds to $i = 0$. If
     $i < 0$ the function returns 1 if the polynomial is equal to any generator
     of the polynomial ring, otherwise it returns 0.
 
@@ -229,41 +229,41 @@ void fmpz_mpoly_get_coeff_fmpz(fmpz_t x,
                   const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 
     Set $x$ to coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with least significance.
+    with $i = 0$ for the term with most significance.
 
 ulong fmpz_mpoly_get_coeff_ui(const fmpz_mpoly_t poly, 
                                            slong i, const fmpz_mpoly_ctx_t ctx)
 
     Return the coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with least significance. The coefficient is
+    with $i = 0$ for the term with most significance. The coefficient is
     assumed to be unsigned and to fit in a \code{ulong}.
 
 slong fmpz_mpoly_get_coeff_si(const fmpz_mpoly_t poly, 
                                            slong i, const fmpz_mpoly_ctx_t ctx)
 
     Return the coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with least significance. The coefficient may be
+    with $i = 0$ for the term with most significance. The coefficient may be
     signed and is assumed to fit in an \code{slong}.
 
 void fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly, 
                            slong i, const fmpz_t x, const fmpz_mpoly_ctx_t ctx)
 
     Set the coefficient of the given polynomial with index $i$ to the given
-    value $x$, starting with $i = 0$ for the term with least signifance. Any
+    value $x$, starting with $i = 0$ for the term with most signifance. Any
     existing term at that index is overwritten.
 
 void fmpz_mpoly_set_coeff_ui(fmpz_mpoly_t poly,
                                   slong i, ulong x, const fmpz_mpoly_ctx_t ctx)
 
     Set the coefficient of the given polynomial with index $i$ to the given
-    unsigned integer $x$, starting with $i = 0$ for the term with least
+    unsigned integer $x$, starting with $i = 0$ for the term with most
     signifance. Any existing term at that index is overwritten.
 
 void fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
                                   slong i, slong x, const fmpz_mpoly_ctx_t ctx)
 
     Set the coefficient of the given polynomial with index $i$ to the given
-    signed integer $x$, starting with $i = 0$ for the term with least
+    signed integer $x$, starting with $i = 0$ for the term with most
     signifance. Any existing term at that index is overwritten.
 
 void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
@@ -274,7 +274,7 @@ void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly,
     entries, where $n$ is the number of variable of the polynomial. If the
     polynomial is either deglex or degrevlex, the degree field of the exponent
     vector is ignored. The entry with index 0 in the array corresponds to the
-    variable with the least significance with respect to the polynomial
+    variable with the most significance with respect to the polynomial
     ordering.
 
 void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
@@ -286,7 +286,7 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
     polynomial. If the polynomial is either deglex or degrevlex, the degree
     field of the exponent should not be included in \code{exps}. It is
     calculated by the function. The entry with index 0 in the array corresponds
-    to the variable with the least significance with respect to the
+    to the variable with the most significance with respect to the
     polynomial ordering.
 
 fmpz * fmpz_mpoly_get_coeff_ptr(fmpz_mpoly_t poly,
@@ -866,7 +866,7 @@ char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
     representing \code{(poly, exps, len)} in $n$ variables, exponent fields
     of the given number of bits and exponent vectors taking $N$ words each,
     given an array of $n$ variable strings, starting with the variable of
-    least significance with respect to the ordering. The ordering is
+    most significance with respect to the ordering. The ordering is
     specified by the values \code{deg}, which is set to 1 if the polynomial
     is deglex or degrevlex, and \code{rev}, which is set to 1 if the
     polynomial is revlex or degrevlex.
@@ -876,7 +876,7 @@ char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly,
 
     Return a string (which the user is responsible for cleaning up),
     representing \code{poly}, given an array of variable strings, starting
-    with the variable of least significance with respect to the ordering. 
+    with the variable of most significance with respect to the ordering. 
 
 int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                            const ulong * exps, slong len, const char ** x,
@@ -885,7 +885,7 @@ int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
     Print to the given stream, a string representing \code{(poly, exps, len)}
     in $n$ variables, exponent fields of the given number of bits and exponent
     vectors taking $N$ words each, given an array of $n$ variable strings,
-    starting with the variable of least significance with respect to the
+    starting with the variable of most significance with respect to the
     ordering. The ordering is specified by the values \code{deg}, which is set
     to 1 if the polynomial is deglex or degrevlex, and \code{rev}, which is set
     to 1 if the polynomial is revlex or degrevlex. The number of characters
@@ -895,7 +895,7 @@ int fmpz_mpoly_fprint_pretty(FILE * file,
           const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
 
     Print to the given stream, a string representing \code{poly}, given an
-    array of variable strings, starting with the variable of least
+    array of variable strings, starting with the variable of most
     significance with respect to the ordering. The number of characters
     written is returned.
 
@@ -906,7 +906,7 @@ int _fmpz_mpoly_print_pretty(const fmpz * poly,
     Print to stdout, a string representing \code{(poly, exps, len)}
     in $n$ variables, exponent fields of the given number of bits and exponent
     vectors taking $N$ words each, given an array of $n$ variable strings,
-    starting with the variable of least significance with respect to the
+    starting with the variable of most significance with respect to the
     ordering. The ordering is specified by the values \code{deg}, which is set
     to 1 if the polynomial is deglex or degrevlex, and \code{rev}, which is set
     to 1 if the polynomial is revlex or degrevlex. The number of characters
@@ -916,7 +916,7 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t poly,
                                    const char ** x, const fmpz_mpoly_ctx_t ctx)
 
     Print to the given stream, a string representing \code{poly}, given an
-    array of variable strings, starting with the variable of least
+    array of variable strings, starting with the variable of most
     significance with respect to the ordering. The number of characters
     written is returned.
 

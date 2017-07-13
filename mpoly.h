@@ -369,6 +369,19 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
 FLINT_DLL void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
                                                slong len, slong bits, slong n);
 
+MPOLY_INLINE
+int mpoly_monomials_test(ulong * exps, slong len, slong N)
+{
+   slong i;
+
+   for (i = 0; i + 1 < len; i++)
+   {
+      if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N))
+         return 0;
+   }
+   return 1;
+}
+
 /* Heap **********************************************************************/
 
 #define HEAP_LEFT(i) (2*(i))

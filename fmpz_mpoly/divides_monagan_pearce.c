@@ -770,7 +770,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 
    /* quick check for easy case of inexact division of leading monomials */
    if (poly2->bits == poly3->bits && N == 1 && 
-       poly2->exps[poly2->length - 1] < poly3->exps[poly3->length - 1])
+       poly2->exps[0] < poly3->exps[0])
    {
       goto cleanup;
    }
@@ -791,8 +791,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
       mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
 
    /* check leading monomial divides exactly */
-   if (!mpoly_monomial_divides(expq, exp2 + (poly2->length - 1)*N,
-                                        exp3 + (poly3->length - 1)*N, N, mask))
+   if (!mpoly_monomial_divides(expq, exp2, exp3, N, mask))
    {
       len = 0;
 

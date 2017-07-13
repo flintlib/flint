@@ -79,8 +79,7 @@ main(void)
 
           if (!result)
           {
-             printf("FAIL\n");
-
+             printf("FAIL1\n");
              printf("ord = "); mpoly_ordering_print(ord);
              printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
                     "len1 = %ld, exp_bits1 = %ld, exp_bound1 = %lx, "
@@ -158,7 +157,7 @@ main(void)
 
           if (!result)
           {
-             printf("FAIL\n");
+             printf("FAIL2\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
              printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
@@ -237,7 +236,7 @@ main(void)
 
           if (!result)
           {
-             printf("FAIL\n");
+             printf("FAIL3\n");
              printf("Aliasing test1\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
@@ -313,7 +312,7 @@ main(void)
 
           if (!result)
           {
-             printf("FAIL\n");
+             printf("FAIL4\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
              printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
@@ -390,7 +389,7 @@ main(void)
 
           if (!result)
           {
-             printf("FAIL\n");
+             printf("FAIL5\n");
              printf("Aliasing test2\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
@@ -466,7 +465,7 @@ main(void)
 
           if (!result)
           {
-             printf("FAIL\n");
+             printf("FAIL6\n");
 
              printf("ord = "); mpoly_ordering_print(ord);
              printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "

@@ -22,11 +22,13 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
             const char ** x_in, slong bits, slong n, int deg, int rev, slong N)
 {
    char * str, ** x = (char **) x_in;
-   slong i, j, bound, off;
+   slong i, j, nvars, bound, off;
    ulong * degs;
    int first;
 
    TMP_INIT;
+
+   nvars = n - deg;
 
    if (len == 0)
    {
@@ -40,9 +42,9 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
 
    if (x == NULL)
    {
-      x = (char **) TMP_ALLOC((n - deg)*sizeof(char *));
+      x = (char **) TMP_ALLOC(nvars*sizeof(char *));
 
-      for (i = 0; i < n - deg; i++)
+      for (i = 0; i < nvars; i++)
       {
          x[i] = (char *) TMP_ALLOC(22*sizeof(char));
          flint_sprintf(x[i], "x%wd", i + 1);
@@ -55,7 +57,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
 
    degs = (ulong *) TMP_ALLOC(n*sizeof(ulong));
       
-   _fmpz_mpoly_max_degrees(degs, exps, len, bits, n, deg, rev, 1);
+   _fmpz_mpoly_max_degrees(degs, exps, len, bits, n, deg, rev, N);
 
    for (i = deg; i < n; i++) /* for each max degree */
    {
@@ -74,7 +76,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
    str = flint_malloc(bound);
    off = 0;
    
-   for (i = len - 1; i >= 0; i--)
+   for (i = 0; i < len; i++)
    {
       if (fmpz_sgn(poly + i) > 0 && i != len - 1)
          str[off++] = '+';
@@ -88,12 +90,11 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
             off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(poly[i]));
       }
 
-      /* code below expects monomials in opposite order */
-      mpoly_get_monomial(degs, exps + i*N, bits, n, deg, 1 - rev);
+      mpoly_get_monomial(degs, exps + i*N, bits, n, deg, rev);
 
       first = 1;
 
-      for (j = 0; j < n - deg; j++)
+      for (j = 0; j < nvars; j++)
       {
           if (degs[j] > 1)
           {

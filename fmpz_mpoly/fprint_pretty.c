@@ -22,7 +22,7 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
                         const ulong * exps, slong len, const char ** x_in,
                                 slong bits, slong n, int deg, int rev, slong N)
 {
-   slong i, j;
+   slong i, j, nvars;
    ulong * degs;
    int r, first;
    char ** x = (char **) x_in;
@@ -38,23 +38,25 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
 
    TMP_START;
 
+   nvars = n - deg;
+
    if (x == NULL)
    {
-      x = (char **) TMP_ALLOC((n - deg)*sizeof(char *));
+      x = (char **) TMP_ALLOC(nvars*sizeof(char *));
 
-      for (i = 0; i < n - deg; i++)
+      for (i = 0; i < nvars; i++)
       {
          x[i] = (char *) TMP_ALLOC(22*sizeof(char));
          flint_sprintf(x[i], "x%wd", i + 1);
       }
    }
 
-   degs = (ulong *) TMP_ALLOC((n - deg)*sizeof(ulong));
+   degs = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
    
    r = 1;
-   for (i = len - 1; r > 0 && i >= 0; i--)
+   for (i = 0; r > 0 && i < len; i++)
    {
-      if (fmpz_sgn(poly + i) > 0 && i != len - 1)
+      if (fmpz_sgn(poly + i) > 0 && i != 0)
       {
          r = fputc('+', file);
          r = (r != EOF) ? 1 : EOF;
@@ -65,19 +67,14 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
          r = (r != EOF) ? 1 : EOF;
       }
       if (r > 0 && poly[i] != WORD(1) && poly[i] != WORD(-1))
-      {
          r = fmpz_fprint(file, poly + i);
-      }
 
       if (r > 0)
-      {
-         /* code below expects monomials in opposite order */
-         mpoly_get_monomial(degs, exps + i*N, bits, n, deg, 1 - rev);
-      }
+         mpoly_get_monomial(degs, exps + i*N, bits, n, deg, rev);
 
       first = 1;
 
-      for (j = 0; r > 0 && j < n - deg; j++)
+      for (j = 0; r > 0 && j < nvars; j++)
       {
          if (degs[j] > 1)
          {
