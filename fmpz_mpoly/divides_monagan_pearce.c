@@ -274,7 +274,10 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                
                /* check quotient really fit a small */
                if (!COEFF_IS_MPZ(FLINT_ABS((slong) q)))
+               {
+                  _fmpz_demote(p1 + k);
                   p1[k] = q;
+               }
                else
                {
                   fmpz_set_si(p1 + k, q);
@@ -629,7 +632,10 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                
                /* check quotient really fit a small */
                if (!COEFF_IS_MPZ(FLINT_ABS((slong) q)))
+               {
+                  _fmpz_demote(p1 + k);
                   p1[k] = q;
+               }
                else
                {
                   fmpz_set_si(p1 + k, q);

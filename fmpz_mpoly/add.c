@@ -128,7 +128,18 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    max_bits = FLINT_MAX(poly2->bits, poly3->bits);
    N = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
-   
+
+   /* treat cases of length 0 first */
+   if (poly2->length == 0)
+   {
+      fmpz_mpoly_set(poly1, poly3, ctx);
+      return;
+   } else if (poly3->length == 0)
+   {
+      fmpz_mpoly_set(poly1, poly2, ctx);
+      return;
+   }
+
    ptr1 = mpoly_unpack_monomials(max_bits, poly2->exps, 
                                            poly2->length, ctx->n, poly2->bits);
 

@@ -128,23 +128,32 @@ void fmpz_mpoly_truncate(fmpz_mpoly_t poly, slong newlen,
     }  
 }
 
+/*
+   if poly->bits < bits, set poly->bits = bits and reallocate poly->exps
+*/
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
                                         slong bits, const fmpz_mpoly_ctx_t ctx)
 {
-   if (bits > poly->bits)
-   {
-      slong N;
+   slong N;
+   ulong * t;
 
+   FLINT_ASSERT(bits <= FLINT_BITS);
+
+   if (poly->bits < bits)
+   {
       if (poly->alloc != 0)
       {
          N = (bits*ctx->n - 1)/FLINT_BITS + 1;
-
-         poly->exps = flint_realloc(poly->exps, N*poly->alloc*sizeof(ulong));
+         t = flint_malloc(N*poly->alloc*sizeof(ulong));
+         mpoly_unpack_monomials_noalloc(t, bits, poly->exps,
+                                             poly->bits, poly->length, ctx->n);
+         flint_free(poly->exps);
+         poly->exps = t;
       }
 
       poly->bits = bits;
-   }   
+   }
 }
 
 /*  Basic manipulation *******************************************************/

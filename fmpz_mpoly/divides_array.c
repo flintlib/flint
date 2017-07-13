@@ -570,7 +570,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             _fmpz_mpoly_fit_length(&p1, &e1, alloc, len + 1, 1);
             
             /* write quotient term */
-            p1[len] = q;
+            fmpz_set_si(p1 + len, q);
             e1[len++] = i - max3;         
          }
       }
@@ -659,7 +659,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
             _fmpz_mpoly_fit_length(&p1, &e1, alloc, len + 1, 1);
             
             /* write quotient term */
-            p1[len] = q;
+            fmpz_set_si(p1 + len, q);
             e1[len++] = i - max3;
          }
       }
@@ -1228,6 +1228,9 @@ cleanup2:
    }
 
 cleanup:
+
+   for (j = 0; j < talloc; j++)
+      fmpz_clear(temp + j);
 
    flint_free(temp);
    flint_free(texp);

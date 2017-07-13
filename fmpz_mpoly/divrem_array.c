@@ -164,7 +164,7 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
                   /* realloc quotient poly */
                   _fmpz_mpoly_fit_length(&p1, &e1, allocq, k + 1, 1);
                   /* set quotient coeff and exponent */
-                  p1[k] = q;
+                  fmpz_set_si(p1 + k, q);
                   e1[k++] = i - max3;
                }
             }         
@@ -282,7 +282,8 @@ slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
                   _fmpz_mpoly_fit_length(&p1, &e1, allocq, k + 1, 1);
                   
                   /* set quotient coeff and exponent */
-                  p1[k] = q;
+                  fmpz_set_si(p1 + k, q);
+
                   e1[k++] = i - max3;
                }
             }
@@ -544,22 +545,20 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
                if (k < l3 && k >= 0)
                {
                   for (m = 0; m < num; m++)
-		  {
-	             if (max_exp1[j*num + m] + max_exp3[k*num + m] >= mults[m])
-		     {
+                  {
+                     if (max_exp1[j*num + m] + max_exp3[k*num + m] >= mults[m])
+                     {
                         for (j = 0; j < len; j++)
                            _fmpz_demote((*polyq) + j);
                         for (j = 0; j < l; j++)
                            _fmpz_demote((*polyr) + j);
-		        len = 0;
-		        l = 0;
+                        len = 0;
+                        l = 0;
+                        goto cleanup3;
+                     }
+                  }
 
-		        goto cleanup3;
-	             }
-		  }
-				  
-	          bits1 = FLINT_MAX(bits1,
-                  FLINT_MIN(b1[j] + maxb3[k], maxb1[j] + b3[k]));
+                  bits1 = FLINT_MAX(bits1, FLINT_MIN(b1[j] + maxb3[k], maxb1[j] + b3[k]));
                   num1++;
                }
             }
@@ -727,6 +726,8 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
             /* set index and length of quotient chunk */
             i1[i] = len;
             n1[i] = 0;
+            b1[i] = 0;
+            maxb1[i] = 0;
 
             /* write out maximum exponents in chunk */
             mpoly_max_degrees_tight(max_exp1 + i*num,
@@ -857,6 +858,8 @@ big:
             /* set index and length of quotient chunk */
             i1[i] = len;
             n1[i] = 0;
+            b1[i] = 0;
+            maxb1[i] = 0;
 
             /* write out maximum exponents in chunk */
             mpoly_max_degrees_tight(max_exp1 + i*num,
@@ -885,6 +888,9 @@ big:
    }
 
 cleanup3:
+
+   for (j = 0; j < talloc; j++)
+      fmpz_clear(temp + j);
 
    flint_free(temp);
    flint_free(texp);
