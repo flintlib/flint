@@ -78,7 +78,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
    
    for (i = 0; i < len; i++)
    {
-      if (fmpz_sgn(poly + i) > 0 && i != len - 1)
+      if (fmpz_sgn(poly + i) > 0 && i != 0)
          str[off++] = '+';
       if (poly[i] == WORD(-1))
             str[off++] = '-';
