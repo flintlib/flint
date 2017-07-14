@@ -31,7 +31,7 @@ main(void)
        test that CLD_bound is between the absolute value of the n-th 
        coeff of f' and the sum of the absolute values of the coeffs of f'
     */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, g;
         fmpz_t sum, bound;
@@ -98,7 +98,7 @@ main(void)
        let f have a factor g (by setting f = g*h) then check that
        the bounds for f*g'/g are valid
     */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, d, g;
         fmpz_t bound;
