@@ -53,6 +53,12 @@ typedef struct
 
 typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
 
+typedef struct
+{
+   slong count;
+   void * address;
+} fmpz_block_header_s;
+
 /* maximum positive value a small coefficient can have */
 #define COEFF_MAX ((WORD(1) << (FLINT_BITS - 2)) - WORD(1))
 
