@@ -501,7 +501,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       poly1->bits = exp_bits;
 
       /* algorithm more efficient if smaller poly first */
-      if (poly2->length >= poly3->length)
+      if (poly2->length > poly3->length)
          len = _fmpz_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                            poly2->coeffs, exp2, poly2->length, N);
