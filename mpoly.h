@@ -34,10 +34,10 @@
 #endif
 
 typedef enum {
-   ORD_LEX, ORD_REVLEX, ORD_DEGLEX, ORD_DEGREVLEX
+   ORD_LEX, ORD_DEGLEX, ORD_DEGREVLEX
 } ordering_t;
 
-#define MPOLY_NUM_ORDERINGS 4
+#define MPOLY_NUM_ORDERINGS 3
 
 typedef struct mpoly_heap_t
 {
@@ -77,14 +77,25 @@ typedef struct mpoly_heap_s
          break;                                                       \
       case ORD_DEGLEX:                                                \
          (deg) = 1; break;                                            \
-      case ORD_REVLEX:                                                \
-         (rev) = 1; break;                                            \
       case ORD_DEGREVLEX:                                             \
          (deg) = (rev) = 1; break;                                    \
       default:                                                        \
          flint_throw(FLINT_ERROR, "Invalid ordering in fmpz_mpoly");  \
       }                                                               \
    } while (0)
+
+#define masks_from_bits_ord(maskhi, masklo, bits, ord)                \
+   do {                                                               \
+      if ((ord) == ORD_DEGREVLEX)                                     \
+      {                                                               \
+         (masklo) = -WORD(1);                                         \
+         (maskhi) = (WORD(1) << ((FLINT_BITS) - (bits))) - 1;         \
+      } else                                                          \
+      {                                                               \
+         (masklo) = 0;                                                \
+         (maskhi) = 0;                                                \
+      }                                                               \
+   } while (0)                                                        \
 
 /* Orderings *****************************************************************/
 
@@ -103,7 +114,7 @@ int mpoly_ordering_isdeg(ordering_t ord)
 MPOLY_INLINE
 int mpoly_ordering_isrev(ordering_t ord)
 {
-   return ord == ORD_REVLEX || ord == ORD_DEGREVLEX;
+   return ord == ORD_DEGREVLEX;
 }
 
 MPOLY_INLINE
@@ -116,9 +127,6 @@ void mpoly_ordering_print(ordering_t ord)
       break;
    case ORD_DEGLEX:
       printf("deglex");
-      break;
-   case ORD_REVLEX:
-      printf("revlex");
       break;
    case ORD_DEGREVLEX:
       printf("degrevlex");
@@ -261,43 +269,60 @@ int mpoly_monomial_equal(const ulong * exp2, const ulong * exp3, slong N)
 }
 
 MPOLY_INLINE
-int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3, slong N)
+int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3,
+                                           slong N, ulong maskhi, ulong masklo)
 {
-   slong i;
+   slong i = 0;
 
-   for (i = 0; i < N; i++)
+      if (exp2[i] != exp3[i])
+         return (exp3[i]^maskhi) < (exp2[i]^maskhi);
+
+   for (i++; i < N; i++)
    {
       if (exp2[i] != exp3[i])
-         return exp3[i] < exp2[i];
+         return (exp3[i]^masklo) < (exp2[i]^masklo);
    }
 
    return 0;
 }
 
 MPOLY_INLINE
-int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3, slong N)
+int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3,
+                                           slong N, ulong maskhi, ulong masklo)
 {
-   slong i;
+   slong i = 0;
 
-   for (i = 0; i < N; i++)
+      if (exp2[i] != exp3[i])
+         return (exp3[i]^maskhi) > (exp2[i]^maskhi);
+
+   for (i++; i < N; i++)
    {
       if (exp2[i] != exp3[i])
-         return exp3[i] > exp2[i];
+         return (exp3[i]^masklo) > (exp2[i]^masklo);
    }
 
    return 0;
 }
 
 MPOLY_INLINE
-int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3, slong N)
+int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
+                                           slong N, ulong maskhi, ulong masklo)
 {
-   slong i;
+   slong i = 0;
 
-   for (i = 0; i < N; i++)
+      if (exp2[i] != exp3[i])
+      {
+         if ((exp2[i]^maskhi) > (exp3[i]^maskhi))
+            return 1;
+         else
+            return -1;
+      }
+
+   for (i++; i < N; i++)
    {
       if (exp2[i] != exp3[i])
       {
-         if (exp2[i] > exp3[i])
+         if ((exp2[i]^masklo) > (exp3[i]^masklo))
             return 1;
          else
             return -1;
@@ -367,19 +392,20 @@ FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
                             slong * mults, slong num, slong extra, slong bits);
 
 FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
-                                        const ulong * exp, slong len, slong N);
+            const ulong * exp, slong len, slong N, ulong maskhi, ulong masklo);
 
 FLINT_DLL void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
                                                slong len, slong bits, slong n);
 
 MPOLY_INLINE
-int mpoly_monomials_test(ulong * exps, slong len, slong N)
+int mpoly_monomials_test(ulong * exps, slong len, slong N,
+                                                    ulong maskhi, ulong masklo)
 {
    slong i;
 
    for (i = 0; i + 1 < len; i++)
    {
-      if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N))
+      if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N, maskhi, masklo))
          return 0;
    }
    return 1;
@@ -398,7 +424,7 @@ int mpoly_monomials_test(ulong * exps, slong len, slong N)
    } while (0)
 
 MPOLY_INLINE
-void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
+void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len, ulong maskhi)
 {
    ulong exp;
    slong i, j, s = --(*heap_len);
@@ -409,7 +435,7 @@ void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
 
    while (j < s)
    {
-      if (heap[j].exp <= heap[j + 1].exp)
+      if ((heap[j].exp^maskhi) <= (heap[j + 1].exp^maskhi))
          j++;
       heap[i] = heap[j];
       i = j;
@@ -420,7 +446,7 @@ void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
    exp = heap[s].exp;
    j = HEAP_PARENT(i);
 
-   while (i > 1 && exp > heap[j].exp)
+   while (i > 1 && (exp^maskhi) > (heap[j].exp^maskhi))
    {
      heap[i] = heap[j];
      i = j;
@@ -434,7 +460,7 @@ void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len)
 
 MPOLY_INLINE
 void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
-                                                    void * x, slong * heap_len)
+                                      void * x, slong * heap_len, ulong maskhi)
 {
    slong i = *heap_len, j, n = *heap_len;
    static slong next_loc = 0;
@@ -466,7 +492,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
          next_loc = j;
 
          return;
-      } else if (exp > heap[j].exp)
+      } else if ((exp^maskhi) > (heap[j].exp^maskhi))
          i = j;
       else
          break;
@@ -484,7 +510,8 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
 }
 
 MPOLY_INLINE
-void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
+void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
+                                                    ulong maskhi, ulong masklo)
 {
    ulong * exp;
    slong i, j, s = --(*heap_len);
@@ -495,7 +522,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
 
    while (j < s)
    {
-      if (!mpoly_monomial_gt(heap[j + 1].exp, heap[j].exp, N))
+      if (!mpoly_monomial_gt(heap[j + 1].exp, heap[j].exp, N, maskhi, masklo))
          j++;
       heap[i] = heap[j];
       i = j;
@@ -506,7 +533,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
    exp = heap[s].exp;
    j = HEAP_PARENT(i);
 
-   while (i > 1 && mpoly_monomial_gt(heap[j].exp, exp, N))
+   while (i > 1 && mpoly_monomial_gt(heap[j].exp, exp, N, maskhi, masklo))
    {
       heap[i] = heap[j];
       i = j;
@@ -520,7 +547,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N)
 
 MPOLY_INLINE
 int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
-                                                     slong * heap_len, slong N)
+                         slong * heap_len, slong N, ulong maskhi, ulong masklo)
 {
    slong i = *heap_len, j, n = *heap_len;
    static slong next_loc = 0;
@@ -545,7 +572,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    while ((j = HEAP_PARENT(i)) >= 1)
    {
-      if (!mpoly_monomial_gt(heap[j].exp, exp, N))
+      if (!mpoly_monomial_gt(heap[j].exp, exp, N, maskhi, masklo))
          break;
 
       i = j;

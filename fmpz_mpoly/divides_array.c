@@ -1365,7 +1365,8 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
    /* array division expects each exponent vector in one word */
-   if (N != 1)
+   /* current code is wrong for reversed orderings */
+   if (N != 1 || mpoly_ordering_isrev(ctx->ord))
       goto cleanup;
 
    /* compute bounds on output exps, used as mixed bases for packing exps */

@@ -209,11 +209,14 @@ FLINT_DLL int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
-   slong N = (ctx->n*poly->bits - 1)/FLINT_BITS + 1;
+   slong N;
+   ulong maskhi, masklo;
 
-   if (!mpoly_monomials_test(poly->exps, poly->length, N))
+   masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
+   N = (ctx->n*poly->bits - 1)/FLINT_BITS + 1;
+
+   if (!mpoly_monomials_test(poly->exps, poly->length, N, maskhi, masklo))
       flint_throw(FLINT_ERROR, "Polynomial invalid");
-
 }
 
 FMPZ_MPOLY_INLINE
@@ -353,14 +356,16 @@ FLINT_DLL void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t poly1,
 
 FLINT_DLL slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1,
                  const fmpz * poly2, const ulong * exps2, slong len2,
-                 const fmpz * poly3, const ulong * exps3, slong len3, slong N);
+                 const fmpz * poly3, const ulong * exps3, slong len3, slong N,
+                                                   ulong maskhi, ulong masklo);
 
 FLINT_DLL void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
                  const fmpz * poly2, const ulong * exps2, slong len2,
-                 const fmpz * poly3, const ulong * exps3, slong len3, slong N);
+                 const fmpz * poly3, const ulong * exps3, slong len3, slong N,
+                                                   ulong maskhi, ulong masklo);
 
 FLINT_DLL void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
@@ -407,7 +412,8 @@ FLINT_DLL void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1,
 
 FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1,
         slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-                  const fmpz * poly3, const ulong * exp3, slong len3, slong N);
+                const fmpz * poly3, const ulong * exp3, slong len3, slong N,
+                                                   ulong maskhi, ulong masklo);
 
 FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
@@ -426,7 +432,7 @@ FLINT_DLL int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1,
 
 FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
                 slong * alloc, const fmpz * poly2, const ulong * exp2, 
-                                                 slong len2, slong k, slong N);
+                     slong len2, slong k, slong N, ulong maskhi, ulong masklo);
 
 FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                           slong k, const fmpz_mpoly_ctx_t ctx);
@@ -445,7 +451,8 @@ FLINT_DLL int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1,
 FLINT_DLL slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
                       ulong ** exp1, slong * alloc, const fmpz * poly2,
                     const ulong * exp2, slong len2, const fmpz * poly3,
-                          const ulong * exp3, slong len3, slong bits, slong N);
+                          const ulong * exp3, slong len3, slong bits, slong N,
+                                                   ulong maskhi, ulong masklo);
 
 FLINT_DLL int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
@@ -456,7 +463,7 @@ FLINT_DLL int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 FLINT_DLL slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
            ulong ** expq, slong * allocq, const fmpz * poly2,
    const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
-                                              slong len3, slong bits, slong N);
+                  slong len3, slong bits, slong N, ulong maskhi, ulong masklo);
 
 FLINT_DLL void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q,
                      const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
@@ -466,7 +473,7 @@ FLINT_DLL slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
                   ulong ** expr, slong * allocr, const fmpz * poly2,
    const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
-                                              slong len3, slong bits, slong N);
+                  slong len3, slong bits, slong N, ulong maskhi, ulong masklo);
 
 FLINT_DLL void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
@@ -490,7 +497,7 @@ _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
        fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
           const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
                         ulong * const * exp3, slong len, slong N, slong bits,
-                                                   const fmpz_mpoly_ctx_t ctx);
+                       const fmpz_mpoly_ctx_t ctx, ulong maskhi, ulong masklo);
 
 FLINT_DLL void
 fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,

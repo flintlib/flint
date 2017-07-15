@@ -21,6 +21,7 @@ void fmpz_mpoly_get_term_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
    slong i, N, index, bits, exp_bits;
    int exists;
    ulong sum = 0, max_exp = 0;
+   ulong maskhi, masklo;
    ulong * packed_exp;
    int deg, rev;
 
@@ -69,6 +70,7 @@ void fmpz_mpoly_get_term_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
       return;
    }
    
+   masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
    N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
@@ -78,7 +80,7 @@ void fmpz_mpoly_get_term_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
 
    /* work out at what index term should be placed */
    exists = mpoly_monomial_exists(&index, poly->exps,
-                                                  packed_exp, poly->length, N);
+                                  packed_exp, poly->length, N, maskhi, masklo);
 
    if (!exists) /* term with that exponent doesn't exist */
       fmpz_zero(c);
