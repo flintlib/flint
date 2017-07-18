@@ -53,6 +53,7 @@ main(void)
        k = n_randint(state, nvars);
 
        fmpz_mpoly_gen(f, k, ctx);
+       fmpz_mpoly_test(f, ctx);
 
        result = fmpz_mpoly_is_gen(f, k, ctx) &&
                 fmpz_mpoly_is_gen(f, -WORD(1), ctx);

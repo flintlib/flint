@@ -774,6 +774,8 @@ big:
 		     len = 0;
 	             l = 0;
 						
+                for (j = 0; j < prod; j++)
+                   fmpz_clear(p2 + j);
 		     goto cleanup3;
 	          }
 	       }
@@ -827,6 +829,8 @@ big:
                      len = 0;
 	             l = 0;
 
+                for (j = 0; j < prod; j++)
+                   fmpz_clear(p2 + j);
 	             goto cleanup3;
                   }				  
 	       }
@@ -1056,7 +1060,7 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
    /* if exponents too large for array multiplication, exit silently */
    if (array_size > MAX_ARRAY_SIZE)
       goto cleanup;
-	  
+
    /* expand input exponents to same number of bits as output */
    exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
                                            poly2->length, ctx->n, poly2->bits);

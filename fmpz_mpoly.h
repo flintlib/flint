@@ -207,19 +207,6 @@ FLINT_DLL int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-{
-   slong N;
-   ulong maskhi, masklo;
-
-   masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = (ctx->n*poly->bits - 1)/FLINT_BITS + 1;
-
-   if (!mpoly_monomials_test(poly->exps, poly->length, N, maskhi, masklo))
-      flint_throw(FLINT_ERROR, "Polynomial invalid");
-}
-
-FMPZ_MPOLY_INLINE
 void fmpz_mpoly_swap(fmpz_mpoly_t poly1, 
                                 fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
@@ -641,6 +628,79 @@ void _fmpz_mpoly_submul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
    else
       add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, p[1], p[0]);
 }
+
+
+/******************************************************************************
+
+   Internal consistency checks
+
+******************************************************************************/
+
+/*
+   test that the terms in poly are in the correct order
+*/
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+{
+   slong N;
+   ulong maskhi, masklo;
+
+   masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
+   N = (ctx->n*poly->bits - 1)/FLINT_BITS + 1;
+
+   if (!mpoly_monomials_test(poly->exps, poly->length, N, maskhi, masklo))
+      flint_throw(FLINT_ERROR, "Polynomial invalid");
+}
+
+
+/*
+   test that r is a valid remainder upon divison by g
+   this means that if c*x^a is a term of r and x^a is divisible by the leading
+   monomial of g, then |c| < |leading coefficient of g|
+*/
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+   slong i, N, bits;
+   ulong mask = 0;
+   ulong * rexp, * gexp;
+
+   bits = FLINT_MAX(r->bits, g->bits);
+
+   if (g->length == 0 )
+      flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
+
+   if (r->length == 0 )
+      return;
+
+   rexp = mpoly_unpack_monomials(bits, r->exps, r->length, ctx->n, r->bits);
+
+   gexp = mpoly_unpack_monomials(bits, g->exps, 1, ctx->n, g->bits);
+
+   N = (bits*ctx->n - 1)/FLINT_BITS + 1;
+
+   /* mask with high bit set in each field of exponent vector */
+   for (i = 0; i < FLINT_BITS/bits; i++)
+      mask = (mask << bits) + (UWORD(1) << (bits - 1));
+
+   for (i = 0; i < r->length; i++)
+      if (mpoly_monomial_divides_test(rexp + i*N, gexp + 0*N, N, mask)
+         && fmpz_cmpabs(g->coeffs + 0, r->coeffs + i) <= 0)
+      {
+         flint_printf("fmpz_mpoly_remainder_test FAILED i = %wd\n", i);
+         flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
+         flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+         flint_abort();
+      }
+
+   if (rexp != r->exps)
+      flint_free(rexp);
+
+   if (gexp != g->exps)
+      flint_free(gexp);
+}
+
 
 #ifdef __cplusplus
 }

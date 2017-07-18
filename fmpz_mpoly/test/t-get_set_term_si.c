@@ -66,6 +66,7 @@ main(void)
           c = z_randtest(state);
 
           fmpz_mpoly_set_term_si(f, exp, c, ctx);
+          fmpz_mpoly_test(f, ctx);
 
           d = fmpz_mpoly_get_term_si(f, exp, ctx);
 

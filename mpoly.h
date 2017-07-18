@@ -201,6 +201,18 @@ int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2,
 }
 
 MPOLY_INLINE
+int mpoly_monomial_divides_test(const ulong * exp2,
+                                       const ulong * exp3, slong N, ulong mask)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      if (((exp2[i] - exp3[i]) & mask) != 0)
+         return 0;
+
+   return 1;
+}
+
+MPOLY_INLINE
 int mpoly_monomial_divides1(ulong * exp_ptr, const ulong exp2,
                                                   const ulong exp3, ulong mask)
 {

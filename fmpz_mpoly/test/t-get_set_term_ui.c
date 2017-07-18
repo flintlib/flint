@@ -65,6 +65,7 @@ main(void)
           c = n_randtest(state);
 
           fmpz_mpoly_set_term_ui(f, exp, c, ctx);
+          fmpz_mpoly_test(f, ctx);
 
           d = fmpz_mpoly_get_term_ui(f, exp, ctx);
 

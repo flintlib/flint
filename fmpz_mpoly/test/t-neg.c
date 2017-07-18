@@ -53,7 +53,9 @@ main(void)
        fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
 
        fmpz_mpoly_neg(h, f, ctx);
+       fmpz_mpoly_test(h, ctx);
        fmpz_mpoly_neg(g, h, ctx);
+       fmpz_mpoly_test(g, ctx);
 
        result = fmpz_mpoly_equal(f, g, ctx);
 

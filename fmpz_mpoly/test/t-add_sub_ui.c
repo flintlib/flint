@@ -60,8 +60,10 @@ main(void)
           c = n_randtest(state);
 
           fmpz_mpoly_add_ui(g, f, c, ctx);
+          fmpz_mpoly_test(g, ctx);
 
           fmpz_mpoly_sub_ui(h, g, c, ctx);
+          fmpz_mpoly_test(h, ctx);
 
           result = fmpz_mpoly_equal(f, h, ctx);
 
@@ -121,8 +123,10 @@ main(void)
           c = n_randtest(state);
 
           fmpz_mpoly_add_ui(f, f, c, ctx);
+          fmpz_mpoly_test(f, ctx);
 
           fmpz_mpoly_sub_ui(f, f, c, ctx);
+          fmpz_mpoly_test(f, ctx);
 
           result = fmpz_mpoly_equal(f, g, ctx);
 
