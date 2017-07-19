@@ -74,8 +74,11 @@ main(void)
           fmpz_mpoly_randtest(r, state, len, exp_bound, coeff_bits, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
+          fmpz_mpoly_test(h, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(k, r, h, g, ctx);
+          if (ok1)
+             fmpz_mpoly_remainder_test(r, g, ctx);
 
           result = (ok1 == 0) || (ok1 && fmpz_mpoly_equal(f, k, ctx));
 
@@ -155,11 +158,13 @@ main(void)
           fmpz_mpoly_randtest(k, state, len, exp_bound, coeff_bits, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r, f, g, ctx);
-
+          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_test(r, ctx);
           if (ok1)
-		  {
+		    {
+             fmpz_mpoly_remainder_test(r, g, ctx);
              fmpz_mpoly_mul_johnson(k, h, g, ctx);
-			 fmpz_mpoly_add(k, k, r, ctx);
+			    fmpz_mpoly_add(k, k, r, ctx);
           }
 		  
           result = (ok1 == 0) || (ok1 == 1 && fmpz_mpoly_equal(f, k, ctx));
@@ -241,7 +246,16 @@ main(void)
           fmpz_mpoly_randtest(r2, state, len, exp_bound, coeff_bits, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r1, f, g, ctx);
+          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_test(r1, ctx);
+          if (ok1)
+             fmpz_mpoly_remainder_test(r1, g, ctx);
+
           ok2 = fmpz_mpoly_divrem_array(f, r2, f, g, ctx);
+          fmpz_mpoly_test(f, ctx);
+          fmpz_mpoly_test(r2, ctx);
+          if (ok2)
+             fmpz_mpoly_remainder_test(r2, g, ctx);
 
           result = (ok1 == 0 || ok2 == 0) || 
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, f, ctx)
@@ -325,7 +339,14 @@ main(void)
           fmpz_mpoly_randtest(r2, state, len, exp_bound, coeff_bits, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r1, f, g, ctx);
+          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_test(r1, ctx);
+          if (ok1)
+             fmpz_mpoly_remainder_test(r1, g, ctx);
+
           ok2 = fmpz_mpoly_divrem_array(g, r2, f, g, ctx);
+          fmpz_mpoly_test(g, ctx);
+          fmpz_mpoly_test(r2, ctx);
 
           result = (ok1 == 0 || ok2 == 0) || 
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, g, ctx)
@@ -409,9 +430,19 @@ main(void)
           fmpz_mpoly_randtest(r1, state, len, exp_bound, coeff_bits, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
+          fmpz_mpoly_test(h, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r1, f, g, ctx);
+          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_test(r1, ctx);
+          if (ok1)
+             fmpz_mpoly_remainder_test(r1, g, ctx);
+
           ok2 = fmpz_mpoly_divrem_array(k, f, f, g, ctx);
+          fmpz_mpoly_test(k, ctx);
+          fmpz_mpoly_test(f, ctx);
+          if (ok2)
+             fmpz_mpoly_remainder_test(f, g, ctx);
 
           result = (ok1 == 0 || ok2 == 0) || 
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, k, ctx)
@@ -495,9 +526,17 @@ main(void)
           fmpz_mpoly_randtest(r1, state, len, exp_bound, coeff_bits, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
+          fmpz_mpoly_test(h, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r1, f, g, ctx);
+          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_test(r1, ctx);
+          if (ok1)
+             fmpz_mpoly_remainder_test(r1, g, ctx);
+
           ok2 = fmpz_mpoly_divrem_array(k, g, f, g, ctx);
+          fmpz_mpoly_test(k, ctx);
+          fmpz_mpoly_test(g, ctx);
 
           result = (ok1 == 0 || ok2 == 0) || 
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, k, ctx)

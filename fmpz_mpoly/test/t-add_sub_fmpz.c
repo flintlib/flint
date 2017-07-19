@@ -62,8 +62,10 @@ main(void)
           fmpz_randtest(c, state, n_randint(state, 200));
 
           fmpz_mpoly_add_fmpz(g, f, c, ctx);
+          fmpz_mpoly_test(g, ctx);
 
           fmpz_mpoly_sub_fmpz(h, g, c, ctx);
+          fmpz_mpoly_test(h, ctx);
 
           result = fmpz_mpoly_equal(f, h, ctx);
 
@@ -127,8 +129,10 @@ main(void)
           fmpz_randtest(c, state, n_randint(state, 200));
 
           fmpz_mpoly_add_fmpz(f, f, c, ctx);
+          fmpz_mpoly_test(f, ctx);
 
           fmpz_mpoly_sub_fmpz(f, f, c, ctx);
+          fmpz_mpoly_test(f, ctx);
 
           result = fmpz_mpoly_equal(f, g, ctx);
 

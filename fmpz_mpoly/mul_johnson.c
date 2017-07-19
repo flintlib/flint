@@ -22,8 +22,8 @@
    single word. Assumes input polys are nonzero.
 */
 slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
-                 const fmpz * poly2, const ulong * exp2, slong len2,
-                           const fmpz * poly3, const ulong * exp3, slong len3)
+              const fmpz * poly2, const ulong * exp2, slong len2,
+              const fmpz * poly3, const ulong * exp3, slong len3, ulong maskhi)
 {
    slong k;
    slong next_free, Q_len = 0, heap_len = 2; /* heap zero index unused */
@@ -84,7 +84,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
       while (heap_len > 1 && heap[1].exp == exp)
       {
          /* pop chain from heap */
-         x = _mpoly_heap_pop1(heap, &heap_len);
+         x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
          
          /* if output coeffs will fit in three words */
          if (small)
@@ -163,7 +163,8 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x2->next = NULL;
 
             /* insert (x->i + 1, 0, exps[x->i + 1] + exp3[0]) in heap */
-            _mpoly_heap_insert1(heap, exp2[x->i + 1] + exp3[0], x2, &heap_len);
+            _mpoly_heap_insert1(heap, exp2[x->i + 1] + exp3[0], x2, &heap_len,
+                                                                       maskhi);
          }
 
          if (x->j < len3 - 1)
@@ -172,7 +173,8 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->next = NULL;
 
             /* insert (x->i, x->j + 1, exps[x->i] + exp3[x->j + 1]) in heap */
-            _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &heap_len);
+            _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &heap_len,
+                                                                       maskhi);
          }
       }     
 
@@ -201,7 +203,8 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 */
 slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2,
-                           const fmpz * poly3, const ulong * exp3, slong len3, slong N)
+                 const fmpz * poly3, const ulong * exp3, slong len3,
+                                           slong N, ulong maskhi, ulong masklo)
 {
    slong i, k;
    slong next_free, Q_len = 0, heap_len = 2; /* heap zero index unused */
@@ -222,7 +225,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
    /* if exponent vectors fit in single word, call special version */
    if (N == 1)
       return _fmpz_mpoly_mul_johnson1(poly1, exp1, alloc,
-                                         poly2, exp2, len2, poly3, exp3, len3);
+                                  poly2, exp2, len2, poly3, exp3, len3, maskhi);
 
    TMP_START;
 
@@ -283,7 +286,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
          /* pop chain from heap and set exponent field to be reused */
          exp_list[--exp_next] = heap[1].exp;
 
-         x = _mpoly_heap_pop(heap, &heap_len, N);
+         x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
          
          /* if output coeffs will fit in three words */
          if (small)
@@ -368,7 +371,8 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
             
             mpoly_monomial_add(exp_list[exp_next], exp2 + (x->i + 1)*N, exp3, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2, &heap_len, N))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2, &heap_len,
+                                                            N, maskhi, masklo))
                exp_next--;
          }
 
@@ -381,7 +385,8 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
             mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
+                                                            N, maskhi, masklo))
                exp_next--;
          }
       }     
@@ -410,6 +415,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    slong i, bits, exp_bits, N, len = 0;
    ulong * max_degs2;
    ulong * max_degs3;
+   ulong maskhi, masklo;
    ulong max;
    ulong * exp2, * exp3;
    int free2, free3;
@@ -469,6 +475,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    
    free3 = exp3 != poly3->exps;
 
+   masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
    /* number of words exponent vectors packed into */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
@@ -485,11 +492,13 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       if (poly2->length >= poly3->length)
          len = _fmpz_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
                                       poly3->coeffs, exp3, poly3->length,
-                                           poly2->coeffs, exp2, poly2->length, N);
+                                      poly2->coeffs, exp2, poly2->length,
+                                                            N, maskhi, masklo);
       else
          len = _fmpz_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
                                       poly2->coeffs, exp2, poly2->length,
-                                           poly3->coeffs, exp3, poly3->length, N);
+                                      poly3->coeffs, exp3, poly3->length,
+                                                            N, maskhi, masklo);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -504,11 +513,13 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       if (poly2->length > poly3->length)
          len = _fmpz_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly3->coeffs, exp3, poly3->length,
-                                           poly2->coeffs, exp2, poly2->length, N);
+                                      poly2->coeffs, exp2, poly2->length,
+                                                            N, maskhi, masklo);
       else
          len = _fmpz_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly2->coeffs, exp2, poly2->length,
-                                           poly3->coeffs, exp3, poly3->length, N);
+                                      poly3->coeffs, exp3, poly3->length,
+                                                            N, maskhi, masklo);
    }
 
    if (free2)

@@ -68,6 +68,7 @@ main(void)
           fmpz_randtest(c, state, n_randint(state, 200));
 
           fmpz_mpoly_set_term_fmpz(f, exp, c, ctx);
+          fmpz_mpoly_test(f, ctx);
 
           fmpz_mpoly_get_term_fmpz(d, f, exp, ctx);
 

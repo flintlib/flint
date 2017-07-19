@@ -17,18 +17,19 @@
 
 slong _fmpz_mpoly_add1(fmpz * poly1, ulong * exps1,
                  const fmpz * poly2, const ulong * exps2, slong len2,
-                           const fmpz * poly3, const ulong * exps3, slong len3)
+                 const fmpz * poly3, const ulong * exps3, slong len3,
+                                                                  ulong maskhi)
 {
    slong i = 0, j = 0, k = 0;
 
    while (i < len2 && j < len3)
    {
-      if (exps2[i] > exps3[j])
+      if ((exps2[i]^maskhi) > (exps3[j]^maskhi))
       {
          fmpz_set(poly1 + k, poly2 + i);
          exps1[k] = exps2[i];
          i++;
-      } else if (exps2[i] == exps3[j])
+      } else if ((exps2[i]^maskhi) == (exps3[j]^maskhi))
       {
          fmpz_add(poly1 + k, poly2 + i, poly3 + j);
          exps1[k] = exps2[i];
@@ -66,17 +67,18 @@ slong _fmpz_mpoly_add1(fmpz * poly1, ulong * exps1,
 
 slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1,
                   const fmpz * poly2, const ulong * exps2, slong len2,
-                  const fmpz * poly3, const ulong * exps3, slong len3, slong N)
+                  const fmpz * poly3, const ulong * exps3, slong len3, slong N,
+                                                    ulong maskhi, ulong masklo)
 {
    slong i = 0, j = 0, k = 0;
 
    if (N == 1)
       return _fmpz_mpoly_add1(poly1, exps1, poly2, exps2, len2,
-                                                           poly3, exps3, len3);
+                                                   poly3, exps3, len3, maskhi);
 
    while (i < len2 && j < len3)
    {
-      int cmp = mpoly_monomial_cmp(exps2 + i*N, exps3 + j*N, N);
+      int cmp = mpoly_monomial_cmp(exps2 + i*N, exps3 + j*N, N, maskhi, masklo);
 
       if (cmp > 0)
       {
@@ -124,9 +126,11 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 {
    slong len = 0, max_bits, N;
    ulong * ptr1, * ptr2;
+   ulong maskhi, masklo;
    int free2, free3;
 
    max_bits = FLINT_MAX(poly2->bits, poly3->bits);
+   masks_from_bits_ord(maskhi, masklo, max_bits, ctx->ord);
    N = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
 
    /* treat cases of length 0 first */
@@ -160,7 +164,7 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       len = _fmpz_mpoly_add(temp->coeffs, temp->exps, 
                     poly2->coeffs, ptr1, poly2->length,
-                    poly3->coeffs, ptr2, poly3->length, N);
+                    poly3->coeffs, ptr2, poly3->length, N, maskhi, masklo);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -173,7 +177,7 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       len = _fmpz_mpoly_add(poly1->coeffs, poly1->exps, 
                        poly2->coeffs, ptr1, poly2->length,
-                       poly3->coeffs, ptr2, poly3->length, N);
+                       poly3->coeffs, ptr2, poly3->length, N, maskhi, masklo);
    }
       
    if (free2)

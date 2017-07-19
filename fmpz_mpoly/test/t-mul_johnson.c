@@ -70,8 +70,10 @@ main(void)
           fmpz_mpoly_randtest(k, state, len, exp_bound, coeff_bits, ctx);
 
           ok1 = fmpz_mpoly_mul_array(h, f, g, ctx);
-             
+          fmpz_mpoly_test(h, ctx);
+
           fmpz_mpoly_mul_johnson(k, f, g, ctx);
+          fmpz_mpoly_test(k, ctx);
 
           result = ok1 == 0 || fmpz_mpoly_equal(h, k, ctx);
 
@@ -151,11 +153,16 @@ main(void)
           fmpz_mpoly_randtest(h, state, len2, exp_bound2, coeff_bits, ctx);
 
           fmpz_mpoly_add(t1, g, h, ctx);
+          fmpz_mpoly_test(t1, ctx);
           fmpz_mpoly_mul_johnson(k1, f, t1, ctx);
+          fmpz_mpoly_test(k1, ctx);
 
           fmpz_mpoly_mul_johnson(t1, f, g, ctx);
+          fmpz_mpoly_test(t1, ctx);
           fmpz_mpoly_mul_johnson(t2, f, h, ctx);
+          fmpz_mpoly_test(t2, ctx);
           fmpz_mpoly_add(k2, t1, t2, ctx);
+          fmpz_mpoly_test(k2, ctx);
 
           result = fmpz_mpoly_equal(k1, k2, ctx);
 
@@ -234,8 +241,10 @@ main(void)
           fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
+          fmpz_mpoly_test(h, ctx);
              
           fmpz_mpoly_mul_johnson(f, f, g, ctx);
+          fmpz_mpoly_test(f, ctx);
 
           result = fmpz_mpoly_equal(h, f, ctx);
 
@@ -307,8 +316,10 @@ main(void)
           fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
+          fmpz_mpoly_test(h, ctx);
              
           fmpz_mpoly_mul_johnson(g, f, g, ctx);
+          fmpz_mpoly_test(g, ctx);
 
           result = fmpz_mpoly_equal(h, g, ctx);
 

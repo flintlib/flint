@@ -49,6 +49,7 @@ main(void)
        coeff_bits = n_randint(state, 200);
 
        fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+       fmpz_mpoly_test(f, ctx);
 
        fmpz_mpoly_clear(f, ctx);        
     }

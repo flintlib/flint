@@ -28,7 +28,8 @@
 */
 slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-                const fmpz * poly3, const ulong * exp3, slong len3, slong bits)
+                const fmpz * poly3, const ulong * exp3, slong len3, slong bits,
+                                                                  ulong maskhi)
 {
    slong i, k, s;
    slong next_free, Q_len = 0, reuse_len = 0, heap_len = 2; /* heap zero index unused */
@@ -128,7 +129,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
       while (heap_len > 1 && heap[1].exp == exp)
       {
          /* pop chain from heap */
-         x = _mpoly_heap_pop1(heap, &heap_len);
+         x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
          
          /* if first heap node for this exp, check it's divisible by exp3[0] */
          if (first)
@@ -217,14 +218,15 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
             x->next = NULL;
 
             /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
-            _mpoly_heap_insert1(heap, exp2[x->j], x, &heap_len);
+            _mpoly_heap_insert1(heap, exp2[x->j], x, &heap_len, maskhi);
          } else if (x->j < k - 1)
          {
             x->j++;
             x->next = NULL;
 
             /* insert (x->i, x->j + 1, exp3[x->j] + e1[x->j]) in heap */
-            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x, &heap_len);
+            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x, &heap_len,
+                                                                       maskhi);
          } else if (x->j == k - 1)
          {
             s++;
@@ -297,7 +299,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
          }
 
          /* if coeffs or monomials don't divide or exponent too large */
-         if (!d1 || !d2 || exp < maxexp) /* not an exact division */
+         if (!d1 || !d2 || (exp^maskhi) < (maxexp^maskhi)) /* not an exact division */
          {
             for (i = 0; i <= k; i++)
                _fmpz_demote(p1 + i);
@@ -321,7 +323,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
             x2->next = NULL;
 
             /* insert (i, k, exp3[i] + e1[k]) in heap */
-            _mpoly_heap_insert1(heap, exp3[i] + e1[k], x2, &heap_len);
+            _mpoly_heap_insert1(heap, exp3[i] + e1[k], x2, &heap_len, maskhi);
          }
 
          s = 1;
@@ -360,7 +362,8 @@ cleanup:
 */
 slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-       const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N)
+       const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N,
+                                                    ulong maskhi, ulong masklo)
 {
    slong i, k, s;
    slong next_free, Q_len = 0;
@@ -385,7 +388,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
    /* if exponent vectors are all one word, call specialised version */
    if (N == 1)
       return _fmpz_mpoly_divides_monagan_pearce1(poly1, exp1, alloc,
-                                    poly2, exp2, len2, poly3, exp3, len3, bits);
+                           poly2, exp2, len2, poly3, exp3, len3, bits, maskhi);
 
    TMP_START;
 
@@ -483,7 +486,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
          exp_list[--exp_next] = heap[1].exp;
 
          /* pop chain from heap */
-         x = _mpoly_heap_pop(heap, &heap_len, N);
+         x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
          
          /* if first heap node for this exp, check it's divisible by exp3[0] */
          if (first)
@@ -574,7 +577,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
 
             /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
+                                                            N, maskhi, masklo))
                exp_next--;
          } else if (x->j < k - 1)
          {
@@ -584,7 +588,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
 
             /* insert (x->i, x->j + 1, exp3[x->j] + e1[x->j]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
+                                                            N, maskhi, masklo))
                exp_next--;
          } else if (x->j == k - 1)
          {
@@ -596,7 +601,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
       }
 
       /* if accumulated coeff is zero, no output coeff to be written */
-      if ((small && (c[2] == 0 && c[1] == 0 && c[0] == 0)) || (!small && fmpz_is_zero(qc)))
+      if ((small && (c[2] == 0 && c[1] == 0 && c[0] == 0))
+            || (!small && fmpz_is_zero(qc)))
          k--;
       else
       {
@@ -656,7 +662,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
 
          /* if coeffs or monomials don't divide, or exponent too large */
          if (!d1 || !d2 ||
-          mpoly_monomial_gt(exp, exp2 + (len2 - 1)*N, N)) /* inexact division */
+          mpoly_monomial_gt(exp, exp2 + (len2 - 1)*N, N, maskhi, masklo)) /* inexact division */
          {
             for (i = 0; i <= k; i++)
                _fmpz_demote(p1 + i);
@@ -681,7 +687,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             mpoly_monomial_add(exp_list[exp_next], exp3 + i*N, e1 + k*N, N);
 
             /* insert (i, k, exp3[i] + e1[k]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2, &heap_len, N))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2, &heap_len,
+                                                            N, maskhi, masklo))
                exp_next--;
          }
 
@@ -717,6 +724,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    slong i, bits, exp_bits, N, len = 0;
    ulong * max_degs2, * max_degs3;
    ulong max = 0;
+   ulong maskhi, masklo;
    ulong * exp2, * exp3, * expq;
    int free2 = 0, free3 = 0;
    ulong mask = 0;
@@ -768,6 +776,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
 
+   masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
    /* number of words required for exponent vectors */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
@@ -815,7 +824,8 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 
       len = _fmpz_mpoly_divides_monagan_pearce(&temp->coeffs, &temp->exps,
                             &temp->alloc, poly2->coeffs, exp2, poly2->length,
-                              poly3->coeffs, exp3, poly3->length, exp_bits, N);
+                              poly3->coeffs, exp3, poly3->length, exp_bits, N,
+                                                               maskhi, masklo);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -828,7 +838,8 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 
       len = _fmpz_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
                             &poly1->alloc, poly2->coeffs, exp2, poly2->length,
-                              poly3->coeffs, exp3, poly3->length, exp_bits, N);
+                              poly3->coeffs, exp3, poly3->length, exp_bits, N,
+                                                               maskhi, masklo);
    }
 
 cleanup:

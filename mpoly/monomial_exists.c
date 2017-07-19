@@ -15,12 +15,12 @@
 #include "mpoly.h"
 
 int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
-                                                    const ulong exp, slong len)
+                                      const ulong exp, slong len, ulong maskhi)
 {
    slong n = len;
    slong i = 0;
 
-   if (exp > poly_exps[0]) /* greater than first term */
+   if ((exp^maskhi) > (poly_exps[0]^maskhi)) /* greater than first term */
    {
       (*index) = 0;
       return 0;
@@ -31,7 +31,7 @@ int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
       slong half = n/2;
 
       /* if in first half */
-      if (exp > poly_exps[i + half]) 
+      if ((exp^maskhi) > (poly_exps[i + half]^maskhi))
          n = half;
       else /* in second half */
       {
@@ -53,7 +53,7 @@ int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
 }
 
 int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
-                                         const ulong * exp, slong len, slong N)
+             const ulong * exp, slong len, slong N, ulong maskhi, ulong masklo)
 {
    slong n = len;
    slong i = 0;
@@ -66,9 +66,9 @@ int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
 
    /* specialised version if exponent vectors are one word */
    if (N == 1)
-      return mpoly_monomial_exists1(index, poly_exps, *exp, len);
+      return mpoly_monomial_exists1(index, poly_exps, *exp, len, maskhi);
 
-   if (mpoly_monomial_gt(poly_exps, exp, N)) /* greater than first term */
+   if (mpoly_monomial_gt(poly_exps, exp, N, maskhi, masklo)) /* greater than first term */
    {
       (*index) = 0;
       return 0;
@@ -79,7 +79,7 @@ int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
       slong half = n/2;
 
       /* if in first half */
-      if (mpoly_monomial_gt(poly_exps + (i + half)*N, exp, N)) 
+      if (mpoly_monomial_gt(poly_exps + (i + half)*N, exp, N, maskhi, masklo))
          n = half;
       else /* in second half */
       {

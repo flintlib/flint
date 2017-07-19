@@ -92,8 +92,10 @@ main(void)
           fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
              
           fmpz_mpoly_pow_fps(g, f, s, ctx);
-             
+          fmpz_mpoly_test(g, ctx);
+
           fmpz_mpoly_pow_naive(h, f, s, ctx);
+          fmpz_mpoly_test(h, ctx);
 
           result = fmpz_mpoly_equal(g, h, ctx);
 
@@ -159,8 +161,10 @@ main(void)
           fmpz_mpoly_randtest(g, state, len, exp_bound, coeff_bits, ctx);
 
           fmpz_mpoly_pow_fps(g, f, s, ctx);
-             
+          fmpz_mpoly_test(g, ctx);
+
           fmpz_mpoly_pow_fps(f, f, s, ctx);
+          fmpz_mpoly_test(f, ctx);
 
           result = fmpz_mpoly_equal(f, g, ctx);
 
