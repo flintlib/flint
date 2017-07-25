@@ -19,7 +19,7 @@ cache:
 - C:\projects\mpir -> .build_dependencies.cmd
 - C:\projects\mpfr -> .build_dependencies.cmd
 - C:\projects\pthreads -> .build_dependencies.cmd
-- C:\projects\flint2\mpir-2.7.0 -> .build_dependencies
+- C:\projects\flint2\mpir-2.7.2 -> .build_dependencies
 - C:\projects\flint2\mpfr-3.1.5 -> .build_dependencies
  
 build_script:
