@@ -725,7 +725,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    ulong * max_degs2, * max_degs3;
    ulong max = 0;
    ulong maskhi, masklo;
-   ulong * exp2, * exp3, * expq;
+   ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;
    int free2 = 0, free3 = 0;
    ulong mask = 0;
    TMP_INIT;
@@ -791,15 +791,21 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    }
 
    /* ensure input exponents packed to same size as output exponents */
-   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
-                                           poly2->length, ctx->n, poly2->bits);
+   if (exp_bits > poly2->bits)
+   {
+      free2 = 1;
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                        poly2->length, ctx->n);
+   }
 
-   free2 = exp2 != poly2->exps;
-
-   exp3 = mpoly_unpack_monomials(exp_bits, poly3->exps, 
-                                           poly3->length, ctx->n, poly3->bits);
-   
-   free3 = exp3 != poly3->exps;
+   if (exp_bits > poly3->bits)
+   {
+      free3 = 1;
+      exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp3, exp_bits, poly3->exps, poly3->bits,
+                                                        poly3->length, ctx->n);
+   }
 
    /* mask with high bit of each exponent vector field set */
    for (i = 0; i < FLINT_BITS/exp_bits; i++)

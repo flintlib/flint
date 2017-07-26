@@ -1305,7 +1305,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    slong i, bits, exp_bits, N, len = 0, array_size;
    ulong * max_degs1, * max_degs2, * max_degs3;
    ulong max = 0;
-   ulong * exp2, * exp3;
+   ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    int free2 = 0, free3 = 0;
    int res = -1;
 
@@ -1383,15 +1383,21 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       goto cleanup;
 
    /* expand input exponents to same number of bits as output */
-   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
-                                           poly2->length, ctx->n, poly2->bits);
+   if (exp_bits > poly2->bits)
+   {
+      free2 = 1;
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                        poly2->length, ctx->n);
+   }
 
-   free2 = exp2 != poly2->exps;
-
-   exp3 = mpoly_unpack_monomials(exp_bits, poly3->exps, 
-                                           poly3->length, ctx->n, poly3->bits);
-   
-   free3 = exp3 != poly3->exps;
+   if (exp_bits > poly3->bits)
+   {
+      free3 = 1;
+      exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp3, exp_bits, poly3->exps, poly3->bits,
+                                                        poly3->length, ctx->n);
+   }
 
    /* handle aliasing and do array division */
    if (poly1 == poly2 || poly1 == poly3)

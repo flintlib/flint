@@ -736,7 +736,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
    slong exp_bits, N, lenq = 0;
-   ulong * exp2, * exp3;
+   ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    ulong maskhi, masklo;
    int free2 = 0, free3 = 0;
    fmpz_mpoly_t temp1;
@@ -762,15 +762,21 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
    /* ensure input exponents packed to same size as output exponents */
-   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
-                                           poly2->length, ctx->n, poly2->bits);
+   if (exp_bits > poly2->bits)
+   {
+      free2 = 1;
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                        poly2->length, ctx->n);
+   }
 
-   free2 = exp2 != poly2->exps;
-
-   exp3 = mpoly_unpack_monomials(exp_bits, poly3->exps, 
-                                           poly3->length, ctx->n, poly3->bits);
-   
-   free3 = exp3 != poly3->exps;
+   if (exp_bits > poly3->bits)
+   {
+      free3 = 1;
+      exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp3, exp_bits, poly3->exps, poly3->bits,
+                                                        poly3->length, ctx->n);
+   }
 
    /* check divisor leading monomial is at most that of the dividend */
    if (mpoly_monomial_lt(exp3, exp2, N, maskhi, masklo))
@@ -808,12 +814,17 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    {
       ulong * old_exp2 = exp2, * old_exp3 = exp3;
 
-      exp2 = mpoly_unpack_monomials(2*exp_bits, old_exp2, 
-                                              poly2->length, ctx->n, exp_bits);
+      masks_from_bits_ord(maskhi, masklo, 2*exp_bits, ctx->ord);
+      N = (2*exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
-      exp3 = mpoly_unpack_monomials(2*exp_bits, old_exp3, 
-                                              poly3->length, ctx->n, exp_bits);
-   
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp2, 2*exp_bits, old_exp2, exp_bits,
+                                                        poly2->length, ctx->n);
+
+      exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp3, 2*exp_bits, old_exp3, exp_bits,
+                                                        poly3->length, ctx->n);
+
       exp_bits *= 2;
 
       if (free2)
@@ -823,9 +834,6 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
          flint_free(old_exp3);
 
       free2 = free3 = 1; 
-
-      masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-      N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
       fmpz_mpoly_fit_bits(tq, exp_bits, ctx);
       tq->bits = exp_bits;

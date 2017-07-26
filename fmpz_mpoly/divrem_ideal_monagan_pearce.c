@@ -771,18 +771,28 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
    /* ensure input exponents packed to same size as output exponents */
-   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
-                                           poly2->length, ctx->n, poly2->bits);
+   exp2 = poly2->exps;
+   free2 = 0;
+   if (exp_bits > poly2->bits)
+   {
+      free2 = 1;
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                        poly2->length, ctx->n);
 
-   free2 = exp2 != poly2->exps;
+   }
 
    for (i = 0; i < len; i++)
    {
-      exp3[i] = mpoly_unpack_monomials(exp_bits, poly3[i]->exps, 
-                                     poly3[i]->length, ctx->n, poly3[i]->bits);
-   
-      free3[i] = exp3[i] != poly3[i]->exps;
-
+      exp3[i] = poly3[i]->exps;
+      free3[i] = 0;
+      if (exp_bits > poly3[i]->bits)
+      {
+         free3[i] = 1;
+         exp3[i] = (ulong *) flint_malloc(N*poly3[i]->length*sizeof(ulong));
+         mpoly_unpack_monomials_noalloc(exp3[i], exp_bits, poly3[i]->exps,
+                                     poly3[i]->bits, poly3[i]->length, ctx->n);
+      }
       fmpz_mpoly_fit_length(q[i], 1, ctx);
       fmpz_mpoly_fit_bits(q[i], exp_bits, ctx);
       q[i]->bits = exp_bits;
@@ -834,12 +844,15 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
          break;
 
       exp_bits *= 2;
+      masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
+      N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
 
       if (exp_bits > FLINT_BITS)
          break;
 
-      exp2 = mpoly_unpack_monomials(exp_bits, old_exp2, 
-                                            poly2->length, ctx->n, exp_bits/2);
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials_noalloc(exp2, exp_bits, old_exp2, exp_bits/2,
+                                                        poly2->length, ctx->n);
 
       if (free2)
          flint_free(old_exp2);
@@ -847,15 +860,15 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
       free2 = 1;
  
       fmpz_mpoly_fit_bits(tr, exp_bits, ctx);
-
       tr->bits = exp_bits;
 
       for (i = 0; i < len; i++)
       {
          old_exp3 = exp3[i];
 
-         exp3[i] = mpoly_unpack_monomials(exp_bits, old_exp3, 
-                                         poly3[i]->length, ctx->n, exp_bits/2);
+         exp3[i] = (ulong *) flint_malloc(N*poly3[i]->length*sizeof(ulong));
+         mpoly_unpack_monomials_noalloc(exp3[i], exp_bits, old_exp3, exp_bits/2,
+                                                     poly3[i]->length, ctx->n);
    
          if (free3[i])
             flint_free(old_exp3);
@@ -863,12 +876,9 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
          free3[i] = 1; 
 
          fmpz_mpoly_fit_bits(q[i], exp_bits, ctx);
-
          q[i]->bits = exp_bits;
       }
 
-      masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-      N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
    }
 
    if (lenr < 0)
