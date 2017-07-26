@@ -329,45 +329,46 @@ void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 
 
 /*
-    b = packed vectors to unpack
-    b_len = number of pack vectors to unpack
-    b_bits = bits per field in b
-    b_nfields = number of elements in each vector
-    a = destination for unpacked vector
-    a_bits = number of bits desired in return packed vector
+    exps2 = packed vectors to unpack
+    bits2 = bits per field in exps2
+    len = number of packed vectors to unpack
+    num = number of elements in each vector
+
+    exps1 = destination for unpacked vector
+    bits1 = number of bits desired in return packed vector
 */
-void mpoly_unpack_monomials(ulong * a, slong a_bits,
-                   const ulong * b, slong b_bits, slong b_len, slong b_nfields)
+void mpoly_unpack_monomials(ulong * exps1, slong bits1,
+                   const ulong * exps2, slong bits2, slong len, slong num)
 {
-    FLINT_ASSERT(a_bits >= b_bits);
+    FLINT_ASSERT(bits1 >= bits2);
 
-    if (a_bits == b_bits) {
+    if (bits1 == bits2) {
 
-        slong i, N = (b_bits*b_nfields - 1)/FLINT_BITS + 1;
+        slong i, N = (bits2*num - 1)/FLINT_BITS + 1;
 
-        for (i = 0; i < N*b_len; i++)
-            a[i] = b[i];
+        for (i = 0; i < N*len; i++)
+            exps1[i] = exps2[i];
 
         return;
     }
 
 #if FLINT64
-   if (a_bits == 64)
+   if (bits1 == 64)
    {
-      if (b_bits == 8)
-         mpoly_unpack_monomials_8to64(a, b, b_len, b_nfields);
-      else if (b_bits == 16)
-         mpoly_unpack_monomials_16to64(a, b, b_len, b_nfields);
-      else /* b_bits == 32 */
-         mpoly_unpack_monomials_32to64(a, b, b_len, b_nfields);
+      if (bits2 == 8)
+         mpoly_unpack_monomials_8to64(exps1, exps2, len, num);
+      else if (bits2 == 16)
+         mpoly_unpack_monomials_16to64(exps1, exps2, len, num);
+      else /* bits2 == 32 */
+         mpoly_unpack_monomials_32to64(exps1, exps2, len, num);
    } else
 #endif
-   if (a_bits == 32)
+   if (bits1 == 32)
    {
-      if (b_bits == 8)
-         mpoly_unpack_monomials_8to32(a, b, b_len, b_nfields);
-      else /* b_bits == 16 */
-         mpoly_unpack_monomials_16to32(a, b, b_len, b_nfields);
-   } else  /* a_bits == 16, b_bits = 8 */
-         mpoly_unpack_monomials_8to16(a, b, b_len, b_nfields);
+      if (bits2 == 8)
+         mpoly_unpack_monomials_8to32(exps1, exps2, len, num);
+      else /* bits2 == 16 */
+         mpoly_unpack_monomials_16to32(exps1, exps2, len, num);
+   } else  /* bits1 == 16, bits2 = 8 */
+         mpoly_unpack_monomials_8to16(exps1, exps2, len, num);
 }

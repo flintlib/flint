@@ -125,7 +125,7 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
    slong len = 0, max_bits, N;
-   ulong * ptr1 = poly2->exps, * ptr2 = poly3->exps;
+   ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    ulong maskhi, masklo;
    int free2 = 0, free3 = 0;
 
@@ -147,16 +147,16 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    if (max_bits > poly2->bits)
    {
       free2 = 1;
-      ptr1 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-      mpoly_unpack_monomials(ptr1, max_bits, poly2->exps, poly2->bits,
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials(exp2, max_bits, poly2->exps, poly2->bits,
                                                         poly2->length, ctx->n);
    }
 
    if (max_bits > poly3->bits)
    {
       free3 = 1;
-      ptr2 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-      mpoly_unpack_monomials(ptr2, max_bits, poly3->exps, poly3->bits,
+      exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
+      mpoly_unpack_monomials(exp3, max_bits, poly3->exps, poly3->bits,
                                                         poly3->length, ctx->n);
    }
 
@@ -169,8 +169,8 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       temp->bits = max_bits;
 
       len = _fmpz_mpoly_add(temp->coeffs, temp->exps, 
-                    poly2->coeffs, ptr1, poly2->length,
-                    poly3->coeffs, ptr2, poly3->length, N, maskhi, masklo);
+                    poly2->coeffs, exp2, poly2->length,
+                    poly3->coeffs, exp3, poly3->length, N, maskhi, masklo);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -182,15 +182,15 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       poly1->bits = max_bits;
 
       len = _fmpz_mpoly_add(poly1->coeffs, poly1->exps, 
-                       poly2->coeffs, ptr1, poly2->length,
-                       poly3->coeffs, ptr2, poly3->length, N, maskhi, masklo);
+                       poly2->coeffs, exp2, poly2->length,
+                       poly3->coeffs, exp3, poly3->length, N, maskhi, masklo);
    }
       
    if (free2)
-      flint_free(ptr1);
+      flint_free(exp2);
 
    if (free3)
-      flint_free(ptr2);
+      flint_free(exp3);
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
 }
