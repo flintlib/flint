@@ -1002,7 +1002,7 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
 {
    slong i, exp_bits, N, lenq = 0, lenr = 0, array_size;
    ulong * max_degs2, * max_degs3;
-   ulong * exp2, * exp3, * maxexp;
+   ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * maxexp;
    int free2 = 0, free3 = 0;
    fmpz_mpoly_t temp1, temp2;
    fmpz_mpoly_struct * tq, * tr;
@@ -1062,15 +1062,21 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
       goto cleanup;
 
    /* expand input exponents to same number of bits as output */
-   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
-                                           poly2->length, ctx->n, poly2->bits);
+   if (exp_bits > poly2->bits)
+   {
+      free2 = 1;
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                        poly2->length, ctx->n);
+   }
 
-   free2 = exp2 != poly2->exps;
-
-   exp3 = mpoly_unpack_monomials(exp_bits, poly3->exps, 
-                                           poly3->length, ctx->n, poly3->bits);
-   
-   free3 = exp3 != poly3->exps;
+   if (exp_bits > poly3->bits)
+   {
+      free3 = 1;
+      exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
+      mpoly_unpack_monomials(exp3, exp_bits, poly3->exps, poly3->bits,
+                                                        poly3->length, ctx->n);
+   }
 
    if (exp2[0] < exp3[0])
    {

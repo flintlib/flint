@@ -146,7 +146,7 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
       {
          N = (bits*ctx->n - 1)/FLINT_BITS + 1;
          t = flint_malloc(N*poly->alloc*sizeof(ulong));
-         mpoly_unpack_monomials_noalloc(t, bits, poly->exps,
+         mpoly_unpack_monomials(t, bits, poly->exps,
                                              poly->bits, poly->length, ctx->n);
          flint_free(poly->exps);
          poly->exps = t;
@@ -667,6 +667,7 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
    ulong * rexp, * gexp;
 
    bits = FLINT_MAX(r->bits, g->bits);
+   N = (bits*ctx->n - 1)/FLINT_BITS + 1;
 
    if (g->length == 0 )
       flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
@@ -674,11 +675,10 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
    if (r->length == 0 )
       return;
 
-   rexp = mpoly_unpack_monomials(bits, r->exps, r->length, ctx->n, r->bits);
-
-   gexp = mpoly_unpack_monomials(bits, g->exps, 1, ctx->n, g->bits);
-
-   N = (bits*ctx->n - 1)/FLINT_BITS + 1;
+   rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
+   gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
+   mpoly_unpack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->n);
+   mpoly_unpack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->n);
 
    /* mask with high bit set in each field of exponent vector */
    for (i = 0; i < FLINT_BITS/bits; i++)
@@ -694,11 +694,8 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
          flint_abort();
       }
 
-   if (rexp != r->exps)
-      flint_free(rexp);
-
-   if (gexp != g->exps)
-      flint_free(gexp);
+   flint_free(rexp);
+   flint_free(gexp);
 }
 
 

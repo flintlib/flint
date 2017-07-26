@@ -417,8 +417,8 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    ulong * max_degs3;
    ulong maskhi, masklo;
    ulong max;
-   ulong * exp2, * exp3;
-   int free2, free3;
+   ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
+   int free2 = 0, free3 = 0;
 
    TMP_INIT;
 
@@ -464,20 +464,26 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
 
-   /* ensure input exponents are packed into same sized fields as output */
-   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
-                                           poly2->length, ctx->n, poly2->bits);
-
-   free2 = exp2 != poly2->exps;
-
-   exp3 = mpoly_unpack_monomials(exp_bits, poly3->exps, 
-                                           poly3->length, ctx->n, poly3->bits);
-   
-   free3 = exp3 != poly3->exps;
-
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
    /* number of words exponent vectors packed into */
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+
+   /* ensure input exponents are packed into same sized fields as output */
+   if (exp_bits > poly2->bits)
+   {
+      free2 = 1;
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                        poly2->length, ctx->n);
+   }
+
+   if (exp_bits > poly3->bits)
+   {
+      free3 = 1;
+      exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
+      mpoly_unpack_monomials(exp3, exp_bits, poly3->exps, poly3->bits,
+                                                        poly3->length, ctx->n);
+   }
 
    /* deal with aliasing and do multiplication */
    if (poly1 == poly2 || poly1 == poly3)

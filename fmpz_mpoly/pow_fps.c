@@ -602,8 +602,8 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    ulong * max_degs2;
    ulong max = 0;
    ulong maskhi, masklo;
-   ulong * exp2;
-   int free2;
+   ulong * exp2 = poly2->exps;
+   int free2 = 0;
 
    TMP_INIT;
 
@@ -658,13 +658,17 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
 
-   exp2 = mpoly_unpack_monomials(exp_bits, poly2->exps, 
-                                           poly2->length, ctx->n, poly2->bits);
-
-   free2 = exp2 != poly2->exps;
-
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
    N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+
+   if (exp_bits > poly2->bits)
+   {
+      free2 = 1;
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                        poly2->length, ctx->n);
+   }
+
 
    if (poly2->length == 1)
    {
