@@ -473,7 +473,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    {
       free2 = 1;
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-      mpoly_unpack_monomials_noalloc(exp2, exp_bits, poly2->exps, poly2->bits,
+      mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
                                                         poly2->length, ctx->n);
    }
 
@@ -481,7 +481,7 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    {
       free3 = 1;
       exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-      mpoly_unpack_monomials_noalloc(exp3, exp_bits, poly3->exps, poly3->bits,
+      mpoly_unpack_monomials(exp3, exp_bits, poly3->exps, poly3->bits,
                                                         poly3->length, ctx->n);
    }
 

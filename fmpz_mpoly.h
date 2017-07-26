@@ -146,7 +146,7 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
       {
          N = (bits*ctx->n - 1)/FLINT_BITS + 1;
          t = flint_malloc(N*poly->alloc*sizeof(ulong));
-         mpoly_unpack_monomials_noalloc(t, bits, poly->exps,
+         mpoly_unpack_monomials(t, bits, poly->exps,
                                              poly->bits, poly->length, ctx->n);
          flint_free(poly->exps);
          poly->exps = t;
@@ -677,8 +677,8 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
 
    rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
    gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
-   mpoly_unpack_monomials_noalloc(rexp, bits, r->exps, r->bits, r->length, ctx->n);
-   mpoly_unpack_monomials_noalloc(gexp, bits, g->exps, g->bits, 1,         ctx->n);
+   mpoly_unpack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->n);
+   mpoly_unpack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->n);
 
    /* mask with high bit set in each field of exponent vector */
    for (i = 0; i < FLINT_BITS/bits; i++)

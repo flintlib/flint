@@ -327,42 +327,6 @@ void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 
 #endif
 
-ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
-                                             slong len, slong num, slong bits2)
-{
-   ulong * exps1;
-   slong N;
-
-   if (bits1 == bits2)
-      return (ulong *) exps2;
-
-   N = (num*bits1 - 1)/FLINT_BITS + 1; /* no. of words per exponent vector */
-
-   exps1 = (ulong *) flint_malloc(N*len*sizeof(ulong));
-
-#if FLINT64
-   if (bits1 == 64)
-   {
-      if (bits2 == 8)
-         mpoly_unpack_monomials_8to64(exps1, exps2, len, num);
-      else if (bits2 == 16)
-         mpoly_unpack_monomials_16to64(exps1, exps2, len, num);
-      else /* bits2 == 32 */
-         mpoly_unpack_monomials_32to64(exps1, exps2, len, num);
-   } else 
-#endif
-   if (bits1 == 32)
-   {
-      if (bits2 == 8)
-         mpoly_unpack_monomials_8to32(exps1, exps2, len, num);
-      else /* bits2 == 16 */
-         mpoly_unpack_monomials_16to32(exps1, exps2, len, num);
-   } else  /* bits1 == 16, bits2 = 8 */
-         mpoly_unpack_monomials_8to16(exps1, exps2, len, num);
-
-   return exps1;
-}
-
 
 /*
     b = packed vectors to unpack
@@ -372,7 +336,7 @@ ulong * mpoly_unpack_monomials(slong bits1, const ulong * exps2,
     a = destination for unpacked vector
     a_bits = number of bits desired in return packed vector
 */
-void mpoly_unpack_monomials_noalloc(ulong * a, slong a_bits,
+void mpoly_unpack_monomials(ulong * a, slong a_bits,
                    const ulong * b, slong b_bits, slong b_len, slong b_nfields)
 {
     FLINT_ASSERT(a_bits >= b_bits);

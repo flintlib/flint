@@ -148,7 +148,7 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    {
       free2 = 1;
       ptr1 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-      mpoly_unpack_monomials_noalloc(ptr1, max_bits, poly2->exps, poly2->bits,
+      mpoly_unpack_monomials(ptr1, max_bits, poly2->exps, poly2->bits,
                                                         poly2->length, ctx->n);
    }
 
@@ -156,7 +156,7 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    {
       free3 = 1;
       ptr2 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-      mpoly_unpack_monomials_noalloc(ptr2, max_bits, poly3->exps, poly3->bits,
+      mpoly_unpack_monomials(ptr2, max_bits, poly3->exps, poly3->bits,
                                                         poly3->length, ctx->n);
    }
 
