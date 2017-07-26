@@ -25,37 +25,7 @@ void mpoly_set_monomial_8_64(ulong * exp1, const ulong * exp2,
    q = n/8;
    r = n%8;
 
-   if (!rev)
-   {
-      for (j = 0; j < q; j++)
-      {
-         if (deg && j == 0)
-            v = (degree << 56);
-         else
-            v = (exp2[k2++] << 56);
-         v += (exp2[k2++] << 48);
-         v += (exp2[k2++] << 40);
-         v += (exp2[k2++] << 32);
-         v += (exp2[k2++] << 24);
-         v += (exp2[k2++] << 16);
-         v += (exp2[k2++] << 8);
-         v += (exp2[k2++]);
-         exp1[k1++] = v;
-      }    
-
-      if (r > 0)
-      {
-         if (deg && q == 0)
-            v = (degree << 56);
-         else
-            v = (exp2[k2++] << 56);
-
-         for (j = 1; j < r; j++)
-            v += (exp2[k2++] << (56 - 8*j));
-
-         exp1[k1++] = v;
-      }
-   } else
+   if (rev)
    {
       k2 = n - 1 - deg;
 
@@ -88,6 +58,36 @@ void mpoly_set_monomial_8_64(ulong * exp1, const ulong * exp2,
 
          exp1[k1++] = v;
       }
+   } else
+   {
+      for (j = 0; j < q; j++)
+      {
+         if (deg && j == 0)
+            v = (degree << 56);
+         else
+            v = (exp2[k2++] << 56);
+         v += (exp2[k2++] << 48);
+         v += (exp2[k2++] << 40);
+         v += (exp2[k2++] << 32);
+         v += (exp2[k2++] << 24);
+         v += (exp2[k2++] << 16);
+         v += (exp2[k2++] << 8);
+         v += (exp2[k2++]);
+         exp1[k1++] = v;
+      }    
+
+      if (r > 0)
+      {
+         if (deg && q == 0)
+            v = (degree << 56);
+         else
+            v = (exp2[k2++] << 56);
+
+         for (j = 1; j < r; j++)
+            v += (exp2[k2++] << (56 - 8*j));
+
+         exp1[k1++] = v;
+      }
 
    }
 }
@@ -101,33 +101,7 @@ void mpoly_set_monomial_16_64(ulong * exp1, const ulong * exp2,
    q = n/4;
    r = n%4;
 
-   if (!rev)
-   {
-      for (j = 0; j < q; j++)
-      {
-         if (deg && j == 0)
-            v = (degree << 48);
-         else
-            v = (exp2[k2++] << 48);
-         v += (exp2[k2++] << 32);
-         v += (exp2[k2++] << 16);
-         v += (exp2[k2++]);
-         exp1[k1++] = v;
-      }    
-
-      if (r > 0)
-      {
-         if (deg && q == 0)
-            v = (degree << 48);
-         else
-            v = (exp2[k2++] << 48);
-
-         for (j = 1; j < r; j++)
-            v += (exp2[k2++] << (48 - 16*j));
-
-         exp1[k1++] = v;
-      }
-   } else
+   if (rev)
    {
       k2 = n - 1 - deg;
 
@@ -156,6 +130,32 @@ void mpoly_set_monomial_16_64(ulong * exp1, const ulong * exp2,
 
          exp1[k1++] = v;
       }
+   } else
+   {
+      for (j = 0; j < q; j++)
+      {
+         if (deg && j == 0)
+            v = (degree << 48);
+         else
+            v = (exp2[k2++] << 48);
+         v += (exp2[k2++] << 32);
+         v += (exp2[k2++] << 16);
+         v += (exp2[k2++]);
+         exp1[k1++] = v;
+      }    
+
+      if (r > 0)
+      {
+         if (deg && q == 0)
+            v = (degree << 48);
+         else
+            v = (exp2[k2++] << 48);
+
+         for (j = 1; j < r; j++)
+            v += (exp2[k2++] << (48 - 16*j));
+
+         exp1[k1++] = v;
+      }
    }
 }
 
@@ -168,26 +168,7 @@ void mpoly_set_monomial_32_64(ulong * exp1, const ulong * exp2,
    q = n/2;
    r = n%2;
 
-   if (!rev)
-   {
-      for (j = 0; j < q; j++)
-      {
-         if (deg && j == 0)
-            v = (degree << 32);
-         else
-            v = (exp2[k2++] << 32);
-         v += (exp2[k2++]);
-         exp1[k1++] = v;
-      }    
-
-      if (r != 0)
-      {
-         if (deg && q == 0)
-            exp1[k1++] = (degree << 32);
-         else
-            exp1[k1++] = (exp2[k2++] << 32);
-      }
-   } else
+   if (rev)
    {
       k2 = n - 1 - deg;
 
@@ -209,6 +190,25 @@ void mpoly_set_monomial_32_64(ulong * exp1, const ulong * exp2,
          else
             exp1[k1++] = (exp2[k2--] << 32);
       }
+   } else
+   {
+      for (j = 0; j < q; j++)
+      {
+         if (deg && j == 0)
+            v = (degree << 32);
+         else
+            v = (exp2[k2++] << 32);
+         v += (exp2[k2++]);
+         exp1[k1++] = v;
+      }    
+
+      if (r != 0)
+      {
+         if (deg && q == 0)
+            exp1[k1++] = (degree << 32);
+         else
+            exp1[k1++] = (exp2[k2++] << 32);
+      }
    }
 }
 
@@ -217,20 +217,20 @@ void mpoly_set_monomial_64_64(ulong * exp1, const ulong * exp2,
 {
    slong k1 = 0;
    
-   if (!rev)
-   {
-      if (deg)
-         exp1[k1++] = degree;
-
-      for ( ; k1 < n; k1++)
-         exp1[k1] = exp2[k1 - deg];
-   } else
+   if (rev)
    {
       if (deg)
          exp1[k1++] = degree;
 
       for ( ; k1 < n; k1++)
          exp1[k1] = exp2[n - k1 - 1];      
+   } else
+   {
+      if (deg)
+         exp1[k1++] = degree;
+
+      for ( ; k1 < n; k1++)
+         exp1[k1] = exp2[k1 - deg];
    }
 }
 
@@ -245,33 +245,7 @@ void mpoly_set_monomial_8_32(ulong * exp1, const ulong * exp2,
    q = n/4;
    r = n%4;
 
-   if (!rev)
-   {
-      for (j = 0; j < q; j++)
-      {
-         if (deg && j == 0)
-            v = (degree << 24);
-         else
-            v = (exp2[k2++] << 24);
-         v += (exp2[k2++] << 16);
-         v += (exp2[k2++] << 8);
-         v += (exp2[k2++]);
-         exp1[k1++] = v;
-      }    
-
-      if (r > 0)
-      {
-         if (deg && q == 0)
-            v = (degree << 24);
-         else
-            v = (exp2[k2++] << 24);
-
-         for (j = 1; j < r; j++)
-            v += (exp2[k2++] << (24 - 8*j));
-
-         exp1[k1++] = v;
-      }
-   } else
+   if (rev)
    {
       k2 = n - 1 - deg;
 
@@ -300,6 +274,32 @@ void mpoly_set_monomial_8_32(ulong * exp1, const ulong * exp2,
 
          exp1[k1++] = v;
       }
+   } else
+   {
+      for (j = 0; j < q; j++)
+      {
+         if (deg && j == 0)
+            v = (degree << 24);
+         else
+            v = (exp2[k2++] << 24);
+         v += (exp2[k2++] << 16);
+         v += (exp2[k2++] << 8);
+         v += (exp2[k2++]);
+         exp1[k1++] = v;
+      }    
+
+      if (r > 0)
+      {
+         if (deg && q == 0)
+            v = (degree << 24);
+         else
+            v = (exp2[k2++] << 24);
+
+         for (j = 1; j < r; j++)
+            v += (exp2[k2++] << (24 - 8*j));
+
+         exp1[k1++] = v;
+      }
    }
 }
 
@@ -312,26 +312,7 @@ void mpoly_set_monomial_16_32(ulong * exp1, const ulong * exp2,
    q = n/2;
    r = n%2;
 
-   if (!rev)
-   {
-      for (j = 0; j < q; j++)
-      {
-         if (deg && j == 0)
-            v = (degree << 16);
-         else
-            v = (exp2[k2++] << 16);
-         v += (exp2[k2++]);
-         exp1[k1++] = v;
-      }    
-
-      if (r != 0)
-      {
-         if (deg && q == 0)
-            exp1[k1++] = (degree << 16);
-         else
-            exp1[k1++] = (exp2[k2++] << 16);
-      }
-   } else
+   if (rev)
    {
       k2 = n - 1 - deg;
 
@@ -353,6 +334,25 @@ void mpoly_set_monomial_16_32(ulong * exp1, const ulong * exp2,
          else
             exp1[k1++] = (exp2[k2--] << 16);
       }
+   } else
+   {
+      for (j = 0; j < q; j++)
+      {
+         if (deg && j == 0)
+            v = (degree << 16);
+         else
+            v = (exp2[k2++] << 16);
+         v += (exp2[k2++]);
+         exp1[k1++] = v;
+      }    
+
+      if (r != 0)
+      {
+         if (deg && q == 0)
+            exp1[k1++] = (degree << 16);
+         else
+            exp1[k1++] = (exp2[k2++] << 16);
+      }
    }
 }
 
@@ -361,20 +361,20 @@ void mpoly_set_monomial_32_32(ulong * exp1, const ulong * exp2,
 {
    slong k1 = 0;
    
-   if (!rev)
-   {
-      if (deg)
-         exp1[k1++] = degree;
-
-      for ( ; k1 < n; k1++)
-         exp1[k1] = exp2[k1 - deg];
-   } else
+   if (rev)
    {
       if (deg)
          exp1[k1++] = degree;
 
       for ( ; k1 < n; k1++)
          exp1[k1] = exp2[n - k1 - 1];      
+   } else
+   {
+      if (deg)
+         exp1[k1++] = degree;
+
+      for ( ; k1 < n; k1++)
+         exp1[k1] = exp2[k1 - deg];
    }
 }
 
