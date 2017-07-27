@@ -654,7 +654,7 @@ void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
 
 /*
-   test that r is a valid remainder upon divison by g
+   test that r is a valid remainder upon division by g
    this means that if c*x^a is a term of r and x^a is divisible by the leading
    monomial of g, then |c| < |leading coefficient of g|
 */
