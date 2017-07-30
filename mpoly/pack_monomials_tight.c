@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -19,7 +19,7 @@ void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,
 {
    slong i, j;
    ulong e1, e2;
-   ulong mask = (UWORD(1) << bits) - 1;
+   ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
    slong shift = FLINT_BITS - (num + extra)*bits;
 
    for (i = 0; i < len; i++)
