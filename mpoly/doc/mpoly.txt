@@ -170,11 +170,11 @@ void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
     each with $n$ fields each packed into the given number of bits, compute the
     maximum exponent in each of the $n$ fields. The results are stored in an
     array \code{max_degs} which should have space for $n$ values, each of which
-    is a \code{ulong}.
-
-    The first entry in the array will be the degree field, if any. This is
-    followed by the exponents in decreasing order of precedence with respect to
-    the ordering, i.e. with the most significant field first.
+    is a \code{ulong}. The first entry of \code{max_degs} will correspond to the
+    fields of least significance in the input exponent vector. Similarly, the
+    last entry of \code{max_degs} will correspond to the field of most
+    significance in the input exponent vector. This reversal of order is
+    compatible with \code{mpoly_pack_monomials_tight}.
 
 void mpoly_max_degrees_tight(slong * max_exp,
                              ulong * exps, slong len, slong * prods, slong num)

@@ -46,7 +46,7 @@ main(void)
             nfields = n_randint(state, max_fields) + 1;
             N = (bits1*nfields - 1)/FLINT_BITS + 1;
             for (i = 0; i < length*nfields; i++)
-                a[i] = n_randint(state, 0) & (l_shift(WORD(1), bits1) - 1);
+                a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1);
 
             /* FLINT_BITS => bits1 */
             for (i = 0; i < length; i++)
