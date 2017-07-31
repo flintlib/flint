@@ -20,12 +20,12 @@ int
 main(void)
 {
     slong k, i, j, length, nfields, bits1, bits2;
-    slong * bases;
-    ulong * a, * b, * c, * d, * t;
+    slong * bases, * max, * max2, * prods;
+    ulong * a, * b, * c, * t;
     ulong max_length, max_fields;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pack_unpack_tight....");
+    flint_printf("max_degrees_tight....");
     fflush(stdout);
 
     max_length = 100;
@@ -34,13 +34,15 @@ main(void)
     a = flint_malloc(max_length*max_fields*sizeof(ulong));
     b = flint_malloc(max_length*max_fields*sizeof(ulong));
     c = flint_malloc(max_length*max_fields*sizeof(ulong));
-    d = flint_malloc(max_length*max_fields*sizeof(ulong));
     t = flint_malloc(max_length*sizeof(ulong));
-    bases = flint_malloc(max_fields*sizeof(slong));
+    bases = (slong *) flint_malloc(max_fields*sizeof(slong));
+    prods = (slong *) flint_malloc((max_fields + 1)*sizeof(slong));
+    max =   (slong *) flint_malloc(max_fields*sizeof(ulong));
+    max2 =  (slong *) flint_malloc(max_fields*sizeof(ulong));
 
     for (k = 0; k < 1000 * flint_test_multiplier(); k++)
     {
-        /* do FLINT_BITS => bits1 
+        /* do FLINT_BITS => bits1
                          => tight packing
                          => bits2 => FLINT_BITS and compare */
         for (bits1 = 8; bits1 <= FLINT_BITS; bits1 *= 2)
@@ -50,11 +52,22 @@ main(void)
             nfields = n_randint(state, FLINT_BITS/FLINT_MAX(bits1, bits2)) + 1;
 
             for (j = 0; j < nfields; j++)
+                max[j] = 0;
+
+            for (j = 0; j < nfields; j++)
                 bases[j] =  n_randint(state, 200) + 1;
+
+            prods[0] = 1;
+            for (i = 0; i < nfields; i++)
+                prods[i + 1] = prods[i]*bases[i];
 
             for (i = 0; i < nfields*length; i += nfields)
                 for (j = 0; j < nfields; j++)
+                {
                     a[i + j] = n_randint(state, bases[nfields - j - 1]);
+                    max[nfields - j - 1] = FLINT_MAX(max[nfields - j - 1],
+                                                                     a[i + j]);
+                }
 
             /* FLINT_BITS => bits1 */
             for (i = 0; i < length; i++)
@@ -66,23 +79,23 @@ main(void)
             /* tight packing => bits2 */
             mpoly_unpack_monomials_tight(c, t, length, bases, nfields, 0, bits2);
 
-            /* bits2 => FLINT_BITS */
-            mpoly_unpack_monomials(d, FLINT_BITS, c, bits2, length, nfields);
+            mpoly_max_degrees_tight(max2, t, length, prods, nfields);
 
-            for (i = 0; i < length*nfields; i++)
-                if (a[i] != d[i])
+            for (j = 0; j < nfields; j++)
+                if (max[j] != max2[j])
                 {
-                    printf("FAIL\nunpack_monomials_tight\n");
-                    flint_printf("bits1 = %wd, bits2 = %wd\n", bits1, bits2);
+                    flint_printf("FAIL\nmax_degrees_tight");
                     flint_abort();
                 }
 
         }
     }
 
+    flint_free(max2);
+    flint_free(max);
+    flint_free(prods);
     flint_free(bases);
     flint_free(t);
-    flint_free(d);
     flint_free(c);
     flint_free(b);
     flint_free(a);

@@ -30,10 +30,10 @@ main(void)
     max_length = 100;
     max_fields = 20;
 
-    a = flint_malloc(max_length*max_fields*sizeof(ulong));
-    b = flint_malloc(max_length*max_fields*sizeof(ulong));
-    max = flint_malloc(max_fields*sizeof(ulong));
-    max2 = flint_malloc(max_fields*sizeof(ulong));
+    a    = (ulong *) flint_malloc(max_length*max_fields*sizeof(ulong));
+    b    = (ulong *) flint_malloc(max_length*max_fields*sizeof(ulong));
+    max  = (ulong *) flint_malloc(max_fields*sizeof(ulong));
+    max2 = (ulong *) flint_malloc(max_fields*sizeof(ulong));
 
     for (k = 0; k < 1000 * flint_test_multiplier(); k++)
     {
@@ -75,6 +75,8 @@ main(void)
         }
     }
 
+    flint_free(max2);
+    flint_free(max);
     flint_free(b);
     flint_free(a);
 
