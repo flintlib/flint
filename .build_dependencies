@@ -12,16 +12,16 @@ absolute_path(){
    echo $retval
 }
 
-wget http://mpir.org/mpir-2.7.0.tar.bz2
-tar -xf mpir-2.7.0.tar.bz2
-cd mpir-2.7.0
+wget http://mpir.org/mpir-2.7.2.tar.bz2
+tar -xf mpir-2.7.2.tar.bz2
+cd mpir-2.7.2
 ./configure ABI=$ABI --enable-gmpcompat
 make -j4 > /dev/null 2>&1
 cd ..
 wget http://www.mpfr.org/mpfr-current/mpfr-3.1.5.tar.bz2
 tar -xf mpfr-3.1.5.tar.bz2
 cd mpfr-3.1.5
-./configure ABI=$ABI --with-gmp-build=$(absolute_path "../mpir-2.7.0")
+./configure ABI=$ABI --with-gmp-build=$(absolute_path "../mpir-2.7.2")
 make -j4 > /dev/null 2>&1
 cd ..
 
