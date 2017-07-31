@@ -737,7 +737,7 @@ ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
     \code{ulong}, without changing $g$.  If $x$ is $0$ an
     exception will result.
 
-void fmpz_preinvn_init(fmpz_preinvn_t inv, fmpz_t f)
+void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 
     Compute a precomputed inverse \code{inv} of \code{f} for use in the
     \code{preinvn} functions listed below.

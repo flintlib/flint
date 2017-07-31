@@ -65,9 +65,9 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         mpq_canonicalize(a1);
 
         size0 = mpz_sizeinbase(mpq_numref(a0), 10) 
-              + mpz_sizeinbase(mpq_denref(a0), 10) + 1;
+              + mpz_sizeinbase(mpq_denref(a0), 10) + 2;
         size1 = mpz_sizeinbase(mpq_numref(a1), 10) 
-              + mpz_sizeinbase(mpq_denref(a1), 10) + 1;
+              + mpz_sizeinbase(mpq_denref(a1), 10) + 2;
         size  = size0 + 1 + strlen(var) + 1 + size1 + 1;
         str   = flint_malloc(size);
 
@@ -124,7 +124,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     for (i = 0; i < len; i++)
     {
         fmpz_get_mpz(z, poly + i);
-        size += mpz_sizeinbase(z, 10);                   /* Numerator         */
+        size += mpz_sizeinbase(z, 10) + 1;               /* Numerator + sign  */
         if (mpz_sgn(z) != 0) size += 1 + densize;        /* Denominator and / */
         size += 3;                                       /* Operator and ws   */
         size += 1 + varsize + 1;                         /* *, x and ^        */

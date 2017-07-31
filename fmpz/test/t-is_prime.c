@@ -85,6 +85,23 @@ main(void)
         fmpz_clear(F);
     }
 
+    /* test issue 345 */
+    {
+        fmpz_t t;
+        fmpz_init(t);
+        fmpz_set_ui(t, 13567);
+        fmpz_pow_ui(t, t, 145);
+
+        if (fmpz_is_prime(t) != 0)
+        {
+            flint_printf("FAIL:\n");
+            fmpz_print(t); printf("\n");
+            abort();
+        }
+
+        fmpz_clear(t);
+    }
+
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2012, 2016 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,18 +9,19 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, slong n)
+_fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, slong len)
 {
-    if (n <= 256)
-        _fmpz_poly_taylor_shift_horner(poly, c, n);
+    if (len < 64)
+        _fmpz_poly_taylor_shift_horner(poly, c, len);
     else
-        _fmpz_poly_taylor_shift_divconquer(poly, c, n);
+        _fmpz_poly_taylor_shift_divconquer(poly, c, len);
 }
 
 void
@@ -31,3 +32,4 @@ fmpz_poly_taylor_shift(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)
 
     _fmpz_poly_taylor_shift(g->coeffs, c, g->length);
 }
+
