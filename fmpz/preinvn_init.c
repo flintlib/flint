@@ -15,7 +15,7 @@
 #include "mpn_extras.h"
 #include "fmpz.h"
 
-void fmpz_preinvn_init(fmpz_preinvn_t inv, fmpz_t f)
+void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 {
    fmpz c = *f;
    mp_bitcnt_t norm;

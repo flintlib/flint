@@ -24,7 +24,7 @@
 
 int fmpz_is_prime(const fmpz_t n)
 {
-   double logd = log(fmpz_get_d(n));
+   double logd = fmpz_dlog(n);
    ulong p, ppi, limit = (ulong) (logd*logd*logd/100.0) + 20;
    ulong * pp1, * pm1;
    slong i, l, num, num_pp1, num_pm1;

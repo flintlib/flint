@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2012, 2016 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -26,41 +26,8 @@ main(void)
     flint_printf("taylor_shift_divconquer....");
     fflush(stdout);
 
-    
-
-    /* Check aliasing */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
-    {
-        fmpz_poly_t f, g;
-        fmpz_t c;
-
-        fmpz_poly_init(f);
-        fmpz_poly_init(g);
-        fmpz_init(c);
-
-        fmpz_poly_randtest(f, state, 1 + n_randint(state, 20),
-                                     1 + n_randint(state, 200));
-
-        fmpz_randtest(c, state, n_randint(state, 200));
-
-        fmpz_poly_taylor_shift_divconquer(g, f, c);
-        fmpz_poly_taylor_shift_divconquer(f, f, c);
-
-        if (!fmpz_poly_equal(g, f))
-        {
-            flint_printf("FAIL\n");
-            fmpz_poly_print(f); flint_printf("\n");
-            fmpz_poly_print(g); flint_printf("\n");
-            abort();
-        }
-
-        fmpz_poly_clear(f);
-        fmpz_poly_clear(g);
-        fmpz_clear(c);
-    }
-
     /* Compare with composition */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t f, g, h1, h2;
         fmpz_t c;
@@ -72,16 +39,29 @@ main(void)
 
         fmpz_init(c);
 
-        fmpz_poly_randtest(f, state, 1 + n_randint(state, 20),
-                                     1 + n_randint(state, 200));
+        fmpz_poly_randtest(f, state, 1 + n_randint(state, 1000),
+                                     1 + n_randint(state, 400));
 
-        fmpz_randtest(c, state, n_randint(state, 200));
+        fmpz_randtest(c, state, n_randint(state, 10));
 
         fmpz_poly_set_coeff_ui(g, 1, 1);
         fmpz_poly_set_coeff_fmpz(g, 0, c);
 
-        fmpz_poly_taylor_shift_divconquer(h1, f, c);
-        fmpz_poly_compose(h2, f, g);
+        flint_set_num_threads(1 + n_randint(state, 3));
+
+        if (n_randint(state, 2))
+        {
+            fmpz_poly_taylor_shift_divconquer(h1, f, c);
+        }
+        else
+        {
+            fmpz_poly_set(h1, f);
+            fmpz_poly_taylor_shift_divconquer(h1, h1, c);
+        }
+
+        flint_set_num_threads(1);
+
+        fmpz_poly_compose_divconquer(h2, f, g);
 
         if (!fmpz_poly_equal(h1, h2))
         {
@@ -101,7 +81,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
     flint_printf("PASS\n");
     return 0;
 }
+
