@@ -19,7 +19,7 @@ void fmpz_poly_q_clear(fmpz_poly_q_t rop)
         flint_free(rop->num);
         rop->num = NULL;
     }
-    if (rop->den != NULL);
+    if (rop->den != NULL)
     {
         fmpz_poly_clear(rop->den);
         flint_free(rop->den);
