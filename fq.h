@@ -304,6 +304,7 @@ FQ_INLINE void fq_gen(fq_t rop, const fq_ctx_t ctx)
 {
     if (ctx->modulus->length == 2)
     {
+	fmpz_poly_fit_length(rop, 1);
         fmpz_invmod(rop->coeffs, ctx->modulus->coeffs + 1, fq_ctx_prime(ctx));
         fmpz_neg(rop->coeffs, rop->coeffs);
         fmpz_mul(rop->coeffs, rop->coeffs, ctx->modulus->coeffs);
