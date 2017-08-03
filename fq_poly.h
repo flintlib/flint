@@ -46,17 +46,6 @@
 #undef CAP_T
 #undef T
 
-FQ_POLY_INLINE void fq_poly_set_mod_poly(fq_poly_t rop, const fmpz_mod_poly_t op, const fq_ctx_t ctx)
-{
-    slong i, len = op->length;
-
-    fq_poly_fit_length(rop, len, ctx);
-    _fq_poly_set_length(rop, len, ctx);
-
-    for (i = 0; i < len; i++)
-	fq_set_fmpz(rop->coeffs + i, op->coeffs + i, ctx);
-}
-
 #include "fq_poly_factor.h"
 
 #endif
