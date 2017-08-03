@@ -89,6 +89,7 @@ fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
     return ctx->qm1 + 1;
 }
 
+#define fq_zech_ctx_modulus(ctx)  fq_nmod_ctx_modulus(ctx->fq_nmod_ctx)
 #define fq_zech_ctx_prime(ctx)  fq_nmod_ctx_prime(ctx->fq_nmod_ctx)
 
 FQ_ZECH_INLINE int

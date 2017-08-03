@@ -77,6 +77,7 @@ FQ_NMOD_INLINE slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
     return ctx->modulus->length - 1;
 }
 
+#define fq_nmod_ctx_modulus(ctx)  ((ctx)->modulus)
 #define fq_nmod_ctx_prime(ctx)  (&((ctx)->p))
 
 FQ_NMOD_INLINE void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
