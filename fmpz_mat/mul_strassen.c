@@ -91,6 +91,7 @@ void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     fmpz_mat_add(C11, X1, C11);
 
+    X1->c = FLINT_MAX(bnc, anc);
     fmpz_mat_clear(X1);
 
     fmpz_mat_window_clear(A11);

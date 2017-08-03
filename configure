@@ -503,7 +503,7 @@ fi
 
 # sometimes LDCONFIG is not to be found in the path. Look at some common places.
 case "$OS" in
-   MINGW*|CYGWIN*|Darwin)
+   MINGW*|CYGWIN*|Darwin|FreeBSD)
       LDCONFIG="true";;
    *)
       if [ -z "$LDCONFIG" ]; then
@@ -612,6 +612,8 @@ if [ -z "$CFLAGS" ]; then
       CFLAGS="-O2 -funroll-loops -g -D _WIN64 $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
    elif [ "$MACHINE" = "mips64" ]; then
       CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
+   elif [ "$KERNEL" = FreeBSD ]; then
+      CFLAGS="-std=c99 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
    else
       CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
    fi
@@ -777,6 +779,7 @@ echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "FLINT_LIB=$FLINT_LIB" >> Makefile
 echo "FLINT_LIBNAME=$FLINT_LIBNAME" >> Makefile
 echo "FLINT_SOLIB=$FLINT_SOLIB" >> Makefile
+echo "FLINT_MAJOR=$FLINT_MAJOR" >> Makefile
 echo "EXEEXT=$EXEEXT" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 echo "" >> Makefile
