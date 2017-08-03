@@ -1,0 +1,55 @@
+/*
+    Copyright (C) 2017 Luca De Feo
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#ifdef T
+
+#include "templates.h"
+
+void TEMPLATE(T, embed_gens)(TEMPLATE(T, t) gen_sub,
+			     TEMPLATE(T, t) gen_sup,
+			     const TEMPLATE(T, ctx_t) sub_ctx,
+			     const TEMPLATE(T, ctx_t) sup_ctx) {
+    if (TEMPLATE(T, ctx_degree)(sub_ctx) == 1) {
+	TEMPLATE(T, gen)(gen_sub, sub_ctx);
+	TEMPLATE(T, set)(gen_sup, gen_sub, sup_ctx);
+    } else {
+	_TEMPLATE(T, embed_gens_naive)(gen_sub, gen_sup, sub_ctx, sup_ctx);
+    }
+}
+
+void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
+				    TEMPLATE(T, t) gen_sup,
+				    const TEMPLATE(T, ctx_t) sub_ctx,
+				    const TEMPLATE(T, ctx_t) sup_ctx) {
+    TEMPLATE(T, poly_t) modulus, fact;
+    flint_rand_t state;
+    
+    TEMPLATE(T, poly_init) (modulus, sup_ctx);
+    TEMPLATE(T, poly_init) (fact, sup_ctx);
+    TEMPLATE(T, poly_set_mod_poly)(modulus, sub_ctx->modulus, sup_ctx);
+    
+    flint_randinit(state);
+
+    /* Get one linear factor of sub_ctx->modulus in sup_ctx */
+    do {
+	while (!TEMPLATE(T, poly_factor_equal_deg_prob)
+	       (fact, state, modulus, 1, sup_ctx))
+	    {
+	    };
+    } while (TEMPLATE(T, poly_degree)(fact, sup_ctx) != 1);
+    
+    TEMPLATE(T, gen)(gen_sub, sub_ctx);
+    TEMPLATE(T, set)(gen_sup, fact->coeffs, sup_ctx);
+    TEMPLATE(T, neg)(gen_sup, gen_sup, sup_ctx);
+}
+
+
+#endif
