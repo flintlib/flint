@@ -39,21 +39,21 @@ main(void)
         TEMPLATE(T, init) (a, ctx);
         TEMPLATE(T, init) (b, ctx);
 
-	TEMPLATE(T, embed_gens) (a, b, ctx, ctx);
-	
-	d = TEMPLATE(T, ctx_degree)(ctx);
-	for (e = 0; e < d; e++) {
-	    if (TEMPLATE(T, equal)(a, b, ctx))
-		break;
-	    TEMPLATE(T, frobenius)(b, b, 1, ctx);
-	}
-	
+        TEMPLATE(T, embed_gens) (a, b, ctx, ctx);
+        
+        d = TEMPLATE(T, ctx_degree)(ctx);
+        for (e = 0; e < d; e++) {
+            if (TEMPLATE(T, equal)(a, b, ctx))
+                break;
+            TEMPLATE(T, frobenius)(b, b, 1, ctx);
+        }
+        
         if (e == d)
         {
             flint_printf("FAIL:\n\n");
-	    flint_printf("CTX\n"), TEMPLATE(T, ctx_print)(ctx), flint_printf("\n");
-	    flint_printf("a: "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
-	    flint_printf("b: "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
+            flint_printf("CTX\n"), TEMPLATE(T, ctx_print)(ctx), flint_printf("\n");
+            flint_printf("a: "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
+            flint_printf("b: "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
             abort();
         }
 
