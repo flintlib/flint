@@ -38,9 +38,9 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
             fmpz_mod(Q + iQ, Q + iQ, p);
 
             _fmpz_vec_scalar_submul_fmpz(R + lenA - lenR - 1, B, lenR, Q + iQ);
-            if (lenR > 0)
-			   fmpz_mod(R + lenA - 2, R + lenA - 2, p);
         }
+        if (iQ > 0)
+			fmpz_mod(R + lenA - 2, R + lenA - 2, p);
 
         if (lenR - 1 >= iQ)
         {
