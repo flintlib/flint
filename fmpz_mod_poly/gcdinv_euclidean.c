@@ -90,10 +90,10 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
 
             do {
                 fmpz_invmod(inv, V3 + (lenV3 - 1), p);
-                _fmpz_mod_poly_divrem(Q, R, D, lenD, V3, lenV3, inv, p);
+                _fmpz_mod_poly_divrem(Q, D, D, lenD, V3, lenV3, inv, p);
                 lenQ = lenD - lenV3 + 1;
-                lenR = lenV3 - 1;
-                FMPZ_VEC_NORM(R, lenR);
+                lenD = lenV3 - 1;
+                FMPZ_VEC_NORM(D, lenD);
 
                 if (lenU2 >= lenQ)
                     _fmpz_mod_poly_mul(W, U2, lenU2, Q, lenQ, p);
@@ -106,24 +106,11 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
                 FMPZ_VEC_NORM(U1, lenU1);
 
                 FMPZ_VEC_SWAP(U1, lenU1, U2, lenU2);
-                {
-                    fmpz *__t;
-                    slong __tn;
-
-                    __t = D;
-                    D   = V3;
-                    V3  = R;
-                    R   = __t;
-                    __tn  = lenD;
-                    lenD  = lenV3;
-                    lenV3 = lenR;
-                    lenR  = __tn;
-                }
-
+				FMPZ_VEC_SWAP(V3, lenV3, D, lenD);
             } while (lenV3 != 0);
 
-            _fmpz_vec_set(G, D, lenD);
-            _fmpz_vec_set(S, U1, lenU1);
+            _fmpz_vec_swap(G, D, lenD);
+            _fmpz_vec_swap(S, U1, lenU1);
 
             for (i = 0; i < 3*lenB + 2*lenA; i++)
 			   fmpz_clear(W + i);
