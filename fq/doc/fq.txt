@@ -2,6 +2,7 @@
     Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2012, 2013 Andres Goens
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2017 Luca De Feo
 
     This file is part of FLINT.
 
@@ -71,6 +72,10 @@ void fq_ctx_init_modulus(fq_ctx_t ctx,
 void fq_ctx_clear(fq_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.
+
+const fmpz_mod_poly_struct* fq_ctx_modulus(const fq_ctx_t ctx)
+
+    Returns a pointer to the modulus in the context.
 
 long fq_ctx_degree(const fq_ctx_t ctx)
 
