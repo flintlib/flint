@@ -26,7 +26,7 @@ void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
     for (i = 0; i < len; i++)
     {
         if (fmpz_cmpabs(res + i, p) >= 0)
-            fmpz_sub(res + i, res + i, p);
+		    fmpz_sub(res + i, res + i, p);
     }
 }
 

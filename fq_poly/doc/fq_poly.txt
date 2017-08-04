@@ -4,6 +4,7 @@
     Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2012,2013 Andres Goens
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2017 Luca De Feo
 
     This file is part of FLINT.
 
@@ -173,6 +174,14 @@ void fq_poly_set(fq_poly_t poly1, const fq_poly_t poly2, const fq_ctx_t ctx)
 void fq_poly_set_fq(fq_poly_t poly, const fq_t c, const fq_ctx_t ctx)
 
     Sets the polynomial \code{poly} to \code{c}.
+
+void fq_poly_set_fmpz_mod_poly(fq_poly_t rop, const fmpz_mod_poly_t op, fq_ctx_t ctx)
+
+    Sets the polynomial \code{rop} to the polynomial \code{op}
+
+void fq_poly_set_nmod_poly(fq_poly_t rop, const nmod_poly_t op, fq_ctx_t ctx)
+
+    Sets the polynomial \code{rop} to the polynomial \code{op}
 
 void fq_poly_swap(fq_poly_t op1, fq_poly_t op2, const fq_ctx_t ctx)
 

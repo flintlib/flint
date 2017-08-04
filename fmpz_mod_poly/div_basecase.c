@@ -19,11 +19,18 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
     const fmpz_t invB, const fmpz_t p)
 {
     const slong alloc = (R == NULL) ? lenA : 0;
-    slong lenR = lenB - 1, iQ;
-
+    slong i, lenR = lenB - 1, iQ;
+    TMP_INIT;
+	
+	TMP_START;
+	
     if (alloc)
-        R = _fmpz_vec_init(alloc);
-    if (R != A)
+    {
+        R = (fmpz *) TMP_ALLOC(alloc*sizeof(fmpz));
+		for (i = 0; i < alloc; i++)
+		   fmpz_init(R + i);
+    }
+	if (R != A)
         _fmpz_vec_set(R + lenR, A + lenR, lenA - lenR);
 
     for (iQ = lenA - lenB; iQ >= 0; iQ--)
@@ -38,8 +45,9 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
             fmpz_mod(Q + iQ, Q + iQ, p);
 
             _fmpz_vec_scalar_submul_fmpz(R + lenA - lenR - 1, B, lenR, Q + iQ);
-            _fmpz_vec_scalar_mod_fmpz(R + lenA - lenR - 1, R + lenA - lenR - 1, lenR, p);
         }
+        if (iQ > 0)
+			fmpz_mod(R + lenA - 2, R + lenA - 2, p);
 
         if (lenR - 1 >= iQ)
         {
@@ -51,7 +59,12 @@ void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R,
     }
 
     if (alloc)
-        _fmpz_vec_clear(R, alloc);
+	{
+        for (i = 0; i < alloc; i++)
+		    fmpz_clear(R + i);
+	}
+	
+	TMP_END;
 }
 
 void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 

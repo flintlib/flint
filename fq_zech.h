@@ -71,6 +71,11 @@ FLINT_DLL void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t st
 
 FLINT_DLL void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
+FQ_ZECH_INLINE const nmod_poly_struct* fq_zech_ctx_modulus(const fq_zech_ctx_t ctx)
+{
+    return fq_nmod_ctx_modulus(ctx->fq_nmod_ctx);
+}
+
 FQ_ZECH_INLINE slong
 fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
 {
