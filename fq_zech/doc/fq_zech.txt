@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2017 Luca De Feo
 
     This file is part of FLINT.
 
@@ -77,6 +78,10 @@ void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.
+
+const nmod_poly_struct* fq_zech_ctx_modulus(const fq_zech_ctx_t ctx)
+
+    Returns a pointer to the modulus in the context.
 
 long fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
 

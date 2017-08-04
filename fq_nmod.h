@@ -72,6 +72,11 @@ FLINT_DLL void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t st
 
 FLINT_DLL void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 
+FQ_NMOD_INLINE const nmod_poly_struct* fq_nmod_ctx_modulus(const fq_nmod_ctx_t ctx)
+{
+    return ctx->modulus;
+}
+
 FQ_NMOD_INLINE slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
 {
     return ctx->modulus->length - 1;
