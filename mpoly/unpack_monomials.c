@@ -278,7 +278,7 @@ void mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2,
       for (j = 0; j < q; j++)
       {
          v = exps2[k2++];
-         exps1[k1++] = ((v >> 16);
+         exps1[k1++] = ((v >> 16));
          exps1[k1++] = (v & UWORD(0xFFFF));
       }
       
