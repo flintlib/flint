@@ -10,6 +10,7 @@
 */
 
 #ifdef T
+#ifdef B
 
 #include "templates.h"
 
@@ -34,9 +35,9 @@ void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
     
     TEMPLATE(T, poly_init) (modulus, sup_ctx);
     TEMPLATE(T, poly_init) (fact, sup_ctx);
-    TEMPLATE(T, poly_set_mod_poly)(modulus,
-                                   TEMPLATE(T, ctx_modulus)(sub_ctx),
-                                   sup_ctx);
+    TEMPLATE4(T, poly_set, B, poly)(modulus,
+				    TEMPLATE(T, ctx_modulus)(sub_ctx),
+				    sup_ctx);
     
     flint_randinit(state);
 
@@ -54,4 +55,5 @@ void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
 }
 
 
+#endif
 #endif

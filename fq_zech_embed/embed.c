@@ -15,9 +15,14 @@
 #ifdef T
 #undef T
 #endif
+#ifdef B
+#undef B
+#endif
 
 #define T fq_zech
 #define CAP_T FQ_ZECH
+#define B nmod
 #include "fq_embed_templates/embed.c"
+#undef B
 #undef CAP_T
 #undef T

@@ -15,9 +15,14 @@
 #ifdef T
 #undef T
 #endif
+#ifdef B
+#undef B
+#endif
 
 #define T fq
 #define CAP_T FQ
+#define B fmpz_mod
 #include "fq_embed_templates/embed.c"
+#undef B
 #undef CAP_T
 #undef T
