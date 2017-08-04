@@ -20,20 +20,14 @@ void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
                                    const fmpz *poly2, slong len2, const fmpz_t p)
 {
     slong i, len = FLINT_MAX(len1, len2);
-	fmpz_t diff;
 
     _fmpz_poly_add(res, poly1, len1, poly2, len2);
 
-	fmpz_init(diff);
-	
     for (i = 0; i < len; i++)
     {
-        fmpz_sub(diff, res + i, p);
-		if (fmpz_sgn(diff) >= 0)
-            fmpz_swap(res + i, diff);
+        if (fmpz_cmpabs(res + i, p) >= 0)
+		    fmpz_sub(res + i, res + i, p);
     }
-	
-	fmpz_clear(diff);
 }
 
 void fmpz_mod_poly_add(fmpz_mod_poly_t res, 
