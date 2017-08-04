@@ -38,10 +38,14 @@ void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
             fmpz_mod(Q + iQ, Q + iQ, p);
 
             _fmpz_vec_scalar_submul_fmpz(W + iQ, B, lenB, Q + iQ);
-            _fmpz_vec_scalar_mod_fmpz(W + iQ, W + iQ, lenB, p);
+			if (iQ > 0)
+                fmpz_mod(W + iR - 1, W + iR - 1, p);
+
         }
     }
 
+	_fmpz_vec_scalar_mod_fmpz(W, W, lenB - 1, p);
+	
     if (R != A)
     {
        _fmpz_vec_set(R, W, lenB - 1);
