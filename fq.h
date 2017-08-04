@@ -69,12 +69,16 @@ FLINT_DLL void fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state);
 
 FLINT_DLL void fq_ctx_clear(fq_ctx_t ctx);
 
+FQ_INLINE const fmpz_mod_poly_struct* fq_ctx_modulus(const fq_ctx_t ctx)
+{
+    return ctx->modulus;
+}
+
 FQ_INLINE slong fq_ctx_degree(const fq_ctx_t ctx)
 {
     return ctx->modulus->length - 1;
 }
 
-#define fq_ctx_modulus(ctx)  ((ctx)->modulus)
 #define fq_ctx_prime(ctx)  (&((ctx)->p))
 
 FQ_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
