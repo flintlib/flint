@@ -37,9 +37,9 @@ int main(void)
     pid_t childpid;
     fmpz_t two;
 
-    n = 100 * flint_test_multiplier();
-
     FLINT_TEST_INIT(state);
+
+    n = 100 * flint_test_multiplier();
 
     fmpz_init(two);
     fmpz_set_ui(two,2);
