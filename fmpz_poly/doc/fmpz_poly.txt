@@ -2272,7 +2272,7 @@ fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
     coefficients.
 
     If an interpolating polynomial with integer coefficients does not
-    exist, the result is undefined.
+    exist, a \code{FLINT_INEXACT} exception is thrown.
 
     It is assumed that the $x$ values are distinct.
 
