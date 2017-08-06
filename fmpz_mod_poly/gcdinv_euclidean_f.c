@@ -109,7 +109,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
                 if (!fmpz_is_one(f))					
 					goto cleanup;
 				
-				_fmpz_mod_poly_divrem(Q, D, D, lenD, V3, lenV3, inv, p);
+				_fmpz_mod_poly_divrem_basecase(Q, D, D, lenD, V3, lenV3, inv, p);
                 lenQ = lenD - lenV3 + 1;
                 lenD = lenV3 - 1;
                 FMPZ_VEC_NORM(D, lenD);
