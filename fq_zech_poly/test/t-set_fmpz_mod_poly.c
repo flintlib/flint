@@ -19,6 +19,6 @@
 
 #define T fq
 #define CAP_T FQ
-#include "fq_poly_templates/test/t-set_zech_poly.c"
+#include "fq_poly_templates/test/t-set_fmpz_mod_poly.c"
 #undef CAP_T
 #undef T
