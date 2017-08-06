@@ -1361,6 +1361,21 @@ void fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
 
     In the case that $A = 0 \pmod{B}$, returns $G = S = 0$.
 
+slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
+                         const fmpz *A, slong lenA, const fmpz *B, slong lenB,
+                         const fmpz_t p)
+
+    If $f$ returns with value $1$ then the function operates as per
+    \code{_fmpz_mod_poly_gcdinv_euclidean}, otherwise $f$ is set to a 
+    nontrivial factor of $p$.
+
+void fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
+       fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If $f$ returns with value $1$ then the function operates as per
+    \code{fmpz_mod_poly_gcdinv_euclidean}, otherwise $f$ is set to a 
+    nontrivial factor of the modulus of $A$.
+
 slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
                          const fmpz *A, slong lenA, const fmpz *B, slong lenB,
                          const fmpz_t p)

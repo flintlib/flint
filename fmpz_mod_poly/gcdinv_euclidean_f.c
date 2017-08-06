@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S, 
+slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, 
                                    const fmpz *A, slong lenA, 
                                    const fmpz *B, slong lenB, 
                                    const fmpz_t invA, const fmpz_t p)
@@ -29,7 +29,8 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
 
     if (lenA == 1)
     {
-        fmpz_set(G + 0, A + 0);
+        fmpz_set_ui(f, 1);
+		fmpz_set(G + 0, A + 0);
         fmpz_one(S + 0);
         return 1;
     }
@@ -50,7 +51,8 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
 
         if (lenR == 0)
         {
-            _fmpz_vec_set(G, A, lenA);
+            fmpz_set_ui(f, 1);
+			_fmpz_vec_set(G, A, lenA);
             fmpz_one(S + 0);
 
             for (i = 0; i < 2*lenB; i++)
@@ -103,8 +105,11 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
             FMPZ_VEC_SWAP(V3, lenV3, R, lenR);
 
             do {
-                fmpz_invmod(inv, V3 + (lenV3 - 1), p);
-                _fmpz_mod_poly_divrem(Q, D, D, lenD, V3, lenV3, inv, p);
+                fmpz_gcdinv(f, inv, V3 + (lenV3 - 1), p);
+                if (!fmpz_is_one(f))					
+					goto cleanup;
+				
+				_fmpz_mod_poly_divrem(Q, D, D, lenD, V3, lenV3, inv, p);
                 lenQ = lenD - lenV3 + 1;
                 lenD = lenV3 - 1;
                 FMPZ_VEC_NORM(D, lenD);
@@ -129,6 +134,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
             _fmpz_vec_swap(G, D, lenD);
             _fmpz_vec_swap(S, U1, lenU1);
 
+cleanup:
             for (i = 0; i < 3*lenB + 2*lenA; i++)
 			   fmpz_clear(W + i);
 			   
@@ -145,7 +151,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
 }
 
 void 
-fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G, 
+fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, 
                              fmpz_mod_poly_t S,
                              const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
@@ -154,7 +160,7 @@ fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G,
 
 	if (lenB < 2)
     {
-        flint_printf("Exception (fmpz_mod_poly_gcdinv). lenB < 2.\n");
+        flint_printf("Exception (fmpz_mod_poly_gcdinv_euclidean_f). lenB < 2.\n");
         flint_abort();
     }
     if (lenA >= lenB)
@@ -163,7 +169,7 @@ fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G,
 
         fmpz_mod_poly_init(T, &A->p);
         fmpz_mod_poly_rem(T, A, B);
-        fmpz_mod_poly_gcdinv_euclidean(G, S, T, B);
+        fmpz_mod_poly_gcdinv_euclidean_f(f, G, S, T, B);
         fmpz_mod_poly_clear(T);
         return;
     }
@@ -171,6 +177,7 @@ fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G,
     fmpz_init(inv);
     if (lenA == 0)  
 	{
+        fmpz_set_ui(f, 1);
         fmpz_mod_poly_zero(G);
         fmpz_mod_poly_zero(S);
     }
@@ -178,6 +185,10 @@ fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G,
     {
         fmpz *g, *s;
         slong lenG;
+
+   		fmpz_gcdinv(f, inv, fmpz_mod_poly_lead(A), &A->p);
+        if (!fmpz_is_one(f))
+            goto cleanup;
 
         if (G == A || G == B)
         {
@@ -198,8 +209,7 @@ fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G,
             s = S->coeffs;
         }
 
-        fmpz_invmod(inv, fmpz_mod_poly_lead(A), &A->p);
-        lenG = _fmpz_mod_poly_gcdinv_euclidean(g, s, 
+	    lenG = _fmpz_mod_poly_gcdinv_euclidean_f(f, g, s, 
         A->coeffs, lenA, B->coeffs, lenB, inv, &B->p);
 
         if (G == A || G == B)
@@ -215,7 +225,10 @@ fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G,
             S->alloc  = lenB;
         }
 
-        _fmpz_mod_poly_set_length(G, lenG);
+        if (!fmpz_is_one(f))
+            goto cleanup;
+
+		_fmpz_mod_poly_set_length(G, lenG);
         _fmpz_mod_poly_set_length(S, FLINT_MAX(lenB - lenG, 1));
         _fmpz_mod_poly_normalise(S);
 
@@ -225,6 +238,8 @@ fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G,
             fmpz_mod_poly_scalar_mul_fmpz(G, G, inv);
             fmpz_mod_poly_scalar_mul_fmpz(S, S, inv);
         }
+
+cleanup:
         fmpz_clear(inv);
     }
 }
