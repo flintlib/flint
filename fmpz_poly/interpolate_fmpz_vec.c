@@ -18,12 +18,13 @@
 static void
 _fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, slong n)
 {
-    fmpz_t p, q, t;
+    fmpz_t p, q, t, r;
     slong i, j;
 
     fmpz_init(p);
     fmpz_init(q);
     fmpz_init(t);
+	fmpz_init(r);
 
     for (i = 1; i < n; i++)
     {
@@ -34,11 +35,23 @@ _fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, slong n)
             fmpz_sub(p, ys + j, t);
             fmpz_sub(q, xs + j, xs + j - i);
             fmpz_set(t, ys + j);
-            fmpz_divexact(ys + j, p, q);
+            fmpz_fdiv_qr(ys + j, r, p, q);
+			
+            if (!fmpz_is_zero(r))
+            {
+                fmpz_clear(r);
+                fmpz_clear(t);
+                fmpz_clear(q);
+                fmpz_clear(p);
+				
+                flint_throw(FLINT_INEXACT, "Not an exact division in"     
+                    "fmpz_poly_interpolate_newton");
+            }
         }
     }
 
-    fmpz_clear(p);
+    fmpz_clear(r);
+	fmpz_clear(p);
     fmpz_clear(q);
     fmpz_clear(t);
 }
