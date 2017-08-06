@@ -22,15 +22,26 @@ slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S,
     fmpz_t inv;
     slong ans = 0;
 
-    T = _fmpz_vec_init(lenA - 1);
     fmpz_init(inv);
     fmpz_gcdinv(f, inv, A + (lenA - 1), p);
 
     if (fmpz_is_one(f))
-       ans = _fmpz_mod_poly_xgcd_f(f, G, T, S, B, lenB, A, lenA, inv, p);
-
+    {
+        if (lenB < 16)
+	    {
+		    ans = _fmpz_mod_poly_gcdinv_euclidean_f(f, G, S, 
+			                                         A, lenA, B, lenB, inv, p);
+	    } else
+        {
+    		T = _fmpz_vec_init(lenA - 1);
+    
+	        ans = _fmpz_mod_poly_xgcd_f(f, G, T, S, B, lenB, A, lenA, inv, p);
+            
+			_fmpz_vec_clear(T, lenA - 1);
+        }
+	}
+	
     fmpz_clear(inv);
-    _fmpz_vec_clear(T, lenA - 1);
 
     return ans;
 }

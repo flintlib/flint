@@ -60,10 +60,10 @@ slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA,
         {
             fmpz_invmod(invR3, R3 + (lenR3 - 1), p);
 
-            _fmpz_mod_poly_divrem(Q, R1, R2, lenR2, R3, lenR3, invR3, p);
-            lenR2 = lenR3--;
-            FMPZ_VEC_NORM(R1, lenR3);
-            T = R2; R2 = R3; R3 = R1; R1 = T;
+            _fmpz_mod_poly_divrem_basecase(Q, R2, R2, lenR2, R3, lenR3, invR3, p);
+            lenR2 = lenR3 - 1;
+            FMPZ_VEC_NORM(R2, lenR2);
+            FMPZ_VEC_SWAP(R2, lenR2, R3, lenR3);
         } 
         while (lenR3 > 0);
 
