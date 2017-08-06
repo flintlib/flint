@@ -37,7 +37,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
     else
     {
         fmpz *Q, *R;
-        slong lenQ, lenR;
+        slong lenQ, lenR, lenD = 0;
 
         Q = (fmpz *) TMP_ALLOC(2*lenB*sizeof(fmpz));
         R = Q + lenB;
@@ -45,8 +45,11 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
 		for (i = 0; i < 2*lenB; i++)
 		   fmpz_init(Q + i);
 
-        _fmpz_mod_poly_divrem(Q, R, B, lenB, A, lenA, invA, p);
-        lenR = lenA - 1;
+        _fmpz_mod_poly_divrem_f(f, Q, R, B, lenB, A, lenA, p);
+        if (!fmpz_is_one(f))
+            goto cleanup2;
+        
+		lenR = lenA - 1;
         FMPZ_VEC_NORM(R, lenR);
 
         if (lenR == 0)
@@ -80,7 +83,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
         {
             fmpz_t inv;
             fmpz *D, *U1, *U2, *V3, *W;
-            slong lenD, lenU1, lenU2, lenV3, lenW;
+            slong lenU1, lenU2, lenV3, lenW;
 
             fmpz_init(inv);
             W  = (fmpz *) TMP_ALLOC((3*lenB + 2*lenA)*sizeof(fmpz));
@@ -137,7 +140,8 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
 cleanup:
             for (i = 0; i < 3*lenB + 2*lenA; i++)
 			   fmpz_clear(W + i);
-			   
+			
+cleanup2:			
             for (i = 0; i < 2*lenB; i++)
 		        fmpz_clear(Q + i);
 
