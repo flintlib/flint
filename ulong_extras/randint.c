@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2017 Apoorv Mishra
 
     This file is part of FLINT.
 
@@ -33,22 +34,22 @@ mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
 
     if (limit == UWORD(0)) 
     {
-    	return n_randlimb(state);
+        return n_randlimb(state);
     } 
     else
     {
-    	mp_limb_t x, y, r;
+        mp_limb_t x, y, r;
 
-    	x = rand_max / limit;
-		y = x * limit;
+        x = rand_max/limit;
+        y = x*limit;
 
-		do 
-		{
-			r = n_randlimb(state);
-		}
-		while(r >= y);
+        do 
+        {
+            r = n_randlimb(state);
+        }
+        while (r >= y);
 
-		return r / x;
+        return r/x;
     }
 }
 
