@@ -30,18 +30,15 @@ mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
 
 mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit) 
 {
-    if (limit == UWORD(0)) 
+    if ((limit & (limit - 1)) == 0)
     {
-        return n_randlimb(state);
-    }
-    else if (limit == UWORD(1))
-    {
-        return 0;
+        return n_randlimb(state) & (limit - 1);
     }
     else
     {
         const mp_limb_t rand_max = UWORD_MAX;
         mp_limb_t bucket_size, bucket_num, rand_within_range, temp_rand_max;
+        mp_limb_t val1, val2, quotient;
         
         int msb = -1;
         int i;
@@ -57,35 +54,27 @@ mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
             }
         }
 
-        if ((limit & (limit - 1)) == 0)
+        val1 = (UWORD(1)<<(FLINT_BITS - msb - 1));
+        val2 = limit*val1;
+        quotient = UWORD(0);
+
+        /* First iteration of long division method */
+        temp_rand_max -= (val2 - UWORD(1));
+        quotient |= val1;
+        val1 >>= 1;
+        val2 >>= 1;
+
+        quotient |= temp_rand_max/limit;
+
+        bucket_size = quotient;
+        bucket_num = bucket_size*limit;
+        do
         {
-            bucket_size = (UWORD(1)<<(FLINT_BITS - msb));
-            return n_randlimb(state)/bucket_size;
+            rand_within_range = n_randlimb(state);
         }
-        else
-        {
-            ulong val1 = (UWORD(1)<<(FLINT_BITS - msb - 1));
-            ulong val2 = limit*val1;
-            ulong quotient = UWORD(0);
+        while (rand_within_range >= bucket_num);
 
-            /* First iteration of long division method */
-            temp_rand_max -= (val2 - UWORD(1));
-            quotient |= val1;
-            val1 >>= 1;
-            val2 >>= 1;
-
-            quotient |= temp_rand_max/limit;
-
-            bucket_size = quotient;
-            bucket_num = bucket_size*limit;
-            do
-            {
-                rand_within_range = n_randlimb(state);
-            }
-            while (rand_within_range >= bucket_num);
-
-            return rand_within_range/bucket_size;
-        }
+        return rand_within_range/bucket_size;
     }
 }
 
