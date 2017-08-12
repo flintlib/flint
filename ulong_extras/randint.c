@@ -30,26 +30,62 @@ mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
 
 mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit) 
 {
-    mp_limb_t rand_max = UWORD_MAX;
-
     if (limit == UWORD(0)) 
     {
         return n_randlimb(state);
-    } 
+    }
+    else if (limit == UWORD(1))
+    {
+        return 0;
+    }
     else
     {
-        mp_limb_t x, y, r;
+        const mp_limb_t rand_max = UWORD_MAX;
+        mp_limb_t bucket_size, bucket_num, rand_within_range, temp_rand_max;
+        
+        int msb = -1;
+        int i;
 
-        x = rand_max/limit;
-        y = x*limit;
+        temp_rand_max = rand_max;
 
-        do 
+        for (i = FLINT_BITS - 1; i >= 0; i--)
         {
-            r = n_randlimb(state);
+            if ((UWORD(1)<<i) & limit)
+            {
+                msb = i;
+                break;
+            }
         }
-        while (r >= y);
 
-        return r/x;
+        if ((limit & (limit - 1)) == 0)
+        {
+            bucket_size = (UWORD(1)<<(FLINT_BITS - msb));
+            return n_randlimb(state)/bucket_size;
+        }
+        else
+        {
+            ulong val1 = (UWORD(1)<<(FLINT_BITS - msb - 1));
+            ulong val2 = limit*val1;
+            ulong quotient = UWORD(0);
+
+            /* First iteration of long division method */
+            temp_rand_max -= (val2 - UWORD(1));
+            quotient |= val1;
+            val1 >>= 1;
+            val2 >>= 1;
+
+            quotient |= temp_rand_max/limit;
+
+            bucket_size = quotient;
+            bucket_num = bucket_size*limit;
+            do
+            {
+                rand_within_range = n_randlimb(state);
+            }
+            while (rand_within_range >= bucket_num);
+
+            return rand_within_range/bucket_size;
+        }
     }
 }
 
