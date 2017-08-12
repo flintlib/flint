@@ -38,35 +38,10 @@ mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
     {
         const mp_limb_t rand_max = UWORD_MAX;
         mp_limb_t bucket_size, bucket_num, rand_within_range, temp_rand_max;
-        mp_limb_t val1, val2, quotient;
         
-        int msb = -1;
-        int i;
+        temp_rand_max = rand_max - limit + 1;
 
-        temp_rand_max = rand_max;
-
-        for (i = FLINT_BITS - 1; i >= 0; i--)
-        {
-            if ((UWORD(1)<<i) & limit)
-            {
-                msb = i;
-                break;
-            }
-        }
-
-        val1 = (UWORD(1)<<(FLINT_BITS - msb - 1));
-        val2 = limit*val1;
-        quotient = UWORD(0);
-
-        /* First iteration of long division method */
-        temp_rand_max -= (val2 - UWORD(1));
-        quotient |= val1;
-        val1 >>= 1;
-        val2 >>= 1;
-
-        quotient |= temp_rand_max/limit;
-
-        bucket_size = quotient;
+        bucket_size = 1 + temp_rand_max/limit;
         bucket_num = bucket_size*limit;
         do
         {
