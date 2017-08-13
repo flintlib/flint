@@ -20,7 +20,7 @@ void fq_nmod_mul_matrix(nmod_mat_t matrix,
     mp_limb_t lead;
 
     /* This is usually 1, unless the context is non-monic */
-    lead = n_invmod(modulus->coeffs[len], mod.n);
+    lead = nmod_inv(modulus->coeffs[len], mod);
 
     for (i = 0; i < gen->length; i++)
         nmod_mat_entry(matrix, i, 0) =  gen->coeffs[i];
@@ -30,23 +30,18 @@ void fq_nmod_mul_matrix(nmod_mat_t matrix,
     /* M[i,j] = M[i-1,j-1] - M[len-1,j-1] * lead * ctx->modulus->coeffs[i] */
     for (j = 1; j < len; j++) {
         nmod_mat_entry(matrix, len-1, j) = 
-            n_mulmod2_preinv(nmod_mat_entry(matrix, len-1, j-1), 
-                             lead,
-                             mod.n, mod.ninv);
+            nmod_mul(nmod_mat_entry(matrix, len-1, j-1), lead, mod);
         for (i = 0; i < len; i++) {
             nmod_mat_entry(matrix, i, j) = 
-                n_mulmod2_preinv(nmod_mat_entry(matrix, len-1, j), 
-                                modulus->coeffs[i],
-                                mod.n, mod.ninv);
+                nmod_mul(nmod_mat_entry(matrix, len-1, j), 
+                         modulus->coeffs[i], mod);
             if (i > 0)
                 nmod_mat_entry(matrix, i, j) =
-                    n_submod(nmod_mat_entry(matrix, i, j),
+                    nmod_sub(nmod_mat_entry(matrix, i, j),
                              nmod_mat_entry(matrix, i-1, j-1),
-                             mod.n);
+                             mod);
             nmod_mat_entry(matrix, i, j) = 
-                n_submod(0,
-                         nmod_mat_entry(matrix, i, j),
-                         mod.n);
+                nmod_neg(nmod_mat_entry(matrix, i, j), mod);
         }
     }
 }

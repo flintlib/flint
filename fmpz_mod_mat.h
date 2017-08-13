@@ -136,6 +136,39 @@ void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state)
     _fmpz_mod_mat_reduce(mat);
 }
 
+/* Windows and concatenation */
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat,
+                              slong r1, slong c1, slong r2, slong c2)
+{
+    fmpz_mat_window_init(window->mat, mat->mat, r1, c1, r2, c2);
+    fmpz_init_set(window->mod, mat->mod);    
+}
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window)
+{
+    fmpz_mat_window_clear(window->mat);
+    fmpz_clear(window->mod);
+}
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res,
+                                    const fmpz_mod_mat_t mat1,
+                                    const fmpz_mod_mat_t mat2)
+{
+    fmpz_mat_concat_horizontal(res->mat, mat1->mat, mat2->mat);
+}
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res,
+                                  const fmpz_mod_mat_t mat1,  
+                                  const fmpz_mod_mat_t mat2)
+{
+    fmpz_mat_concat_vertical(res->mat, mat1->mat, mat2->mat);
+}
+
 /* Inupt - Output */
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat)
