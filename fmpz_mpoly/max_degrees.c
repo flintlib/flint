@@ -20,9 +20,6 @@ void _fmpz_mpoly_max_degrees1(ulong * max_degs, const ulong * exps,
    slong i, j, k = FLINT_BITS/bits, shift;
    ulong mask;
 
-   for (i = 0; i < n; i++)
-      max_degs[i] = 0;
-
    shift = (k - n)*bits;
    mask = bits == FLINT_BITS ? ~UWORD(0) : (UWORD(1) << bits) - UWORD(1);
 
@@ -69,6 +66,9 @@ void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
    ulong * exps;
    TMP_INIT;
    
+   for (i = 0; i < n; i++)
+      max_degs[i] = 0;
+
    if (N == 1)
    {
        _fmpz_mpoly_max_degrees1(max_degs, poly_exps, len, bits, n, deg, rev);
@@ -84,7 +84,7 @@ void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
    {
       ulong s = 0;
 
-      _fmpz_mpoly_get_monomial(exps, poly_exps + i*N, bits, n, deg, rev);
+      mpoly_get_monomial(exps, poly_exps + i*N, bits, n, deg, rev);
 
       for (j = 0; j < n - deg; j++)
       {

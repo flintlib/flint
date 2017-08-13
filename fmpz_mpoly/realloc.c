@@ -15,6 +15,18 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
+void _fmpz_mpoly_realloc(fmpz ** poly, ulong ** exps,
+                                             slong * alloc, slong len, slong N)
+{
+    (*poly) = (fmpz *) flint_realloc(*poly, len*sizeof(fmpz));
+    (*exps) = (ulong *) flint_realloc(*exps, len*N*sizeof(ulong));
+
+    if (len > *alloc)
+        flint_mpn_zero((mp_ptr) (*poly + *alloc), len - *alloc);
+    
+    (*alloc) = len;
+}
+
 void fmpz_mpoly_realloc(fmpz_mpoly_t poly,
                                        slong alloc, const fmpz_mpoly_ctx_t ctx)
 {

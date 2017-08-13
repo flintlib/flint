@@ -211,7 +211,7 @@ void flint_cleanup()
 
     mpfr_free_cache();
     _fmpz_cleanup();
-
+    
 #if FLINT_REENTRANT && !HAVE_TLS
     pthread_mutex_unlock(&register_lock);
 #endif

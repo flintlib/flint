@@ -17,7 +17,7 @@
 __mpz_struct * _fmpz_new_mpz(void)
 {
     __mpz_struct * mpz_ptr = (__mpz_struct *) flint_malloc(sizeof(__mpz_struct));
-    mpz_init(mpz_ptr);
+    mpz_init2(mpz_ptr, 2*FLINT_BITS);
     return mpz_ptr;
 }
 

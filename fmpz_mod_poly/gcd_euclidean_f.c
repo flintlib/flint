@@ -58,26 +58,35 @@ slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
         }
         else
         {
-            T  = R3;
+            fmpz_t inv;
+			
+			T  = R3;
             R3 = R1;
             R1 = T;
             _fmpz_vec_set(R2, B, lenB);
             lenR2 = lenB;
 
+			fmpz_init(inv);
+			
             do
             {
-                _fmpz_mod_poly_divrem_f(f, Q, R1, R2, lenR2, R3, lenR3, p);
-                if (!fmpz_is_one(f))
-                    goto exit;
-
-                lenR2 = lenR3--;
-                FMPZ_VEC_NORM(R1, lenR3);
-                T = R2; R2 = R3; R3 = R1; R1 = T;
+                fmpz_gcdinv(f, inv, R3 + (lenR3 - 1), p);
+                if (!fmpz_is_one(f))					
+					goto cleanup;
+				
+				_fmpz_mod_poly_divrem_basecase(Q, R2, R2, lenR2, R3, lenR3, inv, p);
+                
+                lenR2 = lenR3 - 1;
+                FMPZ_VEC_NORM(R2, lenR2);
+                FMPZ_VEC_SWAP(R2, lenR2, R3, lenR3);
             } 
             while (lenR3 > 0);
 
             _fmpz_vec_set(G, R2, lenR2);
             lenG = lenR2;
+
+cleanup:			
+			fmpz_clear(inv);
         }
 
       exit:

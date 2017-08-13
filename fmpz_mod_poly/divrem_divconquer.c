@@ -138,6 +138,12 @@ fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         return;
     }
 
+	if (B->length < 8)
+	{
+        fmpz_mod_poly_divrem_basecase(Q, R, A, B);
+        return;
+    }
+	
     fmpz_init(invB);
     fmpz_invmod(invB, fmpz_mod_poly_lead(B), &(B->p));
 

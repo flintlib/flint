@@ -12,19 +12,18 @@
 #include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mpoly.h"
+#include "mpoly.h"
 
 #if FLINT64
 
-void _fmpz_mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2, 
-                                                            slong n, slong len)
+void mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2, 
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/8;
-   r = n%8;
+   q = num/8;
+   r = num%8;
 
    for (i = 0; i < len; i++)
    {
@@ -51,14 +50,14 @@ void _fmpz_mpoly_unpack_monomials_8to64(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2, 
-                                                            slong n, slong len)
+void mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2, 
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/4;
-   r = n%4;
+   q = num/4;
+   r = num%4;
 
    for (i = 0; i < len; i++)
    {
@@ -81,14 +80,14 @@ void _fmpz_mpoly_unpack_monomials_16to64(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2, 
-                                                            slong n, slong len)
+void mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2, 
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/2;
-   r = n%2;
+   q = num/2;
+   r = num%2;
 
    for (i = 0; i < len; i++)
    {
@@ -104,14 +103,14 @@ void _fmpz_mpoly_unpack_monomials_32to64(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
-                                                            slong n, slong len)
+void mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
+                                                          slong len, slong num)
 {
    slong i, j, q, r, r2, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/8;
-   r = n%8;
+   q = num/8;
+   r = num%8;
 
    for (i = 0; i < len; i++)
    {
@@ -139,7 +138,7 @@ void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2,
          }
 
          for (j = 0; j + 1 < r2; j += 2)
-            exps1[k1++] = ((v >> (24 - 8*j)) & UWORD(0xFF00000000)) + ((v >> (56 - 8*j)) & UWORD(0xFF));
+            exps1[k1++] = ((v >> (24 - 8*j)) & UWORD(0xFF00000000)) + ((v >> (48 - 8*j)) & UWORD(0xFF));
 
          if (r2 & 1)
             exps1[k1++] = ((v >> (24 - 8*j)) & UWORD(0xFF00000000));
@@ -147,14 +146,14 @@ void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
-                                                            slong n, slong len)
+void mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/4;
-   r = n%4;
+   q = num/4;
+   r = num%4;
 
    for (i = 0; i < len; i++)
    {
@@ -181,14 +180,14 @@ void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
-                                                            slong n, slong len)
+void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
+                                                          slong len, slong num)
 {
    slong i, j, q, r, r2, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/8;
-   r = n%8;
+   q = num/8;
+   r = num%8;
 
    for (i = 0; i < len; i++)
    {
@@ -235,14 +234,14 @@ void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 
 #else
 
-void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
-                                                            slong n, slong len)
+void mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2, 
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/4;
-   r = n%4;
+   q = num/4;
+   r = num%4;
 
    for (i = 0; i < len; i++)
    {
@@ -265,21 +264,21 @@ void _fmpz_mpoly_unpack_monomials_8to32(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
-                                                            slong n, slong len)
+void mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2, 
+                                                          slong len, slong num)
 {
    slong i, j, q, r, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/2;
-   r = n%2;
+   q = num/2;
+   r = num%2;
 
    for (i = 0; i < len; i++)
    {
       for (j = 0; j < q; j++)
       {
          v = exps2[k2++];
-         exps1[k1++] = ((v >> 16);
+         exps1[k1++] = (v >> 16);
          exps1[k1++] = (v & UWORD(0xFFFF));
       }
       
@@ -288,14 +287,14 @@ void _fmpz_mpoly_unpack_monomials_16to32(ulong * exps1, const ulong * exps2,
    }
 }
 
-void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
-                                                            slong n, slong len)
+void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2, 
+                                                          slong len, slong num)
 {
    slong i, j, q, r, r2, k1 = 0, k2 = 0;
    ulong v;
 
-   q = n/4;
-   r = n%4;
+   q = num/4;
+   r = num%4;
 
    for (i = 0; i < len; i++)
    {
@@ -328,38 +327,48 @@ void _fmpz_mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 
 #endif
 
-ulong * _fmpz_mpoly_unpack_monomials(slong bits1, const ulong * exps2, 
-                                               slong bits2, slong n, slong len)
+
+/*
+    exps2 = packed vectors to unpack
+    bits2 = bits per field in exps2
+    len = number of packed vectors to unpack
+    num = number of elements in each vector
+
+    exps1 = destination for unpacked vector
+    bits1 = number of bits desired in return packed vector
+*/
+void mpoly_unpack_monomials(ulong * exps1, slong bits1,
+                   const ulong * exps2, slong bits2, slong len, slong num)
 {
-   ulong * exps1;
-   slong N;
+    FLINT_ASSERT(bits1 >= bits2);
 
-   if (bits1 == bits2)
-      return (ulong *) exps2;
+    if (bits1 == bits2) {
 
-   N = (n*bits1 - 1)/FLINT_BITS + 1; /* number of words per exponent vector */
+        slong i, N = (bits2*num - 1)/FLINT_BITS + 1;
 
-   exps1 = (ulong *) flint_malloc(N*len*sizeof(ulong));
+        for (i = 0; i < N*len; i++)
+            exps1[i] = exps2[i];
+
+        return;
+    }
 
 #if FLINT64
    if (bits1 == 64)
    {
       if (bits2 == 8)
-         _fmpz_mpoly_unpack_monomials_8to64(exps1, exps2, n, len);
+         mpoly_unpack_monomials_8to64(exps1, exps2, len, num);
       else if (bits2 == 16)
-         _fmpz_mpoly_unpack_monomials_16to64(exps1, exps2, n, len);
+         mpoly_unpack_monomials_16to64(exps1, exps2, len, num);
       else /* bits2 == 32 */
-         _fmpz_mpoly_unpack_monomials_32to64(exps1, exps2, n, len);
-   } else 
+         mpoly_unpack_monomials_32to64(exps1, exps2, len, num);
+   } else
 #endif
    if (bits1 == 32)
    {
       if (bits2 == 8)
-         _fmpz_mpoly_unpack_monomials_8to32(exps1, exps2, n, len);
+         mpoly_unpack_monomials_8to32(exps1, exps2, len, num);
       else /* bits2 == 16 */
-         _fmpz_mpoly_unpack_monomials_16to32(exps1, exps2, n, len);
+         mpoly_unpack_monomials_16to32(exps1, exps2, len, num);
    } else  /* bits1 == 16, bits2 = 8 */
-         _fmpz_mpoly_unpack_monomials_8to16(exps1, exps2, n, len);
-
-   return exps1;
+         mpoly_unpack_monomials_8to16(exps1, exps2, len, num);
 }

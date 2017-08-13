@@ -53,6 +53,12 @@ typedef struct
 
 typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
 
+typedef struct
+{
+   slong count;
+   void * address;
+} fmpz_block_header_s;
+
 /* maximum positive value a small coefficient can have */
 #define COEFF_MAX ((WORD(1) << (FLINT_BITS - 2)) - WORD(1))
 
@@ -260,6 +266,10 @@ fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
         z->_mp_size = -2;
     }
 }
+
+FLINT_DLL void fmpz_set_signed_uiui(fmpz_t r, ulong hi, ulong lo);
+
+FLINT_DLL void fmpz_set_signed_uiuiui(fmpz_t r, ulong hi, ulong mid, ulong lo);
 
 FLINT_DLL void fmpz_get_mpz(mpz_t x, const fmpz_t f);
 

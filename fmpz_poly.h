@@ -91,7 +91,7 @@ void _fmpz_poly_set_length(fmpz_poly_t poly, slong newlen)
     {
         slong i;
         for (i = newlen; i < poly->length; i++)
-            _fmpz_demote(poly->coeffs + i); 
+           _fmpz_demote(poly->coeffs + i); 
     }
     poly->length = newlen;
 }

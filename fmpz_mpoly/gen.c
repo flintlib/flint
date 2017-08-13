@@ -21,10 +21,10 @@ void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
     slong k = FLINT_BITS/bits;
 
     fmpz_set_ui(poly + 0, 1);
-    if (rev)
-       exps[0] = (UWORD(1) << ((k - n + i)*bits));
-    else
+    if (!rev)
        exps[0] = (UWORD(1) << ((k - i - deg - 1)*bits));
+    else
+       exps[0] = (UWORD(1) << ((k - n + i)*bits));
     
     if (deg)
        exps[0] |= (UWORD(1) << ((k - 1)*bits));
@@ -56,7 +56,7 @@ void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
 
     mon[i] = 1;
 
-    _fmpz_mpoly_set_monomial(exps, mon, bits, n, deg, rev);
+    mpoly_set_monomial(exps, mon, bits, n, deg, rev);
 
     TMP_END;
 }

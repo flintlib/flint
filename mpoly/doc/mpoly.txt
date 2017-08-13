@@ -1,0 +1,348 @@
+/*
+    Copyright (C) 2017 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+*******************************************************************************
+
+    Orderings
+
+*******************************************************************************
+
+ordering_t mpoly_ordering_randtest(flint_rand_t state)
+
+    Return a random ordering. The possibilities are \code{ORD_LEX},
+    \code{ORD_DEGLEX} and \code{ORD_DEGREVLEX}.
+
+int mpoly_ordering_isdeg(ordering_t ord)
+
+    Return 1 if the given ordering is a degree ordering (deglex or degrevlex).
+
+int mpoly_ordering_isrev(ordering_t ord)
+
+    Return 1 if the given ordering is a reverse ordering (currently only
+    degrevlex).
+
+void mpoly_ordering_print(ordering_t ord)
+
+    Print a string (either ``lex'', ``deglex'' or ``degrevlex'') to standard
+    output, corresponding to the given ordering.
+
+*******************************************************************************
+
+    Monomial arithemtic
+
+*******************************************************************************
+
+void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2,
+                                                   const ulong * exp3, slong N)
+
+    Set \code{(exp_ptr, N)} to the sum of the monomials \code{(exp2, N)} and
+    \code{(exp3, N)}, i.e. \code{exp2 + exp3}.
+
+void mpoly_monomial_sub_with_borrow(ulong * exp_ptr, const ulong * exp2, 
+                                                   const ulong * exp3, slong N)
+    Set \code{(exp_ptr, N)} to the difference of the monomials \code{(exp2, N)}
+    and \code{(exp3, N)} where \code{exp2} and \code{exp3} are considered as
+    multiprecision integers. This may lead to an invalid monomial
+    \code{exp_ptr} in the presence of borrows, i.e. if some field of
+    \code{exp3} exceeds the corresponding field of \code{exp2}. The most
+    significant word of the multiprecision integers is taken to be the first
+    entry in the array, i.e. the word corresponding to the most significant
+    fields with respect to the monomial ordering.
+
+void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2,
+                                                   const ulong * exp3, slong N)
+    Set \code{(exp_ptr, N)} to the difference of the monomials \code{(exp2, N)}
+    and \code{(exp3, N)}, i.e. \code{exp2 - exp3}.
+
+int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
+
+    Return true if any of the fields of the given monomial \code{(exp2, N)} has
+    overflowed (or is negative). The \code{mask} is a word with the high bit of
+    each field set to 1. In other words, the function returns 1 if any word of
+    \code{exp2} has any of the nonzero bits in \code{mask} set.
+
+int mpoly_monomial_overflows1(ulong exp, ulong mask)
+
+    As per \code{mpoly_monomial_overflows} with \code{N = 1}.
+
+void mpoly_monomial_set(ulong * exp2, const ulong * exp3, slong N)
+
+    Set the monomial \code{(exp2, N)} to \code{(exp3, N)}.
+
+void mpoly_monomial_swap(ulong * exp2, ulong * exp3, slong N)
+
+    Swap the words in \code{(exp2, N)} and \code{(exp3, N)}.
+
+void mpoly_monomial_mul_si(ulong * exp2, const ulong * exp3, slong N, slong c)
+
+    Set the words of \code{(exp2, N)} to the words of \code{(exp3, N)}
+    multiplied by \code{c}.
+
+*******************************************************************************
+
+    Monomial comparison
+
+*******************************************************************************
+
+int mpoly_monomial_is_zero(const ulong * exp, slong N)
+
+    Return 1 if \code{(exp, N)} is zero.
+
+int mpoly_monomial_equal(const ulong * exp2, const ulong * exp3, slong N)
+
+    Return 1 if the monomials \code{(exp2, N)} and \code{(exp3, N)} are equal.
+
+int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3,
+                                           slong N, ulong maskhi, ulong masklo)
+
+    Return 1 if \code{(exp2, N)} is less than \code{(exp3, N)}. The integers
+    \code{maskhi} and \code{masklo} are zero unless the ordering is degrevlex.
+    In the case that the ordering is degrevlex, the integer \code{maskhi} is a
+    mask of the bits in the first word of each exponent vector corresponding to
+    the non-degree part of that word of the exponent vector. The integer
+    \code{masklo} will be a mask of all bits of the word.
+
+int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3,
+                                           slong N, ulong maskhi, ulong masklo)
+
+    Return 1 if \code{(exp2, N)} is greater than \code{(exp3, N)}. The integers
+    \code{maskhi} and \code{masklo} are zero unless the ordering is degrevlex.
+    In the case that the ordering is degrevlex, the integer \code{maskhi} is a
+    mask of the bits in the first word of each exponent vector corresponding to
+    the non-degree part of that word of the exponent vector. The integer
+    \code{masklo} will be a mask of all bits of the word.
+
+int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
+                                           slong N, ulong maskhi, ulong masklo)
+
+    Return $1$ if \code{(exp2, N)} is greater than, $0$ if it is equal and
+    $-1$ if it is less than, \code{(exp3, N)}. The integers \code{maskhi} and
+    \code{masklo} are zero unless the ordering is degrevlex. In the case that
+    the ordering is degrevlex, the integer \code{maskhi} is a mask of the bits
+    in the first word of each exponent vector corresponding to the non-degree
+    part of that word of the exponent vector. The integer \code{masklo} will be
+    a mask of all bits of the word.
+
+*******************************************************************************
+
+    Monomial divisibility
+
+*******************************************************************************
+
+int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2,
+                                       const ulong * exp3, slong N, ulong mask)
+
+    Return 1 if the monomial \code{(exp3, N)} divides \code{(exp2, N)}. If so
+    set \code{(exp_ptr, N)} to the quotient monomial. The \code{mask} is a word
+    with the high bit of each bit field set to 1.
+
+int mpoly_monomial_divides1(ulong * exp_ptr, const ulong exp2,
+                                                  const ulong exp3, ulong mask)
+
+    As per \code{mpoly_monomial_divides} with \code{N = 1}.
+
+
+int mpoly_monomial_divides_tight(slong e1, slong e2, slong * prods, slong num)
+
+    Return 1 if the monomial \code{e2} divides the monomial \code{e1}, where
+    the monomials are stored using factorial representation. The array
+    \code{(prods, num)} should consist of $1$, $b_1$, $b_1\times b_2, \ldots$,
+    where the $b_i$ are the bases of the factorial number representation.
+
+*******************************************************************************
+
+    Basic manipulation
+
+*******************************************************************************
+
+void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
+                                                slong len, slong bits, slong n)
+
+    Given an array of exponent vectors \code{poly_exps} of length \code{len},
+    each with $n$ fields each packed into the given number of bits, compute the
+    maximum exponent in each of the $n$ fields. The results are stored in an
+    array \code{max_degs} which should have space for $n$ values, each of which
+    is a \code{ulong}. The first entry of \code{max_degs} will correspond to the
+    fields of least significance in the input exponent vector. Similarly, the
+    last entry of \code{max_degs} will correspond to the field of most
+    significance in the input exponent vector. This reversal of order is
+    compatible with \code{mpoly_pack_monomials_tight}.
+
+void mpoly_max_degrees_tight(slong * max_exp,
+                             ulong * exps, slong len, slong * prods, slong num)
+
+    Return an array of \code{num} integers corresponding to the maximum degrees
+    of the exponents in the array of exponent vectors \code{(exps, len)},
+    assuming that the exponent are packed in a factorial representation. The
+    array \code{(prods, num)} should consist of $1$, $b_1$,
+    $b_1\times b_2, \ldots$, where the $b_i$ are the bases of the factorial
+    number representation. The results are stored in the array \code{max_exp},
+    with the entry corresponding to the most significant base of the factorial
+    representation first in the array.
+
+int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
+             const ulong * exp, slong len, slong N, ulong maskhi, ulong masklo)
+
+    Returns true if the given exponent vector \code{exp} exists in the array of
+    exponent vectors \code{(poly_exps, len)}, otherwise, return false. If the
+    exponent vector is found, its index into the array of exponent vectors is
+    returned. Otherwise, \code{index} is set to the index where this exponent
+    could be inserted to preserve the ordering. The index can be in the range
+    \code{[0, len]}$.
+
+    The parameter $N$ is the number of words that each (possibly packed)
+    exponent vector takes up. The integers \code{maskhi} and \code{masklo} are
+    zero unless the ordering is degrevlex. In the case that the ordering
+    is degrevlex, the integer \code{maskhi} is a mask of the bits in the first
+    word of each exponent vector corresponding to the non-degree part of that
+    word of the exponent vector. The integer \code{masklo} will be a mask of
+    all bits of the word.
+
+*******************************************************************************
+
+    Setting and getting monomials
+
+*******************************************************************************
+
+void mpoly_set_monomial(ulong * exp1, const ulong * exp2,
+                                         slong bits, slong n, int deg, int rev)
+
+    Given an array of possibly packed exponent vectors \code{exp1}, each with
+    $n$ fields (including any degree field) each packed into the given number
+    of bits, set the monomial at index $n$ to the given exponent vector
+    \code{exp2}. The exponent vector \code{exp2} should be unpacked (one word
+    per exponent), should not contain a degree field (this is computed by the
+    function), and should have the entry of the exponent vector corresponding
+    to the most significant variable with respect to the ordering, first in the
+    array \code{exp2}.
+
+    If the ordering is a degree ordering \code{deg} should be set to 1 and if
+    the ordering is degrevlex, rev should also be set to 1. Otherwise
+    \code{deg} and \code{rev} should be 0.
+
+void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
+                                         slong bits, slong n, int deg, int rev)
+
+
+    Given an array of possibly packed exponent vectors, each packed into the
+    given number of bits, get the monomial at index $n$ and set \code{exps} to
+    the corresponding unpacked exponent vector. The degree field, if any, is
+    not returned, thus the first entry of the return value \code{exp1} will
+    contain the entry of the exponent vector corresponding to the most
+    significant variable with respect to the ordering. 
+
+    If the ordering is a degree ordering \code{deg} should be set to 1 and if
+    the ordering is degrevlex, rev should also be set to 1. Otherwise
+    \code{deg} and \code{rev} should be 0.
+
+*******************************************************************************
+
+    Packing and unpacking monomials
+
+*******************************************************************************
+
+void mpoly_unpack_monomials(ulong * exps1, slong bits1,
+                        const ulong * exps2, slong bits2, slong len, slong num)
+
+    Given an array of exponent vectors \code{exps2} of length \code{len}, each
+    of the \code{num} fields of which is packed into \code{bits2} bits, pack
+    the exponent vectors into an array of exponent vectors \code{exps1}, each
+    field of which consists of \code{bits1} bits. We require that
+    \code{bits2 <= bits1 <= FLINT_BITS). It is assumed that \code{exps1} has
+    sufficient space for the output.
+ 
+
+void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,
+            slong len, const slong * mults, slong num, slong extra, slong bits)
+
+    Given an array of possibly packed exponent vectors \code{exp2} of length
+    \code{len}, where each field of each exponent vector is packed into the
+    given number of bits, return the corresponding array of monomial vectors
+    packed using a factorial numbering scheme. The ``bases'' for the factorial
+    numbering scheme are given as an array of integers \code{mults}, the first
+    entry of which corresponds to the field of least significance in each 
+    input exponent vector. Obviously the maximum exponent to be packed must be
+    less than the corresponding base in \code{mults}.
+
+    The number of multipliers is given by \code{num}. The code only considers
+    least significant \code{num} fields of each exponent vectors and ignores
+    the rest. The number of ignored fields should be passed in \code{extras}.
+
+void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
+                               slong * mults, slong num, slong extra, slong bits)
+
+    Given an array of exponent vectors \code{e2} of length \code{len} packed
+    using a factorial numbering scheme, unpack the monomials into an array
+    \code{e1} of exponent vectors in standard packed format, where each field
+    has the given number of bits. The ``bases'' for the factorial
+    numbering scheme are given as an array of integers \code{mults}, the first
+    entry of which corresponds to the field of least significance in each 
+    exponent vector.
+  
+    The number of multipliers is given by \code{num}. The code only considers
+    least significant \code{num} fields of each exponent vectors and ignores the
+    rest. The number of ignored fields should be passed in \code{extras}.
+
+*******************************************************************************
+
+    Chunking
+
+*******************************************************************************
+
+void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
+                          slong l1, slong len1, slong k, slong num, slong bits)
+
+    Given an array of exponent vectors \code{(exp1, len1)}, each exponent
+    vector taking one word of space, with each exponent being packed into the
+    given number of bits, compute \code{l1} starting offsets \code{i1} and
+    lengths \code{n1} (which may be zero) to break the exponents into chunks.
+    Each chunk consists of exponents have the same degree in the main variable.
+    The index of the main variable is given by $k$. The variables are indexed
+    from the variable of least significance, starting from $0$. The value 
+    \code{l1} should be the degree in the main variable, plus one.
+
+*******************************************************************************
+
+    Chained heap functions
+
+*******************************************************************************
+
+int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
+                         slong * heap_len, slong N, ulong maskhi, ulong masklo)
+
+    Given a heap, insert a new node $x$ corresponding to the given exponent
+    into the heap. Heap elements are ordered by the exponent \code{(exp, N)},
+    with the largest element at the head of the heap. A pointer to the current
+    heap length must be passed in via \code{heap_len}. This will be updated by
+    the function. Note that the index 0 position in the heap is not used, so
+    the length is always one greater than the number of elements. The
+    \code{maskhi} and \code{masklo} values are zero except for degrevlex
+    ordering, where they are as per the monomial comparison operations above.
+
+void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
+                                      void * x, slong * heap_len, ulong maskhi)
+
+    As per \code{_mpoly_heap_insert} except that \code{N = 1}.
+
+void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
+                                                    ulong maskhi, ulong masklo)
+
+    Pop the head of the heap. It is cast to a \code{void *}. A pointer to the
+    current heap length must be passed in via \code{heap_len}. This will be
+    updated by the function. Note that the index 0 position in the heap is not
+    used, so the length is always one greater than the number of elements. The 
+    \code{maskhi} and \code{masklo} values are zero except for degrevlex
+    ordering, where they are as per the monomial comparison operations above.
+
+void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len, ulong maskhi)
+
+    As per \code{_mpoly_heap_pop1} except that \code{N = 1}.
+

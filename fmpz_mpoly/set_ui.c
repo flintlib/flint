@@ -17,7 +17,7 @@
 
 void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
 {
-   slong m, i;
+   slong N, i;
 
    if (c == 0)
    {
@@ -29,9 +29,9 @@ void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
 
    fmpz_set_ui(poly->coeffs, c);
 
-   m = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
 
-   for (i = 0; i < m; i++)
+   for (i = 0; i < N; i++)
       poly->exps[i] = 0;
 
    _fmpz_mpoly_set_length(poly, 1, ctx);

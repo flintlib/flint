@@ -16,7 +16,7 @@
 #include "fmpz_mpoly.h"
 
 int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
-                     const fmpz * poly2, const ulong * exps2, slong n, slong m)
+                     const fmpz * poly2, const ulong * exps2, slong n, slong N)
 {
    slong i;
 
@@ -31,7 +31,7 @@ int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
 
    if (exps1 != exps2)
    {
-      for (i = 0; i < n*m; i++)
+      for (i = 0; i < n*N; i++)
       {
          if (exps1[i] != exps2[i])
             return 0;
@@ -44,9 +44,9 @@ int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
 int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-   ulong * ptr1, * ptr2;
-   slong max_bits, m;
-   int r;
+   ulong * ptr1 = poly1->exps, * ptr2 = poly2->exps;
+   slong max_bits, N;
+   int r, free1 = 0, free2 = 0;
 
    if (poly1 == poly2)
       return 1;
@@ -55,21 +55,31 @@ int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       return 0;
 
    max_bits = FLINT_MAX(poly1->bits, poly2->bits);
-   m = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
 
-   ptr1 = _fmpz_mpoly_unpack_monomials(max_bits, poly1->exps, 
-                                           poly1->bits, ctx->n, poly1->length);
+   if (max_bits > poly1->bits)
+   {
+      free1 = 1;
+      ptr1 = (ulong *) flint_malloc(N*poly1->length*sizeof(ulong));
+      mpoly_unpack_monomials(ptr1, max_bits, poly1->exps, poly1->bits,
+                                                        poly1->length, ctx->n);
+   }
 
-   ptr2 = _fmpz_mpoly_unpack_monomials(max_bits, poly2->exps, 
-                                           poly2->bits, ctx->n, poly2->length);
+   if (max_bits > poly2->bits)
+   {
+      free2 = 1;
+      ptr2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials(ptr2, max_bits, poly2->exps, poly2->bits,
+                                                        poly2->length, ctx->n);
+   }
 
    r = _fmpz_mpoly_equal(poly1->coeffs, ptr1,
-                                        poly2->coeffs, ptr2, poly2->length, m);
+                                        poly2->coeffs, ptr2, poly2->length, N);
 
-   if (ptr1 != poly1->exps)
+   if (free1)
       flint_free(ptr1);
 
-   if (ptr2 != poly2->exps)
+   if (free2)
       flint_free(ptr2);
 
    return r;

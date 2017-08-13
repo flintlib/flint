@@ -540,7 +540,10 @@ void _fmpz_mod_poly_divrem(fmpz *Q, fmpz *R,
                            const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
                            const fmpz_t invB, const fmpz_t p)
 {
-    _fmpz_mod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, p);
+    if (lenB < 8)
+	   _fmpz_mod_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, p);
+	else
+	   _fmpz_mod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, p);
 }
 
 FMPZ_MOD_POLY_INLINE 
@@ -792,6 +795,20 @@ fmpz_mod_poly_xgcd_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_po
 {
     fmpz_mod_poly_xgcd_euclidean_f(f, G, S, T, A, B);
 }
+
+FLINT_DLL slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, 
+                    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+                                            const fmpz_t invA, const fmpz_t p);
+
+FLINT_DLL void fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, 
+          fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+							 
+FLINT_DLL slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S, 
+                  const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+                                            const fmpz_t invA, const fmpz_t p);
+
+FLINT_DLL void fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G, 
+          fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
 FLINT_DLL slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
                            const fmpz *A, slong lenA, const fmpz *B, slong lenB, 

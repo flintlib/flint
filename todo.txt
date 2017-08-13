@@ -91,15 +91,26 @@ fmpz_factor
 
 * Use multipoint polynomial evaluation in ECM stage II.
 
-fmpz_mpoly / nmod_mpoly
------------------------
+fmpz_mpoly
+----------
 
-* Write fmpz_mpoly_max_bits, use in t-mul_heap test code and mul_heap
+* Rename divrem_ideal to divrem_ideal_monagan_pearce.
 
-* Write ACCUM2 and ACCUM3 assembly functions and use in mul_heap
+* Implement array version of divrem_ideal.
 
-* Make mul_heap take arrays of fmpz's as arguments and document function
+* Don't restart division if upgrading to multiprecision.
 
+* Check quotient and remainder coefficients are normalised the same way for
+  small vs multiprecision division functions. Beware one normalisation may
+  require an extra bit for either q or r in signed integer division in
+  small case. This is probably why C division is normalised the way it is.
+
+* Move _fmpz_mpoly_max_degrees to mpoly module and rename.
+
+* Implement fmpz_mpoly_ui/si/fmpz_sub functions for Nemo.
+
+* Add references to Monagan and Pearce papers to bibtex and reference in
+  heap multiplication, powering and division functions.
 
 nmod_poly
 ---------

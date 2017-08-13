@@ -17,18 +17,19 @@
 
 slong _fmpz_mpoly_sub1(fmpz * poly1, ulong * exps1,
                  const fmpz * poly2, const ulong * exps2, slong len2,
-                           const fmpz * poly3, const ulong * exps3, slong len3)
+                 const fmpz * poly3, const ulong * exps3, slong len3,
+                                                                  ulong maskhi)
 {
    slong i = 0, j = 0, k = 0;
 
    while (i < len2 && j < len3)
    {
-      if (exps2[i] < exps3[j])
+      if ((exps2[i]^maskhi) > (exps3[j]^maskhi))
       {
          fmpz_set(poly1 + k, poly2 + i);
          exps1[k] = exps2[i];
          i++;
-      } else if (exps2[i] == exps3[j])
+      } else if ((exps2[i]^maskhi) == (exps3[j]^maskhi))
       {
          fmpz_sub(poly1 + k, poly2 + i, poly3 + j);
          exps1[k] = exps2[i];
@@ -66,15 +67,20 @@ slong _fmpz_mpoly_sub1(fmpz * poly1, ulong * exps1,
 
 slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
                   const fmpz * poly2, const ulong * exps2, slong len2,
-                  const fmpz * poly3, const ulong * exps3, slong len3, slong N)
+                  const fmpz * poly3, const ulong * exps3, slong len3, slong N,
+                                                    ulong maskhi, ulong masklo)
 {
    slong i = 0, j = 0, k = 0;
 
+   if (N == 1)
+      return _fmpz_mpoly_sub1(poly1, exps1, poly2, exps2, len2,
+                                                   poly3, exps3, len3, maskhi);
+
    while (i < len2 && j < len3)
    {
-      int cmp = mpoly_monomial_cmp(exps2 + i*N, exps3 + j*N, N);
+      int cmp = mpoly_monomial_cmp(exps2 + i*N, exps3 + j*N, N, maskhi, masklo);
 
-      if (cmp < 0)
+      if (cmp > 0)
       {
          fmpz_set(poly1 + k, poly2 + i);
          mpoly_monomial_set(exps1 + k*N, exps2 + i*N, N);
@@ -119,21 +125,40 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
    slong len = 0, max_bits, N;
-   ulong * ptr1, * ptr2;
-   int free2, free3;
+   ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
+   ulong maskhi, masklo;
+   int free2 = 0, free3 = 0;
 
    max_bits = FLINT_MAX(poly2->bits, poly3->bits);
+   masks_from_bits_ord(maskhi, masklo, max_bits, ctx->ord);
    N = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
    
-   ptr1 = _fmpz_mpoly_unpack_monomials(max_bits, poly2->exps, 
-                                           poly2->bits, ctx->n, poly2->length);
+   /* treat cases of length 0 first */
+   if (poly2->length == 0)
+   {
+      fmpz_mpoly_neg(poly1, poly3, ctx);
+      return;
+   } else if (poly3->length == 0)
+   {
+      fmpz_mpoly_set(poly1, poly2, ctx);
+      return;
+   }
 
-   free2 = ptr1 != poly2->exps;
+   if (max_bits > poly2->bits)
+   {
+      free2 = 1;
+      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
+      mpoly_unpack_monomials(exp2, max_bits, poly2->exps, poly2->bits,
+                                                        poly2->length, ctx->n);
+   }
 
-   ptr2 = _fmpz_mpoly_unpack_monomials(max_bits, poly3->exps, 
-                                           poly3->bits, ctx->n, poly3->length);
-
-   free3 = ptr2 != poly3->exps;
+   if (max_bits > poly3->bits)
+   {
+      free3 = 1;
+      exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
+      mpoly_unpack_monomials(exp3, max_bits, poly3->exps, poly3->bits,
+                                                        poly3->length, ctx->n);
+   }
 
    if (poly1 == poly2 || poly1 == poly3)
    {
@@ -141,10 +166,11 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       fmpz_mpoly_init2(temp, poly2->length + poly3->length, ctx);
       fmpz_mpoly_fit_bits(temp, max_bits, ctx);
+      temp->bits = max_bits;
 
       len = _fmpz_mpoly_sub(temp->coeffs, temp->exps, 
-                    poly2->coeffs, ptr1, poly2->length,
-                    poly3->coeffs, ptr2, poly3->length, N);
+                    poly2->coeffs, exp2, poly2->length,
+                    poly3->coeffs, exp3, poly3->length, N, maskhi, masklo);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -153,17 +179,18 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    {
       fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length, ctx);
       fmpz_mpoly_fit_bits(poly1, max_bits, ctx);
+      poly1->bits = max_bits;
 
       len = _fmpz_mpoly_sub(poly1->coeffs, poly1->exps, 
-                       poly2->coeffs, ptr1, poly2->length,
-                       poly3->coeffs, ptr2, poly3->length, N);
+                       poly2->coeffs, exp2, poly2->length,
+                       poly3->coeffs, exp3, poly3->length, N, maskhi, masklo);
    }
       
    if (free2)
-      flint_free(ptr1);
+      flint_free(exp2);
 
    if (free3)
-      flint_free(ptr2);
+      flint_free(exp3);
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
 }

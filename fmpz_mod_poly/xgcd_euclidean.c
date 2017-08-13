@@ -72,10 +72,10 @@ slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
 
             do {
                 fmpz_invmod(inv, V3 + (lenV3 - 1), p);
-                _fmpz_mod_poly_divrem(Q, R, D, lenD, V3, lenV3, inv, p);
+                _fmpz_mod_poly_divrem_basecase(Q, D, D, lenD, V3, lenV3, inv, p);
                 lenQ = lenD - lenV3 + 1;
-                lenR = lenV3 - 1;
-                FMPZ_VEC_NORM(R, lenR);
+                lenD = lenV3 - 1;
+                FMPZ_VEC_NORM(D, lenD);
 
                 if (lenV1 >= lenQ)
                     _fmpz_mod_poly_mul(W, V1, lenV1, Q, lenQ, p);
@@ -88,19 +88,7 @@ slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
                 FMPZ_VEC_NORM(U, lenU);
 
                 FMPZ_VEC_SWAP(U, lenU, V1, lenV1);
-                {
-                    fmpz *__t;
-                    slong __tn;
-
-                    __t = D;
-                    D   = V3;
-                    V3  = R;
-                    R   = __t;
-                    __tn  = lenD;
-                    lenD  = lenV3;
-                    lenV3 = lenR;
-                    lenR  = __tn;
-                }
+                FMPZ_VEC_SWAP(D, lenD, V3, lenV3);
 
             } while (lenV3 != 0);
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,15 +11,21 @@
 
 #include <gmp.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_mpoly.h"
 
 void
-_fmpz_mpoly_normalise(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+fmpz_set_signed_uiui(fmpz_t r, ulong hi, ulong lo)
 {
-    slong i;
-
-    for (i = poly->length - 1; i >= 0 && poly->coeffs[i] == 0; i--) ;
-
-    poly->length = i + 1;
+    if (((slong) hi) < 0)
+    {
+        hi = -hi - (lo != 0);
+        lo = -lo;
+        fmpz_neg_uiui(r, hi, lo);
+    }
+    else
+    {
+        fmpz_set_uiui(r, hi, lo);
+    }
 }
+

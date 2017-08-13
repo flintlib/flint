@@ -204,6 +204,19 @@ void fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
     Sets $f$ to \code{lo}, plus \code{hi} shifted to the left by
     \code{FLINT_BITS}, and then negates $f$.
 
+void fmpz_set_signed_uiui(fmpz_t f, ulong hi, ulong lo)
+
+    Sets $f$ to \code{lo}, plus \code{hi} shifted to the left by
+    \code{FLINT_BITS}, interpreted as a signed two's complement
+    integer with \code{2 * FLINT_BITS} bits.
+
+void fmpz_set_signed_uiuiui(fmpz_t f, ulong hi, ulong mid, ulong lo)
+
+    Sets $f$ to \code{lo}, plus \code{mid} shifted to the left by
+    \code{FLINT_BITS}, plus \code{hi} shifted to the left by
+    \code{2*FLINT_BITS} bits, interpreted as a signed two's complement
+    integer with \code{3 * FLINT_BITS} bits.
+
 void fmpz_set_mpz(fmpz_t f, const mpz_t x)
 
     Sets $f$ to the given \code{mpz_t} value.
