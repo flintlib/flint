@@ -9,9 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_embed.h"
-#include "fq_zech_poly.h"
-
+#include "fq_nmod_embed.h"
+#include "fq_nmod_poly.h"
 
 #ifdef T
 #undef T
@@ -20,10 +19,10 @@
 #undef B
 #endif
 
-#define T fq_zech
-#define CAP_T FQ_ZECH
+#define T fq_nmod
+#define CAP_T FQ_NMOD
 #define B nmod
-#include "fq_embed_templates/test/t-embed.c"
+#include "fq_embed_templates/composition_matrix.c"
 #undef B
 #undef CAP_T
 #undef T

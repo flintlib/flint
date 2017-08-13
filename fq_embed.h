@@ -12,12 +12,36 @@
 #ifndef FQ_EMBED_H
 #define FQ_EMBED_H
 
+#ifdef FQ_EMBED_INLINES_C
+#define FQ_EMBED_INLINE FLINT_DLL
+#define FQ_EMBED_TEMPLATES_INLINE FLINT_DLL
+#else
+#define FQ_EMBED_INLINE static __inline__
+#define FQ_EMBED_TEMPLATES_INLINE static __inline__
+#endif
+
 #include "fq.h"
+#include "fmpz_mod_mat.h"
 
 #define T fq
-#define CAP_T FQ
+#define B fmpz_mod
 #include "fq_embed_templates.h"
-#undef CAP_T
+#undef B
 #undef T
+
+FQ_EMBED_INLINE void fq_modulus_derivative_inv(fq_t m_prime,
+					       fq_t m_prime_inv,
+					       const fq_ctx_t ctx) {
+    fmpz_mod_poly_t tmp;
+    fmpz_mod_poly_init(tmp, fq_ctx_prime(ctx));
+    
+    fmpz_mod_poly_derivative(tmp, fq_ctx_modulus(ctx));
+    fmpz_poly_fit_length(m_prime, tmp->length);
+    _fmpz_vec_set(m_prime->coeffs, tmp->coeffs, tmp->length);
+    _fmpz_poly_set_length(m_prime, tmp->length);
+    
+    fq_inv(m_prime_inv, m_prime, ctx);
+    fmpz_mod_poly_clear(tmp);
+}
 
 #endif

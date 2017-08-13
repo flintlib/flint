@@ -10,15 +10,20 @@
 */
 
 #include "fq_nmod_embed.h"
-
+#include "fq_nmod_poly.h"
 
 
 #ifdef T
 #undef T
 #endif
+#ifdef B
+#undef B
+#endif
 
 #define T fq_nmod
 #define CAP_T FQ_NMOD
+#define B nmod
 #include "fq_embed_templates/test/t-embed.c"
+#undef B
 #undef CAP_T
 #undef T

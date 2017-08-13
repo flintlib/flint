@@ -12,12 +12,27 @@
 #ifndef FQ_NMOD_EMBED_H
 #define FQ_NMOD_EMBED_H
 
+#ifdef FQ_NMOD_EMBED_INLINES_C
+#define FQ_NMOD_EMBED_INLINE FLINT_DLL
+#define FQ_EMBED_TEMPLATES_INLINE FLINT_DLL
+#else
+#define FQ_NMOD_EMBED_INLINE static __inline__
+#define FQ_EMBED_TEMPLATES_INLINE static __inline__
+#endif
+
 #include "fq_nmod.h"
 
 #define T fq_nmod
-#define CAP_T FQ_NMOD
+#define B nmod
 #include "fq_embed_templates.h"
-#undef CAP_T
+#undef B
 #undef T
+
+FQ_NMOD_EMBED_INLINE void fq_nmod_modulus_derivative_inv(fq_nmod_t m_prime,
+							 fq_nmod_t m_prime_inv,
+							 const fq_nmod_ctx_t ctx) {
+    nmod_poly_derivative(m_prime, fq_nmod_ctx_modulus(ctx));
+    fq_nmod_inv(m_prime_inv, m_prime, ctx);
+}
 
 #endif

@@ -10,20 +10,14 @@
 */
 
 #include "fq_zech_embed.h"
-#include "fq_zech_poly.h"
 
-
-#ifdef T
-#undef T
-#endif
-#ifdef B
-#undef B
-#endif
-
-#define T fq_zech
-#define CAP_T FQ_ZECH
-#define B nmod
-#include "fq_embed_templates/test/t-embed.c"
-#undef B
-#undef CAP_T
-#undef T
+void fq_zech_mul_matrix(nmod_mat_t matrix,
+                        const fq_zech_t gen,
+                        const fq_zech_ctx_t ctx) {
+    fq_nmod_t gen_nmod;
+    fq_nmod_ctx_struct *modulus = ctx->fq_nmod_ctx;
+    fq_nmod_init(gen_nmod, modulus);
+    fq_zech_get_fq_nmod(gen_nmod, gen, ctx);
+    fq_nmod_mul_matrix(matrix, gen_nmod, modulus);
+    fq_nmod_clear(gen_nmod, modulus);
+}

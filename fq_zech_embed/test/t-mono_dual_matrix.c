@@ -10,7 +10,7 @@
 */
 
 #include "fq_zech_embed.h"
-#include "fq_zech_poly.h"
+
 
 
 #ifdef T
@@ -23,7 +23,7 @@
 #define T fq_zech
 #define CAP_T FQ_ZECH
 #define B nmod
-#include "fq_embed_templates/test/t-embed.c"
+#include "fq_embed_templates/test/t-mono_dual_matrix.c"
 #undef B
 #undef CAP_T
 #undef T

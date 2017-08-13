@@ -16,18 +16,20 @@
 
 void TEMPLATE(T, embed_gens)(TEMPLATE(T, t) gen_sub,
                              TEMPLATE(T, t) gen_sup,
+                             TEMPLATE(B, poly_t) minpoly,
                              const TEMPLATE(T, ctx_t) sub_ctx,
                              const TEMPLATE(T, ctx_t) sup_ctx) {
     if (TEMPLATE(T, ctx_degree)(sub_ctx) == 1) {
         TEMPLATE(T, gen)(gen_sub, sub_ctx);
         TEMPLATE(T, set)(gen_sup, gen_sub, sup_ctx);
     } else {
-        _TEMPLATE(T, embed_gens_naive)(gen_sub, gen_sup, sub_ctx, sup_ctx);
+        _TEMPLATE(T, embed_gens_naive)(gen_sub, gen_sup, minpoly, sub_ctx, sup_ctx);
     }
 }
 
 void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
                                     TEMPLATE(T, t) gen_sup,
+                                    TEMPLATE(B, poly_t) minpoly,
                                     const TEMPLATE(T, ctx_t) sub_ctx,
                                     const TEMPLATE(T, ctx_t) sup_ctx) {
     TEMPLATE(T, poly_t) modulus, fact;
@@ -52,6 +54,11 @@ void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
     TEMPLATE(T, gen)(gen_sub, sub_ctx);
     TEMPLATE(T, set)(gen_sup, fact->coeffs, sup_ctx);
     TEMPLATE(T, neg)(gen_sup, gen_sup, sup_ctx);
+
+    TEMPLATE(B, poly_set)(minpoly, TEMPLATE(T, ctx_modulus)(sub_ctx));
+
+    TEMPLATE(T, poly_clear) (modulus, sup_ctx);
+    TEMPLATE(T, poly_clear) (fact, sup_ctx);
 }
 
 

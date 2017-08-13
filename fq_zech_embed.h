@@ -12,12 +12,37 @@
 #ifndef FQ_ZECH_EMBED_H
 #define FQ_ZECH_EMBED_H
 
+#ifdef FQ_ZECH_EMBED_INLINES_C
+#define FQ_ZECH_EMBED_INLINE FLINT_DLL
+#define FQ_EMBED_TEMPLATES_INLINE FLINT_DLL
+#else
+#define FQ_ZECH_EMBED_INLINE static __inline__
+#define FQ_EMBED_TEMPLATES_INLINE static __inline__
+#endif
+
 #include "fq_zech.h"
+#include "fq_nmod_embed.h"
 
 #define T fq_zech
-#define CAP_T FQ_ZECH
+#define B nmod
 #include "fq_embed_templates.h"
-#undef CAP_T
+#undef B
 #undef T
+
+FQ_ZECH_EMBED_INLINE void fq_zech_modulus_derivative_inv(fq_zech_t m_prime,
+							 fq_zech_t m_prime_inv,
+							 const fq_zech_ctx_t ctx) {
+    fq_nmod_t m_nmod, m_inv_nmod;
+    fq_nmod_init(m_nmod, ctx->fq_nmod_ctx);
+    fq_nmod_init(m_inv_nmod, ctx->fq_nmod_ctx);
+
+    fq_nmod_modulus_derivative_inv(m_nmod, m_inv_nmod, ctx->fq_nmod_ctx);
+    
+    fq_zech_set_fq_nmod(m_prime, m_nmod, ctx);
+    fq_zech_set_fq_nmod(m_prime_inv, m_inv_nmod, ctx);
+
+    fq_nmod_clear(m_nmod, ctx->fq_nmod_ctx);
+    fq_nmod_clear(m_inv_nmod, ctx->fq_nmod_ctx);
+}
 
 #endif
