@@ -14,21 +14,13 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-/* Current implementation follows */
-
-/*
 mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit) 
 {
     if (limit == UWORD(0)) return n_randlimb(state);
     else return n_randlimb(state) % limit;
 }
-*/
 
-/* Current implementation ends */
-
-/* New implementation follows */
-
-mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit) 
+mp_limb_t n_urandint(flint_rand_t state, const mp_limb_t limit) 
 {
     if ((limit & (limit - 1)) == 0)
     {
@@ -37,20 +29,16 @@ mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
     else
     {
         const mp_limb_t rand_max = UWORD_MAX;
-        mp_limb_t bucket_size, bucket_num, rand_within_range, temp_rand_max;
-        
-        temp_rand_max = rand_max - limit + 1;
+        mp_limb_t bucket_size, num_of_buckets, rand_within_range;
 
-        bucket_size = 1 + temp_rand_max/limit;
-        bucket_num = bucket_size*limit;
+        bucket_size = 1 + (rand_max - limit + 1)/limit;
+        num_of_buckets = bucket_size*limit;
         do
         {
             rand_within_range = n_randlimb(state);
         }
-        while (rand_within_range >= bucket_num);
+        while (rand_within_range >= num_of_buckets);
 
         return rand_within_range/bucket_size;
     }
 }
-
-/* New implementation ends */
