@@ -19,6 +19,8 @@ main(void)
     ulong limit, rand_num;
     slong deviation;
     int i, j, result;
+    int * count;
+    int * count_in_subrange;
 
     FLINT_TEST_INIT(state);
 
@@ -26,9 +28,13 @@ main(void)
     fflush(stdout);
 
     /* Test for limit <= 1000 */
-    for (limit = 1; limit <= 100 * flint_test_multiplier(); limit++)
+    count = flint_malloc(sizeof(int) * 1000);
+    for (limit = 1; limit <= 1000; limit+=10)
     {
-        int count[1000] = {0};
+        for (i = 0; i < limit; i++)
+        {
+            count[i] = 0;
+        }
 
         for (i = 0; i < 1000 * flint_test_multiplier(); i++)
         {
@@ -39,8 +45,8 @@ main(void)
         result = 1;
         for (i = 0; i < limit; i++)
         {
-            deviation = count[i] - 10000/limit;
-            if (deviation >= 315 || deviation <= -315)
+            deviation = count[i] - (1000 * flint_test_multiplier())/limit;
+            if (deviation >= WORD(100) * flint_test_multiplier() || deviation <= WORD(-100) * flint_test_multiplier())
             {
                 result = 0;
                 break;
@@ -51,14 +57,21 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("limit = %wu, deviation = %wd\n", limit, deviation);
+            flint_free(count);
             abort();
         }
     }
 
+    flint_free(count);
+    
     /* Test for larger values of limit */
-    for (i = 0; i < 1000; i++)
+    count_in_subrange = flint_malloc(sizeof(int) * 4);
+    for (i = 0; i < 1000; i+=10)
     {
-        ulong count_in_subrange[4] = {0};
+        for (j = 0; j < 4; j++)
+        {
+            count_in_subrange[j] = 0;
+        }
 
         limit = UWORD_MAX/(i + 2)*(i + 1);
 
@@ -87,8 +100,8 @@ main(void)
         result = 1;
         for (j = 0; j < 4; j++)
         {
-            deviation = count_in_subrange[j] - (10000 >> 2);
-            if (deviation >= WORD(575) || deviation <= WORD(-575))
+            deviation = count_in_subrange[j] - ((1000 * flint_test_multiplier()) >> 2);
+            if (deviation >= WORD(100) * flint_test_multiplier() || deviation <= WORD(-100) * flint_test_multiplier())
             {
                 result = 0;
                 break;
@@ -99,13 +112,12 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("limit = %wu, deviation = %wd\n", limit, deviation);
-            for (j = 0; j < 4; j++)
-            {
-                flint_printf("count_in_subrange[%d] = %wu\n", j, count_in_subrange[j]);
-            }
+            flint_free(count_in_subrange);
             abort();
         }
     }
+
+    flint_free(count_in_subrange);
 
     FLINT_TEST_CLEANUP(state);
 
