@@ -55,7 +55,8 @@ typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
 
 typedef struct
 {
-   slong count;
+   int count;
+   int main_thread;
    void * address;
 } fmpz_block_header_s;
 

@@ -10,7 +10,9 @@
 */
 
 #ifdef __unix__
+#define _GNU_SOURCE
 #include <unistd.h> /* sysconf */
+#include <sys/syscall.h> /* syscall, gettid */
 #endif
 
 #if defined(_WIN32) || defined(WIN32)
@@ -60,6 +62,15 @@ void * flint_align_ptr(void * ptr, slong size)
     return (void *)((mask & (slong) ptr) + size);
 }
 
+int flint_is_main_thread(void)
+{
+#if defined(__linux__) && HAVE_PTHREAD
+  return getpid() == syscall(SYS_gettid);
+#else
+  return 1;
+#endif
+}
+
 __mpz_struct * _fmpz_new_mpz(void)
 {
     if (mpz_free_num == 0) /* allocate more mpz's */
@@ -78,8 +89,9 @@ __mpz_struct * _fmpz_new_mpz(void)
         /* align to page boundary */
         aligned_ptr = flint_align_ptr(ptr, flint_page_size);
 
-        /* set free count to zero */
+        /* set free count to zero and determine if this is the main thread */
         ((fmpz_block_header_s *) ptr)->count = 0;
+        ((fmpz_block_header_s *) ptr)->main_thread = flint_is_main_thread();
 
         /* how many __mpz_structs worth are dedicated to header, per page */
         skip = (sizeof(fmpz_block_header_s) - 1)/sizeof(__mpz_struct) + 1;
@@ -123,7 +135,7 @@ void _fmpz_clear_mpz(fmpz f)
 
     header_ptr = (fmpz_block_header_s *) header_ptr->address;
 
-    if (header_ptr->count != 0) /* clean up if this is left over from a thread */
+    if (!header_ptr->main_thread || header_ptr->count != 0) /* clean up if this is left over from a thread */
     {
         mpz_clear(ptr);
 
