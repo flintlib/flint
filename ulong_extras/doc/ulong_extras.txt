@@ -48,6 +48,13 @@ ulong n_randint(flint_rand_t state, ulong limit)
     the given limit. If zero is passed as a parameter, an entire random
     limb is returned.
 
+ulong n_urandint(flint_rant_t state, ulong limit)
+    
+    Returns a uniformly pseudo random number up to but not including
+    the given limit. If zero is passed as a parameter, an entire random
+    limb is returned. This function provides somewhat better randomness
+    as compared to n_randint, especially for larger values of limit.
+
 ulong n_randtest(flint_rand_t state)
 
     Returns a pseudo random number with a random number of bits,
