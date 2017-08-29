@@ -68,19 +68,19 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
 {
    /*
       Given: f = a_0 + ... + a_N x^N and n in {0, 1, ..., N - 1}
-      Let B_1(r) = 1/(r^n+1)(|a_0| + ... + |a_n|r^n)
-      Let B_2(r) = 1/(r^n+1)(|a_n|r^{n+1} + ... + |a_N|r^N)
+      Let B_1(r) = 1/(r^{n+1})(|a_0| + ... + |a_n|r^n)
+      Let B_2(r) = 1/(r^{n+1})(|a_{n + 1}|r^{n+1} + ... + |a_N|r^N)
       Find r > 0 such that Max{B_1(r), B_2(r)} is minimized
       Return N*Max{B_1(r), B_2(r)}
 
    */
 
    /*
-      We let hi(x)    = 1/x^(n+1) * (a_{n+1}*x^(n+1) + ... + a_N*x^N)
-      so that hi(r)   = a_{n+1} + ... + a_N*r^(N-n-1) = B_2(r)
+      We let hi(x)    = 1/x^(n+1) * (|a_{n+1}|*x^(n+1) + ... + |a_N|*x^N)
+      so that hi(r)   = |a_{n+1}| + ... + |a_N|*r^(N-n-1) = B_2(r)
 
-      and let lo(x)   = a_n*x + ... + a_0*x^(n+1)
-      so that lo(1/r) = a_n/r + ... + a_0/r^{n+1}     = B_1(r)
+      and let lo(x)   = |a_n|*x + ... + |a_0|*x^(n+1)
+      so that lo(1/r) = |a_n|/r + ... + |a_0|/r^{n+1}     = B_1(r)
    */
 
    /*
@@ -152,7 +152,7 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
 
             rpow += step;
             r = pow(2.0, rpow);
-         } else if (hi_eval > DBL_MAX || lo_eval > DBL_MAX)
+         } else if (hi_eval != hi_eval || lo_eval != lo_eval)
          {
             /* doubles were insufficient after all */
             too_much = 1; 

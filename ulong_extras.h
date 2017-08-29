@@ -134,6 +134,8 @@ FLINT_DLL ulong n_randlimb(flint_rand_t state);
 
 FLINT_DLL ulong n_randint(flint_rand_t state, ulong limit);
 
+FLINT_DLL ulong n_urandint(flint_rand_t state, ulong limit);
+
 FLINT_DLL ulong n_randbits(flint_rand_t state, unsigned int bits);
 
 FLINT_DLL ulong n_randtest_bits(flint_rand_t state, int bits);

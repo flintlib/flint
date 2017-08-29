@@ -78,9 +78,11 @@ __mpz_struct * _fmpz_new_mpz(void)
         /* align to page boundary */
         aligned_ptr = flint_align_ptr(ptr, flint_page_size);
 
-        /* set free count to zero */
+        /* set free count to zero and determine if this is the main thread */
         ((fmpz_block_header_s *) ptr)->count = 0;
-
+#if HAVE_PTHREAD
+        ((fmpz_block_header_s *) ptr)->thread = pthread_self();
+#endif
         /* how many __mpz_structs worth are dedicated to header, per page */
         skip = (sizeof(fmpz_block_header_s) - 1)/sizeof(__mpz_struct) + 1;
 
@@ -123,7 +125,12 @@ void _fmpz_clear_mpz(fmpz f)
 
     header_ptr = (fmpz_block_header_s *) header_ptr->address;
 
-    if (header_ptr->count != 0) /* clean up if this is left over from a thread */
+    /* clean up if this is left over from another thread */
+#if HAVE_PTHREAD
+    if (header_ptr->count != 0 || header_ptr->thread != pthread_self()) 
+#else
+    if (header_ptr->count != 0)
+#endif
     {
         mpz_clear(ptr);
 

@@ -31,6 +31,9 @@
 #include "nmod_vec.h"
 #include "fmpz-conversions.h"
 
+#if HAVE_PTHREAD
+#include <pthread.h>
+#endif
 
 #ifdef __cplusplus
  extern "C" {
@@ -55,7 +58,10 @@ typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
 
 typedef struct
 {
-   slong count;
+   int count;
+#if HAVE_PTHREAD
+   pthread_t thread;
+#endif
    void * address;
 } fmpz_block_header_s;
 
