@@ -17,12 +17,18 @@ _perm_parity(const slong *vec, slong n)
     slong i, k;
     int * encountered;
     int parity;
+    TMP_INIT;
 
     if (n <= 1)
         return 0;
 
+    TMP_START;
+
     parity = 0;
-    encountered = flint_calloc(n, sizeof(int));
+    encountered = (int *) TMP_ALLOC(n*sizeof(int));
+
+    for (i = 0; i < n; i++)
+       encountered[i] = 0;
 
     for (i = 0; i < n; i++)
     {
@@ -42,6 +48,7 @@ _perm_parity(const slong *vec, slong n)
         }
     }
 
-    flint_free(encountered);
+    TMP_END;
+
     return parity;
 }
