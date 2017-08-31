@@ -206,6 +206,23 @@ int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
     word of the exponent vector. The integer \code{masklo} will be a mask of
     all bits of the word.
 
+void mpoly_search_monomials(
+                slong ** e_ind, ulong * e, slong * e_score,
+                slong * t1, slong * t2, slong *t3,
+                slong lower, slong upper,
+                const ulong * a, slong a_len, const ulong * b, slong b_len,
+                                          slong N, ulong maskhi, ulong masklo)
+    Given packed exponent vectors \code{a} and \code{b}, compute a packed
+    exponent \code{e} such that the number of monomials in the cross product
+    \code{a} X \code{b} that are less than or equal to \code{e} is between
+    \code{lower} and \code{upper}. This number is stored in \code{e_store}. If
+    no such monomial exists, one is chosen so that the number of monomials is as
+    close as possible. This function assumes that \code{1} is the smallest
+    monomial and needs three arrays \code{t1}, \code{t1}, and \code{t3} of the
+    size as \code{a} for workspace. The parameter \code{e_ind} is set to one
+    of \code{t1}, \code{t1}, and \code{t3} and gives the locations of the
+    monomials in \code{a} X \code{b}.
+
 *******************************************************************************
 
     Setting and getting monomials
