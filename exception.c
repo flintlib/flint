@@ -25,9 +25,9 @@ void __flint_set_abort_init()
 }
 #endif
 
-__attribute__ ((noreturn)) void (*abort_func)(void) = abort;
+void (*abort_func)(void) = abort;
 
-void flint_set_abort(__attribute__ ((noreturn)) void (*func)(void))
+void flint_set_abort(void (*func)(void))
 {
 #if FLINT_REENTRANT && !HAVE_TLS
     pthread_once(&abort_func_init, __flint_set_abort_init);
@@ -41,7 +41,7 @@ void flint_set_abort(__attribute__ ((noreturn)) void (*func)(void))
 #endif
 }
 
-__attribute__ ((noreturn)) void flint_abort()
+void flint_abort()
 {
     (*abort_func)();
 }
