@@ -32,6 +32,11 @@
  extern "C" {
 #endif
 
+/* Undefine to make the ifndef logic below for the fallback 
+   work even if the symbols are already defined (e.g. by givaro).  */
+#undef count_leading_zeros
+#undef count_trailing_zeros
+
 /* x86 : 64 bit */
 #if (GMP_LIMB_BITS == 64 && defined (__amd64__)) 
 
