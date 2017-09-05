@@ -50,7 +50,7 @@ main(void)
 
                 nmod_poly_set_coeff_ui(a, 0, nmod_neg((i*j*k) % n, mod));
                 nmod_poly_set_coeff_ui(a, 1, i * j + i * k + j * k);
-                nmod_poly_set_coeff_ui(a, 2, nmod_neg(i + j + k, mod));
+                nmod_poly_set_coeff_ui(a, 2, nmod_neg((i + j + k) % n, mod));
                 nmod_poly_set_coeff_ui(a, 3, 1);
 
                 nmod_poly_power_sums_schoenhage(b, a, 20);
