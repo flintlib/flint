@@ -108,7 +108,7 @@ fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
         return;
     }
 
-    if (poly1->length != len)
+    if (poly1->length < len)
     {
         pol1 = (fmpz *) flint_calloc(len, sizeof(fmpz));
         memcpy(pol1, poly1->coeffs, poly1->length * sizeof(fmpz));
@@ -117,7 +117,7 @@ fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
     else
         pol1 = poly1->coeffs;
 
-    if (poly2->length != len)
+    if (poly2->length < len)
     {
         pol2 = (fmpz *) flint_calloc(len, sizeof(fmpz));
         memcpy(pol2, poly2->coeffs, poly2->length * sizeof(fmpz));

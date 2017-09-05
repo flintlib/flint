@@ -37,7 +37,7 @@ fmpz_poly_mulhigh_n(fmpz_poly_t res,
         return;
     }
 
-    if ((limbsx > 4) && (n < 16))
+    if ((limbsx > 4) && (n < 16) && poly1->length <= n && poly2->length <= n)
         fmpz_poly_mulhigh_karatsuba_n(res, poly1, poly2, n);
     else if (limbs1 + limbs2 <= 8)
         fmpz_poly_mul_KS(res, poly1, poly2);
