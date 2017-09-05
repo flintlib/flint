@@ -33,9 +33,8 @@ main(void)
                 mp_limb_t n;
                 nmod_t mod;
                 nmod_poly_t a, b, c, d;
-                slong t;
 
-                do{
+                do {
                     n = n_randtest_prime(state, 1);
                 } while(n < 4);
                     nmod_init(&mod, n);
