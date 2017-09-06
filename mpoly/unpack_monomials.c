@@ -313,7 +313,7 @@ void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
       
          if (r2 >= 2)
          {
-            exps1[k1++] = ((v >> 24) << 16) + ((v >> 16) & UWORD(0xFF0000));
+            exps1[k1++] = ((v >> 24) << 16) + ((v >> 16) & UWORD(0xFF));
 
             r2 -= 2;
             v <<= 16;
