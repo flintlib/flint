@@ -39,6 +39,7 @@ void mpoly_max_degrees1(ulong * max_degs, const ulong * exps,
    }
 }
 
+/*
 void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
                                                 slong len, slong bits, slong n)
 {
@@ -76,3 +77,32 @@ void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
 
    TMP_END;
 }
+*/
+
+
+void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
+                                          slong len, slong bits, slong nfields)
+{
+    slong i, j, k;
+    ulong * tmp_exps;
+    slong N;
+    TMP_INIT;
+    for (i = 0; i < nfields; i++)
+        max_degs[i] = 0;
+    N = (nfields - 1)/(FLINT_BITS/bits) + 1;
+    TMP_START;
+    tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
+    for (i = 0; i < len; i++)
+    {
+        mpoly_unpack_vec(tmp_exps, poly_exps + i*N, bits, nfields, 1);
+        for (j = 0, k = nfields - 1; j < nfields; j++, k--)
+        {
+            if (max_degs[j] < tmp_exps[k])
+                max_degs[j] = tmp_exps[k];
+        }
+    }
+    TMP_END;
+}
+
+
+

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -293,6 +293,7 @@ void mpoly_get_monomial_32_32(ulong * exp1, const ulong * exp2,
 
 #endif
 
+/*
 void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                          slong bits, slong n, int deg, int rev)
 {
@@ -327,4 +328,30 @@ void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
    }
 #endif
 }
+*/
+
+
+
+
+void mpoly_get_monomial(ulong * user_exps, const ulong * poly_exps,
+                                   slong bits, slong nfields, int deg, int rev)
+{
+    slong i;
+    ulong * tmp_exps;
+    TMP_INIT;
+    TMP_START;
+    tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
+    mpoly_unpack_vec(tmp_exps, poly_exps, bits, nfields, 1);
+    if (rev)
+    {
+        for (i = nfields - 1; i >= deg; i--)
+            user_exps[nfields - i - 1] = tmp_exps[i];
+    } else
+    {
+        for (i = deg; i < nfields; i++)
+            user_exps[i - deg] = tmp_exps[i];
+    }   
+    TMP_END;
+}
+
 

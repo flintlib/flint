@@ -329,14 +329,6 @@ void mpoly_unpack_monomials_8to16(ulong * exps1, const ulong * exps2,
 
 
 /*
-    exps2 = packed vectors to unpack
-    bits2 = bits per field in exps2
-    len = number of packed vectors to unpack
-    num = number of elements in each vector
-
-    exps1 = destination for unpacked vector
-    bits1 = number of bits desired in return packed vector
-*/
 void mpoly_unpack_monomials(ulong * exps1, slong bits1,
                    const ulong * exps2, slong bits2, slong len, slong num)
 {
@@ -359,7 +351,7 @@ void mpoly_unpack_monomials(ulong * exps1, slong bits1,
          mpoly_unpack_monomials_8to64(exps1, exps2, len, num);
       else if (bits2 == 16)
          mpoly_unpack_monomials_16to64(exps1, exps2, len, num);
-      else /* bits2 == 32 */
+      else
          mpoly_unpack_monomials_32to64(exps1, exps2, len, num);
    } else
 #endif
@@ -367,8 +359,50 @@ void mpoly_unpack_monomials(ulong * exps1, slong bits1,
    {
       if (bits2 == 8)
          mpoly_unpack_monomials_8to32(exps1, exps2, len, num);
-      else /* bits2 == 16 */
+      else
          mpoly_unpack_monomials_16to32(exps1, exps2, len, num);
-   } else  /* bits1 == 16, bits2 = 8 */
+   } else
          mpoly_unpack_monomials_8to16(exps1, exps2, len, num);
 }
+*/
+
+
+
+
+
+
+
+
+/*
+    exps2 = packed vectors to unpack
+    bits2 = bits per field in exps2
+    len = number of packed vectors to unpack
+    num = number of elements in each vector
+
+    exps1 = destination for unpacked vector
+    bits1 = number of bits desired in return packed vector
+*/
+void mpoly_unpack_monomials(ulong * exps1, slong bits1,
+                   const ulong * exps2, slong bits2, slong len, slong nfields)
+{
+    slong i, N2 = (nfields - 1)/(FLINT_BITS/bits2) + 1;
+    slong    N1 = (nfields - 1)/(FLINT_BITS/bits1) + 1;
+    ulong * tmp_exps;
+    FLINT_ASSERT(bits1 >= bits2);
+    if (bits1 == bits2) {
+        for (i = 0; i < N2*len; i++)
+            exps1[i] = exps2[i];
+        return;
+    }
+    TMP_INIT;
+    TMP_START;
+    tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
+    for (i = 0; i < len; i++)
+    {
+        mpoly_unpack_vec(tmp_exps, exps2 + i*N2, bits2, nfields, 1);
+        mpoly_pack_vec(exps1 + i*N1, tmp_exps, bits1, nfields, 1);
+    }
+    TMP_END;
+}
+
+

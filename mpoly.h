@@ -384,6 +384,12 @@ void mpoly_max_degrees_tight(slong * max_exp,
 
 /* Monomial arrays ***********************************************************/
 
+
+FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong fields, slong len);
+FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits, slong fields, slong len);
+
+
+
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                         slong bits, slong n, int deg, int rev);
 
