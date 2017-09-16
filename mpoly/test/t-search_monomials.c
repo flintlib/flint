@@ -65,14 +65,16 @@ main(void)
 
         do {
             fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+            fmpz_mpoly_test(f, ctx);
         } while (f->length == 0);
         do {
             fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+            fmpz_mpoly_test(g, ctx);
         } while (g->length == 0);
 
         fg_bits = FLINT_MAX(f->bits, g->bits);
         masks_from_bits_ord(maskhi, masklo, fg_bits, ctx->ord);
-        N = (ctx->n*fg_bits - 1)/FLINT_BITS + 1;
+        N = words_per_exp(ctx->n, fg_bits);
 
         fexp = (ulong *) flint_malloc(f->length*N*sizeof(ulong));
         gexp = (ulong *) flint_malloc(g->length*N*sizeof(ulong));
@@ -112,8 +114,9 @@ main(void)
             {
                 flint_printf("e_ind is not right  x=%wd, e_ind[%wd]=%wd\n",x,i,e_ind[i]);
                 flint_printf("lower = %wd  upper = %wd\n",lower,upper);
-                flint_printf("e_score = %wx\n",e_score);
-                flint_printf("e = %wx\n",e[0]);
+                flint_printf("e_score = %wd\n",e_score);
+                flint_printf("fg_bits = %wd\n",fg_bits);
+                flint_printf("e = %0.16llx\n",e[0]);
 
                 fmpz_mpoly_print_pretty(f,NULL,ctx);printf("\n\n");
                 fmpz_mpoly_print_pretty(g,NULL,ctx);printf("\n\n");

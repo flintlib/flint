@@ -131,9 +131,8 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    max_bits = FLINT_MAX(poly2->bits, poly3->bits);
    masks_from_bits_ord(maskhi, masklo, max_bits, ctx->ord);
-   N = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, max_bits);
 
-   /* treat cases of length 0 first */
    if (poly2->length == 0)
    {
       fmpz_mpoly_set(poly1, poly3, ctx);

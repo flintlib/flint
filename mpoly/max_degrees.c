@@ -104,5 +104,3 @@ void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
     TMP_END;
 }
 
-
-

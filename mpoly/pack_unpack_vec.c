@@ -4,14 +4,34 @@
 #include "mpoly.h"
 #include <assert.h>
 
+/* maximize "bits" while keeping "(nfields-1)/(FLINT_BITS/bits)+1" constant */
+slong mpoly_optimize_bits(slong bits, slong nfields) {
+    while (bits < FLINT_BITS &&   (nfields - 1)/(FLINT_BITS/(bits    ))
+                               == (nfields - 1)/(FLINT_BITS/(bits + 1))
+          )
+    {
+        bits++;
+    }
 
-void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong fields, slong len) {
+    return bits;
+}
+
+
+
+void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {
     slong i, j, shift, fields_per_word = FLINT_BITS/bits;
     ulong v, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+    slong N;
+    ulong * exp1save;
+
+    N = (nfields - 1)/(FLINT_BITS/bits) + 1;
+
+
     for (j = 0; j < len; j++) {
+        exp1save = exp1;
         v = 0;
         shift = bits*fields_per_word;
-        for (i = 0; i < fields; i++) {
+        for (i = 0; i < nfields; i++) {
             shift -= bits;
             assert((*exp2 & mask) == *exp2);
             v |= *exp2++ << shift;
@@ -26,23 +46,57 @@ void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong fields, 
         {
             *exp1++ = v;
         }
+        assert(exp1-exp1save == N);
     }
 }
 
-void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits, slong fields, slong len) {
+void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {
     slong i, j, shift, fields_per_word = FLINT_BITS/bits;
     ulong u, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     for (j = 0; j < len; j++) {
         u = *exp2++;
         shift = bits*fields_per_word;
-        for (i = 0; i < fields; i++) {
+        for (i = 0; i < nfields; i++) {
             shift -= bits;
             *exp1++ = (u >> shift) & mask;
-            if (shift == 0 && i + 1 < fields)
+            if (shift == 0 && i + 1 < nfields)
             {
                 u = *exp2++;
                 shift = bits*fields_per_word;
             }
         }
     }
+}
+
+/*
+    compute number of bits required to store user_exp in packed format
+    the returned number of bits includes space for a zero'd signed bit
+    a return value of > FLINT_BITS indicates an error (it doesn't fit)
+*/
+slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg)
+{
+    slong i, bits, exp_bits = 8;
+    ulong max = 0;
+    if (deg)
+    {
+        for (i = 0; i < nfields - 1; i++)
+        {  
+            max += user_exp[i];
+            if (max < user_exp[i])
+                return FLINT_BITS + 1;
+        }
+    } else
+    {
+        for (i = 0; i < nfields; i++)
+        {
+            if (max < user_exp[i])
+                max = user_exp[i];
+        }
+    }
+
+    bits = FLINT_BIT_COUNT(max);
+    while (bits >= exp_bits)
+        exp_bits += 1;
+
+    return exp_bits;
 }

@@ -388,13 +388,13 @@ void mpoly_unpack_monomials(ulong * exps1, slong bits1,
     slong i, N2 = (nfields - 1)/(FLINT_BITS/bits2) + 1;
     slong    N1 = (nfields - 1)/(FLINT_BITS/bits1) + 1;
     ulong * tmp_exps;
+    TMP_INIT;
     FLINT_ASSERT(bits1 >= bits2);
     if (bits1 == bits2) {
         for (i = 0; i < N2*len; i++)
             exps1[i] = exps2[i];
         return;
     }
-    TMP_INIT;
     TMP_START;
     tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
     for (i = 0; i < len; i++)
