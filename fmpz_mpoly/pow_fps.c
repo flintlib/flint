@@ -647,19 +647,20 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          max = max_degs2[i];
    }
 
-   if (FLINT_BIT_COUNT(max) + FLINT_BIT_COUNT(k) > sizeof(ulong)*8 || 0 > (slong) (k*max))
+   if (FLINT_BIT_COUNT(max) + FLINT_BIT_COUNT(k) > FLINT_BITS || 0 > (slong) (k*max))
       flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_pow_fps");
 
    bits = FLINT_BIT_COUNT(k*max);
 
    exp_bits = 8;
    while (bits >= exp_bits)
-      exp_bits *= 2;
+      exp_bits += 1;
 
    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, exp_bits);
 
    if (exp_bits > poly2->bits)
    {

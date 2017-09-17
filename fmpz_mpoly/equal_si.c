@@ -19,7 +19,6 @@ int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly,
                                            slong c, const fmpz_mpoly_ctx_t ctx)
 {
    slong N, i;
-   int deg, rev;
 
    if (c == 0)
       return poly->length == 0;
@@ -27,9 +26,7 @@ int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly,
    if (poly->length != 1)
       return 0;
 
-   degrev_from_ord(deg, rev, ctx->ord);
-
-   N = deg ? (poly->bits*ctx->n - 1)/FLINT_BITS + 1 : 1;
+   N = words_per_exp(ctx->n, poly->bits);
 
    for (i = 0; i < N; i++)
    {

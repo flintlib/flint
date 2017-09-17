@@ -19,7 +19,7 @@ void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
 {
    slong i, j;
    ulong exp;
-   slong shift = FLINT_BITS - (num + extra)*bits;
+   slong shift = bits*(FLINT_BITS/bits - (num + extra));
    slong * prods;
    TMP_INIT;
 

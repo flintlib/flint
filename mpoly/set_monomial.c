@@ -14,6 +14,7 @@
 #include "flint.h"
 #include "mpoly.h"
 
+/*
 #if FLINT64
 
 void mpoly_set_monomial_8_64(ulong * exp1, const ulong * exp2, 
@@ -379,7 +380,7 @@ void mpoly_set_monomial_32_32(ulong * exp1, const ulong * exp2,
 }
 
 #endif
-/*
+
 void mpoly_set_monomial(ulong * exp1, const ulong * exp2,
                                          slong bits, slong n, int deg, int rev)
 {

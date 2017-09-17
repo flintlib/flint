@@ -760,15 +760,13 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
 
    exp3 = (ulong **) TMP_ALLOC(len*sizeof(ulong *));
 
-   exp_bits = poly2->bits;
-
    /* compute maximum degrees that can occur in any input or output polys */
+   exp_bits = poly2->bits;
    for (i = 0; i < len; i++)
       exp_bits = FLINT_MAX(exp_bits, poly3[i]->bits);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   /* number of words in exponent vector */
-   N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, exp_bits);
 
    /* ensure input exponents packed to same size as output exponents */
    exp2 = poly2->exps;
@@ -779,7 +777,6 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
       mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
                                                         poly2->length, ctx->n);
-
    }
 
    for (i = 0; i < len; i++)
@@ -843,9 +840,9 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
       if (lenr >= 0) /* check if division was successful */
          break;
 
-      exp_bits *= 2;
+      exp_bits = mpoly_optimize_bits(exp_bits + 1, ctx->n);
       masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-      N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+      N = words_per_exp(ctx->n, exp_bits);
 
       if (exp_bits > FLINT_BITS)
          break;

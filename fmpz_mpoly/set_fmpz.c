@@ -30,7 +30,7 @@ void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
 
    fmpz_set(poly->coeffs, c);
 
-   N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, poly->bits);
 
    for (i = 0; i < N; i++)
       poly->exps[i] = 0;

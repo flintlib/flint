@@ -29,7 +29,8 @@ void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
 
    fmpz_set_ui(poly->coeffs, c);
 
-   N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, poly->bits);
+
 
    for (i = 0; i < N; i++)
       poly->exps[i] = 0;

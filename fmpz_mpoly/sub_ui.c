@@ -24,14 +24,15 @@ void fmpz_mpoly_sub_ui(fmpz_mpoly_t poly1,
    if (len2 == 0)
    {
       fmpz_mpoly_set_ui(poly1, c, ctx);
-      fmpz_neg(poly1->coeffs, poly1->coeffs);
+      if (poly1->length != 0)
+          fmpz_neg(poly1->coeffs, poly1->coeffs);
 
       return;
    }
 
    if (c != 0)
    {
-      N = (poly2->bits*ctx->n - 1)/FLINT_BITS + 1;
+      N = words_per_exp(ctx->n, poly2->bits);
 
       if (mpoly_monomial_is_zero(poly2->exps + (len2 - 1)*N, N))
       {

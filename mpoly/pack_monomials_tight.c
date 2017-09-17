@@ -20,7 +20,7 @@ void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,
    slong i, j;
    ulong e1, e2;
    ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-   slong shift = FLINT_BITS - (num + extra)*bits;
+   slong shift = bits*(FLINT_BITS/bits - (num + extra));
 
    for (i = 0; i < len; i++)
    {
