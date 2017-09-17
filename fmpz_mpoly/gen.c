@@ -73,10 +73,10 @@ void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
     fmpz_mpoly_fit_length(poly, 1, ctx);
 
     fmpz_set_ui(poly->coeffs + 0, 1);
-    
+
     TMP_START;
 
-    mon = (ulong *) TMP_ALLOC((ctx->n - deg)*sizeof(ulong));    
+    mon = (ulong *) TMP_ALLOC((ctx->n - deg)*sizeof(ulong));
     for (j = 0; j < ctx->n - deg; j++)
        mon[j] = (j == i);
     mpoly_set_monomial(poly->exps, mon, poly->bits, ctx->n, deg, rev);

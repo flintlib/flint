@@ -13,6 +13,7 @@
 #include "flint.h"
 #include "mpoly.h"
 
+/*
 #if FLINT64
 
 void mpoly_get_monomial_8_64(ulong * exp1, const ulong * exp2,
@@ -293,7 +294,7 @@ void mpoly_get_monomial_32_32(ulong * exp1, const ulong * exp2,
 
 #endif
 
-/*
+
 void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                          slong bits, slong n, int deg, int rev)
 {
@@ -339,9 +340,11 @@ void mpoly_get_monomial(ulong * user_exps, const ulong * poly_exps,
     slong i;
     ulong * tmp_exps;
     TMP_INIT;
+
     TMP_START;
     tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
     mpoly_unpack_vec(tmp_exps, poly_exps, bits, nfields, 1);
+
     if (rev)
     {
         for (i = nfields - 1; i >= deg; i--)
@@ -350,8 +353,7 @@ void mpoly_get_monomial(ulong * user_exps, const ulong * poly_exps,
     {
         for (i = deg; i < nfields; i++)
             user_exps[i - deg] = tmp_exps[i];
-    }   
+    }
+
     TMP_END;
 }
-
-

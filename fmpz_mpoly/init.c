@@ -22,10 +22,8 @@ void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
    poly->coeffs = NULL;
    poly->exps = NULL;
-
    poly->alloc = 0;
    poly->length = 0;
-   /* default to at least 8 bits per exponent */
    poly->bits = bits;
 }
 
@@ -45,7 +43,6 @@ void fmpz_mpoly_init2(fmpz_mpoly_t poly,
       poly->coeffs = NULL;
       poly->exps = NULL;
    }
-
    poly->alloc = alloc;
    poly->length = 0;
    poly->bits = bits;

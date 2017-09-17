@@ -80,7 +80,7 @@ slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg)
     if (deg)
     {
         for (i = 0; i < nfields - 1; i++)
-        {  
+        {
             max += user_exp[i];
             if (max < user_exp[i])
                 return FLINT_BITS + 1;

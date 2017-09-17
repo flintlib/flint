@@ -434,23 +434,28 @@ void mpoly_set_monomial(ulong * poly_exps, const ulong * user_exps,
     slong i = 0;
     ulong * tmp_exps, degree = 0;
     TMP_INIT;
+
     TMP_START;
     tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
+
     if (deg)
     {
         for (i = 0; i < nfields - 1; i++)
             degree += user_exps[i];
         tmp_exps[0] = degree;
     }
+
     if (rev)
     {
         for (i = deg; i < nfields; i++)
-            tmp_exps[i] = user_exps[nfields - i - 1];      
+            tmp_exps[i] = user_exps[nfields - i - 1];
     } else
     {
         for (i = deg; i < nfields; i++)
             tmp_exps[i] = user_exps[i - deg];
     }
+
     mpoly_pack_vec(poly_exps, tmp_exps, bits, nfields, 1);
+
     TMP_END;
 }

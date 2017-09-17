@@ -369,10 +369,6 @@ void mpoly_unpack_monomials(ulong * exps1, slong bits1,
 
 
 
-
-
-
-
 /*
     exps2 = packed vectors to unpack
     bits2 = bits per field in exps2
@@ -385,24 +381,26 @@ void mpoly_unpack_monomials(ulong * exps1, slong bits1,
 void mpoly_unpack_monomials(ulong * exps1, slong bits1,
                    const ulong * exps2, slong bits2, slong len, slong nfields)
 {
-    slong i, N2 = (nfields - 1)/(FLINT_BITS/bits2) + 1;
-    slong    N1 = (nfields - 1)/(FLINT_BITS/bits1) + 1;
+    slong i, N2 = words_per_exp(nfields, bits2);
+    slong    N1 = words_per_exp(nfields, bits1);
     ulong * tmp_exps;
     TMP_INIT;
+
     FLINT_ASSERT(bits1 >= bits2);
     if (bits1 == bits2) {
         for (i = 0; i < N2*len; i++)
             exps1[i] = exps2[i];
         return;
     }
+
     TMP_START;
     tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
+
     for (i = 0; i < len; i++)
     {
         mpoly_unpack_vec(tmp_exps, exps2 + i*N2, bits2, nfields, 1);
         mpoly_pack_vec(exps1 + i*N1, tmp_exps, bits1, nfields, 1);
     }
+
     TMP_END;
 }
-
-

@@ -114,10 +114,6 @@ main(void)
             {
                 flint_printf("e_ind is not right  x=%wd, e_ind[%wd]=%wd\n",x,i,e_ind[i]);
                 flint_printf("lower = %wd  upper = %wd\n",lower,upper);
-                flint_printf("e_score = %wd\n",e_score);
-                flint_printf("fg_bits = %wd\n",fg_bits);
-                flint_printf("e = %0.16llx\n",e[0]);
-
                 fmpz_mpoly_print_pretty(f,NULL,ctx);printf("\n\n");
                 fmpz_mpoly_print_pretty(g,NULL,ctx);printf("\n\n");
                 flint_abort();

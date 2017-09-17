@@ -27,7 +27,7 @@ main(void)
     flint_printf("pack_unpack....");
     fflush(stdout);
 
-    max_length = 50;
+    max_length = 100;
     max_fields = 20;
 
     a = flint_malloc(max_length*max_fields*sizeof(ulong));
