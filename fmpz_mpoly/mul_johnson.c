@@ -459,14 +459,15 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    exp_bits = 8;
    while (bits >= exp_bits) /* extra bit required for signs */
-      exp_bits *= 2;
+      exp_bits += 1;
 
    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
+   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
    /* number of words exponent vectors packed into */
-   N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, exp_bits);
 
    /* ensure input exponents are packed into same sized fields as output */
    if (exp_bits > poly2->bits)

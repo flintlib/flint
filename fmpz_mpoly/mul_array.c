@@ -210,7 +210,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
    /* exponents take up this many bits */
-   slong shift = FLINT_BITS - num*bits;
+   slong shift = bits*(FLINT_BITS/bits - num);
    TMP_INIT;
 
    TMP_START;
@@ -279,7 +279,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
    /* exponents take up this many bits */
-   slong shift = FLINT_BITS - num*bits;
+   slong shift = bits*(FLINT_BITS/bits - num);
    TMP_INIT;
 
    TMP_START;
@@ -348,7 +348,7 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
    /* exponents take up this many bits */
-   slong shift = FLINT_BITS - num*bits;
+   slong shift = bits*(FLINT_BITS/bits - num);
    TMP_INIT;
 
    TMP_START;
@@ -418,7 +418,7 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
    /* exponents take up this many bits */
-   slong shift = FLINT_BITS - num*bits;
+   slong shift = bits*(FLINT_BITS/bits - num);
    TMP_INIT;
 
    TMP_START;
@@ -547,7 +547,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
                                           slong * mults, slong num, slong bits)
 {
    slong i, j, k = 0, len, l1, l2, l3, prod, bits1, bits2 = 0, bits3 = 0;
-   slong shift = FLINT_BITS - bits;
+   slong shift = bits*(FLINT_BITS/bits - 1);
    slong * i2, * i3, * n2, * n3, * b2, * maxb2, * b3, * maxb3;
    ulong * e2, * e3, * p1;
    int small;
@@ -579,12 +579,10 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
    maxb3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
    
    /* compute chunks of the input polys with respect to the main variable */
-
    mpoly_main_variable_terms1(i2, n2, exp2, l2, len2, num + 1, num + 1, bits);
    mpoly_main_variable_terms1(i3, n3, exp3, l3, len3, num + 1, num + 1, bits);
 
    /* pack input exponents tightly with mixed bases specified by "mults" */
-
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
@@ -964,20 +962,19 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    
    exp_bits = 8;
    while (bits >= exp_bits)
-      exp_bits *= 2;
+      exp_bits += 1;
 
    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
 
    /* number of words for exponents */
-   N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, exp_bits);
 
    /* array multiplication expects each exponent vector in one word */
    /* current code is wrong for reversed orderings */
    if (N != 1 || mpoly_ordering_isrev(ctx->ord))
    {
       res = 0;
-
       goto cleanup;
    }
 

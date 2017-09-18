@@ -16,44 +16,30 @@
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
-                       slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx)
+                       slong n, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, bits, max_bits, N;
-   ulong maxdeg = 0;
+   slong exp_bits, N;
    int deg, rev;
 
    degrev_from_ord(deg, rev, ctx->ord);
 
-   if (deg)
-   {
-      for (i = 0; i < ctx->n - 1; i++)
-         maxdeg += exps[i];
-   } else
-   {
-      for (i = 0; i < ctx->n; i++)
-      {
-         if (exps[i] > maxdeg)
-            maxdeg = exps[i];
-      }
-   }
-
-   max_bits = poly->bits;
-   bits = FLINT_BIT_COUNT(maxdeg);
-   
-   while (bits >= max_bits)
-      max_bits *= 2;
-
-   /* reallocate the number of bits of the exponents of the polynomial */
-   fmpz_mpoly_fit_bits(poly, max_bits, ctx);
-
    if (n > poly->length)
       flint_throw(FLINT_ERROR, "Invalid index in fmpz_mpoly_set_monomial");
 
+   /* compute how many bits are required to represent exp */
+   exp_bits = mpoly_exp_bits(exp, ctx->n, deg);
+   if (exp_bits > FLINT_BITS)
+       flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_set_monomial");
+
+   /* reallocate the number of bits of the exponents of the polynomial */
+   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+   fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
+
+   N = words_per_exp(ctx->n, poly->bits);
+
    fmpz_mpoly_fit_length(poly, n + 1, ctx);
 
-   N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
-   
-   mpoly_set_monomial(poly->exps + n*N, exps, poly->bits, ctx->n, deg, rev);
+   mpoly_set_monomial(poly->exps + n*N, exp, poly->bits, ctx->n, deg, rev);
 
    if (n == poly->length)
       _fmpz_mpoly_set_length(poly, n + 1, ctx);

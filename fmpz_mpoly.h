@@ -144,7 +144,7 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
    {
       if (poly->alloc != 0)
       {
-         N = (bits*ctx->n - 1)/FLINT_BITS + 1;
+         N = words_per_exp(ctx->n, bits);
          t = flint_malloc(N*poly->alloc*sizeof(ulong));
          mpoly_unpack_monomials(t, bits, poly->exps,
                                              poly->bits, poly->length, ctx->n);
@@ -650,7 +650,7 @@ void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
    ulong maskhi, masklo;
 
    masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = (ctx->n*poly->bits - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, poly->bits);
 
    if (!mpoly_monomials_test(poly->exps, poly->length, N, maskhi, masklo))
       flint_throw(FLINT_ERROR, "Polynomial invalid");
@@ -671,7 +671,7 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
    ulong * rexp, * gexp;
 
    bits = FLINT_MAX(r->bits, g->bits);
-   N = (bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, bits);
 
    if (g->length == 0 )
       flint_throw(FLINT_ERROR, "Zero denominator in remainder test");

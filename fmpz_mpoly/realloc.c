@@ -40,7 +40,7 @@ void fmpz_mpoly_realloc(fmpz_mpoly_t poly,
         return;
     }
 
-    N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+    N = words_per_exp(ctx->n, poly->bits);
 
     if (poly->alloc != 0)            /* Realloc */
     {

@@ -35,16 +35,42 @@ main(void)
     c = flint_malloc(max_length*max_fields*sizeof(ulong));
     d = flint_malloc(max_length*max_fields*sizeof(ulong));
 
-    for (k = 0; k < 1000 * flint_test_multiplier(); k++)
+
+    for (k = 0; k < 100 * flint_test_multiplier(); k++)
     {
-        /* do FLINT_BITS => bits1 => bits2 => FLINT_BITS and compare */
-        for (bits1 = 8; bits1 <= FLINT_BITS; bits1 *= 2)
-        {
-        for (bits2 = bits1; bits2 <= FLINT_BITS; bits2 *= 2)
+        /* do FLINT_BITS => bits1 => FLINT_BITS and compare */
+        for (bits1 = 8; bits1 <= FLINT_BITS; bits1 += 1)
         {
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, max_fields) + 1;
-            N = (bits1*nfields - 1)/FLINT_BITS + 1;
+            N = words_per_exp(nfields, bits1);
+            for (i = 0; i < length*nfields; i++)
+                a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1);
+
+            mpoly_pack_vec(b, a, bits1, nfields, length);
+            mpoly_unpack_vec(c, b, bits1, nfields, length);
+
+            for (i = 0; i < length*nfields; i++)
+                if (a[i] != c[i])
+                {
+                    printf("FAIL\n");
+                    flint_printf("bits1 = %wd  fields = %wd  len = %wd\n", bits1, nfields, length);
+                    flint_abort();
+                }
+        }
+    }
+
+
+    for (k = 0; k < 10 * flint_test_multiplier(); k++)
+    {
+        /* do FLINT_BITS => bits1 => bits2 => FLINT_BITS and compare */
+        for (bits1 = 8; bits1 <= FLINT_BITS; bits1 += 1)
+        {
+        for (bits2 = bits1; bits2 <= FLINT_BITS; bits2 += 1)
+        {
+            length = n_randint(state, max_length) + 1;
+            nfields = n_randint(state, max_fields) + 1;
+            N = words_per_exp(nfields, bits1);
             for (i = 0; i < length*nfields; i++)
                 a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1);
 

@@ -18,9 +18,9 @@
 int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
                                            slong k, const fmpz_mpoly_ctx_t ctx)
 {
-   int deg, rev;
+   int deg, rev, ret = 1;
    slong i;
-   ulong * exps;
+   ulong * user_exp, total = 0;
 
    TMP_INIT;
 
@@ -32,68 +32,21 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
 
    degrev_from_ord(deg, rev, ctx->ord);
 
-   if (deg)
-   {
-      if (k >= 0)
-      {
-         if ((poly->exps[0] >> (FLINT_BITS - poly->bits)) != 1)
-            return 0;
-      } else
-         return (poly->exps[0] >> (FLINT_BITS - poly->bits)) == 1;
-   }
+    TMP_START;
+    user_exp = (ulong *) TMP_ALLOC((ctx->n - deg)*sizeof(ulong));
+    mpoly_get_monomial(user_exp, poly->exps, poly->bits, ctx->n, deg, rev);
 
-   if (k >= 0)
-   {
-      TMP_START;
+    for (i = 0; i < ctx->n - deg; i++)
+    {
+        total += user_exp[i];
+        ret &= total < 2;
+    }
 
-      exps = (ulong *) TMP_ALLOC((ctx->n - deg)*sizeof(ulong));
+    if (k >= 0)
+        ret &= (user_exp[k] == 1);
+    else
+        ret &= (total == 1);
 
-      fmpz_mpoly_get_monomial(exps, poly, 0, ctx);
-
-      for (i = 0; i < k; i++)
-      {
-         if (exps[i] != 0)
-            return 0;
-      }
-
-      if (exps[i++] != 1)
-         return 0;
-
-      for ( ; i < ctx->n - deg; i++)
-      {
-         if (exps[i] != 0)
-            return 0;
-      }   
-
-      TMP_END;
-   } else
-   {
-      slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
-
-      for (i = 0; i < N; i++)
-      {
-         if (poly->exps[i] != 0)
-         {
-            ulong s = 1;
-
-            while (s != 0 && poly->exps[i] != s)
-               s <<= poly->bits;
-
-            if (poly->exps[i] != s)
-               return 0;
-
-            for (i++; i < N; i++)
-            {
-               if (poly->exps[i] != 0)
-                  return 0;
-            }
-
-            return 1;
-         }
-      }
-
-      return 0;
-   }
-   
-   return 1;
+    TMP_END
+    return ret;
 }
