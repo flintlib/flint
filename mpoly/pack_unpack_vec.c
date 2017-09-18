@@ -19,7 +19,7 @@ slong mpoly_optimize_bits(slong bits, slong nfields) {
 
 void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {
     slong i, j, shift, fields_per_word = FLINT_BITS/bits;
-    ulong v, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+    ulong v;
     for (j = 0; j < len; j++) {
         v = 0;
         shift = bits*fields_per_word;
