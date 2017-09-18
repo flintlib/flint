@@ -14,65 +14,29 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void mpoly_max_degrees1(ulong * max_degs, const ulong * exps,
-                                                slong len, slong bits, slong n)
-{
-   slong i, j, k = FLINT_BITS/bits, shift;
-   ulong mask;
-
-   shift = (k - n)*bits;
-   mask = bits == FLINT_BITS ? ~UWORD(0) : (UWORD(1) << bits) - UWORD(1);
-
-   for (i = 0; i < len; i++) /* for each exponent vector */
-   {
-      ulong v = (exps[i] >> shift); /* shift unused exponents */
-
-      for (j = 0; j < n; j++) /* for each exponent */
-      {
-         ulong ex = (v & mask);
-
-         if (ex > max_degs[j])
-            max_degs[j] = ex;
-
-         v >>= bits;
-      }      
-   }
-}
 
 void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
-                                                slong len, slong bits, slong n)
+                                          slong len, slong bits, slong nfields)
 {
-   slong i, j;
-   ulong * exps;
-   slong N;
-   TMP_INIT;
-   
-   for (i = 0; i < n; i++)
-      max_degs[i] = 0;
+    slong i, j, k, N = words_per_exp(nfields, bits);
+    ulong * tmp_exps;
+    TMP_INIT;
 
-   N = (bits*n - 1)/FLINT_BITS + 1;
-  
-   if (N == 1)
-   {
-       mpoly_max_degrees1(max_degs, poly_exps, len, bits, n);
+    for (i = 0; i < nfields; i++)
+        max_degs[i] = 0;
 
-       return;
-   }
+    TMP_START;
+    tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
 
-   TMP_START;
-     
-   exps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    for (i = 0; i < len; i++)
+    {
+        mpoly_unpack_vec(tmp_exps, poly_exps + i*N, bits, nfields, 1);
+        for (j = 0, k = nfields - 1; j < nfields; j++, k--)
+        {
+            if (max_degs[j] < tmp_exps[k])
+                max_degs[j] = tmp_exps[k];
+        }
+    }
 
-   for (i = 0; i < len; i++)
-   {
-      mpoly_get_monomial(exps, poly_exps + i*N, bits, n, 0, 1);
-
-      for (j = 0; j < n; j++)
-      {
-         if (exps[j] > max_degs[j])
-            max_degs[j] = exps[j];
-      }
-   }
-
-   TMP_END;
+    TMP_END;
 }

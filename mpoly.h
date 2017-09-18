@@ -84,18 +84,23 @@ typedef struct mpoly_heap_s
       }                                                               \
    } while (0)
 
-#define masks_from_bits_ord(maskhi, masklo, bits, ord)                \
-   do {                                                               \
-      if ((ord) == ORD_DEGREVLEX)                                     \
-      {                                                               \
-         (masklo) = -WORD(1);                                         \
-         (maskhi) = (WORD(1) << ((FLINT_BITS) - (bits))) - 1;         \
-      } else                                                          \
-      {                                                               \
-         (masklo) = 0;                                                \
-         (maskhi) = 0;                                                \
-      }                                                               \
-   } while (0)                                                        \
+#define masks_from_bits_ord(maskhi, masklo, bits, ord)                       \
+   do {                                                                      \
+      if ((ord) == ORD_DEGREVLEX)                                            \
+      {                                                                      \
+         (masklo) = -WORD(1);                                                \
+         (maskhi) = (WORD(1) << ((bits)*((FLINT_BITS)/(bits) - 1))) - 1;     \
+      } else                                                                 \
+      {                                                                      \
+         (masklo) = 0;                                                       \
+         (maskhi) = 0;                                                       \
+      }                                                                      \
+   } while (0)
+
+
+#define words_per_exp(nfields, bits)                                  \
+   (((nfields) - 1)/(FLINT_BITS/(bits)) + 1)
+
 
 /* Orderings *****************************************************************/
 
@@ -384,6 +389,16 @@ void mpoly_max_degrees_tight(slong * max_exp,
 
 /* Monomial arrays ***********************************************************/
 
+FLINT_DLL slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg);
+
+FLINT_DLL slong mpoly_optimize_bits(slong bits, slong nfields);
+
+FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len);
+
+FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len);
+
+
+
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                         slong bits, slong n, int deg, int rev);
 
@@ -629,7 +644,7 @@ void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
                           slong l1, slong len1, slong k, slong num, slong bits)
 {
    slong i, j = 0;
-   slong shift = FLINT_BITS - (num - k + 1)*bits;
+   slong shift = bits*(FLINT_BITS/bits - (num - k + 1));
 
    i1[0] = 0;
    for (i = 0; i < l1 - 1; i++)

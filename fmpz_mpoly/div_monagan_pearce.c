@@ -758,8 +758,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   /* number of words required for exponent vectors */
-   N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, exp_bits);
 
    /* ensure input exponents packed to same size as output exponents */
    if (exp_bits > poly2->bits)
@@ -813,19 +812,20 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
             && exp_bits < FLINT_BITS)
    {
       ulong * old_exp2 = exp2, * old_exp3 = exp3;
+      slong old_exp_bits = exp_bits;
 
-      masks_from_bits_ord(maskhi, masklo, 2*exp_bits, ctx->ord);
-      N = (2*exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+      exp_bits = mpoly_optimize_bits(exp_bits + 1, ctx->n);
+
+      masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
+      N = words_per_exp(ctx->n, exp_bits);
 
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-      mpoly_unpack_monomials(exp2, 2*exp_bits, old_exp2, exp_bits,
+      mpoly_unpack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
                                                         poly2->length, ctx->n);
 
       exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-      mpoly_unpack_monomials(exp3, 2*exp_bits, old_exp3, exp_bits,
+      mpoly_unpack_monomials(exp3, exp_bits, old_exp3, old_exp_bits,
                                                         poly3->length, ctx->n);
-
-      exp_bits *= 2;
 
       if (free2)
          flint_free(old_exp2);

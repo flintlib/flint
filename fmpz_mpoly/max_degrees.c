@@ -106,7 +106,7 @@ void fmpz_mpoly_max_degrees(ulong * max_degs, const fmpz_mpoly_t poly,
 {
    int deg, rev;
    
-   slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+   slong N = words_per_exp(ctx->n, poly->bits);
 
    degrev_from_ord(deg, rev, ctx->ord);
 
