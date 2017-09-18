@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "flint.h"
 #include "mpoly.h"
-#include <assert.h>
 
 /* maximize "bits" while keeping "(nfields-1)/(FLINT_BITS/bits)+1" constant */
 slong mpoly_optimize_bits(slong bits, slong nfields) {
@@ -21,19 +20,11 @@ slong mpoly_optimize_bits(slong bits, slong nfields) {
 void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {
     slong i, j, shift, fields_per_word = FLINT_BITS/bits;
     ulong v, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    slong N;
-    ulong * exp1save;
-
-    N = (nfields - 1)/(FLINT_BITS/bits) + 1;
-
-
     for (j = 0; j < len; j++) {
-        exp1save = exp1;
         v = 0;
         shift = bits*fields_per_word;
         for (i = 0; i < nfields; i++) {
             shift -= bits;
-            assert((*exp2 & mask) == *exp2);
             v |= *exp2++ << shift;
             if (shift == 0)
             {
@@ -46,7 +37,6 @@ void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields,
         {
             *exp1++ = v;
         }
-        assert(exp1-exp1save == N);
     }
 }
 
