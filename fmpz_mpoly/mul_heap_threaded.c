@@ -61,7 +61,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
     /* space for heap indices */
     hind = (slong *) TMP_ALLOC(len2*sizeof(slong));
     for (i = 0; i < len2; i++)
-        hind[i] = 2*start[i] + 0;
+        hind[i] = 2*start[i] + 1;
 
     /* put all the starting nodes on the heap */
     for (i = 0; i < len2; i++)
@@ -76,7 +76,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->i = i;
             x->j = start[i];
             x->next = NULL;
-            hind[x->i] = 2*(x->j+1) + 1;
+            hind[x->i] = 2*(x->j+1) + 0;
             _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &heap_len,
                                                                        maskhi);
         }
@@ -108,7 +108,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
 
             /* temporarily store indicies of this node */
-            hind[x->i] &= -WORD(2);
+            hind[x->i] |= WORD(1);
             Q[Q_len++] = x->i;
             Q[Q_len++] = x->j;
 
@@ -140,7 +140,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                     c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
 
                     /* take node out of heap and put into store */
-                    hind[x->i] &= -WORD(2);
+                    hind[x->i] |= WORD(1);
                     Q[Q_len++] = x->i;
                     Q[Q_len++] = x->j;
                 }
@@ -162,7 +162,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                     fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
 
                     /* take node out of heap and put into store */
-                    hind[x->i] &= -WORD(2);
+                    hind[x->i] |= WORD(1);
                     Q[Q_len++] = x->i;
                     Q[Q_len++] = x->j;
                 }
@@ -179,7 +179,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             /* should we go right? */
             if (  (i + 1 < len2)
                && (j + 0 < end[i + 1])
-               && (hind[i + 1] == 2*j + 0)
+               && (hind[i + 1] == 2*j + 1)
                )
             {
                 x = chain + i + 1;
@@ -187,17 +187,17 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 x->j = j;
                 x->next = NULL;
 
-                hind[x->i] = 2*(x->j+1) + 1;
+                hind[x->i] = 2*(x->j+1) + 0;
                 _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x,
                                                             &heap_len, maskhi);
             }
 
             /* should we go up? */
             if (  (j + 1 < end[i + 0])
-               && ((hind[i]&WORD(1)) == 0)
+               && ((hind[i] & 1) == 1)
                && (  (i == 0)
                   || (hind[i - 1] >  2*(j + 2) + 1)
-                  || (hind[i - 1] == 2*(j + 2) + 0)
+                  || (hind[i - 1] == 2*(j + 2) + 1) /* gcc should fuse */
                   )
                )
             {
@@ -206,7 +206,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 x->j = j + 1;
                 x->next = NULL;
 
-                hind[x->i] = 2*(x->j+1) + 1;
+                hind[x->i] = 2*(x->j+1) + 0;
                 _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x,
                                                             &heap_len, maskhi);
             }
@@ -289,7 +289,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
     /* space for heap indices */
     hind = (slong *) TMP_ALLOC(len2*sizeof(slong));
     for (i = 0; i < len2; i++)
-        hind[i] = 2*start[i] + 0;
+        hind[i] = 2*start[i] + 1;
 
 
     /* start with no heap nodes and no exponent vectors in use */
@@ -309,7 +309,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->i = i;
             x->j = start[i];
             x->next = NULL;
-            hind[x->i] = 2*(x->j+1) + 1;
+            hind[x->i] = 2*(x->j+1) + 0;
             mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                              exp3 + x->j*N, N);
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
@@ -346,7 +346,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
 
             /* take node out of heap and put into store */
-            hind[x->i] &= -WORD(2);
+            hind[x->i] |= WORD(1);
             Q[Q_len++] = x->i;
             Q[Q_len++] = x->j;
 
@@ -379,7 +379,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                     c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
 
                     /* take node out of heap and put into store */
-                    hind[x->i] &= -WORD(2);
+                    hind[x->i] |= WORD(1);
                     Q[Q_len++] = x->i;
                     Q[Q_len++] = x->j;
                 }
@@ -405,7 +405,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                     fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
 
                     /* take node out of heap and put into store */
-                    hind[x->i] &= -WORD(2);
+                    hind[x->i] |= WORD(1);
                     Q[Q_len++] = x->i;
                     Q[Q_len++] = x->j;
                 }
@@ -422,7 +422,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
             /* should we go right? */
             if (  (i + 1 < len2)
                && (j + 0 < end[i + 1])
-               && (hind[i + 1] == 2*j + 0)
+               && (hind[i + 1] == 2*j + 1)
                )
             {
                 x = chain + i + 1;
@@ -430,7 +430,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 x->j = j;
                 x->next = NULL;
 
-                hind[x->i] = 2*(x->j+1) + 1;
+                hind[x->i] = 2*(x->j+1) + 0;
                 mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N, maskhi, masklo))
                     exp_next--;
@@ -438,10 +438,10 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
             /* should we go up? */
             if (  (j + 1 < end[i + 0])
-               && ((hind[i]&WORD(1)) == 0)
+               && ((hind[i] & 1) == 1)
                && (  (i == 0)
                   || (hind[i - 1] >  2*(j + 2) + 1)
-                  || (hind[i - 1] == 2*(j + 2) + 0)
+                  || (hind[i - 1] == 2*(j + 2) + 1) /* gcc should fuse */
                   )
                )
             {
@@ -450,7 +450,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 x->j = j + 1;
                 x->next = NULL;
 
-                hind[x->i] = 2*(x->j+1) + 1;
+                hind[x->i] = 2*(x->j+1) + 0;
                 mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N, maskhi, masklo))
                     exp_next--;
