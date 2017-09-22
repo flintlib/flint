@@ -56,7 +56,6 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
     for (i = 0; i < len2; i++)
         hind[i] = 1;
 
-   
    /* put (0, 0, exp2[0] + exp3[0]) on heap */
    x = chain + 0;
    x->i = 0;
@@ -136,8 +135,10 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                
                e1[k] = exp;
                first = 0; 
-            } else /* addmul product of input poly coeffs */
+            } else
+            {  /* addmul product of input poly coeffs */
                fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
+            }
 
             /* for each node in this chain */
             while ((x = x->next) != NULL)
@@ -359,7 +360,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
                mpoly_monomial_set(e1 + k*N, exp, N);
 
                first = 0; 
-            } else 
+            } else
             {  /* addmul product of input poly coeffs */
                fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
             }
@@ -396,8 +397,10 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->next = NULL;
 
             hind[x->i] = 2*(x->j+1) + 0;
-            mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N, maskhi, masklo))
+            mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
+                                                   exp3 + x->j*N, N);
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                                 &heap_len, N, maskhi, masklo))
                exp_next--;
          }
 
@@ -416,8 +419,10 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->next = NULL;
 
             hind[x->i] = 2*(x->j+1) + 0;
-            mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N, maskhi, masklo))
+            mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
+                                                   exp3 + x->j*N, N);
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                                 &heap_len, N, maskhi, masklo))
                exp_next--;
          }
       }

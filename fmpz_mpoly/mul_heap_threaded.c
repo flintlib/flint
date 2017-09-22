@@ -152,12 +152,14 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                
                     e1[k] = exp;
                     first = 0; 
-                } else /* addmul product of input poly coeffs */
+                } else
+                {   /* addmul product of input poly coeffs */
                     fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
+                }
 
-               /* for each node in this chain */
-               while ((x = x->next) != NULL)
-               {
+                /* for each node in this chain */
+                while ((x = x->next) != NULL)
+                {
                     /* addmul product of input poly coeffs */
                     fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
 
@@ -301,7 +303,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
     {
         if (  (start[i] < end[i])
            && (  (i == 0)
-              || (start[i] < start[i-1])
+              || (start[i] < start[i - 1])
               )
            )
         {
@@ -309,7 +311,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->i = i;
             x->j = start[i];
             x->next = NULL;
-            hind[x->i] = 2*(x->j+1) + 0;
+            hind[x->i] = 2*(x->j + 1) + 0;
             mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                              exp3 + x->j*N, N);
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
@@ -430,9 +432,11 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 x->j = j;
                 x->next = NULL;
 
-                hind[x->i] = 2*(x->j+1) + 0;
-                mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
-                if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N, maskhi, masklo))
+                hind[x->i] = 2*(x->j + 1) + 0;
+                mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
+                                                       exp3 + x->j*N, N);
+                if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                                 &heap_len, N, maskhi, masklo))
                     exp_next--;
             }
 
@@ -450,9 +454,11 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 x->j = j + 1;
                 x->next = NULL;
 
-                hind[x->i] = 2*(x->j+1) + 0;
-                mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
-                if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len, N, maskhi, masklo))
+                hind[x->i] = 2*(x->j + 1) + 0;
+                mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
+                                                       exp3 + x->j*N, N);
+                if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                                 &heap_len, N, maskhi, masklo))
                     exp_next--;
             }
         }     
