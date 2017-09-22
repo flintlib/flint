@@ -28,7 +28,6 @@
 
 #include "flint.h"
 #include "ulong_extras.h"
-#include <assert.h>
 
 #ifdef __cplusplus
  extern "C" {
@@ -506,8 +505,6 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
 
    if (*next_loc < *heap_len)
    {
-assert(*next_loc != 0);
-
       if (exp == heap[*next_loc].exp)
       {
          ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
@@ -594,7 +591,6 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    if (*next_loc < *heap_len)
    {
-assert(*next_loc != 0);
       if (mpoly_monomial_equal(exp, heap[*next_loc].exp, N))
       {
          ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
