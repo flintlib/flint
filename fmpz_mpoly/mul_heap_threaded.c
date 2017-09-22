@@ -779,7 +779,6 @@ void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
 
     masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-    /* number of words exponent vectors packed into */
     N = words_per_exp(ctx->n, exp_bits);
 
     /* ensure input exponents are packed into same sized fields as output */
