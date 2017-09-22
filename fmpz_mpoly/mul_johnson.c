@@ -26,6 +26,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
               const fmpz * poly3, const ulong * exp3, slong len3, ulong maskhi)
 {
    slong i, j, k;
+   slong next_loc;
    slong Q_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap1_s * heap;
    mpoly_heap_t * chain;
@@ -45,6 +46,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    small = _fmpz_mpoly_fits_small(poly2, len2) &&
                                            _fmpz_mpoly_fits_small(poly3, len3);
 
+   next_loc = len2 + 4;   /* something bigger than heap can ever be */
    heap = (mpoly_heap1_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap1_s));
    /* alloc array of heap nodes which can be chained together */
    chain = (mpoly_heap_t *) TMP_ALLOC(len2*sizeof(mpoly_heap_t));
@@ -172,8 +174,8 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->next = NULL;
 
             hind[x->i] = 2*(x->j+1) + 0;
-            _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &heap_len,
-                                                                       maskhi);
+            _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          }
 
          /* should we go up? */
@@ -191,8 +193,8 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->next = NULL;
 
             hind[x->i] = 2*(x->j+1) + 0;
-            _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &heap_len,
-                                                                       maskhi);
+            _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          }
       }
 
@@ -225,6 +227,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
                                            slong N, ulong maskhi, ulong masklo)
 {
    slong i, j, k;
+   slong next_loc;
    slong Q_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap_s * heap;
    mpoly_heap_t * chain;
@@ -252,6 +255,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
    small = _fmpz_mpoly_fits_small(poly2, len2) &&
                                            _fmpz_mpoly_fits_small(poly3, len3);
 
+   next_loc = len2 + 4;   /* something bigger than heap can ever be */
    heap = (mpoly_heap_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap_s));
    /* alloc array of heap nodes which can be chained together */
    chain = (mpoly_heap_t *) TMP_ALLOC(len2*sizeof(mpoly_heap_t));
@@ -400,7 +404,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
             mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                    exp3 + x->j*N, N);
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                                 &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          }
 
@@ -422,7 +426,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
             mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                    exp3 + x->j*N, N);
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                                 &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          }
       }

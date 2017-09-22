@@ -33,6 +33,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
                                       slong * start, slong * end, ulong maskhi)
 {
     slong i, j, k;
+    slong next_loc = len2 + 4;   /* something bigger than heap can ever be */
     slong Q_len = 0, heap_len = 1; /* heap zero index unused */
     mpoly_heap1_s * heap;
     mpoly_heap_t * chain;
@@ -77,8 +78,8 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->j = start[i];
             x->next = NULL;
             hind[x->i] = 2*(x->j+1) + 0;
-            _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &heap_len,
-                                                                       maskhi);
+            _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
         }
     }
 
@@ -191,7 +192,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
                 hind[x->i] = 2*(x->j+1) + 0;
                 _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x,
-                                                            &heap_len, maskhi);
+                                                 &next_loc, &heap_len, maskhi);
             }
 
             /* should we go up? */
@@ -210,7 +211,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
                 hind[x->i] = 2*(x->j+1) + 0;
                 _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x,
-                                                            &heap_len, maskhi);
+                                                 &next_loc, &heap_len, maskhi);
             }
         }
 
@@ -246,6 +247,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
             slong * start, slong * end, slong N, ulong maskhi, ulong masklo)
 {
     slong i, j, k;
+    slong next_loc = len2 + 4;   /* something bigger than heap can ever be */
     slong Q_len = 0, heap_len = 1; /* heap zero index unused */
     mpoly_heap_s * heap;
     mpoly_heap_t * chain;
@@ -313,9 +315,9 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
             mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
-                                                             exp3 + x->j*N, N);
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
-                                                            N, maskhi, masklo))
+                                                   exp3 + x->j*N, N);
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
         }
     }
@@ -436,7 +438,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                        exp3 + x->j*N, N);
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                                 &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                     exp_next--;
             }
 
@@ -458,7 +460,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                        exp3 + x->j*N, N);
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                                 &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                     exp_next--;
             }
         }     

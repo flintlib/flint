@@ -28,6 +28,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                                                                   ulong maskhi)
 {
    slong i, l, w;
+   slong next_loc;
    slong next_free, Q_len = 0, len3;
    slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap1_s * heap;
@@ -69,6 +70,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
            FLINT_BIT_COUNT(len3) + FLINT_BITS - 2) &&
            FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
+   next_loc = len3 + 4;   /* something bigger than heap can ever be */
    heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
    chain = (mpoly_nheap_t *) TMP_ALLOC(len3*sizeof(mpoly_nheap_t));
    Q = (mpoly_nheap_t **) TMP_ALLOC(len3*sizeof(mpoly_nheap_t *));
@@ -191,14 +193,16 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
             x->j++;
             x->next = NULL;
 
-            _mpoly_heap_insert1(heap, exp2[x->j], x, &heap_len, maskhi);
+            _mpoly_heap_insert1(heap, exp2[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j < k[x->p])
          {
             x->j++;
             x->next = NULL;
 
             _mpoly_heap_insert1(heap, exp3[x->p][x->i] +
-                                polyq[x->p]->exps[x->j], x, &heap_len, maskhi);
+                                polyq[x->p]->exps[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j == k[x->p])
          {
             s[x->p]++;
@@ -306,7 +310,8 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                      x2->next = NULL;
 
                      _mpoly_heap_insert1(heap, exp3[w][i] +
-                                  polyq[w]->exps[k[w]], x2, &heap_len, maskhi);
+                                  polyq[w]->exps[k[w]], x2,
+                                                 &next_loc, &heap_len, maskhi);
                   }
                   s[w] = 1;
                }
@@ -363,6 +368,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                         const fmpz_mpoly_ctx_t ctx, ulong maskhi, ulong masklo)
 {
    slong i, l, w;
+   slong next_loc;
    slong next_free, Q_len = 0, len3;
    slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap_s * heap;
@@ -410,6 +416,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
            FLINT_BIT_COUNT(len3) + FLINT_BITS - 2) &&
            FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
+   next_loc = len3 + 4;   /* something bigger than heap can ever be */
    heap = (mpoly_heap_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap_s));
    chain = (mpoly_nheap_t *) TMP_ALLOC(len3*sizeof(mpoly_nheap_t));
    Q = (mpoly_nheap_t **) TMP_ALLOC(len3*sizeof(mpoly_nheap_t *));
@@ -547,7 +554,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
             mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
 
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                                 &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          } else if (x->j < k[x->p])
          {
@@ -558,7 +565,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                                                 polyq[x->p]->exps + x->j*N, N);
 
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, 
-                                                 &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          } else if (x->j == k[x->p])
          {
@@ -669,8 +676,8 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                      mpoly_monomial_add(exp_list[exp_next], exp3[w] + i*N, 
                                                    polyq[w]->exps + k[w]*N, N);
 
-                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++],
-                                             x2, &heap_len, N, maskhi, masklo))
+                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                         exp_next--;
                   }
                   s[w] = 1;

@@ -28,6 +28,7 @@
 
 #include "flint.h"
 #include "ulong_extras.h"
+#include <assert.h>
 
 #ifdef __cplusplus
  extern "C" {
@@ -490,11 +491,10 @@ void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len, ulong maskhi)
 }
 
 MPOLY_INLINE
-void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
-                                      void * x, slong * heap_len, ulong maskhi)
+void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
+                              slong * next_loc, slong * heap_len, ulong maskhi)
 {
    slong i = *heap_len, j, n = *heap_len;
-   static slong next_loc = 0;
 
    if (i != 1 && exp == heap[1].exp)
    {
@@ -504,12 +504,14 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
       return;
    }
 
-   if (next_loc != 0 && next_loc < *heap_len)
+   if (*next_loc < *heap_len)
    {
-      if (exp == heap[next_loc].exp)
+assert(*next_loc != 0);
+
+      if (exp == heap[*next_loc].exp)
       {
-         ((mpoly_heap_t *) x)->next = heap[next_loc].next;
-         heap[next_loc].next = x;
+         ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
+         heap[*next_loc].next = x;
          return;
       }
    }
@@ -520,7 +522,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
       {
          ((mpoly_heap_t *) x)->next = heap[j].next;
          heap[j].next = x;
-         next_loc = j;
+         *next_loc = j;
 
          return;
       } else if ((exp^maskhi) > (heap[j].exp^maskhi))
@@ -578,10 +580,9 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
 
 MPOLY_INLINE
 int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
-                         slong * heap_len, slong N, ulong maskhi, ulong masklo)
+       slong * next_loc, slong * heap_len, slong N, ulong maskhi, ulong masklo)
 {
    slong i = *heap_len, j, n = *heap_len;
-   static slong next_loc = 0;
 
    if (i != 1 && mpoly_monomial_equal(exp, heap[1].exp, N))
    {
@@ -591,12 +592,13 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
       return 0;
    }
 
-   if (next_loc != 0 && next_loc < *heap_len)
+   if (*next_loc < *heap_len)
    {
-      if (mpoly_monomial_equal(exp, heap[next_loc].exp, N))
+assert(*next_loc != 0);
+      if (mpoly_monomial_equal(exp, heap[*next_loc].exp, N))
       {
-         ((mpoly_heap_t *) x)->next = heap[next_loc].next;
-         heap[next_loc].next = x;
+         ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
+         heap[*next_loc].next = x;
          return 0;
       }
    }
@@ -613,7 +615,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
    {
       ((mpoly_heap_t *) x)->next = heap[j].next;
       heap[j].next = x;
-      next_loc = j;
+      *next_loc = j;
 
       return 0;
    }

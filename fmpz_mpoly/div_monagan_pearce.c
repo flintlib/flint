@@ -37,6 +37,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                                                       slong bits, ulong maskhi)
 {
    slong i, k, s;
+   slong next_loc = len3 + 4;   /* something bigger than heap can ever be */
    slong next_free, Q_len = 0;
    slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap1_s * heap;
@@ -225,7 +226,8 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
 
             /* but only if monomial is big enough */
             if ((exp_temp^maskhi) >= (exp3_lead^maskhi))
-               _mpoly_heap_insert1(heap, exp_temp, x, &heap_len, maskhi);
+               _mpoly_heap_insert1(heap, exp_temp, x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j < k - 1)
          {
             x->j++;
@@ -236,7 +238,8 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
 
             /* but only if monomial is big enough */
             if ((exp_temp^maskhi) >= (exp3_lead^maskhi))
-               _mpoly_heap_insert1(heap, exp_temp, x, &heap_len, maskhi);
+               _mpoly_heap_insert1(heap, exp_temp, x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j == k - 1)
          {
             s++;
@@ -326,7 +329,8 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
 
                   /* but only if monomial is big enough */
                   if ((exp_temp^maskhi) >= (exp3_lead^maskhi))
-                     _mpoly_heap_insert1(heap, exp_temp, x2, &heap_len, maskhi);
+                     _mpoly_heap_insert1(heap, exp_temp, x2,
+                                                 &next_loc, &heap_len, maskhi);
                }
                s = 1;
             } else /* quotient coeff was zero, nothing to write out */
@@ -375,6 +379,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                    slong len3, slong bits, slong N, ulong maskhi, ulong masklo)
 {
    slong i, k, s;
+   slong next_loc = len3 + 4;   /* something bigger than heap can ever be */
    slong next_free, Q_len = 0;
    slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap_s * heap;
@@ -592,7 +597,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
             if (!mpoly_monomial_lt(texp, exp_list[exp_next], N, maskhi, masklo))
             {
                if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                                 &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                   exp_next--;
             }
          } else if (x->j < k - 1)
@@ -606,8 +611,8 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
             /* but only if exponent is big enough */
             if (!mpoly_monomial_lt(texp, exp_list[exp_next], N, maskhi, masklo))
             {
-               if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
-                                                             N, maskhi, masklo))
+               if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
             }
          } else if (x->j == k - 1)
@@ -702,7 +707,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                                                                maskhi, masklo))
                   {
                      if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2,
-                                                 &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                         exp_next--;
                   }
                }

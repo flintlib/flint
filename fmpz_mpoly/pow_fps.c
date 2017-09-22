@@ -22,6 +22,7 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    const slong topbit = (WORD(1) << (FLINT_BITS - 1));
    const slong mask = ~topbit;
    slong i, rnext, g_alloc, gnext;
+   slong next_loc;
    slong next_free, Q_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap1_s * heap;
    mpoly_heap_t * chain;
@@ -37,6 +38,7 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    TMP_START;
 
+   next_loc = len2 + 4;   /* something bigger than heap can ever be */
    heap = (mpoly_heap1_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap1_s));
    /* 2x as we pull from heap and insert more before processing pulled ones */
    chain = (mpoly_heap_t *) TMP_ALLOC(2*len2*sizeof(mpoly_heap_t));
@@ -175,8 +177,8 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->i++;
             x->next = NULL;
 
-            _mpoly_heap_insert1(heap, exp2[i + 1] + ge[j], x, &heap_len,
-                                                                       maskhi);
+            _mpoly_heap_insert1(heap, exp2[i + 1] + ge[j], x,
+                                                 &next_loc, &heap_len, maskhi);
             largest[i + 1] = j + 1;
          } else
             reuse[--next_free] = x;
@@ -189,8 +191,8 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->j = j + 1;
             x->next = NULL;
 
-            _mpoly_heap_insert1(heap, exp2[i] + ge[j + 1], x, &heap_len,
-                                                                       maskhi);
+            _mpoly_heap_insert1(heap, exp2[i] + ge[j + 1], x,
+                                                 &next_loc, &heap_len, maskhi);
             largest[i] = j + 2;
          }
       }
@@ -217,8 +219,8 @@ slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             x->j = gnext;
             x->next = NULL;
 
-            _mpoly_heap_insert1(heap, exp2[1] + ge[gnext], x, &heap_len,
-                                                                       maskhi);
+            _mpoly_heap_insert1(heap, exp2[1] + ge[gnext], x,
+                                                 &next_loc, &heap_len, maskhi);
 
             largest[1] = gnext + 1;
          }
@@ -337,6 +339,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
    const slong topbit = (WORD(1) << (FLINT_BITS - 1));
    const slong mask = ~topbit;
    slong i, rnext, g_alloc, gnext, exp_next;
+   slong next_loc;
    slong next_free, Q_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap_s * heap;
    mpoly_heap_t * chain;
@@ -357,6 +360,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    TMP_START;
 
+   next_loc = len2 + 4;   /* something bigger than heap can ever be */
    heap = (mpoly_heap_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap_s));
    /* 2x as we pull from heap and insert more before processing pulled ones */
    chain = (mpoly_heap_t *) TMP_ALLOC(2*len2*sizeof(mpoly_heap_t));
@@ -509,8 +513,8 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
             mpoly_monomial_add(exp_list[exp_next], exp2 + (i + 1)*N, ge + j*N, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
  
             largest[i + 1] = j + 1;
@@ -527,8 +531,8 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
             mpoly_monomial_add(exp_list[exp_next], exp2 + i*N, ge + (j + 1)*N, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
 
             largest[i] = j + 2;
@@ -555,8 +559,8 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
             mpoly_monomial_add(exp_list[exp_next], exp2 + N, ge + gnext*N, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
  
             largest[1] = gnext + 1;
