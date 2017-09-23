@@ -28,7 +28,7 @@
     Only terms t with start >= t > end are written;
     "start" and "end" are not monomials but arrays of indicies into exp3
 */
-slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
+slong _fmpz_mpoly_mul_heapNEW_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
               const fmpz * poly2, const ulong * exp2, slong len2,
               const fmpz * poly3, const ulong * exp3, slong len3,
                                       slong * start, slong * end, slong * hind, ulong maskhi)
@@ -246,7 +246,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
     Only terms t with start >= t > end are written;
     "start" and "end" are not monomials but arrays of indicies into exp3
 */
-slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
+slong _fmpz_mpoly_mul_heapNEW_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                  const fmpz * poly3, const ulong * exp3, slong len3,
             slong * start, slong * end, slong * hind, slong N, ulong maskhi, ulong masklo)
@@ -273,7 +273,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
     /* if exponent vectors fit in single word, call special version */
     if (N == 1)
-        return _fmpz_mpoly_mul_heap_part1(poly1, exp1, alloc,
+        return _fmpz_mpoly_mul_heapNEW_part1(poly1, exp1, alloc,
                                           poly2, exp2, len2,
                                           poly3, exp3, len3,
                                                     start, end, hind, maskhi);
@@ -498,7 +498,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
 /*
     The workers calculate product terms from 4*n divisions, where n is the
     number of threads. 
-    This contains the address of a mul_heap_threaded_div_t structure
+    This contains the address of a mul_heapNEW_threaded_div_t structure
 */
 
 typedef struct
@@ -512,7 +512,7 @@ typedef struct
     ulong maskhi; ulong masklo;    
     volatile int idx;
 }
-mul_heap_threaded_base_t;
+mul_heapNEW_threaded_base_t;
 
 typedef struct
 {
@@ -526,20 +526,20 @@ typedef struct
     ulong * exp1;
     fmpz * coeff1;
 }
-mul_heap_threaded_div_t;
+mul_heapNEW_threaded_div_t;
 
 typedef struct
 {
     slong idx;
     slong time;
-    mul_heap_threaded_base_t * basep;
-    mul_heap_threaded_div_t * divp;
+    mul_heapNEW_threaded_base_t * basep;
+    mul_heapNEW_threaded_div_t * divp;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
     slong * t1, * t2, *t3, *t4;
     ulong * exp;
 }
-mul_heap_threaded_arg_t;
+mul_heapNEW_threaded_arg_t;
 
 
 /*
@@ -554,12 +554,12 @@ mul_heap_threaded_arg_t;
       yy = tt; \
    } while (0)
 
-void * _fmpz_mpoly_mul_heap_threaded_worker(void * arg_ptr)
+void * _fmpz_mpoly_mul_heapNEW_threaded_worker(void * arg_ptr)
 {
-    mul_heap_threaded_arg_t * arg = (mul_heap_threaded_arg_t *) arg_ptr;
+    mul_heapNEW_threaded_arg_t * arg = (mul_heapNEW_threaded_arg_t *) arg_ptr;
 
-    mul_heap_threaded_div_t * divs;
-    mul_heap_threaded_base_t * base;
+    mul_heapNEW_threaded_div_t * divs;
+    mul_heapNEW_threaded_base_t * base;
     slong i, j;
 
     ulong *exp;
@@ -665,7 +665,7 @@ printf("\n");
     assert(end == t2);
 
         /* calculate products in [start, end) */
-        divs[i].len1 = _fmpz_mpoly_mul_heap_part(
+        divs[i].len1 = _fmpz_mpoly_mul_heapNEW_part(
                      &divs[i].coeff1, &divs[i].exp1, &divs[i].alloc1,
                       base->coeff2,  base->exp2,  base->len2,
                       base->coeff3,  base->exp3,  base->len3,
@@ -697,20 +697,20 @@ printf("\n");
     First, 4*n ranges are calculated. Then, the product terms in each of these
     ranges are calculated. Finally, the results are joined into poly1.
 */
-slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
+slong _fmpz_mpoly_mul_heapNEW_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * coeff2, const ulong * exp2, slong len2,
                  const fmpz * coeff3, const ulong * exp3, slong len3,
                                            slong N, ulong maskhi, ulong masklo)
 {
     slong i, j, k, ndivs2;
     pthread_t * threads;
-    mul_heap_threaded_arg_t * args;
-    mul_heap_threaded_base_t * base;
-    mul_heap_threaded_div_t * divs;
+    mul_heapNEW_threaded_arg_t * args;
+    mul_heapNEW_threaded_base_t * base;
+    mul_heapNEW_threaded_div_t * divs;
     fmpz * p1;
     ulong * e1;
 
-    base = flint_malloc(sizeof(mul_heap_threaded_base_t));
+    base = flint_malloc(sizeof(mul_heapNEW_threaded_base_t));
     base->nthreads = flint_get_num_threads();
     base->ndivs    = base->nthreads*4;  /* number of divisons */
     base->coeff2 = coeff2;
@@ -726,9 +726,9 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
     ndivs2 = base->ndivs*base->ndivs;
 
-    divs    = flint_malloc(sizeof(mul_heap_threaded_div_t) * base->ndivs);
+    divs    = flint_malloc(sizeof(mul_heapNEW_threaded_div_t) * base->ndivs);
     threads = flint_malloc(sizeof(pthread_t) * base->nthreads);
-    args    = flint_malloc(sizeof(mul_heap_threaded_arg_t) * base->nthreads);
+    args    = flint_malloc(sizeof(mul_heapNEW_threaded_arg_t) * base->nthreads);
 
     for (i = base->ndivs - 1; i >= 0; i--)
     {
@@ -767,9 +767,9 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
         args[i].basep = base;
         args[i].divp = divs;
         if (i + 1 < base->nthreads) {
-            pthread_create(&threads[i], NULL, _fmpz_mpoly_mul_heap_threaded_worker, &args[i]);
+            pthread_create(&threads[i], NULL, _fmpz_mpoly_mul_heapNEW_threaded_worker, &args[i]);
         } else {
-            _fmpz_mpoly_mul_heap_threaded_worker(&args[i]);
+            _fmpz_mpoly_mul_heapNEW_threaded_worker(&args[i]);
         }
     }
     for (i = base->nthreads-1; i >= 0; i--) {
@@ -819,7 +819,7 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
     return k;
 }
 
-void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+void fmpz_mpoly_mul_heapNEW_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, bits, exp_bits, N, len = 0;
@@ -905,13 +905,13 @@ void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
         /* algorithm more efficient if smaller poly first */
         if (poly2->length >= poly3->length)
-            len = _fmpz_mpoly_mul_heap_threaded(
+            len = _fmpz_mpoly_mul_heapNEW_threaded(
                                     &temp->coeffs, &temp->exps, &temp->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
                                                N, maskhi, masklo);
         else
-            len = _fmpz_mpoly_mul_heap_threaded(
+            len = _fmpz_mpoly_mul_heapNEW_threaded(
                                    &temp->coeffs, &temp->exps, &temp->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
@@ -928,13 +928,13 @@ void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
         /* algorithm more efficient if smaller poly first */
         if (poly2->length > poly3->length)
-            len = _fmpz_mpoly_mul_heap_threaded(
+            len = _fmpz_mpoly_mul_heapNEW_threaded(
                                 &poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
                                                N, maskhi, masklo);
         else
-            len = _fmpz_mpoly_mul_heap_threaded(
+            len = _fmpz_mpoly_mul_heapNEW_threaded(
                                 &poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,

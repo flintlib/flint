@@ -495,8 +495,6 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
 {
    slong i = *heap_len, j, n = *heap_len;
 
-static slong junk=0;
-
    if (i != 1 && exp == heap[1].exp)
    {
       ((mpoly_heap_t *) x)->next = heap[1].next;
@@ -504,7 +502,7 @@ static slong junk=0;
 
       return;
    }
-/*
+
    if (*next_loc < *heap_len)
    {
       if (exp == heap[*next_loc].exp)
@@ -514,16 +512,7 @@ static slong junk=0;
          return;
       }
    }
-*/
-   if (junk!=0 && junk < *heap_len)
-   {
-      if (exp == heap[junk].exp)
-      {
-         ((mpoly_heap_t *) x)->next = heap[junk].next;
-         heap[junk].next = x;
-         return;
-      }
-   }
+
 
 
    while ((j = HEAP_PARENT(i)) >= 1)
@@ -532,10 +521,9 @@ static slong junk=0;
       {
          ((mpoly_heap_t *) x)->next = heap[j].next;
          heap[j].next = x;
-/*
+
          *next_loc = j;
-*/
-         junk = j;
+
 
          return;
       } else if ((exp^maskhi) > (heap[j].exp^maskhi))
