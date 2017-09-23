@@ -31,7 +31,7 @@
 slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
               const fmpz * poly2, const ulong * exp2, slong len2,
               const fmpz * poly3, const ulong * exp3, slong len3,
-                                      slong * start, slong * end, slong * hind, ulong maskhi)
+                        slong * start, slong * end, slong * hind, ulong maskhi)
 {
     slong i, j, k;
     slong next_loc = len2 + 4;   /* something bigger than heap can ever be */

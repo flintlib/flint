@@ -219,15 +219,16 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
             x->next = NULL;
 
             /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
-            _mpoly_heap_insert1(heap, exp2[x->j], x, &next_loc, &heap_len, maskhi);
+            _mpoly_heap_insert1(heap, exp2[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j < k - 1)
          {
             x->j++;
             x->next = NULL;
 
             /* insert (x->i, x->j + 1, exp3[x->i] + e1[x->j]) in heap */
-            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x, &next_loc, &heap_len,
-                                                                       maskhi);
+            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j == k - 1)
          {
             s++;
@@ -363,8 +364,8 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                   x2->next = NULL;
 
                   /* insert (i, k, exp3[i] + e1[k]) */
-                  _mpoly_heap_insert1(heap, exp3[i] + e1[k], x2, &next_loc, &heap_len,
-                                                                       maskhi);
+                  _mpoly_heap_insert1(heap, exp3[i] + e1[k], x2,
+                                                 &next_loc, &heap_len, maskhi);
                }
                s = 1;
             } else /* quotient coeff was zero, nothing to write out */
@@ -628,8 +629,8 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
             mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
 
             /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &next_loc, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          } else if (x->j < k - 1)
          {
@@ -639,8 +640,8 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
             mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
 
             /* insert (x->i, x->j + 1, exp3[x->i] + e1[x->j]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &next_loc, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          } else if (x->j == k - 1)
          {
