@@ -428,6 +428,14 @@ FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
 FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                           slong k, const fmpz_mpoly_ctx_t ctx);
 
+/* Calculus ******************************************************************/
+
+FLINT_DLL void fmpz_mpoly_differentiate(fmpz_mpoly_t poly1,
+              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_integrate(fmpz_mpoly_t poly1, fmpz_t scale,
+              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
+
 /* Divisibility **************************************************************/
 
 FLINT_DLL slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1,
@@ -496,6 +504,9 @@ fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 /* Input/output **************************************************************/
+
+FLINT_DLL int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t poly, const char * str,
+                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
                           const ulong * exps, slong len, const char ** x, 
