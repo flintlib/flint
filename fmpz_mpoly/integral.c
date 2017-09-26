@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_integrate(fmpz_t s, fmpz * coeff1, ulong * exp1,
+slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
                          const fmpz * coeff2, const ulong * exp2, slong len,
                 slong idx, int deg, int rev, slong nfields, slong bits, slong N)
 {
@@ -77,7 +77,7 @@ slong _fmpz_mpoly_integrate(fmpz_t s, fmpz * coeff1, ulong * exp1,
     return len;
 }
 
-void fmpz_mpoly_integrate(fmpz_mpoly_t poly1, fmpz_t scale,
+void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
                const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
 {
     int deg, rev;
@@ -122,7 +122,7 @@ void fmpz_mpoly_integrate(fmpz_mpoly_t poly1, fmpz_t scale,
         fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
         temp->bits = exp_bits;
 
-        len = _fmpz_mpoly_integrate(scale, temp->coeffs, temp->exps,
+        len = _fmpz_mpoly_integral(scale, temp->coeffs, temp->exps,
                        poly2->coeffs, exp2, poly2->length,
                             idx, deg, rev, ctx->n, exp_bits, N);
         _fmpz_mpoly_set_length(temp, len, ctx);
@@ -135,7 +135,7 @@ void fmpz_mpoly_integrate(fmpz_mpoly_t poly1, fmpz_t scale,
         fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
         poly1->bits = exp_bits;
 
-        len = _fmpz_mpoly_integrate(scale, poly1->coeffs, poly1->exps,
+        len = _fmpz_mpoly_integral(scale, poly1->coeffs, poly1->exps,
                        poly2->coeffs, exp2, poly2->length,
                             idx, deg, rev, ctx->n, exp_bits, N);
         _fmpz_mpoly_set_length(poly1, len, ctx);

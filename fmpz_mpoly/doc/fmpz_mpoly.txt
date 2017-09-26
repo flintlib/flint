@@ -867,13 +867,13 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q,
 
 *******************************************************************************
 
-void fmpz_mpoly_differentiate(fmpz_mpoly_t poly1,
+void fmpz_mpoly_derivative(fmpz_mpoly_t poly1,
                const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
 
     Sets \code{poly1} to the derivative of \code{poly2} with respect to the
     variable of index \code{idx}. This function cannot fail.
 
-void fmpz_mpoly_integrate(fmpz_mpoly_t poly1, fmpz_t scale,
+void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
                const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
 
     Sets \code{poly1} and \code{scale} so that \{poly1} is an integral of

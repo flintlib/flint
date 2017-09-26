@@ -430,10 +430,10 @@ FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
 /* Calculus ******************************************************************/
 
-FLINT_DLL void fmpz_mpoly_differentiate(fmpz_mpoly_t poly1,
+FLINT_DLL void fmpz_mpoly_derivative(fmpz_mpoly_t poly1,
               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_integrate(fmpz_mpoly_t poly1, fmpz_t scale,
+FLINT_DLL void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 
 /* Divisibility **************************************************************/

@@ -23,10 +23,10 @@ main(void)
     int i, j, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("differentiate/integrate....");
+    flint_printf("derivative/integral....");
     fflush(stdout);
 
-    /* randomized testing doesn't catch exponent overflow in integrate */
+    /* randomized testing doesn't catch exponent overflow in integral */
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g;
@@ -47,14 +47,14 @@ main(void)
                 flint_abort();
         }
 
-        fmpz_mpoly_integrate(g, s, f, 1, ctx);
-        fmpz_mpoly_differentiate(g, g, 1, ctx);
+        fmpz_mpoly_integral(g, s, f, 1, ctx);
+        fmpz_mpoly_derivative(g, g, 1, ctx);
         fmpz_mpoly_scalar_divexact_fmpz(g, g, s, ctx);
 
         result = fmpz_mpoly_equal(f, f, ctx);
         if (!result) {
                 printf("FAIL\n");
-                flint_printf("manual integrate check\n");
+                flint_printf("manual integral check\n");
                 flint_abort();
         }
 
@@ -119,11 +119,11 @@ main(void)
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_test(h, ctx);
 
-            fmpz_mpoly_differentiate(hp, h, idx, ctx);
+            fmpz_mpoly_derivative(hp, h, idx, ctx);
             fmpz_mpoly_test(hp, ctx);
-            fmpz_mpoly_differentiate(fp, f, idx, ctx);
+            fmpz_mpoly_derivative(fp, f, idx, ctx);
             fmpz_mpoly_test(fp, ctx);
-            fmpz_mpoly_differentiate(gp, g, idx, ctx);
+            fmpz_mpoly_derivative(gp, g, idx, ctx);
             fmpz_mpoly_test(gp, ctx);
 
             fmpz_mpoly_mul_johnson(t1, f, gp, ctx);
@@ -208,13 +208,13 @@ main(void)
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_test(h, ctx);
 
-            fmpz_mpoly_differentiate(h, h, idx, ctx);
+            fmpz_mpoly_derivative(h, h, idx, ctx);
             fmpz_mpoly_test(h, ctx);
             fmpz_mpoly_set(fp, f, ctx);
-            fmpz_mpoly_differentiate(fp, fp, idx, ctx);
+            fmpz_mpoly_derivative(fp, fp, idx, ctx);
             fmpz_mpoly_test(fp, ctx);
             fmpz_mpoly_set(gp, g, ctx);
-            fmpz_mpoly_differentiate(gp, gp, idx, ctx);
+            fmpz_mpoly_derivative(gp, gp, idx, ctx);
             fmpz_mpoly_test(gp, ctx);
 
             fmpz_mpoly_mul_johnson(t1, f, gp, ctx);
@@ -292,12 +292,12 @@ main(void)
 
             fmpz_mpoly_set(g, f, ctx);
             fmpz_mpoly_test(g, ctx);
-            fmpz_mpoly_integrate(f1, s1, f, idx, ctx);
+            fmpz_mpoly_integral(f1, s1, f, idx, ctx);
             fmpz_mpoly_test(f1, ctx);
-            fmpz_mpoly_integrate(f, s, f, idx, ctx);
+            fmpz_mpoly_integral(f, s, f, idx, ctx);
             fmpz_mpoly_test(f, ctx);
             result = fmpz_equal(s, s1) && fmpz_mpoly_equal(f, f1, ctx);
-            fmpz_mpoly_differentiate(f, f, idx, ctx);
+            fmpz_mpoly_derivative(f, f, idx, ctx);
             fmpz_mpoly_test(f, ctx);
             fmpz_mpoly_scalar_mul_fmpz(g, g, s, ctx);
             result = result && fmpz_mpoly_equal(f, g, ctx);

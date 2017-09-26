@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_differentiate(fmpz * coeff1, ulong * exp1,
+slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
                          const fmpz * coeff2, const ulong * exp2, slong len,
                 slong idx, int deg, int rev, slong nfields, slong bits, slong N)
 {
@@ -60,7 +60,7 @@ slong _fmpz_mpoly_differentiate(fmpz * coeff1, ulong * exp1,
     return k;
 }
 
-void fmpz_mpoly_differentiate(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                          slong idx, const fmpz_mpoly_ctx_t ctx)
 {
     int deg, rev;
@@ -73,7 +73,7 @@ void fmpz_mpoly_differentiate(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
     poly1->bits = poly2->bits;
 
-    len = _fmpz_mpoly_differentiate(poly1->coeffs, poly1->exps,
+    len = _fmpz_mpoly_derivative(poly1->coeffs, poly1->exps,
                    poly2->coeffs, poly2->exps, poly2->length,
                         idx, deg, rev, ctx->n, poly2->bits, N);
 
