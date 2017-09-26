@@ -51,7 +51,7 @@ main(void)
         fmpz_mpoly_derivative(g, g, 1, ctx);
         fmpz_mpoly_scalar_divexact_fmpz(g, g, s, ctx);
 
-        result = fmpz_mpoly_equal(f, f, ctx);
+        result = fmpz_mpoly_equal(f, g, ctx);
         if (!result) {
                 printf("FAIL\n");
                 flint_printf("manual integral check\n");
