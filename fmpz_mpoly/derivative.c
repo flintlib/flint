@@ -27,10 +27,12 @@ slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
     TMP_START;
 
     fpw = FLINT_BITS/bits;
-    if (rev) {
+    if (rev)
+    {
         off   = (nfields - 1 - idx)/fpw;
         shift = (nfields - 1 - idx)%fpw;
-    } else {
+    } else
+    {
         off   = (deg + idx)/fpw;
         shift = (deg + idx)%fpw;
     }
@@ -38,11 +40,13 @@ slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
 
     /* get exponent one to subtract */
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    for (i = 0; i < N; i++) {
+    for (i = 0; i < N; i++)
+    {
         one[i] = 0;
     }
     one[off] = WORD(1) << shift;
-    if (deg) {
+    if (deg)
+    {
         one[0] |= WORD(1) << ((fpw - 1)*bits);
     }
 
@@ -50,7 +54,8 @@ slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
     for (i = 0; i < len; i++)
     {
         c = (exp2[N*i + off] >> shift) & mask;
-        if (c != 0) {
+        if (c != 0)
+        {
             mpoly_monomial_sub(exp1 + N*k, exp2 + N*i, one, N);
             fmpz_mul_ui(coeff1 + k, coeff2 + i, c);
             k++;

@@ -41,7 +41,8 @@ main(void)
         result = fmpz_mpoly_set_str_pretty(f,
                            "-2*x^2+x*(-(x+y)+x^3*y^2+y^3)+z*y^126", vars, ctx);
 
-        if (result) {
+        if (result)
+        {
                 printf("FAIL\n");
                 flint_printf("set_str_pretty\n");
                 flint_abort();
@@ -52,7 +53,8 @@ main(void)
         fmpz_mpoly_scalar_divexact_fmpz(g, g, s, ctx);
 
         result = fmpz_mpoly_equal(f, g, ctx);
-        if (!result) {
+        if (!result)
+        {
                 printf("FAIL\n");
                 flint_printf("manual integral check\n");
                 flint_abort();
@@ -135,7 +137,8 @@ main(void)
 
             result = fmpz_mpoly_equal(hp, t1, ctx);
 
-            if (!result) {
+            if (!result)
+            {
                 printf("FAIL\n");
                 flint_printf("Check d(f*g) = df*g + f*dg\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
@@ -226,7 +229,8 @@ main(void)
 
             result = fmpz_mpoly_equal(h, t1, ctx);
 
-            if (!result) {
+            if (!result)
+            {
                 printf("FAIL\n");
                 flint_printf("Check d(f*g) = df*g + f*dg with aliasing\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
@@ -302,7 +306,8 @@ main(void)
             fmpz_mpoly_scalar_mul_fmpz(g, g, s, ctx);
             result = result && fmpz_mpoly_equal(f, g, ctx);
                                        
-            if (!result) {
+            if (!result)
+            {
                 printf("FAIL\n");
                 flint_printf("Check d(int(f)) = f with aliasing\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);

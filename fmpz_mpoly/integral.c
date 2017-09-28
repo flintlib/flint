@@ -32,10 +32,12 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
     fmpz_set_si(s, WORD(1));
 
     fpw = FLINT_BITS/bits;
-    if (rev) {
+    if (rev)
+    {
         off   = (nfields - 1 - idx)/fpw;
         shift = (nfields - 1 - idx)%fpw;
-    } else {
+    } else
+    {
         off   = (deg + idx)/fpw;
         shift = (deg + idx)%fpw;
     }
@@ -43,16 +45,19 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
 
     /* get exponent to add */
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    for (i = 0; i < N; i++) {
+    for (i = 0; i < N; i++)
+    {
         one[i] = 0;
     }
     one[off] = WORD(1) << shift;
-    if (deg) {
+    if (deg)
+    {
         one[0] |= WORD(1) << ((fpw - 1)*bits);
     }
 
     /* scan once to find required denominator */
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < len; i++)
+    {
         c = (exp2[N*i + off] >> shift) & mask;
         fmpz_set_ui(d, c + 1);
         fmpz_gcd(g, d, coeff2 + i);
@@ -62,7 +67,8 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
 
     /* then scan again to compute the terms */
     /* x^n -> x^(n+1)/(n+1) */
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < len; i++)
+    {
         c = (exp2[N*i + off] >> shift) & mask;
         mpoly_monomial_add(exp1 + N*i, exp2 + N*i, one, N);
         fmpz_set_ui(d, c + 1);
@@ -95,19 +101,22 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
     /* compute bits required to represent result */
     mpoly_max_degrees(max_deg, poly2->exps, poly2->length, poly2->bits, ctx->n);
     max_exp = max_deg[rev ? idx : ctx->n - 1 - deg - idx];
-    if (deg) {
+    if (deg)
+    {
         max_exp = FLINT_MAX(max_exp, max_deg[ctx->n - 1]);
     }
     exp_bits = FLINT_MAX(WORD(8), 1 + FLINT_BIT_COUNT(max_exp + 1));
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
-    if (exp_bits > FLINT_BITS) {
+    if (exp_bits > FLINT_BITS)
+    {
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_integrate");
     }
     exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
     N = words_per_exp(ctx->n, exp_bits);
 
     /* ensure input exponents are packed into same sized fields as output */
-    if (exp_bits > poly2->bits) {
+    if (exp_bits > poly2->bits)
+    {
         free2 = 1;
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
         mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
@@ -115,7 +124,8 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
     }
 
     /* deal with aliasing and do integration */
-    if (poly1 == poly2) {
+    if (poly1 == poly2)
+    {
         fmpz_mpoly_t temp;
 
         fmpz_mpoly_init2(temp, poly2->length, ctx);
@@ -129,8 +139,8 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 
         fmpz_mpoly_swap(temp, poly1, ctx);
         fmpz_mpoly_clear(temp, ctx);
-
-    } else {
+    } else
+    {
         fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
         fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
         poly1->bits = exp_bits;
@@ -141,7 +151,8 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
         _fmpz_mpoly_set_length(poly1, len, ctx);
     }
 
-    if (free2) {
+    if (free2)
+    {
         flint_free(exp2);
     }
 

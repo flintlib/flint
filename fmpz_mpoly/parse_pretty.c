@@ -27,21 +27,26 @@ void _fmpz_mpoly_parse_pretty_pop(fmpz_mpoly_struct ** estack,
 
     while (oi > 0 && ((all && (ostack[oi - 1] == '+' || ostack[oi - 1] == '-'))
            || ostack[oi - 1] == '*' || ostack[oi - 1] == 100 + '-'
-                                    || ostack[oi - 1] == 100 + '+')) {
+                                    || ostack[oi - 1] == 100 + '+'))
+    {
         oi--;
-        if (ostack[oi] == '+') {
+        if (ostack[oi] == '+')
+        {
             --ei;
             fmpz_mpoly_add(estack[ei - 1], estack[ei - 1], estack[ei], ctx);
             fmpz_mpoly_clear(estack[ei], ctx);
-        } else if (ostack[oi] == '-') {
+        } else if (ostack[oi] == '-')
+        {
             --ei;
             fmpz_mpoly_sub(estack[ei - 1], estack[ei - 1], estack[ei], ctx);
             fmpz_mpoly_clear(estack[--ei], ctx);
-        } else if (ostack[oi] == '*') {
+        } else if (ostack[oi] == '*')
+        {
             --ei;
             fmpz_mpoly_mul_johnson(estack[ei - 1], estack[ei - 1], estack[ei], ctx);
             fmpz_mpoly_clear(estack[ei], ctx);
-        } else if (ostack[oi] == 100 + '-') {
+        } else if (ostack[oi] == 100 + '-')
+        {
             fmpz_mpoly_neg(estack[ei - 1], estack[ei - 1], ctx);
         }
     }
@@ -53,12 +58,14 @@ void _fmpz_mpoly_parse_pretty_pop(fmpz_mpoly_struct ** estack,
 void _fmpz_mpoly_parse_pretty_fit_estack(fmpz_mpoly_struct *** estack,
                                                       slong ei, slong * ealloc)
 {
-    if (ei >= *ealloc) {
+    if (ei >= *ealloc)
+    {
         slong new_ealloc = ei + 8;
 
         (*estack) = (fmpz_mpoly_struct **) flint_realloc(*estack,
                                         new_ealloc*sizeof(fmpz_mpoly_struct*));
-        for (; ei < new_ealloc; ei++) {
+        for (; ei < new_ealloc; ei++)
+        {
             (*estack)[ei] = (fmpz_mpoly_struct*)
                                        flint_malloc(sizeof(fmpz_mpoly_struct));            
         }
@@ -69,7 +76,8 @@ void _fmpz_mpoly_parse_pretty_fit_estack(fmpz_mpoly_struct *** estack,
 void _fmpz_mpoly_parse_pretty_fit_ostack(slong ** ostack,
                                                       slong oi, slong * oalloc)
 {
-    if (oi >= *oalloc) {
+    if (oi >= *oalloc)
+    {
         slong new_oalloc = oi + 8;
 
         (*ostack) = (slong*) flint_realloc(*ostack, new_oalloc*sizeof(slong));
@@ -97,7 +105,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
     ealloc = 8;
     estack = (fmpz_mpoly_struct **) flint_malloc(ealloc*sizeof(fmpz_mpoly_struct*));
-    for (k = 0; k < ealloc; k++) {
+    for (k = 0; k < ealloc; k++)
+    {
         estack[k] = (fmpz_mpoly_struct*) flint_malloc(sizeof(fmpz_mpoly_struct));
     }
     oalloc = 8;
@@ -110,8 +119,10 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
 get_next_char:
 
-    if ('0' <= *s && *s <= '9') {
-        if (!(expecting & 1)) {
+    if ('0' <= *s && *s <= '9')
+    {
+        if (!(expecting & 1))
+        {
             goto failed;
         }
         fmpz_set_ui(c, *s++ - '0');
@@ -125,16 +136,21 @@ get_next_char:
         ei++;
         expecting = 2;
 
-    } else if (*s == '^') {
+    } else if (*s == '^')
+    {
         s++;
-        if (!(expecting & 2)) {
+        if (!(expecting & 2))
+        {
             goto failed;
         }
-        if (s < end && '0' <= *s && *s <= '9') {
+        if (s < end && '0' <= *s && *s <= '9')
+        {
             k = *s++ - '0';
-            while (s < end && '0' <= *s && *s <= '9') {
+            while (s < end && '0' <= *s && *s <= '9')
+            {
                 k = 10*k + *s++ - '0';
-                if (k < 0) {
+                if (k < 0)
+                {
                     goto failed;
                 }
             }
@@ -144,21 +160,25 @@ get_next_char:
             goto failed;
         }
 
-    } else if ((*s == '+' || *s == '-') && (expecting & 2)) {
+    } else if ((*s == '+' || *s == '-') && (expecting & 2))
+    {
         /* infix */
         _fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 1);
         _fmpz_mpoly_parse_pretty_fit_ostack(&ostack, oi, &oalloc);
         ostack[oi++] = *s++;
         expecting = 1;
 
-    } else if ((*s == '+' || *s == '-') && !(expecting & 2)) {
+    } else if ((*s == '+' || *s == '-') && !(expecting & 2))
+    {
         /* unary */
         _fmpz_mpoly_parse_pretty_fit_ostack(&ostack, oi, &oalloc);
         ostack[oi++] = 100 + *s++;
         expecting = 1;
 
-    } else if (*s == '*') {
-        if (!(expecting & 2)) {
+    } else if (*s == '*')
+    {
+        if (!(expecting & 2))
+        {
             goto failed;
         }
         _fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 0);
@@ -166,39 +186,49 @@ get_next_char:
         ostack[oi++] = *s++;
         expecting = 1;
 
-    } else if (*s == ' ') {
+    } else if (*s == ' ')
+    {
         s++;
 
-    } else if (*s == '(') {
-        if (!(expecting & 1)) {
+    } else if (*s == '(')
+    {
+        if (!(expecting & 1))
+        {
             goto failed;
         }
         _fmpz_mpoly_parse_pretty_fit_ostack(&ostack, oi, &oalloc);
         ostack[oi++] = *s++;
         expecting = 1;
         
-    } else if (*s == ')') {
+    } else if (*s == ')')
+    {
         _fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 1);
         s++;
-        if (oi>0 && ostack[oi-1] == '(') {
+        if (oi>0 && ostack[oi-1] == '(')
+        {
             oi--;
-        } else {
+        } else
+        {
             goto failed;
         }
         expecting = 2;
 
     } else {
         /* must be a variable */
-        if (!(expecting & 1)) {
+        if (!(expecting & 1))
+        {
             goto failed;
         }
-        for (k = 0; k < nvars; k++) {
+        for (k = 0; k < nvars; k++)
+        {
             l = strlen(x[k]);
-            if ((end - s >= l) && (strncmp(s, x[k], l) == 0)) {
+            if ((end - s >= l) && (strncmp(s, x[k], l) == 0))
+            {
                 break;
             }
         }
-        if (k >= nvars) {
+        if (k >= nvars)
+        {
             goto failed;
         }
         _fmpz_mpoly_parse_pretty_fit_estack(&estack, ei, &ealloc);
@@ -208,12 +238,14 @@ get_next_char:
         s += l;
         expecting = 2;
     }
-    if (s < end) {
+    if (s < end)
+    {
         goto get_next_char;
     }
 
     _fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 1);
-    if (ei != 1 || oi != 0) {
+    if (ei != 1 || oi != 0)
+    {
         goto failed;
     }
 
@@ -223,7 +255,8 @@ get_next_char:
     ret = 0;
 
 done:
-    for (k = 0; k < ealloc; k++) {
+    for (k = 0; k < ealloc; k++)
+    {
         flint_free(estack[k]);
     }
 
@@ -252,9 +285,11 @@ int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t poly, const char * str,
     TMP_START;
     degrev_from_ord(deg, rev, ctx->ord);
     nvars = ctx->n - deg;
-    if (x == NULL) {
+    if (x == NULL)
+    {
         x = (char **) TMP_ALLOC(nvars*sizeof(char *));
-        for (i = 0; i < nvars; i++) {
+        for (i = 0; i < nvars; i++)
+        {
             x[i] = (char *) TMP_ALLOC(22*sizeof(char));
             flint_sprintf(x[i], "x%wd", i + 1);
         }
