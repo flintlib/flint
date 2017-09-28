@@ -199,8 +199,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
         } else if (*s == ')')
         {
-            _fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 1);
-            if (oi < 1 || ostack[--oi] != '(')
+            if (_fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 1)
+                     || oi < 1 || ostack[--oi] != '(')
                 goto failed;
             s++;
             expecting = 2;
