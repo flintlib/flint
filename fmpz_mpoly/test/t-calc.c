@@ -38,9 +38,7 @@ main(void)
         fmpz_mpoly_init(g, ctx);
         fmpz_init(s);
 
-        result = fmpz_mpoly_set_str_pretty(f,
-                           "-2*x^2+x*(-(x+y)+x^3*y^2+y^3)+z*y^126", vars, ctx);
-
+        result = fmpz_mpoly_set_str_pretty(f, "-2*x^2*(y+z)+z*y^126", vars, ctx);
         if (result)
         {
                 printf("FAIL\n");
