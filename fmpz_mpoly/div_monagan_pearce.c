@@ -149,7 +149,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                } else
                {
                   /* subtract q[j]*poly3 coeff from accum. three word coeff */
-                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
+                  _fmpz_mpoly_addmul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
                }
             } else /* accumulated coeffs are multiprecision */
             {
@@ -186,7 +186,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                   } else
                   {
                      /* subtract q[j]*poly3 coeff from accum. three word coeff */
-                     _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
+                     _fmpz_mpoly_addmul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
                   }
                } else /* accumulated coeffs are multiprecision */
                {
@@ -519,7 +519,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                } else
                {
                   /* subtract q[j]*poly3 coeff from accum. three word coeff */
-                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
+                  _fmpz_mpoly_addmul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
                }
             } else /* accumulated coeffs are multiprecision */
             {
@@ -555,7 +555,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                   } else
                   {
                      /* subtract q[j]*poly3 coeff from accum. three word coeff */
-                     _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
+                     _fmpz_mpoly_addmul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
                   }
                } else /* accumulated coeffs are multiprecision */
                {

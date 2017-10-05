@@ -142,7 +142,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
             if (x->i == -WORD(1))
                _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
             else
-            {   _fmpz_mpoly_submul_uiuiui_fmpz(c,
+            {   _fmpz_mpoly_addmul_uiuiui_fmpz(c,
                          poly3[x->p]->coeffs[x->i], polyq[x->p]->coeffs[x->j]);
             }
          } else
@@ -166,7 +166,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                if (x->i == -WORD(1))
                   _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
                else
-                  _fmpz_mpoly_submul_uiuiui_fmpz(c,
+                  _fmpz_mpoly_addmul_uiuiui_fmpz(c,
                          poly3[x->p]->coeffs[x->i], polyq[x->p]->coeffs[x->j]);
             } else
             {
@@ -501,7 +501,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
             if (x->i == -WORD(1))
                _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
             else
-               _fmpz_mpoly_submul_uiuiui_fmpz(c,
+               _fmpz_mpoly_addmul_uiuiui_fmpz(c,
                          poly3[x->p]->coeffs[x->i], polyq[x->p]->coeffs[x->j]);
          } else
          {
@@ -524,7 +524,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                if (x->i == -WORD(1))
                   _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
                else
-                  _fmpz_mpoly_submul_uiuiui_fmpz(c,
+                  _fmpz_mpoly_addmul_uiuiui_fmpz(c,
                          poly3[x->p]->coeffs[x->i], polyq[x->p]->coeffs[x->j]);
             } else
             {
