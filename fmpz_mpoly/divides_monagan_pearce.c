@@ -25,207 +25,171 @@
    are nonzero. Implements "Polynomial division using dynamic arrays, heaps
    and packed exponents" by Michael Monagan and Roman Pearce [1], except that
    we divide from right to left and use a heap with smallest exponent at head.
-   [1] http://www.cecm.sfu.ca/~rpearcea/sdmp/sdmp_paper.pdf 
+   [1] http://www.cecm.sfu.ca/~rpearcea/sdmp/sdmp_paper.pdf
 */
 slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
                 const fmpz * poly3, const ulong * exp3, slong len3, slong bits,
                                                                   ulong maskhi)
 {
-   slong i, j, k, s;
-   slong next_loc = len3 + 4;   /* something bigger than heap can ever be */
-   slong Q_len = 0, heap_len = 2; /* heap zero index unused */
-   mpoly_heap1_s * heap;
-   mpoly_heap_t * chain;
-   slong * Q;
-   mpoly_heap_t * x;
-   fmpz * p1 = *poly1;
-   ulong * e1 = *exp1;
-   slong * hind;
-   ulong exp, maxexp = exp2[len2 - 1];
-   ulong c[3]; /* for accumulating coefficients */
-   int first, d1, d2;
-   ulong mask = 0;
-   fmpz_t mb, qc, r, temp;
-   int small;
-   slong bits2, bits3;
-    ulong lc_norm, lc_abs, lc_n, lc_i;
-    int lc_neg;
-   TMP_INIT;
+    slong i, j, k, s;
+    slong next_loc, heap_len = 2;
+    mpoly_heap1_s * heap;
+    mpoly_heap_t * chain;
+    slong * store, * store_base;
+    mpoly_heap_t * x;
+    fmpz * p1 = *poly1;
+    ulong * e1 = *exp1;
+    slong * hind;
+    ulong mask, exp, maxexp = exp2[len2 - 1];
+    fmpz_t r, acc_lg;
+    ulong acc_sm[3];
+    int lt_divides, small;
+    slong bits2, bits3;
+    ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
+    TMP_INIT;
 
-   TMP_START;
+    TMP_START;
 
-   fmpz_init(mb);
-   fmpz_init(qc);
-   fmpz_init(r);
-   fmpz_init(temp);
+    fmpz_init(acc_lg);
+    fmpz_init(r);
 
-   /* whether intermediate computations q - a*b will fit in three words */
-   bits2 = _fmpz_vec_max_bits(poly2, len2);
-   bits3 = _fmpz_vec_max_bits(poly3, len3);
-   /* allow one bit for sign, one bit for subtraction */
-   small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) +
-           FLINT_BITS - 2) && FLINT_ABS(bits3) <= FLINT_BITS - 2;
+    /* whether intermediate computations q - a*b will fit in three words */
+    bits2 = _fmpz_vec_max_bits(poly2, len2);
+    bits3 = _fmpz_vec_max_bits(poly3, len3);
+    /* allow one bit for sign, one bit for subtraction */
+    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + FLINT_BITS - 2)
+         && FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
 
-   heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
-   /* alloc array of heap nodes which can be chained together */
-   chain = (mpoly_heap_t *) TMP_ALLOC(len3*sizeof(mpoly_heap_t));
-   /* space for temporary storage of pointers to heap nodes */
-   Q = (slong *) TMP_ALLOC(2*len3*sizeof(mpoly_heap_t *));
+flint_printf("bits2: %wd\n",bits2);
+if (small)
+{
+    printf("starting small\n");
+}
 
-    /* space for heap indices */
+    next_loc = len3 + 4;   /* something bigger than heap can ever be */
+    heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
+    /* alloc array of heap nodes which can be chained together */
+    chain = (mpoly_heap_t *) TMP_ALLOC(len3*sizeof(mpoly_heap_t));
+    /* space for temporary storage of indices of heap nodes */
+    store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(mpoly_heap_t *));
+    /* space for flagged heap indicies */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;
 
-   /* mask with high bit set in each field of exponent vector */
-   for (i = 0; i < FLINT_BITS/bits; i++)
-      mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    /* mask with high bit set in each field of exponent vector */
+    mask = 0;
+    for (i = 0; i < FLINT_BITS/bits; i++)
+        mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-   /* output poly index starts at -1, will be immediately updated to 0 */
-   k = -WORD(1);
-   
-   /* s is the number of terms * (latest quotient) we should put into heap */
-   s = len3;
+    /* output poly index starts at -1, will be immediately updated to 0 */
+    k = -WORD(1);
 
-   /* insert (-1, 0, exp2[0]) into heap */
-   x = chain + 0;
-   x->i = -WORD(1);
-   x->j = 0;
-   x->next = NULL;
+    /* s is the number of terms * (latest quotient) we should put into heap */
+    s = len3;
 
-   HEAP_ASSIGN(heap[1], exp2[0], x);
+    /* insert (-1, 0, exp2[0]) into heap */
+    x = chain + 0;
+    x->i = -WORD(1);
+    x->j = 0;
+    x->next = NULL;
 
-   /* precompute -c_0 where c_i is the i-th coeff of poly3 */
-   fmpz_neg(mb, poly3 + 0);
+    HEAP_ASSIGN(heap[1], exp2[0], x);
 
-    lc_abs = FLINT_ABS(*mb);
-    lc_neg = (slong)(*mb) < 0;
+    /* precompute leading cofficient info assuming "small" case */
+    lc_abs = FLINT_ABS(poly3[0]);
+    lc_sign = -((slong)(poly3[0]) < 0);
     count_leading_zeros(lc_norm, lc_abs);
     lc_n = lc_abs << lc_norm;
     invert_limb(lc_i, lc_n);
 
-   /* while heap is nonempty */
-   while (heap_len > 1)
-   {
-      /* get exponent field of heap top */
-      exp = heap[1].exp;
+    while (heap_len > 1)
+    {
+        exp = heap[1].exp;
 
-      /* check for overflow in exponent: not an exact division */
-      if (mpoly_monomial_overflows1(exp, mask))
-      {
-            for (i = 0; i < k; i++)
-               _fmpz_demote(p1 + i);
+        if (mpoly_monomial_overflows1(exp, mask))
+            goto not_exact_division;
 
-            k = 0;
+        k++;
+        _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
-            goto cleanup;
-      }
+        lt_divides = mpoly_monomial_divides1(e1 + k, exp, exp3[0], mask);
 
-      /* realloc output poly ready for next quotient term */
-      k++;
-      _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
-
-      /* whether we are on first heap node for this exponent */
-      first = 1;
-      
-      /* whether current exponent is divisible by exp3[0] */
-      d1 = 0;
-
-      /* set temporary coeff to zero */
-      c[0] = c[1] = c[2] = 0;
-
-      /* while heap nonempty and contains chain with current output exponent */
-      while (heap_len > 1 && heap[1].exp == exp)
-      {
-         /* pop chain from heap */
-         x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
-
-         /* take node out of heap and put into store */
-         Q[Q_len++] = x->i;
-         Q[Q_len++] = x->j;
-         if (x->i != -WORD(1))
-            hind[x->i] |= WORD(1);
-
-         /* if first heap node for this exp, check it's divisible by exp3[0] */
-         if (first)
-         {
-            d1 = mpoly_monomial_divides1(e1 + k, exp, exp3[0], mask);
-
-            first = 0; 
-         }
-
-         /* if accumulated coeffs will fit in three words */
-         if (small)
-         {
-            if (x->i == -WORD(1))
-            {
-               /* subtract poly2[j] from accumulated three word coeff */
-               _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
-            } else
-            {
-               /* subtract poly3[i]*q[j] from accumulated three word coeff */
-               _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
-            }
-         } else /* accumulated coeffs are multiprecision */
-         {
-            if (x->i == -WORD(1))
-            {
-               /* subtract poly2[j] from accumulated coeff */
-               fmpz_sub(qc, qc, poly2 + x->j);
-            } else
-            {
-               /* subtract poly3[i]*q[j] from accumulated coeff */
-               fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
-            }
-         }
-
-         /* for every node in this chain */
-         while ((x = x->next) != NULL)
-         {
-
-            /* take node out of heap and put into store */
-            Q[Q_len++] = x->i;
-            Q[Q_len++] = x->j;
-            if (x->i != -WORD(1))
-               hind[x->i] |= WORD(1);
-
-            /* if accumulated coeffs will fit in three words */
-            if (small)
-            {
-               if (x->i == -WORD(1))
-               {
-                  /* subtract poly2[j] from accumulated three word coeff */
-                  _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
-               } else
-               {
-                  /* subtract poly3[i]*q[j] from accum. three word coeff */
-                  _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
-               }
-            } else /* accumulated coeffs are multiprecision */
-            {
-               if (x->i == -WORD(1))
-               {
-                  /* subtract poly2[j] from accumulated coeff */
-                     fmpz_sub(qc, qc, poly2 + x->j);
-               } else
-               {
-                  /* subtract poly3[i]*q[j] from accum. coeff */
-                  fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
-               }
-            }
-         }
-      }
-
-        /* for each node temporarily stored */
-        while (Q_len > 0)
+        if (small)
         {
-            j = Q[--Q_len];
-            i = Q[--Q_len];
+            acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
+
+            while (heap_len > 1 && heap[1].exp == exp)
+            {
+                x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                *store++ = x->i;
+                *store++ = x->j;
+
+                if (x->i != -WORD(1))
+                    hind[x->i] |= WORD(1);
+
+                if (x->i == -WORD(1))
+                    _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
+                else
+                    _fmpz_mpoly_mysubmul_uiuiui_fmpz(acc_sm, poly3[x->i], p1[x->j]);
+
+                while ((x = x->next) != NULL)
+                {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
+                    if (x->i == -WORD(1))
+                        _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
+                    else
+                        _fmpz_mpoly_mysubmul_uiuiui_fmpz(acc_sm, poly3[x->i], p1[x->j]);
+                }
+            }
+
+        } else
+        {
+            fmpz_zero(acc_lg);  
+
+            while (heap_len > 1 && heap[1].exp == exp)
+            {
+                x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                *store++ = x->i;
+                *store++ = x->j;
+                if (x->i != -WORD(1))
+                    hind[x->i] |= WORD(1);
+
+                if (x->i == -WORD(1))
+                    fmpz_add(acc_lg, acc_lg, poly2 + x->j);
+                else
+                    fmpz_submul(acc_lg, poly3 + x->i, p1 + x->j);
+
+                while ((x = x->next) != NULL)
+                {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
+                    if (x->i == -WORD(1))
+                        fmpz_add(acc_lg, acc_lg, poly2 + x->j);
+                    else
+                        fmpz_submul(acc_lg, poly3 + x->i, p1 + x->j);
+                }
+            }
+        }
+
+        /* process nodes taken from the heap */
+        while (store > store_base)
+        {
+            j = *--store;
+            i = *--store;
 
             if (i == -WORD(1))
             {
+                /* take next dividend term */
                 if (j + 1 < len2)
                 {
                     x = chain + 0;
@@ -272,115 +236,88 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
             }
         }
 
-      /* if accumulated coeff is zero, no output coeff to be written */
-      if ((small && (c[2] == 0 && c[1] == 0 && c[0] == 0)) ||
-          (!small && fmpz_is_zero(qc)))
-      {
-         k--;
-      } else /* accumulated coeff is nonzero */
-      {
+        /* try to divide accumulated term by leading term */
+        if (small)
+        {
+            ulong d0, d1, ds = acc_sm[2];
 
-         /* if accumulated coeff fit in three words */
-         if (small)
-         {
-            ulong d[3];
-            int neg = lc_neg;
-
-            if (0 > (slong) c[2])
+            /* d1:d0 = abs(acc_sm[1:0]) assuming ds is sign extension of acc_sm[1:0] */
+            sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
+            
+            if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
             {
-                neg = !lc_neg;
-               mpn_neg(d, c, 3);
-            } else
-            {
-               flint_mpn_copyi(d, c, 3);
+                k--;
+                continue;
             }
 
-            /* check quotient of accumulated coeff by -poly3[0] is small */
-            if (d[2] != 0 || d[1] >= lc_abs) /* quotient not a small */
-            {
-               /* convert three words to multiprecision value */
-               fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
-
-               /* continue in non-small case from now on */
-               fmpz_fdiv_qr(p1 + k, r, qc, mb); /* quotient and remainder */
-
-               /* coeff division exact if remainder zero */
-               d2 = fmpz_is_zero(r);
-
-               small = 0;
-            } else /* quotient may fit a small */
+            if (ds == -((slong)acc_sm[1] < 0) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
-                nhi = (d[1] << lc_norm) | (d[0] >> (FLINT_BITS - lc_norm));
-                nlo = d[0] << lc_norm;
+                nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
+                nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
-                fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
-                fmpz_fdiv_qr(temp, r, qc, mb);
-                assert((rr==0) == (fmpz_is_zero(r)!=0));
-                /* check quotient really fit a small */
+                if (rr != WORD(0))
+                    goto not_exact_division;
+
+                ds ^= lc_sign;
                 if ((qq & (WORD(3) << (FLINT_BITS - 2))) == WORD(0))
                 {
                     _fmpz_demote(p1 + k);
-                    p1[k] = neg ? -qq : qq;
-                    assert((rr!=0)||(*temp == p1[k]));
+                    p1[k] = (qq^ds) - ds;
                 } else
                 {
-                    fmpz_set_ui(p1 + k, qq);
-                    if (neg)
-                        fmpz_neg(p1 + k, p1 + k);
-                    assert((rr!=0)||fmpz_equal(temp, p1 + k));
+printf("1 switching to large\n");
                     small = 0;
+                    fmpz_set_ui(p1 + k, qq);
+                    if (ds != WORD(0))
+                        fmpz_neg(p1 + k, p1 + k);
                 }
-                /* coeff division exact if remainder zero */
-                d2 = rr==0;
-            }
-         } else /* multiprecision case */
-         {
-            /* write out quotient and compute remainder */
-            fmpz_fdiv_qr(p1 + k, r, qc, mb);
-
-            /* coeff division exact if remainder zero */
-            d2 = fmpz_is_zero(r);
-         }
-
-         /* if coeffs or monomials don't divide or exponent too large */
-         if (!d1 || !d2 || (exp^maskhi) < (maxexp^maskhi)) /* not an exact division */
-         {
-            for (i = 0; i <= k; i++)
-               _fmpz_demote(p1 + i);
-
-            k = 0;
-
-            goto cleanup;
-         }
-
-         /* see paper */
-            if (s > 1)
+            } else
             {
-                i = 1;
-                x = chain + i;
-                x->i = i;
-                x->j = k;
-                x->next = NULL;
-                hind[x->i] = 2*(x->j + 1) + 0;
-                _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x,
-                                                 &next_loc, &heap_len, maskhi);
+printf("2 switching to large\n");
+                small = 0;
+                fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
+                fmpz_fdiv_qr(p1 + k, r, acc_lg, poly3 + 0);
+                if (!fmpz_is_zero(r))
+                    goto not_exact_division;
             }
-            s = 1;
-      } 
 
-      /* zero temporary accumulator */
-      fmpz_zero(qc);  
+        } else
+        {
+            if (fmpz_is_zero(acc_lg))
+            {
+                k--;
+                continue;
+            }
+            fmpz_fdiv_qr(p1 + k, r, acc_lg, poly3 + 0);
+            if (!fmpz_is_zero(r))
+                goto not_exact_division;
+        }
+
+        if (!lt_divides || (exp^maskhi) < (maxexp^maskhi))
+            goto not_exact_division;
+
+        /* put newly generated quotient term back into the heap if neccesary */
+        if (s > 1)
+        {
+            i = 1;
+            x = chain + i;
+            x->i = i;
+            x->j = k;
+            x->next = NULL;
+            hind[x->i] = 2*(x->j + 1) + 0;
+            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
+        }
+        s = 1;
    }
 
    k++;
 
 cleanup:
 
-   fmpz_clear(mb);
-   fmpz_clear(qc);
+   fmpz_clear(acc_lg);
    fmpz_clear(r);
-    fmpz_clear(temp);
 
    (*poly1) = p1;
    (*exp1) = e1;
@@ -389,18 +326,15 @@ cleanup:
 
    /* return length of quotient, or zero if division not exact */
    return k;
+
+not_exact_division:
+    for (i = 0; i <= k; i++)
+        _fmpz_demote(p1 + i);
+    k = 0;
+    goto cleanup;
 }
 
-/*
-   Set poly1 to poly2/poly3 if the division is exact, and return the length
-   of the quotient. Otherwise return 0. This version allows exponent vectors
-   that each fit in "N" word. The exponent vectors are assumed to have fields
-   with the given number of bits. Assumes input polys are nonzero. Implements
-   "Polynomial division using dynamic arrays, heaps and packed exponents" by
-   Michael Monagan and Roman Pearce [1], except that we divide from right to
-   left and use a heap with smallest exponent at head.
-   [1] http://www.cecm.sfu.ca/~rpearcea/sdmp/sdmp_paper.pdf 
-*/
+
 slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
        const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N,
@@ -548,7 +482,6 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
          if (first)
          {
             d1 = mpoly_monomial_divides(e1 + k*N, exp, exp3, N, mask);
-
             first = 0; 
          }
 
@@ -556,25 +489,20 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
          if (small)
          {
             if (x->i == -WORD(1))
-            {
-               /* subtract poly2[j] from accumulated three word coeff */
                _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
-            } else
-            {
-               /* subtract poly3[i]*q[j] from accumulated three word coeff */
+            else
                _fmpz_mpoly_submul_uiuiui_fmpz(c, poly3[x->i], p1[x->j]);
-            }
+
+
+
          } else
          {
             if (x->i == -WORD(1))
-            {
-               /* subtract poly2[j] from accumulated coeff */
                fmpz_sub(qc, qc, poly2 + x->j);
-            } else
-            {
-               /* subtract poly3[i]*q[j] from accumulated coeff */
+            else
                fmpz_addmul(qc, poly3 + x->i, p1 + x->j);
-            }
+
+
          }
 
          /* for every node in this chain */
