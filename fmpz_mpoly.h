@@ -610,6 +610,9 @@ FLINT_DLL void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
 FLINT_DLL void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
                           const fmpz * poly1, slong * i1, slong * n1, slong i);
 
+#define FLINT_SIGN(x) (-(ulong)((slong)(x) < 0))
+
+
 FMPZ_MPOLY_INLINE
 void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d)
 {
@@ -617,10 +620,10 @@ void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d)
 
    if (!COEFF_IS_MPZ(fc))
    {
-      if (fc >= 0)
-         sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, fc);
-      else
-         add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], 0, 0, -fc);
+        ulong f0, f1, f2;
+        f0 = fc;
+        f1 = f2 = FLINT_SIGN(f0);
+        sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], f2, f1, f0);
    } else
    {
       slong size = fmpz_size(d);
@@ -641,7 +644,7 @@ void _fmpz_mpoly_add_uiuiui_fmpz(ulong * c, const fmpz_t d)
     {
         ulong f0, f1, f2;
         f0 = fc;
-        f1 = f2 = -((slong) f0 < 0);
+        f1 = f2 = FLINT_SIGN(f0);
         add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], f2, f1, f0);
    } else
    {
@@ -659,7 +662,7 @@ void _fmpz_mpoly_submul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 {
     ulong p[2], p2;
     smul_ppmm(p[1], p[0], d1, d2);
-    p2 = -((slong) p[1] < 0);
+    p2 = FLINT_SIGN(p[1]);
     sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
 
@@ -668,7 +671,7 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 {
     ulong p[2], p2;
     smul_ppmm(p[1], p[0], d1, d2);
-    p2 = -((slong) p[1] < 0);
+    p2 = FLINT_SIGN(p[1]);
     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
 
