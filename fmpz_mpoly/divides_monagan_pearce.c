@@ -316,9 +316,9 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     ulong * e1 = *exp1;
     ulong * exp, * exps;
     ulong ** exp_list;
+    slong exp_next;
     fmpz_t r, acc_lg;
     ulong acc_sm[3];
-    slong exp_next;
     ulong mask;
     slong * hind;
     int lt_divides, small;
