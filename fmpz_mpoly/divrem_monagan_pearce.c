@@ -71,7 +71,6 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
     small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + FLINT_BITS - 2)
          && FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
-
     /* alloc array of heap nodes which can be chained together */
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
@@ -100,7 +99,6 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
     x->i = -WORD(1);
     x->j = 0;
     x->next = NULL;
-
     HEAP_ASSIGN(heap[1], exp2[0], x);
 
     /* precompute leading cofficient info assuming "small" case */
@@ -229,48 +227,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                 k--;
                 continue;
             }
-
-            if (lt_divides)
-            {
-                if (ds == FLINT_SIGN(acc_sm[1]) && d1 < lc_abs)
-                {
-                    ulong qq, rr, nhi, nlo;
-                    nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
-                    nlo = d0 << lc_norm;
-                    udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
-
-                    if ((qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
-                    {
-                        rr = rr >> lc_norm;
-                        qq = (qq^ds^lc_sign) - (ds^lc_sign);
-                        rr = (rr^ds) - ds;
-                        if (rr != 0)
-                        {
-                            l++;
-                            _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
-                            fmpz_set_si(p2 + l, rr);
-                            e2[l] = exp;
-                        }
-                        if (qq == 0)
-                        {
-                            k--;
-                            continue;
-                        }
-                        _fmpz_demote(p1 + k);
-                        p1[k] = qq;
-                    } else
-                    {
-                        small = 0;
-                        fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
-                        goto large_lt_divides;
-                    }
-                } else
-                {
-                    small = 0;
-                    fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
-                    goto large_lt_divides;
-                }
-            } else
+            if (!lt_divides)
             {
                 l++;
                 _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
@@ -278,6 +235,42 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                 e2[l] = exp;
                 k--;
                 continue;
+            }
+            if (ds == FLINT_SIGN(acc_sm[1]) && d1 < lc_abs)
+            {
+                ulong qq, rr, nhi, nlo;
+                nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
+                nlo = d0 << lc_norm;
+                udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
+                rr = rr >> lc_norm;
+                if (rr != 0)
+                {
+                    l++;
+                    _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
+                    fmpz_set_si(p2 + l, (rr^ds) - ds);
+                    e2[l] = exp;
+                }
+                if (qq == 0)
+                {
+                    k--;
+                    continue;
+                }
+                if ((qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
+                {
+                    _fmpz_demote(p1 + k);
+                    p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
+                } else
+                {
+                    small = 0;
+                    fmpz_set_ui(p1 + k, qq);
+                    if (ds != lc_sign)
+                        fmpz_neg(p1 + k, p1 + k);
+                }
+            } else
+            {
+                small = 0;
+                fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
+                goto large_lt_divides;
             }
 
         } else
@@ -287,28 +280,26 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                 k--;
                 continue;
             }
-            if (lt_divides)
-            {
-large_lt_divides:
-                fmpz_fdiv_qr(p1 + k, r, acc_lg, poly3 + 0);
-                if (!fmpz_is_zero(r))
-                {
-                    l++;
-                    _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
-                    fmpz_set(p2 + l, r);                     
-                    e2[l] = exp;
-                }
-                if (fmpz_is_zero(p1 + k))
-                {
-                    k--;
-                    continue;
-                }
-            } else
+            if (!lt_divides)
             {
                 l++;
                 _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
                 fmpz_set(p2 + l, acc_lg); 
                 e2[l] = exp;
+                k--;
+                continue;
+            }
+large_lt_divides:
+            fmpz_fdiv_qr(p1 + k, r, acc_lg, poly3 + 0);
+            if (!fmpz_is_zero(r))
+            {
+                l++;
+                _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
+                fmpz_set(p2 + l, r);                     
+                e2[l] = exp;
+            }
+            if (fmpz_is_zero(p1 + k))
+            {
                 k--;
                 continue;
             }
@@ -589,49 +580,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                 k--;
                 continue;
             }
-
-            if (lt_divides)
-            {
-                if (ds == FLINT_SIGN(acc_sm[1]) && d1 < lc_abs)
-                {
-                    ulong qq, rr, nhi, nlo;
-                    nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
-                    nlo = d0 << lc_norm;
-                    udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
-
-                    if ((qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
-                    {
-                        rr = rr >> lc_norm;
-                        qq = (qq^ds^lc_sign) - (ds^lc_sign);
-                        rr = (rr^ds) - ds;
-
-                        if (rr != 0)
-                        {
-                            l++;
-                            _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
-                            fmpz_set_si(p2 + l, rr);
-                            mpoly_monomial_set(e2 + l*N, exp, N);
-                        }
-                        if (qq == 0)
-                        {
-                            k--;
-                            continue;
-                        }
-                        _fmpz_demote(p1 + k);
-                        p1[k] = qq;
-                    } else
-                    {
-                        small = 0;
-                        fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
-                        goto large_lt_divides;
-                    }
-                } else
-                {
-                    small = 0;
-                    fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
-                    goto large_lt_divides;
-                }
-            } else
+            if (!lt_divides)
             {
                 l++;
                 _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
@@ -639,6 +588,42 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                 mpoly_monomial_set(e2 + l*N, exp, N);
                 k--;
                 continue;
+            }
+            if (ds == FLINT_SIGN(acc_sm[1]) && d1 < lc_abs)
+            {
+                ulong qq, rr, nhi, nlo;
+                nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
+                nlo = d0 << lc_norm;
+                udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
+                rr = rr >> lc_norm;
+                if (rr != 0)
+                {
+                    l++;
+                    _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
+                    fmpz_set_si(p2 + l, (rr^ds) - ds);
+                    mpoly_monomial_set(e2 + l*N, exp, N);
+                }
+                if (qq == 0)
+                {
+                    k--;
+                    continue;
+                }
+                if ((qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
+                {
+                    _fmpz_demote(p1 + k);
+                    p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
+                } else
+                {
+                    small = 0;
+                    fmpz_set_ui(p1 + k, qq);
+                    if (ds != lc_sign)
+                        fmpz_neg(p1 + k, p1 + k);
+                }
+            } else
+            {
+                small = 0;
+                fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
+                goto large_lt_divides;
             }
 
         } else
@@ -648,28 +633,26 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                 k--;
                 continue;
             }
-            if (lt_divides)
-            {
-large_lt_divides:
-                fmpz_fdiv_qr(p1 + k, r, acc_lg, poly3 + 0);
-                if (!fmpz_is_zero(r))
-                {
-                    l++;
-                    _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
-                    fmpz_set(p2 + l, r);                     
-                    mpoly_monomial_set(e2 + l*N, exp, N);
-                }
-                if (fmpz_is_zero(p1 + k))
-                {
-                    k--;
-                    continue;
-                }
-            } else
+            if (!lt_divides)
             {
                 l++;
                 _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
                 fmpz_set(p2 + l, acc_lg); 
                 mpoly_monomial_set(e2 + l*N, exp, N);
+                k--;
+                continue;
+            }
+large_lt_divides:
+            fmpz_fdiv_qr(p1 + k, r, acc_lg, poly3 + 0);
+            if (!fmpz_is_zero(r))
+            {
+                l++;
+                _fmpz_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
+                fmpz_set(p2 + l, r);                     
+                mpoly_monomial_set(e2 + l*N, exp, N);
+            }
+            if (fmpz_is_zero(p1 + k))
+            {
                 k--;
                 continue;
             }

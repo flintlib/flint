@@ -88,7 +88,6 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
     x->i = -WORD(1);
     x->j = 0;
     x->next = NULL;
-
     HEAP_ASSIGN(heap[1], exp2[0], x);
 
     /* precompute leading cofficient info assuming "small" case */
@@ -227,16 +226,15 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                 if (rr != WORD(0))
                     goto not_exact_division;
 
-                ds ^= lc_sign;
                 if ((qq & (WORD(3) << (FLINT_BITS - 2))) == WORD(0))
                 {
                     _fmpz_demote(p1 + k);
-                    p1[k] = (qq^ds) - ds;
+                    p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
                 } else
                 {
                     small = 0;
                     fmpz_set_ui(p1 + k, qq);
-                    if (ds != WORD(0))
+                    if (ds != lc_sign)
                         fmpz_neg(p1 + k, p1 + k);
                 }
             } else
@@ -528,16 +526,15 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 if (rr != WORD(0))
                     goto not_exact_division;
 
-                ds ^= lc_sign;
                 if ((qq & (WORD(3) << (FLINT_BITS - 2))) == WORD(0))
                 {
                     _fmpz_demote(p1 + k);
-                    p1[k] = (qq^ds) - ds;
+                    p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
                 } else
                 {
                     small = 0;
                     fmpz_set_ui(p1 + k, qq);
-                    if (ds != WORD(0))
+                    if (ds != lc_sign)
                         fmpz_neg(p1 + k, p1 + k);
                 }
             } else
