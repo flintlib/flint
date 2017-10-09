@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -88,12 +88,11 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
     x->i = -WORD(1);
     x->j = 0;
     x->next = NULL;
-
     HEAP_ASSIGN(heap[1], exp2[0], x);
 
     /* precompute leading cofficient info assuming "small" case */
     lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = -((slong)(poly3[0]) < 0);
+    lc_sign = FLINT_SIGN(poly3[0]);
     count_leading_zeros(lc_norm, lc_abs);
     lc_n = lc_abs << lc_norm;
     invert_limb(lc_i, lc_n);
@@ -188,8 +187,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                 if (j + 1 == k)
                 {
                     s++;
-                } else if (  1 /* (j + 1 < k) must be true */
-                          && ((hind[i] & 1) == 1)
+                } else if (  ((hind[i] & 1) == 1)
                           && ((i == 1) || (hind[i - 1] >= 2*(j + 2) + 1))
                           )
                 {
@@ -218,7 +216,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                 continue;
             }
 
-            if (ds == -((slong)acc_sm[1] < 0) && d1 < lc_abs)
+            if (ds == FLINT_SIGN(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
@@ -227,16 +225,15 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                 if (rr != WORD(0))
                     goto not_exact_division;
 
-                ds ^= lc_sign;
                 if ((qq & (WORD(3) << (FLINT_BITS - 2))) == WORD(0))
                 {
                     _fmpz_demote(p1 + k);
-                    p1[k] = (qq^ds) - ds;
+                    p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
                 } else
                 {
                     small = 0;
                     fmpz_set_ui(p1 + k, qq);
-                    if (ds != WORD(0))
+                    if (ds != lc_sign)
                         fmpz_neg(p1 + k, p1 + k);
                 }
             } else
@@ -316,9 +313,9 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     ulong * e1 = *exp1;
     ulong * exp, * exps;
     ulong ** exp_list;
+    slong exp_next;
     fmpz_t r, acc_lg;
     ulong acc_sm[3];
-    slong exp_next;
     ulong mask;
     slong * hind;
     int lt_divides, small;
@@ -385,7 +382,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
 
     /* precompute leading cofficient info assuming "small" case */
     lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = -((slong)(poly3[0]) < 0);
+    lc_sign = FLINT_SIGN(poly3[0]);
     count_leading_zeros(lc_norm, lc_abs);
     lc_n = lc_abs << lc_norm;
     invert_limb(lc_i, lc_n);
@@ -486,8 +483,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 if (j + 1 == k)
                 {
                     s++;
-                } else if (  1 /* (j + 1 < k) is always true */
-                          && ((hind[i] & 1) == 1)
+                } else if (  ((hind[i] & 1) == 1)
                           && ((i == 1) || (hind[i - 1] >= 2*(j + 2) + 1))
                           )
                 {
@@ -519,7 +515,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 continue;
             }
 
-            if (ds == -((slong)acc_sm[1] < 0) && d1 < lc_abs)
+            if (ds == FLINT_SIGN(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
@@ -528,16 +524,15 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 if (rr != WORD(0))
                     goto not_exact_division;
 
-                ds ^= lc_sign;
                 if ((qq & (WORD(3) << (FLINT_BITS - 2))) == WORD(0))
                 {
                     _fmpz_demote(p1 + k);
-                    p1[k] = (qq^ds) - ds;
+                    p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
                 } else
                 {
                     small = 0;
                     fmpz_set_ui(p1 + k, qq);
-                    if (ds != WORD(0))
+                    if (ds != lc_sign)
                         fmpz_neg(p1 + k, p1 + k);
                 }
             } else
