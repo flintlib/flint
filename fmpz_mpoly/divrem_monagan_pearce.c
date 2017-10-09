@@ -69,7 +69,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
     bits3 = _fmpz_vec_max_bits(poly3, len3);
     /* allow one bit for sign, one bit for subtraction */
     small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + FLINT_BITS - 2)
-         && FLINT_ABS(bits3) <= FLINT_BITS - 2;
+          && FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
@@ -198,8 +198,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                 if (j + 1 == k)
                 {
                     s++;
-                } else if (  1 /* (j + 1 < k) must be true */
-                          && ((hind[i] & 1) == 1)
+                } else if (  ((hind[i] & 1) == 1)
                           && ((i == 1) || (hind[i - 1] >= 2*(j + 2) + 1))
                           )
                 {
@@ -528,7 +527,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                 }
             } else
             {
-                /* should we go up */
+                /* should we go right? */
                 if (  (i + 1 < len3)
                    && (hind[i + 1] == 2*j + 1)
                    )
@@ -548,8 +547,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                 if (j + 1 == k)
                 {
                     s++;
-                } else if (  1 /* (j + 1 < k) is always true */
-                          && ((hind[i] & 1) == 1)
+                } else if (  ((hind[i] & 1) == 1)
                           && ((i == 1) || (hind[i - 1] >= 2*(j + 2) + 1))
                           )
                 {

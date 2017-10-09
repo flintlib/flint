@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -198,8 +198,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                 if (j + 1 == k)
                 {
                     s++;
-                } else if (  1 /* (j + 1 < k) must be true */
-                          && ((hind[i] & 1) == 1)
+                } else if (  ((hind[i] & 1) == 1)
                           && ((i == 1) || (hind[i - 1] >= 2*(j + 2) + 1))
                           )
                 {
@@ -506,8 +505,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                 if (j + 1 == k)
                 {
                     s++;
-                } else if (  1 /* (j + 1 < k) is always true */
-                          && ((hind[i] & 1) == 1)
+                } else if (  ((hind[i] & 1) == 1)
                           && ((i == 1) || (hind[i - 1] >= 2*(j + 2) + 1))
                           )
                 {
