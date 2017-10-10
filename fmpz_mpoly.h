@@ -489,6 +489,20 @@ FLINT_DLL int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
                     const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
+                        fmpz_mpoly_t q, fmpz_mpoly_t r,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_quasidivrem_heapV1(fmpz_t scale,
+                        fmpz_mpoly_t q, fmpz_mpoly_t r,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_quasidivrem_heapV2(fmpz_t scale,
+                        fmpz_mpoly_t q, fmpz_mpoly_t r,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+
 /* Reduction *****************************************************************/
 
 FLINT_DLL slong
@@ -751,6 +765,51 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
    flint_free(rexp);
    flint_free(gexp);
 }
+
+
+/*
+   test that r is a valid remainder upon division by g over Q
+   this means that no term of r is divisible by lt(g)
+*/
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+   slong i, N, bits;
+   ulong mask = 0;
+   ulong * rexp, * gexp;
+
+   bits = FLINT_MAX(r->bits, g->bits);
+   N = words_per_exp(ctx->n, bits);
+
+   if (g->length == 0 )
+      flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
+
+   if (r->length == 0 )
+      return;
+
+   rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
+   gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
+   mpoly_unpack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->n);
+   mpoly_unpack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->n);
+
+   /* mask with high bit set in each field of exponent vector */
+   for (i = 0; i < FLINT_BITS/bits; i++)
+      mask = (mask << bits) + (UWORD(1) << (bits - 1));
+
+   for (i = 0; i < r->length; i++)
+      if (mpoly_monomial_divides_test(rexp + i*N, gexp + 0*N, N, mask))
+      {
+         flint_printf("fmpz_mpoly_remainder_strongtest FAILED i = %wd\n", i);
+         flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
+         flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+         flint_abort();
+      }
+
+   flint_free(rexp);
+   flint_free(gexp);
+}
+
 
 
 #ifdef __cplusplus
