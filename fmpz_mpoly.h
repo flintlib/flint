@@ -493,14 +493,6 @@ FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
                         fmpz_mpoly_t q, fmpz_mpoly_t r,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
-FLINT_DLL void fmpz_mpoly_quasidivrem_heapV1(fmpz_t scale,
-                        fmpz_mpoly_t q, fmpz_mpoly_t r,
-                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
-FLINT_DLL void fmpz_mpoly_quasidivrem_heapV2(fmpz_t scale,
-                        fmpz_mpoly_t q, fmpz_mpoly_t r,
-                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
 
 
 /* Reduction *****************************************************************/
