@@ -95,7 +95,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
     /* precompute leading cofficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
     lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN(poly3[0]);
+    lc_sign = FLINT_SIGN_EXT(poly3[0]);
     count_leading_zeros(lc_norm, lc_abs);
     lc_n = lc_abs << lc_norm;
     invert_limb(lc_i, lc_n);
@@ -238,7 +238,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
                 r_len++;
                 continue;
             }
-            if (ds == FLINT_SIGN(acc_sm[1]) && d1 < lc_abs)
+            if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
@@ -455,7 +455,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
     /* precompute leading cofficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
     lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN(poly3[0]);
+    lc_sign = FLINT_SIGN_EXT(poly3[0]);
     count_leading_zeros(lc_norm, lc_abs);
     lc_n = lc_abs << lc_norm;
     invert_limb(lc_i, lc_n);
@@ -608,7 +608,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
                 r_len++;
                 continue;
             }
-            if (ds == FLINT_SIGN(acc_sm[1]) && d1 < lc_abs)
+            if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
