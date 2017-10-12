@@ -489,6 +489,12 @@ FLINT_DLL int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
                     const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
+                        fmpz_mpoly_t q, fmpz_mpoly_t r,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+
 /* Reduction *****************************************************************/
 
 FLINT_DLL slong
@@ -610,7 +616,7 @@ FLINT_DLL void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
 FLINT_DLL void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
                           const fmpz * poly1, slong * i1, slong * n1, slong i);
 
-#define FLINT_SIGN(x) (-(ulong)((slong)(x) < 0))
+#define FLINT_SIGN_EXT(x) (-(ulong)((slong)(x) < 0))
 
 
 FMPZ_MPOLY_INLINE
@@ -622,7 +628,7 @@ void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d)
    {
         ulong f0, f1, f2;
         f0 = fc;
-        f1 = f2 = FLINT_SIGN(f0);
+        f1 = f2 = FLINT_SIGN_EXT(f0);
         sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], f2, f1, f0);
    } else
    {
@@ -644,7 +650,7 @@ void _fmpz_mpoly_add_uiuiui_fmpz(ulong * c, const fmpz_t d)
     {
         ulong f0, f1, f2;
         f0 = fc;
-        f1 = f2 = FLINT_SIGN(f0);
+        f1 = f2 = FLINT_SIGN_EXT(f0);
         add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], f2, f1, f0);
    } else
    {
@@ -662,7 +668,7 @@ void _fmpz_mpoly_submul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 {
     ulong p[2], p2;
     smul_ppmm(p[1], p[0], d1, d2);
-    p2 = FLINT_SIGN(p[1]);
+    p2 = FLINT_SIGN_EXT(p[1]);
     sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
 
@@ -671,7 +677,7 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 {
     ulong p[2], p2;
     smul_ppmm(p[1], p[0], d1, d2);
-    p2 = FLINT_SIGN(p[1]);
+    p2 = FLINT_SIGN_EXT(p[1]);
     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
 
@@ -751,6 +757,51 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
    flint_free(rexp);
    flint_free(gexp);
 }
+
+
+/*
+   test that r is a valid remainder upon division by g over Q
+   this means that no term of r is divisible by lt(g)
+*/
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+   slong i, N, bits;
+   ulong mask = 0;
+   ulong * rexp, * gexp;
+
+   bits = FLINT_MAX(r->bits, g->bits);
+   N = words_per_exp(ctx->n, bits);
+
+   if (g->length == 0 )
+      flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
+
+   if (r->length == 0 )
+      return;
+
+   rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
+   gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
+   mpoly_unpack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->n);
+   mpoly_unpack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->n);
+
+   /* mask with high bit set in each field of exponent vector */
+   for (i = 0; i < FLINT_BITS/bits; i++)
+      mask = (mask << bits) + (UWORD(1) << (bits - 1));
+
+   for (i = 0; i < r->length; i++)
+      if (mpoly_monomial_divides_test(rexp + i*N, gexp + 0*N, N, mask))
+      {
+         flint_printf("fmpz_mpoly_remainder_strongtest FAILED i = %wd\n", i);
+         flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
+         flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+         flint_abort();
+      }
+
+   flint_free(rexp);
+   flint_free(gexp);
+}
+
 
 
 #ifdef __cplusplus
