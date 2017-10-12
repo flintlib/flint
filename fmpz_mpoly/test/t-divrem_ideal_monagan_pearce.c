@@ -327,9 +327,13 @@ main(void)
              fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
 
              for (w = 0; w < num; w++)
+             {
                 fmpz_mpoly_print_pretty(darr[w], NULL, ctx); printf("\n\n");
+             }
              for (w = 0; w < num; w++)
+             {
                 fmpz_mpoly_print_pretty(qarr[w], NULL, ctx); printf("\n\n");
+             }
 			           
              flint_abort();
           }

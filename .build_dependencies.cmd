@@ -22,5 +22,5 @@ rename pthreads-master pthreads
 cd pthreads\build.vc14
 msbuild.exe pthreads.sln /p:Configuration=Release /p:Platform=%PLATFORM% /p:PlatformToolset=v140 /verbosity:minimal
 cd ..\..
-
+ 
 cd flint2

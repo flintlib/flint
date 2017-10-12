@@ -229,7 +229,7 @@ build/%.o: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/test/%$(EXEEXT): test/%.c $(HEADERS) test_helpers.o | build/test
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $(LDFLAGS) test_helpers.o $< -o $@ $(LIBS)
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) test_helpers.o $< -o $@ $(LIBS) $(LDFLAGS)
 
 build/test:
 	mkdir -p build/test
@@ -244,7 +244,7 @@ build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp NTL-interface.h
 	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) -c $< -o $@
 
 build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o
-	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) $(LDFLAGS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS)
+	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS) $(LDFLAGS)
 
 print-%:
 	@echo '$*=$($*)'

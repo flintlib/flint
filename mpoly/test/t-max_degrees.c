@@ -35,17 +35,17 @@ main(void)
     max  = (ulong *) flint_malloc(max_fields*sizeof(ulong));
     max2 = (ulong *) flint_malloc(max_fields*sizeof(ulong));
 
-    for (k = 0; k < 1000 * flint_test_multiplier(); k++)
+    for (k = 0; k < 100 * flint_test_multiplier(); k++)
     {
         /*
             calculate the maximum by hand using FLINT_BITS
             then pack FLINT_BITS => bits and compare the output
         */
-        for (bits = 8; bits <= FLINT_BITS; bits *= 2)
+        for (bits = 8; bits <= FLINT_BITS; bits += 1)
         {
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, max_fields) + 1;
-            N = (bits*nfields - 1)/FLINT_BITS + 1;
+            N = words_per_exp(nfields, bits);
 
             for (j = 0; j < nfields; j++)
                 max[j] = 0;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -39,6 +39,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                                                       slong bits, ulong maskhi)
 {
    slong i, k, l, s;
+   slong next_loc = len3 + 4;   /* something bigger than heap can ever be */
    slong next_free, Q_len = 0;
    slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap1_s * heap;
@@ -218,15 +219,16 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
             x->next = NULL;
 
             /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
-            _mpoly_heap_insert1(heap, exp2[x->j], x, &heap_len, maskhi);
+            _mpoly_heap_insert1(heap, exp2[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j < k - 1)
          {
             x->j++;
             x->next = NULL;
 
             /* insert (x->i, x->j + 1, exp3[x->i] + e1[x->j]) in heap */
-            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x, &heap_len,
-                                                                       maskhi);
+            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j == k - 1)
          {
             s++;
@@ -362,8 +364,8 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                   x2->next = NULL;
 
                   /* insert (i, k, exp3[i] + e1[k]) */
-                  _mpoly_heap_insert1(heap, exp3[i] + e1[k], x2, &heap_len,
-                                                                       maskhi);
+                  _mpoly_heap_insert1(heap, exp3[i] + e1[k], x2,
+                                                 &next_loc, &heap_len, maskhi);
                }
                s = 1;
             } else /* quotient coeff was zero, nothing to write out */
@@ -421,6 +423,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                    slong len3, slong bits, slong N, ulong maskhi, ulong masklo)
 {
    slong i, k, l, s;
+   slong next_loc = len3 + 4;   /* something bigger than heap can ever be */
    slong next_free, Q_len = 0;
    slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap_s * heap;
@@ -626,8 +629,8 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
             mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
 
             /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          } else if (x->j < k - 1)
          {
@@ -637,8 +640,8 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
             mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
 
             /* insert (x->i, x->j + 1, exp3[x->i] + e1[x->j]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          } else if (x->j == k - 1)
          {
@@ -776,7 +779,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
 
                   /* insert (i, k, exp3[i] + e1[k]) */
                   if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2,
-                                                 &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                      exp_next--;
                }
                s = 1;
@@ -843,7 +846,7 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
    /* number of words required for exponent vectors */
-   N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, exp_bits);
 
    /* ensure input exponents packed to same size as output exponents */
    if (exp_bits > poly2->bits)
@@ -914,19 +917,20 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
          && lenr == 0 && exp_bits < FLINT_BITS)
    {
       ulong * old_exp2 = exp2, * old_exp3 = exp3;
+      slong old_exp_bits = exp_bits;
 
-      masks_from_bits_ord(maskhi, masklo, 2*exp_bits, ctx->ord);
-      N = (2*exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+      exp_bits = mpoly_optimize_bits(exp_bits + 1, ctx->n);
+
+      masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
+      N = words_per_exp(ctx->n, exp_bits);
 
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-      mpoly_unpack_monomials(exp2, 2*exp_bits, old_exp2, exp_bits,
+      mpoly_unpack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
                                                         poly2->length, ctx->n);
 
       exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-      mpoly_unpack_monomials(exp3, 2*exp_bits, old_exp3, exp_bits,
+      mpoly_unpack_monomials(exp3, exp_bits, old_exp3, old_exp_bits,
                                                         poly3->length, ctx->n);
-
-      exp_bits *= 2;
 
       if (free2)
          flint_free(old_exp2);

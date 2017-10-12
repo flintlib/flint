@@ -626,6 +626,15 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
 
     Set \code{poly1} to \code{poly2} times \code{poly3} using the Johnson heap
     based method. See the numerous papers by Michael Monagan and Roman Pearce.
+    This function throws an exception upon exponent overflow.
+
+
+void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx)
+
+    Does the same operation as \code{fmpz_mpoly_mul_johnson} but with
+    multiple threads. This function throws an exception upon exponent overflow.
 
 slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1,
           slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, 
@@ -752,7 +761,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
     "Polynomial division using dynamic arrays, heaps and packed exponents" by
     Michael Monagan and Roman Pearce. No aliasing is allowed.
 
-void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q,
+void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t polyq,
                      const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                     const fmpz_mpoly_ctx_t ctx)
 
@@ -854,6 +863,26 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q,
 
 *******************************************************************************
 
+    Differentiation/Integration
+
+*******************************************************************************
+
+void fmpz_mpoly_derivative(fmpz_mpoly_t poly1,
+               const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
+
+    Sets \code{poly1} to the derivative of \code{poly2} with respect to the
+    variable of index \code{idx}. This function cannot fail.
+
+void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
+               const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
+
+    Sets \code{poly1} and \code{scale} so that \{poly1} is an integral of
+    \code{poly2*scale} with respect to the variable of index \code{idx},
+    where \code{scale} is positive and as small as possible. This function
+    throws an exception upon exponent overflow.
+
+*******************************************************************************
+
     Input/Output
 
 *******************************************************************************
@@ -919,6 +948,14 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t poly,
     array of variable strings, starting with the variable of most
     significance with respect to the ordering. The number of characters
     written is returned.
+
+int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t poly, const char * str,
+                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
+
+    Sets \code{poly} to the polynomial in the null-terminates string \code{str}
+    given an array \code{x} of variable strings. If parsing \code{str} fails,
+    \code{poly} is set to zero, and \code{-1} is returned. Otherwise, \code{0}
+    is returned.
 
 *******************************************************************************
 

@@ -441,7 +441,7 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
 {
    slong i, j, k, l = 0, m, prod, len = 0, l1, l2, l3;
    slong bits1, bits2, bits3 = 0, tlen, talloc;
-   slong shift = FLINT_BITS - bits;
+   slong shift = bits*(FLINT_BITS/bits - 1);
    slong * i1, * i2, * i3, * n1, * n2, * n3, * prods;
    slong * b1, * b3, * maxb1, * maxb3, * max_exp1, * max_exp3;
    ulong * e2, * e3, * texp, * p2;
@@ -1039,9 +1039,7 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
 
    /* compute number of bits required for output exponents */
    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
-
-   /* number of words for exponents */
-   N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, exp_bits);
 
    /* array division expects each exponent vector in one word */
    /* current code is wrong for reversed orderings */

@@ -32,6 +32,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                                                                   ulong maskhi)
 {
    slong i, k, s;
+   slong next_loc = len3 + 4;   /* something bigger than heap can ever be */
    slong next_free, Q_len = 0, reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap1_s * heap;
    mpoly_heap_t * chain;
@@ -218,15 +219,16 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
             x->next = NULL;
 
             /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
-            _mpoly_heap_insert1(heap, exp2[x->j], x, &heap_len, maskhi);
+            _mpoly_heap_insert1(heap, exp2[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j < k - 1)
          {
             x->j++;
             x->next = NULL;
 
             /* insert (x->i, x->j + 1, exp3[x->j] + e1[x->j]) in heap */
-            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x, &heap_len,
-                                                                       maskhi);
+            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x,
+                                                 &next_loc, &heap_len, maskhi);
          } else if (x->j == k - 1)
          {
             s++;
@@ -323,7 +325,8 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
             x2->next = NULL;
 
             /* insert (i, k, exp3[i] + e1[k]) in heap */
-            _mpoly_heap_insert1(heap, exp3[i] + e1[k], x2, &heap_len, maskhi);
+            _mpoly_heap_insert1(heap, exp3[i] + e1[k], x2,
+                                                 &next_loc, &heap_len, maskhi);
          }
 
          s = 1;
@@ -366,6 +369,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                                                     ulong maskhi, ulong masklo)
 {
    slong i, k, s;
+   slong next_loc = len3 + 4;   /* something bigger than heap can ever be */
    slong next_free, Q_len = 0;
    slong reuse_len = 0, heap_len = 2; /* heap zero index unused */
    mpoly_heap_s * heap;
@@ -577,8 +581,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
 
             /* insert (x->i, x->j + 1, exp2[x->j]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          } else if (x->j < k - 1)
          {
@@ -588,8 +592,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
 
             /* insert (x->i, x->j + 1, exp3[x->j] + e1[x->j]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          } else if (x->j == k - 1)
          {
@@ -687,8 +691,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             mpoly_monomial_add(exp_list[exp_next], exp3 + i*N, e1 + k*N, N);
 
             /* insert (i, k, exp3[i] + e1[k]) in heap */
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2, &heap_len,
-                                                            N, maskhi, masklo))
+            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x2,
+                                      &next_loc, &heap_len, N, maskhi, masklo))
                exp_next--;
          }
 
@@ -771,14 +775,14 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 
    exp_bits = 8;
    while (bits >= exp_bits)
-      exp_bits *= 2;
+      exp_bits += 1;
 
    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
+   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   /* number of words required for exponent vectors */
-   N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, exp_bits);
 
    /* temporary space to check leading monomials divide */
    expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));

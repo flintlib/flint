@@ -163,6 +163,12 @@ int mpoly_monomial_divides_tight(slong e1, slong e2, slong * prods, slong num)
 
 *******************************************************************************
 
+slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg)
+
+    Returns the number of bits required to store \code{user_exp} in packed
+    format. The returned number of bits includes space for a zeroed signed bit.
+    A return value of \code{> FLINT_BITS} indicates that it does not fit.
+
 void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
                                                 slong len, slong bits, slong n)
 
@@ -206,6 +212,24 @@ int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
     word of the exponent vector. The integer \code{masklo} will be a mask of
     all bits of the word.
 
+void mpoly_search_monomials(
+                slong ** e_ind, ulong * e, slong * e_score,
+                slong * t1, slong * t2, slong *t3,
+                slong lower, slong upper,
+                const ulong * a, slong a_len, const ulong * b, slong b_len,
+                                          slong N, ulong maskhi, ulong masklo)
+
+    Given packed exponent vectors \code{a} and \code{b}, compute a packed
+    exponent \code{e} such that the number of monomials in the cross product
+    \code{a} X \code{b} that are less than or equal to \code{e} is between
+    \code{lower} and \code{upper}. This number is stored in \code{e_store}. If
+    no such monomial exists, one is chosen so that the number of monomials is as
+    close as possible. This function assumes that \code{1} is the smallest
+    monomial and needs three arrays \code{t1}, \code{t1}, and \code{t3} of the
+    size as \code{a} for workspace. The parameter \code{e_ind} is set to one
+    of \code{t1}, \code{t1}, and \code{t3} and gives the locations of the
+    monomials in \code{a} X \code{b}.
+
 *******************************************************************************
 
     Setting and getting monomials
@@ -231,7 +255,6 @@ void mpoly_set_monomial(ulong * exp1, const ulong * exp2,
 void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                          slong bits, slong n, int deg, int rev)
 
-
     Given an array of possibly packed exponent vectors, each packed into the
     given number of bits, get the monomial at index $n$ and set \code{exps} to
     the corresponding unpacked exponent vector. The degree field, if any, is
@@ -249,6 +272,36 @@ void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
 
 *******************************************************************************
 
+slong mpoly_optimize_bits(slong bits, slong nfields)
+
+    Returns the largest number \code{x} in the range
+    \code{bits <= x <= FLINT_BITS} for which \code{nfields} fields can be
+    packed without increasing the required words per exponent vector. It is
+    assumed that \code{bits <= FLINT_BITS}, and the return satisfies
+    \code{(nfields - 1)/(FLINT_BITS/bits) = (nfields - 1)/(FLINT_BITS/x)}.
+
+void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits,
+                                                      slong nfields, slong len)
+
+    Given an array of exponent vectors \code{exp2} of length \code{len}, each
+    of the \code{nfields} fields of which is a full word,
+    pack the exponent vectors into an array of exponent vectors \code{exp1},
+    each field of which is packed into \code{bits} bits. We require that
+    \code{1 <= bits <= FLINT_BITS}. It is assumed that \code{exp1} has
+    sufficient space for the output. It is not assumed that \code{bits} divides
+    \code{FLINT_BITS} here nor in any of the other packing and unpacking
+    functions.
+
+void mpoly_unpack_vec(ulong * exp1, const ulong * exp2,
+                                          slong bits, slong nfields, slong len)
+
+    Given an array of exponent vectors \code{exp2} of length \code{len}, each
+    of the \code{nfields} fields of which is packed into \code{bits} bits,
+    unpack the exponent vectors into an array of exponent vectors \code{exp1},
+    each field of which is a full word. We require that
+    \code{1 <= bits <= FLINT_BITS}. It is assumed that \code{exp1} has
+    sufficient space for the output.
+
 void mpoly_unpack_monomials(ulong * exps1, slong bits1,
                         const ulong * exps2, slong bits2, slong len, slong num)
 
@@ -256,10 +309,9 @@ void mpoly_unpack_monomials(ulong * exps1, slong bits1,
     of the \code{num} fields of which is packed into \code{bits2} bits, pack
     the exponent vectors into an array of exponent vectors \code{exps1}, each
     field of which consists of \code{bits1} bits. We require that
-    \code{bits2 <= bits1 <= FLINT_BITS). It is assumed that \code{exps1} has
+    \code{bits2 <= bits1 <= FLINT_BITS}. It is assumed that \code{exps1} has
     sufficient space for the output.
  
-
 void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,
             slong len, const slong * mults, slong num, slong extra, slong bits)
 

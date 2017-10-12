@@ -144,7 +144,7 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
    {
       if (poly->alloc != 0)
       {
-         N = (bits*ctx->n - 1)/FLINT_BITS + 1;
+         N = words_per_exp(ctx->n, bits);
          t = flint_malloc(N*poly->alloc*sizeof(ulong));
          mpoly_unpack_monomials(t, bits, poly->exps,
                                              poly->bits, poly->length, ctx->n);
@@ -406,6 +406,10 @@ FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1,
           slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, 
                          const fmpz * poly3, const ulong * exp3, slong len3, 
@@ -423,6 +427,14 @@ FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
 
 FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                           slong k, const fmpz_mpoly_ctx_t ctx);
+
+/* Calculus ******************************************************************/
+
+FLINT_DLL void fmpz_mpoly_derivative(fmpz_mpoly_t poly1,
+              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
+              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 
 /* Divisibility **************************************************************/
 
@@ -492,6 +504,9 @@ fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 /* Input/output **************************************************************/
+
+FLINT_DLL int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t poly, const char * str,
+                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
                           const ulong * exps, slong len, const char ** x, 
@@ -646,7 +661,7 @@ void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
    ulong maskhi, masklo;
 
    masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = (ctx->n*poly->bits - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, poly->bits);
 
    if (!mpoly_monomials_test(poly->exps, poly->length, N, maskhi, masklo))
       flint_throw(FLINT_ERROR, "Polynomial invalid");
@@ -667,7 +682,7 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
    ulong * rexp, * gexp;
 
    bits = FLINT_MAX(r->bits, g->bits);
-   N = (bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, bits);
 
    if (g->length == 0 )
       flint_throw(FLINT_ERROR, "Zero denominator in remainder test");

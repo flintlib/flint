@@ -18,60 +18,30 @@
 void fmpz_mpoly_get_term_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
                                  ulong const * exp, const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, N, index, bits, exp_bits;
-   int exists;
-   ulong sum = 0, max_exp = 0;
+   slong N, index, exp_bits;
    ulong maskhi, masklo;
    ulong * packed_exp;
-   int deg, rev;
+   int exists, deg, rev;
 
    TMP_INIT;
 
-   TMP_START;
-
    degrev_from_ord(deg, rev, ctx->ord);
 
-   if (deg)
-   {
-      for (i = 0; i < ctx->n - 1; i++)
-      {  
-         sum += exp[i];
-
-         if (sum < exp[i])
-            flint_throw(FLINT_EXPOF,
-                              "Exponent overflow in fmpz_mpoly_get_term_fmpz");
-      }
-
-      max_exp = sum;
-   } else
-   {
-      for (i = 0; i < ctx->n - 1; i++)
-      {
-         if (exp[i] > max_exp)
-            max_exp = exp[i];
-      }
-   }
-      
-   if (0 > (slong) max_exp)
-      flint_throw(FLINT_EXPOF,
-                              "Exponent overflow in fmpz_mpoly_get_term_fmpz");
-
-   /* compute number of bits to store maximum degree */
-   bits = FLINT_BIT_COUNT(max_exp);
-
-   exp_bits = 8;
-   while (bits >= exp_bits) /* extra bit required for signs */
-      exp_bits *= 2;
+   /* compute how many bits are required to represent exp */
+   exp_bits = mpoly_exp_bits(exp, ctx->n, deg);
+   if (exp_bits > FLINT_BITS)
+       flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_get_term_fmpz");
 
    if (exp_bits > poly->bits) /* exponent too large to be poly exponent */
    {
       fmpz_zero(c);
-
       return;
    }
+
+   TMP_START;
    
    masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, poly->bits);
 
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 

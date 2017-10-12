@@ -56,7 +56,7 @@ int main(void)
         }
     }
 
-    if (fails > flint_test_multiplier())
+    if (fails > 2*flint_test_multiplier())
     {
         flint_printf("Too many unsuccessful factorizations, %d\n", fails);
         flint_printf("Aborting\n");

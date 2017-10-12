@@ -30,7 +30,7 @@ void fmpz_mpoly_add_si(fmpz_mpoly_t poly1,
 
    if (c != 0)
    {
-      N = (poly2->bits*ctx->n - 1)/FLINT_BITS + 1;
+      N = words_per_exp(ctx->n, poly2->bits);
 
       if (mpoly_monomial_is_zero(poly2->exps + (len2 - 1)*N, N))
       {

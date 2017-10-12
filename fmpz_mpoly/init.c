@@ -17,24 +17,25 @@
 
 void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
+   /* default to at least 8 bits per exponent */
+   slong bits = mpoly_optimize_bits(8, ctx->n);
+
    poly->coeffs = NULL;
    poly->exps = NULL;
-
    poly->alloc = 0;
    poly->length = 0;
-   poly->bits = 8;   /* default to 8 bits per exponent */
+   poly->bits = bits;
 }
 
 void fmpz_mpoly_init2(fmpz_mpoly_t poly,
                                        slong alloc, const fmpz_mpoly_ctx_t ctx)
 {
-   slong N;
+   /* default to at least 8 bits per exponent */
+   slong bits = mpoly_optimize_bits(8, ctx->n);
+   slong N = words_per_exp(ctx->n, bits);
 
    if (alloc != 0)
    {
-      /* default to 8 bits per exponent */
-      N = (8*ctx->n - 1)/FLINT_BITS + 1;
-
       poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
       poly->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
    } else
@@ -42,9 +43,8 @@ void fmpz_mpoly_init2(fmpz_mpoly_t poly,
       poly->coeffs = NULL;
       poly->exps = NULL;
    }
-
    poly->alloc = alloc;
    poly->length = 0;
-   poly->bits = 8;      /* default to 8 bits per exponent */
+   poly->bits = bits;
 }
 

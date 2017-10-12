@@ -787,7 +787,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 {
    slong i, j, k, prod, len = 0, l1, l2, l3;
    slong bits1, bits2, bits3 = 0, tlen, talloc, skip, max_exp;
-   slong shift = FLINT_BITS - bits;
+   slong shift = bits*(FLINT_BITS/bits - 1);
    slong * i1, * i2, * i3, * n1, * n2, * n3;
    slong * b1, * b3, * maxb1, * maxb3, * max_exp1, * max_exp3;
    ulong * e2, * e3, * texp, * p2;
@@ -1356,13 +1356,12 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    exp_bits = 8;
    while (bits >= exp_bits)
-      exp_bits *= 2;
+      exp_bits += 1;
 
    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
-
-   /* number of words for exponents */
-   N = (exp_bits*ctx->n - 1)/FLINT_BITS + 1;
+   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+   N = words_per_exp(ctx->n, exp_bits);
 
    /* array division expects each exponent vector in one word */
    /* current code is wrong for reversed orderings */

@@ -14,7 +14,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
-
+/*
 void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
                                          slong bits, slong n, int deg, int rev)
 {
@@ -60,19 +60,28 @@ void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
 
     TMP_END;
 }
-
+*/
 void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 {
-   int deg, rev;
+    int deg, rev;
+    slong j;
+    ulong * mon;
+    TMP_INIT;
 
-   slong N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+    degrev_from_ord(deg, rev, ctx->ord);
 
-   fmpz_mpoly_fit_length(poly, 1, ctx);
+    fmpz_mpoly_fit_length(poly, 1, ctx);
 
-   degrev_from_ord(deg, rev, ctx->ord);
+    fmpz_set_ui(poly->coeffs + 0, 1);
 
-   _fmpz_mpoly_gen(poly->coeffs, poly->exps, i, poly->bits,
-                                                          ctx->n, deg, rev, N);
-      
-   _fmpz_mpoly_set_length(poly, 1, ctx);
+    TMP_START;
+
+    mon = (ulong *) TMP_ALLOC((ctx->n - deg)*sizeof(ulong));
+    for (j = 0; j < ctx->n - deg; j++)
+       mon[j] = (j == i);
+    mpoly_set_monomial(poly->exps, mon, poly->bits, ctx->n, deg, rev);
+
+    TMP_END;
+
+    _fmpz_mpoly_set_length(poly, 1, ctx);
 }

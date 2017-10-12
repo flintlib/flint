@@ -84,18 +84,23 @@ typedef struct mpoly_heap_s
       }                                                               \
    } while (0)
 
-#define masks_from_bits_ord(maskhi, masklo, bits, ord)                \
-   do {                                                               \
-      if ((ord) == ORD_DEGREVLEX)                                     \
-      {                                                               \
-         (masklo) = -WORD(1);                                         \
-         (maskhi) = (WORD(1) << ((FLINT_BITS) - (bits))) - 1;         \
-      } else                                                          \
-      {                                                               \
-         (masklo) = 0;                                                \
-         (maskhi) = 0;                                                \
-      }                                                               \
-   } while (0)                                                        \
+#define masks_from_bits_ord(maskhi, masklo, bits, ord)                       \
+   do {                                                                      \
+      if ((ord) == ORD_DEGREVLEX)                                            \
+      {                                                                      \
+         (masklo) = -WORD(1);                                                \
+         (maskhi) = (WORD(1) << ((bits)*((FLINT_BITS)/(bits) - 1))) - 1;     \
+      } else                                                                 \
+      {                                                                      \
+         (masklo) = 0;                                                       \
+         (maskhi) = 0;                                                       \
+      }                                                                      \
+   } while (0)
+
+
+#define words_per_exp(nfields, bits)                                  \
+   (((nfields) - 1)/(FLINT_BITS/(bits)) + 1)
+
 
 /* Orderings *****************************************************************/
 
@@ -384,6 +389,16 @@ void mpoly_max_degrees_tight(slong * max_exp,
 
 /* Monomial arrays ***********************************************************/
 
+FLINT_DLL slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg);
+
+FLINT_DLL slong mpoly_optimize_bits(slong bits, slong nfields);
+
+FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len);
+
+FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len);
+
+
+
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                         slong bits, slong n, int deg, int rev);
 
@@ -405,6 +420,13 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
 
 FLINT_DLL void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
                                                slong len, slong bits, slong n);
+
+FLINT_DLL void mpoly_search_monomials(
+                slong ** e_ind, ulong * e, slong * e_score,
+                slong * t1, slong * t2, slong *t3,
+                slong lower, slong upper,
+                const ulong * a, slong a_len, const ulong * b, slong b_len,
+                                          slong N, ulong maskhi, ulong masklo);
 
 MPOLY_INLINE
 int mpoly_monomials_test(ulong * exps, slong len, slong N,
@@ -468,11 +490,10 @@ void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len, ulong maskhi)
 }
 
 MPOLY_INLINE
-void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
-                                      void * x, slong * heap_len, ulong maskhi)
+void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
+                              slong * next_loc, slong * heap_len, ulong maskhi)
 {
    slong i = *heap_len, j, n = *heap_len;
-   static slong next_loc = 0;
 
    if (i != 1 && exp == heap[1].exp)
    {
@@ -482,15 +503,17 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
       return;
    }
 
-   if (next_loc != 0 && next_loc < *heap_len)
+   if (*next_loc < *heap_len)
    {
-      if (exp == heap[next_loc].exp)
+      if (exp == heap[*next_loc].exp)
       {
-         ((mpoly_heap_t *) x)->next = heap[next_loc].next;
-         heap[next_loc].next = x;
+         ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
+         heap[*next_loc].next = x;
          return;
       }
    }
+
+
 
    while ((j = HEAP_PARENT(i)) >= 1)
    {
@@ -498,7 +521,9 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
       {
          ((mpoly_heap_t *) x)->next = heap[j].next;
          heap[j].next = x;
-         next_loc = j;
+
+         *next_loc = j;
+
 
          return;
       } else if ((exp^maskhi) > (heap[j].exp^maskhi))
@@ -556,10 +581,9 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
 
 MPOLY_INLINE
 int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
-                         slong * heap_len, slong N, ulong maskhi, ulong masklo)
+       slong * next_loc, slong * heap_len, slong N, ulong maskhi, ulong masklo)
 {
    slong i = *heap_len, j, n = *heap_len;
-   static slong next_loc = 0;
 
    if (i != 1 && mpoly_monomial_equal(exp, heap[1].exp, N))
    {
@@ -569,12 +593,12 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
       return 0;
    }
 
-   if (next_loc != 0 && next_loc < *heap_len)
+   if (*next_loc < *heap_len)
    {
-      if (mpoly_monomial_equal(exp, heap[next_loc].exp, N))
+      if (mpoly_monomial_equal(exp, heap[*next_loc].exp, N))
       {
-         ((mpoly_heap_t *) x)->next = heap[next_loc].next;
-         heap[next_loc].next = x;
+         ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
+         heap[*next_loc].next = x;
          return 0;
       }
    }
@@ -591,7 +615,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
    {
       ((mpoly_heap_t *) x)->next = heap[j].next;
       heap[j].next = x;
-      next_loc = j;
+      *next_loc = j;
 
       return 0;
    }
@@ -622,7 +646,7 @@ void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
                           slong l1, slong len1, slong k, slong num, slong bits)
 {
    slong i, j = 0;
-   slong shift = FLINT_BITS - (num - k + 1)*bits;
+   slong shift = bits*(FLINT_BITS/bits - (num - k + 1));
 
    i1[0] = 0;
    for (i = 0; i < l1 - 1; i++)

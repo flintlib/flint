@@ -34,9 +34,9 @@ main(void)
                 nmod_t mod;
                 nmod_poly_t a, b, c, d;
 
-                do{
+                do {
                     n = n_randtest_prime(state, 1);
-                }while(n < 4);
+                } while(n < 4);
                 nmod_init(&mod, n);
 
                 nmod_poly_init(a, n);
@@ -48,9 +48,9 @@ main(void)
                 nmod_poly_randtest(c, state, 40);
                 nmod_poly_randtest(d, state, 40);
 
-                nmod_poly_set_coeff_ui(a, 0, n - i * j * k);
+                nmod_poly_set_coeff_ui(a, 0, nmod_neg((i*j*k) % n, mod));
                 nmod_poly_set_coeff_ui(a, 1, i * j + i * k + j * k);
-                nmod_poly_set_coeff_ui(a, 2, n - i - j - k);
+                nmod_poly_set_coeff_ui(a, 2, nmod_neg((i + j + k) % n, mod));
                 nmod_poly_set_coeff_ui(a, 3, 1);
 
                 nmod_poly_power_sums_naive(b, a, 20);

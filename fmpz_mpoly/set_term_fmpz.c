@@ -18,12 +18,10 @@
 void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
                  ulong const * exp, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, N, index, bits, exp_bits;
-   int exists;
-   ulong sum = 0, max_exp = 0;
+   slong i, N, index, exp_bits;
    ulong maskhi, masklo;
    ulong * packed_exp;
-   int deg, rev;
+   int exists, deg, rev;
 
    TMP_INIT;
 
@@ -31,42 +29,17 @@ void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
 
    degrev_from_ord(deg, rev, ctx->ord);
 
-   if (deg)
-   {
-      for (i = 0; i < ctx->n - 1; i++)
-      {  
-         sum += exp[i];
-
-         if (sum < exp[i])
-            flint_throw(FLINT_EXPOF,
-                              "Exponent overflow in fmpz_mpoly_set_term_fmpz");
-      }
-      max_exp = sum;
-   } else
-   {
-      for (i = 0; i < ctx->n; i++)
-      {
-         if (exp[i] > max_exp)
-            max_exp = exp[i];
-      }
-   }
-            
-   if (0 > (slong) max_exp)
-      flint_throw(FLINT_EXPOF,
-                              "Exponent overflow in fmpz_mpoly_set_term_fmpz");
-
-   /* compute number of bits to store maximum degree */
-   bits = FLINT_BIT_COUNT(max_exp);
-
-   exp_bits = 8;
-   while (bits >= exp_bits) /* extra bit required for signs */
-      exp_bits *= 2;
+   /* compute how many bits are required to represent exp */
+   exp_bits = mpoly_exp_bits(exp, ctx->n, deg);
+   if (exp_bits > FLINT_BITS)
+       flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_set_term_fmpz");
 
    /* reallocate the number of bits of the exponents of the polynomial */
+   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
    fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
 
    masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = (poly->bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, poly->bits);
 
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 

@@ -55,7 +55,7 @@ int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       return 0;
 
    max_bits = FLINT_MAX(poly1->bits, poly2->bits);
-   N = (max_bits*ctx->n - 1)/FLINT_BITS + 1;
+   N = words_per_exp(ctx->n, max_bits);
 
    if (max_bits > poly1->bits)
    {
