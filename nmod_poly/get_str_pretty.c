@@ -32,7 +32,7 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
     }
     else if (poly->length == 1)
     {
-        size = (ulong) ceil(0.30103*FLINT_BIT_COUNT(poly->coeffs[0]));
+        size = (ulong) ceil(0.30103*FLINT_BIT_COUNT(poly->coeffs[0])) + 1;
         buf = (char *) flint_malloc(size);
         flint_sprintf(buf, "%wu", poly->coeffs[0]);
         return buf;
