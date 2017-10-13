@@ -18,7 +18,7 @@
   Vol. 8, No. 4, pp. 499-507.
 */
 void
-fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
+fmpz_mat_hnf_minors_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
 {
     slong j, j2, i, k, l, m, n;
     fmpz_t u, v, d, r2d, r1d, q, b;
@@ -34,6 +34,7 @@ fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
     fmpz_init(q);
     fmpz_init(b);
     fmpz_mat_set(H, A);
+    fmpz_mat_one(U);
 
     /* put the kth principal minor in HNF */
     for (k = 0, l = m - 1; k < n; k++)
@@ -55,6 +56,10 @@ fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                  {
                      fmpz_submul(fmpz_mat_entry(H, k, j2), b, fmpz_mat_entry(H, j, j2));
                  }
+                 for (j2 = 0; j2 < m; j2++)
+                 {
+                     fmpz_submul(fmpz_mat_entry(U, k, j2), b, fmpz_mat_entry(U, j, j2));
+                 }
                  continue;
             }
                 
@@ -71,12 +76,24 @@ fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                             fmpz_mat_entry(H, j, j2));
                 fmpz_set(fmpz_mat_entry(H, j, j2), b);
             }
+            for (j2 = 0; j2 < m; j2++)
+            {
+                fmpz_mul(b, u, fmpz_mat_entry(U, j, j2));
+                fmpz_addmul(b, v, fmpz_mat_entry(U, k, j2));
+                fmpz_mul(fmpz_mat_entry(U, k, j2), r1d,
+                         fmpz_mat_entry(U, k, j2));
+                fmpz_submul(fmpz_mat_entry(U, k, j2), r2d,
+                            fmpz_mat_entry(U, j, j2));
+                fmpz_set(fmpz_mat_entry(U, j, j2), b);
+
+            }
         }
         /* if H_k,k is zero we swap row k for some other row (starting with the
            last) */
         if (fmpz_is_zero(fmpz_mat_entry(H, k, k)))
         {
             fmpz_mat_swap_rows(H, NULL, k, l);
+            fmpz_mat_swap_rows(U, NULL, k, l);
             l--;
             k--;
             continue;
@@ -87,6 +104,10 @@ fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
             for (j = k; j < n; j++)
             {
                 fmpz_neg(fmpz_mat_entry(H, k, j), fmpz_mat_entry(H, k, j));
+            }
+            for (j = 0; j < m; j++)
+            {
+                fmpz_neg(fmpz_mat_entry(U, k, j), fmpz_mat_entry(U, k, j));
             }
         }
         /* reduce above diagonal elements of each row i */
@@ -104,6 +125,11 @@ fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                 {
                     fmpz_submul(fmpz_mat_entry(H, i, j2), q,
                                 fmpz_mat_entry(H, j, j2));
+                }
+                for (j2 = 0; j2 < m; j2++)
+                {
+                    fmpz_submul(fmpz_mat_entry(U, i, j2), q,
+                                fmpz_mat_entry(U, j, j2));
                 }
             }
         }
@@ -125,6 +151,11 @@ fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                  {
                      fmpz_submul(fmpz_mat_entry(H, k, j2), b, fmpz_mat_entry(H, j, j2));
                  }
+                 for (j2 = 0; j2 < m; j2++)
+                 {
+                     fmpz_submul(fmpz_mat_entry(U, k, j2), b, fmpz_mat_entry(U, j, j2));
+                 }
+
                  continue;
             }
 
@@ -139,6 +170,16 @@ fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                 fmpz_submul(fmpz_mat_entry(H, k, j2), r2d,
                             fmpz_mat_entry(H, j, j2));
                 fmpz_set(fmpz_mat_entry(H, j, j2), b);
+            }
+            for (j2 = 0; j2 < m; j2++)
+            {
+                fmpz_mul(b, u, fmpz_mat_entry(U, j, j2));
+                fmpz_addmul(b, v, fmpz_mat_entry(U, k, j2));
+                fmpz_mul(fmpz_mat_entry(U, k, j2), r1d,
+                         fmpz_mat_entry(U, k, j2));
+                fmpz_submul(fmpz_mat_entry(U, k, j2), r2d,
+                            fmpz_mat_entry(U, j, j2));
+                fmpz_set(fmpz_mat_entry(U, j, j2), b);
             }
         }
         /* reduce above diagonal elements of each row i */
@@ -157,6 +198,11 @@ fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                 {
                     fmpz_submul(fmpz_mat_entry(H, i, j2), q,
                                 fmpz_mat_entry(H, j, j2));
+                }
+                for (j2 = 0; j2 < m; j2++)
+                {
+                    fmpz_submul(fmpz_mat_entry(U, i, j2), q,
+                                fmpz_mat_entry(U, j, j2));
                 }
             }
         }
