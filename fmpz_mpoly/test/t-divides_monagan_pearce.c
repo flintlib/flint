@@ -26,6 +26,35 @@ main(void)
     flint_printf("divides_monagan_pearce....");
     fflush(stdout);
 
+
+    /*
+        A bad case is hit when testing with multiplier 50. The following
+        example illustrates this behaviour if the ordering is changed to
+        ORD_DEGLEX
+    */
+
+{
+    fmpz_mpoly_ctx_t ctx;
+    fmpz_mpoly_t f, g, q, r;
+
+    fmpz_mpoly_ctx_init(ctx, 2, ORD_LEX);
+    fmpz_mpoly_init(f, ctx);
+    fmpz_mpoly_init(g, ctx);
+    fmpz_mpoly_init(q, ctx);
+    fmpz_mpoly_init(r, ctx);
+
+    fmpz_mpoly_set_str_pretty(f, "-x1^1918*x2^1075-x1^1891*x2^2001",NULL, ctx);
+    fmpz_mpoly_set_str_pretty(g, "x1^22*x2^3-x1^19*x2^21-x1^16*x2^10-2*x1^14*x2^17-x1^14*x2^11-x1*x2^15-2*x2^17", NULL, ctx);
+
+    ok1 = fmpz_mpoly_divides_monagan_pearce(q, f, g, ctx);
+
+    fmpz_mpoly_clear(f, ctx);
+    fmpz_mpoly_clear(g, ctx);
+    fmpz_mpoly_clear(q, ctx);
+    fmpz_mpoly_clear(r, ctx);
+}
+
+
     /* Check f*g/g = f */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -213,9 +242,9 @@ main(void)
 
        exp_bits = n_randint(state, FLINT_BITS - 1 - 
                   mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
-       exp_bits1 = n_randint(state, FLINT_BITS - 1 - 
+       exp_bits1 = n_randint(state, FLINT_BITS - 2 -
                   mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
-       exp_bits2 = n_randint(state, FLINT_BITS - 1 - 
+       exp_bits2 = n_randint(state, FLINT_BITS - 2 -
                   mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
 
        exp_bound = n_randbits(state, exp_bits);
@@ -371,9 +400,9 @@ main(void)
 
        exp_bits = n_randint(state, FLINT_BITS - 1 - 
                   mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
-       exp_bits1 = n_randint(state, FLINT_BITS - 1 - 
+       exp_bits1 = n_randint(state, FLINT_BITS - 2 -
                   mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
-       exp_bits2 = n_randint(state, FLINT_BITS - 1 - 
+       exp_bits2 = n_randint(state, FLINT_BITS - 2 -
                   mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
 
        exp_bound = n_randbits(state, exp_bits);
