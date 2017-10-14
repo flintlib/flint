@@ -110,16 +110,13 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                                   (p1h << norm) + r_shift(p1l, (FLINT_BITS - norm)),
                                       p1l << norm, uden << norm, dinv);
 
-                                if (quo <= COEFF_MAX)
-                                    (*XX(j, k)) = quo;
-                                else
-                                {
-                                    fmpz_set_ui(XX(j, k), quo);
-                                    small = 0;
-                                }
-
                                 if (sgn ^ dsgn)
-                                    fmpz_neg(XX(j, k), XX(j, k));
+                                    fmpz_neg_ui(XX(j, k), quo);
+                                else
+                                    fmpz_set_ui(XX(j, k), quo);
+
+                                if (quo > COEFF_MAX)
+                                    small = 0;
                             }
                         } else
                         {
@@ -198,16 +195,13 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                       (p1m << norm) + r_shift(p1l, (FLINT_BITS - norm)),
                           p1l << norm, uden << norm, dinv);
 
-                    if (quo <= COEFF_MAX)
-                        (*XX(i, k)) = quo;
-                    else
-                    {
-                        fmpz_set_ui(XX(i, k), quo);
-                        small = 0;
-                    }
-
                     if (sgn ^ dsgn)
-                        fmpz_neg(XX(i, k), XX(i, k));
+                        fmpz_neg_ui(XX(i, k), quo);
+                    else
+                        fmpz_set_ui(XX(i, k), quo);
+
+                    if (quo > COEFF_MAX)
+                        small = 0;
                 }
             } else
             {

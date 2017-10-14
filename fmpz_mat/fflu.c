@@ -95,16 +95,13 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                               (p1h << norm) + r_shift(p1l, (FLINT_BITS - norm)),
                                   p1l << norm, uden << norm, dinv);
 
-                            if (quo <= COEFF_MAX)
-                                (*E(j, k)) = quo;
-                            else
-                            {
-                                fmpz_set_ui(E(j, k), quo);
-                                small = 0;
-                            }
-
                             if (sgn ^ dsgn)
-                                fmpz_neg(E(j, k), E(j, k));
+                                fmpz_neg_ui(E(j, k), quo);
+                            else
+                                fmpz_set_ui(E(j, k), quo);
+
+                            if (quo > COEFF_MAX)
+                                small = 0;
                         }
                     } else
                     {
