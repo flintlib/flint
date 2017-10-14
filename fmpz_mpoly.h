@@ -616,9 +616,6 @@ FLINT_DLL void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
 FLINT_DLL void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
                           const fmpz * poly1, slong * i1, slong * n1, slong i);
 
-#define FLINT_SIGN_EXT(x) (-(ulong)((slong)(x) < 0))
-
-
 FMPZ_MPOLY_INLINE
 void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d)
 {
