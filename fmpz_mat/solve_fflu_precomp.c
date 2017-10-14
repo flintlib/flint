@@ -43,12 +43,14 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                     const fmpz_mat_t FFLU, const fmpz_mat_t B)
 {
     fmpz_t T;
-    slong i, j, k, m, n, norm;
+    slong i, j, k, m, n, norm = 0;
     ulong p1h, p1m, p1l, p2h, p2m, p2l, uden = 0, dinv = 0, quo;
     ulong FLINT_SET_BUT_UNUSED(rem);
-    int small = FLINT_ABS(fmpz_mat_max_bits(FFLU)) <= FLINT_BITS - 2
-             && FLINT_ABS(fmpz_mat_max_bits(B)) <= FLINT_BITS - 2;
-    int sgn, dsgn = 0;
+    slong fbits = fmpz_mat_max_bits(FFLU);
+    slong bbits = fmpz_mat_max_bits(B);
+    int small = FLINT_ABS(fbits) <= FLINT_BITS - 2
+             && FLINT_ABS(bbits) <= FLINT_BITS - 2;
+    int sgn, dsgn = 0, den1 = 0, work_to_do;
 
     n = X->r;
     m = X->c;
@@ -63,71 +65,80 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
         {
             if (small)
             {
+                den1 = 0;
+
                 if (i > 0)
                 {
                     uden = FLINT_ABS((slong)(*LU(i-1, i-1)));
                     dsgn = 0 > (slong)(*LU(i-1, i-1));
                     count_leading_zeros(norm, uden);
                     invert_limb(dinv, uden << norm);
+                    den1 = fmpz_is_one(LU(i-1, i-1));
                 }
 
-                for (j = i + 1; j < n; j++)
+                work_to_do = (!den1 || !fmpz_is_zero(XX(i, k)) ||
+                      !fmpz_is_one(LU(i, i)));
+
+                if (work_to_do)
                 {
-                    smul_ppmm(p1h, p1l, *XX(j, k), *LU(i, i));
-                    smul_ppmm(p2h, p2l, *LU(j, i), *XX(i, k));
-                    sub_ddmmss(p1h, p1l, p1h, p1l, p2h, p2l);
-
-                    sgn = 0 > (slong) p1h;
-
-                    if (sgn) /* take absolute value */
-                       sub_ddmmss(p1h, p1l, UWORD(0), UWORD(0), p1h, p1l);
-
-                    if (i > 0)
+                    for (j = i + 1; j < n; j++)
                     {
-                        if (p1h >= uden)
+                        smul_ppmm(p1h, p1l, *XX(j, k), *LU(i, i));
+                        smul_ppmm(p2h, p2l, *LU(j, i), *XX(i, k));
+                        sub_ddmmss(p1h, p1l, p1h, p1l, p2h, p2l);
+
+                        sgn = 0 > (slong) p1h;
+
+                        if (sgn) /* take absolute value */
+                           sub_ddmmss(p1h, p1l, UWORD(0), UWORD(0), p1h, p1l);
+
+                        if (i > 0 && !den1)
                         {
-                            fmpz_set_uiui(XX(j, k), p1h, p1l);
+                            if (p1h >= uden)
+                            {
+                                fmpz_set_uiui(XX(j, k), p1h, p1l);
+
+                                if (sgn)
+                                    fmpz_neg(XX(j, k), XX(j, k));
+
+                                fmpz_divexact(XX(j, k), XX(j, k), LU(i-1, i-1));
+
+                                small = 0;
+                            } else
+                            {
+                                udiv_qrnnd_preinv(quo, rem,
+                                  (p1h << norm) + r_shift(p1l, (FLINT_BITS - norm)),
+                                      p1l << norm, uden << norm, dinv);
+
+                                if (quo <= COEFF_MAX)
+                                    (*XX(j, k)) = quo;
+                                else
+                                {
+                                    fmpz_set_ui(XX(j, k), quo);
+                                    small = 0;
+                                }
+
+                                if (sgn ^ dsgn)
+                                    fmpz_neg(XX(j, k), XX(j, k));
+                            }
+                        } else
+                        {
+                            if (p1h > 0)
+                            {
+                                fmpz_set_uiui(XX(j, k), p1h, p1l);
+
+                                small = 0;
+                            } else
+                            {
+                                fmpz_set_ui(XX(j, k), p1l);
+
+                                if (p1l > COEFF_MAX)
+                                    small = 0;
+                            }
 
                             if (sgn)
                                 fmpz_neg(XX(j, k), XX(j, k));
-
-                            fmpz_divexact(XX(j, k), XX(j, k), LU(i-1, i-1));
-
-                            small = 0;
-                        } else
-                        {
-                            udiv_qrnnd_preinv(quo, rem,
-                              (p1h << norm) + r_shift(p1l, (FLINT_BITS - norm)),
-                                  p1l << norm, uden << norm, dinv);
-
-                            if (quo <= COEFF_MAX)
-                                (*XX(j, k)) = quo;
-                            else
-                            {
-                                fmpz_set_ui(XX(j, k), quo);
-                                small = 0;
-                            }
-
-                            if (sgn ^ dsgn)
-                                fmpz_neg(XX(j, k), XX(j, k));
                         }
-                    } else
-                    {
-                        if (p1h > 0)
-                        {
-                            fmpz_set_uiui(XX(j, k), p1h, p1l);
-
-                            small = 0;
-                        } else
-                        {
-                            fmpz_set_ui(XX(j, k), p1l);
-
-                            if (p1l > COEFF_MAX)
-                                small = 0;
-                        }
-
-                        if (sgn)
-                            fmpz_neg(XX(j, k), XX(j, k));
                     }
                 }
             } else
@@ -158,9 +169,12 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
 
                 for (j = i + 1; j < n; j++)
                 {
-                    smul_ppmm(p2m, p2l, *XX(j, k), *LU(i, j));
-                    p2h = FLINT_SIGN_EXT(p2m);
-                    sub_dddmmmsss(p1h, p1m, p1l, p1h, p1m, p1l, p2h, p2m, p2l);
+                    if (!fmpz_is_zero(LU(i, j)))
+                    {
+                        smul_ppmm(p2m, p2l, *XX(j, k), *LU(i, j));
+                        p2h = FLINT_SIGN_EXT(p2m);
+                        sub_dddmmmsss(p1h, p1m, p1l, p1h, p1m, p1l, p2h, p2m, p2l);
+                    }
                 }
 
                 sgn = 0 > (slong) p1h;

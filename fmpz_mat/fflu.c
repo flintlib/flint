@@ -22,8 +22,9 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
     slong m, n, j, k, rank, r, pivot_row, pivot_col, norm = 0;
     ulong p1h, p1l, p2h, p2l, uden = 0, dinv = 0, quo;
     ulong FLINT_SET_BUT_UNUSED(rem);
-    int small = FLINT_ABS(fmpz_mat_max_bits(A)) <= FLINT_BITS - 2;
-    int dsgn = 0, sgn;
+    slong mbits = fmpz_mat_max_bits(A);
+    int small = FLINT_ABS(mbits) <= FLINT_BITS - 2;
+    int dsgn = 0, sgn, den1 = 0, work_to_do;
 
     if (fmpz_mat_is_empty(A))
     {
@@ -60,6 +61,11 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
         {
             for (j = pivot_row + 1; j < m; j++)
             {
+                work_to_do = !den1 || !fmpz_is_zero(E(j, pivot_col)) ||
+                   !fmpz_is_one(E(pivot_row, pivot_col));
+
+                if (work_to_do)
+                {
                 for (k = pivot_col + 1; k < n; k++)
                 {
                     smul_ppmm(p1h, p1l, *E(j, k), *E(pivot_row, pivot_col));
@@ -71,7 +77,7 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                     if (sgn) /* take absolute value */
                        sub_ddmmss(p1h, p1l, UWORD(0), UWORD(0), p1h, p1l);
 
-                    if (pivot_row > 0)
+                    if (pivot_row > 0 && !den1)
                     {
                         if (p1h >= uden)
                         {
@@ -119,6 +125,7 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             fmpz_neg(E(j, k), E(j, k));
                     }
                 }
+                }
             }
         } else
         {
@@ -129,13 +136,15 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                     fmpz_mul(E(j, k), E(j, k), E(pivot_row, pivot_col));
                     fmpz_submul(E(j, k), E(j, pivot_col), E(pivot_row, k));
 
-                    if (pivot_row > 0)
+                    if (pivot_row > 0 && !den1)
                         fmpz_divexact(E(j, k), E(j, k), den);
                 }
             }
         }
 
         fmpz_set(den, E(pivot_row, pivot_col));
+
+        den1 = fmpz_is_one(den);
 
         if (small)
         {
