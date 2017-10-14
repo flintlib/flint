@@ -49,8 +49,8 @@
 /* flint version number */
 
 #define __FLINT_VERSION 2
-#define __FLINT_VERSION_MINOR 5 
-#define __FLINT_VERSION_PATCHLEVEL 3 
+#define __FLINT_VERSION_MINOR 5
+#define __FLINT_VERSION_PATCHLEVEL 3
 #define FLINT_VERSION "2.5.3"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
@@ -68,7 +68,7 @@
 #endif
 
 /*
-   We define alternative key words for "asm" and "inline", allowing 
+   We define alternative key words for "asm" and "inline", allowing
    the code to be compiled with the "-ansi" flag under GCC
  */
 #ifndef __GNUC__
@@ -132,7 +132,7 @@ FLINT_DLL void flint_set_abort(void (*func)(void));
     #define FLINT_BITS 64
     #define FLINT_D_BITS 53
     #define FLINT64 1
-#else 
+#else
     #define FLINT_BITS 32
     #define FLINT_D_BITS 31
 #endif
@@ -232,7 +232,7 @@ typedef __mpfr_struct mpfr;
 
 #if WANT_ASSERT
 #define FLINT_ASSERT(param) assert(param)
-#else 
+#else
 #define FLINT_ASSERT(param)
 #endif
 
@@ -247,6 +247,7 @@ typedef __mpfr_struct mpfr;
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
 #define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
+#define FLINT_SIGN_EXT(x) (-(ulong)((slong)(x) < 0))
 
 #define MP_PTR_SWAP(x, y) \
     do { \
@@ -400,4 +401,3 @@ FLINT_DLL int flint_sscanf(const char * s, const char * str, ...); /* flint vers
 #endif
 
 #endif
-
