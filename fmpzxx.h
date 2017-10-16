@@ -333,6 +333,12 @@ struct fmpz_data
         fmpz_set_str(inner, str, 10);
     }
 
+    void init(const mpz_t x)
+    {
+        fmpz_init(inner);
+        fmpz_set_mpz(inner, x);
+    }
+
     void init(const fmpzxx_srcref& r)
     {
         fmpz_init_set(inner, r._fmpz());
