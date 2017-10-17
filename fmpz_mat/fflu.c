@@ -66,62 +66,63 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
 
                 if (work_to_do)
                 {
-                for (k = pivot_col + 1; k < n; k++)
-                {
-                    smul_ppmm(p1h, p1l, *E(j, k), *E(pivot_row, pivot_col));
-                    smul_ppmm(p2h, p2l, *E(j, pivot_col), *E(pivot_row, k));
-                    sub_ddmmss(p1h, p1l, p1h, p1l, p2h, p2l);
-
-                    sgn = 0 > (slong) p1h;
-
-                    if (sgn) /* take absolute value */
-                       sub_ddmmss(p1h, p1l, UWORD(0), UWORD(0), p1h, p1l);
-
-                    if (pivot_row > 0 && !den1)
+                    for (k = pivot_col + 1; k < n; k++)
                     {
-                        if (p1h >= uden)
+                        smul_ppmm(p1h, p1l, *E(j, k), *E(pivot_row, pivot_col));
+                        smul_ppmm(p2h, p2l, *E(j, pivot_col), *E(pivot_row, k));
+                        sub_ddmmss(p1h, p1l, p1h, p1l, p2h, p2l);
+
+                        sgn = 0 > (slong) p1h;
+
+                        if (sgn) /* take absolute value */
+                           sub_ddmmss(p1h, p1l, UWORD(0), UWORD(0), p1h, p1l);
+
+                        if (pivot_row > 0 && !den1)
                         {
-                            fmpz_set_uiui(E(j, k), p1h, p1l);
+                            if (p1h >= uden)
+                            {
+                                fmpz_set_uiui(E(j, k), p1h, p1l);
+
+                                if (sgn)
+                                    fmpz_neg(E(j, k), E(j, k));
+
+                                fmpz_divexact(E(j, k), E(j, k), den);
+
+                                small = 0;
+                            } else
+                            {
+                                udiv_qrnnd_preinv(quo, rem,
+                                  (p1h << norm) +
+                                  r_shift(p1l, (FLINT_BITS - norm)),
+                                      p1l << norm, uden << norm, dinv);
+
+                                if (sgn ^ dsgn)
+                                    fmpz_neg_ui(E(j, k), quo);
+                                else
+                                    fmpz_set_ui(E(j, k), quo);
+
+                                if (quo > COEFF_MAX)
+                                    small = 0;
+                            }
+                        } else
+                        {
+                            if (p1h > 0)
+                            {
+                                fmpz_set_uiui(E(j, k), p1h, p1l);
+
+                                small = 0;
+                            } else
+                            {
+                                fmpz_set_ui(E(j, k), p1l);
+
+                                if (p1l > COEFF_MAX)
+                                    small = 0;
+                            }
 
                             if (sgn)
                                 fmpz_neg(E(j, k), E(j, k));
-
-                            fmpz_divexact(E(j, k), E(j, k), den);
-
-                            small = 0;
-                        } else
-                        {
-                            udiv_qrnnd_preinv(quo, rem,
-                              (p1h << norm) + r_shift(p1l, (FLINT_BITS - norm)),
-                                  p1l << norm, uden << norm, dinv);
-
-                            if (sgn ^ dsgn)
-                                fmpz_neg_ui(E(j, k), quo);
-                            else
-                                fmpz_set_ui(E(j, k), quo);
-
-                            if (quo > COEFF_MAX)
-                                small = 0;
                         }
-                    } else
-                    {
-                        if (p1h > 0)
-                        {
-                            fmpz_set_uiui(E(j, k), p1h, p1l);
-
-                            small = 0;
-                        } else
-                        {
-                            fmpz_set_ui(E(j, k), p1l);
-
-                            if (p1l > COEFF_MAX)
-                                small = 0;
-                        }
-
-                        if (sgn)
-                            fmpz_neg(E(j, k), E(j, k));
                     }
-                }
                 }
             }
         } else
