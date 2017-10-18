@@ -257,4 +257,3 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     return ret;
 }
-
