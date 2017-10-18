@@ -17,11 +17,11 @@
 
 flint_rand_s * flint_rand_alloc()
 
-    Allocates a flint_rand_t object to be used like a heap-allocated
-    flint_rand_t in external libraries.
+    Allocates a \code{flint_rand_t} object to be used like a heap-allocated
+    \code{flint_rand_t} in external libraries.
     The random state is not initialised.
 
 void flint_rand_free(flint_rand_s * state)
    
-    Frees a random state object as allocated using flint_rand_alloc.
+    Frees a random state object as allocated using \code{flint_rand_alloc}.
 
