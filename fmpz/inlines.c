@@ -10,7 +10,6 @@
 */
 
 #define FMPZ_INLINES_C
-#define FLINT_INLINES_C
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
