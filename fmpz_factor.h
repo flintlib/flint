@@ -162,9 +162,6 @@ FLINT_DLL int fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2,
 FLINT_DLL int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1,
                         mp_limb_t B2, flint_rand_t state, const fmpz_t n_in);
 
-FLINT_DLL int fmpz_factor_ecm_nostate(fmpz_t f, mp_limb_t curves, mp_limb_t B1,
-                        mp_limb_t B2, const fmpz_t n_in);
-
 #ifdef __cplusplus
 }
 #endif

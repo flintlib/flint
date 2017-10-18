@@ -258,15 +258,3 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     return ret;
 }
 
-
-int
-fmpz_factor_ecm_nostate(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
-                const fmpz_t n_in)
-{
-  flint_rand_t state;
-  flint_randinit(state);
-  int r = fmpz_factor_ecm(f, curves, B1, B2, state, n_in);
-  flint_randclear(state);
-  return r;
-}
-
