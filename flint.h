@@ -227,13 +227,13 @@ void flint_randclear(flint_rand_t state)
 FLINT_INLINE
 flint_rand_s * flint_rand_alloc()
 {  
-  return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
+    return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
 }
 
 FLINT_INLINE
 void flint_rand_free(flint_rand_s * state)
 {
-  flint_free(state);
+    flint_free(state);
 }
 
 #if HAVE_GC
