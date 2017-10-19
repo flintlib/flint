@@ -12,6 +12,12 @@
 #ifndef FLINT_H
 #define FLINT_H
 
+#ifdef FLINT_INLINES_C
+#define FLINT_INLINE FLINT_DLL
+#else
+#define FLINT_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #if !defined(_MSC_VER)
@@ -173,7 +179,7 @@ typedef struct
 
 typedef flint_rand_s flint_rand_t[1];
 
-static __inline__
+FLINT_INLINE
 void flint_randinit(flint_rand_t state)
 {
    state->gmp_init = 0;
@@ -186,14 +192,22 @@ void flint_randinit(flint_rand_t state)
 #endif
 }
 
-static __inline__
+FLINT_INLINE
 void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2)
 {
    state->__randval = seed1;
    state->__randval2 = seed2;
 }
 
-static __inline__
+FLINT_INLINE
+void flint_get_randseed(ulong * seed1, ulong * seed2, flint_rand_t state)
+{
+   *seed1 = state->__randval;
+   *seed2 = state->__randval2;
+}
+
+
+FLINT_INLINE
 void _flint_rand_init_gmp(flint_rand_t state)
 {
     if (!state->gmp_init)
@@ -203,11 +217,23 @@ void _flint_rand_init_gmp(flint_rand_t state)
     }
 }
 
-static __inline__
+FLINT_INLINE
 void flint_randclear(flint_rand_t state)
 {
     if (state->gmp_init)
         gmp_randclear(state->gmp_state);
+}
+
+FLINT_INLINE
+flint_rand_s * flint_rand_alloc()
+{  
+    return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
+}
+
+FLINT_INLINE
+void flint_rand_free(flint_rand_s * state)
+{
+    flint_free(state);
 }
 
 #if HAVE_GC
