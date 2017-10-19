@@ -18,24 +18,30 @@
 void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
                                           slong len, slong bits, slong nfields)
 {
-    slong i, j, k, N = words_per_exp(nfields, bits);
-    ulong * tmp_exps;
+    slong i, j, N = words_per_exp(nfields, bits);
+    ulong * pmax, mask, t;
     TMP_INIT;
 
-    for (i = 0; i < nfields; i++)
-        max_degs[i] = 0;
+    mask = 0;
+    for (i = 0; i < FLINT_BITS/bits; i++)
+        mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
     TMP_START;
-    tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
 
+    pmax = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    for (i = 0; i < N; i++)
+        pmax[i] = 0;
     for (i = 0; i < len; i++)
+        mpoly_monomial_max(pmax, pmax, poly_exps + i*N, bits, N, mask);
+
+    mpoly_unpack_vec(max_degs, pmax, bits, nfields, 1);
+
+    /* reverse the order */
+    for (i = 0, j = nfields - 1; i < j; i++, j--)
     {
-        mpoly_unpack_vec(tmp_exps, poly_exps + i*N, bits, nfields, 1);
-        for (j = 0, k = nfields - 1; j < nfields; j++, k--)
-        {
-            if (max_degs[j] < tmp_exps[k])
-                max_degs[j] = tmp_exps[k];
-        }
+        t = max_degs[j];
+        max_degs[j] = max_degs[i];
+        max_degs[i] = t;
     }
 
     TMP_END;

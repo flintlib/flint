@@ -172,6 +172,34 @@ void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2,
 }
 
 MPOLY_INLINE
+void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
+                                               slong bits, slong N, ulong mask)
+{
+    ulong i, s, m;
+    for (i = 0; i < N; i++)
+    {
+        s = mask + exp2[i] - exp3[i];
+        m = mask & s;
+        m = m - (m >> (bits - 1));
+        exp1[i] = exp3[i] + (s & m);
+    }
+}
+
+MPOLY_INLINE
+void mpoly_monomial_min(ulong * exp1, const ulong * exp2, const ulong * exp3,
+                                               slong bits, slong N, ulong mask)
+{
+    ulong i, s, m;
+    for (i = 0; i < N; i++)
+    {
+        s = mask + exp2[i] - exp3[i];
+        m = mask & s;
+        m = m - (m >> (bits - 1));
+        exp1[i] = exp2[i] - (s & m);
+    }
+}
+
+MPOLY_INLINE
 int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
 {
    slong i;
