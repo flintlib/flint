@@ -42,14 +42,14 @@
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addq %8,%q2\n\tadcq %6,%q1\n\tadcq %4,%q0"     \
-       : "=r" (sh), "=r" (sm), "=&r" (sl)                  \
+       : "=r" (sh), "=&r" (sm), "=&r" (sl)                  \
        : "0"  ((mp_limb_t)(ah)), "rme" ((mp_limb_t)(bh)),  \
          "1"  ((mp_limb_t)(am)), "rme" ((mp_limb_t)(bm)),  \
          "2"  ((mp_limb_t)(al)), "rme" ((mp_limb_t)(bl)))  \
 
 #define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)  \
   __asm__ ("subq %8,%q2\n\tsbbq %6,%q1\n\tsbbq %4,%q0"     \
-       : "=r" (dh), "=r" (dm), "=&r" (dl)                  \
+       : "=r" (dh), "=&r" (dm), "=&r" (dl)                  \
        : "0"  ((mp_limb_t)(mh)), "rme" ((mp_limb_t)(sh)),  \
          "1"  ((mp_limb_t)(mm)), "rme" ((mp_limb_t)(sm)),  \
          "2"  ((mp_limb_t)(ml)), "rme" ((mp_limb_t)(sl)))  \
