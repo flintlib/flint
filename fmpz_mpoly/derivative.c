@@ -17,40 +17,22 @@
 
 slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
                          const fmpz * coeff2, const ulong * exp2, slong len,
-                slong idx, int deg, int rev, slong nfields, slong bits, slong N)
+                slong var, int deg, int rev, slong nfields, slong bits, slong N)
 {
     slong off, shift, fpw, i, k = 0;
-    ulong c, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+    ulong c, mask;
     ulong*one;
     TMP_INIT;
 
     TMP_START;
 
     fpw = FLINT_BITS/bits;
-    if (rev)
-    {
-        off   = (nfields - 1 - idx)/fpw;
-        shift = (nfields - 1 - idx)%fpw;
-    } else
-    {
-        off   = (deg + idx)/fpw;
-        shift = (deg + idx)%fpw;
-    }
-    shift = (fpw - 1 - shift) * bits;
-
-    /* get exponent one to subtract */
+    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+    mpoly_off_shift(&off, &shift, var, deg, rev, fpw, nfields, bits);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    for (i = 0; i < N; i++)
-    {
-        one[i] = 0;
-    }
-    one[off] = WORD(1) << shift;
-    if (deg)
-    {
-        one[0] |= WORD(1) << ((fpw - 1)*bits);
-    }
+    mpoly_univar_exp(one, var, deg, N, off, shift, fpw, bits);
 
-    /* x^n -> n*x^(n-1) */
+    /* x^c -> c*x^(c-1) */
     for (i = 0; i < len; i++)
     {
         c = (exp2[N*i + off] >> shift) & mask;
@@ -66,7 +48,7 @@ slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
 }
 
 void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                                         slong idx, const fmpz_mpoly_ctx_t ctx)
+                                         slong var, const fmpz_mpoly_ctx_t ctx)
 {
     int deg, rev;
     slong N, len;
@@ -80,7 +62,7 @@ void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
     len = _fmpz_mpoly_derivative(poly1->coeffs, poly1->exps,
                    poly2->coeffs, poly2->exps, poly2->length,
-                        idx, deg, rev, ctx->n, poly2->bits, N);
+                        var, deg, rev, ctx->n, poly2->bits, N);
 
     _fmpz_mpoly_set_length(poly1, len, ctx);
 }

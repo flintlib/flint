@@ -104,33 +104,6 @@ fmpz_mpoly_struct * fmpz_mpoly_univar_get_coeff(fmpz_mpoly_univar_t poly, ulong 
     return xk;
 }
 
-
-
-void mpoly_off_shift(slong * off, slong * shift, slong idx, int deg, int rev, slong fpw, slong nfields, slong bits)
-{
-    if (rev)
-    {
-        *off   = (nfields - 1 - idx)/fpw;
-        *shift = (nfields - 1 - idx)%fpw;
-    } else
-    {
-        *off   = (deg + idx)/fpw;
-        *shift = (deg + idx)%fpw;
-    }
-    *shift = (fpw - 1 - *shift) * bits;
-}
-
-void mpoly_univar_exp(ulong * one, slong var, int deg, slong N, slong off, slong shift, slong fpw, slong bits)
-{
-    slong i;
-    for (i = 0; i < N; i++)
-        one[i] = 0;
-    one[off] = WORD(1) << shift;
-    if (deg)
-        one[0] |= WORD(1) << ((fpw - 1)*bits);
-}
-
-
 void fmpz_mpoly_univar_print(fmpz_mpoly_univar_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
@@ -147,23 +120,6 @@ void fmpz_mpoly_univar_print(fmpz_mpoly_univar_t poly, const char ** x, const fm
         else
             flint_printf(")*%s^%wd", x[poly->var],poly->exps[i]);
     }
-}
-
-
-void mpoly_monomial_madd(ulong * exp1, const ulong * exp2, ulong scalar,
-                                                   const ulong * exp3, slong N)
-{
-   slong i;
-   for (i = 0; i < N; i++)
-      exp1[i] = exp2[i] + scalar*exp3[i];
-}
-
-void mpoly_monomial_msub(ulong * exp1, const ulong * exp2, ulong scalar,
-                                                   const ulong * exp3, slong N)
-{
-   slong i;
-   for (i = 0; i < N; i++)
-      exp1[i] = exp2[i] - scalar*exp3[i];
 }
 
 

@@ -17,10 +17,10 @@
 
 slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
                          const fmpz * coeff2, const ulong * exp2, slong len,
-                slong idx, int deg, int rev, slong nfields, slong bits, slong N)
+                slong var, int deg, int rev, slong nfields, slong bits, slong N)
 {
     slong off, shift, fpw, i;
-    ulong c, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+    ulong c, mask;
     ulong * one;
     fmpz_t d, g;
     TMP_INIT;
@@ -32,28 +32,10 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
     fmpz_set_si(s, WORD(1));
 
     fpw = FLINT_BITS/bits;
-    if (rev)
-    {
-        off   = (nfields - 1 - idx)/fpw;
-        shift = (nfields - 1 - idx)%fpw;
-    } else
-    {
-        off   = (deg + idx)/fpw;
-        shift = (deg + idx)%fpw;
-    }
-    shift = (fpw - 1 - shift) * bits;
-
-    /* get exponent to add */
-    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    for (i = 0; i < N; i++)
-    {
-        one[i] = 0;
-    }
-    one[off] = WORD(1) << shift;
-    if (deg)
-    {
-        one[0] |= WORD(1) << ((fpw - 1)*bits);
-    }
+    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+    mpoly_off_shift(&off, &shift, var, deg, rev, fpw, nfields, bits);
+    one = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_univar_exp(one, var, deg, N, off, shift, fpw, bits);
 
     /* scan once to find required denominator */
     for (i = 0; i < len; i++)
@@ -66,7 +48,7 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
     }
 
     /* then scan again to compute the terms */
-    /* x^n -> x^(n+1)/(n+1) */
+    /* x^c -> x^(c+1)/(c+1) */
     for (i = 0; i < len; i++)
     {
         c = (exp2[N*i + off] >> shift) & mask;
@@ -84,7 +66,7 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
 }
 
 void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
-               const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
+               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
     int deg, rev;
     slong len, N, exp_bits;
@@ -100,7 +82,7 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 
     /* compute bits required to represent result */
     mpoly_max_degrees(max_deg, poly2->exps, poly2->length, poly2->bits, ctx->n);
-    max_exp = max_deg[rev ? idx : ctx->n - 1 - deg - idx];
+    max_exp = max_deg[rev ? var : ctx->n - 1 - deg - var];
     if (deg)
     {
         max_exp = FLINT_MAX(max_exp, max_deg[ctx->n - 1]);
@@ -134,7 +116,7 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 
         len = _fmpz_mpoly_integral(scale, temp->coeffs, temp->exps,
                        poly2->coeffs, exp2, poly2->length,
-                            idx, deg, rev, ctx->n, exp_bits, N);
+                            var, deg, rev, ctx->n, exp_bits, N);
         _fmpz_mpoly_set_length(temp, len, ctx);
 
         fmpz_mpoly_swap(temp, poly1, ctx);
@@ -147,7 +129,7 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 
         len = _fmpz_mpoly_integral(scale, poly1->coeffs, poly1->exps,
                        poly2->coeffs, exp2, poly2->length,
-                            idx, deg, rev, ctx->n, exp_bits, N);
+                            var, deg, rev, ctx->n, exp_bits, N);
         _fmpz_mpoly_set_length(poly1, len, ctx);
     }
 

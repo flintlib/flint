@@ -25,7 +25,7 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("univar_basic....");
+    flint_printf("univar....");
     fflush(stdout);
 
     /* Check mpoly -> mpoly_univar -> mpoly */
