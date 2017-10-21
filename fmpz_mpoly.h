@@ -498,13 +498,16 @@ FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
 
 FLINT_DLL void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx);
-FLINT_DLL void fmpz_mpoly_univar_print(fmpz_mpoly_univar_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_univar_print(const fmpz_mpoly_univar_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL int fmpz_mpoly_univar_equal(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3, const fmpz_mpoly_ctx_t ctx);
-
+FLINT_DLL void _fmpz_mpoly_univar_prem(fmpz_mpoly_univar_t polyA, const fmpz_mpoly_univar_t polyB, fmpz_mpoly_univar_t polyC, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpz_mpoly_univar_res(fmpz_mpoly_t poly1, fmpz_mpoly_univar_t polyP, fmpz_mpoly_univar_t polyQ, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_resultant(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2, fmpz_mpoly_t poly3, slong var, fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2, slong var, fmpz_mpoly_ctx_t ctx);
 
 
 
