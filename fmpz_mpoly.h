@@ -64,9 +64,9 @@ typedef struct
    slong alloc;
    slong length;
    slong var; /* univariate variable number */
-} fmpz_mpoly_univariate_struct;
+} fmpz_mpoly_univar_struct;
 
-typedef fmpz_mpoly_univariate_struct fmpz_mpoly_univariate_t[1];
+typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
 
 /* Context object ************************************************************/
 
@@ -493,6 +493,19 @@ FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
                         fmpz_mpoly_t q, fmpz_mpoly_t r,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
+
+/* Univariates *************/
+
+FLINT_DLL void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_univar_print(fmpz_mpoly_univar_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL int fmpz_mpoly_univar_equal(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3, const fmpz_mpoly_ctx_t ctx);
+
+
 
 
 /* Reduction *****************************************************************/
