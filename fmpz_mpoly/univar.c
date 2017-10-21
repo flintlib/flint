@@ -37,6 +37,15 @@ void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ct
 }
 
 
+void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t poly1, fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+{
+   fmpz_mpoly_univar_struct t = *poly1;
+   *poly1 = *poly2;
+   *poly2 = t;
+}
+
+
+
 void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t poly, slong length, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
@@ -69,7 +78,6 @@ fmpz_mpoly_struct * fmpz_mpoly_univar_get_coeff(fmpz_mpoly_univar_t poly, ulong 
 {
     slong i, j;
     fmpz_mpoly_struct * xk;
-
 
     for (i = 0; i < poly->length && poly->exps[i] >= pow; i++)
     {
@@ -371,25 +379,30 @@ void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t 
     ulong * exp1, * exp2, * exp3;
     slong len1, len2, len3;
 
-    assert(poly1 != poly2);
-    assert(poly1 != poly3);
     assert(poly2->var == poly3->var);
 
+    if (poly1 == poly2 || poly1 == poly3)
+    {
+        fmpz_mpoly_univar_t temp;
+        fmpz_mpoly_univar_init(temp, ctx);
+        fmpz_mpoly_univar_add(temp, poly2, poly3, ctx);
+        fmpz_mpoly_univar_swap(poly1, temp, ctx);
+        fmpz_mpoly_univar_clear(temp, ctx);
+        return;
+    }
+
     poly1->var = poly2->var;
-
-    fmpz_mpoly_univar_fit_length(poly1, poly2->length + poly3->length, ctx);
-
-    coeff1 = poly1->coeffs;
-    coeff2 = poly2->coeffs;
-    coeff3 = poly3->coeffs;
-
-    exp1 = poly1->exps;
-    exp2 = poly2->exps;
-    exp3 = poly3->exps;
 
     len1 = 0;
     len2 = poly2->length;
     len3 = poly3->length;
+    fmpz_mpoly_univar_fit_length(poly1, len2 + len3, ctx);
+    coeff1 = poly1->coeffs;
+    coeff2 = poly2->coeffs;
+    coeff3 = poly3->coeffs;
+    exp1 = poly1->exps;
+    exp2 = poly2->exps;
+    exp3 = poly3->exps;
 
     i = j = 0;
     while (i < len2 && j < len3)
@@ -448,32 +461,36 @@ void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t 
     fmpz_mpoly_t tcoeff;
     TMP_INIT;
 
-    assert(poly1 != poly2);
-    assert(poly1 != poly3);
     assert(poly2->var == poly3->var);
+
+    len1 = 0;
+    if (poly2->length == 0 || poly3->length == 0)
+        goto done;
+    if (poly1 == poly2 || poly1 == poly3)
+    {
+        fmpz_mpoly_univar_t temp;
+        fmpz_mpoly_univar_init(temp, ctx);
+        fmpz_mpoly_univar_mul(temp, poly2, poly3, ctx);
+        fmpz_mpoly_univar_swap(poly1, temp, ctx);
+        fmpz_mpoly_univar_clear(temp, ctx);
+        return;
+    }
 
     poly1->var = poly2->var;
 
-    len1 = 0;
     len2 = poly2->length;
     len3 = poly3->length;
-
-    if (poly2->length == 0 || poly3->length == 0)
-        goto done;
-
-    fmpz_mpoly_univar_fit_length(poly1, poly2->length*poly3->length, ctx);
-
+    fmpz_mpoly_univar_fit_length(poly1, len2*len3, ctx);
     coeff1 = poly1->coeffs;
     coeff2 = poly2->coeffs;
     coeff3 = poly3->coeffs;
-
     exp1 = poly1->exps;
     exp2 = poly2->exps;
     exp3 = poly3->exps;
 
     TMP_START;
 
-    next_loc = len2 + 4;   /* something bigger than heap can ever be */
+    next_loc = len2 + 4;
     heap_len = 1;
     heap = (mpoly_heap1_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap1_s));
     chain = (mpoly_heap_t *) TMP_ALLOC(len2*sizeof(mpoly_heap_t));

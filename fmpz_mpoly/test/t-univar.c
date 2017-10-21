@@ -124,8 +124,10 @@ main(void)
             fmpz_mpoly_add(h2, f, g, ctx);
             fmpz_mpoly_from_univar(h1, h1x, ctx);
             fmpz_mpoly_to_univar(h2x, h2, j, ctx);
+            fmpz_mpoly_univar_add(fx, fx, gx, ctx);
 
-            if (!fmpz_mpoly_equal(h1, h2, ctx) || !fmpz_mpoly_univar_equal(h1x, h2x, ctx))
+            if (!fmpz_mpoly_equal(h1, h2, ctx) || !fmpz_mpoly_univar_equal(h1x, h2x, ctx) 
+                                               || !fmpz_mpoly_univar_equal(h1x, fx, ctx))
             {
                 printf("FAIL\n");
                 flint_printf("Check addition commutes\ni: %wd  j: %wd\n",i,j);
@@ -169,8 +171,8 @@ main(void)
 
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
-        exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
+        exp_bits1 = n_randint(state, (FLINT_BITS - 3)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
+        exp_bits2 = n_randint(state, (FLINT_BITS - 3)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
         exp_bound1 = n_randbits(state, exp_bits1);
         exp_bound2 = n_randbits(state, exp_bits2);
 
@@ -187,8 +189,10 @@ main(void)
             fmpz_mpoly_mul_johnson(h2, f, g, ctx);
             fmpz_mpoly_from_univar(h1, h1x, ctx);
             fmpz_mpoly_to_univar(h2x, h2, j, ctx);
+            fmpz_mpoly_univar_mul(fx, fx, gx, ctx);
 
-            if (!fmpz_mpoly_equal(h1, h2, ctx) || !fmpz_mpoly_univar_equal(h1x, h2x, ctx))
+            if (!fmpz_mpoly_equal(h1, h2, ctx) || !fmpz_mpoly_univar_equal(h1x, h2x, ctx)
+                                               || !fmpz_mpoly_univar_equal(h1x, fx, ctx))
             {
                 printf("FAIL\n");
                 flint_printf("Check multiplication commutes\ni: %wd  j: %wd\n",i,j);
