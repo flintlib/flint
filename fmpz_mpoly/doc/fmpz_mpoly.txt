@@ -112,9 +112,23 @@ int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
 
 slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
 
-    Computer the maximum number of bits $b$ required to represent the absolute
+    Computes the maximum number of bits $b$ required to represent the absolute
     values of the coefficients of \code{poly}. If all of the coefficients are
     positive, $b$ is returned, otherwise $-b$ is returned.
+
+void fmpz_mpoly_degrees(slong * degs,
+                           const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Returns the degree of \code{poly} with respect to each variable. The array
+    \code{degs} has length equal to the number of variables, and the degree of
+    \code{poly} with respect its $i$-th variable is stored in \code{degs[i]}. If
+    \code{poly} is zero, all degrees are set to \code{-1}.
+
+slong fmpz_mpoly_degree(const fmpz_mpoly_t poly, slong var, 
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Returns the degree of \code{poly} with respect to the variable of index
+    \code{var}. If \code{poly} is zero, the return is \code{-1}.
 
 void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
                      slong len, slong bits, slong n, int deg, int rev, slong N)
@@ -141,6 +155,7 @@ void fmpz_mpoly_max_degrees(ulong * max_degs,
     corresponds to the lowest index entry of the output array, after a possible
     degree field in the case of deglex and degrevlex, i.e. the degree field if
     it exists, corresponds to index 0 of the output array \code{max_degs}.
+
 
 void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
                                 slong bits, slong n, int deg, int rev, slong N)
