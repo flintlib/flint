@@ -929,6 +929,11 @@ void _fmpz_mpoly_univar_res_ducos(fmpz_mpoly_t poly1, fmpz_mpoly_univar_t polyP,
     fmpz_mpoly_univar_t A, B, C, D, H, T;
     fmpz_mpoly_univar_struct * last = polyQ;
 
+    const char* vars[] = {"x","y","z","a","b","c","d","e","f","g","h"};
+
+/*
+printf("***** res called ************\n");
+*/
     assert(polyP->length != 0);
     assert(polyQ->length != 0);
     assert(polyP->exps[0] >= polyQ->exps[0]);
@@ -965,6 +970,10 @@ void _fmpz_mpoly_univar_res_ducos(fmpz_mpoly_t poly1, fmpz_mpoly_univar_t polyP,
     _fmpz_mpoly_univar_prem(B, A, D, ctx);
 
 looper:
+/*
+printf("A: "); fmpz_mpoly_univar_print(A, vars, ctx); printf("\n");
+printf("B: "); fmpz_mpoly_univar_print(B, vars, ctx); printf("\n");
+*/
 
     d = A->exps[0]; e = B->exps[0];
     if (B->length == 0)
@@ -1029,7 +1038,11 @@ looper:
             }
         }
         D->length = d_len;
+/*
+printf("1D: "); fmpz_mpoly_univar_print(D, vars, ctx); printf("\n");
 
+printf("s: "); fmpz_mpoly_print_pretty(s, vars, ctx); printf("\n");
+*/
         /* A = (B[e]*(D - B*x) + B[e-1]*B)/s */
         /*            i    j            k    */
         i = 0;
@@ -1043,6 +1056,9 @@ looper:
         a_len = 0;
         while (i < d_len || j < b_len || k < b_len)
         {
+/*
+flint_printf("i: %wd  j: %wd  k: %wd\n",i,j,k);
+*/
             exp = 0;
             if (i < d_len)
                 exp = FLINT_MAX(exp, d_exp[i]);
@@ -1053,13 +1069,17 @@ looper:
 
             a_exp[a_len] = exp;
 
-            iexists = (i < d_len && exp == d_exp[i]);
-            jexists = (j < b_len && exp == b_exp[j] + 1);
-            kexists = (k < b_len && exp == b_exp[k]);
+            iexists = (i < d_len) && (exp == d_exp[i]);
+            jexists = (j < b_len) && (exp == b_exp[j] + 1);
+            kexists = (k < b_len) && (exp == b_exp[k]);
 
 
             assert(iexists || jexists || kexists);
-
+/*
+printf("iexists: %d\n",iexists);
+printf("jexists: %d\n",jexists);
+printf("kexists: %d\n",kexists);
+*/
             if (iexists) {
                 if (jexists) {
                     fmpz_mpoly_sub(w, d_coeff + i, b_coeff + j, ctx);
@@ -1077,12 +1097,23 @@ looper:
             } else {
                 if (kexists) {
                     fmpz_mpoly_mul_johnson(u, b_coeff + 1, b_coeff + k, ctx);
+/*
+printf("u: "); fmpz_mpoly_print_pretty(u, vars, ctx); printf("\n");
+*/
                     if (jexists) {
                         fmpz_mpoly_mul_johnson(v, b_coeff + 0, b_coeff + j, ctx);
                         fmpz_mpoly_sub(w, u, v, ctx);
                         fmpz_mpoly_divides_monagan_pearce(a_coeff + a_len, w, s, ctx);
                     } else {
+/*
+printf("u: "); fmpz_mpoly_print_pretty(u, vars, ctx); printf("\n");
+printf("s: "); fmpz_mpoly_print_pretty(s, vars, ctx); printf("\n");
+*/
                         fmpz_mpoly_divides_monagan_pearce(a_coeff + a_len, u, s, ctx);
+/*
+flint_printf("a[%wd]: ",a_len); fmpz_mpoly_print_pretty(a_coeff + a_len, vars, ctx); printf("\n");
+*/
+
                     }
                 } else {
                     fmpz_mpoly_mul_johnson(u, b_coeff + 0, b_coeff + j, ctx);
@@ -1098,6 +1129,9 @@ looper:
             k += kexists;
         }
         A->length = a_len;
+/*
+printf("1A: "); fmpz_mpoly_univar_print(A, vars, ctx); printf("\n");
+*/
 
         /* A <-> B */
         fmpz_mpoly_univar_swap(A, B, ctx);
@@ -1555,6 +1589,55 @@ void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2, slong var, 
 }
 
 
+
+
+void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+{
+    int deg, rev;
+    slong bits, nfields;
+    slong i, N;
+    ulong * pmin, * exps, mask;
+    fmpz_t igcd;
+    TMP_INIT;
+
+    bits = poly2->bits;
+    nfields = ctx->n;
+    degrev_from_ord(deg, rev, ctx->ord);
+
+    TMP_START;
+
+    mask = 0;
+    for (i = 0; i < FLINT_BITS/bits; i++)
+        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+
+    N = words_per_exp(nfields, bits);
+    pmin = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    exps = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+
+    fmpz_init(igcd);
+
+    assert(poly2->length > 0);
+
+    mpoly_monomial_set(pmin, poly2->exps + 0*N, N);
+    fmpz_set(igcd, poly2->coeffs + 0);
+    for (i = 1; i < poly2->length; i++)
+    {
+        mpoly_monomial_min(pmin, pmin, poly2->exps + N*i, bits, N, mask);
+        fmpz_gcd(igcd, igcd, poly2->coeffs + i);
+    }
+    mpoly_get_monomial(exps, pmin, bits, ctx->n, deg, rev);
+
+    fmpz_mpoly_fit_length(poly1, 1, ctx);
+    fmpz_mpoly_fit_bits(poly1, bits, ctx);
+    poly1->bits = bits;
+    mpoly_set_monomial(poly1->exps + N*0, exps, bits, ctx->n, deg, rev);
+    fmpz_set(poly1->coeffs + 0, igcd);
+    _fmpz_mpoly_set_length(poly1, 1, ctx);
+
+
+    fmpz_clear(igcd);
+}
+
 void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
                         slong len, slong bits, slong nfields, int deg, int rev)
 {
@@ -1607,13 +1690,13 @@ slong fmpz_mpoly_degree(const fmpz_mpoly_t poly, slong var, const fmpz_mpoly_ctx
 }
 
 
-void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * ex, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, shift, off, bits, fpw, N;
     ulong k;
     int deg, rev;
     ulong mask;
-    slong len = poly2->length;
+    slong _ex = 0, len = poly2->length;
     fmpz * coeff = poly2->coeffs;
     ulong * exp = poly2->exps;
 
@@ -1625,14 +1708,22 @@ void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, const fmpz_mpoly_t poly2, slong 
     mpoly_off_shift(&off, &shift, var, deg, rev, fpw, ctx->n, bits);
 
     fmpz_poly_zero(poly1);
-    for (i = 0; i < len; i++)
+    if (len > 0)
     {
-        k = (exp[N*i + off] >> shift) & mask;
-        fmpz_poly_set_coeff_fmpz(poly1, k, coeff + i);
+        _ex = (exp[N*(len - 1)] >> shift) & mask;
+        for (i = 0; i < len; i++)
+        {
+            k = (exp[N*i + off] >> shift) & mask;
+            k -= _ex;
+            assert(((slong)k) >= 0);
+            fmpz_poly_set_coeff_fmpz(poly1, k, coeff + i);
+        }
     }
+
+    *ex = _ex;
 }
 
-void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slong ex, slong var, const fmpz_mpoly_ctx_t ctx)
 {
     slong shift, off, bits, fpw, N;
     slong k;
@@ -1646,11 +1737,14 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slon
 
     TMP_START;
 
-    bits = 1 + FLINT_BIT_COUNT(FLINT_MAX(WORD(1), fmpz_poly_degree(poly2)));
+    bits = 1 + FLINT_BIT_COUNT(FLINT_MAX(WORD(1), ex + fmpz_poly_degree(poly2)));
     if (bits > FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_fmpz_poly");
     bits = mpoly_optimize_bits(bits, ctx->n);
-
+    
+/*
+printf("fmpz_mpoly_from_fmpz_poly called\n");
+*/
     fpw = FLINT_BITS/bits;
     N = words_per_exp(ctx->n, bits);
     degrev_from_ord(deg, rev, ctx->ord);
@@ -1658,6 +1752,11 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slon
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_univar_exp(one, var, deg, N, off, shift, fpw, bits);
 
+    fmpz_mpoly_fit_bits(poly1, bits, ctx);
+    poly1->bits = bits;
+/*
+flint_printf("bits: %wd\n", bits);
+*/
     p_coeff = poly1->coeffs;
     p_exp = poly1->exps;
     p_alloc = poly1->alloc;
@@ -1665,8 +1764,16 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slon
     for (k = fmpz_poly_degree(poly2); k >= 0; k--)
     {
         _fmpz_mpoly_fit_length(&p_coeff, &p_exp, &p_alloc, p_len + 1, N);
-        mpoly_monomial_mul_si(p_exp + N*p_len, one, N, k);
-        fmpz_poly_get_coeff_fmpz(p_coeff + p_len , poly2, k);
+        mpoly_monomial_mul_si(p_exp + N*p_len, one, N, k + ex);
+        fmpz_poly_get_coeff_fmpz(p_coeff + p_len, poly2, k);
+/*
+if (!fmpz_is_zero(p_coeff + p_len))
+{
+flint_printf("k: %wd ", k);
+flint_printf("exp: %wx ",(p_exp + N*p_len)[0]);
+flint_printf("p_len: %wd\n", p_len);
+}
+*/
         p_len += !fmpz_is_zero(p_coeff + p_len);
     }
 
@@ -1674,48 +1781,95 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slon
     poly1->exps = p_exp;
     poly1->alloc = p_alloc;
     _fmpz_mpoly_set_length(poly1, p_len, ctx);
+/*
+printf("fmpz_mpoly_from_fmpz_poly returning ");
+fmpz_mpoly_print_pretty(poly1, NULL, ctx);
+printf("\n");
+*/
+
+    TMP_END;
+}
+
+void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA, const fmpz_mpoly_t polyB, const fmpz_mpoly_ctx_t ctx)
+{
+    int deg, rev;
+    slong i, N, bits;
+    ulong * texpA, * texpB, * exps;
+    ulong mask;
+    fmpz_t igcd;
+    TMP_INIT;
+
+    assert(polyA->length == 1);
+    assert(polyB->length == 1);
+
+    TMP_START;
+    texpA = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    texpB = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    exps = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+
+
+    fmpz_init(igcd);
+    fmpz_gcd(igcd, polyA->coeffs + 0, polyB->coeffs + 0);
+
+    bits = FLINT_MAX(polyA->bits, polyB->bits);
+    N = words_per_exp(ctx->n, bits);
+    degrev_from_ord(deg, rev, ctx->ord);
+    mask = 0;
+    for (i = 0; i < FLINT_BITS/bits; i++)
+        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+
+    mpoly_unpack_monomials(texpA, bits, polyA->exps, polyA->bits, 1, ctx->n);
+    mpoly_unpack_monomials(texpB, bits, polyB->exps, polyB->bits, 1, ctx->n);
+    mpoly_monomial_min(texpA, texpA, texpB, bits, N, mask);
+    mpoly_get_monomial(exps, texpA, bits, ctx->n, deg, rev);
+    
+    fmpz_mpoly_fit_length(poly1, 1, ctx);
+    fmpz_mpoly_fit_bits(poly1, bits, ctx);
+    poly1->bits = bits;
+    mpoly_set_monomial(poly1->exps + N*0, exps, bits, ctx->n, deg, rev);
+    fmpz_set(poly1->coeffs + 0, igcd);
+    _fmpz_mpoly_set_length(poly1, 1, ctx);
+
+    fmpz_clear(igcd);
 
     TMP_END;
 }
 
 
 
-void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, slong var, const fmpz_mpoly_ctx_t ctx)
+void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA, const fmpz_mpoly_t polyB, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i;
+
+    slong shift, off, bits, fpw, N;
+    slong i, j, m, c, d, v, k, var, nvars;
+    int deg, rev;
+    ulong mask;
+    slong * a_degs, * b_degs, * a_leads, * b_leads;
+
+    fmpz_mpoly_t A,B;
 
     fmpz_mpoly_t ac, bc, gc, gabc, g;
     fmpz_mpoly_univar_t ax, bx, gx;
-    const char* vars[] = {"x","y","z","a","b","c","d","e","f","g","h"};
 
+    const char* vars[] = {"x","y","z","t","a","b","c","d","e","f","g","h"};
 
-    assert(var >= 0);
+    TMP_INIT;
+
+    TMP_START;
 
 /*
-printf("**********\n");
-flint_printf("_fmpz_mpoly_gcd_prs(var=%wd)(\n",var);
-fmpz_mpoly_print_pretty(poly2,vars,ctx);
-flint_printf("\n,\n");
-fmpz_mpoly_print_pretty(poly3,vars,ctx);
-flint_printf("\n)\n");
-printf("**********\n");
+printf("**********\ncalled _fmpz_mpoly_gcd_prs(");
+fmpz_mpoly_print_pretty(polyA,vars,ctx);
+flint_printf(", ");
+fmpz_mpoly_print_pretty(polyB,vars,ctx);
+flint_printf(")\n");
 */
 
-    if (var == 0)
-    {
-        fmpz_poly_t u1, u2, u3;
-        fmpz_poly_init(u1);
-        fmpz_poly_init(u2);
-        fmpz_poly_init(u3);
-        fmpz_mpoly_to_fmpz_poly(u2, poly2, var, ctx);
-        fmpz_mpoly_to_fmpz_poly(u3, poly3, var, ctx);
-        fmpz_poly_gcd(u1, u2, u3);
-        fmpz_mpoly_from_fmpz_poly(poly1, u1, var, ctx);
-        fmpz_poly_clear(u1);
-        fmpz_poly_clear(u2);
-        fmpz_poly_clear(u3);
-        return;
-    }
+
+    fmpz_mpoly_init(A, ctx);
+    fmpz_mpoly_init(B, ctx);
+    fmpz_mpoly_set(A, polyA, ctx);
+    fmpz_mpoly_set(B, polyB, ctx);
 
     fmpz_mpoly_init(ac, ctx);
     fmpz_mpoly_init(bc, ctx);
@@ -1726,40 +1880,215 @@ printf("**********\n");
     fmpz_mpoly_univar_init(bx, ctx);
     fmpz_mpoly_univar_init(gx, ctx);
 
-/*
-printf("poly2: "); fmpz_mpoly_print_pretty(poly2, vars, ctx); printf("\n");
-*/
-
-    fmpz_mpoly_to_univar(ax, poly2, var, ctx);
-/*
-printf("ax: "); fmpz_mpoly_univar_print(ax, vars, ctx); printf("\n");
-*/
-    fmpz_mpoly_to_univar(bx, poly3, var, ctx);
-/*
-printf("bx: "); fmpz_mpoly_univar_print(bx, vars, ctx); printf("\n");
-*/
-    gx->var = var;
 
 
-    if (ax->length == 0)
+
+    degrev_from_ord(deg, rev, ctx->ord);    
+    nvars = ctx->n - deg;
+
+
+    if (polyA->length == 0)
     {
-        fmpz_mpoly_set(poly1, poly3, ctx);
+        fmpz_mpoly_set(poly1, polyB, ctx);
         goto done;
-    } else if (bx->length == 0)
+    } else if (polyB->length == 0)
     {
-        fmpz_mpoly_set(poly1, poly2, ctx);
+        fmpz_mpoly_set(poly1, polyA, ctx);
         goto done;
     }
+/*
+printf("neither is zero\n");
+*/
+    if (polyA->length == 1)
+    {
+        fmpz_mpoly_term_content(bc, polyB, ctx);
+        fmpz_mpoly_gcd_monomial(poly1, polyA, bc, ctx);
+        goto done;
+    } else if (polyB->length == 1)
+    {
+        fmpz_mpoly_term_content(ac, polyA, ctx);
+        fmpz_mpoly_gcd_monomial(poly1, polyB, ac, ctx);
+        goto done;
+    }
+
+/*
+printf("neither is monomial\n");
+*/
+
+    a_degs = (slong *)TMP_ALLOC(nvars*sizeof(slong));
+    b_degs = (slong *)TMP_ALLOC(nvars*sizeof(slong));
+    a_leads = (slong *)TMP_ALLOC(nvars*sizeof(slong));
+    b_leads = (slong *)TMP_ALLOC(nvars*sizeof(slong));
+    fmpz_mpoly_degrees(a_degs, polyA, ctx);
+    fmpz_mpoly_degrees(b_degs, polyB, ctx);
+
+    d = 0;
+    for (v = 0; v < nvars; v++)
+    {
+        d |= a_degs[v] | b_degs[v];
+    }
+    if (d == 0)
+    {
+        fmpz_t gg;
+        assert(polyA->length == 1);
+        assert(polyB->length == 1);
+        fmpz_init(gg);
+        fmpz_gcd(gg, polyA->coeffs + 0, polyB->coeffs + 0);
+        fmpz_mpoly_set_fmpz(poly1, gg, ctx);
+        fmpz_clear(gg);
+        goto done;
+    }
+
+/*
+printf("at least one is non constant\n");
+*/
+
+    for (v = 0; v < nvars; v++)
+    {
+        if (a_degs[v] == 0 && b_degs[v] != 0)
+        {
+            fmpz_mpoly_to_univar(bx, polyB, v, ctx);
+            fmpz_mpoly_set(poly1, polyA, ctx);
+            for (i = 0; i < bx->length; i++)
+                _fmpz_mpoly_gcd_prs(poly1, poly1, bx->coeffs + i, ctx);
+            goto done;
+        }
+        if (b_degs[v] == 0 && a_degs[v] != 0)
+        {
+            fmpz_mpoly_to_univar(ax, polyA, v, ctx);
+            fmpz_mpoly_set(poly1, polyB, ctx);
+            for (i = 0; i < ax->length; i++)
+                _fmpz_mpoly_gcd_prs(poly1, poly1, ax->coeffs + i, ctx);
+            goto done;
+        }
+    }
+/*
+printf("matching variables\n");
+*/
+    for (v = 0; v < nvars; v++)
+    {
+        bits = polyA->bits;
+        fpw = FLINT_BITS/bits;
+        mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+        N = words_per_exp(ctx->n, bits);
+        degrev_from_ord(deg, rev, ctx->ord);
+        mpoly_off_shift(&off, &shift, v, deg, rev, fpw, ctx->n, bits);
+        if (a_degs[v] != 0)
+        {
+            a_leads[v] = 0;
+            for (i = 0; i < polyA->length; i++)
+                a_leads[v] += ((polyA->exps[N*i + off] >> shift) & mask) == a_degs[v];
+        }
+
+        bits = polyB->bits;
+        fpw = FLINT_BITS/bits;
+        mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+        N = words_per_exp(ctx->n, bits);
+        degrev_from_ord(deg, rev, ctx->ord);
+        mpoly_off_shift(&off, &shift, v, deg, rev, fpw, ctx->n, bits);
+        if (b_degs[v] != 0)
+        {
+            b_leads[v] = 0;
+            for (i = 0; i < polyB->length; i++)
+                b_leads[v] += ((polyB->exps[N*i + off] >> shift) & mask) == b_degs[v];
+        }
+    }
+
+/*
+for (v = 0; v < nvars; v++)
+{
+    flint_printf("%wd:  a_deg %wd  a_lead %wd   b_deg %wd  b_lead %wd\n", v, a_degs[v], a_leads[v], b_degs[v], b_leads[v]);
+}
+*/
+
+    k = 0;
+    m = 1000000;
+    for (v = 0; v < nvars; v++)
+    {
+        if (a_degs[v] != 0)
+        {
+            if (a_degs[v] >= b_degs[v])
+                c = FLINT_MAX(FLINT_BIT_COUNT(b_leads[v]-1)*a_degs[v], 1)*b_degs[v];
+            else
+                c = FLINT_MAX(FLINT_BIT_COUNT(a_leads[v]-1)*b_degs[v], 1)*a_degs[v];
+
+            if (c < m)
+            {
+                m = c;
+                k = v;
+            }
+        }
+
+    }
+
+    var = k;
+
+/*
+flint_printf("choosing variable %wd\n", var);
+*/
+
+    d = 0;
+    for (v = 0; v < nvars; v++)
+    {
+        if (v != k)
+            d |= a_degs[v] | b_degs[v];
+    }
+    if (d == 0)
+    {
+/*
+flint_printf("using univar in ");
+flint_printf("_fmpz_mpoly_gcd_prs(");
+fmpz_mpoly_print_pretty(polyA,vars,ctx);
+flint_printf(", ");
+fmpz_mpoly_print_pretty(polyB,vars,ctx);
+flint_printf(")\n");
+*/
+
+        slong e1, e2, e3;
+        fmpz_poly_t u1, u2, u3;
+        fmpz_poly_init(u1);
+        fmpz_poly_init(u2);
+        fmpz_poly_init(u3);
+        fmpz_mpoly_to_fmpz_poly(u2, &e2, polyA, k, ctx);
+        fmpz_mpoly_to_fmpz_poly(u3, &e3, polyB, k, ctx);
+/*
+printf("**************\n");
+printf("u2: "); fmpz_poly_print_pretty(u2,"X"); printf("\n");
+printf("u3: "); fmpz_poly_print_pretty(u3,"X"); printf("\n");
+*/
+        fmpz_poly_gcd(u1, u2, u3);
+/*
+printf("u1: "); fmpz_poly_print_pretty(u1,"X"); printf("\n");
+*/
+        e1 = FLINT_MIN(e2, e3);
+        fmpz_mpoly_from_fmpz_poly(poly1, u1, e1, k, ctx);
+
+
+
+
+        fmpz_poly_clear(u1);
+        fmpz_poly_clear(u2);
+        fmpz_poly_clear(u3);
+        goto done;
+    }
+
+/*
+flint_printf("using pgcd\n");
+*/
+
+    fmpz_mpoly_to_univar(ax, polyA, var, ctx);
+    fmpz_mpoly_to_univar(bx, polyB, var, ctx);
+    gx->var = var;
 
     fmpz_mpoly_set(ac, ax->coeffs + 0, ctx);
     for (i = 1; i < ax->length; i++)
     {
-        _fmpz_mpoly_gcd_prs(ac, ac, ax->coeffs + i, var - 1, ctx);
+        _fmpz_mpoly_gcd_prs(ac, ac, ax->coeffs + i, ctx);
     }
     fmpz_mpoly_set(bc, bx->coeffs + 0, ctx);
     for (i = 1; i < bx->length; i++)
     {
-        _fmpz_mpoly_gcd_prs(bc, bc, bx->coeffs + i, var - 1, ctx);
+        _fmpz_mpoly_gcd_prs(bc, bc, bx->coeffs + i, ctx);
     }
 
     for (i = 0; i < ax->length; i++)
@@ -1788,43 +2117,132 @@ printf("bx: "); fmpz_mpoly_univar_print(bx, vars, ctx); printf("\n");
         assert(gx->length > 0);
     }
 
+/*
+flint_printf("gx(%wd):\n",gx->length);
+fmpz_mpoly_univar_print(gx, vars, ctx);
+printf("\n");
+*/
+    assert(gx->length > 0);
+    if ((gx->coeffs + 0)->length != 1 && (gx->coeffs + gx->length - 1)->length != 1)
+    {
+/*
+flint_printf("ax: ");
+fmpz_mpoly_univar_print(ax, vars, ctx);
+printf("\n");
+flint_printf("bx: ");
+fmpz_mpoly_univar_print(bx, vars, ctx);
+printf("\n");
+*/
 
-    fmpz_mpoly_set(gc, gx->coeffs + 0, ctx);
+        if ((ax->coeffs + 0)->length == 1 || (bx->coeffs + 0)->length == 1)
+        {
+            fmpz_mpoly_term_content(gc, gx->coeffs + 0, ctx);
+            fmpz_mpoly_divides_monagan_pearce(gabc, gx->coeffs + 0, gc, ctx);
+            for (i = 0; i < gx->length; i++)
+            {
+                if (!fmpz_mpoly_divides_monagan_pearce(gx->coeffs + i, gx->coeffs + i, gabc, ctx))
+                    assert(0 && "not lead div");
+            }
+        } else if ((ax->coeffs + ax->length-1)->length == 1 || (bx->coeffs + bx->length-1)->length == 1)
+        {
+            fmpz_mpoly_term_content(gc, gx->coeffs + gx->length-1, ctx);
+            fmpz_mpoly_divides_monagan_pearce(gabc, gx->coeffs + gx->length-1, gc, ctx);
+            for (i = 0; i < gx->length; i++)
+            {
+                if (!fmpz_mpoly_divides_monagan_pearce(gx->coeffs + i, gx->coeffs + i, gabc, ctx))
+                    assert(0 && "not trail div");
+            }
+        } else
+        {
+            _fmpz_mpoly_gcd_prs(gc, ax->coeffs + 0, bx->coeffs + 0, ctx);
+            if (gc->length == 1)
+            {
+                fmpz_mpoly_term_content(gc, gx->coeffs + 0, ctx);
+                fmpz_mpoly_divides_monagan_pearce(gabc, gx->coeffs + 0, gc, ctx);
+                for (i = 0; i < gx->length; i++)
+                {
+                    if (!fmpz_mpoly_divides_monagan_pearce(gx->coeffs + i, gx->coeffs + i, gabc, ctx))
+                        assert(0 && "not lead div");
+                }                
+            }
+        }
+    }
+
+
+    fmpz_mpoly_term_content(gc, gx->coeffs + 0, ctx);
     for (i = 1; i < gx->length; i++)
     {
-        _fmpz_mpoly_gcd_prs(gc, gc, gx->coeffs + i, var - 1, ctx);
+        fmpz_mpoly_term_content(gabc, gx->coeffs + i, ctx);
+        fmpz_mpoly_gcd_monomial(gc, gc, gabc, ctx);
     }
-/*
-printf("1gc: "); fmpz_mpoly_print_pretty(gc, vars, ctx); printf("\n");
-printf("1gx: "); fmpz_mpoly_univar_print(gx, vars, ctx); printf("\n");
-*/
     for (i = 0; i < gx->length; i++)
     {
         fmpz_mpoly_divides_monagan_pearce(gx->coeffs + i, gx->coeffs + i, gc, ctx);
     }
 
-/*
-printf("2gx: "); fmpz_mpoly_univar_print(gx, vars, ctx); printf("\n");
-*/
+    fmpz_mpoly_set(gc, gx->coeffs + 0, ctx);
+    for (i = 1; i < gx->length; i++)
+    {
+        _fmpz_mpoly_gcd_prs(gc, gc, gx->coeffs + i, ctx);
+    }
+
+    for (i = 0; i < gx->length; i++)
+    {
+        fmpz_mpoly_divides_monagan_pearce(gx->coeffs + i, gx->coeffs + i, gc, ctx);
+    }
+
     fmpz_mpoly_from_univar(g, gx, ctx);
 
 
-    _fmpz_mpoly_gcd_prs(gabc, ac, bc, var - 1, ctx);
+    _fmpz_mpoly_gcd_prs(gabc, ac, bc, ctx);
 
     fmpz_mpoly_mul_johnson(poly1, g, gabc, ctx);
-/*
-printf("**********\n");
-fmpz_mpoly_print_pretty(poly2,vars,ctx);
-flint_printf("\n==\n");
-flint_printf("_fmpz_mpoly_gcd_prs(var=%wd)(\n",var);
-fmpz_mpoly_print_pretty(poly2,vars,ctx);
-flint_printf("\n,\n");
-fmpz_mpoly_print_pretty(poly3,vars,ctx);
-flint_printf("\n)\n");
-printf("**********\n");
-*/
 
 done:
+
+
+    fmpz_mpoly_test(poly1, ctx);
+    fmpz_mpoly_test(A, ctx);
+    fmpz_mpoly_test(B, ctx);
+
+/*
+    if (poly1->length > 0)
+    {
+        if (!fmpz_mpoly_divides_monagan_pearce(ac, A, poly1, ctx)
+            || !fmpz_mpoly_divides_monagan_pearce(ac, B, poly1, ctx))
+        {
+
+printf("**********\nproblem ");
+fmpz_mpoly_print_pretty(poly1,vars,ctx);
+flint_printf(" != ");
+flint_printf("_fmpz_mpoly_gcd_prs(");
+fmpz_mpoly_print_pretty(A,vars,ctx);
+flint_printf(", ");
+fmpz_mpoly_print_pretty(B,vars,ctx);
+flint_printf(")\n");
+assert(0);
+
+        }
+
+    }
+*/
+
+/*
+printf("**********\nreturning ");
+fmpz_mpoly_print_pretty(poly1,vars,ctx);
+flint_printf(" = ");
+flint_printf("_fmpz_mpoly_gcd_prs(");
+fmpz_mpoly_print_pretty(A,vars,ctx);
+flint_printf(", ");
+fmpz_mpoly_print_pretty(B,vars,ctx);
+flint_printf(")\n");
+*/
+
+    TMP_END;
+/*
+    fmpz_mpoly_clear(A, ctx);
+    fmpz_mpoly_clear(B, ctx);
+*/
 
     fmpz_mpoly_clear(ac, ctx);
     fmpz_mpoly_clear(bc, ctx);
@@ -1841,9 +2259,7 @@ done:
 
 void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2, fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev;
-    degrev_from_ord(deg, rev, ctx->ord);    
-    _fmpz_mpoly_gcd_prs(poly1, poly2, poly3, ctx->n - deg - 1, ctx);
+    _fmpz_mpoly_gcd_prs(poly1, poly2, poly3, ctx);
     if ((poly1->length > 0) && (fmpz_cmp_ui(poly1->coeffs + 0, WORD(0)) < 0))
         fmpz_mpoly_neg(poly1, poly1, ctx);
 }
