@@ -63,6 +63,11 @@ mp_limb_t * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
     Return a pointer to the entry at row $i$ and column $j$ of the matrix
     \code{mat}.
 
+void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x)
+
+    Set the entry at row $i$ and column $j$ of the matrix \code{mat}
+    to \code{x}.
+
 slong nmod_mat_nrows(nmod_mat_t mat)
 
     Returns the number of rows in \code{mat}.
