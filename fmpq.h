@@ -156,6 +156,8 @@ FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
 FLINT_DLL int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
 
+FLINT_DLL void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c);
+
 FLINT_DLL void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f);
 
 FLINT_DLL void flint_mpq_clear_readonly(mpq_t z);
