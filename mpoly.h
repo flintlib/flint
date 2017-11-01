@@ -141,6 +141,42 @@ void mpoly_ordering_print(ordering_t ord)
    }
 }
 
+/* Misc **********************************************************************/
+
+/*
+    in order to pickout the exponent of the variable of index "idx", calculate
+    the word offset "off" and the shift amount "shift"
+*/
+MPOLY_INLINE
+void mpoly_off_shift(slong * off, slong * shift, slong idx, int deg, int rev, slong fpw, slong nfields, slong bits)
+{
+    if (rev)
+    {
+        *off   = (nfields - 1 - idx)/fpw;
+        *shift = (nfields - 1 - idx)%fpw;
+    } else
+    {
+        *off   = (deg + idx)/fpw;
+        *shift = (deg + idx)%fpw;
+    }
+    *shift = (fpw - 1 - *shift) * bits;
+}
+
+/*
+    get the exponent vector "one" of a the variable of index "var"
+*/
+MPOLY_INLINE
+void mpoly_univar_exp(ulong * one, slong var, int deg, slong N, slong off, slong shift, slong fpw, slong bits)
+{
+    slong i;
+    for (i = 0; i < N; i++)
+        one[i] = 0;
+    one[off] = WORD(1) << shift;
+    if (deg)
+        one[0] |= WORD(1) << ((fpw - 1)*bits);
+}
+
+
 /*  Monomials ****************************************************************/
 
 MPOLY_INLINE
@@ -183,6 +219,24 @@ void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
         m = m - (m >> (bits - 1));
         exp1[i] = exp3[i] + (s & m);
     }
+}
+
+MPOLY_INLINE
+void mpoly_monomial_madd(ulong * exp1, const ulong * exp2, ulong scalar,
+                                                   const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp1[i] = exp2[i] + scalar*exp3[i];
+}
+
+MPOLY_INLINE
+void mpoly_monomial_msub(ulong * exp1, const ulong * exp2, ulong scalar,
+                                                   const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp1[i] = exp2[i] - scalar*exp3[i];
 }
 
 MPOLY_INLINE
@@ -421,11 +475,11 @@ FLINT_DLL slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg);
 
 FLINT_DLL slong mpoly_optimize_bits(slong bits, slong nfields);
 
-FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len);
+FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits,
+                                                     slong nfields, slong len);
 
-FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len);
-
-
+FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits,
+                                                     slong nfields, slong len);
 
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                         slong bits, slong n, int deg, int rev);
@@ -448,6 +502,9 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
 
 FLINT_DLL void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
                                                slong len, slong bits, slong n);
+
+FLINT_DLL void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
+                       slong len, slong bits, slong nfields, int deg, int rev);
 
 FLINT_DLL void mpoly_search_monomials(
                 slong ** e_ind, ulong * e, slong * e_score,
