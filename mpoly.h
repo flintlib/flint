@@ -475,11 +475,11 @@ FLINT_DLL slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg);
 
 FLINT_DLL slong mpoly_optimize_bits(slong bits, slong nfields);
 
-FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len);
+FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits,
+                                                     slong nfields, slong len);
 
-FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len);
-
-
+FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits,
+                                                     slong nfields, slong len);
 
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                         slong bits, slong n, int deg, int rev);

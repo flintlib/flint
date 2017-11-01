@@ -105,7 +105,8 @@ main(void)
             {
                 if (!fmpz_mpoly_is_zero(a, ctx) || !fmpz_mpoly_is_zero(b, ctx))
                 {
-                    flint_printf("FAIL\ngcd is zero but both inputs are not\ni: %wd  j: %wd\n", i, j);
+                    flint_printf("FAIL\ngcd is zero but both inputs are not\n"
+                                                     "i: %wd  j: %wd\n", i, j);
                     flint_abort();
                 }
                 continue;
@@ -115,12 +116,14 @@ main(void)
             ok = ok && fmpz_mpoly_divides_monagan_pearce(b, b, g, ctx);
             if (!ok)
             {
-                flint_printf("FAIL\ngcd doesn't divide both inputs\ni: %wd  j: %wd\n", i, j);
+                flint_printf("FAIL\ngcd doesn't divide both inputs\n"
+                                                     "i: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
 
             if (!fmpz_mpoly_gcd_is_unit(a, b, ctx))
-                flint_printf("FAIL\ncofactors are not relatively prime\ni: %wd  j: %wd\n", i, j);
+                flint_printf("FAIL\ncofactors are not relatively prime\n"
+                                                     "i: %wd  j: %wd\n", i, j);
 
         }
 
@@ -133,8 +136,6 @@ main(void)
         fmpz_mpoly_clear(g, ctx);       
         fmpz_mpoly_clear(t, ctx);
     }
-
-
 
     FLINT_TEST_CLEANUP(state);
 

@@ -17,7 +17,8 @@
 #include "assert.h"
 
 
-void fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, slong var, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+               const fmpz_mpoly_t poly3, slong var, const fmpz_mpoly_ctx_t ctx)
 {
     int change_sign = 0;
     fmpz_mpoly_univar_t rx, fx, gx;

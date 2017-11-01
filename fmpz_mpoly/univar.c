@@ -773,14 +773,17 @@ done:
 
 
 
-void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ, const fmpz_mpoly_ctx_t ctx)
+void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
+        const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     ulong exp;
     slong i, j, k, d, e;
     slong alpha, n, J, aJ, ae;
     slong a_len, b_len, c_len, d_len, h_len, t_len;
     ulong * a_exp, * b_exp, * c_exp, * d_exp, * h_exp, * t_exp;
-    fmpz_mpoly_struct * a_coeff, * b_coeff, * c_coeff, * d_coeff, * h_coeff, * t_coeff;
+    fmpz_mpoly_struct * a_coeff, * b_coeff, * c_coeff, * d_coeff, * h_coeff,
+                                                                     * t_coeff;
     int iexists, jexists, kexists;
     fmpz_mpoly_t u, v, w, s;
     fmpz_mpoly_univar_t A, B, C, D, H, T;
@@ -1289,7 +1292,8 @@ done:
 
 
 
-void fmpz_mpoly_univar_derivative(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_derivative(fmpz_mpoly_univar_t poly1,
+                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     fmpz_mpoly_struct * coeff1, * coeff2;
@@ -1325,7 +1329,8 @@ void fmpz_mpoly_univar_derivative(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_un
 
 
 
-void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift,
+               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, shift, off, bits, fpw, N;
     ulong k;
@@ -1358,7 +1363,8 @@ void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift, const fmpz_
     *poly1_shift = _shift;
 }
 
-void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slong poly2_shift, slong var, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
+                           slong shift2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
     slong shift, off, bits, fpw, N;
     slong k;
@@ -1372,7 +1378,8 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slon
 
     TMP_START;
 
-    bits = 1 + FLINT_BIT_COUNT(FLINT_MAX(WORD(1), shift + fmpz_poly_degree(poly2)));
+    bits = fmpz_poly_degree(poly2);
+    bits = 1 + FLINT_BIT_COUNT(FLINT_MAX(WORD(1), shift2 + bits));
     if (bits > FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_fmpz_poly");
     bits = mpoly_optimize_bits(bits, ctx->n);
@@ -1394,7 +1401,7 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slon
     for (k = fmpz_poly_degree(poly2); k >= 0; k--)
     {
         _fmpz_mpoly_fit_length(&p_coeff, &p_exp, &p_alloc, p_len + 1, N);
-        mpoly_monomial_mul_si(p_exp + N*p_len, one, N, k + poly2_shift);
+        mpoly_monomial_mul_si(p_exp + N*p_len, one, N, k + shift2);
         fmpz_poly_get_coeff_fmpz(p_coeff + p_len, poly2, k);
         p_len += !fmpz_is_zero(p_coeff + p_len);
     }

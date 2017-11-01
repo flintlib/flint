@@ -17,7 +17,8 @@
 #include "assert.h"
 
 
-void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                         slong var, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_t lcfx;
     fmpz_mpoly_univar_t rx, fx, fxp;
@@ -31,10 +32,16 @@ void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, slong
     /* the discriminant of a constant polynomial "a" should be "1/a^2" */
     if (fxp->length == 0)
     {
-        if (fmpz_mpoly_equal_si(poly2, WORD(1), ctx) || fmpz_mpoly_equal_si(poly2, -WORD(1), ctx))
+        if (   fmpz_mpoly_equal_si(poly2, WORD(1), ctx)
+            || fmpz_mpoly_equal_si(poly2, -WORD(1), ctx)
+           )
+        {
             fmpz_mpoly_set_si(poly1, WORD(1), ctx);
+        }
         else
+        {
             flint_throw(FLINT_IMPINV, "Non-unit constant polynomial in fmpz_mpoly_discriminant");
+        }
 
     /* the discriminant of a linear polynomial "a*x+b" should be "1" */
     } else if (fxp->exps[0] == 0)

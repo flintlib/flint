@@ -17,7 +17,8 @@
 #include "assert.h"
 
 
-void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     int deg, rev;
     slong bits, nfields;

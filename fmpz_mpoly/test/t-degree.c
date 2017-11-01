@@ -49,8 +49,10 @@ main(void)
 
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
-        exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
+        exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars
+                          + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
+        exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars
+                          + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
         exp_bound1 = n_randbits(state, exp_bits1);
         exp_bound2 = n_randbits(state, exp_bits2);
 
@@ -62,7 +64,11 @@ main(void)
             fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
             fmpz_mpoly_add(h, f, g, ctx);
 
-            if (fmpz_mpoly_degree(h, j, ctx) > FLINT_MAX(fmpz_mpoly_degree(f, j, ctx), fmpz_mpoly_degree(g, j, ctx)))
+            if (fmpz_mpoly_degree(h, j, ctx) > FLINT_MAX(
+                                                  fmpz_mpoly_degree(f, j, ctx),
+                                                  fmpz_mpoly_degree(g, j, ctx)
+                                               )
+               )
             {
                 printf("FAIL\n");
                 flint_printf("Check degree does not go up under addition\n"

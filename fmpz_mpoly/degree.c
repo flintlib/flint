@@ -17,14 +17,16 @@
 #include "assert.h"
 
 
-void fmpz_mpoly_degrees(slong * degs, const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_degrees(slong * degs, const fmpz_mpoly_t poly,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     int deg, rev;
     degrev_from_ord(deg, rev, ctx->ord);
     mpoly_degrees(degs, poly->exps, poly->length, poly->bits, ctx->n, deg, rev);
 }
 
-slong fmpz_mpoly_degree(const fmpz_mpoly_t poly, slong var, const fmpz_mpoly_ctx_t ctx)
+slong fmpz_mpoly_degree(const fmpz_mpoly_t poly, slong var,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong * degs, nvars, ret;
     int deg, rev;
