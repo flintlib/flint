@@ -19,7 +19,7 @@
 int fmpz_mpoly_gcd_is_unit(const fmpz_mpoly_t a, const fmpz_mpoly_t b,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev;
+    int deg, rev, ret = 1;
     slong nvars, v;
     fmpz_t d, ac, bc;
     fmpz_mpoly_t t;
@@ -34,28 +34,42 @@ int fmpz_mpoly_gcd_is_unit(const fmpz_mpoly_t a, const fmpz_mpoly_t b,
 
     if (a->length == 0)
     {
-        return fmpz_mpoly_equal_si(b, +WORD(1), ctx)
+        ret =  fmpz_mpoly_equal_si(b, +WORD(1), ctx)
             || fmpz_mpoly_equal_si(b, -WORD(1), ctx);
+        goto done;
     }
 
     if (b->length == 0)
     {
-        return fmpz_mpoly_equal_si(a, +WORD(1), ctx)
+        ret =  fmpz_mpoly_equal_si(a, +WORD(1), ctx)
             || fmpz_mpoly_equal_si(a, -WORD(1), ctx);
+        goto done;
     }
 
     _fmpz_vec_content(ac, a->coeffs, a->length);
     _fmpz_vec_content(bc, b->coeffs, b->length);
     fmpz_gcd(d, ac, bc);
     if (!fmpz_is_one(d))
-        return 0;
+    {
+        ret = 0;
+        goto done;
+    }
 
     for (v = 0; v < nvars; v++)
     {
         fmpz_mpoly_resultant(t, a, b, v, ctx);
         if (fmpz_mpoly_is_zero(t, ctx))
-            return 0;
+        {
+            ret = 0;
+            goto done;
+        }
     }
 
-    return 1;
+done:
+    fmpz_clear(d);
+    fmpz_clear(ac);
+    fmpz_clear(bc);
+    fmpz_mpoly_clear(t, ctx);
+
+    return ret;
 }

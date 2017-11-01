@@ -59,9 +59,8 @@ main(void)
     }
 */
 
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-
         int ok;
         fmpz_t ac, bc, d;
         fmpz_mpoly_ctx_t ctx;
@@ -84,7 +83,7 @@ main(void)
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        for (j = 0; j < 4; j++)
+        for (j = 0; j < 1; j++)
         {
             len1 = n_randint(state, 18);
             len2 = n_randint(state, 18);

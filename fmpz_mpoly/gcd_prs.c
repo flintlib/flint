@@ -74,17 +74,11 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     int deg, rev;
     ulong mask;
     slong * a_degs, * b_degs, * a_leads, * b_leads;
-    fmpz_mpoly_t A,B;
     fmpz_mpoly_t ac, bc, gc, gabc, g;
     fmpz_mpoly_univar_t ax, bx, gx;
     TMP_INIT;
 
     TMP_START;
-
-    fmpz_mpoly_init(A, ctx);
-    fmpz_mpoly_init(B, ctx);
-    fmpz_mpoly_set(A, polyA, ctx);
-    fmpz_mpoly_set(B, polyB, ctx);
 
     fmpz_mpoly_init(ac, ctx);
     fmpz_mpoly_init(bc, ctx);
