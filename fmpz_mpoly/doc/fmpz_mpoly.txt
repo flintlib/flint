@@ -119,7 +119,7 @@ slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
 void fmpz_mpoly_degrees(slong * degs,
                            const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
-    Returns the degree of \code{poly} with respect to each variable. The array
+    Return the degree of \code{poly} with respect to each variable. The array
     \code{degs} has length equal to the number of variables, and the degree of
     \code{poly} with respect its $i$-th variable is stored in \code{degs[i]}. If
     \code{poly} is zero, all degrees are set to \code{-1}.
@@ -127,7 +127,7 @@ void fmpz_mpoly_degrees(slong * degs,
 slong fmpz_mpoly_degree(const fmpz_mpoly_t poly, slong var, 
                                                     const fmpz_mpoly_ctx_t ctx)
 
-    Returns the degree of \code{poly} with respect to the variable of index
+    Return the degree of \code{poly} with respect to the variable of index
     \code{var}. If \code{poly} is zero, the return is \code{-1}.
 
 void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
@@ -854,20 +854,6 @@ void fmpz_mpoly_quasidivrem_heap(fmpz_t scale, fmpz_mpoly_t q, fmpz_mpoly_t r,
     and as small as possible. This function throws an execption if
     \code{poly3} is zero or if an exponent overflow occurs.
 
-
-*******************************************************************************
-
-    Greatest Common Divisor
-
-*******************************************************************************
-
-void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    Uses psuedo-remainder sequences to set \code{poly1} to the greatest common
-    divisor of \code{poly2} and \code{poly3}, where \code{poly1} has positive
-    leading term.
-
 *******************************************************************************
 
     Reduction
@@ -919,6 +905,145 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
     \code{poly2*scale} with respect to the variable of index \code{idx},
     where \code{scale} is positive and as small as possible. This function
     throws an exception upon exponent overflow.
+
+*******************************************************************************
+
+    Greatest Common Divisor
+
+*******************************************************************************
+
+void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Sets \code{poly1} to the GCD of the terms of \code{poly2}.
+
+
+void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+
+    Uses psuedo-remainder sequences to set \code{poly1} to the
+    GCD of \code{poly2} and \code{poly3}, where \code{poly1} has positive
+    leading term.
+
+int fmpz_mpoly_gcd_is_unit(const fmpz_mpoly_t poly1,
+                          const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if the GCD \code{poly1} and \code{poly2} is a unit, else return 0.
+
+void fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+               const fmpz_mpoly_t poly3, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the resultant of \code{poly2} and \code{poly3}
+    with respect to the variable of index \code{var}.
+
+void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                         slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the discriminant of \code{poly2}
+    with respect to the variable of index \code{var}.
+
+*******************************************************************************
+
+    Univariates
+
+*******************************************************************************
+
+
+void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+    Initialize \{poly}.
+
+void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t poly,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+    Free all memory used by \code{poly}.
+
+void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t poly1,
+                         fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Swap \code{poly1} and \code{poly2}.
+
+void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t poly,
+                                      slong length, const fmpz_mpoly_ctx_t ctx)
+
+    Make sure that \code{poly} has space for at least \code{length} terms.
+
+void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1,
+               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Break up \code{poly2} as a polynomial in the variable of index \code{var}
+    with multivariate coefficients in the other variables, and store the result
+    in \code{poly1}.
+
+void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1,
+                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Reverse the operation performed by \code{fmpz_mpoly_to_univar}. This
+    function is currently undefined if the coefficients of \code{poly2}
+    themselves depend on the main variable in \code{poly2}. 
+
+int fmpz_mpoly_univar_equal(fmpz_mpoly_univar_t poly1,
+                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly1} and \code{poly2} are equal, otherwise return 0.
+
+void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1,
+        const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus \code{poly3}.
+
+void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1,
+        const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times \code{poly3}.
+
+void fmpz_mpoly_univar_derivative(fmpz_mpoly_univar_t poly1,
+                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the derivative of \code{poly2} with respect to
+    its main variable.
+
+void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * shift1,
+               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} and \code{shift1} so that $p_1*x^{s_1} = p_2$. The
+    shift is included because the \code{fmpz_poly_t} type is a dense type and
+    \code{fmpz_mpoly_t} is not. A call to
+    \code{fmpz_poly_shift_left(poly1, poly1, shift1)}
+    will result in \code{poly1} being equal to \code{poly2}. This function
+    is defined only if \code{poly2} depends solely on the variable
+    of index \code{var}.
+
+void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
+                           slong shift2, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Reverse the operation performed by \code{fmpz_mpoly_to_fmpz_poly}.
+
+void _fmpz_mpoly_univar_prem(fmpz_mpoly_univar_t polyA,
+        const fmpz_mpoly_univar_t polyB, fmpz_mpoly_univar_t polyC,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{polyA} to the pseudo remainder of \code{polyA} and -\code{polyB}.
+    The division is performed with respect to the variable store in
+    \code{polyB}. An extra polynomial \code{polyC} is needed for workspace.
+
+void _fmpz_mpoly_univar_pgcd(fmpz_mpoly_univar_t poly1,
+        const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the last (nonzero) subresultant polynomial of
+    \code{polyQ} and \code{polyQ}. It is assumed that $\operatorname{deg}(P)
+    \ge \operatorname{deg}(Q) \ge 1$.
+
+void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
+        const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Perform the same operation as \code{_fmpz_mpoly_univar_pgcd} using the
+    algorithm of Ducos.
 
 *******************************************************************************
 

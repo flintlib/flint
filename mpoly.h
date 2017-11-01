@@ -503,6 +503,9 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
 FLINT_DLL void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
                                                slong len, slong bits, slong n);
 
+FLINT_DLL void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
+                       slong len, slong bits, slong nfields, int deg, int rev);
+
 FLINT_DLL void mpoly_search_monomials(
                 slong ** e_ind, ulong * e, slong * e_score,
                 slong * t1, slong * t2, slong *t3,

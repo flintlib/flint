@@ -25,12 +25,12 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("univar....\n");
+    flint_printf("univar....");
     fflush(stdout);
 
 
     /* Check mpoly -> mpoly_univar -> mpoly */
-    for (i = 0; i < 0 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g;
@@ -82,7 +82,7 @@ main(void)
 
 
     /* Check addition commutes */
-    for (i = 0; i < 0 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h1, h2;
@@ -147,7 +147,7 @@ main(void)
     }
 
     /* Check multiplication commutes */
-    for (i = 0; i < 0 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h1, h2;
