@@ -38,14 +38,16 @@ void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ct
 }
 
 
-void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t poly1, fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t poly1,
+                         fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
    fmpz_mpoly_univar_struct t = *poly1;
    *poly1 = *poly2;
    *poly2 = t;
 }
 
-void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t poly, slong length, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t poly,
+                                      slong length, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     slong old_alloc = poly->alloc;
@@ -56,11 +58,14 @@ void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t poly, slong length, const 
         if (old_alloc == 0)
         {
             poly->exps = (ulong *) flint_malloc(new_alloc*sizeof(ulong));
-            poly->coeffs = (fmpz_mpoly_struct *) flint_malloc(new_alloc*sizeof(fmpz_mpoly_struct));
+            poly->coeffs = (fmpz_mpoly_struct *) flint_malloc(
+                                          new_alloc*sizeof(fmpz_mpoly_struct));
         } else
         {
-            poly->exps = (ulong *) flint_realloc(poly->exps, new_alloc*sizeof(ulong));
-            poly->coeffs = (fmpz_mpoly_struct *) flint_realloc(poly->coeffs, new_alloc*sizeof(fmpz_mpoly_struct));
+            poly->exps = (ulong *) flint_realloc(poly->exps,
+                                                      new_alloc*sizeof(ulong));
+            poly->coeffs = (fmpz_mpoly_struct *) flint_realloc(poly->coeffs,
+                                          new_alloc*sizeof(fmpz_mpoly_struct));
         }
 
         for (i = old_alloc; i < new_alloc; i++)
@@ -72,7 +77,8 @@ void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t poly, slong length, const 
 
 }
 
-void fmpz_mpoly_univar_set(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_set(fmpz_mpoly_univar_t poly1,
+                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     fmpz_mpoly_struct * coeff1, * coeff2;
@@ -108,7 +114,8 @@ void fmpz_mpoly_univar_set(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t 
 
 
 /* if the coefficient doesn't exist, a new one is created */
-fmpz_mpoly_struct * _fmpz_mpoly_univar_get_coeff(fmpz_mpoly_univar_t poly, ulong pow, slong bits, const fmpz_mpoly_ctx_t ctx)
+fmpz_mpoly_struct * _fmpz_mpoly_univar_get_coeff(fmpz_mpoly_univar_t poly,
+                             ulong pow, slong bits, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j;
     fmpz_mpoly_struct * xk;
@@ -138,7 +145,8 @@ fmpz_mpoly_struct * _fmpz_mpoly_univar_get_coeff(fmpz_mpoly_univar_t poly, ulong
     return xk;
 }
 
-void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t poly,
+                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     if (poly->length == 0)
@@ -157,7 +165,8 @@ void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t poly, const char *
 }
 
 
-void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
+                                         slong var, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j, shift, off, bits, fpw, N;
     ulong k;
@@ -223,7 +232,8 @@ void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2, s
     the assertion x->next == NULL would need to be removed and a loop put in place
     other asserts would need to be removed as well
 */
-void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, shift, off, bits, fpw, N;
     ulong k;
@@ -273,8 +283,11 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         poly2_exps[i] = (poly2->coeffs + i)->exps;
         if (bits != (poly2->coeffs + i)->bits)
         {
-            poly2_exps[i] = (ulong *) flint_malloc(N*(poly2->coeffs + i)->length*sizeof(ulong));
-            mpoly_unpack_monomials(poly2_exps[i], bits, (poly2->coeffs + i)->exps, (poly2->coeffs + i)->bits, (poly2->coeffs + i)->length, ctx->n);
+            poly2_exps[i] = (ulong *) flint_malloc(
+                                  N*(poly2->coeffs + i)->length*sizeof(ulong));
+            mpoly_unpack_monomials(poly2_exps[i], bits,
+                    (poly2->coeffs + i)->exps, (poly2->coeffs + i)->bits,
+                                          (poly2->coeffs + i)->length, ctx->n);
         }
     }
 
@@ -299,7 +312,8 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         x->j = 0;
         x->next = NULL;
         mpoly_monomial_madd(exp + N*i, poly2_exps[x->i] + N*x->j, k, one, N);
-        _mpoly_heap_insert(heap, exp + N*i, x, &next_loc, &heap_len, N, maskhi, masklo);
+        _mpoly_heap_insert(heap, exp + N*i, x, &next_loc, &heap_len, N,
+                                                               maskhi, masklo);
     }
 
     p_len = 0;
@@ -317,8 +331,10 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
             k = poly2->exps[x->i];
             x->j = x->j + 1;
             x->next = NULL;
-            mpoly_monomial_madd(exp + N*x->i, poly2_exps[x->i] + N*x->j, k, one, N);
-            _mpoly_heap_insert(heap, exp + N*x->i, x, &next_loc, &heap_len, N, maskhi, masklo);
+            mpoly_monomial_madd(exp + N*x->i, poly2_exps[x->i] + N*x->j, k, one,
+                                                                            N);
+            _mpoly_heap_insert(heap, exp + N*x->i, x, &next_loc, &heap_len, N,
+                                                               maskhi, masklo);
         }
     }
 
@@ -340,13 +356,14 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
 void fmpz_mpoly_univar_test(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
-    if (!mpoly_monomials_test(poly->exps, poly->length, WORD(1), WORD(0), WORD(0)))
+    if (!mpoly_monomials_test(poly->exps, poly->length, WORD(1), 0, 0))
         flint_throw(FLINT_ERROR, "Univariate polynomial exponents invalid");
     for (i = 0; i < poly->length; i++)
         fmpz_mpoly_test(poly->coeffs + i, ctx);
 }
 
-int fmpz_mpoly_univar_equal(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_univar_equal(fmpz_mpoly_univar_t poly1,
+                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
 
@@ -369,7 +386,9 @@ int fmpz_mpoly_univar_equal(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t
 }
 
 
-void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1,
+            const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j;
     fmpz_mpoly_struct * coeff1, * coeff2, * coeff3;
@@ -437,7 +456,9 @@ void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t 
 }
 
 
-void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1,
+        const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j;
     slong next_loc, heap_len;
@@ -492,7 +513,8 @@ void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t 
     x->j = 0;
     x->next = NULL;
 
-    _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &next_loc, &heap_len, WORD(0));
+    _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &next_loc, &heap_len,
+                                                                      WORD(0));
 
     fmpz_mpoly_init(tcoeff, ctx);
 
@@ -538,7 +560,8 @@ void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t 
                 x->i = i + 1;
                 x->j = j;
                 x->next = NULL;
-                _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &next_loc, &heap_len, WORD(0));
+                _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x,
+                                                &next_loc, &heap_len, WORD(0));
             }
             if (j + 1 < len3)
             {
@@ -546,7 +569,8 @@ void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t 
                 x->i = i;
                 x->j = j + 1;
                 x->next = NULL;
-                _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x, &next_loc, &heap_len, WORD(0));
+                _mpoly_heap_insert1(heap, exp2[x->i] + exp3[x->j], x,
+                                                &next_loc, &heap_len, WORD(0));
             }
         }
     }
@@ -571,7 +595,9 @@ done:
     A = prem(A, -B)
     C is used for working space
 */
-void _fmpz_mpoly_univar_prem(fmpz_mpoly_univar_t polyA, const fmpz_mpoly_univar_t polyB, fmpz_mpoly_univar_t polyC, const fmpz_mpoly_ctx_t ctx)
+void _fmpz_mpoly_univar_prem(fmpz_mpoly_univar_t polyA,
+            const fmpz_mpoly_univar_t polyB, fmpz_mpoly_univar_t polyC,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong a_len, b_len, c_len;
     slong a_deg, b_deg;
@@ -667,7 +693,9 @@ done:
 
 
 
-void _fmpz_mpoly_univar_pgcd(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ, const fmpz_mpoly_ctx_t ctx)
+void _fmpz_mpoly_univar_pgcd(fmpz_mpoly_univar_t poly1,
+            const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, d, e;
     fmpz_mpoly_t u, v, w, s;
