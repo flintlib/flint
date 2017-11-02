@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -15,34 +15,34 @@
 #include "fmpz_mpoly.h"
 
 
-void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
-                                          slong len, slong bits, slong nfields)
+void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
+                        slong len, slong bits, slong nfields, int deg, int rev)
 {
-    slong i, j, N = words_per_exp(nfields, bits);
-    ulong * pmax, mask, t;
+    slong i, N;
+    ulong * pmax, mask;
     TMP_INIT;
+
+    if (len == 0)
+    {
+        for (i = 0; i < nfields - deg; i++)
+            user_degs[i] = -WORD(1);
+        return;
+    }
+
+    TMP_START;
 
     mask = 0;
     for (i = 0; i < FLINT_BITS/bits; i++)
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-    TMP_START;
-
+    N = words_per_exp(nfields, bits);
     pmax = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     for (i = 0; i < N; i++)
         pmax[i] = 0;
     for (i = 0; i < len; i++)
         mpoly_monomial_max(pmax, pmax, poly_exps + i*N, bits, N, mask);
 
-    mpoly_unpack_vec(max_degs, pmax, bits, nfields, 1);
-
-    /* reverse the order */
-    for (i = 0, j = nfields - 1; i < j; i++, j--)
-    {
-        t = max_degs[j];
-        max_degs[j] = max_degs[i];
-        max_degs[i] = t;
-    }
+    mpoly_get_monomial((ulong *) user_degs, pmax, bits, nfields, deg, rev);
 
     TMP_END;
 }

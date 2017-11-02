@@ -51,13 +51,15 @@ main(void)
                 max[j] = 0;
 
             for (i = 0; i < nfields*length; i += nfields)
+            {
                 for (j = 0; j < nfields; j++)
                 {
-                    a[i + j] = n_randint(state, 0) & (l_shift(UWORD(1), bits)
-                                                                          - 1);
+                    a[i + j] = n_randint(state, 0);
+                    a[i + j] &= (UWORD(1) << (bits - 1)) - 1;
                     max[nfields - j - 1] = FLINT_MAX(max[nfields - j - 1],
                                                                      a[i + j]);
                 }
+            }
 
             /* FLINT_BITS => bits */
             for (i = 0; i < length; i++)
