@@ -28,6 +28,7 @@ void fq_nmod_set_nmod_mat(fq_nmod_t a,
 {
     slong i, n = fq_nmod_ctx_degree(ctx);
     nmod_poly_fit_length(a, n);
+    a->length = n;
     for (i = 0; i < n; i++)
         a->coeffs[i] = nmod_mat_entry(col, i, 0);
     _nmod_poly_normalise(a);

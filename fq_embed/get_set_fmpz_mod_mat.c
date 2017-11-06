@@ -28,6 +28,7 @@ void fq_set_fmpz_mod_mat(fq_t a,
 {
     slong i, n = fq_ctx_degree(ctx);
     fmpz_poly_fit_length(a, n);
+    a->length = n;
     for (i = 0; i < n; i++)
         fmpz_set(a->coeffs + i, fmpz_mod_mat_entry(col, i, 0));
     _fmpz_poly_normalise(a);

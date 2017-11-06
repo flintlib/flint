@@ -167,7 +167,7 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
     /* Sub -> Gen */
     TEMPLATE(T, trace_matrix)(sub2gen, gen2sub, gen_ctx, sub_ctx);
     /* Gen -> Sup */
-    TEMPLATE(T, composition_matrix_sub)(gen2sup, gen_sub, sub_ctx, m);
+    TEMPLATE(T, composition_matrix_sub)(gen2sup, gen_sup, sup_ctx, m);
     /* Sup -> Gen (trace) */
     TEMPLATE(T, trace_matrix)(sup2gen, gen2sup, gen_ctx, sup_ctx);
 
@@ -204,7 +204,6 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
         TEMPLATE(B, mat_window_init)(column, sup2gen, 0, i, m, i+1);
         TEMPLATE(B, mat_mul)(tvec, gen2sup, column);
         TEMPLATE4(T, set, B, mat)(trace, tvec, sup_ctx);
-
         /* Get an element of trace 1 */
         TEMPLATE(T, div)(mul, mul, trace, sup_ctx);
         
