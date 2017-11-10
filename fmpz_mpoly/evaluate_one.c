@@ -16,7 +16,6 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
-#include "profiler.h"
 #include "assert.h"
 
 
@@ -96,7 +95,8 @@ void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
         y^1  0    (x^3*y   term)
         y^3  1    (x^2*y^3 term)
 
-        the inds array conains the term number of the next term with the same power of y
+        the inds array conains the term number of the next term with
+        the same power of y
 
         inds[0] = 2  (x*y term)
         inds[1] = -1 
@@ -121,7 +121,7 @@ void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
         inds[i] = -WORD(1);
     }
 
-    /* manually traverse tree and node data to heap */
+    /* manually traverse tree and add node data to heap */
     heap_len = 1;
     next_loc = tree->size + 4;
     heap = (mpoly_heap_s *) TMP_ALLOC((tree->size + 1)*sizeof(mpoly_heap_s));
@@ -133,7 +133,8 @@ void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
     stack_size = 0;
     main_exps = (slong *) TMP_ALLOC(tree->size*sizeof(fmpz));
     powers = (fmpz *) TMP_ALLOC(tree->size*sizeof(fmpz));
-    stack = (mpoly_rbnode_struct **) TMP_ALLOC(tree->size*sizeof(mpoly_rbnode_struct *));
+    stack = (mpoly_rbnode_struct **) TMP_ALLOC(tree->size
+                                              * sizeof(mpoly_rbnode_struct *));
     root = tree->head->left;
 
 looper:
@@ -156,7 +157,8 @@ looper:
 
     x->next = NULL;
     mpoly_monomial_msub(exp_array + i*N, p2_exp + x->j*N, root->key, one, N);
-    _mpoly_heap_insert(heap, exp_array + i*N, x, &next_loc, &heap_len, N, maskhi, masklo);
+    _mpoly_heap_insert(heap, exp_array + i*N, x,
+                                      &next_loc, &heap_len, N, maskhi, masklo);
 
     i++;    
     node = root->right;
@@ -205,8 +207,10 @@ done:
                 x->i = i;
                 x->j = inds[j];
                 x->next = NULL;
-                mpoly_monomial_msub(exp_array + i*N, p2_exp + x->j*N, main_exps[i], one, N);
-                _mpoly_heap_insert(heap, exp_array + i*N, x, &next_loc, &heap_len, N, maskhi, masklo);
+                mpoly_monomial_msub(exp_array + i*N, p2_exp + x->j*N,
+                                                         main_exps[i], one, N);
+                _mpoly_heap_insert(heap, exp_array + i*N, x,
+                                      &next_loc, &heap_len, N, maskhi, masklo);
             }
         }
     }

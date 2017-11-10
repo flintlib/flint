@@ -139,7 +139,6 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
    slong N;
    ulong * t;
 
-
    FLINT_ASSERT(bits <= FLINT_BITS);
 
    if (poly->bits < bits)
@@ -504,10 +503,7 @@ FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
 
 /* Evaluation ****************************************************************/
 
-void fmpz_mpoly_evaluate_all_fmpz_straight(fmpz_t ev, fmpz_mpoly_t poly,
-                                            fmpz ** val, fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_evaluate_all_fmpz_tree(fmpz_t ev, fmpz_mpoly_t poly,
+void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
                                             fmpz ** val, fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,

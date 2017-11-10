@@ -73,7 +73,7 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_tree(fe, f, vals, ctx);
+            fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals, ctx);
 
             for (v = 0; v < nvars; v++)
             {
@@ -136,12 +136,15 @@ main(void)
         exp_bound2 = n_randint(state, 4) + 1;
         coeff_bits = n_randint(state, 10);
 
-        vals1 = (fmpz_mpoly_struct **) flint_malloc(nvars1*sizeof(fmpz_mpoly_struct *));
+        vals1 = (fmpz_mpoly_struct **) flint_malloc(nvars1
+                                                * sizeof(fmpz_mpoly_struct *));
         for (v = 0; v < nvars1; v++)
         {
-            vals1[v] = (fmpz_mpoly_struct *) flint_malloc(sizeof(fmpz_mpoly_struct)); 
+            vals1[v] = (fmpz_mpoly_struct *) flint_malloc(
+                                                    sizeof(fmpz_mpoly_struct)); 
             fmpz_mpoly_init(vals1[v], ctx2);
-            fmpz_mpoly_randtest(vals1[v], state, len2, exp_bound2, coeff_bits, ctx2);
+            fmpz_mpoly_randtest(vals1[v], state, len2, exp_bound2,
+                                                             coeff_bits, ctx2);
         }
 
         vals2 = (fmpz **) flint_malloc(nvars2*sizeof(fmpz*));
@@ -157,14 +160,14 @@ main(void)
         {
             vals3[v] = (fmpz *) flint_malloc(sizeof(fmpz)); 
             fmpz_init(vals3[v]);
-            fmpz_mpoly_evaluate_all_fmpz_tree(vals3[v], vals1[v], vals2, ctx2);
+            fmpz_mpoly_evaluate_all_tree_fmpz(vals3[v], vals1[v], vals2, ctx2);
         }
 
         fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx1);
         fmpz_mpoly_compose(g, f, vals1, ctx1, ctx2);
         fmpz_mpoly_test(g, ctx2);
-        fmpz_mpoly_evaluate_all_fmpz_tree(fe, f, vals3, ctx1);
-        fmpz_mpoly_evaluate_all_fmpz_tree(ge, g, vals2, ctx2);
+        fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals3, ctx1);
+        fmpz_mpoly_evaluate_all_tree_fmpz(ge, g, vals2, ctx2);
 
         if (!fmpz_equal(fe, ge))
         {
@@ -209,7 +212,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, fg;
-        fmpz_t fe, ge, fge, fe2, ge2, fge2,t;
+        fmpz_t fe, ge, fge, t;
         ordering_t ord;
         fmpz ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
@@ -227,9 +230,6 @@ main(void)
         fmpz_init(fe);
         fmpz_init(ge);
         fmpz_init(fge);
-        fmpz_init(fe2);
-        fmpz_init(ge2);
-        fmpz_init(fge2);
         fmpz_init(t);
 
         len1 = n_randint(state, 500);
@@ -258,16 +258,12 @@ main(void)
             fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
             fmpz_mpoly_add(fg, f, g, ctx);
 
-            fmpz_mpoly_evaluate_all_fmpz_tree(fe, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_tree(ge, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_tree(fge, fg, vals, ctx);
-
-            fmpz_mpoly_evaluate_all_fmpz_straight(fe2, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_straight(ge2, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_straight(fge2, fg, vals, ctx);
+            fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals, ctx);
+            fmpz_mpoly_evaluate_all_tree_fmpz(ge, g, vals, ctx);
+            fmpz_mpoly_evaluate_all_tree_fmpz(fge, fg, vals, ctx);
 
             fmpz_add(t, fe, ge);
-            if (!fmpz_equal(t, fge) | !fmpz_equal(fe, fe2) | !fmpz_equal(ge, ge2))
+            if (!fmpz_equal(t, fge))
             {
                 printf("FAIL\n");
                 flint_printf("Check addition commutes with evalall\n"
@@ -290,9 +286,6 @@ main(void)
         fmpz_clear(fe);
         fmpz_clear(ge);
         fmpz_clear(fge);
-        fmpz_clear(fe2);
-        fmpz_clear(ge2);
-        fmpz_clear(fge2);
         fmpz_clear(t);
 
     }
@@ -302,7 +295,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, fg;
-        fmpz_t fe, ge, fge, fe2, ge2, fge2,t;
+        fmpz_t fe, ge, fge, t;
         ordering_t ord;
         fmpz ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
@@ -320,9 +313,6 @@ main(void)
         fmpz_init(fe);
         fmpz_init(ge);
         fmpz_init(fge);
-        fmpz_init(fe2);
-        fmpz_init(ge2);
-        fmpz_init(fge2);
         fmpz_init(t);
 
         len1 = n_randint(state, 100);
@@ -351,16 +341,12 @@ main(void)
             fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
             fmpz_mpoly_mul_johnson(fg, f, g, ctx);
 
-            fmpz_mpoly_evaluate_all_fmpz_tree(fe, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_tree(ge, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_tree(fge, fg, vals, ctx);
-
-            fmpz_mpoly_evaluate_all_fmpz_straight(fe2, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_straight(ge2, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_straight(fge2, fg, vals, ctx);
+            fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals, ctx);
+            fmpz_mpoly_evaluate_all_tree_fmpz(ge, g, vals, ctx);
+            fmpz_mpoly_evaluate_all_tree_fmpz(fge, fg, vals, ctx);
 
             fmpz_mul(t, fe, ge);
-            if (!fmpz_equal(t, fge) | !fmpz_equal(fe, fe2) | !fmpz_equal(ge, ge2))
+            if (!fmpz_equal(t, fge))
             {
                 printf("FAIL\n");
                 flint_printf("Check multiplication commutes with evalall\n"
@@ -383,9 +369,6 @@ main(void)
         fmpz_clear(fe);
         fmpz_clear(ge);
         fmpz_clear(fge);
-        fmpz_clear(fe2);
-        fmpz_clear(ge2);
-        fmpz_clear(fge2);
         fmpz_clear(t);
 
     }

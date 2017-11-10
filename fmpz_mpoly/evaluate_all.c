@@ -16,105 +16,14 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
-#include "profiler.h"
 #include "assert.h"
-
-
-/*
-    evaluate a f(xbar) at xbar = val,
-*/
-void fmpz_mpoly_evaluate_all_fmpz_straight(fmpz_t ev, fmpz_mpoly_t poly,
-                                             fmpz ** val, fmpz_mpoly_ctx_t ctx)
-{
-    int deg, rev;
-    slong i, j, k, N, nvars, bits;
-    slong shift, off, fpw;
-    slong entries, k_len;
-    slong p_len;
-    fmpz * p_coeff;
-    ulong * p_exp;
-    slong * degrees;
-    slong * offs;
-    ulong * masks;
-    fmpz * powers;
-    fmpz_t t;
-    TMP_INIT;
-
-    p_len = poly->length;
-    p_coeff = poly->coeffs;
-    p_exp = poly->exps;
-    bits = poly->bits;
-
-    if (p_len == 0) {
-        fmpz_zero(ev);
-        return;
-    }
-
-    TMP_START;
-
-    N = words_per_exp(ctx->n, bits);
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
-
-    degrees = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    fmpz_mpoly_degrees(degrees, poly, ctx);
-    
-    fpw = FLINT_BITS/bits;
-
-    entries = 1;
-    for (i = 0; i < nvars; i++)
-        entries += FLINT_BIT_COUNT(degrees[i]);
-
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
-    powers = (fmpz *) TMP_ALLOC(entries*sizeof(fmpz));
-
-    k = 0;
-    for (i = 0; i < nvars; i++)
-    {
-        mpoly_off_shift(&off, &shift, i, deg, rev, fpw, ctx->n, bits);
-        for (j = 1; j <= degrees[i]; j *= 2)
-        {
-            offs[k] = off;
-            masks[k] = j << shift;
-            fmpz_init(powers + k);
-            if (j == 1)
-                fmpz_set(powers + k, val[i]);
-            else
-                fmpz_mul(powers + k, powers + k - 1, powers + k - 1);
-            k++;
-        }
-    }
-    k_len = k;
-    assert(k_len + 1 == entries);
-
-    fmpz_zero(ev);
-    fmpz_init(t);
-    for (i = 0; i < p_len; i++)
-    {
-        fmpz_set_ui(t, WORD(1));
-        for (k = 0; k < k_len; k++)
-        {
-            if ((p_exp[N*i + offs[k]] & masks[k]) != WORD(0))
-                fmpz_mul(t, t, powers + k);
-        }
-        fmpz_addmul(ev, p_coeff + i, t);
-    }
-
-    fmpz_clear(t);
-    for (k = 0; k < k_len; k++)
-        fmpz_clear(powers + k);
-
-    TMP_END;
-}
-
 
 
 /*
     Given a polynomial tree with exponents stored in the keys and
     coefficients stored in the data member,
-    the function mpoly_rbtree_clear_eval clears the tree
-    and stores the evaluation of the polynomial in ev.
+    the function _mpoly_rbnode_clear_evalall_tree_fmpz clears the tree
+    and stores the evaluation of the polynomial in "l".
 
     poly = a0 x^0 + a1 x^1 + a2 x^2 + a3 x^3 + a4 x^4 + a5 x^5 + a6 x^6
 
@@ -123,10 +32,10 @@ void fmpz_mpoly_evaluate_all_fmpz_straight(fmpz_t ev, fmpz_mpoly_t poly,
 
             a0 x^0    a2 x^2    a4 x^4    a6 x^6
 
-    ev = a0*x^0 + x^1*(a1 + a2*x^1) + x^3*(a3 + a4*x^1 + x^2*(a5 + a6*x^1))
+    l = a0*x^0 + x^1*(a1 + a2*x^1) + x^3*(a3 + a4*x^1 + x^2*(a5 + a6*x^1))
 
 */
-void _mpoly_rbnode_clear_evalall_fmpz_tree(mpoly_rbtree_t tree,
+void _mpoly_rbnode_clear_evalall_tree_fmpz(mpoly_rbtree_t tree,
                               mpoly_rbnode_t node, slong s, fmpz_t l, fmpz_t x)
 {
     fmpz_t r, xp;
@@ -136,11 +45,11 @@ void _mpoly_rbnode_clear_evalall_fmpz_tree(mpoly_rbtree_t tree,
     fmpz_init(r);
     fmpz_zero(r);
     if (node->right != tree->null)
-        _mpoly_rbnode_clear_evalall_fmpz_tree(tree, node->right, e, r, x);
+        _mpoly_rbnode_clear_evalall_tree_fmpz(tree, node->right, e, r, x);
 
     fmpz_zero(l);
     if (node->left != tree->null)
-        _mpoly_rbnode_clear_evalall_fmpz_tree(tree, node->left, s, l, x);
+        _mpoly_rbnode_clear_evalall_tree_fmpz(tree, node->left, s, l, x);
 
     fmpz_init(xp);
     fmpz_pow_ui(xp, x, e - s);
@@ -157,7 +66,7 @@ void _mpoly_rbnode_clear_evalall_fmpz_tree(mpoly_rbtree_t tree,
 /*
     evaluate a f(xbar) at xbar = val,
 */
-void fmpz_mpoly_evaluate_all_fmpz_tree(fmpz_t ev, fmpz_mpoly_t poly,
+void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
                                              fmpz ** val, fmpz_mpoly_ctx_t ctx)
 {
     int deg, rev, new;
@@ -268,7 +177,7 @@ void fmpz_mpoly_evaluate_all_fmpz_tree(fmpz_t ev, fmpz_mpoly_t poly,
     fmpz_clear(t);
 
     /* use tree method to evaluate in the main variable */
-    _mpoly_rbnode_clear_evalall_fmpz_tree(tree, tree->head->left, WORD(0), ev, val[main_var]);
+    _mpoly_rbnode_clear_evalall_tree_fmpz(tree, tree->head->left, WORD(0), ev, val[main_var]);
 
     for (k = 0; k < k_len; k++)
         fmpz_clear(powers + k);
