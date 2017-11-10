@@ -16,21 +16,15 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
-#include "profiler.h"
-#include "assert.h"
-
 
 int
 main(void)
 {
     slong i, j, v;
-    slong t1, t2;
-
     FLINT_TEST_INIT(state);
 
     flint_printf("eval....");
     fflush(stdout);
-
 
     /* Check repeated evalone matches evalall */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -211,7 +205,6 @@ main(void)
 
 
     /* Check addition commutes with evalall */
-    t1 = t2 = 0;
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -221,7 +214,6 @@ main(void)
         fmpz ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
         slong coeff_bits, exp_bits1, exp_bits2;
-        timeit_t time;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -266,35 +258,13 @@ main(void)
             fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
             fmpz_mpoly_add(fg, f, g, ctx);
 
-if (n_randint(state, 2)) {
-            timeit_start(time);
             fmpz_mpoly_evaluate_all_fmpz_tree(fe, f, vals, ctx);
             fmpz_mpoly_evaluate_all_fmpz_tree(ge, g, vals, ctx);
             fmpz_mpoly_evaluate_all_fmpz_tree(fge, fg, vals, ctx);
-            timeit_stop(time);
-            t1 += time->wall;
 
-            timeit_start(time);
             fmpz_mpoly_evaluate_all_fmpz_straight(fe2, f, vals, ctx);
             fmpz_mpoly_evaluate_all_fmpz_straight(ge2, g, vals, ctx);
             fmpz_mpoly_evaluate_all_fmpz_straight(fge2, fg, vals, ctx);
-            timeit_stop(time);
-            t2 += time->wall;
-} else {
-            timeit_start(time);
-            fmpz_mpoly_evaluate_all_fmpz_straight(fe2, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_straight(ge2, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_straight(fge2, fg, vals, ctx);
-            timeit_stop(time);
-            t2 += time->wall;
-
-            timeit_start(time);
-            fmpz_mpoly_evaluate_all_fmpz_tree(fe, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_tree(ge, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_tree(fge, fg, vals, ctx);
-            timeit_stop(time);
-            t1 += time->wall;
-}
 
             fmpz_add(t, fe, ge);
             if (!fmpz_equal(t, fge) | !fmpz_equal(fe, fe2) | !fmpz_equal(ge, ge2))
@@ -327,14 +297,7 @@ if (n_randint(state, 2)) {
 
     }
 
-/*
-flint_printf("tree    : %wd\n", t1);
-flint_printf("straight: %wd\n", t2);
-printf("ratio: %f\n", (double)(t1)/(double)(t2));
-*/
-
-    /* Check multiplication commutes with evalall*/
-    t1 = t2 = 0;
+    /* Check multiplication commutes with evalall */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -344,7 +307,6 @@ printf("ratio: %f\n", (double)(t1)/(double)(t2));
         fmpz ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
         slong coeff_bits, exp_bits1, exp_bits2;
-        timeit_t time;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -389,35 +351,13 @@ printf("ratio: %f\n", (double)(t1)/(double)(t2));
             fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
             fmpz_mpoly_mul_johnson(fg, f, g, ctx);
 
-if (n_randint(state, 2)) {
-            timeit_start(time);
             fmpz_mpoly_evaluate_all_fmpz_tree(fe, f, vals, ctx);
             fmpz_mpoly_evaluate_all_fmpz_tree(ge, g, vals, ctx);
             fmpz_mpoly_evaluate_all_fmpz_tree(fge, fg, vals, ctx);
-            timeit_stop(time);
-            t1 += time->wall;
 
-            timeit_start(time);
             fmpz_mpoly_evaluate_all_fmpz_straight(fe2, f, vals, ctx);
             fmpz_mpoly_evaluate_all_fmpz_straight(ge2, g, vals, ctx);
             fmpz_mpoly_evaluate_all_fmpz_straight(fge2, fg, vals, ctx);
-            timeit_stop(time);
-            t2 += time->wall;
-} else {
-            timeit_start(time);
-            fmpz_mpoly_evaluate_all_fmpz_straight(fe2, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_straight(ge2, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_straight(fge2, fg, vals, ctx);
-            timeit_stop(time);
-            t2 += time->wall;
-
-            timeit_start(time);
-            fmpz_mpoly_evaluate_all_fmpz_tree(fe, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_tree(ge, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz_tree(fge, fg, vals, ctx);
-            timeit_stop(time);
-            t1 += time->wall;
-}
 
             fmpz_mul(t, fe, ge);
             if (!fmpz_equal(t, fge) | !fmpz_equal(fe, fe2) | !fmpz_equal(ge, ge2))
@@ -449,12 +389,6 @@ if (n_randint(state, 2)) {
         fmpz_clear(t);
 
     }
-/*
-flint_printf("tree    : %wd\n", t1);
-flint_printf("straight: %wd\n", t2);
-printf("ratio: %f\n", (double)(t1)/(double)(t2));
-*/
-
 
     printf("PASS\n");
     FLINT_TEST_CLEANUP(state);

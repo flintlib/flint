@@ -17,7 +17,6 @@
 #include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
-#include "profiler.h"
 
 int
 main(void)

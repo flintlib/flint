@@ -16,7 +16,6 @@
 #include "fmpz.h"
 #include "mpoly.h"
 #include "ulong_extras.h"
-#include "assert.h"
 
 int
 main(void)
@@ -32,7 +31,6 @@ main(void)
     flint_printf("rbtree....");
     fflush(stdout);
 
-
     mpoly_rbtree_init(t);
 
     for (i = 0; i < 1000; i++)
@@ -41,7 +39,12 @@ main(void)
         if (new)
             x->data = (void *) flint_malloc(8);
     }
-    assert(t->size > 0);
+
+    if (t->size == 0) {
+        printf("FAIL\n");
+        flint_printf("empty tree\n");
+        flint_abort();
+    }
 
     data = (void **) flint_malloc(t->size * sizeof(void *));
     keys = (slong *) flint_malloc(t->size * sizeof(slong));
