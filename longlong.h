@@ -72,12 +72,12 @@
        : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
 
 #define udiv_qrnnd(q, r, n1, n0, dx)                                            \
-  __asm__ ("divq %4"                                                            \
+  __asm__ volatile ("divq %4"                                                            \
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
 #define sdiv_qrnnd(q, r, n1, n0, dx)                                            \
-  __asm__ ("idivq %4"                                                           \
+  __asm__ volatile ("idivq %4"                                                           \
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
@@ -141,12 +141,12 @@
        : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
 
 #define udiv_qrnnd(q, r, n1, n0, dx)                                            \
-  __asm__ ("divl %4"                                                            \
+  __asm__ volatile ("divl %4"                                                            \
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
 #define sdiv_qrnnd(q, r, n1, n0, dx)                                            \
-  __asm__ ("idivl %4"                                                           \
+  __asm__ volatile ("idivl %4"                                                           \
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
