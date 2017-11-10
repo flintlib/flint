@@ -39,6 +39,7 @@ typedef enum {
 
 #define MPOLY_NUM_ORDERINGS 3
 
+/* heaps *********************************************************************/
 typedef struct mpoly_heap_t
 {
    ulong i;
@@ -65,6 +66,40 @@ typedef struct mpoly_heap_s
    ulong * exp;
    void * next;
 } mpoly_heap_s;
+
+/* trees *********************************************************************/
+typedef struct mpoly_rbnode
+{
+    struct mpoly_rbnode * up;
+    struct mpoly_rbnode * left;
+    struct mpoly_rbnode * right;
+    void * data;
+    void * data2;
+    slong key;
+    int col;
+} mpoly_rbnode_struct;
+
+typedef mpoly_rbnode_struct mpoly_rbnode_t[1];
+
+typedef struct mpoly_rbtree
+{
+    slong size;
+    mpoly_rbnode_t head;  /* dummy node for pointer to head */
+    mpoly_rbnode_t null;  /* dummy node to be pointed to by leaves */
+} mpoly_rbtree_struct;
+
+typedef mpoly_rbtree_struct mpoly_rbtree_t[1];
+
+void mpoly_rbtree_init(mpoly_rbtree_t tree);
+
+void mpoly_rbnode_clear(mpoly_rbtree_t tree, mpoly_rbnode_t node,
+                                void ** dataout, slong * keysout, slong * idx);
+
+void mpoly_rbtree_clear(mpoly_rbtree_t tree, void ** dataout, slong * keysout);
+
+mpoly_rbnode_struct * mpoly_rbtree_get(int * new,
+                                         struct mpoly_rbtree *tree, slong rcx);
+
 
 /* Macros ********************************************************************/
 
