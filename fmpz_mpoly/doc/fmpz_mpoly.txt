@@ -912,19 +912,26 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 
 *******************************************************************************
 
+void fmpz_mpoly_evaluate_all_fmpz_straight(fmpz_t ev, fmpz_mpoly_t poly,
+                                            fmpz ** vals, fmpz_mpoly_ctx_t ctx)
+
+    Sets \code{ev} to the evaluation of \code{poly} where the variables are
+    replaced by the corresponding elements of the array \code{vals}. This
+    function simply evaluations the terms from most significant to least
+    significant.
+
 void fmpz_mpoly_evaluate_all_fmpz_tree(fmpz_t ev, fmpz_mpoly_t poly,
                                             fmpz ** vals, fmpz_mpoly_ctx_t ctx)
 
     Sets \code{ev} to the evaluation of \code{poly} where the variables are
-    replaced by the corresponding elements of the array \code{vals}.
-
+    replaced by the corresponding elements of the array \code{vals}. This
+    function uses the tree method on the variable of largest degree.
 
 void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
                                    slong var, fmpz_t val, fmpz_mpoly_ctx_t ctx)
 
-    Sets \code{ev} to the evaluation of \code{poly} where the variables of
+    Sets \code{poly1} to the evaluation of \code{poly2} where the variables of
     index \code{var} is replaced by \code{val}.
-
 
 void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
      fmpz_mpoly_struct ** polys2, fmpz_mpoly_ctx_t ctx1, fmpz_mpoly_ctx_t ctx2)
@@ -933,7 +940,6 @@ void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
     replaced by the corresponding elements of the array \code{polys2}. Both
     \code{res} and the elements of \code{polys2} have context object
     \code{ctx2}, while \code{poly1} has context object \code{ctx1}.
-
 
 *******************************************************************************
 
