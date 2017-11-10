@@ -20,10 +20,10 @@
 void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
                                                  slong n, fmpz_mpoly_ctx_t ctx)
 {
-   if (f->length == 0)
-      fmpz_mpoly_zero(res, ctx);
-   else if (n == 0)
+   if (n == 0)
       fmpz_mpoly_set_ui(res, 1, ctx);
+   else if (f->length == 0)
+      fmpz_mpoly_zero(res, ctx);
    else if (n == 1)
       fmpz_mpoly_set(res, f, ctx);
    else

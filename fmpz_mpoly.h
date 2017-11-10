@@ -501,7 +501,18 @@ FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-/* Univariates *************/
+/* Evaluation ****************************************************************/
+
+void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
+                                            fmpz ** val, fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
+                                  slong var, fmpz_t val, fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
+    fmpz_mpoly_struct ** polys2, fmpz_mpoly_ctx_t ctx1, fmpz_mpoly_ctx_t ctx2);
+
+/* Univariates ***************************************************************/
 
 FLINT_DLL void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly,
                                                    const fmpz_mpoly_ctx_t ctx);

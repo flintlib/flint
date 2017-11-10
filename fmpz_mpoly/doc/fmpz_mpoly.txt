@@ -895,16 +895,44 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q,
 void fmpz_mpoly_derivative(fmpz_mpoly_t poly1,
                const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
 
-    Sets \code{poly1} to the derivative of \code{poly2} with respect to the
+    Set \code{poly1} to the derivative of \code{poly2} with respect to the
     variable of index \code{idx}. This function cannot fail.
 
 void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
                const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
 
-    Sets \code{poly1} and \code{scale} so that \{poly1} is an integral of
+    Set \code{poly1} and \code{scale} so that \{poly1} is an integral of
     \code{poly2*scale} with respect to the variable of index \code{idx},
     where \code{scale} is positive and as small as possible. This function
     throws an exception upon exponent overflow.
+
+*******************************************************************************
+
+    Evaluation
+
+*******************************************************************************
+
+void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
+                                            fmpz ** vals, fmpz_mpoly_ctx_t ctx)
+
+    Set \code{ev} to the evaluation of \code{poly} where the variables are
+    replaced by the corresponding elements of the array \code{vals}. This
+    function uses a tree method on the variable of largest degree.
+
+void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
+                                   slong var, fmpz_t val, fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the evaluation of \code{poly2} where the variable of
+    index \code{var} is replaced by \code{val}.
+
+void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
+     fmpz_mpoly_struct ** polys2, fmpz_mpoly_ctx_t ctx1, fmpz_mpoly_ctx_t ctx2)
+
+    Set \code{res} to the evaluation of \code{poly1} where the variables are
+    replaced by the corresponding elements of the array \code{polys2}. Both
+    \code{res} and the elements of \code{polys2} have context object
+    \code{ctx2}, while \code{poly1} has context object \code{ctx1}. None of
+    the polynomials are allowed to alias.
 
 *******************************************************************************
 
