@@ -611,31 +611,27 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_INIT;
 
-   if (poly2->length == 0)
-   {
-      fmpz_mpoly_zero(poly1, ctx);
-
-      return;
-   }
-
    if (k == 0)
    {
       fmpz_mpoly_set_ui(poly1, 1, ctx);
+      return;
+   }
 
+   if (poly2->length == 0)
+   {
+      fmpz_mpoly_zero(poly1, ctx);
       return;
    }
 
    if (k == 1)
    {
       fmpz_mpoly_set(poly1, poly2, ctx);
-
       return;
    }
 
    if (k == 2)
    {
       fmpz_mpoly_mul_johnson(poly1, poly2, poly2, ctx);
-
       return;
    }
 
