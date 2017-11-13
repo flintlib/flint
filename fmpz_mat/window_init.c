@@ -18,7 +18,8 @@ fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
     slong i;
     window->entries = NULL;
 
-    window->rows = flint_malloc((r2 - r1) * sizeof(fmpz *));
+    if (r2 > r1)
+        window->rows = (fmpz **) flint_malloc((r2 - r1) * sizeof(fmpz *));
 
     if (mat->c > 0)
     {
