@@ -34,26 +34,41 @@ main(void)
         char * str;
         const char * vars[] = {"x","y","z","w","u","v"};
 
+
         for (i = 0; i < flint_test_multiplier(); i++)
         {
+flint_printf("i = %wd\n", i);
+fflush(stdout);
             ord = mpoly_ordering_randtest(state);
             nvars = n_randint(state, 6) + 1;
 
+printf("1\n");
+fflush(stdout);
             fmpz_mpoly_ctx_init(ctx, nvars, ord);
+printf("2\n");
+fflush(stdout);
             fmpz_mpoly_init(f, ctx);
+printf("3\n");
+fflush(stdout);
             fmpz_mpoly_init(f1, ctx);
+printf("4\n");
+fflush(stdout);
 
             for (len1 = 3; len1 < 1000; len1 += len1/2)
             {
                 exp_bound1 = 1000;
                 coeff_bits = 10;
 printf("a\n");
+fflush(stdout);
                 fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
 printf("b\n");
+fflush(stdout);
                 str = fmpz_mpoly_get_str_pretty(f, vars, ctx);
 printf("c\n");
+fflush(stdout);
                 fmpz_mpoly_set_str_pretty(f1, str, vars, ctx);
 printf("d\n");
+fflush(stdout);
                 flint_free(str);
 
                 if (!fmpz_mpoly_equal(f, f1, ctx))
