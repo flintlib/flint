@@ -71,6 +71,11 @@
        : "=a" (w0), "=d" (w1)                           \
        : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
 
+#define smul_ppmm(w1, w0, u, v)                         \
+  __asm__ ("imulq %3"                                   \
+       : "=a" (w0), "=d" (w1)                           \
+       : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
+
 #define udiv_qrnnd(q, r, n1, n0, dx)                                            \
   __asm__ volatile ("divq %4"                                                            \
        : "=a" (q), "=d" (r)                                                     \
@@ -137,6 +142,11 @@
 
 #define umul_ppmm(w1, w0, u, v)                         \
   __asm__ ("mull %3"                                    \
+       : "=a" (w0), "=d" (w1)                           \
+       : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
+
+#define smul_ppmm(w1, w0, u, v)                         \
+  __asm__ ("imull %3"                                   \
        : "=a" (w0), "=d" (w1)                           \
        : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
 
@@ -550,7 +560,9 @@
 
 #endif /* non x86 fallback code */
 
-#if !(GMP_LIMB_BITS == 32 && defined (__arm__))
+/* smul_ppm is defined previously for 32bit arm and for all x86 */
+#if !( (GMP_LIMB_BITS == 32 && defined (__arm__))                              \
+       || defined (__i386__) || defined (__i486__) || defined(__amd64__))
 
 #define smul_ppmm(w1, w0, u, v)                         \
   do {                                                  \
