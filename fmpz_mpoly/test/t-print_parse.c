@@ -47,10 +47,13 @@ main(void)
             {
                 exp_bound1 = 1000;
                 coeff_bits = 10;
+printf("a\n");
                 fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-
+printf("b\n");
                 str = fmpz_mpoly_get_str_pretty(f, vars, ctx);
+printf("c\n");
                 fmpz_mpoly_set_str_pretty(f1, str, vars, ctx);
+printf("d\n");
                 flint_free(str);
 
                 if (!fmpz_mpoly_equal(f, f1, ctx))
