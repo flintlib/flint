@@ -1147,7 +1147,10 @@ int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t poly, const char * str,
     Sets \code{poly} to the polynomial in the null-terminates string \code{str}
     given an array \code{x} of variable strings. If parsing \code{str} fails,
     \code{poly} is set to zero, and \code{-1} is returned. Otherwise, \code{0}
-    is returned.
+    is returned. The operations \code{+}, \code{-}, \code{*}, and \code{/} are
+    permitted along with integers and the variables in \code{x}. The character
+    \code{^} must be immediately followed by the (integer) exponent. If any
+    division is not exact, parsing fails.
 
 *******************************************************************************
 

@@ -69,6 +69,67 @@ typedef struct
 
 typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
 
+/* geobuckets ****************************************************************/
+typedef struct fmpz_mpoly_geobucket
+{
+    fmpz_mpoly_struct polys[FLINT_BITS/2];
+    slong length;
+} fmpz_mpoly_geobucket_struct;
+
+typedef fmpz_mpoly_geobucket_struct fmpz_mpoly_geobucket_t[1];
+
+FLINT_DLL void fmpz_mpoly_geobucket_init(fmpz_mpoly_geobucket_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_clear(fmpz_mpoly_geobucket_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_empty(fmpz_mpoly_t p,
+                         fmpz_mpoly_geobucket_t B, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_print(fmpz_mpoly_geobucket_t B,
+                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_fit_length(fmpz_mpoly_geobucket_t B,
+                                          slong i, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_geobucket_fix(fmpz_mpoly_geobucket_t B, slong i,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_set(fmpz_mpoly_geobucket_t B,
+                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_add(fmpz_mpoly_geobucket_t B,
+                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_sub(fmpz_mpoly_geobucket_t B,
+                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_set_fmpz(fmpz_mpoly_geobucket_t B,
+                                         fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_gen(fmpz_mpoly_geobucket_t B, slong var,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_add_inplace(fmpz_mpoly_geobucket_t B1,
+                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_sub_inplace(fmpz_mpoly_geobucket_t B1,
+                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_neg_inplace(fmpz_mpoly_geobucket_t B1,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_mul_inplace(fmpz_mpoly_geobucket_t B1,
+                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_pow_inplace(fmpz_mpoly_geobucket_t B1,
+                                          slong k, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_geobucket_divides_inplace(fmpz_mpoly_geobucket_t B1,
+                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
+
+
 /* Context object ************************************************************/
 
 FLINT_DLL void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
