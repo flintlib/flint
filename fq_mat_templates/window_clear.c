@@ -21,7 +21,8 @@ void
 TEMPLATE(T, mat_window_clear) (TEMPLATE(T, mat_t) window,
                                const TEMPLATE(T, ctx_t) ctx)
 {
-    flint_free(window->rows);
+    if (window->r != 0)
+        flint_free(window->rows);
 }
 
 
