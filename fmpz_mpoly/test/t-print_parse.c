@@ -64,7 +64,7 @@ fflush(stdout);
 printf("b\n");
 fflush(stdout);
                 str = fmpz_mpoly_get_str_pretty(f, vars, ctx);
-printf("c\n");
+printf("c str = %s\n", str);
 fflush(stdout);
                 fmpz_mpoly_set_str_pretty(f1, str, vars, ctx);
 printf("d\n");

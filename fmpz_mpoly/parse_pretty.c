@@ -141,6 +141,7 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
     slong l, k;
     int deg, rev, ret;
     slong nvars;
+    const char * vars[] = {"x","y","z","w","u","v"};
 
     degrev_from_ord(deg, rev, ctx->ord);
     nvars = ctx->n - deg;
@@ -159,6 +160,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
     {
         if ('0' <= *s && *s <= '9')
         {
+printf("got digit\n");
+fflush(stdout);
             s = _fmpz_mpoly_parse_pretty_int(s, end, c, &ret);
             if (!(expecting & 1) || ret)
                 goto failed;
@@ -169,6 +172,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
         } else if (*s == '^')
         {
+printf("got ^\n");
+fflush(stdout);
             s = _fmpz_mpoly_parse_pretty_int(++s, end, c, &ret);
             if (!(expecting & 2) || ret || !fmpz_fits_si(c))
                 goto failed;
@@ -177,6 +182,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
         } else if ((*s == '+' || *s == '-') && (expecting & 2))
         {
+printf("got infix +-\n");
+fflush(stdout);
             /* infix */
             if (_fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 1))
                 goto failed;
@@ -186,6 +193,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
         } else if ((*s == '+' || *s == '-') && (expecting & 1))
         {
+printf("got unary +-\n");
+fflush(stdout);
             /* unary */
             _fmpz_mpoly_parse_pretty_fit_ostack(&ostack, oi, &oalloc);
             ostack[oi++] = 100 + *s++;
@@ -193,6 +202,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
         } else if (*s == '*')
         {
+printf("got *\n");
+fflush(stdout);
             if (!(expecting & 2)
                  || _fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 0))
                 goto failed;
@@ -202,6 +213,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
         } else if (*s == '/')
         {
+printf("got /\n");
+fflush(stdout);
             if (!(expecting & 2)
                  || _fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 0))
                 goto failed;
@@ -215,6 +228,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
         } else if (*s == '(')
         {
+printf("got (\n");
+fflush(stdout);
             if (!(expecting & 1))
                 goto failed;
             _fmpz_mpoly_parse_pretty_fit_ostack(&ostack, oi, &oalloc);
@@ -223,6 +238,8 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
         } else if (*s == ')')
         {
+printf("got )\n");
+fflush(stdout);
             if (_fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 1)
                      || oi < 1 || ostack[--oi] != '(')
                 goto failed;
@@ -230,6 +247,10 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
             expecting = 2;
 
         } else {
+
+printf("expecting variable\n");
+fflush(stdout);
+
             /* must be a variable */
             for (k = 0; k < nvars; k++)
             {
@@ -239,6 +260,10 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
             }
             if (!(expecting & 1) || k >= nvars)
                 goto failed;
+
+printf("got variable\n");
+fflush(stdout);
+
             _fmpz_mpoly_parse_pretty_fit_estack(&estack, ei, &ealloc);
             fmpz_mpoly_geobucket_init(estack[ei], ctx);
             fmpz_mpoly_geobucket_gen(estack[ei], k, ctx);
@@ -248,15 +273,24 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
         }
     }
 
+printf("end\n");
+fflush(stdout);
+
     if (_fmpz_mpoly_parse_pretty_pop(estack, ostack, &ei, &oi, ctx, 1)
                || ei != 1 || oi != 0)
         goto failed;
+
+printf("estack[0]: "); fmpz_mpoly_geobucket_print(estack[0], vars, ctx); printf("\n");
+fflush(stdout);
+
 
     ret = 0;
     fmpz_mpoly_geobucket_empty(poly, estack[0], ctx);
     fmpz_mpoly_geobucket_clear(estack[0], ctx);
 
 done:
+printf("done\n");
+fflush(stdout);
     for (k = 0; k < ealloc; k++)
         flint_free(estack[k]);
     flint_free(ostack);
@@ -265,6 +299,8 @@ done:
     return ret;
 
 failed:
+printf("failed\n");
+fflush(stdout);
     ret = -1;
     fmpz_mpoly_set_ui(poly, 0, ctx);
     for (k = 0; k < ei; k++)
