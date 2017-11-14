@@ -35,7 +35,7 @@ main(void)
         const char * vars[] = {"x","y","z","w","u","v"};
 
 
-        for (i = 0; i < flint_test_multiplier(); i++)
+        for (i = 0; i < 1+0*flint_test_multiplier(); i++)
         {
 flint_printf("i = %wd\n", i);
 fflush(stdout);
@@ -54,7 +54,7 @@ fflush(stdout);
 printf("4\n");
 fflush(stdout);
 
-            for (len1 = 3; len1 < 1000; len1 += len1/2)
+            for (len1 = 3; len1 < 10; len1 += len1/2)
             {
                 exp_bound1 = 1000;
                 coeff_bits = 10;
