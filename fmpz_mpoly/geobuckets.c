@@ -60,11 +60,18 @@ void fmpz_mpoly_geobucket_print(fmpz_mpoly_geobucket_t B, const char ** x,
     printf("}");
 }
 
-/* ceiling(log_4(x)) */
+/* ceiling(log_4(x)) - 1 */
 slong fmpz_mpoly_geobucket_clog4(slong x)
 {
-    x = FLINT_MAX(x - WORD(1), WORD(0));
-    return (FLINT_BIT_COUNT(x) - WORD(1))/2;
+    if (x <= 4)
+        return 0;
+    /*
+        FLINT_BIT_COUNT returns unsigned int.
+        Signed division is not defined.
+        Do the calculation with unsigned ints and then convert to slong.
+    */
+    x = (FLINT_BIT_COUNT(x - 1) - (unsigned int) 1)/((unsigned int) 2);
+    return x;
 }
 
 void fmpz_mpoly_geobucket_fit_length(fmpz_mpoly_geobucket_t B, slong len,
