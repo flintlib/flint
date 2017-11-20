@@ -392,6 +392,12 @@ void nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1,
 
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
 
+void nmod_poly_add_series(nmod_poly_t res,
+            const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length $n$ and set
+    \code{res} to the sum.
+
 void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, slong len1,
                          mp_srcptr poly2, slong len2, nmod_t mod)
 
@@ -402,6 +408,12 @@ void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1,
                                     const nmod_poly_t poly2)
 
     Sets \code{res} to the difference of \code{poly1} and \code{poly2}.
+
+void nmod_poly_sub_series(nmod_poly_t res,
+            const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length $n$ and set
+    \code{res} to the difference.
 
 void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly)
 
