@@ -296,6 +296,9 @@ int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
    return 1;
 }
 
+FLINT_DLL int nmod_poly_equal_trunc(const nmod_poly_t poly1, 
+                                             const nmod_poly_t poly2, slong n);
+
 NMOD_POLY_INLINE
 int nmod_poly_is_zero(const nmod_poly_t poly)
 {

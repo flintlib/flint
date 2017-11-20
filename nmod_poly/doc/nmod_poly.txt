@@ -335,6 +335,12 @@ int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 
     Returns~$1$ if the polynomials are equal, otherwise~$0$.
 
+int nmod_poly_equal_trunc(const nmod_poly_t poly1,
+                                              const nmod_poly_t poly2, slong n)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length $n$ and return
+    $1$ if the truncations are equal, otherwise return $0$.
+
 int nmod_poly_is_zero(const nmod_poly_t poly)
 
     Returns~$1$ if the polynomial \code{poly} is the zero polynomial,
