@@ -125,6 +125,11 @@ void nmod_poly_truncate(nmod_poly_t poly, slong len)
     If \code{len} is greater than the current length of \code{poly},
     then nothing happens.
 
+void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong n)
+
+    Notionally truncate \code{poly} to length $n$ and set \code{res} to the
+    result. The result is normalised.
+
 void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
 
     Sets \code{output} to the reverse of \code{input}, which is of length

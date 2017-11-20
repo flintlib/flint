@@ -272,9 +272,14 @@ void nmod_poly_truncate(nmod_poly_t poly, slong len)
     }
 }
 
-FLINT_DLL void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m);
+FLINT_DLL void nmod_poly_set_trunc(nmod_poly_t res,
+                                              const nmod_poly_t poly, slong n);
 
-FLINT_DLL void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m);
+FLINT_DLL void _nmod_poly_reverse(mp_ptr output,
+                                          mp_srcptr input, slong len, slong m);
+
+FLINT_DLL void nmod_poly_reverse(nmod_poly_t output, 
+                                             const nmod_poly_t input, slong m);
 
 /* Comparison  ***************************************************************/
 
