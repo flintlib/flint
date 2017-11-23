@@ -20,7 +20,7 @@
 int
 main(void)
 {
-    int i;
+  int i, j;
     
     FLINT_TEST_INIT(state);
 
@@ -68,9 +68,68 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    /* Check random isomorphism */
-    /* Check proper embeddings */
-    /* Check Artin-Schreier case */
+    /* Check random emebedding (degrees 1..5) */
+    for (j = 1; j < 6; j++) {
+        for (i = 0; i < (6-j) * flint_test_multiplier(); i++)
+        {
+            TEMPLATE(T, ctx_t) ctx1, ctx2;
+            TEMPLATE(T, t) gen1, gen2;
+            TEMPLATE(B, poly_t) minpoly;
+            const TEMPLATE(B, poly_struct) *modulus;
+            TEMPLATE(B, poly_t) modulus2;
+            TEMPLATE(B, mat_t) embed, project, comp, one;
+            slong m, n;
+
+            TEMPLATE(T, ctx_randtest)(ctx1, state);
+            m = TEMPLATE(T, ctx_degree)(ctx1);
+            n = m*j;
+            if (m == 1) {
+                i--;
+                continue;
+            }
+            modulus = TEMPLATE(T, ctx_modulus)(ctx1);
+
+            TEMPLATE(B, poly_init)(modulus2, TEMPLATE(B, poly_modulus)(modulus));
+            TEMPLATE(B, poly_randtest_monic_irreducible)(modulus2, state, n+1);
+            TEMPLATE(T, ctx_init_modulus)(ctx2, modulus2, "X");
+
+            TEMPLATE(T, init)(gen1, ctx1);
+            TEMPLATE(T, init)(gen2, ctx2);
+            TEMPLATE(B, poly_init)(minpoly, TEMPLATE(B, poly_modulus)(modulus));
+            TEMPLATE(T, embed_gens)(gen1, gen2, minpoly, ctx1, ctx2);
+
+            TEMPLATE(B, mat_init)(embed, n, m, TEMPLATE(B, poly_modulus)(modulus));
+            TEMPLATE(B, mat_init)(project, m, n, TEMPLATE(B, poly_modulus)(modulus));
+            TEMPLATE(B, mat_init)(comp, m, m, TEMPLATE(B, poly_modulus)(modulus));
+            TEMPLATE(B, mat_init)(one, m, m, TEMPLATE(B, poly_modulus)(modulus));
+
+            TEMPLATE(T, embed_matrices)(embed, project, gen1, ctx1, gen2, ctx2, minpoly);
+
+            TEMPLATE(B, mat_mul)(comp, project, embed);
+            TEMPLATE(B, mat_one)(one);
+            if (!TEMPLATE(B, mat_equal)(comp, one)) {
+                flint_printf("FAIL:\n\n");
+                flint_printf("CTX 1\n"), TEMPLATE(T, ctx_print)(ctx1), flint_printf("\n");
+                flint_printf("CTX 2\n"), TEMPLATE(T, ctx_print)(ctx2), flint_printf("\n");
+                flint_printf("Embed\n"),
+                    TEMPLATE(B, mat_print_pretty)(embed), flint_printf("\nProject\n"),
+                    TEMPLATE(B, mat_print_pretty)(project), flint_printf("\nComposition\n"),
+                    TEMPLATE(B, mat_print_pretty)(comp), flint_printf("\n");
+                abort();
+            }
+
+            TEMPLATE(B, mat_clear)(embed);
+            TEMPLATE(B, mat_clear)(project);
+            TEMPLATE(B, mat_clear)(comp);
+            TEMPLATE(B, mat_clear)(one);
+            TEMPLATE(B, poly_clear)(minpoly);
+            TEMPLATE(B, poly_clear)(modulus2);
+            TEMPLATE(T, clear)(gen1, ctx1);
+            TEMPLATE(T, ctx_clear)(ctx1);
+            TEMPLATE(T, clear)(gen2, ctx2);
+            TEMPLATE(T, ctx_clear)(ctx2);
+        }
+    }
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
