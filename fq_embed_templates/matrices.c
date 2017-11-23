@@ -193,7 +193,7 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
         /* Look for a non-zero column in sup2gen
            (we know it has full rank, so first row is non-null) */
         for (i = 1; i < n; i++) {
-            if (TEMPLATE(B, mat_entry_is_zero(sup2gen, i, 0)))
+            if (!TEMPLATE(B, mat_entry_is_zero(sup2gen, 0, i)))
                 break;
         }
         
