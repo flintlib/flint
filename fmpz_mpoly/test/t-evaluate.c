@@ -11,11 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
 int
 main(void)
@@ -23,8 +19,9 @@ main(void)
     slong i, j, v;
     FLINT_TEST_INIT(state);
 
-    flint_printf("eval....");
+    flint_printf("evaluate....");
     fflush(stdout);
+
 
     /* Check repeated evalone matches evalall */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -101,109 +98,6 @@ main(void)
         fmpz_clear(fe);
 
         flint_free(perm);
-    }
-
-
-    /* check composition and evalall commute */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
-    {
-        ordering_t ord1, ord2;
-        fmpz_mpoly_ctx_t ctx1, ctx2;
-        fmpz_mpoly_t f, g;
-        fmpz_mpoly_struct ** vals1;
-        fmpz_t fe, ge;
-        fmpz ** vals2, ** vals3;
-        slong nvars1, nvars2;
-        slong len1, len2;
-        slong exp_bound1, exp_bound2;
-        slong coeff_bits;
-
-        ord1 = mpoly_ordering_randtest(state);
-        ord2 = mpoly_ordering_randtest(state);
-        nvars1 = n_randint(state, 5) + 1;
-        nvars2 = n_randint(state, 6) + 1;
-        fmpz_mpoly_ctx_init(ctx1, nvars1, ord1);
-        fmpz_mpoly_ctx_init(ctx2, nvars2, ord2);
-
-        fmpz_mpoly_init(f, ctx1);
-        fmpz_mpoly_init(g, ctx2);
-        fmpz_init(fe);
-        fmpz_init(ge);
-
-        len1 = n_randint(state, 12);
-        len2 = n_randint(state, 12);
-        exp_bound1 = n_randint(state, 4) + 1;
-        exp_bound2 = n_randint(state, 4) + 1;
-        coeff_bits = n_randint(state, 10);
-
-        vals1 = (fmpz_mpoly_struct **) flint_malloc(nvars1
-                                                * sizeof(fmpz_mpoly_struct *));
-        for (v = 0; v < nvars1; v++)
-        {
-            vals1[v] = (fmpz_mpoly_struct *) flint_malloc(
-                                                    sizeof(fmpz_mpoly_struct)); 
-            fmpz_mpoly_init(vals1[v], ctx2);
-            fmpz_mpoly_randtest(vals1[v], state, len2, exp_bound2,
-                                                             coeff_bits, ctx2);
-        }
-
-        vals2 = (fmpz **) flint_malloc(nvars2*sizeof(fmpz*));
-        for (v = 0; v < nvars2; v++)
-        {
-            vals2[v] = (fmpz *) flint_malloc(sizeof(fmpz));
-            fmpz_init(vals2[v]);
-            fmpz_randbits(vals2[v], state, 5);
-        }
-
-        vals3 = (fmpz **) flint_malloc(nvars1*sizeof(fmpz*));
-        for (v = 0; v < nvars1; v++)
-        {
-            vals3[v] = (fmpz *) flint_malloc(sizeof(fmpz)); 
-            fmpz_init(vals3[v]);
-            fmpz_mpoly_evaluate_all_tree_fmpz(vals3[v], vals1[v], vals2, ctx2);
-        }
-
-        fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx1);
-        fmpz_mpoly_compose(g, f, vals1, ctx1, ctx2);
-        fmpz_mpoly_test(g, ctx2);
-        fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals3, ctx1);
-        fmpz_mpoly_evaluate_all_tree_fmpz(ge, g, vals2, ctx2);
-
-        if (!fmpz_equal(fe, ge))
-        {
-            printf("FAIL\n");
-            flint_printf("check composition and evalall commute\ni: %wd\n", i);
-            flint_abort();
-        }
-
-        for (v = 0; v < nvars1; v++)
-        {
-            fmpz_mpoly_clear(vals1[v], ctx2);
-            flint_free(vals1[v]);
-        }
-        flint_free(vals1);
-
-        for (v = 0; v < nvars2; v++)
-        {
-            fmpz_clear(vals2[v]);
-            flint_free(vals2[v]);
-        }
-        flint_free(vals2);
-
-        for (v = 0; v < nvars1; v++)
-        {
-            fmpz_clear(vals3[v]);
-            flint_free(vals3[v]);
-        }
-        flint_free(vals3);
-
-
-        fmpz_mpoly_clear(f, ctx1);
-        fmpz_mpoly_clear(g, ctx2);
-
-        fmpz_clear(fe);
-        fmpz_clear(ge);
-
     }
 
 

@@ -931,8 +931,8 @@ void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
     Set \code{res} to the evaluation of \code{poly1} where the variables are
     replaced by the corresponding elements of the array \code{polys2}. Both
     \code{res} and the elements of \code{polys2} have context object
-    \code{ctx2}, while \code{poly1} has context object \code{ctx1}. None of
-    the polynomials are allowed to alias.
+    \code{ctx2}, while \code{poly1} has context object \code{ctx1}. Neither of
+    \code{res} and \code{poly1} is allowed to alias any other polynomial.
 
 *******************************************************************************
 
