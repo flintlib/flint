@@ -28,7 +28,7 @@ main(void)
         nmod_mpoly_t f, g, h;
         const char * vars[] = {"x","y","z","w","u","v"};
 
-        nmod_mpoly_ctx_init(ctx, 3, ORD_LEX, 6);
+        nmod_mpoly_ctx_init(ctx, 3, ORD_LEX, 7);
 
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);
@@ -49,6 +49,10 @@ main(void)
 
         nmod_mpoly_mul_johnson(h, f, g, ctx);
         printf("h: "); nmod_mpoly_print_pretty(h, vars, ctx); printf("\n");
+
+        nmod_mpoly_neg(h, h, ctx);
+        printf("h: "); nmod_mpoly_print_pretty(h, vars, ctx); printf("\n");
+
 
         nmod_mpoly_clear(f, ctx);
         nmod_mpoly_clear(g, ctx);
