@@ -17,7 +17,7 @@ slong _nmod_mpoly_mul_johnson1(ulong ** poly1, ulong ** exp1, slong * alloc,
               const ulong * poly3, const ulong * exp3, slong len3,
                                           ulong maskhi, const nmodf_ctx_t fctx)
 {
-    slong i, j, k, D;
+    slong i, j;
     slong next_loc;
     slong Q_len = 0, heap_len = 2; /* heap zero index unused */
     mpoly_heap1_s * heap;
@@ -28,12 +28,11 @@ slong _nmod_mpoly_mul_johnson1(ulong ** poly1, ulong ** exp1, slong * alloc,
     ulong * p1 = *poly1;
     ulong * e1 = *exp1;
     slong * hind;
-    ulong exp, cy;
+    ulong exp;
+    ulong acc0, acc1, acc2, pp0, pp1;
     TMP_INIT;
 
     TMP_START;
-
-    D = fctx->deg;
 
     next_loc = len2 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap1_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap1_s));
@@ -61,7 +60,8 @@ slong _nmod_mpoly_mul_johnson1(ulong ** poly1, ulong ** exp1, slong * alloc,
 
         _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, 1, fctx);
 
-        nmodf_zero(p1 + len1*D, fctx);
+        acc0 = acc1 = acc2 = 0;
+
         e1[len1] = exp;
         do
         {
@@ -70,18 +70,21 @@ slong _nmod_mpoly_mul_johnson1(ulong ** poly1, ulong ** exp1, slong * alloc,
             hind[x->i] |= WORD(1);
             Q[Q_len++] = x->i;
             Q[Q_len++] = x->j;
-            nmodf_addmul(p1 + len1*D, poly2 + x->i*D, poly3 + x->j*D, fctx);
+            umul_ppmm(pp1, pp0, poly2[x->i], poly3[x->j]);
+            add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
 
             while ((x = x->next) != NULL)
             {
-               hind[x->i] |= WORD(1);
-               Q[Q_len++] = x->i;
-               Q[Q_len++] = x->j;
-               nmodf_addmul(p1 + len1*D, poly2 + x->i*D, poly3 + x->j*D, fctx);
+                hind[x->i] |= WORD(1);
+                Q[Q_len++] = x->i;
+                Q[Q_len++] = x->j;
+                umul_ppmm(pp1, pp0, poly2[x->i], poly3[x->j]);
+                add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
             }
         } while (heap_len > 1 && heap[1].exp == exp);
 
-        len1 += !nmodf_is_zero(p1 + len1*D, fctx);
+        NMOD_RED3(p1[len1], acc2, acc1, acc0, fctx->mod);
+        len1 += (p1[len1] != 0);
       
         while (Q_len > 0)
         {
@@ -137,7 +140,7 @@ slong _nmod_mpoly_mul_johnson(ulong ** poly1, ulong ** exp1, slong * alloc,
                  const ulong * poly3, const ulong * exp3, slong len3,
                    slong N, ulong maskhi, ulong masklo, const nmodf_ctx_t fctx)
 {
-    slong i, j, D;
+    slong i, j;
     slong next_loc;
     slong Q_len = 0, heap_len = 2; /* heap zero index unused */
     mpoly_heap_s * heap;
@@ -151,6 +154,7 @@ slong _nmod_mpoly_mul_johnson(ulong ** poly1, ulong ** exp1, slong * alloc,
     ulong ** exp_list;
     slong exp_next;
     slong * hind;
+    ulong acc0, acc1, acc2, pp0, pp1;
     TMP_INIT;
 
     if (N == 1)
@@ -158,8 +162,6 @@ slong _nmod_mpoly_mul_johnson(ulong ** poly1, ulong ** exp1, slong * alloc,
                            poly2, exp2, len2, poly3, exp3, len3, maskhi, fctx);
 
     TMP_START;
-
-    D = fctx->deg;
 
     next_loc = len2 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap_s));
@@ -197,7 +199,8 @@ slong _nmod_mpoly_mul_johnson(ulong ** poly1, ulong ** exp1, slong * alloc,
 
         _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, N, fctx);
 
-        nmodf_zero(p1 + len1*D, fctx);
+        acc0 = acc1 = acc2 = 0;
+
         mpoly_monomial_set(e1 + len1*N, exp, N);
         do
         {
@@ -208,18 +211,21 @@ slong _nmod_mpoly_mul_johnson(ulong ** poly1, ulong ** exp1, slong * alloc,
             hind[x->i] |= WORD(1);
             Q[Q_len++] = x->i;
             Q[Q_len++] = x->j;
-            nmodf_addmul(p1 + len1*D, poly2 + x->i*D, poly3 + x->j*D, fctx);
+            umul_ppmm(pp1, pp0, poly2[x->i], poly3[x->j]);
+            add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
 
             while ((x = x->next) != NULL)
             {
                 hind[x->i] |= WORD(1);
                 Q[Q_len++] = x->i;
                 Q[Q_len++] = x->j;
-                nmodf_addmul(p1 + len1*D, poly2 + x->i*D, poly3 + x->j*D, fctx);
+                umul_ppmm(pp1, pp0, poly2[x->i], poly3[x->j]);
+                add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
             }
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
-        len1 += !nmodf_is_zero(p1 + len1*D, fctx);
+        NMOD_RED3(p1[len1], acc2, acc1, acc0, fctx->mod);
+        len1 += (p1[len1] != 0);
 
         while (Q_len > 0)
         {

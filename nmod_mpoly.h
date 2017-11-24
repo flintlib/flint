@@ -68,7 +68,7 @@ void nmodf_ctx_init(nmodf_ctx_t ctx, ulong modulus)
 }
 
 NMOD_MPOLY_INLINE
-void nmodf_ctx_clear(nmodf_ctx_t ctx, ulong modulus)
+void nmodf_ctx_clear(nmodf_ctx_t ctx)
 {
     if (ctx->minpoly != NULL)
         flint_free(ctx->minpoly);
@@ -271,19 +271,62 @@ typedef struct nmod_mpoly_geobucket
 
 typedef nmod_mpoly_geobucket_struct nmod_mpoly_geobucket_t[1];
 
+FLINT_DLL void nmod_mpoly_geobucket_init(nmod_mpoly_geobucket_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_clear(nmod_mpoly_geobucket_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_empty(nmod_mpoly_t p,
+                         nmod_mpoly_geobucket_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_print(nmod_mpoly_geobucket_t B,
+                                  const char ** x, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_fit_length(nmod_mpoly_geobucket_t B,
+                                          slong i, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_set(nmod_mpoly_geobucket_t B,
+                                   nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_add(nmod_mpoly_geobucket_t B,
+                                   nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_sub(nmod_mpoly_geobucket_t B,
+                                   nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_set_ui(nmod_mpoly_geobucket_t B,
+                                          ulong c, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_gen(nmod_mpoly_geobucket_t B, slong var,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_add_inplace(nmod_mpoly_geobucket_t B1,
+                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_sub_inplace(nmod_mpoly_geobucket_t B1,
+                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_neg_inplace(nmod_mpoly_geobucket_t B1,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_mul_inplace(nmod_mpoly_geobucket_t B1,
+                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_geobucket_pow_inplace(nmod_mpoly_geobucket_t B1,
+                                          slong k, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_geobucket_divides_inplace(nmod_mpoly_geobucket_t B1,
+                        nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
+
 /* Context object ************************************************************/
 
 FLINT_DLL void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, 
                              slong nvars, const ordering_t ord, ulong modulus);
 
-NMOD_MPOLY_INLINE
-void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx)
-{
-   /* nothing to be done at the moment */
-}
+FLINT_DLL void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx);
 
 /*  Memory management ********************************************************/
-
 
 FLINT_DLL void nmod_mpoly_init(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx);
 
@@ -436,7 +479,7 @@ FLINT_DLL void nmod_mpoly_set_monomial(nmod_mpoly_t poly,
                       slong n, const ulong * exps, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_set_term_ui(nmod_mpoly_t poly,
-                ulong const * exp, const nmod_t c, const nmod_mpoly_ctx_t ctx);
+                       ulong const * exp, ulong c, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_get_term_ui(nmod_t c, const nmod_mpoly_t poly,
                                 ulong const * exp, const nmod_mpoly_ctx_t ctx);
@@ -479,9 +522,13 @@ FLINT_DLL void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1,
                  const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, 
                                                    const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1,
+                 const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 /* Powering ******************************************************************/
 
-FLINT_DLL void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                           slong k, const nmod_mpoly_ctx_t ctx);
 
 /* Calculus ******************************************************************/
@@ -645,7 +692,7 @@ int nmod_mpoly_print_pretty(const nmod_mpoly_t poly,
 /* Random generation *********************************************************/
 
 void nmod_mpoly_randtest(nmod_mpoly_t poly, flint_rand_t state,
-   slong length, slong exp_bound, slong coeff_bits, const nmod_mpoly_ctx_t ctx);
+                    slong length, slong exp_bound, const nmod_mpoly_ctx_t ctx);
 
 /******************************************************************************
 
