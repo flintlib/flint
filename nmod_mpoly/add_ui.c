@@ -14,7 +14,7 @@
 void nmod_mpoly_add_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                            ulong c, const nmod_mpoly_ctx_t ctx)
 {
-    ulong cr;
+    mp_limb_t cr;
     slong i, N;
     slong len2 = poly2->length;
     const nmodf_ctx_struct * fctx = ctx->ffinfo;
@@ -38,7 +38,7 @@ void nmod_mpoly_add_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                 nmod_mpoly_fit_bits(poly1, poly2->bits, ctx);
 
                 for (i = 0; i < len2 - 1; i++)
-                    nmodf_set(poly1->coeffs + i*fctx->deg, poly2->coeffs + i*fctx->deg, fctx);
+                    poly1->coeffs[i] = poly2->coeffs[i];
 
                 for (i = 0; i < len2; i++)
                     mpoly_monomial_set(poly1->exps + i*N, poly2->exps + i*N, N);
@@ -47,9 +47,8 @@ void nmod_mpoly_add_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                 poly1->bits = poly2->bits;
             }
 
-            nmodf_sadd_nmod(poly1->coeffs + (len2 - 1)*fctx->deg, poly2->coeffs + (len2 - 1)*fctx->deg, cr, fctx);
-
-            if (nmodf_is_zero(poly1->coeffs + (len2 - 1)*fctx->deg, fctx))
+            poly1->coeffs[len2 - 1] = nmod_add(poly2->coeffs[len2 - 1], cr, fctx->mod);
+            if (poly1->coeffs[len2 - 1] == 0)
                 _nmod_mpoly_set_length(poly1, len2 - 1, ctx);
         } else
         {
@@ -61,15 +60,15 @@ void nmod_mpoly_add_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                 poly1->bits = poly2->bits;
 
                 for (i = 0; i < len2; i++)
-                    nmodf_set(poly1->coeffs + i*fctx->deg, poly2->coeffs + i*fctx->deg, fctx);
+                    poly1->coeffs[i] = poly2->coeffs[i];
 
                 for (i = 0; i < len2; i++)
                     mpoly_monomial_set(poly1->exps + i*N, poly2->exps + i*N, N);
-            } 
+            }
 
             mpoly_monomial_zero(poly1->exps + len2*N, N);
 
-            nmodf_sset_nmod(poly1->coeffs + len2*fctx->deg, cr, fctx);
+            poly1->coeffs[len2] = cr;
             _nmod_mpoly_set_length(poly1, poly2->length + 1, ctx);
         }
     } else if (poly1 != poly2)

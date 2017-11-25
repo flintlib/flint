@@ -18,7 +18,7 @@ void nmod_mpoly_set_term_ui(nmod_mpoly_t poly,
     slong i, N, index, exp_bits;
     ulong maskhi, masklo;
     ulong * packed_exp;
-    ulong cr;
+    mp_limb_t cr;
     int exists, deg, rev;
     TMP_INIT;
 

@@ -24,7 +24,7 @@ void nmod_mpoly_gen(nmod_mpoly_t poly, slong i, const nmod_mpoly_ctx_t ctx)
 
     nmod_mpoly_fit_length(poly, 1, ctx);
 
-    nmodf_set_ui(poly->coeffs, 1, ctx->ffinfo);
+    poly->coeffs[0] = WORD(1);
 
     TMP_START;
 

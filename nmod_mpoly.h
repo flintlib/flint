@@ -48,7 +48,7 @@ typedef struct
 {
     nmod_t mod;
     slong deg;    /* degree of finite field over its prime field */
-    ulong * minpoly; /* minpoly[0] is constant term, minpoly[deg] should be 1 */
+    mp_limb_t * minpoly; /* minpoly[0] is constant term, minpoly[deg] should be 1 */
 } nmodf_ctx_struct;
 
 typedef nmodf_ctx_struct nmodf_ctx_t[1];
@@ -73,9 +73,9 @@ void nmodf_ctx_clear(nmodf_ctx_t ctx)
     if (ctx->minpoly != NULL)
         flint_free(ctx->minpoly);
 }
-
+/*
 NMOD_MPOLY_INLINE
-void nmodf_set_ui(ulong * a, ulong b, const nmodf_ctx_t ctx)
+void nmodf_set_ui(mp_limb_t * a, mp_limb_t b, const nmodf_ctx_t ctx)
 {
     slong i = 0;
     NMOD_RED(a[0], b, ctx->mod);
@@ -84,7 +84,7 @@ void nmodf_set_ui(ulong * a, ulong b, const nmodf_ctx_t ctx)
 }
 
 NMOD_MPOLY_INLINE
-void nmodf_zero(ulong * a, const nmodf_ctx_t ctx)
+void nmodf_zero(mp_limb_t * a, const nmodf_ctx_t ctx)
 {
     slong i = 0;
     do
@@ -94,7 +94,7 @@ void nmodf_zero(ulong * a, const nmodf_ctx_t ctx)
 }
 
 NMOD_MPOLY_INLINE
-int nmodf_is_zero(const ulong * a, const nmodf_ctx_t ctx)
+int nmodf_is_zero(const mp_limb_t * a, const nmodf_ctx_t ctx)
 {
     slong i = 0;
     do
@@ -226,7 +226,7 @@ int nmodf_fprintf(FILE * f, const ulong * a, const nmodf_ctx_t ctx)
 
     return 1;
 }
-
+*/
 
 /*  Type definitions *********************************************************/
 
@@ -241,7 +241,7 @@ typedef nmod_mpoly_ctx_struct nmod_mpoly_ctx_t[1];
 
 typedef struct
 {
-   ulong * coeffs;
+   mp_limb_t * coeffs;
    ulong * exps;  
    slong alloc;
    slong length;
@@ -659,10 +659,6 @@ nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t r,
 FLINT_DLL int nmod_mpoly_set_str_pretty(nmod_mpoly_t poly, const char * str,
                                   const char ** x, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL char * _nmod_mpoly_get_str_pretty(const ulong * poly,
-                          const ulong * exps, slong len, const char ** x, 
-                               slong bits, slong n, int deg, int rev, slong N);
-
 FLINT_DLL char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t poly,
                                   const char ** x, const nmod_mpoly_ctx_t ctx);
 
@@ -728,7 +724,7 @@ void nmod_mpoly_test(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
 
     for (i = 0; i < poly->length; i++)
     {
-        if (nmodf_is_zero(poly->coeffs + i*(ctx->ffinfo->deg), ctx->ffinfo))
+        if (poly->coeffs[i] == 0)
             flint_throw(FLINT_ERROR, "Polynomial has a zero coefficient");
     }
 

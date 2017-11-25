@@ -17,7 +17,7 @@
 #include "nmod_mpoly.h"
 
 int
-_nmod_mpoly_fprint_pretty(FILE * file, const ulong * poly, const ulong * exps,
+_nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * exp,
         slong len, const char ** x_in,  slong bits,
             slong n, int deg, int rev, slong N, const nmodf_ctx_t fctx)
 {
@@ -60,14 +60,14 @@ _nmod_mpoly_fprint_pretty(FILE * file, const ulong * poly, const ulong * exps,
             if (r <= 0) goto done;
         }
 
-        first = nmodf_is_one(poly + i*fctx->deg, fctx);
+        first = (coeff[i] == 1);
         if (!first)
         {
-            r = nmodf_fprintf(file, poly + i*fctx->deg, fctx);
+            r = flint_fprintf(file, "%wd", coeff[i]);
             if (r <= 0) goto done;
         }
 
-        mpoly_get_monomial(degs, exps + i*N, bits, n, deg, rev);
+        mpoly_get_monomial(degs, exp + i*N, bits, n, deg, rev);
 
         for (j = 0; j < nvars; j++)
         {

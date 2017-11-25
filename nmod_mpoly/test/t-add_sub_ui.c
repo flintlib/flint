@@ -19,7 +19,7 @@ main(void)
     int i, j, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("add/sub_ui....");
+    flint_printf("add_sub_ui....");
     fflush(stdout);
 
     /* Check (f + c) - c = f */
@@ -28,7 +28,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         ordering_t ord;
-        ulong modulus;
+        mp_limb_t modulus;
         ulong c;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong exp_bits, exp_bits1, exp_bits2;
@@ -82,9 +82,9 @@ main(void)
             }
         }
 
-        nmod_mpoly_clear(f, ctx);  
-        nmod_mpoly_clear(g, ctx);  
-        nmod_mpoly_clear(h, ctx);  
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(h, ctx);
 
         nmod_mpoly_ctx_clear(ctx);
     }
@@ -95,9 +95,9 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g;
         ordering_t ord;
-        ulong modulus;
+        mp_limb_t modulus;
         ulong c;
-        slong nvars, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong nvars, len1, len2, exp_bound1, exp_bound2;
         slong exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -143,8 +143,8 @@ main(void)
             }
         }
 
-        nmod_mpoly_clear(f, ctx);  
-        nmod_mpoly_clear(g, ctx);  
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
 
         nmod_mpoly_ctx_clear(ctx);
     }

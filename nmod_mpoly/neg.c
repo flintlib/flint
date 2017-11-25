@@ -11,21 +11,19 @@
 
 #include "nmod_mpoly.h"
 
-void _nmod_mpoly_neg(ulong * poly1, ulong * exps1,
-                     const ulong * poly2, const ulong * exps2, slong len,
+void _nmod_mpoly_neg(mp_limb_t * coeff1, ulong * exp1,
+                     const mp_limb_t * coeff2, const ulong * exp2, slong len,
                                                slong N, const nmodf_ctx_t fctx)
 {
-    slong i, D;
-
-    D = fctx->deg;
+    slong i;
 
     for (i = 0; i < len; i++)
-        nmodf_neg(poly1 + i*D, poly2 + i*D, fctx);
+        coeff1[i] = nmod_neg(coeff2[i], fctx->mod);
 
-    if (exps1 != exps2)
+    if (exp1 != exp2)
     {
         for (i = 0; i < len; i++)
-            mpoly_monomial_set(exps1 + i*N, exps2 + i*N, N);
+            mpoly_monomial_set(exp1 + N*i, exp2 + N*i, N);
     }
 }
 

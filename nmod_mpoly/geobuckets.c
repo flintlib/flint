@@ -205,7 +205,7 @@ void nmod_mpoly_geobucket_pow_inplace(nmod_mpoly_geobucket_t B1,
     nmod_mpoly_init(a, ctx);
 
     nmod_mpoly_geobucket_empty(a, B1, ctx);
-    nmod_mpoly_pow_rmul(a, a, k, ctx);
+    nmod_mpoly_pow(a, a, k, ctx);
     nmod_mpoly_geobucket_set(B1, a, ctx);
 
     nmod_mpoly_clear(a, ctx);

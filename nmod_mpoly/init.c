@@ -35,7 +35,7 @@ void nmod_mpoly_init2(nmod_mpoly_t poly,
 
     if (alloc != 0)
     {
-        poly->coeffs = (ulong *) flint_malloc(alloc*ctx->ffinfo->deg*sizeof(ulong));
+        poly->coeffs = (mp_limb_t *) flint_malloc(alloc*sizeof(mp_limb_t));
         poly->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
     } else
     {

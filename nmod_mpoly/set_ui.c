@@ -13,7 +13,7 @@
 
 void nmod_mpoly_set_ui(nmod_mpoly_t poly, ulong c, const nmod_mpoly_ctx_t ctx)
 {
-    ulong cr;
+    mp_limb_t cr;
     slong N;
 
     NMOD_RED(cr, c, ctx->ffinfo->mod);

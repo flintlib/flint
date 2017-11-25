@@ -11,22 +11,22 @@
 
 #include "nmod_mpoly.h"
 
-void _nmod_mpoly_set(ulong * poly1, ulong * exps1,
-                     const ulong * poly2, const ulong * exps2, slong len,
+void _nmod_mpoly_set(mp_limb_t * coeff1, ulong * exps1,
+                     const mp_limb_t * coeff2, const ulong * exps2, slong len2,
                                                slong N, const nmodf_ctx_t fctx)
 {
     slong i;
 
-    if (poly1 != poly2)
+    if (coeff1 != coeff2)
     {
-        for (i = 0; i < len; i++)
-            nmodf_set(poly1 + i*fctx->deg, poly2 + i*fctx->deg, fctx);
+        for (i = 0; i < len2; i++)
+            coeff1[i] = coeff2[i];
     }
 
     if (exps1 != exps2)
     {
-        for (i = 0; i < len; i++)
-            mpoly_monomial_set(exps1 + i*N, exps2 + i*N, N);
+        for (i = 0; i < len2; i++)
+            mpoly_monomial_set(exps1 + N*i, exps2 + N*i, N);
     }
 }
 

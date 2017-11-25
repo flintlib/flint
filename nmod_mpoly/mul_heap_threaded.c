@@ -23,9 +23,9 @@
     Only terms t with start >= t > end are written;
     "start" and "end" are not monomials but arrays of indicies into exp3
 */
-slong _nmod_mpoly_mul_heap_part1(ulong ** poly1, ulong ** exp1, slong * alloc,
-              const ulong * poly2, const ulong * exp2, slong len2,
-              const ulong * poly3, const ulong * exp3, slong len3,
+slong _nmod_mpoly_mul_heap_part1(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
+              const mp_limb_t * coeff2, const ulong * exp2, slong len2,
+              const mp_limb_t * coeff3, const ulong * exp3, slong len3,
                slong * start, slong * end, slong * hind, ulong maskhi,
                                                         const nmodf_ctx_t fctx)
 {
@@ -36,11 +36,11 @@ slong _nmod_mpoly_mul_heap_part1(ulong ** poly1, ulong ** exp1, slong * alloc,
     mpoly_heap_t * chain;
     slong * Q;
     mpoly_heap_t * x;
-    ulong * p1 = *poly1;
+    mp_limb_t * p1 = * coeff1;
     ulong * e1 = *exp1;
 /*  slong * hind;   */
     ulong exp;
-    ulong acc0, acc1, acc2, pp0, pp1;
+    mp_limb_t acc0, acc1, acc2, pp0, pp1;
     TMP_INIT;
 
     TMP_START;
@@ -81,9 +81,9 @@ slong _nmod_mpoly_mul_heap_part1(ulong ** poly1, ulong ** exp1, slong * alloc,
       
         _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, 1, fctx);
 
-        acc0 = acc1 = acc2 = 0;
-
         e1[len1] = exp;
+
+        acc0 = acc1 = acc2 = 0;
         do
         {
             x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
@@ -91,7 +91,7 @@ slong _nmod_mpoly_mul_heap_part1(ulong ** poly1, ulong ** exp1, slong * alloc,
             hind[x->i] |= WORD(1);
             Q[Q_len++] = x->i;
             Q[Q_len++] = x->j;
-            umul_ppmm(pp1, pp0, poly2[x->i], poly3[x->j]);
+            umul_ppmm(pp1, pp0, coeff2[x->i], coeff3[x->j]);
             add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
 
             while ((x = x->next) != NULL)
@@ -99,7 +99,7 @@ slong _nmod_mpoly_mul_heap_part1(ulong ** poly1, ulong ** exp1, slong * alloc,
                 hind[x->i] |= WORD(1);
                 Q[Q_len++] = x->i;
                 Q[Q_len++] = x->j;
-                umul_ppmm(pp1, pp0, poly2[x->i], poly3[x->j]);
+                umul_ppmm(pp1, pp0, coeff2[x->i], coeff3[x->j]);
                 add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
             }
         } while (heap_len > 1 && heap[1].exp == exp);
@@ -150,7 +150,7 @@ slong _nmod_mpoly_mul_heap_part1(ulong ** poly1, ulong ** exp1, slong * alloc,
         }
     }
 
-    (*poly1) = p1;
+    (*coeff1) = p1;
     (*exp1) = e1;
    
     TMP_END;
@@ -166,9 +166,9 @@ slong _nmod_mpoly_mul_heap_part1(ulong ** poly1, ulong ** exp1, slong * alloc,
     Only terms t with start >= t > end are written;
     "start" and "end" are not monomials but arrays of indicies into exp3
 */
-slong _nmod_mpoly_mul_heap_part(ulong ** poly1, ulong ** exp1, slong * alloc,
-                 const ulong * poly2, const ulong * exp2, slong len2,
-                 const ulong * poly3, const ulong * exp3, slong len3,
+slong _nmod_mpoly_mul_heap_part(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
+                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
+                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
                   slong * start, slong * end, slong * hind, slong N,
                             ulong maskhi, ulong masklo, const nmodf_ctx_t fctx)
 {
@@ -179,7 +179,7 @@ slong _nmod_mpoly_mul_heap_part(ulong ** poly1, ulong ** exp1, slong * alloc,
     mpoly_heap_t * chain;
     slong * Q;
     mpoly_heap_t * x;
-    ulong * p1 = *poly1;
+    mp_limb_t * p1 = * coeff1;
     ulong * e1 = *exp1;
     ulong acc0, acc1, acc2, pp0, pp1;
     ulong * exp, * exps;
@@ -189,9 +189,9 @@ slong _nmod_mpoly_mul_heap_part(ulong ** poly1, ulong ** exp1, slong * alloc,
 
     /* if exponent vectors fit in single word, call special version */
     if (N == 1)
-        return _nmod_mpoly_mul_heap_part1(poly1, exp1, alloc,
-                                          poly2, exp2, len2,
-                                          poly3, exp3, len3,
+        return _nmod_mpoly_mul_heap_part1(coeff1, exp1, alloc,
+                                          coeff2, exp2, len2,
+                                          coeff3, exp3, len3,
                                                start, end, hind, maskhi, fctx);
 
     TMP_START;
@@ -238,9 +238,9 @@ slong _nmod_mpoly_mul_heap_part(ulong ** poly1, ulong ** exp1, slong * alloc,
 
         _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, N, fctx);
 
-        acc0 = acc1 = acc2 = 0;
-
         mpoly_monomial_set(e1 + len1*N, exp, N);
+
+        acc0 = acc1 = acc2 = 0;
         do
         {
             exp_list[--exp_next] = heap[1].exp;
@@ -250,7 +250,7 @@ slong _nmod_mpoly_mul_heap_part(ulong ** poly1, ulong ** exp1, slong * alloc,
             hind[x->i] |= WORD(1);
             Q[Q_len++] = x->i;
             Q[Q_len++] = x->j;
-            umul_ppmm(pp1, pp0, poly2[x->i], poly3[x->j]);
+            umul_ppmm(pp1, pp0, coeff2[x->i], coeff3[x->j]);
             add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
 
             while ((x = x->next) != NULL)
@@ -258,7 +258,7 @@ slong _nmod_mpoly_mul_heap_part(ulong ** poly1, ulong ** exp1, slong * alloc,
                 hind[x->i] |= WORD(1);
                 Q[Q_len++] = x->i;
                 Q[Q_len++] = x->j;
-                umul_ppmm(pp1, pp0, poly2[x->i], poly3[x->j]);
+                umul_ppmm(pp1, pp0, coeff2[x->i], coeff3[x->j]);
                 add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
             }
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
@@ -315,7 +315,7 @@ slong _nmod_mpoly_mul_heap_part(ulong ** poly1, ulong ** exp1, slong * alloc,
         }
     }
 
-    (*poly1) = p1;
+    (*coeff1) = p1;
     (*exp1) = e1;
 
     TMP_END;
@@ -336,8 +336,8 @@ typedef struct
     const nmodf_ctx_struct * fctx;
     slong nthreads;
     slong ndivs;
-    const ulong * coeff2; const ulong * exp2; slong len2;
-    const ulong * coeff3; const ulong * exp3; slong len3;
+    const mp_limb_t * coeff2; const ulong * exp2; slong len2;
+    const mp_limb_t * coeff3; const ulong * exp3; slong len3;
     slong N;
     ulong maskhi, masklo;    
     volatile int idx;
@@ -351,7 +351,7 @@ typedef struct
     slong len1;
     slong alloc1;
     ulong * exp1;
-    ulong * coeff1;
+    mp_limb_t * coeff1;
 }
 mul_heap_threaded_div_t;
 
@@ -363,7 +363,7 @@ typedef struct
     mul_heap_threaded_div_t * divp;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
-    slong * t1, * t2, *t3, *t4;
+    slong * t1, * t2, * t3, * t4;
     ulong * exp;
 }
 mul_heap_threaded_arg_t;
@@ -492,9 +492,9 @@ void * _nmod_mpoly_mul_heap_threaded_worker(void * arg_ptr)
 
 
 
-slong _nmod_mpoly_mul_heap_threaded(ulong ** poly1, ulong ** exp1, slong * alloc,
-                 const ulong * coeff2, const ulong * exp2, slong len2,
-                 const ulong * coeff3, const ulong * exp3, slong len3,
+slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
+                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
+                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
                    slong N, ulong maskhi, ulong masklo, const nmodf_ctx_t fctx)
 {
     slong i, j, k, ndivs2;
@@ -502,7 +502,7 @@ slong _nmod_mpoly_mul_heap_threaded(ulong ** poly1, ulong ** exp1, slong * alloc
     mul_heap_threaded_arg_t * args;
     mul_heap_threaded_base_t * base;
     mul_heap_threaded_div_t * divs;
-    ulong * p1;
+    mp_limb_t * p1;
     ulong * e1;
 
     base = flint_malloc(sizeof(mul_heap_threaded_base_t));
@@ -540,7 +540,7 @@ slong _nmod_mpoly_mul_heap_threaded(ulong ** poly1, ulong ** exp1, slong * alloc
             /* highest division writes to original poly */
             divs[i].alloc1 = *alloc;
             divs[i].exp1 = *exp1;
-            divs[i].coeff1 = *poly1;
+            divs[i].coeff1 = *coeff1;
         } else
         {
             /* lower divisions write to a new worker poly */
@@ -605,7 +605,7 @@ slong _nmod_mpoly_mul_heap_threaded(ulong ** poly1, ulong ** exp1, slong * alloc
     flint_free(divs);
     flint_free(base);
 
-    *poly1 = p1;
+    *coeff1 = p1;
     *exp1  = e1;
     return k;
 }

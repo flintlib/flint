@@ -11,8 +11,8 @@
 
 #include "nmod_mpoly.h"
 
-int _nmod_mpoly_equal(const ulong * coeff1, const ulong * exp1,
-                      const ulong * coeff2, const ulong * exp2,
+int _nmod_mpoly_equal(const mp_limb_t * coeff1, const ulong * exp1,
+                      const mp_limb_t * coeff2, const ulong * exp2,
                                                             slong len, slong N)
 {
     slong i;
@@ -20,19 +20,15 @@ int _nmod_mpoly_equal(const ulong * coeff1, const ulong * exp1,
     if (coeff1 != coeff2)
     {
         for (i = 0; i < len; i++)
-        {
             if (coeff1[i] != coeff2[i])
                 return 0;
-        }
     }
 
     if (exp1 != exp2)
     {
         for (i = 0; i < len; i++)
-        {
-            if (!mpoly_monomial_equal(exp1 + i*N, exp2 + i*N, N))
+            if (!mpoly_monomial_equal(exp1 + N*i, exp2 + N*i, N))
                 return 0;
-        }
     }
 
     return 1;

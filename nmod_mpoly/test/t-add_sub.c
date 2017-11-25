@@ -19,7 +19,7 @@ main(void)
     int i, j, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("add/sub....");
+    flint_printf("add_sub....");
     fflush(stdout);
 
     /* Check (f + g) - g = f */
@@ -28,7 +28,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         ordering_t ord;
-        ulong modulus;
+        mp_limb_t modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -93,7 +93,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         ordering_t ord;
-        ulong modulus;
+        mp_limb_t modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -158,7 +158,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         ordering_t ord;
-        ulong modulus;
+        mp_limb_t modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -224,7 +224,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k1, k2;
         ordering_t ord;
-        ulong modulus;
+        mp_limb_t modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -294,7 +294,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k1, k2;
         ordering_t ord;
-        ulong modulus;
+        mp_limb_t modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -364,7 +364,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         ordering_t ord;
-        ulong modulus;
+        mp_limb_t modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -429,7 +429,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         ordering_t ord;
-        ulong modulus;
+        mp_limb_t modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong exp_bits, exp_bits1, exp_bits2;
 

@@ -11,19 +11,22 @@
 
 #include "nmod_mpoly.h"
 
-slong _nmod_mpoly_scalar_mul_nmod(ulong * poly1, ulong * exps1,
-        const ulong * poly2, const ulong * exps2, slong len2, slong N, ulong c,
-                                                        const nmodf_ctx_t fctx)
+slong _nmod_mpoly_scalar_mul_nmod(mp_limb_t * coeff1, ulong * exp1,
+                const mp_limb_t * coeff2, const ulong * exp2, slong len2,
+                                      slong N, ulong c, const nmodf_ctx_t fctx)
 {
     slong i;
 
-    if (exps1 != exps2)
-        mpn_copyi(exps1, exps2, N*len2);
+    if (exp1 != exp2)
+    {
+        for (i = 0; i < len2; i++)
+            mpoly_monomial_set(exp1 + N*i, exp2 + N*i, N);
+    }
 
     for (i = 0; i < len2; i++)
-        nmodf_smul_nmod(poly1 + i*fctx->deg, poly2 + i*fctx->deg, c, fctx);
+        coeff1[i] = nmod_mul(coeff2[i], c, fctx->mod);
 
-    while (i > 0 && nmodf_is_zero(poly1 + (i-1)*fctx->deg, fctx))
+    while (i > 0 && coeff1[i - 1] == 0)
         i--;
 
     return i;  
@@ -33,7 +36,7 @@ void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                           ulong c, const nmod_mpoly_ctx_t ctx)
 {
     slong N, len1;
-    ulong cr;
+    mp_limb_t cr;
 
     N = words_per_exp(ctx->n, poly2->bits);
 
