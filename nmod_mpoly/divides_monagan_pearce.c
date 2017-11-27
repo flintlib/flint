@@ -96,7 +96,7 @@ slong _nmod_mpoly_divides_monagan_pearce1(
                 } else
                 {
                     umul_ppmm(pp1, pp0, coeff3[x->i], p1[x->j]);
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);                    
+                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
                 }
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && heap[1].exp == exp);
