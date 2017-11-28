@@ -269,7 +269,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, exp2, N);
 
-    /* precompute leading cofficient info assuming "small" case */
+    /* precompute leading cofficient info */
     lc_minus_inv = fctx->mod.n - nmod_inv(coeff3[0], fctx->mod);
 
     while (heap_len > 1)

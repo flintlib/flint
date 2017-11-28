@@ -73,160 +73,7 @@ void nmodf_ctx_clear(nmodf_ctx_t ctx)
     if (ctx->minpoly != NULL)
         flint_free(ctx->minpoly);
 }
-/*
-NMOD_MPOLY_INLINE
-void nmodf_set_ui(mp_limb_t * a, mp_limb_t b, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    NMOD_RED(a[0], b, ctx->mod);
-    while (++i < ctx->deg)
-        a[i] = 0;
-}
 
-NMOD_MPOLY_INLINE
-void nmodf_zero(mp_limb_t * a, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    do
-    {
-        a[i] = 0;
-    } while (++i < ctx->deg);
-}
-
-NMOD_MPOLY_INLINE
-int nmodf_is_zero(const mp_limb_t * a, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    do
-    {
-        if (a[i] != 0)
-            return 0;
-    } while (++i < ctx->deg);
-    return 1;
-}
-
-NMOD_MPOLY_INLINE
-int nmodf_is_one(const ulong * a, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    if (a[0] != 1)
-        return 0;
-    while (++i < ctx->deg)
-    {
-        if (a[i] != 0)
-            return 0;
-    }
-    return 1;
-}
-
-
-NMOD_MPOLY_INLINE
-void nmodf_set(ulong * a, const ulong * b, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    do
-    {
-        a[i] = b[i];
-    } while (++i < ctx->deg);
-}
-
-NMOD_MPOLY_INLINE
-void nmodf_sset_nmod(ulong * a, ulong b, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    a[0] = b;
-    while (++i < ctx->deg)
-        a[i] = 0;
-}
-
-NMOD_MPOLY_INLINE
-void nmodf_add(ulong * a, const ulong * b, const ulong * c, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    do
-    {
-        a[i] = nmod_add(b[i], c[i], ctx->mod);
-    } while (++i < ctx->deg);
-}
-
-NMOD_MPOLY_INLINE
-void nmodf_sadd_nmod(ulong * a, const ulong * b, ulong c, const nmodf_ctx_t ctx)
-{
-    a[0] = nmod_add(b[0], c, ctx->mod);
-}
-
-
-NMOD_MPOLY_INLINE
-void nmodf_sub(ulong * a, const ulong * b, const ulong * c, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    do
-    {
-        a[i] = nmod_sub(b[i], c[i], ctx->mod);
-    } while (++i < ctx->deg);
-}
-
-NMOD_MPOLY_INLINE
-void nmodf_neg(ulong * a, const ulong * b, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    do
-    {
-        a[i] = nmod_neg(b[i], ctx->mod);
-    } while (++i < ctx->deg);
-}
-
-NMOD_MPOLY_INLINE
-void nmodf_smul_nmod(ulong * a, const ulong * b, ulong c, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    do
-    {
-        a[i] = nmod_mul(b[i], c, ctx->mod);
-    } while (++i < ctx->deg);
-}
-
-NMOD_MPOLY_INLINE
-void nmodf_mul(ulong * a, const ulong * b, const ulong * c, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    do
-    {
-        a[i] = nmod_mul(b[i], c[i], ctx->mod);
-    } while (++i < ctx->deg);
-}
-
-NMOD_MPOLY_INLINE
-void nmodf_addmul(ulong * a, const ulong * b, const ulong * c, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    do
-    {
-        NMOD_ADDMUL(a[i], b[i], c[i], ctx->mod);
-    } while (++i < ctx->deg);
-}
-
-
-NMOD_MPOLY_INLINE
-int nmodf_fprintf(FILE * f, const ulong * a, const nmodf_ctx_t ctx)
-{
-    slong i = 0;
-    if (ctx->deg > 1)
-        flint_fprintf(f, "(");
-    do {
-        if (i == 0)
-            flint_fprintf(f, "%wu", a[i],i);
-        else
-            flint_fprintf(f, "%wu*#^%wd", a[i],i);
-        if (i + 1 < ctx->deg)
-            flint_fprintf(f, "+");
-    } while (++i < ctx->deg);
-    if (ctx->deg > 1)
-        flint_fprintf(f, ")");
-
-    return 1;
-}
-*/
 
 /*  Type definitions *********************************************************/
 
@@ -514,7 +361,7 @@ FLINT_DLL void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 /* Scalar operations *********************************************************/
 
 FLINT_DLL void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t poly1,
-         const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx);
+                const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx);
 
 /* Multiplication ************************************************************/
 
@@ -527,6 +374,9 @@ FLINT_DLL void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1,
                                                    const nmod_mpoly_ctx_t ctx);
 
 /* Powering ******************************************************************/
+
+FLINT_DLL void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                                          slong k, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                           slong k, const nmod_mpoly_ctx_t ctx);

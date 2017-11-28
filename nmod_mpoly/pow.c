@@ -19,7 +19,6 @@ void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     slong i, bits, exp_bits, N, len1 = 0;
     ulong * max_degs2;
     ulong max = 0;
-    ulong maskhi, masklo;
     ulong * exp2 = poly2->exps;
     int free2 = 0;
 
@@ -52,7 +51,10 @@ void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     if (poly2->length > 1)
     {
         nmod_mpoly_pow_rmul(poly1, poly2, k, ctx);
+        return;
     }
+
+    /* code for powering a monomial */
 
     TMP_START;
 
@@ -73,7 +75,6 @@ void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
 
-    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
     N = words_per_exp(ctx->n, exp_bits);
 
     if (exp_bits > poly2->bits)
