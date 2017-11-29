@@ -215,6 +215,14 @@ void mpoly_univar_exp(ulong * one, slong var, int deg, slong N, slong off, slong
 /*  Monomials ****************************************************************/
 
 MPOLY_INLINE
+void mpoly_monomial_zero(ulong * exp_ptr, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp_ptr[i] = 0;
+}
+
+MPOLY_INLINE
 void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2,
                                                    const ulong * exp3, slong N)
 {
