@@ -58,7 +58,7 @@ slong _nmod_mpoly_mul_johnson1(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc
     {
         exp = heap[1].exp;
 
-        _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, 1, fctx);
+        _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, 1);
 
         e1[len1] = exp;
 
@@ -197,7 +197,7 @@ slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
     {
         exp = heap[1].exp;
 
-        _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, N, fctx);
+        _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, N);
 
         mpoly_monomial_set(e1 + len1*N, exp, N);
 

@@ -172,13 +172,13 @@ FLINT_DLL void nmod_mpoly_init2(nmod_mpoly_t poly, slong alloc,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void _nmod_mpoly_realloc(ulong ** poly, ulong ** exps,
-                                            slong * alloc, slong len, slong N, const nmodf_ctx_t fctx);
+                                            slong * alloc, slong len, slong N);
 
 FLINT_DLL void nmod_mpoly_realloc(nmod_mpoly_t poly, slong alloc, 
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void _nmod_mpoly_fit_length(ulong ** poly,
-                             ulong ** exps, slong * alloc, slong len, slong N, const nmodf_ctx_t fctx);
+FLINT_DLL void _nmod_mpoly_fit_length(mp_limb_t ** poly,
+                             ulong ** exps, slong * alloc, slong len, slong N);
 
 FLINT_DLL void nmod_mpoly_fit_length(nmod_mpoly_t poly, slong len, 
                                                    const nmod_mpoly_ctx_t ctx);

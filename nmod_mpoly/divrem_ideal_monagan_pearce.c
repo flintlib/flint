@@ -199,7 +199,7 @@ slong _nmod_mpoly_divrem_ideal_monagan_pearce1(nmod_mpoly_struct ** polyq,
 
         /* if get here, no leading terms divided */
         l++;
-        _nmod_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1, ctx->ffinfo);
+        _nmod_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
         p2[l] = ctx->ffinfo->mod.n - acc0;
         e2[l] = exp;
 
@@ -443,7 +443,7 @@ slong _nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** polyq,
 
         /* if get here, no leading terms divided */
         l++;
-        _nmod_mpoly_fit_length(&p2, &e2, allocr, l + 1, N, ctx->ffinfo);
+        _nmod_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
         p2[l] = ctx->ffinfo->mod.n - acc0;
         mpoly_monomial_set(e2 + l*N, exp, N);
 

@@ -75,7 +75,7 @@ slong _nmod_mpoly_divides_monagan_pearce1(
             goto not_exact_division;
 
         k++;
-        _nmod_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1, fctx);
+        _nmod_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
         lt_divides = mpoly_monomial_divides1(e1 + k, exp, exp3[0], mask);
 
@@ -280,7 +280,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
             goto not_exact_division;
       
         k++;
-        _nmod_mpoly_fit_length(&p1, &e1, alloc, k + 1, N, fctx);
+        _nmod_mpoly_fit_length(&p1, &e1, alloc, k + 1, N);
 
         lt_divides = mpoly_monomial_divides(e1 + k*N, exp, exp3, N, mask);
 

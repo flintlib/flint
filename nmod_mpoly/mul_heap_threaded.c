@@ -79,7 +79,7 @@ slong _nmod_mpoly_mul_heap_part1(mp_limb_t ** coeff1, ulong ** exp1, slong * all
     {
         exp = heap[1].exp;
       
-        _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, 1, fctx);
+        _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, 1);
 
         e1[len1] = exp;
 
@@ -236,7 +236,7 @@ slong _nmod_mpoly_mul_heap_part(mp_limb_t ** coeff1, ulong ** exp1, slong * allo
     {
         exp = heap[1].exp;
 
-        _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, N, fctx);
+        _nmod_mpoly_fit_length(&p1, &e1, alloc, len1 + 1, N);
 
         mpoly_monomial_set(e1 + len1*N, exp, N);
 
@@ -583,7 +583,7 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** coeff1, ulong ** exp1, slong * 
             /* transfer from worker poly to original poly */
             for (j = 0; j < divs[i].len1; j++)
             {
-                _nmod_mpoly_fit_length(&p1, &e1, alloc, k + 1, N, fctx);
+                _nmod_mpoly_fit_length(&p1, &e1, alloc, k + 1, N);
                 p1[k] = divs[i].coeff1[j];
                 mpoly_monomial_set(e1 + N*k, divs[i].exp1 + N*j, N);
                 k++;

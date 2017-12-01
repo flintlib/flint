@@ -12,13 +12,13 @@
 #include "nmod_mpoly.h"
 
 void _nmod_mpoly_fit_length(ulong ** poly,
-                              ulong ** exps, slong * alloc, slong len, slong N, const nmodf_ctx_t fctx)
+                              ulong ** exps, slong * alloc, slong len, slong N)
 {
     if (len > *alloc)
     {
         /* at least double size */
         len = FLINT_MAX(len, 2*(*alloc));
-        _nmod_mpoly_realloc(poly, exps, alloc, len, N, fctx);
+        _nmod_mpoly_realloc(poly, exps, alloc, len, N);
     }
 }
 

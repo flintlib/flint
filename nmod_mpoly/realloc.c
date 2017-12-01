@@ -12,7 +12,7 @@
 #include "nmod_mpoly.h"
 
 void _nmod_mpoly_realloc(mp_limb_t ** coeff, ulong ** exp,
-                                   slong * alloc, slong len, slong N, const nmodf_ctx_t fctx)
+                                             slong * alloc, slong len, slong N)
 {
     (* coeff) = (mp_limb_t *) flint_realloc(* coeff, len*sizeof(mp_limb_t));
     (* exp) = (ulong *) flint_realloc(* exp, len*N*sizeof(ulong));    
