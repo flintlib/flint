@@ -604,7 +604,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
    slong i, bits, exp_bits, N, len = 0;
-   ulong * max_degs2, * max_degs3;
+   ulong * max_fields2, * max_fields3;
    ulong max = 0;
    ulong maskhi, masklo;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;
@@ -626,38 +626,35 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 
    TMP_START;
 
-   max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-   max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    /* compute maximum fields in exponents */
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+                                                          poly2->bits, ctx->n);
+    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
+                                                          poly3->bits, ctx->n);
 
-   /* compute maximum degree appearing in inputs and outputs */
-   
-   fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
-   fmpz_mpoly_max_degrees(max_degs3, poly3, ctx);
+    for (i = 0; i < ctx->n; i++)
+    {
+        if (max_fields2[i] > max)
+            max = max_fields2[i];
+        /*
+            cannot be exact division if any max field from poly2
+            is less than corresponding max field from poly3
+        */
+        if (max_fields2[i] < max_fields3[i])
+        {
+            len = 0;
+            goto cleanup;
+        }
+    }
 
-   for (i = 0; i < ctx->n; i++)
-   {
-      if (max_degs2[i] > max)
-         max = max_degs2[i];
-
-      /* cannot be exact division if poly2 degrees less than those of poly3 */
-      if (max_degs2[i] < max_degs3[i])
-      {
-         len = 0;
-
-         goto cleanup;
-      }
-   }
-
-   /* compute number of bits required for exponent fields */
-   bits = FLINT_BIT_COUNT(max);
-
-   exp_bits = 8;
-   while (bits >= exp_bits)
-      exp_bits += 1;
-
-   exp_bits = FLINT_MAX(exp_bits, poly2->bits);
-   exp_bits = FLINT_MAX(exp_bits, poly3->bits);
-   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+    /* compute number of bits required for exponent fields */
+    bits = FLINT_BIT_COUNT(max);
+    exp_bits = FLINT_MAX(WORD(8), bits + 1); /* extra bit required for signs */
+    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
+    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
    N = words_per_exp(ctx->n, exp_bits);

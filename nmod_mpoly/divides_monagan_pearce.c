@@ -419,8 +419,7 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i, bits, exp_bits, N, len = 0;
-    ulong * max_degs2, * max_degs3;
-    ulong max = 0;
+    ulong max, * max_fields2, * max_fields3;
     ulong maskhi, masklo;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;
     int free2 = 0, free3 = 0;
@@ -438,19 +437,20 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
 
     TMP_START;
 
-    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    mpoly_max_degrees(max_degs2, poly2->exps, poly2->length, poly2->bits, ctx->n);
-    mpoly_max_degrees(max_degs3, poly3->exps, poly3->length, poly3->bits, ctx->n);
-
-
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+                                                         poly2->bits, ctx->n);
+    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
+                                                         poly3->bits, ctx->n);
+    max = 0;
     for (i = 0; i < ctx->n; i++)
     {
-        if (max_degs2[i] > max)
-            max = max_degs2[i];
+        if (max_fields2[i] > max)
+            max = max_fields2[i];
 
         /* cannot be exact division if poly2 degrees less than those of poly3 */
-        if (max_degs2[i] < max_degs3[i])
+        if (max_fields2[i] < max_fields3[i])
         {
             len = 0;
             goto cleanup;

@@ -17,8 +17,8 @@ void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                            slong k, const nmod_mpoly_ctx_t ctx)
 {
     slong i, bits, exp_bits, N, len1 = 0;
-    ulong * max_degs2;
-    ulong max = 0;
+    ulong max, * max_fields2;
+    ulong lo, hi;
     ulong * exp2 = poly2->exps;
     int free2 = 0;
 
@@ -58,19 +58,20 @@ void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 
     TMP_START;
 
-    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    mpoly_max_degrees(max_degs2, poly2->exps, poly2->length, poly2->bits, ctx->n);
-
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length, poly2->bits, ctx->n);
+    max = 0;
     for (i = 0; i < ctx->n; i++)
     {
-        if (max_degs2[i] > max)
-            max = max_degs2[i];
+        if (max_fields2[i] > max)
+            max = max_fields2[i];
     }
 
-    if (FLINT_BIT_COUNT(max) + FLINT_BIT_COUNT(k) > FLINT_BITS || 0 > (slong) (k*max))
+    umul_ppmm(hi, lo, k, max);
+    bits = FLINT_BIT_COUNT(lo);
+    if (hi != 0 || bits >= FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in nmod_mpoly_pow");
 
-    bits = FLINT_BIT_COUNT(k*max);
     exp_bits = FLINT_MAX(WORD(8), bits + 1);
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);

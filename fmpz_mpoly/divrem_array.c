@@ -1001,8 +1001,8 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
    slong i, exp_bits, N, lenq = 0, lenr = 0, array_size;
-   ulong * max_degs2, * max_degs3;
-   ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * maxexp;
+   ulong * max_fields, * max_fields2, * max_fields3;
+   ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    int free2 = 0, free3 = 0;
    fmpz_mpoly_t temp1, temp2;
    fmpz_mpoly_struct * tq, * tr;
@@ -1025,17 +1025,17 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
 
    TMP_START;
 
-   maxexp = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
 
    /* compute maximum exponents for each variable */
-   max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-   max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-
-   mpoly_max_degrees(max_degs2, poly2->exps, poly2->length, poly2->bits, ctx->n);
-   mpoly_max_degrees(max_degs3, poly3->exps, poly3->length, poly3->bits, ctx->n);
-
+   max_fields = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+   max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+   max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+   mpoly_max_fields_ui_backwards(max_fields2, poly2->exps, poly2->length,
+                                                          poly2->bits, ctx->n);
+   mpoly_max_fields_ui_backwards(max_fields3, poly3->exps, poly3->length,
+                                                          poly3->bits, ctx->n);
    for (i = 0; i < ctx->n; i++)
-      maxexp[i] = FLINT_MAX(max_degs2[i], max_degs3[i]);
+      max_fields[i] = FLINT_MAX(max_fields2[i], max_fields3[i]);
 
    /* compute number of bits required for output exponents */
    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
@@ -1050,10 +1050,10 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
    array_size = 1;
    for (i = 0; i < ctx->n - 1; i++)
    {
-      max_degs2[i] = maxexp[i] + 1;
-      array_size *= max_degs2[i];
+      max_fields2[i] = max_fields[i] + 1;
+      array_size *= max_fields2[i];
    }  
-   max_degs2[ctx->n - 1] = maxexp[ctx->n - 1] + 1;
+   max_fields2[ctx->n - 1] = max_fields[ctx->n - 1] + 1;
    
    /* if exponents too large for array multiplication, exit silently */
    if (array_size > MAX_ARRAY_SIZE)
@@ -1125,7 +1125,7 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
    lenq = _fmpz_mpoly_divrem_array(&lenr, &tq->coeffs, &tq->exps,
         &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs,
                   exp2, poly2->length, poly3->coeffs, exp3, poly3->length,
-                                        (slong *) max_degs2, ctx->n, exp_bits);
+                                      (slong *) max_fields2, ctx->n, exp_bits);
 
    res = (lenq != 0 || lenr != 0);
 

@@ -23,7 +23,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
 {
    char * str, ** x = (char **) x_in;
    slong i, j, nvars, bound, off;
-   ulong * degs;
+   ulong * fields;
    int first;
 
    TMP_INIT;
@@ -55,16 +55,16 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
    for (i = 0; i < len; i++) /* for each term */
       bound += fmpz_sizeinbase(poly + i, 10) + 1;
 
-   degs = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+   fields = (ulong *) TMP_ALLOC(n*sizeof(ulong));
       
-   _fmpz_mpoly_max_degrees(degs, exps, len, bits, n, deg, rev, N);
+   mpoly_max_fields_ui(fields, exps, len, bits, n);
 
    for (i = deg; i < n; i++) /* for each max degree */
    {
       ulong d10 = 1;
       slong b = 0;
 
-      while (d10 <= degs[i])
+      while (d10 <= fields[i])
       {
          d10 *= 10;
          b++;
@@ -90,20 +90,20 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
             off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(poly[i]));
       }
 
-      mpoly_get_monomial(degs, exps + i*N, bits, n, deg, rev);
+      mpoly_get_monomial(fields, exps + i*N, bits, n, deg, rev);
 
       first = 1;
 
       for (j = 0; j < nvars; j++)
       {
-          if (degs[j] > 1)
+          if (fields[j] > 1)
           {
              if (!first || (poly[i] != WORD(1) && poly[i] != WORD(-1)))
                 off += flint_sprintf(str + off, "*");
-             off += flint_sprintf(str + off, "%s^%wd", x[j], degs[j]);
+             off += flint_sprintf(str + off, "%s^%wd", x[j], fields[j]);
              first = 0;
           }
-          if (degs[j] == 1)
+          if (fields[j] == 1)
           {
              if (!first || (poly[i] != WORD(1) && poly[i] != WORD(-1)))
                 off += flint_sprintf(str + off, "*");

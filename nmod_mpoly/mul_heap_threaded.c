@@ -614,10 +614,8 @@ void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                           const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
 {
     slong i, bits, exp_bits, N, len1;
-    ulong * max_degs2;
-    ulong * max_degs3;
+    ulong max, * max_fields2, * max_fields3;
     ulong maskhi, masklo;
-    ulong max;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
     int free2 = 0, free3 = 0;
 
@@ -632,29 +630,29 @@ void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 
     TMP_START;
 
-    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    mpoly_max_degrees(max_degs2, poly2->exps, poly2->length, poly2->bits, ctx->n);
-    mpoly_max_degrees(max_degs3, poly3->exps, poly3->length, poly3->bits, ctx->n);
-
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+                                                          poly2->bits, ctx->n);
+    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
+                                                          poly3->bits, ctx->n);
     max = 0;
     for (i = 0; i < ctx->n; i++)
     {
-        max_degs3[i] += max_degs2[i];
-        if (max_degs3[i] < max_degs2[i] || 0 > (slong) max_degs3[i]) 
-            flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_johnson");
+        max_fields3[i] += max_fields2[i];
+        if (max_fields3[i] < max_fields2[i] || 0 > (slong) max_fields3[i])
+            flint_throw(FLINT_EXPOF, "Exponent overflow in nmod_mpoly_mul_heap_threaded");
 
-        if (max_degs3[i] > max)
-            max = max_degs3[i];
+        if (max_fields3[i] > max)
+            max = max_fields3[i];
     }
 
     /* compute number of bits to store maximum degree */
     bits = FLINT_BIT_COUNT(max);
     if (bits >= FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_johnson");
+        flint_throw(FLINT_EXPOF, "Exponent overflow in nmod_mpoly_mul_heap_threaded");
 
     exp_bits = FLINT_MAX(WORD(8), bits + 1); /* extra bit required for signs */
-    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = FLINT_MAX(exp_bits, poly3->bits);
     exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);

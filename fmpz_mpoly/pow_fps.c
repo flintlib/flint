@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -603,8 +604,8 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                            slong k, const fmpz_mpoly_ctx_t ctx)
 {
    slong i, bits, exp_bits, N, len = 0;
-   ulong * max_degs2;
-   ulong max = 0;
+   ulong max = 0, * max_degs2;
+   ulong lo, hi;
    ulong maskhi, masklo;
    ulong * exp2 = poly2->exps;
    int free2 = 0;
@@ -637,27 +638,24 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_START;
 
-   max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    mpoly_max_fields_ui(max_degs2, poly2->exps, poly2->length,
+                                                          poly2->bits, ctx->n);
+    max = 0;
+    for (i = 0; i < ctx->n; i++)
+    {
+        if (max_degs2[i] > max)
+            max = max_degs2[i];
+    }
 
-   fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
+    umul_ppmm(hi, lo, k, max);
+    bits = FLINT_BIT_COUNT(lo);
+    if (hi != 0 || bits >= FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_pow_fps");
 
-   for (i = 0; i < ctx->n; i++)
-   {
-      if (max_degs2[i] > max)
-         max = max_degs2[i];
-   }
-
-   if (FLINT_BIT_COUNT(max) + FLINT_BIT_COUNT(k) > FLINT_BITS || 0 > (slong) (k*max))
-      flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_pow_fps");
-
-   bits = FLINT_BIT_COUNT(k*max);
-
-   exp_bits = 8;
-   while (bits >= exp_bits)
-      exp_bits += 1;
-
-   exp_bits = FLINT_MAX(exp_bits, poly2->bits);
-   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+    exp_bits = FLINT_MAX(WORD(8), bits + 1);
+    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
    N = words_per_exp(ctx->n, exp_bits);
