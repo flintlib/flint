@@ -244,12 +244,6 @@ FLINT_DLL void fmpz_mpoly_degrees(slong * degs, const fmpz_mpoly_t poly,
 FLINT_DLL slong fmpz_mpoly_degree(const fmpz_mpoly_t poly, slong var,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
-                    slong len, slong bits, slong n, int deg, int rev, slong N);
-
-FLINT_DLL void fmpz_mpoly_max_degrees(ulong * max_degs,
-                          const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
                                slong bits, slong n, int deg, int rev, slong N);
 

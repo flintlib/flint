@@ -1303,8 +1303,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
    slong i, bits, exp_bits, N, len = 0, array_size;
-   ulong * max_degs1, * max_degs2, * max_degs3;
-   ulong max = 0;
+   ulong max, * max_fields1, * max_fields2, * max_fields3;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    int free2 = 0, free3 = 0;
    int res = -1;
@@ -1325,43 +1324,38 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_START;
 
-   /* compute maximum exponents for each variable */
-   max_degs1 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-   max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-   max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    /* compute maximum fields */
+    max_fields1 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    mpoly_max_fields_ui_backwards(max_fields2, poly2->exps, poly2->length,
+                                                          poly2->bits, ctx->n);
+    mpoly_max_fields_ui_backwards(max_fields3, poly3->exps, poly3->length,
+                                                          poly3->bits, ctx->n);
+    max = 0;
+    for (i = 0; i < ctx->n; i++)
+    {
+        if (max_fields2[i] > max)
+            max = max_fields2[i];
+        /*
+            cannot be an exact division if variable in dividend has smaller degree
+            than corresponding variable in divisor
+        */
+        if (max_fields2[i] < max_fields3[i])
+        {
+            res = 0;
+            goto cleanup;
+        }
+    }
 
-   mpoly_max_degrees(max_degs2, poly2->exps, poly2->length, poly2->bits, ctx->n);
-   mpoly_max_degrees(max_degs3, poly3->exps, poly3->length, poly3->bits, ctx->n);
+    /* compute number of bits required for output exponents */
+    bits = FLINT_BIT_COUNT(max);
+    exp_bits = FLINT_MAX(WORD(8), bits + 1);
+    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
+    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
 
-   for (i = 0; i < ctx->n; i++)
-   {
-      if (max_degs2[i] > max)
-         max = max_degs2[i];
-
-      /* 
-         cannot be an exact division if variable in dividend has smaller degree
-         than corresponding variable in divisor
-      */
-
-      if (max_degs2[i] < max_degs3[i])
-      {
-         res = 0;
-
-         goto cleanup;
-      }
-   }
-
-   /* compute number of bits required for output exponents */
-   bits = FLINT_BIT_COUNT(max);
-
-   exp_bits = 8;
-   while (bits >= exp_bits)
-      exp_bits += 1;
-
-   exp_bits = FLINT_MAX(exp_bits, poly2->bits);
-   exp_bits = FLINT_MAX(exp_bits, poly3->bits);
-   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
-   N = words_per_exp(ctx->n, exp_bits);
+    N = words_per_exp(ctx->n, exp_bits);
 
    /* array division expects each exponent vector in one word */
    /* current code is wrong for reversed orderings */
@@ -1372,10 +1366,10 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    array_size = 1;
    for (i = 0; i < ctx->n - 1; i++)
    {
-      max_degs2[i]++;
-      array_size *= max_degs2[i];
+      max_fields2[i]++;
+      array_size *= max_fields2[i];
    }  
-   max_degs2[ctx->n - 1]++;
+   max_fields2[ctx->n - 1]++;
    
    /* if exponents too large for array multiplication, exit silently */
    if (array_size > MAX_ARRAY_SIZE)
@@ -1410,7 +1404,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       len = _fmpz_mpoly_divides_array(&temp->coeffs, &temp->exps,
                      &temp->alloc, poly2->coeffs, exp2, poly2->length,
                                        poly3->coeffs, exp3, poly3->length,
-                                        (slong *) max_degs2, ctx->n, exp_bits);
+                                      (slong *) max_fields2, ctx->n, exp_bits);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -1424,7 +1418,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       len = _fmpz_mpoly_divides_array(&poly1->coeffs, &poly1->exps,
                      &poly1->alloc, poly2->coeffs, exp2, poly2->length,
                                         poly3->coeffs, exp3, poly3->length,
-                                        (slong *) max_degs2, ctx->n, exp_bits);
+                                      (slong *) max_fields2, ctx->n, exp_bits);
    }
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
@@ -1437,13 +1431,13 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    */  
    if (len != 0)
    {
-      mpoly_max_degrees(max_degs1, poly1->exps,
+      mpoly_max_fields_ui_backwards(max_fields1, poly1->exps,
                                            poly1->length, poly1->bits, ctx->n);
 
       for (i = 0; i < ctx->n; i++)
       {
-         /* we incremented max_degs2[i] by 1 previously, so add 1 here */
-         if (max_degs2[i] != max_degs1[i] + max_degs3[i] + 1)
+         /* we incremented max_fields2[i] by 1 previously, so add 1 here */
+         if (max_fields2[i] != max_fields1[i] + max_fields3[i] + 1)
          {
             fmpz_mpoly_zero(poly1, ctx);
 

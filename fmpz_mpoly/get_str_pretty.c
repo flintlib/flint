@@ -55,23 +55,13 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
    for (i = 0; i < len; i++) /* for each term */
       bound += fmpz_sizeinbase(poly + i, 10) + 1;
 
-   degs = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-      
-   _fmpz_mpoly_max_degrees(degs, exps, len, bits, n, deg, rev, N);
+    degs = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+    mpoly_degrees((slong *) degs, exps, len, bits, n, deg, rev);
 
-   for (i = deg; i < n; i++) /* for each max degree */
-   {
-      ulong d10 = 1;
-      slong b = 0;
-
-      while (d10 <= degs[i])
-      {
-         d10 *= 10;
-         b++;
-      }
-
-      bound += (b + strlen(x[i - deg]) + 3)*len;
-   }
+    for (i = 0; i < nvars; i++)
+    {
+        bound += ((FLINT_BIT_COUNT(degs[i]) + 3)/3 + strlen(x[i]) + 3)*len;
+    }
 
    str = flint_malloc(bound);
    off = 0;

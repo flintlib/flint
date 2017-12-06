@@ -11,7 +11,8 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, slong nvars, const ordering_t ord, ulong modulus)
+void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, slong nvars,
+                                           const ordering_t ord, ulong modulus)
 {
     ctx->n = (ord == ORD_DEGLEX || ord == ORD_DEGREVLEX) ? nvars + 1 : nvars;
     ctx->ord = ord;

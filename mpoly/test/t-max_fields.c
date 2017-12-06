@@ -20,11 +20,11 @@ int
 main(void)
 {
     slong k, i, j, N, length, nfields, bits;
-    ulong * a, * b, *max, *max2;
+    ulong * a, * b, * max, * max2;
     ulong max_length, max_fields;
     FLINT_TEST_INIT(state);
 
-    flint_printf("max_degrees....");
+    flint_printf("max_fields....");
     fflush(stdout);
 
     max_length = 100;
@@ -56,8 +56,7 @@ main(void)
                 {
                     a[i + j] = n_randint(state, 0);
                     a[i + j] &= (UWORD(1) << (bits - 1)) - 1;
-                    max[nfields - j - 1] = FLINT_MAX(max[nfields - j - 1],
-                                                                     a[i + j]);
+                    max[j] = FLINT_MAX(max[j], a[i + j]);
                 }
             }
 
@@ -65,7 +64,7 @@ main(void)
             for (i = 0; i < length; i++)
                 mpoly_set_monomial(b + i*N, a + i*nfields, bits, nfields, 0, 0);
 
-            mpoly_max_degrees(max2, b, length, bits, nfields);
+            mpoly_max_fields_ui(max2, b, length, bits, nfields);
 
             for (i = 0; i < nfields; i++)
                 if (max[i] != max2[i])

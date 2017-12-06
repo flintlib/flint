@@ -453,10 +453,8 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
    slong i, bits, exp_bits, N, len = 0;
-   ulong * max_degs2;
-   ulong * max_degs3;
+   ulong max, * max_fields2, * max_fields3;
    ulong maskhi, masklo;
-   ulong max;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    int free2 = 0, free3 = 0;
 
@@ -472,27 +470,26 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_START;
 
-   /* compute maximum degree of any variable */
-   max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-   max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-
-   fmpz_mpoly_max_degrees(max_degs2, poly2, ctx);
-   fmpz_mpoly_max_degrees(max_degs3, poly3, ctx);
-
+   /* compute maximum fields in exponents */
+   max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+   max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+   mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+                                                          poly2->bits, ctx->n);
+   mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
+                                                          poly3->bits, ctx->n);
    max = 0;
-
    for (i = 0; i < ctx->n; i++)
    {
-      max_degs3[i] += max_degs2[i];
+      max_fields3[i] += max_fields2[i];
       /*check exponents won't overflow */
-      if (max_degs3[i] < max_degs2[i] || 0 > (slong) max_degs3[i]) 
+      if (max_fields3[i] < max_fields2[i] || 0 > (slong) max_fields3[i])
          flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_johnson");
 
-      if (max_degs3[i] > max)
-         max = max_degs3[i];
+      if (max_fields3[i] > max)
+         max = max_fields3[i];
    }
 
-   /* compute number of bits to store maximum degree */
+   /* compute number of bits to store maximum field */
    bits = FLINT_BIT_COUNT(max);
    if (bits >= FLINT_BITS)
       flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_johnson");

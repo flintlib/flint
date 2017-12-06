@@ -70,7 +70,7 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 {
     int deg, rev;
     slong len, N, exp_bits;
-    ulong max_exp, * max_deg, * exp2 = poly2->exps;
+    ulong max_exp, * max_fields, * exp2 = poly2->exps;
     int free2 = 0;
     TMP_INIT;
 
@@ -78,14 +78,14 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 
     degrev_from_ord(deg, rev, ctx->ord);
 
-    max_deg = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-
     /* compute bits required to represent result */
-    mpoly_max_degrees(max_deg, poly2->exps, poly2->length, poly2->bits, ctx->n);
-    max_exp = max_deg[rev ? var : ctx->n - 1 - deg - var];
+    max_fields = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    mpoly_max_fields_ui(max_fields, poly2->exps, poly2->length,
+                                                          poly2->bits, ctx->n);
+    max_exp = max_fields[rev ? ctx->n - 1 - deg - var: var];
     if (deg)
     {
-        max_exp = FLINT_MAX(max_exp, max_deg[ctx->n - 1]);
+        max_exp = FLINT_MAX(max_exp, max_fields[0]);
     }
     exp_bits = FLINT_MAX(WORD(8), 1 + FLINT_BIT_COUNT(max_exp + 1));
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
