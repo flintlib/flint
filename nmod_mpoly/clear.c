@@ -9,9 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_clear(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)

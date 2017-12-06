@@ -10,7 +10,6 @@
 */
 
 #include "nmod_mpoly.h"
-#include "assert.h"
 
 slong _nmod_mpoly_divides_monagan_pearce1(
                      mp_limb_t ** coeff1,      ulong ** exp1, slong * alloc,

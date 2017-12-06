@@ -130,33 +130,6 @@ slong fmpz_mpoly_degree(const fmpz_mpoly_t poly, slong var,
     Return the degree of \code{poly} with respect to the variable of index
     \code{var}. If \code{poly} is zero, the return is \code{-1}.
 
-void _fmpz_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
-                     slong len, slong bits, slong n, int deg, int rev, slong N)
-
-    Given an exponent array \code{exps} of length \code{len}, with $n$ fields
-    per exponent vector, each consisting of the given number of bits, fill a
-    preallocated array \code{max_degs} of length $n$ with the maximum degrees
-    encountered for each of the $n$ fields throughout \code{exps}. The
-    parameter \code{deg} should be set to 1 if the polynomial is deglex or
-    degrevlex, and \code{rev} should be set to 1 if the polynomial is revlex or
-    degrevlex. Each exponent vector is assumed to consist of $N$ words. The
-    variable with greatest significance with respect to the ordering
-    corresponds to the lowest index entry of the output array, after a possible
-    degree field in the case of deglex and degrevlex, i.e. the degree field if
-    it exists, corresponds to index 0 of the output array \code{max_degs}.
-
-void fmpz_mpoly_max_degrees(ulong * max_degs,
-                           const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Given a polynomial with $n$ fields per exponent vector, fill a
-    preallocated array \code{max_degs} with the maximum degrees encountered
-    for each of the $n$ fields throughout the exponent array of \code{poly}.
-    The variable with greatest significance with respect to the ordering
-    corresponds to the lowest index entry of the output array, after a possible
-    degree field in the case of deglex and degrevlex, i.e. the degree field if
-    it exists, corresponds to index 0 of the output array \code{max_degs}.
-
-
 void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
                                 slong bits, slong n, int deg, int rev, slong N)
 
