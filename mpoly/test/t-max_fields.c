@@ -56,8 +56,7 @@ main(void)
                 {
                     a[i + j] = n_randint(state, 0);
                     a[i + j] &= (UWORD(1) << (bits - 1)) - 1;
-                    max[nfields - j - 1] = FLINT_MAX(max[nfields - j - 1],
-                                                                     a[i + j]);
+                    max[j] = FLINT_MAX(max[j], a[i + j]);
                 }
             }
 
