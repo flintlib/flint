@@ -36,15 +36,23 @@
  extern "C" {
 #endif
 
-/*  Type definitions *********************************************************/
+/* Context object ************************************************************/
 
 typedef struct
 {
+    mpoly_ctx_t minfo;
    slong n;        /* number of elements in exponent vector (including deg) */
    ordering_t ord; /* polynomial ordering */
 } fmpz_mpoly_ctx_struct;
 
 typedef fmpz_mpoly_ctx_struct fmpz_mpoly_ctx_t[1];
+
+FLINT_DLL void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
+                                            slong nvars, const ordering_t ord);
+
+FLINT_DLL void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx);
+
+/*  Type definitions *********************************************************/
 
 typedef struct
 {
@@ -128,18 +136,6 @@ FLINT_DLL void fmpz_mpoly_geobucket_pow_inplace(fmpz_mpoly_geobucket_t B1,
 
 FLINT_DLL int fmpz_mpoly_geobucket_divides_inplace(fmpz_mpoly_geobucket_t B1,
                         fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
-
-
-/* Context object ************************************************************/
-
-FLINT_DLL void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
-                                            slong nvars, const ordering_t ord);
-
-FMPZ_MPOLY_INLINE
-void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx)
-{
-   /* nothing to be done at the moment */
-}
 
 /*  Memory management ********************************************************/
 
@@ -662,25 +658,24 @@ FLINT_DLL int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t poly, const char * str,
 
 FLINT_DLL char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
                           const ulong * exps, slong len, const char ** x, 
-                               slong bits, slong n, int deg, int rev, slong N);
+                                           slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
-                           const ulong * exps, slong len, const char ** x,
-                               slong bits, slong n, int deg, int rev, slong N);
+                        const ulong * exps, slong len, const char ** x_in,
+                                           slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file, 
          const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
 int _fmpz_mpoly_print_pretty(const fmpz * poly, 
-                const ulong * exps, slong len, const char ** x,
-                                slong bits, slong n, int deg, int rev, slong N)
+                       const ulong * exps, slong len, const char ** x,
+                                            slong bits, const mpoly_ctx_t mctx)
 {
-   return _fmpz_mpoly_fprint_pretty(stdout, poly, exps, len,
-                                                      x, bits, n, deg, rev, N);
+    return _fmpz_mpoly_fprint_pretty(stdout, poly, exps, len, x, bits, mctx);
 }
 
 FMPZ_MPOLY_INLINE

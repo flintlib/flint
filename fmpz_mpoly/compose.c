@@ -117,7 +117,7 @@ void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
     nvars = ctx1->n - deg;
     p_uexp = (ulong *) TMP_ALLOC(nvars*p_len*sizeof(ulong));
     for (i = 0; i < p_len; i++)
-        mpoly_get_monomial(p_uexp + nvars*i, p_exp + N*i, bits, ctx1->n, deg, rev);
+        mpoly_get_monomial(p_uexp + nvars*i, p_exp + N*i, bits, ctx1->minfo);
 
     counts = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
     mdegs = (ulong * ) TMP_ALLOC(nvars*sizeof(ulong));

@@ -19,16 +19,14 @@
 
 char *
 _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
-            const char ** x_in, slong bits, slong n, int deg, int rev, slong N)
+                        const char ** x_in, slong bits, const mpoly_ctx_t mctx)
 {
    char * str, ** x = (char **) x_in;
-   slong i, j, nvars, bound, off;
+   slong i, j, N, bound, off;
    ulong * degs;
    int first;
 
    TMP_INIT;
-
-   nvars = n - deg;
 
    if (len == 0)
    {
@@ -38,13 +36,15 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
       return str;
    }
 
+    N = mpoly_words_per_exp(bits, mctx);
+
    TMP_START;
 
    if (x == NULL)
    {
-      x = (char **) TMP_ALLOC(nvars*sizeof(char *));
+      x = (char **) TMP_ALLOC(mctx->nvars*sizeof(char *));
 
-      for (i = 0; i < nvars; i++)
+      for (i = 0; i < mctx->nvars; i++)
       {
          x[i] = (char *) TMP_ALLOC(22*sizeof(char));
          flint_sprintf(x[i], "x%wd", i + 1);
@@ -55,10 +55,10 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
    for (i = 0; i < len; i++) /* for each term */
       bound += fmpz_sizeinbase(poly + i, 10) + 1;
 
-    degs = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-    mpoly_degrees((slong *) degs, exps, len, bits, n, deg, rev);
+    degs = (ulong *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
+    mpoly_degrees((slong *) degs, exps, len, bits, mctx);
 
-    for (i = 0; i < nvars; i++)
+    for (i = 0; i < mctx->nvars; i++)
     {
         bound += ((FLINT_BIT_COUNT(degs[i]) + 3)/3 + strlen(x[i]) + 3)*len;
     }
@@ -80,11 +80,11 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
             off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(poly[i]));
       }
 
-      mpoly_get_monomial(degs, exps + i*N, bits, n, deg, rev);
+      mpoly_get_monomial(degs, exps + N*i, bits, mctx);
 
       first = 1;
 
-      for (j = 0; j < nvars; j++)
+      for (j = 0; j < mctx->nvars; j++)
       {
           if (degs[j] > 1)
           {
@@ -114,14 +114,6 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
 char *
 fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
 {
-   int deg, rev;
-
-   slong N = words_per_exp(ctx->n, poly->bits);
-
-   degrev_from_ord(deg, rev, ctx->ord);
-
    return _fmpz_mpoly_get_str_pretty(poly->coeffs, poly->exps,
-                             poly->length, x, poly->bits, ctx->n, deg, rev, N);
-
-   return 0; 
+                             poly->length, x, poly->bits, ctx->minfo);
 }

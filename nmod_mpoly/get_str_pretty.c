@@ -16,17 +16,15 @@
 
 char *
 _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len,
-            const char ** x_in, slong bits, slong nfields, int deg, int rev,
-                                               slong N, const nmodf_ctx_t fctx)
+                             const char ** x_in, slong bits,
+                                const mpoly_ctx_t mctx, const nmodf_ctx_t fctx)
 {
     char * str, ** x = (char **) x_in;
-    slong i, j, nvars, bound, off;
+    slong i, j, N, bound, off;
     ulong * degs;
     int first;
 
     TMP_INIT;
-
-    nvars = nfields - deg;
 
     if (len == 0)
     {
@@ -36,13 +34,14 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
         return str;
     }
 
+    N = mpoly_words_per_exp(bits, mctx);
+
     TMP_START;
 
     if (x == NULL)
     {
-        x = (char **) TMP_ALLOC(nvars*sizeof(char *));
-
-        for (i = 0; i < nvars; i++)
+        x = (char **) TMP_ALLOC(mctx->nvars*sizeof(char *));
+        for (i = 0; i < mctx->nvars; i++)
         {
             x[i] = (char *) TMP_ALLOC(22*sizeof(char));
             flint_sprintf(x[i], "x%wd", i + 1);
@@ -51,10 +50,10 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
 
     bound = 1 + len * ((FLINT_BIT_COUNT(fctx->mod.n) + 3)/3);
 
-    degs = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-    mpoly_degrees((slong *) degs, exp, len, bits, nfields, deg, rev);
+    degs = (ulong *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
+    mpoly_degrees((slong *) degs, exp, len, bits, mctx);
 
-    for (i = 0; i < nvars; i++)
+    for (i = 0; i < mctx->nvars; i++)
     {
         bound += ((FLINT_BIT_COUNT(degs[i]) + 3)/3 + strlen(x[i]) + 3)*len;
     }
@@ -75,9 +74,9 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
             off += flint_sprintf(str + off, "%wd", coeff[i]);
         }
 
-        mpoly_get_monomial(degs, exp + N*i, bits, nfields, deg, rev);
+        mpoly_get_monomial(degs, exp + N*i, bits, mctx);
 
-        for (j = 0; j < nvars; j++)
+        for (j = 0; j < mctx->nvars; j++)
         {
             if (degs[j] == 0)
                 continue;
@@ -109,13 +108,9 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
 }
 
 char *
-nmod_mpoly_get_str_pretty(const nmod_mpoly_t poly, const char ** x, const nmod_mpoly_ctx_t ctx)
+nmod_mpoly_get_str_pretty(const nmod_mpoly_t poly, const char ** x,
+                                                    const nmod_mpoly_ctx_t ctx)
 {
-   int deg, rev;
-
-   slong N = words_per_exp(ctx->n, poly->bits);
-   degrev_from_ord(deg, rev, ctx->ord);
-
    return _nmod_mpoly_get_str_pretty(poly->coeffs, poly->exps, poly->length,
-                              x, poly->bits, ctx->n, deg, rev, N, ctx->ffinfo);
+                                       x, poly->bits, ctx->minfo, ctx->ffinfo);
 }

@@ -39,6 +39,28 @@ typedef enum {
 
 #define MPOLY_NUM_ORDERINGS 3
 
+
+typedef struct
+{
+    slong nvars;    /* number of variables */
+    slong nfields;  /* number of fields in exponent vector */
+    ordering_t ord; /* monomial ordering */
+    int deg;        /* is ord a degree ordering? */
+    int rev;        /* is ord a reversed ordering? */
+} mpoly_ctx_struct;
+
+typedef mpoly_ctx_struct mpoly_ctx_t[1];
+
+FLINT_DLL void mpoly_ctx_init(mpoly_ctx_t ctx, slong nvars, const ordering_t ord);
+
+FLINT_DLL void mpoly_ctx_clear(mpoly_ctx_t mctx);
+
+MPOLY_INLINE slong mpoly_words_per_exp(slong bits, const mpoly_ctx_t mctx)
+{
+    return (((mctx->nfields) - 1)/(FLINT_BITS/(bits)) + 1);
+}
+
+
 /* heaps *********************************************************************/
 typedef struct mpoly_heap_t
 {
@@ -525,7 +547,7 @@ FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits,
                                                      slong nfields, slong len);
 
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
-                                        slong bits, slong n, int deg, int rev);
+                                           slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_set_monomial(ulong * exp1, const ulong * exp2,
                                         slong bits, slong n, int deg, int rev);
@@ -550,7 +572,7 @@ FLINT_DLL void mpoly_max_fields_ui_backwards(ulong * max_fields, const ulong * p
                                          slong len, slong bits, slong nfields);
 
 FLINT_DLL void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
-                       slong len, slong bits, slong nfields, int deg, int rev);
+                                slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_search_monomials(
                 slong ** e_ind, ulong * e, slong * e_score,

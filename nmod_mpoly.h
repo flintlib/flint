@@ -71,6 +71,7 @@ void nmodf_ctx_clear(nmodf_ctx_t ctx)
 typedef struct
 {
     nmodf_ctx_t ffinfo;
+    mpoly_ctx_t minfo;
     slong n;        /* number of elements in exponent vector (including deg) */
     ordering_t ord; /* polynomial ordering */
 } nmod_mpoly_ctx_struct;
@@ -505,7 +506,7 @@ FLINT_DLL char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t poly,
 
 FLINT_DLL int _nmod_mpoly_fprint_pretty(FILE * file, const ulong * poly, 
                            const ulong * exps, slong len, const char ** x,
-             slong bits, slong n, int deg, int rev, slong N, const nmodf_ctx_t fctx);
+                   slong bits, const mpoly_ctx_t mctx, const nmodf_ctx_t fctx);
 
 FLINT_DLL int nmod_mpoly_fprint_pretty(FILE * file, 
          const nmod_mpoly_t poly, const char ** x, const nmod_mpoly_ctx_t ctx);
@@ -513,10 +514,9 @@ FLINT_DLL int nmod_mpoly_fprint_pretty(FILE * file,
 NMOD_MPOLY_INLINE
 int _nmod_mpoly_print_pretty(const ulong * poly, 
                 const ulong * exps, slong len, const char ** x,
-              slong bits, slong n, int deg, int rev, slong N, const nmodf_ctx_t fctx)
+                    slong bits, const mpoly_ctx_t mctx, const nmodf_ctx_t fctx)
 {
-   return _nmod_mpoly_fprint_pretty(stdout, poly, exps, len,
-                                    x, bits, n, deg, rev, N, fctx);
+   return _nmod_mpoly_fprint_pretty(stdout, poly, exps, len, x, bits, mctx, fctx);
 }
 
 NMOD_MPOLY_INLINE

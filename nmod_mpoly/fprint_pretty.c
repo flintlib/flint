@@ -18,10 +18,10 @@
 
 int
 _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * exp,
-        slong len, const char ** x_in,  slong bits,
-            slong n, int deg, int rev, slong N, const nmodf_ctx_t fctx)
+                        slong len, const char ** x_in,  slong bits,
+                                const mpoly_ctx_t mctx, const nmodf_ctx_t fctx)
 {
-    slong i, j, nvars;
+    slong i, j, N;
     ulong * degs;
     int r = 0, first;
     char ** x = (char **) x_in;
@@ -35,21 +35,21 @@ _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * ex
         return r;
     }
 
-    TMP_START;
+    N = mpoly_words_per_exp(bits, mctx);
 
-    nvars = n - deg;
+    TMP_START;
 
     if (x == NULL)
     {
-        x = (char **) TMP_ALLOC(nvars*sizeof(char *));
-        for (i = 0; i < nvars; i++)
+        x = (char **) TMP_ALLOC(mctx->nvars*sizeof(char *));
+        for (i = 0; i < mctx->nvars; i++)
         {
             x[i] = (char *) TMP_ALLOC(((FLINT_BITS+4)/3)*sizeof(char));
             flint_sprintf(x[i], "x%wd", i + 1);
         }
     }
 
-    degs = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+    degs = (ulong *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
    
     for (i = 0; i < len; i++)
     {
@@ -67,9 +67,9 @@ _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * ex
             if (r <= 0) goto done;
         }
 
-        mpoly_get_monomial(degs, exp + i*N, bits, n, deg, rev);
+        mpoly_get_monomial(degs, exp + N*i, bits, mctx);
 
-        for (j = 0; j < nvars; j++)
+        for (j = 0; j < mctx->nvars; j++)
         {
             if (degs[j] == 0)
                 continue;
@@ -105,11 +105,6 @@ int
 nmod_mpoly_fprint_pretty(FILE * file, const nmod_mpoly_t poly,
                                    const char ** x, const nmod_mpoly_ctx_t ctx)
 {
-   int deg, rev;
-   slong N = words_per_exp(ctx->n, poly->bits);
-   degrev_from_ord(deg, rev, ctx->ord);
-
    return _nmod_mpoly_fprint_pretty(file, poly->coeffs, poly->exps,
-                poly->length, x, poly->bits, ctx->n, deg, rev, N, ctx->ffinfo);
-
+                         poly->length, x, poly->bits, ctx->minfo, ctx->ffinfo);
 }
