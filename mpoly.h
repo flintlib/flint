@@ -39,6 +39,7 @@ typedef enum {
 
 #define MPOLY_NUM_ORDERINGS 3
 
+/* context *******************************************************************/
 
 typedef struct
 {
@@ -59,7 +60,6 @@ MPOLY_INLINE slong mpoly_words_per_exp(slong bits, const mpoly_ctx_t mctx)
 {
     return (((mctx->nfields) - 1)/(FLINT_BITS/(bits)) + 1);
 }
-
 
 /* heaps *********************************************************************/
 typedef struct mpoly_heap_t
@@ -549,8 +549,8 @@ FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits,
 FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
                                            slong bits, const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_set_monomial(ulong * exp1, const ulong * exp2,
-                                        slong bits, slong n, int deg, int rev);
+FLINT_DLL void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2,
+                                           slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_unpack_monomials(ulong * exps1, slong bits1,
                        const ulong * exps2, slong bits2, slong len, slong num);

@@ -44,7 +44,7 @@ void fmpz_mpoly_set_term_ui(fmpz_mpoly_t poly,
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
    /* pack exponent vector */
-   mpoly_set_monomial(packed_exp, exp, poly->bits, ctx->n, deg, rev);
+   mpoly_set_monomial_ui(packed_exp, exp, poly->bits, ctx->minfo);
        
    /* work out at what index term should be placed */
    exists = mpoly_monomial_exists(&index, poly->exps,

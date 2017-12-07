@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2017 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -44,7 +45,7 @@ ulong fmpz_mpoly_get_term_ui(const fmpz_mpoly_t poly,
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
    /* pack exponent vector */
-   mpoly_set_monomial(packed_exp, exp, poly->bits, ctx->n, deg, rev);
+   mpoly_set_monomial_ui(packed_exp, exp, poly->bits, ctx->minfo);
 
    /* work out at what index term is */
    exists = mpoly_monomial_exists(&index, poly->exps,

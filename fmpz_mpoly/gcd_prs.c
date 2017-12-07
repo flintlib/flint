@@ -22,7 +22,6 @@
 void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
                           const fmpz_mpoly_t polyB, const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev;
     slong i, N, bits;
     ulong * texpA, * texpB, * exps;
     ulong mask;
@@ -42,7 +41,6 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
 
     bits = FLINT_MAX(polyA->bits, polyB->bits);
     N = words_per_exp(ctx->n, bits);
-    degrev_from_ord(deg, rev, ctx->ord);
     mask = 0;
     for (i = 0; i < FLINT_BITS/bits; i++)
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
@@ -55,7 +53,7 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     fmpz_mpoly_fit_length(poly1, 1, ctx);
     fmpz_mpoly_fit_bits(poly1, bits, ctx);
     poly1->bits = bits;
-    mpoly_set_monomial(poly1->exps + N*0, exps, bits, ctx->n, deg, rev);
+    mpoly_set_monomial_ui(poly1->exps + N*0, exps, bits, ctx->minfo);
     fmpz_set(poly1->coeffs + 0, igcd);
     _fmpz_mpoly_set_length(poly1, 1, ctx);
 

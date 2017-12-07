@@ -9,18 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "assert.h"
 
 
 void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev;
     slong bits, nfields;
     slong i, N;
     ulong * pmin, * exps, mask;
@@ -35,7 +29,6 @@ void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
     bits = poly2->bits;
     nfields = ctx->n;
-    degrev_from_ord(deg, rev, ctx->ord);
 
     TMP_START;
 
@@ -61,7 +54,7 @@ void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     fmpz_mpoly_fit_length(poly1, 1, ctx);
     fmpz_mpoly_fit_bits(poly1, bits, ctx);
     poly1->bits = bits;
-    mpoly_set_monomial(poly1->exps + N*0, exps, bits, ctx->n, deg, rev);
+    mpoly_set_monomial_ui(poly1->exps + N*0, exps, bits, ctx->minfo);
     fmpz_set(poly1->coeffs + 0, igcd);
     _fmpz_mpoly_set_length(poly1, 1, ctx);
 

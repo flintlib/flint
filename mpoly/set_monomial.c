@@ -9,15 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
 #include "mpoly.h"
 
 
-void mpoly_set_monomial(ulong * poly_exps, const ulong * user_exps,
-                                   slong bits, slong nfields, int deg, int rev)
+void mpoly_set_monomial_ui(ulong * poly_exps, const ulong * user_exps,
+                                            slong bits, const mpoly_ctx_t mctx)
 {
+    slong nfields = mctx->nfields;
+    int deg = mctx->deg, rev = mctx->rev;
     slong i = 0;
     ulong * tmp_exps, degree = 0;
     TMP_INIT;

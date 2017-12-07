@@ -30,7 +30,7 @@ void nmod_mpoly_gen(nmod_mpoly_t poly, slong i, const nmod_mpoly_ctx_t ctx)
     mon = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
     for (j = 0; j < nvars; j++)
        mon[j] = (j == i);
-    mpoly_set_monomial(poly->exps, mon, poly->bits, ctx->n, deg, rev);
+    mpoly_set_monomial_ui(poly->exps, mon, poly->bits, ctx->minfo);
 
     TMP_END;
 

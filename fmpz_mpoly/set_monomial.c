@@ -39,7 +39,7 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
 
    fmpz_mpoly_fit_length(poly, n + 1, ctx);
 
-   mpoly_set_monomial(poly->exps + n*N, exp, poly->bits, ctx->n, deg, rev);
+   mpoly_set_monomial_ui(poly->exps + N*n, exp, poly->bits, ctx->minfo);
 
    _fmpz_mpoly_set_length(poly, FLINT_MAX(n + 1, poly->length), ctx);
 }
