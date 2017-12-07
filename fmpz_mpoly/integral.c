@@ -81,7 +81,7 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
     /* compute bits required to represent result */
     max_fields = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
     mpoly_max_fields_ui(max_fields, poly2->exps, poly2->length,
-                                                          poly2->bits, ctx->n);
+                                                      poly2->bits, ctx->minfo);
     max_exp = max_fields[rev ? ctx->n - 1 - deg - var: var];
     if (deg)
     {

@@ -59,7 +59,8 @@ void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     TMP_START;
 
     max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length, poly2->bits, ctx->n);
+    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+                                                      poly2->bits, ctx->minfo);
     max = 0;
     for (i = 0; i < ctx->n; i++)
     {

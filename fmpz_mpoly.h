@@ -193,17 +193,14 @@ FMPZ_MPOLY_INLINE
 void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
                                         slong bits, const fmpz_mpoly_ctx_t ctx)
 {
-   slong N;
-   ulong * t;
-
    FLINT_ASSERT(bits <= FLINT_BITS);
 
    if (poly->bits < bits)
    {
       if (poly->alloc != 0)
       {
-         N = words_per_exp(ctx->n, bits);
-         t = flint_malloc(N*poly->alloc*sizeof(ulong));
+         slong N = mpoly_words_per_exp(bits, ctx->minfo);
+         ulong * t = flint_malloc(N*poly->alloc*sizeof(ulong));
          mpoly_unpack_monomials(t, bits, poly->exps,
                                              poly->bits, poly->length, ctx->n);
          flint_free(poly->exps);

@@ -566,10 +566,10 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
             const ulong * exp, slong len, slong N, ulong maskhi, ulong masklo);
 
 FLINT_DLL void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
-                                         slong len, slong bits, slong nfields);
+                                slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_max_fields_ui_backwards(ulong * max_fields, const ulong * poly_exps,
-                                         slong len, slong bits, slong nfields);
+                                slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);

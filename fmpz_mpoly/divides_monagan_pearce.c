@@ -630,9 +630,9 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
     max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
     max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
     mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
-                                                          poly2->bits, ctx->n);
+                                                      poly2->bits, ctx->minfo);
     mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
-                                                          poly3->bits, ctx->n);
+                                                      poly3->bits, ctx->minfo);
 
     for (i = 0; i < ctx->n; i++)
     {

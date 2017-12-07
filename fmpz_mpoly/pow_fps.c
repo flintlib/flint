@@ -640,7 +640,7 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
     max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
     mpoly_max_fields_ui(max_degs2, poly2->exps, poly2->length,
-                                                          poly2->bits, ctx->n);
+                                                      poly2->bits, ctx->minfo);
     max = 0;
     for (i = 0; i < ctx->n; i++)
     {
