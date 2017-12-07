@@ -23,9 +23,11 @@
     exps1 = destination for unpacked vector
     bits1 = number of bits desired in return packed vector
 */
-void mpoly_unpack_monomials(ulong * exps1, slong bits1,
-                   const ulong * exps2, slong bits2, slong len, slong nfields)
+void mpoly_repack_monomials(ulong * exps1, slong bits1,
+                      const ulong * exps2, slong bits2, slong len,
+                                                        const mpoly_ctx_t mctx)
 {
+    slong nfields = mctx->nfields;
     slong i, N2 = words_per_exp(nfields, bits2);
     slong    N1 = words_per_exp(nfields, bits1);
     ulong * tmp_exps;

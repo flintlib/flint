@@ -285,9 +285,9 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         {
             poly2_exps[i] = (ulong *) flint_malloc(
                                   N*(poly2->coeffs + i)->length*sizeof(ulong));
-            mpoly_unpack_monomials(poly2_exps[i], bits,
+            mpoly_repack_monomials(poly2_exps[i], bits,
                     (poly2->coeffs + i)->exps, (poly2->coeffs + i)->bits,
-                                          (poly2->coeffs + i)->length, ctx->n);
+                                      (poly2->coeffs + i)->length, ctx->minfo);
         }
     }
 

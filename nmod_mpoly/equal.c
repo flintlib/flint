@@ -54,16 +54,16 @@ int nmod_mpoly_equal(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     {
         free1 = 1;
         ptr1 = (ulong *) flint_malloc(N*poly1->length*sizeof(ulong));
-        mpoly_unpack_monomials(ptr1, max_bits, poly1->exps, poly1->bits,
-                                                        poly1->length, ctx->n);
+        mpoly_repack_monomials(ptr1, max_bits, poly1->exps, poly1->bits,
+                                                    poly1->length, ctx->minfo);
     }
 
     if (max_bits > poly2->bits)
     {
         free2 = 1;
         ptr2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_unpack_monomials(ptr2, max_bits, poly2->exps, poly2->bits,
-                                                        poly2->length, ctx->n);
+        mpoly_repack_monomials(ptr2, max_bits, poly2->exps, poly2->bits,
+                                                    poly2->length, ctx->minfo);
     }
 
     r = _nmod_mpoly_equal(poly1->coeffs, ptr1,

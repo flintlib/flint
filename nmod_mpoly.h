@@ -221,8 +221,8 @@ void nmod_mpoly_fit_bits(nmod_mpoly_t poly,
       {
          N = words_per_exp(ctx->n, bits);
          t = flint_malloc(N*poly->alloc*sizeof(ulong));
-         mpoly_unpack_monomials(t, bits, poly->exps,
-                                             poly->bits, poly->length, ctx->n);
+         mpoly_repack_monomials(t, bits, poly->exps,
+                                         poly->bits, poly->length, ctx->minfo);
          flint_free(poly->exps);
          poly->exps = t;
       }
@@ -573,8 +573,8 @@ void nmod_mpoly_test(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
 
 
 /*
-   test that r is a valid remainder upon division by g over Q
-   this means that no term of r is divisible by lt(g)
+   test that r is a valid remainder upon division by g
+   this means that no monomial of r is divisible by lm(g)
 */
 NMOD_MPOLY_INLINE
 void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
@@ -595,8 +595,8 @@ void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
 
    rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
    gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
-   mpoly_unpack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->n);
-   mpoly_unpack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->n);
+   mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
+   mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
 
    /* mask with high bit set in each field of exponent vector */
    for (i = 0; i < FLINT_BITS/bits; i++)

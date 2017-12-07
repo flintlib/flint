@@ -83,8 +83,8 @@ void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     {
         free2 = 1;
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
-                                                        poly2->length, ctx->n);
+        mpoly_repack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                    poly2->length, ctx->minfo);
     }
 
     nmod_mpoly_fit_length(poly1, 1, ctx);

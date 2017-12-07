@@ -101,8 +101,8 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
     {
         free2 = 1;
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
-                                                        poly2->length, ctx->n);
+        mpoly_repack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                    poly2->length, ctx->minfo);
     }
 
     /* deal with aliasing and do integration */

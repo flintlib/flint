@@ -68,21 +68,29 @@ main(void)
         {
         for (bits2 = bits1; bits2 <= FLINT_BITS; bits2 += 1)
         {
+
+            mpoly_ctx_t mctx;
+
+
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, max_fields) + 1;
+
+            mpoly_ctx_init(mctx, nfields, ORD_LEX);
+
+
             N = words_per_exp(nfields, bits1);
             for (i = 0; i < length*nfields; i++)
                 a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1);
 
             /* FLINT_BITS => bits1 */
             for (i = 0; i < length; i++)
-                mpoly_set_monomial(b + i*N, a + i*nfields, bits1, nfields, 0, 0);
+                mpoly_set_monomial_ui(b + i*N, a + i*nfields, bits1, mctx);
 
             /* bits1 => bit2 */
-            mpoly_unpack_monomials(c, bits2, b, bits1, length, nfields);
+            mpoly_repack_monomials(c, bits2, b, bits1, length, mctx);
 
             /* bits2 => FLINT_BITS */
-            mpoly_unpack_monomials(d, FLINT_BITS, c, bits2, length, nfields);
+            mpoly_repack_monomials(d, FLINT_BITS, c, bits2, length, mctx);
 
             for (i = 0; i < length*nfields; i++)
                 if (a[i] != d[i])
@@ -91,6 +99,8 @@ main(void)
                     flint_printf("bits1 = %wd, bits2 = %wd\n", bits1, bits2);
                     flint_abort();
                 }
+
+            mpoly_ctx_clear(mctx);
         }
         }
     }

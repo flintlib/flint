@@ -84,8 +84,8 @@ main(void)
         t2 = (slong *) flint_malloc(f->length*N*sizeof(slong));
         t3 = (slong *) flint_malloc(f->length*N*sizeof(slong));
 
-        mpoly_unpack_monomials(fexp, fg_bits, f->exps, f->bits, f->length, ctx->n);
-        mpoly_unpack_monomials(gexp, fg_bits, g->exps, g->bits, g->length, ctx->n);
+        mpoly_repack_monomials(fexp, fg_bits, f->exps, f->bits, f->length, ctx->minfo);
+        mpoly_repack_monomials(gexp, fg_bits, g->exps, g->bits, g->length, ctx->minfo);
 
         lower = n_randint(state, f->length*g->length);
         upper = n_randint(state, f->length*g->length);

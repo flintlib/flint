@@ -46,8 +46,12 @@ main(void)
         for (bits1 = 8; bits1 <= FLINT_BITS; bits1 *= 2)
         for (bits2 = bits1; bits2 <= FLINT_BITS; bits2 *= 2)
         {
+            mpoly_ctx_t mctx;
+
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, FLINT_BITS/FLINT_MAX(bits1, bits2)) + 1;
+
+            mpoly_ctx_init(mctx, nfields, ORD_LEX);
 
             for (j = 0; j < nfields; j++)
                 bases[j] =  n_randint(state, 200) + 1;
@@ -58,7 +62,7 @@ main(void)
 
             /* FLINT_BITS => bits1 */
             for (i = 0; i < length; i++)
-                mpoly_set_monomial(b + i, a + i*nfields, bits1, nfields, 0, 0);
+                mpoly_set_monomial_ui(b + i, a + i*nfields, bits1, mctx);
 
             /* bits1 => tight packing */
             mpoly_pack_monomials_tight(t, b, length, bases, nfields, 0, bits1);
@@ -67,7 +71,7 @@ main(void)
             mpoly_unpack_monomials_tight(c, t, length, bases, nfields, 0, bits2);
 
             /* bits2 => FLINT_BITS */
-            mpoly_unpack_monomials(d, FLINT_BITS, c, bits2, length, nfields);
+            mpoly_repack_monomials(d, FLINT_BITS, c, bits2, length, mctx);
 
             for (i = 0; i < length*nfields; i++)
                 if (a[i] != d[i])
@@ -77,6 +81,7 @@ main(void)
                     flint_abort();
                 }
 
+            mpoly_ctx_clear(mctx);
         }
     }
 

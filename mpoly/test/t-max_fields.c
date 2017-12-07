@@ -43,8 +43,12 @@ main(void)
         */
         for (bits = 8; bits <= FLINT_BITS; bits += 1)
         {
+            mpoly_ctx_t mctx;
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, max_fields) + 1;
+
+            mpoly_ctx_init(mctx, nfields, ORD_LEX);
+
             N = words_per_exp(nfields, bits);
 
             for (j = 0; j < nfields; j++)
@@ -62,9 +66,9 @@ main(void)
 
             /* FLINT_BITS => bits */
             for (i = 0; i < length; i++)
-                mpoly_set_monomial(b + i*N, a + i*nfields, bits, nfields, 0, 0);
+                mpoly_set_monomial_ui(b + i*N, a + i*nfields, bits, mctx);
 
-            mpoly_max_fields_ui(max2, b, length, bits, nfields);
+            mpoly_max_fields_ui(max2, b, length, bits, mctx);
 
             for (i = 0; i < nfields; i++)
                 if (max[i] != max2[i])

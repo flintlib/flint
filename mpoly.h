@@ -552,8 +552,9 @@ FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
 FLINT_DLL void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2,
                                            slong bits, const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_unpack_monomials(ulong * exps1, slong bits1,
-                       const ulong * exps2, slong bits2, slong len, slong num);
+FLINT_DLL void mpoly_repack_monomials(ulong * exps1, slong bits1,
+                                const ulong * exps2, slong bits2, slong len,
+                                                       const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_pack_monomials_tight(ulong * exp1,
                   const ulong * exp2, slong len, const slong * mults, 

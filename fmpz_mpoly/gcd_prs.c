@@ -45,8 +45,8 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     for (i = 0; i < FLINT_BITS/bits; i++)
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-    mpoly_unpack_monomials(texpA, bits, polyA->exps, polyA->bits, 1, ctx->n);
-    mpoly_unpack_monomials(texpB, bits, polyB->exps, polyB->bits, 1, ctx->n);
+    mpoly_repack_monomials(texpA, bits, polyA->exps, polyA->bits, 1, ctx->minfo);
+    mpoly_repack_monomials(texpB, bits, polyB->exps, polyB->bits, 1, ctx->minfo);
     mpoly_monomial_min(texpA, texpA, texpB, bits, N, mask);
     mpoly_get_monomial(exps, texpA, bits, ctx->minfo);
     
