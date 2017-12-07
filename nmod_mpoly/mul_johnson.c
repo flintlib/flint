@@ -301,14 +301,14 @@ void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 
     TMP_START;
 
-    max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
     mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
     max = 0;
-    for (i = 0; i < ctx->n; i++)
+    for (i = 0; i < ctx->minfo->nfields; i++)
     {
         max_fields3[i] += max_fields2[i];
         if (max_fields3[i] < max_fields2[i] || 0 > (slong) max_fields3[i])
@@ -326,10 +326,10 @@ void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     exp_bits = FLINT_MAX(WORD(8), bits + 1); /* extra bit required for signs */
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = FLINT_MAX(exp_bits, poly3->bits);
-    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+    exp_bits = mpoly_optimize_bits(exp_bits, ctx->minfo->nfields);
 
-    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-    N = words_per_exp(ctx->n, exp_bits);
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->minfo->ord);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (exp_bits > poly2->bits)

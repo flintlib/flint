@@ -9,60 +9,53 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
-                         const fmpz * coeff2, const ulong * exp2, slong len,
-                slong var, int deg, int rev, slong nfields, slong bits, slong N)
+                       const fmpz * coeff2, const ulong * exp2, slong len2,
+     slong var, slong bits, slong N, slong offset, slong shift, ulong * oneexp)
 {
-    slong off, shift, fpw, i, k = 0;
-    ulong c, mask;
-    ulong*one;
-    TMP_INIT;
-
-    TMP_START;
-
-    fpw = FLINT_BITS/bits;
-    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    mpoly_off_shift(&off, &shift, var, deg, rev, fpw, nfields, bits);
-    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_univar_exp(one, var, deg, N, off, shift, fpw, bits);
+    slong i, len1;
 
     /* x^c -> c*x^(c-1) */
-    for (i = 0; i < len; i++)
+    len1 = 0;
+    for (i = 0; i < len2; i++)
     {
-        c = (exp2[N*i + off] >> shift) & mask;
+        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+        ulong c = (exp2[N*i + offset] >> shift) & mask;
         if (c != 0)
         {
-            mpoly_monomial_sub(exp1 + N*k, exp2 + N*i, one, N);
-            fmpz_mul_ui(coeff1 + k, coeff2 + i, c);
-            k++;
+            mpoly_monomial_sub(exp1 + N*len1, exp2 + N*i, oneexp, N);
+            fmpz_mul_ui(coeff1 + len1, coeff2 + i, c);
+            len1++;
         }
     }
-    TMP_END;
-    return k;
+
+    return len1;
 }
 
 void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                          slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev;
-    slong N, len;
+    slong bits, N, offset, shift;
+    ulong * oneexp;
+    slong len1;
+    TMP_INIT;
 
-    N = words_per_exp(ctx->n, poly2->bits);
-    degrev_from_ord(deg, rev, ctx->ord);
-
+    TMP_START;
+    bits = poly2->bits;
     fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
-    fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
-    poly1->bits = poly2->bits;
+    fmpz_mpoly_fit_bits(poly1, bits, ctx);
+    poly1->bits = bits;
 
-    len = _fmpz_mpoly_derivative(poly1->coeffs, poly1->exps,
-                   poly2->coeffs, poly2->exps, poly2->length,
-                        var, deg, rev, ctx->n, poly2->bits, N);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
+    oneexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift,
+                                                     var, N, bits, ctx->minfo);
 
-    _fmpz_mpoly_set_length(poly1, len, ctx);
+    len1 = _fmpz_mpoly_derivative(poly1->coeffs, poly1->exps,
+                                  poly2->coeffs, poly2->exps, poly2->length,
+                                          var, bits, N, offset, shift, oneexp);
+
+    _fmpz_mpoly_set_length(poly1, len1, ctx);
 }

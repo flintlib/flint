@@ -40,6 +40,7 @@
 #endif
 
 
+
 /* all of the data we need to do arithmetic mod n */
 
 typedef struct
@@ -72,8 +73,8 @@ typedef struct
 {
     nmodf_ctx_t ffinfo;
     mpoly_ctx_t minfo;
-    slong n;        /* number of elements in exponent vector (including deg) */
-    ordering_t ord; /* polynomial ordering */
+    ordering_t ord;
+    slong n;
 } nmod_mpoly_ctx_struct;
 
 typedef nmod_mpoly_ctx_struct nmod_mpoly_ctx_t[1];
@@ -219,7 +220,7 @@ void nmod_mpoly_fit_bits(nmod_mpoly_t poly,
    {
       if (poly->alloc != 0)
       {
-         N = words_per_exp(ctx->n, bits);
+         N = mpoly_words_per_exp(bits, ctx->minfo);
          t = flint_malloc(N*poly->alloc*sizeof(ulong));
          mpoly_repack_monomials(t, bits, poly->exps,
                                          poly->bits, poly->length, ctx->minfo);
@@ -557,8 +558,8 @@ void nmod_mpoly_test(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
    slong i, N;
    ulong maskhi, masklo;
 
-   masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = words_per_exp(ctx->n, poly->bits);
+   N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+   masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->minfo->ord);
 
    if (!mpoly_monomials_test(poly->exps, poly->length, N, maskhi, masklo))
       flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
@@ -585,7 +586,7 @@ void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
    ulong * rexp, * gexp;
 
    bits = FLINT_MAX(r->bits, g->bits);
-   N = words_per_exp(ctx->n, bits);
+   N = mpoly_words_per_exp(bits, ctx->minfo);
 
    if (g->length == 0 )
       flint_throw(FLINT_ERROR, "Zero denominator in remainder test");

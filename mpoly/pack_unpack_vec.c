@@ -1,7 +1,19 @@
+/*
+    Copyright (C) 2017 Daniel Schultz
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
 #include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "mpoly.h"
+
 
 /* maximize "bits" while keeping "(nfields-1)/(FLINT_BITS/bits)+1" constant */
 slong mpoly_optimize_bits(slong bits, slong nfields) {
@@ -14,7 +26,6 @@ slong mpoly_optimize_bits(slong bits, slong nfields) {
 
     return bits;
 }
-
 
 
 void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {

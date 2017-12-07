@@ -124,8 +124,8 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     int free2 = 0, free3 = 0;
 
     max_bits = FLINT_MAX(poly2->bits, poly3->bits);
-    masks_from_bits_ord(maskhi, masklo, max_bits, ctx->ord);
-    N = words_per_exp(ctx->n, max_bits);
+    N = mpoly_words_per_exp(max_bits, ctx->minfo);
+    masks_from_bits_ord(maskhi, masklo, max_bits, ctx->minfo->ord);
 
     if (poly2->length == 0)
     {

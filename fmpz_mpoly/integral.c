@@ -16,31 +16,23 @@
 #include "fmpz_mpoly.h"
 
 slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
-                         const fmpz * coeff2, const ulong * exp2, slong len,
-                slong var, int deg, int rev, slong nfields, slong bits, slong N)
+                         const fmpz * coeff2, const ulong * exp2, slong len2,
+     slong var, slong bits, slong N, slong offset, slong shift, ulong * oneexp)
 {
-    slong off, shift, fpw, i;
+    slong i;
     ulong c, mask;
-    ulong * one;
     fmpz_t d, g;
-    TMP_INIT;
-
-    TMP_START;
 
     fmpz_init(d);
     fmpz_init(g);
-    fmpz_set_si(s, WORD(1));
+    fmpz_set_ui(s, WORD(1));
 
-    fpw = FLINT_BITS/bits;
-    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    mpoly_off_shift(&off, &shift, var, deg, rev, fpw, nfields, bits);
-    one = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_univar_exp(one, var, deg, N, off, shift, fpw, bits);
+    mask = (-UWORD(1)) >> (FLINT_BITS - bits);        
 
     /* scan once to find required denominator */
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len2; i++)
     {
-        c = (exp2[N*i + off] >> shift) & mask;
+        c = (exp2[N*i + offset] >> shift) & mask;
         fmpz_set_ui(d, c + 1);
         fmpz_gcd(g, d, coeff2 + i);
         fmpz_divexact(d, d, g);
@@ -49,10 +41,10 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
 
     /* then scan again to compute the terms */
     /* x^c -> x^(c+1)/(c+1) */
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len2; i++)
     {
-        c = (exp2[N*i + off] >> shift) & mask;
-        mpoly_monomial_add(exp1 + N*i, exp2 + N*i, one, N);
+        c = (exp2[N*i + offset] >> shift) & mask;
+        mpoly_monomial_add(exp1 + N*i, exp2 + N*i, oneexp, N);
         fmpz_set_ui(d, c + 1);
         fmpz_mul(g, coeff2 + i, s);
         fmpz_mul(coeff1 + i, coeff2 + i, g);
@@ -61,40 +53,42 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
 
     fmpz_clear(g);
     fmpz_clear(d);
-    TMP_END;
-    return len;
+    return len2;
 }
 
 void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
                const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev;
-    slong len, N, exp_bits;
-    ulong max_exp, * max_fields, * exp2 = poly2->exps;
+    slong i, len1, N, offset, shift, exp_bits;
+    ulong max_field, * oneexp, * gen_fields, * max_fields, * exp2 = poly2->exps;
     int free2 = 0;
     TMP_INIT;
 
     TMP_START;
 
-    degrev_from_ord(deg, rev, ctx->ord);
-
     /* compute bits required to represent result */
-    max_fields = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    gen_fields = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    max_fields = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    mpoly_gen_fields_ui(gen_fields, var, ctx->minfo);
     mpoly_max_fields_ui(max_fields, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
-    max_exp = max_fields[rev ? ctx->n - 1 - deg - var: var];
-    if (deg)
-    {
-        max_exp = FLINT_MAX(max_exp, max_fields[0]);
-    }
-    exp_bits = FLINT_MAX(WORD(8), 1 + FLINT_BIT_COUNT(max_exp + 1));
+    max_field = 0;
+    for (i = 0; i < ctx->minfo->nfields; i++)
+        max_field = FLINT_MAX(max_field, gen_fields[i] + max_fields[i]);
+
+    exp_bits = FLINT_MAX(WORD(8), 1 + FLINT_BIT_COUNT(max_field));
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     if (exp_bits > FLINT_BITS)
     {
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_integrate");
     }
     exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
-    N = words_per_exp(ctx->n, exp_bits);
+
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+
+    oneexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift,
+                                                 var, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (exp_bits > poly2->bits)
@@ -114,10 +108,10 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
         fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
         temp->bits = exp_bits;
 
-        len = _fmpz_mpoly_integral(scale, temp->coeffs, temp->exps,
-                       poly2->coeffs, exp2, poly2->length,
-                            var, deg, rev, ctx->n, exp_bits, N);
-        _fmpz_mpoly_set_length(temp, len, ctx);
+        len1 = _fmpz_mpoly_integral(scale, temp->coeffs, temp->exps,
+                                          poly2->coeffs, exp2, poly2->length,
+                                      var, exp_bits, N, offset, shift, oneexp);
+        _fmpz_mpoly_set_length(temp, len1, ctx);
 
         fmpz_mpoly_swap(temp, poly1, ctx);
         fmpz_mpoly_clear(temp, ctx);
@@ -127,10 +121,10 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
         fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
         poly1->bits = exp_bits;
 
-        len = _fmpz_mpoly_integral(scale, poly1->coeffs, poly1->exps,
-                       poly2->coeffs, exp2, poly2->length,
-                            var, deg, rev, ctx->n, exp_bits, N);
-        _fmpz_mpoly_set_length(poly1, len, ctx);
+        len1 = _fmpz_mpoly_integral(scale, poly1->coeffs, poly1->exps,
+                                           poly2->coeffs, exp2, poly2->length,
+                                      var, exp_bits, N, offset, shift, oneexp);
+        _fmpz_mpoly_set_length(poly1, len1, ctx);
     }
 
     if (free2)

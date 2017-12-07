@@ -9,11 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 #include "assert.h"
 
@@ -67,9 +62,8 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
 void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
                           const fmpz_mpoly_t polyB, const fmpz_mpoly_ctx_t ctx)
 {
-    slong shift, off, bits, fpw, N;
-    slong i, m, c, d, v, k, var, nvars;
-    int deg, rev;
+    slong shift, off, bits, N;
+    slong i, m, c, d, v, k, var, nvars = ctx->minfo->nvars;
     ulong mask;
     slong * a_degs, * b_degs, * a_leads, * b_leads;
     fmpz_mpoly_t ac, bc, gc, gabc, g;
@@ -86,9 +80,6 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     fmpz_mpoly_univar_init(ax, ctx);
     fmpz_mpoly_univar_init(bx, ctx);
     fmpz_mpoly_univar_init(gx, ctx);
-
-    degrev_from_ord(deg, rev, ctx->ord);    
-    nvars = ctx->n - deg;
 
     if (polyA->length == 0)
     {
@@ -142,11 +133,10 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     for (v = 0; v < nvars; v++)
     {
         bits = polyA->bits;
-        fpw = FLINT_BITS/bits;
         mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-        N = words_per_exp(ctx->n, bits);
-        degrev_from_ord(deg, rev, ctx->ord);
-        mpoly_off_shift(&off, &shift, v, deg, rev, fpw, ctx->n, bits);
+        N = mpoly_words_per_exp(bits, ctx->minfo);
+        mpoly_gen_offset_shift(&off, &shift, v, N, bits, ctx->minfo);
+
         if (a_degs[v] != 0)
         {
             a_leads[v] = 0;
@@ -155,11 +145,10 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
         }
 
         bits = polyB->bits;
-        fpw = FLINT_BITS/bits;
         mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-        N = words_per_exp(ctx->n, bits);
-        degrev_from_ord(deg, rev, ctx->ord);
-        mpoly_off_shift(&off, &shift, v, deg, rev, fpw, ctx->n, bits);
+        N = mpoly_words_per_exp(bits, ctx->minfo);
+        mpoly_gen_offset_shift(&off, &shift, v, N, bits, ctx->minfo);
+
         if (b_degs[v] != 0)
         {
             b_leads[v] = 0;

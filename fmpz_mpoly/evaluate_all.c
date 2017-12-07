@@ -71,7 +71,7 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
 {
     int deg, rev, new;
     slong i, j, k, N, nvars, bits;
-    slong main_exp, main_var, main_shift, main_off, shift, off, fpw;
+    slong main_exp, main_var, main_shift, main_off, shift, off;
     ulong mask;
     slong entries, k_len;
     slong p_len;
@@ -114,8 +114,6 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
             main_var = i;
     }
 
-    fpw = FLINT_BITS/bits;
-
     /* compute how many masks are needed */
     entries = 0;
     for (i = 0; i < nvars; i++)
@@ -135,7 +133,7 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
         if (i == main_var)
             continue;
 
-        mpoly_off_shift(&off, &shift, i, deg, rev, fpw, ctx->n, bits);
+        mpoly_gen_offset_shift(&off, &shift, i, N, bits, ctx->minfo);
         for (j = 1; j <= degrees[i]; j *= 2)
         {
             offs[k] = off;
@@ -153,7 +151,7 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
 
     /* accumulate coefficients of the main variable */
     mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    mpoly_off_shift(&main_off, &main_shift, main_var, deg, rev, fpw, ctx->n, bits);
+    mpoly_gen_offset_shift(&main_off, &main_shift, main_var, N, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     fmpz_init(t);
     for (i = 0; i < p_len; i++)

@@ -655,10 +655,11 @@ void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     exp_bits = FLINT_MAX(WORD(8), bits + 1); /* extra bit required for signs */
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = FLINT_MAX(exp_bits, poly3->bits);
-    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
+
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
     masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-    N = words_per_exp(ctx->n, exp_bits);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (exp_bits > poly2->bits)

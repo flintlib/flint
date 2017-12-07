@@ -201,9 +201,6 @@ void mpoly_ordering_print(ordering_t ord)
 /* Misc **********************************************************************/
 
 /*
-    in order to pickout the exponent of the variable of index "idx", calculate
-    the word offset "off" and the shift amount "shift"
-*/
 MPOLY_INLINE
 void mpoly_off_shift(slong * off, slong * shift, slong idx, int deg, int rev, slong fpw, slong nfields, slong bits)
 {
@@ -219,9 +216,7 @@ void mpoly_off_shift(slong * off, slong * shift, slong idx, int deg, int rev, sl
     *shift = (fpw - 1 - *shift) * bits;
 }
 
-/*
-    get the exponent vector "one" of a the variable of index "var"
-*/
+
 MPOLY_INLINE
 void mpoly_univar_exp(ulong * one, slong var, int deg, slong N, slong off, slong shift, slong fpw, slong bits)
 {
@@ -232,6 +227,13 @@ void mpoly_univar_exp(ulong * one, slong var, int deg, slong N, slong off, slong
     if (deg)
         one[0] |= WORD(1) << ((fpw - 1)*bits);
 }
+*/
+
+FLINT_DLL void mpoly_gen_offset_shift(slong * _offset, slong * _shift,
+                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift,
+                       slong var, slong N, slong bits, const mpoly_ctx_t mctx);
 
 
 /*  Monomials ****************************************************************/
@@ -538,6 +540,8 @@ void mpoly_max_degrees_tight(slong * max_exp,
 
 FLINT_DLL slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg);
 
+FLINT_DLL slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL slong mpoly_optimize_bits(slong bits, slong nfields);
 
 FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits,
@@ -565,6 +569,8 @@ FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
 
 FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
             const ulong * exp, slong len, slong N, ulong maskhi, ulong masklo);
+
+FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);

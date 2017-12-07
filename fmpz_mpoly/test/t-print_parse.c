@@ -43,12 +43,11 @@ main(void)
             fmpz_mpoly_init(f, ctx);
             fmpz_mpoly_init(f1, ctx);
 
-            for (len1 = 3; len1 < 10; len1 += len1/2)
+            for (len1 = 3; len1 < 1000; len1 += len1/2)
             {
                 exp_bound1 = 1000;
                 coeff_bits = 10;
                 fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-/*printf("f: ");fmpz_mpoly_print_pretty(f, vars, ctx); printf("\n");*/
                 str = fmpz_mpoly_get_str_pretty(f, vars, ctx);
                 fmpz_mpoly_set_str_pretty(f1, str, vars, ctx);
                 flint_free(str);
