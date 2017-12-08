@@ -201,7 +201,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
                      mp_limb_t ** coeff1,      ulong ** exp1, slong * alloc,
                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-       slong bits, slong N, ulong maskhi, ulong masklo, const nmodf_ctx_t fctx)
+       slong bits, slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
 {
     int lt_divides;
     slong i, j, k, s;
@@ -223,7 +223,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
     /* if exponent vectors are all one word, call specialised version */
     if (N == 1)
         return _nmod_mpoly_divides_monagan_pearce1(coeff1, exp1, alloc,
-                   coeff2, exp2, len2, coeff3, exp3, len3, bits, maskhi, fctx);
+               coeff2, exp2, len2, coeff3, exp3, len3, bits, cmpmask[0], fctx);
 
     TMP_START;
 
@@ -287,7 +287,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
         do
         {
             exp_list[--exp_next] = heap[1].exp;
-            x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
             do
             {
                 *store++ = x->i;
@@ -326,7 +326,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
             } else
@@ -344,7 +344,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
                     mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
                                                            e1   + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
                 /* should we go up? */
@@ -363,7 +363,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
                     mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
                                                            e1   + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
             }
@@ -376,7 +376,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
         }
 
         if (!lt_divides ||
-                mpoly_monomial_gt(exp, exp2 + N*(len2 - 1), N, maskhi, masklo))
+                mpoly_monomial_gt(exp, exp2 + N*(len2 - 1), N, cmpmask))
             goto not_exact_division;
 
         if (s > 1)
@@ -390,7 +390,7 @@ slong _nmod_mpoly_divides_monagan_pearce(
             mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
                                                    e1   + x->j*N, N);
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, maskhi, masklo))
+                                  &next_loc, &heap_len, N, cmpmask))
                 exp_next--;
         }
         s = 1;      
@@ -464,7 +464,7 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* temporary space to check leading monomials divide */
@@ -517,7 +517,7 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
       len = _nmod_mpoly_divides_monagan_pearce(&temp->coeffs, &temp->exps,
                             &temp->alloc, poly2->coeffs, exp2, poly2->length,
                               poly3->coeffs, exp3, poly3->length, exp_bits, N,
-                                                  cmpmask[0], cmpmask[1], ctx->ffinfo);
+                                                  cmpmask, ctx->ffinfo);
 
       nmod_mpoly_swap(temp, poly1, ctx);
 
@@ -531,7 +531,7 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
       len = _nmod_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
                             &poly1->alloc, poly2->coeffs, exp2, poly2->length,
                               poly3->coeffs, exp3, poly3->length, exp_bits, N,
-                                                  cmpmask[0], cmpmask[1], ctx->ffinfo);
+                                                  cmpmask, ctx->ffinfo);
    }
 
 cleanup:

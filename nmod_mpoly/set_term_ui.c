@@ -33,7 +33,7 @@ void nmod_mpoly_set_term_ui(nmod_mpoly_t poly,
     nmod_mpoly_fit_bits(poly, exp_bits, ctx);
 
     N = mpoly_words_per_exp(poly->bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, poly->bits, ctx->minfo);
 
     packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
@@ -43,7 +43,7 @@ void nmod_mpoly_set_term_ui(nmod_mpoly_t poly,
 
     /* work out at what index term should be placed */
     exists = mpoly_monomial_exists(&index, poly->exps,
-                                  packed_exp, poly->length, N, cmpmask[0], cmpmask[1]);
+                                  packed_exp, poly->length, N, cmpmask);
 
     NMOD_RED(cr, c, ctx->ffinfo->mod);
     if (!exists) /* term with that exponent doesn't exist */

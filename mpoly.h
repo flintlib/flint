@@ -371,66 +371,46 @@ int mpoly_monomial_equal(const ulong * exp2, const ulong * exp3, slong N)
 
 MPOLY_INLINE
 int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3,
-                                           slong N, ulong maskhi, ulong masklo)
+                                                slong N, const ulong * cmpmask)
 {
-   slong i = 0;
-
-      if (exp2[i] != exp3[i])
-         return (exp3[i]^maskhi) < (exp2[i]^maskhi);
-
-   for (i++; i < N; i++)
-   {
-      if (exp2[i] != exp3[i])
-         return (exp3[i]^masklo) < (exp2[i]^masklo);
-   }
-
-   return 0;
+    slong i = 0;
+    do
+    {
+        if (exp2[i] != exp3[i])
+            return (exp3[i]^cmpmask[i]) < (exp2[i]^cmpmask[i]);
+    } while (++i < N);
+    return 0;
 }
 
 MPOLY_INLINE
 int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3,
-                                           slong N, ulong maskhi, ulong masklo)
+                                                slong N, const ulong * cmpmask)
 {
-   slong i = 0;
-
-      if (exp2[i] != exp3[i])
-         return (exp3[i]^maskhi) > (exp2[i]^maskhi);
-
-   for (i++; i < N; i++)
-   {
-      if (exp2[i] != exp3[i])
-         return (exp3[i]^masklo) > (exp2[i]^masklo);
-   }
-
-   return 0;
+    slong i = 0;
+    do
+    {
+        if (exp2[i] != exp3[i])
+            return (exp3[i]^cmpmask[i]) > (exp2[i]^cmpmask[i]);
+    } while (++i < N);
+    return 0;
 }
 
 MPOLY_INLINE
 int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
-                                           slong N, ulong maskhi, ulong masklo)
+                                                slong N, const ulong * cmpmask)
 {
-   slong i = 0;
-
-      if (exp2[i] != exp3[i])
-      {
-         if ((exp2[i]^maskhi) > (exp3[i]^maskhi))
-            return 1;
-         else
-            return -1;
-      }
-
-   for (i++; i < N; i++)
-   {
-      if (exp2[i] != exp3[i])
-      {
-         if ((exp2[i]^masklo) > (exp3[i]^masklo))
-            return 1;
-         else
-            return -1;
-      }
-   }
-
-   return 0;
+    slong i = 0;
+    do
+    {
+        if (exp2[i] != exp3[i])
+        {
+            if ((exp2[i]^cmpmask[i]) > (exp3[i]^cmpmask[i]))
+                return 1;
+            else
+                return -1;
+        }
+    } while (++i < N);
+    return 0;
 }
 
 MPOLY_INLINE
@@ -507,7 +487,7 @@ FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
                             slong * mults, slong num, slong extra, slong bits);
 
 FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
-            const ulong * exp, slong len, slong N, ulong maskhi, ulong masklo);
+                 const ulong * exp, slong len, slong N, const ulong * cmpmask);
 
 FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx);
 
@@ -525,7 +505,7 @@ FLINT_DLL void mpoly_search_monomials(
                 slong * t1, slong * t2, slong *t3,
                 slong lower, slong upper,
                 const ulong * a, slong a_len, const ulong * b, slong b_len,
-                                          slong N, ulong maskhi, ulong masklo);
+                                               slong N, const ulong * cmpmask);
 
 MPOLY_INLINE
 int mpoly_monomials_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx)
@@ -539,7 +519,7 @@ int mpoly_monomials_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t 
 
     for (i = 0; i + 1 < len; i++)
     {
-        if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N, cmpmask[0], cmpmask[1]))
+        if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N, cmpmask))
         {
             flint_free(cmpmask);
             return 0;
@@ -652,7 +632,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
 
 MPOLY_INLINE
 void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
-                                                    ulong maskhi, ulong masklo)
+                                                         const ulong * cmpmask)
 {
    ulong * exp;
    slong i, j, s = --(*heap_len);
@@ -663,7 +643,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
 
    while (j < s)
    {
-      if (!mpoly_monomial_gt(heap[j + 1].exp, heap[j].exp, N, maskhi, masklo))
+      if (!mpoly_monomial_gt(heap[j + 1].exp, heap[j].exp, N, cmpmask))
          j++;
       heap[i] = heap[j];
       i = j;
@@ -674,7 +654,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
    exp = heap[s].exp;
    j = HEAP_PARENT(i);
 
-   while (i > 1 && mpoly_monomial_gt(heap[j].exp, exp, N, maskhi, masklo))
+   while (i > 1 && mpoly_monomial_gt(heap[j].exp, exp, N, cmpmask))
    {
       heap[i] = heap[j];
       i = j;
@@ -688,7 +668,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
 
 MPOLY_INLINE
 int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
-       slong * next_loc, slong * heap_len, slong N, ulong maskhi, ulong masklo)
+       slong * next_loc, slong * heap_len, slong N, const ulong * cmpmask)
 {
    slong i = *heap_len, j, n = *heap_len;
 
@@ -712,7 +692,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    while ((j = HEAP_PARENT(i)) >= 1)
    {
-      if (!mpoly_monomial_gt(heap[j].exp, exp, N, maskhi, masklo))
+      if (!mpoly_monomial_gt(heap[j].exp, exp, N, cmpmask))
          break;
 
       i = j;

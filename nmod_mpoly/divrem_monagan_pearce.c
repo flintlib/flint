@@ -222,7 +222,7 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                   mp_limb_t ** polyr,      ulong ** expr, slong * allocr,
             const mp_limb_t * coeff2, const ulong * exp2, slong len2,
             const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-       slong bits, slong N, ulong maskhi, ulong masklo, const nmodf_ctx_t fctx)
+       slong bits, slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
 {
     slong i, j, k, l, s;
     slong next_loc;
@@ -248,7 +248,7 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
     if (N == 1)
         return _nmod_mpoly_divrem_monagan_pearce1(lenr, polyq, expq, allocq,
                                      polyr, expr, allocr, coeff2, exp2, len2,
-                                      coeff3, exp3, len3, bits, maskhi, fctx);
+                                   coeff3, exp3, len3, bits, cmpmask[0], fctx);
 
 
     TMP_START;
@@ -316,7 +316,7 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
         do
         {
             exp_list[--exp_next] = heap[1].exp;
-            x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
             do
             {
                 *store++ = x->i;
@@ -354,7 +354,7 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
             } else
@@ -372,7 +372,7 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                     mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
                                                            e1   + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
                 /* should we go up? */
@@ -391,7 +391,7 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                     mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
                                                            e1   + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
             }
@@ -427,7 +427,7 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
             mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
                                                    e1   + x->j*N, N);
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, maskhi, masklo))
+                                  &next_loc, &heap_len, N, cmpmask))
                 exp_next--;
         }
         s = 1;
@@ -484,7 +484,7 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
@@ -505,7 +505,7 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
     }
 
     /* check divisor leading monomial is at most that of the dividend */
-    if (mpoly_monomial_lt(exp3, exp2, N, cmpmask[0], cmpmask[1]))
+    if (mpoly_monomial_lt(exp3, exp2, N, cmpmask))
     {
         nmod_mpoly_set(r, poly2, ctx);
         nmod_mpoly_zero(q, ctx);
@@ -545,7 +545,7 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
     while ((lenq = _nmod_mpoly_divrem_monagan_pearce(&lenr, &tq->coeffs, &tq->exps,
                       &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2, 
                        poly2->length, poly3->coeffs, exp3, poly3->length, exp_bits,
-                                         N, cmpmask[0], cmpmask[1], ctx->ffinfo)) == 0
+                                         N, cmpmask, ctx->ffinfo)) == 0
           && lenr == 0 && exp_bits < FLINT_BITS)
    {
         ulong * old_exp2 = exp2, * old_exp3 = exp3;
@@ -554,7 +554,7 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
         exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
 
         N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-        cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+        cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
 

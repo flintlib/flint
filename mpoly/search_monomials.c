@@ -9,9 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
+
 #include "mpoly.h"
 
 /*
@@ -33,7 +31,7 @@ void mpoly_search_monomials(
     slong * find, slong * gind, slong * hind,
     slong lower, slong upper,
     const ulong * a, slong a_len, const ulong * b, slong b_len,
-    slong N, ulong maskhi, ulong masklo)
+    slong N, const ulong * cmpmask)
 {
     slong i, j, x;
     slong maxdiff, maxind;
@@ -149,8 +147,8 @@ void mpoly_search_monomials(
         */
         mpoly_monomial_add(hexp, a + maxind*N, b + hind[maxind]*N, N);
 
-        FLINT_ASSERT(mpoly_monomial_lt(fexp, hexp, N, maskhi, masklo));
-        FLINT_ASSERT(mpoly_monomial_lt(hexp, gexp, N, maskhi, masklo));
+        FLINT_ASSERT(mpoly_monomial_lt(fexp, hexp, N, cmpmask));
+        FLINT_ASSERT(mpoly_monomial_lt(hexp, gexp, N, cmpmask));
 
         /*
             find new path for h through the point
@@ -167,7 +165,7 @@ void mpoly_search_monomials(
             {
                 mpoly_monomial_add(temp_exp, a + i*N, b + j*N, N);
 
-                if (mpoly_monomial_lt(temp_exp, hexp, N, maskhi, masklo))
+                if (mpoly_monomial_lt(temp_exp, hexp, N, cmpmask))
                 {
                     x = j + 1;
                     break;
@@ -186,7 +184,7 @@ void mpoly_search_monomials(
             for (j = FLINT_MAX(hind[i+1], find[i]); j < gind[i]; j++)
             {
                 mpoly_monomial_add(temp_exp, a + i*N, b + j*N, N);
-                if (mpoly_monomial_lt(temp_exp, hexp, N, maskhi, masklo))
+                if (mpoly_monomial_lt(temp_exp, hexp, N, cmpmask))
                     x = j + 1;
                 else
                     break;

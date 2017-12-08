@@ -354,7 +354,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
                   ulong ** expr, slong * allocr, const fmpz * poly2,
    const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
-                   slong len3, slong bits, slong N, ulong maskhi, ulong masklo)
+                   slong len3, slong bits, slong N, const ulong * cmpmask)
 {
     slong i, j, s = len3;
     slong q_len = 0, r_len = 0;
@@ -389,7 +389,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
     if (N == 1)
         return _fmpz_mpoly_quasidivrem_heap1(scale, lenr, polyq, expq, 
                             allocq, polyr, expr, allocr, poly2, exp2, len2,
-                                              poly3, exp3, len3, bits, maskhi);
+                                          poly3, exp3, len3, bits, cmpmask[0]);
 
     TMP_START;
 
@@ -500,7 +500,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
         while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N))
         {
             exp_list[--exp_next] = heap[1].exp;
-            x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
             do            
             {
                 *store++ = x->i;
@@ -549,7 +549,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
             } else
@@ -566,7 +566,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
                     mpoly_monomial_add(exp_list[exp_next], exp3  + x->i*N,
                                                            q_exp + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
                 if (j + 1 == q_len)
@@ -584,7 +584,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
                     mpoly_monomial_add(exp_list[exp_next], exp3  + x->i*N,
                                                            q_exp + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
             }
@@ -667,7 +667,7 @@ large_lt_divides:
             mpoly_monomial_add(exp_list[exp_next], exp3  + x->i*N,
                                                    q_exp + x->j*N, N);
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, maskhi, masklo))
+                                  &next_loc, &heap_len, N, cmpmask))
                 exp_next--;
         }
         q_len++;
@@ -751,7 +751,7 @@ void fmpz_mpoly_quasidivrem_heap(fmpz_t scale, fmpz_mpoly_t q, fmpz_mpoly_t r,
     TMP_START;
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
@@ -772,7 +772,7 @@ void fmpz_mpoly_quasidivrem_heap(fmpz_t scale, fmpz_mpoly_t q, fmpz_mpoly_t r,
     }
 
     /* check divisor leading monomial is at most that of the dividend */
-    if (mpoly_monomial_lt(exp3, exp2, N, cmpmask[0], cmpmask[1]))
+    if (mpoly_monomial_lt(exp3, exp2, N, cmpmask))
     {
         fmpz_mpoly_set(r, poly2, ctx);
         fmpz_mpoly_zero(q, ctx);
@@ -816,7 +816,7 @@ void fmpz_mpoly_quasidivrem_heap(fmpz_t scale, fmpz_mpoly_t q, fmpz_mpoly_t r,
    while ((lenq = _fmpz_mpoly_quasidivrem_heap(scale, &lenr, &tq->coeffs, &tq->exps,
          &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2, 
          poly2->length, poly3->coeffs, exp3, poly3->length, exp_bits,
-                                                       N, cmpmask[0], cmpmask[1])) == 0
+                                                       N, cmpmask)) == 0
          && lenr == 0 && exp_bits < FLINT_BITS)
    {
       ulong * old_exp2 = exp2, * old_exp3 = exp3;

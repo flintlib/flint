@@ -68,17 +68,17 @@ slong _fmpz_mpoly_sub1(fmpz * poly1, ulong * exps1,
 slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
                   const fmpz * poly2, const ulong * exps2, slong len2,
                   const fmpz * poly3, const ulong * exps3, slong len3, slong N,
-                                                    ulong maskhi, ulong masklo)
+                                                         const ulong * cmpmask)
 {
    slong i = 0, j = 0, k = 0;
 
    if (N == 1)
       return _fmpz_mpoly_sub1(poly1, exps1, poly2, exps2, len2,
-                                                   poly3, exps3, len3, maskhi);
+                                               poly3, exps3, len3, cmpmask[0]);
 
    while (i < len2 && j < len3)
    {
-      int cmp = mpoly_monomial_cmp(exps2 + i*N, exps3 + j*N, N, maskhi, masklo);
+      int cmp = mpoly_monomial_cmp(exps2 + i*N, exps3 + j*N, N, cmpmask);
 
       if (cmp > 0)
       {
@@ -144,7 +144,7 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    }
 
     TMP_START;
-    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, max_bits, ctx->minfo);
 
    if (max_bits > poly2->bits)
@@ -173,7 +173,7 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       len = _fmpz_mpoly_sub(temp->coeffs, temp->exps, 
                     poly2->coeffs, exp2, poly2->length,
-                    poly3->coeffs, exp3, poly3->length, N, cmpmask[0], cmpmask[1]);
+                    poly3->coeffs, exp3, poly3->length, N, cmpmask);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -186,7 +186,7 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       len = _fmpz_mpoly_sub(poly1->coeffs, poly1->exps, 
                        poly2->coeffs, exp2, poly2->length,
-                       poly3->coeffs, exp3, poly3->length, N, cmpmask[0], cmpmask[1]);
+                       poly3->coeffs, exp3, poly3->length, N, cmpmask);
    }
       
    if (free2)

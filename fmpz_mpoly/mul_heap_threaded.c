@@ -245,7 +245,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                  const fmpz * poly3, const ulong * exp3, slong len3,
-            slong * start, slong * end, slong * hind, slong N, ulong maskhi, ulong masklo)
+            slong * start, slong * end, slong * hind, slong N, const ulong * cmpmask)
 {
     slong i, j, k;
     slong next_loc = len2 + 4;   /* something bigger than heap can ever be */
@@ -269,7 +269,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
         return _fmpz_mpoly_mul_heap_part1(poly1, exp1, alloc,
                                           poly2, exp2, len2,
                                           poly3, exp3, len3,
-                                                    start, end, hind, maskhi);
+                                                 start, end, hind, cmpmask[0]);
 
     TMP_START;
 
@@ -314,7 +314,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
             mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                    exp3 + x->j*N, N);
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                exp_next--;
         }
     }
@@ -344,7 +344,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
             /* pop chain from heap and set exponent field to be reused */
             exp_list[--exp_next] = heap[1].exp;
 
-            x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
 
             /* take node out of heap and put into store */
             hind[x->i] |= WORD(1);
@@ -435,7 +435,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                        exp3 + x->j*N, N);
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                     exp_next--;
             }
 
@@ -457,7 +457,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
                 mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                        exp3 + x->j*N, N);
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                     exp_next--;
             }
         }     
@@ -497,7 +497,7 @@ typedef struct
     const fmpz * coeff2; const ulong * exp2; slong len2;
     const fmpz * coeff3; const ulong * exp3; slong len3;
     slong N;
-    ulong maskhi; ulong masklo;    
+    const ulong * cmpmask;    
     volatile int idx;
 }
 mul_heap_threaded_base_t;
@@ -581,7 +581,7 @@ void * _fmpz_mpoly_mul_heap_threaded_worker(void * arg_ptr)
                 &start, exp, &score, t1, t2, t3,
                             divs[i].lower, divs[i].lower,
                             base->exp2, base->len2, base->exp3, base->len3,
-                                          base->N, base->maskhi, base->masklo);
+                                          base->N, base->cmpmask);
             if (start == t2)
             {
                 SWAP_PTRS(t1, t2);
@@ -602,9 +602,7 @@ void * _fmpz_mpoly_mul_heap_threaded_worker(void * arg_ptr)
                 &end, exp, &score, t2, t3, t4,
                             divs[i - 1].lower, divs[i - 1].lower,
                             base->exp2, base->len2, base->exp3, base->len3,
-                                          base->N, base->maskhi, base->masklo);
-
-
+                                          base->N, base->cmpmask);
             if (end == t3)
             {
                 SWAP_PTRS(t2, t3);
@@ -625,7 +623,7 @@ void * _fmpz_mpoly_mul_heap_threaded_worker(void * arg_ptr)
                      &divs[i].coeff1, &divs[i].exp1, &divs[i].alloc1,
                       base->coeff2,  base->exp2,  base->len2,
                       base->coeff3,  base->exp3,  base->len3,
-                       start, end, t3, base->N, base->maskhi, base->masklo);
+                       start, end, t3, base->N, base->cmpmask);
 
         /* get next index to work on */
         pthread_mutex_lock(&base->mutex);
@@ -652,7 +650,7 @@ void * _fmpz_mpoly_mul_heap_threaded_worker(void * arg_ptr)
 slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * coeff2, const ulong * exp2, slong len2,
                  const fmpz * coeff3, const ulong * exp3, slong len3,
-                                           slong N, ulong maskhi, ulong masklo)
+                                           slong N, const ulong * cmpmask)
 {
     slong i, j, k, ndivs2;
     pthread_t * threads;
@@ -672,8 +670,7 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
     base->exp3 = exp3;
     base->len3 = len3;
     base->N = N;
-    base->maskhi = maskhi;
-    base->masklo = masklo;
+    base->cmpmask = cmpmask;
     base->idx = base->ndivs-1;    /* decremented by worker threads */
 
     ndivs2 = base->ndivs*base->ndivs;
@@ -861,13 +858,13 @@ void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                     &temp->coeffs, &temp->exps, &temp->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                               N, cmpmask[0], cmpmask[1]);
+                                               N, cmpmask);
         else
             len = _fmpz_mpoly_mul_heap_threaded(
                                    &temp->coeffs, &temp->exps, &temp->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                               N, cmpmask[0], cmpmask[1]);
+                                               N, cmpmask);
 
         fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -884,13 +881,13 @@ void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                 &poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                               N, cmpmask[0], cmpmask[1]);
+                                               N, cmpmask);
         else
             len = _fmpz_mpoly_mul_heap_threaded(
                                 &poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                               N, cmpmask[0], cmpmask[1]);
+                                               N, cmpmask);
     }
 
     if (free2)

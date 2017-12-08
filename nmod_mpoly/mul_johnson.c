@@ -138,7 +138,7 @@ slong _nmod_mpoly_mul_johnson1(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc
 slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
                  const mp_limb_t * coeff2, const ulong * exp2, slong len2,
                  const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-                   slong N, ulong maskhi, ulong masklo, const nmodf_ctx_t fctx)
+                   slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
 {
     slong i, j;
     slong next_loc;
@@ -159,7 +159,7 @@ slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
 
     if (N == 1)
         return _nmod_mpoly_mul_johnson1(coeff1, exp1, alloc,
-                           coeff2, exp2, len2, coeff3, exp3, len3, maskhi, fctx);
+                     coeff2, exp2, len2, coeff3, exp3, len3, cmpmask[0], fctx);
 
     TMP_START;
 
@@ -206,7 +206,7 @@ slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
         {
             exp_list[--exp_next] = heap[1].exp;
 
-            x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
 
             hind[x->i] |= WORD(1);
             Q[Q_len++] = x->i;
@@ -247,7 +247,7 @@ slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
                 mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                        exp3 + x->j*N, N);
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                     exp_next--;
             }
 
@@ -268,7 +268,7 @@ slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
                 mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N,
                                                        exp3 + x->j*N, N);
                 if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                     exp_next--;
             }
         }
@@ -329,7 +329,7 @@ void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
@@ -363,13 +363,13 @@ void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
             len1 = _nmod_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                               N, cmpmask[0], cmpmask[1], ctx->ffinfo);
+                                               N, cmpmask, ctx->ffinfo);
         } else
         {
             len1 = _nmod_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                               N, cmpmask[0], cmpmask[1], ctx->ffinfo);
+                                               N, cmpmask, ctx->ffinfo);
         }
 
         nmod_mpoly_swap(temp, poly1, ctx);
@@ -385,13 +385,13 @@ void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
             len1 = _nmod_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                               N, cmpmask[0], cmpmask[1], ctx->ffinfo);
+                                               N, cmpmask, ctx->ffinfo);
         } else
         {
             len1 = _nmod_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                               N, cmpmask[0], cmpmask[1], ctx->ffinfo);
+                                               N, cmpmask, ctx->ffinfo);
         }
    }
 

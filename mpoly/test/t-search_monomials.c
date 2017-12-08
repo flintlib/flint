@@ -74,7 +74,7 @@ main(void)
 
         fg_bits = FLINT_MAX(f->bits, g->bits);
         N = mpoly_words_per_exp(fg_bits, ctx->minfo);
-        cmpmask = (ulong*) flint_malloc((N+1)*sizeof(ulong));
+        cmpmask = (ulong*) flint_malloc(N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, fg_bits, ctx->minfo);
         
 
@@ -99,7 +99,7 @@ main(void)
         }
 
         mpoly_search_monomials(&e_ind, e, &e_score, t1, t2, t3, lower, upper,
-                          fexp, f->length, gexp, g->length, N, cmpmask[0], cmpmask[1]);
+                          fexp, f->length, gexp, g->length, N, cmpmask);
 
         /* make sure that e_ind is correct for e */
         score = 0;
@@ -109,7 +109,7 @@ main(void)
             for (j = 0; j < g->length; j++)
             {
                 mpoly_monomial_add(temp, fexp + i*N, gexp + j*N, N);
-                if (mpoly_monomial_lt(temp, e, N, cmpmask[0], cmpmask[1]))
+                if (mpoly_monomial_lt(temp, e, N, cmpmask))
                     x = j + 1;
             }
             if (x != e_ind[i])
@@ -153,7 +153,7 @@ main(void)
                         for (j = 0; j < g->length; j++)
                         {
                             mpoly_monomial_add(temp, fexp + i*N, gexp + j*N, N);
-                            if (mpoly_monomial_lt(temp, temp1, N, cmpmask[0], cmpmask[1]))
+                            if (mpoly_monomial_lt(temp, temp1, N, cmpmask))
                                 x = j + 1;
                         }
                         score += g->length - x;

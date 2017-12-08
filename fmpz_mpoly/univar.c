@@ -262,7 +262,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
 
@@ -304,7 +304,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         x->next = NULL;
         mpoly_monomial_madd(exp + N*i, poly2_exps[x->i] + N*x->j, k, one, N);
         _mpoly_heap_insert(heap, exp + N*i, x, &next_loc, &heap_len, N,
-                                                               cmpmask[0], cmpmask[1]);
+                                                               cmpmask);
     }
 
     p_len = 0;
@@ -312,7 +312,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
     {
         _fmpz_mpoly_fit_length(&p_coeff, &p_exp, &p_alloc, p_len + 1, N);
         mpoly_monomial_set(p_exp + N*p_len, heap[1].exp, N);
-        x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask[0], cmpmask[1]);
+        x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
         fmpz_set(p_coeff + p_len, (poly2->coeffs + x->i)->coeffs + x->j);
         p_len++;
 
@@ -326,7 +326,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
             mpoly_monomial_madd(exp + N*x->i, poly2_exps[x->i] + N*x->j, k, one,
                                                                             N);
             _mpoly_heap_insert(heap, exp + N*x->i, x, &next_loc, &heap_len, N,
-                                                               cmpmask[0], cmpmask[1]);
+                                                               cmpmask);
         }
     }
 

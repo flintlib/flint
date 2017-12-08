@@ -68,7 +68,7 @@ void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_gen_oneexp_offset_shift(one, &main_off, &main_shift,
                                                 main_var, N, bits, ctx->minfo);
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
@@ -150,7 +150,7 @@ looper:
     x->next = NULL;
     mpoly_monomial_msub(exp_array + i*N, p2_exp + x->j*N, root->key, one, N);
     _mpoly_heap_insert(heap, exp_array + i*N, x,
-                                      &next_loc, &heap_len, N, cmpmask[0], cmpmask[1]);
+                                      &next_loc, &heap_len, N, cmpmask);
 
     i++;    
     node = root->right;
@@ -178,7 +178,7 @@ done:
         fmpz_zero(p1_coeff + p1_len);
         do
         {
-            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask[0], cmpmask[1]);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
             do
             {
                 *store++ = x->i;
@@ -202,7 +202,7 @@ done:
                 mpoly_monomial_msub(exp_array + i*N, p2_exp + x->j*N,
                                                          main_exps[i], one, N);
                 _mpoly_heap_insert(heap, exp_array + i*N, x,
-                                      &next_loc, &heap_len, N, cmpmask[0], cmpmask[1]);
+                                      &next_loc, &heap_len, N, cmpmask);
             }
         }
     }

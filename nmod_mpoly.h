@@ -490,7 +490,7 @@ _nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** polyq,
        ulong ** polyr, ulong ** expr, slong * allocr, const ulong * poly2,
           const ulong * exp2, slong len2, nmod_mpoly_struct * const * poly3,
                         ulong * const * exp3, slong len, slong N, slong bits,
-                       const nmod_mpoly_ctx_t ctx, ulong maskhi, ulong masklo);
+                       const nmod_mpoly_ctx_t ctx, const ulong * cmpmask);
 
 FLINT_DLL void
 nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t r,
