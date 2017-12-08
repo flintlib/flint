@@ -42,7 +42,7 @@ void fmpz_mpoly_get_term_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
    TMP_START;
    
    masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = words_per_exp(ctx->n, poly->bits);
+   N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 

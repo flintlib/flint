@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -30,7 +31,7 @@ void fmpz_mpoly_add_ui(fmpz_mpoly_t poly1,
 
    if (c != 0)
    {
-      N = words_per_exp(ctx->n, poly2->bits);
+      N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
 
       if (mpoly_monomial_is_zero(poly2->exps + (len2 - 1)*N, N))
       {

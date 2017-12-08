@@ -485,7 +485,7 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
 
     masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
     /* number of words required for exponent vectors */
-    N = words_per_exp(ctx->n, exp_bits);
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     if (exp_bits > poly2->bits)
@@ -551,10 +551,10 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
         ulong * old_exp2 = exp2, * old_exp3 = exp3;
         slong old_exp_bits = exp_bits;
 
-        exp_bits = mpoly_optimize_bits(exp_bits + 1, ctx->n);
+        exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
 
         masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-        N = words_per_exp(ctx->n, exp_bits);
+        N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
         mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,

@@ -26,7 +26,7 @@ int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
    if (poly->length != 1)
       return 0;
 
-   N = words_per_exp(ctx->n, poly->bits);
+   N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
    for (i = 0; i < N; i++)
    {

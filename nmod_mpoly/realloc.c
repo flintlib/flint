@@ -31,7 +31,7 @@ void nmod_mpoly_realloc(nmod_mpoly_t poly,
         return;
     }
 
-    N = words_per_exp(ctx->n, poly->bits);
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
     if (poly->alloc != 0)            /* Realloc */
     {

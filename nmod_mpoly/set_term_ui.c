@@ -32,11 +32,11 @@ void nmod_mpoly_set_term_ui(nmod_mpoly_t poly,
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_set_term_fmpz");
 
     /* reallocate the number of bits of the exponents of the polynomial */
-    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
     nmod_mpoly_fit_bits(poly, exp_bits, ctx);
 
     masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-    N = words_per_exp(ctx->n, poly->bits);
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
     packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 

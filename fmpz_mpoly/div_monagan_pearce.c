@@ -646,7 +646,6 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    if (poly2->length == 0)
    {
       fmpz_mpoly_zero(q, ctx);
- 
       return;
    }
 
@@ -654,7 +653,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = words_per_exp(ctx->n, exp_bits);
+   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
    /* ensure input exponents packed to same size as output exponents */
    if (exp_bits > poly2->bits)
@@ -677,26 +676,21 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    if (mpoly_monomial_lt(exp3, exp2, N, maskhi, masklo))
    {
       fmpz_mpoly_zero(q, ctx);
-
       goto cleanup3;
    }
 
    /* take care of aliasing */
    if (q == poly2 || q == poly3)
    {
-      fmpz_mpoly_init2(temp1, FLINT_MAX(poly2->length/poly3->length + 1, 1),
-                                                                          ctx);
+      fmpz_mpoly_init2(temp1, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(temp1, exp_bits, ctx);
       temp1->bits = exp_bits;
-
       tq = temp1;
    } else
    {
-      fmpz_mpoly_fit_length(q, FLINT_MAX(poly2->length/poly3->length + 1, 1),
-                                                                          ctx);
+      fmpz_mpoly_fit_length(q, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(q, exp_bits, ctx);
       q->bits = exp_bits;
-
       tq = q;
    }
 
@@ -710,10 +704,10 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
       ulong * old_exp2 = exp2, * old_exp3 = exp3;
       slong old_exp_bits = exp_bits;
 
-      exp_bits = mpoly_optimize_bits(exp_bits + 1, ctx->n);
+      exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
 
       masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-      N = words_per_exp(ctx->n, exp_bits);
+      N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
       mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,

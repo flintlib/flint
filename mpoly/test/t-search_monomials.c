@@ -74,7 +74,7 @@ main(void)
 
         fg_bits = FLINT_MAX(f->bits, g->bits);
         masks_from_bits_ord(maskhi, masklo, fg_bits, ctx->ord);
-        N = words_per_exp(ctx->n, fg_bits);
+        N = mpoly_words_per_exp(fg_bits, ctx->minfo);
 
         fexp = (ulong *) flint_malloc(f->length*N*sizeof(ulong));
         gexp = (ulong *) flint_malloc(g->length*N*sizeof(ulong));

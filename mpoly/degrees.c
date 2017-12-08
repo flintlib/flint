@@ -35,7 +35,7 @@ void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
     for (i = 0; i < FLINT_BITS/bits; i++)
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-    N = words_per_exp(mctx->nfields, bits);
+    N = mpoly_words_per_exp(bits, mctx);
     pmax = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     for (i = 0; i < N; i++)
         pmax[i] = 0;

@@ -28,8 +28,8 @@ void mpoly_repack_monomials(ulong * exps1, slong bits1,
                                                         const mpoly_ctx_t mctx)
 {
     slong nfields = mctx->nfields;
-    slong i, N2 = words_per_exp(nfields, bits2);
-    slong    N1 = words_per_exp(nfields, bits1);
+    slong i, N2 = mpoly_words_per_exp(bits2, mctx);
+    slong    N1 = mpoly_words_per_exp(bits1, mctx);
     ulong * tmp_exps;
     TMP_INIT;
 

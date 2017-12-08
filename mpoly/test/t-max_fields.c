@@ -49,7 +49,7 @@ main(void)
 
             mpoly_ctx_init(mctx, nfields, ORD_LEX);
 
-            N = words_per_exp(nfields, bits);
+            N = mpoly_words_per_exp(bits, mctx);
 
             for (j = 0; j < nfields; j++)
                 max[j] = 0;

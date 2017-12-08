@@ -935,14 +935,14 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    TMP_START;
 
     /* compute maximum exponents for each variable */
-    max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     mpoly_max_fields_ui_backwards(max_fields2, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
     mpoly_max_fields_ui_backwards(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
     max2 = max3 = 0;
-    for (i = 0; i < ctx->n; i++)
+    for (i = 0; i < ctx->minfo->nfields; i++)
     {
         if (max_fields2[i] > max2)
             max2 = max_fields2[i];
@@ -962,7 +962,7 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = FLINT_MAX(exp_bits, poly3->bits);
 
-   N = words_per_exp(ctx->n, exp_bits);
+   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
    /* array multiplication expects each exponent vector in one word */
    /* current code is wrong for reversed orderings */
@@ -974,12 +974,12 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    /* compute bounds on output exps, used as mixed bases for packing exps */
    array_size = 1;
-   for (i = 0; i < ctx->n - 1; i++)
+   for (i = 0; i < ctx->minfo->nfields - 1; i++)
    {
       max_fields2[i] += max_fields3[i] + 1;
       array_size *= max_fields2[i];
    }
-   max_fields2[ctx->n - 1] += max_fields3[ctx->n - 1] + 1;
+   max_fields2[ctx->minfo->nfields - 1] += max_fields3[ctx->minfo->nfields - 1] + 1;
 
    /* if exponents too large for array multiplication, exit silently */
    if (array_size > MAX_ARRAY_SIZE)
@@ -1018,12 +1018,12 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          len = _fmpz_mpoly_mul_array(&temp->coeffs, &temp->exps, &temp->alloc, 
                                            poly3->coeffs, exp3, poly3->length,
                                            poly2->coeffs, exp2, poly2->length,
-                                      (slong *) max_fields2, ctx->n, exp_bits);
+                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
       else
          len = _fmpz_mpoly_mul_array(&temp->coeffs, &temp->exps, &temp->alloc, 
                                            poly2->coeffs, exp2, poly2->length,
                                            poly3->coeffs, exp3, poly3->length,
-                                      (slong *) max_fields2, ctx->n, exp_bits);
+                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -1038,12 +1038,12 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          len = _fmpz_mpoly_mul_array(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                             poly3->coeffs, exp3, poly3->length,
                                             poly2->coeffs, exp2, poly2->length,
-                                      (slong *) max_fields2, ctx->n, exp_bits);
+                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
       else
          len = _fmpz_mpoly_mul_array(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                             poly2->coeffs, exp2, poly2->length, 
                                             poly3->coeffs, exp3, poly3->length,
-                                      (slong *) max_fields2, ctx->n, exp_bits);
+                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
    }
 
    _fmpz_mpoly_set_length(poly1, len, ctx);

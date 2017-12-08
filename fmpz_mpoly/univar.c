@@ -258,7 +258,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_univar");
     for (i = 0; i < poly2->length; i++)
         bits = FLINT_MAX(bits, (poly2->coeffs + i)->bits);
-    bits = mpoly_optimize_bits(bits, ctx->n);
+    bits = mpoly_fix_bits(bits, ctx->minfo);
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
     masks_from_bits_ord(maskhi, masklo, bits, ctx->ord);
@@ -1395,7 +1395,7 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
     bits = 1 + FLINT_BIT_COUNT(FLINT_MAX(WORD(1), shift2 + bits));
     if (bits > FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_fmpz_poly");
-    bits = mpoly_optimize_bits(bits, ctx->n);
+    bits = mpoly_fix_bits(bits, ctx->minfo);
     
     N = mpoly_words_per_exp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));

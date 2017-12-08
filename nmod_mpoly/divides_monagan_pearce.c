@@ -464,7 +464,7 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
     exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
 
     masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-    N = words_per_exp(ctx->n, exp_bits);
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
     /* temporary space to check leading monomials divide */
     expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));

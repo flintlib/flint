@@ -17,7 +17,7 @@ void nmod_mpoly_set_ui(nmod_mpoly_t poly, ulong c, const nmod_mpoly_ctx_t ctx)
     slong N;
 
     NMOD_RED(cr, c, ctx->ffinfo->mod);
-    N = words_per_exp(ctx->n, poly->bits);
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
     if (cr == 0)
     {

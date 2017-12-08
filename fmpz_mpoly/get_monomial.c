@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,14 +10,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
                                            slong n, const fmpz_mpoly_ctx_t ctx)
 {
-   slong N = words_per_exp(ctx->n, poly->bits);
-   mpoly_get_monomial(exps, poly->exps + N*n, poly->bits, ctx->minfo);
+    slong N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    mpoly_get_monomial(exps, poly->exps + N*n, poly->bits, ctx->minfo);
 }

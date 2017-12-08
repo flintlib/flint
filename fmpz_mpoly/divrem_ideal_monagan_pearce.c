@@ -718,7 +718,7 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
       exp_bits = FLINT_MAX(exp_bits, poly3[i]->bits);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = words_per_exp(ctx->n, exp_bits);
+   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
    /* ensure input exponents packed to same size as output exponents */
    exp2 = poly2->exps;
@@ -793,9 +793,9 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
       if (lenr >= 0) /* check if division was successful */
          break;
 
-      exp_bits = mpoly_optimize_bits(exp_bits + 1, ctx->n);
+      exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
       masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-      N = words_per_exp(ctx->n, exp_bits);
+      N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
       if (exp_bits > FLINT_BITS)
          break;

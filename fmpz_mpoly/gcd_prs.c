@@ -27,15 +27,15 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     assert(polyB->length == 1);
 
     TMP_START;
-    texpA = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    texpB = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    exps = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    texpA = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    texpB = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    exps = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
 
     fmpz_init(igcd);
     fmpz_gcd(igcd, polyA->coeffs + 0, polyB->coeffs + 0);
 
     bits = FLINT_MAX(polyA->bits, polyB->bits);
-    N = words_per_exp(ctx->n, bits);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
     mask = 0;
     for (i = 0; i < FLINT_BITS/bits; i++)
         mask = (mask << bits) + (UWORD(1) << (bits - 1));

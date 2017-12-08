@@ -82,7 +82,7 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
     {
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_integrate");
     }
-    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 

@@ -30,7 +30,7 @@ slong fmpz_mpoly_get_term_si(const fmpz_mpoly_t poly,
    degrev_from_ord(deg, rev, ctx->ord);
 
    /* compute how many bits are required to represent exp */
-   exp_bits = mpoly_exp_bits(exp, ctx->n, deg);
+   exp_bits = mpoly_exp_bits(exp, ctx->minfo->nfields, deg);
    if (exp_bits > FLINT_BITS)
        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_get_term_si");
 
@@ -40,7 +40,7 @@ slong fmpz_mpoly_get_term_si(const fmpz_mpoly_t poly,
    TMP_START;
    
    masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = words_per_exp(ctx->n, poly->bits);
+   N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 

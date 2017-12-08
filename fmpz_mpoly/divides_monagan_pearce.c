@@ -627,14 +627,14 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    TMP_START;
 
     /* compute maximum fields in exponents */
-    max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
     mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
 
-    for (i = 0; i < ctx->n; i++)
+    for (i = 0; i < ctx->minfo->nfields; i++)
     {
         if (max_fields2[i] > max)
             max = max_fields2[i];
@@ -654,10 +654,10 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
     exp_bits = FLINT_MAX(WORD(8), bits + 1); /* extra bit required for signs */
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = FLINT_MAX(exp_bits, poly3->bits);
-    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = words_per_exp(ctx->n, exp_bits);
+   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
    /* temporary space to check leading monomials divide */
    expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));

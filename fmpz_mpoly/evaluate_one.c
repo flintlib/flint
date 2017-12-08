@@ -66,7 +66,7 @@ void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
 
     TMP_START;
 
-    N = words_per_exp(ctx->n, bits);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
     masks_from_bits_ord(maskhi, masklo, bits, ctx->ord);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_gen_oneexp_offset_shift(one, &main_off, &main_shift,

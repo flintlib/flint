@@ -154,10 +154,10 @@ mpoly_rbnode_struct * mpoly_rbtree_get(int * new,
       }                                                                      \
    } while (0)
 
-
+/*
 #define words_per_exp(nfields, bits)                                  \
    (((nfields) - 1)/(FLINT_BITS/(bits)) + 1)
-
+*/
 
 /* Orderings *****************************************************************/
 
@@ -199,35 +199,6 @@ void mpoly_ordering_print(ordering_t ord)
 }
 
 /* Misc **********************************************************************/
-
-/*
-MPOLY_INLINE
-void mpoly_off_shift(slong * off, slong * shift, slong idx, int deg, int rev, slong fpw, slong nfields, slong bits)
-{
-    if (rev)
-    {
-        *off   = (nfields - 1 - idx)/fpw;
-        *shift = (nfields - 1 - idx)%fpw;
-    } else
-    {
-        *off   = (deg + idx)/fpw;
-        *shift = (deg + idx)%fpw;
-    }
-    *shift = (fpw - 1 - *shift) * bits;
-}
-
-
-MPOLY_INLINE
-void mpoly_univar_exp(ulong * one, slong var, int deg, slong N, slong off, slong shift, slong fpw, slong bits)
-{
-    slong i;
-    for (i = 0; i < N; i++)
-        one[i] = 0;
-    one[off] = WORD(1) << shift;
-    if (deg)
-        one[0] |= WORD(1) << ((fpw - 1)*bits);
-}
-*/
 
 FLINT_DLL void mpoly_gen_offset_shift(slong * _offset, slong * _shift,
                        slong idx, slong N, slong bits, const mpoly_ctx_t mctx);

@@ -14,7 +14,7 @@
 void nmod_mpoly_init(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
 {
     /* default to at least 8 bits per exponent */
-    slong bits = mpoly_optimize_bits(8, ctx->n);
+    slong bits = mpoly_fix_bits(WORD(8), ctx->minfo);
 
     poly->coeffs = NULL;
     poly->exps = NULL;
@@ -27,8 +27,8 @@ void nmod_mpoly_init2(nmod_mpoly_t poly,
                                        slong alloc, const nmod_mpoly_ctx_t ctx)
 {
     /* default to at least 8 bits per exponent */
-    slong bits = mpoly_optimize_bits(8, ctx->n);
-    slong N = words_per_exp(ctx->n, bits);
+    slong bits = mpoly_fix_bits(WORD(8), ctx->minfo);
+    slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
     if (alloc != 0)
     {

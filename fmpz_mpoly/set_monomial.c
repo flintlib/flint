@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,10 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
@@ -32,10 +30,10 @@ void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_set_monomial");
 
    /* reallocate the number of bits of the exponents of the polynomial */
-   exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+   exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
    fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
 
-   N = words_per_exp(ctx->n, poly->bits);
+   N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
    fmpz_mpoly_fit_length(poly, n + 1, ctx);
 

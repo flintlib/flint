@@ -43,7 +43,7 @@ main(void)
         {
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, max_fields) + 1;
-            N = words_per_exp(nfields, bits1);
+
             for (i = 0; i < length*nfields; i++)
                 a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1);
 
@@ -77,8 +77,8 @@ main(void)
 
             mpoly_ctx_init(mctx, nfields, ORD_LEX);
 
+            N = mpoly_words_per_exp(bits1, mctx);
 
-            N = words_per_exp(nfields, bits1);
             for (i = 0; i < length*nfields; i++)
                 a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1);
 

@@ -15,7 +15,7 @@
 void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    slong bits, nfields;
+    slong bits;
     slong i, N;
     ulong * pmin, * exps, mask;
     fmpz_t igcd;
@@ -28,7 +28,6 @@ void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     }
 
     bits = poly2->bits;
-    nfields = ctx->n;
 
     TMP_START;
 
@@ -36,9 +35,9 @@ void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     for (i = 0; i < FLINT_BITS/bits; i++)
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-    N = words_per_exp(nfields, bits);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
     pmin = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    exps = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    exps = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
 
     fmpz_init(igcd);
 

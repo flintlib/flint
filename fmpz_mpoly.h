@@ -835,7 +835,7 @@ void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
    ulong maskhi, masklo;
 
    masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = words_per_exp(ctx->n, poly->bits);
+   N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
    if (!mpoly_monomials_test(poly->exps, poly->length, N, maskhi, masklo))
       flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
@@ -863,7 +863,7 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
    ulong * rexp, * gexp;
 
    bits = FLINT_MAX(r->bits, g->bits);
-   N = words_per_exp(ctx->n, bits);
+   N = mpoly_words_per_exp(bits, ctx->minfo);
 
    if (g->length == 0 )
       flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
@@ -908,7 +908,7 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
    ulong * rexp, * gexp;
 
    bits = FLINT_MAX(r->bits, g->bits);
-   N = words_per_exp(ctx->n, bits);
+   N = mpoly_words_per_exp(bits, ctx->minfo);
 
    if (g->length == 0 )
       flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
