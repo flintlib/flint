@@ -12,12 +12,6 @@
 #ifndef FLINT_H
 #define FLINT_H
 
-#ifdef FLINT_INLINES_C
-#define FLINT_INLINE FLINT_DLL
-#else
-#define FLINT_INLINE static __inline__
-#endif
-
 #undef ulong
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #if !defined(_MSC_VER)
@@ -39,6 +33,12 @@
 #include "longlong.h"
 #include "config.h"
 #undef ulong
+
+#ifdef FLINT_INLINES_C
+#define FLINT_INLINE FLINT_DLL
+#else
+#define FLINT_INLINE static __inline__
+#endif
 
 #if HAVE_GC
 #include "gc.h"
@@ -226,7 +226,7 @@ void flint_randclear(flint_rand_t state)
 
 FLINT_INLINE
 flint_rand_s * flint_rand_alloc()
-{  
+{
     return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
 }
 
