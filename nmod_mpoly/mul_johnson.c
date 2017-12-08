@@ -287,7 +287,7 @@ void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 {
     slong i, bits, exp_bits, N, len1 = 0;
     ulong max, * max_fields2, * max_fields3;
-    ulong maskhi, masklo;
+    ulong * cmpmask;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
     int free2 = 0, free3 = 0;
 
@@ -329,7 +329,8 @@ void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->minfo->ord);
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (exp_bits > poly2->bits)
@@ -362,13 +363,13 @@ void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
             len1 = _nmod_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                               N, maskhi, masklo, ctx->ffinfo);
+                                               N, cmpmask[0], cmpmask[1], ctx->ffinfo);
         } else
         {
             len1 = _nmod_mpoly_mul_johnson(&temp->coeffs, &temp->exps, &temp->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                               N, maskhi, masklo, ctx->ffinfo);
+                                               N, cmpmask[0], cmpmask[1], ctx->ffinfo);
         }
 
         nmod_mpoly_swap(temp, poly1, ctx);
@@ -384,13 +385,13 @@ void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
             len1 = _nmod_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                               N, maskhi, masklo, ctx->ffinfo);
+                                               N, cmpmask[0], cmpmask[1], ctx->ffinfo);
         } else
         {
             len1 = _nmod_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                               N, maskhi, masklo, ctx->ffinfo);
+                                               N, cmpmask[0], cmpmask[1], ctx->ffinfo);
         }
    }
 

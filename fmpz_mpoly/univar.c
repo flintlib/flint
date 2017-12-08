@@ -232,7 +232,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
     slong i, shift, off, bits, N;
     ulong k;
     slong next_loc, heap_len = 1;
-    ulong maskhi, masklo;
+    ulong * cmpmask;
     slong total_len, p_len;
     fmpz * p_coeff;
     ulong * p_exp;
@@ -261,9 +261,10 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
     bits = mpoly_fix_bits(bits, ctx->minfo);
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
-    masks_from_bits_ord(maskhi, masklo, bits, ctx->ord);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
     mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
+    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
 
     poly2_exps = (ulong **) TMP_ALLOC(poly2->length*sizeof(ulong));
     total_len = 0;
@@ -303,7 +304,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         x->next = NULL;
         mpoly_monomial_madd(exp + N*i, poly2_exps[x->i] + N*x->j, k, one, N);
         _mpoly_heap_insert(heap, exp + N*i, x, &next_loc, &heap_len, N,
-                                                               maskhi, masklo);
+                                                               cmpmask[0], cmpmask[1]);
     }
 
     p_len = 0;
@@ -311,20 +312,21 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
     {
         _fmpz_mpoly_fit_length(&p_coeff, &p_exp, &p_alloc, p_len + 1, N);
         mpoly_monomial_set(p_exp + N*p_len, heap[1].exp, N);
-        x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
+        x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask[0], cmpmask[1]);
         fmpz_set(p_coeff + p_len, (poly2->coeffs + x->i)->coeffs + x->j);
         p_len++;
 
         assert(x->next == NULL);
         
-        if (x->j + 1 < (poly2->coeffs + x->i)->length) {
+        if (x->j + 1 < (poly2->coeffs + x->i)->length)
+        {
             k = poly2->exps[x->i];
             x->j = x->j + 1;
             x->next = NULL;
             mpoly_monomial_madd(exp + N*x->i, poly2_exps[x->i] + N*x->j, k, one,
                                                                             N);
             _mpoly_heap_insert(heap, exp + N*x->i, x, &next_loc, &heap_len, N,
-                                                               maskhi, masklo);
+                                                               cmpmask[0], cmpmask[1]);
         }
     }
 
@@ -346,8 +348,11 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
 void fmpz_mpoly_univar_test(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
-    if (!mpoly_monomials_test(poly->exps, poly->length, WORD(1), 0, 0))
-        flint_throw(FLINT_ERROR, "Univariate polynomial exponents invalid");
+    for (i = 0; i + 1 < poly->length; i++)
+    {
+        if (poly->exps[i] <= poly->exps[i + 1])
+            flint_throw(FLINT_ERROR, "Univariate polynomial exponents invalid");
+    }
     for (i = 0; i < poly->length; i++)
         fmpz_mpoly_test(poly->coeffs + i, ctx);
 }

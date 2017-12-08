@@ -605,8 +605,8 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 {
    slong i, bits, exp_bits, N, len = 0;
    ulong * max_fields2, * max_fields3;
-   ulong max = 0;
-   ulong maskhi, masklo;
+   ulong max;
+   ulong * cmpmask;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;
    int free2 = 0, free3 = 0;
    ulong mask = 0;
@@ -633,7 +633,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                                                       poly2->bits, ctx->minfo);
     mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
-
+    max = 0;
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
         if (max_fields2[i] > max)
@@ -656,8 +656,9 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
     exp_bits = FLINT_MAX(exp_bits, poly3->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-   masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
    /* temporary space to check leading monomials divide */
    expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));
@@ -710,7 +711,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
       len = _fmpz_mpoly_divides_monagan_pearce(&temp->coeffs, &temp->exps,
                             &temp->alloc, poly2->coeffs, exp2, poly2->length,
                               poly3->coeffs, exp3, poly3->length, exp_bits, N,
-                                                               maskhi, masklo);
+                                                              cmpmask[0], cmpmask[1]);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -724,7 +725,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
       len = _fmpz_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
                             &poly1->alloc, poly2->coeffs, exp2, poly2->length,
                               poly3->coeffs, exp3, poly3->length, exp_bits, N,
-                                                               maskhi, masklo);
+                                                               cmpmask[0], cmpmask[1]);
    }
 
 cleanup:

@@ -419,7 +419,7 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
 {
     slong i, bits, exp_bits, N, len = 0;
     ulong max, * max_fields2, * max_fields3;
-    ulong maskhi, masklo;
+    ulong * cmpmask;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;
     int free2 = 0, free3 = 0;
     ulong mask = 0;
@@ -463,8 +463,9 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
     exp_bits = FLINT_MAX(exp_bits, poly3->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-    masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* temporary space to check leading monomials divide */
     expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));
@@ -516,7 +517,7 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
       len = _nmod_mpoly_divides_monagan_pearce(&temp->coeffs, &temp->exps,
                             &temp->alloc, poly2->coeffs, exp2, poly2->length,
                               poly3->coeffs, exp3, poly3->length, exp_bits, N,
-                                                  maskhi, masklo, ctx->ffinfo);
+                                                  cmpmask[0], cmpmask[1], ctx->ffinfo);
 
       nmod_mpoly_swap(temp, poly1, ctx);
 
@@ -530,7 +531,7 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
       len = _nmod_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
                             &poly1->alloc, poly2->coeffs, exp2, poly2->length,
                               poly3->coeffs, exp3, poly3->length, exp_bits, N,
-                                                  maskhi, masklo, ctx->ffinfo);
+                                                  cmpmask[0], cmpmask[1], ctx->ffinfo);
    }
 
 cleanup:

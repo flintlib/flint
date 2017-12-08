@@ -606,7 +606,7 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    slong i, bits, exp_bits, N, len = 0;
    ulong max = 0, * max_degs2;
    ulong lo, hi;
-   ulong maskhi, masklo;
+   ulong * cmpmask;
    ulong * exp2 = poly2->exps;
    int free2 = 0;
 
@@ -657,8 +657,9 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-   masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
    if (exp_bits > poly2->bits)
    {
@@ -694,7 +695,7 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       temp->bits = exp_bits;
 
       len = _fmpz_mpoly_pow_fps(&temp->coeffs, &temp->exps, &temp->alloc,
-                     poly2->coeffs, exp2, poly2->length, k, N, maskhi, masklo);
+                     poly2->coeffs, exp2, poly2->length, k, N, cmpmask[0], cmpmask[1]);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -706,7 +707,7 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       poly1->bits = exp_bits;
 
       len = _fmpz_mpoly_pow_fps(&poly1->coeffs, &poly1->exps, &poly1->alloc,
-                     poly2->coeffs, exp2, poly2->length, k, N, maskhi, masklo);
+                     poly2->coeffs, exp2, poly2->length, k, N, cmpmask[0], cmpmask[1]);
    }
 
 cleanup:

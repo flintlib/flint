@@ -124,13 +124,13 @@ slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1,
 void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
-   slong len = 0, max_bits, N;
-   ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
-   ulong maskhi, masklo;
-   int free2 = 0, free3 = 0;
+    slong len = 0, max_bits, N;
+    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
+    ulong * cmpmask;
+    int free2 = 0, free3 = 0;
+    TMP_INIT;
 
    max_bits = FLINT_MAX(poly2->bits, poly3->bits);
-   masks_from_bits_ord(maskhi, masklo, max_bits, ctx->ord);
    N = mpoly_words_per_exp(max_bits, ctx->minfo);
 
    if (poly2->length == 0)
@@ -142,6 +142,10 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       fmpz_mpoly_set(poly1, poly2, ctx);
       return;
    }
+
+    TMP_START;
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, max_bits, ctx->minfo);
 
    if (max_bits > poly2->bits)
    {
@@ -169,7 +173,7 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       len = _fmpz_mpoly_add(temp->coeffs, temp->exps, 
                     poly2->coeffs, exp2, poly2->length,
-                    poly3->coeffs, exp3, poly3->length, N, maskhi, masklo);
+                    poly3->coeffs, exp3, poly3->length, N, cmpmask[0], cmpmask[1]);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -182,7 +186,7 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
       len = _fmpz_mpoly_add(poly1->coeffs, poly1->exps, 
                        poly2->coeffs, exp2, poly2->length,
-                       poly3->coeffs, exp3, poly3->length, N, maskhi, masklo);
+                       poly3->coeffs, exp3, poly3->length, N, cmpmask[0], cmpmask[1]);
    }
       
    if (free2)
@@ -192,4 +196,5 @@ void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       flint_free(exp3);
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
+    TMP_END;
 }

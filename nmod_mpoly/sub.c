@@ -120,12 +120,12 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 {
     slong len1 = 0, max_bits, N;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
-    ulong maskhi, masklo;
+    ulong * cmpmask;
     int free2 = 0, free3 = 0;
+    TMP_INIT;
 
     max_bits = FLINT_MAX(poly2->bits, poly3->bits);
     N = mpoly_words_per_exp(max_bits, ctx->minfo);
-    masks_from_bits_ord(maskhi, masklo, max_bits, ctx->minfo->ord);
 
     if (poly2->length == 0)
     {
@@ -136,6 +136,10 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         nmod_mpoly_set(poly1, poly2, ctx);
         return;
     }
+
+    TMP_START;
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, max_bits, ctx->minfo);
 
     if (max_bits > poly2->bits)
     {
@@ -164,7 +168,7 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         len1 = _nmod_mpoly_sub(temp->coeffs, temp->exps, 
                     poly2->coeffs, exp2, poly2->length,
                     poly3->coeffs, exp3, poly3->length,
-                                    N, maskhi, masklo, ctx->ffinfo);
+                                    N, cmpmask[0], cmpmask[1], ctx->ffinfo);
 
         nmod_mpoly_swap(temp, poly1, ctx);
 
@@ -178,7 +182,7 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         len1 = _nmod_mpoly_sub(poly1->coeffs, poly1->exps, 
                        poly2->coeffs, exp2, poly2->length,
                        poly3->coeffs, exp3, poly3->length,
-                                    N, maskhi, masklo, ctx->ffinfo);
+                                    N, cmpmask[0], cmpmask[1], ctx->ffinfo);
     }
       
     if (free2)
@@ -188,4 +192,6 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         flint_free(exp3);
 
     _nmod_mpoly_set_length(poly1, len1, ctx);
+
+    TMP_END;
 }

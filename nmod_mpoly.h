@@ -555,13 +555,9 @@ void nmod_mpoly_randtest(nmod_mpoly_t poly, flint_rand_t state,
 NMOD_MPOLY_INLINE
 void nmod_mpoly_test(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
 {
-   slong i, N;
-   ulong maskhi, masklo;
+   slong i;
 
-   N = mpoly_words_per_exp(poly->bits, ctx->minfo);
-   masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->minfo->ord);
-
-   if (!mpoly_monomials_test(poly->exps, poly->length, N, maskhi, masklo))
+   if (!mpoly_monomials_test(poly->exps, poly->length, poly->bits, ctx->minfo))
       flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
 
     for (i = 0; i < poly->length; i++)

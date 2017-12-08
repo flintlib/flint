@@ -675,7 +675,7 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
 {
    slong i, exp_bits, N, lenr = 0;
    slong len3 = 0;
-   ulong maskhi, masklo;
+   ulong * cmpmask;
    ulong * exp2;
    ulong ** exp3;
    int free2 = 0;
@@ -717,8 +717,9 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
    for (i = 0; i < len; i++)
       exp_bits = FLINT_MAX(exp_bits, poly3[i]->bits);
 
-   masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
    /* ensure input exponents packed to same size as output exponents */
    exp2 = poly2->exps;
@@ -750,7 +751,7 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
    /* check leading mon. of at least one divisor is at most that of dividend */
    for (i = 0; i < len; i++)
    {
-      if (!mpoly_monomial_lt(exp3[i], exp2, N, maskhi, masklo))
+      if (!mpoly_monomial_lt(exp3[i], exp2, N, cmpmask[0], cmpmask[1]))
          break;
    }
 
@@ -788,14 +789,15 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
 
       lenr = _fmpz_mpoly_divrem_ideal_monagan_pearce(q, &tr->coeffs, &tr->exps,
                          &tr->alloc, poly2->coeffs, exp2, poly2->length,
-                           poly3, exp3, len, N, exp_bits, ctx, maskhi, masklo);
+                           poly3, exp3, len, N, exp_bits, ctx, cmpmask[0], cmpmask[1]);
 
       if (lenr >= 0) /* check if division was successful */
          break;
 
       exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
-      masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
       N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+      cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+      mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
       if (exp_bits > FLINT_BITS)
          break;

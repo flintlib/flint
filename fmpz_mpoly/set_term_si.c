@@ -16,7 +16,7 @@ void fmpz_mpoly_set_term_si(fmpz_mpoly_t poly,
                         ulong const * exp, slong c, const fmpz_mpoly_ctx_t ctx)
 {
    slong i, N, index, exp_bits;
-   ulong maskhi, masklo;
+   ulong * cmpmask;
    ulong * packed_exp;
    int exists;
    TMP_INIT;
@@ -31,8 +31,9 @@ void fmpz_mpoly_set_term_si(fmpz_mpoly_t poly,
    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
    fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
 
-   masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, poly->bits, ctx->minfo);
 
    packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
@@ -41,7 +42,7 @@ void fmpz_mpoly_set_term_si(fmpz_mpoly_t poly,
        
    /* work out at what index term should be placed */
    exists = mpoly_monomial_exists(&index, poly->exps,
-                                  packed_exp, poly->length, N, maskhi, masklo);
+                                  packed_exp, poly->length, N, cmpmask[0], cmpmask[1]);
 
    if (!exists) /* term with that exponent doesn't exist */
    {

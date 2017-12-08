@@ -831,13 +831,9 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, N;
-   ulong maskhi, masklo;
+   slong i;
 
-   masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-   N = mpoly_words_per_exp(poly->bits, ctx->minfo);
-
-   if (!mpoly_monomials_test(poly->exps, poly->length, N, maskhi, masklo))
+   if (!mpoly_monomials_test(poly->exps, poly->length, poly->bits, ctx->minfo))
       flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
 
     for (i = 0; i < poly->length; i++)
@@ -845,7 +841,6 @@ void fmpz_mpoly_test(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
         if (fmpz_equal_si(poly->coeffs + i, 0))
             flint_throw(FLINT_ERROR, "Polynomial has a zero coefficient");
     }
-
 }
 
 

@@ -711,10 +711,11 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
 {
    slong exp_bits, N, lenq = 0, lenr = 0;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
-   ulong maskhi, masklo;
+   ulong * cmpmask;
    int free2 = 0, free3 = 0;
    fmpz_mpoly_t temp1, temp2;
    fmpz_mpoly_struct * tq, * tr;
+    TMP_INIT;
 
    /* check divisor is nonzero */
    if (poly3->length == 0)
@@ -729,12 +730,12 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
       return;
    }
 
-   /* compute maximum degree appearing in inputs */
+    TMP_START;
 
-   /* maximum bits in quotient and remainder exps is max for poly2 and poly3 */
-   exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
-   masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
    /* ensure input exponents packed to same size as output exponents */
    if (exp_bits > poly2->bits)
@@ -754,11 +755,10 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
    }
 
    /* check divisor leading monomial is at most that of the dividend */
-   if (mpoly_monomial_lt(exp3, exp2, N, maskhi, masklo))
+   if (mpoly_monomial_lt(exp3, exp2, N, cmpmask[0], cmpmask[1]))
    {
       fmpz_mpoly_set(r, poly2, ctx);
       fmpz_mpoly_zero(q, ctx);
-
       goto cleanup3;
    }
 
@@ -768,14 +768,12 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
       fmpz_mpoly_init2(temp1, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(temp1, exp_bits, ctx);
       temp1->bits = exp_bits;
-
       tq = temp1;
    } else
    {
       fmpz_mpoly_fit_length(q, poly2->length/poly3->length + 1, ctx);
       fmpz_mpoly_fit_bits(q, exp_bits, ctx);
       q->bits = exp_bits;
-
       tq = q;
    }
 
@@ -784,14 +782,12 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
       fmpz_mpoly_init2(temp2, poly3->length, ctx);
       fmpz_mpoly_fit_bits(temp2, exp_bits, ctx);
       temp2->bits = exp_bits;
-
       tr = temp2;
    } else
    {
       fmpz_mpoly_fit_length(r, poly3->length, ctx);
       fmpz_mpoly_fit_bits(r, exp_bits, ctx);
       r->bits = exp_bits;
-
       tr = r;
    }
 
@@ -799,7 +795,7 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
    while ((lenq = _fmpz_mpoly_divrem_monagan_pearce(&lenr, &tq->coeffs, &tq->exps,
          &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2, 
          poly2->length, poly3->coeffs, exp3, poly3->length, exp_bits,
-                                                       N, maskhi, masklo)) == 0
+                                                       N, cmpmask[0], cmpmask[1])) == 0
          && lenr == 0 && exp_bits < FLINT_BITS)
    {
       ulong * old_exp2 = exp2, * old_exp3 = exp3;
@@ -807,8 +803,9 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
 
       exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
 
-      masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
       N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+      cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+      mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
       mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
@@ -862,4 +859,6 @@ cleanup3:
 
    if (free3)
       flint_free(exp3);
+
+    TMP_END;
 }

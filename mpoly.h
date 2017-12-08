@@ -123,21 +123,6 @@ mpoly_rbnode_struct * mpoly_rbtree_get(int * new,
                                          struct mpoly_rbtree *tree, slong rcx);
 
 
-/* Macros ********************************************************************/
-
-#define masks_from_bits_ord(maskhi, masklo, bits, ord)                       \
-   do {                                                                      \
-      if ((ord) == ORD_DEGREVLEX)                                            \
-      {                                                                      \
-         (masklo) = -WORD(1);                                                \
-         (maskhi) = (WORD(1) << ((bits)*((FLINT_BITS)/(bits) - 1))) - 1;     \
-      } else                                                                 \
-      {                                                                      \
-         (masklo) = 0;                                                       \
-         (maskhi) = 0;                                                       \
-      }                                                                      \
-   } while (0)
-
 /* Orderings *****************************************************************/
 
 MPOLY_INLINE
@@ -488,6 +473,12 @@ void mpoly_max_degrees_tight(slong * max_exp,
 
 /* Monomial arrays ***********************************************************/
 
+FLINT_DLL void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
+                                                       const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_get_ovfmask(ulong * ovfmask, slong N, slong bits,
+                                                       const mpoly_ctx_t mctx);
+
 FLINT_DLL slong mpoly_exp_bits_required_ui(const ulong * user_exp, const mpoly_ctx_t mctx);
 
 FLINT_DLL slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx);
@@ -537,17 +528,25 @@ FLINT_DLL void mpoly_search_monomials(
                                           slong N, ulong maskhi, ulong masklo);
 
 MPOLY_INLINE
-int mpoly_monomials_test(ulong * exps, slong len, slong N,
-                                                    ulong maskhi, ulong masklo)
+int mpoly_monomials_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx)
 {
-   slong i;
+    slong N, i;
+    ulong * cmpmask;
 
-   for (i = 0; i + 1 < len; i++)
-   {
-      if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N, maskhi, masklo))
-         return 0;
-   }
-   return 1;
+    N = mpoly_words_per_exp(bits, mctx);
+    cmpmask = flint_malloc((N+1)*sizeof(ulong));
+    mpoly_get_cmpmask(cmpmask, N, bits, mctx);
+
+    for (i = 0; i + 1 < len; i++)
+    {
+        if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N, cmpmask[0], cmpmask[1]))
+        {
+            flint_free(cmpmask);
+            return 0;
+        }
+    }
+    flint_free(cmpmask);
+    return 1;
 }
 
 /* Heap **********************************************************************/

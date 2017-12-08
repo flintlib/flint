@@ -631,12 +631,13 @@ exp_overflow:
 void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, 
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
-   slong exp_bits, N, lenq = 0;
-   ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
-   ulong maskhi, masklo;
-   int free2 = 0, free3 = 0;
-   fmpz_mpoly_t temp1;
-   fmpz_mpoly_struct * tq;
+    slong exp_bits, N, lenq = 0;
+    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
+    ulong * cmpmask;
+    int free2 = 0, free3 = 0;
+    fmpz_mpoly_t temp1;
+    fmpz_mpoly_struct * tq;
+    TMP_INIT;
 
    /* check divisor is nonzero */
    if (poly3->length == 0)
@@ -649,11 +650,14 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
       return;
    }
 
+   TMP_START;
+
    /* maximum bits in quotient exps and inputs is max for poly2 and poly3 */
    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
 
-   masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
    /* ensure input exponents packed to same size as output exponents */
    if (exp_bits > poly2->bits)
@@ -673,7 +677,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    }
 
    /* check divisor leading monomial is at most that of the dividend */
-   if (mpoly_monomial_lt(exp3, exp2, N, maskhi, masklo))
+   if (mpoly_monomial_lt(exp3, exp2, N, cmpmask[0], cmpmask[1]))
    {
       fmpz_mpoly_zero(q, ctx);
       goto cleanup3;
@@ -698,7 +702,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    while ((lenq = _fmpz_mpoly_div_monagan_pearce(&tq->coeffs, &tq->exps,
                          &tq->alloc, poly2->coeffs, exp2, poly2->length, 
                                      poly3->coeffs, exp3, poly3->length,
-                                      exp_bits, N, maskhi, masklo)) == -WORD(1)
+                                      exp_bits, N, cmpmask[0], cmpmask[1])) == -WORD(1)
             && exp_bits < FLINT_BITS)
    {
       ulong * old_exp2 = exp2, * old_exp3 = exp3;
@@ -706,8 +710,9 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
 
       exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
 
-      masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
       N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+      cmpmask = (ulong*) TMP_ALLOC((N+1)*sizeof(ulong)); /* read cmpmask[1] even when N=1 */
+      mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
       mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
