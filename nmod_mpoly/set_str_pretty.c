@@ -134,11 +134,7 @@ int _nmod_mpoly_parse_pretty(nmod_mpoly_t poly, const char * s, slong sn,
     int expecting = 1;
     fmpz_t c;
     slong l, k;
-    int deg, rev, ret;
-    slong nvars;
-
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
+    int ret;
 
     fmpz_init(c);
     ostack = (slong *) flint_malloc(ealloc*sizeof(slong));
@@ -227,13 +223,13 @@ int _nmod_mpoly_parse_pretty(nmod_mpoly_t poly, const char * s, slong sn,
 
         } else {
             /* must be a variable */
-            for (k = 0; k < nvars; k++)
+            for (k = 0; k < ctx->minfo->nvars; k++)
             {
                 l = strlen(x[k]);
                 if ((end - s >= l) && (strncmp(s, x[k], l) == 0))
                     break;
             }
-            if (!(expecting & 1) || k >= nvars)
+            if (!(expecting & 1) || k >= ctx->minfo->nvars)
                 goto failed;
             _nmod_mpoly_parse_pretty_fit_estack(&estack, ei, &ealloc);
             nmod_mpoly_geobucket_init(estack[ei], ctx);
@@ -273,18 +269,16 @@ int nmod_mpoly_set_str_pretty(nmod_mpoly_t poly, const char * str,
                                  const char** x_in, const nmod_mpoly_ctx_t ctx)
 {
 
-    int ret, deg, rev;
-    slong i, nvars;
+    int ret;
+    slong i;
     char ** x = (char **) x_in;
     TMP_INIT;
 
     TMP_START;
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
     if (x == NULL)
     {
-        x = (char **) TMP_ALLOC(nvars*sizeof(char *));
-        for (i = 0; i < nvars; i++)
+        x = (char **) TMP_ALLOC(ctx->minfo->nvars*sizeof(char *));
+        for (i = 0; i < ctx->minfo->nvars; i++)
         {
             x[i] = (char *) TMP_ALLOC(22*sizeof(char));
             flint_sprintf(x[i], "x%wd", i + 1);

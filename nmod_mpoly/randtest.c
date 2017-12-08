@@ -14,15 +14,11 @@
 void nmod_mpoly_randtest(nmod_mpoly_t poly, flint_rand_t state,
                      slong length, slong exp_bound, const nmod_mpoly_ctx_t ctx)
 {
-    slong i, j, nvars;
+    slong i, j, nvars = ctx->minfo->nvars;
     ulong * exp;
-    int deg, rev;
     TMP_INIT;
 
     TMP_START;
-
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
 
     exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
     nmod_mpoly_zero(poly, ctx);

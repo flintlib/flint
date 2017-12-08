@@ -589,7 +589,7 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t
         if (lenr >= 0) /* check if division was successful */
             break;
 
-        exp_bits = mpoly_optimize_bits(exp_bits + 1, ctx->n);
+        exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
         masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
         N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 

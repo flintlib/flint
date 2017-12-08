@@ -125,22 +125,6 @@ mpoly_rbnode_struct * mpoly_rbtree_get(int * new,
 
 /* Macros ********************************************************************/
 
-#define degrev_from_ord(deg, rev, ord)                                \
-   (deg) = (rev) = 0;                                                 \
-   do {                                                               \
-      switch (ord)                                                    \
-      {                                                               \
-      case ORD_LEX:                                                   \
-         break;                                                       \
-      case ORD_DEGLEX:                                                \
-         (deg) = 1; break;                                            \
-      case ORD_DEGREVLEX:                                             \
-         (deg) = (rev) = 1; break;                                    \
-      default:                                                        \
-         flint_throw(FLINT_ERROR, "Invalid ordering in fmpz_mpoly");  \
-      }                                                               \
-   } while (0)
-
 #define masks_from_bits_ord(maskhi, masklo, bits, ord)                       \
    do {                                                                      \
       if ((ord) == ORD_DEGREVLEX)                                            \
@@ -153,11 +137,6 @@ mpoly_rbnode_struct * mpoly_rbtree_get(int * new,
          (maskhi) = 0;                                                       \
       }                                                                      \
    } while (0)
-
-/*
-#define words_per_exp(nfields, bits)                                  \
-   (((nfields) - 1)/(FLINT_BITS/(bits)) + 1)
-*/
 
 /* Orderings *****************************************************************/
 
@@ -509,11 +488,9 @@ void mpoly_max_degrees_tight(slong * max_exp,
 
 /* Monomial arrays ***********************************************************/
 
-FLINT_DLL slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg);
+FLINT_DLL slong mpoly_exp_bits_required_ui(const ulong * user_exp, const mpoly_ctx_t mctx);
 
 FLINT_DLL slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx);
-
-FLINT_DLL slong mpoly_optimize_bits(slong bits, slong nfields);
 
 FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits,
                                                      slong nfields, slong len);

@@ -10,26 +10,20 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
                        slong n, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
    slong exp_bits, N;
-   int deg, rev;
-
-   degrev_from_ord(deg, rev, ctx->ord);
 
    if (n > poly->length)
       flint_throw(FLINT_ERROR, "Invalid index in fmpz_mpoly_set_monomial");
 
-   /* compute how many bits are required to represent exp */
-   exp_bits = mpoly_exp_bits(exp, ctx->n, deg);
+   exp_bits = mpoly_exp_bits_required_ui(exp, ctx->minfo);
    if (exp_bits > FLINT_BITS)
        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_set_monomial");
 
-   /* reallocate the number of bits of the exponents of the polynomial */
    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
    fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
 

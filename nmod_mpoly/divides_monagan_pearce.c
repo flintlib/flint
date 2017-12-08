@@ -461,7 +461,7 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
     exp_bits = FLINT_MAX(WORD(8), bits + 1); /* extra bit required for signs */
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = FLINT_MAX(exp_bits, poly3->bits);
-    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
