@@ -11,43 +11,40 @@
 
 #include "mpoly.h"
 
-void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {
-    slong i, j, shift, fields_per_word = FLINT_BITS/bits;
+void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {
+    slong i, j, shift;
     ulong v;
     for (j = 0; j < len; j++) {
         v = 0;
-        shift = bits*fields_per_word;
-        for (i = 0; i < nfields; i++) {
-            shift -= bits;
-            v |= *exp2++ << shift;
-            if (shift == 0)
-            {
+        shift = 0;
+        i = 0;
+        do {
+            if (shift + bits > FLINT_BITS) {
                 *exp1++ = v;
                 v = 0;
-                shift = bits*fields_per_word;
+                shift = 0;
             }
-        }
-        if (shift != bits*fields_per_word)
-        {
-            *exp1++ = v;
-        }
+            v |= *exp2++ << shift;
+            shift += bits;      /* number of bits to encode ith field */
+        } while (++i < nfields);
+        *exp1++ = v;
     }
 }
 
-void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {
-    slong i, j, shift, fields_per_word = FLINT_BITS/bits;
+void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {
+    slong i, j, shift;
     ulong u, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     for (j = 0; j < len; j++) {
-        u = *exp2++;
-        shift = bits*fields_per_word;
-        for (i = 0; i < nfields; i++) {
-            shift -= bits;
-            *exp1++ = (u >> shift) & mask;
-            if (shift == 0 && i + 1 < nfields)
-            {
+        shift = FLINT_BITS;
+        i = 0;
+        do {
+            if (shift + bits > FLINT_BITS) {
                 u = *exp2++;
-                shift = bits*fields_per_word;
+                shift = 0;
             }
-        }
+            *exp1++ = u & mask;
+            u = u >> bits;      /* number of bits to encode ith field */
+            shift += bits;      /* number of bits to encode ith field */
+        } while (++i < nfields);
     }
 }

@@ -33,7 +33,7 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
 
     TMP_START;
     user_exp = (ulong *) TMP_ALLOC((ctx->minfo->nvars)*sizeof(ulong));
-    mpoly_get_monomial(user_exp, poly->exps, poly->bits, ctx->minfo);
+    mpoly_get_monomial_ui(user_exp, poly->exps, poly->bits, ctx->minfo);
 
     for (i = 0; i < ctx->minfo->nvars; i++)
     {

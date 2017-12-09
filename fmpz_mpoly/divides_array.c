@@ -787,7 +787,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 {
    slong i, j, k, prod, len = 0, l1, l2, l3;
    slong bits1, bits2, bits3 = 0, tlen, talloc, skip, max_exp;
-   slong shift = bits*(FLINT_BITS/bits - 1);
+   slong shift = bits*(num);
    slong * i1, * i2, * i3, * n1, * n2, * n3;
    slong * b1, * b3, * maxb1, * maxb3, * max_exp1, * max_exp3;
    ulong * e2, * e3, * texp, * p2;
@@ -862,9 +862,8 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 1, bits);
-
-   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 1, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, bits);
 
    /* work out maximum packed exponent for each chunk */
    for (i = 0; i < l3; i++)
@@ -1031,7 +1030,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
          if (i < l1)
          {
             /* tightly pack chunk exponents */
-            mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, 0, bits);
+            mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, bits);
 
             /* set starting index for quotient chunk we are about to compute */
             i1[i] = len;
@@ -1152,7 +1151,7 @@ big:
          if (i < l1)
          {
             /* tightly pack chunk exponents */
-            mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, 0, bits);
+            mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, bits);
 
             /* set starting index of quotient chunk we are about to compute */
             i1[i] = len;
@@ -1217,7 +1216,7 @@ cleanup2:
    if (len != 0)
    {
       /* unpack monomials of quotient */
-      mpoly_unpack_monomials_tight((*exp1), (*exp1), len, mults, num, 1, bits);
+      mpoly_unpack_monomials_tight((*exp1), (*exp1), len, mults, num, bits);
 
       /* put main variable back in quotient */
       for (i = 0; i < l1; i++)
@@ -1279,16 +1278,15 @@ slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    /* pack input exponents tightly with mixed bases specified by "mults" */
    
-   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 0, bits);
-
-   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 0, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, bits);
 
    /* do exact quotient with divisibility test on tightly packed polys */
    len = _fmpz_mpoly_divides_array_tight(poly1, exp1,
                       alloc, 0,  poly2, e2, len2, poly3, e3, len3, mults, num);
 
    /* unpack output quotient exponents */
-   mpoly_unpack_monomials_tight((*exp1), (*exp1), len, mults, num, 0, bits);
+   mpoly_unpack_monomials_tight((*exp1), (*exp1), len, mults, num, bits);
 
    TMP_END;
 
@@ -1328,9 +1326,9 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     max_fields1 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    mpoly_max_fields_ui_backwards(max_fields2, poly2->exps, poly2->length,
+    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
-    mpoly_max_fields_ui_backwards(max_fields3, poly3->exps, poly3->length,
+    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
     max = 0;
     for (i = 0; i < ctx->minfo->nfields; i++)
@@ -1431,7 +1429,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    */  
    if (len != 0)
    {
-      mpoly_max_fields_ui_backwards(max_fields1, poly1->exps, poly1->length,
+      mpoly_max_fields_ui(max_fields1, poly1->exps, poly1->length,
                                                       poly1->bits, ctx->minfo);
 
       for (i = 0; i < ctx->minfo->nfields; i++)

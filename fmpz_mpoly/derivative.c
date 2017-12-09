@@ -58,4 +58,6 @@ void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                           var, bits, N, offset, shift, oneexp);
 
     _fmpz_mpoly_set_length(poly1, len1, ctx);
+
+    TMP_END;
 }

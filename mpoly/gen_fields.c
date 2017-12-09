@@ -23,13 +23,9 @@ void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx)
     for (i = 0; i < nfields; i++)
         exp[i] = WORD(0);
 
-    if (rev)
-        exp[deg + nvars - 1 - var] = WORD(1);
-    else
-        exp[deg + var] = WORD(1);
-
+    exp[rev ? var : nvars - 1 - var] = WORD(1);
     if (deg)
-        exp[0] = WORD(1);
+        exp[nvars] = WORD(1);
 
 }
 

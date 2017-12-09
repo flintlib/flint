@@ -17,26 +17,28 @@ void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
 {
     slong i;
 
-    /* LEX and DEGLEX use a clear mask */
-    i = 0;
-    do {
-        cmpmask[i] = WORD(0);
-    } while (++i < N);
-
-    /* DEGREVLEX has a bit set everywhere except the in most significant field */
     if (mctx->ord == ORD_DEGREVLEX)
     {
+        /* DEGREVLEX has a bit set everywhere except the in most significant field */
         if (bits <= FLINT_BITS)
         {
-            cmpmask[0] = (UWORD(1) << ((bits)*((FLINT_BITS)/(bits) - 1))) - 1;
-            for (i = 1; i < N; i++)
+            for (i = 0; i + 1 < N; i++)
                 cmpmask[i] = -UWORD(1);
+            cmpmask[N - 1] = (UWORD(1) << (mctx->nvars%(FLINT_BITS/bits)*bits)) - UWORD(1);
+
         } else {
 
             flint_throw(FLINT_ERROR, "bits > FLINT_BITS in mpoly_get_cmpmask");
 
             for (i = 0; i < N - bits/FLINT_BITS; i++)
                 cmpmask[i] = -UWORD(1);
+            for (; i < N; i++)
+                cmpmask[i] = UWORD(0);
         }
+    } else
+    {
+        /* LEX and DEGLEX use a clear mask */
+        for (i = 0; i < N; i++)
+            cmpmask[i] = UWORD(0);
     }
 }

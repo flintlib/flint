@@ -34,29 +34,7 @@ void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
     for (i = 0; i < len; i++)
         mpoly_monomial_max(pmax, pmax, poly_exps + N*i, bits, N, mask);
 
-    mpoly_unpack_vec(max_fields, pmax, bits, mctx->nfields, 1);
+    mpoly_unpack_vec_ui(max_fields, pmax, bits, mctx->nfields, 1);
 
     TMP_END;
 }
-
-
-/*
-    unpack the field-wise maximum of poly_exps into max_fields
-    but write the results backwards (this backwards array is used for dense code)
-*/
-void mpoly_max_fields_ui_backwards(ulong * max_fields, const ulong * poly_exps,
-                                 slong len, slong bits, const mpoly_ctx_t mctx)
-{
-    slong i, j;
-
-    mpoly_max_fields_ui(max_fields, poly_exps, len, bits, mctx);
-
-    /* reverse the order */
-    for (i = 0, j = mctx->nfields - 1; i < j; i++, j--)
-    {
-        ulong t = max_fields[j];
-        max_fields[j] = max_fields[i];
-        max_fields[i] = t;
-    }
-}
-

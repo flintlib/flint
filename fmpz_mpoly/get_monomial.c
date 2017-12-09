@@ -16,5 +16,5 @@ void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly,
                                            slong n, const fmpz_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp(poly->bits, ctx->minfo);
-    mpoly_get_monomial(exps, poly->exps + N*n, poly->bits, ctx->minfo);
+    mpoly_get_monomial_ui(exps, poly->exps + N*n, poly->bits, ctx->minfo);
 }

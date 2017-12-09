@@ -441,7 +441,7 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
 {
    slong i, j, k, l = 0, m, prod, len = 0, l1, l2, l3;
    slong bits1, bits2, bits3 = 0, tlen, talloc;
-   slong shift = bits*(FLINT_BITS/bits - 1);
+   slong shift = bits*(num);
    slong * i1, * i2, * i3, * n1, * n2, * n3, * prods;
    slong * b1, * b3, * maxb1, * maxb3, * max_exp1, * max_exp3;
    ulong * e2, * e3, * texp, * p2;
@@ -501,9 +501,8 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 1, bits);
-
-   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 1, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, bits);
 
    /* work out maximum exponents for each chunk */
    for (i = 0; i < l3; i++)
@@ -648,7 +647,7 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
             if (i < l1) /* potentially a quotient with remainder */
             {
                /* tightly pack chunk exponents */
-               mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, 0, bits);
+               mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, bits);
 
                /* set starting index for quotient chunk we are about to compute */
                i1[i] = len;
@@ -660,7 +659,7 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
 																   
 	       /* unpack remainder exponents */
 	       mpoly_unpack_monomials_tight(*expr + l,
-			                            *expr + l, *lenr, mults, num, 1, bits);
+			                            *expr + l, *lenr, mults, num, bits);
 														  
 	       /* insert main variable */
 	       for (j = 0; j < *lenr; j++)
@@ -716,7 +715,7 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
                {
                   /* set remainder coeff and exponent */
                   fmpz_set(*polyr + l + j, temp + j);
-                  (*expr)[l + j] = (texp[j] >> bits) + ((l2 - i - 1) << shift);
+                  (*expr)[l + j] = (texp[j]) + ((l2 - i - 1) << shift);
                }
 
                l += tlen;
@@ -794,8 +793,7 @@ big:
             if (i < l1) /* potentially a quotient with remainder */
             {
                /* tightly pack chunk exponents */
-               mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, 0,
-                                                                         bits);
+               mpoly_pack_monomials_tight(texp, texp, tlen, mults, num, bits);
 
                /* set start index of quotient chunk we are about to compute */
                i1[i] = len;
@@ -807,7 +805,7 @@ big:
 
 	       /* unpack remainder exponents */
 	       mpoly_unpack_monomials_tight(*expr + l,
-			                *expr + l, *lenr, mults, num, 1, bits);
+			                *expr + l, *lenr, mults, num, bits);
 														  
 	       /* insert main variable */
 	       for (j = 0; j < *lenr; j++)
@@ -851,7 +849,7 @@ big:
                {
                   /* set remainder coeff and exponent */
                   fmpz_set(*polyr + l + j, temp + j);
-                  (*expr)[l + j] = (texp[j] >> bits) + ((l2 - i - 1) << shift);
+                  (*expr)[l + j] = (texp[j]) + ((l2 - i - 1) << shift);
                }
 
                /* update length of output remainder poly */
@@ -879,7 +877,7 @@ big:
    if (len != 0)
    {
       /* unpack monomials of quotient */
-      mpoly_unpack_monomials_tight((*expq), (*expq), len, mults, num, 1, bits);
+      mpoly_unpack_monomials_tight((*expq), (*expq), len, mults, num, bits);
 
       /* put main variable back in quotient */
       for (i = 0; i < l1; i++)
@@ -960,9 +958,8 @@ slong _fmpz_mpoly_divrem_array(slong * lenr,
 
    /* pack input exponents tightly with mixed bases specified by "mults" */
 
-   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 0, bits);
-
-   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 0, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, bits);
 
    /* do divrem on tightly packed polys */
    len = _fmpz_mpoly_divrem_array_tight(lenr, polyq, expq, allocq, 0,
@@ -984,8 +981,8 @@ slong _fmpz_mpoly_divrem_array(slong * lenr,
       }
    }
    /* unpack output quotient and remainder exponents */
-   mpoly_unpack_monomials_tight((*expq), (*expq), len, mults, num, 0, bits);
-   mpoly_unpack_monomials_tight((*expr), (*expr), *lenr, mults, num, 0, bits);
+   mpoly_unpack_monomials_tight((*expq), (*expq), len, mults, num, bits);
+   mpoly_unpack_monomials_tight((*expr), (*expr), *lenr, mults, num, bits);
 
    TMP_END;
 
@@ -1030,9 +1027,9 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
    max_fields = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-   mpoly_max_fields_ui_backwards(max_fields2, poly2->exps, poly2->length,
+   mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
-   mpoly_max_fields_ui_backwards(max_fields3, poly3->exps, poly3->length,
+   mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
    for (i = 0; i < ctx->minfo->nfields; i++)
       max_fields[i] = FLINT_MAX(max_fields2[i], max_fields3[i]);

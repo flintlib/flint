@@ -11,58 +11,38 @@
 
 #include "mpoly.h"
 
-void mpoly_gen_offset_shift(slong * _offset, slong * _shift,
+void mpoly_gen_offset_shift(slong * offset, slong * shift,
                        slong idx, slong N, slong bits, const mpoly_ctx_t mctx)
 {
-    slong nfields = mctx->nfields;
-    int deg = mctx->deg;
-    int rev = mctx->rev;
+    slong nvars = mctx->nvars;
     slong fpw = FLINT_BITS/bits;
-    slong offset, shift;
 
-    if (rev)
-    {
-        offset = (nfields - 1 - idx)/fpw;
-        shift  = (nfields - 1 - idx)%fpw;
-    } else
-    {
-        offset = (deg + idx)/fpw;
-        shift  = (deg + idx)%fpw;
-    }
-    shift = (fpw - 1 - shift) * bits;
+    if (!mctx->rev)
+        idx = nvars - 1 - idx;
 
-    * _offset = offset;
-    * _shift = shift;
+    *offset = idx/fpw;
+    *shift  = idx%fpw*bits;
 }
 
 
 
-void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * _offset, slong * _shift,
+void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift,
                        slong idx, slong N, slong bits, const mpoly_ctx_t mctx)
 {
-    slong nfields = mctx->nfields;
-    int deg = mctx->deg;
-    int rev = mctx->rev;
+    slong nvars = mctx->nvars;
     slong fpw = FLINT_BITS/bits;
-    slong i, offset, shift;
-
-    if (rev)
-    {
-        offset = (nfields - 1 - idx)/fpw;
-        shift  = (nfields - 1 - idx)%fpw;
-    } else
-    {
-        offset = (deg + idx)/fpw;
-        shift  = (deg + idx)%fpw;
-    }
-    shift = (fpw - 1 - shift) * bits;
-
-    * _offset = offset;
-    * _shift = shift;
+    slong i;
 
     for (i = 0; i < N; i++)
         oneexp[i] = 0;
-    oneexp[offset] = WORD(1) << shift;
-    if (deg)
-        oneexp[0] |= WORD(1) << ((fpw - 1)*bits);
+
+    if (!mctx->rev)
+        idx = nvars - 1 - idx;
+
+    *offset = idx/fpw;
+    *shift  = idx%fpw*bits;
+
+    oneexp[idx/fpw] |= UWORD(1) << (idx%fpw*bits);
+    if (mctx->deg)
+        oneexp[nvars/fpw] |= UWORD(1) << (nvars%fpw*bits);
 }

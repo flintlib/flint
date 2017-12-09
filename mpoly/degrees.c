@@ -24,7 +24,7 @@ void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
 
     if (len == 0)
     {
-        for (i = 0; i < mctx->nfields - mctx->deg; i++)
+        for (i = 0; i < mctx->nvars; i++)
             user_degs[i] = -WORD(1);
         return;
     }
@@ -42,7 +42,7 @@ void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
     for (i = 0; i < len; i++)
         mpoly_monomial_max(pmax, pmax, poly_exps + N*i, bits, N, mask);
 
-    mpoly_get_monomial((ulong *) user_degs, pmax, bits, mctx);
+    mpoly_get_monomial_ui((ulong *) user_degs, pmax, bits, mctx);
 
     TMP_END;
 }

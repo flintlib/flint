@@ -15,25 +15,22 @@
 #include "mpoly.h"
 
 void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,
-            slong len, const slong * mults, slong num, slong extra, slong bits)
+                     slong len, const slong * mults, slong nfields, slong bits)
 {
-   slong i, j;
-   ulong e1, e2;
-   ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-   slong shift = bits*(FLINT_BITS/bits - (num + extra));
+    slong i, j, shift;
+    ulong e, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
 
-   for (i = 0; i < len; i++)
-   {
-      e2 = exp2[i] >> shift;
-      e1 = ((e2 >> (num - 1)*bits) & mask);
-
-      for (j = num - 2; j >= 0; j--)
-      {
-         e1 *= mults[j];
-         e1 += ((e2 >> j*bits) & mask);
-      }
-
-      exp1[i] = e1;
+    for (i = 0; i < len; i++)
+    {
+        shift = (nfields - 1)*bits;
+        e = (exp2[i] >> shift) & mask;
+        for (j = nfields - 2; j >= 0; j--)
+        {
+            shift -= bits;
+            e *= mults[j];
+            e += (exp2[i] >> shift) & mask;
+        }
+        exp1[i] = e;
    }
 }
 

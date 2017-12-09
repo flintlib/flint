@@ -373,12 +373,12 @@ MPOLY_INLINE
 int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3,
                                                 slong N, const ulong * cmpmask)
 {
-    slong i = 0;
+    slong i = N - 1;
     do
     {
         if (exp2[i] != exp3[i])
             return (exp3[i]^cmpmask[i]) < (exp2[i]^cmpmask[i]);
-    } while (++i < N);
+    } while (--i >= 0);
     return 0;
 }
 
@@ -386,12 +386,12 @@ MPOLY_INLINE
 int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3,
                                                 slong N, const ulong * cmpmask)
 {
-    slong i = 0;
+    slong i = N - 1;
     do
     {
         if (exp2[i] != exp3[i])
             return (exp3[i]^cmpmask[i]) > (exp2[i]^cmpmask[i]);
-    } while (++i < N);
+    } while (--i >= 0);
     return 0;
 }
 
@@ -399,7 +399,7 @@ MPOLY_INLINE
 int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
                                                 slong N, const ulong * cmpmask)
 {
-    slong i = 0;
+    slong i = N - 1;
     do
     {
         if (exp2[i] != exp3[i])
@@ -409,7 +409,7 @@ int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
             else
                 return -1;
         }
-    } while (++i < N);
+    } while (--i >= 0);
     return 0;
 }
 
@@ -451,6 +451,7 @@ void mpoly_max_degrees_tight(slong * max_exp,
    }
 }
 
+
 /* Monomial arrays ***********************************************************/
 
 FLINT_DLL void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
@@ -463,13 +464,13 @@ FLINT_DLL slong mpoly_exp_bits_required_ui(const ulong * user_exp, const mpoly_c
 
 FLINT_DLL slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx);
 
-FLINT_DLL void   mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits,
+FLINT_DLL void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
                                                      slong nfields, slong len);
 
-FLINT_DLL void mpoly_unpack_vec(ulong * exp1, const ulong * exp2, slong bits,
+FLINT_DLL void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
                                                      slong nfields, slong len);
 
-FLINT_DLL void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
+FLINT_DLL void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps,
                                            slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2,
@@ -481,10 +482,10 @@ FLINT_DLL void mpoly_repack_monomials(ulong * exps1, slong bits1,
 
 FLINT_DLL void mpoly_pack_monomials_tight(ulong * exp1,
                   const ulong * exp2, slong len, const slong * mults, 
-                                           slong num, slong extra, slong bits);
+                                                        slong num, slong bits);
 
 FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
-                            slong * mults, slong num, slong extra, slong bits);
+                                         slong * mults, slong num, slong bits);
 
 FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
                  const ulong * exp, slong len, slong N, const ulong * cmpmask);
@@ -492,9 +493,6 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
 FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
-                                slong len, slong bits, const mpoly_ctx_t mctx);
-
-FLINT_DLL void mpoly_max_fields_ui_backwards(ulong * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
@@ -733,7 +731,7 @@ void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
                           slong l1, slong len1, slong k, slong num, slong bits)
 {
    slong i, j = 0;
-   slong shift = bits*(FLINT_BITS/bits - (num - k + 1));
+   slong shift = bits*(k - 1);
 
    i1[0] = 0;
    for (i = 0; i < l1 - 1; i++)

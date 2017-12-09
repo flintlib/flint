@@ -132,5 +132,5 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
         flint_free(exp2);
     }
 
-    TMP_END
+    TMP_END;
 }

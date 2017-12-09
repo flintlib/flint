@@ -43,7 +43,7 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     mpoly_repack_monomials(texpA, bits, polyA->exps, polyA->bits, 1, ctx->minfo);
     mpoly_repack_monomials(texpB, bits, polyB->exps, polyB->bits, 1, ctx->minfo);
     mpoly_monomial_min(texpA, texpA, texpB, bits, N, mask);
-    mpoly_get_monomial(exps, texpA, bits, ctx->minfo);
+    mpoly_get_monomial_ui(exps, texpA, bits, ctx->minfo);
     
     fmpz_mpoly_fit_length(poly1, 1, ctx);
     fmpz_mpoly_fit_bits(poly1, bits, ctx);

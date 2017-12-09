@@ -15,33 +15,25 @@
 void mpoly_set_monomial_ui(ulong * poly_exps, const ulong * user_exps,
                                             slong bits, const mpoly_ctx_t mctx)
 {
+    slong nvars = mctx->nvars;
     slong nfields = mctx->nfields;
-    int deg = mctx->deg, rev = mctx->rev;
     slong i = 0;
-    ulong * tmp_exps, degree = 0;
+    ulong * tmp_exps, degree;
     TMP_INIT;
 
     TMP_START;
     tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
 
-    if (deg)
-    {
-        for (i = 0; i < nfields - 1; i++)
-            degree += user_exps[i];
-        tmp_exps[0] = degree;
+    degree = 0;
+    for (i = 0; i < nvars; i++) {
+        degree += user_exps[i];
+        tmp_exps[mctx->rev ? i : nvars - 1 - i] = user_exps[i];
     }
 
-    if (rev)
-    {
-        for (i = deg; i < nfields; i++)
-            tmp_exps[i] = user_exps[nfields - i - 1];
-    } else
-    {
-        for (i = deg; i < nfields; i++)
-            tmp_exps[i] = user_exps[i - deg];
-    }
+    if (mctx->deg)
+        tmp_exps[nvars] = degree;
 
-    mpoly_pack_vec(poly_exps, tmp_exps, bits, nfields, 1);
+    mpoly_pack_vec_ui(poly_exps, tmp_exps, bits, nfields, 1);
 
     TMP_END;
 }

@@ -45,8 +45,8 @@ void mpoly_repack_monomials(ulong * exps1, slong bits1,
 
     for (i = 0; i < len; i++)
     {
-        mpoly_unpack_vec(tmp_exps, exps2 + i*N2, bits2, nfields, 1);
-        mpoly_pack_vec(exps1 + i*N1, tmp_exps, bits1, nfields, 1);
+        mpoly_unpack_vec_ui(tmp_exps, exps2 + i*N2, bits2, nfields, 1);
+        mpoly_pack_vec_ui(exps1 + i*N1, tmp_exps, bits1, nfields, 1);
     }
 
     TMP_END;

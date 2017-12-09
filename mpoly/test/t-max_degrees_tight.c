@@ -48,12 +48,8 @@ main(void)
         for (bits1 = 8; bits1 <= FLINT_BITS; bits1 *= 2)
         for (bits2 = bits1; bits2 <= FLINT_BITS; bits2 *= 2)
         {
-            mpoly_ctx_t mctx;
-
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, FLINT_BITS/FLINT_MAX(bits1, bits2)) + 1;
-
-            mpoly_ctx_init(mctx, nfields, ORD_LEX);
 
             for (j = 0; j < nfields; j++)
                 max[j] = 0;
@@ -68,19 +64,13 @@ main(void)
             for (i = 0; i < nfields*length; i += nfields)
                 for (j = 0; j < nfields; j++)
                 {
-                    a[i + j] = n_randint(state, bases[nfields - j - 1]);
-                    max[nfields - j - 1] = FLINT_MAX(max[nfields - j - 1],
-                                                                     a[i + j]);
+                    a[i + j] = n_randint(state, bases[j]);
+                    max[j] = FLINT_MAX(max[j], a[i + j]);
                 }
 
-            /* FLINT_BITS => bits1 */
-            for (i = 0; i < length; i++)
-                mpoly_set_monomial_ui(b + i, a + i*nfields, bits1, mctx);
 
-            /* bits1 => tight packing */
+            mpoly_pack_vec_ui(b, a, bits1, nfields, length);
             mpoly_pack_monomials_tight(t, b, length, bases, nfields, 0, bits1);
-
-            /* tight packing => bits2 */
             mpoly_unpack_monomials_tight(c, t, length, bases, nfields, 0, bits2);
 
             mpoly_max_degrees_tight(max2, t, length, prods, nfields);
@@ -91,8 +81,6 @@ main(void)
                     flint_printf("FAIL\nmax_degrees_tight");
                     flint_abort();
                 }
-
-            mpoly_ctx_clear(mctx);
         }
     }
 

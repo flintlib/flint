@@ -66,7 +66,7 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
          r = fmpz_fprint(file, poly + i);
 
       if (r > 0)
-         mpoly_get_monomial(degs, exps + N*i, bits, mctx);
+         mpoly_get_monomial_ui(degs, exps + N*i, bits, mctx);
 
       first = 1;
 

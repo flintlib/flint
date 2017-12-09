@@ -14,7 +14,7 @@
 #include "mpoly.h"
 
 
-void mpoly_get_monomial(ulong * user_exps, const ulong * poly_exps,
+void mpoly_get_monomial_ui(ulong * user_exps, const ulong * poly_exps,
                                             slong bits, const mpoly_ctx_t mctx)
 {
     slong i;
@@ -23,17 +23,10 @@ void mpoly_get_monomial(ulong * user_exps, const ulong * poly_exps,
 
     TMP_START;
     tmp_exps = (ulong *) TMP_ALLOC(mctx->nfields*sizeof(ulong));
-    mpoly_unpack_vec(tmp_exps, poly_exps, bits, mctx->nfields, 1);
+    mpoly_unpack_vec_ui(tmp_exps, poly_exps, bits, mctx->nfields, 1);
 
-    if (mctx->rev)
-    {
-        for (i = mctx->nfields - 1; i >= mctx->deg; i--)
-            user_exps[mctx->nfields - i - 1] = tmp_exps[i];
-    } else
-    {
-        for (i = mctx->deg; i < mctx->nfields; i++)
-            user_exps[i - mctx->deg] = tmp_exps[i];
-    }
+    for (i = 0; i < mctx->nvars; i++)
+        user_exps[i] = tmp_exps[mctx->rev ? i : mctx->nvars - 1 - i];
 
     TMP_END;
 }

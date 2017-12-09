@@ -15,11 +15,10 @@
 #include "mpoly.h"
 
 void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
-                               slong * mults, slong num, slong extra, slong bits)
+                                          slong * mults, slong num, slong bits)
 {
    slong i, j;
    ulong exp;
-   slong shift = bits*(FLINT_BITS/bits - (num + extra));
    slong * prods;
    TMP_INIT;
 
@@ -38,7 +37,8 @@ void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
       for (j = 0; j < num; j++)
          exp += (e2[i] % prods[j + 1])/prods[j] << bits*j;
 
-      e1[i] = exp << shift;
+      e1[i] = exp;
+
    }
 
    TMP_END;

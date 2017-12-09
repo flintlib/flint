@@ -74,7 +74,7 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
             off += flint_sprintf(str + off, "%wd", coeff[i]);
         }
 
-        mpoly_get_monomial(degs, exp + N*i, bits, mctx);
+        mpoly_get_monomial_ui(degs, exp + N*i, bits, mctx);
 
         for (j = 0; j < mctx->nvars; j++)
         {

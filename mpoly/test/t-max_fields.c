@@ -19,7 +19,7 @@
 int
 main(void)
 {
-    slong k, i, j, N, length, nfields, bits;
+    slong k, i, j, length, nfields, bits;
     ulong * a, * b, * max, * max2;
     ulong max_length, max_fields;
     FLINT_TEST_INIT(state);
@@ -49,8 +49,6 @@ main(void)
 
             mpoly_ctx_init(mctx, nfields, ORD_LEX);
 
-            N = mpoly_words_per_exp(bits, mctx);
-
             for (j = 0; j < nfields; j++)
                 max[j] = 0;
 
@@ -65,8 +63,7 @@ main(void)
             }
 
             /* FLINT_BITS => bits */
-            for (i = 0; i < length; i++)
-                mpoly_set_monomial_ui(b + i*N, a + i*nfields, bits, mctx);
+            mpoly_pack_vec_ui(b, a, bits, nfields, length);
 
             mpoly_max_fields_ui(max2, b, length, bits, mctx);
 

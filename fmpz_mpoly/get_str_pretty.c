@@ -80,7 +80,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len,
             off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(poly[i]));
       }
 
-      mpoly_get_monomial(degs, exps + N*i, bits, mctx);
+      mpoly_get_monomial_ui(degs, exps + N*i, bits, mctx);
 
       first = 1;
 
