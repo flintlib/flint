@@ -18,7 +18,9 @@ void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfiel
         v = 0;
         shift = 0;
         i = 0;
-        do {
+        v |= *exp2++ << shift;
+        shift += bits;      /* number of bits to encode 0th field */
+        while (++i < nfields) {
             if (shift + bits > FLINT_BITS) {
                 *exp1++ = v;
                 v = 0;
@@ -26,7 +28,7 @@ void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfiel
             }
             v |= *exp2++ << shift;
             shift += bits;      /* number of bits to encode ith field */
-        } while (++i < nfields);
+        }
         *exp1++ = v;
     }
 }
@@ -35,9 +37,13 @@ void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfi
     slong i, j, shift;
     ulong u, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     for (j = 0; j < len; j++) {
-        shift = FLINT_BITS;
         i = 0;
-        do {
+        u = *exp2++;
+        shift = 0;
+        *exp1++ = u & mask;
+        u = u >> bits;      /* number of bits to encode 0th field */
+        shift += bits;      /* number of bits to encode 0th field */
+        while (++i < nfields) {
             if (shift + bits > FLINT_BITS) {
                 u = *exp2++;
                 shift = 0;
@@ -45,6 +51,6 @@ void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfi
             *exp1++ = u & mask;
             u = u >> bits;      /* number of bits to encode ith field */
             shift += bits;      /* number of bits to encode ith field */
-        } while (++i < nfields);
+        }
     }
 }

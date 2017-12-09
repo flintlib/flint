@@ -58,8 +58,8 @@ main(void)
                     a[nfields*i + j] = n_randint(state, bases[j]);
 
             mpoly_pack_vec_ui(b, a, bits1, nfields, length);
-            mpoly_pack_monomials_tight(t, b, length, bases, nfields, 0, bits1);
-            mpoly_unpack_monomials_tight(c, t, length, bases, nfields, 0, bits2);
+            mpoly_pack_monomials_tight(t, b, length, bases, nfields, bits1);
+            mpoly_unpack_monomials_tight(c, t, length, bases, nfields, bits2);
             mpoly_unpack_vec_ui(d, c, bits2, nfields, length);
 
             for (i = 0; i < length*nfields; i++)
