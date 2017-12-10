@@ -28,9 +28,10 @@ void fmpz_mpoly_randtest(fmpz_mpoly_t poly, flint_rand_t state,
    fmpz_mpoly_zero(poly, ctx);
    for (i = 0; i < length; i++)
    {
-      fmpz_randtest(c, state, coeff_bits);
       for (j = 0; j < nvars; j++)
          exp[j] = n_randint(state, exp_bound);
+
+      fmpz_randtest(c, state, coeff_bits);
 
       fmpz_mpoly_set_term_fmpz(poly, exp, c, ctx);
    }    
