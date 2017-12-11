@@ -14,7 +14,5 @@
 void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx,
                                              slong nvars, const ordering_t ord)
 {
-   ctx->n = (ord == ORD_DEGLEX || ord == ORD_DEGREVLEX) ? nvars + 1 : nvars;
-   ctx->ord = ord;
     mpoly_ctx_init(ctx->minfo, nvars, ord);
 }

@@ -132,15 +132,15 @@ ordering_t mpoly_ordering_randtest(flint_rand_t state)
 }
 
 MPOLY_INLINE
-int mpoly_ordering_isdeg(ordering_t ord)
+int mpoly_ordering_isdeg(const mpoly_ctx_t mctx)
 {
-   return ord == ORD_DEGLEX || ord == ORD_DEGREVLEX;
+   return mctx->ord == ORD_DEGLEX || mctx->ord == ORD_DEGREVLEX;
 }
 
 MPOLY_INLINE
-int mpoly_ordering_isrev(ordering_t ord)
+int mpoly_ordering_isrev(const mpoly_ctx_t mctx)
 {
-   return ord == ORD_DEGREVLEX;
+   return mctx->ord == ORD_DEGREVLEX;
 }
 
 MPOLY_INLINE

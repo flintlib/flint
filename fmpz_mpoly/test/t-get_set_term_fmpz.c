@@ -48,7 +48,7 @@ main(void)
        len = n_randint(state, 100);
 
        exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
+                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
        exp_bound = n_randbits(state, exp_bits);
        coeff_bits = n_randint(state, 200);
 
@@ -61,7 +61,7 @@ main(void)
           for (k = 0; k < nvars; k++)
           {
              slong bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
+                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
              exp[k] = n_randbits(state, bits);
           }
 

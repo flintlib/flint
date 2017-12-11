@@ -629,14 +629,14 @@ void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 
     TMP_START;
 
-    max_fields2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    max_fields3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
     mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
     max = 0;
-    for (i = 0; i < ctx->n; i++)
+    for (i = 0; i < ctx->minfo->nfields; i++)
     {
         max_fields3[i] += max_fields2[i];
         if (max_fields3[i] < max_fields2[i] || 0 > (slong) max_fields3[i])

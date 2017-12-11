@@ -73,8 +73,6 @@ typedef struct
 {
     nmodf_ctx_t ffinfo;
     mpoly_ctx_t minfo;
-    ordering_t ord;
-    slong n;
 } nmod_mpoly_ctx_struct;
 
 typedef nmod_mpoly_ctx_struct nmod_mpoly_ctx_t[1];

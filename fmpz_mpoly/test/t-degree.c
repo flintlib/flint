@@ -50,9 +50,9 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
         exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars
-                          + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
+                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
         exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars
-                          + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
+                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
         exp_bound1 = n_randbits(state, exp_bits1);
         exp_bound2 = n_randbits(state, exp_bits2);
 
@@ -104,8 +104,8 @@ main(void)
 
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
-        exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
+        exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
+        exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
         exp_bound1 = n_randbits(state, exp_bits1);
         exp_bound2 = n_randbits(state, exp_bits2);
 

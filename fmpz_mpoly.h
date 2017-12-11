@@ -42,8 +42,6 @@
 typedef struct
 {
     mpoly_ctx_t minfo;
-   slong n;        /* number of elements in exponent vector (including deg) */
-   ordering_t ord; /* polynomial ordering */
 } fmpz_mpoly_ctx_struct;
 
 typedef fmpz_mpoly_ctx_struct fmpz_mpoly_ctx_t[1];
