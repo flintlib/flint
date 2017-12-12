@@ -9,9 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
 #include "mpoly.h"
 
 /*
@@ -27,13 +24,12 @@ void mpoly_repack_monomials(ulong * exps1, slong bits1,
                       const ulong * exps2, slong bits2, slong len,
                                                         const mpoly_ctx_t mctx)
 {
+    slong i;
     slong nfields = mctx->nfields;
-    slong i, N2 = mpoly_words_per_exp(bits2, mctx);
-    slong    N1 = mpoly_words_per_exp(bits1, mctx);
-    ulong * tmp_exps;
+    slong N2 = mpoly_words_per_exp(bits2, mctx);
+    slong N1 = mpoly_words_per_exp(bits1, mctx);
     TMP_INIT;
 
-    FLINT_ASSERT(bits1 >= bits2);
     if (bits1 == bits2) {
         for (i = 0; i < N2*len; i++)
             exps1[i] = exps2[i];
@@ -41,12 +37,33 @@ void mpoly_repack_monomials(ulong * exps1, slong bits1,
     }
 
     TMP_START;
-    tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
 
-    for (i = 0; i < len; i++)
+    if (bits1 <= FLINT_BITS && bits2 <= FLINT_BITS)
     {
-        mpoly_unpack_vec_ui(tmp_exps, exps2 + i*N2, bits2, nfields, 1);
-        mpoly_pack_vec_ui(exps1 + i*N1, tmp_exps, bits1, nfields, 1);
+        ulong * tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
+
+        for (i = 0; i < len; i++)
+        {
+            mpoly_unpack_vec_ui(tmp_exps, exps2 + N2*i, bits2, nfields, 1);
+            mpoly_pack_vec_ui(exps1 + N1*i, tmp_exps, bits1, nfields, 1);
+        }
+
+    } else {
+
+        fmpz * tmp_exps = (fmpz *) TMP_ALLOC(nfields*sizeof(fmpz));
+
+        for (i = 0; i < nfields; i++)
+            fmpz_init(tmp_exps + i);
+
+        for (i = 0; i < len; i++)
+        {
+            mpoly_unpack_vec_fmpz(tmp_exps, exps2 + N2*i, bits2, nfields, 1);
+            mpoly_pack_vec_fmpz(exps1 + N1*i, tmp_exps, bits1, nfields, 1);
+        }
+
+        for (i = 0; i < nfields; i++)
+            fmpz_clear(tmp_exps + i);
+
     }
 
     TMP_END;

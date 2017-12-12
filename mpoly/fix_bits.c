@@ -12,12 +12,14 @@
 #include "mpoly.h"
 
 /*
-    ensure that bits is a valid number of bits
+    ensure that bits is a valid (or good) number of bits
 */
 slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx) {
     slong nfields = mctx->nfields;
     if (bits <= FLINT_BITS)
     {
+        bits = FLINT_MAX(bits, MPOLY_MIN_BITS);
+
         while (bits < FLINT_BITS &&   (nfields - 1)/(FLINT_BITS/(bits    ))
                                    == (nfields - 1)/(FLINT_BITS/(bits + 1))
               )
@@ -25,7 +27,8 @@ slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx) {
             bits++;
         }
     } else {
-        flint_throw(FLINT_ERROR, "bits > FLINT_BITS in mpoly_fix_bits");
+
+        bits = (bits + FLINT_BITS - 1)/FLINT_BITS*FLINT_BITS;
     }
 
     return bits;

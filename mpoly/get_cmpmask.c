@@ -28,8 +28,6 @@ void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
 
         } else {
 
-            flint_throw(FLINT_ERROR, "bits > FLINT_BITS in mpoly_get_cmpmask");
-
             for (i = 0; i < N - bits/FLINT_BITS; i++)
                 cmpmask[i] = -UWORD(1);
             for (; i < N; i++)

@@ -49,6 +49,9 @@ typedef fmpz_mpoly_ctx_struct fmpz_mpoly_ctx_t[1];
 FLINT_DLL void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
                                             slong nvars, const ordering_t ord);
 
+FLINT_DLL void fmpz_mpoly_ctx_init_rand(fmpz_mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars);
+
+
 FLINT_DLL void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx);
 
 /*  Type definitions *********************************************************/
@@ -292,6 +295,30 @@ int fmpz_mpoly_is_one(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
    return fmpz_mpoly_equal_ui(poly, 1, ctx);
 }
+
+
+FLINT_DLL void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
+                 const fmpz_t c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
+                const fmpz_t c, const fmpz ** exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_term_ui_fmpz(fmpz_mpoly_t poly,
+                 const ulong c, const fmpz ** exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_term_si_fmpz(fmpz_mpoly_t poly,
+                 const slong c, const fmpz ** exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_term_fmpz_ui(fmpz_mpoly_t poly,
+                const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_term_ui_ui(fmpz_mpoly_t poly,
+                 const ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_term_si_ui(fmpz_mpoly_t poly,
+                 const slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+
+
 
 FLINT_DLL int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
                                           slong k, const fmpz_mpoly_ctx_t ctx);
@@ -661,7 +688,7 @@ FLINT_DLL char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly,
 
 FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                         const ulong * exps, slong len, const char ** x_in,
-                                           slong bits, const mpoly_ctx_t mctx);
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file, 
          const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx);
@@ -685,6 +712,11 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t poly,
 
 void fmpz_mpoly_randtest(fmpz_mpoly_t poly, flint_rand_t state,
    slong length, slong exp_bound, slong coeff_bits, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_randbits(fmpz_mpoly_t poly, flint_rand_t state,
+   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits, const fmpz_mpoly_ctx_t ctx);
+
+
 
 /******************************************************************************
 

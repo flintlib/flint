@@ -17,10 +17,10 @@
 int
 _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                         const ulong * exps, slong len, const char ** x_in,
-                                            slong bits, const mpoly_ctx_t mctx)
+                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
    slong i, j, N;
-   ulong * degs;
+   fmpz * exponents;
    int r, first;
    char ** x = (char **) x_in;
    TMP_INIT;
@@ -47,8 +47,10 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
       }
    }
 
-   degs = (ulong *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
-   
+    exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_init(exponents + i);
+
    r = 1;
    for (i = 0; r > 0 && i < len; i++)
    {
@@ -66,13 +68,14 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
          r = fmpz_fprint(file, poly + i);
 
       if (r > 0)
-         mpoly_get_monomial_ui(degs, exps + N*i, bits, mctx);
+         mpoly_get_monomial_fmpz(exponents, exps + N*i, bits, mctx);
 
       first = 1;
 
       for (j = 0; r > 0 && j < mctx->nvars; j++)
       {
-         if (degs[j] > 1)
+            int cmp = fmpz_cmp_ui(exponents + j, WORD(1));
+         if (cmp > 0)
          {
             if (!first || (poly[i] != WORD(1) && poly[i] != WORD(-1)))
             {
@@ -80,10 +83,13 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
                r = (r != EOF) ? 1 : EOF;
             }
             if (r > 0)
-               r = flint_fprintf(file, "%s^%wd", x[j], degs[j]);
+               r = flint_fprintf(file, "%s^", x[j]);
+            if (r > 0)
+                r = fmpz_fprint(file, exponents + j);
+
             first = 0;
          }
-         if (degs[j] == 1)
+         else if (cmp == 0)
          {
             if (!first || (poly[i] != WORD(1) && poly[i] != WORD(-1)))
             {
@@ -96,7 +102,7 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
          }
       }
 
-      if (r > 0 && mpoly_monomial_is_zero(exps + i*N, N) &&
+      if (r > 0 && mpoly_monomial_is_zero(exps + N*i, N) &&
                   (poly[i] == WORD(1) || poly[i] == WORD(-1)))
       {
          r = flint_fprintf(file, "1");
