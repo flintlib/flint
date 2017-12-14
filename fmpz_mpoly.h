@@ -480,7 +480,7 @@ FLINT_DLL void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1,
 
 FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1,
         slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-                const fmpz * poly3, const ulong * exp3, slong len3, slong N,
+                const fmpz * poly3, const ulong * exp3, slong len3, mp_bitcnt_t bits, slong N,
                                                         const ulong * cmpmask);
 
 FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,

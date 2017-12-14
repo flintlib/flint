@@ -203,6 +203,14 @@ void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2,
 }
 
 MPOLY_INLINE
+void mpoly_monomial_add_mp(ulong * exp_ptr, const ulong * exp2,
+                                                   const ulong * exp3, slong N)
+{
+    mpn_add_n(exp_ptr, exp2, exp3, N);
+}
+
+
+MPOLY_INLINE
 void mpoly_monomial_sub_with_borrow(ulong * exp_ptr, const ulong * exp2, 
                                                    const ulong * exp3, slong N)
 {
@@ -522,6 +530,9 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
 FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
