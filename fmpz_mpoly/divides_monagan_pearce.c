@@ -299,7 +299,7 @@ not_exact_division:
 
 slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-       const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N,
+       const fmpz * poly3, const ulong * exp3, slong len3, mp_bitcnt_t bits, slong N,
                                                          const ulong * cmpmask)
 {
     slong i, j, k, s;
@@ -397,7 +397,10 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
         k++;
         _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, N);
 
-        lt_divides = mpoly_monomial_divides(e1 + k*N, exp, exp3, N, mask);
+        if (bits <= FLINT_BITS)
+            lt_divides = mpoly_monomial_divides(e1 + k*N, exp, exp3, N, mask);
+        else
+            lt_divides = mpoly_monomial_divides_mp(e1 + k*N, exp, exp3, N, bits);
 
         if (small) 
         {
@@ -463,7 +466,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 }
             } else
             {
-                /* should we go up */
+                /* should we go right? */
                 if (  (i + 1 < len3)
                    && (hind[i + 1] == 2*j + 1)
                    )
@@ -473,8 +476,12 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                     x->j = j;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                           e1   + x->j*N, N);
+
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);                        
+
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                       &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
@@ -492,8 +499,12 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                     x->j = j + 1;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                           e1   + x->j*N, N);
+
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                       &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
@@ -568,8 +579,12 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             x->j = k;
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
-            mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                   e1   + x->j*N, N);
+
+            if (bits <= FLINT_BITS)
+                mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+            else
+                mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                   &next_loc, &heap_len, N, cmpmask))
                 exp_next--;
@@ -603,12 +618,11 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, bits, exp_bits, N, len = 0;
-   ulong * max_fields2, * max_fields3;
-   ulong max;
+   slong i, exp_bits, N, len = 0;
+   fmpz * max_fields2, * max_fields3;
    ulong * cmpmask;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;
-   int free2 = 0, free3 = 0;
+   int easy_exit, free2 = 0, free3 = 0;
    ulong mask = 0;
    TMP_INIT;
 
@@ -626,35 +640,47 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 
    TMP_START;
 
-    /* compute maximum fields in exponents */
-    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
-                                                      poly2->bits, ctx->minfo);
-    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
-                                                      poly3->bits, ctx->minfo);
-    max = 0;
+    max_fields2 = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    max_fields3 = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
-        if (max_fields2[i] > max)
-            max = max_fields2[i];
+        fmpz_init(max_fields2 + i);
+        fmpz_init(max_fields3 + i);
+    }
+
+    mpoly_max_fields_fmpz(max_fields2, poly2->exps, poly2->length,
+                                                      poly2->bits, ctx->minfo);
+    mpoly_max_fields_fmpz(max_fields3, poly3->exps, poly3->length,
+                                                      poly3->bits, ctx->minfo);
+
+    easy_exit = 0;
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
         /*
             cannot be exact division if any max field from poly2
             is less than corresponding max field from poly3
         */
-        if (max_fields2[i] < max_fields3[i])
-        {
-            len = 0;
-            goto cleanup;
-        }
+        if (fmpz_cmp(max_fields2 + i, max_fields3 + i) < 0)
+            easy_exit = 1;
     }
 
-    /* compute number of bits required for exponent fields */
-    bits = FLINT_BIT_COUNT(max);
-    exp_bits = FLINT_MAX(WORD(8), bits + 1); /* extra bit required for signs */
+    exp_bits = _fmpz_vec_max_bits(max_fields2, ctx->minfo->nfields);
+    exp_bits = FLINT_MAX(MPOLY_MIN_BITS, exp_bits + 1);
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
     exp_bits = FLINT_MAX(exp_bits, poly3->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(max_fields2 + i);
+        fmpz_clear(max_fields3 + i);
+    }
+
+    if (easy_exit)
+    {
+        len = 0;
+        goto cleanup;
+    }
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));

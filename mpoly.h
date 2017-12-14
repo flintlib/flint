@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016-2017 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -307,6 +308,24 @@ int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2,
    }
 
    return 1;
+}
+
+MPOLY_INLINE
+int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2,
+                                 const ulong * exp3, slong N, mp_bitcnt_t bits)
+{
+    slong i;
+
+    mpn_sub_n(exp_ptr, exp2, exp3, N);
+
+    i = bits/FLINT_BITS - 1;
+    do {
+        if ((slong)(exp_ptr[i]) < 0)
+            return 0;
+        i += bits/FLINT_BITS;
+    } while (i < N);
+
+    return 1;
 }
 
 MPOLY_INLINE

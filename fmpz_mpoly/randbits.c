@@ -39,12 +39,4 @@ void fmpz_mpoly_randbits(fmpz_mpoly_t poly, flint_rand_t state,
     fmpz_clear(coeff);
     for (j = 0; j < nvars; j++)
         fmpz_clear(exp + j);
-/*
-printf("poly: "); fmpz_mpoly_print_pretty(poly, NULL, ctx);
-
-flint_printf("poly->bits: %wd\n",poly->bits);
-
-    printf("randbits returning\n");
-    assert(0);
-*/
 }
