@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mpoly.h"
-#include "assert.h"
 
 void fmpz_mpoly_randbits(fmpz_mpoly_t poly, flint_rand_t state,
               slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,

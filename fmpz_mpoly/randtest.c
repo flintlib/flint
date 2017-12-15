@@ -33,7 +33,7 @@ void fmpz_mpoly_randtest(fmpz_mpoly_t poly, flint_rand_t state,
 
       fmpz_randtest(c, state, coeff_bits);
 
-      fmpz_mpoly_set_term_fmpz(poly, exp, c, ctx);
+      fmpz_mpoly_set_term_fmpz_ui(poly, c, exp, ctx);
    }    
 
    fmpz_clear(c);

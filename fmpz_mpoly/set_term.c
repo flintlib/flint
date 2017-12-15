@@ -39,7 +39,6 @@ void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
 
     if (!exists)
     {
-
         if (!fmpz_is_zero(c)) /* make new term only if coeff is nonzero*/
         {       
 

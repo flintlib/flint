@@ -322,6 +322,29 @@ FLINT_DLL void fmpz_mpoly_set_term_si_ui(fmpz_mpoly_t poly,
                  const slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
 
+FLINT_DLL void _fmpz_mpoly_get_term_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
+                                 const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_get_term_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
+                                const fmpz ** exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL ulong fmpz_mpoly_get_term_ui_fmpz(           const fmpz_mpoly_t poly,
+                                const fmpz ** exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong fmpz_mpoly_get_term_si_fmpz(           const fmpz_mpoly_t poly,
+                                const fmpz ** exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_get_term_fmpz_ui(fmpz_t c, const fmpz_mpoly_t poly,
+                                const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL ulong fmpz_mpoly_get_term_ui_ui(           const fmpz_mpoly_t poly,
+                                const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong fmpz_mpoly_get_term_si_ui(           const fmpz_mpoly_t poly,
+                                const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+
+
+
 
 FLINT_DLL int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
                                           slong k, const fmpz_mpoly_ctx_t ctx);
@@ -357,23 +380,6 @@ FLINT_DLL void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly,
     ((n) < (poly)->length ? (poly)->exps + \
                      (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
 
-FLINT_DLL void fmpz_mpoly_set_term_fmpz(fmpz_mpoly_t poly,
-                ulong const * exp, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_set_term_ui(fmpz_mpoly_t poly,
-                       ulong const * exp, ulong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_set_term_si(fmpz_mpoly_t poly,
-                       ulong const * exp, slong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_get_term_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
-                                ulong const * exp, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL ulong fmpz_mpoly_get_term_ui(const fmpz_mpoly_t poly,
-                                ulong const * exp, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL slong fmpz_mpoly_get_term_si(const fmpz_mpoly_t poly,
-                                ulong const * exp, const fmpz_mpoly_ctx_t ctx);
 
 /* Set and negate ************************************************************/
 
