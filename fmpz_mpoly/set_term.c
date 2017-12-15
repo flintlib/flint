@@ -23,13 +23,6 @@ void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
 
     TMP_START;
 
-/*
-printf("exp: ");
-for (i=0;i<ctx->minfo->nvars;i++){
-printf(" "); fmpz_print(exp+i);
-}
-printf("\n");
-*/
     exp_bits = mpoly_exp_bits_required_fmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
     fmpz_mpoly_fit_bits(poly, exp_bits, ctx);

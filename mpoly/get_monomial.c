@@ -41,7 +41,7 @@ void mpoly_get_monomial_fmpz(fmpz * user_exps, const ulong * poly_exps,
 
     TMP_START;
     tmp_exps = (fmpz *) TMP_ALLOC(mctx->nfields*sizeof(fmpz));
-    for (i = 0; i < nvars; i++)
+    for (i = 0; i < mctx->nfields; i++)
         fmpz_init(tmp_exps + i);
 
     mpoly_unpack_vec_fmpz(tmp_exps, poly_exps, bits, mctx->nfields, 1);
@@ -49,7 +49,7 @@ void mpoly_get_monomial_fmpz(fmpz * user_exps, const ulong * poly_exps,
     for (i = 0; i < nvars; i++)
         fmpz_set(user_exps + i, tmp_exps + (mctx->rev ? i : nvars - 1 - i));
 
-    for (i = 0; i < nvars; i++)
+    for (i = 0; i < mctx->nfields; i++)
         fmpz_clear(tmp_exps + i);
     TMP_END;
 }

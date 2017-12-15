@@ -23,7 +23,7 @@ main(void)
     int i, j, result, ok1, ok2;
     FLINT_TEST_INIT(state);
 
-    flint_printf("divides_monagan_pearce....\n");
+    flint_printf("divides_monagan_pearce....");
     fflush(stdout);
 
 

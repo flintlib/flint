@@ -35,9 +35,7 @@
  extern "C" {
 #endif
 
-
 #define MPOLY_MIN_BITS 8    /* minimum number of bits to pack into */
-
 
 typedef enum {
    ORD_LEX, ORD_DEGLEX, ORD_DEGREVLEX
@@ -217,7 +215,7 @@ void mpoly_monomial_sub_with_borrow(ulong * exp_ptr, const ulong * exp2,
 {
    slong i;
    ulong bw = 0;
-   for (i = N - 1; i >= 0; i--)
+   for (i = 0; i < N; i++)
       sub_ddmmss(bw, exp_ptr[i], WORD(0), exp2[i], WORD(0), exp3[i] - bw);  
 }
 
@@ -228,6 +226,13 @@ void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2,
    slong i;
    for (i = 0; i < N; i++)
       exp_ptr[i] = exp2[i] - exp3[i];
+}
+
+MPOLY_INLINE
+void mpoly_monomial_sub_mp(ulong * exp_ptr, const ulong * exp2,
+                                                   const ulong * exp3, slong N)
+{
+    mpn_sub_n(exp_ptr, exp2, exp3, N);
 }
 
 MPOLY_INLINE
@@ -379,6 +384,12 @@ void mpoly_monomial_mul_si(ulong * exp2, const ulong * exp3, slong N, slong c)
    slong i;
    for (i = 0; i < N; i++)
       exp2[i] = exp3[i]*c;
+}
+
+MPOLY_INLINE
+void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c)
+{
+    mpn_mul_1(exp2, exp3, N, c);
 }
 
 MPOLY_INLINE

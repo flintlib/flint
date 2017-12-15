@@ -108,7 +108,10 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
          r = flint_fprintf(file, "1");
       } 
    }     
-   
+
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_clear(exponents + i);
+
    TMP_END;
 
    return r;

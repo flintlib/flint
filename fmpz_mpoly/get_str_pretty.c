@@ -111,6 +111,9 @@ _fmpz_mpoly_get_str_pretty(const fmpz * coeffs, const ulong * exps, slong len,
             off += flint_sprintf(str + off, "1");
     }
 
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_clear(exponents + i);
+
     TMP_END;
 
     return str;
