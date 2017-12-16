@@ -12,13 +12,13 @@
 #include "nmod_mpoly.h"
 
 
-void nmod_mpoly_degrees(slong * degs, const nmod_mpoly_t poly,
+void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t poly,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    mpoly_degrees(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
+    mpoly_degrees_si(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
 }
 
-slong nmod_mpoly_degree(const nmod_mpoly_t poly, slong var,
+slong nmod_mpoly_degree_si(const nmod_mpoly_t poly, slong var,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong * degs, ret;
@@ -26,7 +26,7 @@ slong nmod_mpoly_degree(const nmod_mpoly_t poly, slong var,
 
     TMP_START;
     degs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
-    mpoly_degrees(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
+    mpoly_degrees_si(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
     ret = degs[var];
 
     TMP_END;

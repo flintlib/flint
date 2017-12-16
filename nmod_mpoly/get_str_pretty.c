@@ -51,7 +51,7 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
     bound = 1 + len * ((FLINT_BIT_COUNT(fctx->mod.n) + 3)/3);
 
     degs = (ulong *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
-    mpoly_degrees((slong *) degs, exp, len, bits, mctx);
+    mpoly_degrees_si((slong *) degs, exp, len, bits, mctx);
 
     for (i = 0; i < mctx->nvars; i++)
     {

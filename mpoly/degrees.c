@@ -15,7 +15,7 @@
 #include "fmpz_mpoly.h"
 
 
-void mpoly_degrees(slong * user_degs, const ulong * poly_exps,
+void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)
 {
     slong i, N;

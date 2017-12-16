@@ -100,7 +100,7 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
     TMP_START;
 
     degrees = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    fmpz_mpoly_degrees(degrees, poly, ctx);
+    fmpz_mpoly_degrees_si(degrees, poly, ctx);
 
     /* pick main variable with highest degree */
     main_var = 0;

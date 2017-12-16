@@ -236,10 +236,16 @@ slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
     return _fmpz_vec_max_bits(poly->coeffs, poly->length);
 }
 
-FLINT_DLL void fmpz_mpoly_degrees(slong * degs, const fmpz_mpoly_t poly,
+FLINT_DLL void fmpz_mpoly_degrees_si(slong * degs, const fmpz_mpoly_t poly,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL slong fmpz_mpoly_degree(const fmpz_mpoly_t poly, slong var,
+FLINT_DLL slong fmpz_mpoly_degree_si(const fmpz_mpoly_t poly, slong var,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_degrees_fmpz(fmpz ** degs, const fmpz_mpoly_t poly,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_degree_fmpz(fmpz_t degs, const fmpz_mpoly_t poly, slong var,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,

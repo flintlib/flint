@@ -107,8 +107,8 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     b_degs = (slong *)TMP_ALLOC(nvars*sizeof(slong));
     a_leads = (slong *)TMP_ALLOC(nvars*sizeof(slong));
     b_leads = (slong *)TMP_ALLOC(nvars*sizeof(slong));
-    fmpz_mpoly_degrees(a_degs, polyA, ctx);
-    fmpz_mpoly_degrees(b_degs, polyB, ctx);
+    fmpz_mpoly_degrees_si(a_degs, polyA, ctx);
+    fmpz_mpoly_degrees_si(b_degs, polyB, ctx);
 
     for (v = 0; v < nvars; v++)
     {
