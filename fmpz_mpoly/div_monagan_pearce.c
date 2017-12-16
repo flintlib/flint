@@ -650,6 +650,10 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
       return;
    }
 
+    if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
+        flint_throw(FLINT_ERROR, "mp exponents in fmpz_mpoly_div_monagan_pearce");
+
+
    TMP_START;
 
    /* maximum bits in quotient exps and inputs is max for poly2 and poly3 */

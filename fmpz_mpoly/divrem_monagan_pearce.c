@@ -730,6 +730,9 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
       return;
    }
 
+    if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
+        flint_throw(FLINT_ERROR, "mp exponents in fmpz_mpoly_divrem_monagan_pearce");
+
     TMP_START;
 
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);

@@ -25,6 +25,8 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
 
     assert(polyA->length == 1);
     assert(polyB->length == 1);
+    if (polyA->bits > FLINT_BITS || polyB->bits > FLINT_BITS)
+        flint_throw(FLINT_ERROR, "mp exponents in fmpz_mpoly_gcd_monomial");
 
     TMP_START;
     texpA = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
@@ -335,6 +337,10 @@ void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
                                 fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
     _fmpz_mpoly_gcd_prs(poly1, poly2, poly3, ctx);
+
+    if (poly1->bits > FLINT_BITS || poly2->bits > FLINT_BITS)
+        flint_throw(FLINT_ERROR, "mp exponents in fmpz_mpoly_gcd_prs");
+
     if ((poly1->length > 0) && (fmpz_cmp_ui(poly1->coeffs + 0, WORD(0)) < 0))
         fmpz_mpoly_neg(poly1, poly1, ctx);
 }

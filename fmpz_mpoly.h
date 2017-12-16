@@ -254,6 +254,9 @@ FLINT_DLL void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
 FLINT_DLL void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
+                                          slong k, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpoly_set_ui(fmpz_mpoly_t poly,
                                           ulong c, const fmpz_mpoly_ctx_t ctx);
 
@@ -350,10 +353,6 @@ FLINT_DLL slong fmpz_mpoly_get_term_si_ui(           const fmpz_mpoly_t poly,
                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
 
-
-
-FLINT_DLL int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
-                                          slong k, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_get_coeff_fmpz(fmpz_t x,
                  const fmpz_mpoly_t poly, slong n, const fmpz_mpoly_ctx_t ctx);

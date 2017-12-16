@@ -706,6 +706,7 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
       return;
    }
 
+
    TMP_START;
 
    free3 = (int *) TMP_ALLOC(len*sizeof(int));
@@ -716,6 +717,9 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
    exp_bits = poly2->bits;
    for (i = 0; i < len; i++)
       exp_bits = FLINT_MAX(exp_bits, poly3[i]->bits);
+
+    if (exp_bits > FLINT_BITS)
+        flint_throw(FLINT_ERROR, "mp exponents in fmpz_mpoly_divrem_ideal_monagan_pearce");
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
