@@ -210,17 +210,6 @@ void mpoly_monomial_add_mp(ulong * exp_ptr, const ulong * exp2,
     mpn_add_n(exp_ptr, exp2, exp3, N);
 }
 
-
-MPOLY_INLINE
-void mpoly_monomial_sub_with_borrow(ulong * exp_ptr, const ulong * exp2, 
-                                                   const ulong * exp3, slong N)
-{
-   slong i;
-   ulong bw = 0;
-   for (i = 0; i < N; i++)
-      sub_ddmmss(bw, exp_ptr[i], WORD(0), exp2[i], WORD(0), exp3[i] - bw);  
-}
-
 MPOLY_INLINE
 void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2,
                                                    const ulong * exp3, slong N)
@@ -293,6 +282,19 @@ int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
          return 1;
    }
    return 0;
+}
+
+MPOLY_INLINE
+int mpoly_monomial_overflows_mp(ulong * exp_ptr, slong N, mp_bitcnt_t bits)
+{
+    slong i = bits/FLINT_BITS - 1;
+    do {
+        if ((slong)(exp_ptr[i]) < 0)
+            return 1;
+        i += bits/FLINT_BITS;
+    } while (i < N);
+
+    return 0;
 }
 
 MPOLY_INLINE

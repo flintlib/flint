@@ -391,8 +391,15 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     {
         exp = heap[1].exp;
 
-        if (mpoly_monomial_overflows(exp, N, mask))
-            goto not_exact_division;
+        if (bits <= FLINT_BITS)
+        {
+            if (mpoly_monomial_overflows(exp, N, mask))
+                goto not_exact_division;
+        } else
+        {
+            if (mpoly_monomial_overflows_mp(exp, N, bits))
+                goto not_exact_division;
+        }
       
         k++;
         _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, N);
@@ -618,13 +625,14 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, exp_bits, N, len = 0;
-   fmpz * max_fields2, * max_fields3;
-   ulong * cmpmask;
-   ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;
-   int easy_exit, free2 = 0, free3 = 0;
-   ulong mask = 0;
-   TMP_INIT;
+    slong i, N, len = 0;
+    mp_bitcnt_t exp_bits;
+    fmpz * max_fields2, * max_fields3;
+    ulong * cmpmask;
+    ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;
+    int easy_exit, free2 = 0, free3 = 0;
+    ulong mask = 0;
+    TMP_INIT;
 
    /* check divisor is nonzero */
    if (poly3->length == 0)
@@ -713,17 +721,27 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                                                     poly3->length, ctx->minfo);
    }
 
-   /* mask with high bit of each exponent vector field set */
-   for (i = 0; i < FLINT_BITS/exp_bits; i++)
-      mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
 
-   /* check leading monomial divides exactly */
-   if (!mpoly_monomial_divides(expq, exp2, exp3, N, mask))
-   {
-      len = 0;
+    /* check leading monomial divides exactly */
+    if (exp_bits <= FLINT_BITS)
+    {
+        /* mask with high bit of each exponent vector field set */
+        for (i = 0; i < FLINT_BITS/exp_bits; i++)
+            mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
 
-      goto cleanup;
-   }
+        if (!mpoly_monomial_divides(expq, exp2, exp3, N, mask))
+        {
+            len = 0;
+            goto cleanup;
+        }
+    } else
+    {
+        if (!mpoly_monomial_divides_mp(expq, exp2, exp3, N, exp_bits))
+        {
+            len = 0;
+            goto cleanup;
+        }
+    }
 
    /* deal with aliasing and divide polynomials */
    if (poly1 == poly2 || poly1 == poly3)

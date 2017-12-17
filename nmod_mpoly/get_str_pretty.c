@@ -11,7 +11,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include "nmod_mpoly.h"
 
 char *
@@ -21,9 +20,8 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
 {
     char * str, ** x = (char **) x_in;
     slong i, j, N, bound, off;
-    ulong * degs;
+    fmpz * exponents;
     int first;
-
     TMP_INIT;
 
     if (len == 0)
@@ -50,13 +48,13 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
 
     bound = 1 + len * ((FLINT_BIT_COUNT(fctx->mod.n) + 3)/3);
 
-    degs = (ulong *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
-    mpoly_degrees_si((slong *) degs, exp, len, bits, mctx);
+    exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_init(exponents + i);
+    mpoly_degrees_fmpz((fmpz *) exponents, exp, len, bits, mctx);
 
     for (i = 0; i < mctx->nvars; i++)
-    {
-        bound += ((FLINT_BIT_COUNT(degs[i]) + 3)/3 + strlen(x[i]) + 3)*len;
-    }
+        bound += (fmpz_sizeinbase(exponents + i, 10) + strlen(x[i]) + 3)*len;
 
     str = flint_malloc(bound);
     off = 0;
@@ -74,11 +72,11 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
             off += flint_sprintf(str + off, "%wd", coeff[i]);
         }
 
-        mpoly_get_monomial_ui(degs, exp + N*i, bits, mctx);
+        mpoly_get_monomial_fmpz(exponents, exp + N*i, bits, mctx);
 
         for (j = 0; j < mctx->nvars; j++)
         {
-            if (degs[j] == 0)
+            if (fmpz_is_zero(exponents + j))
                 continue;
 
             if (!first)
@@ -86,9 +84,14 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
                 str[off++] = '*';
             }
 
-            if (degs[j] > 1)
+            if (fmpz_cmp_ui(exponents + j, UWORD(1)) > 0)
             {
-                off += flint_sprintf(str + off, "%s^%wd", x[j], degs[j]);
+                off += flint_sprintf(str + off, "%s^", x[j]);
+                if (!COEFF_IS_MPZ(exponents[j]))
+                    off += flint_sprintf(str + off, "%wd", exponents[j]);
+                else
+                    off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(exponents[j]));
+
             } else
             {
                 off += flint_sprintf(str + off, "%s", x[j]);
@@ -101,10 +104,13 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
         {
             off += flint_sprintf(str + off, "1");
         }
-   }
+    }
 
-   TMP_END;
-   return str;
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_clear(exponents + i);
+
+    TMP_END;
+    return str;
 }
 
 char *
