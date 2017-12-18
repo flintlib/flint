@@ -651,7 +651,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    }
 
     if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
-        flint_throw(FLINT_ERROR, "mp exponents in fmpz_mpoly_div_monagan_pearce");
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_div_monagan_pearce");
 
 
    TMP_START;

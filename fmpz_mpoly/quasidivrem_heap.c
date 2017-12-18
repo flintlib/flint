@@ -749,7 +749,7 @@ void fmpz_mpoly_quasidivrem_heap(fmpz_t scale, fmpz_mpoly_t q, fmpz_mpoly_t r,
     }
 
     if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
-        flint_throw(FLINT_ERROR, "mp exponents in fmpz_mpoly_quasidivrem_heap");
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_quasidivrem_heap");
 
     TMP_START;
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);

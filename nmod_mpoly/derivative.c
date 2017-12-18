@@ -46,6 +46,10 @@ void nmod_mpoly_derivative(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 
     TMP_START;
     bits = poly2->bits;
+
+    if (bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in nmod_mpoly_derivative");
+
     nmod_mpoly_fit_length(poly1, poly2->length, ctx);
     nmod_mpoly_fit_bits(poly1, bits, ctx);
     poly1->bits = bits;

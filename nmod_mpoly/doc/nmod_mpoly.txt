@@ -149,45 +149,8 @@ int nmod_mpoly_is_gen(const nmod_mpoly_t poly,
     $i < 0$ the function returns 1 if the polynomial is equal to any generator
     of the polynomial ring, otherwise it returns 0.
 
-ulong nmod_mpoly_get_coeff_ui(const nmod_mpoly_t poly, 
-                                           slong i, const nmod_mpoly_ctx_t ctx)
-
-    Return the coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with most significance. The coefficient is
-    assumed to be unsigned and to fit in a \code{ulong}.
-
-void nmod_mpoly_set_coeff_ui(nmod_mpoly_t poly,
-                                  slong i, ulong x, const nmod_mpoly_ctx_t ctx)
-
-    Set the coefficient of the given polynomial with index $i$ to the given
-    unsigned integer $x$, starting with $i = 0$ for the term with most
-    signifance. Any existing term at that index is overwritten.
-
-void nmod_mpoly_get_monomial(ulong * exps, const nmod_mpoly_t poly, 
-                                           slong i, const nmod_mpoly_ctx_t ctx)
-
-    Get the exponent vector of the given polynomial with index $i$. The output
-    is written in the array \code{exps} which is assumed to have space for $n$
-    entries, where $n$ is the number of variable of the polynomial. If the
-    polynomial is either deglex or degrevlex, the degree field of the exponent
-    vector is ignored. The entry with index 0 in the array corresponds to the
-    variable with the most significance with respect to the polynomial
-    ordering.
-
-void nmod_mpoly_set_monomial(nmod_mpoly_t poly, 
-                       slong i, const ulong * exps, const nmod_mpoly_ctx_t ctx)
-
-    Set the exponent vector of the given polynomial with index $i$. The
-    exponent is specified by the values in the array \code{exps} which is
-    assumed to have $n$ entries, where $n$ is the number of variable of the
-    polynomial. If the polynomial is either deglex or degrevlex, the degree
-    field of the exponent should not be included in \code{exps}. It is
-    calculated by the function. The entry with index 0 in the array corresponds
-    to the variable with the most significance with respect to the
-    polynomial ordering.
-
-void nmod_mpoly_set_term_ui(nmod_mpoly_t poly,
-                        ulong const * exp, ulong c, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_set_term_ui_ui(nmod_mpoly_t poly,
+                        ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx)
 
     Set the term of \code{poly} with the given monomial to the given
     coefficient. The monomial is specified as a vector of exponents with as
@@ -197,16 +160,34 @@ void nmod_mpoly_set_term_ui(nmod_mpoly_t poly,
     removed if the coefficient is zero. If a term with that monomial doesn't
     exist, one is inserted at the appropriate position.
 
-ulong nmod_mpoly_get_term_ui(const nmod_mpoly_t poly,
-                                 ulong const * exp, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly,
+                        ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx)
 
-    Get the coefficient $c$ of the term of \code{poly} with the given monomial.
+    Set the term of \code{poly} with the given monomial to the given
+    coefficient. The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If a term with that
+    monomial already exists in the polynomial, it is overwritten. The term is
+    removed if the coefficient is zero. If a term with that monomial doesn't
+    exist, one is inserted at the appropriate position.
+
+ulong nmod_mpoly_get_term_ui_ui(const fmpz_mpoly_t poly,
+                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+
+    Get the coefficient of the term of \code{poly} with the given monomial.
     The monomial is specified as a vector of exponents with as
     many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If no term with that
-    monomial exists in the polynomial, zero is returned. This includes the case
-    where the monomial is smaller than that of the trailing term of \code{poly}.
-    The coeffcient is assumed to be unsigned and to fit in a \code{ulong}.
+    monomial exists in the polynomial, zero is returned.
+
+ulong nmod_mpoly_get_term_ui_fmpz(const fmpz_mpoly_t poly,
+                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+
+    Get the coefficient of the term of \code{poly} with the given monomial.
+    The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If no term with that
+    monomial exists in the polynomial, zero is returned.
 
 *******************************************************************************
 
@@ -303,10 +284,17 @@ void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1,
 *******************************************************************************
 
 void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                                           slong k, const nmod_mpoly_ctx_t ctx)
+                                           ulong k, const nmod_mpoly_ctx_t ctx)
 
     Set \code{poly1} to \code{poly2} raised to the $k$-th power.
-    It is assumed that $k \geq 0$.
+
+void nmod_mpoly_pow_fmpz(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                                           ulong k, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} raised to the $k$-th power. This function
+    will fail if k is bigger than a \code{ulong} and \code{poly1} has more than
+    one term.
+
 
 *******************************************************************************
 
@@ -406,145 +394,6 @@ void nmod_mpoly_compose(nmod_mpoly_t res, nmod_mpoly_t poly1,
     \code{res} and the elements of \code{polys2} have context object
     \code{ctx2}, while \code{poly1} has context object \code{ctx1}. Neither of
     \code{res} and \code{poly1} is allowed to alias any other polynomial.
-
-*******************************************************************************
-
-    Greatest Common Divisor
-
-*******************************************************************************
-
-void nmod_mpoly_term_content(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                                                    const nmod_mpoly_ctx_t ctx)
-
-    Sets \code{poly1} to the GCD of the terms of \code{poly2}.
-
-
-void nmod_mpoly_gcd_prs(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                          const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
-
-    Uses psuedo-remainder sequences to set \code{poly1} to the
-    GCD of \code{poly2} and \code{poly3}, where \code{poly1} has positive
-    leading term.
-
-int nmod_mpoly_gcd_is_unit(const nmod_mpoly_t poly1,
-                          const nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
-
-    Return 1 if the GCD \code{poly1} and \code{poly2} is a unit, else return 0.
-
-void nmod_mpoly_resultant(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-               const nmod_mpoly_t poly3, slong var, const nmod_mpoly_ctx_t ctx)
-
-    Set \code{poly1} to the resultant of \code{poly2} and \code{poly3}
-    with respect to the variable of index \code{var}.
-
-void nmod_mpoly_discriminant(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                                         slong var, const nmod_mpoly_ctx_t ctx)
-
-    Set \code{poly1} to the discriminant of \code{poly2}
-    with respect to the variable of index \code{var}.
-
-*******************************************************************************
-
-    Univariates
-
-*******************************************************************************
-
-
-void nmod_mpoly_univar_init(nmod_mpoly_univar_t poly,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-    Initialize \{poly}.
-
-void nmod_mpoly_univar_clear(nmod_mpoly_univar_t poly,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-    Free all memory used by \code{poly}.
-
-void nmod_mpoly_univar_swap(nmod_mpoly_univar_t poly1,
-                         nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx)
-
-    Swap \code{poly1} and \code{poly2}.
-
-void nmod_mpoly_univar_fit_length(nmod_mpoly_univar_t poly,
-                                      slong length, const nmod_mpoly_ctx_t ctx)
-
-    Make sure that \code{poly} has space for at least \code{length} terms.
-
-void nmod_mpoly_to_univar(nmod_mpoly_univar_t poly1,
-               const nmod_mpoly_t poly2, slong var, const nmod_mpoly_ctx_t ctx)
-
-    Break up \code{poly2} as a polynomial in the variable of index \code{var}
-    with multivariate coefficients in the other variables, and store the result
-    in \code{poly1}.
-
-void nmod_mpoly_from_univar(nmod_mpoly_t poly1,
-                   const nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx)
-
-    Reverse the operation performed by \code{nmod_mpoly_to_univar}. This
-    function is currently undefined if the coefficients of \code{poly2}
-    themselves depend on the main variable in \code{poly2}. 
-
-int nmod_mpoly_univar_equal(nmod_mpoly_univar_t poly1,
-                   const nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx)
-
-    Return 1 if \code{poly1} and \code{poly2} are equal, otherwise return 0.
-
-void nmod_mpoly_univar_add(nmod_mpoly_univar_t poly1,
-        const nmod_mpoly_univar_t poly2, const nmod_mpoly_univar_t poly3,
-                                                    const nmod_mpoly_ctx_t ctx)
-
-    Set \code{poly1} to \code{poly2} plus \code{poly3}.
-
-void nmod_mpoly_univar_mul(nmod_mpoly_univar_t poly1,
-        const nmod_mpoly_univar_t poly2, const nmod_mpoly_univar_t poly3,
-                                                    const nmod_mpoly_ctx_t ctx)
-
-    Set \code{poly1} to \code{poly2} times \code{poly3}.
-
-void nmod_mpoly_univar_derivative(nmod_mpoly_univar_t poly1,
-                   const nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx)
-
-    Set \code{poly1} to the derivative of \code{poly2} with respect to
-    its main variable.
-
-void nmod_mpoly_to_nmod_poly(nmod_poly_t poly1, slong * shift1,
-               const nmod_mpoly_t poly2, slong var, const nmod_mpoly_ctx_t ctx)
-
-    Set \code{poly1} and \code{shift1} so that $p_1*x^{s_1} = p_2$. The
-    shift is included because the \code{nmod_poly_t} type is a dense type and
-    \code{nmod_mpoly_t} is not. A call to
-    \code{nmod_poly_shift_left(poly1, poly1, shift1)}
-    will result in \code{poly1} being equal to \code{poly2}. This function
-    is defined only if \code{poly2} depends solely on the variable
-    of index \code{var}.
-
-void nmod_mpoly_from_nmod_poly(nmod_mpoly_t poly1, const nmod_poly_t poly2,
-                           slong shift2, slong var, const nmod_mpoly_ctx_t ctx)
-
-    Reverse the operation performed by \code{nmod_mpoly_to_nmod_poly}.
-
-void _nmod_mpoly_univar_prem(nmod_mpoly_univar_t polyA,
-        const nmod_mpoly_univar_t polyB, nmod_mpoly_univar_t polyC,
-                                                    const nmod_mpoly_ctx_t ctx)
-
-    Set \code{polyA} to the pseudo remainder of \code{polyA} and -\code{polyB}.
-    The division is performed with respect to the variable store in
-    \code{polyB}. An extra polynomial \code{polyC} is needed for workspace.
-
-void _nmod_mpoly_univar_pgcd(nmod_mpoly_univar_t poly1,
-        const nmod_mpoly_univar_t polyP, const nmod_mpoly_univar_t polyQ,
-                                                    const nmod_mpoly_ctx_t ctx)
-
-    Set \code{poly1} to the last (nonzero) subresultant polynomial of
-    \code{polyQ} and \code{polyQ}. It is assumed that $\operatorname{deg}(P)
-    \ge \operatorname{deg}(Q) \ge 1$.
-
-void _nmod_mpoly_univar_pgcd_ducos(nmod_mpoly_univar_t poly1,
-        const nmod_mpoly_univar_t polyP, const nmod_mpoly_univar_t polyQ,
-                                                    const nmod_mpoly_ctx_t ctx)
-
-    Perform the same operation as \code{_nmod_mpoly_univar_pgcd} using the
-    algorithm of Ducos.
 
 *******************************************************************************
 

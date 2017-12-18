@@ -44,6 +44,10 @@ void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
     TMP_START;
     bits = poly2->bits;
+
+    if (bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_derivative");
+
     fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
     fmpz_mpoly_fit_bits(poly1, bits, ctx);
     poly1->bits = bits;

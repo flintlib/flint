@@ -479,6 +479,9 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
         return;
     }
 
+    if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in nmod_mpoly_divrem_monagan_pearce");
+
     TMP_START;
 
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);

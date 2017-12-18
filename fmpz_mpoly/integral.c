@@ -64,6 +64,9 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
     int free2 = 0;
     TMP_INIT;
 
+    if (poly2->bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_integrate");
+
     TMP_START;
 
     /* compute bits required to represent result */
@@ -76,12 +79,12 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
     for (i = 0; i < ctx->minfo->nfields; i++)
         max_field = FLINT_MAX(max_field, gen_fields[i] + max_fields[i]);
 
-    exp_bits = FLINT_MAX(WORD(8), 1 + FLINT_BIT_COUNT(max_field));
+    exp_bits = FLINT_MAX(MPOLY_MIN_BITS, 1 + FLINT_BIT_COUNT(max_field));
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+
     if (exp_bits > FLINT_BITS)
-    {
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_integrate");
-    }
+
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);

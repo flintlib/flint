@@ -515,6 +515,9 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t
     for (i = 0; i < len; i++)
         exp_bits = FLINT_MAX(exp_bits, poly3[i]->bits);
 
+    if (exp_bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in nmod_mpoly_divrem_ideal_monagan_pearce");
+
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
