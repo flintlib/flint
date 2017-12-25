@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,10 +10,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void _fmpz_mpoly_scalar_divexact_si(fmpz * poly1, ulong * exps1,
@@ -30,22 +27,22 @@ void _fmpz_mpoly_scalar_divexact_si(fmpz * poly1, ulong * exps1,
 void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
 {
-   slong N;
+    slong N;
 
-   if (c == 0)
-   {
-      _fmpz_mpoly_set_length(poly1, 0, ctx);
-      return;
-   }
+    if (c == 0)
+    {
+        _fmpz_mpoly_set_length(poly1, 0, ctx);
+        return;
+    }
 
-   N = words_per_exp(ctx->n, poly2->bits);
+    N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
 
-   fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
-   fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
+    fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
+    fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
 
-   _fmpz_mpoly_scalar_divexact_si(poly1->coeffs, poly1->exps, 
+    _fmpz_mpoly_scalar_divexact_si(poly1->coeffs, poly1->exps, 
                          poly2->coeffs, poly2->exps, poly2->length, N, c);
       
-   _fmpz_mpoly_set_length(poly1, poly2->length, ctx);
-   poly1->bits = poly2->bits;
+    _fmpz_mpoly_set_length(poly1, poly2->length, ctx);
+    poly1->bits = poly2->bits;
 }

@@ -63,17 +63,17 @@ slong _nmod_mpoly_add1(mp_limb_t * coeff1,       ulong * exp1,
 slong _nmod_mpoly_add(mp_limb_t * coeff1,       ulong * exp1,
                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-                   slong N, ulong maskhi, ulong masklo, const nmodf_ctx_t fctx)
+                   slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
     if (N == 1)
         return _nmod_mpoly_add1(coeff1, exp1, coeff2, exp2, len2,
-                                             coeff3, exp3, len3, maskhi, fctx);
+                                         coeff3, exp3, len3, cmpmask[0], fctx);
 
     while (i < len2 && j < len3)
     {
-        int cmp = mpoly_monomial_cmp(exp2 + i*N, exp3 + j*N, N, maskhi, masklo);
+        int cmp = mpoly_monomial_cmp(exp2 + i*N, exp3 + j*N, N, cmpmask);
 
         if (cmp > 0)
         {
@@ -120,12 +120,12 @@ void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 {
     slong len1 = 0, max_bits, N;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
-    ulong maskhi, masklo;
+    ulong * cmpmask;
     int free2 = 0, free3 = 0;
+    TMP_INIT;
 
     max_bits = FLINT_MAX(poly2->bits, poly3->bits);
-    masks_from_bits_ord(maskhi, masklo, max_bits, ctx->ord);
-    N = words_per_exp(ctx->n, max_bits);
+    N = mpoly_words_per_exp(max_bits, ctx->minfo);
 
     if (poly2->length == 0)
     {
@@ -137,20 +137,24 @@ void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         return;
     }
 
+    TMP_START;
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_get_cmpmask(cmpmask, N, max_bits, ctx->minfo);
+
     if (max_bits > poly2->bits)
     {
         free2 = 1;
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_unpack_monomials(exp2, max_bits, poly2->exps, poly2->bits,
-                                                        poly2->length, ctx->n);
+        mpoly_repack_monomials(exp2, max_bits, poly2->exps, poly2->bits,
+                                                    poly2->length, ctx->minfo);
     }
 
     if (max_bits > poly3->bits)
     {
         free3 = 1;
         exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-        mpoly_unpack_monomials(exp3, max_bits, poly3->exps, poly3->bits,
-                                                        poly3->length, ctx->n);
+        mpoly_repack_monomials(exp3, max_bits, poly3->exps, poly3->bits,
+                                                    poly3->length, ctx->minfo);
     }
 
     if (poly1 == poly2 || poly1 == poly3)
@@ -164,7 +168,7 @@ void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         len1 = _nmod_mpoly_add(temp->coeffs, temp->exps, 
                     poly2->coeffs, exp2, poly2->length,
                     poly3->coeffs, exp3, poly3->length,
-                                    N, maskhi, masklo, ctx->ffinfo);
+                                    N, cmpmask, ctx->ffinfo);
 
         nmod_mpoly_swap(temp, poly1, ctx);
 
@@ -178,7 +182,7 @@ void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         len1 = _nmod_mpoly_add(poly1->coeffs, poly1->exps, 
                        poly2->coeffs, exp2, poly2->length,
                        poly3->coeffs, exp3, poly3->length,
-                                    N, maskhi, masklo, ctx->ffinfo);
+                                    N, cmpmask, ctx->ffinfo);
     }
       
     if (free2)
@@ -188,4 +192,6 @@ void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
         flint_free(exp3);
 
     _nmod_mpoly_set_length(poly1, len1, ctx);
+
+    TMP_END;
 }

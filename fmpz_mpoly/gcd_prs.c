@@ -9,11 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 #include "assert.h"
 
@@ -22,7 +17,6 @@
 void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
                           const fmpz_mpoly_t polyB, const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev;
     slong i, N, bits;
     ulong * texpA, * texpB, * exps;
     ulong mask;
@@ -31,31 +25,32 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
 
     assert(polyA->length == 1);
     assert(polyB->length == 1);
+    if (polyA->bits > FLINT_BITS || polyB->bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_gcd_monomial");
 
     TMP_START;
-    texpA = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    texpB = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-    exps = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    texpA = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    texpB = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    exps = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
 
     fmpz_init(igcd);
     fmpz_gcd(igcd, polyA->coeffs + 0, polyB->coeffs + 0);
 
     bits = FLINT_MAX(polyA->bits, polyB->bits);
-    N = words_per_exp(ctx->n, bits);
-    degrev_from_ord(deg, rev, ctx->ord);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
     mask = 0;
     for (i = 0; i < FLINT_BITS/bits; i++)
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-    mpoly_unpack_monomials(texpA, bits, polyA->exps, polyA->bits, 1, ctx->n);
-    mpoly_unpack_monomials(texpB, bits, polyB->exps, polyB->bits, 1, ctx->n);
+    mpoly_repack_monomials(texpA, bits, polyA->exps, polyA->bits, 1, ctx->minfo);
+    mpoly_repack_monomials(texpB, bits, polyB->exps, polyB->bits, 1, ctx->minfo);
     mpoly_monomial_min(texpA, texpA, texpB, bits, N, mask);
-    mpoly_get_monomial(exps, texpA, bits, ctx->n, deg, rev);
+    mpoly_get_monomial_ui(exps, texpA, bits, ctx->minfo);
     
     fmpz_mpoly_fit_length(poly1, 1, ctx);
     fmpz_mpoly_fit_bits(poly1, bits, ctx);
     poly1->bits = bits;
-    mpoly_set_monomial(poly1->exps + N*0, exps, bits, ctx->n, deg, rev);
+    mpoly_set_monomial_ui(poly1->exps + N*0, exps, bits, ctx->minfo);
     fmpz_set(poly1->coeffs + 0, igcd);
     _fmpz_mpoly_set_length(poly1, 1, ctx);
 
@@ -69,9 +64,8 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
 void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
                           const fmpz_mpoly_t polyB, const fmpz_mpoly_ctx_t ctx)
 {
-    slong shift, off, bits, fpw, N;
-    slong i, m, c, d, v, k, var, nvars;
-    int deg, rev;
+    slong shift, off, bits, N;
+    slong i, m, c, d, v, k, var, nvars = ctx->minfo->nvars;
     ulong mask;
     slong * a_degs, * b_degs, * a_leads, * b_leads;
     fmpz_mpoly_t ac, bc, gc, gabc, g;
@@ -88,9 +82,6 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     fmpz_mpoly_univar_init(ax, ctx);
     fmpz_mpoly_univar_init(bx, ctx);
     fmpz_mpoly_univar_init(gx, ctx);
-
-    degrev_from_ord(deg, rev, ctx->ord);    
-    nvars = ctx->n - deg;
 
     if (polyA->length == 0)
     {
@@ -118,8 +109,8 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     b_degs = (slong *)TMP_ALLOC(nvars*sizeof(slong));
     a_leads = (slong *)TMP_ALLOC(nvars*sizeof(slong));
     b_leads = (slong *)TMP_ALLOC(nvars*sizeof(slong));
-    fmpz_mpoly_degrees(a_degs, polyA, ctx);
-    fmpz_mpoly_degrees(b_degs, polyB, ctx);
+    fmpz_mpoly_degrees_si(a_degs, polyA, ctx);
+    fmpz_mpoly_degrees_si(b_degs, polyB, ctx);
 
     for (v = 0; v < nvars; v++)
     {
@@ -144,11 +135,10 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     for (v = 0; v < nvars; v++)
     {
         bits = polyA->bits;
-        fpw = FLINT_BITS/bits;
         mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-        N = words_per_exp(ctx->n, bits);
-        degrev_from_ord(deg, rev, ctx->ord);
-        mpoly_off_shift(&off, &shift, v, deg, rev, fpw, ctx->n, bits);
+        N = mpoly_words_per_exp(bits, ctx->minfo);
+        mpoly_gen_offset_shift(&off, &shift, v, N, bits, ctx->minfo);
+
         if (a_degs[v] != 0)
         {
             a_leads[v] = 0;
@@ -157,11 +147,10 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
         }
 
         bits = polyB->bits;
-        fpw = FLINT_BITS/bits;
         mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-        N = words_per_exp(ctx->n, bits);
-        degrev_from_ord(deg, rev, ctx->ord);
-        mpoly_off_shift(&off, &shift, v, deg, rev, fpw, ctx->n, bits);
+        N = mpoly_words_per_exp(bits, ctx->minfo);
+        mpoly_gen_offset_shift(&off, &shift, v, N, bits, ctx->minfo);
+
         if (b_degs[v] != 0)
         {
             b_leads[v] = 0;
@@ -348,6 +337,10 @@ void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
                                 fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
     _fmpz_mpoly_gcd_prs(poly1, poly2, poly3, ctx);
+
+    if (poly1->bits > FLINT_BITS || poly2->bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_gcd_prs");
+
     if ((poly1->length > 0) && (fmpz_cmp_ui(poly1->coeffs + 0, WORD(0)) < 0))
         fmpz_mpoly_neg(poly1, poly1, ctx);
 }

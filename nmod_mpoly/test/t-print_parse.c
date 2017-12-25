@@ -23,8 +23,8 @@ main(void)
     fflush(stdout);
 
     {
-        ordering_t ord;
-        slong nvars, len1, exp_bound1;
+        slong len1;
+        mp_bitcnt_t exp_bits1;
         mp_limb_t modulus;
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, f1;
@@ -33,21 +33,18 @@ main(void)
 
         for (i = 0; i < flint_test_multiplier(); i++)
         {
-            ord = mpoly_ordering_randtest(state);
-            nvars = n_randint(state, 6) + 1;
-
             modulus = n_randint(state, FLINT_BITS - 1) + 1;
             modulus = n_randbits(state, modulus);
             modulus = n_nextprime(modulus, 1);
-            nmod_mpoly_ctx_init(ctx, nvars, ord, modulus);
+            nmod_mpoly_ctx_init_rand(ctx, state, 6, modulus);
 
             nmod_mpoly_init(f, ctx);
             nmod_mpoly_init(f1, ctx);
 
             for (len1 = 3; len1 < 1000; len1 += len1/2)
             {
-                exp_bound1 = 1000;
-                nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
+                exp_bits1 = 200;
+                nmod_mpoly_randbits(f, state, len1, exp_bits1, ctx);
 
                 str = nmod_mpoly_get_str_pretty(f, vars, ctx);
                 nmod_mpoly_set_str_pretty(f1, str, vars, ctx);

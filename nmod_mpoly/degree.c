@@ -12,26 +12,21 @@
 #include "nmod_mpoly.h"
 
 
-void nmod_mpoly_degrees(slong * degs, const nmod_mpoly_t poly,
+void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t poly,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    int deg, rev;
-    degrev_from_ord(deg, rev, ctx->ord);
-    mpoly_degrees(degs, poly->exps, poly->length, poly->bits, ctx->n, deg, rev);
+    mpoly_degrees_si(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
 }
 
-slong nmod_mpoly_degree(const nmod_mpoly_t poly, slong var,
+slong nmod_mpoly_degree_si(const nmod_mpoly_t poly, slong var,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    slong * degs, nvars, ret;
-    int deg, rev;
+    slong * degs, ret;
     TMP_INIT;
 
     TMP_START;
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
-    degs = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    nmod_mpoly_degrees(degs, poly, ctx);
+    degs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
+    mpoly_degrees_si(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
     ret = degs[var];
 
     TMP_END;

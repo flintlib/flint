@@ -25,9 +25,10 @@ int nmod_mpoly_equal_ui(const nmod_mpoly_t poly,
     if (poly->length != 1)
         return 0;
 
-    N = words_per_exp(ctx->n, poly->bits);
-    if (mpoly_monomial_is_zero(poly->exps + N*0, N))
-        return 1;
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+
+    if (!mpoly_monomial_is_zero(poly->exps + N*0, N))
+        return 0;
 
     return poly->coeffs[0] == cr;
 }

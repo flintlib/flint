@@ -19,7 +19,7 @@
 int
 main(void)
 {
-    slong k, i, N, length, nfields, bits1, bits2;
+    slong k, i, length, nfields, bits1, bits2;
     ulong * a, * b, * c, * d;
     ulong max_length, max_fields;
     FLINT_TEST_INIT(state);
@@ -27,7 +27,7 @@ main(void)
     flint_printf("pack_unpack....");
     fflush(stdout);
 
-    max_length = 100;
+    max_length = 50;
     max_fields = 20;
 
     a = flint_malloc(max_length*max_fields*sizeof(ulong));
@@ -36,19 +36,19 @@ main(void)
     d = flint_malloc(max_length*max_fields*sizeof(ulong));
 
 
-    for (k = 0; k < 100 * flint_test_multiplier(); k++)
+    for (k = 0; k < 10 * flint_test_multiplier(); k++)
     {
         /* do FLINT_BITS => bits1 => FLINT_BITS and compare */
         for (bits1 = 8; bits1 <= FLINT_BITS; bits1 += 1)
         {
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, max_fields) + 1;
-            N = words_per_exp(nfields, bits1);
+
             for (i = 0; i < length*nfields; i++)
                 a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1);
 
-            mpoly_pack_vec(b, a, bits1, nfields, length);
-            mpoly_unpack_vec(c, b, bits1, nfields, length);
+            mpoly_pack_vec_ui(b, a, bits1, nfields, length);
+            mpoly_unpack_vec_ui(c, b, bits1, nfields, length);
 
             for (i = 0; i < length*nfields; i++)
                 if (a[i] != c[i])
@@ -61,28 +61,28 @@ main(void)
     }
 
 
-    for (k = 0; k < 10 * flint_test_multiplier(); k++)
+    for (k = 0; k < 1 * flint_test_multiplier(); k++)
     {
         /* do FLINT_BITS => bits1 => bits2 => FLINT_BITS and compare */
         for (bits1 = 8; bits1 <= FLINT_BITS; bits1 += 1)
         {
-        for (bits2 = bits1; bits2 <= FLINT_BITS; bits2 += 1)
+        for (bits2 = 8; bits2 <= FLINT_BITS; bits2 += 1)
         {
+
+            mpoly_ctx_t mctx;
+
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, max_fields) + 1;
-            N = words_per_exp(nfields, bits1);
+
+            mpoly_ctx_init(mctx, nfields, ORD_LEX);
+
             for (i = 0; i < length*nfields; i++)
-                a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1);
+                a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1)
+                                           & (l_shift(UWORD(1), bits2) - 1);
 
-            /* FLINT_BITS => bits1 */
-            for (i = 0; i < length; i++)
-                mpoly_set_monomial(b + i*N, a + i*nfields, bits1, nfields, 0, 0);
-
-            /* bits1 => bit2 */
-            mpoly_unpack_monomials(c, bits2, b, bits1, length, nfields);
-
-            /* bits2 => FLINT_BITS */
-            mpoly_unpack_monomials(d, FLINT_BITS, c, bits2, length, nfields);
+            mpoly_repack_monomials(b, bits1,      a, FLINT_BITS, length, mctx);
+            mpoly_repack_monomials(c, bits2,      b, bits1,      length, mctx);
+            mpoly_repack_monomials(d, FLINT_BITS, c, bits2,      length, mctx);
 
             for (i = 0; i < length*nfields; i++)
                 if (a[i] != d[i])
@@ -91,6 +91,8 @@ main(void)
                     flint_printf("bits1 = %wd, bits2 = %wd\n", bits1, bits2);
                     flint_abort();
                 }
+
+            mpoly_ctx_clear(mctx);
         }
         }
     }

@@ -49,7 +49,7 @@ main(void)
        len = n_randint(state, 100);
 
        exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
+                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
        exp_bound = n_randbits(state, exp_bits);
        coeff_bits = n_randint(state, 200);
 
@@ -64,7 +64,7 @@ main(void)
        for (j = 0; j < nvars; j++)
           exp[j] = 0;
 
-       fmpz_mpoly_get_term_fmpz(d, f, exp, ctx);
+       fmpz_mpoly_get_term_fmpz_ui(d, f, exp, ctx);
 
        result = fmpz_equal(c, d) &&
                 ((fmpz_is_zero(c) && f->length == 0) || f->length == 1);

@@ -28,7 +28,7 @@ void nmod_mpoly_add_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     NMOD_RED(cr, c, ctx->ffinfo->mod);
     if (cr != 0)
     {
-        N = words_per_exp(ctx->n, poly2->bits);
+        N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
 
         if (mpoly_monomial_is_zero(poly2->exps + (len2 - 1)*N, N))
         {

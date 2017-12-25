@@ -11,12 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
-#include "profiler.h"
 
 int
 main(void)
@@ -28,115 +23,119 @@ main(void)
     flint_printf("degree....");
     fflush(stdout);
 
-
     /* Check degree does not go up under addition */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
-        ordering_t ord;
-        slong nvars, len1, len2, exp_bound1, exp_bound2;
-        slong coeff_bits, exp_bits1, exp_bits2;
+        fmpz_t fdeg, gdeg, hdeg;
+        slong len1, len2;
+        mp_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
-
-        fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(h, ctx);
+        fmpz_init(fdeg);
+        fmpz_init(gdeg);
+        fmpz_init(hdeg);
 
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
-        exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars
-                          + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars
-                          + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        len1 = n_randint(state, 10);
+        len2 = n_randint(state, 10);
+
+        exp_bits1 = n_randint(state, 100) + 2;
+        exp_bits2 = n_randint(state, 100) + 2;
 
         coeff_bits = n_randint(state, 4);
 
-        for (j = 0; j < nvars; j++)
+        for (j = 0; j < ctx->minfo->nvars; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-            fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpz_mpoly_add(h, f, g, ctx);
 
-            if (fmpz_mpoly_degree(h, j, ctx) > FLINT_MAX(
-                                                  fmpz_mpoly_degree(f, j, ctx),
-                                                  fmpz_mpoly_degree(g, j, ctx)
-                                               )
-               )
+            fmpz_mpoly_degree_fmpz(hdeg, h, j, ctx);
+            fmpz_mpoly_degree_fmpz(fdeg, f, j, ctx);
+            fmpz_mpoly_degree_fmpz(gdeg, g, j, ctx);
+
+            if ((fmpz_cmp(hdeg, fdeg) > 0) && (fmpz_cmp(hdeg, gdeg) > 0))
             {
                 printf("FAIL\n");
-                flint_printf("Check degree does not go up under addition\n"
-                                                     "i: %wd  j: %wd\n", i, j);
+                flint_printf("Check degree does not go up under addition\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
         }
 
+        fmpz_clear(fdeg);
+        fmpz_clear(gdeg);
+        fmpz_clear(hdeg);
         fmpz_mpoly_clear(f, ctx);
         fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_clear(h, ctx); 
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
-
 
     /* Check degree adds under multiplication */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
+        int ok;
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
-        ordering_t ord;
-        slong df, dg, dh;
-        slong nvars, len1, len2, exp_bound1, exp_bound2;
-        slong coeff_bits, exp_bits1, exp_bits2;
+        fmpz_t fdeg, gdeg, hdeg;
+        slong len1, len2;
+        mp_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
-
-        fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(h, ctx);
+        fmpz_init(fdeg);
+        fmpz_init(gdeg);
+        fmpz_init(hdeg);
 
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
-        exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        len1 = n_randint(state, 10);
+        len2 = n_randint(state, 10);
+
+        exp_bits1 = n_randint(state, 100) + 2;
+        exp_bits2 = n_randint(state, 100) + 2;
 
         coeff_bits = n_randint(state, 4);
 
-        for (j = 0; j < nvars; j++)
+        for (j = 0; j < ctx->minfo->nvars; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-            fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
-            df = fmpz_mpoly_degree(f, j, ctx);
-            dg = fmpz_mpoly_degree(g, j, ctx);
-            dh = fmpz_mpoly_degree(h, j, ctx);
+            fmpz_mpoly_degree_fmpz(hdeg, h, j, ctx);
+            fmpz_mpoly_degree_fmpz(fdeg, f, j, ctx);
+            fmpz_mpoly_degree_fmpz(gdeg, g, j, ctx);
 
+            if (g->length == 0 || f->length == 0) {
+                ok = (fmpz_cmp_si(hdeg, -WORD(1)) == 0);
+            } else {
+                fmpz_sub(hdeg, hdeg, fdeg);
+                ok = (fmpz_cmp(hdeg, gdeg) == 0);
+            }
 
-
-            if (dh != ((df + dg) | FLINT_SIGN_EXT(df) | FLINT_SIGN_EXT(dg)))
+            if (!ok)
             {
                 printf("FAIL\n");
-                flint_printf("Check degree adds under multiplication\n"
-                                                     "i: %wd  j: %wd\n", i, j);
+                flint_printf("Check degree adds under multiplication\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
         }
 
+        fmpz_clear(fdeg);
+        fmpz_clear(gdeg);
+        fmpz_clear(hdeg);
         fmpz_mpoly_clear(f, ctx);
         fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_clear(h, ctx); 
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

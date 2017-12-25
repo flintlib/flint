@@ -134,11 +134,7 @@ int _nmod_mpoly_parse_pretty(nmod_mpoly_t poly, const char * s, slong sn,
     int expecting = 1;
     fmpz_t c;
     slong l, k;
-    int deg, rev, ret;
-    slong nvars;
-
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
+    int ret;
 
     fmpz_init(c);
     ostack = (slong *) flint_malloc(ealloc*sizeof(slong));
@@ -166,9 +162,9 @@ int _nmod_mpoly_parse_pretty(nmod_mpoly_t poly, const char * s, slong sn,
         } else if (*s == '^')
         {
             s = _nmod_mpoly_parse_pretty_int(++s, end, c, &ret);
-            if (!(expecting & 2) || ret || !fmpz_fits_si(c))
+            if (!(expecting & 2) || ret)
                 goto failed;
-            nmod_mpoly_geobucket_pow_inplace(estack[ei - 1], fmpz_get_si(c), ctx);
+            nmod_mpoly_geobucket_pow_fmpz_inplace(estack[ei - 1], c, ctx);
             expecting = 2;
 
         } else if ((*s == '+' || *s == '-') && (expecting & 2))
@@ -227,19 +223,27 @@ int _nmod_mpoly_parse_pretty(nmod_mpoly_t poly, const char * s, slong sn,
 
         } else {
             /* must be a variable */
-            for (k = 0; k < nvars; k++)
+            slong var = -WORD(1);
+            slong matched_length = -WORD(1);
+            for (k = 0; k < ctx->minfo->nvars; k++)
             {
                 l = strlen(x[k]);
-                if ((end - s >= l) && (strncmp(s, x[k], l) == 0))
-                    break;
+                if ((end - s >= l) && (strncmp(s, x[k], l) == 0)
+                                   && l > matched_length)
+                {
+                    var = k;
+                    matched_length = l;
+                }
             }
-            if (!(expecting & 1) || k >= nvars)
+
+            if (!(expecting & 1) || var < 0)
                 goto failed;
+
             _nmod_mpoly_parse_pretty_fit_estack(&estack, ei, &ealloc);
             nmod_mpoly_geobucket_init(estack[ei], ctx);
-            nmod_mpoly_geobucket_gen(estack[ei], k, ctx);
+            nmod_mpoly_geobucket_gen(estack[ei], var, ctx);
             ei++;
-            s += l;
+            s += matched_length;
             expecting = 2;
         }
     }
@@ -273,18 +277,16 @@ int nmod_mpoly_set_str_pretty(nmod_mpoly_t poly, const char * str,
                                  const char** x_in, const nmod_mpoly_ctx_t ctx)
 {
 
-    int ret, deg, rev;
-    slong i, nvars;
+    int ret;
+    slong i;
     char ** x = (char **) x_in;
     TMP_INIT;
 
     TMP_START;
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
     if (x == NULL)
     {
-        x = (char **) TMP_ALLOC(nvars*sizeof(char *));
-        for (i = 0; i < nvars; i++)
+        x = (char **) TMP_ALLOC(ctx->minfo->nvars*sizeof(char *));
+        for (i = 0; i < ctx->minfo->nvars; i++)
         {
             x[i] = (char *) TMP_ALLOC(22*sizeof(char));
             flint_sprintf(x[i], "x%wd", i + 1);

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,30 +10,23 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly,
                                            ulong c, const fmpz_mpoly_ctx_t ctx)
 {
-   slong N, i;
+    slong N;
 
-   if (c == 0)
-      return poly->length == 0;
+    if (c == 0)
+        return poly->length == 0;
 
-   if (poly->length != 1)
-      return 0;
+    if (poly->length != 1)
+        return 0;
 
-   N = words_per_exp(ctx->n, poly->bits);
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
-   for (i = 0; i < N; i++)
-   {
-      if (poly->exps[i] != 0)
-         return 0;
-   }
+    if (!mpoly_monomial_is_zero(poly->exps + N*0, N))
+        return 0;
 
-   return fmpz_equal_ui(poly->coeffs + 0, c);
+    return fmpz_equal_ui(poly->coeffs + 0, c);
 }

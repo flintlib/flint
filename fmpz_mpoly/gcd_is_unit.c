@@ -19,13 +19,10 @@
 int fmpz_mpoly_gcd_is_unit(const fmpz_mpoly_t a, const fmpz_mpoly_t b,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev, ret = 1;
-    slong nvars, v;
+    int ret = 1;
+    slong v, nvars = ctx->minfo->nvars;
     fmpz_t d, ac, bc;
     fmpz_mpoly_t t;
-
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
 
     fmpz_init(d);
     fmpz_init(ac);

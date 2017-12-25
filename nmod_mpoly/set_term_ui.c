@@ -16,36 +16,34 @@ void nmod_mpoly_set_term_ui(nmod_mpoly_t poly,
                         ulong const * exp, ulong c, const nmod_mpoly_ctx_t ctx)
 {
     slong i, N, index, exp_bits;
-    ulong maskhi, masklo;
+    ulong * cmpmask;
     ulong * packed_exp;
     mp_limb_t cr;
-    int exists, deg, rev;
+    int exists;
     TMP_INIT;
 
     TMP_START;
 
-    degrev_from_ord(deg, rev, ctx->ord);
-
-    /* compute how many bits are required to represent exp */
-    exp_bits = mpoly_exp_bits(exp, ctx->n, deg);
+    exp_bits = mpoly_exp_bits_required_ui(exp, ctx->minfo);
     if (exp_bits > FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_set_term_fmpz");
 
     /* reallocate the number of bits of the exponents of the polynomial */
-    exp_bits = mpoly_optimize_bits(exp_bits, ctx->n);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
     nmod_mpoly_fit_bits(poly, exp_bits, ctx);
 
-    masks_from_bits_ord(maskhi, masklo, poly->bits, ctx->ord);
-    N = words_per_exp(ctx->n, poly->bits);
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_get_cmpmask(cmpmask, N, poly->bits, ctx->minfo);
 
     packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
     /* pack exponent vector */
-    mpoly_set_monomial(packed_exp, exp, poly->bits, ctx->n, deg, rev);
+    mpoly_set_monomial_ui(packed_exp, exp, poly->bits, ctx->minfo);
 
     /* work out at what index term should be placed */
     exists = mpoly_monomial_exists(&index, poly->exps,
-                                  packed_exp, poly->length, N, maskhi, masklo);
+                                  packed_exp, poly->length, N, cmpmask);
 
     NMOD_RED(cr, c, ctx->ffinfo->mod);
     if (!exists) /* term with that exponent doesn't exist */

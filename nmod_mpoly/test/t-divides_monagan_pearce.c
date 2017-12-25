@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
 #include "nmod_mpoly.h"
 
 int
@@ -24,63 +23,52 @@ main(void)
     fflush(stdout);
 
     /* Check f*g/g = f */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
-        ordering_t ord;
+        slong len, len1, len2;
+        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
-        slong maxbits;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong exp_bits, exp_bits1, exp_bits2;
-
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 10) + 1;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
-        nmod_mpoly_ctx_init(ctx, nvars, ord, modulus);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
 
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(h, ctx);
         nmod_mpoly_init(k, ctx);
 
-        len = n_randint(state, 4);
-        len1 = n_randint(state, 4);
-        len2 = n_randint(state, 4) + 1;
+        len = n_randint(state, 10);
+        len1 = n_randint(state, 10);
+        len2 = n_randint(state, 10) + 1;
 
-        maxbits = FLINT_BITS - mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars);
-        exp_bits = n_randint(state, maxbits - 1) + 1;
-        exp_bits1 = n_randint(state, maxbits - 2) + 1;
-        exp_bits2 = n_randint(state, maxbits - 2) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 4; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
+            nmod_mpoly_randbits(f, state, len1, exp_bits1, ctx);
             do {
-                nmod_mpoly_randtest(g, state, len2, exp_bound2, ctx);
+                nmod_mpoly_randbits(g, state, len2, exp_bits2, ctx);
             } while (g->length == 0);
-            nmod_mpoly_randtest(h, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k, state, len, exp_bound, ctx);
+            nmod_mpoly_randbits(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randbits(k, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_test(h, ctx);
-
             ok1 = nmod_mpoly_divides_monagan_pearce(k, h, g, ctx);
             nmod_mpoly_test(k, ctx);
-
             result = (ok1 && nmod_mpoly_equal(f, k, ctx));
 
             if (!result)
             {
-                flint_printf("FAIL\n");
-                flint_printf("Check f*g/g = f\ni = %wd, j = %wd\n", i, j);
+                printf("FAIL\n");
+                flint_printf("Check f*g/g = f\ni = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }
@@ -89,9 +77,7 @@ main(void)
         nmod_mpoly_clear(g, ctx);
         nmod_mpoly_clear(h, ctx);
         nmod_mpoly_clear(k, ctx);
-
         nmod_mpoly_ctx_clear(ctx);
-
     }
 
     /* Check random polys don't divide */
@@ -122,7 +108,7 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20) + 1;
 
-        maxbits = 20/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1;
+        maxbits = 20/(nvars + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1;
         exp_bits = n_randint(state, maxbits) + 1;
         exp_bits1 = n_randint(state, maxbits) + 1;
         exp_bits2 = n_randint(state, maxbits) + 1;
@@ -194,7 +180,7 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100) + 1;
 
-        maxbits = FLINT_BITS - mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars);
+        maxbits = FLINT_BITS - mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars);
         exp_bits = n_randint(state, maxbits - 1) + 1;
         exp_bits1 = n_randint(state, maxbits - 2) + 1;
         exp_bits2 = n_randint(state, maxbits - 2) + 1;
@@ -265,7 +251,7 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20) + 1;
 
-        maxbits = 20/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1;
+        maxbits = 20/(nvars + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1;
         exp_bits = n_randint(state, maxbits) + 1;
         exp_bits1 = n_randint(state, maxbits) + 1;
         exp_bits2 = n_randint(state, maxbits) + 1;
@@ -332,7 +318,7 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100) + 1;
 
-        maxbits = FLINT_BITS - mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars);
+        maxbits = FLINT_BITS - mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars);
         exp_bits = n_randint(state, maxbits - 1) + 1;
         exp_bits1 = n_randint(state, maxbits - 2) + 1;
         exp_bits2 = n_randint(state, maxbits - 2) + 1;
@@ -403,7 +389,7 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100) + 1;
 
-        maxbits = 20/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1;
+        maxbits = 20/(nvars + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1;
         exp_bits = n_randint(state, maxbits) + 1;
         exp_bits1 = n_randint(state, maxbits) + 1;
         exp_bits2 = n_randint(state, maxbits) + 1;

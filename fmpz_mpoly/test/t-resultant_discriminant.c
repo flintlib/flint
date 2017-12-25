@@ -179,9 +179,9 @@ main(void)
 
         for (j = 0; j < nvars; j++)
         {
-            if (fmpz_mpoly_degree(a, j, ctx) < 1)
+            if (fmpz_mpoly_degree_si(a, j, ctx) < 1)
                 continue;
-            if (fmpz_mpoly_degree(b, j, ctx) < 1)
+            if (fmpz_mpoly_degree_si(b, j, ctx) < 1)
                 continue;
 
             fmpz_mpoly_mul_johnson(ab, a, b, ctx);

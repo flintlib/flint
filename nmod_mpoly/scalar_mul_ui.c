@@ -38,7 +38,7 @@ void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     slong N, len1;
     mp_limb_t cr;
 
-    N = words_per_exp(ctx->n, poly2->bits);
+    N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
 
     nmod_mpoly_fit_length(poly1, poly2->length, ctx);
     nmod_mpoly_fit_bits(poly1, poly2->bits, ctx);

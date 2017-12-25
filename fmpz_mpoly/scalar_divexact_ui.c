@@ -38,7 +38,7 @@ void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1,
       return;
    }
 
-   N = words_per_exp(ctx->n, poly2->bits);
+   N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
 
    fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
    fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);

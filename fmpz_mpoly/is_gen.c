@@ -18,7 +18,7 @@
 int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
                                            slong k, const fmpz_mpoly_ctx_t ctx)
 {
-   int deg, rev, ret = 1;
+   int ret = 1;
    slong i;
    ulong * user_exp, total = 0;
 
@@ -30,13 +30,12 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
    if (!fmpz_is_one(poly->coeffs + 0))
       return 0;
 
-   degrev_from_ord(deg, rev, ctx->ord);
 
     TMP_START;
-    user_exp = (ulong *) TMP_ALLOC((ctx->n - deg)*sizeof(ulong));
-    mpoly_get_monomial(user_exp, poly->exps, poly->bits, ctx->n, deg, rev);
+    user_exp = (ulong *) TMP_ALLOC((ctx->minfo->nvars)*sizeof(ulong));
+    mpoly_get_monomial_ui(user_exp, poly->exps, poly->bits, ctx->minfo);
 
-    for (i = 0; i < ctx->n - deg; i++)
+    for (i = 0; i < ctx->minfo->nvars; i++)
     {
         total += user_exp[i];
         ret &= total < 2;

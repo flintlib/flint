@@ -79,8 +79,9 @@ void _fmpz_mpoly_pmul(fmpz_mpoly_t A, const fmpz_mpoly_t X, slong pow,
 void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
      fmpz_mpoly_struct ** polys2, fmpz_mpoly_ctx_t ctx1, fmpz_mpoly_ctx_t ctx2)
 {
-    int deg, rev, ret;
-    slong i, j, k, N, cur, next, f, r, f_prev, r_prev, v, nvars, bits;
+    int ret;
+    slong nvars = ctx1->minfo->nvars;
+    slong i, j, k, N, cur, next, f, r, f_prev, r_prev, v, bits;
     slong sp, rp;
     stack_entry_struct * stack;
     fmpz_mpoly_struct * regs;
@@ -112,12 +113,10 @@ void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
     TMP_START;
 
     /* unpack poly2 exponents */
-    N = words_per_exp(ctx1->n, bits);
-    degrev_from_ord(deg, rev, ctx1->ord);
-    nvars = ctx1->n - deg;
+    N = mpoly_words_per_exp(bits, ctx1->minfo);
     p_uexp = (ulong *) TMP_ALLOC(nvars*p_len*sizeof(ulong));
     for (i = 0; i < p_len; i++)
-        mpoly_get_monomial(p_uexp + nvars*i, p_exp + N*i, bits, ctx1->n, deg, rev);
+        mpoly_get_monomial_ui(p_uexp + nvars*i, p_exp + N*i, bits, ctx1->minfo);
 
     counts = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
     mdegs = (ulong * ) TMP_ALLOC(nvars*sizeof(ulong));

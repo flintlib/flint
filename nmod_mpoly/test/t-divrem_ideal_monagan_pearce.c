@@ -52,7 +52,7 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100) + 1;
 
-        maxbits = FLINT_BITS - mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars);
+        maxbits = FLINT_BITS - mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars);
         exp_bits = n_randint(state, maxbits - 1) + 1;
         exp_bits1 = n_randint(state, maxbits - 2) + 1;
         exp_bits2 = n_randint(state, maxbits - 2) + 1;
@@ -144,7 +144,7 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        maxbits = 14/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1;
+        maxbits = 14/(nvars + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1;
         exp_bits = n_randint(state, maxbits) + 1;
         exp_bits1 = n_randint(state, maxbits) + 1;
         exp_bits2 = n_randint(state, maxbits) + 1;
@@ -251,7 +251,7 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        maxbits = 14/(nvars + mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1;
+        maxbits = 14/(nvars + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1;
         exp_bits = n_randint(state, maxbits) + 1;
         exp_bits1 = n_randint(state, maxbits) + 1;
         exp_bits2 = n_randint(state, maxbits) + 1;

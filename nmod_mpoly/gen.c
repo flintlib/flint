@@ -13,13 +13,9 @@
 
 void nmod_mpoly_gen(nmod_mpoly_t poly, slong i, const nmod_mpoly_ctx_t ctx)
 {
-    int deg, rev;
-    slong j, nvars;
+    slong j;
     ulong * mon;
     TMP_INIT;
-
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
 
     nmod_mpoly_fit_length(poly, 1, ctx);
 
@@ -27,10 +23,10 @@ void nmod_mpoly_gen(nmod_mpoly_t poly, slong i, const nmod_mpoly_ctx_t ctx)
 
     TMP_START;
 
-    mon = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-    for (j = 0; j < nvars; j++)
+    mon = (ulong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(ulong));
+    for (j = 0; j < ctx->minfo->nvars; j++)
        mon[j] = (j == i);
-    mpoly_set_monomial(poly->exps, mon, poly->bits, ctx->n, deg, rev);
+    mpoly_set_monomial_ui(poly->exps, mon, poly->bits, ctx->minfo);
 
     TMP_END;
 

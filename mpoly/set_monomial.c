@@ -9,40 +9,64 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
 #include "mpoly.h"
 
 
-void mpoly_set_monomial(ulong * poly_exps, const ulong * user_exps,
-                                   slong bits, slong nfields, int deg, int rev)
+void mpoly_set_monomial_ui(ulong * poly_exps, const ulong * user_exps,
+                                            slong bits, const mpoly_ctx_t mctx)
 {
+    slong nvars = mctx->nvars;
+    slong nfields = mctx->nfields;
     slong i = 0;
-    ulong * tmp_exps, degree = 0;
+    ulong * tmp_exps, degree;
     TMP_INIT;
 
     TMP_START;
     tmp_exps = (ulong *) TMP_ALLOC(nfields*sizeof(ulong));
 
-    if (deg)
-    {
-        for (i = 0; i < nfields - 1; i++)
-            degree += user_exps[i];
-        tmp_exps[0] = degree;
+    degree = 0;
+    for (i = 0; i < nvars; i++) {
+        degree += user_exps[i];
+        tmp_exps[mctx->rev ? i : nvars - 1 - i] = user_exps[i];
     }
 
-    if (rev)
-    {
-        for (i = deg; i < nfields; i++)
-            tmp_exps[i] = user_exps[nfields - i - 1];
-    } else
-    {
-        for (i = deg; i < nfields; i++)
-            tmp_exps[i] = user_exps[i - deg];
+    if (mctx->deg)
+        tmp_exps[nvars] = degree;
+
+    mpoly_pack_vec_ui(poly_exps, tmp_exps, bits, nfields, 1);
+
+    TMP_END;
+}
+
+
+void mpoly_set_monomial_fmpz(ulong * poly_exps, const fmpz * user_exps,
+                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+{
+    slong nvars = mctx->nvars;
+    slong nfields = mctx->nfields;
+    slong i = 0;
+    fmpz * tmp_exps;
+    fmpz_t degree;
+    TMP_INIT;
+
+    TMP_START;
+    fmpz_init_set_ui(degree, 0);
+    tmp_exps = (fmpz *) TMP_ALLOC(nfields*sizeof(fmpz));
+    for (i = 0; i < nvars; i++) {
+        fmpz_add(degree, degree, user_exps + i);
+        fmpz_init_set(tmp_exps + (mctx->rev ? i : nvars - 1 - i), user_exps + i);
     }
 
-    mpoly_pack_vec(poly_exps, tmp_exps, bits, nfields, 1);
+    if (mctx->deg)
+        fmpz_init_set(tmp_exps + nvars, degree);
+
+    mpoly_pack_vec_fmpz(poly_exps, tmp_exps, bits, nfields, 1);
+
+    fmpz_clear(degree);
+    for (i = 0; i < nvars; i++)
+        fmpz_clear(tmp_exps + i);
+    if (mctx->deg)
+        fmpz_clear(tmp_exps + nvars);
 
     TMP_END;
 }

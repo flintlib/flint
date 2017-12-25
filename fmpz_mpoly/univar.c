@@ -168,10 +168,8 @@ void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t poly,
 void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
                                          slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, j, shift, off, bits, fpw, N;
+    slong i, j, shift, off, bits, N;
     ulong k;
-    int deg, rev;
-    ulong mask;
     slong poly1_old_length = poly1->length;
     slong len = poly2->length;
     fmpz * coeff = poly2->coeffs;
@@ -184,19 +182,20 @@ void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
     TMP_START;
     
     bits = poly2->bits;
-    fpw = FLINT_BITS/bits;
-    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    N = words_per_exp(ctx->n, poly2->bits);
-    degrev_from_ord(deg, rev, ctx->ord);
-    mpoly_off_shift(&off, &shift, var, deg, rev, fpw, ctx->n, bits);
+
+    if (bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_to_univar");
+
+
+    N = mpoly_words_per_exp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_univar_exp(one, var, deg, N, off, shift, fpw, bits);
+    mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
 
     poly1->length = 0;
     poly1->var = var;
-
     for (i = 0; i < len; i++)
     {
+        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         k = (exp[N*i + off] >> shift) & mask;
         xk = _fmpz_mpoly_univar_get_coeff(poly1, k, bits, ctx);
         xk_len = xk->length;
@@ -235,11 +234,10 @@ void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
 void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, shift, off, bits, fpw, N;
+    slong i, shift, off, bits, N;
     ulong k;
     slong next_loc, heap_len = 1;
-    ulong maskhi, masklo;
-    int deg, rev;
+    ulong * cmpmask;
     slong total_len, p_len;
     fmpz * p_coeff;
     ulong * p_exp;
@@ -261,19 +259,19 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
     TMP_START;
 
     bits = 1 + FLINT_BIT_COUNT(poly2->exps[0]);
-    if (bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_univar");
     for (i = 0; i < poly2->length; i++)
         bits = FLINT_MAX(bits, (poly2->coeffs + i)->bits);
-    bits = mpoly_optimize_bits(bits, ctx->n);
 
-    fpw = FLINT_BITS/bits;
-    N = words_per_exp(ctx->n, bits);
-    masks_from_bits_ord(maskhi, masklo, bits, ctx->ord);
-    degrev_from_ord(deg, rev, ctx->ord);
-    mpoly_off_shift(&off, &shift, var, deg, rev, fpw, ctx->n, bits);
+    if (bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_univar");
+
+    bits = mpoly_fix_bits(bits, ctx->minfo);
+
+    N = mpoly_words_per_exp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_univar_exp(one, var, deg, N, off, shift, fpw, bits);
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
+    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
 
     poly2_exps = (ulong **) TMP_ALLOC(poly2->length*sizeof(ulong));
     total_len = 0;
@@ -285,9 +283,9 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         {
             poly2_exps[i] = (ulong *) flint_malloc(
                                   N*(poly2->coeffs + i)->length*sizeof(ulong));
-            mpoly_unpack_monomials(poly2_exps[i], bits,
+            mpoly_repack_monomials(poly2_exps[i], bits,
                     (poly2->coeffs + i)->exps, (poly2->coeffs + i)->bits,
-                                          (poly2->coeffs + i)->length, ctx->n);
+                                      (poly2->coeffs + i)->length, ctx->minfo);
         }
     }
 
@@ -313,7 +311,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         x->next = NULL;
         mpoly_monomial_madd(exp + N*i, poly2_exps[x->i] + N*x->j, k, one, N);
         _mpoly_heap_insert(heap, exp + N*i, x, &next_loc, &heap_len, N,
-                                                               maskhi, masklo);
+                                                               cmpmask);
     }
 
     p_len = 0;
@@ -321,20 +319,21 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
     {
         _fmpz_mpoly_fit_length(&p_coeff, &p_exp, &p_alloc, p_len + 1, N);
         mpoly_monomial_set(p_exp + N*p_len, heap[1].exp, N);
-        x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
+        x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
         fmpz_set(p_coeff + p_len, (poly2->coeffs + x->i)->coeffs + x->j);
         p_len++;
 
         assert(x->next == NULL);
         
-        if (x->j + 1 < (poly2->coeffs + x->i)->length) {
+        if (x->j + 1 < (poly2->coeffs + x->i)->length)
+        {
             k = poly2->exps[x->i];
             x->j = x->j + 1;
             x->next = NULL;
             mpoly_monomial_madd(exp + N*x->i, poly2_exps[x->i] + N*x->j, k, one,
                                                                             N);
             _mpoly_heap_insert(heap, exp + N*x->i, x, &next_loc, &heap_len, N,
-                                                               maskhi, masklo);
+                                                               cmpmask);
         }
     }
 
@@ -356,8 +355,11 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
 void fmpz_mpoly_univar_test(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
-    if (!mpoly_monomials_test(poly->exps, poly->length, WORD(1), 0, 0))
-        flint_throw(FLINT_ERROR, "Univariate polynomial exponents invalid");
+    for (i = 0; i + 1 < poly->length; i++)
+    {
+        if (poly->exps[i] <= poly->exps[i + 1])
+            flint_throw(FLINT_ERROR, "Univariate polynomial exponents invalid");
+    }
     for (i = 0; i < poly->length; i++)
         fmpz_mpoly_test(poly->coeffs + i, ctx);
 }
@@ -477,6 +479,13 @@ void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1,
     len1 = 0;
     if (poly2->length == 0 || poly3->length == 0)
         goto done;
+
+
+    if (    ((slong)(poly2->exps[0])) < WORD(0)
+         || ((slong)(poly3->exps[0])) < WORD(0)
+         || ((slong)(poly2->exps[0] + poly3->exps[0])) < WORD(0)
+       )
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_univar_mul");
 
     if (poly1 == poly2 || poly1 == poly3)
     {
@@ -1360,24 +1369,20 @@ void fmpz_mpoly_univar_derivative(fmpz_mpoly_univar_t poly1,
 void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift,
                const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, shift, off, bits, fpw, N;
+    slong i, shift, off, bits, N;
     ulong k;
-    int deg, rev;
-    ulong mask;
     slong _shift = 0, len = poly2->length;
     fmpz * coeff = poly2->coeffs;
     ulong * exp = poly2->exps;
 
     bits = poly2->bits;
-    fpw = FLINT_BITS/bits;
-    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    N = words_per_exp(ctx->n, poly2->bits);
-    degrev_from_ord(deg, rev, ctx->ord);
-    mpoly_off_shift(&off, &shift, var, deg, rev, fpw, ctx->n, bits);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
+    mpoly_gen_offset_shift(&off, &shift, var, N, bits, ctx->minfo);
 
     fmpz_poly_zero(poly1);
     if (len > 0)
     {
+        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         _shift = (exp[N*(len - 1)] >> shift) & mask;
         for (i = 0; i < len; i++)
         {
@@ -1394,9 +1399,8 @@ void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift,
 void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
                            slong shift2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    slong shift, off, bits, fpw, N;
+    slong shift, off, bits, N;
     slong k;
-    int deg, rev;
     slong p_len;
     fmpz * p_coeff;
     ulong * p_exp;
@@ -1410,14 +1414,11 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
     bits = 1 + FLINT_BIT_COUNT(FLINT_MAX(WORD(1), shift2 + bits));
     if (bits > FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_fmpz_poly");
-    bits = mpoly_optimize_bits(bits, ctx->n);
+    bits = mpoly_fix_bits(bits, ctx->minfo);
     
-    fpw = FLINT_BITS/bits;
-    N = words_per_exp(ctx->n, bits);
-    degrev_from_ord(deg, rev, ctx->ord);
-    mpoly_off_shift(&off, &shift, var, deg, rev, fpw, ctx->n, bits);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_univar_exp(one, var, deg, N, off, shift, fpw, bits);
+    mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
 
     fmpz_mpoly_fit_bits(poly1, bits, ctx);
     poly1->bits = bits;

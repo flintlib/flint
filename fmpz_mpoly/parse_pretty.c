@@ -12,9 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include <assert.h>
 
@@ -139,11 +136,7 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
     int expecting = 1;
     fmpz_t c;
     slong l, k;
-    int deg, rev, ret;
-    slong nvars;
-
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
+    int ret;
 
     fmpz_init(c);
     ostack = (slong *) flint_malloc(ealloc*sizeof(slong));
@@ -170,9 +163,9 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
         } else if (*s == '^')
         {
             s = _fmpz_mpoly_parse_pretty_int(++s, end, c, &ret);
-            if (!(expecting & 2) || ret || !fmpz_fits_si(c))
+            if (!(expecting & 2) || ret)
                 goto failed;
-            fmpz_mpoly_geobucket_pow_inplace(estack[ei - 1], fmpz_get_si(c), ctx);
+            fmpz_mpoly_geobucket_pow_fmpz_inplace(estack[ei - 1], c, ctx);
             expecting = 2;
 
         } else if ((*s == '+' || *s == '-') && (expecting & 2))
@@ -231,19 +224,27 @@ int _fmpz_mpoly_parse_pretty(fmpz_mpoly_t poly, const char * s, slong sn,
 
         } else {
             /* must be a variable */
-            for (k = 0; k < nvars; k++)
+            slong var = -WORD(1);
+            slong matched_length = -WORD(1);
+            for (k = 0; k < ctx->minfo->nvars; k++)
             {
                 l = strlen(x[k]);
-                if ((end - s >= l) && (strncmp(s, x[k], l) == 0))
-                    break;
+                if ((end - s >= l) && (strncmp(s, x[k], l) == 0)
+                                   && l > matched_length)
+                {
+                    var = k;
+                    matched_length = l;
+                }
             }
-            if (!(expecting & 1) || k >= nvars)
+
+            if (!(expecting & 1) || var < 0)
                 goto failed;
+
             _fmpz_mpoly_parse_pretty_fit_estack(&estack, ei, &ealloc);
             fmpz_mpoly_geobucket_init(estack[ei], ctx);
-            fmpz_mpoly_geobucket_gen(estack[ei], k, ctx);
+            fmpz_mpoly_geobucket_gen(estack[ei], var, ctx);
             ei++;
-            s += l;
+            s += matched_length;
             expecting = 2;
         }
     }
@@ -277,14 +278,12 @@ int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t poly, const char * str,
                                  const char** x_in, const fmpz_mpoly_ctx_t ctx)
 {
 
-    int ret, deg, rev;
-    slong i, nvars;
+    int ret;
+    slong i, nvars = ctx->minfo->nvars;
     char ** x = (char **) x_in;
     TMP_INIT;
 
     TMP_START;
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
     if (x == NULL)
     {
         x = (char **) TMP_ALLOC(nvars*sizeof(char *));

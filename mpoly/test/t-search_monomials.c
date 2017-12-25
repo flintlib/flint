@@ -41,7 +41,7 @@ main(void)
         ulong * e, * fexp, * gexp, * temp;
         slong e_score, * e_ind, *t1, *t2, *t3, score, x;
         slong lower, upper, N;
-        ulong maskhi, masklo;
+        ulong * cmpmask;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -55,9 +55,9 @@ main(void)
         len2 = n_randint(state, 100) + 1;
 
         exp_bits1 = n_randint(state, 20/(nvars + 
-                            mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
+                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
         exp_bits2 = n_randint(state, 20/(nvars + 
-                            mpoly_ordering_isdeg(ord) + (nvars == 1)) + 1) + 1;
+                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
         exp_bound1 = n_randbits(state, exp_bits1);
         exp_bound2 = n_randbits(state, exp_bits2);
        
@@ -73,8 +73,10 @@ main(void)
         } while (g->length == 0);
 
         fg_bits = FLINT_MAX(f->bits, g->bits);
-        masks_from_bits_ord(maskhi, masklo, fg_bits, ctx->ord);
-        N = words_per_exp(ctx->n, fg_bits);
+        N = mpoly_words_per_exp(fg_bits, ctx->minfo);
+        cmpmask = (ulong*) flint_malloc(N*sizeof(ulong));
+        mpoly_get_cmpmask(cmpmask, N, fg_bits, ctx->minfo);
+        
 
         fexp = (ulong *) flint_malloc(f->length*N*sizeof(ulong));
         gexp = (ulong *) flint_malloc(g->length*N*sizeof(ulong));
@@ -84,8 +86,8 @@ main(void)
         t2 = (slong *) flint_malloc(f->length*N*sizeof(slong));
         t3 = (slong *) flint_malloc(f->length*N*sizeof(slong));
 
-        mpoly_unpack_monomials(fexp, fg_bits, f->exps, f->bits, f->length, ctx->n);
-        mpoly_unpack_monomials(gexp, fg_bits, g->exps, g->bits, g->length, ctx->n);
+        mpoly_repack_monomials(fexp, fg_bits, f->exps, f->bits, f->length, ctx->minfo);
+        mpoly_repack_monomials(gexp, fg_bits, g->exps, g->bits, g->length, ctx->minfo);
 
         lower = n_randint(state, f->length*g->length);
         upper = n_randint(state, f->length*g->length);
@@ -97,7 +99,7 @@ main(void)
         }
 
         mpoly_search_monomials(&e_ind, e, &e_score, t1, t2, t3, lower, upper,
-                          fexp, f->length, gexp, g->length, N, maskhi, masklo);
+                          fexp, f->length, gexp, g->length, N, cmpmask);
 
         /* make sure that e_ind is correct for e */
         score = 0;
@@ -107,7 +109,7 @@ main(void)
             for (j = 0; j < g->length; j++)
             {
                 mpoly_monomial_add(temp, fexp + i*N, gexp + j*N, N);
-                if (mpoly_monomial_lt(temp, e, N, maskhi, masklo))
+                if (mpoly_monomial_lt(temp, e, N, cmpmask))
                     x = j + 1;
             }
             if (x != e_ind[i])
@@ -151,7 +153,7 @@ main(void)
                         for (j = 0; j < g->length; j++)
                         {
                             mpoly_monomial_add(temp, fexp + i*N, gexp + j*N, N);
-                            if (mpoly_monomial_lt(temp, temp1, N, maskhi, masklo))
+                            if (mpoly_monomial_lt(temp, temp1, N, cmpmask))
                                 x = j + 1;
                         }
                         score += g->length - x;
@@ -172,6 +174,8 @@ main(void)
 
             flint_free(temp1);
         }
+
+        flint_free(cmpmask);
 
         flint_free(fexp);
         flint_free(gexp);
