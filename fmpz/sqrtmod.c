@@ -22,7 +22,7 @@
  */
 static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p) 
 {
-    slong i, r, m;
+    slong i, r, m, iter;
     mpz_t p1, k, exp, b, g, bpow, gpow;
 
     if (mpz_jacobi(a, p) == -1)
@@ -95,6 +95,8 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
     mpz_tdiv_q_2exp(exp, exp, 1);
     mpz_powm(rop, a, exp, p);
 
+    iter = r - 1; /* maximum number of iterations if p is prime */
+
     while (flint_mpz_cmp_ui(b, 1))
     {
         mpz_set(bpow, b);
@@ -123,6 +125,11 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
         mpz_mod(b, b, p);
 
         r = m;
+        if (iter-- == 0) /* too many iterations, p is not prime */
+        {
+            mpz_set_ui(rop, 0);
+            break;
+        }
     }
 
     mpz_clear(p1);

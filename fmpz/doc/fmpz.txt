@@ -802,8 +802,13 @@ double fmpz_dlog(const fmpz_t x)
 
 int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
 
-    Returns whether $a$ is a quadratic residue or zero modulo $p$ 
-    and sets $b$ to a square root of $a$ if this is the case.
+    If $p$ is prime, set $b$ to a square root of $a$ modulo $p$ if $a$ is a
+    quadratic residue modulo $p$ and return $1$, otherwise return $0$. 
+
+    If $p$ is not prime the return value is with high probability $0$,
+    indicating that $p$ is not prime, or $a$ is not a square modulo $p$.
+    If $p$ is not prime and the return value is $1$, the value of $b$ is
+    meaningless.
 
 void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 
