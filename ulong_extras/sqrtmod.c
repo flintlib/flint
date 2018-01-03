@@ -16,7 +16,7 @@
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p) 
 {
-    slong i, r, m;
+    slong i, r, m, iter;
     mp_limb_t p1, k, b, g, bpow, gpow, res;
     mp_limb_t pinv;
 
@@ -87,6 +87,8 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     g = n_powmod2_ui_preinv(k, p1, p, pinv);
     res = n_powmod2_ui_preinv(a, (p1 + 1) / 2, p, pinv);
 
+    iter = r - 1; /* maximum number of iterations possible if p is prime */
+    
     while (b != 1)
     {
         bpow = b;
@@ -105,6 +107,8 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
         g = n_mulmod2_preinv(gpow, gpow, p, pinv);
         b = n_mulmod2_preinv(b, g, p, pinv);
         r = m;
+        if (iter-- == 0)
+            return 0; /* too many iterations, p is not prime, prevents hang */
     }
 
     return res;
