@@ -1021,6 +1021,12 @@ FLINT_DLL void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, sl
 
 /*  Square root  *************************************************************/
 
+FLINT_DLL int _fmpz_poly_sqrtrem_classical(fmpz * res, fmpz * r, 
+                                                 const fmpz * poly, slong len);
+
+FLINT_DLL int fmpz_poly_sqrtrem_classical(fmpz_poly_t b, 
+                                           fmpz_poly_t r, const fmpz_poly_t a);
+
 FLINT_DLL int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len);
 
 FLINT_DLL int fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a);
