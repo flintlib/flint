@@ -40,6 +40,7 @@
 #endif
 
 #define FMPZ_POLY_INV_NEWTON_CUTOFF 32
+#define FMPZ_POLY_SQRTREM_DIVCONQUER_CUTOFF 16
 
 /*  Type definitions *********************************************************/
 
@@ -1025,6 +1026,12 @@ FLINT_DLL int _fmpz_poly_sqrtrem_classical(fmpz * res, fmpz * r,
                                                  const fmpz * poly, slong len);
 
 FLINT_DLL int fmpz_poly_sqrtrem_classical(fmpz_poly_t b, 
+                                           fmpz_poly_t r, const fmpz_poly_t a);
+
+FLINT_DLL int _fmpz_poly_sqrtrem_divconquer(fmpz * res, fmpz * r, 
+                                    const fmpz * poly, slong len, fmpz * temp);
+
+FLINT_DLL int fmpz_poly_sqrtrem_divconquer(fmpz_poly_t b, 
                                            fmpz_poly_t r, const fmpz_poly_t a);
 
 FLINT_DLL int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len);

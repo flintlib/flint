@@ -2581,6 +2581,24 @@ int fmpz_poly_sqrtrem_classical(fmpz_poly_t b,
     If $a$ can be written as $b^2 + r$ with deg$(r) <$ deg$(a)/2$, return
     $1$ and set $b$ and $r$ appropriately. Otherwise return $0$.
 
+int _fmpz_poly_sqrtrem_divconquer(fmpz * res, fmpz * r, 
+                                     const fmpz * poly, slong len, fmpz * temp)
+
+    Returns 1 if \code{(poly, len)} can be written in the form $A^2 + R$ where
+    deg$(R) <$ deg$($\code{poly}$)$, otherwise returns $0$. If it can be so
+    written, \code{(res, m - 1)} is set to $A$ and \code{(res, m)} is set to
+    $R$, where $m =$ deg$($\code{poly}$)/2 + 1$.
+
+    For efficiency reasons, \code{r} must have room for \code{len}
+    coefficients, and may alias \code{poly}. Temporary space of \code{len}
+    coefficients is required.
+
+int fmpz_poly_sqrtrem_divconquer(fmpz_poly_t b, 
+                                            fmpz_poly_t r, const fmpz_poly_t a)
+
+    If $a$ can be written as $b^2 + r$ with deg$(r) <$ deg$(a)/2$, return
+    $1$ and set $b$ and $r$ appropriately. Otherwise return $0$.
+
 int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len)
 
     If \code{(poly, len)} is a perfect square, sets \code{(res, len / 2 + 1)}
