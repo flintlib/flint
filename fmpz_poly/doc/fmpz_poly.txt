@@ -2651,6 +2651,25 @@ int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a)
     \code{a} with positive leading coefficient and returns 1.
     Otherwise returns 0.
 
+int _fmpz_poly_sqrt_series(fmpz * res, const fmpz * poly, slong len, slong n)
+
+    Set \code{(res, n)} to the square root of the series \code{(poly, n)}, if it
+    exists, and return $1$, otherwise, return $0$.
+
+    If the valuation of \code{poly} is not zero, \code{res} is zero padded
+    to make up for the fact that the square root may not be known to precision
+    $n$.
+
+int fmpz_poly_sqrt_series(fmpz_poly_t b, const fmpz_poly_t a, slong n)
+
+    Set \code{b} to the square root of the series \code{a}, where the latter
+    is taken to be a series of precision $n$. If such a square root exists,
+    return $1$, otherwise, return $0$.
+
+    Note that if the valuation of \code{a} is not zero, \code{b} will
+    not have precision \code{n}. It is given only to the precision to which
+    the square root can be computed.
+
 *******************************************************************************
 
     Power sums

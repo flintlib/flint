@@ -60,7 +60,7 @@ _fmpz_poly_sqrt_divconquer(fmpz * res, const fmpz * poly, slong len, int exact)
         return 0;
 
     r = _fmpz_vec_init(len);
-    temp = _fmpz_vec_init(exact ? len : 2*n2 - 1);
+    temp = _fmpz_vec_init(len);
     _fmpz_vec_set(r, poly, len);
         
     result = _fmpz_poly_sqrtrem_divconquer(res + n - n2, r + len - 2*n2 + 1,
@@ -105,7 +105,7 @@ _fmpz_poly_sqrt_divconquer(fmpz * res, const fmpz * poly, slong len, int exact)
     }
 
     _fmpz_vec_clear(r, len);
-    _fmpz_vec_clear(temp, exact ? len : 2*n2 - 1);
+    _fmpz_vec_clear(temp, len);
 
     return result;
 }

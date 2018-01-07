@@ -63,6 +63,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len, int exact)
 
     /* square root of leading coefficient */
     fmpz_sqrt(res + m - 1, poly + len - 1);
+
     result = 1;
 
     /* do divison style 'square root with remainder' from top to bottom */
@@ -80,6 +81,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len, int exact)
         for (i = 1; i < (m + 1)/2; i++)
         {
             fmpz_fdiv_qr(res + m - i - 1, t, r + len - i - 1, u);
+
             if (!fmpz_is_zero(t))
             {
                 result = 0;
@@ -115,6 +117,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len, int exact)
             for (i = (m + 1)/2; i < m - 1; i++)
             {
                 fmpz_fdiv_qr(res + m - i - 1, t, r + len - i - 1, u);
+
                 if (!fmpz_is_zero(t))
                 {
                     result = 0;
@@ -131,6 +134,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len, int exact)
                 if (!fmpz_is_zero(t))
                     result = 0;
             }
+
         }
 
         _fmpz_vec_clear(r, len);
