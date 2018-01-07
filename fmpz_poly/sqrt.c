@@ -17,7 +17,7 @@
 int
 _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, slong len)
 {
-    return _fmpz_poly_sqrt_classical(res, poly, len);
+    return _fmpz_poly_sqrt_divconquer(res, poly, len, 1);
 }
 
 int
