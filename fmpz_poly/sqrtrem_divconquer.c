@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
-
+    Copyright (C) 2018 William Hart
+    
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -14,6 +15,14 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
+/*
+    Implements the square root with remainder function of "speeding up the
+    division and square root of power series", by Hanrot, Quercia and
+    Zimmermann (see https://hal.inria.fr/inria-00072675/document).
+
+    TODO: implement middle product so that we can implement their Sqrt function
+    (their specialised square root Divide function requires it).
+*/
 int
 _fmpz_poly_sqrtrem_divconquer(fmpz * res, fmpz * r, const fmpz * poly, slong len, fmpz * temp)
 {
