@@ -1045,8 +1045,7 @@ FLINT_DLL int _fmpz_poly_sqrt_divconquer(fmpz * res, const fmpz * poly,
 
 FLINT_DLL int fmpz_poly_sqrt_divconquer(fmpz_poly_t b, const fmpz_poly_t a);
 
-FLINT_DLL int _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op,
-                                                         slong len, int exact);
+FLINT_DLL int _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len);
 
 FLINT_DLL int fmpz_poly_sqrt_KS(fmpz_poly_t b, const fmpz_poly_t a);
 

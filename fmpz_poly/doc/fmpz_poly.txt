@@ -2619,21 +2619,17 @@ int fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a)
     \code{a} with positive leading coefficient and returns 1.
     Otherwise returns 0.
 
-int _fmpz_poly_sqrt_KS(fmpz * res, const fmpz * poly, slong len, int exact)
+int _fmpz_poly_sqrt_KS(fmpz * res, const fmpz * poly, slong len)
 
     Heuristic square root. If the return value is $-1$, the function failed,
     otherwise it succeeded and the following applies.
 
-    If \code{exact} is $1$ and \code{(poly, len)} is a perfect square, sets 
+    If \code{(poly, len)} is a perfect square, sets 
     \code{(res, len / 2 + 1)} to the square root of \code{poly} with positive
     leading coefficient and returns 1. Otherwise returns 0.
 
-    If \code{exact} is $0$, allows a remainder after the square root, which is
-    not computed.
-
     This function first uses various tests to detect nonsquares quickly.
-    Then, it computes the square root iteratively from top to bottom,
-    requiring $O(n^2)$ coefficient operations.
+    Then, it computes the square root iteratively from top to bottom.
 
 int fmpz_poly_sqrt_KS(fmpz_poly_t b, const fmpz_poly_t a)
 
@@ -2655,8 +2651,7 @@ int _fmpz_poly_sqrt_divconquer(fmpz * res, const fmpz * poly,
     not computed.
 
     This function first uses various tests to detect nonsquares quickly.
-    Then, it computes the square root iteratively from top to bottom,
-    requiring $O(n^2)$ coefficient operations.
+    Then, it computes the square root iteratively from top to bottom.
 
 int fmpz_poly_sqrt_divconquer(fmpz_poly_t b, const fmpz_poly_t a)
 

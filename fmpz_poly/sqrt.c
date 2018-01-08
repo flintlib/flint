@@ -18,7 +18,7 @@ int
 _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, slong len)
 {
     /* KS is heuristic but fast */
-    int result = _fmpz_poly_sqrt_KS(res, poly, len, 1);
+    int result = _fmpz_poly_sqrt_KS(res, poly, len);
 
     /* KS failed, so use fallback */
     if (result == -1)

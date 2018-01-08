@@ -20,31 +20,27 @@
 #define FMPZ_POLY_SQRT_KS_HEURISTIC_BITS 3
 
 int
-_fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len, int exact)
+_fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len)
 {
-    slong i, len2, len3, m, rlimbs;
+    slong i, len2, m, rlimbs;
     int result = 1;
-    slong bits, bits2, bits3, limbs, limbs2, loglen;
+    slong bits, bits2, limbs, limbs2, loglen;
     mp_limb_t *arr, *arr2, *arr3;
-    fmpz * rem;
 
     /* the degree must be even */
     if (len % 2 == 0)
         return 0;
 
-    if (exact)
+    /* valuation must be even, and then can be reduced to 0 */
+    while (fmpz_is_zero(op))
     {
-        /* valuation must be even, and then can be reduced to 0 */
-        while (fmpz_is_zero(op))
-        {
-            if (!fmpz_is_zero(op + 1))
-                return 0;
+        if (!fmpz_is_zero(op + 1))
+            return 0;
 
-            fmpz_zero(rop);
-            op += 2;
-            len -= 2;
-            rop++;
-        }
+        fmpz_zero(rop);
+        op += 2;
+        len -= 2;
+        rop++;
     }
 
     /* check whether a square root exists modulo 2 */
@@ -54,24 +50,20 @@ _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len, int exact)
         if (!fmpz_is_even(op + i))
             return 0;
 
-    if (exact)
-    {
-        for (i = 1; i < ((m - 1) | 1); i += 2)
-            if (!fmpz_is_even(op + i))
-                return 0;
-    }
+    for (i = 1; i < ((m - 1) | 1); i += 2)
+        if (!fmpz_is_even(op + i))
+            return 0;
 
     /* check endpoints */
-    if (exact && !fmpz_is_square(op))
+    if (!fmpz_is_square(op))
         return 0;
 
-    if ((len > 1 || !exact) && !fmpz_is_square(op + len - 1))
+    if (len > 1 && !fmpz_is_square(op + len - 1))
         return 0;
 
     bits = FLINT_ABS(_fmpz_vec_max_bits(op, len));
 
     len2 = (len + 1) / 2;
-    len3 = len2 - 1;
 
     bits += FMPZ_POLY_SQRT_KS_HEURISTIC_BITS + FLINT_BIT_COUNT(len);
 
@@ -93,43 +85,16 @@ _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len, int exact)
 
     loglen = FLINT_BIT_COUNT(len2);
     
-    if (exact)
+    if (rlimbs != 0)
+        result = 0;
+    else
     {
-        if (rlimbs != 0)
-           result = 0;
-        else
-        {
-            _fmpz_poly_bit_unpack(rop, len2, arr2, bits, 0);
+        _fmpz_poly_bit_unpack(rop, len2, arr2, bits, 0);
 
-            bits2 = _fmpz_vec_max_bits(rop, len2);
+        bits2 = _fmpz_vec_max_bits(rop, len2);
 
-            if (2*FLINT_ABS(bits2) + loglen + 1 > bits)
-                result = -1;
-        }
-    } else
-    {   
-        limbs = (bits * len3 - 1) + 1;
-        
-        if (rlimbs > limbs)
-            result = 0;
-        else{
-            if (rlimbs < limbs)
-                mpn_zero(arr3 + rlimbs, limbs - rlimbs);
-
-            rem = _fmpz_vec_init(len3);
-
-            _fmpz_poly_bit_unpack(rem, len3, arr3, bits, 0);
-            _fmpz_poly_bit_unpack(rop, len2, arr2, bits, 0);
-
-            bits2 = _fmpz_vec_max_bits(rop, len2);
-            bits3 = _fmpz_vec_max_bits(rem, len);
-   
-            loglen = FLINT_BIT_COUNT(len2);
-            if (FLINT_MAX(2*FLINT_ABS(bits2) + loglen, FLINT_ABS(bits3)) + 2 > bits)
-                result = -1;
-
-            _fmpz_vec_clear(rem, len3);
-        }
+        if (2*FLINT_ABS(bits2) + loglen + 1 > bits)
+            result = -1;
     }
 
     flint_free(arr);
@@ -164,7 +129,7 @@ fmpz_poly_sqrt_KS(fmpz_poly_t b, const fmpz_poly_t a)
     blen = len / 2 + 1;
     fmpz_poly_fit_length(b, blen);
     _fmpz_poly_set_length(b, blen);
-    result = _fmpz_poly_sqrt_KS(b->coeffs, a->coeffs, len, 1);
+    result = _fmpz_poly_sqrt_KS(b->coeffs, a->coeffs, len);
     if (result <= 0)
         _fmpz_poly_set_length(b, 0);
 
