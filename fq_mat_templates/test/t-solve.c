@@ -74,6 +74,8 @@ main(void)
         TEMPLATE(T, mat_clear)(B, ctx);
         TEMPLATE(T, mat_clear)(X, ctx);
         TEMPLATE(T, mat_clear)(AX, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -112,6 +114,8 @@ main(void)
         TEMPLATE(T, mat_clear)(B, ctx);
         TEMPLATE(T, mat_clear)(X, ctx);
         TEMPLATE(T, mat_clear)(AX, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -83,6 +83,8 @@ main(void)
         TEMPLATE(T, mat_clear)(B, ctx);
         TEMPLATE(T, mat_clear)(C, ctx);
         TEMPLATE(T, mat_clear)(I, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Test singular systems */
@@ -121,6 +123,8 @@ main(void)
 
         TEMPLATE(T, mat_clear)(A, ctx);
         TEMPLATE(T, mat_clear)(B, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
