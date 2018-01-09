@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2018 Tommy Hofmann
 
     This file is part of FLINT.
 
@@ -267,6 +268,10 @@ FLINT_DLL void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
                                       int unit,
                                       const TEMPLATE(T, ctx_t) ctx);
 
+/* Nonsingular solving *******************************************************/
+
+FLINT_DLL int TEMPLATE(T, mat_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t A),
+                           const TEMPLATE(T, mat_t) C, const TEMPLATE(T, ctx_t) ctx);
 
 /* Transforms ****************************************************************/
 
