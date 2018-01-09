@@ -222,6 +222,10 @@ FLINT_DLL slong TEMPLATE(T, mat_lu_recursive)(slong * P,
 FLINT_DLL slong TEMPLATE(T, mat_lu_classical)(slong * P, TEMPLATE(T, mat_t) A, int rank_check,
                               const TEMPLATE(T, ctx_t) ctx);
 
+/* Inverse *******************************************************************/
+
+FLINT_DLL int TEMPLATE(T, mat_inv)(TEMPLATE(T, mat_t) B, TEMPLATE(T, mat_t) A,
+                                   const TEMPLATE(T, ctx_t) ctx);
 
 /* Solving *******************************************************************/
 

@@ -28,14 +28,13 @@ main(void)
     int solved;
 
     FLINT_TEST_INIT(state);
-
-    TEMPLATE(T, ctx_randtest) (ctx, state);
-
     printf("solve....");
     fflush(stdout);
 
     for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
         m = n_randint(state, 50);
         n = n_randint(state, 50);
 
@@ -79,6 +78,8 @@ main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
         m = 1 + n_randint(state, 20);
         n = 1 + n_randint(state, 20);
         r = n_randint(state, m);

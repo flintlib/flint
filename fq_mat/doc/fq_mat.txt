@@ -292,6 +292,19 @@ void fq_mat_submul(fq_mat_t D, const fq_mat_t C, const fq_mat_t A,
 
 *******************************************************************************
 
+    Inverse
+
+*******************************************************************************
+
+int fq_mat_inv(fq_mat_t B, fq_mat_t A, fq_ctx_t ctx)
+
+    Sets $B = A^{-1}$ and returns $1$ if $A$ is invertible. If $A$ is singular,
+    returns $0$ and sets the elements of $B$ to undefined values.
+
+    $A$ and $B$ must be square matrices with the same dimensions.
+
+*******************************************************************************
+
     LU decomposition
 
 *******************************************************************************
