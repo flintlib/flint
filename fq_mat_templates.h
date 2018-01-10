@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2018 Tommy Hofmann
 
     This file is part of FLINT.
 
@@ -221,6 +222,10 @@ FLINT_DLL slong TEMPLATE(T, mat_lu_recursive)(slong * P,
 FLINT_DLL slong TEMPLATE(T, mat_lu_classical)(slong * P, TEMPLATE(T, mat_t) A, int rank_check,
                               const TEMPLATE(T, ctx_t) ctx);
 
+/* Inverse *******************************************************************/
+
+FLINT_DLL int TEMPLATE(T, mat_inv)(TEMPLATE(T, mat_t) B, TEMPLATE(T, mat_t) A,
+                                   const TEMPLATE(T, ctx_t) ctx);
 
 /* Solving *******************************************************************/
 
@@ -267,6 +272,10 @@ FLINT_DLL void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
                                       int unit,
                                       const TEMPLATE(T, ctx_t) ctx);
 
+/* Nonsingular solving *******************************************************/
+
+FLINT_DLL int TEMPLATE(T, mat_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t A),
+                           const TEMPLATE(T, mat_t) C, const TEMPLATE(T, ctx_t) ctx);
 
 /* Transforms ****************************************************************/
 

@@ -9,21 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "templates.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
-
+#include <limits.h>
 
 int
 main(void)
 {
-    nmod_mat_t A, B, C, I;
+    TEMPLATE(T, mat_t) A, B, C, I;
+    TEMPLATE(T, ctx_t) ctx;
     slong i, j, m, r;
-    mp_limb_t mod;
     int result;
     FLINT_TEST_INIT(state);
     
@@ -31,79 +28,82 @@ main(void)
     flint_printf("inv....");
     fflush(stdout);
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         m = n_randint(state, 20);
-        mod = n_randtest_prime(state, 0);
 
-        nmod_mat_init(A, m, m, mod);
-        nmod_mat_init(B, m, m, mod);
-        nmod_mat_init(C, m, m, mod);
-        nmod_mat_init(I, m, m, mod);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, mat_init)(A, m, m, ctx);
+        TEMPLATE(T, mat_init)(B, m, m, ctx);
+        TEMPLATE(T, mat_init)(C, m, m, ctx);
+        TEMPLATE(T, mat_init)(I, m, m, ctx);
 
         for (j = 0; j < m; j++)
-            I->rows[j][j] = UWORD(1);
+            TEMPLATE(T, one)(TEMPLATE(T, mat_entry)(I, j, j), ctx);
 
         /* Verify that A * A^-1 = I for random matrices */
 
-        nmod_mat_randrank(A, state, m);
+        TEMPLATE(T, mat_randrank)(A, state, m, ctx);
         /* Dense or sparse? */
         if (n_randint(state, 2))
-            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            TEMPLATE(T, mat_randops)(A, 1+n_randint(state, 1+m*m), state, ctx);
 
-        result = nmod_mat_inv(B, A);
-        nmod_mat_mul(C, A, B);
+        result = TEMPLATE(T, mat_inv)(B, A, ctx);
+        TEMPLATE(T, mat_mul)(C, A, B, ctx);
 
-        if (!nmod_mat_equal(C, I) || !result)
+        if (!TEMPLATE(T, mat_equal)(C, I, ctx) || !result)
         {
             flint_printf("FAIL:\n");
             flint_printf("A * A^-1 != I!\n");
             flint_printf("A:\n");
-            nmod_mat_print_pretty(A);
+            TEMPLATE(T, mat_print_pretty)(A, ctx);
             flint_printf("A^-1:\n");
-            nmod_mat_print_pretty(B);
+            TEMPLATE(T, mat_print_pretty)(B, ctx);
             flint_printf("A * A^-1:\n");
-            nmod_mat_print_pretty(C);
+            TEMPLATE(T, mat_print_pretty)(C, ctx);
             flint_printf("\n");
             abort();
         }
 
         /* Test aliasing */
-        nmod_mat_set(C, A);
-        nmod_mat_inv(A, A);
-        nmod_mat_mul(B, A, C);
+        TEMPLATE(T, mat_set)(C, A, ctx);
+        TEMPLATE(T, mat_inv)(A, A, ctx);
+        TEMPLATE(T, mat_mul)(B, A, C, ctx);
 
-        if (!nmod_mat_equal(B, I))
+        if (!TEMPLATE(T, mat_equal)(B, I, ctx))
         {
             flint_printf("FAIL:\n");
             flint_printf("aliasing failed!\n");
-            nmod_mat_print_pretty(C);
+            TEMPLATE(T, mat_print_pretty)(C, ctx);
             abort();
         }
 
-        nmod_mat_clear(A);
-        nmod_mat_clear(B);
-        nmod_mat_clear(C);
-        nmod_mat_clear(I);
+        TEMPLATE(T, mat_clear)(A, ctx);
+        TEMPLATE(T, mat_clear)(B, ctx);
+        TEMPLATE(T, mat_clear)(C, ctx);
+        TEMPLATE(T, mat_clear)(I, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Test singular systems */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         m = 1 + n_randint(state, 20);
-        mod = n_randtest_prime(state, 0);
         r = n_randint(state, m);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        nmod_mat_init(A, m, m, mod);
-        nmod_mat_init(B, m, m, mod);
+        TEMPLATE(T, mat_init)(A, m, m, ctx);
+        TEMPLATE(T, mat_init)(B, m, m, ctx);
 
-        nmod_mat_randrank(A, state, r);
+        TEMPLATE(T, mat_randrank)(A, state, r, ctx);
 
         /* Dense */
         if (n_randint(state, 2))
-            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            TEMPLATE(T, mat_randops)(A, 1+n_randint(state, 1+m*m), state, ctx);
 
-        result = nmod_mat_inv(B, A);
+        result = TEMPLATE(T, mat_inv)(B, A, ctx);
 
         if (result)
         {
@@ -113,7 +113,7 @@ main(void)
         }
 
         /* Aliasing */
-        result = nmod_mat_inv(A, A);
+        result = TEMPLATE(T, mat_inv)(A, A, ctx);
         if (result)
         {
             flint_printf("FAIL:\n");
@@ -121,8 +121,10 @@ main(void)
             abort();
         }
 
-        nmod_mat_clear(A);
-        nmod_mat_clear(B);
+        TEMPLATE(T, mat_clear)(A, ctx);
+        TEMPLATE(T, mat_clear)(B, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

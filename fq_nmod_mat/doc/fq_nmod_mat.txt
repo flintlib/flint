@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2018 Tommy Hofmann
 
     This file is part of FLINT.
 
@@ -302,6 +303,19 @@ void fq_nmod_mat_submul(fq_nmod_mat_t D, const fq_nmod_mat_t C,
 
 *******************************************************************************
 
+    Inverse
+
+*******************************************************************************
+
+int fq_nmod_mat_inv(fq_nmod_mat_t B, fq_nmod_mat_t A, fq_ctx_t ctx)
+
+    Sets $B = A^{-1}$ and returns $1$ if $A$ is invertible. If $A$ is singular,
+    returns $0$ and sets the elements of $B$ to undefined values.
+
+    $A$ and $B$ must be square matrices with the same dimensions.
+
+*******************************************************************************
+
     LU decomposition
 
 *******************************************************************************
@@ -464,6 +478,20 @@ void fq_nmod_mat_solve_triu_recursive(fq_nmod_mat_t X, const fq_nmod_mat_t U,
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
+
+*******************************************************************************
+
+    Nonsingular square solving
+
+*******************************************************************************
+
+int fq_nmod_mat_solve(fq_nmod_mat_t X, const fq_nmod_mat_t A,
+                      const fq_nmod_mat_t B, const fq_nmod_ctx_t ctx)
+
+    Solves the matrix-matrix equation $AX = B$.
+
+    Returns $1$ if $A$ has full rank; otherwise returns $0$ and sets the
+    elements of $X$ to undefined values.
 
 *******************************************************************************
 
