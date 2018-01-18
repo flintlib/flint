@@ -122,6 +122,8 @@ FLINT_DLL void fmpq_mat_sub(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_ma
 
 FLINT_DLL void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op);
 
+FLINT_DLL void fmpq_mat_scalar_mul_fmpq(fmpq_mat_t rop, const fmpq_mat_t op, const fmpq_t x);
+
 FLINT_DLL void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
 
 FLINT_DLL void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);

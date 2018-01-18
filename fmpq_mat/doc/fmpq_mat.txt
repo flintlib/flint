@@ -118,6 +118,15 @@ void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op)
     Sets \code{rop} to the negative of \code{op}, assuming that 
     the two matrices have the same dimensions.
 
+void fmpq_mat_scalar_mul_fmpq(fmpq_mat_t rop, 
+                              const fmpq_mat_t op, const fmpq_t x)
+
+    Sets \code{rop} to \code{op} multiplied by the rational $x$, 
+    assuming that the two matrices have the same dimensions.
+
+    Note that the rational \code{x} may not be aliased with any part of the
+    entries of \code{rop}.
+
 void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, 
                               const fmpq_mat_t op, const fmpz_t x)
 
