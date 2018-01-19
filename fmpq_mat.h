@@ -197,7 +197,7 @@ FLINT_DLL void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
 
 /* Kronecker product *********************************************************/
 
-FLINT_DLL void fmpq_mat_kronecker(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
+FLINT_DLL void fmpq_mat_kronecker_product(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
 
 /* Trace *********************************************************************/
 

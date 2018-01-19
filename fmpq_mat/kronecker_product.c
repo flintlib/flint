@@ -11,7 +11,7 @@
 
 #include "fmpq_mat.h"
 
-void fmpq_mat_kronecker(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
+void fmpq_mat_kronecker_product(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
 {
     slong i, j, k, l;
     slong ir, jc;

@@ -28,7 +28,7 @@ main(void)
     slong bits;
 
 
-    flint_printf("kronecker....");
+    flint_printf("kronecker_product....");
     fflush(stdout);
 
     for (r = 0; r < 100 * flint_test_multiplier(); r++)
@@ -52,7 +52,7 @@ main(void)
         fmpq_mat_randtest(A, state, bits);
         fmpq_mat_randtest(B, state, bits);
 
-        fmpq_mat_kronecker(C, A, B);
+        fmpq_mat_kronecker_product(C, A, B);
 
         if ( m && n )
         {
