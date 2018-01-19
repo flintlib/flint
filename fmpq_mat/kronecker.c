@@ -23,7 +23,7 @@ void fmpq_mat_kronecker(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
         for (j = 0, jc = 0; j < A->c; j++, jc += B->c)
         {
             Aentry = fmpq_mat_entry(A, i, j);
-            for (k = 0; k < B->c; k++)
+            for (k = 0; k < B->r; k++)
             {
                 for (l = 0; l < B->c; l++)
                 {
