@@ -11,7 +11,7 @@ absolute_path(){
    done
    echo $retval
 }
-
+ 
 wget http://mpir.org/mpir-2.7.2.tar.bz2
 tar -xf mpir-2.7.2.tar.bz2
 cd mpir-2.7.2
