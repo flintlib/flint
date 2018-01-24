@@ -595,6 +595,18 @@ int fmpz_mat_inv(fmpz_mat_t Ainv, fmpz_t den, const fmpz_mat_t A)
 
 *******************************************************************************
 
+    Kronecker product
+
+*******************************************************************************
+
+void fmpz_mat_kronecker_product(fmpz_mat_t C, const fmpz_mat_t A,
+    const fmpz_mat_t B)
+
+    Sets \code{C} to the Kronecker product of \code{A} and \code{B}.
+
+
+*******************************************************************************
+
     Content
 
 *******************************************************************************
