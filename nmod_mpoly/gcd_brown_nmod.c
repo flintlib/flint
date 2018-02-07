@@ -29,16 +29,20 @@ int nmod_mpolyd_ctx_settle(nmod_mpolyd_ctx_t dctx,
                             const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    int success = 1;
+    int success;
     slong i, j, degb_prod;
     slong * Aexps, * Bexps, * deg_bounds;
     slong nvars = ctx->minfo->nvars;
     slong * perm = dctx->perm;
     TMP_INIT;
 
+    success = 0;
+
     TMP_START;
     Aexps = (slong *) TMP_ALLOC(nvars*sizeof(slong));
     Bexps = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
+        goto cleanup;
     nmod_mpoly_degrees_si(Aexps, A, ctx);
     nmod_mpoly_degrees_si(Bexps, B, ctx);
 
@@ -55,12 +59,10 @@ int nmod_mpolyd_ctx_settle(nmod_mpolyd_ctx_t dctx,
         deg_bounds[i] = FLINT_MAX(Aexps[i] + 1, Bexps[i] + 1);
         umul_ppmm(hi, degb_prod, degb_prod, deg_bounds[i]);
         if (hi != WORD(0) || degb_prod < 0)
-        {
-            success = 0;
             goto cleanup;
-        }
     }
 
+    success = 1;
     for (i = 1; i < nvars; i++)
     {
         for (j = i; (j > 0) && (deg_bounds[j-1] < deg_bounds[j-0]); j--)
