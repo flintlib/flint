@@ -35,6 +35,9 @@
 #include "fmpz_vec.h"
 #include "mpoly.h"
 
+#include "fq_nmod_poly.h"
+
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -99,6 +102,54 @@ typedef struct
 } nmod_mpoly_univar_struct;
 
 typedef nmod_mpoly_univar_struct nmod_mpoly_univar_t[1];
+
+
+/*
+    A dense mpoly is stored as a flat array of coeffcients.
+    Suppose deg_bounds = {a, b, c}. The coefficient of the monomial with 
+    exponents {i, j, k} is stored at the coefficient of index
+        c + k*(b + j*(a + i*0))    
+*/
+typedef struct
+{
+    slong nvars;
+    slong degb_alloc;
+    slong * deg_bounds;
+    slong coeff_alloc;
+    mp_limb_t * coeffs;
+} nmod_mpolyd_struct;
+
+typedef nmod_mpolyd_struct nmod_mpolyd_t[1];
+
+typedef struct
+{
+    slong nvars;
+    slong * perm;
+} nmod_mpolyd_ctx_struct;
+
+typedef nmod_mpolyd_ctx_struct nmod_mpolyd_ctx_t[1];
+
+
+typedef struct
+{
+    slong nvars;
+    slong degb_alloc;
+    slong * deg_bounds;
+    slong coeff_alloc;
+    fq_nmod_struct * coeffs;
+} fq_nmod_mpolyd_struct;
+typedef fq_nmod_mpolyd_struct fq_nmod_mpolyd_t[1];
+
+typedef struct
+{
+    slong nvars;
+    slong * perm;
+    fq_nmod_ctx_t fqctx;
+} fq_nmod_mpolyd_ctx_struct;
+typedef fq_nmod_mpolyd_ctx_struct fq_nmod_mpolyd_ctx_t[1];
+
+
+
 
 /* geobuckets ****************************************************************/
 typedef struct nmod_mpoly_geobucket
@@ -258,10 +309,10 @@ FLINT_DLL ulong nmod_mpoly_get_term_ui_ui(const nmod_mpoly_t poly,
 
 
 
-FLINT_DLL void nmod_mpoly_degrees(slong * degs, const nmod_mpoly_t poly,
+FLINT_DLL void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t poly,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL slong nmod_mpoly_degree(const nmod_mpoly_t poly, slong var,
+FLINT_DLL slong nmod_mpoly_degree_si(const nmod_mpoly_t poly, slong var,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void _nmod_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
@@ -379,6 +430,9 @@ FLINT_DLL void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 
 FLINT_DLL void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t poly1,
                 const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_make_monic(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                                                    const nmod_mpoly_ctx_t ctx);
 
 /* Multiplication ************************************************************/
 
@@ -509,6 +563,89 @@ FLINT_DLL void nmod_mpoly_resultant(nmod_mpoly_t poly1,
 
 FLINT_DLL void nmod_mpoly_discriminant(nmod_mpoly_t poly1,
               const nmod_mpoly_t poly2, slong var, const nmod_mpoly_ctx_t ctx);
+
+
+
+
+FLINT_DLL void nmod_mpolyd_ctx_init(nmod_mpolyd_ctx_t dctx, slong nvars);
+
+FLINT_DLL int nmod_mpolyd_ctx_settle(nmod_mpolyd_ctx_t dctx,
+                            const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyd_ctx_clear(nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL void nmod_mpolyd_init(nmod_mpolyd_t poly, slong nvars);
+
+FLINT_DLL void nmod_mpolyd_fit_length(nmod_mpolyd_t poly, slong len);
+
+FLINT_DLL void nmod_mpolyd_set_nvars(nmod_mpolyd_t poly, slong nvars);
+
+FLINT_DLL void nmod_mpolyd_zero(nmod_mpolyd_t poly);
+
+FLINT_DLL void nmod_mpolyd_clear(nmod_mpolyd_t poly);
+
+FLINT_DLL void nmod_mpoly_convert_to_nmod_mpolyd(
+                                  nmod_mpolyd_t A, const nmod_mpolyd_ctx_t dctx,
+                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_convert_from_nmod_mpolyd(
+                                 nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
+                          const nmod_mpolyd_t B, const nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL void nmod_mpolyd_zero(nmod_mpolyd_t poly);
+
+FLINT_DLL void nmod_mpolyd_clear(nmod_mpolyd_t poly);
+
+FLINT_DLL int nmod_mpolyd_gcd_brown(nmod_mpolyd_t G,
+                          nmod_mpolyd_t Abar, nmod_mpolyd_t Bbar,
+                          nmod_mpolyd_t A, nmod_mpolyd_t B,
+                         const nmodf_ctx_t fctx, const nmod_mpolyd_ctx_t dctx);
+
+
+FLINT_DLL void fq_nmod_mpolyd_ctx_init(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
+                                                       mp_limb_t p, slong deg);
+
+FLINT_DLL int fq_nmod_mpolyd_ctx_settle(fq_nmod_mpolyd_ctx_t dctx,
+                            const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpolyd_ctx_clear(fq_nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL void fq_nmod_mpolyd_init(fq_nmod_mpolyd_t poly, slong nvars,
+                                              const fq_nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL void fq_nmod_mpolyd_fit_length(fq_nmod_mpolyd_t poly, slong len,
+                                              const fq_nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL void fq_nmod_mpolyd_set_nvars(fq_nmod_mpolyd_t poly, slong nvars);
+
+FLINT_DLL void fq_nmod_mpolyd_zero(fq_nmod_mpolyd_t poly,
+                                              const fq_nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL void fq_nmod_mpolyd_clear(fq_nmod_mpolyd_t poly,
+                                              const fq_nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL void nmod_mpoly_convert_to_fq_nmod_mpolyd(
+                            fq_nmod_mpolyd_t A, const fq_nmod_mpolyd_ctx_t dctx,
+                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_convert_from_fq_nmod_mpolyd(
+                              nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
+                    const fq_nmod_mpolyd_t B, const fq_nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
+                                fq_nmod_mpolyd_t Abar, fq_nmod_mpolyd_t Bbar,
+                                fq_nmod_mpolyd_t A, fq_nmod_mpolyd_t B,
+                                              const fq_nmod_mpolyd_ctx_t dctx);
+
+
+FLINT_DLL int nmod_mpoly_gcd_brown(nmod_mpoly_t G,
+                               const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+
+
 
 /* Reduction *****************************************************************/
 
