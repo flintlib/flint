@@ -39,7 +39,7 @@ void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly,
 {
     slong N = mpoly_words_per_exp(poly->zpoly->bits, ctx->zctx->minfo);
 
-    if (fmpz_is_zero(c))
+    if (fmpq_is_zero(c))
     {
         fmpq_mpoly_zero(poly, ctx);
         return;

@@ -110,11 +110,11 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20) + 1;
 
-        exp_bound = n_randint(state, 30/nvars + 1) + 4;
-        exp_bound1 = n_randint(state, 25/nvars + 1) + 1;
-        exp_bound2 = n_randint(state, 25/nvars + 1) + 1;
+        exp_bound = n_randint(state, 25/nvars + 1) + 2;
+        exp_bound1 = n_randint(state, 35/nvars + 1) + 4;
+        exp_bound2 = n_randint(state, 30/nvars + 1) + 2;
 
-        coeff_bits = n_randint(state, 10);
+        coeff_bits = n_randint(state, 70);
 
         for (j = 0; j < 4; j++)
         {
@@ -176,11 +176,11 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20) + 1;
 
-        exp_bound = n_randint(state, 30/nvars + 1) + 4;
-        exp_bound1 = n_randint(state, 25/nvars + 1) + 1;
-        exp_bound2 = n_randint(state, 25/nvars + 1) + 1;
+        exp_bound = n_randint(state, 35/nvars + 1) + 2;
+        exp_bound1 = n_randint(state, 35/nvars + 1) + 4;
+        exp_bound2 = n_randint(state, 30/nvars + 1) + 2;
 
-        coeff_bits = n_randint(state, 10);
+        coeff_bits = n_randint(state, 70);
 
         for (j = 0; j < 4; j++)
         {
@@ -243,11 +243,11 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20) + 1;
 
-        exp_bound = n_randint(state, 30/nvars + 1) + 4;
-        exp_bound1 = n_randint(state, 25/nvars + 1) + 1;
-        exp_bound2 = n_randint(state, 25/nvars + 1) + 1;
+        exp_bound = n_randint(state, 25/nvars + 1) + 2;
+        exp_bound1 = n_randint(state, 35/nvars + 1) + 4;
+        exp_bound2 = n_randint(state, 30/nvars + 1) + 2;
 
-        coeff_bits = n_randint(state, 10);
+        coeff_bits = n_randint(state, 70);
 
         for (j = 0; j < 4; j++)
         {
@@ -311,11 +311,11 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20) + 1;
 
-        exp_bound = n_randint(state, 30/nvars + 1) + 4;
-        exp_bound1 = n_randint(state, 25/nvars + 1) + 1;
-        exp_bound2 = n_randint(state, 25/nvars + 1) + 1;
+        exp_bound = n_randint(state, 25/nvars + 1) + 2;
+        exp_bound1 = n_randint(state, 35/nvars + 1) + 4;
+        exp_bound2 = n_randint(state, 30/nvars + 1) + 2;
 
-        coeff_bits = n_randint(state, 10);
+        coeff_bits = n_randint(state, 70);
 
         for (j = 0; j < 4; j++)
         {
@@ -378,11 +378,11 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 20) + 1;
 
-        exp_bound = n_randint(state, 30/nvars + 1) + 4;
-        exp_bound1 = n_randint(state, 25/nvars + 1) + 1;
-        exp_bound2 = n_randint(state, 25/nvars + 1) + 1;
+        exp_bound = n_randint(state, 25/nvars + 1) + 2;
+        exp_bound1 = n_randint(state, 35/nvars + 1) + 4;
+        exp_bound2 = n_randint(state, 30/nvars + 1) + 2;
 
-        coeff_bits = n_randint(state, 10);
+        coeff_bits = n_randint(state, 70);
 
         for (j = 0; j < 4; j++)
         {

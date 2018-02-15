@@ -16,7 +16,6 @@
 char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t qpoly,
                                   const char ** x_in, const fmpq_mpoly_ctx_t qctx)
 {
-    int r = 0;
     fmpq_t c;
     slong i, j, N, bound, off;
     fmpz * exponents;
@@ -116,8 +115,6 @@ char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t qpoly,
         if (first)
             str[off++] = '1';
     }
-
-cleanup:
 
     fmpq_clear(c);
     TMP_END;
