@@ -16,7 +16,6 @@ void fmpq_mpoly_div(fmpq_mpoly_t q, const fmpq_mpoly_t a, const fmpq_mpoly_t b,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_t scale;
-    fmpq_t t;
 
     if (fmpq_mpoly_is_zero(b, ctx))
     {
