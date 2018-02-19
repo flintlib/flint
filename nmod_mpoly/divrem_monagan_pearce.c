@@ -18,16 +18,16 @@ slong _nmod_mpoly_divrem_monagan_pearce1(slong * lenr,
         const mp_limb_t * coeff3, const ulong * exp3, slong len3,
                               slong bits, ulong maskhi, const nmodf_ctx_t fctx)
 {
-    slong i, j, k, l, s;
+    slong i, j, q_len, r_len, s;
     slong next_loc, heap_len = 2;
     mpoly_heap1_s * heap;
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * p1 = *polyq;
-    mp_limb_t * p2 = *polyr;
-    ulong * e1 = *expq;
-    ulong * e2 = *expr;
+    mp_limb_t * q_coeff = *polyq;
+    mp_limb_t * r_coeff = *polyr;
+    ulong * q_exp = *expq;
+    ulong * r_exp = *expr;
     slong * hind;
     ulong mask, exp;
     int lt_divides;
@@ -53,8 +53,8 @@ slong _nmod_mpoly_divrem_monagan_pearce1(slong * lenr,
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
     /* quotient and remainder poly indices start at -1 */
-    k = -WORD(1);
-    l = -WORD(1);
+    q_len = WORD(0);
+    r_len = WORD(0);
 
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = len3;
@@ -76,10 +76,8 @@ slong _nmod_mpoly_divrem_monagan_pearce1(slong * lenr,
         if (mpoly_monomial_overflows1(exp, mask))
             goto exp_overflow;
 
-        k++;
-        _nmod_mpoly_fit_length(&p1, &e1, allocq, k + 1, 1);
-
-        lt_divides = mpoly_monomial_divides1(e1 + k, exp, exp3[0], mask);
+        _nmod_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, 1);
+        lt_divides = mpoly_monomial_divides1(q_exp + q_len, exp, exp3[0], mask);
 
         acc0 = acc1 = acc2 = 0;
         do
@@ -97,7 +95,7 @@ slong _nmod_mpoly_divrem_monagan_pearce1(slong * lenr,
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), WORD(0), fctx->mod.n - coeff2[x->j]);
                 } else
                 {
-                    umul_ppmm(pp1, pp0, coeff3[x->i], p1[x->j]);
+                    umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
                 }
 
@@ -136,11 +134,11 @@ slong _nmod_mpoly_divrem_monagan_pearce1(slong * lenr,
                     x->j = j;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x,
+                    _mpoly_heap_insert1(heap, exp3[x->i] + q_exp[x->j], x,
                                                  &next_loc, &heap_len, maskhi);
                 }
                 /* should we go up? */
-                if (j + 1 == k)
+                if (j + 1 == q_len)
                 {
                     s++;
                 } else if (  ((hind[i] & 1) == 1)
@@ -152,7 +150,7 @@ slong _nmod_mpoly_divrem_monagan_pearce1(slong * lenr,
                     x->j = j + 1;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x,
+                    _mpoly_heap_insert1(heap, exp3[x->i] + q_exp[x->j], x,
                                                  &next_loc, &heap_len, maskhi);
                 }
             }
@@ -161,20 +159,18 @@ slong _nmod_mpoly_divrem_monagan_pearce1(slong * lenr,
         /* try to divide accumulated term by leading term */
         if (acc0 == 0)
         {
-            k--;
             continue;
         }
         if (!lt_divides)
         {
-            l++;
-            _nmod_mpoly_fit_length(&p2, &e2, allocr, l + 1, 1);
-            p2[l] = fctx->mod.n - acc0;
-            e2[l] = exp;
-            k--;
+            _nmod_mpoly_fit_length(&r_coeff, &r_exp, allocr, r_len + 1, 1);
+            r_coeff[r_len] = fctx->mod.n - acc0;
+            r_exp[r_len] = exp;
+            r_len++;
             continue;
         }
 
-        p1[k] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
+        q_coeff[q_len] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
 
         /* put newly generated quotient term back into the heap if neccesary */
         if (s > 1)
@@ -182,35 +178,33 @@ slong _nmod_mpoly_divrem_monagan_pearce1(slong * lenr,
             i = 1;
             x = chain + i;
             x->i = i;
-            x->j = k;
+            x->j = q_len;
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
-            _mpoly_heap_insert1(heap, exp3[x->i] + e1[x->j], x,
+            _mpoly_heap_insert1(heap, exp3[x->i] + q_exp[x->j], x,
                                                  &next_loc, &heap_len, maskhi);
         }
         s = 1;
+        q_len++;
     }
-
-    k++;
-    l++;
 
 cleanup:
 
-   (*polyq) = p1;
-   (*expq) = e1;
-   (*polyr) = p2;
-   (*expr) = e2;
+   (*polyq) = q_coeff;
+   (*expq) = q_exp;
+   (*polyr) = r_coeff;
+   (*expr) = r_exp;
    
    /* set remainder poly length */
-   (*lenr) = l;
+   (*lenr) = r_len;
 
     TMP_END;
 
-    return k;
+    return q_len;
 
 exp_overflow:
-    k = 0;
-    l = 0;
+    q_len = 0;
+    r_len = 0;
     goto cleanup;
 }
 
@@ -224,17 +218,17 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
             const mp_limb_t * coeff3, const ulong * exp3, slong len3,
        slong bits, slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
 {
-    slong i, j, k, l, s;
+    slong i, j, q_len, r_len, s;
     slong next_loc;
     slong heap_len = 2; /* heap zero index unused */
     mpoly_heap_s * heap;
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * p1 = *polyq;
-    mp_limb_t * p2 = *polyr;
-    ulong * e1 = *expq;
-    ulong * e2 = *expr;
+    mp_limb_t * q_coeff = *polyq;
+    mp_limb_t * r_coeff = *polyr;
+    ulong * q_exp = *expq;
+    ulong * r_exp = *expr;
     ulong * exp, * exps;
     ulong ** exp_list;
     slong exp_next;
@@ -244,15 +238,12 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
     mp_limb_t lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
-
     if (N == 1)
         return _nmod_mpoly_divrem_monagan_pearce1(lenr, polyq, expq, allocq,
                                      polyr, expr, allocr, coeff2, exp2, len2,
                                    coeff3, exp3, len3, bits, cmpmask[0], fctx);
 
-
     TMP_START;
-
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
@@ -281,9 +272,8 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
     for (i = 0; i < FLINT_BITS/bits; i++)
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-    /* quotient and remainder poly indices start at -1 */
-    k = -WORD(1);
-    l = -WORD(1);
+    q_len = WORD(0);
+    r_len = WORD(0);
    
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = len3;
@@ -307,10 +297,8 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
         if (mpoly_monomial_overflows(exp, N, mask))
             goto exp_overflow2;
       
-        k++;
-        _nmod_mpoly_fit_length(&p1, &e1, allocq, k + 1, N);
-
-        lt_divides = mpoly_monomial_divides(e1 + k*N, exp, exp3, N, mask);
+        _nmod_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
+        lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
 
         acc0 = acc1 = acc2 = 0;
         do
@@ -326,10 +314,11 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
 
                 if (x->i == -WORD(1))
                 {
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), WORD(0), fctx->mod.n - coeff2[x->j]);
+                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
+                                 WORD(0), WORD(0), fctx->mod.n - coeff2[x->j]);
                 } else
                 {
-                    umul_ppmm(pp1, pp0, coeff3[x->i], p1[x->j]);
+                    umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
                 }
             } while ((x = x->next) != NULL);
@@ -370,13 +359,13 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
                     mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                           e1   + x->j*N, N);
+                                                          q_exp + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                       &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
                 /* should we go up? */
-                if (j + 1 == k)
+                if (j + 1 == q_len)
                 {
                     s++;
                 } else if (  ((hind[i] & 1) == 1)
@@ -389,7 +378,7 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
                     mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                           e1   + x->j*N, N);
+                                                          q_exp + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                       &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
@@ -400,20 +389,18 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
         /* try to divide accumulated term by leading term */
         if (acc0 == 0)
         {
-            k--;
             continue;
         }
         if (!lt_divides)
         {
-            l++;
-            _nmod_mpoly_fit_length(&p2, &e2, allocr, l + 1, N);
-            p2[l] = fctx->mod.n - acc0;
-            mpoly_monomial_set(e2 + l*N, exp, N);
-            k--;
+            _nmod_mpoly_fit_length(&r_coeff, &r_exp, allocr, r_len + 1, N);
+            r_coeff[r_len] = fctx->mod.n - acc0;
+            mpoly_monomial_set(r_exp + r_len*N, exp, N);
+            r_len++;
             continue;
         }
 
-        p1[k] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
+        q_coeff[q_len] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
 
         /* put newly generated quotient term back into the heap if neccesary */
         if (s > 1)
@@ -421,39 +408,38 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
             i = 1;
             x = chain + i;
             x->i = i;
-            x->j = k;
+            x->j = q_len;
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
             mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                   e1   + x->j*N, N);
+                                                  q_exp + x->j*N, N);
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                   &next_loc, &heap_len, N, cmpmask))
                 exp_next--;
         }
         s = 1;
+        q_len++;
     }
 
-    k++;
-    l++;
 
 cleanup2:
 
-    (*polyq) = p1;
-    (*expq) = e1;
-    (*polyr) = p2;
-    (*expr) = e2;
+    (*polyq) = q_coeff;
+    (*expq) = q_exp;
+    (*polyr) = r_coeff;
+    (*expr) = r_exp;
 
     /* set remainder poly length */
-    (*lenr) = l;
+    (*lenr) = r_len;
 
     TMP_END;
 
     /* return quotient poly length */
-    return k;
+    return q_len;
 
 exp_overflow2:
-    k = 0;
-    l = 0;
+    q_len = 0;
+    r_len = 0;
     goto cleanup2;
 }
 
