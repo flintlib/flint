@@ -316,7 +316,7 @@ void fmpq_mpoly_neg(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
 /* Comparison ****************************************************************/
 
 FMPQ_MPOLY_INLINE
-int fmpq_mpoly_equal(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+int fmpq_mpoly_equal(const fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
     return fmpq_equal(poly1->content, poly2->content)

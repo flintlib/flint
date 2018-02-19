@@ -34,7 +34,7 @@ int _nmod_mpoly_equal(const mp_limb_t * coeff1, const ulong * exp1,
     return 1;
 }
 
-int nmod_mpoly_equal(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+int nmod_mpoly_equal(const nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     ulong * ptr1 = poly1->exps, * ptr2 = poly2->exps;

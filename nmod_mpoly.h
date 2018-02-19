@@ -407,7 +407,7 @@ FLINT_DLL void nmod_mpoly_neg(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 
 /* Comparison ****************************************************************/
 
-FLINT_DLL int nmod_mpoly_equal(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+FLINT_DLL int nmod_mpoly_equal(const nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                                    const nmod_mpoly_ctx_t ctx);
 
 /* Basic arithmetic **********************************************************/
