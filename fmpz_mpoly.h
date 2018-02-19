@@ -198,8 +198,6 @@ FMPZ_MPOLY_INLINE
 void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
                                         slong bits, const fmpz_mpoly_ctx_t ctx)
 {
-   FLINT_ASSERT(bits <= FLINT_BITS);
-
    if (poly->bits < bits)
    {
       if (poly->alloc != 0)

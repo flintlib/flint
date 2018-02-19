@@ -269,8 +269,6 @@ void nmod_mpoly_fit_bits(nmod_mpoly_t poly,
    slong N;
    ulong * t;
 
-   FLINT_ASSERT(bits <= FLINT_BITS);
-
    if (poly->bits < bits)
    {
       if (poly->alloc != 0)
