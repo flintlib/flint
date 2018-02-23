@@ -17,7 +17,7 @@ main(void)
     slong i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("print_parse....");
+    flint_printf("get/set_str_pretty....");
     fflush(stdout);
 
     {

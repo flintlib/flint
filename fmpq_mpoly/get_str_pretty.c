@@ -117,6 +117,9 @@ char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t qpoly,
     }
 
     fmpq_clear(c);
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_clear(exponents + i);
+
     TMP_END;
 
     str[off] = '\0';
