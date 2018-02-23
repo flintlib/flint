@@ -29,8 +29,20 @@ void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t qpoly1, const fmpq_mpoly_t qpoly2,
 
     if (fmpz_fits_si(pow))
     {
-        if (!fmpq_is_one(qpoly1->content))
+        if (fmpz_is_one(fmpq_denref(qpoly2->content))
+              && fmpz_is_pm1(fmpq_numref(qpoly2->content)))
+        {
+            if (fmpz_is_one(fmpq_numref(qpoly2->content))
+                || fmpz_is_even(pow))
+            {
+                fmpq_set_si(qpoly1->content, +WORD(1), UWORD(1));
+            } else {
+                fmpq_set_si(qpoly1->content, -WORD(1), UWORD(1));
+            }
+
+        } else {
             fmpq_pow_si(qpoly1->content, qpoly2->content, fmpz_get_si(pow));
+        }
 
         fmpz_mpoly_pow_fps(poly1, poly2, fmpz_get_ui(pow), ctx);
         return;
