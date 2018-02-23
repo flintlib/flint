@@ -21,7 +21,7 @@ int fmpq_mpoly_divides(fmpq_mpoly_t poly1,
 
     if (fmpq_mpoly_is_zero(poly3, ctx))
     {
-        flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divides_monagan_pearce");
+        flint_throw(FLINT_DIVZERO, "Divide by zero in fmpq_mpoly_divides");
     }
 
     if (fmpq_mpoly_is_zero(poly2, ctx))

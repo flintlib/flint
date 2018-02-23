@@ -343,8 +343,12 @@ FMPQ_MPOLY_INLINE
 void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t poly1,
          const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_set(poly1->zpoly, poly2->zpoly, ctx->zctx);
     fmpq_mul(poly1->content, poly2->content, c);
+    if (fmpq_is_zero(c)) {
+        fmpz_mpoly_zero(poly1->zpoly, ctx->zctx);
+    } else {
+        fmpz_mpoly_set(poly1->zpoly, poly2->zpoly, ctx->zctx);
+    }
 }
 /* Multiplication ************************************************************/
 
