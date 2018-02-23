@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2016 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
