@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,12 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
-void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t poly,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_si(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
-}
 
 slong nmod_mpoly_degree_si(const nmod_mpoly_t poly, slong var,
                                                     const nmod_mpoly_ctx_t ctx)
@@ -32,4 +26,3 @@ slong nmod_mpoly_degree_si(const nmod_mpoly_t poly, slong var,
     TMP_END;
     return ret;
 }
-

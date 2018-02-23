@@ -41,7 +41,6 @@ void _fmpq_mpoly_set_term_fmpq_fmpz(fmpq_mpoly_t qpoly,
 
     if (!exists)
     {
-/*printf("doesnt exist\n");*/
         if (!fmpq_is_zero(c)) /* make new term only if coeff is nonzero*/
         {
             fmpz_mpoly_fit_length(poly, poly->length + 1, ctx);
@@ -116,26 +115,6 @@ void fmpq_mpoly_set_term_fmpq_fmpz(fmpq_mpoly_t poly,
         fmpz_init(newexp + i);
         fmpz_set(newexp + i, exp[i]);
     }
-
-    _fmpq_mpoly_set_term_fmpq_fmpz(poly, c, newexp, ctx);
-
-    for (i = 0; i < nvars; i++)
-        fmpz_clear(newexp + i);
-
-    TMP_END;
-}
-
-void fmpq_mpoly_set_term_fmpq_ui(fmpq_mpoly_t poly,
-                 const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
-{
-    slong i, nvars = ctx->zctx->minfo->nvars;
-    fmpz * newexp;
-    TMP_INIT;
-
-    TMP_START;
-    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
-    for (i = 0; i < nvars; i++)
-        fmpz_init_set_ui(newexp + i, exp[i]);
 
     _fmpq_mpoly_set_term_fmpq_fmpz(poly, c, newexp, ctx);
 

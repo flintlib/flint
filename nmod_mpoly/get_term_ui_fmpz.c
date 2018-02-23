@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
+
 
 ulong _nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
                                   const fmpz * exp, const nmod_mpoly_ctx_t ctx)
@@ -61,30 +62,6 @@ ulong nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
         fmpz_init(newexp + i);
         fmpz_set(newexp + i, exp[i]);
     }
-
-    ret = _nmod_mpoly_get_term_ui_fmpz(poly, newexp, ctx);
-
-    for (i = 0; i < nvars; i++)
-        fmpz_clear(newexp + i);
-
-    TMP_END;
-
-    return ret;
-}
-
-
-ulong nmod_mpoly_get_term_ui_ui(const nmod_mpoly_t poly,
-                                 const ulong * exp, const nmod_mpoly_ctx_t ctx)
-{
-    ulong ret;
-    slong i, nvars = ctx->minfo->nvars;
-    fmpz * newexp;
-    TMP_INIT;
-
-    TMP_START;
-    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
-    for (i = 0; i < nvars; i++)
-        fmpz_init_set_ui(newexp + i, exp[i]);
 
     ret = _nmod_mpoly_get_term_ui_fmpz(poly, newexp, ctx);
 

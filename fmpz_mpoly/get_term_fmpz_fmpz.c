@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -70,80 +70,3 @@ void fmpz_mpoly_get_term_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
 
     TMP_END;
 }
-
-ulong fmpz_mpoly_get_term_ui_fmpz(const fmpz_mpoly_t poly,
-                                 const fmpz ** exp, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_t newc;
-    ulong ret;
-
-    fmpz_init(newc);
-    fmpz_mpoly_get_term_fmpz_fmpz(newc, poly, exp, ctx);
-
-    ret = fmpz_get_ui(newc);
-    fmpz_clear(newc);
-    return ret;
-}
-
-slong fmpz_mpoly_get_term_si_fmpz(const fmpz_mpoly_t poly,
-                                 const fmpz ** exp, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_t newc;
-    slong ret;
-
-    fmpz_init(newc);
-    fmpz_mpoly_get_term_fmpz_fmpz(newc, poly, exp, ctx);
-
-    ret = fmpz_get_si(newc);
-    fmpz_clear(newc);
-    return ret;
-}
-
-void fmpz_mpoly_get_term_fmpz_ui(fmpz_t c, const fmpz_mpoly_t poly,
-                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, nvars = ctx->minfo->nvars;
-    fmpz * newexp;
-    TMP_INIT;
-
-    TMP_START;
-    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
-    for (i = 0; i < nvars; i++)
-        fmpz_init_set_ui(newexp + i, exp[i]);
-
-    _fmpz_mpoly_get_term_fmpz_fmpz(c, poly, newexp, ctx);
-
-    for (i = 0; i < nvars; i++)
-        fmpz_clear(newexp + i);
-
-    TMP_END;
-}
-
-ulong fmpz_mpoly_get_term_ui_ui(const fmpz_mpoly_t poly,
-                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_t newc;
-    ulong ret;
-
-    fmpz_init(newc);
-    fmpz_mpoly_get_term_fmpz_ui(newc, poly, exp, ctx);
-
-    ret = fmpz_get_ui(newc);
-    fmpz_clear(newc);
-    return ret;
-}
-
-slong fmpz_mpoly_get_term_si_ui(const fmpz_mpoly_t poly,
-                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_t newc;
-    slong ret;
-
-    fmpz_init(newc);
-    fmpz_mpoly_get_term_fmpz_ui(newc, poly, exp, ctx);
-
-    ret = fmpz_get_si(newc);
-    fmpz_clear(newc);
-    return ret;
-}
-
