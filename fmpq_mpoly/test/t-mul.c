@@ -49,14 +49,14 @@ main(void)
 
         coeff_bits = n_randint(state, 200);
 
-        fmpq_mpoly_randbits(k1, state, len, coeff_bits, exp_bits, ctx);
-        fmpq_mpoly_randbits(k2, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(k1, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(k2, state, len, coeff_bits, exp_bits, ctx);
 
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpq_mpoly_randbits(h, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits_bits(h, state, len2, coeff_bits, exp_bits2, ctx);
 
             fmpq_mpoly_add(t1, g, h, ctx);
             fmpq_mpoly_test_canonical(t1, ctx);
@@ -114,9 +114,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpq_mpoly_randbits(h, state, len, coeff_bits, exp_bits, ctx);
+            fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
             fmpq_mpoly_mul(h, f, g, ctx);
             fmpq_mpoly_test_canonical(h, ctx);
@@ -164,9 +164,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpq_mpoly_randbits(h, state, len, coeff_bits, exp_bits, ctx);
+            fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
             fmpq_mpoly_mul(h, f, g, ctx);
             fmpq_mpoly_test_canonical(h, ctx);

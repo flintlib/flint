@@ -51,8 +51,8 @@ main(void)
 
         for (j = 0; j < ctx->zctx->minfo->nvars; j++)
         {
-            fmpq_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpq_mpoly_add(h, f, g, ctx);
 
             fmpq_mpoly_degree_fmpz(hdeg, h, j, ctx);
@@ -105,8 +105,8 @@ main(void)
 
         for (j = 0; j < ctx->zctx->minfo->nvars; j++)
         {
-            fmpq_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpq_mpoly_mul(h, f, g, ctx);
 
             fmpq_mpoly_degree_fmpz(hdeg, h, j, ctx);

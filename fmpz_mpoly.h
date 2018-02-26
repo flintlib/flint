@@ -664,8 +664,8 @@ FLINT_DLL void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
 FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t poly1,
                          const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
-                               fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                         const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_gcd_is_unit(const fmpz_mpoly_t a, const fmpz_mpoly_t b,
                                                    const fmpz_mpoly_ctx_t ctx);

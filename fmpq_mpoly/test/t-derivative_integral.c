@@ -56,14 +56,14 @@ main(void)
 
         coeff_bits = n_randint(state, 200);
 
-        fmpq_mpoly_randbits(hp, state, len, coeff_bits, exp_bits, ctx);
-        fmpq_mpoly_randbits(fp, state, len, coeff_bits, exp_bits, ctx);
-        fmpq_mpoly_randbits(gp, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(hp, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(fp, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(gp, state, len, coeff_bits, exp_bits, ctx);
 
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
 
             idx = n_randint(state, nvars);
 
@@ -139,14 +139,14 @@ main(void)
 
         coeff_bits = n_randint(state, 200);
 
-        fmpq_mpoly_randbits(h, state, len, coeff_bits, exp_bits, ctx);
-        fmpq_mpoly_randbits(fp, state, len, coeff_bits, exp_bits, ctx);
-        fmpq_mpoly_randbits(gp, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(h, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(fp, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(gp, state, len, coeff_bits, exp_bits, ctx);
 
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
 
             idx = n_randint(state, nvars);
 
@@ -217,13 +217,13 @@ main(void)
 
         coeff_bits = n_randint(state, 200);
 
-        fmpq_mpoly_randbits(f, state, len, coeff_bits, exp_bits, ctx);
-        fmpq_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
-        fmpq_mpoly_randbits(f1, state, len1, coeff_bits, exp_bits1, ctx);
+        fmpq_mpoly_randtest_bits_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+        fmpq_mpoly_randtest_bits_bits(f1, state, len1, coeff_bits, exp_bits1, ctx);
 
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
             idx = n_randint(state, nvars);
 
             fmpq_mpoly_set(g, f, ctx);

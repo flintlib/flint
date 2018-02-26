@@ -43,7 +43,7 @@ main(void)
         coeff_bits = n_randint(state, 200);
         exp_bits = n_randint(state, 200) + 2;
 
-        fmpq_mpoly_randbits(f, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
         for (j = 0; j < 10; j++)
         {
@@ -101,7 +101,7 @@ main(void)
         coeff_bits = n_randint(state, 200);
         exp_bits = n_randint(state, 200) + 2;
 
-        fmpq_mpoly_randbits(f, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
         for (j = 0; j < 10; j++)
         {

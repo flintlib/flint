@@ -333,13 +333,13 @@ done:
 }
 
 
-void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
-                                fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
-    _fmpz_mpoly_gcd_prs(poly1, poly2, poly3, ctx);
-
-    if (poly1->bits > FLINT_BITS || poly2->bits > FLINT_BITS)
+    if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_gcd_prs");
+
+    _fmpz_mpoly_gcd_prs(poly1, poly2, poly3, ctx);
 
     if ((poly1->length > 0) && (fmpz_cmp_ui(poly1->coeffs + 0, WORD(0)) < 0))
         fmpz_mpoly_neg(poly1, poly1, ctx);
