@@ -64,6 +64,7 @@ main(void)
 
             fmpq_mpoly_randtest_bits_bound(g, state, len, coeff_bits, degbound, ctx);
             fmpq_mpoly_gcd(g, a, b, ctx);
+            fmpq_mpoly_test_canonical(g, ctx);
 
             if (fmpq_mpoly_is_zero(g, ctx))
             {
@@ -92,8 +93,11 @@ main(void)
                 flint_printf("Check divisibility\ni = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
+            fmpq_mpoly_test_canonical(ca, ctx);
+            fmpq_mpoly_test_canonical(cb, ctx);
 
             fmpq_mpoly_gcd(cg, ca, cb, ctx);
+            fmpq_mpoly_test_canonical(cg, ctx);
 
             if (!fmpq_mpoly_equal_fmpq(cg, lc, ctx))
             {
