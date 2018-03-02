@@ -562,13 +562,22 @@ make
 make check
 \end{lstlisting}
 
-GNU make is required to build FLINT. This is simply \code{make} on
-Linux, Darwin, MinGW and Cygwin systems. However, on some unixes the
-command is \code{gmake}.
+GNU make or CMake is required to build FLINT. For GNU make, this is
+simply \code{make} on Linux, Darwin, MinGW and Cygwin systems. However,
+on some unixes the command is \code{gmake}. For CMake, this is
+\code{cmake}, which which may need to be installed with your package
+manager.
 
-If you wish to install FLINT, simply type:
+If you wish to install FLINT with GNU make, simply type:
 \begin{lstlisting}[language=bash]
 make install
+\end{lstlisting}
+
+If you wish to install FLINT with CMake, simply type:
+\begin{lstlisting}[language=bash]
+mkdir build && cd build
+cmake .. -DBUILD_SHARED_LIBS=ON
+cmake --build . --target install
 \end{lstlisting}
 
 Now to use FLINT, simply include the appropriate header files for
