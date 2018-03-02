@@ -131,7 +131,7 @@ void _fmpz_clear_mpz(fmpz f)
 
     /* clean up if this is left over from another thread */
 #if HAVE_PTHREAD
-    if (header_ptr->count != 0 || header_ptr->thread != pthread_self())
+    if (header_ptr->count != 0 || !pthread_equal(header_ptr->thread, pthread_self()))
 #else
     if (header_ptr->count != 0)
 #endif
