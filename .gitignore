@@ -39,3 +39,4 @@ build.vc14/flint-profiles*.sln
 *.tlog
 *.sdf
 build.vc12
+build
