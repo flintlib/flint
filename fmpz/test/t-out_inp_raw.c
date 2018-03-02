@@ -13,7 +13,9 @@
 #undef ulong
 #define ulong ulongxx /* interferes with standard libraries */
 #include <sys/types.h>
+#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
 #include <unistd.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 
