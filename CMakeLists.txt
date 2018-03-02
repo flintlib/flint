@@ -227,6 +227,13 @@ set_target_properties(flint
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
+if(WIN32)
+    set_target_properties(flint
+        PROPERTIES
+        LINK_FLAGS "/EXPORT:__flint_clz_tab /EXPORT:flint_primes_small"
+    )
+endif()
+
 if(BUILD_TESTING)
     enable_testing()
     add_library(test_helpers STATIC test_helpers.c)
