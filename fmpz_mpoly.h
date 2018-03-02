@@ -564,13 +564,13 @@ FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
 
 /* Evaluation ****************************************************************/
 
-void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
+FLINT_DLL void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
                                             fmpz ** val, fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
+FLINT_DLL void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
                                   slong var, fmpz_t val, fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
+FLINT_DLL void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
     fmpz_mpoly_struct ** polys2, fmpz_mpoly_ctx_t ctx1, fmpz_mpoly_ctx_t ctx2);
 
 /* Univariates ***************************************************************/
@@ -698,7 +698,7 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t poly,
 
 /* Random generation *********************************************************/
 
-void fmpz_mpoly_randtest(fmpz_mpoly_t poly, flint_rand_t state,
+FLINT_DLL void fmpz_mpoly_randtest(fmpz_mpoly_t poly, flint_rand_t state,
    slong length, slong exp_bound, slong coeff_bits, const fmpz_mpoly_ctx_t ctx);
 
 /******************************************************************************
