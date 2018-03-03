@@ -24,17 +24,20 @@ environment:
   matrix:
     - COMPILER: gcc
       ARCH: 32
+    - COMPILER: gcc
+      ARCH: 64
     - COMPILER: cl
       ARCH: 32
     - COMPILER: cl
       ARCH: 64
-    - COMPILER: gcc
-      ARCH: 64
 
 install:
-  - if [%COMPILER%]==[gcc] set "PATH=C:\msys64\usr\bin;%PATH%"
-  - if [%COMPILER%]==[gcc] pacman -Sy --needed base-devel mingw-w64-i686-toolchain mingw-w64-mpfr
-
+  - if [%COMPILER%]==[gcc] set "PATH=C:\msys64\mingw%ARCH%\bin;%PATH%"
+  - if [%COMPILER%]==[gcc] set "CMAKE_PREFIX_PATH=C:\msys64\mingw%ARCH%"
+  - if [%COMPILER%]==[gcc] del /F /Q "C:\Program Files\Git\usr\bin\sh.exe"
+  - if [%COMPILER%]==[gcc] if [%ARCH%]==[64] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-mpfr
+  - if [%COMPILER%]==[gcc] if [%ARCH%]==[32] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-i686-toolchain mingw-w64-i686-mpfr
+  
   - if [%COMPILER%]==[cl] if [%ARCH%]==[64] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_64%"
   - if [%COMPILER%]==[cl] if [%ARCH%]==[32] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_32%"
   - if [%COMPILER%]==[cl] set "LIB=%CONDA_INSTALL_LOCN%\Library\lib;%LIB%"
@@ -47,17 +50,14 @@ install:
 
 before_build:
   - ps: if (-Not (Test-Path .\build)) { mkdir build }
-  - if [%COMPILER%]==[cl] cd build
+  
+  - cd build
+  - if [%COMPILER%]==[gcc] cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
   - if [%COMPILER%]==[cl] cmake -G "Ninja" -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
 build_script:
-  - if [%COMPILER%]==[gcc] set "ABI=%ARCH%"
-  - if [%COMPILER%]==[gcc] bash -lc "cd $(cygpath ${APPVEYOR_BUILD_FOLDER}) && ./.appveyor_msys_build.sh"
-  - if [%COMPILER%]==[gcc] echo "" > build_output.txt
-
-  - if [%COMPILER%]==[cl] cmake --build . 2>&1 > build_output.txt
-
-  - ps: Get-Content .\build_output.txt -Tail 500
+  - cmake --build . 2>&1 > build_output.txt
+  - ps: Get-Content .\build_output.txt -Tail 1000
 
 test_script:
-  - if [%COMPILER%]==[cl] ctest -j3 --timeout 120
+  - ctest -j3 --timeout 120
