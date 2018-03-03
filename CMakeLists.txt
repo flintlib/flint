@@ -14,7 +14,7 @@ find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
 find_package(PythonInterp REQUIRED)
 
-if(WIN32)
+if(MSVC)
     find_package(PThreads REQUIRED)
 endif()
 
@@ -188,7 +188,7 @@ target_include_directories(flint PUBLIC
 )
 
 
-if(${BUILD_SHARED_LIBS})
+if(${BUILD_SHARED_LIBS} AND MSVC)
     target_compile_definitions(flint PRIVATE "MSC_BUILD_DLL")
 endif()
 
@@ -205,7 +205,7 @@ if(NOT DEFINED IPO_SUPPORTED)
 endif()
 
 if(IPO_SUPPORTED)
-    set_target_properties(flint PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    set_target_properties(flint PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
 if(NOT MSVC)
@@ -227,7 +227,7 @@ set_target_properties(flint
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-if(WIN32)
+if(MSVC)
     set_target_properties(flint
         PROPERTIES
         LINK_FLAGS "/EXPORT:__flint_clz_tab /EXPORT:flint_primes_small"
@@ -246,7 +246,10 @@ if(BUILD_TESTING)
             string(REPLACE "/" "-" test_name ${test_name})
             get_filename_component(test_name ${test_name} NAME_WE)
             add_executable(${test_name} ${test_file})
-            target_link_libraries(${test_name} flint test_helpers)
+            target_link_libraries(${test_name}
+                flint test_helpers
+                ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES}
+            )
 
             add_test(
                 NAME ${test_name}
