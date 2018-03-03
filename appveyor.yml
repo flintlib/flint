@@ -18,22 +18,27 @@ skip_commits:
 
 environment:
   global:
-    CONDA_INSTALL_LOCN: "C:\\Miniconda36-x64"
+    CONDA_INSTALL_LOCN: "C:\\Miniconda36"
     VCVARSALL: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat"
   matrix:
-    - COMPILER: cl
     - COMPILER: gcc
+      ARCH: 32
+    - COMPILER: cl
+      ARCH: 32
+    - COMPILER: cl
+      ARCH: 64
+    - COMPILER: gcc
+      ARCH: 64
 
 install:
-  - if [%COMPILER%]==[gcc] set "PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%"
-  - if [%COMPILER%]==[gcc] pacman --noconfirm --sync --refresh --refresh pacman
-  - if [%COMPILER%]==[gcc] pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade
-  - if [%COMPILER%]==[gcc] pacman --noconfirm -S --needed base-devel mpfr-devel
+  - if [%COMPILER%]==[gcc] set "PATH=C:\msys64\usr\bin;%PATH%"
 
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN%-x64"
   - if [%COMPILER%]==[cl] set "LIB=%CONDA_INSTALL_LOCN%\Library\lib;%LIB%"
   - if [%COMPILER%]==[cl] set "CPATH=%CONDA_INSTALL_LOCN%\Library\include;%CPATH%"
   - if [%COMPILER%]==[cl] call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
-  - if [%COMPILER%]==[cl] call "%VCVARSALL%" x64
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] call "%VCVARSALL%" x64
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[32] call "%VCVARSALL%" x86
   - if [%COMPILER%]==[cl] conda config --add channels conda-forge --force
   - if [%COMPILER%]==[cl] conda install --yes --quiet mpir mpfr pthreads-win32 ninja
 
@@ -41,11 +46,10 @@ before_build:
   - ps: if (-Not (Test-Path .\build)) { mkdir build }
   - if [%COMPILER%]==[cl] cd build
   - if [%COMPILER%]==[cl] cmake -G "Ninja" -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
-  
-  - if [%COMPILER%]==[gcc] bash -lc "cd $(cygpath ${APPVEYOR_BUILD_FOLDER}) && ./configure --disable-static --with-gmp=/usr --with-mpfr=/usr"
 
 build_script:
-  - if [%COMPILER%]==[gcc] bash -lc "cd $(cygpath ${APPVEYOR_BUILD_FOLDER}) && make -j4"
+  - if [%COMPILER%]==[gcc] set "ABI=%ARCH%"
+  - if [%COMPILER%]==[gcc] bash -lc "cd $(cygpath ${APPVEYOR_BUILD_FOLDER}) && ./.appveyor_msys_build.sh"
   - if [%COMPILER%]==[gcc] echo "" > build_output.txt
 
   - if [%COMPILER%]==[cl] cmake --build . 2>&1 > build_output.txt
@@ -54,5 +58,3 @@ build_script:
 
 test_script:
   - if [%COMPILER%]==[cl] ctest -j3 --timeout 120
-
-  - if [%COMPILER%]==[gcc] bash -lc "cd $(cygpath ${APPVEYOR_BUILD_FOLDER}) && make -j4 check"
