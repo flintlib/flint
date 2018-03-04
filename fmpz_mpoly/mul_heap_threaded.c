@@ -47,13 +47,13 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 */
     ulong exp, cy;
     ulong c[3], p[2]; /* for accumulating coefficients */
-    int first, small;
+    int first, flint_small;
     TMP_INIT;
 
     TMP_START;
 
     /* whether input coeffs are small, thus output coeffs fit in three words */
-    small = _fmpz_mpoly_fits_small(poly2, len2) &&
+    flint_small = _fmpz_mpoly_fits_small(poly2, len2) &&
                                            _fmpz_mpoly_fits_small(poly3, len3);
 
     heap = (mpoly_heap1_s *) TMP_ALLOC((len2 + 1)*sizeof(mpoly_heap1_s));
@@ -119,7 +119,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             Q[Q_len++] = x->j;
 
             /* if output coeffs will fit in three words */
-            if (small)
+            if (flint_small)
             {
                 /* compute product of input poly coeffs */
                 if (first)
@@ -221,7 +221,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** poly1, ulong ** exp1, slong * alloc,
         }
 
         /* set output poly coeff from temporary accumulation, if not multiprec */
-        if (small)
+        if (flint_small)
             fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
 
         if (fmpz_is_zero(p1 + k))
@@ -265,7 +265,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
     ulong * exp, * exps;
     ulong ** exp_list;
     slong exp_next;
-    int first, small;
+    int first, flint_small;
     TMP_INIT;
 
     /* if exponent vectors fit in single word, call special version */
@@ -278,7 +278,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
     TMP_START;
 
     /* whether input coeffs are small, thus output coeffs fit in three words */
-    small = _fmpz_mpoly_fits_small(poly2, len2) &&
+    flint_small = _fmpz_mpoly_fits_small(poly2, len2) &&
                                            _fmpz_mpoly_fits_small(poly3, len3);
 
 
@@ -356,7 +356,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
             Q[Q_len++] = x->j;
 
             /* if output coeffs will fit in three words */
-            if (small)
+            if (flint_small)
             {
                 /* compute product of input poly coeffs */
                 if (first)
@@ -467,7 +467,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** poly1, ulong ** exp1, slong * alloc,
         }     
 
         /* set output poly coeff from temporary accumulation, if not multiprec */
-        if (small)
+        if (flint_small)
             fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
 
         if (fmpz_is_zero(p1 + k))
