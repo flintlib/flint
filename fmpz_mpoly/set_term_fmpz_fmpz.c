@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mpoly.h"
+
 
 void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
                   const fmpz_t c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx)
@@ -96,68 +97,3 @@ void fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
 
     TMP_END;
 }
-
-void fmpz_mpoly_set_term_ui_fmpz(fmpz_mpoly_t poly,
-                 const ulong c, const fmpz ** exp, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_t newc;
-
-    fmpz_init(newc);
-    fmpz_set_ui(newc, c);
-    fmpz_mpoly_set_term_fmpz_fmpz(poly, newc, exp, ctx);
-    fmpz_clear(newc);
-}
-
-void fmpz_mpoly_set_term_si_fmpz(fmpz_mpoly_t poly,
-                 const slong c, const fmpz ** exp, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_t newc;
-
-    fmpz_init(newc);
-    fmpz_set_si(newc, c);
-    fmpz_mpoly_set_term_fmpz_fmpz(poly, newc, exp, ctx);
-    fmpz_clear(newc);
-}
-
-void fmpz_mpoly_set_term_fmpz_ui(fmpz_mpoly_t poly,
-                 const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, nvars = ctx->minfo->nvars;
-    fmpz * newexp;
-    TMP_INIT;
-
-    TMP_START;
-    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
-    for (i = 0; i < nvars; i++)
-        fmpz_init_set_ui(newexp + i, exp[i]);
-
-    _fmpz_mpoly_set_term_fmpz_fmpz(poly, c, newexp, ctx);
-
-    for (i = 0; i < nvars; i++)
-        fmpz_clear(newexp + i);
-
-    TMP_END;
-}
-
-void fmpz_mpoly_set_term_ui_ui(fmpz_mpoly_t poly,
-                 const ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_t newc;
-
-    fmpz_init(newc);
-    fmpz_set_ui(newc, c);
-    fmpz_mpoly_set_term_fmpz_ui(poly, newc, exp, ctx);
-    fmpz_clear(newc);
-}
-
-void fmpz_mpoly_set_term_si_ui(fmpz_mpoly_t poly,
-                 const slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_t newc;
-
-    fmpz_init(newc);
-    fmpz_set_si(newc, c);
-    fmpz_mpoly_set_term_fmpz_ui(poly, newc, exp, ctx);
-    fmpz_clear(newc);
-}
-

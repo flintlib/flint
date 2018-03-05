@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -15,7 +15,6 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "longlong.h"
-#include "assert.h"
 
 
 slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
@@ -340,9 +339,9 @@ cleanup2:
     return q_len;
 
 exp_overflow:
-    for (i = 0; i <= q_len; i++)
+    for (i = 0; i < q_len; i++)
         _fmpz_demote(q_coeff + i);
-    for (i = 0; i <= r_len; i++)
+    for (i = 0; i < r_len; i++)
         _fmpz_demote(r_coeff + i);
     q_len = 0;
     r_len = 0;
@@ -713,9 +712,9 @@ cleanup2:
     return q_len;
 
 exp_overflow:
-    for (i = 0; i <= q_len; i++)
+    for (i = 0; i < q_len; i++)
         _fmpz_demote(q_coeff + i);
-    for (i = 0; i <= r_len; i++)
+    for (i = 0; i < r_len; i++)
         _fmpz_demote(r_coeff + i);
     q_len = 0;
     r_len = 0;

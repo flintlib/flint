@@ -27,6 +27,6 @@ void nmod_mpoly_randtest(nmod_mpoly_t poly, flint_rand_t state,
         for (j = 0; j < nvars; j++)
             exp[j] = n_randint(state, exp_bound);
 
-        nmod_mpoly_set_term_ui(poly, exp, n_randtest(state), ctx);
+        nmod_mpoly_set_term_ui_ui(poly, n_randtest(state), exp, ctx);
     }
 }

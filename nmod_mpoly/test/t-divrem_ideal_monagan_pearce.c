@@ -107,9 +107,7 @@ main(void)
         nmod_mpoly_struct * g, * q;
         ordering_t ord;
         mp_limb_t modulus;
-        slong maxbits;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
-        slong exp_bits, exp_bits1, exp_bits2;
         nmod_mpoly_struct * qarr[5], * darr[5];
 
         num = n_randint(state, 5) + 1;
@@ -144,14 +142,9 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        maxbits = 14/(nvars + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1;
-        exp_bits = n_randint(state, maxbits) + 1;
-        exp_bits1 = n_randint(state, maxbits) + 1;
-        exp_bits2 = n_randint(state, maxbits) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bound = n_randint(state, 10/nvars + 1) + 2;
+        exp_bound1 = n_randint(state, 25/nvars + 1) + 2;
+        exp_bound2 = n_randint(state, 20/nvars + 1) + 1;
 
         for (j = 0; j < 4; j++)
         {
@@ -214,9 +207,7 @@ main(void)
         nmod_mpoly_struct * g, * q;
         ordering_t ord;
         mp_limb_t modulus;
-        slong maxbits;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
-        slong exp_bits, exp_bits1, exp_bits2;
         nmod_mpoly_struct * qarr[5], * darr[5];
 
         num = n_randint(state, 5) + 1;
@@ -251,14 +242,9 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        maxbits = 14/(nvars + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1;
-        exp_bits = n_randint(state, maxbits) + 1;
-        exp_bits1 = n_randint(state, maxbits) + 1;
-        exp_bits2 = n_randint(state, maxbits) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bound = n_randint(state, 10/nvars + 1) + 2;
+        exp_bound1 = n_randint(state, 25/nvars + 1) + 2;
+        exp_bound2 = n_randint(state, 20/nvars + 1) + 1;
 
         for (j = 0; j < 4; j++)
         {
