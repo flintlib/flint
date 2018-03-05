@@ -13,18 +13,6 @@
 /* Define if you have <alloca.h> and it should be used (not on Ultrix). */
 #cmakedefine HAVE_ALLOCA_H
 
-/* Define if the compiler accepts gcc style __attribute__ ((const)) */
-#cmakedefine HAVE_ATTRIBUTE_CONST
-
-/* Define if the compiler accepts gcc style __attribute__ ((malloc)) */
-#cmakedefine HAVE_ATTRIBUTE_MALLOC
-
-/* Define if the compiler accepts gcc style __attribute__ ((mode (XX))) */
-#cmakedefine HAVE_ATTRIBUTE_MODE
-
-/* Define if the compiler accepts gcc style __attribute__ ((noreturn)) */
-#cmakedefine HAVE_ATTRIBUTE_NORETURN
-
 /* Define if tests/libtests has calling conventions checking for the CPU */
 #cmakedefine HAVE_CALLING_CONVENTIONS
 
@@ -287,6 +275,13 @@
 
 #cmakedefine HAVE_PTHREAD 1
 
+/* Define  if compiler supports __attribute__((x)) */
+#cmakedefine HAVE_ATTRIBUTE
+
+/* Define  if compiler supports __declspec((x)) */
+#cmakedefine HAVE_DECLSPEC
+
+
 /* Define as `__inline' if that's what the C compiler calls it, or to nothing
    if it is not supported. */
 #ifndef __cplusplus
@@ -323,4 +318,15 @@
 #define FLINT_DLL __declspec(dllimport)
 #else
 #define FLINT_DLL
+#endif
+
+#if defined(HAVE_ATTRIBUTE)
+#define FLINT_NORETURN __attribute__ ((noreturn))
+#define FLINT_CLOSURE_NORETURN __attribute__ ((noreturn))
+#elif defined(HAVE_DECLSPEC)
+#define FLINT_NORETURN __declspec(noreturn)
+#define FLINT_CLOSURE_NORETURN
+#else
+#define FLINT_NORETURN 
+#define FLINT_CLOSURE_NORETURN 
 #endif
