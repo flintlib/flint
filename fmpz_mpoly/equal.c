@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -41,7 +42,7 @@ int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
    return 1;
 }
 
-int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+int fmpz_mpoly_equal(const fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
    ulong * ptr1 = poly1->exps, * ptr2 = poly2->exps;

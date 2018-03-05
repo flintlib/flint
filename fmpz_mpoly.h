@@ -198,8 +198,6 @@ FMPZ_MPOLY_INLINE
 void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
                                         slong bits, const fmpz_mpoly_ctx_t ctx)
 {
-   FLINT_ASSERT(bits <= FLINT_BITS);
-
    if (poly->bits < bits)
    {
       if (poly->alloc != 0)
@@ -405,7 +403,7 @@ FLINT_DLL void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 FLINT_DLL int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
                     const fmpz * poly2, const ulong * exps2, slong n, slong N);
 
-FLINT_DLL int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+FLINT_DLL int fmpz_mpoly_equal(const fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 /* Reverse *******************************************************************/
@@ -590,6 +588,10 @@ FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 /* Evaluation ****************************************************************/
 
 void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
@@ -662,8 +664,8 @@ FLINT_DLL void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
 FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t poly1,
                          const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
-                               fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                         const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_gcd_is_unit(const fmpz_mpoly_t a, const fmpz_mpoly_t b,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -688,6 +690,13 @@ FLINT_DLL void
 fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
     const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3, slong len,
                                                    const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void
+fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
+                                 fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
+                const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3,
+                                        slong len, const fmpz_mpoly_ctx_t ctx);
+
 
 /* Input/output **************************************************************/
 

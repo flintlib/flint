@@ -269,8 +269,6 @@ void nmod_mpoly_fit_bits(nmod_mpoly_t poly,
    slong N;
    ulong * t;
 
-   FLINT_ASSERT(bits <= FLINT_BITS);
-
    if (poly->bits < bits)
    {
       if (poly->alloc != 0)
@@ -393,12 +391,6 @@ FLINT_DLL void nmod_mpoly_get_monomial(ulong * exps, const nmod_mpoly_t poly,
 FLINT_DLL void nmod_mpoly_set_monomial(nmod_mpoly_t poly, 
                       slong n, const ulong * exps, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_set_term_ui(nmod_mpoly_t poly,
-                       ulong const * exp, ulong c, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_get_term_ui(nmod_t c, const nmod_mpoly_t poly,
-                                ulong const * exp, const nmod_mpoly_ctx_t ctx);
-
 /* Set and negate ************************************************************/
 
 FLINT_DLL void nmod_mpoly_set(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
@@ -409,7 +401,7 @@ FLINT_DLL void nmod_mpoly_neg(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 
 /* Comparison ****************************************************************/
 
-FLINT_DLL int nmod_mpoly_equal(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+FLINT_DLL int nmod_mpoly_equal(const nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                                    const nmod_mpoly_ctx_t ctx);
 
 /* Basic arithmetic **********************************************************/

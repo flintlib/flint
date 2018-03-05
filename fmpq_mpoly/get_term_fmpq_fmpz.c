@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,21 +9,24 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fmpq_mpoly.h"
 
-ulong _nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
-                                  const fmpz * exp, const nmod_mpoly_ctx_t ctx)
+void _fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t qpoly,
+                                  const fmpz * exp, const fmpq_mpoly_ctx_t qctx)
 {
     slong N, index, exp_bits;
     ulong * cmpmask, * packed_exp;
     int exists;
+    const fmpz_mpoly_struct * poly = qpoly->zpoly;
+    const fmpz_mpoly_ctx_struct * ctx = qctx->zctx;
     TMP_INIT;
 
     exp_bits = mpoly_exp_bits_required_fmpz(exp, ctx->minfo);
 
     if (exp_bits > poly->bits) /* exponent too large to be poly exponent */
     {
-        return UWORD(0);
+        fmpq_zero(c);
+        return;
     }
 
     TMP_START;
@@ -38,19 +41,22 @@ ulong _nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
 
     exists = mpoly_monomial_exists(&index, poly->exps,
                                   packed_exp, poly->length, N, cmpmask);
-    TMP_END;
 
     if (!exists)
-        return UWORD(0);
-    else
-        return poly->coeffs[index];
+    {
+        fmpq_zero(c);
+    } else
+    {
+        fmpq_mul_fmpz(c, qpoly->content, poly->coeffs + index);
+    }
+
+    TMP_END; 
 }
 
-ulong nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
-                                 const fmpz ** exp, const nmod_mpoly_ctx_t ctx)
+void fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
+                                 const fmpz ** exp, const fmpq_mpoly_ctx_t ctx)
 {
-    ulong ret;
-    slong i, nvars = ctx->minfo->nvars;
+    slong i, nvars = ctx->zctx->minfo->nvars;
     fmpz * newexp;
     TMP_INIT;
 
@@ -62,36 +68,10 @@ ulong nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
         fmpz_set(newexp + i, exp[i]);
     }
 
-    ret = _nmod_mpoly_get_term_ui_fmpz(poly, newexp, ctx);
+    _fmpq_mpoly_get_term_fmpq_fmpz(c, poly, newexp, ctx);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(newexp + i);
 
     TMP_END;
-
-    return ret;
-}
-
-
-ulong nmod_mpoly_get_term_ui_ui(const nmod_mpoly_t poly,
-                                 const ulong * exp, const nmod_mpoly_ctx_t ctx)
-{
-    ulong ret;
-    slong i, nvars = ctx->minfo->nvars;
-    fmpz * newexp;
-    TMP_INIT;
-
-    TMP_START;
-    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
-    for (i = 0; i < nvars; i++)
-        fmpz_init_set_ui(newexp + i, exp[i]);
-
-    ret = _nmod_mpoly_get_term_ui_fmpz(poly, newexp, ctx);
-
-    for (i = 0; i < nvars; i++)
-        fmpz_clear(newexp + i);
-
-    TMP_END;
-
-    return ret;
 }
