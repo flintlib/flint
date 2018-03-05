@@ -334,7 +334,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
   fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
      const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
                      ulong * const * exp3, slong len, slong N, slong bits, 
-                        const fmpz_mpoly_ctx_t ctx, ulong maskhi, ulong masklo)
+                        const fmpz_mpoly_ctx_t ctx, const ulong * cmpmask)
 {
     slong i, j, p, l, w;
     slong next_loc;
@@ -363,7 +363,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
 
     if (N == 1)
         return _fmpz_mpoly_divrem_ideal_monagan_pearce1(polyq, polyr, expr,
-               allocr, poly2, exp2, len2, poly3, exp3, len, bits, ctx, maskhi);
+           allocr, poly2, exp2, len2, poly3, exp3, len, bits, ctx, cmpmask[0]);
 
     TMP_START;
 
@@ -448,7 +448,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
         while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N))
         {
             exp_list[--exp_next] = heap[1].exp;
-            x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
             do
             {
                 *store++ = x->i;
@@ -491,7 +491,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                              &next_loc, &heap_len, N, maskhi, masklo))
+                                              &next_loc, &heap_len, N, cmpmask))
                        exp_next--;
                 }
             } else
@@ -510,7 +510,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                     mpoly_monomial_add(exp_list[exp_next], exp3[x->p] + x->i*N,
                                                    polyq[x->p]->exps + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
 
@@ -531,7 +531,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                     mpoly_monomial_add(exp_list[exp_next], exp3[x->p] + x->i*N,
                                                    polyq[x->p]->exps + x->j*N, N);
                     if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                         exp_next--;
                 }
             }
@@ -613,7 +613,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                             mpoly_monomial_add(exp_list[exp_next], exp3[w] + i*N, 
                                                    polyq[w]->exps + k[w]*N, N);
                             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, maskhi, masklo))
+                                      &next_loc, &heap_len, N, cmpmask))
                                 exp_next--;
                         }
                         s[w] = 1;
@@ -675,7 +675,7 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
 {
    slong i, exp_bits, N, lenr = 0;
    slong len3 = 0;
-   ulong maskhi, masklo;
+   ulong * cmpmask;
    ulong * exp2;
    ulong ** exp3;
    int free2 = 0;
@@ -706,6 +706,7 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
       return;
    }
 
+
    TMP_START;
 
    free3 = (int *) TMP_ALLOC(len*sizeof(int));
@@ -717,8 +718,12 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
    for (i = 0; i < len; i++)
       exp_bits = FLINT_MAX(exp_bits, poly3[i]->bits);
 
-   masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-   N = words_per_exp(ctx->n, exp_bits);
+    if (exp_bits > FLINT_BITS)
+        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_divrem_ideal_monagan_pearce");
+
+    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
    /* ensure input exponents packed to same size as output exponents */
    exp2 = poly2->exps;
@@ -727,8 +732,8 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
    {
       free2 = 1;
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-      mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
-                                                        poly2->length, ctx->n);
+      mpoly_repack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                    poly2->length, ctx->minfo);
    }
 
    for (i = 0; i < len; i++)
@@ -739,8 +744,8 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
       {
          free3[i] = 1;
          exp3[i] = (ulong *) flint_malloc(N*poly3[i]->length*sizeof(ulong));
-         mpoly_unpack_monomials(exp3[i], exp_bits, poly3[i]->exps,
-                                     poly3[i]->bits, poly3[i]->length, ctx->n);
+         mpoly_repack_monomials(exp3[i], exp_bits, poly3[i]->exps,
+                                 poly3[i]->bits, poly3[i]->length, ctx->minfo);
       }
       fmpz_mpoly_fit_length(q[i], 1, ctx);
       fmpz_mpoly_fit_bits(q[i], exp_bits, ctx);
@@ -750,7 +755,7 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
    /* check leading mon. of at least one divisor is at most that of dividend */
    for (i = 0; i < len; i++)
    {
-      if (!mpoly_monomial_lt(exp3[i], exp2, N, maskhi, masklo))
+      if (!mpoly_monomial_lt(exp3[i], exp2, N, cmpmask))
          break;
    }
 
@@ -783,25 +788,27 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
    /* do division with remainder */
    while (exp_bits <= FLINT_BITS)
    {
+      slong old_exp_bits = exp_bits;
       ulong * old_exp2 = exp2, * old_exp3;
 
       lenr = _fmpz_mpoly_divrem_ideal_monagan_pearce(q, &tr->coeffs, &tr->exps,
                          &tr->alloc, poly2->coeffs, exp2, poly2->length,
-                           poly3, exp3, len, N, exp_bits, ctx, maskhi, masklo);
+                           poly3, exp3, len, N, exp_bits, ctx, cmpmask);
 
       if (lenr >= 0) /* check if division was successful */
          break;
 
-      exp_bits = mpoly_optimize_bits(exp_bits + 1, ctx->n);
-      masks_from_bits_ord(maskhi, masklo, exp_bits, ctx->ord);
-      N = words_per_exp(ctx->n, exp_bits);
+      exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
+      N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+      cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+      mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
       if (exp_bits > FLINT_BITS)
          break;
 
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-      mpoly_unpack_monomials(exp2, exp_bits, old_exp2, exp_bits/2,
-                                                        poly2->length, ctx->n);
+      mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
+                                                    poly2->length, ctx->minfo);
 
       if (free2)
          flint_free(old_exp2);
@@ -816,8 +823,8 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
          old_exp3 = exp3[i];
 
          exp3[i] = (ulong *) flint_malloc(N*poly3[i]->length*sizeof(ulong));
-         mpoly_unpack_monomials(exp3[i], exp_bits, old_exp3, exp_bits/2,
-                                                     poly3[i]->length, ctx->n);
+         mpoly_repack_monomials(exp3[i], exp_bits, old_exp3, old_exp_bits,
+                                                 poly3[i]->length, ctx->minfo);
    
          if (free3[i])
             flint_free(old_exp3);

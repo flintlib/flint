@@ -69,9 +69,9 @@ void _mpoly_rbnode_clear_evalall_tree_fmpz(mpoly_rbtree_t tree,
 void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
                                              fmpz ** val, fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev, new;
-    slong i, j, k, N, nvars, bits;
-    slong main_exp, main_var, main_shift, main_off, shift, off, fpw;
+    int new;
+    slong i, j, k, N, bits, nvars = ctx->minfo->nvars;
+    slong main_exp, main_var, main_shift, main_off, shift, off;
     ulong mask;
     slong entries, k_len;
     slong p_len;
@@ -99,12 +99,8 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
 
     TMP_START;
 
-    N = words_per_exp(ctx->n, bits);
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
-
     degrees = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    fmpz_mpoly_degrees(degrees, poly, ctx);
+    fmpz_mpoly_degrees_si(degrees, poly, ctx);
 
     /* pick main variable with highest degree */
     main_var = 0;
@@ -113,8 +109,6 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
         if (degrees[i] > degrees[main_var])
             main_var = i;
     }
-
-    fpw = FLINT_BITS/bits;
 
     /* compute how many masks are needed */
     entries = 0;
@@ -128,6 +122,8 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
     masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
     powers = (fmpz *) TMP_ALLOC(entries*sizeof(fmpz));
 
+    N = mpoly_words_per_exp(bits, ctx->minfo);
+
     /* store bit masks for each power of two of the non-main variables */
     k = 0;
     for (i = 0; i < nvars; i++)
@@ -135,7 +131,7 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
         if (i == main_var)
             continue;
 
-        mpoly_off_shift(&off, &shift, i, deg, rev, fpw, ctx->n, bits);
+        mpoly_gen_offset_shift(&off, &shift, i, N, bits, ctx->minfo);
         for (j = 1; j <= degrees[i]; j *= 2)
         {
             offs[k] = off;
@@ -152,10 +148,10 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
     assert(k_len == entries);
 
     /* accumulate coefficients of the main variable */
-    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    mpoly_off_shift(&main_off, &main_shift, main_var, deg, rev, fpw, ctx->n, bits);
+    mpoly_gen_offset_shift(&main_off, &main_shift, main_var, N, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     fmpz_init(t);
+    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     for (i = 0; i < p_len; i++)
     {
         main_exp = (p_exp[N*i + main_off] >> main_shift) & mask;

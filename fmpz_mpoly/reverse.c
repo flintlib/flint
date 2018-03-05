@@ -72,7 +72,7 @@ void _fmpz_mpoly_reverse(fmpz * poly1, ulong * exp1, const fmpz * poly2,
 void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
                                 fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
-   slong N = words_per_exp(ctx->n, poly2->bits);
+   slong N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
 
    if (poly1 != poly2)
    {

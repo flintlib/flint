@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,10 +10,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void _fmpz_mpoly_set(fmpz * poly1, ulong * exps1,
@@ -37,7 +34,7 @@ void fmpz_mpoly_set(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
    slong N;
-   N = words_per_exp(ctx->n, poly2->bits);
+   N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
 
    fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
    fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);

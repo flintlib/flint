@@ -209,8 +209,6 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
-   /* exponents take up this many bits */
-   slong shift = bits*(FLINT_BITS/bits - num);
    TMP_INIT;
 
    TMP_START;
@@ -242,7 +240,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          /* shift exponent vector into place */
-         e1[k] = exp << shift;
+         e1[k] = exp;
 
          /* set coefficient */
          fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
@@ -278,8 +276,6 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
-   /* exponents take up this many bits */
-   slong shift = bits*(FLINT_BITS/bits - num);
    TMP_INIT;
 
    TMP_START;
@@ -311,7 +307,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          /* shift exponent vector into place */
-         e1[k] = exp << shift;
+         e1[k] = exp;
 
          /* set coefficient */
          fmpz_set_signed_uiui(p1 + k, c[1], c[0]);
@@ -347,8 +343,6 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
-   /* exponents take up this many bits */
-   slong shift = bits*(FLINT_BITS/bits - num);
    TMP_INIT;
 
    TMP_START;
@@ -380,7 +374,7 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          /* shift exponent vector into place */
-         e1[k] = exp << shift;
+         e1[k] = exp;
          
          /* set coefficient */
          fmpz_set_si(p1 + k, c[0]);
@@ -417,8 +411,6 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    slong * prods;
    fmpz * p1 = *poly1;
    ulong * e1 = *exp1;
-   /* exponents take up this many bits */
-   slong shift = bits*(FLINT_BITS/bits - num);
    TMP_INIT;
 
    TMP_START;
@@ -450,7 +442,7 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          /* shift exponent vector into place */
-         e1[k] = exp << shift;
+         e1[k] = exp;
          
          /* set coefficient */
          fmpz_set(p1 + k, poly2 + i);
@@ -547,7 +539,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
                                           slong * mults, slong num, slong bits)
 {
    slong i, j, k = 0, len, l1, l2, l3, prod, bits1, bits2 = 0, bits3 = 0;
-   slong shift = bits*(FLINT_BITS/bits - 1);
+   slong shift = bits*(num);
    slong * i2, * i3, * n2, * n3, * b2, * maxb2, * b3, * maxb3;
    ulong * e2, * e3, * p1;
    int small;
@@ -586,8 +578,8 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 1, bits);
-   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 1, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, bits);
 
    /* work out max bits for each chunk and optimal bits */
 
@@ -663,7 +655,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
             /* insert main variable into exponents */
             for (j = 0; j < len; j++)
-               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + ((l1 - i - 1) << shift);
+               (*exp1)[k + j] += ((l1 - i - 1) << shift);
 
             k += len;
          } else if (bits1 <= 2*FLINT_BITS) /* output coeffs fit in two words */        
@@ -689,7 +681,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
             /* insert main variable into exponents */
             for (j = 0; j < len; j++)
-               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + ((l1 - i - 1) << shift);
+               (*exp1)[k + j] += ((l1 - i - 1) << shift);
 
             k += len;
          } else /* output coeffs fit in three words */
@@ -715,7 +707,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
             /* insert main variable into exponents */
             for (j = 0; j < len; j++)
-               (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + ((l1 - i - 1) << shift);
+               (*exp1)[k + j] += ((l1 - i - 1) << shift);
 
             k += len;
          }
@@ -748,7 +740,7 @@ slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
 
           /* insert main variable into exponents */
           for (j = 0; j < len; j++)
-             (*exp1)[k + j] = ((*exp1)[k + j] >> bits) + ((l1 - i - 1) << shift);
+             (*exp1)[k + j] += ((l1 - i - 1) << shift);
 
           for (j = 0; j < prod; j++)
              _fmpz_demote(p1 + j);
@@ -801,8 +793,8 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
    e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
 
-   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, 0, bits);
-   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, 0, bits);
+   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, bits);
+   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, bits);
 
    /* compute bound on output bits and whether they are "small" */
    bits2 = _fmpz_vec_max_bits(poly2, len2);
@@ -917,9 +909,7 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
    slong i, bits, exp_bits, N, len = 0, array_size;
-   ulong * max_degs2;
-   ulong * max_degs3;
-   ulong max2 = 0, max3 = 0, max;
+   ulong max, max2, max3, * max_fields2, * max_fields3;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    int free2 = 0, free3 = 0;
    int res = 1;
@@ -936,43 +926,39 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    TMP_START;
 
-   /* compute maximum exponents for each variable */
-   max_degs2 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
-   max_degs3 = (ulong *) TMP_ALLOC(ctx->n*sizeof(ulong));
+    /* compute maximum exponents for each variable */
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+                                                      poly2->bits, ctx->minfo);
+    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
+                                                      poly3->bits, ctx->minfo);
+    max2 = max3 = 0;
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        if (max_fields2[i] > max2)
+            max2 = max_fields2[i];
 
-   mpoly_max_degrees(max_degs2, poly2->exps, poly2->length, poly2->bits, ctx->n);
-   mpoly_max_degrees(max_degs3, poly3->exps, poly3->length, poly3->bits, ctx->n);
-
-   for (i = 0; i < ctx->n; i++)
-   {
-      if (max_degs2[i] > max2)
-         max2 = max_degs2[i];
-
-      if (max_degs3[i] > max3)
-         max3 = max_degs3[i];
-   }
+        if (max_fields3[i] > max3)
+            max3 = max_fields3[i];
+    }
 
    /* check that exponents won't overflow a word */
    max = max2 + max3;
    if (max < max2 || 0 > (slong) max)
       flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_array");
 
-   /* compute number of bits required for output exponents */
-   bits = FLINT_BIT_COUNT(max);
-   
-   exp_bits = 8;
-   while (bits >= exp_bits)
-      exp_bits += 1;
+    /* compute number of bits required for output exponents */
+    bits = FLINT_BIT_COUNT(max);
+    exp_bits = FLINT_MAX(WORD(8), bits + 1);
+    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
+    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
 
-   exp_bits = FLINT_MAX(exp_bits, poly2->bits);
-   exp_bits = FLINT_MAX(exp_bits, poly3->bits);
-
-   /* number of words for exponents */
-   N = words_per_exp(ctx->n, exp_bits);
+   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
 
    /* array multiplication expects each exponent vector in one word */
    /* current code is wrong for reversed orderings */
-   if (N != 1 || mpoly_ordering_isrev(ctx->ord))
+   if (N != 1 || mpoly_ordering_isrev(ctx->minfo))
    {
       res = 0;
       goto cleanup;
@@ -980,12 +966,12 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
    /* compute bounds on output exps, used as mixed bases for packing exps */
    array_size = 1;
-   for (i = 0; i < ctx->n - 1; i++)
+   for (i = 0; i < ctx->minfo->nfields - 1; i++)
    {
-      max_degs2[i] += max_degs3[i] + 1;
-      array_size *= max_degs2[i];  
+      max_fields2[i] += max_fields3[i] + 1;
+      array_size *= max_fields2[i];
    }
-   max_degs2[ctx->n - 1] += max_degs3[ctx->n - 1] + 1;
+   max_fields2[ctx->minfo->nfields - 1] += max_fields3[ctx->minfo->nfields - 1] + 1;
 
    /* if exponents too large for array multiplication, exit silently */
    if (array_size > MAX_ARRAY_SIZE)
@@ -999,16 +985,16 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    {
       free2 = 1;
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-      mpoly_unpack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
-                                                        poly2->length, ctx->n);
+      mpoly_repack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
+                                                    poly2->length, ctx->minfo);
    }
 
    if (exp_bits > poly3->bits)
    {
       free3 = 1;
       exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-      mpoly_unpack_monomials(exp3, exp_bits, poly3->exps, poly3->bits,
-                                                        poly3->length, ctx->n);
+      mpoly_repack_monomials(exp3, exp_bits, poly3->exps, poly3->bits,
+                                                    poly3->length, ctx->minfo);
    }
 
    /* handle aliasing and do array multiplication */
@@ -1024,12 +1010,12 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          len = _fmpz_mpoly_mul_array(&temp->coeffs, &temp->exps, &temp->alloc, 
                                            poly3->coeffs, exp3, poly3->length,
                                            poly2->coeffs, exp2, poly2->length,
-                                        (slong *) max_degs2, ctx->n, exp_bits);
+                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
       else
          len = _fmpz_mpoly_mul_array(&temp->coeffs, &temp->exps, &temp->alloc, 
                                            poly2->coeffs, exp2, poly2->length,
                                            poly3->coeffs, exp3, poly3->length,
-                                        (slong *) max_degs2, ctx->n, exp_bits);
+                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
 
       fmpz_mpoly_swap(temp, poly1, ctx);
 
@@ -1044,12 +1030,12 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
          len = _fmpz_mpoly_mul_array(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                             poly3->coeffs, exp3, poly3->length,
                                             poly2->coeffs, exp2, poly2->length,
-                                        (slong *) max_degs2, ctx->n, exp_bits);
+                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
       else
          len = _fmpz_mpoly_mul_array(&poly1->coeffs, &poly1->exps, &poly1->alloc,
                                             poly2->coeffs, exp2, poly2->length, 
                                             poly3->coeffs, exp3, poly3->length,
-                                        (slong *) max_degs2, ctx->n, exp_bits);
+                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
    }
 
    _fmpz_mpoly_set_length(poly1, len, ctx);

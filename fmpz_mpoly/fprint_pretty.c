@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,22 +12,17 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 int
 _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                         const ulong * exps, slong len, const char ** x_in,
-                                slong bits, slong n, int deg, int rev, slong N)
+                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
-   slong i, j, nvars;
-   ulong * degs;
+   slong i, j, N;
+   fmpz * exponents;
    int r, first;
    char ** x = (char **) x_in;
-
    TMP_INIT;
 
    if (len == 0)
@@ -36,23 +32,25 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
         return r;
    }
 
-   TMP_START;
+    N = mpoly_words_per_exp(bits, mctx);
 
-   nvars = n - deg;
+   TMP_START;
 
    if (x == NULL)
    {
-      x = (char **) TMP_ALLOC(nvars*sizeof(char *));
+      x = (char **) TMP_ALLOC(mctx->nvars*sizeof(char *));
 
-      for (i = 0; i < nvars; i++)
+      for (i = 0; i < mctx->nvars; i++)
       {
          x[i] = (char *) TMP_ALLOC(22*sizeof(char));
          flint_sprintf(x[i], "x%wd", i + 1);
       }
    }
 
-   degs = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-   
+    exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_init(exponents + i);
+
    r = 1;
    for (i = 0; r > 0 && i < len; i++)
    {
@@ -70,13 +68,14 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
          r = fmpz_fprint(file, poly + i);
 
       if (r > 0)
-         mpoly_get_monomial(degs, exps + i*N, bits, n, deg, rev);
+         mpoly_get_monomial_fmpz(exponents, exps + N*i, bits, mctx);
 
       first = 1;
 
-      for (j = 0; r > 0 && j < nvars; j++)
+      for (j = 0; r > 0 && j < mctx->nvars; j++)
       {
-         if (degs[j] > 1)
+            int cmp = fmpz_cmp_ui(exponents + j, WORD(1));
+         if (cmp > 0)
          {
             if (!first || (poly[i] != WORD(1) && poly[i] != WORD(-1)))
             {
@@ -84,10 +83,13 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
                r = (r != EOF) ? 1 : EOF;
             }
             if (r > 0)
-               r = flint_fprintf(file, "%s^%wd", x[j], degs[j]);
+               r = flint_fprintf(file, "%s^", x[j]);
+            if (r > 0)
+                r = fmpz_fprint(file, exponents + j);
+
             first = 0;
          }
-         if (degs[j] == 1)
+         else if (cmp == 0)
          {
             if (!first || (poly[i] != WORD(1) && poly[i] != WORD(-1)))
             {
@@ -100,13 +102,16 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
          }
       }
 
-      if (r > 0 && mpoly_monomial_is_zero(exps + i*N, N) &&
+      if (r > 0 && mpoly_monomial_is_zero(exps + N*i, N) &&
                   (poly[i] == WORD(1) || poly[i] == WORD(-1)))
       {
          r = flint_fprintf(file, "1");
       } 
    }     
-   
+
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_clear(exponents + i);
+
    TMP_END;
 
    return r;
@@ -116,14 +121,6 @@ int
 fmpz_mpoly_fprint_pretty(FILE * file, const fmpz_mpoly_t poly,
                                    const char ** x, const fmpz_mpoly_ctx_t ctx)
 {
-   int deg, rev;
-
-   slong N = words_per_exp(ctx->n, poly->bits);
-
-   degrev_from_ord(deg, rev, ctx->ord);
-
    return _fmpz_mpoly_fprint_pretty(file, poly->coeffs, poly->exps,
-                             poly->length, x, poly->bits, ctx->n, deg, rev, N);
-
-   return 0; 
+                                      poly->length, x, poly->bits, ctx->minfo);
 }

@@ -18,7 +18,7 @@
 void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
    /* default to at least 8 bits per exponent */
-   slong bits = mpoly_optimize_bits(8, ctx->n);
+   slong bits = mpoly_fix_bits(WORD(8), ctx->minfo);
 
    poly->coeffs = NULL;
    poly->exps = NULL;
@@ -31,8 +31,8 @@ void fmpz_mpoly_init2(fmpz_mpoly_t poly,
                                        slong alloc, const fmpz_mpoly_ctx_t ctx)
 {
    /* default to at least 8 bits per exponent */
-   slong bits = mpoly_optimize_bits(8, ctx->n);
-   slong N = words_per_exp(ctx->n, bits);
+   slong bits = mpoly_fix_bits(WORD(8), ctx->minfo);
+   slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
    if (alloc != 0)
    {

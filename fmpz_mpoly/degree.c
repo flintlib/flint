@@ -9,37 +9,73 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "assert.h"
 
-
-void fmpz_mpoly_degrees(slong * degs, const fmpz_mpoly_t poly,
+void fmpz_mpoly_degrees_si(slong * degs, const fmpz_mpoly_t poly,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev;
-    degrev_from_ord(deg, rev, ctx->ord);
-    mpoly_degrees(degs, poly->exps, poly->length, poly->bits, ctx->n, deg, rev);
+    mpoly_degrees_si(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
 }
 
-slong fmpz_mpoly_degree(const fmpz_mpoly_t poly, slong var,
+slong fmpz_mpoly_degree_si(const fmpz_mpoly_t poly, slong var,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    slong * degs, nvars, ret;
-    int deg, rev;
+    slong * degs, ret;
     TMP_INIT;
 
     TMP_START;
-    degrev_from_ord(deg, rev, ctx->ord);
-    nvars = ctx->n - deg;
-    degs = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    fmpz_mpoly_degrees(degs, poly, ctx);
+    degs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
+    mpoly_degrees_si(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
     ret = degs[var];
 
     TMP_END;
     return ret;
+}
+
+void fmpz_mpoly_degrees_fmpz(fmpz ** degs, const fmpz_mpoly_t poly,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+    fmpz * new_degs;
+    TMP_INIT;
+
+    TMP_START;
+    new_degs = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nvars; i++)
+        fmpz_init(new_degs + i);
+
+    mpoly_degrees_fmpz(new_degs, poly->exps, poly->length, poly->bits, ctx->minfo);
+
+    for (i = 0; i < ctx->minfo->nvars; i++)
+    {
+        fmpz_swap(new_degs + i, degs[i]);
+        fmpz_clear(new_degs + i);
+    }
+
+    TMP_END;
+}
+
+void fmpz_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t poly, slong var,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+    fmpz * new_degs;
+    TMP_INIT;
+
+    TMP_START;
+    new_degs = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nvars; i++)
+        fmpz_init(new_degs + i);
+
+    mpoly_degrees_fmpz(new_degs, poly->exps, poly->length, poly->bits, ctx->minfo);
+
+    for (i = 0; i < ctx->minfo->nvars; i++)
+    {
+        if (i == var)
+            fmpz_swap(new_degs + i, deg);
+        fmpz_clear(new_degs + i);
+    }
+
+    TMP_END;
 }
 

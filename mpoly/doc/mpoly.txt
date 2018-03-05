@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2017 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,16 +10,87 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+The mpoly module implments the low level packing and unpacking of exponents
+for multivariate polynomials. If the variables in the polynomial are, say,
+x, y and z with x > y > z in the monimial ordering, then the monomial
+x^a*y^b*z^c is represented as the array {a, b, c} from the user's perspective.
+
+
+Polynomial exponents are stoed in packed format. This means that monomials are
+actually stored as an array of integer 'fields' that may be packed within
+a machine word or across multiple machine words if needed.
+This facilitates basic
+operations on the monomials, and we make the following assumptions about
+the correspondence between the variables' exponents and the
+fields in the packing:
+
+    1. The monomial ordering is a total ordering, i.e. 1 is the smallest.
+    2. Multiplication of monomials corresponds to field-wise addition.
+    3. Monomials can be compared by compairing their packed representation
+        possibly with an xor mask on certain fields.
+    4. The exponent of each variable is itself one of the fields.
+    5. The fields are all non-negative.
+
+For the three supported ordering ORD_LEX, ORD_DEGLEX, and ORD_DEGREVLEX, the
+monomial x^a*y^b*z^c is converted into fields in the following ways (the
+least significant field is on the left, the most significant is on the right),
+and the comparison mask is shown below.
+
+    ORD_LEX:         | c | b | a |         ( 3 fields)
+                      000 000 000
+
+    ORD_DEGLEX:      | c | b | a | a+b+c | ( 4 fields)
+                      000 000 000  00000
+
+    ORD_DEGREVLEX:   | a | b | c | a+b+c |  ( 4 fields)
+                      111 111 111 0000000
+
+If one wanted to support, for example, a block ordering which was ORD_DEGLEX
+in {x, y} and then ORD_DEGREVLEX in {z, w}, the monomial x^a*y^b*z^c*w^d
+would need to be stored as
+
+    | a | b | a+b | d | c | c+d |    (6 fields)
+     111 111 00000 000 000 00000
+
+No such interface is currently implmented.
+
+
+There is no limit to the size of the fields. The fields themselves are packed
+to a uniform bit width, usually denoted by 'bits' in the functions. This bit
+count should contain extra sign bit used for overflow detection. Thus, if the
+maximum field is 15, then the fields only fit into a packing with bits >= 5.
+The total number of machine words taken by an exponent packed into fields
+is usually denoted by N in the code.
+
+If bits < FLINT_BITS then precisely a maximum of floor(FLINT_BITS/bits)
+number of fields may be packed into a single word. Within a word, the packing
+is from low to high, and unused fields (as well as unused bits) at the top of
+the word are zero.
+
+
+
 *******************************************************************************
 
     Orderings
 
 *******************************************************************************
 
+void mpoly_ctx_init(mpoly_ctx_t ctx, slong nvars, const ordering_t ord)
+
+    Initialize a context for specified number of variables and ordering.
+
+void mpoly_ctx_clear(mpoly_ctx_t mctx)
+
+    Clean up any spaced used by a context object.
+
 ordering_t mpoly_ordering_randtest(flint_rand_t state)
 
     Return a random ordering. The possibilities are \code{ORD_LEX},
     \code{ORD_DEGLEX} and \code{ORD_DEGREVLEX}.
+
+void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars)
+
+    Initialize a context with a random choice for the ordering.
 
 int mpoly_ordering_isdeg(ordering_t ord)
 
@@ -44,30 +116,44 @@ void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2,
                                                    const ulong * exp3, slong N)
 
     Set \code{(exp_ptr, N)} to the sum of the monomials \code{(exp2, N)} and
-    \code{(exp3, N)}, i.e. \code{exp2 + exp3}.
+    \code{(exp3, N)}, assuming \code{bits <= FLINT_BITS}
 
-void mpoly_monomial_sub_with_borrow(ulong * exp_ptr, const ulong * exp2, 
+void mpoly_monomial_add_mp(ulong * exp_ptr, const ulong * exp2,
                                                    const ulong * exp3, slong N)
-    Set \code{(exp_ptr, N)} to the difference of the monomials \code{(exp2, N)}
-    and \code{(exp3, N)} where \code{exp2} and \code{exp3} are considered as
-    multiprecision integers. This may lead to an invalid monomial
-    \code{exp_ptr} in the presence of borrows, i.e. if some field of
-    \code{exp3} exceeds the corresponding field of \code{exp2}. The most
-    significant word of the multiprecision integers is taken to be the first
-    entry in the array, i.e. the word corresponding to the most significant
-    fields with respect to the monomial ordering.
+
+    Set \code{(exp_ptr, N)} to the sum of the monomials \code{(exp2, N)} and
+    \code{(exp3, N)}.
 
 void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2,
                                                    const ulong * exp3, slong N)
     Set \code{(exp_ptr, N)} to the difference of the monomials \code{(exp2, N)}
-    and \code{(exp3, N)}, i.e. \code{exp2 - exp3}.
+    and \code{(exp3, N)}, assuming \code{bits <= FLINT_BITS}
+
+void mpoly_monomial_sub_mp(ulong * exp_ptr, const ulong * exp2,
+                                                   const ulong * exp3, slong N)
+    Set \code{(exp_ptr, N)} to the difference of the monomials \code{(exp2, N)}
+    and \code{(exp3, N)}.
 
 int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
 
     Return true if any of the fields of the given monomial \code{(exp2, N)} has
     overflowed (or is negative). The \code{mask} is a word with the high bit of
     each field set to 1. In other words, the function returns 1 if any word of
-    \code{exp2} has any of the nonzero bits in \code{mask} set.
+    \code{exp2} has any of the nonzero bits in \code{mask} set. Assumes that
+    \code{bits <= FLINT_BITS}.
+
+int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
+
+    Return true if any of the fields of the given monomial \code{(exp2, N)} has
+    overflowed (or is negative). The \code{mask} is a word with the high bit of
+    each field set to 1. In other words, the function returns 1 if any word of
+    \code{exp2} has any of the nonzero bits in \code{mask} set. Assumes that
+    \code{bits <= FLINT_BITS}.
+
+int mpoly_monomial_overflows_mp(ulong * exp_ptr, slong N, mp_bitcnt_t bits)
+
+    Return true if any of the fields of the given monomial \code{(exp_ptr, N)}
+    has overflowed. Assumes that \code{bits >= FLINT_BITS}.
 
 int mpoly_monomial_overflows1(ulong exp, ulong mask)
 
@@ -100,36 +186,29 @@ int mpoly_monomial_equal(const ulong * exp2, const ulong * exp3, slong N)
 
     Return 1 if the monomials \code{(exp2, N)} and \code{(exp3, N)} are equal.
 
-int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3,
-                                           slong N, ulong maskhi, ulong masklo)
+void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
+                                                       const mpoly_ctx_t mctx)
 
-    Return 1 if \code{(exp2, N)} is less than \code{(exp3, N)}. The integers
-    \code{maskhi} and \code{masklo} are zero unless the ordering is degrevlex.
-    In the case that the ordering is degrevlex, the integer \code{maskhi} is a
-    mask of the bits in the first word of each exponent vector corresponding to
-    the non-degree part of that word of the exponent vector. The integer
-    \code{masklo} will be a mask of all bits of the word.
+    Get the mask \code{(cmpmask, N)} for comparisions.
+    \code{bits} should be set to the number of bits in the exponents
+    to be compared. Any function that compares monomials should use this
+    comparison mask.
+
+int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3,
+                                           slong N, const ulong * cmpmask)
+
+    Return 1 if \code{(exp2, N)} is less than \code{(exp3, N)}.
 
 int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3,
-                                           slong N, ulong maskhi, ulong masklo)
+                                           slong N, const ulong * cmpmask)
 
-    Return 1 if \code{(exp2, N)} is greater than \code{(exp3, N)}. The integers
-    \code{maskhi} and \code{masklo} are zero unless the ordering is degrevlex.
-    In the case that the ordering is degrevlex, the integer \code{maskhi} is a
-    mask of the bits in the first word of each exponent vector corresponding to
-    the non-degree part of that word of the exponent vector. The integer
-    \code{masklo} will be a mask of all bits of the word.
+    Return 1 if \code{(exp2, N)} is greater than \code{(exp3, N)}.
 
 int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
-                                           slong N, ulong maskhi, ulong masklo)
+                                           slong N, const ulong * cmpmask)
 
     Return $1$ if \code{(exp2, N)} is greater than, $0$ if it is equal and
-    $-1$ if it is less than, \code{(exp3, N)}. The integers \code{maskhi} and
-    \code{masklo} are zero unless the ordering is degrevlex. In the case that
-    the ordering is degrevlex, the integer \code{maskhi} is a mask of the bits
-    in the first word of each exponent vector corresponding to the non-degree
-    part of that word of the exponent vector. The integer \code{masklo} will be
-    a mask of all bits of the word.
+    $-1$ if it is less than, \code{(exp3, N)}.
 
 *******************************************************************************
 
@@ -142,7 +221,15 @@ int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2,
 
     Return 1 if the monomial \code{(exp3, N)} divides \code{(exp2, N)}. If so
     set \code{(exp_ptr, N)} to the quotient monomial. The \code{mask} is a word
-    with the high bit of each bit field set to 1.
+    with the high bit of each bit field set to 1. Assumes that
+    \code{bits <= FLINT_BITS}.
+
+int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2,
+                                 const ulong * exp3, slong N, mp_bitcnt_t bits)
+
+    Return 1 if the monomial \code{(exp3, N)} divides \code{(exp2, N)}. If so
+    set \code{(exp_ptr, N)} to the quotient monomial. Assumes that
+    \code{bits >= FLINT_BITS}.
 
 int mpoly_monomial_divides1(ulong * exp_ptr, const ulong exp2,
                                                   const ulong exp3, ulong mask)
@@ -163,24 +250,30 @@ int mpoly_monomial_divides_tight(slong e1, slong e2, slong * prods, slong num)
 
 *******************************************************************************
 
-slong mpoly_exp_bits(const ulong * user_exp, slong nfields, int deg)
+mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
+                                                       const mpoly_ctx_t mctx)
 
     Returns the number of bits required to store \code{user_exp} in packed
     format. The returned number of bits includes space for a zeroed signed bit.
-    A return value of \code{> FLINT_BITS} indicates that it does not fit.
 
-void mpoly_max_degrees(ulong * max_degs, const ulong * poly_exps,
-                                                slong len, slong bits, slong n)
+mp_bitcnt_t mpoly_exp_bits_required_fmpz(const fmpz * user_exp,
+                                                       const mpoly_ctx_t mctx)
 
-    Given an array of exponent vectors \code{poly_exps} of length \code{len},
-    each with $n$ fields each packed into the given number of bits, compute the
-    maximum exponent in each of the $n$ fields. The results are stored in an
-    array \code{max_degs} which should have space for $n$ values, each of which
-    is a \code{ulong}. The first entry of \code{max_degs} will correspond to the
-    fields of least significance in the input exponent vector. Similarly, the
-    last entry of \code{max_degs} will correspond to the field of most
-    significance in the input exponent vector. This reversal of order is
-    compatible with \code{mpoly_pack_monomials_tight}.
+    Returns the number of bits required to store \code{user_exp} in packed
+    format. The returned number of bits includes space for a zeroed signed bit.
+
+void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx)
+
+    Compute the field-wise maximum of packed exponents from \code{poly_exps}
+    of length \code{len} and unpack the result into \code{max_fields}.
+    The maximums are assumed to fit a ulong.
+
+void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx)
+
+    Compute the field-wise maximum of packed exponents from \code{poly_exps}
+    of length \code{len} and unpack the result into \code{max_fields}.
 
 void mpoly_max_degrees_tight(slong * max_exp,
                              ulong * exps, slong len, slong * prods, slong num)
@@ -195,7 +288,7 @@ void mpoly_max_degrees_tight(slong * max_exp,
     representation first in the array.
 
 int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
-             const ulong * exp, slong len, slong N, ulong maskhi, ulong masklo)
+                 const ulong * exp, slong len, slong N, const ulong * cmpmask)
 
     Returns true if the given exponent vector \code{exp} exists in the array of
     exponent vectors \code{(poly_exps, len)}, otherwise, return false. If the
@@ -204,20 +297,12 @@ int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
     could be inserted to preserve the ordering. The index can be in the range
     \code{[0, len]}$.
 
-    The parameter $N$ is the number of words that each (possibly packed)
-    exponent vector takes up. The integers \code{maskhi} and \code{masklo} are
-    zero unless the ordering is degrevlex. In the case that the ordering
-    is degrevlex, the integer \code{maskhi} is a mask of the bits in the first
-    word of each exponent vector corresponding to the non-degree part of that
-    word of the exponent vector. The integer \code{masklo} will be a mask of
-    all bits of the word.
-
 void mpoly_search_monomials(
                 slong ** e_ind, ulong * e, slong * e_score,
                 slong * t1, slong * t2, slong *t3,
                 slong lower, slong upper,
                 const ulong * a, slong a_len, const ulong * b, slong b_len,
-                                          slong N, ulong maskhi, ulong masklo)
+                                                slong N, const ulong * cmpmask)
 
     Given packed exponent vectors \code{a} and \code{b}, compute a packed
     exponent \code{e} such that the number of monomials in the cross product
@@ -236,35 +321,29 @@ void mpoly_search_monomials(
 
 *******************************************************************************
 
-void mpoly_set_monomial(ulong * exp1, const ulong * exp2,
-                                         slong bits, slong n, int deg, int rev)
+void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps,
+                                           slong bits, const mpoly_ctx_t mctx)
 
-    Given an array of possibly packed exponent vectors \code{exp1}, each with
-    $n$ fields (including any degree field) each packed into the given number
-    of bits, set the monomial at index $n$ to the given exponent vector
-    \code{exp2}. The exponent vector \code{exp2} should be unpacked (one word
-    per exponent), should not contain a degree field (this is computed by the
-    function), and should have the entry of the exponent vector corresponding
-    to the most significant variable with respect to the ordering, first in the
-    array \code{exp2}.
+    Convert the packed exponent \code{poly_exps} of bit count \code{bits} to a
+    monomial from the user's perspective. The exponents are assumed to fit
+    a ulong.
 
-    If the ordering is a degree ordering \code{deg} should be set to 1 and if
-    the ordering is degrevlex, rev should also be set to 1. Otherwise
-    \code{deg} and \code{rev} should be 0.
+void mpoly_get_monomial_fmpz(fmpz * exps, const ulong * poly_exps,
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 
-void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
-                                         slong bits, slong n, int deg, int rev)
+    Convert the packed exponent \code{poly_exps} of bit count \code{bits} to a
+    monomial from the user's perspective.
 
-    Given an array of possibly packed exponent vectors, each packed into the
-    given number of bits, get the monomial at index $n$ and set \code{exps} to
-    the corresponding unpacked exponent vector. The degree field, if any, is
-    not returned, thus the first entry of the return value \code{exp1} will
-    contain the entry of the exponent vector corresponding to the most
-    significant variable with respect to the ordering. 
+void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2,
+                                           slong bits, const mpoly_ctx_t mctx)
 
-    If the ordering is a degree ordering \code{deg} should be set to 1 and if
-    the ordering is degrevlex, rev should also be set to 1. Otherwise
-    \code{deg} and \code{rev} should be 0.
+    Convert the user monomial \code{exp2} to packed format using \code{bits}.
+
+void mpoly_set_monomial_fmpz(ulong * exp1, const fmpz * exp2,
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+
+    Convert the user monomial \code{exp2} to packed format using \code{bits}.
+
 
 *******************************************************************************
 
@@ -272,45 +351,44 @@ void mpoly_get_monomial(ulong * exps, const ulong * poly_exps,
 
 *******************************************************************************
 
-slong mpoly_optimize_bits(slong bits, slong nfields)
+void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
+                                                     slong nfields, slong len)
 
-    Returns the largest number \code{x} in the range
-    \code{bits <= x <= FLINT_BITS} for which \code{nfields} fields can be
-    packed without increasing the required words per exponent vector. It is
-    assumed that \code{bits <= FLINT_BITS}, and the return satisfies
-    \code{(nfields - 1)/(FLINT_BITS/bits) = (nfields - 1)/(FLINT_BITS/x)}.
+    Packs a vector \code{exp2} into \{exp1} using a bit count of \code{bits}.
+    No checking is done to ensure that the vector actually fits
+    into \code{bits} bits. The number of fields in each vector is
+    \code{nfields} and the total number of vectors to unpack is \code{len}.
+    
 
-void mpoly_pack_vec(ulong * exp1, const ulong * exp2, slong bits,
-                                                      slong nfields, slong len)
+void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, mp_bitcnt_t bits,
+                                                     slong nfields, slong len)
 
-    Given an array of exponent vectors \code{exp2} of length \code{len}, each
-    of the \code{nfields} fields of which is a full word,
-    pack the exponent vectors into an array of exponent vectors \code{exp1},
-    each field of which is packed into \code{bits} bits. We require that
-    \code{1 <= bits <= FLINT_BITS}. It is assumed that \code{exp1} has
-    sufficient space for the output. It is not assumed that \code{bits} divides
-    \code{FLINT_BITS} here nor in any of the other packing and unpacking
-    functions.
+    Packs a vector \code{exp2} into \{exp1} using a bit count of \code{bits}.
+    No checking is done to ensure that the vector actually fits
+    into \code{bits} bits. The number of fields in each vector is
+    \code{nfields} and the total number of vectors to unpack is \code{len}.
 
-void mpoly_unpack_vec(ulong * exp1, const ulong * exp2,
-                                          slong bits, slong nfields, slong len)
+void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
+                                                     slong nfields, slong len)
 
-    Given an array of exponent vectors \code{exp2} of length \code{len}, each
-    of the \code{nfields} fields of which is packed into \code{bits} bits,
-    unpack the exponent vectors into an array of exponent vectors \code{exp1},
-    each field of which is a full word. We require that
-    \code{1 <= bits <= FLINT_BITS}. It is assumed that \code{exp1} has
-    sufficient space for the output.
+    Unpacks vector \code{exp2} of bit count \code{bits} into \code{exp1}.
+    The number of fields in each vector is
+    \code{nfields} and the total number of vectors to unpack is \code{len}.
 
-void mpoly_unpack_monomials(ulong * exps1, slong bits1,
-                        const ulong * exps2, slong bits2, slong len, slong num)
+void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
+                                                     slong nfields, slong len)
 
-    Given an array of exponent vectors \code{exps2} of length \code{len}, each
-    of the \code{num} fields of which is packed into \code{bits2} bits, pack
-    the exponent vectors into an array of exponent vectors \code{exps1}, each
-    field of which consists of \code{bits1} bits. We require that
-    \code{bits2 <= bits1 <= FLINT_BITS}. It is assumed that \code{exps1} has
-    sufficient space for the output.
+    Unpacks vector \code{exp2} of bit count \code{bits} into \code{exp1}.
+    The number of fields in each vector is
+    \code{nfields} and the total number of vectors to unpack is \code{len}.
+
+void mpoly_repack_monomials(ulong * exps1, slong bits1,
+                                const ulong * exps2, slong bits2, slong len,
+                                                       const mpoly_ctx_t mctx)
+
+    Convert an array of length \code{len} of exponents \code{exps2} packed
+    using bits \code{bits2} into an array \code{exps1} using bits \code{bits1}.
+    No checking is done to unsure that the result fits into bits \code{bits1}.
  
 void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,
             slong len, const slong * mults, slong num, slong extra, slong bits)
@@ -368,21 +446,20 @@ void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
 *******************************************************************************
 
 int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
-                         slong * heap_len, slong N, ulong maskhi, ulong masklo)
+                         slong * heap_len, slong N, const ulong * cmpmask)
 
     Given a heap, insert a new node $x$ corresponding to the given exponent
     into the heap. Heap elements are ordered by the exponent \code{(exp, N)},
     with the largest element at the head of the heap. A pointer to the current
     heap length must be passed in via \code{heap_len}. This will be updated by
     the function. Note that the index 0 position in the heap is not used, so
-    the length is always one greater than the number of elements. The
-    \code{maskhi} and \code{masklo} values are zero except for degrevlex
-    ordering, where they are as per the monomial comparison operations above.
+    the length is always one greater than the number of elements.
 
 void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp,
                                       void * x, slong * heap_len, ulong maskhi)
 
-    As per \code{_mpoly_heap_insert} except that \code{N = 1}.
+    As per \code{_mpoly_heap_insert} except that \code{N = 1}, and 
+    \code{maskhi = cmpmask[0]}.
 
 void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
                                                     ulong maskhi, ulong masklo)
@@ -396,5 +473,6 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
 
 void * _mpoly_heap_pop1(mpoly_heap1_s * heap, slong * heap_len, ulong maskhi)
 
-    As per \code{_mpoly_heap_pop1} except that \code{N = 1}.
+    As per \code{_mpoly_heap_pop1} except that \code{N = 1}, and 
+    \code{maskhi = cmpmask[0]}.
 

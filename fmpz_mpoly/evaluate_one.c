@@ -9,15 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 #include "assert.h"
-
 
 
 /*
@@ -26,10 +19,10 @@
 void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
                                    slong var, fmpz_t val, fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev, new;
+    int new;
     slong i, j, N, bits;
-    slong main_exp, main_var = var, main_shift, main_off, fpw;
-    ulong mask, maskhi, masklo, * one;
+    slong main_exp, main_var = var, main_shift, main_off;
+    ulong * cmpmask, * one;
     slong p1_alloc, p1_len, p2_len;
     fmpz * p1_coeff, * p2_coeff;
     ulong * p1_exp, * p2_exp;
@@ -73,14 +66,12 @@ void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
 
     TMP_START;
 
-    N = words_per_exp(ctx->n, bits);
-    masks_from_bits_ord(maskhi, masklo, bits, ctx->ord);
-    degrev_from_ord(deg, rev, ctx->ord);
-    fpw = FLINT_BITS/bits;
-    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    mpoly_off_shift(&main_off, &main_shift, main_var, deg, rev, fpw, ctx->n, bits);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_univar_exp(one, var, deg, N, main_off, main_shift, fpw, bits);
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_gen_oneexp_offset_shift(one, &main_off, &main_shift,
+                                                main_var, N, bits, ctx->minfo);
+    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
 
     /* scan poly2 and put powers of var into tree */
     /*
@@ -108,6 +99,7 @@ void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
     mpoly_rbtree_init(tree);
     for (i = 0; i < p2_len; i++)
     {
+        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         main_exp = (p2_exp[N*i + main_off] >> main_shift) & mask;
         node = mpoly_rbtree_get(&new, tree, main_exp);
         if (new)
@@ -158,7 +150,7 @@ looper:
     x->next = NULL;
     mpoly_monomial_msub(exp_array + i*N, p2_exp + x->j*N, root->key, one, N);
     _mpoly_heap_insert(heap, exp_array + i*N, x,
-                                      &next_loc, &heap_len, N, maskhi, masklo);
+                                      &next_loc, &heap_len, N, cmpmask);
 
     i++;    
     node = root->right;
@@ -186,7 +178,7 @@ done:
         fmpz_zero(p1_coeff + p1_len);
         do
         {
-            x = _mpoly_heap_pop(heap, &heap_len, N, maskhi, masklo);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
             do
             {
                 *store++ = x->i;
@@ -210,7 +202,7 @@ done:
                 mpoly_monomial_msub(exp_array + i*N, p2_exp + x->j*N,
                                                          main_exps[i], one, N);
                 _mpoly_heap_insert(heap, exp_array + i*N, x,
-                                      &next_loc, &heap_len, N, maskhi, masklo);
+                                      &next_loc, &heap_len, N, cmpmask);
             }
         }
     }

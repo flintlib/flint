@@ -35,7 +35,7 @@ fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
 
        poly->coeffs[i] = ptr;
 
-       N = words_per_exp(ctx->n, poly->bits);
+       N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
        for (i = n*N; i < (poly->length - 1)*N; i++)
           poly->exps[i] = poly->exps[i + N];
