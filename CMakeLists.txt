@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.9)
 include(CheckIPOSupported)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
+include(CheckCSourceCompiles)
 include(CheckPrototypeDefinition)
 include(TestBigEndian)
 
@@ -126,6 +127,14 @@ check_function_exists(getpagesize HAVE_GETPAGESIZE)
 check_function_exists(getrusage HAVE_GETRUSAGE)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 
+check_c_source_compiles(
+    "__declspec(noreturn) void func(void); int main() { return 0; }"
+    HAVE_DECLSPEC
+)
+check_c_source_compiles(
+    "__attribute__ ((noreturn)) void func(void); int main() { return 0; }"
+    HAVE_ATTRIBUTE
+)
 
 configure_file(
     config.h.in
