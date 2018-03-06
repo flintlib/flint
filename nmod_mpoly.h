@@ -685,10 +685,10 @@ int nmod_mpoly_print_pretty(const nmod_mpoly_t poly,
 
 /* Random generation *********************************************************/
 
-void nmod_mpoly_randtest(nmod_mpoly_t poly, flint_rand_t state,
+FLINT_DLL void nmod_mpoly_randtest(nmod_mpoly_t poly, flint_rand_t state,
                     slong length, slong exp_bound, const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpoly_randbits(nmod_mpoly_t poly, flint_rand_t state,
+FLINT_DLL void nmod_mpoly_randbits(nmod_mpoly_t poly, flint_rand_t state,
               slong length, mp_bitcnt_t exp_bound, const nmod_mpoly_ctx_t ctx);
 
 /******************************************************************************
