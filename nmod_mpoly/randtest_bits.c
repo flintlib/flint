@@ -11,7 +11,7 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_randbits(nmod_mpoly_t poly, flint_rand_t state,
+void nmod_mpoly_randtest_bits(nmod_mpoly_t poly, flint_rand_t state,
                 slong length, mp_bitcnt_t exp_bits, const nmod_mpoly_ctx_t ctx)
 {
     slong i, j, nvars = ctx->minfo->nvars;

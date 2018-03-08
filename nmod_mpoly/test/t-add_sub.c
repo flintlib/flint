@@ -29,7 +29,7 @@ main(void)
         nmod_mpoly_t f, g, h, k;
         ordering_t ord;
         mp_limb_t modulus;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong nvars, len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -50,23 +50,16 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
-            nmod_mpoly_randtest(g, state, len2, exp_bound2, ctx);
-            nmod_mpoly_randtest(h, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
 
             nmod_mpoly_add(h, g, f, ctx);
             nmod_mpoly_sub(k, h, g, ctx);
@@ -94,7 +87,7 @@ main(void)
         nmod_mpoly_t f, g, h, k;
         ordering_t ord;
         mp_limb_t modulus;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong nvars, len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -115,23 +108,16 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
-            nmod_mpoly_randtest(g, state, len2, exp_bound2, ctx);
-            nmod_mpoly_randtest(h, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
 
             nmod_mpoly_add(h, f, g, ctx);
             nmod_mpoly_add(k, g, f, ctx);
@@ -159,7 +145,7 @@ main(void)
         nmod_mpoly_t f, g, h, k;
         ordering_t ord;
         mp_limb_t modulus;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong nvars, len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -180,23 +166,16 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
-            nmod_mpoly_randtest(g, state, len2, exp_bound2, ctx);
-            nmod_mpoly_randtest(h, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
 
             nmod_mpoly_sub(h, f, g, ctx);
             nmod_mpoly_neg(k, g, ctx);
@@ -225,7 +204,7 @@ main(void)
         nmod_mpoly_t f, g, h, k1, k2;
         ordering_t ord;
         mp_limb_t modulus;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong nvars, len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -247,24 +226,17 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
-            nmod_mpoly_randtest(g, state, len2, exp_bound2, ctx);
-            nmod_mpoly_randtest(h, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k1, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k2, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(k1, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(k2, state, len, exp_bits, ctx);
 
             nmod_mpoly_add(k1, f, g, ctx);
             nmod_mpoly_add(k1, k1, h, ctx);
@@ -295,7 +267,7 @@ main(void)
         nmod_mpoly_t f, g, h, k1, k2;
         ordering_t ord;
         mp_limb_t modulus;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong nvars, len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -317,24 +289,17 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
-            nmod_mpoly_randtest(g, state, len2, exp_bound2, ctx);
-            nmod_mpoly_randtest(h, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k1, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k2, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(k1, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(k2, state, len, exp_bits, ctx);
 
             nmod_mpoly_add(k1, g, h, ctx);
             nmod_mpoly_sub(k1, f, k1, ctx);
@@ -365,7 +330,7 @@ main(void)
         nmod_mpoly_t f, g, h;
         ordering_t ord;
         mp_limb_t modulus;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong nvars, len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -385,22 +350,15 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
-            nmod_mpoly_randtest(g, state, len2, exp_bound2, ctx);
-            nmod_mpoly_randtest(h, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
             nmod_mpoly_set(h, f, ctx);
 
             nmod_mpoly_add(f, f, g, ctx);
@@ -430,7 +388,7 @@ main(void)
         nmod_mpoly_t f, g, h;
         ordering_t ord;
         mp_limb_t modulus;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong nvars, len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -450,22 +408,15 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
-            nmod_mpoly_randtest(g, state, len2, exp_bound2, ctx);
-            nmod_mpoly_randtest(h, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
             if ((j % 2) == 0)
             {

@@ -44,7 +44,7 @@ main(void)
             for (len1 = 3; len1 < 1000; len1 += len1/2)
             {
                 exp_bits1 = 200;
-                nmod_mpoly_randbits(f, state, len1, exp_bits1, ctx);
+                nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
 
                 str = nmod_mpoly_get_str_pretty(f, vars, ctx);
                 nmod_mpoly_set_str_pretty(f1, str, vars, ctx);

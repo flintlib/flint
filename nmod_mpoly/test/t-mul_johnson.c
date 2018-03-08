@@ -53,14 +53,14 @@ main(void)
         exp_bits1 = n_randint(state, 200) + 2;
         exp_bits2 = n_randint(state, 200) + 2;
 
-        nmod_mpoly_randbits(k1, state, len, exp_bits, ctx);
-        nmod_mpoly_randbits(k2, state, len, exp_bits, ctx);
+        nmod_mpoly_randtest_bits(k1, state, len, exp_bits, ctx);
+        nmod_mpoly_randtest_bits(k2, state, len, exp_bits, ctx);
 
         for (j = 0; j < 4; j++)
         {
-            nmod_mpoly_randbits(f, state, len1, exp_bits1, ctx);
-            nmod_mpoly_randbits(g, state, len2, exp_bits2, ctx);
-            nmod_mpoly_randbits(h, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len2, exp_bits2, ctx);
 
             nmod_mpoly_add(t1, g, h, ctx);
             nmod_mpoly_test(t1, ctx);
@@ -121,9 +121,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            nmod_mpoly_randbits(f, state, len1, exp_bits1, ctx);
-            nmod_mpoly_randbits(g, state, len2, exp_bits2, ctx);
-            nmod_mpoly_randbits(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_test(h, ctx);
@@ -174,9 +174,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            nmod_mpoly_randbits(f, state, len1, exp_bits1, ctx);
-            nmod_mpoly_randbits(g, state, len2, exp_bits2, ctx);
-            nmod_mpoly_randbits(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_test(h, ctx);

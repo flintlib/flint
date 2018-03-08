@@ -41,7 +41,7 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
         x = (char **) TMP_ALLOC(mctx->nvars*sizeof(char *));
         for (i = 0; i < mctx->nvars; i++)
         {
-            x[i] = (char *) TMP_ALLOC(22*sizeof(char));
+            x[i] = (char *) TMP_ALLOC(((FLINT_BITS+4)/3)*sizeof(char));
             flint_sprintf(x[i], "x%wd", i + 1);
         }
     }

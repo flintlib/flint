@@ -22,7 +22,7 @@ _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * ex
                                 const mpoly_ctx_t mctx, const nmodf_ctx_t fctx)
 {
     slong i, j, N;
-    ulong * degs;
+    fmpz * exponents;
     int r = 0, first;
     char ** x = (char **) x_in;
 
@@ -49,7 +49,9 @@ _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * ex
         }
     }
 
-    degs = (ulong *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
+    exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_init(exponents + i);
    
     for (i = 0; i < len; i++)
     {
@@ -67,11 +69,13 @@ _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * ex
             if (r <= 0) goto done;
         }
 
-        mpoly_get_monomial_ui(degs, exp + N*i, bits, mctx);
+        mpoly_get_monomial_fmpz(exponents, exp + N*i, bits, mctx);
 
         for (j = 0; j < mctx->nvars; j++)
         {
-            if (degs[j] == 0)
+            int cmp = fmpz_cmp_ui(exponents + j, WORD(1));
+
+            if (cmp < 0)
                 continue;
 
             if (!first)
@@ -80,12 +84,18 @@ _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * ex
                 r = (r != EOF) ? 1 : EOF;
                 if (r <= 0) goto done;
             }
-            if (degs[j] > 1)
-                r = flint_fprintf(file, "%s^%wd", x[j], degs[j]);
-            else
-                r = flint_fprintf(file, "%s", x[j]);
+
+            r = flint_fprintf(file, "%s", x[j]);
             if (r <= 0) goto done;
-            
+
+            if (cmp > 0)
+            {
+                r = fputc('^', file);
+                if (r <= 0) goto done;
+                r = fmpz_fprint(file, exponents + j);
+                if (r <= 0) goto done;
+            }
+
             first = 0;
         }
 
@@ -94,11 +104,14 @@ _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * ex
             r = flint_fprintf(file, "1");
             if (r <= 0) goto done;
         }
-   }
+    }
    
 done:
-   TMP_END;
-   return r;
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_clear(exponents + i);
+
+    TMP_END;
+    return r;
 }
 
 int
