@@ -16,13 +16,13 @@ wget http://mpir.org/mpir-2.7.2.tar.bz2
 tar -xf mpir-2.7.2.tar.bz2
 cd mpir-2.7.2
 ./configure ABI=$ABI --enable-gmpcompat
-make -j4 > /dev/null 2>&1
+${MAKE} > /dev/null 2>&1
 cd ..
 wget http://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2
 tar -xf mpfr-4.0.0.tar.bz2
 cd mpfr-4.0.0
 ./configure ABI=$ABI --with-gmp-build=$(absolute_path "../mpir-2.7.2")
-make -j4 > /dev/null 2>&1
+${MAKE} > /dev/null 2>&1
 cd ..
  
 echo "int flint_test_multiplier(){return 1;}" > test_helpers.c

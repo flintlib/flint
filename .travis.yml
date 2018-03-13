@@ -1,9 +1,12 @@
 language: c
 sudo: false
+cache: ccache
 addons:
   apt:
     packages:
       - texinfo
+env:
+  MAKE="make -j4"
 
 os:
   - osx
@@ -15,6 +18,12 @@ compiler:
   - gcc
   - clang
 
-script:
-  - ./.build_dependencies && ./configure --with-mpir=mpir-2.7.2 --with-mpfr=mpfr-4.0.0 && make -j4 && make -j4 check
+install:
+  - ./.build_dependencies
+  - ./configure --with-mpir=mpir-2.7.2 --with-mpfr=mpfr-4.0.0
+  - ${MAKE} QUIET_CC=
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L libflint.dylib; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ldd libflint.so; fi
 
+script:
+  - ${MAKE} check QUIET_CC=
