@@ -341,7 +341,7 @@ void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
     _fmpz_mpoly_gcd_prs(poly1, poly2, poly3, ctx);
 
-    if ((poly1->length > 0) && (fmpz_cmp_ui(poly1->coeffs + 0, WORD(0)) < 0))
+    if ((poly1->length > 0) && (fmpz_sgn(poly1->coeffs + 0) < 0))
         fmpz_mpoly_neg(poly1, poly1, ctx);
 }
 

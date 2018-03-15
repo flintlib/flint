@@ -79,6 +79,39 @@ typedef struct
 
 typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
 
+
+
+
+
+/*
+    A dense mpoly is stored as a flat array of coeffcients.
+    Suppose deg_bounds = {a, b, c}. The coefficient of the monomial with 
+    exponents {i, j, k} is stored at the coefficient of index
+        c + k*(b + j*(a + i*0))    
+*/
+typedef struct
+{
+    slong nvars;
+    slong degb_alloc;
+    slong * deg_bounds;
+    slong coeff_alloc;
+    fmpz * coeffs;
+} fmpz_mpolyd_struct;
+
+typedef fmpz_mpolyd_struct fmpz_mpolyd_t[1];
+
+typedef struct
+{
+    slong nvars;
+    slong * perm;
+} fmpz_mpolyd_ctx_struct;
+
+typedef fmpz_mpolyd_ctx_struct fmpz_mpolyd_ctx_t[1];
+
+
+
+
+
 /* geobuckets ****************************************************************/
 typedef struct fmpz_mpoly_geobucket
 {
@@ -677,6 +710,9 @@ FLINT_DLL void fmpz_mpoly_resultant(fmpz_mpoly_t poly1,
 FLINT_DLL void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1,
               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpoly_gcd_brown(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                         const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
+
 /* Reduction *****************************************************************/
 
 FLINT_DLL slong
@@ -740,6 +776,12 @@ void fmpz_mpoly_randtest(fmpz_mpoly_t poly, flint_rand_t state,
 void fmpz_mpoly_randbits(fmpz_mpoly_t poly, flint_rand_t state,
    slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits, const fmpz_mpoly_ctx_t ctx);
 
+
+void fmpz_mpoly_randtest_bound(fmpz_mpoly_t poly, flint_rand_t state,
+   slong length, mp_bitcnt_t coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_randtest_bits(fmpz_mpoly_t poly, flint_rand_t state,
+   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits, const fmpz_mpoly_ctx_t ctx);
 
 
 /******************************************************************************

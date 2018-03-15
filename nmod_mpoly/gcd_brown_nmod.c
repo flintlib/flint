@@ -132,7 +132,7 @@ void nmod_mpolyd_zero(nmod_mpolyd_t poly)
     {
         poly->deg_bounds[i] = WORD(1);
     }
-    poly->coeffs[i] = UWORD(0);
+    poly->coeffs[0] = UWORD(0);
 }
 
 
@@ -223,7 +223,7 @@ void nmod_mpolyd_print(nmod_mpolyd_t poly, const char ** vars,
         if (!first)
             printf(" + ");
 
-        flint_printf("%wd", poly->coeffs[i]);
+        flint_printf("%wu", poly->coeffs[i]);
 
         for (j = poly->nvars - 1; j >= 0; j--) 
         {
@@ -240,6 +240,44 @@ void nmod_mpolyd_print(nmod_mpolyd_t poly, const char ** vars,
         flint_printf("0");
 }
 
+void nmod_mpolyd_print_simple(nmod_mpolyd_t poly)
+{
+
+    int first = 0;
+    slong i, j;
+    slong degb_prod;
+
+    degb_prod = WORD(1);
+    for (j = 0; j < poly->nvars; j++) {
+        degb_prod *= poly->deg_bounds[j];
+    }
+
+    first = 1;
+    for (i = 0; i < degb_prod; i++) {
+        ulong k = i;
+
+        if (poly->coeffs[i] == 0)
+            continue;
+
+        if (!first)
+            printf(" + ");
+
+        flint_printf("%wu", poly->coeffs[i]);
+
+        for (j = poly->nvars - 1; j >= 0; j--) 
+        {
+            ulong m = poly->deg_bounds[j];
+            ulong e = k % m;
+            k = k / m;
+            flint_printf("*x%wd^%wd", j, e);
+        }
+        FLINT_ASSERT(k == 0);
+        first = 0;
+    }
+
+    if (first)
+        flint_printf("0");
+}
 
 void nmod_mpolyd_add(nmod_mpolyd_t A, const nmod_mpolyd_t B,
                                  const nmod_mpolyd_t C, const nmodf_ctx_t fctx)
@@ -906,7 +944,7 @@ void nmod_mpolyd_promote(nmod_mpolyd_t fxn,
 int nmod_mpolyd_gcd_brown(nmod_mpolyd_t G,
      nmod_mpolyd_t Abar, nmod_mpolyd_t Bbar,
             nmod_mpolyd_t A, nmod_mpolyd_t B,
-                 const nmodf_ctx_t fctx, const nmod_mpolyd_ctx_t dctx) {
+                 const nmodf_ctx_t fctx) {
 
     int success;
     slong i, j, bound;
@@ -983,7 +1021,7 @@ int nmod_mpolyd_gcd_brown(nmod_mpolyd_t G,
         nmod_mpolyd_eval_last(phiA, A, alpha, fctx);
         nmod_mpolyd_eval_last(phiB, B, alpha, fctx);
 
-        success = nmod_mpolyd_gcd_brown(gs, abars, bbars, phiA, phiB, fctx, dctx);
+        success = nmod_mpolyd_gcd_brown(gs, abars, bbars, phiA, phiB, fctx);
         if (success == 0)
             goto break_continue;
 

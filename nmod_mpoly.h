@@ -592,8 +592,9 @@ FLINT_DLL void nmod_mpolyd_clear(nmod_mpolyd_t poly);
 FLINT_DLL int nmod_mpolyd_gcd_brown(nmod_mpolyd_t G,
                           nmod_mpolyd_t Abar, nmod_mpolyd_t Bbar,
                           nmod_mpolyd_t A, nmod_mpolyd_t B,
-                         const nmodf_ctx_t fctx, const nmod_mpolyd_ctx_t dctx);
+                                                       const nmodf_ctx_t fctx);
 
+FLINT_DLL void nmod_mpolyd_print_simple(nmod_mpolyd_t poly);
 
 FLINT_DLL void fq_nmod_mpolyd_ctx_init(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
                                                        mp_limb_t p, slong deg);
@@ -601,6 +602,8 @@ FLINT_DLL void fq_nmod_mpolyd_ctx_init(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
 FLINT_DLL int fq_nmod_mpolyd_ctx_settle(fq_nmod_mpolyd_ctx_t dctx,
                             const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyd_mul_scalar(nmod_mpolyd_t A, mp_limb_t b, const nmodf_ctx_t fctx);
 
 FLINT_DLL void fq_nmod_mpolyd_ctx_clear(fq_nmod_mpolyd_ctx_t dctx);
 
@@ -631,6 +634,7 @@ FLINT_DLL int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
                                 fq_nmod_mpolyd_t A, fq_nmod_mpolyd_t B,
                                               const fq_nmod_mpolyd_ctx_t dctx);
 
+FLINT_DLL slong nmod_mpolyd_leadmon(slong * exps, const nmod_mpolyd_t A);
 
 FLINT_DLL int nmod_mpoly_gcd_brown(nmod_mpoly_t G,
                                const nmod_mpoly_t A, const nmod_mpoly_t B,
