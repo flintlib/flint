@@ -71,17 +71,17 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
 
             for (w = 0; w < num; w++)
             {
                 do {
-                    fmpz_mpoly_randtest(darr[w], state, len2, exp_bound2, coeff_bits + 1, ctx);
+                    fmpz_mpoly_randtest_bound(darr[w], state, len2, coeff_bits + 1, exp_bound2, ctx);
                 } while (darr[w]->length == 0);
-                fmpz_mpoly_randtest(qarr[w], state, len, exp_bound, coeff_bits, ctx);
+                fmpz_mpoly_randtest_bound(qarr[w], state, len, coeff_bits, exp_bound, ctx);
             }
-            fmpz_mpoly_randtest(k1, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(k2, state, len, exp_bound, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(k1, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(k2, state, len, coeff_bits, exp_bound, ctx);
 
             fmpz_mpoly_quasidivrem_ideal_heap(scale, qarr, r, f, darr, num, ctx);
             fmpz_mpoly_test(r, ctx);
@@ -169,16 +169,16 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
             for (w = 0; w < num; w++)
             {
                 do {
-                    fmpz_mpoly_randtest(darr[w], state, len2, exp_bound2, coeff_bits + 1, ctx);
+                    fmpz_mpoly_randtest_bound(darr[w], state, len2, coeff_bits + 1, exp_bound2, ctx);
                 } while (darr[w]->length == 0);
-                fmpz_mpoly_randtest(qarr[w], state, len, exp_bound, coeff_bits, ctx);
+                fmpz_mpoly_randtest_bound(qarr[w], state, len, coeff_bits, exp_bound, ctx);
             }
-            fmpz_mpoly_randtest(k1, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(k2, state, len, exp_bound, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(k1, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(k2, state, len, coeff_bits, exp_bound, ctx);
 
             fmpz_mpoly_set(r, f, ctx);
             fmpz_mpoly_quasidivrem_ideal_heap(scale, qarr, r, r, darr, num, ctx);

@@ -77,9 +77,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randbits(g, state, len, coeff_bits, exp_bits, ctx);
-            fmpz_mpoly_randbits(h, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
             fmpz_mpoly_pow_fps(g, f, pow, ctx);
             fmpz_mpoly_test(g, ctx);
@@ -127,8 +127,8 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randbits(g, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
             fmpz_mpoly_pow_fps(g, f, pow, ctx);
             fmpz_mpoly_test(g, ctx);

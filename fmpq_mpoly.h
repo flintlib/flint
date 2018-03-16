@@ -469,7 +469,7 @@ void fmpq_mpoly_randtest_bits_bound(fmpq_mpoly_t poly, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, slong exp_bound,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_randtest(poly->zpoly, state, length, exp_bound, coeff_bits, ctx->zctx);
+    fmpz_mpoly_randtest_bound(poly->zpoly, state, length, coeff_bits, exp_bound, ctx->zctx);
     do {
         fmpq_randtest(poly->content, state, coeff_bits + 1);
     } while (fmpq_is_zero(poly->content));
@@ -481,7 +481,7 @@ void fmpq_mpoly_randtest_bits_bits(fmpq_mpoly_t poly, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_randbits(poly->zpoly, state, length, coeff_bits, exp_bits, ctx->zctx);
+    fmpz_mpoly_randtest_bits(poly->zpoly, state, length, coeff_bits, exp_bits, ctx->zctx);
     do {
         fmpq_randtest(poly->content, state, coeff_bits + 1);
     } while (fmpq_is_zero(poly->content));

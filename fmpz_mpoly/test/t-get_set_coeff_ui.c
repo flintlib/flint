@@ -33,7 +33,7 @@ main(void)
        fmpz_mpoly_t f;
        ordering_t ord;
        ulong c, d;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits, index;
+       slong nvars, len, coeff_bits, exp_bits, index;
 
        ord = mpoly_ordering_randtest(state);
        nvars = n_randint(state, 20) + 1;
@@ -44,12 +44,10 @@ main(void)
 
        len = n_randint(state, 100);
 
-       exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-       exp_bound = n_randbits(state, exp_bits);
+       exp_bits = n_randint(state, 200) + 1;
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+       fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
        for (j = 0; j < 10; j++)
        {
@@ -76,16 +74,7 @@ main(void)
           if (!result)
           {
              printf("FAIL\n");
-
-             printf("ord = "); mpoly_ordering_print(ord);
-             printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                                      "coeff_bits = %ld, nvars = %ld\n\n",
-                                  len, exp_bits, exp_bound, coeff_bits, nvars);
-
-             flint_printf("c = %wu\n", c);
-             flint_printf("d = %wu\n", d);
-             flint_printf("index = %wd\n", index);
-
+             flint_printf("Set coeff and get coeff and compare\ni = %wd, j = %wd\n", i, j);
              flint_abort();
           }
        }

@@ -49,10 +49,10 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpz_mpoly_randbits(h, state, len, coeff_bits, exp_bits, ctx);
-            fmpz_mpoly_randbits(k, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
@@ -104,9 +104,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpz_mpoly_randbits(h, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
@@ -156,9 +156,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpz_mpoly_randbits(h, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 

@@ -38,7 +38,7 @@ main(void)
             {
                 coeff_bits = 100;
                 exp_bits = 100;
-                fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits, ctx);
+                fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx);
 
                 str = fmpz_mpoly_get_str_pretty(f, vars, ctx);
                 fmpz_mpoly_set_str_pretty(f1, str, vars, ctx);

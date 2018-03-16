@@ -35,7 +35,7 @@ main(void)
         fmpz_mpoly_t f, g;
         fmpz_mpoly_univar_t fx;
         ordering_t ord;
-        slong nvars, len1, len2, exp_bound1, exp_bound2;
+        slong nvars, len1, len2;
         slong coeff_bits,  exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -50,20 +50,16 @@ main(void)
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
 
-        exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits1 = n_randint(state, FLINT_BITS - 1) + 1;
+        exp_bits2 = n_randint(state, FLINT_BITS - 1) + 1;
 
         coeff_bits = n_randint(state, 200);
 
         for (j = 0; j < nvars; j++)
         {
 
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-            fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
 
             fmpz_mpoly_to_univar(fx, f, j, ctx);
             fmpz_mpoly_from_univar(g, fx, ctx);
@@ -71,8 +67,7 @@ main(void)
             if (!fmpz_mpoly_equal(f,g,ctx))
             {
                 printf("FAIL\n");
-                flint_printf("Check mpoly -> mpoly_univar -> mpoly\n"
-                                                       "i: %wd  j: %wd\n",i,j);
+                flint_printf("Check mpoly -> mpoly_univar -> mpoly\ni: %wd  j: %wd\n",i,j);
                 flint_abort();
             }
         }
@@ -90,7 +85,7 @@ main(void)
         fmpz_mpoly_t f, g, h1, h2;
         fmpz_mpoly_univar_t fx, gx, h1x, h2x;
         ordering_t ord;
-        slong nvars, len1, len2, exp_bound1, exp_bound2;
+        slong nvars, len1, len2;
         slong coeff_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -109,19 +104,14 @@ main(void)
 
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
-        exp_bits1 = n_randint(state, (FLINT_BITS - 1)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (FLINT_BITS - 1)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
-
+        exp_bits1 = n_randint(state, FLINT_BITS - 1) + 1;
+        exp_bits2 = n_randint(state, FLINT_BITS - 1) + 1;
         coeff_bits = n_randint(state, 100);
 
         for (j = 0; j < nvars; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-            fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
 
             fmpz_mpoly_to_univar(fx, f, j, ctx);
             fmpz_mpoly_to_univar(gx, g, j, ctx);
@@ -158,7 +148,7 @@ main(void)
         fmpz_mpoly_t f, g, h1, h2;
         fmpz_mpoly_univar_t fx, gx, h1x, h2x;
         ordering_t ord;
-        slong nvars, len1, len2, exp_bound1, exp_bound2;
+        slong nvars, len1, len2;
         slong coeff_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
@@ -177,19 +167,14 @@ main(void)
 
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
-        exp_bits1 = n_randint(state, (FLINT_BITS - 3)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (FLINT_BITS - 3)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
-
+        exp_bits1 = n_randint(state, FLINT_BITS - 2) + 1;
+        exp_bits2 = n_randint(state, FLINT_BITS - 2) + 1;
         coeff_bits = n_randint(state, 100);
 
         for (j = 0; j < nvars; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-            fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
 
             fmpz_mpoly_to_univar(fx, f, j, ctx);
             fmpz_mpoly_to_univar(gx, g, j, ctx);
@@ -204,8 +189,7 @@ main(void)
                 || !fmpz_mpoly_univar_equal(h1x, fx, ctx))
             {
                 printf("FAIL\n");
-                flint_printf("Check multiplication commutes\n"
-                                                       "i: %wd  j: %wd\n",i,j);
+                flint_printf("Check multiplication commutes\ni: %wd  j: %wd\n",i,j);
                 flint_abort();
             }
         }

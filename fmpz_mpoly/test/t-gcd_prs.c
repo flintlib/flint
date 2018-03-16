@@ -60,9 +60,9 @@ main(void)
             exp_bound2 = n_randint(state, 4) + 2;
             exp_bound3 = n_randint(state, 3) + 2;
             coeff_bits = n_randint(state, 3) + 1;
-            fmpz_mpoly_randtest(a, state, len1, exp_bound1, coeff_bits, ctx);
-            fmpz_mpoly_randtest(b, state, len2, exp_bound2, coeff_bits, ctx);
-            fmpz_mpoly_randtest(c, state, len3, exp_bound3, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(a, state, len1, coeff_bits, exp_bound1, ctx);
+            fmpz_mpoly_randtest_bound(b, state, len2, coeff_bits, exp_bound2, ctx);
+            fmpz_mpoly_randtest_bound(c, state, len3, coeff_bits, exp_bound3, ctx);
 
             fmpz_mpoly_mul_johnson(a, a, c, ctx);
             fmpz_mpoly_mul_johnson(b, b, c, ctx);
