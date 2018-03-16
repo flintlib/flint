@@ -37,7 +37,7 @@ main(void)
             {
                 coeff_bits = 100;
                 exp_bits = 100;
-                fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits, ctx);
+                fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx);
                 fmpq_mpoly_test_canonical(f, ctx);
                 str = fmpq_mpoly_get_str_pretty(f, vars, ctx);
                 fmpq_mpoly_set_str_pretty(f1, str, vars, ctx);

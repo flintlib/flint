@@ -54,15 +54,15 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             do {
-                fmpq_mpoly_randtest_bits_bound(t, state, len, coeff_bits + 1, degbound, ctx);
+                fmpq_mpoly_randtest_bound(t, state, len, coeff_bits + 1, degbound, ctx);
             } while (fmpq_mpoly_is_zero(t, ctx));
-            fmpq_mpoly_randtest_bits_bound(a, state, len1, coeff_bits, degbound, ctx);
-            fmpq_mpoly_randtest_bits_bound(b, state, len2, coeff_bits, degbound, ctx);
+            fmpq_mpoly_randtest_bound(a, state, len1, coeff_bits, degbound, ctx);
+            fmpq_mpoly_randtest_bound(b, state, len2, coeff_bits, degbound, ctx);
 
             fmpq_mpoly_mul(a, a, t, ctx);
             fmpq_mpoly_mul(b, b, t, ctx);
 
-            fmpq_mpoly_randtest_bits_bound(g, state, len, coeff_bits, degbound, ctx);
+            fmpq_mpoly_randtest_bound(g, state, len, coeff_bits, degbound, ctx);
             res = fmpq_mpoly_gcd(g, a, b, ctx);
             if (!res) {
                 continue;

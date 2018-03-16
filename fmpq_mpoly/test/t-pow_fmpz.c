@@ -46,9 +46,9 @@ main(void)
 
         for (j = 0; j < 10; j++)
         {
-            fmpq_mpoly_randtest_bits_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randtest_bits_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpq_mpoly_randtest_bits_bits(h, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpq_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpq_mpoly_randtest_bits(h, state, len2, coeff_bits, exp_bits2, ctx);
 
             fmpz_set_si(power, j);
             fmpq_mpoly_pow_fmpz(h, f, power, ctx);

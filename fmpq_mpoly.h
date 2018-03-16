@@ -465,7 +465,7 @@ int fmpq_mpoly_print_pretty(const fmpq_mpoly_t poly,
 /* Random generation *********************************************************/
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bits_bound(fmpq_mpoly_t poly, flint_rand_t state,
+void fmpq_mpoly_randtest_bound(fmpq_mpoly_t poly, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, slong exp_bound,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
@@ -477,7 +477,7 @@ void fmpq_mpoly_randtest_bits_bound(fmpq_mpoly_t poly, flint_rand_t state,
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bits_bits(fmpq_mpoly_t poly, flint_rand_t state,
+void fmpq_mpoly_randtest_bits(fmpq_mpoly_t poly, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
