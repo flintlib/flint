@@ -433,7 +433,7 @@ void fmpq_mpoly_compose(fmpq_mpoly_t res, fmpq_mpoly_t poly1,
 
 /* GCD ***********************************************************************/
 
-FLINT_DLL void fmpq_mpoly_gcd(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+FLINT_DLL int fmpq_mpoly_gcd(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
                          const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_resultant(fmpq_mpoly_t poly1,

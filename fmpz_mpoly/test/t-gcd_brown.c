@@ -34,7 +34,6 @@ main(void)
         slong len, len1, len2;
         slong degbound;
         int res;
-        const char* vars[] = {"x","y","z","w","u"};
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 5);
 

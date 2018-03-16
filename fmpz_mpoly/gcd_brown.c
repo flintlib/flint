@@ -11,8 +11,7 @@
 
 #include "fmpz_mpoly.h"
 #include "nmod_mpoly.h"
-#include "assert.h"
-#include "unistd.h"
+
 
 void fmpz_mpolyd_swap(fmpz_mpolyd_t A, fmpz_mpolyd_t B)
 {
@@ -34,18 +33,16 @@ void fmpz_mpolyd_ctx_init(fmpz_mpolyd_ctx_t dctx, slong nvars)
 }
 
 
-int fmpz_mpolyd_ctx_settle(fmpz_mpolyd_ctx_t dctx,
+int fmpz_mpolyd_ctx_init_version1(fmpz_mpolyd_ctx_t dctx,
                             const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    int success;
+    int success = 0;
     slong i, j, degb_prod;
     slong * Aexps, * Bexps, * deg_bounds;
     slong nvars = ctx->minfo->nvars;
     slong * perm = dctx->perm;
     TMP_INIT;
-
-    success = 0;
 
     TMP_START;
     Aexps = (slong *) TMP_ALLOC(nvars*sizeof(slong));
@@ -120,7 +117,8 @@ void fmpz_mpolyd_init(fmpz_mpolyd_t poly, slong nvars)
 }
 
 
-void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len) {
+void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len)
+{
     if (poly->coeff_alloc < len) {
         slong i;
         poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, len*sizeof(fmpz));
@@ -133,8 +131,8 @@ void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len) {
 }
 
 
-void fmpz_mpolyd_set_nvars(fmpz_mpolyd_t poly, slong nvars) {
-
+void fmpz_mpolyd_set_nvars(fmpz_mpolyd_t poly, slong nvars)
+{
     poly->nvars = nvars;
     if (poly->degb_alloc < nvars) {
         poly->deg_bounds = (slong *) flint_realloc(poly->deg_bounds, nvars*sizeof(slong));
@@ -360,12 +358,7 @@ void fmpz_mpoly_convert_from_fmpz_mpolyd(
 
 
 
-/*
-void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
-    ulong r2, ulong m2, int sign)
-*/
-
-void fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
+int fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
                                  const fmpz_mpolyd_t B, const fmpz_t Bm,
                                  const nmod_mpolyd_t C, const nmodf_ctx_t fctx)
 {
@@ -377,77 +370,112 @@ void fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
     slong nvars = B->nvars;
     slong degb_prod;
     ulong hi;
+    slong diff;
     fmpz_t zero;
+    slong * temp_deg_bounds;
     TMP_INIT;
 
-    FLINT_ASSERT(A != B);
     FLINT_ASSERT(B->nvars == C->nvars);
 
-    fmpz_mpolyd_set_nvars(A, B->nvars);
-
-/*printf("CRT here0\n");*/
+    TMP_START;
+    temp_deg_bounds = (slong *) TMP_ALLOC(nvars*sizeof(slong));
 
     degb_prod = 1;
+    diff = 0;
     for (j = 0; j < nvars; j++)
     {
-        A->deg_bounds[j] = FLINT_MAX(B->deg_bounds[j], C->deg_bounds[j]);
-        umul_ppmm(hi, degb_prod, degb_prod, A->deg_bounds[j]);
+        diff |= B->deg_bounds[j] - C->deg_bounds[j];
+        temp_deg_bounds[j] = FLINT_MAX(B->deg_bounds[j], C->deg_bounds[j]);
+        umul_ppmm(hi, degb_prod, degb_prod, temp_deg_bounds[j]);
         if (hi != WORD(0) || degb_prod < 0)
-            assert(0);
+            return 0;
     }
-/*printf("CRT here1\n");*/
-
-    fmpz_mpolyd_fit_length(A, degb_prod);
-
-/*printf("CRT here2\n");*/
 
     fmpz_init_set_ui(zero, 0);
 
+    if (diff == 0) {
+        /* both polynomials are packed into the same bounds */
 
-    TMP_START;
-    inds = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    for (j = 0; j < nvars; j++)
-        inds[j] = 0;
-    Bok = 1;
-    Cok = 1;
-    Bind = 0;
-    Cind = 0;
-    for (i = 0; i < degb_prod; i++)
-    {
-/*printf("CRT i: %d\n",i);*/
+        fmpz_mpolyd_set_nvars(A, nvars);
+        fmpz_mpolyd_fit_length(A, degb_prod);
+        for (j = 0; j < nvars; j++)
+            A->deg_bounds[j] = temp_deg_bounds[j];
 
-               if (Bok && Cok) {
-            fmpz_CRT_ui(A->coeffs + i, B->coeffs + Bind++, Bm, C->coeffs[Cind++], fctx->mod.n, 1);
-        } else if (Bok && !Cok) {
-            fmpz_CRT_ui(A->coeffs + i, B->coeffs + Bind++, Bm,    0             , fctx->mod.n, 1);
-        } else if (!Bok && Cok) {
-            fmpz_CRT_ui(A->coeffs + i, zero              , Bm, C->coeffs[Cind++], fctx->mod.n, 1);
-        } else {
-            fmpz_zero(A->coeffs + i);
+        for (i = 0; i < degb_prod; i++)
+        {
+            fmpz_CRT_ui(A->coeffs + i, B->coeffs + i, Bm, C->coeffs[i], fctx->mod.n, 1);
         }
 
+    } else {
+        /* different bounds for packing */
+
+        fmpz_mpolyd_t temp;
+        fmpz_mpolyd_struct * T;
+
+        if (A == B)
+        {
+            T = temp;
+            fmpz_mpolyd_init(T, nvars);
+        } else {
+            T = A;
+        }
+
+        fmpz_mpolyd_set_nvars(T, nvars);
+        fmpz_mpolyd_fit_length(T, degb_prod);
+        for (j = 0; j < nvars; j++)
+            T->deg_bounds[j] = temp_deg_bounds[j];
+
+        inds = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+        for (j = 0; j < nvars; j++)
+            inds[j] = 0;
         Bok = 1;
         Cok = 1;
-        carry = 1;
-        for (j = nvars - 1; j >= 0; j--)
+        Bind = 0;
+        Cind = 0;
+        for (i = 0; i < degb_prod; i++)
         {
-            inds[j] += carry;
-            if (inds[j] < A->deg_bounds[j])
-            {
-                carry = 0;
-                Bok = Bok && (inds[j] < B->deg_bounds[j]);
-                Cok = Cok && (inds[j] < C->deg_bounds[j]);
-            } else
-            {
-                carry = 1;
-                inds[j] = 0;
+                   if (Bok && Cok) {
+                fmpz_CRT_ui(T->coeffs + i, B->coeffs + Bind++, Bm, C->coeffs[Cind++], fctx->mod.n, 1);
+            } else if (Bok && !Cok) {
+                fmpz_CRT_ui(T->coeffs + i, B->coeffs + Bind++, Bm, 0                , fctx->mod.n, 1);
+            } else if (!Bok && Cok) {
+                fmpz_CRT_ui(T->coeffs + i, zero              , Bm, C->coeffs[Cind++], fctx->mod.n, 1);
+            } else {
+                fmpz_zero(T->coeffs + i);
             }
+
+            Bok = 1;
+            Cok = 1;
+            carry = 1;
+            for (j = nvars - 1; j >= 0; j--)
+            {
+                inds[j] += carry;
+                if (inds[j] < T->deg_bounds[j])
+                {
+                    carry = 0;
+                    Bok = Bok && (inds[j] < B->deg_bounds[j]);
+                    Cok = Cok && (inds[j] < C->deg_bounds[j]);
+                } else
+                {
+                    carry = 1;
+                    inds[j] = 0;
+                }
+            }
+        }
+
+        if (A == B)
+        {
+            fmpz_mpolyd_swap(A, T);
+            fmpz_mpolyd_clear(T);
+        } else {
+
         }
     }
 
     fmpz_clear(zero);
 
     TMP_END;
+    return 1;
 }
 
 
@@ -497,7 +525,7 @@ void fmpz_mpolyd_heights(fmpz_t max, fmpz_t sum, fmpz_mpolyd_t A)
     fmpz_clear(t);
 }
 
-void fmpz_mpolyd_divexact_fmpz(fmpz_mpolyd_t A, fmpz_t c)
+void fmpz_mpolyd_divexact_fmpz_inplace(fmpz_mpolyd_t A, fmpz_t c)
 {
     slong degb_prod, i, j;
 
@@ -511,7 +539,7 @@ void fmpz_mpolyd_divexact_fmpz(fmpz_mpolyd_t A, fmpz_t c)
     }
 }
 
-void fmpz_mpolyd_mul_scalar(fmpz_mpolyd_t A, fmpz_t c)
+void fmpz_mpolyd_mul_scalar_inplace(fmpz_mpolyd_t A, fmpz_t c)
 {
     slong degb_prod, i, j;
 
@@ -629,7 +657,7 @@ slong fmpz_mpolyd_leadmon(slong * exps, const fmpz_mpolyd_t A)
 void fmpz_mpolyd_lc(fmpz_t a, const fmpz_mpolyd_t A)
 {
 
-    slong i, j, k;
+    slong i, j;
     slong degb_prod;
 
     degb_prod = WORD(1);
@@ -649,12 +677,13 @@ void fmpz_mpolyd_lc(fmpz_t a, const fmpz_mpolyd_t A)
 }
 
 
+
 int fmpz_mpolyd_gcd_brown(fmpz_mpolyd_t G,
             fmpz_mpolyd_t Abar, fmpz_mpolyd_t Bbar,
                     fmpz_mpolyd_t A, fmpz_mpolyd_t B)
 {
-    int equal, success;
-    mp_limb_t p, gammap;
+    int equal, success = 1;
+    mp_limb_t p, old_p;
     slong j, nvars;
     slong lm_idx;
     slong * exp, * texp;
@@ -662,25 +691,19 @@ int fmpz_mpolyd_gcd_brown(fmpz_mpolyd_t G,
     fmpz_t gnm, gns, anm, ans, bnm, bns;
     fmpz_t lA, lB, cA, cB, cG, bound, temp, pp;
     nmod_mpolyd_t Gp, Apbar, Bpbar, Ap, Bp;
-    fmpz_mpolyd_t T;
     nmodf_ctx_t fctx;
+    TMP_INIT;
+
+    TMP_START;
 
     nmodf_ctx_init(fctx, 2);
     nvars = A->nvars;
-
-/*printf("\n\n******* starting mpolyd_gcd_brown *********\n");*/
-
-    fmpz_mpolyd_init(T, nvars);
 
     nmod_mpolyd_init(Gp, nvars);
     nmod_mpolyd_init(Apbar, nvars);
     nmod_mpolyd_init(Bpbar, nvars);
     nmod_mpolyd_init(Ap, nvars);
     nmod_mpolyd_init(Bp, nvars);
-
-
-/*printf("A: "); fmpz_mpolyd_print_simple(A); printf("\n");
-printf("B: "); fmpz_mpolyd_print_simple(B); printf("\n");*/
 
     fmpz_init(cA);
     fmpz_init(cB);
@@ -699,45 +722,24 @@ printf("B: "); fmpz_mpolyd_print_simple(B); printf("\n");*/
     fmpz_init_set_si(m, 1);
     fmpz_init(pp);
 
-
-
     fmpz_mpolyd_content(cA, A);
-/*printf("cA: "); fmpz_print(cA); printf("\n");*/
-
     fmpz_mpolyd_content(cB, B);
-/*printf("cB: "); fmpz_print(cB); printf("\n");*/
-
     fmpz_gcd(cG, cA, cB);
-    fmpz_mpolyd_divexact_fmpz(A, cA);
-    fmpz_mpolyd_divexact_fmpz(B, cB);
-/*printf("A: "); fmpz_mpolyd_print_simple(A); printf("\n");
-printf("B: "); fmpz_mpolyd_print_simple(B); printf("\n");*/
-
+    fmpz_mpolyd_divexact_fmpz_inplace(A, cA);
+    fmpz_mpolyd_divexact_fmpz_inplace(B, cB);
     fmpz_mpolyd_lc(lA, A);
-/*printf("lA: "); fmpz_print(lA); printf("\n");*/
-
     fmpz_mpolyd_lc(lB, B);
-/*printf("lB: "); fmpz_print(lB); printf("\n");*/
-
     fmpz_gcd(gamma, lA, lB);
-/*printf("gamma: "); fmpz_print(gamma); printf("\n");*/
-
     fmpz_mpolyd_height(bound, A);
-/*printf("bound: "); fmpz_print(bound); printf("\n");*/
-
     fmpz_mpolyd_height(temp, B);
-/*printf("temp: "); fmpz_print(temp); printf("\n");*/
 
     if (fmpz_cmp(bound, temp) < 0)
         fmpz_swap(bound, temp);
     fmpz_mul(bound, bound, gamma);
     fmpz_add(bound, bound, bound);
-/*printf("bound: "); fmpz_print(bound); printf("\n");*/
 
-
-    exp = (slong *) flint_malloc(nvars*sizeof(slong));
-    texp = (slong *) flint_malloc(nvars*sizeof(slong));
-
+    exp = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    texp = (slong *) TMP_ALLOC(nvars*sizeof(slong));
 
     fmpz_mpolyd_leadmon(exp, A);
     fmpz_mpolyd_leadmon(texp, B);
@@ -746,59 +748,38 @@ printf("B: "); fmpz_mpolyd_print_simple(B); printf("\n");*/
 
     p = UWORD(1) << (FLINT_BITS - 1);
 
-loop:
+choose_next_prime:
+
+    old_p = p;
     p = n_nextprime(p, 1);
-
-/*sleep(1);*/
-
-    nmodf_ctx_clear(fctx);
-    nmodf_ctx_init(fctx, p);
-
-/*printf("m: "); fmpz_print(m); printf("\n");*/
-
+    if (p <= old_p) {
+        /* ran out of primes */
+        success = 0;
+        goto done;
+    }
     fmpz_set_ui(pp, p);
     if (fmpz_divisible(lA, pp) || fmpz_divisible(lB, pp))
-        goto loop;
+        goto choose_next_prime;
 
-/*printf("pp: "); fmpz_print(pp); printf("\n");*/
-
+    nmodf_ctx_reset(fctx, p);
     fmpz_mpolyd_to_nmod_mpolyd(Ap, A, fctx);
     fmpz_mpolyd_to_nmod_mpolyd(Bp, B, fctx);
-
-/*
-printf("Ap: "); nmod_mpolyd_print_simple(Ap); printf("\n");
-printf("Bp: "); nmod_mpolyd_print_simple(Bp); printf("\n");
-printf("m: "); fmpz_print(m); printf("\n");
-*/
-
-
     success = nmod_mpolyd_gcd_brown(Gp, Apbar, Bpbar, Ap, Bp, fctx);
-
-/*
-printf("success: %d\n", success);
-printf("   Gp: "); nmod_mpolyd_print_simple(Gp); printf("\n");
-printf("Apbar: "); nmod_mpolyd_print_simple(Apbar); printf("\n");
-printf("Bpbar: "); nmod_mpolyd_print_simple(Bpbar); printf("\n");
-printf("m: "); fmpz_print(m); printf("\n");
-*/
-
     if (!success)
-        goto loop;
+        goto choose_next_prime;
 
     lm_idx = nmod_mpolyd_leadmon(texp, Gp);
-
-/*printf("lm_idx: %d\n", lm_idx);*/
-
     if (lm_idx <= 0)
     {
+        /* Gp is 1, which means A and B are r.p. */
         FLINT_ASSERT(leadmon_idx == 0);
         fmpz_mpolyd_set_fmpz(G, cG);
         fmpz_mpolyd_swap(Abar, A);
         fmpz_divexact(temp, cA, cG);
-        fmpz_mpolyd_mul_scalar(Abar, temp);
+        fmpz_mpolyd_mul_scalar_inplace(Abar, temp);
         fmpz_mpolyd_swap(Bbar, B);
         fmpz_divexact(temp, cB, cG);
-        fmpz_mpolyd_mul_scalar(Bbar, temp);
+        fmpz_mpolyd_mul_scalar_inplace(Bbar, temp);
         goto done;
     }
 
@@ -807,7 +788,7 @@ printf("m: "); fmpz_print(m); printf("\n");
     {
         if (texp[j] > exp[j])
         {
-            goto loop;
+            goto choose_next_prime;
         } else if (texp[j] < exp[j])
         {
             equal = 0;
@@ -815,51 +796,30 @@ printf("m: "); fmpz_print(m); printf("\n");
         }
     }
 
-
-    gammap = fmpz_fdiv_ui(gamma, p);
-    nmod_mpolyd_mul_scalar(Gp, gammap, fctx);
-/*
-printf("m: "); fmpz_print(m); printf("\n");
-printf("   Gp: "); nmod_mpolyd_print_simple(Gp); printf("\n");
-printf("Apbar: "); nmod_mpolyd_print_simple(Apbar); printf("\n");
-printf("Bpbar: "); nmod_mpolyd_print_simple(Bpbar); printf("\n");
-*/
-
+    nmod_mpolyd_mul_scalar(Gp, fmpz_fdiv_ui(gamma, p), fctx);
 
     if (fmpz_is_one(m) || !equal)
     {
         fmpz_mpolyd_set_nmod_mpolyd(G, Gp, fctx);
         fmpz_mpolyd_set_nmod_mpolyd(Abar, Apbar, fctx);
         fmpz_mpolyd_set_nmod_mpolyd(Bbar, Bpbar, fctx);
-/*
-printf("   G: "); fmpz_mpolyd_print_simple(G); printf("\n");
-printf("Abar: "); fmpz_mpolyd_print_simple(Abar); printf("\n");
-printf("Bbar: "); fmpz_mpolyd_print_simple(Bbar); printf("\n");
-*/
         fmpz_set_ui(m, p);
         for (j = 0; j < nvars; j++)
             exp[j] = texp[j];
-        goto loop;
+
+        goto choose_next_prime;
     }
 
-    fmpz_mpolyd_CRT_nmod(T, G, m, Gp, fctx);
-    fmpz_mpolyd_swap(T, G);
-    fmpz_mpolyd_CRT_nmod(T, Abar, m, Apbar, fctx);
-    fmpz_mpolyd_swap(T, Abar);
-    fmpz_mpolyd_CRT_nmod(T, Bbar, m, Bpbar, fctx);
-    fmpz_mpolyd_swap(T, Bbar);
+    success = 1;
+    success = success && fmpz_mpolyd_CRT_nmod(G, G, m, Gp, fctx);
+    success = success && fmpz_mpolyd_CRT_nmod(Abar, Abar, m, Apbar, fctx);
+    success = success && fmpz_mpolyd_CRT_nmod(Bbar, Bbar, m, Bpbar, fctx);
     fmpz_mul(m, m, pp);
-
-/*printf("after interp\n");
-printf("   G: "); fmpz_mpolyd_print_simple(G); printf("\n");
-printf("Abar: "); fmpz_mpolyd_print_simple(Abar); printf("\n");
-printf("Bbar: "); fmpz_mpolyd_print_simple(Bbar); printf("\n");
-printf("m: "); fmpz_print(m); printf("\n");*/
+    if (!success)
+        goto done;
 
     if (fmpz_cmp(m, bound) <= 0)
-        goto loop;
-
-/*printf("more1\n");*/
+        goto choose_next_prime;
 
     fmpz_mpolyd_heights(gnm, gns, G);
     fmpz_mpolyd_heights(anm, ans, Abar);
@@ -869,8 +829,6 @@ printf("m: "); fmpz_print(m); printf("\n");*/
     fmpz_mul(bns, bns, gnm);
     fmpz_mul(bnm, bnm, gns);
 
-/*printf("more2\n");*/
-
     if (fmpz_cmp(ans, anm) > 0)
         fmpz_swap(ans, anm);
     if (fmpz_cmp(bns, bnm) > 0)
@@ -878,26 +836,21 @@ printf("m: "); fmpz_print(m); printf("\n");*/
     fmpz_add(ans, ans, ans);
     fmpz_add(bns, bns, bns);
     if (fmpz_cmp(ans, m) >= 0 || fmpz_cmp(bns, m) >= 0)
-        goto loop;
-
-/*printf("no more loop\n");*/
+        goto choose_next_prime;
 
     fmpz_mpolyd_content(temp, G);
-    fmpz_mpolyd_divexact_fmpz(G, temp);
+    fmpz_mpolyd_divexact_fmpz_inplace(G, temp);
     fmpz_mpolyd_lc(temp, G);
-    fmpz_mpolyd_divexact_fmpz(Abar, temp);
-    fmpz_mpolyd_divexact_fmpz(Bbar, temp);
+    fmpz_mpolyd_divexact_fmpz_inplace(Abar, temp);
+    fmpz_mpolyd_divexact_fmpz_inplace(Bbar, temp);
 
-    fmpz_mpolyd_mul_scalar(G, cG);
+    fmpz_mpolyd_mul_scalar_inplace(G, cG);
     fmpz_divexact(temp, cA, cG);
-    fmpz_mpolyd_mul_scalar(Abar, temp);
+    fmpz_mpolyd_mul_scalar_inplace(Abar, temp);
     fmpz_divexact(temp, cB, cG);
-    fmpz_mpolyd_mul_scalar(Bbar, temp);
+    fmpz_mpolyd_mul_scalar_inplace(Bbar, temp);
 
 done:
-
-    flint_free(exp);
-    flint_free(texp);
 
     fmpz_clear(cA);
     fmpz_clear(cB);
@@ -916,8 +869,6 @@ done:
     fmpz_clear(m);
     fmpz_clear(pp);
 
-    fmpz_mpolyd_clear(T);
-
     nmod_mpolyd_clear(Gp);
     nmod_mpolyd_clear(Apbar);
     nmod_mpolyd_clear(Bpbar);
@@ -926,7 +877,8 @@ done:
 
     nmodf_ctx_clear(fctx);
 
-    return 1;
+    TMP_END;
+    return success;
 }
 
 
@@ -949,16 +901,14 @@ int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G,
         fmpz_mpoly_set(G, A, ctx);
         goto cleanup_stage0;
     }
-/*printf("here1\n");*/
 
     fmpz_mpolyd_ctx_init(dctx, nvars);
-    success = fmpz_mpolyd_ctx_settle(dctx, A, B, ctx);
+    success = fmpz_mpolyd_ctx_init_version1(dctx, A, B, ctx);
     if (!success)
     {
         fmpz_mpoly_zero(G, ctx);
         goto cleanup_stage1;
     }
-/*printf("here2\n");*/
 
     fmpz_mpolyd_init(Ad, nvars);
     fmpz_mpolyd_init(Bd, nvars);
@@ -966,12 +916,8 @@ int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G,
     fmpz_mpolyd_init(Abar, nvars);
     fmpz_mpolyd_init(Bbar, nvars);
 
-/*printf("here3\n");*/
-
     fmpz_mpoly_convert_to_fmpz_mpolyd(Ad, dctx, A, ctx);
     fmpz_mpoly_convert_to_fmpz_mpolyd(Bd, dctx, B, ctx);
-
-/*printf("here4\n");*/
 
     success = fmpz_mpolyd_gcd_brown(Gd, Abar, Bbar, Ad, Bd);
     if (!success)

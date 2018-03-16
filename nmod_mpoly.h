@@ -65,6 +65,14 @@ void nmodf_ctx_init(nmodf_ctx_t ctx, ulong modulus)
 }
 
 NMOD_MPOLY_INLINE
+void nmodf_ctx_reset(nmodf_ctx_t ctx, ulong modulus)
+{
+    ctx->mod.n = modulus;
+    ctx->mod.ninv = n_preinvert_limb(modulus);
+    count_leading_zeros(ctx->mod.norm, modulus);
+}
+
+NMOD_MPOLY_INLINE
 void nmodf_ctx_clear(nmodf_ctx_t ctx)
 {
     flint_free(ctx->extras);

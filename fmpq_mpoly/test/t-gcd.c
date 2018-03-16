@@ -43,11 +43,11 @@ main(void)
         fmpq_mpoly_init(cg, ctx);
         fmpq_mpoly_init(t, ctx);
 
-        len = n_randint(state, 10) + 1;
-        len1 = n_randint(state, 10);
-        len2 = n_randint(state, 10);
+        len = n_randint(state, 20) + 1;
+        len1 = n_randint(state, 30);
+        len2 = n_randint(state, 30);
 
-        degbound = 16/(1 + ctx->zctx->minfo->nvars);
+        degbound = 20/(1 + ctx->zctx->minfo->nvars);
 
         coeff_bits = n_randint(state, 20);
 
@@ -63,7 +63,11 @@ main(void)
             fmpq_mpoly_mul(b, b, t, ctx);
 
             fmpq_mpoly_randtest_bits_bound(g, state, len, coeff_bits, degbound, ctx);
-            fmpq_mpoly_gcd(g, a, b, ctx);
+            res = fmpq_mpoly_gcd(g, a, b, ctx);
+            if (!res) {
+                continue;
+            }
+
             fmpq_mpoly_test_canonical(g, ctx);
 
             if (fmpq_mpoly_is_zero(g, ctx))
