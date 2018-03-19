@@ -1,0 +1,535 @@
+/*
+    Copyright (C) 2018 Daniel Schultz
+    
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+*******************************************************************************
+
+    Context object
+
+*******************************************************************************
+
+void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx, 
+                                             slong nvars, const ordering_t ord)
+
+    Initialise a context object for a polynomial ring with the given number of
+    variables and the given ordering. The possibilities for the ordering are
+    \code{ORD_LEX}, \code{ORD_REVLEX}, \code{ORD_DEGLEX} and
+    \code{ORD_DEGREVLEX}.
+
+void fmpq_mpoly_ctx_clear(fmpq_mpoly_ctx_t ctx)
+
+    Release up any space allocated by an \code{fmpq_mpoly_ctx_t}.
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fmpq_mpoly_init(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Initialise an \code{fmpq_mpoly_t} for use, given an initialised context
+    object.
+
+void fmpq_mpoly_init2(fmpq_mpoly_t poly, slong alloc, 
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Initialise an \code{fmpq_mpoly_t} for use, with space for at least
+    \code{alloc} terms, given an initialised context. By default, fields of 8
+    bits are allocated for the exponents in each exponent vector.
+
+void fmpq_mpoly_realloc(fmpq_mpoly_t poly, slong len, 
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Reallocate an \code{fmpq_mpoly_t} to have space for \code{alloc} terms. 
+    Assumes the current length of the polynomial is not greater than
+    \code{len}.
+
+
+void fmpq_mpoly_fit_length(fmpq_mpoly_t poly, slong len, 
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Reallocate a low level \code{fmpq_mpoly} to have space for at least
+    \code{len} terms. No truncation is performed if \code{len} is less than
+    the currently allocated number of terms; the allocated space can only grow.
+
+void fmpq_mpoly_clear(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Release any space allocated for an \code{fmpq_mpoly_t}.
+
+void fmpq_mpoly_truncate(fmpq_mpoly_t poly, slong newlen, 
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    If the given polynomial is larger than the given number of terms, truncate
+    to that number of terms.
+
+void fmpq_mpoly_fit_bits(fmpq_mpoly_t poly,
+                                         slong bits, const fmpq_mpoly_ctx_t ctx)
+
+    Reallocate the polynomial to have space for exponent fields of the given
+    number of bits. This function can increase the number of bits only.
+
+*******************************************************************************
+
+    Basic manipulation
+
+*******************************************************************************
+
+void fmpq_mpoly_degrees_si(slong * degs,
+                           const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Return the degree of \code{poly} with respect to each variable. The array
+    \code{degs} has length equal to the number of variables, and the degree of
+    \code{poly} with respect its $i$-th variable is stored in \code{degs[i]}. If
+    \code{poly} is zero, all degrees are set to \code{-1}.
+
+slong fmpq_mpoly_degree_si(const fmpq_mpoly_t poly, slong var, 
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Return the degree of \code{poly} with respect to the variable of index
+    \code{var}. If \code{poly} is zero, the return is \code{-1}.
+
+void fmpq_mpoly_degrees_fmpz(fmpz ** degs,
+                           const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Return the degree of \code{poly} with respect to each variable. The array
+    \code{degs} has length equal to the number of variables, and the degree of
+    \code{poly} with respect its $i$-th variable is stored in \code{degs[i]}. If
+    \code{poly} is zero, all degrees are set to \code{-1}.
+
+void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t poly, slong var, 
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Return into \code{deg} the degree of \code{poly} with respect
+    to the variable of index
+    \code{var}. If \code{poly} is zero, then \code{deg} is set to \code{-1}.
+
+void fmpq_mpoly_gen(fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpq_mpoly_t} to the $i$-th generator (variable),
+    where $i = 0$ corresponds to the variable with the most significance
+    with respect to the ordering. 
+
+void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly,
+                                    const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpq_mpoly_t} to the constant polynomial corresponding
+    to the rational number $c$.
+
+int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t poly,
+                                          fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpq_mpoly_t} is equal to the constant
+    polynomial represented by the rational number $c$, else return 0.
+
+void fmpq_mpoly_swap(fmpq_mpoly_t poly1, 
+                                 fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
+
+    Efficiently swap the contents of the two given polynomials. No copying is
+    performed; the swap is accomplished by swapping pointers.
+
+void fmpq_mpoly_zero(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpq_mpoly_t} to the zero polynomial.
+
+void fmpq_mpoly_one(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Set the given \code{fmpq_mpoly_t} to the constant polynomial with value 1.
+
+int fmpq_mpoly_is_zero(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpq_mpoly_t} is equal to the zero polynomial,
+    else return 0.
+
+int fmpq_mpoly_is_one(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpq_mpoly_t} is equal to the constant
+    polynomial with coefficient 1, else return 0.
+
+int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly,
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{fmpq_mpoly_t} is equal to the $i$-th generator
+    of the polynomial ring, otherwise return 0. The generator corresponding to
+    the variable with the most significance corresponds to $i = 0$. If
+    $i < 0$ the function returns 1 if the polynomial is equal to any generator
+    of the polynomial ring, otherwise it returns 0.
+
+void fmpq_mpoly_get_coeff_fmpq(fmpq_t x,
+                  const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Set $x$ to coefficient of the given polynomial with index $i$, starting
+    with $i = 0$ for the term with most significance.
+
+void fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly, 
+                           slong i, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
+
+    Set the coefficient of the given polynomial with index $i$ to the given
+    value $x$, starting with $i = 0$ for the term with most signifance. Any
+    existing term at that index is overwritten.
+
+void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly, 
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Get the exponent vector of the given polynomial with index $i$. The output
+    is written in the array \code{exps} which is assumed to have space for $n$
+    entries, where $n$ is the number of variable of the polynomial.
+    The entry with index 0 in the array corresponds to the
+    variable with the most significance with respect to the polynomial
+    ordering.
+
+void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, 
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Get the exponent vector of the given polynomial with index $i$. The output
+    is written in the array \code{exps} which is assumed to have space for $n$
+    entries, where $n$ is the number of variable of the polynomial.
+    The entry with index 0 in the array corresponds to the
+    variable with the most significance with respect to the polynomial
+    ordering.
+
+void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly, 
+                       slong i, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
+
+    Set the exponent vector of the given polynomial with index $i$. The
+    exponent is specified by the values in the array \code{exps} which is
+    assumed to have $n$ entries, where $n$ is the number of variable of the
+    polynomial. The entry with index 0 in the array corresponds
+    to the variable with the most significance with respect to the
+    polynomial ordering.
+
+void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
+                       slong i, const fmpz ** exps, const fmpq_mpoly_ctx_t ctx)
+
+    Set the exponent vector of the given polynomial with index $i$. The
+    exponent is specified by the values in the array \code{exps} which is
+    assumed to have $n$ entries, where $n$ is the number of variable of the
+    polynomial. The entry with index 0 in the array corresponds
+    to the variable with the most significance with respect to the
+    polynomial ordering.
+
+void fmpq_mpoly_set_term_fmpq_ui(fmpq_mpoly_t poly,
+                       const fmpq_t c, ulong const * exp, fmpq_mpoly_ctx_t ctx)
+
+    Set the term of \code{poly} with the given monomial to the given
+    coefficient. The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If a term with that
+    monomial already exists in the polynomial, it is overwritten. The term is
+    removed if the coefficient is zero. If a term with that monomial doesn't
+    exist, one is inserted at the appropriate position.
+
+void fmpq_mpoly_set_term_fmpq_fmpz(fmpq_mpoly_t poly,
+                       const fmpq_t c, const fmpz ** exp, fmpq_mpoly_ctx_t ctx)
+
+    Set the term of \code{poly} with the given monomial to the given
+    coefficient. The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If a term with that
+    monomial already exists in the polynomial, it is overwritten. The term is
+    removed if the coefficient is zero. If a term with that monomial doesn't
+    exist, one is inserted at the appropriate position.
+
+void fmpq_mpoly_get_term_fmpq_ui(fmpq_t c, const fmpq_mpoly_t poly,
+                                 ulong const * exp, const fmpq_mpoly_ctx_t ctx)
+
+    Get the coefficient $c$ of the term of \code{poly} with the given monomial.
+    The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If no term with that
+    monomial exists in the polynomial, zero is returned.
+
+void fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
+                                 const fmpq ** exp, const fmpq_mpoly_ctx_t ctx)
+
+    Get the coefficient $c$ of the term of \code{poly} with the given monomial.
+    The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If no term with that
+    monomial exists in the polynomial, zero is returned.
+
+*******************************************************************************
+
+    Set and negate
+
+*******************************************************************************
+
+void fmpq_mpoly_set(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                                    const fmpq_mpoly_ctx_t ctx)
+    
+    Set \code{poly1} to \code{poly2}.
+
+void fmpq_mpoly_neg(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                                    const fmpq_mpoly_ctx_t ctx)
+    
+    Set \code{poly1} to $-$\code{poly2}.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int fmpq_mpoly_equal(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly1} is equal to \code{poly2}, else return 0.
+
+
+*******************************************************************************
+
+    Basic arithmetic
+
+*******************************************************************************
+
+void fmpq_mpoly_add_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                    const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus the constant polynomial given by the
+    multiprecision integer $c$.
+
+void fmpq_mpoly_sub_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                          fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} minus the constant polynomial given by the
+    multiprecision integer $c$.
+
+void fmpq_mpoly_add(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                          const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus \code{poly3}.
+
+
+void fmpq_mpoly_sub(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                          const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} minus \code{poly3}.
+
+*******************************************************************************
+
+    Scalar operations
+
+*******************************************************************************
+
+void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                    fmpq_t ulong c, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times the rational number $c$.
+
+void fmpq_mpoly_make_monic_inplace(fmpq_mpoly_t poly1,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Divide \code{poly1} by its leading coefficient. An expection is raised if
+    \code{poly1} is zero.
+
+*******************************************************************************
+
+    Multiplication
+
+*******************************************************************************
+
+void fmpq_mpoly_mul(fmpq_mpoly_t poly1,
+                 const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, 
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times \code{poly3}.
+
+void fmpq_mpoly_mul_threaded(fmpq_mpoly_t poly1,
+                 const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
+                                                   const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times \code{poly3} using multiple threads.
+
+*******************************************************************************
+
+    Powering
+
+*******************************************************************************
+
+void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                    const fmpz_t k, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} raised to the $k$-th power.
+    An expection is raised if $k < 0$ or if $k$ is large and the polynomial is
+    not a monomial with coefficient $\pm1$.
+
+*******************************************************************************
+
+    Divisibility testing
+
+*******************************************************************************
+
+int fmpq_mpoly_divides(fmpq_mpoly_t poly1,
+                  const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} divided by \code{poly3} and return 1 if
+    the quotient is exact. Otherwise return 0.
+
+*******************************************************************************
+
+    Division
+
+*******************************************************************************
+
+void fmpq_mpoly_div(fmpq_mpoly_t polyq,
+                     const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{polyq} to the quotient of \code{poly2} by \code{poly3},
+    discarding the remainder. An expection is raised if \code{poly2}
+    or \code{poly3} have bit counts greater than \code{FLINT_BITS}.
+
+void fmpq_mpoly_divrem(fmpq_mpoly_t q, fmpq_mpoly_t r,
+                  const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{polyq} and \code{polyr} to the quotient and remainder of
+    \code{poly2} divided by \code{poly3}. An expection is raised if \code{poly2}
+    or \code{poly3} have bit counts greater than \code{FLINT_BITS}.
+
+*******************************************************************************
+
+    Reduction
+
+*******************************************************************************
+
+void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q,
+                                fmpq_mpoly_t r, const fmpq_mpoly_t poly2,
+      fmpq_mpoly_struct * const * poly3, slong len, const fmpq_mpoly_ctx_t ctx)
+
+    This function is as per \code{fmpq_mpoly_divrem} except
+    that it takes an array of divisor polynomials \code{poly3}, and it returns
+    an array of quotient polynomials \code{q}. The number of divisor (and hence
+    quotient) polynomials, is given by \code{len}. The function computes
+    polynomials $q_i = q[i]$ such that \code{poly2} is
+    $r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i$, where $b_i =$ \code{poly3[i]}.
+
+*******************************************************************************
+
+    Differentiation/Integration
+
+*******************************************************************************
+
+void fmpq_mpoly_derivative(fmpq_mpoly_t poly1,
+               const fmpq_mpoly_t poly2, slong idx, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the derivative of \code{poly2} with respect to the
+    variable of index \code{idx}.
+
+void fmpq_mpoly_integral(fmpq_mpoly_t poly1, fmpq_t scale,
+               const fmpq_mpoly_t poly2, slong idx, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the integral with the fewest number of terms
+    of \{poly2} with respect to the variable of index \code{idx}.
+
+*******************************************************************************
+
+    Evaluation
+
+*******************************************************************************
+
+void fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, fmpq_mpoly_t poly,
+                                            fmpq ** vals, fmpq_mpoly_ctx_t ctx)
+
+    Set \code{ev} to the evaluation of \code{poly} where the variables are
+    replaced by the corresponding elements of the array \code{vals}.
+
+void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t poly1, fmpq_mpoly_t poly2,
+                                   slong var, fmpq_t val, fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the evaluation of \code{poly2} where the variable of
+    index \code{var} is replaced by \code{val}.
+
+void fmpq_mpoly_compose(fmpq_mpoly_t res, fmpq_mpoly_t poly1,
+     fmpq_mpoly_struct ** polys2, fmpq_mpoly_ctx_t ctx1, fmpq_mpoly_ctx_t ctx2)
+
+    Set \code{res} to the evaluation of \code{poly1} where the variables are
+    replaced by the corresponding elements of the array \code{polys2}. Both
+    \code{res} and the elements of \code{polys2} have context object
+    \code{ctx2}, while \code{poly1} has context object \code{ctx1}. Neither of
+    \code{res} and \code{poly1} is allowed to alias any other polynomial.
+
+*******************************************************************************
+
+    Greatest Common Divisor
+
+*******************************************************************************
+
+int fmpq_mpoly_gcd(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                          const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the monic GCD of \code{poly2} and \code{poly3}, assuming
+    the return value is non zero. If the return value is zero, the GCD was
+    unable to be computed.
+
+*******************************************************************************
+
+    Input/Output
+
+*******************************************************************************
+
+char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t poly,
+                                   const char ** x, const fmpq_mpoly_ctx_t ctx)
+
+    Return a string (which the user is responsible for cleaning up),
+    representing \code{poly}, given an array of variable strings, starting
+    with the variable of most significance with respect to the ordering. 
+
+int fmpq_mpoly_fprint_pretty(FILE * file, 
+          const fmpq_mpoly_t poly, const char ** x, const fmpq_mpoly_ctx_t ctx)
+
+    Print to the given stream a string representing \code{poly}, given an
+    array of variable strings, starting with the variable of most
+    significance with respect to the ordering. The number of characters
+    written is returned.
+
+int fmpq_mpoly_print_pretty(const fmpq_mpoly_t poly,
+                                   const char ** x, const fmpq_mpoly_ctx_t ctx)
+
+    Print to \code{stdout} a string representing \code{poly}, given an
+    array of variable strings, starting with the variable of most
+    significance with respect to the ordering. The number of characters
+    written is returned.
+
+int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t poly, const char * str,
+                                   const char ** x, const fmpq_mpoly_ctx_t ctx)
+
+    Sets \code{poly} to the polynomial in the null-terminated string \code{str}
+    given an array \code{x} of variable strings. If parsing \code{str} fails,
+    \code{poly} is set to zero, and \code{-1} is returned. Otherwise, \code{0}
+    is returned. The operations \code{+}, \code{-}, \code{*}, and \code{/} are
+    permitted along with integers and the variables in \code{x}. The character
+    \code{^} must be immediately followed by the (integer) exponent. If any
+    division is not exact, parsing fails.
+
+*******************************************************************************
+
+    Random generation
+
+*******************************************************************************
+
+void fmpq_mpoly_randtest_bound(fmpq_mpoly_t poly, flint_rand_t state,
+                   slong length, mp_limb_t coeff_bits, slong exp_bound,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Generate a random polynomial with the number of variables and ordering
+    specified by \code{ctx}, and with length up to the given length, exponents
+    which don't exceed the given bound and with signed coefficients of the
+    given number of bits.
+
+void fmpq_mpoly_randtest_bits(fmpq_mpoly_t poly, flint_rand_t state,
+                   slong length, mp_limb_t coeff_bits, mp_limb_t exp_bits,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Generate a random polynomial with the number of variables and ordering
+    specified by \code{ctx}, and with length up to the given length, exponents
+    whose packed form don't exceed the given bit count, and with signed
+    coefficients of the given number of bits.
