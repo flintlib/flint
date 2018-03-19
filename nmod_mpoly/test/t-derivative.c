@@ -56,9 +56,9 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS - 1) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS - 1) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS - 1) + 1;
+        exp_bits = n_randint(state, 200) + 1;
+        exp_bits1 = n_randint(state, 200) + 1;
+        exp_bits2 = n_randint(state, 200) + 1;
 
         nmod_mpoly_randtest_bits(hp, state, len, exp_bits, ctx);
         nmod_mpoly_randtest_bits(fp, state, len, exp_bits1, ctx);
@@ -145,9 +145,9 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS - 1) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS - 1) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS - 1) + 1;
+        exp_bits = n_randint(state, 200) + 1;
+        exp_bits1 = n_randint(state, 200) + 1;
+        exp_bits2 = n_randint(state, 200) + 1;
 
         nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
         nmod_mpoly_randtest_bits(fp, state, len, exp_bits, ctx);

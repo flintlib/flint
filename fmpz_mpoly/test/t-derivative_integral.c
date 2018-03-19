@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,11 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
 int
 main(void)
@@ -92,9 +88,9 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS - 2) + 1;
+        exp_bits = n_randint(state, 200) + 1;
+        exp_bits1 = n_randint(state, 200) + 1;
+        exp_bits2 = n_randint(state, 200) + 1;
 
         coeff_bits = n_randint(state, 200);
 
@@ -111,14 +107,12 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_test(h, ctx);
-
             fmpz_mpoly_derivative(hp, h, idx, ctx);
             fmpz_mpoly_test(hp, ctx);
             fmpz_mpoly_derivative(fp, f, idx, ctx);
             fmpz_mpoly_test(fp, ctx);
             fmpz_mpoly_derivative(gp, g, idx, ctx);
             fmpz_mpoly_test(gp, ctx);
-
             fmpz_mpoly_mul_johnson(t1, f, gp, ctx);
             fmpz_mpoly_test(t1, ctx);
             fmpz_mpoly_mul_johnson(t2, g, fp, ctx);
@@ -173,9 +167,9 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        exp_bits = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS - 2) + 1;
+        exp_bits = n_randint(state, 200) + 1;
+        exp_bits1 = n_randint(state, 200) + 1;
+        exp_bits2 = n_randint(state, 200) + 1;
 
         coeff_bits = n_randint(state, 200);
 
@@ -250,15 +244,15 @@ main(void)
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(f1, ctx);
 
-        len = n_randint(state, 100);
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
+        len = n_randint(state, 10);
+        len1 = n_randint(state, 10);
+        len2 = n_randint(state, 10);
 
-        exp_bits = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS - 2) + 1;
+        exp_bits = n_randint(state, 200) + 1;
+        exp_bits1 = n_randint(state, 200) + 1;
+        exp_bits2 = n_randint(state, 200) + 1;
 
-        coeff_bits = n_randint(state, 200);
+        coeff_bits = n_randint(state, 20);
 
         fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
         fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);

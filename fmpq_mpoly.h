@@ -388,6 +388,9 @@ FLINT_DLL void fmpq_mpoly_mul_threaded(fmpq_mpoly_t poly1,
 FLINT_DLL void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
                                  const fmpz_t pow, const fmpq_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpq_mpoly_pow_si(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                        slong pow, const fmpq_mpoly_ctx_t ctx);
+
 /* Calculus ******************************************************************/
 
 FLINT_DLL void fmpq_mpoly_derivative(fmpq_mpoly_t poly1,

@@ -33,6 +33,8 @@ void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift
     slong fpw = FLINT_BITS/bits;
     slong i;
 
+    FLINT_ASSERT(bits <= FLINTS); /* division by FLINT_BITS/bits follows */
+
     for (i = 0; i < N; i++)
         oneexp[i] = 0;
 
@@ -46,3 +48,26 @@ void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift
     if (mctx->deg)
         oneexp[nvars/fpw] |= UWORD(1) << (nvars%fpw*bits);
 }
+
+void mpoly_gen_oneexp_offset_mp(ulong * oneexp, slong * offset,
+                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx)
+{
+    slong nvars = mctx->nvars;
+    slong wpf = bits/FLINT_BITS;
+    slong i;
+
+    FLINT_ASSERT(bits > FLINTS);
+
+    for (i = 0; i < N; i++)
+        oneexp[i] = 0;
+
+    if (!mctx->rev)
+        idx = nvars - 1 - idx;
+
+    *offset = idx*wpf;
+
+    oneexp[idx*wpf] = UWORD(1);
+    if (mctx->deg)
+        oneexp[nvars*wpf] = UWORD(1);
+}
+

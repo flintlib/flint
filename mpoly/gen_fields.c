@@ -29,3 +29,19 @@ void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx)
 
 }
 
+void mpoly_gen_fields_fmpz(fmpz * exp, slong var, const mpoly_ctx_t mctx)
+{
+    slong nvars = mctx->nvars;
+    slong nfields = mctx->nfields;
+    int deg = mctx->deg;
+    int rev = mctx->rev;
+    slong i;
+
+    for (i = 0; i < nfields; i++)
+        fmpz_zero(exp + i);
+
+    fmpz_set_ui(exp + (rev ? var : nvars - 1 - var), WORD(1));
+    if (deg)
+        fmpz_set_ui(exp + nvars, WORD(1));
+}
+
