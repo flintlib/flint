@@ -26,7 +26,7 @@ main(void)
     flint_printf("get/set_monomial....");
     fflush(stdout);
 
-    /* Set monomial and get monomial and compare */
+    /* check ui */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
@@ -45,10 +45,9 @@ main(void)
 
        fmpz_mpoly_init(f, ctx);
 
-       len = n_randint(state, 100);
-
-       exp_bits = n_randint(state, FLINT_BITS - 1) + 1;
-       coeff_bits = n_randint(state, 200);
+       len = n_randint(state, 50);
+       exp_bits = n_randint(state, 100) + 1;
+       coeff_bits = n_randint(state, 100);
 
        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
@@ -59,16 +58,21 @@ main(void)
 
           for (k = 0; k < nvars; k++)
           {
-             slong bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars) - 1) + 1;
+             slong bits = n_randint(state, FLINT_BITS) + 1;
              exp[k] = n_randbits(state, bits);
           }
 
           index = n_randint(state, f->length + 1);
 
-          fmpz_mpoly_set_monomial(f, index, exp, ctx);
+          fmpz_mpoly_set_monomial_ui(f, index, exp, ctx);
 
-          fmpz_mpoly_get_monomial(exp2, f, index, ctx);
+          if (!mpoly_monomials_valid_test(f->exps, f->length, f->bits, ctx->minfo))
+             flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
+
+          if (mpoly_monomials_overflow_test(f->exps, f->length, f->bits, ctx->minfo))
+             flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
+
+          fmpz_mpoly_get_monomial_ui(exp2, f, index, ctx);
 
           result = 1;
           for (k = 0; k < nvars; k++)
@@ -76,25 +80,86 @@ main(void)
 
           if (!result)
           {
-             printf("FAIL\n");
-
-             flint_printf("index = %wd\n", index);
-
-             flint_printf("exp = [");
-             for (k = 0; k < nvars; k++)
-                flint_printf("%wu, ", exp[k]);
-             flint_printf("]\n");
-
-             flint_printf("exp2 = [");
-             for (k = 0; k < nvars; k++)
-                flint_printf("%wu, ", exp2[k]);
-             flint_printf("]\n");
-
+             printf("FAIL\ncheck ui, i = %d, j = %d\n", i, j);
              flint_abort();
           }
 
           flint_free(exp);
           flint_free(exp2);
+       }
+
+       fmpz_mpoly_clear(f, ctx);  
+    }
+
+    /* check fmpz */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f;
+        ordering_t ord;
+        fmpz_t c, d;
+        slong nvars, len, coeff_bits, exp_bits, index;
+
+        fmpz_init(c);
+        fmpz_init(d);
+
+        ord = mpoly_ordering_randtest(state);
+        nvars = n_randint(state, 20) + 1;
+
+        fmpz_mpoly_ctx_init(ctx, nvars, ord);
+
+        fmpz_mpoly_init(f, ctx);
+
+        len = n_randint(state, 50);
+        exp_bits = n_randint(state, 100) + 1;
+        coeff_bits = n_randint(state, 100);
+
+        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+
+        for (j = 0; j < 10; j++)
+        {
+            fmpz ** exp1 = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
+            fmpz ** exp2 = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
+
+            for (k = 0; k < nvars; k++)
+            {
+                exp1[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+                exp2[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+                fmpz_init(exp1[k]);
+                fmpz_init(exp2[k]);
+                fmpz_randtest_unsigned(exp1[k], state, 200);
+            }
+
+            index = n_randint(state, f->length + 1);
+
+            fmpz_mpoly_set_monomial_fmpz(f, index, exp1, ctx);
+
+            if (!mpoly_monomials_valid_test(f->exps, f->length, f->bits, ctx->minfo))
+                flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
+
+            if (mpoly_monomials_overflow_test(f->exps, f->length, f->bits, ctx->minfo))
+                flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
+
+            fmpz_mpoly_get_monomial_fmpz(exp2, f, index, ctx);
+
+            result = 1;
+            for (k = 0; k < nvars; k++)
+            {
+                result &= fmpz_equal(exp1[k], exp2[k]);
+                fmpz_clear(exp1[k]);
+                fmpz_clear(exp2[k]);
+                flint_free(exp1[k]); 
+                flint_free(exp2[k]); 
+            }
+
+            if (!result)
+            {
+                printf("FAIL\ncheck fmpz, i = %d, j = %d\n", i, j);
+                flint_abort();
+            }
+
+            flint_free(exp1);
+            flint_free(exp2);
        }
 
        fmpz_mpoly_clear(f, ctx);  

@@ -580,27 +580,11 @@ FLINT_DLL void mpoly_search_monomials(
                                                slong N, const ulong * cmpmask);
 
 
-MPOLY_INLINE
-int mpoly_monomials_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx)
-{
-    slong N, i;
-    ulong * cmpmask;
+FLINT_DLL int mpoly_monomials_valid_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
-    N = mpoly_words_per_exp(bits, mctx);
-    cmpmask = flint_malloc((N+1)*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, bits, mctx);
+FLINT_DLL int mpoly_monomials_overflow_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
-    for (i = 0; i + 1 < len; i++)
-    {
-        if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N, cmpmask))
-        {
-            flint_free(cmpmask);
-            return 0;
-        }
-    }
-    flint_free(cmpmask);
-    return 1;
-}
+FLINT_DLL int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
 /* Heap **********************************************************************/
 

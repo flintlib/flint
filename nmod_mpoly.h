@@ -728,15 +728,17 @@ void nmod_mpoly_test(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
 {
    slong i;
 
-   if (!mpoly_monomials_test(poly->exps, poly->length, poly->bits, ctx->minfo))
-      flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
+    if (mpoly_monomials_overflow_test(poly->exps, poly->length, poly->bits, ctx->minfo))
+        flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
+
+    if (!mpoly_monomials_inorder_test(poly->exps, poly->length, poly->bits, ctx->minfo))
+        flint_throw(FLINT_ERROR, "Polynomial exponents out of order");
 
     for (i = 0; i < poly->length; i++)
     {
         if (poly->coeffs[i] == 0)
             flint_throw(FLINT_ERROR, "Polynomial has a zero coefficient");
     }
-
 }
 
 
