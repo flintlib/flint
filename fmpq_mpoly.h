@@ -207,6 +207,20 @@ void fmpq_mpoly_fit_bits(fmpq_mpoly_t poly,
 FLINT_DLL void fmpq_mpoly_get_coeff_fmpq(fmpq_t c, const fmpq_mpoly_t poly,
                                           slong n, const fmpq_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly,
+                          slong n, const fmpq_t x, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly, 
+                                          slong n, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, 
+                                          slong n, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly, 
+                      slong n, const ulong * exps, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
+                      slong n,       fmpz ** exps, const fmpq_mpoly_ctx_t ctx);
+
+
 FLINT_DLL void fmpq_mpoly_canonicalise(fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);
 
