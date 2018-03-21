@@ -314,6 +314,13 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
     bits = FLINT_MAX(MPOLY_MIN_BITS, bits + 1);
     bits = mpoly_fix_bits(bits, ctx->minfo);
 
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(gen_fields + i);
+        fmpz_clear(tmp_fields + i);
+        fmpz_clear(max_fields + i);
+    }
+
     /* pack everything into bits */
     N = mpoly_words_per_exp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
