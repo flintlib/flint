@@ -58,10 +58,10 @@ main(void)
           c = z_randtest(state);
 
           fmpz_mpoly_add_si(g, f, c, ctx);
-          fmpz_mpoly_test(g, ctx);
+          fmpz_mpoly_assert_canonical(g, ctx);
 
           fmpz_mpoly_sub_si(h, g, c, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           result = fmpz_mpoly_equal(f, h, ctx);
 
@@ -107,10 +107,10 @@ main(void)
           c = z_randtest(state);
 
           fmpz_mpoly_add_si(f, f, c, ctx);
-          fmpz_mpoly_test(f, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
 
           fmpz_mpoly_sub_si(f, f, c, ctx);
-          fmpz_mpoly_test(f, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
 
           result = fmpz_mpoly_equal(f, g, ctx);
 

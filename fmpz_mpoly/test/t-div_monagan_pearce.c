@@ -65,10 +65,10 @@ main(void)
           fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           fmpz_mpoly_div_monagan_pearce(k, h, g, ctx);
-          fmpz_mpoly_test(k, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
 
           result = fmpz_mpoly_equal(f, k, ctx);
 
@@ -127,9 +127,9 @@ main(void)
           fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_divrem_monagan_pearce(h, r, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
           fmpz_mpoly_div_monagan_pearce(k, f, g, ctx);
-          fmpz_mpoly_test(k, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
           
           result = fmpz_mpoly_equal(k, h, ctx);
 
@@ -185,9 +185,9 @@ main(void)
           fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_div_monagan_pearce(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
           fmpz_mpoly_div_monagan_pearce(f, f, g, ctx);
-          fmpz_mpoly_test(f, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
 
           result = fmpz_mpoly_equal(h, f, ctx);
 
@@ -241,9 +241,9 @@ main(void)
           fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_div_monagan_pearce(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
           fmpz_mpoly_div_monagan_pearce(g, f, g, ctx);
-          fmpz_mpoly_test(g, ctx);
+          fmpz_mpoly_assert_canonical(g, ctx);
 
           result = fmpz_mpoly_equal(h, g, ctx);
 

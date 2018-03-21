@@ -638,10 +638,13 @@ FLINT_DLL void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t poly,
 FLINT_DLL void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t poly,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t poly,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1,
+FLINT_DLL int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1,
               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_univar_equal(fmpz_mpoly_univar_t poly1,
@@ -651,7 +654,7 @@ FLINT_DLL void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1,
             const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1,
+FLINT_DLL int fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1,
             const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
@@ -682,17 +685,17 @@ FLINT_DLL void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
 FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t poly1,
                          const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+FLINT_DLL int fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_gcd_is_unit(const fmpz_mpoly_t a, const fmpz_mpoly_t b,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_resultant(fmpz_mpoly_t poly1,
+FLINT_DLL int fmpz_mpoly_resultant(fmpz_mpoly_t poly1,
                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                         slong var, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1,
+FLINT_DLL int fmpz_mpoly_discriminant(fmpz_mpoly_t poly1,
               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_gcd_brown(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
@@ -900,12 +903,6 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 ******************************************************************************/
 
 FLINT_DLL void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx);
-
-FMPZ_MPOLY_INLINE 
-void fmpz_mpoly_test(const fmpz_mpoly_t f, const fmpz_mpoly_ctx_t ctx) {
-    fmpz_mpoly_assert_canonical(f, ctx);
-}
-
 
 /*
    test that r is a valid remainder upon division by g

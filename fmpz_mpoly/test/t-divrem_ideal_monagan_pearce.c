@@ -154,6 +154,7 @@ main(void)
           fmpz_mpoly_zero(k2, ctx);
           for (w = 0; w < num; w++)
           {
+             fmpz_mpoly_assert_canonical(qarr[w], ctx);
              fmpz_mpoly_mul_johnson(k1, qarr[w], darr[w], ctx);
              fmpz_mpoly_add(k2, k2, k1, ctx);
           }

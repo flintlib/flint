@@ -131,7 +131,7 @@ main(void)
         fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx1);
 
         fmpz_mpoly_compose(g, f, vals1, ctx1, ctx2);
-        fmpz_mpoly_test(g, ctx2);
+        fmpz_mpoly_assert_canonical(g, ctx2);
 
         fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals3, ctx1);
         fmpz_mpoly_evaluate_all_tree_fmpz(ge, g, vals2, ctx2);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -17,16 +17,21 @@
 #include "assert.h"
 
 
-void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+int fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                          slong var, const fmpz_mpoly_ctx_t ctx)
 {
+    int success = 1;
     fmpz_mpoly_t lcfx;
     fmpz_mpoly_univar_t rx, fx, fxp;
     fmpz_mpoly_init(lcfx, ctx);
     fmpz_mpoly_univar_init(rx, ctx);
     fmpz_mpoly_univar_init(fx, ctx);
     fmpz_mpoly_univar_init(fxp, ctx);
-    fmpz_mpoly_to_univar(fx, poly2, var, ctx);
+
+    success = success && fmpz_mpoly_to_univar(fx, poly2, var, ctx);
+    if (!success)
+        goto cleanup;
+
     fmpz_mpoly_univar_derivative(fxp, fx, ctx);
 
     /* the discriminant of a constant polynomial "a" should be "1/a^2" */
@@ -63,9 +68,13 @@ void fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
         else
             fmpz_mpoly_zero(poly1, ctx);
     }
+
+cleanup:
+
     fmpz_mpoly_clear(lcfx, ctx);
     fmpz_mpoly_univar_clear(rx, ctx);
     fmpz_mpoly_univar_clear(fx, ctx);
     fmpz_mpoly_univar_clear(fxp, ctx);
+    return success;
 }
 

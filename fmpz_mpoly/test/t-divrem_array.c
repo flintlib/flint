@@ -67,7 +67,7 @@ main(void)
           fmpz_mpoly_randtest_bound(r, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(k, r, h, g, ctx);
           if (ok1)
@@ -131,8 +131,8 @@ main(void)
           fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r, ctx);
           if (ok1)
 		    {
              fmpz_mpoly_remainder_test(r, g, ctx);
@@ -198,14 +198,14 @@ main(void)
           fmpz_mpoly_randtest_bound(r2, state, len, coeff_bits, exp_bound, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r1, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r1, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r1, ctx);
           if (ok1)
              fmpz_mpoly_remainder_test(r1, g, ctx);
 
           ok2 = fmpz_mpoly_divrem_array(f, r2, f, g, ctx);
-          fmpz_mpoly_test(f, ctx);
-          fmpz_mpoly_test(r2, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
+          fmpz_mpoly_assert_canonical(r2, ctx);
           if (ok2)
              fmpz_mpoly_remainder_test(r2, g, ctx);
 
@@ -269,14 +269,14 @@ main(void)
           fmpz_mpoly_randtest_bound(r2, state, len, coeff_bits, exp_bound, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r1, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r1, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r1, ctx);
           if (ok1)
              fmpz_mpoly_remainder_test(r1, g, ctx);
 
           ok2 = fmpz_mpoly_divrem_array(g, r2, f, g, ctx);
-          fmpz_mpoly_test(g, ctx);
-          fmpz_mpoly_test(r2, ctx);
+          fmpz_mpoly_assert_canonical(g, ctx);
+          fmpz_mpoly_assert_canonical(r2, ctx);
 
           result = (ok1 == 0 || ok2 == 0) || 
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, g, ctx)
@@ -338,17 +338,17 @@ main(void)
           fmpz_mpoly_randtest_bound(r1, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r1, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r1, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r1, ctx);
           if (ok1)
              fmpz_mpoly_remainder_test(r1, g, ctx);
 
           ok2 = fmpz_mpoly_divrem_array(k, f, f, g, ctx);
-          fmpz_mpoly_test(k, ctx);
-          fmpz_mpoly_test(f, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
           if (ok2)
              fmpz_mpoly_remainder_test(f, g, ctx);
 
@@ -412,17 +412,17 @@ main(void)
           fmpz_mpoly_randtest_bound(r1, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           ok1 = fmpz_mpoly_divrem_array(h, r1, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r1, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r1, ctx);
           if (ok1)
              fmpz_mpoly_remainder_test(r1, g, ctx);
 
           ok2 = fmpz_mpoly_divrem_array(k, g, f, g, ctx);
-          fmpz_mpoly_test(k, ctx);
-          fmpz_mpoly_test(g, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
+          fmpz_mpoly_assert_canonical(g, ctx);
 
           result = (ok1 == 0 || ok2 == 0) || 
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, k, ctx)

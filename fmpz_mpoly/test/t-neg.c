@@ -51,9 +51,9 @@ main(void)
        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
        fmpz_mpoly_neg(h, f, ctx);
-       fmpz_mpoly_test(h, ctx);
+       fmpz_mpoly_assert_canonical(h, ctx);
        fmpz_mpoly_neg(g, h, ctx);
-       fmpz_mpoly_test(g, ctx);
+       fmpz_mpoly_assert_canonical(g, ctx);
 
        result = fmpz_mpoly_equal(f, g, ctx);
 

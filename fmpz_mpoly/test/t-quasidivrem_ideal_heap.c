@@ -84,12 +84,12 @@ main(void)
             fmpz_mpoly_randtest_bound(k2, state, len, coeff_bits, exp_bound, ctx);
 
             fmpz_mpoly_quasidivrem_ideal_heap(scale, qarr, r, f, darr, num, ctx);
-            fmpz_mpoly_test(r, ctx);
+            fmpz_mpoly_assert_canonical(r, ctx);
 
             fmpz_mpoly_set(k2, r, ctx);
             for (w = 0; w < num; w++)
             {
-                fmpz_mpoly_test(qarr[w], ctx);
+                fmpz_mpoly_assert_canonical(qarr[w], ctx);
                 fmpz_mpoly_remainder_strongtest(r, darr[w], ctx);
                 fmpz_mpoly_mul_johnson(k1, qarr[w], darr[w], ctx);
                 fmpz_mpoly_add(k2, k2, k1, ctx);
@@ -182,11 +182,11 @@ main(void)
 
             fmpz_mpoly_set(r, f, ctx);
             fmpz_mpoly_quasidivrem_ideal_heap(scale, qarr, r, r, darr, num, ctx);
-            fmpz_mpoly_test(r, ctx);
+            fmpz_mpoly_assert_canonical(r, ctx);
             fmpz_mpoly_set(k2, r, ctx);
             for (w = 0; w < num; w++)
             {
-                fmpz_mpoly_test(qarr[w], ctx);
+                fmpz_mpoly_assert_canonical(qarr[w], ctx);
                 fmpz_mpoly_remainder_strongtest(r, darr[w], ctx);
                 fmpz_mpoly_mul_johnson(k1, qarr[w], darr[w], ctx);
                 fmpz_mpoly_add(k2, k2, k1, ctx);

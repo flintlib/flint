@@ -12,7 +12,7 @@
 #include "fmpq_mpoly.h"
 
 
-void fmpq_mpoly_test_canonical(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 {
     slong i;
     const fmpz_mpoly_struct * zpoly = poly->zpoly;

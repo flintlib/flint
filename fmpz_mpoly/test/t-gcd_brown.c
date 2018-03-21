@@ -66,6 +66,8 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
             res = fmpz_mpoly_gcd_brown(g, a, b, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
+
             if (!res) {
                 continue;
             }

@@ -317,9 +317,9 @@ main(void)
             fmpz_mpoly_set(h, f, ctx);
 
             fmpz_mpoly_add(f, f, g, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
             fmpz_mpoly_sub(f, f, g, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
             result = fmpz_mpoly_equal(f, h, ctx);
 
             if (!result)
@@ -369,15 +369,15 @@ main(void)
             if ((j % 2) == 0)
             {
                 fmpz_mpoly_add(h, g, f, ctx);
-                fmpz_mpoly_test(h, ctx);
+                fmpz_mpoly_assert_canonical(h, ctx);
                 fmpz_mpoly_add(f, g, f, ctx);
-                fmpz_mpoly_test(f, ctx);
+                fmpz_mpoly_assert_canonical(f, ctx);
             } else
             {
                 fmpz_mpoly_sub(h, g, f, ctx);
-                fmpz_mpoly_test(h, ctx);
+                fmpz_mpoly_assert_canonical(h, ctx);
                 fmpz_mpoly_sub(f, g, f, ctx);
-                fmpz_mpoly_test(f, ctx);
+                fmpz_mpoly_assert_canonical(f, ctx);
             }
             result = fmpz_mpoly_equal(f, h, ctx);
 

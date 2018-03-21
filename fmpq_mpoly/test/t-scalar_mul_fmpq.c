@@ -61,11 +61,11 @@ main(void)
             fmpq_mul(c, a, b);
 
             fmpq_mpoly_scalar_mul_fmpq(g, f, a, ctx);
-            fmpq_mpoly_test_canonical(g, ctx);
+            fmpq_mpoly_assert_canonical(g, ctx);
             fmpq_mpoly_scalar_mul_fmpq(h, g, b, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
             fmpq_mpoly_scalar_mul_fmpq(k, f, c, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
 
             result = fmpq_mpoly_equal(h, k, ctx);
 
@@ -120,11 +120,11 @@ main(void)
             fmpq_randtest(c, state, coeff_bits + 1);
 
             fmpq_mpoly_set(g, f, ctx);
-            fmpq_mpoly_test_canonical(g, ctx);
+            fmpq_mpoly_assert_canonical(g, ctx);
             fmpq_mpoly_scalar_mul_fmpq(h, f, c, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
             fmpq_mpoly_scalar_mul_fmpq(g, g, c, ctx);
-            fmpq_mpoly_test_canonical(g, ctx);
+            fmpq_mpoly_assert_canonical(g, ctx);
             result = fmpq_mpoly_equal(g, h, ctx);
 
             if (!result)

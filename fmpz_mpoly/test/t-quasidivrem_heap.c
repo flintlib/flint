@@ -72,8 +72,8 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_quasidivrem_heap(s1, q1, r1, h, g, ctx);
-            fmpz_mpoly_test(q1, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(q1, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             result = fmpz_equal_ui(s1, WORD(1)) && fmpz_mpoly_equal(q1, f, ctx);
@@ -143,8 +143,8 @@ main(void)
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s1, h, r1, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             fmpz_mpoly_mul_johnson(t1, h, g, ctx);
@@ -152,8 +152,8 @@ main(void)
             fmpz_mpoly_scalar_mul_fmpz(t2, f, s1, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s2, f, k, f, g, ctx);
-            fmpz_mpoly_test(k, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
 
             result = fmpz_mpoly_equal(t1, t2, ctx)
                     && fmpz_mpoly_equal(h, f, ctx)
@@ -228,8 +228,8 @@ main(void)
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s1, h, r1, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             fmpz_mpoly_mul_johnson(t1, h, g, ctx);
@@ -237,8 +237,8 @@ main(void)
             fmpz_mpoly_scalar_mul_fmpz(t2, f, s1, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s2, g, k, f, g, ctx);
-            fmpz_mpoly_test(k, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
 
             result = fmpz_mpoly_equal(t1, t2, ctx)
                     && fmpz_mpoly_equal(h, g, ctx)
@@ -313,8 +313,8 @@ main(void)
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s1, h, r1, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             fmpz_mpoly_mul_johnson(t1, h, g, ctx);
@@ -322,8 +322,8 @@ main(void)
             fmpz_mpoly_scalar_mul_fmpz(t2, f, s1, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s2, k, f, f, g, ctx);
-            fmpz_mpoly_test(k, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
 
             result = fmpz_mpoly_equal(t1, t2, ctx)
                     && fmpz_mpoly_equal(h, k, ctx)
@@ -398,8 +398,8 @@ main(void)
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s1, h, r1, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             fmpz_mpoly_mul_johnson(t1, h, g, ctx);
@@ -407,8 +407,8 @@ main(void)
             fmpz_mpoly_scalar_mul_fmpz(t2, f, s1, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s2, k, g, f, g, ctx);
-            fmpz_mpoly_test(k, ctx);
-            fmpz_mpoly_test(g, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
 
             result = fmpz_mpoly_equal(t1, t2, ctx)
                     && fmpz_mpoly_equal(h, k, ctx)

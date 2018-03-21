@@ -61,9 +61,10 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
 
 
 
-void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
+int _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
                           const fmpz_mpoly_t polyB, const fmpz_mpoly_ctx_t ctx)
 {
+    int success = 1;
     slong shift, off, bits, N;
     slong i, m, c, d, v, k, var, nvars = ctx->minfo->nvars;
     ulong mask;
@@ -116,7 +117,8 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     {
         if (a_degs[v] == 0 && b_degs[v] != 0)
         {
-            fmpz_mpoly_to_univar(bx, polyB, v, ctx);
+            if (!fmpz_mpoly_to_univar(bx, polyB, v, ctx))
+                goto failed;
             fmpz_mpoly_set(poly1, polyA, ctx);
             for (i = 0; i < bx->length; i++)
                 _fmpz_mpoly_gcd_prs(poly1, poly1, bx->coeffs + i, ctx);
@@ -124,7 +126,8 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
         }
         if (b_degs[v] == 0 && a_degs[v] != 0)
         {
-            fmpz_mpoly_to_univar(ax, polyA, v, ctx);
+            if (!fmpz_mpoly_to_univar(ax, polyA, v, ctx))
+                goto failed;
             fmpz_mpoly_set(poly1, polyB, ctx);
             for (i = 0; i < ax->length; i++)
                 _fmpz_mpoly_gcd_prs(poly1, poly1, ax->coeffs + i, ctx);
@@ -208,8 +211,11 @@ void _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
         goto done;
     }
 
-    fmpz_mpoly_to_univar(ax, polyA, var, ctx);
-    fmpz_mpoly_to_univar(bx, polyB, var, ctx);
+    if (!fmpz_mpoly_to_univar(ax, polyA, var, ctx))
+        goto failed;
+    if (!fmpz_mpoly_to_univar(bx, polyB, var, ctx))
+        goto failed;
+
     gx->var = var;
 
     /* divide out content in ax and bx */
@@ -330,19 +336,26 @@ done:
     fmpz_mpoly_univar_clear(ax, ctx);
     fmpz_mpoly_univar_clear(bx, ctx);
     fmpz_mpoly_univar_clear(gx, ctx);
+
+    return success;
+
+failed:
+    success = 0;
+    fmpz_mpoly_zero(poly1, ctx);
+    goto done;
 }
 
 
-void fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+int fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
-    if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_gcd_prs");
+    int success;
+    success = _fmpz_mpoly_gcd_prs(poly1, poly2, poly3, ctx);
 
-    _fmpz_mpoly_gcd_prs(poly1, poly2, poly3, ctx);
-
-    if ((poly1->length > 0) && (fmpz_sgn(poly1->coeffs + 0) < 0))
+    if (success && (poly1->length > 0) && (fmpz_sgn(poly1->coeffs + 0) < 0))
         fmpz_mpoly_neg(poly1, poly1, ctx);
+
+    return success;
 }
 
 

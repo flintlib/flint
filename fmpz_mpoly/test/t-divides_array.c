@@ -65,10 +65,10 @@ main(void)
           fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           ok1 = fmpz_mpoly_divides_array(k, h, g, ctx);
-          fmpz_mpoly_test(k, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
 
           result = (ok1 == -1) || (ok1 && fmpz_mpoly_equal(f, k, ctx));
 
@@ -125,12 +125,12 @@ main(void)
           fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
           ok1 = fmpz_mpoly_divides_array(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           if (ok1)
           {
              fmpz_mpoly_mul_johnson(k, h, g, ctx);
-             fmpz_mpoly_test(k, ctx);
+             fmpz_mpoly_assert_canonical(k, ctx);
           }
 
           result = (ok1 == -1 || ok1 == 0) || (ok1 == 1 && fmpz_mpoly_equal(f, k, ctx));
@@ -188,12 +188,12 @@ main(void)
           fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           ok1 = fmpz_mpoly_divides_array(k, h, g, ctx);
-          fmpz_mpoly_test(k, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
           ok2 = fmpz_mpoly_divides_array(h, h, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           result = (ok1 == -1 || ok2 == -1) || 
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, k, ctx));
@@ -251,12 +251,12 @@ main(void)
           fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           ok1 = fmpz_mpoly_divides_array(k, h, g, ctx);
-          fmpz_mpoly_test(k, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
           ok2 = fmpz_mpoly_divides_array(g, h, g, ctx);
-          fmpz_mpoly_test(g, ctx);
+          fmpz_mpoly_assert_canonical(g, ctx);
 
           result = (ok1 == -1 && ok2 == -1) || 
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(g, k, ctx));

@@ -30,7 +30,7 @@ void fmpz_mpoly_randtest_bits(fmpz_mpoly_t poly, flint_rand_t state,
     fmpz_mpoly_zero(poly, ctx);
     for (i = 0; i < length; i++)
     {
-        mpoly_monomial_randbits_fmpz(exp, state, exp_bits, ctx->minfo);        
+        mpoly_monomial_randbits_fmpz(exp, state, exp_bits, ctx->minfo);
         fmpz_randtest(coeff, state, coeff_bits);
         _fmpz_mpoly_set_term_fmpz_fmpz(poly, coeff, exp, ctx);
     }

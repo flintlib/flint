@@ -20,7 +20,7 @@
 int
 main(void)
 {
-    int i, j;
+    int i, j, success;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd_prs....");
@@ -66,7 +66,12 @@ main(void)
 
             fmpz_mpoly_mul_johnson(a, a, c, ctx);
             fmpz_mpoly_mul_johnson(b, b, c, ctx);
-            fmpz_mpoly_gcd_prs(g, a, b, ctx);
+
+            success = fmpz_mpoly_gcd_prs(g, a, b, ctx);
+            if (!success)
+                continue;
+
+            fmpz_mpoly_assert_canonical(g, ctx);
 
             if (fmpz_mpoly_is_zero(g, ctx))
             {

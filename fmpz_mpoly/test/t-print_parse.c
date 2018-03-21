@@ -42,6 +42,7 @@ main(void)
 
                 str = fmpz_mpoly_get_str_pretty(f, vars, ctx);
                 fmpz_mpoly_set_str_pretty(f1, str, vars, ctx);
+                fmpz_mpoly_assert_canonical(f1, ctx);
                 flint_free(str);
 
                 if (!fmpz_mpoly_equal(f, f1, ctx))

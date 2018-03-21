@@ -56,9 +56,9 @@ main(void)
             fmpq_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
 
             fmpq_mpoly_mul(h, f, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
             ok1 = fmpq_mpoly_divides(k, h, g, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
             result = (ok1 && fmpq_mpoly_equal(f, k, ctx));
 
             if (!result)
@@ -120,12 +120,12 @@ main(void)
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
             ok1 = fmpq_mpoly_divides(h, f, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
 
             if (ok1)
             {
                 fmpq_mpoly_mul(k, h, g, ctx);
-                fmpq_mpoly_test_canonical(k, ctx);
+                fmpq_mpoly_assert_canonical(k, ctx);
             }
 
             result = (ok1 == 0 || fmpq_mpoly_equal(f, k, ctx));
@@ -180,11 +180,11 @@ main(void)
             fmpq_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
 
             fmpq_mpoly_mul(h, f, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
             ok1 = fmpq_mpoly_divides(k, h, g, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
             ok2 = fmpq_mpoly_divides(h, h, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
             result = (ok1 == 1 && ok2 == 1 && fmpq_mpoly_equal(h, k, ctx));
 
             if (!result)
@@ -244,9 +244,9 @@ main(void)
             fmpq_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
 
             ok1 = fmpq_mpoly_divides(h, f, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
             ok2 = fmpq_mpoly_divides(f, f, g, ctx);
-            fmpq_mpoly_test_canonical(f, ctx);
+            fmpq_mpoly_assert_canonical(f, ctx);
 
             result = ((ok1 == ok2) &&  (ok1 == 0 || fmpq_mpoly_equal(f, h, ctx)));
 
@@ -299,11 +299,11 @@ main(void)
             fmpq_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
 
             fmpq_mpoly_mul(h, f, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
             ok1 = fmpq_mpoly_divides(k, h, g, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
             ok2 = fmpq_mpoly_divides(g, h, g, ctx);
-            fmpq_mpoly_test_canonical(g, ctx);
+            fmpq_mpoly_assert_canonical(g, ctx);
             result = (ok1 == 1 && ok2 == 1 && fmpq_mpoly_equal(g, k, ctx));
 
             if (!result)
@@ -363,9 +363,9 @@ main(void)
             fmpq_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
 
             ok1 = fmpq_mpoly_divides(h, f, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
             ok2 = fmpq_mpoly_divides(g, f, g, ctx);
-            fmpq_mpoly_test_canonical(g, ctx);
+            fmpq_mpoly_assert_canonical(g, ctx);
 
             result = ((ok1 == ok2) &&  (ok1 == 0 || fmpq_mpoly_equal(g, h, ctx)));
 

@@ -47,7 +47,7 @@ main(void)
        coeff_bits = n_randint(state, 200);
 
        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
-       fmpz_mpoly_test(f, ctx);
+       fmpz_mpoly_assert_canonical(f, ctx);
 
        fmpz_mpoly_clear(f, ctx);        
     }

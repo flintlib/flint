@@ -65,8 +65,8 @@ main(void)
             fmpq_mpoly_mul(h, f, g, ctx);
 
             fmpq_mpoly_divrem(k, r, h, g, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
-            fmpq_mpoly_test_canonical(r, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(r, ctx);
 
             result = fmpq_mpoly_equal(f, k, ctx);
 
@@ -126,13 +126,13 @@ main(void)
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
             fmpq_mpoly_divrem(h, r, f, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
-            fmpq_mpoly_test_canonical(r, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(r, ctx);
             fmpq_mpoly_remainder_test(r, g, ctx);
 
             fmpq_mpoly_mul(k, h, g, ctx);
             fmpq_mpoly_add(k, k, r, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
 
             result = fmpq_mpoly_equal(f, k, ctx);
 
@@ -193,13 +193,13 @@ main(void)
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
             
             fmpq_mpoly_divrem(h, r, h, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
-            fmpq_mpoly_test_canonical(r, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(r, ctx);
             fmpq_mpoly_remainder_test(r, g, ctx);
 
             fmpq_mpoly_mul(k, h, g, ctx);
             fmpq_mpoly_add(k, k, r, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
 
             result = fmpq_mpoly_equal(f, k, ctx);
 
@@ -260,13 +260,13 @@ main(void)
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
             
             fmpq_mpoly_divrem(h, r, f, h, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
-            fmpq_mpoly_test_canonical(r, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(r, ctx);
             fmpq_mpoly_remainder_test(r, g, ctx);
 
             fmpq_mpoly_mul(k, h, g, ctx);
             fmpq_mpoly_add(k, k, r, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
 
             result = fmpq_mpoly_equal(f, k, ctx);
 
@@ -328,13 +328,13 @@ main(void)
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
             
             fmpq_mpoly_divrem(h, r, f, r, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
-            fmpq_mpoly_test_canonical(r, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(r, ctx);
             fmpq_mpoly_remainder_test(r, g, ctx);
 
             fmpq_mpoly_mul(k, h, g, ctx);
             fmpq_mpoly_add(k, k, r, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
 
             result = fmpq_mpoly_equal(f, k, ctx);
 
@@ -395,13 +395,13 @@ main(void)
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
             
             fmpq_mpoly_divrem(h, r, r, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
-            fmpq_mpoly_test_canonical(r, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(r, ctx);
             fmpq_mpoly_remainder_test(r, g, ctx);
 
             fmpq_mpoly_mul(k, h, g, ctx);
             fmpq_mpoly_add(k, k, r, ctx);
-            fmpq_mpoly_test_canonical(k, ctx);
+            fmpq_mpoly_assert_canonical(k, ctx);
 
             result = fmpq_mpoly_equal(f, k, ctx);
 

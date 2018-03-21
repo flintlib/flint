@@ -54,7 +54,7 @@ main(void)
                 exp[k] = n_randtest(state);
 
             fmpq_mpoly_set_term_fmpq_ui(f, c, exp, ctx);
-            fmpq_mpoly_test_canonical(f, ctx);
+            fmpq_mpoly_assert_canonical(f, ctx);
             fmpq_mpoly_get_term_fmpq_ui(d, f, exp, ctx);
             result = fmpq_equal(c, d);
 

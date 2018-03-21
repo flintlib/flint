@@ -106,19 +106,19 @@ main(void)
             idx = n_randint(state, nvars);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
             fmpz_mpoly_derivative(hp, h, idx, ctx);
-            fmpz_mpoly_test(hp, ctx);
+            fmpz_mpoly_assert_canonical(hp, ctx);
             fmpz_mpoly_derivative(fp, f, idx, ctx);
-            fmpz_mpoly_test(fp, ctx);
+            fmpz_mpoly_assert_canonical(fp, ctx);
             fmpz_mpoly_derivative(gp, g, idx, ctx);
-            fmpz_mpoly_test(gp, ctx);
+            fmpz_mpoly_assert_canonical(gp, ctx);
             fmpz_mpoly_mul_johnson(t1, f, gp, ctx);
-            fmpz_mpoly_test(t1, ctx);
+            fmpz_mpoly_assert_canonical(t1, ctx);
             fmpz_mpoly_mul_johnson(t2, g, fp, ctx);
-            fmpz_mpoly_test(t2, ctx);
+            fmpz_mpoly_assert_canonical(t2, ctx);
             fmpz_mpoly_add(t1, t1, t2, ctx);
-            fmpz_mpoly_test(t1, ctx);
+            fmpz_mpoly_assert_canonical(t1, ctx);
 
             result = fmpz_mpoly_equal(hp, t1, ctx);
 
@@ -185,23 +185,23 @@ main(void)
             idx = n_randint(state, nvars);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
 
             fmpz_mpoly_derivative(h, h, idx, ctx);
-            fmpz_mpoly_test(h, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
             fmpz_mpoly_set(fp, f, ctx);
             fmpz_mpoly_derivative(fp, fp, idx, ctx);
-            fmpz_mpoly_test(fp, ctx);
+            fmpz_mpoly_assert_canonical(fp, ctx);
             fmpz_mpoly_set(gp, g, ctx);
             fmpz_mpoly_derivative(gp, gp, idx, ctx);
-            fmpz_mpoly_test(gp, ctx);
+            fmpz_mpoly_assert_canonical(gp, ctx);
 
             fmpz_mpoly_mul_johnson(t1, f, gp, ctx);
-            fmpz_mpoly_test(t1, ctx);
+            fmpz_mpoly_assert_canonical(t1, ctx);
             fmpz_mpoly_mul_johnson(t2, g, fp, ctx);
-            fmpz_mpoly_test(t2, ctx);
+            fmpz_mpoly_assert_canonical(t2, ctx);
             fmpz_mpoly_add(t1, t1, t2, ctx);
-            fmpz_mpoly_test(t1, ctx);
+            fmpz_mpoly_assert_canonical(t1, ctx);
 
             result = fmpz_mpoly_equal(h, t1, ctx);
 
@@ -264,14 +264,14 @@ main(void)
             idx = n_randint(state, nvars);
 
             fmpz_mpoly_set(g, f, ctx);
-            fmpz_mpoly_test(g, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
             fmpz_mpoly_integral(f1, s1, f, idx, ctx);
-            fmpz_mpoly_test(f1, ctx);
+            fmpz_mpoly_assert_canonical(f1, ctx);
             fmpz_mpoly_integral(f, s, f, idx, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
             result = fmpz_equal(s, s1) && fmpz_mpoly_equal(f, f1, ctx);
             fmpz_mpoly_derivative(f, f, idx, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
             fmpz_mpoly_scalar_mul_fmpz(g, g, s, ctx);
             result = result && fmpz_mpoly_equal(f, g, ctx);
                                        

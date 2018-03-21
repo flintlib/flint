@@ -66,8 +66,8 @@ main(void)
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
           fmpz_mpoly_divrem_monagan_pearce(k, r, h, g, ctx);
-          fmpz_mpoly_test(k, ctx);
-          fmpz_mpoly_test(r, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
+          fmpz_mpoly_assert_canonical(r, ctx);
 
           result = fmpz_mpoly_equal(f, k, ctx);
 
@@ -127,13 +127,13 @@ main(void)
           fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_divrem_monagan_pearce(h, r, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r, ctx);
           fmpz_mpoly_remainder_test(r, g, ctx);
 
           fmpz_mpoly_mul_johnson(k, h, g, ctx);
 	      fmpz_mpoly_add(k, k, r, ctx);
-          fmpz_mpoly_test(k, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
 
           result = fmpz_mpoly_equal(f, k, ctx);
 
@@ -193,12 +193,12 @@ main(void)
           fmpz_mpoly_randtest_bound(r2, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_divrem_monagan_pearce(h, r1, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r1, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r1, ctx);
           fmpz_mpoly_remainder_test(r1, g, ctx);
           fmpz_mpoly_divrem_monagan_pearce(f, r2, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r2, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r2, ctx);
           fmpz_mpoly_remainder_test(r2, g, ctx);
 
           result = fmpz_mpoly_equal(h, f, ctx) && fmpz_mpoly_equal(r1, r2, ctx);
@@ -259,12 +259,12 @@ main(void)
           fmpz_mpoly_randtest_bound(r2, state, len, coeff_bits, exp_bound, ctx);
 
           fmpz_mpoly_divrem_monagan_pearce(h, r1, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r1, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r1, ctx);
           fmpz_mpoly_remainder_test(r1, g, ctx);
           fmpz_mpoly_divrem_monagan_pearce(g, r2, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r2, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r2, ctx);
 
           result = fmpz_mpoly_equal(h, g, ctx) && fmpz_mpoly_equal(r1, r2, ctx);
 
@@ -326,13 +326,13 @@ main(void)
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
           fmpz_mpoly_divrem_monagan_pearce(h, r1, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r1, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r1, ctx);
           fmpz_mpoly_remainder_test(r1, g, ctx);
 
           fmpz_mpoly_divrem_monagan_pearce(k, f, f, g, ctx);
-          fmpz_mpoly_test(k, ctx);
-          fmpz_mpoly_test(f, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
           fmpz_mpoly_remainder_test(f, g, ctx);
 
           result = fmpz_mpoly_equal(h, k, ctx) && fmpz_mpoly_equal(r1, f, ctx);
@@ -395,13 +395,13 @@ main(void)
           fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
           fmpz_mpoly_divrem_monagan_pearce(h, r1, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
-          fmpz_mpoly_test(r1, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
+          fmpz_mpoly_assert_canonical(r1, ctx);
           fmpz_mpoly_remainder_test(r1, g, ctx);
 
           fmpz_mpoly_divrem_monagan_pearce(k, g, f, g, ctx);
-          fmpz_mpoly_test(k, ctx);
-          fmpz_mpoly_test(g, ctx);
+          fmpz_mpoly_assert_canonical(k, ctx);
+          fmpz_mpoly_assert_canonical(g, ctx);
 
           result = fmpz_mpoly_equal(h, k, ctx) && fmpz_mpoly_equal(r1, g, ctx);
 

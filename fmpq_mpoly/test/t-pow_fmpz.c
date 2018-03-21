@@ -52,6 +52,7 @@ main(void)
 
             fmpz_set_si(power, j);
             fmpq_mpoly_pow_fmpz(h, f, power, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
 
             fmpq_mpoly_one(g, ctx);
             for (k = 0; k < j; k++)

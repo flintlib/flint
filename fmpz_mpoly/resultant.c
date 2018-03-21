@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -17,16 +17,20 @@
 #include "assert.h"
 
 
-void fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+int fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                const fmpz_mpoly_t poly3, slong var, const fmpz_mpoly_ctx_t ctx)
 {
+    int success = 1;
     int change_sign = 0;
     fmpz_mpoly_univar_t rx, fx, gx;
     fmpz_mpoly_univar_init(rx, ctx);
     fmpz_mpoly_univar_init(fx, ctx);
     fmpz_mpoly_univar_init(gx, ctx);
-    fmpz_mpoly_to_univar(fx, poly2, var, ctx);
-    fmpz_mpoly_to_univar(gx, poly3, var, ctx);
+
+    success = success && fmpz_mpoly_to_univar(fx, poly2, var, ctx);
+    success = success && fmpz_mpoly_to_univar(gx, poly3, var, ctx);
+    if (!success)
+        goto cleanup;
 
     if (fx->length == 0 || gx->length == 0)
     {
@@ -58,8 +62,11 @@ void fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
         }
     }
 
+cleanup:
+
     fmpz_mpoly_univar_clear(rx, ctx);
     fmpz_mpoly_univar_clear(fx, ctx);
     fmpz_mpoly_univar_clear(gx, ctx);
+    return success;
 }
 

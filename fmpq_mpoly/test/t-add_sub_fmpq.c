@@ -50,10 +50,10 @@ main(void)
             fmpq_randtest(c, state, n_randint(state, 200) + 1);
 
             fmpq_mpoly_add_fmpq(g, f, c, ctx);
-            fmpq_mpoly_test_canonical(g, ctx);
+            fmpq_mpoly_assert_canonical(g, ctx);
 
             fmpq_mpoly_sub_fmpq(h, g, c, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
 
             result = fmpq_mpoly_equal(f, h, ctx);
 
@@ -97,10 +97,10 @@ main(void)
             fmpq_randtest(c, state, n_randint(state, 200) + 1);
 
             fmpq_mpoly_add_fmpq(f, f, c, ctx);
-            fmpq_mpoly_test_canonical(f, ctx);
+            fmpq_mpoly_assert_canonical(f, ctx);
 
             fmpq_mpoly_sub_fmpq(f, f, c, ctx);
-            fmpq_mpoly_test_canonical(f, ctx);
+            fmpq_mpoly_assert_canonical(f, ctx);
 
             result = fmpq_mpoly_equal(f, g, ctx);
 

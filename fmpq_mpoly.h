@@ -510,7 +510,7 @@ void fmpq_mpoly_randtest_bits(fmpq_mpoly_t poly, flint_rand_t state,
 
 ******************************************************************************/
 
-FLINT_DLL void fmpq_mpoly_test_canonical(const fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 

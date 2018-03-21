@@ -57,7 +57,7 @@ main(void)
             }
 
             _fmpq_mpoly_set_term_fmpq_fmpz(f, c, exp, ctx);
-            fmpq_mpoly_test_canonical(f, ctx);
+            fmpq_mpoly_assert_canonical(f, ctx);
             _fmpq_mpoly_get_term_fmpq_fmpz(d, f, exp, ctx);
             result = fmpq_equal(c, d);
 

@@ -21,13 +21,46 @@
 int
 main(void)
 {
-    int i, j;
+    int i, j, success;
 
     FLINT_TEST_INIT(state);
 
     flint_printf("resultant_discriminant....");
     fflush(stdout);
 
+
+    /* Check quadratic polynomial */
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, d, d1;
+        const char * vars[] = {"x","a","b","c"};
+
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_DEGLEX);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(d, ctx);
+        fmpz_mpoly_init(d1, ctx);
+
+        fmpz_mpoly_set_str_pretty(f, "a^10*x^2 + b^100*x + c^100000000000000000000", vars, ctx);
+        fmpz_mpoly_set_str_pretty(d1, "b^200 - 4*a^10*c^100000000000000000000", vars, ctx);
+        if (!fmpz_mpoly_discriminant(d, f, 0, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("could not compute quadratic discriminant\n");
+            flint_abort();
+        }
+
+        if (!fmpz_mpoly_equal(d, d1, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check quadratic polynomial\n");
+            flint_abort();
+        }
+
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(d, ctx);
+        fmpz_mpoly_clear(d1, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
 
     /* Check univariate resultant */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -67,8 +100,9 @@ main(void)
         fmpz_poly_shift_left(bu, bu, bshift);
 
         fmpz_poly_resultant(ru, au, bu);
-        fmpz_mpoly_resultant(r, a, b, 0, ctx);
-        if (!fmpz_mpoly_equal_fmpz(r, ru, ctx))
+        success = fmpz_mpoly_resultant(r, a, b, 0, ctx);
+            
+        if (success && !fmpz_mpoly_equal_fmpz(r, ru, ctx))
         {
             printf("FAIL\n");
             flint_printf(" Check univariate resultant \ni: %wd\n",i);
@@ -121,9 +155,19 @@ main(void)
         for (j = 0; j < nvars; j++)
         {
             fmpz_mpoly_mul_johnson(ab, a, b, ctx);
-            fmpz_mpoly_resultant(ra, a, c, j, ctx);
-            fmpz_mpoly_resultant(rb, b, c, j, ctx);
-            fmpz_mpoly_resultant(rab, ab, c, j, ctx);
+
+            if (!fmpz_mpoly_resultant(ra, a, c, j, ctx))
+                continue;
+            fmpz_mpoly_assert_canonical(ra, ctx);
+
+            if (!fmpz_mpoly_resultant(rb, b, c, j, ctx))
+                continue;
+            fmpz_mpoly_assert_canonical(rb, ctx);
+
+            if (!fmpz_mpoly_resultant(rab, ab, c, j, ctx))
+                continue;
+            fmpz_mpoly_assert_canonical(rab, ctx);
+
             fmpz_mpoly_mul_johnson(p, ra, rb, ctx);
 
             if (!fmpz_mpoly_equal(p,rab,ctx))
@@ -185,10 +229,16 @@ main(void)
                 continue;
 
             fmpz_mpoly_mul_johnson(ab, a, b, ctx);
-            fmpz_mpoly_resultant(r, a, b, j, ctx);
-            fmpz_mpoly_discriminant(da, a, j, ctx);
-            fmpz_mpoly_discriminant(db, b, j, ctx);
-            fmpz_mpoly_discriminant(dab, ab, j, ctx);
+
+            if (!fmpz_mpoly_resultant(r, a, b, j, ctx))
+                continue;
+            if (!fmpz_mpoly_discriminant(da, a, j, ctx))
+                continue;
+            if (!fmpz_mpoly_discriminant(db, b, j, ctx))
+                continue;
+            if (!fmpz_mpoly_discriminant(dab, ab, j, ctx))
+                continue;
+
             fmpz_mpoly_mul_johnson(p, da, db, ctx);
             fmpz_mpoly_mul_johnson(p, p, r, ctx);
             fmpz_mpoly_mul_johnson(p, p, r, ctx);

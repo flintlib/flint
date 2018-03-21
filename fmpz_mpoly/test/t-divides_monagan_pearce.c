@@ -91,9 +91,9 @@ main(void)
             fmpz_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
             ok1 = fmpz_mpoly_divides_monagan_pearce(k, h, g, ctx);
-            fmpz_mpoly_test(k, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
             result = (ok1 && fmpz_mpoly_equal(f, k, ctx));
 
             if (!result)
@@ -150,12 +150,12 @@ main(void)
           fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
           ok1 = fmpz_mpoly_divides_monagan_pearce(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           if (ok1)
           {
              fmpz_mpoly_mul_johnson(k, h, g, ctx);
-             fmpz_mpoly_test(k, ctx);
+             fmpz_mpoly_assert_canonical(k, ctx);
           }
 
           result = (ok1 == 0 || fmpz_mpoly_equal(f, k, ctx));
@@ -210,11 +210,11 @@ main(void)
             fmpz_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
             ok1 = fmpz_mpoly_divides_monagan_pearce(k, h, g, ctx);
-            fmpz_mpoly_test(k, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
             ok2 = fmpz_mpoly_divides_monagan_pearce(h, h, g, ctx);
-            fmpz_mpoly_test(h, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
             result = (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, k, ctx));
 
             if (!result)
@@ -269,9 +269,9 @@ main(void)
           fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
 
           ok1 = fmpz_mpoly_divides_monagan_pearce(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
           ok2 = fmpz_mpoly_divides_monagan_pearce(f, f, g, ctx);
-          fmpz_mpoly_test(f, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
 
           result = ((ok1 == ok2) &&  (ok1 == 0 || fmpz_mpoly_equal(f, h, ctx)));
 
@@ -324,11 +324,11 @@ main(void)
             fmpz_mpoly_randtest_bits(k, state, len, coeff_bits, exp_bits, ctx);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
             ok1 = fmpz_mpoly_divides_monagan_pearce(k, h, g, ctx);
-            fmpz_mpoly_test(k, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
             ok2 = fmpz_mpoly_divides_monagan_pearce(g, h, g, ctx);
-            fmpz_mpoly_test(g, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
             result = (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(g, k, ctx));
 
             if (!result)
@@ -383,9 +383,9 @@ main(void)
           fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
 
           ok1 = fmpz_mpoly_divides_monagan_pearce(h, f, g, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
           ok2 = fmpz_mpoly_divides_monagan_pearce(g, f, g, ctx);
-          fmpz_mpoly_test(g, ctx);
+          fmpz_mpoly_assert_canonical(g, ctx);
 
           result = ((ok1 == ok2) &&  (ok1 == 0 || fmpz_mpoly_equal(g, h, ctx)));
 

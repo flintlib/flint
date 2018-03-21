@@ -68,21 +68,21 @@ main(void)
             idx = n_randint(state, nvars);
 
             fmpq_mpoly_mul(h, f, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
 
             fmpq_mpoly_derivative(hp, h, idx, ctx);
-            fmpq_mpoly_test_canonical(hp, ctx);
+            fmpq_mpoly_assert_canonical(hp, ctx);
             fmpq_mpoly_derivative(fp, f, idx, ctx);
-            fmpq_mpoly_test_canonical(fp, ctx);
+            fmpq_mpoly_assert_canonical(fp, ctx);
             fmpq_mpoly_derivative(gp, g, idx, ctx);
-            fmpq_mpoly_test_canonical(gp, ctx);
+            fmpq_mpoly_assert_canonical(gp, ctx);
 
             fmpq_mpoly_mul(t1, f, gp, ctx);
-            fmpq_mpoly_test_canonical(t1, ctx);
+            fmpq_mpoly_assert_canonical(t1, ctx);
             fmpq_mpoly_mul(t2, g, fp, ctx);
-            fmpq_mpoly_test_canonical(t2, ctx);
+            fmpq_mpoly_assert_canonical(t2, ctx);
             fmpq_mpoly_add(t1, t1, t2, ctx);
-            fmpq_mpoly_test_canonical(t1, ctx);
+            fmpq_mpoly_assert_canonical(t1, ctx);
 
             result = fmpq_mpoly_equal(hp, t1, ctx);
 
@@ -151,23 +151,23 @@ main(void)
             idx = n_randint(state, nvars);
 
             fmpq_mpoly_mul(h, f, g, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
 
             fmpq_mpoly_derivative(h, h, idx, ctx);
-            fmpq_mpoly_test_canonical(h, ctx);
+            fmpq_mpoly_assert_canonical(h, ctx);
             fmpq_mpoly_set(fp, f, ctx);
             fmpq_mpoly_derivative(fp, fp, idx, ctx);
-            fmpq_mpoly_test_canonical(fp, ctx);
+            fmpq_mpoly_assert_canonical(fp, ctx);
             fmpq_mpoly_set(gp, g, ctx);
             fmpq_mpoly_derivative(gp, gp, idx, ctx);
-            fmpq_mpoly_test_canonical(gp, ctx);
+            fmpq_mpoly_assert_canonical(gp, ctx);
 
             fmpq_mpoly_mul(t1, f, gp, ctx);
-            fmpq_mpoly_test_canonical(t1, ctx);
+            fmpq_mpoly_assert_canonical(t1, ctx);
             fmpq_mpoly_mul(t2, g, fp, ctx);
-            fmpq_mpoly_test_canonical(t2, ctx);
+            fmpq_mpoly_assert_canonical(t2, ctx);
             fmpq_mpoly_add(t1, t1, t2, ctx);
-            fmpq_mpoly_test_canonical(t1, ctx);
+            fmpq_mpoly_assert_canonical(t1, ctx);
 
             result = fmpq_mpoly_equal(h, t1, ctx);
 
@@ -227,14 +227,14 @@ main(void)
             idx = n_randint(state, nvars);
 
             fmpq_mpoly_set(g, f, ctx);
-            fmpq_mpoly_test_canonical(g, ctx);
+            fmpq_mpoly_assert_canonical(g, ctx);
             fmpq_mpoly_integral(f1, f, idx, ctx);
-            fmpq_mpoly_test_canonical(f1, ctx);
+            fmpq_mpoly_assert_canonical(f1, ctx);
             fmpq_mpoly_integral(f, f, idx, ctx);
-            fmpq_mpoly_test_canonical(f, ctx);
+            fmpq_mpoly_assert_canonical(f, ctx);
             result = fmpq_mpoly_equal(f, f1, ctx);
             fmpq_mpoly_derivative(f, f, idx, ctx);
-            fmpq_mpoly_test_canonical(f, ctx);
+            fmpq_mpoly_assert_canonical(f, ctx);
             result = result && fmpq_mpoly_equal(f, g, ctx);
                                        
             if (!result)

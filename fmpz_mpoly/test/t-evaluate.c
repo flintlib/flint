@@ -75,7 +75,7 @@ main(void)
             for (v = 0; v < nvars; v++)
             {
                 fmpz_mpoly_evaluate_one_fmpz(f, f, perm[v], vals[perm[v]], ctx);
-                fmpz_mpoly_test(f, ctx);
+                fmpz_mpoly_assert_canonical(f, ctx);
             }
             if (!fmpz_mpoly_equal_fmpz(f, fe, ctx))
             {
