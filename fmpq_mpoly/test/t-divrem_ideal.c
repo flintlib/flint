@@ -69,25 +69,25 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randtest_bits_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
+            fmpq_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
 
             for (w = 0; w < num; w++)
             {
                 do {
-                    fmpq_mpoly_randtest_bits_bound(darr[w], state, len2, coeff_bits + 1, exp_bound2, ctx);
+                    fmpq_mpoly_randtest_bound(darr[w], state, len2, coeff_bits + 1, exp_bound2, ctx);
                 } while (fmpq_mpoly_is_zero(darr[w], ctx));
-                fmpq_mpoly_randtest_bits_bound(qarr[w], state, len, coeff_bits, exp_bound, ctx);
+                fmpq_mpoly_randtest_bound(qarr[w], state, len, coeff_bits, exp_bound, ctx);
             }
-            fmpq_mpoly_randtest_bits_bound(k1, state, len, coeff_bits, exp_bound, ctx);
-            fmpq_mpoly_randtest_bits_bound(k2, state, len, coeff_bits, exp_bound, ctx);
+            fmpq_mpoly_randtest_bound(k1, state, len, coeff_bits, exp_bound, ctx);
+            fmpq_mpoly_randtest_bound(k2, state, len, coeff_bits, exp_bound, ctx);
 
             fmpq_mpoly_divrem_ideal(qarr, r, f, darr, num, ctx);
-            fmpq_mpoly_test_canonical(r, ctx);
+            fmpq_mpoly_assert_canonical(r, ctx);
 
             fmpq_mpoly_set(k2, r, ctx);
             for (w = 0; w < num; w++)
             {
-                fmpq_mpoly_test_canonical(qarr[w], ctx);
+                fmpq_mpoly_assert_canonical(qarr[w], ctx);
                 fmpq_mpoly_remainder_test(r, darr[w], ctx);
                 fmpq_mpoly_mul(k1, qarr[w], darr[w], ctx);
                 fmpq_mpoly_add(k2, k2, k1, ctx);
@@ -163,26 +163,26 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randtest_bits_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
+            fmpq_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
 
             for (w = 0; w < num; w++)
             {
                 do {
-                    fmpq_mpoly_randtest_bits_bound(darr[w], state, len2, coeff_bits + 1, exp_bound2, ctx);
+                    fmpq_mpoly_randtest_bound(darr[w], state, len2, coeff_bits + 1, exp_bound2, ctx);
                 } while (fmpq_mpoly_is_zero(darr[w], ctx));
-                fmpq_mpoly_randtest_bits_bound(qarr[w], state, len, coeff_bits, exp_bound, ctx);
+                fmpq_mpoly_randtest_bound(qarr[w], state, len, coeff_bits, exp_bound, ctx);
             }
-            fmpq_mpoly_randtest_bits_bound(k1, state, len, coeff_bits, exp_bound, ctx);
-            fmpq_mpoly_randtest_bits_bound(k2, state, len, coeff_bits, exp_bound, ctx);
+            fmpq_mpoly_randtest_bound(k1, state, len, coeff_bits, exp_bound, ctx);
+            fmpq_mpoly_randtest_bound(k2, state, len, coeff_bits, exp_bound, ctx);
 
             fmpq_mpoly_set(r, f, ctx);
             fmpq_mpoly_divrem_ideal(qarr, r, r, darr, num, ctx);
-            fmpq_mpoly_test_canonical(r, ctx);
+            fmpq_mpoly_assert_canonical(r, ctx);
 
             fmpq_mpoly_set(k2, r, ctx);
             for (w = 0; w < num; w++)
             {
-                fmpq_mpoly_test_canonical(qarr[w], ctx);
+                fmpq_mpoly_assert_canonical(qarr[w], ctx);
                 fmpq_mpoly_remainder_test(r, darr[w], ctx);
                 fmpq_mpoly_mul(k1, qarr[w], darr[w], ctx);
                 fmpq_mpoly_add(k2, k2, k1, ctx);

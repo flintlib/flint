@@ -36,6 +36,17 @@
 #endif
 
 
+/* MISSING FXNS ************************************************************/
+
+FLINT_DLL void fmpz_get_ui_array(ulong * out, slong out_len, const fmpz_t in);
+
+FLINT_DLL void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len);
+
+FLINT_DLL void _fmpz_vec_max(fmpz * vec1, const fmpz * vec2, const fmpz * vec3,
+                                                                     slong len);
+FLINT_DLL void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len);
+
+
 #define MPOLY_MIN_BITS 8    /* minimum number of bits to pack into */
 
 typedef enum {
@@ -182,6 +193,8 @@ FLINT_DLL void mpoly_gen_offset_shift(slong * _offset, slong * _shift,
 FLINT_DLL void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift,
                        slong var, slong N, slong bits, const mpoly_ctx_t mctx);
 
+FLINT_DLL void mpoly_gen_oneexp_offset_mp(ulong * oneexp, slong * offset,
+                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx);
 
 /*  Monomials ****************************************************************/
 
@@ -226,6 +239,45 @@ void mpoly_monomial_sub_mp(ulong * exp_ptr, const ulong * exp2,
 }
 
 MPOLY_INLINE
+void mpoly_monomial_madd(ulong * exp1, const ulong * exp2, ulong scalar,
+                                                   const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp1[i] = exp2[i] + scalar*exp3[i];
+}
+
+MPOLY_INLINE
+void mpoly_monomial_madd_mp(ulong * exp1, const ulong * exp2, ulong scalar,
+                                                   const ulong * exp3, slong N)
+{
+    slong i;
+    for (i = 0; i < N; i++)
+        exp1[i] = exp2[i];
+    mpn_addmul_1(exp1, exp3, N, scalar);
+}
+
+MPOLY_INLINE
+void mpoly_monomial_msub(ulong * exp1, const ulong * exp2, ulong scalar,
+                                                   const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp1[i] = exp2[i] - scalar*exp3[i];
+}
+
+MPOLY_INLINE
+void mpoly_monomial_msub_mp(ulong * exp1, const ulong * exp2, ulong scalar,
+                                                   const ulong * exp3, slong N)
+{
+    slong i;
+    for (i = 0; i < N; i++)
+        exp1[i] = exp2[i];
+    mpn_submul_1(exp1, exp3, N, scalar);
+}
+
+
+MPOLY_INLINE
 void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
                                                slong bits, slong N, ulong mask)
 {
@@ -237,24 +289,6 @@ void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
         m = m - (m >> (bits - 1));
         exp1[i] = exp3[i] + (s & m);
     }
-}
-
-MPOLY_INLINE
-void mpoly_monomial_madd(ulong * exp1, const ulong * exp2, ulong scalar,
-                                                   const ulong * exp3, slong N)
-{
-   slong i;
-   for (i = 0; i < N; i++)
-      exp1[i] = exp2[i] + scalar*exp3[i];
-}
-
-MPOLY_INLINE
-void mpoly_monomial_msub(ulong * exp1, const ulong * exp2, ulong scalar,
-                                                   const ulong * exp3, slong N)
-{
-   slong i;
-   for (i = 0; i < N; i++)
-      exp1[i] = exp2[i] - scalar*exp3[i];
 }
 
 MPOLY_INLINE
@@ -270,6 +304,7 @@ void mpoly_monomial_min(ulong * exp1, const ulong * exp2, const ulong * exp3,
         exp1[i] = exp2[i] - (s & m);
     }
 }
+
 
 MPOLY_INLINE
 int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
@@ -521,30 +556,23 @@ FLINT_DLL slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
                                                      slong nfields, slong len);
-
 FLINT_DLL void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, mp_bitcnt_t bits,
                                                      slong nfields, slong len);
 
-
 FLINT_DLL void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
                                                      slong nfields, slong len);
-
 FLINT_DLL void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
                                                      slong nfields, slong len);
 
-
 FLINT_DLL void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps,
                                            slong bits, const mpoly_ctx_t mctx);
-
 FLINT_DLL void mpoly_get_monomial_fmpz(fmpz * exps, const ulong * poly_exps,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2,
                                            slong bits, const mpoly_ctx_t mctx);
-
 FLINT_DLL void mpoly_set_monomial_fmpz(ulong * exp1, const fmpz * exp2,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx);
-
 
 FLINT_DLL void mpoly_repack_monomials(ulong * exps1, slong bits1,
                                 const ulong * exps2, slong bits2, slong len,
@@ -561,16 +589,15 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
                  const ulong * exp, slong len, slong N, const ulong * cmpmask);
 
 FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gen_fields_fmpz(fmpz * exp, slong var, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
-
 FLINT_DLL void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
-
 FLINT_DLL void mpoly_degrees_fmpz(fmpz * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
@@ -582,27 +609,11 @@ FLINT_DLL void mpoly_search_monomials(
                                                slong N, const ulong * cmpmask);
 
 
-MPOLY_INLINE
-int mpoly_monomials_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx)
-{
-    slong N, i;
-    ulong * cmpmask;
+FLINT_DLL int mpoly_monomials_valid_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
-    N = mpoly_words_per_exp(bits, mctx);
-    cmpmask = flint_malloc((N+1)*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, bits, mctx);
+FLINT_DLL int mpoly_monomials_overflow_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
-    for (i = 0; i + 1 < len; i++)
-    {
-        if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N, cmpmask))
-        {
-            flint_free(cmpmask);
-            return 0;
-        }
-    }
-    flint_free(cmpmask);
-    return 1;
-}
+FLINT_DLL int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
 /* Heap **********************************************************************/
 

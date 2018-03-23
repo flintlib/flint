@@ -48,7 +48,7 @@ main(void)
         len1 = n_randint(state, 200);
         exp_bound1 = n_randint(state, 40) + 1;
         coeff_bits = n_randint(state, 100) + 1;
-        fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+        fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
         fmpz_mpoly_compose(g, f, vals1, ctx, ctx);
 
         if (!fmpz_mpoly_equal(f, g, ctx))
@@ -108,8 +108,8 @@ main(void)
             vals1[v] = (fmpz_mpoly_struct *) flint_malloc(
                                                     sizeof(fmpz_mpoly_struct)); 
             fmpz_mpoly_init(vals1[v], ctx2);
-            fmpz_mpoly_randtest(vals1[v], state, len2, exp_bound2,
-                                                             coeff_bits, ctx2);
+            fmpz_mpoly_randtest_bound(vals1[v], state, len2,
+                                                 coeff_bits, exp_bound2, ctx2);
         }
 
         vals2 = (fmpz **) flint_malloc(nvars2*sizeof(fmpz*));
@@ -128,10 +128,10 @@ main(void)
             fmpz_mpoly_evaluate_all_tree_fmpz(vals3[v], vals1[v], vals2, ctx2);
         }
 
-        fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx1);
+        fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx1);
 
         fmpz_mpoly_compose(g, f, vals1, ctx1, ctx2);
-        fmpz_mpoly_test(g, ctx2);
+        fmpz_mpoly_assert_canonical(g, ctx2);
 
         fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals3, ctx1);
         fmpz_mpoly_evaluate_all_tree_fmpz(ge, g, vals2, ctx2);

@@ -65,6 +65,14 @@ void nmodf_ctx_init(nmodf_ctx_t ctx, ulong modulus)
 }
 
 NMOD_MPOLY_INLINE
+void nmodf_ctx_reset(nmodf_ctx_t ctx, ulong modulus)
+{
+    ctx->mod.n = modulus;
+    ctx->mod.ninv = n_preinvert_limb(modulus);
+    count_leading_zeros(ctx->mod.norm, modulus);
+}
+
+NMOD_MPOLY_INLINE
 void nmodf_ctx_clear(nmodf_ctx_t ctx)
 {
     flint_free(ctx->extras);
@@ -592,8 +600,9 @@ FLINT_DLL void nmod_mpolyd_clear(nmod_mpolyd_t poly);
 FLINT_DLL int nmod_mpolyd_gcd_brown(nmod_mpolyd_t G,
                           nmod_mpolyd_t Abar, nmod_mpolyd_t Bbar,
                           nmod_mpolyd_t A, nmod_mpolyd_t B,
-                         const nmodf_ctx_t fctx, const nmod_mpolyd_ctx_t dctx);
+                                                       const nmodf_ctx_t fctx);
 
+FLINT_DLL void nmod_mpolyd_print_simple(nmod_mpolyd_t poly);
 
 FLINT_DLL void fq_nmod_mpolyd_ctx_init(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
                                                        mp_limb_t p, slong deg);
@@ -601,6 +610,8 @@ FLINT_DLL void fq_nmod_mpolyd_ctx_init(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
 FLINT_DLL int fq_nmod_mpolyd_ctx_settle(fq_nmod_mpolyd_ctx_t dctx,
                             const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyd_mul_scalar(nmod_mpolyd_t A, mp_limb_t b, const nmodf_ctx_t fctx);
 
 FLINT_DLL void fq_nmod_mpolyd_ctx_clear(fq_nmod_mpolyd_ctx_t dctx);
 
@@ -631,6 +642,7 @@ FLINT_DLL int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
                                 fq_nmod_mpolyd_t A, fq_nmod_mpolyd_t B,
                                               const fq_nmod_mpolyd_ctx_t dctx);
 
+FLINT_DLL slong nmod_mpolyd_leadmon(slong * exps, const nmod_mpolyd_t A);
 
 FLINT_DLL int nmod_mpoly_gcd_brown(nmod_mpoly_t G,
                                const nmod_mpoly_t A, const nmod_mpoly_t B,
@@ -685,11 +697,11 @@ int nmod_mpoly_print_pretty(const nmod_mpoly_t poly,
 
 /* Random generation *********************************************************/
 
-FLINT_DLL void nmod_mpoly_randtest(nmod_mpoly_t poly, flint_rand_t state,
+FLINT_DLL void nmod_mpoly_randtest_bound(nmod_mpoly_t poly, flint_rand_t state,
                     slong length, slong exp_bound, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_randbits(nmod_mpoly_t poly, flint_rand_t state,
-              slong length, mp_bitcnt_t exp_bound, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_randtest_bits(nmod_mpoly_t poly, flint_rand_t state,
+               slong length, mp_bitcnt_t exp_bits, const nmod_mpoly_ctx_t ctx);
 
 /******************************************************************************
 
@@ -716,15 +728,17 @@ void nmod_mpoly_test(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
 {
    slong i;
 
-   if (!mpoly_monomials_test(poly->exps, poly->length, poly->bits, ctx->minfo))
-      flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
+    if (mpoly_monomials_overflow_test(poly->exps, poly->length, poly->bits, ctx->minfo))
+        flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
+
+    if (!mpoly_monomials_inorder_test(poly->exps, poly->length, poly->bits, ctx->minfo))
+        flint_throw(FLINT_ERROR, "Polynomial exponents out of order");
 
     for (i = 0; i < poly->length; i++)
     {
         if (poly->coeffs[i] == 0)
             flint_throw(FLINT_ERROR, "Polynomial has a zero coefficient");
     }
-
 }
 
 

@@ -51,7 +51,7 @@ int nmod_mpoly_gcd_brown_nmod(
     nmod_mpoly_convert_to_nmod_mpolyd(Ad, dctx, A, ctx);
     nmod_mpoly_convert_to_nmod_mpolyd(Bd, dctx, B, ctx);
 
-    success = nmod_mpolyd_gcd_brown(Gd, Abar, Bbar, Ad, Bd, ctx->ffinfo, dctx);
+    success = nmod_mpolyd_gcd_brown(Gd, Abar, Bbar, Ad, Bd, ctx->ffinfo);
     if (!success)
     {
         nmod_mpoly_zero(G, ctx);

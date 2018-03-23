@@ -19,6 +19,7 @@ void mpoly_set_monomial_ui(ulong * poly_exps, const ulong * user_exps,
     slong nfields = mctx->nfields;
     slong i = 0;
     ulong * tmp_exps, degree;
+    fmpz * big_exps;
     TMP_INIT;
 
     TMP_START;
@@ -27,6 +28,8 @@ void mpoly_set_monomial_ui(ulong * poly_exps, const ulong * user_exps,
     degree = 0;
     for (i = 0; i < nvars; i++) {
         degree += user_exps[i];
+        if (mctx->deg && degree < user_exps[i])
+            goto big_case;
         tmp_exps[mctx->rev ? i : nvars - 1 - i] = user_exps[i];
     }
 
@@ -35,7 +38,25 @@ void mpoly_set_monomial_ui(ulong * poly_exps, const ulong * user_exps,
 
     mpoly_pack_vec_ui(poly_exps, tmp_exps, bits, nfields, 1);
 
+done:
+
     TMP_END;
+    return;
+
+
+big_case:
+
+    big_exps = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
+
+    for (i = 0; i < nvars; i++)
+        fmpz_init_set_ui(big_exps + i, user_exps[i]);
+
+    mpoly_set_monomial_fmpz(poly_exps, big_exps, bits, mctx);
+
+    for (i = 0; i < nvars; i++)
+        fmpz_clear(big_exps + i);
+
+    goto done;
 }
 
 

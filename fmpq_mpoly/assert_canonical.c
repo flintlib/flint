@@ -12,15 +12,17 @@
 #include "fmpq_mpoly.h"
 
 
-void fmpq_mpoly_test_canonical(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 {
     slong i;
     const fmpz_mpoly_struct * zpoly = poly->zpoly;
     const fmpz_mpoly_ctx_struct * zctx = ctx->zctx;
 
+    if (mpoly_monomials_overflow_test(zpoly->exps, zpoly->length, zpoly->bits, zctx->minfo))
+        flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
 
-    if (!mpoly_monomials_test(zpoly->exps, zpoly->length, zpoly->bits, zctx->minfo))
-        flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
+    if (!mpoly_monomials_inorder_test(zpoly->exps, zpoly->length, zpoly->bits, zctx->minfo))
+        flint_throw(FLINT_ERROR, "Polynomial exponents out of order");
 
     for (i = 0; i < zpoly->length; i++)
     {

@@ -77,14 +77,14 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randbits(g, state, len, coeff_bits, exp_bits, ctx);
-            fmpz_mpoly_randbits(h, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
             fmpz_mpoly_pow_fps(g, f, pow, ctx);
-            fmpz_mpoly_test(g, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
             fmpz_mpoly_pow_naive(h, f, pow, ctx);
-            fmpz_mpoly_test(h, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
             result = fmpz_mpoly_equal(g, h, ctx);
 
             if (!result)
@@ -127,13 +127,13 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randbits(g, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
             fmpz_mpoly_pow_fps(g, f, pow, ctx);
-            fmpz_mpoly_test(g, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
             fmpz_mpoly_pow_fps(f, f, pow, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
             result = fmpz_mpoly_equal(f, g, ctx);
 
             if (!result)

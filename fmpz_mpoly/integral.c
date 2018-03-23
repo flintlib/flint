@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,93 +9,135 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
                          const fmpz * coeff2, const ulong * exp2, slong len2,
-     slong var, slong bits, slong N, slong offset, slong shift, ulong * oneexp)
+                                 slong var, slong bits, const mpoly_ctx_t mctx)
 {
-    slong i;
-    ulong c, mask;
+    slong i, N;
     fmpz_t d, g;
+    slong offset;
+    slong shift;
+    ulong * oneexp;
+    TMP_INIT;
 
+    TMP_START;
     fmpz_init(d);
     fmpz_init(g);
     fmpz_set_ui(s, WORD(1));
 
-    mask = (-UWORD(1)) >> (FLINT_BITS - bits);        
+    N = mpoly_words_per_exp(bits, mctx);
+    oneexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
-    /* scan once to find required denominator */
-    for (i = 0; i < len2; i++)
+    if (bits <= FLINT_BITS)
     {
-        c = (exp2[N*i + offset] >> shift) & mask;
-        fmpz_set_ui(d, c + 1);
-        fmpz_gcd(g, d, coeff2 + i);
-        fmpz_divexact(d, d, g);
-        fmpz_lcm(s, s, d);
-    }
+        ulong c, mask;
 
-    /* then scan again to compute the terms */
-    /* x^c -> x^(c+1)/(c+1) */
-    for (i = 0; i < len2; i++)
+        mask = (-UWORD(1)) >> (FLINT_BITS - bits);        
+        mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift,
+                                                     var, N, bits, mctx);
+
+        /* scan once to find required denominator */
+        for (i = 0; i < len2; i++)
+        {
+            c = (exp2[N*i + offset] >> shift) & mask;
+            fmpz_set_ui(d, c + 1);
+            fmpz_gcd(g, d, coeff2 + i);
+            fmpz_divexact(d, d, g);
+            fmpz_lcm(s, s, d);
+        }
+
+        /* then scan again to compute the terms */
+        /* x^c -> x^(c+1)/(c+1) */
+        for (i = 0; i < len2; i++)
+        {
+            c = (exp2[N*i + offset] >> shift) & mask;
+            mpoly_monomial_add(exp1 + N*i, exp2 + N*i, oneexp, N);
+            fmpz_set_ui(d, c + 1);
+            fmpz_mul(g, coeff2 + i, s);
+            fmpz_mul(coeff1 + i, coeff2 + i, g);
+            fmpz_divexact(coeff1 + i, g, d);
+        }
+
+    } else
     {
-        c = (exp2[N*i + offset] >> shift) & mask;
-        mpoly_monomial_add(exp1 + N*i, exp2 + N*i, oneexp, N);
-        fmpz_set_ui(d, c + 1);
-        fmpz_mul(g, coeff2 + i, s);
-        fmpz_mul(coeff1 + i, coeff2 + i, g);
-        fmpz_divexact(coeff1 + i, g, d);
+        fmpz_t c;
+        fmpz_init(c);
+
+        mpoly_gen_oneexp_offset_mp(oneexp, &offset, var, N, bits, mctx);
+
+        /* scan once to find required denominator */
+        for (i = 0; i < len2; i++)
+        {
+            fmpz_set_ui_array(c, exp2 + N*i + offset, bits/FLINT_BITS);
+            fmpz_add_ui(d, c, 1);
+            fmpz_gcd(g, d, coeff2 + i);
+            fmpz_divexact(d, d, g);
+            fmpz_lcm(s, s, d);
+        }
+
+        /* then scan again to compute the terms */
+        /* x^c -> x^(c+1)/(c+1) */
+        for (i = 0; i < len2; i++)
+        {
+            fmpz_set_ui_array(c, exp2 + N*i + offset, bits/FLINT_BITS);
+            mpoly_monomial_add_mp(exp1 + N*i, exp2 + N*i, oneexp, N);
+            fmpz_add_ui(d, c, 1);
+            fmpz_mul(g, coeff2 + i, s);
+            fmpz_mul(coeff1 + i, coeff2 + i, g);
+            fmpz_divexact(coeff1 + i, g, d);
+        }
+
+        fmpz_clear(c);
     }
 
     fmpz_clear(g);
     fmpz_clear(d);
+    TMP_END;
     return len2;
 }
 
 void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
                const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, len1, N, offset, shift, exp_bits;
-    ulong max_field, * oneexp, * gen_fields, * max_fields, * exp2 = poly2->exps;
+    slong i, len1, exp_bits;
+    ulong * exp2 = poly2->exps;
+    fmpz * gen_fields, * max_fields;
     int free2 = 0;
     TMP_INIT;
-
-    if (poly2->bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_integrate");
 
     TMP_START;
 
     /* compute bits required to represent result */
-    gen_fields = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    max_fields = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    mpoly_gen_fields_ui(gen_fields, var, ctx->minfo);
-    mpoly_max_fields_ui(max_fields, poly2->exps, poly2->length,
-                                                      poly2->bits, ctx->minfo);
-    max_field = 0;
+    gen_fields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    max_fields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
     for (i = 0; i < ctx->minfo->nfields; i++)
-        max_field = FLINT_MAX(max_field, gen_fields[i] + max_fields[i]);
+    {
+        fmpz_init(gen_fields + i);
+        fmpz_init(max_fields + i);
+    }
+    mpoly_gen_fields_fmpz(gen_fields, var, ctx->minfo);
+    mpoly_max_fields_fmpz(max_fields, poly2->exps, poly2->length,
+                                                      poly2->bits, ctx->minfo);
+    _fmpz_vec_add(max_fields, max_fields, gen_fields, ctx->minfo->nfields);
 
-    exp_bits = FLINT_MAX(MPOLY_MIN_BITS, 1 + FLINT_BIT_COUNT(max_field));
+    exp_bits = _fmpz_vec_max_bits(max_fields, ctx->minfo->nfields);
+    exp_bits = FLINT_MAX(MPOLY_MIN_BITS, exp_bits + 1);
     exp_bits = FLINT_MAX(exp_bits, poly2->bits);
-
-    if (exp_bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_integrate");
-
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(gen_fields + i);
+        fmpz_clear(max_fields + i);
+    }
 
-    oneexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift,
-                                                 var, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (exp_bits > poly2->bits)
     {
+        slong N = mpoly_words_per_exp(exp_bits, ctx->minfo);
         free2 = 1;
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
         mpoly_repack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
@@ -113,7 +155,7 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 
         len1 = _fmpz_mpoly_integral(scale, temp->coeffs, temp->exps,
                                           poly2->coeffs, exp2, poly2->length,
-                                      var, exp_bits, N, offset, shift, oneexp);
+                                                    var, exp_bits, ctx->minfo);
         _fmpz_mpoly_set_length(temp, len1, ctx);
 
         fmpz_mpoly_swap(temp, poly1, ctx);
@@ -126,7 +168,7 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 
         len1 = _fmpz_mpoly_integral(scale, poly1->coeffs, poly1->exps,
                                            poly2->coeffs, exp2, poly2->length,
-                                      var, exp_bits, N, offset, shift, oneexp);
+                                                    var, exp_bits, ctx->minfo);
         _fmpz_mpoly_set_length(poly1, len1, ctx);
     }
 

@@ -11,28 +11,22 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_randbits(nmod_mpoly_t poly, flint_rand_t state,
-                slong length, mp_bitcnt_t exp_bits, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_randtest_bound(nmod_mpoly_t poly, flint_rand_t state,
+                     slong length, slong exp_bound, const nmod_mpoly_ctx_t ctx)
 {
     slong i, j, nvars = ctx->minfo->nvars;
-    mp_limb_t coeff;
-    fmpz * exp;
+    ulong * exp;
     TMP_INIT;
 
     TMP_START;
 
-    exp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
-    for (j = 0; j < nvars; j++)
-        fmpz_init(exp + j);
-
+    exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
     nmod_mpoly_zero(poly, ctx);
     for (i = 0; i < length; i++)
     {
-        mpoly_monomial_randbits_fmpz(exp, state, exp_bits, ctx->minfo);
-        coeff = n_randint(state, ctx->ffinfo->mod.n);
-        _nmod_mpoly_set_term_ui_fmpz(poly, coeff, exp, ctx);
-    }
+        for (j = 0; j < nvars; j++)
+            exp[j] = n_randint(state, exp_bound);
 
-    for (j = 0; j < nvars; j++)
-        fmpz_clear(exp + j);
+        nmod_mpoly_set_term_ui_ui(poly, n_randtest(state), exp, ctx);
+    }
 }

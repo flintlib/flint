@@ -44,23 +44,23 @@ main(void)
         nmod_mpoly_init(cg, ctx);
         nmod_mpoly_init(t, ctx);
 
-        len = n_randint(state, 50)+1;
+        len = n_randint(state, 50) + 1;
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
 
-        degbound = 30/(1+2*(ctx->minfo->nvars-1));
+        degbound = 30/(2*ctx->minfo->nvars - 1);
 
         for (j = 0; j < 4; j++)
         {
             do {
-                nmod_mpoly_randtest(t, state, len, degbound, ctx);
+                nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
             } while (t->length == 0);
-            nmod_mpoly_randtest(a, state, len1, degbound, ctx);
-            nmod_mpoly_randtest(b, state, len2, degbound, ctx);
+            nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
+            nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
             nmod_mpoly_mul_johnson(a, a, t, ctx);
             nmod_mpoly_mul_johnson(b, b, t, ctx);
 
-            nmod_mpoly_randbits(g, state, len, FLINT_BITS, ctx);
+            nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
 
             res = nmod_mpoly_gcd_brown(g, a, b, ctx);
             if (!res) {

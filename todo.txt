@@ -108,6 +108,9 @@ fmpz_mpoly
 * Add references to Monagan and Pearce papers to bibtex and reference in
   heap multiplication, powering and division functions.
 
+* Move functions in mpoly/MISSING_FXNS.c and decarations in mpoly.h to their
+  appropriate places.
+
 nmod_poly
 ---------
 

@@ -63,13 +63,13 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
+            nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
             do {
-                nmod_mpoly_randtest(g, state, len2, exp_bound2 + 1, ctx);
+                nmod_mpoly_randtest_bound(g, state, len2, exp_bound2 + 1, ctx);
             } while (g->length == 0);
-            nmod_mpoly_randtest(h, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(r, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(k, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(r, state, len, exp_bound, ctx);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
 
@@ -148,16 +148,16 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
+            nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
             for (w = 0; w < num; w++)
             {
                 do {
-                    nmod_mpoly_randtest(darr[w], state, len2, exp_bound2 + 1, ctx);
+                    nmod_mpoly_randtest_bound(darr[w], state, len2, exp_bound2 + 1, ctx);
                 } while (darr[w]->length == 0);
-                nmod_mpoly_randtest(qarr[w], state, len, exp_bound, ctx);
+                nmod_mpoly_randtest_bound(qarr[w], state, len, exp_bound, ctx);
             }
-            nmod_mpoly_randtest(k1, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k2, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(k1, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(k2, state, len, exp_bound, ctx);
 
             nmod_mpoly_divrem_ideal_monagan_pearce(qarr, r, f, darr, num, ctx);
             nmod_mpoly_test(r, ctx);
@@ -248,16 +248,16 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            nmod_mpoly_randtest(f, state, len1, exp_bound1, ctx);
+            nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
             for (w = 0; w < num; w++)
             {
                 do {
-                    nmod_mpoly_randtest(darr[w], state, len2, exp_bound2 + 1, ctx);
+                    nmod_mpoly_randtest_bound(darr[w], state, len2, exp_bound2 + 1, ctx);
                 } while (darr[w]->length == 0);
-                nmod_mpoly_randtest(qarr[w], state, len, exp_bound, ctx);
+                nmod_mpoly_randtest_bound(qarr[w], state, len, exp_bound, ctx);
             }
-            nmod_mpoly_randtest(k1, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest(k2, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(k1, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(k2, state, len, exp_bound, ctx);
 
             nmod_mpoly_set(r, f, ctx);
 

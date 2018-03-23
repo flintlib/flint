@@ -43,7 +43,7 @@ main(void)
         coeff_bits = n_randint(state, 200);
         exp_bits = n_randint(state, 200) + 2;
 
-        fmpz_mpoly_randbits(f, state, len, coeff_bits, exp_bits, ctx);
+        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
         for (j = 0; j < 10; j++)
         {
@@ -57,7 +57,7 @@ main(void)
             }
 
             _fmpz_mpoly_set_term_fmpz_fmpz(f, c, exp, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
             _fmpz_mpoly_get_term_fmpz_fmpz(d, f, exp, ctx);
             result = fmpz_equal(c, d);
 
@@ -101,7 +101,7 @@ main(void)
         coeff_bits = n_randint(state, 200);
         exp_bits = n_randint(state, 200) + 2;
 
-        fmpz_mpoly_randbits(f, state, len, coeff_bits, exp_bits, ctx);
+        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
         for (j = 0; j < 10; j++)
         {
@@ -112,7 +112,7 @@ main(void)
                 exp[k] = n_randtest(state);
 
             fmpz_mpoly_set_term_fmpz_ui(f, c, exp, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
             fmpz_mpoly_get_term_fmpz_ui(d, f, exp, ctx);
             result = fmpz_equal(c, d);
 
