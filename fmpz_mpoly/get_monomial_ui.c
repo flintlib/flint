@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,7 +12,7 @@
 
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
+void fmpz_mpoly_get_monomial_ui(ulong * exps, const fmpz_mpoly_t poly, 
                                            slong n, const fmpz_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp(poly->bits, ctx->minfo);

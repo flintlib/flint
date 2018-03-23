@@ -44,7 +44,7 @@ main(void)
 
         exp_bits = n_randint(state, 200) + 2;
 
-        nmod_mpoly_randbits(f, state, len, exp_bits, ctx);
+        nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
 
         for (j = 0; j < 10; j++)
         {
@@ -101,7 +101,7 @@ main(void)
 
         exp_bits = n_randint(state, 200) + 2;
 
-        nmod_mpoly_randbits(f, state, len, exp_bits, ctx);
+        nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
 
         for (j = 0; j < 10; j++)
         {

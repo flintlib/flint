@@ -43,28 +43,32 @@ main(void)
         fmpq_mpoly_init(cg, ctx);
         fmpq_mpoly_init(t, ctx);
 
-        len = n_randint(state, 10) + 1;
-        len1 = n_randint(state, 10);
-        len2 = n_randint(state, 10);
+        len = n_randint(state, 20) + 1;
+        len1 = n_randint(state, 30);
+        len2 = n_randint(state, 30);
 
-        degbound = 16/(1 + ctx->zctx->minfo->nvars);
+        degbound = 20/(1 + ctx->zctx->minfo->nvars);
 
         coeff_bits = n_randint(state, 20);
 
         for (j = 0; j < 4; j++)
         {
             do {
-                fmpq_mpoly_randtest_bits_bound(t, state, len, coeff_bits + 1, degbound, ctx);
+                fmpq_mpoly_randtest_bound(t, state, len, coeff_bits + 1, degbound, ctx);
             } while (fmpq_mpoly_is_zero(t, ctx));
-            fmpq_mpoly_randtest_bits_bound(a, state, len1, coeff_bits, degbound, ctx);
-            fmpq_mpoly_randtest_bits_bound(b, state, len2, coeff_bits, degbound, ctx);
+            fmpq_mpoly_randtest_bound(a, state, len1, coeff_bits, degbound, ctx);
+            fmpq_mpoly_randtest_bound(b, state, len2, coeff_bits, degbound, ctx);
 
             fmpq_mpoly_mul(a, a, t, ctx);
             fmpq_mpoly_mul(b, b, t, ctx);
 
-            fmpq_mpoly_randtest_bits_bound(g, state, len, coeff_bits, degbound, ctx);
-            fmpq_mpoly_gcd(g, a, b, ctx);
-            fmpq_mpoly_test_canonical(g, ctx);
+            fmpq_mpoly_randtest_bound(g, state, len, coeff_bits, degbound, ctx);
+            res = fmpq_mpoly_gcd(g, a, b, ctx);
+            if (!res) {
+                continue;
+            }
+
+            fmpq_mpoly_assert_canonical(g, ctx);
 
             if (fmpq_mpoly_is_zero(g, ctx))
             {
@@ -93,11 +97,11 @@ main(void)
                 flint_printf("Check divisibility\ni = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
-            fmpq_mpoly_test_canonical(ca, ctx);
-            fmpq_mpoly_test_canonical(cb, ctx);
+            fmpq_mpoly_assert_canonical(ca, ctx);
+            fmpq_mpoly_assert_canonical(cb, ctx);
 
             fmpq_mpoly_gcd(cg, ca, cb, ctx);
-            fmpq_mpoly_test_canonical(cg, ctx);
+            fmpq_mpoly_assert_canonical(cg, ctx);
 
             if (!fmpq_mpoly_equal_fmpq(cg, lc, ctx))
             {

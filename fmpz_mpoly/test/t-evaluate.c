@@ -69,19 +69,18 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
             fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals, ctx);
 
             for (v = 0; v < nvars; v++)
             {
                 fmpz_mpoly_evaluate_one_fmpz(f, f, perm[v], vals[perm[v]], ctx);
-                fmpz_mpoly_test(f, ctx);
+                fmpz_mpoly_assert_canonical(f, ctx);
             }
             if (!fmpz_mpoly_equal_fmpz(f, fe, ctx))
             {
                 printf("FAIL\n");
-                flint_printf("Check repeated evalone matches evalall\n"
-                                                    "i: %wd  j: %wd\n", i, j);
+                flint_printf("Check repeated evalone matches evalall\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
         }
@@ -110,7 +109,7 @@ main(void)
         ordering_t ord;
         fmpz ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
-        slong coeff_bits, exp_bits1, exp_bits2;
+        slong coeff_bits;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -128,12 +127,9 @@ main(void)
 
         len1 = n_randint(state, 500);
         len2 = n_randint(state, 500);
-        exp_bits1 = n_randint(state, (20)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (20)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+
+        exp_bound1 = n_randint(state, 5000/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 5000/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 100);
 
@@ -148,8 +144,8 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-            fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
+            fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
             fmpz_mpoly_add(fg, f, g, ctx);
 
             fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals, ctx);
@@ -160,8 +156,7 @@ main(void)
             if (!fmpz_equal(t, fge))
             {
                 printf("FAIL\n");
-                flint_printf("Check addition commutes with evalall\n"
-                                                     "i: %wd  j: %wd\n", i, j);
+                flint_printf("Check addition commutes with evalall\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
         }
@@ -193,7 +188,7 @@ main(void)
         ordering_t ord;
         fmpz ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
-        slong coeff_bits, exp_bits1, exp_bits2;
+        slong coeff_bits;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -211,15 +206,11 @@ main(void)
 
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
-        exp_bits1 = n_randint(state, (15)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, (15)/(nvars
-                          + mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+
+        exp_bound1 = n_randint(state, 1000/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 1000/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 100);
-
 
         vals = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
         for (v = 0; v < nvars; v++)
@@ -231,8 +222,8 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-            fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
+            fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
             fmpz_mpoly_mul_johnson(fg, f, g, ctx);
 
             fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals, ctx);
@@ -243,8 +234,7 @@ main(void)
             if (!fmpz_equal(t, fge))
             {
                 printf("FAIL\n");
-                flint_printf("Check multiplication commutes with evalall\n"
-                                                     "i: %wd  j: %wd\n", i, j);
+                flint_printf("Check multiplication commutes with evalall\ni: %wd  j: %wd\n", i, j);
                 flint_abort();
             }
         }

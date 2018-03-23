@@ -368,6 +368,8 @@ void fq_nmod_mpolyd_add(fq_nmod_mpolyd_t A, const fq_nmod_mpolyd_t B,
             fq_nmod_set(A->coeffs + i, B->coeffs + Bind++, dctx->fqctx);
         } else if (!Bok && Cok) {
             fq_nmod_set(A->coeffs + i, C->coeffs + Cind++, dctx->fqctx);
+        } else {
+            fq_nmod_zero(A->coeffs + i, dctx->fqctx);
         }
 
         Bok = 1;

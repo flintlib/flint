@@ -21,13 +21,46 @@
 int
 main(void)
 {
-    int i, j;
+    int i, j, success;
 
     FLINT_TEST_INIT(state);
 
     flint_printf("resultant_discriminant....");
     fflush(stdout);
 
+
+    /* Check quadratic polynomial */
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, d, d1;
+        const char * vars[] = {"x","a","b","c"};
+
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_DEGLEX);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(d, ctx);
+        fmpz_mpoly_init(d1, ctx);
+
+        fmpz_mpoly_set_str_pretty(f, "a^10*x^2 + b^100*x + c^100000000000000000000", vars, ctx);
+        fmpz_mpoly_set_str_pretty(d1, "b^200 - 4*a^10*c^100000000000000000000", vars, ctx);
+        if (!fmpz_mpoly_discriminant(d, f, 0, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("could not compute quadratic discriminant\n");
+            flint_abort();
+        }
+
+        if (!fmpz_mpoly_equal(d, d1, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check quadratic polynomial\n");
+            flint_abort();
+        }
+
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(d, ctx);
+        fmpz_mpoly_clear(d1, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
 
     /* Check univariate resultant */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -58,8 +91,8 @@ main(void)
         exp_bound1 = n_randint(state, 50) + 1;
         exp_bound2 = n_randint(state, 50) + 1;
         coeff_bits = n_randint(state, 4);
-        fmpz_mpoly_randtest(a, state, len1, exp_bound1, coeff_bits, ctx);
-        fmpz_mpoly_randtest(b, state, len2, exp_bound2, coeff_bits, ctx);
+        fmpz_mpoly_randtest_bound(a, state, len1, coeff_bits, exp_bound1, ctx);
+        fmpz_mpoly_randtest_bound(b, state, len2, coeff_bits, exp_bound2, ctx);
 
         fmpz_mpoly_to_fmpz_poly(au, &ashift, a, 0, ctx);
         fmpz_mpoly_to_fmpz_poly(bu, &bshift, b, 0, ctx);
@@ -67,8 +100,9 @@ main(void)
         fmpz_poly_shift_left(bu, bu, bshift);
 
         fmpz_poly_resultant(ru, au, bu);
-        fmpz_mpoly_resultant(r, a, b, 0, ctx);
-        if (!fmpz_mpoly_equal_fmpz(r, ru, ctx))
+        success = fmpz_mpoly_resultant(r, a, b, 0, ctx);
+            
+        if (success && !fmpz_mpoly_equal_fmpz(r, ru, ctx))
         {
             printf("FAIL\n");
             flint_printf(" Check univariate resultant \ni: %wd\n",i);
@@ -114,16 +148,26 @@ main(void)
         exp_bound2 = n_randint(state, 5) + 1;
         exp_bound3 = n_randint(state, 5) + 1;
         coeff_bits = n_randint(state, 3);
-        fmpz_mpoly_randtest(a, state, len1, exp_bound1, coeff_bits, ctx);
-        fmpz_mpoly_randtest(b, state, len2, exp_bound2, coeff_bits, ctx);
-        fmpz_mpoly_randtest(c, state, len3, exp_bound3, coeff_bits, ctx);
+        fmpz_mpoly_randtest_bound(a, state, len1, coeff_bits, exp_bound1, ctx);
+        fmpz_mpoly_randtest_bound(b, state, len2, coeff_bits, exp_bound2, ctx);
+        fmpz_mpoly_randtest_bound(c, state, len3, coeff_bits, exp_bound3, ctx);
 
         for (j = 0; j < nvars; j++)
         {
             fmpz_mpoly_mul_johnson(ab, a, b, ctx);
-            fmpz_mpoly_resultant(ra, a, c, j, ctx);
-            fmpz_mpoly_resultant(rb, b, c, j, ctx);
-            fmpz_mpoly_resultant(rab, ab, c, j, ctx);
+
+            if (!fmpz_mpoly_resultant(ra, a, c, j, ctx))
+                continue;
+            fmpz_mpoly_assert_canonical(ra, ctx);
+
+            if (!fmpz_mpoly_resultant(rb, b, c, j, ctx))
+                continue;
+            fmpz_mpoly_assert_canonical(rb, ctx);
+
+            if (!fmpz_mpoly_resultant(rab, ab, c, j, ctx))
+                continue;
+            fmpz_mpoly_assert_canonical(rab, ctx);
+
             fmpz_mpoly_mul_johnson(p, ra, rb, ctx);
 
             if (!fmpz_mpoly_equal(p,rab,ctx))
@@ -174,8 +218,8 @@ main(void)
         exp_bound1 = n_randint(state, 5) + 1;
         exp_bound2 = n_randint(state, 5) + 1;
         coeff_bits = n_randint(state, 3);
-        fmpz_mpoly_randtest(a, state, len1, exp_bound1, coeff_bits, ctx);
-        fmpz_mpoly_randtest(b, state, len2, exp_bound2, coeff_bits, ctx);
+        fmpz_mpoly_randtest_bound(a, state, len1, coeff_bits, exp_bound1, ctx);
+        fmpz_mpoly_randtest_bound(b, state, len2, coeff_bits, exp_bound2, ctx);
 
         for (j = 0; j < nvars; j++)
         {
@@ -185,10 +229,16 @@ main(void)
                 continue;
 
             fmpz_mpoly_mul_johnson(ab, a, b, ctx);
-            fmpz_mpoly_resultant(r, a, b, j, ctx);
-            fmpz_mpoly_discriminant(da, a, j, ctx);
-            fmpz_mpoly_discriminant(db, b, j, ctx);
-            fmpz_mpoly_discriminant(dab, ab, j, ctx);
+
+            if (!fmpz_mpoly_resultant(r, a, b, j, ctx))
+                continue;
+            if (!fmpz_mpoly_discriminant(da, a, j, ctx))
+                continue;
+            if (!fmpz_mpoly_discriminant(db, b, j, ctx))
+                continue;
+            if (!fmpz_mpoly_discriminant(dab, ab, j, ctx))
+                continue;
+
             fmpz_mpoly_mul_johnson(p, da, db, ctx);
             fmpz_mpoly_mul_johnson(p, p, r, ctx);
             fmpz_mpoly_mul_johnson(p, p, r, ctx);

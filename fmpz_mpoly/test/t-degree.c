@@ -24,7 +24,7 @@ main(void)
     fflush(stdout);
 
     /* Check degree does not go up under addition */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
@@ -51,8 +51,8 @@ main(void)
 
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
-            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpz_mpoly_add(h, f, g, ctx);
 
             fmpz_mpoly_degree_fmpz(hdeg, h, j, ctx);
@@ -77,7 +77,7 @@ main(void)
     }
 
     /* Check degree adds under multiplication */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         int ok;
         fmpz_mpoly_ctx_t ctx;
@@ -105,15 +105,15 @@ main(void)
 
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
-            fmpz_mpoly_randbits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpz_mpoly_randbits(g, state, len2, coeff_bits, exp_bits2, ctx);
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
             fmpz_mpoly_degree_fmpz(hdeg, h, j, ctx);
             fmpz_mpoly_degree_fmpz(fdeg, f, j, ctx);
             fmpz_mpoly_degree_fmpz(gdeg, g, j, ctx);
 
-            if (g->length == 0 || f->length == 0) {
+            if (fmpz_mpoly_is_zero(g, ctx) || fmpz_mpoly_is_zero(f, ctx)) {
                 ok = (fmpz_cmp_si(hdeg, -WORD(1)) == 0);
             } else {
                 fmpz_sub(hdeg, hdeg, fdeg);

@@ -207,6 +207,20 @@ void fmpq_mpoly_fit_bits(fmpq_mpoly_t poly,
 FLINT_DLL void fmpq_mpoly_get_coeff_fmpq(fmpq_t c, const fmpq_mpoly_t poly,
                                           slong n, const fmpq_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly,
+                          slong n, const fmpq_t x, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly, 
+                                          slong n, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, 
+                                          slong n, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly, 
+                      slong n, const ulong * exps, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
+                      slong n,       fmpz ** exps, const fmpq_mpoly_ctx_t ctx);
+
+
 FLINT_DLL void fmpq_mpoly_canonicalise(fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);
 
@@ -433,7 +447,7 @@ void fmpq_mpoly_compose(fmpq_mpoly_t res, fmpq_mpoly_t poly1,
 
 /* GCD ***********************************************************************/
 
-FLINT_DLL void fmpq_mpoly_gcd(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+FLINT_DLL int fmpq_mpoly_gcd(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
                          const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_resultant(fmpq_mpoly_t poly1,
@@ -465,11 +479,11 @@ int fmpq_mpoly_print_pretty(const fmpq_mpoly_t poly,
 /* Random generation *********************************************************/
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bits_bound(fmpq_mpoly_t poly, flint_rand_t state,
+void fmpq_mpoly_randtest_bound(fmpq_mpoly_t poly, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, slong exp_bound,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_randtest(poly->zpoly, state, length, exp_bound, coeff_bits, ctx->zctx);
+    fmpz_mpoly_randtest_bound(poly->zpoly, state, length, coeff_bits, exp_bound, ctx->zctx);
     do {
         fmpq_randtest(poly->content, state, coeff_bits + 1);
     } while (fmpq_is_zero(poly->content));
@@ -477,11 +491,11 @@ void fmpq_mpoly_randtest_bits_bound(fmpq_mpoly_t poly, flint_rand_t state,
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bits_bits(fmpq_mpoly_t poly, flint_rand_t state,
+void fmpq_mpoly_randtest_bits(fmpq_mpoly_t poly, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_randbits(poly->zpoly, state, length, coeff_bits, exp_bits, ctx->zctx);
+    fmpz_mpoly_randtest_bits(poly->zpoly, state, length, coeff_bits, exp_bits, ctx->zctx);
     do {
         fmpq_randtest(poly->content, state, coeff_bits + 1);
     } while (fmpq_is_zero(poly->content));
@@ -496,7 +510,7 @@ void fmpq_mpoly_randtest_bits_bits(fmpq_mpoly_t poly, flint_rand_t state,
 
 ******************************************************************************/
 
-FLINT_DLL void fmpq_mpoly_test_canonical(const fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 

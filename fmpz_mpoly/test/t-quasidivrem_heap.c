@@ -37,7 +37,7 @@ main(void)
         fmpz_t s1;
         ordering_t ord;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        slong coeff_bits;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -55,41 +55,33 @@ main(void)
         len1 = n_randint(state, 100) + 50;
         len2 = n_randint(state, 100) + 50;
 
-        exp_bits = n_randint(state, FLINT_BITS - 1 - 
-                  mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars)) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS - 2 - 
-                  mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars)) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS - 2 - 
-                  mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars)) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bound =  n_randint(state, 10000/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 10000/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 10000/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 200);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(q1, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(r1, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(q1, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(r1, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
             do {
-                fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits + 1, ctx);
+                fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits + 1, exp_bound2, ctx);
             } while (g->length == 0);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_quasidivrem_heap(s1, q1, r1, h, g, ctx);
-            fmpz_mpoly_test(q1, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(q1, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             result = fmpz_equal_ui(s1, WORD(1)) && fmpz_mpoly_equal(q1, f, ctx);
 
             if (!result)
             {
-                printf("FAIL1\n");
-                printf("Check f*g/g = f\n");
-                flint_printf("i=%wd j=%wd\n",i,j);
+                printf("FAIL\n");
+                flint_printf("Check f*g/g = f\ni=%wd, j=%wd\n",i,j);
                 flint_abort();
             }
         }
@@ -110,7 +102,7 @@ main(void)
         fmpz_t s1, s2;
         ordering_t ord;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        slong coeff_bits;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -132,34 +124,27 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bits = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits1 = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bound =  n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 800/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 50);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
             do {
-                fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits + 1, ctx);
+                fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits + 1, exp_bound2, ctx);
             } while (g->length == 0);
-            fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(k, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(r1, state, len, exp_bound, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(r1, state, len, coeff_bits, exp_bound, ctx);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s1, h, r1, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             fmpz_mpoly_mul_johnson(t1, h, g, ctx);
@@ -167,8 +152,8 @@ main(void)
             fmpz_mpoly_scalar_mul_fmpz(t2, f, s1, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s2, f, k, f, g, ctx);
-            fmpz_mpoly_test(k, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
 
             result = fmpz_mpoly_equal(t1, t2, ctx)
                     && fmpz_mpoly_equal(h, f, ctx)
@@ -202,7 +187,7 @@ main(void)
         fmpz_t s1, s2;
         ordering_t ord;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        slong coeff_bits;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -224,34 +209,27 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bits = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits1 = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bound =  n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 800/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 50);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
             do {
-                fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits + 1, ctx);
+                fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits + 1, exp_bound2, ctx);
             } while (g->length == 0);
-            fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(k, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(r1, state, len, exp_bound, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(r1, state, len, coeff_bits, exp_bound, ctx);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s1, h, r1, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             fmpz_mpoly_mul_johnson(t1, h, g, ctx);
@@ -259,8 +237,8 @@ main(void)
             fmpz_mpoly_scalar_mul_fmpz(t2, f, s1, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s2, g, k, f, g, ctx);
-            fmpz_mpoly_test(k, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
 
             result = fmpz_mpoly_equal(t1, t2, ctx)
                     && fmpz_mpoly_equal(h, g, ctx)
@@ -294,7 +272,7 @@ main(void)
         fmpz_t s1, s2;
         ordering_t ord;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        slong coeff_bits;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -316,34 +294,27 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bits = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits1 = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bound =  n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 800/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 50);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
             do {
-                fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits + 1, ctx);
+                fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits + 1, exp_bound2, ctx);
             } while (g->length == 0);
-            fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(k, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(r1, state, len, exp_bound, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(r1, state, len, coeff_bits, exp_bound, ctx);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s1, h, r1, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             fmpz_mpoly_mul_johnson(t1, h, g, ctx);
@@ -351,8 +322,8 @@ main(void)
             fmpz_mpoly_scalar_mul_fmpz(t2, f, s1, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s2, k, f, f, g, ctx);
-            fmpz_mpoly_test(k, ctx);
-            fmpz_mpoly_test(f, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
 
             result = fmpz_mpoly_equal(t1, t2, ctx)
                     && fmpz_mpoly_equal(h, k, ctx)
@@ -386,7 +357,7 @@ main(void)
         fmpz_t s1, s2;
         ordering_t ord;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        slong coeff_bits;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -408,34 +379,27 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bits = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits1 = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-        exp_bits2 = n_randint(state, 14/(nvars + 
-                            mpoly_ordering_isdeg(ctx->minfo) + (nvars == 1)) + 1) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bound =  n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 800/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 50);
 
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
             do {
-                fmpz_mpoly_randtest(g, state, len2, exp_bound2, coeff_bits + 1, ctx);
+                fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits + 1, exp_bound2, ctx);
             } while (g->length == 0);
-            fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(k, state, len, exp_bound, coeff_bits, ctx);
-            fmpz_mpoly_randtest(r1, state, len, exp_bound, coeff_bits, ctx);
+            fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(r1, state, len, coeff_bits, exp_bound, ctx);
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s1, h, r1, f, g, ctx);
-            fmpz_mpoly_test(h, ctx);
-            fmpz_mpoly_test(r1, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+            fmpz_mpoly_assert_canonical(r1, ctx);
             fmpz_mpoly_remainder_strongtest(r1, g, ctx);
 
             fmpz_mpoly_mul_johnson(t1, h, g, ctx);
@@ -443,8 +407,8 @@ main(void)
             fmpz_mpoly_scalar_mul_fmpz(t2, f, s1, ctx);
 
             fmpz_mpoly_quasidivrem_heap(s2, k, g, f, g, ctx);
-            fmpz_mpoly_test(k, ctx);
-            fmpz_mpoly_test(g, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
 
             result = fmpz_mpoly_equal(t1, t2, ctx)
                     && fmpz_mpoly_equal(h, k, ctx)
