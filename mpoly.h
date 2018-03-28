@@ -137,7 +137,7 @@ typedef mpoly_rbtree_struct mpoly_rbtree_t[1];
 
 FLINT_DLL void mpoly_rbtree_init(mpoly_rbtree_t tree);
 
-void mpoly_rbnode_clear(mpoly_rbtree_t tree, mpoly_rbnode_t node,
+FLINT_DLL void mpoly_rbnode_clear(mpoly_rbtree_t tree, mpoly_rbnode_t node,
                                 void ** dataout, slong * keysout, slong * idx);
 
 FLINT_DLL void mpoly_rbtree_clear(mpoly_rbtree_t tree, void ** dataout, slong * keysout);

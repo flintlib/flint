@@ -480,7 +480,8 @@ FLINT_DLL void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
                                                    const nmod_mpoly_ctx_t ctx);
 
 /* Evaluation ****************************************************************/
-
+/*
+not implemented yet
 void nmod_mpoly_evaluate_all_tree_nmod(nmod_t ev, nmod_mpoly_t poly,
                                            ulong ** val, nmod_mpoly_ctx_t ctx);
 
@@ -489,7 +490,7 @@ void nmod_mpoly_evaluate_one_nmod(nmod_mpoly_t poly1, nmod_mpoly_t poly2,
 
 void nmod_mpoly_compose(nmod_mpoly_t res, nmod_mpoly_t poly1,
     nmod_mpoly_struct ** polys2, nmod_mpoly_ctx_t ctx1, nmod_mpoly_ctx_t ctx2);
-
+*/
 /* Univariates ***************************************************************/
 
 FLINT_DLL void nmod_mpoly_univar_init(nmod_mpoly_univar_t poly,
