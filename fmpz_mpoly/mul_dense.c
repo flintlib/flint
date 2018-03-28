@@ -111,7 +111,7 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
     slong bits, nvars = ctx->minfo->nvars;
     slong Alen;
     ulong diff;
-    ulong ormask;
+    ulong topmask;
     ulong * exps, * ptempexp, * plastexp;
     TMP_INIT;
 
@@ -154,7 +154,7 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
     diff = 0;
 
     /* scan down through the exponents */
-    ormask = 0;
+    topmask = 0;
     for (; i >= 0; i--)
     {
         if (!fmpz_is_zero(B->coeffs + i))
@@ -162,7 +162,7 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
             _fmpz_mpoly_fit_length(&A->coeffs, &A->exps, &A->alloc, Alen + 1, N);
             fmpz_swap(A->coeffs + Alen, B->coeffs + i);
             mpoly_monomial_msub_mp(A->exps + N*Alen, ptempexp, diff, plastexp, N);
-            ormask |= (A->exps + N*Alen)[N-1];
+            topmask |= (A->exps + N*Alen)[N - 1];
             Alen++;
         }
         fmpz_clear(B->coeffs + i);
@@ -194,12 +194,21 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
     /* sort the exponents if needed */
     if (ctx->minfo->ord != ORD_LEX)
     {
-        ulong msb;
+        slong msb;
         mpoly_get_cmpmask(ptempexp, N, bits, ctx->minfo);
-        count_leading_zeros(msb, ormask);
-        msb = (FLINT_BITS - 1)^msb;
+        if (topmask != WORD(0))
+        {
+            count_leading_zeros(msb, topmask);
+            msb = (FLINT_BITS - 1)^msb;
+        } else
+        {
+            msb = -WORD(1);
+        }
         if (N == 1) {
-            _fmpz_mpoly_radix_sort1(A, 0, A->length, msb, ptempexp[0], ormask);
+            if (msb >= WORD(0))
+            {
+                _fmpz_mpoly_radix_sort1(A, 0, A->length, msb, ptempexp[0], topmask);
+            }
         } else {
             _fmpz_mpoly_radix_sort(A, 0, A->length, (N - 1)*FLINT_BITS + msb, N, ptempexp);
         }
