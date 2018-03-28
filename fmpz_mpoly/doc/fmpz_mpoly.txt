@@ -229,86 +229,6 @@ int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
     $i < 0$ the function returns 1 if the polynomial is equal to any generator
     of the polynomial ring, otherwise it returns 0.
 
-void fmpz_mpoly_get_coeff_fmpz(fmpz_t x,
-                  const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
-
-    Set $x$ to coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with most significance.
-
-ulong fmpz_mpoly_get_coeff_ui(const fmpz_mpoly_t poly, 
-                                           slong i, const fmpz_mpoly_ctx_t ctx)
-
-    Return the coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with most significance. The coefficient is
-    assumed to be unsigned and to fit in a \code{ulong}.
-
-slong fmpz_mpoly_get_coeff_si(const fmpz_mpoly_t poly, 
-                                           slong i, const fmpz_mpoly_ctx_t ctx)
-
-    Return the coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with most significance. The coefficient may be
-    signed and is assumed to fit in an \code{slong}.
-
-void fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly, 
-                           slong i, const fmpz_t x, const fmpz_mpoly_ctx_t ctx)
-
-    Set the coefficient of the given polynomial with index $i$ to the given
-    value $x$, starting with $i = 0$ for the term with most signifance. Any
-    existing term at that index is overwritten.
-
-void fmpz_mpoly_set_coeff_ui(fmpz_mpoly_t poly,
-                                  slong i, ulong x, const fmpz_mpoly_ctx_t ctx)
-
-    Set the coefficient of the given polynomial with index $i$ to the given
-    unsigned integer $x$, starting with $i = 0$ for the term with most
-    signifance. Any existing term at that index is overwritten.
-
-void fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
-                                  slong i, slong x, const fmpz_mpoly_ctx_t ctx)
-
-    Set the coefficient of the given polynomial with index $i$ to the given
-    signed integer $x$, starting with $i = 0$ for the term with most
-    signifance. Any existing term at that index is overwritten.
-
-void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
-                                           slong i, const fmpz_mpoly_ctx_t ctx)
-
-    Get the exponent vector of the given polynomial with index $i$. The output
-    is written in the array \code{exps} which is assumed to have space for $n$
-    entries, where $n$ is the number of variable of the polynomial. If the
-    polynomial is either deglex or degrevlex, the degree field of the exponent
-    vector is ignored. The entry with index 0 in the array corresponds to the
-    variable with the most significance with respect to the polynomial
-    ordering.
-
-void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
-                       slong i, const ulong * exps, const fmpz_mpoly_ctx_t ctx)
-
-    Set the exponent vector of the given polynomial with index $i$. The
-    exponent is specified by the values in the array \code{exps} which is
-    assumed to have $n$ entries, where $n$ is the number of variable of the
-    polynomial. If the polynomial is either deglex or degrevlex, the degree
-    field of the exponent should not be included in \code{exps}. It is
-    calculated by the function. The entry with index 0 in the array corresponds
-    to the variable with the most significance with respect to the
-    polynomial ordering.
-
-fmpz * fmpz_mpoly_get_coeff_ptr(fmpz_mpoly_t poly,
-                                                 slong i, fmpz_mpoly_ctx_t ctx)
-
-    Return a pointer into the array of coefficients of \code{poly} at index
-    $i$. The function is implemented as a macro and returns \code{NULL} if the
-    index is beyond the current number of terms of the polynomial. It is
-    assumed that $i \geq 0$.
-
-ulong * fmpz_mpoly_get_monomial_ptr(fmpz_mpoly_t poly,
-                                                 slong i, fmpz_mpoly_ctx_t ctx)
-
-    Return a pointer into the exponent array of \code{poly} at index $i$. The
-    function is implemented as a macro and returns \code{NULL} if the index is 
-    beyond the current number of terms of the polynomial. It is assumed that
-    $i \geq 0$.
-
 void fmpz_mpoly_set_term_fmpz_ui(fmpz_mpoly_t poly,
                        const fmpz_t c, ulong const * exp, fmpz_mpoly_ctx_t ctx)
 
@@ -439,6 +359,119 @@ slong fmpz_mpoly_get_term_si_fmpz(const fmpz_mpoly_t poly,
     where the monomial is smaller than that of the trailing term of \code{poly}.
     The coeffcient is assumed to fit in an \code{slong}.
 
+
+*******************************************************************************
+
+    Functions dealing with violations of internal canonical ordering
+
+*******************************************************************************
+
+void fmpz_mpoly_get_coeff_fmpz(fmpz_t x,
+                  const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set $x$ to coefficient of the given polynomial with index $i$, starting
+    with $i = 0$ for the term with most significance.
+
+ulong fmpz_mpoly_get_coeff_ui(const fmpz_mpoly_t poly, 
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Return the coefficient of the given polynomial with index $i$, starting
+    with $i = 0$ for the term with most significance. The coefficient is
+    assumed to be unsigned and to fit in a \code{ulong}.
+
+slong fmpz_mpoly_get_coeff_si(const fmpz_mpoly_t poly, 
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Return the coefficient of the given polynomial with index $i$, starting
+    with $i = 0$ for the term with most significance. The coefficient may be
+    signed and is assumed to fit in an \code{slong}.
+
+void fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly, 
+                           slong i, const fmpz_t x, const fmpz_mpoly_ctx_t ctx)
+
+    Set the coefficient of the given polynomial with index $i$ to the given
+    value $x$, starting with $i = 0$ for the term with most signifance. Any
+    existing term at that index is overwritten.
+
+void fmpz_mpoly_set_coeff_ui(fmpz_mpoly_t poly,
+                                  slong i, ulong x, const fmpz_mpoly_ctx_t ctx)
+
+    Set the coefficient of the given polynomial with index $i$ to the given
+    unsigned integer $x$, starting with $i = 0$ for the term with most
+    signifance. Any existing term at that index is overwritten.
+
+void fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
+                                  slong i, slong x, const fmpz_mpoly_ctx_t ctx)
+
+    Set the coefficient of the given polynomial with index $i$ to the given
+    signed integer $x$, starting with $i = 0$ for the term with most
+    signifance. Any existing term at that index is overwritten.
+
+void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Get the exponent vector of the given polynomial with index $i$. The output
+    is written in the array \code{exps} which is assumed to have space for $n$
+    entries, where $n$ is the number of variable of the polynomial. If the
+    polynomial is either deglex or degrevlex, the degree field of the exponent
+    vector is ignored. The entry with index 0 in the array corresponds to the
+    variable with the most significance with respect to the polynomial
+    ordering.
+
+void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
+                       slong i, const ulong * exps, const fmpz_mpoly_ctx_t ctx)
+
+    Set the exponent vector of the given polynomial with index $i$. The
+    exponent is specified by the values in the array \code{exps} which is
+    assumed to have $n$ entries, where $n$ is the number of variable of the
+    polynomial. If the polynomial is either deglex or degrevlex, the degree
+    field of the exponent should not be included in \code{exps}. It is
+    calculated by the function. The entry with index 0 in the array corresponds
+    to the variable with the most significance with respect to the
+    polynomial ordering.
+
+fmpz * fmpz_mpoly_get_coeff_ptr(fmpz_mpoly_t poly,
+                                                 slong i, fmpz_mpoly_ctx_t ctx)
+
+    Return a pointer into the array of coefficients of \code{poly} at index
+    $i$. The function is implemented as a macro and returns \code{NULL} if the
+    index is beyond the current number of terms of the polynomial. It is
+    assumed that $i \geq 0$.
+
+ulong * fmpz_mpoly_get_monomial_ptr(fmpz_mpoly_t poly,
+                                                 slong i, fmpz_mpoly_ctx_t ctx)
+
+    Return a pointer into the exponent array of \code{poly} at index $i$. The
+    function is implemented as a macro and returns \code{NULL} if the index is 
+    beyond the current number of terms of the polynomial. It is assumed that
+    $i \geq 0$.
+
+void _fmpz_mpoly_reverse(fmpz * poly1, ulong * exp1,
+                    const fmpz * poly2, const ulong * exp2, slong len, slong N)
+
+    Set the \code{(poly1, exps1, len)} to the reverse of
+    \code{(poly2, exps2, len)}$ assuming the exponent vectors each take $N$
+    words. The polynomial \code{(poly1, exps1, len)} is assumed to have enough
+    space allocated for \code{len} terms. This is mainly for internal use,
+    the ordering of the terms in a polynomial is assumed to be correct in all
+    other functions.
+
+void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
+                                fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Reverse the terms in \code{poly2} and set \code{poly1} to the result. This
+    function is mainly for internal use, since applying it to a polynomial with
+    terms in correct order will result in terms with incorrect order. The
+    function serves merely as a version of \code{_fmpz_mpoly_reverse} which
+    takes care of memory management.
+
+void fmpz_mpoly_sort(fmpz_mpoly_t A, fmpz_mpoly_ctx_t ctx)
+
+    Assuming that the terms of \code{poly} are otherwise valid, sort the
+    terms into the canonical ordering dictated by the ordering in \code{ctx}.
+    This function does not combine like terms, nor does it delete terms with
+    coefficient zero.
+
 *******************************************************************************
 
     Set and negate
@@ -488,31 +521,6 @@ int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 
     Return 1 if \code{poly1} is equal to \code{poly2}, else return 0.
-
-*******************************************************************************
-
-    Reverse
-
-*******************************************************************************
-
-void _fmpz_mpoly_reverse(fmpz * poly1, ulong * exp1,
-                    const fmpz * poly2, const ulong * exp2, slong len, slong N)
-
-    Set the \code{(poly1, exps1, len)} to the reverse of
-    \code{(poly2, exps2, len)}$ assuming the exponent vectors each take $N$
-    words. The polynomial \code{(poly1, exps1, len)} is assumed to have enough
-    space allocated for \code{len} terms. This is mainly for internal use,
-    the ordering of the terms in a polynomial is assumed to be correct in all
-    other functions.
-
-void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
-                                fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Reverse the terms in \code{poly2} and set \code{poly1} to the result. This
-    function is mainly for internal use, since applying it to a polynomial with
-    terms in correct order will result in terms with incorrect order. The
-    function serves merely as a version of \code{_fmpz_mpoly_reverse} which
-    takes care of memory management.
 
 *******************************************************************************
 
@@ -695,15 +703,13 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
 
     Set \code{poly1} to \code{poly2} times \code{poly3} using the Johnson heap
     based method. See the numerous papers by Michael Monagan and Roman Pearce.
-    This function throws an exception upon exponent overflow.
-
 
 void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx)
 
     Does the same operation as \code{fmpz_mpoly_mul_johnson} but with
-    multiple threads. This function throws an exception upon exponent overflow.
+    multiple threads.
 
 slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1,
           slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, 
@@ -727,7 +733,14 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1,
     Set \code{poly1} to \code{poly2} times \code{poly3} using a big array to
     accumulate coefficients. If the array will be larger than some internally
     set parameter, the function fails silently and returns 0 so that some other
-    method may be called. This function is most efficient on dense inputs.
+    method may be called. This function is most efficient on semi-sparse inputs.
+
+int fmpz_mpoly_mul_dense(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    If the return is nonzero, set \code{poly1} to \code{poly2} times
+    \code{poly3} using a Kronecker substitution and \code{fmpz_poly_mul}.
 
 *******************************************************************************
 
