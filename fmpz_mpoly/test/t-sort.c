@@ -16,7 +16,7 @@
 int
 main(void)
 {
-    int i, j, k, result;
+    int i, j, result;
     FLINT_TEST_INIT(state);
 
     flint_printf("sort....");
@@ -41,13 +41,13 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            slong N;
+            slong N, k;
 
             fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
             fmpz_mpoly_set(g, f, ctx);
 
             N = mpoly_words_per_exp(f->bits, ctx->minfo);
-            for (k = 0; k < f->length; k++)
+            for (k = WORD(0); k < f->length; k++)
             {
                 ulong a, b;
                 a = n_randint(state, f->length);
