@@ -434,7 +434,8 @@ FLINT_DLL void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 /* Evaluation ****************************************************************/
-
+/*
+not implemented yet
 void fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, fmpq_mpoly_t poly,
                                             fmpq ** val, fmpq_mpoly_ctx_t ctx);
 
@@ -443,7 +444,7 @@ void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t poly1, fmpq_mpoly_t poly2,
 
 void fmpq_mpoly_compose(fmpq_mpoly_t res, fmpq_mpoly_t poly1,
     fmpq_mpoly_struct ** polys2, fmpq_mpoly_ctx_t ctx1, fmpq_mpoly_ctx_t ctx2);
-
+*/
 
 /* GCD ***********************************************************************/
 
