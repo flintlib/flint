@@ -8,7 +8,7 @@ include(TestBigEndian)
 
 project(flint C)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
@@ -62,7 +62,7 @@ execute_process(
 from os.path import join
 
 with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
-    with open('cpimport.h', 'w+') as fout:
+    with open('CPimport.h', 'w+') as fout:
         while True:
             l = fin.readline()
             if not l:
@@ -188,7 +188,7 @@ target_include_directories(flint PUBLIC
 )
 
 
-if(${BUILD_SHARED_LIBS} AND MSVC)
+if(BUILD_SHARED_LIBS AND MSVC)
     target_compile_definitions(flint PRIVATE "MSC_BUILD_DLL")
 endif()
 
