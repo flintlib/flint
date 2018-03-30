@@ -691,7 +691,7 @@ EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${EXTENSIONS}"
 
 #include paths
 
-INCS="-I\$(CURDIR)"
+INCS="-I\$(CURDIR) -I\$(CURDIR)/build"
 for INC_DIR in ${INC_DIRS} ${EXTRA_INC_DIRS}; do
    INCS="${INCS} -I${INC_DIR}"
 done
