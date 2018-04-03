@@ -87,13 +87,16 @@ typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
     A dense mpoly is stored as a flat array of coeffcients.
     Suppose deg_bounds = {a, b, c}. The coefficient of the monomial with 
     exponents {i, j, k} is stored at the coefficient of index
-        c + k*(b + j*(a + i*0))    
+        c + k*(b + j*(a + i*0))
+
+    Design is still in flux.
 */
 typedef struct
 {
     slong nvars;
     slong degb_alloc;
     slong * deg_bounds;
+    slong length;           /* usage is inconsistent currently */
     slong coeff_alloc;
     fmpz * coeffs;
 } fmpz_mpolyd_struct;
@@ -370,6 +373,8 @@ FLINT_DLL ulong fmpz_mpoly_get_term_ui_ui(           const fmpz_mpoly_t poly,
 FLINT_DLL slong fmpz_mpoly_get_term_si_ui(           const fmpz_mpoly_t poly,
                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
+/* functions dealing with internal canonical ordering  ***********************/
+
 FLINT_DLL void fmpz_mpoly_get_coeff_fmpz(fmpz_t x, const fmpz_mpoly_t poly,
                                           slong n, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL ulong fmpz_mpoly_get_coeff_ui(           const fmpz_mpoly_t poly, 
@@ -393,6 +398,12 @@ FLINT_DLL void fmpz_mpoly_set_monomial_ui(fmpz_mpoly_t poly,
                       slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL void fmpz_mpoly_set_monomial_fmpz(fmpz_mpoly_t poly, 
                       slong n,       fmpz ** exps, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
+                              mp_bitcnt_t pos, ulong cmpmask, ulong totalmask);
+FLINT_DLL void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
+                                    mp_bitcnt_t pos, slong N, ulong * cmpmask);
+FLINT_DLL void fmpz_mpoly_sort(fmpz_mpoly_t A, fmpz_mpoly_ctx_t ctx);
 
 #define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
@@ -527,6 +538,10 @@ FLINT_DLL slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1,
                                          slong * mults, slong num, slong bits);
 
 FLINT_DLL int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, 
+                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_mul_dense(fmpz_mpoly_t poly1, 
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
@@ -679,6 +694,15 @@ FLINT_DLL void _fmpz_mpoly_univar_pgcd(fmpz_mpoly_univar_t poly1,
 FLINT_DLL void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
             const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ,
                                                    const fmpz_mpoly_ctx_t ctx);
+
+
+/* Container for dense storage - still in flux *******************************/
+
+FLINT_DLL void fmpz_mpolyd_init(fmpz_mpolyd_t poly, slong nvars);
+
+FLINT_DLL void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len);
+
+FLINT_DLL void fmpz_mpolyd_clear(fmpz_mpolyd_t poly);
 
 /* GCD ***********************************************************************/
 
