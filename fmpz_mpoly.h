@@ -400,9 +400,9 @@ FLINT_DLL void fmpz_mpoly_set_monomial_fmpz(fmpz_mpoly_t poly,
                       slong n,       fmpz ** exps, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
-                                    ulong pos, ulong cmpmask, ulong totalmask);
+                              mp_bitcnt_t pos, ulong cmpmask, ulong totalmask);
 FLINT_DLL void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
-                                           ulong pos, slong N, ulong * cmpmask);
+                                    mp_bitcnt_t pos, slong N, ulong * cmpmask);
 FLINT_DLL void fmpz_mpoly_sort(fmpz_mpoly_t A, fmpz_mpoly_ctx_t ctx);
 
 #define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \

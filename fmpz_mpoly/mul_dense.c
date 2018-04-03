@@ -11,6 +11,7 @@
 
 #include "fmpz_mpoly.h"
 
+
 slong fmpz_mpolyd_length(const fmpz_mpolyd_t A)
 {
     slong i, j;
@@ -25,11 +26,14 @@ slong fmpz_mpolyd_length(const fmpz_mpolyd_t A)
     for (i = degb_prod; i > 0; i--)
     {
         if (!fmpz_is_zero(A->coeffs + i - 1))
+        {
             break;
+        }
     }
 
     return i;
 }
+
 
 int fmpz_mpolyd_set_degbounds(fmpz_mpolyd_t A, slong * bounds)
 {
@@ -44,7 +48,9 @@ int fmpz_mpolyd_set_degbounds(fmpz_mpolyd_t A, slong * bounds)
         A->deg_bounds[i] = bounds[i];
         umul_ppmm(hi, degb_prod, degb_prod, A->deg_bounds[i]);
         if (hi != WORD(0) || degb_prod < 0)
+        {
             goto done;
+        }
     }
 
     success = 1;
@@ -55,13 +61,15 @@ done:
 }
 
 
-void fmpz_mpoly_convert_to_fmpz_mpolyd_degbound(
-                              fmpz_mpolyd_t poly1, const fmpz_mpoly_t poly2,
-                                                    const fmpz_mpoly_ctx_t ctx)
+/*
+    assuming poly1 has valid degree bounds set, pack poly2 into it.
+*/
+void fmpz_mpoly_convert_to_fmpz_mpolyd_degbound(fmpz_mpolyd_t poly1,
+                          const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
     slong degb_prod;
     slong i, j, N;
-    slong * exps;
+    ulong * exps;
     slong nvars = ctx->minfo->nvars;
     TMP_INIT;
 
@@ -70,35 +78,38 @@ void fmpz_mpoly_convert_to_fmpz_mpolyd_degbound(
 
     degb_prod = WORD(1);
     for (i = 0; i < nvars; i++)
+    {
         degb_prod *= poly1->deg_bounds[i];
+    }
 
     for (i = 0; i < degb_prod; i++)
+    {
         fmpz_zero(poly1->coeffs + i);
+    }
 
     if (poly2->length == 0)
+    {
         return;
+    }
 
     TMP_START;
-    exps = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    exps = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
     N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
     for (i = 0; i < poly2->length; i++)
     {
         slong off;
 
-        mpoly_get_monomial_ui((ulong *)exps, poly2->exps + N*i, poly2->bits, ctx->minfo);
+        mpoly_get_monomial_ui(exps, poly2->exps + N*i, poly2->bits, ctx->minfo);
         off = 0;
         for (j = 0; j < nvars; j++)
+        {
             off = exps[j] + poly1->deg_bounds[j]*off;
-
+        }
         fmpz_set(poly1->coeffs + off, poly2->coeffs + i);
     }
 
     TMP_END;
 }
-
-
-
-
 
 
 /*
@@ -126,7 +137,9 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
 
     /* find bits needed for the result */
     for (j = 0; j < nvars; j++)
+    {
         exps[j] = B->deg_bounds[j] - 1;
+    }
     bits = mpoly_exp_bits_required_ui(exps, ctx->minfo);
     bits = mpoly_fix_bits(bits, ctx->minfo);
     N = mpoly_words_per_exp(bits, ctx->minfo);
@@ -207,10 +220,12 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
         if (N == 1) {
             if (msb >= WORD(0))
             {
-                _fmpz_mpoly_radix_sort1(A, 0, A->length, msb, ptempexp[0], topmask);
+                _fmpz_mpoly_radix_sort1(A, 0, A->length,
+                                                   msb, ptempexp[0], topmask);
             }
         } else {
-            _fmpz_mpoly_radix_sort(A, 0, A->length, (N - 1)*FLINT_BITS + msb, N, ptempexp);
+            _fmpz_mpoly_radix_sort(A, 0, A->length,
+                                        (N - 1)*FLINT_BITS + msb, N, ptempexp);
         }
     }
 
@@ -220,7 +235,6 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
     B->coeffs = NULL;
     TMP_END;
 }
-
 
 
 
@@ -248,17 +262,24 @@ int fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
     }
 
     TMP_START;
+    /*
+        for each variable v except for the most significant variable,
+        we need to pack to degree deg_v(A) + deg_v(A)
+    */
     Abounds = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
     Bbounds = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
     Pbounds = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
     mpoly_degrees_si(Abounds, A->exps, A->length, A->bits, ctx->minfo);
     mpoly_degrees_si(Bbounds, B->exps, B->length, B->bits, ctx->minfo);
-    for (i = 0; i < ctx->minfo->nvars; i++) {
+    for (i = 0; i < ctx->minfo->nvars; i++)
+    {
         Abounds[i] = Abounds[i] + 1;
         Bbounds[i] = Bbounds[i] + 1;
         Pbounds[i] = Abounds[i] + Bbounds[i] - 1;
         if ((slong)(Abounds[i] | Bbounds[i] | Pbounds[i]) < 0)
+        {
             goto failed_stage1;
+        }
         if (i > 0)
         {
             Abounds[i] = Pbounds[i];
@@ -276,7 +297,9 @@ int fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
         Pd->degb_alloc = nvars;
         Pd->deg_bounds = (slong *) flint_malloc(Pd->degb_alloc*sizeof(slong));
         for (i = 0; i < nvars; i++)
+        {
             Pd->deg_bounds[i] = WORD(1);
+        }
         Pd->coeffs = P->coeffs;
         Pd->coeff_alloc = P->alloc;
 
@@ -292,7 +315,9 @@ int fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
     success = success && fmpz_mpolyd_set_degbounds(Bd, Bbounds);
     success = success && fmpz_mpolyd_set_degbounds(Pd, Pbounds);
     if (!success)
+    {
         goto failed_stage2;
+    }
 
     fmpz_mpoly_convert_to_fmpz_mpolyd_degbound(Ad, A, ctx);
     fmpz_mpoly_convert_to_fmpz_mpolyd_degbound(Bd, B, ctx);

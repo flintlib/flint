@@ -11,6 +11,7 @@
 
 #include "fmpz_mpoly.h"
 
+
 /*
     sort terms in [left, right) by exponent
     assuming that bits in position > pos are already sorted
@@ -18,19 +19,20 @@
     and assuming that all bit positions that need to be sorted are in totalmask
 */
 void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
-                                    ulong pos, ulong cmpmask, ulong totalmask)
+                               mp_bitcnt_t pos, ulong cmpmask, ulong totalmask)
 {
-    ulong bit = pos;
-    ulong mask = UWORD(1) << bit;
+    ulong mask = UWORD(1) << pos;
     ulong cmp = cmpmask & mask;
-    slong mid, check;
+    slong mid, cur;
 
     FLINT_ASSERT(left <= right);
     FLINT_ASSERT(pos < FLINT_BITS);
 
     /* do nothing on lists of 0 or 1 elements */
     if (left + 1 >= right)
+    {
         return;
+    }
 
     /* return if there is no information to sort on this bit */
     if ((totalmask & mask) == WORD(0))
@@ -43,27 +45,22 @@ void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
         return;
     }
 
-    /* find first zero */
+    /* find first 'zero' */
     mid = left;
-    while (mid < right && ((A->exps+1*mid)[0] & mask) != cmp)
+    while (mid < right && ((A->exps + 1*mid)[0] & mask) != cmp)
     {
         mid++;
     }
 
-    /* make sure [left,mid)  has all ones
-                 [mid,right) has all zeros  */
-    check = mid;
-    while (++check < right)
+    /* make sure [left,mid)  doesn't match cmpmask in position pos 'one'
+                 [mid,right)    does match cmpmask in position pos 'zero' */
+    cur = mid;
+    while (++cur < right)
     {
-        if (((A->exps+1*check)[0] & mask) != cmp)
+        if (((A->exps + 1*cur)[0] & mask) != cmp)
         {
-            ulong t;
-            t = (A->exps + 1*mid)[0];
-            (A->exps + 1*mid)[0] = (A->exps + 1*check)[0];
-            (A->exps + 1*check)[0] = t;
-
-            fmpz_swap(A->coeffs + check, A->coeffs + mid);
-
+            fmpz_swap(A->coeffs + cur, A->coeffs + mid);
+            mpoly_monomial_swap(A->exps + 1*cur, A->exps + 1*mid, 1);
             mid++;
         }
     }
@@ -76,6 +73,7 @@ void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
     }
 }
 
+
 /*
     sort terms in [left, right) by exponent
     assuming that bits in position > pos are already sorted
@@ -85,7 +83,7 @@ void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
             Low priority
 */
 void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
-                                           ulong pos, slong N, ulong * cmpmask)
+                                     mp_bitcnt_t pos, slong N, ulong * cmpmask)
 {
     ulong off = pos/FLINT_BITS;
     ulong bit = pos%FLINT_BITS;
@@ -100,14 +98,15 @@ void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
     if (left + 1 >= right)
         return;
 
-    /* find first zero */
+    /* find first 'zero' */
     mid = left;
-    while (mid < right && ((A->exps+N*mid)[off] & mask) != cmp) {
+    while (mid < right && ((A->exps+N*mid)[off] & mask) != cmp)
+    {
         mid++;
     }
 
-    /* make sure [left,mid)  has all ones
-                 [mid,right) has all zeros  */
+    /* make sure [left,mid)  doesn't match cmpmask in position pos 'one'
+                 [mid,right)    does match cmpmask in position pos 'zero' */
     check = mid;
     while (++check < right)
     {
@@ -127,6 +126,7 @@ void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
     }
 }
 
+
 /*
     sort the terms in A by exponent
     assuming that the exponents are valid (other than being in order)
@@ -144,7 +144,9 @@ void fmpz_mpoly_sort(fmpz_mpoly_t A, fmpz_mpoly_ctx_t ctx)
 
     himask = 0;
     for (i = 0; i < A->length; i++)
+    {
         himask |= (A->exps + N*i)[N - 1];
+    }
 
     if (himask != 0)
     {
@@ -158,8 +160,11 @@ void fmpz_mpoly_sort(fmpz_mpoly_t A, fmpz_mpoly_ctx_t ctx)
     if (N == 1)
     {
         if (msb >= 0)
+        {
             _fmpz_mpoly_radix_sort1(A, 0, A->length, msb, ptempexp[0], himask);
-    } else {
+        }
+    } else
+    {
         _fmpz_mpoly_radix_sort(A, 0, A->length, (N - 1)*FLINT_BITS + msb, N, ptempexp);
     }
 
