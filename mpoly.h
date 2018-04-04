@@ -46,6 +46,8 @@ FLINT_DLL void _fmpz_vec_max(fmpz * vec1, const fmpz * vec2, const fmpz * vec3,
                                                                      slong len);
 FLINT_DLL void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len);
 
+FLINT_DLL void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs,
+                                            const fmpz * coeffs, slong length);
 
 #define MPOLY_MIN_BITS 8    /* minimum number of bits to pack into */
 

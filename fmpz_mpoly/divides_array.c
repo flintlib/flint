@@ -851,7 +851,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
    for (i = 0; i < l3; i++)
    {
-      _fmpz_mpoly_chunk_max_bits(b3, maxb3, poly3, i3, n3, i);
+      _fmpz_vec_sum_max_bits(&b3[i], &maxb3[i], poly3+i3[i], n3[i]);
 
       if (bits3 < maxb3[i])
          bits3 = maxb3[i];
@@ -1078,7 +1078,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
             }
 
             /* abs bound and sum of abs vals of coeffs of quotient chunk */
-            _fmpz_mpoly_chunk_max_bits(b1, maxb1, *poly1, i1, n1, i);
+            _fmpz_vec_sum_max_bits(&b1[i], &maxb1[i], (*poly1)+i1[i], n1[i]);
 
             /* update length of output quotient poly */
             len += n1[i];

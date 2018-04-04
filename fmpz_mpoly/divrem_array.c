@@ -490,7 +490,7 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
 
    for (i = 0; i < l3; i++)
    {
-      _fmpz_mpoly_chunk_max_bits(b3, maxb3, poly3, i3, n3, i);
+      _fmpz_vec_sum_max_bits(&b3[i], &maxb3[i], poly3+i3[i], n3[i]);
 
       if (bits3 < maxb3[i])
          bits3 = maxb3[i];
@@ -700,7 +700,7 @@ slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
                }
 
                /* abs bound and sum of abs vals of coeffs of quotient chunk */
-               _fmpz_mpoly_chunk_max_bits(b1, maxb1, *polyq, i1, n1, i);
+               _fmpz_vec_sum_max_bits(&b1[i], &maxb1[i], (*polyq)+i1[i], n1[i]);
 
                /* update length of output quotient and remainder polys */
                len += n1[i];
@@ -834,7 +834,7 @@ big:
 	       }
 
                /* abs bound and sum of abs vals of coeffs of quotient chunk */
-               _fmpz_mpoly_chunk_max_bits(b1, maxb1, *polyq, i1, n1, i);
+               _fmpz_vec_sum_max_bits(&b1[i], &maxb1[i], (*polyq)+i1[i], n1[i]);
 
                /* update length of output quotient and remainder polys */
                len += n1[i];
