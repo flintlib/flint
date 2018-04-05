@@ -870,46 +870,94 @@ void mpoly_main_variable_split_DEGLEX(slong * ind, ulong * pexp, const ulong * A
 }
 
 
+
+
 #define DEGLEX_UNPACK_MACRO(fxn_name, coeff_decl, nonzero_test, swapper)       \
 slong fxn_name(fmpz_mpoly_t P, slong Plen, coeff_decl,                         \
-                   slong top, slong nvars, slong degb, slong array_size)       \
+                                     slong top, slong nvars, slong degb)       \
 {                                                                              \
-    slong off, j;                                                              \
-    slong lastd   = degb - 1;                                                  \
-    slong reset   = array_size/degb;                                           \
-    slong counter = reset;                                                     \
-    ulong startexp = ((top) << (P->bits*nvars))                                \
-                        + ((lastd) << (P->bits*(nvars-1)))                     \
-                        + top - lastd;                                         \
+    slong i;                                                                   \
+    ulong exp, lomask = (UWORD(1) << (P->bits - 1)) - 1;                       \
+    slong off, array_size;                                                     \
+    slong * curexp, * degpow;                                                  \
+    ulong * oneexp;                                                            \
+    int carry;                                                                 \
+    TMP_INIT;                                                                  \
                                                                                \
-    for (off = array_size - 1; off >= 0; off--)                                \
+    TMP_START;                                                                 \
+    curexp = (slong *) TMP_ALLOC(nvars*sizeof(slong));                         \
+    degpow = (slong *) TMP_ALLOC(nvars*sizeof(slong));                         \
+    oneexp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));                         \
+    array_size = 1;                                                            \
+    curexp[0] = 0;                                                             \
+    oneexp[0] = 0;                                                             \
+    degpow[0] = 1;                                                             \
+    for (i = 0; i < nvars-1; i++)                                              \
     {                                                                          \
+        curexp[i] = 0;                                                         \
+        degpow[i] = array_size;                                                \
+        oneexp[i] = (UWORD(1) << (P->bits*(i+1))) - UWORD(1);                  \
+        array_size *= degb;                                                    \
+    }                                                                          \
+    off = 0;                                                                   \
+    if (nvars > 1)                                                             \
+    {                                                                          \
+        curexp[nvars - 2] = top;                                               \
+        off = top * degpow[nvars - 2];                                         \
+    }                                                                          \
+    exp = (top << (P->bits*nvars)) + (top << (P->bits*(nvars-1)));             \
+                                                                               \
+    carry = 1;                                                                 \
+    do {                                                                       \
         if (nonzero_test)                                                      \
         {                                                                      \
-            slong d = off;                                                     \
-            ulong exp = startexp;                                              \
-            for (j = 1; j + 1 < nvars; j++) {                                  \
-                exp -= d % degb;                                               \
-                exp += (d % degb) << (P->bits*j);                              \
-                d = d / degb;                                                  \
-            }                                                                  \
-            _fmpz_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc, Plen + 1, 1);   \
+            _fmpz_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc, Plen + 1, 1); \
             P->exps[Plen] = exp;                                               \
             swapper                                                            \
             Plen++;                                                            \
         }                                                                      \
-        counter--;                                                             \
-        if (counter <= 0) {                                                    \
-            counter = reset;                                                   \
-            lastd--;                                                           \
-            startexp += 1;                                                     \
-            startexp -= UWORD(1) << (P->bits*(nvars-1));                       \
+                                                                               \
+        exp -= oneexp[0];                                                      \
+        off -= 1;                                                              \
+        curexp[0] -= 1;                                                        \
+        if (curexp[0] >= 0)                                                    \
+        {                                                                      \
+            carry = 0;                                                         \
+        } else                                                                 \
+        {                                                                      \
+            exp -= curexp[0]*oneexp[0];                                        \
+            off -= curexp[0];                                                  \
+            curexp[0] = 0;                                                     \
+            carry = 1;                                                         \
+                                                                               \
+            for (i = 1; i < nvars - 1; i++)                                    \
+            {                                                                  \
+                exp -= oneexp[i];                                              \
+                off -= degpow[i];                                              \
+                curexp[i] -= 1;                                                \
+                if (curexp[i] < 0)                                             \
+                {                                                              \
+                    exp -= curexp[i]*oneexp[i];                                \
+                    off -= curexp[i]*degpow[i];                                \
+                    curexp[i] = 0;                                             \
+                    carry = 1;                                                 \
+                } else                                                         \
+                {                                                              \
+                    ulong t = exp & lomask;                                    \
+                    off += t*degpow[i - 1];                                    \
+                    curexp[i - 1] = t;                                         \
+                    exp += t*oneexp[i - 1];                                    \
+                    carry = 0;                                                 \
+                    break;                                                     \
+                }                                                              \
+            }                                                                  \
         }                                                                      \
-    }                                                                          \
+    } while (!carry);                                                          \
+                                                                               \
+    TMP_END;                                                                   \
+                                                                               \
     return Plen;                                                               \
 }
-
-
 
 DEGLEX_UNPACK_MACRO(
     fmpz_mpoly_append_array_sm1_DEGLEX, ulong * coeff_array
@@ -946,6 +994,8 @@ DEGLEX_UNPACK_MACRO(
     fmpz_swap(P->coeffs + Plen, coeff_array + off);
     fmpz_zero(coeff_array + off);
 )
+
+
 
 
 
@@ -1041,7 +1091,7 @@ void _fmpz_mpoly_mul_array_chunked_DEGLEX(fmpz_mpoly_t P,
                     }
                 }
                 Plen = fmpz_mpoly_append_array_sm1_DEGLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb, array_size);
+                                                     Pl - Pi - 1, nvars, degb);
             } else if (Pbits <= 2*FLINT_BITS)
             {
                 /* fits into two words */
@@ -1056,7 +1106,7 @@ void _fmpz_mpoly_mul_array_chunked_DEGLEX(fmpz_mpoly_t P,
                     }
                 }
                 Plen = fmpz_mpoly_append_array_sm2_DEGLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb, array_size);
+                                                     Pl - Pi - 1, nvars, degb);
             } else
             {
                 /* fits into three words */
@@ -1070,7 +1120,7 @@ void _fmpz_mpoly_mul_array_chunked_DEGLEX(fmpz_mpoly_t P,
                     }
                 }
                 Plen = fmpz_mpoly_append_array_sm3_DEGLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb, array_size);
+                                                     Pl - Pi - 1, nvars, degb);
             }
         }
 
@@ -1094,7 +1144,7 @@ void _fmpz_mpoly_mul_array_chunked_DEGLEX(fmpz_mpoly_t P,
                 }
             }
             Plen = fmpz_mpoly_append_array_fmpz_DEGLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb, array_size);
+                                                     Pl - Pi - 1, nvars, degb);
         }
     }
 
