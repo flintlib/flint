@@ -100,7 +100,9 @@ void * _fmpz_mpoly_mul_array_threaded_worker_LEX(void * arg_ptr)
                 number++;
                 Abits = FLINT_MAX(Abits, base->Amax[i]);
                 Bbits = FLINT_MAX(Bbits, base->Bmax[j]);
-                Pbits = FLINT_MAX(Pbits, FLINT_MIN(base->Asum[i] + base->Bmax[j], base->Amax[i] + base->Bsum[j]));
+                Pbits = FLINT_MAX(Pbits,
+                            FLINT_MIN(base->Asum[i] + base->Bmax[j],
+                                      base->Amax[i] + base->Bsum[j]));
             }
         }
         Pbits += FLINT_BIT_COUNT(number) + 1; /* includes one bit for sign */
@@ -113,57 +115,82 @@ void * _fmpz_mpoly_mul_array_threaded_worker_LEX(void * arg_ptr)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong1((ulong*)coeff_array, 
-                            base->Acoeffs + base->Amain[i], base->Apexp + base->Amain[i], base->Amain[i + 1] - base->Amain[i],
-                            base->Bcoeffs + base->Bmain[j], base->Bpexp + base->Bmain[j], base->Bmain[j + 1] - base->Bmain[j]);
+                        _fmpz_mpoly_addmul_array1_slong1((ulong *)coeff_array, 
+                            base->Acoeffs + base->Amain[i],
+                                base->Apexp + base->Amain[i],
+                                base->Amain[i + 1] - base->Amain[i],
+                            base->Bcoeffs + base->Bmain[j],
+                                base->Bpexp + base->Bmain[j],
+                                base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
                 (base->Pchunks + base->perm[Pi])->len = 
-                    fmpz_mpoly_append_array_sm1_LEX((base->Pchunks + base->perm[Pi])->poly, 0, (ulong*)coeff_array,
-                                                    base->mults, base->nvars - 1, base->array_size, base->Pl - base->perm[Pi] - 1);
+                    fmpz_mpoly_append_array_sm1_LEX(
+                        (base->Pchunks + base->perm[Pi])->poly, 0,
+                        (ulong *)coeff_array, base->mults, base->nvars - 1,
+                        base->array_size, base->Pl - base->perm[Pi] - 1);
+
             } else if (Pbits <= 2*FLINT_BITS)
             {
                 for (i = 0, j = base->perm[Pi]; i < base->Al && j >= 0; i++, j--)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong2((ulong*)coeff_array, 
-                            base->Acoeffs + base->Amain[i], base->Apexp + base->Amain[i], base->Amain[i + 1] - base->Amain[i],
-                            base->Bcoeffs + base->Bmain[j], base->Bpexp + base->Bmain[j], base->Bmain[j + 1] - base->Bmain[j]);
+                        _fmpz_mpoly_addmul_array1_slong2((ulong *)coeff_array, 
+                            base->Acoeffs + base->Amain[i],
+                                base->Apexp + base->Amain[i],
+                                base->Amain[i + 1] - base->Amain[i],
+                            base->Bcoeffs + base->Bmain[j],
+                                base->Bpexp + base->Bmain[j],
+                                base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
                 (base->Pchunks + base->perm[Pi])->len = 
-                    fmpz_mpoly_append_array_sm2_LEX((base->Pchunks + base->perm[Pi])->poly, 0, (ulong*)coeff_array,
-                                                    base->mults, base->nvars - 1, base->array_size, base->Pl - base->perm[Pi] - 1);
+                    fmpz_mpoly_append_array_sm2_LEX(
+                        (base->Pchunks + base->perm[Pi])->poly, 0,
+                        (ulong *)coeff_array, base->mults, base->nvars - 1,
+                        base->array_size, base->Pl - base->perm[Pi] - 1);
             } else
             {
                 for (i = 0, j = base->perm[Pi]; i < base->Al && j >= 0; i++, j--)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong((ulong*)coeff_array, 
-                            base->Acoeffs + base->Amain[i], base->Apexp + base->Amain[i], base->Amain[i + 1] - base->Amain[i],
-                            base->Bcoeffs + base->Bmain[j], base->Bpexp + base->Bmain[j], base->Bmain[j + 1] - base->Bmain[j]);
+                        _fmpz_mpoly_addmul_array1_slong((ulong *)coeff_array, 
+                            base->Acoeffs + base->Amain[i],
+                                base->Apexp + base->Amain[i],
+                                base->Amain[i + 1] - base->Amain[i],
+                            base->Bcoeffs + base->Bmain[j],
+                                base->Bpexp + base->Bmain[j],
+                                base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
                 (base->Pchunks + base->perm[Pi])->len = 
-                    fmpz_mpoly_append_array_sm3_LEX((base->Pchunks + base->perm[Pi])->poly, 0, (ulong*)coeff_array,
-                                                    base->mults, base->nvars - 1, base->array_size, base->Pl - base->perm[Pi] - 1);
+                    fmpz_mpoly_append_array_sm3_LEX(
+                        (base->Pchunks + base->perm[Pi])->poly, 0,
+                        (ulong *)coeff_array, base->mults, base->nvars - 1,
+                        base->array_size, base->Pl - base->perm[Pi] - 1);
             }
-        } else {
-
+        } else
+        {
             for (i = 0, j = base->perm[Pi]; i < base->Al && j >= 0; i++, j--)
             {
                 if (j < base->Bl)
                 {
-                    _fmpz_mpoly_addmul_array1_fmpz((fmpz*)coeff_array, 
-                        base->Acoeffs + base->Amain[i], base->Apexp + base->Amain[i], base->Amain[i + 1] - base->Amain[i],
-                        base->Bcoeffs + base->Bmain[j], base->Bpexp + base->Bmain[j], base->Bmain[j + 1] - base->Bmain[j]);
+                    _fmpz_mpoly_addmul_array1_fmpz((fmpz *)coeff_array, 
+                        base->Acoeffs + base->Amain[i],
+                            base->Apexp + base->Amain[i],
+                            base->Amain[i + 1] - base->Amain[i],
+                        base->Bcoeffs + base->Bmain[j],
+                            base->Bpexp + base->Bmain[j],
+                            base->Bmain[j + 1] - base->Bmain[j]);
                 }
             }
             (base->Pchunks + base->perm[Pi])->len = 
-                fmpz_mpoly_append_array_fmpz_LEX((base->Pchunks + base->perm[Pi])->poly, 0, (fmpz*)coeff_array,
-                                                base->mults, base->nvars - 1, base->array_size, base->Pl - base->perm[Pi] - 1);
+                fmpz_mpoly_append_array_fmpz_LEX(
+                    (base->Pchunks + base->perm[Pi])->poly, 0,
+                    (fmpz *)coeff_array, base->mults, base->nvars - 1,
+                    base->array_size, base->Pl - base->perm[Pi] - 1);
         }
 
         pthread_mutex_lock(&base->mutex);
@@ -218,23 +245,28 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
     Bmax  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
     Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
     Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
-    mpoly_main_variable_split_LEX(Amain, Apexp, A->exps, Al, A->length, mults, nvars - 1, A->bits);
-    mpoly_main_variable_split_LEX(Bmain, Bpexp, B->exps, Bl, B->length, mults, nvars - 1, B->bits);
+    mpoly_main_variable_split_LEX(Amain, Apexp, A->exps, Al, A->length,
+                                                    mults, nvars - 1, A->bits);
+    mpoly_main_variable_split_LEX(Bmain, Bpexp, B->exps, Bl, B->length,
+                                                    mults, nvars - 1, B->bits);
 
     /* work out bit counts for each chunk */
     for (i = 0; i < Al; i++)
     {
-        _fmpz_vec_sum_max_bits(&Asum[i], &Amax[i], A->coeffs + Amain[i], Amain[i + 1] - Amain[i]);
+        _fmpz_vec_sum_max_bits(&Asum[i], &Amax[i],
+                                A->coeffs + Amain[i], Amain[i + 1] - Amain[i]);
     }
     for (j = 0; j < Bl; j++)
     {
-        _fmpz_vec_sum_max_bits(&Bsum[j], &Bmax[j], B->coeffs + Bmain[j], Bmain[j + 1] - Bmain[j]);
+        _fmpz_vec_sum_max_bits(&Bsum[j], &Bmax[j],
+                                B->coeffs + Bmain[j], Bmain[j + 1] - Bmain[j]);
     }
 
     Pl = Al + Bl - 1;
 
     /* work out data for each chunk of the output */
-    Pchunks = (mul_array_threaded_chunk_t *) TMP_ALLOC(Pl*sizeof(mul_array_threaded_chunk_t));
+    Pchunks = (mul_array_threaded_chunk_t *) TMP_ALLOC(Pl
+                                          *sizeof(mul_array_threaded_chunk_t));
     perm = (slong *) TMP_ALLOC(Pl*sizeof(slong));
     for (Pi = 0; Pi < Pl; Pi++)
     {
@@ -246,14 +278,16 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
         {
             if (j < Bl)
             {
-                (Pchunks + Pi)->work += (Amain[i + 1] - Amain[i])*(Bmain[j + 1] - Bmain[j]);
+                (Pchunks + Pi)->work += (Amain[i + 1] - Amain[i])
+                                       *(Bmain[j + 1] - Bmain[j]);
             }
         }
     }
 
     for (i = 0; i < Pl; i++)
     {
-        for (j = i; j > 0 && (Pchunks + perm[j-1])->work < (Pchunks + perm[j])->work; j--)
+        for (j = i; j > 0 && (Pchunks + perm[j - 1])->work
+                                   < (Pchunks + perm[j])->work; j--)
         {
             slong t = perm[j - 1];
             perm[j - 1] = perm[j];
@@ -261,7 +295,8 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
         }
     }
 
-    base = (mul_array_threaded_base_t *) TMP_ALLOC(sizeof(mul_array_threaded_base_t));
+    base = (mul_array_threaded_base_t *) TMP_ALLOC(sizeof(
+                                                   mul_array_threaded_base_t));
     base->nthreads = flint_get_num_threads();
     base->Al = Al;
     base->Bl = Bl;
@@ -283,7 +318,8 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
     base->array_size = array_size;
     base->mults = mults;
 
-    args    = (mul_array_threaded_arg_t *) TMP_ALLOC(sizeof(mul_array_threaded_arg_t) * base->nthreads);
+    args    = (mul_array_threaded_arg_t *) TMP_ALLOC(
+                            sizeof(mul_array_threaded_arg_t) * base->nthreads);
     threads = (pthread_t *) TMP_ALLOC(sizeof(pthread_t) * base->nthreads);
 
     pthread_mutex_init(&base->mutex, NULL);
@@ -293,7 +329,8 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
         args[i].basep = base;
         if (i > 0)
         {
-            pthread_create(&threads[i], NULL, _fmpz_mpoly_mul_array_threaded_worker_LEX, &args[i]);
+            pthread_create(&threads[i], NULL,
+                          _fmpz_mpoly_mul_array_threaded_worker_LEX, &args[i]);
         } else
         {
             _fmpz_mpoly_mul_array_threaded_worker_LEX(&args[i]);
@@ -308,7 +345,8 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
     Plen = 0;
     for (Pi = 0; Pi < Pl; Pi++)
     {
-        _fmpz_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc, Plen + (Pchunks + Pi)->len, 1);
+        _fmpz_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc,
+                                                Plen + (Pchunks + Pi)->len, 1);
         for (i = 0; i < (Pchunks + Pi)->len; i++)
         {
             P->exps[Plen] = (Pchunks + Pi)->poly->exps[i];
@@ -326,8 +364,9 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
 }
 
 
-int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t poly1,
+                          const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, exp_bits, array_size;
     ulong max, * max_fields2, * max_fields3;
@@ -402,7 +441,8 @@ int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t pol
         fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
         fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
         temp->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_LEX(temp, poly3, poly2, max_fields2, ctx);
+        _fmpz_mpoly_mul_array_chunked_threaded_LEX(temp, poly3, poly2,
+                                                             max_fields2, ctx);
         fmpz_mpoly_swap(temp, poly1, ctx);
         fmpz_mpoly_clear(temp, ctx);
     } else
@@ -410,7 +450,8 @@ int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t pol
         fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
         fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
         poly1->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_LEX(poly1, poly3, poly2, max_fields2, ctx);
+        _fmpz_mpoly_mul_array_chunked_threaded_LEX(poly1, poly3, poly2,
+                                                             max_fields2, ctx);
     }
 
 cleanup:
@@ -479,7 +520,9 @@ void * _fmpz_mpoly_mul_array_threaded_worker_DEG(void * arg_ptr)
                 number++;
                 Abits = FLINT_MAX(Abits, base->Amax[i]);
                 Bbits = FLINT_MAX(Bbits, base->Bmax[j]);
-                Pbits = FLINT_MAX(Pbits, FLINT_MIN(base->Asum[i] + base->Bmax[j], base->Amax[i] + base->Bsum[j]));
+                Pbits = FLINT_MAX(Pbits,
+                            FLINT_MIN(base->Asum[i] + base->Bmax[j],
+                                      base->Amax[i] + base->Bsum[j]));
             }
         }
         Pbits += FLINT_BIT_COUNT(number) + 1; /* includes one bit for sign */
@@ -492,14 +535,19 @@ void * _fmpz_mpoly_mul_array_threaded_worker_DEG(void * arg_ptr)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong1((ulong*)coeff_array, 
-                            base->Acoeffs + base->Amain[i], base->Apexp + base->Amain[i], base->Amain[i + 1] - base->Amain[i],
-                            base->Bcoeffs + base->Bmain[j], base->Bpexp + base->Bmain[j], base->Bmain[j + 1] - base->Bmain[j]);
+                        _fmpz_mpoly_addmul_array1_slong1((ulong *)coeff_array, 
+                            base->Acoeffs + base->Amain[i],
+                                base->Apexp + base->Amain[i],
+                                base->Amain[i + 1] - base->Amain[i],
+                            base->Bcoeffs + base->Bmain[j],
+                                base->Bpexp + base->Bmain[j],
+                                base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
                 (base->Pchunks + base->perm[Pi])->len = 
-                    upack_sm1((base->Pchunks + base->perm[Pi])->poly, 0, (ulong*)coeff_array,
-                                                         base->Pl - base->perm[Pi] - 1, base->nvars, base->degb);
+                    upack_sm1((base->Pchunks + base->perm[Pi])->poly, 0,
+                        (ulong *)coeff_array, base->Pl - base->perm[Pi] - 1,
+                                                      base->nvars, base->degb);
 
             } else if (Pbits <= 2*FLINT_BITS)
             {
@@ -507,43 +555,58 @@ void * _fmpz_mpoly_mul_array_threaded_worker_DEG(void * arg_ptr)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong2((ulong*)coeff_array, 
-                            base->Acoeffs + base->Amain[i], base->Apexp + base->Amain[i], base->Amain[i + 1] - base->Amain[i],
-                            base->Bcoeffs + base->Bmain[j], base->Bpexp + base->Bmain[j], base->Bmain[j + 1] - base->Bmain[j]);
+                        _fmpz_mpoly_addmul_array1_slong2((ulong *)coeff_array, 
+                            base->Acoeffs + base->Amain[i],
+                                base->Apexp + base->Amain[i],
+                                base->Amain[i + 1] - base->Amain[i],
+                            base->Bcoeffs + base->Bmain[j],
+                                base->Bpexp + base->Bmain[j],
+                                base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
                 (base->Pchunks + base->perm[Pi])->len = 
-                    upack_sm2((base->Pchunks + base->perm[Pi])->poly, 0, (ulong*)coeff_array,
-                                                         base->Pl - base->perm[Pi] - 1, base->nvars, base->degb);
+                    upack_sm2((base->Pchunks + base->perm[Pi])->poly, 0,
+                        (ulong *)coeff_array, base->Pl - base->perm[Pi] - 1,
+                                                      base->nvars, base->degb);
             } else
             {
                 for (i = 0, j = base->perm[Pi]; i < base->Al && j >= 0; i++, j--)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong((ulong*)coeff_array, 
-                            base->Acoeffs + base->Amain[i], base->Apexp + base->Amain[i], base->Amain[i + 1] - base->Amain[i],
-                            base->Bcoeffs + base->Bmain[j], base->Bpexp + base->Bmain[j], base->Bmain[j + 1] - base->Bmain[j]);
+                        _fmpz_mpoly_addmul_array1_slong((ulong *)coeff_array, 
+                            base->Acoeffs + base->Amain[i],
+                                base->Apexp + base->Amain[i],
+                                base->Amain[i + 1] - base->Amain[i],
+                            base->Bcoeffs + base->Bmain[j],
+                                base->Bpexp + base->Bmain[j],
+                                base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
                 (base->Pchunks + base->perm[Pi])->len = 
-                    upack_sm3((base->Pchunks + base->perm[Pi])->poly, 0, (ulong*)coeff_array,
-                                                         base->Pl - base->perm[Pi] - 1, base->nvars, base->degb);
+                    upack_sm3((base->Pchunks + base->perm[Pi])->poly, 0,
+                        (ulong *)coeff_array, base->Pl - base->perm[Pi] - 1,
+                                                      base->nvars, base->degb);
             }
-        } else {
-
+        } else
+        {
             for (i = 0, j = base->perm[Pi]; i < base->Al && j >= 0; i++, j--)
             {
                 if (j < base->Bl)
                 {
-                    _fmpz_mpoly_addmul_array1_fmpz((fmpz*)coeff_array, 
-                        base->Acoeffs + base->Amain[i], base->Apexp + base->Amain[i], base->Amain[i + 1] - base->Amain[i],
-                        base->Bcoeffs + base->Bmain[j], base->Bpexp + base->Bmain[j], base->Bmain[j + 1] - base->Bmain[j]);
+                    _fmpz_mpoly_addmul_array1_fmpz((fmpz *)coeff_array, 
+                        base->Acoeffs + base->Amain[i],
+                            base->Apexp + base->Amain[i],
+                            base->Amain[i + 1] - base->Amain[i],
+                        base->Bcoeffs + base->Bmain[j],
+                            base->Bpexp + base->Bmain[j],
+                            base->Bmain[j + 1] - base->Bmain[j]);
                 }
             }
             (base->Pchunks + base->perm[Pi])->len = 
-                upack_fmpz((base->Pchunks + base->perm[Pi])->poly, 0, (fmpz*)coeff_array,
-                                                     base->Pl - base->perm[Pi] - 1, base->nvars, base->degb);
+                upack_fmpz((base->Pchunks + base->perm[Pi])->poly, 0,
+                    (fmpz *)coeff_array, base->Pl - base->perm[Pi] - 1,
+                                                      base->nvars, base->degb);
         }
 
         pthread_mutex_lock(&base->mutex);
@@ -601,24 +664,29 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
     Bmax  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
     Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
     Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
-    mpoly_main_variable_split_DEG(Amain, Apexp, A->exps, Al, A->length, degb, nvars, A->bits);
-    mpoly_main_variable_split_DEG(Bmain, Bpexp, B->exps, Bl, B->length, degb, nvars, B->bits);
+    mpoly_main_variable_split_DEG(Amain, Apexp, A->exps, Al, A->length,
+                                                         degb, nvars, A->bits);
+    mpoly_main_variable_split_DEG(Bmain, Bpexp, B->exps, Bl, B->length,
+                                                         degb, nvars, B->bits);
 
     /* work out bit counts for each chunk */
     for (i = 0; i < Al; i++)
     {
-        _fmpz_vec_sum_max_bits(&Asum[i], &Amax[i], A->coeffs + Amain[i], Amain[i + 1] - Amain[i]);
+        _fmpz_vec_sum_max_bits(&Asum[i], &Amax[i],
+                                A->coeffs + Amain[i], Amain[i + 1] - Amain[i]);
     }
     for (j = 0; j < Bl; j++)
     {
-        _fmpz_vec_sum_max_bits(&Bsum[j], &Bmax[j], B->coeffs + Bmain[j], Bmain[j + 1] - Bmain[j]);
+        _fmpz_vec_sum_max_bits(&Bsum[j], &Bmax[j],
+                                B->coeffs + Bmain[j], Bmain[j + 1] - Bmain[j]);
     }
 
     Pl = Al + Bl - 1;
     FLINT_ASSERT(Pl == degb);
 
     /* work out data for each chunk of the output */
-    Pchunks = (mul_array_threaded_chunk_t *) TMP_ALLOC(Pl*sizeof(mul_array_threaded_chunk_t));
+    Pchunks = (mul_array_threaded_chunk_t *) TMP_ALLOC(Pl
+                                          *sizeof(mul_array_threaded_chunk_t));
     perm = (slong *) TMP_ALLOC(Pl*sizeof(slong));
     for (Pi = 0; Pi < Pl; Pi++)
     {
@@ -630,14 +698,16 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
         {
             if (j < Bl)
             {
-                (Pchunks + Pi)->work += (Amain[i + 1] - Amain[i])*(Bmain[j + 1] - Bmain[j]);
+                (Pchunks + Pi)->work += (Amain[i + 1] - Amain[i])
+                                       *(Bmain[j + 1] - Bmain[j]);
             }
         }
     }
 
     for (i = 0; i < Pl; i++)
     {
-        for (j = i; j > 0 && (Pchunks + perm[j-1])->work < (Pchunks + perm[j])->work; j--)
+        for (j = i; j > 0 && (Pchunks + perm[j-1])->work
+                                         < (Pchunks + perm[j])->work; j--)
         {
             slong t = perm[j - 1];
             perm[j - 1] = perm[j];
@@ -645,7 +715,8 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
         }
     }
 
-    base = (mul_array_threaded_base_t *) TMP_ALLOC(sizeof(mul_array_threaded_base_t));
+    base = (mul_array_threaded_base_t *) TMP_ALLOC(sizeof(
+                                                   mul_array_threaded_base_t));
     base->nthreads = flint_get_num_threads();
     base->Al = Al;
     base->Bl = Bl;
@@ -668,7 +739,8 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
     base->degb = degb;
     base->rev = (ctx->minfo->ord == ORD_DEGREVLEX);
 
-    args    = (mul_array_threaded_arg_t *) TMP_ALLOC(sizeof(mul_array_threaded_arg_t) * base->nthreads);
+    args    = (mul_array_threaded_arg_t *) TMP_ALLOC(sizeof(
+                                   mul_array_threaded_arg_t) * base->nthreads);
     threads = (pthread_t *) TMP_ALLOC(sizeof(pthread_t) * base->nthreads);
 
     pthread_mutex_init(&base->mutex, NULL);
@@ -678,7 +750,8 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
         args[i].basep = base;
         if (i > 0)
         {
-            pthread_create(&threads[i], NULL, _fmpz_mpoly_mul_array_threaded_worker_DEG, &args[i]);
+            pthread_create(&threads[i], NULL,
+                          _fmpz_mpoly_mul_array_threaded_worker_DEG, &args[i]);
         } else
         {
             _fmpz_mpoly_mul_array_threaded_worker_DEG(&args[i]);
@@ -693,7 +766,8 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
     Plen = 0;
     for (Pi = 0; Pi < Pl; Pi++)
     {
-        _fmpz_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc, Plen + (Pchunks + Pi)->len, 1);
+        _fmpz_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc,
+                                                Plen + (Pchunks + Pi)->len, 1);
         for (i = 0; i < (Pchunks + Pi)->len; i++)
         {
             P->exps[Plen] = (Pchunks + Pi)->poly->exps[i];
@@ -711,8 +785,9 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
 }
 
 
-int fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t poly1,
+                         const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, exp_bits, array_size;
     ulong deg, * max_fields2, * max_fields3;

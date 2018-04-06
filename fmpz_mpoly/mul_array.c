@@ -643,7 +643,8 @@ void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
             {
                 if (j < Bl)
                 {
-                    Pbits = FLINT_MAX(Pbits, FLINT_MIN(Asum[i] + Bmax[j], Amax[i] + Bsum[j]));
+                    Pbits = FLINT_MAX(Pbits,
+                              FLINT_MIN(Asum[i] + Bmax[j], Amax[i] + Bsum[j]));
                     number++;
                 }
             }
@@ -657,8 +658,10 @@ void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
                     if (j < Bl)
                     {
                         _fmpz_mpoly_addmul_array1_slong1(coeff_array, 
-                            (slong *) A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                            (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                            (slong *) A->coeffs + Amain[i],
+                                Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                     }
                 }
 
@@ -673,8 +676,10 @@ void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
                     if (j < Bl)
                     {
                         _fmpz_mpoly_addmul_array1_slong2(coeff_array, 
-                            (slong *) A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                            (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                            (slong *) A->coeffs + Amain[i],
+                                    Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                    Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                     }
                 }
 
@@ -689,8 +694,10 @@ void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
                     if (j < Bl)
                     {
                         _fmpz_mpoly_addmul_array1_slong(coeff_array, 
-                            (slong *) A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                            (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                            (slong *) A->coeffs + Amain[i],
+                                    Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                    Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                     }
                 }
 
@@ -714,8 +721,10 @@ void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
                 if (j < Bl)
                 {
                     _fmpz_mpoly_addmul_array1_fmpz(coeff_array, 
-                        A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                        B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                        A->coeffs + Amain[i],
+                            Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                        B->coeffs + Bmain[j],
+                            Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                 }
             }
 
@@ -1138,21 +1147,25 @@ void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
     Bmax  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
     Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
     Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
-    mpoly_main_variable_split_DEG(Amain, Apexp, A->exps, Al, A->length, degb, nvars, A->bits);
-    mpoly_main_variable_split_DEG(Bmain, Bpexp, B->exps, Bl, B->length, degb, nvars, B->bits);
+    mpoly_main_variable_split_DEG(Amain, Apexp, A->exps, Al, A->length,
+                                                         degb, nvars, A->bits);
+    mpoly_main_variable_split_DEG(Bmain, Bpexp, B->exps, Bl, B->length,
+                                                         degb, nvars, B->bits);
 
     /* work out bit counts for each chunk */
     Abits = 0;
     for (i = 0; i < Al; i++)
     {
-        _fmpz_vec_sum_max_bits(&Asum[i], &Amax[i], A->coeffs + Amain[i], Amain[i + 1] - Amain[i]);
+        _fmpz_vec_sum_max_bits(&Asum[i], &Amax[i],
+                                A->coeffs + Amain[i], Amain[i + 1] - Amain[i]);
         Abits = FLINT_MAX(Abits, Amax[i]);
     }
 
     Bbits = 0;
     for (j = 0; j < Bl; j++)
     {
-        _fmpz_vec_sum_max_bits(&Bsum[j], &Bmax[j], B->coeffs + Bmain[j], Bmain[j + 1] - Bmain[j]);
+        _fmpz_vec_sum_max_bits(&Bsum[j], &Bmax[j],
+                                B->coeffs + Bmain[j], Bmain[j + 1] - Bmain[j]);
         Bbits = FLINT_MAX(Bbits, Bmax[j]);
     }
 
@@ -1176,7 +1189,8 @@ void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
             {
                 if (j < Bl)
                 {
-                    Pbits = FLINT_MAX(Pbits, FLINT_MIN(Asum[i] + Bmax[j], Amax[i] + Bsum[j]));
+                    Pbits = FLINT_MAX(Pbits,
+                              FLINT_MIN(Asum[i] + Bmax[j], Amax[i] + Bsum[j]));
                     number++;
                 }
             }
@@ -1190,8 +1204,10 @@ void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
                     if (j < Bl)
                     {
                         _fmpz_mpoly_addmul_array1_slong1(coeff_array, 
-                            (slong *) A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                            (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                            (slong *) A->coeffs + Amain[i],
+                                Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                     }
                 }
                 Plen = upack_sm1(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
@@ -1204,8 +1220,10 @@ void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
                     if (j < Bl)
                     {
                         _fmpz_mpoly_addmul_array1_slong2(coeff_array, 
-                            (slong *) A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                            (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                            (slong *) A->coeffs + Amain[i],
+                                Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
 
                     }
                 }
@@ -1219,8 +1237,10 @@ void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
                     if (j < Bl)
                     {
                         _fmpz_mpoly_addmul_array1_slong(coeff_array, 
-                            (slong *) A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                            (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                            (slong *) A->coeffs + Amain[i],
+                                Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                     }
                 }
                 Plen = upack_sm3(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
@@ -1242,8 +1262,10 @@ void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
                 if (j < Bl)
                 {
                     _fmpz_mpoly_addmul_array1_fmpz(coeff_array, 
-                        A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                        B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                        A->coeffs + Amain[i],
+                            Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                        B->coeffs + Bmain[j],
+                            Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                 }
             }
             Plen = upack_fmpz(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
