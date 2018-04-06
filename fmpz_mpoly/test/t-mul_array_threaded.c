@@ -18,13 +18,13 @@
 int
 main(void)
 {
-    int i, j, result;
+    int i, j, result, max_threads = 5;
     FLINT_TEST_INIT(state);
 
-    flint_printf("mul_array....");
+    flint_printf("mul_array_threaded....");
     fflush(stdout);
 
-    /* Check mul_array matches mul_johnson */
+    /* Check mul_array_threaded matches mul_johnson */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -57,9 +57,11 @@ main(void)
             fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
             fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array(k, f, g, ctx);
+            result = fmpz_mpoly_mul_array_threaded(k, f, g, ctx);
             if (!result)
             {
                 continue;
@@ -69,7 +71,7 @@ main(void)
             if (!result)
             {
                 printf("FAIL\n");
-                flint_printf("Check mul_array matches mul_johnson\ni = %wd, j = %wd\n", i, j);
+                flint_printf("Check mul_array_threaded matches mul_johnson\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
         }
@@ -110,9 +112,11 @@ main(void)
             fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
             fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array(f, f, g, ctx);
+            result = fmpz_mpoly_mul_array_threaded(f, f, g, ctx);
             if (!result)
                 continue;
 
@@ -161,9 +165,11 @@ main(void)
             fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
             fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array(g, f, g, ctx);
+            result = fmpz_mpoly_mul_array_threaded(g, f, g, ctx);
             if (!result)
                 continue;
 

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -463,22 +464,9 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
 
 
-
-
-
-
-
-
-
-
-
-
 /****************************************************
-
     LEX
-
 ****************************************************/
-
 
 
 void mpoly_main_variable_split_LEX(slong * ind, ulong * pexp, const ulong * Aexp,
@@ -839,16 +827,11 @@ cleanup:
 
 
 
-
-
 /****************************************************
-
-    DEGLEX
-
+    DEGLEX and DEGREVLEX
 ****************************************************/
 
-
-void mpoly_main_variable_split_DEGLEX(slong * ind, ulong * pexp, const ulong * Aexp,
+void mpoly_main_variable_split_DEG(slong * ind, ulong * pexp, const ulong * Aexp,
              slong l1, slong Alen, ulong deg, slong num, slong Abits)
 {
     slong i, j = 0, s = 0;
@@ -868,7 +851,6 @@ void mpoly_main_variable_split_DEGLEX(slong * ind, ulong * pexp, const ulong * A
     while (s <= l1)
         ind[s++] = Alen;
 }
-
 
 
 
@@ -999,288 +981,6 @@ DEGLEX_UNPACK_MACRO(
 
 
 
-void _fmpz_mpoly_mul_array_chunked_DEGLEX(fmpz_mpoly_t P,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
-                                        ulong degb, const fmpz_mpoly_ctx_t ctx)
-{
-    slong nvars = ctx->minfo->nvars;
-    slong Pi, i, j, Plen, Pl, Al, Bl, array_size;
-    slong Abits, * Asum, * Amax, Bbits, * Bsum, * Bmax;
-    slong * Amain, * Bmain;
-    ulong * Apexp, * Bpexp;
-    int small;
-    TMP_INIT;
-
-    TMP_START;
-
-    /* compute lengths of poly2 and poly3 in chunks */
-    Al = 1 + (slong) (A->exps[0] >> (A->bits*nvars));
-    Bl = 1 + (slong) (B->exps[0] >> (B->bits*nvars));
-
-    array_size = 1;
-    for (i = 0; i < nvars-1; i++) {
-        array_size *= degb;
-    }
-
-    /* compute indices and lengths of coefficients of polys in main variable */
-    Amain = (slong *) TMP_ALLOC((Al + 1)*sizeof(slong));
-    Bmain = (slong *) TMP_ALLOC((Bl + 1)*sizeof(slong));
-    Asum  = (slong *) TMP_ALLOC(Al*sizeof(slong));
-    Amax  = (slong *) TMP_ALLOC(Al*sizeof(slong));
-    Bsum  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
-    Bmax  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
-    Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
-    Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
-    mpoly_main_variable_split_DEGLEX(Amain, Apexp, A->exps, Al, A->length, degb, nvars, A->bits);
-    mpoly_main_variable_split_DEGLEX(Bmain, Bpexp, B->exps, Bl, B->length, degb, nvars, B->bits);
-
-    /* work out bit counts for each chunk */
-    Abits = 0;
-    for (i = 0; i < Al; i++)
-    {
-        _fmpz_vec_sum_max_bits(&Asum[i], &Amax[i], A->coeffs + Amain[i], Amain[i + 1] - Amain[i]);
-        Abits = FLINT_MAX(Abits, Amax[i]);
-    }
-
-    Bbits = 0;
-    for (j = 0; j < Bl; j++)
-    {
-        _fmpz_vec_sum_max_bits(&Bsum[j], &Bmax[j], B->coeffs + Bmain[j], Bmain[j + 1] - Bmain[j]);
-        Bbits = FLINT_MAX(Bbits, Bmax[j]);
-    }
-
-    /* whether the output coefficients are "small" */
-    small = Abits <= (FLINT_BITS - 2) && Bbits <= (FLINT_BITS - 2);
-
-    Pl = Al + Bl - 1;
-    FLINT_ASSERT(Pl == degb);
-    Plen = 0;
-
-    if (small)
-    {
-        ulong * coeff_array = (ulong *) TMP_ALLOC(3*array_size*sizeof(ulong));
-        for (j = 0; j < 3*array_size; j++)
-            coeff_array[j] = 0;
-
-        /* for each output chunk */
-        for (Pi = 0; Pi < Pl; Pi++)
-        {
-            /* compute bound on coeffs of output chunk */
-            slong number = 0;
-            slong Pbits = 0;
-            for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
-            {
-                if (j < Bl)
-                {
-                    Pbits = FLINT_MAX(Pbits, FLINT_MIN(Asum[i] + Bmax[j], Amax[i] + Bsum[j]));
-                    number++;
-                }
-            }
-            Pbits += FLINT_BIT_COUNT(number) + 1; /* includes one bit for sign */
-
-            if (Pbits <= FLINT_BITS)
-            {
-                /* fits into one word */
-                for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
-                {
-                    if (j < Bl)
-                    {
-                        _fmpz_mpoly_addmul_array1_slong1(coeff_array, 
-                            (slong *) A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                            (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
-                    }
-                }
-                Plen = fmpz_mpoly_append_array_sm1_DEGLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb);
-            } else if (Pbits <= 2*FLINT_BITS)
-            {
-                /* fits into two words */
-                for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
-                {
-                    if (j < Bl)
-                    {
-                        _fmpz_mpoly_addmul_array1_slong2(coeff_array, 
-                            (slong *) A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                            (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
-
-                    }
-                }
-                Plen = fmpz_mpoly_append_array_sm2_DEGLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb);
-            } else
-            {
-                /* fits into three words */
-                for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
-                {
-                    if (j < Bl)
-                    {
-                        _fmpz_mpoly_addmul_array1_slong(coeff_array, 
-                            (slong *) A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                            (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
-                    }
-                }
-                Plen = fmpz_mpoly_append_array_sm3_DEGLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb);
-            }
-        }
-
-    } else
-    {
-        fmpz * coeff_array = (fmpz *) TMP_ALLOC(array_size*sizeof(fmpz));
-        for (j = 0; j < array_size; j++)
-            fmpz_init(coeff_array + j);
-
-        /* for each output chunk */
-        for (Pi = 0; Pi < Pl; Pi++)
-        {
-            /* addmuls for each cross product of chunks */
-            for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
-            {
-                if (j < Bl)
-                {
-                    _fmpz_mpoly_addmul_array1_fmpz(coeff_array, 
-                        A->coeffs + Amain[i], Apexp + Amain[i], Amain[i + 1] - Amain[i],
-                        B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
-                }
-            }
-            Plen = fmpz_mpoly_append_array_fmpz_DEGLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb);
-        }
-    }
-
-    TMP_END;
-    _fmpz_mpoly_set_length(P, Plen, ctx);
-}
-
-
-
-int fmpz_mpoly_mul_array_DEGLEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, exp_bits, array_size;
-    ulong deg, * max_fields2, * max_fields3;
-    int success = 1;
-    TMP_INIT;
-
-    /* input poly is zero */
-    if (poly2->length == 0 || poly3->length == 0)
-    {
-        fmpz_mpoly_zero(poly1, ctx);
-        return 1;
-    }
-
-    /* lets only work with exponents packed into 1 word */
-    if (    1 != mpoly_words_per_exp(poly2->bits, ctx->minfo)
-         || 1 != mpoly_words_per_exp(poly3->bits, ctx->minfo))
-    {
-        return 0;
-    }
-
-    TMP_START;
-
-    /* compute maximum exponents for each variable */
-    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
-                                                      poly2->bits, ctx->minfo);
-    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
-                                                      poly3->bits, ctx->minfo);
-
-    /* the field of index n-1 is the one that wil be pulled out */
-    i = ctx->minfo->nfields - 1;
-    deg = max_fields2[i] + max_fields3[i] + 1;
-    if (((slong) deg) <= 0 || deg > MAX_ARRAY_SIZE)
-    {
-        success = 0;
-        goto cleanup;
-    }
-
-    /* the fields of index n-2...1, contribute to the array size */
-    array_size = WORD(1);
-    for (i--; i >= 1; i--)
-    {
-        ulong hi;
-        umul_ppmm(hi, array_size, array_size, deg);
-        if (hi != WORD(0) || array_size <= 0
-                          || array_size > MAX_ARRAY_SIZE)
-        {
-            success = 0;
-            goto cleanup;
-        }
-    }
-
-    exp_bits = FLINT_MAX(WORD(8), FLINT_BIT_COUNT(deg) + 1);
-    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
-
-    /* array multiplication assumes result fit into 1 word */
-    if (ctx->minfo->ord != ORD_DEGLEX ||
-            1 != mpoly_words_per_exp(exp_bits, ctx->minfo))
-    {
-        success = 0;
-        goto cleanup;
-    }
-
-    /* handle aliasing and do array multiplication */
-    success = 1;
-    if (poly1 == poly2 || poly1 == poly3)
-    {
-        fmpz_mpoly_t temp;
-        fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
-        fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
-        temp->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_DEGLEX(temp, poly3, poly2, deg, ctx);
-        fmpz_mpoly_swap(temp, poly1, ctx);
-        fmpz_mpoly_clear(temp, ctx);
-    } else
-    {
-        fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
-        fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
-        poly1->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_DEGLEX(poly1, poly3, poly2, deg, ctx);
-    }
-
-cleanup:
-
-    TMP_END;
-
-    return success;
-}
-
-
-
-
-
-
-
-
-/****************************************************
-
-    DEGREVLEX
-
-****************************************************/
-
-
-void mpoly_main_variable_split_DEGREVLEX(slong * ind, ulong * pexp, const ulong * Aexp,
-             slong l1, slong Alen, ulong deg, slong num, slong Abits)
-{
-    slong i, j = 0, s = 0;
-    ulong e, mask = (-UWORD(1)) >> (FLINT_BITS - Abits);
-
-    for (i = 0; i < Alen; i++)
-    {
-        slong top = Aexp[i] >> (Abits*num);
-        while (s < l1 - top)
-            ind[s++] = i;
-        e = 0;
-        for (j = num - 1; j >= 1; j--)
-            e = (e * deg) + ((Aexp[i] >> (j*Abits)) & mask);
-        pexp[i] = e;
-    }
-
-    while (s <= l1)
-        ind[s++] = Alen;
-}
-
 #define DEGREVLEX_UNPACK_MACRO(fxn_name, coeff_decl, nonzero_test, swapper)    \
 slong fxn_name(fmpz_mpoly_t P, slong Plen, coeff_decl,                         \
                                      slong top, slong nvars, slong degb)       \
@@ -1392,7 +1092,7 @@ DEGREVLEX_UNPACK_MACRO(
 
 
 
-void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
+void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
                              const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
                                         ulong degb, const fmpz_mpoly_ctx_t ctx)
 {
@@ -1401,7 +1101,10 @@ void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
     slong Abits, * Asum, * Amax, Bbits, * Bsum, * Bmax;
     slong * Amain, * Bmain;
     ulong * Apexp, * Bpexp;
-    int small;
+    slong (* upack_sm1)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
+    slong (* upack_sm2)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
+    slong (* upack_sm3)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
+    slong (* upack_fmpz)(fmpz_mpoly_t, slong, fmpz *, slong, slong, slong);
     TMP_INIT;
 
     TMP_START;
@@ -1415,6 +1118,17 @@ void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
         array_size *= degb;
     }
 
+    upack_sm1  = &fmpz_mpoly_append_array_sm1_DEGLEX;
+    upack_sm2  = &fmpz_mpoly_append_array_sm2_DEGLEX;
+    upack_sm3  = &fmpz_mpoly_append_array_sm3_DEGLEX;
+    upack_fmpz = &fmpz_mpoly_append_array_fmpz_DEGLEX;
+    if (ctx->minfo->ord == ORD_DEGREVLEX) {
+        upack_sm1  = &fmpz_mpoly_append_array_sm1_DEGREVLEX;
+        upack_sm2  = &fmpz_mpoly_append_array_sm2_DEGREVLEX;
+        upack_sm3  = &fmpz_mpoly_append_array_sm3_DEGREVLEX;
+        upack_fmpz = &fmpz_mpoly_append_array_fmpz_DEGREVLEX;
+    }
+
     /* compute indices and lengths of coefficients of polys in main variable */
     Amain = (slong *) TMP_ALLOC((Al + 1)*sizeof(slong));
     Bmain = (slong *) TMP_ALLOC((Bl + 1)*sizeof(slong));
@@ -1424,8 +1138,8 @@ void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
     Bmax  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
     Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
     Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
-    mpoly_main_variable_split_DEGREVLEX(Amain, Apexp, A->exps, Al, A->length, degb, nvars, A->bits);
-    mpoly_main_variable_split_DEGREVLEX(Bmain, Bpexp, B->exps, Bl, B->length, degb, nvars, B->bits);
+    mpoly_main_variable_split_DEG(Amain, Apexp, A->exps, Al, A->length, degb, nvars, A->bits);
+    mpoly_main_variable_split_DEG(Bmain, Bpexp, B->exps, Bl, B->length, degb, nvars, B->bits);
 
     /* work out bit counts for each chunk */
     Abits = 0;
@@ -1442,14 +1156,11 @@ void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
         Bbits = FLINT_MAX(Bbits, Bmax[j]);
     }
 
-    /* whether the output coefficients are "small" */
-    small = Abits <= (FLINT_BITS - 2) && Bbits <= (FLINT_BITS - 2);
-
     Pl = Al + Bl - 1;
     FLINT_ASSERT(Pl == degb);
     Plen = 0;
 
-    if (small)
+    if (Abits <= (FLINT_BITS - 2) && Bbits <= (FLINT_BITS - 2))
     {
         ulong * coeff_array = (ulong *) TMP_ALLOC(3*array_size*sizeof(ulong));
         for (j = 0; j < 3*array_size; j++)
@@ -1483,8 +1194,8 @@ void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
                             (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                     }
                 }
-                Plen = fmpz_mpoly_append_array_sm1_DEGREVLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb);
+                Plen = upack_sm1(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
+
             } else if (Pbits <= 2*FLINT_BITS)
             {
                 /* fits into two words */
@@ -1498,8 +1209,8 @@ void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
 
                     }
                 }
-                Plen = fmpz_mpoly_append_array_sm2_DEGREVLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb);
+                Plen = upack_sm2(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
+
             } else
             {
                 /* fits into three words */
@@ -1512,8 +1223,7 @@ void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
                             (slong *) B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                     }
                 }
-                Plen = fmpz_mpoly_append_array_sm3_DEGREVLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb);
+                Plen = upack_sm3(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
             }
         }
 
@@ -1536,8 +1246,7 @@ void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
                         B->coeffs + Bmain[j], Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
                 }
             }
-            Plen = fmpz_mpoly_append_array_fmpz_DEGREVLEX(P, Plen, coeff_array,
-                                                     Pl - Pi - 1, nvars, degb);
+            Plen = upack_fmpz(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
         }
     }
 
@@ -1547,7 +1256,7 @@ void _fmpz_mpoly_mul_array_chunked_DEGREVLEX(fmpz_mpoly_t P,
 
 
 
-int fmpz_mpoly_mul_array_DEGREVLEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+int fmpz_mpoly_mul_array_DEG(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, exp_bits, array_size;
@@ -1563,8 +1272,11 @@ int fmpz_mpoly_mul_array_DEGREVLEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     }
 
     /* lets only work with exponents packed into 1 word */
-    if (    1 != mpoly_words_per_exp(poly2->bits, ctx->minfo)
-         || 1 != mpoly_words_per_exp(poly3->bits, ctx->minfo))
+    if ((     ctx->minfo->ord != ORD_DEGREVLEX 
+           && ctx->minfo->ord != ORD_DEGLEX)
+        || 1 != mpoly_words_per_exp(poly2->bits, ctx->minfo)
+        || 1 != mpoly_words_per_exp(poly3->bits, ctx->minfo)
+       )
     {
         return 0;
     }
@@ -1606,8 +1318,7 @@ int fmpz_mpoly_mul_array_DEGREVLEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     /* array multiplication assumes result fit into 1 word */
-    if (ctx->minfo->ord != ORD_DEGREVLEX ||
-            1 != mpoly_words_per_exp(exp_bits, ctx->minfo))
+    if (1 != mpoly_words_per_exp(exp_bits, ctx->minfo))
     {
         success = 0;
         goto cleanup;
@@ -1621,7 +1332,7 @@ int fmpz_mpoly_mul_array_DEGREVLEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
         fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
         fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
         temp->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_DEGREVLEX(temp, poly3, poly2, deg, ctx);
+        _fmpz_mpoly_mul_array_chunked_DEG(temp, poly3, poly2, deg, ctx);
         fmpz_mpoly_swap(temp, poly1, ctx);
         fmpz_mpoly_clear(temp, ctx);
     } else
@@ -1629,7 +1340,7 @@ int fmpz_mpoly_mul_array_DEGREVLEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
         fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
         fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
         poly1->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_DEGREVLEX(poly1, poly3, poly2, deg, ctx);
+        _fmpz_mpoly_mul_array_chunked_DEG(poly1, poly3, poly2, deg, ctx);
     }
 
 cleanup:
@@ -1641,15 +1352,6 @@ cleanup:
 
 
 
-
-
-
-
-
-
-
-
-
 int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
@@ -1658,9 +1360,8 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
         case ORD_LEX:
             return fmpz_mpoly_mul_array_LEX(poly1, poly2, poly3, ctx);
         case ORD_DEGLEX:
-            return fmpz_mpoly_mul_array_DEGLEX(poly1, poly2, poly3, ctx);
         case ORD_DEGREVLEX:
-            return fmpz_mpoly_mul_array_DEGREVLEX(poly1, poly2, poly3, ctx);
+            return fmpz_mpoly_mul_array_DEG(poly1, poly2, poly3, ctx);
         default:
             return 0;
     }
