@@ -528,9 +528,13 @@ slong fxn_name(fmpz_mpoly_t P, slong Plen, coeff_decl,                         \
 }
 
 /*
-    these four functions will replace
+    These four functions will replace
         _fmpz_mpoly_from_ulong_array, ..., _fmpz_mpoly_from_fmpz_array
-    defined above
+    defined above.
+
+    WARNING: In order for the coeff_array to be used interchangeably between
+    the small versions and fmpz version, it is necessary that zero is
+    represented as a real zero in the fmpz type.
 */
 
 LEX_UNPACK_MACRO(

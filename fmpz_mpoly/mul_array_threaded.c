@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <pthread.h>
 
 #include "fmpz_mpoly.h"
 
@@ -499,7 +501,7 @@ void * _fmpz_mpoly_mul_array_threaded_worker_DEG(void * arg_ptr)
     TMP_START;
     coeff_array = (ulong *) TMP_ALLOC(3*base->array_size*sizeof(ulong));
     for (j = 0; j < 3*base->array_size; j++)
-        coeff_array[j] = 0;;
+        coeff_array[j] = 0;
 
     pthread_mutex_lock(&base->mutex);
     Pi = base->idx;

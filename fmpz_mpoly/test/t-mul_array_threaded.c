@@ -1,5 +1,4 @@
 /*
-    Copyright (C) 2017 William Hart
     Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
@@ -12,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
 
