@@ -43,7 +43,7 @@ main(void)
         len2 = n_randint(state, 200);
 
         max_bound = 1 + 100/ctx->minfo->nvars/ctx->minfo->nvars;
-        exp_bound = n_randint(state, max_bound) + 1;
+        exp_bound = UWORD(1) << (FLINT_BITS - 1);
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
 
@@ -99,7 +99,7 @@ main(void)
         len2 = n_randint(state, 200);
 
         max_bound = 1 + 100/ctx->minfo->nvars/ctx->minfo->nvars;
-        exp_bound = n_randint(state, max_bound) + 1;
+        exp_bound = UWORD(1) << (FLINT_BITS - 1);
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
 
@@ -153,7 +153,7 @@ main(void)
         len2 = n_randint(state, 200);
 
         max_bound = 1 + 100/ctx->minfo->nvars/ctx->minfo->nvars;
-        exp_bound = n_randint(state, max_bound) + 1;
+        exp_bound = UWORD(1) << (FLINT_BITS - 1);
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
 
