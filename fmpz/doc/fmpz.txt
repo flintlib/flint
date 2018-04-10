@@ -217,6 +217,19 @@ void fmpz_set_signed_uiuiui(fmpz_t f, ulong hi, ulong mid, ulong lo)
     \code{2*FLINT_BITS} bits, interpreted as a signed two's complement
     integer with \code{3 * FLINT_BITS} bits.
 
+void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len)
+
+    Sets $out$ to the nonnegative integer \code{in[0] + in[1]*X 
+    + ... + in[in_len - 1]*X^(in_len - 1)} where $X = 2^FLINT_BITS$.
+    It is assumed that \code{in_len > 0}.
+
+void fmpz_get_ui_array(ulong * out, slong out_len, const fmpz_t in)
+
+    Assuming that the nonegative integer $in$ can be represented in the form,
+    \code{out[0] + out[1]*X + ... + out[out_len - 1]*X^(out_len - 1)}
+    where $X = 2^FLINT_BITS$, sets the corresponding elements of \code{out}
+    so that this is true. It is assumed that \code{out_len > 0}.
+
 void fmpz_set_mpz(fmpz_t f, const mpz_t x)
 
     Sets $f$ to the given \code{mpz_t} value.
