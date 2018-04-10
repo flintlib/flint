@@ -9,12 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
-
-
-
-
-
+#include "fmpz_vec.h"
 
 /*
     set sumabs = bit_count(sum of absolute values of coefficients);
@@ -62,28 +57,4 @@ void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs,
         sumabs[0] = fmpz_sizeinbase(sum, 2);
         fmpz_clear(sum);
    }
-}
-
-
-/* vec1 = pointwise max of vec1 and vec2 */
-void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len)
-{
-    slong i;
-    for (i = WORD(0); i < len; i++)
-    {
-        if (fmpz_cmp(vec1 + i, vec2 + i) < 0)
-            fmpz_set(vec1 + i, vec2 + i);
-    }
-}
-
-
-/* vec1 = pointwise max of vec2 and vec3 */
-void _fmpz_vec_max(fmpz * vec1, const fmpz * vec2, const fmpz * vec3, slong len)
-{
-    slong i;
-    for (i = WORD(0); i < len; i++)
-    {
-        int cmp = fmpz_cmp(vec2 + i, vec3 + i);
-        fmpz_set(vec1 + i, (cmp > 0 ? vec2 : vec3) + i);
-    }
 }
