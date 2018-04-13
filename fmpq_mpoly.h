@@ -242,11 +242,21 @@ FLINT_DLL void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t poly,
 FLINT_DLL void fmpq_mpoly_degree_fmpz(fmpz_t degs, const fmpq_mpoly_t poly, slong var,
                                                    const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_gen(fmpq_mpoly_t poly, slong i,
-                                                   const fmpq_mpoly_ctx_t ctx);
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_gen(fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_one(poly->content);
+    fmpz_mpoly_gen(poly->zpoly, i, ctx->zctx);
+}
 
-FLINT_DLL int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly,
-                                          slong k, const fmpq_mpoly_ctx_t ctx);
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly,
+                                          slong k, const fmpq_mpoly_ctx_t ctx)
+{
+    return fmpq_is_one(poly->content)
+          && fmpz_mpoly_is_gen(poly->zpoly, k, ctx->zctx);
+}
 
 
 
@@ -450,14 +460,15 @@ void fmpq_mpoly_compose(fmpq_mpoly_t res, fmpq_mpoly_t poly1,
 
 FLINT_DLL int fmpq_mpoly_gcd(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
                          const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx);
-
+/*
+not implemented yet
 FLINT_DLL void fmpq_mpoly_resultant(fmpq_mpoly_t poly1,
                 const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
                                         slong var, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_discriminant(fmpq_mpoly_t poly1,
               const fmpq_mpoly_t poly2, slong var, const fmpq_mpoly_ctx_t ctx);
-
+*/
 
 /* Input/output **************************************************************/
 

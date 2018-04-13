@@ -552,9 +552,11 @@ FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
         slong len2, ulong k, mp_bitcnt_t bits, slong N, const ulong * cmpmask);
 
 FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                                          ulong k, const fmpz_mpoly_ctx_t ctx);
+                                          slong k, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                  const fmpz_t pow, const fmpz_mpoly_ctx_t ctx);
+
 /* Calculus ******************************************************************/
 
 FLINT_DLL void fmpz_mpoly_derivative(fmpz_mpoly_t poly1,

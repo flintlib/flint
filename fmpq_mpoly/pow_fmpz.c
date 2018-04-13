@@ -16,7 +16,6 @@ void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t qpoly1, const fmpq_mpoly_t qpoly2,
                                  const  fmpz_t pow, const fmpq_mpoly_ctx_t qctx)
 {
     slong i;
-    fmpq_t c;
     fmpz * max_fields2;
     mp_bitcnt_t exp_bits;
     fmpz_mpoly_struct * poly1 = qpoly1->zpoly;
@@ -29,22 +28,8 @@ void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t qpoly1, const fmpq_mpoly_t qpoly2,
 
     if (fmpz_fits_si(pow))
     {
-        if (fmpz_is_one(fmpq_denref(qpoly2->content))
-              && fmpz_is_pm1(fmpq_numref(qpoly2->content)))
-        {
-            if (fmpz_is_one(fmpq_numref(qpoly2->content))
-                || fmpz_is_even(pow))
-            {
-                fmpq_set_si(qpoly1->content, +WORD(1), UWORD(1));
-            } else {
-                fmpq_set_si(qpoly1->content, -WORD(1), UWORD(1));
-            }
-
-        } else {
-            fmpq_pow_si(qpoly1->content, qpoly2->content, fmpz_get_si(pow));
-        }
-
-        fmpz_mpoly_pow_fps(poly1, poly2, fmpz_get_ui(pow), ctx);
+        fmpq_pow_si(qpoly1->content, qpoly2->content, fmpz_get_si(pow));
+        fmpz_mpoly_pow_fps(poly1, poly2, fmpz_get_si(pow), ctx);
         return;
     }
 
@@ -60,14 +45,10 @@ void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t qpoly1, const fmpq_mpoly_t qpoly2,
     }
 
     if (poly2->length != WORD(1))
-        flint_throw(FLINT_ERROR, "Multinomial in fmpz_mpoly_pow_fmpz");
+        flint_throw(FLINT_ERROR, "Multinomial in fmpq_mpoly_pow_fmpz");
 
-
-    fmpq_init(c);
-    fmpq_abs(c, qpoly2->content);
-    if (!fmpq_is_one(c))
-        flint_throw(FLINT_ERROR, "Non-unit coefficient in fmpz_mpoly_pow_fmpz");
-    fmpq_clear(c);
+    if (!fmpq_is_pm1(qpoly2->content))
+        flint_throw(FLINT_ERROR, "Non-unit coefficient in fmpq_mpoly_pow_fmpz");
 
     TMP_START;
 
@@ -88,10 +69,9 @@ void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t qpoly1, const fmpq_mpoly_t qpoly2,
     poly1->bits = exp_bits;
 
     fmpz_set_si(poly1->coeffs + 0, UWORD(1));
-    if (fmpq_is_one(qpoly2->content) || fmpz_is_even(pow))
-        fmpq_set_si(qpoly1->content, +WORD(1), UWORD(1));
-    else
-        fmpq_set_si(qpoly1->content, -WORD(1), UWORD(1));
+    fmpq_set_si(qpoly1->content,
+      (fmpq_is_one(qpoly2->content) || fmpz_is_even(pow)) ? +WORD(1) : -WORD(1),
+                                                                     UWORD(1));
 
     mpoly_pack_vec_fmpz(poly1->exps + 0, max_fields2, exp_bits, ctx->minfo->nfields, 1);
 

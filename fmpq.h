@@ -93,6 +93,11 @@ FMPQ_INLINE int fmpq_is_one(const fmpq_t x)
     return fmpz_is_one(fmpq_numref(x)) && fmpz_is_one(fmpq_denref(x));
 }
 
+FMPQ_INLINE int fmpq_is_pm1(const fmpq_t x)
+{
+    return fmpz_is_pm1(fmpq_numref(x)) && fmpz_is_one(fmpq_denref(x));
+}
+
 FMPQ_INLINE void fmpq_set(fmpq_t dest, const fmpq_t src)
 {
     fmpz_set(fmpq_numref(dest), fmpq_numref(src));
