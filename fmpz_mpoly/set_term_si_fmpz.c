@@ -13,7 +13,7 @@
 
 
 void fmpz_mpoly_set_term_si_fmpz(fmpz_mpoly_t poly,
-                 const slong c, const fmpz ** exp, const fmpz_mpoly_ctx_t ctx)
+                 const slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_t newc;
 

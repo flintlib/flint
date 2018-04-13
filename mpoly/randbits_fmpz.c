@@ -28,7 +28,7 @@ void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state,
             fmpz_randtest_unsigned(exp + j, state, newbits);
         }
 
-        if (mpoly_exp_bits_required_fmpz(exp, mctx) <= exp_bits)
+        if (mpoly_exp_bits_required_ffmpz(exp, mctx) <= exp_bits)
             return;
 
         newbits--;

@@ -13,7 +13,7 @@
 
 
 void fmpz_mpoly_set_term_ui_fmpz(fmpz_mpoly_t poly,
-                 const ulong c, const fmpz ** exp, const fmpz_mpoly_ctx_t ctx)
+                const ulong c, fmpz * const *  exp, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_t newc;
 

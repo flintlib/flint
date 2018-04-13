@@ -162,59 +162,6 @@ int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly,
     $i < 0$ the function returns 1 if the polynomial is equal to any generator
     of the polynomial ring, otherwise it returns 0.
 
-void fmpq_mpoly_get_coeff_fmpq(fmpq_t x,
-                  const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
-
-    Set $x$ to coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with most significance.
-
-void fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly, 
-                           slong i, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
-
-    Set the coefficient of the given polynomial with index $i$ to the given
-    value $x$, starting with $i = 0$ for the term with most signifance. Any
-    existing term at that index is overwritten.
-
-void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly, 
-                                           slong i, const fmpq_mpoly_ctx_t ctx)
-
-    Get the exponent vector of the given polynomial with index $i$. The output
-    is written in the array \code{exps} which is assumed to have space for $n$
-    entries, where $n$ is the number of variable of the polynomial.
-    The entry with index 0 in the array corresponds to the
-    variable with the most significance with respect to the polynomial
-    ordering.
-
-void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, 
-                                           slong i, const fmpq_mpoly_ctx_t ctx)
-
-    Get the exponent vector of the given polynomial with index $i$. The output
-    is written in the array \code{exps} which is assumed to have space for $n$
-    entries, where $n$ is the number of variable of the polynomial.
-    The entry with index 0 in the array corresponds to the
-    variable with the most significance with respect to the polynomial
-    ordering.
-
-void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly, 
-                       slong i, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
-
-    Set the exponent vector of the given polynomial with index $i$. The
-    exponent is specified by the values in the array \code{exps} which is
-    assumed to have $n$ entries, where $n$ is the number of variable of the
-    polynomial. The entry with index 0 in the array corresponds
-    to the variable with the most significance with respect to the
-    polynomial ordering.
-
-void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
-                       slong i, const fmpz ** exps, const fmpq_mpoly_ctx_t ctx)
-
-    Set the exponent vector of the given polynomial with index $i$. The
-    exponent is specified by the values in the array \code{exps} which is
-    assumed to have $n$ entries, where $n$ is the number of variable of the
-    polynomial. The entry with index 0 in the array corresponds
-    to the variable with the most significance with respect to the
-    polynomial ordering.
-
 void fmpq_mpoly_set_term_fmpq_ui(fmpq_mpoly_t poly,
                        const fmpq_t c, ulong const * exp, fmpq_mpoly_ctx_t ctx)
 
@@ -254,6 +201,77 @@ void fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
     many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If no term with that
     monomial exists in the polynomial, zero is returned.
+
+*******************************************************************************
+
+    Container operations
+
+*******************************************************************************
+
+    These functions deal with violations of the internal canonical
+    representation. The length of an exponent vector is the number of variables
+    in the polynomial, and the element at index $0$ corresponds to the most
+    significant variable.
+
+void fmpq_mpoly_get_coeff_fmpq(fmpq_t x,
+                  const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Set $x$ to coefficient of the given polynomial with index $i$, starting
+    with $i = 0$ for the term with most significance.
+
+void fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly, 
+                           slong i, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
+
+    Set the coefficient of the given polynomial with index $i$ to the given
+    value $x$, starting with $i = 0$ for the term with most signifance. Any
+    existing term at that index is overwritten.
+
+void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly, 
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Get the exponent vector of the given polynomial with index $i$.
+
+void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, 
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Get the exponent vector of the given polynomial with index $i$.
+
+void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly, 
+                       slong i, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
+
+    Set the exponent vector of the given polynomial with index $i$.
+
+void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
+                       slong i, const fmpz ** exps, const fmpq_mpoly_ctx_t ctx)
+
+    Set the exponent vector of the given polynomial with index $i$.
+
+void fmpq_mpoly_pushback_term_fmpz_fmpz(fmpz_mpoly_t poly,
+                     const fmpz_t c, fmpz * const * exp, fmpz_mpoly_ctx_t ctx)
+
+    Appends a terms to \code{poly} with the given coefficient and exponents.
+    Assuming the terms pushed back have bounded denominators, this function
+    runs in constant average time, and a term is appened even if $c=0$.
+
+void fmpq_mpoly_pushback_term_fmpz_ui(fmpz_mpoly_t poly,
+                             const fmpz_t c, ulong * exp, fmpz_mpoly_ctx_t ctx)
+
+    Appends a terms to \code{poly} with the given coefficient and exponents.
+    Assuming the terms pushed back have bounded denominators, this function
+    runs in constant average time, and a term is appened even if $c=0$.
+
+
+void fmpq_mpoly_sort(fmpq_mpoly_t poly, fmpq_mpoly_ctx_t ctx)
+
+    Assuming that the terms of \code{poly} are otherwise valid, sort the
+    terms into the canonical ordering dictated by the ordering in \code{ctx}.
+    This function does not combine like terms, nor does it delete terms with
+    coefficient zero.
+
+void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly, fmpz_mpoly_ctx_t ctx)
+
+    Combines adjacent like terms in \code{poly}. If the terms of \code{poly}
+    were sorted to begin with, the result will be in canonical form.
 
 *******************************************************************************
 

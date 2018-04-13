@@ -21,7 +21,7 @@ void _fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t qpoly,
     const fmpz_mpoly_ctx_struct * ctx = qctx->zctx;
     TMP_INIT;
 
-    exp_bits = mpoly_exp_bits_required_fmpz(exp, ctx->minfo);
+    exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
 
     if (exp_bits > poly->bits) /* exponent too large to be poly exponent */
     {
@@ -37,7 +37,7 @@ void _fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t qpoly,
     mpoly_get_cmpmask(cmpmask, N, poly->bits, ctx->minfo);
 
     packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_set_monomial_fmpz(packed_exp, exp, poly->bits, ctx->minfo);
+    mpoly_set_monomial_ffmpz(packed_exp, exp, poly->bits, ctx->minfo);
 
     exists = mpoly_monomial_exists(&index, poly->exps,
                                   packed_exp, poly->length, N, cmpmask);
@@ -54,7 +54,7 @@ void _fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t qpoly,
 }
 
 void fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
-                                 const fmpz ** exp, const fmpq_mpoly_ctx_t ctx)
+                                fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 {
     slong i, nvars = ctx->zctx->minfo->nvars;
     fmpz * newexp;

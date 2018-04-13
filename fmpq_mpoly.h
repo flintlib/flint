@@ -210,15 +210,33 @@ FLINT_DLL void fmpq_mpoly_get_coeff_fmpq(fmpq_t c, const fmpq_mpoly_t poly,
 FLINT_DLL void fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly,
                           slong n, const fmpq_t x, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly, 
-                                          slong n, const fmpq_mpoly_ctx_t ctx);
-FLINT_DLL void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, 
-                                          slong n, const fmpq_mpoly_ctx_t ctx);
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly, 
+                                          slong n, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_get_monomial_ui(exps, poly->zpoly, n, ctx->zctx);
+}
 
-FLINT_DLL void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly, 
-                      slong n, const ulong * exps, const fmpq_mpoly_ctx_t ctx);
-FLINT_DLL void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
-                      slong n,       fmpz ** exps, const fmpq_mpoly_ctx_t ctx);
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, 
+                                          slong n, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_get_monomial_fmpz(exps, poly->zpoly, n, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly, 
+                      slong n, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_set_monomial_ui(poly->zpoly, n, exps, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
+                      slong n, fmpz * const * exps, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_set_monomial_fmpz(poly->zpoly, n, exps, ctx->zctx);
+}
 
 
 FLINT_DLL void fmpq_mpoly_canonicalise(fmpq_mpoly_t poly,
@@ -297,13 +315,18 @@ int fmpq_mpoly_is_one(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
           && fmpz_mpoly_is_one(poly->zpoly, ctx->zctx);
 }
 
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_is_monomial(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+{
+   return fmpz_mpoly_is_monomial(poly->zpoly, ctx->zctx);
+}
 
 
 FLINT_DLL void _fmpq_mpoly_set_term_fmpq_fmpz(fmpq_mpoly_t poly,
                  const fmpq_t c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_set_term_fmpq_fmpz(fmpq_mpoly_t poly,
-                const fmpq_t c, const fmpz ** exp, const fmpq_mpoly_ctx_t ctx);
+                const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_set_term_fmpq_ui(fmpq_mpoly_t poly,
                 const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
@@ -312,10 +335,28 @@ FLINT_DLL void _fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
                                  const fmpz * exp, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_get_term_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
-                                const fmpz ** exp, const fmpq_mpoly_ctx_t ctx);
+                               fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_get_term_fmpq_ui(fmpq_t c, const fmpq_mpoly_t poly,
                                 const ulong * exp, const fmpq_mpoly_ctx_t ctx);
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_sort(fmpq_mpoly_t poly1, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_sort(poly1->zpoly, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly1, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_combine_like_terms(poly1->zpoly, ctx->zctx);
+    fmpq_mpoly_canonicalise(poly1, ctx);
+}
+
+FLINT_DLL void fmpq_mpoly_pushback_term_fmpq_ui(fmpq_mpoly_t poly,
+                const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_pushback_term_fmpq_fmpz(fmpq_mpoly_t poly,
+               const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
 
 /* Set and negate ************************************************************/

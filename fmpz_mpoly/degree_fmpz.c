@@ -24,7 +24,7 @@ void fmpz_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t poly, slong var,
     for (i = 0; i < ctx->minfo->nvars; i++)
         fmpz_init(new_degs + i);
 
-    mpoly_degrees_fmpz(new_degs, poly->exps, poly->length, poly->bits, ctx->minfo);
+    mpoly_degrees_ffmpz(new_degs, poly->exps, poly->length, poly->bits, ctx->minfo);
 
     for (i = 0; i < ctx->minfo->nvars; i++)
     {

@@ -24,7 +24,7 @@ void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
 
     TMP_START;
 
-    exp_bits = mpoly_exp_bits_required_fmpz(exp, ctx->minfo);
+    exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
     fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
 
@@ -34,7 +34,7 @@ void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
 
     packed_exp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
-    mpoly_set_monomial_fmpz(packed_exp, exp, poly->bits, ctx->minfo);
+    mpoly_set_monomial_ffmpz(packed_exp, exp, poly->bits, ctx->minfo);
     exists = mpoly_monomial_exists(&index, poly->exps,
                                   packed_exp, poly->length, N, cmpmask);
 
@@ -76,7 +76,7 @@ void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
 
 
 void fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
-                 const fmpz_t c, const fmpz ** exp, const fmpz_mpoly_ctx_t ctx)
+                const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, nvars = ctx->minfo->nvars;
     fmpz * newexp;

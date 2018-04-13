@@ -13,7 +13,7 @@
 
 
 slong fmpz_mpoly_get_term_si_fmpz(const fmpz_mpoly_t poly,
-                                 const fmpz ** exp, const fmpz_mpoly_ctx_t ctx)
+                                fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_t newc;
     slong ret;
