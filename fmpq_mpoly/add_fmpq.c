@@ -11,9 +11,7 @@
 
 #include "fmpq_mpoly.h"
 
-void
-
-fmpq_mpoly_add_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+void fmpq_mpoly_add_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
                                     const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_t t;

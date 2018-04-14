@@ -339,7 +339,7 @@ int fmpz_mpoly_is_zero(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 FMPZ_MPOLY_INLINE
 int fmpz_mpoly_is_monomial(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
-   return poly->length <= WORD(1);
+   return poly->length == WORD(1);
 }
 
 
