@@ -127,7 +127,7 @@ void fmpq_mpoly_set_term_fmpq_ui(fmpq_mpoly_t poly,
     Set the coefficient of the monomial with exponent \code{exp} to \code{c}.
 
 void fmpq_mpoly_set_term_fmpq_fmpz(fmpq_mpoly_t poly,
-                       const fmpq_t c, const fmpz ** exp, fmpq_mpoly_ctx_t ctx)
+                      const fmpq_t c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
 
     Set the coefficient of the monomial with exponent \code{exp} to \code{c}.
 
@@ -206,7 +206,7 @@ void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly,
     Set the exponent vector of the given polynomial with index $i$.
 
 void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
-                       slong i, const fmpz ** exps, const fmpq_mpoly_ctx_t ctx)
+                      slong i, fmpz * const * exps, const fmpq_mpoly_ctx_t ctx)
 
     Set the exponent vector of the given polynomial with index $i$.
 
