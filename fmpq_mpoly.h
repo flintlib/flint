@@ -214,28 +214,46 @@ FLINT_DLL void fmpq_mpoly_get_coeff_monomial(fmpq_t c, const fmpq_mpoly_t poly1,
                          const fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly, 
+int fmpq_mpoly_monomial_fits_si(const fmpq_mpoly_t poly,
+                                           slong n, const fmpq_mpoly_ctx_t ctx)
+{
+    return poly->zpoly->bits <= FLINT_BITS ? 1
+                               : mpoly_monomial_fits_si(poly->zpoly->exps,
+                                       poly->zpoly->bits, n, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_monomial_fits_ui(const fmpq_mpoly_t poly,
+                                           slong n, const fmpq_mpoly_ctx_t ctx)
+{
+    return poly->zpoly->bits <= FLINT_BITS ? 1
+                               : mpoly_monomial_fits_ui(poly->zpoly->exps,
+                                       poly->zpoly->bits, n, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly,
                                           slong n, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_get_monomial_ui(exps, poly->zpoly, n, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, 
+void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly,
                                           slong n, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_get_monomial_fmpz(exps, poly->zpoly, n, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly, 
+void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly,
                       slong n, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_set_monomial_ui(poly->zpoly, n, exps, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
+void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly,
                       slong n, fmpz * const * exps, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_set_monomial_fmpz(poly->zpoly, n, exps, ctx->zctx);
@@ -250,6 +268,17 @@ FLINT_DLL void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly,
 
 FLINT_DLL void fmpq_mpoly_set_fmpz(fmpq_mpoly_t poly,
                                    const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t poly,
+                                           slong n, const fmpq_mpoly_ctx_t ctx)
+{
+    return poly->zpoly->bits <= FLINT_BITS ? 1
+                               : mpoly_degrees_fit_si(poly->zpoly->exps,
+                                       poly->zpoly->length, poly->zpoly->bits,
+                                                             ctx->zctx->minfo);
+}
+
 
 FLINT_DLL void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);

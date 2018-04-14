@@ -85,6 +85,12 @@ void fmpq_mpoly_fit_bits(fmpq_mpoly_t poly,
 
 *******************************************************************************
 
+int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t poly,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if the degrees of poly with respect to each variable fit into
+    an \code{slong}, otherwise return 0.
+
 void fmpq_mpoly_degrees_si(slong * degs,
                            const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 
@@ -167,12 +173,24 @@ void fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly,
     value $x$, starting with $i = 0$ for the term with most signifance. Any
     existing term at that index is overwritten.
 
-void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly, 
+void fmpq_mpoly_monomial_fits_si(const fmpq_mpoly_t poly,
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if all entries of the exponent vector of the term of index $i$
+    fit into an \code{slong}.
+
+void fmpq_mpoly_monomial_fits_ui(const fmpq_mpoly_t poly,
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if all entries of the exponent vector of the term of index $i$
+    fit into a \code{ulong}.
+
+void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
 
     Get the exponent vector of the given polynomial with index $i$.
 
-void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, 
+void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
 
     Get the exponent vector of the given polynomial with index $i$.

@@ -603,6 +603,8 @@ FLINT_DLL void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
 FLINT_DLL void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
+FLINT_DLL int mpoly_degrees_fit_si(const ulong * poly_exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
@@ -617,6 +619,11 @@ FLINT_DLL void mpoly_search_monomials(
                 const ulong * a, slong a_len, const ulong * b, slong b_len,
                                                slong N, const ulong * cmpmask);
 
+FLINT_DLL int mpoly_monomial_fits_si(ulong * exps, slong bits,
+                                              slong n, const mpoly_ctx_t mctx);
+
+FLINT_DLL int mpoly_monomial_fits_ui(ulong * exps, slong bits,
+                                              slong n, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_monomials_valid_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
