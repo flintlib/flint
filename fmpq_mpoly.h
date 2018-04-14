@@ -214,6 +214,12 @@ FLINT_DLL void fmpq_mpoly_get_coeff_monomial(fmpq_t c, const fmpq_mpoly_t poly1,
                          const fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
+slong fmpq_mpoly_length(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+{
+    return poly->zpoly->length;
+}
+
+FMPQ_MPOLY_INLINE
 int fmpq_mpoly_monomial_fits_si(const fmpq_mpoly_t poly,
                                            slong n, const fmpq_mpoly_ctx_t ctx)
 {
