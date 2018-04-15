@@ -54,6 +54,8 @@ void fmpq_mpoly_get_coeff_monomial(fmpq_t c, const fmpq_mpoly_t poly1,
         if (exp_bits > poly1->zpoly->bits) /* exponent too large to be poly1 exponent */
         {
             fmpq_zero(c);
+            for (i = 0; i < nvars; i++)
+                fmpz_clear(exps + i);
             goto clean_up;
         }
 

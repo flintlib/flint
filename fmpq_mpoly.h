@@ -277,7 +277,7 @@ FLINT_DLL void fmpq_mpoly_set_fmpz(fmpq_mpoly_t poly,
 
 FMPQ_MPOLY_INLINE
 int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t poly,
-                                           slong n, const fmpq_mpoly_ctx_t ctx)
+                                                    const fmpq_mpoly_ctx_t ctx)
 {
     return poly->zpoly->bits <= FLINT_BITS ? 1
                                : mpoly_degrees_fit_si(poly->zpoly->exps,

@@ -290,17 +290,17 @@ int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t poly,
     Return 1 if \code{poly} is equal to the constant $c$, else return 0.
 
 int fmpq_mpoly_equal_fmpz(const fmpq_mpoly_t poly,
-                                          fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+                                          fmpz_t c, const fmpq_mpoly_ctx_t ctx)
 
     Return 1 if \code{poly} is equal to the constant $c$, else return 0.
 
 int fmpq_mpoly_equal_ui(const fmpq_mpoly_t poly,
-                                          fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+                                          ulong  c, const fmpq_mpoly_ctx_t ctx)
 
     Return 1 if \code{poly} is equal to the constant $c$, else return 0.
 
 int fmpq_mpoly_equal_si(const fmpq_mpoly_t poly,
-                                          fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+                                          slong  c, const fmpq_mpoly_ctx_t ctx)
 
     Return 1 if \code{poly} is equal to the constant $c$, else return 0.
 
