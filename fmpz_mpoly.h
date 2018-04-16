@@ -88,8 +88,6 @@ typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
 
 
 
-
-
 /*
     A dense mpoly is stored as a flat array of coeffcients.
     Suppose deg_bounds = {a, b, c}. The coefficient of the monomial with 
@@ -419,31 +417,39 @@ FLINT_DLL void fmpz_mpoly_pushterm_ui_ui(fmpz_mpoly_t poly,
 FLINT_DLL void fmpz_mpoly_pushterm_si_ui(fmpz_mpoly_t poly,
                        slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
+/* getters and setters for nth term ******************************************/
 
-
-FLINT_DLL void fmpz_mpoly_get_coeff_fmpz(fmpz_t x, const fmpz_mpoly_t poly,
-                                          slong n, const fmpz_mpoly_ctx_t ctx);
-FLINT_DLL ulong fmpz_mpoly_get_coeff_ui(           const fmpz_mpoly_t poly, 
-                                          slong n, const fmpz_mpoly_ctx_t ctx);
-FLINT_DLL slong fmpz_mpoly_get_coeff_si(           const fmpz_mpoly_t poly, 
+FLINT_DLL void fmpz_mpoly_get_termcoeff_fmpz(fmpz_t x, const fmpz_mpoly_t poly,
                                           slong n, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly, 
+FLINT_DLL ulong fmpz_mpoly_get_termcoeff_ui(           const fmpz_mpoly_t poly, 
+                                          slong n, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong fmpz_mpoly_get_termcoeff_si(           const fmpz_mpoly_t poly, 
+                                          slong n, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_termcoeff_fmpz(fmpz_mpoly_t poly, 
                           slong n, const fmpz_t x, const fmpz_mpoly_ctx_t ctx);
-FLINT_DLL void fmpz_mpoly_set_coeff_ui(fmpz_mpoly_t poly,
+
+FLINT_DLL void fmpz_mpoly_set_termcoeff_ui(fmpz_mpoly_t poly,
                                  slong n, ulong x, const fmpz_mpoly_ctx_t ctx);
-FLINT_DLL void fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
+
+FLINT_DLL void fmpz_mpoly_set_termcoeff_si(fmpz_mpoly_t poly,
                                  slong n, slong x, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_get_monomial_ui(ulong * exps, const fmpz_mpoly_t poly, 
-                                          slong n, const fmpz_mpoly_ctx_t ctx);
-FLINT_DLL void fmpz_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpz_mpoly_t poly, 
+FLINT_DLL void fmpz_mpoly_get_termexp_ui(ulong * exps, const fmpz_mpoly_t poly, 
                                           slong n, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_set_monomial_ui(fmpz_mpoly_t poly, 
-                      slong n, const ulong * exps, const fmpz_mpoly_ctx_t ctx);
-FLINT_DLL void fmpz_mpoly_set_monomial_fmpz(fmpz_mpoly_t poly, 
-                     slong n, fmpz * const * exps, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_get_termexp_fmpz(fmpz ** exps, const fmpz_mpoly_t poly, 
+                                          slong n, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t poly, 
+                       slong n, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_termexp_fmpz(fmpz_mpoly_t poly, 
+                      slong n, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+
+/* sorting *******************************************************************/
 
 FLINT_DLL void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
                               mp_bitcnt_t pos, ulong cmpmask, ulong totalmask);

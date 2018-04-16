@@ -371,137 +371,105 @@ slong fmpz_mpoly_get_term_si_fmpz(const fmpz_mpoly_t poly,
     in the polynomial, and the element at index $0$ corresponds to the most
     significant variable. The \code{pushterm} functions runs in constant
     average time, and a term is appened even if the specified coefficient
-    is zero.
+    is zero. If term index is negative or not strictly less than the length
+    of the polynomial, the function will throw.
 
-void fmpz_mpoly_get_coeff_fmpz(fmpz_t x,
+void fmpz_mpoly_get_termcoeff_fmpz(fmpz_t x,
                   const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 
-    Set $x$ to coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with most significance.
+    Set $x$ to coefficient of the term of index $i$.
 
-ulong fmpz_mpoly_get_coeff_ui(const fmpz_mpoly_t poly, 
+ulong fmpz_mpoly_get_termcoeff_ui(const fmpz_mpoly_t poly, 
                                            slong i, const fmpz_mpoly_ctx_t ctx)
 
-    Return the coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with most significance. The coefficient is
-    assumed to be unsigned and to fit in a \code{ulong}.
+    Return the coefficient of the term of index $i$.
 
-slong fmpz_mpoly_get_coeff_si(const fmpz_mpoly_t poly, 
+slong fmpz_mpoly_get_termcoeff_si(const fmpz_mpoly_t poly, 
                                            slong i, const fmpz_mpoly_ctx_t ctx)
 
-    Return the coefficient of the given polynomial with index $i$, starting
-    with $i = 0$ for the term with most significance. The coefficient may be
-    signed and is assumed to fit in an \code{slong}.
+    Return the coefficient of the term of index $i$.
 
-void fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly, 
+void fmpz_mpoly_set_termcoeff_fmpz(fmpz_mpoly_t poly, 
                            slong i, const fmpz_t x, const fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the given polynomial with index $i$ to the given
-    value $x$, starting with $i = 0$ for the term with most signifance. Any
-    existing term at that index is overwritten.
+    Set the coefficient of the term of index $i$ to $x$.
 
-void fmpz_mpoly_set_coeff_ui(fmpz_mpoly_t poly,
+void fmpz_mpoly_set_termcoeff_ui(fmpz_mpoly_t poly,
                                   slong i, ulong x, const fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the given polynomial with index $i$ to the given
-    unsigned integer $x$, starting with $i = 0$ for the term with most
-    signifance. Any existing term at that index is overwritten.
+    Set the coefficient of the term of index $i$ to $x$.
 
-void fmpz_mpoly_set_coeff_si(fmpz_mpoly_t poly,
+void fmpz_mpoly_set_termcoeff_si(fmpz_mpoly_t poly,
                                   slong i, slong x, const fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the given polynomial with index $i$ to the given
-    signed integer $x$, starting with $i = 0$ for the term with most
-    signifance. Any existing term at that index is overwritten.
+    Set the coefficient of the term of index $i$ to $x$.
 
-void fmpz_mpoly_get_monomial(ulong * exps, const fmpz_mpoly_t poly, 
+void fmpz_mpoly_get_termexp_fmpz(fmpz ** exp, const fmpz_mpoly_t poly, 
                                            slong i, const fmpz_mpoly_ctx_t ctx)
 
-    Get the exponent vector of the given polynomial with index $i$. The output
-    is written in the array \code{exps}.
+    Set \code{exp} to the exponent vector of the term of index $i$.
 
-void fmpz_mpoly_set_monomial(fmpz_mpoly_t poly, 
-                       slong i, const ulong * exps, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_get_termexp_ui(ulong * exp, const fmpz_mpoly_t poly, 
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
 
-    Set the exponent vector of the given polynomial with index $i$.
+    Set \code{exp} to the exponent vector of the term of index $i$.
 
-fmpz * fmpz_mpoly_get_coeff_ptr(fmpz_mpoly_t poly,
-                                                 slong i, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t poly, 
+                       slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Return a pointer into the array of coefficients of \code{poly} at index
-    $i$. The function is implemented as a macro and returns \code{NULL} if the
-    index is beyond the current number of terms of the polynomial. It is
-    assumed that $i \geq 0$.
+    Set the exponent vector of the term index $i$ to \code{exp}.
 
-ulong * fmpz_mpoly_get_monomial_ptr(fmpz_mpoly_t poly,
-                                                 slong i, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t poly, 
+                        slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Return a pointer into the exponent array of \code{poly} at index $i$. The
-    function is implemented as a macro and returns \code{NULL} if the index is 
-    beyond the current number of terms of the polynomial. It is assumed that
-    $i \geq 0$.
-
-void _fmpz_mpoly_reverse(fmpz * poly1, ulong * exp1,
-                    const fmpz * poly2, const ulong * exp2, slong len, slong N)
-
-    Set the \code{(poly1, exps1, len)} to the reverse of
-    \code{(poly2, exps2, len)}$ assuming the exponent vectors each take $N$
-    words. The polynomial \code{(poly1, exps1, len)} is assumed to have enough
-    space allocated for \code{len} terms. This is mainly for internal use,
-    the ordering of the terms in a polynomial is assumed to be correct in all
-    other functions.
-
-void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
-                                fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Reverse the terms in \code{poly2} and set \code{poly1} to the result. This
-    function is mainly for internal use, since applying it to a polynomial with
-    terms in correct order will result in terms with incorrect order. The
-    function serves merely as a version of \code{_fmpz_mpoly_reverse} which
-    takes care of memory management.
-
+    Set the exponent vector of the term index $i$ to \code{exp}.
 
 void fmpz_mpoly_pushterm_fmpz_fmpz(fmpz_mpoly_t poly,
-                      const fmpz_t c, fmpz * const * exp, fmpz_mpoly_ctx_t ctx)
+                const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
     Appends a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_ui_fmpz(fmpz_mpoly_t poly,
-                             ulong c, fmpz * const * exp, fmpz_mpoly_ctx_t ctx)
+                       ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
     Appends a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_si_fmpz(fmpz_mpoly_t poly,
-                             slong c, fmpz * const * exp, fmpz_mpoly_ctx_t ctx)
+                       slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
     Appends a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_fmpz_ui(fmpz_mpoly_t poly,
-                       const fmpz_t c, const ulong * exp, fmpz_mpoly_ctx_t ctx)
+                 const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
     Appends a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_ui_ui(fmpz_mpoly_t poly,
-                              ulong c, const ulong * exp, fmpz_mpoly_ctx_t ctx)
+                        ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
     Appends a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_si_ui(fmpz_mpoly_t poly,
-                              slong c, const ulong * exp, fmpz_mpoly_ctx_t ctx)
+                        slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
     Appends a term to \code{poly} with the given coefficient and exponents.
 
-
-void fmpz_mpoly_sort(fmpz_mpoly_t poly, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_sort(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
     Sort the terms of \code{poly} into the canonical ordering dictated by
     the ordering in \code{ctx}. This function does not combine like terms,
     nor does it delete terms with coefficient zero.
 
-void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t poly, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t poly,
+                                                   const fmpz_mpoly_ctx_t ctx)
 
     Combine adjacent like terms in \code{poly}. If the terms of \code{poly}
     were sorted to begin with, the result will be in canonical form.
+
+void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
+                                fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Reverse the terms in \code{poly2} and set \code{poly1} to the result.
 
 *******************************************************************************
 

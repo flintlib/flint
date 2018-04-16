@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2008, 2009, 2016 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2016 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -10,14 +10,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-ulong
-fmpz_mpoly_get_coeff_ui(const fmpz_mpoly_t poly,
+void fmpz_mpoly_get_termexp_fmpz(fmpz ** exps, const fmpz_mpoly_t poly, 
                                            slong n, const fmpz_mpoly_ctx_t ctx)
 {
-    return (n < poly->length) ? fmpz_get_ui(poly->coeffs + n) : UWORD(0);
+    slong N;
+
+    if ((ulong) n >= (ulong) poly->length)
+        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_get_termexp_fmpz");
+
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    mpoly_get_monomial_pfmpz(exps, poly->exps + N*n, poly->bits, ctx->minfo);
 }

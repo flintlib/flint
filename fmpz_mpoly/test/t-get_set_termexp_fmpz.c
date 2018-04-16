@@ -20,51 +20,51 @@
 int
 main(void)
 {
-    int i, j, k, result;
+    slong i, j, k;
+    int result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get/set_monomial_ui....");
+    flint_printf("get_set_termexp_fmpz....");
     fflush(stdout);
 
-    /* check ui */
+    /* check fmpz */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
-        ordering_t ord;
-        fmpz_t c, d;
-        slong nvars, len, coeff_bits, exp_bits, index;
+        slong nvars, len, index;
+        mp_bitcnt_t coeff_bits, exp_bits;
 
-        fmpz_init(c);
-        fmpz_init(d);
-
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
-
-        fmpz_mpoly_ctx_init(ctx, nvars, ord);
-
+        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
         fmpz_mpoly_init(f, ctx);
+
+        nvars = fmpz_mpoly_ctx_nvars(ctx);
 
         len = n_randint(state, 50);
         exp_bits = n_randint(state, 100) + 1;
         coeff_bits = n_randint(state, 100);
 
         fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        if (f->length == WORD(0))
+            continue;
 
         for (j = 0; j < 10; j++)
         {
-            ulong * exp1 = (ulong *) flint_malloc(nvars*sizeof(ulong));
-            ulong * exp2 = (ulong *) flint_malloc(nvars*sizeof(ulong));
+            fmpz ** exp1 = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
+            fmpz ** exp2 = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
 
             for (k = 0; k < nvars; k++)
             {
-                slong bits = n_randint(state, FLINT_BITS) + 1;
-                exp1[k] = n_randbits(state, bits);
+                exp1[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+                exp2[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+                fmpz_init(exp1[k]);
+                fmpz_init(exp2[k]);
+                fmpz_randtest_unsigned(exp1[k], state, 200);
             }
 
-            index = n_randint(state, f->length + 1);
+            index = n_randint(state, f->length);
 
-            fmpz_mpoly_set_monomial_ui(f, index, exp1, ctx);
+            fmpz_mpoly_set_termexp_fmpz(f, index, exp1, ctx);
 
             if (!mpoly_monomials_valid_test(f->exps, f->length, f->bits, ctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
@@ -72,23 +72,29 @@ main(void)
             if (mpoly_monomials_overflow_test(f->exps, f->length, f->bits, ctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
 
-            fmpz_mpoly_get_monomial_ui(exp2, f, index, ctx);
+            fmpz_mpoly_get_termexp_fmpz(exp2, f, index, ctx);
 
             result = 1;
             for (k = 0; k < nvars; k++)
-                result &= exp1[k] == exp2[k];
+            {
+                result = result && fmpz_equal(exp1[k], exp2[k]);
+                fmpz_clear(exp1[k]);
+                fmpz_clear(exp2[k]);
+                flint_free(exp1[k]); 
+                flint_free(exp2[k]); 
+            }
 
             if (!result)
             {
-                printf("FAIL\ncheck ui, i = %d, j = %d\n", i, j);
+                flint_printf("FAIL\ncheck set and get match\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
 
             flint_free(exp1);
             flint_free(exp2);
-        }
+       }
 
-        fmpz_mpoly_clear(f, ctx);  
+       fmpz_mpoly_clear(f, ctx);  
     }
 
     FLINT_TEST_CLEANUP(state);

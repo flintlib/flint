@@ -67,7 +67,7 @@ main(void)
         /* check all monomials in f */
         for (j = 0; j < fmpq_mpoly_length(f, ctx); j++)
         {
-            fmpq_mpoly_get_monomial_fmpz(exp, f, j, ctx);
+            fmpq_mpoly_get_termexp_fmpz(exp, f, j, ctx);
 
             fmpq_mpoly_zero(m, ctx);
             fmpq_mpoly_set_term_fmpq_fmpz(m, q, exp, ctx);

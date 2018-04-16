@@ -167,94 +167,94 @@ slong fmpq_mpoly_length(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
     Return the number of terms stored in \code{poly}. If the polynomial
     is in canonical form, this will be the number of nonzero coefficients.
 
-void fmpq_mpoly_get_coeff_fmpq(fmpq_t x,
+void fmpq_mpoly_get_termcoeff_fmpq(fmpq_t x,
                   const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
 
     Set $x$ to coefficient of the given polynomial with index $i$, starting
     with $i = 0$ for the term with most significance.
 
-void fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly, 
+void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly, 
                            slong i, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
 
     Set the coefficient of the given polynomial with index $i$ to the given
     value $x$, starting with $i = 0$ for the term with most signifance. Any
     existing term at that index is overwritten.
 
-int fmpq_mpoly_monomial_fits_si(const fmpq_mpoly_t poly,
+int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
 
     Return 1 if all entries of the exponent vector of the term of index $i$
     fit into an \code{slong}. Otherwise, return 0.
 
-int fmpq_mpoly_monomial_fits_ui(const fmpq_mpoly_t poly,
+int fmpq_mpoly_termexp_fits_ui(const fmpq_mpoly_t poly,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
 
     Return 1 if all entries of the exponent vector of the term of index $i$
     fit into a \code{ulong}. Otherwise, return 0.
 
-void fmpq_mpoly_get_monomial_ui(ulong * exps, const fmpq_mpoly_t poly,
+void fmpq_mpoly_get_termexp_ui(ulong * exps, const fmpq_mpoly_t poly,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
 
     Get the exponent vector of the given polynomial with index $i$.
 
-void fmpq_mpoly_get_monomial_fmpz(fmpz ** exps, const fmpq_mpoly_t poly,
+void fmpq_mpoly_get_termexp_fmpz(fmpz ** exps, const fmpq_mpoly_t poly,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
 
     Get the exponent vector of the given polynomial with index $i$.
 
-void fmpq_mpoly_set_monomial_ui(fmpq_mpoly_t poly, 
+void fmpq_mpoly_set_termexp_ui(fmpq_mpoly_t poly, 
                        slong i, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
 
     Set the exponent vector of the given polynomial with index $i$.
 
-void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly, 
-                      slong i, fmpz * const * exps, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_set_termexp_fmpz(fmpq_mpoly_t poly, 
+                slong i, fmpz * const * exps, const const fmpq_mpoly_ctx_t ctx)
 
     Set the exponent vector of the given polynomial with index $i$.
 
 
-void fmpq_mpoly_pushback_term_fmpq_fmpz(fmpz_mpoly_t poly,
-                     const fmpq_t c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_pushterm_fmpq_fmpz(fmpz_mpoly_t poly,
+                const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
 
-void fmpq_mpoly_pushback_term_fmpz_fmpz(fmpz_mpoly_t poly,
-                     const fmpq_t c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_pushterm_fmpz_fmpz(fmpz_mpoly_t poly,
+                const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
 
-void fmpq_mpoly_pushback_term_ui_fmpz(fmpz_mpoly_t poly,
-                             ulong c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_pushterm_ui_fmpz(fmpz_mpoly_t poly,
+                       ulong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
 
-void fmpq_mpoly_pushback_term_si_fmpz(fmpz_mpoly_t poly,
-                             slong c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_pushterm_si_fmpz(fmpz_mpoly_t poly,
+                       slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
 
-void fmpq_mpoly_pushback_term_fmpq_ui(fmpz_mpoly_t poly,
-                       const fmpq_t c, const ulong * exp, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_pushterm_fmpq_ui(fmpz_mpoly_t poly,
+                 const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
 
-void fmpq_mpoly_pushback_term_fmpz_ui(fmpz_mpoly_t poly,
-                       const fmpq_t c, const ulong * exp, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_pushterm_fmpz_ui(fmpz_mpoly_t poly,
+                 const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
 
-void fmpq_mpoly_pushback_term_ui_ui(fmpz_mpoly_t poly,
-                              ulong c, const ulong * exp, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_pushterm_ui_ui(fmpz_mpoly_t poly,
+                        ulong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
 
-void fmpq_mpoly_pushback_term_si_ui(fmpz_mpoly_t poly,
-                              slong c, const ulong * exp, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_pushterm_si_ui(fmpz_mpoly_t poly,
+                        slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
 
 
-void fmpq_mpoly_sort(fmpq_mpoly_t poly, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_sort(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 
     Sort the terms of \code{poly} into the canonical ordering dictated by
     the ordering in \code{ctx}. This function does not combine like terms,
@@ -262,7 +262,8 @@ void fmpq_mpoly_sort(fmpq_mpoly_t poly, fmpq_mpoly_ctx_t ctx)
     Even if all terms have distinct exponent vectors, the
     result may still not be in canonical form.
 
-void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly, fmpz_mpoly_ctx_t ctx)
+void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly,
+                                                    const fmpz_mpoly_ctx_t ctx)
 
     Combine adjacent like terms in \code{poly}. If the terms of \code{poly}
     were sorted to begin with, the result will be in canonical form.

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,50 +11,44 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mpoly.h"
+#include "fmpq_mpoly.h"
 #include "ulong_extras.h"
 
 int
 main(void)
 {
-    int i, j, k, result;
+    slong i, j, k;
+    int result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get/set_monomial_fmpz....");
+    flint_printf("get_set_termexp_fmpz....");
     fflush(stdout);
 
-    /* check fmpz */
+    /* check get and set match */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f;
-        ordering_t ord;
-        fmpz_t c, d;
-        slong nvars, len, coeff_bits, exp_bits, index;
+        fmpq_mpoly_ctx_t ctx;
+        fmpq_mpoly_t f;
+        slong len, nvars, index;
+        mp_bitcnt_t coeff_bits, exp_bits;
 
-        fmpz_init(c);
-        fmpz_init(d);
+        fmpq_mpoly_ctx_init_rand(ctx, state, 20);
+        fmpq_mpoly_init(f, ctx);
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
-
-        fmpz_mpoly_ctx_init(ctx, nvars, ord);
-
-        fmpz_mpoly_init(f, ctx);
+        nvars = fmpq_mpoly_ctx_nvars(ctx);
 
         len = n_randint(state, 50);
         exp_bits = n_randint(state, 100) + 1;
         coeff_bits = n_randint(state, 100);
 
-        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        fmpq_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        if (fmpq_mpoly_length(f, ctx) == 0)
+            continue;
 
         for (j = 0; j < 10; j++)
         {
-            fmpz ** exp1 = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
-            fmpz ** exp2 = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
+            fmpz ** exp1 = (fmpz **) flint_malloc(ctx->zctx->minfo->nvars*sizeof(fmpz*));
+            fmpz ** exp2 = (fmpz **) flint_malloc(ctx->zctx->minfo->nvars*sizeof(fmpz*));
 
             for (k = 0; k < nvars; k++)
             {
@@ -65,22 +59,22 @@ main(void)
                 fmpz_randtest_unsigned(exp1[k], state, 200);
             }
 
-            index = n_randint(state, f->length + 1);
+            index = n_randint(state, fmpq_mpoly_length(f, ctx));
 
-            fmpz_mpoly_set_monomial_fmpz(f, index, exp1, ctx);
+            fmpq_mpoly_set_termexp_fmpz(f, index, exp1, ctx);
 
-            if (!mpoly_monomials_valid_test(f->exps, f->length, f->bits, ctx->minfo))
+            if (!mpoly_monomials_valid_test(f->zpoly->exps, f->zpoly->length, f->zpoly->bits, ctx->zctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
 
-            if (mpoly_monomials_overflow_test(f->exps, f->length, f->bits, ctx->minfo))
+            if (mpoly_monomials_overflow_test(f->zpoly->exps, f->zpoly->length, f->zpoly->bits, ctx->zctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
 
-            fmpz_mpoly_get_monomial_fmpz(exp2, f, index, ctx);
+            fmpq_mpoly_get_termexp_fmpz(exp2, f, index, ctx);
 
             result = 1;
             for (k = 0; k < nvars; k++)
             {
-                result &= fmpz_equal(exp1[k], exp2[k]);
+                result = result && fmpz_equal(exp1[k], exp2[k]);
                 fmpz_clear(exp1[k]);
                 fmpz_clear(exp2[k]);
                 flint_free(exp1[k]); 
@@ -89,7 +83,7 @@ main(void)
 
             if (!result)
             {
-                printf("FAIL\ncheck fmpz, i = %d, j = %d\n", i, j);
+                flint_printf("FAIL\ncheck get and set match\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
 
@@ -97,7 +91,7 @@ main(void)
             flint_free(exp2);
        }
 
-       fmpz_mpoly_clear(f, ctx);  
+       fmpq_mpoly_clear(f, ctx);  
     }
 
     FLINT_TEST_CLEANUP(state);

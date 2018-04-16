@@ -78,12 +78,12 @@ main(void)
                 fmpq_mpoly_pushterm_fmpq_fmpz(f2, c, exp, ctx);
 
             /* make sure last term matches */
-            fmpq_mpoly_get_coeff_fmpq(c2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
-            fmpq_mpoly_get_monomial_fmpz(exp2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
+            fmpq_mpoly_get_termcoeff_fmpq(c2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
+            fmpq_mpoly_get_termexp_fmpz(exp2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
             if (!fmpq_equal(c, c2))
             {
                 printf("FAIL\n");
-                flint_printf("Check pushed coefficient matches\ni=%wd, j=%wd\n", i, j);
+                flint_printf("Check pushed coefficient matches\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
             for (k = 0; k < nvars; k++)
@@ -91,7 +91,7 @@ main(void)
                 if (!fmpz_equal(exp[k], exp2[k]))
                 {
                     printf("FAIL\n");
-                    flint_printf("Check pushed exponent matches\ni=%wd, j=%wd\n", i, j);
+                    flint_printf("Check pushed exponent matches\ni = %wd, j = %wd\n", i, j);
                     flint_abort();                    
                 }
             }
@@ -104,7 +104,7 @@ main(void)
         if (!fmpq_mpoly_equal(f1, f2, ctx))
         {
             printf("FAIL\n");
-            flint_printf("Check pushed polynomial matches add\ni=%wd\n",i,j);
+            flint_printf("Check pushed polynomial matches add\ni = %wd\n",i);
             flint_abort();
         }
 

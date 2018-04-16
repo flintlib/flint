@@ -75,8 +75,8 @@ main(void)
             fmpz_mpoly_pushterm_fmpz_fmpz(f2, c, exp, ctx);
 
             /* make sure last term matches */
-            fmpz_mpoly_get_coeff_fmpz(c2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
-            fmpz_mpoly_get_monomial_fmpz(exp2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
+            fmpz_mpoly_get_termcoeff_fmpz(c2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
+            fmpz_mpoly_get_termexp_fmpz(exp2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
             if (!fmpz_equal(c, c2))
             {
                 printf("FAIL\n");

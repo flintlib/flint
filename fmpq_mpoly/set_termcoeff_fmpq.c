@@ -12,14 +12,13 @@
 #include "fmpq_mpoly.h"
 
 void
-
-
-fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly,
+fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly,
                            slong n, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
 {
     if (fmpq_is_zero(x))
     {
-        fmpz_mpoly_set_coeff_fmpz(poly->zpoly, n, fmpq_numref(x), ctx->zctx);
+        fmpz_mpoly_set_termcoeff_fmpz(poly->zpoly, n, fmpq_numref(x), ctx->zctx);
+        /* poly is not guaranteed to have a nonzero coeff, so no canonicalise */
 
     } else
     {
@@ -28,12 +27,11 @@ fmpq_mpoly_set_coeff_fmpq(fmpq_mpoly_t poly,
         fmpz_mul(t, fmpq_numref(poly->content), fmpq_denref(x));
         fmpz_mpoly_scalar_mul_fmpz(poly->zpoly, poly->zpoly, t, ctx->zctx);
         fmpz_mul(t, fmpq_denref(poly->content), fmpq_numref(x));
-        fmpz_set_ui(fmpq_numref(poly->content), 1);
+        fmpz_set_ui(fmpq_numref(poly->content), UWORD(1));
         fmpz_mul(fmpq_denref(poly->content), fmpq_denref(poly->content), fmpq_denref(x));
-        fmpz_mpoly_set_coeff_fmpz(poly->zpoly, n, t, ctx->zctx);
+        fmpz_mpoly_set_termcoeff_fmpz(poly->zpoly, n, t, ctx->zctx);
         fmpz_clear(t);
+        fmpq_mpoly_canonicalise(poly, ctx);
     }
-
-    fmpq_mpoly_canonicalise(poly, ctx);
     return;
 }
