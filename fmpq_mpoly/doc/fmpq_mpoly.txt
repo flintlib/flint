@@ -158,7 +158,9 @@ void fmpq_mpoly_get_coeff_monomial(fmpq_t c, const fmpq_mpoly_t poly1,
     Some of these functions deal with violations of the internal canonical
     representation. A call to \code{fmpq_mpoly_sort} followed by a call to
     \code{fmpq_mpoly_combine_like_terms} should leave a polynomial in
-    canonical form.
+    canonical form. The \code{pushterm} functions runs in constant
+    average time if the terms pushed have bounded denominators,
+    and a term is appened even if the specified coefficient is zero.
 
 slong fmpq_mpoly_length(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 
@@ -210,26 +212,54 @@ void fmpq_mpoly_set_monomial_fmpz(fmpq_mpoly_t poly,
 
     Set the exponent vector of the given polynomial with index $i$.
 
-void fmpq_mpoly_pushback_term_fmpz_fmpz(fmpz_mpoly_t poly,
-                     const fmpz_t c, fmpz * const * exp, fmpz_mpoly_ctx_t ctx)
+
+void fmpq_mpoly_pushback_term_fmpq_fmpz(fmpz_mpoly_t poly,
+                     const fmpq_t c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
-    If the terms pushed back have bounded denominators, this function
-    runs in constant average time, and a term is appened even if $c=0$.
+
+void fmpq_mpoly_pushback_term_fmpz_fmpz(fmpz_mpoly_t poly,
+                     const fmpq_t c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
+
+    Append a term to \code{poly} with the given coefficient and exponents.
+
+void fmpq_mpoly_pushback_term_ui_fmpz(fmpz_mpoly_t poly,
+                             ulong c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
+
+    Append a term to \code{poly} with the given coefficient and exponents.
+
+void fmpq_mpoly_pushback_term_si_fmpz(fmpz_mpoly_t poly,
+                             slong c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
+
+    Append a term to \code{poly} with the given coefficient and exponents.
+
+void fmpq_mpoly_pushback_term_fmpq_ui(fmpz_mpoly_t poly,
+                       const fmpq_t c, const ulong * exp, fmpq_mpoly_ctx_t ctx)
+
+    Append a term to \code{poly} with the given coefficient and exponents.
 
 void fmpq_mpoly_pushback_term_fmpz_ui(fmpz_mpoly_t poly,
-                             const fmpz_t c, ulong * exp, fmpz_mpoly_ctx_t ctx)
+                       const fmpq_t c, const ulong * exp, fmpq_mpoly_ctx_t ctx)
 
     Append a term to \code{poly} with the given coefficient and exponents.
-    If the terms pushed back have bounded denominators, this function
-    runs in constant average time, and a term is appened even if $c=0$.
+
+void fmpq_mpoly_pushback_term_ui_ui(fmpz_mpoly_t poly,
+                              ulong c, const ulong * exp, fmpq_mpoly_ctx_t ctx)
+
+    Append a term to \code{poly} with the given coefficient and exponents.
+
+void fmpq_mpoly_pushback_term_si_ui(fmpz_mpoly_t poly,
+                              slong c, const ulong * exp, fmpq_mpoly_ctx_t ctx)
+
+    Append a term to \code{poly} with the given coefficient and exponents.
+
 
 void fmpq_mpoly_sort(fmpq_mpoly_t poly, fmpq_mpoly_ctx_t ctx)
 
-    Assuming that the terms of \code{poly} are otherwise valid, sort the
-    terms into the canonical ordering dictated by the ordering in \code{ctx}.
-    This function does not combine like terms, nor does it delete terms with
-    coefficient zero. Even if all terms have distinct exponent vectors, the
+    Sort the terms of \code{poly} into the canonical ordering dictated by
+    the ordering in \code{ctx}. This function does not combine like terms,
+    nor does it delete terms with coefficient zero.
+    Even if all terms have distinct exponent vectors, the
     result may still not be in canonical form.
 
 void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly, fmpz_mpoly_ctx_t ctx)

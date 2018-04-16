@@ -28,20 +28,27 @@ main(void)
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f1, f2, m;
         mp_bitcnt_t coeff_bits, exp_bits;
-        fmpz ** exp;
-        slong len;
-        fmpq_t c;
+        fmpz ** exp, ** exp2;
+        slong len, nvars;
+        fmpq_t c, c2;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 10);
         fmpq_mpoly_init(f1, ctx);
         fmpq_mpoly_init(f2, ctx);
         fmpq_mpoly_init(m, ctx);
         fmpq_init(c);
-        exp = (fmpz **) flint_malloc(ctx->zctx->minfo->nvars*sizeof(fmpz *));
-        for (k = 0; k < ctx->zctx->minfo->nvars; k++)
+        fmpq_init(c2);
+
+        nvars = fmpq_mpoly_ctx_nvars(ctx);
+
+        exp = (fmpz **) flint_malloc(nvars*sizeof(fmpz *));
+        exp2 = (fmpz **) flint_malloc(nvars*sizeof(fmpz *));
+        for (k = 0; k < nvars; k++)
         {
             exp[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
             fmpz_init(exp[k]);
+            exp2[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            fmpz_init(exp2[k]);
         }
 
         len = n_randint(state, 20);
@@ -54,17 +61,40 @@ main(void)
         for (j = 0; j < len; j++)
         {
             /* get random term */
-            fmpq_randtest(c, state, coeff_bits);
-            for (k = 0; k < ctx->zctx->minfo->nvars; k++)
+            fmpq_randtest(c, state, coeff_bits + 1);
+            for (k = 0; k < nvars; k++)
                 fmpz_randtest_unsigned(exp[k], state, exp_bits);
 
             /* add it to f1 */
             fmpq_mpoly_zero(m, ctx);
             fmpq_mpoly_set_term_fmpq_fmpz(m, c, exp, ctx);
             fmpq_mpoly_add(f1, f1, m, ctx);
+            fmpq_mpoly_assert_canonical(f1, ctx);
 
             /* push it back on f2 */
-            fmpq_mpoly_pushback_term_fmpq_fmpz(f2, c, exp, ctx);
+            if (fmpz_is_one(fmpq_denref(c)))
+                fmpq_mpoly_pushterm_fmpz_fmpz(f2, fmpq_numref(c), exp, ctx);
+            else
+                fmpq_mpoly_pushterm_fmpq_fmpz(f2, c, exp, ctx);
+
+            /* make sure last term matches */
+            fmpq_mpoly_get_coeff_fmpq(c2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
+            fmpq_mpoly_get_monomial_fmpz(exp2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
+            if (!fmpq_equal(c, c2))
+            {
+                printf("FAIL\n");
+                flint_printf("Check pushed coefficient matches\ni=%wd, j=%wd\n", i, j);
+                flint_abort();
+            }
+            for (k = 0; k < nvars; k++)
+            {
+                if (!fmpz_equal(exp[k], exp2[k]))
+                {
+                    printf("FAIL\n");
+                    flint_printf("Check pushed exponent matches\ni=%wd, j=%wd\n", i, j);
+                    flint_abort();                    
+                }
+            }
         }
 
         fmpq_mpoly_sort(f2, ctx);
@@ -74,21 +104,25 @@ main(void)
         if (!fmpq_mpoly_equal(f1, f2, ctx))
         {
             printf("FAIL\n");
-            flint_printf("Check pushback matches add\ni=%wd\n",i,j);
+            flint_printf("Check pushed polynomial matches add\ni=%wd\n",i,j);
             flint_abort();
         }
 
+        fmpq_clear(c2);
         fmpq_clear(c);
         fmpq_mpoly_clear(f1, ctx);
         fmpq_mpoly_clear(f2, ctx);
         fmpq_mpoly_clear(m, ctx);
         fmpq_mpoly_ctx_clear(ctx);
 
-        for (k = 0; k < ctx->zctx->minfo->nvars; k++)
+        for (k = 0; k < nvars; k++)
         {
+            fmpz_clear(exp2[k]);
+            flint_free(exp2[k]); 
             fmpz_clear(exp[k]);
             flint_free(exp[k]); 
         }
+        flint_free(exp2);
         flint_free(exp);
     }
 
