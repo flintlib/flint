@@ -280,6 +280,15 @@ slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
     return _fmpz_vec_max_bits(poly->coeffs, poly->length);
 }
 
+FMPZ_MPOLY_INLINE
+int fmpz_mpoly_degrees_fit_si(const fmpz_mpoly_t poly,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    return poly->bits <= FLINT_BITS ? 1
+                               : mpoly_degrees_fit_si(poly->exps,
+                                         poly->length, poly->bits, ctx->minfo);
+}
+
 FLINT_DLL void fmpz_mpoly_degrees_si(slong * degs, const fmpz_mpoly_t poly,
                                                    const fmpz_mpoly_ctx_t ctx);
 
@@ -345,13 +354,6 @@ int fmpz_mpoly_is_zero(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
    return poly->length == 0;
 }
-
-FMPZ_MPOLY_INLINE
-int fmpz_mpoly_is_monomial(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-{
-   return poly->length == WORD(1);
-}
-
 
 FMPZ_MPOLY_INLINE
 int fmpz_mpoly_is_one(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
@@ -436,6 +438,24 @@ FLINT_DLL void fmpz_mpoly_set_termcoeff_ui(fmpz_mpoly_t poly,
 
 FLINT_DLL void fmpz_mpoly_set_termcoeff_si(fmpz_mpoly_t poly,
                                  slong n, slong x, const fmpz_mpoly_ctx_t ctx);
+
+FMPZ_MPOLY_INLINE
+int fmpz_mpoly_termexp_fits_si(const fmpz_mpoly_t poly,
+                                           slong n, const fmpz_mpoly_ctx_t ctx)
+{
+    return poly->bits <= FLINT_BITS ? 1
+                               : mpoly_termexp_fits_si(poly->exps,
+                                                    poly->bits, n, ctx->minfo);
+}
+
+FMPZ_MPOLY_INLINE
+int fmpz_mpoly_termexp_fits_ui(const fmpz_mpoly_t poly,
+                                           slong n, const fmpz_mpoly_ctx_t ctx)
+{
+    return poly->bits <= FLINT_BITS ? 1
+                               : mpoly_termexp_fits_ui(poly->exps,
+                                                    poly->bits, n, ctx->minfo);
+}
 
 FLINT_DLL void fmpz_mpoly_get_termexp_ui(ulong * exps, const fmpz_mpoly_t poly, 
                                           slong n, const fmpz_mpoly_ctx_t ctx);

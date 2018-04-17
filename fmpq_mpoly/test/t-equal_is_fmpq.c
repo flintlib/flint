@@ -20,7 +20,7 @@ main(void)
     int result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("equal/is_fmpq/fmpz....");
+    flint_printf("equal_is_fmpq....");
     fflush(stdout);
 
     {
@@ -38,7 +38,6 @@ main(void)
         fmpq_init(r);
         fmpz_init(a);
         fmpz_init(b);
-
 
 
         result = 1;
@@ -62,7 +61,7 @@ main(void)
 
         result = result && !fmpq_mpoly_is_gen(f, -WORD(1), ctx);
 
-        result = result && !fmpq_mpoly_is_monomial(f, ctx);
+        result = result && (fmpq_mpoly_length(f, ctx) == WORD(0));
 
         if (!result)
         {
@@ -96,7 +95,7 @@ main(void)
 
         result = result && !fmpq_mpoly_is_gen(f, -WORD(1), ctx);
 
-        result = result && fmpq_mpoly_is_monomial(f, ctx);
+        result = result && (fmpq_mpoly_length(f, ctx) == WORD(1));
 
         if (!result)
         {
@@ -127,7 +126,7 @@ main(void)
 
         result = result && !fmpq_mpoly_is_gen(f, -WORD(1), ctx);
 
-        result = result && fmpq_mpoly_is_monomial(f, ctx);
+        result = result && (fmpq_mpoly_length(f, ctx) == WORD(1));
 
         if (!result)
         {
@@ -157,7 +156,7 @@ main(void)
 
         result = result && fmpq_mpoly_is_gen(f, -WORD(1), ctx);
 
-        result = result && fmpq_mpoly_is_monomial(f, ctx);
+        result = result && (fmpq_mpoly_length(f, ctx) == WORD(1));
 
         if (!result)
         {
@@ -187,7 +186,7 @@ main(void)
 
         result = result && !fmpq_mpoly_is_gen(f, -WORD(1), ctx);
 
-        result = result && fmpq_mpoly_is_monomial(f, ctx);
+        result = result && (fmpq_mpoly_length(f, ctx) == WORD(1));
 
         fmpq_mpoly_get_coeff_monomial(r, f, g, ctx);
         result = result && fmpq_equal(r, q);
@@ -223,7 +222,7 @@ main(void)
 
         result = result && !fmpq_mpoly_is_gen(f, -WORD(1), ctx);
 
-        result = result && !fmpq_mpoly_is_monomial(f, ctx);
+        result = result && (fmpq_mpoly_length(f, ctx) != WORD(1));
 
         fmpq_mpoly_get_coeff_monomial(r, f, g, ctx);
         fmpq_set_si(q, WORD(2), WORD(3));

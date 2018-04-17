@@ -115,6 +115,7 @@ void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t poly, slong var,
     Set \code{deg} to the degree of \code{poly} with respect to the variable
     of index \code{var}. If \code{poly} is zero, set \code{deg} to \code{-1}.
 
+
 void fmpq_mpoly_swap(fmpq_mpoly_t poly1, 
                                  fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
 
@@ -162,23 +163,25 @@ void fmpq_mpoly_get_coeff_monomial(fmpq_t c, const fmpq_mpoly_t poly1,
     average time if the terms pushed have bounded denominators,
     and a term is appened even if the specified coefficient is zero.
 
+
 slong fmpq_mpoly_length(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 
     Return the number of terms stored in \code{poly}. If the polynomial
     is in canonical form, this will be the number of nonzero coefficients.
 
+
 void fmpq_mpoly_get_termcoeff_fmpq(fmpq_t x,
                   const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
 
-    Set $x$ to coefficient of the given polynomial with index $i$, starting
+    Set $x$ to coefficient of index $i$, starting
     with $i = 0$ for the term with most significance.
 
 void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly, 
                            slong i, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
 
-    Set the coefficient of the given polynomial with index $i$ to the given
-    value $x$, starting with $i = 0$ for the term with most signifance. Any
-    existing term at that index is overwritten.
+    Set the coefficient of index $i$ to $x$, starting
+    with $i = 0$ for the term with most signifance.
+
 
 int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
@@ -290,12 +293,11 @@ void fmpq_mpoly_one(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly,
                                     const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 
-    Set the given \code{fmpq_mpoly_t} to the constant polynomial corresponding
-    to the rational number $c$.
+    Set \code{poly} to the constant $c$.
 
 void fmpq_mpoly_gen(fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
 
-    Set the given \code{fmpq_mpoly_t} to the $i$-th generator (variable),
+    Set \code{poly} to the $i$-th generator (variable),
     where $i = 0$ corresponds to the variable with the most significance
     with respect to the ordering. 
 
@@ -354,10 +356,6 @@ int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly,
     If $i \ge 0$, return 1 if \code{poly} is equal to the $i$-th generator,
     otherwise return 0. If $i < 0$, return 1 if the polynomial is
     equal to any generator, otherwise return 0.
-
-int fmpq_mpoly_is_monomial(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Return 1 if \code{poly} is a monomial (i.e. length 1), otherwise return 0.
 
 *******************************************************************************
 

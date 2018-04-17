@@ -115,13 +115,18 @@ slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
     values of the coefficients of \code{poly}. If all of the coefficients are
     positive, $b$ is returned, otherwise $-b$ is returned.
 
+
+int fmpz_mpoly_degrees_fit_si(const fmpq_mpoly_t poly,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if the degrees of poly with respect to each variable fit into
+    an \code{slong}, otherwise return 0.
+
 void fmpz_mpoly_degrees_si(slong * degs,
                            const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
-    Return the degree of \code{poly} with respect to each variable. The array
-    \code{degs} has length equal to the number of variables, and the degree of
-    \code{poly} with respect its $i$-th variable is stored in \code{degs[i]}. If
-    \code{poly} is zero, all degrees are set to \code{-1}.
+    Set \code{degs} to the degrees of \code{poly} with respect to each variable.
+    If \code{poly} is zero, all degrees are set to \code{-1}.
 
 slong fmpz_mpoly_degree_si(const fmpz_mpoly_t poly, slong var, 
                                                     const fmpz_mpoly_ctx_t ctx)
@@ -132,51 +137,15 @@ slong fmpz_mpoly_degree_si(const fmpz_mpoly_t poly, slong var,
 void fmpz_mpoly_degrees_fmpz(fmpz ** degs,
                            const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
-    Return the degree of \code{poly} with respect to each variable. The array
-    \code{degs} has length equal to the number of variables, and the degree of
-    \code{poly} with respect its $i$-th variable is stored in \code{degs[i]}. If
-    \code{poly} is zero, all degrees are set to \code{-1}.
+    Set \code{degs} to the degrees of \code{poly} with respect to each variable.
+    If \code{poly} is zero, all degrees are set to \code{-1}.
 
 void fmpz_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t poly, slong var, 
                                                     const fmpz_mpoly_ctx_t ctx)
 
-    Return into \code{deg} the degree of \code{poly} with respect
-    to the variable of index
-    \code{var}. If \code{poly} is zero, the return is \code{-1}.
+    Set \code{deg} to the degree of \code{poly} with respect to the variable
+    of index \code{var}. If \code{poly} is zero, set \code{deg} to \code{-1}.
 
-
-
-void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
-                                slong bits, slong n, int deg, int rev, slong N)
-
-    Set the low level \code{fmpz_mpoly} to the $i$-th generator (variable),
-    where $i = 0$ corresponds to the variable with the greatest significance
-    with respect to the ordering. The ordering is specified by whether it is
-    a degree ordering or a reverse ordering via \code{deg} and \code{rev}. Each
-    exponent vector is assumed to fit in $N$ words and consist of $n$ fields,
-    each of the given number of bits.
-
-void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
-
-    Set the given \code{fmpz_mpoly_t} to the $i$-th generator (variable),
-    where $i = 0$ corresponds to the variable with the most significance
-    with respect to the ordering. 
-
-void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set the given \code{fmpz_mpoly_t} to the constant polynomial corresponding
-    to the unsigned integer $c$.
-
-void fmpz_mpoly_set_si(fmpz_mpoly_t poly, slong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set the given \code{fmpz_mpoly_t} to the constant polynomial corresponding
-    to the signed integer $c$.
-
-void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
-                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
-
-    Set the given \code{fmpz_mpoly_t} to the constant polynomial corresponding
-    to the multiprecision integer $c$.
 
 int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly,
                                            ulong c, const fmpz_mpoly_ctx_t ctx)
@@ -374,6 +343,13 @@ slong fmpz_mpoly_get_term_si_fmpz(const fmpz_mpoly_t poly,
     is zero. If term index is negative or not strictly less than the length
     of the polynomial, the function will throw.
 
+
+slong fmpz_mpoly_length(const fmpz_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Return the number of terms stored in \code{poly}. If the polynomial
+    is in canonical form, this will be the number of nonzero coefficients.
+
+
 void fmpz_mpoly_get_termcoeff_fmpz(fmpz_t x,
                   const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 
@@ -404,6 +380,18 @@ void fmpz_mpoly_set_termcoeff_si(fmpz_mpoly_t poly,
 
     Set the coefficient of the term of index $i$ to $x$.
 
+int fmpz_mpoly_termexp_fits_si(const fmpz_mpoly_t poly,
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if all entries of the exponent vector of the term of index $i$
+    fit into an \code{slong}. Otherwise, return 0.
+
+int fmpz_mpoly_termexp_fits_ui(const fmpz_mpoly_t poly,
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if all entries of the exponent vector of the term of index $i$
+    fit into a \code{ulong}. Otherwise, return 0.
+
 void fmpz_mpoly_get_termexp_fmpz(fmpz ** exp, const fmpz_mpoly_t poly, 
                                            slong i, const fmpz_mpoly_ctx_t ctx)
 
@@ -424,35 +412,37 @@ void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t poly,
 
     Set the exponent vector of the term index $i$ to \code{exp}.
 
+
 void fmpz_mpoly_pushterm_fmpz_fmpz(fmpz_mpoly_t poly,
                 const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Appends a term to \code{poly} with the given coefficient and exponents.
+    Append a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_ui_fmpz(fmpz_mpoly_t poly,
                        ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Appends a term to \code{poly} with the given coefficient and exponents.
+    Append a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_si_fmpz(fmpz_mpoly_t poly,
                        slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Appends a term to \code{poly} with the given coefficient and exponents.
+    Append a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_fmpz_ui(fmpz_mpoly_t poly,
                  const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Appends a term to \code{poly} with the given coefficient and exponents.
+    Append a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_ui_ui(fmpz_mpoly_t poly,
                         ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Appends a term to \code{poly} with the given coefficient and exponents.
+    Append a term to \code{poly} with the given coefficient and exponents.
 
 void fmpz_mpoly_pushterm_si_ui(fmpz_mpoly_t poly,
                         slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Appends a term to \code{poly} with the given coefficient and exponents.
+    Append a term to \code{poly} with the given coefficient and exponents.
+
 
 void fmpz_mpoly_sort(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
@@ -477,26 +467,37 @@ void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
 
 *******************************************************************************
 
-void _fmpz_mpoly_set(fmpz * poly1, ulong * exps1,
-                   const fmpz * poly2, const ulong * exps2, slong len, slong N)
-
-    Set the \code{(poly1, exps1, len)} to \code{(poly2, exps2, len)}$ assuming
-    the exponent vectors each take $N$ words. The polynomial
-    \code{(poly1, exps1, len)} is assumed to have enough space allocated for
-    \code{len} terms.
-
 void fmpz_mpoly_set(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
     
     Set \code{poly1} to \code{poly2}.
 
-void _fmpz_mpoly_neg(fmpz * poly1, ulong * exps1,
-                   const fmpz * poly2, const ulong * exps2, slong len, slong N)
+void fmpz_mpoly_zero(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
-    Set the \code{(poly1, exps1, len)} to the negation of
-    \code{(poly2, exps2, len)}$ assuming the exponent vectors each take $N$
-    words. The polynomial \code{(poly1, exps1, len)} is assumed to have enough
-    space allocated for \code{len} terms.
+    Set \code{poly} to the constant 0.
+
+void fmpz_mpoly_one(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant 1.
+
+void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
+                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant $c$.
+
+void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant $c$.
+
+void fmpz_mpoly_set_si(fmpz_mpoly_t poly, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant $c$.
+
+void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the $i$-th generator (variable),
+    where $i = 0$ corresponds to the variable with the most significance
+    with respect to the ordering. 
 
 void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)

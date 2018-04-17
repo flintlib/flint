@@ -619,10 +619,10 @@ FLINT_DLL void mpoly_search_monomials(
                 const ulong * a, slong a_len, const ulong * b, slong b_len,
                                                slong N, const ulong * cmpmask);
 
-FLINT_DLL int mpoly_monomial_fits_si(ulong * exps, slong bits,
+FLINT_DLL int mpoly_termexp_fits_si(ulong * exps, slong bits,
                                               slong n, const mpoly_ctx_t mctx);
 
-FLINT_DLL int mpoly_monomial_fits_ui(ulong * exps, slong bits,
+FLINT_DLL int mpoly_termexp_fits_ui(ulong * exps, slong bits,
                                               slong n, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_monomials_valid_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);

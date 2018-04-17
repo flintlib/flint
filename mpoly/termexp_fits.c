@@ -11,7 +11,7 @@
 
 #include "fmpz_mpoly.h"
 
-int mpoly_monomial_fits_ui(ulong * exps, slong bits,
+int mpoly_termexp_fits_ui(ulong * exps, slong bits,
                                                slong n, const mpoly_ctx_t mctx)
 {
     slong i, N;
@@ -32,6 +32,34 @@ int mpoly_monomial_fits_ui(ulong * exps, slong bits,
     for (i = 0; i < mctx->nvars; i++)
     {
         ret = ret && fmpz_abs_fits_ui(unpacked_exps + i);
+        fmpz_clear(unpacked_exps + i);
+    }
+
+    TMP_END;
+    return ret;
+}
+
+int mpoly_termexp_fits_si(ulong * exps, slong bits,
+                                               slong n, const mpoly_ctx_t mctx)
+{
+    slong i, N;
+    int ret;
+    fmpz * unpacked_exps;
+    TMP_INIT;
+
+    TMP_START;
+
+    unpacked_exps = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
+    for (i = 0; i < mctx->nvars; i++)
+        fmpz_init(unpacked_exps + i);
+
+    N = mpoly_words_per_exp(bits, mctx);
+    mpoly_get_monomial_ffmpz(unpacked_exps, exps + N*n, bits, mctx);
+
+    ret = 1;
+    for (i = 0; i < mctx->nvars; i++)
+    {
+        ret = ret && fmpz_fits_si(unpacked_exps + i);
         fmpz_clear(unpacked_exps + i);
     }
 

@@ -304,12 +304,6 @@ int fmpq_mpoly_is_one(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
           && fmpz_mpoly_is_one(poly->zpoly, ctx->zctx);
 }
 
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_is_monomial(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-{
-   return fmpz_mpoly_is_monomial(poly->zpoly, ctx->zctx);
-}
-
 FLINT_DLL void fmpq_mpoly_get_coeff_monomial(fmpq_t c, const fmpq_mpoly_t poly1,
                          const fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx);
 
@@ -390,7 +384,7 @@ int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly,
                                            slong n, const fmpq_mpoly_ctx_t ctx)
 {
     return poly->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_monomial_fits_si(poly->zpoly->exps,
+                               : mpoly_termexp_fits_si(poly->zpoly->exps,
                                        poly->zpoly->bits, n, ctx->zctx->minfo);
 }
 
@@ -399,7 +393,7 @@ int fmpq_mpoly_termexp_fits_ui(const fmpq_mpoly_t poly,
                                            slong n, const fmpq_mpoly_ctx_t ctx)
 {
     return poly->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_monomial_fits_ui(poly->zpoly->exps,
+                               : mpoly_termexp_fits_ui(poly->zpoly->exps,
                                        poly->zpoly->bits, n, ctx->zctx->minfo);
 }
 
