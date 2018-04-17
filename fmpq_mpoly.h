@@ -217,7 +217,13 @@ void fmpq_mpoly_fit_bits(fmpq_mpoly_t poly,
 
 /*  Basic manipulation *******************************************************/
 
-FLINT_DLL void fmpq_mpoly_canonicalise(fmpq_mpoly_t poly,
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_is_fmpq(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+{
+   return fmpz_mpoly_is_fmpz(poly->zpoly, ctx->zctx);
+}
+
+FLINT_DLL void fmpq_mpoly_get_fmpq(fmpq_t x, const fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly,
@@ -225,6 +231,16 @@ FLINT_DLL void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly,
 
 FLINT_DLL void fmpq_mpoly_set_fmpz(fmpq_mpoly_t poly,
                                    const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_set_ui(fmpq_mpoly_t poly,
+                                          ulong c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_set_si(fmpq_mpoly_t poly,
+                                          slong c, const fmpq_mpoly_ctx_t ctx);
+
+
+FLINT_DLL void fmpq_mpoly_canonicalise(fmpq_mpoly_t poly,
+                                                   const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
 int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t poly,
@@ -465,9 +481,6 @@ FLINT_DLL int fmpq_mpoly_equal_ui(const fmpq_mpoly_t poly, ulong        c,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpq_mpoly_equal_si(const fmpq_mpoly_t poly, slong        c,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpq_mpoly_is_fmpq(fmpq_t x, const fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 /* Basic arithmetic **********************************************************/

@@ -146,58 +146,6 @@ void fmpz_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t poly, slong var,
     Set \code{deg} to the degree of \code{poly} with respect to the variable
     of index \code{var}. If \code{poly} is zero, set \code{deg} to \code{-1}.
 
-
-int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly,
-                                           ulong c, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if the given \code{fmpz_mpoly_t} is equal to the constant
-    polynomial represented by the unsigned integer $c$, else return 0.
-
-int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly,
-                                           slong c, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if the given \code{fmpz_mpoly_t} is equal to the constant
-    polynomial represented by the signed integer $c$, else return 0.
-
-int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
-                                          fmpz_t c, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if the given \code{fmpz_mpoly_t} is equal to the constant
-    polynomial represented by the multiprecision integer $c$, else return 0.
-
-void fmpz_mpoly_swap(fmpz_mpoly_t poly1, 
-                                 fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Efficiently swap the contents of the two given polynomials. No copying is
-    performed; the swap is accomplished by swapping pointers.
-
-void fmpz_mpoly_zero(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Set the given \code{fmpz_mpoly_t} to the zero polynomial.
-
-void fmpz_mpoly_one(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Set the given \code{fmpz_mpoly_t} to the constant polynomial with value 1.
-
-int fmpz_mpoly_is_zero(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if the given \code{fmpz_mpoly_t} is equal to the zero polynomial,
-    else return 0.
-
-int fmpz_mpoly_is_one(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if the given \code{fmpz_mpoly_t} is equal to the constant
-    polynomial with coefficient 1, else return 0.
-
-int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
-                                           slong i, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if the given \code{fmpz_mpoly_t} is equal to the $i$-th generator
-    of the polynomial ring, otherwise return 0. The generator corresponding to
-    the variable with the most significance corresponds to $i = 0$. If
-    $i < 0$ the function returns 1 if the polynomial is equal to any generator
-    of the polynomial ring, otherwise it returns 0.
-
 void fmpz_mpoly_set_term_fmpz_ui(fmpz_mpoly_t poly,
                        const fmpz_t c, ulong const * exp, fmpz_mpoly_ctx_t ctx)
 
@@ -472,26 +420,11 @@ void fmpz_mpoly_set(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     
     Set \code{poly1} to \code{poly2}.
 
-void fmpz_mpoly_zero(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_swap(fmpz_mpoly_t poly1, 
+                                 fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 
-    Set \code{poly} to the constant 0.
-
-void fmpz_mpoly_one(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Set \code{poly} to the constant 1.
-
-void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
-                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
-
-    Set \code{poly} to the constant $c$.
-
-void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set \code{poly} to the constant $c$.
-
-void fmpz_mpoly_set_si(fmpz_mpoly_t poly, slong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set \code{poly} to the constant $c$.
+    Efficiently swap the contents of the two given polynomials. No copying is
+    performed; the swap is accomplished by swapping pointers.
 
 void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 
@@ -506,21 +439,82 @@ void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
 *******************************************************************************
 
-    Comparison
+    Constants
 
 *******************************************************************************
 
-int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
-                   const fmpz * poly2, const ulong * exps2, slong len, slong N)
+int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
-    Return 1 if \code{(poly1, exps1, len)} is equal to
-    \code{(poly2, exps2, len)}, else return 0. Assumes the exponent vectors
-    each take $N$ words.
+    Return 1 if \code{poly} is a constant, else return 0.
+
+void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
+                                                   const fmpz_mpoly_ctx_t ctx)
+
+    Assuming that \code{poly} is a constant, set $c$ to this constant.
+    This function throws if \code{poly} is not a constant.
+
+void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
+                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant $c$.
+
+void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant $c$.
+
+void fmpz_mpoly_set_si(fmpz_mpoly_t poly, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant $c$.
+
+void fmpz_mpoly_zero(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant 0.
+
+void fmpz_mpoly_one(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant 1.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
 
 int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 
     Return 1 if \code{poly1} is equal to \code{poly2}, else return 0.
+
+int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
+                                          fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly} is equal to the constant $c$, else return 0.
+
+int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly,
+                                          ulong  c, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly} is equal to the constant $c$, else return 0.
+
+int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly,
+                                          slong  c, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly} is equal to the constant $c$, else return 0.
+
+int fmpz_mpoly_is_zero(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly} is equal to the constant 0, else return 0.
+
+int fmpz_mpoly_is_one(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly} is equal to the constant 1, else return 0.
+
+
+int fmpz_mpoly_is_gen(const fmpq_mpoly_t poly,
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
+
+    If $i \ge 0$, return 1 if \code{poly} is equal to the $i$-th generator,
+    otherwise return 0. If $i < 0$, return 1 if the polynomial is
+    equal to any generator, otherwise return 0.
 
 *******************************************************************************
 
@@ -528,66 +522,40 @@ int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
 *******************************************************************************
 
+void fmpz_mpoly_add_fmpz(fmpz_mpoly_t poly1,
+                const fmpz_mpoly_t poly2, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus $c$.
+
 void fmpz_mpoly_add_ui(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
 
-    Set \code{poly1} to \code{poly2} plus the constant polynomial given by the
-    unsigned integer $c$.
+    Set \code{poly1} to \code{poly2} plus $c$.
 
 void fmpz_mpoly_add_si(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
 
-    Set \code{poly1} to \code{poly2} plus the constant polynomial given by the
-    signed integer $c$.
-
-void fmpz_mpoly_add_fmpz(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
-
-    Set \code{poly1} to \code{poly2} plus the constant polynomial given by the
-    multiprecision integer $c$.
-
-void fmpz_mpoly_sub_ui(fmpz_mpoly_t poly1,
-                 const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set \code{poly1} to \code{poly2} minus the constant polynomial given by the
-    unsigned integer $c$.
-
-void fmpz_mpoly_sub_si(fmpz_mpoly_t poly1,
-                 const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set \code{poly1} to \code{poly2} minus the constant polynomial given by the
-    signed integer $c$.
+    Set \code{poly1} to \code{poly2} plus $c$.
 
 void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t poly1,
                 const fmpz_mpoly_t poly2, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 
-    Set \code{poly1} to \code{poly2} minus the constant polynomial given by the
-    multiprecision integer $c$.
+    Set \code{poly1} to \code{poly2} minus $c$.
 
-slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1,
-                  const fmpz * poly2, const ulong * exps2, slong len2,
-                  const fmpz * poly3, const ulong * exps3, slong len3, slong N)
+void fmpz_mpoly_sub_ui(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
 
-    Set \code{(poly1, exps1)} to \code{(poly2, exps2, len2)} plus
-    \code{(poly3, exps3, len3)}, assuming exponent vectors are each $N$ words.
-    The output \code{(poly1, exps1)} is assumed to have space for
-    \code{len2 + len3} terms, but the actual number of terms used is returned.
-    No aliasing is allowed.
+    Set \code{poly1} to \code{poly2} minus $c$.
+
+void fmpz_mpoly_sub_si(fmpz_mpoly_t poly1,
+                 const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} minus $c$.
 
 void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
     Set \code{poly1} to \code{poly2} plus \code{poly3}.
-
-slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
-                  const fmpz * poly2, const ulong * exps2, slong len2,
-                  const fmpz * poly3, const ulong * exps3, slong len3, slong N)
-
-    Set \code{(poly1, exps1)} to \code{(poly2, exps2, len2)} minus
-    \code{(poly3, exps3, len3)}, assuming exponent vectors are each $N$ words.
-    The output \code{(poly1, exps1)} is assumed to have space for
-    \code{len2 + len3} terms, but the actual number of terms used is returned.
-    No aliasing is allowed.
 
 void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)

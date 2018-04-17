@@ -54,7 +54,8 @@ main(void)
 
         result = result && fmpq_mpoly_equal_si(f, WORD(0), ctx);
 
-        result = result && fmpq_mpoly_is_fmpq(r, f, ctx);
+        result = result && fmpq_mpoly_is_fmpq(f, ctx);
+                           fmpq_mpoly_get_fmpq(r, f, ctx);
         result = result && fmpq_is_zero(r);
 
         result = result && !fmpq_mpoly_is_gen(f, WORD(0), ctx);
@@ -85,7 +86,8 @@ main(void)
 
         result = result && fmpq_mpoly_equal_si(f, WORD(1), ctx);
 
-        result = result && fmpq_mpoly_is_fmpq(r, f, ctx);
+        result = result && fmpq_mpoly_is_fmpq(f, ctx);
+                           fmpq_mpoly_get_fmpq(r, f, ctx);
         result = result && fmpq_is_one(r);
 
         fmpq_mpoly_get_coeff_monomial(r, f, f, ctx);
@@ -119,7 +121,8 @@ main(void)
 
         result = result && !fmpq_mpoly_equal_si(f, WORD(2), ctx);
 
-        result = result && fmpq_mpoly_is_fmpq(r, f, ctx);
+        result = result && fmpq_mpoly_is_fmpq(f, ctx);
+                           fmpq_mpoly_get_fmpq(r, f, ctx);
         result = result && fmpq_equal(r, q);
 
         result = result && !fmpq_mpoly_is_gen(f, WORD(0), ctx);
@@ -150,7 +153,7 @@ main(void)
 
         result = result && !fmpq_mpoly_equal_si(f, WORD(1), ctx);
 
-        result = result && !fmpq_mpoly_is_fmpq(r, f, ctx);
+        result = result && !fmpq_mpoly_is_fmpq(f, ctx);
 
         result = result && fmpq_mpoly_is_gen(f, WORD(0), ctx);
 

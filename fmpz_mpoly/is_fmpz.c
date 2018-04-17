@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2016 William Hart
     Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
@@ -9,20 +10,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpz_mpoly.h"
 
-int fmpq_mpoly_is_fmpq(fmpq_t x, const fmpq_mpoly_t poly,
-                                                   const fmpq_mpoly_ctx_t ctx)
+int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 {
-    if (fmpq_mpoly_is_zero(poly, ctx)) {
-        fmpq_zero(x);
-        return 1;
-    } else if (fmpz_mpoly_is_one(poly->zpoly, ctx->zctx))
-    {
-        fmpq_set(x, poly->content);
-        return 1;
-    } else
-    {
+    slong N;
+
+    if (poly->length > WORD(1))
         return 0;
-    }
+
+    if (poly->length == WORD(0))
+        return 1;
+
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    return mpoly_monomial_is_zero(poly->exps + N*0, N);
 }

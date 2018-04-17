@@ -116,12 +116,6 @@ void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t poly, slong var,
     of index \code{var}. If \code{poly} is zero, set \code{deg} to \code{-1}.
 
 
-void fmpq_mpoly_swap(fmpq_mpoly_t poly1, 
-                                 fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
-
-    Efficiently swap the contents of the two given polynomials. No copying is
-    performed; the swap is accomplished by swapping pointers.
-
 void fmpq_mpoly_set_term_fmpq_ui(fmpq_mpoly_t poly,
                        const fmpq_t c, ulong const * exp, fmpq_mpoly_ctx_t ctx)
 
@@ -273,7 +267,7 @@ void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly,
 
 *******************************************************************************
 
-    Set and negate
+    Set/Negate
 
 *******************************************************************************
 
@@ -282,18 +276,11 @@ void fmpq_mpoly_set(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
     
     Set \code{poly1} to \code{poly2}.
 
-void fmpq_mpoly_zero(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_swap(fmpq_mpoly_t poly1, 
+                                 fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
 
-    Set \code{poly} to the constant 0.
-
-void fmpq_mpoly_one(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Set \code{poly} to the constant 1.
-
-void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly,
-                                    const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
-
-    Set \code{poly} to the constant $c$.
+    Efficiently swap the contents of the two given polynomials. No copying is
+    performed; the swap is accomplished by swapping pointers.
 
 void fmpq_mpoly_gen(fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
 
@@ -305,6 +292,51 @@ void fmpq_mpoly_neg(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
                                                     const fmpq_mpoly_ctx_t ctx)
     
     Set \code{poly1} to $-$\code{poly2}.
+
+
+*******************************************************************************
+
+    Constants
+
+*******************************************************************************
+
+int fmpq_mpoly_is_fmpq(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly} is a constant, else return 0.
+
+void fmpq_mpoly_get_fmpq(fmpq_t c, const fmpq_mpoly_t poly,
+                                                   const fmpq_mpoly_ctx_t ctx)
+
+    Assuming that \code{poly} is a constant, set $c$ to this constant.
+    This function throws if \code{poly} is not a constant.
+
+void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly,
+                                   const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+
+    Set \code{poly} to the constant $c$.
+
+void fmpq_mpoly_set_fmpz(fmpq_mpoly_t poly,
+                                   const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+
+    Set \code{poly} to the constant $c$.
+
+void fmpq_mpoly_set_ui(fmpq_mpoly_t poly,
+                                          ulong c, const fmpq_mpoly_ctx_t ctx);
+
+    Set \code{poly} to the constant $c$.
+
+void fmpq_mpoly_set_si(fmpq_mpoly_t poly,
+                                          slong c, const fmpq_mpoly_ctx_t ctx);
+
+    Set \code{poly} to the constant $c$.
+
+void fmpq_mpoly_zero(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant 0.
+
+void fmpq_mpoly_one(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{poly} to the constant 1.
 
 *******************************************************************************
 
@@ -337,11 +369,6 @@ int fmpq_mpoly_equal_si(const fmpq_mpoly_t poly,
 
     Return 1 if \code{poly} is equal to the constant $c$, else return 0.
 
-int fmpq_mpoly_is_fmpq(fmpq_t x, fmpq_mpoly_t poly1, const fmpq_mpoly_ctx_t ctx)
-
-    If \code{poly1} is a constant, set $x$ to that constant and return 1.
-    Otherwise, return 0.
-
 int fmpq_mpoly_is_zero(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 
     Return 1 if \code{poly} is equal to the constant 0, else return 0.
@@ -349,6 +376,7 @@ int fmpq_mpoly_is_zero(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 int fmpq_mpoly_is_one(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 
     Return 1 if \code{poly} is equal to the constant 1, else return 0.
+
 
 int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
