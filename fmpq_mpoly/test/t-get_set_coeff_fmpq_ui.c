@@ -39,7 +39,6 @@ main(void)
         fmpq_mpoly_init(f, ctx);
 
         len = n_randint(state, 100);
-
         coeff_bits = n_randint(state, 200);
         exp_bits = n_randint(state, 200) + 2;
 
@@ -53,9 +52,9 @@ main(void)
             for (k = 0; k < ctx->zctx->minfo->nvars; k++)
                 exp[k] = n_randtest(state);
 
-            fmpq_mpoly_set_term_fmpq_ui(f, c, exp, ctx);
+            fmpq_mpoly_set_coeff_fmpq_ui(f, c, exp, ctx);
             fmpq_mpoly_assert_canonical(f, ctx);
-            fmpq_mpoly_get_term_fmpq_ui(d, f, exp, ctx);
+            fmpq_mpoly_get_coeff_fmpq_ui(d, f, exp, ctx);
             result = fmpq_equal(c, d);
 
             if (!result)

@@ -9,12 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpq_mpoly.h"
+#include "fmpz_mpoly.h"
 
-void fmpq_mpoly_get_term_fmpq_ui(fmpq_t c, const fmpq_mpoly_t poly,
-                                 const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+
+void fmpz_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mpoly_t poly,
+                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, nvars = ctx->zctx->minfo->nvars;
+    slong i, nvars = ctx->minfo->nvars;
     fmpz * newexp;
     TMP_INIT;
 
@@ -23,7 +24,7 @@ void fmpq_mpoly_get_term_fmpq_ui(fmpq_t c, const fmpq_mpoly_t poly,
     for (i = 0; i < nvars; i++)
         fmpz_init_set_ui(newexp + i, exp[i]);
 
-    _fmpq_mpoly_get_term_fmpq_fmpz(c, poly, newexp, ctx);
+    _fmpz_mpoly_get_coeff_fmpz_fmpz(c, poly, newexp, ctx);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(newexp + i);

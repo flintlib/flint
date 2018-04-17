@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,13 +12,16 @@
 #include "fmpz_mpoly.h"
 
 
-void fmpz_mpoly_set_term_si_fmpz(fmpz_mpoly_t poly,
-                 const slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+ulong fmpz_mpoly_get_coeff_ui_fmpz(const fmpz_mpoly_t poly,
+                                fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_t newc;
+    ulong ret;
 
     fmpz_init(newc);
-    fmpz_set_si(newc, c);
-    fmpz_mpoly_set_term_fmpz_fmpz(poly, newc, exp, ctx);
+    fmpz_mpoly_get_coeff_fmpz_fmpz(newc, poly, exp, ctx);
+
+    ret = fmpz_get_ui(newc);
     fmpz_clear(newc);
+    return ret;
 }

@@ -12,13 +12,16 @@
 #include "fmpz_mpoly.h"
 
 
-void fmpz_mpoly_set_term_ui_fmpz(fmpz_mpoly_t poly,
-                const ulong c, fmpz * const *  exp, const fmpz_mpoly_ctx_t ctx)
+ulong fmpz_mpoly_get_coeff_ui_ui(const fmpz_mpoly_t poly,
+                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_t newc;
+    ulong ret;
 
     fmpz_init(newc);
-    fmpz_set_ui(newc, c);
-    fmpz_mpoly_set_term_fmpz_fmpz(poly, newc, exp, ctx);
+    fmpz_mpoly_get_coeff_fmpz_ui(newc, poly, exp, ctx);
+
+    ret = fmpz_get_ui(newc);
     fmpz_clear(newc);
+    return ret;
 }

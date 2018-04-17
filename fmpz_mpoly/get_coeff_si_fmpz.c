@@ -12,14 +12,14 @@
 #include "fmpz_mpoly.h"
 
 
-slong fmpz_mpoly_get_term_si_fmpz(const fmpz_mpoly_t poly,
+slong fmpz_mpoly_get_coeff_si_fmpz(const fmpz_mpoly_t poly,
                                 fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_t newc;
     slong ret;
 
     fmpz_init(newc);
-    fmpz_mpoly_get_term_fmpz_fmpz(newc, poly, exp, ctx);
+    fmpz_mpoly_get_coeff_fmpz_fmpz(newc, poly, exp, ctx);
 
     ret = fmpz_get_si(newc);
     fmpz_clear(newc);

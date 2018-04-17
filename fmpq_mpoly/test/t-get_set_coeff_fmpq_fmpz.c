@@ -56,9 +56,9 @@ main(void)
                 fmpz_randtest_unsigned(exp + k, state, 200);
             }
 
-            _fmpq_mpoly_set_term_fmpq_fmpz(f, c, exp, ctx);
+            _fmpq_mpoly_set_coeff_fmpq_fmpz(f, c, exp, ctx);
             fmpq_mpoly_assert_canonical(f, ctx);
-            _fmpq_mpoly_get_term_fmpq_fmpz(d, f, exp, ctx);
+            _fmpq_mpoly_get_coeff_fmpq_fmpz(d, f, exp, ctx);
             result = fmpq_equal(c, d);
 
             if (!result)

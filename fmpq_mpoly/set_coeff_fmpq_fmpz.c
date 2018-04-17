@@ -9,17 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpq_mpoly.h"
 
-
-void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
-                  const fmpz_t c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx)
+void _fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t qpoly,
+                  const fmpq_t c, const fmpz * exp, const fmpq_mpoly_ctx_t qctx)
 {
     mp_bitcnt_t exp_bits;
     slong i, N, index;
     ulong * cmpmask;
     ulong * packed_exp;
     int exists;
+    fmpz_mpoly_struct * poly = qpoly->zpoly;
+    const fmpz_mpoly_ctx_struct * ctx = qctx->zctx;
     TMP_INIT;
 
     TMP_START;
@@ -40,23 +41,38 @@ void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
 
     if (!exists)
     {
-        if (!fmpz_is_zero(c)) /* make new term only if coeff is nonzero*/
-        {       
-
+        if (!fmpq_is_zero(c)) /* make new term only if coeff is nonzero*/
+        {
             fmpz_mpoly_fit_length(poly, poly->length + 1, ctx);
-
-            for (i = poly->length; i >= index + 1; i--)
+            if (poly->length > 0)
             {
-                fmpz_set(poly->coeffs + i, poly->coeffs + i - 1);
-                mpoly_monomial_set(poly->exps + N*i, poly->exps + N*(i - 1), N);
+                fmpz_t prod;
+                fmpz_init(prod);
+
+                fmpz_mul(prod, fmpq_numref(qpoly->content), fmpq_denref(c));
+                fmpz_mpoly_scalar_mul_fmpz(poly, poly, prod, ctx);
+
+                for (i = poly->length; i >= index + 1; i--)
+                {
+                    fmpz_set(poly->coeffs + i, poly->coeffs + i - 1);
+                    mpoly_monomial_set(poly->exps + N*i, poly->exps + N*(i - 1), N);
+                }
+                fmpz_mul(poly->coeffs + index, fmpq_denref(qpoly->content), fmpq_numref(c));
+
+                fmpq_div_fmpz(qpoly->content, qpoly->content, prod);
+                fmpz_clear(prod);
+
+            } else
+            {
+                index = 0;
+                fmpz_one(poly->coeffs + index);
+                fmpq_set(qpoly->content, c);
             }
 
-            fmpz_set(poly->coeffs + index, c);
             mpoly_monomial_set(poly->exps + N*index, packed_exp, N);
-
             poly->length++; /* safe because length is increasing */
         }
-    } else if (fmpz_is_zero(c)) /* zero coeff, remove term */
+    } else if (fmpq_is_zero(c)) /* zero coeff, remove term */
     {
         for (i = index; i < poly->length - 1; i++)
         {
@@ -68,17 +84,27 @@ void _fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
 
     } else /* term with that monomial exists, coeff is nonzero */
     {
-        fmpz_set(poly->coeffs + index, c);  
+        fmpz_t prod;
+        fmpz_init(prod);
+
+        fmpz_mul(prod, fmpq_numref(qpoly->content), fmpq_denref(c));
+        fmpz_mpoly_scalar_mul_fmpz(poly, poly, prod, ctx);
+
+        fmpz_mul(poly->coeffs + index, fmpq_denref(qpoly->content), fmpq_numref(c));
+        fmpq_div_fmpz(qpoly->content, qpoly->content, prod);
+        fmpz_clear(prod);
     }
 
-   TMP_END; 
+    fmpq_mpoly_canonicalise(qpoly, qctx);
+
+    TMP_END; 
 }
 
 
-void fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
-                const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+void fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t poly,
+                const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 {
-    slong i, nvars = ctx->minfo->nvars;
+    slong i, nvars = ctx->zctx->minfo->nvars;
     fmpz * newexp;
     TMP_INIT;
 
@@ -90,7 +116,7 @@ void fmpz_mpoly_set_term_fmpz_fmpz(fmpz_mpoly_t poly,
         fmpz_set(newexp + i, exp[i]);
     }
 
-    _fmpz_mpoly_set_term_fmpz_fmpz(poly, c, newexp, ctx);
+    _fmpq_mpoly_set_coeff_fmpq_fmpz(poly, c, newexp, ctx);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(newexp + i);

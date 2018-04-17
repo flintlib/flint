@@ -27,7 +27,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        mp_bitcnt_t coeff_bits, exp_bits, exp_bits2;
         slong len;
         fmpz_t c, d;
 
@@ -35,13 +35,12 @@ main(void)
         fmpz_init(d);
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
-
         fmpz_mpoly_init(f, ctx);
 
         len = n_randint(state, 100);
-
         coeff_bits = n_randint(state, 200);
         exp_bits = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
 
         fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
@@ -50,15 +49,15 @@ main(void)
             fmpz * exp = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
 
             fmpz_randtest_unsigned(c, state, 200);
-            for (k = 0; k < ctx->minfo->nvars; k++)
+            for (k = 0; k < fmpz_mpoly_ctx_nvars(ctx); k++)
             {
                 fmpz_init(exp + k);
-                fmpz_randtest_unsigned(exp + k, state, 200);
+                fmpz_randtest_unsigned(exp + k, state, exp_bits2);
             }
 
-            _fmpz_mpoly_set_term_fmpz_fmpz(f, c, exp, ctx);
+            _fmpz_mpoly_set_coeff_fmpz_fmpz(f, c, exp, ctx);
             fmpz_mpoly_assert_canonical(f, ctx);
-            _fmpz_mpoly_get_term_fmpz_fmpz(d, f, exp, ctx);
+            _fmpz_mpoly_get_coeff_fmpz_fmpz(d, f, exp, ctx);
             result = fmpz_equal(c, d);
 
             if (!result)
@@ -68,7 +67,7 @@ main(void)
                 flint_abort();
             }
 
-            for (k = 0; k < ctx->minfo->nvars; k++)
+            for (k = 0; k < fmpz_mpoly_ctx_nvars(ctx); k++)
                 fmpz_clear(exp + k);
 
             flint_free(exp);
@@ -93,11 +92,9 @@ main(void)
         fmpz_init(d);
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
-
         fmpz_mpoly_init(f, ctx);
 
         len = n_randint(state, 100);
-
         coeff_bits = n_randint(state, 200);
         exp_bits = n_randint(state, 200) + 2;
 
@@ -108,12 +105,12 @@ main(void)
             ulong * exp = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
 
             fmpz_randtest_unsigned(c, state, 200);
-            for (k = 0; k < ctx->minfo->nvars; k++)
+            for (k = 0; k < fmpz_mpoly_ctx_nvars(ctx); k++)
                 exp[k] = n_randtest(state);
 
-            fmpz_mpoly_set_term_fmpz_ui(f, c, exp, ctx);
+            fmpz_mpoly_set_coeff_fmpz_ui(f, c, exp, ctx);
             fmpz_mpoly_assert_canonical(f, ctx);
-            fmpz_mpoly_get_term_fmpz_ui(d, f, exp, ctx);
+            fmpz_mpoly_get_coeff_fmpz_ui(d, f, exp, ctx);
             result = fmpz_equal(c, d);
 
             if (!result)

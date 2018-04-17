@@ -9,21 +9,23 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpq_mpoly.h"
 
-void _fmpz_mpoly_get_term_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
-                                  const fmpz * exp, const fmpz_mpoly_ctx_t ctx)
+void _fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t qpoly,
+                                  const fmpz * exp, const fmpq_mpoly_ctx_t qctx)
 {
     slong N, index, exp_bits;
     ulong * cmpmask, * packed_exp;
     int exists;
+    const fmpz_mpoly_struct * poly = qpoly->zpoly;
+    const fmpz_mpoly_ctx_struct * ctx = qctx->zctx;
     TMP_INIT;
 
     exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
 
     if (exp_bits > poly->bits) /* exponent too large to be poly exponent */
     {
-        fmpz_zero(c);
+        fmpq_zero(c);
         return;
     }
 
@@ -41,17 +43,20 @@ void _fmpz_mpoly_get_term_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
                                   packed_exp, poly->length, N, cmpmask);
 
     if (!exists)
-        fmpz_zero(c);
-    else
-        fmpz_set(c, poly->coeffs + index);
+    {
+        fmpq_zero(c);
+    } else
+    {
+        fmpq_mul_fmpz(c, qpoly->content, poly->coeffs + index);
+    }
 
     TMP_END; 
 }
 
-void fmpz_mpoly_get_term_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
-                                fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
+                                fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 {
-    slong i, nvars = ctx->minfo->nvars;
+    slong i, nvars = ctx->zctx->minfo->nvars;
     fmpz * newexp;
     TMP_INIT;
 
@@ -63,7 +68,7 @@ void fmpz_mpoly_get_term_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
         fmpz_set(newexp + i, exp[i]);
     }
 
-    _fmpz_mpoly_get_term_fmpz_fmpz(c, poly, newexp, ctx);
+    _fmpq_mpoly_get_coeff_fmpq_fmpz(c, poly, newexp, ctx);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(newexp + i);

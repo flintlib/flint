@@ -67,7 +67,7 @@ main(void)
 
             /* add it to f1 */
             fmpq_mpoly_zero(m, ctx);
-            fmpq_mpoly_set_term_fmpq_fmpz(m, c, exp, ctx);
+            fmpq_mpoly_set_coeff_fmpq_fmpz(m, c, exp, ctx);
             fmpq_mpoly_add(f1, f1, m, ctx);
             fmpq_mpoly_assert_canonical(f1, ctx);
 

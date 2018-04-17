@@ -60,7 +60,7 @@ main(void)
 
             /* add it to f1 */
             fmpz_mpoly_zero(m, ctx);
-            fmpz_mpoly_set_term_fmpz_ui(m, c, exp, ctx);
+            fmpz_mpoly_set_coeff_fmpz_ui(m, c, exp, ctx);
             fmpz_mpoly_add(f1, f1, m, ctx);
 
             /* push it back on f2 */

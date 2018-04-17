@@ -90,7 +90,7 @@ main(void)
                            fmpq_mpoly_get_fmpq(r, f, ctx);
         result = result && fmpq_is_one(r);
 
-        fmpq_mpoly_get_coeff_monomial(r, f, f, ctx);
+        fmpq_mpoly_get_coeff_fmpq_monomial(r, f, f, ctx);
         result = result && fmpq_is_one(r);
 
         result = result && !fmpq_mpoly_is_gen(f, WORD(0), ctx);
@@ -191,10 +191,10 @@ main(void)
 
         result = result && (fmpq_mpoly_length(f, ctx) == WORD(1));
 
-        fmpq_mpoly_get_coeff_monomial(r, f, g, ctx);
+        fmpq_mpoly_get_coeff_fmpq_monomial(r, f, g, ctx);
         result = result && fmpq_equal(r, q);
 
-        fmpq_mpoly_get_coeff_monomial(r, f, h, ctx);
+        fmpq_mpoly_get_coeff_fmpq_monomial(r, f, h, ctx);
         result = result && fmpq_is_zero(r);
 
         if (!result)
@@ -227,16 +227,16 @@ main(void)
 
         result = result && (fmpq_mpoly_length(f, ctx) != WORD(1));
 
-        fmpq_mpoly_get_coeff_monomial(r, f, g, ctx);
+        fmpq_mpoly_get_coeff_fmpq_monomial(r, f, g, ctx);
         fmpq_set_si(q, WORD(2), WORD(3));
         result = result && fmpq_equal(r, q);
 
-        fmpq_mpoly_get_coeff_monomial(r, f, h, ctx);
+        fmpq_mpoly_get_coeff_fmpq_monomial(r, f, h, ctx);
         fmpq_set_si(q, WORD(3), WORD(5));
         result = result && fmpq_equal(r, q);
 
         result = result && fmpq_mpoly_divides(g, h, g, ctx);
-        fmpq_mpoly_get_coeff_monomial(r, f, g, ctx);
+        fmpq_mpoly_get_coeff_fmpq_monomial(r, f, g, ctx);
         result = result && fmpq_is_zero(r);
 
         if (!result)
@@ -246,6 +246,39 @@ main(void)
             flint_abort();
         }
 
+        result = 1;
+
+        fmpq_mpoly_set_str_pretty(f, "0", vars, ctx);
+
+        fmpq_mpoly_set_str_pretty(g, "2*x^2", vars, ctx);
+        fmpq_set_si(q, WORD(2), WORD(3));
+        fmpq_mpoly_set_coeff_fmpq_monomial(f, q, g, ctx);
+
+        fmpq_mpoly_set_str_pretty(g, "2*y^3", vars, ctx);
+        fmpq_set_si(q, WORD(3), WORD(5));
+        fmpq_mpoly_set_coeff_fmpq_monomial(f, q, g, ctx);
+
+        fmpq_mpoly_set_str_pretty(g, "2*z", vars, ctx);
+        fmpq_set_si(q, WORD(7), WORD(1));
+        fmpq_mpoly_set_coeff_fmpq_monomial(f, q, g, ctx);
+
+        fmpq_mpoly_set_str_pretty(g, "2*y^3", vars, ctx);
+        fmpq_set_si(q, -WORD(3), WORD(5));
+        fmpq_mpoly_set_coeff_fmpq_monomial(f, q, g, ctx);
+
+        fmpq_mpoly_set_str_pretty(g, "-2", vars, ctx);
+        fmpq_set_si(q, -WORD(6), WORD(11));
+        fmpq_mpoly_set_coeff_fmpq_monomial(f, q, g, ctx);
+
+        fmpq_mpoly_set_str_pretty(h, "2/3*x^2 - 3/5*y^3 + 7*z - 6/11", vars, ctx);
+
+        result = fmpq_mpoly_equal(f, h, ctx);
+        if (!result)
+        {
+            printf("FAIL\n");
+            flint_printf("test 7\n");
+            flint_abort();
+        }
 
         fmpz_clear(b);
         fmpz_clear(a);

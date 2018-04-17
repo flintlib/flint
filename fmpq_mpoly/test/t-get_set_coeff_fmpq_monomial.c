@@ -20,7 +20,7 @@ main(void)
     slong i, j, k;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get_coeff_monomial....");
+    flint_printf("get_set_coeff_fmpq_monomial....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -29,8 +29,8 @@ main(void)
         fmpq_mpoly_t f, m;
         fmpz ** exp;
         fmpq_t cm, ce, q;
-        slong len;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1;
+        slong nvars, len;
+        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 20);
         fmpq_mpoly_init(f, ctx);
@@ -40,27 +40,30 @@ main(void)
         fmpq_init(q);
         fmpq_one(q); /* anything nonzero is ok */
 
+        nvars = fmpq_mpoly_ctx_nvars(ctx);
+
         len = n_randint(state, 100);
         exp_bits = n_randint(state, FLINT_BITS + 10) + 1;
-        exp_bits1 = n_randint(state, 200) + 1;
+        exp_bits1 = n_randint(state, 200);
+        exp_bits2 = n_randint(state, 200);
         coeff_bits = n_randint(state, 200);
         fmpq_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
         /* check a random monomial - this also randomizes m->bits */
         exp = (fmpz **) flint_malloc(ctx->zctx->minfo->nvars*sizeof(fmpz *));
-        for (k = 0; k < ctx->zctx->minfo->nvars; k++)
+        for (k = 0; k < nvars; k++)
         {
             exp[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
             fmpz_init(exp[k]);
             fmpz_randtest_unsigned(exp[k], state, exp_bits1);
         }
         fmpq_mpoly_zero(m, ctx);
-        fmpq_mpoly_set_term_fmpq_fmpz(m, q, exp, ctx);
-        fmpq_mpoly_get_coeff_monomial(cm, f, m, ctx);
-        fmpq_mpoly_get_term_fmpq_fmpz(ce, f, exp, ctx);
+        fmpq_mpoly_set_coeff_fmpq_fmpz(m, q, exp, ctx);
+        fmpq_mpoly_get_coeff_fmpq_monomial(cm, f, m, ctx);
+        fmpq_mpoly_get_coeff_fmpq_fmpz(ce, f, exp, ctx);
         if (!fmpq_equal(cm, ce))
         {
-            flint_printf("FAIL\ni = %wd\n", i);
+            flint_printf("FAIL\ncheck a random monomial\ni = %wd\n", i);
             flint_abort();
         }
 
@@ -70,12 +73,33 @@ main(void)
             fmpq_mpoly_get_termexp_fmpz(exp, f, j, ctx);
 
             fmpq_mpoly_zero(m, ctx);
-            fmpq_mpoly_set_term_fmpq_fmpz(m, q, exp, ctx);
-            fmpq_mpoly_get_coeff_monomial(cm, f, m, ctx);
-            fmpq_mpoly_get_term_fmpq_fmpz(ce, f, exp, ctx);
+            fmpq_mpoly_set_coeff_fmpq_fmpz(m, q, exp, ctx);
+            fmpq_mpoly_get_coeff_fmpq_monomial(cm, f, m, ctx);
+            fmpq_mpoly_get_coeff_fmpq_fmpz(ce, f, exp, ctx);
             if (!fmpq_equal(cm, ce))
             {
-                flint_printf("FAIL\ni = %wd, j = %wd\n", i, j);
+                flint_printf("FAIL\ncheck all monomials in f\ni = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
+        }
+
+        /* set random coeff and check */
+        for (j = 0; j < 10; j++)
+        {
+            for (k = 0; k < nvars; k++)
+            {
+                fmpz_randtest_unsigned(exp[k], state, exp_bits2);
+            }
+
+            fmpq_randtest(cm, state, coeff_bits + 1);
+
+            fmpq_mpoly_zero(m, ctx);
+            fmpq_mpoly_set_coeff_fmpq_fmpz(m, q, exp, ctx);
+            fmpq_mpoly_set_coeff_fmpq_monomial(f, cm, m, ctx);
+            fmpq_mpoly_get_coeff_fmpq_monomial(ce, f, m, ctx);
+            if (!fmpq_equal(cm, ce))
+            {
+                flint_printf("FAIL\nset random coeff and check\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
         }
