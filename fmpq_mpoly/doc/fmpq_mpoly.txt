@@ -33,6 +33,10 @@ void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx,
     variables and the given ordering. The possibilities for the ordering are
     \code{ORD_LEX}, \code{ORD_DEGLEX} and \code{ORD_DEGREVLEX}.
 
+slong fmpq_mpoly_ctx_nvars(fmpq_mpoly_ctx_t ctx)
+
+    Return the number of variables used to initialize the context.
+
 void fmpq_mpoly_ctx_clear(fmpq_mpoly_ctx_t ctx)
 
     Release up any space allocated by an \code{fmpq_mpoly_ctx_t}.

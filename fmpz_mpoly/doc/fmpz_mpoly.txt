@@ -23,6 +23,10 @@ void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx,
     \code{ORD_LEX}, \code{ORD_REVLEX}, \code{ORD_DEGLEX} and
     \code{ORD_DEGREVLEX}.
 
+slong fmpz_mpoly_ctx_nvars(fmpz_mpoly_ctx_t ctx)
+
+    Return the number of variables used to initialize the context.
+
 void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx)
 
     Release up any space allocated by an \code{fmpz_mpoly_ctx_t}.
