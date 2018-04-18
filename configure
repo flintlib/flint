@@ -150,7 +150,7 @@ while [ "$1" != "" ]; do
          BUILD="$VALUE"
          ;;
       --prefix)
-         PREFIX=$VALUE
+         PREFIX=$(absolute_path "$VALUE")
          ;;
       --enable-shared)
          SHARED=1
@@ -473,6 +473,7 @@ if [ -z "$FLINT_LIB" ]; then
       Darwin)
          FLINT_LIBNAME="libflint.dylib"
          FLINT_LIB="libflint-$FLINT_MAJOR.dylib"
+         EXTRA_SHARED_FLAGS="-install_name `pwd`/$FLINT_LIB"
          EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -compatibility_version $FLINT_MAJOR.$FLINT_MINOR"
          EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -current_version $FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH"
          ;;
@@ -757,6 +758,7 @@ echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "FLINT_LIB=$FLINT_LIB" >> Makefile
 echo "FLINT_LIBNAME=$FLINT_LIBNAME" >> Makefile
+echo "OS=$OS" >> Makefile
 echo "FLINT_SOLIB=$FLINT_SOLIB" >> Makefile
 echo "FLINT_MAJOR=$FLINT_MAJOR" >> Makefile
 echo "EXEEXT=$EXEEXT" >> Makefile

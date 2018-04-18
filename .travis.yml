@@ -20,10 +20,12 @@ compiler:
 
 install:
   - ./.build_dependencies
-  - ./configure --with-mpir=mpir-2.7.2 --with-mpfr=mpfr-4.0.0
+  - ./configure --with-mpir=local --with-mpfr=local --prefix=local
   - ${MAKE} QUIET_CC=
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L libflint.dylib; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ldd libflint.so; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make install; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L local/lib/libflint.dylib; fi
 
 script:
   - ${MAKE} check QUIET_CC=
