@@ -46,14 +46,13 @@ void fmpq_mpoly_ctx_clear(fmpq_mpoly_ctx_t ctx)
 void fmpq_mpoly_init(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 
     Initialise \code{poly} for use, given an initialised context object.
-    By default, fields of 8
-    bits are allocated for the exponents in each exponent vector.
+    Its value is set to 0.
 
 void fmpq_mpoly_init2(fmpq_mpoly_t poly, slong alloc, 
                                                     const fmpq_mpoly_ctx_t ctx)
 
     Initialise \code{poly} for use, with space for at least
-    \code{alloc} terms, given an initialised context.
+    \code{alloc} terms, given an initialised context. Its value is set to 0.
 
 void fmpq_mpoly_realloc(fmpq_mpoly_t poly, slong len, 
                                                     const fmpq_mpoly_ctx_t ctx)
@@ -69,15 +68,15 @@ void fmpq_mpoly_fit_length(fmpq_mpoly_t poly, slong len,
     \code{len} terms. No truncation is performed if \code{len} is less than
     the currently allocated number of terms; the allocated space can only grow.
 
-void fmpq_mpoly_clear(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Release any space allocated in \code{poly}.
-
 void fmpq_mpoly_fit_bits(fmpq_mpoly_t poly,
                                          slong bits, const fmpq_mpoly_ctx_t ctx)
 
     Reallocate the polynomial to have space for exponent fields of the given
     number of bits. This function can increase the number of bits only.
+
+void fmpq_mpoly_clear(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+
+    Release any space allocated an \code{fmpq_mpoly_t}.
 
 *******************************************************************************
 
@@ -157,6 +156,34 @@ void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t poly,
 
 *******************************************************************************
 
+    Internal operations
+
+*******************************************************************************
+
+    An \code{fmpq_mpoly_t poly} is an \code{fmpz_mpoly_t zpoly} together with
+    an \code{fmpq_t content} representing any content.
+    In order to be in canonical form, either \code{zpoly} and \code{content}
+    must both be zero, or \code{zcode} must be a polynomial with content 1
+    and positive leading term. In either the case the representation
+    \code{poly = content * zpoly} holds.
+
+void fmpq_mpoly_canonicalise(fmpq_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Factor out content from the internal \code{fmpz_mpoly_t}. If this
+    \code{fmpz_mpoly_t} was in canonical form, the resulting \code{poly}
+    will be. This function expects the internal \code{fmpz_mpoly_t} to be
+    in canonical form. If this is not the case, the container operations
+    of \code{fmpq_mpoly_sort} and \code{fmpq_mpoly_combine_like_terms} may
+    be useful. All operations other than the container operations 
+    produce canonical output and expect their inputs to be canonical.
+
+void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Throw if \code{poly} is not canonical form.
+
+*******************************************************************************
+
     Container operations
 
 *******************************************************************************
@@ -164,7 +191,7 @@ void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t poly,
     Some of these functions deal with violations of the internal canonical
     representation. A call to \code{fmpq_mpoly_sort} followed by a call to
     \code{fmpq_mpoly_combine_like_terms} should leave a polynomial in
-    canonical form. The \code{pushterm} functions runs in constant
+    canonical form. The \code{pushterm} functions run in constant
     average time if the terms pushed have bounded denominators,
     and a term is appened even if the specified coefficient is zero.
 
@@ -264,17 +291,18 @@ void fmpq_mpoly_pushterm_si_ui(fmpz_mpoly_t poly,
 
 void fmpq_mpoly_sort(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 
-    Sort the terms of \code{poly} into the canonical ordering dictated by
-    the ordering in \code{ctx}. This function does not combine like terms,
-    nor does it delete terms with coefficient zero.
-    Even if all terms have distinct exponent vectors, the
-    result may still not be in canonical form.
+    Sort the internal \code{fmpz_mpoly_t} into the canonical ordering
+    dictated by the ordering in \code{ctx}. This function does not combine
+    like terms, nor does it delete terms with coefficient zero.
+    Even if all terms have distinct exponents, the result may still not be
+    in canonical form, because content may not be factored out.
 
 void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly,
                                                     const fmpz_mpoly_ctx_t ctx)
 
-    Combine adjacent like terms in \code{poly}. If the terms of \code{poly}
-    were sorted to begin with, the result will be in canonical form.
+    Combine adjacent like terms in the internal \code{fmpz_poly} and then
+    factor out content via \code{fmpq_mpoly_canonicalise}. If the terms of
+    \code{poly} were sorted to begin with, the result will be in canonical form.
 
 *******************************************************************************
 

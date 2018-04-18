@@ -36,21 +36,15 @@ void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx)
 void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
     Initialise an \code{fmpz_mpoly_t} for use, given an initialised context
-    object.
+    object. Its value is set to 0.
+    By default 8 bits are allocated for the exponent widths.
 
 void fmpz_mpoly_init2(fmpz_mpoly_t poly, slong alloc, 
                                                     const fmpz_mpoly_ctx_t ctx)
 
     Initialise an \code{fmpz_mpoly_t} for use, with space for at least
-    \code{alloc} terms, given an initialised context. By default, fields of 8
-    bits are allocated for the exponents in each exponent vector.
-
-void _fmpz_mpoly_realloc(fmpz ** poly, ulong ** exps,
-                                             slong * alloc, slong len, slong N)
-
-    Reallocate a low level \code{fmpz_mpoly} to the given length, assuming
-    exponent vectors each consist of $N$ words. Assumes the current length of
-    the polynomial is not greater than \code{len}.
+    \code{alloc} terms, given an initialised context. Its value is set to 0.
+    By default 8 bits are allocated for the exponent widths.
 
 void fmpz_mpoly_realloc(fmpz_mpoly_t poly, slong len, 
                                                     const fmpz_mpoly_ctx_t ctx)
@@ -74,10 +68,6 @@ void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len,
     \code{len} terms. No truncation is performed if \code{len} is less than
     the currently allocated number of terms; the allocated space can only grow.
 
-void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Release any space allocated for an \code{fmpz_mpoly_t}.
-
 void _fmpz_mpoly_set_length(fmpz_mpoly_t poly, slong newlen, 
                                                     const fmpz_mpoly_ctx_t ctx)
 
@@ -96,6 +86,10 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
 
     Reallocate the polynomial to have space for exponent fields of the given
     number of bits. This function can increase the number of bits only.
+
+void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+
+    Release any space allocated for an \code{fmpz_mpoly_t}.
 
 *******************************************************************************
 
@@ -212,6 +206,19 @@ void fmpz_mpoly_set_coeff_si_ui(fmpz_mpoly_t poly,
                         slong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
 
     Set the coefficient of the monomial with exponent vector \code{exp} to $c$.
+
+*******************************************************************************
+
+    Internal operations
+
+*******************************************************************************
+
+void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t poly,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Throw if \code{poly} is not canonical form. To be in canonical form,
+    all of the terms must have nonzero coefficient with valid exponents, and
+    the terms must be sorted from greatest to least.
 
 *******************************************************************************
 
@@ -337,8 +344,9 @@ void fmpz_mpoly_sort(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t poly,
                                                    const fmpz_mpoly_ctx_t ctx)
 
-    Combine adjacent like terms in \code{poly}. If the terms of \code{poly}
-    were sorted to begin with, the result will be in canonical form.
+    Combine adjacent like terms in \code{poly} and delete terms with
+    coefficient zero. If the terms of \code{poly} were sorted to begin with,
+    the result will be in canonical form.
 
 void fmpz_mpoly_reverse(fmpz_mpoly_t poly1,
                                 fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
