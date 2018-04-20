@@ -595,7 +595,7 @@ void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t poly1,
           const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 
     Set \code{poly1} to \code{poly2} divided by the multiprecision integer $c$.
-     The division is assumed to be exact.
+    The division is assumed to be exact.
 
 *******************************************************************************
 
@@ -607,11 +607,11 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1,
        slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
                    const fmpz * poly3, const ulong * exp3, slong len3, slong N)
 
-   Set \code{(poly1, exp1, alloc)} to \code{(poly2, exps2, len2)} times
-   \code{(poly3, exps3, len3)} using Johnson's heap method (see papers by
-   Michael Monagan and Roman Pearce). The function realocates its output, hence
-   the double indirection, and returns the length of the product. The function
-   assumes the exponent vectors take N words. No aliasing is allowed.
+    Set \code{(poly1, exp1, alloc)} to \code{(poly2, exps2, len2)} times
+    \code{(poly3, exps3, len3)} using Johnson's heap method (see papers by
+    Michael Monagan and Roman Pearce). The function realocates its output, hence
+    the double indirection, and returns the length of the product. The function
+    assumes the exponent vectors take N words. No aliasing is allowed.
 
 void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
@@ -632,15 +632,15 @@ slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1,
                          const fmpz * poly3, const ulong * exp3, slong len3, 
                                           slong * mults, slong num, slong bits)
 
-   Set \code{(poly1, exp1, alloc)} to \code{(poly2, exps2, len2)} times
-   \code{(poly3, exps3, len3)} by accumulating coefficients in a big, dense
-   array. The function realocates its output, hence the double indirection, and
-   returns the length of the product. The array \code{mults} is a list of bases
-   to be used in encoding the array indices from the exponents. They should
-   exceed the maximum exponent for each field of the exponent vectors of the
-   output. The output exponent vectors will be packed with fields of the given
-   number of bits. The number of variables is given by \code{num}$. No aliasing
-   is allowed.
+    Set \code{(poly1, exp1, alloc)} to \code{(poly2, exps2, len2)} times
+    \code{(poly3, exps3, len3)} by accumulating coefficients in a big, dense
+    array. The function realocates its output, hence the double indirection, and
+    returns the length of the product. The array \code{mults} is a list of bases
+    to be used in encoding the array indices from the exponents. They should
+    exceed the maximum exponent for each field of the exponent vectors of the
+    output. The output exponent vectors will be packed with fields of the given
+    number of bits. The number of variables is given by \code{num}. No aliasing
+    is allowed.
 
 int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, 
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
@@ -884,7 +884,7 @@ void fmpz_mpoly_derivative(fmpz_mpoly_t poly1,
 void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
                const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
 
-    Set \code{poly1} and \code{scale} so that \{poly1} is an integral of
+    Set \code{poly1} and \code{scale} so that \code{poly1} is an integral of
     \code{poly2*scale} with respect to the variable of index \code{idx},
     where \code{scale} is positive and as small as possible. This function
     throws an exception upon exponent overflow.
@@ -959,7 +959,7 @@ int fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-    Initialize \{poly}.
+    Initialize \code{poly}.
 
 void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t poly,
                                                    const fmpz_mpoly_ctx_t ctx);
