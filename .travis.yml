@@ -19,14 +19,15 @@ compiler:
   - clang
 
 install:
+  - export LOCAL=$(pwd)/local
   - ./.build_dependencies
-  - ./configure --with-mpir=local --with-mpfr=local --prefix=local
-  - ${MAKE} QUIET_CC=
+  - ./configure --with-mpir=${LOCAL} --with-mpfr=${LOCAL} --prefix=${LOCAL}
+  - ${MAKE}
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L libflint.dylib; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ldd libflint.so; fi
 
 script:
-  - ${MAKE} check QUIET_CC=
-  - make install
+  - ${MAKE} check
+  - ${MAKE} install
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L local/lib/libflint.dylib; fi
   - PREFIX=$(pwd)/local ./.check_post_install
