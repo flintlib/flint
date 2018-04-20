@@ -519,11 +519,6 @@ FLINT_DLL void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1,
 
 /* Multiplication ************************************************************/
 
-FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1,
-        slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-                const fmpz * poly3, const ulong * exp3, slong len3, mp_bitcnt_t bits, slong N,
-                                                        const ulong * cmpmask);
-
 FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -532,12 +527,11 @@ FLINT_DLL void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1,
-          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, 
-                         const fmpz * poly3, const ulong * exp3, slong len3, 
-                                         slong * mults, slong num, slong bits);
-
 FLINT_DLL int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, 
+                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t poly1,
                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
@@ -795,23 +789,23 @@ FLINT_DLL void fmpz_mpoly_randtest_bits(fmpz_mpoly_t poly, flint_rand_t state,
 
 ******************************************************************************/
 
-/* Internal packing and conversion */
+/* Helpers for array methods *************************************************/
 
-FLINT_DLL slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1,
-                         ulong ** exp1, slong * alloc, ulong * poly2,
-                          const slong * mults, slong num, slong bits, slong k);
+FLINT_DLL void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1, 
+                 const slong * poly2, const ulong * exp2, slong len2,
+                          const slong * poly3, const ulong * exp3, slong len3);
 
-FLINT_DLL slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1,
-                         ulong ** exp1, slong * alloc, ulong * poly2, 
-                          const slong * mults, slong num, slong bits, slong k);
+FLINT_DLL void _fmpz_mpoly_addmul_array1_slong(ulong * poly1, 
+                 const slong * poly2, const ulong * exp2, slong len2,
+                          const slong * poly3, const ulong * exp3, slong len3);
 
-FLINT_DLL slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1,
-                         ulong ** exp1, slong * alloc, ulong * poly2,
-                          const slong * mults, slong num, slong bits, slong k);
+FLINT_DLL void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1, 
+                 const slong * poly2, const ulong * exp2, slong len2,
+                          const slong * poly3, const ulong * exp3, slong len3);
 
-FLINT_DLL slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1,
-                         ulong ** exp1, slong * alloc, fmpz * poly2,
-                          const slong * mults, slong num, slong bits, slong k);
+FLINT_DLL void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1, 
+                 const fmpz * poly2, const ulong * exp2, slong len2,
+                           const fmpz * poly3, const ulong * exp3, slong len3);
 
 FLINT_DLL void _fmpz_mpoly_submul_array1_slong(ulong * poly1, 
                   const slong * poly2, const ulong * exp2, slong len2,
@@ -841,6 +835,61 @@ FLINT_DLL void _fmpz_mpoly_submul_array1_fmpz_1(fmpz * poly1,
                           const fmpz_t d, ulong exp2,
                            const fmpz * poly3, const ulong * exp3, slong len3);
 
+FLINT_DLL void mpoly_main_variable_split_LEX(slong * ind, ulong * pexp,
+             const ulong * Aexp,
+             slong l1, slong Alen, const ulong * mults, slong num, slong Abits);
+
+FLINT_DLL void mpoly_main_variable_split_DEG(slong * ind, ulong * pexp,
+             const ulong * Aexp,
+             slong l1, slong Alen, ulong deg, slong num, slong Abits);
+
+FLINT_DLL slong fmpz_mpoly_append_array_sm1_LEX(fmpz_mpoly_t P,
+                        slong Plen, ulong * coeff_array,
+                  const ulong * mults, slong num, slong array_size, slong top);
+FLINT_DLL slong fmpz_mpoly_append_array_sm2_LEX(fmpz_mpoly_t P,
+                        slong Plen, ulong * coeff_array,
+                  const ulong * mults, slong num, slong array_size, slong top);
+FLINT_DLL slong fmpz_mpoly_append_array_sm3_LEX(fmpz_mpoly_t P,
+                         slong Plen, ulong * coeff_array,
+                  const ulong * mults, slong num, slong array_size, slong top);
+FLINT_DLL slong fmpz_mpoly_append_array_fmpz_LEX(fmpz_mpoly_t P,
+                        slong Plen, fmpz * coeff_array,
+                  const ulong * mults, slong num, slong array_size, slong top);
+
+FLINT_DLL slong fmpz_mpoly_append_array_sm1_DEGLEX(fmpz_mpoly_t P,
+          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+FLINT_DLL slong fmpz_mpoly_append_array_sm2_DEGLEX(fmpz_mpoly_t P,
+          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+FLINT_DLL slong fmpz_mpoly_append_array_sm3_DEGLEX(fmpz_mpoly_t P,
+          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+FLINT_DLL slong fmpz_mpoly_append_array_fmpz_DEGLEX(fmpz_mpoly_t P,
+           slong Plen, fmpz * coeff_array, slong top, slong nvars, slong degb);
+
+FLINT_DLL slong fmpz_mpoly_append_array_sm1_DEGREVLEX(fmpz_mpoly_t P,
+          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+FLINT_DLL slong fmpz_mpoly_append_array_sm2_DEGREVLEX(fmpz_mpoly_t P,
+          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+FLINT_DLL slong fmpz_mpoly_append_array_sm3_DEGREVLEX(fmpz_mpoly_t P,
+          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+FLINT_DLL slong fmpz_mpoly_append_array_fmpz_DEGREVLEX(fmpz_mpoly_t P,
+           slong Plen, fmpz * coeff_array, slong top, slong nvars, slong degb);
+
+FLINT_DLL slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1,
+                         ulong ** exp1, slong * alloc, ulong * poly2,
+                          const slong * mults, slong num, slong bits, slong k);
+
+FLINT_DLL slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1,
+                         ulong ** exp1, slong * alloc, ulong * poly2, 
+                          const slong * mults, slong num, slong bits, slong k);
+
+FLINT_DLL slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1,
+                         ulong ** exp1, slong * alloc, ulong * poly2,
+                          const slong * mults, slong num, slong bits, slong k);
+
+FLINT_DLL slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1,
+                         ulong ** exp1, slong * alloc, fmpz * poly2,
+                          const slong * mults, slong num, slong bits, slong k);
+
 FLINT_DLL void _fmpz_mpoly_to_ulong_array2(ulong * p, const fmpz * coeffs,
                                                 const ulong * exps, slong len);
 
@@ -853,8 +902,8 @@ FLINT_DLL void _fmpz_mpoly_to_ulong_array(ulong * p, const fmpz * coeffs,
 FLINT_DLL void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
                                                 const ulong * exps, slong len);
 
-FLINT_DLL void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
-                          const fmpz * poly1, slong * i1, slong * n1, slong i);
+
+/* Misc arithmetic - has nothing to do with mpoly, should be moved out *******/
 
 FMPZ_MPOLY_INLINE
 void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d)

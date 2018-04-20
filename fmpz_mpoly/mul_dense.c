@@ -148,6 +148,7 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
     Alen = 0;
     fmpz_mpoly_zero(A, ctx);
     fmpz_mpoly_fit_bits(A, bits, ctx);
+    A->bits = bits;
 
     /* find exponent vector for least significant variable */
     plastexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));

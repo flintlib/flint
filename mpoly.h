@@ -36,17 +36,6 @@
 #endif
 
 
-/* MISSING FXNS ************************************************************/
-
-FLINT_DLL void fmpz_get_ui_array(ulong * out, slong out_len, const fmpz_t in);
-
-FLINT_DLL void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len);
-
-FLINT_DLL void _fmpz_vec_max(fmpz * vec1, const fmpz * vec2, const fmpz * vec3,
-                                                                     slong len);
-FLINT_DLL void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len);
-
-
 #define MPOLY_MIN_BITS 8    /* minimum number of bits to pack into */
 
 typedef enum {

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -14,10 +15,12 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
+#include "assert.h"
 
 /* improve locality */
 #define BLOCK 128
 #define MAX_ARRAY_SIZE (WORD(300000))
+#define MAX_LEX_SIZE (WORD(300))
 
 /*
    Addmul into a dense array poly1, given polys with coefficients
@@ -458,473 +461,310 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    return k;
 }
 
-/*
-   Compute two bounds for the i-th multivariate "coefficient" (chunk) of
-   the chunked polynomial. The first bound, stored at the i-th location
-   in the  array b1 is the number of bits of the sum of the absolute value
-   of the coefficients of the chunk. The second, stored in maxb1 is the
-   maximum absolute value of the coefficients in the chunk. The array i1
-   contains the starting indices of the chunks within the polynomial poly1,
-   and the array n1 contains the corresponding lengths. Thus the i-th chunk
-   starts at index i1[i] and has length n1[i].
-*/
-void _fmpz_mpoly_chunk_max_bits(slong * b1, slong * maxb1,
-                           const fmpz * poly1, slong * i1, slong * n1, slong i)
+
+
+
+/****************************************************
+    LEX
+****************************************************/
+
+
+void mpoly_main_variable_split_LEX(slong * ind, ulong * pexp, const ulong * Aexp,
+             slong l1, slong Alen, const ulong * mults, slong num, slong Abits)
 {
-   slong j;
-   ulong hi = 0, lo = 0;
+    slong i, j = 0, s = 0;
+    ulong e, mask = (-UWORD(1)) >> (FLINT_BITS - Abits);
 
-   maxb1[i] = 0;
+    for (i = 0; i < Alen; i++)
+    {
+        slong top = Aexp[i] >> (Abits*num);
+        while (s < l1 - top)
+            ind[s++] = i;
+        e = 0;
+        for (j = num - 1; j >= 0; j--) {
+            e = (e * mults[j]) +  ((Aexp[i] >> (j*Abits)) & mask);
+        }
+        pexp[i] = e;
+    }
 
-   /* for each coeff in the chunk */
-   for (j = 0; j < n1[i] && fmpz_fits_si(poly1 + i1[i] + j); j++)
-   {
-      slong c = fmpz_get_si(poly1 + i1[i] + j);
-      ulong uc = (ulong) FLINT_ABS(c);
+    while (s <= l1)
+        ind[s++] = Alen;
+}
 
-      /* compute max abs value of the coeff */
-      if (FLINT_BIT_COUNT(uc) > maxb1[i])
-         maxb1[i] = FLINT_BIT_COUNT(uc);
 
-      /* sum the absolute values of the coeffs */
-      add_ssaaaa(hi, lo, hi, lo, UWORD(0), uc);
-   }
-
-   if (j == n1[i]) /* no large coeffs encountered */
-   {
-      /* write out the number of bits */
-      if (hi != 0)
-         b1[i] = FLINT_BIT_COUNT(hi) + FLINT_BITS;
-      else
-         b1[i] = FLINT_BIT_COUNT(lo);
-   } else /* restart with multiprecision routine */
-   {
-      fmpz_t sum;
-
-      fmpz_init(sum);
-
-      for (j = 0; j < n1[i]; j++)
-      {
-         slong size;
-
-         if (fmpz_sgn(poly1 + i1[i] + j) < 0)
-            fmpz_sub(sum, sum, poly1 + i1[i] + j);
-         else
-            fmpz_add(sum, sum, poly1 + i1[i] + j);
-
-         size = fmpz_sizeinbase(poly1 + i1[i] + j, 2);
-
-         if (size > maxb1[i])
-            maxb1[i] = size;
-      }
-
-      b1[i] = fmpz_sizeinbase(sum, 2);
-
-      fmpz_clear(sum);
-   }
+#define LEX_UNPACK_MACRO(fxn_name, coeff_decl, nonzero_test, swapper)          \
+slong fxn_name(fmpz_mpoly_t P, slong Plen, coeff_decl,                         \
+           const ulong * mults, slong num, slong array_size, slong top)        \
+{                                                                              \
+    slong off, j;                                                              \
+    slong topmult = num == 0 ? 1 : mults[num - 1];                             \
+    slong lastd   = topmult - 1;                                               \
+    slong reset   = array_size/topmult;                                        \
+    slong counter = reset;                                                     \
+    ulong startexp = (top << (P->bits*num)) + (lastd << (P->bits*(num-1)));    \
+    for (off = array_size - 1; off >= 0; off--)                                \
+    {                                                                          \
+        if (nonzero_test)                                                      \
+        {                                                                      \
+            slong d = off;                                                     \
+            ulong exp = startexp;                                              \
+            for (j = 0; j + 1 < num; j++) {                                    \
+                exp += (d % mults[j]) << (P->bits*j);                          \
+                d = d / mults[j];                                              \
+            }                                                                  \
+            _fmpz_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc, Plen + 1, 1); \
+            P->exps[Plen] = exp;                                               \
+            swapper                                                            \
+            Plen++;                                                            \
+        }                                                                      \
+        counter--;                                                             \
+        if (counter <= 0) {                                                    \
+            counter = reset;                                                   \
+            lastd--;                                                           \
+            startexp -= UWORD(1) << (P->bits*(num-1));                         \
+        }                                                                      \
+    }                                                                          \
+    return Plen;                                                               \
 }
 
 /*
-   Use dense array multiplication to set poly1 to poly2*poly3 in num + 1
-   variables, given a list of multipliers to tightly pack exponents and a
-   number of bits for the fields of the exponents of the result, assuming
-   no aliasing. Classical multiplication in main variable, array
-   multiplication for multivariate coefficients in remaining num variables.
-   The array "mults" is a list of bases to be used in encoding the array
-   indices from the exponents. The function reallocates its output. 
+    These four functions will replace
+        _fmpz_mpoly_from_ulong_array, ..., _fmpz_mpoly_from_fmpz_array
+    defined above.
+
+    WARNING: In order for the coeff_array to be used interchangeably between
+    the small versions and fmpz version, it is necessary that zero is
+    represented as a real zero in the fmpz type.
 */
-slong _fmpz_mpoly_mul_array_chunked(fmpz ** poly1, ulong ** exp1,
-        slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-                       const fmpz * poly3, const ulong * exp3, slong len3, 
-                                          slong * mults, slong num, slong bits)
+
+LEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_sm1_LEX, ulong * coeff_array
+,
+    coeff_array[off] != WORD(0)
+,
+    fmpz_set_si(P->coeffs + Plen, coeff_array[off]);
+    coeff_array[off] = 0;
+)
+
+LEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_sm2_LEX, ulong * coeff_array
+,
+    (coeff_array[2*off+0] || coeff_array[2*off+1]) != WORD(0)
+,
+    fmpz_set_signed_uiui(P->coeffs + Plen, coeff_array[2*off+1], coeff_array[2*off+0]);
+    coeff_array[2*off+0] = coeff_array[2*off+1] = 0;
+)
+
+LEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_sm3_LEX, ulong * coeff_array
+,
+    (coeff_array[3*off+0] || coeff_array[3*off+1] || coeff_array[3*off+2]) != WORD(0)
+,
+    fmpz_set_signed_uiuiui(P->coeffs + Plen, coeff_array[3*off+2], coeff_array[3*off+1], coeff_array[3*off+0]);
+    coeff_array[3*off+0] = coeff_array[3*off+1] = coeff_array[3*off+2] = 0;
+)
+
+LEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_fmpz_LEX, fmpz * coeff_array
+,
+    !fmpz_is_zero(coeff_array + off)
+,
+    fmpz_swap(P->coeffs + Plen, coeff_array + off);
+    fmpz_zero(coeff_array + off);
+)
+
+
+
+void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
+                             const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
+                               const ulong * mults, const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, j, k = 0, len, l1, l2, l3, prod, bits1, bits2 = 0, bits3 = 0;
-   slong shift = bits*(num);
-   slong * i2, * i3, * n2, * n3, * b2, * maxb2, * b3, * maxb3;
-   ulong * e2, * e3, * p1;
-   int small;
-   TMP_INIT;
+    slong num = ctx->minfo->nfields - 1;
+    slong Pi, i, j, Plen, Pl, Al, Bl, array_size;
+    slong Abits, * Asum, * Amax, Bbits, * Bsum, * Bmax;
+    slong * Amain, * Bmain;
+    ulong * Apexp, * Bpexp;
+    int small;
+    TMP_INIT;
 
-   /*
-      compute products 1, b0, b0*b1, b0*b1*b2 ...
-      from list of bases b0, b1, b2, ...
-   */
-   prod = 1;
-   for (i = 0; i < num; i++)
-      prod *= mults[i];
+    array_size = 1;
+    for (i = 0; i < num; i++) {
+        array_size *= mults[i];
+    }
 
-   /* compute lengths of poly2 and poly3 in chunks */
-   l2 = 1 + (slong) (exp2[0] >> shift);
-   l3 = 1 + (slong) (exp3[0] >> shift);
+    /* compute lengths of poly2 and poly3 in chunks */
+    Al = 1 + (slong) (A->exps[0] >> (A->bits*num));
+    Bl = 1 + (slong) (B->exps[0] >> (B->bits*num));
 
-   TMP_START;
+    TMP_START;
 
-   /* compute indices and lengths of coefficients of polys in main variable */
+    /* compute indices and lengths of coefficients of polys in main variable */
+    Amain = (slong *) TMP_ALLOC((Al + 1)*sizeof(slong));
+    Bmain = (slong *) TMP_ALLOC((Bl + 1)*sizeof(slong));
+    Asum  = (slong *) TMP_ALLOC(Al*sizeof(slong));
+    Amax  = (slong *) TMP_ALLOC(Al*sizeof(slong));
+    Bsum  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
+    Bmax  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
+    Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
+    Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
+    mpoly_main_variable_split_LEX(Amain, Apexp, A->exps, Al, A->length, mults, num, A->bits);
+    mpoly_main_variable_split_LEX(Bmain, Bpexp, B->exps, Bl, B->length, mults, num, B->bits);
 
-   i2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
-   n2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
-   b2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
-   i3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
-   n3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
-   b3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
-   maxb2 = (slong *) TMP_ALLOC(l2*sizeof(slong));
-   maxb3 = (slong *) TMP_ALLOC(l3*sizeof(slong));
-   
-   /* compute chunks of the input polys with respect to the main variable */
-   mpoly_main_variable_terms1(i2, n2, exp2, l2, len2, num + 1, num + 1, bits);
-   mpoly_main_variable_terms1(i3, n3, exp3, l3, len3, num + 1, num + 1, bits);
+    /* work out bit counts for each chunk */
+    Abits = 0;
+    for (i = 0; i < Al; i++)
+    {
+        _fmpz_vec_sum_max_bits(&Asum[i], &Amax[i], A->coeffs + Amain[i], Amain[i + 1] - Amain[i]);
+        Abits = FLINT_MAX(Abits, Amax[i]);
+    }
 
-   /* pack input exponents tightly with mixed bases specified by "mults" */
-   e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
-   e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
+    Bbits = 0;
+    for (j = 0; j < Bl; j++)
+    {
+        _fmpz_vec_sum_max_bits(&Bsum[j], &Bmax[j], B->coeffs + Bmain[j], Bmain[j + 1] - Bmain[j]);
+        Bbits = FLINT_MAX(Bbits, Bmax[j]);
+    }
 
-   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, bits);
-   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, bits);
+    /* whether the output coefficients are "small" */
+    small = Abits <= (FLINT_BITS - 2) && Bbits <= (FLINT_BITS - 2);
 
-   /* work out max bits for each chunk and optimal bits */
+    Pl = Al + Bl - 1;
+    Plen = 0;
 
-   for (i = 0; i < l2; i++)
-   {
-      _fmpz_mpoly_chunk_max_bits(b2, maxb2, poly2, i2, n2, i);
+    if (small)
+    {
+        ulong * coeff_array = (ulong *) TMP_ALLOC(3*array_size*sizeof(ulong));
+        for (j = 0; j < 3*array_size; j++)
+            coeff_array[j] = 0;
 
-      if (bits2 < maxb2[i])
-         bits2 = maxb2[i];
-   }
-
-   for (i = 0; i < l3; i++)
-   {
-      _fmpz_mpoly_chunk_max_bits(b3, maxb3, poly3, i3, n3, i);
-
-      if (bits3 < maxb3[i])
-         bits3 = maxb3[i];
-   }
-
-   /* whether the output coefficients are "small" */
-   small = bits2 <= (FLINT_BITS - 2) &&
-           bits3 <= (FLINT_BITS - 2);
-
-   /* classical multiplication one output chunk at a time */
-
-   l1 = l2 + l3 - 1; /* length of output in chunks */
-
-   if (small)
-   {
-      p1 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
-
-      /* for each output chunk */
-      for (i = 0; i < l1; i++)
-      {
-         slong num1 = 0;
-         bits1 = 0;
-
-         /* compute bound on coeffs of output chunk */
-         
-         for (j = 0; j < l2 && j <= i; j++)
-         {
-            /* for each cross product of chunks */
-            if (i - j < l3)
+        /* for each output chunk */
+        for (Pi = 0; Pi < Pl; Pi++)
+        {
+            /* compute bound on coeffs of output chunk */
+            slong number = 0;
+            slong Pbits = 0;
+            for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
             {
-               bits1 = FLINT_MAX(bits1, FLINT_MIN(b2[j] +
-                           maxb3[i - j], maxb2[j] + b3[i - j]));
-               num1++;
+                if (j < Bl)
+                {
+                    Pbits = FLINT_MAX(Pbits,
+                              FLINT_MIN(Asum[i] + Bmax[j], Amax[i] + Bsum[j]));
+                    number++;
+                }
             }
-         }
+            Pbits += FLINT_BIT_COUNT(number) + 1; /* includes one bit for sign */
 
-         bits1 += FLINT_BIT_COUNT(num1) + 1; /* includes one bit for sign */
+            if (Pbits <= FLINT_BITS)
+            {
+                /* fits into one word */
+                for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
+                {
+                    if (j < Bl)
+                    {
+                        _fmpz_mpoly_addmul_array1_slong1(coeff_array, 
+                            (slong *) A->coeffs + Amain[i],
+                                Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                    }
+                }
 
-         /* output coeffs fit in one word */
-         if (bits1 <= FLINT_BITS)
-         {
-            for (j = 0; j < prod; j++)
-               p1[j] = 0;
+                Plen = fmpz_mpoly_append_array_sm1_LEX(P, Plen, coeff_array,
+                                          mults, num, array_size, Pl - Pi - 1);
 
+            } else if (Pbits <= 2*FLINT_BITS)
+            {
+                /* fits into two words */
+                for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
+                {
+                    if (j < Bl)
+                    {
+                        _fmpz_mpoly_addmul_array1_slong2(coeff_array, 
+                            (slong *) A->coeffs + Amain[i],
+                                    Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                    Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                    }
+                }
+
+                Plen = fmpz_mpoly_append_array_sm2_LEX(P, Plen, coeff_array,
+                                          mults, num, array_size, Pl - Pi - 1);
+
+            } else 
+            {
+                /* fits into three word */
+                for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
+                {
+                    if (j < Bl)
+                    {
+                        _fmpz_mpoly_addmul_array1_slong(coeff_array, 
+                            (slong *) A->coeffs + Amain[i],
+                                    Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                    Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                    }
+                }
+
+                Plen = fmpz_mpoly_append_array_sm3_LEX(P, Plen, coeff_array,
+                                          mults, num, array_size, Pl - Pi - 1);
+            }
+        }
+    } else
+    {
+
+        fmpz * coeff_array = (fmpz *) TMP_ALLOC(array_size*sizeof(fmpz));
+        for (j = 0; j < array_size; j++)
+            fmpz_init(coeff_array + j);
+
+        /* for each output chunk */
+        for (Pi = 0; Pi < Pl; Pi++)
+        {
             /* addmuls for each cross product of chunks */
-            for (j = 0; j < l2 && j <= i; j++)
+            for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
             {
-               if (i - j < l3)
-               {
-                  _fmpz_mpoly_addmul_array1_slong1(p1, 
-                     (slong *) poly2 + i2[j], e2 + i2[j], n2[j],
-                     (slong *) poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
-               }
+                if (j < Bl)
+                {
+                    _fmpz_mpoly_addmul_array1_fmpz(coeff_array, 
+                        A->coeffs + Amain[i],
+                            Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                        B->coeffs + Bmain[j],
+                            Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                }
             }
 
-            /* convert array to fmpz_poly */
-            len = _fmpz_mpoly_from_ulong_array1(poly1, exp1, alloc, 
-                                                      p1, mults, num, bits, k) - k;
+            Plen = fmpz_mpoly_append_array_fmpz_LEX(P, Plen, coeff_array,
+                                          mults, num, array_size, Pl - Pi - 1);
+        }
+    }
 
-            /* insert main variable into exponents */
-            for (j = 0; j < len; j++)
-               (*exp1)[k + j] += ((l1 - i - 1) << shift);
-
-            k += len;
-         } else if (bits1 <= 2*FLINT_BITS) /* output coeffs fit in two words */        
-         {
-            for (j = 0; j < 2*prod; j++)
-               p1[j] = 0;
-
-            /* addmuls for each cross product of chunks */
-            for (j = 0; j < l2 && j <= i; j++)
-            {
-               if (i - j < l3)
-               {
-                  _fmpz_mpoly_addmul_array1_slong2(p1, 
-                     (slong *) poly2 + i2[j], e2 + i2[j], n2[j],
-                     (slong *) poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
-
-               }
-            }
-
-            /* convert array to fmpz_poly */
-            len = _fmpz_mpoly_from_ulong_array2(poly1, exp1, alloc, 
-                                                      p1, mults, num, bits, k) - k;
-
-            /* insert main variable into exponents */
-            for (j = 0; j < len; j++)
-               (*exp1)[k + j] += ((l1 - i - 1) << shift);
-
-            k += len;
-         } else /* output coeffs fit in three words */
-         {
-            for (j = 0; j < 3*prod; j++)
-               p1[j] = 0;
-
-            /* addmuls for each cross product of chunks */
-            for (j = 0; j < l2 && j <= i; j++)
-            {
-               if (i - j < l3)
-               {
-                  _fmpz_mpoly_addmul_array1_slong(p1, 
-                     (slong *) poly2 + i2[j], e2 + i2[j], n2[j],
-                     (slong *) poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
-
-               }
-            }
-
-            /* convert array to fmpz_poly */
-            len = _fmpz_mpoly_from_ulong_array(poly1, exp1, alloc, 
-                                                      p1, mults, num, bits, k) - k;
-
-            /* insert main variable into exponents */
-            for (j = 0; j < len; j++)
-               (*exp1)[k + j] += ((l1 - i - 1) << shift);
-
-            k += len;
-         }
-      }
-   } else /* output coeffs may be arbitrary size */
-   {
-      fmpz * p1 = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
-     
-      /* for each output chunk */
-      for (i = 0; i < l1; i++)
-      {
-         for (j = 0; j < prod; j++)
-            p1[j] = 0;
-
-         /* addmuls for each cross product of chunks */
-         for (j = 0; j < l2 && j <= i; j++)
-         {
-            if (i - j < l3)
-            {
-               _fmpz_mpoly_addmul_array1_fmpz(p1, 
-                   poly2 + i2[j], e2 + i2[j], n2[j],
-                   poly3 + i3[i - j], e3 + i3[i - j], n3[i - j]);
-
-             }
-          }
-
-          /* convert array to fmpz_poly */
-          len = _fmpz_mpoly_from_fmpz_array(poly1, exp1, alloc, 
-                                                      p1, mults, num, bits, k) - k;
-
-          /* insert main variable into exponents */
-          for (j = 0; j < len; j++)
-             (*exp1)[k + j] += ((l1 - i - 1) << shift);
-
-          for (j = 0; j < prod; j++)
-             _fmpz_demote(p1 + j);
-
-          k += len;
-       }
-   }
-
-   TMP_END;
-
-   return k;
+    TMP_END;
+    _fmpz_mpoly_set_length(P, Plen, ctx);
 }
 
-/*
-   Use array multiplication to set poly1 to poly2*poly3 in num variables, given
-   a list of multipliers to tightly pack exponents and a number of bits for the
-   fields of the exponents of the result, assuming no aliasing. The array "mults"
-   is a list of bases to be used in encoding the array indices from the exponents.
-   The function reallocates its output.
-*/
-slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
-                         const fmpz * poly2, const ulong * exp2, slong len2, 
-                         const fmpz * poly3, const ulong * exp3, slong len3, 
-                                          slong * mults, slong num, slong bits)
-{
-   slong i, bits1, bits2, bits3;
-   ulong * e2, * e3;
-   slong prod, len;
-   int small;
-   ulong hi = 0, lo = 0; /* two words to count bits */
-   TMP_INIT;
 
-   /*
-      compute products 1, b0, b0*b1, b0*b1*b2 ...
-      from list of bases b0, b1, b2, ...
-   */
-   prod = 1;
-   for (i = 0; i < num; i++)
-      prod *= mults[i];
 
-   /* if array size will be too large, chunk the polynomials */
-   if (prod > MAX_ARRAY_SIZE)
-      return _fmpz_mpoly_mul_array_chunked(poly1, exp1, alloc,
-                   poly2, exp2, len2, poly3, exp3, len3, mults, num - 1, bits);
-
-   TMP_START;
-
-   /* pack input exponents tightly with mixed bases specified by "mults" */
-   
-   e2 = (ulong *) TMP_ALLOC(len2*sizeof(ulong));
-   e3 = (ulong *) TMP_ALLOC(len3*sizeof(ulong));
-
-   mpoly_pack_monomials_tight(e2, exp2, len2, mults, num, bits);
-   mpoly_pack_monomials_tight(e3, exp3, len3, mults, num, bits);
-
-   /* compute bound on output bits and whether they are "small" */
-   bits2 = _fmpz_vec_max_bits(poly2, len2);
-   bits3 = _fmpz_vec_max_bits(poly3, len3);
-
-   small = FLINT_ABS(bits2) <= (FLINT_BITS - 2) &&
-           FLINT_ABS(bits3) <= (FLINT_BITS - 2);
-
-   bits1 = -1; /* not used in large case */
-
-   /* if output coeffs are "small" */
-   if (small)
-   {
-      /* compute bound : sum of absolute value of coeffs of shorter poly */
-      if (len2 < len3)
-      {
-         for (i = 0; i < len2; i++)
-         {
-            slong b2 = fmpz_get_si(poly2 + i);
-
-            add_ssaaaa(hi, lo, hi, lo, UWORD(0), (ulong) FLINT_ABS(b2));
-         }
-
-         bits1 = FLINT_ABS(bits3) + 1; /* one bit for sign */
-      } else
-      {
-         for (i = 0; i < len3; i++)
-         {
-            slong b3 = fmpz_get_si(poly3 + i);
-
-            add_ssaaaa(hi, lo, hi, lo, UWORD(0), (ulong) FLINT_ABS(b3));
-         }
-
-         bits1 = FLINT_ABS(bits2) + 1; /* one bit for sign */
-      }
-
-      /* compute number of bits of sum of absolute values */
-      if (hi != 0)
-         bits1 += FLINT_BIT_COUNT(hi) + FLINT_BITS;
-      else
-         bits1 += FLINT_BIT_COUNT(lo);
-   } 
-
-   /* output coeffs fit in one word */
-   if (small && bits1 <= FLINT_BITS)
-   {
-      ulong * p1 = (ulong *) TMP_ALLOC(prod*sizeof(ulong));
-
-      for (i = 0; i < prod; i++)
-         p1[i] = 0;
-
-      /* array multiplication */
-      _fmpz_mpoly_addmul_array1_slong1(p1, 
-                         (slong *) poly2, e2, len2, (slong *) poly3, e3, len3);
-
-      /* convert to fmpz_poly */
-      len = _fmpz_mpoly_from_ulong_array1(poly1, exp1, alloc, 
-                                                      p1, mults, num, bits, 0);
-
-   } else if (small && bits1 <= 2*FLINT_BITS) /* output coeffs in two words */
-   {
-      ulong * p1 = (ulong *) TMP_ALLOC(2*prod*sizeof(ulong));
-
-      for (i = 0; i < 2*prod; i++)
-         p1[i] = 0;
-
-      /* array multiplication */
-      _fmpz_mpoly_addmul_array1_slong2(p1, 
-                         (slong *) poly2, e2, len2, (slong *) poly3, e3, len3);
-
-      /* convert to fmpz_poly */
-      len = _fmpz_mpoly_from_ulong_array2(poly1, exp1, alloc, 
-                                                      p1, mults, num, bits, 0);
-   } else if (small) /* three words per output coeff */
-   {
-      ulong * p1 = (ulong *) TMP_ALLOC(3*prod*sizeof(ulong));
-
-      for (i = 0; i < 3*prod; i++)
-         p1[i] = 0;
-
-      /* array multiplication */
-      _fmpz_mpoly_addmul_array1_slong(p1, 
-                         (slong *) poly2, e2, len2, (slong *) poly3, e3, len3);
-
-      /* convert to fmpz_poly */
-      len = _fmpz_mpoly_from_ulong_array(poly1, exp1, alloc, 
-                                                      p1, mults, num, bits, 0);      
-   } else /* multiprecision output coeffs */
-   {
-      fmpz * p1 = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
-
-      for (i = 0; i < prod; i++)
-         p1[i] = 0;
-
-      /* array multiplication */
-      _fmpz_mpoly_addmul_array1_fmpz(p1, poly2, e2, len2, poly3, e3, len3);
-
-      /* convert to fmpz_poly */
-      len = _fmpz_mpoly_from_fmpz_array(poly1, exp1, alloc, 
-                                                      p1, mults, num, bits, 0);
-
-      for (i = 0; i < prod; i++)
-         _fmpz_demote(p1 + i);
-   }
-  
-   TMP_END;
-
-   return len;
-}
-
-int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+int fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, bits, exp_bits, N, len = 0, array_size;
-   ulong max, max2, max3, * max_fields2, * max_fields3;
-   ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
-   int free2 = 0, free3 = 0;
-   int res = 1;
+    slong i, exp_bits, array_size;
+    ulong max, * max_fields2, * max_fields3;
+    int success = 1;
+    TMP_INIT;
 
-   TMP_INIT;
+    /* input poly is zero */
+    if (poly2->length == 0 || poly3->length == 0)
+    {
+        fmpz_mpoly_zero(poly1, ctx);
+        return 1;
+    }
+    /* lets only work with exponents packed into 1 word */
+    if (    1 != mpoly_words_per_exp(poly2->bits, ctx->minfo)
+         || 1 != mpoly_words_per_exp(poly3->bits, ctx->minfo))
+    {
+        return 0;
+    }
 
-   /* input poly is zero */
-   if (poly2->length == 0 || poly3->length == 0)
-   {
-      fmpz_mpoly_zero(poly1, ctx);
-
-      return 1;
-   }
-
-   TMP_START;
+    TMP_START;
 
     /* compute maximum exponents for each variable */
     max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
@@ -933,122 +773,622 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                       poly2->bits, ctx->minfo);
     mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
-    max2 = max3 = 0;
-    for (i = 0; i < ctx->minfo->nfields; i++)
-    {
-        if (max_fields2[i] > max2)
-            max2 = max_fields2[i];
 
-        if (max_fields3[i] > max3)
-            max3 = max_fields3[i];
+    /* the field of index n-1 is the one that wil be pulled out */
+    i = ctx->minfo->nfields - 1;
+    max_fields2[i] += max_fields3[i] + 1;
+    max = max_fields2[i];
+    if (((slong) max_fields2[i]) <= 0 || max_fields2[i] > MAX_LEX_SIZE)
+    {
+        success = 0;
+        goto cleanup;
     }
 
-   /* check that exponents won't overflow a word */
-   max = max2 + max3;
-   if (max < max2 || 0 > (slong) max)
-      flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_mul_array");
+    /* the fields of index n-2...0, contribute to the array size */
+    array_size = WORD(1);
+    for (i--; i >= 0; i--)
+    {
+        ulong hi;
+        max_fields2[i] += max_fields3[i] + 1;
+        max |= max_fields2[i];
+        umul_ppmm(hi, array_size, array_size, max_fields2[i]);
+        if (hi != WORD(0) || (array_size | (slong) max_fields2[i]) <= 0
+                          || array_size > MAX_ARRAY_SIZE)
+        {
+            success = 0;
+            goto cleanup;
+        }
+    }
 
-    /* compute number of bits required for output exponents */
-    bits = FLINT_BIT_COUNT(max);
-    exp_bits = FLINT_MAX(WORD(8), bits + 1);
-    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
-    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
+    exp_bits = FLINT_MAX(WORD(8), FLINT_BIT_COUNT(max) + 1);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-   N = mpoly_words_per_exp(exp_bits, ctx->minfo);
+    /* array multiplication assumes result fit into 1 word */
+    if (ctx->minfo->ord != ORD_LEX ||
+            1 != mpoly_words_per_exp(exp_bits, ctx->minfo))
+    {
+        success = 0;
+        goto cleanup;
+    }
 
-   /* array multiplication expects each exponent vector in one word */
-   /* current code is wrong for reversed orderings */
-   if (N != 1 || mpoly_ordering_isrev(ctx->minfo))
-   {
-      res = 0;
-      goto cleanup;
-   }
-
-   /* compute bounds on output exps, used as mixed bases for packing exps */
-   array_size = 1;
-   for (i = 0; i < ctx->minfo->nfields - 1; i++)
-   {
-      max_fields2[i] += max_fields3[i] + 1;
-      array_size *= max_fields2[i];
-   }
-   max_fields2[ctx->minfo->nfields - 1] += max_fields3[ctx->minfo->nfields - 1] + 1;
-
-   /* if exponents too large for array multiplication, exit silently */
-   if (array_size > MAX_ARRAY_SIZE)
-   {
-      res = 0;
-      goto cleanup;
-   }
-
-   /* expand input exponents to same number of bits as output */
-   if (exp_bits > poly2->bits)
-   {
-      free2 = 1;
-      exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-      mpoly_repack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
-                                                    poly2->length, ctx->minfo);
-   }
-
-   if (exp_bits > poly3->bits)
-   {
-      free3 = 1;
-      exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-      mpoly_repack_monomials(exp3, exp_bits, poly3->exps, poly3->bits,
-                                                    poly3->length, ctx->minfo);
-   }
-
-   /* handle aliasing and do array multiplication */
-   if (poly1 == poly2 || poly1 == poly3)
-   {
-      fmpz_mpoly_t temp;
-
-      fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
-      fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
-      temp->bits = exp_bits;
-
-      if (poly2->length >= poly3->length)
-         len = _fmpz_mpoly_mul_array(&temp->coeffs, &temp->exps, &temp->alloc, 
-                                           poly3->coeffs, exp3, poly3->length,
-                                           poly2->coeffs, exp2, poly2->length,
-                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
-      else
-         len = _fmpz_mpoly_mul_array(&temp->coeffs, &temp->exps, &temp->alloc, 
-                                           poly2->coeffs, exp2, poly2->length,
-                                           poly3->coeffs, exp3, poly3->length,
-                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
-
-      fmpz_mpoly_swap(temp, poly1, ctx);
-
-      fmpz_mpoly_clear(temp, ctx);
-   } else
-   {
-      fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
-      fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
-      poly1->bits = exp_bits;
-
-      if (poly2->length >= poly3->length)
-         len = _fmpz_mpoly_mul_array(&poly1->coeffs, &poly1->exps, &poly1->alloc,
-                                            poly3->coeffs, exp3, poly3->length,
-                                            poly2->coeffs, exp2, poly2->length,
-                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
-      else
-         len = _fmpz_mpoly_mul_array(&poly1->coeffs, &poly1->exps, &poly1->alloc,
-                                            poly2->coeffs, exp2, poly2->length, 
-                                            poly3->coeffs, exp3, poly3->length,
-                         (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
-   }
-
-   _fmpz_mpoly_set_length(poly1, len, ctx);
-
-   if (free2)
-      flint_free(exp2);
-
-   if (free3)
-      flint_free(exp3);
+    /* handle aliasing and do array multiplication */
+    success = 1;
+    if (poly1 == poly2 || poly1 == poly3)
+    {
+        fmpz_mpoly_t temp;
+        fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
+        fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
+        temp->bits = exp_bits;
+        _fmpz_mpoly_mul_array_chunked_LEX(temp, poly3, poly2, max_fields2, ctx);
+        fmpz_mpoly_swap(temp, poly1, ctx);
+        fmpz_mpoly_clear(temp, ctx);
+    } else
+    {
+        fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
+        fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
+        poly1->bits = exp_bits;
+        _fmpz_mpoly_mul_array_chunked_LEX(poly1, poly3, poly2, max_fields2, ctx);
+    }
 
 cleanup:
 
-   TMP_END;
+    TMP_END;
 
-   return res;
+    return success;
+}
+
+
+
+
+/****************************************************
+    DEGLEX and DEGREVLEX
+****************************************************/
+
+void mpoly_main_variable_split_DEG(slong * ind, ulong * pexp, const ulong * Aexp,
+             slong l1, slong Alen, ulong deg, slong num, slong Abits)
+{
+    slong i, j = 0, s = 0;
+    ulong e, mask = (-UWORD(1)) >> (FLINT_BITS - Abits);
+
+    for (i = 0; i < Alen; i++)
+    {
+        slong top = Aexp[i] >> (Abits*num);
+        while (s < l1 - top)
+            ind[s++] = i;
+        e = 0;
+        for (j = num - 1; j >= 1; j--)
+            e = (e * deg) + ((Aexp[i] >> (j*Abits)) & mask);
+        pexp[i] = e;
+    }
+
+    while (s <= l1)
+        ind[s++] = Alen;
+}
+
+
+
+#define DEGLEX_UNPACK_MACRO(fxn_name, coeff_decl, nonzero_test, swapper)       \
+slong fxn_name(fmpz_mpoly_t P, slong Plen, coeff_decl,                         \
+                                     slong top, slong nvars, slong degb)       \
+{                                                                              \
+    slong i;                                                                   \
+    ulong exp, lomask = (UWORD(1) << (P->bits - 1)) - 1;                       \
+    slong off, array_size;                                                     \
+    slong * curexp, * degpow;                                                  \
+    ulong * oneexp;                                                            \
+    int carry;                                                                 \
+    TMP_INIT;                                                                  \
+                                                                               \
+    TMP_START;                                                                 \
+    curexp = (slong *) TMP_ALLOC(nvars*sizeof(slong));                         \
+    degpow = (slong *) TMP_ALLOC(nvars*sizeof(slong));                         \
+    oneexp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));                         \
+    array_size = 1;                                                            \
+    curexp[0] = 0;                                                             \
+    oneexp[0] = 0;                                                             \
+    degpow[0] = 1;                                                             \
+    for (i = 0; i < nvars-1; i++)                                              \
+    {                                                                          \
+        curexp[i] = 0;                                                         \
+        degpow[i] = array_size;                                                \
+        oneexp[i] = (UWORD(1) << (P->bits*(i+1))) - UWORD(1);                  \
+        array_size *= degb;                                                    \
+    }                                                                          \
+    off = 0;                                                                   \
+    if (nvars > 1)                                                             \
+    {                                                                          \
+        curexp[nvars - 2] = top;                                               \
+        off = top * degpow[nvars - 2];                                         \
+    }                                                                          \
+    exp = (top << (P->bits*nvars)) + (top << (P->bits*(nvars-1)));             \
+                                                                               \
+    carry = 1;                                                                 \
+    do {                                                                       \
+        if (nonzero_test)                                                      \
+        {                                                                      \
+            _fmpz_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc, Plen + 1, 1); \
+            P->exps[Plen] = exp;                                               \
+            swapper                                                            \
+            Plen++;                                                            \
+        }                                                                      \
+                                                                               \
+        exp -= oneexp[0];                                                      \
+        off -= 1;                                                              \
+        curexp[0] -= 1;                                                        \
+        if (curexp[0] >= 0)                                                    \
+        {                                                                      \
+            carry = 0;                                                         \
+        } else                                                                 \
+        {                                                                      \
+            exp -= curexp[0]*oneexp[0];                                        \
+            off -= curexp[0];                                                  \
+            curexp[0] = 0;                                                     \
+            carry = 1;                                                         \
+                                                                               \
+            for (i = 1; i < nvars - 1; i++)                                    \
+            {                                                                  \
+                exp -= oneexp[i];                                              \
+                off -= degpow[i];                                              \
+                curexp[i] -= 1;                                                \
+                if (curexp[i] < 0)                                             \
+                {                                                              \
+                    exp -= curexp[i]*oneexp[i];                                \
+                    off -= curexp[i]*degpow[i];                                \
+                    curexp[i] = 0;                                             \
+                    carry = 1;                                                 \
+                } else                                                         \
+                {                                                              \
+                    ulong t = exp & lomask;                                    \
+                    off += t*degpow[i - 1];                                    \
+                    curexp[i - 1] = t;                                         \
+                    exp += t*oneexp[i - 1];                                    \
+                    carry = 0;                                                 \
+                    break;                                                     \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+    } while (!carry);                                                          \
+                                                                               \
+    TMP_END;                                                                   \
+                                                                               \
+    return Plen;                                                               \
+}
+
+DEGLEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_sm1_DEGLEX, ulong * coeff_array
+,
+    coeff_array[off] != WORD(0)
+,
+    fmpz_set_si(P->coeffs + Plen, coeff_array[off]);
+    coeff_array[off] = 0;
+)
+
+DEGLEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_sm2_DEGLEX, ulong * coeff_array
+,
+    (coeff_array[2*off + 0] || coeff_array[2*off + 1]) != WORD(0)
+,
+    fmpz_set_signed_uiui(P->coeffs + Plen, coeff_array[2*off + 1], coeff_array[2*off + 0]);
+    coeff_array[2*off + 0] = coeff_array[2*off + 1] = 0;
+)
+
+DEGLEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_sm3_DEGLEX, ulong * coeff_array
+,
+    (coeff_array[3*off + 0] || coeff_array[3*off + 1] || coeff_array[3*off + 2]) != WORD(0)
+,
+    fmpz_set_signed_uiuiui(P->coeffs + Plen, coeff_array[3*off + 2], coeff_array[3*off + 1], coeff_array[3*off + 0]);
+    coeff_array[3*off + 0] = coeff_array[3*off + 1] = coeff_array[3*off + 2] = 0;
+)
+
+DEGLEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_fmpz_DEGLEX, fmpz * coeff_array
+,
+    !fmpz_is_zero(coeff_array + off)
+,
+    fmpz_swap(P->coeffs + Plen, coeff_array + off);
+    fmpz_zero(coeff_array + off);
+)
+
+
+
+
+
+#define DEGREVLEX_UNPACK_MACRO(fxn_name, coeff_decl, nonzero_test, swapper)    \
+slong fxn_name(fmpz_mpoly_t P, slong Plen, coeff_decl,                         \
+                                     slong top, slong nvars, slong degb)       \
+{                                                                              \
+    slong i;                                                                   \
+    ulong exp, mask = UWORD(1) << (P->bits - 1);                               \
+    slong off, array_size;                                                     \
+    slong * curexp, * degpow;                                                  \
+    ulong * oneexp;                                                            \
+    int carry;                                                                 \
+    TMP_INIT;                                                                  \
+                                                                               \
+    TMP_START;                                                                 \
+    curexp = (slong *) TMP_ALLOC(nvars*sizeof(slong));                         \
+    degpow = (slong *) TMP_ALLOC(nvars*sizeof(slong));                         \
+    oneexp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));                         \
+    array_size = 1;                                                            \
+    oneexp[0] = 0;                                                             \
+    for (i = 0; i < nvars-1; i++) {                                            \
+        curexp[i] = 0;                                                         \
+        degpow[i] = array_size;                                                \
+        oneexp[i] = (UWORD(1) << (P->bits*(i+1))) - UWORD(1);                  \
+        array_size *= degb;                                                    \
+    }                                                                          \
+                                                                               \
+    off = 0;                                                                   \
+    exp = (top << (P->bits*nvars)) + top;                                      \
+                                                                               \
+    do {                                                                       \
+        if (nonzero_test)                                                      \
+        {                                                                      \
+            _fmpz_mpoly_fit_length(&P->coeffs, &P->exps, &P->alloc, Plen + 1, 1); \
+            P->exps[Plen] = exp;                                               \
+            swapper                                                            \
+            Plen++;                                                            \
+        }                                                                      \
+                                                                               \
+        exp += oneexp[0];                                                      \
+        off += 1;                                                              \
+        curexp[0] += 1;                                                        \
+        if ((exp & mask) == 0)                                                 \
+        {                                                                      \
+            carry = (nvars - 1 == 0);                                          \
+        } else                                                                 \
+        {                                                                      \
+            carry = 1;                                                         \
+            exp -= curexp[0]*oneexp[0];                                        \
+            off -= curexp[0];                                                  \
+            curexp[0] = 0;                                                     \
+            for (i = 1; i < nvars - 1; i++)                                    \
+            {                                                                  \
+                exp += oneexp[i];                                              \
+                off += degpow[i];                                              \
+                curexp[i] += 1;                                                \
+                if ((exp & mask) == 0)                                         \
+                {                                                              \
+                    carry = 0;                                                 \
+                    break;                                                     \
+                } else {                                                       \
+                    carry = 1;                                                 \
+                    exp -= curexp[i]*oneexp[i];                                \
+                    off -= curexp[i]*degpow[i];                                \
+                    curexp[i] = 0;                                             \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+    } while (!carry);                                                          \
+                                                                               \
+    TMP_END;                                                                   \
+                                                                               \
+    return Plen;                                                               \
+}
+
+DEGREVLEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_sm1_DEGREVLEX, ulong * coeff_array
+,
+    coeff_array[off] != WORD(0)
+,
+    fmpz_set_si(P->coeffs + Plen, coeff_array[off]);
+    coeff_array[off] = 0;
+)
+
+DEGREVLEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_sm2_DEGREVLEX, ulong * coeff_array
+,
+    (coeff_array[2*off + 0] || coeff_array[2*off + 1]) != WORD(0)
+,
+    fmpz_set_signed_uiui(P->coeffs + Plen, coeff_array[2*off + 1], coeff_array[2*off + 0]);
+    coeff_array[2*off + 0] = coeff_array[2*off + 1] = 0;
+)
+
+DEGREVLEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_sm3_DEGREVLEX, ulong * coeff_array
+,
+    (coeff_array[3*off + 0] || coeff_array[3*off + 1] || coeff_array[3*off + 2]) != WORD(0)
+,
+    fmpz_set_signed_uiuiui(P->coeffs + Plen, coeff_array[3*off + 2], coeff_array[3*off + 1], coeff_array[3*off + 0]);
+    coeff_array[3*off + 0] = coeff_array[3*off + 1] = coeff_array[3*off + 2] = 0;
+)
+
+DEGREVLEX_UNPACK_MACRO(
+    fmpz_mpoly_append_array_fmpz_DEGREVLEX, fmpz * coeff_array
+,
+    !fmpz_is_zero(coeff_array + off)
+,
+    fmpz_swap(P->coeffs + Plen, coeff_array + off);
+    fmpz_zero(coeff_array + off);
+)
+
+
+
+void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
+                             const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
+                                        ulong degb, const fmpz_mpoly_ctx_t ctx)
+{
+    slong nvars = ctx->minfo->nvars;
+    slong Pi, i, j, Plen, Pl, Al, Bl, array_size;
+    slong Abits, * Asum, * Amax, Bbits, * Bsum, * Bmax;
+    slong * Amain, * Bmain;
+    ulong * Apexp, * Bpexp;
+    slong (* upack_sm1)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
+    slong (* upack_sm2)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
+    slong (* upack_sm3)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
+    slong (* upack_fmpz)(fmpz_mpoly_t, slong, fmpz *, slong, slong, slong);
+    TMP_INIT;
+
+    TMP_START;
+
+    /* compute lengths of poly2 and poly3 in chunks */
+    Al = 1 + (slong) (A->exps[0] >> (A->bits*nvars));
+    Bl = 1 + (slong) (B->exps[0] >> (B->bits*nvars));
+
+    array_size = 1;
+    for (i = 0; i < nvars-1; i++) {
+        array_size *= degb;
+    }
+
+    upack_sm1  = &fmpz_mpoly_append_array_sm1_DEGLEX;
+    upack_sm2  = &fmpz_mpoly_append_array_sm2_DEGLEX;
+    upack_sm3  = &fmpz_mpoly_append_array_sm3_DEGLEX;
+    upack_fmpz = &fmpz_mpoly_append_array_fmpz_DEGLEX;
+    if (ctx->minfo->ord == ORD_DEGREVLEX) {
+        upack_sm1  = &fmpz_mpoly_append_array_sm1_DEGREVLEX;
+        upack_sm2  = &fmpz_mpoly_append_array_sm2_DEGREVLEX;
+        upack_sm3  = &fmpz_mpoly_append_array_sm3_DEGREVLEX;
+        upack_fmpz = &fmpz_mpoly_append_array_fmpz_DEGREVLEX;
+    }
+
+    /* compute indices and lengths of coefficients of polys in main variable */
+    Amain = (slong *) TMP_ALLOC((Al + 1)*sizeof(slong));
+    Bmain = (slong *) TMP_ALLOC((Bl + 1)*sizeof(slong));
+    Asum  = (slong *) TMP_ALLOC(Al*sizeof(slong));
+    Amax  = (slong *) TMP_ALLOC(Al*sizeof(slong));
+    Bsum  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
+    Bmax  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
+    Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
+    Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
+    mpoly_main_variable_split_DEG(Amain, Apexp, A->exps, Al, A->length,
+                                                         degb, nvars, A->bits);
+    mpoly_main_variable_split_DEG(Bmain, Bpexp, B->exps, Bl, B->length,
+                                                         degb, nvars, B->bits);
+
+    /* work out bit counts for each chunk */
+    Abits = 0;
+    for (i = 0; i < Al; i++)
+    {
+        _fmpz_vec_sum_max_bits(&Asum[i], &Amax[i],
+                                A->coeffs + Amain[i], Amain[i + 1] - Amain[i]);
+        Abits = FLINT_MAX(Abits, Amax[i]);
+    }
+
+    Bbits = 0;
+    for (j = 0; j < Bl; j++)
+    {
+        _fmpz_vec_sum_max_bits(&Bsum[j], &Bmax[j],
+                                B->coeffs + Bmain[j], Bmain[j + 1] - Bmain[j]);
+        Bbits = FLINT_MAX(Bbits, Bmax[j]);
+    }
+
+    Pl = Al + Bl - 1;
+    FLINT_ASSERT(Pl == degb);
+    Plen = 0;
+
+    if (Abits <= (FLINT_BITS - 2) && Bbits <= (FLINT_BITS - 2))
+    {
+        ulong * coeff_array = (ulong *) TMP_ALLOC(3*array_size*sizeof(ulong));
+        for (j = 0; j < 3*array_size; j++)
+            coeff_array[j] = 0;
+
+        /* for each output chunk */
+        for (Pi = 0; Pi < Pl; Pi++)
+        {
+            /* compute bound on coeffs of output chunk */
+            slong number = 0;
+            slong Pbits = 0;
+            for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
+            {
+                if (j < Bl)
+                {
+                    Pbits = FLINT_MAX(Pbits,
+                              FLINT_MIN(Asum[i] + Bmax[j], Amax[i] + Bsum[j]));
+                    number++;
+                }
+            }
+            Pbits += FLINT_BIT_COUNT(number) + 1; /* includes one bit for sign */
+
+            if (Pbits <= FLINT_BITS)
+            {
+                /* fits into one word */
+                for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
+                {
+                    if (j < Bl)
+                    {
+                        _fmpz_mpoly_addmul_array1_slong1(coeff_array, 
+                            (slong *) A->coeffs + Amain[i],
+                                Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                    }
+                }
+                Plen = upack_sm1(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
+
+            } else if (Pbits <= 2*FLINT_BITS)
+            {
+                /* fits into two words */
+                for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
+                {
+                    if (j < Bl)
+                    {
+                        _fmpz_mpoly_addmul_array1_slong2(coeff_array, 
+                            (slong *) A->coeffs + Amain[i],
+                                Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+
+                    }
+                }
+                Plen = upack_sm2(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
+
+            } else
+            {
+                /* fits into three words */
+                for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
+                {
+                    if (j < Bl)
+                    {
+                        _fmpz_mpoly_addmul_array1_slong(coeff_array, 
+                            (slong *) A->coeffs + Amain[i],
+                                Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                            (slong *) B->coeffs + Bmain[j],
+                                Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                    }
+                }
+                Plen = upack_sm3(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
+            }
+        }
+
+    } else
+    {
+        fmpz * coeff_array = (fmpz *) TMP_ALLOC(array_size*sizeof(fmpz));
+        for (j = 0; j < array_size; j++)
+            fmpz_init(coeff_array + j);
+
+        /* for each output chunk */
+        for (Pi = 0; Pi < Pl; Pi++)
+        {
+            /* addmuls for each cross product of chunks */
+            for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
+            {
+                if (j < Bl)
+                {
+                    _fmpz_mpoly_addmul_array1_fmpz(coeff_array, 
+                        A->coeffs + Amain[i],
+                            Apexp + Amain[i], Amain[i + 1] - Amain[i],
+                        B->coeffs + Bmain[j],
+                            Bpexp + Bmain[j], Bmain[j + 1] - Bmain[j]);
+                }
+            }
+            Plen = upack_fmpz(P, Plen, coeff_array, Pl - Pi - 1, nvars, degb);
+        }
+    }
+
+    TMP_END;
+    _fmpz_mpoly_set_length(P, Plen, ctx);
+}
+
+
+
+int fmpz_mpoly_mul_array_DEG(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, exp_bits, array_size;
+    ulong deg, * max_fields2, * max_fields3;
+    int success = 1;
+    TMP_INIT;
+
+    /* input poly is zero */
+    if (poly2->length == 0 || poly3->length == 0)
+    {
+        fmpz_mpoly_zero(poly1, ctx);
+        return 1;
+    }
+
+    /* lets only work with exponents packed into 1 word */
+    if ((     ctx->minfo->ord != ORD_DEGREVLEX 
+           && ctx->minfo->ord != ORD_DEGLEX)
+        || 1 != mpoly_words_per_exp(poly2->bits, ctx->minfo)
+        || 1 != mpoly_words_per_exp(poly3->bits, ctx->minfo)
+       )
+    {
+        return 0;
+    }
+
+    TMP_START;
+
+    /* compute maximum exponents for each variable */
+    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
+    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+                                                      poly2->bits, ctx->minfo);
+    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
+                                                      poly3->bits, ctx->minfo);
+
+    /* the field of index n-1 is the one that wil be pulled out */
+    i = ctx->minfo->nfields - 1;
+    deg = max_fields2[i] + max_fields3[i] + 1;
+    if (((slong) deg) <= 0 || deg > MAX_ARRAY_SIZE)
+    {
+        success = 0;
+        goto cleanup;
+    }
+
+    /* the fields of index n-2...1, contribute to the array size */
+    array_size = WORD(1);
+    for (i--; i >= 1; i--)
+    {
+        ulong hi;
+        umul_ppmm(hi, array_size, array_size, deg);
+        if (hi != WORD(0) || array_size <= 0
+                          || array_size > MAX_ARRAY_SIZE)
+        {
+            success = 0;
+            goto cleanup;
+        }
+    }
+
+    exp_bits = FLINT_MAX(WORD(8), FLINT_BIT_COUNT(deg) + 1);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
+
+    /* array multiplication assumes result fit into 1 word */
+    if (1 != mpoly_words_per_exp(exp_bits, ctx->minfo))
+    {
+        success = 0;
+        goto cleanup;
+    }
+
+    /* handle aliasing and do array multiplication */
+    success = 1;
+    if (poly1 == poly2 || poly1 == poly3)
+    {
+        fmpz_mpoly_t temp;
+        fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
+        fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
+        temp->bits = exp_bits;
+        _fmpz_mpoly_mul_array_chunked_DEG(temp, poly3, poly2, deg, ctx);
+        fmpz_mpoly_swap(temp, poly1, ctx);
+        fmpz_mpoly_clear(temp, ctx);
+    } else
+    {
+        fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
+        fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
+        poly1->bits = exp_bits;
+        _fmpz_mpoly_mul_array_chunked_DEG(poly1, poly3, poly2, deg, ctx);
+    }
+
+cleanup:
+
+    TMP_END;
+
+    return success;
+}
+
+
+
+int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+{
+    switch (ctx->minfo->ord)
+    {
+        case ORD_LEX:
+            return fmpz_mpoly_mul_array_LEX(poly1, poly2, poly3, ctx);
+        case ORD_DEGLEX:
+        case ORD_DEGREVLEX:
+            return fmpz_mpoly_mul_array_DEG(poly1, poly2, poly3, ctx);
+        default:
+            return 0;
+    }
 }

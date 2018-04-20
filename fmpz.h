@@ -277,6 +277,10 @@ FLINT_DLL void fmpz_set_signed_uiui(fmpz_t r, ulong hi, ulong lo);
 
 FLINT_DLL void fmpz_set_signed_uiuiui(fmpz_t r, ulong hi, ulong mid, ulong lo);
 
+FLINT_DLL void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len);
+
+FLINT_DLL void fmpz_get_ui_array(ulong * out, slong out_len, const fmpz_t in);
+
 FLINT_DLL void fmpz_get_mpz(mpz_t x, const fmpz_t f);
 
 FLINT_DLL void fmpz_set_mpz(fmpz_t f, const mpz_t x);
