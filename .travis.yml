@@ -24,8 +24,9 @@ install:
   - ${MAKE} QUIET_CC=
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L libflint.dylib; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ldd libflint.so; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make install; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L local/lib/libflint.dylib; fi
 
 script:
   - ${MAKE} check QUIET_CC=
+  - make install
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L local/lib/libflint.dylib; fi
+  - PREFIX=$(pwd)/local ./.check_post_install
