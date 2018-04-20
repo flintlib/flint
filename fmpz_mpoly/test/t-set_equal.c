@@ -84,12 +84,7 @@ main(void)
 
        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
-       fmpz_mpoly_set(g, f, ctx);
-
-       if (g->length != 0)
-          fmpz_add_ui(g->coeffs + 0, g->coeffs + 0, 1);
-       else
-          fmpz_mpoly_set_coeff_ui(g, 0, 1, ctx);
+       fmpz_mpoly_add_ui(g, f, UWORD(1), ctx);
 
        result = !fmpz_mpoly_equal(f, g, ctx);
 

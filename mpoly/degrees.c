@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,7 +11,6 @@
 
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 
@@ -48,7 +47,7 @@ void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
 }
 
 
-void mpoly_degrees_fmpz(fmpz * user_degs, const ulong * poly_exps,
+void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)
 {
     slong i, j, N;
@@ -73,7 +72,7 @@ void mpoly_degrees_fmpz(fmpz * user_degs, const ulong * poly_exps,
 
     for (i = 0; i < len; i++)
     {
-        mpoly_get_monomial_fmpz(tmp_exps, poly_exps + N*i, bits, mctx);
+        mpoly_get_monomial_ffmpz(tmp_exps, poly_exps + N*i, bits, mctx);
         for (j = 0; j < mctx->nvars; j++)
             if (fmpz_cmp(user_degs + j, tmp_exps + j) < 0)
                 fmpz_set(user_degs + j, tmp_exps + j);
@@ -82,6 +81,42 @@ void mpoly_degrees_fmpz(fmpz * user_degs, const ulong * poly_exps,
     for (j = 0; j < mctx->nvars; j++)
         fmpz_clear(tmp_exps + j);
 
+    TMP_END;
+}
+
+void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
+                                 slong len, slong bits, const mpoly_ctx_t mctx)
+{
+    slong i, j, N;
+    fmpz * tmp_exps;
+    TMP_INIT;
+
+    if (len == 0)
+    {
+        for (i = 0; i < mctx->nvars; i++)
+            fmpz_set_si(user_degs[i], -WORD(1));
+        return;
+    }
+
+    TMP_START;
+    tmp_exps = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
+    for (j = 0; j < mctx->nvars; j++) {
+        fmpz_zero(user_degs[j]);
+        fmpz_init(tmp_exps + j);
+    }
+
+    N = mpoly_words_per_exp(bits, mctx);
+
+    for (i = 0; i < len; i++)
+    {
+        mpoly_get_monomial_ffmpz(tmp_exps, poly_exps + N*i, bits, mctx);
+        for (j = 0; j < mctx->nvars; j++)
+            if (fmpz_cmp(user_degs[j], tmp_exps + j) < 0)
+                fmpz_set(user_degs[j], tmp_exps + j);
+    }
+
+    for (j = 0; j < mctx->nvars; j++)
+        fmpz_clear(tmp_exps + j);
 
     TMP_END;
 }

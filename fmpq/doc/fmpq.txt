@@ -102,6 +102,10 @@ int fmpq_is_one(const fmpq_t res)
 
     Returns nonzero if \code{res} has value $1$, and returns zero otherwise.
 
+int fmpq_is_pm1(const fmpq_t res)
+
+    Returns nonzero if \code{res} has value $\pm{1}$ and zero otherwise.
+
 int fmpq_equal(const fmpq_t x, const fmpq_t y)
 
     Returns nonzero if \code{x} and \code{y} are equal, and zero otherwise.

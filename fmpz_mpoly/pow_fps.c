@@ -629,7 +629,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 }
 
 void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                                           ulong k, const fmpz_mpoly_ctx_t ctx)
+                                           slong k, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, N, len = 0;
     fmpz * max_fields2;
@@ -638,6 +638,8 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     ulong * exp2 = poly2->exps;
     int free2 = 0;
     TMP_INIT;
+
+    FLINT_ASSERT(k >= 0);
 
    if (k == 0)
    {

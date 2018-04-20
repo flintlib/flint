@@ -54,7 +54,7 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
    r = 1;
    for (i = 0; r > 0 && i < len; i++)
    {
-      if (fmpz_sgn(poly + i) > 0 && i != 0)
+      if (fmpz_sgn(poly + i) >= 0 && i != 0)
       {
          r = fputc('+', file);
          r = (r != EOF) ? 1 : EOF;
@@ -68,7 +68,7 @@ _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
          r = fmpz_fprint(file, poly + i);
 
       if (r > 0)
-         mpoly_get_monomial_fmpz(exponents, exps + N*i, bits, mctx);
+         mpoly_get_monomial_ffmpz(exponents, exps + N*i, bits, mctx);
 
       first = 1;
 

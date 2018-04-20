@@ -15,23 +15,6 @@
 void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t poly,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    slong i;
-    fmpz * new_degs;
-    TMP_INIT;
-
-    TMP_START;
-    new_degs = (fmpz *) TMP_ALLOC(ctx->zctx->minfo->nvars*sizeof(fmpz));
-    for (i = 0; i < ctx->zctx->minfo->nvars; i++)
-        fmpz_init(new_degs + i);
-
-    mpoly_degrees_fmpz(new_degs, poly->zpoly->exps, poly->zpoly->length,
+    mpoly_degrees_pfmpz(degs, poly->zpoly->exps, poly->zpoly->length,
                                           poly->zpoly->bits, ctx->zctx->minfo);
-
-    for (i = 0; i < ctx->zctx->minfo->nvars; i++)
-    {
-        fmpz_swap(new_degs + i, degs[i]);
-        fmpz_clear(new_degs + i);
-    }
-
-    TMP_END;
 }

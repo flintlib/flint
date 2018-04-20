@@ -51,7 +51,7 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
     exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
     for (i = 0; i < mctx->nvars; i++)
         fmpz_init(exponents + i);
-    mpoly_degrees_fmpz((fmpz *) exponents, exp, len, bits, mctx);
+    mpoly_degrees_ffmpz((fmpz *) exponents, exp, len, bits, mctx);
 
     for (i = 0; i < mctx->nvars; i++)
         bound += (fmpz_sizeinbase(exponents + i, 10) + strlen(x[i]) + 3)*len;
@@ -72,7 +72,7 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
             off += flint_sprintf(str + off, "%wd", coeff[i]);
         }
 
-        mpoly_get_monomial_fmpz(exponents, exp + N*i, bits, mctx);
+        mpoly_get_monomial_ffmpz(exponents, exp + N*i, bits, mctx);
 
         for (j = 0; j < mctx->nvars; j++)
         {

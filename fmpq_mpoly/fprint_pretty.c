@@ -70,7 +70,7 @@ fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t qpoly,
             fmpq_fprint(file, c);
         }
 
-        mpoly_get_monomial_fmpz(exponents, poly->exps + N*i, poly->bits, mctx);
+        mpoly_get_monomial_ffmpz(exponents, poly->exps + N*i, poly->bits, mctx);
 
         for (j = 0; j < mctx->nvars; j++)
         {

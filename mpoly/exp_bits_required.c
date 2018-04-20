@@ -16,7 +16,8 @@
     the returned number of bits includes space for a zero'd signed bit
     a return value of > FLINT_BITS indicates an error (it doesn't fit)
 */
-slong mpoly_exp_bits_required_ui(const ulong * user_exp, const mpoly_ctx_t mctx)
+mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
+                                                        const mpoly_ctx_t mctx)
 {
     int deg = mctx->deg;
     slong i, exp_bits, nfields = mctx->nfields;
@@ -47,14 +48,13 @@ slong mpoly_exp_bits_required_ui(const ulong * user_exp, const mpoly_ctx_t mctx)
     compute number of bits required to store user_exp in packed format
     the returned number of bits includes space for a zero'd signed bit
 */
-mp_bitcnt_t mpoly_exp_bits_required_fmpz(const fmpz * user_exp,
+mp_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
                                                         const mpoly_ctx_t mctx)
 {
     int deg = mctx->deg;
     slong i, exp_bits, nvars = mctx->nvars;
     fmpz_t max;
-    fmpz_init(max);
-    fmpz_zero(max);
+    fmpz_init_set_ui(max, UWORD(0));
 
     if (deg)
     {
@@ -66,6 +66,37 @@ mp_bitcnt_t mpoly_exp_bits_required_fmpz(const fmpz * user_exp,
         for (i = 0; i < nvars; i++)
             if (fmpz_cmp(max, user_exp + i) < 0)
                 fmpz_set(max, user_exp + i);
+    }
+
+    exp_bits = fmpz_bits(max) + 1;
+
+    fmpz_clear(max);
+
+    return exp_bits;
+}
+
+/*
+    compute number of bits required to store user_exp in packed format
+    the returned number of bits includes space for a zero'd signed bit
+*/
+mp_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
+                                                        const mpoly_ctx_t mctx)
+{
+    int deg = mctx->deg;
+    slong i, exp_bits, nvars = mctx->nvars;
+    fmpz_t max;
+    fmpz_init_set_ui(max, UWORD(0));
+
+    if (deg)
+    {
+        for (i = 0; i < nvars; i++)
+            fmpz_add(max, max, user_exp[i]);
+
+    } else
+    {
+        for (i = 0; i < nvars; i++)
+            if (fmpz_cmp(max, user_exp[i]) < 0)
+                fmpz_set(max, user_exp[i]);
     }
 
     exp_bits = fmpz_bits(max) + 1;

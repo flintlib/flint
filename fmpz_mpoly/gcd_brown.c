@@ -350,7 +350,7 @@ void fmpz_mpoly_convert_from_fmpz_mpolyd(
         }
         FLINT_ASSERT(k == 0);
 
-        fmpz_mpoly_set_term_fmpz_ui(A, B->coeffs + i, exps, ctx);
+        fmpz_mpoly_set_coeff_fmpz_ui(A, B->coeffs + i, exps, ctx);
     }
 
     TMP_END;
