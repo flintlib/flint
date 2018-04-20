@@ -60,6 +60,11 @@ slong fmpz_mpoly_ctx_nvars(fmpz_mpoly_ctx_t ctx)
     return ctx->minfo->nvars;
 }
 
+FMPZ_MPOLY_INLINE
+ordering_t fmpz_mpoly_ctx_ord(fmpz_mpoly_ctx_t ctx)
+{
+    return ctx->minfo->ord;
+}
 
 /*  Type definitions *********************************************************/
 

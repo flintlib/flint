@@ -67,6 +67,11 @@ slong fmpq_mpoly_ctx_nvars(fmpq_mpoly_ctx_t ctx)
     return ctx->zctx->minfo->nvars;
 }
 
+FMPQ_MPOLY_INLINE
+ordering_t fmpq_mpoly_ctx_ord(fmpq_mpoly_ctx_t ctx)
+{
+    return ctx->zctx->minfo->ord;
+}
 
 /* Polynomials over Q ********************************************************/
 
@@ -152,7 +157,6 @@ FLINT_DLL void fmpq_mpoly_geobucket_pow_fmpz_inplace(fmpq_mpoly_geobucket_t B1,
 
 FLINT_DLL int fmpq_mpoly_geobucket_divides_inplace(fmpq_mpoly_geobucket_t B1,
                         fmpq_mpoly_geobucket_t B2, const fmpq_mpoly_ctx_t ctx);
-
 
 /*  Memory management ********************************************************/
 
@@ -272,7 +276,6 @@ void fmpq_mpoly_gen(fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
     fmpz_mpoly_gen(poly->zpoly, i, ctx->zctx);
 }
 
-
 FMPQ_MPOLY_INLINE
 int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly,
                                           slong k, const fmpq_mpoly_ctx_t ctx)
@@ -280,9 +283,6 @@ int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly,
     return fmpq_is_one(poly->content)
           && fmpz_mpoly_is_gen(poly->zpoly, k, ctx->zctx);
 }
-
-
-
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_swap(fmpq_mpoly_t poly1, 
