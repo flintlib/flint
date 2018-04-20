@@ -46,13 +46,13 @@ and the comparison mask is shown below.
                       111 111 111 0000000
 
 If one wanted to support, for example, a block ordering which was ORD_DEGLEX
-in {x, y} and then ORD_DEGREVLEX in {z, w}, the monomial x^a*y^b*z^c*w^d
-would need to be stored as
+in {x, y} and ORD_DEGREVLEX in {z, w} with x>y>z>w,
+the monomial x^a*y^b*z^c*w^d would need to be stored as
 
-    | a | b | a+b | d | c | c+d |    (6 fields)
+    | c | d | c+d | b | a | a+b |    (6 fields)
      111 111 00000 000 000 00000
 
-No such interface is currently implmented.
+No such interface is currently implemented.
 
 
 There is no limit to the size of the fields. The fields themselves are packed
@@ -62,7 +62,7 @@ maximum field is 15, then the fields only fit into a packing with bits >= 5.
 The total number of machine words taken by an exponent packed into fields
 is usually denoted by N in the code.
 
-If bits < FLINT_BITS then precisely a maximum of floor(FLINT_BITS/bits)
+If bits <= FLINT_BITS then precisely a maximum of floor(FLINT_BITS/bits)
 number of fields may be packed into a single word. Within a word, the packing
 is from low to high, and unused fields (as well as unused bits) at the top of
 the word are zero.
@@ -321,6 +321,18 @@ void mpoly_search_monomials(
 
 *******************************************************************************
 
+int mpoly_termexp_fits_ui(ulong * exps, slong bits,
+                                               slong n, const mpoly_ctx_t mctx)
+
+    Return whether every entry of the exponent vector of index $n$ in
+    \code{exps} fits into a \code{ulong}.
+
+int mpoly_termexp_fits_si(ulong * exps, slong bits,
+                                               slong n, const mpoly_ctx_t mctx)
+
+    Return whether every entry of the exponent vector of index $n$ in
+    \code{exps} fits into a \code{slong}.
+
 void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps,
                                            slong bits, const mpoly_ctx_t mctx)
 
@@ -328,7 +340,13 @@ void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps,
     monomial from the user's perspective. The exponents are assumed to fit
     a ulong.
 
-void mpoly_get_monomial_fmpz(fmpz * exps, const ulong * poly_exps,
+void mpoly_get_monomial_ffmpz(fmpz * exps, const ulong * poly_exps,
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+
+    Convert the packed exponent \code{poly_exps} of bit count \code{bits} to a
+    monomial from the user's perspective.
+
+void mpoly_get_monomial_pfmpz(fmpz ** exps, const ulong * poly_exps,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 
     Convert the packed exponent \code{poly_exps} of bit count \code{bits} to a
@@ -339,11 +357,15 @@ void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2,
 
     Convert the user monomial \code{exp2} to packed format using \code{bits}.
 
-void mpoly_set_monomial_fmpz(ulong * exp1, const fmpz * exp2,
+void mpoly_set_monomial_ffmpz(ulong * exp1, const fmpz * exp2,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 
     Convert the user monomial \code{exp2} to packed format using \code{bits}.
 
+void mpoly_set_monomial_pfmpz(ulong * exp1, fmpz * const * exp2,
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+
+    Convert the user monomial \code{exp2} to packed format using \code{bits}.
 
 *******************************************************************************
 

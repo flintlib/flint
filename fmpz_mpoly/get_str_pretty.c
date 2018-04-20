@@ -53,7 +53,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * coeffs, const ulong * exps, slong len,
     exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
     for (i = 0; i < mctx->nvars; i++)
         fmpz_init(exponents + i);
-    mpoly_degrees_fmpz((fmpz *) exponents, exps, len, bits, mctx);
+    mpoly_degrees_ffmpz((fmpz *) exponents, exps, len, bits, mctx);
 
     for (i = 0; i < mctx->nvars; i++)
         bound += (fmpz_sizeinbase(exponents + i, 10) + strlen(x[i]) + 3)*len;
@@ -75,7 +75,7 @@ _fmpz_mpoly_get_str_pretty(const fmpz * coeffs, const ulong * exps, slong len,
                 off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(coeffs[i]));
         }
 
-        mpoly_get_monomial_fmpz(exponents, exps + N*i, bits, mctx);
+        mpoly_get_monomial_ffmpz(exponents, exps + N*i, bits, mctx);
 
         first = 1;
 

@@ -24,7 +24,7 @@ main(void)
     fflush(stdout);
 
     /* Check f*g/g = f */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h, k;

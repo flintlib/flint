@@ -51,7 +51,7 @@ big_case:
     for (i = 0; i < nvars; i++)
         fmpz_init_set_ui(big_exps + i, user_exps[i]);
 
-    mpoly_set_monomial_fmpz(poly_exps, big_exps, bits, mctx);
+    mpoly_set_monomial_ffmpz(poly_exps, big_exps, bits, mctx);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(big_exps + i);
@@ -60,7 +60,7 @@ big_case:
 }
 
 
-void mpoly_set_monomial_fmpz(ulong * poly_exps, const fmpz * user_exps,
+void mpoly_set_monomial_ffmpz(ulong * poly_exps, const fmpz * user_exps,
                                       mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
@@ -76,6 +76,38 @@ void mpoly_set_monomial_fmpz(ulong * poly_exps, const fmpz * user_exps,
     for (i = 0; i < nvars; i++) {
         fmpz_add(degree, degree, user_exps + i);
         fmpz_init_set(tmp_exps + (mctx->rev ? i : nvars - 1 - i), user_exps + i);
+    }
+
+    if (mctx->deg)
+        fmpz_init_set(tmp_exps + nvars, degree);
+
+    mpoly_pack_vec_fmpz(poly_exps, tmp_exps, bits, nfields, 1);
+
+    fmpz_clear(degree);
+    for (i = 0; i < nvars; i++)
+        fmpz_clear(tmp_exps + i);
+    if (mctx->deg)
+        fmpz_clear(tmp_exps + nvars);
+
+    TMP_END;
+}
+
+void mpoly_set_monomial_pfmpz(ulong * poly_exps, fmpz * const * user_exps,
+                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+{
+    slong nvars = mctx->nvars;
+    slong nfields = mctx->nfields;
+    slong i = 0;
+    fmpz * tmp_exps;
+    fmpz_t degree;
+    TMP_INIT;
+
+    TMP_START;
+    fmpz_init_set_ui(degree, 0);
+    tmp_exps = (fmpz *) TMP_ALLOC(nfields*sizeof(fmpz));
+    for (i = 0; i < nvars; i++) {
+        fmpz_add(degree, degree, user_exps[i]);
+        fmpz_init_set(tmp_exps + (mctx->rev ? i : nvars - 1 - i), user_exps[i]);
     }
 
     if (mctx->deg)

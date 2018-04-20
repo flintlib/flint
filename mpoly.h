@@ -36,17 +36,6 @@
 #endif
 
 
-/* MISSING FXNS ************************************************************/
-
-FLINT_DLL void fmpz_get_ui_array(ulong * out, slong out_len, const fmpz_t in);
-
-FLINT_DLL void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len);
-
-FLINT_DLL void _fmpz_vec_max(fmpz * vec1, const fmpz * vec2, const fmpz * vec3,
-                                                                     slong len);
-FLINT_DLL void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len);
-
-
 #define MPOLY_MIN_BITS 8    /* minimum number of bits to pack into */
 
 typedef enum {
@@ -548,9 +537,12 @@ FLINT_DLL void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
 FLINT_DLL void mpoly_get_ovfmask(ulong * ovfmask, slong N, slong bits,
                                                        const mpoly_ctx_t mctx);
 
-FLINT_DLL slong mpoly_exp_bits_required_ui(const ulong * user_exp, const mpoly_ctx_t mctx);
-
-FLINT_DLL mp_bitcnt_t mpoly_exp_bits_required_fmpz(const fmpz * user_exp, const mpoly_ctx_t mctx);
+FLINT_DLL mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
+                                                       const mpoly_ctx_t mctx);
+FLINT_DLL mp_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
+                                                       const mpoly_ctx_t mctx);
+FLINT_DLL mp_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
+                                                       const mpoly_ctx_t mctx);
 
 FLINT_DLL slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx);
 
@@ -566,12 +558,16 @@ FLINT_DLL void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_
 
 FLINT_DLL void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps,
                                            slong bits, const mpoly_ctx_t mctx);
-FLINT_DLL void mpoly_get_monomial_fmpz(fmpz * exps, const ulong * poly_exps,
+FLINT_DLL void mpoly_get_monomial_ffmpz(fmpz * exps, const ulong * poly_exps,
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_get_monomial_pfmpz(fmpz ** exps, const ulong * poly_exps,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2,
                                            slong bits, const mpoly_ctx_t mctx);
-FLINT_DLL void mpoly_set_monomial_fmpz(ulong * exp1, const fmpz * exp2,
+FLINT_DLL void mpoly_set_monomial_ffmpz(ulong * exp1, const fmpz * exp2,
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_set_monomial_pfmpz(ulong * exp1, fmpz * const * exp2,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_repack_monomials(ulong * exps1, slong bits1,
@@ -596,9 +592,13 @@ FLINT_DLL void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
 FLINT_DLL void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
+FLINT_DLL int mpoly_degrees_fit_si(const ulong * poly_exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
-FLINT_DLL void mpoly_degrees_fmpz(fmpz * user_degs, const ulong * poly_exps,
+FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_search_monomials(
@@ -608,6 +608,11 @@ FLINT_DLL void mpoly_search_monomials(
                 const ulong * a, slong a_len, const ulong * b, slong b_len,
                                                slong N, const ulong * cmpmask);
 
+FLINT_DLL int mpoly_termexp_fits_si(ulong * exps, slong bits,
+                                              slong n, const mpoly_ctx_t mctx);
+
+FLINT_DLL int mpoly_termexp_fits_ui(ulong * exps, slong bits,
+                                              slong n, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_monomials_valid_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 

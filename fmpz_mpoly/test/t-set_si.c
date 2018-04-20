@@ -58,7 +58,7 @@ main(void)
        for (j = 0; j < nvars; j++)
           exp[j] = 0;
 
-       d = fmpz_mpoly_get_term_si_ui(f, exp, ctx);
+       d = fmpz_mpoly_get_coeff_si_ui(f, exp, ctx);
 
        result = c == d &&
                 ((c == 0 && f->length == 0) || f->length == 1);

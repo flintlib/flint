@@ -20,7 +20,7 @@ void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     mp_bitcnt_t exp_bits;
     TMP_INIT;
 
-    if (fmpz_cmp_ui(pow, UWORD(0)) < 0)
+    if (fmpz_sgn(pow) < 0)
         flint_throw(FLINT_ERROR, "Negative power in fmpz_mpoly_pow_fmpz");
 
     if (fmpz_fits_si(pow))
@@ -64,10 +64,9 @@ void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
     poly1->bits = exp_bits;
 
-    if (fmpz_is_one(poly2->coeffs + 0) || fmpz_is_even(pow))
-        fmpz_set_si(poly1->coeffs + 0, +WORD(1));
-    else
-        fmpz_set_si(poly1->coeffs + 0, -WORD(1));
+    fmpz_set_si(poly1->coeffs + 0,
+             (fmpz_is_one(poly2->coeffs + 0) || fmpz_is_even(pow)) ? +WORD(1)
+                                                                   : -WORD(1));
 
     mpoly_pack_vec_fmpz(poly1->exps + 0, max_fields2, exp_bits, ctx->minfo->nfields, 1);
 

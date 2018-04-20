@@ -299,7 +299,7 @@ FLINT_DLL void _nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly,
                         ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly,
-                       ulong c, const fmpz ** exp, const nmod_mpoly_ctx_t ctx);
+                      ulong c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_set_term_ui_ui(nmod_mpoly_t poly,
                        ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
@@ -308,7 +308,7 @@ FLINT_DLL ulong _nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
                                  const fmpz * exp, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL ulong nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
-                                const fmpz ** exp, const nmod_mpoly_ctx_t ctx);
+                               fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL ulong nmod_mpoly_get_term_ui_ui(const nmod_mpoly_t poly,
                                 const ulong * exp, const nmod_mpoly_ctx_t ctx);

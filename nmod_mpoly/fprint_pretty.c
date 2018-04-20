@@ -69,7 +69,7 @@ _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * ex
             if (r <= 0) goto done;
         }
 
-        mpoly_get_monomial_fmpz(exponents, exp + N*i, bits, mctx);
+        mpoly_get_monomial_ffmpz(exponents, exp + N*i, bits, mctx);
 
         for (j = 0; j < mctx->nvars; j++)
         {

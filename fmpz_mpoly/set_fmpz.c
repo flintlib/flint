@@ -15,7 +15,7 @@
 void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
                                     const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 {
-    slong N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    slong N;
 
     if (fmpz_is_zero(c))
     {
