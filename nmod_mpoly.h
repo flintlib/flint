@@ -436,12 +436,20 @@ FLINT_DLL void nmod_mpoly_make_monic(nmod_mpoly_t poly1, const nmod_mpoly_t poly
 
 /* Multiplication ************************************************************/
 
+FLINT_DLL void nmod_mpoly_mul(nmod_mpoly_t poly1,
+                 const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, 
+                                                   const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1,
                  const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, 
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1,
                  const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_mul_dense(nmod_mpoly_t P,
+                        const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
 /* Powering ******************************************************************/
@@ -547,6 +555,42 @@ FLINT_DLL void _nmod_mpoly_univar_pgcd_ducos(nmod_mpoly_univar_t poly1,
             const nmod_mpoly_univar_t polyP, const nmod_mpoly_univar_t polyQ,
                                                    const nmod_mpoly_ctx_t ctx);
 
+/* terms *********************************************************************/
+
+FLINT_DLL void _nmod_mpoly_radix_sort1(nmod_mpoly_t A, slong left, slong right,
+                              mp_bitcnt_t pos, ulong cmpmask, ulong totalmask);
+
+FLINT_DLL void _nmod_mpoly_radix_sort(nmod_mpoly_t A, slong left, slong right,
+                                    mp_bitcnt_t pos, slong N, ulong * cmpmask);
+
+FLINT_DLL void nmod_mpoly_sort_terms(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
+
+/* dense helpers *************************************************************/
+
+FLINT_DLL void nmod_mpolyd_ctx_init(nmod_mpolyd_ctx_t dctx, slong nvars);
+
+FLINT_DLL void nmod_mpolyd_ctx_clear(nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL int nmod_mpolyd_set_degbounds(nmod_mpolyd_t A, slong * bounds);
+
+FLINT_DLL int nmod_mpolyd_set_degbounds_perm(nmod_mpolyd_t A, const nmod_mpolyd_ctx_t dctx, slong * bounds);
+
+FLINT_DLL void nmod_mpoly_convert_to_nmod_mpolyd(
+                                  nmod_mpolyd_t A, const nmod_mpolyd_ctx_t dctx,
+                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_convert_to_nmod_mpolyd_degbound(
+                                  nmod_mpolyd_t A, const nmod_mpolyd_ctx_t dctx,
+                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_convert_from_nmod_mpolyd(
+                                 nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
+                          const nmod_mpolyd_t B, const nmod_mpolyd_ctx_t dctx);
+
+FLINT_DLL void nmod_mpolyd_print_simple(nmod_mpolyd_t poly);
+
+FLINT_DLL slong nmod_mpolyd_length(const nmod_mpolyd_t A);
+
 /* GCD ***********************************************************************/
 
 FLINT_DLL void nmod_mpoly_term_content(nmod_mpoly_t poly1,
@@ -568,13 +612,9 @@ FLINT_DLL void nmod_mpoly_discriminant(nmod_mpoly_t poly1,
 
 
 
-FLINT_DLL void nmod_mpolyd_ctx_init(nmod_mpolyd_ctx_t dctx, slong nvars);
-
 FLINT_DLL int nmod_mpolyd_ctx_settle(nmod_mpolyd_ctx_t dctx,
                             const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpolyd_ctx_clear(nmod_mpolyd_ctx_t dctx);
 
 FLINT_DLL void nmod_mpolyd_init(nmod_mpolyd_t poly, slong nvars);
 
@@ -585,14 +625,6 @@ FLINT_DLL void nmod_mpolyd_set_nvars(nmod_mpolyd_t poly, slong nvars);
 FLINT_DLL void nmod_mpolyd_zero(nmod_mpolyd_t poly);
 
 FLINT_DLL void nmod_mpolyd_clear(nmod_mpolyd_t poly);
-
-FLINT_DLL void nmod_mpoly_convert_to_nmod_mpolyd(
-                                  nmod_mpolyd_t A, const nmod_mpolyd_ctx_t dctx,
-                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_convert_from_nmod_mpolyd(
-                                 nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
-                          const nmod_mpolyd_t B, const nmod_mpolyd_ctx_t dctx);
 
 FLINT_DLL void nmod_mpolyd_zero(nmod_mpolyd_t poly);
 
@@ -720,6 +752,9 @@ FLINT_DLL void nmod_mpoly_randtest_bits(nmod_mpoly_t poly, flint_rand_t state,
    Internal consistency checks
 
 ******************************************************************************/
+
+FLINT_DLL void nmod_mpoly_assert_canonical(const nmod_mpoly_t poly,
+                                                   const nmod_mpoly_ctx_t ctx);
 
 /*
    test that the terms in poly are in the correct order
