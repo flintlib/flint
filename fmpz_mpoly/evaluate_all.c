@@ -16,7 +16,6 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
-#include "assert.h"
 
 
 /*
@@ -40,7 +39,7 @@ void _mpoly_rbnode_clear_evalall_tree_fmpz(mpoly_rbtree_t tree,
 {
     fmpz_t r, xp;
     slong e = node->key;
-    assert(e >= s);
+    FLINT_ASSERT(e >= s);
 
     fmpz_init(r);
     fmpz_zero(r);
@@ -145,7 +144,7 @@ void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
         }
     }
     k_len = k;
-    assert(k_len == entries);
+    FLINT_ASSERT(k_len == entries);
 
     /* accumulate coefficients of the main variable */
     mpoly_gen_offset_shift(&main_off, &main_shift, main_var, N, bits, ctx->minfo);

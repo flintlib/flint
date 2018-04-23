@@ -158,7 +158,7 @@ void nmod_mpoly_convert_to_nmod_mpolyd(
 
     nmod_mpolyd_set_nvars(poly1, ctx->minfo->nvars);
 
-    FLINT_ASSERT(poly2->bits <= FLINT_BITS)
+    FLINT_ASSERT(poly2->bits <= FLINT_BITS);
 
     if (poly2->length == 0)
     {
