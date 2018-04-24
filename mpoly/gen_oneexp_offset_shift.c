@@ -33,7 +33,7 @@ void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift
     slong fpw = FLINT_BITS/bits;
     slong i;
 
-    FLINT_ASSERT(bits <= FLINTS); /* division by FLINT_BITS/bits follows */
+    FLINT_ASSERT(bits <= FLINT_BITS); /* division by FLINT_BITS/bits follows */
 
     for (i = 0; i < N; i++)
         oneexp[i] = 0;
@@ -56,7 +56,8 @@ void mpoly_gen_oneexp_offset_mp(ulong * oneexp, slong * offset,
     slong wpf = bits/FLINT_BITS;
     slong i;
 
-    FLINT_ASSERT(bits > FLINTS);
+    FLINT_ASSERT(bits > FLINT_BITS);
+    FLINT_ASSERT(bits % FLINT_BITS == WORD(0));
 
     for (i = 0; i < N; i++)
         oneexp[i] = 0;

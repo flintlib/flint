@@ -15,7 +15,6 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
-#include "assert.h"
 
 
 void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx)
@@ -383,7 +382,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         fmpz_set(p_coeff + p_len, (poly2->coeffs + x->i)->coeffs + x->j);
         p_len++;
 
-        assert(x->next == NULL);
+        FLINT_ASSERT(x->next == NULL);
         
         if (x->j + 1 < (poly2->coeffs + x->i)->length)
         {
@@ -401,7 +400,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
         }
     }
 
-    assert(total_len == p_len);
+    FLINT_ASSERT(total_len == p_len);
     poly1->coeffs = p_coeff;
     poly1->exps = p_exp;
     poly1->alloc = p_alloc;
@@ -466,7 +465,7 @@ void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1,
     ulong * exp1, * exp2, * exp3;
     slong len1, len2, len3;
 
-    assert(poly2->var == poly3->var);
+    FLINT_ASSERT(poly2->var == poly3->var);
 
     if (poly1 == poly2 || poly1 == poly3)
     {
@@ -513,7 +512,7 @@ void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1,
             j++;
         } else 
         {
-            assert(0);
+            FLINT_ASSERT(0);
         }
     }
 
@@ -544,7 +543,7 @@ int fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1,
     fmpz_mpoly_t tcoeff;
     TMP_INIT;
 
-    assert(poly2->var == poly3->var);
+    FLINT_ASSERT(poly2->var == poly3->var);
 
     len1 = 0;
     if (poly2->length == 0 || poly3->length == 0)
@@ -687,12 +686,12 @@ void _fmpz_mpoly_univar_prem(fmpz_mpoly_univar_t polyA,
     slong i, j, delta, delta_org;
     fmpz_mpoly_t u, v;
 
-    assert(polyA != polyB);
-    assert(polyB != polyC);
-    assert(polyC != polyA);
-    assert(polyA->length != 0);
-    assert(polyB->length != 0);
-    assert(polyA->exps[0] >= polyB->exps[0]);
+    FLINT_ASSERT(polyA != polyB);
+    FLINT_ASSERT(polyB != polyC);
+    FLINT_ASSERT(polyC != polyA);
+    FLINT_ASSERT(polyA->length != 0);
+    FLINT_ASSERT(polyB->length != 0);
+    FLINT_ASSERT(polyA->exps[0] >= polyB->exps[0]);
 
     delta_org = polyA->exps[0] - polyB->exps[0] + 1;
 
@@ -748,7 +747,7 @@ looper:
             j++;
         } else
         {
-            assert(0);
+            FLINT_ASSERT(0);
         }
     }
 
@@ -760,7 +759,7 @@ looper:
 done:
     if (delta_org != 0)
     {
-        assert(delta_org > 0);
+        FLINT_ASSERT(delta_org > 0);
         fmpz_mpoly_neg(v, b_coeff + 0, ctx);
         fmpz_mpoly_pow_fps(u, v, delta_org, ctx);
         for (i = 0; i < polyA->length; i++)
@@ -783,10 +782,10 @@ void _fmpz_mpoly_univar_pgcd(fmpz_mpoly_univar_t poly1,
     fmpz_mpoly_univar_t A, B, C, D;
     fmpz_mpoly_univar_struct * last;
 
-    assert(polyP->length != 0);
-    assert(polyQ->length != 0);
-    assert(polyP->exps[0] >= polyQ->exps[0]);
-    assert(polyQ->exps[0] >= 1);
+    FLINT_ASSERT(polyP->length != 0);
+    FLINT_ASSERT(polyQ->length != 0);
+    FLINT_ASSERT(polyP->exps[0] >= polyQ->exps[0]);
+    FLINT_ASSERT(polyQ->exps[0] >= 1);
 
 
     fmpz_mpoly_init(u,ctx);
@@ -898,10 +897,10 @@ void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
     fmpz_mpoly_univar_t A, B, C, D, H, T;
     fmpz_mpoly_univar_struct * last;
 
-    assert(polyP->length != 0);
-    assert(polyQ->length != 0);
-    assert(polyP->exps[0] >= polyQ->exps[0]);
-    assert(polyQ->exps[0] >= 1);
+    FLINT_ASSERT(polyP->length != 0);
+    FLINT_ASSERT(polyQ->length != 0);
+    FLINT_ASSERT(polyP->exps[0] >= polyQ->exps[0]);
+    FLINT_ASSERT(polyQ->exps[0] >= 1);
 
     fmpz_mpoly_init(u,ctx);
     fmpz_mpoly_init(v,ctx);
@@ -995,7 +994,7 @@ looper:
                 j++;
             } else
             {
-                assert(0);
+                FLINT_ASSERT(0);
             }
         }
         D->length = d_len;
@@ -1027,7 +1026,7 @@ looper:
             jexists = (j < b_len) && (exp == b_exp[j] + 1);
             kexists = (k < b_len) && (exp == b_exp[k]);
 
-            assert(iexists || jexists || kexists);
+            FLINT_ASSERT(iexists || jexists || kexists);
 
             if (iexists) {
                 if (jexists) {
@@ -1096,7 +1095,7 @@ looper:
         t_coeff = T->coeffs;
 
         n = d - e - 1;
-        assert(n > 0);
+        FLINT_ASSERT(n > 0);
         alpha = 1;
         while (2*alpha <= n)
             alpha = 2*alpha;
@@ -1176,7 +1175,7 @@ looper:
                 j++;
             } else
             {
-                assert(0);
+                FLINT_ASSERT(0);
             }
         }
         D->length = d_len;
@@ -1219,7 +1218,7 @@ looper:
                         j++;                
                     } else
                     {
-                        assert(0);
+                        FLINT_ASSERT(0);
                     }
                 }
                 T->length = t_len;
@@ -1236,7 +1235,7 @@ looper:
                                 
             } else
             {
-                assert(h_exp[0] < e - 1);
+                FLINT_ASSERT(h_exp[0] < e - 1);
                 for (i = 0; i < h_len; i++)
                     h_exp[i]++;
             }
@@ -1275,7 +1274,7 @@ looper:
                     j++;
                 } else
                 {
-                    assert(0);
+                    FLINT_ASSERT(0);
                 }
             }
             T->length = t_len;
@@ -1314,7 +1313,7 @@ looper:
             jexists = (j < h_len && exp == h_exp[j] + 1);
             kexists = (k < b_len && exp == b_exp[k]);
 
-            assert(iexists || jexists || kexists);
+            FLINT_ASSERT(iexists || jexists || kexists);
 
             if (iexists) {
                 if (jexists) {
@@ -1422,7 +1421,7 @@ void fmpz_mpoly_univar_derivative(fmpz_mpoly_univar_t poly1,
 
     for (i = 0; i < len1; i++)
     {
-        assert(exp2[i] > 0);
+        FLINT_ASSERT(exp2[i] > 0);
         fmpz_mpoly_scalar_mul_ui(coeff1 + i, coeff2 + i, exp2[i], ctx);
         exp1[i] = exp2[i] - 1;
     }
@@ -1460,7 +1459,7 @@ void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift,
         {
             k = (exp[N*i + off] >> shift) & mask;
             k -= _shift;
-            assert(((slong)k) >= 0);
+            FLINT_ASSERT(((slong)k) >= 0);
             fmpz_poly_set_coeff_fmpz(poly1, k, coeff + i);
         }
     }

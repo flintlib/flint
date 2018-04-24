@@ -74,7 +74,7 @@ void fmpz_mpoly_convert_to_fmpz_mpolyd_degbound(fmpz_mpolyd_t poly1,
     TMP_INIT;
 
     FLINT_ASSERT(poly1->nvars == nvars);
-    FLINT_ASSERT(poly2->bits <= FLINT_BITS)
+    FLINT_ASSERT(poly2->bits <= FLINT_BITS);
 
     degb_prod = WORD(1);
     for (i = 0; i < nvars; i++)
@@ -191,7 +191,7 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
                 --exps[j];
                 if ((slong)(exps[j]) < WORD(0))
                 {
-                    FLINT_ASSERT(j > 0);
+                    FLINT_ASSERT(i == 0 || j > 0);
                     exps[j] = B->deg_bounds[j] - 1;
                 } else
                 {

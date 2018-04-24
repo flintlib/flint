@@ -193,7 +193,7 @@ void fmpz_mpoly_convert_to_fmpz_mpolyd(
 
     fmpz_mpolyd_set_nvars(poly1, ctx->minfo->nvars);
 
-    FLINT_ASSERT(poly2->bits <= FLINT_BITS)
+    FLINT_ASSERT(poly2->bits <= FLINT_BITS);
 
     if (poly2->length == 0)
     {
@@ -772,7 +772,7 @@ choose_next_prime:
     if (lm_idx <= 0)
     {
         /* Gp is 1, which means A and B are r.p. */
-        FLINT_ASSERT(leadmon_idx == 0);
+        FLINT_ASSERT(lm_idx == 0);
         fmpz_mpolyd_set_fmpz(G, cG);
         fmpz_mpolyd_swap(Abar, A);
         fmpz_divexact(temp, cA, cG);

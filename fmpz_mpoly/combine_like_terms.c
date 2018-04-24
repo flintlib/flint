@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mpoly.h"
-#include "assert.h"
 
 /*
     assuming that the exponents are valid and sorted,
@@ -27,7 +26,7 @@ void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
     for (in = WORD(0); in < A->length; in++)
     {
-        assert(in > out);
+        FLINT_ASSERT(in > out);
 
         if (out >= WORD(0) &&
                      mpoly_monomial_equal(A->exps + N*out, A->exps + N*in, N))
