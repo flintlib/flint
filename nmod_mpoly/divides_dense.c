@@ -12,15 +12,14 @@
 #include "nmod_poly.h"
 #include "nmod_mpoly.h"
 
-
-
-
 /*
-    Convert B to A if the degrees of A are bounded by expected_degb
+    Convert B to A if the degrees of A are <= expected_deg
     If not, return 0 and set A to 0.
 */
-int nmod_mpoly_convert_from_nmod_mpolyd_degbound(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
-                           const nmod_mpolyd_t B, const nmod_mpolyd_ctx_t dctx, slong * expect_deg)
+int nmod_mpoly_convert_from_nmod_mpolyd_degbound(
+                                  nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
+                           const nmod_mpolyd_t B, const nmod_mpolyd_ctx_t dctx,
+                                                            slong * expect_deg)
 {
     int ret;
     slong off, j, k, N;
@@ -83,7 +82,8 @@ int nmod_mpoly_convert_from_nmod_mpolyd_degbound(nmod_mpoly_t A, const nmod_mpol
     {
         exps[j] = k % B->deg_bounds[j];
         rangemask[j] = UWORD(1) << j;
-        outrange ^= (outrange ^ FLINT_SIGN_EXT(rexpect_deg[j] - exps[j])) & rangemask[j];
+        outrange ^= (outrange ^ FLINT_SIGN_EXT(rexpect_deg[j]
+                                                    - exps[j])) & rangemask[j];
         k = k / B->deg_bounds[j];
         mpoly_monomial_madd_inplace_mp(pcurexp, exps[j], pexps + N*j, N);
     }
@@ -107,13 +107,15 @@ int nmod_mpoly_convert_from_nmod_mpolyd_degbound(nmod_mpoly_t A, const nmod_mpol
         j = nvars - 1;
         do {
             --exps[j];
-            outrange ^= (outrange ^ FLINT_SIGN_EXT(rexpect_deg[j] - exps[j])) & rangemask[j];
+            outrange ^= (outrange ^ FLINT_SIGN_EXT(rexpect_deg[j]
+                                                    - exps[j])) & rangemask[j];
             if ((slong)(exps[j]) < WORD(0))
             {
                 FLINT_ASSERT(off == 0 || j > 0);
                 FLINT_ASSERT(exps[j] == -UWORD(1));
                 exps[j] = B->deg_bounds[j] - 1;
-                outrange ^= (outrange ^ FLINT_SIGN_EXT(rexpect_deg[j] - exps[j])) & rangemask[j];
+                outrange ^= (outrange ^ FLINT_SIGN_EXT(rexpect_deg[j]
+                                                    - exps[j])) & rangemask[j];
                 mpoly_monomial_madd_inplace_mp(pcurexp, exps[j], pexps + N*j, N);
             } else
             {
@@ -321,4 +323,3 @@ cleanup_stage1:
     nmod_mpolyd_ctx_clear(dctx);
     goto done;
 }
-
