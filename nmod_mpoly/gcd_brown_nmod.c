@@ -336,7 +336,7 @@ void nmod_mpolyd_mul_last_poly(nmod_mpolyd_t M,
                                               b->coeffs, b->length, fctx->mod);
             j +=  Plen + (b->length - 1);
         }
-        assert(j <= new_degb_last);
+        FLINT_ASSERT(j <= new_degb_last);
         while (j < new_degb_last)
         {
 
@@ -623,8 +623,8 @@ void nmod_mpolyd_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
     slong * inds, Find, Nind, Tind;
     TMP_INIT;
 
-    assert(N->nvars == nvars - 1);
-    assert(modulus->length > 0);
+    FLINT_ASSERT(N->nvars == nvars - 1);
+    FLINT_ASSERT(modulus->length > 0);
 
     nmod_mpolyd_set_nvars(T, nvars);
 
