@@ -473,8 +473,16 @@ FLINT_DLL int nmod_mpoly_integral(nmod_mpoly_t poly1,
 
 /* Divisibility **************************************************************/
 
+FLINT_DLL int nmod_mpoly_divides(nmod_mpoly_t Q,
+                        const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
                   const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
+                        const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
 /* Division ******************************************************************/
@@ -563,7 +571,18 @@ FLINT_DLL void _nmod_mpoly_radix_sort1(nmod_mpoly_t A, slong left, slong right,
 FLINT_DLL void _nmod_mpoly_radix_sort(nmod_mpoly_t A, slong left, slong right,
                                     mp_bitcnt_t pos, slong N, ulong * cmpmask);
 
-FLINT_DLL void nmod_mpoly_sort_terms(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_sort_terms(nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_combine_terms(nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_ui(nmod_mpoly_t poly,
+                   mp_limb_t c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_pushterm_ui_ui(nmod_mpoly_t poly,
+                       ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
+
 
 /* dense helpers *************************************************************/
 
@@ -682,8 +701,6 @@ FLINT_DLL int nmod_mpoly_gcd_brown(nmod_mpoly_t G,
                                                    const nmod_mpoly_ctx_t ctx);
 
 
-
-
 /* Reduction *****************************************************************/
 
 FLINT_DLL slong
@@ -731,7 +748,10 @@ int nmod_mpoly_print_pretty(const nmod_mpoly_t poly,
 /* Random generation *********************************************************/
 
 FLINT_DLL void nmod_mpoly_randtest_bound(nmod_mpoly_t poly, flint_rand_t state,
-                    slong length, slong exp_bound, const nmod_mpoly_ctx_t ctx);
+                slong length, mp_limb_t exp_bound, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_randtest_bounds(nmod_mpoly_t poly, flint_rand_t state,
+             slong length, mp_limb_t * exp_bounds, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_randtest_bits(nmod_mpoly_t poly, flint_rand_t state,
                slong length, mp_bitcnt_t exp_bits, const nmod_mpoly_ctx_t ctx);
