@@ -764,7 +764,7 @@ choose_next_prime:
     nmodf_ctx_reset(fctx, p);
     fmpz_mpolyd_to_nmod_mpolyd(Ap, A, fctx);
     fmpz_mpolyd_to_nmod_mpolyd(Bp, B, fctx);
-    success = nmod_mpolyd_gcd_brown(Gp, Apbar, Bpbar, Ap, Bp, fctx);
+    success = nmod_mpolyd_gcd_brown_smprime(Gp, Apbar, Bpbar, Ap, Bp, fctx);
     if (!success)
         goto choose_next_prime;
 

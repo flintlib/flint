@@ -11,8 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
-
 void nmod_mpolyd_ctx_init(nmod_mpolyd_ctx_t dctx, slong nvars)
 {
     slong i;
@@ -28,6 +26,61 @@ void nmod_mpolyd_ctx_init(nmod_mpolyd_ctx_t dctx, slong nvars)
 void nmod_mpolyd_ctx_clear(nmod_mpolyd_ctx_t dctx)
 {
     flint_free(dctx->perm);
+}
+
+void nmod_mpolyd_init(nmod_mpolyd_t poly, slong nvars)
+{
+    slong i;
+
+    poly->nvars = nvars;
+    poly->degb_alloc = nvars;
+    poly->deg_bounds = (slong *) flint_malloc(poly->degb_alloc*sizeof(slong));
+    for (i = 0; i < nvars; i++)
+    {
+        poly->deg_bounds[i] = WORD(1);
+    }
+    poly->coeff_alloc = WORD(16);
+    poly->coeffs = (mp_limb_t *) flint_malloc(poly->coeff_alloc*sizeof(mp_limb_t));
+    for (i = 0; i < poly->coeff_alloc; i++)
+    {
+        poly->coeffs[i] = UWORD(0);
+    }
+}
+
+void nmod_mpolyd_fit_length(nmod_mpolyd_t poly, slong len) {
+    if (poly->coeff_alloc < len) {
+/*flint_printf("realloc %wd -> %wd\n",poly->coeff_alloc, len);*/
+        poly->coeffs = (mp_limb_t *) flint_realloc(poly->coeffs, len*sizeof(mp_limb_t));
+        poly->coeff_alloc = len;
+    }
+}
+
+void nmod_mpolyd_set_nvars(nmod_mpolyd_t poly, slong nvars) {
+
+    poly->nvars = nvars;
+    if (poly->degb_alloc < nvars) {
+        poly->deg_bounds = (slong *) flint_realloc(poly->deg_bounds, nvars*sizeof(slong));
+        poly->degb_alloc = nvars;
+    }
+}
+
+void nmod_mpolyd_zero(nmod_mpolyd_t poly)
+{
+    slong i;
+
+    for (i = 0; i < poly->nvars; i++)
+    {
+        poly->deg_bounds[i] = WORD(1);
+    }
+    poly->coeffs[0] = UWORD(0);
+}
+
+void nmod_mpolyd_clear(nmod_mpolyd_t poly)
+{
+    flint_free(poly->deg_bounds);
+    flint_free(poly->coeffs);
+    poly->deg_bounds = NULL;
+    poly->coeffs = NULL;
 }
 
 
@@ -130,7 +183,6 @@ void nmod_mpoly_convert_to_nmod_mpolyd_degbound(nmod_mpolyd_t A,
     TMP_END;
 }
 
-
 /*
     convert B to A - sets degree bounds in A
 */
@@ -188,8 +240,6 @@ void nmod_mpoly_convert_to_nmod_mpolyd(
 
     TMP_END;
 }
-
-
 
 /*
     Convert B to A
@@ -311,51 +361,9 @@ void nmod_mpoly_convert_from_nmod_mpolyd(nmod_mpoly_t A, const nmod_mpoly_ctx_t 
 
     TMP_END;
 }
-/*
-void nmod_mpoly_convert_from_nmod_mpolyd(
-                                  nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
-                           const nmod_mpolyd_t B, const nmod_mpolyd_ctx_t dctx)
-{
-    slong i, j;
-    slong degb_prod;
-    slong * perm = dctx->perm;
-    ulong * exps;
-    TMP_INIT;
 
-    FLINT_ASSERT(ctx->minfo->nvars == B->nvars);
 
-    degb_prod = WORD(1);
-    for (j = 0; j < B->nvars; j++) {
-        degb_prod *= B->deg_bounds[j];
-    }
-
-    TMP_START;
-    exps = (ulong *) TMP_ALLOC(B->nvars*sizeof(ulong));
-
-    nmod_mpoly_zero(A, ctx);
-    for (i = 0; i < degb_prod; i++) {
-        ulong k = i;
-
-        if (B->coeffs[i] == 0)
-            continue;
-
-        for (j = B->nvars - 1; j >= 0; j--) 
-        {
-            ulong m = B->deg_bounds[j];
-            ulong e = k % m;
-            k = k / m;
-            exps[perm[j]] = e;
-        }
-        FLINT_ASSERT(k == 0);
-
-        nmod_mpoly_set_term_ui_ui(A, B->coeffs[i], exps, ctx);
-    }
-
-    TMP_END;
-}
-*/
-
-void nmod_mpolyd_print_simple(nmod_mpolyd_t poly)
+void nmod_mpolyd_print(nmod_mpolyd_t poly)
 {
 
     int first = 0;
@@ -409,4 +417,33 @@ slong nmod_mpolyd_length(const nmod_mpolyd_t A)
     }
 
     return i;
+}
+
+slong nmod_mpolyd_last_degree(const nmod_mpolyd_t A, const nmodf_ctx_t fctx)
+{
+    slong i, j, Plen, degree;
+    slong degb_prod, degb_last=0;
+
+    degb_prod = WORD(1);
+    for (j = 0; j < A->nvars; j++) {
+        degb_last = A->deg_bounds[j];
+        degb_prod *= degb_last;
+    }
+
+    degree = -1;
+    for (i = 0; i < degb_prod; i += degb_last)
+    {
+        mp_limb_t * P = A->coeffs + i;
+        Plen = degb_last;
+        while (P[Plen-1] == 0)
+        {
+            Plen --;
+            if (Plen == 0)
+                break;
+        }
+        degree = FLINT_MAX(degree, Plen - 1);
+        if (degree + 1 == degb_last)
+            return degree;
+    }
+    return degree;
 }
