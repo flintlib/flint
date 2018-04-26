@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mpoly.h"
-#include "assert.h"
 
 
 /*
@@ -159,7 +158,7 @@ looper:
 
     goto looper;
 done:
-    assert(i == tree->size);
+    FLINT_ASSERT(i == tree->size);
 
     /* take from heap and put into poly1 */
     fmpz_mpoly_fit_bits(poly1, bits, ctx);

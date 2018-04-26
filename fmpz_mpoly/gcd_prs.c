@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mpoly.h"
-#include "assert.h"
 
 
 /* gcd of two monomials */
@@ -23,8 +22,8 @@ void fmpz_mpoly_gcd_monomial(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
     fmpz_t igcd;
     TMP_INIT;
 
-    assert(polyA->length == 1);
-    assert(polyB->length == 1);
+    FLINT_ASSERT(polyA->length == 1);
+    FLINT_ASSERT(polyB->length == 1);
     if (polyA->bits > FLINT_BITS || polyB->bits > FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_gcd_monomial");
 
@@ -252,11 +251,11 @@ int _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
         } else {
             _fmpz_mpoly_univar_pgcd(gx, bx, ax, ctx);
         }
-        assert(gx->length > 0);
+        FLINT_ASSERT(gx->length > 0);
     }
 
     /* try to divide out easy content from gcd */
-    assert(gx->length > 0);
+    FLINT_ASSERT(gx->length > 0);
     if ((gx->coeffs + 0)->length != 1
         && (gx->coeffs + gx->length - 1)->length != 1)
     {
@@ -267,7 +266,7 @@ int _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
             for (i = 0; i < gx->length; i++)
             {
                 if (!fmpz_mpoly_divides_monagan_pearce(gx->coeffs + i, gx->coeffs + i, gabc, ctx))
-                    assert(0 && "not lead div");
+                    FLINT_ASSERT(0 && "not lead div");
             }
         } else if ((ax->coeffs + ax->length - 1)->length == 1
                 || (bx->coeffs + bx->length - 1)->length == 1)
@@ -277,7 +276,7 @@ int _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
             for (i = 0; i < gx->length; i++)
             {
                 if (!fmpz_mpoly_divides_monagan_pearce(gx->coeffs + i, gx->coeffs + i, gabc, ctx))
-                    assert(0 && "not trail div");
+                    FLINT_ASSERT(0 && "not trail div");
             }
         } else
         {
@@ -289,7 +288,7 @@ int _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
                 for (i = 0; i < gx->length; i++)
                 {
                     if (!fmpz_mpoly_divides_monagan_pearce(gx->coeffs + i, gx->coeffs + i, gabc, ctx))
-                        assert(0 && "not lead div");
+                        FLINT_ASSERT(0 && "not lead div");
                 }                
             }
         }

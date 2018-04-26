@@ -12,19 +12,6 @@
 #include "nmod_mpoly.h"
 
 
-void nmod_mpolyd_ctx_init(nmod_mpolyd_ctx_t dctx, slong nvars)
-{
-    slong i;
-
-    dctx->nvars = nvars;
-    dctx->perm = (slong *) flint_malloc(nvars*sizeof(slong));
-    for (i = 0; i < nvars; i++)
-    {
-        dctx->perm[i] = i;
-    }
-}
-
-
 int nmod_mpolyd_ctx_settle(nmod_mpolyd_ctx_t dctx,
                             const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx)
@@ -84,11 +71,6 @@ cleanup:
     return success;
 }
 
-void nmod_mpolyd_ctx_clear(nmod_mpolyd_ctx_t dctx)
-{
-    flint_free(dctx->perm);
-}
-
 void nmod_mpolyd_init(nmod_mpolyd_t poly, slong nvars)
 {
     slong i;
@@ -145,60 +127,6 @@ void nmod_mpolyd_clear(nmod_mpolyd_t poly)
     poly->coeffs = NULL;
 }
 
-void nmod_mpoly_convert_to_nmod_mpolyd(
-                            nmod_mpolyd_t poly1, const nmod_mpolyd_ctx_t dctx,
-                          const nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
-{
-    slong degb_prod;
-    slong i, j, N;
-    slong * exps;
-    const slong * perm = dctx->perm;
-    slong nvars = ctx->minfo->nvars;
-    TMP_INIT;
-
-    nmod_mpolyd_set_nvars(poly1, ctx->minfo->nvars);
-
-    FLINT_ASSERT(poly2->bits <= FLINT_BITS)
-
-    if (poly2->length == 0)
-    {
-        nmod_mpolyd_zero(poly1);
-        return;
-    }
-
-    TMP_START;
-    exps = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
-
-    nmod_mpoly_degrees_si(exps, poly2, ctx);
-    degb_prod = WORD(1);
-    for (i = 0; i < nvars; i++)
-    {
-        poly1->deg_bounds[i] = exps[perm[i]] + 1;
-        degb_prod *= poly1->deg_bounds[i];
-    }
-
-    nmod_mpolyd_fit_length(poly1, degb_prod);
-    for (i = 0; i < degb_prod; i++)
-    {
-        poly1->coeffs[i] = UWORD(0);
-    }
-
-    N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
-    for (i = 0; i < poly2->length; i++)
-    {
-        slong off = 0;
-
-        mpoly_get_monomial_ui((ulong *)exps, poly2->exps + N*i, poly2->bits, ctx->minfo);
-        for (j = 0; j < nvars; j++)
-        {
-            off = exps[perm[j]] + poly1->deg_bounds[j]*off;
-        }
-
-        poly1->coeffs[off] = poly2->coeffs[i];
-    }
-
-    TMP_END;
-}
 
 void nmod_mpolyd_print(nmod_mpolyd_t poly, const char ** vars,
                                                   const nmod_mpolyd_ctx_t dctx)
@@ -231,45 +159,6 @@ void nmod_mpolyd_print(nmod_mpolyd_t poly, const char ** vars,
             ulong e = k % m;
             k = k / m;
             flint_printf("*%s^%wd", vars[dctx->perm[j]], e);
-        }
-        FLINT_ASSERT(k == 0);
-        first = 0;
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
-void nmod_mpolyd_print_simple(nmod_mpolyd_t poly)
-{
-
-    int first = 0;
-    slong i, j;
-    slong degb_prod;
-
-    degb_prod = WORD(1);
-    for (j = 0; j < poly->nvars; j++) {
-        degb_prod *= poly->deg_bounds[j];
-    }
-
-    first = 1;
-    for (i = 0; i < degb_prod; i++) {
-        ulong k = i;
-
-        if (poly->coeffs[i] == 0)
-            continue;
-
-        if (!first)
-            printf(" + ");
-
-        flint_printf("%wu", poly->coeffs[i]);
-
-        for (j = poly->nvars - 1; j >= 0; j--) 
-        {
-            ulong m = poly->deg_bounds[j];
-            ulong e = k % m;
-            k = k / m;
-            flint_printf("*x%wd^%wd", j, e);
         }
         FLINT_ASSERT(k == 0);
         first = 0;
@@ -407,51 +296,6 @@ void nmod_mpolyd_sub(nmod_mpolyd_t A, const nmod_mpolyd_t B,
                 inds[j] = 0;
             }
         }
-    }
-
-    TMP_END;
-}
-
-
-
-
-void nmod_mpoly_convert_from_nmod_mpolyd(
-                                  nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
-                           const nmod_mpolyd_t B, const nmod_mpolyd_ctx_t dctx)
-{
-    slong i, j;
-    slong degb_prod;
-    slong * perm = dctx->perm;
-    ulong * exps;
-    TMP_INIT;
-
-    FLINT_ASSERT(ctx->minfo->nvars == B->nvars);
-
-    degb_prod = WORD(1);
-    for (j = 0; j < B->nvars; j++) {
-        degb_prod *= B->deg_bounds[j];
-    }
-
-    TMP_START;
-    exps = (ulong *) TMP_ALLOC(B->nvars*sizeof(ulong));
-
-    nmod_mpoly_zero(A, ctx);
-    for (i = 0; i < degb_prod; i++) {
-        ulong k = i;
-
-        if (B->coeffs[i] == 0)
-            continue;
-
-        for (j = B->nvars - 1; j >= 0; j--) 
-        {
-            ulong m = B->deg_bounds[j];
-            ulong e = k % m;
-            k = k / m;
-            exps[perm[j]] = e;
-        }
-        FLINT_ASSERT(k == 0);
-
-        nmod_mpoly_set_term_ui_ui(A, B->coeffs[i], exps, ctx);
     }
 
     TMP_END;

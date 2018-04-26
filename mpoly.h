@@ -247,6 +247,13 @@ void mpoly_monomial_madd_mp(ulong * exp1, const ulong * exp2, ulong scalar,
 }
 
 MPOLY_INLINE
+void mpoly_monomial_madd_inplace_mp(ulong * exp12, ulong scalar,
+                                                   const ulong * exp3, slong N)
+{
+    mpn_addmul_1(exp12, exp3, N, scalar);
+}
+
+MPOLY_INLINE
 void mpoly_monomial_msub(ulong * exp1, const ulong * exp2, ulong scalar,
                                                    const ulong * exp3, slong N)
 {
