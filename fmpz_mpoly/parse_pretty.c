@@ -13,7 +13,6 @@
 #include <string.h>
 #include <math.h>
 #include "fmpz_mpoly.h"
-#include <assert.h>
 
 
 int _fmpz_mpoly_parse_pretty_pop(fmpz_mpoly_geobucket_struct ** estack,

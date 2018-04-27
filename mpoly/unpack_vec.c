@@ -10,23 +10,26 @@
 */
 
 #include "mpoly.h"
-#include "assert.h"
 
-void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len) {
-
-    if (bits <= FLINT_BITS) {
-
+void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
+                                                     slong nfields, slong len)
+{
+    if (bits <= FLINT_BITS)
+    {
         slong i, j, shift;
         ulong u, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-        for (j = 0; j < len; j++) {
+        for (j = 0; j < len; j++)
+        {
             i = 0;
             u = *exp2++;
             shift = 0;
             *exp1++ = u & mask;
             u = u >> bits;      /* number of bits to encode 0th field */
             shift += bits;      /* number of bits to encode 0th field */
-            while (++i < nfields) {
-                if (shift + bits > FLINT_BITS) {
+            while (++i < nfields)
+            {
+                if (shift + bits > FLINT_BITS) 
+                {
                     u = *exp2++;
                     shift = 0;
                 }
@@ -36,34 +39,38 @@ void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfi
             }
         }
 
-    } else {
-
+    } else
+    {
         slong j;
         ulong words_per_field = bits/FLINT_BITS;
-        assert(bits%FLINT_BITS == 0);
+        FLINT_ASSERT(bits%FLINT_BITS == 0);
 
-        for (j = 0; j < len*nfields; j++, exp2 += words_per_field) {
-                *exp1++ = *exp2;
+        for (j = 0; j < len*nfields; j++, exp2 += words_per_field)
+        {
+            *exp1++ = *exp2;
         }
-
     }
 }
 
-void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits, slong nfields, slong len) {
-
-    if (bits <= FLINT_BITS) {
-
+void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
+                                                      slong nfields, slong len)
+{
+    if (bits <= FLINT_BITS)
+    {
         slong i, j, shift;
         ulong u, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-        for (j = 0; j < len; j++) {
+        for (j = 0; j < len; j++)
+        {
             i = 0;
             u = *exp2++;
             shift = 0;
             fmpz_set_ui(exp1++, u & mask);
             u = u >> bits;      /* number of bits to encode 0th field */
             shift += bits;      /* number of bits to encode 0th field */
-            while (++i < nfields) {
-                if (shift + bits > FLINT_BITS) {
+            while (++i < nfields)
+            {
+                if (shift + bits > FLINT_BITS)
+                {
                     u = *exp2++;
                     shift = 0;
                 }
@@ -72,27 +79,27 @@ void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits, sl
                 shift += bits;      /* number of bits to encode ith field */
             }
         }
-
-    } else {
-
+    } else
+    {
         slong j;
         ulong words_per_field = bits/FLINT_BITS;
-        assert(bits%FLINT_BITS == 0);
+        FLINT_ASSERT(bits%FLINT_BITS == 0);
 
-        for (j = 0; j < len*nfields; j++, exp2 += words_per_field) {
-
+        for (j = 0; j < len*nfields; j++, exp2 += words_per_field)
+        {
                 ulong size = words_per_field;
                 while (size > 1 && exp2[size - 1] == 0)
                     size--;
-                if (size == 1) {
+                if (size == 1)
+                {
                     fmpz_set_ui(exp1, exp2[0]);
-                } else {
+                } else
+                {
                     __mpz_struct * mpz = _fmpz_promote(exp1);
                     mpz_realloc2(mpz, bits);
                     mpn_copyi(mpz->_mp_d, exp2, size);
                     mpz->_mp_size = size;
                 }
-
                 exp1++;
         }
     }

@@ -9,14 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "longlong.h"
-#include "assert.h"
-
 
 slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
                               fmpz ** polyq, ulong ** expq, slong * allocq,
