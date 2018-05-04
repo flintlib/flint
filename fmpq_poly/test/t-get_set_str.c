@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2018 Vincent Delecroix
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
 
@@ -18,6 +19,23 @@
 #include "fmpq_poly.h"
 #include "ulong_extras.h"
 
+void check_invalid(char * s)
+{
+    fmpq_poly_t p;
+    int err;
+
+    fmpq_poly_init(p);
+    err = fmpq_poly_set_str(p, s);
+    if (!err)
+    {
+        printf("Got no error with s='%s'\n", s);
+        printf("p = "); fmpq_poly_print(p); printf("\n");
+        flint_abort();
+    }
+    fmpq_poly_clear(p);
+}
+
+
 int
 main(void)
 {
@@ -28,6 +46,27 @@ main(void)
 
     flint_printf("get_set_str....");
     fflush(stdout);
+
+    /* badly formatted input */
+    check_invalid("");
+    check_invalid("1");
+    check_invalid("x");
+    check_invalid("-");
+    check_invalid("-1");
+    check_invalid("-1  0");
+    check_invalid("2 X1 0");
+    check_invalid("3 X-2 0 1");
+    check_invalid("2 -1 0 1Y");
+    check_invalid("2 -1 0 1");
+    check_invalid("3   -1 0 1 ");
+    check_invalid("3  -1 0 1 ");
+    check_invalid("3  -1 0  1");
+    check_invalid("3  -1  0 1");
+
+    /* wrong length */
+    check_invalid("0  0");
+    check_invalid("2  -1 0 1");
+    check_invalid("4  0 0");
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -49,6 +88,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("f      = "), fmpq_poly_debug(f), flint_printf("\n\n");
             flint_printf("g      = "), fmpq_poly_debug(g), flint_printf("\n\n");
+            flint_printf("str    = %s\n\n", str);
             flint_printf("ans    = %d\n\n", ans);
             flint_printf("cflags = %wu\n\n", cflags);
             abort();

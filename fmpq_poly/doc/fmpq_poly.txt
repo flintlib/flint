@@ -223,31 +223,33 @@ void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, slong n)
     The result is only guaranteed to be in canonical form if all 
     input coefficients are given in lowest terms.
 
-int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
+int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len)
 
-    Sets \code{(poly, den)} to the polynomial specified by the null-terminated 
-    string \code{str}.
+    Sets \code{(poly, den)} to the polynomial specified by the
+    null-terminated string \code{str} of \code{len} coefficients. The input
+    format is a sequence of coefficients separated by one space.
     
-    The result is only guaranteed to be in lowest terms if all 
+    The result is only guaranteed to be in lowest terms if all
     coefficients in the input string are in lowest terms.
     
-    Returns $0$ if no error occurred.  Otherwise, returns a non-zero value, 
+    Returns $0$ if no error occurred. Otherwise, returns -1
     in which case the resulting value of \code{(poly, den)} is undefined. 
-    If \code{str} is not null-terminated, calling this method might result 
+    If \code{str} is not null-terminated, calling this method might result
     in a segmentation fault.
 
 int fmpq_poly_set_str(fmpq_poly_t poly, const char * str)
 
-    Sets \code{poly} to the polynomial specified by the null-terminated 
-    string \code{str}.
+    Sets \code{poly} to the polynomial specified by the null-terminated
+    string \code{str}. The input format is the same as the output format
+    of \code{fmpq_poly_get_str}: the length given as a decimal integer,
+    then two spaces, then the list of coefficients separated by one space.
     
-    The result is only guaranteed to be in canonical for if all 
+    The result is only guaranteed to be in canonical form if all
     coefficients in the input string are in lowest terms.
     
-    Returns $0$ if no error occurred.  Otherwise, returns a non-zero 
-    value, in which case the resulting value of \code{poly} is undefined. 
-    If \code{str} is not null-terminated, calling this method might result 
-    in a segmentation fault.
+    Returns $0$ if no error occurred.  Otherwise, returns -1 in which case
+    the resulting value of \code{poly} is set to zero. If \code{str} is not
+    null-terminated, calling this method might result in a segmentation fault.
 
 char * fmpq_poly_get_str(const fmpq_poly_t poly)
 
