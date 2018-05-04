@@ -146,6 +146,7 @@ FLINT_DLL void fmpq_set_si(fmpq_t res, slong p, ulong q);
 
 FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 
+FLINT_DLL int fmpq_set_str(fmpq_t res, const char * str, int base);
 
 FMPQ_INLINE void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
 {
