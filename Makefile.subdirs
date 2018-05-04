@@ -82,10 +82,10 @@ $(BUILD_DIR)/test/%$(EXEEXT): $(BUILD_DIR)/../../libflint.a
 endif
 
 $(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $(LDFLAGS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
 
 $(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o
-	$(QUIET_CC) $(CXX) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+	$(QUIET_CC) $(CXX) $(CFLAGS) $(INCS) $(LDFLAGS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
 
 %_RUN: %
 	@$<

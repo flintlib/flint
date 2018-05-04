@@ -8,19 +8,24 @@ make
 make check
 make install
 
-However, this assumes that MPIR and MPFR are already installed on your system in
-/usr/local. If the libraries are not in this location you must specify where 
-they are by passing their location to configure. It also assumes you wish to 
-install FLINT 2 at the prefix /usr/local. If not you must pass the prefix (the
-directory containing lib and include subdirectories into which FLINT will be
-installed) to configure:
+However, this assumes that MPIR and MPFR are already installed in the default
+search path of your compiler (e.g. /usr/include/ and /usr/lib/). If these
+libraries are not in such location you must specify where they are by passing
+their location to configure `--with-mpir=ABSOLUTE_PATH` for MPIR and
+`--with-mpfr=ABSOLUTE_PATH` for MPFR.
+
+The configure script also assumes you wish to install FLINT 2 at the prefix
+/usr/local. If not you must pass the prefix (the directory containing lib and
+include subdirectories into which FLINT will be installed) to configure with
+the option `--prefix=PATH`.
+
+A complete example of a custom configuration command would be
 
 ./configure --with-mpir=/home/user1/mpir-2.1.1/ --with-mpfr=/usr --prefix=/usr
 
 Note that the FLINT configure system can handle MPIR/MPFR as installed (in lib
 and include dirs) at some location, or as source builds (built from source and
-not installed).
+not installed). Though, to run the FLINT tests, MPIR/MPFR needs to be
+properly installed.
 
-For further configure and make options, please refer to the FLINT 2
-documentation.
-
+For further configure and make options, please refer to the FLINT 2 documentation.
