@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2009 William Hart
     Copyright (C) 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2018 Vincent Delecroix
 
     This file is part of FLINT.
 
@@ -19,25 +20,45 @@
 #include "fmpz.h"
 #include "fmpq.h"
 
+void check_invalid(char * s, int b)
+{
+    fmpq_t r;
+    int err;
+
+    fmpq_init(r);
+    err = fmpq_set_str(r, s, b);
+    if (!err)
+    {
+        printf("Got no error with s='%s'\n", s);
+        printf("r = "); fmpq_print(r); printf("\n");
+        flint_abort();
+    }
+    fmpq_clear(r);
+}
+
 int
 main(void)
 {
-    int i, result;
+    int i;
     FLINT_TEST_INIT(state);
 
     flint_printf("get_str....");
     fflush(stdout);
 
-    
+    check_invalid("x5/3", 6);
+    check_invalid("5x/3", 6);
+    check_invalid("5/x3", 6);
+    check_invalid("5/3x", 6);
 
     for (i = 0; i < 100000; i++)
     {
-        fmpq_t a;
+        fmpq_t a, a2;
         mpq_t b;
-        int base, j;
-        char *str1, *str2;
+        int ans, base;
+        char *str1, *str2, *str3;
 
         fmpq_init(a);
+        fmpq_init(a2);
         mpq_init(b);
         fmpq_randtest(a, state, 200);
         base = (int) (n_randint(state, 31) + 2);
@@ -46,15 +67,7 @@ main(void)
 
         str1 = fmpq_get_str(NULL, base, a);
         str2 = mpq_get_str(NULL, base, b);
-        result = (strlen(str1) == strlen(str2));
-        if (result)
-        {
-            for (j = 0; result && j < strlen(str1); j++)
-                if (str1[j] != str2[j])
-                    result = 0;
-        }
-
-        if (!result)
+        if (strcmp(str1, str2))
         {
             flint_printf("FAIL:\n");
             gmp_printf("b = %Qd\n", b);
@@ -63,15 +76,27 @@ main(void)
             abort();
         }
 
+        ans = fmpq_set_str(a2, str1, base);
+
+        if (ans || !fmpq_equal(a, a2))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("str1 = %s\n", str1);
+            flint_printf("base = %d\n", base);
+            flint_printf("ans = %d\n", ans);
+            abort();
+        }
+
         flint_free(str1);
         flint_free(str2);
 
         fmpq_clear(a);
+        fmpq_clear(a2);
         mpq_clear(b);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }
