@@ -12,6 +12,10 @@
 #include "nmod_mpoly.h"
 #include "fq_nmod_poly.h"
 
+/*
+    helper functions for
+    small prime version of the modular gcd over finite fields
+*/
 
 void fq_nmod_mpolyd_ctx_init(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
                                                         mp_limb_t p, slong deg)
@@ -31,65 +35,6 @@ void fq_nmod_mpolyd_ctx_init(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
     fmpz_clear(P);
 }
 
-int fq_nmod_mpolyd_ctx_settle(fq_nmod_mpolyd_ctx_t dctx,
-                            const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    int success;
-    slong i, j, degb_prod;
-    slong * Aexps, * Bexps, * deg_bounds;
-    slong nvars = ctx->minfo->nvars;
-    slong * perm = dctx->perm;
-    TMP_INIT;
-
-    success = 0;
-
-    TMP_START;
-    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
-        goto cleanup;
-    Aexps = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    Bexps = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    nmod_mpoly_degrees_si(Aexps, A, ctx);
-    nmod_mpoly_degrees_si(Bexps, B, ctx);
-
-    deg_bounds = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    for (i = 0; i < nvars; i++)
-    {
-        dctx->perm[i] = i;
-    }
-
-    degb_prod = 1;
-    for (i = 0; i < nvars; i++)
-    {
-        ulong hi;
-        deg_bounds[i] = FLINT_MAX(Aexps[i] + 1, Bexps[i] + 1);
-        umul_ppmm(hi, degb_prod, degb_prod, deg_bounds[i]);
-        if (hi != WORD(0) || degb_prod < 0)
-            goto cleanup;
-    }
-
-    success = 1;
-
-    for (i = 1; i < nvars; i++)
-    {
-        for (j = i; (j > 0) && (deg_bounds[j-1] < deg_bounds[j-0]); j--)
-        {
-            slong t1, t2;
-            t1 = deg_bounds[j-1];
-            t2 = deg_bounds[j-0];
-            deg_bounds[j-0] = t1;
-            deg_bounds[j-1] = t2;
-            t1 = perm[j-1];
-            t2 = perm[j-0];
-            perm[j-0] = t1;
-            perm[j-1] = t2;
-        }
-    }
-
-cleanup:
-    TMP_END;
-    return success;
-}
 
 void fq_nmod_mpolyd_ctx_clear(fq_nmod_mpolyd_ctx_t dctx)
 {
@@ -118,8 +63,17 @@ void fq_nmod_mpolyd_init(fq_nmod_mpolyd_t poly, slong nvars,
     }
 }
 
+NMOD_MPOLY_INLINE void fq_nmod_mpolyd_swap(fq_nmod_mpolyd_t poly1,
+                                fq_nmod_mpolyd_t poly2)
+{
+   fq_nmod_mpolyd_struct t = *poly1;
+   *poly1 = *poly2;
+   *poly2 = t;
+}
+
 void fq_nmod_mpolyd_fit_length(fq_nmod_mpolyd_t poly, slong len,
-                                             const fq_nmod_mpolyd_ctx_t dctx) {
+                                               const fq_nmod_mpolyd_ctx_t dctx)
+{
     slong i;
     if (poly->coeff_alloc < len) {
         slong new_alloc = len;
@@ -154,8 +108,6 @@ void fq_nmod_mpolyd_zero(fq_nmod_mpolyd_t poly, const fq_nmod_mpolyd_ctx_t dctx)
     fq_nmod_set_ui(poly->coeffs + 0, UWORD(0), dctx->fqctx);
 }
 
-
-
 void fq_nmod_mpolyd_clear(fq_nmod_mpolyd_t poly, const fq_nmod_mpolyd_ctx_t dctx)
 {
     slong i;
@@ -168,7 +120,6 @@ void fq_nmod_mpolyd_clear(fq_nmod_mpolyd_t poly, const fq_nmod_mpolyd_ctx_t dctx
     poly->deg_bounds = NULL;
     poly->coeffs = NULL;
 }
-
 
 void nmod_mpoly_convert_to_fq_nmod_mpolyd(
                        fq_nmod_mpolyd_t poly1, const fq_nmod_mpolyd_ctx_t dctx,
@@ -213,7 +164,8 @@ void nmod_mpoly_convert_to_fq_nmod_mpolyd(
     {
         slong off = 0;
 
-        mpoly_get_monomial_ui((ulong *)exps, poly2->exps + N*i, poly2->bits, ctx->minfo);
+        mpoly_get_monomial_ui((ulong *)exps, poly2->exps + N*i,
+                                                      poly2->bits, ctx->minfo);
         for (j = 0; j < nvars; j++)
         {
             off = exps[perm[j]] + poly1->deg_bounds[j]*off;
@@ -271,10 +223,8 @@ void nmod_mpoly_convert_from_fq_nmod_mpolyd(
     TMP_END;
 }
 
-
-void fq_nmod_mpolyd_print(fq_nmod_mpolyd_t poly,
-                const char ** vars, const fq_nmod_mpolyd_ctx_t dctx) {
-
+void fq_nmod_mpolyd_print(fq_nmod_mpolyd_t poly, const fq_nmod_mpolyd_ctx_t dctx)
+{
     int first = 0;
     slong i, j;
     slong degb_prod;
@@ -308,7 +258,7 @@ void fq_nmod_mpolyd_print(fq_nmod_mpolyd_t poly,
             ulong m = poly->deg_bounds[j];
             ulong e = k % m;
             k = k / m;
-            flint_printf("*%s^%wd", vars[dctx->perm[j]], e);
+            flint_printf("*x%wd^%wd", j, e);
         }
         FLINT_ASSERT(k == 0);
         first = 0;
@@ -321,273 +271,132 @@ void fq_nmod_mpolyd_print(fq_nmod_mpolyd_t poly,
 }
 
 
-
-
-void fq_nmod_mpolyd_add(fq_nmod_mpolyd_t A, const fq_nmod_mpolyd_t B,
-                     const fq_nmod_mpolyd_t C, const fq_nmod_mpolyd_ctx_t dctx)
-{
-
-    int Bok, Cok;
-    slong Bind, Cind;
-    slong i, j;
-    slong * inds;
-    slong nvars = B->nvars;
-    slong degb_prod;
-    TMP_INIT;
-
-    FLINT_ASSERT(A != B);
-    FLINT_ASSERT(A != C);
-    FLINT_ASSERT(B->nvars == C->nvars);
-
-    fq_nmod_mpolyd_set_nvars(A, B->nvars);
-
-    degb_prod = 1;
-    for (j = 0; j < nvars; j++)
-    {
-/*        printf("deg_bounds: %d %d\n",B->deg_bounds[j], C->deg_bounds[j]);*/
-        A->deg_bounds[j] = FLINT_MAX(B->deg_bounds[j], C->deg_bounds[j]);
-        degb_prod *= A->deg_bounds[j];
-    }
-    fq_nmod_mpolyd_fit_length(A, degb_prod, dctx);
-
-    TMP_START;
-    inds = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    for (j = 0; j < nvars; j++)
-        inds[j] = 0;
-    Bok = 1;
-    Cok = 1;
-    Bind = 0;
-    Cind = 0;
-    for (i = 0; i < degb_prod; i++)
-    {
-        int carry = 1;
-
-               if (Bok && Cok) {
-            fq_nmod_add(A->coeffs + i, B->coeffs + Bind++, C->coeffs + Cind++, dctx->fqctx);
-        } else if (Bok && !Cok) {
-            fq_nmod_set(A->coeffs + i, B->coeffs + Bind++, dctx->fqctx);
-        } else if (!Bok && Cok) {
-            fq_nmod_set(A->coeffs + i, C->coeffs + Cind++, dctx->fqctx);
-        } else {
-            fq_nmod_zero(A->coeffs + i, dctx->fqctx);
-        }
-
-        Bok = 1;
-        Cok = 1;
-        for (j = nvars - 1; j >= 0; j--)
-        {
-            inds[j] += carry;
-            if (inds[j] < A->deg_bounds[j])
-            {
-                carry = 0;
-                Bok = Bok && (inds[j] < B->deg_bounds[j]);
-                Cok = Cok && (inds[j] < C->deg_bounds[j]);
-            } else
-            {
-                carry = 1;
-                inds[j] = 0;
-            }
-        }
-    }
-
-    TMP_END;
-}
-
-
-
-void fq_nmod_mpolyd_sub(fq_nmod_mpolyd_t A, const fq_nmod_mpolyd_t B,
-                     const fq_nmod_mpolyd_t C, const fq_nmod_mpolyd_ctx_t dctx)
-{
-
-    int Bok, Cok;
-    slong Bind, Cind;
-    slong i, j;
-    slong * inds;
-    slong nvars = B->nvars;
-    slong degb_prod;
-    TMP_INIT;
-
-    FLINT_ASSERT(A != B);
-    FLINT_ASSERT(A != C);
-    FLINT_ASSERT(B->nvars == C->nvars);
-
-    fq_nmod_mpolyd_set_nvars(A, B->nvars);
-
-    degb_prod = 1;
-    for (j = 0; j < nvars; j++)
-    {
-        A->deg_bounds[j] = FLINT_MAX(B->deg_bounds[j], C->deg_bounds[j]);
-        degb_prod *= A->deg_bounds[j];
-    }
-    fq_nmod_mpolyd_fit_length(A, degb_prod, dctx);
-
-    TMP_START;
-    inds = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    for (j = 0; j < nvars; j++)
-        inds[j] = 0;
-    Bok = 1;
-    Cok = 1;
-    Bind = 0;
-    Cind = 0;
-    for (i = 0; i < degb_prod; i++)
-    {
-        int carry = 1;
-
-               if (Bok && Cok) {
-            fq_nmod_sub(A->coeffs + i, B->coeffs + Bind++, C->coeffs + Cind++, dctx->fqctx);
-        } else if (Bok && !Cok) {
-            fq_nmod_set(A->coeffs + i, B->coeffs + Bind++, dctx->fqctx);
-        } else if (!Bok && Cok) {
-            fq_nmod_neg(A->coeffs + i, C->coeffs + Cind++, dctx->fqctx);
-        }
-
-        Bok = 1;
-        Cok = 1;
-        for (j = nvars - 1; j >= 0; j--)
-        {
-            inds[j] += carry;
-            if (inds[j] < A->deg_bounds[j])
-            {
-                carry = 0;
-                Bok = Bok && (inds[j] < B->deg_bounds[j]);
-                Cok = Cok && (inds[j] < C->deg_bounds[j]);
-            } else
-            {
-                carry = 1;
-                inds[j] = 0;
-            }
-        }
-    }
-
-    TMP_END;
-}
-
-
-
 void fq_nmod_mpolyd_gcd_brown_univar(fq_nmod_mpolyd_t G,
                              fq_nmod_mpolyd_t Abar,      fq_nmod_mpolyd_t Bbar,
                        const fq_nmod_mpolyd_t A,   const fq_nmod_mpolyd_t B,
                                                const fq_nmod_mpolyd_ctx_t dctx)
 {
-        slong Alen, Blen;
+    slong Alen, Blen;
 
-        Alen = A->deg_bounds[0];
-        while (fq_nmod_is_zero(A->coeffs + Alen-1, dctx->fqctx)) {
-            Alen--;
-            if (Alen == 0)
-                break;
-        }
-
-        Blen = B->deg_bounds[0];
-        while (fq_nmod_is_zero(B->coeffs + Blen-1, dctx->fqctx)) {
-            Blen--;
-            if (Blen == 0)
-                break;
-        }
-
-        fq_nmod_mpolyd_set_nvars(G, 1);
-        fq_nmod_mpolyd_set_nvars(Abar, 1);
-        fq_nmod_mpolyd_set_nvars(Bbar, 1);
+    Alen = A->deg_bounds[0];
+    while (fq_nmod_is_zero(A->coeffs + Alen-1, dctx->fqctx))
+    {
+        Alen--;
         if (Alen == 0)
+            break;
+    }
+
+    Blen = B->deg_bounds[0];
+    while (fq_nmod_is_zero(B->coeffs + Blen-1, dctx->fqctx))
+    {
+        Blen--;
+        if (Blen == 0)
+            break;
+    }
+
+    fq_nmod_mpolyd_set_nvars(G, 1);
+    fq_nmod_mpolyd_set_nvars(Abar, 1);
+    fq_nmod_mpolyd_set_nvars(Bbar, 1);
+    if (Alen == 0)
+    {
+        if (Blen == 0)
         {
-            if (Blen == 0)
+            fq_nmod_zero(G->coeffs + 0, dctx->fqctx);
+            G->deg_bounds[0] = 1;
+            fq_nmod_zero(Abar->coeffs + 0, dctx->fqctx);
+            Abar->deg_bounds[0] = 1;
+            fq_nmod_zero(Bbar->coeffs + 0, dctx->fqctx);
+            Bbar->deg_bounds[0] = 1;
+        } else
+        {
+            fq_nmod_t inv;
+
+            fq_nmod_mpolyd_fit_length(G, Blen, dctx);
+
+            fq_nmod_init(inv, dctx->fqctx);
+            fq_nmod_inv(inv, B->coeffs + Blen-1, dctx->fqctx);
+            _fq_nmod_poly_scalar_mul_fq_nmod(G->coeffs, B->coeffs, Blen,
+                                                         inv, dctx->fqctx);
+            fq_nmod_clear(inv, dctx->fqctx);
+
+            G->deg_bounds[0] = Blen;
+            fq_nmod_set_ui(Abar->coeffs + 0, 0, dctx->fqctx);
+            Abar->deg_bounds[0] = 1;
+            fq_nmod_set_ui(Bbar->coeffs + 0, 1, dctx->fqctx);
+            Bbar->deg_bounds[0] = 1;
+        }
+
+    } else {
+        if (Blen == 0)
+        {
+            fq_nmod_t inv;
+
+            fq_nmod_mpolyd_fit_length(G, Alen, dctx);
+
+            fq_nmod_init(inv, dctx->fqctx);
+            fq_nmod_inv(inv, A->coeffs + Alen-1, dctx->fqctx);
+            _fq_nmod_poly_scalar_mul_fq_nmod(G->coeffs, A->coeffs, Alen,
+                                                         inv, dctx->fqctx);
+            fq_nmod_clear(inv, dctx->fqctx);
+
+            G->deg_bounds[0] = Blen;
+            fq_nmod_set_ui(Abar->coeffs + 0, 0, dctx->fqctx);
+            Abar->deg_bounds[0] = 1;
+            fq_nmod_set_ui(Bbar->coeffs + 0, 1, dctx->fqctx);
+            Bbar->deg_bounds[0] = 1;
+
+        } else {
+
+            if (Alen >= Blen)
             {
-                fq_nmod_zero(G->coeffs + 0, dctx->fqctx);
-                G->deg_bounds[0] = 1;
-                fq_nmod_zero(Abar->coeffs + 0, dctx->fqctx);
-                Abar->deg_bounds[0] = 1;
-                fq_nmod_zero(Bbar->coeffs + 0, dctx->fqctx);
-                Bbar->deg_bounds[0] = 1;
+                fq_nmod_t invB;
+                fq_nmod_mpolyd_fit_length(G, Blen, dctx);
+                fq_nmod_init(invB, dctx->fqctx);
+                fq_nmod_inv(invB, B->coeffs + Blen-1, dctx->fqctx);
+                G->deg_bounds[0] = _fq_nmod_poly_gcd_euclidean(G->coeffs,
+                      A->coeffs, Alen, B->coeffs, Blen, invB, dctx->fqctx);
+                fq_nmod_clear(invB, dctx->fqctx);
+            } else
+            {
+
+                fq_nmod_t invA;
+                fq_nmod_mpolyd_fit_length(G, Alen, dctx);
+                fq_nmod_init(invA, dctx->fqctx);
+                fq_nmod_inv(invA, A->coeffs + Alen-1, dctx->fqctx);
+                G->deg_bounds[0] = _fq_nmod_poly_gcd_euclidean(G->coeffs,
+                      B->coeffs, Blen, A->coeffs, Alen, invA, dctx->fqctx);
+                fq_nmod_clear(invA, dctx->fqctx);
+            }
+
+            if (G->deg_bounds[0] <= 1)
+            {
+                fq_nmod_set_ui(G->coeffs, 1, dctx->fqctx);
             } else
             {
                 fq_nmod_t inv;
-
-                fq_nmod_mpolyd_fit_length(G, Blen, dctx);
-
                 fq_nmod_init(inv, dctx->fqctx);
-                fq_nmod_inv(inv, B->coeffs + Blen-1, dctx->fqctx);
-                _fq_nmod_poly_scalar_mul_fq_nmod(G->coeffs, B->coeffs, Blen,
-                                                             inv, dctx->fqctx);
+                fq_nmod_inv(inv, G->coeffs + G->deg_bounds[0]-1, dctx->fqctx);
+                _fq_nmod_poly_scalar_mul_fq_nmod(G->coeffs, G->coeffs,
+                                       G->deg_bounds[0], inv, dctx->fqctx);
                 fq_nmod_clear(inv, dctx->fqctx);
-
-                G->deg_bounds[0] = Blen;
-                fq_nmod_set_ui(Abar->coeffs + 0, 0, dctx->fqctx);
-                Abar->deg_bounds[0] = 1;
-                fq_nmod_set_ui(Bbar->coeffs + 0, 1, dctx->fqctx);
-                Bbar->deg_bounds[0] = 1;
             }
 
-        } else {
-            if (Blen == 0)
-            {
-                fq_nmod_t inv;
+            Abar->deg_bounds[0] = Alen - G->deg_bounds[0] + 1;
+            fq_nmod_mpolyd_fit_length(Abar, Alen - G->deg_bounds[0] + 1, dctx);
 
-                fq_nmod_mpolyd_fit_length(G, Alen, dctx);
+            _fq_nmod_poly_divides(Abar->coeffs, A->coeffs, Alen,
+                              G->coeffs, G->deg_bounds[0],
+                              G->coeffs + G->deg_bounds[0]-1, dctx->fqctx);
 
-                fq_nmod_init(inv, dctx->fqctx);
-                fq_nmod_inv(inv, A->coeffs + Alen-1, dctx->fqctx);
-                _fq_nmod_poly_scalar_mul_fq_nmod(G->coeffs, A->coeffs, Alen,
-                                                             inv, dctx->fqctx);
-                fq_nmod_clear(inv, dctx->fqctx);
+            Bbar->deg_bounds[0] = Blen - G->deg_bounds[0] + 1;
+            fq_nmod_mpolyd_fit_length(Bbar, Blen - G->deg_bounds[0] + 1, dctx);
+            _fq_nmod_poly_divides(Bbar->coeffs, B->coeffs, Blen,
+                              G->coeffs, G->deg_bounds[0],
+                              G->coeffs + G->deg_bounds[0]-1, dctx->fqctx);
 
-                G->deg_bounds[0] = Blen;
-                fq_nmod_set_ui(Abar->coeffs + 0, 0, dctx->fqctx);
-                Abar->deg_bounds[0] = 1;
-                fq_nmod_set_ui(Bbar->coeffs + 0, 1, dctx->fqctx);
-                Bbar->deg_bounds[0] = 1;
-
-            } else {
-
-                if (Alen >= Blen)
-                {
-                    fq_nmod_t invB;
-                    fq_nmod_mpolyd_fit_length(G, Blen, dctx);
-                    fq_nmod_init(invB, dctx->fqctx);
-                    fq_nmod_inv(invB, B->coeffs + Blen-1, dctx->fqctx);
-                    G->deg_bounds[0] = _fq_nmod_poly_gcd_euclidean(G->coeffs,
-                          A->coeffs, Alen, B->coeffs, Blen, invB, dctx->fqctx);
-                    fq_nmod_clear(invB, dctx->fqctx);
-                } else
-                {
-
-                    fq_nmod_t invA;
-                    fq_nmod_mpolyd_fit_length(G, Alen, dctx);
-                    fq_nmod_init(invA, dctx->fqctx);
-                    fq_nmod_inv(invA, A->coeffs + Alen-1, dctx->fqctx);
-                    G->deg_bounds[0] = _fq_nmod_poly_gcd_euclidean(G->coeffs,
-                          B->coeffs, Blen, A->coeffs, Alen, invA, dctx->fqctx);
-                    fq_nmod_clear(invA, dctx->fqctx);
-                }
-
-                if (G->deg_bounds[0] <= 1)
-                {
-                    fq_nmod_set_ui(G->coeffs, 1, dctx->fqctx);
-                } else
-                {
-                    fq_nmod_t inv;
-                    fq_nmod_init(inv, dctx->fqctx);
-                    fq_nmod_inv(inv, G->coeffs + G->deg_bounds[0]-1, dctx->fqctx);
-                    _fq_nmod_poly_scalar_mul_fq_nmod(G->coeffs, G->coeffs,
-                                           G->deg_bounds[0], inv, dctx->fqctx);
-                    fq_nmod_clear(inv, dctx->fqctx);
-                }
-
-                Abar->deg_bounds[0] = Alen - G->deg_bounds[0] + 1;
-                fq_nmod_mpolyd_fit_length(Abar, Alen - G->deg_bounds[0] + 1, dctx);
-
-                _fq_nmod_poly_divides(Abar->coeffs, A->coeffs, Alen,
-                                  G->coeffs, G->deg_bounds[0],
-                                  G->coeffs + G->deg_bounds[0]-1, dctx->fqctx);
-
-                Bbar->deg_bounds[0] = Blen - G->deg_bounds[0] + 1;
-                fq_nmod_mpolyd_fit_length(Bbar, Blen - G->deg_bounds[0] + 1, dctx);
-                _fq_nmod_poly_divides(Bbar->coeffs, B->coeffs, Blen,
-                                  G->coeffs, G->deg_bounds[0],
-                                  G->coeffs + G->deg_bounds[0]-1, dctx->fqctx);
-
-            }
         }
-        return;
+    }
+    return;
 }
 
 
@@ -659,7 +468,6 @@ void fq_nmod_mpolyd_last_content(fq_nmod_poly_t cont, const fq_nmod_mpolyd_t A,
     }
 
     fq_nmod_poly_clear(temp, dctx->fqctx);
-
 }
 
 
@@ -875,9 +683,6 @@ void fq_nmod_mpolyd_last_lc(fq_nmod_poly_t lc, const fq_nmod_mpolyd_t A,
 }
 
 
-
-
-
 void fq_nmod_mpolyd_eval_last(fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_t A,
                               fq_nmod_t alpha, const fq_nmod_mpolyd_ctx_t dctx)
 {
@@ -925,10 +730,6 @@ void fq_nmod_mpolyd_eval_last(fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_t A,
 
     return;
 }
-
-
-
-
 
 
 slong fq_nmod_mpolyd_leadmon(slong * exps, const fq_nmod_mpolyd_t A,
@@ -1003,34 +804,7 @@ void fq_nmod_mpolyd_set(fq_nmod_mpolyd_t A, const fq_nmod_mpolyd_t B,
     }
 }
 
-
-void fq_nmod_mpolyd_interpolation(fq_nmod_mpolyd_t fxn,
-            fq_nmod_mpolyd_t newvalue, fq_nmod_poly_t modulus, fq_nmod_t alpha,
-                                               const fq_nmod_mpolyd_ctx_t dctx)
-{
-    fq_nmod_mpolyd_t temp;
-    fq_nmod_mpolyd_t E;
-    slong nvars = fxn->nvars;
-
-    fq_nmod_mpolyd_init(E, nvars, dctx);
-    fq_nmod_mpolyd_eval_last(E, fxn, alpha, dctx);
-
-    fq_nmod_mpolyd_init(temp, nvars, dctx);
-    fq_nmod_mpolyd_sub(temp, newvalue, E, dctx);
-
-    FLINT_ASSERT(temp->nvars = nvars - 1);
-    fq_nmod_mpolyd_set_nvars(temp, nvars);
-    temp->deg_bounds[nvars - 1] = 1;
-
-    fq_nmod_mpolyd_mul_last_poly(E, temp, modulus, dctx);
-    fq_nmod_mpolyd_add(temp, fxn, E, dctx);
-    fq_nmod_mpolyd_set(fxn, temp, dctx);
-    fq_nmod_mpolyd_clear(temp, dctx);
-    fq_nmod_mpolyd_clear(E, dctx);
-}
-
-
-void fq_nmod_mpolyd_promote(fq_nmod_mpolyd_t fxn,
+void fq_nmod_mpolyd_startinterp(fq_nmod_mpolyd_t fxn,
                     fq_nmod_mpolyd_t newvalue, const fq_nmod_mpolyd_ctx_t dctx)
 {
     slong nvars = newvalue->nvars;
@@ -1062,8 +836,148 @@ int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
     return 0;
 }
 
+void fq_nmod_mpolyd_addinterp(fq_nmod_mpolyd_t F, fq_nmod_mpolyd_t T,
+             fq_nmod_mpolyd_t N, fq_nmod_poly_t modulus, fq_nmod_t alpha,
+                                               const fq_nmod_mpolyd_ctx_t dctx)
+{
+    slong i, j, k, degb_prod;
+    slong nvars = F->nvars;
+    fq_nmod_t Nvalue, pp, v, u;
+    int changed = 0;
+    int carry, Fok, Nok;
+    slong * inds, Find, Nind, Tind;
+    TMP_INIT;
 
+    fq_nmod_init(Nvalue, dctx->fqctx);
+    fq_nmod_init(pp, dctx->fqctx);
+    fq_nmod_init(v, dctx->fqctx);
+    fq_nmod_init(u, dctx->fqctx);
 
+    FLINT_ASSERT(N->nvars == nvars - 1);
+    FLINT_ASSERT(modulus->length > 0);
+
+    fq_nmod_mpolyd_set_nvars(T, nvars);
+
+    degb_prod = 1;
+    for (j = 0; j < nvars - 1; j++)
+    {
+        T->deg_bounds[j] = FLINT_MAX(F->deg_bounds[j], N->deg_bounds[j]);
+        degb_prod *= T->deg_bounds[j];
+    }
+        T->deg_bounds[j] = FLINT_MAX(1 + fq_nmod_mpolyd_last_degree(F, dctx),
+                                                  modulus->length);
+
+    fq_nmod_mpolyd_fit_length(T, degb_prod*T->deg_bounds[nvars-1], dctx);
+
+    TMP_START;
+    inds = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    for (j = 0; j < nvars - 1; j++)
+        inds[j] = 0;
+
+    Fok = 1;
+    Nok = 1;
+    Find = 0;
+    Nind = 0;
+    Tind = 0;
+    for (i = 0; i < degb_prod; i++)
+    {
+        for (k = 0; k < T->deg_bounds[nvars-1]; k++)
+        {
+            fq_nmod_zero(T->coeffs + Tind+k, dctx->fqctx);
+        }
+
+        fq_nmod_zero(Nvalue, dctx->fqctx);
+        if (Nok)
+        {
+            fq_nmod_set(Nvalue, N->coeffs + Nind, dctx->fqctx);
+        }
+
+        if (Fok)
+        {
+            for (k = 0; k < T->deg_bounds[nvars-1]
+                       && k < F->deg_bounds[nvars-1]; k++)
+            {
+                fq_nmod_set(T->coeffs + Tind+k, F->coeffs + Find+k, dctx->fqctx);
+            }
+
+            fq_nmod_zero(v, dctx->fqctx);
+            k = F->deg_bounds[nvars-1];
+            while (--k >= 0)
+            {
+                fq_nmod_mul(pp, v, alpha, dctx->fqctx);
+                fq_nmod_add(v, pp, F->coeffs + Find + k, dctx->fqctx);
+            }
+
+            fq_nmod_sub(v, Nvalue, v, dctx->fqctx);
+
+            if (!fq_nmod_is_zero(v, dctx->fqctx))
+            {
+                changed = 1;
+                for (k = 0; k < modulus->length; k++)
+                {
+                    fq_nmod_mul(u, modulus->coeffs + k, v, dctx->fqctx);
+                    fq_nmod_add(T->coeffs + Tind + k, T->coeffs + Tind + k,
+                                                               u, dctx->fqctx);
+                }
+            }
+
+        } else
+        {
+            if (!fq_nmod_is_zero(Nvalue, dctx->fqctx))
+            {
+                changed = 1;
+                for (k = 0; k < modulus->length; k++)
+                {
+                    fq_nmod_mul(T->coeffs + Tind + k, modulus->coeffs + k,
+                                                          Nvalue, dctx->fqctx);
+                }
+            }
+        }
+
+        /* move indices to next chunk */
+
+        carry = 1;
+        for (j = nvars - 2; j >= 0; j--)
+        {
+            inds[j] += carry;
+            if (inds[j] < T->deg_bounds[j])
+            {
+                carry = 0;
+            } else
+            {
+                carry = 1;
+                inds[j] = 0;
+            }
+        }
+
+        Tind += T->deg_bounds[nvars-1];
+
+        Find = 0;
+        Nind = 0;
+        Fok = 1;
+        Nok = 1;
+        for (j = 0; j < nvars - 1; j++)
+        {
+            Fok = Fok && (inds[j] < F->deg_bounds[j]);
+            Nok = Nok && (inds[j] < N->deg_bounds[j]);
+            Find = inds[j] + F->deg_bounds[j]*Find;
+            Nind = inds[j] + N->deg_bounds[j]*Nind;
+        }
+        Find *= F->deg_bounds[nvars - 1];
+    }
+
+    if (changed)
+    {
+        fq_nmod_mpolyd_swap(F, T);
+    }
+
+    fq_nmod_clear(Nvalue, dctx->fqctx);
+    fq_nmod_clear(pp, dctx->fqctx);
+    fq_nmod_clear(v, dctx->fqctx);
+    fq_nmod_clear(u, dctx->fqctx);
+
+    TMP_END;
+}
 
 int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
                                fq_nmod_mpolyd_t Abar, fq_nmod_mpolyd_t Bbar,
@@ -1072,12 +986,12 @@ int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
 {
 
     int success;
-    slong i, j, bound;
+    slong j, bound;
     slong nvars = A->nvars;
     fq_nmod_t alpha, gamma_eval;
     fq_nmod_poly_t cA, cB, cG, cAbar, cBbar, lcA, lcB, gamma;
     fq_nmod_poly_t cGs, cAbars, cBbars, modulus, modulus2;
-    fq_nmod_mpolyd_t Gs, Abars, Bbars, phiA, phiB, gs, abars, bbars;
+    fq_nmod_mpolyd_t T, Gs, Abars, Bbars, phiA, phiB, gs, abars, bbars;
     slong leadmon_gs_idx;
     slong * leadmon_gs, * leadmon_Gs;
     slong deggamma, degGs, degA, degB, degAbars, degBbars;
@@ -1086,7 +1000,8 @@ int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
     FLINT_ASSERT(G != B);
     FLINT_ASSERT(A->nvars == B->nvars);
 
-    if (A->nvars == 1) {
+    if (A->nvars == 1)
+    {
         fq_nmod_mpolyd_gcd_brown_univar(G, Abar, Bbar, A, B, dctx);
         return 1;
     }
@@ -1122,6 +1037,8 @@ int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
                + FLINT_MAX(fq_nmod_mpolyd_last_degree(A, dctx),
                            fq_nmod_mpolyd_last_degree(B, dctx));
 
+    fq_nmod_mpolyd_init(T, nvars, dctx);
+
     fq_nmod_mpolyd_init(Gs, nvars, dctx);
     fq_nmod_mpolyd_init(Abars, nvars, dctx);
     fq_nmod_mpolyd_init(Bbars, nvars, dctx);
@@ -1138,8 +1055,7 @@ int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
     fq_nmod_init(gamma_eval, dctx->fqctx);
     fq_nmod_init(alpha, dctx->fqctx);
 
-
-    i = 0;
+    fq_nmod_poly_one(modulus, dctx->fqctx);
 
     fq_nmod_set_ui(alpha, 0, dctx->fqctx);
     while (fq_nmod_next(alpha, dctx->fqctx) != 0)
@@ -1164,10 +1080,10 @@ int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
             fq_nmod_mpolyd_set_ui(Gs, WORD(1), dctx);
             fq_nmod_mpolyd_set(Abars, A, dctx);
             fq_nmod_mpolyd_set(Bbars, B, dctx);
-            goto successful;        
+            goto successful;
         }
 
-        if (i > 0)
+        if (fq_nmod_poly_degree(modulus, dctx->fqctx) > 0)
         {
             fq_nmod_mpolyd_leadmon(leadmon_Gs, Gs, dctx);
             for (j = 0; j < nvars - 1; j++)
@@ -1180,14 +1096,14 @@ int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
                     fq_nmod_mpolyd_zero(Gs, dctx);
                     fq_nmod_mpolyd_zero(Abars, dctx);
                     fq_nmod_mpolyd_zero(Bbars, dctx);
-                    i = 0;
+                    fq_nmod_poly_one(modulus, dctx->fqctx);
                 }
             }
         }
 
         fq_nmod_mpolyd_mul_scalar(gs, gamma_eval, dctx);
 
-        if (i > 0)
+        if (fq_nmod_poly_degree(modulus, dctx->fqctx) > 0)
         {
             fq_nmod_t modulus_eval, inv;
 
@@ -1198,9 +1114,10 @@ int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
             fq_nmod_inv(inv, modulus_eval, dctx->fqctx);
 
             fq_nmod_poly_scalar_mul_fq_nmod(modulus, modulus, inv, dctx->fqctx);
-            fq_nmod_mpolyd_interpolation(Gs, gs, modulus, alpha, dctx);
-            fq_nmod_mpolyd_interpolation(Abars, abars, modulus, alpha, dctx);
-            fq_nmod_mpolyd_interpolation(Bbars, bbars, modulus, alpha, dctx);
+
+            fq_nmod_mpolyd_addinterp(Gs, T, gs, modulus, alpha, dctx);
+            fq_nmod_mpolyd_addinterp(Abars, T, abars, modulus, alpha, dctx);
+            fq_nmod_mpolyd_addinterp(Bbars, T, bbars, modulus, alpha, dctx);
 
             fq_nmod_clear(modulus_eval, dctx->fqctx);
             fq_nmod_clear(inv, dctx->fqctx);
@@ -1208,18 +1125,16 @@ int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
         } else
         {
             fq_nmod_poly_one(modulus, dctx->fqctx);
-            fq_nmod_mpolyd_promote(Gs, gs, dctx);
-            fq_nmod_mpolyd_promote(Abars, abars, dctx);
-            fq_nmod_mpolyd_promote(Bbars, bbars, dctx);
+            fq_nmod_mpolyd_startinterp(Gs, gs, dctx);
+            fq_nmod_mpolyd_startinterp(Abars, abars, dctx);
+            fq_nmod_mpolyd_startinterp(Bbars, bbars, dctx);
         }
-
 
         fq_nmod_poly_scalar_mul_fq_nmod(modulus2, modulus, alpha, dctx->fqctx);
         fq_nmod_poly_shift_left(modulus, modulus, 1, dctx->fqctx);
         fq_nmod_poly_sub(modulus, modulus, modulus2, dctx->fqctx);
 
-        i++;
-        if (i < bound)
+        if (fq_nmod_poly_degree(modulus, dctx->fqctx) < bound)
             continue;
 
         deggamma = fq_nmod_poly_degree(gamma, dctx->fqctx);
@@ -1239,7 +1154,7 @@ int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
             fq_nmod_mpolyd_zero(Gs, dctx);
             fq_nmod_mpolyd_zero(Abars, dctx);
             fq_nmod_mpolyd_zero(Bbars, dctx);
-            i = 0;
+            fq_nmod_poly_one(modulus, dctx->fqctx);
             continue;
         }
 
@@ -1249,8 +1164,6 @@ break_continue:
     }
 
     success = 0;
-
-
 
 cleanup:
 
@@ -1268,6 +1181,8 @@ cleanup:
     fq_nmod_poly_clear(lcB, dctx->fqctx);
 
     fq_nmod_poly_clear(gamma, dctx->fqctx);
+
+    fq_nmod_mpolyd_clear(T, dctx);
 
     fq_nmod_mpolyd_clear(Gs, dctx);
     fq_nmod_mpolyd_clear(Abars, dctx);
@@ -1307,6 +1222,489 @@ successful:
     fq_nmod_poly_clear(cGs, dctx->fqctx);
     fq_nmod_poly_clear(cAbars, dctx->fqctx);
     fq_nmod_poly_clear(cBbars, dctx->fqctx);
+
+    success = 1;
+    goto cleanup;
+}
+
+
+/*
+    helper functions for
+    large prime version of the modular gcd
+*/
+
+void nmod_mpolyd_lgprime_eval_last(fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_ctx_t efctx,
+                                     nmod_mpolyd_t A, const nmodf_ctx_t fctx)
+{
+    slong i, j, k;
+    slong degb_prod, degb_last=0, degb_prod_last=0;
+    nmod_poly_t P;
+
+    fq_nmod_mpolyd_set_nvars(E, A->nvars - 1);
+
+    degb_prod = WORD(1);
+    for (j = 0; j < A->nvars; j++)
+    {
+        degb_last = A->deg_bounds[j];
+        degb_prod_last = degb_prod;
+        degb_prod *= degb_last;
+        if (j < E->nvars)
+        {
+            E->deg_bounds[j] = A->deg_bounds[j];
+        }
+    }
+
+    fq_nmod_mpolyd_fit_length(E, degb_prod_last, efctx);
+
+    P->mod.n = fctx->mod.n;
+    P->mod.ninv = fctx->mod.ninv;
+    P->mod.norm = fctx->mod.norm;
+    P->alloc = degb_last;
+
+    j = 0;
+    for (i = 0; i < degb_prod; i += degb_last)
+    {
+        k = degb_last;
+        while (k > 0 && (A->coeffs + i)[k-1] == UWORD(0))
+            k--;
+        P->coeffs = A->coeffs + i;
+        P->length = k;
+        nmod_poly_rem(E->coeffs + j, P, efctx->fqctx->modulus);
+        j++;
+    }
+
+    FLINT_ASSERT(j == degb_prod_last);
+
+    return;
+}
+
+void nmod_mpolyd_lgprime_startinterp(nmod_mpolyd_t A, const nmodf_ctx_t fctx,
+                         fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_ctx_t efctx)
+{
+
+    slong i, j, k;
+    slong degb_prod, degb_last;
+
+    nmod_mpolyd_set_nvars(A, E->nvars + 1);
+
+    degb_prod = WORD(1);
+    for (j = 0; j < E->nvars; j++)
+    {
+        A->deg_bounds[j] = E->deg_bounds[j];
+        degb_prod *= E->deg_bounds[j];
+    }
+    degb_last = nmod_poly_degree(efctx->fqctx->modulus);
+    A->deg_bounds[E->nvars] = degb_last;
+    degb_prod *= degb_last;
+
+    nmod_mpolyd_fit_length(A, degb_prod);
+
+    j = 0;
+    for (i = 0; i < degb_prod; i += degb_last)
+    {
+        FLINT_ASSERT((E->coeffs + j)->length <= degb_last);
+        for (k = 0; k < (E->coeffs + j)->length; k++)
+            (A->coeffs + i)[k] = (E->coeffs + j)->coeffs[k];
+
+        for (; k < degb_last; k++)
+            (A->coeffs + i)[k] = UWORD(0);
+
+        j++;
+    }
+
+    return;
+}
+
+
+void nmod_mpolyd_lgprime_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
+                              const nmodf_ctx_t fctx, fq_nmod_mpolyd_t N,
+                                 nmod_poly_t modulus, fq_nmod_t modulus_eval,
+                                              const fq_nmod_mpolyd_ctx_t efctx)
+{
+
+
+    slong i, j, k, degb_prod;
+    slong nvars = F->nvars;
+    fq_nmod_t Nvalue, v, u;
+    int changed = 0;
+    int carry, Fok, Nok;
+    slong * inds, Find, Nind, Tind;
+    nmod_poly_t P;
+    TMP_INIT;
+
+    fq_nmod_init(Nvalue, efctx->fqctx);
+    fq_nmod_init(v, efctx->fqctx);
+    fq_nmod_init(u, efctx->fqctx);
+
+    FLINT_ASSERT(N->nvars == nvars - 1);
+    FLINT_ASSERT(modulus->length > 0);
+
+    nmod_mpolyd_set_nvars(T, nvars);
+
+    degb_prod = 1;
+    for (j = 0; j < nvars - 1; j++)
+    {
+        T->deg_bounds[j] = FLINT_MAX(F->deg_bounds[j], N->deg_bounds[j]);
+        degb_prod *= T->deg_bounds[j];
+    }
+        T->deg_bounds[j] = FLINT_MAX(1 + nmod_mpolyd_last_degree(F, fctx),
+                                       modulus->length
+                                       + nmod_poly_degree(efctx->fqctx->modulus)
+                                    );
+    
+    nmod_mpolyd_fit_length(T, degb_prod*T->deg_bounds[nvars-1]);
+
+    TMP_START;
+    inds = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    for (j = 0; j < nvars - 1; j++)
+        inds[j] = 0;
+
+    P->mod.n = fctx->mod.n;
+    P->mod.ninv = fctx->mod.ninv;
+    P->mod.norm = fctx->mod.norm;
+    P->alloc = F->deg_bounds[nvars-1];
+
+    Fok = 1;
+    Nok = 1;
+    Find = 0;
+    Nind = 0;
+    Tind = 0;
+    for (i = 0; i < degb_prod; i++)
+    {
+        for (k = 0; k < T->deg_bounds[nvars-1]; k++)
+        {
+            T->coeffs[Tind+k] = UWORD(0);
+        }
+
+        fq_nmod_zero(Nvalue, efctx->fqctx);
+        if (Nok)
+        {
+            fq_nmod_set(Nvalue, N->coeffs + Nind, efctx->fqctx);
+        }
+
+        if (Fok)
+        {
+            for (k = 0; k < T->deg_bounds[nvars-1]
+                                         && k < F->deg_bounds[nvars-1]; k++)
+            {
+                T->coeffs[Tind+k] = F->coeffs[Find+k];
+            }
+            k = F->deg_bounds[nvars-1];
+            while (k > 0 && (F->coeffs[Find+k-1] == UWORD(0)))
+                k--;
+            P->coeffs = F->coeffs + Find;
+            P->length = k;
+            nmod_poly_rem(v, P, efctx->fqctx->modulus);
+            fq_nmod_sub(Nvalue, Nvalue, v, efctx->fqctx);
+        }
+
+        if (!fq_nmod_is_zero(Nvalue, efctx->fqctx))
+        {
+            changed = 1;
+
+            fq_nmod_mul(u, Nvalue, modulus_eval, efctx->fqctx);
+            nmod_poly_mul(v, u, modulus);
+            FLINT_ASSERT(v->length <= T->deg_bounds[nvars-1]);
+            for (k = 0; k < v->length; k++)
+                T->coeffs[Tind + k] = nmod_add(T->coeffs[Tind + k],
+                                                      v->coeffs[k], fctx->mod);
+        }
+
+        /* move indices to next chunk */
+
+        carry = 1;
+        for (j = nvars - 2; j >= 0; j--)
+        {
+            inds[j] += carry;
+            if (inds[j] < T->deg_bounds[j])
+            {
+                carry = 0;
+            } else
+            {
+                carry = 1;
+                inds[j] = 0;
+            }
+        }
+
+        Tind += T->deg_bounds[nvars-1];
+
+        Find = 0;
+        Nind = 0;
+        Fok = 1;
+        Nok = 1;
+        for (j = 0; j < nvars - 1; j++)
+        {
+            Fok = Fok && (inds[j] < F->deg_bounds[j]);
+            Nok = Nok && (inds[j] < N->deg_bounds[j]);
+            Find = inds[j] + F->deg_bounds[j]*Find;
+            Nind = inds[j] + N->deg_bounds[j]*Nind;
+        }
+        Find *= F->deg_bounds[nvars - 1];
+    }
+
+    if (changed) 
+    {
+        nmod_mpolyd_swap(F, T);
+    }
+
+    fq_nmod_clear(Nvalue, efctx->fqctx);
+    fq_nmod_clear(v, efctx->fqctx);
+    fq_nmod_clear(u, efctx->fqctx);
+
+    TMP_END;
+    return;
+}
+
+
+
+
+
+int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
+                                 nmod_mpolyd_t Abar,  nmod_mpolyd_t Bbar,
+                                 nmod_mpolyd_t A, nmod_mpolyd_t B,
+                                                       const nmodf_ctx_t fctx)
+{
+
+    int success;
+    slong j, bound, deg;
+    slong nvars = A->nvars;
+    nmod_poly_t cA, cB, cG, cAbar, cBbar, lcA, lcB, gamma;
+    nmod_poly_t cGs, cAbars, cBbars, modulus, modulus_eval;
+    nmod_mpolyd_t T, Gs, Abars, Bbars;
+    slong leadmon_gs_idx;
+    slong * leadmon_gs, * leadmon_Gs;
+    slong deggamma, degGs, degA, degB, degAbars, degBbars;
+
+    FLINT_ASSERT(G != A);
+    FLINT_ASSERT(G != B);
+    FLINT_ASSERT(A->nvars == B->nvars);
+
+    if (A->nvars == 1) {
+        nmod_mpolyd_gcd_brown_univar(G, Abar, Bbar, A, B, fctx);
+        return 1;
+    }
+
+    leadmon_gs = (slong *) flint_malloc(nvars*sizeof(slong));
+    leadmon_Gs = (slong *) flint_malloc(nvars*sizeof(slong));
+
+    nmod_poly_init(cA, fctx->mod.n);
+    nmod_poly_init(cB, fctx->mod.n);
+    nmod_mpolyd_last_content(cA, A, fctx);
+    nmod_mpolyd_last_content(cB, B, fctx);
+
+    nmod_mpolyd_div_last_poly(A, cA, fctx);
+    nmod_mpolyd_div_last_poly(B, cB, fctx);
+
+    nmod_poly_init(cG, fctx->mod.n);
+    nmod_poly_gcd_euclidean(cG, cA, cB);
+
+    nmod_poly_init(cAbar, fctx->mod.n);
+    nmod_poly_init(cBbar, fctx->mod.n);
+    nmod_poly_div(cAbar, cA, cG);
+    nmod_poly_div(cBbar, cB, cG);
+
+    nmod_poly_init(lcA, fctx->mod.n);
+    nmod_poly_init(lcB, fctx->mod.n);
+    nmod_mpolyd_last_lc(lcA, A, fctx);
+    nmod_mpolyd_last_lc(lcB, B, fctx);
+
+    nmod_poly_init(gamma, fctx->mod.n);
+    nmod_poly_gcd_euclidean(gamma, lcA, lcB);
+
+    bound = 1 + nmod_poly_degree(gamma)
+               + FLINT_MAX(nmod_mpolyd_last_degree(A, fctx),
+                           nmod_mpolyd_last_degree(B, fctx));
+
+    nmod_mpolyd_init(T, nvars);
+
+    nmod_mpolyd_init(Gs, nvars);
+    nmod_mpolyd_init(Abars, nvars);
+    nmod_mpolyd_init(Bbars, nvars);
+
+    nmod_poly_init(modulus_eval, fctx->mod.n);
+    nmod_poly_init(modulus, fctx->mod.n);
+    nmod_poly_one(modulus);
+
+    /* find a starting degree for the ffield extension */
+    deg = 0;
+    for (j = 0; j<nvars; j++)
+    {
+        deg +=   FLINT_BIT_COUNT(A->deg_bounds[j])
+               + FLINT_BIT_COUNT(B->deg_bounds[j]);
+    }
+    deg = 2 + deg/FLINT_BIT_COUNT(fctx->mod.n);
+
+    for (; deg < 100; deg++)
+    {
+        fq_nmod_mpolyd_ctx_t efctx;
+        fq_nmod_mpolyd_t phiA, phiB, gs, abars, bbars;
+        fq_nmod_t gamma_eval;
+
+        fq_nmod_mpolyd_ctx_init(efctx, nvars - 1, fctx->mod.n, deg);
+
+        fq_nmod_mpolyd_init(phiA, nvars - 1, efctx);
+        fq_nmod_mpolyd_init(phiB, nvars - 1, efctx);
+        fq_nmod_mpolyd_init(gs, nvars - 1, efctx);
+        fq_nmod_mpolyd_init(abars, nvars - 1, efctx);
+        fq_nmod_mpolyd_init(bbars, nvars - 1, efctx);
+        fq_nmod_init(gamma_eval, efctx->fqctx);
+
+        nmod_poly_rem(gamma_eval, gamma, efctx->fqctx->modulus);
+        if (fq_nmod_is_zero(gamma_eval, efctx->fqctx))
+            goto break_continue;
+
+        nmod_mpolyd_lgprime_eval_last(phiA, efctx, A, fctx);
+        nmod_mpolyd_lgprime_eval_last(phiB, efctx, B, fctx);
+
+        success = fq_nmod_mpolyd_gcd_brown(gs, abars, bbars, phiA, phiB, efctx);
+        if (success == 0)
+            goto break_continue;
+
+        leadmon_gs_idx = fq_nmod_mpolyd_leadmon(leadmon_gs, gs, efctx);
+
+        if (leadmon_gs_idx <= 0)
+        {
+            FLINT_ASSERT(leadmon_gs_idx == 0);
+            nmod_mpolyd_set_ui(Gs, WORD(1));
+            nmod_mpolyd_set(Abars, A);
+            nmod_mpolyd_set(Bbars, B);
+            fq_nmod_mpolyd_clear(phiA, efctx);
+            fq_nmod_mpolyd_clear(phiB, efctx);
+            fq_nmod_mpolyd_clear(gs, efctx);
+            fq_nmod_mpolyd_clear(abars, efctx);
+            fq_nmod_mpolyd_clear(bbars, efctx);
+            fq_nmod_clear(gamma_eval, efctx->fqctx);
+            fq_nmod_mpolyd_ctx_clear(efctx);
+            goto successful;
+        }
+
+        if (nmod_poly_degree(modulus) > 0)
+        {
+            nmod_mpolyd_leadmon(leadmon_Gs, Gs);
+            for (j = 0; j < nvars - 1; j++)
+            {
+                if (leadmon_gs[j] > leadmon_Gs[j])
+                {
+                    goto break_continue;
+
+                } else if (leadmon_gs[j] < leadmon_Gs[j])
+                {
+                    nmod_poly_one(modulus);
+                }
+            }
+        }
+
+        fq_nmod_mpolyd_mul_scalar(gs, gamma_eval, efctx);
+
+        if (nmod_poly_degree(modulus) > 0)
+        {
+            nmod_poly_rem(modulus_eval, modulus, efctx->fqctx->modulus);
+            FLINT_ASSERT(!fq_nmod_is_zero(modulus_eval, efctx->fqctx));
+            fq_nmod_inv(modulus_eval, modulus_eval, efctx->fqctx);
+
+            nmod_mpolyd_lgprime_addinterp(Gs,    T, fctx, gs,    modulus, modulus_eval, efctx);
+            nmod_mpolyd_lgprime_addinterp(Abars, T, fctx, abars, modulus, modulus_eval, efctx);
+            nmod_mpolyd_lgprime_addinterp(Bbars, T, fctx, bbars, modulus, modulus_eval, efctx);
+
+        } else
+        {
+            nmod_poly_one(modulus);
+            nmod_mpolyd_lgprime_startinterp(Gs, fctx, gs, efctx);
+            nmod_mpolyd_lgprime_startinterp(Abars, fctx, abars, efctx);
+            nmod_mpolyd_lgprime_startinterp(Bbars, fctx, bbars, efctx);
+        }
+
+        nmod_poly_mul(modulus, modulus, efctx->fqctx->modulus);
+
+        if (nmod_poly_degree(modulus) < bound)
+            goto break_continue;
+
+        deggamma = nmod_poly_degree(gamma);
+        degGs = nmod_mpolyd_last_degree(Gs, fctx);
+        degA = nmod_mpolyd_last_degree(A, fctx);
+        degB = nmod_mpolyd_last_degree(B, fctx);
+        degAbars = nmod_mpolyd_last_degree(Abars, fctx);
+        degBbars = nmod_mpolyd_last_degree(Bbars, fctx);
+
+        if (   deggamma + degA == degGs + degAbars
+            && deggamma + degB == degGs + degBbars
+           )
+        {
+            fq_nmod_mpolyd_clear(phiA, efctx);
+            fq_nmod_mpolyd_clear(phiB, efctx);
+            fq_nmod_mpolyd_clear(gs, efctx);
+            fq_nmod_mpolyd_clear(abars, efctx);
+            fq_nmod_mpolyd_clear(bbars, efctx);
+            fq_nmod_clear(gamma_eval, efctx->fqctx);
+            fq_nmod_mpolyd_ctx_clear(efctx);
+            goto successful;
+
+        } else
+        {
+            nmod_poly_one(modulus);
+            goto break_continue;
+        }
+
+break_continue:
+
+        fq_nmod_mpolyd_clear(phiA, efctx);
+        fq_nmod_mpolyd_clear(phiB, efctx);
+        fq_nmod_mpolyd_clear(gs, efctx);
+        fq_nmod_mpolyd_clear(abars, efctx);
+        fq_nmod_mpolyd_clear(bbars, efctx);
+        fq_nmod_clear(gamma_eval, efctx->fqctx);
+        fq_nmod_mpolyd_ctx_clear(efctx);
+    }
+
+    success = 0;
+
+cleanup:
+
+    flint_free(leadmon_gs);
+    flint_free(leadmon_Gs);
+
+    nmod_poly_clear(cA);
+    nmod_poly_clear(cB);
+    nmod_poly_clear(cG);
+
+    nmod_poly_clear(cAbar);
+    nmod_poly_clear(cBbar);
+
+    nmod_poly_clear(lcA);
+    nmod_poly_clear(lcB);
+
+    nmod_poly_clear(gamma);
+
+    nmod_mpolyd_clear(T);
+    nmod_mpolyd_clear(Gs);
+    nmod_mpolyd_clear(Abars);
+    nmod_mpolyd_clear(Bbars);
+
+    nmod_poly_clear(modulus);
+    nmod_poly_clear(modulus_eval);
+
+    return success;
+
+successful:
+
+    nmod_poly_init(cGs, fctx->mod.n);
+    nmod_poly_init(cAbars, fctx->mod.n);
+    nmod_poly_init(cBbars, fctx->mod.n);
+    nmod_mpolyd_last_content(cGs, Gs, fctx);
+    nmod_mpolyd_last_content(cAbars, Abars, fctx);
+    nmod_mpolyd_last_content(cBbars, Bbars, fctx);
+
+    nmod_mpolyd_div_last_poly(Gs, cGs, fctx);
+    nmod_mpolyd_div_last_poly(Abars, cAbars, fctx);
+    nmod_mpolyd_div_last_poly(Bbars, cBbars, fctx);
+
+    nmod_mpolyd_mul_last_poly(G, Gs, cG, fctx);
+    nmod_mpolyd_mul_last_poly(Abar, Abars, cAbar, fctx);
+    nmod_mpolyd_mul_last_poly(Bbar, Bbars, cBbar, fctx);
+
+    nmod_poly_clear(cGs);
+    nmod_poly_clear(cAbars);
+    nmod_poly_clear(cBbars);
 
     success = 1;
     goto cleanup;

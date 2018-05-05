@@ -9,12 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "assert.h"
 
 
 int fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
@@ -49,7 +44,7 @@ int fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
         } else {
 
             _fmpz_mpoly_univar_pgcd_ducos(rx, fx, gx, ctx);
-            assert (rx->length != 0);
+            FLINT_ASSERT(rx->length != 0);
             if (rx->length == 1 && rx->exps[0] == 0)
                 fmpz_mpoly_swap(poly1, rx->coeffs + 0, ctx);
             else

@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2017 William Hart
     Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
@@ -9,13 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "longlong.h"
-#include "assert.h"
 
 /*
    Set poly1 to poly2/poly3 if the division is exact, and return the length
