@@ -148,7 +148,7 @@ FLINT_DLL void _fmpq_poly_set_array_mpq(fmpz * poly,
 FLINT_DLL void fmpq_poly_set_array_mpq(fmpq_poly_t poly, 
                                                      const mpq_t * a, slong n);
 
-FLINT_DLL int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str);
+FLINT_DLL int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len);
 
 FLINT_DLL int fmpq_poly_set_str(fmpq_poly_t poly, const char * str);
 
