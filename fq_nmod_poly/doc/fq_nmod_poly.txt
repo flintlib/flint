@@ -89,7 +89,7 @@ void fq_nmod_poly_truncate(fq_nmod_poly_t poly, slong newlen,
 
     Truncates the polynomial to length at most~$n$.
 
-void fq_nmod_poly_set_trunc(fq_nmod_poly_t poly1, fq_nmod_poly_t poly2, 
+void fq_nmod_poly_set_trunc(fq_nmod_poly_t poly1, fq_nmod_poly_t poly2,
                                            slong newlen, const fq_ctx_t ctx)
 
     Sets \code{poly1} to \code{poly2} truncated to length~$n$.
@@ -309,7 +309,7 @@ void fq_nmod_poly_add(fq_nmod_poly_t res, const fq_nmod_poly_t poly1,
 
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
 
-void fq_nmod_poly_add_series(fq_poly_t res, const fq_poly_t poly1, 
+void fq_nmod_poly_add_series(fq_poly_t res, const fq_poly_t poly1,
            const fq_poly_t poly2, slong n, const fq_ctx_t ctx)
 
     Notionally truncate \code{poly1} and \code{poly2} to length \code{n} and set
@@ -328,7 +328,7 @@ void fq_nmod_poly_sub(fq_nmod_poly_t res, const fq_nmod_poly_t poly1,
 
     Sets \code{res} to the difference of \code{poly1} and \code{poly2}.
 
-void fq_nmod_poly_sub_series(fq_poly_t res, const fq_poly_t poly1, 
+void fq_nmod_poly_sub_series(fq_poly_t res, const fq_poly_t poly1,
            const fq_poly_t poly2, slong n, const fq_ctx_t ctx)
 
     Notionally truncate \code{poly1} and \code{poly2} to length \code{n} and set
@@ -337,7 +337,7 @@ void fq_nmod_poly_sub_series(fq_poly_t res, const fq_poly_t poly1,
 void _fq_nmod_poly_neg(fq_nmod_struct *rop, const fq_nmod_struct *op, slong len,
                   const fq_nmod_ctx_t ctx)
 
-    Sets \code{res} to the additive inverse of \code{(poly,len)}.
+    Sets \code{rop} to the additive inverse of \code{(poly,len)}.
 
 void fq_nmod_poly_neg(fq_nmod_poly_t res, const fq_nmod_poly_t poly,
                       const fq_nmod_ctx_t ctx)
@@ -517,8 +517,8 @@ void _fq_nmod_poly_mullow_classical(fq_nmod_struct *rop,
                                     const fq_nmod_struct *op2, slong len2, slong n,
                                     const fq_nmod_ctx_t ctx)
 
-    Sets \code{(res, n)} to the first $n$ coefficients of
-    \code{(poly1, len1)} multiplied by \code{(poly2, len2)}.
+    Sets \code{(rop, n)} to the first $n$ coefficients of
+    \code{(op1, len1)} multiplied by \code{(op2, len2)}.
 
     Assumes \code{0 < n <= len1 + len2 - 1}.  Assumes neither
     \code{len1} nor \code{len2} is zero.
@@ -526,7 +526,7 @@ void _fq_nmod_poly_mullow_classical(fq_nmod_struct *rop,
 void fq_nmod_poly_mullow_classical(fq_nmod_poly_t rop,
     const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, slong n, const fq_nmod_ctx_t ctx)
 
-    Sets \code{res} to the product of \code{poly1} and \code{poly2},
+    Sets \code{rop} to the product of \code{op1} and \code{op2},
     computed using the classical or schoolbook method.
 
 void _fq_nmod_poly_mullow_univariate(fq_nmod_struct *rop,
@@ -534,20 +534,20 @@ void _fq_nmod_poly_mullow_univariate(fq_nmod_struct *rop,
                              const fq_nmod_struct *op2, slong len2, slong n,
                              const fq_nmod_ctx_t ctx)
 
-    Sets \code{(res, n)} to the lowest $n$ coefficients of the product of
-    \code{(poly1, len1)} and \code{(poly2, len2)}, computed using a
+    Sets \code{(rop, n)} to the lowest $n$ coefficients of the product of
+    \code{(op1, len1)} and \code{(op2, len2)}, computed using a
     bivariate to univariate transformation.
 
     Assumes that \code{len1} and \code{len2} are positive, but does allow
     for the polynomials to be zero-padded.  The polynomials may be zero,
-    too.  Assumes $n$ is positive.  Supports aliasing between \code{res},
-    \code{poly1} and \code{poly2}.
+    too.  Assumes $n$ is positive.  Supports aliasing between \code{rop},
+    \code{op1} and \code{op2}.
 
 void fq_nmod_poly_mullow_univariate(fq_nmod_poly_t rop,
                             const fq_nmod_poly_t op1, const fq_nmod_poly_t op2,
                             slong n, const fq_nmod_ctx_t ctx)
 
-    Sets \code{res} to the lowest $n$ coefficients of the product of
+    Sets \code{rop} to the lowest $n$ coefficients of the product of
     \code{poly1} and \code{poly2}, computed using a bivariate to
     univariate transformation.
 
@@ -556,27 +556,27 @@ void _fq_nmod_poly_mullow_KS(fq_nmod_struct *rop,
                              const fq_nmod_struct *op2, slong len2, slong n,
                              const fq_nmod_ctx_t ctx)
 
-    Sets \code{(res, n)} to the lowest $n$ coefficients of the product of
-    \code{(poly1, len1)} and \code{(poly2, len2)}.
+    Sets \code{(rop, n)} to the lowest $n$ coefficients of the product of
+    \code{(op1, len1)} and \code{(op2, len2)}.
 
     Assumes that \code{len1} and \code{len2} are positive, but does allow
     for the polynomials to be zero-padded.  The polynomials may be zero,
-    too.  Assumes $n$ is positive.  Supports aliasing between \code{res},
-    \code{poly1} and \code{poly2}.
+    too.  Assumes $n$ is positive.  Supports aliasing between \code{rop},
+    \code{op1} and \code{op2}.
 
 void fq_nmod_poly_mullow_KS(fq_nmod_poly_t rop,
                             const fq_nmod_poly_t op1, const fq_nmod_poly_t op2,
                             slong n, const fq_nmod_ctx_t ctx)
 
-    Sets \code{res} to the product of \code{poly1} and \code{poly2}.
+    Sets \code{rop} to the product of \code{op1} and \code{op2}.
 
 void _fq_nmod_poly_mullow(fq_nmod_struct *rop,
                           const fq_nmod_struct *op1, slong len1,
                           const fq_nmod_struct *op2, slong len2, slong n,
                           const fq_nmod_ctx_t ctx)
 
-    Sets \code{(res, n)} to the lowest $n$ coefficients of the product of
-    \code{(poly1, len1)} and \code{(poly2, len2)}.
+    Sets \code{(rop, n)} to the lowest $n$ coefficients of the product of
+    \code{(op1, len1)} and \code{(op2, len2)}.
 
     Assumes \code{0 < n <= len1 + len2 - 1}.  Allows for zero-padding in
     the inputs.  Does not support aliasing between the inputs and the output.
@@ -585,8 +585,8 @@ void fq_nmod_poly_mullow(fq_nmod_poly_t rop,
                          const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, slong n,
                          const fq_nmod_ctx_t ctx)
 
-    Sets \code{res} to the lowest $n$ coefficients of the product of
-    \code{poly1} and \code{poly2}.
+    Sets \code{rop} to the lowest $n$ coefficients of the product of
+    \code{op1} and \code{op2}.
 
 void _fq_nmod_poly_mulhigh_classical(fq_nmod_struct *res,
                                      const fq_nmod_struct *poly1, slong len1,
@@ -743,14 +743,14 @@ void fq_nmod_poly_sqr(fq_nmod_poly_t rop, const fq_nmod_poly_t op,
 void _fq_nmod_poly_pow(fq_nmod_struct *rop, const fq_nmod_struct *op, slong len,
                        ulong e, const fq_nmod_ctx_t ctx)
 
-    Sets \code{res = poly^e}, assuming that \code{e, len > 0} and that
-    \code{res} has space for \code{e*(len - 1) + 1} coefficients.  Does
+    Sets \code{rop = op^e}, assuming that \code{e, len > 0} and that
+    \code{rop} has space for \code{e*(len - 1) + 1} coefficients.  Does
     not support aliasing.
 
 void fq_nmod_poly_pow(fq_nmod_poly_t rop, const fq_nmod_poly_t op, ulong e,
                       const fq_nmod_ctx_t ctx)
 
-    Computes \code{res = poly^e}.  If $e$ is zero, returns one,
+    Computes \code{rop = op^e}.  If $e$ is zero, returns one,
     so that in particular \code{0^0 = 1}.
 
 void _fq_nmod_poly_powmod_ui_binexp(fq_nmod_struct* res,
@@ -917,37 +917,37 @@ fq_nmod_poly_powmod_x_fmpz_preinv(fq_nmod_poly_t res, const fmpz_t e,
 void _fq_nmod_poly_shift_left(fq_nmod_struct *rop, const fq_nmod_struct *op,
                               slong len, slong n, const fq_nmod_ctx_t ctx)
 
-    Sets \code{(res, len + n)} to \code{(poly, len)} shifted left by
+    Sets \code{(rop, len + n)} to \code{(op, len)} shifted left by
     $n$ coefficients.
 
     Inserts zero coefficients at the lower end.  Assumes that
-    \code{len} and $n$ are positive, and that \code{res} fits
-    \code{len + n} elements.  Supports aliasing between \code{res} and
-    \code{poly}.
+    \code{len} and $n$ are positive, and that \code{rop} fits
+    \code{len + n} elements.  Supports aliasing between \code{rop} and
+    \code{op}.
 
 void fq_nmod_poly_shift_left(fq_nmod_poly_t rop, const fq_nmod_poly_t op, slong n,
                              const fq_nmod_ctx_t ctx)
 
-    Sets \code{res} to \code{poly} shifted left by $n$ coeffs.  Zero
+    Sets \code{rop} to \code{op} shifted left by $n$ coeffs.  Zero
     coefficients are inserted.
 
 void _fq_nmod_poly_shift_right(fq_nmod_struct *rop, const fq_nmod_struct *op,
                                slong len, slong n, const fq_nmod_ctx_t ctx)
 
-    Sets \code{(res, len - n)} to \code{(poly, len)} shifted right by
+    Sets \code{(rop, len - n)} to \code{(op, len)} shifted right by
     $n$ coefficients.
 
     Assumes that \code{len} and $n$ are positive, that \code{len > n},
-    and that \code{res} fits \code{len - n} elements.  Supports
-    aliasing between \code{res} and \code{poly}, although in this case
-    the top coefficients of \code{poly} are not set to zero.
+    and that \code{rop} fits \code{len - n} elements.  Supports
+    aliasing between \code{rop} and \code{op}, although in this case
+    the top coefficients of \code{op} are not set to zero.
 
 void fq_nmod_poly_shift_right(fq_nmod_poly_t rop, const fq_nmod_poly_t op,
                               slong n, const fq_nmod_ctx_t ctx)
 
-    Sets \code{res} to \code{poly} shifted right by $n$ coefficients.
+    Sets \code{rop} to \code{op} shifted right by $n$ coefficients.
     If $n$ is equal to or greater than the current length of
-    \code{poly}, \code{res} is set to the zero polynomial.
+    \code{op}, \code{rop} is set to the zero polynomial.
 
 *******************************************************************************
 
@@ -1221,7 +1221,7 @@ void _fq_nmod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     \code{(B, Blen)} assuming \code{Alen, Blen <= n}. We assume the bottom
     coefficient of \code{B} is invertible.
 
-void fq_nmod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, 
+void fq_nmod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
                                 const fmpz_mod_poly_t B, slong n, fq_ctx_t ctx)
 
     Set $Q$ to the quotient of the series $A$ by $B$, thinking of the series as
@@ -1493,13 +1493,13 @@ int fq_nmod_poly_divides(fq_nmod_poly_t Q, const fq_nmod_poly_t A, const fq_nmod
 void _fq_nmod_poly_derivative(fq_nmod_struct *rop, const fq_nmod_struct *op, slong len,
                                          const fq_nmod_ctx_t ctx)
 
-    Sets \code{(rpoly, len - 1)} to the derivative of \code{(poly, len)}.
+    Sets \code{(rop, len - 1)} to the derivative of \code{(op, len)}.
     Also handles the cases where \code{len} is $0$ or $1$ correctly.
-    Supports aliasing of \code{rpoly} and \code{poly}.
+    Supports aliasing of \code{rop} and \code{op}.
 
 void fq_nmod_poly_derivative(fq_nmod_poly_t rop, const fq_nmod_poly_t op, const fq_nmod_ctx_t ctx)
 
-    Sets \code{res} to the derivative of \code{poly}.
+    Sets \code{rop} to the derivative of \code{op}.
 
 *******************************************************************************
 
