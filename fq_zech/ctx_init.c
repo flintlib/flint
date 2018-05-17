@@ -127,7 +127,8 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
 
     ctx->zech_log_table[ctx->qm1] = 0;
     ctx->prime_field_table[0] = ctx->qm1;
-    n_reverse_table[0] = ctx->qm1;
+    for (i = 0; i < q; i++)
+        n_reverse_table[i] = ctx->qm1;
     ctx->eval_table[ctx->qm1] = 0;
 
     fq_nmod_init(r, ctx->fq_nmod_ctx);
@@ -141,6 +142,10 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
     {
         nmod_poly_evaluate_fmpz(result, r, fq_nmod_ctx_prime(fq_nmod_ctx));
         result_ui = fmpz_get_ui(result);
+        if (n_reverse_table[result_ui] != ctx->qm1) {
+            flint_printf("Exception (fq_zech_ctx_init_nmod_ctx). Polynomial is not primitive.\n");
+            flint_abort();
+        }
         n_reverse_table[result_ui] = i;
         ctx->eval_table[i] = result_ui;
         if (r->length == 1)
