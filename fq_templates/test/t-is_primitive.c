@@ -22,6 +22,7 @@ main(void)
     flint_printf("is_primitive... ");
     fflush(stdout);
 
+    /* Test that is_primitive gives consistent answers with multiplicative_order */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;

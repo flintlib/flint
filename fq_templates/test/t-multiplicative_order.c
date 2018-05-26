@@ -22,7 +22,8 @@ main(void)
     flint_printf("multiplicative_order... ");
     fflush(stdout);
 
-    for (i = 0; i < flint_test_multiplier(); i++)
+    /* Test that the computed multiplicative order is a multiple of the real one */
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, tmp;
@@ -50,6 +51,51 @@ main(void)
         fmpz_clear(ord);
         TEMPLATE(T, clear)(a, ctx);
         TEMPLATE(T, clear)(tmp, ctx);
+
+        TEMPLATE(T, ctx_clear)(ctx);
+    }
+
+    /* Test that the computed multiplicative order is coherent with powering by p-1 */
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    {
+        TEMPLATE(T, ctx_t) ctx;
+        TEMPLATE(T, t) X, a;
+        fmpz_t ord, size, pm1;
+
+        TEMPLATE(T, ctx_randtest)(ctx, state);
+
+        TEMPLATE(T, init)(X, ctx);
+        TEMPLATE(T, init)(a, ctx);
+        fmpz_init(ord);
+        fmpz_init(size);
+        fmpz_init(pm1);
+        
+        TEMPLATE(T, gen)(X, ctx);
+        if (!TEMPLATE(T, is_primitive)(X, ctx))
+            continue;
+
+        fmpz_sub_ui(pm1, TEMPLATE(T, ctx_prime)(ctx), 1);
+        TEMPLATE(T, pow)(a, X, pm1, ctx);
+        result = TEMPLATE(T, multiplicative_order)(ord, a, ctx);
+        fmpz_mul(ord, ord, pm1);
+
+        TEMPLATE(T, ctx_order)(size, ctx);
+        fmpz_sub(size, size, ord);
+
+        if (result && !fmpz_is_one(size))
+        {
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
+            flint_printf("ord = "), fmpz_print(ord), flint_printf("\n");
+            TEMPLATE(T, ctx_print)(ctx);
+            abort();
+        }
+
+        fmpz_clear(pm1);
+        fmpz_clear(ord);
+        fmpz_clear(size);
+        TEMPLATE(T, clear)(a, ctx);
+        TEMPLATE(T, clear)(X, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }
