@@ -329,6 +329,8 @@ FLINT_DLL void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, sl
 
 FLINT_DLL void nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
 
+FLINT_DLL void nmod_poly_randtest_monic_primitive(nmod_poly_t poly, flint_rand_t state, slong len);
+
 FLINT_DLL void nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len);
 
 FLINT_DLL int nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_t state,

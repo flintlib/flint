@@ -18,13 +18,8 @@
 void
 fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
-    fq_nmod_ctx_struct * fq_nmod_ctx;
-
-    fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
-
-    fq_nmod_ctx_init(fq_nmod_ctx, p, d, var);
-    fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
-    ctx->owns_fq_nmod_ctx = 1;
+    if (!_fq_zech_ctx_init_conway(ctx, p, d, var))
+        fq_zech_ctx_init_random(ctx, p, d, var);
 }
 
 void
@@ -61,6 +56,29 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
     return result;
 }
 
+void
+fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
+                        const char *var)
+{
+    fq_nmod_ctx_struct * fq_nmod_ctx;
+    flint_rand_t state;
+    nmod_poly_t poly;
+
+    fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
+
+    flint_randinit(state);
+
+    nmod_poly_init2(poly, fmpz_get_ui(p), d + 1);
+    nmod_poly_randtest_monic_primitive(poly, state, d + 1);
+
+    fq_nmod_ctx_init_modulus(fq_nmod_ctx, poly, var);
+
+    nmod_poly_clear(poly);
+    flint_randclear(state);
+
+    fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
+    ctx->owns_fq_nmod_ctx = 1;
+}
 
 void
 fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
