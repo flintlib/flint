@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
-    Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2017, 2018 Luca De Feo
 
     This file is part of FLINT.
 
@@ -22,9 +22,9 @@ void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p,
     Initialises the context for prime~$p$ and extension degree~$d$,
     with name \code{var} for the generator.  By default, it will try
     use a Conway polynomial; if one is not available, a random
-    irreducible polynomial will be used.
+    primitive polynomial will be used.
 
-    Assumes that $p$ is a prime and $p^d < 2^{FLINT_BITS}$.
+    Assumes that $p$ is a prime and $p^d < 2^\texttt{FLINT\_BITS}$.
 
     Assumes that the string \code{var} is a null-terminated string
     of length at least one.
@@ -40,7 +40,7 @@ int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p,
     given size and the initialization is successful; otherwise,
     returns $0$.
 
-    Assumes that $p$ is a prime and $p^d < 2^{FLINT_BITS}$.
+    Assumes that $p$ is a prime and $p^d < 2^\texttt{FLINT\_BITS}$.
 
     Assumes that the string \code{var} is a null-terminated string
     of length at least one.
@@ -52,7 +52,19 @@ void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p,
     with name \code{var} for the generator using a Conway polynomial
     for the modulus.
 
-    Assumes that $p$ is a prime and $p^d < 2^{FLINT_BITS}$.
+    Assumes that $p$ is a prime and $p^d < 2^\texttt{FLINT\_BITS}$.
+
+    Assumes that the string \code{var} is a null-terminated string
+    of length at least one.
+
+void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p,
+                             slong d, const char *var)
+
+    Initialises the context for prime~$p$ and extension degree~$d$,
+    with name \code{var} for the generator using a random primitive
+    polynomial.
+
+    Assumes that $p$ is a prime and $p^d < 2^\texttt{FLINT\_BITS}$.
 
     Assumes that the string \code{var} is a null-terminated string
     of length at least one.
@@ -64,7 +76,7 @@ void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx
     Initialises the context for given \code{modulus} with name
     \code{var} for the generator.
 
-    Assumes that \code{modulus} is an irreducible polynomial over
+    Assumes that \code{modulus} is an primitive polynomial over
     $\mathbf{F}_{p}$.
 
     Assumes that the string \code{var} is a null-terminated string
@@ -473,6 +485,19 @@ void fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, slong e,
     $\mathbf{Z}/d\mathbf{Z}$, where
     $\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)$ is the Frobenius element
     $\sigma \colon x \mapsto x^p$.
+
+int fq_zech_multiplicative_order(fmpz_t ord, const fq_zech_t op, const fq_zech_ctx_t ctx)
+
+    Computes the order of \code{op} as an element of the
+    multiplicative group of \code{ctx}.
+    
+    Returns 0 if \code{op} is 0, otherwise it returns 1 if \code{op}
+    is a generator of the multiplicative group, and -1 if it is not.
+
+int fq_zech_is_primitive(const fq_zech_t op, const fq_zech_ctx_t ctx)
+
+    Returns whether \code{op} is primitive, i.e., whether it is a
+    generator of the multiplicative group of \code{ctx}.
 
 *******************************************************************************
 
