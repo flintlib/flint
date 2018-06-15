@@ -26,4 +26,18 @@ FLINT_DLL int TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T,
 FLINT_DLL void TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
                  const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,
+                             const TEMPLATE(T, ctx_t) ctx);
+
+FQ_TEMPLATES_INLINE
+int TEMPLATE(T, is_primitive)(const TEMPLATE(T, t) op, const TEMPLATE(T, ctx_t) ctx)
+{
+    fmpz_t tmp;
+    int ret;
+    fmpz_init(tmp);
+    ret = TEMPLATE(T, multiplicative_order)(tmp, op, ctx) == 1;
+    fmpz_clear(tmp);
+    return ret;
+}
+
 #endif

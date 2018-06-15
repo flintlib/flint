@@ -3,6 +3,7 @@
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2018 Luca De Feo
 
     This file is part of FLINT.
 
@@ -113,6 +114,13 @@ fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t poly,
                                          flint_rand_t state, slong len)
 
     Generates a random monic irreducible polynomial with length \code{len}.
+
+void
+fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t poly,
+                                       flint_rand_t state, slong len)
+
+    Generates a random monic irreducible primitive polynomial with
+    length \code{len}.
 
 
 void
