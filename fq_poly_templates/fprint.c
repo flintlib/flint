@@ -33,7 +33,7 @@ _TEMPLATE(T, poly_fprint) (FILE * file, const TEMPLATE(T, struct) * poly,
 
     for (i = 0; (r > 0) && (i < len); i++)
     {
-        r = flint_fprintf(file, " ");
+        r = flint_fprintf(file, "  ");
         if (r <= 0)
             return r;
         r = TEMPLATE(T, fprint) (file, poly + i, ctx);
