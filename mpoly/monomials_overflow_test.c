@@ -1,0 +1,36 @@
+/*
+    Copyright (C) 2017 Daniel Schultz
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "mpoly.h"
+
+
+int mpoly_monomials_overflow_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx)
+{
+    slong N, i;
+    N = mpoly_words_per_exp(bits, mctx);
+
+    if (bits <= FLINT_BITS)
+    {
+        ulong mask = 0;
+        for (i = 0; i < FLINT_BITS/bits; i++)
+            mask = (mask << bits) + (UWORD(1) << (bits - 1));
+
+        for (i = 0; i + 1 < len; i++)
+            if (mpoly_monomial_overflows(exps + i*N, N, mask))
+                return 1;
+    } else
+    {
+        for (i = 0; i + 1 < len; i++)
+            if (mpoly_monomial_overflows_mp(exps + i*N, N, bits))
+                return 1;
+    }
+    return 0;
+}

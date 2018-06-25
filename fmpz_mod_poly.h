@@ -159,6 +159,9 @@ FLINT_DLL void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t stat
 FLINT_DLL void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
                                          flint_rand_t state, slong len);
 
+FLINT_DLL void fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t f,
+                                         flint_rand_t state, slong len);
+
 FLINT_DLL void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t f, flint_rand_t state, slong len);
 
 FLINT_DLL int fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t f,

@@ -64,20 +64,14 @@ main(void)
             for (i = 0; i < nfields*length; i += nfields)
                 for (j = 0; j < nfields; j++)
                 {
-                    a[i + j] = n_randint(state, bases[nfields - j - 1]);
-                    max[nfields - j - 1] = FLINT_MAX(max[nfields - j - 1],
-                                                                     a[i + j]);
+                    a[i + j] = n_randint(state, bases[j]);
+                    max[j] = FLINT_MAX(max[j], a[i + j]);
                 }
 
-            /* FLINT_BITS => bits1 */
-            for (i = 0; i < length; i++)
-                mpoly_set_monomial(b + i, a + i*nfields, bits1, nfields, 0, 0);
 
-            /* bits1 => tight packing */
-            mpoly_pack_monomials_tight(t, b, length, bases, nfields, 0, bits1);
-
-            /* tight packing => bits2 */
-            mpoly_unpack_monomials_tight(c, t, length, bases, nfields, 0, bits2);
+            mpoly_pack_vec_ui(b, a, bits1, nfields, length);
+            mpoly_pack_monomials_tight(t, b, length, bases, nfields, bits1);
+            mpoly_unpack_monomials_tight(c, t, length, bases, nfields, bits2);
 
             mpoly_max_degrees_tight(max2, t, length, prods, nfields);
 
@@ -87,7 +81,6 @@ main(void)
                     flint_printf("FAIL\nmax_degrees_tight");
                     flint_abort();
                 }
-
         }
     }
 

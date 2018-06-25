@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2017 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,19 +12,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
 void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
                                                  slong n, fmpz_mpoly_ctx_t ctx)
 {
-   if (f->length == 0)
-      fmpz_mpoly_zero(res, ctx);
-   else if (n == 0)
+   if (n == 0)
       fmpz_mpoly_set_ui(res, 1, ctx);
+   else if (f->length == 0)
+      fmpz_mpoly_zero(res, ctx);
    else if (n == 1)
       fmpz_mpoly_set(res, f, ctx);
    else
@@ -53,142 +50,103 @@ main(void)
     fflush(stdout);
 
     /* Check pow_fps against pow_naive */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-       fmpz_mpoly_ctx_t ctx;
-       fmpz_mpoly_t f, g, h;
-       ordering_t ord;
-       slong nvars, len, len1, exp_bound, exp_bound1;
-       slong coeff_bits, exp_bits, exp_bits1, s;
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g, h;
+        slong len, len1;
+        ulong pow;
+        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1;
 
-       ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 10) + 1;
+        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
 
-       fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(h, ctx);
 
-       fmpz_mpoly_init(f, ctx);
-       fmpz_mpoly_init(g, ctx);
-       fmpz_mpoly_init(h, ctx);
+        len = n_randint(state, 10);
+        len1 = n_randint(state, 10);
 
-       s = n_randint(state, 12);
+        pow = n_randint(state, 50/(len1 + 2));
 
-       len = n_randint(state, 10);
-       len1 = n_randint(state, 10);
+        exp_bits = n_randint(state, 600) + 2;
+        exp_bits1 = n_randint(state, 600) + 10;
+        exp_bits1 = n_randint(state, exp_bits1) + 2; /* increase chances of lower values */
 
-       exp_bits = n_randint(state, FLINT_BITS - 1 -
-                         mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
-       exp_bits1 = n_randint(state, FLINT_BITS - 1 - FLINT_BIT_COUNT(s) -
-                         mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
+        coeff_bits = n_randint(state, 200);
 
-       exp_bound = n_randbits(state, exp_bits);
-       exp_bound1 = n_randbits(state, exp_bits1);
+        for (j = 0; j < 4; j++)
+        {
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
+            fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
-       coeff_bits = n_randint(state, 200);
+            fmpz_mpoly_pow_fps(g, f, pow, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
+            fmpz_mpoly_pow_naive(h, f, pow, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
+            result = fmpz_mpoly_equal(g, h, ctx);
 
-       for (j = 0; j < 4; j++)
-       {
-          fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-          fmpz_mpoly_randtest(g, state, len, exp_bound, coeff_bits, ctx);
-          fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
-             
-          fmpz_mpoly_pow_fps(g, f, s, ctx);
-          fmpz_mpoly_test(g, ctx);
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check pow_fps against pow_naive\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+        }
 
-          fmpz_mpoly_pow_naive(h, f, s, ctx);
-          fmpz_mpoly_test(h, ctx);
-
-          result = fmpz_mpoly_equal(g, h, ctx);
-
-          if (!result)
-          {
-             printf("FAIL\n");
-
-             printf("ord = "); mpoly_ordering_print(ord);
-             printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                    "len1 = %ld, exp_bits1 = %ld, exp_bound1 = %lx, "
-                                      "coeff_bits = %ld, nvars = %ld\n\n",
-                       len, exp_bits, exp_bound, len1, exp_bits1, exp_bound1,
-                                                            coeff_bits, nvars);
-
-             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(h, NULL, ctx); printf("\n\n");
-          
-             flint_abort();
-          }
-       }
-
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
-       fmpz_mpoly_ctx_t ctx;
-       fmpz_mpoly_t f, g;
-       ordering_t ord;
-       slong nvars, len, len1, exp_bound, exp_bound1;
-       slong coeff_bits, exp_bits, exp_bits1, s;
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g;
+        slong len, len1;
+        ulong pow;
+        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1;
 
-       ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 10) + 1;
+        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
 
-       fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
 
-       fmpz_mpoly_init(f, ctx);
-       fmpz_mpoly_init(g, ctx);
+        pow = n_randint(state, 8);
 
-       s = n_randint(state, 12);
+        len = n_randint(state, 10);
+        len1 = n_randint(state, 10);
 
-       len = n_randint(state, 10);
-       len1 = n_randint(state, 10);
+        exp_bits = n_randint(state, 600) + 2;
+        exp_bits1 = n_randint(state, 600) + 10;
 
-       exp_bits = n_randint(state, FLINT_BITS - 1 -
-                         mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
-       exp_bits1 = n_randint(state, FLINT_BITS - 1 - FLINT_BIT_COUNT(s) -
-                         mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars)) + 1;
+        coeff_bits = n_randint(state, 200);
 
-       exp_bound = n_randbits(state, exp_bits);
-       exp_bound1 = n_randbits(state, exp_bits1);
+        for (j = 0; j < 4; j++)
+        {
+            fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
-       coeff_bits = n_randint(state, 200);
+            fmpz_mpoly_pow_fps(g, f, pow, ctx);
+            fmpz_mpoly_assert_canonical(g, ctx);
+            fmpz_mpoly_pow_fps(f, f, pow, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
+            result = fmpz_mpoly_equal(f, g, ctx);
 
-       for (j = 0; j < 4; j++)
-       {
-          fmpz_mpoly_randtest(f, state, len1, exp_bound1, coeff_bits, ctx);
-          fmpz_mpoly_randtest(g, state, len, exp_bound, coeff_bits, ctx);
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check aliasing\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+        }
 
-          fmpz_mpoly_pow_fps(g, f, s, ctx);
-          fmpz_mpoly_test(g, ctx);
-
-          fmpz_mpoly_pow_fps(f, f, s, ctx);
-          fmpz_mpoly_test(f, ctx);
-
-          result = fmpz_mpoly_equal(f, g, ctx);
-
-          if (!result)
-          {
-             printf("FAIL\n");
-             printf("Aliasing test1\n");
-
-             printf("ord = "); mpoly_ordering_print(ord);
-             printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                    "len1 = %ld, exp_bits1 = %ld, exp_bound1 = %lx, "
-                                      "coeff_bits = %ld, nvars = %ld\n\n",
-                       len, exp_bits, exp_bound, len1, exp_bits1, exp_bound1,
-                                                            coeff_bits, nvars);
-
-             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-          
-             flint_abort();
-          }
-       }
-
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

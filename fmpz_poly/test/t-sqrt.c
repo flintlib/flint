@@ -26,8 +26,6 @@ main(void)
     flint_printf("sqrt... ");
     fflush(stdout);
 
-    
-
     /* Test aliasing */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {

@@ -14,7 +14,7 @@
 
 void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
 {
-    if ((rows) && (cols))
+    if (rows != 0 && cols != 0)
     {
         slong i;
         mat->entries = (fmpq *) flint_calloc(rows * cols, sizeof(fmpq));

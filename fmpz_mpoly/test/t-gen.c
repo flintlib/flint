@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2017 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,9 +12,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
 
@@ -26,54 +24,64 @@ main(void)
     flint_printf("gen/is_gen....");
     fflush(stdout);
 
-    /* Set to random integer and compare */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-       fmpz_mpoly_ctx_t ctx;
-       fmpz_mpoly_t f;
-       ordering_t ord;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits, k;
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f1, f2;
+        ordering_t ord;
+        slong nvars, len, coeff_bits, exp_bits, k1, k2;
 
-       ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 20) + 1;
+        ord = mpoly_ordering_randtest(state);
+        nvars = n_randint(state, 20) + 1;
 
-       fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
-       fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(f1, ctx);
+        fmpz_mpoly_init(f2, ctx);
 
-       len = n_randint(state, 100);
+        len = n_randint(state, 100);
+        exp_bits = n_randint(state, 200) + 1;
+        coeff_bits = n_randint(state, 200);
 
-       exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-       exp_bound = n_randbits(state, exp_bits);
-       coeff_bits = n_randint(state, 200);
+        fmpz_mpoly_randtest_bits(f1, state, len, coeff_bits, exp_bits, ctx);
+        fmpz_mpoly_randtest_bits(f2, state, len, coeff_bits, exp_bits, ctx);
 
-       fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+        k1 = n_randint(state, nvars);
+        k2 = n_randint(state, nvars);
+        fmpz_mpoly_gen(f1, k1, ctx);
+        fmpz_mpoly_assert_canonical(f1, ctx);
+        fmpz_mpoly_gen(f2, k2, ctx);
+        fmpz_mpoly_assert_canonical(f2, ctx);
 
-       k = n_randint(state, nvars);
+        result = 1;
+        result = result && fmpz_mpoly_is_gen(f1, k1, ctx);
+        result = result && fmpz_mpoly_is_gen(f1, -WORD(1), ctx);
+        result = result && fmpz_mpoly_is_gen(f2, k2, ctx);
+        result = result && fmpz_mpoly_is_gen(f2, -WORD(1), ctx);
 
-       fmpz_mpoly_gen(f, k, ctx);
-       fmpz_mpoly_test(f, ctx);
+        if (!result)
+        {
+            printf("FAIL\n");
+            flint_printf("Check one generator\ni = %wd\n", i);
+            flint_abort();
+        }
 
-       result = fmpz_mpoly_is_gen(f, k, ctx) &&
-                fmpz_mpoly_is_gen(f, -WORD(1), ctx);
+        fmpz_mpoly_mul_johnson(f1, f1, f2, ctx);
+        result = 1;
+        result = result && !fmpz_mpoly_is_gen(f1, k1, ctx);
+        result = result && !fmpz_mpoly_is_gen(f1, k2, ctx);
+        result = result && !fmpz_mpoly_is_gen(f1, -WORD(1), ctx);
 
-       if (!result)
-       {
-          printf("FAIL\n");
+        if (!result)
+        {
+            printf("FAIL\n");
+            flint_printf("Check product of two generators\ni = %wd\n", i);
+            flint_abort();
+        }
 
-          printf("ord = "); mpoly_ordering_print(ord);
-          printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                                    "coeff_bits = %ld, nvars = %ld\n\n",
-                                  len, exp_bits, exp_bound, coeff_bits, nvars);
 
-          fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
-          flint_printf("k = %wd\n", k);
-
-          flint_abort();
-       }
-
-       fmpz_mpoly_clear(f, ctx);  
+        fmpz_mpoly_clear(f1, ctx);
+        fmpz_mpoly_clear(f2, ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

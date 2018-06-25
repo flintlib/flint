@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,14 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx,
                                              slong nvars, const ordering_t ord)
 {
-   ctx->n = (ord == ORD_DEGLEX || ord == ORD_DEGREVLEX) ? nvars + 1 : nvars;
-   ctx->ord = ord;
+    mpoly_ctx_init(ctx->minfo, nvars, ord);
 }

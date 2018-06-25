@@ -17,7 +17,7 @@
 void
 fmpz_poly_mat_init(fmpz_poly_mat_t A, slong rows, slong cols)
 {
-    if (rows && cols)
+    if (rows != 0 && cols != 0)
     {
         slong i;
 

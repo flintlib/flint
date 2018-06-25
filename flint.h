@@ -34,6 +34,12 @@
 #include "config.h"
 #undef ulong
 
+#ifdef FLINT_INLINES_C
+#define FLINT_INLINE FLINT_DLL
+#else
+#define FLINT_INLINE static __inline__
+#endif
+
 #if HAVE_GC
 #include "gc.h"
 #endif
@@ -49,8 +55,8 @@
 /* flint version number */
 
 #define __FLINT_VERSION 2
-#define __FLINT_VERSION_MINOR 5 
-#define __FLINT_VERSION_PATCHLEVEL 3 
+#define __FLINT_VERSION_MINOR 5
+#define __FLINT_VERSION_PATCHLEVEL 3
 #define FLINT_VERSION "2.5.3"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
@@ -68,7 +74,7 @@
 #endif
 
 /*
-   We define alternative key words for "asm" and "inline", allowing 
+   We define alternative key words for "asm" and "inline", allowing
    the code to be compiled with the "-ansi" flag under GCC
  */
 #ifndef __GNUC__
@@ -132,7 +138,7 @@ FLINT_DLL void flint_set_abort(void (*func)(void));
     #define FLINT_BITS 64
     #define FLINT_D_BITS 53
     #define FLINT64 1
-#else 
+#else
     #define FLINT_BITS 32
     #define FLINT_D_BITS 31
 #endif
@@ -173,7 +179,7 @@ typedef struct
 
 typedef flint_rand_s flint_rand_t[1];
 
-static __inline__
+FLINT_INLINE
 void flint_randinit(flint_rand_t state)
 {
    state->gmp_init = 0;
@@ -186,14 +192,22 @@ void flint_randinit(flint_rand_t state)
 #endif
 }
 
-static __inline__
+FLINT_INLINE
 void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2)
 {
    state->__randval = seed1;
    state->__randval2 = seed2;
 }
 
-static __inline__
+FLINT_INLINE
+void flint_get_randseed(ulong * seed1, ulong * seed2, flint_rand_t state)
+{
+   *seed1 = state->__randval;
+   *seed2 = state->__randval2;
+}
+
+
+FLINT_INLINE
 void _flint_rand_init_gmp(flint_rand_t state)
 {
     if (!state->gmp_init)
@@ -203,11 +217,23 @@ void _flint_rand_init_gmp(flint_rand_t state)
     }
 }
 
-static __inline__
+FLINT_INLINE
 void flint_randclear(flint_rand_t state)
 {
     if (state->gmp_init)
         gmp_randclear(state->gmp_state);
+}
+
+FLINT_INLINE
+flint_rand_s * flint_rand_alloc()
+{
+    return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
+}
+
+FLINT_INLINE
+void flint_rand_free(flint_rand_s * state)
+{
+    flint_free(state);
 }
 
 #if HAVE_GC
@@ -232,19 +258,22 @@ typedef __mpfr_struct mpfr;
 
 #if WANT_ASSERT
 #define FLINT_ASSERT(param) assert(param)
-#else 
+#else
 #define FLINT_ASSERT(param)
 #endif
 
 #if defined(__GNUC__)
 #define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
 #else
 #define FLINT_UNUSED(x) x
+#define FLINT_SET_BUT_UNUSED(x) x
 #endif
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
 #define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
+#define FLINT_SIGN_EXT(x) (-(ulong)((slong)(x) < 0))
 
 #define MP_PTR_SWAP(x, y) \
     do { \
@@ -398,4 +427,3 @@ FLINT_DLL int flint_sscanf(const char * s, const char * str, ...); /* flint vers
 #endif
 
 #endif
-

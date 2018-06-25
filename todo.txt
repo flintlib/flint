@@ -94,8 +94,6 @@ fmpz_factor
 fmpz_mpoly
 ----------
 
-* Rename divrem_ideal to divrem_ideal_monagan_pearce.
-
 * Implement array version of divrem_ideal.
 
 * Don't restart division if upgrading to multiprecision.
@@ -105,12 +103,13 @@ fmpz_mpoly
   require an extra bit for either q or r in signed integer division in
   small case. This is probably why C division is normalised the way it is.
 
-* Move _fmpz_mpoly_max_degrees to mpoly module and rename.
-
 * Implement fmpz_mpoly_ui/si/fmpz_sub functions for Nemo.
 
 * Add references to Monagan and Pearce papers to bibtex and reference in
   heap multiplication, powering and division functions.
+
+* Move functions in mpoly/MISSING_FXNS.c and decarations in mpoly.h to their
+  appropriate places.
 
 nmod_poly
 ---------

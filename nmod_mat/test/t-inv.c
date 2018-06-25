@@ -117,7 +117,7 @@ main(void)
         if (result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("singular matrix reported as invertiblen");
+            flint_printf("singular matrix reported as invertible\n");
             abort();
         }
 

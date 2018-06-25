@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,30 +10,20 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_set_si(fmpz_mpoly_t poly, slong c, const fmpz_mpoly_ctx_t ctx)
 {
-   slong N, i;
+    slong N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
-   if (c == 0)
-   {
-      _fmpz_mpoly_set_length(poly, 0, ctx);
-      return;
-   }
+    if (c == 0)
+    {
+        _fmpz_mpoly_set_length(poly, 0, ctx);
+        return;
+    }
 
-   fmpz_mpoly_fit_length(poly, 1, ctx);
-
-   fmpz_set_si(poly->coeffs + 0, c);
-
-   N = words_per_exp(ctx->n, poly->bits);
-
-   for (i = 0; i < N; i++)
-      poly->exps[i] = 0;
-
-   _fmpz_mpoly_set_length(poly, 1, ctx);
+    fmpz_mpoly_fit_length(poly, 1, ctx);
+    fmpz_set_si(poly->coeffs + 0, c);
+    mpoly_monomial_zero(poly->exps + N*0, N);
+    _fmpz_mpoly_set_length(poly, 1, ctx);
 }

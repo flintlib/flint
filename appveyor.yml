@@ -1,31 +1,63 @@
-version: 1.0.{build}
-build:
-  verbosity: minimal
-  
+version: 0.2.19.{build}
+
+platform: 
+  - x64
+
+os: Visual Studio 2017
+
+clone_depth: 5
+
+skip_tags: true
+
+matrix:
+  fast_finish: false
+
+skip_commits:
+# Add [av skip] to commit messages
+  message: /\[av skip\]/
+
 environment:
+  global:
+    CONDA_INSTALL_LOCN_32: "C:\\Miniconda36"
+    CONDA_INSTALL_LOCN_64: "C:\\Miniconda36-x64"
+    VCVARSALL: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat"
   matrix:
-    - BUILD_TYPE: Release
-      COMPILER: MSVC15
-      PLATFORM: x64
-    - COMPILER: MinGW-w64
-      ABI: 32
-    - BUILD_TYPE: Release
-      COMPILER: MSVC15
-      PLATFORM: Win32
-    - COMPILER: MinGW-w64
-      ABI: 64
+    - COMPILER: gcc
+      ARCH: 32
+    - COMPILER: gcc
+      ARCH: 64
+    - COMPILER: cl
+      ARCH: 32
+    - COMPILER: cl
+      ARCH: 64
 
-cache:
-- C:\projects\mpir -> .build_dependencies.cmd
-- C:\projects\mpfr -> .build_dependencies.cmd
-- C:\projects\pthreads -> .build_dependencies.cmd
-- C:\projects\flint2\mpir-2.7.2 -> .build_dependencies
-- C:\projects\flint2\mpfr-3.1.6 -> .build_dependencies
- 
+install:
+  - if [%COMPILER%]==[gcc] set "PATH=C:\msys64\mingw%ARCH%\bin;%PATH%"
+  - if [%COMPILER%]==[gcc] set "CMAKE_PREFIX_PATH=C:\msys64\mingw%ARCH%"
+  - if [%COMPILER%]==[gcc] del /F /Q "C:\Program Files\Git\usr\bin\sh.exe"
+  - if [%COMPILER%]==[gcc] if [%ARCH%]==[64] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-mpfr
+  - if [%COMPILER%]==[gcc] if [%ARCH%]==[32] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-i686-toolchain mingw-w64-i686-mpfr
+  
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_64%"
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[32] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_32%"
+  - if [%COMPILER%]==[cl] set "LIB=%CONDA_INSTALL_LOCN%\Library\lib;%LIB%"
+  - if [%COMPILER%]==[cl] set "CPATH=%CONDA_INSTALL_LOCN%\Library\include;%CPATH%"
+  - if [%COMPILER%]==[cl] call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] call "%VCVARSALL%" x64
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[32] call "%VCVARSALL%" x86
+  - if [%COMPILER%]==[cl] conda config --add channels conda-forge --force
+  - if [%COMPILER%]==[cl] conda install --yes --quiet mpir mpfr pthreads-win32 ninja
+
+before_build:
+  - ps: if (-Not (Test-Path .\build)) { mkdir build }
+  
+  - cd build
+  - if [%COMPILER%]==[gcc] cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+  - if [%COMPILER%]==[cl] cmake -G "Ninja" -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+
 build_script:
-  - if [%COMPILER%]==[MSVC15] if not exist C:\projects\mpir .build_dependencies.cmd
-  - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] set PATH=C:\Python35-x64;%PATH%
-  - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] set PATH=C:\Python35;%PATH%
+  - cmake --build . 2>&1 > build_output.txt
+  - ps: Get-Content .\build_output.txt -Tail 1000
 
-  - if [%COMPILER%]==[MinGW-w64] C:\msys64\usr\bin\sh.exe --login /c/projects/flint2/.appveyor_msys_build.sh
-  - if [%COMPILER%]==[MSVC15] call .appveyor_msvc_build.cmd
+test_script:
+  - ctest -j3 --timeout 120

@@ -95,6 +95,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     ret = 0;
     fac = _fmpz_promote(f);
+    mpz_realloc(fac, fmpz_size(n_in));
 
     /************************ STAGE I PRECOMPUTATIONS ************************/
 
@@ -117,6 +118,11 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     
     mmin = (B1 + (P/2)) / P;
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */
+    if (mmax < mmin)
+    {  
+       flint_printf("Exception (ecm). B1 > B2 encountered.\n");
+       flint_abort();
+    }
     maxj = (P + 1)/2; 
     mdiff = mmax - mmin + 1;
 

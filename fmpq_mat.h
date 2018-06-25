@@ -122,6 +122,8 @@ FLINT_DLL void fmpq_mat_sub(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_ma
 
 FLINT_DLL void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op);
 
+FLINT_DLL void fmpq_mat_scalar_mul_fmpq(fmpq_mat_t rop, const fmpq_mat_t op, const fmpq_t x);
+
 FLINT_DLL void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
 
 FLINT_DLL void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
@@ -192,6 +194,10 @@ FLINT_DLL void fmpq_mat_mul_fmpz_mat(fmpq_mat_t C, const fmpq_mat_t A,
 
 FLINT_DLL void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
     const fmpq_mat_t B);
+
+/* Kronecker product *********************************************************/
+
+FLINT_DLL void fmpq_mat_kronecker_product(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
 
 /* Trace *********************************************************************/
 

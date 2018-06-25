@@ -93,6 +93,11 @@ FMPQ_INLINE int fmpq_is_one(const fmpq_t x)
     return fmpz_is_one(fmpq_numref(x)) && fmpz_is_one(fmpq_denref(x));
 }
 
+FMPQ_INLINE int fmpq_is_pm1(const fmpq_t x)
+{
+    return fmpz_is_pm1(fmpq_numref(x)) && fmpz_is_one(fmpq_denref(x));
+}
+
 FMPQ_INLINE void fmpq_set(fmpq_t dest, const fmpq_t src)
 {
     fmpz_set(fmpq_numref(dest), fmpq_numref(src));
@@ -141,6 +146,7 @@ FLINT_DLL void fmpq_set_si(fmpq_t res, slong p, ulong q);
 
 FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 
+FLINT_DLL int fmpq_set_str(fmpq_t res, const char * str, int base);
 
 FMPQ_INLINE void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
 {
@@ -155,6 +161,8 @@ FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 }
 
 FLINT_DLL int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
+
+FLINT_DLL void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c);
 
 FLINT_DLL void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f);
 

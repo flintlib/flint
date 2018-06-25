@@ -28,7 +28,7 @@ main(void)
     flint_printf("pack_unpack_tight....");
     fflush(stdout);
 
-    max_length = 100;
+    max_length = 50;
     max_fields = FLINT_BITS/8;  /* exponents should fit in one word */
 
     a = flint_malloc(max_length*max_fields*sizeof(ulong));
@@ -38,13 +38,14 @@ main(void)
     t = flint_malloc(max_length*sizeof(ulong));
     bases = flint_malloc(max_fields*sizeof(slong));
 
-    for (k = 0; k < 1000 * flint_test_multiplier(); k++)
+    for (k = 0; k < 20 * flint_test_multiplier(); k++)
     {
         /* do FLINT_BITS => bits1 
                          => tight packing
                          => bits2 => FLINT_BITS and compare */
-        for (bits1 = 8; bits1 <= FLINT_BITS; bits1 *= 2)
-        for (bits2 = bits1; bits2 <= FLINT_BITS; bits2 *= 2)
+
+        for (bits1 = 8; bits1 <= FLINT_BITS; bits1 += 1)
+        for (bits2 = 8; bits2 <= FLINT_BITS; bits2 += 1)
         {
             length = n_randint(state, max_length) + 1;
             nfields = n_randint(state, FLINT_BITS/FLINT_MAX(bits1, bits2)) + 1;
@@ -52,22 +53,14 @@ main(void)
             for (j = 0; j < nfields; j++)
                 bases[j] =  n_randint(state, 200) + 1;
 
-            for (i = 0; i < nfields*length; i += nfields)
+            for (i = 0; i < length; i += 1)
                 for (j = 0; j < nfields; j++)
-                    a[i + j] = n_randint(state, bases[nfields - j - 1]);
+                    a[nfields*i + j] = n_randint(state, bases[j]);
 
-            /* FLINT_BITS => bits1 */
-            for (i = 0; i < length; i++)
-                mpoly_set_monomial(b + i, a + i*nfields, bits1, nfields, 0, 0);
-
-            /* bits1 => tight packing */
-            mpoly_pack_monomials_tight(t, b, length, bases, nfields, 0, bits1);
-
-            /* tight packing => bits2 */
-            mpoly_unpack_monomials_tight(c, t, length, bases, nfields, 0, bits2);
-
-            /* bits2 => FLINT_BITS */
-            mpoly_unpack_monomials(d, FLINT_BITS, c, bits2, length, nfields);
+            mpoly_pack_vec_ui(b, a, bits1, nfields, length);
+            mpoly_pack_monomials_tight(t, b, length, bases, nfields, bits1);
+            mpoly_unpack_monomials_tight(c, t, length, bases, nfields, bits2);
+            mpoly_unpack_vec_ui(d, c, bits2, nfields, length);
 
             for (i = 0; i < length*nfields; i++)
                 if (a[i] != d[i])
@@ -76,7 +69,6 @@ main(void)
                     flint_printf("bits1 = %wd, bits2 = %wd\n", bits1, bits2);
                     flint_abort();
                 }
-
         }
     }
 

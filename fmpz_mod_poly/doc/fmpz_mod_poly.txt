@@ -3,6 +3,7 @@
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2018 Luca De Feo
 
     This file is part of FLINT.
 
@@ -75,7 +76,7 @@ void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len)
     is truncated to have the given length.  Discarded coefficients are
     not necessarily set to zero.
 
-void fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res, 
+void fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res,
                                            const fmpz_mod_poly_t poly, slong n)
 
     Notionally truncate \code{poly} to length $n$ and set \code{res} to the
@@ -113,6 +114,13 @@ fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t poly,
                                          flint_rand_t state, slong len)
 
     Generates a random monic irreducible polynomial with length \code{len}.
+
+void
+fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t poly,
+                                       flint_rand_t state, slong len)
+
+    Generates a random monic irreducible primitive polynomial with
+    length \code{len}.
 
 
 void
@@ -428,17 +436,17 @@ void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len, 
+void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len,
                                                 const fmpz_t x, const fmpz_t p)
 
-    Sets \code{(res, len}) to \code{(poly, len)} divided by $x$ (i.e. 
+    Sets \code{(res, len}) to \code{(poly, len)} divided by $x$ (i.e.
     multiplied by the inverse of $x \pmod{p}$). The result is reduced modulo
     $p$.
 
-void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res, 
+void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res,
                                     const fmpz_mod_poly_t poly, const fmpz_t x)
 
-    Sets \code{res} to \code{poly} divided by $x$, (i.e. multiplied by the 
+    Sets \code{res} to \code{poly} divided by $x$, (i.e. multiplied by the
     inverse of $x \pmod{p}$). The result is reduced modulo $p$.
 
 *******************************************************************************
@@ -542,7 +550,7 @@ void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n
     of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
     given by \code{xs}. The coefficients reduced modulo \code{f}.
 
-    Aliasing of the input and output is not allowed. It is required that 
+    Aliasing of the input and output is not allowed. It is required that
     \code{poly} is reduced modulo \code{f}.
 
 
@@ -564,13 +572,13 @@ void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs,
 void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, slong len, ulong e,
                         const fmpz_t p)
 
-    Sets \code{res = poly^e}, assuming that $e > 1$ and \code{elen > 0},
+    Sets \code{rop = poly^e}, assuming that $e > 1$ and \code{elen > 0},
     and that \code{res} has space for \code{e*(len - 1) + 1} coefficients.
     Does not support aliasing.
 
 void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
 
-    Computes \code{res = poly^e}.  If $e$ is zero, returns one,
+    Computes \code{rop = poly^e}.  If $e$ is zero, returns one,
     so that in particular \code{0^0 = 1}.
 
 void _fmpz_mod_poly_pow_trunc(fmpz * res, const fmpz * poly,
@@ -691,7 +699,7 @@ void fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
     modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
     We require \code{finv} to be the inverse of the reverse of \code{f}.
 
-void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, 
+void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e,
                   const fmpz * f, slong lenf, const fmpz* finv, slong lenfinv,
                                   const fmpz_t p)
 
@@ -702,7 +710,7 @@ void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e,
     We require \code{lenf > 2}. The output \code{res} must have room for
     \code{lenf - 1} coefficients.
 
-void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, 
+void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res,
            const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
 
     Sets \code{res} to \code{x} raised to the power \code{e}
@@ -710,13 +718,13 @@ void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res,
     \code{e >= 0}. We require \code{finv} to be the inverse of the reverse of
     \code{f}.
 
-void 
+void
 fmpz_mod_poly_frobenius_powers_2exp_precomp(
-                   fmpz_mod_poly_frobenius_powers_2exp_t pow, 
+                   fmpz_mod_poly_frobenius_powers_2exp_t pow,
                   const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
 
-    If \code{p = f->p}, compute $x^(p^1)$, $x^(p^2)$, $x^(p^4)$, ..., 
-    $x^(p^(2^l)) \pmod{f}$ where $2^l$ is the greatest power of $2$ less than 
+    If \code{p = f->p}, compute $x^(p^1)$, $x^(p^2)$, $x^(p^4)$, ...,
+    $x^(p^(2^l)) \pmod{f}$ where $2^l$ is the greatest power of $2$ less than
     or equal to $m$.
 
     Allows construction of $x^(p^k)$ for $k = 0$, $1$, ..., $x^(p^m) \pmod{f}$
@@ -724,15 +732,15 @@ fmpz_mod_poly_frobenius_powers_2exp_precomp(
 
     Requires precomputed inverse of $f$, i.e. newton inverse.
 
-void 
+void
 fmpz_mod_poly_frobenius_powers_2exp_clear(fmpz_mod_poly_frobenius_powers_2exp_t
                                           pow)
 
-    Clear resources used by the \code{fmpz_mod_poly_frobenius_powers_2exp_t} 
+    Clear resources used by the \code{fmpz_mod_poly_frobenius_powers_2exp_t}
     struct.
 
 void fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
-                             fmpz_mod_poly_frobenius_powers_2exp_t pow, 
+                             fmpz_mod_poly_frobenius_powers_2exp_t pow,
                                               const fmpz_mod_poly_t f, ulong m)
 
     If \code{p = f->p}, compute $x^(p^m) \pmod{f}$.
@@ -740,15 +748,15 @@ void fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
     Requires precomputed frobenius powers supplied by
     \code{fmpz_mod_poly_frobenius_powers_2exp_precomp}.
 
-    If $m == 0$ and $f$ has degree $0$ or $1$, this performs a division. 
+    If $m == 0$ and $f$ has degree $0$ or $1$, this performs a division.
     However an impossible inverse by the leading coefficient of $f$ will have
     been caught by \code{fmpz_mod_poly_frobenius_powers_2exp_precomp}.
 
 void
-fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
+fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow,
                   const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
 
-    If \code{p = f->p}, compute $x^(p^0)$, $x^(p^1)$, $x^(p^2)$, $x^(p^3)$, 
+    If \code{p = f->p}, compute $x^(p^0)$, $x^(p^1)$, $x^(p^2)$, $x^(p^3)$,
     ..., $x^(p^m) \pmod{f}$.
 
     Requires precomputed inverse of $f$, i.e. newton inverse.
@@ -756,7 +764,7 @@ fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow,
 void
 fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow);
 
-    Clear resources used by the \code{fmpz_mod_poly_frobenius_powers_t} 
+    Clear resources used by the \code{fmpz_mod_poly_frobenius_powers_t}
     struct.
 
 *******************************************************************************
@@ -983,7 +991,7 @@ void _fmpz_mod_poly_rem_f(fmpz_t f, fmpz *R,
                         const fmpz_t invB, const fmpz_t p)
 
     If $f$ returns with the value $1$ then the function operates as
-    \code{_fmpz_mod_poly_rem}, otherwise $f$ will be set to a nontrivial 
+    \code{_fmpz_mod_poly_rem}, otherwise $f$ will be set to a nontrivial
     factor of $p$.
 
 void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
@@ -1016,7 +1024,7 @@ void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
     where $n \geq 1$, assuming that the bottom coefficient of
     $Q$ is a unit.
 
-void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
+void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
     const fmpz_mod_poly_t Q, slong n)
 
     Either sets $f$ to a nontrivial factor of $p$ with the value of
@@ -1037,7 +1045,7 @@ void fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv,
     where $n \geq 1$, assuming that the bottom coefficient of
     $Q$ is a unit.
 
-void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
+void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv,
     const fmpz_mod_poly_t Q, slong n)
 
     Either sets $f$ to a nontrivial factor of $p$ with the value of
@@ -1057,7 +1065,7 @@ void _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     \code{(B, Blen)} assuming \code{Alen, Blen <= n}. We assume the bottom
     coefficient of \code{B} is invertible modulo $p$.
 
-void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, 
+void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
                                               const fmpz_mod_poly_t B, slong n)
 
     Set $Q$ to the quotient of the series $A$ by $B$, thinking of the series as
@@ -1078,10 +1086,10 @@ void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
     Otherwise, if \code{poly} is zero, sets \code{res} to zero.
 
-void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res, 
+void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res,
                                                     const fmpz_mod_poly_t poly)
 
-    Either set $f$ to $1$ and \code{res} to \code{poly} divided by its leading 
+    Either set $f$ to $1$ and \code{res} to \code{poly} divided by its leading
     coefficient or set $f$ to a nontrivial factor of $p$ and leave \code{res}
     undefined.
 
@@ -1181,9 +1189,9 @@ void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G,
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime
     number.
 
-slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM, 
-                     fmpz *A, slong *lenA, fmpz *B, slong *lenB, 
-                     const fmpz *a, slong lena, const fmpz *b, slong lenb, 
+slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM,
+                     fmpz *A, slong *lenA, fmpz *B, slong *lenB,
+                     const fmpz *a, slong lena, const fmpz *b, slong lenb,
                      const fmpz_t mod)
 
     Computes the HGCD of $a$ and $b$, that is, a matrix~$M$, a sign~$\sigma$
@@ -1201,7 +1209,7 @@ slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM,
     Assumes that \code{M[0]}, \code{M[1]}, \code{M[2]}, and \code{M[3]}
     each point to a vector of size at least $\len(a)$.
 
-slong _fmpz_mod_poly_gcd_hgcd(fmpz *G, const fmpz *A, slong lenA, 
+slong _fmpz_mod_poly_gcd_hgcd(fmpz *G, const fmpz *A, slong lenA,
                                    const fmpz *B, slong lenB, const fmpz_t mod)
 
     Computes the monic GCD of $A$ and $B$, assuming that
@@ -1210,7 +1218,7 @@ slong _fmpz_mod_poly_gcd_hgcd(fmpz *G, const fmpz *A, slong lenA,
     Assumes that $G$ has space for $\len(B)$ coefficients and
     returns the length of $G$ on output.
 
-void fmpz_mod_poly_gcd_hgcd(fmpz_mod_poly_t G, 
+void fmpz_mod_poly_gcd_hgcd(fmpz_mod_poly_t G,
                               const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Computes the monic GCD of $A$ and $B$ using the HGCD algorithm.
@@ -1218,7 +1226,7 @@ void fmpz_mod_poly_gcd_hgcd(fmpz_mod_poly_t G,
     As a special case, the GCD of two zero polynomials is defined to be
     the zero polynomial.
 
-    The time complexity of the algorithm is $\mathcal{O}(n \log^2 n)$ 
+    The time complexity of the algorithm is $\mathcal{O}(n \log^2 n)$
     ring operations. For further details, see~\citep{ThullYap1990}.
 
 slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
@@ -1249,7 +1257,7 @@ slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
     If $f$ returns with the value $1$ then the function operates as per
     \code{_fmpz_mod_poly_xgcd_euclidean}, otherwise $f$ is set to a nontrivial
     factor of $p$.
- 
+
 void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
                              fmpz_mod_poly_t S, fmpz_mod_poly_t T,
                              const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
@@ -1271,8 +1279,8 @@ void fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
     \code{fmpz_mod_poly_xgcd_euclidean}, otherwise $f$ is set to a nontrivial
     factor of $p$.
 
-slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T, 
-               const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T,
+               const fmpz *A, slong lenA, const fmpz *B, slong lenB,
                                                               const fmpz_t mod)
 
     Computes the GCD of $A$ and $B$, where $\len(A) \geq \len(B) > 0$,
@@ -1290,7 +1298,7 @@ slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T,
 
     No aliasing of input and output operands is permitted.
 
-void fmpz_mod_poly_xgcd_hgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
+void fmpz_mod_poly_xgcd_hgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
            fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
@@ -1366,14 +1374,14 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
                          const fmpz_t p)
 
     If $f$ returns with value $1$ then the function operates as per
-    \code{_fmpz_mod_poly_gcdinv_euclidean}, otherwise $f$ is set to a 
+    \code{_fmpz_mod_poly_gcdinv_euclidean}, otherwise $f$ is set to a
     nontrivial factor of $p$.
 
 void fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
        fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     If $f$ returns with value $1$ then the function operates as per
-    \code{fmpz_mod_poly_gcdinv_euclidean}, otherwise $f$ is set to a 
+    \code{fmpz_mod_poly_gcdinv_euclidean}, otherwise $f$ is set to a
     nontrivial factor of the modulus of $A$.
 
 slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
@@ -1431,7 +1439,7 @@ int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A,
     If $f$ returns with the value $1$, then the function operates as per
     \code{_fmpz_mod_poly_invmod}. Otherwise $f$ is set to a nontrivial
     factor of $p$.
-    
+
 int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
 
@@ -1458,15 +1466,15 @@ int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A,
 
 *******************************************************************************
 
-slong _fmpz_mod_poly_minpoly_bm(fmpz* poly, 
+slong _fmpz_mod_poly_minpoly_bm(fmpz* poly,
                                 const fmpz* seq, slong len, const fmpz_t p)
-    
+
     Sets \code{poly} to the coefficients of a minimal generating
     polynomial for sequence \code{(seq, len)} modulo $p$.
 
     The return value equals the length of \code{poly}.
 
-    It is assumed that $p$ is prime and \code{poly} has space for at least 
+    It is assumed that $p$ is prime and \code{poly} has space for at least
     $len+1$ coefficients. No aliasing between inputs and outputs is
     allowed.
 
@@ -1480,15 +1488,15 @@ void fmpz_mod_poly_minpoly_bm(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
     This version uses the Berlekamp-Massey algorithm, whose running time
     is proportional to \code{len} times the size of the minimal generator.
 
-slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly, 
+slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly,
                  const fmpz* seq, slong len, const fmpz_t p)
-    
+
     Sets \code{poly} to the coefficients of a minimal generating
     polynomial for sequence \code{(seq, len)} modulo $p$.
 
     The return value equals the length of \code{poly}.
 
-    It is assumed that $p$ is prime and \code{poly} has space for at least 
+    It is assumed that $p$ is prime and \code{poly} has space for at least
     $len+1$ coefficients. No aliasing between inputs and outputs is
     allowed.
 
@@ -1510,7 +1518,7 @@ slong _fmpz_mod_poly_minpoly(fmpz* poly, const fmpz* seq, slong len, const fmpz_
 
     The return value equals the length of \code{poly}.
 
-    It is assumed that $p$ is prime and \code{poly} has space for at least 
+    It is assumed that $p$ is prime and \code{poly} has space for at least
     $len+1$ coefficients. No aliasing between inputs and outputs is
     allowed.
 
@@ -1538,8 +1546,8 @@ void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
 
 *******************************************************************************
 
-void _fmpz_mod_poly_resultant_euclidean(fmpz_t res, 
-                                     const fmpz *poly1, slong len1, 
+void _fmpz_mod_poly_resultant_euclidean(fmpz_t res,
+                                     const fmpz *poly1, slong len1,
                                const fmpz *poly2, slong len2, const fmpz_t mod)
 
     Sets $r$ to the resultant of \code{(poly1, len1)} and
@@ -1549,7 +1557,7 @@ void _fmpz_mod_poly_resultant_euclidean(fmpz_t res,
 
     Asumes that the modulus is prime.
 
-void fmpz_mod_poly_resultant_euclidean(fmpz_t r, 
+void fmpz_mod_poly_resultant_euclidean(fmpz_t r,
                               const fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
 
     Computes the resultant of $f$ and $g$ using the Euclidean algorithm.
@@ -1563,13 +1571,13 @@ void fmpz_mod_poly_resultant_euclidean(fmpz_t r,
     For convenience, we define the resultant to be equal to zero if either
     of the two polynomials is zero.
 
-void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA, 
+void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
                                    const fmpz *B, slong lenB, const fmpz_t mod)
 
     Sets \code{res} to the resultant of \code{(A, lenA)} and
     \code{(B, lenB)} using the half-gcd algorithm.
 
-    This algorithm computes the half-gcd as per 
+    This algorithm computes the half-gcd as per
     \code{_fmpz_mod_poly_gcd_hgcd()}
     but additionally updates the resultant every time a division occurs. The
     half-gcd algorithm computes the GCD recursively. Given inputs $a$ and $b$
@@ -1577,10 +1585,10 @@ void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
     the Euclidean algorithm which do not require the low $m$ coefficients of
     $a$ and $b$.
 
-    This performs quotients in exactly the same order as the ordinary 
+    This performs quotients in exactly the same order as the ordinary
     Euclidean algorithm except that the low $m$ coefficients of the polynomials
-    in the remainder sequence are not computed. A correction step after hgcd 
-    has been called computes these low $m$ coefficients (by matrix 
+    in the remainder sequence are not computed. A correction step after hgcd
+    has been called computes these low $m$ coefficients (by matrix
     multiplication by a transformation matrix also computed by hgcd).
 
     This means that from the point of view of the resultant, all but the last
@@ -1591,8 +1599,8 @@ void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
 
     To compute the adjustments to the resultant coming from this corrected
     quotient, we save the relevant information in an \code{nmod_poly_res_t}
-    struct at the time the quotient is performed so that when the correction 
-    step is performed later, the adjustments to the resultant can be computed 
+    struct at the time the quotient is performed so that when the correction
+    step is performed later, the adjustments to the resultant can be computed
     at that time also.
 
     The only time an adjustment to the resultant is not required after a
@@ -1603,7 +1611,7 @@ void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
 
     Asumes that the modulus is prime.
 
-void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t f, 
+void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t f,
                                                        const fmpz_mod_poly_t g)
 
     Computes the resultant of $f$ and $g$ using the half-gcd algorithm.
@@ -1617,7 +1625,7 @@ void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t f,
     For convenience, we define the resultant to be equal to zero if either
     of the two polynomials is zero.
 
-void _fmpz_mod_poly_resultant(fmpz_t res, const fmpz *poly1, slong len1, 
+void _fmpz_mod_poly_resultant(fmpz_t res, const fmpz *poly1, slong len1,
                               const fmpz *poly2, slong len2, const fmpz_t mod)
 
     Returns the resultant of \code{(poly1, len1)} and
@@ -1627,7 +1635,7 @@ void _fmpz_mod_poly_resultant(fmpz_t res, const fmpz *poly1, slong len1,
 
     Asumes that the modulus is prime.
 
-void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f, 
+void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f,
                                                        const fmpz_mod_poly_t g)
     Computes the resultant of $f$ and $g$.
 
@@ -1646,7 +1654,7 @@ void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_discriminant(fmpz_t d, const fmpz *poly, 
+void _fmpz_mod_poly_discriminant(fmpz_t d, const fmpz *poly,
                                                    slong len, const fmpz_t mod)
 
     Set $d$ to the discriminant of \code{(poly, len)}. Assumes \code{len > 1}.

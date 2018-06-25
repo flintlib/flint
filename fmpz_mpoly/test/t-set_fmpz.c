@@ -33,7 +33,7 @@ main(void)
        fmpz_mpoly_t f;
        ordering_t ord;
        fmpz_t c, d;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits, j;
+       slong nvars, len, coeff_bits, exp_bits, j;
        ulong * exp;
 
        fmpz_init(c);
@@ -48,12 +48,10 @@ main(void)
 
        len = n_randint(state, 100);
 
-       exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-       exp_bound = n_randbits(state, exp_bits);
+       exp_bits = n_randint(state, 200) + 1;
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+       fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
        fmpz_randtest(c, state, n_randint(state, 200));
 
@@ -64,7 +62,7 @@ main(void)
        for (j = 0; j < nvars; j++)
           exp[j] = 0;
 
-       fmpz_mpoly_get_term_fmpz(d, f, exp, ctx);
+       fmpz_mpoly_get_coeff_fmpz_ui(d, f, exp, ctx);
 
        result = fmpz_equal(c, d) &&
                 ((fmpz_is_zero(c) && f->length == 0) || f->length == 1);
@@ -72,17 +70,7 @@ main(void)
        if (!result)
        {
           printf("FAIL\n");
-
-          printf("ord = "); mpoly_ordering_print(ord);
-          printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                                    "coeff_bits = %ld, nvars = %ld\n\n",
-                                  len, exp_bits, exp_bound, coeff_bits, nvars);
-
-          printf("c = "); fmpz_print(c); printf("\n");
-          printf("d = "); fmpz_print(d); printf("\n\n");
-
-          fmpz_mpoly_print_pretty(f, NULL, ctx);
-
+          flint_printf("Set to random integer and compare\ni = %wd\n", i);
           flint_abort();
        }
 

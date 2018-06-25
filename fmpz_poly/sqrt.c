@@ -17,7 +17,14 @@
 int
 _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, slong len)
 {
-    return _fmpz_poly_sqrt_classical(res, poly, len);
+    /* KS is heuristic but fast */
+    int result = _fmpz_poly_sqrt_KS(res, poly, len);
+
+    /* KS failed, so use fallback */
+    if (result == -1)
+       result = _fmpz_poly_sqrt_divconquer(res, poly, len, 1);
+
+    return result;
 }
 
 int

@@ -102,6 +102,10 @@ int fmpq_is_one(const fmpq_t res)
 
     Returns nonzero if \code{res} has value $1$, and returns zero otherwise.
 
+int fmpq_is_pm1(const fmpq_t res)
+
+    Returns nonzero if \code{res} has value $\pm{1}$ and zero otherwise.
+
 int fmpq_equal(const fmpq_t x, const fmpq_t y)
 
     Returns nonzero if \code{x} and \code{y} are equal, and zero otherwise.
@@ -158,6 +162,14 @@ void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
 
     Sets the value of \code{dest} to that of the \code{mpq_t} variable
     \code{src}.
+
+void fmpq_set_str(fmpq_t dest, const char * s, int base)
+
+    Sets the value of \code{dest} to the value represented in the string
+    \code{s} in base \code{base}.
+
+    Returns 0 if no error occurrs. Otherwise returns -1 and \code{dest} is
+    set to zero.
 
 void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t p, const mpz_t q)
 

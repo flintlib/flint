@@ -61,6 +61,13 @@ slong _fmpz_vec_max_bits_ref(const fmpz * vec, slong len)
     negative, $-b$ is returned, else $b$ is returned.
     This is a slower reference implementation of \code{_fmpz_vec_max_bits}.
 
+void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs,
+                                                  const fmpz * vec, slong len)
+
+    Sets \code{sumabs} to the bit count of the sum of the absolute values of
+    the elements of \code{vec}. Sets \code{maxabs} to the bit count of the
+    maximum of the absolute values of the elements of \code{vec}.
+
 ulong _fmpz_vec_max_limbs(const fmpz * vec, slong len)
 
     Returns the maximum number of limbs needed to store the absolute value 
@@ -223,6 +230,14 @@ int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len)
 int _fmpz_vec_is_zero(const fmpz * vec, slong len)
 
     Returns $1$ if \code{(vec, len)} is zero, and $0$ otherwise.
+
+void _fmpz_vec_max(fmpz * vec1, const fmpz * vec2, const fmpz * vec3, slong len)
+
+    Sets \code{vec1} to the pointwise maximum of \code{vec2} and \code{vec3}.
+
+void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len);
+
+    Sets \code{vec1} to the pointwise maximum of \code{vec1} and \code{vec2}.
 
 *******************************************************************************
 

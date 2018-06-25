@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2014 Alex J. Best
+    Copyright (C) 2017 Tommy Hofmann
 
     This file is part of FLINT.
 
@@ -12,7 +13,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
+_fmpz_mat_hnf_transform_naive(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
 {
     slong i, j, m, n;
     fmpz_mat_t A2, H2;
@@ -44,4 +45,36 @@ fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
 
     fmpz_mat_clear(A2);
     fmpz_mat_clear(H2);
+}
+
+void
+fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
+{
+    slong m, n, r, p;
+    nmod_mat_t Amod;
+    flint_rand_t state;
+
+    m = fmpz_mat_nrows(A);
+    n = fmpz_mat_ncols(A);
+
+    if (n > m)
+        _fmpz_mat_hnf_transform_naive(H, U, A);
+    else
+    {
+        flint_randinit(state);
+        p = n_randprime(state, NMOD_MAT_OPTIMAL_MODULUS_BITS, 1);
+        nmod_mat_init(Amod, m, n, p);
+
+        fmpz_mat_get_nmod_mat(Amod, A);
+        r = nmod_mat_rref(Amod);
+
+        nmod_mat_clear(Amod);
+
+        flint_randclear(state);
+
+        if (r == n) /* Full column rank */
+            fmpz_mat_hnf_minors_transform(H, U, A);
+        else
+            _fmpz_mat_hnf_transform_naive(H, U, A);
+    }
 }

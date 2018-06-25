@@ -24,7 +24,9 @@ fmpz_mat_rank(const fmpz_mat_t A)
     fmpz_mat_init_set(tmp, A);
     fmpz_init(den);
 
-    if (FLINT_MIN(A->r, A->c) < 25)
+    if (FLINT_ABS(fmpz_mat_max_bits(tmp)) <= (FLINT_BITS - 4)/2)
+        rank = fmpz_mat_rank_small_inplace(tmp);
+    else if (FLINT_MIN(tmp->r, tmp->c) < 25)
         rank = fmpz_mat_fflu(tmp, den, NULL, tmp, 0);
     else
         rank = fmpz_mat_rref(tmp, den, tmp);

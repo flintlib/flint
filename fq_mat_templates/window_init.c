@@ -26,7 +26,9 @@ TEMPLATE(T, mat_window_init) (TEMPLATE(T, mat_t) window,
     slong i;
     window->entries = NULL;
 
-    window->rows = flint_malloc((r2 - r1) * sizeof(TEMPLATE(T, struct) *));
+    if (r2 > r1)
+        window->rows = (TEMPLATE(T, struct) **) flint_malloc((r2 - r1)
+                                              * sizeof(TEMPLATE(T, struct) *));
 
     if (mat->c > 0)
     {

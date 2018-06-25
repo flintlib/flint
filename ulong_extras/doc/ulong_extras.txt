@@ -511,11 +511,15 @@ ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv)
 
 ulong n_sqrtmod(ulong a, ulong p)
 
-    Computes a square root of $a$ modulo $p$.
+    If $p$ is prime, compute a square root of $a$ modulo $p$ if $a$ is a
+    quadratic residue modulo $p$, otherwise return $0$. 
 
-    Assumes that $p$ is a prime and that $a$ is reduced modulo $p$.
-    Returns 0 if $a$ is a quadratic non-residue modulo $p$.
+    If $p$ is not prime the result is with high probability $0$, indicating
+    that $p$ is not prime, or $a$ is not a square modulo $p$. Otherwise the
+    result is meaningless.
 
+    Assumes that $a$ is reduced modulo $p$.
+    
 slong n_sqrtmod_2pow(ulong ** sqrt, ulong a, slong exp)
 
     Computes all the square roots of \code{a} modulo \code{2^exp}. The roots 

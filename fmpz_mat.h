@@ -234,7 +234,7 @@ FLINT_DLL void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B
 
 FLINT_DLL void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
-    
+
 FLINT_DLL void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
 FLINT_DLL void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
@@ -251,6 +251,10 @@ FLINT_DLL void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A);
 
 FLINT_DLL void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
+
+/* Kronecker product */
+
+FLINT_DLL void fmpz_mat_kronecker_product(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
 /* Content */
 
@@ -282,11 +286,16 @@ void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
 /* Gaussian elimination *****************************************************/
 
 FLINT_DLL slong fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
-                                    slong start_row, slong end_row, slong c);
+                                      slong start_row, slong end_row, slong c);
+
+FLINT_DLL slong fmpz_mat_find_pivot_smallest(const fmpz_mat_t mat,
+                                      slong start_row, slong end_row, slong c);
 
 FLINT_DLL slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             const fmpz_mat_t A, int rank_check);
 
+FLINT_DLL slong fmpz_mat_rank_small_inplace(fmpz_mat_t B);
+                 
 FLINT_DLL slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 FLINT_DLL slong fmpz_mat_rref_fflu(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 FLINT_DLL slong fmpz_mat_rref_mul(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
@@ -431,7 +440,7 @@ FLINT_DLL void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
                         const fmpz_t m1, const nmod_mat_t mat2, int sign);
 
-FLINT_DLL void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, 
+FLINT_DLL void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres,
     const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
 FLINT_DLL void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat);
@@ -451,6 +460,7 @@ FLINT_DLL void fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat
 FLINT_DLL void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_hnf_minors_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_hnf_modular(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
 FLINT_DLL void fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D);
 FLINT_DLL void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state);
@@ -511,7 +521,7 @@ FLINT_DLL void fmpz_mat_lll_storjohann(fmpz_mat_t A,
 
 /* Column partitioning *******************************************************/
 
-FLINT_DLL int fmpz_mat_col_partition(slong * part, 
+FLINT_DLL int fmpz_mat_col_partition(slong * part,
                                               fmpz_mat_t M, int short_circuit);
 
 /* Van Hoeij helper function *************************************************/
@@ -524,4 +534,3 @@ FLINT_DLL int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
 #endif
 
 #endif
-

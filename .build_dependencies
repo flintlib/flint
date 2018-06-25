@@ -1,28 +1,21 @@
 #! /bin/sh
-absolute_path(){
-   dirlist="$1"
-   retval=""
-   for dir in $dirlist; do
-      case $dir in
-        /*) dir=$dir;;
-        *) dir=$PWD/$dir;;
-      esac
-      retval=$retval" "$dir
-   done
-   echo $retval
-}
 
 wget http://mpir.org/mpir-2.7.2.tar.bz2
 tar -xf mpir-2.7.2.tar.bz2
+mkdir -p local
+
 cd mpir-2.7.2
-./configure ABI=$ABI --enable-gmpcompat
-make -j4 > /dev/null 2>&1
+./configure ABI=$ABI --enable-gmpcompat --prefix=${LOCAL}
+${MAKE} > /dev/null 2>&1
+${MAKE} install > /dev/null 2>&1
 cd ..
-wget http://www.mpfr.org/mpfr-current/mpfr-3.1.6.tar.bz2
-tar -xf mpfr-3.1.6.tar.bz2
-cd mpfr-3.1.6
-./configure ABI=$ABI --with-gmp-build=$(absolute_path "../mpir-2.7.2")
-make -j4 > /dev/null 2>&1
+
+wget http://www.mpfr.org/mpfr-4.0.0/mpfr-4.0.0.tar.bz2
+tar -xf mpfr-4.0.0.tar.bz2
+cd mpfr-4.0.0
+./configure ABI=$ABI --with-gmp=${LOCAL} --prefix=${LOCAL}
+${MAKE} > /dev/null 2>&1
+${MAKE} install > /dev/null 2>&1
 cd ..
  
 echo "int flint_test_multiplier(){return 1;}" > test_helpers.c

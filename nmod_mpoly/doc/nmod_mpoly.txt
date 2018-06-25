@@ -1,0 +1,463 @@
+/*
+    Copyright (C) 2017 Daniel Schultz
+    
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+*******************************************************************************
+
+    Context object
+
+*******************************************************************************
+
+void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, 
+                                slong nvars, const ordering_t ord, mp_limb_t n)
+
+    Initialise a context object for a polynomial ring with the given number of
+    variables and the given ordering.  It will have coefficients modulo~$n$.
+    The possibilities for the ordering are
+    \code{ORD_LEX}, \code{ORD_REVLEX}, \code{ORD_DEGLEX} and
+    \code{ORD_DEGREVLEX}.
+
+void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx)
+
+    Release any space allocated by an \code{nmod_mpoly_ctx_t}.
+
+void nmodf_ctx_init(nmodf_ctx_t ctx, mp_limb_t n)
+
+    Initialise a context object for doing arithmetic modulo~$n$.
+
+void nmodf_ctx_clear(nmodf_ctx_t ctx)
+
+    Release any space allocated by an \code{nmodf_ctx_t}.
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void nmod_mpoly_init(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+
+    Initialise an \code{nmod_mpoly_t} for use, given an initialised context
+    object.
+
+void nmod_mpoly_init2(nmod_mpoly_t poly, slong alloc, 
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Initialise an \code{nmod_mpoly_t} for use, with space for at least
+    \code{alloc} terms, given an initialised context. By default, fields of 8
+    bits are allocated for the exponents in each exponent vector.
+
+void nmod_mpoly_realloc(nmod_mpoly_t poly, slong len, 
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Reallocate an \code{nmod_mpoly_t} to have space for \code{alloc} terms. 
+    Assumes the current length of the polynomial is not greater than
+    \code{len}.
+
+void nmod_mpoly_clear(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+
+    Release any space allocated for an \code{nmod_mpoly_t}.
+
+void nmod_mpoly_truncate(nmod_mpoly_t poly, slong newlen, 
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    If the given polynomial is larger than the given number of terms, truncate
+    to that number of terms.
+
+void nmod_mpoly_fit_bits(nmod_mpoly_t poly,
+                                         slong bits, const nmod_mpoly_ctx_t ctx)
+
+    Reallocate the polynomial to have space for exponent fields of the given
+    number of bits. The number of bits must be at least 8 and at most
+    FLINT_BITS. This function can increase the number of bits only.
+
+*******************************************************************************
+
+    Basic manipulation
+
+*******************************************************************************
+
+void nmod_mpoly_degrees(slong * degs,
+                           const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+
+    Return the degree of \code{poly} with respect to each variable. The array
+    \code{degs} has length equal to the number of variables, and the degree of
+    \code{poly} with respect its $i$-th variable is stored in \code{degs[i]}. If
+    \code{poly} is zero, all degrees are set to \code{-1}.
+
+slong nmod_mpoly_degree(const nmod_mpoly_t poly, slong var, 
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Return the degree of \code{poly} with respect to the variable of index
+    \code{var}. If \code{poly} is zero, the return is \code{-1}.
+
+
+void nmod_mpoly_gen(nmod_mpoly_t poly, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Set the given \code{nmod_mpoly_t} to the $i$-th generator (variable),
+    where $i = 0$ corresponds to the variable with the most significance
+    with respect to the ordering. 
+
+void nmod_mpoly_set_ui(nmod_mpoly_t poly, ulong c, const nmod_mpoly_ctx_t ctx)
+
+    Set the given \code{nmod_mpoly_t} to the constant polynomial corresponding
+    to the unsigned integer $c$.
+
+int nmod_mpoly_equal_ui(const nmod_mpoly_t poly,
+                                           ulong c, const nmod_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{nmod_mpoly_t} is equal to the constant
+    polynomial represented by the unsigned integer $c$, else return 0.
+
+void nmod_mpoly_swap(nmod_mpoly_t poly1, 
+                                 nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
+
+    Efficiently swap the contents of the two given polynomials. No copying is
+    performed; the swap is accomplished by swapping pointers.
+
+void nmod_mpoly_zero(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+
+    Set the given \code{nmod_mpoly_t} to the zero polynomial.
+
+void nmod_mpoly_one(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+
+    Set the given \code{nmod_mpoly_t} to the constant polynomial with value 1.
+
+int nmod_mpoly_is_zero(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{nmod_mpoly_t} is equal to the zero polynomial,
+    else return 0.
+
+int nmod_mpoly_is_one(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{nmod_mpoly_t} is equal to the constant
+    polynomial with coefficient 1, else return 0.
+
+int nmod_mpoly_is_gen(const nmod_mpoly_t poly,
+                                           slong i, const nmod_mpoly_ctx_t ctx)
+
+    Return 1 if the given \code{nmod_mpoly_t} is equal to the $i$-th generator
+    of the polynomial ring, otherwise return 0. The generator corresponding to
+    the variable with the most significance corresponds to $i = 0$. If
+    $i < 0$ the function returns 1 if the polynomial is equal to any generator
+    of the polynomial ring, otherwise it returns 0.
+
+void nmod_mpoly_set_term_ui_ui(nmod_mpoly_t poly,
+                        ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx)
+
+    Set the term of \code{poly} with the given monomial to the given
+    coefficient. The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If a term with that
+    monomial already exists in the polynomial, it is overwritten. The term is
+    removed if the coefficient is zero. If a term with that monomial doesn't
+    exist, one is inserted at the appropriate position.
+
+void nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly,
+                        ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx)
+
+    Set the term of \code{poly} with the given monomial to the given
+    coefficient. The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If a term with that
+    monomial already exists in the polynomial, it is overwritten. The term is
+    removed if the coefficient is zero. If a term with that monomial doesn't
+    exist, one is inserted at the appropriate position.
+
+ulong nmod_mpoly_get_term_ui_ui(const fmpz_mpoly_t poly,
+                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+
+    Get the coefficient of the term of \code{poly} with the given monomial.
+    The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If no term with that
+    monomial exists in the polynomial, zero is returned.
+
+ulong nmod_mpoly_get_term_ui_fmpz(const fmpz_mpoly_t poly,
+                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+
+    Get the coefficient of the term of \code{poly} with the given monomial.
+    The monomial is specified as a vector of exponents with as
+    many variables as the polynomial. The most significant variable with
+    respect to the ordering is at index 0 of the vector. If no term with that
+    monomial exists in the polynomial, zero is returned.
+
+*******************************************************************************
+
+    Set and negate
+
+*******************************************************************************
+
+void nmod_mpoly_set(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                                                    const nmod_mpoly_ctx_t ctx)
+    
+    Set \code{poly1} to \code{poly2}.
+
+void nmod_mpoly_neg(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                                                    const nmod_mpoly_ctx_t ctx)
+    
+    Set \code{poly1} to $-$\code{poly2}.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int nmod_mpoly_equal(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Return 1 if \code{poly1} is equal to \code{poly2}, else return 0.
+
+*******************************************************************************
+
+    Basic arithmetic
+
+*******************************************************************************
+
+void nmod_mpoly_add_ui(nmod_mpoly_t poly1,
+                 const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus the constant polynomial given by the
+    unsigned integer $c$.
+
+void nmod_mpoly_sub_ui(nmod_mpoly_t poly1,
+                 const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} minus the constant polynomial given by the
+    unsigned integer $c$.
+
+void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                          const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} plus \code{poly3}.
+
+void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                          const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} minus \code{poly3}.
+
+*******************************************************************************
+
+    Scalar operations
+
+*******************************************************************************
+
+void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t poly1,
+                 const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times the unsigned integer $c$.
+
+*******************************************************************************
+
+    Multiplication
+
+*******************************************************************************
+
+void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1,
+                 const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, 
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} times \code{poly3} using the Johnson heap
+    based method. See the numerous papers by Michael Monagan and Roman Pearce.
+    This function throws an exception upon exponent overflow.
+
+
+void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1,
+                 const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
+                                                   const nmod_mpoly_ctx_t ctx)
+
+    Does the same operation as \code{nmod_mpoly_mul_johnson} but with
+    multiple threads. This function throws an exception upon exponent overflow.
+
+*******************************************************************************
+
+    Powering
+
+*******************************************************************************
+
+void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                                           ulong k, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} raised to the $k$-th power.
+
+void nmod_mpoly_pow_fmpz(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                                           ulong k, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} raised to the $k$-th power. This function
+    will fail if k is bigger than a \code{ulong} and \code{poly1} has more than
+    one term.
+
+
+*******************************************************************************
+
+    Divisibility testing
+
+*******************************************************************************
+
+int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
+                  const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to \code{poly2} divided by \code{poly3} and return 1 if
+    the quotient is exact. Otherwise return 0. The function uses the algorithm
+    of Michael Monagan and Roman Pearce. Note that the function
+    \code{nmod_mpoly_div_monagan_pearce} below may be much faster if the
+    quotient is known to be exact.
+
+*******************************************************************************
+
+    Division
+
+*******************************************************************************
+
+void nmod_mpoly_div_monagan_pearce(nmod_mpoly_t polyq,
+                     const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Set \code{polyq} to the quotient of \code{poly2} by \code{poly3},
+    discarding the remainder (with notional remainder coefficients reduced
+    modulo the leading coefficient of \code{poly3}). Implements "Polynomial
+    division using dynamic arrays, heaps and packed exponents" by Michael
+    Monagan and Roman Pearce. This function is exceptionally efficient if the
+    division is known to be exact.
+
+void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
+                  const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Set \code{polyq} and \code{polyr} to the quotient and remainder of
+    \code{poly2} divided by \code{poly3}, (with remainder coefficients reduced
+    modulo the leading coefficient of \code{poly3}). Implements "Polynomial
+    division using dynamic arrays, heaps and packed exponents" by Michael
+    Monagan and Roman Pearce.
+
+*******************************************************************************
+
+    Reduction
+
+*******************************************************************************
+
+void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q,
+                                nmod_mpoly_t r, const nmod_mpoly_t poly2,
+      nmod_mpoly_struct * const * poly3, slong len, const nmod_mpoly_ctx_t ctx)
+
+    This function is as per \code{nmod_mpoly_divrem_monagan_pearce} except
+    that it takes an array of divisor polynomials \code{poly3}, and it returns
+    an array of quotient polynomials \code{q}. The number of divisor (and hence
+    quotient) polynomials, is given by \code{len}. The function computes
+    polynomials $q_i = q[i]$ such that \code{poly2} is
+    $r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i$, where $b_i =$ \code{poly3[i]}.
+
+*******************************************************************************
+
+    Differentiation
+
+*******************************************************************************
+
+void nmod_mpoly_derivative(nmod_mpoly_t poly1,
+               const nmod_mpoly_t poly2, slong idx, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the derivative of \code{poly2} with respect to the
+    variable of index \code{idx}. This function cannot fail.
+
+*******************************************************************************
+
+    Evaluation
+
+*******************************************************************************
+
+mp_limb_t nmod_mpoly_evaluate_all_ui(nmod_mpoly_t poly,
+                                       mp_limb_t ** vals, nmod_mpoly_ctx_t ctx)
+
+    Return the evaluation of \code{poly} where the variables are
+    replaced by the corresponding elements of the array \code{vals}.
+
+void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t poly1, nmod_mpoly_t poly2,
+                                   slong var, ulong val, nmod_mpoly_ctx_t ctx)
+
+    Set \code{poly1} to the evaluation of \code{poly2} where the variable of
+    index \code{var} is replaced by \code{val}.
+
+void nmod_mpoly_compose(nmod_mpoly_t res, nmod_mpoly_t poly1,
+     nmod_mpoly_struct ** polys2, nmod_mpoly_ctx_t ctx1, nmod_mpoly_ctx_t ctx2)
+
+    Set \code{res} to the evaluation of \code{poly1} where the variables are
+    replaced by the corresponding elements of the array \code{polys2}. Both
+    \code{res} and the elements of \code{polys2} have context object
+    \code{ctx2}, while \code{poly1} has context object \code{ctx1}. Neither of
+    \code{res} and \code{poly1} is allowed to alias any other polynomial.
+
+*******************************************************************************
+
+    Input/Output
+
+*******************************************************************************
+
+char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t poly,
+                                   const char ** x, const nmod_mpoly_ctx_t ctx)
+
+    Return a string (which the user is responsible for cleaning up),
+    representing \code{poly}, given an array of variable strings, starting
+    with the variable of most significance with respect to the ordering. 
+
+int _nmod_mpoly_fprint_pretty(FILE * file, const nmod * poly, 
+                           const ulong * exps, slong len, const char ** x,
+                                slong bits, slong n, int deg, int rev, slong N)
+
+    Print to the given stream, a string representing \code{(poly, exps, len)}
+    in $n$ variables, exponent fields of the given number of bits and exponent
+    vectors taking $N$ words each, given an array of $n$ variable strings,
+    starting with the variable of most significance with respect to the
+    ordering. The ordering is specified by the values \code{deg}, which is set
+    to 1 if the polynomial is deglex or degrevlex, and \code{rev}, which is set
+    to 1 if the polynomial is revlex or degrevlex. The number of characters
+    written is returned.
+
+int nmod_mpoly_fprint_pretty(FILE * file, 
+          const nmod_mpoly_t poly, const char ** x, const nmod_mpoly_ctx_t ctx)
+
+    Print to the given stream, a string representing \code{poly}, given an
+    array of variable strings, starting with the variable of most
+    significance with respect to the ordering. The number of characters
+    written is returned.
+
+int nmod_mpoly_print_pretty(const nmod_mpoly_t poly,
+                                   const char ** x, const nmod_mpoly_ctx_t ctx)
+
+    Print to the given stream, a string representing \code{poly}, given an
+    array of variable strings, starting with the variable of most
+    significance with respect to the ordering. The number of characters
+    written is returned.
+
+int nmod_mpoly_set_str_pretty(nmod_mpoly_t poly, const char * str,
+                                   const char ** x, const nmod_mpoly_ctx_t ctx)
+
+    Sets \code{poly} to the polynomial in the null-terminates string \code{str}
+    given an array \code{x} of variable strings. If parsing \code{str} fails,
+    \code{poly} is set to zero, and \code{-1} is returned. Otherwise, \code{0}
+    is returned. The operations \code{+}, \code{-}, \code{*}, and \code{/} are
+    permitted along with integers and the variables in \code{x}. The character
+    \code{^} must be immediately followed by the (integer) exponent. If any
+    division is not exact, parsing fails.
+
+*******************************************************************************
+
+    Random generation
+
+*******************************************************************************
+
+void nmod_mpoly_randtest(nmod_mpoly_t poly, flint_rand_t state,
+    slong length, slong exp_bound, slong coeff_bits, const nmod_mpoly_ctx_t ctx)
+
+    Generate a random polynomial with the number of variables and ordering
+    specified by \code{ctx}, and with length up to the given length, exponents
+    which don't exceed the given bound and with signed coefficients of the
+    given number of bits.

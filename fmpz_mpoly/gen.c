@@ -14,74 +14,22 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
-/*
-void _fmpz_mpoly_gen1(fmpz * poly, ulong * exps, slong i,
-                                         slong bits, slong n, int deg, int rev)
-{
-    slong k = FLINT_BITS/bits;
 
-    fmpz_set_ui(poly + 0, 1);
-    if (!rev)
-       exps[0] = (UWORD(1) << ((k - i - deg - 1)*bits));
-    else
-       exps[0] = (UWORD(1) << ((k - n + i)*bits));
-    
-    if (deg)
-       exps[0] |= (UWORD(1) << ((k - 1)*bits));
-}
-
-void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
-                                slong bits, slong n, int deg, int rev, slong N)
-{
-    slong j;
-    ulong * mon;
-
-    TMP_INIT;
-
-    if (N == 1)
-    {
-       _fmpz_mpoly_gen1(poly, exps, i, bits, n, deg, rev);
-
-       return;
-    }
-    
-    fmpz_set_ui(poly + 0, 1);
-    
-    TMP_START;
-
-    mon = (ulong *) TMP_ALLOC((n - deg)*sizeof(ulong));
-    
-    for (j = 0; j < n - deg; j++)
-       mon[j] = 0;
-
-    mon[i] = 1;
-
-    mpoly_set_monomial(exps, mon, bits, n, deg, rev);
-
-    TMP_END;
-}
-*/
 void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 {
-    int deg, rev;
     slong j;
     ulong * mon;
     TMP_INIT;
 
-    degrev_from_ord(deg, rev, ctx->ord);
-
+    TMP_START;
     fmpz_mpoly_fit_length(poly, 1, ctx);
-
     fmpz_set_ui(poly->coeffs + 0, 1);
 
-    TMP_START;
-
-    mon = (ulong *) TMP_ALLOC((ctx->n - deg)*sizeof(ulong));
-    for (j = 0; j < ctx->n - deg; j++)
+    mon = (ulong *) TMP_ALLOC((ctx->minfo->nvars)*sizeof(ulong));
+    for (j = 0; j < ctx->minfo->nvars; j++)
        mon[j] = (j == i);
-    mpoly_set_monomial(poly->exps, mon, poly->bits, ctx->n, deg, rev);
+    mpoly_set_monomial_ui(poly->exps, mon, poly->bits, ctx->minfo);
 
     TMP_END;
-
     _fmpz_mpoly_set_length(poly, 1, ctx);
 }

@@ -33,7 +33,7 @@ main(void)
        fmpz_mpoly_t f, g, h;
        ordering_t ord;
        ulong c;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits;
+       slong nvars, len, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
        nvars = n_randint(state, 20) + 1;
@@ -45,43 +45,29 @@ main(void)
        fmpz_mpoly_init(h, ctx);
 
        len = n_randint(state, 100);
-
-       exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-       exp_bound = n_randbits(state, exp_bits);
+       exp_bits = n_randint(state, 200) + 1;
        coeff_bits = n_randint(state, 200);
 
        for (j = 0; j < 10; j++)
        {
-          fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
-          fmpz_mpoly_randtest(g, state, len, exp_bound, coeff_bits, ctx);
-          fmpz_mpoly_randtest(h, state, len, exp_bound, coeff_bits, ctx);
+          fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+          fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
+          fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
           c = n_randtest(state);
 
           fmpz_mpoly_add_ui(g, f, c, ctx);
-          fmpz_mpoly_test(g, ctx);
+          fmpz_mpoly_assert_canonical(g, ctx);
 
           fmpz_mpoly_sub_ui(h, g, c, ctx);
-          fmpz_mpoly_test(h, ctx);
+          fmpz_mpoly_assert_canonical(h, ctx);
 
           result = fmpz_mpoly_equal(f, h, ctx);
 
           if (!result)
           {
              printf("FAIL\n");
-
-             printf("ord = "); mpoly_ordering_print(ord);
-             printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                                      "coeff_bits = %ld, nvars = %ld\n\n",
-                                  len, exp_bits, exp_bound, coeff_bits, nvars);
-
-             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(h, NULL, ctx); printf("\n\n");
-          
-             flint_printf("c = %wu\n", c);
-
+             flint_printf("Check (f + a) - a = f\ni = %wd, j = %wd\n", i ,j);
              flint_abort();
           }
        }
@@ -98,7 +84,7 @@ main(void)
        fmpz_mpoly_t f, g;
        ordering_t ord;
        ulong c;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits;
+       slong nvars, len, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
        nvars = n_randint(state, 20) + 1;
@@ -109,42 +95,28 @@ main(void)
        fmpz_mpoly_init(g, ctx);
 
        len = n_randint(state, 100);
-
-       exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-       exp_bound = n_randbits(state, exp_bits);
+       exp_bits = n_randint(state, 200) + 1;
        coeff_bits = n_randint(state, 200);
 
        for (j = 0; j < 10; j++)
        {
-          fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+          fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
           fmpz_mpoly_set(g, f, ctx);
 
           c = n_randtest(state);
 
           fmpz_mpoly_add_ui(f, f, c, ctx);
-          fmpz_mpoly_test(f, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
 
           fmpz_mpoly_sub_ui(f, f, c, ctx);
-          fmpz_mpoly_test(f, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
 
           result = fmpz_mpoly_equal(f, g, ctx);
 
           if (!result)
           {
              printf("FAIL\n");
-             
-             printf("Aliasing test\n");
-             printf("ord = "); mpoly_ordering_print(ord);
-             printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                                      "coeff_bits = %ld, nvars = %ld\n\n",
-                                  len, exp_bits, exp_bound, coeff_bits, nvars);
-
-             fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
-             fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-          
-             flint_printf("c = %wu\n", c);
-
+             flint_printf("Check aliasing\ni = %wd, j = %wd\n", i ,j);
              flint_abort();
           }
        }

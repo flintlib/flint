@@ -14,7 +14,7 @@
 void
 fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols)
 {
-    if ((rows) && (cols))       /* Allocate space for r*c small entries */
+    if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
     {
         slong i;
         mat->entries = (fmpz *) flint_calloc(rows * cols, sizeof(fmpz));

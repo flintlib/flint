@@ -29,7 +29,7 @@
 #define PAGES_PER_BLOCK 16
 
 /* The number of new mpz's allocated at a time */
-#define MPZ_BLOCK 64 
+#define MPZ_BLOCK 64
 
 FLINT_TLS_PREFIX __mpz_struct ** mpz_free_arr = NULL;
 FLINT_TLS_PREFIX ulong mpz_free_num = 0;
@@ -91,12 +91,6 @@ __mpz_struct * _fmpz_new_mpz(void)
 
         flint_mpz_structs_per_block = PAGES_PER_BLOCK*(num - skip);
 
-        if (mpz_free_num  + flint_mpz_structs_per_block >= mpz_free_alloc)
-        {
-            mpz_free_alloc = FLINT_MAX(mpz_free_num + flint_mpz_structs_per_block, mpz_free_alloc * 2);
-            mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(__mpz_struct *));
-        }
-
         for (i = 0; i < PAGES_PER_BLOCK; i++)
         {
             __mpz_struct * page_ptr = (__mpz_struct *)((slong) aligned_ptr + i*flint_page_size);
@@ -104,9 +98,19 @@ __mpz_struct * _fmpz_new_mpz(void)
             /* set pointer in each page to start of entire block */
             ((fmpz_block_header_s *) page_ptr)->address = ptr;
 
-            for (j = skip; j < num; j++) 
+            for (j = skip; j < num; j++)
             {
                 mpz_init2(page_ptr + j, 2*FLINT_BITS);
+
+                /*
+                   Cannot be lifted from loop due to possibility of
+                   gc calling _fmpz_clear_mpz during call to mpz_init_2
+                */
+                if (mpz_free_num >= mpz_free_alloc)
+                {
+                    mpz_free_alloc = FLINT_MAX(mpz_free_num + 1, mpz_free_alloc * 2);
+                    mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(__mpz_struct *));
+                }
 
                 mpz_free_arr[mpz_free_num++] = page_ptr + j;
             }
@@ -127,7 +131,7 @@ void _fmpz_clear_mpz(fmpz f)
 
     /* clean up if this is left over from another thread */
 #if HAVE_PTHREAD
-    if (header_ptr->count != 0 || header_ptr->thread != pthread_self()) 
+    if (header_ptr->count != 0 || !pthread_equal(header_ptr->thread, pthread_self()))
 #else
     if (header_ptr->count != 0)
 #endif
@@ -135,7 +139,7 @@ void _fmpz_clear_mpz(fmpz f)
         mpz_clear(ptr);
 
         if (++header_ptr->count == flint_mpz_structs_per_block)
-            flint_free(header_ptr);    
+            flint_free(header_ptr);
     } else
     {
         if (ptr->_mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
@@ -165,7 +169,7 @@ void _fmpz_cleanup_mpz_content(void)
        ptr = (fmpz_block_header_s *)((slong) mpz_free_arr[i] & ~(flint_page_size - 1));
 
        ptr = (fmpz_block_header_s *) ptr->address;
-       
+
        if (++ptr->count == flint_mpz_structs_per_block)
           flint_free(ptr);
     }

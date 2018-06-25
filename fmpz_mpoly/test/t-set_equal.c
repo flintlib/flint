@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2017 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,11 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
 int
 main(void)
@@ -27,12 +24,12 @@ main(void)
     fflush(stdout);
 
     /* Set b = a and check a == b */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f, g;
        ordering_t ord;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits;
+       slong nvars, len, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
        nvars = n_randint(state, 20) + 1;
@@ -44,12 +41,10 @@ main(void)
 
        len = n_randint(state, 100);
 
-       exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-       exp_bound = n_randbits(state, exp_bits);
+       exp_bits = n_randint(state, 200) + 1;
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+       fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
        fmpz_mpoly_set(g, f, ctx);
 
@@ -58,15 +53,7 @@ main(void)
        if (!result)
        {
           printf("FAIL\n");
-
-          printf("ord = "); mpoly_ordering_print(ord);
-          printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                                    "coeff_bits = %ld, nvars = %ld\n\n",
-                                  len, exp_bits, exp_bound, coeff_bits, nvars);
-
-          fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
-          fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-
+          flint_printf("Set b = a and check a == b\ni = %wd\n", i);
           flint_abort();
        }
 
@@ -75,12 +62,12 @@ main(void)
     }
 
     /* Set b = a, alter b and check a == b */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f, g;
        ordering_t ord;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits;
+       slong nvars, len, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
        nvars = n_randint(state, 20) + 1;
@@ -92,34 +79,19 @@ main(void)
 
        len = n_randint(state, 100);
 
-       exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-       exp_bound = n_randbits(state, exp_bits);
+       exp_bits = n_randint(state, 200) + 1;
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+       fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
-       fmpz_mpoly_set(g, f, ctx);
-
-       if (g->length != 0)
-          fmpz_add_ui(g->coeffs + 0, g->coeffs + 0, 1);
-       else
-          fmpz_mpoly_set_coeff_ui(g, 0, 1, ctx);
+       fmpz_mpoly_add_ui(g, f, UWORD(1), ctx);
 
        result = !fmpz_mpoly_equal(f, g, ctx);
 
        if (!result)
        {
           printf("FAIL\n");
-
-          printf("ord = "); mpoly_ordering_print(ord);
-          printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                                    "coeff_bits = %ld, nvars = %ld\n\n",
-                                  len, exp_bits, exp_bound, coeff_bits, nvars);
-
-          fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
-          fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-
+          flint_printf("Set b = a, alter b and check a == b\ni = %wd\n", i);
           flint_abort();
        }
 
@@ -128,12 +100,12 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f, g;
        ordering_t ord;
-       slong nvars, len, exp_bound, coeff_bits, exp_bits;
+       slong nvars, len, coeff_bits, exp_bits;
 
        ord = mpoly_ordering_randtest(state);
        nvars = n_randint(state, 20) + 1;
@@ -145,12 +117,10 @@ main(void)
 
        len = n_randint(state, 100);
 
-       exp_bits = n_randint(state, FLINT_BITS -
-                     mpoly_ordering_isdeg(ord)*FLINT_BIT_COUNT(nvars) - 1) + 1;
-       exp_bound = n_randbits(state, exp_bits);
+       exp_bits = n_randint(state, 200) + 1;
        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest(f, state, len, exp_bound, coeff_bits, ctx);
+       fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
        fmpz_mpoly_set(g, f, ctx);
        fmpz_mpoly_set(g, g, ctx);
@@ -160,15 +130,7 @@ main(void)
        if (!result)
        {
           printf("FAIL\n");
-
-          printf("ord = "); mpoly_ordering_print(ord);
-          printf(", len = %ld, exp_bits = %ld, exp_bound = %lx, "
-                                    "coeff_bits = %ld, nvars = %ld\n\n",
-                                  len, exp_bits, exp_bound, coeff_bits, nvars);
-
-          fmpz_mpoly_print_pretty(f, NULL, ctx); printf("\n\n");
-          fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-
+          flint_printf("Check aliasing\ni = %wd\n", i);
           flint_abort();
        }
 

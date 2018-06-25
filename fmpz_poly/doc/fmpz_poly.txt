@@ -2564,17 +2564,96 @@ void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
 *******************************************************************************
 
-int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len)
+int _fmpz_poly_sqrtrem_classical(fmpz * res, fmpz * r, 
+                                                  const fmpz * poly, slong len)
 
-    If \code{(poly, len)} is a perfect square, sets \code{(res, len / 2 + 1)}
-    to the square root of \code{poly} with positive leading coefficient
-    and returns 1. Otherwise returns 0.
+    Returns 1 if \code{(poly, len)} can be written in the form $A^2 + R$ where
+    deg$(R) <$ deg$($\code{poly}$)$, otherwise returns $0$. If it can be so
+    written, \code{(res, m - 1)} is set to $A$ and \code{(res, m)} is set to
+    $R$, where $m =$ deg$($\code{poly}$)/2 + 1$.
+
+    For efficiency reasons, \code{r} must have room for \code{len}
+    coefficients, and may alias \code{poly}.
+
+int fmpz_poly_sqrtrem_classical(fmpz_poly_t b, 
+                                            fmpz_poly_t r, const fmpz_poly_t a)
+
+    If $a$ can be written as $b^2 + r$ with deg$(r) <$ deg$(a)/2$, return
+    $1$ and set $b$ and $r$ appropriately. Otherwise return $0$.
+
+int _fmpz_poly_sqrtrem_divconquer(fmpz * res, fmpz * r, 
+                                     const fmpz * poly, slong len, fmpz * temp)
+
+    Returns 1 if \code{(poly, len)} can be written in the form $A^2 + R$ where
+    deg$(R) <$ deg$($\code{poly}$)$, otherwise returns $0$. If it can be so
+    written, \code{(res, m - 1)} is set to $A$ and \code{(res, m)} is set to
+    $R$, where $m =$ deg$($\code{poly}$)/2 + 1$.
+
+    For efficiency reasons, \code{r} must have room for \code{len}
+    coefficients, and may alias \code{poly}. Temporary space of \code{len}
+    coefficients is required.
+
+int fmpz_poly_sqrtrem_divconquer(fmpz_poly_t b, 
+                                            fmpz_poly_t r, const fmpz_poly_t a)
+
+    If $a$ can be written as $b^2 + r$ with deg$(r) <$ deg$(a)/2$, return
+    $1$ and set $b$ and $r$ appropriately. Otherwise return $0$.
+
+int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly,
+                                                          slong len, int exact)
+
+    If \code{exact} is $1$ and \code{(poly, len)} is a perfect square, sets 
+    \code{(res, len / 2 + 1)} to the square root of \code{poly} with positive
+    leading coefficient and returns 1. Otherwise returns 0.
+
+    If \code{exact} is $0$, allows a remainder after the square root, which is
+    not computed.
 
     This function first uses various tests to detect nonsquares quickly.
     Then, it computes the square root iteratively from top to bottom,
     requiring $O(n^2)$ coefficient operations.
 
 int fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a)
+
+    If \code{a} is a perfect square, sets \code{b} to the square root of
+    \code{a} with positive leading coefficient and returns 1.
+    Otherwise returns 0.
+
+int _fmpz_poly_sqrt_KS(fmpz * res, const fmpz * poly, slong len)
+
+    Heuristic square root. If the return value is $-1$, the function failed,
+    otherwise it succeeded and the following applies.
+
+    If \code{(poly, len)} is a perfect square, sets 
+    \code{(res, len / 2 + 1)} to the square root of \code{poly} with positive
+    leading coefficient and returns 1. Otherwise returns 0.
+
+    This function first uses various tests to detect nonsquares quickly.
+    Then, it computes the square root iteratively from top to bottom.
+
+int fmpz_poly_sqrt_KS(fmpz_poly_t b, const fmpz_poly_t a)
+
+    Heuristic square root. If the return value is $-1$, the function failed,
+    otherwise it succeeded and the following applies.
+
+    If \code{a} is a perfect square, sets \code{b} to the square root of
+    \code{a} with positive leading coefficient and returns 1.
+    Otherwise returns 0.
+
+int _fmpz_poly_sqrt_divconquer(fmpz * res, const fmpz * poly,
+                                                          slong len, int exact)
+
+    If \code{exact} is $1$ and \code{(poly, len)} is a perfect square, sets 
+    \code{(res, len / 2 + 1)} to the square root of \code{poly} with positive
+    leading coefficient and returns 1. Otherwise returns 0.
+
+    If \code{exact} is $0$, allows a remainder after the square root, which is
+    not computed.
+
+    This function first uses various tests to detect nonsquares quickly.
+    Then, it computes the square root iteratively from top to bottom.
+
+int fmpz_poly_sqrt_divconquer(fmpz_poly_t b, const fmpz_poly_t a)
 
     If \code{a} is a perfect square, sets \code{b} to the square root of
     \code{a} with positive leading coefficient and returns 1.
@@ -2591,6 +2670,25 @@ int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a)
     If \code{a} is a perfect square, sets \code{b} to the square root of
     \code{a} with positive leading coefficient and returns 1.
     Otherwise returns 0.
+
+int _fmpz_poly_sqrt_series(fmpz * res, const fmpz * poly, slong len, slong n)
+
+    Set \code{(res, n)} to the square root of the series \code{(poly, n)}, if it
+    exists, and return $1$, otherwise, return $0$.
+
+    If the valuation of \code{poly} is not zero, \code{res} is zero padded
+    to make up for the fact that the square root may not be known to precision
+    $n$.
+
+int fmpz_poly_sqrt_series(fmpz_poly_t b, const fmpz_poly_t a, slong n)
+
+    Set \code{b} to the square root of the series \code{a}, where the latter
+    is taken to be a series of precision $n$. If such a square root exists,
+    return $1$, otherwise, return $0$.
+
+    Note that if the valuation of \code{a} is not zero, \code{b} will
+    not have precision \code{n}. It is given only to the precision to which
+    the square root can be computed.
 
 *******************************************************************************
 

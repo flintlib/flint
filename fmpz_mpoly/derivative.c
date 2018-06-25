@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,78 +9,94 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
-                         const fmpz * coeff2, const ulong * exp2, slong len,
-                slong idx, int deg, int rev, slong nfields, slong bits, slong N)
+                       const fmpz * coeff2, const ulong * exp2, slong len2,
+                slong bits, slong N, slong offset, slong shift, ulong * oneexp)
 {
-    slong off, shift, fpw, i, k = 0;
-    ulong c, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    ulong*one;
+    slong i, len1;
+
+    /* x^c -> c*x^(c-1) */
+    len1 = 0;
+    for (i = 0; i < len2; i++)
+    {
+        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+        ulong c = (exp2[N*i + offset] >> shift) & mask;
+        if (c != 0)
+        {
+            mpoly_monomial_sub(exp1 + N*len1, exp2 + N*i, oneexp, N);
+            fmpz_mul_ui(coeff1 + len1, coeff2 + i, c);
+            len1++;
+        }
+    }
+
+    return len1;
+}
+
+
+slong _fmpz_mpoly_derivative_mp(fmpz * coeff1, ulong * exp1,
+                       const fmpz * coeff2, const ulong * exp2, slong len2,
+                slong bits, slong N, slong offset,              ulong * oneexp)
+{
+    slong i, len1;
+    fmpz_t c;
+    fmpz_init(c);
+
+    /* x^c -> c*x^(c-1) */
+    len1 = 0;
+    for (i = 0; i < len2; i++)
+    {
+        fmpz_set_ui_array(c, exp2 + N*i + offset, bits/FLINT_BITS);
+        if (!fmpz_is_zero(c))
+        {
+            mpoly_monomial_sub_mp(exp1 + N*len1, exp2 + N*i, oneexp, N);
+            fmpz_mul(coeff1 + len1, coeff2 + i, c);
+            len1++;
+        }
+    }
+
+    fmpz_clear(c);
+
+    return len1;
+}
+
+
+void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                                         slong var, const fmpz_mpoly_ctx_t ctx)
+{
+    slong bits, N, offset, shift;
+    ulong * oneexp;
+    slong len1;
     TMP_INIT;
 
     TMP_START;
-
-    fpw = FLINT_BITS/bits;
-    if (rev)
-    {
-        off   = (nfields - 1 - idx)/fpw;
-        shift = (nfields - 1 - idx)%fpw;
-    } else
-    {
-        off   = (deg + idx)/fpw;
-        shift = (deg + idx)%fpw;
-    }
-    shift = (fpw - 1 - shift) * bits;
-
-    /* get exponent one to subtract */
-    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    for (i = 0; i < N; i++)
-    {
-        one[i] = 0;
-    }
-    one[off] = WORD(1) << shift;
-    if (deg)
-    {
-        one[0] |= WORD(1) << ((fpw - 1)*bits);
-    }
-
-    /* x^n -> n*x^(n-1) */
-    for (i = 0; i < len; i++)
-    {
-        c = (exp2[N*i + off] >> shift) & mask;
-        if (c != 0)
-        {
-            mpoly_monomial_sub(exp1 + N*k, exp2 + N*i, one, N);
-            fmpz_mul_ui(coeff1 + k, coeff2 + i, c);
-            k++;
-        }
-    }
-    TMP_END;
-    return k;
-}
-
-void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                                         slong idx, const fmpz_mpoly_ctx_t ctx)
-{
-    int deg, rev;
-    slong N, len;
-
-    N = words_per_exp(ctx->n, poly2->bits);
-    degrev_from_ord(deg, rev, ctx->ord);
+    bits = poly2->bits;
 
     fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
-    fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
-    poly1->bits = poly2->bits;
+    fmpz_mpoly_fit_bits(poly1, bits, ctx);
+    poly1->bits = bits;
 
-    len = _fmpz_mpoly_derivative(poly1->coeffs, poly1->exps,
-                   poly2->coeffs, poly2->exps, poly2->length,
-                        idx, deg, rev, ctx->n, poly2->bits, N);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
+    oneexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
-    _fmpz_mpoly_set_length(poly1, len, ctx);
+    if (bits <= FLINT_BITS) {
+        mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift,
+                                                     var, N, bits, ctx->minfo);
+
+        len1 = _fmpz_mpoly_derivative(poly1->coeffs, poly1->exps,
+                                  poly2->coeffs, poly2->exps, poly2->length,
+                                               bits, N, offset, shift, oneexp);
+    } else
+    {
+        mpoly_gen_oneexp_offset_mp(oneexp, &offset, var, N, bits, ctx->minfo);
+
+        len1 = _fmpz_mpoly_derivative_mp(poly1->coeffs, poly1->exps,
+                                  poly2->coeffs, poly2->exps, poly2->length,
+                                               bits, N, offset,        oneexp);        
+    }
+
+    _fmpz_mpoly_set_length(poly1, len1, ctx);
+
+    TMP_END;
 }

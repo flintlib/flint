@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
-    Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2017, 2018 Luca De Feo
 
     This file is part of FLINT.
 
@@ -466,6 +466,19 @@ void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e,
     $\mathbf{Z}/d\mathbf{Z}$, where
     $\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)$ is the Frobenius element
     $\sigma \colon x \mapsto x^p$.
+
+int fq_nmod_multiplicative_order(fmpz_t ord, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Computes the order of \code{op} as an element of the
+    multiplicative group of \code{ctx}.
+    
+    Returns 0 if \code{op} is 0, otherwise it returns 1 if \code{op}
+    is a generator of the multiplicative group, and -1 if it is not.
+
+int fq_nmod_is_primitive(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Returns whether \code{op} is primitive, i.e., whether it is a
+    generator of the multiplicative group of \code{ctx}.
 
 *******************************************************************************
 

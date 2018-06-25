@@ -118,6 +118,15 @@ void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op)
     Sets \code{rop} to the negative of \code{op}, assuming that 
     the two matrices have the same dimensions.
 
+void fmpq_mat_scalar_mul_fmpq(fmpq_mat_t rop, 
+                              const fmpq_mat_t op, const fmpq_t x)
+
+    Sets \code{rop} to \code{op} multiplied by the rational $x$, 
+    assuming that the two matrices have the same dimensions.
+
+    Note that the rational \code{x} may not be aliased with any part of the
+    entries of \code{rop}.
+
 void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, 
                               const fmpq_mat_t op, const fmpz_t x)
 
@@ -382,6 +391,17 @@ void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
     Sets \code{C} to the matrix product \code{AB}, with \code{A}
     an integer matrix. This function works efficiently by clearing
     denominators of \code{B}.
+
+*******************************************************************************
+
+    Kronecker product
+
+*******************************************************************************
+
+void fmpq_mat_kronecker_product(fmpq_mat_t C, const fmpq_mat_t A,
+    const fmpq_mat_t B)
+
+    Sets \code{C} to the Kronecker product of \code{A} and \code{B}.
 
 *******************************************************************************
 
