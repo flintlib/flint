@@ -131,7 +131,7 @@ void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
     sort the terms in A by exponent
     assuming that the exponents are valid (other than being in order)
 */
-void fmpz_mpoly_sort(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_sort_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, msb, N;
     ulong himask, * ptempexp;

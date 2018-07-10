@@ -124,9 +124,9 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound =  n_randint(state, 800/nvars/nvars) + 1;
-        exp_bound1 = n_randint(state, 800/nvars/nvars) + 1;
-        exp_bound2 = n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound =  n_randint(state, 600/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 600/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 600/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 50);
 
@@ -209,9 +209,9 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound =  n_randint(state, 800/nvars/nvars) + 1;
-        exp_bound1 = n_randint(state, 800/nvars/nvars) + 1;
-        exp_bound2 = n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound =  n_randint(state, 600/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 600/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 600/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 50);
 
@@ -294,9 +294,9 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound =  n_randint(state, 800/nvars/nvars) + 1;
-        exp_bound1 = n_randint(state, 800/nvars/nvars) + 1;
-        exp_bound2 = n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound =  n_randint(state, 600/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 600/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 600/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 50);
 
@@ -379,9 +379,9 @@ main(void)
         len1 = n_randint(state, 20);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound =  n_randint(state, 800/nvars/nvars) + 1;
-        exp_bound1 = n_randint(state, 800/nvars/nvars) + 1;
-        exp_bound2 = n_randint(state, 800/nvars/nvars) + 1;
+        exp_bound =  n_randint(state, 600/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 600/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 600/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 50);
 

@@ -504,9 +504,11 @@ FLINT_DLL void fmpz_mpoly_set_termexp_fmpz(fmpz_mpoly_t poly,
 
 FLINT_DLL void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
                               mp_bitcnt_t pos, ulong cmpmask, ulong totalmask);
+
 FLINT_DLL void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
                                     mp_bitcnt_t pos, slong N, ulong * cmpmask);
-FLINT_DLL void fmpz_mpoly_sort(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_sort_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -884,12 +886,17 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t poly,
 
 /* Random generation *********************************************************/
 
+FLINT_DLL void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t poly, flint_rand_t state,
+                       slong length, mp_bitcnt_t coeff_bits, ulong * exp_bounds,
+                                                    const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpoly_randtest_bound(fmpz_mpoly_t poly, flint_rand_t state,
-   slong length, mp_bitcnt_t coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx);
+                         slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
+                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_randtest_bits(fmpz_mpoly_t poly, flint_rand_t state,
-   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits, const fmpz_mpoly_ctx_t ctx);
-
+                    slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
+                                                    const fmpz_mpoly_ctx_t ctx);
 
 /******************************************************************************
 
