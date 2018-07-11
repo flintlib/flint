@@ -11,6 +11,29 @@
 
 #include "nmod_mpoly.h"
 
+
+/*
+    emplaceterm assumes that c is valid modulo ctx->ffinfo->mod.n
+*/
+void _nmod_mpoly_emplacebackterm_ui_ffmpz(nmod_mpoly_t poly,
+                    mp_limb_t c, const fmpz * exp, const nmod_mpoly_ctx_t ctx)
+{
+    mp_bitcnt_t exp_bits;
+    slong N;
+    FLINT_ASSERT(c < ctx->ffinfo->mod.n);
+
+    exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
+    nmod_mpoly_fit_bits(poly, exp_bits, ctx);
+
+    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+
+    nmod_mpoly_fit_length(poly, poly->length + 1, ctx);
+    poly->coeffs[poly->length] = c;
+    mpoly_set_monomial_ffmpz(poly->exps + N*poly->length, exp, poly->bits, ctx->minfo);
+    poly->length++; /* safe because length is increasing */
+}
+
 /*
     emplaceterm assumes that c is valid modulo ctx->ffinfo->mod.n
 */
