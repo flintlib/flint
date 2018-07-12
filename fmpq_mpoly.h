@@ -92,6 +92,13 @@ typedef struct
 typedef fmpq_mpoly_struct fmpq_mpoly_t[1];
 
 
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t poly,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_set(d, fmpq_denref(poly->content));
+}
+
 /* geobuckets ****************************************************************/
 typedef struct fmpq_mpoly_geobucket
 {

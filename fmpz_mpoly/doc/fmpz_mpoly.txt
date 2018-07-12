@@ -235,7 +235,7 @@ void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t poly,
     in the polynomial, and the element at index $0$ corresponds to the most
     significant variable. The \code{pushterm} functions runs in constant
     average time, and a term is appened even if the specified coefficient
-    is zero. If term index is negative or not strictly less than the length
+    is zero. If a term index is negative or not strictly less than the length
     of the polynomial, the function will throw.
 
 
@@ -339,7 +339,7 @@ void fmpz_mpoly_pushterm_si_ui(fmpz_mpoly_t poly,
     Append a term to \code{poly} with the given coefficient and exponents.
 
 
-void fmpz_mpoly_sort(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_sort_terms(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
 
     Sort the terms of \code{poly} into the canonical ordering dictated by
     the ordering in \code{ctx}. This function does not combine like terms,
@@ -933,6 +933,21 @@ int fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
     If the return is nonzero, used psuedo-remainder sequences to set 
+    \code{poly1} to the GCD of \code{poly2} and \code{poly3}, where
+    \code{poly1} has positive leading term.
+
+int fmpz_mpoly_gcd_brown(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+
+    If the return is nonzero, used Brown's dense modular algorithm to set
+    \code{poly1} to the GCD of \code{poly2} and \code{poly3}, where
+    \code{poly1} has positive leading term.
+
+int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+
+    If the return is nonzero, used a modular algorithm with Zippel's sparse
+    interpolation to set
     \code{poly1} to the GCD of \code{poly2} and \code{poly3}, where
     \code{poly1} has positive leading term.
 
