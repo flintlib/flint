@@ -779,11 +779,7 @@ FLINT_DLL void nmod_mpoly_to_mpolyu_perm(nmod_mpolyu_t A,
                       const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_from_mpolyu_perm(nmod_mpoly_t A,
-                                     const nmod_mpolyu_t B, const slong * perm,
-                      const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_from_mpolyu_keepbits(nmod_mpoly_t A,
-                                     const nmod_mpolyu_t B, const slong * perm,
+                       const nmod_mpolyu_t B, int keepbits, const slong * perm,
                       const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpolyu_divides(nmod_mpolyu_t A, nmod_mpolyu_t B,

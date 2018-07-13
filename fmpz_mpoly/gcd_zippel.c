@@ -171,7 +171,9 @@ choose_prime_inner:
         goto choose_prime_inner;
     }
 
-    fmpz_mpolyu_remove_fmpz_content(G, H, ctx);
+    fmpz_mpolyu_fmpz_content(pp, H, ctx);
+    fmpz_mpolyu_scalar_divexact_fmpz(G, H, pp, ctx);
+/*    fmpz_mpolyu_remove_fmpz_content(G, H, ctx);*/
 
     if (!fmpz_mpolyu_divides(A, G, ctx) || !fmpz_mpolyu_divides(B, G, ctx))
         goto choose_prime_inner;
@@ -349,8 +351,11 @@ void fmpz_mpoly_from_fmpz_poly_keepbits(fmpz_mpoly_t A, const fmpz_poly_t B,
 }
 
 
-
-int fmpz_mpoly_gcd_zippel_keepbits(fmpz_mpoly_t G, fmpz_mpoly_t A, fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+/*
+    like fmpz_mpoly_gcd_zippel, but G and A and B all have the same bits
+*/
+int fmpz_mpoly_gcd_zippel_keepbits(fmpz_mpoly_t G, fmpz_mpoly_t A,
+                                    fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     flint_rand_t randstate;
@@ -414,7 +419,7 @@ int fmpz_mpoly_gcd_zippel_keepbits(fmpz_mpoly_t G, fmpz_mpoly_t A, fmpz_mpoly_t 
 
     ret = fmpz_mpolyu_gcd_zippel(Gu, Au, Bu, uctx, zinfo, randstate);
     if (ret) {
-        fmpz_mpoly_from_mpolyu_perm_keepbits(G, Gu, zinfo->perm, uctx, ctx);
+        fmpz_mpoly_from_mpolyu_perm(G, Gu, A->bits, zinfo->perm, uctx, ctx);
         if (fmpz_sgn(G->coeffs + 0) < 0)
             fmpz_mpoly_neg(G, G, ctx);
         success = 1;
@@ -530,7 +535,7 @@ int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G,
 
     ret = fmpz_mpolyu_gcd_zippel(Gu, Au, Bu, uctx, zinfo, randstate);
     if (ret) {
-        fmpz_mpoly_from_mpolyu_perm(G, Gu, zinfo->perm, uctx, ctx);
+        fmpz_mpoly_from_mpolyu_perm(G, Gu, 0, zinfo->perm, uctx, ctx);
         if (fmpz_sgn(G->coeffs + 0) < 0)
             fmpz_mpoly_neg(G, G, ctx);
         success = 1;

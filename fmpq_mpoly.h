@@ -342,6 +342,9 @@ void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly1, const fmpq_mpoly_ctx_t ct
 
 /* coefficients of monomials *************************************************/
 
+/* get/set a coeff of poly1 corresponding to the monomial poly2 */
+/* these two functions throw if poly2 is not a monomial */
+
 FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_monomial(fmpq_t c,
                         const fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
                                                    const fmpq_mpoly_ctx_t ctx);
@@ -349,6 +352,8 @@ FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_monomial(fmpq_t c,
 FLINT_DLL void fmpq_mpoly_set_coeff_fmpq_monomial(fmpq_mpoly_t poly1,
                                     const fmpq_t c, const fmpq_mpoly_t poly2,
                                                    const fmpq_mpoly_ctx_t ctx);
+
+/* get/set a coeff of poly1 corresponding to an exponent vector exp */
 
 FLINT_DLL void _fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t poly,
                  const fmpq_t c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx);
@@ -402,12 +407,16 @@ FLINT_DLL void fmpq_mpoly_pushterm_si_ui(fmpq_mpoly_t poly,
 
 /* getters and setters for nth term ******************************************/
 
+/* get/set the coefficient of the nth term into/from c */
+/* these two functions throw if n is out of range */
+
 FLINT_DLL void fmpq_mpoly_get_termcoeff_fmpq(fmpq_t c, const fmpq_mpoly_t poly,
                                           slong n, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly,
-                          slong n, const fmpq_t x, const fmpq_mpoly_ctx_t ctx);
+                          slong n, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
 
+/* does the exponent vector of the nth term fit? */
 FMPQ_MPOLY_INLINE
 int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly,
                                            slong n, const fmpq_mpoly_ctx_t ctx)
@@ -426,6 +435,7 @@ int fmpq_mpoly_termexp_fits_ui(const fmpq_mpoly_t poly,
                                        poly->zpoly->bits, n, ctx->zctx->minfo);
 }
 
+/* get/set the exponent vector of the nth term into/from exps */
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_get_termexp_ui(ulong * exps, const fmpq_mpoly_t poly,
                                           slong n, const fmpq_mpoly_ctx_t ctx)
