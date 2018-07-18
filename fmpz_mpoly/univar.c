@@ -327,7 +327,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2,
     mpoly_pack_vec_fmpz(one, gen_fields, bits, ctx->minfo->nfields, 1);
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
 
-    poly2_exps = (ulong **) TMP_ALLOC(poly2->length*sizeof(ulong));
+    poly2_exps = (ulong **) TMP_ALLOC(poly2->length*sizeof(ulong*));
     total_len = 0;
     for (i = 0; i < poly2->length; i++)
     {

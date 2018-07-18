@@ -86,7 +86,7 @@ main(void)
             }
         }
 
-        fmpz_mpoly_sort(f2, ctx);
+        fmpz_mpoly_sort_terms(f2, ctx);
         fmpz_mpoly_combine_like_terms(f2, ctx);
         fmpz_mpoly_assert_canonical(f2, ctx);
 

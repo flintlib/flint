@@ -19,7 +19,7 @@ main(void)
     int i, j, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("sort....");
+    flint_printf("sort_terms....");
     fflush(stdout);
 
     /* Check scramble and sort */
@@ -56,7 +56,7 @@ main(void)
                 mpoly_monomial_swap(f->exps + N*a, f->exps + N*b, N);
             }
 
-            fmpz_mpoly_sort(f, ctx);
+            fmpz_mpoly_sort_terms(f, ctx);
             result = fmpz_mpoly_equal(f, g, ctx);
             if (!result)
             {

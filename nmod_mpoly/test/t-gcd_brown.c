@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
 int
 main(void)
 {
@@ -34,7 +33,7 @@ main(void)
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
 
-        nmod_mpoly_ctx_init_rand(ctx, state, 4, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, modulus < 3000 ? 4 : 5, modulus);
 
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(a, ctx);
@@ -44,11 +43,11 @@ main(void)
         nmod_mpoly_init(cg, ctx);
         nmod_mpoly_init(t, ctx);
 
-        len = n_randint(state, 50) + 1;
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
+        len = n_randint(state, 100) + 1;
+        len1 = n_randint(state, 200);
+        len2 = n_randint(state, 200);
 
-        degbound = 30/(2*ctx->minfo->nvars - 1);
+        degbound = 100/ctx->minfo->nvars/ctx->minfo->nvars;
 
         for (j = 0; j < 4; j++)
         {
@@ -66,10 +65,12 @@ main(void)
             if (!res) {
                 continue;
             }
+            nmod_mpoly_assert_canonical(g, ctx);
 
             if (nmod_mpoly_is_zero(g, ctx))
             {
-                if (!nmod_mpoly_is_zero(a, ctx) || !nmod_mpoly_is_zero(b, ctx)) {
+                if (!nmod_mpoly_is_zero(a, ctx) || !nmod_mpoly_is_zero(b, ctx))
+                {
                     printf("FAIL\n");
                     flint_printf("Check zero gcd only results from zero inputs\ni = %wd, j = %wd\n", i ,j);
                     flint_abort();

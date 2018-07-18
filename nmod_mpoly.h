@@ -384,6 +384,9 @@ int nmod_mpoly_is_one(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
    return nmod_mpoly_equal_ui(poly, 1, ctx);
 }
 
+FLINT_DLL int nmod_mpoly_is_nmod(const nmod_mpoly_t poly,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL int nmod_mpoly_is_gen(const nmod_mpoly_t poly,
                                           slong k, const nmod_mpoly_ctx_t ctx);
 
@@ -452,6 +455,12 @@ FLINT_DLL int nmod_mpoly_mul_dense(nmod_mpoly_t P,
                         const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
+
+slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
+                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
+                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+      mp_bitcnt_t bits, slong N, const ulong * cmpmask, const nmodf_ctx_t fctx);
+
 /* Powering ******************************************************************/
 
 FLINT_DLL void nmod_mpoly_pow_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
@@ -484,6 +493,12 @@ FLINT_DLL int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
 FLINT_DLL int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
                         const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
+
+slong _nmod_mpoly_divides_monagan_pearce(
+                     mp_limb_t ** coeff1,      ulong ** exp1, slong * alloc,
+                const mp_limb_t * coeff2, const ulong * exp2, slong len2,
+                const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+     mp_bitcnt_t bits, slong N, const ulong * cmpmask, const nmodf_ctx_t fctx);
 
 /* Division ******************************************************************/
 
@@ -583,6 +598,8 @@ FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_ui(nmod_mpoly_t poly,
 FLINT_DLL void nmod_mpoly_pushterm_ui_ui(nmod_mpoly_t poly,
                        ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_ffmpz(nmod_mpoly_t poly,
+                    mp_limb_t c, const fmpz * exp, const nmod_mpoly_ctx_t ctx);
 
 /* dense helpers *************************************************************/
 
@@ -590,9 +607,18 @@ FLINT_DLL void nmod_mpolyd_ctx_init(nmod_mpolyd_ctx_t dctx, slong nvars);
 
 FLINT_DLL void nmod_mpolyd_ctx_clear(nmod_mpolyd_ctx_t dctx);
 
+NMOD_MPOLY_INLINE void nmod_mpolyd_swap(nmod_mpolyd_t poly1,
+                                nmod_mpolyd_t poly2)
+{
+   nmod_mpolyd_struct t = *poly1;
+   *poly1 = *poly2;
+   *poly2 = t;
+}
+
 FLINT_DLL int nmod_mpolyd_set_degbounds(nmod_mpolyd_t A, slong * bounds);
 
-FLINT_DLL int nmod_mpolyd_set_degbounds_perm(nmod_mpolyd_t A, const nmod_mpolyd_ctx_t dctx, slong * bounds);
+FLINT_DLL int nmod_mpolyd_set_degbounds_perm(nmod_mpolyd_t A,
+                                 const nmod_mpolyd_ctx_t dctx, slong * bounds);
 
 FLINT_DLL void nmod_mpoly_convert_to_nmod_mpolyd(
                                   nmod_mpolyd_t A, const nmod_mpolyd_ctx_t dctx,
@@ -606,9 +632,41 @@ FLINT_DLL void nmod_mpoly_convert_from_nmod_mpolyd(
                                  nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
                           const nmod_mpolyd_t B, const nmod_mpolyd_ctx_t dctx);
 
-FLINT_DLL void nmod_mpolyd_print_simple(nmod_mpolyd_t poly);
+FLINT_DLL void nmod_mpolyd_init(nmod_mpolyd_t poly, slong nvars);
+
+FLINT_DLL void nmod_mpolyd_fit_length(nmod_mpolyd_t poly, slong len);
+
+FLINT_DLL void nmod_mpolyd_zero(nmod_mpolyd_t poly);
+
+FLINT_DLL void nmod_mpolyd_set_nvars(nmod_mpolyd_t poly, slong nvars);
+
+FLINT_DLL void nmod_mpolyd_set_ui(nmod_mpolyd_t A, mp_limb_t v);
+
+FLINT_DLL void nmod_mpolyd_set(nmod_mpolyd_t A, const nmod_mpolyd_t B);
+
+FLINT_DLL void nmod_mpolyd_clear(nmod_mpolyd_t poly);
+
+FLINT_DLL void nmod_mpolyd_print(nmod_mpolyd_t poly);
 
 FLINT_DLL slong nmod_mpolyd_length(const nmod_mpolyd_t A);
+
+FLINT_DLL slong nmod_mpolyd_last_degree(const nmod_mpolyd_t A,
+                                                       const nmodf_ctx_t fctx);
+
+FLINT_DLL void nmod_mpolyd_div_last_poly(nmod_mpolyd_t A, nmod_poly_t b,
+                                                       const nmodf_ctx_t fctx);
+
+FLINT_DLL void nmod_mpolyd_last_lc(nmod_poly_t lc, const nmod_mpolyd_t A,
+                                                       const nmodf_ctx_t fctx);
+
+FLINT_DLL slong nmod_mpolyd_leadmon(slong * exps, const nmod_mpolyd_t A);
+
+FLINT_DLL void nmod_mpolyd_mul_last_poly(nmod_mpolyd_t M,
+                       nmod_mpolyd_t A, nmod_poly_t b, const nmodf_ctx_t fctx);
+
+FLINT_DLL void nmod_mpolyd_mul_scalar(nmod_mpolyd_t A, mp_limb_t b,
+                                                       const nmodf_ctx_t fctx);
+
 
 /* GCD ***********************************************************************/
 
@@ -628,78 +686,274 @@ FLINT_DLL void nmod_mpoly_resultant(nmod_mpoly_t poly1,
 FLINT_DLL void nmod_mpoly_discriminant(nmod_mpoly_t poly1,
               const nmod_mpoly_t poly2, slong var, const nmod_mpoly_ctx_t ctx);
 
-
-
-
-FLINT_DLL int nmod_mpolyd_ctx_settle(nmod_mpolyd_ctx_t dctx,
+FLINT_DLL int nmod_mpolyd_ctx_set_for_gcd(nmod_mpolyd_ctx_t dctx,
                             const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyd_init(nmod_mpolyd_t poly, slong nvars);
+FLINT_DLL void nmod_mpolyd_last_content(nmod_poly_t cont, const nmod_mpolyd_t A,
+                                                       const nmodf_ctx_t fctx);
 
-FLINT_DLL void nmod_mpolyd_fit_length(nmod_mpolyd_t poly, slong len);
+FLINT_DLL void nmod_mpolyd_gcd_brown_univar(nmod_mpolyd_t G,
+                                 nmod_mpolyd_t Abar,       nmod_mpolyd_t Bbar,
+                           const nmod_mpolyd_t A   , const nmod_mpolyd_t B,
+                                                       const nmodf_ctx_t fctx);
 
-FLINT_DLL void nmod_mpolyd_set_nvars(nmod_mpolyd_t poly, slong nvars);
-
-FLINT_DLL void nmod_mpolyd_zero(nmod_mpolyd_t poly);
-
-FLINT_DLL void nmod_mpolyd_clear(nmod_mpolyd_t poly);
-
-FLINT_DLL void nmod_mpolyd_zero(nmod_mpolyd_t poly);
-
-FLINT_DLL void nmod_mpolyd_clear(nmod_mpolyd_t poly);
-
-FLINT_DLL int nmod_mpolyd_gcd_brown(nmod_mpolyd_t G,
+FLINT_DLL int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
                           nmod_mpolyd_t Abar, nmod_mpolyd_t Bbar,
                           nmod_mpolyd_t A, nmod_mpolyd_t B,
                                                        const nmodf_ctx_t fctx);
 
-FLINT_DLL void nmod_mpolyd_print_simple(nmod_mpolyd_t poly);
+FLINT_DLL int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
+                                 nmod_mpolyd_t Abar,  nmod_mpolyd_t Bbar,
+                                 nmod_mpolyd_t A, nmod_mpolyd_t B,
+                                                       const nmodf_ctx_t fctx);
 
-FLINT_DLL void fq_nmod_mpolyd_ctx_init(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
-                                                       mp_limb_t p, slong deg);
-
-FLINT_DLL int fq_nmod_mpolyd_ctx_settle(fq_nmod_mpolyd_ctx_t dctx,
-                            const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpolyd_mul_scalar(nmod_mpolyd_t A, mp_limb_t b, const nmodf_ctx_t fctx);
-
-FLINT_DLL void fq_nmod_mpolyd_ctx_clear(fq_nmod_mpolyd_ctx_t dctx);
-
-FLINT_DLL void fq_nmod_mpolyd_init(fq_nmod_mpolyd_t poly, slong nvars,
-                                              const fq_nmod_mpolyd_ctx_t dctx);
-
-FLINT_DLL void fq_nmod_mpolyd_fit_length(fq_nmod_mpolyd_t poly, slong len,
-                                              const fq_nmod_mpolyd_ctx_t dctx);
-
-FLINT_DLL void fq_nmod_mpolyd_set_nvars(fq_nmod_mpolyd_t poly, slong nvars);
-
-FLINT_DLL void fq_nmod_mpolyd_zero(fq_nmod_mpolyd_t poly,
-                                              const fq_nmod_mpolyd_ctx_t dctx);
-
-FLINT_DLL void fq_nmod_mpolyd_clear(fq_nmod_mpolyd_t poly,
-                                              const fq_nmod_mpolyd_ctx_t dctx);
-
-FLINT_DLL void nmod_mpoly_convert_to_fq_nmod_mpolyd(
-                            fq_nmod_mpolyd_t A, const fq_nmod_mpolyd_ctx_t dctx,
-                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_convert_from_fq_nmod_mpolyd(
-                              nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
-                    const fq_nmod_mpolyd_t B, const fq_nmod_mpolyd_ctx_t dctx);
-
-FLINT_DLL int fq_nmod_mpolyd_gcd_brown(fq_nmod_mpolyd_t G,
+FLINT_DLL int fq_nmod_mpolyd_gcd_brown_smprime(fq_nmod_mpolyd_t G,
                                 fq_nmod_mpolyd_t Abar, fq_nmod_mpolyd_t Bbar,
                                 fq_nmod_mpolyd_t A, fq_nmod_mpolyd_t B,
                                               const fq_nmod_mpolyd_ctx_t dctx);
-
-FLINT_DLL slong nmod_mpolyd_leadmon(slong * exps, const nmod_mpolyd_t A);
 
 FLINT_DLL int nmod_mpoly_gcd_brown(nmod_mpoly_t G,
                                const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, nmod_mpoly_t A,
+                                   nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
+
+/*
+    nmod_mpolyu_t
+    sparse univariates with nmod_mpoly_t coefficients
+        with uniform bits and LEX ordering
+*/
+typedef struct
+{
+   nmod_mpoly_struct * coeffs;
+   ulong * exps;
+   slong alloc;
+   slong length;
+   mp_bitcnt_t bits;    /* default bits to construct coeffs */
+} nmod_mpolyu_struct;
+typedef nmod_mpolyu_struct nmod_mpolyu_t[1];
+
+FLINT_DLL void nmod_mpolyu_init(nmod_mpolyu_t A, mp_bitcnt_t bits,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyu_clear(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx);
+
+FLINT_DLL void nmod_mpolyu_swap(nmod_mpolyu_t A, nmod_mpolyu_t B,
+                                                  const nmod_mpoly_ctx_t uctx);
+
+FLINT_DLL void nmod_mpolyu_zero(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx);
+
+FLINT_DLL int nmod_mpolyu_is_one(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx);
+
+FLINT_DLL void nmod_mpolyu_print_pretty(const nmod_mpolyu_t poly,
+                                  const char ** x, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyu_fit_length(nmod_mpolyu_t A, slong length,
+                                                  const nmod_mpoly_ctx_t uctx);
+
+FLINT_DLL nmod_mpoly_struct * _nmod_mpolyu_get_coeff(nmod_mpolyu_t A,
+                                       ulong pow, const nmod_mpoly_ctx_t uctx);
+
+FLINT_DLL void nmod_mpolyu_shift_left(nmod_mpolyu_t A, ulong s);
+
+FLINT_DLL void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, mp_limb_t c,
+                                                         nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyu_set(nmod_mpolyu_t A, const nmod_mpolyu_t B,
+                                                  const nmod_mpoly_ctx_t uctx);
+
+FLINT_DLL void nmod_mpolyu_cvtto_poly(nmod_poly_t a, nmod_mpolyu_t A,
+                                                         nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyu_cvtfrom_poly(nmod_mpolyu_t A, nmod_poly_t a,
+                                                         nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyu_cvtfrom_poly_notmain(nmod_mpolyu_t A, nmod_poly_t a,
+                                              slong var, nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_to_mpolyu_perm(nmod_mpolyu_t A,
+                                      const nmod_mpoly_t B, const slong * perm,
+                      const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_from_mpolyu_perm(nmod_mpoly_t A,
+                       const nmod_mpolyu_t B, int keepbits, const slong * perm,
+                      const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpolyu_divides(nmod_mpolyu_t A, nmod_mpolyu_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyu_divexact_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
+                                         nmod_mpoly_t c, nmod_mpoly_ctx_t ctx);
+
+
+FLINT_DLL void nmod_mpolyu_mul_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
+                                         nmod_mpoly_t c, nmod_mpoly_ctx_t ctx);
+
+/*
+    nmod_mpolyn_t
+    multivariates with nmod_poly_t coefficients
+*/
+typedef struct
+{
+   nmod_poly_struct * coeffs;
+   ulong * exps;
+   slong alloc;
+   slong length;
+   slong bits;
+} nmod_mpolyn_struct;
+typedef nmod_mpolyn_struct nmod_mpolyn_t[1];
+
+FLINT_DLL void nmod_mpolyn_init(nmod_mpolyn_t A, mp_bitcnt_t bits,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_clear(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_swap(nmod_mpolyn_t A, nmod_mpolyn_t B);
+
+FLINT_DLL void nmod_mpolyn_zero(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpolyn_is_zero(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_print_pretty(const nmod_mpolyn_t A, const char ** x_in,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_fit_length(nmod_mpolyn_t A, slong length,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_set_length(nmod_mpolyn_t A, slong newlen,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_fit_bits(nmod_mpolyn_t A, slong bits,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_set(nmod_mpolyn_t A, const nmod_mpolyn_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyn_mul_poly(nmod_mpolyn_t A, const nmod_mpolyn_t B, 
+                              const nmod_poly_t c, const nmod_mpoly_ctx_t ctx);
+
+/*
+    nmod_mpolyun_t
+    sparse univariates with nmod_mpolyn_t coefficients
+        with uniform bits and LEX ordering
+*/
+typedef struct
+{
+    nmod_mpolyn_struct * coeffs;
+    ulong * exps;
+    slong alloc;
+    slong length;
+    mp_bitcnt_t bits;   /* default bits to construct coeffs */
+} nmod_mpolyun_struct;
+typedef nmod_mpolyun_struct nmod_mpolyun_t[1];
+
+FLINT_DLL void nmod_mpolyun_init(nmod_mpolyun_t A, mp_bitcnt_t bits,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_clear(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_swap(nmod_mpolyun_t A, nmod_mpolyun_t B);
+
+FLINT_DLL void nmod_mpolyun_zero(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_print_pretty(const nmod_mpolyun_t poly,
+                                   const char ** x, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_fit_length(nmod_mpolyun_t A, slong length,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_shift_right(nmod_mpolyun_t A, ulong s);
+
+FLINT_DLL void nmod_mpolyun_shift_left(nmod_mpolyun_t A, ulong s);
+
+FLINT_DLL slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A, nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_set(nmod_mpolyun_t A, const nmod_mpolyun_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_mul_poly(nmod_mpolyun_t A, const nmod_mpolyun_t B,
+                              const nmod_poly_t c, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_content_last(nmod_poly_t a, nmod_mpolyun_t B,
+                                                         nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
+                                                         nmod_mpoly_ctx_t ctx);
+
+NMOD_MPOLY_INLINE nmod_poly_struct *
+nmod_mpolyn_leadcoeff_ref(nmod_mpolyn_t A, nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(A->length > 0);
+    return A->coeffs + 0;
+}
+
+NMOD_MPOLY_INLINE nmod_poly_struct *
+nmod_mpolyun_leadcoeff_ref(nmod_mpolyun_t A, nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(A->length > 0);
+    return nmod_mpolyn_leadcoeff_ref(A->coeffs + 0, ctx);
+}
+
+
+NMOD_MPOLY_INLINE mp_limb_t
+nmod_mpoly_leadcoeff(nmod_mpoly_t A, nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(A->length > 0);
+    return A->coeffs[0];
+}
+
+NMOD_MPOLY_INLINE mp_limb_t
+nmod_mpolyu_leadcoeff(nmod_mpolyu_t A, nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(A->length > 0);
+    return nmod_mpoly_leadcoeff(A->coeffs + 0, ctx);
+}
+
+FLINT_DLL int nmod_mpolyu_gcd_zippel_linzipp(
+    nmod_mpolyu_t G,
+    nmod_mpolyu_t A,
+    nmod_mpolyu_t B,
+    slong var,
+    nmod_mpoly_ctx_t ctx,
+    mpoly_zipinfo_t zinfo,
+    flint_rand_t randstate);
+
+FLINT_DLL void nmod_mpolyu_init(nmod_mpolyu_t A, mp_bitcnt_t bits,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyu_fit_length(nmod_mpolyu_t A, slong length,
+                                                  const nmod_mpoly_ctx_t uctx);
+
+FLINT_DLL void nmod_mpolyu_clear(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx);
+
+FLINT_DLL void nmod_mpolyu_setform(nmod_mpolyu_t A, nmod_mpolyu_t B,
+                                                         nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL mp_limb_t nmod_mpolyu_leadcoeff(nmod_mpolyu_t A, nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, mp_limb_t c,
+                                                         nmod_mpoly_ctx_t ctx);
+
+typedef enum {
+    nmod_mpoly_sgcd_success,
+    nmod_mpoly_sgcd_form_main_degree_too_high,
+    nmod_mpoly_sgcd_form_wrong,
+    nmod_mpoly_sgcd_no_solution,
+    nmod_mpoly_sgcd_scales_not_found,
+    nmod_mpoly_sgcd_eval_point_not_found,
+    nmod_mpoly_sgcd_eval_gcd_deg_too_high
+} nmod_mpoly_sgcd_ret_t;
+
+FLINT_DLL nmod_mpoly_sgcd_ret_t nmod_mpolyu_sgcd_zippel(nmod_mpolyu_t G,
+                             nmod_mpolyu_t A, nmod_mpolyu_t B, nmod_mpolyu_t f,
+                                               slong var, nmod_mpoly_ctx_t ctx,
+                                     flint_rand_t randstate, slong * degbound);
 
 /* Reduction *****************************************************************/
 
@@ -747,11 +1001,11 @@ int nmod_mpoly_print_pretty(const nmod_mpoly_t poly,
 
 /* Random generation *********************************************************/
 
-FLINT_DLL void nmod_mpoly_randtest_bound(nmod_mpoly_t poly, flint_rand_t state,
-                slong length, mp_limb_t exp_bound, const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void nmod_mpoly_randtest_bounds(nmod_mpoly_t poly, flint_rand_t state,
-             slong length, mp_limb_t * exp_bounds, const nmod_mpoly_ctx_t ctx);
+                 slong length, ulong * exp_bounds, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_randtest_bound(nmod_mpoly_t poly, flint_rand_t state,
+                    slong length, ulong exp_bound, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_randtest_bits(nmod_mpoly_t poly, flint_rand_t state,
                slong length, mp_bitcnt_t exp_bits, const nmod_mpoly_ctx_t ctx);
