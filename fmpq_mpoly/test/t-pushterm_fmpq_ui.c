@@ -90,7 +90,7 @@ main(void)
             }
         }
 
-        fmpq_mpoly_sort(f2, ctx);
+        fmpq_mpoly_sort_terms(f2, ctx);
         fmpq_mpoly_combine_like_terms(f2, ctx);
         fmpq_mpoly_assert_canonical(f2, ctx);
 

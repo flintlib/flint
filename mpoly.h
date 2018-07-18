@@ -480,6 +480,30 @@ int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3,
 }
 
 MPOLY_INLINE
+int mpoly_monomial_lt_nomask(const ulong * exp2, const ulong * exp3, slong N)
+{
+    slong i = N - 1;
+    do
+    {
+        if (exp2[i] != exp3[i])
+            return exp2[i] < exp3[i];
+    } while (--i >= 0);
+    return 0;
+}
+ 
+MPOLY_INLINE
+int mpoly_monomial_gt_nomask(const ulong * exp2, const ulong * exp3, slong N)
+{
+    slong i = N - 1;
+    do
+    {
+        if (exp2[i] != exp3[i])
+            return exp2[i] > exp3[i];
+    } while (--i >= 0);
+    return 0;
+}
+
+MPOLY_INLINE
 int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
                                                 slong N, const ulong * cmpmask)
 {
@@ -626,6 +650,20 @@ FLINT_DLL int mpoly_monomials_valid_test(ulong * exps, slong len, slong bits, co
 FLINT_DLL int mpoly_monomials_overflow_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
+
+/* info related to zippel interpolation **************************************/
+typedef struct
+{
+    slong nvars;
+    slong * Adegs;
+    slong * Bdegs;
+    slong * perm;
+} mpoly_zipinfo_struct;
+typedef mpoly_zipinfo_struct mpoly_zipinfo_t[1];
+
+void mpoly_zipinfo_init(mpoly_zipinfo_t zinfo, slong nvars);
+
+void mpoly_zipinfo_clear(mpoly_zipinfo_t zinfo);
 
 /* Heap **********************************************************************/
 
