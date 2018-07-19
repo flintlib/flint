@@ -146,10 +146,14 @@ FLINT_DLL void flint_set_abort(void (*func)(void));
 #define mp_bitcnt_t ulong
 
 #if HAVE_TLS
-#ifdef _MSC_VER
+#if __STDC_VERSION__ >= 201112L
+#define FLINT_TLS_PREFIX _Thread_local
+#elif defined(_MSC_VER)
 #define FLINT_TLS_PREFIX __declspec(thread)
-#else
+#elif defined(__GNUC__)
 #define FLINT_TLS_PREFIX __thread
+#else
+#error "thread local prefix defined in C11 or later"
 #endif
 #else
 #define FLINT_TLS_PREFIX
