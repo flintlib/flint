@@ -104,6 +104,14 @@ void nmod_mpolyu_fit_length(nmod_mpolyu_t A, slong length, const nmod_mpoly_ctx_
     }
 }
 
+void nmod_mpolyu_one(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
+{
+    nmod_mpolyu_fit_length(A, WORD(1), uctx);
+    A->exps[0] = UWORD(0);
+    nmod_mpoly_one(A->coeffs + 0, uctx);
+    A->length = WORD(1);
+}
+
 /* if the coefficient doesn't exist, a new one is created (and set to zero) */
 nmod_mpoly_struct * _nmod_mpolyu_get_coeff(nmod_mpolyu_t A,
                              ulong pow, const nmod_mpoly_ctx_t uctx)
@@ -136,6 +144,16 @@ nmod_mpoly_struct * _nmod_mpolyu_get_coeff(nmod_mpolyu_t A,
     return xk;
 }
 
+
+void nmod_mpolyu_shift_right(nmod_mpolyu_t A, ulong s)
+{
+    slong i;
+    for (i = 0; i < A->length; i++)
+    {
+        FLINT_ASSERT(A->exps[i] >= s);
+        A->exps[i] -= s;
+    }
+}
 
 void nmod_mpolyu_shift_left(nmod_mpolyu_t A, ulong s)
 {
