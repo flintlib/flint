@@ -12,7 +12,8 @@
 #include "nmod_mpoly.h"
 
 
-int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctx)
+int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
 
@@ -41,7 +42,8 @@ int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ct
     return 1;
 }
 
-void fq_nmod_mpolyu_init(fq_nmod_mpolyu_t A, mp_bitcnt_t bits, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpolyu_init(fq_nmod_mpolyu_t A, mp_bitcnt_t bits,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -157,7 +159,7 @@ void fq_nmod_mpolyu_shift_left(fq_nmod_mpolyu_t A, ulong s)
 }
 
 void fq_nmod_mpolyu_scalar_mul_fq_nmod(fq_nmod_mpolyu_t A, fq_nmod_t c,
-                                                       fq_nmod_mpoly_ctx_t ctx)
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
 
@@ -172,7 +174,8 @@ void fq_nmod_mpolyu_scalar_mul_fq_nmod(fq_nmod_mpolyu_t A, fq_nmod_t c,
 }
 
 
-void fq_nmod_mpolyu_set(fq_nmod_mpolyu_t A, const fq_nmod_mpolyu_t B, const fq_nmod_mpoly_ctx_t uctx)
+void fq_nmod_mpolyu_set(fq_nmod_mpolyu_t A, const fq_nmod_mpolyu_t B,
+                                                const fq_nmod_mpoly_ctx_t uctx)
 {
     slong i;
     fq_nmod_mpoly_struct * Acoeff, * Bcoeff;
@@ -205,11 +208,8 @@ void fq_nmod_mpolyu_set(fq_nmod_mpolyu_t A, const fq_nmod_mpolyu_t B, const fq_n
 
 
 
-void fq_nmod_mpoly_cvtfrom_poly_notmain(
-    fq_nmod_mpoly_t A,
-    fq_nmod_poly_t a,
-    slong var,
-    fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_cvtfrom_poly_notmain(fq_nmod_mpoly_t A, fq_nmod_poly_t a,
+                                      slong var, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
     slong k;
@@ -222,7 +222,8 @@ void fq_nmod_mpoly_cvtfrom_poly_notmain(
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
     oneexp = (ulong *)TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift, var, N, A->bits, ctx->minfo);
+    mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift, var, N, A->bits,
+                                                                   ctx->minfo);
 
     fq_nmod_mpoly_fit_length(A, fq_nmod_poly_length(a, ctx->fqctx), ctx);
 
@@ -239,11 +240,8 @@ void fq_nmod_mpoly_cvtfrom_poly_notmain(
 /*
     Set "A" to "a" where "a" is a polynomial in a non-main variable "var"
 */
-void fq_nmod_mpolyu_cvtfrom_poly_notmain(
-    fq_nmod_mpolyu_t A,
-    fq_nmod_poly_t a,
-    slong var,
-    fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpolyu_cvtfrom_poly_notmain(fq_nmod_mpolyu_t A, fq_nmod_poly_t a,
+                                      slong var, const fq_nmod_mpoly_ctx_t ctx)
 {
     fq_nmod_mpolyu_fit_length(A, 1, ctx);
     A->exps[0] = 0;
@@ -258,7 +256,7 @@ void fq_nmod_mpolyu_cvtfrom_poly_notmain(
     convert it to a poly "a".
 */
 void fq_nmod_mpolyu_cvtto_poly(fq_nmod_poly_t a, fq_nmod_mpolyu_t A,
-                                                       fq_nmod_mpoly_ctx_t ctx)
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
 
@@ -270,7 +268,8 @@ void fq_nmod_mpolyu_cvtto_poly(fq_nmod_poly_t a, fq_nmod_mpolyu_t A,
         FLINT_ASSERT((A->coeffs + i)->length == 1);
         FLINT_ASSERT(mpoly_monomial_is_zero((A->coeffs + i)->exps, 
                       mpoly_words_per_exp((A->coeffs + i)->bits, ctx->minfo)));
-        fq_nmod_poly_set_coeff(a, A->exps[i], (A->coeffs + i)->coeffs + 0, ctx->fqctx);
+        fq_nmod_poly_set_coeff(a, A->exps[i], (A->coeffs + i)->coeffs + 0,
+                                                                   ctx->fqctx);
     }
 }
 
@@ -278,7 +277,7 @@ void fq_nmod_mpolyu_cvtto_poly(fq_nmod_poly_t a, fq_nmod_mpolyu_t A,
     Convert a poly "a" to "A" in the main variable,
 */
 void fq_nmod_mpolyu_cvtfrom_poly(fq_nmod_mpolyu_t A, fq_nmod_poly_t a,
-                                                       fq_nmod_mpoly_ctx_t ctx)
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
     slong k;
@@ -312,13 +311,9 @@ void fq_nmod_mpolyu_cvtfrom_poly(fq_nmod_mpolyu_t A, fq_nmod_poly_t a,
 
 
 
-void fq_nmod_mpolyu_msub(
-    fq_nmod_mpolyu_t R,
-    fq_nmod_mpolyu_t A,
-    fq_nmod_mpolyu_t B,
-    fq_nmod_mpoly_t c,
-    slong e,
-    const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpolyu_msub(fq_nmod_mpolyu_t R, fq_nmod_mpolyu_t A,
+                             fq_nmod_mpolyu_t B, fq_nmod_mpoly_t c, slong e,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, j, k;
     fq_nmod_mpoly_t T;
@@ -365,7 +360,8 @@ void fq_nmod_mpolyu_msub(
     R->length = k;
 }
 
-int fq_nmod_mpolyu_divides(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B, const fq_nmod_mpoly_ctx_t ctx)
+int fq_nmod_mpolyu_divides(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     int ret = 0;
     fq_nmod_mpolyu_t P, R;
@@ -402,7 +398,7 @@ done:
     A = B / c and preserve the bit packing
 */
 void fq_nmod_mpolyu_divexact_mpoly(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
-                                   fq_nmod_mpoly_t c, fq_nmod_mpoly_ctx_t ctx)
+                              fq_nmod_mpoly_t c, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
     slong len;
@@ -452,7 +448,7 @@ void fq_nmod_mpolyu_divexact_mpoly(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
     A = B * c and preserve the bit packing
 */
 void fq_nmod_mpolyu_mul_mpoly(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
-                                    fq_nmod_mpoly_t c, fq_nmod_mpoly_ctx_t ctx)
+                              fq_nmod_mpoly_t c, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
     slong len;
@@ -485,8 +481,8 @@ void fq_nmod_mpolyu_mul_mpoly(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
         poly1->bits = exp_bits;
 
         len = _fq_nmod_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps,
-                            &poly1->alloc, poly2->coeffs, poly2->exps, poly2->length,
-                              poly3->coeffs, poly3->exps, poly3->length, exp_bits, N,
+                      &poly1->alloc, poly2->coeffs, poly2->exps, poly2->length,
+                       poly3->coeffs, poly3->exps, poly3->length, exp_bits, N,
                                                   cmpmask, ctx->fqctx);
 
         FLINT_ASSERT(len > 0);
@@ -496,5 +492,3 @@ void fq_nmod_mpolyu_mul_mpoly(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
     A->length = B->length;
     TMP_END;
 }
-
-

@@ -14,7 +14,8 @@
 
 
 
-void fmpz_mpolyu_init(fmpz_mpolyu_t A, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpolyu_init(fmpz_mpolyu_t A, mp_bitcnt_t bits,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -34,7 +35,8 @@ void fmpz_mpolyu_clear(fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx)
 }
 
 
-void fmpz_mpolyu_swap(fmpz_mpolyu_t A, fmpz_mpolyu_t B, const fmpz_mpoly_ctx_t uctx)
+void fmpz_mpolyu_swap(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
+                                                   const fmpz_mpoly_ctx_t uctx)
 {
    fmpz_mpolyu_struct t = *A;
    *A = *B;
@@ -71,7 +73,8 @@ void fmpz_mpolyu_print_pretty(const fmpz_mpolyu_t poly,
 
 
 
-void fmpz_mpolyu_fit_length(fmpz_mpolyu_t A, slong length, const fmpz_mpoly_ctx_t uctx)
+void fmpz_mpolyu_fit_length(fmpz_mpolyu_t A, slong length,
+                                                   const fmpz_mpoly_ctx_t uctx)
 {
     slong i;
     slong old_alloc = A->alloc;
@@ -111,7 +114,8 @@ void fmpz_mpolyu_one(fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx)
 }
 
 
-void fmpz_mpolyu_set(fmpz_mpolyu_t A, const fmpz_mpolyu_t B, const fmpz_mpoly_ctx_t uctx)
+void fmpz_mpolyu_set(fmpz_mpolyu_t A, const fmpz_mpolyu_t B,
+                                                   const fmpz_mpoly_ctx_t uctx)
 {
     slong i;
     fmpz_mpoly_struct * Acoeff, * Bcoeff;
@@ -359,11 +363,9 @@ void fmpz_mpoly_from_mpolyu_perm(fmpz_mpoly_t A,
 }
 
 
-
-
 /* Convert A to Ap by reducing mod p */
-void fmpz_mpoly_to_nmod_mpoly(nmod_mpoly_t Ap, nmod_mpoly_ctx_t ctxp,
-                                          fmpz_mpoly_t A, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_to_nmod_mpoly(nmod_mpoly_t Ap, const nmod_mpoly_ctx_t ctxp,
+                                    fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     slong k;
@@ -388,8 +390,8 @@ void fmpz_mpoly_to_nmod_mpoly(nmod_mpoly_t Ap, nmod_mpoly_ctx_t ctxp,
 }
 
 /* Convert A to Ap by reducing mod p */
-void fmpz_mpolyu_to_nmod_mpolyu(nmod_mpolyu_t Ap, nmod_mpoly_ctx_t ctxp,
-                                         fmpz_mpolyu_t A, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpolyu_to_nmod_mpolyu(nmod_mpolyu_t Ap, const nmod_mpoly_ctx_t ctxp,
+                                   fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     slong k;
@@ -409,8 +411,8 @@ void fmpz_mpolyu_to_nmod_mpolyu(nmod_mpolyu_t Ap, nmod_mpoly_ctx_t ctxp,
 
 
 /* Convert Ap to A using the symmetric range [-p/2, p/2) */
-void fmpz_mpoly_set_nmod_mpoly(fmpz_mpoly_t A, fmpz_mpoly_ctx_t ctx,
-                                        nmod_mpoly_t Ap, nmod_mpoly_ctx_t ctxp)
+void fmpz_mpoly_set_nmod_mpoly(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx,
+                                  nmod_mpoly_t Ap, const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
     slong N;
@@ -425,8 +427,8 @@ void fmpz_mpoly_set_nmod_mpoly(fmpz_mpoly_t A, fmpz_mpoly_ctx_t ctx,
 }
 
 /* Convert Ap to A using the symmetric range [-p/2, p/2) */
-void fmpz_mpolyu_set_nmod_mpolyu(fmpz_mpolyu_t A, fmpz_mpoly_ctx_t ctx,
-                                       nmod_mpolyu_t Ap, nmod_mpoly_ctx_t ctxp)
+void fmpz_mpolyu_set_nmod_mpolyu(fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx,
+                                 nmod_mpolyu_t Ap, const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
 
@@ -440,9 +442,12 @@ void fmpz_mpolyu_set_nmod_mpolyu(fmpz_mpolyu_t A, fmpz_mpoly_ctx_t ctx,
     A->length = Ap->length;
 }
 
-/* Update H so that it does not change mod m, and is now A mod p */
-int fmpz_mpoly_CRT_nmod_mpoly(fmpz_mpoly_t H, fmpz_mpoly_ctx_t ctx,
-                               fmpz_t m, nmod_mpoly_t A, nmod_mpoly_ctx_t ctxp)
+/*
+    Update H so that it does not change mod m, and is now A mod p
+    It is asserted that the monomials in H and A match
+*/
+int fmpz_mpoly_CRT_nmod_mpoly(fmpz_mpoly_t H, const fmpz_mpoly_ctx_t ctx,
+                         fmpz_t m, nmod_mpoly_t A, const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
     slong N;
@@ -464,9 +469,12 @@ int fmpz_mpoly_CRT_nmod_mpoly(fmpz_mpoly_t H, fmpz_mpoly_ctx_t ctx,
     return changed;
 }
 
-/* Update H so that it does not change mod m, and is now A mod p */
-int fmpz_mpolyu_CRT_nmod_mpolyu(fmpz_mpolyu_t H, fmpz_mpoly_ctx_t ctx,
-                              fmpz_t m, nmod_mpolyu_t A, nmod_mpoly_ctx_t ctxp)
+/*
+    Update H so that it does not change mod m, and is now A mod p
+    It is asserted that the monomials in H and A match
+*/
+int fmpz_mpolyu_CRT_nmod_mpolyu(fmpz_mpolyu_t H, const fmpz_mpoly_ctx_t ctx,
+                        fmpz_t m, nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
     int changed = 0;
@@ -476,7 +484,8 @@ int fmpz_mpolyu_CRT_nmod_mpolyu(fmpz_mpolyu_t H, fmpz_mpoly_ctx_t ctx,
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(H->exps[i] == A->exps[i]);
-        changed |= fmpz_mpoly_CRT_nmod_mpoly(H->coeffs + i, ctx, m, A->coeffs + i, ctxp);
+        changed |= fmpz_mpoly_CRT_nmod_mpoly(H->coeffs + i, ctx, m,
+                                                          A->coeffs + i, ctxp);
     }
     H->length = A->length;
     return changed;
@@ -531,7 +540,8 @@ void fmpz_mpolyu_msub(fmpz_mpolyu_t R, fmpz_mpolyu_t A, fmpz_mpolyu_t B,
     R->length = k;
 }
 
-int fmpz_mpolyu_divides(fmpz_mpolyu_t A, fmpz_mpolyu_t B, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpolyu_divides(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     int ret = 0;
     fmpz_mpolyu_t P, R;
@@ -566,7 +576,8 @@ done:
 
 
 
-void fmpz_mpolyu_fmpz_content(fmpz_t c, fmpz_mpolyu_t A, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpolyu_fmpz_content(fmpz_t c, fmpz_mpolyu_t A,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j;
 
@@ -585,7 +596,7 @@ void fmpz_mpolyu_fmpz_content(fmpz_t c, fmpz_mpolyu_t A, fmpz_mpoly_ctx_t ctx)
 
 
 void fmpz_mpolyu_scalar_divexact_fmpz(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
-                                                fmpz_t c, fmpz_mpoly_ctx_t ctx)
+                                          fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
 
@@ -608,7 +619,7 @@ void fmpz_mpolyu_scalar_divexact_fmpz(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
     The bit counts of A, B and c must all agree for this division
 */
 void fmpz_mpolyu_divexact_mpoly(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
-                                          fmpz_mpoly_t c, fmpz_mpoly_ctx_t ctx)
+                                    fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     slong len;
@@ -658,7 +669,7 @@ void fmpz_mpolyu_divexact_mpoly(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
     The bit counts of A, B and c must all agree for this multiplication
 */
 void fmpz_mpolyu_mul_mpoly(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
-                                          fmpz_mpoly_t c, fmpz_mpoly_ctx_t ctx)
+                                    fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     slong len;
