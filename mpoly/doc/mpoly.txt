@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2017 William Hart
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,65 +9,6 @@
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
-
-The mpoly module implments the low level packing and unpacking of exponents
-for multivariate polynomials. If the variables in the polynomial are, say,
-x, y and z with x > y > z in the monimial ordering, then the monomial
-x^a*y^b*z^c is represented as the array {a, b, c} from the user's perspective.
-
-
-Polynomial exponents are stoed in packed format. This means that monomials are
-actually stored as an array of integer 'fields' that may be packed within
-a machine word or across multiple machine words if needed.
-This facilitates basic
-operations on the monomials, and we make the following assumptions about
-the correspondence between the variables' exponents and the
-fields in the packing:
-
-    1. The monomial ordering is a total ordering, i.e. 1 is the smallest.
-    2. Multiplication of monomials corresponds to field-wise addition.
-    3. Monomials can be compared by compairing their packed representation
-        possibly with an xor mask on certain fields.
-    4. The exponent of each variable is itself one of the fields.
-    5. The fields are all non-negative.
-
-For the three supported ordering ORD_LEX, ORD_DEGLEX, and ORD_DEGREVLEX, the
-monomial x^a*y^b*z^c is converted into fields in the following ways (the
-least significant field is on the left, the most significant is on the right),
-and the comparison mask is shown below.
-
-    ORD_LEX:         | c | b | a |         ( 3 fields)
-                      000 000 000
-
-    ORD_DEGLEX:      | c | b | a | a+b+c | ( 4 fields)
-                      000 000 000  00000
-
-    ORD_DEGREVLEX:   | a | b | c | a+b+c |  ( 4 fields)
-                      111 111 111 0000000
-
-If one wanted to support, for example, a block ordering which was ORD_DEGLEX
-in {x, y} and ORD_DEGREVLEX in {z, w} with x>y>z>w,
-the monomial x^a*y^b*z^c*w^d would need to be stored as
-
-    | c | d | c+d | b | a | a+b |    (6 fields)
-     111 111 00000 000 000 00000
-
-No such interface is currently implemented.
-
-
-There is no limit to the size of the fields. The fields themselves are packed
-to a uniform bit width, usually denoted by 'bits' in the functions. This bit
-count should contain extra sign bit used for overflow detection. Thus, if the
-maximum field is 15, then the fields only fit into a packing with bits >= 5.
-The total number of machine words taken by an exponent packed into fields
-is usually denoted by N in the code.
-
-If bits <= FLINT_BITS then precisely a maximum of floor(FLINT_BITS/bits)
-number of fields may be packed into a single word. Within a word, the packing
-is from low to high, and unused fields (as well as unused bits) at the top of
-the word are zero.
-
-
 
 *******************************************************************************
 
