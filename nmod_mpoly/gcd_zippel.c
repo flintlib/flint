@@ -1372,6 +1372,8 @@ int nmod_mpolyu_gcdm_zippel(
     flint_rand_t randstate)
 {
     slong degbound;
+    slong coeff_deg_bound;
+    slong lastdeg;
     int success, changed;
     slong deg = 4;
     nmod_mpolyun_t An, Bn, Hn, Ht;
@@ -1401,6 +1403,9 @@ int nmod_mpolyu_gcdm_zippel(
     nmod_mpolyun_init(Bn, A->bits, ctx);
     nmod_mpolyu_cvtto_mpolyun(An, A, ctx->minfo->nvars - 1, ctx);
     nmod_mpolyu_cvtto_mpolyun(Bn, B, ctx->minfo->nvars - 1, ctx);
+
+    coeff_deg_bound = FLINT_MIN(nmod_mpolyun_lastdeg(An, ctx),
+                                nmod_mpolyun_lastdeg(Bn, ctx));
 
     FLINT_ASSERT(An->bits == B->bits);
     FLINT_ASSERT(An->bits == G->bits);
@@ -1529,7 +1534,8 @@ choose_prime_inner:
     if (Aff->length == 0 || Bff->length == 0)
         goto choose_prime_inner;
 
-    switch (fq_nmod_mpolyu_gcds_zippel(Gff, Aff, Bff, Gform, ctx->minfo->nvars - 1, ffctx, randstate, &degbound))
+    switch (fq_nmod_mpolyu_gcds_zippel(Gff, Aff, Bff, Gform,
+                           ctx->minfo->nvars - 1, ffctx, randstate, &degbound))
     {
         default:
             FLINT_ASSERT(0);
@@ -1552,12 +1558,13 @@ choose_prime_inner:
     fq_nmod_mul(t, t, gammaff, ffctx->fqctx);
     fq_nmod_mpolyu_scalar_mul_fq_nmod(Gff, t, ffctx);
 
-    changed = nmod_mpolyun_CRT_fq_nmod_mpolyu(Hn, ctx, modulus, Gff, ffctx);
+    changed = nmod_mpolyun_CRT_fq_nmod_mpolyu(&lastdeg, Hn, ctx, modulus, Gff, ffctx);
     nmod_poly_mul(modulus, modulus, ffctx->fqctx->modulus);
-
     if (changed)
     {
-        /* TODO: if the coefficients are getting too big, goto outer */
+        if (lastdeg > coeff_deg_bound) {
+            goto choose_prime_outer;
+        }
         goto choose_prime_inner;
     }
 

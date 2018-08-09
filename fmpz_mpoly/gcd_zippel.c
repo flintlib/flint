@@ -19,16 +19,93 @@ void nmod_mpoly_ctx_change_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t modulus)
     nmodf_ctx_init(ctx->ffinfo, modulus);
 }
 
+/*
+    Find a bound on the bits of the coefficients of gcd(A,B).
+    If this overflows a mp_bitcnt_t, the max mp_bitcnt_t is returned.
+    We will apply a Kronecker substitution and use the Landau-Mignotte bound
+        for univariates.
 
+         min(deg A, deg B)
+        2                  * gcd(A[0], B[0])
 
-int fmpz_mpolyu_gcdm_zippel(
-    fmpz_mpolyu_t G,
-    fmpz_mpolyu_t A,
-    fmpz_mpolyu_t B,
-    fmpz_mpoly_ctx_t ctx,
-    mpoly_zipinfo_t zinfo,
-    flint_rand_t randstate)
+                 * min( L2Norm(A) / A[0] , L2Norm(B) / B[0] )
+
+    This number is almost certainly not going to be used,
+        so it just needs to be correct and not nececessary as tight as possible.
+*/
+mp_bitcnt_t fmpz_mpolyu_gcd_bitbound(const fmpz_t gcdlc,
+                            const fmpz_mpolyu_t A, const fmpz_mpolyu_t B,
+                       const fmpz_mpoly_ctx_t ctx, const mpoly_zipinfo_t zinfo)
 {
+    slong i;
+    fmpz_t n, an, bn;
+    ulong max, len;
+    mp_bitcnt_t r;
+
+    /* find the degree of the kronecker substitution in the lesser variables */
+    fmpz_init_set_ui(n, UWORD(1));
+    for (i = 0; i < zinfo->nvars - 1; i++)
+    {
+        fmpz_mul_ui(n, n, FLINT_MAX((ulong)(zinfo->Adegs[i]),
+                                    (ulong)(zinfo->Bdegs[i])) + UWORD(1));
+    }
+
+    /* n = min(deg A, deg B) after the KS */
+    i = zinfo->nvars - 1;
+    fmpz_addmul_ui(n, n, FLINT_MIN((ulong)(zinfo->Adegs[i]),
+                                   (ulong)(zinfo->Bdegs[i])));
+
+    /* n += log2(gcd(A[0], B[0])) */
+    fmpz_add_ui(n, n, fmpz_bits(gcdlc));
+
+    len = max = UWORD(0);
+    for (i = 0; i < A->length; i++)
+    {
+        len += (A->coeffs + i)->length;
+        max = FLINT_MAX(max, FLINT_ABS(
+                    _fmpz_vec_max_bits((A->coeffs + i)->coeffs,
+                                       (A->coeffs + i)->length)
+              ));
+    }
+    fmpz_init_set_ui(an, n_clog(len, UWORD(2))/UWORD(2));
+    fmpz_add_ui(an, an, max);
+    fmpz_sub_ui(an, an, fmpz_bits(fmpz_mpolyu_leadcoeff_ref(A)));
+    FLINT_ASSERT(fmpz_sgn(an) >= 0);
+
+    len = max = UWORD(0);
+    for (i = 0; i < B->length; i++)
+    {
+        len += (B->coeffs + i)->length;
+        max = FLINT_MAX(max, FLINT_ABS(
+                    _fmpz_vec_max_bits((B->coeffs + i)->coeffs,
+                                       (B->coeffs + i)->length)
+              ));
+    }
+    fmpz_init_set_ui(bn, n_clog(len, UWORD(2))/UWORD(2));
+    fmpz_add_ui(bn, bn, max);
+    fmpz_sub_ui(bn, bn, fmpz_bits(fmpz_mpolyu_leadcoeff_ref(B)));
+    FLINT_ASSERT(fmpz_sgn(bn) >= 0);
+
+    /* n += log2( min( L2Norm(A) / A[0] , L2Norm(B) / B[0] ) ) */
+    fmpz_add(n, n, fmpz_cmp(an, bn) < 0 ? an : bn);
+
+    FLINT_ASSERT(fmpz_sgn(n) > 0);
+
+    r = fmpz_abs_fits_ui(n) ? fmpz_get_ui(n) : -UWORD(1);
+
+    fmpz_clear(n);
+    fmpz_clear(an);
+    fmpz_clear(bn);
+
+    return r;
+}
+
+int fmpz_mpolyu_gcdm_zippel(fmpz_mpolyu_t G, fmpz_mpolyu_t A, fmpz_mpolyu_t B,
+                            const fmpz_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo,
+                                                        flint_rand_t randstate)
+{
+    mp_bitcnt_t coeffbitbound;
+    mp_bitcnt_t coeffbits;
     slong degbound;
     int success, changed;
     mp_limb_t p = UWORD(1) << (FLINT_BITS - 1), old_p, t, gammap;
@@ -54,6 +131,7 @@ int fmpz_mpolyu_gcdm_zippel(
 
     degbound = FLINT_MIN(A->exps[0], B->exps[0]);
 
+    coeffbitbound = fmpz_mpolyu_gcd_bitbound(gamma, A, B, ctx, zinfo);
 
     nmod_mpoly_ctx_init(ctxp, ctx->minfo->nvars, ORD_LEX, 2);
 
@@ -88,7 +166,8 @@ choose_prime_outer:
     if (Ap->length == 0 || Bp->length == 0)
         goto choose_prime_outer;
 
-    success = nmod_mpolyu_gcdp_zippel(Gp, Ap, Bp, ctx->minfo->nvars - 1, ctxp, zinfo, randstate);
+    success = nmod_mpolyu_gcdp_zippel(Gp, Ap, Bp, ctx->minfo->nvars - 1,
+                                                       ctxp, zinfo, randstate);
     if (!success || Gp->exps[0] > degbound)
         goto choose_prime_outer;
     degbound = Gp->exps[0];
@@ -136,7 +215,8 @@ choose_prime_inner:
     if (Ap->length == 0 || Bp->length == 0)
         goto choose_prime_inner;
 
-    switch (nmod_mpolyu_gcds_zippel(Gp, Ap, Bp, Gform, ctx->minfo->nvars, ctxp, randstate, &degbound))
+    switch (nmod_mpolyu_gcds_zippel(Gp, Ap, Bp, Gform, ctx->minfo->nvars,
+                                                   ctxp, randstate, &degbound))
     {
         default:
             FLINT_ASSERT(0);
@@ -161,12 +241,15 @@ choose_prime_inner:
     t = nmod_mul(t, gammap, ctxp->ffinfo->mod);
     nmod_mpolyu_scalar_mul_nmod(Gp, t, ctxp);
 
-    changed = fmpz_mpolyu_CRT_nmod_mpolyu(H, ctx, modulus, Gp, ctxp);
+    changed = fmpz_mpolyu_CRT_nmod_mpolyu(&coeffbits, H, ctx, modulus, Gp, ctxp);
     fmpz_mul_ui(modulus, modulus, p);
 
     if (changed)
     {
-        /* TODO: if the coefficients are getting too big, goto outer */
+        if (coeffbits > coeffbitbound)
+        {
+            goto choose_prime_outer;
+        }
         goto choose_prime_inner;
     }
 
@@ -177,9 +260,6 @@ choose_prime_inner:
         goto choose_prime_inner;
 
     success = 1;
-    goto finished;
-
-
 
 finished:
 

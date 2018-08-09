@@ -1152,7 +1152,7 @@ FLINT_DLL void nmod_mpolyun_set_fq_nmod_mpolyu(
                              nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx,
                           fq_nmod_mpolyu_t Ap, const fq_nmod_mpoly_ctx_t ctxp);
 
-FLINT_DLL int nmod_mpolyun_CRT_fq_nmod_mpolyu(
+FLINT_DLL int nmod_mpolyun_CRT_fq_nmod_mpolyu(slong * lastdeg,
                              nmod_mpolyun_t H, const nmod_mpoly_ctx_t ctx,
             nmod_poly_t m, fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctxp);
 
@@ -1299,14 +1299,14 @@ int fq_nmod_mpolyu_gcdp_zippel_univar(fq_nmod_mpolyu_t G,
 
 
 NMOD_MPOLY_INLINE fq_nmod_poly_struct *
-fq_nmod_mpolyn_leadcoeff_ref(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
+fq_nmod_mpolyn_leadcoeff_ref(const fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
     return A->coeffs + 0;
 }
 
 NMOD_MPOLY_INLINE fq_nmod_poly_struct *
-fq_nmod_mpolyun_leadcoeff_ref(fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t ctx)
+fq_nmod_mpolyun_leadcoeff_ref(const fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
     return fq_nmod_mpolyn_leadcoeff_ref(A->coeffs + 0, ctx);
@@ -1314,14 +1314,14 @@ fq_nmod_mpolyun_leadcoeff_ref(fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t ctx
 
 
 NMOD_MPOLY_INLINE fq_nmod_struct *
-fq_nmod_mpoly_leadcoeff_ref(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+fq_nmod_mpoly_leadcoeff_ref(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
     return A->coeffs + 0;
 }
 
 NMOD_MPOLY_INLINE fq_nmod_struct *
-fq_nmod_mpolyu_leadcoeff_ref(fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctx)
+fq_nmod_mpolyu_leadcoeff_ref(const fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
     return fq_nmod_mpoly_leadcoeff_ref(A->coeffs + 0, ctx);

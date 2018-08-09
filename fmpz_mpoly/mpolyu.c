@@ -446,7 +446,8 @@ void fmpz_mpolyu_set_nmod_mpolyu(fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx,
     Update H so that it does not change mod m, and is now A mod p
     It is asserted that the monomials in H and A match
 */
-int fmpz_mpoly_CRT_nmod_mpoly(fmpz_mpoly_t H, const fmpz_mpoly_ctx_t ctx,
+int fmpz_mpoly_CRT_nmod_mpoly(mp_bitcnt_t * coeffbits,
+                                   fmpz_mpoly_t H, const fmpz_mpoly_ctx_t ctx,
                          fmpz_t m, nmod_mpoly_t A, const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
@@ -462,6 +463,7 @@ int fmpz_mpoly_CRT_nmod_mpoly(fmpz_mpoly_t H, const fmpz_mpoly_ctx_t ctx,
     {
         FLINT_ASSERT(mpoly_monomial_equal(H->exps + N*i, A->exps + N*i, N));
         fmpz_CRT_ui(t, H->coeffs + i, m, A->coeffs[i], ctxp->ffinfo->mod.n, 1);
+        coeffbits[0] = FLINT_MAX(coeffbits[0], fmpz_bits(t));
         changed |= !fmpz_equal(t, H->coeffs + i);
         fmpz_swap(t, H->coeffs + i);
     }
@@ -473,18 +475,21 @@ int fmpz_mpoly_CRT_nmod_mpoly(fmpz_mpoly_t H, const fmpz_mpoly_ctx_t ctx,
     Update H so that it does not change mod m, and is now A mod p
     It is asserted that the monomials in H and A match
 */
-int fmpz_mpolyu_CRT_nmod_mpolyu(fmpz_mpolyu_t H, const fmpz_mpoly_ctx_t ctx,
+int fmpz_mpolyu_CRT_nmod_mpolyu(mp_bitcnt_t * coeffbits,
+                        fmpz_mpolyu_t H, const fmpz_mpoly_ctx_t ctx,
                         fmpz_t m, nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
     int changed = 0;
 
     FLINT_ASSERT(H->bits == A->bits);
-    FLINT_ASSERT(H->length == A->length);;
+    FLINT_ASSERT(H->length == A->length);
+
+    coeffbits[0] = UWORD(0);
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(H->exps[i] == A->exps[i]);
-        changed |= fmpz_mpoly_CRT_nmod_mpoly(H->coeffs + i, ctx, m,
+        changed |= fmpz_mpoly_CRT_nmod_mpoly(coeffbits, H->coeffs + i, ctx, m,
                                                           A->coeffs + i, ctxp);
     }
     H->length = A->length;

@@ -893,7 +893,7 @@ FLINT_DLL void fmpz_mpolyu_set_nmod_mpolyu(
                                  fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx,
                                 nmod_mpolyu_t Ap, const nmod_mpoly_ctx_t ctxp);
 
-FLINT_DLL int fmpz_mpolyu_CRT_nmod_mpolyu(
+FLINT_DLL int fmpz_mpolyu_CRT_nmod_mpolyu(mp_bitcnt_t * coeffbits,
                                  fmpz_mpolyu_t H, const fmpz_mpoly_ctx_t ctx,
                        fmpz_t m, nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctxp);
 
@@ -920,13 +920,13 @@ FLINT_DLL int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, fmpz_mpoly_t A,
                                    fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 
-FMPZ_MPOLY_INLINE fmpz * fmpz_mpoly_leadcoeff_ref(fmpz_mpoly_t A)
+FMPZ_MPOLY_INLINE fmpz * fmpz_mpoly_leadcoeff_ref(const fmpz_mpoly_t A)
 {
     FLINT_ASSERT(A->length > 0);
     return A->coeffs + 0;
 }
 
-FMPZ_MPOLY_INLINE fmpz * fmpz_mpolyu_leadcoeff_ref(fmpz_mpolyu_t A)
+FMPZ_MPOLY_INLINE fmpz * fmpz_mpolyu_leadcoeff_ref(const fmpz_mpolyu_t A)
 {
     FLINT_ASSERT(A->length > 0);
     return fmpz_mpoly_leadcoeff_ref(A->coeffs + 0);

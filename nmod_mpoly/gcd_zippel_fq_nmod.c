@@ -12,7 +12,7 @@
 #include "nmod_mpoly.h"
 
 
-void fq_nmod_next_not_zero(fq_nmod_t alpha, fq_nmod_ctx_t fqctx)
+void fq_nmod_next_not_zero(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
 {
     slong i;
     slong deg = fqctx->modulus->length - 1;

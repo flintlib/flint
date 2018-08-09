@@ -467,7 +467,8 @@ void nmod_mpolyun_set_fq_nmod_mpolyu(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ct
     Update H so that it does not change mod m, and is now A mod p
     It is asserted that the monomials in H and A match
 */
-int nmod_mpolyn_CRT_fq_nmod_mpoly(nmod_mpolyn_t H, const nmod_mpoly_ctx_t ctx,
+int nmod_mpolyn_CRT_fq_nmod_mpoly(slong * lastdeg,
+                          nmod_mpolyn_t H, const nmod_mpoly_ctx_t ctx,
                           nmod_poly_t m, fq_nmod_t inv_m_eval,
                              fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctxp)
 {
@@ -496,6 +497,9 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(nmod_mpolyn_t H, const nmod_mpoly_ctx_t ctx,
             nmod_poly_mul(w, u, m);
             nmod_poly_add(H->coeffs + i, H->coeffs + i, w);
         }
+
+        lastdeg[0] = FLINT_MAX(lastdeg[0], nmod_poly_degree(H->coeffs + i));
+
         FLINT_ASSERT(nmod_poly_degree(H->coeffs + i) < nmod_poly_degree(m)
                                                      + nmod_poly_degree(ctxp->fqctx->modulus));
     }
@@ -507,14 +511,17 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(nmod_mpolyn_t H, const nmod_mpoly_ctx_t ctx,
     return changed;
 }
 
-int nmod_mpolyun_CRT_fq_nmod_mpolyu(nmod_mpolyun_t H, const nmod_mpoly_ctx_t ctx,
+int nmod_mpolyun_CRT_fq_nmod_mpolyu(slong * lastdeg,
+                        nmod_mpolyun_t H, const nmod_mpoly_ctx_t ctx,
              nmod_poly_t m, fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctxp)
 {
     slong i;
     int changed = 0;
     fq_nmod_t inv_m_eval;
-    fq_nmod_init(inv_m_eval, ctxp->fqctx);
 
+    lastdeg[0] = -WORD(1);
+
+    fq_nmod_init(inv_m_eval, ctxp->fqctx);
     nmod_poly_rem(inv_m_eval, m, ctxp->fqctx->modulus);
     fq_nmod_inv(inv_m_eval, inv_m_eval, ctxp->fqctx);
 
@@ -523,7 +530,7 @@ int nmod_mpolyun_CRT_fq_nmod_mpolyu(nmod_mpolyun_t H, const nmod_mpoly_ctx_t ctx
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(H->exps[i] == A->exps[i]);
-        changed |= nmod_mpolyn_CRT_fq_nmod_mpoly(H->coeffs + i, ctx, m,
+        changed |= nmod_mpolyn_CRT_fq_nmod_mpoly(lastdeg, H->coeffs + i, ctx, m,
                                               inv_m_eval, A->coeffs + i, ctxp);
     }
     H->length = A->length;
@@ -832,7 +839,6 @@ int nmod_mpolyun_addinterp(slong * lastdeg,
             j++;
         } else 
         {
-
             FLINT_ASSERT(0);
         }
     }
