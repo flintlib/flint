@@ -114,8 +114,6 @@ int fmpz_mpolyu_gcdm_zippel(fmpz_mpolyu_t G, fmpz_mpolyu_t A, fmpz_mpolyu_t B,
     fmpz_mpolyu_t H;
     nmod_mpoly_ctx_t ctxp;
 
-    p=12;
-
     fmpz_init(pp);
     fmpz_init(gammapp);
     fmpz_init_set_si(modulus, 1);
