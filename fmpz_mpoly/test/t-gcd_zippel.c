@@ -184,7 +184,9 @@ main(void)
 
             if (!res)
             {
-                continue;
+                printf("FAIL\n");
+                flint_printf("Check that gcd could be computed\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
             }
 
             if (fmpz_mpoly_is_zero(g, ctx))
@@ -219,7 +221,9 @@ main(void)
 
             if (!res)
             {
-                continue;
+                printf("FAIL\n");
+                flint_printf("Check that cofactor gcd could be computed\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
             }
 
             if (!fmpz_mpoly_equal_ui(cg, UWORD(1), ctx))

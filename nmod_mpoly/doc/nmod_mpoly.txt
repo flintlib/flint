@@ -397,6 +397,27 @@ void nmod_mpoly_compose(nmod_mpoly_t res, nmod_mpoly_t poly1,
 
 *******************************************************************************
 
+    Greatest Common Divisor
+
+*******************************************************************************
+
+int nmod_mpoly_gcd_brown(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                          const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
+
+    If the return is nonzero, used Brown's dense modular algorithm to set
+    \code{poly1} to the GCD of \code{poly2} and \code{poly3}, where
+    \code{poly1} is monic.
+
+int nmod_mpoly_gcd_zippel(nmod_mpoly_t poly1, const fmpz_mpoly_t poly2,
+                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+
+    If the return is nonzero, used a modular algorithm with Zippel's sparse
+    interpolation to set
+    \code{poly1} to the GCD of \code{poly2} and \code{poly3}, where
+    \code{poly1} is monic.
+
+*******************************************************************************
+
     Input/Output
 
 *******************************************************************************
