@@ -210,7 +210,7 @@ FLINT_DLL void nmod_mpoly_geobucket_neg_inplace(nmod_mpoly_geobucket_t B1,
 FLINT_DLL void nmod_mpoly_geobucket_mul_inplace(nmod_mpoly_geobucket_t B1,
                         nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_geobucket_pow_ui_inplace(nmod_mpoly_geobucket_t B1,
+FLINT_DLL void nmod_mpoly_geobucket_pow_si_inplace(nmod_mpoly_geobucket_t B1,
                                           slong k, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_geobucket_pow_fmpz_inplace(nmod_mpoly_geobucket_t B1,
@@ -234,6 +234,9 @@ FLINT_DLL void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx);
 FLINT_DLL void nmod_mpoly_init(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_init2(nmod_mpoly_t poly, slong alloc, 
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_init3(nmod_mpoly_t poly, slong alloc, mp_bitcnt_t bits,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void _nmod_mpoly_realloc(ulong ** poly, ulong ** exps,
@@ -264,7 +267,7 @@ void nmod_mpoly_truncate(nmod_mpoly_t poly, slong newlen,
     if (poly->length > newlen)
     {
         poly->length = newlen;
-    }  
+    }
 }
 
 /*
@@ -463,7 +466,7 @@ slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
 
 /* Powering ******************************************************************/
 
-FLINT_DLL void nmod_mpoly_pow_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+FLINT_DLL void nmod_mpoly_pow_si(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                           slong k, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,

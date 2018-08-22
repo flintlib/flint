@@ -28,7 +28,7 @@ void nmod_mpoly_pow_fmpz(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 
     if (fmpz_fits_si(pow))
     {
-        nmod_mpoly_pow_ui(poly1, poly2, fmpz_get_ui(pow), ctx);
+        nmod_mpoly_pow_si(poly1, poly2, fmpz_get_si(pow), ctx);
         return;
     }
 
