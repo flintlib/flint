@@ -43,6 +43,17 @@
 #endif
 
 
+/* FIXME: these do not belong here */
+
+FLINT_DLL ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp, ulong n, ulong ninv);
+
+NMOD_MPOLY_INLINE
+mp_limb_t nmod_pow_fmpz(mp_limb_t a, const fmpz_t exp, nmod_t mod)
+{
+    return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
+}
+
+
 
 /* all of the data we need to do arithmetic mod n */
 
