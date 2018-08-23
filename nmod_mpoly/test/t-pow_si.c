@@ -48,7 +48,7 @@ main(void)
     flint_printf("pow_si....");
     fflush(stdout);
 
-    for (i = 0; i < 50* flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
