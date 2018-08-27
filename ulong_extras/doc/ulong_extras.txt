@@ -509,6 +509,15 @@ ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv)
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
+ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp, ulong n, ulong ninv)
+
+    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
+    by \code{n_preinvert_limb()}. We require $0 \leq a < n$, but there are no 
+    restrictions on $n$. The exponent \code{exp} must not be negative.
+
+    This is implemented as a standard binary powering algorithm using
+    repeated squaring and reducing modulo $n$ at each step.
+
 ulong n_sqrtmod(ulong a, ulong p)
 
     If $p$ is prime, compute a square root of $a$ modulo $p$ if $a$ is a

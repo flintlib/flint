@@ -65,7 +65,7 @@ _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * ex
         first = (coeff[i] == 1);
         if (!first)
         {
-            r = flint_fprintf(file, "%wd", coeff[i]);
+            r = flint_fprintf(file, "%wu", coeff[i]);
             if (r <= 0) goto done;
         }
 
