@@ -231,6 +231,12 @@ ulong n_powmod(ulong a, slong exp, ulong n)
    return n_powmod_precomp(a, exp, n, npre);
 }
 
+/*
+This function is in fmpz.h
+
+FLINT_DLL ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp,
+                                                          ulong n, ulong ninv);
+*/
 FLINT_DLL ulong n_powmod2_preinv(ulong a, slong exp, ulong n, ulong ninv);
 
 FLINT_DLL ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv);

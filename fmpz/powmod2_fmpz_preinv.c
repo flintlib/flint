@@ -15,7 +15,7 @@
 #include "fmpz.h"
 
 ulong
-n_powmod2_fmpz_preinv(ulong a, fmpz_t exp, ulong n, ulong ninv)
+n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp, ulong n, ulong ninv)
 {
     mp_bitcnt_t i, bits;
     ulong x, norm;
@@ -48,13 +48,13 @@ n_powmod2_fmpz_preinv(ulong a, fmpz_t exp, ulong n, ulong ninv)
 
     x = a;
 
+    i++;
     while (i < bits)
     {
         a = n_mulmod_preinv(a, a, n, ninv, norm);
-
-        if (fmpz_tstbit(exp, i) == 0)
+        if (fmpz_tstbit(exp, i) != 0) {
             x = n_mulmod_preinv(x, a, n, ninv, norm);
-
+        }
         i++;
     }
 
