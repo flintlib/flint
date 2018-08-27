@@ -198,14 +198,14 @@ void nmod_mpoly_geobucket_mul_inplace(nmod_mpoly_geobucket_t B1,
     nmod_mpoly_clear(b, ctx);
 }
 
-void nmod_mpoly_geobucket_pow_ui(nmod_mpoly_geobucket_t B1,
+void nmod_mpoly_geobucket_pow_si(nmod_mpoly_geobucket_t B1,
                                            slong k, const nmod_mpoly_ctx_t ctx)
 {
     nmod_mpoly_t a;
     nmod_mpoly_init(a, ctx);
 
     nmod_mpoly_geobucket_empty(a, B1, ctx);
-    nmod_mpoly_pow_ui(a, a, k, ctx);
+    nmod_mpoly_pow_si(a, a, k, ctx);
     nmod_mpoly_geobucket_set(B1, a, ctx);
 
     nmod_mpoly_clear(a, ctx);
