@@ -457,6 +457,8 @@ FLINT_DLL int nmod_mpoly_mul_dense(nmod_mpoly_t P,
                         const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int nmod_mpoly_mul_array(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                         const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx);
 
 slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
                  const mp_limb_t * coeff2, const ulong * exp2, slong len2,
