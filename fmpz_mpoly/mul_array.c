@@ -463,30 +463,6 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
     LEX
 ****************************************************/
 
-
-void mpoly_main_variable_split_LEX(slong * ind, ulong * pexp, const ulong * Aexp,
-             slong l1, slong Alen, const ulong * mults, slong num, slong Abits)
-{
-    slong i, j = 0, s = 0;
-    ulong e, mask = (-UWORD(1)) >> (FLINT_BITS - Abits);
-
-    for (i = 0; i < Alen; i++)
-    {
-        slong top = Aexp[i] >> (Abits*num);
-        while (s < l1 - top)
-            ind[s++] = i;
-        e = 0;
-        for (j = num - 1; j >= 0; j--) {
-            e = (e * mults[j]) +  ((Aexp[i] >> (j*Abits)) & mask);
-        }
-        pexp[i] = e;
-    }
-
-    while (s <= l1)
-        ind[s++] = Alen;
-}
-
-
 #define LEX_UNPACK_MACRO(fxn_name, coeff_decl, nonzero_test, swapper)          \
 slong fxn_name(fmpz_mpoly_t P, slong Plen, coeff_decl,                         \
            const ulong * mults, slong num, slong array_size, slong top)        \
@@ -838,29 +814,6 @@ cleanup:
 /****************************************************
     DEGLEX and DEGREVLEX
 ****************************************************/
-
-void mpoly_main_variable_split_DEG(slong * ind, ulong * pexp, const ulong * Aexp,
-             slong l1, slong Alen, ulong deg, slong num, slong Abits)
-{
-    slong i, j = 0, s = 0;
-    ulong e, mask = (-UWORD(1)) >> (FLINT_BITS - Abits);
-
-    for (i = 0; i < Alen; i++)
-    {
-        slong top = Aexp[i] >> (Abits*num);
-        while (s < l1 - top)
-            ind[s++] = i;
-        e = 0;
-        for (j = num - 1; j >= 1; j--)
-            e = (e * deg) + ((Aexp[i] >> (j*Abits)) & mask);
-        pexp[i] = e;
-    }
-
-    while (s <= l1)
-        ind[s++] = Alen;
-}
-
-
 
 #define DEGLEX_UNPACK_MACRO(fxn_name, coeff_decl, nonzero_test, swapper)       \
 slong fxn_name(fmpz_mpoly_t P, slong Plen, coeff_decl,                         \
