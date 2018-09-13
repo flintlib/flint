@@ -28,7 +28,6 @@ typedef struct
 
 typedef tpentry_struct tpentry_t[1];
 
-
 typedef struct
 {
     pthread_mutex_t mutex;
@@ -39,3 +38,18 @@ typedef struct
 typedef threadpool_struct threadpool_t[1];
 
 typedef int threadpool_threadhandle;
+
+
+FLINT_DLL void threadpool_init(threadpool_t T, slong l);
+
+FLINT_DLL slong threadpool_size(threadpool_t T);
+
+FLINT_DLL slong threadpool_request(threadpool_t T, threadpool_threadhandle * out, slong requested);
+
+FLINT_DLL void threadpool_wake(threadpool_t T, threadpool_threadhandle i, void (*f)(void*), void * a);
+
+FLINT_DLL void threadpool_wait(threadpool_t T, threadpool_threadhandle i);
+
+FLINT_DLL void threadpool_giveback(threadpool_t T, threadpool_threadhandle i);
+
+FLINT_DLL void threadpool_clear(threadpool_t T);

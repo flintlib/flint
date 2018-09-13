@@ -10,6 +10,7 @@
 */
 
 #include "threadpool.h"
+#include "fmpz.h"
 
 threadpool_t global_thread_pool;
 
@@ -163,7 +164,7 @@ main(void)
     slong i, j;
     FLINT_TEST_INIT(state);
 
-    flint_printf("thread_pool....");
+    flint_printf("threadpool....");
     fflush(stdout);
 
     for (i = 0; i < 10*flint_test_multiplier(); i++)
@@ -174,7 +175,7 @@ main(void)
         fmpz_init(y);
         threadpool_init(global_thread_pool, n_randint(state, 10));
 
-        for (j = 0; j < 1; j++)
+        for (j = 0; j < 10; j++)
         {
             ulong n = n_randint(state, 1000);
 
