@@ -473,7 +473,9 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(slong * lastdeg,
                              fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctxp)
 {
     slong i;
+#if WANT_ASSERT
     slong N;
+#endif
     int changed = 0;
     fq_nmod_t u, v;
     nmod_poly_t w;
@@ -484,7 +486,9 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(slong * lastdeg,
 
     FLINT_ASSERT(H->length == A->length);
     FLINT_ASSERT(H->bits == A->bits);
+#if WANT_ASSERT
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
+#endif
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(mpoly_monomial_equal(H->exps + N*i, A->exps + N*i, N));
