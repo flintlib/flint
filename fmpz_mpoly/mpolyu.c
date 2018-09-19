@@ -451,13 +451,17 @@ int fmpz_mpoly_CRT_nmod_mpoly(mp_bitcnt_t * coeffbits,
                          fmpz_t m, nmod_mpoly_t A, const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
+#if WANT_ASSERT
     slong N;
+#endif
     int changed = 0;
 
     fmpz_t t;
     FLINT_ASSERT(H->length == A->length);
     FLINT_ASSERT(H->bits == A->bits);
+#if WANT_ASSERT
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
+#endif
     fmpz_init(t);
     for (i = 0; i < A->length; i++)
     {
