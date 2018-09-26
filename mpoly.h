@@ -175,15 +175,17 @@ void mpoly_ordering_print(ordering_t ord)
 }
 
 /* Misc **********************************************************************/
-
-FLINT_DLL void mpoly_gen_offset_shift(slong * _offset, slong * _shift,
-                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx);
-
-FLINT_DLL void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift,
-                       slong var, slong N, slong bits, const mpoly_ctx_t mctx);
-
-FLINT_DLL void mpoly_gen_oneexp_offset_mp(ulong * oneexp, slong * offset,
-                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gen_offset_shift(
+                                slong * _offset, slong * _shift, slong var,
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gen_oneexp_offset_shift(ulong * oneexp,
+                                slong * offset, slong * shift, slong var, 
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL slong mpoly_gen_offset_mp(slong var,
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gen_oneexp_offset_mp(ulong * oneexp,
+                                        slong * offset, slong var,
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 /*  Monomials ****************************************************************/
 
@@ -426,6 +428,9 @@ void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c
     mpn_mul_1(exp2, exp3, N, c);
 }
 
+FLINT_DLL void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,
+                                                            slong N, fmpz_t c);
+
 MPOLY_INLINE
 int mpoly_monomial_is_zero(const ulong * exp, slong N)
 {
@@ -630,6 +635,10 @@ FLINT_DLL void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
 FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL slong mpoly_totaldegree_si(const ulong * exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_totaldegree_fmpz(fmpz_t totdeg, const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_search_monomials(
