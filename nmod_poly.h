@@ -258,7 +258,7 @@ NMOD_POLY_INLINE
 void nmod_poly_one(nmod_poly_t res)
 {
     nmod_poly_fit_length(res, 1);
-    res->length = 1;
+    res->length = (res->mod.n != UWORD(1));
     res->coeffs[0] = 1;
 }
 
