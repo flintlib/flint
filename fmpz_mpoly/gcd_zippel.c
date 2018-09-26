@@ -177,7 +177,7 @@ choose_prime_outer:
 
     if (Gp->length == 1 && Gp->exps[0] == 0)
     {
-        FLINT_ASSERT(nmod_mpoly_is_nmod(Gp->coeffs + 0, ctxp));
+        FLINT_ASSERT(nmod_mpoly_is_ui(Gp->coeffs + 0, ctxp));
         FLINT_ASSERT(!nmod_mpoly_is_zero(Gp->coeffs + 0, ctxp));
         fmpz_mpolyu_one(G, ctx);
         

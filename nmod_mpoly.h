@@ -347,11 +347,18 @@ FLINT_DLL void nmod_mpoly_set_nmod(nmod_mpoly_t poly,
 FLINT_DLL int nmod_mpoly_equal_ui(const nmod_mpoly_t poly,
                                           ulong c, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpoly_equal_si(const nmod_mpoly_t poly,
-                                          slong c, const nmod_mpoly_ctx_t ctx);
+NMOD_MPOLY_INLINE
+slong nmod_mpoly_totaldegree_si(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+{
+    return mpoly_totaldegree_si(A->exps, A->length, A->bits, ctx->minfo);
+}
 
-FLINT_DLL int nmod_mpoly_equal_nmod(const nmod_mpoly_t poly,
-                                   const nmod_t c, const nmod_mpoly_ctx_t ctx);
+NMOD_MPOLY_INLINE
+void nmod_mpoly_totaldegree_fmpz(fmpz_t td,
+                                    nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+{
+    mpoly_totaldegree_fmpz(td, A->exps, A->length, A->bits, ctx->minfo);
+}
 
 NMOD_MPOLY_INLINE
 void nmod_mpoly_swap(nmod_mpoly_t poly1, 
@@ -386,7 +393,10 @@ int nmod_mpoly_is_one(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
    return nmod_mpoly_equal_ui(poly, 1, ctx);
 }
 
-FLINT_DLL int nmod_mpoly_is_nmod(const nmod_mpoly_t poly,
+FLINT_DLL int nmod_mpoly_is_ui(const nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL ulong nmod_mpoly_get_ui(const nmod_mpoly_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpoly_is_gen(const nmod_mpoly_t poly,
@@ -515,17 +525,19 @@ FLINT_DLL void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
                                                    const nmod_mpoly_ctx_t ctx);
 
 /* Evaluation ****************************************************************/
-/*
-not implemented yet
-void nmod_mpoly_evaluate_all_tree_nmod(nmod_t ev, nmod_mpoly_t poly,
-                                           ulong ** val, nmod_mpoly_ctx_t ctx);
 
-void nmod_mpoly_evaluate_one_nmod(nmod_mpoly_t poly1, nmod_mpoly_t poly2,
-                                  slong var, nmod_t val, nmod_mpoly_ctx_t ctx);
+FLINT_DLL ulong nmod_mpoly_evaluate_all_ui(nmod_mpoly_t A,
+                                           ulong * vals, nmod_mpoly_ctx_t ctx);
 
-void nmod_mpoly_compose(nmod_mpoly_t res, nmod_mpoly_t poly1,
-    nmod_mpoly_struct ** polys2, nmod_mpoly_ctx_t ctx1, nmod_mpoly_ctx_t ctx2);
-*/
+FLINT_DLL void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, nmod_mpoly_t B,
+                                   slong var, ulong val, nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_compose_nmod_poly(nmod_poly_t A, nmod_mpoly_t B,
+                                 nmod_poly_struct ** C, nmod_mpoly_ctx_t ctxB);
+
+FLINT_DLL void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A, nmod_mpoly_t B,
+        nmod_mpoly_struct ** C, nmod_mpoly_ctx_t ctxB, nmod_mpoly_ctx_t ctxAC);
+
 /* Univariates ***************************************************************/
 
 FLINT_DLL void nmod_mpoly_univar_init(nmod_mpoly_univar_t poly,
