@@ -212,3 +212,143 @@ Case5:
     return rax;
 }
 
+/*
+    get the node with key "rcx"
+    if such a node doesn't exist, one is created and "new" is set to 1
+*/
+mpoly_rbnode_struct * mpoly_rbtree_get_fmpz(int * new,
+                                         struct mpoly_rbtree * tree, fmpz_t rcx)
+{
+    int cmp;
+    mpoly_rbnode_struct * t, * head, * null;
+    mpoly_rbnode_struct * rax, * rdx, * r8, * r9, * r10, * r11;
+    * new = 0;
+    head = tree->head;
+    null = tree->null;
+    r10 = head->left;
+    if (tree->size == 0)
+    {
+        rax = flint_malloc(sizeof(struct mpoly_rbnode));
+        rax->up = head;
+        rax->left = null;
+        rax->right = null;
+        rax->data = NULL;
+        rax->col = 0;
+        fmpz_init_set(&rax->key, rcx);
+        tree->size++;
+        * new = 1;
+        head->left = rax;
+        return rax;
+    }
+Compare:
+    r8 = r10->left;
+    r9 = r10->right;
+    cmp = fmpz_cmp(rcx, &r10->key);
+    if (cmp < 0)
+        goto GoLeft;
+    if (cmp > 0)
+        goto GoRight;
+    rax = r10;
+    return rax;
+GoLeft:
+    if (r8 == null)
+        goto MakeNewLeft;
+    r10 = r8;
+    goto Compare;
+GoRight:
+    if (r9 == null)
+        goto MakeNewRight;
+    r10 = r9;
+    goto Compare;
+MakeNewLeft:
+    rdx = flint_malloc(sizeof(mpoly_rbnode_struct));
+    r10->left = rdx;
+    goto FixTree;
+MakeNewRight:
+    rdx = flint_malloc(sizeof(mpoly_rbnode_struct));
+    r10->right = rdx;
+FixTree:
+    rdx->up = r10;
+    rdx->left = null;
+    rdx->right = null;
+    rdx->data = NULL;
+    rdx->col = 1;
+    fmpz_init_set(&rdx->key, rcx);
+    tree->size++;
+    * new = 1;
+    rax = rdx;
+FixNode:
+/*Case1:*/
+    r8 = rdx->up;
+    if (r8 == head)
+    {
+        rdx->col = 0;
+        return rax;
+    }
+/*Case2:*/
+    if (r8->col == 0)
+        return rax;
+/*Case3:*/
+    r9 = r8->up;
+    r10 = r9->left;
+    r11 = r9-> right;
+    if (r8 == r10)
+        r10 = r11;
+    if (r10 == null || r10->col == 0)
+        goto Case4;
+    rdx = r9;
+    r8->col = 0;
+    r9->col = 1;
+    r10->col = 0;
+    goto FixNode;
+Case4:
+    r10 = r9->up;
+/*Case4A:*/
+    if (rdx != r8->right || r8 != r9->left)
+        goto Case4B;
+    r11 = rdx->left;
+    r9->left = rdx;
+    rdx->left = r8;
+    r8->right = r11;
+    r8->up = rdx;
+    rdx->up = r9;
+    r11->up = r8;
+    goto Case4Done;
+Case4B:
+    if (rdx != r8->left || r8 != r9->right)
+        goto Case5;
+    r11 = rdx->right;
+    r9->right = rdx;
+    rdx->right = r8;
+    r8->left = r11;
+    r8->up = rdx;
+    rdx->up = r9;
+    r11->up = r8;
+Case4Done:
+    t = rdx;
+    rdx = r8;
+    r8 = t;
+Case5:
+    if (r10->right == r9)
+        r10->right = r8;
+    if (r10->left == r9)
+        r10->left = r8;
+    r8->up = r10;
+    r8->col = 0;
+    r9->up = r8;
+    r9->col = 1;
+    r11 = r8->right;
+    r10 = r8->left;
+    if (rdx == r10)
+    {
+        r8->right = r9;
+        r9->left = r11;
+        r11->up = r9;
+    } else
+    {
+        r8->left = r9;
+        r9->right = r10;
+        r10->up = r9;
+    }
+    return rax;
+}
