@@ -12,7 +12,7 @@
 #include "mpoly.h"
 
 void mpoly_gen_offset_shift(slong * offset, slong * shift,
-                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx)
+                  slong idx, slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong fpw = FLINT_BITS/bits;
@@ -27,7 +27,7 @@ void mpoly_gen_offset_shift(slong * offset, slong * shift,
 
 
 void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift,
-                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx)
+                  slong idx, slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong fpw = FLINT_BITS/bits;
@@ -49,8 +49,20 @@ void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift
         oneexp[nvars/fpw] |= UWORD(1) << (nvars%fpw*bits);
 }
 
+slong mpoly_gen_offset_mp(slong idx, slong N, mp_bitcnt_t bits,
+                                                        const mpoly_ctx_t mctx)
+{
+    slong nvars = mctx->nvars;
+    slong wpf = bits/FLINT_BITS;
+    FLINT_ASSERT(bits > FLINT_BITS);
+    FLINT_ASSERT(bits % FLINT_BITS == WORD(0));
+    if (!mctx->rev)
+        idx = nvars - 1 - idx;
+    return idx*wpf;
+}
+
 void mpoly_gen_oneexp_offset_mp(ulong * oneexp, slong * offset,
-                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx)
+                  slong idx, slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong wpf = bits/FLINT_BITS;
