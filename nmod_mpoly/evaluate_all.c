@@ -34,8 +34,8 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
     Aexp = A->exps;
     bits = A->bits;
 
-    assert(Alen != 0);
-    assert(bits <= FLINT_BITS);
+    FLINT_ASSERT(Alen != 0);
+    FLINT_ASSERT(bits <= FLINT_BITS);
 
     TMP_START;
 
@@ -128,8 +128,8 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
     Aexp = A->exps;
     bits = A->bits;
 
-    assert(Alen != 0);
-    assert(bits > FLINT_BITS);
+    FLINT_ASSERT(Alen != 0);
+    FLINT_ASSERT(bits > FLINT_BITS);
 
     TMP_START;
 

@@ -95,7 +95,7 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, nmod_mpoly_t B,
     Bexp = B->exps;
     bits = B->bits;
 
-    assert(Blen != 0);
+    FLINT_ASSERT(Blen != 0);
 
     TMP_START;
 
@@ -272,7 +272,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, nmod_mpoly_t B,
     Bexp = B->exps;
     bits = B->bits;
 
-    assert(Blen != 0);
+    FLINT_ASSERT(Blen != 0);
 
     TMP_START;
 
