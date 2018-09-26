@@ -11,16 +11,16 @@
 
 #include "nmod_mpoly.h"
 
-int nmod_mpoly_is_nmod(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+int nmod_mpoly_is_ui(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 {
     slong N;
 
-    if (poly->length > WORD(1))
+    if (A->length > WORD(1))
         return 0;
 
-    if (poly->length == WORD(0))
+    if (A->length == WORD(0))
         return 1;
 
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
-    return mpoly_monomial_is_zero(poly->exps + N*0, N);
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    return mpoly_monomial_is_zero(A->exps + N*0, N);
 }
