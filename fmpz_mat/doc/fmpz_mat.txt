@@ -1339,9 +1339,9 @@ int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta,
 void fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
 
     Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
-    the rows of a $m x n$ matrix \code{A}). The output is an (\code{delta},
+    the rows of a $m \times n$ matrix \code{A}). The output is an (\code{delta},
     \code{eta})-reduced basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as
-    the rows of the same $m x n$ matrix \code{A}).
+    the rows of the same $m \times n$ matrix \code{A}).
 
 *******************************************************************************
 
@@ -1353,9 +1353,9 @@ void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta,
                              const fmpq_t eta)
 
     Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
-    the rows of a $m x n$ matrix \code{A}). The output is an (\code{delta},
+    the rows of a $m \times n$ matrix \code{A}). The output is an (\code{delta},
     \code{eta})-reduced basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as
-    the rows of the same $m x n$ matrix \code{A}). Uses a modified version of
+    the rows of the same $m \times n$ matrix \code{A}). Uses a modified version of
     LLL, which has better complexity in terms of the lattice dimension,
     introduced by Storjohann.
 
