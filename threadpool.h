@@ -20,8 +20,8 @@ typedef struct
     pthread_cond_t sleep2;
     volatile int idx;
     volatile int available;
-    void (*fxn)(void *); /* <- TODO:                                        */
-    void * fxnarg;       /* <-   these should be marked volatile somehow ?? */
+    void (* fxn)(void *);
+    void * fxnarg;
     volatile int working;
     volatile int exit;
 } tpentry_struct;
@@ -44,9 +44,11 @@ FLINT_DLL void threadpool_init(threadpool_t T, slong l);
 
 FLINT_DLL slong threadpool_size(threadpool_t T);
 
-FLINT_DLL slong threadpool_request(threadpool_t T, threadpool_threadhandle * out, slong requested);
+FLINT_DLL slong threadpool_request(threadpool_t T, threadpool_threadhandle * out,
+                                                              slong requested);
 
-FLINT_DLL void threadpool_wake(threadpool_t T, threadpool_threadhandle i, void (*f)(void*), void * a);
+FLINT_DLL void threadpool_wake(threadpool_t T, threadpool_threadhandle i,
+                                                   void (*f)(void*), void * a);
 
 FLINT_DLL void threadpool_wait(threadpool_t T, threadpool_threadhandle i);
 
