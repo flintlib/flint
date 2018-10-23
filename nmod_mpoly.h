@@ -228,6 +228,11 @@ FLINT_DLL void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_t state
 
 FLINT_DLL void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx);
 
+NMOD_MPOLY_INLINE int nmod_mpoly_ctx_modulus_is_prime(nmod_mpoly_ctx_t ctx)
+{
+    return n_is_prime(ctx->ffinfo->mod.n);
+}
+
 /*  Memory management ********************************************************/
 
 FLINT_DLL void nmod_mpoly_init(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx);

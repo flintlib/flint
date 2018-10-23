@@ -9,6 +9,17 @@
 
 #include "nmod_mpoly.h"
 
+int mpoly_totaldegree_fits_si(const ulong * exps,
+                                 slong len, slong bits, const mpoly_ctx_t mctx)
+{
+    int r;
+    fmpz_t td;
+    fmpz_init(td);
+    mpoly_totaldegree_fmpz(td, exps, len, bits, mctx);
+    r = fmpz_fits_si(td);
+    fmpz_clear(td);
+    return r;
+}
 
 slong mpoly_totaldegree_si(const ulong * exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)

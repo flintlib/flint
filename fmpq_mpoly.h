@@ -277,6 +277,30 @@ FLINT_DLL void fmpq_mpoly_degree_fmpz(fmpz_t degs, const fmpq_mpoly_t poly, slon
                                                    const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
+int fmpq_mpoly_totaldegree_fits_si(const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    return mpoly_totaldegree_fits_si(A->zpoly->exps, A->zpoly->length,
+                                             A->zpoly->bits, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+slong fmpq_mpoly_totaldegree_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+{
+    return mpoly_totaldegree_si(A->zpoly->exps, A->zpoly->length,
+                                             A->zpoly->bits, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_totaldegree_fmpz(fmpz_t td, const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    mpoly_totaldegree_fmpz(td, A->zpoly->exps, A->zpoly->length,
+                                             A->zpoly->bits, ctx->zctx->minfo);
+}
+
+
+FMPQ_MPOLY_INLINE
 void fmpq_mpoly_gen(fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_one(poly->content);

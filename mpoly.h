@@ -638,6 +638,8 @@ FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL int  mpoly_totaldegree_fits_si(const ulong * exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL slong mpoly_totaldegree_si(const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_totaldegree_fmpz(fmpz_t totdeg, const ulong * exps,
