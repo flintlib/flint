@@ -84,21 +84,6 @@ void nmod_mpoly_fit_bits(nmod_mpoly_t poly,
 
 *******************************************************************************
 
-void nmod_mpoly_degrees(slong * degs,
-                           const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-
-    Return the degree of \code{poly} with respect to each variable. The array
-    \code{degs} has length equal to the number of variables, and the degree of
-    \code{poly} with respect its $i$-th variable is stored in \code{degs[i]}. If
-    \code{poly} is zero, all degrees are set to \code{-1}.
-
-slong nmod_mpoly_degree(const nmod_mpoly_t poly, slong var, 
-                                                    const nmod_mpoly_ctx_t ctx)
-
-    Return the degree of \code{poly} with respect to the variable of index
-    \code{var}. If \code{poly} is zero, the return is \code{-1}.
-
-
 void nmod_mpoly_gen(nmod_mpoly_t poly, slong i, const nmod_mpoly_ctx_t ctx)
 
     Set the given \code{nmod_mpoly_t} to the $i$-th generator (variable),
@@ -188,6 +173,60 @@ ulong nmod_mpoly_get_term_ui_fmpz(const fmpz_mpoly_t poly,
     many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If no term with that
     monomial exists in the polynomial, zero is returned.
+
+*******************************************************************************
+
+    Degrees
+
+*******************************************************************************
+
+int nmod_mpoly_degrees_fit_si(const nmod_mpoly_t poly,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Return 1 if the degrees of poly with respect to each variable fit into
+    an \code{slong}, otherwise return 0.
+
+void nmod_mpoly_degrees_si(slong * degs,
+                           const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{degs} to the degrees of \code{poly} with respect to each variable.
+    If \code{poly} is zero, all degrees are set to \code{-1}.
+
+slong nmod_mpoly_degree_si(const nmod_mpoly_t poly, slong var,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Return the degree of \code{poly} with respect to the variable of index
+    \code{var}. If \code{poly} is zero, the return is \code{-1}.
+
+void nmod_mpoly_degrees_fmpz(fmpz ** degs,
+                           const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+
+    Set \code{degs} to the degrees of \code{poly} with respect to each variable.
+    If \code{poly} is zero, all degrees are set to \code{-1}.
+
+void nmod_mpoly_degree_fmpz(fmpz_t deg, const nmod_mpoly_t poly, slong var,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Set \code{deg} to the degree of \code{poly} with respect to the variable
+    of index \code{var}. If \code{poly} is zero, set \code{deg} to \code{-1}.
+
+int nmod_mpoly_totaldegree_fits_si(const nmod_mpoly_t A,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Return 1 if the total degree of \code{A} fits into
+    an \code{slong}, otherwise return 0.
+
+slong nmod_mpoly_totaldegree_si(const nmod_mpoly_t A,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Return the total degree of \code{A} assuming it fits into an slong.
+    If \code{A} is zero, the return is \code{-1}.
+
+void nmod_mpoly_totaldegree_fmpz(fmpz_t tdeg, const nmod_mpoly_t A,
+                                                    const nmod_mpoly_ctx_t ctx)
+
+    Set \code{tdeg} to the total degree of \code{A}.
+    If \code{A} is zero, \code{tdeg} is set to \code{-1}.
 
 *******************************************************************************
 

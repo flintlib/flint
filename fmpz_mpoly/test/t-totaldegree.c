@@ -49,10 +49,12 @@ void _check_totaldegree(const fmpz_t totdeg_check, const fmpz_mpoly_t A,
     for (j = 0; j < mctx->nvars; j++)
         fmpz_clear(tmp_exps + j);
 
-    TMP_END;
-
     if (!fmpz_equal(totdeg_check, totdeg))
         flint_throw(FLINT_ERROR, "Total degree is wrong");
+
+    fmpz_clear(totdeg);
+
+    TMP_END;
 }
 
 

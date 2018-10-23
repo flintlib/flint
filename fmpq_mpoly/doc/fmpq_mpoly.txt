@@ -100,7 +100,7 @@ void fmpq_mpoly_degrees_si(slong * degs,
     Set \code{degs} to the degrees of \code{poly} with respect to each variable.
     If \code{poly} is zero, all degrees are set to \code{-1}.
 
-slong fmpq_mpoly_degree_si(const fmpq_mpoly_t poly, slong var, 
+slong fmpq_mpoly_degree_si(const fmpq_mpoly_t poly, slong var,
                                                     const fmpq_mpoly_ctx_t ctx)
 
     Return the degree of \code{poly} with respect to the variable of index
@@ -117,6 +117,24 @@ void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t poly, slong var,
 
     Set \code{deg} to the degree of \code{poly} with respect to the variable
     of index \code{var}. If \code{poly} is zero, set \code{deg} to \code{-1}.
+
+int fmpq_mpoly_totaldegree_fits_si(const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if the total degree of \code{A} fits into
+    an \code{slong}, otherwise return 0.
+
+slong fmpq_mpoly_totaldegree_si(const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Return the total degree of \code{A} assuming it fits into an slong.
+    If \code{A} is zero, the return is \code{-1}.
+
+void fmpq_mpoly_totaldegree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{tdeg} to the total degree of \code{A}.
+    If \code{A} is zero, \code{tdeg} is set to \code{-1}.
 
 *******************************************************************************
 
@@ -222,7 +240,7 @@ void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly,
                            slong i, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
 
     Set the coefficient of index $i$ to $x$, starting
-    with $i = 0$ for the term with most signifance.
+    with $i = 0$ for the term with most significance.
 
 
 int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly,
