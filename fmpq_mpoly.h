@@ -263,18 +263,37 @@ int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t poly,
                                                              ctx->zctx->minfo);
 }
 
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t poly,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    mpoly_degrees_si(degs, poly->zpoly->exps, poly->zpoly->length,
+                                          poly->zpoly->bits, ctx->zctx->minfo);
+}
 
-FLINT_DLL void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t poly,
-                                                   const fmpq_mpoly_ctx_t ctx);
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t poly,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    mpoly_degrees_pfmpz(degs, poly->zpoly->exps, poly->zpoly->length,
+                                          poly->zpoly->bits, ctx->zctx->minfo);
+}
 
-FLINT_DLL slong fmpq_mpoly_degree_si(const fmpq_mpoly_t poly, slong var,
-                                                   const fmpq_mpoly_ctx_t ctx);
+FMPQ_MPOLY_INLINE
+slong fmpq_mpoly_degree_si(const fmpq_mpoly_t poly, slong var,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    return mpoly_degree_si(poly->zpoly->exps, poly->zpoly->length,
+                                     poly->zpoly->bits, var, ctx->zctx->minfo);
+}
 
-FLINT_DLL void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t poly,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_degree_fmpz(fmpz_t degs, const fmpq_mpoly_t poly, slong var,
-                                                   const fmpq_mpoly_ctx_t ctx);
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t poly, slong var,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    mpoly_degree_fmpz(deg, poly->zpoly->exps, poly->zpoly->length,
+                                     poly->zpoly->bits, var, ctx->zctx->minfo);
+}
 
 FMPQ_MPOLY_INLINE
 int fmpq_mpoly_totaldegree_fits_si(const fmpq_mpoly_t A,
