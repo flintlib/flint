@@ -10,7 +10,6 @@
 */
 
 #include "fmpz.h"
-#include "fmpq.h"
 
 void fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e)
 {
@@ -36,29 +35,4 @@ void fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e)
         return;
     }
     fmpz_set_si(a, r);
-}
-
-void fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e)
-{
-    slong r = WORD(1);
-    FLINT_ASSERT(fmpz_sgn(e) >= 0);
-    if (fmpq_is_zero(b))
-    {
-        if (!fmpz_is_zero(e))
-            r = 0;
-    }
-    else if (fmpz_is_one(fmpq_denref(b)) && fmpz_is_pm1(fmpq_numref(b)))
-    {
-        if (!fmpz_is_one(fmpq_numref(b)) && !fmpz_is_even(e))
-            r = -WORD(1);
-    }
-    else
-    {
-        if (fmpz_fits_si(e))
-            fmpq_pow_si(a, b, fmpz_get_si(e));
-        else
-            flint_throw(FLINT_ERROR, "Exponent too large in fmpq_mpoly_evaluate_one_fmpq");
-        return;
-    }
-    fmpq_set_si(a, r, WORD(1));
 }

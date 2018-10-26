@@ -307,7 +307,7 @@ void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
 
     if (fmpq_mpoly_is_zero(B, ctxB))
     {
-        fmpq_poly_zero(A);
+        fmpq_mpoly_zero(A, ctxAC);
         return;
     }
 

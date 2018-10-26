@@ -37,9 +37,6 @@
 #endif
 
 
-void fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e);
-void fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e);
-
 #define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
 
 typedef enum {

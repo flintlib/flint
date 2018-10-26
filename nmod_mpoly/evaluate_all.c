@@ -13,7 +13,7 @@
 
 
 ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
-                                            ulong * vals, nmod_mpoly_ctx_t ctx)
+                                const ulong * vals, const nmod_mpoly_ctx_t ctx)
 {
     ulong l;
     slong i, j, k, N, nvars = ctx->minfo->nvars;
@@ -107,7 +107,7 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
 
 
 ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
-                                            ulong * vals, nmod_mpoly_ctx_t ctx)
+                                const ulong * vals, const nmod_mpoly_ctx_t ctx)
 {
     ulong l;
     slong i, j, k, N, nvars = ctx->minfo->nvars;
