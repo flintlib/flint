@@ -12,8 +12,8 @@
 #include "nmod_mpoly.h"
 
 /* exponents of B are not multiprecision */
-void _nmod_mpoly_evaluate_one_ui_sp(nmod_mpoly_t A, nmod_mpoly_t B,
-                                   slong var, ulong val, nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_evaluate_one_ui_sp(nmod_mpoly_t A, const nmod_mpoly_t B,
+                              slong var, ulong val, const nmod_mpoly_ctx_t ctx)
 {
     int new;
     ulong acc0, acc1, acc2, pp0, pp1;
@@ -91,7 +91,8 @@ void _nmod_mpoly_evaluate_one_ui_sp(nmod_mpoly_t A, nmod_mpoly_t B,
         if (new)
         {
             node->data = (void *) i;
-        } else
+        }
+        else
         {
             inds[(slong) node->data2] = i;
         }
@@ -134,7 +135,7 @@ looper:
 
     x->next = NULL;
     mpoly_monomial_sub(exp_array + N*i, Bexp + N*x->j, main_exps + N*i, N);
-    _mpoly_heap_insert(heap, exp_array + i*N, x,
+    _mpoly_heap_insert(heap, exp_array + N*i, x,
                                       &next_loc, &heap_len, N, cmpmask);
 
     i++;    
@@ -186,7 +187,7 @@ done:
                 x->i = i;
                 x->j = inds[j];
                 x->next = NULL;
-                mpoly_monomial_sub(exp_array + N*i, Bexp + x->j*N,
+                mpoly_monomial_sub(exp_array + N*i, Bexp + N*x->j,
                                                        main_exps + N*i, N);
                 _mpoly_heap_insert(heap, exp_array + i*N, x,
                                       &next_loc, &heap_len, N, cmpmask);
@@ -204,8 +205,8 @@ done:
 
 
 /* exponents of B are multiprecision */
-void _nmod_mpoly_evaluate_one_ui_mp(nmod_mpoly_t A, nmod_mpoly_t B,
-                                    slong var, ulong val, nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_evaluate_one_ui_mp(nmod_mpoly_t A, const nmod_mpoly_t B,
+                             slong var, ulong val, const nmod_mpoly_ctx_t ctx)
 {
     int new;
     ulong acc0, acc1, acc2, pp0, pp1;
@@ -318,7 +319,7 @@ looper:
     root = stack[--stack_size];
 
     mpoly_monomial_mul_fmpz(main_exps + N*i, main_one, N, &root->key);
-    powers[i] = nmod_pow_fmpz(val, &root->key, ctx->ffinfo->mod);
+    powers[i] = nmod_pow_fmpz(val, (fmpz*)(&root->key), ctx->ffinfo->mod);
 
     x = chain + i;
     x->i = i;
@@ -331,7 +332,7 @@ looper:
 
     i++;    
     node = root->right;
-    fmpz_clear(&root->key);
+    fmpz_clear((fmpz*)(&root->key));
     flint_free(root);
     root = node;
 
@@ -395,8 +396,8 @@ done:
 }
 
 
-void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, nmod_mpoly_t B,
-                                   slong var, ulong val, nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
+                              slong var, ulong val, const nmod_mpoly_ctx_t ctx)
 {
     if (B->length == 0)
     {

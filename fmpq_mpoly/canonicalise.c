@@ -17,8 +17,14 @@ void fmpq_mpoly_canonicalise(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
     slong i;
     fmpz_t c;
 
-    if (poly->zpoly->length == 0) {
+    if (poly->zpoly->length == 0)
+    {
         fmpq_zero(poly->content);
+        return;
+    }
+    else if (fmpq_is_zero(poly->content))
+    {
+        fmpz_mpoly_zero(poly->zpoly, ctx->zctx);
         return;
     }
 

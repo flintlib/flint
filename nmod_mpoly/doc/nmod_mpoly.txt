@@ -414,27 +414,29 @@ void nmod_mpoly_derivative(nmod_mpoly_t poly1,
 *******************************************************************************
 
 ulong nmod_mpoly_evaluate_all_ui(nmod_mpoly_t A,
-                                            ulong * vals, nmod_mpoly_ctx_t ctx)
+                               const ulong * vals, const nmod_mpoly_ctx_t ctx)
 
     Return the evaluation of \code{A} where the variables are
     replaced by the corresponding elements of the array \code{vals}.
 
-void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, nmod_mpoly_t B,
-                                    slong var, ulong val, nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
+                             slong var, ulong val, const nmod_mpoly_ctx_t ctx)
 
     Set \code{A} to the evaluation of \code{B} where the variable of
     index \code{var} is replaced by \code{val}.
 
-void nmod_mpoly_compose_nmod_poly(nmod_poly_t A, nmod_mpoly_t B,
-                                  nmod_poly_struct ** C, nmod_mpoly_ctx_t ctxB)
+void nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
+                        const nmod_mpoly_t B, nmod_poly_struct * const * C,
+                                                   const nmod_mpoly_ctx_t ctx)
 
     Set \code{A} to the evaluation of \code{B} where the variables are
     replaced by the corresponding elements of the array \code{C}. Both
     \code{A} and the elements of \code{C} should have modulus matching that of
     \code{ctxB}, which is the context object of \code{B}.
 
-void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A, nmod_mpoly_t B,
-         nmod_mpoly_struct ** C, nmod_mpoly_ctx_t ctxB, nmod_mpoly_ctx_t ctxAC)
+void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
+                    const nmod_mpoly_t B, nmod_mpoly_struct * const * C,
+                    const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC)
 
     Set \code{A} to the evaluation of \code{B} where the variables are
     replaced by the corresponding elements of the array \code{C}. Both
