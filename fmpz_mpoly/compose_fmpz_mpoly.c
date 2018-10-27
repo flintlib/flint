@@ -9,8 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "fmpz_mpoly.h"
 
 /*
@@ -85,13 +83,7 @@ void _fmpz_mpoly_pmul(fmpz_mpoly_t A, const fmpz_mpoly_t X, const fmpz_t pow,
 }
 
 /*
-    evaluate B(xbar) at xbar = C,
-
-res   -> A
-poly1 -> B
-polys2-> C
-ctx1  -> ctxB
-ctx2  -> ctxAC
+    evaluate B(xbar) at xbar = C
 */
 void _fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,

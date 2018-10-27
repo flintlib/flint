@@ -12,14 +12,11 @@
 #include "fmpq_mpoly.h"
 
 
-
 void _fmpz_binpow_fmpz(fmpz_t a, const fmpz * p, const fmpz_t e)
 {
     ulong i;
     mp_bitcnt_t bits = fmpz_bits(e);
-/*
-printf("computing "); fmpz_print(p); printf("^"); fmpz_print(e); printf("\n");
-*/
+
     fmpz_one(a);
     for (i = 0; i < bits; i++)
     {
@@ -28,9 +25,6 @@ printf("computing "); fmpz_print(p); printf("^"); fmpz_print(e); printf("\n");
             fmpz_mul(a, a, p + 2*i);
         }
     }
-/*
-printf("result "); fmpz_print(a); printf("\n");
-*/
 }
 
 /*
@@ -66,12 +60,8 @@ b1           bn
 
 */
 
-void _fmpq_mpoly_rescale(
-    fmpq_t Acontent,
-    fmpz * Acoeff,
-    const fmpq_mpoly_t B,
-    const fmpq * scales,
-    const fmpq_mpoly_ctx_t ctx)
+void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
+                               const fmpq * scales, const fmpq_mpoly_ctx_t ctx)
 {
     slong i, j, v;
     slong nvars, N;
@@ -129,14 +119,6 @@ void _fmpq_mpoly_rescale(
         }
     }
 
-/*
-for (v = 0; v < nvars; v++)
-{
-flint_printf("emin[%wd]: ",v); fmpz_print(emin + v); printf("\n");
-flint_printf("emax[%wd]: ",v); fmpz_print(emax + v); printf("\n");
-}
-*/
-
     powertable = (fmpz **) TMP_ALLOC(nvars*sizeof(fmpz *));
     for (v = 0; v < nvars; v++)
     {
@@ -150,20 +132,12 @@ flint_printf("emax[%wd]: ",v); fmpz_print(emax + v); printf("\n");
         j = 0;
         fmpz_init_set(row + 2*j + 0, fmpq_numref(scales + v));
         fmpz_init_set(row + 2*j + 1, fmpq_denref(scales + v));
-/*
-flint_printf("powtable[%wd] + %wd: ",v,2*j + 0); fmpz_print(row + 2*j + 0); printf("\n");
-flint_printf("powtable[%wd] + %wd: ",v,2*j + 1); fmpz_print(row + 2*j + 1); printf("\n");
-*/
         for (j = 1; j < bits; j++)
         {
             fmpz_init(row + 2*j + 0);
             fmpz_init(row + 2*j + 1);
             fmpz_mul(row + 2*j + 0, row + 2*j - 2, row + 2*j - 2);
             fmpz_mul(row + 2*j + 1, row + 2*j - 1, row + 2*j - 1);
-/*
-flint_printf("powtable[%wd] + %wd: ",v,2*j + 0); fmpz_print(row + 2*j + 0); printf("\n");
-flint_printf("powtable[%wd] + %wd: ",v,2*j + 1); fmpz_print(row + 2*j + 1); printf("\n");
-*/
         }
     }
 
@@ -182,35 +156,17 @@ flint_printf("powtable[%wd] + %wd: ",v,2*j + 1); fmpz_print(row + 2*j + 1); prin
     {
         _fmpz_binpow_fmpz(fmpq_numref(q), powertable[v] + 0, emin + v);
         _fmpz_binpow_fmpz(fmpq_denref(q), powertable[v] + 1, emax + v);
-/*
-flint_printf("q[%wd]: ",v); fmpq_print(q); printf("\n");
-*/
         fmpq_mul(Acontent, Acontent, q);
     }
-/*
-printf("Acontent: "); fmpq_print(Acontent); printf("\n");
-*/
     for (i = 0; i < Blen; i++)
     {
-/*
-flint_printf("\ni: %wd\n",i);
-*/
         fmpz_set(Acoeff + i, Bcoeff + i);
-/*
-flint_printf("1 Acoeff[%wd]: ",i); fmpz_print(Acoeff + i); printf("\n");
-*/
         for (v = 0; v < nvars; v++)
         {
-/*
-flint_printf("v: %wd\n",v);
-*/
             /* power numerator of vth scale */
             fmpz_sub(t, Buexp + nvars*i + v, emin + v);
             FLINT_ASSERT(fmpz_sgn(t) >= 0);
             fmpz_sub(s, t, lastexp + 2*v + 0);
-/*
-flint_printf("lastpow + 2*v + 0: "); fmpz_print(lastpow + 2*v + 0); printf("\n");
-*/
             if (fmpz_sgn(s) >= 0)
             {
                 _fmpz_binpow_fmpz(u, powertable[v] + 0, s);
@@ -220,18 +176,9 @@ flint_printf("lastpow + 2*v + 0: "); fmpz_print(lastpow + 2*v + 0); printf("\n")
             {
                 _fmpz_binpow_fmpz(lastpow + 2*v + 0, powertable[v] + 0, t);
             }
-/*
-flint_printf("lastpow + 2*v + 0: "); fmpz_print(lastpow + 2*v + 0); printf("\n");
-*/
             fmpz_swap(lastexp + 2*v + 0, t);
-/*
-flint_printf("2 Acoeff[%wd]: ",i); fmpz_print(Acoeff + i); printf("\n");
-flint_printf("lastpow + 2*v + 0: "); fmpz_print(lastpow + 2*v + 0); printf("\n");
-*/
             fmpz_mul(Acoeff + i, Acoeff + i, lastpow + 2*v + 0);
-/*
-flint_printf("3 Acoeff[%wd]: ",i); fmpz_print(Acoeff + i); printf("\n");
-*/
+
             /* power denominator of vth scale */
             fmpz_sub(t, emax + v, Buexp + nvars*i + v);
             FLINT_ASSERT(fmpz_sgn(t) >= 0);
@@ -246,17 +193,8 @@ flint_printf("3 Acoeff[%wd]: ",i); fmpz_print(Acoeff + i); printf("\n");
                 _fmpz_binpow_fmpz(lastpow + 2*v + 1, powertable[v] + 1, t);
             }
             fmpz_swap(lastexp + 2*v + 1, t);
-/*
-flint_printf("4 Acoeff[%wd]: ",i); fmpz_print(Acoeff + i); printf("\n");
-*/
             fmpz_mul(Acoeff + i, Acoeff + i, lastpow + 2*v + 1);
-/*
-flint_printf("5 Acoeff[%wd]: ",i); fmpz_print(Acoeff + i); printf("\n");
-*/
         }
-/*
-flint_printf("6 Acoeff[%wd]: ",i); fmpz_print(Acoeff + i); printf("\n");
-*/
     }
 
     /* clean up */
@@ -331,9 +269,7 @@ void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
     *newB = *B->zpoly;
     newB->coeffs = _fmpz_vec_init(B->zpoly->length);
     _fmpq_mpoly_rescale(A->content, newB->coeffs, B, scales, ctxB);
-/*
-printf("newB: "); fmpz_mpoly_print_pretty(newB, NULL, ctxB->zctx); printf("\n");
-*/
+
     fmpz_mpoly_compose_fmpz_mpoly(A->zpoly, newB, Czpoly, ctxB->zctx, ctxAC->zctx);
     fmpq_mpoly_canonicalise(A, ctxAC);
 
