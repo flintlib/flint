@@ -30,7 +30,7 @@ void fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e)
         if (fmpz_fits_si(e))
             fmpq_pow_si(a, b, fmpz_get_si(e));
         else
-            flint_throw(FLINT_ERROR, "Exponent too large in fmpq_mpoly_evaluate_one_fmpq");
+            flint_throw(FLINT_ERROR, "Exponent too large in fmpq_pow_fmpz");
         return;
     }
     fmpq_set_si(a, r, UWORD(1));
