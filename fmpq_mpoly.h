@@ -26,6 +26,7 @@
 #include <gmp.h>
 #define ulong mp_limb_t
 
+#include "fmpq_poly.h"
 #include "fmpz_mpoly.h"
 
 #ifdef __cplusplus
@@ -657,17 +658,24 @@ FLINT_DLL void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 /* Evaluation ****************************************************************/
-/*
-not implemented yet
-void fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, fmpq_mpoly_t poly,
-                                            fmpq ** val, fmpq_mpoly_ctx_t ctx);
 
-void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t poly1, fmpq_mpoly_t poly2,
-                                  slong var, fmpq_t val, fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,
+       const fmpq_mpoly_t B, const fmpq * scales,  const fmpq_mpoly_ctx_t ctx);
 
-void fmpq_mpoly_compose(fmpq_mpoly_t res, fmpq_mpoly_t poly1,
-    fmpq_mpoly_struct ** polys2, fmpq_mpoly_ctx_t ctx1, fmpq_mpoly_ctx_t ctx2);
-*/
+FLINT_DLL void fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A,
+                              fmpq * const * vals, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
+                           const fmpq_mpoly_t B, slong var, const fmpq_t val,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
+                         const fmpq_mpoly_t B, fmpq_poly_struct * const * C,
+                                                  const fmpq_mpoly_ctx_t ctxB);
+
+FLINT_DLL void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
+                   const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C,
+                    const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC);
 
 /* GCD ***********************************************************************/
 

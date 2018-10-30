@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -19,14 +19,14 @@ main(void)
     slong i, v;
     FLINT_TEST_INIT(state);
 
-    flint_printf("compose....");
+    flint_printf("compose_fmpz_mpoly....");
     fflush(stdout);
 
-
     /* Check composition with identity */
-    for (i = 0; i < 20*flint_test_multiplier(); i++)
+    for (i = 0; i < 50*flint_test_multiplier(); i++)
     {
-        slong nvars, len1, exp_bound1, coeff_bits;
+        slong nvars, len1;
+        mp_bitcnt_t exp_bits, coeff_bits;
         fmpz_mpoly_struct ** vals1;
         fmpz_mpoly_t f, g;
         fmpz_mpoly_ctx_t ctx;
@@ -46,10 +46,10 @@ main(void)
         fmpz_mpoly_init(g, ctx);
 
         len1 = n_randint(state, 200);
-        exp_bound1 = n_randint(state, 40) + 1;
+        exp_bits = n_randint(state, 100) + 1;
         coeff_bits = n_randint(state, 100) + 1;
-        fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
-        fmpz_mpoly_compose(g, f, vals1, ctx, ctx);
+        fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx);
+        fmpz_mpoly_compose_fmpz_mpoly(g, f, vals1, ctx, ctx);
 
         if (!fmpz_mpoly_equal(f, g, ctx))
         {
@@ -70,7 +70,7 @@ main(void)
     }
 
     /* Check composition and evalall commute */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         ordering_t ord1, ord2;
         fmpz_mpoly_ctx_t ctx1, ctx2;
@@ -125,16 +125,16 @@ main(void)
         {
             vals3[v] = (fmpz *) flint_malloc(sizeof(fmpz)); 
             fmpz_init(vals3[v]);
-            fmpz_mpoly_evaluate_all_tree_fmpz(vals3[v], vals1[v], vals2, ctx2);
+            fmpz_mpoly_evaluate_all_fmpz(vals3[v], vals1[v], vals2, ctx2);
         }
 
         fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx1);
 
-        fmpz_mpoly_compose(g, f, vals1, ctx1, ctx2);
+        fmpz_mpoly_compose_fmpz_mpoly(g, f, vals1, ctx1, ctx2);
         fmpz_mpoly_assert_canonical(g, ctx2);
 
-        fmpz_mpoly_evaluate_all_tree_fmpz(fe, f, vals3, ctx1);
-        fmpz_mpoly_evaluate_all_tree_fmpz(ge, g, vals2, ctx2);
+        fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1);
+        fmpz_mpoly_evaluate_all_fmpz(ge, g, vals2, ctx2);
 
         if (!fmpz_equal(fe, ge))
         {
@@ -169,7 +169,6 @@ main(void)
 
         fmpz_clear(fe);
         fmpz_clear(ge);
-
     }
 
     printf("PASS\n");
