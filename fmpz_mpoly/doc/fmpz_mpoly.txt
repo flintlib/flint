@@ -132,7 +132,7 @@ void fmpz_mpoly_degrees_si(slong * degs,
     Set \code{degs} to the degrees of \code{poly} with respect to each variable.
     If \code{poly} is zero, all degrees are set to \code{-1}.
 
-slong fmpz_mpoly_degree_si(const fmpz_mpoly_t poly, slong var, 
+slong fmpz_mpoly_degree_si(const fmpz_mpoly_t poly, slong var,
                                                     const fmpz_mpoly_ctx_t ctx)
 
     Return the degree of \code{poly} with respect to the variable of index
@@ -149,6 +149,24 @@ void fmpz_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t poly, slong var,
 
     Set \code{deg} to the degree of \code{poly} with respect to the variable
     of index \code{var}. If \code{poly} is zero, set \code{deg} to \code{-1}.
+
+int fmpz_mpoly_totaldegree_fits_si(const fmpz_mpoly_t A,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Return 1 if the total degree of \code{A} fits into
+    an \code{slong}, otherwise return 0.
+
+slong fmpz_mpoly_totaldegree_si(const fmpz_mpoly_t A,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Return the total degree of \code{A} assuming it fits into an slong.
+    If \code{A} is zero, the return is \code{-1}.
+
+void fmpz_mpoly_totaldegree_fmpz(fmpz_t tdeg, const fmpz_mpoly_t A,
+                                                    const fmpz_mpoly_ctx_t ctx)
+
+    Set \code{tdeg} to the total degree of \code{A}.
+    If \code{A} is zero, \code{tdeg} is set to \code{-1}.
 
 *******************************************************************************
 
@@ -895,27 +913,37 @@ void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
 
 *******************************************************************************
 
-void fmpz_mpoly_evaluate_all_tree_fmpz(fmpz_t ev, fmpz_mpoly_t poly,
-                                            fmpz ** vals, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A,
+                              fmpz * const * vals, const fmpz_mpoly_ctx_t ctx)
 
     Set \code{ev} to the evaluation of \code{poly} where the variables are
     replaced by the corresponding elements of the array \code{vals}. This
     function uses a tree method on the variable of largest degree.
 
-void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2,
-                                   slong var, fmpz_t val, fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A,
+                           const fmpz_mpoly_t B, slong var, const fmpz_t val,
+                                                   const fmpz_mpoly_ctx_t ctx)
 
-    Set \code{poly1} to the evaluation of \code{poly2} where the variable of
+    Set \code{A} to the evaluation of \code{B} where the variable of
     index \code{var} is replaced by \code{val}.
 
-void fmpz_mpoly_compose(fmpz_mpoly_t res, fmpz_mpoly_t poly1,
-     fmpz_mpoly_struct ** polys2, fmpz_mpoly_ctx_t ctx1, fmpz_mpoly_ctx_t ctx2)
+void fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A,
+                         const fmpz_mpoly_t B, fmpz_poly_struct * const * C,
+                                                  const fmpz_mpoly_ctx_t ctxB)
 
-    Set \code{res} to the evaluation of \code{poly1} where the variables are
-    replaced by the corresponding elements of the array \code{polys2}. Both
-    \code{res} and the elements of \code{polys2} have context object
-    \code{ctx2}, while \code{poly1} has context object \code{ctx1}. Neither of
-    \code{res} and \code{poly1} is allowed to alias any other polynomial.
+    Set \code{A} to the evaluation of \code{B} where the variables are
+    replaced by the corresponding elements of the array \code{C}.
+    The context object of \code{B} is \code{ctxB}.
+
+void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
+                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
+                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
+
+    Set \code{A} to the evaluation of \code{B} where the variables are
+    replaced by the corresponding elements of the array \code{C}. Both
+    \code{A} and the elements of \code{C} have context object
+    \code{ctxAC}, while \code{B} has context object \code{ctxB}. Neither of
+    \code{A} and \code{B} is allowed to alias any other polynomial.
 
 *******************************************************************************
 

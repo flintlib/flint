@@ -30,7 +30,12 @@ nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e)
     if ((len < 2) | (e < UWORD(3)))
     {
         if (len == 0)
-            nmod_poly_zero(res);
+        {
+            if (e == 0)
+                nmod_poly_one(res);
+            else
+                nmod_poly_zero(res);
+        }
         else if (len == 1)
         {
             nmod_poly_fit_length(res, 1);

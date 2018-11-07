@@ -11,18 +11,16 @@
 
 #include "nmod_mpoly.h"
 
-
-slong nmod_mpoly_degree_si(const nmod_mpoly_t poly, slong var,
-                                                    const nmod_mpoly_ctx_t ctx)
+int nmod_mpoly_is_ui(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 {
-    slong * degs, ret;
-    TMP_INIT;
+    slong N;
 
-    TMP_START;
-    degs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
-    mpoly_degrees_si(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
-    ret = degs[var];
+    if (A->length > WORD(1))
+        return 0;
 
-    TMP_END;
-    return ret;
+    if (A->length == WORD(0))
+        return 1;
+
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    return mpoly_monomial_is_zero(A->exps + N*0, N);
 }

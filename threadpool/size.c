@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,11 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "threadpool.h"
 
 
-void fmpz_mpoly_degrees_fmpz(fmpz ** degs, const fmpz_mpoly_t poly,
-                                                    const fmpz_mpoly_ctx_t ctx)
+slong threadpool_size(threadpool_t T)
 {
-    mpoly_degrees_pfmpz(degs, poly->exps, poly->length, poly->bits, ctx->minfo);
+    slong ret;
+    pthread_mutex_lock(&T->mutex);
+    ret = T->length;
+    pthread_mutex_unlock(&T->mutex);
+    return ret;
 }

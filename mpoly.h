@@ -29,6 +29,7 @@
 
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpq.h"
 #include "ulong_extras.h"
 
 #ifdef __cplusplus
@@ -36,7 +37,7 @@
 #endif
 
 
-#define MPOLY_MIN_BITS 8    /* minimum number of bits to pack into */
+#define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
 
 typedef enum {
    ORD_LEX, ORD_DEGLEX, ORD_DEGREVLEX
@@ -134,6 +135,8 @@ FLINT_DLL void mpoly_rbtree_clear(mpoly_rbtree_t tree, void ** dataout, slong * 
 FLINT_DLL mpoly_rbnode_struct * mpoly_rbtree_get(int * new,
                                          struct mpoly_rbtree *tree, slong rcx);
 
+FLINT_DLL mpoly_rbnode_struct * mpoly_rbtree_get_fmpz(int * new,
+                                        struct mpoly_rbtree *tree, fmpz_t rcx);
 
 /* Orderings *****************************************************************/
 
@@ -175,15 +178,17 @@ void mpoly_ordering_print(ordering_t ord)
 }
 
 /* Misc **********************************************************************/
-
-FLINT_DLL void mpoly_gen_offset_shift(slong * _offset, slong * _shift,
-                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx);
-
-FLINT_DLL void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift,
-                       slong var, slong N, slong bits, const mpoly_ctx_t mctx);
-
-FLINT_DLL void mpoly_gen_oneexp_offset_mp(ulong * oneexp, slong * offset,
-                       slong idx, slong N, slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gen_offset_shift(
+                                slong * _offset, slong * _shift, slong var,
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gen_oneexp_offset_shift(ulong * oneexp,
+                                slong * offset, slong * shift, slong var, 
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL slong mpoly_gen_offset_mp(slong var,
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gen_oneexp_offset_mp(ulong * oneexp,
+                                        slong * offset, slong var,
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 /*  Monomials ****************************************************************/
 
@@ -426,6 +431,9 @@ void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c
     mpn_mul_1(exp2, exp3, N, c);
 }
 
+FLINT_DLL void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,
+                                                            slong N, fmpz_t c);
+
 MPOLY_INLINE
 int mpoly_monomial_is_zero(const ulong * exp, slong N)
 {
@@ -631,6 +639,16 @@ FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL slong mpoly_degree_si(const ulong * poly_exps,
+                     slong len, slong bits, slong var, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_degree_fmpz(fmpz_t deg, const ulong * poly_exps,
+                     slong len, slong bits, slong var, const mpoly_ctx_t mctx);
+FLINT_DLL int  mpoly_totaldegree_fits_si(const ulong * exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL slong mpoly_totaldegree_si(const ulong * exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_totaldegree_fmpz(fmpz_t totdeg, const ulong * exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_search_monomials(
                 slong ** e_ind, ulong * e, slong * e_score,
@@ -638,6 +656,14 @@ FLINT_DLL void mpoly_search_monomials(
                 slong lower, slong upper,
                 const ulong * a, slong a_len, const ulong * b, slong b_len,
                                                slong N, const ulong * cmpmask);
+
+FLINT_DLL void mpoly_main_variable_split_LEX(slong * ind, ulong * pexp,
+                                 const ulong * Aexp, slong l1, slong Alen,
+                                  const ulong * mults, slong num, slong Abits);
+
+FLINT_DLL void mpoly_main_variable_split_DEG(slong * ind, ulong * pexp,
+                                  const ulong * Aexp,  slong l1, slong Alen,
+                                            ulong deg, slong num, slong Abits);
 
 FLINT_DLL int mpoly_termexp_fits_si(ulong * exps, slong bits,
                                               slong n, const mpoly_ctx_t mctx);

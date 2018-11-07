@@ -100,7 +100,7 @@ void fmpq_mpoly_degrees_si(slong * degs,
     Set \code{degs} to the degrees of \code{poly} with respect to each variable.
     If \code{poly} is zero, all degrees are set to \code{-1}.
 
-slong fmpq_mpoly_degree_si(const fmpq_mpoly_t poly, slong var, 
+slong fmpq_mpoly_degree_si(const fmpq_mpoly_t poly, slong var,
                                                     const fmpq_mpoly_ctx_t ctx)
 
     Return the degree of \code{poly} with respect to the variable of index
@@ -117,6 +117,24 @@ void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t poly, slong var,
 
     Set \code{deg} to the degree of \code{poly} with respect to the variable
     of index \code{var}. If \code{poly} is zero, set \code{deg} to \code{-1}.
+
+int fmpq_mpoly_totaldegree_fits_si(const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Return 1 if the total degree of \code{A} fits into
+    an \code{slong}, otherwise return 0.
+
+slong fmpq_mpoly_totaldegree_si(const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Return the total degree of \code{A} assuming it fits into an slong.
+    If \code{A} is zero, the return is \code{-1}.
+
+void fmpq_mpoly_totaldegree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+
+    Set \code{tdeg} to the total degree of \code{A}.
+    If \code{A} is zero, \code{tdeg} is set to \code{-1}.
 
 *******************************************************************************
 
@@ -222,7 +240,7 @@ void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly,
                            slong i, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
 
     Set the coefficient of index $i$ to $x$, starting
-    with $i = 0$ for the term with most signifance.
+    with $i = 0$ for the term with most significance.
 
 
 int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly,
@@ -654,30 +672,40 @@ void fmpq_mpoly_integral(fmpq_mpoly_t poly1,
 
 *******************************************************************************
 
-    Evaluation (not implemented yet)
+    Evaluation
 
 *******************************************************************************
 
-void fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, fmpq_mpoly_t poly,
-                                            fmpq ** vals, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A,
+                              fmpq * const * vals, const fmpq_mpoly_ctx_t ctx)
 
-    Set \code{ev} to the evaluation of \code{poly} where the variables are
+    Set \code{ev} the evaluation of \code{A} where the variables are
     replaced by the corresponding elements of the array \code{vals}.
 
-void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t poly1, fmpq_mpoly_t poly2,
-                                   slong var, fmpq_t val, fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
+                           const fmpq_mpoly_t B, slong var, const fmpq_t val,
+                                                   const fmpq_mpoly_ctx_t ctx)
 
-    Set \code{poly1} to the evaluation of \code{poly2} where the variable of
+    Set \code{A} to the evaluation of \code{B} where the variable of
     index \code{var} is replaced by \code{val}.
 
-void fmpq_mpoly_compose(fmpq_mpoly_t res, fmpq_mpoly_t poly1,
-     fmpq_mpoly_struct ** polys2, fmpq_mpoly_ctx_t ctx1, fmpq_mpoly_ctx_t ctx2)
+void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
+                         const fmpq_mpoly_t B, fmpq_poly_struct * const * C,
+                                                  const fmpq_mpoly_ctx_t ctxB)
 
-    Set \code{res} to the evaluation of \code{poly1} where the variables are
-    replaced by the corresponding elements of the array \code{polys2}. Both
-    \code{res} and the elements of \code{polys2} have context object
-    \code{ctx2}, while \code{poly1} has context object \code{ctx1}. Neither of
-    \code{res} and \code{poly1} is allowed to alias any other polynomial.
+    Set \code{A} to the evaluation of \code{B} where the variables are
+    replaced by the corresponding elements of the array \code{C}.
+    The context object of \code{B} is \code{ctxB}.
+
+void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
+                   const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C,
+                    const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC)
+
+    Set \code{A} to the evaluation of \code{B} where the variables are
+    replaced by the corresponding elements of the array \code{C}. Both
+    \code{A} and the elements of \code{C} have context object
+    \code{ctxAC}, while \code{B} has context object \code{ctxB}. Neither of
+    \code{A} and \code{B} is allowed to alias any other polynomial.
 
 *******************************************************************************
 

@@ -45,8 +45,7 @@ main(void)
         for (j = 0; j < e; j++)
             nmod_poly_mul(c, c, a);
 
-        result = (nmod_poly_equal(b, c) 
-            || (a->length == 0 && e == 0 && c->length == 1 && c->coeffs[0] == 1));
+        result = nmod_poly_equal(b, c);
         if (!result)
         {
             flint_printf("FAIL:\n");

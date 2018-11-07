@@ -470,6 +470,8 @@ FLINT_DLL void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp);
 
+FLINT_DLL void fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e);
+
 FLINT_DLL void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
 
 FLINT_DLL void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m);
@@ -788,6 +790,16 @@ FLINT_DLL void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 FLINT_DLL int fmpz_moebius_mu(const fmpz_t n);
 
 FLINT_DLL void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
+
+/* Functions that should be in ulong extras */
+
+FLINT_DLL ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp,
+                                                          ulong n, ulong ninv);
+
+FMPZ_INLINE mp_limb_t nmod_pow_fmpz(mp_limb_t a, const fmpz_t exp, nmod_t mod)
+{
+    return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
+}
 
 #ifdef __cplusplus
 }

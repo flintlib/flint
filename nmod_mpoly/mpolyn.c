@@ -80,7 +80,7 @@ void nmod_mpolyn_print_pretty(const nmod_mpolyn_t A,
         for (i = 0; i < ctx->minfo->nvars; i++)
         {
             x[i] = (char *) TMP_ALLOC(((FLINT_BITS+4)/3)*sizeof(char));
-            flint_sprintf(x[i], "x%wd", i);
+            flint_sprintf(x[i], "x%wd", i+1);
         }
     }
 
@@ -207,43 +207,6 @@ void nmod_mpolyn_set(nmod_mpolyn_t A, const nmod_mpolyn_t B, const nmod_mpoly_ct
     for (i = 0; i < Blen; i++)
     {
         nmod_poly_set(Acoeff + i, Bcoeff + i);
-        mpoly_monomial_set(Aexp + N*i, Bexp + N*i, N);
-    }
-
-    /* demote remaining coefficients */
-    for (i = Blen; i < A->length; i++)
-    {
-        nmod_poly_clear(Acoeff + i);
-        nmod_poly_init(Acoeff + i, ctx->ffinfo->mod.n);
-    }
-    A->length = Blen;
-}
-
-void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-    slong N;
-    nmod_poly_struct * Acoeff;
-    mp_limb_t * Bcoeff;
-    ulong * Aexp, * Bexp;
-    slong Blen;
-
-    nmod_mpolyn_fit_bits(A, B->bits, ctx);
-    A->bits = B->bits;
-
-    Blen = B->length;
-    nmod_mpolyn_fit_length(A, Blen, ctx);
-    Acoeff = A->coeffs;
-    Bcoeff = B->coeffs;
-    Aexp = A->exps;
-    Bexp = B->exps;
-
-    N = mpoly_words_per_exp(B->bits, ctx->minfo);
-
-    for (i = 0; i < Blen; i++)
-    {
-        nmod_poly_zero(Acoeff + i);
-        nmod_poly_set_coeff_ui(Acoeff + i, 0, Bcoeff[i]);
         mpoly_monomial_set(Aexp + N*i, Bexp + N*i, N);
     }
 

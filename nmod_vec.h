@@ -156,6 +156,11 @@ mp_limb_t nmod_pow_ui(mp_limb_t a, ulong exp, nmod_t mod)
 {
     return n_powmod2_ui_preinv(a, exp, mod.n, mod.ninv);
 }
+/*
+This function is in fmpz.h
+
+FMPZ_INLINE mp_limb_t nmod_pow_fmpz(mp_limb_t a, const fmpz_t exp, nmod_t mod)
+*/
 
 NMOD_VEC_INLINE
 void nmod_init(nmod_t * mod, mp_limb_t n)

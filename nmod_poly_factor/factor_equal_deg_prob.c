@@ -79,7 +79,7 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     }
     mpz_clear(exp);
 
-    b->coeffs[0] = n_submod(b->coeffs[0], 1, pol->mod.n);
+    nmod_poly_set_coeff_ui(b, 0, n_submod(b->coeffs[0], 1, pol->mod.n));
 
     nmod_poly_gcd(factor, b, pol);
 
