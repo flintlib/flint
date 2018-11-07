@@ -229,7 +229,7 @@ void flint_randclear(flint_rand_t state)
 }
 
 FLINT_INLINE
-flint_rand_s * flint_rand_alloc()
+flint_rand_s * flint_rand_alloc(void)
 {
     return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
 }
