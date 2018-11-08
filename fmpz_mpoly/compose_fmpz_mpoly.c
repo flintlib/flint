@@ -305,6 +305,7 @@ HornerForm1:
         /* remainder is non zero */
         rp++;
         sp++;
+        fmpz_init((stack + sp)->v_exp);
         (stack + sp)->ret = 2;
         (stack + sp)->f = r;
         goto HornerForm;
