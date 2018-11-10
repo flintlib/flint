@@ -139,8 +139,8 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
         else
         {
             mp_ptr M, Ns, T, U;
-            mp_size_t Msize, Nsize, ri;
-            mp_limb_t cy;
+            mp_size_t Msize, Nsize;
+            mp_limb_t cy, ri;
 
             M = flint_malloc(sizeof(mp_limb_t) * (num_primes + 1));
 
