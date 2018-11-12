@@ -165,7 +165,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
             {
                 Ns[i * Nsize + (Nsize - 1)] = 0;
                 Ns[i * Nsize + (Nsize - 2)] = 0;
-                mpn_divexact_1(Ns + i * Nsize, M, Msize, primes[i]);
+                mpn_divrem_1(Ns + i * Nsize, 0, M, Msize, primes[i]);
                 ri = mpn_mod_1(Ns + i * Nsize, Msize, primes[i]);
                 ri = n_invmod(ri, primes[i]);
                 Ns[i * Nsize + Msize] = mpn_mul_1(Ns + i * Nsize, Ns + i * Nsize, Msize, ri);
