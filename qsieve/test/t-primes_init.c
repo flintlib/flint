@@ -41,15 +41,15 @@ int main(void)
 
    FLINT_TEST_INIT(state);
 
-   fmpz_init(n);
-   fmpz_init(x);
-   fmpz_init(y);
-
    flint_printf("primes_init....");
    fflush(stdout);
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
+       fmpz_init(n);
+       fmpz_init(x);
+       fmpz_init(y);
+
        fmpz_randtest_unsigned(n, state, 130);
 
        if (fmpz_is_zero(n) || fmpz_is_one(n)) continue;

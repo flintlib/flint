@@ -167,7 +167,8 @@ void fmpz_init_set_si(fmpz_t f, slong g)
 FMPZ_INLINE
 void fmpz_clear(fmpz_t f)
 {
-	_fmpz_demote(f);
+    if (COEFF_IS_MPZ(*f))
+        _fmpz_clear_mpz(*f);
 }
 
 FLINT_DLL void fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);

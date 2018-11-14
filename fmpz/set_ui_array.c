@@ -29,14 +29,13 @@ void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len)
     if (size == WORD(1))
     {
         fmpz_set_ui(out, in[0]);
-    } else
+    }
+    else
     {
         __mpz_struct * mpz = _fmpz_promote(out);
-        mpz_realloc2(mpz, FLINT_BITS*size);
+        if (mpz->_mp_alloc < size)
+            mpz_realloc2(mpz, FLINT_BITS * size);
         mpz->_mp_size = size;
-        do {
-            size--;
-            mpz->_mp_d[size] = in[size];
-        } while (size > 0);
+        flint_mpn_copyi(mpz->_mp_d, in, size);
     }
 }

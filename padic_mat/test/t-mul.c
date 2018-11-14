@@ -163,6 +163,9 @@ main(void)
         N = FLINT_MAX(1, N);
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_VAL_UNIT);
 
+        m = n_randint(state, 10);
+        n = m;
+
         padic_mat_init2(a, m, n, N);
         padic_mat_init2(b, m, n, N);
 

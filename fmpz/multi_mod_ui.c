@@ -39,9 +39,9 @@ fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in, const fmpz_comb_t comb,
     slong num_primes = comb->num_primes;
     fmpz ** comb_temp = temp->comb_temp;
 
-    if (num_primes == 1)
+    if (num_primes <= 80)
     {
-        out[0] = fmpz_fdiv_ui(in, comb->primes[0]);
+        fmpz_multi_mod_ui_basecase(out, in, comb->primes, comb->num_primes);
         return;
     }
 
