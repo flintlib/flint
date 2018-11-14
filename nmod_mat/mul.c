@@ -18,20 +18,19 @@
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
-    slong m, k, n;
+    slong m, k, n, cutoff;
 
     m = A->r;
     k = A->c;
     n = B->c;
 
-    if (m < NMOD_MAT_MUL_STRASSEN_CUTOFF ||
-        n < NMOD_MAT_MUL_STRASSEN_CUTOFF ||
-        k < NMOD_MAT_MUL_STRASSEN_CUTOFF)
-    {
-        nmod_mat_mul_classical(C, A, B);
-    }
+    if (FLINT_BITS == 64 && C->mod.n < 2048)
+        cutoff = 400;
     else
-    {
+        cutoff = 200;
+
+    if (m < cutoff || n < cutoff || k < cutoff)
+        nmod_mat_mul_classical(C, A, B);
+    else
         nmod_mat_mul_strassen(C, A, B);
-    }
 }

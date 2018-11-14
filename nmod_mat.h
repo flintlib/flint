@@ -276,9 +276,6 @@ FLINT_DLL void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 /* Size at which pre-transposing becomes faster in classical multiplication */
 #define NMOD_MAT_MUL_TRANSPOSE_CUTOFF 20
 
-/* Strassen multiplication */
-#define NMOD_MAT_MUL_STRASSEN_CUTOFF 256
-
 /* Cutoff between classical and recursive triangular solving */
 #define NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64
 #define NMOD_MAT_SOLVE_TRI_COLS_CUTOFF 64

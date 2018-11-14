@@ -19,15 +19,18 @@ void
 nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B)
 {
-    slong m, k, n;
+    slong m, k, n, cutoff;
 
     m = A->r;
     k = A->c;
     n = B->c;
 
-    if (m < NMOD_MAT_MUL_STRASSEN_CUTOFF ||
-        n < NMOD_MAT_MUL_STRASSEN_CUTOFF ||
-        k < NMOD_MAT_MUL_STRASSEN_CUTOFF)
+    if (FLINT_BITS == 64 && C->mod.n < 2048)
+        cutoff = 400;
+    else
+        cutoff = 200;
+
+    if (m < cutoff || n < cutoff || k < cutoff)
     {
         _nmod_mat_mul_classical(D, C, A, B, 1);
     }
