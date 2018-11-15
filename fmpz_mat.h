@@ -321,9 +321,6 @@ FLINT_DLL void fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat);
 FLINT_DLL void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
 
 FLINT_DLL void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A);
-FLINT_DLL void _fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x);
-FLINT_DLL void _fmpz_mat_det_cofactor_3x3(fmpz_t det, fmpz ** const x);
-FLINT_DLL void _fmpz_mat_det_cofactor_4x4(fmpz_t det, fmpz ** const x);
 
 FLINT_DLL void fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A);
 

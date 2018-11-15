@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2010,2011,2018 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,110 +11,75 @@
 
 #include "fmpz_mat.h"
 
-void
-_fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x)
+#define E(i,j) fmpz_mat_entry(A, i, j)
+
+static void
+_fmpz_mat_det_cofactor_2x2(fmpz_t det, const fmpz_mat_t A)
 {
-    fmpz_t t;
-    fmpz_init(t);
-
-    fmpz_mul   (t, &x[0][0], &x[1][1]);
-    fmpz_submul(t, &x[0][1], &x[1][0]);
-
-    fmpz_set(det, t);
-    fmpz_clear(t);
+    fmpz_fmms(det, E(0,0), E(1,1), E(0,1), E(1,0));
 }
 
-void
-_fmpz_mat_det_cofactor_3x3(fmpz_t det, fmpz ** const x)
+static void
+_fmpz_mat_det_cofactor_3x3(fmpz_t det, const fmpz_mat_t A)
 {
-    fmpz_t a, t;
-
+    fmpz_t a;
     fmpz_init(a);
-    fmpz_init(t);
 
-    fmpz_mul   (a, &x[1][0], &x[2][1]);
-    fmpz_submul(a, &x[1][1], &x[2][0]);
-    fmpz_mul   (t, a, &x[0][2]);
-
-    fmpz_mul   (a, &x[1][2], &x[2][0]);
-    fmpz_submul(a, &x[1][0], &x[2][2]);
-    fmpz_addmul(t, a, &x[0][1]);
-
-    fmpz_mul   (a, &x[1][1], &x[2][2]);
-    fmpz_submul(a, &x[1][2], &x[2][1]);
-    fmpz_addmul(t, a, &x[0][0]);
-
-    fmpz_set(det, t);
+    fmpz_fmms(a, E(1,0), E(2,1), E(1,1), E(2,0));
+    fmpz_mul(det, a, E(0,2));
+    fmpz_fmms(a, E(1,2), E(2,0), E(1,0), E(2,2));
+    fmpz_addmul(det, a, E(0,1));
+    fmpz_fmms(a, E(1,1), E(2,2), E(1,2), E(2,1));
+    fmpz_addmul(det, a, E(0,0));
 
     fmpz_clear(a);
-    fmpz_clear(t);
 }
 
-void
-_fmpz_mat_det_cofactor_4x4(fmpz_t det, fmpz ** const x)
+static void
+_fmpz_mat_det_cofactor_4x4(fmpz_t det, const fmpz_mat_t A)
 {
-    fmpz_t a, b, t;
-
+    fmpz_t a, b;
     fmpz_init(a);
     fmpz_init(b);
-    fmpz_init(t);
 
-    fmpz_mul   (a, &x[0][3], &x[1][2]);
-    fmpz_submul(a, &x[0][2], &x[1][3]);
-    fmpz_mul   (b, &x[2][1], &x[3][0]);
-    fmpz_submul(b, &x[2][0], &x[3][1]);
-    fmpz_mul(t, a, b);
+    fmpz_fmms(a, E(0,3), E(1,2), E(0,2), E(1,3));
+    fmpz_fmms(b, E(2,1), E(3,0), E(2,0), E(3,1));
+    fmpz_mul(det, a, b);
 
-    fmpz_mul   (a, &x[0][1], &x[1][3]);
-    fmpz_submul(a, &x[0][3], &x[1][1]);
-    fmpz_mul   (b, &x[2][2], &x[3][0]);
-    fmpz_submul(b, &x[2][0], &x[3][2]);
-    fmpz_addmul(t, a, b);
+    fmpz_fmms(a, E(0,1), E(1,3), E(0,3), E(1,1));
+    fmpz_fmms(b, E(2,2), E(3,0), E(2,0), E(3,2));
+    fmpz_addmul(det, a, b);
 
-    fmpz_mul   (a, &x[0][2], &x[1][1]);
-    fmpz_submul(a, &x[0][1], &x[1][2]);
-    fmpz_mul   (b, &x[2][3], &x[3][0]);
-    fmpz_submul(b, &x[2][0], &x[3][3]);
-    fmpz_addmul(t, a, b);
+    fmpz_fmms(a, E(0,2), E(1,1), E(0,1), E(1,2));
+    fmpz_fmms(b, E(2,3), E(3,0), E(2,0), E(3,3));
+    fmpz_addmul(det, a, b);
 
-    fmpz_mul   (a, &x[0][3], &x[1][0]);
-    fmpz_submul(a, &x[0][0], &x[1][3]);
-    fmpz_mul   (b, &x[2][2], &x[3][1]);
-    fmpz_submul(b, &x[2][1], &x[3][2]);
-    fmpz_addmul(t, a, b);
+    fmpz_fmms(a, E(0,3), E(1,0), E(0,0), E(1,3));
+    fmpz_fmms(b, E(2,2), E(3,1), E(2,1), E(3,2));
+    fmpz_addmul(det, a, b);
 
-    fmpz_mul   (a, &x[0][0], &x[1][2]);
-    fmpz_submul(a, &x[0][2], &x[1][0]);
-    fmpz_mul   (b, &x[2][3], &x[3][1]);
-    fmpz_submul(b, &x[2][1], &x[3][3]);
-    fmpz_addmul(t, a, b);
+    fmpz_fmms(a, E(0,0), E(1,2), E(0,2), E(1,0));
+    fmpz_fmms(b, E(2,3), E(3,1), E(2,1), E(3,3));
+    fmpz_addmul(det, a, b);
 
-    fmpz_mul   (a, &x[0][1], &x[1][0]);
-    fmpz_submul(a, &x[0][0], &x[1][1]);
-    fmpz_mul   (b, &x[2][3], &x[3][2]);
-    fmpz_submul(b, &x[2][2], &x[3][3]);
-    fmpz_addmul(t, a, b);
-
-    fmpz_set(det, t);
+    fmpz_fmms(a, E(0,1), E(1,0), E(0,0), E(1,1));
+    fmpz_fmms(b, E(2,3), E(3,2), E(2,2), E(3,3));
+    fmpz_addmul(det, a, b);
 
     fmpz_clear(a);
     fmpz_clear(b);
-    fmpz_clear(t);
 }
-
 
 void
 fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
 {
-    slong dim = A->r;
-
-    switch (dim)
+    switch (fmpz_mat_nrows(A))
     {
-        case 0:  fmpz_one(det);                            break;
-        case 1:  fmpz_set(det, A->rows[0]);                break;
-        case 2:  _fmpz_mat_det_cofactor_2x2(det, A->rows); break;
-        case 3:  _fmpz_mat_det_cofactor_3x3(det, A->rows); break;
-        case 4:  _fmpz_mat_det_cofactor_4x4(det, A->rows); break;
+        case 0:  fmpz_one(det);                          break;
+        case 1:  fmpz_set(det, fmpz_mat_entry(A, 0, 0)); break;
+        case 2:  _fmpz_mat_det_cofactor_2x2(det, A);     break;
+        case 3:  _fmpz_mat_det_cofactor_3x3(det, A);     break;
+        case 4:  _fmpz_mat_det_cofactor_4x4(det, A);     break;
         default:
             flint_printf("Exception (fmpz_mat_det_cofactor). dim > 4 not implemented.");
             flint_abort();

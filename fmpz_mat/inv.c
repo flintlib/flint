@@ -11,21 +11,24 @@
 
 #include "fmpz_mat.h"
 
-void
-_fmpz_mat_inv_2x2(fmpz ** b, fmpz_t den, fmpz ** const a)
+static void
+_fmpz_mat_inv_2x2(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 {
-    fmpz_t tmp;
+    fmpz_fmms(den, fmpz_mat_entry(A, 0, 0), fmpz_mat_entry(A, 1, 1),
+                   fmpz_mat_entry(A, 0, 1), fmpz_mat_entry(A, 1, 0));
 
-    _fmpz_mat_det_cofactor_2x2(den, a);
+    fmpz_neg(fmpz_mat_entry(B, 0, 1), fmpz_mat_entry(A, 0, 1));
+    fmpz_neg(fmpz_mat_entry(B, 1, 0), fmpz_mat_entry(A, 1, 0));
 
-    fmpz_neg(&b[0][1], &a[0][1]);
-    fmpz_neg(&b[1][0], &a[1][0]);
-
-    fmpz_init(tmp);
-    fmpz_set(tmp, &a[0][0]);
-    fmpz_set(&b[0][0], &a[1][1]);
-    fmpz_set(&b[1][1], tmp);
-    fmpz_clear(tmp);
+    if (A == B)
+    {
+        fmpz_swap(fmpz_mat_entry(B, 0, 0), fmpz_mat_entry(B, 1, 1));
+    }
+    else
+    {
+        fmpz_set(fmpz_mat_entry(B, 0, 0), fmpz_mat_entry(A, 1, 1));
+        fmpz_set(fmpz_mat_entry(B, 1, 1), fmpz_mat_entry(A, 0, 0));
+    }
 }
 
 int
@@ -46,7 +49,7 @@ fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
     }
     else if (dim == 2)
     {
-        _fmpz_mat_inv_2x2(B->rows, den, A->rows);
+        _fmpz_mat_inv_2x2(B, den, A);
         return !fmpz_is_zero(den);
     }
     else
