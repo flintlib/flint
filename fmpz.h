@@ -468,6 +468,10 @@ FLINT_DLL void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+FLINT_DLL void fmpz_fmma(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d);
+
+FLINT_DLL void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d);
+
 FLINT_DLL void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp);
 
 FLINT_DLL void fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e);
