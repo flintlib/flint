@@ -356,8 +356,6 @@ void fmpz_mpoly_convert_from_fmpz_mpolyd(
     TMP_END;
 }
 
-
-
 int fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
                                  const fmpz_mpolyd_t B, const fmpz_t Bm,
                                  const nmod_mpolyd_t C, const nmodf_ctx_t fctx)
@@ -369,9 +367,10 @@ int fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
     slong * inds;
     slong nvars = B->nvars;
     slong degb_prod;
-    ulong hi;
+    ulong hi, c;
     slong diff;
     fmpz_t zero;
+    fmpz_t Bmn;
     slong * temp_deg_bounds;
     TMP_INIT;
 
@@ -392,6 +391,11 @@ int fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
     }
 
     fmpz_init_set_ui(zero, 0);
+    fmpz_init(Bmn);
+
+    fmpz_mul_ui(Bmn, Bm, fctx->mod.n);
+    c = fmpz_fdiv_ui(Bm, fctx->mod.n);
+    c = n_invmod(c, fctx->mod.n);
 
     if (diff == 0) {
         /* both polynomials are packed into the same bounds */
@@ -403,7 +407,7 @@ int fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
 
         for (i = 0; i < degb_prod; i++)
         {
-            fmpz_CRT_ui(A->coeffs + i, B->coeffs + i, Bm, C->coeffs[i], fctx->mod.n, 1);
+            _fmpz_CRT_ui_precomp(A->coeffs + i, B->coeffs + i, Bm, C->coeffs[i], fctx->mod.n, fctx->mod.ninv, Bmn, c, 1);
         }
 
     } else {
@@ -435,11 +439,11 @@ int fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
         for (i = 0; i < degb_prod; i++)
         {
                    if (Bok && Cok) {
-                fmpz_CRT_ui(T->coeffs + i, B->coeffs + Bind++, Bm, C->coeffs[Cind++], fctx->mod.n, 1);
+                _fmpz_CRT_ui_precomp(T->coeffs + i, B->coeffs + Bind++, Bm, C->coeffs[Cind++], fctx->mod.n, fctx->mod.ninv, Bmn, c, 1);
             } else if (Bok && !Cok) {
-                fmpz_CRT_ui(T->coeffs + i, B->coeffs + Bind++, Bm, 0                , fctx->mod.n, 1);
+                _fmpz_CRT_ui_precomp(T->coeffs + i, B->coeffs + Bind++, Bm, 0                , fctx->mod.n, fctx->mod.ninv, Bmn, c, 1);
             } else if (!Bok && Cok) {
-                fmpz_CRT_ui(T->coeffs + i, zero              , Bm, C->coeffs[Cind++], fctx->mod.n, 1);
+                _fmpz_CRT_ui_precomp(T->coeffs + i, zero              , Bm, C->coeffs[Cind++], fctx->mod.n, fctx->mod.ninv, Bmn, c, 1);
             } else {
                 fmpz_zero(T->coeffs + i);
             }
@@ -473,6 +477,7 @@ int fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
     }
 
     fmpz_clear(zero);
+    fmpz_clear(Bmn);
 
     TMP_END;
     return 1;
