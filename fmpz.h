@@ -670,10 +670,6 @@ FLINT_DLL void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1
     ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c,
         int sign);
 
-FLINT_DLL void _fmpz_CRT_ui_signed_precomp(fmpz_t out, const fmpz_t r1,
-        const fmpz_t m1, ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2,
-        const fmpz_t halfm1m2, mp_limb_t c);
-
 FLINT_DLL void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, int sign);
 

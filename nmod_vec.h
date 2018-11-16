@@ -264,7 +264,7 @@ FLINT_DLL int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
         switch (nlimbs)                                                     \
         {                                                                   \
             case 1:                                                         \
-                for (i = 0; i < len; i++)                                   \
+                for (i = 0; i < (len); i++)                                 \
                 {                                                           \
                     s0 += (expr1) * (expr2);                                \
                 }                                                           \
@@ -273,13 +273,13 @@ FLINT_DLL int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
             case 2:                                                         \
                 if (mod.n <= (UWORD(1) << (FLINT_BITS / 2)))                \
                 {                                                           \
-                    for (i = 0; i < len; i++)                               \
+                    for (i = 0; i < (len); i++)                             \
                     {                                                       \
                         t0 = (expr1) * (expr2);                             \
                         add_ssaaaa(s1, s0, s1, s0, 0, t0);                  \
                     }                                                       \
                 }                                                           \
-                else if (len < 8)                                           \
+                else if ((len) < 8)                                         \
                 {                                                           \
                     for (i = 0; i < len; i++)                               \
                     {                                                       \
@@ -291,11 +291,11 @@ FLINT_DLL int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
                 {                                                           \
                     mp_limb_t v0, v1, u0, u1;                               \
                     i = 0;                                                  \
-                    if (len & 1)                                            \
+                    if ((len) & 1)                                          \
                         umul_ppmm(v1, v0, (expr1), (expr2));                \
                     else                                                    \
                         v0 = v1 = 0;                                        \
-                    for (i = (len & 1); i < len; i++)                       \
+                    for (i = (len) & 1; i < (len); i++)                     \
                     {                                                       \
                         umul_ppmm(t1, t0, (expr1), (expr2));                \
                         add_ssaaaa(s1, s0, s1, s0, t1, t0);                 \
@@ -308,7 +308,7 @@ FLINT_DLL int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
                 NMOD2_RED2(s0, s1, s0, mod);                                \
                 break;                                                      \
             default:                                                        \
-                for (i = 0; i < len; i++)                                   \
+                for (i = 0; i < (len); i++)                                 \
                 {                                                           \
                     umul_ppmm(t1, t0, (expr1), (expr2));                    \
                     add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);       \
