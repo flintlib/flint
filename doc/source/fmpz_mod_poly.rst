@@ -1,0 +1,1943 @@
+.. _fmpz-mod-poly:
+
+**fmpz_mod_poly.h** -- polynomials over integers mod n
+===============================================================================
+
+Description.
+
+Types, macros and constants
+-------------------------------------------------------------------------------
+
+.. type:: fmpz_mod_poly_struct
+
+.. type:: fmpz_mod_poly_t
+
+    Description.
+
+
+Memory management
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_t p)
+
+    Initialises ``poly`` for use over `\mathbf{Z} / p \mathbf{Z}`,
+    setting its length to zero.
+
+    A corresponding call to ``fmpz_mod_poly_clear()`` must be made after
+    finishing with the ``fmpz_mod_poly_t`` to free the memory used by
+    the polynomial.  The user is also responsible to clearing the
+    integer~`p`.
+
+.. function:: void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, const fmpz_t p, slong alloc)
+
+    Initialises ``poly`` with space for at least ``alloc`` coefficients
+    and sets the length to zero.  The allocated coefficients are all set to
+    zero.
+
+.. function:: void fmpz_mod_poly_clear(fmpz_mod_poly_t poly)
+
+    Clears the given polynomial, releasing any memory used.  It must
+    be reinitialised in order to be used again.
+
+.. function:: void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc)
+
+    Reallocates the given polynomial to have space for ``alloc``
+    coefficients.  If ``alloc`` is zero the polynomial is cleared
+    and then reinitialised.  If the current length is greater than
+    ``alloc`` the polynomial is first truncated to length ``alloc``.
+
+.. function:: void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len)
+
+    If ``len`` is greater than the number of coefficients currently
+    allocated, then the polynomial is reallocated to have space for at
+    least ``len`` coefficients.  No data is lost when calling this
+    function.
+
+    The function efficiently deals with the case where it is called
+    many times in small increments by at least doubling the number of
+    allocated coefficients when length is larger than the number of
+    coefficients currently allocated.
+
+.. function:: void _fmpz_mod_poly_normalise(fmpz_mod_poly_t poly)
+
+    Sets the length of ``poly`` so that the top coefficient is non-zero.
+    If all coefficients are zero, the length is set to zero.  This function
+    is mainly used internally, as all functions guarantee normalisation.
+
+.. function:: void _fmpz_mod_poly_set_length(fmpz_mod_poly_t poly, slong len)
+
+    Demotes the coefficients of ``poly`` beyond ``len`` and sets
+    the length of ``poly`` to ``len``.
+
+.. function:: void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len)
+
+    If the current length of ``poly`` is greater than ``len``, it
+    is truncated to have the given length.  Discarded coefficients are
+    not necessarily set to zero.
+
+.. function:: void fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n)
+
+    Notionally truncate ``poly`` to length `n` and set ``res`` to the
+    result. The result is normalised.
+
+
+Randomisation
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len)
+
+    Sets the polynomial~`f` to a random polynomial of length up~``len``.
+
+.. function:: void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f, flint_rand_t state, slong len)
+
+    Sets the polynomial~`f` to a random irreducible polynomial of length
+    up~``len``, assuming ``len`` is positive.
+
+.. function:: void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, flint_rand_t state, slong len)
+
+    Sets the polynomial~`f` to a random polynomial of length up~``len``,
+    assuming ``len`` is positive.
+
+.. function:: void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic polynomial with length ``len``.
+
+.. function:: void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic irreducible polynomial with length ``len``.
+
+.. function:: void fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic irreducible primitive polynomial with
+    length ``len``.
+
+
+.. function:: void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic trinomial of length ``len``.
+
+.. function:: int fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t poly, flint_rand_t state, slong len, slong max_attempts)
+
+    Attempts to set ``poly`` to a monic irreducible trinomial of
+    length ``len``.  It will generate up to ``max_attempts``
+    trinomials in attempt to find an irreducible one.  If
+    ``max_attempts`` is ``0``, then it will keep generating
+    trinomials until an irreducible one is found.  Returns `1` if one
+    is found and `0` otherwise.
+
+.. function:: void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic pentomial of length ``len``.
+
+.. function:: int fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t poly, flint_rand_t state, slong len, slong max_attempts)
+
+    Attempts to set ``poly`` to a monic irreducible pentomial of
+    length ``len``.  It will generate up to ``max_attempts``
+    pentomials in attempt to find an irreducible one.  If
+    ``max_attempts`` is ``0``, then it will keep generating
+    pentomials until an irreducible one is found.  Returns `1` if one
+    is found and `0` otherwise.
+
+.. function:: void fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
+
+    Attempts to set ``poly`` to a sparse, monic irreducible polynomial
+    with length ``len``.  It attempts to find an irreducible
+    trinomial.  If that does not succeed, it attempts to find a
+    irreducible pentomial.  If that fails, then ``poly`` is just
+    set to a random monic irreducible polynomial.
+
+
+
+Attributes
+--------------------------------------------------------------------------------
+
+
+.. function:: fmpz * fmpz_mod_poly_modulus(const fmpz_mod_poly_t poly)
+
+    Returns the modulus of this polynomial.  This function is
+    implemented as a macro.
+
+.. function:: slong fmpz_mod_poly_degree(const fmpz_mod_poly_t poly)
+
+    Returns the degree of the polynomial.  The degree of the zero
+    polynomial is defined to be `-1`.
+
+.. function:: slong fmpz_mod_poly_length(const fmpz_mod_poly_t poly)
+
+    Returns the length of the polynomial, which is one more than
+    its degree.
+
+.. function:: fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
+
+    Returns a pointer to the first leading coefficient of ``poly``
+    if this is non-zero, otherwise returns ``NULL``.
+
+
+Assignment and basic manipulation
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_poly_set(fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+
+    Sets the polynomial ``poly1`` to the value of ``poly2``.
+
+.. function:: void fmpz_mod_poly_swap(fmpz_mod_poly_t poly1, fmpz_mod_poly_t poly2)
+
+    Swaps the two polynomials.  This is done efficiently by swapping
+    pointers rather than individual coefficients.
+
+.. function:: void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
+
+    Sets ``poly`` to the zero polynomial.
+
+.. function:: void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j)
+
+    Sets the coefficients of `X^k` for `k \in [i, j)` in the polynomial
+    to zero.
+
+.. function:: void fmpz_mod_poly_reverse(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n)
+
+    This function considers the polynomial ``poly`` to be of length `n`,
+    notionally truncating and zero padding if required, and reverses
+    the result.  Since the function normalises its result ``res`` may be
+    of length less than `n`.
+
+
+Conversion
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_poly_set_ui(fmpz_mod_poly_t f, ulong c)
+
+    Sets the polynomial `f` to the constant `c` reduced modulo `p`.
+
+.. function:: void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t f, const fmpz_t c)
+
+    Sets the polynomial `f` to the constant `c` reduced modulo `p`.
+
+.. function:: void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g)
+
+    Sets `f` to `g` reduced modulo `p`, where `p` is the modulus that
+    is part of the data structure of `f`.
+
+.. function:: void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g)
+
+    Sets `f` to `g`.  This is done simply by lifting the coefficients
+    of `g` taking representatives `[0, p) \subset \mathbf{Z}`.
+
+
+Comparison
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+
+    Returns non-zero if the two polynomials are equal, otherwise returns zero.
+
+.. function:: int fmpz_mod_poly_equal_trunc(const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n)
+
+    Notionally truncates the two polynomials to length `n` and returns non-zero
+    if the two polynomials are equal, otherwise returns zero.
+
+.. function:: int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
+
+    Returns non-zero if the polynomial is zero.
+
+.. function:: int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly)
+
+    Returns non-zero if the polynomial is the constant `1`.
+
+.. function:: int fmpz_mod_poly_is_x(const fmpz_mod_poly_t poly)
+
+    Returns non-zero if the polynomial is the degree `1` polynomial `x`.
+
+
+Getting and setting coefficients
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x)
+
+    Sets the coefficient of `X^n` in the polynomial to `x`,
+    assuming `n \geq 0`.
+
+.. function:: void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x)
+
+    Sets the coefficient of `X^n` in the polynomial to `x`,
+    assuming `n \geq 0`.
+
+.. function:: void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
+
+    Sets `x` to the coefficient of `X^n` in the polynomial,
+    assumng `n \geq 0`.
+
+.. function:: void fmpz_mod_poly_set_coeff_mpz(fmpz_mod_poly_t poly, slong n, const mpz_t x)
+
+    Sets the coefficient of `X^n` in the polynomial to `x`,
+    assuming `n \geq 0`.
+
+.. function:: void fmpz_mod_poly_get_coeff_mpz(mpz_t x, const fmpz_mod_poly_t poly, slong n)
+
+    Sets `x` to the coefficient of `X^n` in the polynomial,
+    assumng `n \geq 0`.
+
+
+Shifting
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_shift_left(fmpz * res, const fmpz * poly, slong len, slong n)
+
+    Sets ``(res, len + n)`` to ``(poly, len)`` shifted left by
+    `n` coefficients.
+
+    Inserts zero coefficients at the lower end.  Assumes that ``len``
+    and `n` are positive, and that ``res`` fits ``len + n`` elements.
+    Supports aliasing between ``res`` and ``poly``.
+
+.. function:: void fmpz_mod_poly_shift_left(fmpz_mod_poly_t f, const fmpz_mod_poly_t g, slong n)
+
+    Sets ``res`` to ``poly`` shifted left by `n` coeffs.  Zero
+    coefficients are inserted.
+
+.. function:: void _fmpz_mod_poly_shift_right(fmpz * res, const fmpz * poly, slong len, slong n)
+
+    Sets ``(res, len - n)`` to ``(poly, len)`` shifted right by
+    `n` coefficients.
+
+    Assumes that ``len`` and `n` are positive, that ``len > n``,
+    and that ``res`` fits ``len - n`` elements.  Supports aliasing
+    between ``res`` and ``poly``, although in this case the top
+    coefficients of ``poly`` are not set to zero.
+
+.. function:: void fmpz_mod_poly_shift_right(fmpz_mod_poly_t f, const fmpz_mod_poly_t g, slong n)
+
+    Sets ``res`` to ``poly`` shifted right by `n` coefficients.  If `n`
+    is equal to or greater than the current length of ``poly``, ``res``
+    is set to the zero polynomial.
+
+
+Addition and subtraction
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
+
+    Sets ``res`` to the sum of ``(poly1, len1)`` and
+    ``(poly2, len2)``.  It is assumed that ``res`` has
+    sufficient space for the longer of the two polynomials.
+
+.. function:: void fmpz_mod_poly_add(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+
+    Sets ``res`` to the sum of ``poly1`` and ``poly2``.
+
+.. function:: void fmpz_mod_poly_add_series(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n)
+
+    Notionally truncate ``poly1`` and ``poly2`` to length `n` and set
+    ``res`` to the sum.
+
+.. function:: void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
+
+    Sets ``res`` to ``(poly1, len1)`` minus ``(poly2, len2)``.  It
+    is assumed that ``res`` has sufficient space for the longer of the
+    two polynomials.
+
+.. function:: void fmpz_mod_poly_sub(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+
+    Sets ``res`` to ``poly1`` minus ``poly2``.
+
+.. function:: void fmpz_mod_poly_sub_series(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n)
+
+    Notionally truncate ``poly1`` and ``poly2`` to length `n` and set
+    ``res`` to the difference.
+
+.. function:: void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
+
+    Sets ``(res, len)`` to the negative of ``(poly, len)``
+    modulo `p`.
+
+.. function:: void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+
+    Sets ``res`` to the negative of ``poly`` modulo `p`.
+
+
+Scalar multiplication
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, slong len, const fmpz_t x, const fmpz_t p)
+
+    Sets ``(res, len``) to ``(poly, len)`` multiplied by `x`,
+    reduced modulo `p`.
+
+.. function:: void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t x)
+
+    Sets ``res`` to ``poly`` multiplied by `x`.
+
+
+Scalar division
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len, const fmpz_t x, const fmpz_t p)
+
+    Sets ``(res, len``) to ``(poly, len)`` divided by `x` (i.e.
+    multiplied by the inverse of `x \pmod{p}`). The result is reduced modulo
+    `p`.
+
+.. function:: void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t x)
+
+    Sets ``res`` to ``poly`` divided by `x`, (i.e. multiplied by the
+    inverse of `x \pmod{p}`). The result is reduced modulo `p`.
+
+
+Multiplication
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
+
+    Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)``
+    and ``(poly2, len2)``.  Assumes ``len1 >= len2 > 0``.  Allows
+    zero-padding of the two input polynomials.
+
+.. function:: void fmpz_mod_poly_mul(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+
+    Sets ``res`` to the product of ``poly1`` and ``poly2``.
+
+.. function:: void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p, slong n)
+
+    Sets ``(res, n)`` to the lowest `n` coefficients of the product of
+    ``(poly1, len1)`` and ``(poly2, len2)``.
+
+    Assumes ``len1 >= len2 > 0`` and ``0 < n <= len1 + len2 - 1``.
+    Allows for zero-padding in the inputs.  Does not support aliasing between
+    the inputs and the output.
+
+.. function:: void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n)
+
+    Sets ``res`` to the lowest `n` coefficients of the product of
+    ``poly1`` and ``poly2``.
+
+.. function:: void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
+
+    Sets ``res`` to the square of ``poly``.
+
+.. function:: void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+
+    Computes ``res`` as the square of ``poly``.
+
+.. function:: void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, const fmpz * f, slong lenf, const fmpz_t p)
+
+    Sets ``res, len1 + len2 - 1`` to the remainder of the product of
+    ``poly1`` and ``poly2`` upon polynomial division by ``f``.
+
+    It is required that ``len1 + len2 - lenf > 0``, which is equivalent
+    to requiring that the result will actually be reduced. Otherwise, simply
+    use ``_fmpz_mod_poly_mul`` instead.
+
+    Aliasing of ``f`` and ``res`` is not permitted.
+
+.. function:: void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f)
+
+    Sets ``res`` to the remainder of the product of ``poly1`` and
+    ``poly2`` upon polynomial division by ``f``.
+
+.. function:: void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, const fmpz * f, slong lenf, const fmpz* finv, slong lenfinv, const fmpz_t p)
+
+    Sets ``res, len1 + len2 - 1`` to the remainder of the product of
+    ``poly1`` and ``poly2`` upon polynomial division by ``f``.
+
+    It is required that ``finv`` is the inverse of the reverse of ``f``
+    mod ``x^lenf``. It is required that ``len1 + len2 - lenf > 0``,
+    which is equivalent to requiring that the result will actually be reduced.
+    It is required that ``len1 < lenf`` and ``len2 < lenf``.
+    Otherwise, simply use ``_fmpz_mod_poly_mul`` instead.
+
+    Aliasing of ``f`` or ``finv`` and ``res`` is not permitted.
+
+.. function:: void fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+
+    Sets ``res`` to the remainder of the product of ``poly1`` and
+    ``poly2`` upon polynomial division by ``f``. ``finv`` is the
+    inverse of the reverse of ``f``. It is required that ``poly1`` and
+    ``poly2`` are reduced modulo ``f``.
+
+
+Products
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n fmpz_t f)
+
+    Sets ``(poly, n + 1)`` to the monic polynomial which is the product
+    of `(x - x_0)(x - x_1) \cdots (x - x_{n-1})`, the roots `x_i` being
+    given by ``xs``. The coefficients reduced modulo ``f``.
+
+    Aliasing of the input and output is not allowed. It is required that
+    ``poly`` is reduced modulo ``f``.
+
+
+.. function:: void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, slong n, fmpz_t f)
+
+    Sets ``poly`` to the monic polynomial which is the product
+    of `(x - x_0)(x - x_1) \cdots (x - x_{n-1})`, the roots `x_i` being
+    given by ``xs``. The coefficients reduced modulo ``f``.
+
+    It is required that ``poly`` is reduced modulo ``f``.
+
+
+Powering
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, slong len, ulong e, const fmpz_t p)
+
+    Sets ``rop = poly^e``, assuming that `e > 1` and ``elen > 0``,
+    and that ``res`` has space for ``e*(len - 1) + 1`` coefficients.
+    Does not support aliasing.
+
+.. function:: void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
+
+    Computes ``rop = poly^e``.  If `e` is zero, returns one,
+    so that in particular ``0^0 = 1``.
+
+.. function:: void _fmpz_mod_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, slong trunc, const fmpz_t p)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    (assumed to be zero padded if necessary to length ``trunc``) to
+    the power ``e``. This is equivalent to doing a powering followed
+    by a truncation. We require that ``res`` has enough space for
+    ``trunc`` coefficients, that ``trunc > 0`` and that
+    ``e > 1``. Aliasing is not permitted.
+
+.. function:: void fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, slong trunc)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    to the power ``e``. This is equivalent to doing a powering
+    followed by a truncation.
+
+.. function:: void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly, ulong e, slong trunc, const fmpz_t p)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    (assumed to be zero padded if necessary to length ``trunc``) to
+    the power ``e``. This is equivalent to doing a powering followed
+    by a truncation. We require that ``res`` has enough space for
+    ``trunc`` coefficients, that ``trunc > 0`` and that
+    ``e > 1``. Aliasing is not permitted. Uses the binary
+    exponentiation method.
+
+.. function:: void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, slong trunc)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    to the power ``e``. This is equivalent to doing a powering
+    followed by a truncation. Uses the binary exponentiation method.
+
+.. function:: void _fmpz_mod_poly_powmod_ui_binexp(fmpz * res, const fmpz * poly, ulong e, const fmpz * f, slong lenf, const fmpz_t p)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e > 0``.
+
+    We require ``lenf > 1``. It is assumed that ``poly`` is already
+    reduced modulo ``f`` and zero-padded as necessary to have length
+    exactly ``lenf - 1``. The output ``res`` must have room for
+    ``lenf - 1`` coefficients.
+
+.. function:: void fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, const fmpz_mod_poly_t f)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e >= 0``.
+
+.. function:: void _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly, ulong e, const fmpz * f, slong lenf, const fmpz * finv, slong lenfinv, const fmpz_t p)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e > 0``.
+    We require ``finv`` to be the inverse of the reverse of ``f``.
+
+    We require ``lenf > 1``. It is assumed that ``poly`` is already
+    reduced modulo ``f`` and zero-padded as necessary to have length
+    exactly ``lenf - 1``. The output ``res`` must have room for
+    ``lenf - 1`` coefficients.
+
+.. function:: void fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e >= 0``.
+    We require ``finv`` to be the inverse of the reverse of ``f``.
+
+.. function:: void _fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly, const fmpz_t e, const fmpz * f, slong lenf, const fmpz_t p)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e > 0``.
+
+    We require ``lenf > 1``. It is assumed that ``poly`` is already
+    reduced modulo ``f`` and zero-padded as necessary to have length
+    exactly ``lenf - 1``. The output ``res`` must have room for
+    ``lenf - 1`` coefficients.
+
+.. function:: void fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t e, const fmpz_mod_poly_t f)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e >= 0``.
+
+.. function:: void _fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz * res, const fmpz * poly, const fmpz_t e, const fmpz * f, slong lenf, const fmpz* finv, slong lenfinv, const fmpz_t p)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e > 0``.
+    We require ``finv`` to be the inverse of the reverse of ``f``.
+
+    We require ``lenf > 1``. It is assumed that ``poly`` is already
+    reduced modulo ``f`` and zero-padded as necessary to have length
+    exactly ``lenf - 1``. The output ``res`` must have room for
+    ``lenf - 1`` coefficients.
+
+.. function:: void fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e >= 0``.
+    We require ``finv`` to be the inverse of the reverse of ``f``.
+
+.. function:: void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f, slong lenf, const fmpz* finv, slong lenfinv, const fmpz_t p)
+
+    Sets ``res`` to ``x`` raised to the power ``e`` modulo ``f``,
+    using sliding window exponentiation. We require ``e > 0``.
+    We require ``finv`` to be the inverse of the reverse of ``f``.
+
+    We require ``lenf > 2``. The output ``res`` must have room for
+    ``lenf - 1`` coefficients.
+
+.. function:: void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+
+    Sets ``res`` to ``x`` raised to the power ``e``
+    modulo ``f``, using sliding window exponentiation. We require
+    ``e >= 0``. We require ``finv`` to be the inverse of the reverse of
+    ``f``.
+
+.. function:: void fmpz_mod_poly_frobenius_powers_2exp_precomp( fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
+
+    If ``p = f->p``, compute `x^(p^1)`, `x^(p^2)`, `x^(p^4)`, ...,
+    `x^(p^(2^l)) \pmod{f}` where `2^l` is the greatest power of `2` less than
+    or equal to `m`.
+
+    Allows construction of `x^(p^k)` for `k = 0`, `1`, ..., `x^(p^m) \pmod{f}`
+    using ``fmpz_mod_poly_frobenius_power()``.
+
+    Requires precomputed inverse of `f`, i.e. newton inverse.
+
+.. function:: void fmpz_mod_poly_frobenius_powers_2exp_clear(fmpz_mod_poly_frobenius_powers_2exp_t pow)
+
+    Clear resources used by the ``fmpz_mod_poly_frobenius_powers_2exp_t``
+    struct.
+
+.. function:: void fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res, fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f, ulong m)
+
+    If ``p = f->p``, compute `x^(p^m) \pmod{f}`.
+
+    Requires precomputed frobenius powers supplied by
+    ``fmpz_mod_poly_frobenius_powers_2exp_precomp``.
+
+    If `m == 0` and `f` has degree `0` or `1`, this performs a division.
+    However an impossible inverse by the leading coefficient of `f` will have
+    been caught by ``fmpz_mod_poly_frobenius_powers_2exp_precomp``.
+
+.. function:: void fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
+
+    If ``p = f->p``, compute `x^(p^0)`, `x^(p^1)`, `x^(p^2)`, `x^(p^3)`,
+    ..., `x^(p^m) \pmod{f}`.
+
+    Requires precomputed inverse of `f`, i.e. newton inverse.
+
+.. function:: void fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow);
+
+    Clear resources used by the ``fmpz_mod_poly_frobenius_powers_t``
+    struct.
+
+
+Division
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
+    `A = B Q + R` with `0 \leq \len(R) < \len(B)`.
+
+    Assumes that the leading coefficient of `B` is invertible
+    modulo `p`, and that ``invB`` is the inverse.
+
+    Assumes that `\len(A), \len(B) > 0`.  Allows zero-padding in
+    ``(A, lenA)``.  `R` and `A` may be aliased, but apart from this no
+    aliasing of input and output operands is allowed.
+
+.. function:: void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes `Q`, `R` such that `A = B Q + R` with
+    `0 \leq \len(R) < \len(B)`.
+
+    Assumes that the leading coefficient of `B` is invertible
+    modulo `p`.
+
+.. function:: void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A, slong lenA, const fmpz* B, slong lenB, const fmpz* Binv, slong lenBinv, const fmpz_t mod)
+
+    Computes `Q` and `R` such that `A = BQ + R` with `\len(R)` less than
+    ``lenB``, where `A` is of length ``lenA`` and `B` is of length
+    ``lenB``. We require that `Q` have space for ``lenA - lenB + 1``
+    coefficients. Furthermore, we assume that `Binv` is the inverse of the
+    reverse of `B` mod `x^{\len(B)}`. The algorithm used is to call
+    ``div_newton_n_preinv()`` and then multiply out and compute
+    the remainder.
+
+.. function:: void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv)
+
+    Computes `Q` and `R` such that `A = BQ + R` with `\len(R) < \len(B)`.
+    We assume `Binv` is the inverse of the reverse of `B` mod `x^{\len(B)}`.
+
+    It is required that the length of `A` is less than or equal to
+    2*the length of `B` - 2.
+
+    The algorithm used is to call ``div_newton_n()`` and then multiply out
+    and compute the remainder.
+
+.. function:: void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Notationally, computes `Q`, `R` such that `A = B Q + R` with
+    `0 \leq \len(R) < \len(B)` but only sets ``(Q, lenA - lenB + 1)``.
+
+    Requires temporary space ``(R, lenA)``.  Allows aliasing
+    only between `A` and `R`.  Allows zero-padding in `A` but
+    not in `B`.  Assumes that the leading coefficient of `B`
+    is a unit modulo `p`.
+
+.. function:: void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Notationally, computes `Q`, `R` such that `A = B Q + R` with
+    `0 \leq \len(R) < \len(B)` assuming that the leading term
+    of `B` is a unit.
+
+.. function:: void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA, const fmpz* B, slong lenB, const fmpz* Binv, slong lenBinv, const fmpz_t mod)
+
+    Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
+    `\len(R)` less than ``lenB``, where ``A`` is of length ``lenA``
+    and ``B`` is of length ``lenB``, but return only `Q`.
+
+    We require that `Q` have space for ``lenA - lenB + 1`` coefficients
+    and assume that the leading coefficient of `B` is a unit. Furthermore, we
+    assume that `Binv` is the inverse of the reverse of `B` mod `x^{\len(B)}`.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
+
+.. function:: void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv)
+
+    Notionally computes `Q` and `R` such that `A = BQ + R` with
+    `\len(R) < \len(B)`, but returns only `Q`.
+
+    We assume that the leading coefficient of `B` is a unit and that `Binv` is
+    the inverse of the reverse of `B` mod `x^{\len(B)}`.
+
+    It is required that the length of `A` is less than or equal to
+    2*the length of `B` - 2.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
+
+.. function:: ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
+
+    Removes the highest possible power of ``g`` from ``f`` and
+    returns the exponent.
+
+.. function:: void _fmpz_mod_poly_rem_basecase(fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Notationally, computes `Q`, `R` such that `A = B Q + R` with
+    `0 \leq \len(R) < \len(B)` but only sets ``(R, lenB - 1)``.
+
+    Allows aliasing only between `A` and `R`.  Allows zero-padding
+    in `A` but not in `B`.  Assumes that the leading coefficient
+    of `B` is a unit modulo `p`.
+
+.. function:: void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Notationally, computes `Q`, `R` such that `A = B Q + R` with
+    `0 \leq \len(R) < \len(B)` assuming that the leading term
+    of `B` is a unit.
+
+.. function:: void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, const fmpz * A, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Computes ``(Q, lenB)``, ``(BQ, 2 lenB - 1)`` such that
+    `BQ = B \times Q` and `A = B Q + R` where `0 \leq \len(R) < \len(B)`.
+
+    Assumes that the leading coefficient of `B` is invertible
+    modulo `p`, and that ``invB`` is the inverse.
+
+    Assumes `\len(B) > 0`.  Allows zero-padding in ``(A, lenA)``.  Requires
+    a temporary array ``(W, 2 lenB - 1)``.  No aliasing of input and output
+    operands is allowed.
+
+    This function does not read the bottom `\len(B) - 1` coefficients from
+    `A`, which means that they might not even need to exist in allocated
+    memory.
+
+.. function:: void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Computes ``(Q, lenA - lenB + 1)``, ``(R, lenB - 1)`` such that
+    `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+
+    Assumes that the leading coefficient of `B` is invertible
+    modulo `p`, and that ``invB`` is the inverse.
+
+    Assumes `\len(A) \geq \len(B) > 0`.  Allows zero-padding in
+    ``(A, lenA)``.  No aliasing of input and output operands is
+    allowed.
+
+.. function:: void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes `Q`, `R` such that `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+
+    Assumes that `B` is non-zero and that the leading coefficient
+    of `B` is invertible modulo `p`.
+
+.. function:: void _fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Computes ``(Q, lenA - lenB + 1)``, ``(R, lenB - 1)`` such that
+    `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+
+    Assumes that `B` is non-zero, that the leading coefficient
+    of `B` is invertible modulo `p` and that ``invB`` is
+    the inverse.
+
+    Assumes `\len(A) \geq \len(B) > 0`.  Allows zero-padding in
+    ``(A, lenA)``.  No aliasing of input and output operands is
+    allowed.
+
+.. function:: void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes `Q`, `R` such that `A = B Q + R` and
+    `0 \leq \len(R) < \len(B)`.
+
+    Assumes that `B` is non-zero and that the leading coefficient
+    of `B` is invertible modulo `p`.
+
+.. function:: void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Either finds a non-trivial factor~`f` of the modulus~`p`, or computes
+    `Q`, `R` such that `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+
+    If the leading coefficient of `B` is invertible in `\mathbf{Z}/(p)`,
+    the division with remainder operation is carried out, `Q` and `R` are
+    computed correctly, and `f` is set to `1`.  Otherwise, `f` is set to
+    a non-trivial factor of `p` and `Q` and `R` are not touched.
+
+    Assumes that `B` is non-zero.
+
+.. function:: void _fmpz_mod_poly_rem(fmpz *R, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Notationally, computes ``(Q, lenA - lenB + 1)``, ``(R, lenB - 1)``
+    such that `A = B Q + R` and `0 \leq \len(R) < \len(B)`, returning
+    only the remainder part.
+
+    Assumes that `B` is non-zero, that the leading coefficient
+    of `B` is invertible modulo `p` and that ``invB`` is
+    the inverse.
+
+    Assumes `\len(A) \geq \len(B) > 0`.  Allows zero-padding in
+    ``(A, lenA)``.  No aliasing of input and output operands is
+    allowed.
+
+.. function:: void _fmpz_mod_poly_rem_f(fmpz_t f, fmpz *R, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    If `f` returns with the value `1` then the function operates as
+    ``_fmpz_mod_poly_rem``, otherwise `f` will be set to a nontrivial
+    factor of `p`.
+
+.. function:: void fmpz_mod_poly_rem(fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Notationally, computes `Q`, `R` such that `A = B Q + R`
+    and `0 \leq \len(R) < \len(B)`, returning only the remainder
+    part.
+
+    Assumes that `B` is non-zero and that the leading coefficient
+    of `B` is invertible modulo `p`.
+
+
+Power series inversion
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, const fmpz_t cinv, const fmpz_t p)
+
+    Sets ``(Qinv, n)`` to the inverse of ``(Q, n)`` modulo `x^n`,
+    where `n \geq 1`, assuming that the bottom coefficient of `Q` is
+    invertible modulo `p` and that its inverse is ``cinv``.
+
+.. function:: void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n)
+
+    Sets ``Qinv`` to the inverse of ``Q`` modulo `x^n`,
+    where `n \geq 1`, assuming that the bottom coefficient of
+    `Q` is a unit.
+
+.. function:: void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n)
+
+    Either sets `f` to a nontrivial factor of `p` with the value of
+    ``Qinv`` undefined, or sets ``Qinv`` to the inverse of ``Q``
+    modulo `x^n`, where `n \geq 1`.
+
+.. function:: void _fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n, const fmpz_t cinv, const fmpz_t p)
+
+    Sets ``(Qinv, n)`` to the inverse of ``(Q, n)`` modulo `x^n`,
+    where `n \geq 1`, assuming that the bottom coefficient of `Q` is
+    invertible modulo `p` and that its inverse is ``cinv``.
+
+.. function:: void fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n)
+
+    Sets ``Qinv`` to the inverse of ``Q`` modulo `x^n`,
+    where `n \geq 1`, assuming that the bottom coefficient of
+    `Q` is a unit.
+
+.. function:: void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n)
+
+    Either sets `f` to a nontrivial factor of `p` with the value of
+    ``Qinv`` undefined, or sets ``Qinv`` to the inverse of ``Q``
+    modulo `x^n`, where `n \geq 1`.
+
+
+Power series division
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, const fmpz_t p, slong n)
+
+    Set ``(Q, n)`` to the quotient of the series ``(A, Alen``) and
+    ``(B, Blen)`` assuming ``Alen, Blen <= n``. We assume the bottom
+    coefficient of ``B`` is invertible modulo `p`.
+
+.. function:: void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, slong n)
+
+    Set `Q` to the quotient of the series `A` by `B`, thinking of the series as
+    though they were of length `n`. We assume that the bottom coefficient of
+    `B` is a unit.
+
+
+Greatest common divisor
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+
+    If ``poly`` is non-zero, sets ``res`` to ``poly`` divided
+    by its leading coefficient.  This assumes that the leading coefficient
+    of ``poly`` is invertible modulo `p`.
+
+    Otherwise, if ``poly`` is zero, sets ``res`` to zero.
+
+.. function:: void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+
+    Either set `f` to `1` and ``res`` to ``poly`` divided by its leading
+    coefficient or set `f` to a nontrivial factor of `p` and leave ``res``
+    undefined.
+
+.. function:: slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Sets `G` to the greatest common divisor of `(A, \len(A))`
+    and `(B, \len(B))` and returns its length.
+
+    Assumes that `\len(A) \geq \len(B) > 0` and that the vector `G` has
+    space for sufficiently many coefficients.
+
+    Assumes that ``invB`` is the inverse of the leading coefficients
+    of `B` modulo the prime number `p`.
+
+.. function:: void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Sets `G` to the greatest common divisor of `A` and `B`.
+
+    The algorithm used to compute `G` is the classical Euclidean
+    algorithm.
+
+    In general, the greatest common divisor is defined in the polynomial
+    ring `(\mathbf{Z}/(p \mathbf{Z}))[X]` if and only if `p` is a prime
+    number.  Thus, this function assumes that `p` is prime.
+
+.. function:: slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Sets `G` to the greatest common divisor of `(A, \len(A))`
+    and `(B, \len(B))` and returns its length.
+
+    Assumes that `\len(A) \geq \len(B) > 0` and that the vector `G` has
+    space for sufficiently many coefficients.
+
+    Assumes that ``invB`` is the inverse of the leading coefficients
+    of `B` modulo the prime number `p`.
+
+.. function:: void fmpz_mod_poly_gcd(fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Sets `G` to the greatest common divisor of `A` and `B`.
+
+    In general, the greatest common divisor is defined in the polynomial
+    ring `(\mathbf{Z}/(p \mathbf{Z}))[X]` if and only if `p` is a prime
+    number.  Thus, this function assumes that `p` is prime.
+
+.. function:: slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
+
+    Either sets `f = 1` and `G` to the greatest common divisor
+    of `(A, \len(A))` and `(B, \len(B))` and returns its length,
+    or sets `f \in (1,p)` to a non-trivial factor of `p` and
+    leaves the contents of the vector `(G, lenB)` undefined.
+
+    Assumes that `\len(A) \geq \len(B) > 0` and that the vector `G` has
+    space for sufficiently many coefficients.
+
+    Does not support aliasing of any of the input arguments
+    with any of the output argument.
+
+.. function:: void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Either sets `f = 1` and `G` to the greatest common divisor
+    of `A` and `B`, or ` \in (1,p)` to a non-trivial factor of `p`.
+
+    In general, the greatest common divisor is defined in the polynomial
+    ring `(\mathbf{Z}/(p \mathbf{Z}))[X]` if and only if `p` is a prime
+    number.
+
+.. function:: slong _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
+
+    Either sets `f = 1` and `G` to the greatest common divisor
+    of `(A, \len(A))` and `(B, \len(B))` and returns its length,
+    or sets `f \in (1,p)` to a non-trivial factor of `p` and
+    leaves the contents of the vector `(G, lenB)` undefined.
+
+    Assumes that `\len(A) \geq \len(B) > 0` and that the vector `G` has
+    space for sufficiently many coefficients.
+
+    Does not support aliasing of any of the input arguments
+    with any of the output arguments.
+
+.. function:: void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Either sets `f = 1` and `G` to the greatest common divisor
+    of `A` and `B`, or `f \in (1,p)` to a non-trivial factor of `p`.
+
+    In general, the greatest common divisor is defined in the polynomial
+    ring `(\mathbf{Z}/(p \mathbf{Z}))[X]` if and only if `p` is a prime
+    number.
+
+.. function:: slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM, fmpz *A, slong *lenA, fmpz *B, slong *lenB, const fmpz *a, slong lena, const fmpz *b, slong lenb, const fmpz_t mod)
+
+    Computes the HGCD of `a` and `b`, that is, a matrix~`M`, a sign~`\sigma`
+    and two polynomials `A` and `B` such that
+
+    .. math ::
+
+
+        (A,B)^t = \sigma M^{-1} (a,b)^t.
+
+
+
+    Assumes that `\len(a) > \len(b) > 0`.
+
+    Assumes that `A` and `B` have space of size at least `\len(a)`
+    and `\len(b)`, respectively.  On exit, ``*lenA`` and ``*lenB``
+    will contain the correct lengths of `A` and `B`.
+
+    Assumes that ``M[0]``, ``M[1]``, ``M[2]``, and ``M[3]``
+    each point to a vector of size at least `\len(a)`.
+
+.. function:: slong _fmpz_mod_poly_gcd_hgcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t mod)
+
+    Computes the monic GCD of `A` and `B`, assuming that
+    `\len(A) \geq \len(B) > 0`.
+
+    Assumes that `G` has space for `\len(B)` coefficients and
+    returns the length of `G` on output.
+
+.. function:: void fmpz_mod_poly_gcd_hgcd(fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes the monic GCD of `A` and `B` using the HGCD algorithm.
+
+    As a special case, the GCD of two zero polynomials is defined to be
+    the zero polynomial.
+
+    The time complexity of the algorithm is `\mathcal{O}(n \log^2 n)`
+    ring operations. For further details, see~\citep{ThullYap1990}.
+
+.. function:: slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Computes the GCD of `A` and `B` together with cofactors `S` and `T`
+    such that `S A + T B = G`.  Returns the length of `G`.
+
+    Assumes that `\len(A) \geq \len(B) \geq 1` and
+    `(\len(A),\len(B)) \neq (1,1)`.
+
+    No attempt is made to make the GCD monic.
+
+    Requires that `G` have space for `\len(B)` coefficients.  Writes
+    `\len(B)-1` and `\len(A)-1` coefficients to `S` and `T`, respectively.
+    Note that, in fact, `\len(S) \leq \max(\len(B) - \len(G), 1)` and
+    `\len(T) \leq \max(\len(A) - \len(G), 1)`.
+
+    No aliasing of input and output operands is permitted.
+
+.. function:: slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    If `f` returns with the value `1` then the function operates as per
+    ``_fmpz_mod_poly_xgcd_euclidean``, otherwise `f` is set to a nontrivial
+    factor of `p`.
+
+.. function:: void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes the GCD of `A` and `B`. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial `P` is defined to be `P`. Except in the case where
+    the GCD is zero, the GCD `G` is made monic.
+
+    Polynomials ``S`` and ``T`` are computed such that
+    ``S*A + T*B = G``. The length of ``S`` will be at most
+    ``lenB`` and the length of ``T`` will be at most ``lenA``.
+
+.. function:: void fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If `f` returns with the value `1` then the function operates as per
+    ``fmpz_mod_poly_xgcd_euclidean``, otherwise `f` is set to a nontrivial
+    factor of `p`.
+
+.. function:: slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t mod)
+
+    Computes the GCD of `A` and `B`, where `\len(A) \geq \len(B) > 0`,
+    together with cofactors `S` and `T` such that `S A + T B = G`. Returns
+    the length of `G`.
+
+    No attempt is made to make the GCD monic.
+
+    Requires that `G` have space for `\len(B)` coefficients.  Writes
+    `\len(B) - 1` and `\len(A) - 1` coefficients to `S` and `T`,
+    respectively.  Note that, in fact, `\len(S) \leq \len(B) - \len(G)`
+    and `\len(T) \leq \len(A) - \len(G)`.
+
+    Both `S` and `T` must have space for at least `2` coefficients.
+
+    No aliasing of input and output operands is permitted.
+
+.. function:: void fmpz_mod_poly_xgcd_hgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes the GCD of `A` and `B`. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial `P` is defined to be `P`. Except in the case where
+    the GCD is zero, the GCD `G` is made monic.
+
+    Polynomials ``S`` and ``T`` are computed such that
+    ``S*A + T*B = G``. The length of ``S`` will be at most
+    ``lenB`` and the length of ``T`` will be at most ``lenA``.
+
+.. function:: slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
+
+    Computes the GCD of `A` and `B` together with cofactors `S` and `T`
+    such that `S A + T B = G`.  Returns the length of `G`.
+
+    Assumes that `\len(A) \geq \len(B) \geq 1` and
+    `(\len(A),\len(B)) \neq (1,1)`.
+
+    No attempt is made to make the GCD monic.
+
+    Requires that `G` have space for `\len(B)` coefficients.  Writes
+    `\len(B)-1` and `\len(A)-1` coefficients to `S` and `T`, respectively.
+    Note that, in fact, `\len(S) \leq \max(\len(B) - \len(G), 1)` and
+    `\len(T) \leq \max(\len(A) - \len(G), 1)`.
+
+    No aliasing of input and output operands is permitted.
+
+.. function:: void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes the GCD of `A` and `B`. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial `P` is defined to be `P`. Except in the case where
+    the GCD is zero, the GCD `G` is made monic.
+
+    Polynomials ``S`` and ``T`` are computed such that
+    ``S*A + T*B = G``. The length of ``S`` will be at most
+    ``lenB`` and the length of ``T`` will be at most ``lenA``.
+
+.. function:: void fmpz_mod_poly_xgcd_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If `f` returns with the value `1` then the function operates as per
+    ``fmpz_mod_poly_xgcd``, otherwise `f` is set to a nontrivial
+    factor of `p`.
+
+.. function:: slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
+
+    Computes ``(G, lenA)``, ``(S, lenB-1)`` such that
+    `G \cong S A \pmod{B}`, returning the actual length of `G`.
+
+    Assumes that `0 < \len(A) < \len(B)`.
+
+.. function:: void fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes polynomials `G` and `S`, both reduced modulo~`B`,
+    such that `G \cong S A \pmod{B}`, where `B` is assumed to
+    have `\len(B) \geq 2`.
+
+    In the case that `A = 0 \pmod{B}`, returns `G = S = 0`.
+
+.. function:: slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
+
+    If `f` returns with value `1` then the function operates as per
+    ``_fmpz_mod_poly_gcdinv_euclidean``, otherwise `f` is set to a
+    nontrivial factor of `p`.
+
+.. function:: void fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If `f` returns with value `1` then the function operates as per
+    ``fmpz_mod_poly_gcdinv_euclidean``, otherwise `f` is set to a
+    nontrivial factor of the modulus of `A`.
+
+.. function:: slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
+
+    Computes ``(G, lenA)``, ``(S, lenB-1)`` such that
+    `G \cong S A \pmod{B}`, returning the actual length of `G`.
+
+    Assumes that `0 < \len(A) < \len(B)`.
+
+.. function:: slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
+
+    If `f` returns with value `1` then the function operates as per
+    ``_fmpz_mod_poly_gcdinv``, otherwise `f` will be set to a nontrivial
+    factor of `p`.
+
+.. function:: void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes polynomials `G` and `S`, both reduced modulo~`B`,
+    such that `G \cong S A \pmod{B}`, where `B` is assumed to
+    have `\len(B) \geq 2`.
+
+    In the case that `A = 0 \pmod{B}`, returns `G = S = 0`.
+
+.. function:: void fmpz_mod_poly_gcdinv_f(fmpz_t fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If `f` returns with value `1` then the function operates as per
+    ``fmpz_mod_poly_gcdinv``, otherwise `f` will be set to a nontrivial
+    factor of `p`.
+
+.. function:: int _fmpz_mod_poly_invmod(fmpz *A, const fmpz *B, slong lenB, const fmpz *P, slong lenP, const fmpz_t p)
+
+    Attempts to set ``(A, lenP-1)`` to the inverse of ``(B, lenB)``
+    modulo the polynomial ``(P, lenP)``.  Returns `1` if ``(B, lenB)``
+    is invertible and `0` otherwise.
+
+    Assumes that `0 < \len(B) < \len(P)`, and hence also `\len(P) \geq 2`,
+    but supports zero-padding in ``(B, lenB)``.
+
+    Does not support aliasing.
+
+    Assumes that `p` is a prime number.
+
+.. function:: int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A, const fmpz *B, slong lenB, const fmpz *P, slong lenP, const fmpz_t p)
+
+    If `f` returns with the value `1`, then the function operates as per
+    ``_fmpz_mod_poly_invmod``. Otherwise `f` is set to a nontrivial
+    factor of `p`.
+
+.. function:: int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
+
+    Attempts to set `A` to the inverse of `B` modulo `P` in the polynomial
+    ring `(\mathbf{Z}/p\mathbf{Z})[X]`, where we assume that `p` is a prime
+    number.
+
+    If `\deg(P) < 2`, raises an exception.
+
+    If the greatest common divisor of `B` and `P` is~`1`, returns~`1` and
+    sets `A` to the inverse of `B`.  Otherwise, returns~`0` and the value
+    of `A` on exit is undefined.
+
+.. function:: int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
+
+    If `f` returns with the value `1`, then the function operates as per
+    ``fmpz_mod_poly_invmod``. Otherwise `f` is set to a nontrivial
+    factor of `p`.
+
+
+Minpoly
+--------------------------------------------------------------------------------
+
+
+.. function:: slong _fmpz_mod_poly_minpoly_bm(fmpz* poly, const fmpz* seq, slong len, const fmpz_t p)
+
+    Sets ``poly`` to the coefficients of a minimal generating
+    polynomial for sequence ``(seq, len)`` modulo `p`.
+
+    The return value equals the length of ``poly``.
+
+    It is assumed that `p` is prime and ``poly`` has space for at least
+    `len+1` coefficients. No aliasing between inputs and outputs is
+    allowed.
+
+.. function:: void fmpz_mod_poly_minpoly_bm(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+
+    Sets ``poly`` to a minimal generating polynomial for sequence
+    ``seq`` of length ``len``.
+
+    Assumes that the modulus is prime.
+
+    This version uses the Berlekamp-Massey algorithm, whose running time
+    is proportional to ``len`` times the size of the minimal generator.
+
+.. function:: slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly, const fmpz* seq, slong len, const fmpz_t p)
+
+    Sets ``poly`` to the coefficients of a minimal generating
+    polynomial for sequence ``(seq, len)`` modulo `p`.
+
+    The return value equals the length of ``poly``.
+
+    It is assumed that `p` is prime and ``poly`` has space for at least
+    `len+1` coefficients. No aliasing between inputs and outputs is
+    allowed.
+
+.. function:: void fmpz_mod_poly_minpoly_hgcd(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+
+    Sets ``poly`` to a minimal generating polynomial for sequence
+    ``seq`` of length ``len``.
+
+    Assumes that the modulus is prime.
+
+    This version uses the HGCD algorithm, whose running time is
+    `O(n \log^2 n)` field operations, regardless of the actual size of
+    the minimal generator.
+
+.. function:: slong _fmpz_mod_poly_minpoly(fmpz* poly, const fmpz* seq, slong len, const fmpz_t p)
+
+    Sets ``poly`` to the coefficients of a minimal generating
+    polynomial for sequence ``(seq, len)`` modulo `p`.
+
+    The return value equals the length of ``poly``.
+
+    It is assumed that `p` is prime and ``poly`` has space for at least
+    `len+1` coefficients. No aliasing between inputs and outputs is
+    allowed.
+
+.. function:: void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz* seq, slong len)
+
+    Sets ``poly`` to a minimal generating polynomial for sequence
+    ``seq`` of length ``len``.
+
+    A minimal generating polynomial is a monic polynomial
+    `f = x^d + c_{d-1}x^{d-1} + \cdots + c_1 x + c_0`,
+    of minimal degree `d`, that annihilates any consecutive `d+1` terms
+    in ``seq``. That is, for any `i < len - d`,
+
+    `seq_i = -\sum_{j=0}^{d-1} seq_{i+j}*f_j.`
+
+    Assumes that the modulus is prime.
+
+    This version automatically chooses the fastest underlying
+    implementation based on ``len`` and the size of the modulus.
+
+
+
+Resultant
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t mod)
+
+    Sets `r` to the resultant of ``(poly1, len1)`` and
+    ``(poly2, len2)`` using the Euclidean algorithm.
+
+    Assumes that ``len1 >= len2 > 0``.
+
+    Asumes that the modulus is prime.
+
+.. function:: void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
+
+    Computes the resultant of `f` and `g` using the Euclidean algorithm.
+
+    For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
+    `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
+    is defined to be
+
+    .. math ::
+
+
+            a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+
+
+    For convenience, we define the resultant to be equal to zero if either
+    of the two polynomials is zero.
+
+.. function:: void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t mod)
+
+    Sets ``res`` to the resultant of ``(A, lenA)`` and
+    ``(B, lenB)`` using the half-gcd algorithm.
+
+    This algorithm computes the half-gcd as per
+    ``_fmpz_mod_poly_gcd_hgcd()``
+    but additionally updates the resultant every time a division occurs. The
+    half-gcd algorithm computes the GCD recursively. Given inputs `a` and `b`
+    it lets ``m = len(a)/2`` and (recursively) performs all quotients in
+    the Euclidean algorithm which do not require the low `m` coefficients of
+    `a` and `b`.
+
+    This performs quotients in exactly the same order as the ordinary
+    Euclidean algorithm except that the low `m` coefficients of the polynomials
+    in the remainder sequence are not computed. A correction step after hgcd
+    has been called computes these low `m` coefficients (by matrix
+    multiplication by a transformation matrix also computed by hgcd).
+
+    This means that from the point of view of the resultant, all but the last
+    quotient performed by a recursive call to hgcd is an ordinary quotient as
+    per the usual Euclidean algorithm. However, the final quotient may give
+    a remainder of less than `m + 1` coefficients, which won't be corrected
+    until the hgcd correction step is performed afterwards.
+
+    To compute the adjustments to the resultant coming from this corrected
+    quotient, we save the relevant information in an ``nmod_poly_res_t``
+    struct at the time the quotient is performed so that when the correction
+    step is performed later, the adjustments to the resultant can be computed
+    at that time also.
+
+    The only time an adjustment to the resultant is not required after a
+    call to hgcd is if hgcd does nothing (the remainder may already have had
+    less than `m + 1` coefficients when hgcd was called).
+
+    Assumes that ``lenA >= lenB > 0``.
+
+    Asumes that the modulus is prime.
+
+.. function:: void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
+
+    Computes the resultant of `f` and `g` using the half-gcd algorithm.
+
+    For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
+    `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
+    is defined to be
+
+    .. math ::
+
+
+            a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+
+
+    For convenience, we define the resultant to be equal to zero if either
+    of the two polynomials is zero.
+
+.. function:: void _fmpz_mod_poly_resultant(fmpz_t res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t mod)
+
+    Returns the resultant of ``(poly1, len1)`` and
+    ``(poly2, len2)``.
+
+    Assumes that ``len1 >= len2 > 0``.
+
+    Asumes that the modulus is prime.
+
+.. function:: void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g) Computes the resultant of $f$ and $g$.
+
+    For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
+    `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
+    is defined to be
+
+    .. math ::
+
+
+            a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+
+
+    For convenience, we define the resultant to be equal to zero if either
+    of the two polynomials is zero.
+
+
+Discriminant
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_discriminant(fmpz_t d, const fmpz *poly, slong len, const fmpz_t mod)
+
+    Set `d` to the discriminant of ``(poly, len)``. Assumes ``len > 1``.
+
+.. function:: void fmpz_mod_poly_discriminant(fmpz_t d, const fmpz_mod_poly_t f)
+
+    Set `d` to the discriminant of `f`.
+    We normalise the discriminant so that
+    `\operatorname{disc}(f) = (-1)^(n(n-1)/2) \operatorname{res}(f, f') /
+    \operatorname{lc}(f)^(n - m - 2)`, where ``n = len(f)`` and
+    ``m = len(f')``. Thus `\operatorname{disc}(f) =
+    \operatorname{lc}(f)^(2n - 2) \prod_{i < j} (r_i - r_j)^2`, where
+    `\operatorname{lc}(f)` is the leading coefficient of `f` and `r_i` are the
+    roots of `f`.
+
+
+Derivative
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
+
+    Sets ``(res, len - 1)`` to the derivative of ``(poly, len)``.
+    Also handles the cases where ``len`` is `0` or `1` correctly.
+    Supports aliasing of ``res`` and ``poly``.
+
+.. function:: void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+
+    Sets ``res`` to the derivative of ``poly``.
+
+
+Evaluation
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len, const fmpz_t a, const fmpz_t p)
+
+    Evaluates the polynomial ``(poly, len)`` at the integer `a` and sets
+    ``res`` to the result.  Aliasing between ``res`` and `a` or any
+    of the coefficients of ``poly`` is not supported.
+
+.. function:: void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz_mod_poly_t poly, const fmpz_t a)
+
+    Evaluates the polynomial ``poly`` at the integer `a` and sets
+    ``res`` to the result.
+
+    As expected, aliasing between ``res`` and `a` is supported.  However,
+    ``res`` may not be aliased with a coefficient of ``poly``.
+
+
+Multipoint evaluation
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, slong len, const fmpz * xs, slong n, const fmpz_t mod)
+
+    Evaluates (``coeffs``, ``len``) at the ``n`` values
+    given in the vector ``xs``, writing the output values
+    to ``ys``. The values in ``xs`` should be reduced
+    modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+.. function:: void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n)
+
+    Evaluates ``poly`` at the ``n`` values given in the vector
+    ``xs``, writing the output values to ``ys``. The values in
+    ``xs`` should be reduced modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+.. function:: void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly, slong plen, fmpz_poly_struct * const * tree, slong len, const fmpz_t mod) Evaluates (\code{poly}, \code{plen}) at the \code{len} values given by the precomputed subproduct tree \code{tree}.
+
+.. function:: void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz * poly, slong plen, const fmpz * xs, slong n, const fmpz_t mod)
+
+    Evaluates (``coeffs``, ``len``) at the ``n`` values
+    given in the vector ``xs``, writing the output values
+    to ``ys``. The values in ``xs`` should be reduced
+    modulo the modulus.
+
+    Uses fast multipoint evaluation, building a temporary subproduct tree.
+
+.. function:: void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n)
+
+    Evaluates ``poly`` at the ``n`` values given in the vector
+    ``xs``, writing the output values to ``ys``. The values in
+    ``xs`` should be reduced modulo the modulus.
+
+    Uses fast multipoint evaluation, building a temporary subproduct tree.
+
+.. function:: void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs, slong len, const fmpz * xs, slong n, const fmpz_t mod)
+
+    Evaluates (``coeffs``, ``len``) at the ``n`` values
+    given in the vector ``xs``, writing the output values
+    to ``ys``. The values in ``xs`` should be reduced
+    modulo the modulus.
+
+.. function:: void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n)
+
+    Evaluates ``poly`` at the ``n`` values given in the vector
+    ``xs``, writing the output values to ``ys``. The values in
+    ``xs`` should be reduced modulo the modulus.
+
+
+Composition
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
+
+    Sets ``res`` to the composition of ``(poly1, len1)`` and
+    ``(poly2, len2)`` using Horner's algorithm.
+
+    Assumes that ``res`` has space for ``(len1-1)*(len2-1) + 1``
+    coefficients, although in `\mathbf{Z}_p[X]` this might not actually
+    be the length of the resulting polynomial when `p` is not a prime.
+
+    Assumes that ``poly1`` and ``poly2`` are non-zero polynomials.
+    Does not support aliasing between any of the inputs and the output.
+
+.. function:: void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+
+    Sets ``res`` to the composition of ``poly1`` and ``poly2``
+    using Horner's algorithm.
+
+    To be precise about the order of composition, denoting ``res``,
+    ``poly1``, and ``poly2`` by `f`, `g`, and `h`, respectively,
+    sets `f(t) = g(h(t))`.
+
+.. function:: void _fmpz_mod_poly_compose_divconquer(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
+
+    Sets ``res`` to the composition of ``(poly1, len1)`` and
+    ``(poly2, len2)`` using a divide and conquer algorithm which
+    takes out factors of ``poly2`` raised to `2^i` where possible.
+
+    Assumes that ``res`` has space for ``(len1-1)*(len2-1) + 1``
+    coefficients, although in `\mathbf{Z}_p[X]` this might not actually
+    be the length of the resulting polynomial when `p` is not a prime.
+
+    Assumes that ``poly1`` and ``poly2`` are non-zero polynomials.
+    Does not support aliasing between any of the inputs and the output.
+
+.. function:: void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+
+    Sets ``res`` to the composition of ``poly1`` and ``poly2``
+    using a divide and conquer algorithm which takes out factors of
+    ``poly2`` raised to `2^i` where possible.
+
+    To be precise about the order of composition, denoting ``res``,
+    ``poly1``, and ``poly2`` by `f`, `g`, and `h`, respectively,
+    sets `f(t) = g(h(t))`.
+
+.. function:: void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
+
+    Sets ``res`` to the composition of ``(poly1, len1)`` and
+    ``(poly2, len2)``.
+
+    Assumes that ``res`` has space for ``(len1-1)*(len2-1) + 1``
+    coefficients, although in `\mathbf{Z}_p[X]` this might not actually
+    be the length of the resulting polynomial when `p` is not a prime.
+
+    Assumes that ``poly1`` and ``poly2`` are non-zero polynomials.
+    Does not support aliasing between any of the inputs and the output.
+
+.. function:: void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+
+    Sets ``res`` to the composition of ``poly1`` and ``poly2``.
+
+    To be precise about the order of composition, denoting ``res``,
+    ``poly1``, and ``poly2`` by `f`, `g`, and `h`, respectively,
+    sets `f(t) = g(h(t))`.
+
+
+Modular composition
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpz_mod_poly_compose_mod(fmpz * res, const fmpz * f, slong lenf, const fmpz * g, const fmpz * h, slong lenh, const fmpz_t p)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
+    `h` is nonzero and that the length of `g` is one less than the
+    length of `h` (possibly with zero padding). The output is not allowed
+    to be aliased with any of the inputs.
+
+.. function:: void fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
+    `h` is nonzero.
+
+.. function:: void _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const fmpz * g, const fmpz * h, slong lenh, const fmpz_t p)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
+    `h` is nonzero and that the length of `g` is one less than the
+    length of `h` (possibly with zero padding). The output is not allowed
+    to be aliased with any of the inputs.
+
+    The algorithm used is Horner's rule.
+
+.. function:: void fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
+    `h` is nonzero. The algorithm used is Horner's rule.
+
+.. function:: void _fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * f, slong len1, const fmpz * g, const fmpz * h, slong len3, const fmpz_t p)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
+    `h` is nonzero and that the length of `g` is one less than the
+    length of `h` (possibly with zero padding). We also require that
+    the length of `f` is less than the length of `h`. The output is not
+    allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+.. function:: void fmpz_mod_poly_compose_mod_brent_kung( fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
+    `h` is nonzero and that `f` has smaller degree than `h`.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+.. function:: void _fmpz_mod_poly_reduce_matrix_mod_poly (fmpz_mat_t A, const fmpz_mat_t B, const fmpz_mod_poly_t f)
+
+    Sets the ith row of ``A`` to the reduction of the ith row of `B` modulo
+    `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
+    a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
+
+.. function:: void * _fmpz_mod_poly_precompute_matrix_worker(void * arg_ptr)
+
+    Worker function version of ``_fmpz_mod_poly_precompute_matrix``.
+    Input/output is stored in ``fmpz_mod_poly_matrix_precompute_arg_t``.
+
+.. function:: void _fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * f, const fmpz * g, slong leng, const fmpz * ginv, slong lenginv, const fmpz_t p)
+
+    Sets the ith row of ``A`` to `f^i` modulo `g` for
+    `i=1,\ldots,\sqrt{\deg(g)}`. We require `A` to be
+    a `\sqrt{\deg(g)}\times \deg(g)` matrix. We require
+    ``ginv`` to be the inverse of the reverse of ``g`` and `g` to be
+    nonzero. ``f`` has to be reduced modulo ``g`` and of length one less
+    than ``leng`` (possibly with zero padding).
+
+.. function:: void fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t ginv)
+
+    Sets the ith row of ``A`` to `f^i` modulo `g` for
+    `i=1,\ldots,\sqrt{\deg(g)}`. We require `A` to be
+    a `\sqrt{\deg(g)}\times \deg(g)` matrix. We require
+    ``ginv`` to be the inverse of the reverse of ``g``.
+
+.. function:: void * _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
+
+    Worker function version of
+    ``_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv``.
+    Input/output is stored in
+    ``fmpz_mod_poly_compose_mod_precomp_preinv_arg_t``.
+
+.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res, const fmpz * f, slong lenf, const fmpz_mat_t A, const fmpz * h, slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_t p)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
+    `h` is nonzero. We require that the ith row of `A` contains `g^i` for
+    `i=1,\ldots,\sqrt{\deg(h)}`, i.e. `A` is a
+    `\sqrt{\deg(h)}\times \deg(h)` matrix. We also require that
+    the length of `f` is less than the length of `h`. Furthermore, we require
+    ``hinv`` to be the inverse of the reverse of ``h``.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+.. function:: void fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mat_t A, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that the
+    ith row of `A` contains `g^i` for `i=1,\ldots,\sqrt{\deg(h)}`, i.e. `A` is
+    a `\sqrt{\deg(h)}\times \deg(h)` matrix. We require that `h` is nonzero and
+    that `f` has smaller degree than `h`. Furthermore, we require ``hinv``
+    to be the inverse of the reverse of ``h``. This version of Brent-Kung
+    modular composition is particularly useful if one has to perform several
+    modular composition of the form `f(g)` modulo `h` for fixed `g` and `h`.
+
+.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * f, slong lenf, const fmpz * g, const fmpz * h, slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_t p)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
+    `h` is nonzero and that the length of `g` is one less than the
+    length of `h` (possibly with zero padding). We also require that
+    the length of `f` is less than the length of `h`. Furthermore, we require
+    ``hinv`` to be the inverse of the reverse of ``h``.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+.. function:: void fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require that
+    `h` is nonzero and that `f` has smaller degree than `h`. Furthermore,
+    we require ``hinv`` to be the inverse of the reverse of ``h``.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong l, const fmpz * h, slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_t p)
+
+    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq l`,
+    where `f_i` are the first ``l`` elements of ``polys`` and `g` is the
+    last element of ``polys``. We require that `h` is nonzero and that the
+    length of `g` is less than the length of `h`. We also require that the
+    length of `f_i` is less than the length of `h`. We require ``res`` to
+    have enough memory allocated to hold ``l`` ``fmpz_mod_poly_struct``.
+    The entries of ``res`` need to be initialised and ``l`` needs to be
+    less than ``len1`` Furthermore, we require ``hinv`` to be the inverse
+    of the reverse of ``h``. The output is not allowed to be aliased with any
+    of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+
+.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
+
+    Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq n`
+    where `f_i` are the first ``n`` elements of ``polys`` and `g` is the
+    last element of ``polys``. We require ``res`` to have enough memory
+    allocated to hold ``n`` ``fmpz_mod_poly_struct``. The entries of
+    ``res`` need to be uninitialised and ``n`` needs to be less than
+    ``len1``. We require that `h` is nonzero and that `f_i` and `g` have
+    smaller degree than `h`. Furthermore, we require ``hinv`` to be the
+    inverse of the reverse of ``h``. No aliasing of ``res`` and
+    ``polys`` is allowed.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong lenpolys, slong l, const fmpz * poly, slong len, const fmpz * polyinv, slong leninv, const fmpz_t p)
+
+    Multithreaded version of
+    ``_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the
+    Horner evaluations across ``flint_get_num_threads()`` threads.
+
+.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv)
+
+    Multithreaded version of
+    ``fmpz_mod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the
+    Horner evaluations across ``flint_get_num_threads()`` threads.
+
+
+Subproduct trees
+--------------------------------------------------------------------------------
+
+
+.. function:: fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(slong len)
+
+    Allocates space for a subproduct tree of the given length, having
+    linear factors at the lowest level.
+
+.. function:: void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, slong len)
+
+    Free the allocated space for the subproduct.
+
+.. function:: void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong len, const fmpz_t mod)
+
+    Builds a subproduct tree in the preallocated space from
+    the ``len`` monic linear factors `(x-r_i)` where `r_i` are given by
+    ``roots``. The top level product is not computed.
+
+
+Radix conversion
+--------------------------------------------------------------------------------
+
+The following functions provide the functionality to solve the
+radix conversion problems for polynomials, which is to express
+a polynomial `f(X)` with respect to a given radix `r(X)` as
+
+    .. math ::
+
+
+    f(X) = \sum_{i = 0}^{N} b_i(X) r(X)^i
+
+
+where `N = \floor{\deg(f) / \deg(r)}`.
+The algorithm implemented here is a recursive one, which performs
+Euclidean divisions by powers of `r` of the form `r^{2^i}`, and it
+has time complexity `\Theta(\deg(f) \log \deg(f))`.
+It facilitates the repeated use of precomputed data, namely the
+powers of `r` and their power series inverses.  This data is stored
+in objects of type ``fmpz_mod_poly_radix_t`` and it is computed
+using the function ``fmpz_mod_poly_radix_init()``, which only
+depends on~`r` and an upper bound on the degree of~`f`.
+
+.. function:: void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv, const fmpz *R, slong lenR, slong k, const fmpz_t invL, const fmpz_t p)
+
+    Computes powers of `R` of the form `R^{2^i}` and their Newton inverses
+    modulo `x^{2^{i} \deg(R)}` for `i = 0, \dotsc, k-1`.
+
+    Assumes that the vectors ``Rpow[i]`` and ``Rinv[i]`` have space
+    for `2^i \deg(R) + 1` and `2^i \deg(R)` coefficients, respectively.
+
+    Assumes that the polynomial `R` is non-constant, i.e.\ `\deg(R) \geq 1`.
+
+    Assumes that the leading coefficient of `R` is a unit and that the
+    argument ``invL`` is the inverse of the coefficient modulo~`p`.
+
+    The argument~`p` is the modulus, which in `p`-adic applications is
+    typically a prime power, although this is not necessary.  Here, we
+    only assume that `p \geq 2`.
+
+    Note that this precomputed data can be used for any `F` such that
+    `\len(F) \leq 2^k \deg(R)`.
+
+.. function:: void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, const fmpz_mod_poly_t R, slong degF)
+
+    Carries out the precomputation necessary to perform radix conversion
+    to radix~`R` for polynomials~`F` of degree at most ``degF``.
+
+    Assumes that `R` is non-constant, i.e.\ `\deg(R) \geq 1`,
+    and that the leading coefficient is a unit.
+
+.. function:: void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, slong degR, slong k, slong i, fmpz *W, const fmpz_t p)
+
+    This is the main recursive function used by the
+    function ``fmpz_mod_poly_radix()``.
+
+    Assumes that, for all `i = 0, \dotsc, N`, the vector
+    ``B[i]`` has space for `\deg(R)` coefficients.
+
+    The variable `k` denotes the factors of `r` that have
+    previously been counted for the polynomial `F`, which
+    is assumed to have length `2^{i+1} \deg(R)`, possibly
+    including zero-padding.
+
+    Assumes that `W` is a vector providing temporary space
+    of length `\len(F) = 2^{i+1} \deg(R)`.
+
+    The entire computation takes place over `\mathbf{Z} / p \mathbf{Z}`,
+    where `p \geq 2` is a natural number.
+
+    Thus, the top level call will have `F` as in the original
+    problem, and `k = 0`.
+
+.. function:: void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F, const fmpz_mod_poly_radix_t D)
+
+    Given a polynomial `F` and the precomputed data `D` for the radix `R`,
+    computes polynomials `B_0, \dotsc, B_N` of degree less than `\deg(R)`
+    such that
+
+    .. math ::
+
+
+        F = B_0 + B_1 R + \dotsb + B_N R^N,
+
+
+    where necessarily `N = \floor{\deg(F) / \deg(R)}`.
+
+    Assumes that `R` is non-constant, i.e.\ `\deg(R) \geq 1`,
+    and that the leading coefficient is a unit.
+
+
+Input and output
+--------------------------------------------------------------------------------
+
+The printing options supported by this module are very similar to
+what can be found in the two related modules ``fmpz_poly`` and
+``nmod_poly``.
+Consider, for example, the polynomial `f(x) = 5x^3 + 2x + 1` in
+`(\mathbf{Z}/6\mathbf{Z})[x]`.  Its simple string representation
+is ``"4 6  1 2 0 5"``, where the first two numbers denote the
+length of the polynomial and the modulus.  The pretty string
+representation is ``"5*x^3+2*x+1"``.
+
+.. function:: int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, const fmpz_t p)
+
+    Prints the polynomial ``(poly, len)`` to the stream ``file``.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
+
+.. function:: int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly)
+
+    Prints the polynomial to the stream ``file``.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
+
+.. function:: int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly, const char * x)
+
+    Prints the pretty representation of ``(poly, len)`` to the stream
+    ``file``, using the string ``x`` to represent the indeterminate.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
+
+.. function:: int fmpz_mod_poly_print(const fmpz_mod_poly_t poly)
+
+    Prints the polynomial to ``stdout``.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
+
+.. function:: int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
+
+    Prints the pretty representation of ``poly`` to ``stdout``,
+    using the string ``x`` to represent the indeterminate.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
