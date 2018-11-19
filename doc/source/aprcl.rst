@@ -62,6 +62,12 @@ Primality test functions
 Configuration functions
 --------------------------------------------------------------------------------
 
+.. type:: _aprcl_config
+
+.. type:: aprcl_config
+
+    Holds precomputed parameters.
+
 .. function:: void config_gauss_init(aprcl_config conf, const fmpz_t n)
 
     Compute the `s` and `R` values used in the cyclotomic primality test,
