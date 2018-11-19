@@ -413,4 +413,3 @@ is_prime_gauss(const fmpz_t n)
         return 1;
     return 0;
 }
-

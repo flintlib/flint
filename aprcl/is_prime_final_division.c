@@ -35,7 +35,7 @@ is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
         if (fmpz_is_zero(rem))
         {
             /* if npow != n and npow != 1 */
-            if ((fmpz_equal(n, npow) == 0) && (fmpz_equal_ui(npow, 1) == 0))
+            if (!fmpz_equal(n, npow) && !fmpz_is_one(npow))
             {
                 /* npow | n, so n is composite */
                 result = 0;
@@ -54,4 +54,3 @@ is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 
     return result;
 }
-

@@ -229,7 +229,6 @@ int main(void)
 
             fmpz_clear(n);
         }
-
     }
 
     FLINT_TEST_CLEANUP(state);
@@ -237,4 +236,3 @@ int main(void)
     flint_printf("PASS\n");
     return 0;
 }
-

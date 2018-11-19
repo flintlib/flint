@@ -31,7 +31,6 @@ typedef struct
     fmpz_t s;
     n_factor_t rs;
     fmpz_factor_t qs;
-
     int * qs_used;
 } _aprcl_config;
 
@@ -92,20 +91,12 @@ FLINT_DLL void config_gauss_init_min_R(aprcl_config conf,
 
 FLINT_DLL void config_gauss_clear(aprcl_config conf);
 
-FLINT_DLL void _config_gauss_update(aprcl_config conf);
-
 /* Jacobi test configuration */
-FLINT_DLL ulong _R_value(const fmpz_t n);
+FLINT_DLL ulong aprcl_R_value(const fmpz_t n);
 
 FLINT_DLL void config_jacobi_init(aprcl_config conf, const fmpz_t n);
 
 FLINT_DLL void config_jacobi_clear(aprcl_config conf);
-
-FLINT_DLL void _config_jacobi_update(aprcl_config conf);
-
-FLINT_DLL void _config_jacobi_reduce_s(aprcl_config conf, const fmpz_t n);
-
-FLINT_DLL void _config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n);
 
 /*  Gauss sums primality test */
 FLINT_DLL int is_prime_gauss(const fmpz_t n);

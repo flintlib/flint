@@ -14,7 +14,7 @@
 /*
     Returns a table of the function f: [1,2,...,q-2] -> [1,2,...,q-2]
     defined by $1 - g^x \equiv  gf(x) \bmod q$, 
-    there $g$ is a primitive root modulo $q$.
+    where $g$ is a primitive root modulo $q$.
 
     f_table[x - 1] = f(x).
 */
@@ -49,4 +49,3 @@ f_table(const ulong q)
     _nmod_vec_clear(g_table);
     return f_table;
 }
-

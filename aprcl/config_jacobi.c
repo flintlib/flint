@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 ulong
-_R_value(const fmpz_t n)
+aprcl_R_value(const fmpz_t n)
 {
     ulong bits = fmpz_bits(n);
 
@@ -60,7 +60,7 @@ _R_value(const fmpz_t n)
     return 6983776800;
 }
 
-void
+static void
 _config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 {
     ulong i, j, q;
@@ -135,7 +135,10 @@ _config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
     flint_free(w);
 }
 
-void
+/*
+This is not used anywhere.
+
+static void
 _config_jacobi_reduce_s(aprcl_config conf, const fmpz_t n)
 {
     slong i;
@@ -166,8 +169,9 @@ _config_jacobi_reduce_s(aprcl_config conf, const fmpz_t n)
     fmpz_clear(new_s2);
     fmpz_clear(new_s);
 }
+*/
 
-void
+static void
 _config_jacobi_update(aprcl_config conf)
 {
     ulong prime = 2;
@@ -206,7 +210,7 @@ config_jacobi_init(aprcl_config conf, const fmpz_t n)
 {
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
-    conf->R = _R_value(n);
+    conf->R = aprcl_R_value(n);
     _config_jacobi_update(conf);
 
     n_factor_init(&conf->rs);
@@ -223,4 +227,3 @@ config_jacobi_clear(aprcl_config conf)
     fmpz_factor_clear(conf->qs);
     flint_free(conf->qs_used);
 }
-

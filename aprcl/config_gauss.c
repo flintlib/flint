@@ -11,7 +11,7 @@
 
 #include "aprcl.h"
 
-void
+static void
 _config_gauss_update(aprcl_config conf)
 {
     ulong prime = 2;
@@ -53,6 +53,8 @@ config_gauss_init(aprcl_config conf, const fmpz_t n)
     n_factor_init(&conf->rs);
     n_factor(&conf->rs, conf->R, 1);
 
+    conf->qs_used = NULL;  /* not used */
+
     fmpz_clear(s2);
 }
 
@@ -76,6 +78,8 @@ config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
     n_factor_init(&conf->rs);
     n_factor(&conf->rs, conf->R, 1);
 
+    conf->qs_used = NULL;  /* not used */
+
     fmpz_clear(s2);
 }
 
@@ -85,4 +89,3 @@ config_gauss_clear(aprcl_config conf)
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);
 }
-

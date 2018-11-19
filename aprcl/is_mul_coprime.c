@@ -31,7 +31,7 @@ is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n)
     fmpz_clear(m);
 
     /* q and r must be small, so q*r must get into ulong. */
-    if (result == 1 || fmpz_equal_ui(n, result) == 1)
+    if (result == 1 || fmpz_equal_ui(n, result))
         return 1;
     return 0;
 }
@@ -57,7 +57,7 @@ is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n)
     fmpz_gcd(result, result, n);    /* result = gcd(y, m % y) */
 
     is_coprime = 0;
-    if (fmpz_equal_ui(result, 1) == 1 || fmpz_equal(n, result) == 1)
+    if (fmpz_is_one(result) || fmpz_equal(n, result))
         is_coprime = 1;
 
     fmpz_clear(m);
@@ -65,5 +65,3 @@ is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n)
 
     return is_coprime;
 }
-
-

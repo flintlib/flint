@@ -77,7 +77,7 @@ Configuration functions
     Clears the given ``aprcl_config`` element. It must be reinitialised in
     order to be used again.
 
-.. function:: ulong _R_value(const fmpz_t n)
+.. function:: ulong aprcl_R_value(const fmpz_t n)
 
     Returns precomputed `R` value for APR-CL configration. `R` such that the 
     corresponding `s` value greater then `\sqrt{n}`. Maximum stored value:

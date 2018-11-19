@@ -432,7 +432,7 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
             /* npow = n^{(q - 1) / p} */
             fmpz_powm_ui(npow, n, (q - 1) / p, qmod);
             /* if n^{(q - 1) / p} != 1 mod n then we find q */
-            if (fmpz_equal_ui(npow, 1) == 0)
+            if (!fmpz_equal_ui(npow, 1))
                 break;
             /* else decrease the prime counter */
             p_counter--;
@@ -486,7 +486,7 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
                 fmpz_powm(qpow, qpow, ndecdiv, n);
 
                 /* if q^{(n - 1) / 2} = -1 mod n then n can b prime */
-                if (fmpz_equal(qpow, ndec) == 1)
+                if (fmpz_equal(qpow, ndec))
                     result = 1;
                 else /* else n is composite */
                     result = 2;
@@ -826,4 +826,3 @@ is_prime_jacobi(const fmpz_t n)
         return 1;
     return 0;
 }
-

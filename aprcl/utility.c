@@ -40,4 +40,3 @@ p_power_in_q(ulong q, ulong p)
     }
     return k;
 }
-
