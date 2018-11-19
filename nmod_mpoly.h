@@ -500,6 +500,11 @@ FLINT_DLL void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 FLINT_DLL void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                          const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
+                    const ulong * coeff2, const ulong * exp2, slong len2,
+                    const ulong * coeff3, const ulong * exp3, slong len3,
+                       slong N, const ulong * cmpmask, const nmodf_ctx_t fctx);
+
 /* Scalar operations *********************************************************/
 
 FLINT_DLL void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t poly1,
@@ -567,7 +572,11 @@ FLINT_DLL int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
                         const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
-slong _nmod_mpoly_divides_monagan_pearce(
+FLINT_DLL int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
+                          const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong _nmod_mpoly_divides_monagan_pearce(
                      mp_limb_t ** coeff1,      ulong ** exp1, slong * alloc,
                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
