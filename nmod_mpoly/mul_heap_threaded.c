@@ -766,8 +766,8 @@ void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B,
         else
             A->length = _nmod_mpoly_mul_heap_threaded(
                                              &A->coeffs, &A->exps, &A->alloc,
-                                                  C->coeffs, Cexp, C->length,
                                                   B->coeffs, Bexp, B->length,
+                                                  C->coeffs, Cexp, C->length,
                                                        Abits, N, cmpmask, ctx);
     }
 
