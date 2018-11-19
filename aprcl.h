@@ -310,7 +310,7 @@ FLINT_DLL void unity_zpq_swap(unity_zpq f, unity_zpq g);
 /* Comparision */
 FLINT_DLL int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
 
-FLINT_DLL ulong unity_zpq_p_unity(const unity_zpq f);
+FLINT_DLL slong unity_zpq_p_unity(const unity_zpq f);
 
 FLINT_DLL int unity_zpq_is_p_unity(const unity_zpq f);
 
