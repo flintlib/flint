@@ -9,12 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "threadpool.h"
+#include "thread_pool.h"
 
 
-int threadpool_set_size(threadpool_t T, slong new_size)
+int thread_pool_set_size(thread_pool_t T, slong new_size)
 {
-    tpentry_struct * D;
+    thread_pool_entry_struct * D;
     slong i;
     slong old_size;
 
@@ -56,7 +56,7 @@ int threadpool_set_size(threadpool_t T, slong new_size)
     if (new_size > 0)
     {
         D = T->tdata
-          = (tpentry_struct *) flint_malloc(new_size * sizeof(tpentry_struct));
+          = (thread_pool_entry_struct *) flint_malloc(new_size * sizeof(thread_pool_entry_struct));
 
         for (i = 0; i < new_size; i++)
         {
@@ -70,7 +70,7 @@ int threadpool_set_size(threadpool_t T, slong new_size)
             D[i].working = -1;
             D[i].exit = 0;
             pthread_mutex_lock(&D[i].mutex);
-            pthread_create(&D[i].pth, NULL, threadpool_idle_loop, &D[i]);
+            pthread_create(&D[i].pth, NULL, thread_pool_idle_loop, &D[i]);
             while (D[i].working != 0)
                 pthread_cond_wait(&D[i].sleep2, &D[i].mutex);
             pthread_mutex_unlock(&D[i].mutex);

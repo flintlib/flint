@@ -9,43 +9,45 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "threadpool.h"
+#include "thread_pool.h"
 
-threadpool_t global_threadpool;
-int global_threadpool_initialized = 0;
 
-void * threadpool_idle_loop(void * varg)
+thread_pool_t global_thread_pool;
+int global_thread_pool_initialized = 0;
+
+
+void * thread_pool_idle_loop(void * varg)
 {
-    tpentry_struct * arg = (tpentry_struct *) varg;
+    thread_pool_entry_struct * arg = (thread_pool_entry_struct *) varg;
 
-    goto threadpool_Lock;
+    goto thread_pool_Lock;
 
-threadpool_DoWork:
+thread_pool_DoWork:
 
     arg->fxn(arg->fxnarg);
 
-threadpool_Lock:
+thread_pool_Lock:
 
     pthread_mutex_lock(&arg->mutex);
     arg->working = 0;
 
-threadpool_CheckExit:
+thread_pool_CheckExit:
 
     if (arg->exit != 0)
-        goto threadpool_Unlock;
+        goto thread_pool_Unlock;
 
     pthread_cond_signal(&arg->sleep2);
     pthread_cond_wait(&arg->sleep1, &arg->mutex);
 
     if (arg->working == 0)
-        goto threadpool_CheckExit;
+        goto thread_pool_CheckExit;
 
-threadpool_Unlock:
+thread_pool_Unlock:
 
     pthread_mutex_unlock(&arg->mutex);
 
     if (arg->exit == 0)
-        goto threadpool_DoWork;
+        goto thread_pool_DoWork;
 
     flint_cleanup();
 
@@ -53,10 +55,10 @@ threadpool_Unlock:
 }
 
 
-void threadpool_init(threadpool_t T, slong size)
+void thread_pool_init(thread_pool_t T, slong size)
 {
     slong i;
-    tpentry_struct * D;
+    thread_pool_entry_struct * D;
     size = FLINT_MAX(size, WORD(0));
 
     pthread_mutex_init(&T->mutex, NULL);
@@ -68,7 +70,8 @@ void threadpool_init(threadpool_t T, slong size)
         return;
     }
 
-    D = (tpentry_struct *) flint_malloc(size * sizeof(tpentry_struct));
+    D = (thread_pool_entry_struct *) flint_malloc(
+                                      size * sizeof(thread_pool_entry_struct));
     T->tdata = D;
 
     for (i = 0; i < size; i++)
@@ -83,7 +86,7 @@ void threadpool_init(threadpool_t T, slong size)
         D[i].working = -1;
         D[i].exit = 0;
         pthread_mutex_lock(&D[i].mutex);
-        pthread_create(&D[i].pth, NULL, threadpool_idle_loop, &D[i]);
+        pthread_create(&D[i].pth, NULL, thread_pool_idle_loop, &D[i]);
         while (D[i].working != 0)
             pthread_cond_wait(&D[i].sleep2, &D[i].mutex);
         pthread_mutex_unlock(&D[i].mutex);

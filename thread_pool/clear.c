@@ -9,16 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "threadpool.h"
+#include "thread_pool.h"
 
 
-void threadpool_clear(threadpool_t T)
+void thread_pool_clear(thread_pool_t T)
 {
     slong i;
-    tpentry_struct * D = T->tdata;
-    slong l = T->length;
+    thread_pool_entry_struct * D = T->tdata;
+    slong size = T->length;
 
-    for (i = 0; i < l; i++)
+    for (i = 0; i < size; i++)
     {
         FLINT_ASSERT(D[i].available == 1); /* all threads should be given back */
         pthread_mutex_lock(&D[i].mutex);

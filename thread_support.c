@@ -10,7 +10,7 @@
 */
 
 #include "flint.h"
-#include "threadpool.h"
+#include "thread_pool.h"
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -26,9 +26,9 @@ int flint_get_num_threads()
 void flint_set_num_threads(int num_threads)
 {
     _flint_num_threads = num_threads;
-    if (global_threadpool_initialized)
+    if (global_thread_pool_initialized)
     {
-        if (!threadpool_set_size(global_threadpool, num_threads - 1))
+        if (!thread_pool_set_size(global_thread_pool, num_threads - 1))
         {
             flint_throw(FLINT_ERROR,
                "flint_set_num_threads called while global thread pool in use");
@@ -36,7 +36,7 @@ void flint_set_num_threads(int num_threads)
     }
     else
     {
-        threadpool_init(global_threadpool, num_threads - 1);
+        thread_pool_init(global_thread_pool, num_threads - 1);
     }
 #ifdef _OPENMP
     omp_set_num_threads(num_threads);
