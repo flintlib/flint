@@ -591,30 +591,27 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** coeff1, ulong ** exp1, slong * 
     }
     pthread_mutex_destroy(&base->mutex);
 
-    /* concatenate the outputs */ 
-    k = 0; /* avoid bogus warning */
-    for (i = base->ndivs - 1; i >= 0; i--)
+    /* concatenate the outputs */
+    i = base->ndivs - 1;
+    k = divs[i].len1;
+    p1 = divs[i].coeff1;
+    e1 = divs[i].exp1;
+    *alloc = divs[i].alloc1;
+
+    /* make space for all coeffs in one call to fit length */
+    j = k;
+    for (i = base->ndivs - 2; i >= 0; i--)
+        j += divs[i].len1;
+    _nmod_mpoly_fit_length(&p1, &e1, alloc, j, N);
+
+    for (i = base->ndivs - 2; i >= 0; i--)
     {
-        if (i + 1 < base->ndivs)
-        {
-            /* transfer from worker poly to original poly */
-            for (j = 0; j < divs[i].len1; j++)
-            {
-                _nmod_mpoly_fit_length(&p1, &e1, alloc, k + 1, N);
-                p1[k] = divs[i].coeff1[j];
-                mpoly_monomial_set(e1 + N*k, divs[i].exp1 + N*j, N);
-                k++;
-            }
-            flint_free(divs[i].coeff1);
-            flint_free(divs[i].exp1);
-        } else
-        {
-            /* highest thread used original poly */
-            k = divs[i].len1;
-            p1 = divs[i].coeff1;
-            e1 = divs[i].exp1;
-            *alloc = divs[i].alloc1;
-        }
+        /* transfer from worker poly to original poly */
+        flint_mpn_copyi(p1 + k, divs[i].coeff1, divs[i].len1);
+        flint_mpn_copyi(e1 + N*k, divs[i].exp1, N*divs[i].len1);
+        k += divs[i].len1;
+        flint_free(divs[i].coeff1);
+        flint_free(divs[i].exp1);
     }
 
     flint_free(handles);
