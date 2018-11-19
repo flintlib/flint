@@ -39,10 +39,16 @@ typedef threadpool_struct threadpool_t[1];
 
 typedef int threadpool_threadhandle;
 
+extern threadpool_t global_threadpool;
+extern int global_threadpool_initialized;
+
+FLINT_DLL void * threadpool_idle_loop(void * varg);
 
 FLINT_DLL void threadpool_init(threadpool_t T, slong l);
 
-FLINT_DLL slong threadpool_size(threadpool_t T);
+FLINT_DLL slong threadpool_get_size(threadpool_t T);
+
+FLINT_DLL int threadpool_set_size(threadpool_t T, slong new_size);
 
 FLINT_DLL slong threadpool_request(threadpool_t T, threadpool_threadhandle * out,
                                                               slong requested);

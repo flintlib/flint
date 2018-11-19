@@ -11,6 +11,8 @@
 
 #include "threadpool.h"
 
+threadpool_t global_threadpool;
+int global_threadpool_initialized = 0;
 
 void * threadpool_idle_loop(void * varg)
 {
@@ -51,25 +53,25 @@ threadpool_Unlock:
 }
 
 
-void threadpool_init(threadpool_t T, slong l)
+void threadpool_init(threadpool_t T, slong size)
 {
     slong i;
     tpentry_struct * D;
-    FLINT_ASSERT(l >= 0);
+    size = FLINT_MAX(size, WORD(0));
 
     pthread_mutex_init(&T->mutex, NULL);
-    T->length = l;
+    T->length = size;
 
-    if (l == 0)
+    if (size == 0)
     {
         T->tdata = NULL;
         return;
     }
 
-    D = (tpentry_struct *) flint_malloc(l * sizeof(tpentry_struct));
+    D = (tpentry_struct *) flint_malloc(size * sizeof(tpentry_struct));
     T->tdata = D;
 
-    for (i = 0; i < l; i++)
+    for (i = 0; i < size; i++)
     {
         pthread_mutex_init(&D[i].mutex, NULL);
         pthread_cond_init(&D[i].sleep1, NULL);

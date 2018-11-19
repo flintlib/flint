@@ -49,7 +49,7 @@ void test1(fmpz_t x, ulong n)
     threadpool_threadhandle * handles;
 
     /* request as many workers as possible */
-    req = threadpool_size(global_thread_pool);
+    req = threadpool_get_size(global_thread_pool);
     handles = (threadpool_threadhandle *) flint_malloc(sizeof(threadpool_threadhandle) * req);
     num_workers = threadpool_request(global_thread_pool, handles, req);
 

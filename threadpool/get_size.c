@@ -12,7 +12,7 @@
 #include "threadpool.h"
 
 
-slong threadpool_size(threadpool_t T)
+slong threadpool_get_size(threadpool_t T)
 {
     slong ret;
     pthread_mutex_lock(&T->mutex);
