@@ -16,16 +16,18 @@ void thread_pool_give_back(thread_pool_t T, thread_pool_handle i)
 {
     thread_pool_entry_struct * D;
 
+    pthread_mutex_lock(&T->mutex);
     D = T->tdata;
 
-    /* should not be trying to giveback an available thread */
-    FLINT_ASSERT(D[i].available == 0);
-
     pthread_mutex_lock(&D[i].mutex);
+
+    /* thread we are giving back should not be available nor working */
+    FLINT_ASSERT(D[i].available == 0);
     FLINT_ASSERT(D[i].working == 0);
+
+    D[i].available = 1;
+
     pthread_mutex_unlock(&D[i].mutex);
 
-    pthread_mutex_lock(&T->mutex);
-    D[i].available = 1;    
     pthread_mutex_unlock(&T->mutex);
 }

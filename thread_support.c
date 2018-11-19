@@ -37,6 +37,7 @@ void flint_set_num_threads(int num_threads)
     else
     {
         thread_pool_init(global_thread_pool, num_threads - 1);
+        global_thread_pool_initialized = 1;
     }
 #ifdef _OPENMP
     omp_set_num_threads(num_threads);

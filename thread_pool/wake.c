@@ -23,13 +23,16 @@ void thread_pool_wake(thread_pool_t T, thread_pool_handle i,
 
     D = T->tdata;
 
-    FLINT_ASSERT(D[i].available == 0); /* should not be trying to wake an available thread */
-
     pthread_mutex_lock(&D[i].mutex);
+
+    /* should not be trying to wake an available thread */
+    FLINT_ASSERT(D[i].available == 0);
+
     D[i].working = 1;
     D[i].fxn = f;
     D[i].fxnarg = a;
     pthread_cond_signal(&D[i].sleep1);
+
     pthread_mutex_unlock(&D[i].mutex);
 
     pthread_mutex_unlock(&T->mutex);

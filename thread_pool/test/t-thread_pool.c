@@ -12,8 +12,6 @@
 #include "thread_pool.h"
 #include "fmpz.h"
 
-thread_pool_t global_thread_pool;
-
 /******************************************************************************
     test1:
         calculate x = n! using a simple non-recursive residue scheme
@@ -175,7 +173,7 @@ main(void)
 
         fmpz_init(x);
         fmpz_init(y);
-        thread_pool_init(global_thread_pool, n_randint(state, 10));
+        flint_set_num_threads(n_randint(state, 10) + 1);
 
         for (j = 0; j < 10; j++)
         {
@@ -204,7 +202,6 @@ main(void)
             }
         }
 
-        thread_pool_clear(global_thread_pool);
         fmpz_clear(y);
         fmpz_clear(x);
     }
