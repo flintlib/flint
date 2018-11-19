@@ -11,24 +11,19 @@
 
 #include "aprcl.h"
 
-int
-unity_zpq_equal(const unity_zpq f, const unity_zpq g)
+void
+unity_zpq_clear(unity_zpq f)
 {
     slong i;
 
-    if (f->p != g->p)
-        return 0;
-
-    if (f->q != g->q)
-        return 0;
-
-    if (!fmpz_equal(f->n, g->n))
-        return 0;
-
     for (i = 0; i < f->p; i++)
-        if (!fmpz_mod_poly_equal(f->polys[i], g->polys[i]))
-            return 0;
+    {
+        fmpz_mod_poly_clear(f->polys[i]);
+    }
 
-    return 1;
+    f->p = 0;
+    f->q = 0;
+
+    fmpz_clear(f->n);
+    flint_free(f->polys);
 }
-

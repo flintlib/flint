@@ -11,24 +11,12 @@
 
 #include "aprcl.h"
 
-int
-unity_zpq_equal(const unity_zpq f, const unity_zpq g)
+void
+unity_zpq_scalar_mul_ui(unity_zpq f, const unity_zpq g, ulong s)
 {
     slong i;
 
-    if (f->p != g->p)
-        return 0;
-
-    if (f->q != g->q)
-        return 0;
-
-    if (!fmpz_equal(f->n, g->n))
-        return 0;
-
     for (i = 0; i < f->p; i++)
-        if (!fmpz_mod_poly_equal(f->polys[i], g->polys[i]))
-            return 0;
-
-    return 1;
+        fmpz_mod_poly_scalar_mul_ui(f->polys[i], g->polys[i], s);
 }
 

@@ -17,7 +17,7 @@
 void
 unity_zpq_gauss_sum(unity_zpq f, ulong q, ulong p)
 {
-    ulong i, qinv, qpow, ppow, g;
+    slong i, qinv, qpow, ppow, g;
 
     g = n_primitive_root_prime(q);
     qinv = n_preinvert_limb(q);

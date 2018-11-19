@@ -14,30 +14,17 @@
 void
 unity_zpq_init(unity_zpq f, ulong q, ulong p, const fmpz_t n)
 {
-    int i;
+    slong i;
 
     f->p = p;
     f->q = q;
+
     fmpz_init_set(f->n, n);
     f->polys = (fmpz_mod_poly_t *) flint_malloc(p * sizeof(fmpz_mod_poly_t));
+
     for (i = 0; i < p; i++)
     {
         fmpz_mod_poly_init(f->polys[i], n);
     }
-}
-
-void
-unity_zpq_clear(unity_zpq f)
-{
-    int i;
-    
-    for (i = 0; i < f->p; i++)
-    {
-        fmpz_mod_poly_clear(f->polys[i]);
-    }
-    f->p = 0;
-    f->q = 0;
-    fmpz_clear(f->n);
-    flint_free(f->polys);
 }
 

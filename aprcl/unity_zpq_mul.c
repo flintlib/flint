@@ -14,7 +14,8 @@
 void
 unity_zpq_mul(unity_zpq f, const unity_zpq g, const unity_zpq h)
 {
-    ulong i, j, k, p, q;
+    slong i, j, k;
+    ulong p, q;
     fmpz_mod_poly_t temp;
 
     q = f->q;
