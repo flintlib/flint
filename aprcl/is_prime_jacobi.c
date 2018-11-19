@@ -115,6 +115,7 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
         unity_zp_swap(temp, j0);
 
         /* update jv = \prod{\sigma_i^{-1}(j^{(v * i) / r})} */
+        /* note: overflow in v * i is not a concern here */
         unity_zp_pow_ui(temp, j, (v * i) / r);
         _unity_zp_reduce_cyclotomic(temp);
         /* aut = \sigma_i^{-1}(temp) */
@@ -820,6 +821,13 @@ is_prime_jacobi(const fmpz_t n)
     result = _is_prime_jacobi(n, config);
 
     config_jacobi_clear(config);
+
+    if (result == PROBABPRIME || result == UNKNOWN)
+    {
+        flint_printf("is_prime_jacobi: failed to prove n prime\n");
+        fmpz_print(n); flint_printf("\n");
+        flint_abort();
+    }
 
     /* if we prove primality returns 1 */
     if (result == PRIME)

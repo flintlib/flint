@@ -15,8 +15,32 @@ Primality test functions
 
 .. function:: int is_prime_aprcl(const fmpz_t n)
 
-    Tests `n` for primality using the APRCL test. Calls :func:`is_prime_jacobi()`.
-    Returns a non-zero value if `n` is prime.
+    Tests `n` for primality using the APRCL test.
+    This is the same as :func:`is_prime_jacobi()`.
+
+.. function:: int is_prime_jacobi(const fmpz_t n)
+
+    If `n` prime returns 1; otherwise returns 0. The algorithm is well described
+    in "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra and
+    "A Course in Computational Algebraic Number Theory" by H. Cohen.
+
+    It is theoretically possible that this function fails to prove that
+    `n` is prime. In this event, ``flint_abort()`` is called.
+    To handle this condition, the :func:`_is_prime_jacobi()` function
+    can be used.
+
+.. function:: int is_prime_gauss(const fmpz_t n)
+
+    If `n` is prime returns 1; otherwise returns 0.
+    Uses the Cyclotomic primality testing algorithm described in
+    "Four primality testing algorithms" by Rene Schoof.
+    The minimum required numbers `s` and `R` are computed automatically.
+
+    By default `R \ge 180`. In some cases this function fails to prove
+    that `n` is prime. This means that we select a too small `R` value.
+    In this event, ``flint_abort()`` is called.
+    To handle this condition, the :func:`_is_prime_jacobi()` function
+    can be used.
 
 .. function:: primality_test_status _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 
@@ -24,31 +48,11 @@ Primality test functions
     ``PRIME``, ``COMPOSITE`` and ``UNKNOWN`` (if we cannot
     prove primality).
 
-.. function:: int is_prime_jacobi(const fmpz_t n)
-
-    If `n` prime returns 1; otherwise returns 0. The algorithm is well described
-    in "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra and
-    "A Course in Computational Algebraic Number Theory" by H. Cohen.
-    It is theoretically possible that this function returns 0 for a prime number.
-    It means that we cannot check the `L_p` condition (see the
-    ``is_prime_jacobi.c``  source code for implementation details).
-    This case can be detected using the :func:`_is_prime_jacobi()` function.
-
 .. function:: primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config)
 
     Tests `n` for primality with fixed ``config``. Possible return values:
     ``PRIME``, ``COMPOSITE`` and ``PROBABPRIME``
     (if we cannot prove primality).
-
-.. function:: int is_prime_gauss(const fmpz_t n)
-
-    If `n` exactly prime returns 1; otherwise returns 0.
-    Uses the Cyclotomic primality testing algorithm described in
-    "Four primality testing algorithms" by Rene Schoof.
-    The minimum required numbers `s` and `R` are computed automatically.
-    By default `R \ge 180`. In some cases this function returns 0 for
-    prime numbers.  It means that we select a too small `R` value.
-    This case can be detected using the  :func:`_is_prime_gauss()` function.
 
 .. function:: is_prime_gauss_min_R(const fmpz_t n, ulong R)
 
@@ -70,7 +74,7 @@ Configuration functions
 
 .. function:: void config_gauss_init(aprcl_config conf, const fmpz_t n)
 
-    Compute the `s` and `R` values used in the cyclotomic primality test,
+    Computes the `s` and `R` values used in the cyclotomic primality test,
     `s^2 > n` and `s=\prod\limits_{\substack{q-1|R \\ q \text{ prime}}}q`.
     Also stores factors of `R` and `s`.
 

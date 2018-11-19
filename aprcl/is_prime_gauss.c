@@ -409,6 +409,13 @@ is_prime_gauss(const fmpz_t n)
         config_gauss_clear(config);
     }
 
+    if (result == PROBABPRIME || result == UNKNOWN)
+    {
+        flint_printf("is_prime_gauss: failed to prove n prime\n");
+        fmpz_print(n); flint_printf("\n");
+        flint_abort();
+    }
+
     if (result == PRIME)
         return 1;
     return 0;
