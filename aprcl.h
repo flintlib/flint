@@ -318,16 +318,16 @@ FLINT_DLL int unity_zpq_is_p_unity_generator(const unity_zpq f);
 
 /* Coefficient management */
 FLINT_DLL void unity_zpq_coeff_set_fmpz(unity_zpq f,
-        ulong i, ulong j, const fmpz_t x);
+        slong i, slong j, const fmpz_t x);
 
 FLINT_DLL void unity_zpq_coeff_set_ui(unity_zpq f,
-        ulong i, ulong j, ulong x);
+        slong i, slong j, ulong x);
 
 FLINT_DLL void unity_zpq_coeff_add(unity_zpq f,
-        ulong i, ulong j, const fmpz_t x);
+        slong i, slong j, const fmpz_t x);
 
 FLINT_DLL void unity_zpq_coeff_add_ui(unity_zpq f,
-        ulong i, ulong j, ulong x);
+        slong i, slong j, ulong x);
 
 /* Scalar multiplication */
 FLINT_DLL void unity_zpq_scalar_mul_ui(unity_zpq f,

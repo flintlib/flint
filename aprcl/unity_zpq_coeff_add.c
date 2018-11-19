@@ -12,36 +12,28 @@
 #include "aprcl.h"
 
 void
-unity_zpq_coeff_add(unity_zpq f, ulong i, ulong j, const fmpz_t x)
+unity_zpq_coeff_add(unity_zpq f, slong i, slong j, const fmpz_t x)
 {
-    fmpz_t coeff;
-    fmpz_init(coeff);
-    fmpz_mod_poly_get_coeff_fmpz(coeff, f->polys[j], i);
-    if (fmpz_is_zero(coeff))
+    if (i >= fmpz_mod_poly_length(f->polys[j]))
     {
-        fmpz_clear(coeff);
         fmpz_mod_poly_set_coeff_fmpz(f->polys[j], i, x);
         return;
     }
-    fmpz_clear(coeff);
+
     fmpz_add(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i, x);           
     if (fmpz_cmp(f->polys[j]->coeffs + i, f->n) >= 0)
         fmpz_sub(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i, f->n);
 }
 
 void
-unity_zpq_coeff_add_ui(unity_zpq f, ulong i, ulong j, ulong x)
+unity_zpq_coeff_add_ui(unity_zpq f, slong i, slong j, ulong x)
 {
-    fmpz_t coeff;
-    fmpz_init(coeff);
-    fmpz_mod_poly_get_coeff_fmpz(coeff, f->polys[j], i);
-    if (fmpz_is_zero(coeff))
+    if (i >= fmpz_mod_poly_length(f->polys[j]))
     {
-        fmpz_clear(coeff);
         fmpz_mod_poly_set_coeff_ui(f->polys[j], i, x);
         return;
     }
-    fmpz_clear(coeff);
+
     fmpz_add_ui(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i, x);          
     if (fmpz_cmp(f->polys[j]->coeffs + i, f->n) >= 0)
         fmpz_sub(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i, f->n);
