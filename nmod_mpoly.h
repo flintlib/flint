@@ -156,7 +156,25 @@ typedef struct
 typedef fq_nmod_mpolyd_ctx_struct fq_nmod_mpolyd_ctx_t[1];
 
 
+/* data is passed to the threaded mul/div functions via a stripe struct */
 
+typedef struct _nmod_mpoly_stripe_struct
+{
+    char * big_mem;
+    slong big_mem_alloc;
+    const nmod_mpoly_ctx_struct * ctx;
+    slong N;
+    mp_bitcnt_t bits;
+    nmod_t mod;
+    const ulong * cmpmask;
+    slong * startidx;
+    slong * endidx;
+    ulong * emin;
+    ulong * emax;
+    int upperclosed;
+} nmod_mpoly_stripe_struct;
+
+typedef nmod_mpoly_stripe_struct nmod_mpoly_stripe_t[1];
 
 /* geobuckets ****************************************************************/
 typedef struct nmod_mpoly_geobucket
