@@ -87,4 +87,3 @@ unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g)
     unity_zp_copy(f, g);
     _unity_zp_reduce_cyclotomic(f);
 }
-

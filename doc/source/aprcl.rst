@@ -3,73 +3,74 @@
 **aprcl.h** -- APRCL primality testing
 ========================================================================================
 
+This module implements the rigorous APRCL primality test, suitable for integers
+up to a few thousand digits.
+
+Authors:
+
+* Vladimir Glazachev (Google Summer of Code, 2015)
 
 Primality test functions
 --------------------------------------------------------------------------------
 
-
 .. function:: int is_prime_aprcl(const fmpz_t n)
 
-    Test `n` for primality using APRCL test. Calls ``is_prime_jacobi()``
-    function. Returns non zero value if `n` is prime.
+    Tests `n` for primality using the APRCL test. Calls :func:`is_prime_jacobi()`.
+    Returns a non-zero value if `n` is prime.
 
 .. function:: primality_test_status _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 
-    Jacobi sum test for ``fmpz`` value `n`. Possible return values:
-    ``PRIME``, ``COMPOSITE`` and ``UNKNOWN`` (if we can't 
-    prove primality). For implementation details see ``is_prime_jacobi.c``
-    source code.
+    Jacobi sum test for `n`. Possible return values:
+    ``PRIME``, ``COMPOSITE`` and ``UNKNOWN`` (if we cannot
+    prove primality).
 
 .. function:: int is_prime_jacobi(const fmpz_t n)
 
     If `n` prime returns 1; otherwise returns 0. The algorithm is well described
-    in "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra and 
+    in "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra and
     "A Course in Computational Algebraic Number Theory" by H. Cohen.
-    It is theoretically possible that returns 0 for prime number. 
-    It means that we can't check `L_p` condition (see ``is_prime_jacobi.c`` 
-    source code for implementation details), this case can be find
-    using ``_is_prime_jacobi()`` function.
+    It is theoretically possible that this function returns 0 for a prime number.
+    It means that we cannot check the `L_p` condition (see the
+    ``is_prime_jacobi.c``  source code for implementation details).
+    This case can be detected using the :func:`_is_prime_jacobi()` function.
 
 .. function:: primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config)
 
-    Test `n` for primality with fixed ``config``. Possible return values:
-    ``PRIME``, ``COMPOSITE`` and ``PROBABPRIME`` 
-    (if we can't prove primality).
+    Tests `n` for primality with fixed ``config``. Possible return values:
+    ``PRIME``, ``COMPOSITE`` and ``PROBABPRIME``
+    (if we cannot prove primality).
 
 .. function:: int is_prime_gauss(const fmpz_t n)
 
     If `n` exactly prime returns 1; otherwise returns 0.
-    In function used Cyclotomic primality testing algorithm discribed in 
-    "Four primality testing algorithms" by Rene Schoof. 
-    The minimum required numbers `s` and `R` computed automatically. 
-    By default `R >= 180`. In some cases returns 0 for prime numbers. 
-    It means that we select too small R value. To find this case 
-    ``_is_prime_gauss()`` function can be used.
+    Uses the Cyclotomic primality testing algorithm described in
+    "Four primality testing algorithms" by Rene Schoof.
+    The minimum required numbers `s` and `R` are computed automatically.
+    By default `R \ge 180`. In some cases this function returns 0 for
+    prime numbers.  It means that we select a too small `R` value.
+    This case can be detected using the  :func:`_is_prime_gauss()` function.
 
 .. function:: is_prime_gauss_min_R(const fmpz_t n, ulong R)
 
-    Same as ``is_prime_gauss`` function with fixed minimum value of `R`.
+    Same as :func:`is_prime_gauss` with fixed minimum value of `R`.
 
 .. function:: int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 
     Returns 0 if for some `a = n^k \bmod s`, where `k \in [1, r - 1]`, 
     we have that `a | n`; otherwise returns 1.
 
-
-
 Configuration functions
 --------------------------------------------------------------------------------
 
-
 .. function:: void config_gauss_init(aprcl_config conf, const fmpz_t n)
 
-    Compute the `s` and `R` values used in cyclotomic primality test.
+    Compute the `s` and `R` values used in the cyclotomic primality test,
     `s^2 > n` and `s=\prod\limits_{\substack{q-1|R \\ q \text{ prime}}}q`.
-    Also store factors of `R` and `s`.
+    Also stores factors of `R` and `s`.
 
 .. function:: void config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 
-    Compute the `s` with fixed minimum `R` such that `a^R \equiv 1 \mod{s}`
+    Computes the `s` with fixed minimum `R` such that `a^R \equiv 1 \mod{s}`
     for all integer `a` coprime to `s`. 
 
 .. function:: void config_gauss_clear(aprcl_config conf)
@@ -79,36 +80,53 @@ Configuration functions
 
 .. function:: ulong aprcl_R_value(const fmpz_t n)
 
-    Returns precomputed `R` value for APR-CL configration. `R` such that the 
-    corresponding `s` value greater then `\sqrt{n}`. Maximum stored value:
-    `6983776800` allows to test numbers up to `6000` digit.
+    Returns a precomputed `R` value for APRCL, such that the
+    corresponding `s` value is greater than `\sqrt{n}`. The maximum
+    stored value `6983776800` allows to test numbers up to `6000` digits.
 
 .. function:: void config_jacobi_init(aprcl_config conf, const fmpz_t n)
 
-    Compute the `s` and `R` values used in cyclotomic primality test.
+    Computes the `s` and `R` values used in the cyclotomic primality test,
     `s^2 > n` and `a^R \equiv 1 \mod{s}` for all `a` coprime to `s`.
-    Also store factors of `R` and `s`.
+    Also stores factors of `R` and `s`.
 
 .. function:: void config_jacobi_clear(aprcl_config conf)
 
     Clears the given ``aprcl_config`` element. It must be reinitialised in
     order to be used again.
 
-
-
-$\mathbb{Z}[\zeta_p]/(n)$. Memory management
+Cyclotomic arithmetic
 --------------------------------------------------------------------------------
 
-``unity_zp`` represents as ``fmpz_mod_poly`` reduced modulo
-cyclotomic polynomial.
+This code implements arithmetic in cyclotomic rings.
 
-.. function:: void unity_zp_init(unity_zp f, ulong p, const fmpz_t n)
+Types
+................................................................................
 
-    Initialized ``unity_zp`` element of `\mathbb{Z}[\zeta_p]/(n)`.
+.. type:: _unity_zp
+
+.. type:: unity_zp
+
+    Represents an element of `\mathbb{Z}[\zeta_{p^{exp}}]/(n)` as an
+    :type:`fmpz_mod_poly_t` reduced modulo a cyclotomic polynomial.
+
+.. type:: _unity_zpq
+
+.. type:: unity_zpq
+
+    Represents an element of `\mathbb{Z}[\zeta_q, \zeta_p]/(n)`
+    as an array of :type:`fmpz_mod_poly_t`.
+
+Memory management
+................................................................................
+
+.. function:: void unity_zp_init(unity_zp f, ulong p, ulong exp, const fmpz_t n)
+
+    Initializes `f` as an element of `\mathbb{Z}[\zeta_{p^{exp}}]/(n)`.
 
 .. function:: void unity_zp_clear(unity_zp f)
 
-    Clears the given ``unity_zp`` element. It must be reinitialised in
+    Clears the given element. It must be reinitialised in
     order to be used again.
 
 .. function:: void unity_zp_copy(unity_zp f, const unity_zp g)
@@ -121,13 +139,10 @@ cyclotomic polynomial.
 
 .. function:: void unity_zp_set_zero(unity_zp f)
 
-    Sets `f` to zero value.
+    Sets `f` to zero.
 
-
-
-$\mathbb{Z}[\zeta_p]/(n)$. Comparision
---------------------------------------------------------------------------------
-
+Comparision
+................................................................................
 
 .. function:: slong unity_zp_is_unity(const unity_zp f)
 
@@ -135,152 +150,127 @@ $\mathbb{Z}[\zeta_p]/(n)$. Comparision
 
 .. function:: int unity_zp_equal(const unity_zp f, const unity_zp g)
 
-    Returns non zero value if `f == g` reduced by `p^{exp}`-th cyclotomic
+    Returns nonzero if `f = g` reduced by the `p^{exp}`-th cyclotomic
     polynomial.
 
-
-
-$\mathbb{Z}[\zeta_p]/(n)$. Output
---------------------------------------------------------------------------------
-
+Output
+................................................................................
 
 .. function:: void unity_zp_print(const unity_zp f)
 
     Prints the contents of the `f`.
 
-
-
-$\mathbb{Z}[\zeta_p]/(n)$. Coefficient management
---------------------------------------------------------------------------------
-
+Coefficient management
+................................................................................
 
 .. function:: void unity_zp_coeff_set_fmpz(unity_zp f, ulong ind, const fmpz_t x)
 
-    Sets the coefficient of the `\zeta^{ind}` equal to x.
-    `ind` must be less then `p^{exp}`.
-
 .. function:: void unity_zp_coeff_set_ui(unity_zp f, ulong ind, ulong x)
 
-    Sets the coefficient of the `\zeta^{ind}` equal to x.
-    `ind` must be less then `p^{exp}`.
+    Sets the coefficient of `\zeta^{ind}` to `x`.
+    `ind` must be less than `p^{exp}`.
 
 .. function:: void unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x)
 
-    Sets the `a` in `a*\zeta^{ind}` to `a + x`. `x` must be less then `n`.
-    `ind` must be less then `p^{exp}`.
-
 .. function:: void unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x)
 
-    Sets the `a` in `a*\zeta^{ind}` to `a + x`. `x` must be less then `n`.
-    `ind` must be less then `p^{exp}`.
+    Adds `x` to the coefficient of `\zeta^{ind}`.
+    `x` must be less than `n`.
+    `ind` must be less than `p^{exp}`.
 
 .. function:: void unity_zp_coeff_inc(unity_zp f, ulong ind)
 
-    Increase the coefficient at `\zeta^{ind}`. 
-    `ind` must be less then `p^{exp}`.
+    Increments the coefficient of `\zeta^{ind}`.
+    `ind` must be less than `p^{exp}`.
 
 .. function:: void unity_zp_coeff_dec(unity_zp f, ulong ind)
 
-    Decrease the coefficient at `\zeta^{ind}`. 
-    `ind` must be less then `p^{exp}`.
+    Decrements the coefficient of `\zeta^{ind}`.
+    `ind` must be less than `p^{exp}`.
 
-
-
-$\mathbb{Z}[\zeta_p]/(n)$. Scalar multiplication
---------------------------------------------------------------------------------
-
+Scalar multiplication
+................................................................................
 
 .. function:: void unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s)
 
-    Sets the `f` to `s * g`. `f` and `g` must be initialized with
+    Sets `f` to `s \cdot g`. `f` and `g` must be initialized with
     same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s)
 
-    Sets the `f` to `s * g`. `f` and `g` must be initialized with
+    Sets `f` to `s \cdot g`. `f` and `g` must be initialized with
     same `p`, `exp` and `n`.
 
-
-
-$\mathbb{Z}[\zeta_p]/(n)$. Addition and multiplication
---------------------------------------------------------------------------------
-
+Addition and multiplication
+................................................................................
 
 .. function:: void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h)
 
-    Sets the `f` to `g + h`.
+    Sets `f` to `g + h`.
     `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
 
-    Sets `f` to `g * h`.
+    Sets `f` to `g \cdot h`.
     `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_sqr(unity_zp f, const unity_zp g)
 
-    Sets `f` to `g * g`.
+    Sets `f` to `g \cdot g`.
     `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
 
 .. function:: void untiy_zp_mul_inplace(unity_zp f, const unity_zp g, const untiy_zp h, fmpz_t * t)
 
-    Sets `f` to `g * h`. If `p^{exp} = 3, 4, 5, 7, 8, 9, 11, 16` special
-    multiplication functions are used. Allocated array `t` of ``fmpz_t`` are
+    Sets `f` to `g \cdot h`. If `p^{exp} = 3, 4, 5, 7, 8, 9, 11, 16` special
+    multiplication functions are used. The preallocated array `t` of ``fmpz_t`` is
     used for all computations in this case.
     `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t)
 
-    Sets `f` to `g * g`. If `p^{exp} = 3, 4, 5, 7, 8, 9, 11, 16` special
-    multiplication functions are used. Allocated array `t` of ``fmpz_t`` are
+    Sets `f` to `g \cdot g`. If `p^{exp} = 3, 4, 5, 7, 8, 9, 11, 16` special
+    multiplication functions are used. The preallocated array `t` of ``fmpz_t`` is
     used for all computations in this case.
     `f` and `g` must be initialized with same `p`, `exp` and `n`.
 
-
-
-$\mathbb{Z}[\zeta_p]/(n)$. Powering functions
---------------------------------------------------------------------------------
-
+Powering functions
+................................................................................
 
 .. function:: void unity_zp_pow_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
 
-    Sets the `f` to `g^{pow}`. `f` and `g` must be initialized with
+    Sets `f` to `g^{pow}`. `f` and `g` must be initialized with
     same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_pow_ui(unity_zp f, unity_zp g, ulong pow)
 
-    Sets the `f` to `g^{pow}`. `f` and `g` must be initialized with 
+    Sets `f` to `g^{pow}`. `f` and `g` must be initialized with
     same `p`, `exp` and `n`.
 
 .. function:: ulong _unity_zp_pow_select_k(const fmpz_t n)
 
-    Returns smallest integer `k` satisfies: 
+    Returns the smallest integer `k` satisfying
     `\log (n) < (k(k + 1)2^{2k}) / (2^{k + 1} - k - 2) + 1`
 
 .. function:: void unity_zp_pow_2k_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
 
-    Sets the `f` to `g^{pow}` using `2^k`-ary exponentiation method.
+    Sets `f` to `g^{pow}` using the `2^k`-ary exponentiation method.
     `f` and `g` must be initialized with same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_pow_2k_ui(unity_zp f, const unity_zp g, ulong pow)
 
-    Sets the `f` to `g^{pow}` using `2^k`-ary exponentiation method.
+    Sets `f` to `g^{pow}` using the `2^k`-ary exponentiation method.
     `f` and `g` must be initialized with same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
 
-    Sets the `f` to `g^{pow}` using sliding window exponentiation method.
+    Sets `f` to `g^{pow}` using the sliding window exponentiation method.
     `f` and `g` must be initialized with same `p`, `exp` and `n`.
 
 
-
-$\mathbb{Z}[\zeta_p]/(n)$. Cyclotomic reduction
---------------------------------------------------------------------------------
-
+Cyclotomic reduction
+................................................................................
 
 .. function:: void _unity_zp_reduce_cyclotomic_divmod(unity_zp f)
-
-    Sets `f = \sigma_x(g)`, there automorphism `\sigma_x(\zeta)=\zeta^x`.
-    `f` and `g` must be initialized with same `p`, `exp` and `n`.
 
 .. function:: void _unity_zp_reduce_cyclotomic(unity_zp f)
 
@@ -293,62 +283,52 @@ $\mathbb{Z}[\zeta_p]/(n)$. Cyclotomic reduction
     Sets `f = g \bmod \Phi_{p^{exp}}`. `\Phi_{p^{exp}}` is the `p^{exp}`-th
     cyclotomic polynomial.
 
-
-
-$\mathbb{Z}[\zeta_p]/(n)$. Automorphism and inverse
---------------------------------------------------------------------------------
-
+Automorphism and inverse
+................................................................................
 
 .. function:: void unity_zp_aut(unity_zp f, const unity_zp g, ulong x)
 
-    Sets `f = \sigma_x(g)`, there automorphism `\sigma_x(\zeta)=\zeta^x`.
-    `f` and `g` must be initialized with same `p`, `exp` and `n`.
+    Sets `f = \sigma_x(g)`, the automorphism `\sigma_x(\zeta)=\zeta^x`.
+    `f` and `g` must be initialized with the same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
 
-    Sets `f = \sigma_x^{-1}(g)`, so `\sigma_x(f) = g`. 
+    Sets `f = \sigma_x^{-1}(g)`, so `\sigma_x(f) = g`.
     `g` must be reduced by `\Phi_{p^{exp}}`.
-    `f` and `g` must be initialized with same `p`, `exp` and `n`.
+    `f` and `g` must be initialized with the same `p`, `exp` and `n`.
 
+Jacobi sum
+................................................................................
 
-
-$\mathbb{Z}[\zeta_p]/(n)$. Jacobi sum
---------------------------------------------------------------------------------
-
-In this part `\chi_{p, q}` is the character defined by 
-`\chi_{p, q}(g^x) = \zeta_{p^k}^x`, there `g` is
+Here `\chi_{p, q}` is the character defined by
+`\chi_{p, q}(g^x) = \zeta_{p^k}^x`, where `g` is
 a primitive root modulo `q`.
 
 .. function:: void unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p)
 
-    Sets `f` to Jacobi sum `J(p, q) = j(\chi_{p, q}, \chi_{p, q})`.
+    Sets `f` to the Jacobi sum `J(p, q) = j(\chi_{p, q}, \chi_{p, q})`.
 
 .. function:: void unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q)
 
-    Sets `f` to Jacobi sum 
-    `J_2(q) = j(\chi_{2, q}^{2^{k - 3}}, \chi_{2, q}^{3 * 2^{k - 3}}))^2`
+    Sets `f` to the Jacobi sum
+    `J_2(q) = j(\chi_{2, q}^{2^{k - 3}}, \chi_{2, q}^{3 \cdot 2^{k - 3}}))^2`.
 
 .. function:: void unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
 
-    Sets `f` to Jacobi sum
-    `J_3(1) = j(\chi_{2, q}, \chi_{2, q}, \chi_{2, q}) = 
-    J(2, q) * j(\chi_{2, q}^2, \chi_{2, q})`
+    Sets `f` to the Jacobi sum
+    `J_3(1) = j(\chi_{2, q}, \chi_{2, q}, \chi_{2, q}) =
+    J(2, q) \cdot j(\chi_{2, q}^2, \chi_{2, q})`.
 
-
-
-Operations in $\mathbb{Z}[\zeta_q, \zeta_p]/(n)$.
---------------------------------------------------------------------------------
-
-``unity_zpq`` represents as array of ``fmpz_mod_poly``.
+Extended rings
+................................................................................
 
 .. function:: void unity_zpq_init(unity_zpq f, ulong q, ulong p, const fmpz_t n)
 
-    Initialized ``unity_zpq`` element of `\mathbb{Z}[\zeta_q, \zeta_p]/(n)`.
-    ``unity_zpq`` is an array of ``fmpz_mod_poly_t`` elements.
+    Initializes `f` as an element of `\mathbb{Z}[\zeta_q, \zeta_p]/(n)`.
 
 .. function:: void unity_zpq_clear(unity_zpq f)
 
-    Clears the given ``unity_zpq`` element. It must be reinitialised in
+    Clears the given element. It must be reinitialized in
     order to be used again.
 
 .. function:: void unity_zpq_copy(unity_zpq f, const unity_zpq g)
@@ -363,61 +343,61 @@ Operations in $\mathbb{Z}[\zeta_q, \zeta_p]/(n)$.
 
 .. function:: int unity_zpq_equal(const unity_zpq f, const unity_zpq g)
 
-    Returns non zero value if `f == g`.
+    Returns nonzero if `f = g`.
 
 .. function:: ulong unity_zpq_p_unity(const unity_zpq f)
 
-    If `f = \zeta_p^x` returns `x in [0, p - 1]`; otherwise returns `f->p`. 
+    If `f = \zeta_p^x` returns `x in [0, p - 1]`; otherwise returns `p`.
 
 .. function:: int unity_zpq_is_p_unity(const unity_zpq f)
 
-    Returns non zero value if `f = \zeta_p^x`.
+    Returns nonzero if `f = \zeta_p^x`.
 
 .. function:: int unity_zpq_is_p_unity_generator(const unity_zpq f)
 
-    Returns non zero value if `f` is a generator of `<\zeta_p>` cyclic group.
+    Returns nonzero if `f` is a generator of the cyclic group `<\zeta_p>`.
 
 .. function:: void unity_zpq_coeff_set_fmpz(unity_zpq f, ulong i, ulong j, const fmpz_t x)
 
-    Sets the coefficient of the `\zeta_q^i*\zeta_p^j` equal to x.
-    ``i`` must be less then {q} and ``j`` must be less then {p}.
+    Sets the coefficient of `\zeta_q^i \zeta_p^j` to `x`.
+    `i` must be less than `q` and `j` must be less than `p`.
 
 .. function:: void unity_zpq_coeff_set_ui(unity_zpq f, ulong i, ulong j, ulong x)
 
-    Sets the coefficient of the `\zeta_q^i*\zeta_p^j` equal to x.
-    ``i`` must be less then {q} and ``j`` must be less then {p}.
+    Sets the coefficient of `\zeta_q^i \zeta_p^j` to `x`.
+    `i` must be less than `q` and `j` must be less then `p`.
 
 .. function:: void unity_zpq_coeff_add(unity_zpq f, ulong i, ulong j, const fmpz_t x)
 
-    Sets `a` in `a*\zeta_p^i*\zeta_q^j` to `a + x`. `x` must be less then `n`.
+    Adds `x` to the coefficient of `\zeta_p^i \zeta_q^j`. `x` must be less than `n`.
 
 .. function:: void unity_zpq_add(unity_zpq f, const unity_zpq g, const unity_zpq h)
 
-    Sets the ``f`` to the ``g``+``h``.
-    ``f``, ``g`` and ``h`` must be initialized with same
-    ``q``, ``p`` and ``n``.
+    Sets `f` to `g + h`.
+    `f`, `g` and `h` must be initialized with same
+    `q`, `p` and `n`.
 
 .. function:: void unity_zpq_mul(unity_zpq f, const unity_zpq g, const unity_zpq h)
 
-    Sets the ``f`` to the ``g``*``h``.
-    ``f``, ``g`` and ``h`` must be initialized with same
-    ``q``, ``p`` and ``n``.
+    Sets the `f` to `g \cdot h`.
+    `f`, `g` and `h` must be initialized with same
+    `q`, `p` and `n`.
 
 .. function:: void _unity_zpq_mul_unity_p(unity_zpq f)
 
-    Sets `f = f * \zeta_p`.
+    Sets `f = f \cdot \zeta_p`.
 
 .. function:: void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong k)
 
-    Sets `f` to `g * \zeta_p^k`.
+    Sets `f` to `g \cdot \zeta_p^k`.
 
 .. function:: void unity_zpq_pow(unity_zpq f, unity_zpq g, const fmpz_t p)
 
-    Sets the `f` to `g^p`. `f` and `g` must be initialized with same `p`, `q` and `n`.
+    Sets `f` to `g^p`. `f` and `g` must be initialized with same `p`, `q` and `n`.
 
 .. function:: void unity_zpq_pow_ui(unity_zpq f, unity_zpq g, ulong p)
 
-    Sets the `f` to `g^p`. `f` and `g` must be initialized with same `p`, `q` and `n`.
+    Sets `f` to `g^p`. `f` and `g` must be initialized with same `p`, `q` and `n`.
 
 .. function:: void unity_zpq_gauss_sum(unity_zpq f, ulong q, ulong p)
 
