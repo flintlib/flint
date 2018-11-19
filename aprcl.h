@@ -343,7 +343,7 @@ FLINT_DLL void unity_zpq_mul(unity_zpq f,
 FLINT_DLL void _unity_zpq_mul_unity_p(unity_zpq f);
 
 FLINT_DLL void unity_zpq_mul_unity_p_pow(
-        unity_zpq f, const unity_zpq g, ulong p);
+        unity_zpq f, const unity_zpq g, slong p);
 
 /* Powering */
 FLINT_DLL void unity_zpq_pow(unity_zpq f,
