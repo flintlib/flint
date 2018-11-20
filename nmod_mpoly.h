@@ -166,6 +166,7 @@ typedef struct _nmod_mpoly_stripe_struct
     slong N;
     mp_bitcnt_t bits;
     nmod_t mod;
+    mp_limb_t lc_minus_inv;
     const ulong * cmpmask;
     slong * startidx;
     slong * endidx;

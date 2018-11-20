@@ -53,10 +53,17 @@ main(void)
             flint_printf("Check simple example\n");
             flint_abort();
         }
+
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(p, ctx);
+        nmod_mpoly_clear(h, ctx);
+        nmod_mpoly_clear(h2, ctx);
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     /* Check f*g/g = f */
-    for (i = 0; i < 1 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
@@ -75,9 +82,9 @@ main(void)
         nmod_mpoly_init(h, ctx);
         nmod_mpoly_init(k, ctx);
 
-        len = n_randint(state, 10);
-        len1 = n_randint(state, 10);
-        len2 = n_randint(state, 10) + 1;
+        len = n_randint(state, 20);
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20) + 1;
 
         exp_bits = n_randint(state, 200) + 2;
         exp_bits1 = n_randint(state, 200) + 2;
@@ -115,11 +122,307 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
+    /* Check f*g/g = f with divisor aliasing */
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, h;
+        slong len, len1, len2;
+        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
+
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(h, ctx);
+
+        len = n_randint(state, 20);
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20) + 1;
+
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
+
+        for (j = 0; j < 4; j++)
+        {
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            do {
+                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            } while (g->length == 0);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
+
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+            nmod_mpoly_mul_johnson(h, f, g, ctx);
+            nmod_mpoly_test(h, ctx);
+            result = nmod_mpoly_divides_heap_threaded(g, h, g, ctx);
+            nmod_mpoly_test(g, ctx);
+            result = result && nmod_mpoly_equal(f, g, ctx);
+
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check f*g/g = f with divisor aliasing\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+        }
+
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(h, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* Check f*g/g = f with dividend aliasing */
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, h;
+        slong len, len1, len2;
+        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
+
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(h, ctx);
+
+        len = n_randint(state, 20);
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20) + 1;
+
+        exp_bits = n_randint(state, 200) + 2;
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
+
+        for (j = 0; j < 4; j++)
+        {
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            do {
+                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            } while (g->length == 0);
+            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
+
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+            nmod_mpoly_mul_johnson(h, f, g, ctx);
+            nmod_mpoly_test(h, ctx);
+            result = nmod_mpoly_divides_heap_threaded(h, h, g, ctx);
+            nmod_mpoly_test(h, ctx);
+            result = result && nmod_mpoly_equal(f, h, ctx);
+
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check f*g/g = f with dividend aliasing\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+        }
+
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(h, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* Check random polys don't divide */
+    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, p, h1, h2;
+        slong len1, len2, len3;
+        mp_bitcnt_t exp_bits1, exp_bits2, exp_bound3;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
+
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(p, ctx);
+        nmod_mpoly_init(h1, ctx);
+        nmod_mpoly_init(h2, ctx);
+
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20) + 1;
+        len3 = n_randint(state, 10);
+
+        exp_bits1 = n_randint(state, 100) + 2;
+        exp_bits2 = n_randint(state, 100) + 2;
+        exp_bound3 = n_randint(state, 20) + 1;
+
+        for (j = 0; j < 4; j++)
+        {
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            do {
+                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(p, state, len3, exp_bound3, ctx);
+
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+            nmod_mpoly_mul(f, f, g, ctx);
+            nmod_mpoly_add(f, f, p, ctx);
+            result = nmod_mpoly_divides_monagan_pearce(h1, f, g, ctx);
+            nmod_mpoly_test(h1, ctx);
+            result2 = nmod_mpoly_divides_heap_threaded(h2, f, g, ctx);
+            nmod_mpoly_test(h2, ctx);
+
+            if (result != result2 || !nmod_mpoly_equal(h1, h2, ctx))
+            {
+                flint_printf("Check random polys don't divide\n"
+                                                   "i = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
+        }
+
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(p, ctx);
+        nmod_mpoly_clear(h1, ctx);
+        nmod_mpoly_clear(h2, ctx);
+
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* Check random polys don't divide alias dividend */
+    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, p, h1;
+        slong len1, len2, len3;
+        mp_bitcnt_t exp_bits1, exp_bits2, exp_bound3;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
+
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(p, ctx);
+        nmod_mpoly_init(h1, ctx);
+
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20) + 1;
+        len3 = n_randint(state, 10);
+
+        exp_bits1 = n_randint(state, 100) + 2;
+        exp_bits2 = n_randint(state, 100) + 2;
+        exp_bound3 = n_randint(state, 20) + 1;
+
+        for (j = 0; j < 4; j++)
+        {
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            do {
+                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(p, state, len3, exp_bound3, ctx);
+
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+            nmod_mpoly_mul(f, f, g, ctx);
+            nmod_mpoly_add(f, f, p, ctx);
+            result = nmod_mpoly_divides_monagan_pearce(h1, f, g, ctx);
+            nmod_mpoly_test(h1, ctx);
+            result2 = nmod_mpoly_divides_heap_threaded(f, f, g, ctx);
+            nmod_mpoly_test(f, ctx);
+
+            if (result != result2 || !nmod_mpoly_equal(h1, f, ctx))
+            {
+                flint_printf("Check random polys don't divide alias dividend\n"
+                                                   "i = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
+        }
+
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(p, ctx);
+        nmod_mpoly_clear(h1, ctx);
+
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* Check random polys don't divide alias divisor */
+    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, p, h1;
+        slong len1, len2, len3;
+        mp_bitcnt_t exp_bits1, exp_bits2, exp_bound3;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
+
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(p, ctx);
+        nmod_mpoly_init(h1, ctx);
+
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20) + 1;
+        len3 = n_randint(state, 10);
+
+        exp_bits1 = n_randint(state, 100) + 2;
+        exp_bits2 = n_randint(state, 100) + 2;
+        exp_bound3 = n_randint(state, 20) + 1;
+
+        for (j = 0; j < 4; j++)
+        {
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            do {
+                nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(p, state, len3, exp_bound3, ctx);
+
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+            nmod_mpoly_mul(f, f, g, ctx);
+            nmod_mpoly_add(f, f, p, ctx);
+            result = nmod_mpoly_divides_monagan_pearce(h1, f, g, ctx);
+            nmod_mpoly_test(h1, ctx);
+            result2 = nmod_mpoly_divides_heap_threaded(g, f, g, ctx);
+            nmod_mpoly_test(g, ctx);
+
+            if (result != result2 || !nmod_mpoly_equal(h1, g, ctx))
+            {
+                flint_printf("Check random polys don't divide alias divisor\n"
+                                                   "i = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
+        }
+
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(p, ctx);
+        nmod_mpoly_clear(h1, ctx);
+
+        nmod_mpoly_ctx_clear(ctx);
+    }
 
     FLINT_TEST_CLEANUP(state);
 
     printf("PASS\n");
     return 0;
 }
-
-
