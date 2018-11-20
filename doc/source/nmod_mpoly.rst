@@ -274,46 +274,67 @@ Multiplication
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mpoly_mul_johnson(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_mul(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` times ``poly3`` using the Johnson heap
-    based method. See the numerous papers by Michael Monagan and Roman Pearce.
-    This function throws an exception upon exponent overflow.
+    Set `A` to `B` times `C`.
 
+.. function:: int nmod_mpoly_mul_dense(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-.. function:: void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
+    Try to set `A` to `B` times `C` using univariate arithmetic.
+    If the return is `0`, the operation was unsuccessful. Otherwise, it was successful and the return is `1`.
 
-    Does the same operation as ``nmod_mpoly_mul_johnson`` but with
-    multiple threads. This function throws an exception upon exponent overflow.
+.. function:: int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
+
+    Try to set `A` to `B` times `C` using arrays.
+    If the return is `0`, the operation was unsuccessful. Otherwise, it was successful and the return is `1`.
+
+.. function:: void nmod_mpoly_mul_johnson(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
+
+    Set `A` to `B` times `C` using Johnson's heap-based method.
+
+.. function:: void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
+
+    Set `A` to `B` times `C` using a heap and multiple threads.
+    This function should only be called once ``global_thread_pool`` has been initialized.
 
 
 Powering
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mpoly_pow(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, ulong k, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B, ulong k, const nmod_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` raised to the `k`-th power.
+    Set `A` to `B` raised to the `k`-th power.
+    This functions throws if `k < 0`.
 
-.. function:: void nmod_mpoly_pow_fmpz(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, ulong k, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B, const fmpz_t k, const nmod_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` raised to the `k`-th power. This function
-    will fail if k is bigger than a ``ulong`` and ``poly1`` has more than
-    one term.
-
+    Set `A` to `B` raised to the `k`-th power.
+    This function throws if `k < 0` or if `k` does not fit an ``slong`` and `A` has more than one term.
 
 
 Divisibility testing
 --------------------------------------------------------------------------------
 
 
-.. function:: int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
+.. function:: int nmod_mpoly_divides(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` divided by ``poly3`` and return 1 if
-    the quotient is exact. Otherwise return 0. The function uses the algorithm
-    of Michael Monagan and Roman Pearce. Note that the function
-    ``nmod_mpoly_div_monagan_pearce`` below may be much faster if the
-    quotient is known to be exact.
+    If `A` is divisible by `B`, set `Q` to the exact quotient and return `1`. Otherwise, set `Q` to zero and return `0`.
+    Note that the function ``nmod_mpoly_div`` below may be faster if the quotient is known to be exact.
+
+.. function:: int nmod_mpoly_divides_dense(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Try to do the operation of ``nmod_mpoly_divides`` using univariate arithmetic.
+    If the return is `-1`, the operation was unsuccessful. Otherwise, it was successful and the return is `0` or `1`.
+
+.. function:: int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Do the operation of ``nmod_mpoly_divides`` using the algorithm of Michael Monagan and Roman Pearce.
+
+.. function:: int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Do the operation of ``nmod_mpoly_divides`` using a heap and multiple threads.
+    This function should only be called once ``global_thread_pool`` has been initialized.
 
 
 Division

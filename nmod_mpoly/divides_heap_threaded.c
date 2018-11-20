@@ -1745,6 +1745,8 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     */
     lc_inv = nmod_inv(B->coeffs[0], ctx->ffinfo->mod);
 
+    FLINT_ASSERT(global_thread_pool_initialized);
+
     max_num_workers = thread_pool_get_size(global_thread_pool);
     handles = (thread_pool_handle *) flint_malloc(max_num_workers
                                                   *sizeof(thread_pool_handle));

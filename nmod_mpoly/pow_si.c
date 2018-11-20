@@ -24,7 +24,10 @@ void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B,
     int freeBexps;
     TMP_INIT;
 
-    FLINT_ASSERT(k >= 0);
+    if (k < 0)
+    {
+        flint_throw(FLINT_ERROR, "Negative power in nmod_mpoly_pow_si");
+    }
 
     if (k == 0)
     {
