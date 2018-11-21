@@ -95,6 +95,7 @@ FLINT_DLL void flint_free(void * ptr);
 typedef void (*flint_cleanup_function_t)(void);
 FLINT_DLL void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
 FLINT_DLL void flint_cleanup(void);
+FLINT_DLL void flint_cleanup_master(void);
 
 FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
      void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
@@ -253,7 +254,7 @@ void flint_rand_free(flint_rand_s * state)
 
 #define FLINT_TEST_CLEANUP(xxx) \
    flint_randclear(xxx); \
-   flint_cleanup();
+   flint_cleanup_master();
 
 /*
   We define this here as there is no mpfr.h

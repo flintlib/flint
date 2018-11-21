@@ -21,7 +21,7 @@ void nmod_mpoly_pow_fmpz(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     mp_bitcnt_t exp_bits;
     TMP_INIT;
 
-    if (fmpz_cmp_ui(pow, UWORD(0)) < 0)
+    if (fmpz_sgn(pow) < 0)
         flint_throw(FLINT_ERROR, "Negative power in nmod_mpoly_pow_fmpz");
 
     if (fmpz_fits_si(pow))

@@ -9,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "threadpool.h"
+#include "thread_pool.h"
 
 
-slong threadpool_request(threadpool_t T, threadpool_threadhandle * out,
+slong thread_pool_request(thread_pool_t T, thread_pool_handle * out,
                                                                slong requested)
 {
     slong i, ret = 0;
-    tpentry_struct * D;
+    thread_pool_entry_struct * D;
 
     if (requested <= 0)
         return 0;

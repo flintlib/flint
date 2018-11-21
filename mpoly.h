@@ -462,14 +462,40 @@ int mpoly_monomial_equal(const ulong * exp2, const ulong * exp3, slong N)
 }
 
 MPOLY_INLINE
+int mpoly_monomial_cmp1(ulong a, ulong b, ulong cmpmask)
+{
+    if ((a^cmpmask) != (b^cmpmask))
+    {
+        if ((a^cmpmask) > (b^cmpmask))
+            return 1;
+        else
+            return -1;
+    }
+    return 0;
+}
+
+MPOLY_INLINE
+int mpoly_monomial_gt1(ulong a, ulong b, ulong cmpmask)
+{
+    return (a^cmpmask) > (b^cmpmask);
+}
+
+MPOLY_INLINE
+int mpoly_monomial_ge1(ulong a, ulong b, ulong cmpmask)
+{
+    return (a^cmpmask) >= (b^cmpmask);
+}
+
+MPOLY_INLINE
 int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3,
                                                 slong N, const ulong * cmpmask)
 {
     slong i = N - 1;
-    do
-    {
+    do {
         if (exp2[i] != exp3[i])
+        {
             return (exp3[i]^cmpmask[i]) < (exp2[i]^cmpmask[i]);
+        }
     } while (--i >= 0);
     return 0;
 }
@@ -479,10 +505,11 @@ int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3,
                                                 slong N, const ulong * cmpmask)
 {
     slong i = N - 1;
-    do
-    {
+    do {
         if (exp2[i] != exp3[i])
+        {
             return (exp3[i]^cmpmask[i]) > (exp2[i]^cmpmask[i]);
+        }
     } while (--i >= 0);
     return 0;
 }
@@ -491,10 +518,11 @@ MPOLY_INLINE
 int mpoly_monomial_lt_nomask(const ulong * exp2, const ulong * exp3, slong N)
 {
     slong i = N - 1;
-    do
-    {
+    do {
         if (exp2[i] != exp3[i])
+        {
             return exp2[i] < exp3[i];
+        }
     } while (--i >= 0);
     return 0;
 }
@@ -503,10 +531,11 @@ MPOLY_INLINE
 int mpoly_monomial_gt_nomask(const ulong * exp2, const ulong * exp3, slong N)
 {
     slong i = N - 1;
-    do
-    {
+    do {
         if (exp2[i] != exp3[i])
+        {
             return exp2[i] > exp3[i];
+        }
     } while (--i >= 0);
     return 0;
 }
@@ -516,8 +545,7 @@ int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
                                                 slong N, const ulong * cmpmask)
 {
     slong i = N - 1;
-    do
-    {
+    do {
         if (exp2[i] != exp3[i])
         {
             if ((exp2[i]^cmpmask[i]) > (exp3[i]^cmpmask[i]))

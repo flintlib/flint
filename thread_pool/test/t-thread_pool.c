@@ -9,10 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "threadpool.h"
+#include "thread_pool.h"
 #include "fmpz.h"
-
-threadpool_t global_thread_pool;
 
 /******************************************************************************
     test1:
@@ -46,14 +44,16 @@ void test1(fmpz_t x, ulong n)
     ulong i, modulus;
     slong k, req, num_workers;
     worker1_arg_struct * args;
-    threadpool_threadhandle * handles;
+    thread_pool_handle * handles;
 
     /* request as many workers as possible */
-    req = threadpool_size(global_thread_pool);
-    handles = (threadpool_threadhandle *) flint_malloc(sizeof(threadpool_threadhandle) * req);
-    num_workers = threadpool_request(global_thread_pool, handles, req);
+    req = thread_pool_get_size(global_thread_pool);
+    handles = (thread_pool_handle *) flint_malloc(req
+                                                  *sizeof(thread_pool_handle));
+    num_workers = thread_pool_request(global_thread_pool, handles, req);
 
-    args = (worker1_arg_struct *) flint_malloc(sizeof(worker1_arg_struct) * FLINT_MAX(num_workers, 1));
+    args = (worker1_arg_struct *) flint_malloc(FLINT_MAX(num_workers, 1)
+                                                  *sizeof(worker1_arg_struct));
 
     modulus = num_workers + 1;
 
@@ -64,7 +64,7 @@ void test1(fmpz_t x, ulong n)
         args[k].modulus = modulus;
         args[k].n = n;
         fmpz_init(args[k].ans); /* worker expects an inited ans */
-        threadpool_wake(global_thread_pool, handles[k], worker1, &args[k]);
+        thread_pool_wake(global_thread_pool, handles[k], worker1, &args[k]);
     }
 
     /* do some work ourselves */
@@ -77,10 +77,10 @@ void test1(fmpz_t x, ulong n)
     /* wait for each of the workers and combine their answers */
     for (k = 0; k < num_workers; k++)
     {
-        threadpool_wait(global_thread_pool, handles[k]);
+        thread_pool_wait(global_thread_pool, handles[k]);
         fmpz_mul(x, x, args[k].ans);
         fmpz_clear(args[k].ans); /* worker of course did not clean up its ans */
-        threadpool_giveback(global_thread_pool, handles[k]);
+        thread_pool_give_back(global_thread_pool, handles[k]);
     }
 
     flint_free(args);
@@ -115,13 +115,13 @@ void test2_helper(fmpz_t x, ulong min, ulong max)
 {
     ulong i, mid;
     slong num_workers;
-    threadpool_threadhandle handles[1];
+    thread_pool_handle handles[1];
     worker2_arg_struct args[1];
 
     FLINT_ASSERT(max >= min);
 
     if (max - min > UWORD(20)
-        && ((num_workers = threadpool_request(global_thread_pool, handles, 1)) != 0))
+        && ((num_workers = thread_pool_request(global_thread_pool, handles, 1)) != 0))
     {
         FLINT_ASSERT(num_workers == 1);
 
@@ -131,16 +131,16 @@ void test2_helper(fmpz_t x, ulong min, ulong max)
         args[0].min = min;
         args[0].max = mid;
         fmpz_init(args[0].ans);
-        threadpool_wake(global_thread_pool, handles[0], worker2, &args[0]);
+        thread_pool_wake(global_thread_pool, handles[0], worker2, &args[0]);
 
         /* do some work ourselves */
         test2_helper(x, mid, max);
 
         /* wait for the worker and combine its answer */
-        threadpool_wait(global_thread_pool, handles[0]);
+        thread_pool_wait(global_thread_pool, handles[0]);
         fmpz_mul(x, x, args[0].ans);
         fmpz_clear(args[0].ans);
-        threadpool_giveback(global_thread_pool, handles[0]);
+        thread_pool_give_back(global_thread_pool, handles[0]);
     }
     else
     {
@@ -164,7 +164,7 @@ main(void)
     slong i, j;
     FLINT_TEST_INIT(state);
 
-    flint_printf("threadpool....");
+    flint_printf("thread_pool....");
     fflush(stdout);
 
     for (i = 0; i < 10*flint_test_multiplier(); i++)
@@ -173,7 +173,7 @@ main(void)
 
         fmpz_init(x);
         fmpz_init(y);
-        threadpool_init(global_thread_pool, n_randint(state, 10));
+        flint_set_num_threads(n_randint(state, 10) + 1);
 
         for (j = 0; j < 10; j++)
         {
@@ -202,7 +202,6 @@ main(void)
             }
         }
 
-        threadpool_clear(global_thread_pool);
         fmpz_clear(y);
         fmpz_clear(x);
     }

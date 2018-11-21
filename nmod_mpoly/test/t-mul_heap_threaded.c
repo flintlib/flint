@@ -22,6 +22,37 @@ main(void)
     flint_printf("mul_heap_threaded....");
     fflush(stdout);
 
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, h1, h2;
+        const char * vars[] = {"x","y","z","t","u"};
+
+        nmod_mpoly_ctx_init(ctx, 5, ORD_LEX, -UWORD(1));
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(h1, ctx);
+        nmod_mpoly_init(h2, ctx);
+
+        nmod_mpoly_set_str_pretty(f, "(1+x+y+2*z^2+3*t^3+5*u^5)^6", vars, ctx);
+        nmod_mpoly_set_str_pretty(g, "(1+u+t+2*z^2+3*y^3+5*x^5)^6", vars, ctx);
+
+        nmod_mpoly_mul(h1, f, g, ctx);
+        flint_set_num_threads(2);
+        nmod_mpoly_mul_heap_threaded(h2, f, g, ctx);
+        if (!nmod_mpoly_equal(h1, h2, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check simple example\n");
+            flint_abort();
+        }
+
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(h1, ctx);
+        nmod_mpoly_clear(h2, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
     /* Check mul_heap_threaded matches mul_johnson */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {

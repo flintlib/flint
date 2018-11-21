@@ -156,7 +156,26 @@ typedef struct
 typedef fq_nmod_mpolyd_ctx_struct fq_nmod_mpolyd_ctx_t[1];
 
 
+/* data is passed to the threaded mul/div functions via a stripe struct */
 
+typedef struct _nmod_mpoly_stripe_struct
+{
+    char * big_mem;
+    slong big_mem_alloc;
+    const nmod_mpoly_ctx_struct * ctx;
+    slong N;
+    mp_bitcnt_t bits;
+    nmod_t mod;
+    mp_limb_t lc_minus_inv;
+    const ulong * cmpmask;
+    slong * startidx;
+    slong * endidx;
+    ulong * emin;
+    ulong * emax;
+    int upperclosed;
+} nmod_mpoly_stripe_struct;
+
+typedef nmod_mpoly_stripe_struct nmod_mpoly_stripe_t[1];
 
 /* geobuckets ****************************************************************/
 typedef struct nmod_mpoly_geobucket
@@ -482,6 +501,11 @@ FLINT_DLL void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
 FLINT_DLL void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                          const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
+                    const ulong * coeff2, const ulong * exp2, slong len2,
+                    const ulong * coeff3, const ulong * exp3, slong len3,
+                       slong N, const ulong * cmpmask, const nmodf_ctx_t fctx);
+
 /* Scalar operations *********************************************************/
 
 FLINT_DLL void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t poly1,
@@ -518,13 +542,13 @@ slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
 
 /* Powering ******************************************************************/
 
-FLINT_DLL void nmod_mpoly_pow_si(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+FLINT_DLL void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B,
                                           slong k, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
                                           slong k, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_pow_fmpz(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+FLINT_DLL void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B,
                                  const fmpz_t pow, const nmod_mpoly_ctx_t ctx);
 
 /* Calculus ******************************************************************/
@@ -549,7 +573,11 @@ FLINT_DLL int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
                         const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
-slong _nmod_mpoly_divides_monagan_pearce(
+FLINT_DLL int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
+                          const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong _nmod_mpoly_divides_monagan_pearce(
                      mp_limb_t ** coeff1,      ulong ** exp1, slong * alloc,
                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,

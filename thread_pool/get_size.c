@@ -9,10 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "threadpool.h"
+#include "thread_pool.h"
 
 
-slong threadpool_size(threadpool_t T)
+slong thread_pool_get_size(thread_pool_t T)
 {
     slong ret;
     pthread_mutex_lock(&T->mutex);
