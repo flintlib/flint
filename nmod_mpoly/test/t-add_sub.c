@@ -362,9 +362,9 @@ main(void)
             nmod_mpoly_set(h, f, ctx);
 
             nmod_mpoly_add(f, f, g, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             nmod_mpoly_sub(f, f, g, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             result = nmod_mpoly_equal(f, h, ctx);
             if (!result)
             {
@@ -421,15 +421,15 @@ main(void)
             if ((j % 2) == 0)
             {
                 nmod_mpoly_add(h, g, f, ctx);
-                nmod_mpoly_test(h, ctx);
+                nmod_mpoly_assert_canonical(h, ctx);
                 nmod_mpoly_add(f, g, f, ctx);
-                nmod_mpoly_test(f, ctx);
+                nmod_mpoly_assert_canonical(f, ctx);
             } else
             {
                 nmod_mpoly_sub(h, g, f, ctx);
-                nmod_mpoly_test(h, ctx);
+                nmod_mpoly_assert_canonical(h, ctx);
                 nmod_mpoly_sub(f, g, f, ctx);
-                nmod_mpoly_test(f, ctx);
+                nmod_mpoly_assert_canonical(f, ctx);
             }
 
             result = nmod_mpoly_equal(f, h, ctx);

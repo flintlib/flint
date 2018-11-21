@@ -15,7 +15,7 @@
 
 
 /* foolproof way to check totdeg_check is correct */
-void _check_totaldegree(const fmpz_t totdeg_check, const nmod_mpoly_t A,
+void _check_total_degree(const fmpz_t totdeg_check, const nmod_mpoly_t A,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i, j, N;
@@ -67,10 +67,10 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("totaldegree....");
+    flint_printf("total_degree....");
     fflush(stdout);
 
-    /* Check totaldegree does not go up under addition */
+    /* Check total_degree does not go up under addition */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
@@ -104,12 +104,12 @@ main(void)
             nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
             nmod_mpoly_add(h, f, g, ctx);
 
-            nmod_mpoly_totaldegree_fmpz(hdeg, h, ctx);
-            nmod_mpoly_totaldegree_fmpz(fdeg, f, ctx);
-            nmod_mpoly_totaldegree_fmpz(gdeg, g, ctx);
-            _check_totaldegree(hdeg, h, ctx);
-            _check_totaldegree(fdeg, f, ctx);
-            _check_totaldegree(gdeg, g, ctx);
+            nmod_mpoly_total_degree_fmpz(hdeg, h, ctx);
+            nmod_mpoly_total_degree_fmpz(fdeg, f, ctx);
+            nmod_mpoly_total_degree_fmpz(gdeg, g, ctx);
+            _check_total_degree(hdeg, h, ctx);
+            _check_total_degree(fdeg, f, ctx);
+            _check_total_degree(gdeg, g, ctx);
 
             if ((fmpz_cmp(hdeg, fdeg) > 0) && (fmpz_cmp(hdeg, gdeg) > 0))
             {
@@ -128,7 +128,7 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    /* Check totaldegree adds under multiplication */
+    /* Check total_degree adds under multiplication */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         int ok;
@@ -163,12 +163,12 @@ main(void)
             nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
             nmod_mpoly_mul_johnson(h, f, g, ctx);
 
-            nmod_mpoly_totaldegree_fmpz(hdeg, h, ctx);
-            nmod_mpoly_totaldegree_fmpz(fdeg, f, ctx);
-            nmod_mpoly_totaldegree_fmpz(gdeg, g, ctx);
-            _check_totaldegree(hdeg, h, ctx);
-            _check_totaldegree(fdeg, f, ctx);
-            _check_totaldegree(gdeg, g, ctx);
+            nmod_mpoly_total_degree_fmpz(hdeg, h, ctx);
+            nmod_mpoly_total_degree_fmpz(fdeg, f, ctx);
+            nmod_mpoly_total_degree_fmpz(gdeg, g, ctx);
+            _check_total_degree(hdeg, h, ctx);
+            _check_total_degree(fdeg, f, ctx);
+            _check_total_degree(gdeg, g, ctx);
 
             if (nmod_mpoly_is_zero(f, ctx) || nmod_mpoly_is_zero(g, ctx))
             {

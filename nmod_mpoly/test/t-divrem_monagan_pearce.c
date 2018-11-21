@@ -67,8 +67,8 @@ main(void)
             nmod_mpoly_mul_johnson(h, f, g, ctx);
 
             nmod_mpoly_divrem_monagan_pearce(k, r, h, g, ctx);
-            nmod_mpoly_test(k, ctx);
-            nmod_mpoly_test(r, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
+            nmod_mpoly_assert_canonical(r, ctx);
 
             result = nmod_mpoly_equal(f, k, ctx);
 
@@ -131,13 +131,13 @@ main(void)
             nmod_mpoly_randtest_bound(k, state, len, exp_bound, ctx);
 
             nmod_mpoly_divrem_monagan_pearce(h, r, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
-            nmod_mpoly_test(r, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            nmod_mpoly_assert_canonical(r, ctx);
             nmod_mpoly_remainder_strongtest(r, g, ctx);
 
             nmod_mpoly_mul_johnson(k, h, g, ctx);
             nmod_mpoly_add(k, k, r, ctx);
-            nmod_mpoly_test(k, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
 
             result = nmod_mpoly_equal(f, k, ctx);
 
@@ -199,12 +199,12 @@ main(void)
             nmod_mpoly_randtest_bound(r2, state, len, exp_bound, ctx);
 
             nmod_mpoly_divrem_monagan_pearce(h, r1, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
-            nmod_mpoly_test(r1, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            nmod_mpoly_assert_canonical(r1, ctx);
             nmod_mpoly_remainder_strongtest(r1, g, ctx);
             nmod_mpoly_divrem_monagan_pearce(f, r2, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
-            nmod_mpoly_test(r2, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            nmod_mpoly_assert_canonical(r2, ctx);
             nmod_mpoly_remainder_strongtest(r2, g, ctx);
 
             result = nmod_mpoly_equal(h, f, ctx) && nmod_mpoly_equal(r1, r2, ctx);
@@ -267,12 +267,12 @@ main(void)
             nmod_mpoly_randtest_bound(r2, state, len, exp_bound, ctx);
 
             nmod_mpoly_divrem_monagan_pearce(h, r1, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
-            nmod_mpoly_test(r1, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            nmod_mpoly_assert_canonical(r1, ctx);
             nmod_mpoly_remainder_strongtest(r1, g, ctx);
             nmod_mpoly_divrem_monagan_pearce(g, r2, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
-            nmod_mpoly_test(r2, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            nmod_mpoly_assert_canonical(r2, ctx);
 
             result = nmod_mpoly_equal(h, g, ctx) && nmod_mpoly_equal(r1, r2, ctx);
 
@@ -336,13 +336,13 @@ main(void)
             nmod_mpoly_mul_johnson(h, f, g, ctx);
 
             nmod_mpoly_divrem_monagan_pearce(h, r1, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
-            nmod_mpoly_test(r1, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            nmod_mpoly_assert_canonical(r1, ctx);
             nmod_mpoly_remainder_strongtest(r1, g, ctx);
 
             nmod_mpoly_divrem_monagan_pearce(k, f, f, g, ctx);
-            nmod_mpoly_test(k, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             nmod_mpoly_remainder_strongtest(f, g, ctx);
 
             result = nmod_mpoly_equal(h, k, ctx) && nmod_mpoly_equal(r1, f, ctx);
@@ -407,13 +407,13 @@ main(void)
             nmod_mpoly_mul_johnson(h, f, g, ctx);
 
             nmod_mpoly_divrem_monagan_pearce(h, r1, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
-            nmod_mpoly_test(r1, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            nmod_mpoly_assert_canonical(r1, ctx);
             nmod_mpoly_remainder_strongtest(r1, g, ctx);
 
             nmod_mpoly_divrem_monagan_pearce(k, g, f, g, ctx);
-            nmod_mpoly_test(k, ctx);
-            nmod_mpoly_test(g, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
 
             result = nmod_mpoly_equal(h, k, ctx) && nmod_mpoly_equal(r1, g, ctx);
 

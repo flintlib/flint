@@ -705,6 +705,8 @@ FLINT_DLL int mpoly_monomials_overflow_test(ulong * exps, slong len, slong bits,
 
 FLINT_DLL int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
+FLINT_DLL void mpoly_reverse(ulong * Aexp, const ulong * Bexp, slong len, slong N);
+
 /* info related to zippel interpolation **************************************/
 typedef struct
 {

@@ -177,43 +177,116 @@ Degrees
 
 .. function:: int nmod_mpoly_degrees_fit_si(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
 
-    Return 1 if the degrees of poly with respect to each variable fit into
-    an ``slong``, otherwise return 0.
+    Return ``1`` if the degrees of poly with respect to each variable fit into an ``slong``, otherwise return ``0``.
 
-.. function:: void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
-    Set ``degs`` to the degrees of ``poly`` with respect to each variable.
-    If ``poly`` is zero, all degrees are set to ``-1``.
+    Set ``degs`` to the degrees of ``A`` with respect to each variable.
+    If ``A`` is zero, all degrees are set to ``-1``.
 
-.. function:: slong nmod_mpoly_degree_si(const nmod_mpoly_t poly, slong var, const nmod_mpoly_ctx_t ctx)
+.. function:: slong nmod_mpoly_degree_si(const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
 
-    Return the degree of ``poly`` with respect to the variable of index
-    ``var``. If ``poly`` is zero, the return is ``-1``.
+    Return the degree of ``A`` with respect to the variable of index ``var``.
+    If ``A`` is zero, the return is ``-1``.
 
-.. function:: void nmod_mpoly_degrees_fmpz(fmpz ** degs, const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_degrees_fmpz(fmpz ** degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
-    Set ``degs`` to the degrees of ``poly`` with respect to each variable.
-    If ``poly`` is zero, all degrees are set to ``-1``.
+    Set ``degs`` to the degrees of ``A`` with respect to each variable.
+    If ``A`` is zero, all degrees are set to ``-1``.
 
-.. function:: void nmod_mpoly_degree_fmpz(fmpz_t deg, const nmod_mpoly_t poly, slong var, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_degree_fmpz(fmpz_t deg, const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
 
-    Set ``deg`` to the degree of ``poly`` with respect to the variable
-    of index ``var``. If ``poly`` is zero, set ``deg`` to ``-1``.
+    Set ``deg`` to the degree of ``A`` with respect to the variable of index ``var``.
+    If ``A`` is zero, set ``deg`` to ``-1``.
 
-.. function:: int nmod_mpoly_totaldegree_fits_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+.. function:: int nmod_mpoly_total_degree_fits_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
-    Return 1 if the total degree of ``A`` fits into
-    an ``slong``, otherwise return 0.
+    Return ``1`` if the total degree of ``A`` fits into an ``slong``, otherwise return ``0``.
 
-.. function:: slong nmod_mpoly_totaldegree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+.. function:: slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Return the total degree of ``A`` assuming it fits into an slong.
     If ``A`` is zero, the return is ``-1``.
 
-.. function:: void nmod_mpoly_totaldegree_fmpz(fmpz_t tdeg, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_total_degree_fmpz(fmpz_t tdeg, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Set ``tdeg`` to the total degree of ``A``.
     If ``A`` is zero, ``tdeg`` is set to ``-1``.
+
+
+Container operations
+----------------------------------------------------------------------
+
+    These functions deal with violations of the internal canonical representation.
+    If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
+
+.. function:: int nmod_mpoly_is_canonical(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
+    To be in canonical form, all of the terms must have nonzero coefficient with valid exponents, and the terms must be sorted from greatest to least.
+
+.. function:: slong nmod_mpoly_length(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return the number of terms in ``A``.
+    If the polynomial is in canonical form, this will be the number of nonzero coefficients.
+
+.. function:: ulong nmod_mpoly_get_term_coeff_ui(const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Return the coefficient of the term of index ``i``.
+
+.. function:: void nmod_mpoly_set_term_coeff_ui(nmod_mpoly_t A, slong i, ulong c, const nmod_mpoly_ctx_t ctx)
+
+    Set the coefficient of the term of index ``i`` to ``c``.
+
+.. function:: int nmod_mpoly_term_exp_fits_si(const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if all entries of the exponent vector of the term of index `i` fit into an ``slong``. Otherwise, return ``0``.
+
+.. function:: int nmod_mpoly_term_exp_fits_ui(const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if all entries of the exponent vector of the term of index `i` fit into a ``ulong``. Otherwise, return ``0``.
+
+.. function:: void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Set ``exp`` to the exponent vector of the term of index ``i``.
+
+.. function:: void nmod_mpoly_get_term_exp_ui(ulong * exp, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Set ``exp`` to the exponent vector of the term of index ``i``.
+
+.. function:: void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
+
+    Set the exponent of the term of index ``i`` to ``exp``.
+
+.. function:: void nmod_mpoly_set_term_exp_ui(nmod_mpoly_t A, slong i, const ulong * exp, const nmod_mpoly_ctx_t ctx)
+
+    Set the exponent of the term of index ``i`` to ``exp``.
+
+.. function:: void nmod_mpoly_push_term_ui_fmpz(nmod_mpoly_t A, ulong c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
+
+    Append a term to ``A`` with the given coefficient and exponents.
+    This function runs in constant average time.
+
+.. function:: void nmod_mpoly_push_term_ui_ui(nmod_mpoly_t A, ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx)
+
+    Append a term to ``A`` with the given coefficient and exponents.
+    This function runs in constant average time.
+
+.. function:: void nmod_mpoly_sort_terms(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Sort the terms of ``A`` into the canonical ordering dictated by the ordering in ``ctx``.
+    This function simply reorders the terms: It does not combine like terms, nor does it delete terms with coefficient zero.
+    This function runs in linear time in the bit size of ``A``.
+
+.. function:: void nmod_mpoly_combine_like_terms(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Combine adjacent like terms in ``A`` and delete terms with coefficient zero.
+    If the terms of ``A`` were sorted to begin with, the result will be in canonical form.
+    This function runs in linear time in the bit size of ``A``.
+
+.. function:: void nmod_mpoly_reverse(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the reversal of ``B``.
 
 
 Set and negate
@@ -481,23 +554,16 @@ Random generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mpoly_randtest_bound(nmod_mpoly_t poly, flint_rand_t state, slong length, slong exp_bound, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_randtest_bound(nmod_mpoly_t A, flint_rand_t state, slong length, ulong exp_bound, const nmod_mpoly_ctx_t ctx)
 
-    Generate a random polynomial with
-    length up to the given length and
-    exponents in the range ``[0, exp_bound - 1]``.
-    The exponents of each variable are generated by calls to
-    ``n_randint(state, exp_bound)``.
+    Generate a random polynomial with length up to ``length`` and exponents in the range ``[0, exp_bound - 1]``.
+    The exponents of each variable are generated by calls to  ``n_randint(state, exp_bound)``.
 
-.. function:: void nmod_mpoly_randtest_bound(nmod_mpoly_t poly, flint_rand_t state, slong length, slong exp_bound, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_randtest_bounds(nmod_mpoly_t A, flint_rand_t state, slong length, ulong exp_bounds, const nmod_mpoly_ctx_t ctx)
 
-    Generate a random polynomial with
-    length up to the given length and
-    exponents in the range ``[0, exp_bounds[i] - 1]``.
-    The exponents of the variable of index `i` are generated by calls to
-    ``n_randint(state, exp_bounds[i])``.
+    Generate a random polynomial with length up to ``length`` and exponents in the range ``[0, exp_bounds[i] - 1]``.
+    The exponents of the variable of index ``i`` are generated by calls to ``n_randint(state, exp_bounds[i])``.
 
-.. function:: void nmod_mpoly_randtest_bits(nmod_mpoly_t poly, flint_rand_t state, slong length, mp_limb_t exp_bits, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_randtest_bits(nmod_mpoly_t A, flint_rand_t state, slong length, mp_limb_t exp_bits, const nmod_mpoly_ctx_t ctx)
 
-    Generate a random polynomial with length up to the given length and
-    exponents whose packed form does not exceed the given bit count.
+    Generate a random polynomial with length up to the given length and exponents whose packed form does not exceed the given bit count.

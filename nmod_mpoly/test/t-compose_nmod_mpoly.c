@@ -127,7 +127,7 @@ main(void)
             vals3[v] = nmod_mpoly_evaluate_all_ui(vals1[v], vals2, ctx2);
         }
 
-        if (nmod_mpoly_totaldegree_si(f, ctx1)
+        if (nmod_mpoly_total_degree_si(f, ctx1)
                                          <= 4000/(1+len2*len2*nvars2*nvars2))
         {
             nmod_mpoly_compose_nmod_mpoly(g, f, vals1, ctx1, ctx2);

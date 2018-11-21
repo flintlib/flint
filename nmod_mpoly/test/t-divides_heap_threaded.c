@@ -40,10 +40,10 @@ main(void)
 
         nmod_mpoly_mul(p, f, g, ctx);
         result = nmod_mpoly_divides_monagan_pearce(h, p, f, ctx);
-        nmod_mpoly_test(h, ctx);
+        nmod_mpoly_assert_canonical(h, ctx);
         flint_set_num_threads(2);
         result2 = nmod_mpoly_divides_heap_threaded(h2, p, f, ctx);
-        nmod_mpoly_test(h2, ctx);
+        nmod_mpoly_assert_canonical(h2, ctx);
 
         if (!result || !result2
                     || !nmod_mpoly_equal(h, g, ctx)
@@ -102,9 +102,9 @@ main(void)
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             result = nmod_mpoly_divides_heap_threaded(k, h, g, ctx);
-            nmod_mpoly_test(k, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
             result = result && nmod_mpoly_equal(f, k, ctx);
 
             if (!result)
@@ -160,9 +160,9 @@ main(void)
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             result = nmod_mpoly_divides_heap_threaded(g, h, g, ctx);
-            nmod_mpoly_test(g, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
             result = result && nmod_mpoly_equal(f, g, ctx);
 
             if (!result)
@@ -217,9 +217,9 @@ main(void)
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             result = nmod_mpoly_divides_heap_threaded(h, h, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             result = result && nmod_mpoly_equal(f, h, ctx);
 
             if (!result)
@@ -278,9 +278,9 @@ main(void)
             nmod_mpoly_mul(f, f, g, ctx);
             nmod_mpoly_add(f, f, p, ctx);
             result = nmod_mpoly_divides_monagan_pearce(h1, f, g, ctx);
-            nmod_mpoly_test(h1, ctx);
+            nmod_mpoly_assert_canonical(h1, ctx);
             result2 = nmod_mpoly_divides_heap_threaded(h2, f, g, ctx);
-            nmod_mpoly_test(h2, ctx);
+            nmod_mpoly_assert_canonical(h2, ctx);
 
             if (result != result2 || !nmod_mpoly_equal(h1, h2, ctx))
             {
@@ -340,9 +340,9 @@ main(void)
             nmod_mpoly_mul(f, f, g, ctx);
             nmod_mpoly_add(f, f, p, ctx);
             result = nmod_mpoly_divides_monagan_pearce(h1, f, g, ctx);
-            nmod_mpoly_test(h1, ctx);
+            nmod_mpoly_assert_canonical(h1, ctx);
             result2 = nmod_mpoly_divides_heap_threaded(f, f, g, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
 
             if (result != result2 || !nmod_mpoly_equal(h1, f, ctx))
             {
@@ -401,9 +401,9 @@ main(void)
             nmod_mpoly_mul(f, f, g, ctx);
             nmod_mpoly_add(f, f, p, ctx);
             result = nmod_mpoly_divides_monagan_pearce(h1, f, g, ctx);
-            nmod_mpoly_test(h1, ctx);
+            nmod_mpoly_assert_canonical(h1, ctx);
             result2 = nmod_mpoly_divides_heap_threaded(g, f, g, ctx);
-            nmod_mpoly_test(g, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
 
             if (result != result2 || !nmod_mpoly_equal(h1, g, ctx))
             {
