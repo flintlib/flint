@@ -31,7 +31,6 @@ fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly,
         fmpz_mul(fmpq_denref(poly->content), fmpq_denref(poly->content), fmpq_denref(x));
         fmpz_mpoly_set_termcoeff_fmpz(poly->zpoly, n, t, ctx->zctx);
         fmpz_clear(t);
-        fmpq_mpoly_canonicalise(poly, ctx);
     }
     return;
 }
