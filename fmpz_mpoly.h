@@ -487,6 +487,9 @@ FLINT_DLL void fmpz_mpoly_pushterm_ui_ui(fmpz_mpoly_t poly,
 FLINT_DLL void fmpz_mpoly_pushterm_si_ui(fmpz_mpoly_t poly,
                        slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_resize(fmpz_mpoly_t poly,
+                                 slong new_length, const fmpz_mpoly_ctx_t ctx);
+
 /* getters and setters for nth term ******************************************/
 
 /* get/set the coefficient of the nth term into/from c */

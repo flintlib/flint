@@ -372,6 +372,13 @@ int fmpq_mpoly_is_one(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 }
 
 FMPQ_MPOLY_INLINE
+void fmpq_mpoly_resize(fmpq_mpoly_t poly1, slong new_length,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_resize(poly1->zpoly, new_length, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
 void fmpq_mpoly_sort_terms(fmpq_mpoly_t poly1, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_sort_terms(poly1->zpoly, ctx->zctx);
