@@ -199,105 +199,89 @@ Internal operations
 Container operations
 --------------------------------------------------------------------------------
 
+    These function try to deal efficiently with violations of the internal canonical representation.
+    If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
+    The mutating functions here are not guaranteed to leave the polynomial in reduced form (see :func:`fmpq_mpoly_is_canonical` for a definition of reduced).
+    This means that even if nonzero terms with distinct exponents have been constructed in the correct order, a call to :func:`fmpq_mpoly_reduce` is necessary to ensure that the polynomial is in canonical form.
+    As with the ``fmpz_mpoly`` module, a call to :func:`fmpq_mpoly_sort_terms` followed by a call to :func:`fmpq_mpoly_combine_like_terms` should leave the polynomial in canoncial form.
 
-    Some of these functions deal with violations of the internal canonical
-    representation. A call to ``fmpq_mpoly_sort`` followed by a call to
-    ``fmpq_mpoly_combine_like_terms`` should leave a polynomial in
-    canonical form. The ``pushterm`` functions run in constant
-    average time if the terms pushed have bounded denominators,
-    and a term is appened even if the specified coefficient is zero.
+.. function:: int fmpq_mpoly_is_canonical(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
+    Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
+    An ``fmpq_mpoly_t`` is represented as the product of an ``fmpq_t content`` and an ``fmpz_mpoly_t zpoly``.
+    The representation is considered canonical when either
+        (1) both ``content`` and ``zpoly`` are zero, or
+        (2) both ``content`` and ``zpoly`` are nonzero and canonical and ``zpoly`` is reduced.
+    A nonzero ``zpoly`` is considered reduced when the coefficients have GCD one and the leading coefficient is positive.
 
-.. function:: slong fmpq_mpoly_length(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+.. function:: slong fmpq_mpoly_length(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Return the number of terms stored in ``poly``. If the polynomial
-    is in canonical form, this will be the number of nonzero coefficients.
+    Return the number of terms stored in ``A``.
+    If the polynomial is in canonical form, this will be the number of nonzero coefficients.
 
+.. function:: void fmpq_mpoly_get_term_coeff_fmpq(fmpq_t c, const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_get_termcoeff_fmpq(fmpq_t x, const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
+    Set `c` to coefficient of index `i`
 
-    Set `x` to coefficient of index `i`, starting
-    with `i = 0` for the term with most significance.
+.. function:: void fmpq_mpoly_set_term_coeff_fmpq(fmpq_mpoly_t A, slong i, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly, slong i, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
+    Set the coefficient of index `i` to `c`.
 
-    Set the coefficient of index `i` to `x`, starting
-    with `i = 0` for the term with most significance.
+.. function:: int fmpq_mpoly_term_exp_fits_si(const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
 
+.. function:: int fmpq_mpoly_term_exp_fits_ui(const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
+    Return ``1`` if all entries of the exponent vector of the term of index `i`  fit into an ``slong`` (resp. a ``ulong``). Otherwise, return ``0``.
 
-    Return 1 if all entries of the exponent vector of the term of index `i`
-    fit into an ``slong``. Otherwise, return 0.
+.. function:: void fmpq_mpoly_get_term_exp_fmpz(fmpz ** exps, const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: int fmpq_mpoly_termexp_fits_ui(const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_get_term_exp_ui(ulong * exps, const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
 
-    Return 1 if all entries of the exponent vector of the term of index `i`
-    fit into a ``ulong``. Otherwise, return 0.
+    Set ``exp`` to the exponent vector of the term of index ``i``.
 
-.. function:: void fmpq_mpoly_get_termexp_ui(ulong * exps, const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_set_term_exp_fmpz(fmpq_mpoly_t A, slong i, fmpz * const * exps, const const fmpq_mpoly_ctx_t ctx)
 
-    Get the exponent vector of the given polynomial with index `i`.
+.. function:: void fmpq_mpoly_set_term_exp_ui(fmpq_mpoly_t A, slong i, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_get_termexp_fmpz(fmpz ** exps, const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
+    Set the exponent vector of the term of index ``i`` to ``exp``.
 
-    Get the exponent vector of the given polynomial with index `i`.
+.. function:: void fmpq_mpoly_push_term_fmpq_fmpz(fmpz_mpoly_t A, const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_set_termexp_ui(fmpq_mpoly_t poly, slong i, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
-    Set the exponent vector of the given polynomial with index `i`.
+.. function:: void fmpq_mpoly_push_term_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_set_termexp_fmpz(fmpq_mpoly_t poly, slong i, fmpz * const * exps, const const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_si_fmpz(fmpz_mpoly_t A, slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
-    Set the exponent vector of the given polynomial with index `i`.
+.. function:: void fmpq_mpoly_push_term_fmpq_ui(fmpz_mpoly_t A, const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
+.. function:: void fmpq_mpoly_push_term_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_pushterm_fmpq_fmpz(fmpz_mpoly_t poly, const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_ui_ui(fmpz_mpoly_t A, ulong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
-    Append a term to ``poly`` with the given coefficient and exponents.
+.. function:: void fmpq_mpoly_push_term_si_ui(fmpz_mpoly_t A, slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_pushterm_fmpz_fmpz(fmpz_mpoly_t poly, const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+    Append a term to ``A`` with coefficient ``c`` and exponent vector ``exp``.
+    This function should run in constant average time if the terms pushed have bounded denominator.
 
-    Append a term to ``poly`` with the given coefficient and exponents.
+.. function:: void fmpq_mpoly_sort_terms(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_pushterm_ui_fmpz(fmpz_mpoly_t poly, ulong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+    Sort the internal ``A->zpoly`` into the canonical ordering dictated by the ordering in ``ctx``.
+    This function does not combine like terms, nor does it delete terms with coefficient zero, nor does it reduce.
 
-    Append a term to ``poly`` with the given coefficient and exponents.
+.. function:: void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_pushterm_si_fmpz(fmpz_mpoly_t poly, slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+    Combine adjacent like terms in the internal ``A->zpoly`` and then factor out content via a call to :func:`fmpq_mpoly_reduce`.
+    If the terms of ``A`` were sorted to begin with, the result will be in canonical form.
 
-    Append a term to ``poly`` with the given coefficient and exponents.
+.. function:: void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_pushterm_fmpq_ui(fmpz_mpoly_t poly, const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+    Factor out necessary content from ``A->zpoly`` so that it is reduced.
+    If the terms of ``A`` were nonzero and sorted with distinct exponents to begin with, the result will be in canonical form.
 
-    Append a term to ``poly`` with the given coefficient and exponents.
+.. function:: void fmpq_mpoly_reverse(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_pushterm_fmpz_ui(fmpz_mpoly_t poly, const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
-
-    Append a term to ``poly`` with the given coefficient and exponents.
-
-.. function:: void fmpq_mpoly_pushterm_ui_ui(fmpz_mpoly_t poly, ulong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
-
-    Append a term to ``poly`` with the given coefficient and exponents.
-
-.. function:: void fmpq_mpoly_pushterm_si_ui(fmpz_mpoly_t poly, slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
-
-    Append a term to ``poly`` with the given coefficient and exponents.
-
-
-.. function:: void fmpq_mpoly_sort_terms(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Sort the internal ``fmpz_mpoly_t`` into the canonical ordering
-    dictated by the ordering in ``ctx``. This function does not combine
-    like terms, nor does it delete terms with coefficient zero.
-    Even if all terms have distinct exponents, the result may still not be
-    in canonical form, because content may not be factored out.
-
-.. function:: void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Combine adjacent like terms in the internal ``fmpz_poly`` and then
-    factor out content via ``fmpq_mpoly_canonicalise``. If the terms of
-    ``poly`` were sorted to begin with, the result will be in canonical form.
+    Set ``A`` to the reversal of ``B``.
 
 
 Set/Negate

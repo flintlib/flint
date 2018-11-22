@@ -19,6 +19,6 @@ void fmpq_mpoly_integral(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
     fmpz_init(s);
     fmpz_mpoly_integral(poly1->zpoly, s, poly2->zpoly, var, ctx->zctx);
     fmpq_div_fmpz(poly1->content, poly2->content, s);
-    fmpq_mpoly_canonicalise(poly1, ctx);
+    fmpq_mpoly_reduce(poly1, ctx);
     fmpz_clear(s);
 }

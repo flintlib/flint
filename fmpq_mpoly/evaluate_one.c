@@ -216,7 +216,7 @@ done:
     A->zpoly->alloc = Aalloc;
     _fmpz_mpoly_set_length(A->zpoly, Alen, ctx->zctx);
 
-    fmpq_mpoly_canonicalise(A, ctx);
+    fmpq_mpoly_reduce(A, ctx);
 
     _fmpz_vec_clear(powers, poweralloc);
 
@@ -448,7 +448,7 @@ done:
     fmpz_clear(emin);
     fmpz_clear(emax);
 
-    fmpq_mpoly_canonicalise(A, ctx);
+    fmpq_mpoly_reduce(A, ctx);
 
     TMP_END;
 }

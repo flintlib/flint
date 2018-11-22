@@ -271,7 +271,7 @@ void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
     _fmpq_mpoly_rescale(A->content, newB->coeffs, B, scales, ctxB);
 
     fmpz_mpoly_compose_fmpz_mpoly(A->zpoly, newB, Czpoly, ctxB->zctx, ctxAC->zctx);
-    fmpq_mpoly_canonicalise(A, ctxAC);
+    fmpq_mpoly_reduce(A, ctxAC);
 
     _fmpz_vec_clear(newB->coeffs, B->zpoly->length);
 

@@ -23,7 +23,6 @@ void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
     fmpz_mpoly_struct ** qarr, ** barr;
     TMP_INIT;
 
-
     /* check none of the divisor polynomials is zero */
     for (i = 0; i < len; i++)
     {
@@ -62,8 +61,8 @@ void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
     fmpz_clear(scale);
 
     for (i = 0; i < len; i++)
-        fmpq_mpoly_canonicalise(q[i], ctx);
-    fmpq_mpoly_canonicalise(r, ctx);
+        fmpq_mpoly_reduce(q[i], ctx);
+    fmpq_mpoly_reduce(r, ctx);
 
     TMP_END;
 }

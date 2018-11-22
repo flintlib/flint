@@ -191,12 +191,6 @@ void fmpq_mpoly_realloc(fmpq_mpoly_t poly, slong alloc,
 }
 
 FMPQ_MPOLY_INLINE
-slong fmpq_mpoly_length(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-{
-    return fmpz_mpoly_length(poly->zpoly, ctx->zctx);
-}
-
-FMPQ_MPOLY_INLINE
 void fmpq_mpoly_fit_length(fmpq_mpoly_t poly, slong len, 
                                                    const fmpq_mpoly_ctx_t ctx)
 {
@@ -249,10 +243,6 @@ FLINT_DLL void fmpq_mpoly_set_ui(fmpq_mpoly_t poly,
 
 FLINT_DLL void fmpq_mpoly_set_si(fmpq_mpoly_t poly,
                                           slong c, const fmpq_mpoly_ctx_t ctx);
-
-
-FLINT_DLL void fmpq_mpoly_canonicalise(fmpq_mpoly_t poly,
-                                                   const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
 int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t poly,
@@ -371,26 +361,6 @@ int fmpq_mpoly_is_one(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
           && fmpz_mpoly_is_one(poly->zpoly, ctx->zctx);
 }
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_resize(fmpq_mpoly_t poly1, slong new_length,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_resize(poly1->zpoly, new_length, ctx->zctx);
-}
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_sort_terms(fmpq_mpoly_t poly1, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_sort_terms(poly1->zpoly, ctx->zctx);
-}
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t poly1, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_combine_like_terms(poly1->zpoly, ctx->zctx);
-    fmpq_mpoly_canonicalise(poly1, ctx);
-}
-
 /* coefficients of monomials *************************************************/
 
 /* get/set a coeff of poly1 corresponding to the monomial poly2 */
@@ -424,10 +394,75 @@ FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
 FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t poly,
                                 const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
-/* pushing *******************************************************************/
+/* container operations ******************************************************/
 
-FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_fmpz(fmpq_mpoly_t poly,
-                     fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL int fmpq_mpoly_is_canonical(const fmpq_mpoly_t A,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FMPQ_MPOLY_INLINE
+slong fmpq_mpoly_length(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+{
+    return A->zpoly->length;
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_resize(fmpq_mpoly_t A, slong new_length,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_resize(A->zpoly, new_length, ctx->zctx);
+}
+
+FLINT_DLL void fmpq_mpoly_get_termcoeff_fmpq(fmpq_t c, const fmpq_mpoly_t poly,
+                                          slong n, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly,
+                          slong n, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_termexp_fits_ui(const fmpq_mpoly_t poly,
+                                           slong n, const fmpq_mpoly_ctx_t ctx)
+{
+    return poly->zpoly->bits <= FLINT_BITS ? 1
+                               : mpoly_termexp_fits_ui(poly->zpoly->exps,
+                                       poly->zpoly->bits, n, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly,
+                                           slong n, const fmpq_mpoly_ctx_t ctx)
+{
+    return poly->zpoly->bits <= FLINT_BITS ? 1
+                               : mpoly_termexp_fits_si(poly->zpoly->exps,
+                                       poly->zpoly->bits, n, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_get_termexp_fmpz(fmpz ** exps, const fmpq_mpoly_t poly,
+                                          slong n, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_get_term_exp_fmpz(exps, poly->zpoly, n, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_get_termexp_ui(ulong * exps, const fmpq_mpoly_t poly,
+                                          slong n, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_get_term_exp_ui(exps, poly->zpoly, n, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_set_termexp_fmpz(fmpq_mpoly_t poly,
+                      slong n, fmpz * const * exps, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_set_term_exp_fmpz(poly->zpoly, n, exps, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_set_termexp_ui(fmpq_mpoly_t poly,
+                      slong n, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_set_term_exp_ui(poly->zpoly, n, exps, ctx->zctx);
+}
 
 FLINT_DLL void fmpq_mpoly_pushterm_fmpq_fmpz(fmpq_mpoly_t poly,
                const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
@@ -441,9 +476,6 @@ FLINT_DLL void fmpq_mpoly_pushterm_ui_fmpz(fmpq_mpoly_t poly,
 FLINT_DLL void fmpq_mpoly_pushterm_si_fmpz(fmpq_mpoly_t poly,
                       slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_ui(fmpq_mpoly_t poly,
-                       fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
-
 FLINT_DLL void fmpq_mpoly_pushterm_fmpq_ui(fmpq_mpoly_t poly,
                 const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
@@ -456,64 +488,33 @@ FLINT_DLL void fmpq_mpoly_pushterm_ui_ui(fmpq_mpoly_t poly,
 FLINT_DLL void fmpq_mpoly_pushterm_si_ui(fmpq_mpoly_t poly,
                        slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
-/* getters and setters for nth term ******************************************/
+FLINT_DLL void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx);
 
-/* get/set the coefficient of the nth term into/from c */
-/* these two functions throw if n is out of range */
-
-FLINT_DLL void fmpq_mpoly_get_termcoeff_fmpq(fmpq_t c, const fmpq_mpoly_t poly,
-                                          slong n, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly,
-                          slong n, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
-
-/* does the exponent vector of the nth term fit? */
 FMPQ_MPOLY_INLINE
-int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly,
-                                           slong n, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_sort_terms(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 {
-    return poly->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_termexp_fits_si(poly->zpoly->exps,
-                                       poly->zpoly->bits, n, ctx->zctx->minfo);
+    fmpz_mpoly_sort_terms(A->zpoly, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-int fmpq_mpoly_termexp_fits_ui(const fmpq_mpoly_t poly,
-                                           slong n, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 {
-    return poly->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_termexp_fits_ui(poly->zpoly->exps,
-                                       poly->zpoly->bits, n, ctx->zctx->minfo);
+    fmpz_mpoly_combine_like_terms(A->zpoly, ctx->zctx);
+    fmpq_mpoly_reduce(A, ctx);
 }
 
-/* get/set the exponent vector of the nth term into/from exps */
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_get_termexp_ui(ulong * exps, const fmpq_mpoly_t poly,
-                                          slong n, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_get_term_exp_ui(exps, poly->zpoly, n, ctx->zctx);
-}
+FLINT_DLL void fmpq_mpoly_reverse(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                                   const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_get_termexp_fmpz(fmpz ** exps, const fmpq_mpoly_t poly,
-                                          slong n, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_get_term_exp_fmpz(exps, poly->zpoly, n, ctx->zctx);
-}
+FLINT_DLL void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly,
+                                                   const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_set_termexp_ui(fmpq_mpoly_t poly,
-                      slong n, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_set_term_exp_ui(poly->zpoly, n, exps, ctx->zctx);
-}
+FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_ui(fmpq_mpoly_t poly,
+                       fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_set_termexp_fmpz(fmpq_mpoly_t poly,
-                      slong n, fmpz * const * exps, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_set_term_exp_fmpz(poly->zpoly, n, exps, ctx->zctx);
-}
+FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_fmpz(fmpq_mpoly_t poly,
+                     fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
+
 
 
 /* Set and negate ************************************************************/
@@ -728,7 +729,7 @@ void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t poly, flint_rand_t state,
     do {
         fmpq_randtest(poly->content, state, coeff_bits + 1);
     } while (fmpq_is_zero(poly->content));
-    fmpq_mpoly_canonicalise(poly, ctx);
+    fmpq_mpoly_reduce(poly, ctx);
 }
 
 FMPQ_MPOLY_INLINE
@@ -741,7 +742,7 @@ void fmpq_mpoly_randtest_bound(fmpq_mpoly_t poly, flint_rand_t state,
     do {
         fmpq_randtest(poly->content, state, coeff_bits + 1);
     } while (fmpq_is_zero(poly->content));
-    fmpq_mpoly_canonicalise(poly, ctx);
+    fmpq_mpoly_reduce(poly, ctx);
 }
 
 FMPQ_MPOLY_INLINE
@@ -754,7 +755,7 @@ void fmpq_mpoly_randtest_bits(fmpq_mpoly_t poly, flint_rand_t state,
     do {
         fmpq_randtest(poly->content, state, coeff_bits + 1);
     } while (fmpq_is_zero(poly->content));
-    fmpq_mpoly_canonicalise(poly, ctx);
+    fmpq_mpoly_reduce(poly, ctx);
 }
 
 
@@ -764,10 +765,6 @@ void fmpq_mpoly_randtest_bits(fmpq_mpoly_t poly, flint_rand_t state,
    Internal consistency checks
 
 ******************************************************************************/
-
-FLINT_DLL void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
 
 /*
    test that r is a valid remainder upon division by g over Q

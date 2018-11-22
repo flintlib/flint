@@ -249,7 +249,7 @@ Container operations
 
 .. function:: void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t A, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Set the exponent vector of the term index ``i`` to ``exp``.
+    Set the exponent vector of the term of index ``i`` to ``exp``.
 
 .. function:: void fmpz_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 

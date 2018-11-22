@@ -26,6 +26,6 @@ fmpq_mpoly_sub_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
     fmpz_mpoly_sub_fmpz(poly1->zpoly, poly1->zpoly, t, ctx->zctx);
     fmpz_clear(t);
 
-    fmpq_mpoly_canonicalise(poly1, ctx);
+    fmpq_mpoly_reduce(poly1, ctx);
     return;
 }

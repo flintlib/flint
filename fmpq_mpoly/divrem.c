@@ -42,6 +42,6 @@ void fmpq_mpoly_divrem(fmpq_mpoly_t q, fmpq_mpoly_t r,
     fmpq_clear(t);
     fmpz_clear(scale);
 
-    fmpq_mpoly_canonicalise(q, ctx);
-    fmpq_mpoly_canonicalise(r, ctx);
+    fmpq_mpoly_reduce(q, ctx);
+    fmpq_mpoly_reduce(r, ctx);
 }

@@ -12,28 +12,28 @@
 #include "fmpq_mpoly.h"
 
 
-void fmpq_mpoly_div(fmpq_mpoly_t q, const fmpq_mpoly_t a, const fmpq_mpoly_t b,
+void fmpq_mpoly_div(fmpq_mpoly_t Q, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_t scale;
 
-    if (fmpq_mpoly_is_zero(b, ctx))
+    if (fmpq_mpoly_is_zero(B, ctx))
     {
-        flint_throw(FLINT_DIVZERO, "Divide by zero in fmpq_mpoly_divrem");
+        flint_throw(FLINT_DIVZERO, "Divide by zero in fmpq_mpoly_div");
     }
 
-    if (fmpq_mpoly_is_zero(a, ctx))
+    if (fmpq_mpoly_is_zero(A, ctx))
     {
-        fmpq_mpoly_zero(q, ctx);
+        fmpq_mpoly_zero(Q, ctx);
         return;
     }
 
     fmpz_init(scale);
-    fmpz_mpoly_quasidiv_heap(scale, q->zpoly, a->zpoly, b->zpoly, ctx->zctx);
+    fmpz_mpoly_quasidiv_heap(scale, Q->zpoly, A->zpoly, B->zpoly, ctx->zctx);
 
-    fmpq_div(q->content, a->content, b->content);
-    fmpq_div_fmpz(q->content, q->content, scale);
+    fmpq_div(Q->content, A->content, B->content);
+    fmpq_div_fmpz(Q->content, Q->content, scale);
     fmpz_clear(scale);
 
-    fmpq_mpoly_canonicalise(q, ctx);
+    fmpq_mpoly_reduce(Q, ctx);
 }
