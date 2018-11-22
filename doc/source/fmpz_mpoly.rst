@@ -89,11 +89,6 @@ Memory management
     Assumes the polynomial has at least ``newlen`` allocated and initialised
     terms.
 
-.. function:: void fmpz_mpoly_truncate(fmpz_mpoly_t poly, slong newlen, const fmpz_mpoly_ctx_t ctx)
-
-    If the given polynomial is larger than the given number of terms, truncate
-    to that number of terms.
-
 .. function:: void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly, slong bits, const fmpz_mpoly_ctx_t ctx)
 
     Reallocate the polynomial to have space for exponent fields of the given
@@ -126,45 +121,34 @@ Degrees
 ----------------------------------------------------------------------
 
 
-.. function:: int fmpz_mpoly_degrees_fit_si(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_degrees_fit_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Return 1 if the degrees of poly with respect to each variable fit into
-    an ``slong``, otherwise return 0.
+    Return ``1`` if the degrees of ``A`` with respect to each variable fit into an ``slong``, otherwise return ``0``.
 
-.. function:: void fmpz_mpoly_degrees_si(slong * degs, const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_degrees_fmpz(fmpz ** degs, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``degs`` to the degrees of ``poly`` with respect to each variable.
-    If ``poly`` is zero, all degrees are set to ``-1``.
+.. function:: void fmpz_mpoly_degrees_si(slong * degs, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: slong fmpz_mpoly_degree_si(const fmpz_mpoly_t poly, slong var, const fmpz_mpoly_ctx_t ctx)
+    Set ``degs`` to the degrees of ``A`` with respect to each variable.
+    If ``A`` is zero, all degrees are set to ``-1``.
 
-    Return the degree of ``poly`` with respect to the variable of index
-    ``var``. If ``poly`` is zero, the return is ``-1``.
+.. function:: void fmpz_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_degrees_fmpz(fmpz ** degs, const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+.. function:: slong fmpz_mpoly_degree_si(const fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``degs`` to the degrees of ``poly`` with respect to each variable.
-    If ``poly`` is zero, all degrees are set to ``-1``.
+    Either return or set ``deg`` to the degree of ``A`` with respect to the variable of index ``var``.
+    If ``A`` is zero, the degree is defined to be ``-1``.
 
-.. function:: void fmpz_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t poly, slong var, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_total_degree_fits_si(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``deg`` to the degree of ``poly`` with respect to the variable
-    of index ``var``. If ``poly`` is zero, set ``deg`` to ``-1``.
+    Return ``1`` if the total degree of ``A`` fits into an ``slong``, otherwise return ``0``.
 
-.. function:: int fmpz_mpoly_totaldegree_fits_si(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-    Return 1 if the total degree of ``A`` fits into
-    an ``slong``, otherwise return 0.
+.. function:: slong fmpz_mpoly_total_degree_si(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: slong fmpz_mpoly_totaldegree_si(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
-
-    Return the total degree of ``A`` assuming it fits into an slong.
-    If ``A`` is zero, the return is ``-1``.
-
-.. function:: void fmpz_mpoly_totaldegree_fmpz(fmpz_t tdeg, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``tdeg`` to the total degree of ``A``.
-    If ``A`` is zero, ``tdeg`` is set to ``-1``.
+    Either return or set ``tdeg`` to the total degree of ``A``.
+    If ``A`` is zero, the total degree is defined to be ``-1``.
 
 
 Coefficients
@@ -217,127 +201,86 @@ Coefficients
     Set the coefficient of the monomial with exponent vector ``exp`` to `c`.
 
 
-Internal operations
-----------------------------------------------------------------------
-
-
-.. function:: void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Throw if ``poly`` is not canonical form. To be in canonical form,
-    all of the terms must have nonzero coefficient with valid exponents, and
-    the terms must be sorted from greatest to least.
-
-
 Container operations
 ----------------------------------------------------------------------
 
+    These functions deal with violations of the internal canonical representation.
+    If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
 
-    These functions deal with violations of the internal canonical
-    representation. The length of an exponent vector is the number of variables
-    in the polynomial, and the element at index `0` corresponds to the most
-    significant variable. The ``pushterm`` functions runs in constant
-    average time, and a term is appened even if the specified coefficient
-    is zero. If a term index is negative or not strictly less than the length
-    of the polynomial, the function will throw.
+.. function:: int fmpz_mpoly_is_canonical(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
+    Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
+    To be in canonical form, all of the terms must have nonzero coefficient, and the terms must be sorted from greatest to least.
 
-.. function:: slong fmpz_mpoly_length(const fmpz_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+.. function:: slong fmpz_mpoly_length(const fmpz_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Return the number of terms stored in ``poly``. If the polynomial
-    is in canonical form, this will be the number of nonzero coefficients.
+    Return the number of terms in ``A``.
+    If the polynomial is in canonical form, this will be the number of nonzero coefficients.
 
+.. function:: void fmpz_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_get_termcoeff_fmpz(fmpz_t x, const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+.. function:: ulong fmpz_mpoly_get_term_coeff_ui(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
 
-    Set `x` to coefficient of the term of index `i`.
+.. function:: slong fmpz_mpoly_get_term_coeff_si(const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: ulong fmpz_mpoly_get_termcoeff_ui(const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+    Either return or set ``c`` to the coefficient of the term of index ``i``.
 
-    Return the coefficient of the term of index `i`.
+.. function:: void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A, slong i, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: slong fmpz_mpoly_get_termcoeff_si(const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_set_term_coeff_ui(fmpz_mpoly_t A, slong i, ulong c, const fmpz_mpoly_ctx_t ctx)
 
-    Return the coefficient of the term of index `i`.
+.. function:: void fmpz_mpoly_set_term_coeff_si(fmpz_mpoly_t A, slong i, slong c, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_termcoeff_fmpz(fmpz_mpoly_t poly, slong i, const fmpz_t x, const fmpz_mpoly_ctx_t ctx)
+    Set the coefficient of the term of index ``i`` to ``c``.
 
-    Set the coefficient of the term of index `i` to `x`.
+.. function:: int fmpz_mpoly_term_exp_fits_si(const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_termcoeff_ui(fmpz_mpoly_t poly, slong i, ulong x, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_term_exp_fits_ui(const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the term of index `i` to `x`.
+    Return ``1`` if all entries of the exponent vector of the term of index `i`  fit into an ``slong`` (resp. a ``ulong``). Otherwise, return ``0``.
 
-.. function:: void fmpz_mpoly_set_termcoeff_si(fmpz_mpoly_t poly, slong i, slong x, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_get_term_exp_fmpz(fmpz ** exp, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the term of index `i` to `x`.
+.. function:: void fmpz_mpoly_get_term_exp_ui(ulong * exp, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: int fmpz_mpoly_termexp_fits_si(const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+    Set ``exp`` to the exponent vector of the term of index ``i``.
 
-    Return 1 if all entries of the exponent vector of the term of index `i`
-    fit into an ``slong``. Otherwise, return 0.
+.. function:: void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A, slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: int fmpz_mpoly_termexp_fits_ui(const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t A, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Return 1 if all entries of the exponent vector of the term of index `i`
-    fit into a ``ulong``. Otherwise, return 0.
+    Set the exponent vector of the term index ``i`` to ``exp``.
 
-.. function:: void fmpz_mpoly_get_termexp_fmpz(fmpz ** exp, const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``exp`` to the exponent vector of the term of index `i`.
+.. function:: void fmpz_mpoly_push_term_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_get_termexp_ui(ulong * exp, const fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_push_term_si_fmpz(fmpz_mpoly_t A, slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``exp`` to the exponent vector of the term of index `i`.
+.. function:: void fmpz_mpoly_push_term_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t poly, slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_push_term_ui_ui(fmpz_mpoly_t A, ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Set the exponent vector of the term index `i` to ``exp``.
+.. function:: void fmpz_mpoly_push_term_si_ui(fmpz_mpoly_t A, slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t poly, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+    Append a term to ``A`` with coefficient ``c`` and exponent vector ``exp``.
+    This function runs in constant average time.
 
-    Set the exponent vector of the term index `i` to ``exp``.
+.. function:: void fmpz_mpoly_sort_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
+    Sort the terms of ``A`` into the canonical ordering dictated by the ordering in ``ctx``.
+    This function simply reorders the terms: It does not combine like terms, nor does it delete terms with coefficient zero.
+    This function runs in linear time in the bit size of ``A``.
 
-.. function:: void fmpz_mpoly_pushterm_fmpz_fmpz(fmpz_mpoly_t poly, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-    Append a term to ``poly`` with the given coefficient and exponents.
+    Combine adjacent like terms in ``A`` and delete terms with coefficient zero.
+    If the terms of ``A`` were sorted to begin with, the result will be in canonical form.
+    This function runs in linear time in the bit size of ``A``.
 
-.. function:: void fmpz_mpoly_pushterm_ui_fmpz(fmpz_mpoly_t poly, ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_reverse(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
-    Append a term to ``poly`` with the given coefficient and exponents.
-
-.. function:: void fmpz_mpoly_pushterm_si_fmpz(fmpz_mpoly_t poly, slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
-
-    Append a term to ``poly`` with the given coefficient and exponents.
-
-.. function:: void fmpz_mpoly_pushterm_fmpz_ui(fmpz_mpoly_t poly, const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
-
-    Append a term to ``poly`` with the given coefficient and exponents.
-
-.. function:: void fmpz_mpoly_pushterm_ui_ui(fmpz_mpoly_t poly, ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
-
-    Append a term to ``poly`` with the given coefficient and exponents.
-
-.. function:: void fmpz_mpoly_pushterm_si_ui(fmpz_mpoly_t poly, slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
-
-    Append a term to ``poly`` with the given coefficient and exponents.
-
-
-.. function:: void fmpz_mpoly_sort_terms(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Sort the terms of ``poly`` into the canonical ordering dictated by
-    the ordering in ``ctx``. This function does not combine like terms,
-    nor does it delete terms with coefficient zero.
-
-.. function:: void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Combine adjacent like terms in ``poly`` and delete terms with
-    coefficient zero. If the terms of ``poly`` were sorted to begin with,
-    the result will be in canonical form.
-
-.. function:: void fmpz_mpoly_reverse(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Reverse the terms in ``poly2`` and set ``poly1`` to the result.
+    Set ``A`` to the reversal of ``B``.
 
 
 Set and negate
@@ -1003,28 +946,19 @@ Input/Output
 Random generation
 ----------------------------------------------------------------------
 
+.. function:: void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, ulong exp_bound, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_randtest_bound(fmpz_mpoly_t poly, flint_rand_t state, slong length, mp_limb_t coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx)
+    Generate a random polynomial with length up to ``length`` and exponents in the range ``[0, exp_bound - 1]``.
+    The exponents of each variable are generated by calls to ``n_randint(state, exp_bound)``.
 
-    Generate a random polynomial with
-    length up to the given length,
-    exponents in the range ``[0, exp_bound - 1]``, and with
-    signed coefficients of the given number of bits.
-    The exponents of each variable are generated by calls to
-    ``n_randint(state, exp_bound)``.
+.. function:: void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, ulong * exp_bounds, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_randtest_bound(fmpz_mpoly_t poly, flint_rand_t state, slong length, mp_limb_t coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx)
+    Generate a random polynomial with length up to ``length`` and exponents in the range ``[0, exp_bounds[i] - 1]``.
+    The exponents of the variable of index ``i`` are generated by calls to ``n_randint(state, exp_bounds[i])``.
 
-    Generate a random polynomial with
-    length up to the given length,
-    exponents in the range ``[0, exp_bounds[i] - 1]``, and with
-    signed coefficients of the given number of bits.
-    The exponents of the variable of index `i` are generated by calls to
-    ``n_randint(state, exp_bounds[i])``.
+.. function:: void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, mp_limb_t exp_bits, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_randtest_bits(fmpz_mpoly_t poly, flint_rand_t state, slong length, mp_limb_t coeff_bits, mp_limb_t exp_bits, const fmpz_mpoly_ctx_t ctx)
+    Generate a random polynomial with length up to the given length and exponents whose packed form does not exceed the given bit count.
 
-    Generate a random polynomial with length up to the given length, exponents
-    whose packed form does not exceed the given bit count, and with signed
-    coefficients of the given number of bits.
-
+    The parameter ``coeff_bits`` to the three functions ``fmpz_mpoly_randtest_{bound|bounds|bits}`` is merely a suggestion for the approximate bit count of the resulting signed coefficients.
+    The function ``fmpz_mpoly_max_bits`` will give the exact bit count of the result.

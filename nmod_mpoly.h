@@ -674,6 +674,9 @@ slong nmod_mpoly_length(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
     return A->length;
 }
 
+FLINT_DLL void nmod_mpoly_resize(nmod_mpoly_t poly,
+                                 slong new_length, const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL ulong nmod_mpoly_get_term_coeff_ui(const nmod_mpoly_t A, slong i,
                                                    const nmod_mpoly_ctx_t ctx);
 
@@ -722,7 +725,6 @@ FLINT_DLL void nmod_mpoly_combine_like_terms(nmod_mpoly_t A,
 
 FLINT_DLL void nmod_mpoly_reverse(nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
-
 
 FLINT_DLL void nmod_mpoly_assert_canonical(const nmod_mpoly_t poly,
                                                    const nmod_mpoly_ctx_t ctx);

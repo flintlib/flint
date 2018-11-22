@@ -21,7 +21,7 @@ main(void)
     slong i, j;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get_set_termcoeff_fmpz....");
+    flint_printf("get/set_term_coeff_fmpz....");
     fflush(stdout);
 
     /* Set coeff and get coeff and compare */
@@ -52,8 +52,8 @@ main(void)
 
             index = n_randint(state, f->length);
 
-            fmpz_mpoly_set_termcoeff_fmpz(f, index, c, ctx);
-            fmpz_mpoly_get_termcoeff_fmpz(d, f, index, ctx);
+            fmpz_mpoly_set_term_coeff_fmpz(f, index, c, ctx);
+            fmpz_mpoly_get_term_coeff_fmpz(d, f, index, ctx);
             if (!fmpz_equal(c, d))
             {
                 printf("FAIL\n");

@@ -491,28 +491,28 @@ FMPQ_MPOLY_INLINE
 void fmpq_mpoly_get_termexp_ui(ulong * exps, const fmpq_mpoly_t poly,
                                           slong n, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_get_termexp_ui(exps, poly->zpoly, n, ctx->zctx);
+    fmpz_mpoly_get_term_exp_ui(exps, poly->zpoly, n, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_get_termexp_fmpz(fmpz ** exps, const fmpq_mpoly_t poly,
                                           slong n, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_get_termexp_fmpz(exps, poly->zpoly, n, ctx->zctx);
+    fmpz_mpoly_get_term_exp_fmpz(exps, poly->zpoly, n, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_set_termexp_ui(fmpq_mpoly_t poly,
                       slong n, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_set_termexp_ui(poly->zpoly, n, exps, ctx->zctx);
+    fmpz_mpoly_set_term_exp_ui(poly->zpoly, n, exps, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_set_termexp_fmpz(fmpq_mpoly_t poly,
                       slong n, fmpz * const * exps, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_set_termexp_fmpz(poly->zpoly, n, exps, ctx->zctx);
+    fmpz_mpoly_set_term_exp_fmpz(poly->zpoly, n, exps, ctx->zctx);
 }
 
 

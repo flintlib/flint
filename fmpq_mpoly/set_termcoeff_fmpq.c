@@ -18,7 +18,7 @@ void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t A,
     if (fmpq_is_zero(x))
     {
         /* we can easily get a zero coeff by zeroing the coeff of the zpoly */
-        fmpz_mpoly_set_termcoeff_fmpz(A->zpoly, n, fmpq_numref(x), ctx->zctx);
+        fmpz_mpoly_set_term_coeff_fmpz(A->zpoly, n, fmpq_numref(x), ctx->zctx);
 
     }
     else if (fmpq_is_zero(A->content))
@@ -33,7 +33,7 @@ void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t A,
         fmpz_init_set_ui(t, UWORD(1));
         fmpq_set(A->content, x);
         _fmpz_vec_zero(A->zpoly->coeffs, A->zpoly->length);
-        fmpz_mpoly_set_termcoeff_fmpz(A->zpoly, n, t, ctx->zctx);
+        fmpz_mpoly_set_term_coeff_fmpz(A->zpoly, n, t, ctx->zctx);
         fmpz_clear(t);
     }
     else
@@ -54,7 +54,7 @@ void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t A,
             _fmpz_vec_scalar_mul_fmpz(A->zpoly->coeffs, A->zpoly->coeffs,
                                              A->zpoly->length, fmpq_denref(t));            
         }
-        fmpz_mpoly_set_termcoeff_fmpz(A->zpoly, n, fmpq_numref(t), ctx->zctx);
+        fmpz_mpoly_set_term_coeff_fmpz(A->zpoly, n, fmpq_numref(t), ctx->zctx);
         fmpq_clear(t);
     }
 }

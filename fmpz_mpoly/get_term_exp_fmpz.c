@@ -12,14 +12,16 @@
 
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_get_termexp_ui(ulong * exps, const fmpz_mpoly_t poly, 
-                                           slong n, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_get_term_exp_fmpz(fmpz ** exp, const fmpz_mpoly_t A, 
+                                           slong i, const fmpz_mpoly_ctx_t ctx)
 {
     slong N;
 
-    if ((ulong) n >= (ulong) poly->length)
-        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_get_termexp_ui");
+    if ((ulong) i >= (ulong) A->length)
+    {
+        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_get_term_exp_fmpz");
+    }
 
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
-    mpoly_get_monomial_ui(exps, poly->exps + N*n, poly->bits, ctx->minfo);
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    mpoly_get_monomial_pfmpz(exp, A->exps + N*i, A->bits, ctx->minfo);
 }

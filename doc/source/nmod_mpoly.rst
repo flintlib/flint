@@ -179,39 +179,30 @@ Degrees
 
     Return ``1`` if the degrees of poly with respect to each variable fit into an ``slong``, otherwise return ``0``.
 
-.. function:: void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-
-    Set ``degs`` to the degrees of ``A`` with respect to each variable.
-    If ``A`` is zero, all degrees are set to ``-1``.
-
-.. function:: slong nmod_mpoly_degree_si(const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
-
-    Return the degree of ``A`` with respect to the variable of index ``var``.
-    If ``A`` is zero, the return is ``-1``.
-
 .. function:: void nmod_mpoly_degrees_fmpz(fmpz ** degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+.. function:: void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Set ``degs`` to the degrees of ``A`` with respect to each variable.
     If ``A`` is zero, all degrees are set to ``-1``.
 
 .. function:: void nmod_mpoly_degree_fmpz(fmpz_t deg, const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
 
-    Set ``deg`` to the degree of ``A`` with respect to the variable of index ``var``.
-    If ``A`` is zero, set ``deg`` to ``-1``.
+.. function:: slong nmod_mpoly_degree_si(const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Either return or set ``deg`` to the degree of ``A`` with respect to the variable of index ``var``.
+    If ``A`` is zero, the degree is defined to be ``-1``.
 
 .. function:: int nmod_mpoly_total_degree_fits_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Return ``1`` if the total degree of ``A`` fits into an ``slong``, otherwise return ``0``.
 
-.. function:: slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-
-    Return the total degree of ``A`` assuming it fits into an slong.
-    If ``A`` is zero, the return is ``-1``.
-
 .. function:: void nmod_mpoly_total_degree_fmpz(fmpz_t tdeg, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
-    Set ``tdeg`` to the total degree of ``A``.
-    If ``A`` is zero, ``tdeg`` is set to ``-1``.
+.. function:: slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Either return or set ``tdeg`` to the total degree of ``A``.
+    If ``A`` is zero, the total degree is defined to be ``-1``.
 
 
 Container operations
@@ -223,7 +214,7 @@ Container operations
 .. function:: int nmod_mpoly_is_canonical(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
-    To be in canonical form, all of the terms must have nonzero coefficient with valid exponents, and the terms must be sorted from greatest to least.
+    To be in canonical form, all of the terms must have nonzero coefficients, and the terms must be sorted from greatest to least.
 
 .. function:: slong nmod_mpoly_length(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
@@ -240,15 +231,11 @@ Container operations
 
 .. function:: int nmod_mpoly_term_exp_fits_si(const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
 
-    Return ``1`` if all entries of the exponent vector of the term of index `i` fit into an ``slong``. Otherwise, return ``0``.
-
 .. function:: int nmod_mpoly_term_exp_fits_ui(const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
 
-    Return ``1`` if all entries of the exponent vector of the term of index `i` fit into a ``ulong``. Otherwise, return ``0``.
+    Return ``1`` if all entries of the exponent vector of the term of index `i` fit into an ``slong`` (resp. a ``ulong). Otherwise, return ``0``.
 
 .. function:: void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
-
-    Set ``exp`` to the exponent vector of the term of index ``i``.
 
 .. function:: void nmod_mpoly_get_term_exp_ui(ulong * exp, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
 
@@ -256,20 +243,15 @@ Container operations
 
 .. function:: void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 
-    Set the exponent of the term of index ``i`` to ``exp``.
-
 .. function:: void nmod_mpoly_set_term_exp_ui(nmod_mpoly_t A, slong i, const ulong * exp, const nmod_mpoly_ctx_t ctx)
 
     Set the exponent of the term of index ``i`` to ``exp``.
 
 .. function:: void nmod_mpoly_push_term_ui_fmpz(nmod_mpoly_t A, ulong c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 
-    Append a term to ``A`` with the given coefficient and exponents.
-    This function runs in constant average time.
-
 .. function:: void nmod_mpoly_push_term_ui_ui(nmod_mpoly_t A, ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx)
 
-    Append a term to ``A`` with the given coefficient and exponents.
+    Append a term to ``A`` with coefficient ``c`` and exponent vector ``exp``.
     This function runs in constant average time.
 
 .. function:: void nmod_mpoly_sort_terms(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)

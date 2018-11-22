@@ -23,6 +23,7 @@ void nmod_mpoly_reverse(nmod_mpoly_t A,
         nmod_mpoly_fit_length(A, Blen, ctx);
         nmod_mpoly_fit_bits(A, B->bits, ctx);
         A->bits = B->bits;
+        A->length = B->length;
         for (i = 0; i < Blen; i++)
         {
             A->coeffs[i] = B->coeffs[Blen - i - 1];

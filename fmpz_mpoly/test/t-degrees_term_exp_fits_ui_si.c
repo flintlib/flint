@@ -36,7 +36,7 @@ main(void)
         if (FLINT_BITS == 64)
         {
             fmpz_mpoly_set_str_pretty(f, "x^9223372036854775807", vars, ctx);
-            if (!fmpz_mpoly_termexp_fits_si(f, 0, ctx)
+            if (!fmpz_mpoly_term_exp_fits_si(f, 0, ctx)
                 || !fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 1\n");
@@ -44,7 +44,7 @@ main(void)
             }
 
             fmpz_mpoly_set_str_pretty(f, "(x*y)^9223372036854775807", vars, ctx);
-            if (!fmpz_mpoly_termexp_fits_si(f, 0, ctx)
+            if (!fmpz_mpoly_term_exp_fits_si(f, 0, ctx)
                 || !fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 2\n");
@@ -52,7 +52,7 @@ main(void)
             }
 
             fmpz_mpoly_set_str_pretty(f, "x^9223372036854775808", vars, ctx);
-            if (fmpz_mpoly_termexp_fits_si(f, 0, ctx)
+            if (fmpz_mpoly_term_exp_fits_si(f, 0, ctx)
                 || fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 3\n");
@@ -60,7 +60,7 @@ main(void)
             }
 
             fmpz_mpoly_set_str_pretty(f, "(x*y)^9223372036854775808", vars, ctx);
-            if (fmpz_mpoly_termexp_fits_si(f, 0, ctx)
+            if (fmpz_mpoly_term_exp_fits_si(f, 0, ctx)
                 || fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 4\n");
@@ -69,28 +69,28 @@ main(void)
 
 
             fmpz_mpoly_set_str_pretty(f, "x^18446744073709551615", vars, ctx);
-            if (!fmpz_mpoly_termexp_fits_ui(f, 0, ctx))
+            if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 1\n");
                 flint_abort();
             }
 
             fmpz_mpoly_set_str_pretty(f, "(x*y)^18446744073709551615", vars, ctx);
-            if (!fmpz_mpoly_termexp_fits_ui(f, 0, ctx))
+            if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 2\n");
                 flint_abort();
             }
 
             fmpz_mpoly_set_str_pretty(f, "x^18446744073709551616", vars, ctx);
-            if (fmpz_mpoly_termexp_fits_ui(f, 0, ctx))
+            if (fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 3\n");
                 flint_abort();
             }
 
             fmpz_mpoly_set_str_pretty(f, "(x*y)^18446744073709551616", vars, ctx);
-            if (fmpz_mpoly_termexp_fits_ui(f, 0, ctx))
+            if (fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 4\n");
                 flint_abort();
@@ -99,7 +99,7 @@ main(void)
         } else if (FLINT_BITS == 32)
         {
             fmpz_mpoly_set_str_pretty(f, "x^2147483647", vars, ctx);
-            if (!fmpz_mpoly_termexp_fits_si(f, 0, ctx)
+            if (!fmpz_mpoly_term_exp_fits_si(f, 0, ctx)
                 || !fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 1\n");
@@ -107,7 +107,7 @@ main(void)
             }
 
             fmpz_mpoly_set_str_pretty(f, "x^2147483647*y^2147483647", vars, ctx);
-            if (!fmpz_mpoly_termexp_fits_si(f, 0, ctx)
+            if (!fmpz_mpoly_term_exp_fits_si(f, 0, ctx)
                 || !fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 2\n");
@@ -115,7 +115,7 @@ main(void)
             }
 
             fmpz_mpoly_set_str_pretty(f, "x^2147483648", vars, ctx);
-            if (fmpz_mpoly_termexp_fits_si(f, 0, ctx)
+            if (fmpz_mpoly_term_exp_fits_si(f, 0, ctx)
                 || fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 3\n");
@@ -123,7 +123,7 @@ main(void)
             }
 
             fmpz_mpoly_set_str_pretty(f, "x^2147483648*y^2147483648", vars, ctx);
-            if (fmpz_mpoly_termexp_fits_si(f, 0, ctx)
+            if (fmpz_mpoly_term_exp_fits_si(f, 0, ctx)
                 || fmpz_mpoly_degrees_fit_si(f, ctx))
             {
                 printf("FAIL\nsi test 4\n");
@@ -132,28 +132,28 @@ main(void)
 
 
             fmpz_mpoly_set_str_pretty(f, "x^4294967295", vars, ctx);
-            if (!fmpz_mpoly_termexp_fits_ui(f, 0, ctx))
+            if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 1\n");
                 flint_abort();
             }
 
             fmpz_mpoly_set_str_pretty(f, "x^4294967295*y^4294967295", vars, ctx);
-            if (!fmpz_mpoly_termexp_fits_ui(f, 0, ctx))
+            if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 2\n");
                 flint_abort();
             }
 
             fmpz_mpoly_set_str_pretty(f, "x^4294967296", vars, ctx);
-            if (fmpz_mpoly_termexp_fits_ui(f, 0, ctx))
+            if (fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 3\n");
                 flint_abort();
             }
 
             fmpz_mpoly_set_str_pretty(f, "x^4294967296*y^4294967296", vars, ctx);
-            if (fmpz_mpoly_termexp_fits_ui(f, 0, ctx))
+            if (fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
                 printf("FAIL\nui test 4\n");
                 flint_abort();
@@ -202,7 +202,7 @@ main(void)
 
         for (j = 0; j < fmpz_mpoly_length(f, ctx); j++)
         {
-            fmpz_mpoly_get_termexp_fmpz(exp, f, j, ctx);
+            fmpz_mpoly_get_term_exp_fmpz(exp, f, j, ctx);
             for (k = 0; k < nvars; k++)
                 if (fmpz_cmp(deg[k], exp[k]) < 0)
                     fmpz_set(deg[k], exp[k]);
@@ -210,7 +210,7 @@ main(void)
             result = 1;
             for (k = 0; k < nvars; k++)
                 result = result && fmpz_fits_si(exp[k]);
-            if (result != fmpz_mpoly_termexp_fits_si(f, j, ctx))
+            if (result != fmpz_mpoly_term_exp_fits_si(f, j, ctx))
             {
                 flint_printf("FAIL\nCheck monomial_fit_si\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
@@ -219,7 +219,7 @@ main(void)
             result = 1;
             for (k = 0; k < nvars; k++)
                 result = result && fmpz_abs_fits_ui(exp[k]);
-            if (result != fmpz_mpoly_termexp_fits_ui(f, j, ctx))
+            if (result != fmpz_mpoly_term_exp_fits_ui(f, j, ctx))
             {
                 flint_printf("FAIL\nCheck monomial_fit_ui\ni = %wd, j = %wd\n", i, j);
                 flint_abort();

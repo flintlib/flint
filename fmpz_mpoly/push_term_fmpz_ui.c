@@ -14,49 +14,49 @@
 /*
     emplaceterm clears c
 */
-void _fmpz_mpoly_emplacebackterm_fmpz_ui(fmpz_mpoly_t poly,
+void _fmpz_mpoly_emplacebackterm_fmpz_ui(fmpz_mpoly_t A,
                        fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
-    mp_bitcnt_t exp_bits;
     slong N;
+    slong old_length = A->length;
+    mp_bitcnt_t exp_bits;
 
     exp_bits = mpoly_exp_bits_required_ui(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
-    fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
+    fmpz_mpoly_fit_bits(A, exp_bits, ctx);
 
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    fmpz_mpoly_fit_length(poly, poly->length + 1, ctx);
-    fmpz_swap(poly->coeffs + poly->length, c);
-    mpoly_set_monomial_ui(poly->exps + N*poly->length, exp, poly->bits, ctx->minfo);
-    poly->length++; /* safe because length is increasing */
+    fmpz_mpoly_fit_length(A, old_length + 1, ctx);
+    fmpz_swap(A->coeffs + old_length, c);
+    A->length = old_length + 1;
     fmpz_clear(c);
+    mpoly_set_monomial_ui(A->exps + N*old_length, exp, A->bits, ctx->minfo);
 }
 
 
-
-void fmpz_mpoly_pushterm_fmpz_ui(fmpz_mpoly_t poly,
+void fmpz_mpoly_push_term_fmpz_ui(fmpz_mpoly_t A,
                  const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_t C;
     fmpz_init_set(C, c);
-    _fmpz_mpoly_emplacebackterm_fmpz_ui(poly, C, exp, ctx);    
+    _fmpz_mpoly_emplacebackterm_fmpz_ui(A, C, exp, ctx);    
 }
 
-void fmpz_mpoly_pushterm_ui_ui(fmpz_mpoly_t poly,
+void fmpz_mpoly_push_term_ui_ui(fmpz_mpoly_t A,
                         ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_t C;
     fmpz_init_set_ui(C, c);
-    _fmpz_mpoly_emplacebackterm_fmpz_ui(poly, C, exp, ctx);    
+    _fmpz_mpoly_emplacebackterm_fmpz_ui(A, C, exp, ctx);    
 }
 
-void fmpz_mpoly_pushterm_si_ui(fmpz_mpoly_t poly,
+void fmpz_mpoly_push_term_si_ui(fmpz_mpoly_t A,
                         slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_t C;
     fmpz_init(C);
     fmpz_set_si(C, c);
-    _fmpz_mpoly_emplacebackterm_fmpz_ui(poly, C, exp, ctx);    
+    _fmpz_mpoly_emplacebackterm_fmpz_ui(A, C, exp, ctx);    
 }
 

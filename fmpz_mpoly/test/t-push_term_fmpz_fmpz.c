@@ -72,11 +72,11 @@ main(void)
             fmpz_mpoly_assert_canonical(f1, ctx);
 
             /* push it back on f2 */
-            fmpz_mpoly_pushterm_fmpz_fmpz(f2, c, exp, ctx);
+            fmpz_mpoly_push_term_fmpz_fmpz(f2, c, exp, ctx);
 
             /* make sure last term matches */
-            fmpz_mpoly_get_termcoeff_fmpz(c2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
-            fmpz_mpoly_get_termexp_fmpz(exp2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
+            fmpz_mpoly_get_term_coeff_fmpz(c2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
+            fmpz_mpoly_get_term_exp_fmpz(exp2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
             if (!fmpz_equal(c, c2))
             {
                 printf("FAIL\n");

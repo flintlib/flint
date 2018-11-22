@@ -64,11 +64,11 @@ main(void)
             fmpz_mpoly_add(f1, f1, m, ctx);
 
             /* push it back on f2 */
-            fmpz_mpoly_pushterm_fmpz_ui(f2, c, exp, ctx);
+            fmpz_mpoly_push_term_fmpz_ui(f2, c, exp, ctx);
 
             /* make sure last term matches */
-            fmpz_mpoly_get_termcoeff_fmpz(c2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
-            fmpz_mpoly_get_termexp_ui(exp2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
+            fmpz_mpoly_get_term_coeff_fmpz(c2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
+            fmpz_mpoly_get_term_exp_ui(exp2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
             if (!fmpz_equal(c, c2))
             {
                 printf("FAIL\n");

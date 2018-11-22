@@ -23,7 +23,7 @@ main(void)
     int result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get_set_termexp_ui....");
+    flint_printf("get/set_term_exp_ui....");
     fflush(stdout);
 
     /* check set and get match */
@@ -60,7 +60,7 @@ main(void)
 
             index = n_randint(state, f->length);
 
-            fmpz_mpoly_set_termexp_ui(f, index, exp1, ctx);
+            fmpz_mpoly_set_term_exp_ui(f, index, exp1, ctx);
 
             if (!mpoly_monomials_valid_test(f->exps, f->length, f->bits, ctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
@@ -68,7 +68,7 @@ main(void)
             if (mpoly_monomials_overflow_test(f->exps, f->length, f->bits, ctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
 
-            fmpz_mpoly_get_termexp_ui(exp2, f, index, ctx);
+            fmpz_mpoly_get_term_exp_ui(exp2, f, index, ctx);
 
             result = 1;
             for (k = 0; k < nvars; k++)

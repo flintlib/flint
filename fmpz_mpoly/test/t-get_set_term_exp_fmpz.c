@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2017 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,8 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
 
@@ -24,7 +23,7 @@ main(void)
     int result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get_set_termexp_fmpz....");
+    flint_printf("get/set_term_exp_fmpz....");
     fflush(stdout);
 
     /* check fmpz */
@@ -64,7 +63,7 @@ main(void)
 
             index = n_randint(state, f->length);
 
-            fmpz_mpoly_set_termexp_fmpz(f, index, exp1, ctx);
+            fmpz_mpoly_set_term_exp_fmpz(f, index, exp1, ctx);
 
             if (!mpoly_monomials_valid_test(f->exps, f->length, f->bits, ctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
@@ -72,7 +71,7 @@ main(void)
             if (mpoly_monomials_overflow_test(f->exps, f->length, f->bits, ctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
 
-            fmpz_mpoly_get_termexp_fmpz(exp2, f, index, ctx);
+            fmpz_mpoly_get_term_exp_fmpz(exp2, f, index, ctx);
 
             result = 1;
             for (k = 0; k < nvars; k++)
