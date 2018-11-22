@@ -50,37 +50,37 @@ Memory management
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mpoly_init(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_init(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
-    Initialise an ``nmod_mpoly_t`` for use, given an initialised context
-    object.
+    Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
+    By default 8 bits are allocated for the exponent widths.
 
-.. function:: void nmod_mpoly_init2(nmod_mpoly_t poly, slong alloc, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_init2(nmod_mpoly_t A, slong alloc, const nmod_mpoly_ctx_t ctx)
 
-    Initialise an ``nmod_mpoly_t`` for use, with space for at least
-    ``alloc`` terms, given an initialised context. By default, fields of 8
-    bits are allocated for the exponents in each exponent vector.
+    Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
+    It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
 
-.. function:: void nmod_mpoly_realloc(nmod_mpoly_t poly, slong len, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_init3(nmod_mpoly_t A, slong alloc, mp_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
 
-    Reallocate an ``nmod_mpoly_t`` to have space for ``alloc`` terms. 
-    Assumes the current length of the polynomial is not greater than
-    ``len``.
+    Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
+    It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
 
-.. function:: void nmod_mpoly_clear(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_fit_length(nmod_mpoly_t A, slong len, const nmod_mpoly_ctx_t ctx)
 
-    Release any space allocated for an ``nmod_mpoly_t``.
+    Ensure that ``A`` has space for at least ``len`` terms.
 
-.. function:: void nmod_mpoly_truncate(nmod_mpoly_t poly, slong newlen, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_fit_bits(nmod_mpoly_t A, mp_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
 
-    If the given polynomial is larger than the given number of terms, truncate
-    to that number of terms.
+    Ensure that the exponent fields of ``A`` have at least ``bits`` bits.
 
-.. function:: void nmod_mpoly_fit_bits(nmod_mpoly_t poly, slong bits, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_realloc(nmod_mpoly_t A, slong alloc, const nmod_mpoly_ctx_t ctx)
 
-    Reallocate the polynomial to have space for exponent fields of the given
-    number of bits. The number of bits must be at least 8 and at most
-    FLINT_BITS. This function can increase the number of bits only.
+    Reallocate ``A`` to have space for ``alloc`` terms. 
+    Assumes the current length of the polynomial is not greater than ``alloc``.
+
+.. function:: void nmod_mpoly_clear(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Release any space allocated for ``A``.
 
 
 Basic manipulation

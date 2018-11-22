@@ -52,51 +52,37 @@ Memory management
 ----------------------------------------------------------------------
 
 
-.. function:: void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-    Initialise an ``fmpz_mpoly_t`` for use, given an initialised context
-    object. Its value is set to 0.
+    Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
     By default 8 bits are allocated for the exponent widths.
 
-.. function:: void fmpz_mpoly_init2(fmpz_mpoly_t poly, slong alloc, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc, const fmpz_mpoly_ctx_t ctx)
 
-    Initialise an ``fmpz_mpoly_t`` for use, with space for at least
-    ``alloc`` terms, given an initialised context. Its value is set to 0.
-    By default 8 bits are allocated for the exponent widths.
+    Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
+    It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
 
-.. function:: void fmpz_mpoly_realloc(fmpz_mpoly_t poly, slong len, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 
-    Reallocate an ``fmpz_mpoly_t`` to have space for ``alloc`` terms. 
-    Assumes the current length of the polynomial is not greater than
-    ``len``.
+    Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
+    It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
 
-.. function:: void _fmpz_mpoly_fit_length(fmpz ** poly, ulong ** exps, slong * alloc, slong len, slong N)
+.. function:: void fmpz_mpoly_fit_length(fmpz_mpoly_t A, slong len, const fmpz_mpoly_ctx_t ctx)
 
-    Reallocate a low level ``fmpz_mpoly`` to have space for at least
-    ``len`` terms. No truncation is performed if ``len`` is less than
-    the currently allocated number of terms; the allocated space can only grow.
-    Assumes exponent vectors each consist of `N` words.
+    Ensure that ``A`` has space for at least ``len`` terms.
 
-.. function:: void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_fit_bits(fmpz_mpoly_t A, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 
-    Reallocate a low level ``fmpz_mpoly`` to have space for at least
-    ``len`` terms. No truncation is performed if ``len`` is less than
-    the currently allocated number of terms; the allocated space can only grow.
+    Ensure that the exponent fields of ``A`` have at least ``bits`` bits.
 
-.. function:: void _fmpz_mpoly_set_length(fmpz_mpoly_t poly, slong newlen, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_realloc(fmpz_mpoly_t A, slong alloc, const fmpz_mpoly_ctx_t ctx)
 
-    Set the number of terms of the given polynomial to the given length. 
-    Assumes the polynomial has at least ``newlen`` allocated and initialised
-    terms.
+    Reallocate ``A`` to have space for ``alloc`` terms. 
+    Assumes the current length of the polynomial is not greater than ``alloc``.
 
-.. function:: void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly, slong bits, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_clear(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-    Reallocate the polynomial to have space for exponent fields of the given
-    number of bits. This function can increase the number of bits only.
-
-.. function:: void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Release any space allocated for an ``fmpz_mpoly_t``.
+    Release any space allocated for ``A``.
 
 
 Basic manipulation
@@ -945,6 +931,7 @@ Input/Output
 
 Random generation
 ----------------------------------------------------------------------
+
 
 .. function:: void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, ulong exp_bound, const fmpz_mpoly_ctx_t ctx)
 

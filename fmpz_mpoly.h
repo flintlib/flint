@@ -75,188 +75,80 @@ typedef struct
    ulong * exps;  
    slong alloc;
    slong length;
-   slong bits;     /* number of bits per exponent */
+   mp_bitcnt_t bits;     /* number of bits per exponent */
 } fmpz_mpoly_struct;
 
 typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
 
-/* sparse univariates with multivariate coefficients */
-typedef struct
-{
-   fmpz_mpoly_struct * coeffs; /* multivariate coefficients */
-   ulong * exps;
-   slong alloc;
-   slong length;
-   slong var; /* univariate variable number */
-} fmpz_mpoly_univar_struct;
-
-typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
-
-
-
-/*
-    A dense mpoly is stored as a flat array of coeffcients.
-    Suppose deg_bounds = {a, b, c}. The coefficient of the monomial with 
-    exponents {i, j, k} is stored at the coefficient of index
-        c + k*(b + j*(a + i*0))
-
-    Design is still in flux.
-*/
-typedef struct
-{
-    slong nvars;
-    slong degb_alloc;
-    slong * deg_bounds;
-    slong length;           /* usage is inconsistent currently */
-    slong coeff_alloc;
-    fmpz * coeffs;
-} fmpz_mpolyd_struct;
-
-typedef fmpz_mpolyd_struct fmpz_mpolyd_t[1];
-
-typedef struct
-{
-    slong nvars;
-    slong * perm;
-} fmpz_mpolyd_ctx_struct;
-
-typedef fmpz_mpolyd_ctx_struct fmpz_mpolyd_ctx_t[1];
-
-
-
-
-/* geobuckets ****************************************************************/
-typedef struct fmpz_mpoly_geobucket
-{
-    fmpz_mpoly_struct polys[FLINT_BITS/2];
-    slong length;
-} fmpz_mpoly_geobucket_struct;
-
-typedef fmpz_mpoly_geobucket_struct fmpz_mpoly_geobucket_t[1];
-
-FLINT_DLL void fmpz_mpoly_geobucket_init(fmpz_mpoly_geobucket_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_clear(fmpz_mpoly_geobucket_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_empty(fmpz_mpoly_t p,
-                         fmpz_mpoly_geobucket_t B, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_print(fmpz_mpoly_geobucket_t B,
-                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_fit_length(fmpz_mpoly_geobucket_t B,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_geobucket_fix(fmpz_mpoly_geobucket_t B, slong i,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_set(fmpz_mpoly_geobucket_t B,
-                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_add(fmpz_mpoly_geobucket_t B,
-                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_sub(fmpz_mpoly_geobucket_t B,
-                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_set_fmpz(fmpz_mpoly_geobucket_t B,
-                                         fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_gen(fmpz_mpoly_geobucket_t B, slong var,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_add_inplace(fmpz_mpoly_geobucket_t B1,
-                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_sub_inplace(fmpz_mpoly_geobucket_t B1,
-                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_neg_inplace(fmpz_mpoly_geobucket_t B1,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_mul_inplace(fmpz_mpoly_geobucket_t B1,
-                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_pow_ui_inplace(fmpz_mpoly_geobucket_t B1,
-                                          ulong k, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_geobucket_pow_fmpz_inplace(fmpz_mpoly_geobucket_t B1,
-                                   const fmpz_t k, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_geobucket_divides_inplace(fmpz_mpoly_geobucket_t B1,
-                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
 
 /*  Memory management ********************************************************/
 
-FLINT_DLL void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_init2(fmpz_mpoly_t poly, slong alloc, 
+FLINT_DLL void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_realloc(fmpz ** poly, ulong ** exps,
-                                            slong * alloc, slong len, slong N);
-
-FLINT_DLL void fmpz_mpoly_realloc(fmpz_mpoly_t poly, slong alloc, 
+FLINT_DLL void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, mp_bitcnt_t bits,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_fit_length(fmpz ** poly,
-                             ulong ** exps, slong * alloc, slong len, slong N);
+FLINT_DLL void _fmpz_mpoly_realloc(fmpz ** Acoeff, ulong ** Aexp,
+                                           slong * Aalloc, slong len, slong N);
 
-FLINT_DLL void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len, 
+FLINT_DLL void fmpz_mpoly_realloc(fmpz_mpoly_t A, slong alloc, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpz_mpoly_fit_length(fmpz ** Acoeff,
+                            ulong ** Aexp, slong * Aalloc, slong len, slong N);
+
+FLINT_DLL void fmpz_mpoly_fit_length(fmpz_mpoly_t A, slong len, 
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_clear(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-void _fmpz_mpoly_set_length(fmpz_mpoly_t poly, slong newlen, 
+void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen, 
                                                    const fmpz_mpoly_ctx_t ctx)
 {
-    if (poly->length > newlen)
+    if (A->length > newlen)
     {
         slong i;
-        for (i = newlen; i < poly->length; i++)
-           _fmpz_demote(poly->coeffs + i); 
+        for (i = newlen; i < A->length; i++)
+           _fmpz_demote(A->coeffs + i); 
     }
-    poly->length = newlen;
+    A->length = newlen;
 }
 
 FMPZ_MPOLY_INLINE
-void fmpz_mpoly_truncate(fmpz_mpoly_t poly, slong newlen, 
+void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen, 
                                                    const fmpz_mpoly_ctx_t ctx)
 {
-    if (poly->length > newlen)
+    if (A->length > newlen)
     {
         slong i;
 
-        for (i = newlen; i < poly->length; i++)
-            _fmpz_demote(poly->coeffs + i);
+        for (i = newlen; i < A->length; i++)
+            _fmpz_demote(A->coeffs + i);
 
-        poly->length = newlen;
+        A->length = newlen;
     }  
 }
 
-/*
-   if poly->bits < bits, set poly->bits = bits and reallocate poly->exps
-*/
 FMPZ_MPOLY_INLINE
-void fmpz_mpoly_fit_bits(fmpz_mpoly_t poly,
-                                        slong bits, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
+                                  mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 {
-   if (poly->bits < bits)
+   if (A->bits < bits)
    {
-      if (poly->alloc != 0)
+      if (A->alloc != 0)
       {
          slong N = mpoly_words_per_exp(bits, ctx->minfo);
-         ulong * t = flint_malloc(N*poly->alloc*sizeof(ulong));
-         mpoly_repack_monomials(t, bits, poly->exps,
-                                         poly->bits, poly->length, ctx->minfo);
-         flint_free(poly->exps);
-         poly->exps = t;
+         ulong * t = flint_malloc(N*A->alloc*sizeof(ulong));
+         mpoly_repack_monomials(t, bits, A->exps, A->bits, A->length, ctx->minfo);
+         flint_free(A->exps);
+         A->exps = t;
       }
 
-      poly->bits = bits;
+      A->bits = bits;
    }
 }
 
@@ -790,6 +682,55 @@ FLINT_DLL void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
                    const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
                     const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
 
+
+/******************************************************************************
+
+   Internal functions (guaranteed to change without notice)
+
+******************************************************************************/
+
+/* sparse univariates with multivariate coefficients */
+typedef struct
+{
+   fmpz_mpoly_struct * coeffs; /* multivariate coefficients */
+   ulong * exps;
+   slong alloc;
+   slong length;
+   slong var; /* univariate variable number */
+} fmpz_mpoly_univar_struct;
+
+typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
+
+
+
+/*
+    A dense mpoly is stored as a flat array of coeffcients.
+    Suppose deg_bounds = {a, b, c}. The coefficient of the monomial with 
+    exponents {i, j, k} is stored at the coefficient of index
+        c + k*(b + j*(a + i*0))
+
+    Design is still in flux.
+*/
+typedef struct
+{
+    slong nvars;
+    slong degb_alloc;
+    slong * deg_bounds;
+    slong length;           /* usage is inconsistent currently */
+    slong coeff_alloc;
+    fmpz * coeffs;
+} fmpz_mpolyd_struct;
+
+typedef fmpz_mpolyd_struct fmpz_mpolyd_t[1];
+
+typedef struct
+{
+    slong nvars;
+    slong * perm;
+} fmpz_mpolyd_ctx_struct;
+
+typedef fmpz_mpolyd_ctx_struct fmpz_mpolyd_ctx_t[1];
+
 /* Univariates ***************************************************************/
 
 FLINT_DLL void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly,
@@ -1042,11 +983,70 @@ FLINT_DLL void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-/******************************************************************************
 
-   Internal functions (guaranteed to change without notice)
+/* geobuckets ****************************************************************/
+typedef struct fmpz_mpoly_geobucket
+{
+    fmpz_mpoly_struct polys[FLINT_BITS/2];
+    slong length;
+} fmpz_mpoly_geobucket_struct;
 
-******************************************************************************/
+typedef fmpz_mpoly_geobucket_struct fmpz_mpoly_geobucket_t[1];
+
+FLINT_DLL void fmpz_mpoly_geobucket_init(fmpz_mpoly_geobucket_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_clear(fmpz_mpoly_geobucket_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_empty(fmpz_mpoly_t p,
+                         fmpz_mpoly_geobucket_t B, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_print(fmpz_mpoly_geobucket_t B,
+                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_fit_length(fmpz_mpoly_geobucket_t B,
+                                          slong i, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_geobucket_fix(fmpz_mpoly_geobucket_t B, slong i,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_set(fmpz_mpoly_geobucket_t B,
+                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_add(fmpz_mpoly_geobucket_t B,
+                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_sub(fmpz_mpoly_geobucket_t B,
+                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_set_fmpz(fmpz_mpoly_geobucket_t B,
+                                         fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_gen(fmpz_mpoly_geobucket_t B, slong var,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_add_inplace(fmpz_mpoly_geobucket_t B1,
+                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_sub_inplace(fmpz_mpoly_geobucket_t B1,
+                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_neg_inplace(fmpz_mpoly_geobucket_t B1,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_mul_inplace(fmpz_mpoly_geobucket_t B1,
+                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_pow_ui_inplace(fmpz_mpoly_geobucket_t B1,
+                                          ulong k, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_geobucket_pow_fmpz_inplace(fmpz_mpoly_geobucket_t B1,
+                                   const fmpz_t k, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_geobucket_divides_inplace(fmpz_mpoly_geobucket_t B1,
+                        fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
+
 
 /* Helpers for array methods *************************************************/
 
@@ -1225,6 +1225,8 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
     p2 = FLINT_SIGN_EXT(p[1]);
     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
+
+
 
 
 

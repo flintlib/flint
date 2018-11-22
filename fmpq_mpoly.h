@@ -93,132 +93,61 @@ typedef struct
 typedef fmpq_mpoly_struct fmpq_mpoly_t[1];
 
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t poly,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_set(d, fmpq_denref(poly->content));
-}
-
-/* geobuckets ****************************************************************/
-typedef struct fmpq_mpoly_geobucket
-{
-    fmpq_mpoly_struct polys[FLINT_BITS/2];
-    slong length;
-} fmpq_mpoly_geobucket_struct;
-
-typedef fmpq_mpoly_geobucket_struct fmpq_mpoly_geobucket_t[1];
-
-FLINT_DLL void fmpq_mpoly_geobucket_init(fmpq_mpoly_geobucket_t B,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_clear(fmpq_mpoly_geobucket_t B,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_empty(fmpq_mpoly_t p,
-                         fmpq_mpoly_geobucket_t B, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_print(fmpq_mpoly_geobucket_t B,
-                                  const char ** x, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_fit_length(fmpq_mpoly_geobucket_t B,
-                                          slong i, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpq_mpoly_geobucket_fix(fmpq_mpoly_geobucket_t B, slong i,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_set(fmpq_mpoly_geobucket_t B,
-                                   fmpq_mpoly_t p, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_add(fmpq_mpoly_geobucket_t B,
-                                   fmpq_mpoly_t p, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_sub(fmpq_mpoly_geobucket_t B,
-                                   fmpq_mpoly_t p, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_set_fmpz(fmpq_mpoly_geobucket_t B,
-                                         fmpz_t c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_set_fmpq(fmpq_mpoly_geobucket_t B,
-                                         fmpq_t c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_gen(fmpq_mpoly_geobucket_t B, slong var,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_add_inplace(fmpq_mpoly_geobucket_t B1,
-                        fmpq_mpoly_geobucket_t B2, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_sub_inplace(fmpq_mpoly_geobucket_t B1,
-                        fmpq_mpoly_geobucket_t B2, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_neg_inplace(fmpq_mpoly_geobucket_t B1,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_mul_inplace(fmpq_mpoly_geobucket_t B1,
-                        fmpq_mpoly_geobucket_t B2, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_pow_ui_inplace(fmpq_mpoly_geobucket_t B1,
-                                          ulong k, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_geobucket_pow_fmpz_inplace(fmpq_mpoly_geobucket_t B1,
-                                   const fmpz_t k, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpq_mpoly_geobucket_divides_inplace(fmpq_mpoly_geobucket_t B1,
-                        fmpq_mpoly_geobucket_t B2, const fmpq_mpoly_ctx_t ctx);
-
 /*  Memory management ********************************************************/
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_init(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_init(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpq_init(poly->content);
-    fmpz_mpoly_init(poly->zpoly, ctx->zctx);
+    fmpq_init(A->content);
+    fmpz_mpoly_init(A->zpoly, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_init2(fmpq_mpoly_t poly, slong alloc, 
+void fmpq_mpoly_init2(fmpq_mpoly_t A, slong alloc, 
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    fmpq_init(poly->content);
-    fmpz_mpoly_init2(poly->zpoly, alloc, ctx->zctx);
+    fmpq_init(A->content);
+    fmpz_mpoly_init2(A->zpoly, alloc, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_realloc(fmpq_mpoly_t poly, slong alloc, 
+void fmpq_mpoly_init3(fmpq_mpoly_t A, slong alloc, mp_bitcnt_t bits,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_realloc(poly->zpoly, alloc, ctx->zctx);
+    fmpq_init(A->content);
+    fmpz_mpoly_init3(A->zpoly, alloc, bits, ctx->zctx);
 }
 
+
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_fit_length(fmpq_mpoly_t poly, slong len, 
+void fmpq_mpoly_realloc(fmpq_mpoly_t A, slong alloc, 
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_fit_length(poly->zpoly, len, ctx->zctx);
+    fmpz_mpoly_realloc(A->zpoly, alloc, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_clear(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_clear(poly->zpoly, ctx->zctx);
-    fmpq_clear(poly->content);
-}
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_truncate(fmpq_mpoly_t poly, slong newlen, 
+void fmpq_mpoly_fit_length(fmpq_mpoly_t A, slong len, 
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_truncate(poly->zpoly, newlen, ctx->zctx);
+    fmpz_mpoly_fit_length(A->zpoly, len, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_clear(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_clear(A->zpoly, ctx->zctx);
+    fmpq_clear(A->content);
 }
 
 /*
    if poly->bits < bits, set poly->bits = bits and reallocate poly->exps
 */
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_fit_bits(fmpq_mpoly_t poly,
-                                        slong bits, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_fit_bits(fmpq_mpoly_t A,
+                                  mp_bitcnt_t bits, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_fit_bits(poly->zpoly, bits, ctx->zctx);
+    fmpz_mpoly_fit_bits(A->zpoly, bits, ctx->zctx);
 }
 
 /*  Basic manipulation *******************************************************/
@@ -362,6 +291,14 @@ int fmpq_mpoly_is_one(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 }
 
 /* coefficients of monomials *************************************************/
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_set(d, fmpq_denref(A->content));
+}
+
 
 /* get/set a coeff of poly1 corresponding to the monomial poly2 */
 /* these two functions throw if poly2 is not a monomial */
@@ -720,45 +657,109 @@ int fmpq_mpoly_print_pretty(const fmpq_mpoly_t poly,
 /* Random generation *********************************************************/
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t poly, flint_rand_t state,
+void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, ulong * exp_bounds,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_randtest_bounds(poly->zpoly, state,
+    fmpz_mpoly_randtest_bounds(A->zpoly, state,
                                      length, coeff_bits, exp_bounds, ctx->zctx);
-    do {
-        fmpq_randtest(poly->content, state, coeff_bits + 1);
-    } while (fmpq_is_zero(poly->content));
-    fmpq_mpoly_reduce(poly, ctx);
+    fmpq_randtest_not_zero(A->content, state, coeff_bits + 1);
+    fmpq_mpoly_reduce(A, ctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bound(fmpq_mpoly_t poly, flint_rand_t state,
+void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_randtest_bound(poly->zpoly, state,
+    fmpz_mpoly_randtest_bound(A->zpoly, state,
                                      length, coeff_bits, exp_bound, ctx->zctx);
-    do {
-        fmpq_randtest(poly->content, state, coeff_bits + 1);
-    } while (fmpq_is_zero(poly->content));
-    fmpq_mpoly_reduce(poly, ctx);
+    fmpq_randtest_not_zero(A->content, state, coeff_bits + 1);
+    fmpq_mpoly_reduce(A, ctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bits(fmpq_mpoly_t poly, flint_rand_t state,
+void fmpq_mpoly_randtest_bits(fmpq_mpoly_t A, flint_rand_t state,
                    slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_randtest_bits(poly->zpoly, state,
+    fmpz_mpoly_randtest_bits(A->zpoly, state,
                                       length, coeff_bits, exp_bits, ctx->zctx);
-    do {
-        fmpq_randtest(poly->content, state, coeff_bits + 1);
-    } while (fmpq_is_zero(poly->content));
-    fmpq_mpoly_reduce(poly, ctx);
+    fmpq_randtest_not_zero(A->content, state, coeff_bits + 1);
+    fmpq_mpoly_reduce(A, ctx);
 }
 
+/******************************************************************************
 
+   Internal functions (guaranteed to change without notice)
+
+******************************************************************************/
+
+/* geobuckets ****************************************************************/
+typedef struct fmpq_mpoly_geobucket
+{
+    fmpq_mpoly_struct polys[FLINT_BITS/2];
+    slong length;
+} fmpq_mpoly_geobucket_struct;
+
+typedef fmpq_mpoly_geobucket_struct fmpq_mpoly_geobucket_t[1];
+
+FLINT_DLL void fmpq_mpoly_geobucket_init(fmpq_mpoly_geobucket_t B,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_clear(fmpq_mpoly_geobucket_t B,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_empty(fmpq_mpoly_t p,
+                         fmpq_mpoly_geobucket_t B, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_print(fmpq_mpoly_geobucket_t B,
+                                  const char ** x, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_fit_length(fmpq_mpoly_geobucket_t B,
+                                          slong i, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpq_mpoly_geobucket_fix(fmpq_mpoly_geobucket_t B, slong i,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_set(fmpq_mpoly_geobucket_t B,
+                                   fmpq_mpoly_t p, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_add(fmpq_mpoly_geobucket_t B,
+                                   fmpq_mpoly_t p, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_sub(fmpq_mpoly_geobucket_t B,
+                                   fmpq_mpoly_t p, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_set_fmpz(fmpq_mpoly_geobucket_t B,
+                                         fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_set_fmpq(fmpq_mpoly_geobucket_t B,
+                                         fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_gen(fmpq_mpoly_geobucket_t B, slong var,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_add_inplace(fmpq_mpoly_geobucket_t B1,
+                        fmpq_mpoly_geobucket_t B2, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_sub_inplace(fmpq_mpoly_geobucket_t B1,
+                        fmpq_mpoly_geobucket_t B2, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_neg_inplace(fmpq_mpoly_geobucket_t B1,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_mul_inplace(fmpq_mpoly_geobucket_t B1,
+                        fmpq_mpoly_geobucket_t B2, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_pow_ui_inplace(fmpq_mpoly_geobucket_t B1,
+                                          ulong k, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_geobucket_pow_fmpz_inplace(fmpq_mpoly_geobucket_t B1,
+                                   const fmpz_t k, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_geobucket_divides_inplace(fmpq_mpoly_geobucket_t B1,
+                        fmpq_mpoly_geobucket_t B2, const fmpq_mpoly_ctx_t ctx);
 
 /******************************************************************************
 
