@@ -699,6 +699,8 @@ FLINT_DLL int mpoly_term_exp_fits_si(ulong * exps, slong bits,
 FLINT_DLL int mpoly_term_exp_fits_ui(ulong * exps, slong bits,
                                               slong n, const mpoly_ctx_t mctx);
 
+FLINT_DLL int mpoly_is_gen(ulong * exps, slong var, slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL int mpoly_monomials_valid_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_monomials_overflow_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);

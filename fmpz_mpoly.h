@@ -190,20 +190,32 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A,
 
 /*  Basic manipulation *******************************************************/
 
-FLINT_DLL int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t poly,
+FLINT_DLL void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
+FLINT_DLL int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
+                                          slong k, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_set(fmpz * poly1, ulong * exps1,
+                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
+
+FLINT_DLL void fmpz_mpoly_set(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
-                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
+                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
 
-FLINT_DLL void fmpz_mpoly_set_si(fmpz_mpoly_t poly,
-                                          slong c, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL int fmpz_mpoly_equal(const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_set_ui(fmpz_mpoly_t poly,
-                                          ulong c, const fmpz_mpoly_ctx_t ctx);
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_swap(fmpz_mpoly_t A, 
+                                fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+{
+   fmpz_mpoly_struct t = *A;
+   *A = *B;
+   *B = t;
+}
 
 FMPZ_MPOLY_INLINE
 int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
@@ -218,10 +230,28 @@ int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
 }
 
 FMPZ_MPOLY_INLINE
-slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
+slong fmpz_mpoly_max_bits(const fmpz_mpoly_t A)
 {
-    return _fmpz_vec_max_bits(poly->coeffs, poly->length);
+    return _fmpz_vec_max_bits(A->coeffs, A->length);
 }
+
+
+/* Constants *****************************************************************/
+
+FLINT_DLL int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t poly,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t poly,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly,
+                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_si(fmpz_mpoly_t poly,
+                                          slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_set_ui(fmpz_mpoly_t poly,
+                                          ulong c, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
 int fmpz_mpoly_degrees_fit_si(const fmpz_mpoly_t poly,
@@ -283,12 +313,6 @@ void fmpz_mpoly_total_degree_fmpz(fmpz_t td, const fmpz_mpoly_t A,
 FLINT_DLL void _fmpz_mpoly_gen(fmpz * poly, ulong * exps, slong i,
                                slong bits, slong n, int deg, int rev, slong N);
 
-FLINT_DLL void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
-                                          slong k, const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly,
                                           ulong c, const fmpz_mpoly_ctx_t ctx);
 
@@ -297,15 +321,6 @@ FLINT_DLL int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly,
 
 FLINT_DLL int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly,
                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-FMPZ_MPOLY_INLINE
-void fmpz_mpoly_swap(fmpz_mpoly_t poly1, 
-                                fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-{
-   fmpz_mpoly_struct t = *poly1;
-   *poly1 = *poly2;
-   *poly2 = t;
-}
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_zero(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
@@ -498,25 +513,12 @@ FLINT_DLL void _fmpz_mpoly_emplacebackterm_fmpz_pfmpz(fmpz_mpoly_t A,
 
 /* Set and negate ************************************************************/
 
-FLINT_DLL void _fmpz_mpoly_set(fmpz * poly1, ulong * exps1,
-                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
-
-FLINT_DLL void fmpz_mpoly_set(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL void _fmpz_mpoly_neg(fmpz * poly1, ulong * exps1,
                     const fmpz * poly2, const ulong * exps2, slong n, slong N);
 
 FLINT_DLL void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-/* Comparison ****************************************************************/
-
-FLINT_DLL int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
-                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
-
-FLINT_DLL int fmpz_mpoly_equal(const fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                                                   const fmpz_mpoly_ctx_t ctx);
 
 /* Basic arithmetic **********************************************************/
 

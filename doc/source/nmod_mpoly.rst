@@ -115,6 +115,30 @@ Basic manipulation
 
     Set ``A`` to the variable of index ``var``, where ``var = 0`` corresponds to the variable with the most significance with respect to the ordering. 
 
+.. function:: int nmod_mpoly_is_gen(const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
+
+    If `var \ge 0`, return ``1`` if ``A`` is equal to the `var`-th generator, otherwise return ``0``.
+    If `var < 0`, return ``1`` if the polynomial is equal to any generator, otherwise return ``0``.
+
+.. function:: void nmod_mpoly_set(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+    
+    Set ``A`` to ``B``.
+
+.. function:: int nmod_mpoly_equal(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is equal to ``B``, else return ``0``.
+
+.. function:: void nmod_mpoly_swap(nmod_mpoly_t A, nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Efficiently swap ``A`` and ``B``.
+
+
+
+
+
+
+
+
 .. function:: int nmod_mpoly_equal(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
     Return ``1`` if ``A`` is equal to ``B``, else return ``0``.
@@ -152,14 +176,6 @@ Basic manipulation
 
     Return 1 if the given ``nmod_mpoly_t`` is equal to the constant
     polynomial with coefficient 1, else return 0.
-
-.. function:: int nmod_mpoly_is_gen(const nmod_mpoly_t poly, slong i, const nmod_mpoly_ctx_t ctx)
-
-    Return 1 if the given ``nmod_mpoly_t`` is equal to the `i`-th generator
-    of the polynomial ring, otherwise return 0. The generator corresponding to
-    the variable with the most significance corresponds to `i = 0`. If
-    `i < 0` the function returns 1 if the polynomial is equal to any generator
-    of the polynomial ring, otherwise it returns 0.
 
 .. function:: void nmod_mpoly_set_term_ui_ui(nmod_mpoly_t poly, ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx)
 

@@ -21,10 +21,10 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("totaldegree....");
+    flint_printf("degree....");
     fflush(stdout);
 
-    /* Check totaldegree does not go up under addition */
+    /* Check degree does not go up under addition */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
@@ -79,7 +79,7 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    /* Check totaldegree adds under multiplication */
+    /* Check degree adds under multiplication */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         int ok;

@@ -200,6 +200,29 @@ int nmod_mpoly_print_pretty(const nmod_mpoly_t A,
 
 /*  Basic manipulation *******************************************************/
 
+FLINT_DLL void nmod_mpoly_gen(nmod_mpoly_t A, slong var,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_is_gen(const nmod_mpoly_t A,
+                                        slong var, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_equal(const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+NMOD_MPOLY_INLINE
+void nmod_mpoly_swap(nmod_mpoly_t A, nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+{
+   nmod_mpoly_struct t = *A;
+   *A = *B;
+   *B = t;
+}
+
+/* Constants *****************************************************************/
+
+
 FLINT_DLL void _nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly,
                         ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx);
 
@@ -223,12 +246,6 @@ FLINT_DLL void _nmod_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
 
 FLINT_DLL void nmod_mpoly_max_degrees(ulong * max_degs,
                           const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void _nmod_mpoly_gen(ulong * poly, ulong * exps, slong i,
-                               slong bits, slong n, int deg, int rev, slong N);
-
-FLINT_DLL void nmod_mpoly_gen(nmod_mpoly_t poly, slong i,
-                                                   const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_set_ui(nmod_mpoly_t poly,
                                           ulong c, const nmod_mpoly_ctx_t ctx);
@@ -298,15 +315,6 @@ void nmod_mpoly_total_degree_fmpz(fmpz_t td, const nmod_mpoly_t A,
 }
 
 NMOD_MPOLY_INLINE
-void nmod_mpoly_swap(nmod_mpoly_t poly1, 
-                                nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
-{
-   nmod_mpoly_struct t = *poly1;
-   *poly1 = *poly2;
-   *poly2 = t;
-}
-
-NMOD_MPOLY_INLINE
 void nmod_mpoly_zero(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
 {
    _nmod_mpoly_set_length(poly, 0, ctx);
@@ -336,9 +344,6 @@ FLINT_DLL int nmod_mpoly_is_ui(const nmod_mpoly_t A,
 FLINT_DLL ulong nmod_mpoly_get_ui(const nmod_mpoly_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpoly_is_gen(const nmod_mpoly_t poly,
-                                          slong k, const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL ulong nmod_mpoly_get_coeff_ui(nmod_t x,
                  const nmod_mpoly_t poly, slong n, const nmod_mpoly_ctx_t ctx);
 
@@ -353,15 +358,7 @@ FLINT_DLL void nmod_mpoly_set_monomial(nmod_mpoly_t poly,
 
 /* Set and negate ************************************************************/
 
-FLINT_DLL void nmod_mpoly_set(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                                                   const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void nmod_mpoly_neg(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-/* Comparison ****************************************************************/
-
-FLINT_DLL int nmod_mpoly_equal(const nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                                    const nmod_mpoly_ctx_t ctx);
 
 /* Basic arithmetic **********************************************************/

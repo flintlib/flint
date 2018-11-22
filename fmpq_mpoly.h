@@ -170,6 +170,51 @@ int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A,
 /*  Basic manipulation *******************************************************/
 
 FMPQ_MPOLY_INLINE
+void fmpq_mpoly_gen(fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_one(A->content);
+    fmpz_mpoly_gen(A->zpoly, var, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_is_gen(const fmpq_mpoly_t A,
+                                         slong var, const fmpq_mpoly_ctx_t ctx)
+{
+    return fmpq_is_one(A->content)
+          && fmpz_mpoly_is_gen(A->zpoly, var, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_set(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_set(A->content, B->content);
+    fmpz_mpoly_set(A->zpoly, B->zpoly, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_equal(const fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    return fmpq_equal(A->content, B->content)
+        && fmpz_mpoly_equal(A->zpoly, B->zpoly, ctx->zctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_swap(fmpq_mpoly_t A, 
+                                fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_mpoly_struct t = *A;
+    *A = *B;
+    *B = t;
+}
+
+
+/* Constants *****************************************************************/
+
+
+
+FMPQ_MPOLY_INLINE
 int fmpq_mpoly_is_fmpq(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
 {
    return fmpz_mpoly_is_fmpz(poly->zpoly, ctx->zctx);
@@ -255,30 +300,6 @@ void fmpq_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A,
                                              A->zpoly->bits, ctx->zctx->minfo);
 }
 
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_gen(fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpq_one(poly->content);
-    fmpz_mpoly_gen(poly->zpoly, i, ctx->zctx);
-}
-
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly,
-                                          slong k, const fmpq_mpoly_ctx_t ctx)
-{
-    return fmpq_is_one(poly->content)
-          && fmpz_mpoly_is_gen(poly->zpoly, k, ctx->zctx);
-}
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_swap(fmpq_mpoly_t poly1, 
-                                fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpq_mpoly_struct t = *poly1;
-    *poly1 = *poly2;
-    *poly2 = t;
-}
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_zero(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
@@ -474,14 +495,6 @@ FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_fmpz(fmpq_mpoly_t poly,
 /* Set and negate ************************************************************/
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_set(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    fmpq_set(poly1->content, poly2->content);
-    fmpz_mpoly_set(poly1->zpoly, poly2->zpoly, ctx->zctx);
-}
-
-FMPQ_MPOLY_INLINE
 void fmpq_mpoly_neg(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
@@ -492,13 +505,6 @@ void fmpq_mpoly_neg(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
 
 /* Comparison ****************************************************************/
 
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_equal(const fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    return fmpq_equal(poly1->content, poly2->content)
-        && fmpz_mpoly_equal(poly1->zpoly, poly2->zpoly, ctx->zctx);
-}
 
 FLINT_DLL int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t poly, const fmpq_t c,
                                                    const fmpq_mpoly_ctx_t ctx);

@@ -118,7 +118,7 @@ Basic manipulation
 
     Set ``A`` to the variable of index ``var``, where ``var = 0`` corresponds to the variable with the most significance with respect to the ordering. 
 
-.. function:: int fmpz_mpoly_is_gen(const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_is_gen(const fmpq_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
 
     If `var \ge 0`, return ``1`` if ``A`` is equal to the `var`-th generator, otherwise return ``0``.
     If `var < 0`, return ``1`` if the polynomial is equal to any generator, otherwise return ``0``.
@@ -127,7 +127,7 @@ Basic manipulation
     
     Set ``A`` to ``B``.
 
-.. function:: int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_equal(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Return ``1`` if ``A`` is equal to ``B``, else return ``0``.
 
@@ -176,6 +176,14 @@ Constants
 .. function:: void fmpz_mpoly_one(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
     Set ``A`` to the constant ``1``.
+
+.. function:: int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t A, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: int fmpz_mpoly_equal_ui(const fmpz_mpoly_t A, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: int fmpz_mpoly_equal_si(const fmpz_mpoly_t A, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is equal to the constant ``c``, else return ``0``.
 
 .. function:: int fmpz_mpoly_is_zero(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 

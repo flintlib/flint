@@ -113,6 +113,82 @@ Input/Output
     If any division is not exact, parsing fails.
 
 
+Basic manipulation
+----------------------------------------------------------------------
+
+
+.. function:: void fmpq_mpoly_gen(fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to the variable of index ``var``, where ``var = 0`` corresponds to the variable with the most significance with respect to the ordering. 
+
+.. function:: int fmpq_mpoly_is_gen(const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
+
+    If `var \ge 0`, return ``1`` if ``A`` is equal to the `var`-th generator, otherwise return ``0``.
+    If `var < 0`, return ``1`` if the polynomial is equal to any generator, otherwise return ``0``.
+
+.. function:: void fmpq_mpoly_set(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+    
+    Set ``A`` to ``B``.
+
+.. function:: int fmpq_mpoly_equal(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is equal to ``B``, else return ``0``.
+
+.. function:: void fmpq_mpoly_swap(fmpq_mpoly_t A, fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+
+    Efficiently swap ``A`` and ``B``.
+
+
+Constants
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpq_mpoly_is_fmpq(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is a constant, else return ``0``.
+
+.. function:: void fmpq_mpoly_get_fmpq(fmpq_t c, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Assuming that ``A`` is a constant, set ``c`` to this constant.
+    This function throws if ``A`` is not a constant.
+
+.. function:: void fmpq_mpoly_set_fmpq(fmpq_mpoly_t A, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+
+.. function:: void fmpq_mpoly_set_fmpz(fmpq_mpoly_t A, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+
+.. function:: void fmpq_mpoly_set_ui(fmpq_mpoly_t A, ulong c, const fmpq_mpoly_ctx_t ctx);
+
+.. function:: void fmpq_mpoly_set_si(fmpq_mpoly_t A, slong c, const fmpq_mpoly_ctx_t ctx);
+
+    Set ``A`` to the constant ``c``.
+
+.. function:: void fmpq_mpoly_zero(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to the constant ``0``.
+
+.. function:: void fmpq_mpoly_one(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to the constant ``1``.
+
+.. function:: int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t A, fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+
+.. function:: int fmpq_mpoly_equal_fmpz(const fmpq_mpoly_t A, fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+
+.. function:: int fmpq_mpoly_equal_ui(const fmpq_mpoly_t A, ulong c, const fmpq_mpoly_ctx_t ctx)
+
+.. function:: int fmpq_mpoly_equal_si(const fmpq_mpoly_t A, slong c, const fmpq_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is equal to the constant ``c``, else return ``0``.
+
+.. function:: int fmpq_mpoly_is_zero(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is equal to the constant ``0``, else return ``0``.
+
+.. function:: int fmpq_mpoly_is_one(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is equal to the constant ``1``, else return ``0``.
+
+
 Degrees
 --------------------------------------------------------------------------------
 
@@ -277,103 +353,9 @@ Set/Negate
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mpoly_set(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
-    
-    Set ``poly1`` to ``poly2``.
-
-.. function:: void fmpq_mpoly_swap(fmpq_mpoly_t poly1, fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
-
-    Efficiently swap the contents of the two given polynomials. No copying is
-    performed; the swap is accomplished by swapping pointers.
-
-.. function:: void fmpq_mpoly_gen(fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly`` to the `i`-th generator (variable),
-    where `i = 0` corresponds to the variable with the most significance
-    with respect to the ordering. 
-
 .. function:: void fmpq_mpoly_neg(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
     
     Set ``poly1`` to `-```poly2``.
-
-
-
-Constants
---------------------------------------------------------------------------------
-
-
-.. function:: int fmpq_mpoly_is_fmpq(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is a constant, else return 0.
-
-.. function:: void fmpq_mpoly_get_fmpq(fmpq_t c, const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Assuming that ``poly`` is a constant, set `c` to this constant.
-    This function throws if ``poly`` is not a constant.
-
-.. function:: void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
-
-    Set ``poly`` to the constant `c`.
-
-.. function:: void fmpq_mpoly_set_fmpz(fmpq_mpoly_t poly, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
-
-    Set ``poly`` to the constant `c`.
-
-.. function:: void fmpq_mpoly_set_ui(fmpq_mpoly_t poly, ulong c, const fmpq_mpoly_ctx_t ctx);
-
-    Set ``poly`` to the constant `c`.
-
-.. function:: void fmpq_mpoly_set_si(fmpq_mpoly_t poly, slong c, const fmpq_mpoly_ctx_t ctx);
-
-    Set ``poly`` to the constant `c`.
-
-.. function:: void fmpq_mpoly_zero(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly`` to the constant 0.
-
-.. function:: void fmpq_mpoly_one(fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly`` to the constant 1.
-
-
-Comparison
---------------------------------------------------------------------------------
-
-
-.. function:: int fmpq_mpoly_equal(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly1`` is equal to ``poly2``, else return 0.
-
-.. function:: int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t poly, fmpq_t c, const fmpq_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant `c`, else return 0.
-
-.. function:: int fmpq_mpoly_equal_fmpz(const fmpq_mpoly_t poly, fmpz_t c, const fmpq_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant `c`, else return 0.
-
-.. function:: int fmpq_mpoly_equal_ui(const fmpq_mpoly_t poly, ulong  c, const fmpq_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant `c`, else return 0.
-
-.. function:: int fmpq_mpoly_equal_si(const fmpq_mpoly_t poly, slong  c, const fmpq_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant `c`, else return 0.
-
-.. function:: int fmpq_mpoly_is_zero(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant 0, else return 0.
-
-.. function:: int fmpq_mpoly_is_one(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant 1, else return 0.
-
-
-.. function:: int fmpq_mpoly_is_gen(const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
-
-    If `i \ge 0`, return 1 if ``poly`` is equal to the `i`-th generator,
-    otherwise return 0. If `i < 0`, return 1 if the polynomial is
-    equal to any generator, otherwise return 0.
 
 
 Basic arithmetic
