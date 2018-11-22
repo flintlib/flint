@@ -83,15 +83,42 @@ Memory management
     Release any space allocated for ``A``.
 
 
+Input/Output
+----------------------------------------------------------------------
+
+    The variable strings in ``x`` start with the variable of most significance at index ``0``. If ``x`` is ``NULL``, the variables are named ``x1``, ``x2``, ect.
+
+.. function:: char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx)
+
+    Return a string, which the user is responsible for cleaning up, representing ``A``, given an array of variable strings ``x``.
+
+.. function:: int nmod_mpoly_fprint_pretty(FILE * file, const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx)
+
+    Print a string representing ``A`` to ``file``.
+
+.. function:: int nmod_mpoly_print_pretty(const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx)
+
+    Print a string representing ``A`` to ``stdout``.
+
+.. function:: int nmod_mpoly_set_str_pretty(nmod_mpoly_t A, const char * str, const char ** x, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the polynomial in the null-terminates string ``str`` given an array ``x`` of variable strings.
+    If parsing ``str`` fails, ``A`` is set to zero, and ``-1`` is returned. Otherwise, ``0``  is returned.
+    The operations ``+``, ``-``, ``*``, and ``/`` are permitted along with integers and the variables in ``x``. The character ``^`` must be immediately followed by the (integer) exponent.
+    If any division is not exact, parsing fails.
+
+
 Basic manipulation
 --------------------------------------------------------------------------------
 
+.. function:: void nmod_mpoly_gen(nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
 
-.. function:: void nmod_mpoly_gen(nmod_mpoly_t poly, slong i, const nmod_mpoly_ctx_t ctx)
+    Set ``A`` to the variable of index ``var``, where ``var = 0`` corresponds to the variable with the most significance with respect to the ordering. 
 
-    Set the given ``nmod_mpoly_t`` to the `i`-th generator (variable),
-    where `i = 0` corresponds to the variable with the most significance
-    with respect to the ordering. 
+.. function:: int nmod_mpoly_equal(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is equal to ``B``, else return ``0``.
+
 
 .. function:: void nmod_mpoly_set_ui(nmod_mpoly_t poly, ulong c, const nmod_mpoly_ctx_t ctx)
 
@@ -282,15 +309,6 @@ Set and negate
 .. function:: void nmod_mpoly_neg(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
     
     Set ``poly1`` to `-```poly2``.
-
-
-Comparison
---------------------------------------------------------------------------------
-
-
-.. function:: int nmod_mpoly_equal(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly1`` is equal to ``poly2``, else return 0.
 
 
 Basic arithmetic
@@ -484,52 +502,6 @@ Greatest Common Divisor
     interpolation to set
     ``poly1`` to the GCD of ``poly2`` and ``poly3``, where
     ``poly1`` is monic.
-
-
-Input/Output
---------------------------------------------------------------------------------
-
-
-.. function:: char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t poly, const char ** x, const nmod_mpoly_ctx_t ctx)
-
-    Return a string (which the user is responsible for cleaning up),
-    representing ``poly``, given an array of variable strings, starting
-    with the variable of most significance with respect to the ordering. 
-
-.. function:: int _nmod_mpoly_fprint_pretty(FILE * file, const nmod * poly, const ulong * exps, slong len, const char ** x, slong bits, slong n, int deg, int rev, slong N)
-
-    Print to the given stream, a string representing ``(poly, exps, len)``
-    in `n` variables, exponent fields of the given number of bits and exponent
-    vectors taking `N` words each, given an array of `n` variable strings,
-    starting with the variable of most significance with respect to the
-    ordering. The ordering is specified by the values ``deg``, which is set
-    to 1 if the polynomial is deglex or degrevlex, and ``rev``, which is set
-    to 1 if the polynomial is revlex or degrevlex. The number of characters
-    written is returned.
-
-.. function:: int nmod_mpoly_fprint_pretty(FILE * file, const nmod_mpoly_t poly, const char ** x, const nmod_mpoly_ctx_t ctx)
-
-    Print to the given stream, a string representing ``poly``, given an
-    array of variable strings, starting with the variable of most
-    significance with respect to the ordering. The number of characters
-    written is returned.
-
-.. function:: int nmod_mpoly_print_pretty(const nmod_mpoly_t poly, const char ** x, const nmod_mpoly_ctx_t ctx)
-
-    Print to the given stream, a string representing ``poly``, given an
-    array of variable strings, starting with the variable of most
-    significance with respect to the ordering. The number of characters
-    written is returned.
-
-.. function:: int nmod_mpoly_set_str_pretty(nmod_mpoly_t poly, const char * str, const char ** x, const nmod_mpoly_ctx_t ctx)
-
-    Sets ``poly`` to the polynomial in the null-terminates string ``str``
-    given an array ``x`` of variable strings. If parsing ``str`` fails,
-    ``poly`` is set to zero, and ``-1`` is returned. Otherwise, ``0``
-    is returned. The operations ``+``, ``-``, ``*``, and ``/`` are
-    permitted along with integers and the variables in ``x``. The character
-    ``^`` must be immediately followed by the (integer) exponent. If any
-    division is not exact, parsing fails.
 
 
 Random generation

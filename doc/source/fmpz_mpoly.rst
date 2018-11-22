@@ -85,9 +85,55 @@ Memory management
     Release any space allocated for ``A``.
 
 
+Input/Output
+----------------------------------------------------------------------
+
+    The variable strings in ``x`` start with the variable of most significance at index ``0``. If ``x`` is ``NULL``, the variables are named ``x1``, ``x2``, ect.
+
+.. function:: char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx)
+
+    Return a string, which the user is responsible for cleaning up, representing ``A``, given an array of variable strings ``x``.
+
+.. function:: int fmpz_mpoly_fprint_pretty(FILE * file, const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx)
+
+    Print a string representing ``A`` to ``file``.
+
+.. function:: int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx)
+
+    Print a string representing ``A`` to ``stdout``.
+
+.. function:: int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t A, const char * str, const char ** x, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to the polynomial in the null-terminates string ``str`` given an array ``x`` of variable strings.
+    If parsing ``str`` fails, ``A`` is set to zero, and ``-1`` is returned. Otherwise, ``0``  is returned.
+    The operations ``+``, ``-``, ``*``, and ``/`` are permitted along with integers and the variables in ``x``. The character ``^`` must be immediately followed by the (integer) exponent.
+    If any division is not exact, parsing fails.
+
+
 Basic manipulation
 ----------------------------------------------------------------------
 
+
+.. function:: void fmpz_mpoly_gen(fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to the variable of index ``var``, where ``var = 0`` corresponds to the variable with the most significance with respect to the ordering. 
+
+.. function:: int fmpz_mpoly_is_gen(const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
+
+    If `var \ge 0`, return ``1`` if ``A`` is equal to the `var`-th generator, otherwise return ``0``.
+    If `var < 0`, return ``1`` if the polynomial is equal to any generator, otherwise return ``0``.
+
+.. function:: void fmpz_mpoly_set(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+    
+    Set ``A`` to ``B``.
+
+.. function:: int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is equal to ``B``, else return ``0``.
+
+.. function:: void fmpz_mpoly_swap(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+    Efficiently swap ``A`` and ``B``.
 
 .. function:: int _fmpz_mpoly_fits_small(const fmpz * poly, slong len)
 
@@ -95,12 +141,49 @@ Basic manipulation
     entirely of values that are small ``fmpz`` values, i.e. of at most
     ``FLINT_BITS - 2`` bits plus a sign bit.
 
-.. function:: slong fmpz_mpoly_max_bits(const fmpz_mpoly_t poly)
+.. function:: slong fmpz_mpoly_max_bits(const fmpz_mpoly_t A)
 
     Computes the maximum number of bits `b` required to represent the absolute
-    values of the coefficients of ``poly``. If all of the coefficients are
+    values of the coefficients of ``A``. If all of the coefficients are
     positive, `b` is returned, otherwise `-b` is returned.
 
+
+Constants
+----------------------------------------------------------------------
+
+
+.. function:: int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is a constant, else return ``0``.
+
+.. function:: void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+
+    Assuming that ``A`` is a constant, set ``c`` to this constant.
+    This function throws if ``A`` is not a constant.
+
+.. function:: void fmpz_mpoly_set_fmpz(fmpz_mpoly_t A, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_set_ui(fmpz_mpoly_t A, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_set_si(fmpz_mpoly_t A, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to the constant ``c``.
+
+.. function:: void fmpz_mpoly_zero(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to the constant ``0``.
+
+.. function:: void fmpz_mpoly_one(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to the constant ``1``.
+
+.. function:: int fmpz_mpoly_is_zero(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is the constant ``0``, else return ``0``.
+
+.. function:: int fmpz_mpoly_is_one(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is the constant ``1``, else return ``0``.
 
 
 Degrees
@@ -141,50 +224,57 @@ Coefficients
 ----------------------------------------------------------------------
 
 
-.. function:: void fmpz_mpoly_get_coeff_fmpz_monomial(fmpz_t c, const fmpz_mpoly_t poly, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_get_coeff_fmpz_monomial(fmpz_t c, const fmpz_mpoly_t A, const fmpz_mpoly_t M, const fmpz_mpoly_ctx_t ctx)
 
-    Assuming that ``poly2`` is a monomial,
-    set `c` to the coefficient of the corresponding monomial in ``poly``.
-    This function thows if ``poly2`` is not a monomial.
+    Assuming that ``M`` is a monomial, set ``c`` to the coefficient of the corresponding monomial in ``A``.
+    This function thows if ``M`` is not a monomial.
 
 .. function:: void fmpz_mpoly_set_coeff_fmpz_monomial(fmpz_mpoly_t poly, const fmpz_t c, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 
-    Assuming that ``poly2`` is a monomial,
-    set the coefficient of the corresponding monomial in ``poly`` to `c`.
-    This function thows if ``poly2`` is not a monomial.
+    Assuming that ``M`` is a monomial, set the coefficient of the corresponding monomial in ``A`` to ``c``.
+    This function thows if ``M`` is not a monomial.
 
-.. function:: void fmpz_mpoly_get_coeff_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t poly, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_get_coeff_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Set `c` to the coefficient of the monomial with exponent vector ``exp``.
+.. function:: void fmpz_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mpoly_t A, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t poly, const fmpz_t c, fmpz * const * exp, fmpz_mpoly_ctx_t ctx)
+    Set ``c`` to the coefficient of the monomial with exponent vector ``exp``.
 
-    Set the coefficient of the monomial with exponent vector ``exp`` to `c`.
+.. function:: void fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_coeff_ui_fmpz(fmpz_mpoly_t poly, ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_set_coeff_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the monomial with exponent vector ``exp`` to `c`.
+.. function:: void fmpz_mpoly_set_coeff_si_fmpz(fmpz_mpoly_t A, slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_coeff_si_fmpz(fmpz_mpoly_t poly, slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, ulong const * exp, fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the monomial with exponent vector ``exp`` to `c`.
+.. function:: void fmpz_mpoly_set_coeff_ui_ui(fmpz_mpoly_t A, ulong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_set_coeff_si_ui(fmpz_mpoly_t A, slong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
+
+    Set the coefficient of the monomial with exponent vector ``exp`` to ``c``.
 
 
-.. function:: void fmpz_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mpoly_t poly, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
+Random generation
+----------------------------------------------------------------------
 
-    Set `c` to the coefficient of the monomial with exponent vector ``exp``.
 
-.. function:: void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t poly, const fmpz_t c, ulong const * exp, fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, ulong exp_bound, const fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the monomial with exponent vector ``exp`` to `c`.
+    Generate a random polynomial with length up to ``length`` and exponents in the range ``[0, exp_bound - 1]``.
+    The exponents of each variable are generated by calls to ``n_randint(state, exp_bound)``.
 
-.. function:: void fmpz_mpoly_set_coeff_ui_ui(fmpz_mpoly_t poly, ulong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, ulong * exp_bounds, const fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the monomial with exponent vector ``exp`` to `c`.
+    Generate a random polynomial with length up to ``length`` and exponents in the range ``[0, exp_bounds[i] - 1]``.
+    The exponents of the variable of index ``i`` are generated by calls to ``n_randint(state, exp_bounds[i])``.
 
-.. function:: void fmpz_mpoly_set_coeff_si_ui(fmpz_mpoly_t poly, slong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, mp_limb_t exp_bits, const fmpz_mpoly_ctx_t ctx)
 
-    Set the coefficient of the monomial with exponent vector ``exp`` to `c`.
+    Generate a random polynomial with length up to the given length and exponents whose packed form does not exceed the given bit count.
+
+    The parameter ``coeff_bits`` to the three functions ``fmpz_mpoly_randtest_{bound|bounds|bits}`` is merely a suggestion for the approximate bit count of the resulting signed coefficients.
+    The function :func:`fmpz_mpoly_max_bits` will give the exact bit count of the result.
 
 
 Container operations
@@ -256,226 +346,135 @@ Container operations
 
     Sort the terms of ``A`` into the canonical ordering dictated by the ordering in ``ctx``.
     This function simply reorders the terms: It does not combine like terms, nor does it delete terms with coefficient zero.
-    This function runs in linear time in the bit size of ``A``.
+    This function runs in linear time in the size of ``A``.
 
 .. function:: void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
     Combine adjacent like terms in ``A`` and delete terms with coefficient zero.
     If the terms of ``A`` were sorted to begin with, the result will be in canonical form.
-    This function runs in linear time in the bit size of ``A``.
+    This function runs in linear time in the size of ``A``.
 
 .. function:: void fmpz_mpoly_reverse(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Set ``A`` to the reversal of ``B``.
 
 
-Set and negate
-----------------------------------------------------------------------
-
-
-.. function:: void fmpz_mpoly_set(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-    
-    Set ``poly1`` to ``poly2``.
-
-.. function:: void fmpz_mpoly_swap(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Efficiently swap the contents of the two given polynomials. No copying is
-    performed; the swap is accomplished by swapping pointers.
-
-.. function:: void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly`` to the `i`-th generator (variable),
-    where `i = 0` corresponds to the variable with the most significance
-    with respect to the ordering. 
-
-.. function:: void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-    
-    Set ``poly1`` to ``-poly2``.
-
-
-Constants
-----------------------------------------------------------------------
-
-
-.. function:: int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is a constant, else return 0.
-
-.. function:: void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Assuming that ``poly`` is a constant, set `c` to this constant.
-    This function throws if ``poly`` is not a constant.
-
-.. function:: void fmpz_mpoly_set_fmpz(fmpz_mpoly_t poly, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly`` to the constant `c`.
-
-.. function:: void fmpz_mpoly_set_ui(fmpz_mpoly_t poly, ulong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly`` to the constant `c`.
-
-.. function:: void fmpz_mpoly_set_si(fmpz_mpoly_t poly, slong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly`` to the constant `c`.
-
-.. function:: void fmpz_mpoly_zero(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly`` to the constant 0.
-
-.. function:: void fmpz_mpoly_one(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly`` to the constant 1.
-
-
-Comparison
-----------------------------------------------------------------------
-
-
-.. function:: int fmpz_mpoly_equal(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly1`` is equal to ``poly2``, else return 0.
-
-.. function:: int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t poly, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant `c`, else return 0.
-
-.. function:: int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly, ulong  c, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant `c`, else return 0.
-
-.. function:: int fmpz_mpoly_equal_si(const fmpz_mpoly_t poly, slong  c, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant `c`, else return 0.
-
-.. function:: int fmpz_mpoly_is_zero(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant 0, else return 0.
-
-.. function:: int fmpz_mpoly_is_one(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly`` is equal to the constant 1, else return 0.
-
-
-.. function:: int fmpz_mpoly_is_gen(const fmpq_mpoly_t poly, slong i, const fmpq_mpoly_ctx_t ctx)
-
-    If `i \ge 0`, return 1 if ``poly`` is equal to the `i`-th generator,
-    otherwise return 0. If `i < 0`, return 1 if the polynomial is
-    equal to any generator, otherwise return 0.
-
-
 Basic arithmetic
 ----------------------------------------------------------------------
 
 
-.. function:: void fmpz_mpoly_add_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` plus `c`.
+.. function:: void fmpz_mpoly_add_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_add_ui(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_add_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` plus `c`.
+    Set ``A`` to ``B`` plus `c`.
+    If ``A`` and ``B`` are aliased, this function will probably run quickly.
 
-.. function:: void fmpz_mpoly_add_si(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` plus `c`.
+.. function:: void fmpz_mpoly_sub_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_sub_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` minus `c`.
-
-.. function:: void fmpz_mpoly_sub_ui(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` minus `c`.
-
-.. function:: void fmpz_mpoly_sub_si(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` minus `c`.
+    Set ``A`` to ``B`` minus `c`.
+    If ``A`` and ``B`` are aliased, this function will probably run quickly.
 
 .. function:: void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` plus ``poly3``.
-
+    Set ``A`` to ``B`` plus ``C``.
+    If ``A`` and ``B`` are aliased, this function might run in time proportional to the size of ``C``.
+    
 .. function:: void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` minus ``poly3``.
+    Set ``A`` to ``B`` minus ``C``.
+    If ``A`` and ``B`` are aliased, this function might run in time proportional to the size of ``C``.
+
+.. function:: void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+    
+    Set ``A`` to ``-B``.
+
+.. function:: void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_scalar_mul_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_scalar_mul_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` times ``c``.
+
+.. function:: void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` divided by ``c``. The  division is assumed to be exact.
 
 
-Scalar operations
+Differentiation/Integration
 ----------------------------------------------------------------------
 
 
-.. function:: void _fmpz_mpoly_scalar_mul_ui(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong len, slong N, ulong c)
+.. function:: void fmpz_mpoly_derivative(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``(poly1, exps1, len)`` to ``(poly2, exps2, len)`` times the
-    unsigned integer `c`. The exponents vectors are assumed to each consist of
-    `N` words. The ouput polynomial is assumed to have space for ``len``
-    terms.
+    Set ``A`` to the derivative of ``B`` with respect to the variable of index ``var``.
 
-.. function:: void fmpz_mpoly_scalar_mul_ui(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_integral(fmpz_mpoly_t A, fmpz_t scale, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` times the unsigned integer `c`.
+    Set ``A`` and ``scale`` so that ``A`` is an integral of ``scale*B`` with respect to the variable of index ``idx``, where ``scale`` is positive and as small as possible.
 
-.. function:: void _fmpz_mpoly_scalar_mul_si(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong len, slong N, slong c)
 
-    Set ``(poly1, exps1, len)`` to ``(poly2, exps2, len)`` times the
-    signed integer `c`. The exponents vectors are assumed to each consist of
-    `N` words. The ouput polynomial is assumed to have space for ``len``
-    terms.
+Evaluation
+----------------------------------------------------------------------
 
-.. function:: void fmpz_mpoly_scalar_mul_si(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` times the signed integer `c`.
+.. function:: void fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A, fmpz * const * vals, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void _fmpz_mpoly_scalar_mul_fmpz(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong len, slong N, fmpz_t c)
+    Set ``ev`` to the evaluation of ``A`` where the variables are replaced by the corresponding elements of the array ``vals``.
 
-    Set ``(poly1, exps1, len)`` to ``(poly2, exps2, len)`` times the
-    multiprecision integer `c`. The exponents vectors are assumed to each
-    consist of `N` words. The ouput polynomial is assumed to have space for
-    ``len`` terms.
+.. function:: void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_t val, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+    Set ``A`` to the evaluation of ``B`` where the variable of index ``var`` is replaced by ``val``.
 
-    Set ``poly1`` to ``poly2`` times the multiprecision integer `c`.
+.. function:: void fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B, fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctxB)
 
-.. function:: void _fmpz_mpoly_scalar_divexact_ui(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong len, slong N, ulong c)
+    Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
+    The context object of ``B`` is ``ctxB``.
 
-    Set ``(poly1, exps1, len)`` to ``(poly2, exps2, len)`` divided by the
-    unsigned integer `c`. The exponents vectors are assumed to each consist of
-    `N` words. The ouput polynomial is assumed to have space for ``len``
-    terms. The division is assumed to be exact.
+.. function:: void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
 
-.. function:: void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` divided by the unsigned integer `c`. The
-    division is assumed to be exact.
-
-.. function:: void _fmpz_mpoly_scalar_divexact_si(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong len, slong N, slong c)
-
-    Set ``(poly1, exps1, len)`` to ``(poly2, exps2, len)`` divided by the
-    signed integer `c`. The exponents vectors are assumed to each consist of
-    `N` words. The ouput polynomial is assumed to have space for ``len``
-    terms. The division is assumed to be exact.
-
-.. function:: void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` divided by the signed integer `c`. The
-    division is assumed to be exact.
-
-.. function:: void _fmpz_mpoly_scalar_divexact_fmpz(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong len, slong N, fmpz_t c)
-
-    Set ``(poly1, exps1, len)`` to ``(poly2, exps2, len)`` divided by the
-    multiprecision integer `c`. The exponents vectors are assumed to each
-    consist of `N` words. The ouput polynomial is assumed to have space for
-    ``len`` terms. The division is assumed to be exact.
-
-.. function:: void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` divided by the multiprecision integer `c`.
-    The division is assumed to be exact.
+    Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
+    Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
+    Neither of ``A`` and ``B`` is allowed to alias any other polynomial.
 
 
 Multiplication
 ----------------------------------------------------------------------
+
+
+.. function:: void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` times ``C``.
+
+.. function:: int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+
+    Try to set ``A`` to ``B`` times ``C`` using univariate arithmetic.
+    If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
+
+.. function:: int fmpz_mpoly_mul_array(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+
+    Try to set ``A`` to ``B`` times `C` using arrays.
+    If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
+
+.. function:: void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` times ``C`` using Johnson's heap-based method.
+
+.. function:: void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` times ``C`` using a heap and multiple threads.
+    This function should only be called once ``global_thread_pool`` has been initialized.
 
 
 .. function:: slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong N)
@@ -485,16 +484,6 @@ Multiplication
     Michael Monagan and Roman Pearce). The function realocates its output, hence
     the double indirection, and returns the length of the product. The function
     assumes the exponent vectors take N words. No aliasing is allowed.
-
-.. function:: void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` times ``poly3`` using the Johnson heap
-    based method. See the numerous papers by Michael Monagan and Roman Pearce.
-
-.. function:: void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    Does the same operation as ``fmpz_mpoly_mul_johnson`` but with
-    multiple threads.
 
 .. function:: slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong * mults, slong num, slong bits)
 
@@ -507,19 +496,6 @@ Multiplication
     output. The output exponent vectors will be packed with fields of the given
     number of bits. The number of variables is given by ``num``. No aliasing
     is allowed.
-
-.. function:: int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` times ``poly3`` using a big array to
-    accumulate coefficients. If the array will be larger than some internally
-    set parameter, the function fails silently and returns 0 so that some other
-    method may be called. This function is most efficient on semi-sparse inputs.
-
-.. function:: int fmpz_mpoly_mul_dense(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    If the return is nonzero, set ``poly1`` to ``poly2`` times
-    ``poly3`` using a Kronecker substitution and ``fmpz_poly_mul``.
-
 
 Powering
 ----------------------------------------------------------------------
@@ -689,53 +665,6 @@ Reduction
     `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
 
 
-Differentiation/Integration
-----------------------------------------------------------------------
-
-
-.. function:: void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to the derivative of ``poly2`` with respect to the
-    variable of index ``idx``. This function cannot fail.
-
-.. function:: void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale, const fmpz_mpoly_t poly2, slong idx, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` and ``scale`` so that ``poly1`` is an integral of
-    ``poly2*scale`` with respect to the variable of index ``idx``,
-    where ``scale`` is positive and as small as possible. This function
-    throws an exception upon exponent overflow.
-
-
-Evaluation
-----------------------------------------------------------------------
-
-
-.. function:: void fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A, fmpz * const * vals, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``ev`` to the evaluation of ``poly`` where the variables are
-    replaced by the corresponding elements of the array ``vals``. This
-    function uses a tree method on the variable of largest degree.
-
-.. function:: void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_t val, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``A`` to the evaluation of ``B`` where the variable of
-    index ``var`` is replaced by ``val``.
-
-.. function:: void fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B, fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctxB)
-
-    Set ``A`` to the evaluation of ``B`` where the variables are
-    replaced by the corresponding elements of the array ``C``.
-    The context object of ``B`` is ``ctxB``.
-
-.. function:: void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
-
-    Set ``A`` to the evaluation of ``B`` where the variables are
-    replaced by the corresponding elements of the array ``C``. Both
-    ``A`` and the elements of ``C`` have context object
-    ``ctxAC``, while ``B`` has context object ``ctxB``. Neither of
-    ``A`` and ``B`` is allowed to alias any other polynomial.
-
-
 Greatest Common Divisor
 ----------------------------------------------------------------------
 
@@ -778,7 +707,6 @@ Greatest Common Divisor
 
 Univariates
 ----------------------------------------------------------------------
-
 
 
 .. function:: void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx)
@@ -860,92 +788,3 @@ Univariates
     Perform the same operation as ``_fmpz_mpoly_univar_pgcd`` using the
     algorithm of Ducos.
 
-
-Input/Output
-----------------------------------------------------------------------
-
-
-.. function:: char * _fmpz_mpoly_get_str_pretty(const fmpz * poly, const ulong * exps, slong len, const char ** x, slong bits, slong n, int deg, int rev, slong N)
-
-    Returns a string (which the user is responsible for cleaning up),
-    representing ``(poly, exps, len)`` in `n` variables, exponent fields
-    of the given number of bits and exponent vectors taking `N` words each,
-    given an array of `n` variable strings, starting with the variable of
-    most significance with respect to the ordering. The ordering is
-    specified by the values ``deg``, which is set to 1 if the polynomial
-    is deglex or degrevlex, and ``rev``, which is set to 1 if the
-    polynomial is revlex or degrevlex.
-
-.. function:: char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
-
-    Return a string (which the user is responsible for cleaning up),
-    representing ``poly``, given an array of variable strings, starting
-    with the variable of most significance with respect to the ordering. 
-
-.. function:: int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, const ulong * exps, slong len, const char ** x, slong bits, slong n, int deg, int rev, slong N)
-
-    Print to the given stream, a string representing ``(poly, exps, len)``
-    in `n` variables, exponent fields of the given number of bits and exponent
-    vectors taking `N` words each, given an array of `n` variable strings,
-    starting with the variable of most significance with respect to the
-    ordering. The ordering is specified by the values ``deg``, which is set
-    to 1 if the polynomial is deglex or degrevlex, and ``rev``, which is set
-    to 1 if the polynomial is revlex or degrevlex. The number of characters
-    written is returned.
-
-.. function:: int fmpz_mpoly_fprint_pretty(FILE * file, const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
-
-    Print to the given stream, a string representing ``poly``, given an
-    array of variable strings, starting with the variable of most
-    significance with respect to the ordering. The number of characters
-    written is returned.
-
-.. function:: int _fmpz_mpoly_print_pretty(const fmpz * poly, const ulong * exps, slong len, const char ** x, slong bits, slong n, int deg, int rev, slong N)
-
-    Print to stdout, a string representing ``(poly, exps, len)``
-    in `n` variables, exponent fields of the given number of bits and exponent
-    vectors taking `N` words each, given an array of `n` variable strings,
-    starting with the variable of most significance with respect to the
-    ordering. The ordering is specified by the values ``deg``, which is set
-    to 1 if the polynomial is deglex or degrevlex, and ``rev``, which is set
-    to 1 if the polynomial is revlex or degrevlex. The number of characters
-    written is returned.
-
-.. function:: int fmpz_mpoly_print_pretty(const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx)
-
-    Print to the given stream, a string representing ``poly``, given an
-    array of variable strings, starting with the variable of most
-    significance with respect to the ordering. The number of characters
-    written is returned.
-
-.. function:: int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t poly, const char * str, const char ** x, const fmpz_mpoly_ctx_t ctx)
-
-    Sets ``poly`` to the polynomial in the null-terminates string ``str``
-    given an array ``x`` of variable strings. If parsing ``str`` fails,
-    ``poly`` is set to zero, and ``-1`` is returned. Otherwise, ``0``
-    is returned. The operations ``+``, ``-``, ``*``, and ``/`` are
-    permitted along with integers and the variables in ``x``. The character
-    ``^`` must be immediately followed by the (integer) exponent. If any
-    division is not exact, parsing fails.
-
-
-Random generation
-----------------------------------------------------------------------
-
-
-.. function:: void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, ulong exp_bound, const fmpz_mpoly_ctx_t ctx)
-
-    Generate a random polynomial with length up to ``length`` and exponents in the range ``[0, exp_bound - 1]``.
-    The exponents of each variable are generated by calls to ``n_randint(state, exp_bound)``.
-
-.. function:: void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, ulong * exp_bounds, const fmpz_mpoly_ctx_t ctx)
-
-    Generate a random polynomial with length up to ``length`` and exponents in the range ``[0, exp_bounds[i] - 1]``.
-    The exponents of the variable of index ``i`` are generated by calls to ``n_randint(state, exp_bounds[i])``.
-
-.. function:: void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, mp_limb_t exp_bits, const fmpz_mpoly_ctx_t ctx)
-
-    Generate a random polynomial with length up to the given length and exponents whose packed form does not exceed the given bit count.
-
-    The parameter ``coeff_bits`` to the three functions ``fmpz_mpoly_randtest_{bound|bounds|bits}`` is merely a suggestion for the approximate bit count of the resulting signed coefficients.
-    The function ``fmpz_mpoly_max_bits`` will give the exact bit count of the result.

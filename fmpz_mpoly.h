@@ -152,6 +152,42 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
    }
 }
 
+
+/* Input/output **************************************************************/
+
+FLINT_DLL int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t A, const char * str,
+                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
+                          const ulong * exps, slong len, const char ** x, 
+                                           slong bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t A,
+                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
+                        const ulong * exps, slong len, const char ** x_in,
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file, 
+            const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx);
+
+FMPZ_MPOLY_INLINE
+int _fmpz_mpoly_print_pretty(const fmpz * poly, 
+                       const ulong * exps, slong len, const char ** x,
+                                            slong bits, const mpoly_ctx_t mctx)
+{
+    return _fmpz_mpoly_fprint_pretty(stdout, poly, exps, len, x, bits, mctx);
+}
+
+FMPZ_MPOLY_INLINE
+int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A,
+                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
+{
+   return fmpz_mpoly_fprint_pretty(stdout, A, x, ctx);
+}
+
+
 /*  Basic manipulation *******************************************************/
 
 FLINT_DLL int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t poly,
@@ -934,40 +970,6 @@ fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
                 const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3,
                                         slong len, const fmpz_mpoly_ctx_t ctx);
 
-
-/* Input/output **************************************************************/
-
-FLINT_DLL int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t poly, const char * str,
-                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
-                          const ulong * exps, slong len, const char ** x, 
-                                           slong bits, const mpoly_ctx_t mctx);
-
-FLINT_DLL char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t poly,
-                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
-                        const ulong * exps, slong len, const char ** x_in,
-                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
-
-FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file, 
-         const fmpz_mpoly_t poly, const char ** x, const fmpz_mpoly_ctx_t ctx);
-
-FMPZ_MPOLY_INLINE
-int _fmpz_mpoly_print_pretty(const fmpz * poly, 
-                       const ulong * exps, slong len, const char ** x,
-                                            slong bits, const mpoly_ctx_t mctx)
-{
-    return _fmpz_mpoly_fprint_pretty(stdout, poly, exps, len, x, bits, mctx);
-}
-
-FMPZ_MPOLY_INLINE
-int fmpz_mpoly_print_pretty(const fmpz_mpoly_t poly,
-                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
-{
-   return fmpz_mpoly_fprint_pretty(stdout, poly, x, ctx);
-}
 
 /* Random generation *********************************************************/
 

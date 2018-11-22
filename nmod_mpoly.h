@@ -178,6 +178,26 @@ void nmod_mpoly_fit_bits(nmod_mpoly_t A,
    }
 }
 
+
+/* Input/output **************************************************************/
+
+FLINT_DLL int nmod_mpoly_set_str_pretty(nmod_mpoly_t A, const char * str,
+                                  const char ** x, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t A,
+                                  const char ** x, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_fprint_pretty(FILE * file, 
+            const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx);
+
+NMOD_MPOLY_INLINE
+int nmod_mpoly_print_pretty(const nmod_mpoly_t A,
+                                   const char ** x, const nmod_mpoly_ctx_t ctx)
+{
+   return nmod_mpoly_fprint_pretty(stdout, A, x, ctx);
+}
+
+
 /*  Basic manipulation *******************************************************/
 
 FLINT_DLL void _nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly,
@@ -1428,36 +1448,6 @@ FLINT_DLL void
 nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t r,
     const nmod_mpoly_t poly2, nmod_mpoly_struct * const * poly3, slong len,
                                                    const nmod_mpoly_ctx_t ctx);
-
-/* Input/output **************************************************************/
-
-FLINT_DLL int nmod_mpoly_set_str_pretty(nmod_mpoly_t poly, const char * str,
-                                  const char ** x, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t poly,
-                                  const char ** x, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int _nmod_mpoly_fprint_pretty(FILE * file, const ulong * poly, 
-                           const ulong * exps, slong len, const char ** x,
-                   slong bits, const mpoly_ctx_t mctx, const nmodf_ctx_t fctx);
-
-FLINT_DLL int nmod_mpoly_fprint_pretty(FILE * file, 
-         const nmod_mpoly_t poly, const char ** x, const nmod_mpoly_ctx_t ctx);
-
-NMOD_MPOLY_INLINE
-int _nmod_mpoly_print_pretty(const ulong * poly, 
-                const ulong * exps, slong len, const char ** x,
-                    slong bits, const mpoly_ctx_t mctx, const nmodf_ctx_t fctx)
-{
-   return _nmod_mpoly_fprint_pretty(stdout, poly, exps, len, x, bits, mctx, fctx);
-}
-
-NMOD_MPOLY_INLINE
-int nmod_mpoly_print_pretty(const nmod_mpoly_t poly,
-                                   const char ** x, const nmod_mpoly_ctx_t ctx)
-{
-   return nmod_mpoly_fprint_pretty(stdout, poly, x, ctx);
-}
 
 /* Random generation *********************************************************/
 

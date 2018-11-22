@@ -88,6 +88,31 @@ Memory management
     Release any space allocated for ``A``.
 
 
+Input/Output
+----------------------------------------------------------------------
+
+    The variable strings in ``x`` start with the variable of most significance at index ``0``. If ``x`` is ``NULL``, the variables are named ``x1``, ``x2``, ect.
+
+.. function:: char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx)
+
+    Return a string, which the user is responsible for cleaning up, representing ``A``, given an array of variable strings ``x``.
+
+.. function:: int fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx)
+
+    Print a string representing ``A`` to ``file``.
+
+.. function:: int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx)
+
+    Print a string representing ``A`` to ``stdout``.
+
+.. function:: int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t A, const char * str, const char ** x, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to the polynomial in the null-terminates string ``str`` given an array ``x`` of variable strings.
+    If parsing ``str`` fails, ``A`` is set to zero, and ``-1`` is returned. Otherwise, ``0``  is returned.
+    The operations ``+``, ``-``, ``*``, and ``/`` are permitted along with integers and the variables in ``x``. The character ``^`` must be immediately followed by the (integer) exponent.
+    If any division is not exact, parsing fails.
+
+
 Degrees
 --------------------------------------------------------------------------------
 
@@ -564,41 +589,6 @@ Greatest Common Divisor
     Set ``poly1`` to the monic GCD of ``poly2`` and ``poly3``, assuming
     the return value is 1. If the return value is 0, the GCD was
     unable to be computed.
-
-
-Input/Output
---------------------------------------------------------------------------------
-
-
-.. function:: char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t poly, const char ** x, const fmpq_mpoly_ctx_t ctx)
-
-    Return a string (which the user is responsible for cleaning up),
-    representing ``poly``, given an array of variable strings, starting
-    with the variable of most significance with respect to the ordering. 
-
-.. function:: int fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t poly, const char ** x, const fmpq_mpoly_ctx_t ctx)
-
-    Print to the given stream a string representing ``poly``, given an
-    array of variable strings, starting with the variable of most
-    significance with respect to the ordering. The number of characters
-    written is returned.
-
-.. function:: int fmpq_mpoly_print_pretty(const fmpq_mpoly_t poly, const char ** x, const fmpq_mpoly_ctx_t ctx)
-
-    Print to ``stdout`` a string representing ``poly``, given an
-    array of variable strings, starting with the variable of most
-    significance with respect to the ordering. The number of characters
-    written is returned.
-
-.. function:: int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t poly, const char * str, const char ** x, const fmpq_mpoly_ctx_t ctx)
-
-    Sets ``poly`` to the polynomial in the null-terminated string ``str``
-    given an array ``x`` of variable strings. If parsing ``str`` fails,
-    ``poly`` is set to zero, and ``-1`` is returned. Otherwise, ``0``
-    is returned. The operations ``+``, ``-``, ``*``, and ``/`` are
-    permitted along with integers and the variables in ``x``. The character
-    ``^`` must be immediately followed by the (integer) exponent. If any
-    division is not exact, parsing fails.
 
 
 Random generation

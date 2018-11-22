@@ -140,15 +140,32 @@ void fmpq_mpoly_clear(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
     fmpq_clear(A->content);
 }
 
-/*
-   if poly->bits < bits, set poly->bits = bits and reallocate poly->exps
-*/
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_fit_bits(fmpq_mpoly_t A,
                                   mp_bitcnt_t bits, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_fit_bits(A->zpoly, bits, ctx->zctx);
 }
+
+
+/* Input/output **************************************************************/
+
+FLINT_DLL int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t A, const char * str,
+                                  const char ** x, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
+                                  const char ** x, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_fprint_pretty(FILE * file, 
+            const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx);
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A,
+                                   const char ** x, const fmpq_mpoly_ctx_t ctx)
+{
+    return fmpq_mpoly_fprint_pretty(stdout, A, x, ctx);
+}
+
 
 /*  Basic manipulation *******************************************************/
 
@@ -635,24 +652,6 @@ FLINT_DLL void fmpq_mpoly_resultant(fmpq_mpoly_t poly1,
 FLINT_DLL void fmpq_mpoly_discriminant(fmpq_mpoly_t poly1,
               const fmpq_mpoly_t poly2, slong var, const fmpq_mpoly_ctx_t ctx);
 */
-
-/* Input/output **************************************************************/
-
-FLINT_DLL int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t poly, const char * str,
-                                  const char ** x, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t poly,
-                                  const char ** x, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpq_mpoly_fprint_pretty(FILE * file, 
-         const fmpq_mpoly_t poly, const char ** x, const fmpq_mpoly_ctx_t ctx);
-
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_print_pretty(const fmpq_mpoly_t poly,
-                                   const char ** x, const fmpq_mpoly_ctx_t ctx)
-{
-    return fmpq_mpoly_fprint_pretty(stdout, poly, x, ctx);
-}
 
 /* Random generation *********************************************************/
 
