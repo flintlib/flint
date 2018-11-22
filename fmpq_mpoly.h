@@ -245,67 +245,67 @@ FLINT_DLL void fmpq_mpoly_set_si(fmpq_mpoly_t poly,
                                           slong c, const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
-int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t poly,
-                                                    const fmpq_mpoly_ctx_t ctx)
+int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 {
-    return poly->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_degrees_fit_si(poly->zpoly->exps,
-                                       poly->zpoly->length, poly->zpoly->bits,
+    return A->zpoly->bits <= FLINT_BITS ? 1
+                               : mpoly_degrees_fit_si(A->zpoly->exps,
+                                       A->zpoly->length, A->zpoly->bits,
                                                              ctx->zctx->minfo);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t poly,
+void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t A,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    mpoly_degrees_si(degs, poly->zpoly->exps, poly->zpoly->length,
-                                          poly->zpoly->bits, ctx->zctx->minfo);
-}
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t poly,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_pfmpz(degs, poly->zpoly->exps, poly->zpoly->length,
-                                          poly->zpoly->bits, ctx->zctx->minfo);
-}
-
-FMPQ_MPOLY_INLINE
-slong fmpq_mpoly_degree_si(const fmpq_mpoly_t poly, slong var,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    return mpoly_degree_si(poly->zpoly->exps, poly->zpoly->length,
-                                     poly->zpoly->bits, var, ctx->zctx->minfo);
-}
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t poly, slong var,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    mpoly_degree_fmpz(deg, poly->zpoly->exps, poly->zpoly->length,
-                                     poly->zpoly->bits, var, ctx->zctx->minfo);
-}
-
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_totaldegree_fits_si(const fmpq_mpoly_t A,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    return mpoly_totaldegree_fits_si(A->zpoly->exps, A->zpoly->length,
+    mpoly_degrees_si(degs, A->zpoly->exps, A->zpoly->length,
                                              A->zpoly->bits, ctx->zctx->minfo);
 }
 
 FMPQ_MPOLY_INLINE
-slong fmpq_mpoly_totaldegree_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t A,
+                                                   const fmpq_mpoly_ctx_t ctx)
 {
-    return mpoly_totaldegree_si(A->zpoly->exps, A->zpoly->length,
+    mpoly_degrees_pfmpz(degs, A->zpoly->exps, A->zpoly->length,
                                              A->zpoly->bits, ctx->zctx->minfo);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_totaldegree_fmpz(fmpz_t td, const fmpq_mpoly_t A,
+slong fmpq_mpoly_degree_si(const fmpq_mpoly_t A, slong var,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    return mpoly_degree_si(A->zpoly->exps, A->zpoly->length,
+                                        A->zpoly->bits, var, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t A, slong var,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    mpoly_degree_fmpz(deg, A->zpoly->exps, A->zpoly->length,
+                                        A->zpoly->bits, var, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+int fmpq_mpoly_total_degree_fits_si(const fmpq_mpoly_t A,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    mpoly_totaldegree_fmpz(td, A->zpoly->exps, A->zpoly->length,
+    return mpoly_total_degree_fits_si(A->zpoly->exps, A->zpoly->length,
+                                             A->zpoly->bits, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    return mpoly_total_degree_si(A->zpoly->exps, A->zpoly->length,
+                                             A->zpoly->bits, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    mpoly_total_degree_fmpz(tdeg, A->zpoly->exps, A->zpoly->length,
                                              A->zpoly->bits, ctx->zctx->minfo);
 }
 
@@ -412,80 +412,80 @@ void fmpq_mpoly_resize(fmpq_mpoly_t A, slong new_length,
     fmpz_mpoly_resize(A->zpoly, new_length, ctx->zctx);
 }
 
-FLINT_DLL void fmpq_mpoly_get_termcoeff_fmpq(fmpq_t c, const fmpq_mpoly_t poly,
-                                          slong n, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_get_term_coeff_fmpq(fmpq_t c, const fmpq_mpoly_t A,
+                                          slong i, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_set_termcoeff_fmpq(fmpq_mpoly_t poly,
-                          slong n, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_set_term_coeff_fmpq(fmpq_mpoly_t A,
+                          slong i, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
-int fmpq_mpoly_termexp_fits_ui(const fmpq_mpoly_t poly,
-                                           slong n, const fmpq_mpoly_ctx_t ctx)
+int fmpq_mpoly_term_exp_fits_ui(const fmpq_mpoly_t A,
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
 {
-    return poly->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_termexp_fits_ui(poly->zpoly->exps,
-                                       poly->zpoly->bits, n, ctx->zctx->minfo);
+    return A->zpoly->bits <= FLINT_BITS ? 1
+                               : mpoly_term_exp_fits_ui(A->zpoly->exps,
+                                          A->zpoly->bits, i, ctx->zctx->minfo);
 }
 
 FMPQ_MPOLY_INLINE
-int fmpq_mpoly_termexp_fits_si(const fmpq_mpoly_t poly,
-                                           slong n, const fmpq_mpoly_ctx_t ctx)
+int fmpq_mpoly_term_exp_fits_si(const fmpq_mpoly_t A,
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
 {
-    return poly->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_termexp_fits_si(poly->zpoly->exps,
-                                       poly->zpoly->bits, n, ctx->zctx->minfo);
+    return A->zpoly->bits <= FLINT_BITS ? 1
+                               : mpoly_term_exp_fits_si(A->zpoly->exps,
+                                          A->zpoly->bits, i, ctx->zctx->minfo);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_get_termexp_fmpz(fmpz ** exps, const fmpq_mpoly_t poly,
-                                          slong n, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_get_term_exp_fmpz(fmpz ** exps, const fmpq_mpoly_t A,
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_get_term_exp_fmpz(exps, poly->zpoly, n, ctx->zctx);
+    fmpz_mpoly_get_term_exp_fmpz(exps, A->zpoly, i, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_get_termexp_ui(ulong * exps, const fmpq_mpoly_t poly,
-                                          slong n, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_get_term_exp_ui(ulong * exps, const fmpq_mpoly_t A,
+                                          slong i, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_get_term_exp_ui(exps, poly->zpoly, n, ctx->zctx);
+    fmpz_mpoly_get_term_exp_ui(exps, A->zpoly, i, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_set_termexp_fmpz(fmpq_mpoly_t poly,
-                      slong n, fmpz * const * exps, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_set_term_exp_fmpz(fmpq_mpoly_t A,
+                      slong i, fmpz * const * exps, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_set_term_exp_fmpz(poly->zpoly, n, exps, ctx->zctx);
+    fmpz_mpoly_set_term_exp_fmpz(A->zpoly, i, exps, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_set_termexp_ui(fmpq_mpoly_t poly,
-                      slong n, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_set_term_exp_ui(fmpq_mpoly_t A,
+                       slong i, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_set_term_exp_ui(poly->zpoly, n, exps, ctx->zctx);
+    fmpz_mpoly_set_term_exp_ui(A->zpoly, i, exps, ctx->zctx);
 }
 
-FLINT_DLL void fmpq_mpoly_pushterm_fmpq_fmpz(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_push_term_fmpq_fmpz(fmpq_mpoly_t A,
                const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pushterm_fmpz_fmpz(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_push_term_fmpz_fmpz(fmpq_mpoly_t A,
                const fmpz_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pushterm_ui_fmpz(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_push_term_ui_fmpz(fmpq_mpoly_t A,
                       ulong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pushterm_si_fmpz(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_push_term_si_fmpz(fmpq_mpoly_t A,
                       slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pushterm_fmpq_ui(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_push_term_fmpq_ui(fmpq_mpoly_t A,
                 const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pushterm_fmpz_ui(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_push_term_fmpz_ui(fmpq_mpoly_t A,
                 const fmpz_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pushterm_ui_ui(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_push_term_ui_ui(fmpq_mpoly_t A,
                        ulong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pushterm_si_ui(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_push_term_si_ui(fmpq_mpoly_t A,
                        slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx);

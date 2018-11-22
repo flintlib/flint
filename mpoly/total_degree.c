@@ -7,33 +7,33 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "mpoly.h"
 
-int mpoly_totaldegree_fits_si(const ulong * exps,
+int mpoly_total_degree_fits_si(const ulong * exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)
 {
     int r;
     fmpz_t td;
     fmpz_init(td);
-    mpoly_totaldegree_fmpz(td, exps, len, bits, mctx);
+    mpoly_total_degree_fmpz(td, exps, len, bits, mctx);
     r = fmpz_fits_si(td);
     fmpz_clear(td);
     return r;
 }
 
-slong mpoly_totaldegree_si(const ulong * exps,
+slong mpoly_total_degree_si(const ulong * exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)
 {
     slong r;
     fmpz_t td;
     fmpz_init(td);
-    mpoly_totaldegree_fmpz(td, exps, len, bits, mctx);
+    mpoly_total_degree_fmpz(td, exps, len, bits, mctx);
     r = fmpz_get_si(td);
     fmpz_clear(td);
     return r;
 }
 
-void mpoly_totaldegree_fmpz(fmpz_t totdeg, const ulong * exps,
+void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)
 {
     slong i, j, N;

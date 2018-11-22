@@ -12,11 +12,13 @@
 #include "fmpq_mpoly.h"
 
 void
-fmpq_mpoly_get_termcoeff_fmpq(fmpq_t c, const fmpq_mpoly_t poly,
-                                           slong n, const fmpq_mpoly_ctx_t ctx)
+fmpq_mpoly_get_term_coeff_fmpq(fmpq_t c, const fmpq_mpoly_t A,
+                                           slong i, const fmpq_mpoly_ctx_t ctx)
 {
-    if ((ulong) n >= (ulong) fmpq_mpoly_length(poly, ctx))
+    if ((ulong) i >= (ulong) fmpq_mpoly_length(A, ctx))
+    {
         flint_throw(FLINT_ERROR, "index out of range in fmpq_mpoly_get_coeff_fmpq");
+    }
 
-    fmpq_mul_fmpz(c, poly->content, poly->zpoly->coeffs + n);
+    fmpq_mul_fmpz(c, A->content, A->zpoly->coeffs + i);
 }

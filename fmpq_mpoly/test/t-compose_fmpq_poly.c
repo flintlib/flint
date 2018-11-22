@@ -75,7 +75,7 @@ main(void)
             fmpq_poly_evaluate_fmpq(vals3[v], vals1[v], vals2);
         }
 
-        if (fmpq_mpoly_totaldegree_si(f, ctx1) < 50)
+        if (fmpq_mpoly_total_degree_si(f, ctx1) < 50)
         {
             fmpq_mpoly_compose_fmpq_poly(g, f, vals1, ctx1);
             fmpq_mpoly_evaluate_all_fmpq(fe, f, vals3, ctx1);
@@ -160,7 +160,7 @@ main(void)
             fmpq_poly_set_fmpq(vals1[v], vals3[v]);
         }
 
-        if (fmpq_mpoly_totaldegree_si(f, ctx1) < 50)
+        if (fmpq_mpoly_total_degree_si(f, ctx1) < 50)
         {
             fmpq_poly_t t;
             fmpq_mpoly_compose_fmpq_poly(g, f, vals1, ctx1);

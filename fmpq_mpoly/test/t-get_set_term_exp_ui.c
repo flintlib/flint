@@ -21,7 +21,7 @@ main(void)
     int result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get_set_termexp_fmpz....");
+    flint_printf("get_set_term_exp_ui....");
     fflush(stdout);
 
     /* check get and set match */
@@ -47,21 +47,18 @@ main(void)
 
         for (j = 0; j < 10; j++)
         {
-            fmpz ** exp1 = (fmpz **) flint_malloc(ctx->zctx->minfo->nvars*sizeof(fmpz*));
-            fmpz ** exp2 = (fmpz **) flint_malloc(ctx->zctx->minfo->nvars*sizeof(fmpz*));
+            ulong * exp1 = (ulong *) flint_malloc(ctx->zctx->minfo->nvars*sizeof(ulong));
+            ulong * exp2 = (ulong *) flint_malloc(ctx->zctx->minfo->nvars*sizeof(ulong));
 
             for (k = 0; k < nvars; k++)
             {
-                exp1[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
-                exp2[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
-                fmpz_init(exp1[k]);
-                fmpz_init(exp2[k]);
-                fmpz_randtest_unsigned(exp1[k], state, 200);
+                slong bits = n_randint(state, FLINT_BITS) + 1;
+                exp1[k] = n_randbits(state, bits);
             }
 
             index = n_randint(state, fmpq_mpoly_length(f, ctx));
 
-            fmpq_mpoly_set_termexp_fmpz(f, index, exp1, ctx);
+            fmpq_mpoly_set_term_exp_ui(f, index, exp1, ctx);
 
             if (!mpoly_monomials_valid_test(f->zpoly->exps, f->zpoly->length, f->zpoly->bits, ctx->zctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
@@ -69,17 +66,11 @@ main(void)
             if (mpoly_monomials_overflow_test(f->zpoly->exps, f->zpoly->length, f->zpoly->bits, ctx->zctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
 
-            fmpq_mpoly_get_termexp_fmpz(exp2, f, index, ctx);
+            fmpq_mpoly_get_term_exp_ui(exp2, f, index, ctx);
 
             result = 1;
             for (k = 0; k < nvars; k++)
-            {
-                result = result && fmpz_equal(exp1[k], exp2[k]);
-                fmpz_clear(exp1[k]);
-                fmpz_clear(exp2[k]);
-                flint_free(exp1[k]); 
-                flint_free(exp2[k]); 
-            }
+                result = result && (exp1[k] == exp2[k]);
 
             if (!result)
             {
@@ -89,9 +80,9 @@ main(void)
 
             flint_free(exp1);
             flint_free(exp2);
-       }
+        }
 
-       fmpq_mpoly_clear(f, ctx);  
+        fmpq_mpoly_clear(f, ctx);  
     }
 
     FLINT_TEST_CLEANUP(state);

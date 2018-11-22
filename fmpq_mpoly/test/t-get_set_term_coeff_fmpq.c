@@ -20,7 +20,7 @@ main(void)
     slong i, j;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get_set_termcoeff_fmpq....");
+    flint_printf("get_set_term_coeff_fmpq....");
     fflush(stdout);
 
     /* check get and set match */
@@ -49,8 +49,8 @@ main(void)
             fmpq_randtest(c, state, n_randint(state, 100) + 1);
 
             index = n_randint(state, fmpq_mpoly_length(f, ctx));
-            fmpq_mpoly_set_termcoeff_fmpq(f, index, c, ctx);
-            fmpq_mpoly_get_termcoeff_fmpq(d, f, index, ctx);
+            fmpq_mpoly_set_term_coeff_fmpq(f, index, c, ctx);
+            fmpq_mpoly_get_term_coeff_fmpq(d, f, index, ctx);
             if (!fmpq_equal(c, d))
             {
                 printf("FAIL\n");

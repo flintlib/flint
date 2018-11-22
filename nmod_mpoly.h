@@ -402,20 +402,20 @@ NMOD_MPOLY_INLINE
 int nmod_mpoly_total_degree_fits_si(const nmod_mpoly_t A,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    return mpoly_totaldegree_fits_si(A->exps, A->length, A->bits, ctx->minfo);
+    return mpoly_total_degree_fits_si(A->exps, A->length, A->bits, ctx->minfo);
 }
 
 NMOD_MPOLY_INLINE
 slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 {
-    return mpoly_totaldegree_si(A->exps, A->length, A->bits, ctx->minfo);
+    return mpoly_total_degree_si(A->exps, A->length, A->bits, ctx->minfo);
 }
 
 NMOD_MPOLY_INLINE
 void nmod_mpoly_total_degree_fmpz(fmpz_t td, const nmod_mpoly_t A,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    mpoly_totaldegree_fmpz(td, A->exps, A->length, A->bits, ctx->minfo);
+    mpoly_total_degree_fmpz(td, A->exps, A->length, A->bits, ctx->minfo);
 }
 
 NMOD_MPOLY_INLINE
@@ -674,8 +674,8 @@ slong nmod_mpoly_length(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
     return A->length;
 }
 
-FLINT_DLL void nmod_mpoly_resize(nmod_mpoly_t poly,
-                                 slong new_length, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_resize(nmod_mpoly_t A, slong new_length,
+                                                   const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL ulong nmod_mpoly_get_term_coeff_ui(const nmod_mpoly_t A, slong i,
                                                    const nmod_mpoly_ctx_t ctx);
@@ -688,7 +688,7 @@ int nmod_mpoly_term_exp_fits_ui(const nmod_mpoly_t A, slong i,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     return A->bits <= FLINT_BITS ? 1
-                      : mpoly_termexp_fits_ui(A->exps, A->bits, i, ctx->minfo);
+                     : mpoly_term_exp_fits_ui(A->exps, A->bits, i, ctx->minfo);
 }
 
 NMOD_MPOLY_INLINE
@@ -696,7 +696,7 @@ int nmod_mpoly_term_exp_fits_si(const nmod_mpoly_t A, slong i,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     return A->bits <= FLINT_BITS ? 1
-                      : mpoly_termexp_fits_si(A->exps, A->bits, i, ctx->minfo);
+                     : mpoly_term_exp_fits_si(A->exps, A->bits, i, ctx->minfo);
 }
 
 FLINT_DLL void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A,

@@ -19,7 +19,7 @@ main(void)
     slong i, j, k;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pushback_fmpq_ui....");
+    flint_printf("push_back_fmpq_ui....");
     fflush(stdout);
 
     /* Check pushback matches add */
@@ -66,13 +66,13 @@ main(void)
 
             /* push it back on f2 */
             if (fmpz_is_one(fmpq_denref(c)))
-                fmpq_mpoly_pushterm_fmpz_ui(f2, fmpq_numref(c), exp, ctx);
+                fmpq_mpoly_push_term_fmpz_ui(f2, fmpq_numref(c), exp, ctx);
             else
-                fmpq_mpoly_pushterm_fmpq_ui(f2, c, exp, ctx);
+                fmpq_mpoly_push_term_fmpq_ui(f2, c, exp, ctx);
 
             /* make sure last term matches */
-            fmpq_mpoly_get_termcoeff_fmpq(c2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
-            fmpq_mpoly_get_termexp_ui(exp2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
+            fmpq_mpoly_get_term_coeff_fmpq(c2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
+            fmpq_mpoly_get_term_exp_ui(exp2, f2, fmpq_mpoly_length(f2, ctx) - 1, ctx);
             if (!fmpq_equal(c, c2))
             {
                 printf("FAIL\n");

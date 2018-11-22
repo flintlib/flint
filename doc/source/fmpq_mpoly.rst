@@ -91,45 +91,34 @@ Degrees
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Return 1 if the degrees of poly with respect to each variable fit into
-    an ``slong``, otherwise return 0.
+    Return ``1`` if the degrees of ``A`` with respect to each variable fit into an ``slong``, otherwise return ``0``.
 
-.. function:: void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``degs`` to the degrees of ``poly`` with respect to each variable.
-    If ``poly`` is zero, all degrees are set to ``-1``.
+.. function:: void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: slong fmpq_mpoly_degree_si(const fmpq_mpoly_t poly, slong var, const fmpq_mpoly_ctx_t ctx)
+    Set ``degs`` to the degrees of ``A`` with respect to each variable.
+    If ``A`` is zero, all degrees are set to ``-1``.
 
-    Return the degree of ``poly`` with respect to the variable of index
-    ``var``. If ``poly`` is zero, the return is ``-1``.
+.. function:: void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+.. function:: slong fmpq_mpoly_degree_si(const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``degs`` to the degrees of ``poly`` with respect to each variable.
-    If ``poly`` is zero, all degrees are set to ``-1``.
+    Either return or set ``deg`` to the degree of ``A`` with respect to the variable of index ``var``.
+    If ``A`` is zero, the degree is defined to be ``-1``.
 
-.. function:: void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t poly, slong var, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpq_mpoly_total_degree_fits_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``deg`` to the degree of ``poly`` with respect to the variable
-    of index ``var``. If ``poly`` is zero, set ``deg`` to ``-1``.
+    Return ``1`` if the total degree of ``A`` fits into an ``slong``, otherwise return ``0``.
 
-.. function:: int fmpq_mpoly_totaldegree_fits_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Return 1 if the total degree of ``A`` fits into
-    an ``slong``, otherwise return 0.
+.. function:: slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: slong fmpq_mpoly_totaldegree_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
-
-    Return the total degree of ``A`` assuming it fits into an slong.
-    If ``A`` is zero, the return is ``-1``.
-
-.. function:: void fmpq_mpoly_totaldegree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``tdeg`` to the total degree of ``A``.
-    If ``A`` is zero, ``tdeg`` is set to ``-1``.
+    Either return or set ``tdeg`` to the total degree of ``A``.
+    If ``A`` is zero, the total degree is defined to be ``-1``.
 
 
 Coefficients
@@ -168,32 +157,6 @@ Coefficients
 .. function:: void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t poly, const fmpq_t c, ulong const * exp, fmpq_mpoly_ctx_t ctx)
 
     Set the coefficient of the monomial with exponent ``exp`` to `c`.
-
-
-Internal operations
---------------------------------------------------------------------------------
-
-
-    An ``fmpq_mpoly_t poly`` is an ``fmpz_mpoly_t zpoly`` together with
-    an ``fmpq_t content`` representing any content.
-    In order to be in canonical form, either ``zpoly`` and ``content``
-    must both be zero, or ``zcode`` must be a polynomial with content 1
-    and positive leading term. In either the case the representation
-    ``poly = content * zpoly`` holds.
-
-.. function:: void fmpq_mpoly_canonicalise(fmpq_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Factor out content from the internal ``fmpz_mpoly_t``. If this
-    ``fmpz_mpoly_t`` was in canonical form, the resulting ``poly``
-    will be. This function expects the internal ``fmpz_mpoly_t`` to be
-    in canonical form. If this is not the case, the container operations
-    of ``fmpq_mpoly_sort`` and ``fmpq_mpoly_combine_like_terms`` may
-    be useful. All operations other than the container operations 
-    produce canonical output and expect their inputs to be canonical.
-
-.. function:: void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
-
-    Throw if ``poly`` is not in canonical form.
 
 
 Container operations

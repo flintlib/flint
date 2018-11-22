@@ -9,9 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "mpoly.h"
 
-int mpoly_termexp_fits_ui(ulong * exps, slong bits,
+int mpoly_term_exp_fits_ui(ulong * exps, slong bits,
                                                slong n, const mpoly_ctx_t mctx)
 {
     slong i, N;
@@ -39,7 +39,7 @@ int mpoly_termexp_fits_ui(ulong * exps, slong bits,
     return ret;
 }
 
-int mpoly_termexp_fits_si(ulong * exps, slong bits,
+int mpoly_term_exp_fits_si(ulong * exps, slong bits,
                                                slong n, const mpoly_ctx_t mctx)
 {
     slong i, N;

@@ -80,7 +80,7 @@ main(void)
                 continue;
             }
 
-            fmpq_mpoly_get_termcoeff_fmpq(lc, g, 0, ctx);
+            fmpq_mpoly_get_term_coeff_fmpq(lc, g, 0, ctx);
             if (!fmpq_is_one(lc))
             {
                 printf("FAIL\n");
