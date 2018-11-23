@@ -12,15 +12,16 @@
 #include "fmpq_mpoly.h"
 
 
-void fmpq_mpoly_set_fmpq(fmpq_mpoly_t poly,
+void fmpq_mpoly_set_fmpq(fmpq_mpoly_t A,
                                     const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 {
+    fmpq_set(A->content, c);
     if (fmpq_is_zero(c))
     {
-        fmpq_mpoly_zero(poly, ctx);
-        return;
+        fmpz_mpoly_zero(A->zpoly, ctx->zctx);
     }
-
-    fmpq_set(poly->content, c);
-    fmpz_mpoly_one(poly->zpoly, ctx->zctx);
+    else
+    {
+        fmpz_mpoly_one(A->zpoly, ctx->zctx);
+    }
 }

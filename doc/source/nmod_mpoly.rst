@@ -133,49 +133,47 @@ Basic manipulation
     Efficiently swap ``A`` and ``B``.
 
 
+Constants
+----------------------------------------------------------------------
+
+
+.. function:: int nmod_mpoly_is_ui(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is a constant, else return ``0``.
+
+.. function:: ulong nmod_mpoly_get_ui(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Assuming that ``A`` is a constant, return this constant.
+    This function throws if ``A`` is not a constant.
+
+.. function:: void nmod_mpoly_set_ui(nmod_mpoly_t A, ulong c, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the constant ``c``.
+
+.. function:: void nmod_mpoly_zero(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the constant ``0``.
+
+.. function:: void fmpz_mpoly_one(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the constant ``1``.
+
+.. function:: int nmod_mpoly_equal_ui(const nmod_mpoly_t A, ulong c, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is equal to the constant ``c``, else return ``0``.
+
+.. function:: int nmod_mpoly_is_zero(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is the constant ``0``, else return ``0``.
+
+.. function:: int nmod_mpoly_is_one(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if ``A`` is the constant ``1``, else return ``0``.
 
 
 
 
 
-
-.. function:: int nmod_mpoly_equal(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
-
-    Return ``1`` if ``A`` is equal to ``B``, else return ``0``.
-
-
-.. function:: void nmod_mpoly_set_ui(nmod_mpoly_t poly, ulong c, const nmod_mpoly_ctx_t ctx)
-
-    Set the given ``nmod_mpoly_t`` to the constant polynomial corresponding
-    to the unsigned integer `c`.
-
-.. function:: int nmod_mpoly_equal_ui(const nmod_mpoly_t poly, ulong c, const nmod_mpoly_ctx_t ctx)
-
-    Return 1 if the given ``nmod_mpoly_t`` is equal to the constant
-    polynomial represented by the unsigned integer `c`, else return 0.
-
-.. function:: void nmod_mpoly_swap(nmod_mpoly_t poly1, nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
-
-    Efficiently swap the contents of the two given polynomials. No copying is
-    performed; the swap is accomplished by swapping pointers.
-
-.. function:: void nmod_mpoly_zero(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-
-    Set the given ``nmod_mpoly_t`` to the zero polynomial.
-
-.. function:: void nmod_mpoly_one(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-
-    Set the given ``nmod_mpoly_t`` to the constant polynomial with value 1.
-
-.. function:: int nmod_mpoly_is_zero(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-
-    Return 1 if the given ``nmod_mpoly_t`` is equal to the zero polynomial,
-    else return 0.
-
-.. function:: int nmod_mpoly_is_one(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-
-    Return 1 if the given ``nmod_mpoly_t`` is equal to the constant
-    polynomial with coefficient 1, else return 0.
 
 .. function:: void nmod_mpoly_set_term_ui_ui(nmod_mpoly_t poly, ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx)
 

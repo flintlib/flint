@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017, 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,24 +11,26 @@
 
 #include "nmod_mpoly.h"
 
-int nmod_mpoly_equal_ui(const nmod_mpoly_t poly,
+int nmod_mpoly_equal_ui(const nmod_mpoly_t A,
                                            ulong c, const nmod_mpoly_ctx_t ctx)
 {
     slong N;
-    mp_limb_t cr;
 
-    NMOD_RED(cr, c, ctx->ffinfo->mod);
+    if (c >= ctx->ffinfo->mod.n)
+    {
+        NMOD_RED(c, c, ctx->ffinfo->mod);
+    }
 
-    if (cr == 0)
-        return poly->length == 0;
+    if (c == 0)
+        return A->length == 0;
 
-    if (poly->length != 1)
+    if (A->length != 1)
         return 0;
 
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    if (!mpoly_monomial_is_zero(poly->exps + N*0, N))
+    if (!mpoly_monomial_is_zero(A->exps + N*0, N))
         return 0;
 
-    return poly->coeffs[0] == cr;
+    return A->coeffs[0] == c;
 }

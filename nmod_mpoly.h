@@ -222,6 +222,44 @@ void nmod_mpoly_swap(nmod_mpoly_t A, nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
 /* Constants *****************************************************************/
 
+FLINT_DLL int nmod_mpoly_is_ui(const nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL ulong nmod_mpoly_get_ui(const nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set_ui(nmod_mpoly_t A,
+                                          ulong c, const nmod_mpoly_ctx_t ctx);
+
+NMOD_MPOLY_INLINE
+void nmod_mpoly_zero(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+{
+   _nmod_mpoly_set_length(A, 0, ctx);
+}
+
+NMOD_MPOLY_INLINE
+void nmod_mpoly_one(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+{
+    nmod_mpoly_set_ui(A, UWORD(1), ctx);
+}
+
+FLINT_DLL int nmod_mpoly_equal_ui(const nmod_mpoly_t A,
+                                          ulong c, const nmod_mpoly_ctx_t ctx);
+
+NMOD_MPOLY_INLINE
+int nmod_mpoly_is_zero(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+{
+   return A->length == 0;
+}
+
+NMOD_MPOLY_INLINE
+int nmod_mpoly_is_one(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+{
+   return nmod_mpoly_equal_ui(A, 1, ctx);
+}
+
+/* Degrees *******************************************************************/
+
 
 FLINT_DLL void _nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly,
                         ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx);
@@ -247,17 +285,8 @@ FLINT_DLL void _nmod_mpoly_max_degrees(ulong * max_degs, const ulong * exps,
 FLINT_DLL void nmod_mpoly_max_degrees(ulong * max_degs,
                           const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_set_ui(nmod_mpoly_t poly,
-                                          ulong c, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_set_si(nmod_mpoly_t poly,
-                                          slong c, const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void nmod_mpoly_set_nmod(nmod_mpoly_t poly,
                                    const nmod_t c, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_equal_ui(const nmod_mpoly_t poly,
-                                          ulong c, const nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE
 int nmod_mpoly_degrees_fit_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
@@ -314,35 +343,6 @@ void nmod_mpoly_total_degree_fmpz(fmpz_t td, const nmod_mpoly_t A,
     mpoly_total_degree_fmpz(td, A->exps, A->length, A->bits, ctx->minfo);
 }
 
-NMOD_MPOLY_INLINE
-void nmod_mpoly_zero(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-{
-   _nmod_mpoly_set_length(poly, 0, ctx);
-}
-
-NMOD_MPOLY_INLINE
-void nmod_mpoly_one(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-{
-    nmod_mpoly_set_ui(poly, UWORD(1), ctx);
-}
-
-NMOD_MPOLY_INLINE
-int nmod_mpoly_is_zero(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-{
-   return poly->length == 0;
-}
-
-NMOD_MPOLY_INLINE
-int nmod_mpoly_is_one(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-{
-   return nmod_mpoly_equal_ui(poly, 1, ctx);
-}
-
-FLINT_DLL int nmod_mpoly_is_ui(const nmod_mpoly_t A,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL ulong nmod_mpoly_get_ui(const nmod_mpoly_t A,
-                                                   const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL ulong nmod_mpoly_get_coeff_ui(nmod_t x,
                  const nmod_mpoly_t poly, slong n, const nmod_mpoly_ctx_t ctx);

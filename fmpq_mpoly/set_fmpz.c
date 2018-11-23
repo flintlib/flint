@@ -12,43 +12,46 @@
 #include "fmpq_mpoly.h"
 
 
-void fmpq_mpoly_set_fmpz(fmpq_mpoly_t poly,
+void fmpq_mpoly_set_fmpz(fmpq_mpoly_t A,
                                     const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
 {
+    fmpz_set(fmpq_numref(A->content), c);
+    fmpz_one(fmpq_denref(A->content));
     if (fmpz_is_zero(c))
     {
-        fmpq_mpoly_zero(poly, ctx);
-        return;
+        fmpz_mpoly_zero(A->zpoly, ctx->zctx);
     }
-
-    fmpz_set(fmpq_numref(poly->content), c);
-    fmpz_one(fmpq_denref(poly->content));
-    fmpz_mpoly_one(poly->zpoly, ctx->zctx);
+    else
+    {
+        fmpz_mpoly_one(A->zpoly, ctx->zctx);
+    }
 }
 
-void fmpq_mpoly_set_ui(fmpq_mpoly_t poly, ulong c, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_set_ui(fmpq_mpoly_t A, ulong c, const fmpq_mpoly_ctx_t ctx)
 {
+    fmpz_set_ui(fmpq_numref(A->content), c);
+    fmpz_one(fmpq_denref(A->content));
     if (c == UWORD(0))
     {
-        fmpq_mpoly_zero(poly, ctx);
-        return;
+        fmpz_mpoly_zero(A->zpoly, ctx->zctx);
     }
-
-    fmpz_set_ui(fmpq_numref(poly->content), c);
-    fmpz_one(fmpq_denref(poly->content));
-    fmpz_mpoly_one(poly->zpoly, ctx->zctx);
+    else
+    {
+        fmpz_mpoly_one(A->zpoly, ctx->zctx);
+    }
 }
 
-void fmpq_mpoly_set_si(fmpq_mpoly_t poly, slong c, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_set_si(fmpq_mpoly_t A, slong c, const fmpq_mpoly_ctx_t ctx)
 {
+    fmpz_set_si(fmpq_numref(A->content), c);
+    fmpz_one(fmpq_denref(A->content));
     if (c == WORD(0))
     {
-        fmpq_mpoly_zero(poly, ctx);
-        return;
+        fmpz_mpoly_zero(A->zpoly, ctx->zctx);
     }
-
-    fmpz_set_si(fmpq_numref(poly->content), c);
-    fmpz_one(fmpq_denref(poly->content));
-    fmpz_mpoly_one(poly->zpoly, ctx->zctx);
+    else
+    {
+        fmpz_mpoly_one(A->zpoly, ctx->zctx);
+    }
 }
 
