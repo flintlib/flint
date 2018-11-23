@@ -273,7 +273,7 @@ int fmpq_mpoly_is_one(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 }
 
 
-
+/* Degrees *******************************************************************/
 
 FMPQ_MPOLY_INLINE
 int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
@@ -285,14 +285,6 @@ int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t A,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_si(degs, A->zpoly->exps, A->zpoly->length,
-                                             A->zpoly->bits, ctx->zctx->minfo);
-}
-
-FMPQ_MPOLY_INLINE
 void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t A,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
@@ -301,11 +293,11 @@ void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t A,
 }
 
 FMPQ_MPOLY_INLINE
-slong fmpq_mpoly_degree_si(const fmpq_mpoly_t A, slong var,
+void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t A,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    return mpoly_degree_si(A->zpoly->exps, A->zpoly->length,
-                                        A->zpoly->bits, var, ctx->zctx->minfo);
+    mpoly_degrees_si(degs, A->zpoly->exps, A->zpoly->length,
+                                             A->zpoly->bits, ctx->zctx->minfo);
 }
 
 FMPQ_MPOLY_INLINE
@@ -313,6 +305,14 @@ void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t A, slong var,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
     mpoly_degree_fmpz(deg, A->zpoly->exps, A->zpoly->length,
+                                        A->zpoly->bits, var, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
+slong fmpq_mpoly_degree_si(const fmpq_mpoly_t A, slong var,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    return mpoly_degree_si(A->zpoly->exps, A->zpoly->length,
                                         A->zpoly->bits, var, ctx->zctx->minfo);
 }
 
@@ -325,6 +325,14 @@ int fmpq_mpoly_total_degree_fits_si(const fmpq_mpoly_t A,
 }
 
 FMPQ_MPOLY_INLINE
+void fmpq_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    mpoly_total_degree_fmpz(tdeg, A->zpoly->exps, A->zpoly->length,
+                                             A->zpoly->bits, ctx->zctx->minfo);
+}
+
+FMPQ_MPOLY_INLINE
 slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
@@ -332,13 +340,6 @@ slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A,
                                              A->zpoly->bits, ctx->zctx->minfo);
 }
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    mpoly_total_degree_fmpz(tdeg, A->zpoly->exps, A->zpoly->length,
-                                             A->zpoly->bits, ctx->zctx->minfo);
-}
 
 /* coefficients of monomials *************************************************/
 

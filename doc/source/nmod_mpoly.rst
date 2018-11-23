@@ -171,6 +171,39 @@ Constants
     Return ``1`` if ``A`` is the constant ``1``, else return ``0``.
 
 
+Degrees
+----------------------------------------------------------------------
+
+
+.. function:: int nmod_mpoly_degrees_fit_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if the degrees of ``A`` with respect to each variable fit into an ``slong``, otherwise return ``0``.
+
+.. function:: void nmod_mpoly_degrees_fmpz(fmpz ** degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+.. function:: void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Set ``degs`` to the degrees of ``A`` with respect to each variable.
+    If ``A`` is zero, all degrees are set to ``-1``.
+
+.. function:: void nmod_mpoly_degree_fmpz(fmpz_t deg, const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
+
+.. function:: slong nmod_mpoly_degree_si(const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Either return or set ``deg`` to the degree of ``A`` with respect to the variable of index ``var``.
+    If ``A`` is zero, the degree is defined to be ``-1``.
+
+.. function:: int nmod_mpoly_total_degree_fits_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` if the total degree of ``A`` fits into an ``slong``, otherwise return ``0``.
+
+.. function:: void nmod_mpoly_total_degree_fmpz(fmpz_t tdeg, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+.. function:: slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Either return or set ``tdeg`` to the total degree of ``A``.
+    If ``A`` is zero, the total degree is defined to be ``-1``.
+
 
 
 
@@ -210,40 +243,6 @@ Constants
     many variables as the polynomial. The most significant variable with
     respect to the ordering is at index 0 of the vector. If no term with that
     monomial exists in the polynomial, zero is returned.
-
-
-Degrees
---------------------------------------------------------------------------------
-
-
-.. function:: int nmod_mpoly_degrees_fit_si(const nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
-
-    Return ``1`` if the degrees of poly with respect to each variable fit into an ``slong``, otherwise return ``0``.
-
-.. function:: void nmod_mpoly_degrees_fmpz(fmpz ** degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-
-.. function:: void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-
-    Set ``degs`` to the degrees of ``A`` with respect to each variable.
-    If ``A`` is zero, all degrees are set to ``-1``.
-
-.. function:: void nmod_mpoly_degree_fmpz(fmpz_t deg, const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
-
-.. function:: slong nmod_mpoly_degree_si(const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
-
-    Either return or set ``deg`` to the degree of ``A`` with respect to the variable of index ``var``.
-    If ``A`` is zero, the degree is defined to be ``-1``.
-
-.. function:: int nmod_mpoly_total_degree_fits_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-
-    Return ``1`` if the total degree of ``A`` fits into an ``slong``, otherwise return ``0``.
-
-.. function:: void nmod_mpoly_total_degree_fmpz(fmpz_t tdeg, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-
-.. function:: slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-
-    Either return or set ``tdeg`` to the total degree of ``A``.
-    If ``A`` is zero, the total degree is defined to be ``-1``.
 
 
 Container operations
