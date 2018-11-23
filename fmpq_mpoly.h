@@ -609,51 +609,14 @@ FLINT_DLL void _fmpq_mpoly_make_monic_inplace(fmpq_mpoly_t A,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 
-/* Multiplication ************************************************************/
+/* Differentiation/Integration ***********************************************/
 
-FLINT_DLL void fmpq_mpoly_mul(fmpq_mpoly_t poly1,
-                 const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, 
-                                                   const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_derivative(fmpq_mpoly_t A,
+                  const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_mul_threaded(fmpq_mpoly_t poly1,
-                 const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
-                                                   const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_integral(fmpq_mpoly_t A,
+                  const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx);
 
-/* Powering ******************************************************************/
-
-FLINT_DLL void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                                 const fmpz_t pow, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_pow_si(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                                        slong pow, const fmpq_mpoly_ctx_t ctx);
-
-/* Calculus ******************************************************************/
-
-FLINT_DLL void fmpq_mpoly_derivative(fmpq_mpoly_t poly1,
-              const fmpq_mpoly_t poly2, slong var, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_integral(fmpq_mpoly_t poly1,
-              const fmpq_mpoly_t poly2, slong var, const fmpq_mpoly_ctx_t ctx);
-
-/* Divisibility **************************************************************/
-
-FLINT_DLL int fmpq_mpoly_divides(fmpq_mpoly_t poly1,
-                  const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-/* Division ******************************************************************/
-
-FLINT_DLL void fmpq_mpoly_div(fmpq_mpoly_t q,
-                     const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_divrem(fmpq_mpoly_t q, fmpq_mpoly_t r,
-                  const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
-    const fmpq_mpoly_t poly2, fmpq_mpoly_struct * const * poly3, slong len,
-                                                   const fmpq_mpoly_ctx_t ctx);
 
 /* Evaluation ****************************************************************/
 
@@ -674,6 +637,46 @@ FLINT_DLL void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
 FLINT_DLL void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
                    const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C,
                     const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC);
+
+
+
+/* Multiplication ************************************************************/
+
+FLINT_DLL void fmpq_mpoly_mul(fmpq_mpoly_t poly1,
+                 const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, 
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_mul_threaded(fmpq_mpoly_t poly1,
+                 const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+/* Powering ******************************************************************/
+
+FLINT_DLL void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                 const fmpz_t pow, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_pow_si(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                                        slong pow, const fmpq_mpoly_ctx_t ctx);
+
+/* Divisibility **************************************************************/
+
+FLINT_DLL int fmpq_mpoly_divides(fmpq_mpoly_t poly1,
+                  const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+/* Division ******************************************************************/
+
+FLINT_DLL void fmpq_mpoly_div(fmpq_mpoly_t q,
+                     const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_divrem(fmpq_mpoly_t q, fmpq_mpoly_t r,
+                  const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
+    const fmpq_mpoly_t poly2, fmpq_mpoly_struct * const * poly3, slong len,
+                                                   const fmpq_mpoly_ctx_t ctx);
 
 /* GCD ***********************************************************************/
 

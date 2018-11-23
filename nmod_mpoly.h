@@ -512,6 +512,29 @@ FLINT_DLL void nmod_mpoly_make_monic(nmod_mpoly_t A, const nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx);
 
 
+/* Differention **************************************************************/
+
+FLINT_DLL void nmod_mpoly_derivative(nmod_mpoly_t A,
+                  const nmod_mpoly_t B, slong var, const nmod_mpoly_ctx_t ctx);
+
+
+/* Evaluation ****************************************************************/
+
+FLINT_DLL ulong nmod_mpoly_evaluate_all_ui(nmod_mpoly_t A,
+                               const ulong * vals, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
+                             slong var, ulong val, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
+                        const nmod_mpoly_t B, nmod_poly_struct * const * C,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
+                    const nmod_mpoly_t B, nmod_mpoly_struct * const * C,
+                    const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC);
+
+
 /* Multiplication ************************************************************/
 
 FLINT_DLL void nmod_mpoly_mul(nmod_mpoly_t poly1,
@@ -549,14 +572,6 @@ FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
 FLINT_DLL void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B,
                                  const fmpz_t pow, const nmod_mpoly_ctx_t ctx);
 
-/* Calculus ******************************************************************/
-
-FLINT_DLL void nmod_mpoly_derivative(nmod_mpoly_t poly1,
-              const nmod_mpoly_t poly2, slong var, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_integral(nmod_mpoly_t poly1,
-              const nmod_mpoly_t poly2, slong var, const nmod_mpoly_ctx_t ctx);
-
 /* Divisibility **************************************************************/
 
 FLINT_DLL int nmod_mpoly_divides(nmod_mpoly_t Q,
@@ -590,23 +605,6 @@ FLINT_DLL void nmod_mpoly_div_monagan_pearce(nmod_mpoly_t q,
 FLINT_DLL void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
                   const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
                                                    const nmod_mpoly_ctx_t ctx);
-
-/* Evaluation ****************************************************************/
-
-FLINT_DLL ulong nmod_mpoly_evaluate_all_ui(nmod_mpoly_t A,
-                               const ulong * vals, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
-                             slong var, ulong val, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
-                        const nmod_mpoly_t B, nmod_poly_struct * const * C,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
-                    const nmod_mpoly_t B, nmod_mpoly_struct * const * C,
-                    const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC);
-
 
 /******************************************************************************
 

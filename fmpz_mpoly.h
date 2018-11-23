@@ -588,6 +588,34 @@ FLINT_DLL int fmpz_mpoly_scalar_divides_ui(fmpz_mpoly_t A,
                     const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
 
 
+/* Differentiation/Integration ***********************************************/
+
+FLINT_DLL void fmpz_mpoly_derivative(fmpz_mpoly_t A,
+                  const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_integral(fmpz_mpoly_t A, fmpz_t scale,
+                  const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
+
+
+/* Evaluation ****************************************************************/
+
+FLINT_DLL void fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A,
+                              fmpz * const * vals, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A,
+                           const fmpz_mpoly_t B, slong var, const fmpz_t val,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A,
+                         const fmpz_mpoly_t B, fmpz_poly_struct * const * C,
+                                                  const fmpz_mpoly_ctx_t ctxB);
+
+FLINT_DLL void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
+                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
+                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
+
+
+
 
 #define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
@@ -636,14 +664,6 @@ FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
 FLINT_DLL void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                  const fmpz_t pow, const fmpz_mpoly_ctx_t ctx);
-
-/* Calculus ******************************************************************/
-
-FLINT_DLL void fmpz_mpoly_derivative(fmpz_mpoly_t poly1,
-              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
-              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 
 /* Divisibility **************************************************************/
 
@@ -706,24 +726,6 @@ FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
 FLINT_DLL void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
-
-/* Evaluation ****************************************************************/
-
-FLINT_DLL void fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A,
-                              fmpz * const * vals, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A,
-                           const fmpz_mpoly_t B, slong var, const fmpz_t val,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A,
-                         const fmpz_mpoly_t B, fmpz_poly_struct * const * C,
-                                                  const fmpz_mpoly_ctx_t ctxB);
-
-FLINT_DLL void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
-                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
-                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
-
 
 /******************************************************************************
 

@@ -360,6 +360,41 @@ Scalar operations
     This throws if ``B`` is zero or the leading coefficient is not invertible.
 
 
+Differentiation
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_mpoly_derivative(nmod_mpoly_t A, const nmod_mpoly_t B, slong idx, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the derivative of ``B`` with respect to the variable of index ``idx``.
+
+
+Evaluation
+--------------------------------------------------------------------------------
+
+
+.. function:: ulong nmod_mpoly_evaluate_all_ui(nmod_mpoly_t A, const ulong * vals, const nmod_mpoly_ctx_t ctx)
+
+    Return the evaluation of ``A`` where the variables are replaced by the corresponding elements of the array ``vals``.
+
+.. function:: void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, const nmod_mpoly_t B, ulong var, ulong val, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the evaluation of ``B`` where the variable of index ``var`` is replaced by ``val``.
+
+.. function:: void nmod_mpoly_compose_nmod_poly(nmod_poly_t A, const nmod_mpoly_t B, nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
+    The context object of ``B`` is ``ctxB``.
+
+.. function:: void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A, const nmod_mpoly_t B, nmod_mpoly_struct * const * C, const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC)
+
+    Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
+    Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
+    Neither of ``A`` and ``B`` is allowed to alias any other polynomial.
+
+    The compose functions try to guard against unreasonable arithmetic by throwing.
+
+
 Multiplication
 --------------------------------------------------------------------------------
 
@@ -461,46 +496,6 @@ Reduction
     quotient) polynomials, is given by ``len``. The function computes
     polynomials `q_i = q[i]` such that ``poly2`` is
     `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
-
-
-Differentiation
---------------------------------------------------------------------------------
-
-
-.. function:: void nmod_mpoly_derivative(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, slong idx, const nmod_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to the derivative of ``poly2`` with respect to the
-    variable of index ``idx``. This function cannot fail.
-
-
-Evaluation
---------------------------------------------------------------------------------
-
-
-.. function:: ulong nmod_mpoly_evaluate_all_ui(nmod_mpoly_t A, const ulong * vals, const nmod_mpoly_ctx_t ctx)
-
-    Return the evaluation of ``A`` where the variables are
-    replaced by the corresponding elements of the array ``vals``.
-
-.. function:: void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, const nmod_mpoly_t B, slong var, ulong val, const nmod_mpoly_ctx_t ctx)
-
-    Set ``A`` to the evaluation of ``B`` where the variable of
-    index ``var`` is replaced by ``val``.
-
-.. function:: void nmod_mpoly_compose_nmod_poly(nmod_poly_t A, const nmod_mpoly_t B, nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
-
-    Set ``A`` to the evaluation of ``B`` where the variables are
-    replaced by the corresponding elements of the array ``C``. Both
-    ``A`` and the elements of ``C`` should have modulus matching that of
-    ``ctxB``, which is the context object of ``B``.
-
-.. function:: void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A, const nmod_mpoly_t B, nmod_mpoly_struct * const * C, const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC)
-
-    Set ``A`` to the evaluation of ``B`` where the variables are
-    replaced by the corresponding elements of the array ``C``. Both
-    ``A`` and the elements of ``C`` have context object
-    ``ctxAC``, while ``B`` has context object ``ctxB``. Neither of
-    ``A`` and ``B`` is allowed to alias any other polynomial.
 
 
 Greatest Common Divisor
