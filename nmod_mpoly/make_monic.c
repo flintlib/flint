@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017, 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,17 +11,15 @@
 
 #include "nmod_mpoly.h"
 
-
-void nmod_mpoly_make_monic(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+void nmod_mpoly_make_monic(nmod_mpoly_t A, const nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    if (poly2->length == 0)
+    if (B->length == 0)
     {
-        flint_printf("Exception (nmod_mpoly_make_monic). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Zero polynomial in nmod_mpoly_make_monic");
     }
 
-    nmod_mpoly_scalar_mul_ui(poly1, poly2,
-                            nmod_inv(poly2->coeffs[0], ctx->ffinfo->mod), ctx);
+    nmod_mpoly_scalar_mul_ui(A, B, nmod_inv(B->coeffs[0], ctx->ffinfo->mod),
+                                                                          ctx);
 }
 

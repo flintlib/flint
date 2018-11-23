@@ -352,7 +352,12 @@ Scalar operations
 
 .. function:: void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t A, const nmod_mpoly_t B, ulong c, const nmod_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` times the unsigned integer ``c``.
+    Set ``A`` to ``B`` times ``c``.
+
+.. function:: void nmod_mpoly_make_monic(nmod_mpoly_t A, nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` divided by the leading coefficient of ``B``.
+    This throws if ``B`` is zero or the leading coefficient is not invertible.
 
 
 Multiplication

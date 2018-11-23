@@ -568,44 +568,46 @@ FLINT_DLL void fmpq_mpoly_sub(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                              const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx);
 
 
-/* Set and negate ************************************************************/
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_neg(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    fmpq_neg(poly1->content, poly2->content);
-    fmpz_mpoly_set(poly1->zpoly, poly2->zpoly, ctx->zctx);
-}
-
 /* Scalar operations *********************************************************/
 
-FLINT_DLL void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_neg(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                                   const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_neg(A->content, B->content);
+    fmpz_mpoly_set(A->zpoly, B->zpoly, ctx->zctx);
+}
 
-FLINT_DLL void fmpq_mpoly_scalar_mul_fmpz(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t A,
+             const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_scalar_mul_ui(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, ulong        c, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_scalar_mul_fmpz(fmpq_mpoly_t A,
+             const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_scalar_mul_si(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, slong        c, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_scalar_mul_ui(fmpq_mpoly_t A,
+             const fmpq_mpoly_t B, ulong        c, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_scalar_div_fmpq(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_scalar_mul_si(fmpq_mpoly_t A,
+             const fmpq_mpoly_t B, slong        c, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_scalar_div_fmpz(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_scalar_div_fmpq(fmpq_mpoly_t A,
+             const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_scalar_div_ui(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, ulong        c, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_scalar_div_fmpz(fmpq_mpoly_t A,
+             const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, slong        c, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_scalar_div_ui(fmpq_mpoly_t A,
+             const fmpq_mpoly_t B, ulong        c, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_make_monic_inplace(fmpq_mpoly_t poly1,
+FLINT_DLL void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t A,
+             const fmpq_mpoly_t B, slong        c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_make_monic(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                    const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpq_mpoly_make_monic_inplace(fmpq_mpoly_t A,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
 
 /* Multiplication ************************************************************/
 

@@ -555,6 +555,40 @@ FLINT_DLL slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
                                                         const ulong * cmpmask);
 
 
+/* Scalar operations *********************************************************/
+
+FLINT_DLL void fmpz_mpoly_neg(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t A,
+             const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_scalar_mul_si(fmpz_mpoly_t A,
+                    const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_scalar_mul_ui(fmpz_mpoly_t A,
+                    const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t A,
+             const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t A,
+                    const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t A,
+                    const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_scalar_divides_fmpz(fmpz_mpoly_t A,
+             const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_scalar_divides_si(fmpz_mpoly_t A,
+                    const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_scalar_divides_ui(fmpz_mpoly_t A,
+                    const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
+
+
+
 #define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
 
@@ -563,51 +597,6 @@ FLINT_DLL slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
                      (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
 
 
-/* Set and negate ************************************************************/
-
-FLINT_DLL void _fmpz_mpoly_neg(fmpz * poly1, ulong * exps1,
-                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
-
-FLINT_DLL void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-/* Scalar operations *********************************************************/
-
-FLINT_DLL void _fmpz_mpoly_scalar_mul_fmpz(fmpz * poly1, ulong * exps1,
- const fmpz * poly2, const ulong * exps2, slong len2, slong N, const fmpz_t c);
-
-FLINT_DLL void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t poly1,
-         const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_scalar_mul_si(fmpz * poly1, ulong * exps1,
-        const fmpz * poly2, const ulong * exps2, slong len2, slong N, slong c);
-
-FLINT_DLL void fmpz_mpoly_scalar_mul_si(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_scalar_mul_ui(fmpz * poly1, ulong * exps1,
-        const fmpz * poly2, const ulong * exps2, slong len2, slong N, ulong c);
-
-FLINT_DLL void fmpz_mpoly_scalar_mul_ui(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_scalar_divexact_fmpz(fmpz * poly1, ulong * exps1,
- const fmpz * poly2, const ulong * exps2, slong len2, slong N, const fmpz_t c);
-
-FLINT_DLL void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t poly1,
-         const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_scalar_divexact_si(fmpz * poly1, ulong * exps1,
-        const fmpz * poly2, const ulong * exps2, slong len2, slong N, slong c);
-
-FLINT_DLL void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_scalar_divexact_ui(fmpz * poly1, ulong * exps1,
-        const fmpz * poly2, const ulong * exps2, slong len2, slong N, ulong c);
-
-FLINT_DLL void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx);
 
 /* Multiplication ************************************************************/
 

@@ -437,6 +437,14 @@ Scalar operations
 
     Set ``A`` to ``B`` divided by ``c``. The division is assumed to be exact.
 
+.. function:: int fmpz_mpoly_scalar_divides_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: int fmpz_mpoly_scalar_divides_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: int fmpz_mpoly_scalar_divides_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx)
+
+    If ``B`` is divisible by ``c``, set ``A`` to the exact quotient and return ``1``, otherwise set ``A`` to zero and return ``0``.
+
 
 Differentiation/Integration
 ----------------------------------------------------------------------

@@ -500,18 +500,17 @@ FLINT_DLL slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
                        slong N, const ulong * cmpmask, const nmodf_ctx_t fctx);
 
 
-/* Set and negate ************************************************************/
-
-FLINT_DLL void nmod_mpoly_neg(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                                                   const nmod_mpoly_ctx_t ctx);
-
 /* Scalar operations *********************************************************/
 
-FLINT_DLL void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t poly1,
-                const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_neg(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_make_monic(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+FLINT_DLL void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t A,
+                const nmod_mpoly_t B, ulong c, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_make_monic(nmod_mpoly_t A, const nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx);
+
 
 /* Multiplication ************************************************************/
 
