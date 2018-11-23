@@ -615,37 +615,30 @@ FLINT_DLL void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
                     const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
 
 
-
-
-#define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
-    ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
-
-#define fmpz_mpoly_get_monomial_ptr(poly, n, ctx) \
-    ((n) < (poly)->length ? (poly)->exps + \
-                     (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
-
-
-
 /* Multiplication ************************************************************/
 
-FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t poly1,
-                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
+FLINT_DLL void fmpz_mpoly_mul(fmpz_mpoly_t A,
+                 const fmpz_mpoly_t B, const fmpz_mpoly_t C, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1,
-                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A,
+                           const fmpz_mpoly_t B, const fmpz_mpoly_t C, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_mul_array(fmpz_mpoly_t poly1, 
-                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+FLINT_DLL void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A,
+                           const fmpz_mpoly_t B, const fmpz_mpoly_t C,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t poly1,
-                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+FLINT_DLL int fmpz_mpoly_mul_array(fmpz_mpoly_t A, 
+                             const fmpz_mpoly_t B, const fmpz_mpoly_t C,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_mul_dense(fmpz_mpoly_t poly1, 
-                 const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+FLINT_DLL int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A,
+                              const fmpz_mpoly_t B, const fmpz_mpoly_t C,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, 
+                               const fmpz_mpoly_t B, const fmpz_mpoly_t C,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
@@ -732,6 +725,13 @@ FLINT_DLL void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
    Internal functions (guaranteed to change without notice)
 
 ******************************************************************************/
+
+#define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
+    ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
+
+#define fmpz_mpoly_get_monomial_ptr(poly, n, ctx) \
+    ((n) < (poly)->length ? (poly)->exps + \
+                     (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
 
 /* sparse univariates with multivariate coefficients */
 typedef struct

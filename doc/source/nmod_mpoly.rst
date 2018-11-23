@@ -401,26 +401,27 @@ Multiplication
 
 .. function:: void nmod_mpoly_mul(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-    Set `A` to `B` times `C`.
-
-.. function:: int nmod_mpoly_mul_dense(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
-
-    Try to set `A` to `B` times `C` using univariate arithmetic.
-    If the return is `0`, the operation was unsuccessful. Otherwise, it was successful and the return is `1`.
-
-.. function:: int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
-
-    Try to set `A` to `B` times `C` using arrays.
-    If the return is `0`, the operation was unsuccessful. Otherwise, it was successful and the return is `1`.
+    Set ``A`` to ``B`` times ``C``.
 
 .. function:: void nmod_mpoly_mul_johnson(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-    Set `A` to `B` times `C` using Johnson's heap-based method.
+    Set ``A`` to ``B`` times ``C`` using Johnson's heap-based method.
 
 .. function:: void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-    Set `A` to `B` times `C` using a heap and multiple threads.
+    Set ``A`` to ``B`` times ``C`` using a heap and multiple threads.
     This function should only be called once ``global_thread_pool`` has been initialized.
+
+.. function:: int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
+
+    Try to set ``A`` to ``B`` times ``C`` using arrays.
+    If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
+
+.. function:: int nmod_mpoly_mul_dense(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
+
+    Try to set ``A`` to ``B`` times `C` using univariate arithmetic.
+    If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
+
 
 
 Powering
