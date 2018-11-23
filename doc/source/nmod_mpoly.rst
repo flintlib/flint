@@ -205,44 +205,31 @@ Degrees
     If ``A`` is zero, the total degree is defined to be ``-1``.
 
 
+Coefficients
+--------------------------------------------------------------------------------
 
 
+.. function:: ulong nmod_mpoly_get_coeff_ui_monomial(const nmod_mpoly_t A, const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx)
 
-.. function:: void nmod_mpoly_set_term_ui_ui(nmod_mpoly_t poly, ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx)
+    Assuming that ``M`` is a monomial, return the coefficient of the corresponding monomial in ``A``.
+    This function thows if ``M`` is not a monomial.
 
-    Set the term of ``poly`` with the given monomial to the given
-    coefficient. The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The most significant variable with
-    respect to the ordering is at index 0 of the vector. If a term with that
-    monomial already exists in the polynomial, it is overwritten. The term is
-    removed if the coefficient is zero. If a term with that monomial doesn't
-    exist, one is inserted at the appropriate position.
+.. function:: void nmod_mpoly_set_coeff_ui_monomial(nmod_mpoly_t A, ulong c, const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx)
 
-.. function:: void nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly, ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx)
+    Assuming that ``M`` is a monomial, set the coefficient of the corresponding monomial in ``A`` to ``c``.
+    This function thows if ``M`` is not a monomial.
 
-    Set the term of ``poly`` with the given monomial to the given
-    coefficient. The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The most significant variable with
-    respect to the ordering is at index 0 of the vector. If a term with that
-    monomial already exists in the polynomial, it is overwritten. The term is
-    removed if the coefficient is zero. If a term with that monomial doesn't
-    exist, one is inserted at the appropriate position.
+.. function:: ulong nmod_mpoly_get_coeff_ui_fmpz(const nmod_mpoly_t A, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 
-.. function:: ulong nmod_mpoly_get_term_ui_ui(const fmpz_mpoly_t poly, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: ulong nmod_mpoly_get_coeff_ui_ui(const nmod_mpoly_t A, ulong const * exp, const nmod_mpoly_ctx_t ctx)
 
-    Get the coefficient of the term of ``poly`` with the given monomial.
-    The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The most significant variable with
-    respect to the ordering is at index 0 of the vector. If no term with that
-    monomial exists in the polynomial, zero is returned.
+    Return the coefficient of the monomial with exponent ``exp``.
 
-.. function:: ulong nmod_mpoly_get_term_ui_fmpz(const fmpz_mpoly_t poly, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_set_coeff_ui_fmpz(nmod_mpoly_t A, ulong c, fmpz * const * exp, nmod_mpoly_ctx_t ctx)
 
-    Get the coefficient of the term of ``poly`` with the given monomial.
-    The monomial is specified as a vector of exponents with as
-    many variables as the polynomial. The most significant variable with
-    respect to the ordering is at index 0 of the vector. If no term with that
-    monomial exists in the polynomial, zero is returned.
+.. function:: void nmod_mpoly_set_coeff_ui_ui(nmod_mpoly_t A, ulong c, ulong const * exp, nmod_mpoly_ctx_t ctx)
+
+    Set the coefficient of the monomial with exponent ``exp`` to `c`.
 
 
 Container operations

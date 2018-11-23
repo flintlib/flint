@@ -227,38 +227,31 @@ Coefficients
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t poly, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Set `d` to the denominator of `poly`, the smallest positive integer `d`
-    such that `d`*``poly`` has integer coefficients.
+    Set ``d`` to the denominator of ``A``, the smallest positive integer `d` such that `d*A` has integer coefficients.
 
-.. function:: void fmpq_mpoly_get_coeff_fmpq_monomial(fmpq_t c, const fmpq_mpoly_t poly, const fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_get_coeff_fmpq_monomial(fmpq_t c, const fmpq_mpoly_t A, const fmpq_mpoly_t M, const fmpq_mpoly_ctx_t ctx)
 
-    Assuming that ``poly2`` is a monomial,
-    set `c` to the coefficient of the corresponding monomial in ``poly``.
-    This function thows if ``poly2`` is not a monomial.
+    Assuming that ``M`` is a monomial, set ``c`` to the coefficient of the corresponding monomial in ``A``.
+    This function thows if ``M`` is not a monomial.
 
-.. function:: void fmpq_mpoly_set_coeff_fmpq_monomial(fmpq_mpoly_t poly, const fmpq_t c, const fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_set_coeff_fmpq_monomial(fmpq_mpoly_t A, const fmpq_t c, const fmpq_mpoly_t M, const fmpq_mpoly_ctx_t ctx)
 
-    Assuming that ``poly2`` is a monomial,
-    set the coefficient of the corresponding monomial in ``poly`` to `c`.
-    This function thows if ``poly2`` is not a monomial.
+    Assuming that ``M`` is a monomial, set the coefficient of the corresponding monomial in ``A`` to ``c``.
+    This function thows if ``M`` is not a monomial.
 
-.. function:: void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t A, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
-    Set `c` to the coefficient of the monomial with exponent ``exp``.
+.. function:: void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t A, ulong const * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t poly, const fmpq_t c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
+    Set ``c`` to the coefficient of the monomial with exponent ``exp``.
 
-    Set the coefficient of the monomial with exponent ``exp`` to `c`.
+.. function:: void fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t A, const fmpq_t c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t poly, ulong const * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t A, const fmpq_t c, ulong const * exp, fmpq_mpoly_ctx_t ctx)
 
-    Set `c` to the coefficient of the monomial with exponent ``exp``.
-
-.. function:: void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t poly, const fmpq_t c, ulong const * exp, fmpq_mpoly_ctx_t ctx)
-
-    Set the coefficient of the monomial with exponent ``exp`` to `c`.
+    Set the coefficient of the monomial with exponent ``exp`` to ``c``.
 
 
 Container operations

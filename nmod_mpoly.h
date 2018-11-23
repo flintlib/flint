@@ -316,6 +316,32 @@ slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ct
 }
 
 
+/* Coefficients **************************************************************/
+
+FLINT_DLL ulong nmod_mpoly_get_coeff_ui_monomial(const nmod_mpoly_t A,
+                             const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set_coeff_ui_monomial(nmod_mpoly_t A, ulong c,
+                             const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL ulong _nmod_mpoly_get_coeff_ui_fmpz(const nmod_mpoly_t A,
+                                 const fmpz * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL ulong nmod_mpoly_get_coeff_ui_fmpz(const nmod_mpoly_t A,
+                               fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL ulong nmod_mpoly_get_coeff_ui_ui(const nmod_mpoly_t A,
+                                const ulong * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _nmod_mpoly_set_coeff_ui_fmpz(nmod_mpoly_t A,
+                        ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set_coeff_ui_fmpz(nmod_mpoly_t A,
+                      ulong c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set_coeff_ui_ui(nmod_mpoly_t A,
+                       ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
+
 
 
 FLINT_DLL void _nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly,

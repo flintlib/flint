@@ -341,7 +341,7 @@ slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A,
 }
 
 
-/* coefficients of monomials *************************************************/
+/* Coefficients **************************************************************/
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t A,
@@ -350,37 +350,32 @@ void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t A,
     fmpz_set(d, fmpq_denref(A->content));
 }
 
-
-/* get/set a coeff of poly1 corresponding to the monomial poly2 */
-/* these two functions throw if poly2 is not a monomial */
-
 FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_monomial(fmpq_t c,
-                        const fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
+                              const fmpq_mpoly_t A, const fmpq_mpoly_t M,
                                                    const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_set_coeff_fmpq_monomial(fmpq_mpoly_t poly1,
-                                    const fmpq_t c, const fmpq_mpoly_t poly2,
+FLINT_DLL void fmpq_mpoly_set_coeff_fmpq_monomial(fmpq_mpoly_t A,
+                                    const fmpq_t c, const fmpq_mpoly_t M,
                                                    const fmpq_mpoly_ctx_t ctx);
 
-/* get/set a coeff of poly1 corresponding to an exponent vector exp */
-
-FLINT_DLL void _fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t poly,
+FLINT_DLL void _fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t A,
                  const fmpq_t c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t A,
                 const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t A,
                 const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
+FLINT_DLL void _fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t A,
                                  const fmpz * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t A,
                                fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t poly,
+FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t A,
                                 const ulong * exp, const fmpq_mpoly_ctx_t ctx);
+
 
 /* container operations ******************************************************/
 
