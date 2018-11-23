@@ -479,29 +479,31 @@ FLINT_DLL void nmod_mpoly_get_monomial(ulong * exps, const nmod_mpoly_t poly,
 FLINT_DLL void nmod_mpoly_set_monomial(nmod_mpoly_t poly, 
                       slong n, const ulong * exps, const nmod_mpoly_ctx_t ctx);
 
-/* Set and negate ************************************************************/
 
-FLINT_DLL void nmod_mpoly_neg(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                                                   const nmod_mpoly_ctx_t ctx);
+/* Addition/Subtraction ******************************************************/
 
-/* Basic arithmetic **********************************************************/
+FLINT_DLL void nmod_mpoly_add_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                          ulong c, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_add_ui(nmod_mpoly_t poly1,
-                const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_sub_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                          ulong c, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_sub_ui(nmod_mpoly_t poly1,
-                const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
+                             const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                         const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                         const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_sub(nmod_mpoly_t A, const nmod_mpoly_t B,
+                             const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
                     const ulong * coeff2, const ulong * exp2, slong len2,
                     const ulong * coeff3, const ulong * exp3, slong len3,
                        slong N, const ulong * cmpmask, const nmodf_ctx_t fctx);
+
+
+/* Set and negate ************************************************************/
+
+FLINT_DLL void nmod_mpoly_neg(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+                                                   const nmod_mpoly_ctx_t ctx);
 
 /* Scalar operations *********************************************************/
 

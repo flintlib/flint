@@ -518,6 +518,42 @@ FLINT_DLL void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 
+/* Addition/Subtraction ******************************************************/
+
+FLINT_DLL void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_add_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                          ulong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_add_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                          slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_sub_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                          ulong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_sub_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                          slong c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_add(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                             const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1,
+                 const fmpz * poly2, const ulong * exps2, slong len2,
+                 const fmpz * poly3, const ulong * exps3, slong len3, slong N,
+                                                        const ulong * cmpmask);
+
+FLINT_DLL void fmpz_mpoly_sub(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                             const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
+                 const fmpz * poly2, const ulong * exps2, slong len2,
+                 const fmpz * poly3, const ulong * exps3, slong len3, slong N,
+                                                        const ulong * cmpmask);
+
 
 #define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
@@ -534,43 +570,6 @@ FLINT_DLL void _fmpz_mpoly_neg(fmpz * poly1, ulong * exps1,
 
 FLINT_DLL void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                    const fmpz_mpoly_ctx_t ctx);
-
-
-/* Basic arithmetic **********************************************************/
-
-FLINT_DLL void fmpz_mpoly_add_ui(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_add_si(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_add_fmpz(fmpz_mpoly_t poly1,
-         const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_sub_ui(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, ulong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_sub_si(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, slong c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t poly1,
-         const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1,
-                 const fmpz * poly2, const ulong * exps2, slong len2,
-                 const fmpz * poly3, const ulong * exps3, slong len3, slong N,
-                                                        const ulong * cmpmask);
-
-FLINT_DLL void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                         const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
-                 const fmpz * poly2, const ulong * exps2, slong len2,
-                 const fmpz * poly3, const ulong * exps3, slong len3, slong N,
-                                                        const ulong * cmpmask);
-
-FLINT_DLL void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                         const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);
 
 /* Scalar operations *********************************************************/
 

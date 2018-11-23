@@ -368,188 +368,86 @@ Random generation
     The parameter ``coeff_bits`` to the three functions ``fmpq_mpoly_randtest_{bound|bounds|bits}`` is merely a suggestion for the approximate bit count of the resulting coefficients.
 
 
-Set/Negate
+Addition/Subtraction
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mpoly_neg(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_ctx_t ctx)
-    
-    Set ``poly1`` to `-```poly2``.
+.. function:: void fmpq_mpoly_add_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
 
+.. function:: void fmpq_mpoly_add_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
 
-Basic arithmetic
---------------------------------------------------------------------------------
+.. function:: void fmpq_mpoly_add_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx);
 
+.. function:: void fmpq_mpoly_add_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx);
 
-.. function:: void fmpq_mpoly_add_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+    Set ``A`` to ``B`` plus ``c``.
 
-    Set ``poly1`` to ``poly2`` plus `c`.
+.. function:: void fmpq_mpoly_sub_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
 
-.. function:: void fmpq_mpoly_add_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+.. function:: void fmpq_mpoly_sub_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
 
-    Set ``poly1`` to ``poly2`` plus `c`.
+.. function:: void fmpq_mpoly_sub_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx);
 
-.. function:: void fmpq_mpoly_add_ui(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, ulong        c, const fmpq_mpoly_ctx_t ctx);
+.. function:: void fmpq_mpoly_sub_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx);
 
-    Set ``poly1`` to ``poly2`` plus `c`.
+    Set ``A`` to ``B`` minus ``c``.
 
-.. function:: void fmpq_mpoly_add_si(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, slong        c, const fmpq_mpoly_ctx_t ctx);
+.. function:: void fmpq_mpoly_add(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` plus `c`.
+    Set ``A`` to ``B`` plus ``C``.
 
-.. function:: void fmpq_mpoly_sub_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+.. function:: void fmpq_mpoly_sub(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` minus `c`.
-
-.. function:: void fmpq_mpoly_sub_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
-
-    Set ``poly1`` to ``poly2`` minus `c`.
-
-.. function:: void fmpq_mpoly_sub_ui(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, ulong        c, const fmpq_mpoly_ctx_t ctx);
-
-    Set ``poly1`` to ``poly2`` minus `c`.
-
-.. function:: void fmpq_mpoly_sub_si(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, slong        c, const fmpq_mpoly_ctx_t ctx);
-
-    Set ``poly1`` to ``poly2`` minus `c`.
-
-.. function:: void fmpq_mpoly_add(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` plus ``poly3``.
-
-.. function:: void fmpq_mpoly_sub(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` minus ``poly3``.
+    Set ``A`` to ``B`` minus ``C``.
 
 
 Scalar operations
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_neg(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+    
+    Set ``A`` to `-```B``.
 
-    Set ``poly1`` to ``poly2`` times `c`.
+.. function:: void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_scalar_mul_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_scalar_mul_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` times `c`.
+.. function:: void fmpq_mpoly_scalar_mul_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_scalar_mul_ui(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, ulong        c, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_scalar_mul_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` times `c`.
+    Set ``A`` to ``B`` times `c`.
 
-.. function:: void fmpq_mpoly_scalar_mul_si(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, slong        c, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_scalar_div_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` times `c`.
+.. function:: void fmpq_mpoly_scalar_div_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_scalar_div_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_scalar_div_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` divided by `c`.
+.. function:: void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_scalar_div_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+    Set ``A`` to ``B`` divided by `c`.
 
-    Set ``poly1`` to ``poly2`` divided by `c`.
+.. function:: void fmpq_mpoly_make_monic(fmpq_mpoly_t A, fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_scalar_div_ui(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, ulong        c, const fmpq_mpoly_ctx_t ctx)
+    Set ``A`` to ``B`` divided by the leading coefficient of ``B``.
+    This throws if ``B`` is zero.
 
-    Set ``poly1`` to ``poly2`` divided by `c`.
-
-.. function:: void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, slong        c, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` divided by `c`.
-
-.. function:: void fmpq_mpoly_make_monic_inplace(fmpq_mpoly_t poly1, const fmpq_mpoly_ctx_t ctx)
-
-    Divide ``poly1`` by its leading coefficient. An expection is raised if
-    ``poly1`` is zero.
-
-
-Multiplication
---------------------------------------------------------------------------------
-
-
-.. function:: void fmpq_mpoly_mul(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` times ``poly3``.
-
-.. function:: void fmpq_mpoly_mul_threaded(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` times ``poly3`` using multiple threads.
-
-
-Powering
---------------------------------------------------------------------------------
-
-
-.. function:: void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpz_t k, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` raised to the `k`-th power.
-    An expection is raised if `k < 0` or if `k` is large and the polynomial is
-    not a monomial with coefficient `\pm1`.
-
-.. function:: void fmpq_mpoly_pow_si(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, slong k, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` raised to the `k`-th power.
-    An expection is raised if `k < 0`.
-
-
-Divisibility testing
---------------------------------------------------------------------------------
-
-
-.. function:: int fmpq_mpoly_divides(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` divided by ``poly3`` and return 1 if
-    the quotient is exact. Otherwise return 0.
-
-
-Division
---------------------------------------------------------------------------------
-
-
-.. function:: void fmpq_mpoly_div(fmpq_mpoly_t polyq, const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``polyq`` to the quotient of ``poly2`` by ``poly3``,
-    discarding the remainder. An expection is currently raised if ``poly2``
-    or ``poly3`` have bit counts greater than ``FLINT_BITS``.
-
-.. function:: void fmpq_mpoly_divrem(fmpq_mpoly_t q, fmpq_mpoly_t r, const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``polyq`` and ``polyr`` to the quotient and remainder of
-    ``poly2`` divided by ``poly3``. An expection is 
-    currently raised if ``poly2``
-    or ``poly3`` have bit counts greater than ``FLINT_BITS``.
-
-
-Reduction
---------------------------------------------------------------------------------
-
-
-.. function:: void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r, const fmpq_mpoly_t poly2, fmpq_mpoly_struct * const * poly3, slong len, const fmpq_mpoly_ctx_t ctx)
-
-    This function is as per ``fmpq_mpoly_divrem`` except
-    that it takes an array of divisor polynomials ``poly3``, and it returns
-    an array of quotient polynomials ``q``. The number of divisor (and hence
-    quotient) polynomials, is given by ``len``. The function computes
-    polynomials `q_i = q[i]` such that ``poly2`` is
-    `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
-    An expection is currently raised 
-    if any input polynomials have bit counts greater than ``FLINT_BITS``.
+    All of these functions run quickly if ``A`` and ``B`` are aliased.
 
 
 Differentiation/Integration
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mpoly_derivative(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, slong var, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_derivative(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to the derivative of ``poly2`` with respect to the
-    variable of index ``var``.
+    Set ``A`` to the derivative of ``B`` with respect to the  variable of index ``var``.
 
-.. function:: void fmpq_mpoly_integral(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, slong var, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_integral(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to the integral with the fewest number of terms
-    of ``poly2`` with respect to the variable of index ``var``.
+    Set ``A`` to the integral with the fewest number of terms of ``B`` with respect to the variable of index ``var``.
 
 
 Evaluation
@@ -558,36 +456,79 @@ Evaluation
 
 .. function:: void fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A, fmpq * const * vals, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``ev`` the evaluation of ``A`` where the variables are
-    replaced by the corresponding elements of the array ``vals``.
+    Set ``ev`` the evaluation of ``A`` where the variables are replaced by the corresponding elements of the array ``vals``.
 
 .. function:: void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong var, const fmpq_t val, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``A`` to the evaluation of ``B`` where the variable of
-    index ``var`` is replaced by ``val``.
+    Set ``A`` to the evaluation of ``B`` where the variable of index ``var`` is replaced by ``val``.
 
 .. function:: void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A, const fmpq_mpoly_t B, fmpq_poly_struct * const * C, const fmpq_mpoly_ctx_t ctxB)
 
-    Set ``A`` to the evaluation of ``B`` where the variables are
-    replaced by the corresponding elements of the array ``C``.
+    Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
     The context object of ``B`` is ``ctxB``.
 
 .. function:: void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A, const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C, const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC)
 
-    Set ``A`` to the evaluation of ``B`` where the variables are
-    replaced by the corresponding elements of the array ``C``. Both
-    ``A`` and the elements of ``C`` have context object
-    ``ctxAC``, while ``B`` has context object ``ctxB``. Neither of
-    ``A`` and ``B`` is allowed to alias any other polynomial.
+    Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
+    Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
+    Neither of ``A`` and ``B`` is allowed to alias any other polynomial.
+
+    These functions try to guard against unreasonable arithmetic by throwing.
+
+
+Multiplication
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpq_mpoly_mul(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` times ``C``.
+
+
+Powering
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t k, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` raised to the `k`-th power.
+    This function throws if `k < 0` or if `k` is large and the polynomial is not a monomial with coefficient `\pm1`.
+
+.. function:: void fmpq_mpoly_pow_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong k, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` raised to the `k`-th power.
+    This function throws if `k < 0`.
+
+
+Division
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpq_mpoly_divides(fmpq_mpoly_t Q, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+
+    If ``A`` is divisible by ``B``, set ``Q`` to the exact quotient and return ``1``. Otherwise, set ``Q`` to zero and return ``0``.
+    Note that the function :func:`fmpq_mpoly_div` may be faster if the quotient is known to be exact.
+
+.. function:: void fmpq_mpoly_div(fmpq_mpoly_t Q, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``Q`` to the quotient of ``A`` by ``B``, discarding the remainder.
+
+.. function:: void fmpq_mpoly_divrem(fmpq_mpoly_t Q, fmpq_mpoly_t R, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``Q`` and ``R`` to the quotient and remainder of ``A`` divided by ``B``.
+
+.. function:: void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** Q, fmpq_mpoly_t R, const fmpq_mpoly_t A, fmpq_mpoly_struct * const * B, slong len, const fmpq_mpoly_ctx_t ctx)
+
+    This function is as per :func:`fmpq_mpoly_divrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
+    The number of divisor (and hence quotient) polynomials, is given by ``len``.
 
 
 Greatest Common Divisor
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpq_mpoly_gcd(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to the monic GCD of ``poly2`` and ``poly3``, assuming
-    the return value is 1. If the return value is 0, the GCD was
-    unable to be computed.
+    Try to set ``G`` to the monic GCD of ``A`` and ``B``. The GCD of zero and zero is defined to be zero.
+    If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
 

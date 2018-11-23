@@ -535,6 +535,39 @@ void fmpq_mpoly_randtest_bits(fmpq_mpoly_t A, flint_rand_t state,
 }
 
 
+/* Basic arithmetic **********************************************************/
+
+FLINT_DLL void fmpq_mpoly_add_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                   const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_add_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                   const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_add_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                          ulong c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_add_si(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                          slong c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_sub_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                   const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_sub_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                   const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_sub_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                          ulong c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_sub_si(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                          slong c, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_add(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                             const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_sub(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                             const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx);
+
+
 /* Set and negate ************************************************************/
 
 FMPQ_MPOLY_INLINE
@@ -544,39 +577,6 @@ void fmpq_mpoly_neg(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
     fmpq_neg(poly1->content, poly2->content);
     fmpz_mpoly_set(poly1->zpoly, poly2->zpoly, ctx->zctx);
 }
-
-
-/* Basic arithmetic **********************************************************/
-
-FLINT_DLL void fmpq_mpoly_add_fmpq(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_add_fmpz(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_add_ui(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, ulong        c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_add_si(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, slong        c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_sub_fmpq(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_sub_fmpz(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_sub_ui(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, ulong        c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_sub_si(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, slong        c, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_add(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                         const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_sub(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                         const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx);
 
 /* Scalar operations *********************************************************/
 

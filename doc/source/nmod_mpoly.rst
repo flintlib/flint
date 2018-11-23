@@ -322,50 +322,37 @@ Random generation
     Generate a random polynomial with length up to the given length and exponents whose packed form does not exceed the given bit count.
 
 
-
-Set and negate
+Addition/Subtraction
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mpoly_set(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
-    
-    Set ``poly1`` to ``poly2``.
+.. function:: void nmod_mpoly_add_ui(nmod_mpoly_t A, const nmod_mpoly_t B, ulong c, const nmod_mpoly_ctx_t ctx)
 
-.. function:: void nmod_mpoly_neg(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
-    
-    Set ``poly1`` to `-```poly2``.
+    Set ``A`` to ``B`` plus ``c``.
 
+.. function:: void nmod_mpoly_sub_ui(nmod_mpoly_t A, const nmod_mpoly_t B, ulong c, const nmod_mpoly_ctx_t ctx)
 
-Basic arithmetic
---------------------------------------------------------------------------------
+    Set ``A`` to ``B`` minus ``c``.
 
+.. function:: void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-.. function:: void nmod_mpoly_add_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx)
+    Set ``A`` to ``B`` plus ``C``.
 
-    Set ``poly1`` to ``poly2`` plus the constant polynomial given by the
-    unsigned integer `c`.
+.. function:: void nmod_mpoly_sub(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-.. function:: void nmod_mpoly_sub_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` minus the constant polynomial given by the
-    unsigned integer `c`.
-
-.. function:: void nmod_mpoly_add(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` plus ``poly3``.
-
-.. function:: void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` minus ``poly3``.
+    Set ``A`` to ``B`` minus ``C``.
 
 
 Scalar operations
 --------------------------------------------------------------------------------
 
+.. function:: void nmod_mpoly_neg(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+    
+    Set ``A`` to `-```B``.
 
-.. function:: void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, ulong c, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t A, const nmod_mpoly_t B, ulong c, const nmod_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` times the unsigned integer `c`.
+    Set ``A`` to ``B`` times the unsigned integer ``c``.
 
 
 Multiplication

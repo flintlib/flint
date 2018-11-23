@@ -380,7 +380,7 @@ Random generation
     The function :func:`fmpz_mpoly_max_bits` will give the exact bit count of the result.
 
 
-Basic arithmetic
+Addition/Subtraction
 ----------------------------------------------------------------------
 
 
@@ -402,17 +402,22 @@ Basic arithmetic
     Set ``A`` to ``B`` minus `c`.
     If ``A`` and ``B`` are aliased, this function will probably run quickly.
 
-.. function:: void fmpz_mpoly_add(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_add(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` plus ``C``.
     If ``A`` and ``B`` are aliased, this function might run in time proportional to the size of ``C``.
     
-.. function:: void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_sub(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` minus ``C``.
     If ``A`` and ``B`` are aliased, this function might run in time proportional to the size of ``C``.
 
-.. function:: void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
+
+Scalar operations
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mpoly_neg(fmpz_mpoly_t A, const fmpz_mpoly_t B const fmpz_mpoly_ctx_t ctx)
     
     Set ``A`` to ``-B``.
 
@@ -430,7 +435,7 @@ Basic arithmetic
 
 .. function:: void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` divided by ``c``. The  division is assumed to be exact.
+    Set ``A`` to ``B`` divided by ``c``. The division is assumed to be exact.
 
 
 Differentiation/Integration
@@ -469,6 +474,8 @@ Evaluation
     Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
     Neither of ``A`` and ``B`` is allowed to alias any other polynomial.
 
+    These functions try to guard against unreasonable arithmetic by throwing.
+
 
 Multiplication
 ----------------------------------------------------------------------
@@ -498,42 +505,23 @@ Multiplication
     This function should only be called once ``global_thread_pool`` has been initialized.
 
 
-.. function:: slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong N)
-
-    Set ``(poly1, exp1, alloc)`` to ``(poly2, exps2, len2)`` times
-    ``(poly3, exps3, len3)`` using Johnson's heap method (see papers by
-    Michael Monagan and Roman Pearce). The function realocates its output, hence
-    the double indirection, and returns the length of the product. The function
-    assumes the exponent vectors take N words. No aliasing is allowed.
-
-.. function:: slong _fmpz_mpoly_mul_array(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong * mults, slong num, slong bits)
-
-    Set ``(poly1, exp1, alloc)`` to ``(poly2, exps2, len2)`` times
-    ``(poly3, exps3, len3)`` by accumulating coefficients in a big, dense
-    array. The function realocates its output, hence the double indirection, and
-    returns the length of the product. The array ``mults`` is a list of bases
-    to be used in encoding the array indices from the exponents. They should
-    exceed the maximum exponent for each field of the exponent vectors of the
-    output. The output exponent vectors will be packed with fields of the given
-    number of bits. The number of variables is given by ``num``. No aliasing
-    is allowed.
-
 Powering
 ----------------------------------------------------------------------
 
+.. function:: void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t k, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, slong k, slong N)
+    Set ``A`` to ``B`` raised to the `k`-th power.
+    This function throws if `k < 0` or if `k` is large and the polynomial is not a monomial with coefficient `\pm1`.
 
-    Set ``(poly2, exp1, alloc)`` ``(poly2, exp2, len2)`` raised to the
-    power of `k`. The function reallocates its output, hence the double
-    indirection. Assumes that exponents vectors each take `N` words. Uses the
-    FPS algorithm of Monagan and Pearce. No aliasing is allowed. Assumes
-    ``len2 > 1``.
+.. function:: void fmpq_mpoly_pow_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong k, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, slong k, const fmpz_mpoly_ctx_t ctx)
+    Set ``A`` to ``B`` raised to the `k`-th power.
+    This function throws if `k < 0`.
 
-    Set ``poly1`` to ``poly2`` raised to the `k`-th power, using the
-    Monagan and Pearce FPS algorithm. It is assumed that `k \geq 0`.
+.. function:: void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong k, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` raised to the `k`-th power, using the Monagan and Pearce FPS algorithm.
+    It is assumed that `k \geq 0`.
 
 
 Divisibility testing
@@ -724,88 +712,4 @@ Greatest Common Divisor
 
     If the return is nonzero, set ``poly1`` to the discriminant of
     ``poly2`` with respect to the variable of index ``var``.
-
-
-Univariates
-----------------------------------------------------------------------
-
-
-.. function:: void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Initialize ``poly``.
-
-.. function:: void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t poly, const fmpz_mpoly_ctx_t ctx)
-
-    Free all memory used by ``poly``.
-
-.. function:: void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t poly1, fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Swap ``poly1`` and ``poly2``.
-
-.. function:: void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t poly, slong length, const fmpz_mpoly_ctx_t ctx)
-
-    Make sure that ``poly`` has space for at least ``length`` terms.
-
-.. function:: int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
-
-    If return is nonzero, broke up ``poly2`` as a polynomial
-    in the variable of index ``var``
-    with multivariate coefficients in the other variables, and stored the result
-    in ``poly1``. The return is zero if and only if the degree of
-    ``poly2`` with respect to the variable of index ``var`` is greater
-    or equal to ``2^(FLINT_BITS-1)``.
-
-.. function:: void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Reverse the operation performed by ``fmpz_mpoly_to_univar``. This
-    function is currently undefined if the coefficients of ``poly2``
-    themselves depend on the main variable in ``poly2``. 
-
-.. function:: int fmpz_mpoly_univar_equal(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Return 1 if ``poly1`` and ``poly2`` are equal, otherwise return 0.
-
-.. function:: void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to ``poly2`` plus ``poly3``.
-
-.. function:: int fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    If return is nonzero, set ``poly1`` to ``poly2`` times ``poly3``.
-
-.. function:: void fmpz_mpoly_univar_derivative(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to the derivative of ``poly2`` with respect to
-    its main variable.
-
-.. function:: void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * shift1, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` and ``shift1`` so that `p_1*x^{s_1} = p_2`. The
-    shift is included because the ``fmpz_poly_t`` type is a dense type and
-    ``fmpz_mpoly_t`` is not. A call to
-    ``fmpz_poly_shift_left(poly1, poly1, shift1)``
-    will result in ``poly1`` being equal to ``poly2``. This function
-    is defined only if ``poly2`` depends solely on the variable
-    of index ``var``.
-
-.. function:: void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slong shift2, slong var, const fmpz_mpoly_ctx_t ctx)
-
-    Reverse the operation performed by ``fmpz_mpoly_to_fmpz_poly``.
-
-.. function:: void _fmpz_mpoly_univar_prem(fmpz_mpoly_univar_t polyA, const fmpz_mpoly_univar_t polyB, fmpz_mpoly_univar_t polyC, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``polyA`` to the pseudo remainder of ``polyA`` and -``polyB``.
-    The division is performed with respect to the variable store in
-    ``polyB``. An extra polynomial ``polyC`` is needed for workspace.
-
-.. function:: void _fmpz_mpoly_univar_pgcd(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``poly1`` to the last (nonzero) subresultant polynomial of
-    ``polyQ`` and ``polyQ``. It is assumed that `\operatorname{deg}(P)
-    \ge \operatorname{deg}(Q) \ge 1`.
-
-.. function:: void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ, const fmpz_mpoly_ctx_t ctx)
-
-    Perform the same operation as ``_fmpz_mpoly_univar_pgcd`` using the
-    algorithm of Ducos.
 
