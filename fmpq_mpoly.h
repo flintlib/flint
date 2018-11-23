@@ -499,6 +499,41 @@ FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_fmpz(fmpq_mpoly_t poly,
                      fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
 
 
+/* Random generation *********************************************************/
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_t state,
+                   slong length, mp_bitcnt_t coeff_bits, ulong * exp_bounds,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_randtest_bounds(A->zpoly, state,
+                                     length, coeff_bits, exp_bounds, ctx->zctx);
+    fmpq_randtest_not_zero(A->content, state, coeff_bits + 1);
+    fmpq_mpoly_reduce(A, ctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_t state,
+                   slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_randtest_bound(A->zpoly, state,
+                                     length, coeff_bits, exp_bound, ctx->zctx);
+    fmpq_randtest_not_zero(A->content, state, coeff_bits + 1);
+    fmpq_mpoly_reduce(A, ctx);
+}
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_randtest_bits(fmpq_mpoly_t A, flint_rand_t state,
+                   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_randtest_bits(A->zpoly, state,
+                                      length, coeff_bits, exp_bits, ctx->zctx);
+    fmpq_randtest_not_zero(A->content, state, coeff_bits + 1);
+    fmpq_mpoly_reduce(A, ctx);
+}
+
 
 /* Set and negate ************************************************************/
 
@@ -651,41 +686,6 @@ FLINT_DLL void fmpq_mpoly_resultant(fmpq_mpoly_t poly1,
 FLINT_DLL void fmpq_mpoly_discriminant(fmpq_mpoly_t poly1,
               const fmpq_mpoly_t poly2, slong var, const fmpq_mpoly_ctx_t ctx);
 */
-
-/* Random generation *********************************************************/
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, ulong * exp_bounds,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_randtest_bounds(A->zpoly, state,
-                                     length, coeff_bits, exp_bounds, ctx->zctx);
-    fmpq_randtest_not_zero(A->content, state, coeff_bits + 1);
-    fmpq_mpoly_reduce(A, ctx);
-}
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_randtest_bound(A->zpoly, state,
-                                     length, coeff_bits, exp_bound, ctx->zctx);
-    fmpq_randtest_not_zero(A->content, state, coeff_bits + 1);
-    fmpq_mpoly_reduce(A, ctx);
-}
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_randtest_bits(fmpq_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_randtest_bits(A->zpoly, state,
-                                      length, coeff_bits, exp_bits, ctx->zctx);
-    fmpq_randtest_not_zero(A->content, state, coeff_bits + 1);
-    fmpq_mpoly_reduce(A, ctx);
-}
 
 /******************************************************************************
 

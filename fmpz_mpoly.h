@@ -503,6 +503,22 @@ FLINT_DLL void _fmpz_mpoly_emplacebackterm_fmpz_pfmpz(fmpz_mpoly_t A,
                      fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
 
 
+/* Random generation *********************************************************/
+
+FLINT_DLL void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state,
+                        slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state,
+                     slong length, mp_bitcnt_t coeff_bits, ulong * exp_bounds,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state,
+                   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+
+
 #define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
 
@@ -971,21 +987,6 @@ fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
                                  fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
                 const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3,
                                         slong len, const fmpz_mpoly_ctx_t ctx);
-
-
-/* Random generation *********************************************************/
-
-FLINT_DLL void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state,
-                        slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state,
-                     slong length, mp_bitcnt_t coeff_bits, ulong * exp_bounds,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
-                                                   const fmpz_mpoly_ctx_t ctx);
 
 
 /* geobuckets ****************************************************************/

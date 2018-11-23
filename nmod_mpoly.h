@@ -343,6 +343,101 @@ FLINT_DLL void nmod_mpoly_set_coeff_ui_ui(nmod_mpoly_t A,
                        ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
 
 
+/* container operations ******************************************************/
+
+FLINT_DLL int nmod_mpoly_is_canonical(const nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+NMOD_MPOLY_INLINE
+slong nmod_mpoly_length(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+{
+    return A->length;
+}
+
+FLINT_DLL void nmod_mpoly_resize(nmod_mpoly_t A, slong new_length,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL ulong nmod_mpoly_get_term_coeff_ui(const nmod_mpoly_t A, slong i,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set_term_coeff_ui(nmod_mpoly_t A, slong i, ulong c,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+NMOD_MPOLY_INLINE
+int nmod_mpoly_term_exp_fits_ui(const nmod_mpoly_t A, slong i,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    return A->bits <= FLINT_BITS ? 1
+                     : mpoly_term_exp_fits_ui(A->exps, A->bits, i, ctx->minfo);
+}
+
+NMOD_MPOLY_INLINE
+int nmod_mpoly_term_exp_fits_si(const nmod_mpoly_t A, slong i,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    return A->bits <= FLINT_BITS ? 1
+                     : mpoly_term_exp_fits_si(A->exps, A->bits, i, ctx->minfo);
+}
+
+FLINT_DLL void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A,
+                                          slong i, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_get_term_exp_ui(ulong * exp, const nmod_mpoly_t A,
+                                          slong i, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i,
+                               fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_set_term_exp_ui(nmod_mpoly_t A, slong i,
+                                const ulong * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_push_term_ui_fmpz(nmod_mpoly_t A, ulong c,
+                               fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_push_term_ui_ui(nmod_mpoly_t A, ulong c,
+                                const ulong * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_sort_terms(nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_combine_like_terms(nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_reverse(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_assert_canonical(const nmod_mpoly_t poly,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _nmod_mpoly_radix_sort1(nmod_mpoly_t A, slong left, slong right,
+                              mp_bitcnt_t pos, ulong cmpmask, ulong totalmask);
+
+FLINT_DLL void _nmod_mpoly_radix_sort(nmod_mpoly_t A, slong left, slong right,
+                                    mp_bitcnt_t pos, slong N, ulong * cmpmask);
+
+FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_ui(nmod_mpoly_t A,
+                   mp_limb_t c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_ffmpz(nmod_mpoly_t A,
+                    mp_limb_t c, const fmpz * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_pfmpz(nmod_mpoly_t A,
+                  mp_limb_t c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
+
+
+/* Random generation *********************************************************/
+
+FLINT_DLL void nmod_mpoly_randtest_bounds(nmod_mpoly_t A, flint_rand_t state,
+                 slong length, ulong * exp_bounds, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_randtest_bound(nmod_mpoly_t A, flint_rand_t state,
+                    slong length, ulong exp_bound, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_randtest_bits(nmod_mpoly_t A, flint_rand_t state,
+               slong length, mp_bitcnt_t exp_bits, const nmod_mpoly_ctx_t ctx);
+
+
+
 
 FLINT_DLL void _nmod_mpoly_set_term_ui_fmpz(nmod_mpoly_t poly,
                         ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx);
@@ -510,87 +605,6 @@ FLINT_DLL void nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
 FLINT_DLL void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
                     const nmod_mpoly_t B, nmod_mpoly_struct * const * C,
                     const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC);
-
-/* container operations ******************************************************/
-
-FLINT_DLL int nmod_mpoly_is_canonical(const nmod_mpoly_t A,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-NMOD_MPOLY_INLINE
-slong nmod_mpoly_length(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-{
-    return A->length;
-}
-
-FLINT_DLL void nmod_mpoly_resize(nmod_mpoly_t A, slong new_length,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL ulong nmod_mpoly_get_term_coeff_ui(const nmod_mpoly_t A, slong i,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_set_term_coeff_ui(nmod_mpoly_t A, slong i, ulong c,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-NMOD_MPOLY_INLINE
-int nmod_mpoly_term_exp_fits_ui(const nmod_mpoly_t A, slong i,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_ui(A->exps, A->bits, i, ctx->minfo);
-}
-
-NMOD_MPOLY_INLINE
-int nmod_mpoly_term_exp_fits_si(const nmod_mpoly_t A, slong i,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_si(A->exps, A->bits, i, ctx->minfo);
-}
-
-FLINT_DLL void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A,
-                                          slong i, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_get_term_exp_ui(ulong * exp, const nmod_mpoly_t A,
-                                          slong i, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i,
-                               fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_set_term_exp_ui(nmod_mpoly_t A, slong i,
-                                const ulong * exp, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_push_term_ui_fmpz(nmod_mpoly_t A, ulong c,
-                               fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_push_term_ui_ui(nmod_mpoly_t A, ulong c,
-                                const ulong * exp, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_sort_terms(nmod_mpoly_t A,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_combine_like_terms(nmod_mpoly_t A,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_reverse(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_assert_canonical(const nmod_mpoly_t poly,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void _nmod_mpoly_radix_sort1(nmod_mpoly_t A, slong left, slong right,
-                              mp_bitcnt_t pos, ulong cmpmask, ulong totalmask);
-
-FLINT_DLL void _nmod_mpoly_radix_sort(nmod_mpoly_t A, slong left, slong right,
-                                    mp_bitcnt_t pos, slong N, ulong * cmpmask);
-
-FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_ui(nmod_mpoly_t A,
-                   mp_limb_t c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_ffmpz(nmod_mpoly_t A,
-                    mp_limb_t c, const fmpz * exp, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_pfmpz(nmod_mpoly_t A,
-                  mp_limb_t c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
 
 
 /******************************************************************************
@@ -1473,17 +1487,6 @@ FLINT_DLL void
 nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t r,
     const nmod_mpoly_t poly2, nmod_mpoly_struct * const * poly3, slong len,
                                                    const nmod_mpoly_ctx_t ctx);
-
-/* Random generation *********************************************************/
-
-FLINT_DLL void nmod_mpoly_randtest_bounds(nmod_mpoly_t poly, flint_rand_t state,
-                 slong length, ulong * exp_bounds, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_randtest_bound(nmod_mpoly_t poly, flint_rand_t state,
-                    slong length, ulong exp_bound, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_randtest_bits(nmod_mpoly_t poly, flint_rand_t state,
-               slong length, mp_bitcnt_t exp_bits, const nmod_mpoly_ctx_t ctx);
 
 
 /* geobuckets ****************************************************************/
