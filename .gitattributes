@@ -1,3 +1,1 @@
-.gitattributes export-ignore
-.gitignote export-ignore
-
+* text=auto
