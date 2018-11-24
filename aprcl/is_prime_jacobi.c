@@ -445,77 +445,93 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
     /* if we find q */
     if (p_counter != 0)
     {
-        ulong v, k;
-        slong h;
-        fmpz_t u;
-        unity_zp jacobi_sum;
-
-        fmpz_init(u);
-
-        /* find max k such that p^k | q - 1; if p = 2 => k = 2 */
-        k = p_power_in_q(q - 1, p);
-
-        /* compute J(p, q) */
-        unity_zp_init(jacobi_sum, p, k, n);
-        unity_zp_jacobi_sum_pq(jacobi_sum, q, p);
-
-        /* compute u and v */
-        fmpz_tdiv_q_ui(u, n, n_pow(p, k));
-        v = fmpz_tdiv_ui(n, n_pow(p, k));
-
-        /* if p == 2 */
-        if (p == 2)
+        if (fmpz_fdiv_ui(n, q) == 0 && !fmpz_equal_ui(n, q))
+           result = 2;
+        else
         {
-            /* find h using (2.c) */
-            h = _is_prime_jacobi_check_22(jacobi_sum, u, v, q);
-            /* if h not find or h not primitive root then n is composite */
-            if (h < 0 || h % 2 == 0)
-                result = 2;
-            else  /* else verify (4.a) */
-            {
-                fmpz_t ndec, ndecdiv, qpow;
+           ulong v, k;
+           slong h;
+           fmpz_t u;
+           unity_zp jacobi_sum;
 
-                fmpz_init_set(ndec, n);
-                fmpz_init(ndecdiv);
-                fmpz_init_set_ui(qpow, q);
+           fmpz_init(u);
 
-                /* ndec = n - 1 */
-                fmpz_sub_ui(ndec, ndec, 1);
-                /* ndecdiv = (n - 1) / 2 */
-                fmpz_fdiv_q_2exp(ndecdiv, ndec, 1);
-                /* qpow = q^{(n - 1) / 2} */
-                fmpz_powm(qpow, qpow, ndecdiv, n);
+           /* find max k such that p^k | q - 1; if p = 2 => k = 2 */
+           k = p_power_in_q(q - 1, p);
 
-                /* if q^{(n - 1) / 2} = -1 mod n then n can b prime */
-                if (fmpz_equal(qpow, ndec))
-                    result = 1;
-                else /* else n is composite */
-                    result = 2;
+           /* compute J(p, q) */
+           unity_zp_init(jacobi_sum, p, k, n);
+           unity_zp_jacobi_sum_pq(jacobi_sum, q, p);
 
-                fmpz_clear(ndec);
-                fmpz_clear(ndecdiv);
-                fmpz_clear(qpow);
-            }
-        }
-        else  /* if p != 2 */
-        {
-            /* find h using (2.a) */
-            h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
-            /* if h not find or h not primitive root then n is composite */
-            if (h < 0 || h % p == 0)
-                result = 2;
-            else /* else (4.b) is true and n can be prime */
-                result = 1;
-        }
+           /* compute u and v */
+           fmpz_tdiv_q_ui(u, n, n_pow(p, k));
+           v = fmpz_tdiv_ui(n, n_pow(p, k));
 
-        fmpz_clear(u);
-        unity_zp_clear(jacobi_sum);
+           /* if p == 2 */
+           if (p == 2)
+           {
+               /* find h using (2.c) */
+               h = _is_prime_jacobi_check_22(jacobi_sum, u, v, q);
+               /* if h not find or h not primitive root then n is composite */
+               if (h < 0 || h % 2 == 0)
+                  result = 2;
+               else  /* else verify (4.a) */
+               {
+                  fmpz_t ndec, ndecdiv, qpow;
+
+                   fmpz_init_set(ndec, n);
+                   fmpz_init(ndecdiv);
+                   fmpz_init_set_ui(qpow, q);
+
+                   /* ndec = n - 1 */
+                   fmpz_sub_ui(ndec, ndec, 1);
+                   /* ndecdiv = (n - 1) / 2 */
+                   fmpz_fdiv_q_2exp(ndecdiv, ndec, 1);
+                   /* qpow = q^{(n - 1) / 2} */
+                   fmpz_powm(qpow, qpow, ndecdiv, n);
+
+                   /* if q^{(n - 1) / 2} = -1 mod n then n can b prime */
+                   if (fmpz_equal(qpow, ndec))
+                      result = 1;
+                   else /* else n is composite */
+                      result = 2;
+
+                   fmpz_clear(ndec);
+                   fmpz_clear(ndecdiv);
+                   fmpz_clear(qpow);
+               }
+           }
+           else  /* if p != 2 */
+           {
+              /* find h using (2.a) */
+              h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
+              /* if h not find or h not primitive root then n is composite */
+              if (h < 0 || h % p == 0)
+                 result = 2;
+              else /* else (4.b) is true and n can be prime */
+                 result = 1;
+           }
+
+           fmpz_clear(u);
+           unity_zp_clear(jacobi_sum);
+       }
     }
 
     /* if we do not find a q then check (4.c) */
     if (p_counter == 0)
-        if (fmpz_tdiv_ui(n, p) == 0) /* if p | n then n is composite */
+    {
+       fmpz_t root;
+
+       if (fmpz_tdiv_ui(n, p) == 0) /* if p | n then n is composite */
             result = 2;
+
+       fmpz_init(root);
+
+       if (fmpz_is_perfect_power(root, n)) /* if n is perfect power, composite */
+          result = 2;
+
+       fmpz_clear(root);
+    }
     /* if we not find q and p not | n then we cant prove composite or primality */
 
     /* clear */
