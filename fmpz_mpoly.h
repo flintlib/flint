@@ -686,6 +686,31 @@ FLINT_DLL int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
 
 /* Division ******************************************************************/
 
+FLINT_DLL int fmpz_mpoly_divides(fmpz_mpoly_t Q, const fmpz_mpoly_t A,
+                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_divrem(fmpz_mpoly_t Q, fmpz_mpoly_t R,
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_quasidivrem(fmpz_t scale, fmpz_mpoly_t Q,
+     fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_div(fmpz_mpoly_t Q, const fmpz_mpoly_t A,
+                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_quasidiv(fmpz_t scale, fmpz_mpoly_t Q,
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** Q,
+     fmpz_mpoly_t R, const fmpz_mpoly_t A, fmpz_mpoly_struct * const * B,
+                                        slong len, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_quasidivrem_ideal(fmpz_t scale,
+     fmpz_mpoly_struct ** Q, fmpz_mpoly_t R, const fmpz_mpoly_t A,
+         fmpz_mpoly_struct * const * B, slong len, const fmpz_mpoly_ctx_t ctx);
+
+
 FLINT_DLL slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
            ulong ** expq, slong * allocq, const fmpz * poly2,
    const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
@@ -724,6 +749,12 @@ FLINT_DLL void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
 FLINT_DLL void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
+
+/* GCD ***********************************************************************/
+
+FLINT_DLL int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A,
+                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+
 
 /******************************************************************************
 

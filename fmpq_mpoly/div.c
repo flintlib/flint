@@ -29,7 +29,7 @@ void fmpq_mpoly_div(fmpq_mpoly_t Q, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
     }
 
     fmpz_init(scale);
-    fmpz_mpoly_quasidiv_heap(scale, Q->zpoly, A->zpoly, B->zpoly, ctx->zctx);
+    fmpz_mpoly_quasidiv(scale, Q->zpoly, A->zpoly, B->zpoly, ctx->zctx);
 
     fmpq_div(Q->content, A->content, B->content);
     fmpq_div_fmpz(Q->content, Q->content, scale);

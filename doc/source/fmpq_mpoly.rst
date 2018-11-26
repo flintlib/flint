@@ -89,7 +89,7 @@ Memory management
 
 
 Input/Output
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
     The variable strings in ``x`` start with the variable of most significance at index ``0``. If ``x`` is ``NULL``, the variables are named ``x1``, ``x2``, ect.
 
@@ -114,7 +114,7 @@ Input/Output
 
 
 Basic manipulation
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpq_mpoly_gen(fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
@@ -494,10 +494,9 @@ Powering
     Set ``A`` to ``B`` raised to the `k`-th power.
     This function throws if `k < 0` or if `k` is large and the polynomial is not a monomial with coefficient `\pm1`.
 
-.. function:: void fmpq_mpoly_pow_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong k, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong k, const fmpq_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` raised to the `k`-th power.
-    This function throws if `k < 0`.
 
 
 Division

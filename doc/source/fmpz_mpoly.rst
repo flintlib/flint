@@ -29,7 +29,7 @@ Types, macros and constants
 
 
 Context object
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, slong nvars, const ordering_t ord)
@@ -49,7 +49,7 @@ Context object
 
 
 Memory management
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
@@ -86,7 +86,7 @@ Memory management
 
 
 Input/Output
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
     The variable strings in ``x`` start with the variable of most significance at index ``0``. If ``x`` is ``NULL``, the variables are named ``x1``, ``x2``, ect.
 
@@ -111,14 +111,14 @@ Input/Output
 
 
 Basic manipulation
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_gen(fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
 
     Set ``A`` to the variable of index ``var``, where ``var = 0`` corresponds to the variable with the most significance with respect to the ordering. 
 
-.. function:: int fmpz_mpoly_is_gen(const fmpq_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_is_gen(const fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
 
     If `var \ge 0`, return ``1`` if ``A`` is equal to the `var`-th generator, otherwise return ``0``.
     If `var < 0`, return ``1`` if the polynomial is equal to any generator, otherwise return ``0``.
@@ -149,7 +149,7 @@ Basic manipulation
 
 
 Constants
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
@@ -195,7 +195,7 @@ Constants
 
 
 Degrees
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: int fmpz_mpoly_degrees_fit_si(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
@@ -229,7 +229,7 @@ Degrees
 
 
 Coefficients
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_get_coeff_fmpz_monomial(fmpz_t c, const fmpz_mpoly_t A, const fmpz_mpoly_t M, const fmpz_mpoly_ctx_t ctx)
@@ -272,7 +272,7 @@ Coefficients
 
 
 Container operations
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
     These functions deal with violations of the internal canonical representation.
     If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
@@ -282,7 +282,7 @@ Container operations
     Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
     To be in canonical form, all of the terms must have nonzero coefficient, and the terms must be sorted from greatest to least.
 
-.. function:: slong fmpz_mpoly_length(const fmpz_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+.. function:: slong fmpz_mpoly_length(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
     Return the number of terms in ``A``.
     If the polynomial is in canonical form, this will be the number of nonzero coefficients.
@@ -359,7 +359,7 @@ Container operations
 
 
 Random generation
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state, slong length, mp_limb_t coeff_bits, ulong exp_bound, const fmpz_mpoly_ctx_t ctx)
@@ -381,7 +381,7 @@ Random generation
 
 
 Addition/Subtraction
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
@@ -447,7 +447,7 @@ Scalar operations
 
 
 Differentiation/Integration
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_derivative(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
@@ -460,7 +460,7 @@ Differentiation/Integration
 
 
 Evaluation
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A, fmpz * const * vals, const fmpz_mpoly_ctx_t ctx)
@@ -486,7 +486,7 @@ Evaluation
 
 
 Multiplication
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
@@ -520,7 +520,7 @@ Multiplication
 
 
 Powering
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 .. function:: void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t k, const fmpz_mpoly_ctx_t ctx)
 
@@ -537,8 +537,56 @@ Powering
     It is assumed that ``B`` is not zero and `k \geq 2`.
 
 
-Divisibility testing
-----------------------------------------------------------------------
+Division
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpz_mpoly_divides(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    If ``A`` is divisible by ``B``, set ``Q`` to the exact quotient and return ``1``. Otherwise, set ``Q`` to zero and return ``0``.
+    Note that the function :func:`fmpz_mpoly_div` may be faster if the quotient is known to be exact.
+
+.. function:: void fmpz_mpoly_divrem(fmpz_mpoly_t Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``Q`` and ``R`` to the quotient and remainder of ``A`` divided by ``B``. The monomials in ``R`` divisible by the leading monomial of ``B`` will have coefficients reduced modulo the absolute value of the leading coefficient of ``B``.
+    Note that this function is not very useful.
+
+.. function:: void fmpz_mpoly_quasidivrem(fmpz_t scale, fmpz_mpoly_t Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``scale``, ``Q`` and ``R`` so that ``Q`` and ``R` are the quotient and remainder of ``scale*A`` divided by ``B``. No monomials in ``R`` will be divisible by the leading monomial of ``B``.
+
+.. function:: void fmpz_mpoly_div(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Perform the operation of :func:`fmpz_mpoly_divrem` and discard ``R``.
+    Note that this function is not very useful.
+
+.. function:: void fmpz_mpoly_quasidiv(fmpz_t scale, fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Perform the operation of :func:`fmpz_mpoly_quasidivrem` and discard ``R``.
+
+.. function:: void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, fmpz_mpoly_struct * const * B, slong len, const fmpz_mpoly_ctx_t ctx)
+
+    This function is as per :func:`fmpz_mpoly_divrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
+    The number of divisor (and hence quotient) polynomials, is given by ``len``.
+    Note that this function is not very useful.
+
+.. function:: void fmpz_mpoly_quasidivrem_ideal(fmpz_t scale, fmpz_mpoly_struct ** Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, fmpz_mpoly_struct * const * B, slong len, const fmpz_mpoly_ctx_t ctx)
+
+    This function is as per :func:`fmpz_mpoly_quasidivrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
+    The number of divisor (and hence quotient) polynomials, is given by ``len``.
+
+
+Greatest Common Divisor
+--------------------------------------------------------------------------------
+
+.. function:: int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` with positive leading coefficient. The GCD of zero and zero is defined to be zero.
+    If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
+
+
+Internal Functions
+--------------------------------------------------------------------------------
 
 
 .. function:: slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong * mults, slong num, slong bits)
@@ -581,10 +629,6 @@ Divisibility testing
     of Michael Monagan and Roman Pearce. Note that the function
     ``fmpz_mpoly_div_monagan_pearce`` below may be much faster if the
     quotient is known to be exact.
-
-
-Division
-----------------------------------------------------------------------
 
 
 .. function:: slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq, ulong ** expq, slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N)
@@ -662,10 +706,6 @@ Division
     ``poly3`` is zero or if an exponent overflow occurs.
 
 
-Reduction
-----------------------------------------------------------------------
-
-
 .. function:: slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq, fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3, ulong * const * exp3, slong len, slong N, slong bits, const fmpz_mpoly_ctx_t ctx)
 
     This function is as per ``_fmpz_mpoly_divrem_monagan_pearce`` except
@@ -685,10 +725,6 @@ Reduction
     quotient) polynomials, is given by ``len``. The function computes
     polynomials `q_i = q[i]` such that ``poly2`` is
     `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
-
-
-Greatest Common Divisor
-----------------------------------------------------------------------
 
 
 .. function:: void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)

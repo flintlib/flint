@@ -13,56 +13,58 @@
 
 
 /* Assumes divisor polys don't alias any output polys */
-void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
-    const fmpq_mpoly_t a, fmpq_mpoly_struct * const * b, slong len,
+void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** Q, fmpq_mpoly_t R,
+              const fmpq_mpoly_t A, fmpq_mpoly_struct * const * B, slong len,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     slong i;
     fmpz_t scale;
     fmpq_t t;
-    fmpz_mpoly_struct ** qarr, ** barr;
+    fmpz_mpoly_struct ** Qarr, ** Barr;
     TMP_INIT;
 
     /* check none of the divisor polynomials is zero */
     for (i = 0; i < len; i++)
     {
-        if (fmpq_mpoly_is_zero(b[i], ctx))
+        if (fmpq_mpoly_is_zero(B[i], ctx))
+        {
             flint_throw(FLINT_DIVZERO, "Divide by zero in fmpq_mpoly_divrem_ideal");
+        }
     }
 
     /* dividend is zero, write out quotients and remainder */
-    if (fmpq_mpoly_is_zero(a, ctx))
+    if (fmpq_mpoly_is_zero(A, ctx))
     {
         for (i = 0; i < len; i++)
-            fmpq_mpoly_zero(q[i], ctx);
-        fmpq_mpoly_zero(r, ctx);
+            fmpq_mpoly_zero(Q[i], ctx);
+        fmpq_mpoly_zero(R, ctx);
         return;
     }
 
     TMP_START;
-    qarr = (fmpz_mpoly_struct **) TMP_ALLOC(len*sizeof(fmpz_mpoly_struct *));
-    barr = (fmpz_mpoly_struct **) TMP_ALLOC(len*sizeof(fmpz_mpoly_struct *));
+    Qarr = (fmpz_mpoly_struct **) TMP_ALLOC(len*sizeof(fmpz_mpoly_struct *));
+    Barr = (fmpz_mpoly_struct **) TMP_ALLOC(len*sizeof(fmpz_mpoly_struct *));
 
     for (i = 0; i < len; i++)
     {
-        qarr[i] = q[i]->zpoly;
-        barr[i] = b[i]->zpoly;
+        Qarr[i] = Q[i]->zpoly;
+        Barr[i] = B[i]->zpoly;
     }
     fmpz_init(scale);
-    fmpz_mpoly_quasidivrem_ideal_heap(scale, qarr, r->zpoly,
-                                               a->zpoly, barr, len, ctx->zctx);
+    fmpz_mpoly_quasidivrem_ideal_heap(scale, Qarr, R->zpoly,
+                                               A->zpoly, Barr, len, ctx->zctx);
 
     fmpq_init(t);
-    fmpq_div_fmpz(t, a->content, scale);
+    fmpq_div_fmpz(t, A->content, scale);
     for (i = 0; i < len; i++)
-        fmpq_div(q[i]->content, t, b[i]->content);
-    fmpq_swap(t, r->content);
+        fmpq_div(Q[i]->content, t, B[i]->content);
+    fmpq_swap(t, R->content);
     fmpq_clear(t);
     fmpz_clear(scale);
 
     for (i = 0; i < len; i++)
-        fmpq_mpoly_reduce(q[i], ctx);
-    fmpq_mpoly_reduce(r, ctx);
+        fmpq_mpoly_reduce(Q[i], ctx);
+    fmpq_mpoly_reduce(R, ctx);
 
     TMP_END;
 }

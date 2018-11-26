@@ -84,7 +84,7 @@ Memory management
 
 
 Input/Output
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
     The variable strings in ``x`` start with the variable of most significance at index ``0``. If ``x`` is ``NULL``, the variables are named ``x1``, ``x2``, ect.
 
@@ -134,7 +134,7 @@ Basic manipulation
 
 
 Constants
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: int nmod_mpoly_is_ui(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
@@ -172,7 +172,7 @@ Constants
 
 
 Degrees
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 .. function:: int nmod_mpoly_degrees_fit_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
@@ -233,7 +233,7 @@ Coefficients
 
 
 Container operations
-----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
     These functions deal with violations of the internal canonical representation.
     If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
@@ -442,14 +442,29 @@ Powering
     Set `A` to `B` raised to the `k`-th power using repeated multiplications.
 
 
-Divisibility testing
+Division
 --------------------------------------------------------------------------------
 
+The division functions will generally throw if the leading coefficient of a divisor polynomial is not invertible.
 
 .. function:: int nmod_mpoly_divides(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
-    If `A` is divisible by `B`, set `Q` to the exact quotient and return `1`. Otherwise, set `Q` to zero and return `0`.
+    If ``A`` is divisible by ``B``, set ``Q`` to the exact quotient and return ``1``. Otherwise, set ``Q`` to zero and return ``0``.
     Note that the function ``nmod_mpoly_div`` below may be faster if the quotient is known to be exact.
+
+.. function:: void nmod_mpoly_div(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Set ``Q`` to the quotient of ``A`` by ``B``, discarding the remainder.
+
+.. function:: void nmod_mpoly_divrem(nmod_mpoly_t Q, nmod_mpoly_t R, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Set ``Q`` and ``R`` to the quotient and remainder of ``A`` divided by ``B``.
+
+.. function:: void nmod_mpoly_divrem_ideal(nmod_mpoly_struct ** Q, nmod_mpoly_t R, const nmod_mpoly_t A, nmod_mpoly_struct * const * B, slong len, const nmod_mpoly_ctx_t ctx)
+
+    This function is as per :func:`fmpq_mpoly_divrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
+    The number of divisor (and hence quotient) polynomials, is given by ``len``.
+
 
 .. function:: int nmod_mpoly_divides_dense(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
@@ -466,7 +481,18 @@ Divisibility testing
     This function should only be called once ``global_thread_pool`` has been initialized.
 
 
-Division
+Greatest Common Divisor
+--------------------------------------------------------------------------------
+
+
+.. function:: int nmod_mpoly_gcd(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Try to set ``G`` to the monic GCD of ``A`` and ``B``. The GCD of zero and zero is defined to be zero.
+    If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
+    If the modulus is not prime, this function will probably return ``0`` quickly.
+
+
+Internal Functions
 --------------------------------------------------------------------------------
 
 
@@ -488,10 +514,6 @@ Division
     Monagan and Roman Pearce.
 
 
-Reduction
---------------------------------------------------------------------------------
-
-
 .. function:: void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t r, const nmod_mpoly_t poly2, nmod_mpoly_struct * const * poly3, slong len, const nmod_mpoly_ctx_t ctx)
 
     This function is as per ``nmod_mpoly_divrem_monagan_pearce`` except
@@ -500,10 +522,6 @@ Reduction
     quotient) polynomials, is given by ``len``. The function computes
     polynomials `q_i = q[i]` such that ``poly2`` is
     `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
-
-
-Greatest Common Divisor
---------------------------------------------------------------------------------
 
 
 .. function:: int nmod_mpoly_gcd_brown(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)

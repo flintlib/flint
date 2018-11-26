@@ -23,7 +23,7 @@ int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A,
         return 1;
     }
 
-    success = fmpz_mpoly_gcd_brown(G->zpoly, A->zpoly, B->zpoly, ctx->zctx);
+    success = fmpz_mpoly_gcd(G->zpoly, A->zpoly, B->zpoly, ctx->zctx);
     if (success)
     {
         _fmpq_mpoly_make_monic_inplace(G, ctx);

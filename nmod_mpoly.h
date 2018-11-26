@@ -572,11 +572,24 @@ FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
                                           ulong k, const nmod_mpoly_ctx_t ctx);
 
 
-/* Divisibility **************************************************************/
+/* Division ******************************************************************/
 
 FLINT_DLL int nmod_mpoly_divides(nmod_mpoly_t Q,
                         const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_div(nmod_mpoly_t Q,
+                                 const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_divrem(nmod_mpoly_t Q, nmod_mpoly_t R,
+                                  const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_divrem_ideal(nmod_mpoly_struct ** Q, nmod_mpoly_t R,
+                const nmod_mpoly_t A, nmod_mpoly_struct * const * B, slong len,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 
 FLINT_DLL int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
                   const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
@@ -596,15 +609,25 @@ FLINT_DLL slong _nmod_mpoly_divides_monagan_pearce(
                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
      mp_bitcnt_t bits, slong N, const ulong * cmpmask, const nmodf_ctx_t fctx);
 
-/* Division ******************************************************************/
-
-FLINT_DLL void nmod_mpoly_div_monagan_pearce(nmod_mpoly_t q,
-                     const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
+FLINT_DLL void nmod_mpoly_div_monagan_pearce(nmod_mpoly_t Q,
+                                 const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
                   const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
                                                    const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void
+nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** Q, nmod_mpoly_t R,
+    const nmod_mpoly_t A, nmod_mpoly_struct * const * B, slong len,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+
+/* GCD ***********************************************************************/
+
+FLINT_DLL int nmod_mpoly_gcd(nmod_mpoly_t G, const nmod_mpoly_t A,
+                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
 
 /******************************************************************************
 
