@@ -14,8 +14,8 @@
 #include "fmpz_mpoly.h"
 
 
-void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                           slong k, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                           ulong k, const nmod_mpoly_ctx_t ctx)
 {
     slong i, exp_bits, N;
     fmpz * maxBfields;
@@ -23,11 +23,6 @@ void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B,
     ulong * Bexp;
     int freeBexp;
     TMP_INIT;
-
-    if (k < 0)
-    {
-        flint_throw(FLINT_ERROR, "Negative power in nmod_mpoly_pow_si");
-    }
 
     if (k == 0)
     {
@@ -59,7 +54,7 @@ void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B,
     {
         nmod_mpoly_t T;
         nmod_mpoly_init(T, ctx);
-        nmod_mpoly_pow_si(T, B, k, ctx);
+        nmod_mpoly_pow_ui(T, B, k, ctx);
         nmod_mpoly_swap(A, T, ctx);
         nmod_mpoly_clear(T, ctx);
         return;
@@ -101,7 +96,7 @@ void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B,
         A->bits = exp_bits;
 
         if (exp_bits <= FLINT_BITS)
-            mpoly_monomial_mul_si(A->exps, Bexp, N, k);
+            mpoly_monomial_mul_ui(A->exps, Bexp, N, k);
         else
             mpoly_monomial_mul_ui_mp(A->exps, Bexp, N, k);
 
@@ -163,7 +158,7 @@ void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B,
             while (k > 0)
             {
                 ulong kmodn;
-                NMOD_RED(kmodn, (ulong)(k), ctx->ffinfo->mod);
+                NMOD_RED(kmodn, k, ctx->ffinfo->mod);
 
                 if (kmodn > 0)
                 {

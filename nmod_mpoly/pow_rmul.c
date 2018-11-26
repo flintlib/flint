@@ -12,14 +12,14 @@
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                         slong k, const nmod_mpoly_ctx_t ctx)
+                                         ulong k, const nmod_mpoly_ctx_t ctx)
 {
     nmod_mpoly_t T;
     nmod_mpoly_init(T, ctx);
 
     if (A == B)
     {
-        nmod_mpoly_pow_rmul(T, A, pow, ctx);
+        nmod_mpoly_pow_rmul(T, A, k, ctx);
         nmod_mpoly_swap(T, A, ctx);
         goto cleanup;
     }
@@ -28,13 +28,8 @@ void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
     while (k >= 1)
     { 
         nmod_mpoly_mul_johnson(T, A, B, ctx);
-        if (k == 1)
-        {
-            nmod_mpoly_swap(A, T, ctx);
-            break;
-        }
-        nmod_mpoly_mul_johnson(A, T, B, ctx);
-        k -= 2;
+        nmod_mpoly_swap(A, T, ctx);
+        k -= 1;
     }
 
 cleanup:

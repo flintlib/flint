@@ -10,8 +10,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
@@ -28,6 +26,9 @@ void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, mp_bitcnt_t bits,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
    slong N = mpoly_words_per_exp(bits, ctx->minfo);
+
+    /* sanitize alloc input */
+    alloc = FLINT_MAX(alloc, WORD(0));
 
    if (alloc != 0)
    {

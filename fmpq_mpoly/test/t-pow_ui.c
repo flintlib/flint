@@ -18,7 +18,7 @@ main(void)
     int i, j, k, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pow_si....");
+    flint_printf("pow_ui....");
     fflush(stdout);
 
     /* Check against rmul */
@@ -50,7 +50,7 @@ main(void)
             fmpq_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpq_mpoly_randtest_bits(h, state, len2, coeff_bits, exp_bits2, ctx);
 
-            fmpq_mpoly_pow_si(h, f, j, ctx);
+            fmpq_mpoly_pow_ui(h, f, j, ctx);
             fmpq_mpoly_assert_canonical(h, ctx);
 
             fmpq_mpoly_one(g, ctx);
@@ -96,10 +96,8 @@ main(void)
 
         for (j = 0; j < 10; j++)
         {
-            /* make sure power is random positive si */
-            fmpz_randtest_unsigned(power, state, FLINT_BITS);
-            if (!fmpz_fits_si(power))
-                continue;
+            /* make sure power is random ui */
+            fmpz_set_ui(power, n_randlimb(state));
 
             /* set f to a random monomial */
             fmpq_mpoly_one(f, ctx);
@@ -116,7 +114,7 @@ main(void)
             fmpq_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpq_mpoly_randtest_bits(h, state, len2, coeff_bits, exp_bits2, ctx);
 
-            fmpq_mpoly_pow_si(g, f, fmpz_get_si(power), ctx);
+            fmpq_mpoly_pow_ui(g, f, fmpz_get_ui(power), ctx);
             fmpq_mpoly_assert_canonical(h, ctx);
 
             fmpq_mpoly_pow_fmpz(h, f, power, ctx);

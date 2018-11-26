@@ -230,7 +230,7 @@ void fq_nmod_mpoly_cvtfrom_poly_notmain(fq_nmod_mpoly_t A, fq_nmod_poly_t a,
     k = 0;
     for (i = fq_nmod_poly_length(a, ctx->fqctx) - 1; i >= 0; i--)
     {
-        mpoly_monomial_mul_si(A->exps + N*k, oneexp, N, i);
+        mpoly_monomial_mul_ui(A->exps + N*k, oneexp, N, i);
         fq_nmod_poly_get_coeff(A->coeffs + k, a, i, ctx->fqctx);
         k += !fq_nmod_is_zero(A->coeffs + k, ctx->fqctx);
     }

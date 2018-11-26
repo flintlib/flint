@@ -46,7 +46,7 @@ main(void)
     int i, j, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pow_si....");
+    flint_printf("pow_ui....");
     fflush(stdout);
 
     /* Check pow_si against pow_naive */
@@ -81,7 +81,7 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
             fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
-            fmpz_mpoly_pow_si(g, f, pow, ctx);
+            fmpz_mpoly_pow_ui(g, f, pow, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
             fmpz_mpoly_pow_naive(h, f, pow, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
@@ -130,9 +130,9 @@ main(void)
             fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
-            fmpz_mpoly_pow_si(g, f, pow, ctx);
+            fmpz_mpoly_pow_ui(g, f, pow, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
-            fmpz_mpoly_pow_si(f, f, pow, ctx);
+            fmpz_mpoly_pow_ui(f, f, pow, ctx);
             fmpz_mpoly_assert_canonical(f, ctx);
             result = fmpz_mpoly_equal(f, g, ctx);
 

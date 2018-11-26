@@ -417,7 +417,7 @@ void fmpz_mpoly_from_fmpz_poly_keepbits(fmpz_mpoly_t A, const fmpz_poly_t B,
     for (k = fmpz_poly_degree(B); k >= 0; k--)
     {
         _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
-        mpoly_monomial_mul_si(Aexp + N*Alen, one, N, k + Bshift);
+        mpoly_monomial_mul_ui(Aexp + N*Alen, one, N, k + Bshift);
         fmpz_poly_get_coeff_fmpz(Acoeff + Alen, B, k);
         Alen += !fmpz_is_zero(Acoeff + Alen);
     }

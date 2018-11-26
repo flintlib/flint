@@ -11,14 +11,9 @@
 
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_pow_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                           slong k, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_pow_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                           ulong k, const fmpz_mpoly_ctx_t ctx)
 {
-    if (k < 0)
-    {
-        flint_throw(FLINT_ERROR, "Negative power in fmpz_mpoly_pow_si");
-    }
-
     if (B->length == 0)
     {
         fmpz_mpoly_set_ui(A, k == 0, ctx);
@@ -28,7 +23,7 @@ void fmpz_mpoly_pow_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     {
         if (k == 2)
         {
-            fmpz_mpoly_mul_johnson(A, B, B, ctx);
+            fmpz_mpoly_mul(A, B, B, ctx);
         }
         else if (k == 1)
         {

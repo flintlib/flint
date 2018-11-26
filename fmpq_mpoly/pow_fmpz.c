@@ -11,7 +11,6 @@
 
 #include "fmpq_mpoly.h"
 
-
 void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                     const fmpz_t k, const fmpq_mpoly_ctx_t ctx)
 {
@@ -20,10 +19,14 @@ void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
         flint_throw(FLINT_ERROR, "Negative power in fmpq_mpoly_pow_fmpz");
     }
 
+    /*
+        since there is no fmpq_pow_ui function, it is simplest
+        to just send the [ui but not si] case down the fmpz path
+    */
     if (fmpz_fits_si(k))
     {
         fmpq_pow_si(A->content, B->content, fmpz_get_si(k));
-        fmpz_mpoly_pow_si(A->zpoly, B->zpoly, fmpz_get_si(k), ctx->zctx);
+        fmpz_mpoly_pow_ui(A->zpoly, B->zpoly, fmpz_get_si(k), ctx->zctx);
         return;
     }
 

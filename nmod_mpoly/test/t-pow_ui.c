@@ -45,7 +45,7 @@ main(void)
     int i, j;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pow_si....");
+    flint_printf("pow_ui....");
     fflush(stdout);
 
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -94,9 +94,9 @@ main(void)
             nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
-            nmod_mpoly_pow_si(g, f, pow, ctx);
+            nmod_mpoly_pow_ui(g, f, pow, ctx);
             nmod_mpoly_assert_canonical(g, ctx);
-            nmod_mpoly_pow_naive(h, f, pow, ctx);
+            nmod_mpoly_pow_rmul(h, f, pow, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
 
             if (!nmod_mpoly_equal(g, h, ctx))
@@ -106,7 +106,7 @@ main(void)
                 flint_abort();
             }
 
-            nmod_mpoly_pow_si(f, f, pow, ctx);
+            nmod_mpoly_pow_ui(f, f, pow, ctx);
             nmod_mpoly_assert_canonical(f, ctx);
 
             if (!nmod_mpoly_equal(g, f, ctx))

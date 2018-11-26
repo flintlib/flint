@@ -527,10 +527,9 @@ Powering
     Set ``A`` to ``B`` raised to the `k`-th power.
     This function throws if `k < 0` or if `k` is large and the polynomial is not a monomial with coefficient `\pm1`.
 
-.. function:: void fmpz_mpoly_pow_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong k, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_pow_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong k, const fmpz_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` raised to the `k`-th power.
-    This function throws if `k < 0`.
 
 .. function:: void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong k, const fmpz_mpoly_ctx_t ctx)
 

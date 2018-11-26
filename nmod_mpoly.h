@@ -565,11 +565,11 @@ FLINT_DLL slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slon
 FLINT_DLL void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B,
                                    const fmpz_t k, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                          slong k, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                          ulong k, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                          slong k, const nmod_mpoly_ctx_t ctx);
+                                          ulong k, const nmod_mpoly_ctx_t ctx);
 
 
 /* Divisibility **************************************************************/
@@ -1539,8 +1539,8 @@ FLINT_DLL void nmod_mpoly_geobucket_neg_inplace(nmod_mpoly_geobucket_t B1,
 FLINT_DLL void nmod_mpoly_geobucket_mul_inplace(nmod_mpoly_geobucket_t B1,
                         nmod_mpoly_geobucket_t B2, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_geobucket_pow_si_inplace(nmod_mpoly_geobucket_t B1,
-                                          slong k, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_geobucket_pow_ui_inplace(nmod_mpoly_geobucket_t B1,
+                                          ulong k, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_geobucket_pow_fmpz_inplace(nmod_mpoly_geobucket_t B1,
                                    const fmpz_t k, const nmod_mpoly_ctx_t ctx);

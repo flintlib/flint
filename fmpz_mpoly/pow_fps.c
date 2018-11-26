@@ -13,7 +13,7 @@
 #include "fmpz_mpoly.h"
 
 slong _fmpz_mpoly_pow_fps1(fmpz ** poly1, ulong ** exp1, slong * alloc,
-                 const fmpz * poly2, const ulong * exp2, slong len2, slong k,
+                 const fmpz * poly2, const ulong * exp2, slong len2, ulong k,
                                                                   ulong maskhi)
 {
    const slong topbit = (WORD(1) << (FLINT_BITS - 1));
@@ -392,8 +392,8 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
     if (bits <= FLINT_BITS)
     {
-        mpoly_monomial_mul_si(ge + 0, exp2 + 0, N, k - 1);
-        mpoly_monomial_mul_si(e1 + 0, exp2 + 0, N, k);
+        mpoly_monomial_mul_ui(ge + 0, exp2 + 0, N, k - 1);
+        mpoly_monomial_mul_ui(e1 + 0, exp2 + 0, N, k);
     } else
     {
         mpoly_monomial_mul_ui_mp(ge + 0, exp2 + 0, N, k - 1);
@@ -428,7 +428,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
     for (i = 0; i < len2; i++)
     {
         if (bits <= FLINT_BITS)
-            mpoly_monomial_mul_si(fik + i*N, exp2 + i*N, N, k - 1);
+            mpoly_monomial_mul_ui(fik + i*N, exp2 + i*N, N, k - 1);
         else
             mpoly_monomial_mul_ui_mp(fik + i*N, exp2 + i*N, N, k - 1);
     }
@@ -561,7 +561,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
       if (!fmpz_is_zero(C))
       {
          if (bits <= FLINT_BITS)
-             mpoly_monomial_mul_si(temp2, exp2 + 0, N, k);
+             mpoly_monomial_mul_ui(temp2, exp2 + 0, N, k);
          else
              mpoly_monomial_mul_ui_mp(temp2, exp2 + 0, N, k);
 
@@ -629,7 +629,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
 }
 
 void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                           slong k, const fmpz_mpoly_ctx_t ctx)
+                                           ulong k, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, N, len = 0;
     fmpz * maxBfields;
@@ -680,7 +680,7 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
         fmpz_pow_ui(A->coeffs + 0, B->coeffs + 0, k);
 
         if (exp_bits <= FLINT_BITS)
-            mpoly_monomial_mul_si(A->exps, Bexp, N, k);
+            mpoly_monomial_mul_ui(A->exps, Bexp, N, k);
         else
             mpoly_monomial_mul_ui_mp(A->exps, Bexp, N, k);
 

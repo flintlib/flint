@@ -24,9 +24,9 @@ void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B,
         flint_throw(FLINT_ERROR, "Negative power in nmod_mpoly_pow_fmpz");
     }
 
-    if (fmpz_fits_si(k))
+    if (fmpz_abs_fits_ui(k))
     {
-        nmod_mpoly_pow_si(A, B, fmpz_get_si(k), ctx);
+        nmod_mpoly_pow_ui(A, B, fmpz_get_ui(k), ctx);
         return;
     }
 

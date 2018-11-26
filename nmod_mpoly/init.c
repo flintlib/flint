@@ -26,6 +26,9 @@ void nmod_mpoly_init3(nmod_mpoly_t A, slong alloc, mp_bitcnt_t bits,
 {
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
+    /* sanitize alloc input */
+    alloc = FLINT_MAX(alloc, WORD(0));
+
     if (alloc != 0)
     {
         A->coeffs = (mp_limb_t *) flint_malloc(alloc*sizeof(mp_limb_t));

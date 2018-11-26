@@ -650,8 +650,8 @@ FLINT_DLL void fmpq_mpoly_mul(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 FLINT_DLL void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                    const fmpz_t k, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pow_si(fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                                          slong k, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                          ulong k, const fmpq_mpoly_ctx_t ctx);
 
 /* Divisibility **************************************************************/
 

@@ -13,7 +13,7 @@
 
 
 void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                   const  fmpz_t k, const fmpz_mpoly_ctx_t ctx)
+                                    const fmpz_t k, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     fmpz * maxBfields;
@@ -25,9 +25,9 @@ void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
         flint_throw(FLINT_ERROR, "Negative power in fmpz_mpoly_pow_fmpz");
     }
 
-    if (fmpz_fits_si(k))
+    if (fmpz_abs_fits_ui(k))
     {
-        fmpz_mpoly_pow_si(A, B, fmpz_get_si(k), ctx);
+        fmpz_mpoly_pow_ui(A, B, fmpz_get_ui(k), ctx);
         return;
     }
 

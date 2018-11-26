@@ -63,7 +63,7 @@ void _nmod_mpoly_pmul(nmod_mpoly_t A, const nmod_mpoly_t X, const fmpz_t pow,
     
     if (X->length <= WORD(2) || A->length/p < X->length)
     {
-        nmod_mpoly_pow_si(T, X, p, ctx);
+        nmod_mpoly_pow_ui(T, X, p, ctx);
         nmod_mpoly_mul(A, A, T, ctx);
         return;
     }

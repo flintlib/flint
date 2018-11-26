@@ -418,7 +418,7 @@ void mpoly_monomial_swap(ulong * exp2, ulong * exp3, slong N)
 }
 
 MPOLY_INLINE
-void mpoly_monomial_mul_si(ulong * exp2, const ulong * exp3, slong N, slong c)
+void mpoly_monomial_mul_ui(ulong * exp2, const ulong * exp3, slong N, ulong c)
 {
    slong i;
    for (i = 0; i < N; i++)

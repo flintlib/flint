@@ -243,7 +243,7 @@ void nmod_mpoly_cvtfrom_poly_notmain(nmod_mpoly_t A, nmod_poly_t a,
         if (c != UWORD(0))
         {
             A->coeffs[k] = c;
-            mpoly_monomial_mul_si(A->exps + N*k, oneexp, N, i);
+            mpoly_monomial_mul_ui(A->exps + N*k, oneexp, N, i);
             k++;
         }
     }

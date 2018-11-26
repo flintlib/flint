@@ -49,35 +49,30 @@ typedef stack_entry_struct stack_entry_t[1];
 void _fmpz_mpoly_pmul(fmpz_mpoly_t A, const fmpz_mpoly_t X, const fmpz_t pow,
                                        fmpz_mpoly_t T, const fmpz_mpoly_ctx_t ctx)
 {
-    slong p;
+    ulong p;
     FLINT_ASSERT(fmpz_sgn(pow) > 0);
 
-    if (!fmpz_fits_si(pow))
+    if (!fmpz_abs_fits_ui(pow))
     {
         fmpz_mpoly_pow_fmpz(T, X, pow, ctx);
-        fmpz_mpoly_mul_johnson(A, A, T, ctx);
+        fmpz_mpoly_mul(A, A, T, ctx);
         return;
     }
 
-    p = fmpz_get_si(pow);
+    p = fmpz_get_ui(pow);
 
     if (X->length <= WORD(2) || A->length/p < X->length)
     {
-        fmpz_mpoly_pow_si(T, X, p, ctx);
-        fmpz_mpoly_mul_johnson(A, A, T, ctx);
+        fmpz_mpoly_pow_ui(T, X, p, ctx);
+        fmpz_mpoly_mul(A, A, T, ctx);
     }
     else
     {
         while (p >= 1)
         {
-            fmpz_mpoly_mul_johnson(T, A, X, ctx);
-            if (p == 1)
-            {
-                fmpz_mpoly_swap(A, T, ctx);
-                break;
-            }
-            fmpz_mpoly_mul_johnson(A, T, X, ctx);
-            p -= 2;
+            fmpz_mpoly_mul(T, A, X, ctx);
+            fmpz_mpoly_swap(A, T, ctx);
+            p--;
         }
     }
 }

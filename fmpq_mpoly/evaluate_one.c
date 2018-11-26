@@ -142,7 +142,7 @@ looper:
 
     FLINT_ASSERT(root->key >= emin);
     FLINT_ASSERT(root->key <= emax);
-    mpoly_monomial_mul_si(main_exps + N*i, one, N, root->key);
+    mpoly_monomial_mul_ui(main_exps + N*i, one, N, root->key);
     
     fmpz_pow_ui(fmpq_numref(u), fmpq_numref(val), root->key - emin);
     fmpz_pow_ui(fmpq_denref(u), fmpq_denref(val), emax - root->key);
