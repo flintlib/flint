@@ -11,18 +11,15 @@
 
 #include "fmpq_mpoly.h"
 
-
-void fmpq_mpoly_pow_si(fmpq_mpoly_t qpoly1, const fmpq_mpoly_t qpoly2,
-                                        slong pow, const fmpq_mpoly_ctx_t qctx)
+void fmpq_mpoly_pow_si(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                           slong k, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_struct * poly1 = qpoly1->zpoly;
-    const fmpz_mpoly_struct * poly2 = qpoly2->zpoly;
-    const fmpz_mpoly_ctx_struct * ctx = qctx->zctx;
-
-    if (pow < 0)
+    if (k < 0)
+    {
         flint_throw(FLINT_ERROR, "Negative power in fmpq_mpoly_pow_si");
+    }
 
-    fmpq_pow_si(qpoly1->content, qpoly2->content, pow);
-    fmpz_mpoly_pow_fps(poly1, poly2, pow, ctx);
+    fmpq_pow_si(A->content, B->content, k);
+    fmpz_mpoly_pow_fps(A->zpoly, B->zpoly, k, ctx->zctx);
     return;
 }

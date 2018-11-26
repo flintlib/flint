@@ -642,21 +642,16 @@ FLINT_DLL void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
 
 /* Multiplication ************************************************************/
 
-FLINT_DLL void fmpq_mpoly_mul(fmpq_mpoly_t poly1,
-                 const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3, 
-                                                   const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpq_mpoly_mul_threaded(fmpq_mpoly_t poly1,
-                 const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
-                                                   const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_mul(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                             const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx);
 
 /* Powering ******************************************************************/
 
-FLINT_DLL void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                                 const fmpz_t pow, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                   const fmpz_t k, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pow_si(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                                        slong pow, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_pow_si(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                          slong k, const fmpq_mpoly_ctx_t ctx);
 
 /* Divisibility **************************************************************/
 

@@ -428,15 +428,20 @@ Powering
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B, ulong k, const nmod_mpoly_ctx_t ctx)
-
-    Set `A` to `B` raised to the `k`-th power.
-    This functions throws if `k < 0`.
-
 .. function:: void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B, const fmpz_t k, const nmod_mpoly_ctx_t ctx)
 
     Set `A` to `B` raised to the `k`-th power.
     This function throws if `k < 0` or if `k` does not fit an ``slong`` and `A` has more than one term.
+
+.. function:: void nmod_mpoly_pow_si(nmod_mpoly_t A, const nmod_mpoly_t B, slong k, const nmod_mpoly_ctx_t ctx)
+
+    Set `A` to `B` raised to the `k`-th power.
+    This functions throws if `k < 0`.
+
+.. function:: void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B, slong k, const nmod_mpoly_ctx_t ctx)
+
+    Set `A` to `B` raised to the `k`-th power using repeated multiplications.
+    This function assumes that `k \ge 0`.
 
 
 Divisibility testing

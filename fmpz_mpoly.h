@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2016-2017 William Hart
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017,2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -646,17 +646,22 @@ FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * al
                  const fmpz * poly3, const ulong * exp3, slong len3,
                              mp_bitcnt_t bits, slong N, const ulong * cmpmask);
 
+
 /* Powering ******************************************************************/
+
+FLINT_DLL void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                  const fmpz_t k, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_pow_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                          slong k, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                          slong k, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
                 slong * alloc, const fmpz * poly2, const ulong * exp2, 
         slong len2, ulong k, mp_bitcnt_t bits, slong N, const ulong * cmpmask);
 
-FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                                          slong k, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                                 const fmpz_t pow, const fmpz_mpoly_ctx_t ctx);
 
 /* Divisibility **************************************************************/
 
@@ -1033,8 +1038,8 @@ FLINT_DLL void fmpz_mpoly_geobucket_neg_inplace(fmpz_mpoly_geobucket_t B1,
 FLINT_DLL void fmpz_mpoly_geobucket_mul_inplace(fmpz_mpoly_geobucket_t B1,
                         fmpz_mpoly_geobucket_t B2, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_geobucket_pow_ui_inplace(fmpz_mpoly_geobucket_t B1,
-                                          ulong k, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_geobucket_pow_si_inplace(fmpz_mpoly_geobucket_t B1,
+                                          slong k, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_geobucket_pow_fmpz_inplace(fmpz_mpoly_geobucket_t B1,
                                    const fmpz_t k, const fmpz_mpoly_ctx_t ctx);

@@ -12,24 +12,18 @@
 #include "fmpq_mpoly.h"
 
 
-void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t qpoly1, const fmpq_mpoly_t qpoly2,
-                                 const  fmpz_t pow, const fmpq_mpoly_ctx_t qctx)
+void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                    const fmpz_t k, const fmpq_mpoly_ctx_t ctx)
 {
-    slong i;
-    fmpz * max_fields2;
-    mp_bitcnt_t exp_bits;
-    fmpz_mpoly_struct * poly1 = qpoly1->zpoly;
-    const fmpz_mpoly_struct * poly2 = qpoly2->zpoly;
-    const fmpz_mpoly_ctx_struct * ctx = qctx->zctx;
-    TMP_INIT;
-
-    if (fmpz_sgn(pow) < 0)
-        flint_throw(FLINT_ERROR, "Negative power in fmpq_mpoly_pow_fmpz");
-
-    if (fmpz_fits_si(pow))
+    if (fmpz_sgn(k) < 0)
     {
-        fmpq_pow_si(qpoly1->content, qpoly2->content, fmpz_get_si(pow));
-        fmpz_mpoly_pow_fps(poly1, poly2, fmpz_get_si(pow), ctx);
+        flint_throw(FLINT_ERROR, "Negative power in fmpq_mpoly_pow_fmpz");
+    }
+
+    if (fmpz_fits_si(k))
+    {
+        fmpq_pow_si(A->content, B->content, fmpz_get_si(k));
+        fmpz_mpoly_pow_si(A->zpoly, B->zpoly, fmpz_get_si(k), ctx->zctx);
         return;
     }
 
@@ -38,47 +32,31 @@ void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t qpoly1, const fmpq_mpoly_t qpoly2,
         It must either be zero or a monomial with coefficient +-1.
     */
 
-    if (fmpz_mpoly_is_zero(poly2, ctx))
+    if (fmpq_mpoly_is_zero(B, ctx))
     {
-        fmpq_mpoly_zero(qpoly1, qctx);
+        fmpq_mpoly_zero(A, ctx);
         return;
     }
 
-    if (poly2->length != WORD(1))
+    if (B->zpoly->length != WORD(1))
+    {
         flint_throw(FLINT_ERROR, "Multinomial in fmpq_mpoly_pow_fmpz");
+    }
 
-    if (!fmpq_is_pm1(qpoly2->content))
+    if (!fmpq_is_pm1(B->content))
+    {
         flint_throw(FLINT_ERROR, "Non-unit coefficient in fmpq_mpoly_pow_fmpz");
+    }
 
-    TMP_START;
+    if (fmpq_is_one(B->content) || fmpz_is_even(k))
+    {
+        fmpq_one(A->content);
+    }
+    else
+    {
+        fmpq_one(A->content);
+        fmpq_neg(A->content, A->content);
+    }
 
-    max_fields2 = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
-    for (i = 0; i < ctx->minfo->nfields; i++)
-        fmpz_init(max_fields2 + i);
-    mpoly_max_fields_fmpz(max_fields2, poly2->exps, poly2->length,
-                                                      poly2->bits, ctx->minfo);
-
-    _fmpz_vec_scalar_mul_fmpz(max_fields2, max_fields2, ctx->minfo->nfields, pow);
-
-    exp_bits = _fmpz_vec_max_bits(max_fields2, ctx->minfo->nfields);
-    exp_bits = FLINT_MAX(MPOLY_MIN_BITS, exp_bits + 1);
-    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
-
-    fmpz_mpoly_fit_length(poly1, 1, ctx);
-    fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
-    poly1->bits = exp_bits;
-
-    fmpz_set_si(poly1->coeffs + 0, UWORD(1));
-    fmpq_set_si(qpoly1->content,
-      (fmpq_is_one(qpoly2->content) || fmpz_is_even(pow)) ? +WORD(1) : -WORD(1),
-                                                                     UWORD(1));
-
-    mpoly_pack_vec_fmpz(poly1->exps + 0, max_fields2, exp_bits, ctx->minfo->nfields, 1);
-
-    _fmpz_mpoly_set_length(poly1, 1, ctx);
-
-    for (i = 0; i < ctx->minfo->nfields; i++)
-        fmpz_clear(max_fields2 + i);
-
-    TMP_END;
+    fmpz_mpoly_pow_fmpz(A->zpoly, B->zpoly, k, ctx->zctx);
 }

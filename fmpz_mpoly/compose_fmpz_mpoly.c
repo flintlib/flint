@@ -63,7 +63,7 @@ void _fmpz_mpoly_pmul(fmpz_mpoly_t A, const fmpz_mpoly_t X, const fmpz_t pow,
 
     if (X->length <= WORD(2) || A->length/p < X->length)
     {
-        fmpz_mpoly_pow_fps(T, X, p, ctx);
+        fmpz_mpoly_pow_si(T, X, p, ctx);
         fmpz_mpoly_mul_johnson(A, A, T, ctx);
     }
     else

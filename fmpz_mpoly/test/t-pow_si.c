@@ -46,10 +46,10 @@ main(void)
     int i, j, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pow_fps....");
+    flint_printf("pow_si....");
     fflush(stdout);
 
-    /* Check pow_fps against pow_naive */
+    /* Check pow_si against pow_naive */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -65,9 +65,9 @@ main(void)
         fmpz_mpoly_init(h, ctx);
 
         len = n_randint(state, 10);
-        len1 = n_randint(state, 10) + 1;
+        len1 = n_randint(state, 10);
 
-        pow = n_randint(state, 1 + 50/(len1 + 2)) + 2;
+        pow = n_randint(state, 1 + 50/(len1 + 2));
 
         exp_bits = n_randint(state, 600) + 2;
         exp_bits1 = n_randint(state, 600) + 10;
@@ -81,10 +81,7 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
             fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
-            if (fmpz_mpoly_is_zero(f, ctx))
-                continue;
-
-            fmpz_mpoly_pow_fps(g, f, pow, ctx);
+            fmpz_mpoly_pow_si(g, f, pow, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
             fmpz_mpoly_pow_naive(h, f, pow, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
@@ -93,7 +90,7 @@ main(void)
             if (!result)
             {
                 printf("FAIL\n");
-                flint_printf("Check pow_fps against pow_naive\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("Check pow_si against pow_naive\ni = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }
@@ -118,7 +115,7 @@ main(void)
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
 
-        pow = n_randint(state, 8) + 2;
+        pow = n_randint(state, 8);
 
         len = n_randint(state, 10);
         len1 = n_randint(state, 10);
@@ -133,12 +130,9 @@ main(void)
             fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
-            if (fmpz_mpoly_is_zero(f, ctx))
-                continue;
-
-            fmpz_mpoly_pow_fps(g, f, pow, ctx);
+            fmpz_mpoly_pow_si(g, f, pow, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
-            fmpz_mpoly_pow_fps(f, f, pow, ctx);
+            fmpz_mpoly_pow_si(f, f, pow, ctx);
             fmpz_mpoly_assert_canonical(f, ctx);
             result = fmpz_mpoly_equal(f, g, ctx);
 

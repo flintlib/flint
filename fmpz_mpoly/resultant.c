@@ -40,7 +40,7 @@ int fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
 
         if (gx->exps[0] == 0)
         {
-            fmpz_mpoly_pow_fps(poly1, gx->coeffs + 0, fx->exps[0], ctx);
+            fmpz_mpoly_pow_si(poly1, gx->coeffs + 0, fx->exps[0], ctx);
         } else {
 
             _fmpz_mpoly_univar_pgcd_ducos(rx, fx, gx, ctx);

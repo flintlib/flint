@@ -11,33 +11,32 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_pow_rmul(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
-                                         slong pow, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                         slong k, const nmod_mpoly_ctx_t ctx)
 {
-    nmod_mpoly_t t;
+    nmod_mpoly_t T;
+    nmod_mpoly_init(T, ctx);
 
-    nmod_mpoly_init(t, ctx);
-
-    if (poly1 == poly2)
+    if (A == B)
     {
-        nmod_mpoly_pow_rmul(t, poly2, pow, ctx);
-        nmod_mpoly_swap(t, poly1, ctx);
-        goto done;
+        nmod_mpoly_pow_rmul(T, A, pow, ctx);
+        nmod_mpoly_swap(T, A, ctx);
+        goto cleanup;
     }
 
-    nmod_mpoly_set_ui(poly1, 1, ctx);
-    while (pow >= 1)
+    nmod_mpoly_set_ui(A, 1, ctx);
+    while (k >= 1)
     { 
-        nmod_mpoly_mul_johnson(t, poly1, poly2, ctx);
-        if (pow == 1)
+        nmod_mpoly_mul_johnson(T, A, B, ctx);
+        if (k == 1)
         {
-            nmod_mpoly_swap(poly1, t, ctx);
+            nmod_mpoly_swap(A, T, ctx);
             break;
         }
-        nmod_mpoly_mul_johnson(poly1, t, poly2, ctx);
-        pow -= 2;
+        nmod_mpoly_mul_johnson(A, T, B, ctx);
+        k -= 2;
     }
 
-done:
-    nmod_mpoly_clear(t, ctx);
+cleanup:
+    nmod_mpoly_clear(T, ctx);
 }
