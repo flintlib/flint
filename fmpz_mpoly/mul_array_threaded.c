@@ -366,43 +366,36 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
 }
 
 
-int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t poly1,
-                          const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, exp_bits, array_size;
-    ulong max, * max_fields2, * max_fields3;
-    int success = 1;
+    ulong max, * mults;
+    int success;
     TMP_INIT;
 
-    /* input poly is zero */
-    if (poly2->length == 0 || poly3->length == 0)
-    {
-        fmpz_mpoly_zero(poly1, ctx);
-        return 1;
-    }
-    /* lets only work with exponents packed into 1 word */
-    if (    1 != mpoly_words_per_exp(poly2->bits, ctx->minfo)
-         || 1 != mpoly_words_per_exp(poly3->bits, ctx->minfo))
-    {
-        return 0;
-    }
+    FLINT_ASSERT(B->length != 0);
+    FLINT_ASSERT(C->length != 0);
+
+    FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
+
+    FLINT_ASSERT(1 == mpoly_words_per_exp(B->bits, ctx->minfo));
+    FLINT_ASSERT(1 == mpoly_words_per_exp(C->bits, ctx->minfo));
 
     TMP_START;
 
     /* compute maximum exponents for each variable */
-    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
-                                                      poly2->bits, ctx->minfo);
-    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
-                                                      poly3->bits, ctx->minfo);
+    mults = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
 
     /* the field of index n-1 is the one that wil be pulled out */
     i = ctx->minfo->nfields - 1;
-    max_fields2[i] += max_fields3[i] + 1;
-    max = max_fields2[i];
-    if (((slong) max_fields2[i]) <= 0 || max_fields2[i] > MAX_LEX_SIZE)
+    FLINT_ASSERT(fmpz_fits_si(maxBfields + i));
+    FLINT_ASSERT(fmpz_fits_si(maxCfields + i));
+    mults[i] = 1 + fmpz_get_ui(maxBfields + i) + fmpz_get_ui(maxCfields + i);
+    max = mults[i];
+    if (((slong) mults[i]) <= 0 || mults[i] > MAX_LEX_SIZE)
     {
         success = 0;
         goto cleanup;
@@ -413,10 +406,12 @@ int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t poly1,
     for (i--; i >= 0; i--)
     {
         ulong hi;
-        max_fields2[i] += max_fields3[i] + 1;
-        max |= max_fields2[i];
-        umul_ppmm(hi, array_size, array_size, max_fields2[i]);
-        if (hi != WORD(0) || (array_size | (slong) max_fields2[i]) <= 0
+        FLINT_ASSERT(fmpz_fits_si(maxBfields + i));
+        FLINT_ASSERT(fmpz_fits_si(maxCfields + i));
+        mults[i] = 1 + fmpz_get_ui(maxBfields + i) + fmpz_get_ui(maxCfields + i);
+        max |= mults[i];
+        umul_ppmm(hi, array_size, array_size, mults[i]);
+        if (hi != WORD(0) || (array_size | (slong) mults[i]) <= 0
                           || array_size > MAX_ARRAY_SIZE)
         {
             success = 0;
@@ -424,37 +419,35 @@ int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t poly1,
         }
     }
 
-    exp_bits = FLINT_MAX(WORD(8), FLINT_BIT_COUNT(max) + 1);
+    exp_bits = FLINT_MAX(MPOLY_MIN_BITS, FLINT_BIT_COUNT(max) + 1);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-    /* array multiplication assumes result fit into 1 word */
-    if (ctx->minfo->ord != ORD_LEX ||
-            1 != mpoly_words_per_exp(exp_bits, ctx->minfo))
+    /* array multiplication assumes result fits into 1 word */
+    if (1 != mpoly_words_per_exp(exp_bits, ctx->minfo))
     {
         success = 0;
         goto cleanup;
     }
 
     /* handle aliasing and do array multiplication */
-    success = 1;
-    if (poly1 == poly2 || poly1 == poly3)
+    if (A == B || A == C)
     {
-        fmpz_mpoly_t temp;
-        fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
-        fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
-        temp->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_LEX(temp, poly3, poly2,
-                                                             max_fields2, ctx);
-        fmpz_mpoly_swap(temp, poly1, ctx);
-        fmpz_mpoly_clear(temp, ctx);
-    } else
-    {
-        fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
-        fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
-        poly1->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_LEX(poly1, poly3, poly2,
-                                                             max_fields2, ctx);
+        fmpz_mpoly_t T;
+        fmpz_mpoly_init2(T, B->length + C->length - 1, ctx);
+        fmpz_mpoly_fit_bits(T, exp_bits, ctx);
+        T->bits = exp_bits;
+        _fmpz_mpoly_mul_array_chunked_threaded_LEX(T, C, B, mults, ctx);
+        fmpz_mpoly_swap(T, A, ctx);
+        fmpz_mpoly_clear(T, ctx);
     }
+    else
+    {
+        fmpz_mpoly_fit_length(A, B->length + C->length - 1, ctx);
+        fmpz_mpoly_fit_bits(A, exp_bits, ctx);
+        A->bits = exp_bits;
+        _fmpz_mpoly_mul_array_chunked_threaded_LEX(A, C, B, mults, ctx);
+    }
+    success = 1;
 
 cleanup:
 
@@ -787,45 +780,29 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
 }
 
 
-int fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t poly1,
-                         const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+int fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, exp_bits, array_size;
-    ulong deg, * max_fields2, * max_fields3;
-    int success = 1;
-    TMP_INIT;
+    ulong deg;
+    int success;
 
-    /* input poly is zero */
-    if (poly2->length == 0 || poly3->length == 0)
-    {
-        fmpz_mpoly_zero(poly1, ctx);
-        return 1;
-    }
+    FLINT_ASSERT(B->length != 0);
+    FLINT_ASSERT(C->length != 0);
 
-    /* lets only work with exponents packed into 1 word */
-    if ((     ctx->minfo->ord != ORD_DEGREVLEX 
-           && ctx->minfo->ord != ORD_DEGLEX)
-        || 1 != mpoly_words_per_exp(poly2->bits, ctx->minfo)
-        || 1 != mpoly_words_per_exp(poly3->bits, ctx->minfo)
-       )
-    {
-        return 0;
-    }
+    FLINT_ASSERT(  ctx->minfo->ord == ORD_DEGREVLEX
+                || ctx->minfo->ord == ORD_DEGLEX);
 
-    TMP_START;
-
-    /* compute maximum exponents for each variable */
-    max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
-                                                      poly2->bits, ctx->minfo);
-    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
-                                                      poly3->bits, ctx->minfo);
+    FLINT_ASSERT(1 == mpoly_words_per_exp(B->bits, ctx->minfo));
+    FLINT_ASSERT(1 == mpoly_words_per_exp(C->bits, ctx->minfo));
 
     /* the field of index n-1 is the one that wil be pulled out */
     i = ctx->minfo->nfields - 1;
-    deg = max_fields2[i] + max_fields3[i] + 1;
+    FLINT_ASSERT(fmpz_fits_si(maxBfields + i));
+    FLINT_ASSERT(fmpz_fits_si(maxCfields + i));
+    deg = 1 + fmpz_get_ui(maxBfields + i) + fmpz_get_ui(maxCfields + i);
     if (((slong) deg) <= 0 || deg > MAX_ARRAY_SIZE)
     {
         success = 0;
@@ -846,7 +823,7 @@ int fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t poly1,
         }
     }
 
-    exp_bits = FLINT_MAX(WORD(8), FLINT_BIT_COUNT(deg) + 1);
+    exp_bits = FLINT_MAX(MPOLY_MIN_BITS, FLINT_BIT_COUNT(deg) + 1);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     /* array multiplication assumes result fit into 1 word */
@@ -857,44 +834,93 @@ int fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t poly1,
     }
 
     /* handle aliasing and do array multiplication */
-    success = 1;
-    if (poly1 == poly2 || poly1 == poly3)
+    if (A == B || A == C)
     {
-        fmpz_mpoly_t temp;
-        fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
-        fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
-        temp->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_DEG(temp, poly3, poly2, deg, ctx);
-        fmpz_mpoly_swap(temp, poly1, ctx);
-        fmpz_mpoly_clear(temp, ctx);
-    } else
-    {
-        fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
-        fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
-        poly1->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_DEG(poly1, poly3, poly2, deg, ctx);
+        fmpz_mpoly_t T;
+        fmpz_mpoly_init2(T, B->length + C->length - 1, ctx);
+        fmpz_mpoly_fit_bits(T, exp_bits, ctx);
+        T->bits = exp_bits;
+        _fmpz_mpoly_mul_array_chunked_threaded_DEG(T, C, B, deg, ctx);
+        fmpz_mpoly_swap(T, A, ctx);
+        fmpz_mpoly_clear(T, ctx);
     }
+    else
+    {
+        fmpz_mpoly_fit_length(A, B->length + C->length - 1, ctx);
+        fmpz_mpoly_fit_bits(A, exp_bits, ctx);
+        A->bits = exp_bits;
+        _fmpz_mpoly_mul_array_chunked_threaded_DEG(A, C, B, deg, ctx);
+    }
+    success = 1;
 
 cleanup:
-
-    TMP_END;
 
     return success;
 }
 
 
 
-int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                              const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 {
+    slong i;
+    int success;
+    fmpz * maxBfields, * maxCfields;
+    TMP_INIT;
+
+    if (B->length == 0 || C->length == 0)
+    {
+        fmpz_mpoly_zero(A, ctx);
+        return 1;
+    }
+
+    if (  1 != mpoly_words_per_exp(B->bits, ctx->minfo)
+       || 1 != mpoly_words_per_exp(C->bits, ctx->minfo)
+       )
+    {
+        return 0;
+    }
+
+    TMP_START;
+
+    maxBfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    maxCfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_init(maxBfields + i);
+        fmpz_init(maxCfields + i);
+    }
+    mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
+    mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
+
     switch (ctx->minfo->ord)
     {
         case ORD_LEX:
-            return fmpz_mpoly_mul_array_threaded_LEX(poly1, poly2, poly3, ctx);
+        {
+            success = fmpz_mpoly_mul_array_threaded_LEX(A, B, maxBfields,
+                                                           C, maxCfields, ctx);
+            break;
+        }
         case ORD_DEGREVLEX:
         case ORD_DEGLEX:
-            return fmpz_mpoly_mul_array_threaded_DEG(poly1, poly2, poly3, ctx);
+        {
+            success = fmpz_mpoly_mul_array_threaded_DEG(A, B, maxBfields,
+                                                           C, maxCfields, ctx);
+            break;
+        }
         default:
-            return 0;
+        {
+            success = 0;
+            break;
+        }
     }
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(maxBfields + i);
+        fmpz_clear(maxCfields + i);
+    }
+
+    TMP_END;
+    return success;
 }

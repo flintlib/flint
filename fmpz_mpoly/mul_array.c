@@ -770,6 +770,13 @@ int fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t A,
     exp_bits = FLINT_MAX(MPOLY_MIN_BITS, FLINT_BIT_COUNT(max) + 1);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
+    /* array multiplication assumes result fits into 1 word */
+    if (1 != mpoly_words_per_exp(exp_bits, ctx->minfo))
+    {
+        success = 0;
+        goto cleanup;
+    }
+
     /* handle aliasing and do array multiplication */
     if (A == B || A == C)
     {
