@@ -13,6 +13,25 @@
 #include "flint.h"
 #include "mpoly.h"
 
+/*
+    poly_exps (when unpacked) must contain the exponent of each variable in
+    some field. These functions should place the exponent of each variable
+    in the corresponding entry of user_exps.
+*/
+
+void mpoly_get_monomial_ui_unpacked_ffmpz(ulong * user_exps,
+                                const fmpz * poly_exps, const mpoly_ctx_t mctx)
+{
+    slong i;
+
+    /* poly_exps is already unpacked, just read of the correct fields */
+    for (i = 0; i < mctx->nvars; i++)
+    {
+        slong off = mctx->rev ? i : mctx->nvars - 1 - i;
+        FLINT_ASSERT(fmpz_abs_fits_ui(poly_exps + off));
+        user_exps[i] = fmpz_get_ui(poly_exps + off);
+    }
+}
 
 void mpoly_get_monomial_ui(ulong * user_exps, const ulong * poly_exps,
                                             slong bits, const mpoly_ctx_t mctx)
@@ -51,6 +70,7 @@ void mpoly_get_monomial_ffmpz(fmpz * user_exps, const ulong * poly_exps,
 
     for (i = 0; i < mctx->nfields; i++)
         fmpz_clear(tmp_exps + i);
+
     TMP_END;
 }
 
@@ -73,5 +93,6 @@ void mpoly_get_monomial_pfmpz(fmpz ** user_exps, const ulong * poly_exps,
 
     for (i = 0; i < mctx->nfields; i++)
         fmpz_clear(tmp_exps + i);
+
     TMP_END;
 }
