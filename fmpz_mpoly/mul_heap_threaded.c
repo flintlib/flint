@@ -788,125 +788,150 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
     return k;
 }
 
-void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
-                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, N, len = 0;
-    mp_bitcnt_t exp_bits;
-    fmpz * max_fields2, * max_fields3;
-    ulong * cmpmask;
-    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
-    int free2 = 0, free3 = 0;
-    TMP_INIT;
 
-    if (poly2->length == 0 || poly3->length == 0)
-    {
-        fmpz_mpoly_zero(poly1, ctx);
-        return;
-    }
+
+/* maxBfields gets clobbered */
+void _fmpz_mpoly_mul_heap_threaded_maxfields(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    slong N, Alen;
+    mp_bitcnt_t exp_bits;
+    ulong * cmpmask;
+    ulong * Bexp, * Cexp;
+    int freeBexp, freeCexp;
+    TMP_INIT;
 
     TMP_START;
 
-    max_fields2 = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
-    max_fields3 = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
-    for (i = 0; i < ctx->minfo->nfields; i++)
-    {
-        fmpz_init(max_fields2 + i);
-        fmpz_init(max_fields3 + i);
-    }
-    mpoly_max_fields_fmpz(max_fields2, poly2->exps, poly2->length,
-                                                      poly2->bits, ctx->minfo);
-    mpoly_max_fields_fmpz(max_fields3, poly3->exps, poly3->length,
-                                                      poly3->bits, ctx->minfo);
-    _fmpz_vec_add(max_fields2, max_fields2, max_fields3, ctx->minfo->nfields);
+    _fmpz_vec_add(maxBfields, maxBfields, maxCfields, ctx->minfo->nfields);
 
-    exp_bits = _fmpz_vec_max_bits(max_fields2, ctx->minfo->nfields);
+    exp_bits = _fmpz_vec_max_bits(maxBfields, ctx->minfo->nfields);
     exp_bits = FLINT_MAX(MPOLY_MIN_BITS, exp_bits + 1);
-    exp_bits = FLINT_MAX(exp_bits, poly2->bits);
-    exp_bits = FLINT_MAX(exp_bits, poly3->bits);
+    exp_bits = FLINT_MAX(exp_bits, B->bits);
+    exp_bits = FLINT_MAX(exp_bits, C->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
-
-    for (i = 0; i < ctx->minfo->nfields; i++)
-    {
-        fmpz_clear(max_fields2 + i);
-        fmpz_clear(max_fields3 + i);
-    }
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
     cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
-    if (exp_bits > poly2->bits)
+    freeBexp = 0;
+    Bexp = B->exps;
+    if (exp_bits > B->bits)
     {
-        free2 = 1;
-        exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_repack_monomials(exp2, exp_bits, poly2->exps, poly2->bits,
-                                                    poly2->length, ctx->minfo);
+        freeBexp = 1;
+        Bexp = (ulong *) flint_malloc(N*B->length*sizeof(ulong));
+        mpoly_repack_monomials(Bexp, exp_bits, B->exps, B->bits,
+                                                        B->length, ctx->minfo);
     }
 
-    if (exp_bits > poly3->bits)
+    freeCexp = 0;
+    Cexp = C->exps;
+    if (exp_bits > C->bits)
     {
-        free3 = 1;
-        exp3 = (ulong *) flint_malloc(N*poly3->length*sizeof(ulong));
-        mpoly_repack_monomials(exp3, exp_bits, poly3->exps, poly3->bits,
-                                                    poly3->length, ctx->minfo);
+        freeCexp = 1;
+        Cexp = (ulong *) flint_malloc(N*C->length*sizeof(ulong));
+        mpoly_repack_monomials(Cexp, exp_bits, C->exps, C->bits,
+                                                        C->length, ctx->minfo);
     }
 
     /* deal with aliasing and do multiplication */
-    if (poly1 == poly2 || poly1 == poly3)
+    if (A == B || A == C)
     {
-        fmpz_mpoly_t temp;
-
-        fmpz_mpoly_init2(temp, poly2->length + poly3->length - 1, ctx);
-        fmpz_mpoly_fit_bits(temp, exp_bits, ctx);
-        temp->bits = exp_bits;
+        fmpz_mpoly_t T;
+        fmpz_mpoly_init2(T, B->length + C->length - 1, ctx);
+        fmpz_mpoly_fit_bits(T, exp_bits, ctx);
+        T->bits = exp_bits;
 
         /* algorithm more efficient if smaller poly first */
-        if (poly2->length >= poly3->length)
-            len = _fmpz_mpoly_mul_heap_threaded(
-                                    &temp->coeffs, &temp->exps, &temp->alloc,
-                                      poly3->coeffs, exp3, poly3->length,
-                                      poly2->coeffs, exp2, poly2->length,
-                                               exp_bits, N, cmpmask);
+        if (B->length >= C->length)
+        {
+            Alen = _fmpz_mpoly_mul_heap_threaded(&T->coeffs, &T->exps, &T->alloc,
+                                                  C->coeffs, Cexp, C->length,
+                                                  B->coeffs, Bexp, B->length,
+                                                         exp_bits, N, cmpmask);
+        }
         else
-            len = _fmpz_mpoly_mul_heap_threaded(
-                                   &temp->coeffs, &temp->exps, &temp->alloc,
-                                      poly2->coeffs, exp2, poly2->length,
-                                      poly3->coeffs, exp3, poly3->length,
-                                               exp_bits, N, cmpmask);
+        {
+            Alen = _fmpz_mpoly_mul_heap_threaded(&T->coeffs, &T->exps, &T->alloc,
+                                                  B->coeffs, Bexp, B->length,
+                                                  C->coeffs, Cexp, C->length,
+                                                         exp_bits, N, cmpmask);
+        }
 
-        fmpz_mpoly_swap(temp, poly1, ctx);
-
-        fmpz_mpoly_clear(temp, ctx);
-    } else
+        fmpz_mpoly_swap(T, A, ctx);
+        fmpz_mpoly_clear(T, ctx);
+    }
+    else
     {
-        fmpz_mpoly_fit_length(poly1, poly2->length + poly3->length - 1, ctx);
-        fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
-        poly1->bits = exp_bits;
+        fmpz_mpoly_fit_length(A, B->length + C->length - 1, ctx);
+        fmpz_mpoly_fit_bits(A, exp_bits, ctx);
+        A->bits = exp_bits;
 
         /* algorithm more efficient if smaller poly first */
-        if (poly2->length > poly3->length)
-            len = _fmpz_mpoly_mul_heap_threaded(
-                                &poly1->coeffs, &poly1->exps, &poly1->alloc,
-                                      poly3->coeffs, exp3, poly3->length,
-                                      poly2->coeffs, exp2, poly2->length,
-                                               exp_bits, N, cmpmask);
+        if (B->length > C->length)
+        {
+            Alen = _fmpz_mpoly_mul_heap_threaded(&A->coeffs, &A->exps, &A->alloc,
+                                                  C->coeffs, Cexp, C->length,
+                                                  B->coeffs, Bexp, B->length,
+                                                         exp_bits, N, cmpmask);
+        }
         else
-            len = _fmpz_mpoly_mul_heap_threaded(
-                                &poly1->coeffs, &poly1->exps, &poly1->alloc,
-                                      poly2->coeffs, exp2, poly2->length,
-                                      poly3->coeffs, exp3, poly3->length,
-                                               exp_bits, N, cmpmask);
+        {
+            Alen = _fmpz_mpoly_mul_heap_threaded(&A->coeffs, &A->exps, &A->alloc,
+                                                  B->coeffs, Bexp, B->length,
+                                                  C->coeffs, Cexp, C->length,
+                                                         exp_bits, N, cmpmask);
+        }
     }
 
-    if (free2)
-        flint_free(exp2);
+    if (freeBexp)
+        flint_free(Bexp);
 
-    if (free3)
-        flint_free(exp3);
+    if (freeCexp)
+        flint_free(Cexp);
 
-    _fmpz_mpoly_set_length(poly1, len, ctx);
+    _fmpz_mpoly_set_length(A, Alen, ctx);
+
+    TMP_END;
+}
+
+
+void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                              const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+    fmpz * maxBfields, * maxCfields;
+    TMP_INIT;
+
+    if (B->length == 0 || C->length == 0)
+    {
+        fmpz_mpoly_zero(A, ctx);
+        return;
+    }
+
+    TMP_START;
+
+    maxBfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    maxCfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_init(maxBfields + i);
+        fmpz_init(maxCfields + i);
+    }
+    mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
+    mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
+
+    _fmpz_mpoly_mul_heap_threaded_maxfields(A, B, maxBfields, C, maxCfields, ctx);
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(maxBfields + i);
+        fmpz_clear(maxCfields + i);
+    }
 
     TMP_END;
 }
