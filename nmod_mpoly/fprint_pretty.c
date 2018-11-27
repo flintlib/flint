@@ -115,9 +115,9 @@ done:
 }
 
 int
-nmod_mpoly_fprint_pretty(FILE * file, const nmod_mpoly_t poly,
+nmod_mpoly_fprint_pretty(FILE * file, const nmod_mpoly_t A,
                                    const char ** x, const nmod_mpoly_ctx_t ctx)
 {
-   return _nmod_mpoly_fprint_pretty(file, poly->coeffs, poly->exps,
-                         poly->length, x, poly->bits, ctx->minfo, ctx->ffinfo);
+   return _nmod_mpoly_fprint_pretty(file, A->coeffs, A->exps,
+                               A->length, x, A->bits, ctx->minfo, ctx->ffinfo);
 }

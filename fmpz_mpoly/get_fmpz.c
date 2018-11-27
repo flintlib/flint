@@ -12,23 +12,23 @@
 
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_get_fmpz(fmpz_t x, const fmpz_mpoly_t poly, 
+void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t A, 
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong N;
 
-    if (poly->length > WORD(1))
+    if (A->length > WORD(1))
         flint_throw(FLINT_ERROR, "Nonconstant polynomial in fmpz_mpoly_get_fmpz");
 
-    if (poly->length == WORD(0))
+    if (A->length == WORD(0))
     {
-        fmpz_zero(x);
+        fmpz_zero(c);
         return;
     }
 
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
-    if (!mpoly_monomial_is_zero(poly->exps + N*0, N))
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    if (!mpoly_monomial_is_zero(A->exps + N*0, N))
         flint_throw(FLINT_ERROR, "Nonconstant monomial in fmpz_mpoly_get_fmpz");
 
-    fmpz_set(x, poly->coeffs + 0);
+    fmpz_set(c, A->coeffs + 0);
 }

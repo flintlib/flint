@@ -1737,7 +1737,7 @@ void nmod_mpoly_from_nmod_poly_keepbits(nmod_mpoly_t A, const nmod_poly_t B,
     for (k = nmod_poly_degree(B); k >= 0; k--)
     {
         _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
-        mpoly_monomial_mul_si(Aexp + N*Alen, one, N, k + Bshift);
+        mpoly_monomial_mul_ui(Aexp + N*Alen, one, N, k + Bshift);
         Acoeff[Alen] = nmod_poly_get_coeff_ui(B, k);
         Alen += Acoeff[Alen] != UWORD(0);
     }

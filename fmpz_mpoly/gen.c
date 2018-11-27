@@ -15,21 +15,26 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_gen(fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
 {
     slong j;
     ulong * mon;
+    mp_bitcnt_t bits;
     TMP_INIT;
 
     TMP_START;
-    fmpz_mpoly_fit_length(poly, 1, ctx);
-    fmpz_set_ui(poly->coeffs + 0, 1);
 
     mon = (ulong *) TMP_ALLOC((ctx->minfo->nvars)*sizeof(ulong));
     for (j = 0; j < ctx->minfo->nvars; j++)
-       mon[j] = (j == i);
-    mpoly_set_monomial_ui(poly->exps, mon, poly->bits, ctx->minfo);
+       mon[j] = (j == var);
+
+    fmpz_mpoly_fit_length(A, WORD(1), ctx);
+    fmpz_one(A->coeffs);
+    _fmpz_mpoly_set_length(A, WORD(1), ctx);
+
+    bits = mpoly_exp_bits_required_ui(mon, ctx->minfo);
+    fmpz_mpoly_fit_bits(A, bits, ctx);
+    mpoly_set_monomial_ui(A->exps, mon, A->bits, ctx->minfo);
 
     TMP_END;
-    _fmpz_mpoly_set_length(poly, 1, ctx);
 }

@@ -11,38 +11,47 @@
 
 #include "fmpq_mpoly.h"
 
-int fmpq_mpoly_equal_fmpz(const fmpq_mpoly_t poly, const fmpz_t c,
+int fmpq_mpoly_equal_fmpz(const fmpq_mpoly_t A, const fmpz_t c,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    if (fmpq_mpoly_is_zero(poly, ctx)) {
+    if (fmpq_mpoly_is_zero(A, ctx))
+    {
         return fmpz_is_zero(c);
-    } else {
-        return fmpz_mpoly_equal_ui(poly->zpoly, UWORD(1), ctx->zctx)
-                  && fmpz_is_one(fmpq_denref(poly->content))
-                  && fmpz_equal(fmpq_numref(poly->content), c);
+    }
+    else
+    {
+        return   fmpz_is_one(fmpq_denref(A->content))
+              && fmpz_equal(fmpq_numref(A->content), c)
+              && fmpz_mpoly_is_one(A->zpoly, ctx->zctx);
     }
 }
 
-int fmpq_mpoly_equal_ui(const fmpq_mpoly_t poly, ulong c,
+int fmpq_mpoly_equal_ui(const fmpq_mpoly_t A, ulong c,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    if (fmpq_mpoly_is_zero(poly, ctx)) {
-        return c == 0;
-    } else {
-        return fmpz_mpoly_equal_ui(poly->zpoly, UWORD(1), ctx->zctx)
-                  && fmpz_is_one(fmpq_denref(poly->content))
-                  && fmpz_equal_ui(fmpq_numref(poly->content), c);
+    if (fmpq_mpoly_is_zero(A, ctx))
+    {
+        return c == UWORD(0);
+    }
+    else
+    {
+        return   fmpz_is_one(fmpq_denref(A->content))
+              && fmpz_equal_ui(fmpq_numref(A->content), c)
+              && fmpz_mpoly_is_one(A->zpoly, ctx->zctx);
     }
 }
 
-int fmpq_mpoly_equal_si(const fmpq_mpoly_t poly, slong c,
+int fmpq_mpoly_equal_si(const fmpq_mpoly_t A, slong c,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    if (fmpq_mpoly_is_zero(poly, ctx)) {
-        return c == 0;
-    } else {
-        return fmpz_mpoly_equal_ui(poly->zpoly, UWORD(1), ctx->zctx)
-                  && fmpz_is_one(fmpq_denref(poly->content))
-                  && fmpz_equal_si(fmpq_numref(poly->content), c);
+    if (fmpq_mpoly_is_zero(A, ctx))
+    {
+        return c == WORD(0);
+    }
+    else
+    {
+        return   fmpz_is_one(fmpq_denref(A->content))
+              && fmpz_equal_si(fmpq_numref(A->content), c)
+              && fmpz_mpoly_is_one(A->zpoly, ctx->zctx);
     }
 }

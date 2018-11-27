@@ -11,13 +11,16 @@
 
 #include "fmpq_mpoly.h"
 
-int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t poly, const fmpq_t c,
+int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t A, const fmpq_t c,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    if (fmpq_mpoly_is_zero(poly, ctx)) {
+    if (fmpq_mpoly_is_zero(A, ctx))
+    {
         return fmpq_is_zero(c);
-    } else {
-        return fmpz_mpoly_equal_ui(poly->zpoly, UWORD(1), ctx->zctx)
-                  && fmpq_equal(poly->content, c);
+    }
+    else
+    {
+        return   fmpq_equal(A->content, c)
+              && fmpz_mpoly_is_one(A->zpoly, ctx->zctx);
     }
 }

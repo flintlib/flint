@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,43 +10,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
-                                           slong k, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_is_gen(const fmpz_mpoly_t A,
+                                         slong var, const fmpz_mpoly_ctx_t ctx)
 {
-   int ret = 1;
-   slong i;
-   ulong * user_exp, total = 0;
+    if (A->length != WORD(1))
+        return 0;
 
-   TMP_INIT;
+    if (!fmpz_is_one(A->coeffs + 0))
+        return 0;
 
-   if (poly->length != 1)
-      return 0;
-
-   if (!fmpz_is_one(poly->coeffs + 0))
-      return 0;
-
-
-    TMP_START;
-    user_exp = (ulong *) TMP_ALLOC((ctx->minfo->nvars)*sizeof(ulong));
-    mpoly_get_monomial_ui(user_exp, poly->exps, poly->bits, ctx->minfo);
-
-    for (i = 0; i < ctx->minfo->nvars; i++)
-    {
-        total += user_exp[i];
-        ret &= total < 2;
-    }
-
-    if (k >= 0)
-        ret &= (user_exp[k] == 1);
-    else
-        ret &= (total == 1);
-
-    TMP_END
-    return ret;
+    return mpoly_is_gen(A->exps, var, A->bits, ctx->minfo);
 }

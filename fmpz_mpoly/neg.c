@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,40 +10,21 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void _fmpz_mpoly_neg(fmpz * poly1, ulong * exps1,
-                     const fmpz * poly2, const ulong * exps2, slong n, slong N)
-{
-   slong i;
-
-   for (i = 0; i < n; i++)
-      fmpz_neg(poly1 + i, poly2 + i);
-
-   if (exps1 != exps2)
-   {
-      for (i = 0; i < n*N; i++)
-         exps1[i] = exps2[i];
-   }
-}
-
-void fmpz_mpoly_neg(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
+void fmpz_mpoly_neg(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-   slong N;
+    slong N;
 
-   N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
-
-   fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
-   fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
-
-   _fmpz_mpoly_neg(poly1->coeffs, poly1->exps,
-                      poly2->coeffs, poly2->exps, poly2->length, N);
-
-   _fmpz_mpoly_set_length(poly1, poly2->length, ctx);
-   poly1->bits = poly2->bits;
+    if (A != B)
+    {
+        N = mpoly_words_per_exp(B->bits, ctx->minfo);
+        fmpz_mpoly_fit_length(A, B->length, ctx);
+        fmpz_mpoly_fit_bits(A, B->bits, ctx);
+        A->bits = B->bits;
+        mpn_copyi(A->exps, B->exps, N*B->length);
+    }
+    _fmpz_vec_neg(A->coeffs, B->coeffs, B->length);
+    _fmpz_mpoly_set_length(A, B->length, ctx);
 }

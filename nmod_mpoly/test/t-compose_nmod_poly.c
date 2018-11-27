@@ -68,7 +68,7 @@ main(void)
             vals3[v] = nmod_poly_evaluate_nmod(vals1[v], vals2);
         }
 
-        if (nmod_mpoly_totaldegree_si(f, ctx1) < 100)
+        if (nmod_mpoly_total_degree_si(f, ctx1) < 100)
         {
             nmod_mpoly_compose_nmod_poly(g, f, vals1, ctx1);
 

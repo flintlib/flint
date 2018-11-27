@@ -11,24 +11,26 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_gen(nmod_mpoly_t poly, slong i, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_gen(nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
 {
     slong j;
     ulong * mon;
+    mp_bitcnt_t bits;
     TMP_INIT;
-
-    nmod_mpoly_fit_length(poly, 1, ctx);
-
-    poly->coeffs[0] = WORD(1);
 
     TMP_START;
 
     mon = (ulong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(ulong));
     for (j = 0; j < ctx->minfo->nvars; j++)
-       mon[j] = (j == i);
-    mpoly_set_monomial_ui(poly->exps, mon, poly->bits, ctx->minfo);
+       mon[j] = (j == var);
+
+    nmod_mpoly_fit_length(A, WORD(1), ctx);
+    A->coeffs[0] = UWORD(1);
+    _nmod_mpoly_set_length(A, WORD(1), ctx);
+
+    bits = mpoly_exp_bits_required_ui(mon, ctx->minfo);
+    nmod_mpoly_fit_bits(A, bits, ctx);
+    mpoly_set_monomial_ui(A->exps, mon, A->bits, ctx->minfo);
 
     TMP_END;
-
-    _nmod_mpoly_set_length(poly, 1, ctx);
 }

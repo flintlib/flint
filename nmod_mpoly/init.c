@@ -11,41 +11,40 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_init(nmod_mpoly_t poly, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_init(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 {
-    /* default to at least MPOLY_MIN_BITS bits per exponent */
-    slong bits = mpoly_fix_bits(MPOLY_MIN_BITS, ctx->minfo);
-
-    poly->coeffs = NULL;
-    poly->exps = NULL;
-    poly->alloc = 0;
-    poly->length = 0;
-    poly->bits = bits;
+    /* default to MPOLY_MIN_BITS bits per exponent */
+    A->coeffs = NULL;
+    A->exps = NULL;
+    A->alloc = 0;
+    A->length = 0;
+    A->bits = MPOLY_MIN_BITS;
 }
 
-void nmod_mpoly_init3(nmod_mpoly_t poly, slong alloc, mp_bitcnt_t bits,
+void nmod_mpoly_init3(nmod_mpoly_t A, slong alloc, mp_bitcnt_t bits,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
+    /* sanitize alloc input */
+    alloc = FLINT_MAX(alloc, WORD(0));
+
     if (alloc != 0)
     {
-        poly->coeffs = (mp_limb_t *) flint_malloc(alloc*sizeof(mp_limb_t));
-        poly->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
+        A->coeffs = (mp_limb_t *) flint_malloc(alloc*sizeof(mp_limb_t));
+        A->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
     } else
     {
-        poly->coeffs = NULL;
-        poly->exps = NULL;
+        A->coeffs = NULL;
+        A->exps = NULL;
     }
-    poly->alloc = alloc;
-    poly->length = 0;
-    poly->bits = bits;
+    A->alloc = alloc;
+    A->length = 0;
+    A->bits = bits;
 }
 
-void nmod_mpoly_init2(nmod_mpoly_t poly, slong alloc, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_init2(nmod_mpoly_t A, slong alloc, const nmod_mpoly_ctx_t ctx)
 {
-    /* default to at least MPOLY_MIN_BITS bits per exponent */
-    slong bits = mpoly_fix_bits(MPOLY_MIN_BITS, ctx->minfo);
-    nmod_mpoly_init3(poly, alloc, bits, ctx);
+    /* default to MPOLY_MIN_BITS bits per exponent */
+    nmod_mpoly_init3(A, alloc, MPOLY_MIN_BITS, ctx);
 }
-

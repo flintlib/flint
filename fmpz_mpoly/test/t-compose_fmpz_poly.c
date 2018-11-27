@@ -75,7 +75,7 @@ main(void)
             fmpz_poly_evaluate_fmpz(vals3[v], vals1[v], vals2);
         }
 
-        if (fmpz_mpoly_totaldegree_si(f, ctx1) < 50)
+        if (fmpz_mpoly_total_degree_si(f, ctx1) < 50)
         {
             fmpz_mpoly_compose_fmpz_poly(g, f, vals1, ctx1);
             fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1);
@@ -159,7 +159,7 @@ main(void)
             fmpz_poly_set_fmpz(vals1[v], vals3[v]);
         }
 
-        if (fmpz_mpoly_totaldegree_si(f, ctx1) < 50)
+        if (fmpz_mpoly_total_degree_si(f, ctx1) < 50)
         {
             fmpz_poly_t t;
             fmpz_mpoly_compose_fmpz_poly(g, f, vals1, ctx1);

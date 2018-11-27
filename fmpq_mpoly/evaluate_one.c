@@ -142,7 +142,7 @@ looper:
 
     FLINT_ASSERT(root->key >= emin);
     FLINT_ASSERT(root->key <= emax);
-    mpoly_monomial_mul_si(main_exps + N*i, one, N, root->key);
+    mpoly_monomial_mul_ui(main_exps + N*i, one, N, root->key);
     
     fmpz_pow_ui(fmpq_numref(u), fmpq_numref(val), root->key - emin);
     fmpz_pow_ui(fmpq_denref(u), fmpq_denref(val), emax - root->key);
@@ -216,7 +216,7 @@ done:
     A->zpoly->alloc = Aalloc;
     _fmpz_mpoly_set_length(A->zpoly, Alen, ctx->zctx);
 
-    fmpq_mpoly_canonicalise(A, ctx);
+    fmpq_mpoly_reduce(A, ctx);
 
     _fmpz_vec_clear(powers, poweralloc);
 
@@ -448,7 +448,7 @@ done:
     fmpz_clear(emin);
     fmpz_clear(emax);
 
-    fmpq_mpoly_canonicalise(A, ctx);
+    fmpq_mpoly_reduce(A, ctx);
 
     TMP_END;
 }

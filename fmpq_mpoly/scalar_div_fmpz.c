@@ -11,29 +11,29 @@
 
 #include "fmpq_mpoly.h"
 
-void fmpq_mpoly_scalar_div_fmpz(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_scalar_div_fmpz(fmpq_mpoly_t A,
+              const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpq_div_fmpz(poly1->content, poly2->content, c);
-    fmpz_mpoly_set(poly1->zpoly, poly2->zpoly, ctx->zctx);
+    fmpq_div_fmpz(A->content, B->content, c);
+    fmpz_mpoly_set(A->zpoly, B->zpoly, ctx->zctx);
 }
 
-void fmpq_mpoly_scalar_div_ui(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, ulong c, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_scalar_div_ui(fmpq_mpoly_t A,
+                     const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_t C;
     fmpz_init_set_ui(C, c);
-    fmpq_mpoly_scalar_div_fmpz(poly1, poly2, C, ctx);
+    fmpq_mpoly_scalar_div_fmpz(A, B, C, ctx);
     fmpz_clear(C);
 }
 
-void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, slong c, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t A,
+                     const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_t C;
     fmpz_init(C);
     fmpz_set_si(C, c);
-    fmpq_mpoly_scalar_div_fmpz(poly1, poly2, C, ctx);
+    fmpq_mpoly_scalar_div_fmpz(A, B, C, ctx);
     fmpz_clear(C);
 }
 

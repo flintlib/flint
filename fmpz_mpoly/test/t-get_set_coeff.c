@@ -19,7 +19,7 @@ main(void)
     int i, j, k, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get/set_term....");
+    flint_printf("get_set_coeff....");
     fflush(stdout);
 
     /* Check _fmpz_fmpz */

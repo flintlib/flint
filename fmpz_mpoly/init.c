@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,42 +10,42 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_init(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 {
-   /* default to at least 8 bits per exponent */
-   slong bits = mpoly_fix_bits(WORD(8), ctx->minfo);
-
-   poly->coeffs = NULL;
-   poly->exps = NULL;
-   poly->alloc = 0;
-   poly->length = 0;
-   poly->bits = bits;
+    /* default to MPOLY_MIN_BITS bits per exponent */
+    A->coeffs = NULL;
+    A->exps = NULL;
+    A->alloc = 0;
+    A->length = 0;
+    A->bits = MPOLY_MIN_BITS;
 }
 
-void fmpz_mpoly_init2(fmpz_mpoly_t poly,
-                                       slong alloc, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, mp_bitcnt_t bits,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
-   /* default to at least 8 bits per exponent */
-   slong bits = mpoly_fix_bits(WORD(8), ctx->minfo);
    slong N = mpoly_words_per_exp(bits, ctx->minfo);
+
+    /* sanitize alloc input */
+    alloc = FLINT_MAX(alloc, WORD(0));
 
    if (alloc != 0)
    {
-      poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
-      poly->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
+      A->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
+      A->exps   = (ulong *) flint_malloc(alloc*N*sizeof(ulong));
    } else
    {
-      poly->coeffs = NULL;
-      poly->exps = NULL;
+      A->coeffs = NULL;
+      A->exps = NULL;
    }
-   poly->alloc = alloc;
-   poly->length = 0;
-   poly->bits = bits;
+   A->alloc = alloc;
+   A->length = 0;
+   A->bits = bits;
 }
 
+void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc, const fmpz_mpoly_ctx_t ctx)
+{
+    /* default to MPOLY_MIN_BITS bits per exponent */
+    fmpz_mpoly_init3(A, alloc, MPOLY_MIN_BITS, ctx);
+}

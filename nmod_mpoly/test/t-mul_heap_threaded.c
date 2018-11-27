@@ -90,9 +90,9 @@ main(void)
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             nmod_mpoly_mul_heap_threaded(k, f, g, ctx);
-            nmod_mpoly_test(k, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
             result = nmod_mpoly_equal(h, k, ctx);
 
             if (!result)
@@ -147,9 +147,9 @@ main(void)
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             nmod_mpoly_mul_heap_threaded(f, f, g, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             result = nmod_mpoly_equal(h, f, ctx);
 
             if (!result)
@@ -202,9 +202,9 @@ main(void)
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             nmod_mpoly_mul_heap_threaded(g, f, g, ctx);
-            nmod_mpoly_test(g, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
             result = nmod_mpoly_equal(h, g, ctx);
 
             if (!result)

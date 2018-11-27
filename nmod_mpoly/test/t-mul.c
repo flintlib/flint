@@ -63,15 +63,15 @@ main(void)
             nmod_mpoly_randtest_bits(h, state, len2, exp_bits, ctx);
 
             nmod_mpoly_add(t1, g, h, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
             nmod_mpoly_mul(k1, f, t1, ctx);
-            nmod_mpoly_test(k1, ctx);
+            nmod_mpoly_assert_canonical(k1, ctx);
             nmod_mpoly_mul(t1, f, g, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
             nmod_mpoly_mul(t2, f, h, ctx);
-            nmod_mpoly_test(t2, ctx);
+            nmod_mpoly_assert_canonical(t2, ctx);
             nmod_mpoly_add(k2, t1, t2, ctx);
-            nmod_mpoly_test(k2, ctx);
+            nmod_mpoly_assert_canonical(k2, ctx);
             result = nmod_mpoly_equal(k1, k2, ctx);
 
             if (!result)
@@ -134,15 +134,15 @@ main(void)
             nmod_mpoly_randtest_bound(h, state, len2, exp_bound, ctx);
 
             nmod_mpoly_add(t1, g, h, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
             nmod_mpoly_mul(k1, f, t1, ctx);
-            nmod_mpoly_test(k1, ctx);
+            nmod_mpoly_assert_canonical(k1, ctx);
             nmod_mpoly_mul(t1, f, g, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
             nmod_mpoly_mul(t2, f, h, ctx);
-            nmod_mpoly_test(t2, ctx);
+            nmod_mpoly_assert_canonical(t2, ctx);
             nmod_mpoly_add(k2, t1, t2, ctx);
-            nmod_mpoly_test(k2, ctx);
+            nmod_mpoly_assert_canonical(k2, ctx);
             result = nmod_mpoly_equal(k1, k2, ctx);
 
             if (!result)
@@ -197,9 +197,9 @@ main(void)
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             nmod_mpoly_mul(f, f, g, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             result = nmod_mpoly_equal(h, f, ctx);
 
             if (!result)
@@ -250,9 +250,9 @@ main(void)
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             nmod_mpoly_mul(g, f, g, ctx);
-            nmod_mpoly_test(g, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
             result = nmod_mpoly_equal(h, g, ctx);
 
             if (!result)

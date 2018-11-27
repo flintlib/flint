@@ -58,7 +58,7 @@ main(void)
             }
 
             _nmod_mpoly_set_term_ui_fmpz(f, c, exp, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             d = _nmod_mpoly_get_term_ui_fmpz(f, exp, ctx);
             result = (c == d);
 
@@ -112,7 +112,7 @@ main(void)
                 exp[k] = n_randtest(state);
 
             nmod_mpoly_set_term_ui_ui(f, c, exp, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             d = nmod_mpoly_get_term_ui_ui(f, exp, ctx);
             result = (c == d);
 

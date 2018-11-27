@@ -12,16 +12,16 @@
 
 #include "fmpz_mpoly.h"
 
-int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 {
     slong N;
 
-    if (poly->length > WORD(1))
+    if (A->length > WORD(1))
         return 0;
 
-    if (poly->length == WORD(0))
+    if (A->length == WORD(0))
         return 1;
 
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
-    return mpoly_monomial_is_zero(poly->exps + N*0, N);
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    return mpoly_monomial_is_zero(A->exps + N*0, N);
 }

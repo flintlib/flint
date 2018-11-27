@@ -761,7 +761,7 @@ done:
     {
         FLINT_ASSERT(delta_org > 0);
         fmpz_mpoly_neg(v, b_coeff + 0, ctx);
-        fmpz_mpoly_pow_fps(u, v, delta_org, ctx);
+        fmpz_mpoly_pow_ui(u, v, delta_org, ctx);
         for (i = 0; i < polyA->length; i++)
             fmpz_mpoly_mul_johnson(polyA->coeffs + i, polyA->coeffs + i, u, ctx);
     }
@@ -810,7 +810,7 @@ void _fmpz_mpoly_univar_pgcd(fmpz_mpoly_univar_t poly1,
     C->var = polyP->var;
     D->var = polyP->var;
 
-    fmpz_mpoly_pow_fps(s, polyQ->coeffs + 0, polyP->exps[0] - polyQ->exps[0], ctx);
+    fmpz_mpoly_pow_ui(s, polyQ->coeffs + 0, polyP->exps[0] - polyQ->exps[0], ctx);
 
     _fmpz_mpoly_univar_prem(B, A, D, ctx);
 
@@ -822,8 +822,8 @@ looper:
 
     if (d - e > 1)
     {
-        fmpz_mpoly_pow_fps(u, B->coeffs + 0, d - e - 1, ctx);
-        fmpz_mpoly_pow_fps(v, s, d - e - 1, ctx);
+        fmpz_mpoly_pow_ui(u, B->coeffs + 0, d - e - 1, ctx);
+        fmpz_mpoly_pow_ui(v, s, d - e - 1, ctx);
         for (i = 0; i < B->length; i++)
         {
             fmpz_mpoly_mul_johnson(w, u, B->coeffs + i, ctx);
@@ -929,7 +929,7 @@ void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
 
     last = A;
 
-    fmpz_mpoly_pow_fps(s, polyQ->coeffs + 0, polyP->exps[0] - polyQ->exps[0], ctx);
+    fmpz_mpoly_pow_ui(s, polyQ->coeffs + 0, polyP->exps[0] - polyQ->exps[0], ctx);
 
     _fmpz_mpoly_univar_prem(B, A, D, ctx);
 
@@ -1501,7 +1501,7 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
     for (k = fmpz_poly_degree(poly2); k >= 0; k--)
     {
         _fmpz_mpoly_fit_length(&p_coeff, &p_exp, &p_alloc, p_len + 1, N);
-        mpoly_monomial_mul_si(p_exp + N*p_len, one, N, k + shift2);
+        mpoly_monomial_mul_ui(p_exp + N*p_len, one, N, k + shift2);
         fmpz_poly_get_coeff_fmpz(p_coeff + p_len, poly2, k);
         p_len += !fmpz_is_zero(p_coeff + p_len);
     }

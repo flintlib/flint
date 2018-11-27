@@ -11,22 +11,25 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_set_ui(nmod_mpoly_t poly, ulong c, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_set_ui(nmod_mpoly_t A, ulong c, const nmod_mpoly_ctx_t ctx)
 {
-    mp_limb_t cr;
     slong N;
 
-    NMOD_RED(cr, c, ctx->ffinfo->mod);
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    if (cr == 0)
+    if (c >= ctx->ffinfo->mod.n)
     {
-        _nmod_mpoly_set_length(poly, 0, ctx);
+        NMOD_RED(c, c, ctx->ffinfo->mod);
+    }
+
+    if (c == UWORD(0))
+    {
+        _nmod_mpoly_set_length(A, 0, ctx);
         return;
     }
 
-    nmod_mpoly_fit_length(poly, 1, ctx);
-    poly->coeffs[0] = cr;
-    mpoly_monomial_zero(poly->exps, N);
-    _nmod_mpoly_set_length(poly, 1, ctx);
+    nmod_mpoly_fit_length(A, 1, ctx);
+    A->coeffs[0] = c;
+    mpoly_monomial_zero(A->exps, N);
+    _nmod_mpoly_set_length(A, 1, ctx);
 }

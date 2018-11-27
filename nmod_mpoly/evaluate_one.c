@@ -126,7 +126,7 @@ looper:
         goto done;
     root = stack[--stack_size];
 
-    mpoly_monomial_mul_si(main_exps + N*i, one, N, root->key);
+    mpoly_monomial_mul_ui(main_exps + N*i, one, N, root->key);
     powers[i] = nmod_pow_ui(val, root->key, ctx->ffinfo->mod);
 
     x = chain + i;

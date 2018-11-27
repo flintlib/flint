@@ -72,22 +72,22 @@ main(void)
             idx = n_randint(state, nvars);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
 
             nmod_mpoly_derivative(hp, h, idx, ctx);
-            nmod_mpoly_test(hp, ctx);
+            nmod_mpoly_assert_canonical(hp, ctx);
 
             nmod_mpoly_derivative(fp, f, idx, ctx);
-            nmod_mpoly_test(fp, ctx);
+            nmod_mpoly_assert_canonical(fp, ctx);
             nmod_mpoly_derivative(gp, g, idx, ctx);
-            nmod_mpoly_test(gp, ctx);
+            nmod_mpoly_assert_canonical(gp, ctx);
 
             nmod_mpoly_mul_johnson(t1, f, gp, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
             nmod_mpoly_mul_johnson(t2, g, fp, ctx);
-            nmod_mpoly_test(t2, ctx);
+            nmod_mpoly_assert_canonical(t2, ctx);
             nmod_mpoly_add(t1, t1, t2, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
 
             result = nmod_mpoly_equal(hp, t1, ctx);
 
@@ -161,23 +161,23 @@ main(void)
             idx = n_randint(state, nvars);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
 
             nmod_mpoly_derivative(h, h, idx, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             nmod_mpoly_set(fp, f, ctx);
             nmod_mpoly_derivative(fp, fp, idx, ctx);
-            nmod_mpoly_test(fp, ctx);
+            nmod_mpoly_assert_canonical(fp, ctx);
             nmod_mpoly_set(gp, g, ctx);
             nmod_mpoly_derivative(gp, gp, idx, ctx);
-            nmod_mpoly_test(gp, ctx);
+            nmod_mpoly_assert_canonical(gp, ctx);
 
             nmod_mpoly_mul_johnson(t1, f, gp, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
             nmod_mpoly_mul_johnson(t2, g, fp, ctx);
-            nmod_mpoly_test(t2, ctx);
+            nmod_mpoly_assert_canonical(t2, ctx);
             nmod_mpoly_add(t1, t1, t2, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
 
             result = nmod_mpoly_equal(h, t1, ctx);
 

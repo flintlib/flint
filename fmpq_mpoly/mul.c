@@ -12,15 +12,15 @@
 #include "fmpq_mpoly.h"
 
 
-void fmpq_mpoly_mul(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                          const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_mul(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                              const fmpq_mpoly_t C, const fmpq_mpoly_ctx_t ctx)
 {
-    if (fmpq_mpoly_is_zero(poly2, ctx) || fmpq_mpoly_is_zero(poly3, ctx))
+    if (fmpq_mpoly_is_zero(B, ctx) || fmpq_mpoly_is_zero(C, ctx))
     {
-        fmpq_mpoly_zero(poly1, ctx);
+        fmpq_mpoly_zero(A, ctx);
         return;
     }
 
-    fmpq_mul(poly1->content, poly2->content, poly3->content);
-    fmpz_mpoly_mul_johnson(poly1->zpoly, poly2->zpoly, poly3->zpoly, ctx->zctx);
+    fmpq_mul(A->content, B->content, C->content);
+    fmpz_mpoly_mul(A->zpoly, B->zpoly, C->zpoly, ctx->zctx);
 }

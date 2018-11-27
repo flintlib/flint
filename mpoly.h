@@ -418,7 +418,7 @@ void mpoly_monomial_swap(ulong * exp2, ulong * exp3, slong N)
 }
 
 MPOLY_INLINE
-void mpoly_monomial_mul_si(ulong * exp2, const ulong * exp3, slong N, slong c)
+void mpoly_monomial_mul_ui(ulong * exp2, const ulong * exp3, slong N, ulong c)
 {
    slong i;
    for (i = 0; i < N; i++)
@@ -671,11 +671,11 @@ FLINT_DLL slong mpoly_degree_si(const ulong * poly_exps,
                      slong len, slong bits, slong var, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_degree_fmpz(fmpz_t deg, const ulong * poly_exps,
                      slong len, slong bits, slong var, const mpoly_ctx_t mctx);
-FLINT_DLL int  mpoly_totaldegree_fits_si(const ulong * exps,
+FLINT_DLL int  mpoly_total_degree_fits_si(const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
-FLINT_DLL slong mpoly_totaldegree_si(const ulong * exps,
+FLINT_DLL slong mpoly_total_degree_si(const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
-FLINT_DLL void mpoly_totaldegree_fmpz(fmpz_t totdeg, const ulong * exps,
+FLINT_DLL void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_search_monomials(
@@ -693,17 +693,21 @@ FLINT_DLL void mpoly_main_variable_split_DEG(slong * ind, ulong * pexp,
                                   const ulong * Aexp,  slong l1, slong Alen,
                                             ulong deg, slong num, slong Abits);
 
-FLINT_DLL int mpoly_termexp_fits_si(ulong * exps, slong bits,
+FLINT_DLL int mpoly_term_exp_fits_si(ulong * exps, slong bits,
                                               slong n, const mpoly_ctx_t mctx);
 
-FLINT_DLL int mpoly_termexp_fits_ui(ulong * exps, slong bits,
+FLINT_DLL int mpoly_term_exp_fits_ui(ulong * exps, slong bits,
                                               slong n, const mpoly_ctx_t mctx);
+
+FLINT_DLL int mpoly_is_gen(ulong * exps, slong var, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_monomials_valid_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_monomials_overflow_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_reverse(ulong * Aexp, const ulong * Bexp, slong len, slong N);
 
 /* info related to zippel interpolation **************************************/
 typedef struct

@@ -12,19 +12,22 @@
 #include "fmpq_mpoly.h"
 
 
-int fmpq_mpoly_gcd(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                          const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx)
+int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A,
+                          const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 {
-    int success = 1;
-    if (fmpq_mpoly_is_zero(poly2, ctx) && fmpq_mpoly_is_zero(poly3, ctx))
+    int success;
+
+    if (fmpq_mpoly_is_zero(A, ctx) && fmpq_mpoly_is_zero(B, ctx))
     {
-        fmpq_mpoly_zero(poly1, ctx);
-        return success;
+        fmpq_mpoly_zero(G, ctx);
+        return 1;
     }
 
-    success = fmpz_mpoly_gcd_brown(poly1->zpoly, poly2->zpoly, poly3->zpoly, ctx->zctx);
+    success = fmpz_mpoly_gcd(G->zpoly, A->zpoly, B->zpoly, ctx->zctx);
     if (success)
-        fmpq_mpoly_make_monic_inplace(poly1, ctx);
+    {
+        _fmpq_mpoly_make_monic_inplace(G, ctx);
+    }
 
     return success;
 }

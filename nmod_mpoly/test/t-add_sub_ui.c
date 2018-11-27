@@ -62,9 +62,9 @@ main(void)
             c = n_randtest(state);
 
             nmod_mpoly_add_ui(g, f, c, ctx);
-            nmod_mpoly_test(g, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
             nmod_mpoly_sub_ui(h, g, c, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             result = nmod_mpoly_equal(f, h, ctx);
 
             if (!result)
@@ -118,9 +118,9 @@ main(void)
             nmod_mpoly_set(g, f, ctx);
             c = n_randtest(state);
             nmod_mpoly_add_ui(f, f, c, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             nmod_mpoly_sub_ui(f, f, c, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             result = nmod_mpoly_equal(f, g, ctx);
 
             if (!result)

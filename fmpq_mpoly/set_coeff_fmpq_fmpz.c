@@ -95,7 +95,7 @@ void _fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t qpoly,
         fmpz_clear(prod);
     }
 
-    fmpq_mpoly_canonicalise(qpoly, qctx);
+    fmpq_mpoly_reduce(qpoly, qctx);
 
     TMP_END; 
 }
