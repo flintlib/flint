@@ -12,6 +12,10 @@
 
 #include "fmpz_mpoly.h"
 
+/*
+    NOTE: this file is dirty - it assumes that a zero fmpz is zero
+*/
+
 /* improve locality */
 #define BLOCK 128
 #define MAX_ARRAY_SIZE (WORD(300000))
