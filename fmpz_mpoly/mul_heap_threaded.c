@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+#include "thread_pool.h"
 #include "fmpz_mpoly.h"
 
 
@@ -513,7 +514,9 @@ typedef struct
     const ulong * cmpmask;    
     volatile int idx;
 }
-mul_heap_threaded_base_t;
+_base_struct;
+
+typedef _base_struct _base_t[1];
 
 typedef struct
 {
@@ -524,20 +527,20 @@ typedef struct
     ulong * exp1;
     fmpz * coeff1;
 }
-mul_heap_threaded_div_t;
+_div_struct;
 
 typedef struct
 {
     slong idx;
     slong time;
-    mul_heap_threaded_base_t * basep;
-    mul_heap_threaded_div_t * divp;
+    _base_struct * base;
+    _div_struct * divs;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
-    slong * t1, * t2, *t3, *t4;
+    slong * t1, * t2, * t3, * t4;
     ulong * exp;
 }
-mul_heap_threaded_arg_t;
+_worker_arg_struct;
 
 
 /*
@@ -552,20 +555,17 @@ mul_heap_threaded_arg_t;
       yy = tt; \
    } while (0)
 
-void * _fmpz_mpoly_mul_heap_threaded_worker(void * arg_ptr)
+void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
 {
-    mul_heap_threaded_arg_t * arg = (mul_heap_threaded_arg_t *) arg_ptr;
-
-    mul_heap_threaded_div_t * divs;
-    mul_heap_threaded_base_t * base;
+    _worker_arg_struct * arg = (_worker_arg_struct *) varg;
+    _div_struct * divs = arg->divs;
+    _base_struct * base = arg->base;
     slong i, j;
 
     ulong *exp;
     slong score;
     slong *start, *end, *t1, *t2, *t3, *t4, *tt;
 
-    divs = arg->divp;
-    base = arg->basep;
     exp = (ulong *) flint_malloc(base->N*sizeof(ulong));
     t1 = (slong *) flint_malloc(base->len2*sizeof(slong));
     t2 = (slong *) flint_malloc(base->len2*sizeof(slong));
@@ -584,9 +584,8 @@ void * _fmpz_mpoly_mul_heap_threaded_worker(void * arg_ptr)
         i = base->ndivs - 1;
     }
 
-
-    while (i >= 0) {
-
+    while (i >= 0)
+    {
         /* calculate start */
         if (i + 1 < base-> ndivs)
         {
@@ -645,17 +644,11 @@ void * _fmpz_mpoly_mul_heap_threaded_worker(void * arg_ptr)
         pthread_mutex_unlock(&base->mutex);
     }
 
-    /* clean up */
     flint_free(t4);
     flint_free(t3);
     flint_free(t2);
     flint_free(t1);
     flint_free(exp);
-    if (arg->idx + 1 < base->nthreads)
-    {
-        flint_cleanup();
-    }
-    return NULL;
 }
 
 
@@ -666,15 +659,35 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
                               mp_bitcnt_t bits, slong N, const ulong * cmpmask)
 {
     slong i, j, k, ndivs2;
-    pthread_t * threads;
-    mul_heap_threaded_arg_t * args;
-    mul_heap_threaded_base_t * base;
-    mul_heap_threaded_div_t * divs;
+    _worker_arg_struct * args;
+    _base_t base;
+    _div_struct * divs;
     fmpz * p1;
     ulong * e1;
+    slong max_num_workers, num_workers;
+    thread_pool_handle * handles;
 
-    base = flint_malloc(sizeof(mul_heap_threaded_base_t));
-    base->nthreads = flint_get_num_threads();
+    /* bail here if no workers */
+    FLINT_ASSERT(global_thread_pool_initialized);
+    max_num_workers = thread_pool_get_size(global_thread_pool);
+    max_num_workers = FLINT_MIN(max_num_workers, len3/32);
+    if (max_num_workers == 0)
+    {
+        return _fmpz_mpoly_mul_johnson(poly1, exp1, alloc, coeff2, exp2, len2,
+                                         coeff3, exp3, len3, bits, N, cmpmask);
+    }
+    handles = (thread_pool_handle *) flint_malloc(max_num_workers
+                                                  *sizeof(thread_pool_handle));
+    num_workers = thread_pool_request(global_thread_pool,
+                                                     handles, max_num_workers);
+    if (num_workers == 0)
+    {
+        flint_free(handles);
+        return _fmpz_mpoly_mul_johnson(poly1, exp1, alloc, coeff2, exp2, len2,
+                                         coeff3, exp3, len3, bits, N, cmpmask);
+    }
+
+    base->nthreads = num_workers + 1;
     base->ndivs    = base->nthreads*4;  /* number of divisons */
     base->coeff2 = coeff2;
     base->exp2 = exp2;
@@ -685,13 +698,13 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
     base->bits = bits;
     base->N = N;
     base->cmpmask = cmpmask;
-    base->idx = base->ndivs-1;    /* decremented by worker threads */
+    base->idx = base->ndivs - 1;    /* decremented by worker threads */
 
     ndivs2 = base->ndivs*base->ndivs;
 
-    divs    = flint_malloc(sizeof(mul_heap_threaded_div_t) * base->ndivs);
-    threads = flint_malloc(sizeof(pthread_t) * base->nthreads);
-    args    = flint_malloc(sizeof(mul_heap_threaded_arg_t) * base->nthreads);
+    divs = (_div_struct *) flint_malloc(base->ndivs*sizeof(_div_struct));
+    args = (_worker_arg_struct *) flint_malloc(base->nthreads
+                                                  *sizeof(_worker_arg_struct));
 
     /* allocate space and set the boundary for each division */
     for (i = base->ndivs - 1; i >= 0; i--)
@@ -701,52 +714,44 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
         divs[i].upper = divs[i].lower;
 
         divs[i].len1 = 0;
-        k = 0; /* avoid bogus warning */
         if (i == base->ndivs - 1)
         {
             /* highest division writes to original poly */
             divs[i].alloc1 = *alloc;
             divs[i].exp1 = *exp1;
             divs[i].coeff1 = *poly1;
-            /* keep this many coeffs from original poly */
-            k = (ndivs2 - i*i)*(*alloc)/ndivs2;
         } else
         {
             /* lower divisions write to a new worker poly */
             divs[i].alloc1 = len2 + len3/base->ndivs;
             divs[i].exp1 = (ulong *) flint_malloc(divs[i].alloc1*N*sizeof(ulong)); 
             divs[i].coeff1 = (fmpz *) flint_calloc(divs[i].alloc1, sizeof(fmpz));
-            /* try to take this many coeffs from original poly */
-            for (j = 0; j < divs[i].alloc1
-                   && k < *alloc
-                   && k < (ndivs2 - i*i)*(*alloc) / ndivs2; j++, k++)
-                fmpz_swap(*poly1 + k, divs[i].coeff1 + j);
         }
     }
 
     /* compute each chunk in parallel */
     pthread_mutex_init(&base->mutex, NULL);
-    for (i = 0; i < base->nthreads; i++)
+    for (i = 0; i < num_workers; i++)
     {
         args[i].idx = i;
-        args[i].basep = base;
-        args[i].divp = divs;
-        if (i + 1 < base->nthreads)
-        {
-            pthread_create(&threads[i], NULL, _fmpz_mpoly_mul_heap_threaded_worker, &args[i]);
-        } else
-        {
-            _fmpz_mpoly_mul_heap_threaded_worker(&args[i]);
-        }
+        args[i].base = base;
+        args[i].divs = divs;
+        thread_pool_wake(global_thread_pool, handles[i],
+                               _fmpz_mpoly_mul_heap_threaded_worker, &args[i]);
     }
-    for (i = base->nthreads-1; i >= 0; i--)
+    i = num_workers;
+    args[i].idx = i;
+    args[i].base = base;
+    args[i].divs = divs;
+    _fmpz_mpoly_mul_heap_threaded_worker(&args[i]);
+    for (i = 0; i < num_workers; i++)
     {
-        if (i + 1 < base->nthreads)
-        {
-            pthread_join(threads[i], NULL);
-        }
+        thread_pool_wait(global_thread_pool, handles[i]);
+        thread_pool_give_back(global_thread_pool, handles[i]);
     }
     pthread_mutex_destroy(&base->mutex);
+
+    flint_free(handles);
 
     /* concatenate the outputs */ 
     k = 0; /* avoid bogus warning */
@@ -779,9 +784,7 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** poly1, ulong ** exp1, slong * alloc,
     }
 
     flint_free(args);
-    flint_free(threads);
     flint_free(divs);
-    flint_free(base);
 
     *poly1 = p1;
     *exp1  = e1;
