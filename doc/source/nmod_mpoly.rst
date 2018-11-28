@@ -28,7 +28,7 @@ Context object
 .. function:: void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, slong nvars, const ordering_t ord, mp_limb_t n)
 
     Initialise a context object for a polynomial ring with the given number of variables and the given ordering.
-    It will have coefficients modulo `n`.
+    It will have coefficients modulo `n`. Setting `n = 0` or `n = 1` will currently give undefined behavior.
     The possibilities for the ordering are ``ORD_LEX``, ``ORD_DEGLEX`` and ``ORD_DEGREVLEX``.
 
 .. function:: slong nmod_mpoly_ctx_nvars(nmod_mpoly_ctx_t ctx)

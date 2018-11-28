@@ -17,7 +17,7 @@ int nmod_mpoly_is_gen(const nmod_mpoly_t A,
     if (A->length != WORD(1))
         return 0;
 
-    if (A->coeffs[1] != UWORD(1))
+    if (A->coeffs[0] != UWORD(1))
         return 0;
 
     return mpoly_is_gen(A->exps, var, A->bits, ctx->minfo);
