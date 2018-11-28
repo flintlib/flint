@@ -109,7 +109,26 @@ FLINT_DLL void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_t state
 
 FLINT_DLL void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE int nmod_mpoly_ctx_modulus_is_prime(nmod_mpoly_ctx_t ctx)
+NMOD_MPOLY_INLINE
+slong nmod_mpoly_ctx_nvars(const nmod_mpoly_ctx_t ctx)
+{
+    return ctx->minfo->nvars;
+}
+
+NMOD_MPOLY_INLINE
+ordering_t nmod_mpoly_ctx_ord(const nmod_mpoly_ctx_t ctx)
+{
+    return ctx->minfo->ord;
+}
+
+NMOD_MPOLY_INLINE
+mp_limb_t nmod_mpoly_ctx_modulus(const nmod_mpoly_ctx_t ctx)
+{
+    return ctx->ffinfo->mod.n;
+}
+
+NMOD_MPOLY_INLINE
+int nmod_mpoly_ctx_modulus_is_prime(const nmod_mpoly_ctx_t ctx)
 {
     return n_is_prime(ctx->ffinfo->mod.n);
 }

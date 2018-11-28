@@ -38,13 +38,16 @@ Context object
 
 .. function:: void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx, slong nvars, const ordering_t ord)
 
-    Initialise a context object for a polynomial ring with the given number of
-    variables and the given ordering. The possibilities for the ordering are
-    ``ORD_LEX``, ``ORD_DEGLEX`` and ``ORD_DEGREVLEX``.
+    Initialise a context object for a polynomial ring with the given number of variables and the given ordering.
+    The possibilities for the ordering are ``ORD_LEX``, ``ORD_DEGLEX`` and ``ORD_DEGREVLEX``.
 
-.. function:: slong fmpq_mpoly_ctx_nvars(fmpq_mpoly_ctx_t ctx)
+.. function:: slong fmpq_mpoly_ctx_nvars(const fmpq_mpoly_ctx_t ctx)
 
     Return the number of variables used to initialize the context.
+
+.. function:: ordering_t fmpq_mpoly_ctx_ord(const fmpq_mpoly_ctx_t ctx)
+
+    Return the ordering used to initialize the context.
 
 .. function:: void fmpq_mpoly_ctx_clear(fmpq_mpoly_ctx_t ctx)
 

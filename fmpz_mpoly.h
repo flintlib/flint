@@ -56,13 +56,13 @@ FLINT_DLL void fmpz_mpoly_ctx_init_rand(fmpz_mpoly_ctx_t mctx, flint_rand_t stat
 FLINT_DLL void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-slong fmpz_mpoly_ctx_nvars(fmpz_mpoly_ctx_t ctx)
+slong fmpz_mpoly_ctx_nvars(const fmpz_mpoly_ctx_t ctx)
 {
     return ctx->minfo->nvars;
 }
 
 FMPZ_MPOLY_INLINE
-ordering_t fmpz_mpoly_ctx_ord(fmpz_mpoly_ctx_t ctx)
+ordering_t fmpz_mpoly_ctx_ord(const fmpz_mpoly_ctx_t ctx)
 {
     return ctx->minfo->ord;
 }

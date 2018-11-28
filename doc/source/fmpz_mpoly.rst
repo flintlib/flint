@@ -21,12 +21,6 @@ Types, macros and constants
 
     Description.
 
-.. type:: fmpz_mpoly_univar_struct
-
-.. type:: fmpz_mpoly_univar_t
-
-    Description.
-
 
 Context object
 --------------------------------------------------------------------------------
@@ -34,14 +28,16 @@ Context object
 
 .. function:: void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, slong nvars, const ordering_t ord)
 
-    Initialise a context object for a polynomial ring with the given number of
-    variables and the given ordering. The possibilities for the ordering are
-    ``ORD_LEX``, ``ORD_REVLEX``, ``ORD_DEGLEX`` and
-    ``ORD_DEGREVLEX``.
+    Initialise a context object for a polynomial ring with the given number of variables and the given ordering.
+    The possibilities for the ordering are ``ORD_LEX``, ``ORD_DEGLEX`` and ``ORD_DEGREVLEX``.
 
 .. function:: slong fmpz_mpoly_ctx_nvars(fmpz_mpoly_ctx_t ctx)
 
     Return the number of variables used to initialize the context.
+
+.. function:: ordering_t fmpz_mpoly_ctx_ord(const fmpz_mpoly_ctx_t ctx)
+
+    Return the ordering used to initialize the context.
 
 .. function:: void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx)
 

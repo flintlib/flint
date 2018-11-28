@@ -27,23 +27,26 @@ Context object
 
 .. function:: void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, slong nvars, const ordering_t ord, mp_limb_t n)
 
-    Initialise a context object for a polynomial ring with the given number of
-    variables and the given ordering.  It will have coefficients modulo~`n`.
-    The possibilities for the ordering are
-    ``ORD_LEX``, ``ORD_REVLEX``, ``ORD_DEGLEX`` and
-    ``ORD_DEGREVLEX``.
+    Initialise a context object for a polynomial ring with the given number of variables and the given ordering.
+    It will have coefficients modulo `n`.
+    The possibilities for the ordering are ``ORD_LEX``, ``ORD_DEGLEX`` and ``ORD_DEGREVLEX``.
+
+.. function:: slong nmod_mpoly_ctx_nvars(nmod_mpoly_ctx_t ctx)
+
+    Return the number of variables used to initialize the context.
+
+.. function:: ordering_t nmod_mpoly_ctx_ord(const nmod_mpoly_ctx_t ctx)
+
+    Return the ordering used to initialize the context.
+
+.. function:: mp_limb_t nmod_mpoly_ctx_modulus(const nmod_mpoly_ctx_t ctx)
+
+    Return the modulus used to initialize the context.
 
 .. function:: void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx)
 
     Release any space allocated by an ``nmod_mpoly_ctx_t``.
 
-.. function:: void nmodf_ctx_init(nmodf_ctx_t ctx, mp_limb_t n)
-
-    Initialise a context object for doing arithmetic modulo~`n`.
-
-.. function:: void nmodf_ctx_clear(nmodf_ctx_t ctx)
-
-    Release any space allocated by an ``nmodf_ctx_t``.
 
 
 Memory management
