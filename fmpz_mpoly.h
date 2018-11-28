@@ -646,6 +646,41 @@ FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * al
                  const fmpz * poly3, const ulong * exp3, slong len3,
                              mp_bitcnt_t bits, slong N, const ulong * cmpmask);
 
+FLINT_DLL void _fmpz_mpoly_mul_johnson_maxfields(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_mul_heap_threaded_maxfields(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_array_DEG(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
+                                 const fmpz_mpoly_t A, fmpz * maxAfields,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 /* Powering ******************************************************************/
 
 FLINT_DLL void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,

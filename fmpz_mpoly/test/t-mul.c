@@ -15,7 +15,7 @@
 int
 main(void)
 {
-    int i, j, result;
+    int i, j, result, max_threads = 5;
     FLINT_TEST_INIT(state);
 
     flint_printf("mul....");
@@ -118,7 +118,7 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
-            fmpz_mpoly_mul(h, f, g, ctx);
+            fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
             fmpz_mpoly_mul(f, f, g, ctx);
             fmpz_mpoly_assert_canonical(f, ctx);
@@ -127,7 +127,7 @@ main(void)
             if (!result)
             {
                 printf("FAIL\n");
-                flint_printf("Check aliasing second arg\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("Check aliasing first arg\ni = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }
@@ -152,9 +152,9 @@ main(void)
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(h, ctx);
 
-        len = n_randint(state, 100);
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
+        len = n_randint(state, 150);
+        len1 = n_randint(state, 150);
+        len2 = n_randint(state, 150);
 
         exp_bits = n_randint(state, 200) + 2;
         exp_bits1 = n_randint(state, 200) + 2;
@@ -168,7 +168,9 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
-            fmpz_mpoly_mul(h, f, g, ctx);
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+            fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
             fmpz_mpoly_mul(g, f, g, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);

@@ -718,7 +718,7 @@ void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
 
 
 
-int fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t A,
+int _fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t A,
                                  const fmpz_mpoly_t B, fmpz * maxBfields,
                                  const fmpz_mpoly_t C, fmpz * maxCfields,
                                                     const fmpz_mpoly_ctx_t ctx)
@@ -1232,7 +1232,7 @@ void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
 
 
 
-int fmpz_mpoly_mul_array_DEG(fmpz_mpoly_t A,
+int _fmpz_mpoly_mul_array_DEG(fmpz_mpoly_t A,
                                  const fmpz_mpoly_t B, fmpz * maxBfields,
                                  const fmpz_mpoly_t C, fmpz * maxCfields,
                                                     const fmpz_mpoly_ctx_t ctx)
@@ -1349,15 +1349,15 @@ int fmpz_mpoly_mul_array(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     {
         case ORD_LEX:
         {
-            success = fmpz_mpoly_mul_array_LEX(A, B, maxBfields,
-                                                  C, maxCfields, ctx);
+            success = _fmpz_mpoly_mul_array_LEX(A, B, maxBfields,
+                                                   C, maxCfields, ctx);
             break;
         }
         case ORD_DEGLEX:
         case ORD_DEGREVLEX:
         {
-            success = fmpz_mpoly_mul_array_DEG(A, B, maxBfields,
-                                                  C, maxCfields, ctx);
+            success = _fmpz_mpoly_mul_array_DEG(A, B, maxBfields,
+                                                   C, maxCfields, ctx);
             break;
         }
         default:

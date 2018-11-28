@@ -382,7 +382,7 @@ flint_printf("doing threaded LEX with %d threads\n", base->nthreads);
 }
 
 
-int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
+int _fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
                                  const fmpz_mpoly_t B, fmpz * maxBfields,
                                  const fmpz_mpoly_t C, fmpz * maxCfields,
                                                     const fmpz_mpoly_ctx_t ctx)
@@ -401,6 +401,11 @@ int fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
     FLINT_ASSERT(1 == mpoly_words_per_exp(C->bits, ctx->minfo));
 
     TMP_START;
+
+    if (!global_thread_pool_initialized)
+    {
+        return _fmpz_mpoly_mul_array_LEX(A, B, maxBfields, C, maxCfields, ctx);
+    }
 
     /* compute maximum exponents for each variable */
     mults = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
@@ -760,10 +765,6 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
     args = (_worker_arg_struct *) TMP_ALLOC(base->nthreads
                                                   *sizeof(_worker_arg_struct));
 
-
-flint_printf("doing threaded DEG with %d threads\n", base->nthreads);
-
-
     pthread_mutex_init(&base->mutex, NULL);
     for (i = 0; i < num_workers; i++)
     {
@@ -809,7 +810,7 @@ flint_printf("doing threaded DEG with %d threads\n", base->nthreads);
 }
 
 
-int fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
+int _fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
                                  const fmpz_mpoly_t B, fmpz * maxBfields,
                                  const fmpz_mpoly_t C, fmpz * maxCfields,
                                                     const fmpz_mpoly_ctx_t ctx)
@@ -826,6 +827,11 @@ int fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
 
     FLINT_ASSERT(1 == mpoly_words_per_exp(B->bits, ctx->minfo));
     FLINT_ASSERT(1 == mpoly_words_per_exp(C->bits, ctx->minfo));
+
+    if (!global_thread_pool_initialized)
+    {
+        return _fmpz_mpoly_mul_array_DEG(A, B, maxBfields, C, maxCfields, ctx);
+    }
 
     /* the field of index n-1 is the one that wil be pulled out */
     i = ctx->minfo->nfields - 1;
@@ -926,14 +932,14 @@ int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     {
         case ORD_LEX:
         {
-            success = fmpz_mpoly_mul_array_threaded_LEX(A, B, maxBfields,
+            success = _fmpz_mpoly_mul_array_threaded_LEX(A, B, maxBfields,
                                                            C, maxCfields, ctx);
             break;
         }
         case ORD_DEGREVLEX:
         case ORD_DEGLEX:
         {
-            success = fmpz_mpoly_mul_array_threaded_DEG(A, B, maxBfields,
+            success = _fmpz_mpoly_mul_array_threaded_DEG(A, B, maxBfields,
                                                            C, maxCfields, ctx);
             break;
         }

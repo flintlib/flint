@@ -763,6 +763,12 @@ void _fmpz_mpoly_mul_heap_threaded_maxfields(fmpz_mpoly_t A,
     int freeBexp, freeCexp;
     TMP_INIT;
 
+    if (!global_thread_pool_initialized)
+    {
+        _fmpz_mpoly_mul_johnson_maxfields(A, B, maxBfields, C, maxCfields, ctx);
+        return;
+    }
+
     TMP_START;
 
     _fmpz_vec_add(maxBfields, maxBfields, maxCfields, ctx->minfo->nfields);
