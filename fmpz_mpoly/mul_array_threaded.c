@@ -336,8 +336,6 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
     args = (_worker_arg_struct *) TMP_ALLOC(base->nthreads
                                                   *sizeof(_worker_arg_struct));
 
-flint_printf("doing threaded LEX with %d threads\n", base->nthreads);
-
     pthread_mutex_init(&base->mutex, NULL);
     for (i = 0; i < num_workers; i++)
     {
