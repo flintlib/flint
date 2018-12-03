@@ -56,13 +56,13 @@ FLINT_DLL void fmpz_mpoly_ctx_init_rand(fmpz_mpoly_ctx_t mctx, flint_rand_t stat
 FLINT_DLL void fmpz_mpoly_ctx_clear(fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-slong fmpz_mpoly_ctx_nvars(fmpz_mpoly_ctx_t ctx)
+slong fmpz_mpoly_ctx_nvars(const fmpz_mpoly_ctx_t ctx)
 {
     return ctx->minfo->nvars;
 }
 
 FMPZ_MPOLY_INLINE
-ordering_t fmpz_mpoly_ctx_ord(fmpz_mpoly_ctx_t ctx)
+ordering_t fmpz_mpoly_ctx_ord(const fmpz_mpoly_ctx_t ctx)
 {
     return ctx->minfo->ord;
 }
@@ -646,6 +646,40 @@ FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * al
                  const fmpz * poly3, const ulong * exp3, slong len3,
                              mp_bitcnt_t bits, slong N, const ulong * cmpmask);
 
+FLINT_DLL void _fmpz_mpoly_mul_johnson_maxfields(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_mul_heap_threaded_maxfields(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_array_DEG(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                 const fmpz_mpoly_t C, fmpz * maxCfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
+                                 const fmpz_mpoly_t A, fmpz * maxAfields,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
+                                                   const fmpz_mpoly_ctx_t ctx);
 
 /* Powering ******************************************************************/
 
@@ -1080,6 +1114,14 @@ FLINT_DLL int fmpz_mpoly_geobucket_divides_inplace(fmpz_mpoly_geobucket_t B1,
 
 
 /* Helpers for array methods *************************************************/
+
+FLINT_DLL void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
+                             const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
+                                       ulong degb, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
+                             const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
+                              const ulong * mults, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1, 
                  const slong * poly2, const ulong * exp2, slong len2,

@@ -63,13 +63,13 @@ void fmpq_mpoly_ctx_clear(fmpq_mpoly_ctx_t ctx)
 }
 
 FMPQ_MPOLY_INLINE
-slong fmpq_mpoly_ctx_nvars(fmpq_mpoly_ctx_t ctx)
+slong fmpq_mpoly_ctx_nvars(const fmpq_mpoly_ctx_t ctx)
 {
     return ctx->zctx->minfo->nvars;
 }
 
 FMPQ_MPOLY_INLINE
-ordering_t fmpq_mpoly_ctx_ord(fmpq_mpoly_ctx_t ctx)
+ordering_t fmpq_mpoly_ctx_ord(const fmpq_mpoly_ctx_t ctx)
 {
     return ctx->zctx->minfo->ord;
 }

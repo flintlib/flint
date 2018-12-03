@@ -9,16 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#define NMOD_MPOLY_INLINES_C
+
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#include <stdio.h>
+#undef ulong
+#include <gmp.h>
+#include "flint.h"
+#include "ulong_extras.h"
 #include "nmod_mpoly.h"
 
-int nmod_mpoly_is_gen(const nmod_mpoly_t A,
-                                         slong var, const nmod_mpoly_ctx_t ctx)
-{
-    if (A->length != WORD(1))
-        return 0;
-
-    if (A->coeffs[0] != UWORD(1))
-        return 0;
-
-    return mpoly_is_gen(A->exps, var, A->bits, ctx->minfo);
-}

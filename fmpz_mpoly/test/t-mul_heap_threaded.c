@@ -37,9 +37,9 @@ main(void)
         fmpz_mpoly_init(h, ctx);
         fmpz_mpoly_init(k, ctx);
 
-        len = n_randint(state, 100);
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
+        len = n_randint(state, 200);
+        len1 = n_randint(state, 200);
+        len2 = n_randint(state, 200);
 
         exp_bits = n_randint(state, 200) + 2;
         exp_bits1 = n_randint(state, 200) + 2;
