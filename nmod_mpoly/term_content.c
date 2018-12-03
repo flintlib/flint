@@ -9,21 +9,20 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly.h"
 
 
-void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
-                                                    const fmpz_mpoly_ctx_t ctx)
+void nmod_mpoly_term_content(nmod_mpoly_t M, const nmod_mpoly_t A,
+                                                    const nmod_mpoly_ctx_t ctx)
 {
     slong i;
     mp_bitcnt_t Abits;
     fmpz * minAfields, * min_degs;
-    fmpz_t g;
     TMP_INIT;
 
     if (A->length == 0)
     {
-        fmpz_mpoly_zero(M, ctx);
+        nmod_mpoly_zero(M, ctx);
         return;
     }
 
@@ -43,20 +42,17 @@ void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
         fmpz_init(min_degs + i);
     mpoly_get_monomial_ffmpz_unpacked_ffmpz(min_degs, minAfields, ctx->minfo);
 
-    fmpz_mpoly_fit_length(M, 1, ctx);
-    fmpz_mpoly_fit_bits(M, Abits, ctx);
+    nmod_mpoly_fit_length(M, 1, ctx);
+    nmod_mpoly_fit_bits(M, Abits, ctx);
     M->bits = Abits;
     mpoly_set_monomial_ffmpz(M->exps, min_degs, Abits, ctx->minfo);
 
-    fmpz_init(g);
-    _fmpz_vec_content(g, A->coeffs, A->length);
-    fmpz_swap(M->coeffs + 0, g);
-    fmpz_clear(g);
+    M->coeffs[0] = UWORD(1);
 
     for (i = 0; i < ctx->minfo->nfields; i++)
         fmpz_clear(minAfields + i);
     for (i = 0; i < ctx->minfo->nvars; i++)
         fmpz_clear(min_degs + i);
 
-    _fmpz_mpoly_set_length(M, 1, ctx);
+    _nmod_mpoly_set_length(M, 1, ctx);
 }

@@ -786,6 +786,9 @@ FLINT_DLL void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
 
 /* GCD ***********************************************************************/
 
+FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A,
                              const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
@@ -914,9 +917,6 @@ FLINT_DLL void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len);
 FLINT_DLL void fmpz_mpolyd_clear(fmpz_mpolyd_t poly);
 
 /* GCD ***********************************************************************/
-
-FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t poly1,
-                         const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                          const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx);

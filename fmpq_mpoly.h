@@ -653,13 +653,11 @@ FLINT_DLL void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 FLINT_DLL void fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                           ulong k, const fmpq_mpoly_ctx_t ctx);
 
-/* Divisibility **************************************************************/
+/* Division ******************************************************************/
 
 FLINT_DLL int fmpq_mpoly_divides(fmpq_mpoly_t poly1,
                   const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
                                                    const fmpq_mpoly_ctx_t ctx);
-
-/* Division ******************************************************************/
 
 FLINT_DLL void fmpq_mpoly_div(fmpq_mpoly_t q,
                      const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
@@ -675,8 +673,11 @@ FLINT_DLL void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
 
 /* GCD ***********************************************************************/
 
-FLINT_DLL int fmpq_mpoly_gcd(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                         const fmpq_mpoly_t poly3, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_term_content(fmpq_mpoly_t M, const fmpq_mpoly_t A,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A,
+                             const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
 /*
 not implemented yet
 FLINT_DLL void fmpq_mpoly_resultant(fmpq_mpoly_t poly1,

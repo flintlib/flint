@@ -575,6 +575,11 @@ Division
 Greatest Common Divisor
 --------------------------------------------------------------------------------
 
+.. function:: void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+
+    Sets ``M`` to the GCD of the terms of ``A``.
+    If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with positive coefficient.
+
 .. function:: int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Try to set ``G`` to the GCD of ``A`` and ``B`` with positive leading coefficient. The GCD of zero and zero is defined to be zero.
@@ -721,11 +726,6 @@ Internal Functions
     quotient) polynomials, is given by ``len``. The function computes
     polynomials `q_i = q[i]` such that ``poly2`` is
     `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
-
-
-.. function:: void fmpz_mpoly_term_content(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
-
-    Sets ``poly1`` to the GCD of the terms of ``poly2``.
 
 
 .. function:: int fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)

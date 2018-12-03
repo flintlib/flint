@@ -644,6 +644,9 @@ nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** Q, nmod_mpoly_t R,
 
 /* GCD ***********************************************************************/
 
+FLINT_DLL void nmod_mpoly_term_content(nmod_mpoly_t M, const nmod_mpoly_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL int nmod_mpoly_gcd(nmod_mpoly_t G, const nmod_mpoly_t A,
                              const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
