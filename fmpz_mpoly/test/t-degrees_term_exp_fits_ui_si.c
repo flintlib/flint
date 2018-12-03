@@ -21,7 +21,7 @@ main(void)
     int result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("degrees_termexp_fits_ui_si....");
+    flint_printf("degrees_term_exp_fits_ui_si....");
     fflush(stdout);
 
     /* basic corner cases */
