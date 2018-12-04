@@ -59,4 +59,6 @@ void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
         fmpz_clear(min_degs + i);
 
     _fmpz_mpoly_set_length(M, 1, ctx);
+
+    TMP_END;
 }
