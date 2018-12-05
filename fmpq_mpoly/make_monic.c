@@ -31,10 +31,8 @@ void fmpq_mpoly_make_monic(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 /* this version must ignore A->content */
 void _fmpq_mpoly_make_monic_inplace(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 {
-    if (A->zpoly->length == 0)
-    {
-        flint_throw(FLINT_ERROR, "Zero polynomial in fmpq_mpoly_make_monic_inplace");
-    }
+    FLINT_ASSERT(A->zpoly->length > 0);
+    FLINT_ASSERT(fmpz_sgn(A->zpoly->coeffs + 0) > 0);
 
     fmpz_one(fmpq_numref(A->content));
     fmpz_set(fmpq_denref(A->content), A->zpoly->coeffs + 0);

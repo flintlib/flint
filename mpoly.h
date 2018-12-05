@@ -623,6 +623,8 @@ FLINT_DLL void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
 FLINT_DLL void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
                                                      slong nfields, slong len);
 
+FLINT_DLL void mpoly_get_monomial_ffmpz_unpacked_ffmpz(fmpz * user_exps,
+                               const fmpz * poly_exps, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_get_monomial_ui_unpacked_ffmpz(ulong * user_exps,
                                const fmpz * poly_exps, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps,
@@ -656,6 +658,10 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
 FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_gen_fields_fmpz(fmpz * exp, slong var, const mpoly_ctx_t mctx);
 
+FLINT_DLL void mpoly_min_fields_ui(ulong * min_fields, const ulong * poly_exps,
+                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
+                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps,
