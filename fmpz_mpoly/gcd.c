@@ -11,10 +11,179 @@
 
 #include "fmpz_mpoly.h"
 
-int fmpz_mpoly_gcd(fmpz_mpoly_t G,
-                                const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+/*
+    like _fmpz_vec_content, but "start" is included in the content, and we bail
+    as soon as the content is known
+*/
+void _fmpz_vec_content1(fmpz_t res, fmpz_t start, const fmpz * vec, slong len)
+{
+    slong i;
+    fmpz_set(res, start);
+    for (i = 0; i < len; i++)
+    {
+        fmpz_gcd(res, res, vec + i);
+        if (fmpz_is_one(res))
+        {
+            return;
+        }
+    }
+}
+
+/*
+    component-wise minimum
+*/
+void _fmpz_vec_min(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len2)
+{
+    slong i;
+    for (i = 0; i < len2; i++)
+    {
+        if (fmpz_cmp(vec1 + i, vec2 + i) > 0)
+        {
+            fmpz_set(res + i, vec2 + i);
+        }
+        else
+        {
+            fmpz_set(res + i, vec1 + i);
+        }
+    }
+}
+
+
+int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, const fmpz_mpoly_t A,
+           const fmpz_mpoly_t B, mp_bitcnt_t Gbits, const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+    fmpz_t g;
+    fmpz * minAfields, * minAdegs, * minBdegs;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(B->length == 1);
+
+    TMP_START;
+
+    /* get the field-wise minimum of A */
+    minAfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nfields; i++)
+        fmpz_init(minAfields + i);
+    mpoly_min_fields_fmpz(minAfields, A->exps, A->length, A->bits, ctx->minfo);
+
+    /* unpack to get the min degrees of each variable in A */
+    minAdegs = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nvars; i++)
+        fmpz_init(minAdegs + i);
+    mpoly_get_monomial_ffmpz_unpacked_ffmpz(minAdegs, minAfields, ctx->minfo);
+
+    /* get the degree of each variable in B */
+    minBdegs = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nvars; i++)
+        fmpz_init(minBdegs + i);
+    mpoly_get_monomial_ffmpz(minBdegs, B->exps, B->bits, ctx->minfo);
+
+    /* compute the degree of each variable in G */
+    _fmpz_vec_min(minBdegs, minBdegs, minAdegs, ctx->minfo->nvars);
+
+    if (Gbits == 0)
+    {
+        Gbits = FLINT_MIN(A->bits, B->bits);
+    }
+    else
+    {
+        FLINT_ASSERT(Gbits == A->bits);
+        FLINT_ASSERT(Gbits == B->bits);
+    }
+
+    fmpz_mpoly_fit_length(G, 1, ctx);
+    fmpz_mpoly_fit_bits(G, Gbits, ctx);
+    G->bits = Gbits;
+    mpoly_set_monomial_ffmpz(G->exps, minBdegs, Gbits, ctx->minfo);
+
+    fmpz_init(g);
+    _fmpz_vec_content1(g, B->coeffs + 0, A->coeffs, A->length);
+    fmpz_swap(G->coeffs + 0, g);
+    fmpz_clear(g);
+
+    _fmpz_mpoly_set_length(G, 1, ctx);
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(minAfields + i);
+    }
+    for (i = 0; i < ctx->minfo->nvars; i++)
+    {
+        fmpz_clear(minAdegs + i);
+        fmpz_clear(minBdegs + i);
+    }
+
+    TMP_END;
+    return 1;
+}
+
+/*
+    If Gbits = 0, the function has no restriction on the bits into which
+    it can pack its answer.
+    If Gbits != 0, the function was called from an internal context
+    that expect all of G,A,B to be packed with bits = Gbits <= FLINT_BITS.
+
+    return is 1 for success, 0 for failure.
+*/
+int _fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                 mp_bitcnt_t Gbits, const fmpz_mpoly_ctx_t ctx)
+{
+
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT(Gbits <= FLINT_BITS);
+    FLINT_ASSERT(Gbits == 0 || (Gbits == A->bits && Gbits == B->bits));
+
+    if (A->length == 1)
+    {
+        return _fmpz_mpoly_gcd_monomial(G, B, A, Gbits, ctx);
+    }
+    else if (B->length == 1)
+    {
+        return _fmpz_mpoly_gcd_monomial(G, A, B, Gbits, ctx);
+    }
+
+    return fmpz_mpoly_gcd_brown(G, A, B, ctx);
+}
+
+
+int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    /* TODO !!! */
-    return fmpz_mpoly_gcd_brown(G, A, B, ctx);
+    if (fmpz_mpoly_is_zero(A, ctx))
+    {
+        if (B->length == 0)
+        {
+            fmpz_mpoly_zero(G, ctx);
+            return 1;
+        }
+        if (fmpz_sgn(B->coeffs + 0) < 0)
+        {
+            fmpz_mpoly_neg(G, B, ctx);
+            return 1;
+        }
+        else
+        {
+            fmpz_mpoly_set(G, B, ctx);
+            return 1;
+        }
+    }
+
+    if (fmpz_mpoly_is_zero(B, ctx))
+    {
+        if (fmpz_sgn(A->coeffs + 0) < 0)
+        {
+            fmpz_mpoly_neg(G, A, ctx);
+            return 1;
+        }
+        else
+        {
+            fmpz_mpoly_set(G, A, ctx);
+            return 1;
+        }
+    }
+
+    return _fmpz_mpoly_gcd(G, A, B, 0, ctx);
 }
