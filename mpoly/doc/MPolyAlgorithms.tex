@@ -159,7 +159,7 @@ Since solving for the coefficients of $f^k$ involves division, this requires som
 \section{Greatest Common Divisor}
 
 \subsection{Dense GCD in $\bbZ_p[x_1,\dots,x_n]$}\
-Brown's algorithm \cite{Brown} is used here. This comes in two version - a small prime version and a large prime version. The small prime version interpolates in each variable by choosing evaluation points from $\bbZ_p$. If this fails, then interpolation continues in $\bbZ_p/(f(x_n))[x_1,\dots,x_{n-1}]$, for sufficiently many irreducible $f(x) \in \bbZ_p[x]$. Thus the large prime version uses arithmetic in finite fields. No explicit divisibility checks are performed.
+Brown's algorithm \cite{Brown} is used here. This comes in two versions - a small prime version and a large prime version. These refer not to the size of the $p$'s involved, but rather to the field from which evaluation points are chosen: it can either be $\bbF_p$ or an extension of $\bbF_p$. The small prime version interpolates in each variable by choosing evaluation points from $\bbF_p$. If this fails, then the large prime method use interpolation in $\bbF_p/(f(x_n))[x_1,\dots,x_{n-1}]$, i.e. $\bbF_q[x_1,\dots,x_{n-1}]$, for sufficiently many irreducible $f(x) \in \bbZ_p[x]$. No explicit divisibility checks are performed because the cofactors are reconstructed along with the GCD.
 
 \subsection{Dense GCD in $\bbZ[x_1,\dots,x_n]$}\
 We simply reconstruct the GCD from its image in $\bbZ_p[x_1,\dots,x_n]$ for sufficiently many $p$. Only large $p$'s are used, and dense GCD's in $\bbZ_p[x_1,\dots,x_n]$ only use the small prime version. Each image GCD in $\bbZ_p$ is correct and Brown's coefficient bounds \cite{Brown} are used instead of a divisibility check.
@@ -177,19 +177,26 @@ call {\tt nmod\_mpolyu\_gcd\_zippel}
 {\tt nmod\_mpolyu\_gcd\_zippel}($\bbZ_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
 remove content in $x_1,\dots,x_n$ from the GCD via {\tt nmod\_mpoly\_gcd\_zippel}\\
-call {\tt nmod\_mpolyu\_gcdm\_zippel}
+call {\tt nmod\_mpolyu\_gcdm\_zippel}\\
+multiply the content back into the GCD
 \end{tabular}\right.$
 \ \\
 {\tt nmod\_mpolyu\_gcdm\_zippel}($\bbZ_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
+(the GCD is assumed to have no content w.r.t. $x_1,\dots,x_n$)\\
 call {\tt nmod\_mpolyu\_gcdp\_zippel} and return if succeeded\\
-choose several irreducibles $f(x_n) \in \bbZ_p[x_n]$\\
-compute the GCD modulo $f(x_n)$ via {\tt fq\_nmod\_mpolyu\_gcd\{p|s\}\_zippel}\\
-combine answers via CRT and check divisibility
+(small primes have failed, try large primes now)\\
+choose an irreducible $f(x_n)\in \bbZ_p[x_n]$\\
+compute $F=$ GCD modulo $f(x_n)$ via {\tt fq\_nmod\_mpolyu\_gcdp\_zippel}\\
+($F$ is the correct gcd when the inputs are reduced modulo $f(x_n)$)\\
+For several new irreducibles $f(x_n)\in \bbZ_p[x_n]$, \\
+compute the GCD modulo $f(x_n)$ via {\tt nmod\_mpolyu\_gcds\_zippel} using $F$\\
+combine via CRT and check divisibility every time the interpolant stabilizes\\
+start over if the interpolant coefficients have exceeded the obvious degree bound in $x_n$
 \end{tabular}\right.$
 
 \ \\
-The four functions {\tt [fq\_]nmod\_mpoly\_gcd\{p|s\}\_zippel} may be summarized as follows. When the prefix {\tt fq\_} is present, $q$ is a power of $p$, otherwise $q$ is $p$.
+The four functions {\tt [fq\_]nmod\_mpoly\_gcd\{p|s\}\_zippel} may be summarized as follows. The ``p'' versions produce a correct gcd when the inputs have no content in $\bbF_q[x_1,\dots,x_n]$. The ``s'' versions are the heart of Zippel's sparse interpolation. When the prefix {\tt fq\_} is present, $q$ is a power of $p$, otherwise $q$ is $p$.
 
 \ \\
 {\tt [fq\_]nmod\_mpolyu\_gcdp\_zippel}($\bbF_q[x_1,\dots,x_n][X]$, $n \ge 1$):\\
@@ -201,7 +208,7 @@ record the form $f$ of the GCD obtained for step (2) below\\
 pick severial evaluation points $x_n \to \alpha$ for $\alpha \in \bbF_q$\\
 (2) call {\tt [fq\_]nmod\_mpoly\_gcds\_zippel} on the evaluated inputs in $\bbF_q[x_1,\dots,x_{n-1}][X]$\\
 combine the answer from (1) and the answers from (2) via dense interpolation in $x_n$\\
-?? check divisibility ??
+check divisibility on the proposed GCD when the interpolation stabilizes 
 \end{tabular}\right.$
 \ \\
 {\tt [fq\_]nmod\_mpolyu\_gcds\_zippel}($\bbF_q[x_1,\dots,x_n][X]$, assumed form $f$):\\
@@ -223,21 +230,40 @@ call {\tt fmpz\_mpolyu\_gcd\_zippel}
 \ \\
 {\tt fmpz\_mpolyu\_gcd\_zippel}($\bbZ[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
-remove content in $x_1,\dots,x_n$ from the GCD via {\tt fmpz\_mpoly\_gcd\_zippel}\\
-call {\tt fmpz\_mpolyu\_gcdm\_zippel}
+remove content in $\bbZ[x_1,\dots,x_n]$ from the GCD via {\tt fmpz\_mpoly\_gcd\_zippel}\\
+call {\tt fmpz\_mpolyu\_gcdm\_zippel}\\
+multiply the content back into the GCD
 \end{tabular}\right.$
 
 \ \\
 {\tt fmpz\_mpolyu\_gcdm\_zippel}($\bbZ[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
-choose several primes $p$\\
-compute the GCD modulo $p$ via {\tt nmod\_mpolyu\_gcd\{p|s\}\_zippel}\\
-combine answers via CRT and check divisibility
+(the GCD is assumed to have no content w.r.t. $x_1,\dots,x_n$)\\
+choose a prime $p$\\
+compute $F=$ GCD modulo $p$ via {\tt nmod\_mpolyu\_gcdp\_zippel}\\
+($F$ is the correct gcd when the inputs are reduced modulo $p$)\\
+For several new primes $p$, \\
+compute the GCD modulo $p$ via {\tt nmod\_mpolyu\_gcds\_zippel} using $f$\\
+combine via CRT and check divisibility every time the interpolant stabilizes\\
+start over if the interpolant coefficients have exceeded the Landau--Mignotte bound
 \end{tabular}\right.$
 
 \ \\
 \subsection{PRS}
+The PRS algorithm works over $R=\bbZ$ or $R=\bbZ_p$.
+\ \\
+{\tt \_mpoly\_gcd\_prs}($A,B \in R[x_1,\dots,x_n][X]$, $n \ge 1$):\\
+\indent $\left[\begin{tabular}{l}
+(recursively use GCD in fewer variables for content calculation)\\
+let $Ac = \op{content}(A) \in R(x_1,\dots,x_n)$\\
+let $Bc = \op{content}(B) \in R(x_1,\dots,x_n)$\\
+divide $A$ and $B$ by $Ac$ and $Bc$\\
+let $G$ be a pseudo GCD of $A$ and $B$ computed using a prs\\
+divide $G$ by $\op{content}(G)$\\
+multiply $G$ by $\op{gcd}(Ac,Bc)$
+\end{tabular}\right.$
 
+The content of $G$ can be computed without expensive recursive calls to gcd in the case when we know the leading or trailing coefficient of $G$ in the variable $X$ must be a monomial in $x_1,\dots,x_n$.
 
 \section{Factorization}
 
