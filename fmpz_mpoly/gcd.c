@@ -101,11 +101,79 @@ int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, const fmpz_mpoly_t A,
 }
 
 
+typedef struct _var_info_struct
+{
+    ulong min_exp;
+    ulong max_exp;
+    slong min_exp_term_count;
+    slong max_exp_term_count;
+} var_info_struct;
+
+
+static void _init_info(var_info_struct * info, const fmpz_mpoly_t A,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    ulong * Aexp;
+    slong i, j, N;
+    slong nvars = ctx->minfo->nvars;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+
+    TMP_START;
+
+    Aexp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+
+    i = 0;
+    mpoly_get_monomial_ui(Aexp, A->exps + N*i, A->bits, ctx->minfo);
+    for (j = 0; j < nvars; j++)
+    {
+        info[j].min_exp = Aexp[j];
+        info[j].max_exp = Aexp[j];
+        info[j].min_exp_term_count = 1;
+        info[j].max_exp_term_count = 1;
+    }
+    for (i = 1; i < A->length; i++)
+    {
+        mpoly_get_monomial_ui(Aexp, A->exps + N*i, A->bits, ctx->minfo);
+
+        for (j = 0; j < nvars; j++)
+        {
+            if (info[j].min_exp > Aexp[j])
+            {
+                info[j].min_exp = Aexp[j];
+                info[j].min_exp_term_count = 1;            
+            }
+            else if (info[j].min_exp == Aexp[j])
+            {
+                info[j].min_exp_term_count += 1;
+            }
+
+            if (info[j].max_exp < Aexp[j])
+            {
+                info[j].max_exp = Aexp[j];
+                info[j].max_exp_term_count = 1;            
+            }
+            else if (info[j].max_exp == Aexp[j])
+            {
+                info[j].max_exp_term_count += 1;
+            }
+        }
+    }
+
+    TMP_END;
+}
+
+
+
 /*
     If Gbits = 0, the function has no restriction on the bits into which
     it can pack its answer.
     If Gbits != 0, the function was called from an internal context
-    that expect all of G,A,B to be packed with bits = Gbits <= FLINT_BITS.
+    that expects all of G,A,B to be packed with bits = Gbits <= FLINT_BITS.
 
     Both A and B have to be packed into bits <= FLINT_BITS
 
@@ -114,6 +182,10 @@ int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, const fmpz_mpoly_t A,
 int _fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                  mp_bitcnt_t Gbits, const fmpz_mpoly_ctx_t ctx)
 {
+    slong nvars = ctx->minfo->nvars;
+    var_info_struct * Ainfo, * Binfo;
+    TMP_INIT;
+
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
     FLINT_ASSERT(A->bits <= FLINT_BITS);
@@ -129,6 +201,16 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
     {
         return _fmpz_mpoly_gcd_monomial(G, A, B, Gbits, ctx);
     }
+
+    TMP_START;
+
+    Ainfo = (var_info_struct *) TMP_ALLOC(nvars*sizeof(var_info_struct));
+    Binfo = (var_info_struct *) TMP_ALLOC(nvars*sizeof(var_info_struct));
+
+    _init_info(Ainfo, A, ctx);
+    _init_info(Binfo, B, ctx);
+
+    TMP_END;
 
     return fmpz_mpoly_gcd_brown(G, A, B, ctx);
 }
