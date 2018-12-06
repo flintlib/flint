@@ -197,6 +197,69 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
+    /* k = 4: test dense inputs with random repackings */
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, g, t;
+        mp_limb_t rlimb;
+        mp_bitcnt_t coeff_bits, newbits;
+        slong len, len1, len2;
+        slong degbound;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 5);
+
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(t, ctx);
+
+        len = n_randint(state, 25) + 1;
+        len1 = n_randint(state, 50);
+        len2 = n_randint(state, 50);
+
+        degbound = 25/(2*ctx->minfo->nvars - 1);
+
+        coeff_bits = n_randint(state, 400);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                fmpz_mpoly_randtest_bound(t, state, len, coeff_bits + 1, degbound, ctx);
+            } while (t->length == 0);
+            fmpz_mpoly_randtest_bound(a, state, len1, coeff_bits, degbound, ctx);
+            fmpz_mpoly_randtest_bound(b, state, len2, coeff_bits, degbound, ctx);
+            fmpz_mpoly_mul(a, a, t, ctx);
+            fmpz_mpoly_mul(b, b, t, ctx);
+
+            rlimb = n_randlimb(state);
+
+            if (rlimb & UWORD(3))
+            {
+                newbits = a->bits + n_randint(state, 2*FLINT_BITS);
+                newbits = mpoly_fix_bits(newbits, ctx->minfo);
+                fmpz_mpoly_repack_bits(a, a, newbits, ctx);
+            }
+
+            if (rlimb & UWORD(12))
+            {
+                newbits = b->bits + n_randint(state, 2*FLINT_BITS);
+                newbits = mpoly_fix_bits(newbits, ctx->minfo);
+                fmpz_mpoly_repack_bits(b, b, newbits, ctx);
+            }
+
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, 4);
+        }
+
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     FLINT_TEST_CLEANUP(state);
 
     printf("PASS\n");

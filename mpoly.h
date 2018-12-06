@@ -641,7 +641,7 @@ FLINT_DLL void mpoly_set_monomial_ffmpz(ulong * exp1, const fmpz * exp2,
 FLINT_DLL void mpoly_set_monomial_pfmpz(ulong * exp1, fmpz * const * exp2,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_repack_monomials(ulong * exps1, slong bits1,
+FLINT_DLL int mpoly_repack_monomials(ulong * exps1, slong bits1,
                                 const ulong * exps2, slong bits2, slong len,
                                                        const mpoly_ctx_t mctx);
 

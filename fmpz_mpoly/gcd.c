@@ -29,25 +29,6 @@ void _fmpz_vec_content1(fmpz_t res, fmpz_t start, const fmpz * vec, slong len)
     }
 }
 
-/*
-    component-wise minimum
-*/
-void _fmpz_vec_min(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len2)
-{
-    slong i;
-    for (i = 0; i < len2; i++)
-    {
-        if (fmpz_cmp(vec1 + i, vec2 + i) > 0)
-        {
-            fmpz_set(res + i, vec2 + i);
-        }
-        else
-        {
-            fmpz_set(res + i, vec1 + i);
-        }
-    }
-}
-
 
 int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, const fmpz_mpoly_t A,
            const fmpz_mpoly_t B, mp_bitcnt_t Gbits, const fmpz_mpoly_ctx_t ctx)
@@ -81,7 +62,7 @@ int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, const fmpz_mpoly_t A,
     mpoly_get_monomial_ffmpz(minBdegs, B->exps, B->bits, ctx->minfo);
 
     /* compute the degree of each variable in G */
-    _fmpz_vec_min(minBdegs, minBdegs, minAdegs, ctx->minfo->nvars);
+    _fmpz_vec_min_inplace(minBdegs, minAdegs, ctx->minfo->nvars);
 
     if (Gbits == 0)
     {
@@ -119,20 +100,24 @@ int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, const fmpz_mpoly_t A,
     return 1;
 }
 
+
 /*
     If Gbits = 0, the function has no restriction on the bits into which
     it can pack its answer.
     If Gbits != 0, the function was called from an internal context
     that expect all of G,A,B to be packed with bits = Gbits <= FLINT_BITS.
 
+    Both A and B have to be packed into bits <= FLINT_BITS
+
     return is 1 for success, 0 for failure.
 */
 int _fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                  mp_bitcnt_t Gbits, const fmpz_mpoly_ctx_t ctx)
 {
-
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
     FLINT_ASSERT(Gbits <= FLINT_BITS);
     FLINT_ASSERT(Gbits == 0 || (Gbits == A->bits && Gbits == B->bits));
 
@@ -185,5 +170,65 @@ int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
         }
     }
 
-    return _fmpz_mpoly_gcd(G, A, B, 0, ctx);
+    if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS)
+    {
+        return _fmpz_mpoly_gcd(G, A, B, 0, ctx);
+    }
+
+    if (A->length == 1)
+    {
+        return _fmpz_mpoly_gcd_monomial(G, B, A, 0, ctx);
+    }
+    else if (B->length == 1)
+    {
+        return _fmpz_mpoly_gcd_monomial(G, A, B, 0, ctx);
+    }
+    else
+    {
+    /*
+        Since we do not have truly sparse GCD algorithms,
+        if either of A or B cannot be packed into FLINT_BITS and neither is a
+        monomial, assume that the gcd computation is hopeless and fail.
+    */
+        int success;
+        int useAnew = 0;
+        int useBnew = 0;
+        fmpz_mpoly_t Anew;
+        fmpz_mpoly_t Bnew;
+
+        if (A->bits > FLINT_BITS)
+        {
+            fmpz_mpoly_init(Anew, ctx);
+            useAnew = fmpz_mpoly_repack_bits(Anew, A, FLINT_BITS, ctx);
+            if (!useAnew)
+            {
+                useAnew = 1;
+                success = 0;
+                goto cleanup;
+            }
+        }
+
+        if (B->bits > FLINT_BITS)
+        {
+            fmpz_mpoly_init(Bnew, ctx);
+            useBnew = fmpz_mpoly_repack_bits(Bnew, B, FLINT_BITS, ctx);
+            if (!useBnew)
+            {
+                useBnew = 1;
+                success = 0;
+                goto cleanup;
+            }
+        }
+
+        success = _fmpz_mpoly_gcd(G, useAnew ? Anew : A,
+                                     useBnew ? Bnew : B, 0, ctx);
+
+cleanup:
+        if (useAnew)
+            fmpz_mpoly_clear(Anew, ctx);
+        if (useBnew)
+            fmpz_mpoly_clear(Bnew, ctx);
+
+        return success;
+    }
 }
