@@ -792,6 +792,19 @@ FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
 FLINT_DLL int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A,
                              const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
+                                const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors_sp(
+                         fmpz_mpoly_t G, mp_bitcnt_t Gbits,
+                 const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
+                 const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors(fmpz_mpoly_t G,
+                                const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
 
 /******************************************************************************
 

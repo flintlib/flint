@@ -12,105 +12,10 @@
 #include "fmpz_mpoly.h"
 
 /*
-    like _fmpz_vec_content, but "start" is included in the content, and we bail
-    as soon as the content is known
+    Scan A and fill in the min and max exponents of each variable along
+    with the count of terms attached to each.
 */
-void _fmpz_vec_content1(fmpz_t res, fmpz_t start, const fmpz * vec, slong len)
-{
-    slong i;
-    fmpz_set(res, start);
-    for (i = 0; i < len; i++)
-    {
-        fmpz_gcd(res, res, vec + i);
-        if (fmpz_is_one(res))
-        {
-            return;
-        }
-    }
-}
-
-
-int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, const fmpz_mpoly_t A,
-           const fmpz_mpoly_t B, mp_bitcnt_t Gbits, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i;
-    fmpz_t g;
-    fmpz * minAfields, * minAdegs, * minBdegs;
-    TMP_INIT;
-
-    FLINT_ASSERT(A->length > 0);
-    FLINT_ASSERT(B->length == 1);
-
-    TMP_START;
-
-    /* get the field-wise minimum of A */
-    minAfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
-    for (i = 0; i < ctx->minfo->nfields; i++)
-        fmpz_init(minAfields + i);
-    mpoly_min_fields_fmpz(minAfields, A->exps, A->length, A->bits, ctx->minfo);
-
-    /* unpack to get the min degrees of each variable in A */
-    minAdegs = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
-    for (i = 0; i < ctx->minfo->nvars; i++)
-        fmpz_init(minAdegs + i);
-    mpoly_get_monomial_ffmpz_unpacked_ffmpz(minAdegs, minAfields, ctx->minfo);
-
-    /* get the degree of each variable in B */
-    minBdegs = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
-    for (i = 0; i < ctx->minfo->nvars; i++)
-        fmpz_init(minBdegs + i);
-    mpoly_get_monomial_ffmpz(minBdegs, B->exps, B->bits, ctx->minfo);
-
-    /* compute the degree of each variable in G */
-    _fmpz_vec_min_inplace(minBdegs, minAdegs, ctx->minfo->nvars);
-
-    if (Gbits == 0)
-    {
-        Gbits = FLINT_MIN(A->bits, B->bits);
-    }
-    else
-    {
-        FLINT_ASSERT(Gbits == A->bits);
-        FLINT_ASSERT(Gbits == B->bits);
-    }
-
-    fmpz_mpoly_fit_length(G, 1, ctx);
-    fmpz_mpoly_fit_bits(G, Gbits, ctx);
-    G->bits = Gbits;
-    mpoly_set_monomial_ffmpz(G->exps, minBdegs, Gbits, ctx->minfo);
-
-    fmpz_init(g);
-    _fmpz_vec_content1(g, B->coeffs + 0, A->coeffs, A->length);
-    fmpz_swap(G->coeffs + 0, g);
-    fmpz_clear(g);
-
-    _fmpz_mpoly_set_length(G, 1, ctx);
-
-    for (i = 0; i < ctx->minfo->nfields; i++)
-    {
-        fmpz_clear(minAfields + i);
-    }
-    for (i = 0; i < ctx->minfo->nvars; i++)
-    {
-        fmpz_clear(minAdegs + i);
-        fmpz_clear(minBdegs + i);
-    }
-
-    TMP_END;
-    return 1;
-}
-
-
-typedef struct _var_info_struct
-{
-    ulong min_exp;
-    ulong max_exp;
-    slong min_exp_term_count;
-    slong max_exp_term_count;
-} var_info_struct;
-
-
-static void _init_info(var_info_struct * info, const fmpz_mpoly_t A,
+static void _init_info(mpoly_gcd_var_info_struct * info, const fmpz_mpoly_t A,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     ulong * Aexp;
@@ -179,11 +84,13 @@ static void _init_info(var_info_struct * info, const fmpz_mpoly_t A,
 
     return is 1 for success, 0 for failure.
 */
-int _fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                 mp_bitcnt_t Gbits, const fmpz_mpoly_ctx_t ctx)
+int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
+                               const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
+    int success;
     slong nvars = ctx->minfo->nvars;
-    var_info_struct * Ainfo, * Binfo;
+    mpoly_gcd_var_info_struct * Ainfo, * Binfo;
     TMP_INIT;
 
     FLINT_ASSERT(A->length > 0);
@@ -195,24 +102,40 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
     if (A->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, B, A, Gbits, ctx);
+        return _fmpz_mpoly_gcd_monomial(G, Gbits, B, A, ctx);
     }
     else if (B->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, A, B, Gbits, ctx);
+        return _fmpz_mpoly_gcd_monomial(G, Gbits, A, B, ctx);
     }
 
     TMP_START;
 
-    Ainfo = (var_info_struct *) TMP_ALLOC(nvars*sizeof(var_info_struct));
-    Binfo = (var_info_struct *) TMP_ALLOC(nvars*sizeof(var_info_struct));
-
+    Ainfo = (mpoly_gcd_var_info_struct *) TMP_ALLOC(nvars
+                                           *sizeof(mpoly_gcd_var_info_struct));
+    Binfo = (mpoly_gcd_var_info_struct *) TMP_ALLOC(nvars
+                                           *sizeof(mpoly_gcd_var_info_struct));
     _init_info(Ainfo, A, ctx);
     _init_info(Binfo, B, ctx);
 
+    /* check if the cofactors could be monomials */
+    if (A->length == B->length)
+    {
+        success = _fmpz_mpoly_gcd_monomial_cofactors_sp(G, Gbits,
+                                                      A, Ainfo, B, Binfo, ctx);
+        if (success)
+        {
+            goto cleanup;
+        }
+    }
+
+    success = fmpz_mpoly_gcd_brown(G, A, B, ctx);
+
+cleanup:
+
     TMP_END;
 
-    return fmpz_mpoly_gcd_brown(G, A, B, ctx);
+    return success;
 }
 
 
@@ -254,16 +177,20 @@ int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
     if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS)
     {
-        return _fmpz_mpoly_gcd(G, A, B, 0, ctx);
+        return _fmpz_mpoly_gcd(G, 0, A, B, ctx);
     }
 
     if (A->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, B, A, 0, ctx);
+        return _fmpz_mpoly_gcd_monomial(G, 0, B, A, ctx);
     }
     else if (B->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, A, B, 0, ctx);
+        return _fmpz_mpoly_gcd_monomial(G, 0, A, B, ctx);
+    }
+    else if (_fmpz_mpoly_gcd_monomial_cofactors(G, A, B, ctx))
+    {
+        return 1;
     }
     else
     {
@@ -302,8 +229,8 @@ int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
             }
         }
 
-        success = _fmpz_mpoly_gcd(G, useAnew ? Anew : A,
-                                     useBnew ? Bnew : B, 0, ctx);
+        success = _fmpz_mpoly_gcd(G, 0, useAnew ? Anew : A,
+                                        useBnew ? Bnew : B, ctx);
 
 cleanup:
         if (useAnew)

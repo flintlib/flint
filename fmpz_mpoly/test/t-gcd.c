@@ -94,14 +94,34 @@ cleanup:
 int
 main(void)
 {
-    int i, j;
+    int i, j, tmul = 1;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
     fflush(stdout);
 
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t g, a, b;
+        const char * vars[] = {"x" ,"y", "z"};
+
+        fmpz_mpoly_ctx_init(ctx, 3, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(g, ctx);
+
+        fmpz_mpoly_set_str_pretty(a, "-12*x*y*(1+x+y)", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "-6*x^2*y*(1+x+y)", vars, ctx);
+        gcd_check(g, a, b, ctx, 0,0,0);
+
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     /* k = 1: The gcd should always work when one input is a monomial */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * 10 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t;
@@ -152,7 +172,7 @@ main(void)
     }
 
     /* k = 3: test dense inputs */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * 10 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t;
@@ -198,7 +218,7 @@ main(void)
     }
 
     /* k = 4: test dense inputs with random repackings */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * 10 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t;

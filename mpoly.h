@@ -717,7 +717,16 @@ FLINT_DLL int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, 
 
 FLINT_DLL void mpoly_reverse(ulong * Aexp, const ulong * Bexp, slong len, slong N);
 
-/* info related to zippel interpolation **************************************/
+/* info related to gcd calculation *******************************************/
+
+typedef struct mpoly_gcd_var_info_struct
+{
+    ulong min_exp;
+    ulong max_exp;
+    slong min_exp_term_count;
+    slong max_exp_term_count;
+} mpoly_gcd_var_info_struct;
+
 typedef struct
 {
     slong nvars;
