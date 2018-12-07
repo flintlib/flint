@@ -74,124 +74,71 @@ static void _init_info(mpoly_gcd_var_info_struct * info, const fmpz_mpoly_t A,
 
 
 /*
-    set A(var) to B/xbar^Bshifts
-    it is asserted that the conversion is correct
+    Assume when B is converted to univar format, its length would be one.
+    Gcd is gcd of coefficients of univar(A) and B (modulo some shifts).
 */
-void _fmpz_mpoly_to_fmpz_poly_shifts(fmpz_poly_t A,
-                                 const fmpz_mpoly_t B, const ulong * Bshifts,
-                                         slong var, const fmpz_mpoly_ctx_t ctx)
+static int _try_missing_var(fmpz_mpoly_t G, mp_bitcnt_t Gbits, slong var,
+                                         const fmpz_mpoly_t A, ulong Ashift,
+                                         const fmpz_mpoly_t B, ulong Bshift,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
-    ulong mask;
-    slong i, shift, off, N;
-    slong len = B->length;
-    fmpz * coeff = B->coeffs;
-    ulong * exp = B->exps;
-    mp_bitcnt_t bits = B->bits;
+    int success;
+    slong i;
+    ulong Gshift;
+    fmpz_mpoly_t tG;
+    fmpz_mpoly_univar_t Ax;
 
-    FLINT_ASSERT(len > 0);
-    FLINT_ASSERT(bits <= FLINT_BITS);
+    fmpz_mpoly_init(tG, ctx);
+    fmpz_mpoly_univar_init(Ax, ctx);
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-    mpoly_gen_offset_shift(&off, &shift, var, N, bits, ctx->minfo);
+    success = fmpz_mpoly_to_univar(Ax, A, var, ctx);
+    if (!success)
+        goto cleanup;
 
-    fmpz_poly_zero(A);
-    mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-    for (i = 0; i < len; i++)
+    FLINT_ASSERT(Ax->length > 0);
+
+    if (Bshift == 0)
     {
-        ulong k = (exp[N*i + off] >> shift) & mask;
-        FLINT_ASSERT(k >= Bshifts[var]);
-        fmpz_poly_set_coeff_fmpz(A, k - Bshifts[var], coeff + i);
+        success = _fmpz_mpoly_gcd(tG, Gbits, B, Ax->coeffs + 0, ctx);
+    }
+    else
+    {
+        fmpz_mpoly_t Bs;
+        fmpz_mpoly_init(Bs, ctx);
+        fmpz_mpoly_set(Bs, B, ctx);
+        _fmpz_mpoly_gen_shift_right(Bs, var, Bshift, ctx);
+        success = _fmpz_mpoly_gcd(tG, Gbits, Bs, Ax->coeffs + 0, ctx);
+        fmpz_mpoly_clear(Bs, ctx);
     }
 
-#if WANT_ASSERT
-    for (i = 0; i < len; i++)
+    if (!success)
+        goto cleanup;
+
+    for (i = 1; i < Ax->length; i++)
     {
-        slong v;
-        for (v = 0; v < ctx->minfo->nvars; v++)
-        {
-            ulong k;
-            mpoly_gen_offset_shift(&off, &shift, v, N, bits, ctx->minfo);
-            k = (exp[N*i + off] >> shift) & mask;
-            FLINT_ASSERT(   (v == var && k >= Bshifts[v])
-                         || (v != var && k == Bshifts[v]));
-        }
+        success = _fmpz_mpoly_gcd(tG, Gbits, tG, Ax->coeffs + i, ctx);
+        if (!success)
+            goto cleanup;
     }
-#endif
+
+    fmpz_mpoly_swap(G, tG, ctx);
+
+    Gshift = FLINT_MIN(Ashift, Bshift);
+    if (Gshift != 0)
+    {
+        _fmpz_mpoly_gen_shift_left(G, var, Gshift, ctx);
+    }
+
+cleanup:
+
+    fmpz_mpoly_clear(tG, ctx);
+    fmpz_mpoly_univar_clear(Ax, ctx);
+
+    return success;
 }
 
 /*
-    set A to B(var)*xbar^Bshifts
-    If Abits != 0, A must be packed into bits = Abits
-*/
-void _fmpz_mpoly_from_fmpz_poly_shifts(fmpz_mpoly_t A, mp_bitcnt_t Abits,
-                                      const fmpz_poly_t B, ulong * Bshifts,
-                                         slong var, const fmpz_mpoly_ctx_t ctx)
-{
-    slong shift, off, N;
-    slong k;
-    slong Alen;
-    fmpz * Acoeff;
-    ulong * Aexp;
-    slong Aalloc;
-    ulong * one;
-    ulong * shiftexp;
-    slong Bdeg = fmpz_poly_degree(B);
-    TMP_INIT;
-
-    TMP_START;
-
-    FLINT_ASSERT(A->bits <= FLINT_BITS);
-    FLINT_ASSERT(!fmpz_poly_is_zero(B));
-
-    if (Abits == 0)
-    {
-        Bshifts[var] += Bdeg;
-        FLINT_ASSERT((slong)(Bshifts[var]) >= 0);
-        Abits = mpoly_exp_bits_required_ui(Bshifts, ctx->minfo);
-        Bshifts[var] -= Bdeg;
-    }
-
-    /* must have at least space for the highest exponent of var */
-    FLINT_ASSERT(1 + FLINT_BIT_COUNT(Bshifts[var] + Bdeg) <= Abits);
-
-    N = mpoly_words_per_exp(Abits, ctx->minfo);
-    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    shiftexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, Abits, ctx->minfo);
-    mpoly_set_monomial_ui(shiftexp, Bshifts, Abits, ctx->minfo);
-
-    fmpz_mpoly_fit_bits(A, Abits, ctx);
-    A->bits = Abits;
-
-    Acoeff = A->coeffs;
-    Aexp = A->exps;
-    Aalloc = A->alloc;
-    Alen = 0;
-    for (k = Bdeg; k >= 0; k--)
-    {
-        _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
-        mpoly_monomial_madd(Aexp + N*Alen, shiftexp, k, one, N);
-        fmpz_poly_get_coeff_fmpz(Acoeff + Alen, B, k);
-        Alen += !fmpz_is_zero(Acoeff + Alen);
-    }
-
-    A->coeffs = Acoeff;
-    A->exps = Aexp;
-    A->alloc = Aalloc;
-    _fmpz_mpoly_set_length(A, Alen, ctx);
-
-    TMP_END;
-}
-
-
-
-
-/*
-    If Gbits = 0, the function has no restriction on the bits into which
-    it can pack its answer.
-    If Gbits != 0, the function was called from an internal context
-    that expects all of G,A,B to be packed with bits = Gbits <= FLINT_BITS.
-
+    The function must pack its answer into bits = Gbits <= FLINT_BITS
     Both A and B have to be packed into bits <= FLINT_BITS
 
     return is 1 for success, 0 for failure.
@@ -203,17 +150,22 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     int success;
     slong v_in_both;
     slong v_in_either;
+    slong v_in_A_only;
+    slong v_in_B_only;
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_var_info_struct * Ainfo, * Binfo;
     TMP_INIT;
-
+/*
+flint_printf("_fmpz_mpoly_gcd called Gbits = %wd\n", Gbits);
+printf("A: "); fmpz_mpoly_print_pretty(A, NULL, ctx); printf("\n");
+printf("B: "); fmpz_mpoly_print_pretty(B, NULL, ctx); printf("\n");
+*/
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT(Gbits <= FLINT_BITS);
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
-    FLINT_ASSERT(Gbits <= FLINT_BITS);
-    FLINT_ASSERT(Gbits == 0 || (Gbits == A->bits && Gbits == B->bits));
 
     if (A->length == 1)
     {
@@ -271,11 +223,6 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
         fmpz_init(gB);
         _fmpz_vec_content(gA, A->coeffs, A->length);
         _fmpz_vec_content(gB, B->coeffs, B->length);
-
-        if (Gbits == 0)
-        {
-            Gbits = FLINT_MIN(A->bits, B->bits);
-        }
 
         minexps = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
         for (j = 0; j < nvars; j++)
@@ -349,12 +296,50 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
         goto cleanup;
     }
 
+    /* check if there is a variable in ess(A) that is not in ess(B) */
+    v_in_A_only = -WORD(1);
+    v_in_B_only = -WORD(1);
+    for (j = 0; j < nvars; j++)
+    {
+        if (   Ainfo[j].max_exp > Ainfo[j].min_exp
+            && Binfo[j].max_exp == Binfo[j].min_exp
+           )
+        {
+            v_in_A_only = j;
+            break;
+        }
+        if (   Ainfo[j].max_exp == Ainfo[j].min_exp
+            && Binfo[j].max_exp > Binfo[j].min_exp
+           )
+        {
+            v_in_B_only = j;
+            break;
+        }
+    }
+    if (v_in_A_only != -WORD(1))
+    {
+        success = _try_missing_var(G, Gbits, v_in_A_only,
+                                            A, Ainfo[v_in_A_only].min_exp,
+                                            B, Binfo[v_in_A_only].min_exp, ctx);
+        goto cleanup;
+    }
+    if (v_in_B_only != -WORD(1))
+    {
+        success = _try_missing_var(G, Gbits, v_in_B_only,
+                                            B, Binfo[v_in_B_only].min_exp,
+                                            A, Ainfo[v_in_B_only].min_exp, ctx);
+        goto cleanup;
+    }
+
     success = fmpz_mpoly_gcd_brown(G, A, B, ctx);
 
 cleanup:
 
     TMP_END;
-
+/*
+flint_printf("_fmpz_mpoly_gcd returning %d\n", success);
+printf("G: "); fmpz_mpoly_print_pretty(G, NULL, ctx); printf("\n");
+*/
     return success;
 }
 
@@ -362,6 +347,8 @@ cleanup:
 int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
+    mp_bitcnt_t Gbits;
+
     if (fmpz_mpoly_is_zero(A, ctx))
     {
         if (B->length == 0)
@@ -395,18 +382,20 @@ int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
         }
     }
 
+    Gbits = FLINT_MIN(A->bits, B->bits);
+
     if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS)
     {
-        return _fmpz_mpoly_gcd(G, 0, A, B, ctx);
+        return _fmpz_mpoly_gcd(G, Gbits, A, B, ctx);
     }
 
     if (A->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, 0, B, A, ctx);
+        return _fmpz_mpoly_gcd_monomial(G, Gbits, B, A, ctx);
     }
     else if (B->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, 0, A, B, ctx);
+        return _fmpz_mpoly_gcd_monomial(G, Gbits, A, B, ctx);
     }
     else if (_fmpz_mpoly_gcd_monomial_cofactors(G, A, B, ctx))
     {
@@ -449,8 +438,8 @@ int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
             }
         }
 
-        success = _fmpz_mpoly_gcd(G, 0, useAnew ? Anew : A,
-                                        useBnew ? Bnew : B, ctx);
+        success = _fmpz_mpoly_gcd(G, FLINT_BITS, useAnew ? Anew : A,
+                                                 useBnew ? Bnew : B, ctx);
 
 cleanup:
         if (useAnew)

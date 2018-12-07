@@ -67,6 +67,7 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
     }
 
     res = fmpz_mpoly_gcd(cg, ca, cb, ctx);
+    fmpz_mpoly_assert_canonical(cg, ctx);
 
     if (!res)
     {

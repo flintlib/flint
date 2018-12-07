@@ -20,10 +20,7 @@
     general gcd routine. It also assumes that A and B have the same length
     and are packed into <= FLINT_BITS.
 
-    If Gbits = 0, the function has no restriction on the bits into which
-    it can pack its answer.
-    If Gbits != 0, the function was called from an internal context
-    that expects all of G,A,B to be packed with bits = Gbits <= FLINT_BITS.
+    The function should pack its answer into bits = Gbits <= FLINT_BITS
 
 */
 int _fmpz_mpoly_gcd_monomial_cofactors_sp(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
@@ -43,9 +40,9 @@ int _fmpz_mpoly_gcd_monomial_cofactors_sp(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
 
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(A->length == B->length);
+    FLINT_ASSERT(Gbits <= FLINT_BITS);
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
-    FLINT_ASSERT(Gbits == 0 || (Gbits == A->bits && Gbits == B->bits));
 
     for (j = 0; j < nvars; j++)
     {
@@ -96,11 +93,6 @@ int _fmpz_mpoly_gcd_monomial_cofactors_sp(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     }
 
     success = 1;
-
-    if (Gbits == 0)
-    {
-        Gbits = FLINT_MIN(A->bits, B->bits);
-    }
 
     fmpz_mpoly_init3(T, A->length, Gbits, ctx);
 

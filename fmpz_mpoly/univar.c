@@ -163,7 +163,10 @@ void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t poly,
     }
 }
 
-
+/*
+    the coefficients of poly1 should be constructed with the same bitcounts
+    as that of poly2
+*/
 int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
                                          slong var, const fmpz_mpoly_ctx_t ctx)
 {
@@ -1435,83 +1438,5 @@ void fmpz_mpoly_univar_derivative(fmpz_mpoly_univar_t poly1,
     poly1->length = len1;
 }
 
-
-
-void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift,
-               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, shift, off, bits, N;
-    ulong k;
-    slong _shift = 0, len = poly2->length;
-    fmpz * coeff = poly2->coeffs;
-    ulong * exp = poly2->exps;
-
-    bits = poly2->bits;
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-    mpoly_gen_offset_shift(&off, &shift, var, N, bits, ctx->minfo);
-
-    fmpz_poly_zero(poly1);
-    if (len > 0)
-    {
-        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-        _shift = (exp[N*(len - 1)] >> shift) & mask;
-        for (i = 0; i < len; i++)
-        {
-            k = (exp[N*i + off] >> shift) & mask;
-            k -= _shift;
-            FLINT_ASSERT(((slong)k) >= 0);
-            fmpz_poly_set_coeff_fmpz(poly1, k, coeff + i);
-        }
-    }
-
-    *poly1_shift = _shift;
-}
-
-void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
-                           slong shift2, slong var, const fmpz_mpoly_ctx_t ctx)
-{
-    slong shift, off, bits, N;
-    slong k;
-    slong p_len;
-    fmpz * p_coeff;
-    ulong * p_exp;
-    slong p_alloc;
-    ulong * one;
-    TMP_INIT;
-
-    TMP_START;
-
-    bits = fmpz_poly_degree(poly2);
-    bits = 1 + FLINT_BIT_COUNT(FLINT_MAX(WORD(1), shift2 + bits));
-    if (bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_fmpz_poly");
-    bits = mpoly_fix_bits(bits, ctx->minfo);
-    
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
-
-    fmpz_mpoly_fit_bits(poly1, bits, ctx);
-    poly1->bits = bits;
-
-    p_coeff = poly1->coeffs;
-    p_exp = poly1->exps;
-    p_alloc = poly1->alloc;
-    p_len = 0;
-    for (k = fmpz_poly_degree(poly2); k >= 0; k--)
-    {
-        _fmpz_mpoly_fit_length(&p_coeff, &p_exp, &p_alloc, p_len + 1, N);
-        mpoly_monomial_mul_ui(p_exp + N*p_len, one, N, k + shift2);
-        fmpz_poly_get_coeff_fmpz(p_coeff + p_len, poly2, k);
-        p_len += !fmpz_is_zero(p_coeff + p_len);
-    }
-
-    poly1->coeffs = p_coeff;
-    poly1->exps = p_exp;
-    poly1->alloc = p_alloc;
-    _fmpz_mpoly_set_length(poly1, p_len, ctx);
-
-    TMP_END;
-}
 
 
