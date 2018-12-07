@@ -50,6 +50,7 @@ int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
 
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length == 1);
+    FLINT_ASSERT(Gbits == 0 || (Gbits == A->bits && Gbits == B->bits));
 
     TMP_START;
 
@@ -77,11 +78,6 @@ int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     if (Gbits == 0)
     {
         Gbits = FLINT_MIN(A->bits, B->bits);
-    }
-    else
-    {
-        FLINT_ASSERT(Gbits == A->bits);
-        FLINT_ASSERT(Gbits == B->bits);
     }
 
     fmpz_mpoly_fit_length(G, 1, ctx);

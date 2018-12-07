@@ -94,7 +94,7 @@ cleanup:
 int
 main(void)
 {
-    int i, j, tmul = 1;
+    int i, j, tmul = 10;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
@@ -121,7 +121,7 @@ main(void)
     }
 
     /* k = 1: The gcd should always work when one input is a monomial */
-    for (i = 0; i < tmul * 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t;
@@ -171,8 +171,58 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
+    /* k = 2: The gcd should always work when both cofactors are monomials */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, g, t1, t2;
+        slong len, len1;
+        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
+
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(t1, ctx);
+        fmpz_mpoly_init(t2, ctx);
+
+        len = n_randint(state, 25);
+        len1 = n_randint(state, 5);
+
+        exp_bits = n_randint(state, 70) + 2;
+        exp_bits1 = n_randint(state, 100) + 2;
+        exp_bits2 = n_randint(state, 100) + 2;
+
+        coeff_bits = n_randint(state, 100);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                fmpz_mpoly_randtest_bits(t1, state, 1, coeff_bits + 1, exp_bits1, ctx);
+            } while (t1->length != 1);
+            do {
+                fmpz_mpoly_randtest_bits(t2, state, 1, coeff_bits + 1, exp_bits2, ctx);
+            } while (t2->length != 1);
+            fmpz_mpoly_randtest_bound(a, state, len1, coeff_bits, exp_bits1, ctx);
+            fmpz_mpoly_mul(b, a, t1, ctx);
+            fmpz_mpoly_mul(a, a, t2, ctx);
+
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, 2);
+        }
+
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(t1, ctx);
+        fmpz_mpoly_clear(t2, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     /* k = 3: test dense inputs */
-    for (i = 0; i < tmul * 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t;
@@ -218,7 +268,7 @@ main(void)
     }
 
     /* k = 4: test dense inputs with random repackings */
-    for (i = 0; i < tmul * 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t;
