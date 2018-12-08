@@ -95,7 +95,7 @@ cleanup:
 int
 main(void)
 {
-    int i, j, tmul = 10;
+    int i, j, tmul = 15;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
@@ -111,8 +111,8 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(g, ctx);
 
-        fmpz_mpoly_set_str_pretty(a, "-12*x^2*y^3*z^4*w^5*(x^2-1)", vars, ctx);
-        fmpz_mpoly_set_str_pretty(b, "-8*x*y^7*(x^3-1)", vars, ctx);
+        fmpz_mpoly_set_str_pretty(a, "w*x*y^2*(1+z+y)*(1+z-y)", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "w*z*x^2*(1+z+y)*(1+z-2*y)", vars, ctx);
 
         gcd_check(g, a, b, ctx, 0,0,0);
 

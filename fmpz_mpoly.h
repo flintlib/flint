@@ -1015,6 +1015,14 @@ FLINT_DLL void fmpz_mpoly_from_mpolyu_perm(fmpz_mpoly_t A,
                        const fmpz_mpolyu_t B, int keepbits, const slong * perm,
                       const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_to_mpolyu_perm_new(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
+                              const slong * perm, const fmpz_mpoly_ctx_t uctx,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_from_mpolyu_perm_new(fmpz_mpoly_t A, mp_bitcnt_t Abits,
+           const fmpz_mpolyu_t B, const slong * perm, const ulong * defaults,
+                      const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpolyu_to_nmod_mpolyu(
                                 nmod_mpolyu_t Ap, const nmod_mpoly_ctx_t ctxp,
                                  fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx);
@@ -1049,6 +1057,9 @@ FLINT_DLL void fmpz_mpolyu_shift_left(fmpz_mpolyu_t A, ulong s);
 FLINT_DLL int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, fmpz_mpoly_t A,
                                    fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpolyu_gcdm_zippel(fmpz_mpolyu_t G,
+                 fmpz_mpolyu_t A, fmpz_mpolyu_t B, const fmpz_mpoly_ctx_t ctx,
+                                mpoly_zipinfo_t zinfo, flint_rand_t randstate);
 
 FMPZ_MPOLY_INLINE fmpz * fmpz_mpoly_leadcoeff_ref(const fmpz_mpoly_t A)
 {
