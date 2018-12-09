@@ -905,6 +905,9 @@ FLINT_DLL void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t poly,
 FLINT_DLL void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, mp_bitcnt_t bits1,
+                  const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1,
               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 

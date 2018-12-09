@@ -14,7 +14,6 @@
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
 
-
 void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
                                fmpz_mpoly_ctx_t ctx, slong i, slong j, slong k)
 {
@@ -95,7 +94,7 @@ cleanup:
 int
 main(void)
 {
-    int i, j, tmul = 15;
+    int i, j, tmul = 30;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
@@ -104,15 +103,18 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t g, a, b;
-        const char * vars[] = {"x" ,"y", "z", "w"};
+        const char * vars[] = {"x" ,"y", "z", "t"};
 
         fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
         fmpz_mpoly_init(a, ctx);
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(g, ctx);
 
-        fmpz_mpoly_set_str_pretty(a, "w*x*y^2*(1+z+y)*(1+z-y)", vars, ctx);
-        fmpz_mpoly_set_str_pretty(b, "w*z*x^2*(1+z+y)*(1+z-2*y)", vars, ctx);
+        fmpz_mpoly_set_str_pretty(g, "39 - t*x + 39*x^100 - t*x^101 + 39*x^3*y - t*x^4*y - 7*x^2*y^3*z^11 - 7*x^102*y^3*z^11 - 7*x^5*y^4*z^11 + 78*t^15*x^78*y^3*z^13 - 2*t^16*x^79*y^3*z^13 + x^1000*y^3*z^20 + x^1100*y^3*z^20 + x^1003*y^4*z^20 - 14*t^15*x^80*y^6*z^24 + 2*t^15*x^1078*y^6*z^33", vars, ctx);
+        fmpz_mpoly_set_str_pretty(a, "39 - t*x - 7*x^2*y^3*z^11 + x^1000*y^3*z^20", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "1 + x^100 + x^3*y + 2*t^15*x^78*y^3*z^13", vars, ctx);
+        fmpz_mpoly_mul(a, a, g, ctx);
+        fmpz_mpoly_mul(b, b, g, ctx);
 
         gcd_check(g, a, b, ctx, 0,0,0);
 
@@ -245,7 +247,7 @@ main(void)
 
         degbound = 25/(2*ctx->minfo->nvars - 1);
 
-        coeff_bits = n_randint(state, 400);
+        coeff_bits = n_randint(state, 40);
 
         for (j = 0; j < 4; j++)
         {
@@ -292,7 +294,7 @@ main(void)
 
         degbound = 25/(2*ctx->minfo->nvars - 1);
 
-        coeff_bits = n_randint(state, 400);
+        coeff_bits = n_randint(state, 40);
 
         for (j = 0; j < 4; j++)
         {

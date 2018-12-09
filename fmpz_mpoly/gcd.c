@@ -137,7 +137,9 @@ cleanup:
     return success;
 }
 
-
+/*
+    return 1 for success or 0 for failure
+*/
 static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
                  const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
                  const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
@@ -338,6 +340,244 @@ cleanup:
     return success;
 }
 
+
+/*
+    return 1 for success or 0 for failure
+*/
+static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
+                 const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
+                 const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
+                                                   const fmpz_mpoly_ctx_t ctx)
+{
+    int success = 1;
+    slong i, j, var, n = ctx->minfo->nvars;
+    ulong work, newwork;
+    fmpz_mpoly_t ac, bc, gc, gabc, g;
+    fmpz_mpoly_univar_t ax, bx, gx;
+
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(B->length > 0);
+
+    /* find a variable with monomial leading or trailing term */
+    var = -WORD(1);
+    work = -UWORD(1);
+    for (j = 0; j < n; j++)
+    {
+        if (Ainfo[j].max_exp > Ainfo[j].min_exp)
+        {
+            FLINT_ASSERT(Binfo[j].max_exp > Binfo[j].min_exp);
+            if (   Ainfo[j].min_exp_term_count == 1
+                || Ainfo[j].max_exp_term_count == 1
+                || Binfo[j].min_exp_term_count == 1
+                || Binfo[j].max_exp_term_count == 1
+               )
+            {
+                newwork = FLINT_MAX(Ainfo[j].max_exp - Ainfo[j].min_exp,
+                                    Binfo[j].max_exp - Binfo[j].min_exp);
+                if (var < 0)
+                {
+                    var = j;
+                    work = newwork;
+                }
+                else if (newwork < work)
+                {
+                    var = j;
+                    work = newwork;
+                }
+            }
+        }
+    }
+
+    if (var < 0 || work + n > 5)
+    {
+        return 0;
+    }
+
+    fmpz_mpoly_init(ac, ctx);
+    fmpz_mpoly_init(bc, ctx);
+    fmpz_mpoly_init(gc, ctx);
+    fmpz_mpoly_init(gabc, ctx);
+    fmpz_mpoly_init(g, ctx);
+
+    fmpz_mpoly_univar_init(ax, ctx);
+    fmpz_mpoly_univar_init(bx, ctx);
+    fmpz_mpoly_univar_init(gx, ctx);
+
+    /*
+        note: we have no control over the intermediate bits thoughout this
+        algorithm. We just pack into Gbits at the very and.
+    */
+
+    success = fmpz_mpoly_to_univar(ax, A, var, ctx);
+    if (!success)
+        goto cleanup;
+
+    success = fmpz_mpoly_to_univar(bx, B, var, ctx);
+    if (!success)
+        goto cleanup;
+
+    gx->var = var;
+
+    /* remove content from Ax */
+    FLINT_ASSERT(ax->length > 1);
+    FLINT_ASSERT(Ainfo[var].min_exp == ax->exps[ax->length - 1]);
+    success = fmpz_mpoly_gcd(ac, ax->coeffs + 0, ax->coeffs + 1, ctx);
+    if (!success)
+        goto cleanup;
+    for (i = 2; i < ax->length; i++)
+    {
+        success = fmpz_mpoly_gcd(ac, ac, ax->coeffs + i, ctx);
+        if (!success)
+            goto cleanup;
+    }
+    for (i = 0; i < ax->length; i++)
+    {
+        if (!fmpz_mpoly_divides(ax->coeffs + i, ax->coeffs + i, ac, ctx))
+            FLINT_ASSERT(0 && "no divides");
+        ax->exps[i] -= Ainfo[var].min_exp;
+    }
+
+    /* remove content from Bx */
+    FLINT_ASSERT(bx->length > 1);
+    FLINT_ASSERT(Binfo[var].min_exp == bx->exps[bx->length - 1]);
+    success = fmpz_mpoly_gcd(bc, bx->coeffs + 0, bx->coeffs + 1, ctx);
+    if (!success)
+        goto cleanup;
+    for (i = 2; i < bx->length; i++)
+    {
+        success = fmpz_mpoly_gcd(bc, bc, bx->coeffs + i, ctx);
+        if (!success)
+            goto cleanup;
+    }
+    for (i = 0; i < bx->length; i++)
+    {
+        if (!fmpz_mpoly_divides(bx->coeffs + i, bx->coeffs + i, bc, ctx))
+            FLINT_ASSERT(0 && "no divides");
+        bx->exps[i] -= Binfo[var].min_exp;
+    }
+
+    /* compute pseudo gcd of contentless polynomials */
+    FLINT_ASSERT(ax->exps[0] > 0);
+    FLINT_ASSERT(bx->exps[0] > 0);
+    if (ax->exps[0] >= bx->exps[0])
+    {
+        _fmpz_mpoly_univar_pgcd(gx, ax, bx, ctx);
+    }
+    else
+    {
+        _fmpz_mpoly_univar_pgcd(gx, bx, ax, ctx);
+    }
+    FLINT_ASSERT(gx->length > 0);
+
+    /* try to divide out easy content from gcd */
+    FLINT_ASSERT(gx->length > 0);
+    if ((gx->coeffs + 0)->length != 1
+        && (gx->coeffs + gx->length - 1)->length != 1)
+    {
+        if (   (ax->coeffs + 0)->length == 1
+            || (bx->coeffs + 0)->length == 1)
+        {
+            fmpz_mpoly_term_content(gc, gx->coeffs + 0, ctx);
+            if (!fmpz_mpoly_divides(gabc, gx->coeffs + 0, gc, ctx))
+                FLINT_ASSERT(0 && "no divides");
+            for (i = 0; i < gx->length; i++)
+            {
+                if (!fmpz_mpoly_divides(gx->coeffs + i, gx->coeffs + i, gabc, ctx))
+                    FLINT_ASSERT(0 && "not lead div");
+            }
+        }
+        else if (   (ax->coeffs + ax->length - 1)->length == 1
+                 || (bx->coeffs + bx->length - 1)->length == 1)
+        {
+            fmpz_mpoly_term_content(gc, gx->coeffs + gx->length - 1, ctx);
+            if (!fmpz_mpoly_divides(gabc, gx->coeffs + gx->length - 1, gc, ctx))
+                FLINT_ASSERT(0 && "no divides");
+            for (i = 0; i < gx->length; i++)
+            {
+                if (!fmpz_mpoly_divides(gx->coeffs + i, gx->coeffs + i, gabc, ctx))
+                    FLINT_ASSERT(0 && "not trail div");
+            }
+        }
+        else
+        {
+            success = fmpz_mpoly_gcd(gc, ax->coeffs + 0, bx->coeffs + 0, ctx);
+            if (!success)
+                goto cleanup;
+            if (gc->length == 1)
+            {
+                fmpz_mpoly_term_content(gc, gx->coeffs + 0, ctx);
+                if (!fmpz_mpoly_divides(gabc, gx->coeffs + 0, gc, ctx))
+                    FLINT_ASSERT(0 && "no divides");
+                for (i = 0; i < gx->length; i++)
+                {
+                    if (!fmpz_mpoly_divides(gx->coeffs + i, gx->coeffs + i, gabc, ctx))
+                        FLINT_ASSERT(0 && "not lead div");
+                }
+            }
+        }
+    }
+
+    /* divide out monomial content from gcd */
+    fmpz_mpoly_term_content(gc, gx->coeffs + 0, ctx);
+    for (i = 1; i < gx->length; i++)
+    {
+        success = fmpz_mpoly_gcd(gc, gc, gx->coeffs + i, ctx);
+        FLINT_ASSERT(success);
+    }
+    for (i = 0; i < gx->length; i++)
+    {
+        if (!fmpz_mpoly_divides(gx->coeffs + i, gx->coeffs + i, gc, ctx))
+            FLINT_ASSERT(0 && "no divides");
+    }
+
+    /* divide out content from gcd */
+    fmpz_mpoly_set(gc, gx->coeffs + 0, ctx);
+    for (i = 1; i < gx->length; i++)
+    {
+        success = fmpz_mpoly_gcd(gc, gc, gx->coeffs + i, ctx);
+        if (!success)
+            goto cleanup;
+    }
+    for (i = 0; i < gx->length; i++)
+    {
+        if (!fmpz_mpoly_divides(gx->coeffs + i, gx->coeffs + i, gc, ctx))
+            FLINT_ASSERT(0 && "no divides");
+    }
+
+    /* put back real content */
+    fmpz_mpoly_gcd(gabc, ac, bc, ctx);
+    for (i = 0; i < gx->length; i++)
+    {
+        fmpz_mpoly_mul(gx->coeffs + i, gx->coeffs + i, gabc, ctx);
+        gx->exps[i] += FLINT_MIN(Ainfo[var].min_exp, Binfo[var].min_exp);
+    }
+
+    fmpz_mpoly_from_univar_bits(G, Gbits, gx, ctx);
+
+    FLINT_ASSERT(G->length > 0);
+    if (fmpz_sgn(G->coeffs + 0) < 0)
+    {
+        fmpz_mpoly_neg(G, G, ctx);
+    }
+
+    success = 1;
+
+cleanup:
+
+    fmpz_mpoly_clear(ac, ctx);
+    fmpz_mpoly_clear(bc, ctx);
+    fmpz_mpoly_clear(gc, ctx);
+    fmpz_mpoly_clear(gabc, ctx);
+    fmpz_mpoly_clear(g, ctx);
+
+    fmpz_mpoly_univar_clear(ax, ctx);
+    fmpz_mpoly_univar_clear(bx, ctx);
+    fmpz_mpoly_univar_clear(gx, ctx);
+
+    return success;
+}
+
+
 /*
     The function must pack its answer into bits = Gbits <= FLINT_BITS
     Both A and B have to be packed into bits <= FLINT_BITS
@@ -533,9 +773,11 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
             present in both ess(A) and ess(B)
     */
 
-    {
-        success = _try_zippel(G, Gbits, A, Ainfo, B, Binfo, ctx);
-    }
+    success = _try_prs(G, Gbits, A, Ainfo, B, Binfo, ctx);
+    if (success)
+        goto cleanup;
+
+    success = _try_zippel(G, Gbits, A, Ainfo, B, Binfo, ctx);
 
 cleanup:
 
