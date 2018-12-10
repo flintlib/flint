@@ -786,6 +786,15 @@ FLINT_DLL void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
 
 /* GCD ***********************************************************************/
 
+FLINT_DLL void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride, 
+                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_deflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+          const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+          const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
@@ -1018,12 +1027,14 @@ FLINT_DLL void fmpz_mpoly_from_mpolyu_perm(fmpz_mpoly_t A,
                        const fmpz_mpolyu_t B, int keepbits, const slong * perm,
                       const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_to_mpolyu_perm_new(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
-                              const slong * perm, const fmpz_mpoly_ctx_t uctx,
-                                                   const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_to_mpolyu_perm_deflate(
+                                        fmpz_mpolyu_t A, const fmpz_mpoly_t B,
+                const slong * perm, const ulong * shift, const ulong * stride,
+                      const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_from_mpolyu_perm_new(fmpz_mpoly_t A, mp_bitcnt_t Abits,
-           const fmpz_mpolyu_t B, const slong * perm, const ulong * defaults,
+FLINT_DLL void fmpz_mpoly_from_mpolyu_perm_inflate(
+                     fmpz_mpoly_t A, mp_bitcnt_t Abits, const fmpz_mpolyu_t B,
+                const slong * perm, const ulong * shift, const ulong * stride,
                       const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpolyu_to_nmod_mpolyu(

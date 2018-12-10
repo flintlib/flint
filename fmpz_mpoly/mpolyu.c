@@ -184,13 +184,18 @@ fmpz_mpoly_struct * _fmpz_mpolyu_get_coeff(fmpz_mpolyu_t A,
     Convert B to A using the variable permutation perm.
     The uctx should be the context of the coefficients of A.
     The ctx should be the context of B.
-    The uctx should have one fewer variable than ctx.
+
+    operation on each term:
+
+    for 0 <= k <= m
+        l = perm[k]
+        Aexp[k] = (Bexp[l] - shift[l])/stride[l]
 */
-void fmpz_mpoly_to_mpolyu_perm_new(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
-                              const slong * perm, const fmpz_mpoly_ctx_t uctx,
-                                                    const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_to_mpolyu_perm_deflate(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
+               const slong * perm, const ulong * shift, const ulong * stride,
+                       const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, j;
+    slong i, j, k, l;
     slong n = ctx->minfo->nvars;
     slong m = uctx->minfo->nvars;
     slong NA, NB;
@@ -216,9 +221,12 @@ void fmpz_mpoly_to_mpolyu_perm_new(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
     for (j = 0; j < B->length; j++)
     {
         mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
-        for (i = 0; i <= m; i++)
+        for (k = 0; k <= m; k++)
         {
-            uexps[i] = Bexps[perm[i]];
+            l = perm[k];
+            FLINT_ASSERT(stride[l] != UWORD(0));
+            FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
+            uexps[k] = (Bexps[l] - shift[l]) / stride[l];
         }
         Ac = _fmpz_mpolyu_get_coeff(A, uexps[m], uctx);
         FLINT_ASSERT(Ac->bits == A->bits);
@@ -241,16 +249,24 @@ void fmpz_mpoly_to_mpolyu_perm_new(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
 /*
     Convert B to A using the variable permutation vector perm.
     A must be constructed with bits = Abits.
-    If m + 1 < n, variables missing from perm will be fill in with
-    exponents from defaults.
+
+    operation on each term:
+
+        for 0 <= l < n
+            Aexp[l] = shift[l]
+
+        for 0 <= k <= m
+            l = perm[k]
+            Aexp[l] += scale[l]*Bexp[k]
 */
-void fmpz_mpoly_from_mpolyu_perm_new(fmpz_mpoly_t A, mp_bitcnt_t Abits,
-           const fmpz_mpolyu_t B, const slong * perm, const ulong * defaults,
+void fmpz_mpoly_from_mpolyu_perm_inflate(fmpz_mpoly_t A, mp_bitcnt_t Abits,
+                                                        const fmpz_mpolyu_t B,
+                const slong * perm, const ulong * shift, const ulong * stride,
                        const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx)
 {
     slong n = ctx->minfo->nvars;
     slong m = uctx->minfo->nvars;
-    slong i, j, k;
+    slong i, j, k, l;
     slong NA, NB;
     slong Alen;
     fmpz * Acoeff;
@@ -290,13 +306,14 @@ void fmpz_mpoly_from_mpolyu_perm_new(fmpz_mpoly_t A, mp_bitcnt_t Abits,
             fmpz_set(Acoeff + Alen + j, Bc->coeffs + j);
             mpoly_get_monomial_ui(uexps, Bc->exps + NB*j, Bc->bits, uctx->minfo);
             uexps[m] = B->exps[i];
-            for (k = 0; k < n; k++)
+            for (l = 0; l < n; l++)
             {
-                Aexps[k] = defaults[k];
+                Aexps[l] = shift[l];
             }
             for (k = 0; k <= m; k++)
             {
-                Aexps[perm[k]] = uexps[k];
+                l = perm[k];
+                Aexps[l] += stride[l]*uexps[k];
             }
             mpoly_set_monomial_ui(Aexp + NA*(Alen + j), Aexps, Abits, ctx->minfo);
         }

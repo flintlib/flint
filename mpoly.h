@@ -717,6 +717,18 @@ FLINT_DLL int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, 
 
 FLINT_DLL void mpoly_reverse(ulong * Aexp, const ulong * Bexp, slong len, slong N);
 
+FLINT_DLL void mpoly_monomials_deflation(fmpz * shift, fmpz * stride,
+                        const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                                                       const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_monomials_deflate(ulong * Aexps, mp_bitcnt_t Abits,
+                        const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+              const fmpz * shift, const fmpz * stride, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_monomials_inflate(ulong * Aexps, mp_bitcnt_t Abits,
+                        const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+              const fmpz * shift, const fmpz * stride, const mpoly_ctx_t mctx);
+
 /* info related to gcd calculation *******************************************/
 
 typedef struct mpoly_gcd_var_info_struct

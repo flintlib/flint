@@ -15,7 +15,7 @@
 #include "ulong_extras.h"
 
 void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
-                               fmpz_mpoly_ctx_t ctx, slong i, slong j, slong k)
+                     fmpz_mpoly_ctx_t ctx, slong i, slong j, const char * name)
 {
     int res;
     fmpz_mpoly_t ca, cb, cg;
@@ -30,7 +30,7 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
     if (!res)
     {
         flint_printf("Check gcd can be computed\n"
-                                       "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -40,7 +40,7 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
         {
             printf("FAIL\n");
             flint_printf("Check zero gcd only results from zero inputs\n"
-                                       "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
             flint_abort();
         }
         goto cleanup;
@@ -50,7 +50,7 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
     {
         printf("FAIL\n");
         flint_printf("Check gcd has positive lc\n"
-                                       "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -61,7 +61,7 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
     {
         printf("FAIL\n");
         flint_printf("Check divisibility\n"
-                                       "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -72,7 +72,7 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
     {
         printf("FAIL\n");
         flint_printf("Check gcd of cofactors can be computed\n"
-                                       "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -80,7 +80,7 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
     {
         printf("FAIL\n");
         flint_printf("Check gcd of cofactors is one\n"
-                                       "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -116,7 +116,7 @@ main(void)
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
 
-        gcd_check(g, a, b, ctx, 0,0,0);
+        gcd_check(g, a, b, ctx, 0,0,"example");
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
@@ -124,7 +124,7 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    /* k = 1: The gcd should always work when one input is a monomial */
+    /* The gcd should always work when one input is a monomial */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -165,7 +165,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, 1);
+            gcd_check(g, a, b, ctx, i, j, "monomial");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -175,7 +175,7 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    /* k = 2: The gcd should always work when both cofactors are monomials */
+    /* The gcd should always work when both cofactors are monomials */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -214,7 +214,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, 2);
+            gcd_check(g, a, b, ctx, i, j, "monomial cofactors");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -225,7 +225,7 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    /* k = 3: test dense inputs */
+    /* dense inputs */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -261,7 +261,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, 3);
+            gcd_check(g, a, b, ctx, i, j, "dense inputs");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -271,7 +271,7 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    /* k = 4: test dense inputs with random repackings */
+    /* dense inputs with random repackings */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -324,7 +324,55 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, 4);
+            gcd_check(g, a, b, ctx, i, j, "dense inputs with repackings");
+        }
+
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    /* dense inputs with random inflations */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, g, t;
+        mp_bitcnt_t coeff_bits;
+        slong len, len1, len2;
+        slong degbound;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 5);
+
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(t, ctx);
+
+        len = n_randint(state, 25) + 1;
+        len1 = n_randint(state, 50);
+        len2 = n_randint(state, 50);
+
+        degbound = 25/(2*ctx->minfo->nvars - 1);
+
+        coeff_bits = n_randint(state, 40);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                fmpz_mpoly_randtest_bound(t, state, len, coeff_bits + 1, degbound, ctx);
+            } while (t->length == 0);
+            fmpz_mpoly_randtest_bound(a, state, len1, coeff_bits, degbound, ctx);
+            fmpz_mpoly_randtest_bound(b, state, len2, coeff_bits, degbound, ctx);
+            fmpz_mpoly_mul(a, a, t, ctx);
+            fmpz_mpoly_mul(b, b, t, ctx);
+
+            fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
+
+            
+
+            gcd_check(g, a, b, ctx, i, j, "dense inputs with inflations");
         }
 
         fmpz_mpoly_clear(g, ctx);

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mpoly.h"
+#include "ulong_extras.h"
 
 /*
     Scan A and fill in the min and max exponents of each variable along
@@ -70,6 +71,67 @@ static void _init_info(mpoly_gcd_var_info_struct * info, const fmpz_mpoly_t A,
     }
 
     TMP_END;
+}
+
+
+static void _compute_strides(ulong * strides,
+                     const fmpz_mpoly_t A, mpoly_gcd_var_info_struct * Ainfo,
+                     const fmpz_mpoly_t B, mpoly_gcd_var_info_struct * Binfo,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, j, NA, NB;
+    slong nvars = ctx->minfo->nvars;
+    ulong mask;
+    ulong * exps;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+
+    for (j = 0; j < nvars; j++)
+    {
+        strides[j] = n_gcd(Ainfo[j].max_exp - Ainfo[j].min_exp,
+                           Binfo[j].max_exp - Binfo[j].min_exp);
+    }
+
+    TMP_START;
+    exps = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+
+    NA = mpoly_words_per_exp(A->bits, ctx->minfo);
+
+    for (i = 0; i < A->length; i++)
+    {
+        mpoly_get_monomial_ui(exps, A->exps + NA*i, A->bits, ctx->minfo);
+        mask = 0;
+        for (j = 0; j < nvars; j++)
+        {
+            strides[j] = n_gcd(strides[j], exps[j] - Ainfo[j].min_exp);
+            mask |= strides[j];
+        }
+        if (mask < UWORD(2))
+            goto cleanup;
+    }
+
+    NB = mpoly_words_per_exp(B->bits, ctx->minfo);
+
+    for (i = 0; i < B->length; i++)
+    {
+        mpoly_get_monomial_ui(exps, B->exps + NB*i, B->bits, ctx->minfo);
+        mask = 0;
+        for (j = 0; j < nvars; j++)
+        {
+            strides[j] = n_gcd(strides[j], exps[j] - Binfo[j].min_exp);
+            mask |= strides[j];
+        }
+        if (mask < UWORD(2))
+            goto cleanup;
+    }
+
+cleanup:
+
+    TMP_END;
+
+    return;
 }
 
 
@@ -140,7 +202,7 @@ cleanup:
 /*
     return 1 for success or 0 for failure
 */
-static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
+static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
                  const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
                  const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
                                                    const fmpz_mpoly_ctx_t ctx)
@@ -148,13 +210,12 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     slong i, j;
     slong n, m;
     int success;
-    ulong * defaults;
+    ulong * Ashift, * Bshift, * Gshift;
     mpoly_zipinfo_t zinfo;
     mp_bitcnt_t new_bits;
     flint_rand_t randstate;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu;
-    slong ABminshift;
     fmpz_mpoly_t Acontent, Bcontent;
     fmpz_mpolyu_t Abar, Bbar, Gbar;
     TMP_INIT;
@@ -184,16 +245,19 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
         in both ess(A) and ess(B). Each y_i is one of the x_j and the variables
         are ordered as y_{m} > y_0 > ... > y_{m-1} with LEX order.
         The Zippel algorithm will operate in Z[y_0,...,y_{m-1}][y_m] and it
-        only operate with Z[y_0,...,y_{m-1}] in LEX.
+        only operates with Z[y_0,...,y_{m-1}] in LEX.
 
-        When converting to the mpolyu format, the non-essential variables
+        When converting to the mpolyu format via
+        fmpz_mpoly_to_mpolyu_perm_deflate, the non-essential variables
         will be immediately striped out and the remaining variables will be
         mapped according to the permutation in zinfo->perm as
             x_i = y_{perm[i]}
 
-        When converting out of the mpolyu format, the contribution of the
-        non-essential variables needs to be put back in.
+        When converting out of the mpolyu format via
+        fmpz_mpoly_from_mpolyu_perm_inflate, the contribution of the
+        non-essential variables will be put back in.
     */
+
     n = ctx->minfo->nvars;
     m = -WORD(1);
     for (j = 0; j < n; j++)
@@ -216,24 +280,28 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     /* uctx is context for Z[y_0,...,y_{m-1}]*/
     fmpz_mpoly_ctx_init(uctx, m, ORD_LEX);
 
-    defaults = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Ashift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Bshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Gshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
 
-    /* fill in zinfo->perm and set default values to use when converting */
+    /* fill in zinfo->perm and set shift values to use when converting */
     i = 0;
     for (j = 0; j < n; j++)
     {
+        Ashift[j] = Ainfo[j].min_exp;
+        Bshift[j] = Binfo[j].min_exp;
+        Gshift[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
         if (Ainfo[j].max_exp > Ainfo[j].min_exp)
         {
+            FLINT_ASSERT(Gstride[j] != UWORD(0));
+            FLINT_ASSERT(Gstride[j] != UWORD(0));
+            FLINT_ASSERT((Ainfo[j].max_exp - Ainfo[j].min_exp) % Gstride[j] == UWORD(0));
+            FLINT_ASSERT((Binfo[j].max_exp - Binfo[j].min_exp) % Gstride[j] == UWORD(0));
+
             zinfo->perm[i] = j;
-            zinfo->Adegs[i] = Ainfo[j].max_exp - Ainfo[j].min_exp;
-            zinfo->Bdegs[i] = Binfo[j].max_exp - Binfo[j].min_exp;
+            zinfo->Adegs[i] = (Ainfo[j].max_exp - Ainfo[j].min_exp)/Gstride[j];
+            zinfo->Bdegs[i] = (Binfo[j].max_exp - Binfo[j].min_exp)/Gstride[j];
             i++;
-            /* default[j] should not matter in this case - set to absurd */
-            defaults[j] = -UWORD(1);
-        }
-        else
-        {
-            defaults[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
         }
     }
     FLINT_ASSERT(i == m + 1);
@@ -246,8 +314,8 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     fmpz_mpolyu_init(Bu, new_bits, uctx);
     fmpz_mpolyu_init(Gu, new_bits, uctx);
 
-    fmpz_mpoly_to_mpolyu_perm_new(Au, A, zinfo->perm, uctx, ctx);
-    fmpz_mpoly_to_mpolyu_perm_new(Bu, B, zinfo->perm, uctx, ctx);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, A, zinfo->perm, Ashift, Gstride, uctx, ctx);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B, zinfo->perm, Bshift, Gstride, uctx, ctx);
 
     FLINT_ASSERT(Au->bits == Bu->bits);
     FLINT_ASSERT(Au->length > 1);
@@ -293,10 +361,6 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     /* remove content from A and B */
     fmpz_mpolyu_divexact_mpoly(Abar, Au, Acontent, uctx);
     fmpz_mpolyu_divexact_mpoly(Bbar, Bu, Bcontent, uctx);
-    ABminshift = FLINT_MIN(Abar->exps[Abar->length - 1],
-                           Bbar->exps[Bbar->length - 1]);
-    fmpz_mpolyu_shift_right(Abar, Abar->exps[Abar->length - 1]);
-    fmpz_mpolyu_shift_right(Bbar, Bbar->exps[Bbar->length - 1]);
 
     /* compute GCD */
     success = fmpz_mpolyu_gcdm_zippel(Gbar, Abar, Bbar, uctx, zinfo, randstate);
@@ -309,9 +373,8 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
         goto cleanup;
     FLINT_ASSERT(Acontent->bits == new_bits);
 
-    fmpz_mpolyu_shift_left(Gbar, ABminshift);
     fmpz_mpolyu_mul_mpoly(Gu, Gbar, Acontent, uctx);
-    fmpz_mpoly_from_mpolyu_perm_new(G, Gbits, Gu, zinfo->perm, defaults, uctx, ctx);
+    fmpz_mpoly_from_mpolyu_perm_inflate(G, Gbits, Gu, zinfo->perm, Gshift, Gstride, uctx, ctx);
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
     FLINT_ASSERT(G->bits == Gbits);
@@ -596,6 +659,7 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_var_info_struct * Ainfo, * Binfo;
+    ulong * Gstrides;
     TMP_INIT;
 
     FLINT_ASSERT(A->length > 0);
@@ -772,12 +836,15 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
             missing from both ess(A) and ess(B), or
             present in both ess(A) and ess(B)
     */
-
+/*
     success = _try_prs(G, Gbits, A, Ainfo, B, Binfo, ctx);
     if (success)
         goto cleanup;
+*/
+    Gstrides = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+    _compute_strides(Gstrides, A, Ainfo, B, Binfo, ctx);
 
-    success = _try_zippel(G, Gbits, A, Ainfo, B, Binfo, ctx);
+    success = _try_zippel(G, Gbits, Gstrides, A, Ainfo, B, Binfo, ctx);
 
 cleanup:
 
