@@ -811,6 +811,8 @@ void fmpz_mpolyu_divexact_mpoly(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
         fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
         poly1->bits = exp_bits;
 
+        FLINT_ASSERT(poly2->length > 0);
+
         len = _fmpz_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
                             &poly1->alloc, poly2->coeffs, poly2->exps, poly2->length,
                               poly3->coeffs, poly3->exps, poly3->length, exp_bits, N,

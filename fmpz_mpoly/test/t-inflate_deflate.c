@@ -25,7 +25,7 @@ main(void)
     fflush(stdout);
 
     /* Check deflate undoes inflate */
-    for (i = 0; i < 30 * flint_test_multiplier(); i++)
+    for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         slong k;
         fmpz_mpoly_ctx_t ctx;
@@ -116,7 +116,7 @@ main(void)
     }
 
     /* Check deflating by deflation leaves trivial deflation */
-    for (i = 0; i < 30 * flint_test_multiplier(); i++)
+    for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         slong k;
         fmpz_mpoly_ctx_t ctx;
@@ -159,8 +159,7 @@ main(void)
             for (k = 0; k < ctx->minfo->nvars; k++)
             {
                 fmpz_randtest_unsigned(shifts + k, state, shift_bits);
-                fmpz_randtest_not_zero(strides + k, state, stride_bits);
-                fmpz_abs(strides + k, strides + k);
+                fmpz_randtest_unsigned(strides + k, state, stride_bits);
             }
 
             fmpz_mpoly_inflate(h, f, shifts, strides, ctx);
@@ -169,7 +168,9 @@ main(void)
             fmpz_mpoly_deflate(g, h, shifts, strides, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
             fmpz_mpoly_deflation(shifts, strides, g, ctx);
-            success = 1;
+            fmpz_mpoly_deflate(f, g, shifts, strides, ctx);
+            fmpz_mpoly_assert_canonical(f, ctx);
+            success = fmpz_mpoly_equal(f, g, ctx);
             for (k = 0; k < ctx->minfo->nvars; k++)
             {
                 if (!fmpz_is_zero(shifts + k))

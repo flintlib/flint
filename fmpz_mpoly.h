@@ -825,13 +825,13 @@ FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors(fmpz_mpoly_t G,
 
 ******************************************************************************/
 
-FLINT_DLL void _fmpz_mpoly_to_fmpz_poly_shifts(fmpz_poly_t A,
-                                 const fmpz_mpoly_t B, const ulong * Bshifts,
-                                        slong var, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A,
+                         const fmpz_mpoly_t B, slong var, const ulong * Bshift,
+                            const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_from_fmpz_poly_shifts(fmpz_mpoly_t A, mp_bitcnt_t Abits,
-                                      const fmpz_poly_t B, ulong * Bshifts,
-                                        slong var, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
+       mp_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
+                            const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mpoly_gen_shift_right(fmpz_mpoly_t A, slong var,
                                      ulong amount, const fmpz_mpoly_ctx_t ctx);

@@ -22,6 +22,12 @@ void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     fmpz * exps;
     TMP_INIT;
 
+    if (B->length == 0)
+    {
+        fmpz_mpoly_zero(A, ctx);
+        return;
+    }
+
     TMP_START;
 
     exps = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));

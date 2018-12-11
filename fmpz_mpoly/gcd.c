@@ -109,7 +109,9 @@ static void _compute_strides(ulong * strides,
             mask |= strides[j];
         }
         if (mask < UWORD(2))
+        {
             goto cleanup;
+        }
     }
 
     NB = mpoly_words_per_exp(B->bits, ctx->minfo);
@@ -124,7 +126,9 @@ static void _compute_strides(ulong * strides,
             mask |= strides[j];
         }
         if (mask < UWORD(2))
+        {
             goto cleanup;
+        }
     }
 
 cleanup:
@@ -659,7 +663,7 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_var_info_struct * Ainfo, * Binfo;
-    ulong * Gstrides;
+    ulong * Gstride;
     TMP_INIT;
 
     FLINT_ASSERT(A->length > 0);
@@ -770,25 +774,30 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
             The ess(A) and ess(B) depend on only one variable v_in_both
             Calculate gcd using univariates
         */
-        ulong * minA, * minB, * minG;
+        ulong * Ashift, * Bshift, * Gshift;
         fmpz_poly_t a, b, g;
 
-        minA = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-        minB = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-        minG = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+        Ashift = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+        Bshift = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+        Gshift = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
         for (j = 0; j < nvars; j++)
         {
-            minA[j] = Ainfo[j].min_exp;
-            minB[j] = Binfo[j].min_exp;
-            minG[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
+            Ashift[j] = Ainfo[j].min_exp;
+            Bshift[j] = Binfo[j].min_exp;
+            Gshift[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
         }
+
+        Gstride = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+        _compute_strides(Gstride, A, Ainfo, B, Binfo, ctx);
+
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(g);
-        _fmpz_mpoly_to_fmpz_poly_shifts(a, A, minA, v_in_both, ctx);
-        _fmpz_mpoly_to_fmpz_poly_shifts(b, B, minB, v_in_both, ctx);
+        _fmpz_mpoly_to_fmpz_poly_deflate(a, A, v_in_both, Ashift, Gstride, ctx);
+        _fmpz_mpoly_to_fmpz_poly_deflate(b, B, v_in_both, Bshift, Gstride, ctx);
         fmpz_poly_gcd(g, a, b);
-        _fmpz_mpoly_from_fmpz_poly_shifts(G, Gbits, g, minG, v_in_both, ctx);
+        _fmpz_mpoly_from_fmpz_poly_inflate(G, Gbits, g, v_in_both,
+                                                          Gshift, Gstride, ctx);
         fmpz_poly_clear(a);
         fmpz_poly_clear(b);
         fmpz_poly_clear(g);
@@ -841,10 +850,10 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     if (success)
         goto cleanup;
 */
-    Gstrides = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-    _compute_strides(Gstrides, A, Ainfo, B, Binfo, ctx);
+    Gstride = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+    _compute_strides(Gstride, A, Ainfo, B, Binfo, ctx);
 
-    success = _try_zippel(G, Gbits, Gstrides, A, Ainfo, B, Binfo, ctx);
+    success = _try_zippel(G, Gbits, Gstride, A, Ainfo, B, Binfo, ctx);
 
 cleanup:
 
@@ -896,6 +905,7 @@ int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
     if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS)
     {
+        /* usual gcd's go right down here */
         return _fmpz_mpoly_gcd(G, Gbits, A, B, ctx);
     }
 
@@ -913,50 +923,110 @@ int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
     }
     else
     {
-    /*
-        Since we do not have truly sparse GCD algorithms,
-        if either of A or B cannot be packed into FLINT_BITS and neither is a
-        monomial, assume that the gcd computation is hopeless and fail.
-    */
+        /*
+            The gcd calculation is unusual.
+            First see if both inputs fit into FLINT_BITS.
+            Then, try deflation as a last resort.
+        */
+
         int success;
         int useAnew = 0;
         int useBnew = 0;
+        slong k;
+        fmpz * Ashift, * Astride;
+        fmpz * Bshift, * Bstride;
+        fmpz * Gshift, * Gstride;
         fmpz_mpoly_t Anew;
         fmpz_mpoly_t Bnew;
 
+        fmpz_mpoly_init(Anew, ctx);
+        fmpz_mpoly_init(Bnew, ctx);
+
         if (A->bits > FLINT_BITS)
         {
-            fmpz_mpoly_init(Anew, ctx);
             useAnew = fmpz_mpoly_repack_bits(Anew, A, FLINT_BITS, ctx);
             if (!useAnew)
-            {
-                useAnew = 1;
-                success = 0;
-                goto cleanup;
-            }
+                goto could_not_repack;
         }
 
         if (B->bits > FLINT_BITS)
         {
-            fmpz_mpoly_init(Bnew, ctx);
             useBnew = fmpz_mpoly_repack_bits(Bnew, B, FLINT_BITS, ctx);
             if (!useBnew)
-            {
-                useBnew = 1;
-                success = 0;
-                goto cleanup;
-            }
+                goto could_not_repack;
         }
 
         success = _fmpz_mpoly_gcd(G, FLINT_BITS, useAnew ? Anew : A,
                                                  useBnew ? Bnew : B, ctx);
+        goto cleanup;
+
+could_not_repack:
+
+        /*
+            One of A or B could not be repacked into FLINT_BITS. See if
+            they both fit into FLINT_BITS after deflation.
+        */
+
+        Ashift  = _fmpz_vec_init(ctx->minfo->nvars);
+        Astride = _fmpz_vec_init(ctx->minfo->nvars);
+        Bshift  = _fmpz_vec_init(ctx->minfo->nvars);
+        Bstride = _fmpz_vec_init(ctx->minfo->nvars);
+        Gshift  = _fmpz_vec_init(ctx->minfo->nvars);
+        Gstride = _fmpz_vec_init(ctx->minfo->nvars);
+
+        fmpz_mpoly_deflation(Ashift, Astride, A, ctx);
+        fmpz_mpoly_deflation(Bshift, Bstride, B, ctx);
+        _fmpz_vec_min(Gshift, Ashift, Bshift, ctx->minfo->nvars);
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_gcd(Gstride + k, Astride + k, Bstride + k);
+        }
+
+        success = 0;
+
+        fmpz_mpoly_deflate(Anew, A, Ashift, Gstride, ctx);
+        if (Anew->bits > FLINT_BITS)
+        {
+            if (!fmpz_mpoly_repack_bits(Anew, Anew, FLINT_BITS, ctx))
+                goto deflate_cleanup;
+        }
+
+        fmpz_mpoly_deflate(Bnew, B, Bshift, Gstride, ctx);
+        if (Bnew->bits > FLINT_BITS)
+        {
+            if (!fmpz_mpoly_repack_bits(Bnew, Bnew, FLINT_BITS, ctx))
+                goto deflate_cleanup;
+        }
+
+        success = _fmpz_mpoly_gcd(G, FLINT_BITS, Anew, Bnew, ctx);
+
+        if (success)
+        {
+            fmpz_mpoly_inflate(G, G, Gshift, Gstride, ctx);
+
+            /* inflation may have changed the lc */
+            FLINT_ASSERT(G->length > 0);
+            if (fmpz_sgn(G->coeffs + 0) < 0)
+            {
+                fmpz_mpoly_neg(G, G, ctx);
+            }
+        }
+
+deflate_cleanup:
+
+        _fmpz_vec_clear(Ashift, ctx->minfo->nvars);
+        _fmpz_vec_clear(Astride, ctx->minfo->nvars);
+        _fmpz_vec_clear(Bshift, ctx->minfo->nvars);
+        _fmpz_vec_clear(Bstride, ctx->minfo->nvars);
+        _fmpz_vec_clear(Gshift, ctx->minfo->nvars);
+        _fmpz_vec_clear(Gstride, ctx->minfo->nvars);
 
 cleanup:
-        if (useAnew)
-            fmpz_mpoly_clear(Anew, ctx);
-        if (useBnew)
-            fmpz_mpoly_clear(Bnew, ctx);
+
+        fmpz_mpoly_clear(Anew, ctx);
+        fmpz_mpoly_clear(Bnew, ctx);
 
         return success;
+
     }
 }

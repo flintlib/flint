@@ -95,6 +95,7 @@ int
 main(void)
 {
     int i, j, tmul = 30;
+    slong k;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
@@ -116,7 +117,35 @@ main(void)
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
 
-        gcd_check(g, a, b, ctx, 0,0,"example");
+        gcd_check(g, a, b, ctx, 0, 0, "example");
+
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    {
+        int success;
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t g, a, b;
+        const char * vars[] = {"x" ,"y", "z", "t"};
+
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(g, ctx);
+
+        fmpz_mpoly_set_str_pretty(a, "x^3 + 1", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "x^9999999999999999999999 + x^3333333333333333333333 + x", vars, ctx);
+
+        success = fmpz_mpoly_gcd(g, a, b, ctx);
+        if (success)
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example\n");
+
+        }
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
@@ -151,7 +180,7 @@ main(void)
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
 
-        coeff_bits = n_randint(state, 100);
+        coeff_bits = n_randint(state, 200);
 
         for (j = 0; j < 4; j++)
         {
@@ -198,7 +227,7 @@ main(void)
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
 
-        coeff_bits = n_randint(state, 100);
+        coeff_bits = n_randint(state, 200);
 
         for (j = 0; j < 4; j++)
         {
@@ -247,7 +276,7 @@ main(void)
 
         degbound = 25/(2*ctx->minfo->nvars - 1);
 
-        coeff_bits = n_randint(state, 40);
+        coeff_bits = n_randint(state, 200);
 
         for (j = 0; j < 4; j++)
         {
@@ -294,7 +323,7 @@ main(void)
 
         degbound = 25/(2*ctx->minfo->nvars - 1);
 
-        coeff_bits = n_randint(state, 40);
+        coeff_bits = n_randint(state, 200);
 
         for (j = 0; j < 4; j++)
         {
@@ -340,6 +369,8 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t;
         mp_bitcnt_t coeff_bits;
+        fmpz * shifts1, * shifts2, * strides;
+        mp_bitcnt_t stride_bits, shift_bits;
         slong len, len1, len2;
         slong degbound;
 
@@ -350,13 +381,26 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        len = n_randint(state, 25) + 1;
-        len1 = n_randint(state, 50);
-        len2 = n_randint(state, 50);
+        len = n_randint(state, 15) + 1;
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20);
 
         degbound = 25/(2*ctx->minfo->nvars - 1);
 
-        coeff_bits = n_randint(state, 40);
+        coeff_bits = n_randint(state, 200);
+
+        stride_bits = n_randint(state, 100) + 2;
+        shift_bits = n_randint(state, 100) + 2;
+
+        shifts1 = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        shifts2 = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        strides = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_init(shifts1 + k);
+            fmpz_init(shifts2 + k);
+            fmpz_init(strides + k);
+        }
 
         for (j = 0; j < 4; j++)
         {
@@ -370,10 +414,27 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
-            
+            for (k = 0; k < ctx->minfo->nvars; k++)
+            {
+                fmpz_randtest_unsigned(shifts1 + k, state, shift_bits);
+                fmpz_randtest_unsigned(shifts2 + k, state, shift_bits);
+                fmpz_randtest_unsigned(strides + k, state, stride_bits);
+            }
+            fmpz_mpoly_inflate(a, a, shifts1, strides, ctx);
+            fmpz_mpoly_inflate(b, b, shifts2, strides, ctx);
 
             gcd_check(g, a, b, ctx, i, j, "dense inputs with inflations");
         }
+
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_clear(shifts1 + k);
+            fmpz_clear(shifts2 + k);
+            fmpz_clear(strides + k);
+        }
+        flint_free(shifts1);
+        flint_free(shifts2);
+        flint_free(strides);
 
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(a, ctx);

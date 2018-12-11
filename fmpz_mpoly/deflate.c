@@ -17,6 +17,12 @@ void fmpz_mpoly_deflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 {
     slong Abits;
 
+    if (B->length == 0)
+    {
+        fmpz_mpoly_zero(A, ctx);
+        return;
+    }
+
     /* quick and safe bound on bits required */
     Abits = B->bits;
 
