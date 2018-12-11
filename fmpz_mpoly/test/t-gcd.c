@@ -144,7 +144,7 @@ main(void)
         {
             printf("FAIL\n");
             flint_printf("Check non-example\n");
-
+            flint_abort();
         }
 
         fmpz_mpoly_clear(a, ctx);
