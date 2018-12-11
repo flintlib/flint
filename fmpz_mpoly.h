@@ -861,36 +861,6 @@ typedef struct
 
 typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
 
-
-
-/*
-    A dense mpoly is stored as a flat array of coeffcients.
-    Suppose deg_bounds = {a, b, c}. The coefficient of the monomial with 
-    exponents {i, j, k} is stored at the coefficient of index
-        c + k*(b + j*(a + i*0))
-
-    Design is still in flux.
-*/
-typedef struct
-{
-    slong nvars;
-    slong degb_alloc;
-    slong * deg_bounds;
-    slong length;           /* usage is inconsistent currently */
-    slong coeff_alloc;
-    fmpz * coeffs;
-} fmpz_mpolyd_struct;
-
-typedef fmpz_mpolyd_struct fmpz_mpolyd_t[1];
-
-typedef struct
-{
-    slong nvars;
-    slong * perm;
-} fmpz_mpolyd_ctx_struct;
-
-typedef fmpz_mpolyd_ctx_struct fmpz_mpolyd_ctx_t[1];
-
 /* Univariates ***************************************************************/
 
 FLINT_DLL void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly,
@@ -954,13 +924,53 @@ FLINT_DLL void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 
-/* Container for dense storage - still in flux *******************************/
+/* Container for dense storage ***********************************************/
+
+/*
+    A dense mpoly is stored as a flat array of coeffcients.
+    Suppose deg_bounds = {a, b, c}. The coefficient of the monomial with 
+    exponents {i, j, k} is stored at the coefficient of index
+        c + k*(b + j*(a + i*0))
+
+    Design is still in flux.
+*/
+typedef struct
+{
+    slong nvars;
+    slong degb_alloc;
+    slong * deg_bounds;
+    slong length;           /* usage is inconsistent currently */
+    slong coeff_alloc;
+    fmpz * coeffs;
+} fmpz_mpolyd_struct;
+
+typedef fmpz_mpolyd_struct fmpz_mpolyd_t[1];
+
+typedef struct
+{
+    slong nvars;
+    slong * perm;
+} fmpz_mpolyd_ctx_struct;
+
+typedef fmpz_mpolyd_ctx_struct fmpz_mpolyd_ctx_t[1];
+
 
 FLINT_DLL void fmpz_mpolyd_init(fmpz_mpolyd_t poly, slong nvars);
 
 FLINT_DLL void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len);
 
 FLINT_DLL void fmpz_mpolyd_clear(fmpz_mpolyd_t poly);
+
+FLINT_DLL void fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(fmpz_mpolyd_t A, slong m,
+              const fmpz_mpoly_t B, const slong * perm, const ulong * shift,
+       const ulong * stride, const ulong * degree, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(fmpz_mpoly_t A,
+         mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx, const fmpz_mpolyd_t B,
+                const slong * perm, const ulong * shift, const ulong * stride);
+
+FLINT_DLL int fmpz_mpolyd_gcd_brown(fmpz_mpolyd_t G, fmpz_mpolyd_t Abar,
+                         fmpz_mpolyd_t Bbar, fmpz_mpolyd_t A, fmpz_mpolyd_t B);
 
 /* GCD ***********************************************************************/
 

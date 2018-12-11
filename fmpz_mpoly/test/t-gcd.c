@@ -55,8 +55,8 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
     }
 
     res = 1;
-    res = res && fmpz_mpoly_divides_monagan_pearce(ca, a, g, ctx);
-    res = res && fmpz_mpoly_divides_monagan_pearce(cb, b, g, ctx);
+    res = res && fmpz_mpoly_divides(ca, a, g, ctx);
+    res = res && fmpz_mpoly_divides(cb, b, g, ctx);
     if (!res)
     {
         printf("FAIL\n");
@@ -94,7 +94,7 @@ cleanup:
 int
 main(void)
 {
-    int i, j, tmul = 30;
+    int i, j, tmul = 20;
     slong k;
     FLINT_TEST_INIT(state);
 
@@ -146,6 +146,32 @@ main(void)
             flint_printf("Check non-example\n");
             flint_abort();
         }
+
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t g, a, b;
+        const char * vars[] = {"x" ,"y", "z", "t"};
+
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(g, ctx);
+
+        fmpz_mpoly_set_str_pretty(a, "(1 + x)^15*(2 + y)^18*(1 + z)^20", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "(2 + x)^15*(1 + y)^18*(1 - z)^20", vars, ctx);
+        fmpz_mpoly_set_str_pretty(g, "(1 - x)^15*(2 - y)^18*(1 - z)^20", vars, ctx);
+        fmpz_mpoly_mul(a, a, g, ctx);
+        fmpz_mpoly_mul(a, a, g, ctx);
+
+        fmpz_mpoly_gcd(g, a, b, ctx);
+
+        gcd_check(g, a, b, ctx, 0, 0, "total dense example");
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
@@ -254,7 +280,7 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    /* dense inputs */
+    /* sparse inputs */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -270,11 +296,11 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        len = n_randint(state, 25) + 1;
-        len1 = n_randint(state, 50);
-        len2 = n_randint(state, 50);
+        len = n_randint(state, 20) + 1;
+        len1 = n_randint(state, 30);
+        len2 = n_randint(state, 30);
 
-        degbound = 25/(2*ctx->minfo->nvars - 1);
+        degbound = 30/(2*ctx->minfo->nvars - 1);
 
         coeff_bits = n_randint(state, 200);
 
@@ -290,7 +316,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "dense inputs");
+            gcd_check(g, a, b, ctx, i, j, "sparse inputs");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -300,7 +326,7 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    /* dense inputs with random repackings */
+    /* sparse inputs with random repackings */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -317,11 +343,11 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        len = n_randint(state, 25) + 1;
-        len1 = n_randint(state, 50);
-        len2 = n_randint(state, 50);
+        len = n_randint(state, 20) + 1;
+        len1 = n_randint(state, 30);
+        len2 = n_randint(state, 30);
 
-        degbound = 25/(2*ctx->minfo->nvars - 1);
+        degbound = 30/(2*ctx->minfo->nvars - 1);
 
         coeff_bits = n_randint(state, 200);
 
@@ -353,7 +379,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "dense inputs with repackings");
+            gcd_check(g, a, b, ctx, i, j, "sparse input with repacking");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -363,7 +389,7 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    /* dense inputs with random inflations */
+    /* sparse inputs with random inflations */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
@@ -381,11 +407,11 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        len = n_randint(state, 15) + 1;
-        len1 = n_randint(state, 20);
-        len2 = n_randint(state, 20);
+        len = n_randint(state, 20) + 1;
+        len1 = n_randint(state, 30);
+        len2 = n_randint(state, 30);
 
-        degbound = 25/(2*ctx->minfo->nvars - 1);
+        degbound = 30/(2*ctx->minfo->nvars - 1);
 
         coeff_bits = n_randint(state, 200);
 
@@ -423,7 +449,7 @@ main(void)
             fmpz_mpoly_inflate(a, a, shifts1, strides, ctx);
             fmpz_mpoly_inflate(b, b, shifts2, strides, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "dense inputs with inflations");
+            gcd_check(g, a, b, ctx, i, j, "sparse input with inflation");
         }
 
         for (k = 0; k < ctx->minfo->nvars; k++)
@@ -442,6 +468,236 @@ main(void)
         fmpz_mpoly_clear(t, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
+
+    /* dense inputs */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, g, t;
+        mp_bitcnt_t coeff_bits1, coeff_bits2, coeff_bits3, coeff_bits4;
+        slong len1, len2, len3, len4;
+        ulong degbounds1[4];
+        ulong degbounds2[4];
+        ulong degbounds3[4];
+        mp_bitcnt_t bits4;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 4);
+
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(t, ctx);
+
+        len1 = n_randint(state, 300) + 1;
+        len2 = n_randint(state, 300);
+        len3 = n_randint(state, 300);
+        len4 = n_randint(state, 300);
+ 
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            degbounds1[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+            degbounds2[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+            degbounds3[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+        }
+
+        bits4 = n_randint(state, 200);
+        coeff_bits1 = n_randint(state, 200);
+        coeff_bits2 = n_randint(state, 200);
+        coeff_bits3 = n_randint(state, 200);
+        coeff_bits4 = n_randint(state, 200);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                fmpz_mpoly_randtest_bounds(t, state, len1, coeff_bits1 + 1, degbounds1, ctx);
+            } while (t->length == 0);
+            fmpz_mpoly_randtest_bounds(a, state, len2, coeff_bits2, degbounds2, ctx);
+            fmpz_mpoly_randtest_bounds(b, state, len3, coeff_bits3, degbounds3, ctx);
+            fmpz_mpoly_mul(a, a, t, ctx);
+            fmpz_mpoly_mul(b, b, t, ctx);
+
+            fmpz_mpoly_randtest_bits(g, state, len4, coeff_bits4, bits4, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "dense input");
+        }
+
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    /* dense inputs with repacking */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, g, t;
+        mp_limb_t rlimb;
+        mp_bitcnt_t newbits;
+        mp_bitcnt_t coeff_bits1, coeff_bits2, coeff_bits3, coeff_bits4;
+        slong len1, len2, len3, len4;
+        ulong degbounds1[4];
+        ulong degbounds2[4];
+        ulong degbounds3[4];
+        mp_bitcnt_t bits4;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 4);
+
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(t, ctx);
+
+        len1 = n_randint(state, 300) + 1;
+        len2 = n_randint(state, 300);
+        len3 = n_randint(state, 300);
+        len4 = n_randint(state, 300);
+ 
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            degbounds1[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+            degbounds2[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+            degbounds3[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+        }
+
+        bits4 = n_randint(state, 200);
+        coeff_bits1 = n_randint(state, 200);
+        coeff_bits2 = n_randint(state, 200);
+        coeff_bits3 = n_randint(state, 200);
+        coeff_bits4 = n_randint(state, 200);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                fmpz_mpoly_randtest_bounds(t, state, len1, coeff_bits1 + 1, degbounds1, ctx);
+            } while (t->length == 0);
+            fmpz_mpoly_randtest_bounds(a, state, len2, coeff_bits2, degbounds2, ctx);
+            fmpz_mpoly_randtest_bounds(b, state, len3, coeff_bits3, degbounds3, ctx);
+            fmpz_mpoly_mul(a, a, t, ctx);
+            fmpz_mpoly_mul(b, b, t, ctx);
+
+            rlimb = n_randlimb(state);
+
+            if (rlimb & UWORD(3))
+            {
+                newbits = a->bits + n_randint(state, 2*FLINT_BITS);
+                newbits = mpoly_fix_bits(newbits, ctx->minfo);
+                fmpz_mpoly_repack_bits(a, a, newbits, ctx);
+            }
+
+            if (rlimb & UWORD(12))
+            {
+                newbits = b->bits + n_randint(state, 2*FLINT_BITS);
+                newbits = mpoly_fix_bits(newbits, ctx->minfo);
+                fmpz_mpoly_repack_bits(b, b, newbits, ctx);
+            }
+
+            fmpz_mpoly_randtest_bits(g, state, len4, coeff_bits4, bits4, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "dense input with repacking");
+        }
+
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    /* dense inputs with random inflations */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, g, t;
+        fmpz * shifts1, * shifts2, * strides;
+        mp_bitcnt_t stride_bits, shift_bits;
+        mp_bitcnt_t coeff_bits1, coeff_bits2, coeff_bits3, coeff_bits4;
+        slong len1, len2, len3, len4;
+        ulong degbounds1[4];
+        ulong degbounds2[4];
+        ulong degbounds3[4];
+        mp_bitcnt_t bits4;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 4);
+
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(t, ctx);
+
+        len1 = n_randint(state, 300) + 1;
+        len2 = n_randint(state, 300);
+        len3 = n_randint(state, 300);
+        len4 = n_randint(state, 300);
+ 
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            degbounds1[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+            degbounds2[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+            degbounds3[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+        }
+
+        bits4 = n_randint(state, 200);
+        coeff_bits1 = n_randint(state, 200);
+        coeff_bits2 = n_randint(state, 200);
+        coeff_bits3 = n_randint(state, 200);
+        coeff_bits4 = n_randint(state, 200);
+
+        stride_bits = n_randint(state, 100) + 2;
+        shift_bits = n_randint(state, 100) + 2;
+
+        shifts1 = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        shifts2 = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        strides = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_init(shifts1 + k);
+            fmpz_init(shifts2 + k);
+            fmpz_init(strides + k);
+        }
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                fmpz_mpoly_randtest_bounds(t, state, len1, coeff_bits1 + 1, degbounds1, ctx);
+            } while (t->length == 0);
+            fmpz_mpoly_randtest_bounds(a, state, len2, coeff_bits2, degbounds2, ctx);
+            fmpz_mpoly_randtest_bounds(b, state, len3, coeff_bits3, degbounds3, ctx);
+            fmpz_mpoly_mul(a, a, t, ctx);
+            fmpz_mpoly_mul(b, b, t, ctx);
+
+            fmpz_mpoly_randtest_bits(g, state, len4, coeff_bits4, bits4, ctx);
+
+            for (k = 0; k < ctx->minfo->nvars; k++)
+            {
+                fmpz_randtest_unsigned(shifts1 + k, state, shift_bits);
+                fmpz_randtest_unsigned(shifts2 + k, state, shift_bits);
+                fmpz_randtest_unsigned(strides + k, state, stride_bits);
+            }
+            fmpz_mpoly_inflate(a, a, shifts1, strides, ctx);
+            fmpz_mpoly_inflate(b, b, shifts2, strides, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "dense input with inflation");
+        }
+
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_clear(shifts1 + k);
+            fmpz_clear(shifts2 + k);
+            fmpz_clear(strides + k);
+        }
+        flint_free(shifts1);
+        flint_free(shifts2);
+        flint_free(strides);
+
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
 
     FLINT_TEST_CLEANUP(state);
 

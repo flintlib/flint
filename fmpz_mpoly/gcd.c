@@ -255,7 +255,8 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
         fmpz_mpoly_to_mpolyu_perm_deflate, the non-essential variables
         will be immediately striped out and the remaining variables will be
         mapped according to the permutation in zinfo->perm as
-            x_i = y_{perm[i]}
+
+            y_k = x_perm[k] ^ Gstride[perm[k]]
 
         When converting out of the mpolyu format via
         fmpz_mpoly_from_mpolyu_perm_inflate, the contribution of the
@@ -288,7 +289,7 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     Bshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
     Gshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
 
-    /* fill in zinfo->perm and set shift values to use when converting */
+    /* fill in zinfo->perm and set deflation values to use when converting */
     i = 0;
     for (j = 0; j < n; j++)
     {
@@ -297,7 +298,6 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
         Gshift[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
         if (Ainfo[j].max_exp > Ainfo[j].min_exp)
         {
-            FLINT_ASSERT(Gstride[j] != UWORD(0));
             FLINT_ASSERT(Gstride[j] != UWORD(0));
             FLINT_ASSERT((Ainfo[j].max_exp - Ainfo[j].min_exp) % Gstride[j] == UWORD(0));
             FLINT_ASSERT((Binfo[j].max_exp - Binfo[j].min_exp) % Gstride[j] == UWORD(0));
@@ -401,6 +401,159 @@ cleanup:
     mpoly_zipinfo_clear(zinfo);
 
     flint_randclear(randstate);
+
+    TMP_END;
+
+    return success;
+}
+
+/*
+    return 1 for success or 0 for failure
+*/
+static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
+                 const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
+                 const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
+                                                   const fmpz_mpoly_ctx_t ctx)
+{
+    int success;
+    slong j;
+    slong denseAsize, denseBsize;
+    slong m, n = ctx->minfo->nvars;
+    slong * perm;
+    ulong * Ashift, * Bshift, * Gshift, * Adeg, * Bdeg;
+    fmpz_mpolyd_t Ad, Bd, Gd, Abar, Bbar;
+    TMP_INIT;
+
+    /*
+        Let the variables in A and B be
+            x_0, x_1, ..., x_{n-1}
+        where n = ctx->minfo->nvars, and x_0 is most significant
+
+        Recall from _fmpz_mpoly_gcd that all variables are either
+            missing from both ess(A) and ess(B) (non-essential), or
+            present in both ess(A) and ess(B) (essential)
+        and that there are at least 2 variables in the essential case.
+
+        Let y_0, ..., y_{m-1} with m >= 2 denote the variables present
+        in both ess(A) and ess(B). Each y_i is one of the x_j and the variables
+        are ordered as y_0 > ... > y_{m-1} with LEX order.
+        The Brown algorithm will operate in Z[y_0,...,y_{m-1}] and it
+        only operates with Z[y_0,...,y_{m-1}] in LEX because the coefficients
+        are stored in a dense format.
+
+        When converting to the mpolyd format via
+        fmpz_mpoly_to_mpolyd_perm_deflate, the non-essential variables
+        will be immediately striped out and the remaining variables will be
+        mapped according to the permutation in perm as
+
+            y_k = x_perm[k] ^ Gstride[perm[k]]
+
+        When converting out of the mpolyd format via
+        fmpz_mpoly_from_mpolyd_perm_inflate, the contribution of the
+        non-essential variables will be put back in.
+    */
+
+    /* first see if dense representation is a good idea */
+    if (n > 7)
+        return 0;
+
+    denseAsize = WORD(1);
+    denseBsize = WORD(1);
+    for (j = 0; j < n; j++)
+    {
+        if (Ainfo[j].max_exp > Ainfo[j].min_exp)
+        {
+            ulong hi;
+
+            FLINT_ASSERT(Gstride[j] != UWORD(0));
+            FLINT_ASSERT(Gstride[j] != UWORD(0));
+            FLINT_ASSERT((Ainfo[j].max_exp - Ainfo[j].min_exp) % Gstride[j] == UWORD(0));
+            FLINT_ASSERT((Binfo[j].max_exp - Binfo[j].min_exp) % Gstride[j] == UWORD(0));
+
+            umul_ppmm(hi, denseAsize, denseAsize,
+                         (Ainfo[j].max_exp - Ainfo[j].min_exp)/Gstride[j] + 1);
+            if (hi != 0 || denseAsize <= 0
+                        || denseAsize > 100000000)
+            {
+                return 0;
+            }
+
+            umul_ppmm(hi, denseBsize, denseBsize,
+                         (Binfo[j].max_exp - Binfo[j].min_exp)/Gstride[j] + 1);
+            if (hi != 0 || denseBsize <= 0
+                        || denseBsize > 100000000)
+            {
+                return 0;
+            }
+        }
+    }
+
+    if (   denseAsize/A->length > 3
+        && denseBsize/B->length > 3)
+    {
+        return 0;
+    }
+
+    TMP_START;
+    Ashift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Bshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Gshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Adeg = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Bdeg = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    perm = (slong *) TMP_ALLOC(n*sizeof(slong)); /* only first m entries used */
+
+    /*
+        fill in perm and set deflation values to use when converting
+    */
+    m = 0;
+    for (j = 0; j < n; j++)
+    {
+        Adeg[j] = Ainfo[j].max_exp;
+        Bdeg[j] = Binfo[j].max_exp;
+        Ashift[j] = Ainfo[j].min_exp;
+        Bshift[j] = Binfo[j].min_exp;
+        Gshift[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
+        if (Ainfo[j].max_exp > Ainfo[j].min_exp)
+        {
+            FLINT_ASSERT(Gstride[j] != UWORD(0));
+            FLINT_ASSERT((Ainfo[j].max_exp - Ainfo[j].min_exp) % Gstride[j] == UWORD(0));
+            FLINT_ASSERT((Binfo[j].max_exp - Binfo[j].min_exp) % Gstride[j] == UWORD(0));
+
+            perm[m] = j;
+            m++;
+        }
+    }
+    FLINT_ASSERT(m >= 2);
+
+    /* TODO: see how performance depends on perm and try reorder */
+
+    fmpz_mpolyd_init(Ad, m);
+    fmpz_mpolyd_init(Bd, m);
+    fmpz_mpolyd_init(Gd, m);
+    fmpz_mpolyd_init(Abar, m);
+    fmpz_mpolyd_init(Bbar, m);
+
+    fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(Ad, m, A, perm, Ashift, Gstride, Adeg, ctx);
+    fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(Bd, m, B, perm, Bshift, Gstride, Bdeg, ctx);
+
+    success = fmpz_mpolyd_gcd_brown(Gd, Abar, Bbar, Ad, Bd);
+    if (!success)
+        goto cleanup;
+
+    fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(G, Gbits, ctx, Gd, perm, Gshift, Gstride);
+    FLINT_ASSERT(G->length > 0);
+    if ((fmpz_sgn(G->coeffs + 0) < 0))
+        fmpz_mpoly_neg(G, G, ctx);
+
+    success = 1;
+
+cleanup:
+
+    fmpz_mpolyd_clear(Bbar);
+    fmpz_mpolyd_clear(Abar);
+    fmpz_mpolyd_clear(Gd);
+    fmpz_mpolyd_clear(Bd);
+    fmpz_mpolyd_clear(Ad);
 
     TMP_END;
 
@@ -845,13 +998,17 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
             missing from both ess(A) and ess(B), or
             present in both ess(A) and ess(B)
     */
-/*
+
     success = _try_prs(G, Gbits, A, Ainfo, B, Binfo, ctx);
     if (success)
         goto cleanup;
-*/
+
     Gstride = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
     _compute_strides(Gstride, A, Ainfo, B, Binfo, ctx);
+
+    success = _try_brown(G, Gbits, Gstride, A, Ainfo, B, Binfo, ctx);
+    if (success)
+        goto cleanup;
 
     success = _try_zippel(G, Gbits, Gstride, A, Ainfo, B, Binfo, ctx);
 
