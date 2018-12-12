@@ -211,10 +211,10 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
                  const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
                                                    const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, j;
+    slong i, j, k;
     slong n, m;
     int success;
-    ulong * Ashift, * Bshift, * Gshift;
+    ulong * Ashift, * Bshift, * Gshift, * Addeg, * Bddeg;
     mpoly_zipinfo_t zinfo;
     mp_bitcnt_t new_bits;
     flint_rand_t randstate;
@@ -288,8 +288,11 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     Ashift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
     Bshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
     Gshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    /* degrees after deflation */
+    Addeg = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Bddeg = (ulong *) TMP_ALLOC(n*sizeof(ulong));
 
-    /* fill in zinfo->perm and set deflation values to use when converting */
+    /* fill in a valid zinfo->perm and set deflation values used when converting */
     i = 0;
     for (j = 0; j < n; j++)
     {
@@ -302,15 +305,96 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
             FLINT_ASSERT((Ainfo[j].max_exp - Ainfo[j].min_exp) % Gstride[j] == UWORD(0));
             FLINT_ASSERT((Binfo[j].max_exp - Binfo[j].min_exp) % Gstride[j] == UWORD(0));
 
+            Addeg[j] = (Ainfo[j].max_exp - Ainfo[j].min_exp) / Gstride[j];
+            Bddeg[j] = (Binfo[j].max_exp - Binfo[j].min_exp) / Gstride[j];
+
             zinfo->perm[i] = j;
-            zinfo->Adegs[i] = (Ainfo[j].max_exp - Ainfo[j].min_exp)/Gstride[j];
-            zinfo->Bdegs[i] = (Binfo[j].max_exp - Binfo[j].min_exp)/Gstride[j];
             i++;
+        }
+        else
+        {
+            Addeg[j] = 0;
+            Bddeg[j] = 0;
         }
     }
     FLINT_ASSERT(i == m + 1);
 
-    /* TODO: see how performance depends on zinfo->perm and try reorder */
+    /* work out a favourable permation to zinfo->perm */
+
+    /* figure out a main variable y_m */
+    {
+        slong main_var;
+        ulong count, deg, new_count, new_deg;
+
+        main_var = m;
+        j = zinfo->perm[main_var];
+        count = FLINT_MIN(FLINT_MIN(Ainfo[j].min_exp_term_count,
+                                    Ainfo[j].max_exp_term_count),
+                          FLINT_MIN(Binfo[j].min_exp_term_count,
+                                    Binfo[j].max_exp_term_count));
+        deg = FLINT_MAX(Addeg[j], Bddeg[j]);
+        for (i = 0; i < m; i++)
+        {
+            j = zinfo->perm[i];
+            new_count = FLINT_MIN(FLINT_MIN(Ainfo[j].min_exp_term_count,
+                                            Ainfo[j].max_exp_term_count),
+                                  FLINT_MIN(Binfo[j].min_exp_term_count,
+                                            Binfo[j].max_exp_term_count));
+            new_deg = FLINT_MAX(Addeg[j], Bddeg[j]);
+
+            if (  new_count < count
+                || (new_count == count && new_deg < deg))
+            {
+                count = new_count;
+                deg = new_deg;
+                main_var = i;
+            }
+        }
+
+        if (main_var != m)
+        {
+            slong t = zinfo->perm[main_var];
+            zinfo->perm[main_var] = zinfo->perm[m];
+            zinfo->perm[m] = t;
+        }
+    }
+
+    /* sort with hope that ddeg(G,y_0) >= ddeg(G,y_1) ... >= ddeg(G,y_{m-1}) */
+    for (k = 0; k + 1 < m; k++)
+    {
+        slong var;
+        ulong deg, new_deg;
+
+        var = k;
+        j = zinfo->perm[var];
+        deg = FLINT_MIN(Addeg[j], Bddeg[j]);
+        for (i = k + 1; i < m; i++)
+        {
+            j = zinfo->perm[i];
+            new_deg = FLINT_MIN(Addeg[j], Bddeg[j]);
+            if (new_deg > deg)
+            {
+                deg = new_deg;
+                var = i;
+            }
+        }
+        if (var != k)
+        {
+            slong t = zinfo->perm[var];
+            zinfo->perm[var] = zinfo->perm[k];
+            zinfo->perm[k] = t;
+        }
+    }
+
+    /* fill in the degrees of the y_i */
+    for (i = 0; i <= m; i++)
+    {
+        j = zinfo->perm[i];
+        FLINT_ASSERT(Addeg[j] != 0);
+        FLINT_ASSERT(Bddeg[j] != 0);
+        zinfo->Adegs[i] = Addeg[j];
+        zinfo->Bdegs[i] = Bddeg[j];
+    }
 
     new_bits = FLINT_MAX(A->bits, B->bits);
 
@@ -320,6 +404,7 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
 
     fmpz_mpoly_to_mpolyu_perm_deflate(Au, A, zinfo->perm, Ashift, Gstride, uctx, ctx);
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B, zinfo->perm, Bshift, Gstride, uctx, ctx);
+
 
     FLINT_ASSERT(Au->bits == Bu->bits);
     FLINT_ASSERT(Au->length > 1);
@@ -366,10 +451,13 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     fmpz_mpolyu_divexact_mpoly(Abar, Au, Acontent, uctx);
     fmpz_mpolyu_divexact_mpoly(Bbar, Bu, Bcontent, uctx);
 
+    /* after removing content, degree bounds in zinfo are still valid bounds */
+
     /* compute GCD */
     success = fmpz_mpolyu_gcdm_zippel(Gbar, Abar, Bbar, uctx, zinfo, randstate);
     if (!success)
         goto cleanup;
+
 
     /* put back content */
     success = _fmpz_mpoly_gcd(Acontent, new_bits, Acontent, Bcontent, uctx);
@@ -488,8 +576,8 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
         }
     }
 
-    if (   denseAsize/A->length > 3
-        && denseBsize/B->length > 3)
+    if (   denseAsize/A->length > 4
+        || denseBsize/B->length > 4)
     {
         return 0;
     }

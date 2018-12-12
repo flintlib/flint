@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
+#include "profiler.h"
 
 void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
                      fmpz_mpoly_ctx_t ctx, slong i, slong j, const char * name)
@@ -104,7 +105,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t g, a, b;
-        const char * vars[] = {"x" ,"y", "z", "t"};
+        const char * vars[] = {"t" ,"x", "y", "z"};
 
         fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
         fmpz_mpoly_init(a, ctx);
@@ -116,6 +117,8 @@ main(void)
         fmpz_mpoly_set_str_pretty(b, "1 + x^100 + x^3*y + 2*t^15*x^78*y^3*z^13", vars, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
+
+        fmpz_mpoly_gcd(g, a, b, ctx);
 
         gcd_check(g, a, b, ctx, 0, 0, "example");
 
@@ -168,8 +171,6 @@ main(void)
         fmpz_mpoly_set_str_pretty(g, "(1 - x)^15*(2 - y)^18*(1 - z)^20", vars, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
-
-        fmpz_mpoly_gcd(g, a, b, ctx);
 
         gcd_check(g, a, b, ctx, 0, 0, "total dense example");
 
