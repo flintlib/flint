@@ -34,12 +34,12 @@ main(void)
         nmod_poly_mat_t a, w;
         mp_limb_t mod;
         slong j, k, r1, r2, c1, c2;
-        slong rows = n_randint(state, 100) + 1;
-        slong cols = n_randint(state, 100) + 1;
+        slong rows = n_randint(state, 10) + 1;
+        slong cols = n_randint(state, 10) + 1;
         mod = n_randtest_prime(state, 0);
 
         nmod_poly_mat_init(a, rows, cols, mod);
-        nmod_poly_mat_randtest(a, state, n_randint(state, 200) + 1);
+        nmod_poly_mat_randtest(a, state, n_randint(state, 10) + 1);
 
         r2 = n_randint(state, rows);
         c2 = n_randint(state, cols);

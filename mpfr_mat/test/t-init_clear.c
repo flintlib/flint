@@ -27,12 +27,12 @@ main(void)
     flint_printf("init/clear....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000; i++)
     {
         mpfr_mat_t a;
         slong j, k;
-        slong rows = n_randint(state, 100);
-        slong cols = n_randint(state, 100);
+        slong rows = n_randint(state, 10);
+        slong cols = n_randint(state, 10);
         mp_prec_t prec = n_randint(state, 200) + MPFR_PREC_MIN;
 
         mpfr_mat_init(a, rows, cols, prec);

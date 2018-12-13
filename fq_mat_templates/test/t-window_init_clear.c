@@ -29,14 +29,14 @@ main(void)
     fflush(stdout);
 
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
     	TEMPLATE(T, ctx_t) ctx;
 
     	TEMPLATE(T, mat_t) a, w;
         slong j, r1, r2, c1, c2;
-        slong rows = n_randint(state, 100) + 1;
-        slong cols = n_randint(state, 100) + 1;
+        slong rows = n_randint(state, 10) + 1;
+        slong cols = n_randint(state, 10) + 1;
 
         TEMPLATE(T, ctx_randtest) (ctx, state);
 
@@ -61,6 +61,8 @@ main(void)
 
         TEMPLATE(T, mat_window_clear) (w, ctx);
         TEMPLATE(T, mat_clear) (a, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
 
