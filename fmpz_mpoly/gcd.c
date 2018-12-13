@@ -12,132 +12,6 @@
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
 
-/*
-    Scan A and fill in the min and max exponents of each variable along
-    with the count of terms attached to each.
-*/
-static void _init_info(mpoly_gcd_var_info_struct * info, const fmpz_mpoly_t A,
-                                                    const fmpz_mpoly_ctx_t ctx)
-{
-    ulong * Aexp;
-    slong i, j, N;
-    slong nvars = ctx->minfo->nvars;
-    TMP_INIT;
-
-    FLINT_ASSERT(A->length > 0);
-    FLINT_ASSERT(A->bits <= FLINT_BITS);
-
-    TMP_START;
-
-    Aexp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
-
-    i = 0;
-    mpoly_get_monomial_ui(Aexp, A->exps + N*i, A->bits, ctx->minfo);
-    for (j = 0; j < nvars; j++)
-    {
-        info[j].min_exp = Aexp[j];
-        info[j].max_exp = Aexp[j];
-        info[j].min_exp_term_count = 1;
-        info[j].max_exp_term_count = 1;
-    }
-    for (i = 1; i < A->length; i++)
-    {
-        mpoly_get_monomial_ui(Aexp, A->exps + N*i, A->bits, ctx->minfo);
-
-        for (j = 0; j < nvars; j++)
-        {
-            if (info[j].min_exp > Aexp[j])
-            {
-                info[j].min_exp = Aexp[j];
-                info[j].min_exp_term_count = 1;            
-            }
-            else if (info[j].min_exp == Aexp[j])
-            {
-                info[j].min_exp_term_count += 1;
-            }
-
-            if (info[j].max_exp < Aexp[j])
-            {
-                info[j].max_exp = Aexp[j];
-                info[j].max_exp_term_count = 1;            
-            }
-            else if (info[j].max_exp == Aexp[j])
-            {
-                info[j].max_exp_term_count += 1;
-            }
-        }
-    }
-
-    TMP_END;
-}
-
-
-static void _compute_strides(ulong * strides,
-                     const fmpz_mpoly_t A, mpoly_gcd_var_info_struct * Ainfo,
-                     const fmpz_mpoly_t B, mpoly_gcd_var_info_struct * Binfo,
-                                                    const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, j, NA, NB;
-    slong nvars = ctx->minfo->nvars;
-    ulong mask;
-    ulong * exps;
-    TMP_INIT;
-
-    FLINT_ASSERT(A->bits <= FLINT_BITS);
-    FLINT_ASSERT(B->bits <= FLINT_BITS);
-
-    for (j = 0; j < nvars; j++)
-    {
-        strides[j] = n_gcd(Ainfo[j].max_exp - Ainfo[j].min_exp,
-                           Binfo[j].max_exp - Binfo[j].min_exp);
-    }
-
-    TMP_START;
-    exps = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-
-    NA = mpoly_words_per_exp(A->bits, ctx->minfo);
-
-    for (i = 0; i < A->length; i++)
-    {
-        mpoly_get_monomial_ui(exps, A->exps + NA*i, A->bits, ctx->minfo);
-        mask = 0;
-        for (j = 0; j < nvars; j++)
-        {
-            strides[j] = n_gcd(strides[j], exps[j] - Ainfo[j].min_exp);
-            mask |= strides[j];
-        }
-        if (mask < UWORD(2))
-        {
-            goto cleanup;
-        }
-    }
-
-    NB = mpoly_words_per_exp(B->bits, ctx->minfo);
-
-    for (i = 0; i < B->length; i++)
-    {
-        mpoly_get_monomial_ui(exps, B->exps + NB*i, B->bits, ctx->minfo);
-        mask = 0;
-        for (j = 0; j < nvars; j++)
-        {
-            strides[j] = n_gcd(strides[j], exps[j] - Binfo[j].min_exp);
-            mask |= strides[j];
-        }
-        if (mask < UWORD(2))
-        {
-            goto cleanup;
-        }
-    }
-
-cleanup:
-
-    TMP_END;
-
-    return;
-}
-
 
 /*
     Assume when B is converted to univar format, its length would be one.
@@ -207,14 +81,16 @@ cleanup:
     return 1 for success or 0 for failure
 */
 static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
-                 const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
-                 const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
-                                                   const fmpz_mpoly_ctx_t ctx)
+         const fmpz_mpoly_t A, const ulong * Amax_exp, const ulong * Amin_exp,
+                   const slong * Amax_exp_count, const slong * Amin_exp_count,
+         const fmpz_mpoly_t B, const ulong * Bmax_exp, const ulong * Bmin_exp,
+                   const slong * Bmax_exp_count, const slong * Bmin_exp_count,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j, k;
     slong n, m;
     int success;
-    ulong * Ashift, * Bshift, * Gshift, * Addeg, * Bddeg;
+    ulong * Gshift, * Addeg, * Bddeg;
     mpoly_zipinfo_t zinfo;
     mp_bitcnt_t new_bits;
     flint_rand_t randstate;
@@ -267,14 +143,14 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     m = -WORD(1);
     for (j = 0; j < n; j++)
     {
-        if (Ainfo[j].max_exp > Ainfo[j].min_exp)
+        if (Amax_exp[j] > Amin_exp[j])
         {
-            FLINT_ASSERT(Binfo[j].max_exp > Binfo[j].min_exp);
+            FLINT_ASSERT(Bmax_exp[j] > Bmin_exp[j]);
             m++;
         }
         else
         {
-            FLINT_ASSERT(Binfo[j].max_exp == Binfo[j].min_exp);
+            FLINT_ASSERT(Bmax_exp[j] == Bmin_exp[j]);
         }
     }
     FLINT_ASSERT(m >= 1);
@@ -285,8 +161,6 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     /* uctx is context for Z[y_0,...,y_{m-1}]*/
     fmpz_mpoly_ctx_init(uctx, m, ORD_LEX);
 
-    Ashift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-    Bshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
     Gshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
     /* degrees after deflation */
     Addeg = (ulong *) TMP_ALLOC(n*sizeof(ulong));
@@ -296,17 +170,15 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     i = 0;
     for (j = 0; j < n; j++)
     {
-        Ashift[j] = Ainfo[j].min_exp;
-        Bshift[j] = Binfo[j].min_exp;
-        Gshift[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
-        if (Ainfo[j].max_exp > Ainfo[j].min_exp)
+        Gshift[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
+        if (Amax_exp[j] > Amin_exp[j])
         {
             FLINT_ASSERT(Gstride[j] != UWORD(0));
-            FLINT_ASSERT((Ainfo[j].max_exp - Ainfo[j].min_exp) % Gstride[j] == UWORD(0));
-            FLINT_ASSERT((Binfo[j].max_exp - Binfo[j].min_exp) % Gstride[j] == UWORD(0));
+            FLINT_ASSERT((Amax_exp[j] - Amin_exp[j]) % Gstride[j] == UWORD(0));
+            FLINT_ASSERT((Bmax_exp[j] - Bmin_exp[j]) % Gstride[j] == UWORD(0));
 
-            Addeg[j] = (Ainfo[j].max_exp - Ainfo[j].min_exp) / Gstride[j];
-            Bddeg[j] = (Binfo[j].max_exp - Binfo[j].min_exp) / Gstride[j];
+            Addeg[j] = (Amax_exp[j] - Amin_exp[j]) / Gstride[j];
+            Bddeg[j] = (Bmax_exp[j] - Bmin_exp[j]) / Gstride[j];
 
             zinfo->perm[i] = j;
             i++;
@@ -328,22 +200,17 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
 
         main_var = m;
         j = zinfo->perm[main_var];
-        count = FLINT_MIN(FLINT_MIN(Ainfo[j].min_exp_term_count,
-                                    Ainfo[j].max_exp_term_count),
-                          FLINT_MIN(Binfo[j].min_exp_term_count,
-                                    Binfo[j].max_exp_term_count));
+        count = FLINT_MIN(FLINT_MIN(Amin_exp_count[j], Amax_exp_count[j]),
+                          FLINT_MIN(Bmin_exp_count[j], Bmax_exp_count[j]));
         deg = FLINT_MAX(Addeg[j], Bddeg[j]);
         for (i = 0; i < m; i++)
         {
             j = zinfo->perm[i];
-            new_count = FLINT_MIN(FLINT_MIN(Ainfo[j].min_exp_term_count,
-                                            Ainfo[j].max_exp_term_count),
-                                  FLINT_MIN(Binfo[j].min_exp_term_count,
-                                            Binfo[j].max_exp_term_count));
+            new_count = FLINT_MIN(FLINT_MIN(Amin_exp_count[j], Amax_exp_count[j]),
+                                  FLINT_MIN(Bmin_exp_count[j], Bmax_exp_count[j]));
             new_deg = FLINT_MAX(Addeg[j], Bddeg[j]);
 
-            if (  new_count < count
-                || (new_count == count && new_deg < deg))
+            if (new_count < count || (new_count == count && new_deg < deg))
             {
                 count = new_count;
                 deg = new_deg;
@@ -402,8 +269,10 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     fmpz_mpolyu_init(Bu, new_bits, uctx);
     fmpz_mpolyu_init(Gu, new_bits, uctx);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, A, zinfo->perm, Ashift, Gstride, uctx, ctx);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B, zinfo->perm, Bshift, Gstride, uctx, ctx);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, A,
+                                   zinfo->perm, Amin_exp, Gstride, uctx, ctx);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B,
+                                   zinfo->perm, Bmin_exp, Gstride, uctx, ctx);
 
 
     FLINT_ASSERT(Au->bits == Bu->bits);
@@ -458,7 +327,6 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     if (!success)
         goto cleanup;
 
-
     /* put back content */
     success = _fmpz_mpoly_gcd(Acontent, new_bits, Acontent, Bcontent, uctx);
     if (!success)
@@ -466,7 +334,8 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     FLINT_ASSERT(Acontent->bits == new_bits);
 
     fmpz_mpolyu_mul_mpoly(Gu, Gbar, Acontent, uctx);
-    fmpz_mpoly_from_mpolyu_perm_inflate(G, Gbits, Gu, zinfo->perm, Gshift, Gstride, uctx, ctx);
+    fmpz_mpoly_from_mpolyu_perm_inflate(G, Gbits, Gu,
+                                      zinfo->perm, Gshift, Gstride, uctx, ctx);
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
     FLINT_ASSERT(G->bits == Gbits);
@@ -499,16 +368,16 @@ cleanup:
     return 1 for success or 0 for failure
 */
 static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
-                 const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
-                 const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
-                                                   const fmpz_mpoly_ctx_t ctx)
+         const fmpz_mpoly_t A, const ulong * Amax_exp, const ulong * Amin_exp,
+         const fmpz_mpoly_t B, const ulong * Bmax_exp, const ulong * Bmin_exp,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     int success;
     slong j;
     slong denseAsize, denseBsize;
     slong m, n = ctx->minfo->nvars;
     slong * perm;
-    ulong * Ashift, * Bshift, * Gshift, * Adeg, * Bdeg;
+    ulong * Gshift;
     fmpz_mpolyd_t Ad, Bd, Gd, Abar, Bbar;
     TMP_INIT;
 
@@ -549,17 +418,17 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     denseBsize = WORD(1);
     for (j = 0; j < n; j++)
     {
-        if (Ainfo[j].max_exp > Ainfo[j].min_exp)
+        if (Amax_exp[j] > Amin_exp[j])
         {
             ulong hi;
 
             FLINT_ASSERT(Gstride[j] != UWORD(0));
             FLINT_ASSERT(Gstride[j] != UWORD(0));
-            FLINT_ASSERT((Ainfo[j].max_exp - Ainfo[j].min_exp) % Gstride[j] == UWORD(0));
-            FLINT_ASSERT((Binfo[j].max_exp - Binfo[j].min_exp) % Gstride[j] == UWORD(0));
+            FLINT_ASSERT((Amax_exp[j] - Amin_exp[j]) % Gstride[j] == UWORD(0));
+            FLINT_ASSERT((Bmax_exp[j] - Bmin_exp[j]) % Gstride[j] == UWORD(0));
 
             umul_ppmm(hi, denseAsize, denseAsize,
-                         (Ainfo[j].max_exp - Ainfo[j].min_exp)/Gstride[j] + 1);
+                                   (Amax_exp[j] - Amin_exp[j])/Gstride[j] + 1);
             if (hi != 0 || denseAsize <= 0
                         || denseAsize > 100000000)
             {
@@ -567,7 +436,7 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
             }
 
             umul_ppmm(hi, denseBsize, denseBsize,
-                         (Binfo[j].max_exp - Binfo[j].min_exp)/Gstride[j] + 1);
+                                   (Bmax_exp[j] - Bmin_exp[j])/Gstride[j] + 1);
             if (hi != 0 || denseBsize <= 0
                         || denseBsize > 100000000)
             {
@@ -583,30 +452,16 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     }
 
     TMP_START;
-    Ashift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-    Bshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
     Gshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-    Adeg = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-    Bdeg = (ulong *) TMP_ALLOC(n*sizeof(ulong));
     perm = (slong *) TMP_ALLOC(n*sizeof(slong)); /* only first m entries used */
 
-    /*
-        fill in perm and set deflation values to use when converting
-    */
+    /* fill in perm and set shift of GCD */
     m = 0;
     for (j = 0; j < n; j++)
     {
-        Adeg[j] = Ainfo[j].max_exp;
-        Bdeg[j] = Binfo[j].max_exp;
-        Ashift[j] = Ainfo[j].min_exp;
-        Bshift[j] = Binfo[j].min_exp;
-        Gshift[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
-        if (Ainfo[j].max_exp > Ainfo[j].min_exp)
+        Gshift[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
+        if (Amax_exp[j] > Amin_exp[j])
         {
-            FLINT_ASSERT(Gstride[j] != UWORD(0));
-            FLINT_ASSERT((Ainfo[j].max_exp - Ainfo[j].min_exp) % Gstride[j] == UWORD(0));
-            FLINT_ASSERT((Binfo[j].max_exp - Binfo[j].min_exp) % Gstride[j] == UWORD(0));
-
             perm[m] = j;
             m++;
         }
@@ -621,14 +476,17 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     fmpz_mpolyd_init(Abar, m);
     fmpz_mpolyd_init(Bbar, m);
 
-    fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(Ad, m, A, perm, Ashift, Gstride, Adeg, ctx);
-    fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(Bd, m, B, perm, Bshift, Gstride, Bdeg, ctx);
+    fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(Ad, m, A,
+                                       perm, Amin_exp, Gstride, Amax_exp, ctx);
+    fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(Bd, m, B,
+                                       perm, Bmin_exp, Gstride, Bmax_exp, ctx);
 
     success = fmpz_mpolyd_gcd_brown(Gd, Abar, Bbar, Ad, Bd);
     if (!success)
         goto cleanup;
 
-    fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(G, Gbits, ctx, Gd, perm, Gshift, Gstride);
+    fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(G, Gbits, ctx, Gd,
+                                                        perm, Gshift, Gstride);
     FLINT_ASSERT(G->length > 0);
     if ((fmpz_sgn(G->coeffs + 0) < 0))
         fmpz_mpoly_neg(G, G, ctx);
@@ -653,9 +511,11 @@ cleanup:
     return 1 for success or 0 for failure
 */
 static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
-                 const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
-                 const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
-                                                   const fmpz_mpoly_ctx_t ctx)
+         const fmpz_mpoly_t A, const ulong * Amax_exp, const ulong * Amin_exp,
+                   const slong * Amax_exp_count, const slong * Amin_exp_count,
+         const fmpz_mpoly_t B, const ulong * Bmax_exp, const ulong * Bmin_exp,
+                   const slong * Bmax_exp_count, const slong * Bmin_exp_count,
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     int success = 1;
     slong i, j, var, n = ctx->minfo->nvars;
@@ -671,17 +531,17 @@ static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     work = -UWORD(1);
     for (j = 0; j < n; j++)
     {
-        if (Ainfo[j].max_exp > Ainfo[j].min_exp)
+        if (Amax_exp[j] > Amin_exp[j])
         {
-            FLINT_ASSERT(Binfo[j].max_exp > Binfo[j].min_exp);
-            if (   Ainfo[j].min_exp_term_count == 1
-                || Ainfo[j].max_exp_term_count == 1
-                || Binfo[j].min_exp_term_count == 1
-                || Binfo[j].max_exp_term_count == 1
+            FLINT_ASSERT(Bmax_exp[j] > Bmin_exp[j]);
+            if (   Amax_exp_count[j] == 1
+                || Amin_exp_count[j] == 1
+                || Bmax_exp_count[j] == 1
+                || Bmin_exp_count[j] == 1
                )
             {
-                newwork = FLINT_MAX(Ainfo[j].max_exp - Ainfo[j].min_exp,
-                                    Binfo[j].max_exp - Binfo[j].min_exp);
+                newwork = FLINT_MAX(Amax_exp[j] - Amin_exp[j],
+                                    Bmax_exp[j] - Bmin_exp[j]);
                 if (var < 0)
                 {
                     var = j;
@@ -696,6 +556,7 @@ static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
         }
     }
 
+    /* stringent condition ensures that we only try this for low degrees */
     if (var < 0 || work + n > 5)
     {
         return 0;
@@ -728,7 +589,7 @@ static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
 
     /* remove content from Ax */
     FLINT_ASSERT(ax->length > 1);
-    FLINT_ASSERT(Ainfo[var].min_exp == ax->exps[ax->length - 1]);
+    FLINT_ASSERT(Amin_exp[var] == ax->exps[ax->length - 1]);
     success = fmpz_mpoly_gcd(ac, ax->coeffs + 0, ax->coeffs + 1, ctx);
     if (!success)
         goto cleanup;
@@ -742,12 +603,12 @@ static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     {
         if (!fmpz_mpoly_divides(ax->coeffs + i, ax->coeffs + i, ac, ctx))
             FLINT_ASSERT(0 && "no divides");
-        ax->exps[i] -= Ainfo[var].min_exp;
+        ax->exps[i] -= Amin_exp[var];
     }
 
     /* remove content from Bx */
     FLINT_ASSERT(bx->length > 1);
-    FLINT_ASSERT(Binfo[var].min_exp == bx->exps[bx->length - 1]);
+    FLINT_ASSERT(Bmin_exp[var] == bx->exps[bx->length - 1]);
     success = fmpz_mpoly_gcd(bc, bx->coeffs + 0, bx->coeffs + 1, ctx);
     if (!success)
         goto cleanup;
@@ -761,7 +622,7 @@ static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     {
         if (!fmpz_mpoly_divides(bx->coeffs + i, bx->coeffs + i, bc, ctx))
             FLINT_ASSERT(0 && "no divides");
-        bx->exps[i] -= Binfo[var].min_exp;
+        bx->exps[i] -= Bmin_exp[var];
     }
 
     /* compute pseudo gcd of contentless polynomials */
@@ -857,7 +718,7 @@ static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     for (i = 0; i < gx->length; i++)
     {
         fmpz_mpoly_mul(gx->coeffs + i, gx->coeffs + i, gabc, ctx);
-        gx->exps[i] += FLINT_MIN(Ainfo[var].min_exp, Binfo[var].min_exp);
+        gx->exps[i] += FLINT_MIN(Amin_exp[var], Bmin_exp[var]);
     }
 
     fmpz_mpoly_from_univar_bits(G, Gbits, gx, ctx);
@@ -903,7 +764,10 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     slong v_in_B_only;
     slong j;
     slong nvars = ctx->minfo->nvars;
-    mpoly_gcd_var_info_struct * Ainfo, * Binfo;
+    ulong * Amax_exp, * Amin_exp;
+    ulong * Bmax_exp, * Bmin_exp;
+    slong * Amax_exp_count, * Amin_exp_count;
+    slong * Bmax_exp_count, * Bmin_exp_count;
     ulong * Gstride;
     TMP_INIT;
 
@@ -924,20 +788,28 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
 
     TMP_START;
 
-    Ainfo = (mpoly_gcd_var_info_struct *) TMP_ALLOC(nvars
-                                           *sizeof(mpoly_gcd_var_info_struct));
-    Binfo = (mpoly_gcd_var_info_struct *) TMP_ALLOC(nvars
-                                           *sizeof(mpoly_gcd_var_info_struct));
-    _init_info(Ainfo, A, ctx);
-    _init_info(Binfo, B, ctx);
+    Amax_exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+    Amin_exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+    Bmax_exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+    Bmin_exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+    Amax_exp_count = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    Amin_exp_count = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    Bmax_exp_count = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    Bmin_exp_count = (slong *) TMP_ALLOC(nvars*sizeof(slong));
 
-    /* set ess(p) = p/term_content(p) */
+    mpoly_gcd_info_limits(Amax_exp, Amin_exp, Amax_exp_count, Amin_exp_count,
+                                      A->exps, A->bits, A->length, ctx->minfo);
+    mpoly_gcd_info_limits(Bmax_exp, Bmin_exp, Bmax_exp_count, Bmin_exp_count,
+                                      B->exps, B->bits, B->length, ctx->minfo);
+
+    /* set ess(p) := p/term_content(p) */
 
     /* check if the cofactors could be monomials, i.e. ess(A) == ess(B) */
     if (A->length == B->length)
     {
         success = _fmpz_mpoly_gcd_monomial_cofactors_sp(G, Gbits,
-                                                      A, Ainfo, B, Binfo, ctx);
+                                                   A, Amax_exp, Amin_exp,
+                                                   B, Bmax_exp, Bmin_exp, ctx);
         if (success)
         {
             goto cleanup;
@@ -948,9 +820,7 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     v_in_both = -WORD(1);
     for (j = 0; j < nvars; j++)
     {
-        if (   Ainfo[j].max_exp > Ainfo[j].min_exp
-            && Binfo[j].max_exp > Binfo[j].min_exp
-           )
+        if (Amax_exp[j] > Amin_exp[j] && Bmax_exp[j] > Bmin_exp[j])
         {
             v_in_both = j;
             break;
@@ -972,9 +842,7 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
 
         minexps = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
         for (j = 0; j < nvars; j++)
-        {
-            minexps[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
-        }
+            minexps[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
 
         fmpz_mpoly_fit_length(G, 1, ctx);
         fmpz_mpoly_fit_bits(G, Gbits, ctx);
@@ -1000,9 +868,7 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
         if (j == v_in_both)
             continue;
 
-        if (   Ainfo[j].max_exp > Ainfo[j].min_exp
-            || Binfo[j].max_exp > Binfo[j].min_exp
-           )
+        if (Amax_exp[j] > Amin_exp[j] || Bmax_exp[j] > Bmin_exp[j])
         {
             v_in_either = j;
             break;
@@ -1015,27 +881,23 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
             The ess(A) and ess(B) depend on only one variable v_in_both
             Calculate gcd using univariates
         */
-        ulong * Ashift, * Bshift, * Gshift;
+        ulong * Gshift;
         fmpz_poly_t a, b, g;
 
-        Ashift = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-        Bshift = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
         Gshift = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
         for (j = 0; j < nvars; j++)
-        {
-            Ashift[j] = Ainfo[j].min_exp;
-            Bshift[j] = Binfo[j].min_exp;
-            Gshift[j] = FLINT_MIN(Ainfo[j].min_exp, Binfo[j].min_exp);
-        }
+            Gshift[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
 
         Gstride = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-        _compute_strides(Gstride, A, Ainfo, B, Binfo, ctx);
+        mpoly_gcd_info_stride(Gstride,
+                  A->exps, A->bits, A->length, Amax_exp, Amin_exp,
+                  B->exps, B->bits, B->length, Bmax_exp, Bmin_exp, ctx->minfo);
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(g);
-        _fmpz_mpoly_to_fmpz_poly_deflate(a, A, v_in_both, Ashift, Gstride, ctx);
-        _fmpz_mpoly_to_fmpz_poly_deflate(b, B, v_in_both, Bshift, Gstride, ctx);
+        _fmpz_mpoly_to_fmpz_poly_deflate(a, A, v_in_both, Amin_exp, Gstride, ctx);
+        _fmpz_mpoly_to_fmpz_poly_deflate(b, B, v_in_both, Bmin_exp, Gstride, ctx);
         fmpz_poly_gcd(g, a, b);
         _fmpz_mpoly_from_fmpz_poly_inflate(G, Gbits, g, v_in_both,
                                                           Gshift, Gstride, ctx);
@@ -1052,16 +914,12 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     v_in_B_only = -WORD(1);
     for (j = 0; j < nvars; j++)
     {
-        if (   Ainfo[j].max_exp > Ainfo[j].min_exp
-            && Binfo[j].max_exp == Binfo[j].min_exp
-           )
+        if (Amax_exp[j] > Amin_exp[j] && Bmax_exp[j] == Bmin_exp[j])
         {
             v_in_A_only = j;
             break;
         }
-        if (   Ainfo[j].max_exp == Ainfo[j].min_exp
-            && Binfo[j].max_exp > Binfo[j].min_exp
-           )
+        if (Bmax_exp[j] > Bmin_exp[j] && Amax_exp[j] == Amin_exp[j])
         {
             v_in_B_only = j;
             break;
@@ -1070,35 +928,43 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     if (v_in_A_only != -WORD(1))
     {
         success = _try_missing_var(G, Gbits, v_in_A_only,
-                                            A, Ainfo[v_in_A_only].min_exp,
-                                            B, Binfo[v_in_A_only].min_exp, ctx);
+                                                A, Amin_exp[v_in_A_only],
+                                                B, Bmin_exp[v_in_A_only], ctx);
         goto cleanup;
     }
     if (v_in_B_only != -WORD(1))
     {
         success = _try_missing_var(G, Gbits, v_in_B_only,
-                                            B, Binfo[v_in_B_only].min_exp,
-                                            A, Ainfo[v_in_B_only].min_exp, ctx);
+                                                B, Bmin_exp[v_in_B_only],
+                                                A, Amin_exp[v_in_B_only], ctx);
         goto cleanup;
     }
 
     /* all variable are now either
             missing from both ess(A) and ess(B), or
             present in both ess(A) and ess(B)
+        and there are at least two in the latter case
     */
 
-    success = _try_prs(G, Gbits, A, Ainfo, B, Binfo, ctx);
+    success = _try_prs(G, Gbits,
+                   A, Amax_exp, Amin_exp, Amax_exp_count, Amin_exp_count,
+                   B, Bmax_exp, Bmin_exp, Bmax_exp_count, Bmin_exp_count, ctx);
     if (success)
         goto cleanup;
 
     Gstride = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-    _compute_strides(Gstride, A, Ainfo, B, Binfo, ctx);
+    mpoly_gcd_info_stride(Gstride,
+                  A->exps, A->bits, A->length, Amax_exp, Amin_exp,
+                  B->exps, B->bits, B->length, Bmax_exp, Bmin_exp, ctx->minfo);
 
-    success = _try_brown(G, Gbits, Gstride, A, Ainfo, B, Binfo, ctx);
+    success = _try_brown(G, Gbits, Gstride, A, Amax_exp, Amin_exp,
+                                            B, Bmax_exp, Bmin_exp, ctx);
     if (success)
         goto cleanup;
 
-    success = _try_zippel(G, Gbits, Gstride, A, Ainfo, B, Binfo, ctx);
+    success = _try_zippel(G, Gbits, Gstride,
+                   A, Amax_exp, Amin_exp, Amax_exp_count, Amin_exp_count,
+                   B, Bmax_exp, Bmin_exp, Bmax_exp_count, Bmin_exp_count, ctx);
 
 cleanup:
 

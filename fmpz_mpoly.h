@@ -811,8 +811,8 @@ FLINT_DLL int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
 
 FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors_sp(
                          fmpz_mpoly_t G, mp_bitcnt_t Gbits,
-                 const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
-                 const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
+         const fmpz_mpoly_t A, const ulong * Amax_exp , const ulong * Amin_exp,
+         const fmpz_mpoly_t B, const ulong * Bmax_exp , const ulong * Bmin_exp,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors(fmpz_mpoly_t G,

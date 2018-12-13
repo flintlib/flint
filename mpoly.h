@@ -731,13 +731,16 @@ FLINT_DLL void mpoly_monomials_inflate(ulong * Aexps, mp_bitcnt_t Abits,
 
 /* info related to gcd calculation *******************************************/
 
-typedef struct mpoly_gcd_var_info_struct
-{
-    ulong min_exp;
-    ulong max_exp;
-    slong min_exp_term_count;
-    slong max_exp_term_count;
-} mpoly_gcd_var_info_struct;
+FLINT_DLL void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,
+                       slong * Amax_exp_count, slong * Amin_exp_count,
+                       const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                                                       const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gcd_info_stride(ulong * strides,
+          const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                             const ulong * Amax_exp, const ulong * Amin_exp,
+          const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+                             const ulong * Bmax_exp, const ulong * Bmin_exp,
+                                                       const mpoly_ctx_t mctx);
 
 typedef struct
 {

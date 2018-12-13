@@ -24,8 +24,8 @@
 
 */
 int _fmpz_mpoly_gcd_monomial_cofactors_sp(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
-                 const fmpz_mpoly_t A, const mpoly_gcd_var_info_struct * Ainfo,
-                 const fmpz_mpoly_t B, const mpoly_gcd_var_info_struct * Binfo,
+         const fmpz_mpoly_t A, const ulong * Amax_exp , const ulong * Amin_exp,
+         const fmpz_mpoly_t B, const ulong * Bmax_exp , const ulong * Bmin_exp,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     int success;
@@ -46,8 +46,7 @@ int _fmpz_mpoly_gcd_monomial_cofactors_sp(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
 
     for (j = 0; j < nvars; j++)
     {
-        if (   Ainfo[j].max_exp - Ainfo[j].min_exp
-            != Binfo[j].max_exp - Binfo[j].min_exp)
+        if (Amax_exp[j] - Amin_exp[j] != Bmax_exp[j] - Bmin_exp[j])
         {
             return 0;
         }
@@ -83,8 +82,8 @@ int _fmpz_mpoly_gcd_monomial_cofactors_sp(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
         mpoly_get_monomial_ui(Bexp, B->exps + NB*i, B->bits, ctx->minfo);
         for (j = 0; j < nvars; j++)
         {
-            if (   Aexp[j] - Ainfo[j].min_exp
-                != Bexp[j] - Binfo[j].min_exp)
+            if (   Aexp[j] - Amin_exp[j]
+                != Bexp[j] - Bmin_exp[j])
             {
                 success = 0;
                 goto cleanup;
@@ -99,8 +98,7 @@ int _fmpz_mpoly_gcd_monomial_cofactors_sp(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     /* put A's cofactor monomial in Bexp */
     for (j = 0; j < nvars; j++)
     {
-        Bexp[j] = FLINT_MAX(Ainfo[j].min_exp, Binfo[j].min_exp)
-                    - Binfo[j].min_exp;
+        Bexp[j] = FLINT_MAX(Amin_exp[j], Bmin_exp[j]) - Bmin_exp[j];
     }
 
     /* put A's cofactor coefficient in t1 */
