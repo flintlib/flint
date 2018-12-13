@@ -134,6 +134,10 @@ FLINT_DLL void _fmpz_vec_max(fmpz * vec1, const fmpz * vec2, const fmpz * vec3,
                                                                      slong len);
 FLINT_DLL void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len);
 
+FLINT_DLL void _fmpz_vec_min(fmpz * vec1, const fmpz * vec2, const fmpz * vec3,
+                                                                     slong len);
+FLINT_DLL void _fmpz_vec_min_inplace(fmpz * vec1, const fmpz * vec2, slong len);
+
 /* Sorting  ******************************************************************/
 
 FLINT_DLL void _fmpz_vec_sort(fmpz * vec, slong len);

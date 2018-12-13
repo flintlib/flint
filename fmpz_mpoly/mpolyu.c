@@ -179,6 +179,157 @@ fmpz_mpoly_struct * _fmpz_mpolyu_get_coeff(fmpz_mpolyu_t A,
     return xk;
 }
 
+
+/*
+    Convert B to A using the variable permutation perm.
+    The uctx should be the context of the coefficients of A.
+    The ctx should be the context of B.
+
+    operation on each term:
+
+    for 0 <= k <= m
+        l = perm[k]
+        Aexp[k] = (Bexp[l] - shift[l])/stride[l]
+*/
+void fmpz_mpoly_to_mpolyu_perm_deflate(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
+               const slong * perm, const ulong * shift, const ulong * stride,
+                       const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, j, k, l;
+    slong n = ctx->minfo->nvars;
+    slong m = uctx->minfo->nvars;
+    slong NA, NB;
+    ulong * uexps;
+    ulong * Bexps;
+    fmpz_mpoly_struct * Ac;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(m + 1 <= n);
+
+    TMP_START;
+
+    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(fmpz));
+    Bexps = (ulong *) TMP_ALLOC(n*sizeof(fmpz));
+
+    fmpz_mpolyu_zero(A, uctx);
+
+    NA = mpoly_words_per_exp(A->bits, uctx->minfo);
+    NB = mpoly_words_per_exp(B->bits, ctx->minfo);
+
+    for (j = 0; j < B->length; j++)
+    {
+        mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
+        for (k = 0; k <= m; k++)
+        {
+            l = perm[k];
+            FLINT_ASSERT(stride[l] != UWORD(0));
+            FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
+            uexps[k] = (Bexps[l] - shift[l]) / stride[l];
+        }
+        Ac = _fmpz_mpolyu_get_coeff(A, uexps[m], uctx);
+        FLINT_ASSERT(Ac->bits == A->bits);
+
+        fmpz_mpoly_fit_length(Ac, Ac->length + 1, uctx);
+        fmpz_set(Ac->coeffs + Ac->length, B->coeffs + j);
+        mpoly_set_monomial_ui(Ac->exps + NA*Ac->length, uexps, A->bits, uctx->minfo);
+        Ac->length++;
+    }
+
+    for (i = 0; i < A->length; i++)
+    {
+        fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+    }
+
+    TMP_END;
+}
+
+
+/*
+    Convert B to A using the variable permutation vector perm.
+    A must be constructed with bits = Abits.
+
+    operation on each term:
+
+        for 0 <= l < n
+            Aexp[l] = shift[l]
+
+        for 0 <= k <= m
+            l = perm[k]
+            Aexp[l] += scale[l]*Bexp[k]
+*/
+void fmpz_mpoly_from_mpolyu_perm_inflate(fmpz_mpoly_t A, mp_bitcnt_t Abits,
+                                                        const fmpz_mpolyu_t B,
+                const slong * perm, const ulong * shift, const ulong * stride,
+                       const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx)
+{
+    slong n = ctx->minfo->nvars;
+    slong m = uctx->minfo->nvars;
+    slong i, j, k, l;
+    slong NA, NB;
+    slong Alen;
+    fmpz * Acoeff;
+    ulong * Aexp;
+    slong Aalloc;
+    ulong * uexps;
+    ulong * Aexps;
+    TMP_INIT;
+
+    FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT(Abits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(m + 1 <= n);
+    TMP_START;
+
+    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(ulong));
+    Aexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+
+    NA = mpoly_words_per_exp(Abits, ctx->minfo);
+    NB = mpoly_words_per_exp(B->bits, uctx->minfo);
+
+    fmpz_mpoly_fit_bits(A, Abits, ctx);
+    A->bits = Abits;
+
+    Acoeff = A->coeffs;
+    Aexp = A->exps;
+    Aalloc = A->alloc;
+    Alen = 0;
+    for (i = 0; i < B->length; i++)
+    {
+        fmpz_mpoly_struct * Bc = B->coeffs + i;
+        _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Bc->length, NA);
+        FLINT_ASSERT(Bc->bits == B->bits);
+
+        for (j = 0; j < Bc->length; j++)
+        {
+            fmpz_set(Acoeff + Alen + j, Bc->coeffs + j);
+            mpoly_get_monomial_ui(uexps, Bc->exps + NB*j, Bc->bits, uctx->minfo);
+            uexps[m] = B->exps[i];
+            for (l = 0; l < n; l++)
+            {
+                Aexps[l] = shift[l];
+            }
+            for (k = 0; k <= m; k++)
+            {
+                l = perm[k];
+                Aexps[l] += stride[l]*uexps[k];
+            }
+            mpoly_set_monomial_ui(Aexp + NA*(Alen + j), Aexps, Abits, ctx->minfo);
+        }
+        Alen += Bc->length;
+    }
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->alloc = Aalloc;
+    _fmpz_mpoly_set_length(A, Alen, ctx);
+
+    fmpz_mpoly_sort_terms(A, ctx);
+    TMP_END;
+}
+
+
+
 /*
     Convert B to A using the variable permutation perm.
     The uctx should be the context of the coefficients of A.
@@ -197,6 +348,8 @@ void fmpz_mpoly_to_mpolyu_perm(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
     fmpz_mpoly_struct * Ac;
     TMP_INIT;
 
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
     FLINT_ASSERT(uctx->minfo->nvars == n - 1);
 
     TMP_START;
@@ -209,7 +362,6 @@ void fmpz_mpoly_to_mpolyu_perm(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
         fmpz_init(exps + i);
     }
 
-    A->bits = B->bits;
     fmpz_mpolyu_zero(A, uctx);
 
     N = mpoly_words_per_exp(B->bits, ctx->minfo);
@@ -225,15 +377,13 @@ void fmpz_mpoly_to_mpolyu_perm(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
         }
         Ac = _fmpz_mpolyu_get_coeff(A, uexps[n - 1], uctx);
 
-        FLINT_ASSERT(Ac->bits == B->bits);
+        FLINT_ASSERT(Ac->bits == A->bits);
 
         fmpz_mpoly_fit_length(Ac, Ac->length + 1, uctx);
         fmpz_set(Ac->coeffs + Ac->length, B->coeffs + j);
         mpoly_set_monomial_ffmpz(Ac->exps + NA*Ac->length, uexps, A->bits, uctx->minfo);
         Ac->length++;
     }
-
-
 
     for (i = 0; i < A->length; i++)
     {
@@ -273,6 +423,7 @@ void fmpz_mpoly_from_mpolyu_perm(fmpz_mpoly_t A,
     mp_bitcnt_t bits;
     TMP_INIT;
 
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
     FLINT_ASSERT(uctx->minfo->nvars == n - 1);
 
     if (B->length == 0)
@@ -659,6 +810,8 @@ void fmpz_mpolyu_divexact_mpoly(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
         fmpz_mpoly_fit_length(poly1, poly2->length/poly3->length + 1, ctx);
         fmpz_mpoly_fit_bits(poly1, exp_bits, ctx);
         poly1->bits = exp_bits;
+
+        FLINT_ASSERT(poly2->length > 0);
 
         len = _fmpz_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
                             &poly1->alloc, poly2->coeffs, poly2->exps, poly2->length,

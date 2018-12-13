@@ -493,7 +493,6 @@ int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, fmpz_mpoly_t A,
     fmpz_mpolyu_init(Bu, new_bits, uctx);
     fmpz_mpolyu_init(Gu, new_bits, uctx);
 
-
     fmpz_mpoly_to_mpolyu_perm(Au, A, zinfo->perm, uctx, ctx);
     fmpz_mpoly_to_mpolyu_perm(Bu, B, zinfo->perm, uctx, ctx);
 
@@ -610,8 +609,12 @@ int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G,
     fmpz_mpolyu_init(Bu, new_bits, uctx);
     fmpz_mpolyu_init(Gu, new_bits, uctx);
 
+FLINT_ASSERT(Au->bits == Bu->bits);
+
     fmpz_mpoly_to_mpolyu_perm(Au, A, zinfo->perm, uctx, ctx);
     fmpz_mpoly_to_mpolyu_perm(Bu, B, zinfo->perm, uctx, ctx);
+
+FLINT_ASSERT(Au->bits == Bu->bits);
 
     ret = fmpz_mpolyu_gcd_zippel(Gu, Au, Bu, uctx, zinfo, randstate);
     if (ret) {

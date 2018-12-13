@@ -14,7 +14,6 @@
 /*
     compute number of bits required to store user_exp in packed format
     the returned number of bits includes space for a zero'd signed bit
-    a return value of > FLINT_BITS indicates an error (it doesn't fit)
 */
 mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
                                                         const mpoly_ctx_t mctx)
@@ -40,7 +39,7 @@ mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
         }
     }
 
-    exp_bits = FLINT_MAX(WORD(8), FLINT_BIT_COUNT(max) + 1);
+    exp_bits = FLINT_MAX(MPOLY_MIN_BITS, FLINT_BIT_COUNT(max) + 1);
     return exp_bits;
 }
 

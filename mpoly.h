@@ -641,7 +641,7 @@ FLINT_DLL void mpoly_set_monomial_ffmpz(ulong * exp1, const fmpz * exp2,
 FLINT_DLL void mpoly_set_monomial_pfmpz(ulong * exp1, fmpz * const * exp2,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_repack_monomials(ulong * exps1, slong bits1,
+FLINT_DLL int mpoly_repack_monomials(ulong * exps1, slong bits1,
                                 const ulong * exps2, slong bits2, slong len,
                                                        const mpoly_ctx_t mctx);
 
@@ -717,7 +717,31 @@ FLINT_DLL int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, 
 
 FLINT_DLL void mpoly_reverse(ulong * Aexp, const ulong * Bexp, slong len, slong N);
 
-/* info related to zippel interpolation **************************************/
+FLINT_DLL void mpoly_monomials_deflation(fmpz * shift, fmpz * stride,
+                        const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                                                       const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_monomials_deflate(ulong * Aexps, mp_bitcnt_t Abits,
+                        const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+              const fmpz * shift, const fmpz * stride, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_monomials_inflate(ulong * Aexps, mp_bitcnt_t Abits,
+                        const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+              const fmpz * shift, const fmpz * stride, const mpoly_ctx_t mctx);
+
+/* info related to gcd calculation *******************************************/
+
+FLINT_DLL void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,
+                       slong * Amax_exp_count, slong * Amin_exp_count,
+                       const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                                                       const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gcd_info_stride(ulong * strides,
+          const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                             const ulong * Amax_exp, const ulong * Amin_exp,
+          const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+                             const ulong * Bmax_exp, const ulong * Bmin_exp,
+                                                       const mpoly_ctx_t mctx);
+
 typedef struct
 {
     slong nvars;
