@@ -21,7 +21,6 @@
     and are packed into <= FLINT_BITS.
 
     The function should pack its answer into bits = Gbits <= FLINT_BITS
-
 */
 int _fmpz_mpoly_gcd_monomial_cofactors_sp(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
          const fmpz_mpoly_t A, const ulong * Amax_exp , const ulong * Amin_exp,

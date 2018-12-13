@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
-#include "profiler.h"
 
 void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
                      fmpz_mpoly_ctx_t ctx, slong i, slong j, const char * name)
