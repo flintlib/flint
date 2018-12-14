@@ -652,6 +652,33 @@ FLINT_DLL void nmod_mpoly_term_content(nmod_mpoly_t M, const nmod_mpoly_t A,
 FLINT_DLL int nmod_mpoly_gcd(nmod_mpoly_t G, const nmod_mpoly_t A,
                              const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int _nmod_mpoly_gcd(nmod_mpoly_t G, mp_bitcnt_t Gbits,
+                               const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _nmod_mpoly_gcd_monomial(nmod_mpoly_t G, mp_bitcnt_t Gbits,
+                                const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _nmod_mpoly_gcd_monomial_cofactors_sp(
+                         nmod_mpoly_t G, mp_bitcnt_t Gbits,
+         const nmod_mpoly_t A, const ulong * Amax_exp , const ulong * Amin_exp,
+         const nmod_mpoly_t B, const ulong * Bmax_exp , const ulong * Bmin_exp,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _nmod_mpoly_gcd_monomial_cofactors(nmod_mpoly_t G,
+                                const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_deflation(fmpz * shift, fmpz * stride,
+                             const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_deflate(nmod_mpoly_t A, const nmod_mpoly_t B,
+          const fmpz * shift, const fmpz * stride, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_inflate(nmod_mpoly_t A, const nmod_mpoly_t B,
+          const fmpz * shift, const fmpz * stride, const nmod_mpoly_ctx_t ctx);
+
 
 /******************************************************************************
 
