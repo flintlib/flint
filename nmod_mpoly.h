@@ -530,6 +530,8 @@ FLINT_DLL void nmod_mpoly_scalar_mul_ui(nmod_mpoly_t A,
 FLINT_DLL void nmod_mpoly_make_monic(nmod_mpoly_t A, const nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void nmod_mpoly_scalar_mul_nmod_invertible(nmod_mpoly_t A,
+                const nmod_mpoly_t B, mp_limb_t c, const nmod_mpoly_ctx_t ctx);
 
 /* Differention **************************************************************/
 
