@@ -75,6 +75,90 @@ int _nmod_mpoly_gcd(nmod_mpoly_t G, mp_bitcnt_t Gbits,
         }
     }
 
+    /* check if ess(A) and ess(B) have a variable v_in_both in common */
+    v_in_both = -WORD(1);
+    for (j = 0; j < nvars; j++)
+    {
+        if (Amax_exp[j] > Amin_exp[j] && Bmax_exp[j] > Bmin_exp[j])
+        {
+            v_in_both = j;
+            break;
+        }
+    }
+    if (v_in_both == -WORD(1))
+    {
+        /*
+            The variables in ess(A) and ess(B) are disjoint.
+            gcd is trivial to compute.
+        */
+        ulong * minexps;
+
+        minexps = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+        for (j = 0; j < nvars; j++)
+            minexps[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
+
+        nmod_mpoly_fit_length(G, 1, ctx);
+        nmod_mpoly_fit_bits(G, Gbits, ctx);
+        G->bits = Gbits;
+        mpoly_set_monomial_ui(G->exps, minexps, Gbits, ctx->minfo);
+        G->coeffs[0] = UWORD(1);
+        _nmod_mpoly_set_length(G, 1, ctx);
+
+        success = 1;
+        goto cleanup;
+    }
+
+    /* check if ess(A) and ess(B) depend on another variable v_in_either */
+    FLINT_ASSERT(0 <= v_in_both);
+    FLINT_ASSERT(v_in_both < nvars);
+
+    v_in_either = -WORD(1);
+    for (j = 0; j < nvars; j++)
+    {
+        if (j == v_in_both)
+            continue;
+
+        if (Amax_exp[j] > Amin_exp[j] || Bmax_exp[j] > Bmin_exp[j])
+        {
+            v_in_either = j;
+            break;
+        }
+    }
+
+    if (v_in_either == -WORD(1))
+    {
+        /*
+            The ess(A) and ess(B) depend on only one variable v_in_both
+            Calculate gcd using univariates
+        */
+        ulong * Gshift;
+        nmod_poly_t a, b, g;
+
+        Gshift = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+        for (j = 0; j < nvars; j++)
+            Gshift[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
+
+        Gstride = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
+        mpoly_gcd_info_stride(Gstride,
+                  A->exps, A->bits, A->length, Amax_exp, Amin_exp,
+                  B->exps, B->bits, B->length, Bmax_exp, Bmin_exp, ctx->minfo);
+
+        nmod_poly_init_preinv(a, ctx->ffinfo->mod.n, ctx->ffinfo->mod.ninv);
+        nmod_poly_init_preinv(b, ctx->ffinfo->mod.n, ctx->ffinfo->mod.ninv);
+        nmod_poly_init_preinv(g, ctx->ffinfo->mod.n, ctx->ffinfo->mod.ninv);
+        _nmod_mpoly_to_nmod_poly_deflate(a, A, v_in_both, Amin_exp, Gstride, ctx);
+        _nmod_mpoly_to_nmod_poly_deflate(b, B, v_in_both, Bmin_exp, Gstride, ctx);
+        nmod_poly_gcd(g, a, b);
+        _nmod_mpoly_from_nmod_poly_inflate(G, Gbits, g, v_in_both,
+                                                          Gshift, Gstride, ctx);
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(g);
+
+        success = 1;
+        goto cleanup;
+    }
+
     success = nmod_mpoly_gcd_brown(G, A, B, ctx);
 
 cleanup:

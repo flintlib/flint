@@ -686,6 +686,14 @@ FLINT_DLL void nmod_mpoly_inflate(nmod_mpoly_t A, const nmod_mpoly_t B,
 
 ******************************************************************************/
 
+void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
+                        slong var, const ulong * Bshift, const ulong * Bstride,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
+                         const nmod_poly_t B, slong var, const ulong * Ashift,
+                            const ulong * Astride, const nmod_mpoly_ctx_t ctx);
+
 /* sparse univariates with multivariate coefficients */
 typedef struct
 {

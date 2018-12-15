@@ -91,12 +91,34 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, tmul = 20;
+    slong i, j, tmul = 0;
 
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
     fflush(stdout);
+
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t g, a, b;
+        const char * vars[] = {"t" ,"x", "y", "z"};
+
+        nmod_mpoly_ctx_init(ctx, 4, ORD_LEX, 11);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(g, ctx);
+
+        nmod_mpoly_set_str_pretty(g, "3", vars, ctx);
+        nmod_mpoly_set_str_pretty(a, "2*x*y*t^3*z^2*(1+x)", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "2*x^2*z^4*t*(1+x+x+x^2)", vars, ctx);
+
+        gcd_check(g, a, b, ctx, 0, 0, "example");
+
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
 
     /* The gcd should always work when one input is a monomial */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
@@ -205,7 +227,7 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    for (i = 0; i < 2 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, ca, cb, cg, t;
