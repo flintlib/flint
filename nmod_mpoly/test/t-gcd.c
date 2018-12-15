@@ -152,6 +152,58 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
+    /* The gcd should always work when both cofactors are monomials */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, g, t1, t2;
+        slong len, len1;
+        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 10, modulus);
+
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(t1, ctx);
+        nmod_mpoly_init(t2, ctx);
+
+        len = n_randint(state, 25);
+        len1 = n_randint(state, 25);
+
+        exp_bits = n_randint(state, 70) + 2;
+        exp_bits1 = n_randint(state, 100) + 2;
+        exp_bits2 = n_randint(state, 100) + 2;
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                nmod_mpoly_randtest_bits(t1, state, 1, exp_bits1, ctx);
+            } while (t1->length != 1);
+            do {
+                nmod_mpoly_randtest_bits(t2, state, 1, exp_bits2, ctx);
+            } while (t2->length != 1);
+            nmod_mpoly_randtest_bits(a, state, len1, exp_bits, ctx);
+            nmod_mpoly_mul(b, a, t1, ctx);
+            nmod_mpoly_mul(a, a, t2, ctx);
+
+            nmod_mpoly_randtest_bits(g, state, len, exp_bits, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "monomial cofactors");
+        }
+
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(t1, ctx);
+        nmod_mpoly_clear(t2, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
 
     for (i = 0; i < 2 * flint_test_multiplier(); i++)
     {

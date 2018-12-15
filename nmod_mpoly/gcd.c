@@ -61,6 +61,20 @@ int _nmod_mpoly_gcd(nmod_mpoly_t G, mp_bitcnt_t Gbits,
     mpoly_gcd_info_limits(Bmax_exp, Bmin_exp, Bmax_exp_count, Bmin_exp_count,
                                       B->exps, B->bits, B->length, ctx->minfo);
 
+    /* set ess(p) := p/term_content(p) */
+
+    /* check if the cofactors could be monomials, i.e. ess(A) == ess(B) */
+    if (A->length == B->length)
+    {
+        success = _nmod_mpoly_gcd_monomial_cofactors_sp(G, Gbits,
+                                                   A, Amax_exp, Amin_exp,
+                                                   B, Bmax_exp, Bmin_exp, ctx);
+        if (success)
+        {
+            goto cleanup;
+        }
+    }
+
     success = nmod_mpoly_gcd_brown(G, A, B, ctx);
 
 cleanup:
@@ -107,6 +121,12 @@ int nmod_mpoly_gcd(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B,
     {
         return _nmod_mpoly_gcd_monomial(G, Gbits, A, B, ctx);
     }
-
-    return 0;
+    else if (_nmod_mpoly_gcd_monomial_cofactors(G, A, B, ctx))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
