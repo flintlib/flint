@@ -24,7 +24,6 @@ static int _try_missing_var(fmpz_mpoly_t G, mp_bitcnt_t Gbits, slong var,
 {
     int success;
     slong i;
-    ulong Gshift;
     fmpz_mpoly_t tG;
     fmpz_mpoly_univar_t Ax;
 
@@ -36,20 +35,7 @@ static int _try_missing_var(fmpz_mpoly_t G, mp_bitcnt_t Gbits, slong var,
         goto cleanup;
 
     FLINT_ASSERT(Ax->length > 0);
-
-    if (Bshift == 0)
-    {
-        success = _fmpz_mpoly_gcd(tG, Gbits, B, Ax->coeffs + 0, ctx);
-    }
-    else
-    {
-        fmpz_mpoly_t Bs;
-        fmpz_mpoly_init(Bs, ctx);
-        fmpz_mpoly_set(Bs, B, ctx);
-        _fmpz_mpoly_gen_shift_right(Bs, var, Bshift, ctx);
-        success = _fmpz_mpoly_gcd(tG, Gbits, Bs, Ax->coeffs + 0, ctx);
-        fmpz_mpoly_clear(Bs, ctx);
-    }
+    success = _fmpz_mpoly_gcd(tG, Gbits, B, Ax->coeffs + 0, ctx);
 
     if (!success)
         goto cleanup;
@@ -62,12 +48,8 @@ static int _try_missing_var(fmpz_mpoly_t G, mp_bitcnt_t Gbits, slong var,
     }
 
     fmpz_mpoly_swap(G, tG, ctx);
-
-    Gshift = FLINT_MIN(Ashift, Bshift);
-    if (Gshift != 0)
-    {
-        _fmpz_mpoly_gen_shift_left(G, var, Gshift, ctx);
-    }
+    _mpoly_gen_shift_left(G->exps, G->bits, G->length,
+                                   var, FLINT_MIN(Ashift, Bshift), ctx->minfo);
 
 cleanup:
 
@@ -1138,6 +1120,5 @@ cleanup:
         fmpz_mpoly_clear(Bnew, ctx);
 
         return success;
-
     }
 }

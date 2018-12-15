@@ -729,6 +729,12 @@ FLINT_DLL void mpoly_monomials_inflate(ulong * Aexps, mp_bitcnt_t Abits,
                         const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
               const fmpz * shift, const fmpz * stride, const mpoly_ctx_t mctx);
 
+FLINT_DLL void _mpoly_gen_shift_right(ulong * Aexp, mp_bitcnt_t Abits,
+               slong Alength, slong var, ulong amount, const mpoly_ctx_t mctx);
+
+FLINT_DLL void _mpoly_gen_shift_left(ulong * Aexp, mp_bitcnt_t Abits,
+               slong Alength, slong var, ulong amount, const mpoly_ctx_t mctx);
+
 /* info related to gcd calculation *******************************************/
 
 FLINT_DLL void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,

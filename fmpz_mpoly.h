@@ -835,12 +835,6 @@ FLINT_DLL void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
        mp_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
                             const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_gen_shift_right(fmpz_mpoly_t A, slong var,
-                                     ulong amount, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_gen_shift_left(fmpz_mpoly_t A, slong var,
-                                     ulong amount, const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                 mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
 

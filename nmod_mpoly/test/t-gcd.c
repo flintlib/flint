@@ -91,8 +91,7 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, tmul = 0;
-
+    slong i, j, k, tmul = 20;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
@@ -101,16 +100,18 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t g, a, b;
-        const char * vars[] = {"t" ,"x", "y", "z"};
+        const char * vars[] = {"x1", "x2"};
 
-        nmod_mpoly_ctx_init(ctx, 4, ORD_LEX, 11);
+        nmod_mpoly_ctx_init(ctx, 2, ORD_LEX, 2);
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(b, ctx);
         nmod_mpoly_init(g, ctx);
 
-        nmod_mpoly_set_str_pretty(g, "3", vars, ctx);
-        nmod_mpoly_set_str_pretty(a, "2*x*y*t^3*z^2*(1+x)", vars, ctx);
-        nmod_mpoly_set_str_pretty(b, "2*x^2*z^4*t*(1+x+x+x^2)", vars, ctx);
+        nmod_mpoly_set_str_pretty(a, "x1^9*x2+x1^8*x2^3+x1^7*x2^3+x1*x2^4+x2^7", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "x1^8*x2^8+x1^7*x2+x1^5*x2^7+x1^5*x2+x1^3*x2^2+x1^2*x2^8+x2^7+x2^5", vars, ctx);
+        nmod_mpoly_set_str_pretty(g, "x1^8*x2^4+x1^7*x2^8+x1^7*x2^2+x1^6*x2^3+x2^7", vars, ctx);
+        nmod_mpoly_mul(a,a,g,ctx);
+        nmod_mpoly_mul(b,b,g,ctx);
 
         gcd_check(g, a, b, ctx, 0, 0, "example");
 
@@ -227,34 +228,158 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
+    /* sparse inputs */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
-        nmod_mpoly_t a, b, g, ca, cb, cg, t;
+        nmod_mpoly_t a, b, g, t;
         slong len, len1, len2;
         slong degbound;
         mp_limb_t modulus;
-        int res;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
         modulus = n_nextprime(modulus, 1);
 
-        nmod_mpoly_ctx_init_rand(ctx, state, modulus < 3000 ? 4 : 5, modulus);
-
+        nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(b, ctx);
-        nmod_mpoly_init(ca, ctx);
-        nmod_mpoly_init(cb, ctx);
-        nmod_mpoly_init(cg, ctx);
         nmod_mpoly_init(t, ctx);
 
-        len = n_randint(state, 100) + 1;
-        len1 = n_randint(state, 200);
-        len2 = n_randint(state, 200);
+        len = n_randint(state, 20) + 1;
+        len1 = n_randint(state, 30);
+        len2 = n_randint(state, 30);
 
-        degbound = 100/ctx->minfo->nvars/ctx->minfo->nvars;
+        degbound = 30/(2*ctx->minfo->nvars - 1);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
+            } while (t->length == 0);
+            nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
+            nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
+
+            nmod_mpoly_mul(a, a, t, ctx);
+            nmod_mpoly_mul(b, b, t, ctx);
+
+            nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "sparse inputs");
+        }
+
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(t, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* sparse inputs with random repackings */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, g, t;
+        mp_limb_t rlimb;
+        mp_bitcnt_t newbits;
+        slong len, len1, len2;
+        slong degbound;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(t, ctx);
+
+        len = n_randint(state, 20) + 1;
+        len1 = n_randint(state, 30);
+        len2 = n_randint(state, 30);
+
+        degbound = 30/(2*ctx->minfo->nvars - 1);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
+            } while (t->length == 0);
+            nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
+            nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
+            nmod_mpoly_mul(a, a, t, ctx);
+            nmod_mpoly_mul(b, b, t, ctx);
+
+            rlimb = n_randlimb(state);
+
+            if (rlimb & UWORD(3))
+            {
+                newbits = a->bits + n_randint(state, 2*FLINT_BITS);
+                newbits = mpoly_fix_bits(newbits, ctx->minfo);
+                nmod_mpoly_repack_bits(a, a, newbits, ctx);
+            }
+
+            if (rlimb & UWORD(12))
+            {
+                newbits = b->bits + n_randint(state, 2*FLINT_BITS);
+                newbits = mpoly_fix_bits(newbits, ctx->minfo);
+                nmod_mpoly_repack_bits(b, b, newbits, ctx);
+            }
+
+            nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "sparse input with repacking");
+        }
+
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(t, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* sparse inputs with random inflations */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, g, t;
+        fmpz * shifts1, * shifts2, * strides;
+        mp_bitcnt_t stride_bits, shift_bits;
+        slong len, len1, len2;
+        slong degbound;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(t, ctx);
+
+        len = n_randint(state, 20) + 1;
+        len1 = n_randint(state, 30);
+        len2 = n_randint(state, 30);
+
+        degbound = 30/(2*ctx->minfo->nvars - 1);
+
+        stride_bits = n_randint(state, 100) + 2;
+        shift_bits = n_randint(state, 100) + 2;
+
+        shifts1 = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        shifts2 = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        strides = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_init(shifts1 + k);
+            fmpz_init(shifts2 + k);
+            fmpz_init(strides + k);
+        }
 
         for (j = 0; j < 4; j++)
         {
@@ -268,63 +393,260 @@ main(void)
 
             nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
 
-            res = nmod_mpoly_gcd(g, a, b, ctx);
-            if (!res) {
-                continue;
-            }
-            nmod_mpoly_assert_canonical(g, ctx);
-
-            if (nmod_mpoly_is_zero(g, ctx))
+            for (k = 0; k < ctx->minfo->nvars; k++)
             {
-                if (!nmod_mpoly_is_zero(a, ctx) || !nmod_mpoly_is_zero(b, ctx))
-                {
-                    printf("FAIL\n");
-                    flint_printf("Check zero gcd only results from zero inputs\ni = %wd, j = %wd\n", i ,j);
-                    flint_abort();
-                }
-                continue;
+                fmpz_randtest_unsigned(shifts1 + k, state, shift_bits);
+                fmpz_randtest_unsigned(shifts2 + k, state, shift_bits);
+                fmpz_randtest_unsigned(strides + k, state, stride_bits);
             }
+            nmod_mpoly_inflate(a, a, shifts1, strides, ctx);
+            nmod_mpoly_inflate(b, b, shifts2, strides, ctx);
 
-            if (g->coeffs[0] != UWORD(1))
-            {
-                printf("FAIL\n");
-                flint_printf("Check gcd is monic\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
+            gcd_check(g, a, b, ctx, i, j, "sparse input with inflation");
+        }
 
-            res = 1;
-            res = res && nmod_mpoly_divides(ca, a, g, ctx);
-            res = res && nmod_mpoly_divides(cb, b, g, ctx);
-            if (!res)
-            {
-                printf("FAIL\n");
-                flint_printf("Check divisibility\ni = %wd, j = %wd\n", i ,j);
-                flint_abort();
-            }
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_clear(shifts1 + k);
+            fmpz_clear(shifts2 + k);
+            fmpz_clear(strides + k);
+        }
+        flint_free(shifts1);
+        flint_free(shifts2);
+        flint_free(strides);
 
-            res = nmod_mpoly_gcd(cg, ca, cb, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(t, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
 
-            if (!res)
-                continue;
+    /* dense inputs */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, g, t;
+        slong len1, len2, len3, len4;
+        ulong degbounds1[4];
+        ulong degbounds2[4];
+        ulong degbounds3[4];
+        mp_bitcnt_t bits4;
+        mp_limb_t modulus;
 
-            if (!nmod_mpoly_equal_ui(cg, UWORD(1), ctx))
-            {
-                printf("FAIL\n");
-                flint_printf("Check cofactors are relatively prime\ni = %wd, j = %wd\n", i ,j);                
-                flint_abort();
-            }
+        modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 4, modulus);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(t, ctx);
+
+        len1 = n_randint(state, 300) + 1;
+        len2 = n_randint(state, 300);
+        len3 = n_randint(state, 300);
+        len4 = n_randint(state, 300);
+ 
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            degbounds1[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
+            degbounds2[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
+            degbounds3[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
+        }
+
+        bits4 = n_randint(state, 200);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                nmod_mpoly_randtest_bounds(t, state, len1, degbounds1, ctx);
+            } while (t->length == 0);
+            nmod_mpoly_randtest_bounds(a, state, len2, degbounds2, ctx);
+            nmod_mpoly_randtest_bounds(b, state, len3, degbounds3, ctx);
+            nmod_mpoly_mul(a, a, t, ctx);
+            nmod_mpoly_mul(b, b, t, ctx);
+
+            nmod_mpoly_randtest_bits(g, state, len4, bits4, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "dense input");
         }
 
         nmod_mpoly_clear(g, ctx);
         nmod_mpoly_clear(a, ctx);
         nmod_mpoly_clear(b, ctx);
-        nmod_mpoly_clear(ca, ctx);
-        nmod_mpoly_clear(cb, ctx);
-        nmod_mpoly_clear(cg, ctx);
         nmod_mpoly_clear(t, ctx);
         nmod_mpoly_ctx_clear(ctx);
     }
 
+    /* dense inputs with repacking */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, g, t;
+        mp_limb_t rlimb;
+        mp_bitcnt_t newbits;
+        slong len1, len2, len3, len4;
+        ulong degbounds1[4];
+        ulong degbounds2[4];
+        ulong degbounds3[4];
+        mp_bitcnt_t bits4;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 4, modulus);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(t, ctx);
+
+        len1 = n_randint(state, 300) + 1;
+        len2 = n_randint(state, 300);
+        len3 = n_randint(state, 300);
+        len4 = n_randint(state, 300);
+ 
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            degbounds1[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
+            degbounds2[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
+            degbounds3[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
+        }
+
+        bits4 = n_randint(state, 200);
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                nmod_mpoly_randtest_bounds(t, state, len1, degbounds1, ctx);
+            } while (t->length == 0);
+            nmod_mpoly_randtest_bounds(a, state, len2, degbounds2, ctx);
+            nmod_mpoly_randtest_bounds(b, state, len3, degbounds3, ctx);
+            nmod_mpoly_mul(a, a, t, ctx);
+            nmod_mpoly_mul(b, b, t, ctx);
+
+            rlimb = n_randlimb(state);
+
+            if (rlimb & UWORD(3))
+            {
+                newbits = a->bits + n_randint(state, 2*FLINT_BITS);
+                newbits = mpoly_fix_bits(newbits, ctx->minfo);
+                nmod_mpoly_repack_bits(a, a, newbits, ctx);
+            }
+
+            if (rlimb & UWORD(12))
+            {
+                newbits = b->bits + n_randint(state, 2*FLINT_BITS);
+                newbits = mpoly_fix_bits(newbits, ctx->minfo);
+                nmod_mpoly_repack_bits(b, b, newbits, ctx);
+            }
+
+            nmod_mpoly_randtest_bits(g, state, len4, bits4, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "dense input with repacking");
+        }
+
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(t, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* dense inputs with random inflations */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, g, t;
+        fmpz * shifts1, * shifts2, * strides;
+        mp_bitcnt_t stride_bits, shift_bits;
+        slong len1, len2, len3, len4;
+        ulong degbounds1[4];
+        ulong degbounds2[4];
+        ulong degbounds3[4];
+        mp_bitcnt_t bits4;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 4, modulus);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(t, ctx);
+
+        len1 = n_randint(state, 300) + 1;
+        len2 = n_randint(state, 300);
+        len3 = n_randint(state, 300);
+        len4 = n_randint(state, 300);
+ 
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            degbounds1[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+            degbounds2[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+            degbounds3[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+        }
+
+        bits4 = n_randint(state, 200);
+
+        stride_bits = n_randint(state, 100) + 2;
+        shift_bits = n_randint(state, 100) + 2;
+
+        shifts1 = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        shifts2 = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        strides = flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_init(shifts1 + k);
+            fmpz_init(shifts2 + k);
+            fmpz_init(strides + k);
+        }
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                nmod_mpoly_randtest_bounds(t, state, len1, degbounds1, ctx);
+            } while (t->length == 0);
+            nmod_mpoly_randtest_bounds(a, state, len2, degbounds2, ctx);
+            nmod_mpoly_randtest_bounds(b, state, len3, degbounds3, ctx);
+            nmod_mpoly_mul(a, a, t, ctx);
+            nmod_mpoly_mul(b, b, t, ctx);
+
+            nmod_mpoly_randtest_bits(g, state, len4, bits4, ctx);
+
+            for (k = 0; k < ctx->minfo->nvars; k++)
+            {
+                fmpz_randtest_unsigned(shifts1 + k, state, shift_bits);
+                fmpz_randtest_unsigned(shifts2 + k, state, shift_bits);
+                fmpz_randtest_unsigned(strides + k, state, stride_bits);
+            }
+            nmod_mpoly_inflate(a, a, shifts1, strides, ctx);
+            nmod_mpoly_inflate(b, b, shifts2, strides, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "dense input with inflation");
+        }
+
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_clear(shifts1 + k);
+            fmpz_clear(shifts2 + k);
+            fmpz_clear(strides + k);
+        }
+        flint_free(shifts1);
+        flint_free(shifts2);
+        flint_free(strides);
+
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(t, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
 
     printf("PASS\n");
     FLINT_TEST_CLEANUP(state);

@@ -643,6 +643,9 @@ pick_evaluation_point:
             fq_nmod_mul(u, W + l*s + i, Msol->rows[i] + 0, ctx->fqctx);
             if (!fq_nmod_equal(acc, u, ctx->fqctx))
             {
+                fq_nmod_clear(acc, ctx->fqctx);
+                fq_nmod_clear(pp, ctx->fqctx);
+                fq_nmod_clear(u, ctx->fqctx);
                 success = nmod_gcds_no_solution;
                 goto finished;
             }

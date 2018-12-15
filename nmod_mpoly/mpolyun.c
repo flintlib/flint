@@ -592,7 +592,7 @@ void nmod_mpolyun_redto_fq_nmod_mpolyu(fq_nmod_mpolyu_t A, nmod_mpolyun_t B,
     {
         nmod_mpolyn_redto_fq_nmod_mpoly(Acoeff + k, Bcoeff + i, ffctx, ctx);
         Aexp[k] = Bexp[i];
-        k += !fq_nmod_mpoly_is_zero(Acoeff + i, ffctx);
+        k += !fq_nmod_mpoly_is_zero(Acoeff + k, ffctx);
     }
 
     for (i = k; i < A->length; i++)

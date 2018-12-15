@@ -418,12 +418,7 @@ void fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(fmpz_mpoly_t A,
                                         (N - 1)*FLINT_BITS + msb, N, pcurexp);
         }
     }
-/*
-flint_printf("A->ord = %wd\n", ctx->minfo->ord);
-flint_printf("A bits = %wd = %wd\n", Abits, A->bits);
-printf("A: "); fmpz_mpoly_print_pretty(A, NULL, ctx); printf("\n");
-FLINT_ASSERT(fmpz_mpoly_is_canonical(A, ctx));
-*/
+
     TMP_END;
 }
 
