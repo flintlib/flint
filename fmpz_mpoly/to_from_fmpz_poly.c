@@ -55,7 +55,8 @@ void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift,
 void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
                            slong shift2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    slong shift, off, bits, N;
+    mp_bitcnt_t bits;
+    slong N;
     slong k;
     slong p_len;
     fmpz * p_coeff;
@@ -66,15 +67,15 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
 
     TMP_START;
 
-    bits = fmpz_poly_degree(poly2);
-    bits = 1 + FLINT_BIT_COUNT(FLINT_MAX(WORD(1), shift2 + bits));
+    bits = 1 + FLINT_BIT_COUNT(FLINT_MAX(WORD(1),
+                                            shift2 + fmpz_poly_degree(poly2)));
     if (bits > FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_fmpz_poly");
     bits = mpoly_fix_bits(bits, ctx->minfo);
     
-    N = mpoly_words_per_exp(bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
+    mpoly_gen_monomial_sp(one, var,bits, ctx->minfo);
 
     fmpz_mpoly_fit_bits(poly1, bits, ctx);
     poly1->bits = bits;
@@ -162,7 +163,7 @@ void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A, mp_bitcnt_t Abits,
                          const fmpz_poly_t B, slong var, const ulong * Ashift,
                              const ulong * Astride, const fmpz_mpoly_ctx_t ctx)
 {
-    slong shift, off, N;
+    slong N;
     slong k;
     slong Alen;
     fmpz * Acoeff;
@@ -185,7 +186,7 @@ void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A, mp_bitcnt_t Abits,
     strideexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     shiftexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_set_monomial_ui(shiftexp, Ashift, Abits, ctx->minfo);
-    mpoly_gen_oneexp_offset_shift(strideexp, &off, &shift, var, N, Abits, ctx->minfo);
+    mpoly_gen_monomial_sp(strideexp, var, Abits, ctx->minfo);
     mpoly_monomial_mul_ui(strideexp, strideexp, N, Astride[var]);
 
     fmpz_mpoly_fit_bits(A, Abits, ctx);

@@ -178,11 +178,11 @@ void fq_nmod_mpoly_cvtto_mpolyn(fq_nmod_mpolyn_t A, fq_nmod_mpoly_t B,
 
     TMP_START;
 
-    N = mpoly_words_per_exp(B->bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(B->bits, ctx->minfo);
     oneexp = TMP_ALLOC(N*sizeof(ulong));
     mask = (-UWORD(1)) >> (FLINT_BITS - B->bits);
-    mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift, var,
-                                                       N, B->bits, ctx->minfo);
+    mpoly_gen_monomial_offset_shift_sp(oneexp, &offset, &shift, var,
+                                                          B->bits, ctx->minfo);
 
     fq_nmod_mpolyn_fit_bits(A, B->bits, ctx);
     A->bits = B->bits;
@@ -250,8 +250,6 @@ void fq_nmod_mpoly_cvtfrom_mpolyn(fq_nmod_mpoly_t A,
     slong k;
     slong N;
     ulong * oneexp;
-    slong offset;
-    slong shift;
     TMP_INIT;
 
     FLINT_ASSERT(B->bits == A->bits);
@@ -260,10 +258,9 @@ void fq_nmod_mpoly_cvtfrom_mpolyn(fq_nmod_mpoly_t A,
 
     TMP_START;
 
-    N = mpoly_words_per_exp(B->bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(B->bits, ctx->minfo);
     oneexp = TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift, var, N, B->bits,
-                                                                   ctx->minfo);
+    mpoly_gen_monomial_sp(oneexp, var, B->bits, ctx->minfo);
 
     fq_nmod_mpoly_fit_length(A, B->length, ctx);
 

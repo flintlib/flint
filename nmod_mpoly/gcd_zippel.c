@@ -1705,7 +1705,7 @@ void nmod_mpoly_to_nmod_poly_keepbits(nmod_poly_t A, slong * Ashift,
 void nmod_mpoly_from_nmod_poly_keepbits(nmod_mpoly_t A, const nmod_poly_t B,
                            slong Bshift, slong var, mp_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
 {
-    slong shift, off, N;
+    slong N;
     slong k;
     slong Alen;
     mp_limb_t * Acoeff;
@@ -1716,14 +1716,15 @@ void nmod_mpoly_from_nmod_poly_keepbits(nmod_mpoly_t A, const nmod_poly_t B,
 
     TMP_START;
 
+    FLINT_ASSERT(bits <= FLINT_BITS);
     FLINT_ASSERT(!nmod_poly_is_zero(B));
     FLINT_ASSERT(Bshift >= 0);
     FLINT_ASSERT(Bshift + nmod_poly_degree(B) >= 0);
     FLINT_ASSERT(1 + FLINT_BIT_COUNT(Bshift + nmod_poly_degree(B)) <= bits);
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
+    mpoly_gen_monomial_sp(one, var, bits, ctx->minfo);
 
     nmod_mpoly_fit_bits(A, bits, ctx);
     A->bits = bits;

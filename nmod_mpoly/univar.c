@@ -152,8 +152,8 @@ int nmod_mpoly_to_univar(nmod_mpoly_univar_t poly1, const nmod_mpoly_t poly2,
 
     if (bits <= FLINT_BITS)
     {
-        mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
-
+        mpoly_gen_monomial_offset_shift_sp(one, &off, &shift,
+                                                        var, bits, ctx->minfo);
         poly1->length = 0;
         poly1->var = var;
         for (i = 0; i < len; i++)

@@ -640,9 +640,8 @@ FLINT_DLL mp_bitcnt_t mpoly_gen_bits_required(slong var, const mpoly_ctx_t mctx)
 FLINT_DLL void mpoly_gen_offset_shift_sp(slong * offset, slong * shift,
                           slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_gen_oneexp_offset_shift(ulong * oneexp,
-                                slong * offset, slong * shift, slong var, 
-                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_gen_monomial_offset_shift_sp(ulong * mexp, slong * offset,
+           slong * shift, slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_gen_monomial_sp(ulong * oneexp, slong var,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx);

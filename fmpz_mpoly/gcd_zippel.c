@@ -382,7 +382,7 @@ void fmpz_mpoly_to_fmpz_poly_keepbits(fmpz_poly_t A, slong * Ashift,
 void fmpz_mpoly_from_fmpz_poly_keepbits(fmpz_mpoly_t A, const fmpz_poly_t B,
                            slong Bshift, slong var, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 {
-    slong shift, off, N;
+    slong N;
     slong k;
     slong Alen;
     fmpz * Acoeff;
@@ -393,14 +393,14 @@ void fmpz_mpoly_from_fmpz_poly_keepbits(fmpz_mpoly_t A, const fmpz_poly_t B,
 
     TMP_START;
 
+    FLINT_ASSERT(bits <= FLINT_BITS);
     FLINT_ASSERT(!fmpz_poly_is_zero(B));
     FLINT_ASSERT(Bshift >= 0);
-    FLINT_ASSERT(Bshift + fmpz_poly_degree(B) >= 0);
     FLINT_ASSERT(1 + FLINT_BIT_COUNT(Bshift + fmpz_poly_degree(B)) <= bits);
     
-    N = mpoly_words_per_exp(bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
+    mpoly_gen_monomial_sp(one, var, bits, ctx->minfo);
 
     fmpz_mpoly_fit_bits(A, bits, ctx);
     A->bits = bits;

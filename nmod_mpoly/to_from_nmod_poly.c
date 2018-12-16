@@ -74,7 +74,7 @@ void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
                          const nmod_poly_t B, slong var, const ulong * Ashift,
                              const ulong * Astride, const nmod_mpoly_ctx_t ctx)
 {
-    slong shift, off, N;
+    slong N;
     slong k;
     slong Alen;
     mp_limb_t * Acoeff;
@@ -97,7 +97,7 @@ void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
     strideexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     shiftexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_set_monomial_ui(shiftexp, Ashift, Abits, ctx->minfo);
-    mpoly_gen_oneexp_offset_shift(strideexp, &off, &shift, var, N, Abits, ctx->minfo);
+    mpoly_gen_monomial_sp(strideexp, var, Abits, ctx->minfo);
     mpoly_monomial_mul_ui(strideexp, strideexp, N, Astride[var]);
 
     nmod_mpoly_fit_bits(A, Abits, ctx);

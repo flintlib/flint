@@ -32,31 +32,34 @@ void mpoly_gen_offset_shift_sp(slong * offset, slong * shift, slong var,
 }
 
 /* additionally get the monomial as well */
-void mpoly_gen_oneexp_offset_shift(ulong * oneexp, slong * offset, slong * shift,
-                  slong idx, slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+void mpoly_gen_monomial_offset_shift_sp(ulong * mexp, slong * offset,
+            slong * shift, slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
-    slong nvars = mctx->nvars;
-    slong fpw = FLINT_BITS/bits;
-    slong i;
+    ulong idx;
+    ulong nvars = mctx->nvars;
+    ulong fpw = FLINT_BITS/bits;
+    slong i, N;
 
     FLINT_ASSERT(bits <= FLINT_BITS);
 
+    N = mpoly_words_per_exp_sp(bits, mctx);
     for (i = 0; i < N; i++)
-        oneexp[i] = 0;
+        mexp[i] = 0;
 
+    idx = var;
     if (!mctx->rev)
-        idx = nvars - 1 - idx;
+        idx = nvars - 1 - var;
 
     *offset = idx/fpw;
     *shift  = idx%fpw*bits;
 
-    oneexp[idx/fpw] |= UWORD(1) << (idx%fpw*bits);
+    mexp[idx/fpw] |= UWORD(1) << (idx%fpw*bits);
     if (mctx->deg)
-        oneexp[nvars/fpw] |= UWORD(1) << (nvars%fpw*bits);
+        mexp[nvars/fpw] |= UWORD(1) << (nvars%fpw*bits);
 }
 
 /* just get the monomial */
-void mpoly_gen_monomial_sp(ulong * oneexp, slong var, mp_bitcnt_t bits,
+void mpoly_gen_monomial_sp(ulong * mexp, slong var, mp_bitcnt_t bits,
                                                         const mpoly_ctx_t mctx)
 {
     ulong nvars = mctx->nvars;
@@ -68,14 +71,15 @@ void mpoly_gen_monomial_sp(ulong * oneexp, slong var, mp_bitcnt_t bits,
 
     N = mpoly_words_per_exp_sp(bits, mctx);
     for (i = 0; i < N; i++)
-        oneexp[i] = 0;
+        mexp[i] = 0;
 
+    idx = var;
     if (!mctx->rev)
-        idx = nvars - 1 - idx;
+        idx = nvars - 1 - var;
 
-    oneexp[idx/fpw] |= UWORD(1) << (idx%fpw*bits);
+    mexp[idx/fpw] |= UWORD(1) << (idx%fpw*bits);
     if (mctx->deg)
-        oneexp[nvars/fpw] |= UWORD(1) << (nvars%fpw*bits);
+        mexp[nvars/fpw] |= UWORD(1) << (nvars%fpw*bits);
 }
 
 /* get the offset where the variable of index var is stored */

@@ -23,7 +23,6 @@ void _mpoly_gen_shift_right(ulong * Aexp, mp_bitcnt_t Abits, slong Alength,
                                slong var, ulong amount, const mpoly_ctx_t mctx)
 {
     slong i, N;
-    slong off, sh; /* not actually used */
     ulong *one;
 #if WANT_ASSERT
     ulong mask;
@@ -43,7 +42,7 @@ void _mpoly_gen_shift_right(ulong * Aexp, mp_bitcnt_t Abits, slong Alength,
     N = mpoly_words_per_exp(Abits, mctx);
     one = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
-    mpoly_gen_oneexp_offset_shift(one, &off, &sh, var, N, Abits, mctx);
+    mpoly_gen_monomial_sp(one, var, Abits, mctx);
     for (i = 0; i < Alength; i++)
     {
         mpoly_monomial_msub(Aexp + N*i, Aexp + N*i, amount, one, N);
@@ -57,7 +56,6 @@ void _mpoly_gen_shift_left(ulong * Aexp, mp_bitcnt_t Abits, slong Alength,
                                slong var, ulong amount, const mpoly_ctx_t mctx)
 {
     slong i, N;
-    slong off, sh; /* not actually used */
     ulong *one;
 #if WANT_ASSERT
     ulong mask;
@@ -77,7 +75,7 @@ void _mpoly_gen_shift_left(ulong * Aexp, mp_bitcnt_t Abits, slong Alength,
     N = mpoly_words_per_exp(Abits, mctx);
     one = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
-    mpoly_gen_oneexp_offset_shift(one, &off, &sh, var, N, Abits, mctx);
+    mpoly_gen_monomial_sp(one, var, Abits, mctx);
 
     for (i = 0; i < Alength; i++)
     {
