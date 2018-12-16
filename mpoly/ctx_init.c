@@ -41,4 +41,16 @@ void mpoly_ctx_init(mpoly_ctx_t mctx, slong nvars, const ordering_t ord)
         mctx->lut_words_per_exp[bits - 1]
                                    = (mctx->nfields - 1)/(FLINT_BITS/bits) + 1;
     }
+
+    for (bits = 1; bits <= FLINT_BITS; bits++)
+    {
+        mp_bitcnt_t new_bits = FLINT_MAX(bits, MPOLY_MIN_BITS);
+        while (new_bits < FLINT_BITS && mctx->lut_words_per_exp[new_bits - 1]
+                                       == mctx->lut_words_per_exp[new_bits])
+        {
+            new_bits++;
+        }
+        mctx->lut_fix_bits[bits - 1] = new_bits;
+    }
+
 }

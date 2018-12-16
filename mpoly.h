@@ -55,6 +55,7 @@ typedef struct
     int deg;        /* is ord a degree ordering? */
     int rev;        /* is ord a reversed ordering? */
     slong lut_words_per_exp[FLINT_BITS];
+    unsigned char lut_fix_bits[FLINT_BITS]; /* FLINT_BITS < 256 */
 } mpoly_ctx_struct;
 
 typedef mpoly_ctx_struct mpoly_ctx_t[1];
@@ -67,7 +68,12 @@ FLINT_DLL void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state, mp_b
 
 FLINT_DLL void mpoly_ctx_clear(mpoly_ctx_t mctx);
 
-/* number of words used by an exponent vector when bits <= FLINT_BITS */
+/*
+    number of words used by an exponent vector packed into "bits" bits:
+    we must have either
+        (mp) bits > FLINT_BITS and bits % FLINT_BITS == 0, or
+        (sp) MPOLY_MIN_BITS <= bits <= FLINT_BITS
+*/
 MPOLY_INLINE
 slong mpoly_words_per_exp_sp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
@@ -78,7 +84,6 @@ slong mpoly_words_per_exp_sp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
     return mctx->lut_words_per_exp[bits - 1];
 }
 
-/* number of words used by an exponent vector when bits > FLINT_BITS */
 MPOLY_INLINE
 slong mpoly_words_per_exp_mp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
@@ -86,8 +91,8 @@ slong mpoly_words_per_exp_mp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
     return bits/FLINT_BITS*mctx->nfields;
 }
 
-/* number of words used by an exponent vector */
-MPOLY_INLINE slong mpoly_words_per_exp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+MPOLY_INLINE
+slong mpoly_words_per_exp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     if (bits <= FLINT_BITS)
         return mpoly_words_per_exp_sp(bits, mctx);
@@ -95,7 +100,23 @@ MPOLY_INLINE slong mpoly_words_per_exp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
         return mpoly_words_per_exp_mp(bits, mctx);
 }
 
-FLINT_DLL mp_bitcnt_t mpoly_fix_bits(mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+/*
+    If "bits" is simply the number of bits needed to pack an exponent vector,
+    possibly upgrade it so that it is either
+        (mp) a multiple of FLINT_BITS in the mp case, or
+        (sp) as big as possible without increasing words_per_exp in the sp case
+    The upgrade in (mp) is manditory, while the upgrade in (sp) is simply nice.
+*/
+MPOLY_INLINE
+mp_bitcnt_t mpoly_fix_bits(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+{
+    FLINT_ASSERT(bits > 0);
+    if (bits <= FLINT_BITS)
+        return mctx->lut_fix_bits[bits - 1];
+    else
+        return (bits + FLINT_BITS - 1)/FLINT_BITS*FLINT_BITS;
+}
+
 
 /* heaps *********************************************************************/
 typedef struct mpoly_heap_t
