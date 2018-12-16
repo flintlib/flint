@@ -66,13 +66,15 @@ FLINT_DLL void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state, mp_b
 
 FLINT_DLL void mpoly_ctx_clear(mpoly_ctx_t mctx);
 
-MPOLY_INLINE slong mpoly_words_per_exp(slong bits, const mpoly_ctx_t mctx)
+MPOLY_INLINE slong mpoly_words_per_exp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     if (bits <= FLINT_BITS)
         return ((mctx->nfields) - 1)/(FLINT_BITS/(bits)) + 1;
     else
         return (bits + FLINT_BITS - 1)/FLINT_BITS*mctx->nfields;
 }
+
+FLINT_DLL mp_bitcnt_t mpoly_fix_bits(mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 /* heaps *********************************************************************/
 typedef struct mpoly_heap_t
@@ -610,8 +612,6 @@ FLINT_DLL mp_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
                                                        const mpoly_ctx_t mctx);
 FLINT_DLL mp_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
                                                        const mpoly_ctx_t mctx);
-
-FLINT_DLL slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
                                                      slong nfields, slong len);

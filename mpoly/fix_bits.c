@@ -14,7 +14,7 @@
 /*
     ensure that bits is a valid (or good) number of bits
 */
-slong mpoly_fix_bits(slong bits, const mpoly_ctx_t mctx) {
+mp_bitcnt_t mpoly_fix_bits(mp_bitcnt_t bits, const mpoly_ctx_t mctx) {
     slong nfields = mctx->nfields;
     if (bits <= FLINT_BITS)
     {
