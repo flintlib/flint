@@ -13,9 +13,12 @@
 
 void mpoly_ctx_init(mpoly_ctx_t mctx, slong nvars, const ordering_t ord)
 {
+    mp_bitcnt_t bits;
+
     mctx->nvars = nvars;
     mctx->ord = ord;
-    switch (ord) {
+    switch (ord)
+    {
         case ORD_LEX:
             mctx->deg = 0;
             mctx->rev = 0;
@@ -32,4 +35,10 @@ void mpoly_ctx_init(mpoly_ctx_t mctx, slong nvars, const ordering_t ord)
             flint_throw(FLINT_ERROR, "Invalid ordering in mpoly_ctx_init");
     }
     mctx->nfields = mctx->nvars + mctx->deg;
+
+    for (bits = 1; bits <= FLINT_BITS; bits++)
+    {
+        mctx->lut_words_per_exp[bits - 1]
+                                   = (mctx->nfields - 1)/(FLINT_BITS/bits) + 1;
+    }
 }

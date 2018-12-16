@@ -54,6 +54,7 @@ typedef struct
     ordering_t ord; /* monomial ordering */
     int deg;        /* is ord a degree ordering? */
     int rev;        /* is ord a reversed ordering? */
+    slong lut_words_per_exp[FLINT_BITS];
 } mpoly_ctx_struct;
 
 typedef mpoly_ctx_struct mpoly_ctx_t[1];
@@ -66,12 +67,32 @@ FLINT_DLL void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state, mp_b
 
 FLINT_DLL void mpoly_ctx_clear(mpoly_ctx_t mctx);
 
+/* number of words used by an exponent vector when bits <= FLINT_BITS */
+MPOLY_INLINE
+slong mpoly_words_per_exp_sp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+{
+    FLINT_ASSERT(0 < bits);
+    FLINT_ASSERT(bits <= FLINT_BITS);
+    FLINT_ASSERT(mctx->lut_words_per_exp[bits - 1]
+                 == (mctx->nfields - 1)/(FLINT_BITS/bits) + 1);
+    return mctx->lut_words_per_exp[bits - 1];
+}
+
+/* number of words used by an exponent vector when bits > FLINT_BITS */
+MPOLY_INLINE
+slong mpoly_words_per_exp_mp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+{
+    FLINT_ASSERT(bits % FLINT_BITS == 0);
+    return bits/FLINT_BITS*mctx->nfields;
+}
+
+/* number of words used by an exponent vector */
 MPOLY_INLINE slong mpoly_words_per_exp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     if (bits <= FLINT_BITS)
-        return ((mctx->nfields) - 1)/(FLINT_BITS/(bits)) + 1;
+        return mpoly_words_per_exp_sp(bits, mctx);
     else
-        return (bits + FLINT_BITS - 1)/FLINT_BITS*mctx->nfields;
+        return mpoly_words_per_exp_mp(bits, mctx);
 }
 
 FLINT_DLL mp_bitcnt_t mpoly_fix_bits(mp_bitcnt_t bits, const mpoly_ctx_t mctx);
