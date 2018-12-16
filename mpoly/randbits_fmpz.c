@@ -9,8 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-
 #include "mpoly.h"
+
+/* this file DOES NOT need to change with new orderings */
 
 /*
     Get a user exponent "exp"' such that it can be packed into "exp_bits" bits.

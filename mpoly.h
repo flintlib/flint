@@ -221,19 +221,6 @@ void mpoly_ordering_print(ordering_t ord)
    }
 }
 
-/* Misc **********************************************************************/
-FLINT_DLL void mpoly_gen_offset_shift(
-                                slong * _offset, slong * _shift, slong var,
-                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
-FLINT_DLL void mpoly_gen_oneexp_offset_shift(ulong * oneexp,
-                                slong * offset, slong * shift, slong var, 
-                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
-FLINT_DLL slong mpoly_gen_offset_mp(slong var,
-                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
-FLINT_DLL void mpoly_gen_oneexp_offset_mp(ulong * oneexp,
-                                        slong * offset, slong var,
-                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
-
 /*  Monomials ****************************************************************/
 
 MPOLY_INLINE
@@ -640,6 +627,37 @@ void mpoly_max_degrees_tight(slong * max_exp,
 }
 
 
+/* generators ****************************************************************/
+
+FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var,
+                                                       const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gen_fields_fmpz(fmpz * exp, slong var,
+                                                       const mpoly_ctx_t mctx);
+
+FLINT_DLL mp_bitcnt_t mpoly_gen_bits_required(slong var, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gen_offset_shift(
+                                slong * _offset, slong * _shift, slong var,
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gen_oneexp_offset_shift(ulong * oneexp,
+                                slong * offset, slong * shift, slong var, 
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gen_monomial_sp(ulong * oneexp, slong var,
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL slong mpoly_gen_offset_mp(slong var, slong N, mp_bitcnt_t bits,
+                                                       const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gen_oneexp_offset_mp(ulong * oneexp,
+                                        slong * offset, slong var,
+                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gen_monomial_mp(ulong * oneexp, slong var, mp_bitcnt_t bits,
+                                                       const mpoly_ctx_t mctx);
+
 /* Monomial arrays ***********************************************************/
 
 FLINT_DLL void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
@@ -696,9 +714,6 @@ FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
 
 FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
                  const ulong * exp, slong len, slong N, const ulong * cmpmask);
-
-FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx);
-FLINT_DLL void mpoly_gen_fields_fmpz(fmpz * exp, slong var, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_min_fields_ui(ulong * min_fields, const ulong * poly_exps,
                           slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
