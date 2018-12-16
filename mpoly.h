@@ -646,15 +646,11 @@ FLINT_DLL void mpoly_gen_monomial_offset_shift_sp(ulong * mexp, slong * offset,
 FLINT_DLL void mpoly_gen_monomial_sp(ulong * oneexp, slong var,
                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
-FLINT_DLL slong mpoly_gen_offset_mp(slong var, slong N, mp_bitcnt_t bits,
-                                                       const mpoly_ctx_t mctx);
+FLINT_DLL slong mpoly_gen_offset_mp(slong var, 
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_gen_oneexp_offset_mp(ulong * oneexp,
-                                        slong * offset, slong var,
-                            slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
-
-FLINT_DLL void mpoly_gen_monomial_mp(ulong * oneexp, slong var, mp_bitcnt_t bits,
-                                                       const mpoly_ctx_t mctx);
+FLINT_DLL slong mpoly_gen_monomial_offset_mp(ulong * mexp, slong var,
+                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 /* Monomial arrays ***********************************************************/
 

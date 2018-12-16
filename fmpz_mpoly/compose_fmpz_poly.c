@@ -308,7 +308,7 @@ void _fmpz_mpoly_compose_fmpz_poly_mp(fmpz_poly_t A, const fmpz_mpoly_t B,
         if (i == main_var)
             continue;
 
-        off = mpoly_gen_offset_mp(i, N, bits, ctx->minfo);
+        off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
 
         for (l = 0; l < bitcounts[i]; l++)
         {
@@ -326,7 +326,7 @@ void _fmpz_mpoly_compose_fmpz_poly_mp(fmpz_poly_t A, const fmpz_mpoly_t B,
     FLINT_ASSERT(k_len == entries);
 
     /* accumulate coefficients of the main variable */
-    main_off = mpoly_gen_offset_mp(main_var, N, bits, ctx->minfo);
+    main_off = mpoly_gen_offset_mp(main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     fmpz_poly_init(t);
     fmpz_poly_init(t2);

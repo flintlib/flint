@@ -211,7 +211,7 @@ int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
         fmpz_t c;
         fmpz_init(c);
 
-        mpoly_gen_oneexp_offset_mp(one, &off, var, N, bits, ctx->minfo);
+        off = mpoly_gen_monomial_offset_mp(one, var, bits, ctx->minfo);
 
         poly1->length = 0;
         poly1->var = var;
@@ -219,7 +219,10 @@ int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
         {
             fmpz_set_ui_array(c, exp + N*i + off, bits/FLINT_BITS);
             if (!fmpz_fits_si(c))
+            {
+                fmpz_clear(c);
                 goto failed;
+            }
             k = fmpz_get_si(c);
             xk = _fmpz_mpoly_univar_get_coeff(poly1, k, bits, ctx);
             xk_len = xk->length;

@@ -83,66 +83,47 @@ void mpoly_gen_monomial_sp(ulong * mexp, slong var, mp_bitcnt_t bits,
 }
 
 /* get the offset where the variable of index var is stored */
-slong mpoly_gen_offset_mp(slong idx, slong N, mp_bitcnt_t bits,
-                                                        const mpoly_ctx_t mctx)
+slong mpoly_gen_offset_mp(slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
-    slong wpf = bits/FLINT_BITS;
+    ulong wpf = bits/FLINT_BITS;
+    ulong idx;
 
     FLINT_ASSERT(bits > FLINT_BITS);
     FLINT_ASSERT(bits % FLINT_BITS == WORD(0));
 
+    idx = var;
     if (!mctx->rev)
         idx = nvars - 1 - idx;
+
     return idx*wpf;
 }
 
 /* additionally get the monomial as well */
-void mpoly_gen_oneexp_offset_mp(ulong * oneexp, slong * offset,
-                  slong idx, slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
-{
-    slong nvars = mctx->nvars;
-    slong wpf = bits/FLINT_BITS;
-    slong i;
-
-    FLINT_ASSERT(bits > FLINT_BITS);
-    FLINT_ASSERT(bits % FLINT_BITS == WORD(0));
-
-    for (i = 0; i < N; i++)
-        oneexp[i] = 0;
-
-    if (!mctx->rev)
-        idx = nvars - 1 - idx;
-
-    *offset = idx*wpf;
-
-    oneexp[idx*wpf] = UWORD(1);
-    if (mctx->deg)
-        oneexp[nvars*wpf] = UWORD(1);
-}
-
-/* just get the monomial */
-void mpoly_gen_monomial_mp(ulong * oneexp, slong var, mp_bitcnt_t bits,
-                                                        const mpoly_ctx_t mctx)
+slong mpoly_gen_monomial_offset_mp(ulong * mexp,
+                           slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     ulong nvars = mctx->nvars;
     ulong wpf = bits/FLINT_BITS;
     ulong idx;
-    slong i, N;
+    slong i, N, offset;
 
     FLINT_ASSERT(bits > FLINT_BITS);
     FLINT_ASSERT(bits % FLINT_BITS == WORD(0));
 
     N = mpoly_words_per_exp_mp(bits, mctx);
     for (i = 0; i < N; i++)
-        oneexp[i] = 0;
+        mexp[i] = 0;
 
     idx = var;
     if (!mctx->rev)
         idx = nvars - 1 - var;
 
-    oneexp[idx*wpf] = UWORD(1);
-    if (mctx->deg)
-        oneexp[nvars*wpf] = UWORD(1);
-}
+    offset = idx*wpf;
 
+    mexp[idx*wpf] = UWORD(1);
+    if (mctx->deg)
+        mexp[nvars*wpf] = UWORD(1);
+
+    return offset;
+}

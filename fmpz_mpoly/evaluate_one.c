@@ -251,7 +251,7 @@ void _fmpz_mpoly_evaluate_one_fmpz_mp(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     N = mpoly_words_per_exp(bits, ctx->minfo);
     main_one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_mp(main_one, &main_off, var, N, bits, ctx->minfo);
+    main_off = mpoly_gen_monomial_offset_mp(main_one, var, bits, ctx->minfo);
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
 
     /* scan poly2 and put powers of var into tree */

@@ -268,7 +268,7 @@ void _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
         if (i == main_var)
             continue;
 
-        off = mpoly_gen_offset_mp(i, N, bits, ctx->minfo);
+        off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
         varibits = fmpz_bits(degrees + i);
         if (varibits >= FLINT_BITS && !fmpz_is_zero(vals[i])
                                   && !fmpz_is_pm1(vals[i]))
@@ -291,7 +291,7 @@ void _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
     FLINT_ASSERT(k_len == entries);
 
     /* accumulate coefficients of the main variable */
-    main_off = mpoly_gen_offset_mp(main_var, N, bits, ctx->minfo);
+    main_off = mpoly_gen_offset_mp(main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     fmpz_init(t);
     fmpz_init(main_exp);

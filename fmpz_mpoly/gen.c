@@ -27,7 +27,7 @@ void fmpz_mpoly_gen(fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
     if (bits <= FLINT_BITS)
         mpoly_gen_monomial_sp(A->exps, var, bits, ctx->minfo);
     else
-        mpoly_gen_monomial_mp(A->exps, var, bits, ctx->minfo);
+        mpoly_gen_monomial_offset_mp(A->exps, var, bits, ctx->minfo);
 
     _fmpz_mpoly_set_length(A, WORD(1), ctx);
 }

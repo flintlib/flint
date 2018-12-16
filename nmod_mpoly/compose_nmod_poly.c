@@ -318,7 +318,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
         if (i == main_var)
             continue;
 
-        off = mpoly_gen_offset_mp(i, N, bits, ctx->minfo);
+        off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
 
         for (l = 0; l < bitcounts[i]; l++)
         {
@@ -338,7 +338,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
     FLINT_ASSERT(k_len == entries);
 
     /* accumulate coefficients of the main variable */
-    main_off = mpoly_gen_offset_mp(main_var, N, bits, ctx->minfo);
+    main_off = mpoly_gen_offset_mp(main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     nmod_poly_init_mod(t, ctx->ffinfo->mod);
     nmod_poly_init_mod(t2, ctx->ffinfo->mod);

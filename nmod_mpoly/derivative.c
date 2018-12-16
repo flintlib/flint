@@ -98,7 +98,7 @@ void nmod_mpoly_derivative(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                   bits, N, offset, shift, oneexp, ctx->ffinfo);
     } else
     {
-        mpoly_gen_oneexp_offset_mp(oneexp, &offset, var, N, bits, ctx->minfo);
+        offset = mpoly_gen_monomial_offset_mp(oneexp, var, bits, ctx->minfo);
 
         len1 = _nmod_mpoly_derivative_mp(poly1->coeffs, poly1->exps,
                                   poly2->coeffs, poly2->exps, poly2->length,

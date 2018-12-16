@@ -161,7 +161,7 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
     {
         FLINT_ASSERT(k < entries);
         
-        off = mpoly_gen_offset_mp(i, N, bits, ctx->minfo);
+        off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
         NMOD_RED(t, vals[i], ctx->ffinfo->mod);
         for (l = 0; l < bits; l++)
         {
