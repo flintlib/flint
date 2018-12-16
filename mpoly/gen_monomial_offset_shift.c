@@ -13,17 +13,19 @@
 
 /* !!! this file DOES need to change with new orderings */
 
-/* get the offset and shift where the variable of index var is stored */
-void mpoly_gen_offset_shift(slong * offset, slong * shift,
-                  slong idx, slong N, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+/* get the offset and shift where variable var is stored in packed form */
+void mpoly_gen_offset_shift_sp(slong * offset, slong * shift, slong var,
+                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
-    slong fpw = FLINT_BITS/bits;
+    ulong fpw = FLINT_BITS/bits;
+    ulong idx;
 
     FLINT_ASSERT(bits <= FLINT_BITS);
 
+    idx = var;
     if (!mctx->rev)
-        idx = nvars - 1 - idx;
+        idx = nvars - 1 - var;
 
     *offset = idx/fpw;
     *shift  = idx%fpw*bits;

@@ -121,7 +121,7 @@ void _fmpz_mpoly_evaluate_all_fmpz_sp(fmpz_t ev, const fmpz_mpoly_t A,
         if (i == main_var)
             continue;
 
-        mpoly_gen_offset_shift(&off, &shift, i, N, bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
         varibits = FLINT_BIT_COUNT(degrees[i]);
         for (j = 0; j < varibits; j++)
         {
@@ -139,7 +139,7 @@ void _fmpz_mpoly_evaluate_all_fmpz_sp(fmpz_t ev, const fmpz_mpoly_t A,
     FLINT_ASSERT(k_len == entries);
 
     /* accumulate coefficients of the main variable */
-    mpoly_gen_offset_shift(&main_off, &main_shift, main_var, N, bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&main_off, &main_shift, main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     fmpz_init(t);
     mask = (-UWORD(1)) >> (FLINT_BITS - bits);

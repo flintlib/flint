@@ -31,8 +31,8 @@ void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
     FLINT_ASSERT(len > 0);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-    mpoly_gen_offset_shift(&off, &shift, var, N, bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&off, &shift, var, bits, ctx->minfo);
 
     nmod_poly_zero(A);
     mask = (-UWORD(1)) >> (FLINT_BITS - bits);
@@ -57,7 +57,7 @@ void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
         for (v = 0; v < ctx->minfo->nvars; v++)
         {
             ulong k;
-            mpoly_gen_offset_shift(&off, &shift, v, N, bits, ctx->minfo);
+            mpoly_gen_offset_shift_sp(&off, &shift, v, bits, ctx->minfo);
             k = (exp[N*i + off] >> shift) & mask;
             FLINT_ASSERT(   (v == var && k >= Bshift[v])
                          || (v != var && k == Bshift[v]));
@@ -93,7 +93,7 @@ void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
     /* must have at least space for the highest exponent of var */
     FLINT_ASSERT(1 + FLINT_BIT_COUNT(Ashift[var] + Bdeg*Astride[var]) <= Abits);
 
-    N = mpoly_words_per_exp(Abits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(Abits, ctx->minfo);
     strideexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     shiftexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_set_monomial_ui(shiftexp, Ashift, Abits, ctx->minfo);

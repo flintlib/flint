@@ -66,7 +66,7 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
     for (i = 0; i < nvars; i++)
     {
         FLINT_ASSERT(k < entries);
-        mpoly_gen_offset_shift(&off, &shift, i, N, bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
         NMOD_RED(t, vals[i], ctx->ffinfo->mod);
         for (l = 0; l < bits; l++)
         {

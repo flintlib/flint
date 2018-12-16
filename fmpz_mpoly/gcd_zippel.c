@@ -349,13 +349,6 @@ finished:
 
 
 
-
-
-
-
-
-
-
 void fmpz_mpoly_to_fmpz_poly_keepbits(fmpz_poly_t A, slong * Ashift,
                const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
 {
@@ -365,8 +358,10 @@ void fmpz_mpoly_to_fmpz_poly_keepbits(fmpz_poly_t A, slong * Ashift,
     ulong * exp = B->exps;
     mp_bitcnt_t bits = B->bits;
 
+    FLINT_ASSERT(bits <= FLINT_BITS);
+
     N = mpoly_words_per_exp(bits, ctx->minfo);
-    mpoly_gen_offset_shift(&off, &shift, var, N, bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&off, &shift, var, bits, ctx->minfo);
 
     fmpz_poly_zero(A);
     if (len > 0)

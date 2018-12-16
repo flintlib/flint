@@ -207,7 +207,6 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     slong * offs;
     ulong * masks;
     mp_limb_t * powers;
-    slong N;
     TMP_INIT;
 
     FLINT_ASSERT(A->length > 0);
@@ -310,7 +309,6 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
     masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
     powers = (mp_limb_t *) TMP_ALLOC(entries*sizeof(mp_limb_t));
-    N = mpoly_words_per_exp(f->bits, ctx->minfo);
 
 
     /***** evaluation loop head *******/
@@ -332,7 +330,7 @@ pick_evaluation_point:
     for (i = 0; i < var; i++)
     {
         slong shift, off;
-        mpoly_gen_offset_shift(&off, &shift, i, N, f->bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, i, f->bits, ctx->minfo);
         for (j = 0; j < f->bits; j++)
         {
             offs[f->bits*i + j] = off;
@@ -1686,7 +1684,7 @@ void nmod_mpoly_to_nmod_poly_keepbits(nmod_poly_t A, slong * Ashift,
     FLINT_ASSERT(bits <= FLINT_BITS);
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
-    mpoly_gen_offset_shift(&off, &shift, var, N, bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&off, &shift, var, bits, ctx->minfo);
 
     nmod_poly_zero(A);
     if (len > 0)
