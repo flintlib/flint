@@ -29,6 +29,7 @@ void nmod_mpoly_gen(nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
     _nmod_mpoly_set_length(A, WORD(1), ctx);
 
     bits = mpoly_exp_bits_required_ui(mon, ctx->minfo);
+    bits = mpoly_fix_bits(bits, ctx->minfo);
     nmod_mpoly_fit_bits(A, bits, ctx);
     mpoly_set_monomial_ui(A->exps, mon, A->bits, ctx->minfo);
 

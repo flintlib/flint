@@ -11,6 +11,8 @@
 
 #include "mpoly.h"
 
+/* !!! this file DOES need to change with new orderings */
+
 /*
     compute number of bits required to store user_exp in packed format
     the returned number of bits includes space for a zero'd signed bit
@@ -18,29 +20,28 @@
 mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
                                                         const mpoly_ctx_t mctx)
 {
-    int deg = mctx->deg;
-    slong i, exp_bits, nfields = mctx->nfields;
-    ulong max = 0;
+    slong i, nfields = mctx->nfields;
+    ulong max;
 
-    if (deg)
+    max = user_exp[0];
+    if (mctx->deg)
     {
-        for (i = 0; i < nfields - 1; i++)
+        for (i = 1; i < nfields - 1; i++)
         {
             max += user_exp[i];
             if (max < user_exp[i])
                 return 2*FLINT_BITS;
         }
-    } else
+    }
+    else
     {
-        for (i = 0; i < nfields; i++)
+        for (i = 1; i < nfields; i++)
         {
-            if (max < user_exp[i])
-                max = user_exp[i];
+            max |= user_exp[i];
         }
     }
 
-    exp_bits = FLINT_MAX(MPOLY_MIN_BITS, FLINT_BIT_COUNT(max) + 1);
-    return exp_bits;
+    return 1 + FLINT_BIT_COUNT(max);
 }
 
 /*
@@ -50,26 +51,29 @@ mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
 mp_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
                                                         const mpoly_ctx_t mctx)
 {
-    int deg = mctx->deg;
-    slong i, exp_bits, nvars = mctx->nvars;
-    fmpz_t max;
-    fmpz_init_set_ui(max, UWORD(0));
+    slong i, nvars = mctx->nvars;
+    mp_bitcnt_t exp_bits;
 
-    if (deg)
+    if (mctx->deg)
     {
-        for (i = 0; i < nvars; i++)
-            fmpz_add(max, max, user_exp + i);
-
-    } else
-    {
-        for (i = 0; i < nvars; i++)
-            if (fmpz_cmp(max, user_exp + i) < 0)
-                fmpz_set(max, user_exp + i);
+        fmpz_t deg;
+        fmpz_init_set(deg, user_exp + 0);
+        for (i = 1; i < nvars; i++)
+        {
+            fmpz_add(deg, deg, user_exp + i);
+        }
+        exp_bits = 1 + fmpz_bits(deg);
+        fmpz_clear(deg);
     }
-
-    exp_bits = fmpz_bits(max) + 1;
-
-    fmpz_clear(max);
+    else
+    {
+        exp_bits = fmpz_bits(user_exp + 0);
+        for (i = 1; i < nvars; i++)
+        {
+            exp_bits = FLINT_MAX(exp_bits, fmpz_bits(user_exp + i));
+        }
+        exp_bits += 1;
+    }
 
     return exp_bits;
 }
@@ -81,26 +85,29 @@ mp_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
 mp_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
                                                         const mpoly_ctx_t mctx)
 {
-    int deg = mctx->deg;
-    slong i, exp_bits, nvars = mctx->nvars;
-    fmpz_t max;
-    fmpz_init_set_ui(max, UWORD(0));
+    slong i, nvars = mctx->nvars;
+    mp_bitcnt_t exp_bits;
 
-    if (deg)
+    if (mctx->deg)
     {
-        for (i = 0; i < nvars; i++)
-            fmpz_add(max, max, user_exp[i]);
-
-    } else
-    {
-        for (i = 0; i < nvars; i++)
-            if (fmpz_cmp(max, user_exp[i]) < 0)
-                fmpz_set(max, user_exp[i]);
+        fmpz_t deg;
+        fmpz_init_set(deg, user_exp[0]);
+        for (i = 1; i < nvars; i++)
+        {
+            fmpz_add(deg, deg, user_exp[i]);
+        }
+        exp_bits = 1 + fmpz_bits(deg);
+        fmpz_clear(deg);
     }
-
-    exp_bits = fmpz_bits(max) + 1;
-
-    fmpz_clear(max);
+    else
+    {
+        exp_bits = fmpz_bits(user_exp[0]);
+        for (i = 1; i < nvars; i++)
+        {
+            exp_bits = FLINT_MAX(exp_bits, fmpz_bits(user_exp[i]));
+        }
+        exp_bits += 1;
+    }
 
     return exp_bits;
 }
