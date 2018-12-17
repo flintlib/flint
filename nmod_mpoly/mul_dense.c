@@ -119,6 +119,8 @@ int nmod_mpoly_mul_dense(nmod_mpoly_t P,
     nmod_mpoly_convert_from_nmod_mpolyd(P, ctx, Pd, dctx);
     nmod_mpolyd_clear(Pd);
 
+    nmod_mpolyd_ctx_clear(dctx);
+
 done:
     TMP_END;
     return success;

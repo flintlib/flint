@@ -9,38 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
-
-
-/*
-    like _fmpz_vec_content, but "start" is included in the content, and we bail
-    as soon as the content is known
-*/
-void _fmpz_vec_content1(fmpz_t res, fmpz_t start, const fmpz * vec, slong len)
-{
-    slong i;
-    fmpz_set(res, start);
-    for (i = 0; i < len; i++)
-    {
-        fmpz_gcd(res, res, vec + i);
-        if (fmpz_is_one(res))
-        {
-            return;
-        }
-    }
-}
+#include "nmod_mpoly.h"
 
 /*
     It is assumed that A is not zero, and B is a monomial.
     This function is always successful and always returns 1.
     G is packed into bits = Gbits
 */
-int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, mp_bitcnt_t Gbits, 
-                                const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                    const fmpz_mpoly_ctx_t ctx)
+int _nmod_mpoly_gcd_monomial(nmod_mpoly_t G, mp_bitcnt_t Gbits, 
+                                const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                    const nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    fmpz_t g;
     fmpz * minAfields, * minAdegs, * minBdegs;
     TMP_INIT;
 
@@ -70,17 +50,12 @@ int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     /* compute the degree of each variable in G */
     _fmpz_vec_min_inplace(minBdegs, minAdegs, ctx->minfo->nvars);
 
-    fmpz_mpoly_fit_length(G, 1, ctx);
-    fmpz_mpoly_fit_bits(G, Gbits, ctx);
+    nmod_mpoly_fit_length(G, 1, ctx);
+    nmod_mpoly_fit_bits(G, Gbits, ctx);
     G->bits = Gbits;
     mpoly_set_monomial_ffmpz(G->exps, minBdegs, Gbits, ctx->minfo);
-
-    fmpz_init(g);
-    _fmpz_vec_content1(g, B->coeffs + 0, A->coeffs, A->length);
-    fmpz_swap(G->coeffs + 0, g);
-    fmpz_clear(g);
-
-    _fmpz_mpoly_set_length(G, 1, ctx);
+    G->coeffs[0] = UWORD(1);
+    _nmod_mpoly_set_length(G, 1, ctx);
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {

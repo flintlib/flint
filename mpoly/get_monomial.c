@@ -13,6 +13,8 @@
 #include "flint.h"
 #include "mpoly.h"
 
+/* !!! this file DOES need to change with new orderings */
+
 /*
     poly_exps (when unpacked) must contain the exponent of each variable in
     some field. These functions should place the exponent of each variable

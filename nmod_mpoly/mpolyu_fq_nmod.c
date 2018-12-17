@@ -214,7 +214,6 @@ void fq_nmod_mpoly_cvtfrom_poly_notmain(fq_nmod_mpoly_t A, fq_nmod_poly_t a,
     slong i;
     slong k;
     ulong * oneexp;
-    slong offset, shift;
     slong N;
     TMP_INIT;
     TMP_START;
@@ -222,8 +221,7 @@ void fq_nmod_mpoly_cvtfrom_poly_notmain(fq_nmod_mpoly_t A, fq_nmod_poly_t a,
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
     oneexp = (ulong *)TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift, var, N, A->bits,
-                                                                   ctx->minfo);
+    mpoly_gen_monomial_sp(oneexp, var, A->bits, ctx->minfo);
 
     fq_nmod_mpoly_fit_length(A, fq_nmod_poly_length(a, ctx->fqctx), ctx);
 

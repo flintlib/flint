@@ -784,16 +784,8 @@ FLINT_DLL void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+
 /* GCD ***********************************************************************/
-
-FLINT_DLL void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride, 
-                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_deflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-          const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-          const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -819,6 +811,16 @@ FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors(fmpz_mpoly_t G,
                                 const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride,
+                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_deflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+          const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+          const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
+
+
 /******************************************************************************
 
    Internal functions (guaranteed to change without notice)
@@ -832,12 +834,6 @@ FLINT_DLL void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A,
 FLINT_DLL void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
        mp_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
                             const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_gen_shift_right(fmpz_mpoly_t A, slong var,
-                                     ulong amount, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_gen_shift_left(fmpz_mpoly_t A, slong var,
-                                     ulong amount, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                 mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);

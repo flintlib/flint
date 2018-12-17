@@ -262,7 +262,6 @@ nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(fq_nmod_mpolyu_t G,
     slong * offs;
     ulong * masks;
     fq_nmod_struct * powers;
-    slong N;
     fq_nmod_t ck;
     TMP_INIT;
 
@@ -382,7 +381,6 @@ nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(fq_nmod_mpolyu_t G,
     for (i = 0; i < entries; i++)
         fq_nmod_init(powers + i, ctx->fqctx);
 
-    N = mpoly_words_per_exp(f->bits, ctx->minfo);
 
     /***** evaluation loop head *******/
     eval_points_tried = 0;
@@ -402,7 +400,7 @@ pick_evaluation_point:
     for (i = 0; i < var; i++)
     {
         slong shift, off;
-        mpoly_gen_offset_shift(&off, &shift, i, N, f->bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, i, f->bits, ctx->minfo);
         for (j = 0; j < f->bits; j++)
         {
             offs[f->bits*i + j] = off;
@@ -643,6 +641,9 @@ pick_evaluation_point:
             fq_nmod_mul(u, W + l*s + i, Msol->rows[i] + 0, ctx->fqctx);
             if (!fq_nmod_equal(acc, u, ctx->fqctx))
             {
+                fq_nmod_clear(acc, ctx->fqctx);
+                fq_nmod_clear(pp, ctx->fqctx);
+                fq_nmod_clear(u, ctx->fqctx);
                 success = nmod_gcds_no_solution;
                 goto finished;
             }

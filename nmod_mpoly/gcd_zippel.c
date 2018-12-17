@@ -207,7 +207,6 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     slong * offs;
     ulong * masks;
     mp_limb_t * powers;
-    slong N;
     TMP_INIT;
 
     FLINT_ASSERT(A->length > 0);
@@ -310,7 +309,6 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
     masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
     powers = (mp_limb_t *) TMP_ALLOC(entries*sizeof(mp_limb_t));
-    N = mpoly_words_per_exp(f->bits, ctx->minfo);
 
 
     /***** evaluation loop head *******/
@@ -332,7 +330,7 @@ pick_evaluation_point:
     for (i = 0; i < var; i++)
     {
         slong shift, off;
-        mpoly_gen_offset_shift(&off, &shift, i, N, f->bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, i, f->bits, ctx->minfo);
         for (j = 0; j < f->bits; j++)
         {
             offs[f->bits*i + j] = off;
@@ -1686,7 +1684,7 @@ void nmod_mpoly_to_nmod_poly_keepbits(nmod_poly_t A, slong * Ashift,
     FLINT_ASSERT(bits <= FLINT_BITS);
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
-    mpoly_gen_offset_shift(&off, &shift, var, N, bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&off, &shift, var, bits, ctx->minfo);
 
     nmod_poly_zero(A);
     if (len > 0)
@@ -1707,7 +1705,7 @@ void nmod_mpoly_to_nmod_poly_keepbits(nmod_poly_t A, slong * Ashift,
 void nmod_mpoly_from_nmod_poly_keepbits(nmod_mpoly_t A, const nmod_poly_t B,
                            slong Bshift, slong var, mp_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
 {
-    slong shift, off, N;
+    slong N;
     slong k;
     slong Alen;
     mp_limb_t * Acoeff;
@@ -1718,14 +1716,15 @@ void nmod_mpoly_from_nmod_poly_keepbits(nmod_mpoly_t A, const nmod_poly_t B,
 
     TMP_START;
 
+    FLINT_ASSERT(bits <= FLINT_BITS);
     FLINT_ASSERT(!nmod_poly_is_zero(B));
     FLINT_ASSERT(Bshift >= 0);
     FLINT_ASSERT(Bshift + nmod_poly_degree(B) >= 0);
     FLINT_ASSERT(1 + FLINT_BIT_COUNT(Bshift + nmod_poly_degree(B)) <= bits);
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
+    mpoly_gen_monomial_sp(one, var, bits, ctx->minfo);
 
     nmod_mpoly_fit_bits(A, bits, ctx);
     A->bits = bits;

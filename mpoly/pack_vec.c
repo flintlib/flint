@@ -11,6 +11,8 @@
 
 #include "mpoly.h"
 
+/* this file DOES NOT need to change with new orderings */
+
 void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
                                                       slong nfields, slong len)
 {

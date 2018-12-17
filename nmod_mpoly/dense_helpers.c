@@ -135,6 +135,192 @@ done:
     return success;
 }
 
+
+/*
+    m is the number of variables in A
+*/
+void nmod_mpoly_to_nmod_mpolyd_perm_deflate(nmod_mpolyd_t A, slong m,
+              const nmod_mpoly_t B, const slong * perm, const ulong * shift,
+        const ulong * stride, const ulong * degree, const nmod_mpoly_ctx_t ctx)
+{
+    slong n = ctx->minfo->nvars;
+    slong degb_prod;
+    slong i, k, l, N;
+    ulong * Bexp;
+    TMP_INIT;
+
+    FLINT_ASSERT(m <= n);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->length > 0);
+
+    nmod_mpolyd_set_nvars(A, m);
+
+    TMP_START;
+    Bexp = (ulong *) TMP_ALLOC(n*sizeof(slong));
+
+    degb_prod = WORD(1);
+    for (k = 0; k < m; k++)
+    {
+        l = perm[k];
+        FLINT_ASSERT(stride[l] != UWORD(0));
+        FLINT_ASSERT((degree[l] - shift[l]) % stride[l] == UWORD(0));
+        A->deg_bounds[k] = (degree[l] - shift[l])/stride[l] + 1;
+        degb_prod *= A->deg_bounds[k];
+        /* we should not be converting something whose dense size overflows */
+        FLINT_ASSERT(degb_prod > 0);
+        FLINT_ASSERT(degb_prod >= A->deg_bounds[k]);
+    }
+
+    nmod_mpolyd_fit_length(A, degb_prod);
+    for (i = 0; i < degb_prod; i++)
+    {
+        A->coeffs[i] = UWORD(0);
+    }
+
+    N = mpoly_words_per_exp(B->bits, ctx->minfo);
+    for (i = 0; i < B->length; i++)
+    {
+        slong off = 0;
+        mpoly_get_monomial_ui(Bexp, B->exps + N*i, B->bits, ctx->minfo);
+        for (k = 0; k < m; k++)
+        {
+            l = perm[k];
+            FLINT_ASSERT(stride[l] != UWORD(0));
+            FLINT_ASSERT(((Bexp[l] - shift[l]) % stride[l]) == UWORD(0));
+            FLINT_ASSERT((Bexp[l] - shift[l])/stride[l] < A->deg_bounds[k]);
+            off = (Bexp[l] - shift[l])/stride[l] + A->deg_bounds[k]*off;
+        }
+        A->coeffs[off] = B->coeffs[i];
+    }
+
+    TMP_END;
+}
+
+
+void nmod_mpoly_from_nmod_mpolyd_perm_inflate(nmod_mpoly_t A,
+         mp_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx, const nmod_mpolyd_t B,
+                 const slong * perm, const ulong * shift, const ulong * stride)
+{
+    slong off;
+    slong n = ctx->minfo->nvars;
+    slong m = B->nvars;
+    slong Alen;
+    slong i, j, l, k, N;
+    slong perm_nontrivial;
+    ulong topmask;
+    ulong * exps, * pcurexp, * pexps;
+    TMP_INIT;
+
+    FLINT_ASSERT(m <= n);
+    FLINT_ASSERT(Abits <= FLINT_BITS);
+
+    perm_nontrivial = n - m;
+
+    /* we are going to push back terms manually */
+    Alen = 0;
+    nmod_mpoly_zero(A, ctx);
+    nmod_mpoly_fit_bits(A, Abits, ctx);
+    A->bits = Abits;
+
+    N = mpoly_words_per_exp(Abits, ctx->minfo);
+
+    TMP_START;
+
+    /* find exponent vector for all variables in B */
+    pexps = (ulong *) TMP_ALLOC(N*m*sizeof(ulong));
+    for (k = 0; k < m; k++)
+    {
+        l = perm[k];
+        perm_nontrivial |= l - k;
+        mpoly_gen_monomial_sp(pexps + k*N, l, Abits, ctx->minfo);
+        mpoly_monomial_mul_ui(pexps + k*N, pexps + k*N, N, stride[l]);
+    }
+
+    /* get most significant exponent in pcurexp and its vector in exps */
+    pcurexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    exps = (ulong *) TMP_ALLOC(m*sizeof(ulong));
+    off = WORD(1);
+    for (j = 0; j < m; j++)
+    {
+        off *= B->deg_bounds[j];
+    }
+    FLINT_ASSERT(off <= B->coeff_alloc);
+    off--;
+    mpoly_set_monomial_ui(pcurexp, shift, Abits, ctx->minfo);
+    i = off;
+    for (k = m - 1; k >= 0; k--) 
+    {
+        exps[k] = i % B->deg_bounds[k];
+        i = i / B->deg_bounds[k];
+        mpoly_monomial_madd(pcurexp, pcurexp, exps[k], pexps + N*k, N);
+    }
+
+    /* scan down through the exponents */
+    topmask = 0;
+
+    for (; off >= 0; off--)
+    {
+        if (B->coeffs[off] != UWORD(0))
+        {
+            _nmod_mpoly_fit_length(&A->coeffs, &A->exps, &A->alloc, Alen + 1, N);
+            A->coeffs[Alen] = B->coeffs[off];
+            mpoly_monomial_set(A->exps + N*Alen, pcurexp, N);
+            topmask |= pcurexp[N - 1];
+            Alen++;
+        }
+
+        k = m - 1;
+        do {
+            --exps[k];
+            if ((slong)(exps[k]) < WORD(0))
+            {
+                FLINT_ASSERT(off == 0 || k > 0);
+                FLINT_ASSERT(exps[k] == -UWORD(1));
+                exps[k] = B->deg_bounds[k] - 1;
+                mpoly_monomial_madd(pcurexp, pcurexp, exps[k], pexps + N*k, N);
+            }
+            else
+            {
+                mpoly_monomial_sub(pcurexp, pcurexp, pexps + N*k, N);
+                break;
+            }
+        } while (--k >= 0);
+    }
+    _nmod_mpoly_set_length(A, Alen, ctx);
+
+    /* sort the terms if needed */
+    if (ctx->minfo->ord != ORD_LEX || perm_nontrivial != WORD(0))
+    {
+        slong msb;
+        mpoly_get_cmpmask(pcurexp, N, Abits, ctx->minfo);
+        if (topmask != WORD(0))
+        {
+            count_leading_zeros(msb, topmask);
+            msb = (FLINT_BITS - 1)^msb;
+        }
+        else
+        {
+            msb = -WORD(1);
+        }
+        if (N == 1)
+        {
+            if (msb >= WORD(0))
+            {
+                _nmod_mpoly_radix_sort1(A, 0, A->length,
+                                                   msb, pcurexp[0], topmask);
+            }
+        }
+        else
+        {
+            _nmod_mpoly_radix_sort(A, 0, A->length,
+                                        (N - 1)*FLINT_BITS + msb, N, pcurexp);
+        }
+    }
+
+    TMP_END;
+}
+
+
 /*
     convert B to A assuming degree bounds have been set in A
 */

@@ -11,6 +11,7 @@
 
 #include "mpoly.h"
 
+/* !!! this file DOES need to change with new orderings */
 
 void mpoly_set_monomial_ui(ulong * poly_exps, const ulong * user_exps,
                                             slong bits, const mpoly_ctx_t mctx)

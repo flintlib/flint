@@ -19,7 +19,6 @@ void nmod_mpoly_make_monic(nmod_mpoly_t A, const nmod_mpoly_t B,
         flint_throw(FLINT_ERROR, "Zero polynomial in nmod_mpoly_make_monic");
     }
 
-    nmod_mpoly_scalar_mul_ui(A, B, nmod_inv(B->coeffs[0], ctx->ffinfo->mod),
-                                                                          ctx);
+    nmod_mpoly_scalar_mul_nmod_invertible(A, B,
+                                nmod_inv(B->coeffs[0], ctx->ffinfo->mod), ctx);
 }
-

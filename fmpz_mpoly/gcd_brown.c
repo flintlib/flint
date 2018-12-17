@@ -306,7 +306,6 @@ void fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(fmpz_mpoly_t A,
     slong m = B->nvars;
     slong Alen;
     slong i, j, l, k, N;
-    slong of, sh; /* value not used */
     slong perm_nontrivial;
     ulong topmask;
     ulong * exps, * pcurexp, * pexps;
@@ -333,7 +332,7 @@ void fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(fmpz_mpoly_t A,
     {
         l = perm[k];
         perm_nontrivial |= l - k;
-        mpoly_gen_oneexp_offset_shift(pexps + k*N, &of, &sh, l, N, Abits, ctx->minfo);
+        mpoly_gen_monomial_sp(pexps + k*N, l, Abits, ctx->minfo);
         mpoly_monomial_mul_ui(pexps + k*N, pexps + k*N, N, stride[l]);
     }
 
@@ -418,12 +417,7 @@ void fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(fmpz_mpoly_t A,
                                         (N - 1)*FLINT_BITS + msb, N, pcurexp);
         }
     }
-/*
-flint_printf("A->ord = %wd\n", ctx->minfo->ord);
-flint_printf("A bits = %wd = %wd\n", Abits, A->bits);
-printf("A: "); fmpz_mpoly_print_pretty(A, NULL, ctx); printf("\n");
-FLINT_ASSERT(fmpz_mpoly_is_canonical(A, ctx));
-*/
+
     TMP_END;
 }
 

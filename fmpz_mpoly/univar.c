@@ -190,7 +190,8 @@ int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
 
     if (bits <= FLINT_BITS)
     {
-        mpoly_gen_oneexp_offset_shift(one, &off, &shift, var, N, bits, ctx->minfo);
+        mpoly_gen_monomial_offset_shift_sp(one, &off, &shift,
+                                                        var, bits, ctx->minfo);
 
         poly1->length = 0;
         poly1->var = var;
@@ -210,7 +211,7 @@ int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
         fmpz_t c;
         fmpz_init(c);
 
-        mpoly_gen_oneexp_offset_mp(one, &off, var, N, bits, ctx->minfo);
+        off = mpoly_gen_monomial_offset_mp(one, var, bits, ctx->minfo);
 
         poly1->length = 0;
         poly1->var = var;
@@ -218,7 +219,10 @@ int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1, const fmpz_mpoly_t poly2,
         {
             fmpz_set_ui_array(c, exp + N*i + off, bits/FLINT_BITS);
             if (!fmpz_fits_si(c))
+            {
+                fmpz_clear(c);
                 goto failed;
+            }
             k = fmpz_get_si(c);
             xk = _fmpz_mpoly_univar_get_coeff(poly1, k, bits, ctx);
             xk_len = xk->length;
@@ -275,7 +279,6 @@ void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, mp_bitcnt_t bits1,
     fmpz * p_coeff;
     ulong * p_exp;
     slong p_alloc;
-    slong off, sh;
     slong var = poly2->var;
     mpoly_heap_s * heap;
     ulong ** poly2_exps;
@@ -299,10 +302,10 @@ void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, mp_bitcnt_t bits1,
     TMP_START;
 
     /* pack everything into bits */
-    N = mpoly_words_per_exp(bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(one, &off, &sh, var, N, bits, ctx->minfo);
+    mpoly_gen_monomial_sp(one, var, bits, ctx->minfo);
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
 
     poly2_exps = (ulong **) TMP_ALLOC(poly2->length*sizeof(ulong*));
