@@ -316,9 +316,9 @@ Container operations
 
     Set ``exp`` to the exponent vector of the term of index ``i``.
 
-.. function:: void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A, slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_set_term_exp_fmpz(fmpz_mpoly_t A, slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t A, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
     Set the exponent vector of the term of index ``i`` to ``exp``.
 
