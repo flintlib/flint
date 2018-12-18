@@ -48,21 +48,95 @@ void mpoly_get_monomial_ui_unpacked_ffmpz(ulong * user_exps,
     }
 }
 
+
+void mpoly_get_monomial_ui_sp(ulong * user_exps, const ulong * poly_exps,
+                                            slong bits, const mpoly_ctx_t mctx)
+{
+    slong nvars = mctx->nvars;
+    slong i, shift;
+    ulong u, mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+    ulong * exp1;
+    const ulong * exp2;
+    slong dir;
+
+    FLINT_ASSERT(bits <= FLINT_BITS);
+
+    exp2 = poly_exps;
+    exp1 = user_exps + nvars - 1;
+    dir = -WORD(1);
+    if (mctx->rev)
+    {
+        exp1 = user_exps;
+        dir = UWORD(1);
+    }
+
+    i = 0;
+    u = *exp2++;
+    shift = 0;
+    *exp1 = u & mask;
+    exp1 += dir;
+    u = u >> bits;      /* number of bits to encode 0th field */
+    shift += bits;      /* number of bits to encode 0th field */
+    while (++i < nvars)
+    {
+        if (shift + bits > FLINT_BITS)
+        {
+            u = *exp2++;
+            shift = 0;
+        }
+        *exp1 = u & mask;
+        exp1 += dir;
+        u = u >> bits;      /* number of bits to encode ith field */
+        shift += bits;      /* number of bits to encode ith field */
+    }
+}
+
+void mpoly_get_monomial_ui_mp(ulong * user_exps, const ulong * poly_exps,
+                                            slong bits, const mpoly_ctx_t mctx)
+{
+    slong nvars = mctx->nvars;
+    slong i, j;
+    ulong * exp1;
+    const ulong * exp2;
+    ulong words_per_field = bits/FLINT_BITS;
+    ulong check_mask;
+    slong dir;
+
+    FLINT_ASSERT(bits%FLINT_BITS == 0);
+    FLINT_ASSERT(bits > FLINT_BITS);
+
+    exp2 = poly_exps;
+    exp1 = user_exps + nvars - 1;
+    dir = -WORD(1);
+    if (mctx->rev)
+    {
+        exp1 = user_exps;
+        dir = UWORD(1);
+    }
+
+    check_mask = 0;
+    for (i = 0; i < nvars; i++)
+    {
+        *exp1 = *exp2;
+        exp1 += dir;
+
+        for (j = 1; j < words_per_field; j++)
+            check_mask |= exp2[j];
+
+        exp2 += words_per_field;
+    }
+
+    if (check_mask != 0)
+        flint_throw(FLINT_ERROR, "Exponent vector does not fit a ulong.");
+}
+
 void mpoly_get_monomial_ui(ulong * user_exps, const ulong * poly_exps,
                                             slong bits, const mpoly_ctx_t mctx)
 {
-    slong i;
-    ulong * tmp_exps;
-    TMP_INIT;
-
-    TMP_START;
-    tmp_exps = (ulong *) TMP_ALLOC(mctx->nfields*sizeof(ulong));
-    mpoly_unpack_vec_ui(tmp_exps, poly_exps, bits, mctx->nfields, 1);
-
-    for (i = 0; i < mctx->nvars; i++)
-        user_exps[i] = tmp_exps[mctx->rev ? i : mctx->nvars - 1 - i];
-
-    TMP_END;
+    if (bits <= FLINT_BITS)
+        mpoly_get_monomial_ui_sp(user_exps, poly_exps, bits, mctx);
+    else
+        mpoly_get_monomial_ui_mp(user_exps, poly_exps, bits, mctx);
 }
 
 

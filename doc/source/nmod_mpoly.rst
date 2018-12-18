@@ -275,6 +275,7 @@ Container operations
 .. function:: void nmod_mpoly_get_term_exp_ui(ulong * exp, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
 
     Set ``exp`` to the exponent vector of the term of index ``i``.
+    The ``_ui`` version throws if any entry does not fit into a ``ulong``.
 
 .. function:: void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 
