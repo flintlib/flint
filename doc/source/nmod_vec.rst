@@ -100,7 +100,7 @@ Modular reduction and arithmetic
 
 .. function:: mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
 
-    Returns `a^{-1}` modulo ``mod.n``. The inverse of `b` is assumed to
+    Returns `ab^{-1}` modulo ``mod.n``. The inverse of `b` is assumed to
     exist. It is assumed that `a` is already reduced modulo ``mod.n``.
 
 .. function:: mp_limb_t nmod_pow_ui(mp_limb_t a, ulong e, nmod_t mod)
