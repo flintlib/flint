@@ -323,6 +323,14 @@ Container operations
 
     Set the exponent vector of the term of index ``i`` to ``exp``.
 
+.. function:: void fmpz_mpoly_get_term(fmpz_mpoly_t M, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``M`` to the term of index ``i`` in ``A``.
+
+.. function:: void fmpz_mpoly_get_term_monomial(fmpz_mpoly_t M, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``M`` to the monomial of the term of index ``i`` in ``A``. The coefficient of ``M`` will be one.
+
 .. function:: void fmpz_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
 .. function:: void fmpz_mpoly_push_term_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)

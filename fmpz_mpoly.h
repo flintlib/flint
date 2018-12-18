@@ -458,6 +458,12 @@ FLINT_DLL void fmpz_mpoly_set_term_exp_fmpz(fmpz_mpoly_t A,
 FLINT_DLL void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A,
                        slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpoly_get_term(fmpz_mpoly_t M, const fmpz_mpoly_t A,
+                                          slong i, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_get_term_monomial(fmpz_mpoly_t M, const fmpz_mpoly_t A,
+                                          slong i, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A,
                const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
 
