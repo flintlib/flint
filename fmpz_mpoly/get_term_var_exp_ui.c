@@ -20,7 +20,7 @@ ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i,
 
     if ((ulong) i >= (ulong) A->length)
     {
-        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_get_term_exp_ui");
+        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_get_term_var_exp_ui");
     }
 
     if (A->bits <= FLINT_BITS)

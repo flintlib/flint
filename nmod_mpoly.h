@@ -362,6 +362,12 @@ FLINT_DLL void nmod_mpoly_set_coeff_ui_ui(nmod_mpoly_t A,
                        ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
 
 
+/* comparison ****************************************************************/
+
+FLINT_DLL int nmod_mpoly_cmp(const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+
 /* container operations ******************************************************/
 
 FLINT_DLL int nmod_mpoly_is_canonical(const nmod_mpoly_t A,

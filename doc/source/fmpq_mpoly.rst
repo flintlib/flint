@@ -256,6 +256,19 @@ Coefficients
 
     Set the coefficient of the monomial with exponent ``exp`` to ``c``.
 
+.. function:: void fmpq_mpoly_get_coeff_vars_ui(fmpq_mpoly_t C, const fmpq_mpoly_t A, slong * vars, ulong * exps, slong length, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``C`` to the coefficient of ``A`` with respect to the variables in ``vars`` with powers in the corresponding array ``exps``.
+
+Comparison
+--------------------------------------------------------------------------------
+
+.. function:: int fmpq_mpoly_cmp(const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+
+    Return ``1`` (resp. ``-1``, or ``0``) if the monomial of ``A`` is greater than (resp. less than, same as) the monomial of ``B``.
+    The comparison ignores the coefficients of ``A`` and ``B``.
+    This function throws if ``A`` or ``B`` is not a monomial.
+
 
 Container operations
 --------------------------------------------------------------------------------
@@ -305,6 +318,11 @@ Container operations
 
     Set ``exp`` to the exponent vector of the term of index ``i``.
     The ``_ui`` version throws if any entry does not fit into a ``ulong``.
+
+.. function:: ulong fmpq_mpoly_get_term_var_exp_ui(const fmpq_mpoly_t A, slong i, slong var, const fmpq_mpoly_ctx_t ctx)
+
+    Return the exponent of the variable ``var`` of the term of index ``i``.
+    This function throws if the exponent not fit into a ``ulong``.
 
 .. function:: void fmpq_mpoly_set_term_exp_fmpz(fmpq_mpoly_t A, slong i, fmpz * const * exps, const const fmpq_mpoly_ctx_t ctx)
 

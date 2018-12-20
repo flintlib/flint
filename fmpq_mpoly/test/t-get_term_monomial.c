@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "fmpz_mpoly.h"
+#include "fmpq_mpoly.h"
 
 int
 main(void)
@@ -25,20 +25,20 @@ main(void)
     /* Check getting a coeff by its monomial */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        fmpz_t c, d;
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f, g, h;
+        fmpq_t c, d;
+        fmpq_mpoly_ctx_t ctx;
+        fmpq_mpoly_t f, g, h;
         mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
         mp_bitcnt_t coeff_bits;
         slong len1, len2, len3;
 
-        fmpz_init(c);
-        fmpz_init(d);
+        fmpq_init(c);
+        fmpq_init(d);
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
-        fmpz_mpoly_init(f, ctx);
-        fmpz_mpoly_init(g, ctx);
-        fmpz_mpoly_init(h, ctx);
+        fmpq_mpoly_ctx_init_rand(ctx, state, 20);
+        fmpq_mpoly_init(f, ctx);
+        fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(h, ctx);
 
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100);
@@ -50,35 +50,35 @@ main(void)
 
         coeff_bits = n_randint(state, 200);
 
-        fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
-        fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
-        fmpz_mpoly_randtest_bits(h, state, len3, coeff_bits, exp_bits3, ctx);
+        fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
+        fmpq_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
+        fmpq_mpoly_randtest_bits(h, state, len3, coeff_bits, exp_bits3, ctx);
 
-        fmpz_mpoly_repack_bits(h, f,
-                                f->bits + n_randint(state, 2*FLINT_BITS), ctx);
+        fmpq_mpoly_repack_bits(h, f,
+                           f->zpoly->bits + n_randint(state, FLINT_BITS), ctx);
 
-        for (j = fmpz_mpoly_length(f, ctx) - 1; j >= 0; j--)
+        for (j = fmpq_mpoly_length(f, ctx) - 1; j >= 0; j--)
         {
-            fmpz_mpoly_get_term_monomial(g, f, j, ctx);
-            fmpz_mpoly_repack_bits(g, g,
-                                  g->bits + n_randint(state, FLINT_BITS), ctx);
-            fmpz_mpoly_get_term_coeff_fmpz(d, f, j, ctx);
-            fmpz_mpoly_get_coeff_fmpz_monomial(c, h, g, ctx);
+            fmpq_mpoly_get_term_monomial(g, f, j, ctx);
+            fmpq_mpoly_repack_bits(g, g,
+                           g->zpoly->bits + n_randint(state, FLINT_BITS), ctx);
+            fmpq_mpoly_get_term_coeff_fmpq(d, f, j, ctx);
+            fmpq_mpoly_get_coeff_fmpq_monomial(c, h, g, ctx);
 
-            if (!fmpz_equal(c, d))
+            if (!fmpq_equal(c, d))
             {
                 flint_printf("FAIL\nCheck getting a coeff by its monomial\ni = %wd\n", i);
                 flint_abort();
             }
         }
 
-        fmpz_clear(c);
-        fmpz_clear(d);
+        fmpq_clear(c);
+        fmpq_clear(d);
 
-        fmpz_mpoly_clear(f, ctx);
-        fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_clear(h, ctx);
-        fmpz_mpoly_ctx_clear(ctx);
+        fmpq_mpoly_clear(f, ctx);
+        fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(h, ctx);
+        fmpq_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

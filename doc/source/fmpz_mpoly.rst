@@ -270,8 +270,10 @@ Coefficients
 
     Set ``C`` to the coefficient of ``A`` with respect to the variables in ``vars`` with powers in the corresponding array ``exps``.
 
+
 Comparison
 --------------------------------------------------------------------------------
+
 
 .. function:: int fmpz_mpoly_cmp(const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 

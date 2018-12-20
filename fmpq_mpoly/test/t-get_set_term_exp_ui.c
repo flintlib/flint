@@ -70,7 +70,11 @@ main(void)
 
             result = 1;
             for (k = 0; k < nvars; k++)
-                result = result && (exp1[k] == exp2[k]);
+            {
+                result = result
+                 && exp1[k] == exp2[k]
+                 && exp1[k] == fmpq_mpoly_get_term_var_exp_ui(f, index, k, ctx);
+            }
 
             if (!result)
             {
