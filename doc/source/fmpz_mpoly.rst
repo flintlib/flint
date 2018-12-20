@@ -270,6 +270,16 @@ Coefficients
 
     Set ``C`` to the coefficient of ``A`` with respect to the variables in ``vars`` with powers in the corresponding array ``exps``.
 
+Comparison
+--------------------------------------------------------------------------------
+
+.. function:: int fmpz_mpoly_cmp(const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Return ``1`` (resp. ``-1``, or ``0``) if the monomial of ``A`` is greater than (resp. less than, same as) the monomial of ``B``.
+    The comparison ignores the coefficients of ``A`` and ``B``.
+    This function throws if ``A`` or ``B`` is not a monomial.
+
+
 Container operations
 --------------------------------------------------------------------------------
 

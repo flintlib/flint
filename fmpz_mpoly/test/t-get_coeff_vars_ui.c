@@ -23,6 +23,31 @@ main(void)
     flint_printf("get_coeff_vars_ui....");
     fflush(stdout);
 
+    /* check simple example */
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g;
+        /* get the coefficient of y^1*x^2*/
+        slong varl[2] = {1, 0};
+        ulong expl[2] = {1, 2};
+        const char * vars[] = {"x", "y", "z", "w"};
+
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_DEGREVLEX);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_set_str_pretty(f, "x^2*y*(z+w)+x+y+x*y^2+z^2+w^2", vars, ctx);
+        fmpz_mpoly_set_str_pretty(g, "z+w", vars, ctx);
+        fmpz_mpoly_get_coeff_vars_ui(f, f, varl, expl, 2, ctx);
+        if (!fmpz_mpoly_equal(f, g, ctx))
+        {
+            flint_printf("FAIL\ncheck simple example\n");
+            flint_abort();
+        }
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     /* check 1 variable sum of coefficients */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {

@@ -401,6 +401,11 @@ FLINT_DLL void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C,
              const fmpz_mpoly_t A,  slong * vars, ulong * exps, slong length,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+/* comparison ****************************************************************/
+
+FLINT_DLL int fmpz_mpoly_cmp(const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 /* container operations ******************************************************/
 
 FLINT_DLL int fmpz_mpoly_is_canonical(const fmpz_mpoly_t A,

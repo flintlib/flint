@@ -589,6 +589,22 @@ int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
 }
 
 MPOLY_INLINE
+int mpoly_monomial_cmp_nomask(const ulong * exp2, const ulong * exp3, slong N)
+{
+    slong i = N - 1;
+    do {
+        if (exp2[i] != exp3[i])
+        {
+            if (exp2[i] > exp3[i])
+                return 1;
+            else
+                return -1;
+        }
+    } while (--i >= 0);
+    return 0;
+}
+
+MPOLY_INLINE
 int mpoly_monomial_divides_tight(slong e1, slong e2, slong * prods, slong num)
 {
    slong j;
@@ -795,6 +811,9 @@ FLINT_DLL void _mpoly_gen_shift_right(ulong * Aexp, mp_bitcnt_t Abits,
 
 FLINT_DLL void _mpoly_gen_shift_left(ulong * Aexp, mp_bitcnt_t Abits,
                slong Alength, slong var, ulong amount, const mpoly_ctx_t mctx);
+
+FLINT_DLL int mpoly_monomial_cmp_general(ulong * Aexp, mp_bitcnt_t Abits,
+                      ulong * Bexp, mp_bitcnt_t Bbits, const mpoly_ctx_t mctx);
 
 /* info related to gcd calculation *******************************************/
 
