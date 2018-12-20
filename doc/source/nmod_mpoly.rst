@@ -208,17 +208,6 @@ Degrees
     If ``A`` is zero, the total degree is defined to be ``-1``.
 
 
-Comparison
---------------------------------------------------------------------------------
-
-
-.. function:: int nmod_mpoly_cmp(const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
-
-    Return ``1`` (resp. ``-1``, or ``0``) if the monomial of ``A`` is greater than (resp. less than, same as) the monomial of ``B``.
-    The comparison ignores the coefficients of ``A`` and ``B``.
-    This function throws if ``A`` or ``B`` is not a monomial.
-
-
 Coefficients
 --------------------------------------------------------------------------------
 
@@ -244,6 +233,21 @@ Coefficients
 .. function:: void nmod_mpoly_set_coeff_ui_ui(nmod_mpoly_t A, ulong c, ulong const * exp, nmod_mpoly_ctx_t ctx)
 
     Set the coefficient of the monomial with exponent ``exp`` to `c`.
+
+.. function:: void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A, slong * vars, ulong * exps, slong length, const nmod_mpoly_ctx_t ctx)
+
+    Set ``C`` to the coefficient of ``A`` with respect to the variables in ``vars`` with powers in the corresponding array ``exps``.
+
+
+Comparison
+--------------------------------------------------------------------------------
+
+
+.. function:: int nmod_mpoly_cmp(const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` (resp. ``-1``, or ``0``) if the monomial of ``A`` is greater than (resp. less than, same as) the monomial of ``B``.
+    The comparison ignores the coefficients of ``A`` and ``B``.
+    This function throws if ``A`` or ``B`` is not a monomial.
 
 
 Container operations
@@ -288,11 +292,24 @@ Container operations
     Set ``exp`` to the exponent vector of the term of index ``i``.
     The ``_ui`` version throws if any entry does not fit into a ``ulong``.
 
+.. function:: ulong nmod_mpoly_get_term_var_exp_ui(const nmod_mpoly_t A, slong i, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Return the exponent of the variable ``var`` of the term of index ``i``.
+    This function throws if the exponent not fit into a ``ulong``.
+
 .. function:: void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 
 .. function:: void nmod_mpoly_set_term_exp_ui(nmod_mpoly_t A, slong i, const ulong * exp, const nmod_mpoly_ctx_t ctx)
 
     Set the exponent of the term of index ``i`` to ``exp``.
+
+.. function:: void nmod_mpoly_get_term(nmod_mpoly_t M, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Set ``M`` to the term of index ``i`` in ``A``.
+
+.. function:: void nmod_mpoly_get_term_monomial(nmod_mpoly_t M, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Set ``M`` to the monomial of the term of index ``i`` in ``A``. The coefficient of ``M`` will be one.
 
 .. function:: void nmod_mpoly_push_term_ui_fmpz(nmod_mpoly_t A, ulong c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 
