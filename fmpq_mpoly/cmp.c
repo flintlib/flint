@@ -14,7 +14,8 @@
 int fmpq_mpoly_cmp(const fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    if (A->zpoly->length != 1 || B->zpoly->length != 1)
+    if (A->zpoly->length != 1 || B->zpoly->length != 1
+        || !fmpq_is_one(A->content) || !fmpq_is_one(B->content))
     {
         flint_throw(FLINT_ERROR, "Inputs to cmp are not both monomials");
     }

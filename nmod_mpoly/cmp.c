@@ -14,7 +14,8 @@
 int nmod_mpoly_cmp(const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    if (A->length != 1 || B->length != 1)
+    if (A->length != 1 || B->length != 1
+        || A->coeffs[0] != UWORD(1) || B->coeffs[0] != UWORD(1))
     {
         flint_throw(FLINT_ERROR, "Inputs to cmp are not both monomials");
     }

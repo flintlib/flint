@@ -14,7 +14,8 @@
 int fmpz_mpoly_cmp(const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    if (A->length != 1 || B->length != 1)
+    if (A->length != 1 || B->length != 1
+        || !fmpz_is_one(A->coeffs + 0) || !fmpz_is_one(B->coeffs + 0))
     {
         flint_throw(FLINT_ERROR, "Inputs to cmp are not both monomials");
     }

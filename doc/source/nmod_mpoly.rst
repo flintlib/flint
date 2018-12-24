@@ -246,8 +246,7 @@ Comparison
 .. function:: int nmod_mpoly_cmp(const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
     Return ``1`` (resp. ``-1``, or ``0``) if the monomial of ``A`` is greater than (resp. less than, same as) the monomial of ``B``.
-    The comparison ignores the coefficients of ``A`` and ``B``.
-    This function throws if ``A`` or ``B`` is not a monomial.
+    ``A`` and ``B`` should both have length one with coefficient one. This function will throw otherwise.
 
 
 Container operations

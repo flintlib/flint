@@ -40,7 +40,7 @@ main(void)
         nvars = nmod_mpoly_ctx_nvars(ctx);
 
         len = n_randint(state, 50) + 1;
-        exp_bits = n_randint(state, 100) + 1;
+        exp_bits = n_randint(state, 100) + 2;
 
         do {
             nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
