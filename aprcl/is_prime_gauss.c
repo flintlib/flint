@@ -375,6 +375,9 @@ is_prime_gauss(const fmpz_t n)
     primality_test_status result;
     aprcl_config config;
 
+    if (fmpz_cmp_ui(n, 2) < 0)
+       return 0;
+
     config_gauss_init_min_R(config, n, 180);
     result = _is_prime_gauss(n, config);
     R = config->R;

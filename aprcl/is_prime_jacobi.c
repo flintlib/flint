@@ -427,7 +427,7 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
         */
         q = 2 * m * p + 1;
         /* if q prime */
-        if (n_is_prime(q))
+        if (n_is_prime(q) && fmpz_fdiv_ui(n, q) != 0)
         {
             fmpz_set_ui(qmod, q);
             /* npow = n^{(q - 1) / p} */
@@ -548,6 +548,18 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     ulong i, j, nmod4;
     primality_test_status result;
     fmpz_t temp, p2, ndec, ndecdiv, u, q_pow;
+
+    if (fmpz_cmp_ui(n, 2) < 0)
+       return COMPOSITE;
+
+    if (fmpz_cmp_ui(n, 2) == 0)
+       return PRIME;
+
+    if (fmpz_cmp_ui(n, 3) == 0) /* only prime which can divide R */
+       return PRIME;
+
+    if (fmpz_is_even(n)) /* we excluded n = 2 above */
+       return COMPOSITE;
 
     /* initialization */
     fmpz_init(q_pow);

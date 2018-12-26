@@ -17,23 +17,18 @@
 int
 is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n)
 {
-    ulong a, rem, result;
-    fmpz_t m;
-
-    fmpz_init(m);
+    ulong a, rem;
+    int result = 0;
 
     rem = fmpz_tdiv_ui(n, x);
     a = n_gcd(x, rem);              /* a = gcd(x, n % x) */
-    fmpz_tdiv_q_ui(m, n, a);        /* m = n / a */
-    rem = fmpz_tdiv_ui(m, y);
-    result = a * n_gcd(y, rem);     /* result = gcd(y, m % y) */
+    if (a == 1)
+    {
+       rem = fmpz_tdiv_ui(n, y);
+       result = n_gcd(y, rem) == 1;     /* result = gcd(y, m % y) */
+    }
 
-    fmpz_clear(m);
-
-    /* q and r must be small, so q*r must get into ulong. */
-    if (result == 1 || fmpz_equal_ui(n, result))
-        return 1;
-    return 0;
+    return result;
 }
 
 
@@ -43,24 +38,22 @@ is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n)
 int
 is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n)
 {
-    int is_coprime;
+    int is_coprime = 0;
     ulong a, rem;
-    fmpz_t m, result;
+    fmpz_t result;
 
-    fmpz_init(m);
     fmpz_init(result);
 
     rem = fmpz_tdiv_ui(n, x);
     a = n_gcd(x, rem);              /* a = gcd(x, n % x) */
-    fmpz_tdiv_q_ui(m, n, a);        /* m = n / a */
-    fmpz_fdiv_r(result, m, y);      /* result = m % y */
-    fmpz_gcd(result, result, n);    /* result = gcd(y, m % y) */
+    if (a == 1)
+    {
+       fmpz_fdiv_r(result, n, y);      /* result = n % y */
+       fmpz_gcd(result, result, y);    /* result = gcd(y, n % y) */
 
-    is_coprime = 0;
-    if (fmpz_is_one(result) || fmpz_equal(n, result))
-        is_coprime = 1;
+       is_coprime = fmpz_is_one(result);
+    }
 
-    fmpz_clear(m);
     fmpz_clear(result);
 
     return is_coprime;
