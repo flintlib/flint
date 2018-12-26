@@ -543,17 +543,12 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     primality_test_status result;
     fmpz_t temp, p2, ndec, ndecdiv, u, q_pow;
 
-    if (fmpz_cmp_ui(n, 2) < 0)
-       return COMPOSITE;
-
+    /* deal with primes that can divide R */
     if (fmpz_cmp_ui(n, 2) == 0)
        return PRIME;
 
-    if (fmpz_cmp_ui(n, 3) == 0) /* only prime which can divide R */
+    if (fmpz_cmp_ui(n, 3) == 0)
        return PRIME;
-
-    if (fmpz_is_even(n)) /* we excluded n = 2 above */
-       return COMPOSITE;
 
     /* initialization */
     fmpz_init(q_pow);
