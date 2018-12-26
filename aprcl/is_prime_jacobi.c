@@ -13,8 +13,10 @@
 
 /*
     Below is the implementation of primality test using Jacobi sums.
-    Many steps are well described in:
+    The steps are described in:
         [1] "A Course in Computational Algebraic Number Theory" by H. Cohen
+    
+    For a different version of the algorithm, also see:
         [2] "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra
 
     The algorithm consist of 4 steps:
@@ -23,7 +25,7 @@
         (3.) Additional tests;
         (4.) Final trial division and primality proving.
 
-    The file contains the implementation of steps (2.) and (3.).
+    This file contains the implementation of steps (2.) and (3.).
     It also contains the Jacobi sum primality test.
     A small part of implementation of step (1.) is here and most are in
     config_jacobi.c file.
@@ -65,10 +67,9 @@
 /*----------------------------------------------------------------------------*/
 
 /*
-    (2.a)
     Checks the case p != 2.
     Computes j0 = j_{0, p, q}, jv = j_{v, p, q} and checks that
-    j0^u * jv is unity root.
+    j0^u * jv is root of unity.
 
     Parameters:
         j = J(p, q);
@@ -144,11 +145,10 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
 }
 
 /*
-    (2.b)
     Check the case p = 2 and k = 1.
 
     Computes j0 = j_{0, 2, q}, jv = j_{v, 2, q} and checks that
-    j0^u * jv is unity root. j^0^u * jv = (-q)^{(n - 1) / 2}.
+    j0^u * jv is root of unity. j^0^u * jv = (-q)^{(n - 1) / 2}.
 
     Parameters:
         q, n from standard variables;
@@ -158,8 +158,7 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
         if j0^u * jv = -1 returns 1;
         otherwise returns -1.
 
-    For details see (i1b) in [2] or
-    algorithm (9.1.28) step 4.d in [1].
+    For details see algorithm (9.1.28) step 4.d in [1].
 */
 slong
 _is_prime_jacobi_check_21(ulong q, const fmpz_t n)
@@ -196,11 +195,10 @@ _is_prime_jacobi_check_21(ulong q, const fmpz_t n)
 }
 
 /*
-    (2.c)
     Check the case p = 2 and k = 2.
 
     Computes j0 = j_{0, 2, q}, jv = j_{v, 2, q} and checks that
-    j0^u * jv is unity root.
+    j0^u * jv is root of unity.
 
     Parameters:
         j = J(2, q);
@@ -211,8 +209,7 @@ _is_prime_jacobi_check_21(ulong q, const fmpz_t n)
         \zeta_4^h \in (1, i, -1, -i);
         otherwise returns -1.
 
-    For details see (i1c) in [2] or
-    algorithm (9.1.28) step 4.c in [1].
+    For details see algorithm (9.1.28) step 4.c in [1].
 */
 slong
 _is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
@@ -255,11 +252,10 @@ _is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
 
 
 /*
-    (2.d)
     Check the case p = 2 and k >= 3.
 
     Computes j0 = j_{0, 2, q}, jv = j_{v, 2, q} and checks that
-    j0^u * jv is unity root.
+    j0^u * jv is root of unity.
 
     Parameters:
         j = J(2, q);
@@ -272,8 +268,7 @@ _is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
         If there exist h such that j0^u * jv = \zeta_{2^k}^h returns h
         otherwise returns -1.
 
-    For details see (i1d) in [2] or
-    algorithm (9.1.28) step 4.b in [1].
+    For details see algorithm (9.1.28) step 4.b in [1].
 */
 slong
 _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
@@ -375,33 +370,32 @@ _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
 }
 
 /*
-    (4.)
     Try to find prime number q such that:
         q == mod 2p;
         n^{(q - 1) / p} != 1 mod q;
         if p == 2 then 4 | q - 1 and 8 not | q - 1.
 
     If the q is found we have two cases:
-        (4.a) if p == 2 verify
-            1) h from (2.c) is a primitive root;
+        - if p == 2 verify
+            1) h from above is a primitive root;
             2) q^{(n - 1) / 2} = -1 mod n;
-        (4.b) if p != 2 verify
-            1) h from (2.a) is a primitive root;
+        - if p != 2 verify
+            1) h from above is a primitive root;
     if this is not the case for (p, q) then n is composite.
 
-    (4.c) If we can't find q check p | n; if so then n is composite. 
+    If we can't find q check p | n or if n is a perfect power; if so
+    then n is composite. 
     Otherwise n can be prime but we can't prove its primality.
 
     Parameters:
         n, p from standard variables;
 
     Returns:
-        if n composite returns 2;
-        if n can be prime returns 1;
-        if we not find q and n can be prime returns 0.
+        if n composite : returns 2;
+        if n can be prime : returns 1;
+        if we do not find q and n can be prime : returns 0.
 
-    For details see (Additional tests step) in [2] or
-    algorithm (9.1.28) step 5 in [1].
+    For details see algorithm (9.1.28) step 5 in [1].
 */
 int
 _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
@@ -470,12 +464,12 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
            /* if p == 2 */
            if (p == 2)
            {
-               /* find h using (2.c) */
+               /* find h using p = 2, k = 2 */
                h = _is_prime_jacobi_check_22(jacobi_sum, u, v, q);
-               /* if h not find or h not primitive root then n is composite */
+               /* if h not found or h not primitive root then n is composite */
                if (h < 0 || h % 2 == 0)
                   result = 2;
-               else  /* else verify (4.a) */
+               else  /* else verify condition for p = 2 */
                {
                   fmpz_t ndec, ndecdiv, qpow;
 
@@ -490,7 +484,7 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
                    /* qpow = q^{(n - 1) / 2} */
                    fmpz_powm(qpow, qpow, ndecdiv, n);
 
-                   /* if q^{(n - 1) / 2} = -1 mod n then n can b prime */
+                   /* if q^{(n - 1) / 2} = -1 mod n then n can be prime */
                    if (fmpz_equal(qpow, ndec))
                       result = 1;
                    else /* else n is composite */
@@ -505,10 +499,10 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
            {
               /* find h using (2.a) */
               h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
-              /* if h not find or h not primitive root then n is composite */
+              /* if h not found or h not primitive root then n is composite */
               if (h < 0 || h % p == 0)
                  result = 2;
-              else /* else (4.b) is true and n can be prime */
+              else /* else n can be prime */
                  result = 1;
            }
 
@@ -532,7 +526,7 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
 
        fmpz_clear(root);
     }
-    /* if we not find q and p not | n then we cant prove composite or primality */
+    /* otherwise we can't prove composite or prime */
 
     /* clear */
     fmpz_clear(npow);
@@ -587,7 +581,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     nmod4 = fmpz_tdiv_ui(n, 4);
 
     /* 
-        (1.b) For every prime p | R, set lambdas_p:
+        For every prime p | R, set lambdas_p:
             to 1 if p >= 3 and n^{p - 1} != 1 mod p^2;
             to 0 otherwise.
     */
@@ -611,9 +605,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     if (is_mul_coprime_ui_fmpz(config->R, config->s, n) == 0)
         result = COMPOSITE;
 
-    /* end of (1.) */
-
-    /* (2.) begin of Pseudoprime tests with Jacobi sums step. */
+    /* Begin pseudoprime tests with Jacobi sums step. */
     /* for every prime q | s */
     for (i = 0; i < config->qs->num; i++)
     {
@@ -680,7 +672,6 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 unity_zp_jacobi_sum_2q_two(jacobi_sum2_2, q);
             }
 
-            /* check (2.b) */
             if (p == 2 && k == 1)
             {
                 h = _is_prime_jacobi_check_21(q, n);
@@ -698,7 +689,6 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                     lambdas[pind] = 1;
             }
 
-            /* check (2.c) */
             if (p == 2 && k == 2)
             {
                 h = _is_prime_jacobi_check_22(jacobi_sum, u, v, q);
@@ -716,7 +706,6 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                     lambdas[pind] = 1;
             }
 
-            /* check (2.d) */
             if (p == 2 && k >= 3)
             {
                 h = _is_prime_jacobi_check_2k(jacobi_sum,
@@ -735,7 +724,6 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                     lambdas[pind] = 1;
             }
 
-            /* check (2.a) */
             if (p != 2)
             {
                 h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
@@ -761,9 +749,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 
     }
 
-    /* end of (2.) */
-
-    /* (3.) begin of Additional tests step */
+    /* Begin L_p tests */
 
     /* if n can be prime */
     if (result == PROBABPRIME)
@@ -790,7 +776,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 {
                     /* 
                         if r == 0 then we can't find q and we can't 
-                        prove is n prime or composite 
+                        prove n prime or composite 
                     */
                     result = UNKNOWN;
                 }
@@ -798,9 +784,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
         }
     }
 
-    /* end of (3.) */
-
-    /* (4.) begin of Final trial division and primality proving step */
+    /* Trial division and primality proving step */
 
     /* 
         If result = PROBAPRIME then all lambdas_p = 1.
@@ -811,14 +795,12 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     */
     if (result == PROBABPRIME)
     {
-        /* if we not find divisors of n then n is composite */
+        /* if we don't find divisors of n then n is composite */
         if (is_prime_final_division(n, config->s, config->R) == 1)
             result = PRIME;
         else
             result = COMPOSITE;
     }
-
-    /* end of (4.) */
 
     /* clear */
     flint_free(lambdas);
@@ -838,10 +820,8 @@ is_prime_jacobi(const fmpz_t n)
     primality_test_status result;
     aprcl_config config;
 
-    /* begin of (1.) Precomutation step */ 
-
     /* 
-        (1.a) Choose R and s values for n and store its factorisation.
+        Choose R and s values for n and store its factorisation.
         See definition in config_jacobi functions documentation. s^2 > n.
     */
     config_jacobi_init(config, n);
@@ -857,7 +837,7 @@ is_prime_jacobi(const fmpz_t n)
         flint_abort();
     }
 
-    /* if we prove primality returns 1 */
+    /* if we prove primality, returns 1 */
     if (result == PRIME)
         return 1;
     return 0;
