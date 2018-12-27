@@ -743,29 +743,40 @@ FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
 
 FLINT_DLL void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
                           slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
                           slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_max_fields_ui_sp(ulong * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_degrees_fit_si(const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL slong mpoly_degree_si(const ulong * poly_exps,
-                     slong len, slong bits, slong var, const mpoly_ctx_t mctx);
+               slong len, mp_bitcnt_t bits, slong var, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_degree_fmpz(fmpz_t deg, const ulong * poly_exps,
-                     slong len, slong bits, slong var, const mpoly_ctx_t mctx);
+               slong len, mp_bitcnt_t bits, slong var, const mpoly_ctx_t mctx);
+
 FLINT_DLL int  mpoly_total_degree_fits_si(const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL slong mpoly_total_degree_si(const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
