@@ -337,6 +337,53 @@ void mpoly_monomial_min(ulong * exp1, const ulong * exp2, const ulong * exp3,
     }
 }
 
+MPOLY_INLINE
+void mpoly_monomial_max_mp(ulong * exp1, const ulong * exp2, const ulong * exp3,
+                                                     mp_bitcnt_t bits, slong N)
+{
+    slong i, j;
+    for (i = 0; i < N; i += bits/FLINT_BITS)
+    {
+        const ulong * t = exp2;
+        for (j = bits/FLINT_BITS - 1; j >= 0; j--)
+        {
+            if (exp3[i + j] != exp2[i + j])
+            {
+                if (exp3[i + j] > exp2[i + j])
+                    t = exp3;
+                break;
+            }
+        }
+        for (j = 0; j < bits/FLINT_BITS; j++)
+        {
+            exp1[i + j] = t[i + j];
+        }
+    }
+}
+
+MPOLY_INLINE
+void mpoly_monomial_min_mp(ulong * exp1, const ulong * exp2, const ulong * exp3,
+                                                     mp_bitcnt_t bits, slong N)
+{
+    slong i, j;
+    for (i = 0; i < N; i += bits/FLINT_BITS)
+    {
+        const ulong * t = exp2;
+        for (j = bits/FLINT_BITS - 1; j >= 0; j--)
+        {
+            if (exp3[i + j] != exp2[i + j])
+            {
+                if (exp3[i + j] < exp2[i + j])
+                    t = exp3;
+                break;
+            }
+        }
+        for (j = 0; j < bits/FLINT_BITS; j++)
+        {
+            exp1[i + j] = t[i + j];
+        }
+    }
+}
 
 MPOLY_INLINE
 int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)

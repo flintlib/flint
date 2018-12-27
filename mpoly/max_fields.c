@@ -46,55 +46,33 @@ void mpoly_max_fields_ui_sp(ulong * max_fields, const ulong * poly_exps,
 void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)
 {
-    slong i, j, N;
+    slong i, N;
     ulong * pmax, mask;
-    fmpz * tmp_exps;
     TMP_INIT;
 
     TMP_START;
 
+    N = mpoly_words_per_exp(bits, mctx);
+    pmax = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    for (i = 0; i < N; i++)
+        pmax[i] = 0;
+
     if (bits <= FLINT_BITS)
     {
-        N = mpoly_words_per_exp_sp(bits, mctx);
-
         mask = 0;
         for (i = 0; i < FLINT_BITS/bits; i++)
             mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-        pmax = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-        for (i = 0; i < N; i++)
-            pmax[i] = 0;
         for (i = 0; i < len; i++)
             mpoly_monomial_max(pmax, pmax, poly_exps + N*i, bits, N, mask);
-
-        mpoly_unpack_vec_fmpz(max_fields, pmax, bits, mctx->nfields, 1);
     }
     else
     {
-        N = mpoly_words_per_exp_mp(bits, mctx);
-
-        tmp_exps = (fmpz *) TMP_ALLOC(mctx->nfields*sizeof(fmpz));
-        for (j = 0; j < mctx->nfields; j++)
-        {
-            fmpz_zero(max_fields + j);
-            fmpz_init(tmp_exps + j);
-        }
-
         for (i = 0; i < len; i++)
-        {
-            mpoly_unpack_vec_fmpz(tmp_exps, poly_exps + N*i, bits, mctx->nfields, 1);
-            for (j = 0; j < mctx->nfields; j++)
-            {
-                if (fmpz_cmp(max_fields + j, tmp_exps + j) < 0)
-                    fmpz_set(max_fields + j, tmp_exps + j);
-            }
-        }
-
-        for (j = 0; j < mctx->nfields; j++)
-        {
-            fmpz_clear(tmp_exps + j);
-        }
+            mpoly_monomial_max_mp(pmax, pmax, poly_exps + N*i, bits, N);
     }
+
+    mpoly_unpack_vec_fmpz(max_fields, pmax, bits, mctx->nfields, 1);
 
     TMP_END;
 }
