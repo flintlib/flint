@@ -9,16 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_mpoly.h"
+#include "mpoly.h"
 
+/* this file does not need to change with new orderings */
 
 void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)
 {
-    slong i, N;
-    ulong * pmax, mask;
+    slong i;
+    fmpz * max_fields;
     TMP_INIT;
 
     if (len == 0)
@@ -30,18 +29,16 @@ void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
 
     TMP_START;
 
-    mask = 0;
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    max_fields = (fmpz *) TMP_ALLOC(mctx->nfields*sizeof(fmpz));
+    for (i = 0; i < mctx->nfields; i++)
+        fmpz_init(max_fields + i);
 
-    N = mpoly_words_per_exp(bits, mctx);
-    pmax = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    for (i = 0; i < N; i++)
-        pmax[i] = 0;
-    for (i = 0; i < len; i++)
-        mpoly_monomial_max(pmax, pmax, poly_exps + N*i, bits, N, mask);
+    mpoly_max_fields_fmpz(max_fields, poly_exps, len, bits, mctx);
 
-    mpoly_get_monomial_ui((ulong *) user_degs, pmax, bits, mctx);
+    mpoly_get_monomial_ui_unpacked_ffmpz((ulong *)user_degs, max_fields, mctx);
+
+    for (i = 0; i < mctx->nfields; i++)
+        fmpz_clear(max_fields + i);
 
     TMP_END;
 }
@@ -50,8 +47,8 @@ void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
 void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)
 {
-    slong i, j, N;
-    fmpz * tmp_exps;
+    slong i;
+    fmpz * max_fields;
     TMP_INIT;
 
     if (len == 0)
@@ -62,24 +59,17 @@ void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
     }
 
     TMP_START;
-    tmp_exps = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
-    for (j = 0; j < mctx->nvars; j++) {
-        fmpz_zero(user_degs + j);
-        fmpz_init(tmp_exps + j);
-    }
 
-    N = mpoly_words_per_exp(bits, mctx);
+    max_fields = (fmpz *) TMP_ALLOC(mctx->nfields*sizeof(fmpz));
+    for (i = 0; i < mctx->nfields; i++)
+        fmpz_init(max_fields + i);
 
-    for (i = 0; i < len; i++)
-    {
-        mpoly_get_monomial_ffmpz(tmp_exps, poly_exps + N*i, bits, mctx);
-        for (j = 0; j < mctx->nvars; j++)
-            if (fmpz_cmp(user_degs + j, tmp_exps + j) < 0)
-                fmpz_set(user_degs + j, tmp_exps + j);
-    }
+    mpoly_max_fields_fmpz(max_fields, poly_exps, len, bits, mctx);
 
-    for (j = 0; j < mctx->nvars; j++)
-        fmpz_clear(tmp_exps + j);
+    mpoly_get_monomial_ffmpz_unpacked_ffmpz(user_degs, max_fields, mctx);
+
+    for (i = 0; i < mctx->nfields; i++)
+        fmpz_clear(max_fields + i);
 
     TMP_END;
 }
@@ -87,8 +77,8 @@ void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
 void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
                                  slong len, slong bits, const mpoly_ctx_t mctx)
 {
-    slong i, j, N;
-    fmpz * tmp_exps;
+    slong i;
+    fmpz * max_fields;
     TMP_INIT;
 
     if (len == 0)
@@ -99,24 +89,17 @@ void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
     }
 
     TMP_START;
-    tmp_exps = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
-    for (j = 0; j < mctx->nvars; j++) {
-        fmpz_zero(user_degs[j]);
-        fmpz_init(tmp_exps + j);
-    }
 
-    N = mpoly_words_per_exp(bits, mctx);
+    max_fields = (fmpz *) TMP_ALLOC(mctx->nfields*sizeof(fmpz));
+    for (i = 0; i < mctx->nfields; i++)
+        fmpz_init(max_fields + i);
 
-    for (i = 0; i < len; i++)
-    {
-        mpoly_get_monomial_ffmpz(tmp_exps, poly_exps + N*i, bits, mctx);
-        for (j = 0; j < mctx->nvars; j++)
-            if (fmpz_cmp(user_degs[j], tmp_exps + j) < 0)
-                fmpz_set(user_degs[j], tmp_exps + j);
-    }
+    mpoly_max_fields_fmpz(max_fields, poly_exps, len, bits, mctx);
 
-    for (j = 0; j < mctx->nvars; j++)
-        fmpz_clear(tmp_exps + j);
+    mpoly_get_monomial_pfmpz_unpacked_ffmpz(user_degs, max_fields, mctx);
+
+    for (i = 0; i < mctx->nfields; i++)
+        fmpz_clear(max_fields + i);
 
     TMP_END;
 }

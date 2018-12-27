@@ -21,19 +21,6 @@
     in the corresponding entry of user_exps.
 */
 
-void mpoly_get_monomial_ffmpz_unpacked_ffmpz(fmpz * user_exps,
-                                const fmpz * poly_exps, const mpoly_ctx_t mctx)
-{
-    slong i;
-
-    /* poly_exps is already unpacked, just read of the correct fields */
-    for (i = 0; i < mctx->nvars; i++)
-    {
-        slong off = mctx->rev ? i : mctx->nvars - 1 - i;
-        fmpz_set(user_exps + i, poly_exps + off);
-    }
-}
-
 void mpoly_get_monomial_ui_unpacked_ffmpz(ulong * user_exps,
                                 const fmpz * poly_exps, const mpoly_ctx_t mctx)
 {
@@ -48,6 +35,44 @@ void mpoly_get_monomial_ui_unpacked_ffmpz(ulong * user_exps,
     }
 }
 
+void mpoly_get_monomial_ffmpz_unpacked_ffmpz(fmpz * user_exps,
+                                const fmpz * poly_exps, const mpoly_ctx_t mctx)
+{
+    slong i;
+
+    /* poly_exps is already unpacked, just read of the correct fields */
+    for (i = 0; i < mctx->nvars; i++)
+    {
+        slong off = mctx->rev ? i : mctx->nvars - 1 - i;
+        fmpz_set(user_exps + i, poly_exps + off);
+    }
+}
+
+void mpoly_get_monomial_pfmpz_unpacked_ffmpz(fmpz ** user_exps,
+                                const fmpz * poly_exps, const mpoly_ctx_t mctx)
+{
+    slong i;
+
+    /* poly_exps is already unpacked, just read of the correct fields */
+    for (i = 0; i < mctx->nvars; i++)
+    {
+        slong off = mctx->rev ? i : mctx->nvars - 1 - i;
+        fmpz_set(user_exps[i], poly_exps + off);
+    }
+}
+
+void mpoly_get_monomial_ui_unpacked_ui(ulong * user_exps,
+                               const ulong * poly_exps, const mpoly_ctx_t mctx)
+{
+    slong i;
+
+    /* poly_exps is already unpacked, just read of the correct fields */
+    for (i = 0; i < mctx->nvars; i++)
+    {
+        slong off = mctx->rev ? i : mctx->nvars - 1 - i;
+        user_exps[i] = poly_exps[off];
+    }
+}
 
 void mpoly_get_monomial_ui_sp(ulong * user_exps, const ulong * poly_exps,
                                             slong bits, const mpoly_ctx_t mctx)

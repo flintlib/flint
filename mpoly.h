@@ -693,11 +693,17 @@ FLINT_DLL void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
 FLINT_DLL void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
                                                      slong nfields, slong len);
 
+FLINT_DLL void mpoly_get_monomial_ui_unpacked_ffmpz(ulong * user_exps,
+                               const fmpz * poly_exps, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_get_monomial_ffmpz_unpacked_ffmpz(fmpz * user_exps,
                                const fmpz * poly_exps, const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_get_monomial_ui_unpacked_ffmpz(ulong * user_exps,
+FLINT_DLL void mpoly_get_monomial_pfmpz_unpacked_ffmpz(fmpz ** user_exps,
                                const fmpz * poly_exps, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_get_monomial_ui_unpacked_ui(ulong * user_exps,
+                              const ulong * poly_exps, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_get_monomial_ui_sp(ulong * user_exps,
                   const ulong * poly_exps, slong bits, const mpoly_ctx_t mctx);
