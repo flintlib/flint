@@ -23,6 +23,7 @@ REENTRANT=0
 WANT_GC=0
 WANT_TLS=0
 WANT_CXX=0
+WANT_POOLED=0
 ASSERT=0
 BUILD=
 EXTENSIONS=
@@ -78,6 +79,7 @@ usage()
    echo "     --disable-static     Do not build a static library"
    echo "     --single             Faster [non-reentrant if tls or pthread not used] version of library (default)"
    echo "     --reentrant          Build fully reentrant [with or without tls, with pthread] version of library"
+   echo "     --pooled             Run tests with pooled allocator"
    echo "     --with-gc=<path>     GC safe build with path to gc"
    echo "     --enable-pthread     Use pthread (default)"
    echo "     --disable-pthread    Do not use pthread"
@@ -175,6 +177,9 @@ while [ "$1" != "" ]; do
          if [ ! -z "$VALUE" ]; then
             GC_DIR="$VALUE"
          fi
+         ;;
+      --pooled)
+         WANT_POOLED=1
          ;;
       --enable-openmp)
          OPENMP=1
@@ -744,6 +749,7 @@ if [ "$FLINT_DLL" = "1" ]; then
 else
    echo "#define FLINT_DLL" >> config.h
 fi
+echo "#define WANT_POOLED $WANT_POOLED" >> config.h
 
 #write out Makefile
 
