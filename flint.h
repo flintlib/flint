@@ -114,6 +114,7 @@ FLINT_DLL void * flint_pooled_realloc_with_old_size(void * ptr, size_t size, siz
 FLINT_DLL void * flint_pooled_calloc(size_t num, size_t size);
 FLINT_DLL void flint_pooled_free(void * ptr);
 FLINT_DLL void flint_pooled_free_with_size(void * ptr, size_t size);
+FLINT_DLL void flint_pool_cleanup(void);
 
 FLINT_DLL slong flint_get_page_size(void);
 FLINT_DLL void * flint_align_ptr(void * ptr, slong size);

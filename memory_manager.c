@@ -30,6 +30,15 @@
 #include "gc.h"
 #endif
 
+#define PAGES_PER_BLOCK 16
+
+static slong flint_page_size;
+static slong flint_page_mask;
+
+FLINT_TLS_PREFIX int flint_pools_initialised = 0;
+FLINT_TLS_PREFIX void * flint_pool_ptr[16]; /* pools 2^i limbs */
+FLINT_TLS_PREFIX slong flint_pool_num_free[16]; /* no. free in current page of pool */
+
 static void * _flint_malloc(size_t);
 static void * _flint_calloc(size_t, size_t);
 static void * _flint_realloc(void *, size_t);
@@ -222,7 +231,10 @@ void flint_cleanup()
 
     mpfr_free_cache();
     _fmpz_cleanup();
-    
+
+    if (flint_pools_initialised)
+       flint_pool_cleanup();
+ 
 #if FLINT_REENTRANT && !HAVE_TLS
     pthread_mutex_unlock(&register_lock);
 #endif
@@ -252,15 +264,6 @@ void flint_cleanup_master()
 
    The allocator requires thread local storage and a pthreads implementation.
 */
-
-#define PAGES_PER_BLOCK 16
-
-static slong flint_page_size;
-static slong flint_page_mask;
-
-FLINT_TLS_PREFIX int flint_pools_initialised = 0;
-FLINT_TLS_PREFIX void * flint_pool_ptr[16]; /* pools 2^i limbs */
-FLINT_TLS_PREFIX slong flint_pool_num_free[16]; /* no. free in current page of pool */
 
 slong flint_get_page_size()
 {
@@ -474,3 +477,45 @@ void * flint_pooled_realloc_with_old_size(void * ptr, size_t old_n, size_t n)
 {
    return flint_pooled_realloc(ptr, n);
 }
+
+void flint_pool_cleanup()
+{
+   slong i, n, num, skip;
+   void * ptr;
+
+   /* for each pool */
+   for (i = 0; i < 16; i++)
+   {
+      /* if we haven't allocated all in the block */
+      ptr = flint_pool_ptr[i];
+
+      if (ptr != NULL)
+      {
+         flint_pool_header_s * header_ptr = (flint_pool_header_s *)((slong) ptr & flint_page_mask);
+         flint_pool_header_s * block_ptr = (flint_pool_header_s *) header_ptr->address;           flint_pool_header_s * header1_ptr = flint_align_ptr(block_ptr, flint_page_size);
+
+         n = header_ptr->n;
+
+         /* adjust free count by no. unallocated allocs in this page */
+         block_ptr->count -= flint_pool_num_free[i];
+           
+         /* no. n word blocks dedicated to header, per page */
+         skip = (sizeof(flint_pool_header_s) - 1)/(8*n) + 1;
+
+         /* total number of n word allocs worth per page */
+         num = flint_page_size/(8*n);
+
+         /* adjust free count by no. unallocated allocs in other pages */
+         block_ptr->count -= (num - skip)*((slong) header_ptr - 
+                                    (slong) header1_ptr)/flint_page_size;
+
+         /* if there are now zero in use for this block, free it */
+         if (block_ptr->count == 0)
+         {
+            free(block_ptr);
+            flint_pool_ptr[i] = NULL;
+         }
+      }
+   }
+}
+

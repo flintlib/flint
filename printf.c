@@ -64,7 +64,7 @@ int parse_fmt(int * floating, const char * fmt)
 int flint_vprintf(const char * str, va_list ap)
 {
    size_t len = strlen(str);
-   char * str2 = flint_malloc(len + 1);
+   char * str2 = malloc(len + 1); /* need malloc not flint_malloc as tests print PASS */
    int w1 = 0, w2 = 0;
    void * w3;
    double d;
@@ -174,7 +174,8 @@ int flint_vprintf(const char * str, va_list ap)
       str += n;
    }
 
-   flint_free(str2);
+   /* need free not flint_free as tests print PASS */
+   free(str2);
 
    return (int) ret;
 }
