@@ -14,7 +14,7 @@
 #endif
 
 #if defined(_WIN32) || defined(WIN32)
-#include <windows.h> /* GetSytemInfo */
+#include <windows.h> /* GetSystemInfo */
 #endif
 
 #include <stdlib.h>
@@ -39,26 +39,6 @@ FLINT_TLS_PREFIX ulong mpz_free_alloc = 0;
 static slong flint_page_size;
 static slong flint_mpz_structs_per_block;
 static slong flint_page_mask;
-
-slong flint_get_page_size()
-{
-#if defined(__unix__)
-   return sysconf(_SC_PAGESIZE);
-#elif defined(_WIN32) || defined(WIN32)
-   SYSTEM_INFO si;
-   GetSystemInfo(&si);
-   return si.dwPageSize;
-#else
-   return 4096;
-#endif
-}
-
-void * flint_align_ptr(void * ptr, slong size)
-{
-    slong mask = ~(size - 1);
-
-    return (void *)((mask & (slong) ptr) + size);
-}
 
 __mpz_struct * _fmpz_new_mpz(void)
 {
@@ -86,7 +66,7 @@ __mpz_struct * _fmpz_new_mpz(void)
         /* how many __mpz_structs worth are dedicated to header, per page */
         skip = (sizeof(fmpz_block_header_s) - 1)/sizeof(__mpz_struct) + 1;
 
-        /* total number of number of __mpz_structs worth per page */
+        /* total number of __mpz_structs worth per page */
         num = flint_page_size/sizeof(__mpz_struct);
 
         flint_mpz_structs_per_block = PAGES_PER_BLOCK*(num - skip);

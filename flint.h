@@ -101,6 +101,23 @@ FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
      void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
                                                               void (*free_func) (void *));
 
+typedef struct
+{
+   slong count;
+   slong n;
+   void * address;
+} flint_pool_header_s;
+
+FLINT_DLL void * flint_pooled_malloc(size_t size);
+FLINT_DLL void * flint_pooled_realloc(void * ptr, size_t size);
+FLINT_DLL void * flint_pooled_realloc_with_old_size(void * ptr, size_t size, size_t old);
+FLINT_DLL void * flint_pooled_calloc(size_t num, size_t size);
+FLINT_DLL void flint_pooled_free(void * ptr);
+FLINT_DLL void flint_pooled_free_with_size(void * ptr, size_t size);
+
+FLINT_DLL slong flint_get_page_size(void);
+FLINT_DLL void * flint_align_ptr(void * ptr, slong size);
+
 FLINT_DLL void flint_abort(void);
 FLINT_DLL void flint_set_abort(void (*func)(void));
   /* flint_abort is calling abort by default
@@ -247,9 +264,20 @@ void flint_rand_free(flint_rand_s * state)
 #define FLINT_GC_INIT()
 #endif
 
+#if WANT_POOLED
+#define FLINT_POOLED_INIT() \
+   __gmp_set_memory_functions(flint_pooled_malloc, \
+        flint_pooled_realloc_with_old_size, flint_pooled_free_with_size); \
+   __flint_set_memory_functions(flint_pooled_malloc, flint_pooled_calloc, \
+                            flint_pooled_realloc, flint_pooled_free)
+#else
+#define FLINT_POOLED_INIT()
+#endif
+
 #define FLINT_TEST_INIT(xxx) \
    flint_rand_t xxx; \
    FLINT_GC_INIT(); \
+   FLINT_POOLED_INIT(); \
    flint_randinit(xxx)
 
 #define FLINT_TEST_CLEANUP(xxx) \

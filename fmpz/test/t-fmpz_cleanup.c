@@ -46,11 +46,6 @@ main(void)
                 A + n_randint(state, n), B + n_randint(state, n));
             fmpz_addmul(B + n_randint(state, n),
                 A + n_randint(state, n), B + n_randint(state, n));
-
-            if (n_randint(state, 10) == 0)
-            {
-                
-            }
         }
 
         _fmpz_vec_clear(A, n);
