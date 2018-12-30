@@ -292,7 +292,7 @@ void * flint_pooled_malloc(size_t n)
 
    /* round up to multiple of 64 bit limb size and set n to number of limbs */
    n = (n + 7) >> 3;
-   if (n < 4) n = 4; /* SIMD requires aligned alloc */
+   if (n < 1) n = 1;
 
    /* initialise data for pages and blocks */
    flint_page_size = flint_get_page_size();
@@ -310,7 +310,7 @@ void * flint_pooled_malloc(size_t n)
       flint_pools_initialised = 1;
    }
 
-   if (n >= (flint_page_size >> 4)) /* large allocation, single block per alloc */
+   if (n > (flint_page_size >> 4)) /* large allocation, single block per alloc */
    {
       /* allocate new block */
       ptr = malloc(n*8 + sizeof(flint_pool_header_s) + flint_page_size);
@@ -450,7 +450,7 @@ void * flint_pooled_realloc(void * ptr, size_t n)
 
    /* round up to multiple of 64 bit limb size and set n to number of limbs */
    n = (n + 7) >> 3;
-   if (n < 4) n = 4; /* SIMD requires aligned alloc */
+   if (n < 1) n = 1;
 
    if (ptr != NULL)
    {
