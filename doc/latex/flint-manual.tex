@@ -366,6 +366,13 @@ If you wish to build a threadsafe version of FLINT which uses a
 less complicated memory model (slower, but still works in the absence
 of TLS) you can pass the \code{--reentrant} option to configure.
 
+If you wish to make use of the threaded functions in Flint, the best
+scaling will happen with the \code{--pooled} and \code{--single}
+options. Note that to use the pooled allocator, one must call the
+macro \code{FLINT_POOLED_INIT();} before any Flint code is called.
+The purpose of the \code{--pooled} option is to automatically insert
+this macro in all of the Flint test code.
+
 \chapter{ABI and architecture support}
 
 On some systems, e.g. Sparc and some Macs, more than one ABI is
