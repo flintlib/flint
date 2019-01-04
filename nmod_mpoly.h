@@ -361,6 +361,15 @@ FLINT_DLL void nmod_mpoly_set_coeff_ui_fmpz(nmod_mpoly_t A,
 FLINT_DLL void nmod_mpoly_set_coeff_ui_ui(nmod_mpoly_t A,
                        ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C,
+             const nmod_mpoly_t A,  slong * vars, ulong * exps, slong length,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+/* comparison ****************************************************************/
+
+FLINT_DLL int nmod_mpoly_cmp(const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 
 /* container operations ******************************************************/
 
@@ -404,11 +413,20 @@ FLINT_DLL void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A,
 FLINT_DLL void nmod_mpoly_get_term_exp_ui(ulong * exp, const nmod_mpoly_t A,
                                           slong i, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL ulong nmod_mpoly_get_term_var_exp_ui(const nmod_mpoly_t A, slong i,
+                                        slong var, const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i,
                                fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_set_term_exp_ui(nmod_mpoly_t A, slong i,
                                 const ulong * exp, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_get_term(nmod_mpoly_t M, const nmod_mpoly_t A,
+                                          slong i, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_get_term_monomial(nmod_mpoly_t M, const nmod_mpoly_t A,
+                                          slong i, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_push_term_ui_fmpz(nmod_mpoly_t A, ulong c,
                                fmpz * const * exp, const nmod_mpoly_ctx_t ctx);

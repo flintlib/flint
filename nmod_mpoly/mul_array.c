@@ -337,9 +337,9 @@ int nmod_mpoly_mul_array_LEX(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     /* compute maximum exponents for each variable */
     max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+    mpoly_max_fields_ui_sp(max_fields2, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
-    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
+    mpoly_max_fields_ui_sp(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
 
     /* the field of index n-1 is the one that wil be pulled out */
@@ -810,9 +810,9 @@ int nmod_mpoly_mul_array_DEG(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     /* compute maximum exponents for each variable */
     max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+    mpoly_max_fields_ui_sp(max_fields2, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
-    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
+    mpoly_max_fields_ui_sp(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
 
     /* the field of index n-1 is the one that wil be pulled out */

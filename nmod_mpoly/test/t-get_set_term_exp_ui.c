@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 2017 William Hart
     Copyright (C) 2018 Daniel Schultz
-
 
     This file is part of FLINT.
 
@@ -13,7 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly.h"
 #include "ulong_extras.h"
 
 int
@@ -29,23 +27,24 @@ main(void)
     /* check set and get match */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f;
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f;
         slong nvars, len, index;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        mp_bitcnt_t exp_bits;
+        mp_limb_t modulus;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
-        fmpz_mpoly_init(f, ctx);
+        modulus = UWORD(2) + n_randint(state, -UWORD(2));
+        nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
+        nmod_mpoly_init(f, ctx);
 
-        nvars = fmpz_mpoly_ctx_nvars(ctx);
+        nvars = nmod_mpoly_ctx_nvars(ctx);
 
         len = n_randint(state, 50) + 1;
         exp_bits = n_randint(state, 100) + 2;
-        coeff_bits = n_randint(state, 100) + 2;
 
         do {
-            fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
-        } while (fmpz_mpoly_length(f, ctx) == 0);
+            nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
+        } while (nmod_mpoly_length(f, ctx) == 0);
 
         for (j = 0; j < 10; j++)
         {
@@ -60,7 +59,7 @@ main(void)
 
             index = n_randint(state, f->length);
 
-            fmpz_mpoly_set_term_exp_ui(f, index, exp1, ctx);
+            nmod_mpoly_set_term_exp_ui(f, index, exp1, ctx);
 
             if (!mpoly_monomials_valid_test(f->exps, f->length, f->bits, ctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents invalid");
@@ -68,14 +67,14 @@ main(void)
             if (mpoly_monomials_overflow_test(f->exps, f->length, f->bits, ctx->minfo))
                 flint_throw(FLINT_ERROR, "Polynomial exponents overflow");
 
-            fmpz_mpoly_get_term_exp_ui(exp2, f, index, ctx);
+            nmod_mpoly_get_term_exp_ui(exp2, f, index, ctx);
 
             result = 1;
             for (k = 0; k < nvars; k++)
             {
                 result = result
                  && exp1[k] == exp2[k]
-                 && exp1[k] == fmpz_mpoly_get_term_var_exp_ui(f, index, k, ctx);
+                 && exp1[k] == nmod_mpoly_get_term_var_exp_ui(f, index, k, ctx);
             }
 
             if (!result)
@@ -88,8 +87,8 @@ main(void)
             flint_free(exp2);
         }
 
-        fmpz_mpoly_clear(f, ctx);
-        fmpz_mpoly_ctx_clear(ctx);
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

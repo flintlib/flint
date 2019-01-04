@@ -18,6 +18,8 @@ int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     int success;
     fmpz_mpoly_t T;
 
+    Abits = mpoly_fix_bits(Abits, ctx->minfo);
+
     if (B->bits == Abits || B->length == 0)
     {
         fmpz_mpoly_set(A, B, ctx);

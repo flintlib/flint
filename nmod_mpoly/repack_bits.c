@@ -18,6 +18,8 @@ int nmod_mpoly_repack_bits(nmod_mpoly_t A, const nmod_mpoly_t B,
     int success;
     nmod_mpoly_t T;
 
+    Abits = mpoly_fix_bits(Abits, ctx->minfo);
+
     if (B->bits == Abits || B->length == 0)
     {
         nmod_mpoly_set(A, B, ctx);

@@ -266,6 +266,20 @@ Coefficients
 
     Set the coefficient of the monomial with exponent vector ``exp`` to ``c``.
 
+.. function:: void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C, const fmpz_mpoly_t A, slong * vars, ulong * exps, slong length, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``C`` to the coefficient of ``A`` with respect to the variables in ``vars`` with powers in the corresponding array ``exps``.
+
+
+Comparison
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpz_mpoly_cmp(const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Return ``1`` (resp. ``-1``, or ``0``) if the monomial of ``A`` is greater than (resp. less than, same as) the monomial of ``B``.
+    ``A`` and ``B`` should both have length one with coefficient one. This function will throw otherwise.
+
 
 Container operations
 --------------------------------------------------------------------------------
@@ -315,12 +329,26 @@ Container operations
 .. function:: void fmpz_mpoly_get_term_exp_ui(ulong * exp, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
 
     Set ``exp`` to the exponent vector of the term of index ``i``.
+    The ``_ui`` version throws if any entry does not fit into a ``ulong``.
 
-.. function:: void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A, slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i, slong var, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t A, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+    Return the exponent of the variable ``var`` of the term of index ``i``.
+    This function throws if the exponent not fit into a ``ulong``.
+
+.. function:: void fmpz_mpoly_set_term_exp_fmpz(fmpz_mpoly_t A, slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
     Set the exponent vector of the term of index ``i`` to ``exp``.
+
+.. function:: void fmpz_mpoly_get_term(fmpz_mpoly_t M, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``M`` to the term of index ``i`` in ``A``.
+
+.. function:: void fmpz_mpoly_get_term_monomial(fmpz_mpoly_t M, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``M`` to the monomial of the term of index ``i`` in ``A``. The coefficient of ``M`` will be one.
 
 .. function:: void fmpz_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
