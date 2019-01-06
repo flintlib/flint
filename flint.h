@@ -34,7 +34,7 @@
 #include "config.h"
 #undef ulong
 
-#if FLINT_REENTRANT && !HAVE_TLS
+#if HAVE_PTHREAD
 #include <pthread.h>
 #endif
 
