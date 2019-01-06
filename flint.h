@@ -34,6 +34,10 @@
 #include "config.h"
 #undef ulong
 
+#if FLINT_REENTRANT && !HAVE_TLS
+#include <pthread.h>
+#endif
+
 #ifdef FLINT_INLINES_C
 #define FLINT_INLINE FLINT_DLL
 #else

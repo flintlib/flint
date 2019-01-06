@@ -534,6 +534,5 @@ void flint_pooled_init()
         flint_pooled_realloc_with_old_size, flint_pooled_free_with_size);
    __flint_set_memory_functions(flint_pooled_malloc, flint_pooled_calloc,
                             flint_pooled_realloc, flint_pooled_free);
-   printf("%ld\n", flint_get_page_size());
 }
 
