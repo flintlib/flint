@@ -103,7 +103,10 @@ FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
 
 typedef struct
 {
-   slong count;
+   int count;
+#if HAVE_PTHREAD
+   pthread_t thread;
+#endif
    slong n;
    void * address;
 } flint_pool_header_s;
