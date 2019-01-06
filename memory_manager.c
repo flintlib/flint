@@ -32,9 +32,8 @@
 
 #define PAGES_PER_BLOCK 16
 
-static slong flint_page_size;
-static slong flint_page_mask;
-
+FLINT_TLS_PREFIX slong flint_page_size;
+FLINT_TLS_PREFIX slong flint_page_mask;
 FLINT_TLS_PREFIX int flint_pools_initialised = 0;
 FLINT_TLS_PREFIX void ** flint_pool_ptr[16]; /* pools 2^i limbs */
 FLINT_TLS_PREFIX slong flint_pool_num_free[16]; /* no. free in pool */
@@ -295,12 +294,12 @@ void * flint_pooled_malloc(size_t n)
    n = (n + 7) >> 3;
    if (n < 1) n = 1;
 
-   /* initialise data for pages and blocks */
-   flint_page_size = flint_get_page_size();
-   flint_page_mask = ~(flint_page_size - 1);
-
    if (!flint_pools_initialised) /* check if pools are initialised */
    {
+      /* initialise data for pages and blocks */
+      flint_page_size = flint_get_page_size();
+      flint_page_mask = ~(flint_page_size - 1);
+
       /* initialise data for pools */
       for (i = 0; i < 16; i++)
       {
@@ -428,7 +427,7 @@ void flint_pooled_free(void * ptr)
       flint_pool_header_s * header_ptr1 = (flint_pool_header_s *) header_ptr->address;
       int n = header_ptr->n;
       
-      if (n > (flint_get_page_size() >> 4)) /* large allocation */
+      if (n > (flint_page_size >> 4)) /* large allocation */
          free(header_ptr1);
       else /* pooled allocation */
       {
