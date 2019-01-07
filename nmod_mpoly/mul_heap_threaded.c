@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017-2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include <gmp.h>
 #include <stdlib.h>
 #include "thread_pool.h"
@@ -338,43 +339,53 @@ slong _nmod_mpoly_mul_heap_part(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_
 
 typedef struct
 {
+    volatile int idx;
     pthread_mutex_t mutex;
-    const nmod_mpoly_ctx_struct * ctx;
     slong nthreads;
     slong ndivs;
-    const mp_limb_t * Bcoeff; const ulong * Bexp; slong Blen;
-    const mp_limb_t * Ccoeff; const ulong * Cexp; slong Clen;
+    const nmod_mpoly_ctx_struct * ctx;
+    mp_limb_t * Acoeff;
+    ulong * Aexp;
+    const mp_limb_t * Bcoeff;
+    const ulong * Bexp;
+    slong Blen;
+    const mp_limb_t * Ccoeff;
+    const ulong * Cexp;
+    slong Clen;
     slong N;
     mp_bitcnt_t bits;
     const ulong * cmpmask;
-    volatile int idx;
 }
-mul_heap_threaded_base_t;
+_base_struct;
+
+typedef _base_struct _base_t[1];
 
 typedef struct
 {
     slong lower;
     slong upper;
+    slong thread_idx;
+    slong Aoffset;
     slong Alen;
     slong Aalloc;
     ulong * Aexp;
     mp_limb_t * Acoeff;
 }
-mul_heap_threaded_div_t;
+_div_struct;
 
 typedef struct
 {
     nmod_mpoly_stripe_t S;
     slong idx;
     slong time;
-    mul_heap_threaded_base_t * basep;
-    mul_heap_threaded_div_t * divp;
+    _base_struct * base;
+    _div_struct * divs;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
     slong * t1, * t2, * t3, * t4;
     ulong * exp;
 }
-mul_heap_threaded_arg_t;
+_worker_arg_struct;
 
 
 /*
@@ -389,12 +400,12 @@ mul_heap_threaded_arg_t;
       yy = tt; \
    } while (0)
 
-void _nmod_mpoly_mul_heap_threaded_worker(void * arg_ptr)
+static void _nmod_mpoly_mul_heap_threaded_worker(void * arg_ptr)
 {
-    mul_heap_threaded_arg_t * arg = (mul_heap_threaded_arg_t *) arg_ptr;
+    _worker_arg_struct * arg = (_worker_arg_struct *) arg_ptr;
     nmod_mpoly_stripe_struct * S = arg->S;
-    mul_heap_threaded_div_t * divs = arg->divp;
-    mul_heap_threaded_base_t * base = arg->basep;
+    _div_struct * divs = arg->divs;
+    _base_struct * base = arg->base;
     slong Blen = base->Blen;
     slong N = base->N;
     slong i, j;
@@ -446,6 +457,9 @@ void _nmod_mpoly_mul_heap_threaded_worker(void * arg_ptr)
 
     while (i >= 0)
     {
+        FLINT_ASSERT(divs[i].thread_idx == -WORD(1));
+        divs[i].thread_idx = arg->idx;
+
         /* calculate start */
         if (i + 1 < base-> ndivs)
         {
@@ -498,7 +512,8 @@ void _nmod_mpoly_mul_heap_threaded_worker(void * arg_ptr)
         /* t3 and t4 are free for workspace at this point */
 
         /* calculate products in [start, end) */
-        _nmod_mpoly_fit_length(&divs[i].Acoeff, &divs[i].Aexp, &divs[i].Aalloc, 256, N);
+        _nmod_mpoly_fit_length(&divs[i].Acoeff, &divs[i].Aexp, &divs[i].Aalloc,
+                                                                       256, N);
         if (N == 1)
         {
             divs[i].Alen = _nmod_mpoly_mul_heap_part1(
@@ -533,6 +548,34 @@ void _nmod_mpoly_mul_heap_threaded_worker(void * arg_ptr)
 }
 
 
+static void _join_worker(void * varg)
+{
+    _worker_arg_struct * arg = (_worker_arg_struct *) varg;
+    _div_struct * divs = arg->divs;
+    _base_struct * base = arg->base;
+    slong N = base->N;
+    slong i;
+
+    for (i = base->ndivs - 2; i >= 0; i--)
+    {
+        FLINT_ASSERT(divs[i].thread_idx != -WORD(1));
+
+        if (divs[i].thread_idx != arg->idx)
+            continue;
+
+        FLINT_ASSERT(divs[i].Acoeff != NULL);
+        FLINT_ASSERT(divs[i].Aexp != NULL);
+
+        memcpy(base->Acoeff + divs[i].Aoffset, divs[i].Acoeff,
+                                               divs[i].Alen*sizeof(mp_limb_t));
+
+        memcpy(base->Aexp + N*divs[i].Aoffset, divs[i].Aexp,
+                                                 N*divs[i].Alen*sizeof(ulong));
+
+        flint_free(divs[i].Acoeff);
+        flint_free(divs[i].Aexp);
+    }
+}
 
 slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_alloc,
                  const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
@@ -540,12 +583,13 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong 
                             mp_bitcnt_t bits, slong N, const ulong * cmpmask,
                                                    const nmod_mpoly_ctx_t ctx)
 {
-    slong i, j, ndivs2;
+    slong i, ndivs2;
     slong max_num_workers, num_workers;
     thread_pool_handle * handles;
-    mul_heap_threaded_arg_t * args;
-    mul_heap_threaded_base_t * base;
-    mul_heap_threaded_div_t * divs;
+    _worker_arg_struct * args;
+    _base_t base;
+    _div_struct * divs;
+    slong Aalloc;
     slong Alen;
     mp_limb_t * Acoeff;
     ulong * Aexp;
@@ -559,7 +603,6 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong 
     num_workers = thread_pool_request(global_thread_pool,
                                                      handles, max_num_workers);
 
-    base = flint_malloc(sizeof(mul_heap_threaded_base_t));
     base->nthreads = num_workers + 1;
     base->ndivs    = base->nthreads*4;  /* number of divisons */
     base->Bcoeff = Bcoeff;
@@ -576,8 +619,9 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong 
 
     ndivs2 = base->ndivs*base->ndivs;
 
-    divs = flint_malloc(sizeof(mul_heap_threaded_div_t) * base->ndivs);
-    args = flint_malloc(sizeof(mul_heap_threaded_arg_t) * base->nthreads);
+    divs = (_div_struct *) flint_malloc(base->ndivs*sizeof(_div_struct));
+    args = (_worker_arg_struct *) flint_malloc(base->nthreads
+                                                  *sizeof(_worker_arg_struct));
 
     /* allocate space and set the boundary for each division */
     for (i = base->ndivs - 1; i >= 0; i--)
@@ -585,6 +629,8 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong 
         /* divisions decrease in size so that no worker finishes too early */
         divs[i].lower = (i + 1)*(i + 1)*Blen*Clen/ndivs2;
         divs[i].upper = divs[i].lower;
+        divs[i].Aoffset = -WORD(1);
+        divs[i].thread_idx = -WORD(1);
 
         divs[i].Alen = 0;
         if (i == base->ndivs - 1)
@@ -593,7 +639,8 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong 
             divs[i].Aalloc = *A_alloc;
             divs[i].Aexp = *A_exp;
             divs[i].Acoeff = *A_coeff;
-        } else
+        }
+        else
         {
             /* lower divisions write to a new worker poly */
             divs[i].Aalloc = 0;
@@ -604,62 +651,67 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong 
 
     /* compute each chunk in parallel */
     pthread_mutex_init(&base->mutex, NULL);
-    for (i = 0; i + 1 < base->nthreads; i++)
+    for (i = 0; i < num_workers; i++)
     {
-        /* start ith worker */
         args[i].idx = i;
-        args[i].basep = base;
-        args[i].divp = divs;
+        args[i].base = base;
+        args[i].divs = divs;
         thread_pool_wake(global_thread_pool, handles[i],
                                _nmod_mpoly_mul_heap_threaded_worker, &args[i]);
     }
-    /* main thread starts on highest index */
-    i = base->nthreads - 1;
+    i = num_workers;
     args[i].idx = i;
-    args[i].basep = base;
-    args[i].divp = divs;
+    args[i].base = base;
+    args[i].divs = divs;
     _nmod_mpoly_mul_heap_threaded_worker(&args[i]);
-
-    /* wait for workers to finish */
-    for (i = 0; i + 1 < base->nthreads; i++)
+    for (i = 0; i < num_workers; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i]);
-        thread_pool_give_back(global_thread_pool, handles[i]);
     }
-    pthread_mutex_destroy(&base->mutex);
 
-    /* start concatenating the outputs */
+    /* calculate and allocate space for final answer */
     i = base->ndivs - 1;
     Alen = divs[i].Alen;
     Acoeff = divs[i].Acoeff;
     Aexp = divs[i].Aexp;
-    *A_alloc = divs[i].Aalloc;
-
-    /* make space for all coeffs in one call to fit length */
-    j = Alen;
-    for (i = base->ndivs - 2; i >= 0; i--)
-        j += divs[i].Alen;
-    _nmod_mpoly_fit_length(&Acoeff, &Aexp, A_alloc, j, N);
-
+    Aalloc = divs[i].Aalloc;
     for (i = base->ndivs - 2; i >= 0; i--)
     {
-        /* transfer from worker poly to original poly */
-        FLINT_ASSERT(divs[i].Acoeff != NULL);
-        FLINT_ASSERT(divs[i].Aexp != NULL);
-        flint_mpn_copyi(Acoeff + Alen, divs[i].Acoeff, divs[i].Alen);
-        flint_mpn_copyi(Aexp + N*Alen, divs[i].Aexp, N*divs[i].Alen);
+        divs[i].Aoffset = Alen;
         Alen += divs[i].Alen;
-        flint_free(divs[i].Acoeff);
-        flint_free(divs[i].Aexp);
+    }
+    if (Alen > Aalloc)
+    {
+        Acoeff = (mp_limb_t *) flint_realloc(Acoeff, Alen*sizeof(mp_limb_t));
+        Aexp = (ulong *) flint_realloc(Aexp, Alen*N*sizeof(ulong));
+        Aalloc = Alen;
+    }
+    base->Acoeff = Acoeff;
+    base->Aexp = Aexp;
+
+    /* join answers */
+    for (i = 0; i < num_workers; i++)
+    {
+        thread_pool_wake(global_thread_pool, handles[i], _join_worker, &args[i]);
+    }
+    _join_worker(&args[num_workers]);
+
+    for (i = 0; i < num_workers; i++)
+    {
+        thread_pool_wait(global_thread_pool, handles[i]);
+        thread_pool_give_back(global_thread_pool, handles[i]);
     }
 
+    pthread_mutex_destroy(&base->mutex);
+
     flint_free(handles);
+
     flint_free(args);
     flint_free(divs);
-    flint_free(base);
 
     *A_coeff = Acoeff;
     *A_exp  = Aexp;
+    *A_alloc = Aalloc;
     return Alen;
 }
 

@@ -463,7 +463,7 @@ _worker_arg_struct;
       yy = tt; \
    } while (0)
 
-void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
+static void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
 {
     _worker_arg_struct * arg = (_worker_arg_struct *) varg;
     fmpz_mpoly_stripe_struct * S = arg->S;
@@ -607,7 +607,7 @@ void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
     flint_free(exp);
 }
 
-void _join_worker(void * varg)
+static void _join_worker(void * varg)
 {
     _worker_arg_struct * arg = (_worker_arg_struct *) varg;
     _div_struct * divs = arg->divs;
