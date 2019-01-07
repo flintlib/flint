@@ -571,6 +571,9 @@ void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
         }
         /* t3 and t4 are free for workspace at this point */
 
+        /* join code assumes all divisions have been allocated */
+        _fmpz_mpoly_fit_length(&divs[i].Acoeff, &divs[i].Aexp, &divs[i].Aalloc,
+                                                                       256, N);
         /* calculate products in [start, end) */
         if (N == 1)
         {
@@ -618,6 +621,9 @@ void _join_worker(void * varg)
 
         if (divs[i].thread_idx != arg->idx)
             continue;
+
+        FLINT_ASSERT(divs[i].Acoeff != NULL);
+        FLINT_ASSERT(divs[i].Aexp != NULL);
 
         memcpy(base->Acoeff + divs[i].Aoffset, divs[i].Acoeff,
                                                     divs[i].Alen*sizeof(fmpz));
