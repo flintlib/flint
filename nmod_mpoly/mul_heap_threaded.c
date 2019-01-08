@@ -577,15 +577,13 @@ static void _join_worker(void * varg)
     }
 }
 
-slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_alloc,
+void _nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A,
                  const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
                  const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
                             mp_bitcnt_t bits, slong N, const ulong * cmpmask,
                                                    const nmod_mpoly_ctx_t ctx)
 {
     slong i, ndivs2;
-    slong max_num_workers, num_workers;
-    thread_pool_handle * handles;
     _worker_arg_struct * args;
     _base_t base;
     _div_struct * divs;
@@ -593,15 +591,32 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong 
     slong Alen;
     mp_limb_t * Acoeff;
     ulong * Aexp;
+    slong max_num_workers, num_workers;
+    thread_pool_handle * handles;
 
+    /* bail here if no workers */
     FLINT_ASSERT(global_thread_pool_initialized);
-
     max_num_workers = thread_pool_get_size(global_thread_pool);
+    max_num_workers = FLINT_MIN(max_num_workers, Clen/32);
+    if (max_num_workers == 0)
+    {
+        A->length = _nmod_mpoly_mul_johnson(&A->coeffs, &A->exps, &A->alloc,
+                            Bcoeff, Bexp, Blen,
+                            Ccoeff, Cexp, Clen, bits, N, cmpmask, ctx->ffinfo);
+        return;
+    }
     handles = (thread_pool_handle *) flint_malloc(max_num_workers
                                                   *sizeof(thread_pool_handle));
-
     num_workers = thread_pool_request(global_thread_pool,
                                                      handles, max_num_workers);
+    if (num_workers == 0)
+    {
+        flint_free(handles);
+        A->length = _nmod_mpoly_mul_johnson(&A->coeffs, &A->exps, &A->alloc,
+                            Bcoeff, Bexp, Blen,
+                            Ccoeff, Cexp, Clen, bits, N, cmpmask, ctx->ffinfo);
+        return;
+    }
 
     base->nthreads = num_workers + 1;
     base->ndivs    = base->nthreads*4;  /* number of divisons */
@@ -636,9 +651,9 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong 
         if (i == base->ndivs - 1)
         {
             /* highest division writes to original poly */
-            divs[i].Aalloc = *A_alloc;
-            divs[i].Aexp = *A_exp;
-            divs[i].Acoeff = *A_coeff;
+            divs[i].Aalloc = A->alloc;
+            divs[i].Aexp = A->exps;
+            divs[i].Acoeff = A->coeffs;
         }
         else
         {
@@ -709,52 +724,37 @@ slong _nmod_mpoly_mul_heap_threaded(mp_limb_t ** A_coeff, ulong ** A_exp, slong 
     flint_free(args);
     flint_free(divs);
 
-    *A_coeff = Acoeff;
-    *A_exp  = Aexp;
-    *A_alloc = Aalloc;
-    return Alen;
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->alloc = Aalloc;
+    A->length = Alen;
 }
 
-void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B,
-                              const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
+
+/* maxBfields gets clobbered */
+void _nmod_mpoly_mul_heap_threaded_maxfields(nmod_mpoly_t A,
+                                 const nmod_mpoly_t B, fmpz * maxBfields,
+                                 const nmod_mpoly_t C, fmpz * maxCfields,
+                                                    const nmod_mpoly_ctx_t ctx)
 {
-    slong i, N;
+    slong N;
     mp_bitcnt_t Abits;
     ulong * cmpmask;
-    fmpz * maxBfields, * maxCfields;
     ulong * Bexp, * Cexp;
     int freeBexp, freeCexp;
     TMP_INIT;
 
-    if (B->length == 0 || C->length == 0)
-    {
-        nmod_mpoly_zero(A, ctx);
-        return;
-    }
+    FLINT_ASSERT(global_thread_pool_initialized);
 
     TMP_START;
 
-    /* work out bits required for A */
-    maxBfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
-    maxCfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
-    for (i = 0; i < ctx->minfo->nfields; i++)
-    {
-        fmpz_init(maxBfields + i);
-        fmpz_init(maxCfields + i);
-    }
-    mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
-    mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
     _fmpz_vec_add(maxBfields, maxBfields, maxCfields, ctx->minfo->nfields);
+
     Abits = _fmpz_vec_max_bits(maxBfields, ctx->minfo->nfields);
     Abits = FLINT_MAX(MPOLY_MIN_BITS, Abits + 1);
     Abits = FLINT_MAX(Abits, B->bits);
     Abits = FLINT_MAX(Abits, C->bits);
     Abits = mpoly_fix_bits(Abits, ctx->minfo);
-    for (i = 0; i < ctx->minfo->nfields; i++)
-    {
-        fmpz_clear(maxBfields + i);
-        fmpz_clear(maxCfields + i);
-    }
 
     N = mpoly_words_per_exp(Abits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
@@ -789,17 +789,17 @@ void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B,
 
         /* algorithm more efficient if smaller poly first */
         if (B->length > C->length)
-            T->length = _nmod_mpoly_mul_heap_threaded(
-                                             &T->coeffs, &T->exps, &T->alloc,
-                                                  C->coeffs, Cexp, C->length,
-                                                  B->coeffs, Bexp, B->length,
-                                                       Abits, N, cmpmask, ctx);
+        {
+            _nmod_mpoly_mul_heap_threaded(T, C->coeffs, Cexp, C->length,
+                                             B->coeffs, Bexp, B->length,
+                                                    Abits, N, cmpmask, ctx);
+        }
         else
-            T->length = _nmod_mpoly_mul_heap_threaded(
-                                             &T->coeffs, &T->exps, &T->alloc,
-                                                  B->coeffs, Bexp, B->length,
-                                                  C->coeffs, Cexp, C->length,
-                                                       Abits, N, cmpmask, ctx);
+        {
+            _nmod_mpoly_mul_heap_threaded(T, B->coeffs, Bexp, B->length,
+                                             C->coeffs, Cexp, C->length,
+                                                    Abits, N, cmpmask, ctx);
+        }
 
         nmod_mpoly_swap(T, A, ctx);
         nmod_mpoly_clear(T, ctx);
@@ -812,17 +812,17 @@ void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B,
 
         /* algorithm more efficient if smaller poly first */
         if (B->length > C->length)
-            A->length = _nmod_mpoly_mul_heap_threaded(
-                                             &A->coeffs, &A->exps, &A->alloc,
-                                                  C->coeffs, Cexp, C->length,
-                                                  B->coeffs, Bexp, B->length,
-                                                       Abits, N, cmpmask, ctx);
+        {
+            _nmod_mpoly_mul_heap_threaded(A, C->coeffs, Cexp, C->length,
+                                             B->coeffs, Bexp, B->length,
+                                                    Abits, N, cmpmask, ctx);
+        }
         else
-            A->length = _nmod_mpoly_mul_heap_threaded(
-                                             &A->coeffs, &A->exps, &A->alloc,
-                                                  B->coeffs, Bexp, B->length,
-                                                  C->coeffs, Cexp, C->length,
-                                                       Abits, N, cmpmask, ctx);
+        {
+            _nmod_mpoly_mul_heap_threaded(A, B->coeffs, Bexp, B->length,
+                                             C->coeffs, Cexp, C->length,
+                                                    Abits, N, cmpmask, ctx);
+        }
     }
 
     if (freeBexp)
@@ -830,6 +830,43 @@ void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B,
 
     if (freeCexp)
         flint_free(Cexp);
+
+    TMP_END;
+}
+
+
+void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B,
+                              const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    fmpz * maxBfields, * maxCfields;
+    TMP_INIT;
+
+    if (B->length == 0 || C->length == 0)
+    {
+        nmod_mpoly_zero(A, ctx);
+        return;
+    }
+
+    TMP_START;
+
+    maxBfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    maxCfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_init(maxBfields + i);
+        fmpz_init(maxCfields + i);
+    }
+    mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
+    mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
+
+    _nmod_mpoly_mul_heap_threaded_maxfields(A, B, maxBfields, C, maxCfields, ctx);
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(maxBfields + i);
+        fmpz_clear(maxCfields + i);
+    }
 
     TMP_END;
 }
