@@ -744,7 +744,11 @@ void _nmod_mpoly_mul_heap_threaded_maxfields(nmod_mpoly_t A,
     int freeBexp, freeCexp;
     TMP_INIT;
 
-    FLINT_ASSERT(global_thread_pool_initialized);
+    if (!global_thread_pool_initialized)
+    {
+        _nmod_mpoly_mul_johnson_maxfields(A, B, maxBfields, C, maxCfields, ctx);
+        return;
+    }
 
     TMP_START;
 

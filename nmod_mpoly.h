@@ -599,6 +599,16 @@ FLINT_DLL slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slon
                  const mp_limb_t * coeff3, const ulong * exp3, slong len3,
       mp_bitcnt_t bits, slong N, const ulong * cmpmask, const nmodf_ctx_t fctx);
 
+FLINT_DLL void _nmod_mpoly_mul_johnson_maxfields(nmod_mpoly_t A,
+                                 const nmod_mpoly_t B, fmpz * maxBfields,
+                                 const nmod_mpoly_t C, fmpz * maxCfields,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _nmod_mpoly_mul_heap_threaded_maxfields(nmod_mpoly_t A,
+                                 const nmod_mpoly_t B, fmpz * maxBfields,
+                                 const nmod_mpoly_t C, fmpz * maxCfields,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 /* Powering ******************************************************************/
 
 FLINT_DLL void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B,
