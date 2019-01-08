@@ -763,8 +763,9 @@ int _fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t A,
         mults[i] = 1 + fmpz_get_ui(maxBfields + i) + fmpz_get_ui(maxCfields + i);
         max |= mults[i];
         umul_ppmm(hi, array_size, array_size, mults[i]);
-        if (hi != WORD(0) || (array_size | (slong) mults[i]) <= 0
-                          || array_size > MAX_ARRAY_SIZE)
+        if (hi != 0 || (slong) mults[i] <= 0
+                    || array_size <= 0
+                    || array_size > MAX_ARRAY_SIZE)
         {
             success = 0;
             goto cleanup;
