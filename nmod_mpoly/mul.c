@@ -207,12 +207,12 @@ void nmod_mpoly_mul(nmod_mpoly_t A, const nmod_mpoly_t B,
     }
     if (ctx->minfo->ord == ORD_LEX)
     {
-        success = _nmod_mpoly_mul_array_LEX(A,
+        success = _nmod_mpoly_mul_array_threaded_LEX(A,
                                             B, maxBfields, C, maxCfields, ctx);
     }
     else if (ctx->minfo->ord == ORD_DEGLEX || ctx->minfo->ord == ORD_DEGREVLEX)
     {
-        success = _nmod_mpoly_mul_array_DEG(A,
+        success = _nmod_mpoly_mul_array_threaded_DEG(A,
                                             B, maxBfields, C, maxCfields, ctx);
     }
     if (success)

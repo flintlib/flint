@@ -591,6 +591,10 @@ FLINT_DLL void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A,
 FLINT_DLL int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B,
                              const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int nmod_mpoly_mul_array_threaded(nmod_mpoly_t A,
+                              const nmod_mpoly_t B, const nmod_mpoly_t C,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL int nmod_mpoly_mul_dense(nmod_mpoly_t A, const nmod_mpoly_t B,
                              const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
@@ -892,6 +896,64 @@ FLINT_DLL void _nmod_mpoly_univar_pgcd(nmod_mpoly_univar_t poly1,
 
 FLINT_DLL void _nmod_mpoly_univar_pgcd_ducos(nmod_mpoly_univar_t poly1,
             const nmod_mpoly_univar_t polyP, const nmod_mpoly_univar_t polyQ,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+/* Helpers for array methods *************************************************/
+
+FLINT_DLL void _nmod_mpoly_mul_array_chunked_LEX(nmod_mpoly_t P,
+                             const nmod_mpoly_t A, const nmod_mpoly_t B, 
+                              const ulong * mults, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _nmod_mpoly_mul_array_chunked_DEG(nmod_mpoly_t P,
+                             const nmod_mpoly_t A, const nmod_mpoly_t B, 
+                                       ulong degb, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void _nmod_mpoly_addmul_array1_ulong1(ulong * poly1,
+                          const ulong * poly2, const ulong * exp2, slong len2,
+                          const ulong * poly3, const ulong * exp3, slong len3);
+
+FLINT_DLL void _nmod_mpoly_addmul_array1_ulong2(ulong * poly1,
+                          const ulong * poly2, const ulong * exp2, slong len2,
+                          const ulong * poly3, const ulong * exp3, slong len3);
+
+FLINT_DLL void _nmod_mpoly_addmul_array1_ulong3(ulong * poly1,
+                          const ulong * poly2, const ulong * exp2, slong len2,
+                          const ulong * poly3, const ulong * exp3, slong len3);
+
+FLINT_DLL slong nmod_mpoly_append_array_sm1_LEX(nmod_mpoly_t P, slong Plen,
+         ulong * coeff_array, const ulong * mults, slong num, slong array_size,
+                                        slong top, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong nmod_mpoly_append_array_sm2_LEX(nmod_mpoly_t P, slong Plen,
+         ulong * coeff_array, const ulong * mults, slong num, slong array_size,
+                                        slong top, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong nmod_mpoly_append_array_sm3_LEX(nmod_mpoly_t P, slong Plen,
+         ulong * coeff_array, const ulong * mults, slong num, slong array_size,
+                                        slong top, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong nmod_mpoly_append_array_sm1_DEGLEX(nmod_mpoly_t P, slong Plen,
+                     ulong * coeff_array, slong top, slong nvars, slong degb,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong nmod_mpoly_append_array_sm2_DEGLEX(nmod_mpoly_t P, slong Plen,
+                     ulong * coeff_array, slong top, slong nvars, slong degb,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong nmod_mpoly_append_array_sm3_DEGLEX(nmod_mpoly_t P, slong Plen,
+                     ulong * coeff_array, slong top, slong nvars, slong degb,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong nmod_mpoly_append_array_sm1_DEGREVLEX(nmod_mpoly_t P, slong Plen,
+                     ulong * coeff_array, slong top, slong nvars, slong degb,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong nmod_mpoly_append_array_sm2_DEGREVLEX(nmod_mpoly_t P, slong Plen,
+                     ulong * coeff_array, slong top, slong nvars, slong degb,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL slong nmod_mpoly_append_array_sm3_DEGREVLEX(nmod_mpoly_t P, slong Plen,
+                     ulong * coeff_array, slong top, slong nvars, slong degb,
                                                    const nmod_mpoly_ctx_t ctx);
 
 /* dense helpers *************************************************************/
