@@ -27,6 +27,7 @@
 #include <gmp.h>
 #define ulong mp_limb_t
 
+#include "string.h"
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
@@ -480,6 +481,12 @@ void mpoly_monomial_set(ulong * exp2, const ulong * exp3, slong N)
    slong i;
    for (i = 0; i < N; i++)
       exp2[i] = exp3[i];
+}
+
+MPOLY_INLINE
+void mpoly_copy_monomials(ulong * exp1, const ulong * exp2, slong len, slong N)
+{
+    memcpy(exp1, exp2, N*len*sizeof(ulong));
 }
 
 MPOLY_INLINE

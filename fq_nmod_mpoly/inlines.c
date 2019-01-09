@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#define FQ_NMOD_MPOLY_INLINES_C
 
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#include <stdio.h>
+#undef ulong
+#include <gmp.h>
+#include "flint.h"
+#include "ulong_extras.h"
+#include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_ctx_change_modulus(fq_nmod_mpoly_ctx_t ctx, slong deg)
-{
-    fmpz_t P;
-    fmpz_init_set_ui(P, ctx->fqctx->mod.n);
-    fq_nmod_ctx_clear(ctx->fqctx);
-    fq_nmod_ctx_init(ctx->fqctx, P, deg, "#");
-    fmpz_clear(P);
-}

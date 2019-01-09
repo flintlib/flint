@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpolyun_init(fq_nmod_mpolyun_t A, mp_bitcnt_t bits,
                                                  const fq_nmod_mpoly_ctx_t ctx)

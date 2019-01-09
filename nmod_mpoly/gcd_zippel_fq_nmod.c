@@ -10,7 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
-
+#include "fq_nmod_mpoly.h"
 
 void fq_nmod_next_not_zero(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
 {

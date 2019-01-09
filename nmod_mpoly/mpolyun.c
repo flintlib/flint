@@ -10,6 +10,8 @@
 */
 
 #include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
+
 
 void nmod_mpolyun_init(nmod_mpolyun_t A, mp_bitcnt_t bits,
                                                     const nmod_mpoly_ctx_t ctx)
@@ -566,7 +568,7 @@ void nmod_mpolyn_redto_fq_nmod_mpoly(fq_nmod_mpoly_t A, nmod_mpolyn_t B,
         k += !fq_nmod_is_zero(A->coeffs + k, ffctx->fqctx);
     }
 
-    fq_nmod_mpoly_set_length(A, k, ffctx);
+    _fq_nmod_mpoly_set_length(A, k, ffctx);
 }
 
 void nmod_mpolyun_redto_fq_nmod_mpolyu(fq_nmod_mpolyu_t A, nmod_mpolyun_t B,
