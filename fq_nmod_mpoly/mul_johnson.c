@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,8 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
-
+#include "fq_nmod_mpoly.h"
 
 slong _fq_nmod_mpoly_mul_johnson(fq_nmod_struct ** coeff1, ulong ** exp1, slong * alloc,
                  const fq_nmod_struct * coeff2, const ulong * exp2, slong len2,
@@ -177,10 +176,7 @@ void fq_nmod_mpoly_mul_johnson(fq_nmod_mpoly_t poly1, const fq_nmod_mpoly_t poly
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
     int free2 = 0, free3 = 0;
     TMP_INIT;
-/*
-printf("****************\nmul_joh first: "); fq_nmod_mpoly_print_pretty(poly2, NULL, ctx); printf("\n");
-printf("mul_joh secon: "); fq_nmod_mpoly_print_pretty(poly3, NULL, ctx); printf("\n");
-*/
+
     if (poly2->length == 0 || poly3->length == 0)
     {
         fq_nmod_mpoly_zero(poly1, ctx);
@@ -258,7 +254,7 @@ printf("mul_joh secon: "); fq_nmod_mpoly_print_pretty(poly3, NULL, ctx); printf(
                                           exp_bits, N, cmpmask, ctx->fqctx);
         }
 
-        fq_nmod_mpoly_swap(temp, poly1);
+        fq_nmod_mpoly_swap(temp, poly1, ctx);
         fq_nmod_mpoly_clear(temp, ctx);
    } else
    {
@@ -288,8 +284,6 @@ printf("mul_joh secon: "); fq_nmod_mpoly_print_pretty(poly3, NULL, ctx); printf(
       flint_free(exp3);
 
    _fq_nmod_mpoly_set_length(poly1, len1, ctx);
-/*
-printf("mul_joh result: "); fq_nmod_mpoly_print_pretty(poly1, NULL, ctx); printf("\n");
-*/
+
    TMP_END;
 }

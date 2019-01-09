@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,9 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
-slong _fq_nmod_mpoly_sub(fq_nmod_struct * coeff1,       ulong * exp1,
+slong _fq_nmod_mpoly_add(fq_nmod_struct * coeff1,       ulong * exp1,
                          fq_nmod_struct * coeff2, const ulong * exp2, slong len2,
                          fq_nmod_struct * coeff3, const ulong * exp3, slong len3,
                    slong N, const ulong * cmpmask, const fq_nmod_ctx_t fqctx)
@@ -27,17 +27,19 @@ slong _fq_nmod_mpoly_sub(fq_nmod_struct * coeff1,       ulong * exp1,
             mpoly_monomial_set(exp1 + k*N, exp2 + i*N, N);
             fq_nmod_set(coeff1 + k, coeff2 + i, fqctx);
             i++;
-        } else if (cmp == 0)
+        }
+        else if (cmp == 0)
         {
             mpoly_monomial_set(exp1 + k*N, exp2 + i*N, N);
-            fq_nmod_sub(coeff1 + k, coeff2 + i, coeff3 + j, fqctx);
+            fq_nmod_add(coeff1 + k, coeff2 + i, coeff3 + j, fqctx);
             k -= fq_nmod_is_zero(coeff1 + k, fqctx);
             i++;
             j++;
-        } else
+        }
+        else
         {
             mpoly_monomial_set(exp1 + k*N, exp3 + j*N, N);
-            fq_nmod_neg(coeff1 + k, coeff3 + j, fqctx);
+            fq_nmod_set(coeff1 + k, coeff3 + j, fqctx);
             j++;
         }
         k++;
@@ -54,7 +56,7 @@ slong _fq_nmod_mpoly_sub(fq_nmod_struct * coeff1,       ulong * exp1,
     while (j < len3)
     {
         mpoly_monomial_set(exp1 + k*N, exp3 + j*N, N);
-        fq_nmod_neg(coeff1 + k, coeff3 + j, fqctx);
+        fq_nmod_set(coeff1 + k, coeff3 + j, fqctx);
         j++;
         k++;
     }
@@ -62,7 +64,7 @@ slong _fq_nmod_mpoly_sub(fq_nmod_struct * coeff1,       ulong * exp1,
     return k;
 }
 
-void fq_nmod_mpoly_sub(fq_nmod_mpoly_t poly1, const fq_nmod_mpoly_t poly2,
+void fq_nmod_mpoly_add(fq_nmod_mpoly_t poly1, const fq_nmod_mpoly_t poly2,
                           const fq_nmod_mpoly_t poly3, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong len1 = 0, max_bits, N;
@@ -76,9 +78,10 @@ void fq_nmod_mpoly_sub(fq_nmod_mpoly_t poly1, const fq_nmod_mpoly_t poly2,
 
     if (poly2->length == 0)
     {
-        fq_nmod_mpoly_neg(poly1, poly3, ctx);
+        fq_nmod_mpoly_set(poly1, poly3, ctx);
         return;
-    } else if (poly3->length == 0)
+    }
+    else if (poly3->length == 0)
     {
         fq_nmod_mpoly_set(poly1, poly2, ctx);
         return;
@@ -112,21 +115,22 @@ void fq_nmod_mpoly_sub(fq_nmod_mpoly_t poly1, const fq_nmod_mpoly_t poly2,
         fq_nmod_mpoly_fit_bits(temp, max_bits, ctx);
         temp->bits = max_bits;
 
-        len1 = _fq_nmod_mpoly_sub(temp->coeffs, temp->exps, 
+        len1 = _fq_nmod_mpoly_add(temp->coeffs, temp->exps, 
                     poly2->coeffs, exp2, poly2->length,
                     poly3->coeffs, exp3, poly3->length,
                                     N, cmpmask, ctx->fqctx);
 
-        fq_nmod_mpoly_swap(temp, poly1);
+        fq_nmod_mpoly_swap(temp, poly1, ctx);
         fq_nmod_mpoly_clear(temp, ctx);
 
-    } else
+    }
+    else
     {
         fq_nmod_mpoly_fit_length(poly1, poly2->length + poly3->length, ctx);
         fq_nmod_mpoly_fit_bits(poly1, max_bits, ctx);
         poly1->bits = max_bits;
 
-        len1 = _fq_nmod_mpoly_sub(poly1->coeffs, poly1->exps, 
+        len1 = _fq_nmod_mpoly_add(poly1->coeffs, poly1->exps, 
                        poly2->coeffs, exp2, poly2->length,
                        poly3->coeffs, exp3, poly3->length,
                                     N, cmpmask, ctx->fqctx);

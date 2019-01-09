@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 /* store in each coefficient the evaluation of the corresponding monomial */
 void nmod_mpoly_evalsk(nmod_mpoly_t A, nmod_mpoly_t B,

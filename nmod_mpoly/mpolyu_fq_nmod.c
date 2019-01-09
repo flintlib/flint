@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 
 int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A,

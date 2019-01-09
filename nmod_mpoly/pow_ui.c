@@ -9,10 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly.h"
-
 
 void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                            ulong k, const nmod_mpoly_ctx_t ctx)
@@ -48,8 +46,6 @@ void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
         return;
     }
 
-    TMP_START;
-
     if (A == B)
     {
         nmod_mpoly_t T;
@@ -59,6 +55,8 @@ void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
         nmod_mpoly_clear(T, ctx);
         return;
     }
+
+    TMP_START;
 
     maxBfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
     for (i = 0; i < ctx->minfo->nfields; i++)
