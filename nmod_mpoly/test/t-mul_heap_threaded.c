@@ -39,6 +39,7 @@ main(void)
         nmod_mpoly_mul(h1, f, g, ctx);
         flint_set_num_threads(2);
         nmod_mpoly_mul_heap_threaded(h2, f, g, ctx);
+
         if (!nmod_mpoly_equal(h1, h2, ctx))
         {
             printf("FAIL\n");
@@ -54,7 +55,7 @@ main(void)
     }
 
     /* Check mul_heap_threaded matches mul_johnson */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 15 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
@@ -113,7 +114,7 @@ main(void)
 
 
     /* Check aliasing first argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 15 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
@@ -168,7 +169,7 @@ main(void)
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 15 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;

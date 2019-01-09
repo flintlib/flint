@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly.h"
 #include "ulong_extras.h"
 
 int
@@ -27,16 +27,20 @@ main(void)
     /* Check mul_array_threaded matches mul_johnson */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f, g, h, k;
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, h, k;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong coeff_bits, max_bound;
+        slong max_bound;
+        mp_limb_t modulus;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 5);
-        fmpz_mpoly_init(f, ctx);
-        fmpz_mpoly_init(g, ctx);
-        fmpz_mpoly_init(h, ctx);
-        fmpz_mpoly_init(k, ctx);
+        modulus = n_randint(state, FLINT_BITS - 2) + 2;
+        modulus = n_randbits(state, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 5, modulus);
+
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(h, ctx);
+        nmod_mpoly_init(k, ctx);
 
         len = n_randint(state, 100);
         len1 = n_randint(state, 100);
@@ -48,26 +52,24 @@ main(void)
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
 
-        coeff_bits = n_randint(state, 100);
-
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
-            fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
-            fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
-            fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
+            nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
+            nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(k, state, len, exp_bound, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-            fmpz_mpoly_mul_johnson(h, f, g, ctx);
-            fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array_threaded(k, f, g, ctx);
+            nmod_mpoly_mul_johnson(h, f, g, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            result = nmod_mpoly_mul_array_threaded(k, f, g, ctx);
             if (!result)
             {
                 continue;
             }
-            fmpz_mpoly_assert_canonical(k, ctx);
-            result = fmpz_mpoly_equal(h, k, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
+            result = nmod_mpoly_equal(h, k, ctx);
             if (!result)
             {
                 printf("FAIL\n");
@@ -76,25 +78,29 @@ main(void)
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);
-        fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_clear(h, ctx);
-        fmpz_mpoly_clear(k, ctx);
-        fmpz_mpoly_ctx_clear(ctx);
+        nmod_mpoly_clear(f, ctx);  
+        nmod_mpoly_clear(g, ctx);  
+        nmod_mpoly_clear(h, ctx);  
+        nmod_mpoly_clear(k, ctx);  
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing first argument */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f, g, h;
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong coeff_bits, max_bound;
+        slong max_bound;
+        mp_limb_t modulus;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
-        fmpz_mpoly_init(f, ctx);
-        fmpz_mpoly_init(g, ctx);
-        fmpz_mpoly_init(h, ctx);
+        modulus = n_randint(state, FLINT_BITS - 2) + 2;
+        modulus = n_randbits(state, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 10, modulus);
+
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(h, ctx);
 
         len = n_randint(state, 50);
         len1 = n_randint(state, 50);
@@ -105,24 +111,22 @@ main(void)
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
 
-        coeff_bits = n_randint(state, 200);
-
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
-            fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
-            fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
+            nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
+            nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-            fmpz_mpoly_mul_johnson(h, f, g, ctx);
-            fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array_threaded(f, f, g, ctx);
+            nmod_mpoly_mul_johnson(h, f, g, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            result = nmod_mpoly_mul_array_threaded(f, f, g, ctx);
             if (!result)
                 continue;
 
-            fmpz_mpoly_assert_canonical(f, ctx);
-            result = fmpz_mpoly_equal(h, f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
+            result = nmod_mpoly_equal(h, f, ctx);
             if (!result)
             {
                 printf("FAIL\n");
@@ -131,24 +135,28 @@ main(void)
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);
-        fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_clear(h, ctx);
-        fmpz_mpoly_ctx_clear(ctx);
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(h, ctx);
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f, g, h;
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong coeff_bits, max_bound;
+        slong max_bound;
+        mp_limb_t modulus;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
-        fmpz_mpoly_init(f, ctx);
-        fmpz_mpoly_init(g, ctx);
-        fmpz_mpoly_init(h, ctx);
+        modulus = n_randint(state, FLINT_BITS - 2) + 2;
+        modulus = n_randbits(state, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 10, modulus);
+
+        nmod_mpoly_init(f, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(h, ctx);
 
         len = n_randint(state, 50);
         len1 = n_randint(state, 50);
@@ -159,24 +167,22 @@ main(void)
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
 
-        coeff_bits = n_randint(state, 200);
-
         for (j = 0; j < 4; j++)
         {
-            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
-            fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
-            fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
+            nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
+            nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-            fmpz_mpoly_mul_johnson(h, f, g, ctx);
-            fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array_threaded(g, f, g, ctx);
+            nmod_mpoly_mul_johnson(h, f, g, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
+            result = nmod_mpoly_mul_array_threaded(g, f, g, ctx);
             if (!result)
                 continue;
 
-            fmpz_mpoly_assert_canonical(g, ctx);
-            result = fmpz_mpoly_equal(h, g, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
+            result = nmod_mpoly_equal(h, g, ctx);
             if (!result)
             {
                 printf("FAIL\n");
@@ -185,10 +191,10 @@ main(void)
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);
-        fmpz_mpoly_clear(g, ctx);
-        fmpz_mpoly_clear(h, ctx);
-        fmpz_mpoly_ctx_clear(ctx);
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(h, ctx);
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
