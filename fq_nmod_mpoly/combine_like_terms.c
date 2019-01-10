@@ -25,18 +25,19 @@ void fq_nmod_mpoly_combine_like_terms(fq_nmod_mpoly_t A,
 
     out = -WORD(1);
 
-    for (in = 0; in < A->length; in++)
+    for (in = WORD(0); in < A->length; in++)
     {
         FLINT_ASSERT(in > out);
 
-        if (out >= 0 && mpoly_monomial_equal(A->exps + N*out, A->exps + N*in, N))
+        if (out >= WORD(0)
+            && mpoly_monomial_equal(A->exps + N*out, A->exps + N*in, N))
         {
             fq_nmod_add(A->coeffs + out, A->coeffs + out, A->coeffs + in,
                                                                   ctx-> fqctx);
         }
         else
         {
-            if (out < 0 || !fq_nmod_is_zero(A->coeffs + out, ctx->fqctx))
+            if (out < WORD(0) || !fq_nmod_is_zero(A->coeffs + out, ctx->fqctx))
                 out++;
 
             if (out != in)
@@ -47,7 +48,7 @@ void fq_nmod_mpoly_combine_like_terms(fq_nmod_mpoly_t A,
         }
     }
 
-    if (out < 0 || !fq_nmod_is_zero(A->coeffs + out, ctx->fqctx))
+    if (out < WORD(0) || !fq_nmod_is_zero(A->coeffs + out, ctx->fqctx))
         out++;
 
     A->length = out;

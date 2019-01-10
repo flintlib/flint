@@ -32,9 +32,7 @@ main(void)
 
         for (i = 0; i < 10*flint_test_multiplier(); i++)
         {
-            fq_nmod_mpoly_ctx_init_rand(ctx, state, 6,
-                                         2 + n_randint(state, FLINT_BITS - 2),
-                                         1 + n_randint(state, 10));
+            fq_nmod_mpoly_ctx_init_rand(ctx, state, 6, FLINT_BITS, 10);
 
             fq_nmod_mpoly_init(f, ctx);
             fq_nmod_mpoly_init(f1, ctx);

@@ -72,10 +72,10 @@ main(void)
             flint_abort();
         }
 
-        fmpz_mpoly_clear(f, ctx);
-
         fmpz_clear(c);
         fmpz_clear(d);
+        fmpz_mpoly_clear(f, ctx);
+        fmpq_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
