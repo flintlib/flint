@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,11 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
-void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C, const fmpz_mpoly_t A,
+void fq_nmod_mpoly_get_coeff_vars_ui(fq_nmod_mpoly_t C, const fq_nmod_mpoly_t A,
                                    slong * vars, ulong * exps, slong length,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, j, N;
     slong offset, shift;
@@ -21,7 +21,7 @@ void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C, const fmpz_mpoly_t A,
     ulong * uexp;
     ulong * tmask, * texp;
     slong nvars = ctx->minfo->nvars;
-    fmpz * Ccoeff;
+    fq_nmod_struct * Ccoeff;
     ulong * Cexp;
     slong Calloc;
     slong Clen;
@@ -29,11 +29,11 @@ void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C, const fmpz_mpoly_t A,
 
     if (C == A)
     {
-        fmpz_mpoly_t T;
-        fmpz_mpoly_init(T, ctx);
-        fmpz_mpoly_get_coeff_vars_ui(T, A, vars, exps,length, ctx);
-        fmpz_mpoly_swap(T, C, ctx);
-        fmpz_mpoly_clear(T, ctx);
+        fq_nmod_mpoly_t T;
+        fq_nmod_mpoly_init(T, ctx);
+        fq_nmod_mpoly_get_coeff_vars_ui(T, A, vars, exps, length, ctx);
+        fq_nmod_mpoly_swap(T, C, ctx);
+        fq_nmod_mpoly_clear(T, ctx);
         return;
     }
 
@@ -51,11 +51,11 @@ void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C, const fmpz_mpoly_t A,
 
     if (A->bits < mpoly_exp_bits_required_ui(uexp, ctx->minfo))
     {
-        fmpz_mpoly_zero(C, ctx);
+        fq_nmod_mpoly_zero(C, ctx);
         goto cleanup;
     }
 
-    fmpz_mpoly_fit_bits(C, A->bits, ctx);
+    fq_nmod_mpoly_fit_bits(C, A->bits, ctx);
     C->bits = A->bits;
 
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
@@ -89,9 +89,10 @@ void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C, const fmpz_mpoly_t A,
                 if ((((A->exps + N*i)[j] ^ texp[j]) & tmask[j]) != UWORD(0))
                     goto continue_outer_sp;
             }
-            _fmpz_mpoly_fit_length(&Ccoeff, &Cexp, &Calloc, Clen + 1, N);
+            _fq_nmod_mpoly_fit_length(&Ccoeff, &Cexp, &Calloc, Clen + 1, N,
+                                                                   ctx->fqctx);
             mpoly_monomial_sub(Cexp + N*Clen, A->exps + N*i, texp, N);
-            fmpz_set(Ccoeff + Clen, A->coeffs + i);
+            fq_nmod_set(Ccoeff + Clen, A->coeffs + i, ctx->fqctx);
             Clen++;
 continue_outer_sp:
             NULL;
@@ -100,7 +101,7 @@ continue_outer_sp:
         C->coeffs = Ccoeff;
         C->exps = Cexp;
         C->alloc = Calloc;
-        _fmpz_mpoly_set_length(C, Clen, ctx);
+        _fq_nmod_mpoly_set_length(C, Clen, ctx);
     }
     else
     {
@@ -128,9 +129,10 @@ continue_outer_sp:
                 if ((((A->exps + N*i)[j] ^ texp[j]) & tmask[j]) != UWORD(0))
                     goto continue_outer_mp;
             }
-            _fmpz_mpoly_fit_length(&Ccoeff, &Cexp, &Calloc, Clen + 1, N);
+            _fq_nmod_mpoly_fit_length(&Ccoeff, &Cexp, &Calloc, Clen + 1, N,
+                                                                   ctx->fqctx);
             mpoly_monomial_sub_mp(Cexp + N*Clen, A->exps + N*i, texp, N);
-            fmpz_set(Ccoeff + Clen, A->coeffs + i);
+            fq_nmod_set(Ccoeff + Clen, A->coeffs + i, ctx->fqctx);
             Clen++;
 continue_outer_mp:
             NULL;
@@ -139,7 +141,7 @@ continue_outer_mp:
         C->coeffs = Ccoeff;
         C->exps = Cexp;
         C->alloc = Calloc;
-        _fmpz_mpoly_set_length(C, Clen, ctx);
+        _fq_nmod_mpoly_set_length(C, Clen, ctx);
     }
 
 cleanup:

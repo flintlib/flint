@@ -795,6 +795,16 @@ FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
 FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
                  const ulong * exp, slong len, slong N, const ulong * cmpmask);
 
+FLINT_DLL slong mpoly_monomial_index_ui(const ulong * Aexp, mp_bitcnt_t Abits,
+                     slong Alength, const ulong * exp, const mpoly_ctx_t mctx);
+
+FLINT_DLL slong mpoly_monomial_index_pfmpz(const ulong * Aexp, mp_bitcnt_t Abits,
+                    slong Alength, fmpz * const * exp, const mpoly_ctx_t mctx);
+
+FLINT_DLL slong mpoly_monomial_index_monomial(const ulong * Aexp,
+                      mp_bitcnt_t Abits, slong Alength, const ulong * Mexp,
+                                    mp_bitcnt_t Mbits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
                           slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 

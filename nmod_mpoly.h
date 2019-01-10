@@ -343,9 +343,6 @@ FLINT_DLL ulong nmod_mpoly_get_coeff_ui_monomial(const nmod_mpoly_t A,
 FLINT_DLL void nmod_mpoly_set_coeff_ui_monomial(nmod_mpoly_t A, ulong c,
                              const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL ulong _nmod_mpoly_get_coeff_ui_fmpz(const nmod_mpoly_t A,
-                                 const fmpz * exp, const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL ulong nmod_mpoly_get_coeff_ui_fmpz(const nmod_mpoly_t A,
                                fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
 

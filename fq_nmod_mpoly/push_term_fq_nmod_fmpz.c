@@ -46,7 +46,7 @@ void _fq_nmod_mpoly_push_exp_pfmpz(fq_nmod_mpoly_t A,
 }
 
 
-void nmod_mpoly_push_term_fq_nmod_fmpz(fq_nmod_mpoly_t A, const fq_nmod_t c,
+void fq_nmod_mpoly_push_term_fq_nmod_fmpz(fq_nmod_mpoly_t A, const fq_nmod_t c,
                              fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx)
 {
     _fq_nmod_mpoly_push_exp_pfmpz(A, exp, ctx);
