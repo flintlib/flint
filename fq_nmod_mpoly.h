@@ -170,11 +170,23 @@ void fq_nmod_mpoly_swap(fq_nmod_mpoly_t A, fq_nmod_mpoly_t B,
 
 /* Constants *****************************************************************/
 
+FLINT_DLL int fq_nmod_mpoly_is_fq_nmod(const fq_nmod_mpoly_t A,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_get_fq_nmod(fq_nmod_t c, const fq_nmod_mpoly_t A,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_set_fq_nmod(fq_nmod_mpoly_t A,
+                             const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void fq_nmod_mpoly_set_ui(fq_nmod_mpoly_t A, ulong c,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_mpoly_set_fq_nmod_gen(fq_nmod_mpoly_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int fq_nmod_mpoly_equal_fq_nmod(const fq_nmod_mpoly_t A,
+                             const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_zero(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
@@ -182,11 +194,8 @@ void fq_nmod_mpoly_zero(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
    _fq_nmod_mpoly_set_length(A, 0, ctx);
 }
 
-FQ_NMOD_MPOLY_INLINE
-void fq_nmod_mpoly_one(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
-{
-    fq_nmod_mpoly_set_ui(A, UWORD(1), ctx);
-}
+FLINT_DLL void fq_nmod_mpoly_one(fq_nmod_mpoly_t A,
+                                                const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
 int fq_nmod_mpoly_is_zero(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
