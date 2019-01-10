@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,21 +9,21 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
-ulong nmod_mpoly_get_coeff_ui_ui(const nmod_mpoly_t A,
-                                 const ulong * exp, const nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_get_coeff_fq_nmod_ui(fq_nmod_t c, const fq_nmod_mpoly_t A,
+                              const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong index;
     index = mpoly_monomial_index_ui(A->exps, A->bits, A->length,
                                                               exp, ctx->minfo);
     if (index < 0)
     {
-        return 0;
+        fq_nmod_zero(c, ctx->fqctx);
     }
     else
     {
         FLINT_ASSERT(index < A->length);
-        return A->coeffs[index];
+        fq_nmod_set(c, A->coeffs + index, ctx->fqctx);
     }
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,10 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
-void _fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t poly,
-                  const fmpz_t c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(fq_nmod_mpoly_t poly,
+            const fq_nmod_t c, const fmpz * exp, const fq_nmod_mpoly_ctx_t ctx)
 {
     mp_bitcnt_t exp_bits;
     slong i, N, index;
@@ -25,7 +25,7 @@ void _fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t poly,
 
     exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
-    fmpz_mpoly_fit_bits(poly, exp_bits, ctx);
+    fq_nmod_mpoly_fit_bits(poly, exp_bits, ctx);
 
     N = mpoly_words_per_exp(poly->bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
@@ -39,43 +39,45 @@ void _fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t poly,
 
     if (!exists)
     {
-        if (!fmpz_is_zero(c)) /* make new term only if coeff is nonzero*/
+        if (!fq_nmod_is_zero(c, ctx->fqctx))
         {       
-
-            fmpz_mpoly_fit_length(poly, poly->length + 1, ctx);
+            /* make new term only if coeff is nonzero*/
+            fq_nmod_mpoly_fit_length(poly, poly->length + 1, ctx);
 
             for (i = poly->length; i >= index + 1; i--)
             {
-                fmpz_set(poly->coeffs + i, poly->coeffs + i - 1);
+                fq_nmod_set(poly->coeffs + i, poly->coeffs + i - 1, ctx->fqctx);
                 mpoly_monomial_set(poly->exps + N*i, poly->exps + N*(i - 1), N);
             }
 
-            fmpz_set(poly->coeffs + index, c);
+            fq_nmod_set(poly->coeffs + index, c, ctx->fqctx);
             mpoly_monomial_set(poly->exps + N*index, packed_exp, N);
 
             poly->length++; /* safe because length is increasing */
         }
-    } else if (fmpz_is_zero(c)) /* zero coeff, remove term */
+    }
+    else if (fq_nmod_is_zero(c, ctx->fqctx)) /* zero coeff, remove term */
     {
         for (i = index; i < poly->length - 1; i++)
         {
-            fmpz_set(poly->coeffs + i, poly->coeffs + i + 1);
+            fq_nmod_set(poly->coeffs + i, poly->coeffs + i + 1, ctx->fqctx);
             mpoly_monomial_set(poly->exps + N*i, poly->exps + N*(i + 1), N);
         }
 
-        _fmpz_mpoly_set_length(poly, poly->length - 1, ctx);
+        _fq_nmod_mpoly_set_length(poly, poly->length - 1, ctx);
 
-    } else /* term with that monomial exists, coeff is nonzero */
+    }
+    else /* term with that monomial exists, coeff is nonzero */
     {
-        fmpz_set(poly->coeffs + index, c);  
+        fq_nmod_set(poly->coeffs + index, c, ctx->fqctx);  
     }
 
-   TMP_END; 
+    TMP_END; 
 }
 
 
-void fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t poly,
-                const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(fq_nmod_mpoly_t poly,
+          const fq_nmod_t c, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, nvars = ctx->minfo->nvars;
     fmpz * newexp;
@@ -89,7 +91,7 @@ void fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t poly,
         fmpz_set(newexp + i, exp[i]);
     }
 
-    _fmpz_mpoly_set_coeff_fmpz_fmpz(poly, c, newexp, ctx);
+    _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(poly, c, newexp, ctx);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(newexp + i);

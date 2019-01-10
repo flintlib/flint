@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,43 +9,47 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
-int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                 mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx)
+int fq_nmod_mpoly_repack_bits(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+                              mp_bitcnt_t Abits, const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong i;
     int success;
-    fmpz_mpoly_t T;
+    fq_nmod_mpoly_t T;
 
     Abits = mpoly_fix_bits(Abits, ctx->minfo);
 
     if (B->bits == Abits || B->length == 0)
     {
-        fmpz_mpoly_set(A, B, ctx);
+        fq_nmod_mpoly_set(A, B, ctx);
         return 1;
     }
     
     /* must use B->alloc because we are going to swap coeff in aliasing case */
-    fmpz_mpoly_init3(T, B->alloc, Abits, ctx);
+    fq_nmod_mpoly_init3(T, B->alloc, Abits, ctx);
     success = mpoly_repack_monomials(T->exps, Abits, B->exps, B->bits,
                                                         B->length, ctx->minfo);
     if (success)
     {
         if (A == B)
         {
-            fmpz * temp = A->coeffs;
+            fq_nmod_struct * temp = A->coeffs;
             A->coeffs = T->coeffs;
             T->coeffs = temp;
         }
         else
         {
-            _fmpz_vec_set(T->coeffs, B->coeffs, B->length);
+            for (i = 0; i < B->length; i++)
+            {
+                fq_nmod_set(T->coeffs + i, B->coeffs + i, ctx->fqctx);
+            }
         }
-        _fmpz_mpoly_set_length(T, B->length, ctx);
-        fmpz_mpoly_swap(A, T, ctx);
+        _fq_nmod_mpoly_set_length(T, B->length, ctx);
+        fq_nmod_mpoly_swap(A, T, ctx);
     }
 
-    fmpz_mpoly_clear(T, ctx);
+    fq_nmod_mpoly_clear(T, ctx);
 
     return success;
 }

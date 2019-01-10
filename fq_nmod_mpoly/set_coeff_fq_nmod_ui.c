@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,10 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
-void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t poly,
-                 const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_set_coeff_fq_nmod_ui(fq_nmod_mpoly_t poly,
+           const fq_nmod_t c, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, nvars = ctx->minfo->nvars;
     fmpz * newexp;
@@ -23,7 +23,7 @@ void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t poly,
     for (i = 0; i < nvars; i++)
         fmpz_init_set_ui(newexp + i, exp[i]);
 
-    _fmpz_mpoly_set_coeff_fmpz_fmpz(poly, c, newexp, ctx);
+    _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(poly, c, newexp, ctx);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(newexp + i);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,10 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
-void fmpz_mpoly_set_coeff_fmpz_monomial(fmpz_mpoly_t A, const fmpz_t c,
-                         const fmpz_mpoly_t M, const fmpz_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_set_coeff_fq_nmod_monomial(fq_nmod_mpoly_t A,
+                               const fq_nmod_t c, const fq_nmod_mpoly_t M,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, nvars = ctx->minfo->nvars;
     fmpz * texps;
@@ -20,7 +21,8 @@ void fmpz_mpoly_set_coeff_fmpz_monomial(fmpz_mpoly_t A, const fmpz_t c,
 
     if (M->length != WORD(1))
     {
-        flint_throw(FLINT_ERROR, "M not monomial in fmpz_mpoly_set_coeff_fmpz_monomial");
+        flint_throw(FLINT_ERROR,
+                 "M not monomial in fq_nmod_mpoly_set_coeff_fq_nmod_monomial");
     }
 
     TMP_START;
@@ -29,7 +31,7 @@ void fmpz_mpoly_set_coeff_fmpz_monomial(fmpz_mpoly_t A, const fmpz_t c,
         fmpz_init(texps + i);
 
     mpoly_get_monomial_ffmpz(texps, M->exps + 0, M->bits, ctx->minfo);
-    _fmpz_mpoly_set_coeff_fmpz_fmpz(A, c, texps, ctx);
+    _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(A, c, texps, ctx);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(texps + i);

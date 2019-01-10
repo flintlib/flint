@@ -22,11 +22,9 @@ void fq_nmod_mpoly_init(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
     A->bits = bits;
 }
 
-void fq_nmod_mpoly_init2(fq_nmod_mpoly_t A,
-                                    slong alloc, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_init3(fq_nmod_mpoly_t A, slong alloc, mp_bitcnt_t bits,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
-    /* default to at least MPOLY_MIN_BITS bits per exponent */
-    mp_bitcnt_t bits = mpoly_fix_bits(MPOLY_MIN_BITS, ctx->minfo);
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
     if (alloc != 0)
@@ -45,4 +43,11 @@ void fq_nmod_mpoly_init2(fq_nmod_mpoly_t A,
     A->alloc = alloc;
     A->length = 0;
     A->bits = bits;
+}
+
+void fq_nmod_mpoly_init2(fq_nmod_mpoly_t A, slong alloc,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    mp_bitcnt_t bits = mpoly_fix_bits(MPOLY_MIN_BITS, ctx->minfo);
+    fq_nmod_mpoly_init3(A, alloc, bits, ctx);
 }

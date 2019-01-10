@@ -355,9 +355,6 @@ FLINT_DLL void fmpz_mpoly_set_coeff_fmpz_monomial(fmpz_mpoly_t A,
                                   const fmpz_t c, const fmpz_mpoly_t M,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_get_coeff_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t A,
-                                 const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL void fmpz_mpoly_get_coeff_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t A,
                                fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
 

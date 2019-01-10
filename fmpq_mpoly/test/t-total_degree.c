@@ -20,7 +20,8 @@ void _check_total_degree(const fmpz_t totdeg_check, const fmpq_mpoly_t A,
 {
     fmpz_t totdeg;
     fmpz_init(totdeg);
-    mpoly_total_degree_fmpz_ref(totdeg, A->exps, A->length, A->bits, ctx->minfo);
+    mpoly_total_degree_fmpz_ref(totdeg, A->zpoly->exps, A->zpoly->length,
+                                             A->zpoly->bits, ctx->zctx->minfo);
     if (!fmpz_equal(totdeg_check, totdeg))
         flint_throw(FLINT_ERROR, "Total degree is wrong");
     fmpz_clear(totdeg);
