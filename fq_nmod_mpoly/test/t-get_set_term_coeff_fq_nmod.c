@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2017 William Hart
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,8 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "fmpz_mpoly.h"
-#include "ulong_extras.h"
+#include "fq_nmod_mpoly.h"
 
 int
 main(void)
@@ -21,40 +19,38 @@ main(void)
     slong i, j;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get/set_term_coeff_fmpz....");
+    flint_printf("get/set_term_coeff_fq_nmod....");
     fflush(stdout);
 
     /* Set coeff and get coeff and compare */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f;
-        fmpz_t c, d;
+        fq_nmod_mpoly_ctx_t ctx;
+        fq_nmod_mpoly_t f;
+        fq_nmod_t c, d;
         slong len, index;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        mp_bitcnt_t exp_bits;
 
-        fmpz_init(c);
-        fmpz_init(d);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
+        fq_nmod_mpoly_init(f, ctx);
+        fq_nmod_init(c, ctx->fqctx);
+        fq_nmod_init(d, ctx->fqctx);
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
-        fmpz_mpoly_init(f, ctx);
-
-        len = n_randint(state, 100);
+        len = n_randint(state, 100) + 1;
         exp_bits = n_randint(state, 200) + 1;
-        coeff_bits = n_randint(state, 200);
-        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
-        if (f->length == WORD(0))
-            continue;
+        do {
+            fq_nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
+        } while (fq_nmod_mpoly_length(f, ctx) == 0);
 
         for (j = 0; j < 10; j++)
         {
-            fmpz_randtest(c, state, n_randint(state, 200));
+            fq_nmod_randtest(c, state, ctx->fqctx);
 
             index = n_randint(state, f->length);
 
-            fmpz_mpoly_set_term_coeff_fmpz(f, index, c, ctx);
-            fmpz_mpoly_get_term_coeff_fmpz(d, f, index, ctx);
-            if (!fmpz_equal(c, d))
+            fq_nmod_mpoly_set_term_coeff_fq_nmod(f, index, c, ctx);
+            fq_nmod_mpoly_get_term_coeff_fq_nmod(d, f, index, ctx);
+            if (!fq_nmod_equal(c, d, ctx->fqctx))
             {
                 printf("FAIL\n");
                 flint_printf("Set coeff and get coeff and compare\ni = %wd, j = %wd\n", i, j);
@@ -62,10 +58,10 @@ main(void)
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);
-        fmpz_clear(c);      
-        fmpz_clear(d);
-        fmpz_mpoly_ctx_clear(ctx);
+        fq_nmod_mpoly_clear(f, ctx);
+        fq_nmod_clear(c, ctx->fqctx);      
+        fq_nmod_clear(d, ctx->fqctx);
+        fq_nmod_mpoly_ctx_clear(ctx);  
     }
 
     FLINT_TEST_CLEANUP(state);
@@ -73,4 +69,3 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-

@@ -17,7 +17,7 @@ void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A,
 {
     if ((ulong) i >= (ulong) A->length)
     {
-        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_get_term_coeff_fmpz");
+        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_set_term_coeff_fmpz");
     }
 
     fmpz_set(A->coeffs + i, c);
@@ -28,7 +28,7 @@ void fmpz_mpoly_set_term_coeff_ui(fmpz_mpoly_t A,
 {
     if ((ulong) i >= (ulong) A->length)
     {
-        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_get_term_coeff_ui");
+        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_set_term_coeff_ui");
     }
 
     fmpz_set_ui(A->coeffs + i, c);
@@ -39,7 +39,7 @@ void fmpz_mpoly_set_term_coeff_si(fmpz_mpoly_t A,
 {
     if ((ulong) i >= (ulong) A->length)
     {
-        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_get_term_coeff_si");
+        flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_set_term_coeff_si");
     }
 
     fmpz_set_si(A->coeffs + i, c);
