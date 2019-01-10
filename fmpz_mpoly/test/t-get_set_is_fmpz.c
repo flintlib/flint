@@ -75,7 +75,7 @@ main(void)
         fmpz_clear(c);
         fmpz_clear(d);
         fmpz_mpoly_clear(f, ctx);
-        fmpq_mpoly_ctx_clear(ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

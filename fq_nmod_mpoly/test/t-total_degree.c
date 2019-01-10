@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,12 +11,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "fmpq_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 
 /* foolproof way to check totdeg_check is correct */
-void _check_total_degree(const fmpz_t totdeg_check, const fmpq_mpoly_t A,
-                                                    const fmpq_mpoly_ctx_t ctx)
+void _check_total_degree(const fmpz_t totdeg_check, const fq_nmod_mpoly_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     fmpz_t totdeg;
     fmpz_init(totdeg);
@@ -40,17 +40,17 @@ main(void)
     /* Check total_degree does not go up under addition */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
-        fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t f, g, h;
+        fq_nmod_mpoly_ctx_t ctx;
+        fq_nmod_mpoly_t f, g, h;
         fmpz_t fdeg, gdeg, hdeg;
         slong len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
+        mp_bitcnt_t exp_bits1, exp_bits2;
 
-        fmpq_mpoly_ctx_init_rand(ctx, state, 20);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
-        fmpq_mpoly_init(f, ctx);
-        fmpq_mpoly_init(g, ctx);
-        fmpq_mpoly_init(h, ctx);
+        fq_nmod_mpoly_init(f, ctx);
+        fq_nmod_mpoly_init(g, ctx);
+        fq_nmod_mpoly_init(h, ctx);
         fmpz_init(fdeg);
         fmpz_init(gdeg);
         fmpz_init(hdeg);
@@ -61,17 +61,15 @@ main(void)
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
 
-        coeff_bits = n_randint(state, 100);
-
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpq_mpoly_add(h, f, g, ctx);
+            fq_nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            fq_nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            fq_nmod_mpoly_add(h, f, g, ctx);
 
-            fmpq_mpoly_total_degree_fmpz(hdeg, h, ctx);
-            fmpq_mpoly_total_degree_fmpz(fdeg, f, ctx);
-            fmpq_mpoly_total_degree_fmpz(gdeg, g, ctx);
+            fq_nmod_mpoly_total_degree_fmpz(hdeg, h, ctx);
+            fq_nmod_mpoly_total_degree_fmpz(fdeg, f, ctx);
+            fq_nmod_mpoly_total_degree_fmpz(gdeg, g, ctx);
             _check_total_degree(hdeg, h, ctx);
             _check_total_degree(fdeg, f, ctx);
             _check_total_degree(gdeg, g, ctx);
@@ -87,27 +85,27 @@ main(void)
         fmpz_clear(fdeg);
         fmpz_clear(gdeg);
         fmpz_clear(hdeg);
-        fmpq_mpoly_clear(f, ctx);
-        fmpq_mpoly_clear(g, ctx);
-        fmpq_mpoly_clear(h, ctx);
-        fmpq_mpoly_ctx_clear(ctx);
+        fq_nmod_mpoly_clear(f, ctx);
+        fq_nmod_mpoly_clear(g, ctx);
+        fq_nmod_mpoly_clear(h, ctx);
+        fq_nmod_mpoly_ctx_clear(ctx);
     }
 
     /* Check total_degree adds under multiplication */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         int ok;
-        fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t f, g, h;
+        fq_nmod_mpoly_ctx_t ctx;
+        fq_nmod_mpoly_t f, g, h;
         fmpz_t fdeg, gdeg, hdeg;
         slong len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
+        mp_bitcnt_t exp_bits1, exp_bits2;
 
-        fmpq_mpoly_ctx_init_rand(ctx, state, 20);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
-        fmpq_mpoly_init(f, ctx);
-        fmpq_mpoly_init(g, ctx);
-        fmpq_mpoly_init(h, ctx);
+        fq_nmod_mpoly_init(f, ctx);
+        fq_nmod_mpoly_init(g, ctx);
+        fq_nmod_mpoly_init(h, ctx);
         fmpz_init(fdeg);
         fmpz_init(gdeg);
         fmpz_init(hdeg);
@@ -118,22 +116,20 @@ main(void)
         exp_bits1 = n_randint(state, 100) + 2;
         exp_bits2 = n_randint(state, 100) + 2;
 
-        coeff_bits = n_randint(state, 100);
-
         for (j = 0; j < 4; j++)
         {
-            fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
-            fmpq_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpq_mpoly_mul(h, f, g, ctx);
+            fq_nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            fq_nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            fq_nmod_mpoly_mul(h, f, g, ctx);
 
-            fmpq_mpoly_total_degree_fmpz(hdeg, h, ctx);
-            fmpq_mpoly_total_degree_fmpz(fdeg, f, ctx);
-            fmpq_mpoly_total_degree_fmpz(gdeg, g, ctx);
+            fq_nmod_mpoly_total_degree_fmpz(hdeg, h, ctx);
+            fq_nmod_mpoly_total_degree_fmpz(fdeg, f, ctx);
+            fq_nmod_mpoly_total_degree_fmpz(gdeg, g, ctx);
             _check_total_degree(hdeg, h, ctx);
             _check_total_degree(fdeg, f, ctx);
             _check_total_degree(gdeg, g, ctx);
 
-            if (fmpq_mpoly_is_zero(f, ctx) || fmpq_mpoly_is_zero(g, ctx))
+            if (fq_nmod_mpoly_is_zero(f, ctx) || fq_nmod_mpoly_is_zero(g, ctx))
             {
                 ok = fmpz_equal_si(hdeg, -WORD(1))
                      && (fmpz_equal_si(fdeg, -WORD(1))
@@ -156,10 +152,10 @@ main(void)
         fmpz_clear(fdeg);
         fmpz_clear(gdeg);
         fmpz_clear(hdeg);
-        fmpq_mpoly_clear(f, ctx);
-        fmpq_mpoly_clear(g, ctx);
-        fmpq_mpoly_clear(h, ctx);
-        fmpq_mpoly_ctx_clear(ctx);
+        fq_nmod_mpoly_clear(f, ctx);
+        fq_nmod_mpoly_clear(g, ctx);
+        fq_nmod_mpoly_clear(h, ctx);
+        fq_nmod_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
@@ -167,4 +163,3 @@ main(void)
     printf("PASS\n");
     return 0;
 }
-

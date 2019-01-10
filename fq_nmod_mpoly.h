@@ -126,6 +126,7 @@ void fq_nmod_mpoly_fit_bits(fq_nmod_mpoly_t A, slong bits,
     }
 }
 
+
 /* Input/output **************************************************************/
 
 FLINT_DLL int fq_nmod_mpoly_set_str_pretty(fq_nmod_mpoly_t A, const char * str,
@@ -168,6 +169,7 @@ void fq_nmod_mpoly_swap(fq_nmod_mpoly_t A, fq_nmod_mpoly_t B,
    *B = t;
 }
 
+
 /* Constants *****************************************************************/
 
 FLINT_DLL int fq_nmod_mpoly_is_fq_nmod(const fq_nmod_mpoly_t A,
@@ -205,6 +207,68 @@ int fq_nmod_mpoly_is_zero(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx
 
 FLINT_DLL int fq_nmod_mpoly_is_one(const fq_nmod_mpoly_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
+
+
+/* Degrees *******************************************************************/
+
+FQ_NMOD_MPOLY_INLINE
+int fq_nmod_mpoly_degrees_fit_si(const fq_nmod_mpoly_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    return A->bits <= FLINT_BITS ? 1
+               : mpoly_degrees_fit_si(A->exps, A->length, A->bits, ctx->minfo);
+}
+
+FQ_NMOD_MPOLY_INLINE
+void fq_nmod_mpoly_degrees_fmpz(fmpz ** degs, const fq_nmod_mpoly_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    mpoly_degrees_pfmpz(degs, A->exps, A->length, A->bits, ctx->minfo);
+}
+
+FQ_NMOD_MPOLY_INLINE
+void fq_nmod_mpoly_degrees_si(slong * degs, const fq_nmod_mpoly_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    mpoly_degrees_si(degs, A->exps, A->length, A->bits, ctx->minfo);
+}
+
+FQ_NMOD_MPOLY_INLINE
+void fq_nmod_mpoly_degree_fmpz(fmpz_t deg, const fq_nmod_mpoly_t A, slong var,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    mpoly_degree_fmpz(deg, A->exps, A->length, A->bits, var, ctx->minfo);
+}
+
+FQ_NMOD_MPOLY_INLINE
+slong fq_nmod_mpoly_degree_si(const fq_nmod_mpoly_t A, slong var,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    return mpoly_degree_si(A->exps, A->length, A->bits, var, ctx->minfo);
+}
+
+FQ_NMOD_MPOLY_INLINE
+int fq_nmod_mpoly_total_degree_fits_si(const fq_nmod_mpoly_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    return mpoly_total_degree_fits_si(A->exps, A->length, A->bits, ctx->minfo);
+}
+
+FQ_NMOD_MPOLY_INLINE
+void fq_nmod_mpoly_total_degree_fmpz(fmpz_t td, const fq_nmod_mpoly_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    mpoly_total_degree_fmpz(td, A->exps, A->length, A->bits, ctx->minfo);
+}
+
+FQ_NMOD_MPOLY_INLINE
+slong fq_nmod_mpoly_total_degree_si(const fq_nmod_mpoly_t A,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    return mpoly_total_degree_si(A->exps, A->length, A->bits, ctx->minfo);
+}
+
+
 
 /* container operations ******************************************************/
 

@@ -834,6 +834,9 @@ FLINT_DLL slong mpoly_total_degree_si(const ulong * exps,
 FLINT_DLL void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
+FLINT_DLL void mpoly_total_degree_fmpz_ref(fmpz_t totdeg, const ulong * exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_search_monomials(
                 slong ** e_ind, ulong * e, slong * e_score,
                 slong * t1, slong * t2, slong *t3,
