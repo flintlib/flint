@@ -458,7 +458,7 @@ FLINT_DLL void fq_nmod_mpoly_derivative(fq_nmod_mpoly_t A,
 
 /* Multiplication ************************************************************/
 
-void fq_nmod_mpoly_mul(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+FLINT_DLL void fq_nmod_mpoly_mul(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
                        const fq_nmod_mpoly_t C, const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_mpoly_mul_johnson(fq_nmod_mpoly_t poly1,
@@ -489,6 +489,20 @@ FLINT_DLL void fq_nmod_mpoly_pow_rmul(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B
 FLINT_DLL int fq_nmod_mpoly_divides(fq_nmod_mpoly_t Q,
                          const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
                                                 const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_div(fq_nmod_mpoly_t Q,
+                            const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_divrem(fq_nmod_mpoly_t Q, fq_nmod_mpoly_t R,
+                            const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_divrem_ideal(fq_nmod_mpoly_struct ** Q,
+                                  fq_nmod_mpoly_t R, const fq_nmod_mpoly_t A,
+                                  fq_nmod_mpoly_struct * const * B, slong len,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
 
 FLINT_DLL int fq_nmod_mpoly_divides_monagan_pearce(fq_nmod_mpoly_t poly1,
                   const fq_nmod_mpoly_t poly2, const fq_nmod_mpoly_t poly3,
