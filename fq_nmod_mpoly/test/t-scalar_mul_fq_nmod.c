@@ -109,7 +109,7 @@ main(void)
         slong len1, len2, len3, len4;
         mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3, exp_bits4;
 
-        fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS/2, 3);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
         fq_nmod_mpoly_init(f, ctx);
         fq_nmod_mpoly_init(g, ctx);
@@ -118,14 +118,14 @@ main(void)
         fq_nmod_init(a, ctx->fqctx);
         fq_nmod_init(b, ctx->fqctx);
 
-        len1 = n_randint(state, 10);
-        len2 = n_randint(state, 10);
-        len3 = n_randint(state, 10);
-        len4 = n_randint(state, 10);
-        exp_bits1 = n_randint(state, 20) + 2;
-        exp_bits2 = n_randint(state, 20) + 2;
-        exp_bits3 = n_randint(state, 20) + 2;
-        exp_bits4 = n_randint(state, 20) + 2;
+        len1 = n_randint(state, 100);
+        len2 = n_randint(state, 100);
+        len3 = n_randint(state, 100);
+        len4 = n_randint(state, 100);
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
+        exp_bits3 = n_randint(state, 200) + 2;
+        exp_bits4 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
