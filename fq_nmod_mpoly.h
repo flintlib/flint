@@ -450,6 +450,12 @@ FLINT_DLL void fq_nmod_mpoly_make_monic(fq_nmod_mpoly_t A,
                        const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx);
 
 
+/* Differentiation **********************************************************/
+
+FLINT_DLL void fq_nmod_mpoly_derivative(fq_nmod_mpoly_t A,
+            const fq_nmod_mpoly_t B, slong var, const fq_nmod_mpoly_ctx_t ctx);
+
+
 /* Multiplication ************************************************************/
 
 void fq_nmod_mpoly_mul(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
