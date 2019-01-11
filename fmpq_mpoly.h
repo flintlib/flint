@@ -514,11 +514,8 @@ FLINT_DLL void fmpq_mpoly_reverse(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 FLINT_DLL void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_ui(fmpq_mpoly_t poly,
-                       fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_fmpz(fmpq_mpoly_t poly,
-                     fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpq_mpoly_push_rescale(fmpq_mpoly_t A,
+                                         fmpq_t C, const fmpq_mpoly_ctx_t ctx);
 
 
 /* Random generation *********************************************************/

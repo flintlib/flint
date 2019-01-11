@@ -507,14 +507,14 @@ FLINT_DLL void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
 FLINT_DLL void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
                                     mp_bitcnt_t pos, slong N, ulong * cmpmask);
 
-FLINT_DLL void _fmpz_mpoly_emplacebackterm_fmpz_ui(fmpz_mpoly_t A,
-                      fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpz_mpoly_push_exp_ffmpz(fmpz_mpoly_t A,
+                                 const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_emplacebackterm_fmpz_ffmpz(fmpz_mpoly_t A,
-                       fmpz_t c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpz_mpoly_push_exp_pfmpz(fmpz_mpoly_t A,
+                               fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_emplacebackterm_fmpz_pfmpz(fmpz_mpoly_t A,
-                     fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpz_mpoly_push_exp_ui(fmpz_mpoly_t A,
+                                const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
 
 /* Random generation *********************************************************/

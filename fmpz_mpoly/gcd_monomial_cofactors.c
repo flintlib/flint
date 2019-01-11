@@ -239,9 +239,9 @@ int _fmpz_mpoly_gcd_monomial_cofactors(fmpz_mpoly_t G,
     {
         mpoly_get_monomial_ffmpz(Aexp, A->exps + NA*i, A->bits, ctx->minfo);
         _fmpz_vec_sub(Aexp, Aexp, Bexp, nvars);
-        fmpz_divexact(t2, A->coeffs + i, t1);
-        _fmpz_mpoly_emplacebackterm_fmpz_ffmpz(T, t2, Aexp, ctx);
-        fmpz_init(t2);
+        _fmpz_mpoly_push_exp_ffmpz(T, Aexp, ctx);
+        FLINT_ASSERT(T->length == i + 1);
+        fmpz_divexact(T->coeffs + i, A->coeffs + i, t1);
     }
 
     fmpz_mpoly_swap(T, G, ctx);
