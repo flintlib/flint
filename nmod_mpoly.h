@@ -449,14 +449,14 @@ FLINT_DLL void _nmod_mpoly_radix_sort1(nmod_mpoly_t A, slong left, slong right,
 FLINT_DLL void _nmod_mpoly_radix_sort(nmod_mpoly_t A, slong left, slong right,
                                     mp_bitcnt_t pos, slong N, ulong * cmpmask);
 
-FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_ui(nmod_mpoly_t A,
-                   mp_limb_t c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void _nmod_mpoly_push_exp_ffmpz(nmod_mpoly_t A,
+                                 const fmpz * exp, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_ffmpz(nmod_mpoly_t A,
-                    mp_limb_t c, const fmpz * exp, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void _nmod_mpoly_push_exp_pfmpz(nmod_mpoly_t A,
+                               fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void _nmod_mpoly_emplacebackterm_ui_pfmpz(nmod_mpoly_t A,
-                  mp_limb_t c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void _nmod_mpoly_push_exp_ui(nmod_mpoly_t A,
+                                const ulong * exp, const nmod_mpoly_ctx_t ctx);
 
 
 /* Random generation *********************************************************/

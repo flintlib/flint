@@ -218,8 +218,9 @@ int _nmod_mpoly_gcd_monomial_cofactors(nmod_mpoly_t G,
     {
         mpoly_get_monomial_ffmpz(Aexp, A->exps + NA*i, A->bits, ctx->minfo);
         _fmpz_vec_sub(Aexp, Aexp, Bexp, nvars);
-        _nmod_mpoly_emplacebackterm_ui_ffmpz(T,
-                   nmod_mul(A->coeffs[i], a0inv, ctx->ffinfo->mod), Aexp, ctx);
+        _nmod_mpoly_push_exp_ffmpz(T, Aexp, ctx);
+        FLINT_ASSERT(T->length == i + 1);
+        T->coeffs[i] = nmod_mul(A->coeffs[i], a0inv, ctx->ffinfo->mod);
     }
 
     nmod_mpoly_swap(T, G, ctx);
