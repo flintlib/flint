@@ -421,6 +421,14 @@ FLINT_DLL void fq_nmod_mpoly_randtest_bits(fq_nmod_mpoly_t A, flint_rand_t state
 
 /* Addition/Subtraction ******************************************************/
 
+FLINT_DLL void fq_nmod_mpoly_add_fq_nmod(fq_nmod_mpoly_t A,
+                            const fq_nmod_mpoly_t B, const fq_nmod_t C,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_sub_fq_nmod(fq_nmod_mpoly_t A,
+                            const fq_nmod_mpoly_t B, const fq_nmod_t C,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void fq_nmod_mpoly_add(fq_nmod_mpoly_t A,
                             const fq_nmod_mpoly_t B, const fq_nmod_mpoly_t C,
                                                 const fq_nmod_mpoly_ctx_t ctx);
@@ -433,6 +441,12 @@ FLINT_DLL void fq_nmod_mpoly_sub(fq_nmod_mpoly_t A,
 /* Scalar operations *********************************************************/
 
 FLINT_DLL void fq_nmod_mpoly_neg(fq_nmod_mpoly_t A,
+                       const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_scalar_mul_fq_nmod(fq_nmod_mpoly_t A,
+    const fq_nmod_mpoly_t B, const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_make_monic(fq_nmod_mpoly_t A,
                        const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx);
 
 
