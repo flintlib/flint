@@ -11,34 +11,32 @@
 
 #include "fq_nmod_mpoly.h"
 
-void _fq_nmod_mpoly_neg(fq_nmod_struct * coeff1, ulong * exp1,
-                  const fq_nmod_struct * coeff2, const ulong * exp2, slong len,
+void _fq_nmod_mpoly_neg(fq_nmod_struct * Acoeff, ulong * Aexp,
+                  const fq_nmod_struct * Bcoeff, const ulong * Bexp, slong Blen,
                                             slong N, const fq_nmod_ctx_t fqctx)
 {
     slong i;
 
-    for (i = 0; i < len; i++)
-        fq_nmod_neg(coeff1 + i, coeff2 + i, fqctx);
+    for (i = 0; i < Blen; i++)
+        fq_nmod_neg(Acoeff + i, Bcoeff + i, fqctx);
 
-    if (exp1 != exp2)
+    if (Aexp != Bexp)
     {
-        for (i = 0; i < len; i++)
-            mpoly_monomial_set(exp1 + N*i, exp2 + N*i, N);
+        mpoly_copy_monomials(Aexp, Bexp, Blen, N);
     }
 }
 
-void fq_nmod_mpoly_neg(fq_nmod_mpoly_t poly1, const fq_nmod_mpoly_t poly2,
+void fq_nmod_mpoly_neg(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
     slong N;
-    N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
 
-    fq_nmod_mpoly_fit_length(poly1, poly2->length, ctx);
-    fq_nmod_mpoly_fit_bits(poly1, poly2->bits, ctx);
+    fq_nmod_mpoly_fit_length(A, B->length, ctx);
+    fq_nmod_mpoly_fit_bits(A, B->bits, ctx);
+    A->bits = B->bits;
 
-    _fq_nmod_mpoly_neg(poly1->coeffs, poly1->exps,
-                   poly2->coeffs, poly2->exps, poly2->length, N, ctx->fqctx);
-
-    _fq_nmod_mpoly_set_length(poly1, poly2->length, ctx);
-    poly1->bits = poly2->bits;
+    N = mpoly_words_per_exp(B->bits, ctx->minfo);
+    _fq_nmod_mpoly_neg(A->coeffs, A->exps, B->coeffs, B->exps, B->length,
+                                                                N, ctx->fqctx);
+    _fq_nmod_mpoly_set_length(A, B->length, ctx);
 }
