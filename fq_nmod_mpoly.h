@@ -503,18 +503,28 @@ FLINT_DLL void fq_nmod_mpoly_divrem_ideal(fq_nmod_mpoly_struct ** Q,
                                   fq_nmod_mpoly_struct * const * B, slong len,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
-
 FLINT_DLL int fq_nmod_mpoly_divides_monagan_pearce(fq_nmod_mpoly_t poly1,
                   const fq_nmod_mpoly_t poly2, const fq_nmod_mpoly_t poly3,
                                                 const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_div_monagan_pearce(fq_nmod_mpoly_t q,
+                      const fq_nmod_mpoly_t poly2, const fq_nmod_mpoly_t poly3,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_divrem_monagan_pearce(fq_nmod_mpoly_t q, fq_nmod_mpoly_t r,
+                      const fq_nmod_mpoly_t poly2, const fq_nmod_mpoly_t poly3,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_divrem_ideal_monagan_pearce(
+                        fq_nmod_mpoly_struct ** q, fq_nmod_mpoly_t r,
+            const fq_nmod_mpoly_t poly2, fq_nmod_mpoly_struct * const * poly3,
+                                      slong len, const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _fq_nmod_mpoly_divides_monagan_pearce(
                   fq_nmod_struct ** coeff1,      ulong ** exp1, slong * alloc,
              const fq_nmod_struct * coeff2, const ulong * exp2, slong len2,
              const fq_nmod_struct * coeff3, const ulong * exp3, slong len3,
   mp_bitcnt_t bits, slong N, const ulong * cmpmask, const fq_nmod_ctx_t fqctx);
-
-
 
 
 /******************************************************************************
@@ -590,6 +600,55 @@ FLINT_DLL void fq_nmod_mpoly_geobucket_pow_fmpz_inplace(fq_nmod_mpoly_geobucket_
 FLINT_DLL int fq_nmod_mpoly_geobucket_divides_inplace(fq_nmod_mpoly_geobucket_t B1,
                   fq_nmod_mpoly_geobucket_t B2, const fq_nmod_mpoly_ctx_t ctx);
 
+
+/******************************************************************************
+
+   Internal consistency checks
+
+******************************************************************************/
+
+/*
+   test that r is a valid remainder upon division by g
+   this means that no monomial of r is divisible by lm(g)
+*/
+FQ_NMOD_MPOLY_INLINE
+void fq_nmod_mpoly_remainder_strongtest(const fq_nmod_mpoly_t r,
+                        const fq_nmod_mpoly_t g, const fq_nmod_mpoly_ctx_t ctx)
+{
+   slong i, N, bits;
+   ulong mask = 0;
+   ulong * rexp, * gexp;
+
+   bits = FLINT_MAX(r->bits, g->bits);
+   N = mpoly_words_per_exp(bits, ctx->minfo);
+
+   if (g->length == 0 )
+      flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
+
+   if (r->length == 0 )
+      return;
+
+   rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
+   gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
+   mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
+   mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
+
+   /* mask with high bit set in each field of exponent vector */
+   for (i = 0; i < FLINT_BITS/bits; i++)
+      mask = (mask << bits) + (UWORD(1) << (bits - 1));
+
+   for (i = 0; i < r->length; i++)
+      if (mpoly_monomial_divides_test(rexp + i*N, gexp + 0*N, N, mask))
+      {
+         flint_printf("nmod_mpoly_remainder_strongtest FAILED i = %wd\n", i);
+         flint_printf("rem ");fq_nmod_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
+         flint_printf("den ");fq_nmod_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+         flint_abort();
+      }
+
+   flint_free(rexp);
+   flint_free(gexp);
+}
 
 
 #ifdef __cplusplus
