@@ -345,7 +345,6 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                                                  poly3, exp3, len3,
                                                              bits, cmpmask[0]);
 
-
     TMP_START;
 
     fmpz_init(lc_abs_lg);
@@ -428,10 +427,22 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
         }
 
         mpoly_monomial_set(exp, heap[1].exp, N);
-        if (mpoly_monomial_overflows(exp, N, mask))
-            goto exp_overflow;
 
-        lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
+        if (bits <= FLINT_BITS)
+        {
+            if (mpoly_monomial_overflows(exp, N, mask))
+                goto exp_overflow;
+
+            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
+
+        }
+        else
+        {
+            if (mpoly_monomial_overflows_mp(exp, N, bits))
+                goto exp_overflow;
+
+            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
+        }
 
         /* accumulate terms from highest terms on heap */
         if (small)
@@ -490,11 +501,11 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                     x->j = j + 1;
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
-            } else
+            }
+            else
             {
                 if (  (i + 1 < len3)
                    && (hind[i + 1] == 2*j + 1)
@@ -505,11 +516,16 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                     x->j = j;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3  + x->i*N,
+
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], exp3  + x->i*N,
                                                            q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3  + x->i*N,
+                                                           q_exp + x->j*N, N);
+
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
                 if (j + 1 == q_len)
                 {
@@ -523,11 +539,16 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                     x->j = j + 1;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3  + x->i*N,
+
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], exp3  + x->i*N,
                                                            q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3  + x->i*N,
+                                                           q_exp + x->j*N, N);
+
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
@@ -598,11 +619,16 @@ large_lt_divides:
             x->j = q_len;
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
-            mpoly_monomial_add(exp_list[exp_next], exp3  + x->i*N,
-                                                   q_exp + x->j*N, N);
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, cmpmask))
-                exp_next--;
+
+            if (bits <= FLINT_BITS)
+                mpoly_monomial_add(exp_list[exp_next], exp3  + x->i*N,
+                                                       q_exp + x->j*N, N);
+            else
+                mpoly_monomial_add_mp(exp_list[exp_next], exp3  + x->i*N,
+                                                          q_exp + x->j*N, N);
+
+            exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
         }
         q_len++;
         s = 1;
@@ -666,9 +692,6 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
         return;
     }
 
-    if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_quasidiv_heap");
-
     TMP_START;
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
@@ -720,8 +743,7 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
    while ((lenq = _fmpz_mpoly_quasidiv_heap(scale, &tq->coeffs, &tq->exps,
                           &tq->alloc,  poly2->coeffs, exp2, poly2->length,
                                        poly3->coeffs, exp3, poly3->length,
-                                            exp_bits, N, cmpmask)) == -WORD(1)
-            && exp_bits < FLINT_BITS)
+                                            exp_bits, N, cmpmask)) == -WORD(1))
    {
       ulong * old_exp2 = exp2, * old_exp3 = exp3;
       slong old_exp_bits = exp_bits;
@@ -750,10 +772,6 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
       fmpz_mpoly_fit_bits(tq, exp_bits, ctx);
       tq->bits = exp_bits;
    }
-   
-   if (lenq == -WORD(1))
-      flint_throw(FLINT_EXPOF,
-                      "Exponent overflow in fmpz_mpoly_quasidiv_heap");
 
    /* take care of aliasing */
    if (q == poly2 || q == poly3)
