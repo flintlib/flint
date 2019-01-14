@@ -334,9 +334,8 @@ slong _nmod_mpoly_div_monagan_pearce(
                     x->j = j + 1;
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             } else
             {
@@ -352,9 +351,8 @@ slong _nmod_mpoly_div_monagan_pearce(
                     hind[x->i] = 2*(x->j + 1) + 0;
                     mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
                                                           q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
                 /* should we go up? */
                 if (j + 1 == q_len)
@@ -371,9 +369,8 @@ slong _nmod_mpoly_div_monagan_pearce(
                     hind[x->i] = 2*(x->j + 1) + 0;
                     mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
                                                           q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
@@ -400,9 +397,8 @@ slong _nmod_mpoly_div_monagan_pearce(
             hind[x->i] = 2*(x->j + 1) + 0;
             mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
                                                       q_exp + x->j*N, N);
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, cmpmask))
-                exp_next--;
+            exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
         }
         s = 1;
         q_len++;
