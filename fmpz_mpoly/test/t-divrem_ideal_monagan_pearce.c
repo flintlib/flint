@@ -50,9 +50,9 @@ main(void)
        len1 = n_randint(state, 100);
        len2 = n_randint(state, 100) + 1;
 
-       exp_bits = n_randint(state, FLINT_BITS - 1) + 1;
-       exp_bits1 = n_randint(state, FLINT_BITS - 2) + 1;
-       exp_bits2 = n_randint(state, FLINT_BITS - 2) + 1;
+       exp_bits = n_randint(state, 200) + 1;
+       exp_bits1 = n_randint(state, 200) + 1;
+       exp_bits2 = n_randint(state, 200) + 1;
 
        coeff_bits = n_randint(state, 200);
 
@@ -136,14 +136,29 @@ main(void)
 
        coeff_bits = n_randint(state, 70);
 
+        shifts = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        strides = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            fmpz_init(shifts + j);
+            fmpz_init(strides + j);
+            fmpz_randtest_unsigned(shifts + j, state, 100);
+            fmpz_randtest_unsigned(strides + j, state, 100);
+            fmpz_add_ui(strides + j, strides + j, 1);
+        }
+
        for (j = 0; j < 4; j++)
        {
           fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
+          fmpz_mpoly_inflate(f, f, shifts, strides, ctx);
+          fmpz_mpoly_assert_canonical(f, ctx);
           for (w = 0; w < num; w++)
           {
              do {
                 fmpz_mpoly_randtest_bound(darr[w], state, len2, coeff_bits + 1, exp_bound2, ctx);
              } while (darr[w]->length == 0);
+             fmpz_mpoly_inflate(darr[w], darr[w], shifts, strides, ctx);
+             fmpz_mpoly_assert_canonical(darr[w], ctx);
              fmpz_mpoly_randtest_bound(qarr[w], state, len, coeff_bits, exp_bound, ctx);
           }
           fmpz_mpoly_randtest_bound(k1, state, len, coeff_bits, exp_bound, ctx);

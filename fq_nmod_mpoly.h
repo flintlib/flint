@@ -615,39 +615,48 @@ FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_remainder_strongtest(const fq_nmod_mpoly_t r,
                         const fq_nmod_mpoly_t g, const fq_nmod_mpoly_ctx_t ctx)
 {
-   slong i, N, bits;
-   ulong mask = 0;
-   ulong * rexp, * gexp;
+    slong i, N, bits;
+    ulong mask = 0;
+    ulong * rexp, * gexp;
 
-   bits = FLINT_MAX(r->bits, g->bits);
-   N = mpoly_words_per_exp(bits, ctx->minfo);
+    bits = FLINT_MAX(r->bits, g->bits);
+    N = mpoly_words_per_exp(bits, ctx->minfo);
 
-   if (g->length == 0 )
-      flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
+    if (g->length == 0 )
+        flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
 
-   if (r->length == 0 )
-      return;
+    if (r->length == 0 )
+        return;
 
-   rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
-   gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
-   mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
-   mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
+    rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
+    gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
+    mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
+    mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
 
-   /* mask with high bit set in each field of exponent vector */
-   for (i = 0; i < FLINT_BITS/bits; i++)
-      mask = (mask << bits) + (UWORD(1) << (bits - 1));
+    /* mask with high bit set in each field of exponent vector */
+    for (i = 0; i < FLINT_BITS/bits; i++)
+        mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-   for (i = 0; i < r->length; i++)
-      if (mpoly_monomial_divides_test(rexp + i*N, gexp + 0*N, N, mask))
-      {
-         flint_printf("nmod_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-         flint_printf("rem ");fq_nmod_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-         flint_printf("den ");fq_nmod_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-         flint_abort();
-      }
+    for (i = 0; i < r->length; i++)
+    {
+        int divides;
 
-   flint_free(rexp);
-   flint_free(gexp);
+        if (bits <= FLINT_BITS)
+            divides = mpoly_monomial_divides_test(rexp + i*N, gexp + 0*N, N, mask);
+        else
+            divides = mpoly_monomial_divides_mp_test(rexp + i*N, gexp + 0*N, N, bits);
+
+        if (divides)
+        {
+            flint_printf("fq_nmod_mpoly_remainder_strongtest FAILED i = %wd\n", i);
+            flint_printf("rem ");fq_nmod_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
+            flint_printf("den ");fq_nmod_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+            flint_abort();
+        }
+    }
+
+    flint_free(rexp);
+    flint_free(gexp);
 }
 
 
