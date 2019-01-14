@@ -190,7 +190,6 @@ main(void)
         flint_free(shifts);
         flint_free(strides);
 
-
         fmpz_mpoly_clear(f, ctx);  
         fmpz_mpoly_clear(g, ctx);  
         fmpz_mpoly_clear(h, ctx);  

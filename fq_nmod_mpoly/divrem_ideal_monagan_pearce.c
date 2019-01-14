@@ -212,7 +212,14 @@ slong _fq_nmod_mpoly_divrem_ideal_monagan_pearce(fq_nmod_mpoly_struct ** polyq,
 
         for (w = 0; w < len; w++)
         {
-            if (mpoly_monomial_divides(texp, exp, exp3[w] + N*0, N, mask))
+            int divides;
+
+            if (bits <= FLINT_BITS)
+                divides = mpoly_monomial_divides(texp, exp, exp3[w] + N*0, N, mask);
+            else
+                divides = mpoly_monomial_divides_mp(texp, exp, exp3[w] + N*0, N, bits);
+
+            if (divides)
             {
                 fq_nmod_mpoly_fit_length(polyq[w], q_len[w] + 1, ctx);
                 fq_nmod_mul(polyq[w]->coeffs + q_len[w],

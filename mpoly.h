@@ -464,6 +464,27 @@ int mpoly_monomial_divides_test(const ulong * exp2,
 }
 
 MPOLY_INLINE
+int mpoly_monomial_divides_mp_test(const ulong * exp2,
+                                 const ulong * exp3, slong N, mp_bitcnt_t bits)
+{
+    slong i, j;
+
+    i = 0;
+    do {
+        for (j = bits/FLINT_BITS - 1; j >= 0; j--)
+        {
+            if (exp2[i + j] > exp3[i + j])
+                break;
+            if (exp2[i + j] < exp3[i + j])
+                return 0;
+        }
+        i += bits/FLINT_BITS;
+    } while (i < N);
+
+    return 1;
+}
+
+MPOLY_INLINE
 int mpoly_monomial_divides1(ulong * exp_ptr, const ulong exp2,
                                                   const ulong exp3, ulong mask)
 {
