@@ -100,7 +100,7 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
    slong n = A->c, i, j, r;
    nmod_poly_t h;
 
-   if (m > 10)
+   if (m > 10 && fq_nmod_ctx_degree(ctx) > 6)
       return fq_nmod_mat_reduce_row_KS(A, P, L, m, ctx);
 
    nmod_poly_init(h, ctx->p);
