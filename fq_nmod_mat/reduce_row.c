@@ -45,7 +45,7 @@ slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
          if (r != -WORD(1))
          {
             fq_nmod_neg(h, fq_nmod_mat_entry(A, m, i), ctx);
-            fq_nmod_bit_pack(mz, fq_nmod_mat_entry(A, m, i), bits, ctx);
+            fq_nmod_bit_pack(mz, h, bits, ctx);
 
             for (j = i + 1; j < L[r]; j++)
             {
