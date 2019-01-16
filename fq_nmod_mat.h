@@ -33,7 +33,9 @@
 FQ_NMOD_MAT_INLINE
 int FQ_NMOD_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_nmod_ctx_t ctx)
 {
-    if (FLINT_MIN(r, c) > fq_nmod_ctx_degree(ctx) / 20 + 6)
+    slong d2 = FLINT_MAX(0, 12 - fq_nmod_ctx_degree(ctx));
+
+    if (2*(r + 1)*c > d2*d2)
         return 1;
     else
         return 0;
