@@ -21,8 +21,9 @@ TEMPLATE(T, mat_mul_classical) (TEMPLATE(T, mat_t) C,
                                 const TEMPLATE(T, ctx_t) ctx)
 {
     slong ar, bc, br;
-    slong i, j, k;
-    TEMPLATE(T, t) t;
+    slong i, j;
+    TEMPLATE(T, struct) * trB;
+    TMP_INIT;
 
     ar = A->r;
     br = B->r;
@@ -44,29 +45,28 @@ TEMPLATE(T, mat_mul_classical) (TEMPLATE(T, mat_t) C,
         return;
     }
 
-    TEMPLATE(T, init) (t, ctx);
+    TMP_START;
 
+    trB = (TEMPLATE(T, struct) *) TMP_ALLOC(br*bc*sizeof(TEMPLATE(T, struct)));
+
+    /* shallow transpose so columns of B are vectors */
+    for (i = 0; i < br; i++)
+    {
+       for (j = 0; j < bc; j++)
+          trB[j*br + i] = *TEMPLATE(T, mat_entry) (B, i, j);
+    }
+   
     for (i = 0; i < ar; i++)
     {
         for (j = 0; j < bc; j++)
         {
-            TEMPLATE(T, mul) (TEMPLATE(T, mat_entry) (C, i, j),
-                              TEMPLATE(T, mat_entry) (A, i, 0),
-                              TEMPLATE(T, mat_entry) (B, 0, j), ctx);
+            _TEMPLATE(T, vec_dot) (TEMPLATE(T, mat_entry) (C, i, j),
+               A->rows[i], trB + j * br, br, ctx);
 
-            for (k = 1; k < br; k++)
-            {
-                TEMPLATE(T, mul) (t,
-                                  TEMPLATE(T, mat_entry) (A, i, k),
-                                  TEMPLATE(T, mat_entry) (B, k, j), ctx);
-
-                TEMPLATE(T, add) (TEMPLATE(T, mat_entry) (C, i, j),
-                                  TEMPLATE(T, mat_entry) (C, i, j), t, ctx);
-            }
         }
     }
 
-    TEMPLATE(T, clear) (t, ctx);
+    TMP_END;
 }
 
 
