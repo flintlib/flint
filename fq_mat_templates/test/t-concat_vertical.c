@@ -29,7 +29,7 @@ main(void)
     fflush(stdout);
 
     
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
     	TEMPLATE(T, ctx_t) ctx;
     	TEMPLATE(T, mat_t) A, B, C;
@@ -38,9 +38,9 @@ main(void)
 
         TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        r1 = n_randint(state, 50);
-        r2 = n_randint(state, 50);
-        c1 = n_randint(state, 50);
+        r1 = n_randint(state, 10);
+        r2 = n_randint(state, 10);
+        c1 = n_randint(state, 10);
 
         TEMPLATE(T, mat_init) (A, r1, c1, ctx);
         TEMPLATE(T, mat_init) (B, r2, c1, ctx);
@@ -56,13 +56,11 @@ main(void)
         TEMPLATE(T, mat_window_init) (window1, C, 0, 0, r1, c1, ctx);
         TEMPLATE(T, mat_window_init) (window2, C, r1, 0, (r1+r2), c1, ctx);
 
-
         if (!(TEMPLATE(T, mat_equal) (window1, A, ctx) && TEMPLATE(T, mat_equal) (window2, B, ctx)))
         {
             flint_printf("FAIL: results not equal\n");
             abort();
         }
-
         
         TEMPLATE(T, mat_clear) (A, ctx);
         TEMPLATE(T, mat_clear) (B, ctx);

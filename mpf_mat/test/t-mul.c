@@ -35,10 +35,10 @@ main(void)
     {
         slong m, n, k, l;
 
-        m = n_randint(state, 50);
-        n = n_randint(state, 50);
-        k = n_randint(state, 50);
-        l = n_randint(state, 50);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
+        k = n_randint(state, 10);
+        l = n_randint(state, 10);
 
         mpf_mat_init(A, m, n, 200);
         mpf_mat_init(B, n, k, 200);

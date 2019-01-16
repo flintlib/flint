@@ -32,8 +32,8 @@ main(void)
         mpfr_mat_t A, B, C;
         slong m, n;
 
-        m = n_randint(state, 50);
-        n = n_randint(state, 50);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
 
         mpfr_mat_init(A, m, n, 200);
         mpfr_mat_init(B, n, n, 200);
@@ -63,8 +63,8 @@ main(void)
         mpfr_mat_t A, B, C;
         slong m, n;
 
-        m = n_randint(state, 50);
-        n = n_randint(state, 50);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
 
         mpfr_mat_init(A, m, n, 200);
         mpfr_mat_init(B, n, n, 200);
