@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2015, 2019 William Hart
 
     This file is part of FLINT.
 
@@ -9,16 +9,60 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "fq_nmod_mat.h"
-#include "fq_nmod_poly.h"
-#include "fq_nmod_vec.h"
 
-#ifdef T
-#undef T
-#endif
+slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L, 
+                                         slong m, const fq_nmod_ctx_t ctx)
+{
+   slong n = A->c, i, j, r;
+   nmod_poly_t h;
 
-#define T fq_nmod
-#define CAP_T FQ_NMOD
-#include "fq_mat_templates/reduce_row.c"
-#undef CAP_T
-#undef T
+   nmod_poly_init(h, ctx->p);
+
+   for (i = 0; i < n; i++)
+   {
+      if (i != 0)
+         fq_nmod_reduce(fq_nmod_mat_entry(A, m, i), ctx);
+
+      if (!fq_nmod_is_zero(fq_nmod_mat_entry(A, m, i), ctx))
+      {
+         r = P[i];
+         if (r != -WORD(1))
+         {
+            for (j = i + 1; j < L[r]; j++)
+            {
+               nmod_poly_mul(h, fq_nmod_mat_entry(A, r, j), fq_nmod_mat_entry(A, m, i));
+               nmod_poly_sub(fq_nmod_mat_entry(A, m, j), fq_nmod_mat_entry(A, m, j), h);
+            }
+ 
+            fq_nmod_zero(fq_nmod_mat_entry(A, m, i), ctx);
+         } else
+         {
+            fq_nmod_inv(h, fq_nmod_mat_entry(A, m, i), ctx);
+            fq_nmod_one(fq_nmod_mat_entry(A, m, i), ctx);
+           
+            for (j = i + 1; j < L[m]; j++)
+            {
+               fq_nmod_reduce(fq_nmod_mat_entry(A, m, j), ctx);
+
+               fq_nmod_mul(fq_nmod_mat_entry(A, m, j), fq_nmod_mat_entry(A, m, j), h, ctx);
+            }
+
+            P[i] = m;
+
+            nmod_poly_clear(h);
+       
+            return i;
+         }
+      }
+   }
+
+   for (j = i + 1; j < L[m]; j++)
+      fq_nmod_reduce(fq_nmod_mat_entry(A, m, j), ctx);
+
+   nmod_poly_clear(h);
+   
+   return -WORD(1);
+}
+
