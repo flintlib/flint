@@ -74,15 +74,15 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
                for (j = i + 1; j < L[r]; j++)
                {
                   umul_ppmm(hi, lo, A[r][j], h);
-                  add_ssaaaa(rowm[2*i + 1], rowm[2*i], rowm[2*i + 1], rowm[2*i], hi, lo);
+                  add_ssaaaa(rowm[2*j + 1], rowm[2*j], rowm[2*j + 1], rowm[2*j], hi, lo);
                }
                break;
             case 3:
                for (j = i + 1; j < L[r]; j++)
                {
                   umul_ppmm(hi, lo, A[r][j], h);
-                  add_sssaaaaaa(rowm[3*i + 2], rowm[3*i + 1], rowm[3*i],
-                                rowm[3*i + 2], rowm[3*i + 1], rowm[3*i], 0, hi, lo);
+                  add_sssaaaaaa(rowm[3*j + 2], rowm[3*j + 1], rowm[3*j],
+                                rowm[3*j + 2], rowm[3*j + 1], rowm[3*j], 0, hi, lo);
                }
                break;
             }
