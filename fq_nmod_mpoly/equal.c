@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018, 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 int _fq_nmod_mpoly_equal(const fq_nmod_struct * coeff1, const ulong * exp1,
                          const fq_nmod_struct * coeff2, const ulong * exp2,
