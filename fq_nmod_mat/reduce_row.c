@@ -17,7 +17,7 @@
 slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
                                          slong m, const fq_nmod_ctx_t ctx)
 {
-   slong n = A->c, i, j, r, bits;
+   slong n = A->c, i, j, r, bits, res = -WORD(1);
    fq_nmod_t h;
    fmpz * mvec;
    fmpz_t mz, rz;
@@ -77,21 +77,17 @@ slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
             fmpz_clear(rz);
             _fmpz_vec_clear(mvec, n);
 
-            return i;
+            res = i;
          }
       }
    }
-
-   for (j = i + 1; j < L[m]; j++)
-      fq_nmod_bit_unpack(fq_nmod_mat_entry(A, m, j),
-                                            mvec + j, bits, ctx);    
 
    fq_nmod_clear(h, ctx);
    fmpz_clear(mz);
    fmpz_clear(rz);
    _fmpz_vec_clear(mvec, n);
 
-   return -WORD(1);
+   return res;
 }
 
 slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L, 
