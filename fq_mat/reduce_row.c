@@ -15,7 +15,7 @@
 slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L, 
                                          slong m, const fq_ctx_t ctx)
 {
-   slong n = A->c, i, j, r;
+   slong n = A->c, i, j, r, res = -WORD(1);
    fmpz_poly_t h;
 
    fmpz_poly_init(h);
@@ -51,18 +51,15 @@ slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L,
 
             P[i] = m;
 
-            fmpz_poly_clear(h);
-       
-            return i;
+            res = i;
+
+            break;
          }
       }
    }
 
-   for (j = i + 1; j < L[m]; j++)
-      fq_reduce(fq_mat_entry(A, m, j), ctx);
-
    fmpz_poly_clear(h);
    
-   return -WORD(1);
+   return res;
 }
 

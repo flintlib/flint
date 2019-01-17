@@ -72,12 +72,9 @@ slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
 
             P[i] = m;
 
-            fq_nmod_clear(h, ctx);
-            fmpz_clear(mz);
-            fmpz_clear(rz);
-            _fmpz_vec_clear(mvec, n);
-
             res = i;
+
+            break;
          }
       }
    }
