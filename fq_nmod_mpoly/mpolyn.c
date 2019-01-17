@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 
 void fq_nmod_mpolyn_init(fq_nmod_mpolyn_t A, mp_bitcnt_t bits, const fq_nmod_mpoly_ctx_t ctx)
