@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 void nmod_mpolyd_ctx_init(nmod_mpolyd_ctx_t dctx, slong nvars)
 {
@@ -632,4 +633,106 @@ slong nmod_mpolyd_last_degree(const nmod_mpolyd_t A, const nmodf_ctx_t fctx)
             return degree;
     }
     return degree;
+}
+
+void nmod_mpoly_convert_to_fq_nmod_mpolyd(
+                       fq_nmod_mpolyd_t poly1, const fq_nmod_mpolyd_ctx_t dctx,
+                          const nmod_mpoly_t poly2, const nmod_mpoly_ctx_t ctx)
+{
+    slong degb_prod;
+    slong i, j, N;
+    slong * exps;
+    const slong * perm = dctx->perm;
+    slong nvars = ctx->minfo->nvars;
+    TMP_INIT;
+
+    fq_nmod_mpolyd_set_nvars(poly1, ctx->minfo->nvars);
+
+    FLINT_ASSERT(poly2->bits <= FLINT_BITS);
+
+    if (poly2->length == 0)
+    {
+        fq_nmod_mpolyd_zero(poly1, dctx);
+        return;
+    }
+
+    TMP_START;
+    exps = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
+
+    nmod_mpoly_degrees_si(exps, poly2, ctx);
+    degb_prod = WORD(1);
+    for (i = 0; i < nvars; i++)
+    {
+        poly1->deg_bounds[i] = exps[perm[i]] + 1;
+        degb_prod *= poly1->deg_bounds[i];
+    }
+
+    fq_nmod_mpolyd_fit_length(poly1, degb_prod, dctx);
+    for (i = 0; i < degb_prod; i++)
+    {
+        fq_nmod_zero(poly1->coeffs + i, dctx->fqctx);
+    }
+
+    N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
+    for (i = 0; i < poly2->length; i++)
+    {
+        slong off = 0;
+
+        mpoly_get_monomial_ui((ulong *)exps, poly2->exps + N*i,
+                                                      poly2->bits, ctx->minfo);
+        for (j = 0; j < nvars; j++)
+        {
+            off = exps[perm[j]] + poly1->deg_bounds[j]*off;
+        }
+        fq_nmod_set_ui(poly1->coeffs + off, poly2->coeffs[i], dctx->fqctx);
+    }
+
+    TMP_END;
+}
+
+
+void nmod_mpoly_convert_from_fq_nmod_mpolyd(
+                               nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
+                     const fq_nmod_mpolyd_t B, const fq_nmod_mpolyd_ctx_t dctx)
+{
+    slong i, j;
+    slong degb_prod;
+    slong * perm = dctx->perm;
+    ulong * exps;
+    TMP_INIT;
+
+    FLINT_ASSERT(ctx->minfo->nvars == B->nvars);
+
+    degb_prod = WORD(1);
+    for (j = 0; j < B->nvars; j++) {
+        degb_prod *= B->deg_bounds[j];
+    }
+
+    TMP_START;
+    exps = (ulong *) TMP_ALLOC(B->nvars*sizeof(ulong));
+
+    nmod_mpoly_zero(A, ctx);
+    for (i = 0; i < degb_prod; i++) {
+        ulong k = i;
+
+        if (fq_nmod_is_zero(B->coeffs + i, dctx->fqctx))
+            continue;
+
+        for (j = B->nvars - 1; j >= 0; j--) 
+        {
+            ulong m = B->deg_bounds[j];
+            ulong e = k % m;
+            k = k / m;
+            exps[perm[j]] = e;
+        }
+        FLINT_ASSERT(k == 0);
+
+        /* need special function to convert F_q element to F_p element */
+        for (j=1; j < (B->coeffs + i)->length; j++) {
+            FLINT_ASSERT((B->coeffs + i)->coeffs[j] == 0);
+        }
+        nmod_mpoly_set_term_ui_ui(A, (B->coeffs + i)->coeffs[0], exps, ctx);
+    }
+
+    TMP_END;
 }
