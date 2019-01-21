@@ -62,16 +62,18 @@ typedef struct
     ulong * exps;
     slong alloc;
     slong length;
-    slong bits;     /* number of bits per exponent */
+    mp_bitcnt_t bits;     /* number of bits per exponent */
 } fq_nmod_mpoly_struct;
 typedef fq_nmod_mpoly_struct fq_nmod_mpoly_t[1];
 
 
 /* Context object ************************************************************/
 
-
 FLINT_DLL void fq_nmod_mpoly_ctx_init(fq_nmod_mpoly_ctx_t ctx, slong nvars,
-                                                       mp_limb_t p, slong deg);
+                                 const ordering_t ord, mp_limb_t p, slong deg);
+
+FLINT_DLL void fq_nmod_mpoly_ctx_init2(fq_nmod_mpoly_ctx_t ctx, slong nvars,
+                              const ordering_t ord, const fq_nmod_ctx_t fqctx);
 
 FLINT_DLL void fq_nmod_mpoly_ctx_init_rand(fq_nmod_mpoly_ctx_t ctx,
                                        flint_rand_t state, slong max_nvars,
@@ -559,6 +561,13 @@ FLINT_DLL int fq_nmod_mpoly_gcd_brown(fq_nmod_mpoly_t G,
                             const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int fq_nmod_mpoly_gcd_zippel(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A,
+                       const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fq_nmod_mpoly_gcd_zippel(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A,
+                      const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx,
+                                         int keepbits, flint_rand_t randstate);
+
 /******************************************************************************
 
    Internal functions (guaranteed to change without notice)
@@ -734,20 +743,28 @@ FLINT_DLL void fq_nmod_mpolyu_scalar_mul_fq_nmod(fq_nmod_mpolyu_t A,
 FLINT_DLL void fq_nmod_mpolyu_set(fq_nmod_mpolyu_t A, const fq_nmod_mpolyu_t B,
                                                const fq_nmod_mpoly_ctx_t uctx);
 
-FLINT_DLL void fq_nmod_mpoly_cvtfrom_poly_notmain(fq_nmod_mpoly_t A,
-                   fq_nmod_poly_t a, slong var, const fq_nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fq_nmod_mpolyu_cvtfrom_poly_notmain(fq_nmod_mpolyu_t A,
-                   fq_nmod_poly_t a, slong var, const fq_nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void fq_nmod_mpolyu_cvtto_poly(fq_nmod_poly_t a, fq_nmod_mpolyu_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_mpolyu_cvtfrom_poly(fq_nmod_mpolyu_t A, fq_nmod_poly_t a,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void fq_nmod_mpoly_cvtfrom_poly_notmain(fq_nmod_mpoly_t A,
+                   fq_nmod_poly_t a, slong var, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpolyu_cvtfrom_poly_notmain(fq_nmod_mpolyu_t A,
+                   fq_nmod_poly_t a, slong var, const fq_nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void fq_nmod_mpolyu_setform(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
                                                 const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_to_mpolyu_perm(fq_nmod_mpolyu_t A,
+                         const fq_nmod_mpoly_t B, const slong * perm,
+                const fq_nmod_mpoly_ctx_t uctx, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_from_mpolyu_perm(fq_nmod_mpoly_t A,
+                const fq_nmod_mpolyu_t B, int keepbits, const slong * perm,
+                const fq_nmod_mpoly_ctx_t uctx, const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int fq_nmod_mpolyu_divides(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
                                                 const fq_nmod_mpoly_ctx_t ctx);

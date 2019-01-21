@@ -1220,7 +1220,8 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     nmod_mpolyun_init(H, A->bits, ctx);
     nmod_mpolyun_init(Ht, A->bits, ctx);
 
-    fq_nmod_mpoly_ctx_init(ffctx, ctx->minfo->nvars, ctx->ffinfo->mod.n, deg);
+    fq_nmod_mpoly_ctx_init(ffctx, ctx->minfo->nvars, ORD_LEX,
+                                                      ctx->ffinfo->mod.n, deg);
 
     fq_nmod_mpolyu_init(Aeval, A->bits, ffctx);
     fq_nmod_mpolyu_init(Beval, A->bits, ffctx);
@@ -1424,8 +1425,8 @@ int nmod_mpolyu_gcdm_zippel(
     nmod_mpolyun_init(Hn, A->bits, ctx);
     nmod_mpolyun_init(Ht, A->bits, ctx);
 
-
-    fq_nmod_mpoly_ctx_init(ffctx, ctx->minfo->nvars, ctx->ffinfo->mod.n, deg);
+    fq_nmod_mpoly_ctx_init(ffctx, ctx->minfo->nvars, ORD_LEX,
+                                                      ctx->ffinfo->mod.n, deg);
 
     fq_nmod_mpolyu_init(Aff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Bff, A->bits, ffctx);

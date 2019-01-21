@@ -14,7 +14,7 @@
 int
 main(void)
 {
-    slong i, j;
+    slong i;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd_brown....");
@@ -29,8 +29,6 @@ main(void)
         int res;
         mp_bitcnt_t pbits;
         slong deg;
-
-flint_printf("i: %wd\n",i);
 
         pbits = 1 + n_randint(state, FLINT_BITS);
         pbits = 1 + n_randint(state, pbits);

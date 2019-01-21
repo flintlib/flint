@@ -12,13 +12,18 @@
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_ctx_init(fq_nmod_mpoly_ctx_t ctx, slong nvars,
-                                                        mp_limb_t p, slong deg)
+                                  const ordering_t ord, mp_limb_t p, slong deg)
 {
     fmpz_t P;
-
-    mpoly_ctx_init(ctx->minfo, nvars, ORD_LEX);
-
+    mpoly_ctx_init(ctx->minfo, nvars, ord);
     fmpz_init_set_ui(P, p);
     fq_nmod_ctx_init(ctx->fqctx, P, deg, "#");
     fmpz_clear(P);
+}
+
+void fq_nmod_mpoly_ctx_init2(fq_nmod_mpoly_ctx_t ctx, slong nvars,
+                               const ordering_t ord, const fq_nmod_ctx_t fqctx)
+{
+    mpoly_ctx_init(ctx->minfo, nvars, ord);
+    fq_nmod_ctx_init_modulus(ctx->fqctx, fqctx->modulus, fqctx->var);
 }

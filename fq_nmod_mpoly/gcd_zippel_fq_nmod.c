@@ -1046,12 +1046,12 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
         goto finished;
     }
 
+    /* we don't expect this function to work over F_p */
     if (nmod_poly_degree(ctx->fqctx->modulus) < WORD(2))
     {
         success = 0;
         goto finished;
     }
-
 
     degbound = FLINT_MIN(A->exps[0], B->exps[0]);
 
