@@ -20,7 +20,7 @@ main(void)
     flint_printf("gcd_zippel....");
     fflush(stdout);
 
-    for (i = 0; i < 2*flint_test_multiplier(); i++)
+    for (i = 0; i < 10*flint_test_multiplier(); i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t a, b, g, ca, cb, cg, t;
@@ -29,7 +29,7 @@ main(void)
         ulong * degbounds, * degbounds1, * degbounds2;
         int res;
 
-        fq_nmod_mpoly_ctx_init_rand(ctx, state, 10, FLINT_BITS, 4);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 3, 3, 4);
 
         fq_nmod_mpoly_init(g, ctx);
         fq_nmod_mpoly_init(a, ctx);

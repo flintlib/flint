@@ -42,6 +42,38 @@
  extern "C" {
 #endif
 
+/* Embeddings ****************************************************************/
+
+/* see fq_nmod_mpoly/fq_nmod_embed for more info */
+
+typedef struct fq_nmod_embed
+{
+    const fq_nmod_ctx_struct * smctx; /* modulus is f */
+    fq_nmod_poly_t phi_sm;      /* phi as an element of F_p[theta][x] */
+    fq_nmod_poly_t h;
+    const fq_nmod_ctx_struct * lgctx; /* modulus is g */
+    fq_nmod_t theta_lg;         /* theta as an element of F_p[phi]/g(phi) */
+    fq_nmod_t x_lg;             /* x as an element of F_p[phi]/g(phi) */
+} fq_nmod_embed_struct;
+
+typedef fq_nmod_embed_struct fq_nmod_embed_t[1];
+
+void _fq_nmod_embed_clear(fq_nmod_embed_t emb);
+
+void _fq_nmod_embed_array_clear(fq_nmod_embed_struct * emb, slong m);
+
+void _fq_nmod_embed_array_init(fq_nmod_embed_struct * emb,
+                     const fq_nmod_ctx_t bigctx, const fq_nmod_ctx_t smallctx);
+
+void _fq_nmod_embed_sm_to_lg(
+        fq_nmod_t out,            /* element of lgctx */
+        const fq_nmod_poly_t in,  /* poly over smctx */
+        const fq_nmod_embed_t emb);
+
+void _fq_nmod_embed_lg_to_sm(
+    fq_nmod_poly_t out,  /* poly over smctx */
+    const fq_nmod_t in,  /* element of lgctx */
+    const fq_nmod_embed_t emb);
 
 /*  Type definitions *********************************************************/
 
@@ -904,6 +936,11 @@ FLINT_DLL void fq_nmod_mpolyun_content_last(fq_nmod_poly_t a,
 FLINT_DLL void fq_nmod_mpolyun_divexact_last(fq_nmod_mpolyun_t A,
                               fq_nmod_poly_t b, const fq_nmod_mpoly_ctx_t ctx);
 
+
+FLINT_DLL void fq_nmod_mpolyun_redto_fq_nmod_mpolyu(fq_nmod_mpolyu_t A, fq_nmod_mpolyun_t B,
+                   const fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
+                                                    const fq_nmod_embed_t emb);
+
 FLINT_DLL void fq_nmod_mpolyun_eval_last(fq_nmod_mpolyu_t B,
                                      fq_nmod_mpolyun_t A, fq_nmod_t alpha,
                                                 const fq_nmod_mpoly_ctx_t ctx);
@@ -911,6 +948,17 @@ FLINT_DLL void fq_nmod_mpolyun_eval_last(fq_nmod_mpolyu_t B,
 FLINT_DLL int fq_nmod_mpolyun_addinterp(slong * lastdeg,
             fq_nmod_mpolyun_t F, fq_nmod_mpolyun_t T, fq_nmod_mpolyu_t A,
        fq_nmod_poly_t modulus, fq_nmod_t alpha, const fq_nmod_mpoly_ctx_t ctx);
+
+
+FLINT_DLL void fq_nmod_mpolyun_startinterp_lgprime(
+                           fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t ctx,
+                           fq_nmod_mpolyu_t B, const fq_nmod_mpoly_ctx_t ectx,
+                                                    const fq_nmod_embed_t emb);
+
+FLINT_DLL int fq_nmod_mpolyun_addinterp_lgprime(slong * lastdeg,
+                   fq_nmod_mpolyun_t F, fq_nmod_mpolyun_t T, fq_nmod_poly_t m,
+                       const fq_nmod_mpoly_ctx_t ctx, fq_nmod_mpolyu_t A,
+                    const fq_nmod_mpoly_ctx_t ectx, const fq_nmod_embed_t emb);
 
 FLINT_DLL nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(fq_nmod_mpolyu_t G,
                  fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B, fq_nmod_mpolyu_t f,

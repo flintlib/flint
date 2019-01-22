@@ -12,6 +12,221 @@
 #include "fq_nmod_mpoly.h"
 
 
+
+
+int fq_nmod_mpolyu_gcdm_zippel_bivar(
+    fq_nmod_mpolyu_t G,
+    fq_nmod_mpolyu_t A,
+    fq_nmod_mpolyu_t B,
+    fq_nmod_mpoly_ctx_t ctx,
+    mpoly_zipinfo_t zinfo,
+    flint_rand_t randstate)
+{
+    fq_nmod_mpolyun_t An, Bn, H, Ht;
+    fq_nmod_poly_t modulus, a, b, c, g;
+    int success = 0, changed;
+    slong Alastdeg;
+    slong Blastdeg;
+    slong lastdeg;
+    slong var = 0;
+    fq_nmod_embed_struct * embed;
+    mp_limb_t p = ctx->fqctx->modulus->mod.n;
+    slong m = nmod_poly_degree(ctx->fqctx->modulus);
+    slong n;
+    slong k;
+
+    FLINT_ASSERT(G->bits == A->bits);
+    FLINT_ASSERT(B->bits == A->bits);
+
+    fq_nmod_mpolyun_init(An, A->bits, ctx);
+    fq_nmod_mpolyun_init(Bn, A->bits, ctx);
+
+    fq_nmod_mpolyu_cvtto_mpolyun(An, A, var, ctx);
+    fq_nmod_mpolyu_cvtto_mpolyun(Bn, B, var, ctx);
+
+    fq_nmod_poly_init(a, ctx->fqctx);
+    fq_nmod_poly_init(b, ctx->fqctx);
+    fq_nmod_poly_init(c, ctx->fqctx);
+    fq_nmod_poly_init(g, ctx->fqctx);
+    fq_nmod_mpolyun_content_last(a, An, ctx);
+    fq_nmod_mpolyun_content_last(b, Bn, ctx);
+    fq_nmod_mpolyun_divexact_last(An, a, ctx);
+    fq_nmod_mpolyun_divexact_last(Bn, b, ctx);
+    fq_nmod_poly_gcd(c, a, b, ctx->fqctx);
+    fq_nmod_poly_gcd(g, fq_nmod_mpolyun_leadcoeff_ref(An, ctx),
+                        fq_nmod_mpolyun_leadcoeff_ref(Bn, ctx), ctx->fqctx);
+
+    Alastdeg = fq_nmod_mpolyun_lastdeg(An, ctx);
+    Blastdeg = fq_nmod_mpolyun_lastdeg(Bn, ctx);
+
+    fq_nmod_poly_init(modulus, ctx->fqctx);
+    fq_nmod_poly_one(modulus, ctx->fqctx);
+    fq_nmod_mpolyun_init(H, A->bits, ctx);
+    fq_nmod_mpolyun_init(Ht, A->bits, ctx);
+
+    FLINT_ASSERT(An->bits == B->bits);
+    FLINT_ASSERT(An->bits == G->bits);
+    FLINT_ASSERT(An->length > 0);
+    FLINT_ASSERT(Bn->length > 0);
+    FLINT_ASSERT(An->exps[A->length - 1] == 0);
+    FLINT_ASSERT(Bn->exps[B->length - 1] == 0);
+
+    embed = (fq_nmod_embed_struct *) flint_malloc(m*sizeof(fq_nmod_embed_struct));
+
+    /* n is the degree of the extension */
+    n = (FLINT_BITS/2)/(m*FLINT_BIT_COUNT(p));
+    for (n = FLINT_MAX(n, WORD(2)); n < 1000; n++)
+    {
+        nmod_poly_t ext_modulus;
+        fq_nmod_ctx_t ext_fqctx;
+        fq_nmod_mpoly_ctx_t ectx;
+        fq_nmod_mpolyu_t Aeval, Beval, Geval;
+        fq_nmod_t t, geval;
+
+        /* init ectx with modulus of degree m*n */
+        nmod_poly_init2(ext_modulus, p, m*n + 1);
+        nmod_poly_randtest_sparse_irreducible(ext_modulus, randstate, m*n + 1);
+        fq_nmod_ctx_init_modulus(ext_fqctx, ext_modulus, "$");
+        fq_nmod_mpoly_ctx_init2(ectx, ctx->minfo->nvars, ORD_LEX, ext_fqctx);
+        fq_nmod_ctx_clear(ext_fqctx);
+        nmod_poly_clear(ext_modulus);
+
+        _fq_nmod_embed_array_init(embed, ectx->fqctx, ctx->fqctx);
+
+        fq_nmod_mpolyu_init(Aeval, A->bits, ectx);
+        fq_nmod_mpolyu_init(Beval, A->bits, ectx);
+        fq_nmod_mpolyu_init(Geval, A->bits, ectx);
+        fq_nmod_init(geval, ectx->fqctx);
+        fq_nmod_init(t, ectx->fqctx);
+
+        for (k = 0; k < m; k++)
+        {
+            /* make sure reduction does not kill both lc(A) and lc(B) */
+            _fq_nmod_embed_sm_to_lg(geval, g, embed + k);
+            if (fq_nmod_is_zero(geval, ectx->fqctx))
+                goto outer_continue;
+
+            /* make sure reduction does not kill either A or B */
+            fq_nmod_mpolyun_redto_fq_nmod_mpolyu(Aeval, An, ectx, ctx, embed + k);
+            fq_nmod_mpolyun_redto_fq_nmod_mpolyu(Beval, Bn, ectx, ctx, embed + k);
+            if (Aeval->length == 0 || Beval->length == 0)
+                goto outer_continue;
+
+            FLINT_ASSERT(fq_nmod_mpolyu_is_canonical(Aeval, ectx));
+            FLINT_ASSERT(fq_nmod_mpolyu_is_canonical(Beval, ectx));
+
+            fq_nmod_mpolyu_gcdp_zippel_univar(Geval, Aeval, Beval, ectx);
+
+            if (fq_nmod_mpolyu_is_one(Geval, ectx))
+            {
+                fq_nmod_mpolyu_cvtfrom_poly_notmain(G, c, var, ctx);
+
+                fq_nmod_clear(geval, ectx->fqctx);
+                fq_nmod_clear(t, ectx->fqctx);
+                fq_nmod_mpolyu_clear(Aeval, ectx);
+                fq_nmod_mpolyu_clear(Beval, ectx);
+                fq_nmod_mpolyu_clear(Geval, ectx);
+                _fq_nmod_embed_array_clear(embed, m);
+                fq_nmod_mpoly_ctx_clear(ectx);
+
+                success = 1;
+                goto finished;
+            }
+
+            FLINT_ASSERT(Geval->length > 0);
+
+            if (fq_nmod_poly_degree(modulus, ctx->fqctx) > 0)
+            {
+                if (Geval->exps[0] > H->exps[0])
+                {
+                    goto outer_continue;
+                }
+                else if (Geval->exps[0] < H->exps[0])
+                {
+                    fq_nmod_poly_one(modulus, ctx->fqctx);
+                }
+            }
+
+            fq_nmod_inv(t, fq_nmod_mpolyu_leadcoeff_ref(Geval, ectx), ectx->fqctx);
+            fq_nmod_mul(t, t, geval, ectx->fqctx);
+            fq_nmod_mpolyu_scalar_mul_fq_nmod(Geval, t, ectx);
+
+            if (fq_nmod_poly_degree(modulus, ctx->fqctx) > 0)
+            {
+                changed = fq_nmod_mpolyun_addinterp_lgprime(&lastdeg,
+                                  H, Ht, modulus, ctx, Geval, ectx, embed + k);
+                if (!changed)
+                {
+                    fq_nmod_mpolyun_content_last(a, H, ctx);
+                    fq_nmod_mpolyun_mul_poly(Ht, H, c, ctx);
+                    fq_nmod_mpolyun_divexact_last(Ht, a, ctx);
+
+                    fq_nmod_mpolyu_cvtfrom_mpolyun(G, Ht, var, ctx);
+
+                    if (!fq_nmod_mpolyu_divides(A, G, ctx))
+                        goto outer_continue;
+                    if (!fq_nmod_mpolyu_divides(B, G, ctx))
+                        goto outer_continue;
+
+                    fq_nmod_clear(geval, ectx->fqctx);
+                    fq_nmod_clear(t, ectx->fqctx);
+                    fq_nmod_mpolyu_clear(Aeval, ectx);
+                    fq_nmod_mpolyu_clear(Beval, ectx);
+                    fq_nmod_mpolyu_clear(Geval, ectx);
+                    _fq_nmod_embed_array_clear(embed, m);
+                    fq_nmod_mpoly_ctx_clear(ectx);
+
+                    success = 1;
+                    goto finished;
+                }
+            }
+            else
+            {
+                fq_nmod_mpolyun_startinterp_lgprime(H, ctx, Geval, ectx, embed + k);
+                lastdeg = fq_nmod_mpolyun_lastdeg(H, ctx);
+            }
+            fq_nmod_poly_mul(modulus, modulus, (embed + k)->h, ctx->fqctx);
+
+            if (lastdeg > Alastdeg || lastdeg > Blastdeg)
+            {
+                fq_nmod_poly_one(modulus, ctx->fqctx);
+                goto outer_continue;
+            }
+
+outer_continue:
+            (void)(NULL);
+        }
+
+        fq_nmod_clear(geval, ectx->fqctx);
+        fq_nmod_clear(t, ectx->fqctx);
+        fq_nmod_mpolyu_clear(Aeval, ectx);
+        fq_nmod_mpolyu_clear(Beval, ectx);
+        fq_nmod_mpolyu_clear(Geval, ectx);
+        _fq_nmod_embed_array_clear(embed, m);
+        fq_nmod_mpoly_ctx_clear(ectx);
+    }
+
+    success = 0;
+
+finished:
+
+    fq_nmod_poly_clear(a, ctx->fqctx);
+    fq_nmod_poly_clear(b, ctx->fqctx);
+    fq_nmod_poly_clear(c, ctx->fqctx);
+    fq_nmod_poly_clear(g, ctx->fqctx);
+    fq_nmod_poly_clear(modulus, ctx->fqctx);
+    fq_nmod_mpolyun_clear(An, ctx);
+    fq_nmod_mpolyun_clear(Bn, ctx);
+    fq_nmod_mpolyun_clear(H, ctx);
+    fq_nmod_mpolyun_clear(Ht, ctx);
+
+    flint_free(embed);
+
+    return success;
+}
+
+
+
 int fq_nmod_mpolyu_gcdm_zippel(
     fq_nmod_mpolyu_t G,
     fq_nmod_mpolyu_t A,
@@ -42,6 +257,12 @@ int fq_nmod_mpolyu_gcdm_zippel(
                                                         ctx, zinfo, randstate);
     if (success)
         return 1;
+
+    /* bivariate more comfortable separated */
+    if (ctx->minfo->nvars == 1)
+        return fq_nmod_mpolyu_gcdm_zippel_bivar(G, A, B, ctx, zinfo, randstate);
+
+
 
     return 0;
 }
