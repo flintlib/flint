@@ -621,6 +621,27 @@ FLINT_DLL slong _fq_nmod_mpoly_divides_monagan_pearce(
 
 /* GCD ***********************************************************************/
 
+FLINT_DLL int fq_nmod_mpoly_gcd(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A,
+                       const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fq_nmod_mpoly_gcd(fq_nmod_mpoly_t G, mp_bitcnt_t Gbits,
+                            const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fq_nmod_mpoly_gcd_monomial(fq_nmod_mpoly_t G, mp_bitcnt_t Gbits,
+                             const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fq_nmod_mpoly_gcd_monomial_cofactors_sp(
+                         fq_nmod_mpoly_t G, mp_bitcnt_t Gbits,
+      const fq_nmod_mpoly_t A, const ulong * Amax_exp , const ulong * Amin_exp,
+      const fq_nmod_mpoly_t B, const ulong * Bmax_exp , const ulong * Bmin_exp,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fq_nmod_mpoly_gcd_monomial_cofactors(fq_nmod_mpoly_t G,
+                             const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL int fq_nmod_mpoly_gcd_brown(fq_nmod_mpoly_t G,
                             const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
                                                 const fq_nmod_mpoly_ctx_t ctx);
@@ -1037,10 +1058,6 @@ fq_nmod_mpolyu_leadcoeff_ref(const fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t
     FLINT_ASSERT(A->length > 0);
     return fq_nmod_mpoly_leadcoeff_ref(A->coeffs + 0, ctx);
 }
-
-
-
-
 
 
 

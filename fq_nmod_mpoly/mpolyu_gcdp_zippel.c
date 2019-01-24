@@ -786,12 +786,11 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(fq_nmod_mpolyu_t G,
 
     fq_nmod_mpolyun_init(An, A->bits, ctx);
     fq_nmod_mpolyun_init(Bn, A->bits, ctx);
-
     fq_nmod_mpolyu_cvtto_mpolyun(An, A, var, ctx);
     fq_nmod_mpolyu_cvtto_mpolyun(Bn, B, var, ctx);
 
-    FLINT_ASSERT(A->length > 0);
-    FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT(An->length > 0);
+    FLINT_ASSERT(Bn->length > 0);
 
     ABminshift = FLINT_MIN(A->exps[A->length - 1], B->exps[B->length - 1]);
     fq_nmod_mpolyun_shift_right(An, A->exps[A->length - 1]);
@@ -1024,10 +1023,8 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
 
     fq_nmod_mpolyun_init(An, A->bits, ctx);
     fq_nmod_mpolyun_init(Bn, A->bits, ctx);
-
     fq_nmod_mpolyu_cvtto_mpolyun(An, A, var, ctx);
     fq_nmod_mpolyu_cvtto_mpolyun(Bn, B, var, ctx);
-
     ABminshift = FLINT_MIN(A->exps[A->length - 1], B->exps[B->length - 1]);
     fq_nmod_mpolyun_shift_right(An, A->exps[A->length - 1]);
     fq_nmod_mpolyun_shift_right(Bn, B->exps[B->length - 1]);
