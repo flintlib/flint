@@ -426,10 +426,98 @@ void fq_nmod_mpolyun_divexact_last(fq_nmod_mpolyun_t A, fq_nmod_poly_t b,
 
 
 
+/*
+    Update H so that it does not change mod m, and is now A mod p
+    It is asserted that the monomials in H and A match
+*/
+int fq_nmod_mpolyn_CRT_fq_nmod_mpoly(slong * lastdeg,
+                          fq_nmod_mpolyn_t H, const fq_nmod_mpoly_ctx_t ctx,
+                          fq_nmod_poly_t m, fq_nmod_t inv_m_eval,
+                             fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ectx,
+                                                    const _fq_nmod_embed_t emb)
+{
+    slong i;
+#if WANT_ASSERT
+    slong N;
+#endif
+    int changed = 0;
+    fq_nmod_t u, v;
+    fq_nmod_poly_t w, u_sm;
+
+    fq_nmod_init(u, ectx->fqctx);
+    fq_nmod_init(v, ectx->fqctx);
+    fq_nmod_poly_init(w, ctx->fqctx);
+    fq_nmod_poly_init(u_sm, ctx->fqctx);
+
+    FLINT_ASSERT(H->length == A->length);
+    FLINT_ASSERT(H->bits == A->bits);
+#if WANT_ASSERT
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+#endif
+    for (i = 0; i < A->length; i++)
+    {
+        FLINT_ASSERT(mpoly_monomial_equal(H->exps + N*i, A->exps + N*i, N));
+        _fq_nmod_embed_sm_to_lg(u, H->coeffs + i, emb);
+        fq_nmod_sub(v, A->coeffs + i, u, ectx->fqctx);
+        if (!fq_nmod_is_zero(v, ectx->fqctx))
+        {
+            changed = 1;
+            fq_nmod_mul(u, v, inv_m_eval, ectx->fqctx);
+            _fq_nmod_embed_lg_to_sm(u_sm, u, emb);
+            fq_nmod_poly_mul(w, u_sm, m, ctx->fqctx);
+            fq_nmod_poly_add(H->coeffs + i, H->coeffs + i, w, ctx->fqctx);
+        }
+
+        lastdeg[0] = FLINT_MAX(lastdeg[0],
+                               fq_nmod_poly_degree(H->coeffs + i, ctx->fqctx));
+
+        FLINT_ASSERT(fq_nmod_poly_degree(H->coeffs + i, ctx->fqctx)
+                         <  fq_nmod_poly_degree(m, ctx->fqctx)
+                          + fq_nmod_poly_degree(emb->h, ctx->fqctx));
+    }
+
+    fq_nmod_clear(u, ectx->fqctx);
+    fq_nmod_clear(v, ectx->fqctx);
+    fq_nmod_poly_clear(w, ctx->fqctx);
+    fq_nmod_poly_clear(u_sm, ctx->fqctx);
+
+    return changed;
+}
+
+int fq_nmod_mpolyun_CRT_fq_nmod_mpolyu(slong * lastdeg,
+         fq_nmod_mpolyun_t H, const fq_nmod_mpoly_ctx_t ctx, fq_nmod_poly_t m,
+                        fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ectx,
+                                                          _fq_nmod_embed_t emb)
+{
+    slong i;
+    int changed = 0;
+    fq_nmod_t inv_m_eval;
+
+    lastdeg[0] = -WORD(1);
+
+    fq_nmod_init(inv_m_eval, ectx->fqctx);
+    _fq_nmod_embed_sm_to_lg(inv_m_eval, m, emb);
+    fq_nmod_inv(inv_m_eval, inv_m_eval, ectx->fqctx);
+
+    FLINT_ASSERT(H->bits == A->bits);
+    FLINT_ASSERT(H->length == A->length);
+    for (i = 0; i < A->length; i++)
+    {
+        FLINT_ASSERT(H->exps[i] == A->exps[i]);
+        changed |= fq_nmod_mpolyn_CRT_fq_nmod_mpoly(lastdeg, H->coeffs + i,
+                                 ctx, m, inv_m_eval, A->coeffs + i, ectx, emb);
+    }
+    H->length = A->length;
+    fq_nmod_clear(inv_m_eval, ectx->fqctx);
+    return changed;
+}
+
+
+
 /* reduce B via the map F_q[x] -> F_q^n */
 void fq_nmod_mpolyn_redto_fq_nmod_mpoly(fq_nmod_mpoly_t A, fq_nmod_mpolyn_t B,
-                   const fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                     const fq_nmod_embed_t emb)
+                 const fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
+                                                    const _fq_nmod_embed_t emb)
 {
     slong i;
     slong k;
@@ -458,8 +546,8 @@ void fq_nmod_mpolyn_redto_fq_nmod_mpoly(fq_nmod_mpoly_t A, fq_nmod_mpolyn_t B,
 
 /* reduce B via the map from F_q[x] -> F_q^n */
 void fq_nmod_mpolyun_redto_fq_nmod_mpolyu(fq_nmod_mpolyu_t A, fq_nmod_mpolyun_t B,
-                   const fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                     const fq_nmod_embed_t emb)
+                 const fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
+                                                    const _fq_nmod_embed_t emb)
 {
     slong i, k, Blen;
     fq_nmod_mpoly_struct * Acoeff;
@@ -482,6 +570,7 @@ void fq_nmod_mpolyun_redto_fq_nmod_mpolyu(fq_nmod_mpolyu_t A, fq_nmod_mpolyun_t 
     }
     A->length = k;  
 }
+
 
 
 /* evaluate A at lastvar = alpha */
@@ -755,15 +844,11 @@ int fq_nmod_mpolyun_addinterp(
 
 
 
-
-
-
-
 /* Convert B to A using the map  F_q^n -> F_q[x] */
 void fq_nmod_mpolyn_startinterp_lgprime(
                             fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx,
                             fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ectx,
-                                                    const fq_nmod_embed_t emb)
+                                                    const _fq_nmod_embed_t emb)
 {
     slong i;
     slong N;
@@ -783,7 +868,7 @@ void fq_nmod_mpolyn_startinterp_lgprime(
 void fq_nmod_mpolyun_startinterp_lgprime(
                            fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t ctx,
                            fq_nmod_mpolyu_t B, const fq_nmod_mpoly_ctx_t ectx,
-                                                    const fq_nmod_embed_t emb)
+                                                    const _fq_nmod_embed_t emb)
 {
     slong i;
 
@@ -800,11 +885,6 @@ void fq_nmod_mpolyun_startinterp_lgprime(
 
 
 
-
-
-
-
-
 /*
     update F so that it doesn't change mod m and is A mod emb->h
 
@@ -816,7 +896,7 @@ int fq_nmod_mpolyn_addinterp_lgprime(slong * lastdeg,
                      fq_nmod_mpolyn_t F, fq_nmod_mpolyn_t T, fq_nmod_poly_t m,
                          const fq_nmod_mpoly_ctx_t ctx, fq_nmod_mpoly_t A,
                          fq_nmod_t inv_m_eval, const fq_nmod_mpoly_ctx_t ectx,
-                                                     const fq_nmod_embed_t emb)
+                                                    const _fq_nmod_embed_t emb)
 {
     int changed = 0;
     slong i, j, k;
@@ -947,7 +1027,7 @@ int fq_nmod_mpolyn_addinterp_lgprime(slong * lastdeg,
 int fq_nmod_mpolyun_addinterp_lgprime(slong * lastdeg,
                    fq_nmod_mpolyun_t F, fq_nmod_mpolyun_t T, fq_nmod_poly_t m,
                        const fq_nmod_mpoly_ctx_t ctx, fq_nmod_mpolyu_t A,
-                     const fq_nmod_mpoly_ctx_t ectx, const fq_nmod_embed_t emb)
+                    const fq_nmod_mpoly_ctx_t ectx, const _fq_nmod_embed_t emb)
 {
     int changed = 0;
     slong i, j, k;

@@ -72,7 +72,7 @@ printf("      x: ");                  fq_nmod_print_pretty(emb->x_lg, emb->lgctx
 }
 */
 
-void _fq_nmod_embed_clear(fq_nmod_embed_t emb)
+void _fq_nmod_embed_clear(_fq_nmod_embed_t emb)
 {
     fq_nmod_poly_clear(emb->phi_sm, emb->smctx);
     fq_nmod_poly_clear(emb->h, emb->smctx);
@@ -81,7 +81,7 @@ void _fq_nmod_embed_clear(fq_nmod_embed_t emb)
     fq_nmod_clear(emb->x_lg, emb->lgctx);
 }
 
-void _fq_nmod_embed_array_clear(fq_nmod_embed_struct * emb, slong m)
+void _fq_nmod_embed_array_clear(_fq_nmod_embed_struct * emb, slong m)
 {
     slong i;
     for (i = 0; i < m; i++)
@@ -90,11 +90,11 @@ void _fq_nmod_embed_array_clear(fq_nmod_embed_struct * emb, slong m)
 /*
     initialize an array of m embeddings making an extension of degree n
 */
-void _fq_nmod_embed_array_init(fq_nmod_embed_struct * emb,
+void _fq_nmod_embed_array_init(_fq_nmod_embed_struct * emb,
                       const fq_nmod_ctx_t bigctx, const fq_nmod_ctx_t smallctx)
 {
     slong i, j, k, l;
-    fq_nmod_embed_struct * cur;
+    _fq_nmod_embed_struct * cur;
     fq_nmod_poly_t poly;
     fq_nmod_t t;
     fq_nmod_poly_t poly2;
@@ -277,7 +277,7 @@ flint_printf("**** emb[%wd]:\n",k); _embed_print(emb + k);
 void _fq_nmod_embed_sm_to_lg(
     fq_nmod_t out,            /* element of lgctx */
     const fq_nmod_poly_t in,  /* poly over smctx */
-    const fq_nmod_embed_t emb)
+    const _fq_nmod_embed_t emb)
 {
     slong i, j;
     fq_nmod_poly_t inred;
@@ -313,7 +313,7 @@ void _fq_nmod_embed_sm_to_lg(
 void _fq_nmod_embed_lg_to_sm(
     fq_nmod_poly_t out,  /* poly over smctx */
     const fq_nmod_t in,  /* element of lgctx */
-    const fq_nmod_embed_t emb)
+    const _fq_nmod_embed_t emb)
 {
     slong i;
     fq_nmod_poly_t t1;
@@ -334,4 +334,90 @@ void _fq_nmod_embed_lg_to_sm(
 
     fq_nmod_poly_clear(t1, emb->smctx);
     fq_nmod_clear(t2, emb->smctx);
+}
+
+
+
+
+_fq_nmod_embed_struct *
+_fq_nmod_mpoly_embed_chooser_init(_fq_nmod_mpoly_embed_chooser_t embc,
+                  fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
+                                                        flint_rand_t randstate)
+{
+    nmod_poly_t ext_modulus;
+    fq_nmod_ctx_t ext_fqctx;
+    mp_limb_t p = ctx->fqctx->modulus->mod.n;
+    slong m = nmod_poly_degree(ctx->fqctx->modulus);
+    slong n;
+
+    n = (FLINT_BITS/2)/(m*FLINT_BIT_COUNT(p));
+    n = FLINT_MAX(n, WORD(2));
+
+    embc->p = p;
+    embc->m = m;
+    embc->n = n;
+
+    embc->embed = (_fq_nmod_embed_struct *) flint_malloc(m*
+                                                sizeof(_fq_nmod_embed_struct));
+
+    /* init ectx with modulus of degree m*n */
+    nmod_poly_init2(ext_modulus, p, m*n + 1);
+    nmod_poly_randtest_sparse_irreducible(ext_modulus, randstate, m*n + 1);
+    fq_nmod_ctx_init_modulus(ext_fqctx, ext_modulus, "$");
+    fq_nmod_mpoly_ctx_init2(ectx, ctx->minfo->nvars, ORD_LEX, ext_fqctx);
+    fq_nmod_ctx_clear(ext_fqctx);
+    nmod_poly_clear(ext_modulus);
+
+    _fq_nmod_embed_array_init(embc->embed, ectx->fqctx, ctx->fqctx);
+
+    embc->k = 0;
+    return embc->embed + embc->k;
+}
+
+void
+_fq_nmod_mpoly_embed_chooser_clear(_fq_nmod_mpoly_embed_chooser_t embc,
+                  fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
+                                                        flint_rand_t randstate)
+{
+    _fq_nmod_embed_array_clear(embc->embed, embc->m);
+    fq_nmod_mpoly_ctx_clear(ectx);
+    flint_free(embc->embed);
+}
+
+
+_fq_nmod_embed_struct *
+_fq_nmod_mpoly_embed_chooser_next(_fq_nmod_mpoly_embed_chooser_t embc,
+                  fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
+                                                        flint_rand_t randstate)
+{
+    nmod_poly_t ext_modulus;
+    fq_nmod_ctx_t ext_fqctx;
+    mp_limb_t p = embc->p;
+    slong m = embc->m;
+    slong n = embc->n;
+
+    embc->k++;
+    if (embc->k < m)
+        return embc->embed + embc->k;
+
+    n++;
+    embc->n = n;
+    if (n > 1000)
+        return NULL;
+
+    _fq_nmod_embed_array_clear(embc->embed, embc->m);
+    fq_nmod_mpoly_ctx_clear(ectx);
+
+    /* init ectx with modulus of degree m*n */
+    nmod_poly_init2(ext_modulus, p, m*n + 1);
+    nmod_poly_randtest_sparse_irreducible(ext_modulus, randstate, m*n + 1);
+    fq_nmod_ctx_init_modulus(ext_fqctx, ext_modulus, "$");
+    fq_nmod_mpoly_ctx_init2(ectx, ctx->minfo->nvars, ORD_LEX, ext_fqctx);
+    fq_nmod_ctx_clear(ext_fqctx);
+    nmod_poly_clear(ext_modulus);
+
+    _fq_nmod_embed_array_init(embc->embed, ectx->fqctx, ctx->fqctx);
+
+    embc->k = 0;
+    return embc->embed + embc->k;
 }

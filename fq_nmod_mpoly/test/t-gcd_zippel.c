@@ -28,8 +28,13 @@ main(void)
         ulong degbound;
         ulong * degbounds, * degbounds1, * degbounds2;
         int res;
+        mp_bitcnt_t pbits;
+        slong deg;
 
-        fq_nmod_mpoly_ctx_init_rand(ctx, state, 3, 3, 4);
+        pbits = 1 + n_randint(state, FLINT_BITS);
+        pbits = 1 + n_randint(state, pbits);
+        deg = 1 + n_randint(state, 4);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 10, pbits, deg);
 
         fq_nmod_mpoly_init(g, ctx);
         fq_nmod_mpoly_init(a, ctx);
@@ -39,11 +44,11 @@ main(void)
         fq_nmod_mpoly_init(cg, ctx);
         fq_nmod_mpoly_init(t, ctx);
 
-        len = n_randint(state, 15) + 1;
-        len1 = n_randint(state, 15);
-        len2 = n_randint(state, 15);
+        len = n_randint(state, 10) + 1;
+        len1 = n_randint(state, 10);
+        len2 = n_randint(state, 10);
 
-        degbound = 100/(2*ctx->minfo->nvars - 1);
+        degbound = 50/(2*ctx->minfo->nvars - 1);
         degbounds = (ulong * ) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
         degbounds1 = (ulong * ) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
         degbounds2 = (ulong * ) flint_malloc(ctx->minfo->nvars*sizeof(ulong));

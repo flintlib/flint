@@ -136,6 +136,13 @@ void fq_nmod_mpolyu_fit_length(fq_nmod_mpolyu_t A, slong length,
     }
 }
 
+void fq_nmod_mpolyu_one(fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t uctx)
+{
+    fq_nmod_mpolyu_fit_length(A, 1, uctx);
+    A->exps[0] = 0;
+    fq_nmod_mpoly_one(A->coeffs + 0, uctx);
+    A->length = 1;
+}
 
 /* if the coefficient doesn't exist, a new one is created (and set to zero) */
 fq_nmod_mpoly_struct * _fq_nmod_mpolyu_get_coeff(fq_nmod_mpolyu_t A,

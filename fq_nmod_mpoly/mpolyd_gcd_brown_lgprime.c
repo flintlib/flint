@@ -16,7 +16,7 @@ void fq_nmod_mpolyd_lgprime_eval_last(
     fq_nmod_mpolyd_t E,
     const fq_nmod_mpolyd_ctx_t edctx,
     fq_nmod_mpolyd_t A,
-    const fq_nmod_embed_t emb)
+    const _fq_nmod_embed_t emb)
 {
     slong i, j, k;
     slong degb_prod, degb_last=0, degb_prod_last=0;
@@ -62,7 +62,7 @@ void fq_nmod_mpolyd_lgprime_startinterp(
     fq_nmod_mpolyd_t A,
     const fq_nmod_mpolyd_ctx_t dctx,
     fq_nmod_mpolyd_t E,
-    const fq_nmod_embed_t emb)
+    const _fq_nmod_embed_t emb)
 {
     slong i, j, k;
     slong degb_prod, degb_last;
@@ -113,7 +113,7 @@ void fq_nmod_mpolyd_lgprime_addinterp(
     const fq_nmod_mpolyd_ctx_t edctx,
     fq_nmod_poly_t modulus,
     fq_nmod_t modulus_eval,
-    const fq_nmod_embed_t emb)
+    const _fq_nmod_embed_t emb)
 {
     slong i, j, k, degb_prod, Tlast_degb;
     slong nvars = F->nvars;
@@ -267,7 +267,7 @@ int fq_nmod_mpolyd_gcd_brown_lgprime(fq_nmod_mpolyd_t G,
     slong * leadmon_gs, * leadmon_Gs;
     slong deggamma, degGs, degA, degB, degAbars, degBbars;
     flint_rand_t state;
-    fq_nmod_embed_struct * embed;
+    _fq_nmod_embed_struct * embed;
     mp_limb_t p = dctx->fqctx->modulus->mod.n;
     slong m = nmod_poly_degree(dctx->fqctx->modulus);
     slong n;
@@ -324,7 +324,8 @@ int fq_nmod_mpolyd_gcd_brown_lgprime(fq_nmod_mpolyd_t G,
     fq_nmod_poly_init(modulus, dctx->fqctx);
     fq_nmod_poly_one(modulus, dctx->fqctx);
 
-    embed = (fq_nmod_embed_struct *) flint_malloc(m*sizeof(fq_nmod_embed_struct));
+    embed = (_fq_nmod_embed_struct *) flint_malloc(m*
+                                                sizeof(_fq_nmod_embed_struct));
 
     /* n is the degree of the extension */
     n = (FLINT_BITS/2)/(m*FLINT_BIT_COUNT(p));
