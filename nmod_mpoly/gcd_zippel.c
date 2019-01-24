@@ -20,26 +20,33 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     mpoly_zipinfo_t zinfo,
     flint_rand_t randstate)
 {
-    slong deg = 2;
+    slong var = 0;
+    slong Alastdeg;
+    slong Blastdeg;
+    slong bound;
+    slong lastdeg;
+    int success = 0, changed, have_enough;
     nmod_mpolyun_t An, Bn, H, Ht;
+    slong deg;
     fq_nmod_mpoly_ctx_t ffctx;
     fq_nmod_mpolyu_t Aeval, Beval, Geval;
     nmod_poly_t modulus, a,b,c,g;
     fq_nmod_t t, geval;
-    int success = 0, changed;
-    slong Alastdeg;
-    slong Blastdeg;
-    slong lastdeg;
-    slong var = 0;
 
     FLINT_ASSERT(G->bits == A->bits);
     FLINT_ASSERT(B->bits == A->bits);
 
     nmod_mpolyun_init(An, A->bits, ctx);
     nmod_mpolyun_init(Bn, A->bits, ctx);
-
     nmod_mpolyu_cvtto_mpolyun(An, A, var, ctx);
     nmod_mpolyu_cvtto_mpolyun(Bn, B, var, ctx);
+
+    FLINT_ASSERT(An->bits == B->bits);
+    FLINT_ASSERT(An->bits == G->bits);
+    FLINT_ASSERT(An->length > 0);
+    FLINT_ASSERT(Bn->length > 0);
+    FLINT_ASSERT(An->exps[A->length - 1] == 0);
+    FLINT_ASSERT(Bn->exps[B->length - 1] == 0);
 
     nmod_poly_init(a, ctx->ffinfo->mod.n);
     nmod_poly_init(b, ctx->ffinfo->mod.n);
@@ -56,10 +63,17 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     Alastdeg = nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
 
+    /* bound on the number of images */
+    bound = 1 + FLINT_MIN(Alastdeg, Blastdeg)
+              + nmod_poly_degree(g);
+
     nmod_poly_init(modulus, ctx->ffinfo->mod.n);
     nmod_poly_one(modulus);
     nmod_mpolyun_init(H, A->bits, ctx);
     nmod_mpolyun_init(Ht, A->bits, ctx);
+
+    deg = WORD(20)/(FLINT_BIT_COUNT(ctx->ffinfo->mod.n));
+    deg = FLINT_MAX(WORD(2), deg);
 
     fq_nmod_mpoly_ctx_init(ffctx, ctx->minfo->nvars, ORD_LEX,
                                                       ctx->ffinfo->mod.n, deg);
@@ -70,18 +84,14 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     fq_nmod_init(geval, ffctx->fqctx);
     fq_nmod_init(t, ffctx->fqctx);
 
-
-    FLINT_ASSERT(An->bits == B->bits);
-    FLINT_ASSERT(An->bits == G->bits);
-    FLINT_ASSERT(An->length > 0);
-    FLINT_ASSERT(Bn->length > 0);
-    FLINT_ASSERT(An->exps[A->length - 1] == 0);
-    FLINT_ASSERT(Bn->exps[B->length - 1] == 0);
-
-    while (1) {
-
+    while (1)
+    {
+        /* TODO:
+            instead of simply increasing the degree everytime, try to find more
+            irreducibles of the same degree
+        */
         deg++;
-        if (deg > 1000)
+        if (deg > 10000)
         {
             /* ran out of primes */
             success = 0;
@@ -132,8 +142,8 @@ int nmod_mpolyu_gcdm_zippel_bivar(
             if (Geval->exps[0] > H->exps[0])
             {
                 goto outer_continue;
-
-            } else if (Geval->exps[0] < H->exps[0])
+            }
+            else if (Geval->exps[0] < H->exps[0])
             {
                 nmod_poly_one(modulus);                
             }
@@ -147,33 +157,39 @@ int nmod_mpolyu_gcdm_zippel_bivar(
         {
             changed = nmod_mpolyun_addinterp_fq_nmod_mpolyu(&lastdeg, H, Ht,
                                                    modulus, ctx, Geval, ffctx);
-            if (!changed)
+            nmod_poly_mul(modulus, modulus, ffctx->fqctx->modulus);
+
+            have_enough = nmod_poly_degree(modulus) >= bound;
+
+            if (changed && !have_enough)
+            {
+                goto outer_continue;
+            }
+
+            if (!changed || have_enough)
             {
                 nmod_mpolyun_content_last(a, H, ctx);
                 nmod_mpolyun_mul_poly(Ht, H, c, ctx);
                 nmod_mpolyun_divexact_last(Ht, a, ctx);
-
                 nmod_mpolyu_cvtfrom_mpolyun(G, Ht, var, ctx);
-
-                if (!nmod_mpolyu_divides(A, G, ctx))
-                    goto outer_continue;
-                if (!nmod_mpolyu_divides(B, G, ctx))
-                    goto outer_continue;
-                success = 1;
-                goto finished;
+                if (   nmod_mpolyu_divides(A, G, ctx)
+                    && nmod_mpolyu_divides(B, G, ctx))
+                {
+                    success = 1;
+                    goto finished;
+                }
             }
 
-        } else
+            if (have_enough)
+            {
+                nmod_poly_one(modulus);
+                goto outer_continue;
+            }
+        }
+        else
         {
             nmod_mpolyun_set_fq_nmod_mpolyu(H, ctx, Geval, ffctx);
-            lastdeg = nmod_mpolyun_lastdeg(H, ctx);
-        }
-        nmod_poly_mul(modulus, modulus, ffctx->fqctx->modulus);
-
-        if (lastdeg > Alastdeg || lastdeg > Blastdeg)
-        {
-            nmod_poly_one(modulus);
-            goto outer_continue;
+            nmod_poly_set(modulus, ffctx->fqctx->modulus);
         }
 
 outer_continue:
@@ -213,11 +229,11 @@ int nmod_mpolyu_gcdm_zippel(
     flint_rand_t randstate)
 {
     slong degbound;
-    slong coeff_deg_bound;
+    slong bound;
     slong lastdeg;
-    int success, changed;
-    slong deg = 4;
+    int success, changed, have_enough;
     nmod_mpolyun_t An, Bn, Hn, Ht;
+    slong deg;
     fq_nmod_mpoly_ctx_t ffctx;
     fq_nmod_mpolyu_t Aff, Bff, Gff, Gform;
     nmod_poly_t modulus, gamma, hc;
@@ -228,11 +244,15 @@ int nmod_mpolyu_gcdm_zippel(
 
     success = nmod_mpolyu_gcdp_zippel(G, A, B, ctx->minfo->nvars - 1, ctx, zinfo, randstate);
     if (success)
+    {
         return 1;
+    }
 
     /* bivariate more comfortable separated */
     if (ctx->minfo->nvars == 1)
+    {
         return nmod_mpolyu_gcdm_zippel_bivar(G, A, B, ctx, zinfo, randstate);
+    }
 
     FLINT_ASSERT(ctx->minfo->nvars > 1);
 
@@ -244,9 +264,6 @@ int nmod_mpolyu_gcdm_zippel(
     nmod_mpolyu_cvtto_mpolyun(An, A, ctx->minfo->nvars - 1, ctx);
     nmod_mpolyu_cvtto_mpolyun(Bn, B, ctx->minfo->nvars - 1, ctx);
 
-    coeff_deg_bound = FLINT_MIN(nmod_mpolyun_lastdeg(An, ctx),
-                                nmod_mpolyun_lastdeg(Bn, ctx));
-
     FLINT_ASSERT(An->bits == B->bits);
     FLINT_ASSERT(An->bits == G->bits);
     FLINT_ASSERT(An->length > 0);
@@ -254,16 +271,25 @@ int nmod_mpolyu_gcdm_zippel(
     FLINT_ASSERT(An->exps[A->length - 1] == 0);
     FLINT_ASSERT(Bn->exps[B->length - 1] == 0);
 
-    nmod_poly_one(modulus);
-
     nmod_poly_init(gamma, ctx->ffinfo->mod.n);
     nmod_poly_gcd(gamma, nmod_mpolyun_leadcoeff_ref(An, ctx),
                          nmod_mpolyun_leadcoeff_ref(Bn, ctx));
 
+    /* bound on the number of images */
+    bound = 1 + nmod_poly_degree(gamma)
+              + FLINT_MIN(nmod_mpolyun_lastdeg(An, ctx),
+                          nmod_mpolyun_lastdeg(Bn, ctx));
+
+    /* degree bound on the gcd */
     degbound = FLINT_MIN(A->exps[0], B->exps[0]);
+
+    nmod_poly_one(modulus);
 
     nmod_mpolyun_init(Hn, A->bits, ctx);
     nmod_mpolyun_init(Ht, A->bits, ctx);
+
+    deg = WORD(20)/(FLINT_BIT_COUNT(ctx->ffinfo->mod.n));
+    deg = FLINT_MAX(WORD(2), deg);
 
     fq_nmod_mpoly_ctx_init(ffctx, ctx->minfo->nvars, ORD_LEX,
                                                       ctx->ffinfo->mod.n, deg);
@@ -278,8 +304,9 @@ int nmod_mpolyu_gcdm_zippel(
 
 choose_prime_outer:
 
+    /* same TODO */
     deg++;
-    if (deg > 1000)
+    if (deg > 10000)
     {
         /* ran out of primes */
         success = 0;
@@ -301,7 +328,6 @@ choose_prime_outer:
     fq_nmod_mpolyu_init(Gform, A->bits, ffctx);
     fq_nmod_init(gammaff, ffctx->fqctx);
     fq_nmod_init(t, ffctx->fqctx);
-
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
     nmod_poly_rem(gammaff, gamma, ffctx->fqctx->modulus);
@@ -400,24 +426,35 @@ choose_prime_inner:
 
     changed = nmod_mpolyun_CRT_fq_nmod_mpolyu(&lastdeg, Hn, ctx, modulus, Gff, ffctx);
     nmod_poly_mul(modulus, modulus, ffctx->fqctx->modulus);
-    if (changed)
+
+    have_enough = nmod_poly_degree(modulus) >= bound;
+
+    if (changed && !have_enough)
     {
-        if (lastdeg > coeff_deg_bound) {
-            goto choose_prime_outer;
-        }
         goto choose_prime_inner;
     }
 
-    nmod_mpolyun_content_last(hc, Hn, ctx);
-    nmod_mpolyun_set(Ht, Hn, ctx);
-    nmod_mpolyun_divexact_last(Ht, hc, ctx);
-    nmod_mpolyu_cvtfrom_mpolyun(G, Ht, ctx->minfo->nvars - 1, ctx);
+    if (!changed || have_enough)
+    {
+        nmod_mpolyun_content_last(hc, Hn, ctx);
+        nmod_mpolyun_set(Ht, Hn, ctx);
+        nmod_mpolyun_divexact_last(Ht, hc, ctx);
+        nmod_mpolyu_cvtfrom_mpolyun(G, Ht, ctx->minfo->nvars - 1, ctx);
+        if (   nmod_mpolyu_divides(A, G, ctx)
+            && nmod_mpolyu_divides(B, G, ctx))
+        {
+            success = 1;
+            goto finished;
+        }
+    }
 
-    if (!nmod_mpolyu_divides(A, G, ctx) || !nmod_mpolyu_divides(B, G, ctx))
-        goto choose_prime_inner;
+    if (have_enough)
+    {
+        nmod_poly_one(modulus);
+        goto choose_prime_outer;
+    }
 
-    success = 1;
-    goto finished;
+    goto choose_prime_inner;
 
 finished:
 

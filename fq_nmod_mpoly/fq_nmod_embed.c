@@ -350,7 +350,7 @@ _fq_nmod_mpoly_embed_chooser_init(_fq_nmod_mpoly_embed_chooser_t embc,
     slong m = nmod_poly_degree(ctx->fqctx->modulus);
     slong n;
 
-    n = (FLINT_BITS/2)/(m*FLINT_BIT_COUNT(p));
+    n = WORD(20)/(m*FLINT_BIT_COUNT(p));
     n = FLINT_MAX(n, WORD(2));
 
     embc->p = p;
