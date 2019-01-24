@@ -851,14 +851,8 @@ FLINT_DLL int nmod_mpolyun_CRT_fq_nmod_mpolyu(slong * lastdeg,
                              nmod_mpolyun_t H, const nmod_mpoly_ctx_t ctx,
             nmod_poly_t m, fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctxp);
 
-
 FLINT_DLL void nmod_mpolyun_redto_fq_nmod_mpolyu(fq_nmod_mpolyu_t A, nmod_mpolyun_t B,
                   const fq_nmod_mpoly_ctx_t ffctx, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpolyun_addinterp(slong * lastdeg,
-                        nmod_mpolyun_t F, nmod_mpolyun_t T,
-                        nmod_mpolyu_t A, nmod_poly_t modulus,  mp_limb_t alpha,
-                                                   const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpolyun_addinterp_fq_nmod_mpolyu(slong * lastdeg,
                                 nmod_mpolyun_t F, nmod_mpolyun_t T,

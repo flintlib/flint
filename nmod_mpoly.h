@@ -1145,6 +1145,9 @@ FLINT_DLL void nmod_mpolyu_divexact_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
 FLINT_DLL void nmod_mpolyu_mul_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                    nmod_mpoly_t c, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void nmod_mpolyu_setform(nmod_mpolyu_t A, nmod_mpolyu_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL int nmod_mpolyu_gcdm_zippel(nmod_mpolyu_t G, nmod_mpolyu_t A,
                nmod_mpolyu_t B, nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo,
                                                        flint_rand_t randstate);
@@ -1293,11 +1296,15 @@ FLINT_DLL void nmod_mpolyu_fit_length(nmod_mpolyu_t A, slong length,
 
 FLINT_DLL void nmod_mpolyu_clear(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx);
 
-FLINT_DLL void nmod_mpolyu_setform(nmod_mpolyu_t A, nmod_mpolyu_t B,
+FLINT_DLL void nmod_mpolyu_setform_mpolyun(nmod_mpolyu_t A, nmod_mpolyun_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, mp_limb_t c,
                                                    const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpolyun_addinterp(slong * lastdeg,
+             nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyu_t A,
+             nmod_poly_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
 
 typedef enum {
     nmod_gcds_success,
