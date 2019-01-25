@@ -753,6 +753,97 @@ int fq_nmod_mpoly_gcd(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A,
             Then, try deflation as a last resort.
         */
 
-        return 0;
+        int success;
+        int useAnew = 0;
+        int useBnew = 0;
+        slong k;
+        fmpz * Ashift, * Astride;
+        fmpz * Bshift, * Bstride;
+        fmpz * Gshift, * Gstride;
+        fq_nmod_mpoly_t Anew;
+        fq_nmod_mpoly_t Bnew;
+
+        fq_nmod_mpoly_init(Anew, ctx);
+        fq_nmod_mpoly_init(Bnew, ctx);
+
+        if (A->bits > FLINT_BITS)
+        {
+            useAnew = fq_nmod_mpoly_repack_bits(Anew, A, FLINT_BITS, ctx);
+            if (!useAnew)
+                goto could_not_repack;
+        }
+
+        if (B->bits > FLINT_BITS)
+        {
+            useBnew = fq_nmod_mpoly_repack_bits(Bnew, B, FLINT_BITS, ctx);
+            if (!useBnew)
+                goto could_not_repack;
+        }
+
+        success = _fq_nmod_mpoly_gcd(G, FLINT_BITS, useAnew ? Anew : A,
+                                                    useBnew ? Bnew : B, ctx);
+        goto cleanup;
+
+could_not_repack:
+
+        /*
+            One of A or B could not be repacked into FLINT_BITS. See if
+            they both fit into FLINT_BITS after deflation.
+        */
+
+        Ashift  = _fmpz_vec_init(ctx->minfo->nvars);
+        Astride = _fmpz_vec_init(ctx->minfo->nvars);
+        Bshift  = _fmpz_vec_init(ctx->minfo->nvars);
+        Bstride = _fmpz_vec_init(ctx->minfo->nvars);
+        Gshift  = _fmpz_vec_init(ctx->minfo->nvars);
+        Gstride = _fmpz_vec_init(ctx->minfo->nvars);
+
+        fq_nmod_mpoly_deflation(Ashift, Astride, A, ctx);
+        fq_nmod_mpoly_deflation(Bshift, Bstride, B, ctx);
+        _fmpz_vec_min(Gshift, Ashift, Bshift, ctx->minfo->nvars);
+        for (k = 0; k < ctx->minfo->nvars; k++)
+        {
+            fmpz_gcd(Gstride + k, Astride + k, Bstride + k);
+        }
+
+        success = 0;
+
+        fq_nmod_mpoly_deflate(Anew, A, Ashift, Gstride, ctx);
+        if (Anew->bits > FLINT_BITS)
+        {
+            if (!fq_nmod_mpoly_repack_bits(Anew, Anew, FLINT_BITS, ctx))
+                goto deflate_cleanup;
+        }
+
+        fq_nmod_mpoly_deflate(Bnew, B, Bshift, Gstride, ctx);
+        if (Bnew->bits > FLINT_BITS)
+        {
+            if (!fq_nmod_mpoly_repack_bits(Bnew, Bnew, FLINT_BITS, ctx))
+                goto deflate_cleanup;
+        }
+
+        success = _fq_nmod_mpoly_gcd(G, FLINT_BITS, Anew, Bnew, ctx);
+
+        if (success)
+        {
+            fq_nmod_mpoly_inflate(G, G, Gshift, Gstride, ctx);
+            fq_nmod_mpoly_make_monic(G, G, ctx);
+        }
+
+deflate_cleanup:
+
+        _fmpz_vec_clear(Ashift, ctx->minfo->nvars);
+        _fmpz_vec_clear(Astride, ctx->minfo->nvars);
+        _fmpz_vec_clear(Bshift, ctx->minfo->nvars);
+        _fmpz_vec_clear(Bstride, ctx->minfo->nvars);
+        _fmpz_vec_clear(Gshift, ctx->minfo->nvars);
+        _fmpz_vec_clear(Gstride, ctx->minfo->nvars);
+
+cleanup:
+
+        fq_nmod_mpoly_clear(Anew, ctx);
+        fq_nmod_mpoly_clear(Bnew, ctx);
+
+        return success;
     }
 }

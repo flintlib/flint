@@ -9,16 +9,17 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
-void nmod_mpoly_deflate(nmod_mpoly_t A, const nmod_mpoly_t B,
-           const fmpz * shift, const fmpz * stride, const nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_deflate(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+        const fmpz * shift, const fmpz * stride, const fq_nmod_mpoly_ctx_t ctx)
 {
+    slong i;
     slong Abits;
 
     if (B->length == 0)
     {
-        nmod_mpoly_zero(A, ctx);
+        fq_nmod_mpoly_zero(A, ctx);
         return;
     }
 
@@ -37,17 +38,18 @@ void nmod_mpoly_deflate(nmod_mpoly_t A, const nmod_mpoly_t B,
     }
     else
     {
-        nmod_mpoly_fit_length(A, B->length, ctx);
-        nmod_mpoly_fit_bits(A, Abits, ctx);
+        fq_nmod_mpoly_fit_length(A, B->length, ctx);
+        fq_nmod_mpoly_fit_bits(A, Abits, ctx);
         A->bits = Abits;
-        _nmod_vec_set(A->coeffs, B->coeffs, B->length);
+        for (i = 0; i < B->length; i++)
+            fq_nmod_set(A->coeffs + i, B->coeffs + i, ctx->fqctx);
         mpoly_monomials_deflate(A->exps, Abits, B->exps, B->bits, B->length,
                                                     shift, stride, ctx->minfo);
-        _nmod_mpoly_set_length(A, B->length, ctx);
+        _fq_nmod_mpoly_set_length(A, B->length, ctx);
     }
 
     if (ctx->minfo->ord != ORD_LEX)
     {
-        nmod_mpoly_sort_terms(A, ctx);
+        fq_nmod_mpoly_sort_terms(A, ctx);
     }
 }

@@ -653,6 +653,16 @@ FLINT_DLL int _fq_nmod_mpoly_gcd_zippel(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t
                       const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx,
                                          int keepbits, flint_rand_t randstate);
 
+FLINT_DLL void fq_nmod_mpoly_deflation(fmpz * shift, fmpz * stride,
+                       const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_deflate(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+          const fmpz * shift, const fmpz * stride, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpoly_inflate(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+       const fmpz * shift, const fmpz * stride, const fq_nmod_mpoly_ctx_t ctx);
+
+
 /******************************************************************************
 
    Internal functions (guaranteed to change without notice)

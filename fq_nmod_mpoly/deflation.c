@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,10 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
-void nmod_mpoly_deflation(fmpz * shift, fmpz * stride, 
-                              const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_deflation(fmpz * shift, fmpz * stride, 
+                        const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     mpoly_monomials_deflation(shift, stride, A->exps, A->bits, A->length,
                                                                    ctx->minfo);
