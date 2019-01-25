@@ -652,7 +652,7 @@ void nmod_mpoly_convert_to_fq_nmod_mpolyd(
 
     if (poly2->length == 0)
     {
-        fq_nmod_mpolyd_zero(poly1, dctx);
+        fq_nmod_mpolyd_zero(poly1, dctx->fqctx);
         return;
     }
 
@@ -667,7 +667,7 @@ void nmod_mpoly_convert_to_fq_nmod_mpolyd(
         degb_prod *= poly1->deg_bounds[i];
     }
 
-    fq_nmod_mpolyd_fit_length(poly1, degb_prod, dctx);
+    fq_nmod_mpolyd_fit_length(poly1, degb_prod, dctx->fqctx);
     for (i = 0; i < degb_prod; i++)
     {
         fq_nmod_zero(poly1->coeffs + i, dctx->fqctx);

@@ -46,11 +46,11 @@ int fq_nmod_mpoly_gcd_brown(fq_nmod_mpoly_t G,
         goto cleanup_stage1;
     }
 
-    fq_nmod_mpolyd_init(Ad, nvars, dctx);
-    fq_nmod_mpolyd_init(Bd, nvars, dctx);
-    fq_nmod_mpolyd_init(Gd, nvars, dctx);
-    fq_nmod_mpolyd_init(Abar, nvars, dctx);
-    fq_nmod_mpolyd_init(Bbar, nvars, dctx);
+    fq_nmod_mpolyd_init(Ad, nvars, ctx->fqctx);
+    fq_nmod_mpolyd_init(Bd, nvars, ctx->fqctx);
+    fq_nmod_mpolyd_init(Gd, nvars, ctx->fqctx);
+    fq_nmod_mpolyd_init(Abar, nvars, ctx->fqctx);
+    fq_nmod_mpolyd_init(Bbar, nvars, ctx->fqctx);
 
     fq_nmod_mpoly_convert_to_fq_nmod_mpolyd(Ad, dctx, A, ctx);
     fq_nmod_mpoly_convert_to_fq_nmod_mpolyd(Bd, dctx, B, ctx);
@@ -66,11 +66,11 @@ int fq_nmod_mpoly_gcd_brown(fq_nmod_mpoly_t G,
         fq_nmod_mpoly_convert_from_fq_nmod_mpolyd(G, ctx, Gd, dctx);
     }
 
-    fq_nmod_mpolyd_clear(Bbar, dctx);
-    fq_nmod_mpolyd_clear(Abar, dctx);
-    fq_nmod_mpolyd_clear(Gd, dctx);
-    fq_nmod_mpolyd_clear(Bd, dctx);
-    fq_nmod_mpolyd_clear(Ad, dctx);
+    fq_nmod_mpolyd_clear(Bbar, ctx->fqctx);
+    fq_nmod_mpolyd_clear(Abar, ctx->fqctx);
+    fq_nmod_mpolyd_clear(Gd, ctx->fqctx);
+    fq_nmod_mpolyd_clear(Bd, ctx->fqctx);
+    fq_nmod_mpolyd_clear(Ad, ctx->fqctx);
 
 cleanup_stage1:
 

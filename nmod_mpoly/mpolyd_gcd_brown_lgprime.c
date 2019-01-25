@@ -33,7 +33,7 @@ void nmod_mpolyd_lgprime_eval_last(fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_ctx_
         }
     }
 
-    fq_nmod_mpolyd_fit_length(E, degb_prod_last, efctx);
+    fq_nmod_mpolyd_fit_length(E, degb_prod_last, efctx->fqctx);
 
     P->mod.n = fctx->mod.n;
     P->mod.ninv = fctx->mod.ninv;
@@ -318,11 +318,11 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
 
         fq_nmod_mpolyd_ctx_init(efctx, nvars - 1, fctx->mod.n, deg);
 
-        fq_nmod_mpolyd_init(phiA, nvars - 1, efctx);
-        fq_nmod_mpolyd_init(phiB, nvars - 1, efctx);
-        fq_nmod_mpolyd_init(gs, nvars - 1, efctx);
-        fq_nmod_mpolyd_init(abars, nvars - 1, efctx);
-        fq_nmod_mpolyd_init(bbars, nvars - 1, efctx);
+        fq_nmod_mpolyd_init(phiA, nvars - 1, efctx->fqctx);
+        fq_nmod_mpolyd_init(phiB, nvars - 1, efctx->fqctx);
+        fq_nmod_mpolyd_init(gs, nvars - 1, efctx->fqctx);
+        fq_nmod_mpolyd_init(abars, nvars - 1, efctx->fqctx);
+        fq_nmod_mpolyd_init(bbars, nvars - 1, efctx->fqctx);
         fq_nmod_init(gamma_eval, efctx->fqctx);
 
         nmod_poly_rem(gamma_eval, gamma, efctx->fqctx->modulus);
@@ -344,11 +344,11 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
             nmod_mpolyd_set_ui(Gs, WORD(1));
             nmod_mpolyd_set(Abars, A);
             nmod_mpolyd_set(Bbars, B);
-            fq_nmod_mpolyd_clear(phiA, efctx);
-            fq_nmod_mpolyd_clear(phiB, efctx);
-            fq_nmod_mpolyd_clear(gs, efctx);
-            fq_nmod_mpolyd_clear(abars, efctx);
-            fq_nmod_mpolyd_clear(bbars, efctx);
+            fq_nmod_mpolyd_clear(phiA, efctx->fqctx);
+            fq_nmod_mpolyd_clear(phiB, efctx->fqctx);
+            fq_nmod_mpolyd_clear(gs, efctx->fqctx);
+            fq_nmod_mpolyd_clear(abars, efctx->fqctx);
+            fq_nmod_mpolyd_clear(bbars, efctx->fqctx);
             fq_nmod_clear(gamma_eval, efctx->fqctx);
             fq_nmod_mpolyd_ctx_clear(efctx);
             goto successful;
@@ -381,8 +381,8 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
             nmod_mpolyd_lgprime_addinterp(Gs,    T, fctx, gs,    modulus, modulus_eval, efctx);
             nmod_mpolyd_lgprime_addinterp(Abars, T, fctx, abars, modulus, modulus_eval, efctx);
             nmod_mpolyd_lgprime_addinterp(Bbars, T, fctx, bbars, modulus, modulus_eval, efctx);
-
-        } else
+        }
+        else
         {
             nmod_poly_one(modulus);
             nmod_mpolyd_lgprime_startinterp(Gs, fctx, gs, efctx);
@@ -406,16 +406,16 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
             && deggamma + degB == degGs + degBbars
            )
         {
-            fq_nmod_mpolyd_clear(phiA, efctx);
-            fq_nmod_mpolyd_clear(phiB, efctx);
-            fq_nmod_mpolyd_clear(gs, efctx);
-            fq_nmod_mpolyd_clear(abars, efctx);
-            fq_nmod_mpolyd_clear(bbars, efctx);
+            fq_nmod_mpolyd_clear(phiA, efctx->fqctx);
+            fq_nmod_mpolyd_clear(phiB, efctx->fqctx);
+            fq_nmod_mpolyd_clear(gs, efctx->fqctx);
+            fq_nmod_mpolyd_clear(abars, efctx->fqctx);
+            fq_nmod_mpolyd_clear(bbars, efctx->fqctx);
             fq_nmod_clear(gamma_eval, efctx->fqctx);
             fq_nmod_mpolyd_ctx_clear(efctx);
             goto successful;
-
-        } else
+        }
+        else
         {
             nmod_poly_one(modulus);
             goto break_continue;
@@ -423,11 +423,11 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
 
 break_continue:
 
-        fq_nmod_mpolyd_clear(phiA, efctx);
-        fq_nmod_mpolyd_clear(phiB, efctx);
-        fq_nmod_mpolyd_clear(gs, efctx);
-        fq_nmod_mpolyd_clear(abars, efctx);
-        fq_nmod_mpolyd_clear(bbars, efctx);
+        fq_nmod_mpolyd_clear(phiA, efctx->fqctx);
+        fq_nmod_mpolyd_clear(phiB, efctx->fqctx);
+        fq_nmod_mpolyd_clear(gs, efctx->fqctx);
+        fq_nmod_mpolyd_clear(abars, efctx->fqctx);
+        fq_nmod_mpolyd_clear(bbars, efctx->fqctx);
         fq_nmod_clear(gamma_eval, efctx->fqctx);
         fq_nmod_mpolyd_ctx_clear(efctx);
     }

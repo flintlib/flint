@@ -36,7 +36,7 @@ void fq_nmod_mpolyd_lgprime_eval_last(
         }
     }
 
-    fq_nmod_mpolyd_fit_length(E, degb_prod_last, edctx);
+    fq_nmod_mpolyd_fit_length(E, degb_prod_last, edctx->fqctx);
 
     P->alloc = degb_last;
 
@@ -80,7 +80,7 @@ void fq_nmod_mpolyd_lgprime_startinterp(
     A->deg_bounds[E->nvars] = degb_last;
     degb_prod *= degb_last;
 
-    fq_nmod_mpolyd_fit_length(A, degb_prod, dctx);
+    fq_nmod_mpolyd_fit_length(A, degb_prod, dctx->fqctx);
 
     fq_nmod_poly_init(t, dctx->fqctx);
 
@@ -146,7 +146,7 @@ void fq_nmod_mpolyd_lgprime_addinterp(
     Tlast_degb = FLINT_MAX(1 + fq_nmod_mpolyd_last_degree(F, dctx),
                    modulus->length + fq_nmod_poly_degree(emb->h, dctx->fqctx));
     T->deg_bounds[nvars-1] = Tlast_degb;
-    fq_nmod_mpolyd_fit_length(T, degb_prod*Tlast_degb, dctx);
+    fq_nmod_mpolyd_fit_length(T, degb_prod*Tlast_degb, dctx->fqctx);
 
     TMP_START;
     inds = (slong *) TMP_ALLOC(nvars*sizeof(slong));
@@ -315,11 +315,11 @@ int fq_nmod_mpolyd_gcd_brown_lgprime(fq_nmod_mpolyd_t G,
                + FLINT_MAX(fq_nmod_mpolyd_last_degree(A, dctx),
                            fq_nmod_mpolyd_last_degree(B, dctx));
 
-    fq_nmod_mpolyd_init(T, nvars, dctx);
+    fq_nmod_mpolyd_init(T, nvars, dctx->fqctx);
 
-    fq_nmod_mpolyd_init(Gs, nvars, dctx);
-    fq_nmod_mpolyd_init(Abars, nvars, dctx);
-    fq_nmod_mpolyd_init(Bbars, nvars, dctx);
+    fq_nmod_mpolyd_init(Gs, nvars, dctx->fqctx);
+    fq_nmod_mpolyd_init(Abars, nvars, dctx->fqctx);
+    fq_nmod_mpolyd_init(Bbars, nvars, dctx->fqctx);
 
     fq_nmod_poly_init(modulus, dctx->fqctx);
     fq_nmod_poly_one(modulus, dctx->fqctx);
@@ -348,11 +348,11 @@ int fq_nmod_mpolyd_gcd_brown_lgprime(fq_nmod_mpolyd_t G,
 
         _fq_nmod_embed_array_init(embed, edctx->fqctx, dctx->fqctx);
 
-        fq_nmod_mpolyd_init(phiA, nvars - 1, edctx);
-        fq_nmod_mpolyd_init(phiB, nvars - 1, edctx);
-        fq_nmod_mpolyd_init(gs, nvars - 1, edctx);
-        fq_nmod_mpolyd_init(abars, nvars - 1, edctx);
-        fq_nmod_mpolyd_init(bbars, nvars - 1, edctx);
+        fq_nmod_mpolyd_init(phiA, nvars - 1, edctx->fqctx);
+        fq_nmod_mpolyd_init(phiB, nvars - 1, edctx->fqctx);
+        fq_nmod_mpolyd_init(gs, nvars - 1, edctx->fqctx);
+        fq_nmod_mpolyd_init(abars, nvars - 1, edctx->fqctx);
+        fq_nmod_mpolyd_init(bbars, nvars - 1, edctx->fqctx);
 
         fq_nmod_init(modulus_eval, edctx->fqctx);
         fq_nmod_init(gamma_eval, edctx->fqctx);
@@ -383,11 +383,11 @@ int fq_nmod_mpolyd_gcd_brown_lgprime(fq_nmod_mpolyd_t G,
                 fq_nmod_mpolyd_set_ui(Gs, 1, dctx);
                 fq_nmod_mpolyd_set(Abars, A, dctx);
                 fq_nmod_mpolyd_set(Bbars, B, dctx);
-                fq_nmod_mpolyd_clear(phiA, edctx);
-                fq_nmod_mpolyd_clear(phiB, edctx);
-                fq_nmod_mpolyd_clear(gs, edctx);
-                fq_nmod_mpolyd_clear(abars, edctx);
-                fq_nmod_mpolyd_clear(bbars, edctx);
+                fq_nmod_mpolyd_clear(phiA, edctx->fqctx);
+                fq_nmod_mpolyd_clear(phiB, edctx->fqctx);
+                fq_nmod_mpolyd_clear(gs, edctx->fqctx);
+                fq_nmod_mpolyd_clear(abars, edctx->fqctx);
+                fq_nmod_mpolyd_clear(bbars, edctx->fqctx);
                 fq_nmod_clear(modulus_eval, edctx->fqctx);
                 fq_nmod_clear(gamma_eval, edctx->fqctx);
                 _fq_nmod_embed_array_clear(embed, m);
@@ -406,9 +406,9 @@ int fq_nmod_mpolyd_gcd_brown_lgprime(fq_nmod_mpolyd_t G,
                     }
                     else if (leadmon_gs[j] < leadmon_Gs[j])
                     {
-                        fq_nmod_mpolyd_zero(Gs, dctx);
-                        fq_nmod_mpolyd_zero(Abars, dctx);
-                        fq_nmod_mpolyd_zero(Bbars, dctx);
+                        fq_nmod_mpolyd_zero(Gs, dctx->fqctx);
+                        fq_nmod_mpolyd_zero(Abars, dctx->fqctx);
+                        fq_nmod_mpolyd_zero(Bbars, dctx->fqctx);
                         fq_nmod_poly_one(modulus, dctx->fqctx);
                     }
                 }
@@ -449,11 +449,11 @@ int fq_nmod_mpolyd_gcd_brown_lgprime(fq_nmod_mpolyd_t G,
                 && deggamma + degB == degGs + degBbars
                )
             {
-                fq_nmod_mpolyd_clear(phiA, edctx);
-                fq_nmod_mpolyd_clear(phiB, edctx);
-                fq_nmod_mpolyd_clear(gs, edctx);
-                fq_nmod_mpolyd_clear(abars, edctx);
-                fq_nmod_mpolyd_clear(bbars, edctx);
+                fq_nmod_mpolyd_clear(phiA, edctx->fqctx);
+                fq_nmod_mpolyd_clear(phiB, edctx->fqctx);
+                fq_nmod_mpolyd_clear(gs, edctx->fqctx);
+                fq_nmod_mpolyd_clear(abars, edctx->fqctx);
+                fq_nmod_mpolyd_clear(bbars, edctx->fqctx);
                 fq_nmod_clear(modulus_eval, edctx->fqctx);
                 fq_nmod_clear(gamma_eval, edctx->fqctx);
                 _fq_nmod_embed_array_clear(embed, m);
@@ -470,11 +470,11 @@ int fq_nmod_mpolyd_gcd_brown_lgprime(fq_nmod_mpolyd_t G,
             (void)(NULL);
         }
 
-        fq_nmod_mpolyd_clear(phiA, edctx);
-        fq_nmod_mpolyd_clear(phiB, edctx);
-        fq_nmod_mpolyd_clear(gs, edctx);
-        fq_nmod_mpolyd_clear(abars, edctx);
-        fq_nmod_mpolyd_clear(bbars, edctx);
+        fq_nmod_mpolyd_clear(phiA, edctx->fqctx);
+        fq_nmod_mpolyd_clear(phiB, edctx->fqctx);
+        fq_nmod_mpolyd_clear(gs, edctx->fqctx);
+        fq_nmod_mpolyd_clear(abars, edctx->fqctx);
+        fq_nmod_mpolyd_clear(bbars, edctx->fqctx);
         fq_nmod_clear(modulus_eval, edctx->fqctx);
         fq_nmod_clear(gamma_eval, edctx->fqctx);
         _fq_nmod_embed_array_clear(embed, m);
@@ -501,11 +501,11 @@ cleanup:
 
     fq_nmod_poly_clear(gamma, dctx->fqctx);
 
-    fq_nmod_mpolyd_clear(T, dctx);
+    fq_nmod_mpolyd_clear(T, dctx->fqctx);
 
-    fq_nmod_mpolyd_clear(Gs, dctx);
-    fq_nmod_mpolyd_clear(Abars, dctx);
-    fq_nmod_mpolyd_clear(Bbars, dctx);
+    fq_nmod_mpolyd_clear(Gs, dctx->fqctx);
+    fq_nmod_mpolyd_clear(Abars, dctx->fqctx);
+    fq_nmod_mpolyd_clear(Bbars, dctx->fqctx);
 
     fq_nmod_poly_clear(modulus, dctx->fqctx);
 

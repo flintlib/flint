@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,20 +9,20 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 /*
     set A(var) to B/xbar^Bshifts
     it is asserted that the conversion is correct
 */
-void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
-                        slong var, const ulong * Bshift, const ulong * Bstride,
-                                                    const nmod_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_to_fq_nmod_poly_deflate(fq_nmod_poly_t A,
+                   const fq_nmod_mpoly_t B, slong var, const ulong * Bshift,
+                          const ulong * Bstride, const fq_nmod_mpoly_ctx_t ctx)
 {
     ulong mask;
     slong i, shift, off, N;
     slong len = B->length;
-    mp_limb_t * coeff = B->coeffs;
+    fq_nmod_struct * coeff = B->coeffs;
     ulong * exp = B->exps;
     ulong var_shift, var_stride;
     mp_bitcnt_t bits = B->bits;
@@ -33,7 +33,7 @@ void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
     N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     mpoly_gen_offset_shift_sp(&off, &shift, var, bits, ctx->minfo);
 
-    nmod_poly_zero(A);
+    fq_nmod_poly_zero(A, ctx->fqctx);
     mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     var_shift = Bshift[var];
     var_stride = Bstride[var];
@@ -46,7 +46,7 @@ void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
         {
             k /= var_stride;
         }
-        nmod_poly_set_coeff_ui(A, k, coeff[i]);
+        fq_nmod_poly_set_coeff(A, k, coeff + i, ctx->fqctx);
     }
 
 #if WANT_ASSERT
@@ -69,25 +69,26 @@ void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
     set A to B(x_var^Astride[var])*xbar^Ashift
     A must be packed into bits = Abits
 */
-void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
-                         const nmod_poly_t B, slong var, const ulong * Ashift,
-                             const ulong * Astride, const nmod_mpoly_ctx_t ctx)
+
+void _fq_nmod_mpoly_from_fq_nmod_poly_inflate(fq_nmod_mpoly_t A,
+    mp_bitcnt_t Abits, const fq_nmod_poly_t B, slong var, const ulong * Ashift,
+                          const ulong * Astride, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong N;
     slong k;
     slong Alen;
-    mp_limb_t * Acoeff;
+    fq_nmod_struct * Acoeff;
     ulong * Aexp;
     slong Aalloc;
     ulong * shiftexp;
     ulong * strideexp;
-    slong Bdeg = nmod_poly_degree(B);
+    slong Bdeg = fq_nmod_poly_degree(B, ctx->fqctx);
     TMP_INIT;
 
     TMP_START;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
-    FLINT_ASSERT(!nmod_poly_is_zero(B));
+    FLINT_ASSERT(!fq_nmod_poly_is_zero(B, ctx->fqctx));
 
     /* must have at least space for the highest exponent of var */
     FLINT_ASSERT(1 + FLINT_BIT_COUNT(Ashift[var] + Bdeg*Astride[var]) <= Abits);
@@ -99,7 +100,7 @@ void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
     mpoly_gen_monomial_sp(strideexp, var, Abits, ctx->minfo);
     mpoly_monomial_mul_ui(strideexp, strideexp, N, Astride[var]);
 
-    nmod_mpoly_fit_bits(A, Abits, ctx);
+    fq_nmod_mpoly_fit_bits(A, Abits, ctx);
     A->bits = Abits;
 
     Acoeff = A->coeffs;
@@ -108,9 +109,9 @@ void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
     Alen = 0;
     for (k = Bdeg; k >= 0; k--)
     {
-        _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
-        Acoeff[Alen] = nmod_poly_get_coeff_ui(B, k);
-        if (Acoeff[Alen] != UWORD(0))
+        _fq_nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N, ctx->fqctx);
+        fq_nmod_poly_get_coeff(Acoeff + Alen, B, k, ctx->fqctx);
+        if (!fq_nmod_is_zero(Acoeff + Alen, ctx->fqctx))
         {
             mpoly_monomial_madd(Aexp + N*Alen, shiftexp, k, strideexp, N);
             Alen++;
@@ -120,8 +121,7 @@ void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
     A->coeffs = Acoeff;
     A->exps = Aexp;
     A->alloc = Aalloc;
-    _nmod_mpoly_set_length(A, Alen, ctx);
+    _fq_nmod_mpoly_set_length(A, Alen, ctx);
 
     TMP_END;
 }
-
