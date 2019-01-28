@@ -142,7 +142,7 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
       if (A->alloc != 0)
       {
          slong N = mpoly_words_per_exp(bits, ctx->minfo);
-         ulong * t = flint_malloc(N*A->alloc*sizeof(ulong));
+         ulong * t = (ulong *) flint_malloc(N*A->alloc*sizeof(ulong));
          mpoly_repack_monomials(t, bits, A->exps, A->bits, A->length, ctx->minfo);
          flint_free(A->exps);
          A->exps = t;

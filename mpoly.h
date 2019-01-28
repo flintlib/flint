@@ -1001,7 +1001,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
 
    if (i != 1 && exp == heap[1].exp)
    {
-      ((mpoly_heap_t *) x)->next = heap[1].next;
+      ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[1].next;
       heap[1].next = x;
 
       return;
@@ -1011,7 +1011,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
    {
       if (exp == heap[*next_loc].exp)
       {
-         ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
+         ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[*next_loc].next;
          heap[*next_loc].next = x;
          return;
       }
@@ -1023,7 +1023,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
    {
       if (exp == heap[j].exp)
       {
-         ((mpoly_heap_t *) x)->next = heap[j].next;
+         ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[j].next;
          heap[j].next = x;
 
          *next_loc = j;
@@ -1053,7 +1053,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
 {
    ulong * exp;
    slong i, j, s = --(*heap_len);
-   mpoly_heap_t * x = heap[1].next;
+   mpoly_heap_t * x = (mpoly_heap_t *) heap[1].next;
 
    i = 1;
    j = 2;
@@ -1091,7 +1091,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    if (i != 1 && mpoly_monomial_equal(exp, heap[1].exp, N))
    {
-      ((mpoly_heap_t *) x)->next = heap[1].next;
+      ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[1].next;
       heap[1].next = x;
 
       return 0;
@@ -1101,7 +1101,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
    {
       if (mpoly_monomial_equal(exp, heap[*next_loc].exp, N))
       {
-         ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
+         ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[*next_loc].next;
          heap[*next_loc].next = x;
          return 0;
       }
@@ -1117,7 +1117,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    if (j >= 1 && mpoly_monomial_equal(exp, heap[j].exp, N))
    {
-      ((mpoly_heap_t *) x)->next = heap[j].next;
+      ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[j].next;
       heap[j].next = x;
       *next_loc = j;
 

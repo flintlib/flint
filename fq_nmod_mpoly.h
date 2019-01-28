@@ -205,15 +205,12 @@ FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_fit_bits(fq_nmod_mpoly_t A, slong bits,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong N;
-    ulong * t;
-
     if (A->bits < bits)
     {
         if (A->alloc != 0)
         {
-            N = mpoly_words_per_exp(bits, ctx->minfo);
-            t = flint_malloc(N*A->alloc*sizeof(ulong));
+            slong N = mpoly_words_per_exp(bits, ctx->minfo);
+            ulong * t = (ulong *) flint_malloc(N*A->alloc*sizeof(ulong));
             mpoly_repack_monomials(t, bits, A->exps, A->bits, A->length,
                                                                    ctx->minfo);
             flint_free(A->exps);
