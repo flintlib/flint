@@ -93,7 +93,7 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, k, tmul = 3;
+    slong i, j, k, tmul = 4;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
