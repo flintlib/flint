@@ -9,8 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
-
+#include "nmod_mpoly.h"
 
 /*
     set A(var) to B/xbar^Bshifts

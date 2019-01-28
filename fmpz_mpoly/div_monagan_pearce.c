@@ -403,11 +403,23 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
     {
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (mpoly_monomial_overflows(exp, N, mask))
-            goto exp_overflow;
-      
+        if (bits <= FLINT_BITS)
+        {
+            if (mpoly_monomial_overflows(exp, N, mask))
+                goto exp_overflow;
+        }
+        else
+        {
+            if (mpoly_monomial_overflows_mp(exp, N, bits))
+                goto exp_overflow;
+        }
+
         _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
-        lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
+
+        if (bits <= FLINT_BITS)
+            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
+        else
+            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
 
         /* take nodes from heap with exponent matching exp */
         if (small) 
@@ -468,9 +480,8 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                     x->j = j + 1;
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             } else
             {
@@ -484,11 +495,16 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                     x->j = j;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                          q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
+                                                            q_exp + x->j*N, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                            q_exp + x->j*N, N);
+
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
                 /* should we go up? */
                 if (j + 1 == q_len)
@@ -503,11 +519,16 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                     x->j = j + 1;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                          q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
+                                                              q_exp + x->j*N, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                                 q_exp + x->j*N, N);
+
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
@@ -580,11 +601,16 @@ large_lt_divides:
             x->j = q_len;
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
-            mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                  q_exp + x->j*N, N);
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, cmpmask))
-                exp_next--;
+
+            if (bits <= FLINT_BITS)
+                mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
+                                                      q_exp + x->j*N, N);
+            else
+                mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                         q_exp + x->j*N, N);
+        
+            exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
         }
         s = 1;
         q_len++;
@@ -633,10 +659,6 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
       fmpz_mpoly_zero(q, ctx);
       return;
    }
-
-    if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_div_monagan_pearce");
-
 
    TMP_START;
 
@@ -690,8 +712,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    while ((lenq = _fmpz_mpoly_div_monagan_pearce(&tq->coeffs, &tq->exps,
                          &tq->alloc, poly2->coeffs, exp2, poly2->length, 
                                      poly3->coeffs, exp3, poly3->length,
-                                      exp_bits, N, cmpmask)) == -WORD(1)
-            && exp_bits < FLINT_BITS)
+                                      exp_bits, N, cmpmask)) == -WORD(1)  )
    {
       ulong * old_exp2 = exp2, * old_exp3 = exp3;
       slong old_exp_bits = exp_bits;
@@ -722,15 +743,10 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
       tq->bits = exp_bits;
    }
 
-   if (lenq == -WORD(1))
-      flint_throw(FLINT_EXPOF,
-                      "Exponent overflow in fmpz_mpoly_div_monagan_pearce");
-
    /* take care of aliasing */
    if (q == poly2 || q == poly3)
    {
       fmpz_mpoly_swap(temp1, q, ctx);
-
       fmpz_mpoly_clear(temp1, ctx);
    } 
 

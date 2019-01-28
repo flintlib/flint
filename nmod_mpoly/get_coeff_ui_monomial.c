@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018, 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -14,64 +14,22 @@
 ulong nmod_mpoly_get_coeff_ui_monomial(const nmod_mpoly_t A,
                              const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx)
 {
-    slong i, index, N, nvars = ctx->minfo->nvars;
-    ulong * cmpmask, * pexp;
-    ulong c;
-    int exists;
-    TMP_INIT;
+    slong index;
 
     if (M->length != WORD(1))
     {
-        flint_throw(FLINT_ERROR, "M not monomial in nmod_mpoly_get_coeff_fmpz_monomial");
+        flint_throw(FLINT_ERROR, "M not monomial in nmod_mpoly_get_coeff_ui_monomial");
     }
 
-    TMP_START;
-
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
-
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    pexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-
-    mpoly_get_cmpmask(cmpmask, N, A->bits, ctx->minfo);
-    if (M->bits == A->bits)
+    index = mpoly_monomial_index_monomial(A->exps, A->bits, A->length,
+                                                 M->exps, M->bits, ctx->minfo);
+    if (index < 0)
     {
-        mpoly_monomial_set(pexp, M->exps + N*0, N);
+        return 0;
     }
     else
     {
-        mp_bitcnt_t exp_bits;
-        fmpz * texps;
-
-        texps = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
-        for (i = 0; i < nvars; i++)
-            fmpz_init(texps + i);
-
-        mpoly_get_monomial_ffmpz(texps, M->exps + 0, M->bits, ctx->minfo);
-
-        exp_bits = mpoly_exp_bits_required_ffmpz(texps, ctx->minfo);
-
-        if (exp_bits > A->bits) /* exponent too large to be A exponent */
-        {
-            c = UWORD(0);
-            for (i = 0; i < nvars; i++)
-                fmpz_clear(texps + i);
-            goto clean_up;
-        }
-
-        mpoly_set_monomial_ffmpz(pexp, texps, A->bits, ctx->minfo);
-
-        for (i = 0; i < nvars; i++)
-            fmpz_clear(texps + i);
+        FLINT_ASSERT(index < A->length);
+        return A->coeffs[index];
     }
-
-    exists = mpoly_monomial_exists(&index, A->exps, pexp, A->length, N, cmpmask);
-
-    if (!exists)
-        c = UWORD(0);
-    else
-        c = A->coeffs[index];
-
-clean_up:
-    TMP_END;
-    return c;
 }

@@ -79,3 +79,36 @@ void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
     TMP_END;
     return;
 }
+
+/* reference implementation */
+void mpoly_total_degree_fmpz_ref(fmpz_t totdeg, const ulong * exps,
+                                 slong len, slong bits, const mpoly_ctx_t mctx)
+{
+    slong i, j, N;
+    fmpz_t tot;
+    fmpz * tmp_exps;
+    TMP_INIT;
+
+    fmpz_set_si(totdeg, -WORD(1));
+
+    TMP_START;
+    fmpz_init(tot);
+    tmp_exps = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
+    for (j = 0; j < mctx->nvars; j++)
+        fmpz_init(tmp_exps + j);
+    N = mpoly_words_per_exp(bits, mctx);
+    for (i = 0; i < len; i++)
+    {
+        mpoly_get_monomial_ffmpz(tmp_exps, exps + N*i, bits, mctx);
+        fmpz_zero(tot);
+        for (j = 0; j < mctx->nvars; j++)
+            fmpz_add(tot, tot, tmp_exps + j);
+        if (fmpz_cmp(totdeg, tot) < 0)
+            fmpz_swap(totdeg, tot);
+    }
+    fmpz_clear(tot);
+    for (j = 0; j < mctx->nvars; j++)
+        fmpz_clear(tmp_exps + j);
+
+    TMP_END;
+}

@@ -19,7 +19,7 @@ main(void)
     slong i, j, k;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pushback_fmpz_fmpz....");
+    flint_printf("push_term_fmpz_fmpz....");
     fflush(stdout);
 
     /* Check pushback matches add */

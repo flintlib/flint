@@ -91,9 +91,10 @@ main(void)
 
             flint_free(exp1);
             flint_free(exp2);
-       }
+        }
 
-       fmpz_mpoly_clear(f, ctx);  
+        fmpz_mpoly_clear(f, ctx);  
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

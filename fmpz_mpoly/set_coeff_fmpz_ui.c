@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly.h"
 
-
 void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t poly,
                  const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {

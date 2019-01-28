@@ -451,7 +451,7 @@ main(void)
  
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
-            degbounds1[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
+            degbounds1[j] = 2 + n_randint(state, 16/ctx->minfo->nvars);
             degbounds2[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
             degbounds3[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
         }
@@ -511,7 +511,7 @@ main(void)
  
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
-            degbounds1[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
+            degbounds1[j] = 2 + n_randint(state, 16/ctx->minfo->nvars);
             degbounds2[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
             degbounds3[j] = 1 + n_randint(state, 16/ctx->minfo->nvars);
         }
@@ -587,7 +587,7 @@ main(void)
  
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
-            degbounds1[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
+            degbounds1[j] = 2 + n_randint(state, 15/ctx->minfo->nvars);
             degbounds2[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
             degbounds3[j] = 1 + n_randint(state, 15/ctx->minfo->nvars);
         }
@@ -653,4 +653,3 @@ main(void)
 
     return 0;
 }
-

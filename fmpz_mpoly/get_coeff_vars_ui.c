@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly.h"
 
-
 void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C, const fmpz_mpoly_t A,
                                    slong * vars, ulong * exps, slong length,
                                                     const fmpz_mpoly_ctx_t ctx)

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2016-2017 William Hart
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017-2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -27,6 +27,7 @@
 #include <gmp.h>
 #define ulong mp_limb_t
 
+#include "string.h"
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
@@ -463,6 +464,27 @@ int mpoly_monomial_divides_test(const ulong * exp2,
 }
 
 MPOLY_INLINE
+int mpoly_monomial_divides_mp_test(const ulong * exp2,
+                                 const ulong * exp3, slong N, mp_bitcnt_t bits)
+{
+    slong i, j;
+
+    i = 0;
+    do {
+        for (j = bits/FLINT_BITS - 1; j >= 0; j--)
+        {
+            if (exp2[i + j] > exp3[i + j])
+                break;
+            if (exp2[i + j] < exp3[i + j])
+                return 0;
+        }
+        i += bits/FLINT_BITS;
+    } while (i < N);
+
+    return 1;
+}
+
+MPOLY_INLINE
 int mpoly_monomial_divides1(ulong * exp_ptr, const ulong exp2,
                                                   const ulong exp3, ulong mask)
 {
@@ -480,6 +502,12 @@ void mpoly_monomial_set(ulong * exp2, const ulong * exp3, slong N)
    slong i;
    for (i = 0; i < N; i++)
       exp2[i] = exp3[i];
+}
+
+MPOLY_INLINE
+void mpoly_copy_monomials(ulong * exp1, const ulong * exp2, slong len, slong N)
+{
+    memcpy(exp1, exp2, N*len*sizeof(ulong));
 }
 
 MPOLY_INLINE
@@ -788,6 +816,16 @@ FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
 FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
                  const ulong * exp, slong len, slong N, const ulong * cmpmask);
 
+FLINT_DLL slong mpoly_monomial_index_ui(const ulong * Aexp, mp_bitcnt_t Abits,
+                     slong Alength, const ulong * exp, const mpoly_ctx_t mctx);
+
+FLINT_DLL slong mpoly_monomial_index_pfmpz(const ulong * Aexp, mp_bitcnt_t Abits,
+                    slong Alength, fmpz * const * exp, const mpoly_ctx_t mctx);
+
+FLINT_DLL slong mpoly_monomial_index_monomial(const ulong * Aexp,
+                      mp_bitcnt_t Abits, slong Alength, const ulong * Mexp,
+                                    mp_bitcnt_t Mbits, const mpoly_ctx_t mctx);
+
 FLINT_DLL void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
                           slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
@@ -825,6 +863,9 @@ FLINT_DLL slong mpoly_total_degree_si(const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
+                                slong len, slong bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_total_degree_fmpz_ref(fmpz_t totdeg, const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_search_monomials(
@@ -960,7 +1001,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
 
    if (i != 1 && exp == heap[1].exp)
    {
-      ((mpoly_heap_t *) x)->next = heap[1].next;
+      ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[1].next;
       heap[1].next = x;
 
       return;
@@ -970,7 +1011,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
    {
       if (exp == heap[*next_loc].exp)
       {
-         ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
+         ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[*next_loc].next;
          heap[*next_loc].next = x;
          return;
       }
@@ -982,7 +1023,7 @@ void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x,
    {
       if (exp == heap[j].exp)
       {
-         ((mpoly_heap_t *) x)->next = heap[j].next;
+         ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[j].next;
          heap[j].next = x;
 
          *next_loc = j;
@@ -1012,7 +1053,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
 {
    ulong * exp;
    slong i, j, s = --(*heap_len);
-   mpoly_heap_t * x = heap[1].next;
+   mpoly_heap_t * x = (mpoly_heap_t *) heap[1].next;
 
    i = 1;
    j = 2;
@@ -1050,7 +1091,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    if (i != 1 && mpoly_monomial_equal(exp, heap[1].exp, N))
    {
-      ((mpoly_heap_t *) x)->next = heap[1].next;
+      ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[1].next;
       heap[1].next = x;
 
       return 0;
@@ -1060,7 +1101,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
    {
       if (mpoly_monomial_equal(exp, heap[*next_loc].exp, N))
       {
-         ((mpoly_heap_t *) x)->next = heap[*next_loc].next;
+         ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[*next_loc].next;
          heap[*next_loc].next = x;
          return 0;
       }
@@ -1076,7 +1117,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    if (j >= 1 && mpoly_monomial_equal(exp, heap[j].exp, N))
    {
-      ((mpoly_heap_t *) x)->next = heap[j].next;
+      ((mpoly_heap_t *) x)->next = (mpoly_heap_t *) heap[j].next;
       heap[j].next = x;
       *next_loc = j;
 

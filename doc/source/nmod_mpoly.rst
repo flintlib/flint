@@ -157,7 +157,7 @@ Constants
 
     Set ``A`` to the constant ``0``.
 
-.. function:: void fmpz_mpoly_one(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_one(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Set ``A`` to the constant ``1``.
 
@@ -494,7 +494,7 @@ The division functions will generally throw if the leading coefficient of a divi
 
 .. function:: void nmod_mpoly_divrem_ideal(nmod_mpoly_struct ** Q, nmod_mpoly_t R, const nmod_mpoly_t A, nmod_mpoly_struct * const * B, slong len, const nmod_mpoly_ctx_t ctx)
 
-    This function is as per :func:`fmpq_mpoly_divrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
+    This function is as per :func:`nmod_mpoly_divrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
     The number of divisor (and hence quotient) polynomials, is given by ``len``.
 
 

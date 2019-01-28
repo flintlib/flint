@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
 void nmod_mpoly_inflate(nmod_mpoly_t A, const nmod_mpoly_t B,
            const fmpz * shift, const fmpz * stride, const nmod_mpoly_ctx_t ctx)
 {
@@ -80,6 +79,3 @@ void nmod_mpoly_inflate(nmod_mpoly_t A, const nmod_mpoly_t B,
     }
     return;
 }
-
-
-

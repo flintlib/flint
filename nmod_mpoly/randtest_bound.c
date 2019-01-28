@@ -27,8 +27,8 @@ void nmod_mpoly_randtest_bound(nmod_mpoly_t A, flint_rand_t state,
         for (j = 0; j < nvars; j++)
             exp[j] = n_randint(state, exp_bound);
 
-        _nmod_mpoly_emplacebackterm_ui_ui(A,
-                               n_randint(state, ctx->ffinfo->mod.n), exp, ctx);
+        _nmod_mpoly_push_exp_ui(A, exp, ctx);
+        A->coeffs[A->length - 1] = n_randint(state, ctx->ffinfo->mod.n);
     }
     nmod_mpoly_sort_terms(A, ctx);
     nmod_mpoly_combine_like_terms(A, ctx);

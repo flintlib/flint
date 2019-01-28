@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mpoly.h"
-
 
 int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                  mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx)
