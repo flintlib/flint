@@ -643,7 +643,7 @@ int _fq_nmod_mpoly_gcd_zippel(fq_nmod_mpoly_t G, const fq_nmod_mpoly_t A,
 
     new_bits = FLINT_MAX(A->bits, B->bits);
 
-    fq_nmod_mpoly_ctx_init2(uctx, ctx->minfo->nvars - 1, ORD_LEX, ctx->fqctx);
+    fq_nmod_mpoly_ctx_init(uctx, ctx->minfo->nvars - 1, ORD_LEX, ctx->fqctx);
     fq_nmod_mpolyu_init(Au, new_bits, uctx);
     fq_nmod_mpolyu_init(Bu, new_bits, uctx);
     fq_nmod_mpolyu_init(Gu, new_bits, uctx);

@@ -31,7 +31,7 @@ main(void)
         ulong expl[2] = {1, 2};
         const char * vars[] = {"x", "y", "z", "w"};
 
-        fq_nmod_mpoly_ctx_init(ctx, 4, ORD_LEX, 11, 2);
+        fq_nmod_mpoly_ctx_init_deg(ctx, 4, ORD_LEX, 11, 2);
         fq_nmod_mpoly_init(f, ctx);
         fq_nmod_mpoly_init(g, ctx);
         fq_nmod_mpoly_set_str_pretty(f, "x^2*y*(z+w)+x+y+x*y^2+z^2+w^2", vars, ctx);

@@ -139,7 +139,7 @@ static int _try_zippel(fq_nmod_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     mpoly_zipinfo_init(zinfo, m + 1);
 
     /* uctx is context for Zp[y_0,...,y_{m-1}]*/
-    fq_nmod_mpoly_ctx_init2(uctx, m, ORD_LEX, ctx->fqctx);
+    fq_nmod_mpoly_ctx_init(uctx, m, ORD_LEX, ctx->fqctx);
 
     Gshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
     /* degrees after deflation */

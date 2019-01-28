@@ -364,7 +364,7 @@ _fq_nmod_mpoly_embed_chooser_init(_fq_nmod_mpoly_embed_chooser_t embc,
     nmod_poly_init2(ext_modulus, p, m*n + 1);
     nmod_poly_randtest_sparse_irreducible(ext_modulus, randstate, m*n + 1);
     fq_nmod_ctx_init_modulus(ext_fqctx, ext_modulus, "$");
-    fq_nmod_mpoly_ctx_init2(ectx, ctx->minfo->nvars, ORD_LEX, ext_fqctx);
+    fq_nmod_mpoly_ctx_init(ectx, ctx->minfo->nvars, ORD_LEX, ext_fqctx);
     fq_nmod_ctx_clear(ext_fqctx);
     nmod_poly_clear(ext_modulus);
 
@@ -412,7 +412,7 @@ _fq_nmod_mpoly_embed_chooser_next(_fq_nmod_mpoly_embed_chooser_t embc,
     nmod_poly_init2(ext_modulus, p, m*n + 1);
     nmod_poly_randtest_sparse_irreducible(ext_modulus, randstate, m*n + 1);
     fq_nmod_ctx_init_modulus(ext_fqctx, ext_modulus, "$");
-    fq_nmod_mpoly_ctx_init2(ectx, ctx->minfo->nvars, ORD_LEX, ext_fqctx);
+    fq_nmod_mpoly_ctx_init(ectx, ctx->minfo->nvars, ORD_LEX, ext_fqctx);
     fq_nmod_ctx_clear(ext_fqctx);
     nmod_poly_clear(ext_modulus);
 
