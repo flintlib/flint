@@ -13,21 +13,6 @@
 #include "thread_pool.h"
 #include "fmpz_mpoly.h"
 
-
-typedef struct _fmpz_mpoly_stripe_struct
-{
-    char * big_mem;
-    slong big_mem_alloc;
-    slong N;
-    mp_bitcnt_t bits;
-    const ulong * cmpmask;
-    int flint_small;
-} fmpz_mpoly_stripe_struct;
-
-typedef fmpz_mpoly_stripe_struct fmpz_mpoly_stripe_t[1];
-
-
-
 slong _fmpz_mpoly_mul_heap_part1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
               const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
               const fmpz * Ccoeff, const ulong * Cexp, slong Clen,

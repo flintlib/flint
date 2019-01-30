@@ -711,7 +711,7 @@ FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
         slong len2, ulong k, mp_bitcnt_t bits, slong N, const ulong * cmpmask);
 
 
-/* Divisibility **************************************************************/
+/* Division ******************************************************************/
 
 FLINT_DLL slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
@@ -720,6 +720,10 @@ FLINT_DLL slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1,
 
 FLINT_DLL int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
+                          const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
@@ -731,8 +735,6 @@ FLINT_DLL slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
 FLINT_DLL int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
-
-/* Division ******************************************************************/
 
 FLINT_DLL int fmpz_mpoly_divides(fmpz_mpoly_t Q, const fmpz_mpoly_t A,
                              const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
@@ -858,6 +860,23 @@ FLINT_DLL int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 #define fmpz_mpoly_get_monomial_ptr(poly, n, ctx) \
     ((n) < (poly)->length ? (poly)->exps + \
                      (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
+
+typedef struct _fmpz_mpoly_stripe_struct
+{
+    char * big_mem;
+    slong big_mem_alloc;
+    slong N;
+    mp_bitcnt_t bits;
+    const ulong * cmpmask;
+    slong * startidx;
+    slong * endidx;
+    ulong * emin;
+    ulong * emax;
+    int upperclosed;
+    int flint_small;
+} fmpz_mpoly_stripe_struct;
+
+typedef fmpz_mpoly_stripe_struct fmpz_mpoly_stripe_t[1];
 
 /* sparse univariates with multivariate coefficients */
 typedef struct
