@@ -375,12 +375,14 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, exp2, N);
 
-    /* precompute leading cofficient info assuming "small" case */
-    lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN_EXT(poly3[0]);
-    count_leading_zeros(lc_norm, lc_abs);
-    lc_n = lc_abs << lc_norm;
-    invert_limb(lc_i, lc_n);
+    if (small)
+    {
+        lc_abs = FLINT_ABS(poly3[0]);
+        lc_sign = FLINT_SIGN_EXT(poly3[0]);
+        count_leading_zeros(lc_norm, lc_abs);
+        lc_n = lc_abs << lc_norm;
+        invert_limb(lc_i, lc_n);
+    }
 
     while (heap_len > 1)
     {
@@ -541,8 +543,9 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 if ((qq & (WORD(3) << (FLINT_BITS - 2))) == WORD(0))
                 {
                     _fmpz_demote(p1 + k);
-                    p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
-                } else
+                    p1[k] = (qq^(ds^lc_sign)) - (ds^lc_sign);
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_ui(p1 + k, qq);
