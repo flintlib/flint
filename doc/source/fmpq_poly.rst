@@ -214,7 +214,7 @@ Assignment, swap, negation
 .. function:: void fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den)
 
     Sets the coefficients of ``rop`` to the coefficients in the denominator
-    of``op``, reduced by the modulus of ``rop``. If ``den == 1``, the result is
+    of ``op``, reduced by the modulus of ``rop``. If ``den == 1``, the result is
     multiplied by the inverse of the denominator of ``op``. In this case it is
     assumed that the reduction of the denominator of ``op`` is invertible.
 
