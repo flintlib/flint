@@ -199,6 +199,25 @@ Assignment, swap, negation
     Sets the rational polynomial ``rop`` to the same value 
     as the integer polynomial ``op``.
 
+.. function:: void fmpq_poly_set_nmod_poly(fmpq_poly_t rop, const nmod_poly_t op)
+
+    Sets the coefficients of ``op`` to the residues in ``op``,
+    normalised to the interval `-m/2 \le r < m/2` where `m` is the modulus.
+
+.. function:: void fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op)
+
+    Sets the coefficients of ``rop`` to the coefficients in the denominator of``op``,
+    reduced by the modulus of ``rop``. The result is multiplied by the inverse of the
+    denominator of ``op``. It is assumed that the reduction of the denominator of ``op``
+    is invertible.
+
+.. function:: void fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den)
+
+    Sets the coefficients of ``rop`` to the coefficients in the denominator
+    of``op``, reduced by the modulus of ``rop``. If ``den == 1``, the result is
+    multiplied by the inverse of the denominator of ``op``. In this case it is
+    assumed that the reduction of the denominator of ``op`` is invertible.
+
 .. function:: void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
 
     Sets ``(poly, den)`` to the polynomial given by the 

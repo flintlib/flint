@@ -142,6 +142,14 @@ FLINT_DLL void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
 
 FLINT_DLL void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op);
 
+FLINT_DLL void _fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op);
+
+FLINT_DLL void fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den);
+
+FLINT_DLL void fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op);
+
+FLINT_DLL void fmpq_poly_set_nmod_poly(fmpq_poly_t rop, const nmod_poly_t op);
+
 FLINT_DLL void _fmpq_poly_set_array_mpq(fmpz * poly, 
                                          fmpz_t den, const mpq_t * a, slong n);
 
