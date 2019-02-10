@@ -28,9 +28,9 @@ set(BUILD_DIRS
     fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve 
     double_extras d_vec d_mat padic_poly padic_mat qadic  
     fq fq_vec fq_mat fq_poly fq_poly_factor
-    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor 
+    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_mpoly fq_nmod_poly_factor 
     fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor 
-    mpoly fmpz_mpoly nmod_mpoly fmpq_mpoly
+    mpoly fmpz_mpoly nmod_mpoly fmpq_mpoly thread_pool
 )
 
 set(TEMPLATE_DIRS
@@ -126,14 +126,21 @@ check_function_exists(getpagesize HAVE_GETPAGESIZE)
 check_function_exists(getrusage HAVE_GETRUSAGE)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 
+set(HAVE_TLS ON CACHE BOOL "Use thread local storage.")
+
+set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
+set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
+
+if(MEMORY_MANAGER STREQUAL "reentrant")
+	set(FLINT_REENTRANT ON)
+else()
+	set(FLINT_REENTRANT OFF)
+endif()
 
 configure_file(
     config.h.in
     config.h
 )
-
-set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
-set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
 
 configure_file(
     fmpz-conversions-${MEMORY_MANAGER}.in
