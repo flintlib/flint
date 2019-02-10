@@ -128,13 +128,19 @@ check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 
 set(HAVE_TLS ON CACHE BOOL "Use thread local storage.")
 
+set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
+set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
+
+if(MEMORY_MANAGER STREQUAL "reentrant")
+	set(FLINT_REENTRANT ON)
+else()
+	set(FLINT_REENTRANT OFF)
+endif()
+
 configure_file(
     config.h.in
     config.h
 )
-
-set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
-set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
 
 configure_file(
     fmpz-conversions-${MEMORY_MANAGER}.in
