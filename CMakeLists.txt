@@ -28,9 +28,9 @@ set(BUILD_DIRS
     fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve 
     double_extras d_vec d_mat padic_poly padic_mat qadic  
     fq fq_vec fq_mat fq_poly fq_poly_factor
-    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor 
+    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_mpoly fq_nmod_poly_factor 
     fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor 
-    mpoly fmpz_mpoly nmod_mpoly fmpq_mpoly
+    mpoly fmpz_mpoly nmod_mpoly fmpq_mpoly thread_pool
 )
 
 set(TEMPLATE_DIRS
