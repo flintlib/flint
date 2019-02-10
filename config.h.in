@@ -104,6 +104,9 @@
 
 #cmakedefine HAVE_STD__LOCALE 1
 
+/* Define if the compiler supports and should use thread-local storage */
+#cmakedefine HAVE_TLS 1
+
 /* Define if you have the `localeconv' function. */
 #cmakedefine HAVE_LOCALECONV		1
 

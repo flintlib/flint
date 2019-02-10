@@ -126,6 +126,7 @@ check_function_exists(getpagesize HAVE_GETPAGESIZE)
 check_function_exists(getrusage HAVE_GETRUSAGE)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 
+set(HAVE_TLS ON CACHE BOOL "Use thread local storage.")
 
 configure_file(
     config.h.in
