@@ -170,6 +170,8 @@ FLINT_DLL void flint_set_abort(void (*func)(void));
 
 FLINT_DLL int flint_get_num_threads(void);
 FLINT_DLL void flint_set_num_threads(int num_threads);
+FLINT_DLL int flint_set_thread_affinity(int * cpus, slong length);
+FLINT_DLL int flint_restore_thread_affinity();
 FLINT_DLL void flint_parallel_cleanup(void);
 
 FLINT_DLL int flint_test_multiplier(void);

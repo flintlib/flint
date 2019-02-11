@@ -9,8 +9,17 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+
+/* for some reason this define needs to be outside of the next if */
+#define _GNU_SOURCE
+#if HAVE_SCHED_H
+#include <sched.h>
+#endif
+
 #include <pthread.h>
+
 #include "flint.h"
+
 
 typedef struct
 {
@@ -30,6 +39,9 @@ typedef thread_pool_entry_struct thread_pool_entry_t[1];
 
 typedef struct
 {
+#if HAVE_SCHED_H
+    cpu_set_t original_affinity;
+#endif
     pthread_mutex_t mutex;
     thread_pool_entry_struct * tdata;
     slong length;
@@ -45,6 +57,11 @@ extern int global_thread_pool_initialized;
 FLINT_DLL void * thread_pool_idle_loop(void * varg);
 
 FLINT_DLL void thread_pool_init(thread_pool_t T, slong l);
+
+FLINT_DLL int thread_pool_set_affinity(thread_pool_t T,
+                                                     int * cpus, slong length);
+
+FLINT_DLL int thread_pool_restore_affinity(thread_pool_t T);
 
 FLINT_DLL slong thread_pool_get_size(thread_pool_t T);
 

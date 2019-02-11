@@ -41,7 +41,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
     ulong acc_sm[3];
     int lt_divides, small;
     slong bits2, bits3;
-    ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
+    ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     TMP_INIT;
 
     TMP_START;
@@ -85,12 +85,14 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
     x->next = NULL;
     HEAP_ASSIGN(heap[1], exp2[0], x);
 
-    /* precompute leading cofficient info assuming "small" case */
-    lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN_EXT(poly3[0]);
-    count_leading_zeros(lc_norm, lc_abs);
-    lc_n = lc_abs << lc_norm;
-    invert_limb(lc_i, lc_n);
+    if (small)
+    {
+        lc_abs = FLINT_ABS(poly3[0]);
+        lc_sign = FLINT_SIGN_EXT(poly3[0]);
+        count_leading_zeros(lc_norm, lc_abs);
+        lc_n = lc_abs << lc_norm;
+        invert_limb(lc_i, lc_n);
+    }
 
     while (heap_len > 1)
     {
@@ -315,7 +317,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     slong * hind;
     int lt_divides, small;
     slong bits2, bits3;
-    ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
+    ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     TMP_INIT;
 
     /* if exponent vectors are all one word, call specialised version */
