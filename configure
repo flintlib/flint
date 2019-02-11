@@ -687,16 +687,18 @@ CONFIG_CPU_SET_T="#define HAVE_CPU_SET_T 0"
 mkdir -p build
 MSG="Testing cpu_set_t..."
 printf "%s" "$MSG"
-echo "#define _GNU_SOURCE" > build/test-cpu_set_t.h
-echo "#include <sched.h>" >> build/test-cpu_set_t.h
-echo "int main(){cpu_set_t s;CPU_ZERO(&s);return 0;}" >> build/test-cpu_set_t.h
-if ($CC -E build/test-fenv.h > /dev/null 2>&1) then
+echo "#define _GNU_SOURCE
+#include <sched.h>
+int main(){cpu_set_t s;CPU_ZERO(&s);return 0;}" > build/test-cpu_set_t.c
+$CC build/test-cpu_set_t.c -o ./build/test-cpu_set_t > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    rm -f build/test-cpu_set_t
     printf "%s\n" "yes"
     CONFIG_CPU_SET_T="#define HAVE_CPU_SET_T 1"
 else
     printf "%s\n" "no"
 fi
-rm -f build/test-cpu_set_t.h
+rm -f build/test-cpu_set_t.c
 
 
 #external modules
