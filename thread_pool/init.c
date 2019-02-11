@@ -63,7 +63,7 @@ void thread_pool_init(thread_pool_t T, slong size)
     pthread_mutex_init(&T->mutex, NULL);
     T->length = size;
 
-#if HAVE_SCHED_H
+#if HAVE_CPU_SET_T
     if (0 != pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t),
                                                         &T->original_affinity))
     {

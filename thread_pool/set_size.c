@@ -11,7 +11,6 @@
 
 #include "thread_pool.h"
 
-
 int thread_pool_set_size(thread_pool_t T, slong new_size)
 {
     thread_pool_entry_struct * D;

@@ -17,7 +17,7 @@
 */
 int thread_pool_set_affinity(thread_pool_t T, int * cpus, slong length)
 {
-#if HAVE_SCHED_H
+#if HAVE_CPU_SET_T
     slong i;
     int errorno;
     cpu_set_t mask;

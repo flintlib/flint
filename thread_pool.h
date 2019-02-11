@@ -39,7 +39,7 @@ typedef thread_pool_entry_struct thread_pool_entry_t[1];
 
 typedef struct
 {
-#if HAVE_SCHED_H
+#if HAVE_CPU_SET_T
     cpu_set_t original_affinity;
 #endif
     pthread_mutex_t mutex;
