@@ -37,8 +37,14 @@
 #undef count_leading_zeros
 #undef count_trailing_zeros
 
+/* 1 if we know that the hardware is strongly-ordered */
+#define FLINT_KNOW_STRONG_ORDER 0
+
 /* x86 : 64 bit */
 #if (GMP_LIMB_BITS == 64 && defined (__amd64__)) 
+
+#undef FLINT_KNOW_STRONG_ORDER
+#define FLINT_KNOW_STRONG_ORDER 1
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addq %8,%q2\n\tadcq %6,%q1\n\tadcq %4,%q0"     \
@@ -113,6 +119,9 @@
 /* x86 : 32 bit */
 #if (GMP_LIMB_BITS == 32 && (defined (__i386__) \
    || defined (__i486__) || defined(__amd64__)))
+
+#undef FLINT_KNOW_STRONG_ORDER
+#define FLINT_KNOW_STRONG_ORDER 1
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addl %8,%k2\n\tadcl %6,%k1\n\tadcl %4,%k0"     \

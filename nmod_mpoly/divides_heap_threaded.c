@@ -1683,6 +1683,10 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     divides_heap_base_t H;
     TMP_INIT;
 
+#if !FLINT_KNOW_STRONG_ORDER
+    return nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
+#endif
+
     if (B->length < 2 || A->length < 2)
     {
         if (B->length == 0)
