@@ -11,7 +11,7 @@
 
 #include "thread_pool.h"
 #include "nmod_mpoly.h"
-#include "fmpz_mpoly.h"
+#include "fmpz_mpoly.h" /* for mpoly_divides_select_exps */
 
 #define PROFILE_THIS 0
 
@@ -360,142 +360,6 @@ static void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chun
         H->tail = L;
     }
     H->length++;
-}
-
-/*
-    When selecting expoenent ranges, we can also detect if an
-    exact division is impossible. The return is non zero in this case.
-*/
-static int select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx, slong nworkers,
-          ulong * Aexp, slong Alen, ulong * Bexp, slong Blen, mp_bitcnt_t bits)
-{
-    int failure;
-    ulong mask;
-    ulong * Sexp;
-    slong Slen;
-    fmpz * Scoeff;
-    slong nA = 30 + 8*nworkers;     /* number of division of A */
-    slong nB = (1 + nworkers)/2;    /* number of division of B */
-    slong tot;
-    ulong * T0, * T1;
-    slong i, j, N;
-    TMP_INIT;
-
-    TMP_START;
-
-    N = mpoly_words_per_exp(bits, zctx->minfo);
-
-    mask = 0; /* mask will be unused if bits > FLINT_BITS*/
-    for (i = 0; i < FLINT_BITS/bits; i++)
-        mask = (mask << bits) + (UWORD(1) << (bits - 1));
-
-    FLINT_ASSERT(Alen > 0);
-    FLINT_ASSERT(Blen > 0);
-
-    tot = 16 + nA + 2*nB;
-    fmpz_mpoly_fit_bits(S, bits, zctx);
-    S->bits = bits;
-    fmpz_mpoly_fit_length(S, tot, zctx);
-    Sexp = S->exps;
-    Scoeff = S->coeffs;
-    Slen = 0;
-
-    /* get a (non-strict) upper bound on the exponents of A */
-    mpoly_monomial_set(Sexp + N*Slen, Aexp + N*0, N);
-    fmpz_one(Scoeff + Slen);
-    Slen++;
-
-    for (i = 1; i < nA; i++)
-    {
-        double a = 1.0;
-        double b = 0.2;
-        double d = (double)(i) / (double)(nA);
-        /*
-            set d to p(d) where p is the cubic satisfying
-            p(0) = 0, p'(0) = a
-            p(1) = 1, p'(1) = b
-        */
-        FLINT_ASSERT(a >= 0);
-        FLINT_ASSERT(b >= 0);
-        d = d*(1 + (1 - d)*((2 - a - b)*d - (1 - a)));
-
-        /* choose exponent at relative position d in A */
-        j = d * Alen;
-        j = FLINT_MAX(j, WORD(0));
-        j = FLINT_MIN(j, Alen - 1);
-        mpoly_monomial_set(Sexp + N*Slen, Aexp + N*j, N);
-        fmpz_one(Scoeff + Slen);
-        Slen++;
-    }
-    _fmpz_mpoly_set_length(S, Slen, zctx);
-
-    T0 = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    T1 = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_monomial_sub_mp(T0, Aexp + N*0, Bexp + N*0, N);
-    mpoly_monomial_sub_mp(T1, Aexp + N*(Alen - 1), Bexp + N*(Blen - 1), N);
-    if (bits <= FLINT_BITS)
-    {
-        if (   mpoly_monomial_overflows(T0, N, mask)
-            || mpoly_monomial_overflows(T1, N, mask))
-        {
-            failure = 1;
-            goto cleanup;
-        }
-    }
-    else
-    {
-        if (   mpoly_monomial_overflows_mp(T0, N, bits)
-            || mpoly_monomial_overflows_mp(T1, N, bits))
-        {
-            failure = 1;
-            goto cleanup;
-        }
-    }
-
-
-    for (i = 1; i < nB; i++)
-    {
-        double d = (double)(i) / (double)(nB);
-        /* choose exponent at relative position d in B */
-        j = d * Blen;
-        j = FLINT_MAX(j, WORD(0));
-        j = FLINT_MIN(j, Blen - 1);
-
-        mpoly_monomial_sub_mp(Sexp + N*Slen, Aexp + N*0, Bexp + N*0, N);
-        mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
-        fmpz_one(Scoeff + Slen);
-        if (bits <= FLINT_BITS)
-            Slen += !(mpoly_monomial_overflows(Sexp + N*Slen, N, mask));
-        else
-            Slen += !(mpoly_monomial_overflows_mp(Sexp + N*Slen, N, bits));
-
-        mpoly_monomial_sub_mp(Sexp + N*Slen, Aexp + N*(Alen - 1), Bexp + N*(Blen - 1), N);
-        mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
-        fmpz_one(Scoeff + Slen);
-        if (bits <= FLINT_BITS)
-            Slen += !(mpoly_monomial_overflows(Sexp + N*Slen, N, mask));
-        else
-            Slen += !(mpoly_monomial_overflows_mp(Sexp + N*Slen, N, bits));
-    }
-
-    /* get a lower bound on the exponents of A */
-    mpoly_monomial_zero(Sexp + N*Slen, N);
-    fmpz_one(Scoeff + Slen);
-    Slen++;
-
-    /* done constructing S */
-    FLINT_ASSERT(Slen < tot);
-
-    _fmpz_mpoly_set_length(S, Slen, zctx);
-
-    fmpz_mpoly_sort_terms(S, zctx);
-    fmpz_mpoly_combine_like_terms(S, zctx);
-
-    failure = 0;
-
-cleanup:
-    TMP_END;
-    return failure;
 }
 
 
@@ -1851,7 +1715,8 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
 
     fmpz_mpoly_ctx_init(zctx, ctx->minfo->nvars, ctx->minfo->ord);
     fmpz_mpoly_init(S, zctx);
-    if (select_exps(S, zctx, max_num_workers,
+
+    if (mpoly_divides_select_exps(S, zctx, max_num_workers,
                                    Aexp, A->length, Bexp, B->length, exp_bits))
     {
         divides = 0;

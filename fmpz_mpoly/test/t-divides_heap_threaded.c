@@ -100,7 +100,6 @@ main(void)
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-continue;
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
             result = fmpz_mpoly_divides_heap_threaded(k, h, g, ctx);
@@ -156,8 +155,6 @@ continue;
             fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-
-continue;
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
@@ -215,8 +212,6 @@ continue;
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-continue;
-
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
             result = fmpz_mpoly_divides_heap_threaded(h, h, g, ctx);
@@ -273,8 +268,6 @@ continue;
             fmpz_mpoly_randtest_bound(p, state, len3, coeff_bits, exp_bound3, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-
-continue;
 
             fmpz_mpoly_mul(f, f, g, ctx);
             fmpz_mpoly_add(f, f, p, ctx);
