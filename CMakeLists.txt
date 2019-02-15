@@ -78,7 +78,7 @@ execute_process(
 from os.path import join
 
 with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
-    with open('CPimport.h', 'w+') as fout:
+    with open('CPimport.h.in', 'w+') as fout:
         while True:
             l = fin.readline()
             if not l:
@@ -89,6 +89,7 @@ with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
 "
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+configure_file(${CMAKE_BINARY_DIR}/CPimport.h.in ${CMAKE_BINARY_DIR}/CPimport.h COPYONLY)
 
 # Configuration checks
 test_big_endian(HAVE_BIG_ENDIAN)
