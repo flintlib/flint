@@ -22,6 +22,11 @@ find_package(PythonInterp REQUIRED)
 
 if(MSVC)
     find_package(PThreads REQUIRED)
+else()
+    option(CMAKE_THREAD_PREFER_PTHREAD "Prefer pthreads" yes)
+    option(THREADS_PREFER_PTHREAD_FLAG "Prefer -pthread flag" yes)
+    find_package(Threads REQUIRED)
+    set(PThreads_LIBRARIES Threads::Threads)
 endif()
 
 # Find sources
