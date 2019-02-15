@@ -13,6 +13,62 @@
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly.h"
 
+#define PROFILE_THIS 0
+
+#if PROFILE_THIS
+
+#include "profiler.h"
+
+typedef struct _vec_slong_struct
+{
+    slong * array;
+    slong alloc;
+    slong length;
+} vec_slong_struct;
+
+typedef vec_slong_struct vec_slong_t[1];
+
+static void vec_slong_init(vec_slong_t v)
+{
+    v->length = 0;
+    v->alloc = 16;
+    v->array = (slong *) flint_malloc(v->alloc*sizeof(slong));
+}
+
+static void vec_slong_clear(vec_slong_t v)
+{
+    flint_free(v->array);
+}
+
+static void vec_slong_push_back(vec_slong_t v, slong a)
+{
+    v->length++;
+    if (v->length > v->alloc)
+    {
+        v->alloc = FLINT_MAX(v->length, 2*v->alloc);
+        v->array = (slong *) flint_realloc(v->array, v->alloc*sizeof(slong));
+    }
+    v->array[v->length - 1] = a;
+}
+
+static void vec_slong_print(const vec_slong_t v)
+{
+    slong i;
+    flint_printf("[");
+    for (i = 0; i < v->length; i++)
+    {
+        flint_printf("%wd",v->array[i]);
+        if (i + 1 < v->length)
+        {
+            flint_printf(",",v->array[i]);
+        }
+    }
+    flint_printf("]");
+}
+#endif
+
+
+
 /*
     a thread safe mpoly supports three mutating operations
     - init from an array of terms
@@ -184,6 +240,9 @@ typedef struct _divides_heap_chunk_struct
     volatile slong ma;
     volatile slong mq;
     int Cinited;
+#if PROFILE_THIS
+    slong idx;
+#endif
 } divides_heap_chunk_struct;
 
 typedef divides_heap_chunk_struct divides_heap_chunk_t[1];
@@ -207,6 +266,9 @@ typedef struct
     mp_limb_t lc_inv;
     ulong * cmpmask;
     int failed;
+#if PROFILE_THIS
+    timeit_t timer;
+#endif
 } divides_heap_base_struct;
 
 typedef divides_heap_base_struct divides_heap_base_t[1];
@@ -221,6 +283,9 @@ typedef struct _worker_arg_struct
     nmod_mpoly_stripe_t S;
     nmod_mpoly_t polyT1;
     nmod_mpoly_t polyT2;
+#if PROFILE_THIS
+    vec_slong_t time_data;
+#endif
 } worker_arg_struct;
 
 typedef worker_arg_struct worker_arg_t[1];
@@ -301,7 +366,7 @@ static void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chun
     When selecting expoenent ranges, we can also detect if an
     exact division is impossible. The return is non zero in this case.
 */
-static int select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
+static int select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx, slong nworkers,
           ulong * Aexp, slong Alen, ulong * Bexp, slong Blen, mp_bitcnt_t bits)
 {
     int failure;
@@ -309,12 +374,11 @@ static int select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
     ulong * Sexp;
     slong Slen;
     fmpz * Scoeff;
-    slong ns = 50;
-    slong Astep = FLINT_MAX(Alen*1/ns, WORD(1));
-    slong Bstep = FLINT_MAX(Blen*4/ns, WORD(1));
+    slong nA = 30 + 8*nworkers;     /* number of division of A */
+    slong nB = (1 + nworkers)/2;    /* number of division of B */
     slong tot;
     ulong * T0, * T1;
-    slong i, N;
+    slong i, j, N;
     TMP_INIT;
 
     TMP_START;
@@ -328,21 +392,40 @@ static int select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
     FLINT_ASSERT(Alen > 0);
     FLINT_ASSERT(Blen > 0);
 
-    tot = 10;
-    tot += (Alen + Astep - 1)/Astep;
-    tot += 2*((Blen + Bstep - 1)/Bstep);
+    tot = 16 + nA + 2*nB;
     fmpz_mpoly_fit_bits(S, bits, zctx);
     S->bits = bits;
     fmpz_mpoly_fit_length(S, tot, zctx);
     Sexp = S->exps;
     Scoeff = S->coeffs;
-
     Slen = 0;
-    for (i = 0; i < Alen; i += Astep)
+
+    /* get a (non-strict) upper bound on the exponents of A */
+    mpoly_monomial_set(Sexp + N*Slen, Aexp + N*0, N);
+    fmpz_one(Scoeff + Slen);
+    Slen++;
+
+    for (i = 1; i < nA; i++)
     {
-        mpoly_monomial_set(Sexp + N*Slen, Aexp + N*i, N);
+        double a = 1.0;
+        double b = 0.2;
+        double d = (double)(i) / (double)(nA);
+        /*
+            set d to p(d) where p is the cubic satisfying
+            p(0) = 0, p'(0) = a
+            p(1) = 1, p'(1) = b
+        */
+        FLINT_ASSERT(a >= 0);
+        FLINT_ASSERT(b >= 0);
+        d = d*(1 + (1 - d)*((2 - a - b)*d - (1 - a)));
+
+        /* choose exponent at relative position d in A */
+        j = d * Alen;
+        j = FLINT_MAX(j, WORD(0));
+        j = FLINT_MIN(j, Alen - 1);
+        mpoly_monomial_set(Sexp + N*Slen, Aexp + N*j, N);
         fmpz_one(Scoeff + Slen);
-        Slen++;   
+        Slen++;
     }
     _fmpz_mpoly_set_length(S, Slen, zctx);
 
@@ -369,13 +452,17 @@ static int select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
         }
     }
 
-/*
-    for now the algo does better without these divisions
 
-    for (i = 0; i < Blen; i += Bstep)
+    for (i = 1; i < nB; i++)
     {
+        double d = (double)(i) / (double)(nB);
+        /* choose exponent at relative position d in B */
+        j = d * Blen;
+        j = FLINT_MAX(j, WORD(0));
+        j = FLINT_MIN(j, Blen - 1);
+
         mpoly_monomial_sub_mp(Sexp + N*Slen, Aexp + N*0, Bexp + N*0, N);
-        mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*i, N);
+        mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
         fmpz_one(Scoeff + Slen);
         if (bits <= FLINT_BITS)
             Slen += !(mpoly_monomial_overflows(Sexp + N*Slen, N, mask));
@@ -383,19 +470,20 @@ static int select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
             Slen += !(mpoly_monomial_overflows_mp(Sexp + N*Slen, N, bits));
 
         mpoly_monomial_sub_mp(Sexp + N*Slen, Aexp + N*(Alen - 1), Bexp + N*(Blen - 1), N);
-        mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*i, N);
+        mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
         fmpz_one(Scoeff + Slen);
         if (bits <= FLINT_BITS)
             Slen += !(mpoly_monomial_overflows(Sexp + N*Slen, N, mask));
         else
             Slen += !(mpoly_monomial_overflows_mp(Sexp + N*Slen, N, bits));
     }
-*/
 
+    /* get a lower bound on the exponents of A */
     mpoly_monomial_zero(Sexp + N*Slen, N);
     fmpz_one(Scoeff + Slen);
     Slen++;
 
+    /* done constructing S */
     FLINT_ASSERT(Slen < tot);
 
     _fmpz_mpoly_set_length(S, Slen, zctx);
@@ -1498,7 +1586,15 @@ static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
         if (L->producer == 0 && q_prev_length - L->mq < 20)
             return;
 
+#if PROFILE_THIS
+        vec_slong_push_back(W->time_data, 4*L->idx + 0);
+        vec_slong_push_back(W->time_data, timeit_query_wall(H->timer));
+#endif
         chunk_mulsub(W, L, q_prev_length);
+#if PROFILE_THIS
+        vec_slong_push_back(W->time_data, 4*L->idx + 1);
+        vec_slong_push_back(W->time_data, timeit_query_wall(H->timer));
+#endif
     }
 
     if (L->producer == 1)
@@ -1507,6 +1603,11 @@ static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
         mp_limb_t * Rcoeff;
         ulong * Rexp;
         slong Rlen;
+
+#if PROFILE_THIS
+        vec_slong_push_back(W->time_data, 4*L->idx + 2);
+        vec_slong_push_back(W->time_data, timeit_query_wall(H->timer));
+#endif
 
         /* process the remaining quotient terms */
         q_prev_length = Q->length;
@@ -1565,6 +1666,10 @@ static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
             }
             if (T2->length == 0)
             {
+#if PROFILE_THIS
+                vec_slong_push_back(W->time_data, 4*L->idx + 3);
+                vec_slong_push_back(W->time_data, timeit_query_wall(H->timer));
+#endif
                 H->failed = 1;
                 return;
             }
@@ -1573,6 +1678,11 @@ static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
                 nmod_mpoly_ts_append(H->polyQ, T2->coeffs, T2->exps, T2->length, N);
             }
         }
+
+#if PROFILE_THIS
+        vec_slong_push_back(W->time_data, 4*L->idx + 3);
+        vec_slong_push_back(W->time_data, timeit_query_wall(H->timer));
+#endif
 
         next = L->next;
         H->length--;
@@ -1681,6 +1791,9 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     ulong * texps, * qexps;
     mp_limb_t lc_inv;
     divides_heap_base_t H;
+#if PROFILE_THIS
+    slong idx = 0;
+#endif
     TMP_INIT;
 
 #if !FLINT_KNOW_STRONG_ORDER
@@ -1733,9 +1846,13 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
                                                     B->length, ctx->minfo);
     }
 
+    FLINT_ASSERT(global_thread_pool_initialized);
+    max_num_workers = thread_pool_get_size(global_thread_pool);
+
     fmpz_mpoly_ctx_init(zctx, ctx->minfo->nvars, ctx->minfo->ord);
     fmpz_mpoly_init(S, zctx);
-    if (select_exps(S, zctx, Aexp, A->length, Bexp, B->length, exp_bits))
+    if (select_exps(S, zctx, max_num_workers,
+                                   Aexp, A->length, Bexp, B->length, exp_bits))
     {
         divides = 0;
         nmod_mpoly_zero(Q, ctx);
@@ -1749,9 +1866,6 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     */
     lc_inv = nmod_inv(B->coeffs[0], ctx->ffinfo->mod);
 
-    FLINT_ASSERT(global_thread_pool_initialized);
-
-    max_num_workers = thread_pool_get_size(global_thread_pool);
     handles = (thread_pool_handle *) flint_malloc(max_num_workers
                                                   *sizeof(thread_pool_handle));
     num_workers = thread_pool_request(global_thread_pool,
@@ -1781,7 +1895,8 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     for (i = 0; i + 1 < S->length; i++)
     {
         divides_heap_chunk_struct * L;
-        L = (divides_heap_chunk_struct *) malloc(sizeof(divides_heap_chunk_struct));
+        L = (divides_heap_chunk_struct *) malloc(
+                                            sizeof(divides_heap_chunk_struct));
         L->ma = 0;
         L->mq = 0;
         L->emax = S->exps + N*i;
@@ -1792,6 +1907,9 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
         L->producer = 0;
         L->Cinited = 0;
         L->lock = -2;
+#if PROFILE_THIS
+        L->idx = idx++;
+#endif
         divides_heap_base_add_chunk(H, L);
     }
 
@@ -1842,6 +1960,14 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     worker_args = (worker_arg_struct *) flint_malloc((num_workers + 1)
                                                         *sizeof(worker_arg_t));
 
+#if PROFILE_THIS
+    for (i = 0; i < num_workers + 1; i++)
+    {
+        vec_slong_init((worker_args + i)->time_data);
+    }
+    timeit_start(H->timer);
+#endif
+
     for (i = 0; i < num_workers; i++)
     {
         (worker_args + i)->H = H;
@@ -1855,6 +1981,20 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
         thread_pool_wait(global_thread_pool, handles[i]);
         thread_pool_give_back(global_thread_pool, handles[i]);
     }
+
+#if PROFILE_THIS
+    timeit_stop(H->timer);
+    flint_printf("data = [");
+    for (i = 0; i < num_workers + 1; i++)
+    {
+        flint_printf("[%wd,", i);
+        vec_slong_print((worker_args + i)->time_data);
+        flint_printf("],\n");
+        vec_slong_clear((worker_args + i)->time_data);
+
+    }
+    flint_printf("%wd]\n", H->timer->wall);
+#endif
 
     flint_free(worker_args);
 
