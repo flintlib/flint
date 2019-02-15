@@ -10,9 +10,13 @@ project(flint LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
+option(WITH_NTL "Build with NTL or not" off)
+
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
-find_package(NTL REQUIRED)
+if (WITH_NTL)
+    find_package(NTL REQUIRED)
+endif()
 find_package(PythonInterp REQUIRED)
 
 if(MSVC)
@@ -32,7 +36,7 @@ set(BUILD_DIRS
     fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_mpoly fq_nmod_poly_factor 
     fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor 
     mpoly fmpz_mpoly nmod_mpoly fmpq_mpoly thread_pool
-    flintxx interfaces
+    flintxx
 )
 
 set(TEMPLATE_DIRS
@@ -43,8 +47,12 @@ set(TEMPLATE_DIRS
 set(SOURCES
     printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c
     memory_manager.c version.c profiler.c thread_support.c exception.c
-    hashmap.c inlines.c fmpz/fmpz.c interfaces/NTL-interface.cpp
+    hashmap.c inlines.c fmpz/fmpz.c
 )
+
+if (WITH_NTL)
+    list(APPEND SOURCES interfaces/NTL-interface.cpp)
+endif()
 
 set(HEADERS
     NTL-interface.h flint.h longlong.h config.h gmpcompat.h fft_tuning.h
@@ -185,8 +193,8 @@ file(GLOB TEMP "${CMAKE_SOURCE_DIR}/*.h")
 list(APPEND HEADERS ${TEMP})
 
 add_library(flint SHARED ${SOURCES})
-target_link_libraries(flint 
-    ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES} ${NTL_LIBRARIES}
+target_link_libraries(flint
+    ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES} ${NTL_LIBRARY}
 )
 
 # Include directories
@@ -194,7 +202,7 @@ target_link_libraries(flint
 target_include_directories(flint PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR} ${GMP_INCLUDE_DIRS} ${MPFR_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR} ${PThreads_INCLUDE_DIRS}
-    ${NTL_INCLUDE_DIRS}
+    ${NTL_INCLUDE_DIR}
 )
 
 
@@ -258,7 +266,6 @@ if(BUILD_TESTING)
             add_executable(${test_name} ${test_file})
             target_link_libraries(${test_name}
                 flint test_helpers
-		${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES} ${NTL_LIBRARIES}
             )
 
             add_test(
