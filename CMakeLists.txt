@@ -10,6 +10,7 @@ project(flint LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
+option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build with NTL or not" off)
 
 find_package(GMP REQUIRED)
@@ -192,7 +193,7 @@ endforeach()
 file(GLOB TEMP "${CMAKE_SOURCE_DIR}/*.h")
 list(APPEND HEADERS ${TEMP})
 
-add_library(flint SHARED ${SOURCES})
+add_library(flint ${SOURCES})
 target_link_libraries(flint
     ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES} ${NTL_LIBRARY}
 )
