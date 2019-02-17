@@ -6,37 +6,16 @@
 #
 # Created by Tai Chi Minh Ralph Eastwood <tcmreastwood@gmail.com>
 
-FIND_PATH(NTL_INCLUDE_DIR RR.h
+FIND_PATH(NTL_INCLUDE_DIR NTL/RR.h
   HINTS
   $ENV{NTLDIR}
-  PATH_SUFFIXES NTL include/NTL include
-  PATHS
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw # Fink
-  /opt/local # DarwinPorts
-  /opt/csw # Blastwave
-  /opt
 )
 
 FIND_LIBRARY(NTL_LIBRARY
   NAMES ntl
   HINTS
   $ENV{NTLDIR}
-  PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
-  PATHS
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
-
 
 # handle the QUIETLY and REQUIRED arguments and set NTL_FOUND to TRUE if
 # all listed variables are TRUE
