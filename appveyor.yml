@@ -47,6 +47,7 @@ install:
   - if [%COMPILER%]==[cl] if [%ARCH%]==[32] call "%VCVARSALL%" x86
   - if [%COMPILER%]==[cl] conda config --add channels conda-forge --force
   - if [%COMPILER%]==[cl] conda install --yes --quiet mpir mpfr pthreads-win32 ninja
+  - echo int flint_test_multiplier(){return 1;} > test_helpers.c
 
 before_build:
   - ps: if (-Not (Test-Path .\build)) { mkdir build }
