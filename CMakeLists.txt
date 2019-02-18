@@ -272,11 +272,8 @@ set_target_properties(flint
 
 if(BUILD_TESTING)
     enable_testing()
-    add_library(test_helpers test_helpers.c)
+    add_library(test_helpers STATIC test_helpers.c)
     target_link_libraries(test_helpers flint)
-    if(BUILD_SHARED_LIBS AND WIN32)
-        target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
-    endif()
 
     foreach (build_dir IN LISTS BUILD_DIRS CMAKE_SOURCE_DIR)
         file(GLOB TEST_FILES "${build_dir}/test/*.c")
