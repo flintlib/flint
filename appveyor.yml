@@ -52,12 +52,14 @@ before_build:
   - ps: if (-Not (Test-Path .\build)) { mkdir build }
   
   - cd build
-  - if [%COMPILER%]==[gcc] cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
-  - if [%COMPILER%]==[cl] cmake -G "Ninja" -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+  - if [%COMPILER%]==[gcc] cmake -G "MinGW Makefiles" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+  - if [%COMPILER%]==[cl] cmake -G "Ninja" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
 build_script:
-  - cmake --build . 2>&1 > build_output.txt
-  - ps: Get-Content .\build_output.txt -Tail 1000
+  - cmake --build .
 
 test_script:
   - ctest -j3 --timeout 120
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
