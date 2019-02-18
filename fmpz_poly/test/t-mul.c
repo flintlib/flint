@@ -30,7 +30,7 @@ main(void)
     
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 2 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -58,7 +58,7 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 2 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -86,7 +86,7 @@ main(void)
     }
 
     /* Check aliasing of b and c */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 2 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, d;
 
@@ -116,7 +116,7 @@ main(void)
     }
 
     /* Check (b*c)+(b*d) = b*(c+d) */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 2 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a1, a2, b, c, d;
 
@@ -153,7 +153,7 @@ main(void)
     }
 
     /* Check _fmpz_poly_mul directly */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 2 * flint_test_multiplier(); i++)
     {
         slong len1, len2;
         fmpz_poly_t a, b, out1, out2;

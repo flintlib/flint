@@ -23,7 +23,7 @@ main(void)
     fflush(stdout);
 
     /* Check repeated evalone matches evalall */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f;
@@ -90,7 +90,7 @@ main(void)
 
 
     /* Check add commutes with evalall */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, fg;
@@ -147,7 +147,7 @@ main(void)
     }
 
     /* Check mul commutes with evalall */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, fg;

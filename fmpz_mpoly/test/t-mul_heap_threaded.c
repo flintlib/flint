@@ -55,7 +55,7 @@ main(void)
     }
 
     /* Check mul_heap_threaded matches mul_johnson */
-    for (i = 0; i < 15 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k;
@@ -110,7 +110,7 @@ main(void)
     }
 
     /* aliasing first input */
-    for (i = 0; i < 15 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
@@ -162,7 +162,7 @@ main(void)
     }
 
     /* aliasing second input */
-    for (i = 0; i < 15 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
