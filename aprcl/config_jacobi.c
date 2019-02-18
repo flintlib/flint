@@ -57,7 +57,7 @@ aprcl_R_value(const fmpz_t n)
     if (bits <= 12713) return 1396755360;
 
     /* 2^5 * 3^3 * 5^2 * 7 * 11 * 13 * 17 * 19 */
-    return 6983776800;
+    return UWORD(6983776800);
 }
 
 static void
