@@ -329,7 +329,7 @@
 
 #if defined (FLINT_BUILD_DLL)
 #define FLINT_DLL __declspec(dllexport)
-#elif defined(FLINT_USE_DLL)
+#elif defined(MSC_USE_DLL)
 #define FLINT_DLL __declspec(dllimport)
 #else
 #define FLINT_DLL

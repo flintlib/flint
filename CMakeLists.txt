@@ -285,9 +285,6 @@ if(BUILD_TESTING)
             target_link_libraries(${test_name}
                 flint test_helpers
             )
-            if(BUILD_SHARED_LIBS AND WIN32)
-                target_compile_definitions(${test_name} PRIVATE "FLINT_USE_DLL")
-            endif()
 
             add_test(
                 NAME ${test_name}
