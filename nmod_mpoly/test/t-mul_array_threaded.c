@@ -25,7 +25,7 @@ main(void)
     fflush(stdout);
 
     /* Check mul_array_threaded matches mul_johnson */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
@@ -86,7 +86,7 @@ main(void)
     }
 
     /* Check aliasing first argument */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
@@ -142,7 +142,7 @@ main(void)
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;

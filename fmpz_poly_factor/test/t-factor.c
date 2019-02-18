@@ -89,7 +89,7 @@ main(void)
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/H2_flint", "H2");
 #endif
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         fmpz_t c;
         fmpz_poly_t f, g, h, t;
