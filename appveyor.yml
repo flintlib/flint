@@ -47,7 +47,7 @@ install:
   - if [%COMPILER%]==[cl] if [%ARCH%]==[32] call "%VCVARSALL%" x86
   - if [%COMPILER%]==[cl] conda config --add channels conda-forge --force
   - if [%COMPILER%]==[cl] conda install --yes --quiet mpir mpfr pthreads-win32 ninja
-  - if [%COMPILER%]==[cl] set "CFLAGS=/wd4146 /wd4018 /w4267 /w4244"
+  - if [%COMPILER%]==[cl] set "CFLAGS=/wd4146 /wd4018 /wd4267 /wd4244"
   - echo int flint_test_multiplier(){return 1;} > test_helpers.c
   - cat test_helpers.c
 
