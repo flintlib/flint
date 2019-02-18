@@ -27,6 +27,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t p, f, g, h, h2;
         const char * vars[] = {"x","y","z","t","u"};
+        int aff[] = {0, 1, 2};
 
         fmpz_mpoly_ctx_init(ctx, 5, ORD_DEGLEX);
         fmpz_mpoly_init(f, ctx);
@@ -41,7 +42,9 @@ main(void)
         result = fmpz_mpoly_divides_monagan_pearce(h, p, f, ctx);
         fmpz_mpoly_assert_canonical(h, ctx);
         flint_set_num_threads(2);
+        flint_set_thread_affinity(aff, 2);
         result2 = fmpz_mpoly_divides_heap_threaded(h2, p, f, ctx);
+        flint_restore_thread_affinity();
         fmpz_mpoly_assert_canonical(h2, ctx);
 
         if (!result || !result2

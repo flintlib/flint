@@ -575,7 +575,6 @@ slong _nmod_mpoly_mulsub_stripe1(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A
     }
 
     FLINT_ASSERT(Di <= Dlen);
-
     _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Dlen - Di, 1);
     flint_mpn_copyi(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
     mpoly_copy_monomials(Aexp + 1*Alen, Dexp + 1*Di, Dlen - Di, 1);

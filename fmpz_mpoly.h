@@ -876,6 +876,7 @@ typedef struct _fmpz_mpoly_stripe_struct
     slong * endidx;
     ulong * emin;
     ulong * emax;
+    mp_bitcnt_t coeff_bits;
     int upperclosed;
     int flint_small;
 } fmpz_mpoly_stripe_struct;

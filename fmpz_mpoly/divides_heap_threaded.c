@@ -70,6 +70,8 @@ void fmpz_mpoly_ts_print(const fmpz_mpoly_ts_t B, const char ** x,
     A->exps = B->exps;
     A->bits = B->bits;
     fmpz_mpoly_print_pretty(A, x, ctx);
+
+    fmpz_mpoly_assert_canonical(A, ctx);
 }
 
 void fmpz_mpoly_ts_clear(fmpz_mpoly_ts_t A)
@@ -221,6 +223,7 @@ typedef struct
     slong length;
     slong N;
     mp_bitcnt_t bits;
+    slong polyBcoeff_bits;
     ulong * cmpmask;
     int failed;
 } divides_heap_base_struct;
@@ -315,13 +318,17 @@ static void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chun
 
 
 /*
-    A = a stripe of B * C 
+    A = D - (a stripe of B * C)
     S->startidx and S->endidx are assumed to be correct
         that is, we expect and successive calls to keep
             B decreasing
             C the same
+
+    saveD: 0 means we can modify coeffs of input D
+           1 means we must not modify coeffs of input D
 */
-slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
+slong _fmpz_mpoly_mulsub_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
+                         const fmpz * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
                          const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
                          const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
                                                    const fmpz_mpoly_stripe_t S)
@@ -339,6 +346,7 @@ slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
+    slong Di;
     slong Alen;
     slong Aalloc = *A_alloc;
     fmpz * Acoeff = *A_coeff;
@@ -432,13 +440,28 @@ slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
 
     /* whether input coeffs are small, thus output coeffs fit in three words */
     FLINT_ASSERT(ends[0] >= startidx);
-    small = _fmpz_mpoly_fits_small(Bcoeff, Blen)
-         && _fmpz_mpoly_fits_small(Ccoeff + startidx, ends[0] - startidx);
+    FLINT_ASSERT(S->coeff_bits == FLINT_ABS(_fmpz_vec_max_bits(Ccoeff, Clen)));
+    small = S->coeff_bits <= FLINT_BITS - 2
+            && _fmpz_mpoly_fits_small(Bcoeff, Blen)
+            && FLINT_ABS(_fmpz_vec_max_bits(Dcoeff, Dlen)) < 3*FLINT_BITS - 3;
 
     Alen = 0;
+    Di = 0;
     while (heap_len > 1)
     {
         exp = heap[1].exp;
+
+        while (Di < Dlen && mpoly_monomial_gt1(Dexp[Di], exp, maskhi))
+        {
+            _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, 1);
+            Aexp[Alen] = Dexp[Di];
+            if (saveD)
+                fmpz_set(Acoeff + Alen, Dcoeff + Di);
+            else
+                fmpz_swap(Acoeff + Alen, (fmpz *)(Dcoeff + Di));
+            Alen++;
+            Di++;
+        }
 
         _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, 1);
 
@@ -447,6 +470,12 @@ slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
         if (small)
         {
             acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
+            if (Di < Dlen && Dexp[Di] == exp)
+            {
+                _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, Dcoeff + Di);
+                Di++;
+            }
+
             do
             {
                 x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
@@ -459,7 +488,7 @@ slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                 FLINT_ASSERT(!COEFF_IS_MPZ(Bcoeff[x->i]));
                 FLINT_ASSERT(!COEFF_IS_MPZ(Ccoeff[x->j]));
                 smul_ppmm(pp1, pp0, Bcoeff[x->i], Ccoeff[x->j]);
-                add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                sub_dddmmmsss(acc_sm[2], acc_sm[1], acc_sm[0],
                               acc_sm[2], acc_sm[1], acc_sm[0],
                               FLINT_SIGN_EXT(pp1), pp1, pp0);
 
@@ -473,7 +502,7 @@ slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                     FLINT_ASSERT(!COEFF_IS_MPZ(Bcoeff[x->i]));
                     FLINT_ASSERT(!COEFF_IS_MPZ(Ccoeff[x->j]));
                     smul_ppmm(pp1, pp0, Bcoeff[x->i], Ccoeff[x->j]);
-                    add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                    sub_dddmmmsss(acc_sm[2], acc_sm[1], acc_sm[0],
                                   acc_sm[2], acc_sm[1], acc_sm[0],
                                   FLINT_SIGN_EXT(pp1), pp1, pp0);
                 }
@@ -484,7 +513,16 @@ slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
         }
         else
         {
-            fmpz_zero(Acoeff + Alen);
+            if (Di < Dlen && Dexp[Di] == exp)
+            {
+                fmpz_set(Acoeff + Alen, Dcoeff + Di);
+                Di++;
+            }
+            else
+            {
+                fmpz_zero(Acoeff + Alen);
+            }
+
             do
             {
                 x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
@@ -492,14 +530,14 @@ slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                 hind[x->i] |= WORD(1);
                 *store++ = x->i;
                 *store++ = x->j;
-                fmpz_addmul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
+                fmpz_submul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
 
                 while ((x = x->next) != NULL)
                 {
                     hind[x->i] |= WORD(1);
                     *store++ = x->i;
                     *store++ = x->j;
-                    fmpz_addmul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
+                    fmpz_submul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
                 }
             } while (heap_len > 1 && heap[1].exp == exp);
         }
@@ -548,6 +586,15 @@ slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
         }
     }
 
+    FLINT_ASSERT(Di <= Dlen);
+    _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Dlen - Di, 1);
+    if (saveD)
+        _fmpz_vec_set(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
+    else
+        _fmpz_vec_swap(Acoeff + Alen, (fmpz *)(Dcoeff + Di), Dlen - Di);
+    mpoly_copy_monomials(Aexp + 1*Alen, Dexp + 1*Di, Dlen - Di, 1);
+    Alen += Dlen - Di;
+
     *A_coeff = Acoeff;
     *A_exp = Aexp;
     *A_alloc = Aalloc;
@@ -556,7 +603,8 @@ slong _fmpz_mpoly_mul_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
 }
 
 
-slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
+slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
+                         const fmpz * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
                          const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
                          const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
                                                    const fmpz_mpoly_stripe_t S)
@@ -574,6 +622,7 @@ slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
+    slong Di;
     slong Alen;
     slong Aalloc = *A_alloc;
     fmpz * Acoeff = *A_coeff;
@@ -679,13 +728,28 @@ slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
 
     /* whether input coeffs are small, thus output coeffs fit in three words */
     FLINT_ASSERT(ends[0] >= startidx);
-    small = _fmpz_mpoly_fits_small(Bcoeff, Blen)
-         && _fmpz_mpoly_fits_small(Ccoeff + startidx, ends[0] - startidx);
+    FLINT_ASSERT(S->coeff_bits == FLINT_ABS(_fmpz_vec_max_bits(Ccoeff, Clen)));
+    small = S->coeff_bits <= FLINT_BITS - 2
+            && _fmpz_mpoly_fits_small(Bcoeff, Blen)
+            && FLINT_ABS(_fmpz_vec_max_bits(Dcoeff, Dlen)) < 3*FLINT_BITS - 3;
 
     Alen = 0;
+    Di = 0;
     while (heap_len > 1)
     {
         exp = heap[1].exp;
+
+        while (Di < Dlen && mpoly_monomial_gt(exp, Dexp + N*Di, N, S->cmpmask))
+        {
+            _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
+            mpoly_monomial_set(Aexp + N*Alen, Dexp + N*Di, N);
+            if (saveD)
+                fmpz_set(Acoeff + Alen, Dcoeff + Di);
+            else
+                fmpz_swap(Acoeff + Alen, (fmpz *)(Dcoeff + Di));
+            Alen++;
+            Di++;
+        }
 
         _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
 
@@ -694,6 +758,12 @@ slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
         if (small)
         {
             acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
+            if (Di < Dlen && mpoly_monomial_equal(Dexp + N*Di, exp, N))
+            {
+                _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, Dcoeff + Di);
+                Di++;
+            }
+
             do
             {
                 exp_list[--exp_next] = heap[1].exp;
@@ -707,7 +777,7 @@ slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                 FLINT_ASSERT(!COEFF_IS_MPZ(Bcoeff[x->i]));
                 FLINT_ASSERT(!COEFF_IS_MPZ(Ccoeff[x->j]));
                 smul_ppmm(pp1, pp0, Bcoeff[x->i], Ccoeff[x->j]);
-                add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                sub_dddmmmsss(acc_sm[2], acc_sm[1], acc_sm[0],
                               acc_sm[2], acc_sm[1], acc_sm[0],
                               FLINT_SIGN_EXT(pp1), pp1, pp0);
 
@@ -721,7 +791,7 @@ slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                     FLINT_ASSERT(!COEFF_IS_MPZ(Bcoeff[x->i]));
                     FLINT_ASSERT(!COEFF_IS_MPZ(Ccoeff[x->j]));
                     smul_ppmm(pp1, pp0, Bcoeff[x->i], Ccoeff[x->j]);
-                    add_sssaaaaaa(acc_sm[2], acc_sm[1], acc_sm[0],
+                    sub_dddmmmsss(acc_sm[2], acc_sm[1], acc_sm[0],
                                   acc_sm[2], acc_sm[1], acc_sm[0],
                                   FLINT_SIGN_EXT(pp1), pp1, pp0);
                 }
@@ -732,7 +802,16 @@ slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
         }
         else
         {
-            fmpz_zero(Acoeff + Alen);
+            if (Di < Dlen && mpoly_monomial_equal(Dexp + N*Di, exp, N))
+            {
+                fmpz_set(Acoeff + Alen, Dcoeff + Di);
+                Di++;
+            }
+            else
+            {
+                fmpz_zero(Acoeff + Alen);
+            }
+
             do
             {
                 exp_list[--exp_next] = heap[1].exp;
@@ -743,7 +822,7 @@ slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                 *store++ = x->j;
                 FLINT_ASSERT(startidx <= x->j);
                 FLINT_ASSERT(x->j < ends[0]);
-                fmpz_addmul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
+                fmpz_submul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
 
                 while ((x = x->next) != NULL)
                 {
@@ -752,7 +831,7 @@ slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                     *store++ = x->j;
                     FLINT_ASSERT(startidx <= x->j);
                     FLINT_ASSERT(x->j < ends[0]);
-                    fmpz_addmul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
+                    fmpz_submul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
                 }
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
         }
@@ -809,6 +888,15 @@ slong _fmpz_mpoly_mul_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
         }
     }
 
+    FLINT_ASSERT(Di <= Dlen);
+    _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Dlen - Di, N);
+    if (saveD)
+        _fmpz_vec_set(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
+    else
+        _fmpz_vec_swap(Acoeff + Alen, (fmpz *)(Dcoeff + Di), Dlen - Di);
+    mpoly_copy_monomials(Aexp + N*Alen, Dexp + N*Di, Dlen - Di, N);
+    Alen += Dlen - Di;
+
     *A_coeff = Acoeff;
     *A_exp = Aexp;
     *A_alloc = Aalloc;
@@ -856,11 +944,12 @@ slong _fmpz_mpoly_divides_stripe1(
 
     Acoeffbits = _fmpz_vec_max_bits(Acoeff, Alen);
     Bcoeffbits = _fmpz_vec_max_bits(Bcoeff, Blen);
+    FLINT_ASSERT(S->coeff_bits == FLINT_ABS(Bcoeffbits));
 
     /* whether intermediate computations A - Q*B will fit in three words */
     /* allow one bit for sign, one bit for subtraction NOT QUITE */
-    small = FLINT_ABS(Bcoeffbits) <= FLINT_BITS - 2
-         && FLINT_ABS(Acoeffbits) <= (FLINT_ABS(Bcoeffbits)
+    small = S->coeff_bits <= FLINT_BITS - 2
+         && FLINT_ABS(Acoeffbits) <= (S->coeff_bits
                                      + FLINT_BIT_COUNT(Blen) + FLINT_BITS - 2);
 
     next_loc = Blen + 4;   /* something bigger than heap can ever be */
@@ -1000,7 +1089,8 @@ slong _fmpz_mpoly_divides_stripe1(
                     _mpoly_heap_insert1(heap, Aexp[x->j], x,
                                                 &next_loc, &heap_len, cmpmask);
                 }
-            } else
+            }
+            else
             {
                 /* should we go up */
                 if (  (i + 1 < Blen)
@@ -1191,11 +1281,12 @@ slong _fmpz_mpoly_divides_stripe(
 
     Acoeffbits = _fmpz_vec_max_bits(Acoeff, Alen);
     Bcoeffbits = _fmpz_vec_max_bits(Bcoeff, Blen);
+    FLINT_ASSERT(S->coeff_bits == FLINT_ABS(Bcoeffbits));
 
     /* whether intermediate computations A - Q*B will fit in three words */
     /* allow one bit for sign, one bit for subtraction NOT QUITE */
-    small = FLINT_ABS(Bcoeffbits) <= FLINT_BITS - 2
-         && FLINT_ABS(Acoeffbits) <= (FLINT_ABS(Bcoeffbits)
+    small = S->coeff_bits <= FLINT_BITS - 2
+         && FLINT_ABS(Acoeffbits) <= (S->coeff_bits
                                      + FLINT_BIT_COUNT(Blen) + FLINT_BITS - 2);
 
     FLINT_ASSERT(Alen > 0);
@@ -1628,7 +1719,6 @@ static void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_le
     const fmpz_mpoly_struct * A = H->polyA;
     fmpz_mpoly_ts_struct * Q = H->polyQ;
     fmpz_mpoly_struct * T1 = W->polyT1;
-    fmpz_mpoly_struct * T2 = W->polyT2;
     fmpz_mpoly_stripe_struct * S = W->S;
 
     S->startidx = &L->startidx;
@@ -1638,52 +1728,61 @@ static void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_le
     S->upperclosed = L->upperclosed;
     FLINT_ASSERT(S->N == N);
     stripe_fit_length(S, q_prev_length - L->mq);
-    if (N == 1)
-    {
-        T1->length = _fmpz_mpoly_mul_stripe1(&T1->coeffs, &T1->exps, &T1->alloc,
-                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
-                    B->coeffs, B->exps, B->length, S);
-    }
-    else
-    {
-        T1->length = _fmpz_mpoly_mul_stripe(&T1->coeffs, &T1->exps, &T1->alloc,
-                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
-                    B->coeffs, B->exps, B->length, S);
-    }
 
-    if (T1->length > 0)
+    if (L->Cinited)
     {
-        if (L->Cinited)
+        if (N == 1)
         {
-            fmpz_mpoly_fit_length(T2, C->length + T1->length, H->ctx);
-            T2->length = _fmpz_mpoly_sub(T2->coeffs, T2->exps,
-                                C->coeffs, C->exps, C->length,
-                                T1->coeffs, T1->exps, T1->length,
-                                                       N, H->cmpmask);
-            fmpz_mpoly_swap(C, T2, H->ctx);
+            T1->length = _fmpz_mpoly_mulsub_stripe1(
+                    &T1->coeffs, &T1->exps, &T1->alloc,
+                    C->coeffs, C->exps, C->length, 1,
+                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
+                    B->coeffs, B->exps, B->length, S);
         }
         else
         {
-            slong startidx, stopidx;
-            if (L->upperclosed)
-            {
-                startidx = 0;
-                stopidx = chunk_find_exp(L->emin, 1, H);
-            }
-            else
-            {
-                startidx = chunk_find_exp(L->emax, 1, H);
-                stopidx = chunk_find_exp(L->emin, startidx, H);
-            }
+            T1->length = _fmpz_mpoly_mulsub_stripe(
+                    &T1->coeffs, &T1->exps, &T1->alloc,
+                    C->coeffs, C->exps, C->length, 1,
+                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
+                    B->coeffs, B->exps, B->length, S);
+        }
+        fmpz_mpoly_swap(C, T1, H->ctx);
+    }
+    else
+    {
+        slong startidx, stopidx;
+        if (L->upperclosed)
+        {
+            startidx = 0;
+            stopidx = chunk_find_exp(L->emin, 1, H);
+        }
+        else
+        {
+            startidx = chunk_find_exp(L->emax, 1, H);
+            stopidx = chunk_find_exp(L->emin, startidx, H);
+        }
 
-            L->Cinited = 1;
-            fmpz_mpoly_init2(C, T1->length + stopidx - startidx, H->ctx);
-            fmpz_mpoly_fit_bits(C, H->bits, H->ctx);
-            C->bits = H->bits;
-            C->length = _fmpz_mpoly_sub(C->coeffs, C->exps, 
-                        A->coeffs + startidx, A->exps + N*startidx, stopidx - startidx,
-                        T1->coeffs, T1->exps, T1->length,
-                                        N, H->cmpmask);
+        L->Cinited = 1;
+        fmpz_mpoly_init2(C, 16 + stopidx - startidx, H->ctx); /*any is OK*/
+        fmpz_mpoly_fit_bits(C, H->bits, H->ctx);
+        C->bits = H->bits;
+
+        if (N == 1)
+        {
+            C->length = _fmpz_mpoly_mulsub_stripe1(
+                    &C->coeffs, &C->exps, &C->alloc,
+                    A->coeffs + startidx, A->exps + N*startidx, stopidx - startidx, 1,
+                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
+                    B->coeffs, B->exps, B->length, S);
+        }
+        else
+        {
+            C->length = _fmpz_mpoly_mulsub_stripe(
+                    &C->coeffs, &C->exps, &C->alloc,
+                    A->coeffs + startidx, A->exps + N*startidx, stopidx - startidx, 1,
+                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
+                    B->coeffs, B->exps, B->length, S);
         }
     }
 
@@ -1828,6 +1927,7 @@ static void worker_loop(void * varg)
     /* initialize stripe working memory */
     S->N = N;
     S->bits = H->bits;
+    S->coeff_bits = FLINT_ABS(H->polyBcoeff_bits);
     S->cmpmask = H->cmpmask;
     S->big_mem_alloc = 0;
     S->big_mem = NULL;
@@ -2001,6 +2101,8 @@ int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
     H->polyB->bits = exp_bits;
     H->polyB->length = B->length;
     H->polyB->alloc = B->alloc;
+
+    H->polyBcoeff_bits = _fmpz_vec_max_bits(B->coeffs, B->length);
 
     H->ctx = ctx;
     H->bits = exp_bits;
