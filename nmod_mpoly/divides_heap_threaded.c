@@ -364,13 +364,14 @@ static void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chun
 
 
 /*
-    A = a stripe of B * C 
+    A = D - (a stripe of B * C)
     S->startidx and S->endidx are assumed to be correct
         that is, we expect and successive calls to keep
             B decreasing
             C the same
 */
-slong _nmod_mpoly_mul_stripe1(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_alloc,
+slong _nmod_mpoly_mulsub_stripe1(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_alloc,
+                 const mp_limb_t * Dcoeff, const ulong * Dexp, slong Dlen,
                  const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
                  const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
                                                    const nmod_mpoly_stripe_t S)
@@ -388,6 +389,7 @@ slong _nmod_mpoly_mul_stripe1(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_al
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
+    slong Di;
     slong Alen;
     slong Aalloc = *A_alloc;
     mp_limb_t * Acoeff = *A_coeff;
@@ -478,15 +480,31 @@ slong _nmod_mpoly_mul_stripe1(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_al
     *S->endidx = endidx;
 
     Alen = 0;
+    Di = 0;
     while (heap_len > 1)
     {
         exp = heap[1].exp;
+
+        while (Di < Dlen && mpoly_monomial_gt1(Dexp[Di], exp, maskhi))
+        {
+            _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, 1);
+            Acoeff[Alen] = Dcoeff[Di];
+            Aexp[Alen] = Dexp[Di];
+            Alen++;
+            Di++;
+        }
 
         _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, 1);
 
         Aexp[Alen] = exp;
 
         acc0 = acc1 = acc2 = 0;
+        if (Di < Dlen && Dexp[Di] == exp)
+        {
+            acc0 = S->mod.n - Dcoeff[Di];
+            Di++;
+        }
+
         do
         {
             x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
@@ -508,7 +526,11 @@ slong _nmod_mpoly_mul_stripe1(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_al
         } while (heap_len > 1 && heap[1].exp == exp);
 
         NMOD_RED3(Acoeff[Alen], acc2, acc1, acc0, S->mod);
-        Alen += (Acoeff[Alen] != 0);
+        if (Acoeff[Alen] != 0)
+        {
+            Acoeff[Alen] = S->mod.n - Acoeff[Alen];
+            Alen++;
+        }
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -552,6 +574,13 @@ slong _nmod_mpoly_mul_stripe1(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_al
         }
     }
 
+    FLINT_ASSERT(Di <= Dlen);
+
+    _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Dlen - Di, 1);
+    flint_mpn_copyi(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
+    mpoly_copy_monomials(Aexp + 1*Alen, Dexp + 1*Di, Dlen - Di, 1);
+    Alen += Dlen - Di;
+
     *A_coeff = Acoeff;
     *A_exp = Aexp;
     *A_alloc = Aalloc;
@@ -560,7 +589,8 @@ slong _nmod_mpoly_mul_stripe1(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_al
 }
 
 
-slong _nmod_mpoly_mul_stripe(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_alloc,
+slong _nmod_mpoly_mulsub_stripe(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_alloc,
+                 const mp_limb_t * Dcoeff, const ulong * Dexp, slong Dlen,
                  const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
                  const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
                                                    const nmod_mpoly_stripe_t S)
@@ -578,6 +608,7 @@ slong _nmod_mpoly_mul_stripe(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_all
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
+    slong Di;
     slong Alen;
     slong Aalloc = *A_alloc;
     mp_limb_t * Acoeff = *A_coeff;
@@ -680,15 +711,31 @@ slong _nmod_mpoly_mul_stripe(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_all
     *S->endidx = endidx;
 
     Alen = 0;
+    Di = 0;
     while (heap_len > 1)
     {
         exp = heap[1].exp;
+
+        while (Di < Dlen && mpoly_monomial_gt(exp, Dexp + N*Di, N, S->cmpmask))
+        {
+            _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
+            mpoly_monomial_set(Aexp + N*Alen, Dexp + N*Di, N);
+            Acoeff[Alen] = Dcoeff[Di];
+            Alen++;
+            Di++;
+        }
 
         _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
 
         mpoly_monomial_set(Aexp + N*Alen, exp, N);
 
         acc0 = acc1 = acc2 = 0;
+        if (Di < Dlen && mpoly_monomial_equal(Dexp + N*Di, exp, N))
+        {
+            acc0 = S->mod.n - Dcoeff[Di];
+            Di++;
+        }
+
         do
         {
             exp_list[--exp_next] = heap[1].exp;
@@ -712,7 +759,11 @@ slong _nmod_mpoly_mul_stripe(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_all
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
 
         NMOD_RED3(Acoeff[Alen], acc2, acc1, acc0, S->mod);
-        Alen += (Acoeff[Alen] != 0);
+        if (Acoeff[Alen] != 0)
+        {
+            Acoeff[Alen] = S->mod.n - Acoeff[Alen];
+            Alen++;
+        }
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -763,6 +814,11 @@ slong _nmod_mpoly_mul_stripe(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_all
             }
         }
     }
+
+    _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Dlen - Di, N);
+    flint_mpn_copyi(Acoeff + Alen, Dcoeff + Di, Dlen - Di);
+    mpoly_copy_monomials(Aexp + N*Alen, Dexp + N*Di, Dlen - Di, N);
+    Alen += Dlen - Di;
 
     *A_coeff = Acoeff;
     *A_exp = Aexp;
@@ -1358,7 +1414,6 @@ static void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_le
     const nmod_mpoly_struct * A = H->polyA;
     nmod_mpoly_ts_struct * Q = H->polyQ;
     nmod_mpoly_struct * T1 = W->polyT1;
-    nmod_mpoly_struct * T2 = W->polyT2;
     nmod_mpoly_stripe_struct * S = W->S;
 
     S->startidx = &L->startidx;
@@ -1368,52 +1423,61 @@ static void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_le
     S->upperclosed = L->upperclosed;
     FLINT_ASSERT(S->N == N);
     stripe_fit_length(S, q_prev_length - L->mq);
-    if (N == 1)
-    {
-        T1->length = _nmod_mpoly_mul_stripe1(&T1->coeffs, &T1->exps, &T1->alloc,
-                Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
-                B->coeffs, B->exps, B->length,  S);
-    }
-    else
-    {
-        T1->length = _nmod_mpoly_mul_stripe(&T1->coeffs, &T1->exps, &T1->alloc,
-                Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
-                B->coeffs, B->exps, B->length,  S);
-    }
 
-    if (T1->length > 0)
+    if (L->Cinited)
     {
-        if (L->Cinited)
+        if (N == 1)
         {
-            nmod_mpoly_fit_length(T2, C->length + T1->length, H->ctx);
-            T2->length = _nmod_mpoly_sub(T2->coeffs, T2->exps, 
-                            C->coeffs, C->exps, C->length,
-                            T1->coeffs, T1->exps, T1->length,
-                                        N, H->cmpmask, H->ctx->ffinfo);
-            nmod_mpoly_swap(C, T2, H->ctx);
+            T1->length = _nmod_mpoly_mulsub_stripe1(
+                    &T1->coeffs, &T1->exps, &T1->alloc,
+                    C->coeffs, C->exps, C->length,
+                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
+                    B->coeffs, B->exps, B->length, S);
         }
         else
         {
-            slong startidx, stopidx;
-            if (L->upperclosed)
-            {
-                startidx = 0;
-                stopidx = chunk_find_exp(L->emin, 1, H);
-            }
-            else
-            {
-                startidx = chunk_find_exp(L->emax, 1, H);
-                stopidx = chunk_find_exp(L->emin, startidx, H);
-            }
+            T1->length = _nmod_mpoly_mulsub_stripe(
+                    &T1->coeffs, &T1->exps, &T1->alloc,
+                    C->coeffs, C->exps, C->length,
+                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
+                    B->coeffs, B->exps, B->length, S);
+        }
+        nmod_mpoly_swap(C, T1, H->ctx);
+    }
+    else
+    {
+        slong startidx, stopidx;
+        if (L->upperclosed)
+        {
+            startidx = 0;
+            stopidx = chunk_find_exp(L->emin, 1, H);
+        }
+        else
+        {
+            startidx = chunk_find_exp(L->emax, 1, H);
+            stopidx = chunk_find_exp(L->emin, startidx, H);
+        }
 
-            L->Cinited = 1;
-            nmod_mpoly_init2(C, T1->length + stopidx - startidx, H->ctx);
-            nmod_mpoly_fit_bits(C, H->bits, H->ctx);
-            C->bits = H->bits;
-            C->length = _nmod_mpoly_sub(C->coeffs, C->exps, 
-                        A->coeffs + startidx, A->exps + N*startidx, stopidx - startidx,
-                        T1->coeffs, T1->exps, T1->length,
-                                        N, H->cmpmask, H->ctx->ffinfo);
+        L->Cinited = 1;
+        nmod_mpoly_init2(C, 16 + stopidx - startidx, H->ctx); /*any is OK*/
+        nmod_mpoly_fit_bits(C, H->bits, H->ctx);
+        C->bits = H->bits;
+
+        if (N == 1)
+        {
+            C->length = _nmod_mpoly_mulsub_stripe1(
+                    &C->coeffs, &C->exps, &C->alloc,
+                    A->coeffs + startidx, A->exps + N*startidx, stopidx - startidx,
+                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
+                    B->coeffs, B->exps, B->length, S);
+        }
+        else
+        {
+            C->length = _nmod_mpoly_mulsub_stripe(
+                    &C->coeffs, &C->exps, &C->alloc,
+                    A->coeffs + startidx, A->exps + N*startidx, stopidx - startidx,
+                    Q->coeffs + L->mq, Q->exps + N*L->mq, q_prev_length - L->mq,
+                    B->coeffs, B->exps, B->length, S);
         }
     }
 
