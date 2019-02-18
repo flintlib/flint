@@ -210,7 +210,7 @@ list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
 target_link_libraries(flint PUBLIC
-    ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES} ${NTL_LIBRARY}
+    ${NTL_LIBRARY} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
 )
 
 # Include directories
