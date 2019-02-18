@@ -22,14 +22,14 @@ environment:
     CONDA_INSTALL_LOCN_64: "C:\\Miniconda36-x64"
     VCVARSALL: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat"
   matrix:
-    - COMPILER: gcc
-      ARCH: 32
-    - COMPILER: gcc
-      ARCH: 64
-    - COMPILER: cl
-      ARCH: 32
     - COMPILER: cl
       ARCH: 64
+    - COMPILER: gcc
+      ARCH: 64
+    - COMPILER: gcc
+      ARCH: 32
+    - COMPILER: cl
+      ARCH: 32
 
 install:
   - if [%COMPILER%]==[gcc] set "PATH=C:\msys64\mingw%ARCH%\bin;%PATH%"
@@ -50,6 +50,7 @@ install:
   - if [%COMPILER%]==[cl] set "CFLAGS=/wd4146 /wd4018"
   - echo ^#include ^"flint.h^" > test_helpers.c
   - echo FLINT_DLL int flint_test_multiplier(){return 1;} >> test_helpers.c
+  - cat test_helpers.c
 
 before_build:
   - ps: if (-Not (Test-Path .\build)) { mkdir build }
