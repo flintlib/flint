@@ -4,11 +4,17 @@ include(CheckIPOSupported)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckPrototypeDefinition)
+include(CheckCCompilerFlag)
 include(TestBigEndian)
 
 project(flint LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+   set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build" FORCE)
+   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
 
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build with NTL or not" off)
@@ -143,6 +149,9 @@ check_function_exists(getpagesize HAVE_GETPAGESIZE)
 check_function_exists(getrusage HAVE_GETRUSAGE)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 
+check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
+check_c_compiler_flag("-funroll-loops" HAS_FLAG_UNROLL_LOOPS)
+
 set(HAVE_TLS ON CACHE BOOL "Use thread local storage.")
 
 set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
@@ -200,8 +209,8 @@ file(GLOB TEMP "${CMAKE_SOURCE_DIR}/*.h")
 list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
-target_link_libraries(flint
-    ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES} ${NTL_LIBRARY}
+target_link_libraries(flint PUBLIC
+    ${NTL_LIBRARY} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
 )
 
 # Include directories
@@ -217,6 +226,12 @@ if(BUILD_SHARED_LIBS AND MSVC)
     target_compile_definitions(flint PRIVATE "MSC_BUILD_DLL")
 endif()
 
+if (HAS_FLAG_MPOPCNT)
+    target_compile_options(flint PUBLIC "-mpopcnt")
+endif()
+if (HAS_FLAG_UNROLL_LOOPS)
+    target_compile_options(flint PUBLIC "-funroll-loops")
+endif()
 
 if(NOT DEFINED IPO_SUPPORTED)
     message(STATUS "Checking for IPO")
@@ -234,7 +249,7 @@ if(IPO_SUPPORTED)
 endif()
 
 if(NOT MSVC)
-    target_link_libraries(flint m)
+    target_link_libraries(flint PRIVATE m)
 endif()
 
 install(TARGETS flint
