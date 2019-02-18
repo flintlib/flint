@@ -576,7 +576,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
         }
 
         if (!lt_divides ||
-                mpoly_monomial_gt(exp, exp2 + (len2 - 1)*N, N, cmpmask))
+                mpoly_monomial_gt(exp2 + (len2 - 1)*N, exp, N, cmpmask))
             goto not_exact_division;
 
         if (s > 1)

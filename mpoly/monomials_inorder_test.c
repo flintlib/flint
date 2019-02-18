@@ -23,7 +23,7 @@ int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, const mpol
 
     for (i = 0; i + 1 < len; i++)
     {
-        if (!mpoly_monomial_gt(exps + (i + 1)*N, exps + i*N, N, cmpmask))
+        if (!mpoly_monomial_gt(exps + i*N, exps + (i + 1)*N, N, cmpmask))
         {
             flint_free(cmpmask);
             return 0;

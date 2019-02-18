@@ -715,7 +715,7 @@ slong _nmod_mpoly_mulsub_stripe(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_
     {
         exp = heap[1].exp;
 
-        while (Di < Dlen && mpoly_monomial_gt(exp, Dexp + N*Di, N, S->cmpmask))
+        while (Di < Dlen && mpoly_monomial_gt(Dexp + N*Di, exp, N, S->cmpmask))
         {
             _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
             mpoly_monomial_set(Aexp + N*Alen, Dexp + N*Di, N);
@@ -1862,7 +1862,7 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
         mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
 
     k = 1;
-    while (k < A->length && mpoly_monomial_gt(texps, Aexp + N*k, N, cmpmask))
+    while (k < A->length && mpoly_monomial_gt(Aexp + N*k, texps, N, cmpmask))
     {
         int lt_divides;
         if (exp_bits <= FLINT_BITS)

@@ -711,7 +711,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
     /* check leading mon. of at least one divisor is at most that of dividend */
     for (i = 0; i < len; i++)
     {
-        if (!mpoly_monomial_lt(exp3[i], exp2, N, cmpmask))
+        if (!mpoly_monomial_lt(exp2, exp3[i], N, cmpmask))
             break;
     }
 
