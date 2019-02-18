@@ -209,7 +209,7 @@ file(GLOB TEMP "${CMAKE_SOURCE_DIR}/*.h")
 list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
-target_link_libraries(flint
+target_link_libraries(flint PUBLIC
     ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES} ${NTL_LIBRARY}
 )
 
@@ -249,7 +249,7 @@ if(IPO_SUPPORTED)
 endif()
 
 if(NOT MSVC)
-    target_link_libraries(flint m)
+    target_link_libraries(flint PRIVATE m)
 endif()
 
 install(TARGETS flint
