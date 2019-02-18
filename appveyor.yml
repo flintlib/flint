@@ -47,7 +47,9 @@ install:
   - if [%COMPILER%]==[cl] if [%ARCH%]==[32] call "%VCVARSALL%" x86
   - if [%COMPILER%]==[cl] conda config --add channels conda-forge --force
   - if [%COMPILER%]==[cl] conda install --yes --quiet mpir mpfr pthreads-win32 ninja
-  - echo int flint_test_multiplier(){return 1;} > test_helpers.c
+  - if [%COMPILER%]==[cl] set "CFLAGS=/wd4146 /wd4018"
+  - echo #include "flint.h" > test_helpers.c
+  - echo FLINT_DLL int flint_test_multiplier(){return 1;} >> test_helpers.c
 
 before_build:
   - ps: if (-Not (Test-Path .\build)) { mkdir build }
@@ -60,7 +62,7 @@ build_script:
   - cmake --build . -- -j2
 
 test_script:
-  - ctest -j3 --timeout 120
+  - ctest -j3 --timeout 240 --output-on-failure
 
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

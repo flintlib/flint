@@ -222,8 +222,11 @@ target_include_directories(flint PUBLIC
 )
 
 
-if(BUILD_SHARED_LIBS AND MSVC)
-    target_compile_definitions(flint PRIVATE "MSC_BUILD_DLL")
+if(BUILD_SHARED_LIBS AND WIN32)
+    # Export flint's functions
+    target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
+    # Use MPIR's dll import functions
+    target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
 endif()
 
 if (HAS_FLAG_MPOPCNT)
@@ -267,17 +270,13 @@ set_target_properties(flint
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-if(MSVC)
-    set_target_properties(flint
-        PROPERTIES
-        LINK_FLAGS "/EXPORT:__flint_clz_tab /EXPORT:flint_primes_small"
-    )
-endif()
-
 if(BUILD_TESTING)
     enable_testing()
-    add_library(test_helpers STATIC test_helpers.c)
+    add_library(test_helpers test_helpers.c)
     target_link_libraries(test_helpers flint)
+    if(BUILD_SHARED_LIBS AND WIN32)
+        target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
+    endif()
 
     foreach (build_dir IN LISTS BUILD_DIRS CMAKE_SOURCE_DIR)
         file(GLOB TEST_FILES "${build_dir}/test/*.c")
@@ -289,6 +288,9 @@ if(BUILD_TESTING)
             target_link_libraries(${test_name}
                 flint test_helpers
             )
+            if(BUILD_SHARED_LIBS AND WIN32)
+                target_compile_definitions(${test_name} PRIVATE "FLINT_USE_DLL")
+            endif()
 
             add_test(
                 NAME ${test_name}
