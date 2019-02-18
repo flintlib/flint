@@ -249,7 +249,7 @@ if(IPO_SUPPORTED)
 endif()
 
 if(NOT MSVC)
-    target_link_libraries(flint PRIVATE m)
+	target_link_libraries(flint PUBLIC m)
 endif()
 
 install(TARGETS flint
