@@ -39,7 +39,7 @@ fmpz_get_d_2exp(slong *exp, const fmpz_t f)
     }
     else
     {
-#if defined(__MPIR_VERSION)
+#if defined(__MPIR_VERSION) && __MPIR_VERSION <= 2
        return mpz_get_d_2exp(exp, COEFF_TO_PTR(d));
 #else
        long exp2;

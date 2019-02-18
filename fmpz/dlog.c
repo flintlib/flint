@@ -26,7 +26,7 @@ fmpz_dlog(const fmpz_t x)
     {
         double s;
 
-#if defined(__MPIR_VERSION) && __MPIR_VERSION==3
+#if defined(__MPIR_VERSION) && __MPIR_VERSION<=2
         slong e;
 #else
         long e;
