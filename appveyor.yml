@@ -62,7 +62,7 @@ build_script:
   - cmake --build . -- -j2
 
 test_script:
-  - ctest -j3 --timeout 240 --output-on-failure
+  - ctest -j3 --output-on-failure
 
 #on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
