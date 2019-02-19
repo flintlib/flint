@@ -28,7 +28,7 @@ main(void)
     /* check QR = A
      * check norm(column(Q)) = 1 or 0
      * check dot product of columns of Q is zero */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         double dot;
         int j, k, l;

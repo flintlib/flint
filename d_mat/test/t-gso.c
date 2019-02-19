@@ -26,7 +26,7 @@ main(void)
 
     /* check norm(column(gso)) = 1 or 0
      * check dot product of columns of gso is zero */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < flint_test_multiplier(); i++)
     {
         double dot;
         int j, k, l;
