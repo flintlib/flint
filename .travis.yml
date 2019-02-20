@@ -30,14 +30,14 @@ install:
   - ${MAKE}
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L libflint.dylib; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-  - ldd libflint.so
-  - echo "Running cmake build"
-  - mkdir build
-  - cd build
-  - cmake -G"Unix Makefiles" -DWITH_NTL=yes -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release ..
-  - ${MAKE}
-  - ldd lib/libflint.so
-  - fi
+       ldd libflint.so;
+       echo "Running cmake build";
+       mkdir build;
+       cd build;
+       cmake -G"Unix Makefiles" -DWITH_NTL=yes -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release ..;
+       ${MAKE};
+       ldd lib/libflint.so;
+    fi
 
 script:
   - ${MAKE} check
@@ -45,6 +45,6 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L local/lib/libflint.dylib; fi
   - PREFIX=$(pwd)/local ./.check_post_install
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-  - echo "Running cmake build testing"
-  - ${MAKE} test
-  - fi
+       echo "Running cmake build testing";
+       ${MAKE} test;
+    fi
