@@ -16,17 +16,17 @@
 int
 main(void)
 {
-    int i, j, result, ret;
+    int i, j, result, ret, max_threads = 5, tmul = 25;
     FLINT_TEST_INIT(state);
 
     flint_printf("divides....");
     fflush(stdout);
 
     /* Check f*g/g = f sparse */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
-        nmod_mpoly_t f, g, h, k;
+        nmod_mpoly_t f, g, h, k, hsave, gsave;
         slong len, len1, len2;
         mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
@@ -41,6 +41,8 @@ main(void)
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(h, ctx);
         nmod_mpoly_init(k, ctx);
+        nmod_mpoly_init(hsave, ctx);
+        nmod_mpoly_init(gsave, ctx);
 
         len = n_randint(state, 100);
         len1 = n_randint(state, 100);
@@ -59,8 +61,12 @@ main(void)
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
             nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
             nmod_mpoly_mul(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
+            nmod_mpoly_set(hsave, h, ctx);
+            nmod_mpoly_set(gsave, g, ctx);
             ret = nmod_mpoly_divides(k, h, g, ctx);
             FLINT_ASSERT(ret == 0 || ret == 1);
             nmod_mpoly_assert_canonical(k, ctx);
@@ -69,7 +75,17 @@ main(void)
             if (!result)
             {
                 printf("FAIL\n");
-                flint_printf("Check f*g/g = f dense\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("Check f*g/g = f sparse\n"
+                                                   "i = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+
+            if (   !nmod_mpoly_equal(h, hsave, ctx)
+                || !nmod_mpoly_equal(g, gsave, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check f*g/g = f sparse input modification\n"
+                                                   "i = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }
@@ -78,11 +94,13 @@ main(void)
         nmod_mpoly_clear(g, ctx);
         nmod_mpoly_clear(h, ctx);
         nmod_mpoly_clear(k, ctx);
+        nmod_mpoly_clear(hsave, ctx);
+        nmod_mpoly_clear(gsave, ctx);
         nmod_mpoly_ctx_clear(ctx);
     }
 
     /* Check f*g/g = f dense */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
@@ -125,6 +143,8 @@ main(void)
             nmod_mpoly_randtest_bounds(h, state, len, exp_bound, ctx);
             nmod_mpoly_randtest_bounds(k, state, len, exp_bound, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
             nmod_mpoly_mul(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
             ret = nmod_mpoly_divides(k, h, g, ctx);
@@ -152,7 +172,7 @@ main(void)
     }
 
     /* Check divisibility of random polys */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
@@ -217,7 +237,8 @@ main(void)
             if (!result)
             {
                 printf("FAIL\n");
-                flint_printf("Check divisibility of random polys\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("Check divisibility of random polys\n"
+                                                   "i = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }
@@ -242,7 +263,7 @@ main(void)
     }
 
     /* Check f*g/g = f aliasing first argument */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
@@ -285,6 +306,8 @@ main(void)
             nmod_mpoly_randtest_bounds(h, state, len, exp_bound, ctx);
             nmod_mpoly_randtest_bounds(k, state, len, exp_bound, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
             nmod_mpoly_set(h, f, ctx);
             nmod_mpoly_mul(h, h, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
@@ -296,7 +319,8 @@ main(void)
             if (!result)
             {
                 printf("FAIL\n");
-                flint_printf("Check f*g/g = f\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("Check f*g/g = f aliasing first\n"
+                                                   "i = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }
@@ -313,7 +337,7 @@ main(void)
     }
 
     /* Check f*g/g = f aliasing second argument */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
@@ -367,7 +391,8 @@ main(void)
             if (!result)
             {
                 printf("FAIL\n");
-                flint_printf("Check f*g/g = f aliasing second argument\ni = %wd, j = %wd\n", i ,j);
+                flint_printf("Check f*g/g = f aliasing second\n"
+                                                   "i = %wd, j = %wd\n", i ,j);
                 flint_abort();
             }
         }

@@ -1710,7 +1710,7 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     mp_bitcnt_t exp_bits;
     ulong * cmpmask;
     ulong * Aexp, * Bexp;
-    int freeAexp = 0, freeBexp = 0;
+    int freeAexp, freeBexp;
     slong max_num_workers, num_workers;
     worker_arg_struct * worker_args;
     thread_pool_handle * handles;
@@ -1727,7 +1727,7 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     return nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
 #endif
 
-    if (B->length < 2 || A->length < 2)
+    if (!global_thread_pool_initialized || B->length < 2 || A->length < 2)
     {
         if (B->length == 0)
         {
@@ -1756,6 +1756,7 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
 
     /* ensure input exponents packed to same size as output exponents */
     Aexp = A->exps;
+    freeAexp = 0;
     if (exp_bits > A->bits)
     {
         freeAexp = 1;
@@ -1765,6 +1766,7 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     }
 
     Bexp = B->exps;
+    freeBexp = 0;
     if (exp_bits > B->bits)
     {
         freeBexp = 1;

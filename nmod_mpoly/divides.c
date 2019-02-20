@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
+#include "thread_pool.h"
 
 int _nmod_mpoly_divides_try_dense(slong * Adegs, slong * Bdegs, slong nvars,
                                                         slong Alen, slong Blen)
@@ -32,9 +33,8 @@ int _nmod_mpoly_divides_try_dense(slong * Adegs, slong * Bdegs, slong nvars,
             && total_dense_size/Alen < WORD(10);
 }
 
-int nmod_mpoly_divides(nmod_mpoly_t Q,
-                        const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
+int nmod_mpoly_divides(nmod_mpoly_t Q, const nmod_mpoly_t A,
+                              const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 {
     int ret;
     slong i, * Adegs, * Bdegs;
@@ -47,11 +47,8 @@ int nmod_mpoly_divides(nmod_mpoly_t Q,
 
     TMP_START;
 
-    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS || A->length < 50)
-    {
-        ret = nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
-
-    } else
+    ret = -1;
+    if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS && A->length > 50)
     {
         Adegs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
         Bdegs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
@@ -59,29 +56,43 @@ int nmod_mpoly_divides(nmod_mpoly_t Q,
         mpoly_degrees_si(Bdegs, B->exps, B->length, B->bits, ctx->minfo);
 
         /* quick degree check */
-        ret = -1;
         for (i = 0; i < ctx->minfo->nvars; i++)
         {
             if (Adegs[i] < Bdegs[i])
             {
+                nmod_mpoly_zero(Q, ctx);
                 ret = 0;
-                break;
+                goto cleanup;
             }
         }
-        if (ret == -1)
-        {
-            if (_nmod_mpoly_divides_try_dense(Adegs, Bdegs, ctx->minfo->nvars,
+        if (_nmod_mpoly_divides_try_dense(Adegs, Bdegs, ctx->minfo->nvars,
                                                          A->length, B->length))
-            {
-                ret = nmod_mpoly_divides_dense(Q, A, B, ctx);
-            }
+        {
+            ret = nmod_mpoly_divides_dense(Q, A, B, ctx);
+        }
+    }
 
-            if (ret == -1)
+    if (ret == -1)
+    {
+        if (!global_thread_pool_initialized)
+        {
+            ret = nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
+        }
+        else
+        {
+            slong max_num_workers = thread_pool_get_size(global_thread_pool);
+            if (A->length > 64*max_num_workers)
+            {
+                ret = nmod_mpoly_divides_heap_threaded(Q, A, B, ctx);
+            }
+            else
             {
                 ret = nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
             }
         }
     }
+
+cleanup:
 
     TMP_END;
     return ret;
