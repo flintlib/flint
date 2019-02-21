@@ -37,6 +37,7 @@ install:
        cmake -G"Unix Makefiles" -DWITH_NTL=yes -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release ..;
        ${MAKE};
        ldd lib/libflint.so;
+       cd ..;
     fi
 
 script:
@@ -45,6 +46,8 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then otool -L local/lib/libflint.dylib; fi
   - PREFIX=$(pwd)/local ./.check_post_install
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+       cd build;
        echo "Running cmake build testing";
        ${MAKE} test;
+       cd ..;
     fi
