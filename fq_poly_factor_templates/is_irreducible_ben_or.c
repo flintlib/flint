@@ -82,6 +82,8 @@ TEMPLATE(T, poly_is_irreducible_ben_or) (const TEMPLATE(T, poly_t) f,
         }
     }
 
+    TEMPLATE(T, poly_clear) (g, ctx);
+    TEMPLATE(T, poly_clear) (x, ctx);
     TEMPLATE(T, poly_clear) (xq, ctx);
     TEMPLATE(T, poly_clear) (xqimx, ctx);
     TEMPLATE(T, poly_clear) (v, ctx);

@@ -71,6 +71,8 @@ main(void)
         _TEMPLATE(T, vec_clear)(x, npoints, ctx);
         _TEMPLATE(T, vec_clear)(y, npoints, ctx);
         _TEMPLATE(T, vec_clear)(z, npoints, ctx);
+
+        TEMPLATE(T, ctx_clear)(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

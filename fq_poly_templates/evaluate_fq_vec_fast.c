@@ -45,6 +45,7 @@ _TEMPLATE4(T, poly_evaluate, T, vec_fast_precomp)
                 TEMPLATE(T, set)(vs + i, poly, ctx);
         
         TEMPLATE(T, clear)(temp, ctx);
+        TEMPLATE(T, clear)(inv, ctx);
         return;
     }
 
