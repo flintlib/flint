@@ -263,6 +263,7 @@ __TEMPLATE(T, poly_factor_berlekamp) (TEMPLATE(T, poly_factor_t) factors,
     TEMPLATE(T, clear) (mul, ctx);
     fmpz_clear(pow);
     fmpz_clear(p);
+    fmpz_clear(q);
     fmpz_clear(s);
 }
 
