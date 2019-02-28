@@ -583,7 +583,8 @@ void _nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A,
                             mp_bitcnt_t bits, slong N, const ulong * cmpmask,
                                                    const nmod_mpoly_ctx_t ctx)
 {
-    slong i, ndivs2;
+    slong i;
+    slong BClen, hi;
     _worker_arg_struct * args;
     _base_t base;
     _div_struct * divs;
@@ -598,7 +599,9 @@ void _nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A,
     FLINT_ASSERT(global_thread_pool_initialized);
     max_num_workers = thread_pool_get_size(global_thread_pool);
     max_num_workers = FLINT_MIN(max_num_workers, Clen/32);
-    if (max_num_workers == 0)
+    /* also bail if product of lengths overflows a word */
+    umul_ppmm(hi, BClen, Blen, Clen);
+    if (max_num_workers == 0 || hi != 0 || BClen < 0)
     {
         A->length = _nmod_mpoly_mul_johnson(&A->coeffs, &A->exps, &A->alloc,
                             Bcoeff, Bexp, Blen,
@@ -632,17 +635,20 @@ void _nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A,
     base->idx = base->ndivs - 1;    /* decremented by worker threads */
     base->ctx = ctx;
 
-    ndivs2 = base->ndivs*base->ndivs;
-
     divs = (_div_struct *) flint_malloc(base->ndivs*sizeof(_div_struct));
     args = (_worker_arg_struct *) flint_malloc(base->nthreads
                                                   *sizeof(_worker_arg_struct));
 
     /* allocate space and set the boundary for each division */
+    FLINT_ASSERT(BClen/Blen == Clen);
     for (i = base->ndivs - 1; i >= 0; i--)
     {
+        double d = (double)(i + 1) / (double)(base->ndivs);
+
         /* divisions decrease in size so that no worker finishes too early */
-        divs[i].lower = (i + 1)*(i + 1)*Blen*Clen/ndivs2;
+        divs[i].lower = (d * d) * BClen;
+        divs[i].lower = FLINT_MIN(divs[i].lower, BClen);
+        divs[i].lower = FLINT_MAX(divs[i].lower, WORD(0));
         divs[i].upper = divs[i].lower;
         divs[i].Aoffset = -WORD(1);
         divs[i].thread_idx = -WORD(1);

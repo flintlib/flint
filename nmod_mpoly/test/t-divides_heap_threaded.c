@@ -18,7 +18,7 @@
 int
 main(void)
 {
-    int i, j, result, result2, max_threads = 5;
+    int i, j, result, result2, max_threads = 5, tmul = 30;
     FLINT_TEST_INIT(state);
 
     flint_printf("divides_heap_threaded....");
@@ -28,6 +28,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t p, f, g, h, h2;
         const char * vars[] = {"x","y","z","t","u"};
+        int aff[] = {0, 1};
 
         nmod_mpoly_ctx_init(ctx, 5, ORD_DEGLEX, 179424691);
         nmod_mpoly_init(f, ctx);
@@ -42,8 +43,10 @@ main(void)
         result = nmod_mpoly_divides_monagan_pearce(h, p, f, ctx);
         nmod_mpoly_assert_canonical(h, ctx);
         flint_set_num_threads(2);
+        flint_set_thread_affinity(aff, 2);
         result2 = nmod_mpoly_divides_heap_threaded(h2, p, f, ctx);
         nmod_mpoly_assert_canonical(h2, ctx);
+        flint_restore_thread_affinity();
 
         if (!result || !result2
                     || !nmod_mpoly_equal(h, g, ctx)
@@ -63,7 +66,7 @@ main(void)
     }
 
     /* Check f*g/g = f */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
@@ -123,7 +126,7 @@ main(void)
     }
 
     /* Check f*g/g = f with divisor aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
@@ -180,7 +183,7 @@ main(void)
     }
 
     /* Check f*g/g = f with dividend aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
@@ -237,7 +240,7 @@ main(void)
     }
 
     /* Check random polys don't divide */
-    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, p, h1, h2;
@@ -300,7 +303,7 @@ main(void)
     }
 
     /* Check random polys don't divide alias dividend */
-    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, p, h1;
@@ -361,7 +364,7 @@ main(void)
     }
 
     /* Check random polys don't divide alias divisor */
-    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, p, h1;

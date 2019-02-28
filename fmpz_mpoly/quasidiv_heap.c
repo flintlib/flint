@@ -716,7 +716,7 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
     }
 
     /* check divisor leading monomial is at most that of the dividend */
-    if (mpoly_monomial_lt(exp3, exp2, N, cmpmask))
+    if (mpoly_monomial_lt(exp2, exp3, N, cmpmask))
     {
         fmpz_mpoly_zero(q, ctx);
         goto cleanup3;

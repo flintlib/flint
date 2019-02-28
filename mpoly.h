@@ -593,7 +593,7 @@ int mpoly_monomial_ge1(ulong a, ulong b, ulong cmpmask)
 }
 
 MPOLY_INLINE
-int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3,
+int mpoly_monomial_lt(const ulong * exp3, const ulong * exp2,
                                                 slong N, const ulong * cmpmask)
 {
     slong i = N - 1;
@@ -607,7 +607,7 @@ int mpoly_monomial_lt(const ulong * exp2, const ulong * exp3,
 }
 
 MPOLY_INLINE
-int mpoly_monomial_gt(const ulong * exp2, const ulong * exp3,
+int mpoly_monomial_gt(const ulong * exp3, const ulong * exp2,
                                                 slong N, const ulong * cmpmask)
 {
     slong i = N - 1;
@@ -1060,7 +1060,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
 
    while (j < s)
    {
-      if (!mpoly_monomial_gt(heap[j + 1].exp, heap[j].exp, N, cmpmask))
+      if (!mpoly_monomial_gt(heap[j].exp, heap[j + 1].exp, N, cmpmask))
          j++;
       heap[i] = heap[j];
       i = j;
@@ -1071,7 +1071,7 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
    exp = heap[s].exp;
    j = HEAP_PARENT(i);
 
-   while (i > 1 && mpoly_monomial_gt(heap[j].exp, exp, N, cmpmask))
+   while (i > 1 && mpoly_monomial_gt(exp, heap[j].exp, N, cmpmask))
    {
       heap[i] = heap[j];
       i = j;
@@ -1109,7 +1109,7 @@ int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x,
 
    while ((j = HEAP_PARENT(i)) >= 1)
    {
-      if (!mpoly_monomial_gt(heap[j].exp, exp, N, cmpmask))
+      if (!mpoly_monomial_gt(exp, heap[j].exp, N, cmpmask))
          break;
 
       i = j;

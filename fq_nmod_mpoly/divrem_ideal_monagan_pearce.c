@@ -369,7 +369,7 @@ void fq_nmod_mpoly_divrem_ideal_monagan_pearce(fq_nmod_mpoly_struct ** q,
     /* check leading mon. of at least one divisor is at most that of dividend */
     for (i = 0; i < len; i++)
     {
-        if (!mpoly_monomial_lt(exp3[i], exp2, N, cmpmask))
+        if (!mpoly_monomial_lt(exp2, exp3[i], N, cmpmask))
             break;
     }
 

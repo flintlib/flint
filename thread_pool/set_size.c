@@ -11,7 +11,6 @@
 
 #include "thread_pool.h"
 
-
 int thread_pool_set_size(thread_pool_t T, slong new_size)
 {
     thread_pool_entry_struct * D;
@@ -56,7 +55,8 @@ int thread_pool_set_size(thread_pool_t T, slong new_size)
     if (new_size > 0)
     {
         D = T->tdata
-          = (thread_pool_entry_struct *) flint_malloc(new_size * sizeof(thread_pool_entry_struct));
+          = (thread_pool_entry_struct *) flint_malloc(new_size
+                                           * sizeof(thread_pool_entry_struct));
 
         for (i = 0; i < new_size; i++)
         {

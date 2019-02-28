@@ -320,6 +320,10 @@
 #define MSC_C_(x) #x  
 #define MSC_CC_(x)  MSC_C_(x)
 #define MSC_VERSION "Microsoft C++ (Version " MSC_CC_(_MSC_FULL_VER) ")"
+#define HAVE_CPU_SET_T 0
+
+#else
+#define HAVE_CPU_SET_T 1
 
 #endif
 

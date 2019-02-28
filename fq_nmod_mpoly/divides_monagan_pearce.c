@@ -206,7 +206,7 @@ slong _fq_nmod_mpoly_divides_monagan_pearce(
         }
 
         if (!lt_divides ||
-                mpoly_monomial_gt(exp, exp2 + N*(len2 - 1), N, cmpmask))
+                mpoly_monomial_gt(exp2 + N*(len2 - 1), exp, N, cmpmask))
             goto not_exact_division;
 
         if (s > 1)

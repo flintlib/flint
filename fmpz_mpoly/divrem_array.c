@@ -1122,24 +1122,47 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
                   exp2, poly2->length, poly3->coeffs, exp3, poly3->length,
                          (slong *) max_fields2, ctx->minfo->nfields, exp_bits);
 
-   res = (lenq != 0 || lenr != 0);
+    res = (lenq != 0 || lenr != 0);
 
-   if (q == poly2 || q == poly3)
-   {
-      fmpz_mpoly_swap(temp1, q, ctx);
+    if (res)
+    {
+        if (q == poly2 || q == poly3)
+        {
+            fmpz_mpoly_swap(temp1, q, ctx);
+            fmpz_mpoly_clear(temp1, ctx);
+        }
 
-      fmpz_mpoly_clear(temp1, ctx);
-   } 
+        if (r == poly2 || r == poly3)
+        {
+            fmpz_mpoly_swap(temp2, r, ctx);
+            fmpz_mpoly_clear(temp2, ctx);
+        }
+    }
+    else
+    {
+        if (q == poly2 || q == poly3)
+        {
+            fmpz_mpoly_clear(temp1, ctx);
+        }
 
-   if (r == poly2 || r == poly3)
-   {
-      fmpz_mpoly_swap(temp2, r, ctx);
+        if (r == poly2 || r == poly3)
+        {
+            fmpz_mpoly_clear(temp2, ctx);
+        }
 
-      fmpz_mpoly_clear(temp2, ctx);
-   } 
+        for (i = q->length; i < q->alloc; i++)
+        {
+            _fmpz_demote(q->coeffs + i);
+        }
+        for (i = r->length; i < r->alloc; i++)
+        {
+            _fmpz_demote(r->coeffs + i);
+        }
+    }
 
-   _fmpz_mpoly_set_length(q, lenq, ctx);
-   _fmpz_mpoly_set_length(r, lenr, ctx);
+    _fmpz_mpoly_set_length(q, lenq, ctx);
+    _fmpz_mpoly_set_length(r, lenr, ctx);
+
 
 cleanup2:
 

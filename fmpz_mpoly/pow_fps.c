@@ -474,7 +474,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
          fmpz_mul(t1, poly2 + x->i, gc + x->j);
          fmpz_add(S, S, t1);
 
-         if (!mpoly_monomial_gt(exp, finalexp, N, cmpmask))
+         if (!mpoly_monomial_gt(finalexp, exp, N, cmpmask))
          {
             mpn_sub_n(temp2, fik + x->i*N, ge + x->j*N, N);
             fmpz_set_mpn_signed(t2, temp2, N);
@@ -500,7 +500,7 @@ slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
             fmpz_mul(t1, poly2 + x->i, gc + x->j);
             fmpz_add(S, S, t1);
 
-            if (!mpoly_monomial_gt(exp, finalexp, N, cmpmask))
+            if (!mpoly_monomial_gt(finalexp, exp, N, cmpmask))
             {
                mpn_sub_n(temp2, fik + x->i*N, ge + x->j*N, N);
                fmpz_set_mpn_signed(t2, temp2, N);

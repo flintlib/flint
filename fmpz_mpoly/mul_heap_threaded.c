@@ -13,21 +13,6 @@
 #include "thread_pool.h"
 #include "fmpz_mpoly.h"
 
-
-typedef struct _fmpz_mpoly_stripe_struct
-{
-    char * big_mem;
-    slong big_mem_alloc;
-    slong N;
-    mp_bitcnt_t bits;
-    const ulong * cmpmask;
-    int flint_small;
-} fmpz_mpoly_stripe_struct;
-
-typedef fmpz_mpoly_stripe_struct fmpz_mpoly_stripe_t[1];
-
-
-
 slong _fmpz_mpoly_mul_heap_part1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
               const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
               const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
@@ -641,7 +626,8 @@ void _fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A,
                  const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
                               mp_bitcnt_t bits, slong N, const ulong * cmpmask)
 {
-    slong i, j, ndivs2;
+    slong i, j;
+    slong BClen, hi;
     _base_t base;
     _div_struct * divs;
     _worker_arg_struct * args;
@@ -656,7 +642,9 @@ void _fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A,
     FLINT_ASSERT(global_thread_pool_initialized);
     max_num_workers = thread_pool_get_size(global_thread_pool);
     max_num_workers = FLINT_MIN(max_num_workers, Clen/32);
-    if (max_num_workers == 0)
+    /* also bail if product of lengths overflows a word */
+    umul_ppmm(hi, BClen, Blen, Clen);
+    if (max_num_workers == 0 || hi != 0 || BClen < 0)
     {
         Alen = _fmpz_mpoly_mul_johnson(&A->coeffs, &A->exps, &A->alloc,
                                          Bcoeff, Bexp, Blen,
@@ -694,17 +682,20 @@ void _fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A,
     base->flint_small =   _fmpz_mpoly_fits_small(Bcoeff, Blen)
                        && _fmpz_mpoly_fits_small(Ccoeff, Clen);
 
-    ndivs2 = base->ndivs*base->ndivs;
-
     divs = (_div_struct *) flint_malloc(base->ndivs*sizeof(_div_struct));
     args = (_worker_arg_struct *) flint_malloc(base->nthreads
                                                   *sizeof(_worker_arg_struct));
 
     /* allocate space and set the boundary for each division */
+    FLINT_ASSERT(BClen/Blen == Clen);
     for (i = base->ndivs - 1; i >= 0; i--)
     {
+        double d = (double)(i + 1) / (double)(base->ndivs);
+
         /* divisions decrease in size so that no worker finishes too early */
-        divs[i].lower = (i + 1)*(i + 1)*Blen*Clen/ndivs2;
+        divs[i].lower = (d * d) * BClen;
+        divs[i].lower = FLINT_MIN(divs[i].lower, BClen);
+        divs[i].lower = FLINT_MAX(divs[i].lower, WORD(0));
         divs[i].upper = divs[i].lower;
         divs[i].Aoffset = -WORD(1);
         divs[i].thread_idx = -WORD(1);
