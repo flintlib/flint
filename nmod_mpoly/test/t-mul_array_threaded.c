@@ -19,13 +19,17 @@ int
 main(void)
 {
     int i, j, result, max_threads = 5;
+    int tmul = 50;
+#ifdef _WIN32
+    tmul = 1;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("mul_array_threaded....");
     fflush(stdout);
 
     /* Check mul_array_threaded matches mul_johnson */
-    for (i = 0; i < flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
@@ -86,7 +90,7 @@ main(void)
     }
 
     /* Check aliasing first argument */
-    for (i = 0; i < flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
@@ -142,7 +146,7 @@ main(void)
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;

@@ -17,13 +17,17 @@ int
 main(void)
 {
     int i, j, result, max_threads = 5;
+    int tmul = 10;
+#ifdef _WIN32
+    tmul = 1;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("mul....");
     fflush(stdout);
 
     /* Check f*(g + h) = f*g + f*h with bit bound */
-    for (i = 0; i < flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k1, k2, t1, t2;
@@ -91,7 +95,7 @@ main(void)
     }
 
     /* Check aliasing first argument */
-    for (i = 0; i < flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
@@ -153,7 +157,7 @@ main(void)
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
