@@ -4,6 +4,7 @@
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Ashish Kedia
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -129,6 +130,48 @@ typedef struct
     nmod_poly_struct poly3inv;
 }
 nmod_poly_compose_mod_precomp_preinv_arg_t;
+
+typedef struct
+{
+    slong a_idx;
+    slong b_idx;
+    slong c_idx;
+    nmod_poly_t idem;
+    nmod_poly_t modulus;
+} _nmod_poly_crt_prog_instr;
+
+typedef struct
+{
+    _nmod_poly_crt_prog_instr * prog;
+    slong length;
+    slong alloc;
+    slong localsize; /* length of outputs required in nmod_poly_crt_run */
+    slong temp1loc;
+    slong temp2loc;
+    int good;   /* the moduli are good for CRT, essentially relatively prime */
+} nmod_poly_crt_struct;
+
+
+/* general crt for nmod_poly_t - compile once, run many times ****************/
+
+typedef nmod_poly_crt_struct nmod_poly_crt_t[1];
+
+FLINT_DLL void nmod_poly_crt_init(nmod_poly_crt_t P);
+
+FLINT_DLL int nmod_poly_crt_compile(nmod_poly_crt_t P,
+                                 nmod_poly_struct * const * moduli, slong len);
+
+NMOD_POLY_INLINE
+slong nmod_poly_crt_local_size(nmod_poly_crt_t P)
+{
+   return P->localsize;
+}
+
+FLINT_DLL void nmod_poly_crt_run(const nmod_poly_crt_t P,
+                                            nmod_poly_struct * const * outputs,
+                                            nmod_poly_struct * const * inputs);
+
+FLINT_DLL void nmod_poly_crt_clear(nmod_poly_crt_t P);
 
 /* zn_poly helper functions  ************************************************
 
