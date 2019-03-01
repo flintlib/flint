@@ -22,10 +22,10 @@ environment:
     CONDA_INSTALL_LOCN_64: "C:\\Miniconda36-x64"
     VCVARSALL: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat"
   matrix:
-    - COMPILER: cl
-      ARCH: 64
     - COMPILER: gcc
       ARCH: 32
+    - COMPILER: cl
+      ARCH: 64
     - COMPILER: gcc
       ARCH: 64
     - COMPILER: cl
