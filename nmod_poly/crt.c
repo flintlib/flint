@@ -252,7 +252,7 @@ int nmod_poly_crt_compile(nmod_poly_crt_t P,
     For thread safety "outputs" is expected to have enough space for all
     temporaries, thus should be at least as long as P->localsize.
 */
-void nmod_poly_crt_run(const nmod_poly_crt_t P,
+void _nmod_poly_crt_run(const nmod_poly_crt_t P,
                                             nmod_poly_struct * const * outputs,
                                             nmod_poly_struct * const * inputs)
 {
@@ -293,4 +293,50 @@ void nmod_poly_crt_run(const nmod_poly_crt_t P,
             FLINT_ASSERT(A == outputs[0]);
         }
     }
+}
+
+void nmod_poly_crt_run(const nmod_poly_crt_t P, nmod_poly_t output,
+                                             nmod_poly_struct * const * inputs)
+{
+    slong i;
+    slong a, b, c;
+    nmod_poly_struct * A, * B, * C, * t1, * t2, * outputs;
+    TMP_INIT;
+
+    TMP_START;
+    outputs = (nmod_poly_struct *) TMP_ALLOC(P->localsize
+                                                    *sizeof(nmod_poly_struct));
+    for (i = 0; i < P->localsize; i++)
+    {
+        nmod_poly_init(outputs + i, inputs[0]->mod.n);
+    }
+
+    nmod_poly_swap(output, outputs + 0);
+
+    t1 = outputs + P->temp1loc;
+    t2 = outputs + P->temp2loc;
+    for (i = 0; i < P->length; i++)
+    {
+        a = P->prog[i].a_idx;
+        b = P->prog[i].b_idx;
+        c = P->prog[i].c_idx;
+        A = outputs + a;
+        B = b < 0 ? inputs[-b-1] : outputs + b;
+        C = c < 0 ? inputs[-c-1] : outputs + c;
+
+        /* A = B + I*(C - B) mod M */
+        nmod_poly_sub(t1, B, C);
+        nmod_poly_mul(t2, P->prog[i].idem, t1);
+        nmod_poly_sub(t1, B, t2);
+        nmod_poly_rem(A, t1, P->prog[i].modulus);
+    }
+
+    nmod_poly_swap(output, outputs + 0);
+
+    for (i = 0; i < P->localsize; i++)
+    {
+        nmod_poly_clear(outputs + i);
+    }
+
+    TMP_END;
 }

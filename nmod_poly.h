@@ -168,10 +168,15 @@ slong nmod_poly_crt_local_size(nmod_poly_crt_t P)
 }
 
 FLINT_DLL void nmod_poly_crt_run(const nmod_poly_crt_t P,
+                        nmod_poly_t output, nmod_poly_struct * const * inputs);
+
+
+FLINT_DLL void nmod_poly_crt_clear(nmod_poly_crt_t P);
+
+FLINT_DLL void _nmod_poly_crt_run(const nmod_poly_crt_t P,
                                             nmod_poly_struct * const * outputs,
                                             nmod_poly_struct * const * inputs);
 
-FLINT_DLL void nmod_poly_crt_clear(nmod_poly_crt_t P);
 
 /* zn_poly helper functions  ************************************************
 

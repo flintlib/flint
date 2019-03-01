@@ -2499,18 +2499,22 @@ Chinese Remaindering
     A return of ``1`` indicates that the compilation was successful.
     A return of ``0`` indicates that the compilation failed and future calls to func::nmod_poly_crt_run will leave the output undefined.
 
-.. function:: slong nmod_poly_crt_local_size(nmod_poly_crt_t P)
+.. function:: void nmod_poly_crt_run(const nmod_poly_crt_t P, nmod_poly_t output, nmod_poly_struct * const * inputs);
 
-    Return the required length of the output for func::nmod_poly_crt_run.
-
-.. function:: void nmod_poly_crt_run(const nmod_poly_crt_t P, nmod_poly_struct * const * outputs, nmod_poly_struct * const * inputs);
-
-    Chinese remainder the ``inputs`` and place the output in ``outputs[0]``, which will have lowest possible degree and be congruent to ``inputs[i]`` modulo the ``moduli[i]`` in func::nmod_poly_crt_compile.
-    The inputs are not modified. For thread safety, ``outputs`` contains space for all temporaries and should be at least as long as ``nmod_poly_crt_local_size(P)``.
+    Set ``output`` to the polynomial of lowest possible degree that is congruent to ``inputs[i]`` modulo the ``moduli[i]`` in func::nmod_poly_crt_compile.
 
 .. function:: void nmod_poly_crt_clear(nmod_poly_crt_t P)
 
     Free all space used by ``P``.
+
+.. function:: slong nmod_poly_crt_local_size(nmod_poly_crt_t P)
+
+    Return the required length of the output for func::_nmod_poly_crt_run.
+
+.. function:: void _nmod_poly_crt_run(const nmod_poly_crt_t P, nmod_poly_struct * const * outputs, nmod_poly_struct * const * inputs);
+
+    Chinese remainder the ``inputs`` and place the output in ``outputs[0]``, which will have lowest possible degree and be congruent to ``inputs[i]`` modulo the ``moduli[i]`` in func::nmod_poly_crt_compile.
+    The inputs are not modified. For thread safety, ``outputs`` contains space for all temporaries and should be at least as long as ``nmod_poly_crt_local_size(P)``.
 
 
 Inflation and deflation

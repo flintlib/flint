@@ -58,7 +58,7 @@ main(void)
 
         for (k = 0; k < 10; k++)
         {
-            nmod_poly_crt_run(P, outputs, inputs);
+            _nmod_poly_crt_run(P, outputs, inputs);
         }
 
         for (k = 0; k < moduli_count; k++)
@@ -83,7 +83,8 @@ main(void)
         nmod_poly_crt_t P;
         nmod_poly_t t, p;
         slong total_degree, moduli_length, moduli_count;
-        nmod_poly_struct ** moduli, ** inputs, ** outputs;
+        nmod_poly_struct ** moduli, ** inputs;
+        nmod_poly_t output;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -92,6 +93,8 @@ main(void)
 
         nmod_poly_init(t, modulus);
         nmod_poly_init(p, modulus);
+        nmod_poly_init(output, modulus);
+
         nmod_poly_crt_init(P);
 
         for (j = 0; j < 4; j++)
@@ -117,27 +120,14 @@ main(void)
 
             if (nmod_poly_crt_compile(P, moduli, moduli_count))
             {
-                slong localsize = nmod_poly_crt_local_size(P);
-
-                FLINT_ASSERT(localsize > 0);
-
-                outputs = (nmod_poly_struct **) flint_malloc(localsize
-                                                  *sizeof(nmod_poly_struct *));
-                for (k = 0; k < localsize; k++)
-                {
-                    outputs[k] = (nmod_poly_struct *) flint_malloc(
-                                                      sizeof(nmod_poly_struct));
-                    nmod_poly_init(outputs[k], modulus);
-                }
-
-                nmod_poly_crt_run(P, outputs, inputs);
+                nmod_poly_crt_run(P, output, inputs);
 
                 total_degree = 0;
                 for (k = 0; k < moduli_count; k++)
                 {
                     total_degree += nmod_poly_degree(moduli[k]);                
 
-                    nmod_poly_sub(t, outputs[0], inputs[k]);
+                    nmod_poly_sub(t, output, inputs[k]);
                     nmod_poly_rem(t, t, moduli[k]);
                     if (!nmod_poly_is_zero(t))
                     {
@@ -147,20 +137,13 @@ main(void)
                         flint_abort();
                     }
                 }
-                if (nmod_poly_degree(outputs[0]) >= total_degree)
+                if (nmod_poly_degree(output) >= total_degree)
                 {
                     printf("FAIL\n");
                     flint_printf("Check output degree "
                                        "i = %wd, j = %wd, k = %wd\n", i, j, k);
                     flint_abort();
                 }
-
-                for (k = 0; k < localsize; k++)
-                {
-                    nmod_poly_clear(outputs[k]);
-                    flint_free(outputs[k]);
-                }
-                flint_free(outputs);
             }
             else
             {
@@ -208,6 +191,8 @@ main(void)
 
         nmod_poly_clear(t);
         nmod_poly_clear(p);
+        nmod_poly_clear(output);
+
         nmod_poly_crt_clear(P);
 
     }
