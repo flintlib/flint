@@ -323,7 +323,7 @@
 #define HAVE_CPU_SET_T 0
 
 #else
-#define HAVE_CPU_SET_T 1
+#define HAVE_CPU_SET_T 0
 
 #endif
 
