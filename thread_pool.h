@@ -12,7 +12,7 @@
 
 /* for some reason this define needs to be outside of the next if */
 #define _GNU_SOURCE
-#if HAVE_SCHED_H
+#if HAVE_CPU_SET_T
 #include <sched.h>
 #endif
 
