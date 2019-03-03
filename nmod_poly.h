@@ -131,30 +131,30 @@ typedef struct
 }
 nmod_poly_compose_mod_precomp_preinv_arg_t;
 
+/* instructions do A = B + I*(C - B) mod M */
 typedef struct
 {
-    slong a_idx;
-    slong b_idx;
-    slong c_idx;
-    nmod_poly_t idem;
-    nmod_poly_t modulus;
+    slong a_idx; /* index of A */
+    slong b_idx; /* index of B */
+    slong c_idx; /* index of C */
+    nmod_poly_t idem;     /* I */
+    nmod_poly_t modulus;  /* M */
 } _nmod_poly_crt_prog_instr;
 
 typedef struct
 {
-    _nmod_poly_crt_prog_instr * prog;
-    slong length;
-    slong alloc;
+    _nmod_poly_crt_prog_instr * prog; /* straight line program */
+    slong length; /* length of prog */
+    slong alloc;  /* alloc of prog */
     slong localsize; /* length of outputs required in nmod_poly_crt_run */
-    slong temp1loc;
-    slong temp2loc;
+    slong temp1loc; /* index of temporary used in run */
+    slong temp2loc; /* index of another tempory used in run */
     int good;   /* the moduli are good for CRT, essentially relatively prime */
 } nmod_poly_crt_struct;
 
+typedef nmod_poly_crt_struct nmod_poly_crt_t[1];
 
 /* general crt for nmod_poly_t - compile once, run many times ****************/
-
-typedef nmod_poly_crt_struct nmod_poly_crt_t[1];
 
 FLINT_DLL void nmod_poly_crt_init(nmod_poly_crt_t P);
 
@@ -176,7 +176,6 @@ FLINT_DLL void nmod_poly_crt_clear(nmod_poly_crt_t P);
 FLINT_DLL void _nmod_poly_crt_run(const nmod_poly_crt_t P,
                                             nmod_poly_struct * const * outputs,
                                             nmod_poly_struct * const * inputs);
-
 
 /* zn_poly helper functions  ************************************************
 
