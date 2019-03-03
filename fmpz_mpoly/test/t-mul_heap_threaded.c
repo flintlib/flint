@@ -17,6 +17,10 @@ int
 main(void)
 {
     int i, j, result, max_threads = 5;
+    int tmul = 15;
+#ifdef _WIN32
+    tmul = 1;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("mul_heap_threaded....");
@@ -55,7 +59,7 @@ main(void)
     }
 
     /* Check mul_heap_threaded matches mul_johnson */
-    for (i = 0; i < 15 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k;
@@ -110,7 +114,7 @@ main(void)
     }
 
     /* aliasing first input */
-    for (i = 0; i < 15 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
@@ -162,7 +166,7 @@ main(void)
     }
 
     /* aliasing second input */
-    for (i = 0; i < 15 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;

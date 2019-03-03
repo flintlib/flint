@@ -17,13 +17,17 @@ int
 main(void)
 {
     slong i, j, v;
+    int tmul = 5;
+#ifdef _WIN32
+    tmul = 1;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("evaluate....");
     fflush(stdout);
 
     /* Check repeated evalone matches evalall */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f;
@@ -90,7 +94,7 @@ main(void)
 
 
     /* Check add commutes with evalall */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, fg;
@@ -147,7 +151,7 @@ main(void)
     }
 
     /* Check mul commutes with evalall */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, fg;

@@ -20,6 +20,9 @@ main(void)
 {
     int i, j, result, result2, max_threads = 5, tmul = 30;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 1;
+#endif
 
     flint_printf("divides_heap_threaded....");
     fflush(stdout);

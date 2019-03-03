@@ -5,6 +5,7 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckPrototypeDefinition)
 include(CheckCCompilerFlag)
+include(CheckLibraryExists)
 include(TestBigEndian)
 
 project(flint LANGUAGES C CXX)
@@ -152,6 +153,8 @@ check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
 check_c_compiler_flag("-funroll-loops" HAS_FLAG_UNROLL_LOOPS)
 
+check_library_exists(${PThreads_LIBRARIES} pthread_getaffinity_np "" HAVE_CPU_SET_T)
+
 set(HAVE_TLS ON CACHE BOOL "Use thread local storage.")
 
 set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
@@ -222,8 +225,11 @@ target_include_directories(flint PUBLIC
 )
 
 
-if(BUILD_SHARED_LIBS AND MSVC)
-    target_compile_definitions(flint PRIVATE "MSC_BUILD_DLL")
+if(BUILD_SHARED_LIBS AND WIN32)
+    # Export flint's functions
+    target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
+    # Use MPIR's dll import functions
+    target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
 endif()
 
 if (HAS_FLAG_MPOPCNT)
@@ -266,13 +272,6 @@ set_target_properties(flint
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
-
-if(MSVC)
-    set_target_properties(flint
-        PROPERTIES
-        LINK_FLAGS "/EXPORT:__flint_clz_tab /EXPORT:flint_primes_small"
-    )
-endif()
 
 if(BUILD_TESTING)
     enable_testing()

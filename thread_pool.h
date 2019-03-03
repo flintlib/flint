@@ -12,7 +12,7 @@
 
 /* for some reason this define needs to be outside of the next if */
 #define _GNU_SOURCE
-#if HAVE_SCHED_H
+#if HAVE_CPU_SET_T
 #include <sched.h>
 #endif
 
@@ -51,8 +51,8 @@ typedef thread_pool_struct thread_pool_t[1];
 
 typedef int thread_pool_handle;
 
-extern thread_pool_t global_thread_pool;
-extern int global_thread_pool_initialized;
+FLINT_DLL extern thread_pool_t global_thread_pool;
+FLINT_DLL extern int global_thread_pool_initialized;
 
 FLINT_DLL void * thread_pool_idle_loop(void * varg);
 

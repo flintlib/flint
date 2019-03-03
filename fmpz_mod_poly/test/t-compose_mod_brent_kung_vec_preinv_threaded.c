@@ -32,11 +32,15 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
+    int tmul = 200;
+#ifdef _WIN32
+    tmul = 1;
+#endif
     
     flint_printf("compose_mod_brent_kung_vec_preinv_threaded....");
     fflush(stdout);
 
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, ainv, b, c;
         fmpz_t p;

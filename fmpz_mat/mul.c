@@ -56,7 +56,7 @@ fmpz_get_sgnbit_mpn2(mp_ptr r, const fmpz_t x)
         r3 += r2 < t1;                                      \
 } while (0)
 
-void
+FLINT_DLL void
 fmpz_mat_mul_1(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, br, bc;
@@ -82,7 +82,7 @@ fmpz_mat_mul_1(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
 }
 
-void
+FLINT_DLL void
 fmpz_mat_mul_2a(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, br, bc;
@@ -115,7 +115,7 @@ fmpz_mat_mul_2a(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
 }
 
-void
+FLINT_DLL void
 fmpz_mat_mul_2b(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, br, bc;
@@ -149,7 +149,7 @@ fmpz_mat_mul_2b(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
 }
 
-void
+FLINT_DLL void
 fmpz_mat_mul_4(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, ac, br, bc;

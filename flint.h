@@ -174,7 +174,7 @@ FLINT_DLL int flint_set_thread_affinity(int * cpus, slong length);
 FLINT_DLL int flint_restore_thread_affinity();
 FLINT_DLL void flint_parallel_cleanup(void);
 
-FLINT_DLL int flint_test_multiplier(void);
+int flint_test_multiplier(void);
 
 typedef struct
 {
