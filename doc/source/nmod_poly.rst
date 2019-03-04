@@ -2496,8 +2496,8 @@ Chinese Remaindering
 .. function:: int nmod_poly_crt_compile(nmod_poly_crt_t P, nmod_poly_struct * const * moduli, slong len);
 
     Configure ``P`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive, and the moduli are not modified.
-    A return of ``1`` indicates that the compilation was successful.
     A return of ``0`` indicates that the compilation failed and future calls to func::nmod_poly_crt_run will leave the output undefined.
+    A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus[0]`` is nonzero, or (2) all of the moduli have positive degree and are pairwise relatively prime.
 
 .. function:: void nmod_poly_crt_run(const nmod_poly_crt_t P, nmod_poly_t output, nmod_poly_struct * const * inputs);
 
