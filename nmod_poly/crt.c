@@ -10,13 +10,16 @@
 */
 
 #include "nmod_poly.h"
-#include "nmod_mpoly.h"
 
 void nmod_poly_crt_init(nmod_poly_crt_t P)
 {
     P->prog = NULL;
     P->alloc = 0;
     P->length = 0;
+    P->localsize = 1;
+    P->temp1loc = 0;
+    P->temp2loc = 0;
+    P->good = 0;
 }
 
 static void nmod_poly_crt_fit_length(nmod_poly_crt_t P, slong k)
@@ -201,7 +204,7 @@ int nmod_poly_crt_compile(nmod_poly_crt_t P,
 
     nmod_poly_crt_fit_length(P, FLINT_MAX(WORD(1), len - 1));
     nmod_poly_crt_set_length(P, 0);
-    P->localsize = 0;
+    P->localsize = 1;
     P->good = 1;
 
     if (1 < len)
