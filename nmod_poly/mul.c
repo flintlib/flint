@@ -88,54 +88,8 @@ void nmod_polydr_mul(nmod_polydr_t res, const nmod_polydr_t poly1,
 
 void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
-    slong len1, len2, len_out;
-
     nmod_polydr_mul(nmod_poly_polydr(res),
                     nmod_poly_polydr(poly1),
                     nmod_poly_polydr(poly2),
                     nmod_poly_ctx(poly1)); /* use the modulus of poly1 */
-    return;
-
-    
-    len1 = poly1->length;
-    len2 = poly2->length;
-
-    if (len1 == 0 || len2 == 0)
-    {
-        nmod_poly_zero(res);
-
-        return;
-    }
-
-    len_out = poly1->length + poly2->length - 1;
-
-    if (res == poly1 || res == poly2)
-    {
-        nmod_poly_t temp;
-
-        nmod_poly_init2(temp, poly1->mod.n, len_out);
-
-        if (len1 >= len2)
-            _nmod_poly_mul(temp->coeffs, poly1->coeffs, len1,
-                           poly2->coeffs, len2, poly1->mod);
-        else
-            _nmod_poly_mul(temp->coeffs, poly2->coeffs, len2,
-                           poly1->coeffs, len1, poly1->mod);
-        
-        nmod_poly_swap(temp, res);
-        nmod_poly_clear(temp);
-    } else
-    {
-        nmod_poly_fit_length(res, len_out);
-        
-        if (len1 >= len2)
-            _nmod_poly_mul(res->coeffs, poly1->coeffs, len1,
-                           poly2->coeffs, len2, poly1->mod);
-        else
-            _nmod_poly_mul(res->coeffs, poly2->coeffs, len2,
-                           poly1->coeffs, len1, poly1->mod);
-    }
-
-    res->length = len_out;
-    _nmod_poly_normalise(res);
 }
