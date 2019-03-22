@@ -132,6 +132,9 @@ typedef struct
 
 typedef nmod_polydr_struct nmod_polydr_t[1];
 
+/* hackey way to get both parts of a nmod_poly_t */
+#define nmod_poly_polydr(p) ((nmod_polydr_struct*)(&p->coeffs))
+#define nmod_poly_ctx(p)    ((nmod_ctx_struct*)(&p->mod))
 
 typedef struct
 {

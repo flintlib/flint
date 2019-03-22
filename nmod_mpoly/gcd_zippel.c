@@ -113,7 +113,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
         fq_nmod_init(t, ffctx->fqctx);
 
         /* make sure reduction does not kill both lc(A) and lc(B) */
-        nmod_polydr_rem(geval, g, ffctx->fqctx->modulus, ctx->ffinfo);
+        nmod_polydr_rem(geval, g, fq_nmod_ctx_modulusdr(ffctx->fqctx), ctx->ffinfo);
         if (fq_nmod_is_zero(geval, ffctx->fqctx))
             goto outer_continue;
 
@@ -157,7 +157,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
         {
             changed = nmod_mpolyun_addinterp_fq_nmod_mpolyu(&lastdeg, H, Ht,
                                                    modulus, ctx, Geval, ffctx);
-            nmod_polydr_mul(modulus, modulus, ffctx->fqctx->modulus, ctx->ffinfo);
+            nmod_polydr_mul(modulus, modulus, fq_nmod_ctx_modulusdr(ffctx->fqctx), ctx->ffinfo);
 
             have_enough = nmod_polydr_degree(modulus, ctx->ffinfo) >= bound;
 
@@ -189,7 +189,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
         else
         {
             nmod_mpolyun_set_fq_nmod_mpolyu(H, ctx, Geval, ffctx);
-            nmod_polydr_set(modulus, ffctx->fqctx->modulus, ctx->ffinfo);
+            nmod_polydr_set(modulus, fq_nmod_ctx_modulusdr(ffctx->fqctx), ctx->ffinfo);
         }
 
 outer_continue:
@@ -330,7 +330,7 @@ choose_prime_outer:
     fq_nmod_init(t, ffctx->fqctx);
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    nmod_polydr_rem(gammaff, gamma, ffctx->fqctx->modulus, ctx->ffinfo);
+    nmod_polydr_rem(gammaff, gamma, fq_nmod_ctx_modulusdr(ffctx->fqctx), ctx->ffinfo);
     if (fq_nmod_is_zero(gammaff, ffctx->fqctx))
         goto choose_prime_outer;
 
@@ -363,7 +363,7 @@ choose_prime_outer:
     fq_nmod_mpolyu_setform(Gform, Gff, ffctx);
     nmod_mpolyun_set_fq_nmod_mpolyu(Hn, ctx, Gff, ffctx);
 
-    nmod_polydr_set(modulus, ffctx->fqctx->modulus, ctx->ffinfo);
+    nmod_polydr_set(modulus, fq_nmod_ctx_modulusdr(ffctx->fqctx), ctx->ffinfo);
 
 choose_prime_inner:
 
@@ -390,7 +390,7 @@ choose_prime_inner:
     fq_nmod_init(t, ffctx->fqctx);
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    nmod_polydr_rem(gammaff, gamma, ffctx->fqctx->modulus, ctx->ffinfo);
+    nmod_polydr_rem(gammaff, gamma, fq_nmod_ctx_modulusdr(ffctx->fqctx), ctx->ffinfo);
     if (fq_nmod_is_zero(gammaff, ffctx->fqctx))
         goto choose_prime_inner;
 
@@ -425,7 +425,7 @@ choose_prime_inner:
     fq_nmod_mpolyu_scalar_mul_fq_nmod(Gff, t, ffctx);
 
     changed = nmod_mpolyun_CRT_fq_nmod_mpolyu(&lastdeg, Hn, ctx, modulus, Gff, ffctx);
-    nmod_polydr_mul(modulus, modulus, ffctx->fqctx->modulus, ctx->ffinfo);
+    nmod_polydr_mul(modulus, modulus, fq_nmod_ctx_modulusdr(ffctx->fqctx), ctx->ffinfo);
 
     have_enough = nmod_polydr_degree(modulus, ctx->ffinfo) >= bound;
 

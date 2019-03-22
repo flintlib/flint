@@ -42,7 +42,7 @@ void fq_nmod_mpolyd_ctx_init_modulus(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
         dctx->perm[i] = i;
     }
 
-    fq_nmod_ctx_init_modulusdr(dctx->fqctx, fqctx->modulus, fqctx->fpctx->mod.n, "#");
+    fq_nmod_ctx_init_modulus(dctx->fqctx, fq_nmod_ctx_modulus(fqctx), "#");
 }
 
 void fq_nmod_mpolyd_ctx_init2(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
@@ -57,7 +57,7 @@ void fq_nmod_mpolyd_ctx_init2(fq_nmod_mpolyd_ctx_t dctx, slong nvars,
         dctx->perm[i] = i;
     }
 
-    fq_nmod_ctx_init_modulusdr(dctx->fqctx, fqctx->modulus, fqctx->fpctx->mod.n, fqctx->var);
+    fq_nmod_ctx_init_modulus(dctx->fqctx, fq_nmod_ctx_modulus(fqctx), fqctx->var);
 }
 
 void fq_nmod_mpolyd_ctx_clear(fq_nmod_mpolyd_ctx_t dctx)

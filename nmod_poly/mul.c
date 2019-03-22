@@ -89,6 +89,13 @@ void nmod_polydr_mul(nmod_polydr_t res, const nmod_polydr_t poly1,
 void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
     slong len1, len2, len_out;
+
+    nmod_polydr_mul(nmod_poly_polydr(res),
+                    nmod_poly_polydr(poly1),
+                    nmod_poly_polydr(poly2),
+                    nmod_poly_ctx(poly1)); /* use the modulus of poly1 */
+    return;
+
     
     len1 = poly1->length;
     len2 = poly2->length;

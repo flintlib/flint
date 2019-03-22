@@ -14,7 +14,7 @@
 
 #include "fq_nmod.h"
 
-
+/*
 void fq_nmod_ctx_init_modulusdr(fq_nmod_ctx_t ctx, const nmod_polydr_t modulus, mp_limb_t p,
                          const char *var)
 {
@@ -31,7 +31,7 @@ void fq_nmod_ctx_init_modulusdr(fq_nmod_ctx_t ctx, const nmod_polydr_t modulus, 
 
     nmod_ctx_clear(fpctx);
 }
-
+*/
 void
 fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
                          const char *var)
@@ -81,8 +81,8 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
     strcpy(ctx->var, var);
 
     /* Set the modulus */
-    nmod_polydr_init(ctx->modulus, ctx->fpctx);
-    nmod_polydr_set_nmod_poly(ctx->modulus, modulus, ctx->fpctx);
+    nmod_poly_init(ctx->modulus, modulus->mod.n);
+    nmod_poly_set(ctx->modulus, modulus);
 
     /* Precompute the inverse of the modulus */
     nmod_polydr_init(ctx->inv, ctx->fpctx);

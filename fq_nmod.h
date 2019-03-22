@@ -44,7 +44,7 @@ typedef struct
     slong *j;
     slong len;
 
-    nmod_polydr_t modulus;
+    nmod_poly_t modulus;
     nmod_polydr_t inv;
 
     char *var;
@@ -66,17 +66,19 @@ FLINT_DLL void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx,
                               const nmod_poly_t modulus,
                               const char *var);
 
-FLINT_DLL void fq_nmod_ctx_init_modulusdr(fq_nmod_ctx_t ctx,
-                              const nmod_polydr_t modulus, mp_limb_t p,
-                              const char *var);
-
 FLINT_DLL void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);
 
 FLINT_DLL void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state);
 
 FLINT_DLL void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 
-FQ_NMOD_INLINE const nmod_polydr_struct* fq_nmod_ctx_modulus(const fq_nmod_ctx_t ctx)
+FQ_NMOD_INLINE const nmod_polydr_struct* fq_nmod_ctx_modulusdr(const fq_nmod_ctx_t ctx)
+{
+/*    return (nmod_polydr_struct*)(ctx->modulus);*/
+    return nmod_poly_polydr(ctx->modulus);
+}
+
+FQ_NMOD_INLINE const nmod_poly_struct* fq_nmod_ctx_modulus(const fq_nmod_ctx_t ctx)
 {
     return ctx->modulus;
 }

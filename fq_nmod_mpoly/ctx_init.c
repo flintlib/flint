@@ -25,5 +25,5 @@ void fq_nmod_mpoly_ctx_init(fq_nmod_mpoly_ctx_t ctx, slong nvars,
                                const ordering_t ord, const fq_nmod_ctx_t fqctx)
 {
     mpoly_ctx_init(ctx->minfo, nvars, ord);
-    fq_nmod_ctx_init_modulusdr(ctx->fqctx, fqctx->modulus, fqctx->fpctx->mod.n, fqctx->var);
+    fq_nmod_ctx_init_modulus(ctx->fqctx, fqctx->modulus, fqctx->var);
 }

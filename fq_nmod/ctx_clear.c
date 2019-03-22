@@ -15,7 +15,7 @@
 
 void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx)
 {
-    nmod_polydr_clear(ctx->modulus, ctx->fpctx);
+    nmod_poly_clear(ctx->modulus);
     nmod_polydr_clear(ctx->inv, ctx->fpctx);
     fmpz_clear(fq_nmod_ctx_prime(ctx));
     _nmod_vec_clear(ctx->a);

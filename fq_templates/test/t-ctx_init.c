@@ -55,8 +55,7 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         TEMPLATE(T, ctx_init_conway)(ctx_conway, p, d, "a");
-        TEMPLATE(T, ctx_init_modulusdr)(ctx_mod, ctx_conway->modulus, fmpz_get_ui(p), "a");
-
+        TEMPLATE(T, ctx_init_modulus)(ctx_mod, ctx_conway->modulus, "a");
         TEMPLATE(T, init)(a, ctx_conway);
         TEMPLATE(T, init)(b, ctx_mod);
         TEMPLATE(T, init)(lhs, ctx_conway);

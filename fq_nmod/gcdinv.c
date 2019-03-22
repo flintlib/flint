@@ -15,5 +15,5 @@ void
 fq_nmod_gcdinv(fq_nmod_t rop, fq_nmod_t inv, const fq_nmod_t op,
                const fq_nmod_ctx_t ctx)
 {
-    nmod_polydr_gcdinv(rop, inv, op, ctx->modulus, ctx->fpctx);
+    nmod_polydr_gcdinv(rop, inv, op, fq_nmod_ctx_modulusdr(ctx), ctx->fpctx);
 }

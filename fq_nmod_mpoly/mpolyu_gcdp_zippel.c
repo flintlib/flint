@@ -1079,7 +1079,7 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
     }
 
     /* we don't expect this function to work over F_p */
-    if (nmod_polydr_degree(ctx->fqctx->modulus, ctx->fqctx->fpctx) < WORD(2))
+    if (nmod_polydr_degree(fq_nmod_ctx_modulusdr(ctx->fqctx), ctx->fqctx->fpctx) < WORD(2))
     {
         success = 0;
         goto finished;

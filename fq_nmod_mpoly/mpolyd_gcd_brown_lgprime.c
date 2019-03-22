@@ -269,7 +269,7 @@ int fq_nmod_mpolyd_gcd_brown_lgprime(fq_nmod_mpolyd_t G,
     flint_rand_t state;
     _fq_nmod_embed_struct * embed;
     mp_limb_t p = dctx->fqctx->fpctx->mod.n;
-    slong m = nmod_polydr_degree(dctx->fqctx->modulus, dctx->fqctx->fpctx);
+    slong m = nmod_polydr_degree(fq_nmod_ctx_modulusdr(dctx->fqctx), dctx->fqctx->fpctx);
     slong n;
 
     FLINT_ASSERT(G != A);
