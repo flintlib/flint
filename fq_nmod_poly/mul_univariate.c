@@ -19,7 +19,7 @@ _fq_nmod_poly_mul_univariate (fq_nmod_struct * rop,
 {
     const slong fqlen = ctx->modulus->length - 1;
     const slong pfqlen = 2*fqlen - 1;
-    const nmod_t mod = ctx->mod;
+    const nmod_t mod = ctx->fpctx->mod;
     const slong rlen = len1 + len2 - 1;
     const slong llen1 = (op1 + (len1 - 1))->length;
     const slong llen2 = (op2 + (len2 - 1))->length;
@@ -70,7 +70,7 @@ _fq_nmod_poly_mul_univariate (fq_nmod_struct * rop,
         _fq_nmod_reduce(crop + pfqlen*i, pfqlen, ctx);
         len = fqlen;
         while (len && (*(crop + pfqlen*i + len - 1) == UWORD(0))) len--;
-        nmod_poly_fit_length(rop + i, len);
+        nmod_polydr_fit_length(rop + i, len, ctx->fpctx);
         (rop + i)->length = len;
         flint_mpn_copyi((rop + i)->coeffs, crop + pfqlen*i, len);
     }
@@ -82,7 +82,7 @@ _fq_nmod_poly_mul_univariate (fq_nmod_struct * rop,
             len = fqlen;
             while (len && (*(crop + pfqlen*i + len - 1) == UWORD(0))) len--;
         }
-        nmod_poly_fit_length(rop + i, len);
+        nmod_polydr_fit_length(rop + i, len, ctx->fpctx);
         (rop + i)->length = len;
         flint_mpn_copyi((rop + i)->coeffs, crop + pfqlen*i, len);
     }

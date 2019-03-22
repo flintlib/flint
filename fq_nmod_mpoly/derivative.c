@@ -27,7 +27,7 @@ slong _fq_nmod_mpoly_derivative(fq_nmod_struct * Acoeff,       ulong * Aexp,
         ulong c = (Bexp[N*i + offset] >> shift) & mask;
         if (c == 0)
             continue;
-        NMOD_RED(cr, c, fqctx->modulus->mod);
+        NMOD_RED(cr, c, fqctx->fpctx->mod);
         if (cr == 0)
             continue;
         fq_nmod_mul_ui(Acoeff + Alen, Bcoeff + i, cr, fqctx);
@@ -56,7 +56,7 @@ slong _fq_nmod_mpoly_derivative_mp(fq_nmod_struct * Acoeff,       ulong * Aexp,
         fmpz_set_ui_array(c, Bexp + N*i + offset, bits/FLINT_BITS);
         if (fmpz_is_zero(c))
             continue;
-        cr = fmpz_fdiv_ui(c, fqctx->modulus->mod.n);
+        cr = fmpz_fdiv_ui(c, fqctx->fpctx->mod.n);
         if (cr == 0)
             continue;
         fq_nmod_mul_ui(Acoeff + Alen, Bcoeff + i, cr, fqctx);

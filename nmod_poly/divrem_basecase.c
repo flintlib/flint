@@ -172,6 +172,73 @@ _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
 }
 
 void
+nmod_polydr_divrem_basecase(nmod_polydr_t Q, nmod_polydr_t R,
+            const nmod_polydr_t A, const nmod_polydr_t B, const nmod_ctx_t ctx)
+{
+    const slong lenA = A->length, lenB = B->length;
+    mp_ptr Q_coeffs, R_coeffs, W;
+    nmod_polydr_t t1, t2;
+    TMP_INIT;
+
+    if (lenB == 0)
+    {
+        flint_printf("Exception (nmod_poly_divrem). Division by zero.\n");
+        flint_abort();
+    }
+
+    if (lenA < lenB)
+    {
+        nmod_polydr_set(R, A, ctx);
+        nmod_polydr_zero(Q, ctx);
+        return;
+    }
+
+    if (Q == A || Q == B)
+    {
+        nmod_polydr_init2(t1, lenA - lenB + 1, ctx);
+        Q_coeffs = t1->coeffs;
+    }
+    else
+    {
+        nmod_polydr_fit_length(Q, lenA - lenB + 1, ctx);
+        Q_coeffs = Q->coeffs;
+    }
+
+    if (R == A || R == B)
+    {
+        nmod_polydr_init2(t2, lenB - 1, ctx);
+        R_coeffs = t2->coeffs;
+    }
+    else
+    {
+        nmod_polydr_fit_length(R, lenB - 1, ctx);
+        R_coeffs = R->coeffs;
+    }
+
+    TMP_START;
+    W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, ctx->mod)*sizeof(mp_limb_t));
+    
+    _nmod_poly_divrem_basecase(Q_coeffs, R_coeffs, W, A->coeffs, lenA,
+                               B->coeffs, lenB, ctx->mod);
+
+    if (Q == A || Q == B)
+    {
+        nmod_polydr_swap(Q, t1, ctx);
+        nmod_polydr_clear(t1, ctx);
+    }
+    if (R == A || R == B)
+    {
+        nmod_polydr_swap(R, t2, ctx);
+        nmod_polydr_clear(t2, ctx);
+    }
+    Q->length = lenA - lenB + 1;
+    R->length = lenB - 1;
+
+    TMP_END;
+    _nmod_polydr_normalise(R);
+}
+
+void
 nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
                           const nmod_poly_t B)
 {

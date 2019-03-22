@@ -17,28 +17,29 @@
 #include "nmod_poly.h"
 
 
-int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
+static int _nmod_poly_fprint_pretty(FILE * f,
+                                mp_limb_t * Acoeff, slong Alen, const char * x)
 {
     size_t r;
     slong i;
 
-    if (a->length == 0)
+    if (Alen == 0)
     {
         r = fputc('0', f);
         r = ((int) r != EOF) ? 1 : EOF;
         return r;
     }
-    else if (a->length == 1)
+    else if (Alen == 1)
     {
-        r = flint_fprintf(f, "%wu", a->coeffs[0]);
+        r = flint_fprintf(f, "%wu", Acoeff[0]);
         return r;
     }
 
-    i = a->length - 1;
+    i = Alen - 1;
     r = 1;
     if (i == 1)
     {
-        switch (a->coeffs[1])
+        switch (Acoeff[1])
         {
             case UWORD(0):
                 break;
@@ -46,13 +47,13 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
                 r = flint_fprintf(f, "%s", x);
                 break;
             default:
-                r = flint_fprintf(f, "%wu*%s", a->coeffs[1], x);
+                r = flint_fprintf(f, "%wu*%s", Acoeff[1], x);
         }
         --i;
     }
     else
     {
-        switch (a->coeffs[i])
+        switch (Acoeff[i])
         {
             case UWORD(0):
                 break;
@@ -60,13 +61,13 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
                 r = flint_fprintf(f, "%s^%wd", x, i);
                 break;
             default:
-                r = flint_fprintf(f, "%wu*%s^%wd", a->coeffs[i], x, i);
+                r = flint_fprintf(f, "%wu*%s^%wd", Acoeff[i], x, i);
         }
         --i;
     }
     for (; (r > 0) && (i > 1); --i)
     {
-        switch (a->coeffs[i])
+        switch (Acoeff[i])
         {
             case UWORD(0):
                 break;
@@ -74,12 +75,12 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
                 r = flint_fprintf(f, "+%s^%wd", x, i);
                 break;
             default:
-                r = flint_fprintf(f, "+%wu*%s^%wd", a->coeffs[i], x, i);
+                r = flint_fprintf(f, "+%wu*%s^%wd", Acoeff[i], x, i);
         }
     }
     if (r > 0 && i == 1)
     {   
-        switch (a->coeffs[1])
+        switch (Acoeff[1])
         {   
             case UWORD(0):
                 break;
@@ -87,15 +88,26 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
                 r = flint_fprintf(f, "+%s", x);
                 break;
             default:
-                r = flint_fprintf(f, "+%wu*%s", a->coeffs[1], x);
+                r = flint_fprintf(f, "+%wu*%s", Acoeff[1], x);
         }
     }
     if (r > 0)
     {
-        if (a->coeffs[0] != UWORD(0))
-            r = flint_fprintf(f, "+%wu", a->coeffs[0]);
+        if (Acoeff[0] != UWORD(0))
+            r = flint_fprintf(f, "+%wu", Acoeff[0]);
     }
 
     return (int) r;
 }
 
+
+int nmod_polydr_fprint_pretty(FILE * f, const nmod_polydr_t A, const char * x,
+                                                          const nmod_ctx_t ctx)
+{
+    return _nmod_poly_fprint_pretty(f, A->coeffs, A->length, x);
+}
+
+int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t A, const char * x)
+{
+    return _nmod_poly_fprint_pretty(f, A->coeffs, A->length, x);
+}

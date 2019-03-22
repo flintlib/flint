@@ -17,16 +17,16 @@ fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
     slong i;
     mp_limb_t q, r;
     
-    nmod_poly_fit_length(rop, fq_zech_ctx_degree(ctx));
+    nmod_polydr_fit_length(rop, fq_zech_ctx_degree(ctx), ctx->fq_nmod_ctx->fpctx);
 
     q = ctx->eval_table[op->value];
     i = 0;
     while (q >= ctx->p)
     {
         r = n_divrem2_precomp(&q, q, ctx->p, ctx->ppre);
-        nmod_poly_set_coeff_ui(rop, i, r);
+        nmod_polydr_set_coeff_ui(rop, i, r, ctx->fq_nmod_ctx->fpctx);
         i ++;
     }
-    nmod_poly_set_coeff_ui(rop, i, q);
+    nmod_polydr_set_coeff_ui(rop, i, q, ctx->fq_nmod_ctx->fpctx);
 
 }

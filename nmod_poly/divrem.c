@@ -43,6 +43,67 @@ _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
         _nmod_poly_divrem_newton(Q, R, A, lenA, B, lenB, mod);
 }
 
+void nmod_polydr_divrem(nmod_polydr_t Q, nmod_polydr_t R,
+            const nmod_polydr_t A, const nmod_polydr_t B, const nmod_ctx_t ctx)
+{
+    const slong lenA = A->length, lenB = B->length;
+    nmod_polydr_t tQ, tR;
+    mp_ptr q, r;
+    
+    if (lenB == 0)
+    {
+        flint_printf("Exception (nmod_poly_divrem). Division by zero.");
+        flint_abort();
+    }
+
+    if (lenA < lenB)
+    {
+        nmod_polydr_set(R, A, ctx);
+        nmod_polydr_zero(Q, ctx);
+        return;
+    }
+
+    if (Q == A || Q == B)
+    {
+        nmod_polydr_init2(tQ, lenA - lenB + 1, ctx);
+        q = tQ->coeffs;
+    }
+    else
+    {
+        nmod_polydr_fit_length(Q, lenA - lenB + 1, ctx);
+        q = Q->coeffs;
+    }
+
+    if (R == A || R == B)
+    {
+        nmod_polydr_init2(tR, lenB - 1, ctx);
+        r = tR->coeffs;
+    }
+    else
+    {
+        nmod_polydr_fit_length(R, lenB - 1, ctx);
+        r = R->coeffs;
+    }
+
+    _nmod_poly_divrem(q, r, A->coeffs, lenA, B->coeffs, lenB, ctx->mod);
+
+    if (Q == A || Q == B)
+    {
+        nmod_polydr_swap(Q, tQ, ctx);
+        nmod_polydr_clear(tQ, ctx);
+    }
+    if (R == A || R == B)
+    {
+        nmod_polydr_swap(R, tR, ctx);
+        nmod_polydr_clear(tR, ctx);
+    }
+        
+    Q->length = lenA - lenB + 1;
+    R->length = lenB - 1;
+
+    _nmod_polydr_normalise(R);
+}
+
 void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
                       const nmod_poly_t A, const nmod_poly_t B)
 {

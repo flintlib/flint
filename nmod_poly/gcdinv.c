@@ -32,6 +32,92 @@ slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S,
     return ans;
 }
 
+
+void nmod_polydr_gcdinv(nmod_polydr_t G, nmod_polydr_t S, 
+                      const nmod_polydr_t A, const nmod_polydr_t B, const nmod_ctx_t ctx)
+{
+    const slong lenA = A->length, lenB = B->length;
+
+    if (lenB < 2)
+    {
+        printf("Exception (nmod_polydr_gcdinv). lenB < 2.\n");
+        flint_abort();
+    }
+    if (lenA >= lenB)
+    {
+        nmod_polydr_t T;
+
+        /* TODO: We can probably use init_preinv here */
+        nmod_polydr_init(T, ctx);
+        nmod_polydr_rem(T, A, B, ctx);
+        nmod_polydr_gcdinv(G, S, T, B, ctx);
+        nmod_polydr_clear(T, ctx);
+        return;
+    }
+
+    if (lenA == 0)
+    {
+        nmod_polydr_zero(G, ctx);
+        nmod_polydr_zero(S, ctx);
+    } 
+    else
+    {
+        mp_limb_t *g, *s;
+        slong lenG;
+
+        if (G == A || G == B)
+        {
+            g = _nmod_vec_init(lenA);
+        }
+        else
+        {
+            nmod_polydr_fit_length(G, lenA, ctx);
+            g = G->coeffs;
+        }
+        if (S == A || S == B)
+        {
+            s = _nmod_vec_init(lenB - 1);
+        }
+        else
+        {
+            nmod_polydr_fit_length(S, lenB - 1, ctx);
+            s = S->coeffs;
+        }
+
+        lenG = _nmod_poly_gcdinv(g, s, 
+                                 A->coeffs, lenA, 
+                                 B->coeffs, lenB, 
+                                 ctx->mod);
+
+        if (G == A || G == B)
+        {
+            _nmod_vec_clear(G->coeffs);
+            G->coeffs = g;
+            G->alloc  = lenA;
+        }
+        if (S == A || S == B)
+        {
+            _nmod_vec_clear(S->coeffs);
+            S->coeffs = s;
+            S->alloc  = lenB - 1;
+        }
+
+        _nmod_polydr_set_length(G, lenG);
+        _nmod_polydr_set_length(S, lenB - lenG);
+        _nmod_polydr_normalise(S);
+
+        if (nmod_polydr_lead(G)[0] != WORD(1))
+        {
+            mp_limb_t inv;
+
+            inv = n_invmod(nmod_polydr_lead(G)[0], ctx->mod.n);
+            nmod_polydr_scalar_mul_nmod(G, G, inv, ctx);
+            nmod_polydr_scalar_mul_nmod(S, S, inv, ctx);
+        }
+    }
+}
+
+
 void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S, 
                       const nmod_poly_t A, const nmod_poly_t B)
 {

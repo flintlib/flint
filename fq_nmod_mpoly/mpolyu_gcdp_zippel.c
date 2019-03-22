@@ -17,18 +17,20 @@ void fq_nmod_next_not_zero(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
     slong i;
     slong deg = fqctx->modulus->length - 1;
 
-    for (i = 0; i < deg; i++) {
-        ulong c = nmod_poly_get_coeff_ui(alpha, i);
+    for (i = 0; i < deg; i++)
+    {
+        ulong c = nmod_polydr_get_coeff_ui(alpha, i, fqctx->fpctx);
         c += UWORD(1);
-        if (c < fqctx->mod.n) {
-            nmod_poly_set_coeff_ui(alpha, i, c);
+        if (c < fqctx->fpctx->mod.n)
+        {
+            nmod_polydr_set_coeff_ui(alpha, i, c, fqctx->fpctx);
             return;
         }
-        nmod_poly_set_coeff_ui(alpha, i, UWORD(0));
+        nmod_polydr_set_coeff_ui(alpha, i, UWORD(0), fqctx->fpctx);
     }
 
     /* we hit zero, so skip to 1 */
-    nmod_poly_set_coeff_ui(alpha, 0, UWORD(1));
+    nmod_polydr_set_coeff_ui(alpha, 0, UWORD(1), fqctx->fpctx);
 }
 
 
@@ -1077,7 +1079,7 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
     }
 
     /* we don't expect this function to work over F_p */
-    if (nmod_poly_degree(ctx->fqctx->modulus) < WORD(2))
+    if (nmod_polydr_degree(ctx->fqctx->modulus, ctx->fqctx->fpctx) < WORD(2))
     {
         success = 0;
         goto finished;

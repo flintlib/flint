@@ -42,7 +42,7 @@ main(void)
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(b, ctx);
-	fmpz_init(x);
+	    fmpz_init(x);
 
         fq_nmod_randtest(a, state, ctx);
         fmpz_randtest_mod_signed(x,state,fq_nmod_ctx_prime(ctx));
@@ -61,7 +61,7 @@ main(void)
 
         fq_nmod_clear(a, ctx);
         fq_nmod_clear(b, ctx);
-	fmpz_clear(x);
+	    fmpz_clear(x);
         fmpz_clear(p);
         fq_nmod_ctx_clear(ctx);
     }
@@ -74,7 +74,7 @@ main(void)
         fq_nmod_ctx_t ctx;
         fmpz_t x;
         fq_nmod_t a, c;
-	nmod_poly_t b;
+	    nmod_polydr_t b;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
@@ -83,8 +83,8 @@ main(void)
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(c, ctx);
-	fmpz_init(x);
-	nmod_poly_init(b, fmpz_get_ui(p));
+	    fmpz_init(x);
+	    nmod_polydr_init(b, ctx->fpctx);
 
         fq_nmod_randtest(a, state, ctx);
         fmpz_randtest_mod_signed(x, state, fq_nmod_ctx_prime(ctx));
@@ -92,12 +92,12 @@ main(void)
 
         if (fmpz_cmp_ui(x, 0) < 0)
         {
-            nmod_poly_scalar_mul_nmod(b,a,-fmpz_get_si(x));
-            nmod_poly_neg(b, b);
+            nmod_polydr_scalar_mul_nmod(b, a, -fmpz_get_si(x), ctx->fpctx);
+            nmod_polydr_neg(b, b, ctx->fpctx);
         }
         else
         {
-            nmod_poly_scalar_mul_nmod(b,a,fmpz_get_ui(x));
+            nmod_polydr_scalar_mul_nmod(b, a, fmpz_get_ui(x), ctx->fpctx);
         }
 
         result = (fq_nmod_equal(c, b, ctx));
@@ -107,15 +107,15 @@ main(void)
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
-	    flint_printf("x = "), fmpz_print(x), flint_printf("\n");
+	        flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             abort();
         }
 
         fq_nmod_clear(a, ctx);
         fq_nmod_clear(c, ctx);
-        nmod_poly_clear(b);
+        nmod_polydr_clear(b, ctx->fpctx);
         fmpz_clear(p);
-	fmpz_clear(x);
+	    fmpz_clear(x);
         fq_nmod_ctx_clear(ctx);
     }
 

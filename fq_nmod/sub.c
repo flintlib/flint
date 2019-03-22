@@ -17,12 +17,12 @@ void fq_nmod_sub(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const 
 {
     slong max = FLINT_MAX(op1->length, op2->length);
 
-    nmod_poly_fit_length(rop, max);
+    nmod_polydr_fit_length(rop, max, ctx->fpctx);
 
     _nmod_poly_sub(rop->coeffs, 
                    op1->coeffs, op1->length, op2->coeffs, op2->length, 
-                   ctx->mod);
+                   ctx->fpctx->mod);
 
-    _nmod_poly_set_length(rop, max);
-    _nmod_poly_normalise(rop);
+    _nmod_polydr_set_length(rop, max);
+    _nmod_polydr_normalise(rop);
 }

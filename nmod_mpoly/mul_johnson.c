@@ -15,7 +15,7 @@
 slong _nmod_mpoly_mul_johnson1(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
               const mp_limb_t * coeff2, const ulong * exp2, slong len2,
               const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-                                          ulong maskhi, const nmodf_ctx_t fctx)
+                                          ulong maskhi, const nmod_ctx_t fctx)
 {
     slong i, j;
     slong next_loc;
@@ -138,7 +138,7 @@ slong _nmod_mpoly_mul_johnson1(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc
 slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
                  const mp_limb_t * coeff2, const ulong * exp2, slong len2,
                  const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-      mp_bitcnt_t bits, slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
+      mp_bitcnt_t bits, slong N, const ulong * cmpmask, const nmod_ctx_t fctx)
 {
     slong i, j;
     slong next_loc;

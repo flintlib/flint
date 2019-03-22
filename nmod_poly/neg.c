@@ -17,6 +17,16 @@
 #include "nmod_poly.h"
 
 void
+nmod_polydr_neg(nmod_polydr_t res, const nmod_polydr_t poly1, const nmod_ctx_t ctx)
+{
+    nmod_polydr_fit_length(res, poly1->length, ctx);
+
+    _nmod_vec_neg(res->coeffs, poly1->coeffs, poly1->length, ctx->mod);
+
+    res->length = poly1->length;
+}
+
+void
 nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
 {
     nmod_poly_fit_length(res, poly1->length);

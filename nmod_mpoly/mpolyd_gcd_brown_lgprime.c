@@ -13,11 +13,11 @@
 #include "fq_nmod_mpoly.h"
 
 void nmod_mpolyd_lgprime_eval_last(fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_ctx_t efctx,
-                                     nmod_mpolyd_t A, const nmodf_ctx_t fctx)
+                                     nmod_mpolyd_t A, const nmod_ctx_t fctx)
 {
     slong i, j, k;
     slong degb_prod, degb_last=0, degb_prod_last=0;
-    nmod_poly_t P;
+    nmod_polydr_t P;
 
     fq_nmod_mpolyd_set_nvars(E, A->nvars - 1);
 
@@ -35,9 +35,6 @@ void nmod_mpolyd_lgprime_eval_last(fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_ctx_
 
     fq_nmod_mpolyd_fit_length(E, degb_prod_last, efctx->fqctx);
 
-    P->mod.n = fctx->mod.n;
-    P->mod.ninv = fctx->mod.ninv;
-    P->mod.norm = fctx->mod.norm;
     P->alloc = degb_last;
 
     j = 0;
@@ -48,7 +45,7 @@ void nmod_mpolyd_lgprime_eval_last(fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_ctx_
             k--;
         P->coeffs = A->coeffs + i;
         P->length = k;
-        nmod_poly_rem(E->coeffs + j, P, efctx->fqctx->modulus);
+        nmod_polydr_rem(E->coeffs + j, P, efctx->fqctx->modulus, fctx);
         j++;
     }
 
@@ -57,7 +54,7 @@ void nmod_mpolyd_lgprime_eval_last(fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_ctx_
     return;
 }
 
-void nmod_mpolyd_lgprime_startinterp(nmod_mpolyd_t A, const nmodf_ctx_t fctx,
+void nmod_mpolyd_lgprime_startinterp(nmod_mpolyd_t A, const nmod_ctx_t fctx,
                          fq_nmod_mpolyd_t E, const fq_nmod_mpolyd_ctx_t efctx)
 {
 
@@ -72,7 +69,7 @@ void nmod_mpolyd_lgprime_startinterp(nmod_mpolyd_t A, const nmodf_ctx_t fctx,
         A->deg_bounds[j] = E->deg_bounds[j];
         degb_prod *= E->deg_bounds[j];
     }
-    degb_last = nmod_poly_degree(efctx->fqctx->modulus);
+    degb_last = nmod_polydr_degree(efctx->fqctx->modulus, fctx);
     A->deg_bounds[E->nvars] = degb_last;
     degb_prod *= degb_last;
 
@@ -96,8 +93,8 @@ void nmod_mpolyd_lgprime_startinterp(nmod_mpolyd_t A, const nmodf_ctx_t fctx,
 
 
 void nmod_mpolyd_lgprime_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
-                              const nmodf_ctx_t fctx, fq_nmod_mpolyd_t N,
-                                 nmod_poly_t modulus, fq_nmod_t modulus_eval,
+                              const nmod_ctx_t fctx, fq_nmod_mpolyd_t N,
+                                 nmod_polydr_t modulus, fq_nmod_t modulus_eval,
                                               const fq_nmod_mpolyd_ctx_t efctx)
 {
 
@@ -108,7 +105,7 @@ void nmod_mpolyd_lgprime_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
     int changed = 0;
     int carry, Fok, Nok;
     slong * inds, Find, Nind, Tind;
-    nmod_poly_t P;
+    nmod_polydr_t P;
     TMP_INIT;
 
     fq_nmod_init(Nvalue, efctx->fqctx);
@@ -128,7 +125,7 @@ void nmod_mpolyd_lgprime_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
     }
         T->deg_bounds[j] = FLINT_MAX(1 + nmod_mpolyd_last_degree(F, fctx),
                                        modulus->length
-                                       + nmod_poly_degree(efctx->fqctx->modulus)
+                                       + nmod_polydr_degree(efctx->fqctx->modulus, fctx)
                                     );
     
     nmod_mpolyd_fit_length(T, degb_prod*T->deg_bounds[nvars-1]);
@@ -138,9 +135,6 @@ void nmod_mpolyd_lgprime_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
     for (j = 0; j < nvars - 1; j++)
         inds[j] = 0;
 
-    P->mod.n = fctx->mod.n;
-    P->mod.ninv = fctx->mod.ninv;
-    P->mod.norm = fctx->mod.norm;
     P->alloc = F->deg_bounds[nvars-1];
 
     Fok = 1;
@@ -173,7 +167,7 @@ void nmod_mpolyd_lgprime_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
                 k--;
             P->coeffs = F->coeffs + Find;
             P->length = k;
-            nmod_poly_rem(v, P, efctx->fqctx->modulus);
+            nmod_polydr_rem(v, P, efctx->fqctx->modulus, fctx);
             fq_nmod_sub(Nvalue, Nvalue, v, efctx->fqctx);
         }
 
@@ -182,7 +176,7 @@ void nmod_mpolyd_lgprime_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
             changed = 1;
 
             fq_nmod_mul(u, Nvalue, modulus_eval, efctx->fqctx);
-            nmod_poly_mul(v, u, modulus);
+            nmod_polydr_mul(v, u, modulus, fctx);
             FLINT_ASSERT(v->length <= T->deg_bounds[nvars-1]);
             for (k = 0; k < v->length; k++)
                 T->coeffs[Tind + k] = nmod_add(T->coeffs[Tind + k],
@@ -238,14 +232,14 @@ void nmod_mpolyd_lgprime_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
 int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
                                  nmod_mpolyd_t Abar,  nmod_mpolyd_t Bbar,
                                  nmod_mpolyd_t A, nmod_mpolyd_t B,
-                                                       const nmodf_ctx_t fctx)
+                                                       const nmod_ctx_t fctx)
 {
 
     int success;
     slong j, bound, deg;
     slong nvars = A->nvars;
-    nmod_poly_t cA, cB, cG, cAbar, cBbar, lcA, lcB, gamma;
-    nmod_poly_t cGs, cAbars, cBbars, modulus, modulus_eval;
+    nmod_polydr_t cA, cB, cG, cAbar, cBbar, lcA, lcB, gamma;
+    nmod_polydr_t cGs, cAbars, cBbars, modulus, modulus_eval;
     nmod_mpolyd_t T, Gs, Abars, Bbars;
     slong leadmon_gs_idx;
     slong * leadmon_gs, * leadmon_Gs;
@@ -263,31 +257,31 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
     leadmon_gs = (slong *) flint_malloc(nvars*sizeof(slong));
     leadmon_Gs = (slong *) flint_malloc(nvars*sizeof(slong));
 
-    nmod_poly_init(cA, fctx->mod.n);
-    nmod_poly_init(cB, fctx->mod.n);
+    nmod_polydr_init(cA, fctx);
+    nmod_polydr_init(cB, fctx);
     nmod_mpolyd_last_content(cA, A, fctx);
     nmod_mpolyd_last_content(cB, B, fctx);
 
     nmod_mpolyd_div_last_poly(A, cA, fctx);
     nmod_mpolyd_div_last_poly(B, cB, fctx);
 
-    nmod_poly_init(cG, fctx->mod.n);
-    nmod_poly_gcd_euclidean(cG, cA, cB);
+    nmod_polydr_init(cG, fctx);
+    nmod_polydr_gcd_euclidean(cG, cA, cB, fctx);
 
-    nmod_poly_init(cAbar, fctx->mod.n);
-    nmod_poly_init(cBbar, fctx->mod.n);
-    nmod_poly_div(cAbar, cA, cG);
-    nmod_poly_div(cBbar, cB, cG);
+    nmod_polydr_init(cAbar, fctx);
+    nmod_polydr_init(cBbar, fctx);
+    nmod_polydr_div(cAbar, cA, cG, fctx);
+    nmod_polydr_div(cBbar, cB, cG, fctx);
 
-    nmod_poly_init(lcA, fctx->mod.n);
-    nmod_poly_init(lcB, fctx->mod.n);
+    nmod_polydr_init(lcA, fctx);
+    nmod_polydr_init(lcB, fctx);
     nmod_mpolyd_last_lc(lcA, A, fctx);
     nmod_mpolyd_last_lc(lcB, B, fctx);
 
-    nmod_poly_init(gamma, fctx->mod.n);
-    nmod_poly_gcd_euclidean(gamma, lcA, lcB);
+    nmod_polydr_init(gamma, fctx);
+    nmod_polydr_gcd_euclidean(gamma, lcA, lcB, fctx);
 
-    bound = 1 + nmod_poly_degree(gamma)
+    bound = 1 + nmod_polydr_degree(gamma, fctx)
                + FLINT_MAX(nmod_mpolyd_last_degree(A, fctx),
                            nmod_mpolyd_last_degree(B, fctx));
 
@@ -297,9 +291,9 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
     nmod_mpolyd_init(Abars, nvars);
     nmod_mpolyd_init(Bbars, nvars);
 
-    nmod_poly_init(modulus_eval, fctx->mod.n);
-    nmod_poly_init(modulus, fctx->mod.n);
-    nmod_poly_one(modulus);
+    nmod_polydr_init(modulus_eval, fctx);
+    nmod_polydr_init(modulus, fctx);
+    nmod_polydr_one(modulus, fctx);
 
     /* find a starting degree for the ffield extension */
     deg = 0;
@@ -325,7 +319,7 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
         fq_nmod_mpolyd_init(bbars, nvars - 1, efctx->fqctx);
         fq_nmod_init(gamma_eval, efctx->fqctx);
 
-        nmod_poly_rem(gamma_eval, gamma, efctx->fqctx->modulus);
+        nmod_polydr_rem(gamma_eval, gamma, efctx->fqctx->modulus, fctx);
         if (fq_nmod_is_zero(gamma_eval, efctx->fqctx))
             goto break_continue;
 
@@ -354,7 +348,7 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
             goto successful;
         }
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, fctx) > 0)
         {
             nmod_mpolyd_leadmon(leadmon_Gs, Gs);
             for (j = 0; j < nvars - 1; j++)
@@ -365,16 +359,16 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
 
                 } else if (leadmon_gs[j] < leadmon_Gs[j])
                 {
-                    nmod_poly_one(modulus);
+                    nmod_polydr_one(modulus, fctx);
                 }
             }
         }
 
         fq_nmod_mpolyd_mul_scalar(gs, gamma_eval, efctx);
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, fctx) > 0)
         {
-            nmod_poly_rem(modulus_eval, modulus, efctx->fqctx->modulus);
+            nmod_polydr_rem(modulus_eval, modulus, efctx->fqctx->modulus, fctx);
             FLINT_ASSERT(!fq_nmod_is_zero(modulus_eval, efctx->fqctx));
             fq_nmod_inv(modulus_eval, modulus_eval, efctx->fqctx);
 
@@ -384,18 +378,18 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
         }
         else
         {
-            nmod_poly_one(modulus);
+            nmod_polydr_one(modulus, fctx);
             nmod_mpolyd_lgprime_startinterp(Gs, fctx, gs, efctx);
             nmod_mpolyd_lgprime_startinterp(Abars, fctx, abars, efctx);
             nmod_mpolyd_lgprime_startinterp(Bbars, fctx, bbars, efctx);
         }
 
-        nmod_poly_mul(modulus, modulus, efctx->fqctx->modulus);
+        nmod_polydr_mul(modulus, modulus, efctx->fqctx->modulus, fctx);
 
-        if (nmod_poly_degree(modulus) < bound)
+        if (nmod_polydr_degree(modulus, fctx) < bound)
             goto break_continue;
 
-        deggamma = nmod_poly_degree(gamma);
+        deggamma = nmod_polydr_degree(gamma, fctx);
         degGs = nmod_mpolyd_last_degree(Gs, fctx);
         degA = nmod_mpolyd_last_degree(A, fctx);
         degB = nmod_mpolyd_last_degree(B, fctx);
@@ -417,7 +411,7 @@ int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
         }
         else
         {
-            nmod_poly_one(modulus);
+            nmod_polydr_one(modulus, fctx);
             goto break_continue;
         }
 
@@ -439,33 +433,33 @@ cleanup:
     flint_free(leadmon_gs);
     flint_free(leadmon_Gs);
 
-    nmod_poly_clear(cA);
-    nmod_poly_clear(cB);
-    nmod_poly_clear(cG);
+    nmod_polydr_clear(cA, fctx);
+    nmod_polydr_clear(cB, fctx);
+    nmod_polydr_clear(cG, fctx);
 
-    nmod_poly_clear(cAbar);
-    nmod_poly_clear(cBbar);
+    nmod_polydr_clear(cAbar, fctx);
+    nmod_polydr_clear(cBbar, fctx);
 
-    nmod_poly_clear(lcA);
-    nmod_poly_clear(lcB);
+    nmod_polydr_clear(lcA, fctx);
+    nmod_polydr_clear(lcB, fctx);
 
-    nmod_poly_clear(gamma);
+    nmod_polydr_clear(gamma, fctx);
 
     nmod_mpolyd_clear(T);
     nmod_mpolyd_clear(Gs);
     nmod_mpolyd_clear(Abars);
     nmod_mpolyd_clear(Bbars);
 
-    nmod_poly_clear(modulus);
-    nmod_poly_clear(modulus_eval);
+    nmod_polydr_clear(modulus, fctx);
+    nmod_polydr_clear(modulus_eval, fctx);
 
     return success;
 
 successful:
 
-    nmod_poly_init(cGs, fctx->mod.n);
-    nmod_poly_init(cAbars, fctx->mod.n);
-    nmod_poly_init(cBbars, fctx->mod.n);
+    nmod_polydr_init(cGs, fctx);
+    nmod_polydr_init(cAbars, fctx);
+    nmod_polydr_init(cBbars, fctx);
     nmod_mpolyd_last_content(cGs, Gs, fctx);
     nmod_mpolyd_last_content(cAbars, Abars, fctx);
     nmod_mpolyd_last_content(cBbars, Bbars, fctx);
@@ -478,9 +472,9 @@ successful:
     nmod_mpolyd_mul_last_poly(Abar, Abars, cAbar, fctx);
     nmod_mpolyd_mul_last_poly(Bbar, Bbars, cBbar, fctx);
 
-    nmod_poly_clear(cGs);
-    nmod_poly_clear(cAbars);
-    nmod_poly_clear(cBbars);
+    nmod_polydr_clear(cGs, fctx);
+    nmod_polydr_clear(cAbars, fctx);
+    nmod_polydr_clear(cBbars, fctx);
 
     success = 1;
     goto cleanup;

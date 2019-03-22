@@ -16,7 +16,7 @@
 char *
 _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len,
                              const char ** x_in, slong bits,
-                                const mpoly_ctx_t mctx, const nmodf_ctx_t fctx)
+                                const mpoly_ctx_t mctx, const nmod_ctx_t fctx)
 {
     char * str, ** x = (char **) x_in;
     slong i, j, N, bound, off;

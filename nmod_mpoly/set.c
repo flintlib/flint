@@ -13,7 +13,7 @@
 
 void _nmod_mpoly_set(mp_limb_t * coeff1, ulong * exps1,
                      const mp_limb_t * coeff2, const ulong * exps2, slong len2,
-                                               slong N, const nmodf_ctx_t fctx)
+                                               slong N, const nmod_ctx_t fctx)
 {
     slong i;
 

@@ -41,6 +41,17 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
     }
 }
 
+void nmod_polydr_reverse(nmod_polydr_t output, const nmod_polydr_t input, slong m,
+                                                          const nmod_ctx_t ctx)
+{
+    nmod_polydr_fit_length(output, m, ctx);
+     
+    _nmod_poly_reverse(output->coeffs, input->coeffs, input->length, m);
+
+    output->length = m;
+    _nmod_polydr_normalise(output);
+}
+
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m)
 {
     nmod_poly_fit_length(output, m);

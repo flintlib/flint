@@ -12,13 +12,6 @@
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly.h"
 
-
-void nmod_mpoly_ctx_change_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t modulus)
-{
-    nmodf_ctx_clear(ctx->ffinfo);
-    nmodf_ctx_init(ctx->ffinfo, modulus);
-}
-
 /*
     Find a bound on the bits of the coefficients of gcd(A,B).
     If this overflows a mp_bitcnt_t, the max mp_bitcnt_t is returned.
@@ -156,7 +149,7 @@ choose_prime_outer:
     if (gammap == UWORD(0))
         goto choose_prime_outer;
 
-    nmod_mpoly_ctx_change_modulus(ctxp, p);
+    nmod_ctx_reset(ctxp->ffinfo, p);
 
     /* make sure mod p reduction does not kill either A or B */
     fmpz_mpolyu_to_nmod_mpolyu(Ap, ctxp, A, ctx);
@@ -205,7 +198,7 @@ choose_prime_inner:
     if (gammap == UWORD(0))
         goto choose_prime_inner;
 
-    nmod_mpoly_ctx_change_modulus(ctxp, p);
+    nmod_ctx_reset(ctxp->ffinfo, p);
 
     /* make sure mod p reduction does not kill either A or B */
     fmpz_mpolyu_to_nmod_mpolyu(Ap, ctxp, A, ctx);

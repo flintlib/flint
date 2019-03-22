@@ -27,8 +27,8 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx1;
         nmod_mpoly_t f;
-        nmod_poly_t g;
-        nmod_poly_struct ** vals1;
+        nmod_polydr_t g;
+        nmod_polydr_struct ** vals1;
         mp_limb_t fe, ge;
         mp_limb_t vals2, * vals3;
         slong nvars1;
@@ -42,7 +42,7 @@ main(void)
         nvars1 = ctx1->minfo->nvars;
 
         nmod_mpoly_init(f, ctx1);
-        nmod_poly_init(g, modulus);
+        nmod_polydr_init(g, ctx1->ffinfo);
 
         len1 = n_randint(state, 50/nvars1 + 1);
         len2 = n_randint(state, 100);
@@ -50,14 +50,14 @@ main(void)
 
         nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx1);
 
-        vals1 = (nmod_poly_struct **) flint_malloc(nvars1
-                                                * sizeof(nmod_poly_struct *));
+        vals1 = (nmod_polydr_struct **) flint_malloc(nvars1
+                                                * sizeof(nmod_polydr_struct *));
         for (v = 0; v < nvars1; v++)
         {
-            vals1[v] = (nmod_poly_struct *) flint_malloc(
-                                                    sizeof(nmod_poly_struct)); 
-            nmod_poly_init(vals1[v], modulus);
-            nmod_poly_randtest(vals1[v], state, len2);
+            vals1[v] = (nmod_polydr_struct *) flint_malloc(
+                                                    sizeof(nmod_polydr_struct)); 
+            nmod_polydr_init(vals1[v], ctx1->ffinfo);
+            nmod_polydr_randtest(vals1[v], state, len2, ctx1->ffinfo);
         }
 
         vals2 = n_randint(state, modulus);
@@ -65,15 +65,15 @@ main(void)
         vals3 = (mp_limb_t *) flint_malloc(nvars1*sizeof(mp_limb_t));
         for (v = 0; v < nvars1; v++)
         {
-            vals3[v] = nmod_poly_evaluate_nmod(vals1[v], vals2);
+            vals3[v] = nmod_polydr_evaluate_nmod(vals1[v], vals2, ctx1->ffinfo);
         }
 
         if (nmod_mpoly_total_degree_si(f, ctx1) < 100)
         {
-            nmod_mpoly_compose_nmod_poly(g, f, vals1, ctx1);
+            nmod_mpoly_compose_nmod_polydr(g, f, vals1, ctx1);
 
             fe = nmod_mpoly_evaluate_all_ui(f, vals3, ctx1);
-            ge = nmod_poly_evaluate_nmod(g, vals2);
+            ge = nmod_polydr_evaluate_nmod(g, vals2, ctx1->ffinfo);
 
             if (fe != ge)
             {
@@ -85,7 +85,7 @@ main(void)
 
         for (v = 0; v < nvars1; v++)
         {
-            nmod_poly_clear(vals1[v]);
+            nmod_polydr_clear(vals1[v], ctx1->ffinfo);
             flint_free(vals1[v]);
         }
         flint_free(vals1);
@@ -93,7 +93,7 @@ main(void)
         flint_free(vals3);
 
         nmod_mpoly_clear(f, ctx1);
-        nmod_poly_clear(g);
+        nmod_polydr_clear(g, ctx1->ffinfo);
 
         nmod_mpoly_ctx_clear(ctx1);
     }

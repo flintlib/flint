@@ -20,12 +20,12 @@ void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, slong len,
 
     if (len == 1)
     {
-        rop[0] = n_invmod(op[0], ctx->mod.n);
+        rop[0] = n_invmod(op[0], ctx->fpctx->mod.n);
         _nmod_vec_zero(rop + 1, d - 1);
     }
     else
     {
-        _nmod_poly_invmod(rop, op, len, ctx->modulus->coeffs, d + 1, ctx->mod);
+        _nmod_poly_invmod(rop, op, len, ctx->modulus->coeffs, d + 1, ctx->fpctx->mod);
     }
 }
 
@@ -47,7 +47,7 @@ void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
         }
         else
         {
-            nmod_poly_fit_length(rop, d);
+            nmod_polydr_fit_length(rop, d, ctx->fpctx);
             t = rop->coeffs;
         }
 
@@ -62,8 +62,8 @@ void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
         }
         else
         {
-            _nmod_poly_set_length(rop, d);
+            _nmod_polydr_set_length(rop, d);
         }
-        _nmod_poly_normalise(rop);
+        _nmod_polydr_normalise(rop);
     }
 }

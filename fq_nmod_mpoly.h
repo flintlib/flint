@@ -928,14 +928,14 @@ FLINT_DLL int fq_nmod_mpolyu_gcdm_zippel(fq_nmod_mpolyu_t G, fq_nmod_mpolyu_t A,
 
 FLINT_DLL int nmod_mpolyun_CRT_fq_nmod_mpolyu(slong * lastdeg,
                              nmod_mpolyun_t H, const nmod_mpoly_ctx_t ctx,
-            nmod_poly_t m, fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctxp);
+            nmod_polydr_t m, fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctxp);
 
 FLINT_DLL void nmod_mpolyun_redto_fq_nmod_mpolyu(fq_nmod_mpolyu_t A, nmod_mpolyun_t B,
                   const fq_nmod_mpoly_ctx_t ffctx, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpolyun_addinterp_fq_nmod_mpolyu(slong * lastdeg,
                                 nmod_mpolyun_t F, nmod_mpolyun_t T,
-                             nmod_poly_t m, const nmod_mpoly_ctx_t ctx,
+                             nmod_polydr_t m, const nmod_mpoly_ctx_t ctx,
                           fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ffctx);
 /*
     fq_nmod_mpolyn_t

@@ -65,7 +65,7 @@ void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod
         }
         else
         {
-            nmod_poly_fit_length(rop, 2 * d - 1);
+            nmod_polydr_fit_length(rop, 2 * d - 1, ctx->fpctx);
             t = rop->coeffs;
         }
 
@@ -80,9 +80,9 @@ void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod
         }
         else
         {
-            _nmod_poly_set_length(rop, d);
+            _nmod_polydr_set_length(rop, d);
         }
-        _nmod_poly_normalise(rop);
+        _nmod_polydr_normalise(rop);
     }
 }
 

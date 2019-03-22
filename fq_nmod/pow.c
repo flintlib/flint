@@ -72,12 +72,12 @@ void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e
            We unroll the first step of the loop, referring to {op, len}
          */
 
-        _nmod_poly_mul(R, op, len, op, len, ctx->mod);
+        _nmod_poly_mul(R, op, len, op, len, ctx->fpctx->mod);
         _fq_nmod_reduce(R, 2 * len - 1, ctx);
 
         if (fmpz_tstbit(e, bit))
         {
-            _nmod_poly_mul(S, R, d, op, len, ctx->mod);
+            _nmod_poly_mul(S, R, d, op, len, ctx->fpctx->mod);
             _fq_nmod_reduce(S, d + len - 1, ctx);
             T = R;
             R = S;
@@ -88,14 +88,14 @@ void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e
         {
             if (fmpz_tstbit(e, bit))
             {
-                _nmod_poly_mul(S, R, d, R, d, ctx->mod);
+                _nmod_poly_mul(S, R, d, R, d, ctx->fpctx->mod);
                 _fq_nmod_reduce(S, 2 * d - 1, ctx);
-                _nmod_poly_mul(R, S, d, op, len, ctx->mod);
+                _nmod_poly_mul(R, S, d, op, len, ctx->fpctx->mod);
                 _fq_nmod_reduce(R, d + len - 1, ctx);
             }
             else
             {
-                _nmod_poly_mul(S, R, d, R, d, ctx->mod);
+                _nmod_poly_mul(S, R, d, R, d, ctx->fpctx->mod);
                 _fq_nmod_reduce(S, 2 * d - 1, ctx);
                 T = R;
                 R = S;
@@ -138,7 +138,7 @@ void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmo
         }
         else
         {
-            nmod_poly_fit_length(rop, 2 * d - 1);
+            nmod_polydr_fit_length(rop, 2 * d - 1, ctx->fpctx);
             t = rop->coeffs;
         }
 
@@ -153,9 +153,9 @@ void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmo
         }
         else
         {
-            _nmod_poly_set_length(rop, d);
+            _nmod_polydr_set_length(rop, d);
         }
-        _nmod_poly_normalise(rop);
+        _nmod_polydr_normalise(rop);
     }
 }
 

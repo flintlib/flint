@@ -16,7 +16,7 @@ void nmod_mpoly_add_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
 {
     slong i, N;
     slong Blen = B->length;
-    const nmodf_ctx_struct * fctx = ctx->ffinfo;
+    const nmod_ctx_struct * fctx = ctx->ffinfo;
 
     if (Blen == 0)
     {

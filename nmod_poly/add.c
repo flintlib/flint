@@ -34,6 +34,21 @@ _nmod_poly_add(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2,
 }
 
 void
+nmod_polydr_add(nmod_polydr_t res, const nmod_polydr_t poly1,
+                              const nmod_polydr_t poly2, const nmod_ctx_t ctx)
+{
+    slong max = FLINT_MAX(poly1->length, poly2->length);
+
+    nmod_polydr_fit_length(res, max, ctx);
+
+    _nmod_poly_add(res->coeffs, poly1->coeffs, poly1->length, poly2->coeffs,
+                   poly2->length, ctx->mod);
+
+    res->length = max;
+    _nmod_polydr_normalise(res);  /* there may have been cancellation */
+}
+
+void
 nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1,
               const nmod_poly_t poly2)
 {

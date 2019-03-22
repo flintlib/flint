@@ -15,7 +15,7 @@
 
 void fq_nmod_mul(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx)
 {
-    nmod_poly_mul(rop, op1, op2);
+    nmod_polydr_mul(rop, op1, op2, ctx->fpctx);
 
     fq_nmod_reduce(rop, ctx);
 }

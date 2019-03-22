@@ -545,7 +545,7 @@ void fmpz_mpoly_convert_from_fmpz_mpolyd(
 
 int fmpz_mpolyd_CRT_nmod(fmpz_mpolyd_t A,
                                  const fmpz_mpolyd_t B, const fmpz_t Bm,
-                                 const nmod_mpolyd_t C, const nmodf_ctx_t fctx)
+                                 const nmod_mpolyd_t C, const nmod_ctx_t fctx)
 {
     int Bok, Cok;
     slong carry;
@@ -756,7 +756,7 @@ void fmpz_mpolyd_content(fmpz_t c, const fmpz_mpolyd_t A)
     _fmpz_vec_content(c, A->coeffs, degb_prod);
 }
 
-void fmpz_mpolyd_to_nmod_mpolyd(nmod_mpolyd_t Ap, fmpz_mpolyd_t A, const nmodf_ctx_t fctx)
+void fmpz_mpolyd_to_nmod_mpolyd(nmod_mpolyd_t Ap, fmpz_mpolyd_t A, const nmod_ctx_t fctx)
 {
     slong j;
     slong degb_prod;
@@ -774,7 +774,7 @@ void fmpz_mpolyd_to_nmod_mpolyd(nmod_mpolyd_t Ap, fmpz_mpolyd_t A, const nmodf_c
     _fmpz_vec_get_nmod_vec(Ap->coeffs, A->coeffs, degb_prod, fctx->mod);
 }
 
-void fmpz_mpolyd_set_nmod_mpolyd(fmpz_mpolyd_t A, nmod_mpolyd_t Ap, const nmodf_ctx_t fctx)
+void fmpz_mpolyd_set_nmod_mpolyd(fmpz_mpolyd_t A, nmod_mpolyd_t Ap, const nmod_ctx_t fctx)
 {
     slong j;
     slong degb_prod;
@@ -883,12 +883,12 @@ int fmpz_mpolyd_gcd_brown(fmpz_mpolyd_t G,
     fmpz_t gnm, gns, anm, ans, bnm, bns;
     fmpz_t lA, lB, cA, cB, cG, bound, temp, pp;
     nmod_mpolyd_t Gp, Apbar, Bpbar, Ap, Bp;
-    nmodf_ctx_t fctx;
+    nmod_ctx_t fctx;
     TMP_INIT;
 
     TMP_START;
 
-    nmodf_ctx_init(fctx, 2);
+    nmod_ctx_init(fctx, 2);
     nvars = A->nvars;
 
     nmod_mpolyd_init(Gp, nvars);
@@ -953,7 +953,7 @@ choose_next_prime:
     if (fmpz_divisible(lA, pp) || fmpz_divisible(lB, pp))
         goto choose_next_prime;
 
-    nmodf_ctx_reset(fctx, p);
+    nmod_ctx_reset(fctx, p);
     fmpz_mpolyd_to_nmod_mpolyd(Ap, A, fctx);
     fmpz_mpolyd_to_nmod_mpolyd(Bp, B, fctx);
     success = nmod_mpolyd_gcd_brown_smprime(Gp, Apbar, Bpbar, Ap, Bp, fctx);
@@ -1067,7 +1067,7 @@ done:
     nmod_mpolyd_clear(Ap);
     nmod_mpolyd_clear(Bp);
 
-    nmodf_ctx_clear(fctx);
+    nmod_ctx_clear(fctx);
 
     TMP_END;
     return success;

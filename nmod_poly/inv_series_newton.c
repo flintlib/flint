@@ -74,6 +74,38 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod
 }
 
 void
+nmod_polydr_inv_series_newton(nmod_polydr_t Qinv, const nmod_polydr_t Q,
+                                                 slong n, const nmod_ctx_t ctx)
+{
+    slong Qlen = Q->length;
+
+    Qlen = FLINT_MIN(Qlen, n);
+
+    if (Qlen == 0)
+    {
+        flint_printf("Exception (nmod_poly_inv_series_newton). Division by zero.\n");
+        flint_abort();
+    }
+
+    if (Qinv != Q)
+    {
+        nmod_polydr_fit_length(Qinv, n, ctx);
+        _nmod_poly_inv_series_newton(Qinv->coeffs, Q->coeffs, Qlen, n, ctx->mod);
+    }
+    else
+    {
+        nmod_polydr_t t;
+        nmod_polydr_init2(t, n, ctx);
+        _nmod_poly_inv_series_newton(t->coeffs, Q->coeffs, Qlen, n, ctx->mod);
+        nmod_polydr_swap(Qinv, t, ctx);
+        nmod_polydr_clear(t, ctx);
+    }
+
+    Qinv->length = n;
+    _nmod_polydr_normalise(Qinv);
+}
+
+void
 nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 {
     slong Qlen = Q->length;

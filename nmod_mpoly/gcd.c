@@ -614,7 +614,7 @@ int _nmod_mpoly_gcd(nmod_mpoly_t G, mp_bitcnt_t Gbits,
             Calculate gcd using univariates
         */
         ulong * Gshift;
-        nmod_poly_t a, b, g;
+        nmod_polydr_t a, b, g;
 
         Gshift = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
         for (j = 0; j < nvars; j++)
@@ -625,17 +625,17 @@ int _nmod_mpoly_gcd(nmod_mpoly_t G, mp_bitcnt_t Gbits,
                   A->exps, A->bits, A->length, Amax_exp, Amin_exp,
                   B->exps, B->bits, B->length, Bmax_exp, Bmin_exp, ctx->minfo);
 
-        nmod_poly_init_preinv(a, ctx->ffinfo->mod.n, ctx->ffinfo->mod.ninv);
-        nmod_poly_init_preinv(b, ctx->ffinfo->mod.n, ctx->ffinfo->mod.ninv);
-        nmod_poly_init_preinv(g, ctx->ffinfo->mod.n, ctx->ffinfo->mod.ninv);
-        _nmod_mpoly_to_nmod_poly_deflate(a, A, v_in_both, Amin_exp, Gstride, ctx);
-        _nmod_mpoly_to_nmod_poly_deflate(b, B, v_in_both, Bmin_exp, Gstride, ctx);
-        nmod_poly_gcd(g, a, b);
-        _nmod_mpoly_from_nmod_poly_inflate(G, Gbits, g, v_in_both,
+        nmod_polydr_init(a, ctx->ffinfo);
+        nmod_polydr_init(b, ctx->ffinfo);
+        nmod_polydr_init(g, ctx->ffinfo);
+        _nmod_mpoly_to_nmod_polydr_deflate(a, A, v_in_both, Amin_exp, Gstride, ctx);
+        _nmod_mpoly_to_nmod_polydr_deflate(b, B, v_in_both, Bmin_exp, Gstride, ctx);
+        nmod_polydr_gcd(g, a, b, ctx->ffinfo);
+        _nmod_mpoly_from_nmod_polydr_inflate(G, Gbits, g, v_in_both,
                                                           Gshift, Gstride, ctx);
-        nmod_poly_clear(a);
-        nmod_poly_clear(b);
-        nmod_poly_clear(g);
+        nmod_polydr_clear(a, ctx->ffinfo);
+        nmod_polydr_clear(b, ctx->ffinfo);
+        nmod_polydr_clear(g, ctx->ffinfo);
 
         success = 1;
         goto cleanup;

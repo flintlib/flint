@@ -125,7 +125,7 @@ slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
     {
         for (j = 0; j < (A->coeffs + i)->length; j++)
         {
-            deg = FLINT_MAX(deg, nmod_poly_degree((A->coeffs + i)->coeffs + j));
+            deg = FLINT_MAX(deg, nmod_polydr_degree((A->coeffs + i)->coeffs + j, ctx->ffinfo));
         }
     }
     FLINT_ASSERT(deg >= 0);
@@ -198,17 +198,17 @@ void nmod_mpoly_cvtto_mpolyn(nmod_mpolyn_t A, nmod_mpoly_t B,
 
         if (k > 0 && mpoly_monomial_equal(A->exps + N*k, A->exps + N*(k - 1), N))
         {
-            nmod_poly_set_coeff_ui(A->coeffs + k - 1, c, B->coeffs[i]);
-        } else
+            nmod_polydr_set_coeff_ui(A->coeffs + k - 1, c, B->coeffs[i], ctx->ffinfo);
+        }
+        else
         {
-            nmod_poly_zero(A->coeffs + k);
-            nmod_poly_set_coeff_ui(A->coeffs + k, c, B->coeffs[i]);
+            nmod_polydr_zero(A->coeffs + k, ctx->ffinfo);
+            nmod_polydr_set_coeff_ui(A->coeffs + k, c, B->coeffs[i], ctx->ffinfo);
             k++;
             nmod_mpolyn_fit_length(A, k + 1, ctx);
         }
     }
-
-    nmod_mpolyn_set_length(A, k, ctx);
+    A->length = k;
     TMP_END;
 }
 
@@ -309,7 +309,7 @@ void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B,
 {
     slong i;
     slong N;
-    nmod_poly_struct * Acoeff;
+    nmod_polydr_struct * Acoeff;
     mp_limb_t * Bcoeff;
     ulong * Aexp, * Bexp;
     slong Blen;
@@ -328,17 +328,10 @@ void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B,
 
     for (i = 0; i < Blen; i++)
     {
-        nmod_poly_zero(Acoeff + i);
-        nmod_poly_set_coeff_ui(Acoeff + i, 0, Bcoeff[i]);
+        nmod_polydr_set_nmod(Acoeff + i, Bcoeff[i], ctx->ffinfo);
         mpoly_monomial_set(Aexp + N*i, Bexp + N*i, N);
     }
 
-    /* demote remaining coefficients */
-    for (i = Blen; i < A->length; i++)
-    {
-        nmod_poly_clear(Acoeff + i);
-        nmod_poly_init(Acoeff + i, ctx->ffinfo->mod.n);
-    }
     A->length = Blen;
 }
 
@@ -363,7 +356,7 @@ void nmod_mpolyun_set_mpolyu(nmod_mpolyun_t A, const nmod_mpolyu_t B,
 
 
 void nmod_mpolyun_mul_poly(nmod_mpolyun_t A, const nmod_mpolyun_t B,
-                              const nmod_poly_t c, const nmod_mpoly_ctx_t ctx)
+                             const nmod_polydr_t c, const nmod_mpoly_ctx_t ctx)
 {
     slong i, Blen;
     nmod_mpolyn_struct * Acoeff, * Bcoeff;
@@ -382,50 +375,54 @@ void nmod_mpolyun_mul_poly(nmod_mpolyun_t A, const nmod_mpolyun_t B,
         Aexp[i] = Bexp[i];
     }
 
-    /* demote remaining coefficients */
-    for (i = Blen; i < A->length; i++)
-    {
-        nmod_mpolyn_clear(Acoeff + i, ctx);
-        nmod_mpolyn_init(Acoeff + i, A->bits, ctx);
-    }
     A->length = Blen;
 }
 
 
-void nmod_mpolyun_content_last(nmod_poly_t a, nmod_mpolyun_t B,
+void nmod_mpolyun_content_last(nmod_polydr_t a, nmod_mpolyun_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
+    nmod_polydr_t t;
 
-    nmod_poly_zero(a);
+    nmod_polydr_init(t, ctx->ffinfo);
+    nmod_polydr_zero(a, ctx->ffinfo);
+
     for (i = 0; i < B->length; i++)
     {
         for (j = 0; j < (B->coeffs + i)->length; j++)
         {
-            nmod_poly_gcd(a, a, (B->coeffs + i)->coeffs + j);
-            if (nmod_poly_degree(a) == 0)
+            nmod_polydr_gcd(t, a, (B->coeffs + i)->coeffs + j, ctx->ffinfo);
+            nmod_polydr_swap(t, a, ctx->ffinfo);
+            if (nmod_polydr_degree(a, ctx->ffinfo) == 0)
                 break;
         }
     }
+
+    nmod_polydr_clear(t, ctx->ffinfo);
+
 }
 
-void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
+void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_polydr_t b,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
+    nmod_polydr_t r, t;
 
-    nmod_poly_t r;
-    nmod_poly_init(r, ctx->ffinfo->mod.n);
+    nmod_polydr_init(r, ctx->ffinfo);
+    nmod_polydr_init(t, ctx->ffinfo);
     for (i = 0; i < A->length; i++)
     {
         for (j = 0; j < (A->coeffs + i)->length; j++)
         {
-            nmod_poly_divrem((A->coeffs + i)->coeffs + j, r,
-                             (A->coeffs + i)->coeffs + j, b);
-            FLINT_ASSERT(nmod_poly_is_zero(r));
+            nmod_polydr_divrem(t, r, (A->coeffs + i)->coeffs + j, b, ctx->ffinfo);
+            FLINT_ASSERT(nmod_polydr_is_zero(r, ctx->ffinfo));
+            FLINT_ASSERT(!nmod_polydr_is_zero(t, ctx->ffinfo));
+            nmod_polydr_swap((A->coeffs + i)->coeffs + j, t, ctx->ffinfo);
         }
     }
-    nmod_poly_clear(r);
+    nmod_polydr_clear(r, ctx->ffinfo);
+    nmod_polydr_clear(t, ctx->ffinfo);
 }
 
 
@@ -439,9 +436,10 @@ void nmod_mpolyn_set_fq_nmod_mpoly(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx,
     FLINT_ASSERT(Ap->bits == A->bits);
     nmod_mpolyn_fit_length(A, Ap->length, ctx);
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
-    for (i = 0; i < Ap->length; i++) {
+    for (i = 0; i < Ap->length; i++)
+    {
         mpoly_monomial_set(A->exps + N*i, Ap->exps + N*i, N);
-        nmod_poly_set(A->coeffs + i, Ap->coeffs + i);
+        nmod_polydr_set(A->coeffs + i, Ap->coeffs + i, ctx->ffinfo);
     }
     A->length = Ap->length;
 }
@@ -468,7 +466,7 @@ void nmod_mpolyun_set_fq_nmod_mpolyu(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ct
 */
 int nmod_mpolyn_CRT_fq_nmod_mpoly(slong * lastdeg,
                           nmod_mpolyn_t H, const nmod_mpoly_ctx_t ctx,
-                          nmod_poly_t m, fq_nmod_t inv_m_eval,
+                          nmod_polydr_t m, fq_nmod_t inv_m_eval,
                              fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctxp)
 {
     slong i;
@@ -477,11 +475,11 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(slong * lastdeg,
 #endif
     int changed = 0;
     fq_nmod_t u, v;
-    nmod_poly_t w;
+    nmod_polydr_t w;
 
     fq_nmod_init(u, ctxp->fqctx);
     fq_nmod_init(v, ctxp->fqctx);
-    nmod_poly_init(w, ctxp->fqctx->modulus->mod.n);
+    nmod_polydr_init(w, ctx->ffinfo);
 
     FLINT_ASSERT(H->length == A->length);
     FLINT_ASSERT(H->bits == A->bits);
@@ -491,41 +489,42 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(slong * lastdeg,
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(mpoly_monomial_equal(H->exps + N*i, A->exps + N*i, N));
-        nmod_poly_rem(u, H->coeffs + i, ctxp->fqctx->modulus);
+        nmod_polydr_rem(u, H->coeffs + i, ctxp->fqctx->modulus, ctx->ffinfo);
         fq_nmod_sub(v, A->coeffs + i, u, ctxp->fqctx);
         if (!fq_nmod_is_zero(v, ctxp->fqctx))
         {
             changed = 1;
             fq_nmod_mul(u, v, inv_m_eval, ctxp->fqctx);
-            nmod_poly_mul(w, u, m);
-            nmod_poly_add(H->coeffs + i, H->coeffs + i, w);
+            nmod_polydr_mul(w, u, m, ctx->ffinfo);
+            nmod_polydr_add(H->coeffs + i, H->coeffs + i, w, ctx->ffinfo);
         }
 
-        lastdeg[0] = FLINT_MAX(lastdeg[0], nmod_poly_degree(H->coeffs + i));
+        *lastdeg = FLINT_MAX(*lastdeg, nmod_polydr_degree(H->coeffs + i, ctx->ffinfo));
 
-        FLINT_ASSERT(nmod_poly_degree(H->coeffs + i) < nmod_poly_degree(m)
-                                                     + nmod_poly_degree(ctxp->fqctx->modulus));
+        FLINT_ASSERT(nmod_polydr_degree(H->coeffs + i, ctx->ffinfo)
+                                 < nmod_polydr_degree(m, ctx->ffinfo)
+                                 + nmod_polydr_degree(ctxp->fqctx->modulus, ctx->ffinfo));
     }
 
     fq_nmod_clear(u, ctxp->fqctx);
     fq_nmod_clear(v, ctxp->fqctx);
-    nmod_poly_clear(w);
+    nmod_polydr_clear(w, ctx->ffinfo);
 
     return changed;
 }
 
 int nmod_mpolyun_CRT_fq_nmod_mpolyu(slong * lastdeg,
                         nmod_mpolyun_t H, const nmod_mpoly_ctx_t ctx,
-             nmod_poly_t m, fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctxp)
+             nmod_polydr_t m, fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctxp)
 {
     slong i;
     int changed = 0;
     fq_nmod_t inv_m_eval;
 
-    lastdeg[0] = -WORD(1);
+    *lastdeg = -WORD(1);
 
     fq_nmod_init(inv_m_eval, ctxp->fqctx);
-    nmod_poly_rem(inv_m_eval, m, ctxp->fqctx->modulus);
+    nmod_polydr_rem(inv_m_eval, m, ctxp->fqctx->modulus, ctx->ffinfo);
     fq_nmod_inv(inv_m_eval, inv_m_eval, ctxp->fqctx);
 
     FLINT_ASSERT(H->bits == A->bits);
@@ -564,7 +563,7 @@ void nmod_mpolyn_redto_fq_nmod_mpoly(fq_nmod_mpoly_t A, nmod_mpolyn_t B,
     {
         fq_nmod_mpoly_fit_length(A, k + 1, ffctx);
         mpoly_monomial_set(A->exps + N*k, B->exps + N*i, N);
-        nmod_poly_rem(A->coeffs + k, B->coeffs + i, ffctx->fqctx->modulus);
+        nmod_polydr_rem(A->coeffs + k, B->coeffs + i, ffctx->fqctx->modulus, ctx->ffinfo);
         k += !fq_nmod_is_zero(A->coeffs + k, ffctx->fqctx);
     }
 
@@ -620,7 +619,7 @@ void nmod_mpolyn_eval_last(nmod_mpoly_t B, nmod_mpolyn_t A, mp_limb_t alpha,
     for (i = 0; i < A->length; i++)
     {
         mpoly_monomial_set(B->exps + N*k, A->exps + N*i, N);
-        B->coeffs[k] = nmod_poly_evaluate_nmod(A->coeffs + i, alpha);
+        B->coeffs[k] = nmod_polydr_evaluate_nmod(A->coeffs + i, alpha, ctx->ffinfo);
         if (B->coeffs[k] != UWORD(0))
         {
             k++;
@@ -660,7 +659,7 @@ void nmod_mpolyun_eval_last(nmod_mpolyu_t B, nmod_mpolyun_t A, mp_limb_t alpha,
 int
 nmod_mpolyn_addinterp(slong * lastdeg,
             nmod_mpolyn_t F, nmod_mpolyn_t T, nmod_mpoly_t A,
-            nmod_poly_t modulus,  mp_limb_t alpha,  const nmod_mpoly_ctx_t ctx)
+            nmod_polydr_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
     slong i, j, k;
@@ -671,14 +670,14 @@ nmod_mpolyn_addinterp(slong * lastdeg,
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
     mp_limb_t * Acoeff = A->coeffs;
-    nmod_poly_struct * Fcoeff = F->coeffs;
-    nmod_poly_struct * Tcoeff;
-    nmod_poly_t tp;
+    nmod_polydr_struct * Fcoeff = F->coeffs;
+    nmod_polydr_struct * Tcoeff;
+    nmod_polydr_t tp;
 
     FLINT_ASSERT(F->bits == bits);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    nmod_poly_init(tp, ctx->ffinfo->mod.n);
+    nmod_polydr_init(tp, ctx->ffinfo);
 
     nmod_mpolyn_fit_length(T, Flen + Alen, ctx);
     Texp = T->exps;
@@ -692,23 +691,26 @@ nmod_mpolyn_addinterp(slong * lastdeg,
         if (i < Flen && (j >= Alen
                         || mpoly_monomial_gt_nomask(Fexp + N*i, Aexp + N*j, N)))
         {
-            FLINT_ASSERT(!nmod_poly_is_zero(Fcoeff + i));
-            FLINT_ASSERT(nmod_poly_degree(Fcoeff + i) < nmod_poly_degree(modulus));
+            FLINT_ASSERT(!nmod_polydr_is_zero(Fcoeff + i, ctx->ffinfo));
+            FLINT_ASSERT(nmod_polydr_degree(Fcoeff + i, ctx->ffinfo)
+                         < nmod_polydr_degree(modulus, ctx->ffinfo));
 
             /* F term ok, A term missing */
-            v = nmod_poly_evaluate_nmod(Fcoeff + i, alpha);
+            v = nmod_polydr_evaluate_nmod(Fcoeff + i, alpha, ctx->ffinfo);
             if (v != UWORD(0))
             {
                 changed = 1;
-                nmod_poly_scalar_mul_nmod(tp, modulus, v);
-                nmod_poly_sub(Tcoeff + k, Fcoeff + i, tp);
-            } else {
-                nmod_poly_set(Tcoeff + k, Fcoeff + i);                
+                nmod_polydr_scalar_mul_nmod(tp, modulus, v, ctx->ffinfo);
+                nmod_polydr_sub(Tcoeff + k, Fcoeff + i, tp, ctx->ffinfo);
             }
-            lastdeg[0] = FLINT_MAX(lastdeg[0], nmod_poly_degree(Tcoeff + k));
+            else
+            {
+                nmod_polydr_set(Tcoeff + k, Fcoeff + i, ctx->ffinfo);
+            }
+            *lastdeg = FLINT_MAX(*lastdeg, nmod_polydr_degree(Tcoeff + k, ctx->ffinfo));
 
             mpoly_monomial_set(Texp + N*k, Fexp + N*i, N);
-            FLINT_ASSERT(!nmod_poly_is_zero(Tcoeff + k));
+            FLINT_ASSERT(!nmod_polydr_is_zero(Tcoeff + k, ctx->ffinfo));
             k++;
             i++;
         }
@@ -719,9 +721,8 @@ nmod_mpolyn_addinterp(slong * lastdeg,
             if (Acoeff[j] != UWORD(0))
             {
                 changed = 1;
-                nmod_poly_zero(Tcoeff + k);
-                nmod_poly_scalar_mul_nmod(Tcoeff + k, modulus, Acoeff[j]);
-                lastdeg[0] = FLINT_MAX(lastdeg[0], nmod_poly_degree(Tcoeff + k));
+                nmod_polydr_scalar_mul_nmod(Tcoeff + k, modulus, Acoeff[j], ctx->ffinfo);
+                *lastdeg = FLINT_MAX(*lastdeg, nmod_polydr_degree(Tcoeff + k, ctx->ffinfo));
                 mpoly_monomial_set(Texp + N*k, Aexp + N*j, N);
                 k++;
             }
@@ -730,46 +731,49 @@ nmod_mpolyn_addinterp(slong * lastdeg,
         else if (i < Flen && j < Alen
                              && mpoly_monomial_equal(Fexp + N*i, Aexp + N*j, N))
         {
-            FLINT_ASSERT(!nmod_poly_is_zero(Fcoeff + i));
-            FLINT_ASSERT(nmod_poly_degree(Fcoeff + i) < nmod_poly_degree(modulus));
+            FLINT_ASSERT(!nmod_polydr_is_zero(Fcoeff + i, ctx->ffinfo));
+            FLINT_ASSERT(nmod_polydr_degree(Fcoeff + i, ctx->ffinfo)
+                          < nmod_polydr_degree(modulus, ctx->ffinfo));
 
             /* F term ok, A term ok */
-            v = nmod_poly_evaluate_nmod(Fcoeff + i, alpha);
+            v = nmod_polydr_evaluate_nmod(Fcoeff + i, alpha, ctx->ffinfo);
             v = nmod_sub(Acoeff[j], v, ctx->ffinfo->mod);
             if (v != UWORD(0))
             {
                 changed = 1;
-                nmod_poly_scalar_mul_nmod(tp, modulus, v);
-                nmod_poly_add(Tcoeff + k, Fcoeff + i, tp);
-            } else {
-                nmod_poly_set(Tcoeff + k, Fcoeff + i);                
+                nmod_polydr_scalar_mul_nmod(tp, modulus, v, ctx->ffinfo);
+                nmod_polydr_add(Tcoeff + k, Fcoeff + i, tp, ctx->ffinfo);
             }
-            lastdeg[0] = FLINT_MAX(lastdeg[0], nmod_poly_degree(Tcoeff + k));
+            else
+            {
+                nmod_polydr_set(Tcoeff + k, Fcoeff + i, ctx->ffinfo);
+            }
+            *lastdeg = FLINT_MAX(*lastdeg, nmod_polydr_degree(Tcoeff + k, ctx->ffinfo));
             mpoly_monomial_set(Texp + N*k, Aexp + N*j, N);
-            FLINT_ASSERT(!nmod_poly_is_zero(Tcoeff + k));
+            FLINT_ASSERT(!nmod_polydr_is_zero(Tcoeff + k, ctx->ffinfo));
             k++;
             i++;
             j++;
-        } else 
+        }
+        else 
         {
             FLINT_ASSERT(0);
         }
     }
-
-    nmod_mpolyn_set_length(T, k, ctx);
+    T->length = k;
 
     if (changed)
     {
         nmod_mpolyn_swap(T, F);
     }
 
-    nmod_poly_clear(tp);
+    nmod_polydr_clear(tp, ctx->ffinfo);
     return changed;
 }
 
 int nmod_mpolyun_addinterp(slong * lastdeg,
              nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyu_t A,
-              nmod_poly_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
+            nmod_polydr_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
     slong i, j, k;
@@ -784,7 +788,7 @@ int nmod_mpolyun_addinterp(slong * lastdeg,
     nmod_mpoly_struct  * Acoeff;
     nmod_mpoly_t zero;
 
-    lastdeg[0] = -WORD(1);
+    *lastdeg = -WORD(1);
 
     FLINT_ASSERT(F->bits == T->bits);
     FLINT_ASSERT(T->bits == A->bits);
@@ -840,7 +844,8 @@ int nmod_mpolyun_addinterp(slong * lastdeg,
             k++;
             i++;
             j++;
-        } else 
+        }
+            else 
         {
             FLINT_ASSERT(0);
         }
@@ -871,7 +876,7 @@ int nmod_mpolyun_addinterp(slong * lastdeg,
 */
 int
 nmod_mpolyn_addinterp_fq_nmod_mpoly(slong * lastdeg,
-                         nmod_mpolyn_t F, nmod_mpolyn_t T, nmod_poly_t m,
+                         nmod_mpolyn_t F, nmod_mpolyn_t T, nmod_polydr_t m,
                          const nmod_mpoly_ctx_t ctx, fq_nmod_mpoly_t A,
                          fq_nmod_t inv_m_eval, const fq_nmod_mpoly_ctx_t ffctx)
 {
@@ -879,21 +884,21 @@ nmod_mpolyn_addinterp_fq_nmod_mpoly(slong * lastdeg,
     slong i, j, k;
     slong N;
     fq_nmod_t u, v;
-    nmod_poly_t w;
+    nmod_polydr_t w;
     mp_bitcnt_t bits = A->bits;
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
     fq_nmod_struct * Acoeff = A->coeffs;
-    nmod_poly_struct * Fcoeff = F->coeffs;
-    nmod_poly_struct * Tcoeff;
+    nmod_polydr_struct * Fcoeff = F->coeffs;
+    nmod_polydr_struct * Tcoeff;
 
     FLINT_ASSERT(F->bits == bits);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
     fq_nmod_init(u, ffctx->fqctx);
     fq_nmod_init(v, ffctx->fqctx);
-    nmod_poly_init(w, ffctx->fqctx->modulus->mod.n);
+    nmod_polydr_init(w, ctx->ffinfo);
 
     nmod_mpolyn_fit_length(T, Flen + Alen, ctx);
     Texp = T->exps;
@@ -907,24 +912,27 @@ nmod_mpolyn_addinterp_fq_nmod_mpoly(slong * lastdeg,
         if (i < Flen && (j >= Alen
                         || mpoly_monomial_gt_nomask(Fexp + N*i, Aexp + N*j, N)))
         {
-            FLINT_ASSERT(!nmod_poly_is_zero(Fcoeff + i));
-            FLINT_ASSERT(nmod_poly_degree(Fcoeff + i) < nmod_poly_degree(m));
+            FLINT_ASSERT(!nmod_polydr_is_zero(Fcoeff + i, ctx->ffinfo));
+            FLINT_ASSERT(nmod_polydr_degree(Fcoeff + i, ctx->ffinfo)
+                         < nmod_polydr_degree(m, ctx->ffinfo));
 
             /* F term ok, A term missing */
-            nmod_poly_rem(v, Fcoeff + i, ffctx->fqctx->modulus);
+            nmod_polydr_rem(v, Fcoeff + i, ffctx->fqctx->modulus, ctx->ffinfo);
             if (!fq_nmod_is_zero(v, ffctx->fqctx))
             {
                 changed = 1;
                 fq_nmod_mul(u, v, inv_m_eval, ffctx->fqctx);
-                nmod_poly_mul(w, u, m);
-                nmod_poly_sub(Tcoeff + k, Fcoeff + i, w);
-            } else {
-                nmod_poly_set(Tcoeff + k, Fcoeff + i);
+                nmod_polydr_mul(w, u, m, ctx->ffinfo);
+                nmod_polydr_sub(Tcoeff + k, Fcoeff + i, w, ctx->ffinfo);
             }
-            lastdeg[0] = FLINT_MAX(lastdeg[0], nmod_poly_degree(Tcoeff + k));
+            else
+            {
+                nmod_polydr_set(Tcoeff + k, Fcoeff + i, ctx->ffinfo);
+            }
+            *lastdeg = FLINT_MAX(*lastdeg, nmod_polydr_degree(Tcoeff + k, ctx->ffinfo));
 
             mpoly_monomial_set(Texp + N*k, Fexp + N*i, N);
-            FLINT_ASSERT(!nmod_poly_is_zero(Tcoeff + k));
+            FLINT_ASSERT(!nmod_polydr_is_zero(Tcoeff + k, ctx->ffinfo));
             k++;
             i++;
         }
@@ -936,8 +944,8 @@ nmod_mpolyn_addinterp_fq_nmod_mpoly(slong * lastdeg,
             {
                 changed = 1;
                 fq_nmod_mul(u, Acoeff + j, inv_m_eval, ffctx->fqctx);
-                nmod_poly_mul(Tcoeff + k, m, u);
-                lastdeg[0] = FLINT_MAX(lastdeg[0], nmod_poly_degree(Tcoeff + k));
+                nmod_polydr_mul(Tcoeff + k, m, u, ctx->ffinfo);
+                *lastdeg = FLINT_MAX(*lastdeg, nmod_polydr_degree(Tcoeff + k, ctx->ffinfo));
                 mpoly_monomial_set(Texp + N*k, Aexp + N*j, N);
                 k++;
             }
@@ -946,28 +954,32 @@ nmod_mpolyn_addinterp_fq_nmod_mpoly(slong * lastdeg,
         else if (i < Flen && j < Alen
                              && mpoly_monomial_equal(Fexp + N*i, Aexp + N*j, N))
         {
-            FLINT_ASSERT(!nmod_poly_is_zero(Fcoeff + i));
-            FLINT_ASSERT(nmod_poly_degree(Fcoeff + i) < nmod_poly_degree(m));
+            FLINT_ASSERT(!nmod_polydr_is_zero(Fcoeff + i, ctx->ffinfo));
+            FLINT_ASSERT(nmod_polydr_degree(Fcoeff + i, ctx->ffinfo) 
+                            < nmod_polydr_degree(m, ctx->ffinfo));
 
             /* F term ok, A term ok */
-            nmod_poly_rem(u, Fcoeff + i, ffctx->fqctx->modulus);
+            nmod_polydr_rem(u, Fcoeff + i, ffctx->fqctx->modulus, ctx->ffinfo);
             fq_nmod_sub(v, Acoeff + j, u, ffctx->fqctx);
             if (!fq_nmod_is_zero(v, ffctx->fqctx))
             {
                 changed = 1;
                 fq_nmod_mul(u, v, inv_m_eval, ffctx->fqctx);
-                nmod_poly_mul(w, m, u);
-                nmod_poly_add(Tcoeff + k, Fcoeff + i, w);
-            } else {
-                nmod_poly_set(Tcoeff + k, Fcoeff + i);                
+                nmod_polydr_mul(w, m, u, ctx->ffinfo);
+                nmod_polydr_add(Tcoeff + k, Fcoeff + i, w, ctx->ffinfo);
             }
-            lastdeg[0] = FLINT_MAX(lastdeg[0], nmod_poly_degree(Tcoeff + k));
+            else
+            {
+                nmod_polydr_set(Tcoeff + k, Fcoeff + i, ctx->ffinfo);                
+            }
+            *lastdeg = FLINT_MAX(*lastdeg, nmod_polydr_degree(Tcoeff + k, ctx->ffinfo));
             mpoly_monomial_set(Texp + N*k, Aexp + N*j, N);
-            FLINT_ASSERT(!nmod_poly_is_zero(Tcoeff + k));
+            FLINT_ASSERT(!nmod_polydr_is_zero(Tcoeff + k, ctx->ffinfo));
             k++;
             i++;
             j++;
-        } else 
+        }
+        else 
         {
             FLINT_ASSERT(0);
         }
@@ -982,14 +994,14 @@ nmod_mpolyn_addinterp_fq_nmod_mpoly(slong * lastdeg,
 
     fq_nmod_clear(u, ffctx->fqctx);
     fq_nmod_clear(v, ffctx->fqctx);
-    nmod_poly_clear(w);
+    nmod_polydr_clear(w, ctx->ffinfo);
 
     return changed;
 }
 
 
 int nmod_mpolyun_addinterp_fq_nmod_mpolyu(slong * lastdeg,
-                            nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_poly_t m,
+                            nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_polydr_t m,
                             const nmod_mpoly_ctx_t ctx, fq_nmod_mpolyu_t A,
                                                const fq_nmod_mpoly_ctx_t ffctx)
 {
@@ -1030,7 +1042,7 @@ int nmod_mpolyun_addinterp_fq_nmod_mpolyu(slong * lastdeg,
     zero->bits = A->bits;
 
     fq_nmod_init(inv_m_eval, ffctx->fqctx);
-    nmod_poly_rem(inv_m_eval, m, ffctx->fqctx->modulus);
+    nmod_polydr_rem(inv_m_eval, m, ffctx->fqctx->modulus, ctx->ffinfo);
     fq_nmod_inv(inv_m_eval, inv_m_eval, ffctx->fqctx);
 
     i = j = k = 0;

@@ -41,6 +41,13 @@ _nmod_poly_evaluate_nmod(mp_srcptr poly, slong len, mp_limb_t c, nmod_t mod)
 }
 
 mp_limb_t
+nmod_polydr_evaluate_nmod(const nmod_polydr_t poly, mp_limb_t c, const nmod_ctx_t ctx)
+{
+    FLINT_ASSERT(c < ctx->mod.n);
+    return _nmod_poly_evaluate_nmod(poly->coeffs, poly->length, c, ctx->mod);
+}
+
+mp_limb_t
 nmod_poly_evaluate_nmod(const nmod_poly_t poly, mp_limb_t c)
 {
     return _nmod_poly_evaluate_nmod(poly->coeffs, poly->length, c, poly->mod);

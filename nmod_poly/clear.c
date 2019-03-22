@@ -17,6 +17,13 @@
 #include "nmod_poly.h"
 
 void
+nmod_polydr_clear(nmod_polydr_t poly, const nmod_ctx_t ctx)
+{
+    if (poly->coeffs)
+        flint_free(poly->coeffs);
+}
+
+void
 nmod_poly_clear(nmod_poly_t poly)
 {
     if (poly->coeffs)

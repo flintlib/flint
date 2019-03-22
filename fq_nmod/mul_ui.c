@@ -13,5 +13,5 @@
 
 void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x, const fq_nmod_ctx_t ctx)
 {
-   nmod_poly_scalar_mul_nmod(rop, op, n_mod2_preinv(x, ctx->mod.n, ctx->mod.ninv));
+   nmod_polydr_scalar_mul_nmod(rop, op, n_mod2_preinv(x, ctx->fpctx->mod.n, ctx->fpctx->mod.ninv), ctx->fpctx);
 }

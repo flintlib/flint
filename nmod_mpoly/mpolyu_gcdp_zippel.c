@@ -82,7 +82,7 @@ void nmod_mpolyu_mulsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
     return 0 if the leading coeff of A vanishes
     else return 1
 */
-int nmod_mpolyu_evalfromsk(nmod_poly_t e, nmod_mpolyu_t A,
+int nmod_mpolyu_evalfromsk(nmod_polydr_t e, nmod_mpolyu_t A,
                                   nmod_mpolyu_t SK, const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -90,7 +90,7 @@ int nmod_mpolyu_evalfromsk(nmod_poly_t e, nmod_mpolyu_t A,
 
     FLINT_ASSERT(A->length == SK->length);
 
-    nmod_poly_zero(e);
+    nmod_polydr_zero(e, ctx->ffinfo);
     for (i = 0; i < A->length; i++)
     {
         mp_limb_t v, pp0, pp1, ac0 = 0, ac1 = 0, ac2 = 0;
@@ -105,7 +105,7 @@ int nmod_mpolyu_evalfromsk(nmod_poly_t e, nmod_mpolyu_t A,
         }
         NMOD_RED3(v, ac2, ac1, ac0, ctx->ffinfo->mod);
 
-        nmod_poly_set_coeff_ui(e, A->exps[i], v);
+        nmod_polydr_set_coeff_ui(e, A->exps[i], v, ctx->ffinfo);
         ret |= (i == 0 && v != 0);
     }
 
@@ -191,7 +191,7 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     int eval_points_tried;
     nmod_gcds_ret_t success;
     nmod_mpolyu_t Aevalsk1, Bevalsk1, fevalsk1, Aevalski, Bevalski, fevalski;
-    nmod_poly_t Aeval, Beval, Geval;
+    nmod_polydr_t Aeval, Beval, Geval;
     mp_limb_t * alpha, * b;
     nmod_mat_struct * M, * ML;
     nmod_mat_t MF, Msol;
@@ -248,9 +248,9 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     nmod_mpolyu_init(Aevalski, f->bits, ctx);
     nmod_mpolyu_init(Bevalski, f->bits, ctx);
     nmod_mpolyu_init(fevalski, f->bits, ctx);
-    nmod_poly_init(Aeval, ctx->ffinfo->mod.n);
-    nmod_poly_init(Beval, ctx->ffinfo->mod.n);
-    nmod_poly_init(Geval, ctx->ffinfo->mod.n);
+    nmod_polydr_init(Aeval, ctx->ffinfo);
+    nmod_polydr_init(Beval, ctx->ffinfo);
+    nmod_polydr_init(Geval, ctx->ffinfo);
 
     d = (slong *) TMP_ALLOC(f->length*sizeof(slong));
     for (i = 0; i < f->length; i++)
@@ -385,9 +385,9 @@ pick_evaluation_point:
             goto pick_evaluation_point;
         }
 
-        nmod_poly_gcd(Geval, Aeval, Beval);
+        nmod_polydr_gcd(Geval, Aeval, Beval, ctx->ffinfo);
 
-        if (f->exps[0] < nmod_poly_degree(Geval))
+        if (f->exps[0] < nmod_polydr_degree(Geval, ctx->ffinfo))
         {
             ++exceededcount;
             if (exceededcount < 2)
@@ -397,18 +397,18 @@ pick_evaluation_point:
             goto finished;
         }
 
-        if (f->exps[0] > nmod_poly_degree(Geval))
+        if (f->exps[0] > nmod_polydr_degree(Geval, ctx->ffinfo))
         {
             success = nmod_gcds_form_main_degree_too_high;
-            *degbound = nmod_poly_degree(Geval);
+            *degbound = nmod_polydr_degree(Geval, ctx->ffinfo);
             goto finished;
         }
 
-        k = nmod_poly_length(Geval);
+        k = nmod_polydr_length(Geval, ctx->ffinfo);
         j = WORD(0);
         while ((--k) >= 0)
         {
-            mp_limb_t ck = nmod_poly_get_coeff_ui(Geval, k);
+            mp_limb_t ck = nmod_polydr_get_coeff_ui(Geval, k, ctx->ffinfo);
             if (ck != UWORD(0))
             {
                 while (j < f->length && f->exps[j] > k)
@@ -587,9 +587,9 @@ finished:
     nmod_mpolyu_clear(Aevalski, ctx);
     nmod_mpolyu_clear(Bevalski, ctx);
     nmod_mpolyu_clear(fevalski, ctx);
-    nmod_poly_clear(Aeval);
-    nmod_poly_clear(Beval);
-    nmod_poly_clear(Geval);
+    nmod_polydr_clear(Aeval, ctx->ffinfo);
+    nmod_polydr_clear(Beval, ctx->ffinfo);
+    nmod_polydr_clear(Geval, ctx->ffinfo);
 
     TMP_END;
     return success;
@@ -600,18 +600,18 @@ finished:
 int nmod_mpolyu_gcdp_zippel_univar(nmod_mpolyu_t G,
                   nmod_mpolyu_t A, nmod_mpolyu_t B, const nmod_mpoly_ctx_t ctx)
 {
-    nmod_poly_t a, b, g;
+    nmod_polydr_t a, b, g;
     FLINT_ASSERT(A->bits == B->bits);
-    nmod_poly_init(a, ctx->ffinfo->mod.n);
-    nmod_poly_init(b, ctx->ffinfo->mod.n);
-    nmod_poly_init(g, ctx->ffinfo->mod.n);
+    nmod_polydr_init(a, ctx->ffinfo);
+    nmod_polydr_init(b, ctx->ffinfo);
+    nmod_polydr_init(g, ctx->ffinfo);
     nmod_mpolyu_cvtto_poly(a, A, ctx);
     nmod_mpolyu_cvtto_poly(b, B, ctx);
-    nmod_poly_gcd(g, a, b);
+    nmod_polydr_gcd(g, a, b, ctx->ffinfo);
     nmod_mpolyu_cvtfrom_poly(G, g, ctx);
-    nmod_poly_clear(a);
-    nmod_poly_clear(b);
-    nmod_poly_clear(g);
+    nmod_polydr_clear(a, ctx->ffinfo);
+    nmod_polydr_clear(b, ctx->ffinfo);
+    nmod_polydr_clear(g, ctx->ffinfo);
     return 1;
 }
 
@@ -627,7 +627,7 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
     slong lastdeg;
     slong bound;
     int success = 0, changed, have_enough;
-    nmod_poly_t a, b, c, g, modulus, tempmod;
+    nmod_polydr_t a, b, c, g, modulus, tempmod;
     nmod_mpolyu_t Aeval, Beval, Geval;
     nmod_mpolyun_t An, Bn, H, Ht;
     mp_limb_t geval, temp, alpha;
@@ -650,29 +650,29 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
     nmod_mpolyun_shift_right(An, A->exps[A->length - 1]);
     nmod_mpolyun_shift_right(Bn, B->exps[B->length - 1]);
 
-    nmod_poly_init(a, ctx->ffinfo->mod.n);
-    nmod_poly_init(b, ctx->ffinfo->mod.n);
-    nmod_poly_init(c, ctx->ffinfo->mod.n);
-    nmod_poly_init(g, ctx->ffinfo->mod.n);
+    nmod_polydr_init(a, ctx->ffinfo);
+    nmod_polydr_init(b, ctx->ffinfo);
+    nmod_polydr_init(c, ctx->ffinfo);
+    nmod_polydr_init(g, ctx->ffinfo);
 
     /* if the gcd has content wrt last variable, we are going to fail */
     nmod_mpolyun_content_last(a, An, ctx);
     nmod_mpolyun_content_last(b, Bn, ctx);
     nmod_mpolyun_divexact_last(An, a, ctx);
     nmod_mpolyun_divexact_last(Bn, b, ctx);
-    nmod_poly_gcd(c, a, b);
-    nmod_poly_gcd(g, nmod_mpolyun_leadcoeff_ref(An, ctx),
-                     nmod_mpolyun_leadcoeff_ref(Bn, ctx));
+    nmod_polydr_gcd(c, a, b, ctx->ffinfo);
+    nmod_polydr_gcd(g, nmod_mpolyun_leadcoeff_ref(An, ctx),
+                       nmod_mpolyun_leadcoeff_ref(Bn, ctx), ctx->ffinfo);
     Alastdeg = nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
 
     /* bound of the number of images required */
     bound = 1 + FLINT_MIN(Alastdeg, Blastdeg)
-              + nmod_poly_degree(g);
+              + nmod_polydr_degree(g, ctx->ffinfo);
 
-    nmod_poly_init(modulus, ctx->ffinfo->mod.n);
-    nmod_poly_init(tempmod, ctx->ffinfo->mod.n);
-    nmod_poly_set_coeff_ui(tempmod, 1, UWORD(1));
+    nmod_polydr_init(modulus, ctx->ffinfo);
+    nmod_polydr_init(tempmod, ctx->ffinfo);
+    nmod_polydr_set_coeff_ui(tempmod, 1, UWORD(1), ctx->ffinfo);
     nmod_mpolyu_init(Aeval, A->bits, ctx);
     nmod_mpolyu_init(Beval, A->bits, ctx);
     nmod_mpolyu_init(Geval, A->bits, ctx);
@@ -680,13 +680,13 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
     nmod_mpolyun_init(Ht, A->bits, ctx);
 
     /* fail if the gcd has content wrt last variable */
-    if (nmod_poly_degree(c) > 0)
+    if (nmod_polydr_degree(c, ctx->ffinfo) > 0)
     {
         success = 0;
         goto finished;
     }
 
-    nmod_poly_one(modulus);
+    nmod_polydr_one(modulus, ctx->ffinfo);
     nmod_mpolyun_zero(H, ctx);
 
     alpha = ctx->ffinfo->mod.n;
@@ -700,7 +700,7 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
         alpha--;
 
         /* make sure evaluation point does not kill both lc(A) and lc(B) */
-        geval = nmod_poly_evaluate_nmod(g, alpha);
+        geval = nmod_polydr_evaluate_nmod(g, alpha, ctx->ffinfo);
         if (geval == WORD(0))
             goto outer_continue;
 
@@ -722,7 +722,7 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
 
         FLINT_ASSERT(Geval->length > 0);
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, ctx->ffinfo) > 0)
         {
             if (Geval->exps[0] > H->exps[0])
             {
@@ -730,7 +730,7 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
             }
             else if (Geval->exps[0] < H->exps[0])
             {
-                nmod_poly_one(modulus);                
+                nmod_polydr_one(modulus, ctx->ffinfo);
             }
         }
 
@@ -739,17 +739,17 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
         nmod_mpolyu_scalar_mul_nmod(Geval, temp, ctx);
 
         /* update interpolant H */
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, ctx->ffinfo) > 0)
         {
-            nmod_poly_scalar_mul_nmod(modulus, modulus,
-                     n_invmod(nmod_poly_evaluate_nmod(modulus, alpha),
-                                                          ctx->ffinfo->mod.n));
+            nmod_polydr_scalar_mul_nmod(modulus, modulus,
+                     n_invmod(nmod_polydr_evaluate_nmod(modulus, alpha, ctx->ffinfo),
+                                             ctx->ffinfo->mod.n), ctx->ffinfo);
             changed = nmod_mpolyun_addinterp(&lastdeg, H, Ht, Geval,
                                                           modulus, alpha, ctx);
-            nmod_poly_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha);
-            nmod_poly_mul(modulus, modulus, tempmod);
+            nmod_polydr_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha, ctx->ffinfo);
+            nmod_polydr_mul(modulus, modulus, tempmod, ctx->ffinfo);
 
-            have_enough = nmod_poly_degree(modulus) >= bound;
+            have_enough = nmod_polydr_degree(modulus, ctx->ffinfo) >= bound;
 
             if (changed && !have_enough)
             {
@@ -773,15 +773,15 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
 
             if (have_enough)
             {
-                nmod_poly_one(modulus);
+                nmod_polydr_one(modulus, ctx->ffinfo);
                 goto outer_continue;
             }
         }
         else
         {
             nmod_mpolyun_set_mpolyu(H, Geval, ctx);
-            nmod_poly_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha);
-            nmod_poly_mul(modulus, modulus, tempmod);
+            nmod_polydr_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha, ctx->ffinfo);
+            nmod_polydr_mul(modulus, modulus, tempmod, ctx->ffinfo);
         }
 
 outer_continue:
@@ -790,12 +790,12 @@ outer_continue:
 
 finished:
 
-    nmod_poly_clear(a);
-    nmod_poly_clear(b);
-    nmod_poly_clear(c);
-    nmod_poly_clear(g);
-    nmod_poly_clear(modulus);
-    nmod_poly_clear(tempmod);
+    nmod_polydr_clear(a, ctx->ffinfo);
+    nmod_polydr_clear(b, ctx->ffinfo);
+    nmod_polydr_clear(c, ctx->ffinfo);
+    nmod_polydr_clear(g, ctx->ffinfo);
+    nmod_polydr_clear(modulus, ctx->ffinfo);
+    nmod_polydr_clear(tempmod, ctx->ffinfo);
     nmod_mpolyu_clear(Aeval, ctx);
     nmod_mpolyu_clear(Beval, ctx);
     nmod_mpolyu_clear(Geval, ctx);
@@ -821,8 +821,8 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
     slong bound;
     int success = 0, changed, have_enough;
     nmod_mpolyun_t An, Bn;
-    nmod_poly_t a, b, c, g;
-    nmod_poly_t modulus, tempmod;
+    nmod_polydr_t a, b, c, g;
+    nmod_polydr_t modulus, tempmod;
     nmod_mpolyu_t Aeval, Beval, Geval, Gform;
     nmod_mpolyun_t H, Ht;
     mp_limb_t geval, temp;
@@ -858,32 +858,32 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
     Alastdeg = nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
 
-    nmod_poly_init(a, ctx->ffinfo->mod.n);
-    nmod_poly_init(b, ctx->ffinfo->mod.n);
-    nmod_poly_init(c, ctx->ffinfo->mod.n);
-    nmod_poly_init(g, ctx->ffinfo->mod.n);
+    nmod_polydr_init(a, ctx->ffinfo);
+    nmod_polydr_init(b, ctx->ffinfo);
+    nmod_polydr_init(c, ctx->ffinfo);
+    nmod_polydr_init(g, ctx->ffinfo);
 
     /* if the gcd has content wrt last variable, we are going to fail */
     nmod_mpolyun_content_last(a, An, ctx);
     nmod_mpolyun_content_last(b, Bn, ctx);
     nmod_mpolyun_divexact_last(An, a, ctx);
     nmod_mpolyun_divexact_last(Bn, b, ctx);
-    nmod_poly_gcd(c, a, b);
-    nmod_poly_gcd(g, nmod_mpolyun_leadcoeff_ref(An, ctx),
-                     nmod_mpolyun_leadcoeff_ref(Bn, ctx));
+    nmod_polydr_gcd(c, a, b, ctx->ffinfo);
+    nmod_polydr_gcd(g, nmod_mpolyun_leadcoeff_ref(An, ctx),
+                       nmod_mpolyun_leadcoeff_ref(Bn, ctx), ctx->ffinfo);
     Alastdeg = nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
 
     /* bound of the number of images required */
     bound = 1 + FLINT_MIN(Alastdeg, Blastdeg)
-              + nmod_poly_degree(g);
+              + nmod_polydr_degree(g, ctx->ffinfo);
 
     /* degree bound on the gcd */
     degbound = FLINT_MIN(A->exps[0], B->exps[0]);
 
-    nmod_poly_init(modulus, ctx->ffinfo->mod.n);
-    nmod_poly_init(tempmod, ctx->ffinfo->mod.n);
-    nmod_poly_set_coeff_ui(tempmod, 1, UWORD(1));
+    nmod_polydr_init(modulus, ctx->ffinfo);
+    nmod_polydr_init(tempmod, ctx->ffinfo);
+    nmod_polydr_set_coeff_ui(tempmod, 1, UWORD(1), ctx->ffinfo);
     nmod_mpolyu_init(Aeval, A->bits, ctx);
     nmod_mpolyu_init(Beval, A->bits, ctx);
     nmod_mpolyu_init(Geval, A->bits, ctx);
@@ -892,7 +892,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
     nmod_mpolyun_init(Ht, A->bits, ctx);
 
     /* fail if the gcd has content wrt last variable */
-    if (nmod_poly_degree(c) > 0)
+    if (nmod_polydr_degree(c, ctx->ffinfo) > 0)
     {
         success = 0;
         goto finished;
@@ -904,7 +904,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
         goto finished;
     }
 
-    nmod_poly_one(modulus);
+    nmod_polydr_one(modulus, ctx->ffinfo);
     nmod_mpolyun_zero(H, ctx);
 
     start_alpha = UWORD(1) + n_randint(randstate, ctx->ffinfo->mod.n - UWORD(1));
@@ -924,7 +924,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
         }
 
         /* make sure evaluation point does not kill both lc(A) and lc(B) */
-        geval = nmod_poly_evaluate_nmod(g, alpha);
+        geval = nmod_polydr_evaluate_nmod(g, alpha, ctx->ffinfo);
         if (geval == 0)
         {
             goto outer_continue;
@@ -956,7 +956,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
             goto finished;
         }
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, ctx->ffinfo) > 0)
         {
             if (Geval->exps[0] > H->exps[0])
             {
@@ -964,7 +964,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
             }
             else if (Geval->exps[0] < H->exps[0])
             {
-                nmod_poly_one(modulus);                
+                nmod_polydr_one(modulus, ctx->ffinfo);                
             }
         }
 
@@ -972,11 +972,11 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
         temp = n_invmod(nmod_mpolyu_leadcoeff(Geval, ctx), ctx->ffinfo->mod.n);
         temp = nmod_mul(geval, temp, ctx->ffinfo->mod);
         nmod_mpolyu_scalar_mul_nmod(Geval, temp, ctx);
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, ctx->ffinfo) > 0)
         {
-            temp = nmod_poly_evaluate_nmod(modulus, alpha);
+            temp = nmod_polydr_evaluate_nmod(modulus, alpha, ctx->ffinfo);
             temp = n_invmod(temp, ctx->ffinfo->mod.n);
-            nmod_poly_scalar_mul_nmod(modulus, modulus, temp);
+            nmod_polydr_scalar_mul_nmod(modulus, modulus, temp, ctx->ffinfo);
             changed = nmod_mpolyun_addinterp(&lastdeg, H, Ht, Geval,
                                                           modulus, alpha, ctx);
             if (!changed)
@@ -998,8 +998,8 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
         {
             nmod_mpolyun_set_mpolyu(H, Geval, ctx);
         }
-        nmod_poly_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha);
-        nmod_poly_mul(modulus, modulus, tempmod);
+        nmod_polydr_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha, ctx->ffinfo);
+        nmod_polydr_mul(modulus, modulus, tempmod, ctx->ffinfo);
 
         nmod_mpolyu_setform_mpolyun(Gform, H, ctx);
 
@@ -1018,7 +1018,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
             }
 
             /* make sure evaluation does not kill both lc(A) and lc(B) */
-            geval = nmod_poly_evaluate_nmod(g, alpha);
+            geval = nmod_polydr_evaluate_nmod(g, alpha, ctx->ffinfo);
             if (geval == WORD(0))
             {
                 goto inner_continue;
@@ -1039,7 +1039,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
                     FLINT_ASSERT(0);
                 case nmod_gcds_form_main_degree_too_high:
                     /* nmod_mpolyu_gcds_zippel has updated degbound */
-                    nmod_poly_one(modulus);
+                    nmod_polydr_one(modulus, ctx->ffinfo);
                     goto outer_continue;
                 case nmod_gcds_form_wrong:
                 case nmod_gcds_no_solution:
@@ -1062,17 +1062,17 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
             temp = n_invmod(nmod_mpolyu_leadcoeff(Geval, ctx), ctx->ffinfo->mod.n);
             nmod_mpolyu_scalar_mul_nmod(Geval, nmod_mul(geval, temp,
                                                        ctx->ffinfo->mod), ctx);
-            FLINT_ASSERT(nmod_poly_degree(modulus) > 0);
-            temp = nmod_poly_evaluate_nmod(modulus, alpha);
+            FLINT_ASSERT(nmod_polydr_degree(modulus, ctx->ffinfo) > 0);
+            temp = nmod_polydr_evaluate_nmod(modulus, alpha, ctx->ffinfo);
             temp = n_invmod(temp, ctx->ffinfo->mod.n);
-            nmod_poly_scalar_mul_nmod(modulus, modulus, temp);
+            nmod_polydr_scalar_mul_nmod(modulus, modulus, temp, ctx->ffinfo);
 
             changed = nmod_mpolyun_addinterp(&lastdeg, H, Ht, Geval,
                                                           modulus, alpha, ctx);
-            nmod_poly_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha);
-            nmod_poly_mul(modulus, modulus, tempmod);
+            nmod_polydr_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha, ctx->ffinfo);
+            nmod_polydr_mul(modulus, modulus, tempmod, ctx->ffinfo);
 
-            have_enough = nmod_poly_degree(modulus) >= bound;
+            have_enough = nmod_polydr_degree(modulus, ctx->ffinfo) >= bound;
 
             if (changed && !have_enough)
             {
@@ -1096,7 +1096,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
 
             if (have_enough)
             {
-                nmod_poly_one(modulus);
+                nmod_polydr_one(modulus, ctx->ffinfo);
                 goto outer_continue;
             }
 
@@ -1112,12 +1112,12 @@ outer_continue:
 
 finished:
 
-    nmod_poly_clear(a);
-    nmod_poly_clear(b);
-    nmod_poly_clear(c);
-    nmod_poly_clear(g);
-    nmod_poly_clear(modulus);
-    nmod_poly_clear(tempmod);
+    nmod_polydr_clear(a, ctx->ffinfo);
+    nmod_polydr_clear(b, ctx->ffinfo);
+    nmod_polydr_clear(c, ctx->ffinfo);
+    nmod_polydr_clear(g, ctx->ffinfo);
+    nmod_polydr_clear(modulus, ctx->ffinfo);
+    nmod_polydr_clear(tempmod, ctx->ffinfo);
     nmod_mpolyu_clear(Aeval, ctx);
     nmod_mpolyu_clear(Beval, ctx);
     nmod_mpolyu_clear(Geval, ctx);

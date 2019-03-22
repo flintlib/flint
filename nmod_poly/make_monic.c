@@ -25,6 +25,21 @@ void _nmod_poly_make_monic(mp_ptr output,
     _nmod_vec_scalar_mul_nmod(output, input, len, inv, mod);
 }
 
+void nmod_polydr_make_monic(nmod_polydr_t output, const nmod_polydr_t input,
+                                                          const nmod_ctx_t ctx)
+{
+    if (input->length == 0)
+    {
+        flint_printf("Exception (nmod_poly_make_monic). Division by zero.\n");
+        flint_abort();
+    }
+
+    nmod_polydr_fit_length(output, input->length, ctx);
+    _nmod_poly_make_monic(output->coeffs, 
+                            input->coeffs, input->length, ctx->mod);
+    output->length = input->length;
+}
+
 void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 {
     if (input->length == 0)
@@ -38,4 +53,3 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
                             input->coeffs, input->length, input->mod);
     output->length = input->length;
 }
-

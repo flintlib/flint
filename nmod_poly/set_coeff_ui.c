@@ -15,6 +15,48 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
+void nmod_polydr_set_coeff_ui(nmod_polydr_t poly, slong j, ulong c,
+                                                          const nmod_ctx_t ctx)
+{
+    if (c >= ctx->mod.n)
+        NMOD_RED(c, c, ctx->mod);
+
+    if (j + 1 < poly->length) /* interior */
+    {
+        poly->coeffs[j] = c;
+        return;
+    }
+
+    nmod_polydr_fit_length(poly, j + 1, ctx);
+
+    if (j + 1 == poly->length) /* leading coeff */
+    {
+        if (c != 0)
+        {
+            poly->coeffs[j] = c;
+        }
+        else
+        {
+            poly->length--;
+            _nmod_polydr_normalise(poly);
+        }
+    }
+    else /* extend polynomial */
+    {
+        if (c == 0)
+        {
+            return;
+        }
+        else
+        {
+            flint_mpn_zero(poly->coeffs + poly->length, j - poly->length);
+
+            poly->coeffs[j] = c;
+            poly->length = j + 1;
+        }
+    }
+}
+
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c)
 {
     if (c >= poly->mod.n)

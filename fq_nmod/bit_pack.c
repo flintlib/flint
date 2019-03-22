@@ -15,6 +15,6 @@ void
 fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, mp_bitcnt_t bit_size,
                  const fq_nmod_ctx_t ctx)
 {
-    nmod_poly_bit_pack(f, op, bit_size);
+    nmod_polydr_bit_pack(f, op, bit_size, ctx->fpctx);
 }
 

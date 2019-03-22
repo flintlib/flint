@@ -19,7 +19,7 @@
 int
 _nmod_mpoly_fprint_pretty(FILE * file, const mp_limb_t * coeff, const ulong * exp,
                         slong len, const char ** x_in,  slong bits,
-                                const mpoly_ctx_t mctx, const nmodf_ctx_t fctx)
+                                const mpoly_ctx_t mctx, const nmod_ctx_t fctx)
 {
     slong i, j, N;
     fmpz * exponents;

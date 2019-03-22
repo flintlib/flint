@@ -13,7 +13,7 @@
 
 void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
-    nmod_poly_mul(rop, op, op);
+    nmod_polydr_mul(rop, op, op, ctx->fpctx);
 
     fq_nmod_reduce(rop, ctx);
 }

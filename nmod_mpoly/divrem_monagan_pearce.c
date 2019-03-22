@@ -16,7 +16,7 @@ slong _nmod_mpoly_divrem_monagan_pearce1(slong * lenr,
         mp_limb_t ** polyr, ulong ** expr, slong * allocr,
         const mp_limb_t * coeff2, const ulong * exp2, slong len2,
         const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-                              slong bits, ulong maskhi, const nmodf_ctx_t fctx)
+                              slong bits, ulong maskhi, const nmod_ctx_t fctx)
 {
     slong i, j, q_len, r_len, s;
     slong next_loc, heap_len = 2;
@@ -216,7 +216,7 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                   mp_limb_t ** polyr,      ulong ** expr, slong * allocr,
             const mp_limb_t * coeff2, const ulong * exp2, slong len2,
             const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-       slong bits, slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
+       slong bits, slong N, const ulong * cmpmask, const nmod_ctx_t fctx)
 {
     slong i, j, q_len, r_len, s;
     slong next_loc;

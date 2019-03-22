@@ -49,7 +49,7 @@ main(void)
             flint_printf("FAIL 1:\n\n");
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
-	    flint_printf("x = %wu\n",x);
+	        flint_printf("x = %wu\n",x);
             abort();
         }
 
@@ -65,18 +65,18 @@ main(void)
         fq_nmod_ctx_t ctx;
         ulong x;
         fq_nmod_t a, c;
-	nmod_poly_t b;
+	    nmod_polydr_t b;
 
         fq_nmod_ctx_randtest(ctx, state);
         
         fq_nmod_init(a, ctx);
         fq_nmod_init(c, ctx);
-	nmod_poly_init(b, ctx->mod.n);
+	    nmod_polydr_init(b, ctx->fpctx);
 
         fq_nmod_randtest(a, state, ctx);
-        x = n_randint(state, ctx->mod.n);
+        x = n_randint(state, ctx->fpctx->mod.n);
         fq_nmod_mul_ui(c, a, x, ctx);
-        nmod_poly_scalar_mul_nmod(b,a,x);
+        nmod_polydr_scalar_mul_nmod(b, a, x, ctx->fpctx);
 
         result = (fq_nmod_equal(c, b, ctx));
         if (!result)
@@ -85,13 +85,13 @@ main(void)
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c = "), fq_nmod_print_pretty(c, ctx), flint_printf("\n");
-	    flint_printf("x = %wu\n",x);
+	        flint_printf("x = %wu\n",x);
             abort();
         }
 
         fq_nmod_clear(a, ctx);
         fq_nmod_clear(c, ctx);
-        nmod_poly_clear(b);
+        nmod_polydr_clear(b, ctx->fpctx);
         fq_nmod_ctx_clear(ctx);
     }
 

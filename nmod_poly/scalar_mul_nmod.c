@@ -16,6 +16,27 @@
 #include "nmod_poly.h"
 
 void
+nmod_polydr_scalar_mul_nmod(nmod_polydr_t res, const nmod_polydr_t poly1,
+                                             mp_limb_t c, const nmod_ctx_t ctx)
+{
+    FLINT_ASSERT(c < ctx->mod.n);
+
+    if ((poly1->length == 0) || (c == 0))
+    {
+        nmod_polydr_zero(res, ctx);
+        return;
+    }
+
+    nmod_polydr_fit_length(res, poly1->length, ctx);
+
+    _nmod_vec_scalar_mul_nmod(res->coeffs, poly1->coeffs, poly1->length,
+                              c, ctx->mod);
+
+    res->length = poly1->length;
+    _nmod_polydr_normalise(res);  /* there may have been cancellation */
+}
+
+void
 nmod_poly_scalar_mul_nmod(nmod_poly_t res, const nmod_poly_t poly1, mp_limb_t c)
 {
     if ((poly1->length == 0) || (c == 0))

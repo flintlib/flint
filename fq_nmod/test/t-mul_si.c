@@ -49,7 +49,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
-	    flint_printf("x = %wd\n",x);
+	        flint_printf("x = %wd\n",x);
             abort();
         }
 
@@ -65,25 +65,25 @@ main(void)
         fq_nmod_ctx_t ctx;
         slong x;
         fq_nmod_t a, c;
-	nmod_poly_t b;
+	    nmod_polydr_t b;
 
         fq_nmod_ctx_randtest(ctx, state);
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(c, ctx);
-	nmod_poly_init(b, ctx->mod.n);
+	    nmod_polydr_init(b, ctx->fpctx);
 
         fq_nmod_randtest(a, state, ctx);
         x = z_randtest(state);
         fq_nmod_mul_si(c, a, x, ctx);
         if (x < 0) 
         {
-            nmod_poly_scalar_mul_nmod(b, a, -x);
-            nmod_poly_neg(b, b);
+            nmod_polydr_scalar_mul_nmod(b, a, (ulong)(-x)%ctx->fpctx->mod.n, ctx->fpctx);
+            nmod_polydr_neg(b, b, ctx->fpctx);
         }
         else
         {
-            nmod_poly_scalar_mul_nmod(b, a, x);
+            nmod_polydr_scalar_mul_nmod(b, a, (ulong)(x)%ctx->fpctx->mod.n, ctx->fpctx);
         }
 
         result = (fq_nmod_equal(c, b, ctx));
@@ -92,13 +92,13 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
-	    flint_printf("x = %wd\n",x);
+	        flint_printf("x = %wd\n",x);
             abort();
         }
 
         fq_nmod_clear(a, ctx);
         fq_nmod_clear(c, ctx);
-        nmod_poly_clear(b);
+        nmod_polydr_clear(b, ctx->fpctx);
         fq_nmod_ctx_clear(ctx);
     }
 

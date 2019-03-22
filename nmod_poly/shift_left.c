@@ -20,6 +20,16 @@ void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, slong len, slong k)
     flint_mpn_zero(res, k);
 }
 
+void nmod_polydr_shift_left(nmod_polydr_t res, const nmod_polydr_t poly, slong k,
+                                                          const nmod_ctx_t ctx)
+{
+    nmod_polydr_fit_length(res, poly->length + k, ctx);
+   
+    _nmod_poly_shift_left(res->coeffs, poly->coeffs, poly->length, k);
+   
+    res->length = poly->length + k;
+}
+
 void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, slong k)
 {
     nmod_poly_fit_length(res, poly->length + k);

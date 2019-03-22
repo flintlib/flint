@@ -15,10 +15,11 @@
 
 void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx)
 {
-    nmod_poly_clear(ctx->modulus);
-    nmod_poly_clear(ctx->inv);
+    nmod_polydr_clear(ctx->modulus, ctx->fpctx);
+    nmod_polydr_clear(ctx->inv, ctx->fpctx);
     fmpz_clear(fq_nmod_ctx_prime(ctx));
     _nmod_vec_clear(ctx->a);
     flint_free(ctx->j);
     flint_free(ctx->var);
+    nmod_ctx_clear(ctx->fpctx);
 }

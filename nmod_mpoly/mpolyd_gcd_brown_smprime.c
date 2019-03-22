@@ -80,7 +80,7 @@ cleanup:
 void nmod_mpolyd_gcd_brown_univar(nmod_mpolyd_t G,
                                  nmod_mpolyd_t Abar,       nmod_mpolyd_t Bbar,
                            const nmod_mpolyd_t A   , const nmod_mpolyd_t B,
-                                                        const nmodf_ctx_t fctx)
+                                                        const nmod_ctx_t fctx)
 {
     slong Alen, Blen;
 
@@ -169,8 +169,8 @@ void nmod_mpolyd_gcd_brown_univar(nmod_mpolyd_t G,
 /*
     Set cont to the content of A in the last (innermost) variable only
 */
-void nmod_mpolyd_last_content(nmod_poly_t cont, const nmod_mpolyd_t A,
-                                                        const nmodf_ctx_t fctx) 
+void nmod_mpolyd_last_content(nmod_polydr_t cont, const nmod_mpolyd_t A,
+                                                        const nmod_ctx_t fctx) 
 {
     mp_limb_t * temp;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
     slong i, j, Plen;
@@ -184,8 +184,8 @@ void nmod_mpolyd_last_content(nmod_poly_t cont, const nmod_mpolyd_t A,
     }
 
     TMP_START;
-    nmod_poly_zero(cont);
-    nmod_poly_fit_length(cont, degb_last);
+    nmod_polydr_zero(cont, fctx);
+    nmod_polydr_fit_length(cont, degb_last, fctx);
     temp = (mp_limb_t *) TMP_ALLOC(degb_last*sizeof(mp_limb_t));
 
     for (i = 0; i < degb_prod; i += degb_last)
@@ -232,8 +232,8 @@ void nmod_mpolyd_last_content(nmod_poly_t cont, const nmod_mpolyd_t A,
 /*
     Divide A by b in the last (innermost) variable only
 */
-void nmod_mpolyd_div_last_poly(nmod_mpolyd_t A, nmod_poly_t b,
-                                                        const nmodf_ctx_t fctx)
+void nmod_mpolyd_div_last_poly(nmod_mpolyd_t A, nmod_polydr_t b,
+                                                        const nmod_ctx_t fctx)
 {
     slong i, j, k;
     slong degb_prod, degb_last=0, new_degb_last;
@@ -292,7 +292,7 @@ void nmod_mpolyd_div_last_poly(nmod_mpolyd_t A, nmod_poly_t b,
 */
 
 void nmod_mpolyd_mul_last_poly(nmod_mpolyd_t M,
-                   nmod_mpolyd_t A, nmod_poly_t b, const nmodf_ctx_t fctx)
+                   nmod_mpolyd_t A, nmod_polydr_t b, const nmod_ctx_t fctx)
 {
     slong i, j, k;
     slong degb_prod, degb_last, new_degb_last;
@@ -349,7 +349,7 @@ void nmod_mpolyd_mul_last_poly(nmod_mpolyd_t M,
 }
 
 
-void nmod_mpolyd_mul_scalar(nmod_mpolyd_t A, mp_limb_t b, const nmodf_ctx_t fctx)
+void nmod_mpolyd_mul_scalar(nmod_mpolyd_t A, mp_limb_t b, const nmod_ctx_t fctx)
 {
     slong j, degb_prod;
 
@@ -365,8 +365,8 @@ void nmod_mpolyd_mul_scalar(nmod_mpolyd_t A, mp_limb_t b, const nmodf_ctx_t fctx
     Set lc to the leading coefficient of A when considered as a polynomial
     in all but the last variable
 */
-void nmod_mpolyd_last_lc(nmod_poly_t lc, const nmod_mpolyd_t A,
-                                                        const nmodf_ctx_t fctx)
+void nmod_mpolyd_last_lc(nmod_polydr_t lc, const nmod_mpolyd_t A,
+                                                        const nmod_ctx_t fctx)
 {
     slong i, j, lc_len;
     slong degb_prod, degb_last=0;
@@ -377,7 +377,7 @@ void nmod_mpolyd_last_lc(nmod_poly_t lc, const nmod_mpolyd_t A,
         degb_prod *= degb_last;
     }
 
-    nmod_poly_zero(lc);
+    nmod_polydr_zero(lc, fctx);
 
     for (i = degb_prod - degb_last; i >= 0; i -= degb_last)
     {
@@ -386,7 +386,7 @@ void nmod_mpolyd_last_lc(nmod_poly_t lc, const nmod_mpolyd_t A,
         {
             if (A->coeffs[i+lc_len-1] != 0)
             {
-                nmod_poly_fit_length(lc, lc_len);
+                nmod_polydr_fit_length(lc, lc_len, fctx);
                 flint_mpn_copyi(lc->coeffs, A->coeffs + i, lc_len);
                 lc->length = lc_len;
                 return;
@@ -402,7 +402,7 @@ void nmod_mpolyd_last_lc(nmod_poly_t lc, const nmod_mpolyd_t A,
     set v = P(alpha) given precomputed powers of alpha
 */
 void _nmod_mpolyd_eval_uni(mp_limb_t * v, mp_limb_t * Pcoeffs, slong Plen,
-                              mp_limb_t * alpha_powers, const nmodf_ctx_t fctx)
+                              mp_limb_t * alpha_powers, const nmod_ctx_t fctx)
 {
     mp_limb_t pp1, pp0, ac0, ac1, ac2;
     slong k;
@@ -425,7 +425,7 @@ void _nmod_mpolyd_eval_uni(mp_limb_t * v, mp_limb_t * Pcoeffs, slong Plen,
 */
 void _nmod_mpolyd_eval2_uni(mp_limb_t * vp, mp_limb_t * vm,
                                       mp_limb_t * Pcoeffs, slong Plen,
-                              mp_limb_t * alpha_powers, const nmodf_ctx_t fctx)
+                              mp_limb_t * alpha_powers, const nmod_ctx_t fctx)
 {
     mp_limb_t p1, p0, a0, a1, a2, q1, q0, b0, b1, b2;
     slong k;
@@ -462,7 +462,7 @@ void _nmod_mpolyd_eval2_uni(mp_limb_t * vp, mp_limb_t * vm,
     Set E to A evaluated at last_var = alpha. E will have one fewer variable.
 */
 void nmod_mpolyd_eval_last(nmod_mpolyd_t E, const nmod_mpolyd_t A,
-                              mp_limb_t * alpha_powers, const nmodf_ctx_t fctx)
+                              mp_limb_t * alpha_powers, const nmod_ctx_t fctx)
 {
 
     slong i, j, k;
@@ -507,7 +507,7 @@ void nmod_mpolyd_eval_last(nmod_mpolyd_t E, const nmod_mpolyd_t A,
 */
 void nmod_mpolyd_eval2_last(nmod_mpolyd_t Ep, nmod_mpolyd_t Em,
                            const nmod_mpolyd_t A,  mp_limb_t * alpha_powers,
-                                                        const nmodf_ctx_t fctx)
+                                                        const nmod_ctx_t fctx)
 {
     slong i, j;
     slong degb_prod, degb_last=0, degb_prod_last=0;
@@ -613,8 +613,8 @@ void nmod_mpolyd_set(nmod_mpolyd_t A, const nmod_mpolyd_t B)
     F = F + modulus*(N - F(alpha))
 */
 void nmod_mpolyd_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
-             nmod_mpolyd_t N, nmod_poly_t modulus, mp_limb_t * alpha_powers,
-                                                        const nmodf_ctx_t fctx)
+             nmod_mpolyd_t N, nmod_polydr_t modulus, mp_limb_t * alpha_powers,
+                                                        const nmod_ctx_t fctx)
 {
     slong i, j, k, degb_prod;
     slong nvars = F->nvars;
@@ -739,9 +739,9 @@ void nmod_mpolyd_addinterp(nmod_mpolyd_t F, nmod_mpolyd_t T,
 
 
 int nmod_mpolyd_addinterp2(nmod_mpolyd_t F, nmod_mpolyd_t T,
-             nmod_mpolyd_t P, nmod_mpolyd_t M, nmod_poly_t modulus,
+             nmod_mpolyd_t P, nmod_mpolyd_t M, nmod_polydr_t modulus,
                                  mp_limb_t alpha, mp_limb_t * alpha_powers,
-                                                        const nmodf_ctx_t fctx)
+                                                        const nmod_ctx_t fctx)
 {
     slong i, j, k, degb_prod;
     slong nvars = F->nvars;
@@ -906,7 +906,7 @@ void nmod_mpolyd_startinterp(nmod_mpolyd_t fxn,
 
 void nmod_mpolyd_startinterp2(nmod_mpolyd_t F, const nmod_mpolyd_t P,
                                  const nmod_mpolyd_t M, mp_limb_t alpha,
-                                                        const nmodf_ctx_t fctx)
+                                                        const nmod_ctx_t fctx)
 {
     int Pok, Mok, carry;
     slong Pind, Mind;
@@ -994,24 +994,21 @@ void nmod_mpolyd_startinterp2(nmod_mpolyd_t F, const nmod_mpolyd_t P,
     the degree and leading coeff of D
 */
 int nmod_mpolyd_divides_univar(nmod_mpolyd_t Q, nmod_mpolyd_t A, nmod_mpolyd_t D,
-                 slong expected_deg, mp_limb_t expected_lc, const nmodf_ctx_t fctx)
+                 slong expected_deg, mp_limb_t expected_lc, const nmod_ctx_t fctx)
 {
     int success = 0;
     slong i;
-    nmod_poly_t q, r;
-    nmod_poly_t a, d;
+    nmod_polydr_t q, r;
+    nmod_polydr_t a, d;
 
-    nmod_poly_init(q, fctx->mod.n);
-    nmod_poly_init(r, fctx->mod.n);
+    nmod_polydr_init(q, fctx);
+    nmod_polydr_init(r, fctx);
 
     FLINT_ASSERT(A->nvars == WORD(1));
 
     a->coeffs = A->coeffs;
     a->length = A->deg_bounds[0];
     a->alloc = A->deg_bounds[0];
-    a->mod.n = fctx->mod.n;
-    a->mod.ninv = fctx->mod.ninv;
-    a->mod.norm = fctx->mod.norm;
     while ((a->length > 0) && (a->coeffs[a->length - 1] == 0))
         a->length--;
 
@@ -1019,9 +1016,6 @@ int nmod_mpolyd_divides_univar(nmod_mpolyd_t Q, nmod_mpolyd_t A, nmod_mpolyd_t D
     d->coeffs = D->coeffs;
     d->length = D->deg_bounds[0];
     d->alloc = D->deg_bounds[0];
-    d->mod.n = fctx->mod.n;
-    d->mod.ninv = fctx->mod.ninv;
-    d->mod.norm = fctx->mod.norm;
     while ((d->length > 0) && (d->coeffs[d->length - 1] == 0))
         d->length--;
 
@@ -1032,7 +1026,7 @@ int nmod_mpolyd_divides_univar(nmod_mpolyd_t Q, nmod_mpolyd_t A, nmod_mpolyd_t D
         goto clean_up;
     }
 
-    nmod_poly_divrem_basecase(q, r, a, d);
+    nmod_polydr_divrem_basecase(q, r, a, d, fctx);
 
     if (r->length != 0)
     {
@@ -1051,8 +1045,8 @@ int nmod_mpolyd_divides_univar(nmod_mpolyd_t Q, nmod_mpolyd_t A, nmod_mpolyd_t D
 
 clean_up:
 
-    nmod_poly_clear(q);
-    nmod_poly_clear(r);
+    nmod_polydr_clear(q, fctx);
+    nmod_polydr_clear(r, fctx);
 
     return success;
 }
@@ -1060,14 +1054,14 @@ clean_up:
 
 int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
              nmod_mpolyd_t Abar, nmod_mpolyd_t Bbar,
-                   nmod_mpolyd_t A, nmod_mpolyd_t B, const nmodf_ctx_t fctx)
+                   nmod_mpolyd_t A, nmod_mpolyd_t B, const nmod_ctx_t fctx)
 {
     int success;
     slong j, bound;
     slong nvars = A->nvars;
     mp_limb_t alpha, gamma_eval, gammam_eval;
-    nmod_poly_t cA, cB, cG, cAbar, cBbar, lcA, lcB, gamma;
-    nmod_poly_t cGs, cAbars, cBbars, modulus, modulus2;
+    nmod_polydr_t cA, cB, cG, cAbar, cBbar, lcA, lcB, gamma;
+    nmod_polydr_t cGs, cAbars, cBbars, modulus, modulus2;
     nmod_mpolyd_t T, Gs, Abars, Bbars, phiA, phiB, phiAm, phiBm,
                                          gs, abars, bbars, gsm, abarsm, bbarsm;
     slong leadmon_gs_idx, leadmon_gsm_idx;
@@ -1091,31 +1085,31 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
     alpha_powers = (mp_limb_t *) flint_malloc(ABlenmax*sizeof(mp_limb_t));
     alpham_powers = (mp_limb_t *) flint_malloc(ABlenmax*sizeof(mp_limb_t));
 
-    nmod_poly_init(cA, fctx->mod.n);
-    nmod_poly_init(cB, fctx->mod.n);
+    nmod_polydr_init(cA, fctx);
+    nmod_polydr_init(cB, fctx);
     nmod_mpolyd_last_content(cA, A, fctx);
     nmod_mpolyd_last_content(cB, B, fctx);
 
     nmod_mpolyd_div_last_poly(A, cA, fctx);
     nmod_mpolyd_div_last_poly(B, cB, fctx);
 
-    nmod_poly_init(cG, fctx->mod.n);
-    nmod_poly_gcd_euclidean(cG, cA, cB);
+    nmod_polydr_init(cG, fctx);
+    nmod_polydr_gcd_euclidean(cG, cA, cB, fctx);
 
-    nmod_poly_init(cAbar, fctx->mod.n);
-    nmod_poly_init(cBbar, fctx->mod.n);
-    nmod_poly_div(cAbar, cA, cG);
-    nmod_poly_div(cBbar, cB, cG);
+    nmod_polydr_init(cAbar, fctx);
+    nmod_polydr_init(cBbar, fctx);
+    nmod_polydr_div(cAbar, cA, cG, fctx);
+    nmod_polydr_div(cBbar, cB, cG, fctx);
 
-    nmod_poly_init(lcA, fctx->mod.n);
-    nmod_poly_init(lcB, fctx->mod.n);
+    nmod_polydr_init(lcA, fctx);
+    nmod_polydr_init(lcB, fctx);
     nmod_mpolyd_last_lc(lcA, A, fctx);
     nmod_mpolyd_last_lc(lcB, B, fctx);
 
-    nmod_poly_init(gamma, fctx->mod.n);
-    nmod_poly_gcd_euclidean(gamma, lcA, lcB);
+    nmod_polydr_init(gamma, fctx);
+    nmod_polydr_gcd_euclidean(gamma, lcA, lcB, fctx);
 
-    bound = 1 + nmod_poly_degree(gamma)
+    bound = 1 + nmod_polydr_degree(gamma, fctx)
                + FLINT_MAX(nmod_mpolyd_last_degree(A, fctx),
                            nmod_mpolyd_last_degree(B, fctx));
 
@@ -1137,8 +1131,8 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
     nmod_mpolyd_init(abarsm, nvars - 1);
     nmod_mpolyd_init(bbarsm, nvars - 1);
 
-    nmod_poly_init(modulus, fctx->mod.n);
-    nmod_poly_init(modulus2, fctx->mod.n);
+    nmod_polydr_init(modulus, fctx);
+    nmod_polydr_init(modulus2, fctx);
 
     if ((fctx->mod.n & UWORD(1)) == UWORD(0))
     {
@@ -1149,7 +1143,7 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
     use_stab = 1;
     gstab = bstab = astab = 0;
 
-    nmod_poly_one(modulus);
+    nmod_polydr_one(modulus, fctx);
 
     for (alpha = (fctx->mod.n - UWORD(1))/UWORD(2); alpha != UWORD(0); alpha--)
     {
@@ -1165,8 +1159,8 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
                                        : alpha_powers[j];
         }
 
-        gamma_eval = nmod_poly_evaluate_nmod(gamma, alpha);
-        gammam_eval = nmod_poly_evaluate_nmod(gamma, fctx->mod.n - alpha);
+        gamma_eval = nmod_polydr_evaluate_nmod(gamma, alpha, fctx);
+        gammam_eval = nmod_polydr_evaluate_nmod(gamma, fctx->mod.n - alpha, fctx);
         if (gamma_eval == WORD(0) || gammam_eval == WORD(0))
             goto break_continue;
 
@@ -1196,7 +1190,7 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
                     6*x1^10 == 13 for the values x1 = +-12, +-13
                 */
                 use_stab = 0;
-                nmod_poly_one(modulus);
+                nmod_polydr_one(modulus, fctx);
                 alpha = (fctx->mod.n - UWORD(1))/UWORD(2);
                 goto break_continue;
             }   
@@ -1242,7 +1236,7 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
         }
 
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, fctx) > 0)
         {
             nmod_mpolyd_leadmon(leadmon_Gs, Gs);
             for (j = 0; j < nvars - 1; j++)
@@ -1258,7 +1252,7 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
                     nmod_mpolyd_zero(Gs);
                     nmod_mpolyd_zero(Abars);
                     nmod_mpolyd_zero(Bbars);
-                    nmod_poly_one(modulus);
+                    nmod_polydr_one(modulus, fctx);
                 }
             }
         }
@@ -1266,15 +1260,15 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
         nmod_mpolyd_mul_scalar(gs, gamma_eval, fctx);
         nmod_mpolyd_mul_scalar(gsm, gammam_eval, fctx);
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, fctx) > 0)
         {
-            temp = nmod_poly_evaluate_nmod(modulus, alpha);
+            temp = nmod_polydr_evaluate_nmod(modulus, alpha, fctx);
             FLINT_ASSERT(temp ==
-                        nmod_poly_evaluate_nmod(modulus, fctx->mod.n - alpha));
+                        nmod_polydr_evaluate_nmod(modulus, fctx->mod.n - alpha, fctx));
             temp = nmod_mul(temp, alpha, fctx->mod);
             temp = nmod_add(temp, temp, fctx->mod);
-            nmod_poly_scalar_mul_nmod(modulus, modulus,
-                                                  n_invmod(temp, fctx->mod.n));
+            nmod_polydr_scalar_mul_nmod(modulus, modulus,
+                                            n_invmod(temp, fctx->mod.n), fctx);
 
             if (!gstab)
             {
@@ -1285,27 +1279,27 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
                                                            alpha_powers, fctx);
             nmod_mpolyd_addinterp2(Bbars, T, bbars, bbarsm, modulus, alpha,
                                                            alpha_powers, fctx);            
-            nmod_poly_scalar_mul_nmod(modulus2, modulus, alpha2);
-            nmod_poly_shift_left(modulus, modulus, 2);
-            nmod_poly_sub(modulus, modulus, modulus2);
+            nmod_polydr_scalar_mul_nmod(modulus2, modulus, alpha2, fctx);
+            nmod_polydr_shift_left(modulus, modulus, 2, fctx);
+            nmod_polydr_sub(modulus, modulus, modulus2, fctx);
 
         } else
         {
-            nmod_poly_one(modulus);
+            nmod_polydr_one(modulus, fctx);
             nmod_mpolyd_startinterp2(Gs, gs, gsm, alpha, fctx);
             nmod_mpolyd_startinterp2(Abars, abars, abarsm, alpha, fctx);
             nmod_mpolyd_startinterp2(Bbars, bbars, bbarsm, alpha, fctx);
-            nmod_poly_scalar_mul_nmod(modulus2, modulus, alpha2);
-            nmod_poly_shift_left(modulus, modulus, 2);
-            nmod_poly_sub(modulus, modulus, modulus2);
+            nmod_polydr_scalar_mul_nmod(modulus2, modulus, alpha2, fctx);
+            nmod_polydr_shift_left(modulus, modulus, 2, fctx);
+            nmod_polydr_sub(modulus, modulus, modulus2, fctx);
 
             gstab = astab = bstab = 0;
         }
 
-        if (nmod_poly_degree(modulus) < bound)
+        if (nmod_polydr_degree(modulus, fctx) < bound)
             continue;
 
-        deggamma = nmod_poly_degree(gamma);
+        deggamma = nmod_polydr_degree(gamma, fctx);
         degGs = nmod_mpolyd_last_degree(Gs, fctx);
         degA = nmod_mpolyd_last_degree(A, fctx);
         degB = nmod_mpolyd_last_degree(B, fctx);
@@ -1322,7 +1316,7 @@ int nmod_mpolyd_gcd_brown_smprime_bivar(nmod_mpolyd_t G,
             nmod_mpolyd_zero(Gs);
             nmod_mpolyd_zero(Abars);
             nmod_mpolyd_zero(Bbars);
-            nmod_poly_one(modulus);
+            nmod_polydr_one(modulus, fctx);
             continue;
         }
 
@@ -1340,17 +1334,17 @@ cleanup:
     flint_free(alpha_powers);
     flint_free(alpham_powers);
 
-    nmod_poly_clear(cA);
-    nmod_poly_clear(cB);
-    nmod_poly_clear(cG);
+    nmod_polydr_clear(cA, fctx);
+    nmod_polydr_clear(cB, fctx);
+    nmod_polydr_clear(cG, fctx);
 
-    nmod_poly_clear(cAbar);
-    nmod_poly_clear(cBbar);
+    nmod_polydr_clear(cAbar, fctx);
+    nmod_polydr_clear(cBbar, fctx);
 
-    nmod_poly_clear(lcA);
-    nmod_poly_clear(lcB);
+    nmod_polydr_clear(lcA, fctx);
+    nmod_polydr_clear(lcB, fctx);
 
-    nmod_poly_clear(gamma);
+    nmod_polydr_clear(gamma, fctx);
 
     nmod_mpolyd_clear(T);
     nmod_mpolyd_clear(Gs);
@@ -1369,16 +1363,16 @@ cleanup:
     nmod_mpolyd_clear(abarsm);
     nmod_mpolyd_clear(bbarsm);
 
-    nmod_poly_clear(modulus);
-    nmod_poly_clear(modulus2);
+    nmod_polydr_clear(modulus, fctx);
+    nmod_polydr_clear(modulus2, fctx);
 
     return success;
 
 successful:
 
-    nmod_poly_init(cGs, fctx->mod.n);
-    nmod_poly_init(cAbars, fctx->mod.n);
-    nmod_poly_init(cBbars, fctx->mod.n);
+    nmod_polydr_init(cGs, fctx);
+    nmod_polydr_init(cAbars, fctx);
+    nmod_polydr_init(cBbars, fctx);
     nmod_mpolyd_last_content(cGs, Gs, fctx);
     nmod_mpolyd_last_content(cAbars, Abars, fctx);
     nmod_mpolyd_last_content(cBbars, Bbars, fctx);
@@ -1391,9 +1385,9 @@ successful:
     nmod_mpolyd_mul_last_poly(Abar, Abars, cAbar, fctx);
     nmod_mpolyd_mul_last_poly(Bbar, Bbars, cBbar, fctx);
 
-    nmod_poly_clear(cGs);
-    nmod_poly_clear(cAbars);
-    nmod_poly_clear(cBbars);
+    nmod_polydr_clear(cGs, fctx);
+    nmod_polydr_clear(cAbars, fctx);
+    nmod_polydr_clear(cBbars, fctx);
 
     success = 1;
     goto cleanup;
@@ -1401,14 +1395,14 @@ successful:
 
 int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
                 nmod_mpolyd_t Abar, nmod_mpolyd_t Bbar,
-                     nmod_mpolyd_t A, nmod_mpolyd_t B,  const nmodf_ctx_t fctx)
+                     nmod_mpolyd_t A, nmod_mpolyd_t B,  const nmod_ctx_t fctx)
 {
     int success;
     slong j, bound;
     slong nvars = A->nvars;
     mp_limb_t alpha, gamma_eval, gammam_eval;
-    nmod_poly_t cA, cB, cG, cAbar, cBbar, lcA, lcB, gamma;
-    nmod_poly_t cGs, cAbars, cBbars, modulus, modulus2;
+    nmod_polydr_t cA, cB, cG, cAbar, cBbar, lcA, lcB, gamma;
+    nmod_polydr_t cGs, cAbars, cBbars, modulus, modulus2;
     nmod_mpolyd_t T, Gs, Abars, Bbars, phiA, phiB, phiAm, phiBm,
                                          gs, abars, bbars, gsm, abarsm, bbarsm;
     slong leadmon_gs_idx, leadmon_gsm_idx;
@@ -1438,31 +1432,31 @@ int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
     alpha_powers = (mp_limb_t *) flint_malloc(ABlenmax*sizeof(mp_limb_t));
     alpham_powers = (mp_limb_t *) flint_malloc(ABlenmax*sizeof(mp_limb_t));
 
-    nmod_poly_init(cA, fctx->mod.n);
-    nmod_poly_init(cB, fctx->mod.n);
+    nmod_polydr_init(cA, fctx);
+    nmod_polydr_init(cB, fctx);
     nmod_mpolyd_last_content(cA, A, fctx);
     nmod_mpolyd_last_content(cB, B, fctx);
 
     nmod_mpolyd_div_last_poly(A, cA, fctx);
     nmod_mpolyd_div_last_poly(B, cB, fctx);
 
-    nmod_poly_init(cG, fctx->mod.n);
-    nmod_poly_gcd_euclidean(cG, cA, cB);
+    nmod_polydr_init(cG, fctx);
+    nmod_polydr_gcd_euclidean(cG, cA, cB, fctx);
 
-    nmod_poly_init(cAbar, fctx->mod.n);
-    nmod_poly_init(cBbar, fctx->mod.n);
-    nmod_poly_div(cAbar, cA, cG);
-    nmod_poly_div(cBbar, cB, cG);
+    nmod_polydr_init(cAbar, fctx);
+    nmod_polydr_init(cBbar, fctx);
+    nmod_polydr_div(cAbar, cA, cG, fctx);
+    nmod_polydr_div(cBbar, cB, cG, fctx);
 
-    nmod_poly_init(lcA, fctx->mod.n);
-    nmod_poly_init(lcB, fctx->mod.n);
+    nmod_polydr_init(lcA, fctx);
+    nmod_polydr_init(lcB, fctx);
     nmod_mpolyd_last_lc(lcA, A, fctx);
     nmod_mpolyd_last_lc(lcB, B, fctx);
 
-    nmod_poly_init(gamma, fctx->mod.n);
-    nmod_poly_gcd_euclidean(gamma, lcA, lcB);
+    nmod_polydr_init(gamma, fctx);
+    nmod_polydr_gcd_euclidean(gamma, lcA, lcB, fctx);
 
-    bound = 1 + nmod_poly_degree(gamma)
+    bound = 1 + nmod_polydr_degree(gamma, fctx)
                + FLINT_MAX(nmod_mpolyd_last_degree(A, fctx),
                            nmod_mpolyd_last_degree(B, fctx));
 
@@ -1484,10 +1478,10 @@ int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
     nmod_mpolyd_init(abarsm, nvars - 1);
     nmod_mpolyd_init(bbarsm, nvars - 1);
 
-    nmod_poly_init(modulus, fctx->mod.n);
-    nmod_poly_init(modulus2, fctx->mod.n);
+    nmod_polydr_init(modulus, fctx);
+    nmod_polydr_init(modulus2, fctx);
 
-    nmod_poly_one(modulus);
+    nmod_polydr_one(modulus, fctx);
 
     if ((fctx->mod.n & UWORD(1)) == UWORD(0))
     {
@@ -1509,8 +1503,8 @@ int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
                                        : alpha_powers[j];
         }
 
-        gamma_eval = nmod_poly_evaluate_nmod(gamma, alpha);
-        gammam_eval = nmod_poly_evaluate_nmod(gamma, fctx->mod.n - alpha);
+        gamma_eval = nmod_polydr_evaluate_nmod(gamma, alpha, fctx);
+        gammam_eval = nmod_polydr_evaluate_nmod(gamma, fctx->mod.n - alpha, fctx);
         if (gamma_eval == WORD(0) || gammam_eval == WORD(0))
             goto break_continue;
 
@@ -1547,7 +1541,7 @@ int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
             goto successful;        
         }
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, fctx) > 0)
         {
             nmod_mpolyd_leadmon(leadmon_Gs, Gs);
             for (j = 0; j < nvars - 1; j++)
@@ -1563,7 +1557,7 @@ int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
                     nmod_mpolyd_zero(Gs);
                     nmod_mpolyd_zero(Abars);
                     nmod_mpolyd_zero(Bbars);
-                    nmod_poly_one(modulus);
+                    nmod_polydr_one(modulus, fctx);
                 }
             }
         }
@@ -1571,15 +1565,15 @@ int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
         nmod_mpolyd_mul_scalar(gs, gamma_eval, fctx);
         nmod_mpolyd_mul_scalar(gsm, gammam_eval, fctx);
 
-        if (nmod_poly_degree(modulus) > 0)
+        if (nmod_polydr_degree(modulus, fctx) > 0)
         {
-            temp = nmod_poly_evaluate_nmod(modulus, alpha);
+            temp = nmod_polydr_evaluate_nmod(modulus, alpha, fctx);
             FLINT_ASSERT(temp == 
-                        nmod_poly_evaluate_nmod(modulus, fctx->mod.n - alpha));
+                        nmod_polydr_evaluate_nmod(modulus, fctx->mod.n - alpha, fctx));
             temp = nmod_mul(temp, alpha, fctx->mod);
             temp = nmod_add(temp, temp, fctx->mod);
-            nmod_poly_scalar_mul_nmod(modulus, modulus,
-                                                  n_invmod(temp, fctx->mod.n));
+            nmod_polydr_scalar_mul_nmod(modulus, modulus,
+                                                  n_invmod(temp, fctx->mod.n), fctx);
 
             nmod_mpolyd_addinterp2(Gs, T, gs, gsm, modulus, alpha,
                                                            alpha_powers, fctx);
@@ -1589,20 +1583,20 @@ int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
                                                            alpha_powers, fctx);
         } else
         {
-            nmod_poly_one(modulus);
+            nmod_polydr_one(modulus, fctx);
             nmod_mpolyd_startinterp2(Gs, gs, gsm, alpha, fctx);
             nmod_mpolyd_startinterp2(Abars, abars, abarsm, alpha, fctx);
             nmod_mpolyd_startinterp2(Bbars, bbars, bbarsm, alpha, fctx);
         }
 
-        nmod_poly_scalar_mul_nmod(modulus2, modulus, alpha2);
-        nmod_poly_shift_left(modulus, modulus, 2);
-        nmod_poly_sub(modulus, modulus, modulus2);
+        nmod_polydr_scalar_mul_nmod(modulus2, modulus, alpha2, fctx);
+        nmod_polydr_shift_left(modulus, modulus, 2, fctx);
+        nmod_polydr_sub(modulus, modulus, modulus2, fctx);
 
-        if (nmod_poly_degree(modulus) < bound)
+        if (nmod_polydr_degree(modulus, fctx) < bound)
             continue;
 
-        deggamma = nmod_poly_degree(gamma);
+        deggamma = nmod_polydr_degree(gamma, fctx);
         degGs = nmod_mpolyd_last_degree(Gs, fctx);
         degA = nmod_mpolyd_last_degree(A, fctx);
         degB = nmod_mpolyd_last_degree(B, fctx);
@@ -1618,7 +1612,7 @@ int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
             nmod_mpolyd_zero(Gs);
             nmod_mpolyd_zero(Abars);
             nmod_mpolyd_zero(Bbars);
-            nmod_poly_one(modulus);
+            nmod_polydr_one(modulus, fctx);
             continue;
         }
 
@@ -1636,17 +1630,17 @@ cleanup:
     flint_free(alpha_powers);
     flint_free(alpham_powers);
 
-    nmod_poly_clear(cA);
-    nmod_poly_clear(cB);
-    nmod_poly_clear(cG);
+    nmod_polydr_clear(cA, fctx);
+    nmod_polydr_clear(cB, fctx);
+    nmod_polydr_clear(cG, fctx);
 
-    nmod_poly_clear(cAbar);
-    nmod_poly_clear(cBbar);
+    nmod_polydr_clear(cAbar, fctx);
+    nmod_polydr_clear(cBbar, fctx);
 
-    nmod_poly_clear(lcA);
-    nmod_poly_clear(lcB);
+    nmod_polydr_clear(lcA, fctx);
+    nmod_polydr_clear(lcB, fctx);
 
-    nmod_poly_clear(gamma);
+    nmod_polydr_clear(gamma, fctx);
 
     nmod_mpolyd_clear(T);
     nmod_mpolyd_clear(Gs);
@@ -1665,16 +1659,16 @@ cleanup:
     nmod_mpolyd_clear(abarsm);
     nmod_mpolyd_clear(bbarsm);
 
-    nmod_poly_clear(modulus);
-    nmod_poly_clear(modulus2);
+    nmod_polydr_clear(modulus, fctx);
+    nmod_polydr_clear(modulus2, fctx);
 
     return success;
 
 successful:
 
-    nmod_poly_init(cGs, fctx->mod.n);
-    nmod_poly_init(cAbars, fctx->mod.n);
-    nmod_poly_init(cBbars, fctx->mod.n);
+    nmod_polydr_init(cGs, fctx);
+    nmod_polydr_init(cAbars, fctx);
+    nmod_polydr_init(cBbars, fctx);
     nmod_mpolyd_last_content(cGs, Gs, fctx);
     nmod_mpolyd_last_content(cAbars, Abars, fctx);
     nmod_mpolyd_last_content(cBbars, Bbars, fctx);
@@ -1687,9 +1681,9 @@ successful:
     nmod_mpolyd_mul_last_poly(Abar, Abars, cAbar, fctx);
     nmod_mpolyd_mul_last_poly(Bbar, Bbars, cBbar, fctx);
 
-    nmod_poly_clear(cGs);
-    nmod_poly_clear(cAbars);
-    nmod_poly_clear(cBbars);
+    nmod_polydr_clear(cGs, fctx);
+    nmod_polydr_clear(cAbars, fctx);
+    nmod_polydr_clear(cBbars, fctx);
 
     success = 1;
     goto cleanup;

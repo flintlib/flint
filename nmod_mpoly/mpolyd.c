@@ -606,7 +606,7 @@ slong nmod_mpolyd_length(const nmod_mpolyd_t A)
     return i;
 }
 
-slong nmod_mpolyd_last_degree(const nmod_mpolyd_t A, const nmodf_ctx_t fctx)
+slong nmod_mpolyd_last_degree(const nmod_mpolyd_t A, const nmod_ctx_t fctx)
 {
     slong i, j, Plen, degree;
     slong degb_prod, degb_last=0;

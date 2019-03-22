@@ -19,7 +19,7 @@ _fq_nmod_rank(const fq_nmod_t x, const fq_nmod_ctx_t ctx)
     ulong t = 0;
 
     for (i = x->length - 1; i >= 0; i--)
-        t = t * ctx->mod.n + x->coeffs[i];
+        t = t * ctx->fpctx->mod.n + x->coeffs[i];
 
     return t;
 }
@@ -29,14 +29,14 @@ _fq_nmod_unrank(fq_nmod_t x, ulong r, const fq_nmod_ctx_t ctx)
 {
     slong i;
 
-    nmod_poly_zero(x);
-    nmod_poly_fit_length(x, fq_nmod_ctx_degree(ctx));
+    nmod_polydr_zero(x, ctx->fpctx);
+    nmod_polydr_fit_length(x, fq_nmod_ctx_degree(ctx), ctx->fpctx);
 
     for (i = 0; r != 0; i++)
     {
-        x->coeffs[i] = r % ctx->mod.n;
+        x->coeffs[i] = r % ctx->fpctx->mod.n;
         x->length = i + 1;
-        r = r / ctx->mod.n;
+        r = r / ctx->fpctx->mod.n;
     }
 }
 

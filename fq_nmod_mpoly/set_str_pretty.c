@@ -161,8 +161,8 @@ int _fq_nmod_mpoly_parse_pretty(fq_nmod_mpoly_t A, const char * s, slong sn,
                 goto failed;
             _fq_nmod_mpoly_parse_pretty_fit_estack(&estack, ei, &ealloc);
             fq_nmod_mpoly_geobucket_init(estack[ei], ctx);
-            fmpz_mod_ui(c, c, ctx->fqctx->modulus->mod.n);
-            fq_nmod_mpoly_geobucket_set_ui(estack[ei++], fmpz_get_ui(c), ctx);
+            fq_nmod_mpoly_geobucket_set_ui(estack[ei++],
+                               fmpz_fdiv_ui(c, ctx->fqctx->fpctx->mod.n), ctx);
             expecting = 2;
         }
         else if (*s == '^')

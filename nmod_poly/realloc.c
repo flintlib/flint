@@ -17,6 +17,31 @@
 #include "nmod_poly.h"
 
 void
+nmod_polydr_realloc(nmod_polydr_t poly, slong alloc, const nmod_ctx_t ctx)
+{
+    if (alloc == 0)
+    {
+        nmod_polydr_clear(poly, ctx);
+        poly->length = 0;
+        poly->alloc = 0;
+        poly->coeffs = NULL;
+
+        return;
+    }
+
+    poly->coeffs = (mp_ptr) flint_realloc(poly->coeffs, alloc * sizeof(mp_limb_t));
+
+    poly->alloc = alloc;
+
+    /* truncate poly if necessary */
+    if (poly->length > alloc)
+    {
+        poly->length = alloc;
+        _nmod_polydr_normalise(poly);
+    }
+}
+
+void
 nmod_poly_realloc(nmod_poly_t poly, slong alloc)
 {
     if (alloc == 0)

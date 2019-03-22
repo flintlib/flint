@@ -18,9 +18,9 @@ void fq_nmod_mpoly_set_ui(fq_nmod_mpoly_t A, ulong c,
 
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    if (c >= ctx->fqctx->modulus->mod.n)
+    if (c >= ctx->fqctx->fpctx->mod.n)
     {
-        NMOD_RED(c, c, ctx->fqctx->modulus->mod);
+        NMOD_RED(c, c, ctx->fqctx->fpctx->mod);
     }
 
     if (c == UWORD(0))

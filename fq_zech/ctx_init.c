@@ -158,7 +158,7 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
 
     for (i = 0; i < ctx->qm1; i++)
     {
-        nmod_poly_evaluate_fmpz(result, r, fq_nmod_ctx_prime(fq_nmod_ctx));
+        nmod_polydr_evaluate_fmpz(result, r, fq_nmod_ctx_prime(fq_nmod_ctx));
         result_ui = fmpz_get_ui(result);
         if (n_reverse_table[result_ui] != ctx->qm1) {
             flint_printf("Exception (fq_zech_ctx_init_nmod_ctx). Polynomial is not primitive.\n");

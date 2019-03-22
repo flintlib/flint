@@ -15,8 +15,8 @@ void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     slong len = op->length;
 
-    nmod_poly_fit_length(rop, len);
-    _nmod_poly_set_length(rop, len);
+    nmod_polydr_fit_length(rop, len, ctx->fpctx);
+    _nmod_polydr_set_length(rop, len);
 
-    nmod_poly_neg(rop, op);
+    nmod_polydr_neg(rop, op, ctx->fpctx);
 }

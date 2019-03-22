@@ -15,7 +15,7 @@
     set A(var) to B/xbar^Bshifts
     it is asserted that the conversion is correct
 */
-void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
+void _nmod_mpoly_to_nmod_polydr_deflate(nmod_polydr_t A, const nmod_mpoly_t B,
                         slong var, const ulong * Bshift, const ulong * Bstride,
                                                     const nmod_mpoly_ctx_t ctx)
 {
@@ -33,7 +33,7 @@ void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
     N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     mpoly_gen_offset_shift_sp(&off, &shift, var, bits, ctx->minfo);
 
-    nmod_poly_zero(A);
+    nmod_polydr_zero(A, ctx->ffinfo);
     mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     var_shift = Bshift[var];
     var_stride = Bstride[var];
@@ -46,7 +46,7 @@ void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
         {
             k /= var_stride;
         }
-        nmod_poly_set_coeff_ui(A, k, coeff[i]);
+        nmod_polydr_set_coeff_ui(A, k, coeff[i], ctx->ffinfo);
     }
 
 #if WANT_ASSERT
@@ -69,8 +69,8 @@ void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
     set A to B(x_var^Astride[var])*xbar^Ashift
     A must be packed into bits = Abits
 */
-void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
-                         const nmod_poly_t B, slong var, const ulong * Ashift,
+void _nmod_mpoly_from_nmod_polydr_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
+                         const nmod_polydr_t B, slong var, const ulong * Ashift,
                              const ulong * Astride, const nmod_mpoly_ctx_t ctx)
 {
     slong N;
@@ -81,13 +81,13 @@ void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
     slong Aalloc;
     ulong * shiftexp;
     ulong * strideexp;
-    slong Bdeg = nmod_poly_degree(B);
+    slong Bdeg = nmod_polydr_degree(B, ctx->ffinfo);
     TMP_INIT;
 
     TMP_START;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
-    FLINT_ASSERT(!nmod_poly_is_zero(B));
+    FLINT_ASSERT(!nmod_polydr_is_zero(B, ctx->ffinfo));
 
     /* must have at least space for the highest exponent of var */
     FLINT_ASSERT(1 + FLINT_BIT_COUNT(Ashift[var] + Bdeg*Astride[var]) <= Abits);
@@ -109,7 +109,7 @@ void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
     for (k = Bdeg; k >= 0; k--)
     {
         _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
-        Acoeff[Alen] = nmod_poly_get_coeff_ui(B, k);
+        Acoeff[Alen] = nmod_polydr_get_coeff_ui(B, k, ctx->ffinfo);
         if (Acoeff[Alen] != UWORD(0))
         {
             mpoly_monomial_madd(Aexp + N*Alen, shiftexp, k, strideexp, N);

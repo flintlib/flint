@@ -14,7 +14,7 @@
 slong _nmod_mpoly_add1(mp_limb_t * coeff1,       ulong * exp1,
                  const mp_limb_t * coeff2, const ulong * exp2, slong len2,
                  const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-                                          ulong maskhi, const nmodf_ctx_t fctx)
+                                          ulong maskhi, const nmod_ctx_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 
@@ -63,7 +63,7 @@ slong _nmod_mpoly_add1(mp_limb_t * coeff1,       ulong * exp1,
 slong _nmod_mpoly_add(mp_limb_t * coeff1,       ulong * exp1,
                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
-                   slong N, const ulong * cmpmask, const nmodf_ctx_t fctx)
+                   slong N, const ulong * cmpmask, const nmod_ctx_t fctx)
 {
     slong i = 0, j = 0, k = 0;
 

@@ -17,6 +17,14 @@
 #include "nmod_poly.h"
 
 void
+nmod_polydr_init(nmod_polydr_t poly, const nmod_ctx_t ctx)
+{
+    poly->coeffs = NULL;
+    poly->alloc = 0;
+    poly->length = 0;
+}
+
+void
 nmod_poly_init_preinv(nmod_poly_t poly, mp_limb_t n, mp_limb_t ninv)
 {
     poly->coeffs = NULL;

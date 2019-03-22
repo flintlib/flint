@@ -91,12 +91,12 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
                                          slong m, const fq_nmod_ctx_t ctx)
 {
    slong n = A->c, i, j, r;
-   nmod_poly_t h;
+   nmod_polydr_t h;
 
    if (m > 10 && fq_nmod_ctx_degree(ctx) > 6)
       return fq_nmod_mat_reduce_row_KS(A, P, L, m, ctx);
 
-   nmod_poly_init(h, ctx->p);
+   nmod_polydr_init(h, ctx->fpctx);
 
    for (i = 0; i < n; i++)
    {
@@ -110,8 +110,8 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
          {
             for (j = i + 1; j < L[r]; j++)
             {
-               nmod_poly_mul(h, fq_nmod_mat_entry(A, r, j), fq_nmod_mat_entry(A, m, i));
-               nmod_poly_sub(fq_nmod_mat_entry(A, m, j), fq_nmod_mat_entry(A, m, j), h);
+               nmod_polydr_mul(h, fq_nmod_mat_entry(A, r, j), fq_nmod_mat_entry(A, m, i), ctx->fpctx);
+               nmod_polydr_sub(fq_nmod_mat_entry(A, m, j), fq_nmod_mat_entry(A, m, j), h, ctx->fpctx);
             }
  
             fq_nmod_zero(fq_nmod_mat_entry(A, m, i), ctx);
@@ -129,7 +129,7 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
 
             P[i] = m;
 
-            nmod_poly_clear(h);
+            nmod_polydr_clear(h, ctx->fpctx);
        
             return i;
          }
@@ -139,7 +139,7 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
    for (j = i + 1; j < L[m]; j++)
       fq_nmod_reduce(fq_nmod_mat_entry(A, m, j), ctx);
 
-   nmod_poly_clear(h);
+   nmod_polydr_clear(h, ctx->fpctx);
    
    return -WORD(1);
 }

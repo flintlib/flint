@@ -17,6 +17,18 @@
 #include "nmod_poly.h"
 
 void
+nmod_polydr_fit_length(nmod_polydr_t poly, slong alloc, const nmod_ctx_t ctx)
+{
+    if (alloc > poly->alloc)
+    {
+        if (alloc < 2 * poly->alloc)
+            alloc = 2 * poly->alloc;
+
+        nmod_polydr_realloc(poly, alloc, ctx);
+    }
+}
+
+void
 nmod_poly_fit_length(nmod_poly_t poly, slong alloc)
 {
     if (alloc > poly->alloc)

@@ -32,12 +32,12 @@ void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len,
     } 
     else if (len == 1) /* element scalar */
     {
-        rop = n_powmod2_ui_preinv(op[0], d, ctx->mod.n, ctx->mod.ninv);
+        rop = n_powmod2_ui_preinv(op[0], d, ctx->fpctx->mod.n, ctx->fpctx->mod.ninv);
     }
     else 
     {
         rop = _nmod_poly_resultant(ctx->modulus->coeffs, ctx->modulus->length,
-            op, len, ctx->mod);
+            op, len, ctx->fpctx->mod);
 
         /*
             XXX:  This part of the code is currently untested as the Conway 
@@ -49,14 +49,13 @@ void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len,
         if (ctx->modulus->coeffs[d] != WORD(1))
         {
             mp_limb_t f;
-            f = n_powmod2_ui_preinv(ctx->modulus->coeffs[d], len - 1, ctx->mod.n, ctx->mod.ninv);
-            f = n_invmod(f, ctx->mod.n);
-            rop = n_mulmod2_preinv(f, rop, ctx->mod.n, ctx->mod.ninv);
+            f = n_powmod2_ui_preinv(ctx->modulus->coeffs[d], len - 1, ctx->fpctx->mod.n, ctx->fpctx->mod.ninv);
+            f = n_invmod(f, ctx->fpctx->mod.n);
+            rop = n_mulmod2_preinv(f, rop, ctx->fpctx->mod.n, ctx->fpctx->mod.ninv);
         }
     }
 
     fmpz_set_ui(rop2, rop);
-
 }
 
 void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)

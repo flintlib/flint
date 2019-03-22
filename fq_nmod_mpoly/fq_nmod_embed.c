@@ -106,11 +106,11 @@ void _fq_nmod_embed_array_init(_fq_nmod_embed_struct * emb,
     fmpz_t P;
     mp_limb_t lc_inv;
     slong nullity;
-    mp_limb_t p = smallctx->modulus->mod.n;
-    slong n, m = nmod_poly_degree(smallctx->modulus);
+    mp_limb_t p = smallctx->fpctx->mod.n;
+    slong n, m = nmod_polydr_degree(smallctx->modulus, smallctx->fpctx);
 
     /* n is the degree of the extension */
-    n = nmod_poly_degree(bigctx->modulus);
+    n = nmod_polydr_degree(bigctx->modulus, bigctx->fpctx);
     FLINT_ASSERT((n%m) == 0);
     n = n/m;
 
@@ -123,8 +123,8 @@ void _fq_nmod_embed_array_init(_fq_nmod_embed_struct * emb,
         cur->lgctx = bigctx;
 
         fq_nmod_init(cur->theta_lg, bigctx);
-        FLINT_ASSERT(1 == nmod_poly_get_coeff_ui(cur->smctx->modulus, 1));
-        fq_nmod_set_ui(cur->theta_lg, nmod_poly_get_coeff_ui(cur->smctx->modulus, 0), bigctx);
+        FLINT_ASSERT(1 == nmod_polydr_get_coeff_ui(cur->smctx->modulus, 1, cur->smctx->fpctx));
+        fq_nmod_set_ui(cur->theta_lg, nmod_polydr_get_coeff_ui(cur->smctx->modulus, 0, cur->smctx->fpctx), bigctx);
         fq_nmod_neg(cur->theta_lg, cur->theta_lg, bigctx);
         
         fq_nmod_init(cur->x_lg, bigctx);
@@ -135,9 +135,9 @@ void _fq_nmod_embed_array_init(_fq_nmod_embed_struct * emb,
 
         fq_nmod_poly_init(cur->h, smallctx);
         fq_nmod_init(t, smallctx);
-        for (i = 0; i < nmod_poly_length(bigctx->modulus); i++)
+        for (i = 0; i < nmod_polydr_length(bigctx->modulus, bigctx->fpctx); i++)
         {
-            fq_nmod_set_ui(t, nmod_poly_get_coeff_ui(bigctx->modulus, i), smallctx);
+            fq_nmod_set_ui(t, nmod_polydr_get_coeff_ui(bigctx->modulus, i, bigctx->fpctx), smallctx);
             fq_nmod_poly_set_coeff(cur->h, i, t, smallctx);
         }
 /*
@@ -151,9 +151,9 @@ flint_printf("**** emb[0]:\n"); _embed_print(emb + 0);
     /* poly will be bigctx->modulus as a polynomial over smallctx */
     fq_nmod_poly_init(poly, smallctx);
     fq_nmod_init(t, smallctx);
-    for (i = 0; i < nmod_poly_length(bigctx->modulus); i++)
+    for (i = 0; i < nmod_polydr_length(bigctx->modulus, bigctx->fpctx); i++)
     {
-        fq_nmod_set_ui(t, nmod_poly_get_coeff_ui(bigctx->modulus, i), smallctx);
+        fq_nmod_set_ui(t, nmod_polydr_get_coeff_ui(bigctx->modulus, i, bigctx->fpctx), smallctx);
         fq_nmod_poly_set_coeff(poly, i, t, smallctx);
     }
 
@@ -161,9 +161,9 @@ flint_printf("**** emb[0]:\n"); _embed_print(emb + 0);
     fq_nmod_poly_init(poly2, bigctx);
     fq_nmod_init(t2, bigctx);
     fq_nmod_init(t3, bigctx);
-    for (i = 0; i < nmod_poly_length(smallctx->modulus); i++)
+    for (i = 0; i < nmod_polydr_length(smallctx->modulus, smallctx->fpctx); i++)
     {
-        fq_nmod_set_ui(t2, nmod_poly_get_coeff_ui(smallctx->modulus, i), bigctx);
+        fq_nmod_set_ui(t2, nmod_polydr_get_coeff_ui(smallctx->modulus, i, smallctx->fpctx), bigctx);
         fq_nmod_poly_set_coeff(poly2, i, t2, bigctx);
     }
 
@@ -209,10 +209,10 @@ flint_printf("**** emb[0]:\n"); _embed_print(emb + 0);
             fq_nmod_set(t3, t2, bigctx);
             for (j = 0; j < m; j++)
             {
-                FLINT_ASSERT(nmod_poly_degree(t3) < m*n);
+                FLINT_ASSERT(nmod_polydr_degree(t3, bigctx->fpctx) < m*n);
                 for (l = 0; l < m*n; l++)
                 {
-                    nmod_mat_entry(M, l, m*i + j) = nmod_poly_get_coeff_ui(t3, l);
+                    nmod_mat_entry(M, l, m*i + j) = nmod_polydr_get_coeff_ui(t3, l, bigctx->fpctx);
                 }
                 fq_nmod_mul(t3, t3, cur->theta_lg, bigctx);
             }
@@ -222,14 +222,14 @@ flint_printf("**** emb[0]:\n"); _embed_print(emb + 0);
         fq_nmod_pow_ui(t3, biggen, n, bigctx);
         for (l = 0; l < m*n; l++)
         {
-            nmod_mat_entry(M, l, m*n) = nmod_poly_get_coeff_ui(t3, l);
+            nmod_mat_entry(M, l, m*n) = nmod_polydr_get_coeff_ui(t3, l, bigctx->fpctx);
         }
         nullity = nmod_mat_nullspace(Msol, M);
         FLINT_ASSERT(nullity == 1);
 
         /* this is the coefficient of x^n in h */
         FLINT_ASSERT(nmod_mat_entry(Msol, m*n, 0) != 0);
-        lc_inv = nmod_inv(nmod_mat_entry(Msol, m*n, 0), smallctx->modulus->mod);
+        lc_inv = nmod_inv(nmod_mat_entry(Msol, m*n, 0), smallctx->fpctx->mod);
 
         /* set h now */
         fq_nmod_poly_init(cur->h, smallctx);
@@ -238,9 +238,9 @@ flint_printf("**** emb[0]:\n"); _embed_print(emb + 0);
             fq_nmod_zero(t, smallctx);
             for (j = 0; j < m; j++)
             {
-                nmod_poly_set_coeff_ui(t, j, 
+                nmod_polydr_set_coeff_ui(t, j, 
                             nmod_mul(lc_inv, nmod_mat_entry(Msol, m*i + j, 0),
-                                 smallctx->modulus->mod));
+                                 smallctx->fpctx->mod), smallctx->fpctx);
             }
             fq_nmod_poly_set_coeff(cur->h, i, t, smallctx);
         }
@@ -292,12 +292,12 @@ void _fq_nmod_embed_sm_to_lg(
     fq_nmod_zero(out, emb->lgctx);
     for (i = 0; i < fq_nmod_poly_length(inred, emb->smctx); i++)
     {
-        nmod_poly_struct * coeff = inred->coeffs + i;
+        nmod_polydr_struct * coeff = inred->coeffs + i;
         fq_nmod_zero(t1, emb->lgctx);
-        for (j = 0; j < nmod_poly_length(coeff); j++)
+        for (j = 0; j < nmod_polydr_length(coeff, emb->smctx->fpctx); j++)
         {
             fq_nmod_pow_ui(t2, emb->theta_lg, j, emb->lgctx);
-            fq_nmod_mul_ui(t2, t2, nmod_poly_get_coeff_ui(coeff, j), emb->lgctx);
+            fq_nmod_mul_ui(t2, t2, nmod_polydr_get_coeff_ui(coeff, j, emb->smctx->fpctx), emb->lgctx);
             fq_nmod_add(t1, t1, t2, emb->lgctx);
         }
         fq_nmod_pow_ui(t2, emb->x_lg, i, emb->lgctx);
@@ -323,10 +323,10 @@ void _fq_nmod_embed_lg_to_sm(
     fq_nmod_init(t2, emb->smctx);
 
     fq_nmod_poly_zero(out, emb->smctx);
-    for (i = 0; i < nmod_poly_length(in); i++)
+    for (i = 0; i < nmod_polydr_length(in, emb->lgctx->fpctx); i++)
     {
         fq_nmod_poly_pow(t1, emb->phi_sm, i, emb->smctx);
-        fq_nmod_set_ui(t2, nmod_poly_get_coeff_ui(in, i), emb->smctx);
+        fq_nmod_set_ui(t2, nmod_polydr_get_coeff_ui(in, i, emb->lgctx->fpctx), emb->smctx);
         fq_nmod_poly_scalar_mul_fq_nmod(t1, t1, t2, emb->smctx);
         fq_nmod_poly_add(out, out, t1, emb->smctx);
     }
@@ -346,8 +346,8 @@ _fq_nmod_mpoly_embed_chooser_init(_fq_nmod_mpoly_embed_chooser_t embc,
 {
     nmod_poly_t ext_modulus;
     fq_nmod_ctx_t ext_fqctx;
-    mp_limb_t p = ctx->fqctx->modulus->mod.n;
-    slong m = nmod_poly_degree(ctx->fqctx->modulus);
+    mp_limb_t p = ctx->fqctx->fpctx->mod.n;
+    slong m = nmod_polydr_degree(ctx->fqctx->modulus, ctx->fqctx->fpctx);
     slong n;
 
     n = WORD(20)/(m*FLINT_BIT_COUNT(p));

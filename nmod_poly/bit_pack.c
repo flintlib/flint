@@ -126,6 +126,39 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
 }
 
 void
+nmod_polydr_bit_pack(fmpz_t f, const nmod_polydr_t poly,
+                   mp_bitcnt_t bit_size, const nmod_ctx_t ctx)
+{
+    slong len, limbs;
+    __mpz_struct * mpz;
+    slong i;
+
+    len = nmod_polydr_length(poly, ctx);
+
+    if (len == 0 || bit_size == 0)
+    {
+        fmpz_zero(f);
+        return;
+    }
+
+    mpz = _fmpz_promote(f);
+    mpz_realloc2(mpz, len * bit_size);
+
+    limbs = (len * bit_size - 1) / FLINT_BITS + 1;
+
+    _nmod_poly_bit_pack(mpz->_mp_d, poly->coeffs, len, bit_size);
+
+    for (i = limbs - 1; i >= 0; i--)
+    {
+        if (mpz->_mp_d[i] != 0)
+            break;
+    }
+
+    mpz->_mp_size = i + 1;
+    _fmpz_demote_val(f);
+}
+
+void
 nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
                    mp_bitcnt_t bit_size)
 {

@@ -198,6 +198,41 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, mp_bitcnt_t bits,
     }
 }
 
+
+void
+nmod_polydr_bit_unpack(nmod_polydr_t poly, const fmpz_t f, mp_bitcnt_t bit_size,
+                                                          const nmod_ctx_t ctx)
+{
+    slong len;
+    mpz_t tmp;
+
+    if (fmpz_sgn(f) < 0)
+    {
+        flint_printf("Exception (nmod_poly_bit_unpack). f < 0.\n");
+        flint_abort();
+    }
+
+    if (bit_size == 0 || fmpz_is_zero(f))
+    {
+        nmod_polydr_zero(poly, ctx);
+        return;
+    }
+
+    len = (fmpz_bits(f) + bit_size - 1) / bit_size;
+
+    mpz_init2(tmp, bit_size*len);
+    flint_mpn_zero(tmp->_mp_d, tmp->_mp_alloc);
+    fmpz_get_mpz(tmp, f);
+
+    nmod_polydr_fit_length(poly, len, ctx);
+
+    _nmod_poly_bit_unpack(poly->coeffs, len, tmp->_mp_d, bit_size, ctx->mod);
+    poly->length = len;
+    _nmod_polydr_normalise(poly);
+
+    mpz_clear(tmp);
+}
+
 void
 nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
 {

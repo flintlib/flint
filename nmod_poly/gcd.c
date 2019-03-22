@@ -23,6 +23,58 @@ slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA,
         return _nmod_poly_gcd_hgcd(G, A, lenA, B, lenB, mod);
 }
 
+void nmod_polydr_gcd(nmod_polydr_t G, 
+            const nmod_polydr_t A, const nmod_polydr_t B, const nmod_ctx_t ctx)
+{
+    if (A->length < B->length)
+    {
+        nmod_polydr_gcd(G, B, A, ctx);
+    }
+    else /* lenA >= lenB >= 0 */
+    {
+        slong lenA = A->length, lenB = B->length, lenG;
+        nmod_polydr_t tG;
+        mp_ptr g;
+
+        if (lenA == 0) /* lenA = lenB = 0 */
+        {
+            nmod_polydr_zero(G, ctx);
+        } 
+        else if (lenB == 0) /* lenA > lenB = 0 */
+        {
+            nmod_polydr_make_monic(G, A, ctx);
+        }
+        else /* lenA >= lenB >= 1 */
+        {
+            if (G == A || G == B)
+            {
+                nmod_polydr_init2(tG, FLINT_MIN(lenA, lenB), ctx);
+                g = tG->coeffs;
+            }
+            else
+            {
+                nmod_polydr_fit_length(G, FLINT_MIN(lenA, lenB), ctx);
+                g = G->coeffs;
+            }
+
+            lenG = _nmod_poly_gcd(g, A->coeffs, lenA,
+                                               B->coeffs, lenB, ctx->mod);
+
+            if (G == A || G == B)
+            {
+                nmod_polydr_swap(tG, G, ctx);
+                nmod_polydr_clear(tG, ctx);
+            }
+            G->length = lenG;
+
+            if (G->length == 1)
+                G->coeffs[0] = 1;
+            else
+                nmod_polydr_make_monic(G, G, ctx);
+        }
+    }
+}
+
 void nmod_poly_gcd(nmod_poly_t G, 
                              const nmod_poly_t A, const nmod_poly_t B)
 {

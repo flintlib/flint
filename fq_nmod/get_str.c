@@ -14,5 +14,5 @@
 char *
 fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
-    return nmod_poly_get_str(op);
+    return nmod_polydr_get_str(op, ctx->fpctx);
 }

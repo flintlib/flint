@@ -17,7 +17,7 @@
 #include "flint.h"
 #include "nmod_poly.h"
 
-char * nmod_poly_get_str(const nmod_poly_t poly)
+static char * _nmod_poly_get_str(const mp_limb_t * Acoeff, slong Alen, nmod_t mod)
 {
     slong i;
     char * buf, * ptr;
@@ -29,22 +29,31 @@ char * nmod_poly_get_str(const nmod_poly_t poly)
     slong size = 11*2 + 1;
 #endif
 
-    for (i = 0; i < poly->length; i++)
+    for (i = 0; i < Alen; i++)
     {
-        if (poly->coeffs[i]) /* log(2)/log(10) < 0.30103, +1 for space/null */
-            size += (ulong) ceil(0.30103*FLINT_BIT_COUNT(poly->coeffs[i])) + 1;
+        if (Acoeff[i]) /* log(2)/log(10) < 0.30103, +1 for space/null */
+            size += (ulong) ceil(0.30103*FLINT_BIT_COUNT(Acoeff[i])) + 1;
         else size += 2;
     }
 
     buf = (char *) flint_malloc(size);  
-    ptr = buf + flint_sprintf(buf, "%wd %wu", poly->length, poly->mod.n);
+    ptr = buf + flint_sprintf(buf, "%wd %wu", Alen, mod.n);
    
-    if (poly->length)
+    if (Alen)
         ptr += flint_sprintf(ptr, " ");
 
-    for (i = 0; i < poly->length; i++)
-        ptr += flint_sprintf(ptr, " %wu", poly->coeffs[i]);
+    for (i = 0; i < Alen; i++)
+        ptr += flint_sprintf(ptr, " %wu", Acoeff[i]);
    
     return buf;
 }
 
+char * nmod_polydr_get_str(const nmod_polydr_t poly, const nmod_ctx_t ctx)
+{
+    return _nmod_poly_get_str(poly->coeffs, poly->length, ctx->mod);
+}
+
+char * nmod_poly_get_str(const nmod_poly_t poly)
+{
+    return _nmod_poly_get_str(poly->coeffs, poly->length, poly->mod);
+}

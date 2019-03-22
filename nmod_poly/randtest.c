@@ -17,6 +17,15 @@
 #include "nmod_poly.h"
 
 void
+nmod_polydr_randtest(nmod_polydr_t poly, flint_rand_t state, slong len, const nmod_ctx_t ctx)
+{
+    nmod_polydr_fit_length(poly, len, ctx);
+    _nmod_vec_randtest(poly->coeffs, state, len, ctx->mod);
+    poly->length = len;
+    _nmod_polydr_normalise(poly);
+}
+
+void
 nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
 {
     nmod_poly_fit_length(poly, len);

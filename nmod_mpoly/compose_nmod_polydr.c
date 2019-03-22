@@ -11,17 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
-void
-nmod_poly_init_mod(nmod_poly_t poly, nmod_t mod)
-{
-    poly->coeffs = NULL;
-    poly->alloc = 0;
-    poly->length = 0;
-    poly->mod = mod;
-}
-
-
 /*
     Given a polynomial tree with exponents stored in the keys and
     coefficients stored in the data member,
@@ -39,39 +28,38 @@ nmod_poly_init_mod(nmod_poly_t poly, nmod_t mod)
 
 */
 static void _rbnode_clear_sp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
-                   slong s, nmod_poly_t l, const nmod_poly_t x,
+                   slong s, nmod_polydr_t l, const nmod_polydr_t x,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    nmod_poly_t r, xp;
+    nmod_polydr_t r, xp;
     slong e = node->key;
     FLINT_ASSERT(e >= s);
 
-    nmod_poly_init_mod(r, ctx->ffinfo->mod);
-    nmod_poly_zero(r);
+    nmod_polydr_init(r, ctx->ffinfo);
     if (node->right != tree->null)
         _rbnode_clear_sp(tree, node->right, e, r, x, ctx);
 
-    nmod_poly_zero(l);
+    nmod_polydr_zero(l, ctx->ffinfo);
     if (node->left != tree->null)
         _rbnode_clear_sp(tree, node->left, s, l, x, ctx);
 
-    nmod_poly_init_mod(xp, ctx->ffinfo->mod);
-    nmod_poly_pow(xp, x, e - s);
+    nmod_polydr_init(xp, ctx->ffinfo);
+    nmod_polydr_pow(xp, x, e - s, ctx->ffinfo);
 
-    nmod_poly_add(r, r, node->data);
-    nmod_poly_mul(r, xp, r);
-    nmod_poly_add(l, l, r);
+    nmod_polydr_add(r, r, node->data, ctx->ffinfo);
+    nmod_polydr_mul(r, xp, r, ctx->ffinfo);
+    nmod_polydr_add(l, l, r, ctx->ffinfo);
 
-    nmod_poly_clear(r);
-    nmod_poly_clear(xp);
-    nmod_poly_clear(node->data);
+    nmod_polydr_clear(r, ctx->ffinfo);
+    nmod_polydr_clear(xp, ctx->ffinfo);
+    nmod_polydr_clear(node->data, ctx->ffinfo);
     flint_free(node->data);
     flint_free(node);
 }
 
 
-void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
-                      nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_compose_nmod_polydr_sp(nmod_polydr_t A, const nmod_mpoly_t B,
+                      nmod_polydr_struct * const * C, const nmod_mpoly_ctx_t ctx)
 {
     int new;
     slong i, j, k, N, bits, nvars = ctx->minfo->nvars;
@@ -84,8 +72,8 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
     slong * degrees;
     slong * offs;
     ulong * masks;
-    nmod_poly_struct * powers;
-    nmod_poly_t t, t2;
+    nmod_polydr_struct * powers;
+    nmod_polydr_t t, t2;
     mpoly_rbtree_t tree;
     mpoly_rbnode_struct * node;
     TMP_INIT;
@@ -120,7 +108,7 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
     masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
-    powers = (nmod_poly_struct *) TMP_ALLOC(entries*sizeof(nmod_poly_struct));
+    powers = (nmod_polydr_struct *) TMP_ALLOC(entries*sizeof(nmod_polydr_struct));
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
 
@@ -139,11 +127,11 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
         {
             offs[k] = off;
             masks[k] = UWORD(1) << (shift + j);
-            nmod_poly_init_mod(powers + k, ctx->ffinfo->mod);
+            nmod_polydr_init(powers + k, ctx->ffinfo);
             if (j == 0)
-                nmod_poly_set(powers + k, C[i]);
+                nmod_polydr_set(powers + k, C[i], ctx->ffinfo);
             else
-                nmod_poly_mul(powers + k, powers + k - 1, powers + k - 1);
+                nmod_polydr_mul(powers + k, powers + k - 1, powers + k - 1, ctx->ffinfo);
             k++;
         }
     }
@@ -153,8 +141,8 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
     /* accumulate coefficients of the main variable */
     mpoly_gen_offset_shift_sp(&main_off, &main_shift, main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
-    nmod_poly_init_mod(t, ctx->ffinfo->mod);
-    nmod_poly_init_mod(t2, ctx->ffinfo->mod);
+    nmod_polydr_init(t, ctx->ffinfo);
+    nmod_polydr_init(t2, ctx->ffinfo);
     mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     for (i = 0; i < Blen; i++)
     {
@@ -162,29 +150,27 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
         node = mpoly_rbtree_get(&new, tree, main_exp);
         if (new)
         {
-            node->data = flint_malloc(sizeof(nmod_poly_struct));
-            nmod_poly_init_mod(node->data, ctx->ffinfo->mod);
-            nmod_poly_zero(node->data);
+            node->data = flint_malloc(sizeof(nmod_polydr_struct));
+            nmod_polydr_init(node->data, ctx->ffinfo);
         }
 
-        nmod_poly_zero(t);
-        nmod_poly_set_coeff_ui(t, 0, Bcoeff[i]);
+        nmod_polydr_set_nmod(t, Bcoeff[i], ctx->ffinfo);
         for (k = 0; k < k_len; k++)
         {
             if ((Bexp[N*i + offs[k]] & masks[k]) != WORD(0))
             {
-                nmod_poly_mul(t2, t, powers + k);
-                nmod_poly_swap(t, t2);
+                nmod_polydr_mul(t2, t, powers + k, ctx->ffinfo);
+                nmod_polydr_swap(t, t2, ctx->ffinfo);
             }
         }
-        nmod_poly_add(t2, t, node->data);
-        nmod_poly_swap(t2, node->data);
+        nmod_polydr_add(t2, t, node->data, ctx->ffinfo);
+        nmod_polydr_swap(t2, node->data, ctx->ffinfo);
     }
-    nmod_poly_clear(t);
-    nmod_poly_clear(t2);
+    nmod_polydr_clear(t, ctx->ffinfo);
+    nmod_polydr_clear(t2, ctx->ffinfo);
 
     for (k = 0; k < k_len; k++)
-        nmod_poly_clear(powers + k);
+        nmod_polydr_clear(powers + k, ctx->ffinfo);
 
     /* use tree method to evaluate in the main variable */
     _rbnode_clear_sp(tree, tree->head->left, WORD(0), A, C[main_var], ctx);
@@ -194,37 +180,36 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
 
 
 static void _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
-                       const fmpz_t s, nmod_poly_t l, const nmod_poly_t x,
+                       const fmpz_t s, nmod_polydr_t l, const nmod_polydr_t x,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    nmod_poly_t r, xp;
+    nmod_polydr_t r, xp;
     FLINT_ASSERT(fmpz_cmp(&node->key, s) >= 0);
 
-    nmod_poly_init_mod(r, ctx->ffinfo->mod);
-    nmod_poly_zero(r);
+    nmod_polydr_init(r, ctx->ffinfo);
     if (node->right != tree->null)
         _rbnode_clear_mp(tree, node->right, &node->key, r, x, ctx);
 
-    nmod_poly_zero(l);
+    nmod_polydr_zero(l, ctx->ffinfo);
     if (node->left != tree->null)
         _rbnode_clear_mp(tree, node->left, s, l, x, ctx);
 
-    nmod_poly_init_mod(xp, ctx->ffinfo->mod);
+    nmod_polydr_init(xp, ctx->ffinfo);
     fmpz_sub(&node->key, &node->key, s);
     FLINT_ASSERT(fmpz_sgn(&node->key) >= 0);
     if (fmpz_fits_si(&node->key))
     {
-        nmod_poly_pow(xp, x, fmpz_get_si(&node->key));
+        nmod_polydr_pow(xp, x, fmpz_get_si(&node->key), ctx->ffinfo);
     }
     else
     {
-        slong degree = nmod_poly_degree(x);
-        nmod_poly_zero(xp);
+        slong degree = nmod_polydr_degree(x, ctx->ffinfo);
+        nmod_polydr_zero(xp, ctx->ffinfo);
         if (degree == WORD(0))
         {
-            nmod_poly_set_coeff_ui(xp, 0, 
-                       nmod_pow_fmpz(nmod_poly_get_coeff_ui(x, 0),
-                                                &node->key, ctx->ffinfo->mod));
+            nmod_polydr_set_coeff_ui(xp, 0, 
+                       nmod_pow_fmpz(nmod_polydr_get_coeff_ui(x, 0, ctx->ffinfo),
+                                   &node->key, ctx->ffinfo->mod), ctx->ffinfo);
         }
         else if (degree > WORD(0))
         {
@@ -234,22 +219,22 @@ static void _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
         }
     
     }
-    nmod_poly_add(r, r, node->data);
-    nmod_poly_mul(r, xp, r);
-    nmod_poly_add(l, l, r);
+    nmod_polydr_add(r, r, node->data, ctx->ffinfo);
+    nmod_polydr_mul(r, xp, r, ctx->ffinfo);
+    nmod_polydr_add(l, l, r, ctx->ffinfo);
 
     fmpz_clear(&node->key);
-    nmod_poly_clear(r);
-    nmod_poly_clear(xp);
-    nmod_poly_clear(node->data);
+    nmod_polydr_clear(r, ctx->ffinfo);
+    nmod_polydr_clear(xp, ctx->ffinfo);
+    nmod_polydr_clear(node->data, ctx->ffinfo);
     flint_free(node->data);
     flint_free(node);
 }
 
 
 
-void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
-                      nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_compose_nmod_polydr_mp(nmod_polydr_t A, const nmod_mpoly_t B,
+                      nmod_polydr_struct * const * C, const nmod_mpoly_ctx_t ctx)
 {
     int new;
     ulong l;
@@ -265,8 +250,8 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
     ulong * masks;
     mp_bitcnt_t * bitcounts;
     fmpz_t s;
-    nmod_poly_struct * powers;
-    nmod_poly_t t, t2;
+    nmod_polydr_struct * powers;
+    nmod_polydr_t t, t2;
     mpoly_rbtree_t tree;
     mpoly_rbnode_struct * node;
     TMP_INIT;
@@ -307,7 +292,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
     masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
-    powers = (nmod_poly_struct *) TMP_ALLOC(entries*sizeof(nmod_poly_struct));
+    powers = (nmod_polydr_struct *) TMP_ALLOC(entries*sizeof(nmod_polydr_struct));
 
     N = mpoly_words_per_exp(bits, ctx->minfo);
 
@@ -326,11 +311,11 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
             ulong l2 = l%FLINT_BITS;
             offs[k] = off + l1;
             masks[k] = UWORD(1) << l2;
-            nmod_poly_init_mod(powers + k, ctx->ffinfo->mod);
+            nmod_polydr_init(powers + k, ctx->ffinfo);
             if (l == 0)
-                nmod_poly_set(powers + k, C[i]);
+                nmod_polydr_set(powers + k, C[i], ctx->ffinfo);
             else
-                nmod_poly_mul(powers + k, powers + k - 1, powers + k - 1);
+                nmod_polydr_mul(powers + k, powers + k - 1, powers + k - 1, ctx->ffinfo);
             k++;
         }
     }
@@ -340,8 +325,8 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
     /* accumulate coefficients of the main variable */
     main_off = mpoly_gen_offset_mp(main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
-    nmod_poly_init_mod(t, ctx->ffinfo->mod);
-    nmod_poly_init_mod(t2, ctx->ffinfo->mod);
+    nmod_polydr_init(t, ctx->ffinfo);
+    nmod_polydr_init(t2, ctx->ffinfo);
     fmpz_init(main_exp);
     for (i = 0; i < Blen; i++)
     {
@@ -349,30 +334,28 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
         node = mpoly_rbtree_get_fmpz(&new, tree, main_exp);
         if (new)
         {
-            node->data = flint_malloc(sizeof(nmod_poly_struct));
-            nmod_poly_init_mod(node->data, ctx->ffinfo->mod);
-            nmod_poly_zero(node->data);
+            node->data = flint_malloc(sizeof(nmod_polydr_struct));
+            nmod_polydr_init(node->data, ctx->ffinfo);
         }
 
-        nmod_poly_zero(t);
-        nmod_poly_set_coeff_ui(t, 0, Bcoeff[i]);
+        nmod_polydr_set_nmod(t, Bcoeff[i], ctx->ffinfo);
         for (k = 0; k < k_len; k++)
         {
             if ((Bexp[N*i + offs[k]] & masks[k]) != WORD(0))
             {
-                nmod_poly_mul(t2, t, powers + k);
-                nmod_poly_swap(t, t2);
+                nmod_polydr_mul(t2, t, powers + k, ctx->ffinfo);
+                nmod_polydr_swap(t, t2, ctx->ffinfo);
             }
         }
-        nmod_poly_add(t2, t, node->data);
-        nmod_poly_swap(t2, node->data);
+        nmod_polydr_add(t2, t, node->data, ctx->ffinfo);
+        nmod_polydr_swap(t2, node->data, ctx->ffinfo);
     }
     fmpz_clear(main_exp);
-    nmod_poly_clear(t);
-    nmod_poly_clear(t2);
+    nmod_polydr_clear(t, ctx->ffinfo);
+    nmod_polydr_clear(t2, ctx->ffinfo);
 
     for (k = 0; k < k_len; k++)
-        nmod_poly_clear(powers + k);
+        nmod_polydr_clear(powers + k, ctx->ffinfo);
 
     for (i = 0; i < nvars; i++)
         fmpz_clear(degrees + i);
@@ -386,25 +369,24 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
 }
 
 
-void nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
-                        const nmod_mpoly_t B, nmod_poly_struct * const * C,
+void nmod_mpoly_compose_nmod_polydr(nmod_polydr_t A,
+                        const nmod_mpoly_t B, nmod_polydr_struct * const * C,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     if (B->length == 0)
     {
-        nmod_poly_zero(A);
+        nmod_polydr_zero(A, ctx->ffinfo);
         return;
     }
     else if (B->bits <= FLINT_BITS)
     {
-        _nmod_mpoly_compose_nmod_poly_sp(A, B, C, ctx);
+        _nmod_mpoly_compose_nmod_polydr_sp(A, B, C, ctx);
         return;
     }
     else
     {
-        _nmod_mpoly_compose_nmod_poly_mp(A, B, C, ctx);
+        _nmod_mpoly_compose_nmod_polydr_mp(A, B, C, ctx);
         return;
     }
-
 }
 

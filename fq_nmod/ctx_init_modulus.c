@@ -14,6 +14,24 @@
 
 #include "fq_nmod.h"
 
+
+void fq_nmod_ctx_init_modulusdr(fq_nmod_ctx_t ctx, const nmod_polydr_t modulus, mp_limb_t p,
+                         const char *var)
+{
+    nmod_ctx_t fpctx;
+    nmod_poly_t m;
+
+    nmod_ctx_init(fpctx, p);
+    m->mod = fpctx->mod;
+    m->coeffs = modulus->coeffs;
+    m->length = modulus->length;
+    m->alloc = modulus->alloc;
+
+    fq_nmod_ctx_init_modulus(ctx, m, var);
+
+    nmod_ctx_clear(fpctx);
+}
+
 void
 fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
                          const char *var)
@@ -22,12 +40,8 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
     int i, j;
     mp_limb_t inv;
 
-    fmpz_init(fq_nmod_ctx_prime(ctx));
-    fmpz_set_ui(fq_nmod_ctx_prime(ctx), modulus->mod.n);
-    
-    ctx->mod.n = modulus->mod.n;
-    ctx->mod.ninv = modulus->mod.ninv;
-    ctx->mod.norm = modulus->mod.norm;
+    fmpz_init_set_ui(fq_nmod_ctx_prime(ctx), modulus->mod.n);
+    nmod_ctx_init_mod(ctx->fpctx, modulus->mod);
 
     /* Count number of nonzero coefficients */
     nz = 0;
@@ -43,7 +57,7 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
     ctx->a = _nmod_vec_init(ctx->len);
     ctx->j = flint_malloc(ctx->len * sizeof(mp_limb_t));
 
-    inv = n_invmod(modulus->coeffs[modulus->length - 1], ctx->mod.n);
+    inv = n_invmod(modulus->coeffs[modulus->length - 1], ctx->fpctx->mod.n);
 
     /* Copy the polynomial */
     j = 0;
@@ -52,7 +66,7 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
         if (modulus->coeffs[i] != 0)
         {
             ctx->a[j] = n_mulmod2_preinv(inv, modulus->coeffs[i],
-                                         ctx->mod.n, ctx->mod.ninv);
+                                      ctx->fpctx->mod.n, ctx->fpctx->mod.ninv);
             ctx->j[j] = i;
             j++;
         }
@@ -67,11 +81,11 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
     strcpy(ctx->var, var);
 
     /* Set the modulus */
-    nmod_poly_init(ctx->modulus, ctx->mod.n);
-    nmod_poly_set(ctx->modulus, modulus);
+    nmod_polydr_init(ctx->modulus, ctx->fpctx);
+    nmod_polydr_set_nmod_poly(ctx->modulus, modulus, ctx->fpctx);
 
     /* Precompute the inverse of the modulus */
-    nmod_poly_init(ctx->inv, ctx->mod.n);
-    nmod_poly_reverse(ctx->inv, ctx->modulus, ctx->modulus->length);
-    nmod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->modulus->length);
+    nmod_polydr_init(ctx->inv, ctx->fpctx);
+    nmod_polydr_reverse(ctx->inv, ctx->modulus, ctx->modulus->length, ctx->fpctx);
+    nmod_polydr_inv_series_newton(ctx->inv, ctx->inv, ctx->modulus->length, ctx->fpctx);
 }

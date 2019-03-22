@@ -11,11 +11,10 @@
 
 #include "nmod_mpoly.h"
 
-
 slong _nmod_mpoly_derivative(mp_limb_t * coeff1,       ulong * exp1,
                        const mp_limb_t * coeff2, const ulong * exp2, slong len2,
           mp_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp,
-                                                        const nmodf_ctx_t fctx)
+                                                        const nmod_ctx_t fctx)
 {
     slong i, len1;
 
@@ -43,7 +42,7 @@ slong _nmod_mpoly_derivative(mp_limb_t * coeff1,       ulong * exp1,
 slong _nmod_mpoly_derivative_mp(mp_limb_t * coeff1,       ulong * exp1,
                           const mp_limb_t * coeff2, const ulong * exp2, slong len2,
           mp_bitcnt_t bits, slong N, slong offset,              ulong * oneexp,
-                                                        const nmodf_ctx_t fctx)
+                                                        const nmod_ctx_t fctx)
 {
     slong i, len1;
     fmpz_t c;

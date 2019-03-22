@@ -364,7 +364,7 @@ void nmod_mpolyu_set(nmod_mpolyu_t A, const nmod_mpolyu_t B,
 
 
 
-void nmod_mpoly_cvtfrom_poly_notmain(nmod_mpoly_t A, nmod_poly_t a,
+void nmod_mpoly_cvtfrom_poly_notmain(nmod_mpoly_t A, nmod_polydr_t a,
                                          slong var, const nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -381,12 +381,12 @@ void nmod_mpoly_cvtfrom_poly_notmain(nmod_mpoly_t A, nmod_poly_t a,
     oneexp = (ulong *)TMP_ALLOC(N*sizeof(ulong));
     mpoly_gen_monomial_sp(oneexp, var, A->bits, ctx->minfo);
 
-    nmod_mpoly_fit_length(A, nmod_poly_length(a), ctx);
+    nmod_mpoly_fit_length(A, nmod_polydr_length(a, ctx->ffinfo), ctx);
 
     k = 0;
-    for (i = nmod_poly_length(a) - 1; i >= 0; i--)
+    for (i = nmod_polydr_length(a, ctx->ffinfo) - 1; i >= 0; i--)
     {
-        mp_limb_t c = nmod_poly_get_coeff_ui(a, i);
+        mp_limb_t c = nmod_polydr_get_coeff_ui(a, i, ctx->ffinfo);
         if (c != UWORD(0))
         {
             A->coeffs[k] = c;
@@ -400,7 +400,7 @@ void nmod_mpoly_cvtfrom_poly_notmain(nmod_mpoly_t A, nmod_poly_t a,
 /*
     Set "A" to "a" where "a" is a polynomial in a non-main variable "var"
 */
-void nmod_mpolyu_cvtfrom_poly_notmain(nmod_mpolyu_t A, nmod_poly_t a,
+void nmod_mpolyu_cvtfrom_poly_notmain(nmod_mpolyu_t A, nmod_polydr_t a,
                                          slong var, const nmod_mpoly_ctx_t ctx)
 {
     nmod_mpolyu_fit_length(A, 1, ctx);
@@ -415,24 +415,24 @@ void nmod_mpolyu_cvtfrom_poly_notmain(nmod_mpolyu_t A, nmod_poly_t a,
     Assuming that "A" depends only on the main variable,
     convert it to a poly "a".
 */
-void nmod_mpolyu_cvtto_poly(nmod_poly_t a, nmod_mpolyu_t A,
+void nmod_mpolyu_cvtto_poly(nmod_polydr_t a, nmod_mpolyu_t A,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    nmod_poly_zero(a);
+    nmod_polydr_zero(a, ctx->ffinfo);
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT((A->coeffs + i)->length == 1);
         FLINT_ASSERT(mpoly_monomial_is_zero((A->coeffs + i)->exps, 
                       mpoly_words_per_exp((A->coeffs + i)->bits, ctx->minfo)));
-        nmod_poly_set_coeff_ui(a, A->exps[i], (A->coeffs + i)->coeffs[0]);
+        nmod_polydr_set_coeff_ui(a, A->exps[i], (A->coeffs + i)->coeffs[0], ctx->ffinfo);
     }
 }
 
 /*
     Convert a poly "a" to "A" in the main variable,
 */
-void nmod_mpolyu_cvtfrom_poly(nmod_mpolyu_t A, nmod_poly_t a,
+void nmod_mpolyu_cvtfrom_poly(nmod_mpolyu_t A, nmod_polydr_t a,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -441,9 +441,9 @@ void nmod_mpolyu_cvtfrom_poly(nmod_mpolyu_t A, nmod_poly_t a,
 
     nmod_mpolyu_zero(A, ctx);
     k = 0;
-    for (i = nmod_poly_length(a) - 1; i >= 0; i--)
+    for (i = nmod_polydr_length(a, ctx->ffinfo) - 1; i >= 0; i--)
     {
-        mp_limb_t c = nmod_poly_get_coeff_ui(a, i);
+        mp_limb_t c = nmod_polydr_get_coeff_ui(a, i, ctx->ffinfo);
         if (c != UWORD(0))
         {
             nmod_mpolyu_fit_length(A, k + 1, ctx);
