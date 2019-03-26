@@ -265,7 +265,7 @@ FLINT_DLL void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A);
 FMPZ_MAT_INLINE
 void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
 {
-    if (r != s)
+    if (r != s && !fmpz_mat_is_empty(mat))
     {
         fmpz * u;
         slong t;
@@ -280,6 +280,66 @@ void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
         u = mat->rows[s];
         mat->rows[s] = mat->rows[r];
         mat->rows[r] = u;
+    }
+}
+
+FMPZ_MAT_INLINE
+void fmpz_mat_invert_rows(fmpz_mat_t mat, slong * perm)
+{
+    slong i;
+
+    for (i = 0; i < mat->r/2; i++)
+        fmpz_mat_swap_rows(mat, perm, i, mat->r - i - 1);
+}
+
+FMPZ_MAT_INLINE
+void fmpz_mat_swap_cols(fmpz_mat_t mat, slong * perm, slong r, slong s)
+{
+    if (r != s && !fmpz_mat_is_empty(mat))
+    {
+        slong t;
+
+        if (perm)
+        {
+            t = perm[s];
+            perm[s] = perm[r];
+            perm[r] = t;
+        }
+
+       for (t = 0; t < mat->r; t++)
+       {
+           fmpz_swap(fmpz_mat_entry(mat, t, r), fmpz_mat_entry(mat, t, s));
+       }
+    }
+}
+
+FMPZ_MAT_INLINE
+void fmpz_mat_invert_cols(fmpz_mat_t mat, slong * perm)
+{
+    if (!fmpz_mat_is_empty(mat))
+    {
+        slong t;
+        slong i;
+        slong c = mat->c;
+        slong k = mat->c/2;
+
+        if (perm)
+        {
+            for (i =0; i < k; i++)
+            {
+                t = perm[i];
+                perm[i] = perm[c - i];
+                perm[c - i] = t;
+            }
+        }
+
+        for (t = 0; t < mat->r; t++)
+        {
+            for (i = 0; i < k; i++)
+            {
+                fmpz_swap(fmpz_mat_entry(mat, t, i), fmpz_mat_entry(mat, t, c - i - 1));
+            }
+        }
     }
 }
 
