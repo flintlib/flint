@@ -169,6 +169,21 @@ FLINT_DLL void nmod_poly_clear(nmod_poly_t poly);
 FLINT_DLL void nmod_poly_fit_length(nmod_poly_t poly, slong alloc);
 
 NMOD_POLY_INLINE
+void nmod_poly_init_mod(nmod_poly_t poly, const nmod_t mod)
+{
+    poly->coeffs = NULL;
+    poly->alloc = 0;
+    poly->length = 0;
+    poly->mod = mod;
+}
+
+NMOD_POLY_INLINE
+void nmod_poly_set_mod(nmod_poly_t poly, const nmod_t mod)
+{
+    poly->mod = mod;
+}
+
+NMOD_POLY_INLINE
 void _nmod_poly_set_length(nmod_poly_t poly, slong len)
 {
     poly->length = len;

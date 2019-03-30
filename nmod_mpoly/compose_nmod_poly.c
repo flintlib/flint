@@ -12,16 +12,6 @@
 #include "nmod_mpoly.h"
 
 
-void
-nmod_poly_init_mod(nmod_poly_t poly, nmod_t mod)
-{
-    poly->coeffs = NULL;
-    poly->alloc = 0;
-    poly->length = 0;
-    poly->mod = mod;
-}
-
-
 /*
     Given a polynomial tree with exponents stored in the keys and
     coefficients stored in the data member,
