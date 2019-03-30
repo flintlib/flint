@@ -2512,8 +2512,8 @@ Chinese Remaindering
 
 .. function:: int nmod_poly_crt(nmod_poly_t output, const nmod_poly_struct * moduli, const nmod_poly_struct * values, slong len)
 
-    Set ``output`` to the polynomial of lowest possible degree that is congruent to ``inputs + i`` modulo the ``moduli + i`` in func::nmod_poly_crt_precompute. The number of moduli, ``len``, should be positive, and the moduli (``mod.n``) of all of the moduli are assumed to match and be prime.
-    The inputs ``values + 0, ... , values + len - 1`` where ``len`` was used in func::nmod_poly_crt_precompute are expected to be valid and have modulus matching the modulus of the moduli used in func::nmod_poly_crt_precompute.
+    Set ``output`` to the polynomial of lowest possible degree that is congruent to ``inputs + i`` modulo the ``moduli + i``. The number of moduli, ``len``, should be positive, and the moduli (``mod.n``) of all of the moduli are assumed to match and be prime.
+    The inputs ``values + 0, ... , values + len - 1`` are expected to have modulus matching the modulus of the moduli.
     A return of ``0`` indicates that the moduli are invalid and ``output`` was left undefined.
     A return of ``1`` indicates success.
 
