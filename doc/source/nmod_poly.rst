@@ -2495,9 +2495,9 @@ Chinese Remaindering
 
     Initialize ``CRT`` for chinese remaindering.
 
-.. function:: int nmod_poly_crt_precompute(nmod_poly_crt CRT, const nmod_poly_struct * moduli, slong len)
+.. function:: int nmod_poly_crt_precompute(nmod_poly_crt_t CRT, const nmod_poly_struct * moduli, slong len)
 
-.. function:: int nmod_poly_crt_precompute_p(nmod_poly_crt CRT, const nmod_poly_struct * const * moduli, slong len)
+.. function:: int nmod_poly_crt_precompute_p(nmod_poly_crt_t CRT, const nmod_poly_struct * const * moduli, slong len)
 
     Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
     A return of ``0`` indicates that the compilation failed and future calls to func::nmod_poly_crt_precomp will leave the output undefined.
@@ -2521,14 +2521,15 @@ Chinese Remaindering
 
     Free all space used by ``CRT``.
 
-.. function:: slong _nmod_poly_crt_local_size(nmod_poly_crt_t CRT)
+.. function:: slong _nmod_poly_crt_local_size(const nmod_poly_crt_t CRT)
 
     Return the required length of the output for func::_nmod_poly_crt_run.
 
-.. function:: void _nmod_poly_crt_run(const nmod_poly_crt_t CRT, nmod_poly_struct * const * outputs, const nmod_poly_struct * const * inputs)
+.. function:: void _nmod_poly_crt_run_p(const nmod_poly_crt_t CRT, nmod_poly_struct * const * outputs, const nmod_poly_struct * const * inputs)
 
     Chinese remainder the ``inputs`` and place the output in ``outputs[0]``, which will have lowest possible degree and be congruent to ``inputs[i]`` modulo the ``moduli[i]`` in func::nmod_poly_crt_compile.
-    The inputs are not modified. ``outputs`` contains space for all temporaries and should be at least as long as ``_nmod_poly_crt_local_size(P)``.
+    ``outputs`` should contain space for all temporaries and should be at least as long as ``_nmod_poly_crt_local_size(P)``.
+    Of course the moduli of these temporaries should match the modulus of the inputs.
 
 
 Inflation and deflation
