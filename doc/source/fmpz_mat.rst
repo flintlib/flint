@@ -67,6 +67,27 @@ Basic assignment and manipulation
     and zeroes elsewhere. If ``mat`` is nonsquare, it is set to the
     truncation of a unit matrix.
 
+.. function:: void fmpz_mat_swap_rows(fmpz_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: void fmpz_mat_swap_cols(fmpz_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
+
+.. function:: void fmpz_mat_invert_rows(fmpz_mat_t, slong * perm)
+    
+    Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
+    ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: void fmpz_mat_invert_cols(fmpz_mat_t, slong * perm)
+    
+    Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
+    ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
 
 Window
 --------------------------------------------------------------------------------
