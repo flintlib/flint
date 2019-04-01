@@ -19,10 +19,10 @@
 #include "fmpz_poly.h"
 
 
-static void 
+static int
 __fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
                               const fmpz * A, slong lenA, 
-                              const fmpz * B, slong lenB)
+                              const fmpz * B, slong lenB, int exact)
 {
     if (lenA < 2 * lenB - 1)
     {
@@ -42,7 +42,11 @@ __fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
         fmpz * d1q1 = R + n2;
         fmpz * d2q1 = W + (2 * n1 - 1);
 
-        _fmpz_poly_divrem_divconquer_recursive(Q, d1q1, W, p1, d1, n1);
+        if (!_fmpz_poly_divrem_divconquer_recursive(Q, d1q1, W, p1, d1, n1, exact))
+        {
+            _fmpz_vec_clear(W, (2 * n1 - 1) + lenB - 1);
+            return 0;
+        }
 
         /*
            Compute d2q1 = Q d2, of length lenB - 1
@@ -68,20 +72,28 @@ __fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
     {
         fmpz * W = _fmpz_vec_init(lenA);
 
-        _fmpz_poly_divrem_divconquer_recursive(Q, R, W, A, B, lenB);
+        if (!_fmpz_poly_divrem_divconquer_recursive(Q, R, W, A, B, lenB, exact))
+        {
+            _fmpz_vec_clear(W, lenA);
+            return 0;
+        }
+
         _fmpz_vec_sub(R, A, R, lenA);
 
         _fmpz_vec_clear(W, lenA);
     }
+
+    return 1;
 }
 
-void _fmpz_poly_divrem_divconquer(fmpz *Q, fmpz *R, 
+int _fmpz_poly_divrem_divconquer(fmpz *Q, fmpz *R, 
                                   const fmpz *A, slong lenA, 
-                                  const fmpz *B, slong lenB)
+                                  const fmpz *B, slong lenB, int exact)
 {
     if (lenA <= 2 * lenB - 1)
     {
-        __fmpz_poly_divrem_divconquer(Q, R, A, lenA, B, lenB);
+        if (!__fmpz_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, exact))
+            return 0;
     }
     else  /* lenA > 2 * lenB - 1 */
     {
@@ -95,20 +107,30 @@ void _fmpz_poly_divrem_divconquer(fmpz *Q, fmpz *R,
         while (lenA >= n)
         {
             shift = lenA - n;
-            _fmpz_poly_divrem_divconquer_recursive(Q + shift, QB,
-                W, R + shift, B, lenB);
+            if (!_fmpz_poly_divrem_divconquer_recursive(Q + shift, QB,
+                W, R + shift, B, lenB, exact))
+            {
+                _fmpz_vec_clear(W, 2 * n);
+                return 0;
+            }
             _fmpz_vec_sub(R + shift, R + shift, QB, n);
             lenA -= lenB;
         }
 
         if (lenA >= lenB)
         {
-            __fmpz_poly_divrem_divconquer(Q, W, R, lenA, B, lenB);
+            if (!__fmpz_poly_divrem_divconquer(Q, W, R, lenA, B, lenB, exact))
+            {
+                _fmpz_vec_clear(W, 2 * n);
+                return 0;
+            }
             _fmpz_vec_swap(W, R, lenA);
         }
 
         _fmpz_vec_clear(W, 2 * n);
     }
+
+    return 1;
 }
 
 void
@@ -155,7 +177,7 @@ fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_poly_divrem_divconquer(q, r, A->coeffs, lenA, B->coeffs, lenB);
+    _fmpz_poly_divrem_divconquer(q, r, A->coeffs, lenA, B->coeffs, lenB, 0);
 
     if (Q == A || Q == B)
     {

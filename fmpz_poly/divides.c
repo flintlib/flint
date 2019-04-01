@@ -20,7 +20,11 @@ int _fmpz_poly_divides(fmpz * q, const fmpz * a,
 {
     fmpz * r = _fmpz_vec_init(len1);
 
-    _fmpz_poly_divrem(q, r, a, len1, b, len2);
+    if (!_fmpz_poly_divrem(q, r, a, len1, b, len2, 1))
+    {
+        _fmpz_vec_clear(r, len1);
+        return 0;
+    }
 
     FMPZ_VEC_NORM(r, len1);
 

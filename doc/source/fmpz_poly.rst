@@ -1363,7 +1363,7 @@ Euclidean division
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that 
     `A = B Q + R` and each coefficient of `R` beyond ``lenB`` is reduced 
@@ -1375,6 +1375,16 @@ Euclidean division
     ``(A, lenA)``.  `R` and `A` may be aliased, but apart from this no 
     aliasing of input and output operands is allowed.
 
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
 .. function:: void fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes `Q`, `R` such that `A = B Q + R` and each coefficient of `R` 
@@ -1383,7 +1393,7 @@ Euclidean division
     this is the same thing as division over `\mathbb{Q}`.  An exception is raised 
     if `B` is zero.
 
-.. function:: void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, const fmpz * A, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, const fmpz * A, const fmpz * B, slong lenB, int exact)
 
     Computes ``(Q, lenB)``, ``(BQ, 2 lenB - 1)`` such that 
     `BQ = B \times Q` and `A = B Q + R` where each coefficient of `R` beyond 
@@ -1400,7 +1410,17 @@ Euclidean division
     `A`, which means that they might not even need to exist in allocated 
     memory.
 
-.. function:: void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
+.. function:: int _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that 
     `A = B Q + R` and each coefficient of `R` beyond `\operatorname{len}(B) - 1` is 
@@ -1412,6 +1432,16 @@ Euclidean division
     ``(A, lenA)``.  No aliasing of input and output operands is 
     allowed.
 
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
 .. function:: void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes `Q`, `R` such that `A = B Q + R` and each coefficient of `R` 
@@ -1420,7 +1450,7 @@ Euclidean division
     this is the same as division over `\mathbb{Q}`.  An exception is raised if `B` 
     is zero.
 
-.. function:: void _fmpz_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that 
     `A = B Q + R` and each coefficient of `R` beyond `\operatorname{len}(B) - 1` is 
@@ -1431,6 +1461,16 @@ Euclidean division
     Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in 
     ``(A, lenA)``.  No aliasing of input and output operands is 
     allowed.
+
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
 
 .. function:: void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 

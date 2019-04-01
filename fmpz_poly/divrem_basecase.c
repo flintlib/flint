@@ -17,12 +17,16 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void
+int
 _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
-                           const fmpz * B, slong lenB)
+                           const fmpz * B, slong lenB, int exact)
 {
     const fmpz * leadB = B + (lenB - 1);
     slong iQ, iR;
+    fmpz_t r;
+
+    if (exact)
+       fmpz_init(r);
 
     if (R != A)
         _fmpz_vec_set(R, A, lenA);
@@ -30,13 +34,36 @@ _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
     for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
     {
         if (fmpz_cmpabs(R + iR, leadB) < 0)
-            fmpz_zero(Q + iQ);
-        else
         {
-            fmpz_fdiv_q(Q + iQ, R + iR, leadB);
+            if (exact && !fmpz_is_zero(R + iR))
+            {
+                fmpz_clear(r);
+                return 0;
+            }
+
+            fmpz_zero(Q + iQ);
+        } else
+        {
+            if (exact)
+            {
+                fmpz_fdiv_qr(Q + iQ, r, R + iR, leadB);
+
+                if (!fmpz_is_zero(r))
+                {
+                    fmpz_clear(r);
+                    return 0;
+                }
+            } else
+                fmpz_fdiv_q(Q + iQ, R + iR, leadB);
+
             _fmpz_vec_scalar_submul_fmpz(R + iQ, B, lenB, Q + iQ);
         }
     }
+
+    if (exact)
+       fmpz_clear(r);
+
+    return 1;
 }
 
 void
@@ -82,7 +109,7 @@ fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     }
 
     _fmpz_poly_divrem_basecase(q, r, A->coeffs, A->length,
-                                     B->coeffs, B->length);
+                                     B->coeffs, B->length, 0);
 
     if (Q == A || Q == B)
     {
