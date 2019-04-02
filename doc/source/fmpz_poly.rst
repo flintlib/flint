@@ -1806,8 +1806,13 @@ Power series division
     Computes the first `n` terms of the inverse power series of `Q`, 
     assuming `Q` has constant term `\pm 1` and `n \geq 1`.
 
-.. function:: void _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen, const fmpz
- * B, slong Blen, slong n)
+.. function:: void _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
+
+    Divides ``(A, Alen)`` by ``(B, Blen)`` as power series over `\mathbb{Z}`,
+    assuming `B` has constant term `\pm 1` and `n \geq 1`.
+    Aliasing is not supported.
+
+.. function:: void _fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
 
     Divides ``(A, Alen)`` by ``(B, Blen)`` as power series over `\mathbb{Z}`,
     assuming `B` has constant term `\pm 1` and `n \geq 1`.
@@ -1824,6 +1829,13 @@ Power series division
     Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function 
     considers the polynomials `A` and `B` as power series of length `n` 
     starting with the constant terms.  The function assumes that `B` has 
+    constant term `\pm 1` and `n \geq 1`.
+
+.. function:: void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
+
+    Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function
+    considers the polynomials `A` and `B` as power series of length `n`
+    starting with the constant terms.  The function assumes that `B` has
     constant term `\pm 1` and `n \geq 1`.
 
 .. function:: void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_po

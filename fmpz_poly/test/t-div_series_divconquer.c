@@ -23,7 +23,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("div_series....");
+    flint_printf("div_series_divconquer....");
     fflush(stdout);
 
     /* Check aliasing q and a */
@@ -40,8 +40,8 @@ main(void)
         fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
         fmpz_poly_set_coeff_si(b, 0, n_randint(state, 2) ? 1 : -1);
 
-        fmpz_poly_div_series(q, a, b, n);
-        fmpz_poly_div_series(a, a, b, n);
+        fmpz_poly_div_series_divconquer(q, a, b, n);
+        fmpz_poly_div_series_divconquer(a, a, b, n);
 
         result = (fmpz_poly_equal(q, a));
         if (!result)
@@ -72,8 +72,8 @@ main(void)
         fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
         fmpz_poly_set_coeff_si(b, 0, n_randint(state, 2) ? 1 : -1);
 
-        fmpz_poly_div_series(q, a, b, n);
-        fmpz_poly_div_series(b, a, b, n);
+        fmpz_poly_div_series_divconquer(q, a, b, n);
+        fmpz_poly_div_series_divconquer(b, a, b, n);
 
         result = (fmpz_poly_equal(q, b));
         if (!result)
@@ -105,7 +105,7 @@ main(void)
         fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
         fmpz_poly_set_coeff_si(b, 0, n_randint(state, 2) ? 1 : -1);
 
-        fmpz_poly_div_series(q, a, b, n);
+        fmpz_poly_div_series_divconquer(q, a, b, n);
         fmpz_poly_mullow(p, q, b, n);
 
         fmpz_poly_truncate(a, n);
@@ -147,7 +147,7 @@ main(void)
 
         fmpz_poly_mullow(p, a, b, n);
 
-        fmpz_poly_div_series(q, p, b, n);
+        fmpz_poly_div_series_divconquer(q, p, b, n);
 
         fmpz_poly_truncate(a, n);
 

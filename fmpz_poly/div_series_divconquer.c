@@ -1,6 +1,4 @@
 /*
-    Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2014 Fredrik Johansson
     Copyright (C) 2019 William Hart
 
     This file is part of FLINT.
@@ -13,28 +11,38 @@
 
 #include "fmpz_poly.h"
 
-void 
-_fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
+void
+_fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong Alen,
     const fmpz * B, slong Blen, slong n)
 {
+    fmpz * Arev = (fmpz *) _fmpz_vec_init(2*n - 1);
+    fmpz * Brev = (fmpz *) _fmpz_vec_init(n);
+    fmpz * R = (fmpz *) _fmpz_vec_init(2*n - 1);
+
     Alen = FLINT_MIN(Alen, n);
     Blen = FLINT_MIN(Blen, n);
 
-    if (n < 32 || Blen < 20)
-       _fmpz_poly_div_series_basecase(Q, A, Alen, B, Blen, n);
-    else if (fmpz_is_pm1(B + 0))
+    _fmpz_poly_reverse(Arev, A, Alen, 2*n - 1);
+    _fmpz_poly_reverse(Brev, B, Blen, n);
+
+    if (!_fmpz_poly_divrem(Q, R, Arev, 2*n - 1, Brev, n, 1))
     {
-        fmpz * Binv = _fmpz_vec_init(n);
+        _fmpz_vec_clear(Arev, 2*n - 1);
+        _fmpz_vec_clear(Brev, n - 1);
+        _fmpz_vec_clear(R, 2*n - 1);
 
-        _fmpz_poly_inv_series(Binv, B, Blen, n);
-        _fmpz_poly_mullow(Q, Binv, n, A, Alen, n);
+        flint_printf("Not an exact division\n");
+        flint_abort();
+    } 
 
-        _fmpz_vec_clear(Binv, n);
-    } else
-        _fmpz_poly_div_series_divconquer(Q, A, Alen, B, Blen, n);
+    _fmpz_poly_reverse(Q, Q, n, n);
+
+    _fmpz_vec_clear(Arev, 2*n - 1);
+    _fmpz_vec_clear(Brev, n - 1);
+    _fmpz_vec_clear(R, 2*n - 1);
 }
 
-void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
+void fmpz_poly_div_series_divconquer(fmpz_poly_t Q, const fmpz_poly_t A,
                                          const fmpz_poly_t B, slong n)
 {
     slong Alen = FLINT_MIN(A->length, n);
@@ -42,7 +50,7 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
 
     if (Blen == 0)
     {
-        flint_printf("Exception (fmpz_poly_div_series). Division by zero.\n");
+        flint_printf("Exception (fmpz_poly_div_series_divconquer). Division by zero.\n");
         flint_abort();
     }
 
@@ -56,16 +64,17 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, n);
-        _fmpz_poly_div_series(t->coeffs, A->coeffs, Alen, B->coeffs, Blen, n);
+        _fmpz_poly_div_series_divconquer(t->coeffs, A->coeffs, Alen, B->coeffs, Blen, n);
         fmpz_poly_swap(Q, t);
         fmpz_poly_clear(t);
     }
     else
     {
         fmpz_poly_fit_length(Q, n);
-        _fmpz_poly_div_series(Q->coeffs, A->coeffs, Alen, B->coeffs, Blen, n);
+        _fmpz_poly_div_series_divconquer(Q->coeffs, A->coeffs, Alen, B->coeffs, Blen, n);
     }
 
     _fmpz_poly_set_length(Q, n);
     _fmpz_poly_normalise(Q);
 }
+
