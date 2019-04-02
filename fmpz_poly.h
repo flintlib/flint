@@ -706,28 +706,29 @@ FLINT_DLL int _fmpz_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
 FLINT_DLL void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
                                      const fmpz_poly_t A, const fmpz_poly_t B);
 
-FLINT_DLL void _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A,
-                                       slong lenA, const fmpz * B, slong lenB);
+FLINT_DLL int _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A,
+                            slong lenA, const fmpz * B, slong lenB, int exact);
 
 FLINT_DLL void fmpz_poly_div_basecase(fmpz_poly_t Q, 
                                      const fmpz_poly_t A, const fmpz_poly_t B);
 
-FLINT_DLL void _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB, 
-                                   const fmpz * A, const fmpz * B, slong lenB);
+FLINT_DLL int _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB, 
+                        const fmpz * A, const fmpz * B, slong lenB, int exact);
 
-FLINT_DLL void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
-                                   const fmpz * A, const fmpz * B, slong lenB);
+FLINT_DLL int _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
+                        const fmpz * A, const fmpz * B, slong lenB, int exact);
 
-FLINT_DLL void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, 
-                                                   const fmpz * B, slong lenB);
+FLINT_DLL int _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, 
+                                        const fmpz * B, slong lenB, int exact);
 
 FLINT_DLL void fmpz_poly_div_divconquer(fmpz_poly_t Q, 
                                      const fmpz_poly_t A, const fmpz_poly_t B);
 
-FLINT_DLL void _fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA, 
-                                                   const fmpz * B, slong lenB);
+FLINT_DLL int _fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA, 
+                                        const fmpz * B, slong lenB, int exact);
 
-FLINT_DLL void fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B);
+FLINT_DLL void fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A,
+                                                          const fmpz_poly_t B);
 
 FLINT_DLL void _fmpz_poly_preinvert(fmpz * B_inv, const fmpz * B, slong n);
 

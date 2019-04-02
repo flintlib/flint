@@ -1480,7 +1480,7 @@ Euclidean division
     this is the same as division over `\mathbb{Q}`.  An exception is raised if `B` 
     is zero.
 
-.. function:: void _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes the quotient ``(Q, lenA - lenB + 1)`` of ``(A, lenA)`` 
     divided by ``(B, lenB)``.
@@ -1498,6 +1498,16 @@ Euclidean division
     aliased, but apart from this no aliasing of input and output operands 
     is allowed.
 
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
 .. function:: void fmpz_poly_div_basecase(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes the quotient `Q` of `A` divided by `Q`.
@@ -1510,7 +1520,7 @@ Euclidean division
     this is the same as division over `\mathbb{Q}`.  An exception is raised if `B` 
     is zero.
 
-.. function:: void _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * BQ, const fmpz * A, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * BQ, const fmpz * A, const fmpz * B, slong lenB, int exact)
 
     Divide and conquer division of ``(A, 2 lenB - 1)`` by ``(B, lenB)``, 
     computing only the bottom `\operatorname{len}(B) - 1` coefficients of `B Q`.
@@ -1520,7 +1530,17 @@ Euclidean division
     carry meaningful output.  Does not support any aliasing.  Allows 
     zero-padding in `A`, but not in `B`.
 
-.. function:: void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, const fmpz * A, const fmpz * B, slong lenB)
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
+.. function:: int _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, const fmpz * A, const fmpz * B, slong lenB, int exact)
 
     Recursive short division in the balanced case.
 
@@ -1531,11 +1551,31 @@ Euclidean division
 
     For further details, see \citep{Mul2000}.
 
-.. function:: void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
+.. function:: int _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes the quotient ``(Q, lenA - lenB + 1)`` of ``(A, lenA)`` 
     upon division by ``(B, lenB)``.  Assumes that 
     `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Does not support aliasing.
+
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
 
 .. function:: fmpz_poly_div_divconquer(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
@@ -1549,7 +1589,7 @@ Euclidean division
     this is the same as division over `\mathbb{Q}`.  An exception is raised if `B` 
     is zero.
 
-.. function:: void _fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes the quotient ``(Q, lenA - lenB + 1)`` of ``(A, lenA)`` 
     divided by ``(B, lenB)``.
@@ -1562,6 +1602,16 @@ Euclidean division
     Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in 
     ``(A, lenA)``.  Aliasing of input and output operands is not 
     allowed.
+
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
 
 .. function:: void fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 

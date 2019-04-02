@@ -242,7 +242,7 @@ _fmpz_poly_cos_minpoly(fmpz * f, ulong n)
         }
     }
 
-    _fmpz_poly_div(f, P, Plen, Q, Qlen);
+    _fmpz_poly_div(f, P, Plen, Q, Qlen, 0);
 
     _fmpz_vec_clear(P, Pdeg + 1);
     _fmpz_vec_clear(Q, Pdeg + 1);
