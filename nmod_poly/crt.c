@@ -179,9 +179,9 @@ static slong _push_prog(
 }
 
 
-
-
-static int _index_deg_pair(const index_deg_pair * lhs, const index_deg_pair * rhs)
+static int index_deg_pair_cmp(
+    const index_deg_pair * lhs,
+    const index_deg_pair * rhs)
 {
     return (lhs->degree < rhs->degree) ? -1 : (lhs->degree > rhs->degree);
 }
@@ -214,7 +214,7 @@ int nmod_poly_crt_precompute_p(nmod_poly_crt_t P,
 
     /* make perm sort the degs so that degs[perm[i-1]] <= degs[perm[i-0]] */
     qsort(perm, len, sizeof(index_deg_pair),
-                             (int(*)(const void*,const void*))_index_deg_pair);
+                        (int(*)(const void*, const void*)) index_deg_pair_cmp);
     for (i = 0; i < len; i++)
     {
         FLINT_ASSERT(perm[i].degree == nmod_poly_degree(moduli[perm[i].idx]));
