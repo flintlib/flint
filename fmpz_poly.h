@@ -790,8 +790,14 @@ FLINT_DLL void _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, sl
 
 FLINT_DLL void fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
+FLINT_DLL void _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
+    const fmpz * B, slong Blen, slong n);
+
 FLINT_DLL void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     const fmpz * B, slong Blen, slong n);
+
+FLINT_DLL void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A,
+                                         const fmpz_poly_t B, slong n);
 
 FLINT_DLL void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
                                          const fmpz_poly_t B, slong n);

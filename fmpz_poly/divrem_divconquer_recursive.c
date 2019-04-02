@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2008, 2009, 2019 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
     This file is part of FLINT.

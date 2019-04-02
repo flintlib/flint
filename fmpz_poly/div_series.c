@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2014 Fredrik Johansson
+    Copyright (C) 2019 William Hart
 
     This file is part of FLINT.
 
@@ -19,43 +20,8 @@ _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     Alen = FLINT_MIN(Alen, n);
     Blen = FLINT_MIN(Blen, n);
 
-    if (Blen == 1)
-    {
-        if (fmpz_is_one(B))
-            _fmpz_vec_set(Q, A, Alen);
-        else
-            _fmpz_vec_neg(Q, A, Alen);
-        _fmpz_vec_zero(Q + Alen, n - Alen);
-    }
-    else if (n < 32 || Blen < 20)
-    {
-        slong i, j;
-
-        if (fmpz_is_one(B))
-            fmpz_set(Q, A);
-        else
-            fmpz_neg(Q, A);
-
-        for (i = 1; i < n; i++)
-        {
-            fmpz_mul(Q + i, B + 1, Q + i - 1);
-
-            for (j = 2; j < FLINT_MIN(i + 1, Blen); j++)
-                fmpz_addmul(Q + i, B + j, Q + i - j);
-
-            if (i < Alen)
-            {
-                if (fmpz_is_one(B))
-                    fmpz_sub(Q + i, A + i, Q + i);
-                else
-                    fmpz_sub(Q + i, Q + i, A + i);
-            }
-            else if (fmpz_is_one(B))
-            {
-                fmpz_neg(Q + i, Q + i);
-            }
-        }
-    }
+    if (n < 32 || Blen < 20)
+       _fmpz_poly_div_series_basecase(Q, A, Alen, B, Blen, n);
     else
     {
         fmpz * Binv = _fmpz_vec_init(n);

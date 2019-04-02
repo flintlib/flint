@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
-    Copyright (C) 2018 William Hart
-    
+    Copyright (C) 2018, 2019 William Hart
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
