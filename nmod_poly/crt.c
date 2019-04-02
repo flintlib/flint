@@ -66,13 +66,22 @@ void nmod_poly_crt_clear(nmod_poly_crt_t P)
     }
 }
 
+typedef struct {
+    slong idx;
+    slong degree;
+} index_deg_pair;
+
 /*
     combine all moduli in [start, stop)
     return index of instruction that computes the result
 */
-static slong _push_prog(nmod_poly_crt_t P,
-                          const nmod_poly_struct * const * moduli, slong * perm,
-                                        slong ret_idx, slong start, slong stop)
+static slong _push_prog(
+    nmod_poly_crt_t P,
+    const nmod_poly_struct * const * moduli,
+    const index_deg_pair * perm,
+    slong ret_idx,
+    slong start,
+    slong stop)
 {
     slong i, mid;
     slong b_idx, c_idx;
@@ -91,22 +100,22 @@ static slong _push_prog(nmod_poly_crt_t P,
     lefttot = 0;
     for (i = start; i < mid; i++)
     {
-        lefttot += nmod_poly_degree(moduli[perm[i]]);
+        lefttot += perm[i].degree;
     }
 
     righttot = 0;
     for (i = mid; i < stop; i++)
     {
-        righttot += nmod_poly_degree(moduli[perm[i]]);
+        righttot += perm[i].degree;
     }
 
     /* try to balance the total degree on left and right */
     while (lefttot < righttot
             && mid + 1 < stop
-            && nmod_poly_degree(moduli[perm[mid]]) < righttot - lefttot)
+            && perm[mid].degree < righttot - lefttot)
     {
-        lefttot += nmod_poly_degree(moduli[perm[mid]]);
-        righttot -= nmod_poly_degree(moduli[perm[mid]]);
+        lefttot += perm[mid].degree;
+        righttot -= perm[mid].degree;
         mid++;
     }
 
@@ -125,8 +134,8 @@ static slong _push_prog(nmod_poly_crt_t P,
     }
     else
     {
-        b_idx = -1 - perm[start];
-        leftmodulus = (nmod_poly_struct *) moduli[perm[start]];
+        b_idx = -1 - perm[start].idx;
+        leftmodulus = (nmod_poly_struct *) moduli[perm[start].idx];
     }
 
     /* compile right [mid, end) */
@@ -142,8 +151,8 @@ static slong _push_prog(nmod_poly_crt_t P,
     }
     else
     {
-        c_idx = -1 - perm[mid];
-        rightmodulus = (nmod_poly_struct *) moduli[perm[mid]];
+        c_idx = -1 - perm[mid].idx;
+        rightmodulus = (nmod_poly_struct *) moduli[perm[mid].idx];
     }
 
     /* check if nmod_poly_invmod is going to throw */
@@ -169,6 +178,14 @@ static slong _push_prog(nmod_poly_crt_t P,
     return i;
 }
 
+
+
+
+static int _index_deg_pair(const index_deg_pair * lhs, const index_deg_pair * rhs)
+{
+    return (lhs->degree < rhs->degree) ? -1 : (lhs->degree > rhs->degree);
+}
+
 /*
     Return 1 if moduli can be CRT'ed, 0 otherwise.
     A return of 0 means that future calls to run will leave output undefined.
@@ -176,8 +193,8 @@ static slong _push_prog(nmod_poly_crt_t P,
 int nmod_poly_crt_precompute_p(nmod_poly_crt_t P,
                             const nmod_poly_struct * const * moduli, slong len)
 {
-    slong i, j;
-    slong * perm;
+    slong i;
+    index_deg_pair * perm;
     TMP_INIT;
 
     FLINT_ASSERT(len > 0);
@@ -187,23 +204,21 @@ int nmod_poly_crt_precompute_p(nmod_poly_crt_t P,
     }
 
     TMP_START;
-    perm = (slong *) TMP_ALLOC(len * sizeof(slong));
+    perm = (index_deg_pair *) TMP_ALLOC(len * sizeof(index_deg_pair));
 
     for (i = 0; i < len; i++)
     {
-        perm[i] = i;
+        perm[i].idx = i;
+        perm[i].degree = nmod_poly_degree(moduli[i]);
     }
 
-    /* make perm sort the degs so that degs[perm[j-1]] <= degs[perm[j-0]] */
-    for (i = 1; i < len; i++)
+    /* make perm sort the degs so that degs[perm[i-1]] <= degs[perm[i-0]] */
+    qsort(perm, len, sizeof(index_deg_pair),
+                             (int(*)(const void*,const void*))_index_deg_pair);
+    for (i = 0; i < len; i++)
     {
-        for (j = i; j > 0 && nmod_poly_degree(moduli[perm[j-1]])
-                           > nmod_poly_degree(moduli[perm[j-0]]); j--)
-        {
-            slong temp = perm[j-1];
-            perm[j-1] = perm[j-0];
-            perm[j-0] = temp;
-        }
+        FLINT_ASSERT(perm[i].degree == nmod_poly_degree(moduli[perm[i].idx]));
+        FLINT_ASSERT(i == 0 || perm[i - 1].degree <= perm[i].degree);
     }
 
     _nmod_poly_crt_fit_length(P, FLINT_MAX(WORD(1), len - 1));
@@ -218,7 +233,7 @@ int nmod_poly_crt_precompute_p(nmod_poly_crt_t P,
     else
     {
         /*
-            There is only one modulus. Lets compute as
+            There is only one modulus. Let's compute as
                 output[0] = input[0] + 0*(input[0] - input[0]) mod moduli[0]
         */
         i = 0;
