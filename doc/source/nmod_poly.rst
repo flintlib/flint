@@ -2486,6 +2486,28 @@ Subproduct trees
     product is not computed.
 
 
+Inflation and deflation
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)
+
+    Sets ``result`` to the inflated polynomial `p(x^n)` where
+    `p` is given by ``input`` and `n` is given by ``deflation``.
+
+.. function:: void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, ulong deflation)
+
+    Sets ``result`` to the deflated polynomial `p(x^{1/n})` where
+    `p` is given by ``input`` and `n` is given by ``deflation``.
+    Requires `n > 0`.
+
+.. function:: ulong nmod_poly_deflation(const nmod_poly_t input)
+
+    Returns the largest integer by which ``input`` can be deflated.
+    As special cases, returns 0 if ``input`` is the zero polynomial
+    and 1 of ``input`` is a constant polynomial.
+
+
 Chinese Remaindering
 --------------------------------------------------------------------------------
 
@@ -2532,23 +2554,53 @@ Chinese Remaindering
     Of course the moduli of these temporaries should match the modulus of the inputs.
 
 
-Inflation and deflation
+Berlekamp-Massey Algorithm
 --------------------------------------------------------------------------------
 
+    The nmod_bma_t manages an unlimited stream of points `a_1, a_2, \dots `.
+    At any point in time, after `n` points have been added, a call to func::nmod_bma_reduce will
+    calculate polynomials U1, V1 and R1 with
 
-.. function:: void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)
+        `U1*x^n + V1*(a_1*x^(n-1) + a_{n-1}*x + \cdots + a_n) = R1, \deg(U1) < \deg(V1) \le n/2, \deg(R1) < n/2`.
 
-    Sets ``result`` to the inflated polynomial `p(x^n)` where
-    `p` is given by ``input`` and `n` is given by ``deflation``.
+    The polynomial V1 may be obtained with func::nmod_bma_master_poly
 
-.. function:: void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, ulong deflation)
+.. function:: void nmod_bma_init(nmod_bma_t B, mp_limb_t p)
 
-    Sets ``result`` to the deflated polynomial `p(x^{1/n})` where
-    `p` is given by ``input`` and `n` is given by ``deflation``.
-    Requires `n > 0`.
+    Initialize ``B`` in characteristic ``p`` with an empty stream.
 
-.. function:: ulong nmod_poly_deflation(const nmod_poly_t input)
+.. function:: void nmod_bma_clear(nmod_bma_t B)
 
-    Returns the largest integer by which ``input`` can be deflated.
-    As special cases, returns 0 if ``input`` is the zero polynomial
-    and 1 of ``input`` is a constant polynomial.
+    Free any space used by ``B``.
+
+.. function:: void nmod_bma_start_over(nmod_bma_t B)
+
+    Empty the stream of points in ``B``.
+
+.. function:: void nmod_bma_set_prime(nmod_bma_t B, mp_limb_t p)
+
+    Set the characteristic of the field and empty the stream of points in ``B``.
+
+.. function:: void nmod_bma_add_points(nmod_bma_t B, const mp_limb_t * a, slong count)
+
+.. function:: void nmod_bma_add_zeros(nmod_bma_t B, slong count)
+
+.. function:: void nmod_bma_add_point(nmod_bma_t B, mp_limb_t a)
+
+    Add point(s) to the stream processed by ``B``. The addition of any number of points will not update the master polynomial.
+
+.. function:: int nmod_bma_reduce(nmod_bma_t B)
+
+    Ensure that the master polynomial is up to date. The return value is 1 if this function changed it, and 0 otherwise.
+
+.. function:: slong nmod_bma_point_count(const nmod_bma_t B)
+
+    Return the number of points stored in ``B``.
+
+.. function:: const mp_limb_t * nmod_bma_points(const nmod_bma_t B)
+
+    Return a pointer the array of points stored in ``B``. This may be ``NULL`` if func::nmod_bma_point_count returns 0.
+
+.. function:: const nmod_poly_struct * nmod_bma_master_poly(const nmod_bma_t B)
+
+    Return the master polynomial ``V1`` in ``B``.

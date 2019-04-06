@@ -1360,6 +1360,49 @@ FLINT_DLL void nmod_mat_minpoly_with_gens(nmod_poly_t p,
 
 FLINT_DLL void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
 
+/* see nmod_poly/bma.c for more info */
+typedef struct {
+    slong npoints;
+    nmod_poly_t R0, R1;
+    nmod_poly_t V0, V1;
+    nmod_poly_t qt, rt; /* temporaries */
+    nmod_poly_t points; /* points added */
+} nmod_bma_struct;
+typedef nmod_bma_struct nmod_bma_t[1];
+
+FLINT_DLL void nmod_bma_init(nmod_bma_t B, mp_limb_t p);
+
+FLINT_DLL void nmod_bma_start_over(nmod_bma_t B);
+
+FLINT_DLL void nmod_bma_clear(nmod_bma_t B);
+
+FLINT_DLL void nmod_bma_set_prime(nmod_bma_t B, mp_limb_t p);
+
+FLINT_DLL void nmod_bma_print(const nmod_bma_t B);
+
+FLINT_DLL void nmod_bma_add_points(nmod_bma_t B, const mp_limb_t * a, slong count);
+
+FLINT_DLL void nmod_bma_add_zeros(nmod_bma_t B, slong count);
+
+FLINT_DLL void nmod_bma_add_point(nmod_bma_t B, mp_limb_t a);
+
+FLINT_DLL int nmod_bma_reduce(nmod_bma_t B);
+
+NMOD_POLY_INLINE const mp_limb_t * nmod_bma_points(const nmod_bma_t B)
+{
+    return B->points->coeffs;
+}
+
+NMOD_POLY_INLINE slong nmod_bma_point_count(const nmod_bma_t B)
+{
+    return B->points->length;
+}
+
+NMOD_POLY_INLINE const nmod_poly_struct * nmod_bma_master_poly(const nmod_bma_t B)
+{
+    return B->V1;
+}
+
 #ifdef __cplusplus
     }
 #endif

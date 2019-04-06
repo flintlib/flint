@@ -1,0 +1,130 @@
+/*
+    Copyright (C) 2019 Daniel Schultz
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "nmod_poly.h"
+
+int
+main(void)
+{
+    slong i, j, k, l;
+    FLINT_TEST_INIT(state);
+
+    flint_printf("bma....");
+    fflush(stdout);
+
+    {
+        nmod_bma_t B;
+        nmod_bma_init(B, 101);
+        nmod_bma_add_point(B, 1);
+        nmod_bma_add_point(B, 1);
+        nmod_bma_add_point(B, 2);
+        nmod_bma_add_point(B, 3);
+        nmod_bma_add_point(B, 5);
+        nmod_bma_reduce(B);
+        if (2 != nmod_poly_degree(nmod_bma_master_poly(B)))
+        {
+            printf("FAIL\n");
+            flint_printf("check fibonacci\n");
+            flint_abort();
+        }
+        nmod_bma_clear(B);
+    }
+
+    for (i = 0; i < 15 * flint_test_multiplier(); i++)
+    {
+        nmod_bma_t B1, B2;
+        nmod_bma_init(B1, 2);
+        nmod_bma_init(B2, 2);
+        for (j = 0; j < 10; j++)
+        {
+            mp_limb_t p;
+
+            p = n_randtest_prime(state, 1);
+
+            nmod_bma_set_prime(B1, p);
+            nmod_bma_set_prime(B2, p);
+
+            /* check intermediate reductions match */
+            for (k = 0; k < 10; k++)
+            {
+                nmod_bma_add_point(B1, n_randint(state, p));
+                nmod_bma_add_zeros(B1, n_randint(state, 5));
+                nmod_bma_add_point(B1, n_randint(state, p));
+                if (n_randlimb(state) & 1)
+                {
+                    nmod_bma_reduce(B1);
+                }
+            }
+            nmod_bma_add_points(B2, nmod_bma_points(B1),
+                                    nmod_bma_point_count(B1));
+            nmod_bma_reduce(B2);
+            nmod_bma_reduce(B1);
+            if (!nmod_poly_equal(nmod_bma_master_poly(B1),
+                                 nmod_bma_master_poly(B2)))
+            {
+                printf("FAIL\n");
+                flint_printf("check intermediate reductions match\n"
+                                                   "i = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
+
+            /* check berlekamp-massey does its job */
+            for (k = 0; k < 15; k++)
+            {
+                nmod_poly_t u, v, s, q, r;
+                nmod_poly_init(u, p);
+                nmod_poly_init(v, p);
+                nmod_poly_init(s, p);
+                nmod_poly_init(q, p);
+                nmod_poly_init(r, p);
+
+                /* deg(u) < deg(v), deg(v) = k */
+                nmod_poly_randtest(u, state, k);
+                nmod_poly_randtest_monic(v, state, k + 1);
+
+                /* q has enough coefficients of expansion of u/v at infty */
+                nmod_poly_shift_left(s, u, 2*k);
+                nmod_poly_divrem(q, r, s, v);
+                
+                nmod_bma_start_over(B1);
+                for (l = 2*k - 1; l >= 0 ; l--)
+                {
+                    nmod_bma_add_point(B1, nmod_poly_get_coeff_ui(q, l));
+                }
+                nmod_bma_reduce(B1);
+                nmod_poly_divrem(q, r, v, nmod_bma_master_poly(B1));
+                if (!nmod_poly_is_zero(r))
+                {
+                    flint_printf("check bma does its job\n"
+                                       "i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    printf("v: "); nmod_poly_print_pretty(v, "#"); printf("\n");
+                    printf("B: "); nmod_bma_print(B1); printf("\n");
+                    flint_abort();
+                }
+
+                nmod_poly_clear(u);
+                nmod_poly_clear(v);
+                nmod_poly_clear(s);
+                nmod_poly_clear(q);
+                nmod_poly_clear(r);
+            }
+        }
+        nmod_bma_clear(B1);
+        nmod_bma_clear(B2);
+    }
+
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
+    return 0;
+}
