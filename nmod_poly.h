@@ -1081,6 +1081,14 @@ FLINT_DLL slong _nmod_poly_hgcd(mp_ptr *M, slong *lenM,
                      mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
                      nmod_t mod);
 
+FLINT_DLL slong nmod_poly_hgcd_ref(
+        nmod_poly_t m11, nmod_poly_t m12, nmod_poly_t m21, nmod_poly_t m22,
+        nmod_poly_t A, nmod_poly_t B, const nmod_poly_t a, const nmod_poly_t b);
+
+FLINT_DLL slong nmod_poly_hgcd(
+        nmod_poly_t m11, nmod_poly_t m12, nmod_poly_t m21, nmod_poly_t m22,
+        nmod_poly_t A, nmod_poly_t B, const nmod_poly_t a, const nmod_poly_t b);
+
 FLINT_DLL slong _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, slong lenA, 
                                    mp_srcptr B, slong lenB, nmod_t mod);
 

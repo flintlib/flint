@@ -37,17 +37,14 @@ do {                                                            \
 int
 main(void)
 {
-    int i, result;
+    slong i, j, result;
     FLINT_TEST_INIT(state);
     
 
     flint_printf("hgcd....");
     fflush(stdout);
 
-    /* 
-       Find coprime polys, multiply by another poly 
-       and check the GCD is that poly 
-    */
+    /* check that [c1,d1] := M^{-1} [a,b] assuming that deg(M) = sgnM */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d, c1, d1, s, t;
@@ -90,7 +87,7 @@ main(void)
         nmod_poly_fit_length(s, 2 * a->length);
         nmod_poly_fit_length(t, 2 * a->length);
 
-        /* [c1,d1] := sgnM * M^{-1} [a,b] */
+        /* [c1, d1] := M^{-1} [a,b] */
         {
             const nmod_t mod = a->mod;
 
@@ -138,6 +135,74 @@ main(void)
         _nmod_vec_clear(M[1]);
         _nmod_vec_clear(M[2]);
         _nmod_vec_clear(M[3]);
+    }
+
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        mp_limb_t p;
+        slong dega, sgnM, sgnMr;
+        nmod_poly_t m11, m12, m21, m22, A, B, a, b;
+        nmod_poly_t m11r, m12r, m21r, m22r, Ar, Br;
+
+        p = n_randtest_prime(state, 1);
+        nmod_poly_init(m11, p);
+        nmod_poly_init(m12, p);
+        nmod_poly_init(m21, p);
+        nmod_poly_init(m22, p);
+        nmod_poly_init(A, p);
+        nmod_poly_init(B, p);
+        nmod_poly_init(m11r, p);
+        nmod_poly_init(m12r, p);
+        nmod_poly_init(m21r, p);
+        nmod_poly_init(m22r, p);
+        nmod_poly_init(Ar, p);
+        nmod_poly_init(Br, p);
+        nmod_poly_init(a, p);
+        nmod_poly_init(b, p);
+
+        dega = n_randint(state, 100);
+        nmod_poly_randtest_monic(a, state, 1 + dega);
+        nmod_poly_randtest(b, state, dega);
+        nmod_poly_scalar_mul_nmod(a, a, 1 + n_randint(state, p - 1));
+
+        /* make a and b sparser */
+        for (j = 0; j < dega; j++)
+        {
+            nmod_poly_set_coeff_ui(a, n_randint(state, dega), 0);
+            nmod_poly_set_coeff_ui(b, n_randint(state, dega), 0);
+        }
+
+        sgnMr = nmod_poly_hgcd_ref(m11r, m12r, m21r, m22r, Ar, Br, a, b);
+        sgnM  = nmod_poly_hgcd(m11, m12, m21, m22, A, B, a, b);
+
+        if (sgnMr != sgnM
+            || !nmod_poly_equal(m11r, m11)
+            || !nmod_poly_equal(m12r, m12)
+            || !nmod_poly_equal(m21r, m21)
+            || !nmod_poly_equal(m22r, m22)
+            || !nmod_poly_equal(Ar, A)
+            || !nmod_poly_equal(Br, B))
+        {
+            printf("check reference match\n");
+            printf("a: "); nmod_poly_print_pretty(a, "x"); printf("\n");
+            printf("b: "); nmod_poly_print_pretty(b, "x"); printf("\n");
+            flint_abort();
+        }
+
+        nmod_poly_clear(m11);
+        nmod_poly_clear(m12);
+        nmod_poly_clear(m21);
+        nmod_poly_clear(m22);
+        nmod_poly_clear(A);
+        nmod_poly_clear(B);
+        nmod_poly_clear(m11r);
+        nmod_poly_clear(m12r);
+        nmod_poly_clear(m21r);
+        nmod_poly_clear(m22r);
+        nmod_poly_clear(Ar);
+        nmod_poly_clear(Br);
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
     }
 
     FLINT_TEST_CLEANUP(state);

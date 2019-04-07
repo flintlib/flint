@@ -14,70 +14,6 @@
 #include "mpn_extras.h"
 
 /*
-    Assuming deg(a) > deg(b) (in particular b could be zero, but a must not be)
-    compute a matrix M = [[m11, m12] [m21 m22]] and r1, r2 so that
-
-    [ m11  m12 ] [ a ] = [ r1 ]
-    [ m21  m22 ] [ b ]   [ r2 ]
-
-    with
-
-    (1) r1 and r2 are consecutive remainders in the euclidean remainder
-        sequence for a, b satsifying 2*deg(r1) >= deg(a) > 2*deg(r2)
-
-    (2) M is a product of [[0 1][1 -qi]] where the qi are the quotients
-        obtained in (1)
-
-    No aliasing: r1 is written to a, r2 is written to b.
-    All of the moduli of the arguments should be the same and prime.
-*/
-void nmod_poly_hgcd(
-    nmod_poly_t m11, nmod_poly_t m12,
-    nmod_poly_t m21, nmod_poly_t m22,
-    nmod_poly_t a, nmod_poly_t b)
-{
-    slong dega = nmod_poly_degree(a);
-    nmod_poly_t q, r, t;
-
-    if (nmod_poly_degree(a) <= nmod_poly_degree(b))
-    {
-        flint_printf("Exception in nmod_poly_hgcd: bad input degrees\n");
-        flint_abort();
-    }
-
-    nmod_poly_init_mod(q, a->mod);
-    nmod_poly_init_mod(r, a->mod);
-    nmod_poly_init_mod(t, a->mod);
-
-    nmod_poly_one(m11);
-    nmod_poly_zero(m12);
-    nmod_poly_zero(m21);
-    nmod_poly_one(m22);
-
-    while (dega <= 2*nmod_poly_degree(b))
-    {
-        nmod_poly_divrem(q, r, a, b);
-        nmod_poly_swap(a, b);
-        nmod_poly_swap(b, r);
-
-        /* multipliy M by [[0 1] [1 -q]] on the left */
-        nmod_poly_mul(t, q, m21);
-        nmod_poly_sub(r, m11, t);
-        nmod_poly_swap(m11, m21);
-        nmod_poly_swap(m21, r);
-
-        nmod_poly_mul(t, q, m22);
-        nmod_poly_sub(r, m12, t);
-        nmod_poly_swap(m12, m22);
-        nmod_poly_swap(m22, r);
-    }
-
-    nmod_poly_clear(q);
-    nmod_poly_clear(r);
-    nmod_poly_clear(t);
-}
-
-/*
 typedef struct {
     slong npoints;
     nmod_poly_t R0, R1;
@@ -243,7 +179,7 @@ int nmod_bma_reduce(nmod_bma_t B)
         return 0;
     }
 
-    /* one iteration of euclid to get deg(R0) >= n/2 */
+    /* one iteration of euclid to get deg(R0) >= B->npoints/2 */
     nmod_poly_divrem(B->qt, B->rt, B->R0, B->R1);
     nmod_poly_swap(B->R0, B->R1);
     nmod_poly_swap(B->R1, B->rt);
@@ -262,7 +198,7 @@ int nmod_bma_reduce(nmod_bma_t B)
         (l - k)/2 is the expected number of required euclidean iterations.
         Either branch is OK anytime. TODO: find cutoff
     */
-    if (l - k < 4)
+    if (l - k < 2)
     {
         while (B->npoints <= 2*nmod_poly_degree(B->R1))
         {
@@ -277,35 +213,41 @@ int nmod_bma_reduce(nmod_bma_t B)
     }
     else
     {
-        nmod_poly_t m11, m12, m21, m22, r0, r1;
+        slong sgnM;
+        nmod_poly_t m11, m12, m21, m22, r0, r1, t0, t1;
         nmod_poly_init_mod(m11, B->V1->mod);
         nmod_poly_init_mod(m12, B->V1->mod);
         nmod_poly_init_mod(m21, B->V1->mod);
         nmod_poly_init_mod(m22, B->V1->mod);
         nmod_poly_init_mod(r0, B->V1->mod);
         nmod_poly_init_mod(r1, B->V1->mod);
+        nmod_poly_init_mod(t0, B->V1->mod);
+        nmod_poly_init_mod(t1, B->V1->mod);
 
         nmod_poly_shift_right(r0, B->R0, k);
         nmod_poly_shift_right(r1, B->R1, k);
-        nmod_poly_hgcd(m11, m12, m21, m22, r0, r1);
+        sgnM = nmod_poly_hgcd(m11, m12, m21, m22, t0, t1, r0, r1);
 
-        /* multiply [[V0 R0] [V1 R1]] by M on the left */
-
-        nmod_poly_mul(B->rt, m11, B->V0);
+        /* multiply [[V0 R0] [V1 R1]] by M^(-1) on the left */
+        nmod_poly_mul(B->rt, m22, B->V0);
         nmod_poly_mul(B->qt, m12, B->V1);
-        nmod_poly_add(r0, B->rt, B->qt);
-        nmod_poly_mul(B->rt, m21, B->V0);
-        nmod_poly_mul(B->qt, m22, B->V1);
-        nmod_poly_add(r1, B->rt, B->qt);
+        sgnM > 0 ? nmod_poly_sub(r0, B->rt, B->qt)
+                 : nmod_poly_sub(r0, B->qt, B->rt);
+        nmod_poly_mul(B->rt, m11, B->V1);
+        nmod_poly_mul(B->qt, m21, B->V0);
+        sgnM > 0 ? nmod_poly_sub(r1, B->rt, B->qt)
+                 : nmod_poly_sub(r1, B->qt, B->rt);
         nmod_poly_swap(B->V0, r0);
         nmod_poly_swap(B->V1, r1);
 
-        nmod_poly_mul(B->rt, m11, B->R0);
+        nmod_poly_mul(B->rt, m22, B->R0);
         nmod_poly_mul(B->qt, m12, B->R1);
-        nmod_poly_add(r0, B->rt, B->qt);
-        nmod_poly_mul(B->rt, m21, B->R0);
-        nmod_poly_mul(B->qt, m22, B->R1);
-        nmod_poly_add(r1, B->rt, B->qt);
+        sgnM > 0 ? nmod_poly_sub(r0, B->rt, B->qt)
+                 : nmod_poly_sub(r0, B->qt, B->rt);
+        nmod_poly_mul(B->rt, m11, B->R1);
+        nmod_poly_mul(B->qt, m21, B->R0);
+        sgnM > 0 ? nmod_poly_sub(r1, B->rt, B->qt)
+                 : nmod_poly_sub(r1, B->qt, B->rt);
         nmod_poly_swap(B->R0, r0);
         nmod_poly_swap(B->R1, r1);
 
@@ -315,6 +257,8 @@ int nmod_bma_reduce(nmod_bma_t B)
         nmod_poly_clear(m22);
         nmod_poly_clear(r0);
         nmod_poly_clear(r1);
+        nmod_poly_clear(t0);
+        nmod_poly_clear(t1);
     }
 
     FLINT_ASSERT(nmod_poly_degree(B->V1) >= 0);

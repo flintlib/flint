@@ -1620,7 +1620,7 @@ Greatest common divisor
     .. math ::
 
 
-        (A,B)^t = \sigma M^{-1} (a,b)^t.
+        (A,B)^t = M^{-1} (a,b)^t, \deg(A) \ge \frac{\deg(a)}{2} > \deg(B), \sigma = \det(M).
 
 
 
