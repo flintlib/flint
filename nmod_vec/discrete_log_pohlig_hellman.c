@@ -15,29 +15,24 @@
 #include <math.h>
 
 
-static int nmod_discrete_log_ph_table_entry_struct_cmp(
-    const nmod_discrete_log_ph_table_entry_struct * lhs,
-    const nmod_discrete_log_ph_table_entry_struct * rhs)
+static int nmod_discrete_log_pohlig_hellman_table_entry_struct_cmp(
+    const nmod_discrete_log_pohlig_hellman_table_entry_struct * lhs,
+    const nmod_discrete_log_pohlig_hellman_table_entry_struct * rhs)
 {
     return (lhs->gammapow < rhs->gammapow) ? -1 : (lhs->gammapow > rhs->gammapow);
 }
 
-void nmod_discrete_log_ph_init(nmod_discrete_log_ph_t L)
+void nmod_discrete_log_pohlig_hellman_init(nmod_discrete_log_pohlig_hellman_t L)
 {
     L->num_factors = 0;
     L->entries = NULL;
     nmod_init(&L->mod, 2);
 }
 
-mp_limb_t nmod_discrete_log_ph_primitive_root(const nmod_discrete_log_ph_t L)
-{
-    return L->alpha;
-}
-
-void nmod_discrete_log_ph_clear(nmod_discrete_log_ph_t L)
+void nmod_discrete_log_pohlig_hellman_clear(nmod_discrete_log_pohlig_hellman_t L)
 {
     slong i;
-    nmod_discrete_log_ph_entry_struct * Li;
+    nmod_discrete_log_pohlig_hellman_entry_struct * Li;
 
     for (i = 0; i < L->num_factors; i++)
     {
@@ -67,16 +62,16 @@ static slong _pow_ui_cost(ulong pow)
     Assume that p is prime, don't check. Return an estimate on the number of
     multiplications need for one run.
 */
-double nmod_discrete_log_ph_precompute_prime(nmod_discrete_log_ph_t L, mp_limb_t p)
+double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohlig_hellman_t L, mp_limb_t p)
 {
     slong i;
     ulong c;
-    nmod_discrete_log_ph_entry_struct * Li;
+    nmod_discrete_log_pohlig_hellman_entry_struct * Li;
     n_factor_t factors;
     double total_cost;
 
     /* just free everything and allocate again for now */
-    nmod_discrete_log_ph_clear(L);
+    nmod_discrete_log_pohlig_hellman_clear(L);
 
     n_factor_init(&factors);
     n_factor(&factors, p - 1, 1);
@@ -86,8 +81,8 @@ double nmod_discrete_log_ph_precompute_prime(nmod_discrete_log_ph_t L, mp_limb_t
     L->num_factors = factors.num;
     if (L->num_factors > 0)
     {
-        L->entries = (nmod_discrete_log_ph_entry_struct*) flint_malloc(
-                     L->num_factors*sizeof(nmod_discrete_log_ph_entry_struct));
+        L->entries = (nmod_discrete_log_pohlig_hellman_entry_struct*) flint_malloc(
+                     L->num_factors*sizeof(nmod_discrete_log_pohlig_hellman_entry_struct));
     }
 
     for (i = 0; i < L->num_factors; i++)
@@ -159,8 +154,8 @@ try_alpha:
 
         FLINT_ASSERT(Li->dbound > 0);
         FLINT_ASSERT(Li->cbound > 0);
-        Li->table = (nmod_discrete_log_ph_table_entry_struct *) flint_malloc(
-                   Li->cbound*sizeof(nmod_discrete_log_ph_table_entry_struct));
+        Li->table = (nmod_discrete_log_pohlig_hellman_table_entry_struct *) flint_malloc(
+                   Li->cbound*sizeof(nmod_discrete_log_pohlig_hellman_table_entry_struct));
 
         for (c = 0; c < Li->cbound; c++)
         {
@@ -168,9 +163,9 @@ try_alpha:
             Li->table[c].gammapow = nmod_pow_ui(Li->gamma, Li->table[c].cm, L->mod);
         }
         qsort(Li->table, Li->cbound,
-                sizeof(nmod_discrete_log_ph_table_entry_struct),
+                sizeof(nmod_discrete_log_pohlig_hellman_table_entry_struct),
                (int(*)(const void*, const void*))
-                                  nmod_discrete_log_ph_table_entry_struct_cmp);
+                                  nmod_discrete_log_pohlig_hellman_table_entry_struct_cmp);
         for (c = 1; c < Li->cbound; c++)
         {
             FLINT_ASSERT(Li->table[c - 1].gammapow < Li->table[c].gammapow);
@@ -202,13 +197,13 @@ try_alpha:
 }
 
 /* return x such that y = alpha^x mod p, alpha is the p.r. L->alpha*/
-ulong nmod_discrete_log_ph_run(const nmod_discrete_log_ph_t L, mp_limb_t y)
+ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, mp_limb_t y)
 {
     slong i, j;
     ulong x, q, r, e, x0 = 0, x1 = 0, x2 = 0, pp0, pp1, acc, g, pipow;
     ulong lo, mid, hi, d;
     mp_limb_t beta, z, w;
-    nmod_discrete_log_ph_entry_struct * Li;
+    nmod_discrete_log_pohlig_hellman_entry_struct * Li;
 
     FLINT_ASSERT(y != 0);
     FLINT_ASSERT(y < L->mod.n);

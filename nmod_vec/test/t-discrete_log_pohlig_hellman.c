@@ -24,8 +24,8 @@ main(void)
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
-        nmod_discrete_log_ph_t L;
-        nmod_discrete_log_ph_init(L);
+        nmod_discrete_log_pohlig_hellman_t L;
+        nmod_discrete_log_pohlig_hellman_init(L);
         for (j = 0; j < 10; j++)
         {
             double score;
@@ -34,7 +34,7 @@ main(void)
 
             p = n_randtest_prime(state, 1);
             nmod_init(&fpctx, p);
-            score = nmod_discrete_log_ph_precompute_prime(L, p);
+            score = nmod_discrete_log_pohlig_hellman_precompute_prime(L, p);
             if (score > 10000)
             {
                 continue;
@@ -43,11 +43,11 @@ main(void)
             for (k = 0; k < 10; k++)
             {
                 ulong x;
-                mp_limb_t y, alpha = nmod_discrete_log_ph_primitive_root(L);
+                mp_limb_t y, alpha = nmod_discrete_log_pohlig_hellman_primitive_root(L);
 
                 x = n_urandint(state, p - 1);
                 y = nmod_pow_ui(alpha, x, fpctx);
-                if (x != nmod_discrete_log_ph_run(L, y))
+                if (x != nmod_discrete_log_pohlig_hellman_run(L, y))
                 {
 
                     printf("FAIL\n");
@@ -57,7 +57,7 @@ main(void)
                 }
             }
         }
-        nmod_discrete_log_ph_clear(L);
+        nmod_discrete_log_pohlig_hellman_clear(L);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -1985,7 +1985,7 @@ Berlekamp-Massey Algorithm
 
 .. function:: int fmpz_mod_berlekamp_massey_reduce(fmpz_mod_berlekamp_massey_t B)
 
-    Ensure that the polynomials `V` and `R` are up to date. The return value is 1 if this function changed either one, and 0 otherwise.
+    Ensure that the polynomials `V` and `R` are up to date. The return value is 1 if this function changed `V` and 0 otherwise.
 
 .. function:: slong fmpz_mod_berlekamp_massey_point_count(const fmpz_mod_berlekamp_massey_t B)
 
