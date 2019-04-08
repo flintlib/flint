@@ -1941,3 +1941,64 @@ representation is ``"5*x^3+2*x+1"``.
 
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
+
+Berlekamp-Massey Algorithm
+--------------------------------------------------------------------------------
+
+    The fmpz_mod_berlekamp_massey_t manages an unlimited stream of points `a_1, a_2, \dots `.
+    At any point in time, after `n` points have been added, a call to func::fmpz_mod_berlekamp_massey_reduce will
+    calculate the polynomials `U`, `V` and `R` in the extended euclidean remainder sequence with
+
+    .. math ::
+
+
+        `U*x^n + V*(a_1*x^(n-1) + a_{n-1}*x + \cdots + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2`.
+
+
+    The polynomials `V` and `R` may be obtained with func::fmpz_mod_berlekamp_massey_V_poly and func::fmpz_mod_berlekamp_massey_R_poly.
+
+.. function:: void fmpz_mod_berlekamp_massey_init(fmpz_mod_berlekamp_massey_t B, const fmpz_t p)
+
+.. function:: void fmpz_mod_berlekamp_massey_init_ui(fmpz_mod_berlekamp_massey_t B, ulong p)
+
+    Initialize ``B`` in characteristic ``p`` with an empty stream.
+
+.. function:: void fmpz_mod_berlekamp_massey_clear(fmpz_mod_berlekamp_massey_t B)
+
+    Free any space used by ``B``.
+
+.. function:: void fmpz_mod_berlekamp_massey_start_over(fmpz_mod_berlekamp_massey_t B)
+
+    Empty the stream of points in ``B``.
+
+.. function:: void fmpz_mod_berlekamp_massey_set_prime(fmpz_mod_berlekamp_massey_t B, const fmpz_t p)
+
+    Set the characteristic of the field and empty the stream of points in ``B``.
+
+.. function:: void fmpz_mod_berlekamp_massey_add_points(fmpz_mod_berlekamp_massey_t B, const fmpz * a, slong count)
+
+.. function:: void fmpz_mod_berlekamp_massey_add_zeros(fmpz_mod_berlekamp_massey_t B, slong count)
+
+.. function:: void fmpz_mod_berlekamp_massey_add_point(fmpz_mod_berlekamp_massey_t B, const fmpz_t a)
+
+    Add point(s) to the stream processed by ``B``. The addition of any number of points will not update the `V` and `R` polynomial.
+
+.. function:: int fmpz_mod_berlekamp_massey_reduce(fmpz_mod_berlekamp_massey_t B)
+
+    Ensure that the polynomials `V` and `R` are up to date. The return value is 1 if this function changed either one, and 0 otherwise.
+
+.. function:: slong fmpz_mod_berlekamp_massey_point_count(const fmpz_mod_berlekamp_massey_t B)
+
+    Return the number of points stored in ``B``.
+
+.. function:: const fmpz * fmpz_mod_berlekamp_massey_points(const fmpz_mod_berlekamp_massey_t B)
+
+    Return a pointer the array of points stored in ``B``. This may be ``NULL`` if func::fmpz_mod_berlekamp_massey_point_count returns 0.
+
+.. function:: const fmpz_mod_poly_struct * fmpz_mod_berlekamp_massey_V_poly(const fmpz_mod_berlekamp_massey_t B)
+
+    Return the polynomial ``V`` in ``B``.
+
+.. function:: const fmpz_mod_poly_struct * fmpz_mod_berlekamp_massey_R_poly(const fmpz_mod_berlekamp_massey_t B)
+
+    Return the polynomial ``R`` in ``B``.

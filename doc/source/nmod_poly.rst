@@ -2559,50 +2559,58 @@ Chinese Remaindering
 Berlekamp-Massey Algorithm
 --------------------------------------------------------------------------------
 
-    The nmod_bma_t manages an unlimited stream of points `a_1, a_2, \dots `.
-    At any point in time, after `n` points have been added, a call to func::nmod_bma_reduce will
-    calculate polynomials U1, V1 and R1 with
+    The nmod_berlekamp_massey_t manages an unlimited stream of points `a_1, a_2, \dots `.
+    At any point in time, after `n` points have been added, a call to func::nmod_berlekamp_massey_reduce will
+    calculate the polynomials `U`, `V` and `R` in the extended euclidean remainder sequence with
 
-        `U1*x^n + V1*(a_1*x^(n-1) + a_{n-1}*x + \cdots + a_n) = R1, \deg(U1) < \deg(V1) \le n/2, \deg(R1) < n/2`.
+    .. math ::
 
-    The polynomial V1 may be obtained with func::nmod_bma_master_poly
 
-.. function:: void nmod_bma_init(nmod_bma_t B, mp_limb_t p)
+        `U*x^n + V*(a_1*x^(n-1) + a_{n-1}*x + \cdots + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2`.
+
+
+    The polynomials `V` and `R` may be obtained with func::nmod_berlekamp_massey_V_poly and func::nmod_berlekamp_massey_R_poly.
+
+.. function:: void nmod_berlekamp_massey_init(nmod_berlekamp_massey_t B, mp_limb_t p)
 
     Initialize ``B`` in characteristic ``p`` with an empty stream.
 
-.. function:: void nmod_bma_clear(nmod_bma_t B)
+.. function:: void nmod_berlekamp_massey_clear(nmod_berlekamp_massey_t B)
 
     Free any space used by ``B``.
 
-.. function:: void nmod_bma_start_over(nmod_bma_t B)
+.. function:: void nmod_berlekamp_massey_start_over(nmod_berlekamp_massey_t B)
 
     Empty the stream of points in ``B``.
 
-.. function:: void nmod_bma_set_prime(nmod_bma_t B, mp_limb_t p)
+.. function:: void nmod_berlekamp_massey_set_prime(nmod_berlekamp_massey_t B, mp_limb_t p)
 
     Set the characteristic of the field and empty the stream of points in ``B``.
 
-.. function:: void nmod_bma_add_points(nmod_bma_t B, const mp_limb_t * a, slong count)
+.. function:: void nmod_berlekamp_massey_add_points(nmod_berlekamp_massey_t B, const mp_limb_t * a, slong count)
 
-.. function:: void nmod_bma_add_zeros(nmod_bma_t B, slong count)
+.. function:: void nmod_berlekamp_massey_add_zeros(nmod_berlekamp_massey_t B, slong count)
 
-.. function:: void nmod_bma_add_point(nmod_bma_t B, mp_limb_t a)
+.. function:: void nmod_berlekamp_massey_add_point(nmod_berlekamp_massey_t B, mp_limb_t a)
 
-    Add point(s) to the stream processed by ``B``. The addition of any number of points will not update the master polynomial.
+    Add point(s) to the stream processed by ``B``. The addition of any number of points will not update the `V` and `R` polynomial.
 
-.. function:: int nmod_bma_reduce(nmod_bma_t B)
+.. function:: int nmod_berlekamp_massey_reduce(nmod_berlekamp_massey_t B)
 
-    Ensure that the master polynomial is up to date. The return value is 1 if this function changed it, and 0 otherwise.
+    Ensure that the polynomials `V` and `R` are up to date. The return value is 1 if this function changed either one, and 0 otherwise.
 
-.. function:: slong nmod_bma_point_count(const nmod_bma_t B)
+.. function:: slong nmod_berlekamp_massey_point_count(const nmod_berlekamp_massey_t B)
 
     Return the number of points stored in ``B``.
 
-.. function:: const mp_limb_t * nmod_bma_points(const nmod_bma_t B)
+.. function:: const mp_limb_t * nmod_berlekamp_massey_points(const nmod_berlekamp_massey_t B)
 
-    Return a pointer the array of points stored in ``B``. This may be ``NULL`` if func::nmod_bma_point_count returns 0.
+    Return a pointer the array of points stored in ``B``. This may be ``NULL`` if func::nmod_berlekamp_massey_point_count returns 0.
 
-.. function:: const nmod_poly_struct * nmod_bma_master_poly(const nmod_bma_t B)
+.. function:: const nmod_poly_struct * nmod_berlekamp_massey_V_poly(const nmod_berlekamp_massey_t B)
 
-    Return the master polynomial ``V1`` in ``B``.
+    Return the polynomial ``V`` in ``B``.
+
+.. function:: const nmod_poly_struct * nmod_berlekamp_massey_R_poly(const nmod_berlekamp_massey_t B)
+
+    Return the polynomial ``R`` in ``B``.

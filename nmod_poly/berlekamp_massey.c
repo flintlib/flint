@@ -18,10 +18,10 @@ typedef struct {
     slong npoints;
     nmod_poly_t R0, R1;
     nmod_poly_t V0, V1;
-    nmod_poly_t qt, rt;
+    nmod_poly_t qt, rt; temporaries
     nmod_poly_t points;
-} nmod_bma_struct;
-typedef nmod_bma_struct nmod_bma_t[1];
+} nmod_berlekamp_massey_struct;
+typedef nmod_berlekamp_massey_struct nmod_berlekamp_massey_t[1];
 
     n = B->npoints is the number of points a_1, ..., a_n that have been added
     to the sequence. The polynomials A and S are then defined as
@@ -31,22 +31,33 @@ typedef nmod_bma_struct nmod_bma_t[1];
 
     We maintain polynomials U0, V0, U1, V1 such that
 
-        U0*A + V0*S = R0   2*deg(R0) >= n
-        U1*A + V1*S = R1   2*deg(R1) < n
+        U0*A + V0*S = R0   deg(R0) >= n/2
+        U1*A + V1*S = R1   deg(R1) < n/2
 
     where R0 and R1 are consecutive euclidean remainders and U0, V0, U1, V1 are
-    the corresponding Bezout coefficients.
+    the corresponding Bezout coefficients. Note that
+        deg(U1) < deg(V1) = deg(A) - deg(R0) <= n/2
 
     The U0 and U1 are not stored explicitly. The points a_1, ..., a_n are stored
-    in B->values, which is used merely as a resizable array.
+    in B->points, which is used merely as a resizable array.
 
     The main usage of this function is the rational reconstruction of a series
 
      a1    a2    a3         -U1
     --- + --- + --- + ... = ---- maybe
      x    x^2   x^3          V1
+
+    It can be seen that
+
+     a1    a2        an   -U1     R1
+    --- + --- + ... --- = --- + -------
+     x    x^2       x^n    V1   V1*x^n
+
+    Thus the error is O(1/x^(n+1)) iff deg(R1) < deg(V1).
 */
-void nmod_bma_init(nmod_bma_t B, mp_limb_t p)
+void nmod_berlekamp_massey_init(
+    nmod_berlekamp_massey_t B,
+    mp_limb_t p)
 {
     nmod_t fpctx;
     nmod_init(&fpctx, p);
@@ -64,7 +75,8 @@ void nmod_bma_init(nmod_bma_t B, mp_limb_t p)
 }
 
 
-void nmod_bma_start_over(nmod_bma_t B)
+void nmod_berlekamp_massey_start_over(
+    nmod_berlekamp_massey_t B)
 {
     B->npoints = 0;
     B->points->length = 0;
@@ -74,7 +86,8 @@ void nmod_bma_start_over(nmod_bma_t B)
     nmod_poly_zero(B->R1);
 }
 
-void nmod_bma_clear(nmod_bma_t B)
+void nmod_berlekamp_massey_clear(
+    nmod_berlekamp_massey_t B)
 {
     nmod_poly_clear(B->R0);
     nmod_poly_clear(B->R1);
@@ -86,7 +99,9 @@ void nmod_bma_clear(nmod_bma_t B)
 }
 
 /* setting the prime also starts over */
-void nmod_bma_set_prime(nmod_bma_t B, mp_limb_t p)
+void nmod_berlekamp_massey_set_prime(
+    nmod_berlekamp_massey_t B,
+    mp_limb_t p)
 {
     nmod_t fpctx;
     nmod_init(&fpctx, p);
@@ -97,20 +112,25 @@ void nmod_bma_set_prime(nmod_bma_t B, mp_limb_t p)
     nmod_poly_set_mod(B->rt, fpctx);
     nmod_poly_set_mod(B->qt, fpctx);
     nmod_poly_set_mod(B->points, fpctx);
-    nmod_bma_start_over(B);
+    nmod_berlekamp_massey_start_over(B);
 }
 
-void nmod_bma_print(const nmod_bma_t B)
+void nmod_berlekamp_massey_print(
+    const nmod_berlekamp_massey_t B)
 {
     slong i;
     nmod_poly_print_pretty(B->V1, "#");
+    flint_printf(",");
     for (i = 0; i < B->points->length; i++)
     {
         flint_printf(" %wu", B->points->coeffs[i]);
     }
 }
 
-void nmod_bma_add_points(nmod_bma_t B, const mp_limb_t * a, slong count)
+void nmod_berlekamp_massey_add_points(
+    nmod_berlekamp_massey_t B,
+    const mp_limb_t * a,
+    slong count)
 {
     slong i;
     slong old_length = B->points->length;
@@ -122,7 +142,9 @@ void nmod_bma_add_points(nmod_bma_t B, const mp_limb_t * a, slong count)
     B->points->length = old_length + count;
 }
 
-void nmod_bma_add_zeros(nmod_bma_t B, slong count)
+void nmod_berlekamp_massey_add_zeros(
+    nmod_berlekamp_massey_t B,
+    slong count)
 {
     slong i;
     slong old_length = B->points->length;
@@ -134,7 +156,9 @@ void nmod_bma_add_zeros(nmod_bma_t B, slong count)
     B->points->length = old_length + count;
 }
 
-void nmod_bma_add_point(nmod_bma_t B, mp_limb_t a)
+void nmod_berlekamp_massey_add_point(
+    nmod_berlekamp_massey_t B,
+    mp_limb_t a)
 {
     slong old_length = B->points->length;
     nmod_poly_fit_length(B->points, old_length + 1);
@@ -143,7 +167,8 @@ void nmod_bma_add_point(nmod_bma_t B, mp_limb_t a)
 }
 
 /* return 1 if reduction changed the master poly, 0 otherwise */
-int nmod_bma_reduce(nmod_bma_t B)
+int nmod_berlekamp_massey_reduce(
+    nmod_berlekamp_massey_t B)
 {
     slong i, l, k, queue_len, queue_lo, queue_hi;
 
@@ -175,7 +200,7 @@ int nmod_bma_reduce(nmod_bma_t B)
     /* now start reducing R0, R1 */
     if (2*nmod_poly_degree(B->R1) < B->npoints)
     {
-        /* already have deg(R1) < n/2 */
+        /* already have deg(R1) < B->npoints/2 */
         return 0;
     }
 
