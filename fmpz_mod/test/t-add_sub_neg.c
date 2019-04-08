@@ -22,7 +22,7 @@ main(void)
    
     flint_randinit(state);
 
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;   /* p not nec prime */
         fmpz_t a, b, c, d, e;
@@ -38,7 +38,7 @@ main(void)
 
         for (j = 0; j < 10; j++)
         {
-            fmpz_randtest_unsigned(p, state, 200);
+            fmpz_randtest_unsigned(p, state, 300);
             fmpz_add_ui(p, p, 1);
             fmpz_mod_ctx_set_mod(fpctx, p);
 

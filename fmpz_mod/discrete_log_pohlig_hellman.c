@@ -172,8 +172,7 @@ try_alpha:
 
     if (fmpz_cmp(L->alpha, p) >= 0)
     {
-        flint_printf("Exception in fmpz_mod_discrete_log_pohlig_hellman_precompute_prime: could not find primitive root\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Could not find primitive root in fmpz_mod_discrete_log_pohlig_hellman_precompute_prime.");
     }
     for (i = 0; i < L->num_factors; i++)
     {
@@ -300,8 +299,7 @@ void fmpz_mod_discrete_log_pohlig_hellman_run(
             {
                 if (!fmpz_equal(w, Li->gamma))
                 {
-                    flint_printf("Exception in fmpz_mod_discrete_log_pohlig_hellman_run: could not find log\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "Could not find log in fmpz_mod_discrete_log_pohlig_hellman_run.");
                 }
                 g = 1;
                 fmpz_mod_mul(z, z, beta, L->fpctx);
@@ -365,8 +363,7 @@ void fmpz_mod_discrete_log_pohlig_hellman_run(
                 d++;
                 if (d >= Li->dbound)
                 {
-                    flint_printf("Exception in fmpz_mod_discrete_log_pohlig_hellman_env_run: could not find log\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "Could not find log in fmpz_mod_discrete_log_pohlig_hellman_run.");
                 }
             }
         found_g:

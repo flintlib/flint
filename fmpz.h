@@ -193,6 +193,62 @@ FLINT_DLL slong fmpz_get_si(const fmpz_t f);
 FLINT_DLL ulong fmpz_get_ui(const fmpz_t f);
 
 FMPZ_INLINE void
+fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+    {
+        *low = *f;
+        *hi  = 0;
+    }
+    else
+    {
+        __mpz_struct * mpz = COEFF_TO_PTR(*f);
+        *low = mpz->_mp_d[0];
+        if (mpz->_mp_size == 2)
+        {
+            *hi  = mpz->_mp_d[1];
+        }
+        else
+        {
+            FLINT_ASSERT(mpz->_mp_size == 1);
+            *hi  = 0;
+        }
+    }
+}
+
+FMPZ_INLINE void
+fmpz_get_uiuiui(mp_limb_t * hi, mp_limb_t * mid, mp_limb_t * low, const fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+    {
+        *low = *f;
+        *mid  = 0;
+        *hi  = 0;
+    }
+    else
+    {
+        __mpz_struct * mpz = COEFF_TO_PTR(*f);
+        *low = mpz->_mp_d[0];
+        if (mpz->_mp_size == 3)
+        {
+            *mid  = mpz->_mp_d[1];
+            *hi  = mpz->_mp_d[2];
+        }
+        else if (mpz->_mp_size == 2)
+        {
+            *mid  = mpz->_mp_d[1];
+            *hi  = 0;
+        }
+        else
+        {
+            FLINT_ASSERT(mpz->_mp_size == 1);
+            *mid  = 0;
+            *hi  = 0;
+        }
+    }
+}
+
+FMPZ_INLINE void
 fmpz_set_si(fmpz_t f, slong val)
 {
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
@@ -271,6 +327,25 @@ fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
         z->_mp_d[0] = lo;
         z->_mp_d[1] = hi;
         z->_mp_size = -2;
+    }
+}
+
+FMPZ_INLINE void
+fmpz_set_uiuiui(fmpz_t f, mp_limb_t hi, mp_limb_t mid, mp_limb_t lo)
+{
+    if ((hi | mid) == 0)
+    {
+        fmpz_set_ui(f, lo);
+    }
+    else
+    {
+        __mpz_struct *z = _fmpz_promote(f);
+        if (z->_mp_alloc < 3)
+            mpz_realloc2(z, 3 * FLINT_BITS);
+        z->_mp_d[0] = lo;
+        z->_mp_d[1] = mid;
+        z->_mp_d[2] = hi;
+        z->_mp_size = 2 + (hi != 0);
     }
 }
 

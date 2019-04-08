@@ -122,8 +122,7 @@ try_alpha:
     L->alpha++;
     if (L->alpha >= p)
     {
-        flint_printf("Exception in nmod_dlog_env_init: could not find primitive root\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Could not find primitive root in nmod_discrete_log_pohlig_hellman_precompute_prime");
     }
     for (i = 0; i < L->num_factors; i++)
     {
@@ -230,7 +229,10 @@ ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellma
             }
             else
             {
-                FLINT_ASSERT(w == Li->gamma);
+                if (w != Li->gamma)
+                {
+                    flint_throw(FLINT_ERROR, "Could not find log in nmod_discrete_log_pohlig_hellman_run");
+                }
                 g = 1;
                 z = nmod_mul(z, beta, L->mod);
             }
@@ -286,8 +288,10 @@ ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellma
                 }
                 w = nmod_mul(w, Li->gammainv, L->mod);
                 d++;
-                /* should have found a solution if d is out of bounds */
-                FLINT_ASSERT(d < Li->dbound);
+                if (d >= Li->dbound)
+                {
+                    flint_throw(FLINT_ERROR, "Could not find log in nmod_discrete_log_pohlig_hellman_run");
+                }
             }
         found_g:
             FLINT_ASSERT(g < Li->prime);
