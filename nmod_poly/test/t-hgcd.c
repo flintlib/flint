@@ -137,12 +137,13 @@ main(void)
         _nmod_vec_clear(M[3]);
     }
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         mp_limb_t p;
-        slong dega, sgnM, sgnMr;
+        slong sgnM, sgnMr;
         nmod_poly_t m11, m12, m21, m22, A, B, a, b;
         nmod_poly_t m11r, m12r, m21r, m22r, Ar, Br;
+        nmod_poly_t q, t;
 
         p = n_randtest_prime(state, 1);
         nmod_poly_init(m11, p);
@@ -159,17 +160,20 @@ main(void)
         nmod_poly_init(Br, p);
         nmod_poly_init(a, p);
         nmod_poly_init(b, p);
+        nmod_poly_init(q, p);
+        nmod_poly_init(t, p);
 
-        dega = n_randint(state, 100);
-        nmod_poly_randtest_monic(a, state, 1 + dega);
-        nmod_poly_randtest(b, state, dega);
+        /* prepare inputs a, b */    
+        nmod_poly_randtest_monic(a, state, 1 + n_randint(state, 10));
         nmod_poly_scalar_mul_nmod(a, a, 1 + n_randint(state, p - 1));
-
-        /* make a and b sparser */
-        for (j = 0; j < dega; j++)
+        nmod_poly_zero(b);
+        for (j = 1 + n_randint(state, 100); j >= 0; j--)
         {
-            nmod_poly_set_coeff_ui(a, n_randint(state, dega), 0);
-            nmod_poly_set_coeff_ui(b, n_randint(state, dega), 0);
+            nmod_poly_randtest_monic(q, state, 2 + n_randint(state, 20));
+            nmod_poly_scalar_mul_nmod(q, q, 1 + n_randint(state, p - 1));
+            nmod_poly_mul(t, a, q);
+            nmod_poly_add(b, b, t);
+            nmod_poly_swap(a, b);
         }
 
         sgnMr = nmod_poly_hgcd_ref(m11r, m12r, m21r, m22r, Ar, Br, a, b);
@@ -183,9 +187,27 @@ main(void)
             || !nmod_poly_equal(Ar, A)
             || !nmod_poly_equal(Br, B))
         {
-            printf("check reference match\n");
-            printf("a: "); nmod_poly_print_pretty(a, "x"); printf("\n");
-            printf("b: "); nmod_poly_print_pretty(b, "x"); printf("\n");
+            flint_printf("check reference match\n i = %wd\n", i);
+            flint_abort();
+        }
+
+        if (!(2*nmod_poly_degree(A) >= nmod_poly_degree(a)
+            && nmod_poly_degree(a) > 2*nmod_poly_degree(B)))
+        {
+            flint_printf("check degrees\n i = %wd\n", i);
+            flint_abort();
+        }
+
+        nmod_poly_mul(q, m11, m22);
+        nmod_poly_mul(t, m12, m21);
+        nmod_poly_sub(t, q, t);
+        if (sgnM < 0)
+        {
+            nmod_poly_neg(t, t);
+        }
+        if (!nmod_poly_is_one(t))
+        {
+            flint_printf("check sign of determinant\n i = %wd\n", i);
             flint_abort();
         }
 
@@ -203,6 +225,8 @@ main(void)
         nmod_poly_clear(Br);
         nmod_poly_clear(a);
         nmod_poly_clear(b);
+        nmod_poly_clear(q);
+        nmod_poly_clear(t);
     }
 
     FLINT_TEST_CLEANUP(state);
