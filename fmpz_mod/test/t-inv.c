@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod.h"
+#include "profiler.h"
 
 int
 main(void)
@@ -17,56 +18,51 @@ main(void)
     slong i, j;
     FLINT_TEST_INIT(state);
 
-    flint_printf("add/sub/neg....");
+    flint_printf("inv....");
     fflush(stdout);
    
     flint_randinit(state);
 
+    /* mod 1 arithmetic is not tested */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_t p;   /* p not nec prime */
-        fmpz_t a, b, c, d, e;
+        fmpz_t p;   /* p not nec prime but > 1 */
+        fmpz_t a, ainv, b, g;
         fmpz_mod_ctx_t fpctx;
 
         fmpz_init_set_ui(p, 2);
         fmpz_init(a);
+        fmpz_init(ainv);
         fmpz_init(b);
-        fmpz_init(c);
-        fmpz_init(d);
-        fmpz_init(e);
+        fmpz_init(g);
         fmpz_mod_ctx_init(fpctx, p);
 
-        for (j = 0; j < 10; j++)
+        for (j = 0; j < 20; j++)
         {
-            fmpz_randtest_unsigned(p, state, 300);
-            fmpz_add_ui(p, p, 1);
+            fmpz_randtest_unsigned(p, state, 200);
+            fmpz_add_ui(p, p, 2);
             fmpz_mod_ctx_set_mod(fpctx, p);
 
             fmpz_randtest_mod(a, state, p);
-            fmpz_randtest_mod(b, state, p);
-            fmpz_randtest_mod(c, state, p);
-            fmpz_randtest_mod(d, state, p);
-            fmpz_randtest_mod(e, state, p);
-
-            fmpz_mod_add(c, a, b, fpctx);
-            fmpz_mod_assert_canonical(c, fpctx);
-            fmpz_mod_sub(c, c, b, fpctx);
-            fmpz_mod_assert_canonical(c, fpctx);
-            if (!fmpz_equal(c, a))
+            fmpz_gcd(g, a, p);
+            if (!fmpz_is_one(g))
             {
-                printf("FAIL1\n");
+                continue;
+            }
+
+            fmpz_mod_inv(ainv, a, fpctx);
+            fmpz_mod_mul(b, a, ainv, fpctx);
+            if (!fmpz_is_one(b))
+            {
+                printf("FAIL\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
 
-            fmpz_mod_sub(d, a, b, fpctx);
-            fmpz_mod_assert_canonical(d, fpctx);
-            fmpz_mod_sub(e, b, a, fpctx);
-            fmpz_mod_assert_canonical(e, fpctx);
-            fmpz_mod_neg(d, d, fpctx);
-            if (!fmpz_equal(d, e))
+            fmpz_mod_inv(a, a, fpctx);
+            if (!fmpz_equal(a, ainv))
             {
-                printf("FAIL2\n");
+                printf("FAIL\ncheck aliasing");
                 flint_printf("i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
@@ -75,10 +71,9 @@ main(void)
         fmpz_mod_ctx_clear(fpctx);
         fmpz_clear(p);
         fmpz_clear(a);
+        fmpz_clear(ainv);
         fmpz_clear(b);
-        fmpz_clear(c);
-        fmpz_clear(d);
-        fmpz_clear(e);
+        fmpz_clear(g);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -13,34 +13,8 @@
 
 void fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t pow, const fmpz_mod_ctx_t ctx)
 {
-    mp_bitcnt_t i, bits;
-    fmpz_t r, x;
-
-    fmpz_init_set_ui(r, 1);
-    if (fmpz_sgn(pow) < 0)
-    {
-        fmpz_init(x);
-        fmpz_mod_inv(x, b, ctx);
-    }
-    else
-    {
-        fmpz_init_set(x, b);
-    }
-
-    bits = fmpz_bits(pow);
-
-    for (i = 0; i < bits; i++)
-    {
-        if (fmpz_tstbit(pow, i) != 0)
-        {
-            fmpz_mod_mul(r, r, x, ctx);
-        }
-        fmpz_mod_mul(x, x, x, ctx);
-    }
-
-    fmpz_swap(a, r);
-
-    fmpz_clear(r);
-    fmpz_clear(x);
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+    fmpz_powm(a, b, pow, ctx->n);
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+    return;
 }

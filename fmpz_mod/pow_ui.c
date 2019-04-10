@@ -13,26 +13,7 @@
 
 void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong pow, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_t r, x;
-
-    fmpz_init_set_ui(r, 1);
-    fmpz_init_set(x, b);
-
-    while (pow != 0)
-    {
-        if ((pow & 1) != 0)
-        {
-            fmpz_mod_mul(r, r, x, ctx);
-        }
-        pow = pow >> 1;
-        if (pow != 0)
-        {
-            fmpz_mod_mul(x, x, x, ctx);
-        }
-    }
-
-    fmpz_swap(a, r);
-    fmpz_clear(r);
-    fmpz_clear(x);
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+    fmpz_powm_ui(a, b, pow, ctx->n);
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }

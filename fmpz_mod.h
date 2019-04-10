@@ -39,11 +39,22 @@
 
 /* all of the data we need to do arithmetic mod n ****************************/
 
+/*
+    Currently operations are special cased according to
+        if      n < 2^FLINT_BITS     -> add1, sub1, mul1 using nmod
+        else if n = 2^FLINT_BITS     -> add2s, sub2s, mul2s
+        else if n < 2^(2*FLINT_BITS) -> add2, sub2, mul2
+        else                         -> addN, subN, mulN
+*/
 typedef struct fmpz_mod_ctx {
     fmpz_t n;
     fmpz_preinvn_t ninv;
+    void (* add_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
     void (* sub_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
+    void (* mul_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
+    nmod_t mod;
     ulong n_limbs[3];
+    ulong ninv_limbs[3];
 } fmpz_mod_ctx_struct;
 typedef fmpz_mod_ctx_struct fmpz_mod_ctx_t[1];
 
@@ -63,17 +74,31 @@ FLINT_DLL int fmpz_mod_is_canonical(const fmpz_t a,  const fmpz_mod_ctx_t ctx);
 FLINT_DLL void fmpz_mod_assert_canonical(const fmpz_t a,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_add(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
+FLINT_DLL void fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_addN(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FMPZ_MOD_INLINE void fmpz_mod_add(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx)
+{
+    (ctx->add_fxn)(a, b, c, ctx);
+}
 
 FLINT_DLL void fmpz_mod_sub1(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_sub2(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void fmpz_mod_sub2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_sub3(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void fmpz_mod_sub2(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_subN(fmpz_t a, const fmpz_t b, const fmpz_t c,
@@ -88,8 +113,25 @@ FMPZ_MOD_INLINE void fmpz_mod_sub(fmpz_t a, const fmpz_t b, const fmpz_t c,
 FLINT_DLL void fmpz_mod_neg(fmpz_t a, const fmpz_t b,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_mul(fmpz_t a, const fmpz_t b, const fmpz_t c,
+
+FLINT_DLL void fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL void fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx);
+
+FMPZ_MOD_INLINE void fmpz_mod_mul(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx)
+{
+    (ctx->mul_fxn)(a, b, c, ctx);
+}
+
 
 FLINT_DLL void fmpz_mod_inv(fmpz_t a, const fmpz_t b,
                                                      const fmpz_mod_ctx_t ctx);
@@ -99,6 +141,8 @@ FLINT_DLL void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong pow,
 
 FLINT_DLL void fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t pow,
                                                      const fmpz_mod_ctx_t ctx);
+
+FLINT_DLL int fmpz_next_smooth_prime(fmpz_t a, const fmpz_t b);
 
 /* discrete logs a la Pohlig - Hellman ***************************************/
 
