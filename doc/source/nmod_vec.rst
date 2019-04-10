@@ -238,24 +238,24 @@ Dot products
 Discrete Logarithms via Pohlig-Hellman
 --------------------------------------------------------------------------------
 
-.. function:: void nmod_discrete_log_ph_init(nmod_discrete_log_ph_t L)
+.. function:: void nmod_discrete_log_pohlig_hellman_init(nmod_discrete_log_pohlig_hellman_t L)
 
     Initialize ``L``. Upon initilization ``L`` is not ready for computation.
 
-.. function:: void nmod_discrete_log_ph_clear(nmod_discrete_log_ph_t L)
+.. function:: void nmod_discrete_log_pohlig_hellman_clear(nmod_discrete_log_pohlig_hellman_t L)
 
     Free any space used by ``L``.
 
-.. function:: double nmod_discrete_log_ph_precompute_prime(nmod_discrete_log_ph_t L, mp_limb_t p)
+.. function:: double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohlig_hellman_t L, mp_limb_t p)
 
     Configure ``L`` for discrete logarithms modulo ``p`` to an internally chosen base. It is assumed that ``p`` is prime.
     The return is an estimate on the number of multiplications needed for one run.
 
-.. function:: mp_limb_t nmod_discrete_log_ph_primitive_root(const nmod_discrete_log_ph_t L)
+.. function:: mp_limb_t nmod_discrete_log_pohlig_hellman_primitive_root(const nmod_discrete_log_pohlig_hellman_t L)
 
     Return the internally stored base.
 
-.. function:: ulong nmod_discrete_log_ph_run(const nmod_discrete_log_ph_t L, mp_limb_t y)
+.. function:: ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, mp_limb_t y)
 
     Return the logarithm of ``y`` with repect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
     The function is undefined if the logarithm does not exist.
