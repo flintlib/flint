@@ -11,7 +11,8 @@
 
 #include "fmpz_mod.h"
 
-void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong pow, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong pow,
+                                                     const fmpz_mod_ctx_t ctx)
 {
     FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
     fmpz_powm_ui(a, b, pow, ctx->n);

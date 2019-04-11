@@ -20,11 +20,16 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
         flint_throw(FLINT_ERROR, "Nonpositive modulus in fmpz_mod_ctx_init");
     }
 
+    /* prepare for general case */
     fmpz_init_set(ctx->n, n);
-    fmpz_preinvn_init(ctx->ninv, n);
+    ctx->n_limbs[0] = 0;
+    ctx->n_limbs[1] = 0;
+    ctx->n_limbs[2] = 0;
+    ctx->add_fxn = fmpz_mod_addN;
+    ctx->sub_fxn = fmpz_mod_subN;
+    ctx->mul_fxn = fmpz_mod_mulN;
 
     bits = fmpz_bits(n);
-
     if (bits <= FLINT_BITS)
     {
         ctx->add_fxn = fmpz_mod_add1;
@@ -58,14 +63,5 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
             ctx->sub_fxn = fmpz_mod_sub2;
             ctx->mul_fxn = fmpz_mod_mul2;
         }
-    }
-    else
-    {
-        ctx->n_limbs[0] = 0;
-        ctx->n_limbs[1] = 0;
-        ctx->n_limbs[2] = 0;
-        ctx->add_fxn = fmpz_mod_addN;
-        ctx->sub_fxn = fmpz_mod_subN;
-        ctx->mul_fxn = fmpz_mod_mulN;
     }
 }

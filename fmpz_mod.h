@@ -45,10 +45,12 @@
         else if n = 2^FLINT_BITS     -> add2s, sub2s, mul2s
         else if n < 2^(2*FLINT_BITS) -> add2, sub2, mul2
         else                         -> addN, subN, mulN
+
+    A special case for the multiplication for 3-word shows no signs of
+    diminishing returns, but it is not implemented currently.
 */
 typedef struct fmpz_mod_ctx {
     fmpz_t n;
-    fmpz_preinvn_t ninv;
     void (* add_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
     void (* sub_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
     void (* mul_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);

@@ -11,7 +11,8 @@
 
 #include "fmpz_mod.h"
 
-void fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx)
 {
     mp_limb_t a0, b0, c0;
 
@@ -29,7 +30,8 @@ void fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_
 /*
     Multiplication modulo 2^FLINT_BITS is easy.
 */
-void fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx)
 {
     mp_limb_t a0, b0, c0;
 
@@ -57,15 +59,16 @@ void fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx
         x = b*c             x < n^2 and therefore fits into 4 words
         z = (x >> r)*ninv   z <= n*2^(3*r) and therefore fits into 5 words
         q = (z >> (3r))*n   q fits into 4 words
-        x = x - q
+        x = x - q           x fits into 3 words after the subtraction
         at this point the canonical reduction in the range [0, n) is one of
             a = x, a = x - n, or a = x - 2n
 */
-void fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx)
 {
     mp_limb_t a1, a0, b1, b0, c1, c0;
     mp_limb_t x3, x2, x1, x0;
-    mp_limb_t q3, q2, q1, q0;
+    mp_limb_t q2, q1, q0;
     mp_limb_t z4, z3, z2, z1, z0;
     mp_limb_t t4, t3, t2, t1;
     mp_limb_t s3, s2, s1;
@@ -103,19 +106,17 @@ void fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_
     add_ssssaaaaaaaa(z4, z3, z2, z1, z4, z3, z2, z1, u4, u3, u2, u1);
     add_ssssaaaaaaaa(z4, z3, z2, z1, z4, z3, z2, z1, v4, v3, v2, v1);
 
-    /* q[3:0] = z[4:3] * n[1:0] */
+    /* q[3:0] = z[4:3] * n[1:0], q[3] is not needed */
+    /* x[3:0] -= q[3:0], x[3] should end up zero */
     umul_ppmm(t2, t1, z3, ctx->n_limbs[1]);
     umul_ppmm(s2, s1, z4, ctx->n_limbs[0]);
-    umul_ppmm(q3, q2, z4, ctx->n_limbs[1]);
     umul_ppmm(q1, q0, z3, ctx->n_limbs[0]);
-    t3 = 0;
-    add_sssaaaaaa(t3, t2, t1, t3, t2, t1, 0, s2, s1);
-    add_sssaaaaaa(q3, q2, q1, q3, q2, q1, t3, t2, t1);
-
-    /* x[3:0] -= q[3:0], x[3] should end up zero */
+    sub_ddmmss(x2, x1, x2, x1, t2, t1);
+    q2 = z4 * ctx->n_limbs[1];
+    sub_ddmmss(x2, x1, x2, x1, s2, s1);
     sub_dddmmmsss(x2, x1, x0, x2, x1, x0, q2, q1, q0);
 
-    /* at most two subtractions of n - use q as temp space */
+    /* at most two subtractions of n, use q as temp space */
     sub_dddmmmsss(q2, q1, q0, x2, x1, x0, 0, ctx->n_limbs[1], ctx->n_limbs[0]);
     if ((slong)(q2) >= 0)
     {
@@ -142,9 +143,8 @@ void fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }
 
-
-
-void fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx)
 {
     FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
     FLINT_ASSERT(fmpz_mod_is_canonical(c, ctx));

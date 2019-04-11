@@ -13,6 +13,5 @@
 
 void fmpz_mod_ctx_clear(fmpz_mod_ctx_t ctx)
 {
-    fmpz_preinvn_clear(ctx->ninv);
     fmpz_clear(ctx->n);
 }
