@@ -2560,16 +2560,29 @@ Berlekamp-Massey Algorithm
 --------------------------------------------------------------------------------
 
     The nmod_berlekamp_massey_t manages an unlimited stream of points `a_1, a_2, \dots `.
-    At any point in time, after `n` points have been added, a call to func::nmod_berlekamp_massey_reduce will
+    At any point in time, after, say, `n` points have been added, a call to func::nmod_berlekamp_massey_reduce will
     calculate the polynomials `U`, `V` and `R` in the extended euclidean remainder sequence with
 
     .. math ::
 
-
         `U*x^n + V*(a_1*x^(n-1) + a_{n-1}*x + \cdots + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2`.
 
-
     The polynomials `V` and `R` may be obtained with func::nmod_berlekamp_massey_V_poly and func::nmod_berlekamp_massey_R_poly.
+    This class differs from func::fmpz_mod_poly_minpoly in the following respect. Let `v_i` denote the coefficient of `x^i` in `V`.
+    func::fmpz_mod_poly_minpoly will return a polynomial `V` of lowest degree that annihilates the whole sequence `a_1, \dots, a_n` as
+
+    .. math ::
+
+        `\sum_{i} v_i a_{j + i} = 0, \quad 1 \le j \le n - \deg(V)`.
+
+    The cost is that a polynomial of degree `n-1` might be returned and the return is not generally uniquely determined by the input sequence.
+    For the nmod_berlekamp_massey_t we have
+
+    .. math ::
+
+        `\sum_{i,j} v_i a_{j+i} x^{-j} = -U + \frac{R}{x^n}\text{,}
+
+    and it can be seen that `\sum_{i} v_i a_{j + i}` is zero for `1 \le j < n - \deg(R)`. Thus whether or not `V` has annihilated the whole sequence may be checked by comparing the degrees of `V` and `R`.
 
 .. function:: void nmod_berlekamp_massey_init(nmod_berlekamp_massey_t B, mp_limb_t p)
 
@@ -2597,7 +2610,9 @@ Berlekamp-Massey Algorithm
 
 .. function:: int nmod_berlekamp_massey_reduce(nmod_berlekamp_massey_t B)
 
-    Ensure that the polynomials `V` and `R` are up to date. The return value is 1 if this function changed `V` and 0 otherwise.
+    Ensure that the polynomials `V` and `R` are up to date. The return value is ``1`` if this function changed `V` and ``0`` otherwise.
+    For example, if this function is called twice in a row without adding any points in between, the return of the second call should be ``0``.
+    As another example, suppose the object is emptied, the points `1, 1, 2, 3` are added, then reduce is called. This reduce should return ``1`` with `\deg(R) < \deg(V) = 2` because the Fibonacci sequence has been recognized. The further addition of the two points `5, 8` and a reduce will result in a return value of ``0``.
 
 .. function:: slong nmod_berlekamp_massey_point_count(const nmod_berlekamp_massey_t B)
 
@@ -2605,12 +2620,12 @@ Berlekamp-Massey Algorithm
 
 .. function:: const mp_limb_t * nmod_berlekamp_massey_points(const nmod_berlekamp_massey_t B)
 
-    Return a pointer the array of points stored in ``B``. This may be ``NULL`` if func::nmod_berlekamp_massey_point_count returns 0.
+    Return a pointer to the array of points stored in ``B``. This may be ``NULL`` if func::nmod_berlekamp_massey_point_count returns ``0``.
 
 .. function:: const nmod_poly_struct * nmod_berlekamp_massey_V_poly(const nmod_berlekamp_massey_t B)
 
-    Return the polynomial ``V`` in ``B``.
+    Return the polynomial `V` in ``B``.
 
 .. function:: const nmod_poly_struct * nmod_berlekamp_massey_R_poly(const nmod_berlekamp_massey_t B)
 
-    Return the polynomial ``R`` in ``B``.
+    Return the polynomial `R` in ``B``.

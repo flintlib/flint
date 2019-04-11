@@ -23,24 +23,37 @@ main(void)
     fflush(stdout);
 
     {
+        int changed;
         nmod_berlekamp_massey_t B;
         nmod_berlekamp_massey_init(B, 101);
         nmod_berlekamp_massey_add_point(B, 1);
         nmod_berlekamp_massey_add_point(B, 1);
         nmod_berlekamp_massey_add_point(B, 2);
         nmod_berlekamp_massey_add_point(B, 3);
-        nmod_berlekamp_massey_add_point(B, 5);
-        nmod_berlekamp_massey_reduce(B);
-        if (2 != nmod_poly_degree(nmod_berlekamp_massey_V_poly(B)))
+        changed = nmod_berlekamp_massey_reduce(B);
+        if (   changed != 1
+            || 2 != nmod_poly_degree(nmod_berlekamp_massey_V_poly(B))
+            || nmod_poly_degree(nmod_berlekamp_massey_R_poly(B)) > 1)
         {
             printf("FAIL\n");
-            flint_printf("check fibonacci\n");
+            flint_printf("check fibonacci 1\n");
+            flint_abort();
+        }
+        nmod_berlekamp_massey_add_point(B, 5);
+        nmod_berlekamp_massey_add_point(B, 8);
+        changed = nmod_berlekamp_massey_reduce(B);
+        if (   changed != 0
+            || 2 != nmod_poly_degree(nmod_berlekamp_massey_V_poly(B))
+            || nmod_poly_degree(nmod_berlekamp_massey_R_poly(B)) > 1)
+        {
+            printf("FAIL\n");
+            flint_printf("check fibonacci 2\n");
             flint_abort();
         }
         nmod_berlekamp_massey_clear(B);
     }
 
-    for (i = 0; i < 15 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_berlekamp_massey_t B1, B2;
         nmod_berlekamp_massey_init(B1, 2);
