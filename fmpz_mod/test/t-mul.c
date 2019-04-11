@@ -15,7 +15,8 @@
 int
 main(void)
 {
-    slong i, j;
+    mp_bitcnt_t max_bits = 200;
+    slong i, j, k;
     FLINT_TEST_INIT(state);
 
     flint_printf("mul....");
@@ -26,7 +27,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;   /* p not nec prime */
-        fmpz_t a, b, c, d, f1, f2;
+        fmpz_t a, b, c, d, ab, bc;
         fmpz_mod_ctx_t fpctx;
 
         fmpz_init_set_ui(p, 2);
@@ -34,52 +35,84 @@ main(void)
         fmpz_init(b);
         fmpz_init(c);
         fmpz_init(d);
-        fmpz_init(f1);
-        fmpz_init(f2);
+        fmpz_init(ab);
+        fmpz_init(bc);
         fmpz_mod_ctx_init(fpctx, p);
 
-        for (j = 0; j < 20; j++)
+        for (j = 0; j < 10; j++)
         {
-            fmpz_randtest_unsigned(p, state, 200);
-            fmpz_add_ui(p, p, 1);
+            if (j == 0)
+            {
+                /* exact powers of 2 */
+                fmpz_one(p);
+                fmpz_mul_2exp(p, p, n_randint(state, max_bits));
+            }
+            else if (j == 1)
+            {
+                /* sum of two powers of 2 */
+                fmpz_one(p);
+                fmpz_mul_2exp(p, p, n_randint(state, max_bits/2));
+                fmpz_add_ui(p, p, 1);
+                fmpz_mul_2exp(p, p, n_randint(state, max_bits/2));
+            }
+            else
+            {
+                fmpz_randtest_unsigned(p, state, max_bits);
+                fmpz_add_ui(p, p, 1);
+            }
+
             fmpz_mod_ctx_set_mod(fpctx, p);
 
-            fmpz_randtest_mod(a, state, p);
-            fmpz_randtest_mod(b, state, p);
-            fmpz_randtest_mod(c, state, p);
-            fmpz_randtest_mod(d, state, p);
-            fmpz_randtest_mod(f1, state, p);
-            fmpz_randtest_mod(f2, state, p);
-
-            fmpz_mul(f1, a, b);
-            fmpz_mod(f1, f1, p);
-            fmpz_mul(f2, b, c);
-            fmpz_mod(f2, f2, p);
-
-            fmpz_mod_mul(d, a, b, fpctx);
-            if (!fmpz_equal(d, f1))
+            for (k = 0; k < 10; k++)
             {
-                printf("FAIL\n");
-                flint_printf("i = %wd, j = %wd\n", i, j);
-                flint_abort();
-            }
+                if (k == 0)
+                {
+                    fmpz_sub_ui(a, p, 1);
+                    fmpz_sub_ui(b, p, 1);
+                    fmpz_sub_ui(c, p, 1);
+                    fmpz_sub_ui(d, p, 1);
+                    fmpz_sub_ui(ab, p, 1);
+                    fmpz_sub_ui(bc, p, 1);
+                }
+                else
+                {
+                    fmpz_randtest_mod(a, state, p);
+                    fmpz_randtest_mod(b, state, p);
+                    fmpz_randtest_mod(c, state, p);
+                    fmpz_randtest_mod(d, state, p);
+                    fmpz_randtest_mod(ab, state, p);
+                    fmpz_randtest_mod(bc, state, p);
+                }
 
-            fmpz_mod_mul(a, a, b, fpctx);
-            if (!fmpz_equal(a, f1))
-            {
-                printf("FAIL\ncheck aliasing first");
-                flint_printf("i = %wd, j = %wd\n", i, j);
-                flint_abort();
-            }
+                fmpz_mul(ab, a, b);
+                fmpz_mod(ab, ab, p);
+                fmpz_mul(bc, b, c);
+                fmpz_mod(bc, bc, p);
 
-            fmpz_mod_mul(c, b, c, fpctx);
-            if (!fmpz_equal(c, f2))
-            {
-                printf("FAIL\ncheck aliasing second");
-                flint_printf("i = %wd, j = %wd\n", i, j);
-                flint_abort();
-            }
+                fmpz_mod_mul(d, a, b, fpctx);
+                if (!fmpz_equal(d, ab))
+                {
+                    printf("FAIL\n");
+                    flint_printf("i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    flint_abort();
+                }
 
+                fmpz_mod_mul(a, a, b, fpctx);
+                if (!fmpz_equal(a, ab))
+                {
+                    printf("FAIL\ncheck aliasing first");
+                    flint_printf("i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    flint_abort();
+                }
+
+                fmpz_mod_mul(c, b, c, fpctx);
+                if (!fmpz_equal(c, bc))
+                {
+                    printf("FAIL\ncheck aliasing second");
+                    flint_printf("i = %wd, j = %wd, k = %wd\n", i, j, k);
+                    flint_abort();
+                }
+            }
         }
 
         fmpz_mod_ctx_clear(fpctx);
@@ -88,8 +121,8 @@ main(void)
         fmpz_clear(b);
         fmpz_clear(c);
         fmpz_clear(d);
-        fmpz_clear(f1);
-        fmpz_clear(f2);
+        fmpz_clear(ab);
+        fmpz_clear(bc);
     }
 
     FLINT_TEST_CLEANUP(state);
