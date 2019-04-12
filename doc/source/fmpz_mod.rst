@@ -35,6 +35,7 @@ Arithmetic
 --------------------------------------------------------------------------------
 
 Unless specified otherwise all functions here expect their relevant arguments to be in the canonical range `[0,n)`.
+Comparison of elements against each other or against zero can be accomplished with func::fmpz_equal or func::fmpz_is_zero without a context.
 
 .. function:: int fmpz_mod_is_canonical(const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
@@ -43,7 +44,6 @@ Unless specified otherwise all functions here expect their relevant arguments to
 .. function:: int fmpz_mod_is_one(const fmpz_t a, const fmpz_mod_ctx_t ctx)
 
     Return ``1`` if `a` is `1` modulo `n` and return ``0`` otherwise.
-    The corresponding comparison of `a` with `0` can be accomplished with func::fmpz_is_zero and no context.
 
 .. function:: void fmpz_mod_add(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 
@@ -61,19 +61,19 @@ Unless specified otherwise all functions here expect their relevant arguments to
 
     Set `a` to `b*c` modulo `n`.
 
-.. function:: void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx);
+.. function:: void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
 
     Set `a` to `b^{-1}` modulo `n`. This function throws if and only if `\gcd(b, n) \ne 1`.
 
-.. function:: void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong e, const fmpz_mod_ctx_t ctx);
-
-.. function:: void fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e, const fmpz_mod_ctx_t ctx);
-
-    Set `a` to `b^e` modulo `n` where `e \ge 0`.
-
-.. function:: int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+.. function:: int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 
     If `a*c = b \mod n` has a solution for `a` return `1` and set `a` to such a solution. Otherwise return `0` and leave `a` undefined.
+
+.. function:: void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong e, const fmpz_mod_ctx_t ctx)
+
+.. function:: void fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e, const fmpz_mod_ctx_t ctx)
+
+    Set `a` to `b^e` modulo `n` where `e \ge 0`.
 
 
 Discrete Logarithms via Pohlig-Hellman

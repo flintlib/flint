@@ -54,7 +54,6 @@ typedef struct fmpz_mod_ctx {
     void (* add_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
     void (* sub_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
     void (* mul_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
-    void (* inv_fxn)(fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
     nmod_t mod;
     ulong n_limbs[3];
     ulong ninv_limbs[3];
@@ -144,13 +143,14 @@ FMPZ_MOD_INLINE void fmpz_mod_mul(fmpz_t a, const fmpz_t b, const fmpz_t c,
 FLINT_DLL void fmpz_mod_inv(fmpz_t a, const fmpz_t b,
                                                      const fmpz_mod_ctx_t ctx);
 
+FLINT_DLL int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                     const fmpz_mod_ctx_t ctx);
+
 FLINT_DLL void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong pow,
                                                      const fmpz_mod_ctx_t ctx);
 
 FLINT_DLL void fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t pow,
                                                      const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL int fmpz_next_smooth_prime(fmpz_t a, const fmpz_t b);
 
 /* discrete logs a la Pohlig - Hellman ***************************************/
 
@@ -203,6 +203,8 @@ FMPZ_MOD_INLINE const fmpz * fmpz_mod_discrete_log_pohlig_hellman_primitive_root
 {
     return L->alpha;
 }
+
+FLINT_DLL int fmpz_next_smooth_prime(fmpz_t a, const fmpz_t b);
 
 
 #ifdef __cplusplus

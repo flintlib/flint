@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mod.h"
-#include "profiler.h"
 
 int
 main(void)
