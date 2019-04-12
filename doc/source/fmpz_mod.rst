@@ -34,11 +34,16 @@ Context object
 Arithmetic
 --------------------------------------------------------------------------------
 
-Unless specified otherwise all functions here expect their relevent arguments to be in the canonical range `[0,n)`.
+Unless specified otherwise all functions here expect their relevant arguments to be in the canonical range `[0,n)`.
 
 .. function:: int fmpz_mod_is_canonical(const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
     Return ``1`` if `a` is in the canonical range `[0,n)` and ``0`` otherwise.
+
+.. function:: int fmpz_mod_is_one(const fmpz_t a, const fmpz_mod_ctx_t ctx)
+
+    Return ``1`` if `a` is `1` modulo `n` and return ``0`` otherwise.
+    The corresponding comparison of `a` with `0` can be accomplished with func::fmpz_is_zero and no context.
 
 .. function:: void fmpz_mod_add(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 

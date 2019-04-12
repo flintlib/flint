@@ -25,16 +25,16 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
     ctx->n_limbs[0] = 0;
     ctx->n_limbs[1] = 0;
     ctx->n_limbs[2] = 0;
-    ctx->add_fxn = fmpz_mod_addN;
-    ctx->sub_fxn = fmpz_mod_subN;
-    ctx->mul_fxn = fmpz_mod_mulN;
+    ctx->add_fxn = _fmpz_mod_addN;
+    ctx->sub_fxn = _fmpz_mod_subN;
+    ctx->mul_fxn = _fmpz_mod_mulN;
 
     bits = fmpz_bits(n);
     if (bits <= FLINT_BITS)
     {
-        ctx->add_fxn = fmpz_mod_add1;
-        ctx->sub_fxn = fmpz_mod_sub1;
-        ctx->mul_fxn = fmpz_mod_mul1;
+        ctx->add_fxn = _fmpz_mod_add1;
+        ctx->sub_fxn = _fmpz_mod_sub1;
+        ctx->mul_fxn = _fmpz_mod_mul1;
         nmod_init(&ctx->mod, fmpz_get_ui(n));
     }
     else if (bits <= 2*FLINT_BITS)
@@ -45,9 +45,9 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
         /* n = 2^FLINT_BITS must be special case */
         if (ctx->n_limbs[1] == 1 && ctx->n_limbs[0] == 0)
         {
-            ctx->add_fxn = fmpz_mod_add2s;
-            ctx->sub_fxn = fmpz_mod_sub2s;
-            ctx->mul_fxn = fmpz_mod_mul2s;
+            ctx->add_fxn = _fmpz_mod_add2s;
+            ctx->sub_fxn = _fmpz_mod_sub2s;
+            ctx->mul_fxn = _fmpz_mod_mul2s;
         }
         else
         {
@@ -59,9 +59,9 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
             fmpz_get_uiuiui(ctx->ninv_limbs + 2, ctx->ninv_limbs + 1, ctx->ninv_limbs + 0, t);
             fmpz_clear(t);
             FLINT_ASSERT(ctx->ninv_limbs[2] != 0);
-            ctx->add_fxn = fmpz_mod_add2;
-            ctx->sub_fxn = fmpz_mod_sub2;
-            ctx->mul_fxn = fmpz_mod_mul2;
+            ctx->add_fxn = _fmpz_mod_add2;
+            ctx->sub_fxn = _fmpz_mod_sub2;
+            ctx->mul_fxn = _fmpz_mod_mul2;
         }
     }
 }

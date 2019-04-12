@@ -54,6 +54,7 @@ typedef struct fmpz_mod_ctx {
     void (* add_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
     void (* sub_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
     void (* mul_fxn)(fmpz_t, const fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
+    void (* inv_fxn)(fmpz_t, const fmpz_t, const struct fmpz_mod_ctx *);
     nmod_t mod;
     ulong n_limbs[3];
     ulong ninv_limbs[3];
@@ -76,16 +77,21 @@ FLINT_DLL int fmpz_mod_is_canonical(const fmpz_t a,  const fmpz_mod_ctx_t ctx);
 FLINT_DLL void fmpz_mod_assert_canonical(const fmpz_t a,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FMPZ_MOD_INLINE int fmpz_mod_is_one(const fmpz_t a, const fmpz_mod_ctx_t ctx)
+{
+    return fmpz_is_one(ctx->n) ? fmpz_is_zero(a) : fmpz_is_one(a);
+}
+
+FLINT_DLL void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_addN(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_addN(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_INLINE void fmpz_mod_add(fmpz_t a, const fmpz_t b, const fmpz_t c,
@@ -94,16 +100,16 @@ FMPZ_MOD_INLINE void fmpz_mod_add(fmpz_t a, const fmpz_t b, const fmpz_t c,
     (ctx->add_fxn)(a, b, c, ctx);
 }
 
-FLINT_DLL void fmpz_mod_sub1(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_sub1(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_sub2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_sub2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_sub2(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_sub2(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_subN(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_subN(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_INLINE void fmpz_mod_sub(fmpz_t a, const fmpz_t b, const fmpz_t c,
@@ -116,16 +122,16 @@ FLINT_DLL void fmpz_mod_neg(fmpz_t a, const fmpz_t b,
                                                      const fmpz_mod_ctx_t ctx);
 
 
-FLINT_DLL void fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c,
+FLINT_DLL void _fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_INLINE void fmpz_mod_mul(fmpz_t a, const fmpz_t b, const fmpz_t c,

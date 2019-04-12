@@ -11,7 +11,7 @@
 
 #include "fmpz_mod.h"
 
-void fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c,
+void _fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx)
 {
     mp_limb_t a0, b0, c0;
@@ -30,7 +30,7 @@ void fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c,
 /*
     Multiplication modulo 2^FLINT_BITS is easy.
 */
-void fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
+void _fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx)
 {
     mp_limb_t a0, b0, c0;
@@ -63,7 +63,7 @@ void fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
         at this point the canonical reduction in the range [0, n) is one of
             a = x, a = x - n, or a = x - 2n
 */
-void fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
+void _fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx)
 {
     mp_limb_t a1, a0, b1, b0, c1, c0;
@@ -143,7 +143,7 @@ void fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }
 
-void fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c,
+void _fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx)
 {
     FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));

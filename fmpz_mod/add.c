@@ -11,7 +11,7 @@
 
 #include "fmpz_mod.h"
 
-void fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
+void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx)
 {
     ulong a0, b0, c0;
@@ -27,7 +27,7 @@ void fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }
 
-void fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
+void _fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx)
 {
     mp_limb_t a0, b0, c0;
@@ -43,7 +43,7 @@ void fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }
 
-void fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c,
+void _fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx)
 {
     mp_limb_t t2, t1, t0, a2, a1, a0, b1, b0, c1, c0;
@@ -66,7 +66,7 @@ void fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c,
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }
 
-void fmpz_mod_addN(fmpz_t a, const fmpz_t b, const fmpz_t c,
+void _fmpz_mod_addN(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx)
 {
     FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));

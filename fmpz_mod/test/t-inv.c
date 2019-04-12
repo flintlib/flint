@@ -23,10 +23,9 @@ main(void)
    
     flint_randinit(state);
 
-    /* mod 1 arithmetic is not tested */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_t p;   /* p not nec prime but > 1 */
+        fmpz_t p;
         fmpz_t a, ainv, b, g;
         fmpz_mod_ctx_t fpctx;
 
@@ -40,7 +39,7 @@ main(void)
         for (j = 0; j < 20; j++)
         {
             fmpz_randtest_unsigned(p, state, 200);
-            fmpz_add_ui(p, p, 2);
+            fmpz_add_ui(p, p, 1);
             fmpz_mod_ctx_set_mod(fpctx, p);
 
             fmpz_randtest_mod(a, state, p);
@@ -52,7 +51,7 @@ main(void)
 
             fmpz_mod_inv(ainv, a, fpctx);
             fmpz_mod_mul(b, a, ainv, fpctx);
-            if (!fmpz_is_one(b))
+            if (!fmpz_mod_is_one(b, fpctx))
             {
                 printf("FAIL\n");
                 flint_printf("i = %wd, j = %wd\n", i, j);
