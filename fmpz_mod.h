@@ -78,7 +78,7 @@ FLINT_DLL void fmpz_mod_assert_canonical(const fmpz_t a,
 
 FMPZ_MOD_INLINE int fmpz_mod_is_one(const fmpz_t a, const fmpz_mod_ctx_t ctx)
 {
-    return fmpz_is_one(ctx->n) ? fmpz_is_zero(a) : fmpz_is_one(a);
+    return fmpz_is_one(a) || fmpz_is_one(ctx->n);
 }
 
 FLINT_DLL void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,

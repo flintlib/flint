@@ -54,6 +54,13 @@ main(void)
                 fmpz_add_ui(p, p, 1);
                 fmpz_mul_2exp(p, p, n_randint(state, max_bits/2));
             }
+            else if (j == 2)
+            {
+                /* one less than a power of 2 */
+                fmpz_one(p);
+                fmpz_mul_2exp(p, p, 1 + n_randint(state, max_bits));
+                fmpz_sub_ui(p, p, 1);
+            }
             else
             {
                 fmpz_randtest_unsigned(p, state, max_bits);

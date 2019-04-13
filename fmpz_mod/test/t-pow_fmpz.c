@@ -24,7 +24,7 @@ main(void)
    
     flint_randinit(state);
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_t p; /* p not nec. prime */
         fmpz_t a, b, u, v, w, x;
