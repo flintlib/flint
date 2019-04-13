@@ -1,6 +1,6 @@
 .. _fmpz-mod:
 
-**fmpz_mod.h** -- arithemtic modulo integers
+**fmpz_mod.h** -- arithmetic modulo integers
 ===============================================================================
 
 Description.
@@ -8,11 +8,11 @@ Description.
 Types, macros and constants
 -------------------------------------------------------------------------------
 
-.. type:: fq_mod_ctx_struct
+.. type:: fmpz_mod_ctx_struct
 
-.. type:: fq_mod_ctx_t
+.. type:: fmpz_mod_ctx_t
 
-    Description.
+    The context object for arithmetic modulo integers.
 
 
 Context object
@@ -105,5 +105,5 @@ Discrete Logarithms via Pohlig-Hellman
 .. function:: int fmpz_next_smooth_prime(fmpz_t a, const fmpz_t b)
 
     Either return `1` and set `a` to a smooth prime strictly greater than `b`, or return `0` and set `a` to `0`.
-    The smooth primes returned by this function currently have `23` as the largest prime factor of `a-1` but should not be relied upon.
+    The smooth primes returned by this function currently have `23` as the largest prime factor of `a-1`, but this should not be relied upon.
 
