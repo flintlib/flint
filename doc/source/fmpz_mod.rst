@@ -96,7 +96,7 @@ Discrete Logarithms via Pohlig-Hellman
 
     Return the internally stored base.
 
-.. function:: fmpz_mod_discrete_log_pohlig_hellman_run(const fmpz_mod_discrete_log_pohlig_hellman_t L, fmpz_t x, const fmpz_t y)
+.. function:: fmpz_mod_discrete_log_pohlig_hellman_run(fmpz_t x, const fmpz_mod_discrete_log_pohlig_hellman_t L, const fmpz_t y)
 
     Set ``x`` to the logarithm of ``y`` with repect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
     The function is undefined if the logarithm does not exist.
@@ -105,5 +105,5 @@ Discrete Logarithms via Pohlig-Hellman
 .. function:: int fmpz_next_smooth_prime(fmpz_t a, const fmpz_t b)
 
     Either return `1` and set `a` to a smooth prime strictly greater than `b`, or return `0` and set `a` to `0`.
-    The smooth primes returned by this function currently have `23` as the largest prime factor of `a-1`, but this should not be relied upon.
+    The smooth primes returned by this function currently have no prime factor of `a-1` greater than `23`, but this should not be relied upon.
 

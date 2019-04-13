@@ -57,7 +57,7 @@ main(void)
 
                 fmpz_randm(x, state, pm1);
                 fmpz_mod_pow_fmpz(y, alpha, x, fpctx);
-                fmpz_mod_discrete_log_pohlig_hellman_run(L, xr, y);
+                fmpz_mod_discrete_log_pohlig_hellman_run(xr, L, y);
                 if (!fmpz_equal(x, xr))
                 {
                     printf("FAIL\ncheck random word-sized primes\n");
@@ -129,7 +129,7 @@ main(void)
 
                 fmpz_randm(x, state, pm1);
                 fmpz_mod_pow_fmpz(y, alpha, x, fpctx);
-                fmpz_mod_discrete_log_pohlig_hellman_run(L, xr, y);
+                fmpz_mod_discrete_log_pohlig_hellman_run(xr, L, y);
                 if (!fmpz_equal(x, xr))
                 {
                     printf("FAIL\n");

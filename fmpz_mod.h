@@ -194,8 +194,8 @@ FLINT_DLL double fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(
                     const fmpz_t p);
 
 FLINT_DLL void fmpz_mod_discrete_log_pohlig_hellman_run(
-                    const fmpz_mod_discrete_log_pohlig_hellman_t L,
                     fmpz_t x,
+                    const fmpz_mod_discrete_log_pohlig_hellman_t L,
                     const fmpz_t y);
 
 FMPZ_MOD_INLINE const fmpz * fmpz_mod_discrete_log_pohlig_hellman_primitive_root(

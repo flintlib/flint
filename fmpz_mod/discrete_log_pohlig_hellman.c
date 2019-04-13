@@ -250,10 +250,10 @@ try_alpha:
 
 }
 
-/* return with xx such that x = alpha^y mod p, alpha is the p.r. L->alpha*/
+/* return with xx such that xx = alpha^y mod p, alpha is the p.r. L->alpha*/
 void fmpz_mod_discrete_log_pohlig_hellman_run(
-    const fmpz_mod_discrete_log_pohlig_hellman_t L,
     fmpz_t xx,
+    const fmpz_mod_discrete_log_pohlig_hellman_t L,
     const fmpz_t y)
 {
     slong i, j;
