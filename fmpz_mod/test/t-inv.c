@@ -39,7 +39,7 @@ main(void)
         {
             fmpz_randtest_unsigned(p, state, 200);
             fmpz_add_ui(p, p, 1);
-            fmpz_mod_ctx_set_mod(fpctx, p);
+            fmpz_mod_ctx_set_modulus(fpctx, p);
 
             fmpz_randtest_mod(a, state, p);
             fmpz_gcd(g, a, p);

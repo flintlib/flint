@@ -141,6 +141,7 @@ void _fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
     fmpz_set_uiui(a, a1, a0);
 
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+
 }
 
 void _fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c,

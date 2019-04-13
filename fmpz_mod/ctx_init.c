@@ -39,8 +39,7 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
     }
     else if (bits <= 2*FLINT_BITS)
     {
-        fmpz_get_uiui(ctx->n_limbs + 1, ctx->n_limbs + 0, n);
-        ctx->n_limbs[2] = 0;
+        fmpz_get_ui_array(ctx->n_limbs, 3, n); /* n_limbs[2] will be 0 */
 
         /* n = 2^FLINT_BITS must be special case */
         if (ctx->n_limbs[1] == 1 && ctx->n_limbs[0] == 0)
@@ -56,7 +55,7 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
             fmpz_one(t);
             fmpz_mul_2exp(t, t, 4*FLINT_BITS);
             fmpz_tdiv_q(t, t, n);
-            fmpz_get_uiuiui(ctx->ninv_limbs + 2, ctx->ninv_limbs + 1, ctx->ninv_limbs + 0, t);
+            fmpz_get_ui_array(ctx->ninv_limbs, 3, t);
             fmpz_clear(t);
             FLINT_ASSERT(ctx->ninv_limbs[2] != 0);
             ctx->add_fxn = _fmpz_mod_add2;

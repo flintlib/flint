@@ -69,7 +69,7 @@ FMPZ_MOD_INLINE const fmpz * fmpz_mod_ctx_mod(fmpz_mod_ctx_t ctx)
     return ctx->n;
 }
 
-FLINT_DLL void fmpz_mod_ctx_set_mod(fmpz_mod_ctx_t ctx, const fmpz_t p);
+FLINT_DLL void fmpz_mod_ctx_set_modulus(fmpz_mod_ctx_t ctx, const fmpz_t n);
 
 FLINT_DLL int fmpz_mod_is_canonical(const fmpz_t a,  const fmpz_mod_ctx_t ctx);
 

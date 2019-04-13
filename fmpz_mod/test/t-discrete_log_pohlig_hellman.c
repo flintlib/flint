@@ -40,7 +40,7 @@ main(void)
 
             fmpz_set_ui(p, n_randtest_prime(state, 1));
             fmpz_sub_ui(pm1, p, 1);
-            fmpz_mod_ctx_set_mod(fpctx, p);
+            fmpz_mod_ctx_set_modulus(fpctx, p);
             score = fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(L, p);
             if (score > 10000)
             {
@@ -107,7 +107,7 @@ main(void)
                 The primes returned by fmpz_next_smooth_prime should not
                 require too many operations for discrete logarithms.
             */
-            fmpz_mod_ctx_set_mod(fpctx, p);
+            fmpz_mod_ctx_set_modulus(fpctx, p);
             score = fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(L, p);
             if (score > 10000)
             {

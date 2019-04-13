@@ -11,8 +11,8 @@
 
 #include "fmpz_mod.h"
 
-void fmpz_mod_ctx_set_mod(fmpz_mod_ctx_t ctx, const fmpz_t p)
+void fmpz_mod_ctx_set_modulus(fmpz_mod_ctx_t ctx, const fmpz_t n)
 {
     fmpz_mod_ctx_clear(ctx);
-    fmpz_mod_ctx_init(ctx, p);
+    fmpz_mod_ctx_init(ctx, n);
 }

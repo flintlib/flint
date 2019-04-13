@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mod.h"
-#include "profiler.h"
 
 int
 main(void)
@@ -61,7 +60,7 @@ main(void)
                 fmpz_add_ui(p, p, 1);
             }
 
-            fmpz_mod_ctx_set_mod(fpctx, p);
+            fmpz_mod_ctx_set_modulus(fpctx, p);
 
             for (k = 0; k < 10; k++)
             {
