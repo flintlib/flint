@@ -117,12 +117,16 @@ double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohli
         fmpz_clear(recp);
     }
 
+    /* alpha will be a primitive root */
     L->alpha = 0;
 try_alpha:
     L->alpha++;
     if (L->alpha >= p)
     {
-        flint_throw(FLINT_ERROR, "Could not find primitive root in nmod_discrete_log_pohlig_hellman_precompute_prime");
+        /* L is corrupted */
+        /* factors appears to need no cleanup */
+        flint_throw(FLINT_ERROR, "Exception in nmod_discrete_log_pohlig"
+                  "_hellman_precompute_prime: Could not find primitive root.");
     }
     for (i = 0; i < L->num_factors; i++)
     {
@@ -231,7 +235,7 @@ ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellma
             {
                 if (w != Li->gamma)
                 {
-                    flint_throw(FLINT_ERROR, "Could not find log in nmod_discrete_log_pohlig_hellman_run");
+                    goto cleanup_and_throw;
                 }
                 g = 1;
                 z = nmod_mul(z, beta, L->mod);
@@ -290,7 +294,7 @@ ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellma
                 d++;
                 if (d >= Li->dbound)
                 {
-                    flint_throw(FLINT_ERROR, "Could not find log in nmod_discrete_log_pohlig_hellman_run");
+                    goto cleanup_and_throw;
                 }
             }
         found_g:
@@ -309,4 +313,11 @@ ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellma
     udiv_qrnnd(q, r, x2, x1, L->mod.n - 1);
     udiv_qrnnd(q, x, r, x0, L->mod.n - 1);
     return x;
+
+cleanup_and_throw:
+
+    /* nothing currently to cleanup */
+    flint_throw(FLINT_ERROR, "Exception in nmod_discrete_log_pohlig"
+                                         "_hellman_run: Could not find log.");
+    return 0;
 }

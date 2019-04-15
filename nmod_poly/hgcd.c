@@ -641,8 +641,8 @@ slong nmod_poly_hgcd_ref(
 
     if (nmod_poly_degree(a) <= nmod_poly_degree(b))
     {
-        flint_printf("Exception in nmod_poly_hgcd_ref: bad input degrees\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception in nmod_poly_hgcd_ref:"
+                                              " Input degrees are invalid.\n");
     }
 
     nmod_poly_init_mod(q, a->mod);
@@ -697,8 +697,8 @@ slong nmod_poly_hgcd(
 
     if (nmod_poly_degree(a) <= nmod_poly_degree(b))
     {
-        flint_printf("Exception in nmod_poly_hgcd: bad input degrees\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception in nmod_poly_hgcd:"
+                                              " Input degrees are invalid.\n");
     }
 
     if (nmod_poly_length(b) == 0)

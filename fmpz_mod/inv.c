@@ -19,7 +19,9 @@ void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
     fmpz_gcdinv(d, a, b, ctx->n);
     if (!fmpz_is_one(d))
     {
-        flint_throw(FLINT_IMPINV, "Cannot invert in fmpz_mod_inv\n");        
+        fmpz_clear(d);
+        /* printing b and n would entail leaking the string so no b nor n */
+        flint_throw(FLINT_IMPINV, "Exception in fmpz_mod_inv: Cannot invert.\n");
     }
     fmpz_clear(d);
     fmpz_mod(a, a, ctx->n); /* return of fmpz_gcdinv may be out of range :-( */

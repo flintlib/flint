@@ -17,7 +17,8 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
 
     if  (fmpz_sgn(n) <= 0)
     {
-        flint_throw(FLINT_ERROR, "Nonpositive modulus in fmpz_mod_ctx_init");
+        flint_throw(FLINT_ERROR, "Exception in fmpz_mod_ctx_init: "
+                                                    "Modulus is nonpositive.");
     }
 
     /* prepare for general case */

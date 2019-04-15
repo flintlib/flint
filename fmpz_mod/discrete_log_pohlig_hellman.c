@@ -141,8 +141,11 @@ double fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(
 
         if (!fmpz_abs_fits_ui(factors->p + i))
         {
-            flint_printf("Exception in fmpz_mod_discrete_log_pohlig_hellman_precompute_prime: large prime factor\n");
-            flint_abort();
+            /* L is corrupted */
+            fmpz_clear(temp);
+            fmpz_factor_clear(factors);
+            flint_throw(FLINT_ERROR, "Exception in fmpz_mod_discrete_log_"
+                  "pohlig_hellman_precompute_prime: Prime factor is large.\n");
         }
         Li->exp = factors->exp[i];
         Li->prime = fmpz_get_ui(factors->p + i);
@@ -165,14 +168,17 @@ double fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(
     }
     fmpz_factor_clear(factors);
 
+    /* alpha will be a primitive root */
     fmpz_zero(L->alpha);
-
 try_alpha:
     fmpz_add_ui(L->alpha, L->alpha, 1);
-
     if (fmpz_cmp(L->alpha, p) >= 0)
     {
-        flint_throw(FLINT_ERROR, "Could not find primitive root in fmpz_mod_discrete_log_pohlig_hellman_precompute_prime.");
+        /* L is corrupted */
+        fmpz_clear(temp);
+        /* factors was already cleared */
+        flint_throw(FLINT_ERROR, "Exception in fmpz_mod_discrete_log_pohlig_"
+                   "hellman_precompute_prime: Could not find primitive root.");
     }
     for (i = 0; i < L->num_factors; i++)
     {
@@ -206,7 +212,8 @@ try_alpha:
 
         FLINT_ASSERT(Li->dbound > 0);
         FLINT_ASSERT(Li->cbound > 0);
-        Li->table = (fmpz_mod_discrete_log_pohlig_hellman_table_entry_struct *) flint_malloc(Li->cbound*sizeof(fmpz_mod_discrete_log_pohlig_hellman_table_entry_struct));
+        Li->table = (fmpz_mod_discrete_log_pohlig_hellman_table_entry_struct *)
+                 flint_malloc(Li->cbound*sizeof(fmpz_mod_discrete_log_pohlig_hellman_table_entry_struct));
 
         for (c = 0; c < Li->cbound; c++)
         {
@@ -214,11 +221,13 @@ try_alpha:
             fmpz_init(Li->table[c].gammapow);
             fmpz_mod_pow_ui(Li->table[c].gammapow, Li->gamma, Li->table[c].cm, L->fpctx);
         }
-        qsort(Li->table, Li->cbound, sizeof(fmpz_mod_discrete_log_pohlig_hellman_table_entry_struct),
+        qsort(Li->table, Li->cbound,
+                sizeof(fmpz_mod_discrete_log_pohlig_hellman_table_entry_struct),
                (int(*)(const void*, const void*)) fmpz_mod_discrete_log_pohlig_hellman_table_entry_struct_cmp);
         for (c = 1; c < Li->cbound; c++)
         {
-            FLINT_ASSERT(fmpz_cmp(Li->table[c - 1].gammapow, Li->table[c].gammapow) < 0);
+            FLINT_ASSERT(fmpz_cmp(Li->table[c - 1].gammapow,
+                                    Li->table[c].gammapow) < 0);
         }
     }
 
@@ -299,7 +308,7 @@ void fmpz_mod_discrete_log_pohlig_hellman_run(
             {
                 if (!fmpz_equal(w, Li->gamma))
                 {
-                    flint_throw(FLINT_ERROR, "Could not find log in fmpz_mod_discrete_log_pohlig_hellman_run.");
+                    goto cleanup_and_throw;
                 }
                 g = 1;
                 fmpz_mod_mul(z, z, beta, L->fpctx);
@@ -363,7 +372,7 @@ void fmpz_mod_discrete_log_pohlig_hellman_run(
                 d++;
                 if (d >= Li->dbound)
                 {
-                    flint_throw(FLINT_ERROR, "Could not find log in fmpz_mod_discrete_log_pohlig_hellman_run.");
+                    goto cleanup_and_throw;
                 }
             }
         found_g:
@@ -389,4 +398,20 @@ void fmpz_mod_discrete_log_pohlig_hellman_run(
     fmpz_clear(temp);
     fmpz_clear(x);
     return;
+
+cleanup_and_throw:
+
+    fmpz_clear(acc);
+    fmpz_clear(pipow);
+    fmpz_clear(e);
+    fmpz_clear(beta);
+    fmpz_clear(z);
+    fmpz_clear(w);
+    fmpz_clear(temp);
+    fmpz_clear(x);
+    flint_throw(FLINT_ERROR, "Exception in fmpz_mod_discrete_log_pohlig_"
+                                          "hellman_run: Could not find log.");
+    return;
+
+
 }
