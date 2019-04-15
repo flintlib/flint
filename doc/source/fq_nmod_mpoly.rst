@@ -25,7 +25,7 @@ Context object
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, slong nvars, const ordering_t ord, const fq_nmod_ctx_t fqctx)
+.. function:: void fq_nmod_mpoly_ctx_init(fq_nmod_mpoly_ctx_t ctx, slong nvars, const ordering_t ord, const fq_nmod_ctx_t fqctx)
 
     Initialise a context object for a polynomial ring with the given number of variables and the given ordering.
     It will have coefficients in the finite field ``fqctx``.

@@ -31,8 +31,8 @@ int
 main(void)
 {
     int i;
-    FLINT_TEST_INIT(state);
     int tmul = 200;
+    FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;
 #endif

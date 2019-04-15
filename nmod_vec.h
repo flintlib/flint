@@ -326,6 +326,58 @@ FLINT_DLL mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
 FLINT_DLL mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
     slong len, nmod_t mod, int nlimbs);
 
+
+/* discrete logs a la Pohlig - Hellman ***************************************/
+
+typedef struct {
+    mp_limb_t gammapow;
+    ulong cm;
+} nmod_discrete_log_pohlig_hellman_table_entry_struct;
+
+typedef struct {
+    slong exp;
+    ulong prime;
+    mp_limb_t gamma;
+    mp_limb_t gammainv;
+    mp_limb_t startingbeta;
+    ulong co;
+    ulong startinge;
+    ulong idem;
+    ulong cbound;
+    ulong dbound;
+    nmod_discrete_log_pohlig_hellman_table_entry_struct * table; /* length cbound */
+} nmod_discrete_log_pohlig_hellman_entry_struct;
+
+typedef struct {
+    nmod_t mod;         /* p is mod.n */
+    mp_limb_t alpha;    /* p.r. of p */
+    mp_limb_t alphainv;
+    slong num_factors;  /* factors of p - 1*/
+    nmod_discrete_log_pohlig_hellman_entry_struct * entries;
+} nmod_discrete_log_pohlig_hellman_struct;
+
+typedef nmod_discrete_log_pohlig_hellman_struct nmod_discrete_log_pohlig_hellman_t[1];
+
+FLINT_DLL void nmod_discrete_log_pohlig_hellman_init(
+                nmod_discrete_log_pohlig_hellman_t L);
+
+FLINT_DLL void nmod_discrete_log_pohlig_hellman_clear(
+                nmod_discrete_log_pohlig_hellman_t L);
+
+FLINT_DLL double nmod_discrete_log_pohlig_hellman_precompute_prime(
+                nmod_discrete_log_pohlig_hellman_t L,
+                mp_limb_t p);
+
+FLINT_DLL ulong nmod_discrete_log_pohlig_hellman_run(
+                const nmod_discrete_log_pohlig_hellman_t L,
+                mp_limb_t y);
+
+NMOD_VEC_INLINE mp_limb_t nmod_discrete_log_pohlig_hellman_primitive_root(
+                const nmod_discrete_log_pohlig_hellman_t L)
+{
+    return L->alpha;
+}
+
 #ifdef __cplusplus
 }
 #endif

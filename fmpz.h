@@ -193,6 +193,22 @@ FLINT_DLL slong fmpz_get_si(const fmpz_t f);
 FLINT_DLL ulong fmpz_get_ui(const fmpz_t f);
 
 FMPZ_INLINE void
+fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+    {
+        *low = *f;
+        *hi  = 0;
+    }
+    else
+    {
+        __mpz_struct * mpz = COEFF_TO_PTR(*f);
+        *low = mpz->_mp_d[0];
+        *hi  = mpz->_mp_size == 2 ? mpz->_mp_d[1] : 0;
+    }
+}
+
+FMPZ_INLINE void
 fmpz_set_si(fmpz_t f, slong val)
 {
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */

@@ -1081,6 +1081,14 @@ FLINT_DLL slong _nmod_poly_hgcd(mp_ptr *M, slong *lenM,
                      mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
                      nmod_t mod);
 
+FLINT_DLL slong nmod_poly_hgcd_ref(
+        nmod_poly_t m11, nmod_poly_t m12, nmod_poly_t m21, nmod_poly_t m22,
+        nmod_poly_t A, nmod_poly_t B, const nmod_poly_t a, const nmod_poly_t b);
+
+FLINT_DLL slong nmod_poly_hgcd(
+        nmod_poly_t m11, nmod_poly_t m12, nmod_poly_t m21, nmod_poly_t m22,
+        nmod_poly_t A, nmod_poly_t B, const nmod_poly_t a, const nmod_poly_t b);
+
 FLINT_DLL slong _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, slong lenA, 
                                    mp_srcptr B, slong lenB, nmod_t mod);
 
@@ -1359,6 +1367,73 @@ FLINT_DLL void nmod_mat_minpoly_with_gens(nmod_poly_t p,
                                                 const nmod_mat_t X, ulong * P);
 
 FLINT_DLL void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
+
+/* Berlekamp-Massey Algorithm - see nmod_poly/berlekamp_massey.c for more info ************/
+typedef struct {
+    slong npoints;
+    nmod_poly_t R0, R1;
+    nmod_poly_t V0, V1;
+    nmod_poly_t qt, rt;
+    nmod_poly_t points;
+} nmod_berlekamp_massey_struct;
+typedef nmod_berlekamp_massey_struct nmod_berlekamp_massey_t[1];
+
+FLINT_DLL void nmod_berlekamp_massey_init(
+                    nmod_berlekamp_massey_t B,
+                    mp_limb_t p);
+
+FLINT_DLL void nmod_berlekamp_massey_start_over(
+                    nmod_berlekamp_massey_t B);
+
+FLINT_DLL void nmod_berlekamp_massey_clear(
+                    nmod_berlekamp_massey_t B);
+
+FLINT_DLL void nmod_berlekamp_massey_set_prime(
+                    nmod_berlekamp_massey_t B,
+                    mp_limb_t p);
+
+FLINT_DLL void nmod_berlekamp_massey_print(
+                    const nmod_berlekamp_massey_t B);
+
+FLINT_DLL void nmod_berlekamp_massey_add_points(
+                    nmod_berlekamp_massey_t B,
+                    const mp_limb_t * a,
+                    slong count);
+
+FLINT_DLL void nmod_berlekamp_massey_add_zeros(
+                    nmod_berlekamp_massey_t B,
+                    slong count);
+
+FLINT_DLL void nmod_berlekamp_massey_add_point(
+                    nmod_berlekamp_massey_t B,
+                    mp_limb_t a);
+
+FLINT_DLL int nmod_berlekamp_massey_reduce(
+                    nmod_berlekamp_massey_t B);
+
+NMOD_POLY_INLINE const mp_limb_t * nmod_berlekamp_massey_points(
+                    const nmod_berlekamp_massey_t B)
+{
+    return B->points->coeffs;
+}
+
+NMOD_POLY_INLINE slong nmod_berlekamp_massey_point_count(
+                    const nmod_berlekamp_massey_t B)
+{
+    return B->points->length;
+}
+
+NMOD_POLY_INLINE const nmod_poly_struct * nmod_berlekamp_massey_V_poly(
+                    const nmod_berlekamp_massey_t B)
+{
+    return B->V1;
+}
+
+NMOD_POLY_INLINE const nmod_poly_struct * nmod_berlekamp_massey_R_poly(
+                    const nmod_berlekamp_massey_t B)
+{
+    return B->R1;
+}
 
 #ifdef __cplusplus
     }
