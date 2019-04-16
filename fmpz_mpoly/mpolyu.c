@@ -55,8 +55,10 @@ void fmpz_mpolyu_zero(fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx)
 
 
 
-void fmpz_mpolyu_print_pretty(const fmpz_mpolyu_t poly,
-                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpolyu_print_pretty(
+    const fmpz_mpolyu_t poly,
+    const char ** x,
+    const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     if (poly->length == 0)
@@ -71,6 +73,32 @@ void fmpz_mpolyu_print_pretty(const fmpz_mpolyu_t poly,
     }
 }
 
+void fmpz_mpolyuu_print_pretty(
+    const fmpz_mpolyu_t poly,
+    const char ** x,
+    slong nmainvars,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, j;
+    ulong mask = (-UWORD(1)) >> (FLINT_BITS - FLINT_BITS/nmainvars);
+
+    if (poly->length == 0)
+        flint_printf("0");
+
+    for (i = 0; i < poly->length; i++)
+    {
+        if (i != 0)
+            flint_printf(" + ");
+        flint_printf("(");
+        fmpz_mpoly_print_pretty(poly->coeffs + i, x, ctx);
+        flint_printf(")");
+        for (j = nmainvars - 1; j >= 0; j--)
+        {
+            flint_printf("*X%wd^%wd", nmainvars - 1 - j,
+                    mask & (poly->exps[i] >> (FLINT_BITS/nmainvars*j)));
+        }
+    }
+}
 
 
 void fmpz_mpolyu_fit_length(fmpz_mpolyu_t A, slong length,
@@ -650,90 +678,6 @@ int fmpz_mpolyu_CRT_nmod_mpolyu(mp_bitcnt_t * coeffbits,
     H->length = A->length;
     return changed;
 }
-
-
-
-void fmpz_mpolyu_msub(fmpz_mpolyu_t R, fmpz_mpolyu_t A, fmpz_mpolyu_t B,
-                           fmpz_mpoly_t c, slong e, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, j, k;
-    fmpz_mpoly_t T;
-
-    fmpz_mpolyu_fit_length(R, A->length + B->length, ctx);
-    fmpz_mpoly_init(T, ctx);
-
-    i = j = k = 0;
-    while (i < A->length || j < B->length)
-    {
-        if (i < A->length && (j >= B->length || A->exps[i] > B->exps[j] + e))
-        {
-            /* only A ok */
-            fmpz_mpoly_set(R->coeffs + k, A->coeffs + i, ctx);
-            R->exps[k] = A->exps[i];
-            k++;
-            i++;
-        }
-        else if (j < B->length && (i >= A->length || B->exps[j] + e > A->exps[i]))
-        {
-            /* only B ok */
-            fmpz_mpoly_mul_johnson(R->coeffs + k, B->coeffs + j, c, ctx);
-            fmpz_mpoly_neg(R->coeffs + k, R->coeffs + k, ctx);
-            R->exps[k] = B->exps[j] + e;
-            k++;
-            j++;
-        }
-        else if (i < A->length && j < B->length && (A->exps[i] == B->exps[j] + e))
-        {
-            fmpz_mpoly_mul_johnson(T, B->coeffs + j, c, ctx);
-            fmpz_mpoly_sub(R->coeffs + k, A->coeffs + i, T, ctx);
-            R->exps[k] = A->exps[i];
-            k += !fmpz_mpoly_is_zero(R->coeffs + k, ctx);
-            i++;
-            j++;
-        } else 
-        {
-            FLINT_ASSERT(0);
-        }
-    }
-
-    fmpz_mpoly_clear(T, ctx);
-    R->length = k;
-}
-
-int fmpz_mpolyu_divides(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
-                                                    const fmpz_mpoly_ctx_t ctx)
-{
-    int ret = 0;
-    fmpz_mpolyu_t P, R;
-    fmpz_mpoly_t t;
-    fmpz_mpoly_init(t, ctx);
-    fmpz_mpolyu_init(P, A->bits, ctx);
-    fmpz_mpolyu_init(R, A->bits, ctx);
-    fmpz_mpolyu_set(R, A, ctx);
-
-    FLINT_ASSERT(B->length > 0);
-
-    while (R->length > 0)
-    {
-        if (R->exps[0] < B->exps[0])
-            goto done;
-
-        if (!fmpz_mpoly_divides_monagan_pearce(t, R->coeffs + 0, B->coeffs + 0, ctx))
-            goto done;
-
-        fmpz_mpolyu_msub(P, R, B, t, R->exps[0] - B->exps[0], ctx);
-        fmpz_mpolyu_swap(P, R, ctx);
-    }
-    ret = 1;
-
-done:
-    fmpz_mpoly_clear(t, ctx);
-    fmpz_mpolyu_clear(P, ctx);
-    fmpz_mpolyu_clear(R, ctx);
-
-    return ret;
-}
-
 
 
 void fmpz_mpolyu_fmpz_content(fmpz_t c, fmpz_mpolyu_t A,

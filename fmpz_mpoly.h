@@ -1055,6 +1055,9 @@ FLINT_DLL void fmpz_mpolyu_zero(fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx);
 FLINT_DLL void fmpz_mpolyu_print_pretty(const fmpz_mpolyu_t poly,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL void fmpz_mpolyuu_print_pretty(const fmpz_mpolyu_t poly,
+                 const char ** x, slong nmainvars, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpolyu_fit_length(fmpz_mpolyu_t A, slong length,
                                                  const fmpz_mpoly_ctx_t uctx);
 
@@ -1092,6 +1095,9 @@ FLINT_DLL void fmpz_mpolyu_set_nmod_mpolyu(
 FLINT_DLL int fmpz_mpolyu_CRT_nmod_mpolyu(mp_bitcnt_t * coeffbits,
                                  fmpz_mpolyu_t H, const fmpz_mpoly_ctx_t ctx,
                        fmpz_t m, nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctxp);
+
+FLINT_DLL int fmpz_mpolyuu_divides(fmpz_mpolyu_t Q, const fmpz_mpolyu_t A,
+           const fmpz_mpolyu_t B, slong nmainvars, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpolyu_divides(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
                                                    const fmpz_mpoly_ctx_t ctx);
