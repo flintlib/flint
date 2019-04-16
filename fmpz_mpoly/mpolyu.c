@@ -357,6 +357,172 @@ void fmpz_mpoly_from_mpolyu_perm_inflate(fmpz_mpoly_t A, mp_bitcnt_t Abits,
 }
 
 
+/*
+    Convert B to A using the variable permutation perm.
+    The uctx should be the context of the coefficients of A.
+    The ctx should be the context of B.
+
+    operation on each term:
+
+    for 0 <= k < m + 2
+        l = perm[k]
+        Aexp[k] = (Bexp[l] - shift[l])/stride[l]
+
+    the most significant main variable uses Aexp[0]
+    the least significant main variable uses Aexp[1]
+    the coefficients of A use variables Aexp[2], ..., Aexp[m + 1]
+*/
+void fmpz_mpoly_to_mpolyuu_perm_deflate(
+    fmpz_mpolyu_t A,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride,
+    const fmpz_mpoly_ctx_t uctx,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, j, k, l;
+    slong n = ctx->minfo->nvars;
+    slong m = uctx->minfo->nvars;
+    slong NA, NB;
+    ulong * uexps;
+    ulong * Bexps;
+    fmpz_mpoly_struct * Ac;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(m + 2 <= n);
+
+    TMP_START;
+
+    uexps = (ulong *) TMP_ALLOC((m + 2)*sizeof(ulong));
+    Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+
+    fmpz_mpolyu_zero(A, uctx);
+
+    NA = mpoly_words_per_exp(A->bits, uctx->minfo);
+    NB = mpoly_words_per_exp(B->bits, ctx->minfo);
+
+    for (j = 0; j < B->length; j++)
+    {
+        mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
+        for (k = 0; k < m + 2; k++)
+        {
+            l = perm[k];
+            FLINT_ASSERT(stride[l] != UWORD(0));
+            FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
+            uexps[k] = (Bexps[l] - shift[l]) / stride[l];
+        }
+        FLINT_ASSERT(FLINT_BIT_COUNT(uexps[0]) < FLINT_BITS/2);
+        FLINT_ASSERT(FLINT_BIT_COUNT(uexps[1]) < FLINT_BITS/2);
+        Ac = _fmpz_mpolyu_get_coeff(A, (uexps[0] << (FLINT_BITS/2)) + uexps[1], uctx);
+        FLINT_ASSERT(Ac->bits == A->bits);
+
+        fmpz_mpoly_fit_length(Ac, Ac->length + 1, uctx);
+        fmpz_set(Ac->coeffs + Ac->length, B->coeffs + j);
+        mpoly_set_monomial_ui(Ac->exps + NA*Ac->length, uexps + 2, A->bits, uctx->minfo);
+        Ac->length++;
+    }
+
+    for (i = 0; i < A->length; i++)
+    {
+        fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+    }
+
+    TMP_END;
+}
+
+
+/*
+    Convert B to A using the variable permutation vector perm.
+    A must be constructed with bits = Abits.
+
+    operation on each term:
+
+        for 0 <= l < n
+            Aexp[l] = shift[l]
+
+        for 0 <= k < m + 2
+            l = perm[k]
+            Aexp[l] += scale[l]*Bexp[k]
+*/
+void fmpz_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
+    fmpz_mpoly_t A,
+    mp_bitcnt_t Abits,
+    const fmpz_mpoly_ctx_t ctx,
+    const fmpz_mpolyu_t B,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride,
+    const fmpz_mpoly_ctx_t uctx)
+{
+    slong n = ctx->minfo->nvars;
+    slong m = uctx->minfo->nvars;
+    slong i, j, k, l;
+    slong NA, NB;
+    slong Alen;
+    fmpz * Acoeff;
+    ulong * Aexp;
+    slong Aalloc;
+    ulong * uexps;
+    ulong * Aexps;
+    TMP_INIT;
+
+    FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT(Abits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(m + 2 <= n);
+    TMP_START;
+
+    uexps = (ulong *) TMP_ALLOC((m + 2)*sizeof(ulong));
+    Aexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+
+    NA = mpoly_words_per_exp(Abits, ctx->minfo);
+    NB = mpoly_words_per_exp(B->bits, uctx->minfo);
+
+    fmpz_mpoly_fit_bits(A, Abits, ctx);
+    A->bits = Abits;
+
+    Acoeff = A->coeffs;
+    Aexp = A->exps;
+    Aalloc = A->alloc;
+    Alen = 0;
+    for (i = 0; i < B->length; i++)
+    {
+        fmpz_mpoly_struct * Bc = B->coeffs + i;
+        _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Bc->length, NA);
+        FLINT_ASSERT(Bc->bits == B->bits);
+
+        for (j = 0; j < Bc->length; j++)
+        {
+            fmpz_set(Acoeff + Alen + j, Bc->coeffs + j);
+            mpoly_get_monomial_ui(uexps + 2, Bc->exps + NB*j, Bc->bits, uctx->minfo);
+            uexps[0] = B->exps[i] >> (FLINT_BITS/2);
+            uexps[1] = B->exps[i] & ((-UWORD(1)) >> (FLINT_BITS - FLINT_BITS/2));
+            for (l = 0; l < n; l++)
+            {
+                Aexps[l] = shift[l];
+            }
+            for (k = 0; k < m + 2; k++)
+            {
+                l = perm[k];
+                Aexps[l] += stride[l]*uexps[k];
+            }
+            mpoly_set_monomial_ui(Aexp + NA*(Alen + j), Aexps, Abits, ctx->minfo);
+        }
+        Alen += Bc->length;
+    }
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->alloc = Aalloc;
+    _fmpz_mpoly_set_length(A, Alen, ctx);
+
+    fmpz_mpoly_sort_terms(A, ctx);
+    TMP_END;
+}
+
+
 
 /*
     Convert B to A using the variable permutation perm.
@@ -841,4 +1007,67 @@ void fmpz_mpolyu_shift_left(fmpz_mpolyu_t A, ulong s)
         FLINT_ASSERT((slong)(A->exps[i] + s) >= 0);
         A->exps[i] += s;
     }
+}
+
+
+int fmpz_mpolyu_content(
+    fmpz_mpoly_t g,
+    const fmpz_mpolyu_t A,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, j;
+    int success;
+    mp_bitcnt_t bits = A->bits;
+
+    FLINT_ASSERT(g->bits == bits);
+
+    if (A->length < 2)
+    {
+        if (A->length == 0)
+        {
+            fmpz_mpoly_zero(g, ctx);
+        }
+        else
+        {
+            fmpz_mpoly_set(g, A->coeffs + 0, ctx);
+        }
+
+        FLINT_ASSERT(g->bits == bits);
+        return 1;
+    }
+
+    j = 0;
+    for (i = 1; i < A->length; i++)
+    {
+        if ((A->coeffs + i)->length < (A->coeffs + j)->length)
+        {
+            j = i;
+        }
+    }
+
+    if (j == 0)
+    {
+        j = 1;
+    }
+    success = _fmpz_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx);
+    if (!success)
+    {
+        return 0;
+    }
+
+    for (i = 1; i < A->length; i++)
+    {
+        if (i == j)
+        {
+            continue;
+        }
+        success = _fmpz_mpoly_gcd(g, bits, g, A->coeffs + i, ctx);
+        FLINT_ASSERT(g->bits == bits);
+        if (!success)
+        {
+            return 0;
+        }
+    }
+
+    return 1;
 }

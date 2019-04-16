@@ -110,6 +110,12 @@ FLINT_DLL void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_t state
 FLINT_DLL void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE
+void nmod_mpoly_ctx_set_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t p)
+{
+    nmodf_ctx_reset(ctx->ffinfo, p);
+}
+
+NMOD_MPOLY_INLINE
 slong nmod_mpoly_ctx_nvars(const nmod_mpoly_ctx_t ctx)
 {
     return ctx->minfo->nvars;
@@ -1235,6 +1241,19 @@ FLINT_DLL slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A,
 FLINT_DLL void nmod_mpolyun_set(nmod_mpolyun_t A, const nmod_mpolyun_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void nmod_mpolyun_one(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL mp_limb_t nmod_mpolyun_leadcoeff_last(nmod_mpolyun_t A,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_set_mod(nmod_mpolyun_t A, const nmod_t mod);
+
+FLINT_DLL void nmod_mpolyun_scalar_mul_nmod(nmod_mpolyun_t A, mp_limb_t c,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpolyun_mul_last(nmod_mpolyun_t A, nmod_poly_t b,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpolyu_cvtto_mpolyun(nmod_mpolyun_t A, nmod_mpolyu_t B,
                                           slong k, const nmod_mpoly_ctx_t ctx);
 
@@ -1302,6 +1321,15 @@ FLINT_DLL void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, mp_limb_t c,
 FLINT_DLL int nmod_mpolyun_addinterp(slong * lastdeg,
              nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyu_t A,
              nmod_poly_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpolyun_gcd_brown_smprime_bivar_ref(
+               nmod_mpolyun_t G, nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar,
+               nmod_mpolyun_t A, nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpolyun_gcd_brown_smprime_bivar(
+               nmod_mpolyun_t G, nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar,
+               nmod_mpolyun_t A, nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx);
+
 
 typedef enum {
     nmod_gcds_success,

@@ -64,7 +64,7 @@ FLINT_DLL void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n);
 
 FLINT_DLL void fmpz_mod_ctx_clear(fmpz_mod_ctx_t ctx);
 
-FMPZ_MOD_INLINE const fmpz * fmpz_mod_ctx_mod(fmpz_mod_ctx_t ctx)
+FMPZ_MOD_INLINE const fmpz * fmpz_mod_ctx_modulus(const fmpz_mod_ctx_t ctx)
 {
     return ctx->n;
 }

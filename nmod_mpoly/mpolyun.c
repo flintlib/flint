@@ -161,6 +161,132 @@ void nmod_mpolyun_set(nmod_mpolyun_t A, const nmod_mpolyun_t B,
     A->length = Blen;
 }
 
+void nmod_mpolyn_one(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
+{
+    nmod_poly_struct * Acoeff;
+    ulong * Aexp;
+    slong N;
+
+    nmod_mpolyn_fit_length(A, 1, ctx);
+    Acoeff = A->coeffs;
+    Aexp = A->exps;
+
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+
+    nmod_poly_one(Acoeff + 0);
+    mpoly_monomial_zero(Aexp + N*0, N);
+
+    A->length = 1;
+}
+
+
+void nmod_mpolyun_one(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(ctx->ffinfo->mod.n > 1);
+    nmod_mpolyun_fit_length(A, 1, ctx);
+    nmod_mpolyn_one(A->coeffs + 0, ctx);
+    A->exps[0] = 0;
+    A->length = 1;
+}
+
+/*
+    get the leading coeff in x_0,...,x_var
+    A is in R[x_0, ... x_(var-1)][x_var]
+*/
+mp_limb_t nmod_mpolyn_leadcoeff_last(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
+{
+    nmod_poly_struct * leadpoly;
+
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(nmod_poly_degree(A->coeffs + 0) >= 0);
+
+    leadpoly = A->coeffs + 0;
+    return leadpoly->coeffs[leadpoly->length - 1];
+}
+
+/*
+    get the leading coeff in X, x_0,...,x_var
+    A is in R[X][x_0, ... x_(var-1)][x_var]
+*/
+mp_limb_t nmod_mpolyun_leadcoeff_last(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(A->length > 0);
+    return nmod_mpolyn_leadcoeff_last(A->coeffs + 0, ctx);
+}
+
+
+void nmod_mpolyun_set_mod(nmod_mpolyun_t A, const nmod_t mod)
+{
+    slong i, j;
+
+    for (i = 0; i < A->alloc; i++)
+    {
+        nmod_mpolyn_struct * Ac = A->coeffs + i;
+        for (j = 0; j < Ac->alloc; j++)
+        {
+            (Ac->coeffs + j)->mod = mod;
+        }
+    }
+}
+
+void nmod_mpolyn_scalar_mul_nmod(
+    nmod_mpolyn_t A,
+    mp_limb_t c,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    for (i = 0; i < A->length; i++)
+    {
+        nmod_poly_scalar_mul_nmod(A->coeffs + i, A->coeffs + i, c);
+    }
+}
+
+void nmod_mpolyun_scalar_mul_nmod(
+    nmod_mpolyun_t A,
+    mp_limb_t c,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    FLINT_ASSERT(c != 0);
+    for (i = 0; i < A->length; i++)
+    {
+        nmod_mpolyn_scalar_mul_nmod(A->coeffs + i, c, ctx);
+    }
+}
+
+/*
+    A *= b
+
+    A is in R[X][x_0,..., x_(v-1)][x_v]
+    b is in R[x_v]
+*/
+void nmod_mpolyun_mul_last(
+    nmod_mpolyun_t A,
+    nmod_poly_t b,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i, j;
+    nmod_poly_t t;
+
+    FLINT_ASSERT(!nmod_poly_is_zero(b));
+    nmod_poly_init_mod(t, ctx->ffinfo->mod);
+
+    for (i = 0; i < A->length; i++)
+    {
+        for (j = 0; j < (A->coeffs + i)->length; j++)
+        {
+            nmod_poly_mul(t, (A->coeffs + i)->coeffs + j, b);
+            nmod_poly_swap(t, (A->coeffs + i)->coeffs + j);
+        }
+    }
+
+    nmod_poly_clear(t);
+}
+
+
+
+
+
 
 /* take the last variable of B out */
 void nmod_mpoly_cvtto_mpolyn(nmod_mpolyn_t A, nmod_mpoly_t B,
