@@ -284,7 +284,60 @@ void nmod_mpolyun_mul_last(
 }
 
 
+int nmod_mpolyn_equal(
+    const nmod_mpolyn_t A,
+    const nmod_mpolyn_t B,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    slong i;
 
+    FLINT_ASSERT(A->bits == B->bits);
+
+    if (A->length != B->length)
+    {
+        return 0;
+    }
+    for (i = 0; i < A->length; i++)
+    {
+        if (!mpoly_monomial_equal(A->exps + N*i, B->exps + N*i, N))
+        {
+            return 0;
+        }
+        if (!nmod_poly_equal(A->coeffs + i, B->coeffs + i))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int nmod_mpolyun_equal(
+    const nmod_mpolyun_t A,
+    const nmod_mpolyun_t B,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    FLINT_ASSERT(A->bits == B->bits);
+
+    if (A->length != B->length)
+    {
+        return 0;
+    }
+    for (i = 0; i < A->length; i++)
+    {
+        if (A->exps[i] != B->exps[i])
+        {
+            return 0;
+        }
+        if (!nmod_mpolyn_equal(A->coeffs + i, B->coeffs + i, ctx))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 
 

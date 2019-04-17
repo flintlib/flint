@@ -492,3 +492,60 @@ void fmpz_mod_mpolyun_scalar_mul_fmpz_mod(
         fmpz_mod_mpolyn_scalar_mul_fmpz_mod(A->coeffs + i, c, ctx, fpctx);
     }
 }
+
+int fmpz_mod_mpolyn_equal(
+    const fmpz_mod_mpolyn_t A,
+    const fmpz_mod_mpolyn_t B,
+    const fmpz_mpoly_ctx_t ctx,
+    const fmpz_mod_ctx_t fpctx)
+{
+    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    slong i;
+
+    FLINT_ASSERT(A->bits == B->bits);
+
+    if (A->length != B->length)
+    {
+        return 0;
+    }
+    for (i = 0; i < A->length; i++)
+    {
+        if (!mpoly_monomial_equal(A->exps + N*i, B->exps + N*i, N))
+        {
+            return 0;
+        }
+        if (!fmpz_mod_poly_equal(A->coeffs + i, B->coeffs + i))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int fmpz_mod_mpolyun_equal(
+    const fmpz_mod_mpolyun_t A,
+    const fmpz_mod_mpolyun_t B,
+    const fmpz_mpoly_ctx_t ctx,
+    const fmpz_mod_ctx_t fpctx)
+{
+    slong i;
+
+    FLINT_ASSERT(A->bits == B->bits);
+
+    if (A->length != B->length)
+    {
+        return 0;
+    }
+    for (i = 0; i < A->length; i++)
+    {
+        if (A->exps[i] != B->exps[i])
+        {
+            return 0;
+        }
+        if (!fmpz_mod_mpolyn_equal(A->coeffs + i, B->coeffs + i, ctx, fpctx))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}

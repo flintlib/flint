@@ -1254,6 +1254,9 @@ FLINT_DLL void nmod_mpolyun_scalar_mul_nmod(nmod_mpolyun_t A, mp_limb_t c,
 FLINT_DLL void nmod_mpolyun_mul_last(nmod_mpolyun_t A, nmod_poly_t b,
                                                    const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int nmod_mpolyun_equal(const nmod_mpolyun_t A,
+                           const nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpolyu_cvtto_mpolyun(nmod_mpolyun_t A, nmod_mpolyu_t B,
                                           slong k, const nmod_mpoly_ctx_t ctx);
 

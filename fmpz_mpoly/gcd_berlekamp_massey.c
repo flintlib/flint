@@ -40,6 +40,12 @@ void mpoly_bma_interpolate_ctx_clear(mpoly_bma_interpolate_ctx_t Ictx)
     nmod_discrete_log_pohlig_hellman_clear(Ictx->dlogenv_sp);
 }
 
+/*
+    If I was formed from evaluations at
+        alpha^alphashift, alpha^(alphashift + 1), ...
+    construct the corresponding mpoly if possible with coeffs in (-p/2, p/2]
+    The substitution degrees and degree bounds in Ictx are used.
+*/
 int nmod_mpoly_bma_get_fmpz_mpoly(
     fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx,
@@ -1465,122 +1471,6 @@ void fmpz_mpolyuu_eval_fmpz_mod(
     fmpz_clear(eval);
 }
 
-
-
-
-int nmod_mpolyn_equal(
-    const nmod_mpolyn_t A,
-    const nmod_mpolyn_t B,
-    const nmod_mpoly_ctx_t ctx)
-{
-    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
-    slong i;
-
-    FLINT_ASSERT(A->bits == B->bits);
-
-    if (A->length != B->length)
-    {
-        return 0;
-    }
-    for (i = 0; i < A->length; i++)
-    {
-        if (!mpoly_monomial_equal(A->exps + N*i, B->exps + N*i, N))
-        {
-            return 0;
-        }
-        if (!nmod_poly_equal(A->coeffs + i, B->coeffs + i))
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int fmpz_mod_mpolyn_equal(
-    const fmpz_mod_mpolyn_t A,
-    const fmpz_mod_mpolyn_t B,
-    const fmpz_mpoly_ctx_t ctx,
-    const fmpz_mod_ctx_t fpctx)
-{
-    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
-    slong i;
-
-    FLINT_ASSERT(A->bits == B->bits);
-
-    if (A->length != B->length)
-    {
-        return 0;
-    }
-    for (i = 0; i < A->length; i++)
-    {
-        if (!mpoly_monomial_equal(A->exps + N*i, B->exps + N*i, N))
-        {
-            return 0;
-        }
-        if (!fmpz_mod_poly_equal(A->coeffs + i, B->coeffs + i))
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-
-int nmod_mpolyun_equal(
-    const nmod_mpolyun_t A,
-    const nmod_mpolyun_t B,
-    const nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-
-    FLINT_ASSERT(A->bits == B->bits);
-
-    if (A->length != B->length)
-    {
-        return 0;
-    }
-    for (i = 0; i < A->length; i++)
-    {
-        if (A->exps[i] != B->exps[i])
-        {
-            return 0;
-        }
-        if (!nmod_mpolyn_equal(A->coeffs + i, B->coeffs + i, ctx))
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-
-int fmpz_mod_mpolyun_equal(
-    const fmpz_mod_mpolyun_t A,
-    const fmpz_mod_mpolyun_t B,
-    const fmpz_mpoly_ctx_t ctx,
-    const fmpz_mod_ctx_t fpctx)
-{
-    slong i;
-
-    FLINT_ASSERT(A->bits == B->bits);
-
-    if (A->length != B->length)
-    {
-        return 0;
-    }
-    for (i = 0; i < A->length; i++)
-    {
-        if (A->exps[i] != B->exps[i])
-        {
-            return 0;
-        }
-        if (!fmpz_mod_mpolyn_equal(A->coeffs + i, B->coeffs + i, ctx, fpctx))
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
 
 mp_limb_t fmpz_mpoly_eval_nmod(
     const nmodf_ctx_t fpctx,

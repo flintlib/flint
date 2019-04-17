@@ -1243,6 +1243,10 @@ FLINT_DLL void fmpz_mod_mpolyun_set_modulus(fmpz_mod_mpolyun_t A,
 FLINT_DLL void fmpz_mod_mpolyun_scalar_mul_fmpz_mod(fmpz_mod_mpolyun_t A,
        const fmpz_t c, const fmpz_mpoly_ctx_t ctx, const fmpz_mod_ctx_t fpctx);
 
+FLINT_DLL int fmpz_mod_mpolyun_equal(
+                    const fmpz_mod_mpolyun_t A, const fmpz_mod_mpolyun_t B,
+                       const fmpz_mpoly_ctx_t ctx, const fmpz_mod_ctx_t fpctx);
+
 FLINT_DLL int fmpz_mod_mpolyun_gcd_brown_bivar(
     fmpz_mod_mpolyun_t G, fmpz_mod_mpolyun_t Abar, fmpz_mod_mpolyun_t Bbar,
     fmpz_mod_mpolyun_t A, fmpz_mod_mpolyun_t B,
