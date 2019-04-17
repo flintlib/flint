@@ -127,7 +127,6 @@ double fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(
     }
     for (i = 0; i < L->num_factors; i++)
     {
-        int success;
         fmpz_t pipow, recp;
 
         Li = L->entries + i;
@@ -154,8 +153,7 @@ double fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(
         fmpz_init_set_ui(pipow, Li->prime);
         fmpz_pow_ui(pipow, pipow, Li->exp);
         fmpz_divexact(recp, L->pm1, pipow);
-        success = fmpz_invmod(temp, recp, pipow);
-        FLINT_ASSERT(success);
+        fmpz_invmod(temp, recp, pipow);
         fmpz_mul(temp, temp, recp);
 
         fmpz_mod(Li->idem, temp, L->pm1);

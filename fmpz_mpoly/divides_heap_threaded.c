@@ -934,7 +934,7 @@ slong _fmpz_mpoly_divides_stripe1(
     slong * hind;
     fmpz_t acc_lg, r;
     ulong acc_sm[3];
-    slong Acoeffbits, Bcoeffbits;
+    slong Acoeffbits;
     ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     int small;
 
@@ -943,8 +943,7 @@ slong _fmpz_mpoly_divides_stripe1(
     FLINT_ASSERT(S->N == 1);
 
     Acoeffbits = _fmpz_vec_max_bits(Acoeff, Alen);
-    Bcoeffbits = _fmpz_vec_max_bits(Bcoeff, Blen);
-    FLINT_ASSERT(S->coeff_bits == FLINT_ABS(Bcoeffbits));
+    FLINT_ASSERT(S->coeff_bits == FLINT_ABS(_fmpz_vec_max_bits(Bcoeff, Blen)));
 
     /* whether intermediate computations A - Q*B will fit in three words */
     /* allow one bit for sign, one bit for subtraction NOT QUITE */
@@ -1272,7 +1271,7 @@ slong _fmpz_mpoly_divides_stripe(
     slong * hind;
     fmpz_t acc_lg, r;
     ulong acc_sm[3];
-    slong Acoeffbits, Bcoeffbits;
+    slong Acoeffbits;
     ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     int small;
 
@@ -1280,8 +1279,7 @@ slong _fmpz_mpoly_divides_stripe(
     FLINT_ASSERT(Blen > 0);
 
     Acoeffbits = _fmpz_vec_max_bits(Acoeff, Alen);
-    Bcoeffbits = _fmpz_vec_max_bits(Bcoeff, Blen);
-    FLINT_ASSERT(S->coeff_bits == FLINT_ABS(Bcoeffbits));
+    FLINT_ASSERT(S->coeff_bits == FLINT_ABS(_fmpz_vec_max_bits(Bcoeff, Blen)));
 
     /* whether intermediate computations A - Q*B will fit in three words */
     /* allow one bit for sign, one bit for subtraction NOT QUITE */

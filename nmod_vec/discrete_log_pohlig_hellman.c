@@ -87,7 +87,6 @@ double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohli
 
     for (i = 0; i < L->num_factors; i++)
     {
-        int success;
         fmpz_t pipow, pm1, temp, recp;
 
         Li = L->entries + i;
@@ -101,15 +100,13 @@ double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohli
         fmpz_pow_ui(pipow, pipow, Li->exp);
         fmpz_init_set_ui(pm1, p - 1);
         fmpz_divexact(recp, pm1, pipow);
-        success = fmpz_invmod(temp, recp, pipow);
-        FLINT_ASSERT(success);
+        fmpz_invmod(temp, recp, pipow);
         fmpz_mul(temp, temp, recp);
 
         Li->idem = fmpz_fdiv_ui(temp, p - 1);
 
         Li->co = fmpz_get_ui(recp);
         Li->startinge = fmpz_get_ui(pipow)/Li->prime;
-
 
         fmpz_clear(pipow);
         fmpz_clear(pm1);
