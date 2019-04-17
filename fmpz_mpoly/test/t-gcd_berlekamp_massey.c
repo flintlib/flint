@@ -156,8 +156,8 @@ main(void)
         /*
             The initial ksub will be
                 x = v^4
-                y = v
-            This kills lc_yt(a) over Z[x,y] in first example, and over Z/pZ[x,y]
+                z = v
+            This kills lc_yt(a) over Z[x,z] in first example, and over Z/pZ[x,z]
             for the first chosen smooth prime in the second example.
         */
         fmpz_mpoly_set_str_pretty(g, "y + t + x^3 + z^3", vars, ctx);
