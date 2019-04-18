@@ -80,9 +80,6 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     fmpz_mpolyu_t Au, Bu, Gu;
     fmpz_mpoly_t Acontent, Bcontent;
     fmpz_mpolyu_t Abar, Bbar, Gbar;
-    TMP_INIT;
-
-    TMP_START;
 
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
@@ -143,10 +140,10 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     /* uctx is context for Z[y_0,...,y_{m-1}]*/
     fmpz_mpoly_ctx_init(uctx, m, ORD_LEX);
 
-    Gshift = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Gshift = (ulong *) flint_malloc(n*sizeof(ulong));
     /* degrees after deflation */
-    Addeg = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-    Bddeg = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    Addeg = (ulong *) flint_malloc(n*sizeof(ulong));
+    Bddeg = (ulong *) flint_malloc(n*sizeof(ulong));
 
     /* fill in a valid zinfo->perm and set deflation values used when converting */
     i = 0;
@@ -341,7 +338,9 @@ cleanup:
 
     flint_randclear(randstate);
 
-    TMP_END;
+    flint_free(Gshift);
+    flint_free(Addeg);
+    flint_free(Bddeg);
 
     return success;
 }
@@ -750,8 +749,7 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     ulong * Bmax_exp, * Bmin_exp;
     slong * Amax_exp_count, * Amin_exp_count;
     slong * Bmax_exp_count, * Bmin_exp_count;
-    ulong * Gstride;
-    TMP_INIT;
+    ulong * Gstride, * Gshift;
 
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
@@ -768,16 +766,16 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
         return _fmpz_mpoly_gcd_monomial(G, Gbits, A, B, ctx);
     }
 
-    TMP_START;
-
-    Amax_exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-    Amin_exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-    Bmax_exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-    Bmin_exp = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
-    Amax_exp_count = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    Amin_exp_count = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    Bmax_exp_count = (slong *) TMP_ALLOC(nvars*sizeof(slong));
-    Bmin_exp_count = (slong *) TMP_ALLOC(nvars*sizeof(slong));
+    Amax_exp = (ulong *) flint_malloc(nvars*sizeof(ulong));
+    Amin_exp = (ulong *) flint_malloc(nvars*sizeof(ulong));
+    Bmax_exp = (ulong *) flint_malloc(nvars*sizeof(ulong));
+    Bmin_exp = (ulong *) flint_malloc(nvars*sizeof(ulong));
+    Amax_exp_count = (slong *) flint_malloc(nvars*sizeof(slong));
+    Amin_exp_count = (slong *) flint_malloc(nvars*sizeof(slong));
+    Bmax_exp_count = (slong *) flint_malloc(nvars*sizeof(slong));
+    Bmin_exp_count = (slong *) flint_malloc(nvars*sizeof(slong));
+    Gstride = (ulong *) flint_malloc(nvars*sizeof(ulong));
+    Gshift = (ulong *) flint_malloc(nvars*sizeof(ulong));
 
     mpoly_gcd_info_limits(Amax_exp, Amin_exp, Amax_exp_count, Amin_exp_count,
                                       A->exps, A->bits, A->length, ctx->minfo);
@@ -815,21 +813,19 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
             gcd is trivial to compute.
         */
         fmpz_t gA, gB;
-        ulong * minexps;
 
         fmpz_init(gA);
         fmpz_init(gB);
         _fmpz_vec_content(gA, A->coeffs, A->length);
         _fmpz_vec_content(gB, B->coeffs, B->length);
 
-        minexps = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
         for (j = 0; j < nvars; j++)
-            minexps[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
+            Gshift[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
 
         fmpz_mpoly_fit_length(G, 1, ctx);
         fmpz_mpoly_fit_bits(G, Gbits, ctx);
         G->bits = Gbits;
-        mpoly_set_monomial_ui(G->exps, minexps, Gbits, ctx->minfo);
+        mpoly_set_monomial_ui(G->exps, Gshift, Gbits, ctx->minfo);
         fmpz_gcd(G->coeffs + 0, gA, gB);
         _fmpz_mpoly_set_length(G, 1, ctx);
 
@@ -863,14 +859,11 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
             The ess(A) and ess(B) depend on only one variable v_in_both
             Calculate gcd using univariates
         */
-        ulong * Gshift;
         fmpz_poly_t a, b, g;
 
-        Gshift = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
         for (j = 0; j < nvars; j++)
             Gshift[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
 
-        Gstride = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
         mpoly_gcd_info_stride(Gstride,
                   A->exps, A->bits, A->length, Amax_exp, Amin_exp,
                   B->exps, B->bits, B->length, Bmax_exp, Bmin_exp, ctx->minfo);
@@ -934,7 +927,6 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     if (success)
         goto cleanup;
 
-    Gstride = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
     mpoly_gcd_info_stride(Gstride,
                   A->exps, A->bits, A->length, Amax_exp, Amin_exp,
                   B->exps, B->bits, B->length, Bmax_exp, Bmin_exp, ctx->minfo);
@@ -950,7 +942,16 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
 
 cleanup:
 
-    TMP_END;
+    flint_free(Amax_exp);
+    flint_free(Amin_exp);
+    flint_free(Bmax_exp);
+    flint_free(Bmin_exp);
+    flint_free(Amax_exp_count);
+    flint_free(Amin_exp_count);
+    flint_free(Bmax_exp_count);
+    flint_free(Bmin_exp_count);
+    flint_free(Gstride);
+    flint_free(Gshift);
 
     return success;
 }
