@@ -199,7 +199,7 @@ main(void)
         slong len, len1, len2;
         slong degbound;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
+        fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(a, ctx);
