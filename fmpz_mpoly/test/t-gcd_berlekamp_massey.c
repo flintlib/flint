@@ -103,7 +103,7 @@ flint_printf("gcd_check returning\n");
 int
 main(void)
 {
-    slong i, j, tmul = 10;
+    slong i, j, tmul = 0;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd_berlekamp_massey....");
@@ -128,6 +128,7 @@ main(void)
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
         gcd_check(g, a, b, ctx, 0, 0, "example");
+return 0;
 
         /*
             The lesser variables are x and z and the gcd degree bounds will be

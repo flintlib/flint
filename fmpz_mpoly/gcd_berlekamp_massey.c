@@ -2455,10 +2455,17 @@ try_again:
         values[i] = n_urandint(state, p);
     }
 
+flint_printf("minor try loop %wd\n", i);
+
+
     degA = fmpz_mpolyuu_eval_all_but_one_nmod(Aeval, A, var, values, ctx);
     degB = fmpz_mpolyuu_eval_all_but_one_nmod(Beval, B, var, values, ctx);
     *Adeg = degA;
     *Bdeg = degB;
+
+flint_printf("minor try loop %wd  degA = %wd, degB = %wd\n", i, degA, degB);
+printf("Aeval: "); nmod_poly_print_pretty(Aeval, "v"); printf("\n");
+printf("Beval: "); nmod_poly_print_pretty(Beval, "v"); printf("\n");
 
     if (degA != nmod_poly_degree(Aeval) || degB != nmod_poly_degree(Beval))
     {
@@ -2477,7 +2484,9 @@ try_again:
         goto try_again;
     }
 
+flint_printf("trying univar gcd\n");
     nmod_poly_gcd(Geval, Aeval, Beval);
+printf("Geval: "); nmod_poly_print_pretty(Geval, "v"); printf("\n");
     degRet = nmod_poly_degree(Geval);
 
 cleanup:
@@ -2816,6 +2825,8 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
 printf("fmpz_mpolyuu_gcd_berlekamp_massey called\n");
 printf("A: "); flint_printf("length %wd in main two vars", A->length); printf("\n");
 printf("B: ");  flint_printf("length %wd in main two vars", B->length); printf("\n");
+printf("A: "); fmpz_mpolyuu_print_pretty(A, NULL, 2, ctx); printf("\n");
+printf("B: ");  fmpz_mpolyuu_print_pretty(B, NULL, 2, ctx); printf("\n");
 printf("Gamma: "); fmpz_mpoly_print_pretty(Gamma, NULL, ctx); printf("\n");
 
     /* let's initialize everything at once to avoid complicated cleanup */
@@ -2890,8 +2901,13 @@ printf("Gamma: "); fmpz_mpoly_print_pretty(Gamma, NULL, ctx); printf("\n");
     /* find a degree bound on G in the two main variables */
     GdegboundXY = FLINT_MIN(A->exps[0], B->exps[0]);
     p_sp = UWORD(1) << (FLINT_BITS - 2);
+printf("finding GdegboundXY\n");
+printf("found GdegboundXY = %016llx\n", GdegboundXY);
+
     for (point_try_count = 0; point_try_count < 10; point_try_count++)
     {
+printf("point try count: %d\n", point_try_count);
+
         p_sp = n_nextprime(p_sp, 1);
         nmod_mpoly_ctx_set_modulus(ctx_sp, p_sp);
         /* unfortunate nmod_poly's need mod set */
@@ -2918,10 +2934,16 @@ printf("Gamma: "); fmpz_mpoly_print_pretty(Gamma, NULL, ctx); printf("\n");
         if (success)
         {
             FLINT_ASSERT(Geval_sp->length > 0);
+
+printf("Geval_sp: "); nmod_mpolyun_print_pretty(Geval_sp, NULL, ctx_sp); printf("\n");
+
             GdegboundXY = nmod_mpolyun_bidegree(Geval_sp, ctx_sp);
             break;
         }
     }
+
+printf("found GdegboundXY = %016llx\n", GdegboundXY);
+
 
     /*
         Find degree bounds on G wrt lesser variables so that
@@ -2933,7 +2955,11 @@ printf("Gamma: "); fmpz_mpoly_print_pretty(Gamma, NULL, ctx); printf("\n");
     mpoly_degrees_si(Gammadegs, Gamma->exps, Gamma->length, bits, ctx->minfo);
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
+flint_printf("finding degree bound minor i = %wd\n", i);
         Gdegbounds[i] = fmpz_mpolyuu_gcd_degree_bound_minor(Adegs + i, Bdegs + i, A, B, i, ctx, randstate);
+
+flint_printf("found degree bound minor Gdegbounds[%wd] = %wd\n", i, Gdegbounds[i]);
+
     }
 
     /*
