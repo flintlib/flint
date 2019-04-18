@@ -27,6 +27,9 @@ void gcd_check(
     fmpz_mpoly_init(cb, ctx);
     fmpz_mpoly_init(cg, ctx);
 
+
+flint_printf("\n\ngcd check i = %wd, j = %wd, %s, nvars = %wd\n", i,j,name,ctx->minfo->nvars);
+
     res = fmpz_mpoly_gcd_berlekamp_massey(g, a, b, ctx);
     fmpz_mpoly_assert_canonical(g, ctx);
 
@@ -92,6 +95,8 @@ cleanup:
     fmpz_mpoly_clear(ca, ctx);
     fmpz_mpoly_clear(cb, ctx);
     fmpz_mpoly_clear(cg, ctx);
+
+flint_printf("gcd_check returning\n");
 }
 
 

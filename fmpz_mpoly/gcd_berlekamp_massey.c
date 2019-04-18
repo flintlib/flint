@@ -2813,6 +2813,11 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
     FLINT_ASSERT(bits == G->bits);
     FLINT_ASSERT(bits == Gamma->bits);
 
+printf("fmpz_mpolyuu_gcd_berlekamp_massey called\n");
+printf("A: "); flint_printf("length %wd in main two vars", A->length); printf("\n");
+printf("B: ");  flint_printf("length %wd in main two vars", B->length); printf("\n");
+printf("Gamma: "); fmpz_mpoly_print_pretty(Gamma, NULL, ctx); printf("\n");
+
     /* let's initialize everything at once to avoid complicated cleanup */
 
     flint_randinit(randstate);
@@ -3006,7 +3011,10 @@ got_ksub:
             goto cleanup;
         }
         fmpz_mul_ui(subprod, subprod, Ictx->subdegs[i]);
+flint_printf("ksub[%wu]: %wu  ", i, Ictx->subdegs[i]);
     }
+flint_printf("\n");
+
 
     /* see if the ksub killed either lc(A) or lc(B) */
     fmpz_mpoly_ksub_content(cAksub, A->coeffs + 0, Ictx->subdegs, ctx);
@@ -3055,6 +3063,9 @@ pick_bma_prime:
         p_sp = fmpz_get_ui(p);
         sshift_sp = 1;
 
+flint_printf("----- bma prime_sp: %wu\n", p_sp);
+
+
         unlucky_count = 0;
         last_unlucky_sshift_plus_1_sp = 0;
 
@@ -3092,6 +3103,9 @@ pick_bma_prime:
         image_count_sp = 0;
 
     next_bma_image_sp:
+
+    flint_printf("next_bma_image_sp %wu sshift_sp %wu\n", image_count_sp, sshift_sp);
+    printf("Lambda: "); nmod_bma_mpoly_print(Lambda_sp); printf("\n");
 
         /* image count is also the current power of alpha we are evaluating */
         image_count_sp++;
@@ -3131,6 +3145,8 @@ pick_bma_prime:
         FLINT_ASSERT(Geval_sp->length > 0);
         GevaldegXY = nmod_mpolyun_bidegree(Geval_sp, ctx_sp);
         nmod_mpolyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
+
+printf("Geval_sp: "); nmod_mpolyun_print_pretty(Geval_sp, NULL, ctx_sp); printf("\n");
 
         FLINT_ASSERT(Gammaeval_sp == nmod_mpolyun_leadcoeff_last(Geval_sp, ctx_sp));
 
@@ -3220,6 +3236,8 @@ pick_bma_prime:
     }
     else
     {
+printf("----- bma prime: "); fmpz_print(p); printf("\n");
+
         fmpz_one(sshift);
 
         unlucky_count = 0;
@@ -3396,6 +3414,8 @@ pick_bma_prime:
     /* assume that H is correct modulo Hmodulus = p */
     fmpz_set(Hmodulus, p);
 
+printf("H("); fmpz_print(Hmodulus); printf("): "); fmpz_mpolyuu_print_pretty(H, NULL, 2, ctx); printf("\n");
+
     /* find number of evals for zip interp */
     FLINT_ASSERT(H->length > 0);
     zip_evals = H->coeffs[0].length;
@@ -3425,6 +3445,8 @@ pick_zip_prime:
     {
         goto pick_zip_prime;
     }
+
+flint_printf("-- zip prime: %wu\n", p_sp);
 
     nmod_mpoly_ctx_set_modulus(ctx_sp, p_sp);
     /* unfortunate nmod_poly's need mod set */
@@ -3508,6 +3530,8 @@ next_zip_image:
     nmod_mpolyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
     FLINT_ASSERT(Gammaeval_sp == nmod_mpolyun_leadcoeff_last(Geval_sp, ctx_sp));
 
+printf("Geval_sp: "); nmod_mpolyun_print_pretty(Geval_sp, NULL, ctx_sp); printf("\n");
+
     /* update the zippler */
     success = nmod_zip_mpolyuu_add_point(Z, Geval_sp);
     if (!success)
@@ -3518,6 +3542,9 @@ next_zip_image:
         */
         goto pick_bma_prime;
     }
+
+printf("Z: "); nmod_zip_mpolyuu_print(Z); printf("\n");
+
     if (Z->pointcount < zip_evals)
     {
         goto next_zip_image;
@@ -3542,6 +3569,8 @@ next_zip_image:
     FLINT_ASSERT(Hbits == H->bits);
     changed = fmpz_mpolyu_addinterp_zip(H, Hmodulus, Z, ctx_sp->ffinfo);
     fmpz_mul_ui(Hmodulus, Hmodulus, ctx_sp->ffinfo->mod.n);
+
+printf("H("); fmpz_print(Hmodulus); printf("): "); fmpz_mpolyuu_print_pretty(H, NULL, 2, ctx); printf("\n");
 
     if (changed)
     {
@@ -3576,6 +3605,8 @@ next_zip_image:
     success = 1;
 
 cleanup:
+
+printf("fmpz_mpolyuu_gcd_berlekamp_massey cleaning up %d\n", success);
 
     fmpz_mpoly_clear(Hcontent, ctx);
     fmpz_mpolyu_clear(H, ctx);
@@ -3655,6 +3686,9 @@ cleanup:
         fmpz_mpolyu_set_bits(G, bits, ctx);
     }
 
+printf("fmpz_mpolyuu_gcd_berlekamp_massey returning %d\n", success);
+printf("G: "); fmpz_mpolyuu_print_pretty(G, NULL, 2, ctx); printf("\n");
+
     return success;
 }
 
@@ -3717,6 +3751,8 @@ int fmpz_mpoly_gcd_berlekamp_massey(
     {
         return fmpz_mpoly_gcd_zippel(G, A, B, ctx);
     }
+
+flint_printf("fmpz_mpoly_gcd_berlekamp_massey called, nvars = %wd\n", ctx->minfo->nvars);
 
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
@@ -3820,6 +3856,8 @@ int fmpz_mpoly_gcd_berlekamp_massey(
 
 cleanup:
 
+flint_printf("fmpz_mpoly_gcd_berlekamp_massey cleaning up %d\n", success);
+
     flint_free(Adegs);
     flint_free(Bdegs);
     flint_free(perm);
@@ -3837,6 +3875,8 @@ cleanup:
     fmpz_mpolyu_clear(Buu, uctx);
     fmpz_mpolyu_clear(Guu, uctx);
     fmpz_mpoly_ctx_clear(uctx);
+
+flint_printf("fmpz_mpoly_gcd_berlekamp_massey returning %d\n", success);
 
     return success;
 }
