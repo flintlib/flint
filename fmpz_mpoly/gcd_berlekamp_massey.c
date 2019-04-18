@@ -2455,7 +2455,7 @@ try_again:
         values[i] = n_urandint(state, p);
     }
 
-flint_printf("minor try loop %wd\n", i);
+flint_printf("minor try loop %wu\n", p);
 
 
     degA = fmpz_mpolyuu_eval_all_but_one_nmod(Aeval, A, var, values, ctx);
@@ -2464,6 +2464,7 @@ flint_printf("minor try loop %wd\n", i);
     *Bdeg = degB;
 
 flint_printf("minor try loop %wd  degA = %wd, degB = %wd\n", i, degA, degB);
+printf("Geval: "); nmod_poly_print_pretty(Geval, "v"); printf("\n");
 printf("Aeval: "); nmod_poly_print_pretty(Aeval, "v"); printf("\n");
 printf("Beval: "); nmod_poly_print_pretty(Beval, "v"); printf("\n");
 
@@ -2484,7 +2485,28 @@ printf("Beval: "); nmod_poly_print_pretty(Beval, "v"); printf("\n");
         goto try_again;
     }
 
-flint_printf("trying univar gcd\n");
+flint_printf("Aeval length: %wd\n", Aeval->length);
+flint_printf("Beval length: %wd\n", Beval->length);
+
+if (Aeval->coeffs[Aeval->length - 1] != WORD(0))
+{
+printf("Aeval is normal\n");
+}
+else
+{
+printf("Aeval is bad!!!!!!!!!!!1\n");
+}
+
+if (Beval->coeffs[Beval->length - 1] != WORD(0))
+{
+printf("Beval is normal\n");
+}
+else
+{
+printf("Beval is bad!!!!!!!!!!!\n");
+}
+
+flint_printf("trying univar gcd - moduli %wu, %wu, %wu\n", Geval->mod.n, Aeval->mod.n, Beval->mod.n);
     nmod_poly_gcd(Geval, Aeval, Beval);
 printf("Geval: "); nmod_poly_print_pretty(Geval, "v"); printf("\n");
     degRet = nmod_poly_degree(Geval);
