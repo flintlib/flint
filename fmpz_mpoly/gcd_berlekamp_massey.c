@@ -2441,7 +2441,7 @@ slong fmpz_mpolyuu_gcd_degree_bound_minor(
 
     TMP_START;
 
-    values = (mp_limb_t *) TMP_ALLOC(ctx->minfo->nvars*sizeof(mp_limb_t));
+    values = (mp_limb_t *) TMP_ALLOC((ctx->minfo->nvars + 2)*sizeof(mp_limb_t));
 
     p = n_nextprime(p, 1);
     nmod_poly_init(Geval, p);
