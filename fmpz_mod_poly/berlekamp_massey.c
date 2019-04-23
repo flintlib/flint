@@ -184,7 +184,10 @@ void fmpz_mod_berlekamp_massey_add_point_ui(
 int fmpz_mod_berlekamp_massey_reduce(
     fmpz_mod_berlekamp_massey_t B)
 {
-    slong i, l, k, queue_len, queue_lo, queue_hi;
+    slong i, l, queue_len, queue_lo, queue_hi;
+#if WANT_ASSERT
+    slong k;
+#endif
 
     /*
         the points in B->points->coeffs[j] for queue_lo <= j < queue_hi need
@@ -229,9 +232,10 @@ int fmpz_mod_berlekamp_massey_reduce(
 
     l = fmpz_mod_poly_degree(B->R0);
     FLINT_ASSERT(B->npoints <= 2*l && l < B->npoints);
-
+#if WANT_ASSERT
     k = B->npoints - l;
     FLINT_ASSERT(0 <= k && k <= l);
+#endif
 
     /*
         (l - k)/2 is the expected number of required euclidean iterations.

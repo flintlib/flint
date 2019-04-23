@@ -2453,6 +2453,12 @@ Products
     of `(x - x_0)(x - x_1) \cdots (x - x_{n-1})`, the roots `x_i` being
     given by ``xs``.
 
+.. function:: void int nmod_poly_find_distinct_nonzero_roots(mp_limb_t * roots, const nmod_poly_t A)
+
+    If ``A`` has `\deg(A)` distinct nonzero roots in `\mathbb{F}_p`, write these roots out to ``roots[0]`` to ``roots[deg(A) - 1]`` and return ``1``.
+    Otherwise, return ``0``. It is assumed that ``A`` is nonzero and that the modulus of ``A`` is prime.
+    This function uses Rabin's probabilistic method via gcd's with `(x + \delta)^{\frac{p-1}{2}} - 1`.
+
 
 Subproduct trees
 --------------------------------------------------------------------------------

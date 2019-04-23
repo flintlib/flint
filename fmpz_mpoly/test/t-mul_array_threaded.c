@@ -19,8 +19,8 @@ int
 main(void)
 {
     int i, j, result, max_threads = 5;
-    FLINT_TEST_INIT(state);
     int tmul = 20;
+    FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;
 #endif
