@@ -144,8 +144,6 @@ FLINT_DLL void flint_set_abort(void (*func)(void));
     #define FLINT_D_BITS 31
 #endif
 
-#define mp_bitcnt_t ulong
-
 #if HAVE_TLS
 #if __STDC_VERSION__ >= 201112L
 #define FLINT_TLS_PREFIX _Thread_local
