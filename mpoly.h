@@ -505,6 +505,17 @@ void mpoly_monomial_set(ulong * exp2, const ulong * exp3, slong N)
 }
 
 MPOLY_INLINE
+void mpoly_monomial_set_extra(ulong * exp2, const ulong * exp3,
+                                            slong N, slong offset, ulong extra)
+{
+    slong i;
+    for (i = 0; i < N; i++)
+    {
+        exp2[i] = exp3[i] + (i == offset ? extra : 0);
+    }
+}
+
+MPOLY_INLINE
 void mpoly_copy_monomials(ulong * exp1, const ulong * exp2, slong len, slong N)
 {
     memcpy(exp1, exp2, N*len*sizeof(ulong));
@@ -561,6 +572,22 @@ int mpoly_monomial_equal(const ulong * exp2, const ulong * exp3, slong N)
    for (i = 0; i < N; i++)
    {
       if (exp2[i] != exp3[i])
+         return 0;
+   }
+
+   return 1;
+}
+
+MPOLY_INLINE
+int mpoly_monomial_equal_extra(const ulong * exp2, const ulong * exp3,
+                                            slong N, slong offset, ulong extra)
+{
+   slong i;
+
+   for (i = 0; i < N; i++)
+   {
+      ulong e3 = exp3[i] + ((i == offset) ? extra : 0);
+      if (exp2[i] != e3)
          return 0;
    }
 
@@ -647,6 +674,36 @@ int mpoly_monomial_gt_nomask(const ulong * exp2, const ulong * exp3, slong N)
 }
 
 MPOLY_INLINE
+int mpoly_monomial_lt_nomask_extra(const ulong * exp2, const ulong * exp3,
+                                            slong N, slong offset, ulong extra)
+{
+    slong i = N - 1;
+    do {
+        ulong e3 = exp3[i] + ((i == offset) ? extra : 0);
+        if (exp2[i] != e3)
+        {
+            return exp2[i] < e3;
+        }
+    } while (--i >= 0);
+    return 0;
+}
+ 
+MPOLY_INLINE
+int mpoly_monomial_gt_nomask_extra(const ulong * exp2, const ulong * exp3,
+                                            slong N, slong offset, ulong extra)
+{
+    slong i = N - 1;
+    do {
+        ulong e3 = exp3[i] + ((i == offset) ? extra : 0);
+        if (exp2[i] != e3)
+        {
+            return exp2[i] > e3;
+        }
+    } while (--i >= 0);
+    return 0;
+}
+
+MPOLY_INLINE
 int mpoly_monomial_cmp(const ulong * exp2, const ulong * exp3,
                                                 slong N, const ulong * cmpmask)
 {
@@ -671,6 +728,24 @@ int mpoly_monomial_cmp_nomask(const ulong * exp2, const ulong * exp3, slong N)
         if (exp2[i] != exp3[i])
         {
             if (exp2[i] > exp3[i])
+                return 1;
+            else
+                return -1;
+        }
+    } while (--i >= 0);
+    return 0;
+}
+
+MPOLY_INLINE
+int mpoly_monomial_cmp_nomask_extra(const ulong * exp2, const ulong * exp3,
+                                            slong N, slong offset, ulong extra)
+{
+    slong i = N - 1;
+    do {
+        ulong e3 = exp3[i] + ((i == offset) ? extra : 0);
+        if (exp2[i] != e3)
+        {
+            if (exp2[i] > e3)
                 return 1;
             else
                 return -1;

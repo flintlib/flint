@@ -11,6 +11,97 @@
 
 #include "nmod_mpoly.h"
 
+
+void nmod_mpoly_to_nmod_poly_keepbits(
+    nmod_poly_t A,
+    slong * Ashift,
+    const nmod_mpoly_t B,
+    slong var,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i, shift, off, N;
+    slong _Ashift = 0, len = B->length;
+    mp_limb_t * coeff = B->coeffs;
+    ulong * exp = B->exps;
+    mp_bitcnt_t bits = B->bits;
+
+    FLINT_ASSERT(bits <= FLINT_BITS);
+
+    N = mpoly_words_per_exp(bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&off, &shift, var, bits, ctx->minfo);
+
+    nmod_poly_zero(A);
+    if (len > 0)
+    {
+        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+        _Ashift = (exp[N*(len - 1)] >> shift) & mask;
+        for (i = 0; i < len; i++)
+        {
+            ulong k = ((exp[N*i + off] >> shift) & mask) - _Ashift;
+            FLINT_ASSERT(((slong)k) >= 0);
+            nmod_poly_set_coeff_ui(A, k, coeff[i]);
+        }
+    }
+
+    *Ashift = _Ashift;
+}
+
+void nmod_mpoly_from_nmod_poly_keepbits(
+    nmod_mpoly_t A,
+    const nmod_poly_t B,
+    slong Bshift,
+    slong var,
+    mp_bitcnt_t bits,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong N;
+    slong k;
+    slong Alen;
+    mp_limb_t * Acoeff;
+    ulong * Aexp;
+    slong Aalloc;
+    ulong * one;
+    TMP_INIT;
+
+    TMP_START;
+
+    FLINT_ASSERT(bits <= FLINT_BITS);
+    FLINT_ASSERT(!nmod_poly_is_zero(B));
+    FLINT_ASSERT(Bshift >= 0);
+    FLINT_ASSERT(Bshift + nmod_poly_degree(B) >= 0);
+    FLINT_ASSERT(1 + FLINT_BIT_COUNT(Bshift + nmod_poly_degree(B)) <= bits);
+
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
+    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_gen_monomial_sp(one, var, bits, ctx->minfo);
+
+    nmod_mpoly_fit_bits(A, bits, ctx);
+    A->bits = bits;
+
+    Acoeff = A->coeffs;
+    Aexp = A->exps;
+    Aalloc = A->alloc;
+    Alen = 0;
+    for (k = nmod_poly_degree(B); k >= 0; k--)
+    {
+        _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
+        mpoly_monomial_mul_ui(Aexp + N*Alen, one, N, k + Bshift);
+        Acoeff[Alen] = nmod_poly_get_coeff_ui(B, k);
+        Alen += Acoeff[Alen] != UWORD(0);
+    }
+
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->alloc = Aalloc;
+    _nmod_mpoly_set_length(A, Alen, ctx);
+
+    TMP_END;
+}
+
+
+
+
+
 /*
     set A(var) to B/xbar^Bshifts
     it is asserted that the conversion is correct

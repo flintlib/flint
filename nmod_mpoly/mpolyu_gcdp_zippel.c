@@ -661,8 +661,8 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
     nmod_mpolyun_divexact_last(An, a, ctx);
     nmod_mpolyun_divexact_last(Bn, b, ctx);
     nmod_poly_gcd(c, a, b);
-    nmod_poly_gcd(g, nmod_mpolyun_leadcoeff_ref(An, ctx),
-                     nmod_mpolyun_leadcoeff_ref(Bn, ctx));
+    nmod_poly_gcd(g, nmod_mpolyun_leadcoeff_poly(An, ctx),
+                     nmod_mpolyun_leadcoeff_poly(Bn, ctx));
     Alastdeg = nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
 
@@ -869,8 +869,8 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
     nmod_mpolyun_divexact_last(An, a, ctx);
     nmod_mpolyun_divexact_last(Bn, b, ctx);
     nmod_poly_gcd(c, a, b);
-    nmod_poly_gcd(g, nmod_mpolyun_leadcoeff_ref(An, ctx),
-                     nmod_mpolyun_leadcoeff_ref(Bn, ctx));
+    nmod_poly_gcd(g, nmod_mpolyun_leadcoeff_poly(An, ctx),
+                     nmod_mpolyun_leadcoeff_poly(Bn, ctx));
     Alastdeg = nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
 

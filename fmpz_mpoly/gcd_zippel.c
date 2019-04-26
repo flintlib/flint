@@ -252,7 +252,7 @@ choose_prime_inner:
     }
 
     fmpz_mpolyu_fmpz_content(pp, H, ctx);
-    fmpz_mpolyu_scalar_divexact_fmpz(G, H, pp, ctx);
+    fmpz_mpolyu_divexact_fmpz(G, H, pp, ctx);
 
     if (!fmpz_mpolyu_divides(A, G, ctx) || !fmpz_mpolyu_divides(B, G, ctx))
         goto choose_prime_inner;
@@ -345,84 +345,6 @@ finished:
     fmpz_mpoly_clear(content, ctx);
 
     return 1;
-}
-
-
-
-void fmpz_mpoly_to_fmpz_poly_keepbits(fmpz_poly_t A, slong * Ashift,
-               const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, shift, off, N;
-    slong _Ashift = 0, len = B->length;
-    fmpz * coeff = B->coeffs;
-    ulong * exp = B->exps;
-    mp_bitcnt_t bits = B->bits;
-
-    FLINT_ASSERT(bits <= FLINT_BITS);
-
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-    mpoly_gen_offset_shift_sp(&off, &shift, var, bits, ctx->minfo);
-
-    fmpz_poly_zero(A);
-    if (len > 0)
-    {
-        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-        _Ashift = (exp[N*(len - 1)] >> shift) & mask;
-        for (i = 0; i < len; i++)
-        {
-            ulong k = ((exp[N*i + off] >> shift) & mask) - _Ashift;
-            FLINT_ASSERT(((slong)k) >= 0);
-            fmpz_poly_set_coeff_fmpz(A, k, coeff + i);
-        }
-    }
-
-    *Ashift = _Ashift;
-}
-
-void fmpz_mpoly_from_fmpz_poly_keepbits(fmpz_mpoly_t A, const fmpz_poly_t B,
-                           slong Bshift, slong var, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
-{
-    slong N;
-    slong k;
-    slong Alen;
-    fmpz * Acoeff;
-    ulong * Aexp;
-    slong Aalloc;
-    ulong * one;
-    TMP_INIT;
-
-    TMP_START;
-
-    FLINT_ASSERT(bits <= FLINT_BITS);
-    FLINT_ASSERT(!fmpz_poly_is_zero(B));
-    FLINT_ASSERT(Bshift >= 0);
-    FLINT_ASSERT(1 + FLINT_BIT_COUNT(Bshift + fmpz_poly_degree(B)) <= bits);
-    
-    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
-    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_monomial_sp(one, var, bits, ctx->minfo);
-
-    fmpz_mpoly_fit_bits(A, bits, ctx);
-    A->bits = bits;
-
-    Acoeff = A->coeffs;
-    Aexp = A->exps;
-    Aalloc = A->alloc;
-    Alen = 0;
-    for (k = fmpz_poly_degree(B); k >= 0; k--)
-    {
-        _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + 1, N);
-        mpoly_monomial_mul_ui(Aexp + N*Alen, one, N, k + Bshift);
-        fmpz_poly_get_coeff_fmpz(Acoeff + Alen, B, k);
-        Alen += !fmpz_is_zero(Acoeff + Alen);
-    }
-
-    A->coeffs = Acoeff;
-    A->exps = Aexp;
-    A->alloc = Aalloc;
-    _fmpz_mpoly_set_length(A, Alen, ctx);
-
-    TMP_END;
 }
 
 

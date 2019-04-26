@@ -802,13 +802,13 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(fq_nmod_mpolyu_t G,
     fq_nmod_poly_init(g, ctx->fqctx);
 
     /* if the gcd has content wrt last variable, we are going to fail */
-    fq_nmod_mpolyun_content_last(a, An, ctx);
-    fq_nmod_mpolyun_content_last(b, Bn, ctx);
-    fq_nmod_mpolyun_divexact_last(An, a, ctx);
-    fq_nmod_mpolyun_divexact_last(Bn, b, ctx);
+    fq_nmod_mpolyun_content_poly(a, An, ctx);
+    fq_nmod_mpolyun_content_poly(b, Bn, ctx);
+    fq_nmod_mpolyun_divexact_poly(An, An, a, ctx);
+    fq_nmod_mpolyun_divexact_poly(Bn, Bn, b, ctx);
     fq_nmod_poly_gcd(c, a, b, ctx->fqctx);
-    fq_nmod_poly_gcd(g, fq_nmod_mpolyun_leadcoeff_ref(An, ctx),
-                        fq_nmod_mpolyun_leadcoeff_ref(Bn, ctx), ctx->fqctx);
+    fq_nmod_poly_gcd(g, fq_nmod_mpolyun_leadcoeff_poly(An, ctx),
+                        fq_nmod_mpolyun_leadcoeff_poly(Bn, ctx), ctx->fqctx);
     Alastdeg = fq_nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = fq_nmod_mpolyun_lastdeg(Bn, ctx);
 
@@ -895,7 +895,7 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(fq_nmod_mpolyu_t G,
         }
 
         /* update interpolant H */
-        fq_nmod_inv(temp, fq_nmod_mpolyu_leadcoeff_ref(Geval, ctx), ctx->fqctx);
+        fq_nmod_inv(temp, fq_nmod_mpolyu_leadcoeff(Geval, ctx), ctx->fqctx);
         fq_nmod_mul(temp, geval, temp, ctx->fqctx);
         fq_nmod_mpolyu_scalar_mul_fq_nmod(Geval, temp, ctx);
 
@@ -918,9 +918,8 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(fq_nmod_mpolyu_t G,
 
             if (!changed || have_enough)
             {
-                fq_nmod_mpolyun_content_last(a, H, ctx);
-                fq_nmod_mpolyun_mul_poly(Ht, H, c, ctx);
-                fq_nmod_mpolyun_divexact_last(Ht, a, ctx);
+                fq_nmod_mpolyun_content_poly(a, H, ctx);
+                fq_nmod_mpolyun_divexact_poly(Ht, H, a, ctx);
                 fq_nmod_mpolyun_shift_left(Ht, ABminshift);
                 fq_nmod_mpolyu_cvtfrom_mpolyun(G, Ht, var, ctx);
                 if (    fq_nmod_mpolyu_divides(A, G, ctx)
@@ -1035,13 +1034,13 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
     fq_nmod_poly_init(g, ctx->fqctx);
 
     /* if the gcd has content wrt last variable, we are going to fail */
-    fq_nmod_mpolyun_content_last(a, An, ctx);
-    fq_nmod_mpolyun_content_last(b, Bn, ctx);
-    fq_nmod_mpolyun_divexact_last(An, a, ctx);
-    fq_nmod_mpolyun_divexact_last(Bn, b, ctx);
+    fq_nmod_mpolyun_content_poly(a, An, ctx);
+    fq_nmod_mpolyun_content_poly(b, Bn, ctx);
+    fq_nmod_mpolyun_divexact_poly(An, An, a, ctx);
+    fq_nmod_mpolyun_divexact_poly(Bn, Bn, b, ctx);
     fq_nmod_poly_gcd(c, a, b, ctx->fqctx);
-    fq_nmod_poly_gcd(g, fq_nmod_mpolyun_leadcoeff_ref(An, ctx),
-                        fq_nmod_mpolyun_leadcoeff_ref(Bn, ctx), ctx->fqctx);
+    fq_nmod_poly_gcd(g, fq_nmod_mpolyun_leadcoeff_poly(An, ctx),
+                        fq_nmod_mpolyun_leadcoeff_poly(Bn, ctx), ctx->fqctx);
     Alastdeg = fq_nmod_mpolyun_lastdeg(An, ctx);
     Blastdeg = fq_nmod_mpolyun_lastdeg(Bn, ctx);
 
@@ -1146,7 +1145,7 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
         }
 
         /* update interpolant H */
-        fq_nmod_inv(temp, fq_nmod_mpolyu_leadcoeff_ref(Geval, ctx), ctx->fqctx);
+        fq_nmod_inv(temp, fq_nmod_mpolyu_leadcoeff(Geval, ctx), ctx->fqctx);
         fq_nmod_mul(temp, geval, temp, ctx->fqctx);
         fq_nmod_mpolyu_scalar_mul_fq_nmod(Geval, temp, ctx);
         if (fq_nmod_poly_degree(modulus, ctx->fqctx) > 0)
@@ -1158,9 +1157,8 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
                                                           modulus, alpha, ctx);
             if (!changed)
             {
-                fq_nmod_mpolyun_content_last(a, H, ctx);
-                fq_nmod_mpolyun_mul_poly(Ht, H, c, ctx);
-                fq_nmod_mpolyun_divexact_last(Ht, a, ctx);
+                fq_nmod_mpolyun_content_poly(a, H, ctx);
+                fq_nmod_mpolyun_divexact_poly(Ht, H, a, ctx);
                 fq_nmod_mpolyun_shift_left(Ht, ABminshift);
                 fq_nmod_mpolyu_cvtfrom_mpolyun(G, Ht, var, ctx);
                 if (    !fq_nmod_mpolyu_divides(A, G, ctx)
@@ -1228,7 +1226,7 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
                     (void)(NULL);
             }
 
-            if (fq_nmod_is_zero(fq_nmod_mpolyu_leadcoeff_ref(Geval, ctx),
+            if (fq_nmod_is_zero(fq_nmod_mpolyu_leadcoeff(Geval, ctx),
                                                                    ctx->fqctx))
             {
                 goto inner_continue;
@@ -1237,7 +1235,7 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
             /* update interpolant H */
             FLINT_ASSERT(fq_nmod_poly_degree(modulus, ctx->fqctx) > 0);
 
-            fq_nmod_inv(temp, fq_nmod_mpolyu_leadcoeff_ref(Geval, ctx),
+            fq_nmod_inv(temp, fq_nmod_mpolyu_leadcoeff(Geval, ctx),
                                                                    ctx->fqctx);
             fq_nmod_mul(temp, temp, geval, ctx->fqctx);
             fq_nmod_mpolyu_scalar_mul_fq_nmod(Geval, temp, ctx);
@@ -1260,9 +1258,8 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
 
             if (!changed || have_enough)
             {
-                fq_nmod_mpolyun_content_last(a, H, ctx);
-                fq_nmod_mpolyun_mul_poly(Ht, H, c, ctx);
-                fq_nmod_mpolyun_divexact_last(Ht, a, ctx);
+                fq_nmod_mpolyun_content_poly(a, H, ctx);
+                fq_nmod_mpolyun_divexact_poly(Ht, H, a, ctx);
                 fq_nmod_mpolyun_shift_left(Ht, ABminshift);
                 fq_nmod_mpolyu_cvtfrom_mpolyun(G, Ht, var, ctx);
                 if (    fq_nmod_mpolyu_divides(A, G, ctx)

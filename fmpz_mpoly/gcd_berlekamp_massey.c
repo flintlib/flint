@@ -3132,7 +3132,7 @@ pick_bma_prime:
         GevaldegXY = nmod_mpolyun_bidegree(Geval_sp, ctx_sp);
         nmod_mpolyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
 
-        FLINT_ASSERT(Gammaeval_sp == nmod_mpolyun_leadcoeff_last(Geval_sp, ctx_sp));
+        FLINT_ASSERT(Gammaeval_sp == nmod_mpolyun_leadcoeff(Geval_sp, ctx_sp));
 
         if (GdegboundXY < GevaldegXY)
         {
@@ -3506,7 +3506,7 @@ next_zip_image:
     }
 
     nmod_mpolyun_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
-    FLINT_ASSERT(Gammaeval_sp == nmod_mpolyun_leadcoeff_last(Geval_sp, ctx_sp));
+    FLINT_ASSERT(Gammaeval_sp == nmod_mpolyun_leadcoeff(Geval_sp, ctx_sp));
 
     /* update the zippler */
     success = nmod_zip_mpolyuu_add_point(Z, Geval_sp);
@@ -3549,7 +3549,7 @@ next_zip_image:
         goto pick_zip_prime;
     }
 
-    success = fmpz_mpolyu_content(Hcontent, H, ctx);
+    success = fmpz_mpolyu_content_mpoly(Hcontent, H, ctx);
     FLINT_ASSERT(Hcontent->bits == Hbits);
     if (!success)
     {
@@ -3786,8 +3786,8 @@ int fmpz_mpoly_gcd_berlekamp_massey(
     fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, perm, shift, stride, uctx, B, ctx);
 
     /* remove content from A and B */
-    success = fmpz_mpolyu_content(Acontent, Auu, uctx);
-    success = success && fmpz_mpolyu_content(Bcontent, Buu, uctx);
+    success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx);
+    success = success && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx);
     if (!success)
         goto cleanup;
     fmpz_mpolyu_divexact_mpoly(Abar, Auu, Acontent, uctx);
