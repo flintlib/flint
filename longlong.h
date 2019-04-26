@@ -376,12 +376,12 @@
     add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                      \
   } while (0)
 
-#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)      \
-  do {                                                                        \
-    mp_limb_t __t;                                                            \
-    add_sssaaaaaa(__t, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0); \
-    add_ssaaaa(s3, s2, a3, a2, b3, b2);                                       \
-    add_ssaaaa(s3, s2, s3, s2, (mp_limb_t) 0, __t);                           \
+#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)       \
+  do {                                                                         \
+    mp_limb_t __tt;                                                            \
+    add_sssaaaaaa(__tt, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0); \
+    add_ssaaaa(s3, s2, a3, a2, b3, b2);                                        \
+    add_ssaaaa(s3, s2, s3, s2, (mp_limb_t) 0, __tt);                           \
   } while (0)
 
 
