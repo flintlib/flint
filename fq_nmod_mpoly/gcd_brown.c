@@ -53,23 +53,6 @@ int fq_nmod_mpoly_gcd_brown(
         return 0;
     }
 
-    if (ctx->minfo->nvars == 1)
-    {
-        slong shiftA, shiftB;
-        fq_nmod_poly_t a, b, g;
-        fq_nmod_poly_init(a, ctx->fqctx);
-        fq_nmod_poly_init(b, ctx->fqctx);
-        fq_nmod_poly_init(g, ctx->fqctx);
-        fq_nmod_mpoly_to_fq_nmod_poly_keepbits(a, &shiftA, A, 0, ctx);
-        fq_nmod_mpoly_to_fq_nmod_poly_keepbits(b, &shiftB, B, 0, ctx);
-        fq_nmod_poly_gcd(g, a, b, ctx->fqctx);
-        fq_nmod_mpoly_from_fq_nmod_poly_keepbits(G, g, FLINT_MIN(shiftA, shiftB), 0, A->bits, ctx);
-        fq_nmod_poly_clear(a, ctx->fqctx);
-        fq_nmod_poly_clear(b, ctx->fqctx);
-        fq_nmod_poly_clear(g, ctx->fqctx);
-        return 1;
-    }
-
     perm = (slong *) flint_malloc(ctx->minfo->nvars*sizeof(slong));
     shift = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
     stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
@@ -78,6 +61,23 @@ int fq_nmod_mpoly_gcd_brown(
         perm[i] = i + 1 < ctx->minfo->nvars ? i + 1 : 0;
         shift[i] = 0;
         stride[i] = 1;
+    }
+
+    if (ctx->minfo->nvars == 1)
+    {
+        fq_nmod_poly_t a, b, g;
+        fq_nmod_poly_init(a, ctx->fqctx);
+        fq_nmod_poly_init(b, ctx->fqctx);
+        fq_nmod_poly_init(g, ctx->fqctx);
+        _fq_nmod_mpoly_to_fq_nmod_poly_deflate(a, A, 0, shift, stride, ctx);
+        _fq_nmod_mpoly_to_fq_nmod_poly_deflate(b, B, 0, shift, stride, ctx);
+        fq_nmod_poly_gcd(g, a, b, ctx->fqctx);
+        _fq_nmod_mpoly_from_fq_nmod_poly_inflate(G, A->bits, g, 0, shift, stride, ctx);
+        fq_nmod_poly_clear(a, ctx->fqctx);
+        fq_nmod_poly_clear(b, ctx->fqctx);
+        fq_nmod_poly_clear(g, ctx->fqctx);
+        success = 1;
+        goto cleanup1;
     }
 
     new_bits = FLINT_MAX(A->bits, B->bits);
@@ -111,6 +111,8 @@ int fq_nmod_mpoly_gcd_brown(
     fq_nmod_mpolyun_clear(Abarn, uctx);
     fq_nmod_mpolyun_clear(Bbarn, uctx);
     fq_nmod_mpoly_ctx_clear(uctx);
+
+cleanup1:
 
     flint_free(perm);
     flint_free(shift);

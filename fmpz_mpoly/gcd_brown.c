@@ -1495,23 +1495,6 @@ int fmpz_mpoly_gcd_brown(
         return 0;
     }
 
-    if (ctx->minfo->nvars == 1)
-    {
-        slong shiftA, shiftB;
-        fmpz_poly_t a, b, g;
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(g);
-        fmpz_mpoly_to_fmpz_poly_keepbits(a, &shiftA, A, 0, ctx);
-        fmpz_mpoly_to_fmpz_poly_keepbits(b, &shiftB, B, 0, ctx);
-        fmpz_poly_gcd(g, a, b);
-        fmpz_mpoly_from_fmpz_poly_keepbits(G, g, FLINT_MIN(shiftA, shiftB), 0, A->bits, ctx);
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(g);
-        return 1;
-    }
-
     perm = (slong *) flint_malloc(ctx->minfo->nvars*sizeof(slong));
     shift = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
     stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
@@ -1520,6 +1503,23 @@ int fmpz_mpoly_gcd_brown(
         perm[i] = i + 1 < ctx->minfo->nvars ? i + 1 : 0;
         shift[i] = 0;
         stride[i] = 1;
+    }
+
+    if (ctx->minfo->nvars == 1)
+    {
+        fmpz_poly_t a, b, g;
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(g);
+        _fmpz_mpoly_to_fmpz_poly_deflate(a, A, 0, shift, stride, ctx);
+        _fmpz_mpoly_to_fmpz_poly_deflate(b, B, 0, shift, stride, ctx);
+        fmpz_poly_gcd(g, a, b);
+        _fmpz_mpoly_from_fmpz_poly_inflate(G, A->bits, g, 0, shift, stride, ctx);
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(g);
+        success = 1;
+        goto cleanup1;
     }
 
     new_bits = FLINT_MAX(A->bits, B->bits);
@@ -1563,6 +1563,8 @@ int fmpz_mpoly_gcd_brown(
     fmpz_mpolyu_clear(Abaru, uctx);
     fmpz_mpolyu_clear(Bbaru, uctx);
     fmpz_mpoly_ctx_clear(uctx);
+
+cleanup1:
 
     flint_free(perm);
     flint_free(shift);

@@ -772,13 +772,6 @@ FLINT_DLL void fq_nmod_mpoly_inflate(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
 
 ******************************************************************************/
 
-FLINT_DLL void fq_nmod_mpoly_to_fq_nmod_poly_keepbits(fq_nmod_poly_t A, slong * Ashift,
-             const fq_nmod_mpoly_t B, slong var, const fq_nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fq_nmod_mpoly_from_fq_nmod_poly_keepbits(fq_nmod_mpoly_t A,
-         const fq_nmod_poly_t B, slong Bshift, slong var, mp_bitcnt_t bits,
-                                                 const fq_nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void _fq_nmod_mpoly_to_fq_nmod_poly_deflate(fq_nmod_poly_t A,
                    const fq_nmod_mpoly_t B, slong var, const ulong * Bshift,
                          const ulong * Bstride, const fq_nmod_mpoly_ctx_t ctx);

@@ -53,23 +53,6 @@ int nmod_mpoly_gcd_brown(
         return 0;
     }
 
-    if (ctx->minfo->nvars == 1)
-    {
-        slong shiftA, shiftB;
-        nmod_poly_t a, b, g;
-        nmod_poly_init(a, ctx->ffinfo->mod.n);
-        nmod_poly_init(b, ctx->ffinfo->mod.n);
-        nmod_poly_init(g, ctx->ffinfo->mod.n);
-        nmod_mpoly_to_nmod_poly_keepbits(a, &shiftA, A, 0, ctx);
-        nmod_mpoly_to_nmod_poly_keepbits(b, &shiftB, B, 0, ctx);
-        nmod_poly_gcd(g, a, b);
-        nmod_mpoly_from_nmod_poly_keepbits(G, g, FLINT_MIN(shiftA, shiftB), 0, A->bits, ctx);
-        nmod_poly_clear(a);
-        nmod_poly_clear(b);
-        nmod_poly_clear(g);
-        return 1;
-    }
-
     perm = (slong *) flint_malloc(ctx->minfo->nvars*sizeof(slong));
     shift = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
     stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
@@ -78,6 +61,23 @@ int nmod_mpoly_gcd_brown(
         perm[i] = i + 1 < ctx->minfo->nvars ? i + 1 : 0;
         shift[i] = 0;
         stride[i] = 1;
+    }
+
+    if (ctx->minfo->nvars == 1)
+    {
+        nmod_poly_t a, b, g;
+        nmod_poly_init(a, ctx->ffinfo->mod.n);
+        nmod_poly_init(b, ctx->ffinfo->mod.n);
+        nmod_poly_init(g, ctx->ffinfo->mod.n);
+        _nmod_mpoly_to_nmod_poly_deflate(a, A, 0, shift, stride, ctx);
+        _nmod_mpoly_to_nmod_poly_deflate(b, B, 0, shift, stride, ctx);
+        nmod_poly_gcd(g, a, b);
+        _nmod_mpoly_from_nmod_poly_inflate(G, A->bits, g, 0, shift, stride, ctx);
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(g);
+        success = 1;
+        goto cleanup1;
     }
 
     new_bits = FLINT_MAX(A->bits, B->bits);
@@ -116,6 +116,8 @@ int nmod_mpoly_gcd_brown(
     nmod_mpolyun_clear(Abarn, uctx);
     nmod_mpolyun_clear(Bbarn, uctx);
     nmod_mpoly_ctx_clear(uctx);
+
+cleanup1:
 
     flint_free(perm);
     flint_free(shift);

@@ -974,12 +974,6 @@ FLINT_DLL int fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1,
             const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_to_fmpz_poly_keepbits(fmpz_poly_t A, slong * Ashift,
-               const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_from_fmpz_poly_keepbits(fmpz_mpoly_t A, const fmpz_poly_t B,
-                           slong Bshift, slong var, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * shift1,
               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 

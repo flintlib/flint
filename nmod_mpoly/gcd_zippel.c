@@ -550,9 +550,13 @@ finished:
 }
 
 
-int _nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
-                              const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
-                                         int keepbits, flint_rand_t randstate)
+int _nmod_mpoly_gcd_zippel(
+    nmod_mpoly_t G,
+    const nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
+    int keepbits,
+    flint_rand_t randstate)
 {
     slong i;
     int ret, success = 0;
@@ -568,19 +572,32 @@ int _nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
     FLINT_ASSERT(!nmod_mpoly_is_zero(A, ctx));
     FLINT_ASSERT(!nmod_mpoly_is_zero(B, ctx));
 
-    if (ctx->minfo->nvars == 1) {
-        slong shiftA, shiftB;
+    if (ctx->minfo->nvars == 1)
+    {
+        ulong * shift, * stride;
         nmod_poly_t a, b, g;
+
+        shift = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        for (i = 0; i < ctx->minfo->nvars; i++)
+        {
+            shift[i] = 0;
+            stride[i] = 1;
+        }
+
         nmod_poly_init(a, ctx->ffinfo->mod.n);
         nmod_poly_init(b, ctx->ffinfo->mod.n);
         nmod_poly_init(g, ctx->ffinfo->mod.n);
-        nmod_mpoly_to_nmod_poly_keepbits(a, &shiftA, A, 0, ctx);
-        nmod_mpoly_to_nmod_poly_keepbits(b, &shiftB, B, 0, ctx);
+        _nmod_mpoly_to_nmod_poly_deflate(a, A, 0, shift, stride, ctx);
+        _nmod_mpoly_to_nmod_poly_deflate(b, B, 0, shift, stride, ctx);
         nmod_poly_gcd(g, a, b);
-        nmod_mpoly_from_nmod_poly_keepbits(G, g, FLINT_MIN(shiftA, shiftB), 0, A->bits, ctx);
+        _nmod_mpoly_from_nmod_poly_inflate(G, A->bits, g, 0, shift, stride, ctx);
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(g);
+
+        flint_free(shift);
+        flint_free(stride);
         return 1;
     }
 
@@ -647,7 +664,9 @@ int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
     if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
         return 0;
 
-    if (ctx->minfo->nvars == 1) {
+/*
+    if (ctx->minfo->nvars == 1)
+    {
         slong shiftA, shiftB;
         nmod_poly_t a, b, g;
         nmod_poly_init(a, ctx->ffinfo->mod.n);
@@ -662,6 +681,7 @@ int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
         nmod_poly_clear(g);
         return 1;
     }
+*/
 
     flint_randinit(randstate);
     success = _nmod_mpoly_gcd_zippel(G, A, B, ctx, 1, randstate);
