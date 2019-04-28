@@ -94,7 +94,7 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, k, tmul = 20;
+    slong i, j, k, tmul = 15;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
@@ -702,4 +702,3 @@ main(void)
     printf("PASS\n");
     return 0;
 }
-

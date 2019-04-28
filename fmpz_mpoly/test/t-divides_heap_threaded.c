@@ -17,7 +17,8 @@
 int
 main(void)
 {
-    int i, j, result, result2, max_threads = 5, tmul = 30;
+    int result, result2;
+    slong i, j, max_threads = 5, tmul = 15;
     FLINT_TEST_INIT(state);
 
     flint_printf("divides_heap_threaded....");

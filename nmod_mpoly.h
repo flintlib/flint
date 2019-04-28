@@ -1129,21 +1129,6 @@ FLINT_DLL int nmod_mpolyd_ctx_set_for_gcd(nmod_mpolyd_ctx_t dctx,
 FLINT_DLL void nmod_mpolyd_last_content(nmod_poly_t cont, const nmod_mpolyd_t A,
                                                        const nmodf_ctx_t fctx);
 
-FLINT_DLL void nmod_mpolyd_gcd_brown_univar(nmod_mpolyd_t G,
-                                 nmod_mpolyd_t Abar,       nmod_mpolyd_t Bbar,
-                           const nmod_mpolyd_t A   , const nmod_mpolyd_t B,
-                                                       const nmodf_ctx_t fctx);
-
-FLINT_DLL int nmod_mpolyd_gcd_brown_smprime(nmod_mpolyd_t G,
-                          nmod_mpolyd_t Abar, nmod_mpolyd_t Bbar,
-                          nmod_mpolyd_t A, nmod_mpolyd_t B,
-                                                       const nmodf_ctx_t fctx);
-
-FLINT_DLL int nmod_mpolyd_gcd_brown_lgprime(nmod_mpolyd_t G,
-                                 nmod_mpolyd_t Abar,  nmod_mpolyd_t Bbar,
-                                 nmod_mpolyd_t A, nmod_mpolyd_t B,
-                                                       const nmodf_ctx_t fctx);
-
 FLINT_DLL int nmod_mpoly_gcd_brown(nmod_mpoly_t G,
                                const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);

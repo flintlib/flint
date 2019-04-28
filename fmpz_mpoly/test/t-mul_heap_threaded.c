@@ -17,7 +17,7 @@ int
 main(void)
 {
     int i, j, result, max_threads = 5;
-    int tmul = 15;
+    int tmul = 10;
 #ifdef _WIN32
     tmul = 1;
 #endif
