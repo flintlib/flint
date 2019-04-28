@@ -936,16 +936,6 @@ FLINT_DLL int fmpz_mpoly_gcd_berlekamp_massey(fmpz_mpoly_t G, const fmpz_mpoly_t
 
 ******************************************************************************/
 
-FLINT_DLL int fmpz_mpoly_gcd_is_unit(const fmpz_mpoly_t a, const fmpz_mpoly_t b,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_resultant(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                        slong var, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_discriminant(fmpz_mpoly_t poly1,
-              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A,
                          const fmpz_mpoly_t B, slong var, const ulong * Bshift,
                             const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
@@ -956,13 +946,6 @@ FLINT_DLL void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
 
 FLINT_DLL int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                 mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
-
-#define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
-    ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
-
-#define fmpz_mpoly_get_monomial_ptr(poly, n, ctx) \
-    ((n) < (poly)->length ? (poly)->exps + \
-                     (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
 
 typedef struct _fmpz_mpoly_stripe_struct
 {
@@ -1044,7 +1027,6 @@ FLINT_DLL void _fmpz_mpoly_univar_pgcd(fmpz_mpoly_univar_t poly1,
 FLINT_DLL void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
             const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ,
                                                    const fmpz_mpoly_ctx_t ctx);
-
 
 /* mpolyd ********************************************************************/
 
@@ -1554,8 +1536,6 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 
 
 
-
-
 /******************************************************************************
 
    Internal consistency checks
@@ -1667,8 +1647,6 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
     flint_free(rexp);
     flint_free(gexp);
 }
-
-
 
 #ifdef __cplusplus
 }
