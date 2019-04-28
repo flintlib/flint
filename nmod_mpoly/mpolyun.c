@@ -529,7 +529,7 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly
 {
     slong j;
     slong m = 1;
-    slong NB, NA = 1;
+    slong NB, NA;
     slong p0 = perm[0], p1 = perm[1];
     ulong shift0 = shift[p0], shift1 = shift[p1];
     ulong stride0 = stride[p0], stride1 = stride[p1];
@@ -541,7 +541,7 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
     FLINT_ASSERT(m == uctx->minfo->nvars);
-    FLINT_ASSERT(NA == mpoly_words_per_exp_sp(A->bits, uctx->minfo));
+    NA = mpoly_words_per_exp_sp(A->bits, uctx->minfo);
     NB = mpoly_words_per_exp_sp(B->bits, ctx->minfo);
 
     mpoly_gen_offset_shift_sp(&Boff0, &Bshift0, p0, B->bits, ctx->minfo);
@@ -557,11 +557,18 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly
                                            : (Bexp1 - shift1) / stride1, uctx);
         FLINT_ASSERT(Ac->bits == A->bits);
 
-        nmod_mpolyn_fit_length(Ac, 1, uctx);
+
+        if (Ac->length == 0)
+        {
+            nmod_mpolyn_fit_length(Ac, 1, uctx);
+            nmod_poly_zero(Ac->coeffs + 0);
+        }
+        Ac->length = 1;
+
         nmod_poly_set_coeff_ui(Ac->coeffs + 0, stride0 == 1 ? (Bexp0 - shift0)
                                    : (Bexp0 - shift0) / stride0, B->coeffs[j]);
+
         mpoly_monomial_zero(Ac->exps + NA*0, NA);
-        Ac->length = 1;
     }
 }
 
@@ -642,10 +649,6 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
         for (k = 0; k + 1 < m; k++)
         {
             l = perm[k];
-/*
-            FLINT_ASSERT(stride[l] != UWORD(0));
-            FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
-*/
             texp[offs[k]] += (stride[l] == 1 ? (Bexps[l] - shift[l]) : (Bexps[l] - shift[l]) / stride[l]) << shifts[k];
         }
 
@@ -653,11 +656,7 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
         l = perm[m - 1];
         nmod_poly_set_coeff_ui(Acc, stride[l] == 1 ? (Bexps[l] - shift[l]) : (Bexps[l] - shift[l]) / stride[l], B->coeffs[j]);
     }
-/*
-printf("nmod_mpoly_to_mpolyun_perm_deflate returning\n");
-printf("B: "); nmod_mpoly_print_pretty(B, NULL, ctx); printf("\n");
-printf("A: "); nmod_mpolyun_print_pretty(A, NULL, uctx); printf("\n");
-*/
+
     TMP_END;
 }
 

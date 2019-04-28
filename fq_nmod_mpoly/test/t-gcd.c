@@ -20,9 +20,7 @@ void gcd_check(fq_nmod_mpoly_t g, fq_nmod_mpoly_t a, fq_nmod_mpoly_t b,
     fq_nmod_mpoly_init(ca, ctx);
     fq_nmod_mpoly_init(cb, ctx);
     fq_nmod_mpoly_init(cg, ctx);
-/*
-flint_printf("%s i = %wd, j = %wd\n",name,i,j);
-*/
+
     res = fq_nmod_mpoly_gcd(g, a, b, ctx);
     fq_nmod_mpoly_assert_canonical(g, ctx);
 
@@ -93,7 +91,7 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, k, tmul = 4;
+    slong i, j, k, tmul = 5;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");

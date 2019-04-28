@@ -17,6 +17,7 @@
 int
 main(void)
 {
+    slong tmul = 5;
     int i, j, result;
     FLINT_TEST_INIT(state);
 
@@ -24,7 +25,7 @@ main(void)
     fflush(stdout);
 
     /* Check d(f*g) = df*g + f*dg */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, fp, gp, hp, t1, t2;
@@ -114,7 +115,7 @@ main(void)
     }
 
     /* Check d(f*g) = df*g + f*dg with aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, fp, gp, t1, t2;

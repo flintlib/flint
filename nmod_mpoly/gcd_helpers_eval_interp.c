@@ -1490,7 +1490,7 @@ int nmod_mpolyn_intp_crt_2sm_mpolyn(
         texp_set = 0;
         if (Fi < Flen)
         {
-            Fvalue = Fcoeff + N*Fi;
+            Fvalue = Fcoeff + Fi;
             texp_set = 1;
             mpoly_monomial_set(Texp + N*Ti, Fexp + N*Fi, N);
         }
@@ -1634,7 +1634,7 @@ int nmod_mpolyun_intp_crt_2sm_mpolyun(
     slong Flen;
     slong Alen;
     slong Blen;
-    slong e;
+    ulong e;
     nmod_mpolyn_struct * Tcoeff;
     nmod_mpolyn_struct * Fcoeff;
     nmod_mpolyn_struct  * Acoeff;
@@ -1662,6 +1662,7 @@ int nmod_mpolyun_intp_crt_2sm_mpolyun(
 
     nmod_mpolyn_init(zero, A->bits, ctx);
 
+    FLINT_ASSERT(nmod_mpolyun_is_canonical(F, ctx));
     FLINT_ASSERT(nmod_mpolyun_is_canonical(A, ctx));
     FLINT_ASSERT(nmod_mpolyun_is_canonical(B, ctx));
 
@@ -1697,7 +1698,7 @@ int nmod_mpolyun_intp_crt_2sm_mpolyun(
         else
         {
             /* at least one term is missing */
-            e = -WORD(1);
+            e = 0;
             if (Fi < Flen)
             {
                 e = Fexp[Fi];

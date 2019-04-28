@@ -89,7 +89,6 @@ int nmod_mpoly_gcd_brown(
     nmod_mpolyun_init(Abarn, new_bits, uctx);
     nmod_mpolyun_init(Bbarn, new_bits, uctx);
 
-    success = 0;
     nmod_mpoly_to_mpolyun_perm_deflate(An, A, perm, shift, stride, uctx, ctx);
     nmod_mpoly_to_mpolyun_perm_deflate(Bn, B, perm, shift, stride, uctx, ctx);
     success = nmod_mpolyun_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn,

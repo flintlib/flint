@@ -415,7 +415,7 @@ void nmod_mpolyn_intp_lift_lg_mpolyn(
     }
     A->length = Ai;
 
-    *lastdeg_ = lastdeg;
+    *lastdeg_ = FLINT_MAX(*lastdeg_, lastdeg);
 }
 
 /*
