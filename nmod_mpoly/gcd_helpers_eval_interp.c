@@ -12,7 +12,20 @@
 #include "nmod_mpoly.h"
 
 /*
-    set vp = P(alpha), vm = P(-alpha) given powers of alpha
+    intp_reduce: map from Fp[x] to Fp[x]/poly(x)
+    intp_lift:   map from Fp[x]/poly(x) to Fp[x]
+    intp_crt:    update element of Fp[x] with a new image in Fp[x]/poly(x)
+    intp_mcrt:   same as intp_update, but monomial match, thus easier
+
+    ..._sm:    poly(x) is x - alpha
+    ..._2sm:   poly(x) is x - alpha and x + alpha
+    ..._lg:    poly(x) is modulus of finite field (these will appear not in
+                    this file but in the fq_nmod_mpoly module)
+*/
+
+/*
+    Set vp = P(alpha), vm = P(-alpha) given powers of alpha
+    The powers of alpha are extended as necessary.
 */
 void _nmod_poly_eval2_pow(
     mp_limb_t * vp,
@@ -72,11 +85,14 @@ void _nmod_poly_eval2_pow(
 
 /*
     E = A(v = alpha)
-    A is in R[X][v]
+    A is in R[X][][v]
     E is in R[X]
 */
-void nmod_mpolyun_eval_last_bivar(nmod_poly_t E, const nmod_mpolyun_t A,
-                                  mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyun_intp_reduce_sm_poly(
+    nmod_poly_t E,
+    const nmod_mpolyun_t A,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
     mp_limb_t v;
     slong Ai, Alen;
@@ -97,10 +113,10 @@ void nmod_mpolyun_eval_last_bivar(nmod_poly_t E, const nmod_mpolyun_t A,
 
 /*
     A = B
-    A is in R[X][x_0]   A will be constant in x_0
-    B is in R[X]
+    A is in Fp[X][][x_0]   A will be constant in x_0
+    B is in Fp[X]
 */
-void nmod_mpolyun_startinterp_bivar(
+void nmod_mpolyun_intp_lift_sm_poly(
     nmod_mpolyun_t A,
     const nmod_poly_t B,
     const nmod_mpoly_ctx_t ctx)
@@ -139,11 +155,11 @@ void nmod_mpolyun_startinterp_bivar(
 /*
     F = F + modulus*(A - F(v = alpha))
     no assumptions about matching monomials
-    F is in Fp[X][v]
+    F is in Fp[X][][v]
     A is in Fp[X]
     it is expected that modulus(alpha) == 1
 */
-int nmod_mpolyun_addinterp_bivar(
+int nmod_mpolyun_intp_crt_sm_poly(
     slong * lastdeg_,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
@@ -270,11 +286,11 @@ int nmod_mpolyun_addinterp_bivar(
 
 /*
     E = A(v = alpha), F = A(v = -alpha)
-    A is in R[X][v]
-    E is in R[X]
-    F is in R[X]
+    A is in Fp[X][][v]
+    E is in Fp[X]
+    F is in Fp[X]
 */
-void nmod_mpolyun_eval2_last_bivar(
+void nmod_mpolyun_intp_reduce_2sm_poly(
     nmod_poly_t E,
     nmod_poly_t F,
     const nmod_mpolyun_t A,
@@ -303,11 +319,11 @@ void nmod_mpolyun_eval2_last_bivar(
 /*
     set F from its value A at v = alpha and its value B at v = -alpha
     no assumptions about matching monomials
-    F is in R[X][v]
-    A is in R[X]
-    B is in R[X]
+    F is in Fp[X][][v]
+    A is in Fp[X]
+    B is in Fp[X]
 */
-void nmod_mpolyun_startinterp2_bivar(
+void nmod_mpolyun_intp_lift_2sm_poly(
     slong * lastdeg_,
     nmod_mpolyun_t F,
     const nmod_poly_t A,
@@ -396,12 +412,12 @@ void nmod_mpolyun_startinterp2_bivar(
 /*
     update F from its value A at v = alpha and its value B at v = -alpha
     no assumptions about matching monomials
-    F is in R[X][v]
+    F is in R[X][][v]
     A is in R[X]
     B is in R[X]
     it is expected that modulus(alpha) == modulus(-alpha) == 1/(2*alpha)
 */
-int nmod_mpolyun_addinterp2_bivar(
+int nmod_mpolyun_intp_crt_2sm_poly(
     slong * lastdeg_,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
@@ -553,8 +569,12 @@ int nmod_mpolyun_addinterp2_bivar(
     A is in Fp[x_0, ..., x_(var-2), x_(var-1)][x_var]
     E is in Fp[x_0, ..., x_(var-2)][x_(var-1)]
 */
-void nmod_mpolyn_eval_last_n(nmod_mpolyn_t E, nmod_mpolyn_t A, slong var,
-                                   mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyn_intp_reduce_sm_mpolyn(
+    nmod_mpolyn_t E,
+    nmod_mpolyn_t A,
+    slong var,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
     slong offset, shift, k;
@@ -615,8 +635,12 @@ void nmod_mpolyn_eval_last_n(nmod_mpolyn_t E, nmod_mpolyn_t A, slong var,
     A is in Fp[X][x_0, ..., x_(var-2), x_(var-1)][x_var]
     E is in Fp[X][x_0, ..., x_(var-2)][x_(var-1)]
 */
-void nmod_mpolyun_eval_last_un(nmod_mpolyun_t E, nmod_mpolyun_t A, slong var,
-                                   mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyun_intp_reduce_sm_mpolyun(
+    nmod_mpolyun_t E,
+    nmod_mpolyun_t A,
+    slong var,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
     nmod_mpolyn_struct * Acoeff = A->coeffs;
     ulong * Aexp = A->exps;
@@ -633,7 +657,7 @@ void nmod_mpolyun_eval_last_un(nmod_mpolyun_t E, nmod_mpolyun_t A, slong var,
     Ei = 0;
     for (Ai = 0; Ai < Alen; Ai++)
     {
-        nmod_mpolyn_eval_last_n(Ecoeff + Ei, Acoeff + Ai, var, alpha, ctx);
+        nmod_mpolyn_intp_reduce_sm_mpolyn(Ecoeff + Ei, Acoeff + Ai, var, alpha, ctx);
         Eexp[Ei] = Aexp[Ai];
         Ei += ((Ecoeff + Ei)->length != 0);
     }
@@ -648,8 +672,11 @@ void nmod_mpolyun_eval_last_un(nmod_mpolyun_t E, nmod_mpolyun_t A, slong var,
     A is in Fp[x_0, ..., x_(var-1), x_(var-1)][x_var]
     B is in Fp[x_0, ..., x_(var-2)][x_(var-1)]
 */
-void nmod_mpolyn_set_popup(nmod_mpolyn_t A, nmod_mpolyn_t B, slong var,
-                                                    const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyn_intp_lift_sm_mpolyn(
+    nmod_mpolyn_t A,
+    nmod_mpolyn_t B,
+    slong var,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp(B->bits, ctx->minfo);
     slong offset, shift;
@@ -698,8 +725,11 @@ void nmod_mpolyn_set_popup(nmod_mpolyn_t A, nmod_mpolyn_t B, slong var,
     A is in Fp[X][x_0, ..., x_(var-2), x_(var-1)][x_var]
     B is in Fp[X][x_0, ..., x_(var-2)][x_(var-1)]
 */
-void nmod_mpolyun_set_popup(nmod_mpolyun_t A, nmod_mpolyun_t B, slong var,
-                                                    const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyun_intp_lift_sm_mpolyun(
+    nmod_mpolyun_t A,
+    nmod_mpolyun_t B,
+    slong var,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i;
     nmod_mpolyn_struct * Bcoeff = B->coeffs;
@@ -716,12 +746,11 @@ void nmod_mpolyun_set_popup(nmod_mpolyun_t A, nmod_mpolyun_t B, slong var,
     for (i = 0; i < Blen; i++)
     {
         Aexp[i] = Bexp[i];
-        nmod_mpolyn_set_popup(Acoeff + i, Bcoeff + i, var, ctx);
+        nmod_mpolyn_intp_lift_sm_mpolyn(Acoeff + i, Bcoeff + i, var, ctx);
     }
     A->length = Blen;
 
     FLINT_ASSERT(nmod_mpolyun_is_canonical(A, ctx));
-
 }
 
 
@@ -732,9 +761,15 @@ void nmod_mpolyun_set_popup(nmod_mpolyun_t A, nmod_mpolyun_t B, slong var,
     A is in Fp[x_0, ..., x_(var-2)][x_(var-1)]
     in order to fxn correctly, modulus(alpha) should be 1
 */
-int nmod_mpolyn_addinterp_n(slong * lastdeg_,
-             nmod_mpolyn_t T, nmod_mpolyn_t F, nmod_mpolyn_t A, slong var,
-              nmod_poly_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
+int nmod_mpolyn_intp_crt_sm_mpolyn(
+    slong * lastdeg_,
+    nmod_mpolyn_t T,
+    nmod_mpolyn_t F,
+    nmod_mpolyn_t A,
+    slong var,
+    nmod_poly_t modulus,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
@@ -876,9 +911,15 @@ int nmod_mpolyn_addinterp_n(slong * lastdeg_,
     A is in Fp[X][x_0, ..., x_(var-2)][x_(var-1)]
     in order to fxn correctly, modulus(alpha) should be 1
 */
-int nmod_mpolyun_addinterp_un(slong * lastdeg,
-             nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyun_t A, slong var,
-              nmod_poly_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
+int nmod_mpolyun_intp_crt_sm_mpolyun(
+    slong * lastdeg,
+    nmod_mpolyun_t F,
+    nmod_mpolyun_t T,
+    nmod_mpolyun_t A,
+    slong var,
+    nmod_poly_t modulus,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
     slong i, j, k;
@@ -918,7 +959,7 @@ int nmod_mpolyun_addinterp_un(slong * lastdeg,
         if (i < Flen && j < Alen && (Fexp[i] == Aexp[j]))
         {
             /* F term ok, A term ok */
-            changed |= nmod_mpolyn_addinterp_n(lastdeg, Tcoeff + k, Fcoeff + i,
+            changed |= nmod_mpolyn_intp_crt_sm_mpolyn(lastdeg, Tcoeff + k, Fcoeff + i,
                                          Acoeff + j, var, modulus, alpha, ctx);
             Texp[k] = Aexp[j];
             i++;
@@ -927,7 +968,7 @@ int nmod_mpolyun_addinterp_un(slong * lastdeg,
         else if (i < Flen && (j >= Alen || Fexp[i] > Aexp[j]))
         {
             /* F term ok, A term missing */
-            changed |= nmod_mpolyn_addinterp_n(lastdeg, Tcoeff + k, Fcoeff + i,
+            changed |= nmod_mpolyn_intp_crt_sm_mpolyn(lastdeg, Tcoeff + k, Fcoeff + i,
                                                zero, var, modulus, alpha, ctx);
             Texp[k] = Fexp[i];
             i++;
@@ -937,7 +978,7 @@ int nmod_mpolyun_addinterp_un(slong * lastdeg,
             FLINT_ASSERT(j < Alen && (i >= Flen || Aexp[j] > Fexp[i]));
 
             /* F term missing, A term ok */
-            changed |= nmod_mpolyn_addinterp_n(lastdeg, Tcoeff + k, zero,
+            changed |= nmod_mpolyn_intp_crt_sm_mpolyn(lastdeg, Tcoeff + k, zero,
                                          Acoeff + j, var, modulus, alpha, ctx);
             Texp[k] = Aexp[j];
             j++;
@@ -957,7 +998,6 @@ int nmod_mpolyun_addinterp_un(slong * lastdeg,
 
     FLINT_ASSERT(nmod_mpolyun_is_canonical(F, ctx));
 
-
     return changed;    
 }
 
@@ -970,7 +1010,7 @@ int nmod_mpolyun_addinterp_un(slong * lastdeg,
     E is in [x_0, ..., x_(var-2)][x_(var-1)]
     F is in [x_0, ..., x_(var-2)][x_(var-1)]
 */
-void nmod_mpolyn_eval2_last_n(
+void nmod_mpolyn_intp_reduce_2sm_mpolyn(
     nmod_mpolyn_t E,
     nmod_mpolyn_t F,
     nmod_mpolyn_t A,
@@ -1068,7 +1108,7 @@ void nmod_mpolyn_eval2_last_n(
     A is in R[X][x_0, ..., x_(var-2), x_(var-1)][x_var]
     E is in R[X][x_0, ..., x_(var-2)][x_(var-1)]
 */
-void nmod_mpolyun_eval2_last_un(
+void nmod_mpolyun_intp_reduce_2sm_mpolyun(
     nmod_mpolyun_t E,
     nmod_mpolyun_t F, 
     nmod_mpolyun_t A,
@@ -1098,7 +1138,7 @@ void nmod_mpolyun_eval2_last_un(
     Ei = Fi = 0;
     for (Ai = 0; Ai < Alen; Ai++)
     {
-        nmod_mpolyn_eval2_last_n(Ecoeff + Ei, Fcoeff + Fi, Acoeff + Ai, var, alphapow, ctx);
+        nmod_mpolyn_intp_reduce_2sm_mpolyn(Ecoeff + Ei, Fcoeff + Fi, Acoeff + Ai, var, alphapow, ctx);
         Eexp[Ei] = Aexp[Ai];
         Fexp[Fi] = Aexp[Ai];
         Ei += ((Ecoeff + Ei)->length != 0);
@@ -1117,7 +1157,7 @@ void nmod_mpolyun_eval2_last_un(
     T is in [x_0, ..., x_(var-1), x_(var-1)][x_var]
     A is in [x_0, ..., x_(var-2)][x_(var-1)]
 */
-void nmod_mpolyn_startinterp2_n(
+void nmod_mpolyn_intp_lift_2sm_mpolyn(
     slong * lastdeg_,
     nmod_mpolyn_t T,
     nmod_mpolyn_t A,
@@ -1262,13 +1302,18 @@ void nmod_mpolyn_startinterp2_n(
     set F from
         A at x_var = alpha
         B at x_var = -alpha
-    F is in R[X][x_0, ..., x_(var-2), x_(var-1)][x_var]
-    A is in R[X][x_0, ..., x_(var-2)][x_(var-1)]
-    B is in R[X][x_0, ..., x_(var-2)][x_(var-1)]
+    F is in Fp[X][x_0, ..., x_(var-2), x_(var-1)][x_var]
+    A is in Fp[X][x_0, ..., x_(var-2)][x_(var-1)]
+    B is in Fp[X][x_0, ..., x_(var-2)][x_(var-1)]
 */
-void nmod_mpolyun_startinterp2_un(slong * lastdeg, nmod_mpolyun_t F,
-                             nmod_mpolyun_t A, nmod_mpolyun_t B, slong var,
-                                  mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyun_intp_lift_2sm_mpolyun(
+    slong * lastdeg,
+    nmod_mpolyun_t F,
+    nmod_mpolyun_t A,
+    nmod_mpolyun_t B,
+    slong var,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
     nmod_mpolyn_struct * Bcoeff = B->coeffs;
     ulong * Bexp = B->exps;
@@ -1308,14 +1353,14 @@ void nmod_mpolyun_startinterp2_un(slong * lastdeg, nmod_mpolyun_t F,
         if (Ai < Alen && Bi < Blen && Aexp[Ai] == Bexp[Bi])
         {
             Fexp[Fi] = Aexp[Ai];
-            nmod_mpolyn_startinterp2_n(lastdeg, Fcoeff + Fi, Acoeff + Ai, Bcoeff + Bi, var, alpha, ctx);
+            nmod_mpolyn_intp_lift_2sm_mpolyn(lastdeg, Fcoeff + Fi, Acoeff + Ai, Bcoeff + Bi, var, alpha, ctx);
             Ai++;
             Bi++;
         }
         else if (Ai < Alen && (Bi >= Blen || Aexp[Ai] > Bexp[Bi]))
         {
             Fexp[Fi] = Aexp[Ai];
-            nmod_mpolyn_startinterp2_n(lastdeg, Fcoeff + Fi, Acoeff + Ai, zero, var, alpha, ctx);
+            nmod_mpolyn_intp_lift_2sm_mpolyn(lastdeg, Fcoeff + Fi, Acoeff + Ai, zero, var, alpha, ctx);
             Ai++;
         }
         else
@@ -1323,7 +1368,7 @@ void nmod_mpolyun_startinterp2_un(slong * lastdeg, nmod_mpolyun_t F,
             FLINT_ASSERT(Bi < Blen && (Ai >= Alen || Bexp[Bi] > Aexp[Ai]));
 
             Fexp[Fi] = Bexp[Bi];
-            nmod_mpolyn_startinterp2_n(lastdeg, Fcoeff + Fi, zero, Bcoeff + Bi, var, alpha, ctx);
+            nmod_mpolyn_intp_lift_2sm_mpolyn(lastdeg, Fcoeff + Fi, zero, Bcoeff + Bi, var, alpha, ctx);
             Bi++;
         }
 
@@ -1349,10 +1394,16 @@ void nmod_mpolyun_startinterp2_un(slong * lastdeg, nmod_mpolyun_t F,
     A is in Fp[x_0, ..., x_(var-2)][x_(var-1)]
     B is in Fp[x_0, ..., x_(var-2)][x_(var-1)]
 */
-int nmod_mpolyn_addinterp2_n(slong * lastdeg_,
-         nmod_mpolyn_t T, nmod_mpolyn_t F, nmod_mpolyn_t A, nmod_mpolyn_t B,
-                   slong var, nmod_poly_t modulus, nmod_poly_t alphapow,
-                                                    const nmod_mpoly_ctx_t ctx)
+int nmod_mpolyn_intp_crt_2sm_mpolyn(
+    slong * lastdeg_,
+    nmod_mpolyn_t T,
+    nmod_mpolyn_t F,
+    nmod_mpolyn_t A,
+    nmod_mpolyn_t B,
+    slong var,
+    nmod_poly_t modulus,
+    nmod_poly_t alphapow,
+    const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
@@ -1563,10 +1614,16 @@ int nmod_mpolyn_addinterp2_n(slong * lastdeg_,
     A is in Fp[X][x_0, ..., x_(var-2)][x_(var-1)]
     B is in Fp[X][x_0, ..., x_(var-2)][x_(var-1)]
 */
-int nmod_mpolyun_addinterp2_un(slong * lastdeg,
-         nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyun_t A, nmod_mpolyun_t B,
-                   slong var, nmod_poly_t modulus, nmod_poly_t alphapow,
-                                                    const nmod_mpoly_ctx_t ctx)
+int nmod_mpolyun_intp_crt_2sm_mpolyun(
+    slong * lastdeg,
+    nmod_mpolyun_t F,
+    nmod_mpolyun_t T,
+    nmod_mpolyun_t A,
+    nmod_mpolyun_t B,
+    slong var,
+    nmod_poly_t modulus,
+    nmod_poly_t alphapow,
+    const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0, Finc, Ainc, Binc;
     slong Ti, Fi, Ai, Bi;
@@ -1608,7 +1665,6 @@ int nmod_mpolyun_addinterp2_un(slong * lastdeg,
     FLINT_ASSERT(nmod_mpolyun_is_canonical(A, ctx));
     FLINT_ASSERT(nmod_mpolyun_is_canonical(B, ctx));
 
-
     nmod_mpolyun_fit_length(T, FLINT_MAX(Alen, Blen), ctx);
     Tcoeff = T->coeffs;
     Texp = T->exps;
@@ -1630,7 +1686,7 @@ int nmod_mpolyun_addinterp2_un(slong * lastdeg,
                                   Fexp[Fi] == Aexp[Ai] && Aexp[Ai] == Bexp[Bi])
         {
             /* F term ok, A term ok, B term ok */
-            changed |= nmod_mpolyn_addinterp2_n(lastdeg, Tcoeff + Ti,
+            changed |= nmod_mpolyn_intp_crt_2sm_mpolyn(lastdeg, Tcoeff + Ti,
                                       Fcoeff + Fi, Acoeff + Ai, Bcoeff + Bi,
                                                   var, modulus, alphapow, ctx);
             Texp[Ti] = Fexp[Fi];
@@ -1675,7 +1731,7 @@ int nmod_mpolyun_addinterp2_un(slong * lastdeg,
             FLINT_ASSERT(Finc || Ainc || Binc);
 
             Texp[Ti] = e;
-            changed |= nmod_mpolyn_addinterp2_n(lastdeg, Tcoeff + Ti,
+            changed |= nmod_mpolyn_intp_crt_2sm_mpolyn(lastdeg, Tcoeff + Ti,
                                                   Fvalue, Avalue, Bvalue,
                                                   var, modulus, alphapow, ctx);
             Fi += Finc;
@@ -1703,8 +1759,11 @@ int nmod_mpolyun_addinterp2_un(slong * lastdeg,
 /*****************************************************************************/
 
 /* evaluate A at lastvar = alpha */
-void nmod_mpolyn_eval_last(nmod_mpoly_t B, nmod_mpolyn_t A, mp_limb_t alpha,
-                                                    const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyn_intp_reduce_sm_mpoly(
+    nmod_mpoly_t B,
+    nmod_mpolyn_t A,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i;
     slong N;
@@ -1726,11 +1785,13 @@ void nmod_mpolyn_eval_last(nmod_mpoly_t B, nmod_mpolyn_t A, mp_limb_t alpha,
     B->length = k;
 }
 
-void nmod_mpolyun_eval_last(nmod_mpolyu_t B, nmod_mpolyun_t A, mp_limb_t alpha,
-                                                    const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyun_intp_reduce_sm_mpolyu(
+    nmod_mpolyu_t B,
+    nmod_mpolyun_t A,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
-    slong k;
+    slong i, k;
 
     FLINT_ASSERT(B->bits == A->bits);
 
@@ -1739,28 +1800,25 @@ void nmod_mpolyun_eval_last(nmod_mpolyu_t B, nmod_mpolyun_t A, mp_limb_t alpha,
     for (i = 0; i < A->length; i++)
     {
         B->exps[k] = A->exps[i];
-        nmod_mpolyn_eval_last(B->coeffs + k, A->coeffs + i, alpha, ctx);
-        if (!nmod_mpoly_is_zero(B->coeffs + k, ctx))
-        {
-            k++;
-        }
+        nmod_mpolyn_intp_reduce_sm_mpoly(B->coeffs + k, A->coeffs + i, alpha, ctx);
+        k += !nmod_mpoly_is_zero(B->coeffs + k, ctx);
     }
     B->length = k;
 }
 
 
-void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyn_intp_lift_sm_mpoly(
+    nmod_mpolyn_t A,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
-    slong N;
+    slong i, N;
     nmod_poly_struct * Acoeff;
     mp_limb_t * Bcoeff;
     ulong * Aexp, * Bexp;
     slong Blen;
 
-    nmod_mpolyn_fit_bits(A, B->bits, ctx);
-    A->bits = B->bits;
+    FLINT_ASSERT(A->bits == B->bits);
 
     Blen = B->length;
     nmod_mpolyn_fit_length(A, Blen, ctx);
@@ -1777,18 +1835,13 @@ void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B,
         nmod_poly_set_coeff_ui(Acoeff + i, 0, Bcoeff[i]);
         mpoly_monomial_set(Aexp + N*i, Bexp + N*i, N);
     }
-
-    /* demote remaining coefficients */
-    for (i = Blen; i < A->length; i++)
-    {
-        nmod_poly_clear(Acoeff + i);
-        nmod_poly_init(Acoeff + i, ctx->ffinfo->mod.n);
-    }
     A->length = Blen;
 }
 
-void nmod_mpolyun_set_mpolyu(nmod_mpolyun_t A, const nmod_mpolyu_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyun_intp_lift_sm_mpolyu(
+    nmod_mpolyun_t A,
+    const nmod_mpolyu_t B,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i;
 
@@ -1797,10 +1850,8 @@ void nmod_mpolyun_set_mpolyu(nmod_mpolyun_t A, const nmod_mpolyu_t B,
     for (i = 0; i < B->length; i++)
     {
         A->exps[i] = B->exps[i];
-        nmod_mpolyn_set_mpoly(A->coeffs + i, B->coeffs + i, ctx);
-
+        nmod_mpolyn_intp_lift_sm_mpoly(A->coeffs + i, B->coeffs + i, ctx);
         FLINT_ASSERT((A->coeffs + i)->bits == B->bits);
-
     }
     A->length = B->length;
 }
@@ -1809,10 +1860,14 @@ void nmod_mpolyun_set_mpolyu(nmod_mpolyun_t A, const nmod_mpolyu_t B,
     F = F + modulus*(A - F(alpha))
     no assumptions about matching monomials
 */
-int
-nmod_mpolyn_addinterp(slong * lastdeg,
-            nmod_mpolyn_t F, nmod_mpolyn_t T, nmod_mpoly_t A,
-            nmod_poly_t modulus,  mp_limb_t alpha,  const nmod_mpoly_ctx_t ctx)
+int nmod_mpolyn_intp_crt_sm_mpoly(
+    slong * lastdeg,
+    nmod_mpolyn_t F,
+    nmod_mpolyn_t T,
+    nmod_mpoly_t A,
+    nmod_poly_t modulus,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
     slong i, j, k;
@@ -1902,7 +1957,8 @@ nmod_mpolyn_addinterp(slong * lastdeg,
             k++;
             i++;
             j++;
-        } else 
+        }
+        else
         {
             FLINT_ASSERT(0);
         }
@@ -1919,9 +1975,14 @@ nmod_mpolyn_addinterp(slong * lastdeg,
     return changed;
 }
 
-int nmod_mpolyun_addinterp(slong * lastdeg,
-             nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyu_t A,
-              nmod_poly_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx)
+int nmod_mpolyun_intp_crt_sm_mpolyu(
+    slong * lastdeg,
+    nmod_mpolyun_t F,
+    nmod_mpolyun_t T,
+    nmod_mpolyu_t A,
+    nmod_poly_t modulus,
+    mp_limb_t alpha,
+    const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
     slong i, j, k;
@@ -1965,7 +2026,7 @@ int nmod_mpolyun_addinterp(slong * lastdeg,
         {
             /* F term ok, A term missing */
             nmod_mpolyn_set(Tcoeff + k, Fcoeff + i, ctx);
-            changed |= nmod_mpolyn_addinterp(lastdeg, Tcoeff + k,
+            changed |= nmod_mpolyn_intp_crt_sm_mpoly(lastdeg, Tcoeff + k,
                                                  S, zero, modulus, alpha, ctx);
             Texp[k] = Fexp[i];
             k++;
@@ -1975,7 +2036,7 @@ int nmod_mpolyun_addinterp(slong * lastdeg,
         {
             /* F term missing, A term ok */
             nmod_mpolyn_zero(Tcoeff + k, ctx);
-            changed |= nmod_mpolyn_addinterp(lastdeg, Tcoeff + k,
+            changed |= nmod_mpolyn_intp_crt_sm_mpoly(lastdeg, Tcoeff + k,
                                            S, Acoeff + j, modulus, alpha, ctx);
             Texp[k] = Aexp[j];
             k++;
@@ -1985,24 +2046,18 @@ int nmod_mpolyun_addinterp(slong * lastdeg,
         {
             /* F term ok, A term ok */
             nmod_mpolyn_set(Tcoeff + k, Fcoeff + i, ctx);
-            changed |= nmod_mpolyn_addinterp(lastdeg, Tcoeff + k,
+            changed |= nmod_mpolyn_intp_crt_sm_mpoly(lastdeg, Tcoeff + k,
                                            S, Acoeff + j, modulus, alpha, ctx);
             Texp[k] = Aexp[j];
             FLINT_ASSERT(!nmod_mpolyn_is_zero(Tcoeff + k, ctx));
             k++;
             i++;
             j++;
-        } else 
+        }
+        else
         {
             FLINT_ASSERT(0);
         }
-    }
-
-    /* demote remaining coefficients */
-    for (i = k; i < T->length; i++)
-    {
-        nmod_mpolyn_clear(Tcoeff + i, ctx);
-        nmod_mpolyn_init(Tcoeff + i, T->bits, ctx);
     }
     T->length = k;
 

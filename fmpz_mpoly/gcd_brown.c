@@ -1250,8 +1250,8 @@ int fmpz_mpolyu_gcd_brown(
     FLINT_ASSERT(fmpz_is_one(temp));
 #endif
 
-    fmpz_gcd(gamma, fmpz_mpolyu_leadcoeff_ref(A),
-                    fmpz_mpolyu_leadcoeff_ref(B));
+    fmpz_gcd(gamma, fmpz_mpolyu_leadcoeff(A),
+                    fmpz_mpolyu_leadcoeff(B));
 
     fmpz_mpolyu_height(bound, A, ctx);
     fmpz_mpolyu_height(temp, B, ctx);
@@ -1297,8 +1297,8 @@ choose_prime:
     nmod_mpolyun_set_mod(Bbarp, pctx->ffinfo->mod);
 
     /* reduction should kill neither A nor B */
-    fmpz_mpolyu_redto_nmod_mpolyun(Ap, pctx, A, ctx);
-    fmpz_mpolyu_redto_nmod_mpolyun(Bp, pctx, B, ctx);
+    fmpz_mpolyu_intp_reduce_p_mpolyun(Ap, pctx, A, ctx);
+    fmpz_mpolyu_intp_reduce_p_mpolyun(Bp, pctx, B, ctx);
     FLINT_ASSERT(Ap->length > 0);
     FLINT_ASSERT(Bp->length > 0);
 
@@ -1348,15 +1348,15 @@ choose_prime:
 
     if (!fmpz_is_one(modulus))
     {
-        fmpz_mpolyu_addinterp_un(G, T, ctx, modulus, Gp, pctx);
-        fmpz_mpolyu_addinterp_un(Abar, T, ctx, modulus, Abarp, pctx);
-        fmpz_mpolyu_addinterp_un(Bbar, T, ctx, modulus, Bbarp, pctx);
+        fmpz_mpolyu_intp_crt_p_mpolyun(G, T, ctx, modulus, Gp, pctx);
+        fmpz_mpolyu_intp_crt_p_mpolyun(Abar, T, ctx, modulus, Abarp, pctx);
+        fmpz_mpolyu_intp_crt_p_mpolyun(Bbar, T, ctx, modulus, Bbarp, pctx);
     }
     else
     {
-        fmpz_mpolyu_startinterp_un(G, ctx, Gp, pctx);
-        fmpz_mpolyu_startinterp_un(Abar, ctx, Abarp, pctx);
-        fmpz_mpolyu_startinterp_un(Bbar, ctx, Bbarp, pctx);
+        fmpz_mpolyu_intp_lift_p_mpolyun(G, ctx, Gp, pctx);
+        fmpz_mpolyu_intp_lift_p_mpolyun(Abar, ctx, Abarp, pctx);
+        fmpz_mpolyu_intp_lift_p_mpolyun(Bbar, ctx, Bbarp, pctx);
     }
 
     fmpz_mul_ui(modulus, modulus, p);
@@ -1390,12 +1390,12 @@ choose_prime:
 
 successful:
 
-    FLINT_ASSERT(fmpz_equal(gamma, fmpz_mpolyu_leadcoeff_ref(G)));
+    FLINT_ASSERT(fmpz_equal(gamma, fmpz_mpolyu_leadcoeff(G)));
 
     fmpz_mpolyu_content_fmpz(temp, G, ctx);
     fmpz_mpolyu_divexact_fmpz(G, G, temp, ctx);
-    fmpz_mpolyu_divexact_fmpz(Abar, Abar, fmpz_mpolyu_leadcoeff_ref(G), ctx);
-    fmpz_mpolyu_divexact_fmpz(Bbar, Bbar, fmpz_mpolyu_leadcoeff_ref(G), ctx);
+    fmpz_mpolyu_divexact_fmpz(Abar, Abar, fmpz_mpolyu_leadcoeff(G), ctx);
+    fmpz_mpolyu_divexact_fmpz(Bbar, Bbar, fmpz_mpolyu_leadcoeff(G), ctx);
 
 successful_put_content:
 
@@ -1407,10 +1407,10 @@ cleanup:
 #if WANT_ASSERT
     if (success)
     {
-        fmpz_mul(temp, fmpz_mpolyu_leadcoeff_ref(G), fmpz_mpolyu_leadcoeff_ref(Abar));
-        FLINT_ASSERT(fmpz_equal(temp, fmpz_mpolyu_leadcoeff_ref(A)));
-        fmpz_mul(temp, fmpz_mpolyu_leadcoeff_ref(G), fmpz_mpolyu_leadcoeff_ref(Bbar));
-        FLINT_ASSERT(fmpz_equal(temp, fmpz_mpolyu_leadcoeff_ref(B)));
+        fmpz_mul(temp, fmpz_mpolyu_leadcoeff(G), fmpz_mpolyu_leadcoeff(Abar));
+        FLINT_ASSERT(fmpz_equal(temp, fmpz_mpolyu_leadcoeff(A)));
+        fmpz_mul(temp, fmpz_mpolyu_leadcoeff(G), fmpz_mpolyu_leadcoeff(Bbar));
+        FLINT_ASSERT(fmpz_equal(temp, fmpz_mpolyu_leadcoeff(B)));
     }
 #endif
 
@@ -1437,9 +1437,6 @@ cleanup:
 
     return success;
 }
-
-
-
 
 
 int fmpz_mpoly_gcd_brown(

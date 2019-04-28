@@ -133,7 +133,7 @@ typedef struct
 typedef fq_nmod_mpolyun_struct fq_nmod_mpolyun_t[1];
 
 /*
-    nmod_mpolyd_t
+    fq_nmod_mpolyd_t
     A dense mpoly is stored as a flat array of coeffcients.
     Suppose deg_bounds = {r0, r1, r2}. The coefficient of the monomial with 
     exponents {e0, e1, e2} is stored at the coefficient of index
@@ -180,19 +180,21 @@ typedef struct _fq_nmod_embed
 typedef _fq_nmod_embed_struct _fq_nmod_embed_t[1];
 
 
-void _fq_nmod_embed_clear(_fq_nmod_embed_t emb);
+FLINT_DLL void _fq_nmod_embed_clear(_fq_nmod_embed_t emb);
 
-void _fq_nmod_embed_array_clear(_fq_nmod_embed_struct * emb, slong m);
+FLINT_DLL void _fq_nmod_embed_array_clear(_fq_nmod_embed_struct * emb, slong m);
 
-void _fq_nmod_embed_array_init(_fq_nmod_embed_struct * emb,
-                     const fq_nmod_ctx_t bigctx, const fq_nmod_ctx_t smallctx);
+FLINT_DLL void _fq_nmod_embed_array_init(
+    _fq_nmod_embed_struct * emb,
+    const fq_nmod_ctx_t bigctx, /* F_p[phi]/g(phi) */
+    const fq_nmod_ctx_t smallctx);
 
-void _fq_nmod_embed_sm_to_lg(
-        fq_nmod_t out,            /* element of lgctx */
-        const fq_nmod_poly_t in,  /* poly over smctx */
-        const _fq_nmod_embed_t emb);
+FLINT_DLL void _fq_nmod_embed_sm_to_lg(
+    fq_nmod_t out,            /* element of lgctx */
+    const fq_nmod_poly_t in,  /* poly over smctx */
+    const _fq_nmod_embed_t emb);
 
-void _fq_nmod_embed_lg_to_sm(
+FLINT_DLL void _fq_nmod_embed_lg_to_sm(
     fq_nmod_poly_t out,  /* poly over smctx */
     const fq_nmod_t in,  /* element of lgctx */
     const _fq_nmod_embed_t emb);
@@ -209,21 +211,23 @@ typedef struct _fq_nmod_mpoly_embed_chooser
 
 typedef _fq_nmod_mpoly_embed_chooser_struct _fq_nmod_mpoly_embed_chooser_t[1];
 
+FLINT_DLL _fq_nmod_embed_struct * _fq_nmod_mpoly_embed_chooser_init(
+    _fq_nmod_mpoly_embed_chooser_t embc,
+    fq_nmod_mpoly_ctx_t ectx,
+    const fq_nmod_mpoly_ctx_t ctx,
+    flint_rand_t randstate);
 
-FLINT_DLL _fq_nmod_embed_struct *
-_fq_nmod_mpoly_embed_chooser_init(_fq_nmod_mpoly_embed_chooser_t embc,
-                   fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                       flint_rand_t randstate);
+FLINT_DLL void _fq_nmod_mpoly_embed_chooser_clear(
+    _fq_nmod_mpoly_embed_chooser_t embc,
+    fq_nmod_mpoly_ctx_t ectx,
+    const fq_nmod_mpoly_ctx_t ctx,
+    flint_rand_t randstate);
 
-FLINT_DLL void
-_fq_nmod_mpoly_embed_chooser_clear(_fq_nmod_mpoly_embed_chooser_t embc,
-                   fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                       flint_rand_t randstate);
-
-FLINT_DLL _fq_nmod_embed_struct *
-_fq_nmod_mpoly_embed_chooser_next(_fq_nmod_mpoly_embed_chooser_t embc,
-                   fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                       flint_rand_t randstate);
+FLINT_DLL _fq_nmod_embed_struct * _fq_nmod_mpoly_embed_chooser_next(
+    _fq_nmod_mpoly_embed_chooser_t embc,
+    fq_nmod_mpoly_ctx_t ectx,
+    const fq_nmod_mpoly_ctx_t ctx,
+    flint_rand_t randstate);
 
 
 /* Context object ************************************************************/
@@ -1009,7 +1013,13 @@ FLINT_DLL void fq_nmod_mpolyn_clear(fq_nmod_mpolyn_t A,
 
 FLINT_DLL void fq_nmod_mpolyn_swap(fq_nmod_mpolyn_t A, fq_nmod_mpolyn_t B);
 
+FLINT_DLL int fq_nmod_mpolyn_is_canonical(const fq_nmod_mpolyn_t A,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void fq_nmod_mpolyn_zero(fq_nmod_mpolyn_t A,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_mpolyn_one(fq_nmod_mpolyn_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int fq_nmod_mpolyn_is_zero(fq_nmod_mpolyn_t A,
@@ -1184,56 +1194,34 @@ FQ_NMOD_MPOLY_INLINE fq_nmod_poly_struct * fq_nmod_mpolyun_leadcoeff_poly(
 
 /*****************************************************************************/
 
-FLINT_DLL nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(fq_nmod_mpolyu_t G,
-                 fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B, fq_nmod_mpolyu_t f,
-                                     slong var, const fq_nmod_mpoly_ctx_t ctx,
-                                     flint_rand_t randstate, slong * degbound);
+FLINT_DLL int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx);
 
-FLINT_DLL int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
-                         fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B, slong var,
-                         const fq_nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo,
-                                                       flint_rand_t randstate);
+FLINT_DLL nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(
+    fq_nmod_mpolyu_t G,
+    fq_nmod_mpolyu_t A,
+    fq_nmod_mpolyu_t B,
+    fq_nmod_mpolyu_t f,
+    slong var,
+    const fq_nmod_mpoly_ctx_t ctx,
+    flint_rand_t randstate,
+    slong * degbound);
 
-FLINT_DLL int fq_nmod_mpolyu_gcdp_zippel_univar(fq_nmod_mpolyu_t G,
-        fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B, const fq_nmod_mpoly_ctx_t ctx);
-
-
-void fq_nmod_mpolyun_mul_last(fq_nmod_mpolyun_t A, fq_nmod_poly_t b,
-                                                 const fq_nmod_mpoly_ctx_t ctx);
-
-void fq_nmod_mpolyn_one(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx);
-
-void fq_nmod_mpolyun_one(fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t ctx);
-
-int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx);
-
-int fq_nmod_mpolyn_is_canonical(const fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx);
-
-void fq_nmod_mpolyun_scalar_mul_fq_nmod(fq_nmod_mpolyun_t A, const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx);
-
-int fq_nmod_mpolyun_is_nonzero_fq_nmod(const fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t ctx);
-
-
-void fq_nmod_mpoly_to_mpolyun_perm_deflate(
-    fq_nmod_mpolyun_t A,
-    const fq_nmod_mpoly_t B,
-    const slong * perm,
-    const ulong * shift,
-    const ulong * stride,
-    const fq_nmod_mpoly_ctx_t uctx,
+FLINT_DLL int fq_nmod_mpolyu_gcdp_zippel_univar(
+    fq_nmod_mpolyu_t G,
+    fq_nmod_mpolyu_t A,
+    fq_nmod_mpolyu_t B,
     const fq_nmod_mpoly_ctx_t ctx);
 
-void fq_nmod_mpoly_from_mpolyun_perm_inflate(
-    fq_nmod_mpoly_t A,
-    mp_bitcnt_t Abits,
-    fq_nmod_mpolyun_t B,
-    const slong * perm,
-    const ulong * shift,
-    const ulong * stride,
-    const fq_nmod_mpoly_ctx_t uctx,
-    const fq_nmod_mpoly_ctx_t ctx);
+FLINT_DLL int fq_nmod_mpolyu_gcdp_zippel(
+    fq_nmod_mpolyu_t G,
+    fq_nmod_mpolyu_t A,
+    fq_nmod_mpolyu_t B,
+    slong var,
+    const fq_nmod_mpoly_ctx_t ctx,
+    mpoly_zipinfo_t zinfo,
+    flint_rand_t randstate);
 
-int fq_nmod_mpolyun_gcd_brown_smprime_bivar(
+FLINT_DLL int fq_nmod_mpolyun_gcd_brown_smprime_bivar(
     fq_nmod_mpolyun_t G,
     fq_nmod_mpolyun_t Abar,
     fq_nmod_mpolyun_t Bbar,
@@ -1241,7 +1229,7 @@ int fq_nmod_mpolyun_gcd_brown_smprime_bivar(
     fq_nmod_mpolyun_t B,
     const fq_nmod_mpoly_ctx_t ctx);
 
-int fq_nmod_mpolyun_gcd_brown_smprime(
+FLINT_DLL int fq_nmod_mpolyun_gcd_brown_smprime(
     fq_nmod_mpolyun_t G,
     fq_nmod_mpolyun_t Abar,
     fq_nmod_mpolyun_t Bbar,
@@ -1250,7 +1238,7 @@ int fq_nmod_mpolyun_gcd_brown_smprime(
     slong var,
     const fq_nmod_mpoly_ctx_t ctx);
 
-int fq_nmod_mpolyun_gcd_brown_lgprime_bivar(
+FLINT_DLL int fq_nmod_mpolyun_gcd_brown_lgprime_bivar(
     fq_nmod_mpolyun_t G,
     fq_nmod_mpolyun_t Abar,
     fq_nmod_mpolyun_t Bbar,
@@ -1258,7 +1246,7 @@ int fq_nmod_mpolyun_gcd_brown_lgprime_bivar(
     fq_nmod_mpolyun_t B,
     const fq_nmod_mpoly_ctx_t ctx);
 
-int fq_nmod_mpolyun_gcd_brown_lgprime(
+FLINT_DLL int fq_nmod_mpolyun_gcd_brown_lgprime(
     fq_nmod_mpolyun_t G,
     fq_nmod_mpolyun_t Abar,
     fq_nmod_mpolyun_t Bbar,
@@ -1269,20 +1257,20 @@ int fq_nmod_mpolyun_gcd_brown_lgprime(
 
 /* gcd_helper_eval_interp ****************************************************/
 
-FLINT_DLL void nmod_mpolyun_reduce_last_fq_nmod_poly(
+FLINT_DLL void nmod_mpolyun_intp_reduce_lg_poly(
     fq_nmod_poly_t E,
     const fq_nmod_ctx_t fqctx,
     const nmod_mpolyun_t A,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_startinterp_fq_nmod_poly(
+FLINT_DLL void nmod_mpolyun_intp_lift_lg_poly(
     slong * lastdeg_,
     nmod_mpolyun_t A,
     const nmod_mpoly_ctx_t ctx,
     const fq_nmod_poly_t B,
     const fq_nmod_ctx_t fqctx);
 
-FLINT_DLL int nmod_mpolyun_addinterp_fq_nmod_poly(
+FLINT_DLL int nmod_mpolyun_intp_crt_lg_poly(
     slong * lastdeg_,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
@@ -1291,14 +1279,14 @@ FLINT_DLL int nmod_mpolyun_addinterp_fq_nmod_poly(
     fq_nmod_poly_t A,
     const fq_nmod_ctx_t fqctx);
 
-FLINT_DLL void nmod_mpolyun_redto_fq_nmod_mpolyun(
+FLINT_DLL void nmod_mpolyun_intp_reduce_lg_mpolyun(
     fq_nmod_mpolyun_t E,
     fq_nmod_mpoly_ctx_t ectx,
     nmod_mpolyun_t A,
     slong var,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_startinterp_fq_nmod_mpolyun(
+FLINT_DLL void nmod_mpolyun_intp_lift_lg_mpolyun(
     slong * lastdeg,
     nmod_mpolyun_t A,
     slong var,
@@ -1306,7 +1294,7 @@ FLINT_DLL void nmod_mpolyun_startinterp_fq_nmod_mpolyun(
     fq_nmod_mpolyun_t B,
     const fq_nmod_mpoly_ctx_t ectx);
 
-FLINT_DLL int nmod_mpolyun_addinterp_fq_nmod_mpolyun(
+FLINT_DLL int nmod_mpolyun_intp_crt_lg_mpolyun(
     slong * lastdeg,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
@@ -1316,19 +1304,19 @@ FLINT_DLL int nmod_mpolyun_addinterp_fq_nmod_mpolyun(
     fq_nmod_mpolyun_t A,
     const fq_nmod_mpoly_ctx_t ectx);
 
-FLINT_DLL void nmod_mpolyun_redto_fq_nmod_mpolyu(
+FLINT_DLL void nmod_mpolyun_intp_reduce_lg_mpolyu(
     fq_nmod_mpolyu_t A,
     nmod_mpolyun_t B,
     const fq_nmod_mpoly_ctx_t ffctx,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_set_fq_nmod_mpolyu(
+FLINT_DLL void nmod_mpolyun_intp_lift_lg_mpolyu(
     nmod_mpolyun_t A,
     const nmod_mpoly_ctx_t ctx,
     fq_nmod_mpolyu_t Ap,
     const fq_nmod_mpoly_ctx_t ctxp);
 
-FLINT_DLL int nmod_mpolyun_addinterp_fq_nmod_mpolyu(
+FLINT_DLL int nmod_mpolyun_intp_crt_lg_mpolyu(
     slong * lastdeg,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
@@ -1337,7 +1325,7 @@ FLINT_DLL int nmod_mpolyun_addinterp_fq_nmod_mpolyu(
     fq_nmod_mpolyu_t A,
     const fq_nmod_mpoly_ctx_t ffctx);
 
-FLINT_DLL int nmod_mpolyun_CRT_fq_nmod_mpolyu(
+FLINT_DLL int nmod_mpolyun_intp_mcrt_lg_mpolyu(
     slong * lastdeg,
     nmod_mpolyun_t H,
     const nmod_mpoly_ctx_t ctx,
@@ -1345,18 +1333,18 @@ FLINT_DLL int nmod_mpolyun_CRT_fq_nmod_mpolyu(
     fq_nmod_mpolyu_t A,
     const fq_nmod_mpoly_ctx_t ctxp);
 
-FLINT_DLL void fq_nmod_mpolyun_eval_last_bivar(
+FLINT_DLL void fq_nmod_mpolyun_intp_reduce_sm_poly(
     fq_nmod_poly_t E,
     const fq_nmod_mpolyun_t A,
     const fq_nmod_t alpha,
     const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpolyun_startinterp_bivar(
+FLINT_DLL void fq_nmod_mpolyun_intp_lift_sm_poly(
     fq_nmod_mpolyun_t A,
     const fq_nmod_poly_t B,
     const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_nmod_mpolyun_addinterp_bivar(
+FLINT_DLL int fq_nmod_mpolyun_intp_crt_sm_poly(
     slong * lastdeg_,
     fq_nmod_mpolyun_t F,
     fq_nmod_mpolyun_t T,
@@ -1365,20 +1353,20 @@ FLINT_DLL int fq_nmod_mpolyun_addinterp_bivar(
     const fq_nmod_t alpha,
     const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpolyun_eval_last_un(
+FLINT_DLL void fq_nmod_mpolyun_intp_reduce_sm_mpolyun(
     fq_nmod_mpolyun_t E,
     fq_nmod_mpolyun_t A,
     slong var,
     fq_nmod_t alpha,
     const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpolyun_startinterp_un(
+FLINT_DLL void fq_nmod_mpolyun_intp_lift_sm_mpolyun(
     fq_nmod_mpolyun_t A,
     fq_nmod_mpolyun_t B,
     slong var,
     const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_nmod_mpolyun_addinterp_un(
+FLINT_DLL int fq_nmod_mpolyun_intp_crt_sm_mpolyun(
     slong * lastdeg,
     fq_nmod_mpolyun_t F,
     fq_nmod_mpolyun_t T,
@@ -1388,14 +1376,14 @@ FLINT_DLL int fq_nmod_mpolyun_addinterp_un(
     const fq_nmod_t alpha,
     const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpolyun_redto_fq_nmod_poly(
+FLINT_DLL void fq_nmod_mpolyun_intp_reduce_lg_poly(
     fq_nmod_poly_t E,
     const fq_nmod_mpoly_ctx_t ectx,
     fq_nmod_mpolyun_t A,
     const fq_nmod_mpoly_ctx_t ctx,
     const _fq_nmod_embed_t emb);
 
-FLINT_DLL void fq_nmod_mpolyun_startinterp_fq_nmod_poly(
+FLINT_DLL void fq_nmod_mpolyun_intp_lift_lg_poly(
     slong * lastdeg_,
     fq_nmod_mpolyun_t A,
     const fq_nmod_mpoly_ctx_t ctx,
@@ -1403,7 +1391,7 @@ FLINT_DLL void fq_nmod_mpolyun_startinterp_fq_nmod_poly(
     const fq_nmod_mpoly_ctx_t ectx,
     const _fq_nmod_embed_t emb);
 
-FLINT_DLL int fq_nmod_mpolyun_addinterp_fq_nmod_poly(
+FLINT_DLL int fq_nmod_mpolyun_intp_crt_lg_poly(
     slong * lastdeg_,
     fq_nmod_mpolyun_t F,
     fq_nmod_mpolyun_t T,
@@ -1413,7 +1401,7 @@ FLINT_DLL int fq_nmod_mpolyun_addinterp_fq_nmod_poly(
     const fq_nmod_mpoly_ctx_t ectx,
     const _fq_nmod_embed_t emb);
 
-FLINT_DLL void fq_nmod_mpolyun_redto_fq_nmod_mpolyun(
+FLINT_DLL void fq_nmod_mpolyun_intp_reduce_lg_mpolyun(
     fq_nmod_mpolyun_t E,
     const fq_nmod_mpoly_ctx_t ectx,
     fq_nmod_mpolyun_t A,
@@ -1421,7 +1409,7 @@ FLINT_DLL void fq_nmod_mpolyun_redto_fq_nmod_mpolyun(
     const fq_nmod_mpoly_ctx_t ctx,
     const _fq_nmod_embed_t emb);
 
-FLINT_DLL void fq_nmod_mpolyun_startinterp_un_lgprime(
+FLINT_DLL void fq_nmod_mpolyun_intp_lift_lg_mpolyun(
     slong * lastdeg,
     fq_nmod_mpolyun_t A,
     slong var,
@@ -1430,7 +1418,7 @@ FLINT_DLL void fq_nmod_mpolyun_startinterp_un_lgprime(
     const fq_nmod_mpoly_ctx_t ectx,
     const _fq_nmod_embed_t emb);
 
-FLINT_DLL int fq_nmod_mpolyun_addinterp_un_lgprime(
+FLINT_DLL int fq_nmod_mpolyun_intp_crt_lg_mpolyun(
     slong * lastdeg,
     fq_nmod_mpolyun_t F,
     fq_nmod_mpolyun_t T,
@@ -1441,18 +1429,18 @@ FLINT_DLL int fq_nmod_mpolyun_addinterp_un_lgprime(
     const fq_nmod_mpoly_ctx_t ectx,
     const _fq_nmod_embed_t emb);
 
-FLINT_DLL void fq_nmod_mpolyun_eval_last(
+FLINT_DLL void fq_nmod_mpolyun_intp_reduce_sm_mpolyu(
     fq_nmod_mpolyu_t B,
     fq_nmod_mpolyun_t A,
     fq_nmod_t alpha,
     const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpolyun_set_mpolyu(
+FLINT_DLL void fq_nmod_mpolyun_intp_lift_sm_mpolyu(
     fq_nmod_mpolyun_t A,
     const fq_nmod_mpolyu_t B,
     const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_nmod_mpolyun_addinterp(
+FLINT_DLL int fq_nmod_mpolyun_intp_crt_sm_mpolyu(
     slong * lastdeg,
     fq_nmod_mpolyun_t F,
     fq_nmod_mpolyun_t T,
@@ -1461,14 +1449,31 @@ FLINT_DLL int fq_nmod_mpolyun_addinterp(
     fq_nmod_t alpha,
     const fq_nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mpolyun_redto_fq_nmod_mpolyu(
+FLINT_DLL void fq_nmod_mpolyun_intp_reduce_lg_mpolyu(
     fq_nmod_mpolyu_t A,
     fq_nmod_mpolyun_t B,
     const fq_nmod_mpoly_ctx_t ectx,
     const fq_nmod_mpoly_ctx_t ctx,
     const _fq_nmod_embed_t emb);
 
-FLINT_DLL int fq_nmod_mpolyun_CRT_fq_nmod_mpolyu(
+FLINT_DLL void fq_nmod_mpolyun_intp_lift_lg_mpolyu(
+    fq_nmod_mpolyun_t A,
+    const fq_nmod_mpoly_ctx_t ctx,
+    fq_nmod_mpolyu_t B,
+    const fq_nmod_mpoly_ctx_t ectx,
+    const _fq_nmod_embed_t emb);
+
+FLINT_DLL int fq_nmod_mpolyun_intp_crt_lg_mpolyu(
+    slong * lastdeg,
+    fq_nmod_mpolyun_t F,
+    fq_nmod_mpolyun_t T,
+    fq_nmod_poly_t m,
+    const fq_nmod_mpoly_ctx_t ctx,
+    fq_nmod_mpolyu_t A,
+    const fq_nmod_mpoly_ctx_t ectx,
+    const _fq_nmod_embed_t emb);
+
+FLINT_DLL int fq_nmod_mpolyun_intp_mcrt_lg_mpolyu(
     slong * lastdeg,
     fq_nmod_mpolyun_t H,
     const fq_nmod_mpoly_ctx_t ctx,
@@ -1476,24 +1481,6 @@ FLINT_DLL int fq_nmod_mpolyun_CRT_fq_nmod_mpolyu(
     fq_nmod_mpolyu_t A,
     const fq_nmod_mpoly_ctx_t ectx,
     _fq_nmod_embed_t emb);
-
-FLINT_DLL void fq_nmod_mpolyun_startinterp_lgprime(
-    fq_nmod_mpolyun_t A,
-    const fq_nmod_mpoly_ctx_t ctx,
-    fq_nmod_mpolyu_t B,
-    const fq_nmod_mpoly_ctx_t ectx,
-    const _fq_nmod_embed_t emb);
-
-FLINT_DLL int fq_nmod_mpolyun_addinterp_lgprime(
-    slong * lastdeg,
-    fq_nmod_mpolyun_t F,
-    fq_nmod_mpolyun_t T,
-    fq_nmod_poly_t m,
-    const fq_nmod_mpoly_ctx_t ctx,
-    fq_nmod_mpolyu_t A,
-    const fq_nmod_mpoly_ctx_t ectx,
-    const _fq_nmod_embed_t emb);
-
 
 /* geobuckets ****************************************************************/
 

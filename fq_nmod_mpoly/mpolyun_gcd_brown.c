@@ -104,8 +104,8 @@ choose_prime:   /* prime is v - alpha */
     }
 
     /* evaluation point should kill neither A nor B */
-    fq_nmod_mpolyun_eval_last_bivar(Aeval, A, alpha, ctx);
-    fq_nmod_mpolyun_eval_last_bivar(Beval, B, alpha, ctx);
+    fq_nmod_mpolyun_intp_reduce_sm_poly(Aeval, A, alpha, ctx);
+    fq_nmod_mpolyun_intp_reduce_sm_poly(Beval, B, alpha, ctx);
     FLINT_ASSERT(Aeval->length > 0);
     FLINT_ASSERT(Beval->length > 0);
 
@@ -147,15 +147,15 @@ choose_prime:   /* prime is v - alpha */
         fq_nmod_poly_evaluate_fq_nmod(temp, modulus, alpha, ctx->fqctx);
         fq_nmod_inv(temp, temp, ctx->fqctx);
         fq_nmod_poly_scalar_mul_fq_nmod(modulus, modulus, temp, ctx->fqctx);
-        fq_nmod_mpolyun_addinterp_bivar(&ldegG, G, T, Geval, modulus, alpha, ctx);
-        fq_nmod_mpolyun_addinterp_bivar(&ldegAbar, Abar, T, Abareval, modulus, alpha, ctx);
-        fq_nmod_mpolyun_addinterp_bivar(&ldegBbar, Bbar, T, Bbareval, modulus, alpha, ctx);
+        fq_nmod_mpolyun_intp_crt_sm_poly(&ldegG, G, T, Geval, modulus, alpha, ctx);
+        fq_nmod_mpolyun_intp_crt_sm_poly(&ldegAbar, Abar, T, Abareval, modulus, alpha, ctx);
+        fq_nmod_mpolyun_intp_crt_sm_poly(&ldegBbar, Bbar, T, Bbareval, modulus, alpha, ctx);
     }
     else
     {
-        fq_nmod_mpolyun_startinterp_bivar(G, Geval, ctx);
-        fq_nmod_mpolyun_startinterp_bivar(Abar, Abareval, ctx);
-        fq_nmod_mpolyun_startinterp_bivar(Bbar, Bbareval, ctx);
+        fq_nmod_mpolyun_intp_lift_sm_poly(G, Geval, ctx);
+        fq_nmod_mpolyun_intp_lift_sm_poly(Abar, Abareval, ctx);
+        fq_nmod_mpolyun_intp_lift_sm_poly(Bbar, Bbareval, ctx);
         ldegG = 0;
         ldegAbar = 0;
         ldegBbar = 0;
@@ -343,8 +343,8 @@ choose_prime:
     }
 
     /* evaluation point should kill neither A nor B */
-    fq_nmod_mpolyun_eval_last_un(Aeval, A, var, alpha, ctx);
-    fq_nmod_mpolyun_eval_last_un(Beval, B, var, alpha, ctx);
+    fq_nmod_mpolyun_intp_reduce_sm_mpolyun(Aeval, A, var, alpha, ctx);
+    fq_nmod_mpolyun_intp_reduce_sm_mpolyun(Beval, B, var, alpha, ctx);
     FLINT_ASSERT(Aeval->length > 0);
     FLINT_ASSERT(Beval->length > 0);
 
@@ -403,15 +403,15 @@ choose_prime:
         fq_nmod_poly_evaluate_fq_nmod(temp, modulus, alpha, ctx->fqctx);
         fq_nmod_inv(temp, temp, ctx->fqctx);
         fq_nmod_poly_scalar_mul_fq_nmod(modulus, modulus, temp, ctx->fqctx);
-        fq_nmod_mpolyun_addinterp_un(&ldegG, G, T, Geval, var, modulus, alpha, ctx);
-        fq_nmod_mpolyun_addinterp_un(&ldegAbar, Abar, T, Abareval, var, modulus, alpha, ctx);
-        fq_nmod_mpolyun_addinterp_un(&ldegBbar, Bbar, T, Bbareval, var, modulus, alpha, ctx);
+        fq_nmod_mpolyun_intp_crt_sm_mpolyun(&ldegG, G, T, Geval, var, modulus, alpha, ctx);
+        fq_nmod_mpolyun_intp_crt_sm_mpolyun(&ldegAbar, Abar, T, Abareval, var, modulus, alpha, ctx);
+        fq_nmod_mpolyun_intp_crt_sm_mpolyun(&ldegBbar, Bbar, T, Bbareval, var, modulus, alpha, ctx);
     }
     else
     {
-        fq_nmod_mpolyun_startinterp_un(G, Geval, var, ctx);
-        fq_nmod_mpolyun_startinterp_un(Abar, Abareval, var, ctx);
-        fq_nmod_mpolyun_startinterp_un(Bbar, Bbareval, var, ctx);
+        fq_nmod_mpolyun_intp_lift_sm_mpolyun(G, Geval, var, ctx);
+        fq_nmod_mpolyun_intp_lift_sm_mpolyun(Abar, Abareval, var, ctx);
+        fq_nmod_mpolyun_intp_lift_sm_mpolyun(Bbar, Bbareval, var, ctx);
         ldegG = 0;
         ldegAbar = 0;
         ldegBbar = 0;
@@ -601,8 +601,8 @@ have_prime:
     }
 
     /* make sure reduction does not kill either A or B */
-    fq_nmod_mpolyun_redto_fq_nmod_poly(Aeval, ectx, A, ctx, cur_emb);
-    fq_nmod_mpolyun_redto_fq_nmod_poly(Beval, ectx, B, ctx, cur_emb);
+    fq_nmod_mpolyun_intp_reduce_lg_poly(Aeval, ectx, A, ctx, cur_emb);
+    fq_nmod_mpolyun_intp_reduce_lg_poly(Beval, ectx, B, ctx, cur_emb);
     if (Aeval->length == 0 || Beval->length == 0)
     {
         goto choose_prime;
@@ -643,15 +643,15 @@ have_prime:
 
     if (fq_nmod_poly_degree(modulus, ctx->fqctx) > 0)
     {
-        fq_nmod_mpolyun_addinterp_fq_nmod_poly(&ldegG, G, T, modulus, ctx, Geval, ectx, cur_emb);
-        fq_nmod_mpolyun_addinterp_fq_nmod_poly(&ldegAbar, Abar, T, modulus, ctx, Abareval, ectx, cur_emb);
-        fq_nmod_mpolyun_addinterp_fq_nmod_poly(&ldegBbar, Bbar, T, modulus, ctx, Bbareval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_crt_lg_poly(&ldegG, G, T, modulus, ctx, Geval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_crt_lg_poly(&ldegAbar, Abar, T, modulus, ctx, Abareval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_crt_lg_poly(&ldegBbar, Bbar, T, modulus, ctx, Bbareval, ectx, cur_emb);
     }
     else
     {
-        fq_nmod_mpolyun_startinterp_fq_nmod_poly(&ldegG, G, ctx, Geval, ectx, cur_emb);
-        fq_nmod_mpolyun_startinterp_fq_nmod_poly(&ldegAbar, Abar, ctx, Abareval, ectx, cur_emb);
-        fq_nmod_mpolyun_startinterp_fq_nmod_poly(&ldegBbar, Bbar, ctx, Bbareval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_lift_lg_poly(&ldegG, G, ctx, Geval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_lift_lg_poly(&ldegAbar, Abar, ctx, Abareval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_lift_lg_poly(&ldegBbar, Bbar, ctx, Bbareval, ectx, cur_emb);
     }
     fq_nmod_poly_mul(modulus, modulus, cur_emb->h, ctx->fqctx);
 
@@ -846,8 +846,8 @@ have_prime:
     }
 
     /* make sure reduction does not kill either A or B */
-    fq_nmod_mpolyun_redto_fq_nmod_mpolyun(Aeval, ectx, A, var, ctx, cur_emb);
-    fq_nmod_mpolyun_redto_fq_nmod_mpolyun(Beval, ectx, B, var, ctx, cur_emb);
+    fq_nmod_mpolyun_intp_reduce_lg_mpolyun(Aeval, ectx, A, var, ctx, cur_emb);
+    fq_nmod_mpolyun_intp_reduce_lg_mpolyun(Beval, ectx, B, var, ctx, cur_emb);
     if (Aeval->length == 0 || Beval->length == 0)
     {
         goto choose_prime;
@@ -905,15 +905,15 @@ have_prime:
 
     if (fq_nmod_poly_degree(modulus, ctx->fqctx) > 0)
     {
-        fq_nmod_mpolyun_addinterp_un_lgprime(&ldegG, G, T, modulus, var, ctx, Geval, ectx, cur_emb);
-        fq_nmod_mpolyun_addinterp_un_lgprime(&ldegAbar, Abar, T, modulus, var, ctx, Abareval, ectx, cur_emb);
-        fq_nmod_mpolyun_addinterp_un_lgprime(&ldegBbar, Bbar, T, modulus, var, ctx, Bbareval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_crt_lg_mpolyun(&ldegG, G, T, modulus, var, ctx, Geval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_crt_lg_mpolyun(&ldegAbar, Abar, T, modulus, var, ctx, Abareval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_crt_lg_mpolyun(&ldegBbar, Bbar, T, modulus, var, ctx, Bbareval, ectx, cur_emb);
     }
     else
     {
-        fq_nmod_mpolyun_startinterp_un_lgprime(&ldegG, G, var, ctx, Geval, ectx, cur_emb);
-        fq_nmod_mpolyun_startinterp_un_lgprime(&ldegAbar, Abar, var, ctx, Abareval, ectx, cur_emb);
-        fq_nmod_mpolyun_startinterp_un_lgprime(&ldegBbar, Bbar, var, ctx, Bbareval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_lift_lg_mpolyun(&ldegG, G, var, ctx, Geval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_lift_lg_mpolyun(&ldegAbar, Abar, var, ctx, Abareval, ectx, cur_emb);
+        fq_nmod_mpolyun_intp_lift_lg_mpolyun(&ldegBbar, Bbar, var, ctx, Bbareval, ectx, cur_emb);
     }
     fq_nmod_poly_mul(modulus, modulus, cur_emb->h, ctx->fqctx);
 

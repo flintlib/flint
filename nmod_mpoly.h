@@ -1443,18 +1443,18 @@ FLINT_DLL void _nmod_poly_eval2_pow(
     nmod_poly_t alphapow,
     const nmodf_ctx_t fctx);
 
-FLINT_DLL void nmod_mpolyun_eval_last_bivar(
+FLINT_DLL void nmod_mpolyun_intp_reduce_sm_poly(
     nmod_poly_t E,
     const nmod_mpolyun_t A,
     mp_limb_t alpha,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_startinterp_bivar(
+FLINT_DLL void nmod_mpolyun_intp_lift_sm_poly(
     nmod_mpolyun_t A,
     const nmod_poly_t B,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpolyun_addinterp_bivar(
+FLINT_DLL int nmod_mpolyun_intp_crt_sm_poly(
     slong * lastdeg_,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
@@ -1463,14 +1463,14 @@ FLINT_DLL int nmod_mpolyun_addinterp_bivar(
     mp_limb_t alpha,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_eval2_last_bivar(
+FLINT_DLL void nmod_mpolyun_intp_reduce_2sm_poly(
     nmod_poly_t E,
     nmod_poly_t F,
     const nmod_mpolyun_t A,
     nmod_poly_t alphapow,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_startinterp2_bivar(
+FLINT_DLL void nmod_mpolyun_intp_lift_2sm_poly(
     slong * lastdeg_,
     nmod_mpolyun_t F,
     const nmod_poly_t A,
@@ -1478,7 +1478,7 @@ FLINT_DLL void nmod_mpolyun_startinterp2_bivar(
     mp_limb_t alpha,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpolyun_addinterp2_bivar(
+FLINT_DLL int nmod_mpolyun_intp_crt_2sm_poly(
     slong * lastdeg_,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
@@ -1488,20 +1488,20 @@ FLINT_DLL int nmod_mpolyun_addinterp2_bivar(
     nmod_poly_t alphapow,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_eval_last_un(
+FLINT_DLL void nmod_mpolyun_intp_reduce_sm_mpolyun(
     nmod_mpolyun_t E,
     nmod_mpolyun_t A,
     slong var,
     mp_limb_t alpha,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_set_popup(
+FLINT_DLL void nmod_mpolyun_intp_lift_sm_mpolyun(
     nmod_mpolyun_t A,
     nmod_mpolyun_t B,
     slong var,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpolyun_addinterp_un(
+FLINT_DLL int nmod_mpolyun_intp_crt_sm_mpolyun(
     slong * lastdeg,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
@@ -1511,7 +1511,7 @@ FLINT_DLL int nmod_mpolyun_addinterp_un(
     mp_limb_t alpha,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_eval2_last_un(
+FLINT_DLL void nmod_mpolyun_intp_reduce_2sm_mpolyun(
     nmod_mpolyun_t E,
     nmod_mpolyun_t F, 
     nmod_mpolyun_t A,
@@ -1519,7 +1519,7 @@ FLINT_DLL void nmod_mpolyun_eval2_last_un(
     nmod_poly_t alphapow,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_startinterp2_un(
+FLINT_DLL void nmod_mpolyun_intp_lift_2sm_mpolyun(
     slong * lastdeg,
     nmod_mpolyun_t F,
     nmod_mpolyun_t A,
@@ -1528,7 +1528,7 @@ FLINT_DLL void nmod_mpolyun_startinterp2_un(
     mp_limb_t alpha,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpolyun_addinterp2_un(
+FLINT_DLL int nmod_mpolyun_intp_crt_2sm_mpolyun(
     slong * lastdeg,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
@@ -1539,18 +1539,18 @@ FLINT_DLL int nmod_mpolyun_addinterp2_un(
     nmod_poly_t alphapow,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_eval_last(
+FLINT_DLL void nmod_mpolyun_intp_reduce_sm_mpolyu(
     nmod_mpolyu_t B,
     nmod_mpolyun_t A,
     mp_limb_t alpha,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpolyun_set_mpolyu(
+FLINT_DLL void nmod_mpolyun_intp_lift_sm_mpolyu(
     nmod_mpolyun_t A,
     const nmod_mpolyu_t B,
     const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpolyun_addinterp(
+FLINT_DLL int nmod_mpolyun_intp_crt_sm_mpolyu(
     slong * lastdeg,
     nmod_mpolyun_t F,
     nmod_mpolyun_t T,
