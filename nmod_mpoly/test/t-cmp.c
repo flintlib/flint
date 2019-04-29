@@ -19,13 +19,14 @@ main(void)
 {
     int result;
     slong i, j1, j2;
+    slong tmul = 20;
     FLINT_TEST_INIT(state);
 
     flint_printf("cmp....");
     fflush(stdout);
 
     /* check polynomial terms are in order */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, mf, mg;

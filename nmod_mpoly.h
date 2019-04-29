@@ -1130,15 +1130,16 @@ FLINT_DLL void nmod_mpolyd_last_content(nmod_poly_t cont, const nmod_mpolyd_t A,
                                                        const nmodf_ctx_t fctx);
 
 FLINT_DLL int nmod_mpoly_gcd_brown(nmod_mpoly_t G,
-                               const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpoly_gcd_brownnew(nmod_mpoly_t G,
-                               const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
+FLINT_DLL int nmod_mpoly_gcd_brown_threaded(nmod_mpoly_t G,
+                                const nmod_mpoly_t A, const nmod_mpoly_t B,
+                               const nmod_mpoly_ctx_t ctx, slong thread_limit);
 
-FLINT_DLL int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
-                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL int nmod_mpoly_gcd_zippel(nmod_mpoly_t G,
+                                const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int _nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
                               const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,

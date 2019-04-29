@@ -17,8 +17,8 @@
 int
 main(void)
 {
-    slong tmul = 5;
     int i, j, result;
+    slong tmul = 5;
     FLINT_TEST_INIT(state);
 
     flint_printf("derivative....");

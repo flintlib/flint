@@ -2555,7 +2555,7 @@ Chinese Remaindering
 
     Return the required length of the output for func::_nmod_poly_crt_run.
 
-.. function:: void _nmod_poly_crt_run_p(const nmod_poly_crt_t CRT, nmod_poly_struct * const * outputs, const nmod_poly_struct * const * inputs)
+.. function:: void _nmod_poly_crt_run_p(nmod_poly_struct * const * outputs, const nmod_poly_crt_t CRT, const nmod_poly_struct * const * inputs)
 
     Chinese remainder the ``inputs`` and place the output in ``outputs[0]``, which will have lowest possible degree and be congruent to ``inputs[i]`` modulo the ``moduli[i]`` in func::nmod_poly_crt_compile.
     ``outputs`` should contain space for all temporaries and should be at least as long as ``_nmod_poly_crt_local_size(P)``.
