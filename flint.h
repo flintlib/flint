@@ -353,7 +353,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
    __tmp_root = NULL
 
 #define TMP_ALLOC(size) \
-   ((size) > 8192 ? \
+   (((WANT_ASSERT) || (size) > 8192) ? \
       (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
        __tpx->next = __tmp_root, \
        __tmp_root = __tpx, \

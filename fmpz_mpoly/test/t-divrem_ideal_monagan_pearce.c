@@ -21,13 +21,14 @@ int
 main(void)
 {
     int i, j, w, result;
+    slong tmul = 10;
     FLINT_TEST_INIT(state);
 
     flint_printf("divrem_ideal_monagan_pearce....");
     fflush(stdout);
 
     /* Check f*g/g = f */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f, g, h, k, r;
@@ -91,7 +92,7 @@ main(void)
     }
 
     /* Check f = g1*q1 + ... + gn*qn + r for random polys */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul*tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, r, k1, k2;
@@ -109,7 +110,7 @@ main(void)
 
         ord = mpoly_ordering_randtest(state);
 
-        nvars = n_randint(state, 10) + 1;
+        nvars = n_randint(state, 9) + 1;
 
         fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
@@ -131,9 +132,9 @@ main(void)
         len1 = n_randint(state, 10);
         len2 = n_randint(state, 10) + 1;
 
-        exp_bound =  n_randint(state, 3 + 200/nvars/nvars) + 1;
-        exp_bound1 = n_randint(state, 3 + 200/nvars/nvars) + 1;
-        exp_bound2 = n_randint(state, 3 + 200/nvars/nvars) + 1;
+        exp_bound =  n_randint(state, 2 + 175/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 2 + 175/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 2 + 175/nvars/nvars) + 1;
 
         coeff_bits = n_randint(state, 70);
 
@@ -187,6 +188,14 @@ main(void)
             }
         }
 
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            fmpz_clear(shifts + j);
+            fmpz_clear(strides + j);
+        }
+        flint_free(shifts);
+        flint_free(strides);
+
         for (w = 0; w < num; w++)
             fmpz_mpoly_clear(qarr[w], ctx);
         for (w = 0; w < num; w++)
@@ -201,7 +210,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 2*tmul * flint_test_multiplier(); i++)
     {
        fmpz_mpoly_ctx_t ctx;
        fmpz_mpoly_t f, r, k1, k2;

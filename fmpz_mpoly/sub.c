@@ -196,4 +196,6 @@ void fmpz_mpoly_sub(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
       flint_free(exp3);
 
    _fmpz_mpoly_set_length(poly1, len, ctx);
+
+    TMP_END;
 }
