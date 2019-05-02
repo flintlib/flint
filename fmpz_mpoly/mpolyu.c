@@ -750,6 +750,27 @@ void fmpz_mpolyu_fmpz_content(fmpz_t c, fmpz_mpolyu_t A,
 }
 
 
+void fmpz_mpolyu_mul_fmpz(
+    fmpz_mpolyu_t A,
+    fmpz_mpolyu_t B,
+    fmpz_t c,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    FLINT_ASSERT(!fmpz_is_zero(c));
+    FLINT_ASSERT(A->bits == B->bits);
+    fmpz_mpolyu_fit_length(A, B->length, ctx);
+
+    for (i = 0; i < B->length; i++)
+    {
+        A->exps[i] = B->exps[i];
+        fmpz_mpoly_scalar_mul_fmpz(A->coeffs + i, B->coeffs + i, c, ctx);
+        FLINT_ASSERT((A->coeffs + i)->bits == B->bits);
+    }
+    A->length = B->length;
+}
+
 
 void fmpz_mpolyu_divexact_fmpz(
     fmpz_mpolyu_t A,

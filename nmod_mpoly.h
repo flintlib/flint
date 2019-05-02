@@ -34,8 +34,8 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "mpoly.h"
-
 #include "fq_nmod_poly.h"
+#include "thread_pool.h"
 
 
 #ifdef __cplusplus
@@ -1395,6 +1395,11 @@ FLINT_DLL int nmod_mpolyun_gcd_brown_smprime_bivar(
 FLINT_DLL int nmod_mpolyun_gcd_brown_smprime(nmod_mpolyun_t G,
   nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar, nmod_mpolyun_t A, nmod_mpolyun_t B,
                                         slong var, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpolyun_gcd_brown_smprime_threaded(nmod_mpolyun_t G,
+                nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar, nmod_mpolyun_t A,
+                     nmod_mpolyun_t B, slong var, const nmod_mpoly_ctx_t ctx,
+                        const thread_pool_handle * handles, slong num_workers);
 
 FLINT_DLL int nmod_mpolyun_gcd_brown_lgprime(nmod_mpolyun_t G,
      nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar, nmod_mpolyun_t A, nmod_mpolyun_t B,

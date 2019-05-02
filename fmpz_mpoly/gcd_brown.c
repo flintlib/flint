@@ -68,15 +68,13 @@ void fmpz_mpolyu_heights(
 }
 
 
-/*
-    A and B are assumed to be primitive and therefore are marked const
-*/
+/* The inputs A and B are modified */
 int fmpz_mpolyu_gcd_brown(
     fmpz_mpolyu_t G,
     fmpz_mpolyu_t Abar,
     fmpz_mpolyu_t Bbar,
-    const fmpz_mpolyu_t A,
-    const fmpz_mpolyu_t B,
+    fmpz_mpolyu_t A,
+    fmpz_mpolyu_t B,
     const fmpz_mpoly_ctx_t ctx)
 {
     int success;
@@ -85,6 +83,7 @@ int fmpz_mpolyu_gcd_brown(
     mp_limb_t p, gammared;
     fmpz_t gamma, modulus;
     fmpz_t gnm, gns, anm, ans, bnm, bns;
+    fmpz_t cA, cB, cG, cAbar, cBbar;
     fmpz_t temp;
     fmpz_mpolyu_t T;
     nmod_mpolyun_t Gp, Abarp, Bbarp, Ap, Bp;
@@ -112,12 +111,21 @@ int fmpz_mpolyu_gcd_brown(
     fmpz_init(temp);
     fmpz_init_set_si(modulus, 1);
 
-#if WANT_ASSERT
-    fmpz_mpolyu_content_fmpz(temp, A, ctx);
-    FLINT_ASSERT(fmpz_is_one(temp));
-    fmpz_mpolyu_content_fmpz(temp, B, ctx);
-    FLINT_ASSERT(fmpz_is_one(temp));
-#endif
+    /* compute contents of G, Abar, Bbar, A, B */
+    fmpz_init(cA);
+    fmpz_init(cB);
+    fmpz_init(cG);
+    fmpz_init(cAbar);
+    fmpz_init(cBbar);
+    fmpz_mpolyu_content_fmpz(cA, A, ctx);
+    fmpz_mpolyu_content_fmpz(cB, B, ctx);
+    fmpz_gcd(cG, cA, cB);
+    fmpz_divexact(cAbar, cA, cG);
+    fmpz_divexact(cBbar, cB, cG);
+
+    /* remove content from inputs */
+    fmpz_mpolyu_divexact_fmpz(A, A, cA, ctx);
+    fmpz_mpolyu_divexact_fmpz(B, B, cB, ctx);
 
     fmpz_gcd(gamma, fmpz_mpolyu_leadcoeff(A),
                     fmpz_mpolyu_leadcoeff(B));
@@ -181,8 +189,8 @@ choose_prime:
     if (nmod_mpolyun_is_nonzero_nmod(Gp, pctx))
     {
         fmpz_mpolyu_one(G, ctx);
-        fmpz_mpolyu_set(Abar, A, ctx);
-        fmpz_mpolyu_set(Bbar, B, ctx);
+        fmpz_mpolyu_swap(Abar, A, ctx);
+        fmpz_mpolyu_swap(Bbar, B, ctx);
         goto successful_put_content;
     }
 
@@ -268,20 +276,19 @@ successful:
 
 successful_put_content:
 
-    /* inputs were supposed to be primitive - nothing to do */
+    fmpz_mpolyu_mul_fmpz(G, G, cG, ctx);
+    fmpz_mpolyu_mul_fmpz(Abar, Abar, cAbar, ctx);
+    fmpz_mpolyu_mul_fmpz(Bbar, Bbar, cBbar, ctx);
+
     success = 1;
 
 cleanup:
 
-#if WANT_ASSERT
-    if (success)
-    {
-        fmpz_mul(temp, fmpz_mpolyu_leadcoeff(G), fmpz_mpolyu_leadcoeff(Abar));
-        FLINT_ASSERT(fmpz_equal(temp, fmpz_mpolyu_leadcoeff(A)));
-        fmpz_mul(temp, fmpz_mpolyu_leadcoeff(G), fmpz_mpolyu_leadcoeff(Bbar));
-        FLINT_ASSERT(fmpz_equal(temp, fmpz_mpolyu_leadcoeff(B)));
-    }
-#endif
+    fmpz_clear(cA);
+    fmpz_clear(cB);
+    fmpz_clear(cG);
+    fmpz_clear(cAbar);
+    fmpz_clear(cBbar);
 
     fmpz_clear(gamma);
     fmpz_clear(gnm);
@@ -321,7 +328,6 @@ int fmpz_mpoly_gcd_brown(
     mp_bitcnt_t new_bits;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
-    fmpz_t cA, cB, cG;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {
@@ -397,31 +403,17 @@ int fmpz_mpoly_gcd_brown(
     fmpz_mpolyu_init(Abaru, new_bits, uctx);
     fmpz_mpolyu_init(Bbaru, new_bits, uctx);
 
-    fmpz_init(cA);
-    fmpz_init(cB);
-    fmpz_init(cG);
-
     fmpz_mpoly_to_mpolyu_perm_deflate(Au, A, perm, shift, stride, uctx, ctx);
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B, perm, shift, stride, uctx, ctx);
 
-    fmpz_mpolyu_content_fmpz(cA, Au, uctx);
-    fmpz_mpolyu_content_fmpz(cB, Bu, uctx);
-    fmpz_gcd(cG, cA, cB);
-    fmpz_mpolyu_divexact_fmpz(Au, Au, cA, uctx);
-    fmpz_mpolyu_divexact_fmpz(Bu, Bu, cB, uctx);
     success = fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx);
-
     if (success)
     {
-        fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits, Gu, perm, shift, stride, uctx, ctx);
+        fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits,
+                                           Gu, perm, shift, stride, uctx, ctx);
         if (fmpz_sgn(G->coeffs + 0) < 0)
-            fmpz_neg(cG, cG);
-        fmpz_mpoly_scalar_mul_fmpz(G, G, cG, ctx);
+            fmpz_mpoly_neg(G, G, ctx);
     }
-
-    fmpz_clear(cA);
-    fmpz_clear(cB);
-    fmpz_clear(cG);
 
     fmpz_mpolyu_clear(Au, uctx);
     fmpz_mpolyu_clear(Bu, uctx);

@@ -663,7 +663,7 @@ choose_prime: /* prime is v - alpha */
         nmod_mpolyun_one(G, ctx);
         nmod_mpolyun_swap(Abar, A);
         nmod_mpolyun_swap(Bbar, B);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (nmod_poly_degree(modulus) > 0)

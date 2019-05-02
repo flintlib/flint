@@ -886,10 +886,10 @@ compute_split:
 
     if (splitbase->gcd_is_one)
     {
-        success = 1;
         nmod_mpolyun_one(G, ctx);
-        nmod_mpolyun_mul_last(G, cG, ctx);
-        goto cleanup_split;
+        nmod_mpolyun_swap(Abar, A);
+        nmod_mpolyun_swap(Bbar, B);
+        goto successful_put_content;
     }
 
     for (i = 0; i < num_threads; i++)
@@ -1000,21 +1000,31 @@ compute_split:
     }
     flint_free(joinargs);
 
-    if (   deggamma + ldegA != ldegGs + ldegAbars
-        || deggamma + ldegB != ldegGs + ldegBbars
-       )
+    if (   deggamma + ldegA == ldegGs + ldegAbars
+        && deggamma + ldegB == ldegGs + ldegBbars)
     {
-        /* divisibility test failed - could try again or just fail */
-        goto compute_split;
+        goto successful;
     }
 
-    success = 1;
+    /* divisibility test failed - could try again or just fail */
+    goto compute_split;
+
+successful:
 
     nmod_poly_init(cGs, ctx->ffinfo->mod.n);
     nmod_mpolyun_content_last(cGs, G, ctx);
     nmod_mpolyun_divexact_last(G, cGs, ctx);
-    nmod_mpolyun_mul_last(G, cG, ctx);
+    nmod_mpolyun_divexact_last(Abar, nmod_mpolyun_leadcoeff_poly(G, ctx), ctx);
+    nmod_mpolyun_divexact_last(Bbar, nmod_mpolyun_leadcoeff_poly(G, ctx), ctx);
     nmod_poly_clear(cGs);
+
+successful_put_content:
+
+    nmod_mpolyun_mul_last(G, cG, ctx);
+    nmod_mpolyun_mul_last(Abar, cAbar, ctx);
+    nmod_mpolyun_mul_last(Bbar, cBbar, ctx);
+
+    success = 1;
 
 cleanup_split:
 
