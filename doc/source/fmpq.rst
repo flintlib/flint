@@ -177,6 +177,10 @@ Conversion
     denominator of ``z`` for read only operations only. The user must not
     run ``fmpq_clear`` on ``z``.
 
+.. function:: double fmpz_get_d(const fmpz_t f)
+
+    Returns `f` as a ``double``, rounding towards zero if ``f`` cannot be represented exactly. The return is undefined if ``f`` is too large or too small to fit in a ``double``.
+
 .. function:: void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
     Sets the value of ``dest``
@@ -556,6 +560,13 @@ Rational enumeration
 
     Starting with zero, this generates every rational number once
     and only once, but not in order of minimal height.
+
+.. function:: int fmpq_farey_neighbors(fmpq_t left, fmpq_t right, const fmpq_t a)
+
+    Set `left` and `right` to the fractions directly below and above `a` in the Farey sequence of order ``fmpq_denref(a)``.
+    If `a` is canonical and has denominator strictly greater than one, then this function is successful and returns ``1``. Otherwise it return ``0``.
+    No aliasing whatsoever is supported.
+
 
 
 Continued fractions

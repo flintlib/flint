@@ -423,7 +423,7 @@ static void _splitworker(void * varg)
             break;
         }
         p = n_nextprime(base->p, 1);
-        base->p = p;        
+        base->p = p;
         pthread_mutex_unlock(&base->mutex);
 
         /* make sure reduction does not kill both lc(A) and lc(B) */
@@ -573,7 +573,7 @@ void fmpz_mpoly_crt(
     /* start[k] is the next available term in B[k] */
     for (k = 0; k < count; k++)
     {
-        start[k] = 0;    
+        start[k] = 0;
     }
 
     Ai = 0;
@@ -751,11 +751,11 @@ static void _joinworker(void * varg)
         }
         else if (our_Abar_exp >= 0)
         {
-            base->Abar_exp = our_Abar_exp - 1;            
+            base->Abar_exp = our_Abar_exp - 1;
         }
         else if (our_Bbar_exp >= 0)
         {
-            base->Bbar_exp = our_Bbar_exp - 1;            
+            base->Bbar_exp = our_Bbar_exp - 1;
         }
         pthread_mutex_unlock(&base->mutex);
 
@@ -841,44 +841,6 @@ static void _final_join(
     TMP_END;
 }
 
-
-
-double fmpq_get_d(const fmpq_t a)
-{
-    /* TODO: make this more robust in the general case */
-    return fmpz_get_d(fmpq_numref(a))/fmpz_get_d(fmpq_denref(a));
-}
-
-/*
-    Find the fractions directly below and above a in the Farey sequence of
-    order a_den:
-
-     left_num     a_num = left_num + right_num     right_num
-    ---------- < ------------------------------ < -----------
-     left_den     a_den = left_den + right_den     right_den
-
-    This function will throw if a is not canonical or has denominator 1.
-    No aliasing.
-*/
-void fmpq_farey_neighbors(fmpq_t left, fmpq_t right, const fmpq_t a)
-{
-    int success;
-
-    success = fmpz_invmod(fmpq_denref(left), fmpq_numref(a), fmpq_denref(a));
-    if (!success || fmpz_is_zero(fmpq_denref(left)))
-    {
-        flint_throw(FLINT_ERROR, "fmpq_farey_neighbors: bad input");
-    }
-
-    fmpz_mul(fmpq_numref(left), fmpq_numref(a), fmpq_denref(left));
-    fmpz_sub_ui(fmpq_numref(left), fmpq_numref(left), 1);
-    fmpz_divexact(fmpq_numref(left), fmpq_numref(left), fmpq_denref(a));
-
-    fmpz_sub(fmpq_numref(right), fmpq_numref(a), fmpq_numref(left));
-    fmpz_sub(fmpq_denref(right), fmpq_denref(a), fmpq_denref(left));
-}
-
-
 /*
     Set 1 <= l <= min(n, m) and fractions v + 0, ..., v + l - 1
     More comments in useage
@@ -923,18 +885,16 @@ static void _divide_master_threads(slong * l_, fmpq * v, slong n, slong m)
     i = 0;
     while (i < l)
     {
-        if (fmpz_cmp_ui(fmpq_denref(v + i), 2) >= 0)
+        if (   fmpz_cmp_ui(fmpq_denref(v + i), 2) >= 0
+            && fmpq_farey_neighbors(left, right, v + i)
+            && fmpq_get_d(right) < score_threashold)
         {
-            fmpq_farey_neighbors(left, right, v + i);
-            if (fmpq_get_d(right) < score_threashold)
-            {
-                /* delete v + i, add left and right */
-                FLINT_ASSERT(l < m);
-                fmpq_set(v + i, right);
-                fmpq_set(v + l, left);
-                l++;
-                continue;
-            }
+            /* delete v + i, add left and right */
+            FLINT_ASSERT(l < m);
+            fmpq_set(v + i, right);
+            fmpq_set(v + l, left);
+            l++;
+            continue;
         }
         i++;
     }
