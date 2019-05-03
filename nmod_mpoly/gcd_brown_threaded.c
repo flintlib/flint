@@ -21,9 +21,9 @@ static slong _nmod_mpolyn_crt(
     nmod_mpolyn_t A,
     nmod_mpolyn_struct * const * B,
     slong count,
-    nmod_poly_struct * const * output,  /* temp space */
-    nmod_poly_struct ** input,          /* temp space */
-    slong * start,                      /* temp space */
+    nmod_poly_struct * output,      /* temp space */
+    nmod_poly_struct ** input,      /* temp space */
+    slong * start,                  /* temp space */
     const nmod_mpoly_ctx_t ctx)
 {
     int cmp;
@@ -93,7 +93,7 @@ static slong _nmod_mpolyn_crt(
 
         _nmod_poly_multi_crt_run_p(output, P,
                                      (const nmod_poly_struct * const *) input);
-        nmod_poly_swap(A->coeffs + Ai, output[0]);
+        nmod_poly_swap(A->coeffs + Ai, output + 0);
         lastdegree = FLINT_MAX(lastdegree, nmod_poly_degree(A->coeffs + Ai));
         Ai += !nmod_poly_is_zero(A->coeffs + Ai);
     }
@@ -117,7 +117,7 @@ static slong _nmod_mpolyun_crt_exp(
     nmod_mpolyn_struct ** Bcoeffs,  /* temp space */
     nmod_poly_struct ** input,      /* temp space */
     slong * start,                  /* temp space */
-    nmod_poly_struct ** output,     /* temp space */
+    nmod_poly_struct * output,      /* temp space */
     const nmod_mpoly_ctx_t ctx)
 {
     slong j, k;
@@ -594,7 +594,7 @@ typedef struct
     volatile slong G_exp, Abar_exp, Bbar_exp;
     pthread_mutex_t mutex;
     const nmod_mpoly_ctx_struct * ctx;
-    nmod_poly_multi_crt_struct * CRT;
+    nmod_poly_multi_crt_t CRT;
     nmod_mpolyun_struct ** gptrs, ** abarptrs, ** bbarptrs;
     ulong num_threads;
 }
@@ -621,7 +621,7 @@ static void _joinworker(void * varg)
     nmod_poly_struct ** input;
     slong * start;
     slong j, ls;
-    nmod_poly_struct ** output;
+    nmod_poly_struct * output;
 
     /* should already be zero, but just make sure */
     arg->G->length = 0;
@@ -633,11 +633,10 @@ static void _joinworker(void * varg)
     input = (nmod_poly_struct **) flint_malloc(count * sizeof(nmod_poly_struct *));
     start = (slong *) flint_malloc(count * sizeof(slong));
     ls = _nmod_poly_multi_crt_local_size(base->CRT);
-    output = (nmod_poly_struct **) flint_malloc(ls*sizeof(nmod_poly_struct *));
+    output = (nmod_poly_struct *) flint_malloc(ls*sizeof(nmod_poly_struct));
     for (j = 0; j < ls; j++)
     {
-        output[j] = (nmod_poly_struct *) flint_malloc(sizeof(nmod_poly_struct));
-        nmod_poly_init_mod(output[j], base->ctx->ffinfo->mod);
+        nmod_poly_init_mod(output + j, base->ctx->ffinfo->mod);
     }
 
     while (1)
@@ -692,8 +691,7 @@ cleanup:
 
     for (j = 0; j < ls; j++)
     {
-        nmod_poly_clear(output[j]);
-        flint_free(output[j]);
+        nmod_poly_clear(output + j);
     }
     flint_free(output);
     flint_free(coeffs);
@@ -788,7 +786,6 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     slong Gexp0, Abarexp0, Bbarexp0;
     nmod_poly_struct ** mptrs;
     nmod_mpolyun_struct ** gptrs, ** abarptrs, ** bbarptrs;
-    nmod_poly_multi_crt_t P;
     _splitworker_arg_struct * splitargs;
     _splitbase_t splitbase;
     _joinworker_arg_struct * joinargs;
@@ -931,8 +928,8 @@ compute_split:
         FLINT_ASSERT(splitargs[i].Bbar->exps[0] == Bbarexp0);
     }
 
-    nmod_poly_multi_crt_init(P);
-    success = nmod_poly_multi_crt_precompute_p(P,
+    nmod_poly_multi_crt_init(joinbase->CRT);
+    success = nmod_poly_multi_crt_precompute_p(joinbase->CRT,
                         (const nmod_poly_struct * const *) mptrs, num_threads);
     FLINT_ASSERT(success);
 
@@ -944,7 +941,6 @@ compute_split:
     joinbase->Abar_exp = Abarexp0;
     joinbase->Bbar_exp = Bbarexp0;
     joinbase->ctx = ctx;
-    joinbase->CRT = P;
     pthread_mutex_init(&joinbase->mutex, NULL);
 
     joinargs = (_joinworker_arg_struct *) flint_malloc(
@@ -992,7 +988,7 @@ compute_split:
     _final_join(Bbar, bbarptrs, num_threads, ctx);
 
     /* free join data */
-    nmod_poly_multi_crt_clear(P);
+    nmod_poly_multi_crt_clear(joinbase->CRT);
     for (i = 0; i < num_threads; i++)
     {
         nmod_mpolyun_clear(joinargs[i].G, ctx);

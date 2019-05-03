@@ -1325,10 +1325,10 @@ slong _nmod_poly_multi_crt_local_size(const nmod_poly_multi_crt_t CRT)
     return CRT->localsize;
 }
 
-FLINT_DLL void _nmod_poly_multi_crt_run(nmod_poly_struct * const * outputs,
+FLINT_DLL void _nmod_poly_multi_crt_run(nmod_poly_struct * outputs,
              const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * inputs);
 
-FLINT_DLL void _nmod_poly_multi_crt_run_p(nmod_poly_struct * const * outputs,
+FLINT_DLL void _nmod_poly_multi_crt_run_p(nmod_poly_struct * outputs,
      const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * inputs);
 
 /* Inflation and deflation ***************************************************/

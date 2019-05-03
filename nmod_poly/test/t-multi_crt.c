@@ -23,23 +23,22 @@ main(void)
     /* test internal interface */
     {
         nmod_poly_multi_crt_t P;
-        nmod_poly_struct ** moduli, ** inputs, ** outputs;
+        nmod_poly_struct ** moduli, ** inputs, * outputs;
         mp_limb_t modulus = 1009;
         slong moduli_count = 1000;
 
         moduli = (nmod_poly_struct **) flint_malloc(moduli_count*sizeof(nmod_poly_struct *));
         inputs = (nmod_poly_struct **) flint_malloc(moduli_count*sizeof(nmod_poly_struct *));
-        outputs = (nmod_poly_struct **) flint_malloc(moduli_count*sizeof(nmod_poly_struct *));
+        outputs = (nmod_poly_struct *) flint_malloc(moduli_count*sizeof(nmod_poly_struct));
 
         for (k = 0; k < moduli_count; k++)
         {
             moduli[k] = (nmod_poly_struct *) flint_malloc(sizeof(nmod_poly_struct));
             inputs[k] = (nmod_poly_struct *) flint_malloc(sizeof(nmod_poly_struct));
-            outputs[k] = (nmod_poly_struct *) flint_malloc(sizeof(nmod_poly_struct));
 
             nmod_poly_init(moduli[k], modulus);
             nmod_poly_init(inputs[k], modulus);
-            nmod_poly_init(outputs[k], modulus);
+            nmod_poly_init(outputs + k, modulus);
 
             nmod_poly_set_coeff_ui(moduli[k], 1, 1);
             nmod_poly_set_coeff_ui(moduli[k], 0, modulus - k);
@@ -68,10 +67,9 @@ main(void)
         {
             nmod_poly_clear(moduli[k]);
             nmod_poly_clear(inputs[k]);
-            nmod_poly_clear(outputs[k]);
+            nmod_poly_clear(outputs + k);
             flint_free(moduli[k]);
             flint_free(inputs[k]);
-            flint_free(outputs[k]);
         }
 
         flint_free(moduli);

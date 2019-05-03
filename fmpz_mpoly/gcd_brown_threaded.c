@@ -376,7 +376,7 @@ typedef struct
     volatile slong G_exp, Abar_exp, Bbar_exp;
     pthread_mutex_t mutex;
     const fmpz_mpoly_ctx_struct * ctx;
-    fmpz_multi_crt_struct * CRT;
+    fmpz_multi_crt_t CRT;
     fmpz_mpolyu_struct ** gptrs, ** abarptrs, ** bbarptrs;
     slong num_images;
 }
@@ -588,7 +588,6 @@ int fmpz_mpolyu_gcd_brown_threaded(
     fmpz_t cA, cB, cG, cAbar, cBbar;
     fmpz ** mptrs;
     fmpz_mpolyu_struct ** gptrs, ** abarptrs, ** bbarptrs;
-    fmpz_multi_crt_t P;
     fmpq * qvec;
     _splitworker_arg_struct * splitargs;
     _splitbase_t splitbase;
@@ -808,8 +807,8 @@ compute_split:
     }
 
     /* now must join ptrs[0], ..., ptrs[num_images-1] where num_images > 0 */
-    fmpz_multi_crt_init(P);
-    success = fmpz_multi_crt_precompute_p(P,
+    fmpz_multi_crt_init(joinbase->CRT);
+    success = fmpz_multi_crt_precompute_p(joinbase->CRT,
                                      (const fmpz * const *) mptrs, num_images);
     FLINT_ASSERT(success);
 
@@ -821,7 +820,6 @@ compute_split:
     joinbase->Abar_exp = abarptrs[0]->exps[0];
     joinbase->Bbar_exp = bbarptrs[0]->exps[0];
     joinbase->ctx = ctx;
-    joinbase->CRT = P;
     pthread_mutex_init(&joinbase->mutex, NULL);
 
     joinargs = (_joinworker_arg_struct *) flint_malloc(
@@ -892,7 +890,7 @@ compute_split:
     }
 
     /* free join data */
-    fmpz_multi_crt_clear(P);
+    fmpz_multi_crt_clear(joinbase->CRT);
     for (i = 0; i < num_threads; i++)
     {
         fmpz_clear(joinargs[i].Gmax);
