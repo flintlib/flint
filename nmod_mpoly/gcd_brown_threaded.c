@@ -17,7 +17,7 @@
     This functions takes some preallocated temp space.
 */
 static slong _nmod_mpolyn_crt(
-    const nmod_poly_crt_t P,
+    const nmod_poly_multi_crt_t P,
     nmod_mpolyn_t A,
     nmod_mpolyn_struct * const * B,
     slong count,
@@ -91,7 +91,8 @@ static slong _nmod_mpolyn_crt(
             }
         }
 
-        _nmod_poly_crt_run_p(output, P, (const nmod_poly_struct * const *) input);
+        _nmod_poly_multi_crt_run_p(output, P,
+                                     (const nmod_poly_struct * const *) input);
         nmod_poly_swap(A->coeffs + Ai, output[0]);
         lastdegree = FLINT_MAX(lastdegree, nmod_poly_degree(A->coeffs + Ai));
         Ai += !nmod_poly_is_zero(A->coeffs + Ai);
@@ -108,7 +109,7 @@ static slong _nmod_mpolyn_crt(
     A and the B's are in Fp[X][x_0, ..., x_(var-1)][x_var]
 */
 static slong _nmod_mpolyun_crt_exp(
-    const nmod_poly_crt_t P,
+    const nmod_poly_multi_crt_t P,
     nmod_mpolyun_t A,
     ulong exp,
     nmod_mpolyun_struct * const * B,
@@ -593,7 +594,7 @@ typedef struct
     volatile slong G_exp, Abar_exp, Bbar_exp;
     pthread_mutex_t mutex;
     const nmod_mpoly_ctx_struct * ctx;
-    nmod_poly_crt_struct * CRT;
+    nmod_poly_multi_crt_struct * CRT;
     nmod_mpolyun_struct ** gptrs, ** abarptrs, ** bbarptrs;
     ulong num_threads;
 }
@@ -631,7 +632,7 @@ static void _joinworker(void * varg)
     coeffs = (nmod_mpolyn_struct **) flint_malloc(count * sizeof(nmod_mpolyn_struct *));
     input = (nmod_poly_struct **) flint_malloc(count * sizeof(nmod_poly_struct *));
     start = (slong *) flint_malloc(count * sizeof(slong));
-    ls = _nmod_poly_crt_local_size(base->CRT);
+    ls = _nmod_poly_multi_crt_local_size(base->CRT);
     output = (nmod_poly_struct **) flint_malloc(ls*sizeof(nmod_poly_struct *));
     for (j = 0; j < ls; j++)
     {
@@ -787,7 +788,7 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     slong Gexp0, Abarexp0, Bbarexp0;
     nmod_poly_struct ** mptrs;
     nmod_mpolyun_struct ** gptrs, ** abarptrs, ** bbarptrs;
-    nmod_poly_crt_t P;
+    nmod_poly_multi_crt_t P;
     _splitworker_arg_struct * splitargs;
     _splitbase_t splitbase;
     _joinworker_arg_struct * joinargs;
@@ -930,8 +931,8 @@ compute_split:
         FLINT_ASSERT(splitargs[i].Bbar->exps[0] == Bbarexp0);
     }
 
-    nmod_poly_crt_init(P);
-    success = nmod_poly_crt_precompute_p(P,
+    nmod_poly_multi_crt_init(P);
+    success = nmod_poly_multi_crt_precompute_p(P,
                         (const nmod_poly_struct * const *) mptrs, num_threads);
     FLINT_ASSERT(success);
 
@@ -991,7 +992,7 @@ compute_split:
     _final_join(Bbar, bbarptrs, num_threads, ctx);
 
     /* free join data */
-    nmod_poly_crt_clear(P);
+    nmod_poly_multi_crt_clear(P);
     for (i = 0; i < num_threads; i++)
     {
         nmod_mpolyun_clear(joinargs[i].G, ctx);
