@@ -561,11 +561,10 @@ Rational enumeration
     Starting with zero, this generates every rational number once
     and only once, but not in order of minimal height.
 
-.. function:: int fmpq_farey_neighbors(fmpq_t left, fmpq_t right, const fmpq_t a)
+.. function:: void fmpq_farey_neighbors(fmpq_t left, fmpq_t right, const fmpq_t mid, const fmpz_t Q)
 
-    Set `left` and `right` to the fractions directly below and above `a` in the Farey sequence of order ``fmpq_denref(a)``.
-    If `a` is canonical and has denominator strictly greater than one, then this function is successful and returns ``1``. Otherwise it return ``0``.
-    No aliasing whatsoever is supported.
+    Set `left` and `right` to the fractions directly below and above `mid` in the Farey sequence of order `Q`.
+    This function will throw if `mid` is not canonical or `Q` is less than the denominator of `mid`.
 
 
 

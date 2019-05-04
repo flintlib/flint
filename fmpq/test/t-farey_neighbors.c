@@ -16,61 +16,73 @@
 int
 main(void)
 {
-    slong i;
+    slong i, q, steps;
     FLINT_TEST_INIT(state);
 
     flint_printf("farey_neighbors....");
     fflush(stdout);
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-    {
-        fmpq_t a, s, t, left, right;
+    /* walk from -2 to 2 with a known number of steps */
 
-        fmpq_init(a);
+    for (q = 1; q <= 4 * flint_test_multiplier(); q++)
+    {
+        fmpq_t s, t, cur, left, right;
+        fmpz_t Q;
+
         fmpq_init(s);
         fmpq_init(t);
+        fmpq_init(cur);
         fmpq_init(left);
         fmpq_init(right);
 
-        fmpq_randtest(a, state, 999);
+        steps = 0;
+        for (i = 1; i <= q; i++)
+            steps += 4*n_euler_phi(i);
 
-        if (fmpq_farey_neighbors(left, right, a))
+        fmpz_init_set_ui(Q, q);
+
+        fmpq_set_si(cur, -2, 1);
+
+        for (i = 0; i < steps; i++)
         {
-            fmpq_sub(t, a, left);
+            fmpq_farey_neighbors(left, right, cur, Q);
+
+            fmpq_sub(t, cur, left);
             fmpz_one(fmpq_numref(s));
-            fmpz_mul(fmpq_denref(s), fmpq_denref(left), fmpq_denref(a));
-            if (fmpz_cmp(fmpq_denref(left), fmpq_denref(a)) >= 0
-                || !fmpq_equal(s, t))
+            fmpz_mul(fmpq_denref(s), fmpq_denref(left), fmpq_denref(cur));
+            if (!fmpq_equal(s, t))
             {
                 flint_printf("FAIL:\n");
-                flint_printf("check left neighbor i = %wd\n", i);
+                flint_printf("check left neighbor i = %wd, q = %wd\n", i, q);
                 flint_abort();
             }
 
-            fmpq_sub(t, right, a);
+            fmpq_sub(t, right, cur);
             fmpz_one(fmpq_numref(s));
-            fmpz_mul(fmpq_denref(s), fmpq_denref(right), fmpq_denref(a));
-            if (fmpz_cmp(fmpq_denref(right), fmpq_denref(a)) >= 0
-                || !fmpq_equal(s, t))
+            fmpz_mul(fmpq_denref(s), fmpq_denref(right), fmpq_denref(cur));
+            if (!fmpq_equal(s, t))
             {
                 flint_printf("FAIL:\n");
-                flint_printf("check right neighbor i = %wd\n", i);
+                flint_printf("check right neighbor i = %wd, q = %wd\n", i, q);
                 flint_abort();
             }
+
+            fmpq_swap(cur, right);
         }
-        else
+
+        fmpq_set_si(right, 2, 1);
+        if (!fmpq_equal(cur, right))
         {
-            if (!fmpz_is_one(fmpq_denref(a)))
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("check neighbors could be computed i = %wd\n", i);
-                flint_abort();
-            }
+            flint_printf("FAIL:\n");
+            flint_printf("check end q = %wd\n", q);
+            flint_abort();            
         }
 
-        fmpq_clear(a);
+        fmpz_clear(Q);
+
         fmpq_clear(s);
         fmpq_clear(t);
+        fmpq_clear(cur);
         fmpq_clear(left);
         fmpq_clear(right);
     }

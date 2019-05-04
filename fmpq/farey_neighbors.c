@@ -12,36 +12,65 @@
 #include "fmpq.h"
 
 /*
-    Find the fractions directly below and above a in the Farey sequence of
-    order a_den:
+    Find the fractions directly below and above a1/q1 in the Farey sequence of
+    order Q:
 
-     left_num     a_num = left_num + right_num     right_num
-    ---------- < ------------------------------ < -----------
-     left_den     a_den = left_den + right_den     right_den
+     a0     a1     a2
+    ---- < ---- < ----
+     q0     q1     q2
 
-    This function will return 0 if a is not canonical or has denominator 1.
-    Otherwise it returns 1;
+    The index v satisfies
+
+               Q + q0      q2 + q0     a2 + a0
+    v = floor(--------) = --------- = ---------
+                 q1           q1          a1
 */
-int fmpq_farey_neighbors(fmpq_t left, fmpq_t right, const fmpq_t a)
+void fmpq_farey_neighbors(fmpq_t left, fmpq_t right,
+                                           const fmpq_t mid_, const fmpz_t Q_)
 {
-    int success;
+    fmpz_t Q, t;
+    fmpq_t mid;
 
-    FLINT_ASSERT(left != right);
-    FLINT_ASSERT(a != right);
-    FLINT_ASSERT(a != left);
+    /* simple handling of aliasing */
+    fmpz_init_set(fmpq_numref(mid), fmpq_numref(mid_));
+    fmpz_init_set(fmpq_denref(mid), fmpq_denref(mid_));
+    fmpz_init_set(Q, Q_);
+    fmpz_init(t);
 
-    success = fmpz_invmod(fmpq_denref(left), fmpq_numref(a), fmpq_denref(a));
-    if (!success || fmpz_is_zero(fmpq_denref(left)))
+    /* find left denominator */
+    if (fmpz_sgn(fmpq_denref(mid)) <= 0
+        || fmpz_cmp(fmpq_denref(mid), Q) > 0
+        || !fmpz_invmod(fmpq_denref(left), fmpq_numref(mid), fmpq_denref(mid)))
     {
-        return 0;
+        fmpz_clear(fmpq_numref(mid));
+        fmpz_clear(fmpq_denref(mid));
+        fmpz_clear(Q);
+        fmpz_clear(t);
+        flint_throw(FLINT_ERROR, "Exception in fmpq_farey_neighbors: bad input");
     }
+    fmpz_sub(t, Q, fmpq_denref(left));
+    fmpz_mod(t, t, fmpq_denref(mid));
+    fmpz_sub(fmpq_denref(left), Q, t);
 
-    fmpz_mul(fmpq_numref(left), fmpq_numref(a), fmpq_denref(left));
-    fmpz_sub_ui(fmpq_numref(left), fmpq_numref(left), 1);
-    fmpz_divexact(fmpq_numref(left), fmpq_numref(left), fmpq_denref(a));
+    /* find left numerator */
+    fmpz_mul(t, fmpq_numref(mid), fmpq_denref(left));
+    fmpz_sub_ui(t, t, 1);
+    fmpz_divexact(fmpq_numref(left), t, fmpq_denref(mid));
 
-    fmpz_sub(fmpq_numref(right), fmpq_numref(a), fmpq_numref(left));
-    fmpz_sub(fmpq_denref(right), fmpq_denref(a), fmpq_denref(left));
+    /* find index t */
+    fmpz_add(t, Q, fmpq_denref(left));
+    fmpz_fdiv_q(t, t, fmpq_denref(mid));
 
-    return 1;
+    /* find right denominator */
+    fmpz_mul(fmpq_denref(mid), fmpq_denref(mid), t);
+    fmpz_sub(fmpq_denref(right), fmpq_denref(mid), fmpq_denref(left));
+
+    /* find right numerator */
+    fmpz_mul(fmpq_numref(mid), fmpq_numref(mid), t);
+    fmpz_sub(fmpq_numref(right), fmpq_numref(mid), fmpq_numref(left));
+
+    fmpz_clear(fmpq_numref(mid));
+    fmpz_clear(fmpq_denref(mid));
+    fmpz_clear(Q);
+    fmpz_clear(t);
 }

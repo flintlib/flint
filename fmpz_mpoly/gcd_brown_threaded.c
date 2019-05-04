@@ -545,16 +545,23 @@ static void _divide_master_threads(slong * l_, fmpq * v, slong n, slong m)
     i = 0;
     while (i < l)
     {
-        if (   fmpz_cmp_ui(fmpq_denref(v + i), 2) >= 0
-            && fmpq_farey_neighbors(left, right, v + i)
-            && fmpq_get_d(right) < score_threashold)
+        if (fmpz_cmp_ui(fmpq_denref(v + i), 2) >= 0)
         {
-            /* delete v + i, add left and right */
-            FLINT_ASSERT(l < m);
-            fmpq_set(v + i, right);
-            fmpq_set(v + l, left);
-            l++;
-            continue;
+            fmpq_farey_neighbors(left, right, v + i, fmpq_denref(v + i));
+
+            FLINT_ASSERT(fmpz_get_ui(fmpq_denref(v + i))
+                            ==  fmpz_get_ui(fmpq_denref(left))
+                              + fmpz_get_ui(fmpq_denref(right)));
+
+            if (fmpq_get_d(right) < score_threashold)
+            {
+                /* delete v + i, add left and right */
+                FLINT_ASSERT(l < m);
+                fmpq_set(v + i, right);
+                fmpq_set(v + l, left);
+                l++;
+                continue;
+            }
         }
         i++;
     }
