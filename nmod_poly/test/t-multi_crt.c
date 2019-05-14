@@ -22,24 +22,23 @@ main(void)
 
     /* test internal interface */
     {
-        nmod_poly_crt_t P;
-        nmod_poly_struct ** moduli, ** inputs, ** outputs;
+        nmod_poly_multi_crt_t P;
+        nmod_poly_struct ** moduli, ** inputs, * outputs;
         mp_limb_t modulus = 1009;
         slong moduli_count = 1000;
 
         moduli = (nmod_poly_struct **) flint_malloc(moduli_count*sizeof(nmod_poly_struct *));
         inputs = (nmod_poly_struct **) flint_malloc(moduli_count*sizeof(nmod_poly_struct *));
-        outputs = (nmod_poly_struct **) flint_malloc(moduli_count*sizeof(nmod_poly_struct *));
+        outputs = (nmod_poly_struct *) flint_malloc(moduli_count*sizeof(nmod_poly_struct));
 
         for (k = 0; k < moduli_count; k++)
         {
             moduli[k] = (nmod_poly_struct *) flint_malloc(sizeof(nmod_poly_struct));
             inputs[k] = (nmod_poly_struct *) flint_malloc(sizeof(nmod_poly_struct));
-            outputs[k] = (nmod_poly_struct *) flint_malloc(sizeof(nmod_poly_struct));
 
             nmod_poly_init(moduli[k], modulus);
             nmod_poly_init(inputs[k], modulus);
-            nmod_poly_init(outputs[k], modulus);
+            nmod_poly_init(outputs + k, modulus);
 
             nmod_poly_set_coeff_ui(moduli[k], 1, 1);
             nmod_poly_set_coeff_ui(moduli[k], 0, modulus - k);
@@ -47,8 +46,8 @@ main(void)
             nmod_poly_set_coeff_ui(inputs[k], 0, (k*k)^k);
         }
 
-        nmod_poly_crt_init(P);
-        if (!nmod_poly_crt_precompute_p(P,
+        nmod_poly_multi_crt_init(P);
+        if (!nmod_poly_multi_crt_precompute_p(P,
                      (const nmod_poly_struct * const *) moduli, moduli_count))
         {
             printf("FAIL\n");
@@ -56,11 +55,11 @@ main(void)
             flint_abort();            
         }
 
-        FLINT_ASSERT(_nmod_poly_crt_local_size(P) <= moduli_count);
+        FLINT_ASSERT(_nmod_poly_multi_crt_local_size(P) <= moduli_count);
 
         for (k = 0; k < 1; k++)
         {
-            _nmod_poly_crt_run_p(outputs, P,
+            _nmod_poly_multi_crt_run_p(outputs, P,
                                     (const nmod_poly_struct * const *) inputs);
         }
 
@@ -68,23 +67,22 @@ main(void)
         {
             nmod_poly_clear(moduli[k]);
             nmod_poly_clear(inputs[k]);
-            nmod_poly_clear(outputs[k]);
+            nmod_poly_clear(outputs + k);
             flint_free(moduli[k]);
             flint_free(inputs[k]);
-            flint_free(outputs[k]);
         }
 
         flint_free(moduli);
         flint_free(inputs);
         flint_free(outputs);
 
-        nmod_poly_crt_clear(P);
+        nmod_poly_multi_crt_clear(P);
     }
 
     /* test pointer interface */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
-        nmod_poly_crt_t P;
+        nmod_poly_multi_crt_t P;
         nmod_poly_t t, p;
         slong total_degree, moduli_length, moduli_count;
         nmod_poly_struct ** moduli, ** inputs;
@@ -99,7 +97,7 @@ main(void)
         nmod_poly_init(p, modulus);
         nmod_poly_init(output, modulus);
 
-        nmod_poly_crt_init(P);
+        nmod_poly_multi_crt_init(P);
 
         for (j = 0; j < 4; j++)
         {
@@ -122,10 +120,10 @@ main(void)
                 nmod_poly_randtest(inputs[k], state, moduli_length);
             }
 
-            if (nmod_poly_crt_precompute_p(P,
+            if (nmod_poly_multi_crt_precompute_p(P,
                       (const nmod_poly_struct * const *) moduli, moduli_count))
             {
-                nmod_poly_crt_precomp_p(output, P,
+                nmod_poly_multi_crt_precomp_p(output, P,
                                     (const nmod_poly_struct * const *) inputs);
 
                 total_degree = 0;
@@ -199,13 +197,13 @@ main(void)
         nmod_poly_clear(p);
         nmod_poly_clear(output);
 
-        nmod_poly_crt_clear(P);
+        nmod_poly_multi_crt_clear(P);
     }
 
     /* test flat interface */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
-        nmod_poly_crt_t P;
+        nmod_poly_multi_crt_t P;
         nmod_poly_t t, p;
         slong total_degree, moduli_length, moduli_count;
         nmod_poly_struct * moduli, * inputs;
@@ -220,7 +218,7 @@ main(void)
         nmod_poly_init(p, modulus);
         nmod_poly_init(output, modulus);
 
-        nmod_poly_crt_init(P);
+        nmod_poly_multi_crt_init(P);
 
         for (j = 0; j < 4; j++)
         {
@@ -239,9 +237,9 @@ main(void)
                 nmod_poly_randtest(inputs + k, state, moduli_length);
             }
 
-            if (nmod_poly_crt_precompute(P, moduli, moduli_count))
+            if (nmod_poly_multi_crt_precompute(P, moduli, moduli_count))
             {
-                nmod_poly_crt_precomp(output, P, inputs);
+                nmod_poly_multi_crt_precomp(output, P, inputs);
 
                 total_degree = 0;
                 for (k = 0; k < moduli_count; k++)
@@ -312,7 +310,7 @@ main(void)
         nmod_poly_clear(p);
         nmod_poly_clear(output);
 
-        nmod_poly_crt_clear(P);
+        nmod_poly_multi_crt_clear(P);
     }
 
     /* test lazy interface */
@@ -349,7 +347,7 @@ main(void)
                 nmod_poly_randtest(inputs + k, state, moduli_length);
             }
 
-            if (nmod_poly_crt(output, moduli, inputs, moduli_count))
+            if (nmod_poly_multi_crt(output, moduli, inputs, moduli_count))
             {
                 total_degree = 0;
                 for (k = 0; k < moduli_count; k++)

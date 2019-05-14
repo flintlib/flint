@@ -16,6 +16,7 @@ void gcd_check(
     nmod_mpoly_t a,
     nmod_mpoly_t b,
     nmod_mpoly_ctx_t ctx,
+    slong thread_limit,
     slong i,
     slong j,
     const char * name)
@@ -27,7 +28,7 @@ void gcd_check(
     nmod_mpoly_init(cb, ctx);
     nmod_mpoly_init(cg, ctx);
 
-    res = nmod_mpoly_gcd_brown(g, a, b, ctx);
+    res = nmod_mpoly_gcd_brown_threaded(g, a, b, ctx, thread_limit);
     nmod_mpoly_assert_canonical(g, ctx);
 
     if (!res)
@@ -68,7 +69,7 @@ void gcd_check(
         flint_abort();
     }
 
-    res = nmod_mpoly_gcd_brown(cg, ca, cb, ctx);
+    res = nmod_mpoly_gcd_brown_threaded(cg, ca, cb, ctx, thread_limit);
     nmod_mpoly_assert_canonical(cg, ctx);
 
     if (!res)
@@ -98,12 +99,37 @@ cleanup:
 int
 main(void)
 {
-    slong tmul = 5;
     slong i, j;
+    slong tmul = 5;
+    slong max_threads = 5;
     FLINT_TEST_INIT(state);
 
-    flint_printf("gcd_brown....");
+    flint_printf("gcd_brown_threaded....");
     fflush(stdout);
+
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t g, a, b;
+        const char * vars[] = {"x", "y", "z", "w"};
+
+        nmod_mpoly_ctx_init(ctx, 3, ORD_DEGREVLEX, 1009);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(g, ctx);
+
+        nmod_mpoly_set_str_pretty(a, "x^4+y^4+z^4", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "x^2+y^2+z^2", vars, ctx);
+        nmod_mpoly_set_str_pretty(g, "x^3+y^3+z^3", vars, ctx);
+        nmod_mpoly_mul(a, a, g, ctx);
+        nmod_mpoly_mul(b, b, g, ctx);
+
+        gcd_check(g, a, b, ctx, 0, 0, 0, "example");
+
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -113,21 +139,21 @@ main(void)
         slong degbound;
         mp_limb_t p;
 
-        p = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
+        p = n_randint(state, FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);
         p = n_nextprime(p, 1);
 
-        nmod_mpoly_ctx_init_rand(ctx, state, p < 3000 ? 4 : 5, p);
+        nmod_mpoly_ctx_init_rand(ctx, state, p < 3000 ? 3 : 4, p);
 
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(b, ctx);
 
-        len = n_randint(state, 100) + 1;
-        len1 = n_randint(state, 200);
-        len2 = n_randint(state, 200);
+        len = n_randint(state, 30) + 1;
+        len1 = n_randint(state, 40);
+        len2 = n_randint(state, 40);
 
-        degbound = 1 + 80/ctx->minfo->nvars/ctx->minfo->nvars;
+        degbound = 1 + 20/ctx->minfo->nvars;
 
         for (j = 0; j < 4; j++)
         {
@@ -140,8 +166,56 @@ main(void)
             nmod_mpoly_mul(b, b, g, ctx);
             nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "random dense");
+            gcd_check(g, a, b, ctx, n_randint(state, max_threads + 3), i, j, "random small");
         }
+
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, g;
+        slong len, len1, len2;
+        slong degbound;
+        mp_limb_t p;
+
+        p = n_randint(state, FLINT_BITS - 1) + 1;
+        p = n_randbits(state, p);
+        p = n_nextprime(p, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, p < 3000 ? 3 : 4, p);
+
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+
+        len = n_randint(state, 100) + 1;
+        len1 = n_randint(state, 150);
+        len2 = n_randint(state, 150);
+
+        degbound = 1 + 60/ctx->minfo->nvars/ctx->minfo->nvars;
+
+        for (j = 0; j < 4; j++)
+        {
+            do {
+                nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
+            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
+            nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
+            nmod_mpoly_mul(a, a, g, ctx);
+            nmod_mpoly_mul(b, b, g, ctx);
+            nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
+
+            gcd_check(g, a, b, ctx, n_randint(state, max_threads + 3), i, j, "random dense");
+        }
+
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
 
         nmod_mpoly_clear(g, ctx);
         nmod_mpoly_clear(a, ctx);
@@ -154,4 +228,3 @@ main(void)
 
     return 0;
 }
-

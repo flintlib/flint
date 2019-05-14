@@ -43,11 +43,6 @@ void nmod_mpolyu_swap(nmod_mpolyu_t A, nmod_mpolyu_t B,
 
 void nmod_mpolyu_zero(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
 {
-    slong i;
-    for (i = 0; i < A->alloc; i++) {
-        nmod_mpoly_clear(A->coeffs + i, uctx);
-        nmod_mpoly_init(A->coeffs + i, uctx);
-    }
     A->length = 0;
 }
 

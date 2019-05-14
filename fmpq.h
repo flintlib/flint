@@ -160,6 +160,8 @@ FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
     fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
 }
 
+FLINT_DLL double fmpq_get_d(const fmpq_t a);
+
 FLINT_DLL int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
 
 FLINT_DLL void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c);
@@ -327,6 +329,9 @@ FLINT_DLL void _fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden,
     const fmpz_t num, const fmpz_t den);
 
 FLINT_DLL void fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x);
+
+FLINT_DLL void fmpq_farey_neighbors(fmpq_t left, fmpq_t right
+                                           , const fmpq_t mid, const fmpz_t Q);
 
 FLINT_DLL slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, slong n);
 

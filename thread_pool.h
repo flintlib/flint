@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#ifndef THREAD_POOL_H
+#define THREAD_POOL_H
 
 /* for some reason this define needs to be outside of the next if */
 #define _GNU_SOURCE
@@ -20,6 +22,9 @@
 
 #include "flint.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 typedef struct
 {
@@ -78,3 +83,9 @@ FLINT_DLL void thread_pool_wait(thread_pool_t T, thread_pool_handle i);
 FLINT_DLL void thread_pool_give_back(thread_pool_t T, thread_pool_handle i);
 
 FLINT_DLL void thread_pool_clear(thread_pool_t T);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

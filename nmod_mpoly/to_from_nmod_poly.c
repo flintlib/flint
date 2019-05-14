@@ -12,12 +12,16 @@
 #include "nmod_mpoly.h"
 
 /*
-    set A(var) to B/xbar^Bshifts
+    set A(x_var^Bstride[var]) to B/xbar^Bshifts
     it is asserted that the conversion is correct
 */
-void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
-                        slong var, const ulong * Bshift, const ulong * Bstride,
-                                                    const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_to_nmod_poly_deflate(
+    nmod_poly_t A,
+    const nmod_mpoly_t B,
+    slong var,
+    const ulong * Bshift,
+    const ulong * Bstride,
+    const nmod_mpoly_ctx_t ctx)
 {
     ulong mask;
     slong i, shift, off, N;
@@ -69,9 +73,14 @@ void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
     set A to B(x_var^Astride[var])*xbar^Ashift
     A must be packed into bits = Abits
 */
-void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
-                         const nmod_poly_t B, slong var, const ulong * Ashift,
-                             const ulong * Astride, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_from_nmod_poly_inflate(
+    nmod_mpoly_t A,
+    mp_bitcnt_t Abits,
+    const nmod_poly_t B,
+    slong var,
+    const ulong * Ashift,
+    const ulong * Astride,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong N;
     slong k;
@@ -124,4 +133,3 @@ void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, mp_bitcnt_t Abits,
 
     TMP_END;
 }
-

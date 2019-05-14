@@ -39,14 +39,87 @@
  extern "C" {
 #endif
 
-/* Context object ************************************************************/
+/* Type definitions **********************************************************/
 
+/*
+    context object for fmpz_mpoly
+*/
 typedef struct
 {
     mpoly_ctx_t minfo;
 } fmpz_mpoly_ctx_struct;
 
 typedef fmpz_mpoly_ctx_struct fmpz_mpoly_ctx_t[1];
+
+/*
+    fmpz_mpoly_t
+    sparse multivariates with fmpz coeffs
+*/
+typedef struct
+{
+   fmpz * coeffs; /* alloc fmpzs */
+   ulong * exps;
+   slong alloc;
+   slong length;
+   mp_bitcnt_t bits;     /* number of bits per exponent */
+} fmpz_mpoly_struct;
+
+typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
+
+
+/* Internal type definitions *************************************************/
+
+/*
+    fmpz_mpoly_univar_t
+    sparse univariates with multivariate coefficients
+*/
+typedef struct
+{
+   fmpz_mpoly_struct * coeffs; /* multivariate coefficients */
+   ulong * exps;
+   slong alloc;
+   slong length;
+   slong var; /* univariate variable number */
+} fmpz_mpoly_univar_struct;
+
+typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
+
+/*
+    fmpz_mpolyu_t
+    sparse univariates with fmpz_mpoly_t coefficients
+        with uniform bits and LEX ordering
+*/
+typedef struct
+{
+   fmpz_mpoly_struct * coeffs;
+   ulong * exps;
+   slong alloc;
+   slong length;
+   mp_bitcnt_t bits;    /* default bits to construct coeffs */
+} fmpz_mpolyu_struct;
+
+typedef fmpz_mpolyu_struct fmpz_mpolyu_t[1];
+
+/*
+    fmpz_mpolyd_t
+    A dense mpoly is stored as a flat array of coeffcients.
+    Suppose deg_bounds = {r0, r1, r2}. The coefficient of the monomial with
+    exponents {e0, e1, e2} is stored at the coefficient of index
+        e2 + r2*(e1 + r1*(e0 + r0*0))
+*/
+typedef struct
+{
+    slong nvars;
+    slong degb_alloc;
+    slong * deg_bounds;
+    slong length;           /* usage is inconsistent currently */
+    slong coeff_alloc;
+    fmpz * coeffs;
+} fmpz_mpolyd_struct;
+
+typedef fmpz_mpolyd_struct fmpz_mpolyd_t[1];
+
+/* Context object ************************************************************/
 
 FLINT_DLL void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
                                             slong nvars, const ordering_t ord);
@@ -67,19 +140,6 @@ ordering_t fmpz_mpoly_ctx_ord(const fmpz_mpoly_ctx_t ctx)
 {
     return ctx->minfo->ord;
 }
-
-/*  Type definitions *********************************************************/
-
-typedef struct
-{
-   fmpz * coeffs; /* alloc fmpzs */
-   ulong * exps;  
-   slong alloc;
-   slong length;
-   mp_bitcnt_t bits;     /* number of bits per exponent */
-} fmpz_mpoly_struct;
-
-typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
 
 
 /*  Memory management ********************************************************/
@@ -864,6 +924,9 @@ FLINT_DLL int fmpz_mpoly_gcd_prs(fmpz_mpoly_t G, const fmpz_mpoly_t A,
 FLINT_DLL int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G, const fmpz_mpoly_t A,
                              const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpoly_gcd_brown_threaded(fmpz_mpoly_t G, const fmpz_mpoly_t A,
+         const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit);
+
 FLINT_DLL int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A,
                              const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
@@ -876,16 +939,6 @@ FLINT_DLL int fmpz_mpoly_gcd_berlekamp_massey(fmpz_mpoly_t G, const fmpz_mpoly_t
 
 ******************************************************************************/
 
-FLINT_DLL int fmpz_mpoly_gcd_is_unit(const fmpz_mpoly_t a, const fmpz_mpoly_t b,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_resultant(fmpz_mpoly_t poly1,
-                const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                        slong var, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_discriminant(fmpz_mpoly_t poly1,
-              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A,
                          const fmpz_mpoly_t B, slong var, const ulong * Bshift,
                             const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
@@ -896,13 +949,6 @@ FLINT_DLL void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
 
 FLINT_DLL int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                 mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
-
-#define fmpz_mpoly_get_coeff_ptr(poly, n, ctx) \
-    ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
-
-#define fmpz_mpoly_get_monomial_ptr(poly, n, ctx) \
-    ((n) < (poly)->length ? (poly)->exps + \
-                     (n)*(((ctx)->n - 1)/(FLINT_BITS/(poly)->bits) + 1) : NULL)
 
 typedef struct _fmpz_mpoly_stripe_struct
 {
@@ -922,17 +968,6 @@ typedef struct _fmpz_mpoly_stripe_struct
 
 typedef fmpz_mpoly_stripe_struct fmpz_mpoly_stripe_t[1];
 
-/* sparse univariates with multivariate coefficients */
-typedef struct
-{
-   fmpz_mpoly_struct * coeffs; /* multivariate coefficients */
-   ulong * exps;
-   slong alloc;
-   slong length;
-   slong var; /* univariate variable number */
-} fmpz_mpoly_univar_struct;
-
-typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
 
 /* Univariates ***************************************************************/
 
@@ -996,28 +1031,7 @@ FLINT_DLL void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
             const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-
-/* Container for dense storage ***********************************************/
-
-/*
-    A dense mpoly is stored as a flat array of coeffcients.
-    Suppose deg_bounds = {a, b, c}. The coefficient of the monomial with 
-    exponents {i, j, k} is stored at the coefficient of index
-        c + k*(b + j*(a + i*0))
-
-    Design is still in flux.
-*/
-typedef struct
-{
-    slong nvars;
-    slong degb_alloc;
-    slong * deg_bounds;
-    slong length;           /* usage is inconsistent currently */
-    slong coeff_alloc;
-    fmpz * coeffs;
-} fmpz_mpolyd_struct;
-
-typedef fmpz_mpolyd_struct fmpz_mpolyd_t[1];
+/* mpolyd ********************************************************************/
 
 typedef struct
 {
@@ -1034,31 +1048,9 @@ FLINT_DLL void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len);
 
 FLINT_DLL void fmpz_mpolyd_clear(fmpz_mpolyd_t poly);
 
-FLINT_DLL void fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(fmpz_mpolyd_t A, slong m,
-              const fmpz_mpoly_t B, const slong * perm, const ulong * shift,
-       const ulong * stride, const ulong * degree, const fmpz_mpoly_ctx_t ctx);
+/* mpolyu ********************************************************************/
 
-FLINT_DLL void fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(fmpz_mpoly_t A,
-         mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx, const fmpz_mpolyd_t B,
-                const slong * perm, const ulong * shift, const ulong * stride);
-
-FLINT_DLL int fmpz_mpolyd_gcd_brown(fmpz_mpolyd_t G, fmpz_mpolyd_t Abar,
-                         fmpz_mpolyd_t Bbar, fmpz_mpolyd_t A, fmpz_mpolyd_t B);
-
-/*
-    fmpz_mpolyu_t
-    sparse univariates with fmpz_mpoly_t coefficients
-        with uniform bits and LEX ordering
-*/
-typedef struct
-{
-   fmpz_mpoly_struct * coeffs;
-   ulong * exps;
-   slong alloc;
-   slong length;
-   mp_bitcnt_t bits;    /* default bits to construct coeffs */
-} fmpz_mpolyu_struct;
-typedef fmpz_mpolyu_struct fmpz_mpolyu_t[1];
+FLINT_DLL int fmpz_mpolyu_is_canonical(const fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpolyu_init(fmpz_mpolyu_t A, mp_bitcnt_t bits,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -1112,18 +1104,6 @@ FLINT_DLL void fmpz_mpoly_from_mpolyuu_perm_inflate(
                 const fmpz_mpolyu_t B, const slong * perm, const ulong * shift,
                             const ulong * stride, const fmpz_mpoly_ctx_t uctx);
 
-FLINT_DLL void fmpz_mpolyu_to_nmod_mpolyu(
-                                nmod_mpolyu_t Ap, const nmod_mpoly_ctx_t ctxp,
-                                 fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpolyu_set_nmod_mpolyu(
-                                 fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx,
-                                nmod_mpolyu_t Ap, const nmod_mpoly_ctx_t ctxp);
-
-FLINT_DLL int fmpz_mpolyu_CRT_nmod_mpolyu(mp_bitcnt_t * coeffbits,
-                                 fmpz_mpolyu_t H, const fmpz_mpoly_ctx_t ctx,
-                       fmpz_t m, nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctxp);
-
 FLINT_DLL int fmpz_mpolyuu_divides(fmpz_mpolyu_t Q, const fmpz_mpolyu_t A,
            const fmpz_mpolyu_t B, slong nmainvars, const fmpz_mpoly_ctx_t ctx);
 
@@ -1133,7 +1113,10 @@ FLINT_DLL int fmpz_mpolyu_divides(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
 FLINT_DLL void fmpz_mpolyu_fmpz_content(fmpz_t c, fmpz_mpolyu_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpolyu_scalar_divexact_fmpz(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
+FLINT_DLL void fmpz_mpolyu_mul_fmpz(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
+                                         fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpolyu_divexact_fmpz(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
                                          fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpolyu_divexact_mpoly(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
@@ -1146,9 +1129,21 @@ FLINT_DLL void fmpz_mpolyu_shift_right(fmpz_mpolyu_t A, ulong s);
 
 FLINT_DLL void fmpz_mpolyu_shift_left(fmpz_mpolyu_t A, ulong s);
 
-FLINT_DLL int fmpz_mpolyu_content(fmpz_mpoly_t g, const fmpz_mpolyu_t A,
+FLINT_DLL void fmpz_mpolyu_content_fmpz(fmpz_t g, const fmpz_mpolyu_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL int fmpz_mpolyu_content_mpoly(fmpz_mpoly_t g, const fmpz_mpolyu_t A,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpolyu_height(fmpz_t max,
+                            const fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpolyu_heights(fmpz_t max, fmpz_t sum,
+                            const fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL int fmpz_mpolyu_gcd_brown(fmpz_mpolyu_t G, fmpz_mpolyu_t Abar,
+                    fmpz_mpolyu_t Bbar, fmpz_mpolyu_t A, fmpz_mpolyu_t B,
+                                                   const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, fmpz_mpoly_t A,
                                    fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
@@ -1157,17 +1152,61 @@ FLINT_DLL int fmpz_mpolyu_gcdm_zippel(fmpz_mpolyu_t G,
                  fmpz_mpolyu_t A, fmpz_mpolyu_t B, const fmpz_mpoly_ctx_t ctx,
                                 mpoly_zipinfo_t zinfo, flint_rand_t randstate);
 
-FMPZ_MPOLY_INLINE fmpz * fmpz_mpoly_leadcoeff_ref(const fmpz_mpoly_t A)
+FMPZ_MPOLY_INLINE fmpz * fmpz_mpoly_leadcoeff(const fmpz_mpoly_t A)
 {
     FLINT_ASSERT(A->length > 0);
     return A->coeffs + 0;
 }
 
-FMPZ_MPOLY_INLINE fmpz * fmpz_mpolyu_leadcoeff_ref(const fmpz_mpolyu_t A)
+FMPZ_MPOLY_INLINE fmpz * fmpz_mpolyu_leadcoeff(const fmpz_mpolyu_t A)
 {
     FLINT_ASSERT(A->length > 0);
-    return fmpz_mpoly_leadcoeff_ref(A->coeffs + 0);
+    return fmpz_mpoly_leadcoeff(A->coeffs + 0);
 }
+
+/* gcd_helper_eval_interp ****************************************************/
+
+FLINT_DLL void fmpz_mpolyu_intp_reduce_p(
+    nmod_mpolyu_t Ap,
+    const nmod_mpoly_ctx_t ctxp,
+    fmpz_mpolyu_t A,
+    const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpolyu_intp_lift_p(
+    fmpz_mpolyu_t A,
+    const fmpz_mpoly_ctx_t ctx,
+    nmod_mpolyu_t Ap,
+    const nmod_mpoly_ctx_t ctxp);
+
+FLINT_DLL int fmpz_mpolyu_intp_mcrt_p(
+    mp_bitcnt_t * coeffbits,
+    fmpz_mpolyu_t H,
+    const fmpz_mpoly_ctx_t ctx,
+    const fmpz_t m,
+    const nmod_mpolyu_t A,
+    const nmod_mpoly_ctx_t ctxp);
+
+FLINT_DLL void fmpz_mpolyu_intp_reduce_p_mpolyun(
+    nmod_mpolyun_t E,
+    const nmod_mpoly_ctx_t pctx,
+    const fmpz_mpolyu_t A,
+    const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpolyu_intp_lift_p_mpolyun(
+    fmpz_mpolyu_t A,
+    const fmpz_mpoly_ctx_t ctx,
+    const nmod_mpolyun_t B,
+    const nmod_mpoly_ctx_t pctx);
+
+FLINT_DLL int fmpz_mpolyu_intp_crt_p_mpolyun(
+    fmpz_mpolyu_t F,
+    fmpz_mpolyu_t T,
+    const fmpz_mpoly_ctx_t ctx,
+    fmpz_t modulus,
+    nmod_mpolyun_t A,
+    const nmod_mpoly_ctx_t pctx);
+
+/* fmpz_mod_mpoly types - should be in a separate module *********************/
 
 /*
     fmpz_mod_mpolyn_t
@@ -1182,6 +1221,7 @@ typedef struct
    slong length;
    slong bits;
 } fmpz_mod_mpolyn_struct;
+
 typedef fmpz_mod_mpolyn_struct fmpz_mod_mpolyn_t[1];
 
 /*
@@ -1197,6 +1237,7 @@ typedef struct
     slong length;
     mp_bitcnt_t bits;   /* default bits to construct coeffs */
 } fmpz_mod_mpolyun_struct;
+
 typedef fmpz_mod_mpolyun_struct fmpz_mod_mpolyun_t[1];
 
 FLINT_DLL void fmpz_mod_mpolyn_fit_length(fmpz_mod_mpolyn_t A,
@@ -1507,8 +1548,6 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 
 
 
-
-
 /******************************************************************************
 
    Internal consistency checks
@@ -1620,8 +1659,6 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
     flint_free(rexp);
     flint_free(gexp);
 }
-
-
 
 #ifdef __cplusplus
 }

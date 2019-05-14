@@ -1172,6 +1172,7 @@ structure and temporary working space with ``fmpz_comb_init`` and
 For simple demonstration programs showing how to use the CRT functions,
 see ``crt.c`` and ``multi_crt.c`` in the ``examples``
 directory.
+The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it performs error checking and works with arbitrary moduli.
 
 .. function:: void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2, int sign)
 
@@ -1242,6 +1243,45 @@ directory.
 
     Clears temporary space ``temp`` used by multimodular and CRT functions
     using the given ``comb`` structure.
+
+
+.. function:: void fmpz_multi_crt_init(fmpz_multi_crt_t CRT)
+
+    Initialize ``CRT`` for chinese remaindering.
+
+.. function:: int fmpz_multi_crt_precompute(fmpz_multi_crt_t CRT, const fmpz * moduli, slong len)
+
+.. function:: int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT, const fmpz * const * moduli, slong len)
+
+    Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
+    A return of ``0`` indicates that the compilation failed and future calls to func::fmpz_crt_precomp will leave the output undefined.
+    A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) no modulus is `0,1,-1` and all moduli are pairwise relatively prime.
+
+.. function:: void fmpz_multi_crt_precomp(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * inputs)
+
+.. function:: void fmpz_multi_crt_precomp_p(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * const * inputs)
+
+    Set ``output`` to an integer of smallest absolute value that is congruent to ``values + i`` modulo the ``moduli + i`` in func::fmpz_crt_precompute.
+
+.. function:: int fmpz_multi_crt(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len);
+
+    Perform the same operation as func::fmpz_multi_crt_precomp while internally constructing and destroying the precomputed data.
+    All of the remarks in func::fmpz_multi_crt_precompute apply.
+
+.. function:: void fmpz_multi_crt_clear(fmpz_multi_crt_t P)
+
+    Free all space used by ``CRT``.
+
+.. function:: slong _nmod_poly_crt_local_size(const nmod_poly_crt_t CRT)
+
+    Return the required length of the output for func::_nmod_poly_crt_run.
+
+.. function:: void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * inputs)
+
+.. function:: void _fmpz_multi_crt_run_p(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * const * inputs)
+
+    Perform the same operation as fmpz::fmpz_multi_crt_precomp using supplied temporary space.
+    The actual output is placed in ``outputs + 0``, and ``outputs`` should contain space for all temporaries and should be at least as long as ``_fmpz_multi_crt_local_size(CRT)``.
 
 
 Primality testing

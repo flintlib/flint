@@ -91,7 +91,7 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, k, tmul = 20;
+    slong i, j, k, tmul = 10;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd....");
@@ -100,18 +100,18 @@ main(void)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t g, a, b;
-        const char * vars[] = {"x1", "x2"};
+        const char * vars[] = {"x1", "x2", "x3", "x4"};
 
-        nmod_mpoly_ctx_init(ctx, 2, ORD_LEX, 2);
+        nmod_mpoly_ctx_init(ctx, 2, ORD_DEGREVLEX, 2);
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(b, ctx);
         nmod_mpoly_init(g, ctx);
 
-        nmod_mpoly_set_str_pretty(a, "x1^9*x2+x1^8*x2^3+x1^7*x2^3+x1*x2^4+x2^7", vars, ctx);
-        nmod_mpoly_set_str_pretty(b, "x1^8*x2^8+x1^7*x2+x1^5*x2^7+x1^5*x2+x1^3*x2^2+x1^2*x2^8+x2^7+x2^5", vars, ctx);
-        nmod_mpoly_set_str_pretty(g, "x1^8*x2^4+x1^7*x2^8+x1^7*x2^2+x1^6*x2^3+x2^7", vars, ctx);
-        nmod_mpoly_mul(a,a,g,ctx);
-        nmod_mpoly_mul(b,b,g,ctx);
+        nmod_mpoly_set_str_pretty(a, "x1*x2^5+x1*x2^3+x2^4+x2^2", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "x1*x2^7+x1*x2^6+x1*x2^5+x2^6+x2^5+x2^4+x1*x2^2+x2", vars, ctx);
+        nmod_mpoly_set_str_pretty(g, "1", vars, ctx);
+        nmod_mpoly_mul(a, a, g,ctx);
+        nmod_mpoly_mul(b, b, g,ctx);
 
         gcd_check(g, a, b, ctx, 0, 0, "example");
 

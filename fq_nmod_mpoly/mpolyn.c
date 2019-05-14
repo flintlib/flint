@@ -12,6 +12,58 @@
 #include "fq_nmod_mpoly.h"
 
 
+void fq_nmod_mpolyn_one(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
+{
+    fq_nmod_poly_struct * Acoeff;
+    ulong * Aexp;
+    slong N;
+
+    fq_nmod_mpolyn_fit_length(A, 1, ctx);
+    Acoeff = A->coeffs;
+    Aexp = A->exps;
+
+    N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
+
+    fq_nmod_poly_one(Acoeff + 0, ctx->fqctx);
+    mpoly_monomial_zero(Aexp + N*0, N);
+
+    A->length = 1;
+}
+
+
+int fq_nmod_mpolyn_is_canonical(const fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    if (!mpoly_monomials_valid_test(A->exps, A->length, A->bits, ctx->minfo))
+    {
+        return 0;
+    }
+
+    if (mpoly_monomials_overflow_test(A->exps, A->length, A->bits, ctx->minfo))
+        return 0;
+
+    if (!mpoly_monomials_inorder_test(A->exps, A->length, A->bits, ctx->minfo))
+        return 0;
+
+    for (i = 0; i < A->length; i++)
+    {
+        slong l = (A->coeffs + i)->length;
+
+        if (l == 0)
+        {
+            return 0;
+        }
+
+        if (fq_nmod_is_zero((A->coeffs + i)->coeffs + l - 1, ctx->fqctx))
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 void fq_nmod_mpolyn_init(fq_nmod_mpolyn_t A, mp_bitcnt_t bits, const fq_nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
@@ -210,48 +262,6 @@ void fq_nmod_mpolyn_set(fq_nmod_mpolyn_t A, const fq_nmod_mpolyn_t B, const fq_n
     for (i = 0; i < Blen; i++)
     {
         fq_nmod_poly_set(Acoeff + i, Bcoeff + i, ctx->fqctx);
-        mpoly_monomial_set(Aexp + N*i, Bexp + N*i, N);
-    }
-
-    /* demote remaining coefficients */
-    for (i = Blen; i < A->length; i++)
-    {
-        fq_nmod_poly_clear(Acoeff + i, ctx->fqctx);
-        fq_nmod_poly_init(Acoeff + i, ctx->fqctx);
-    }
-    A->length = Blen;
-}
-
-
-void fq_nmod_mpolyn_mul_poly(
-    fq_nmod_mpolyn_t A,
-    const fq_nmod_mpolyn_t B,
-    const fq_nmod_poly_t c,
-    const fq_nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-    fq_nmod_poly_struct * Acoeff, * Bcoeff;
-    ulong * Aexp, * Bexp;
-    slong Blen;
-    slong N;
-
-    fq_nmod_mpolyn_fit_bits(A, B->bits, ctx);
-    A->bits = B->bits;
-
-    Blen = B->length;
-    fq_nmod_mpolyn_fit_length(A, Blen, ctx);
-    Acoeff = A->coeffs;
-    Bcoeff = B->coeffs;
-    Aexp = A->exps;
-    Bexp = B->exps;
-
-    N = mpoly_words_per_exp(B->bits, ctx->minfo);
-
-    FLINT_ASSERT(!fq_nmod_poly_is_zero(c, ctx->fqctx));
-
-    for (i = 0; i < Blen; i++)
-    {
-        fq_nmod_poly_mul(Acoeff + i, Bcoeff + i, c, ctx->fqctx);
         mpoly_monomial_set(Aexp + N*i, Bexp + N*i, N);
     }
 

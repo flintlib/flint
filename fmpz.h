@@ -682,6 +682,8 @@ FLINT_DLL int fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
 FLINT_DLL void fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr, 
                               mp_bitcnt_t shift, mp_bitcnt_t bits);
 
+/* crt ***********************************************************************/
+
 FLINT_DLL void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c,
         int sign);
@@ -736,6 +738,61 @@ FMPZ_INLINE void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
     else
         fmpz_set_si(f, x - m);
 }
+
+/* instructions do A = B + I*(C - B) mod M */
+typedef struct
+{
+    slong a_idx; /* index of A */
+    slong b_idx; /* index of B */
+    slong c_idx; /* index of C */
+    fmpz_t idem;     /* I */
+    fmpz_t modulus;  /* M */
+} _fmpz_multi_crt_prog_instr;
+
+typedef struct
+{
+    _fmpz_multi_crt_prog_instr * prog; /* straight line program */
+    slong length; /* length of prog */
+    slong alloc;  /* alloc of prog */
+    slong localsize; /* length of outputs required in nmod_poly_crt_run */
+    slong temp1loc; /* index of temporary used in run */
+    slong temp2loc; /* index of another tempory used in run */
+    int good;   /* the moduli are good for CRT, essentially relatively prime */
+} fmpz_multi_crt_struct;
+
+typedef fmpz_multi_crt_struct fmpz_multi_crt_t[1];
+
+FLINT_DLL void fmpz_multi_crt_init(fmpz_multi_crt_t CRT);
+
+FLINT_DLL int fmpz_multi_crt_precompute(fmpz_multi_crt_t CRT,
+                                               const fmpz * moduli, slong len);
+
+FLINT_DLL int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT,
+                                       const fmpz * const * moduli, slong len);
+
+FLINT_DLL void fmpz_multi_crt_precomp(fmpz_t output, const fmpz_multi_crt_t P,
+                                                          const fmpz * inputs);
+
+FLINT_DLL void fmpz_multi_crt_precomp_p(fmpz_t output,
+                        const fmpz_multi_crt_t P, const fmpz * const * inputs);
+
+FLINT_DLL int fmpz_multi_crt(fmpz_t output, const fmpz * moduli,
+                                               const fmpz * values, slong len);
+
+FLINT_DLL void fmpz_multi_crt_clear(fmpz_multi_crt_t P);
+
+FMPZ_INLINE slong _fmpz_multi_crt_local_size(const fmpz_multi_crt_t CRT)
+{
+    return CRT->localsize;
+}
+
+FLINT_DLL void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT,
+                                                          const fmpz * inputs);
+
+FLINT_DLL void _fmpz_multi_crt_run_p(fmpz * outputs,
+                      const fmpz_multi_crt_t CRT, const fmpz * const * inputs);
+
+/*****************************************************************************/
 
 FLINT_DLL mp_limb_t fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits);
 

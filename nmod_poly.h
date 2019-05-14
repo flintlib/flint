@@ -1285,50 +1285,51 @@ typedef struct
     slong c_idx; /* index of C */
     nmod_poly_t idem;     /* I */
     nmod_poly_t modulus;  /* M */
-} _nmod_poly_crt_prog_instr;
+} _nmod_poly_multi_crt_prog_instr;
 
 typedef struct
 {
-    _nmod_poly_crt_prog_instr * prog; /* straight line program */
+    _nmod_poly_multi_crt_prog_instr * prog; /* straight line program */
     slong length; /* length of prog */
     slong alloc;  /* alloc of prog */
-    slong localsize; /* length of outputs required in nmod_poly_crt_run */
+    slong localsize; /* length of outputs required in nmod_poly_multi_crt_run */
     slong temp1loc; /* index of temporary used in run */
     slong temp2loc; /* index of another tempory used in run */
     int good;   /* the moduli are good for CRT, essentially relatively prime */
-} nmod_poly_crt_struct;
+} nmod_poly_multi_crt_struct;
 
-typedef nmod_poly_crt_struct nmod_poly_crt_t[1];
+typedef nmod_poly_multi_crt_struct nmod_poly_multi_crt_t[1];
 
-FLINT_DLL void nmod_poly_crt_init(nmod_poly_crt_t CRT);
+FLINT_DLL void nmod_poly_multi_crt_init(nmod_poly_multi_crt_t CRT);
 
-FLINT_DLL int nmod_poly_crt_precompute(nmod_poly_crt_t CRT,
-    const nmod_poly_struct * moduli, slong len);
+FLINT_DLL int nmod_poly_multi_crt_precompute(nmod_poly_multi_crt_t CRT,
+                                   const nmod_poly_struct * moduli, slong len);
 
-FLINT_DLL int nmod_poly_crt_precompute_p(nmod_poly_crt_t CRT,
-    const nmod_poly_struct * const * moduli, slong len);
+FLINT_DLL int nmod_poly_multi_crt_precompute_p(nmod_poly_multi_crt_t CRT,
+                           const nmod_poly_struct * const * moduli, slong len);
 
-FLINT_DLL void nmod_poly_crt_precomp(nmod_poly_t output,
-    const nmod_poly_crt_t CRT, const nmod_poly_struct * values);
+FLINT_DLL void nmod_poly_multi_crt_precomp(nmod_poly_t output,
+             const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * values);
 
-FLINT_DLL void nmod_poly_crt_precomp_p(nmod_poly_t output,
-    const nmod_poly_crt_t CRT, const nmod_poly_struct * const * values);
+FLINT_DLL void nmod_poly_multi_crt_precomp_p(nmod_poly_t output,
+     const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * values);
 
-FLINT_DLL int nmod_poly_crt(nmod_poly_t output, const nmod_poly_struct * moduli,
-    const nmod_poly_struct * values, slong len);
+FLINT_DLL int nmod_poly_multi_crt(nmod_poly_t output,
+  const nmod_poly_struct * moduli, const nmod_poly_struct * values, slong len);
 
-FLINT_DLL void nmod_poly_crt_clear(nmod_poly_crt_t CRT);
+FLINT_DLL void nmod_poly_multi_crt_clear(nmod_poly_multi_crt_t CRT);
 
-NMOD_POLY_INLINE slong _nmod_poly_crt_local_size(const nmod_poly_crt_t CRT)
+NMOD_POLY_INLINE
+slong _nmod_poly_multi_crt_local_size(const nmod_poly_multi_crt_t CRT)
 {
     return CRT->localsize;
 }
 
-FLINT_DLL void _nmod_poly_crt_run(nmod_poly_struct * const * outputs,
-    const nmod_poly_crt_t CRT, const nmod_poly_struct * inputs);
+FLINT_DLL void _nmod_poly_multi_crt_run(nmod_poly_struct * outputs,
+             const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * inputs);
 
-FLINT_DLL void _nmod_poly_crt_run_p(nmod_poly_struct * const * outputs,
-    const nmod_poly_crt_t CRT, const nmod_poly_struct * const * inputs);
+FLINT_DLL void _nmod_poly_multi_crt_run_p(nmod_poly_struct * outputs,
+     const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * inputs);
 
 /* Inflation and deflation ***************************************************/
 

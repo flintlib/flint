@@ -357,7 +357,9 @@ static int _try_brown(nmod_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     slong m, n = ctx->minfo->nvars;
     slong * perm;
     ulong * Gshift;
-    nmod_mpolyd_t Ad, Bd, Gd, Abar, Bbar;
+    mp_bitcnt_t new_bits;
+    nmod_mpoly_ctx_t uctx;
+    nmod_mpolyun_t An, Bn, Gn, Abarn, Bbarn;
     TMP_INIT;
 
     /*
@@ -447,45 +449,39 @@ static int _try_brown(nmod_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     }
     FLINT_ASSERT(m >= 2);
 
-    /* TODO: see how performance depends on perm and try reorder */
+    /* TODO: find a favourable permutation of perm */
 
-    nmod_mpolyd_init(Ad, m);
-    nmod_mpolyd_init(Bd, m);
-    nmod_mpolyd_init(Gd, m);
-    nmod_mpolyd_init(Abar, m);
-    nmod_mpolyd_init(Bbar, m);
+    new_bits = FLINT_MAX(A->bits, B->bits);
 
-    nmod_mpoly_to_nmod_mpolyd_perm_deflate(Ad, m, A,
-                                       perm, Amin_exp, Gstride, Amax_exp, ctx);
-    nmod_mpoly_to_nmod_mpolyd_perm_deflate(Bd, m, B,
-                                       perm, Bmin_exp, Gstride, Bmax_exp, ctx);
+    nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->ffinfo->mod.n);
+    nmod_mpolyun_init(An, new_bits, uctx);
+    nmod_mpolyun_init(Bn, new_bits, uctx);
+    nmod_mpolyun_init(Gn, new_bits, uctx);
+    nmod_mpolyun_init(Abarn, new_bits, uctx);
+    nmod_mpolyun_init(Bbarn, new_bits, uctx);
 
-    success = nmod_mpolyd_gcd_brown_smprime(Gd, Abar, Bbar, Ad, Bd, ctx->ffinfo);
+    nmod_mpoly_to_mpolyun_perm_deflate(An, A, perm, Amin_exp, Gstride, uctx, ctx);
+    nmod_mpoly_to_mpolyun_perm_deflate(Bn, B, perm, Bmin_exp, Gstride, uctx, ctx);
+    success = nmod_mpolyun_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn, m - 1, uctx);
     if (!success)
     {
-        nmod_mpoly_to_nmod_mpolyd_perm_deflate(Ad, m, A,
-                                       perm, Amin_exp, Gstride, Amax_exp, ctx);
-        nmod_mpoly_to_nmod_mpolyd_perm_deflate(Bd, m, B,
-                                       perm, Bmin_exp, Gstride, Bmax_exp, ctx);
-        success = nmod_mpolyd_gcd_brown_lgprime(Gd, Abar, Bbar, Ad, Bd, ctx->ffinfo);
+        nmod_mpoly_to_mpolyun_perm_deflate(An, A, perm, Amin_exp, Gstride, uctx, ctx);
+        nmod_mpoly_to_mpolyun_perm_deflate(Bn, B, perm, Bmin_exp, Gstride, uctx, ctx);
+        success = nmod_mpolyun_gcd_brown_lgprime(Gn, Abarn, Bbarn, An, Bn, m - 1, uctx);
     }
-    if (!success)
-        goto cleanup;
+    if (success)
+    {
+        nmod_mpoly_from_mpolyun_perm_inflate(G, Gbits, Gn, perm, Gshift, Gstride, uctx, ctx);
+        nmod_mpoly_make_monic(G, G, ctx);
+        FLINT_ASSERT(G->bits == Gbits);
+    }
 
-    nmod_mpoly_from_nmod_mpolyd_perm_inflate(G, Gbits, ctx, Gd,
-                                                        perm, Gshift, Gstride);
-    nmod_mpoly_make_monic(G, G, ctx);
-    FLINT_ASSERT(G->bits == Gbits);
-
-    success = 1;
-
-cleanup:
-
-    nmod_mpolyd_clear(Bbar);
-    nmod_mpolyd_clear(Abar);
-    nmod_mpolyd_clear(Gd);
-    nmod_mpolyd_clear(Bd);
-    nmod_mpolyd_clear(Ad);
+    nmod_mpolyun_clear(An, uctx);
+    nmod_mpolyun_clear(Bn, uctx);
+    nmod_mpolyun_clear(Gn, uctx);
+    nmod_mpolyun_clear(Abarn, uctx);
+    nmod_mpolyun_clear(Bbarn, uctx);
+    nmod_mpoly_ctx_clear(uctx);
 
     TMP_END;
 

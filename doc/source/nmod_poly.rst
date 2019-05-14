@@ -2519,46 +2519,46 @@ Inflation and deflation
 Chinese Remaindering
 --------------------------------------------------------------------------------
 
-    In all of these functions the moduli (mod.n) of all of the nmod_poly's involved is assumed to match and be prime.
+    In all of these functions the moduli (mod.n) of all of the ``nmod_poly``'s involved is assumed to match and be prime.
 
-.. function:: void nmod_poly_crt_init(nmod_poly_crt_t CRT)
+.. function:: void nmod_poly_multi_crt_init(nmod_poly_multi_crt_t CRT)
 
     Initialize ``CRT`` for chinese remaindering.
 
-.. function:: int nmod_poly_crt_precompute(nmod_poly_crt_t CRT, const nmod_poly_struct * moduli, slong len)
+.. function:: int nmod_poly_multi_crt_precompute(nmod_poly_multi_crt_t CRT, const nmod_poly_struct * moduli, slong len)
 
-.. function:: int nmod_poly_crt_precompute_p(nmod_poly_crt_t CRT, const nmod_poly_struct * const * moduli, slong len)
+.. function:: int nmod_poly_multi_crt_precompute_p(nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * moduli, slong len)
 
     Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
-    A return of ``0`` indicates that the compilation failed and future calls to func::nmod_poly_crt_precomp will leave the output undefined.
+    A return of ``0`` indicates that the compilation failed and future calls to func::nmod_poly_multi_crt_precomp will leave the output undefined.
     A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) all of the moduli have positive degree and are pairwise relatively prime.
 
-.. function:: void nmod_poly_crt_precomp(nmod_poly_t output, const nmod_poly_crt_t CRT, const nmod_poly_struct * values)
+.. function:: void nmod_poly_multi_crt_precomp(nmod_poly_t output, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * values)
 
-.. function:: void nmod_poly_crt_precomp_p(nmod_poly_t output, const nmod_poly_crt_t CRT, const nmod_poly_struct * const * values)
+.. function:: void nmod_poly_multi_crt_precomp_p(nmod_poly_t output, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * values)
 
-    Set ``output`` to the polynomial of lowest possible degree that is congruent to ``values + i`` modulo the ``moduli + i`` in func::nmod_poly_crt_precompute.
-    The inputs ``values + 0, ... , values + len - 1`` where ``len`` was used in func::nmod_poly_crt_precompute are expected to be valid and have modulus matching the modulus of the moduli used in func::nmod_poly_crt_precompute.
+    Set ``output`` to the polynomial of lowest possible degree that is congruent to ``values + i`` modulo the ``moduli + i`` in func::nmod_poly_multi_crt_precompute.
+    The inputs ``values + 0, ..., values + len - 1`` where ``len`` was used in func::nmod_poly_multi_crt_precompute are expected to be valid and have modulus matching the modulus of the moduli used in func::nmod_poly_multi_crt_precompute.
 
-.. function:: int nmod_poly_crt(nmod_poly_t output, const nmod_poly_struct * moduli, const nmod_poly_struct * values, slong len)
+.. function:: int nmod_poly_multi_crt(nmod_poly_t output, const nmod_poly_struct * moduli, const nmod_poly_struct * values, slong len)
 
-    Set ``output`` to the polynomial of lowest possible degree that is congruent to ``inputs + i`` modulo the ``moduli + i``. The number of moduli, ``len``, should be positive, and the moduli (``mod.n``) of all of the moduli are assumed to match and be prime.
-    The inputs ``values + 0, ... , values + len - 1`` are expected to have modulus matching the modulus of the moduli.
-    A return of ``0`` indicates that the moduli are invalid and ``output`` was left undefined.
-    A return of ``1`` indicates success.
+    Perform the same operation as func::nmod_poly_multi_crt_precomp while internally constructing and destroying the precomputed data.
+    All of the remarks in func::nmod_poly_multi_crt_precompute apply.
 
-.. function:: void nmod_poly_crt_clear(nmod_poly_crt_t CRT)
+.. function:: void nmod_poly_multi_crt_clear(nmod_poly_multi_crt_t CRT)
 
     Free all space used by ``CRT``.
 
-.. function:: slong _nmod_poly_crt_local_size(const nmod_poly_crt_t CRT)
+.. function:: slong _nmod_poly_multi_crt_local_size(const nmod_poly_multi_crt_t CRT)
 
-    Return the required length of the output for func::_nmod_poly_crt_run.
+    Return the required length of the output for func::_nmod_poly_multi_crt_run.
 
-.. function:: void _nmod_poly_crt_run_p(const nmod_poly_crt_t CRT, nmod_poly_struct * const * outputs, const nmod_poly_struct * const * inputs)
+.. function:: void _nmod_poly_multi_crt_run(nmod_poly_struct * outputs, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * inputs)
 
-    Chinese remainder the ``inputs`` and place the output in ``outputs[0]``, which will have lowest possible degree and be congruent to ``inputs[i]`` modulo the ``moduli[i]`` in func::nmod_poly_crt_compile.
-    ``outputs`` should contain space for all temporaries and should be at least as long as ``_nmod_poly_crt_local_size(P)``.
+.. function:: void _nmod_poly_multi_crt_run_p(nmod_poly_struct * outputs, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * inputs)
+
+    Perform the same operation as func::nmod_poly_multi_crt_precomp using supplied temporary space.
+    The actual output is placed in ``outputs + 0``, and ``outputs`` should contain space for all temporaries and should be at least as long as ``_nmod_poly_multi_crt_local_size(CRT)``.
     Of course the moduli of these temporaries should match the modulus of the inputs.
 
 

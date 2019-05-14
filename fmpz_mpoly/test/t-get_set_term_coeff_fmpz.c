@@ -43,22 +43,23 @@ main(void)
         exp_bits = n_randint(state, 200) + 1;
         coeff_bits = n_randint(state, 200);
         fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
-        if (f->length == WORD(0))
-            continue;
 
-        for (j = 0; j < 10; j++)
+        if (f->length > 0)
         {
-            fmpz_randtest(c, state, n_randint(state, 200));
-
-            index = n_randint(state, f->length);
-
-            fmpz_mpoly_set_term_coeff_fmpz(f, index, c, ctx);
-            fmpz_mpoly_get_term_coeff_fmpz(d, f, index, ctx);
-            if (!fmpz_equal(c, d))
+            for (j = 0; j < 10; j++)
             {
-                printf("FAIL\n");
-                flint_printf("Set coeff and get coeff and compare\ni = %wd, j = %wd\n", i, j);
-                flint_abort();
+                fmpz_randtest(c, state, n_randint(state, 200));
+
+                index = n_randint(state, f->length);
+
+                fmpz_mpoly_set_term_coeff_fmpz(f, index, c, ctx);
+                fmpz_mpoly_get_term_coeff_fmpz(d, f, index, ctx);
+                if (!fmpz_equal(c, d))
+                {
+                    printf("FAIL\n");
+                    flint_printf("Set coeff and get coeff and compare\ni = %wd, j = %wd\n", i, j);
+                    flint_abort();
+                }
             }
         }
 

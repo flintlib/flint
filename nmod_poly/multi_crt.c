@@ -11,7 +11,7 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_poly_crt_init(nmod_poly_crt_t P)
+void nmod_poly_multi_crt_init(nmod_poly_multi_crt_t P)
 {
     P->prog = NULL;
     P->alloc = 0;
@@ -22,27 +22,27 @@ void nmod_poly_crt_init(nmod_poly_crt_t P)
     P->good = 0;
 }
 
-static void _nmod_poly_crt_fit_length(nmod_poly_crt_t P, slong k)
+static void _nmod_poly_multi_crt_fit_length(nmod_poly_multi_crt_t P, slong k)
 {
     k = FLINT_MAX(WORD(1), k);
 
     if (P->alloc == 0)
     {
         FLINT_ASSERT(P->prog == NULL);
-        P->prog = (_nmod_poly_crt_prog_instr *) flint_malloc(k
-                                           *sizeof(_nmod_poly_crt_prog_instr));
+        P->prog = (_nmod_poly_multi_crt_prog_instr *) flint_malloc(k
+                                     *sizeof(_nmod_poly_multi_crt_prog_instr));
         P->alloc = k;
     }
     else if (k > P->alloc)
     {
         FLINT_ASSERT(P->prog != NULL);
-        P->prog = (_nmod_poly_crt_prog_instr *) flint_realloc(P->prog, k
-                                           *sizeof(_nmod_poly_crt_prog_instr));
+        P->prog = (_nmod_poly_multi_crt_prog_instr *) flint_realloc(P->prog, k
+                                     *sizeof(_nmod_poly_multi_crt_prog_instr));
         P->alloc = k;
     }
 }
 
-static void _nmod_poly_crt_set_length(nmod_poly_crt_t P, slong k)
+static void _nmod_poly_multi_crt_set_length(nmod_poly_multi_crt_t P, slong k)
 {
     slong i;
 
@@ -56,9 +56,9 @@ static void _nmod_poly_crt_set_length(nmod_poly_crt_t P, slong k)
     P->length = k;
 }
 
-void nmod_poly_crt_clear(nmod_poly_crt_t P)
+void nmod_poly_multi_crt_clear(nmod_poly_multi_crt_t P)
 {
-    _nmod_poly_crt_set_length(P, 0);
+    _nmod_poly_multi_crt_set_length(P, 0);
 
     if (P->alloc > 0)
     {
@@ -76,7 +76,7 @@ typedef struct {
     return index of instruction that computes the result
 */
 static slong _push_prog(
-    nmod_poly_crt_t P,
+    nmod_poly_multi_crt_t P,
     const nmod_poly_struct * const * moduli,
     const index_deg_pair * perm,
     slong ret_idx,
@@ -164,7 +164,7 @@ static slong _push_prog(
 
     /* compile [start, end) */
     i = P->length;
-    _nmod_poly_crt_fit_length(P, i + 1);
+    _nmod_poly_multi_crt_fit_length(P, i + 1);
     nmod_poly_init_mod(P->prog[i].modulus, rightmodulus->mod);
     nmod_poly_init_mod(P->prog[i].idem, rightmodulus->mod);
     P->good = P->good && nmod_poly_invmod(P->prog[i].modulus, leftmodulus, rightmodulus);
@@ -190,8 +190,10 @@ static int index_deg_pair_cmp(
     Return 1 if moduli can be CRT'ed, 0 otherwise.
     A return of 0 means that future calls to run will leave output undefined.
 */
-int nmod_poly_crt_precompute_p(nmod_poly_crt_t P,
-                            const nmod_poly_struct * const * moduli, slong len)
+int nmod_poly_multi_crt_precompute_p(
+    nmod_poly_multi_crt_t P,
+    const nmod_poly_struct * const * moduli,
+    slong len)
 {
     slong i;
     index_deg_pair * perm;
@@ -221,8 +223,8 @@ int nmod_poly_crt_precompute_p(nmod_poly_crt_t P,
         FLINT_ASSERT(i == 0 || perm[i - 1].degree <= perm[i].degree);
     }
 
-    _nmod_poly_crt_fit_length(P, FLINT_MAX(WORD(1), len - 1));
-    _nmod_poly_crt_set_length(P, 0);
+    _nmod_poly_multi_crt_fit_length(P, FLINT_MAX(WORD(1), len - 1));
+    _nmod_poly_multi_crt_set_length(P, 0);
     P->localsize = 1;
     P->good = 1;
 
@@ -250,7 +252,7 @@ int nmod_poly_crt_precompute_p(nmod_poly_crt_t P,
 
     if (!P->good)
     {
-        _nmod_poly_crt_set_length(P, 0);
+        _nmod_poly_multi_crt_set_length(P, 0);
     }
 
     /* two more spots for temporaries */
@@ -262,8 +264,10 @@ int nmod_poly_crt_precompute_p(nmod_poly_crt_t P,
     return P->good;
 }
 
-int nmod_poly_crt_precompute(nmod_poly_crt_t P,
-                                   const nmod_poly_struct * moduli, slong len)
+int nmod_poly_multi_crt_precompute(
+    nmod_poly_multi_crt_t P,
+    const nmod_poly_struct * moduli,
+    slong len)
 {
     int success;
     slong i;
@@ -280,7 +284,7 @@ int nmod_poly_crt_precompute(nmod_poly_crt_t P,
         m[i] = moduli + i;
     }
 
-    success = nmod_poly_crt_precompute_p(P,
+    success = nmod_poly_multi_crt_precompute_p(P,
                                     (const nmod_poly_struct * const *) m, len);
     TMP_END;
 
@@ -288,28 +292,25 @@ int nmod_poly_crt_precompute(nmod_poly_crt_t P,
 }
 
 
-
-void nmod_poly_crt_precomp(nmod_poly_t output, const nmod_poly_crt_t P,
-                                               const nmod_poly_struct * inputs)
+void nmod_poly_multi_crt_precomp(
+    nmod_poly_t output,
+    const nmod_poly_multi_crt_t P,
+    const nmod_poly_struct * inputs)
 {
     slong i;
     nmod_poly_struct * out;
-    nmod_poly_struct ** outp;
     TMP_INIT;
 
     TMP_START;
     out = (nmod_poly_struct *) TMP_ALLOC(P->localsize
                                                     *sizeof(nmod_poly_struct));
-    outp = (nmod_poly_struct **) TMP_ALLOC(P->localsize
-                                                  *sizeof(nmod_poly_struct *));
     for (i = 0; i < P->localsize; i++)
     {
-        outp[i] = out + i;
         nmod_poly_init_mod(out + i, inputs[0].mod);
     }
 
     nmod_poly_swap(out + 0, output);
-    _nmod_poly_crt_run(outp, P, inputs);
+    _nmod_poly_multi_crt_run(out, P, inputs);
     nmod_poly_swap(out + 0, output);
 
     for (i = 0; i < P->localsize; i++)
@@ -320,27 +321,25 @@ void nmod_poly_crt_precomp(nmod_poly_t output, const nmod_poly_crt_t P,
     TMP_END;
 }
 
-void nmod_poly_crt_precomp_p(nmod_poly_t output, const nmod_poly_crt_t P,
-                                       const nmod_poly_struct * const * inputs)
+void nmod_poly_multi_crt_precomp_p(
+    nmod_poly_t output,
+    const nmod_poly_multi_crt_t P,
+    const nmod_poly_struct * const * inputs)
 {
     slong i;
     nmod_poly_struct * out;
-    nmod_poly_struct ** outp;
     TMP_INIT;
 
     TMP_START;
     out = (nmod_poly_struct *) TMP_ALLOC(P->localsize
                                                     *sizeof(nmod_poly_struct));
-    outp = (nmod_poly_struct **) TMP_ALLOC(P->localsize
-                                                  *sizeof(nmod_poly_struct *));
     for (i = 0; i < P->localsize; i++)
     {
-        outp[i] = out + i;
         nmod_poly_init_mod(out + i, inputs[0]->mod);
     }
 
     nmod_poly_swap(out + 0, output);
-    _nmod_poly_crt_run_p(outp, P, inputs);
+    _nmod_poly_multi_crt_run_p(out, P, inputs);
     nmod_poly_swap(out + 0, output);
 
     for (i = 0; i < P->localsize; i++)
@@ -351,35 +350,34 @@ void nmod_poly_crt_precomp_p(nmod_poly_t output, const nmod_poly_crt_t P,
     TMP_END;
 }
 
-int nmod_poly_crt(nmod_poly_t output, const nmod_poly_struct * moduli,
-                                  const nmod_poly_struct * values, slong len)
+int nmod_poly_multi_crt(
+    nmod_poly_t output,
+    const nmod_poly_struct * moduli,
+    const nmod_poly_struct * values,
+    slong len)
 {
     int success;
     slong i;
-    nmod_poly_crt_t P;
+    nmod_poly_multi_crt_t P;
     nmod_poly_struct * out;
-    nmod_poly_struct ** outp;
     TMP_INIT;
 
     FLINT_ASSERT(len > 0);
 
     TMP_START;
 
-    nmod_poly_crt_init(P);
-    success = nmod_poly_crt_precompute(P, moduli, len);
+    nmod_poly_multi_crt_init(P);
+    success = nmod_poly_multi_crt_precompute(P, moduli, len);
 
     out = (nmod_poly_struct *) TMP_ALLOC(P->localsize
                                                     *sizeof(nmod_poly_struct));
-    outp = (nmod_poly_struct **) TMP_ALLOC(P->localsize
-                                                  *sizeof(nmod_poly_struct *));
     for (i = 0; i < P->localsize; i++)
     {
-        outp[i] = out + i;
         nmod_poly_init_mod(out + i, values[0].mod);
     }
 
     nmod_poly_swap(out + 0, output);
-    _nmod_poly_crt_run(outp, P, values);
+    _nmod_poly_multi_crt_run(out, P, values);
     nmod_poly_swap(out + 0, output);
 
     for (i = 0; i < P->localsize; i++)
@@ -387,7 +385,7 @@ int nmod_poly_crt(nmod_poly_t output, const nmod_poly_struct * moduli,
         nmod_poly_clear(out + i);
     }
 
-    nmod_poly_crt_clear(P);
+    nmod_poly_multi_crt_clear(P);
 
     TMP_END;
 
@@ -395,7 +393,7 @@ int nmod_poly_crt(nmod_poly_t output, const nmod_poly_struct * moduli,
 }
 
 /*
-    If P was set with a call to nmod_poly_crt_compile(P, m, len), return
+    If P was set with a call to nmod_poly_multi_crt_compile(P, m, len), return
     in outputs[0] polynomial r of smallest degree such that
         r = inputs[0] mod m[0]
         r = inputs[1] mod m[1]
@@ -404,16 +402,18 @@ int nmod_poly_crt(nmod_poly_t output, const nmod_poly_struct * moduli,
     For thread safety "outputs" is expected to have enough space for all
     temporaries, thus should be at least as long as P->localsize.
 */
-void _nmod_poly_crt_run(nmod_poly_struct * const * outputs,
-                   const nmod_poly_crt_t P, const nmod_poly_struct * inputs)
+void _nmod_poly_multi_crt_run(
+    nmod_poly_struct * outputs,
+    const nmod_poly_multi_crt_t P,
+    const nmod_poly_struct * inputs)
 {
     slong i;
     slong a, b, c;
     const nmod_poly_struct * B, * C;
     nmod_poly_struct * A, * t1, * t2;
 
-    t1 = outputs[P->temp1loc];
-    t2 = outputs[P->temp2loc];
+    t1 = outputs + P->temp1loc;
+    t2 = outputs + P->temp2loc;
 
     for (i = 0; i < P->length; i++)
     {
@@ -421,9 +421,9 @@ void _nmod_poly_crt_run(nmod_poly_struct * const * outputs,
         b = P->prog[i].b_idx;
         c = P->prog[i].c_idx;
         FLINT_ASSERT(a >= 0);
-        A = outputs[a];
-        B = b < 0 ? inputs - b - 1 : outputs[b];
-        C = c < 0 ? inputs - c - 1 : outputs[c];
+        A = outputs + a;
+        B = b < 0 ? inputs + (-b-1) : outputs + b;
+        C = c < 0 ? inputs + (-c-1) : outputs + c;
 
         FLINT_ASSERT(A->mod.n == P->prog[i].modulus->mod.n);
         FLINT_ASSERT(B->mod.n == P->prog[i].modulus->mod.n);
@@ -446,21 +446,23 @@ void _nmod_poly_crt_run(nmod_poly_struct * const * outputs,
         /* last calculation should write answer to outputs[0] */
         if (i + 1 >= P->length)
         {
-            FLINT_ASSERT(A == outputs[0]);
+            FLINT_ASSERT(A == outputs + 0);
         }
     }
 }
 
-void _nmod_poly_crt_run_p(nmod_poly_struct * const * outputs,
-              const nmod_poly_crt_t P, const nmod_poly_struct * const * inputs)
+void _nmod_poly_multi_crt_run_p(
+    nmod_poly_struct * outputs,
+    const nmod_poly_multi_crt_t P,
+    const nmod_poly_struct * const * inputs)
 {
     slong i;
     slong a, b, c;
     const nmod_poly_struct * B, * C;
     nmod_poly_struct * A, * t1, * t2;
 
-    t1 = outputs[P->temp1loc];
-    t2 = outputs[P->temp2loc];
+    t1 = outputs + P->temp1loc;
+    t2 = outputs + P->temp2loc;
 
     for (i = 0; i < P->length; i++)
     {
@@ -468,9 +470,9 @@ void _nmod_poly_crt_run_p(nmod_poly_struct * const * outputs,
         b = P->prog[i].b_idx;
         c = P->prog[i].c_idx;
         FLINT_ASSERT(a >= 0);
-        A = outputs[a];
-        B = b < 0 ? inputs[-b-1] : outputs[b];
-        C = c < 0 ? inputs[-c-1] : outputs[c];
+        A = outputs + a;
+        B = b < 0 ? inputs[-b-1] : outputs + b;
+        C = c < 0 ? inputs[-c-1] : outputs + c;
 
         FLINT_ASSERT(A->mod.n == P->prog[i].modulus->mod.n);
         FLINT_ASSERT(B->mod.n == P->prog[i].modulus->mod.n);
@@ -493,7 +495,7 @@ void _nmod_poly_crt_run_p(nmod_poly_struct * const * outputs,
         /* last calculation should write answer to outputs[0] */
         if (i + 1 >= P->length)
         {
-            FLINT_ASSERT(A == outputs[0]);
+            FLINT_ASSERT(A == outputs + 0);
         }
     }
 }

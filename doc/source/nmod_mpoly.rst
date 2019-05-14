@@ -523,6 +523,17 @@ Greatest Common Divisor
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
     If the modulus is not prime, this function will probably return ``0`` quickly.
 
+.. function:: int nmod_mpoly_gcd_brown(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+.. function:: int nmod_mpoly_gcd_brown_threaded(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using Brown's algorithm.
+    The threaded version takes an upper limit on the number of threads to use, while the non-threaded version always uses one thread.
+
+.. function:: int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using Zipple's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
+
 
 Internal Functions
 --------------------------------------------------------------------------------
@@ -554,18 +565,4 @@ Internal Functions
     quotient) polynomials, is given by ``len``. The function computes
     polynomials `q_i = q[i]` such that ``poly2`` is
     `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
-
-
-.. function:: int nmod_mpoly_gcd_brown(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
-
-    If the return is nonzero, used Brown's dense modular algorithm to set
-    ``poly1`` to the GCD of ``poly2`` and ``poly3``, where
-    ``poly1`` is monic.
-
-.. function:: int nmod_mpoly_gcd_zippel(nmod_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    If the return is nonzero, used a modular algorithm with Zippel's sparse
-    interpolation to set
-    ``poly1`` to the GCD of ``poly2`` and ``poly3``, where
-    ``poly1`` is monic.
 

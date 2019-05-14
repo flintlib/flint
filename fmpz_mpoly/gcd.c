@@ -359,7 +359,10 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     slong m, n = ctx->minfo->nvars;
     slong * perm;
     ulong * Gshift;
-    fmpz_mpolyd_t Ad, Bd, Gd, Abar, Bbar;
+    mp_bitcnt_t new_bits;
+    fmpz_mpoly_ctx_t uctx;
+    fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
+    fmpz_t cA, cB, cG;
     TMP_INIT;
 
     /*
@@ -449,38 +452,48 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     }
     FLINT_ASSERT(m >= 2);
 
-    /* TODO: see how performance depends on perm and try reorder */
+    /* TODO: find a favourable permutation of perm */
 
-    fmpz_mpolyd_init(Ad, m);
-    fmpz_mpolyd_init(Bd, m);
-    fmpz_mpolyd_init(Gd, m);
-    fmpz_mpolyd_init(Abar, m);
-    fmpz_mpolyd_init(Bbar, m);
+    new_bits = FLINT_MAX(A->bits, B->bits);
 
-    fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(Ad, m, A,
-                                       perm, Amin_exp, Gstride, Amax_exp, ctx);
-    fmpz_mpoly_to_fmpz_mpolyd_perm_deflate(Bd, m, B,
-                                       perm, Bmin_exp, Gstride, Bmax_exp, ctx);
+    fmpz_mpoly_ctx_init(uctx, m - 1, ORD_LEX);
+    fmpz_mpolyu_init(Au, new_bits, uctx);
+    fmpz_mpolyu_init(Bu, new_bits, uctx);
+    fmpz_mpolyu_init(Gu, new_bits, uctx);
+    fmpz_mpolyu_init(Abaru, new_bits, uctx);
+    fmpz_mpolyu_init(Bbaru, new_bits, uctx);
 
-    success = fmpz_mpolyd_gcd_brown(Gd, Abar, Bbar, Ad, Bd);
-    if (!success)
-        goto cleanup;
+    fmpz_init(cA);
+    fmpz_init(cB);
+    fmpz_init(cG);
 
-    fmpz_mpoly_from_fmpz_mpolyd_perm_inflate(G, Gbits, ctx, Gd,
-                                                        perm, Gshift, Gstride);
-    FLINT_ASSERT(G->length > 0);
-    if ((fmpz_sgn(G->coeffs + 0) < 0))
-        fmpz_mpoly_neg(G, G, ctx);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, A, perm, Amin_exp, Gstride, uctx, ctx);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B, perm, Bmin_exp, Gstride, uctx, ctx);
 
-    success = 1;
+    fmpz_mpolyu_content_fmpz(cA, Au, uctx);
+    fmpz_mpolyu_content_fmpz(cB, Bu, uctx);
+    fmpz_gcd(cG, cA, cB);
+    fmpz_mpolyu_divexact_fmpz(Au, Au, cA, uctx);
+    fmpz_mpolyu_divexact_fmpz(Bu, Bu, cB, uctx);
+    success = fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx);
+    if (success)
+    {
+        fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits, Gu, perm, Gshift, Gstride, uctx, ctx);
+        if (fmpz_sgn(G->coeffs + 0) < 0)
+            fmpz_neg(cG, cG);
+        fmpz_mpoly_scalar_mul_fmpz(G, G, cG, ctx);
+    }
 
-cleanup:
+    fmpz_clear(cA);
+    fmpz_clear(cB);
+    fmpz_clear(cG);
 
-    fmpz_mpolyd_clear(Bbar);
-    fmpz_mpolyd_clear(Abar);
-    fmpz_mpolyd_clear(Gd);
-    fmpz_mpolyd_clear(Bd);
-    fmpz_mpolyd_clear(Ad);
+    fmpz_mpolyu_clear(Au, uctx);
+    fmpz_mpolyu_clear(Bu, uctx);
+    fmpz_mpolyu_clear(Gu, uctx);
+    fmpz_mpolyu_clear(Abaru, uctx);
+    fmpz_mpolyu_clear(Bbaru, uctx);
+    fmpz_mpoly_ctx_clear(uctx);
 
     TMP_END;
 
