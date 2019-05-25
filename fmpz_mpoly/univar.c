@@ -287,9 +287,8 @@ void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, mp_bitcnt_t bits1,
     mpoly_heap_t * chain, * x;
     TMP_INIT;
 
-    FLINT_ASSERT(bits <= FLINT_BITS);
-
     bits = bits1;
+    FLINT_ASSERT(bits <= FLINT_BITS);
 
     if (poly2->length == 0)
     {

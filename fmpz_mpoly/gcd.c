@@ -517,6 +517,7 @@ static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
     fmpz_mpoly_t ac, bc, gc, gabc, g;
     fmpz_mpoly_univar_t ax, bx, gx;
 
+    FLINT_ASSERT(Gbits <= FLINT_BITS);
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
@@ -714,6 +715,8 @@ static int _try_prs(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
         fmpz_mpoly_mul(gx->coeffs + i, gx->coeffs + i, gabc, ctx);
         gx->exps[i] += FLINT_MIN(Amin_exp[var], Bmin_exp[var]);
     }
+
+    FLINT_ASSERT(Gbits <= FLINT_BITS);
 
     fmpz_mpoly_from_univar_bits(G, Gbits, gx, ctx);
 

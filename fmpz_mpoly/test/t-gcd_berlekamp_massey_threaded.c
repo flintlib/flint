@@ -16,6 +16,7 @@ void gcd_check(
     fmpz_mpoly_t a,
     fmpz_mpoly_t b,
     fmpz_mpoly_ctx_t ctx,
+    slong thread_limit,
     slong i,
     slong j,
     const char * name)
@@ -27,7 +28,7 @@ void gcd_check(
     fmpz_mpoly_init(cb, ctx);
     fmpz_mpoly_init(cg, ctx);
 
-    res = fmpz_mpoly_gcd_berlekamp_massey(g, a, b, ctx);
+    res = fmpz_mpoly_gcd_berlekamp_massey_threaded(g, a, b, ctx, thread_limit);
     fmpz_mpoly_assert_canonical(g, ctx);
 
     if (!res)
@@ -68,7 +69,7 @@ void gcd_check(
         flint_abort();
     }
 
-    res = fmpz_mpoly_gcd_berlekamp_massey(cg, ca, cb, ctx);
+    res = fmpz_mpoly_gcd_berlekamp_massey_threaded(cg, ca, cb, ctx, thread_limit);
     fmpz_mpoly_assert_canonical(cg, ctx);
 
     if (!res)
@@ -99,11 +100,16 @@ int
 main(void)
 {
     slong i, j, tmul = 10;
+    slong max_threads = 5;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 1;
+#endif
 
-    flint_printf("gcd_berlekamp_massey....");
+    flint_printf("gcd_berlekamp_massey_threaded....");
     fflush(stdout);
 
+    for (i = 0; i < 2 + 2*tmul; i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t g, a, b;
@@ -122,7 +128,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(b, "1 + x^100 + x^3*y + 2*t^15*x^78*y^3*z^13", vars, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
-        gcd_check(g, a, b, ctx, -1, 0, "example");
+        gcd_check(g, a, b, ctx, 100, -1, 0, "example");
 
         /*
             The lesser variables are x and z and the gcd degree bounds will be
@@ -138,7 +144,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(b, "y*t + 1 + (x - z^5)*(y - t + x)", vars, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
-        gcd_check(g, a, b, ctx, -1, 1, "trigger unlucky ksub");
+        gcd_check(g, a, b, ctx, 100, -1, 1, "trigger unlucky ksub");
 
         /*
             The coefficients of g are the first three chosen smooth primes.
@@ -151,7 +157,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(b, "y^3 + t^4 + x^2 + z", vars, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
-        gcd_check(g, a, b, ctx, -1, 2, "trigger zipple no match");
+        gcd_check(g, a, b, ctx, 100, -1, 2, "trigger zipple no match");
 
         /*
             The initial ksub will be
@@ -165,14 +171,14 @@ main(void)
         fmpz_mpoly_set_str_pretty(b, "(x + z)*y + t", vars, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
-        gcd_check(g, a, b, ctx, -1, 3, "trigger ksub lc kill");
+        gcd_check(g, a, b, ctx, 100, -1, 3, "trigger ksub lc kill");
 
         fmpz_mpoly_set_str_pretty(g, "y + t + x^3 + z^3", vars, ctx);
         fmpz_mpoly_set_str_pretty(a, "(x - z^4 + 33857*(x*z))*y + 1", vars, ctx);
         fmpz_mpoly_set_str_pretty(b, "(x + z)*y + t", vars, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
-        gcd_check(g, a, b, ctx, -1, 4, "trigger ksub lc kill mod p");
+        gcd_check(g, a, b, ctx, 100, -1, 4, "trigger ksub lc kill mod p");
 
         /*
             gcd(lc_yt(a), lc_yt(b)) will have terms vanishing modulo the first
@@ -183,7 +189,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(b, "(2*x - t^2)*(x - 33857*x^2 + 35153*z^4)*y^2*t + t*z + y", vars, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
-        gcd_check(g, a, b, ctx, -1, 5, "trigger gcd lc terms vanish mod p");
+        gcd_check(g, a, b, ctx, 100, -1, 5, "trigger gcd lc terms vanish mod p");
 
         /*
             The ksub will elevate the degrees past FLINT_BITS. Content removal
@@ -203,7 +209,9 @@ main(void)
         }
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
-        gcd_check(g, a, b, ctx, -1, 6, "trigger big p");
+        gcd_check(g, a, b, ctx, 100, -1, 6, "trigger big p");
+
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
@@ -226,11 +234,11 @@ main(void)
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(t, ctx);
 
-        len = n_randint(state, 30) + 1;
-        len1 = n_randint(state, 40);
-        len2 = n_randint(state, 40);
+        len = n_randint(state, 40) + 1;
+        len1 = n_randint(state, 50);
+        len2 = n_randint(state, 50);
 
-        degbound = 100/(2*ctx->minfo->nvars - 1);
+        degbound = 120/(2*ctx->minfo->nvars - 1);
 
         coeff_bits = n_randint(state, 100);
 
@@ -244,7 +252,9 @@ main(void)
             fmpz_mpoly_mul(a, a, t, ctx);
             fmpz_mpoly_mul(b, b, t, ctx);
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
-            gcd_check(g, a, b, ctx, i, j, "sparse");
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+            gcd_check(g, a, b, ctx, n_randint(state, max_threads + 3),
+                                                        i, j, "random sparse");
         }
 
         fmpz_mpoly_clear(g, ctx);

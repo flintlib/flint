@@ -121,12 +121,6 @@ int fmpz_mod_mpolyun_addinterp_bivar(
 
     fmpz_init(v);
 
-/*
-flint_printf("\nnmod_mpolyun_addinterp_bivar: (alpha = %wu)\n", alpha);
-flint_printf("A: "); nmod_poly_print_pretty(A, "X"); printf("\n");
-flint_printf("F: "); nmod_mpolyun_print_pretty(F, NULL, ctx); printf("\n");
-*/
-
     Aexp = fmpz_mod_poly_degree(A);
 
     fmpz_mod_poly_init(tp, fmpz_mod_ctx_modulus(fpctx));
@@ -139,10 +133,7 @@ flint_printf("F: "); nmod_mpolyun_print_pretty(F, NULL, ctx); printf("\n");
     while (Fi < Flen || Aexp >= 0)
     {
         FLINT_ASSERT(Toff < T->alloc);
-/*
-flint_printf("Fi: %wd\n",Fi);
-flint_printf("Aexp: %wd\n",Aexp);
-*/
+
         if (Fi < Flen)
         {
             FLINT_ASSERT(!fmpz_mod_poly_is_zero((Fcoeff + Fi)->coeffs + 0));
@@ -321,10 +312,6 @@ choose_prime: /* prime is v - alpha */
 
     fmpz_sub_ui(alpha, alpha, 1);
 
-/*
-printf("alpha: "); fmpz_print(alpha); printf("\n");
-*/
-
     /* make sure evaluation point does not kill both lc(A) and lc(B) */
     fmpz_mod_poly_evaluate_fmpz(gammaeval, gamma, alpha);
     if (fmpz_is_zero(gammaeval))
@@ -337,21 +324,12 @@ printf("alpha: "); fmpz_print(alpha); printf("\n");
     fmpz_mod_mpolyun_eval_last_bivar(Beval, B, alpha, ctx, fpctx);
     FLINT_ASSERT(Aeval->length > 0);
     FLINT_ASSERT(Beval->length > 0);
-/*
-printf("Aeval: "); fmpz_mod_poly_print_pretty(Aeval, "X"); printf("\n");
-printf("Beval: "); fmpz_mod_poly_print_pretty(Beval, "X"); printf("\n");
-*/
+
     fmpz_mod_poly_gcd(Geval, Aeval, Beval);
     fmpz_mod_poly_divrem(Abareval, r, Aeval, Geval);
     FLINT_ASSERT(fmpz_mod_poly_is_zero(r));
     fmpz_mod_poly_divrem(Bbareval, r, Beval, Geval);
     FLINT_ASSERT(fmpz_mod_poly_is_zero(r));
-
-/*
-printf("   Geval: "); fmpz_mod_poly_print_pretty(Geval, "X"); printf("\n");
-printf("Abareval: "); fmpz_mod_poly_print_pretty(Abareval, "X"); printf("\n");
-printf("Bbareval: "); fmpz_mod_poly_print_pretty(Bbareval, "X"); printf("\n");
-*/
 
     FLINT_ASSERT(Geval->length > 0);
     FLINT_ASSERT(Abareval->length > 0);
@@ -402,12 +380,7 @@ printf("Bbareval: "); fmpz_mod_poly_print_pretty(Bbareval, "X"); printf("\n");
     fmpz_mod_poly_scalar_mul_fmpz(modulus2, modulus, alpha);
     fmpz_mod_poly_shift_left(modulus, modulus, 1);
     fmpz_mod_poly_sub(modulus, modulus, modulus2);
-/*
-printf("modulus: "); fmpz_mod_poly_print_pretty(modulus, "v"); printf("\n");
-printf("   G: "); fmpz_mod_mpolyun_print_pretty(G, NULL, ctx, fpctx); printf("\n");
-printf("Abar: "); fmpz_mod_mpolyun_print_pretty(Abar, NULL, ctx, fpctx); printf("\n");
-printf("Bbar: "); fmpz_mod_mpolyun_print_pretty(Bbar, NULL, ctx, fpctx); printf("\n");
-*/
+
     if (fmpz_mod_poly_degree(modulus) < bound)
     {
         goto choose_prime;
@@ -427,12 +400,6 @@ printf("Bbar: "); fmpz_mod_mpolyun_print_pretty(Bbar, NULL, ctx, fpctx); printf(
     goto choose_prime;
 
 successful:
-/*
-printf("successful\n");
-printf("   G: "); fmpz_mod_mpolyun_print_pretty(G, NULL, ctx, fpctx); printf("\n");
-printf("Abar: "); fmpz_mod_mpolyun_print_pretty(Abar, NULL, ctx, fpctx); printf("\n");
-printf("Bbar: "); fmpz_mod_mpolyun_print_pretty(Bbar, NULL, ctx, fpctx); printf("\n");
-*/
 
     fmpz_mod_mpolyun_content_last(modulus, G, ctx, fpctx);
     fmpz_mod_mpolyun_divexact_last(G, modulus, ctx, fpctx);
@@ -440,12 +407,6 @@ printf("Bbar: "); fmpz_mod_mpolyun_print_pretty(Bbar, NULL, ctx, fpctx); printf(
     fmpz_mod_mpolyun_divexact_last(Bbar, fmpz_mod_mpolyun_leadcoeff_ref(G, ctx, fpctx), ctx, fpctx);
 
 successful_put_content:
-/*
-printf("put_content\n");
-printf("   G: "); fmpz_mod_mpolyun_print_pretty(G, NULL, ctx, fpctx); printf("\n");
-printf("Abar: "); fmpz_mod_mpolyun_print_pretty(Abar, NULL, ctx, fpctx); printf("\n");
-printf("Bbar: "); fmpz_mod_mpolyun_print_pretty(Bbar, NULL, ctx, fpctx); printf("\n");
-*/
 
     fmpz_mod_mpolyun_mul_last(G, cG, ctx, fpctx);
     fmpz_mod_mpolyun_mul_last(Abar, cAbar, ctx, fpctx);
@@ -454,13 +415,6 @@ printf("Bbar: "); fmpz_mod_mpolyun_print_pretty(Bbar, NULL, ctx, fpctx); printf(
     success = 1;
 
 cleanup:
-
-/*
-printf("cleanup\n");
-printf("   G: "); fmpz_mod_mpolyun_print_pretty(G, NULL, ctx, fpctx); printf("\n");
-printf("Abar: "); fmpz_mod_mpolyun_print_pretty(Abar, NULL, ctx, fpctx); printf("\n");
-printf("Bbar: "); fmpz_mod_mpolyun_print_pretty(Bbar, NULL, ctx, fpctx); printf("\n");
-*/
 
 #if WANT_ASSERT
     if (success)
@@ -496,6 +450,10 @@ printf("Bbar: "); fmpz_mod_mpolyun_print_pretty(Bbar, NULL, ctx, fpctx); printf(
 
     fmpz_mod_poly_clear(modulus);
     fmpz_mod_poly_clear(modulus2);
+
+    fmpz_clear(alpha);
+    fmpz_clear(temp);
+    fmpz_clear(gammaeval);
 
     return success;
 }

@@ -631,7 +631,10 @@ Greatest Common Divisor
 
 .. function:: int fmpz_mpoly_gcd_berlekamp_massey(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
+.. function:: int fmpz_mpoly_gcd_berlekamp_massey(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
     Try to set ``G`` to the GCD of ``A`` and ``B`` using the Berlekamp-Massey algorithm to interpolate coefficients from bivariate images in the most significant two variables.
+    The threaded version takes an upper limit on the number of threads to use, while the non-threaded version always uses one thread.
 
 Internal Functions
 --------------------------------------------------------------------------------

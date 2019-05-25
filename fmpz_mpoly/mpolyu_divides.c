@@ -550,7 +550,9 @@ int fmpz_mpolyuu_divides(
         exp = heap[1].exp;
 
         if (mpoly_monomial_overflows1(exp, mask))
+        {
             goto not_exact_division;
+        }
 
         fmpz_mpolyu_fit_length(Q, Q->length + 1, ctx);
         lt_divides = mpoly_monomial_divides1(Q->exps + Q->length, exp, Bexp[0], mask);

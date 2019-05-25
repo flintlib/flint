@@ -24,7 +24,8 @@ int fmpz_mpolyu_is_canonical(const fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx)
 
     for (i = 0; i < A->length; i++)
     {
-        if (!fmpz_mpoly_is_canonical(A->coeffs + i, ctx))
+        if (   fmpz_mpoly_is_zero(A->coeffs + i, ctx)
+            || !fmpz_mpoly_is_canonical(A->coeffs + i, ctx))
         {
             return 0;
         }
