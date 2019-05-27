@@ -1055,7 +1055,7 @@ int fmpz_mpoly_gcd_brown_threaded(
     stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
-        perm[i] = i + 1 < ctx->minfo->nvars ? i + 1 : 0;
+        perm[i] = i;
         shift[i] = 0;
         stride[i] = 1;
     }
@@ -1086,8 +1086,8 @@ int fmpz_mpoly_gcd_brown_threaded(
     fmpz_mpolyu_init(Abaru, new_bits, uctx);
     fmpz_mpolyu_init(Bbaru, new_bits, uctx);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, A, perm, shift, stride, uctx, ctx);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B, perm, shift, stride, uctx, ctx);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx, perm, shift, stride);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx, perm, shift, stride);
 
     /* calculate gcd */
     {
@@ -1123,8 +1123,8 @@ int fmpz_mpoly_gcd_brown_threaded(
 
     if (success)
     {
-        fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits,
-                                           Gu, perm, shift, stride, uctx, ctx);
+        fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits, ctx, Gu, uctx,
+                                                          perm, shift, stride);
         if (fmpz_sgn(G->coeffs + 0) < 0)
             fmpz_mpoly_neg(G, G, ctx);
     }

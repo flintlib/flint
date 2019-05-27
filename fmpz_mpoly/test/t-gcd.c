@@ -116,8 +116,6 @@ main(void)
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
 
-        fmpz_mpoly_gcd(g, a, b, ctx);
-
         gcd_check(g, a, b, ctx, 0, 0, "example");
 
         fmpz_mpoly_clear(a, ctx);

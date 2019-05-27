@@ -3798,8 +3798,8 @@ int fmpz_mpoly_gcd_berlekamp_massey(
     /* Gbits is bits for final answer in ZZ[x_0,...,x_(n-1)] */
     Gbits = FLINT_MIN(A->bits, B->bits);
 
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, perm, shift, stride, uctx, A, ctx);
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, perm, shift, stride, uctx, B, ctx);
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx, perm, shift, stride);
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx, perm, shift, stride);
 
     /* remove content from A and B */
     success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx);
@@ -3826,8 +3826,8 @@ int fmpz_mpoly_gcd_berlekamp_massey(
 
     fmpz_mpolyu_mul_mpoly(Guu, Gbar, Acontent, uctx);
 
-    fmpz_mpoly_from_mpolyuu_perm_inflate(G, Gbits, ctx,
-                                               Guu, perm, shift, stride, uctx);
+    fmpz_mpoly_from_mpolyuu_perm_inflate(G, Gbits, ctx, Guu, uctx,
+                                                          perm, shift, stride);
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
 

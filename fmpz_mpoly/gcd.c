@@ -100,11 +100,11 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
             present in both ess(A) and ess(B) (essential)
         and that there are at least 2 variables in the essential case.
 
-        Let y_m, y_0, ..., y_{m-1} with m >= 1 denote the variables present
+        Let y_0, y_1, ..., y_{m} with m >= 1 denote the variables present
         in both ess(A) and ess(B). Each y_i is one of the x_j and the variables
-        are ordered as y_{m} > y_0 > ... > y_{m-1} with LEX order.
-        The Zippel algorithm will operate in Z[y_0,...,y_{m-1}][y_m] and it
-        only operates with Z[y_0,...,y_{m-1}] in LEX.
+        are ordered as y_0 > ... > y_{m} with LEX order.
+        The Zippel algorithm will operate in Z[y_0][y_1,...,y_m] and it
+        only operates with Z[y_1,...,y_m] in LEX.
 
         When converting to the mpolyu format via
         fmpz_mpoly_to_mpolyu_perm_deflate, the non-essential variables
@@ -172,17 +172,17 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
 
     /* work out a favourable permation to zinfo->perm */
 
-    /* figure out a main variable y_m */
+    /* figure out a main variable y_0 */
     {
         slong main_var;
         ulong count, deg, new_count, new_deg;
 
-        main_var = m;
+        main_var = 0;
         j = zinfo->perm[main_var];
         count = FLINT_MIN(FLINT_MIN(Amin_exp_count[j], Amax_exp_count[j]),
                           FLINT_MIN(Bmin_exp_count[j], Bmax_exp_count[j]));
         deg = FLINT_MAX(Addeg[j], Bddeg[j]);
-        for (i = 0; i < m; i++)
+        for (i = 1; i < m + 1; i++)
         {
             j = zinfo->perm[i];
             new_count = FLINT_MIN(FLINT_MIN(Amin_exp_count[j], Amax_exp_count[j]),
@@ -197,16 +197,16 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
             }
         }
 
-        if (main_var != m)
+        if (main_var != 0)
         {
             slong t = zinfo->perm[main_var];
-            zinfo->perm[main_var] = zinfo->perm[m];
-            zinfo->perm[m] = t;
+            zinfo->perm[main_var] = zinfo->perm[0];
+            zinfo->perm[0] = t;
         }
     }
 
-    /* sort with hope that ddeg(G,y_0) >= ddeg(G,y_1) ... >= ddeg(G,y_{m-1}) */
-    for (k = 0; k + 1 < m; k++)
+    /* sort with hope that ddeg(G,y_1) >= ddeg(G,y_2) ... >= ddeg(G,y_m) */
+    for (k = 1; k + 1 < m + 1; k++)
     {
         slong var;
         ulong deg, new_deg;
@@ -248,11 +248,10 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     fmpz_mpolyu_init(Bu, new_bits, uctx);
     fmpz_mpolyu_init(Gu, new_bits, uctx);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, A,
-                                   zinfo->perm, Amin_exp, Gstride, uctx, ctx);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B,
-                                   zinfo->perm, Bmin_exp, Gstride, uctx, ctx);
-
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
+                                               zinfo->perm, Amin_exp, Gstride);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
+                                               zinfo->perm, Bmin_exp, Gstride);
 
     FLINT_ASSERT(Au->bits == Bu->bits);
     FLINT_ASSERT(Au->length > 1);
@@ -313,8 +312,8 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     FLINT_ASSERT(Acontent->bits == new_bits);
 
     fmpz_mpolyu_mul_mpoly(Gu, Gbar, Acontent, uctx);
-    fmpz_mpoly_from_mpolyu_perm_inflate(G, Gbits, Gu,
-                                      zinfo->perm, Gshift, Gstride, uctx, ctx);
+    fmpz_mpoly_from_mpolyu_perm_inflate(G, Gbits, ctx, Gu, uctx,
+                                                 zinfo->perm, Gshift, Gstride);
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
     FLINT_ASSERT(G->bits == Gbits);
@@ -356,7 +355,7 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     int success;
     slong j;
     slong denseAsize, denseBsize;
-    slong m, n = ctx->minfo->nvars;
+    slong mplus1, n = ctx->minfo->nvars;
     slong * perm;
     ulong * Gshift;
     mp_bitcnt_t new_bits;
@@ -364,35 +363,6 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
     fmpz_t cA, cB, cG;
     TMP_INIT;
-
-    /*
-        Let the variables in A and B be
-            x_0, x_1, ..., x_{n-1}
-        where n = ctx->minfo->nvars, and x_0 is most significant
-
-        Recall from _fmpz_mpoly_gcd that all variables are either
-            missing from both ess(A) and ess(B) (non-essential), or
-            present in both ess(A) and ess(B) (essential)
-        and that there are at least 2 variables in the essential case.
-
-        Let y_0, ..., y_{m-1} with m >= 2 denote the variables present
-        in both ess(A) and ess(B). Each y_i is one of the x_j and the variables
-        are ordered as y_0 > ... > y_{m-1} with LEX order.
-        The Brown algorithm will operate in Z[y_0,...,y_{m-1}] and it
-        only operates with Z[y_0,...,y_{m-1}] in LEX because the coefficients
-        are stored in a dense format.
-
-        When converting to the mpolyd format via
-        fmpz_mpoly_to_mpolyd_perm_deflate, the non-essential variables
-        will be immediately striped out and the remaining variables will be
-        mapped according to the permutation in perm as
-
-            y_k = x_perm[k] ^ Gstride[perm[k]]
-
-        When converting out of the mpolyd format via
-        fmpz_mpoly_from_mpolyd_perm_inflate, the contribution of the
-        non-essential variables will be put back in.
-    */
 
     /* first see if dense representation is a good idea */
     if (n > 7)
@@ -440,23 +410,23 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     perm = (slong *) TMP_ALLOC(n*sizeof(slong)); /* only first m entries used */
 
     /* fill in perm and set shift of GCD */
-    m = 0;
+    mplus1 = 0;
     for (j = 0; j < n; j++)
     {
         Gshift[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
         if (Amax_exp[j] > Amin_exp[j])
         {
-            perm[m] = j;
-            m++;
+            perm[mplus1] = j;
+            mplus1++;
         }
     }
-    FLINT_ASSERT(m >= 2);
+    FLINT_ASSERT(mplus1 >= 2);
 
     /* TODO: find a favourable permutation of perm */
 
     new_bits = FLINT_MAX(A->bits, B->bits);
 
-    fmpz_mpoly_ctx_init(uctx, m - 1, ORD_LEX);
+    fmpz_mpoly_ctx_init(uctx, mplus1 - 1, ORD_LEX);
     fmpz_mpolyu_init(Au, new_bits, uctx);
     fmpz_mpolyu_init(Bu, new_bits, uctx);
     fmpz_mpolyu_init(Gu, new_bits, uctx);
@@ -467,8 +437,8 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     fmpz_init(cB);
     fmpz_init(cG);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, A, perm, Amin_exp, Gstride, uctx, ctx);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B, perm, Bmin_exp, Gstride, uctx, ctx);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx, perm, Amin_exp, Gstride);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx, perm, Bmin_exp, Gstride);
 
     fmpz_mpolyu_content_fmpz(cA, Au, uctx);
     fmpz_mpolyu_content_fmpz(cB, Bu, uctx);
@@ -478,7 +448,7 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     success = fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx);
     if (success)
     {
-        fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits, Gu, perm, Gshift, Gstride, uctx, ctx);
+        fmpz_mpoly_from_mpolyu_perm_inflate(G, Gbits, ctx, Gu, uctx, perm, Gshift, Gstride);
         if (fmpz_sgn(G->coeffs + 0) < 0)
             fmpz_neg(cG, cG);
         fmpz_mpoly_scalar_mul_fmpz(G, G, cG, ctx);

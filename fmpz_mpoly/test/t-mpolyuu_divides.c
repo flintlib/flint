@@ -87,8 +87,8 @@ void bivar_divides_check(
         goto cleanup;
     }
 
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, perm, shift, stride, uuctx, A, ctx);
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, perm, shift, stride, uuctx, B, ctx);
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uuctx, A, ctx, perm, shift, stride);
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uuctx, B, ctx, perm, shift, stride);
 
     uudivides = fmpz_mpolyuu_divides(Quu, Auu, Buu, 2, uuctx);
     divides = fmpz_mpoly_divides(Q, A, B, ctx);
@@ -105,8 +105,8 @@ void bivar_divides_check(
         goto cleanup;
     }
 
-    fmpz_mpoly_from_mpolyuu_perm_inflate(Qcheck, ABbits, ctx,
-                                              Quu, perm, shift, stride, uuctx);
+    fmpz_mpoly_from_mpolyuu_perm_inflate(Qcheck, ABbits, ctx, Quu, uuctx,
+                                                          perm, shift, stride);
     if (!fmpz_mpoly_equal(Q, Qcheck, ctx))
     {
         flint_printf("check bivariate quotient\n"
@@ -193,8 +193,8 @@ void univar_divides_check(
         perm[j] = t1;
     }
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, A, perm, shift, stride, uctx, ctx);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, B, perm, shift, stride, uctx, ctx);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx, perm, shift, stride);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx, perm, shift, stride);
 
     udivides = fmpz_mpolyuu_divides(Qu, Au, Bu, 1, uctx);
     divides = fmpz_mpoly_divides(Q, A, B, ctx);
@@ -211,8 +211,8 @@ void univar_divides_check(
         goto cleanup;
     }
 
-    fmpz_mpoly_from_mpolyu_perm_inflate(Qcheck, ABbits, Qu,
-                                               perm, shift, stride, uctx, ctx);
+    fmpz_mpoly_from_mpolyu_perm_inflate(Qcheck, ABbits, ctx, Qu, uctx,
+                                                          perm, shift, stride);
 
     if (!fmpz_mpoly_equal(Q, Qcheck, ctx))
     {
@@ -241,7 +241,7 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, tmul = 20;
+    slong i, j, tmul = 25;
     FLINT_TEST_INIT(state);
 
     flint_printf("mpolyuu_divides....");
