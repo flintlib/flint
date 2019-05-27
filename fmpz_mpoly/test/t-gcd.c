@@ -27,6 +27,8 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
     res = fmpz_mpoly_gcd(g, a, b, ctx);
     fmpz_mpoly_assert_canonical(g, ctx);
 
+flint_printf("(%wd, %wd) %s\n", i, j, name);
+
     if (!res)
     {
         flint_printf("Check gcd can be computed\n"

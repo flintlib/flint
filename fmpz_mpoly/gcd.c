@@ -74,7 +74,7 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     int success;
     ulong * Gshift, * Addeg, * Bddeg;
     mpoly_zipinfo_t zinfo;
-    mp_bitcnt_t new_bits;
+    mp_bitcnt_t ABbits;
     flint_rand_t randstate;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu;
@@ -119,7 +119,7 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     */
 
     n = ctx->minfo->nvars;
-    m = -WORD(1);
+    m = 0;
     for (j = 0; j < n; j++)
     {
         if (Amax_exp[j] > Amin_exp[j])
@@ -132,13 +132,16 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
             FLINT_ASSERT(Bmax_exp[j] == Bmin_exp[j]);
         }
     }
-    FLINT_ASSERT(m >= 1);
 
-    /* interpolation will continue in m + 1 variables */
-    mpoly_zipinfo_init(zinfo, m + 1);
+    /* need at least two variables */
+    if (m < 2)
+        return 0;
 
-    /* uctx is context for Z[y_0,...,y_{m-1}]*/
-    fmpz_mpoly_ctx_init(uctx, m, ORD_LEX);
+    /* interpolation will continue in m variables */
+    mpoly_zipinfo_init(zinfo, m);
+
+    /* uctx is context for Z[y_1,...,y_{m-1}]*/
+    fmpz_mpoly_ctx_init(uctx, m - 1, ORD_LEX);
 
     Gshift = (ulong *) flint_malloc(n*sizeof(ulong));
     /* degrees after deflation */
@@ -168,7 +171,7 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
             Bddeg[j] = 0;
         }
     }
-    FLINT_ASSERT(i == m + 1);
+    FLINT_ASSERT(i == m);
 
     /* work out a favourable permation to zinfo->perm */
 
@@ -182,7 +185,7 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
         count = FLINT_MIN(FLINT_MIN(Amin_exp_count[j], Amax_exp_count[j]),
                           FLINT_MIN(Bmin_exp_count[j], Bmax_exp_count[j]));
         deg = FLINT_MAX(Addeg[j], Bddeg[j]);
-        for (i = 1; i < m + 1; i++)
+        for (i = 1; i < m; i++)
         {
             j = zinfo->perm[i];
             new_count = FLINT_MIN(FLINT_MIN(Amin_exp_count[j], Amax_exp_count[j]),
@@ -206,7 +209,7 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     }
 
     /* sort with hope that ddeg(G,y_1) >= ddeg(G,y_2) ... >= ddeg(G,y_m) */
-    for (k = 1; k + 1 < m + 1; k++)
+    for (k = 1; k + 1 < m; k++)
     {
         slong var;
         ulong deg, new_deg;
@@ -233,7 +236,7 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     }
 
     /* fill in the degrees of the y_i */
-    for (i = 0; i <= m; i++)
+    for (i = 0; i < m; i++)
     {
         j = zinfo->perm[i];
         FLINT_ASSERT(Addeg[j] != 0);
@@ -242,59 +245,36 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
         zinfo->Bdegs[i] = Bddeg[j];
     }
 
-    new_bits = FLINT_MAX(A->bits, B->bits);
+    ABbits = FLINT_MAX(A->bits, B->bits);
 
-    fmpz_mpolyu_init(Au, new_bits, uctx);
-    fmpz_mpolyu_init(Bu, new_bits, uctx);
-    fmpz_mpolyu_init(Gu, new_bits, uctx);
+    fmpz_mpolyu_init(Au, ABbits, uctx);
+    fmpz_mpolyu_init(Bu, ABbits, uctx);
+    fmpz_mpolyu_init(Gu, ABbits, uctx);
 
     fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
                                                zinfo->perm, Amin_exp, Gstride);
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
                                                zinfo->perm, Bmin_exp, Gstride);
 
-    FLINT_ASSERT(Au->bits == Bu->bits);
+    FLINT_ASSERT(Au->bits == ABbits);
+    FLINT_ASSERT(Au->bits == ABbits);
     FLINT_ASSERT(Au->length > 1);
     FLINT_ASSERT(Bu->length > 1);
 
-    fmpz_mpoly_init(Acontent, uctx);
-    fmpz_mpoly_init(Bcontent, uctx);
-    fmpz_mpolyu_init(Abar, Au->bits, uctx);
-    fmpz_mpolyu_init(Bbar, Au->bits, uctx);
-    fmpz_mpolyu_init(Gbar, Au->bits, uctx);
-
-    /* compute content of A */
-    success = _fmpz_mpoly_gcd(Acontent, new_bits, Au->coeffs + 0,
-                                                  Au->coeffs + 1, uctx);
-    if (!success)
-        goto cleanup;
-    FLINT_ASSERT(Acontent->bits == new_bits);
-
-    for (i = 2; i < Au->length; i++)
-    {
-        success = _fmpz_mpoly_gcd(Acontent, new_bits, Acontent,
-                                                      Au->coeffs + i, uctx);
-        if (!success)
-            goto cleanup;
-        FLINT_ASSERT(Acontent->bits == new_bits);
-    }
-
-    /* compute content of B */
-    success = _fmpz_mpoly_gcd(Bcontent, new_bits, Bu->coeffs + 0,
-                                                  Bu->coeffs + 1, uctx);
-    if (!success)
-        goto cleanup;
-    FLINT_ASSERT(Bcontent->bits == new_bits);
-    for (i = 2; i < Bu->length; i++)
-    {
-        success = _fmpz_mpoly_gcd(Bcontent, new_bits, Bcontent,
-                                                      Bu->coeffs + i, uctx);
-        if (!success)
-            goto cleanup;
-        FLINT_ASSERT(Bcontent->bits == new_bits);
-    }
+    fmpz_mpoly_init3(Acontent, 0, ABbits, uctx);
+    fmpz_mpoly_init3(Bcontent, 0, ABbits, uctx);
+    fmpz_mpolyu_init(Abar, ABbits, uctx);
+    fmpz_mpolyu_init(Bbar, ABbits, uctx);
+    fmpz_mpolyu_init(Gbar, ABbits, uctx);
 
     /* remove content from A and B */
+    success = fmpz_mpolyu_content_mpoly(Acontent, Au, uctx);
+    success = success && fmpz_mpolyu_content_mpoly(Bcontent, Bu, uctx);
+    if (!success)
+        goto cleanup;
+
+    FLINT_ASSERT(Acontent->bits == ABbits);
+    FLINT_ASSERT(Bcontent->bits == ABbits);
     fmpz_mpolyu_divexact_mpoly(Abar, Au, Acontent, uctx);
     fmpz_mpolyu_divexact_mpoly(Bbar, Bu, Bcontent, uctx);
 
@@ -306,16 +286,18 @@ static int _try_zippel(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
         goto cleanup;
 
     /* put back content */
-    success = _fmpz_mpoly_gcd(Acontent, new_bits, Acontent, Bcontent, uctx);
+    success = _fmpz_mpoly_gcd(Acontent, ABbits, Acontent, Bcontent, uctx);
     if (!success)
         goto cleanup;
-    FLINT_ASSERT(Acontent->bits == new_bits);
+
+    FLINT_ASSERT(Acontent->bits == ABbits);
 
     fmpz_mpolyu_mul_mpoly(Gu, Gbar, Acontent, uctx);
     fmpz_mpoly_from_mpolyu_perm_inflate(G, Gbits, ctx, Gu, uctx,
                                                  zinfo->perm, Gshift, Gstride);
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
+
     FLINT_ASSERT(G->bits == Gbits);
 
     success = 1;
@@ -344,6 +326,205 @@ cleanup:
     return success;
 }
 
+
+/*
+    return 1 for success or 0 for failure
+*/
+static int _try_berlekamp_massey(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
+         const fmpz_mpoly_t A, const ulong * Amax_exp, const ulong * Amin_exp,
+                   const slong * Amax_exp_count, const slong * Amin_exp_count,
+         const fmpz_mpoly_t B, const ulong * Bmax_exp, const ulong * Bmin_exp,
+                   const slong * Bmax_exp_count, const slong * Bmin_exp_count,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, j, k;
+    slong n, m;
+    int success;
+    ulong * Gshift, * Addeg, * Bddeg;
+    slong * perm;
+    mp_bitcnt_t ABbits;
+    fmpz_mpoly_ctx_t uctx;
+    fmpz_mpolyu_t Auu, Buu, Guu;
+    fmpz_mpoly_t Acontent, Bcontent, Gamma;
+    fmpz_mpolyu_t Abar, Bbar, Gbar;
+
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+
+    FLINT_ASSERT(ctx->minfo->nvars > WORD(1));
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(B->length > 0);
+
+    n = ctx->minfo->nvars;
+    m = 0;
+    for (j = 0; j < n; j++)
+    {
+        if (Amax_exp[j] > Amin_exp[j])
+        {
+            FLINT_ASSERT(Bmax_exp[j] > Bmin_exp[j]);
+            m++;
+        }
+        else
+        {
+            FLINT_ASSERT(Amax_exp[j] == Amin_exp[j]);
+            FLINT_ASSERT(Bmax_exp[j] == Bmin_exp[j]);
+        }
+    }
+
+    /* need at least 3 variables, but lets require 4 for now */
+    if (m < 4)
+        return 0;
+
+    /* uctx is context for Z[y_2,...,y_{m - 1}]*/
+    fmpz_mpoly_ctx_init(uctx, m - 2, ORD_LEX);
+
+    perm = (slong *) flint_malloc(m*sizeof(slong));
+    Gshift = (ulong *) flint_malloc(n*sizeof(ulong));
+    /* degrees after deflation */
+    Addeg = (ulong *) flint_malloc(n*sizeof(ulong));
+    Bddeg = (ulong *) flint_malloc(n*sizeof(ulong));
+
+    /* fill in a valid perm and set deflation values used when converting */
+    i = 0;
+    for (j = 0; j < n; j++)
+    {
+        Gshift[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
+        if (Amax_exp[j] > Amin_exp[j])
+        {
+            FLINT_ASSERT(Gstride[j] != UWORD(0));
+            FLINT_ASSERT((Amax_exp[j] - Amin_exp[j]) % Gstride[j] == UWORD(0));
+            FLINT_ASSERT((Bmax_exp[j] - Bmin_exp[j]) % Gstride[j] == UWORD(0));
+
+            Addeg[j] = (Amax_exp[j] - Amin_exp[j]) / Gstride[j];
+            Bddeg[j] = (Bmax_exp[j] - Bmin_exp[j]) / Gstride[j];
+
+            perm[i] = j;
+            i++;
+        }
+        else
+        {
+            Addeg[j] = 0;
+            Bddeg[j] = 0;
+        }
+    }
+    FLINT_ASSERT(i == m);
+
+    /* figure out the two main variables y_0, y_1 */
+    for (k = 0; k < 2; k++)
+    {
+        slong main_var;
+        ulong count, deg, new_count, new_deg;
+
+        main_var = k;
+        j = perm[main_var];
+        count = FLINT_MIN(Amax_exp_count[j], Bmax_exp_count[j]);
+        deg = FLINT_MAX(Addeg[j], Bddeg[j]);
+        for (i = k + 1; i < m; i++)
+        {
+            j = perm[i];
+            new_count = FLINT_MIN(Amax_exp_count[j], Bmax_exp_count[j]);
+            new_deg = FLINT_MAX(Addeg[j], Bddeg[j]);
+
+            if (new_deg + new_count/2 < deg + count/2)
+            {
+                count = new_count;
+                deg = new_deg;
+                main_var = i;
+            }
+        }
+
+        if (main_var != k)
+        {
+            slong t = perm[main_var];
+            perm[main_var] = perm[k];
+            perm[k] = t;
+        }
+    }
+
+    ABbits = FLINT_MAX(A->bits, B->bits);
+
+    fmpz_mpolyu_init(Auu, ABbits, uctx);
+    fmpz_mpolyu_init(Buu, ABbits, uctx);
+    fmpz_mpolyu_init(Guu, ABbits, uctx);
+
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
+                                                      perm, Amin_exp, Gstride);
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
+                                                      perm, Bmin_exp, Gstride);
+
+    FLINT_ASSERT(Auu->bits == ABbits);
+    FLINT_ASSERT(Buu->bits == ABbits);
+    FLINT_ASSERT(Auu->length > 1);
+    FLINT_ASSERT(Buu->length > 1);
+
+    fmpz_mpoly_init3(Acontent, 0, ABbits, uctx);
+    fmpz_mpoly_init3(Bcontent, 0, ABbits, uctx);
+    fmpz_mpoly_init3(Gamma, 0, ABbits, uctx);
+    fmpz_mpolyu_init(Abar, ABbits, uctx);
+    fmpz_mpolyu_init(Bbar, ABbits, uctx);
+    fmpz_mpolyu_init(Gbar, ABbits, uctx);
+
+    /* remove content from A and B */
+    success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx);
+    success = success && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx);
+    if (!success)
+        goto cleanup;
+
+    FLINT_ASSERT(Acontent->bits == ABbits);
+    FLINT_ASSERT(Bcontent->bits == ABbits);
+    fmpz_mpolyu_divexact_mpoly(Abar, Auu, Acontent, uctx);
+    fmpz_mpolyu_divexact_mpoly(Bbar, Buu, Bcontent, uctx);
+
+    /* compute GCD of leading coefficients */
+    FLINT_ASSERT(A->length > 0 && B->length > 0);
+    _fmpz_mpoly_gcd(Gamma, ABbits, Abar->coeffs + 0, Bbar->coeffs + 0, uctx);
+    if (!success)
+        goto cleanup;
+
+    success = fmpz_mpolyuu_gcd_berlekamp_massey(Gbar, Abar, Bbar, Gamma, uctx);
+    if (!success)
+        goto cleanup;
+
+    /* put back content */
+    success = _fmpz_mpoly_gcd(Acontent, ABbits, Acontent, Bcontent, uctx);
+    if (!success)
+        goto cleanup;
+
+    fmpz_mpolyu_mul_mpoly(Guu, Gbar, Acontent, uctx);
+
+    fmpz_mpoly_from_mpolyuu_perm_inflate(G, Gbits, ctx, Guu, uctx,
+                                                        perm, Gshift, Gstride);
+    if (fmpz_sgn(G->coeffs + 0) < 0)
+        fmpz_mpoly_neg(G, G, ctx);
+
+    FLINT_ASSERT(G->bits == Gbits);
+
+    success = 1;
+
+cleanup:
+
+    fmpz_mpolyu_clear(Abar, uctx);
+    fmpz_mpolyu_clear(Bbar, uctx);
+    fmpz_mpolyu_clear(Gbar, uctx);
+    fmpz_mpoly_clear(Acontent, uctx);
+    fmpz_mpoly_clear(Bcontent, uctx);
+    fmpz_mpoly_clear(Gamma, uctx);
+
+    fmpz_mpolyu_clear(Auu, uctx);
+    fmpz_mpolyu_clear(Buu, uctx);
+    fmpz_mpolyu_clear(Guu, uctx);
+    fmpz_mpoly_ctx_clear(uctx);
+
+    flint_free(Gshift);
+    flint_free(Addeg);
+    flint_free(Bddeg);
+    flint_free(perm);
+
+    return success;
+}
+
+
+
 /*
     return 1 for success or 0 for failure
 */
@@ -355,16 +536,16 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     int success;
     slong j;
     slong denseAsize, denseBsize;
-    slong mplus1, n = ctx->minfo->nvars;
+    slong m, n = ctx->minfo->nvars;
     slong * perm;
     ulong * Gshift;
-    mp_bitcnt_t new_bits;
+    mp_bitcnt_t ABbits;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
     fmpz_t cA, cB, cG;
     TMP_INIT;
 
-    /* first see if dense representation is a good idea */
+    /* first see if a dense algo is a good idea */
     if (n > 7)
         return 0;
 
@@ -410,28 +591,41 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     perm = (slong *) TMP_ALLOC(n*sizeof(slong)); /* only first m entries used */
 
     /* fill in perm and set shift of GCD */
-    mplus1 = 0;
+    m = 0;
     for (j = 0; j < n; j++)
     {
         Gshift[j] = FLINT_MIN(Amin_exp[j], Bmin_exp[j]);
         if (Amax_exp[j] > Amin_exp[j])
         {
-            perm[mplus1] = j;
-            mplus1++;
+            FLINT_ASSERT(Bmax_exp[j] > Bmin_exp[j]);
+            perm[m] = j;
+            m++;
+        }
+        else
+        {
+            FLINT_ASSERT(Amax_exp[j] == Amin_exp[j]);
+            FLINT_ASSERT(Bmax_exp[j] == Bmin_exp[j]);
         }
     }
-    FLINT_ASSERT(mplus1 >= 2);
+
+    /* need at least 2 variables */
+    if (m < 2)
+    {
+        success = 0;
+        goto cleanup_tmp;
+    }
 
     /* TODO: find a favourable permutation of perm */
 
-    new_bits = FLINT_MAX(A->bits, B->bits);
+    ABbits = FLINT_MAX(A->bits, B->bits);
 
-    fmpz_mpoly_ctx_init(uctx, mplus1 - 1, ORD_LEX);
-    fmpz_mpolyu_init(Au, new_bits, uctx);
-    fmpz_mpolyu_init(Bu, new_bits, uctx);
-    fmpz_mpolyu_init(Gu, new_bits, uctx);
-    fmpz_mpolyu_init(Abaru, new_bits, uctx);
-    fmpz_mpolyu_init(Bbaru, new_bits, uctx);
+    /* uctx is for Z[y_1, ..., y_{m-1}] */
+    fmpz_mpoly_ctx_init(uctx, m - 1, ORD_LEX);
+    fmpz_mpolyu_init(Au, ABbits, uctx);
+    fmpz_mpolyu_init(Bu, ABbits, uctx);
+    fmpz_mpolyu_init(Gu, ABbits, uctx);
+    fmpz_mpolyu_init(Abaru, ABbits, uctx);
+    fmpz_mpolyu_init(Bbaru, ABbits, uctx);
 
     fmpz_init(cA);
     fmpz_init(cB);
@@ -464,6 +658,8 @@ static int _try_brown(fmpz_mpoly_t G, mp_bitcnt_t Gbits, ulong * Gstride,
     fmpz_mpolyu_clear(Abaru, uctx);
     fmpz_mpolyu_clear(Bbaru, uctx);
     fmpz_mpoly_ctx_clear(uctx);
+
+cleanup_tmp:
 
     TMP_END;
 
@@ -919,6 +1115,12 @@ int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
 
     success = _try_brown(G, Gbits, Gstride, A, Amax_exp, Amin_exp,
                                             B, Bmax_exp, Bmin_exp, ctx);
+    if (success)
+        goto cleanup;
+
+    success = _try_berlekamp_massey(G, Gbits, Gstride,
+                   A, Amax_exp, Amin_exp, Amax_exp_count, Amin_exp_count,
+                   B, Bmax_exp, Bmin_exp, Bmax_exp_count, Bmin_exp_count, ctx);
     if (success)
         goto cleanup;
 

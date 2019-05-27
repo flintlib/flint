@@ -1161,6 +1161,10 @@ FLINT_DLL int fmpz_mpolyu_gcdm_zippel(fmpz_mpolyu_t G,
                  fmpz_mpolyu_t A, fmpz_mpolyu_t B, const fmpz_mpoly_ctx_t ctx,
                                 mpoly_zipinfo_t zinfo, flint_rand_t randstate);
 
+FLINT_DLL int fmpz_mpolyuu_gcd_berlekamp_massey(fmpz_mpolyu_t G,
+    const fmpz_mpolyu_t A, const fmpz_mpolyu_t B, const fmpz_mpoly_t Gamma,
+                                                   const fmpz_mpoly_ctx_t ctx);
+
 FMPZ_MPOLY_INLINE fmpz * fmpz_mpoly_leadcoeff(const fmpz_mpoly_t A)
 {
     FLINT_ASSERT(A->length > 0);
