@@ -528,7 +528,6 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly
                        const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx)
 {
     slong j;
-    slong m = 1;
     slong NB, NA;
     slong p0 = perm[0], p1 = perm[1];
     ulong shift0 = shift[p0], shift1 = shift[p1];
@@ -540,7 +539,7 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly
 
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
-    FLINT_ASSERT(m == uctx->minfo->nvars);
+    FLINT_ASSERT(1 == uctx->minfo->nvars);
     NA = mpoly_words_per_exp_sp(A->bits, uctx->minfo);
     NB = mpoly_words_per_exp_sp(B->bits, ctx->minfo);
 
@@ -556,7 +555,6 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly
         Ac = _nmod_mpolyun_get_coeff(A, stride1 == 1 ? (Bexp1 - shift1)
                                            : (Bexp1 - shift1) / stride1, uctx);
         FLINT_ASSERT(Ac->bits == A->bits);
-
 
         if (Ac->length == 0)
         {

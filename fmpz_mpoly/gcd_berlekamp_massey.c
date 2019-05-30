@@ -933,6 +933,7 @@ add_same_exp:
         else if (Li < Llen && (Ai >= Alen || Lexp[Li] > Aexp))
         {
             nmod_berlekamp_massey_add_zeros(Lcoeff + Li, 1);
+            Li++;
         }
         else
         {
@@ -1175,6 +1176,7 @@ add_same_exp:
         {
             /* L term present, A term missing */
             fmpz_mod_berlekamp_massey_add_zeros(Lcoeff + Li, 1);
+            Li++;
         }
         else
         {

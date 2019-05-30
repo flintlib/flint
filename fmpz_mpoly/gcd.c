@@ -204,8 +204,8 @@ static int _try_zippel(
         {
             j = zinfo->perm[i];
             new_count = FLINT_MIN(Amin_exp_count[j], Amax_exp_count[j]);
-            new_count = FLINT_MIN(count, Bmin_exp_count[j]);
-            new_count = FLINT_MIN(count, Bmax_exp_count[j]);
+            new_count = FLINT_MIN(new_count, Bmin_exp_count[j]);
+            new_count = FLINT_MIN(new_count, Bmax_exp_count[j]);
             new_deg = FLINT_MAX(Addeg[j], Bddeg[j]);
             if (new_count < count || (new_count == count && new_deg < deg))
             {
