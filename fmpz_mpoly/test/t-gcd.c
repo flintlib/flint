@@ -20,6 +20,8 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
     int res;
     fmpz_mpoly_t ca, cb, cg;
 
+flint_printf("(%wd, %wd) %s nvars = %wd\n", i, j, name, ctx->minfo->nvars);
+
     fmpz_mpoly_init(ca, ctx);
     fmpz_mpoly_init(cb, ctx);
     fmpz_mpoly_init(cg, ctx);
