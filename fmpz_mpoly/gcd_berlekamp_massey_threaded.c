@@ -34,8 +34,8 @@ _eval_mp_ret_struct;
 /*
     Most of the objects used by fmpz_mpolyuu_gcd_berlekamp_massey_threaded
     need to be made visible to other threads. They are all passed via a
-    _base_t, of which there is only on instance (on the stack of 
-    fmpz_mpolyuu_gcd_berlekamp_massey_threaded), and this instance is
+    _base_t, of which there is only one instance on the stack of 
+    fmpz_mpolyuu_gcd_berlekamp_massey_threaded, and this instance is
     succinctly referred to as "w".
 
     When calculations are done modulo a machine prime, the "_sp" suffix is
@@ -2239,7 +2239,8 @@ next_zip_image:
         goto pick_zip_prime;
     }
 
-    success = fmpz_mpolyu_content_mpoly(Hcontent, w->H, ctx);
+    success = fmpz_mpolyu_content_mpoly(Hcontent, w->H, ctx,
+                                                         handles, num_handles);
     FLINT_ASSERT(Hcontent->bits == Hbits);
     if (!success)
     {
@@ -2267,17 +2268,8 @@ next_zip_image:
                 main, (handles[0]  , ..., handles[m-1])
             B/G is processed by the n - m threads
                 handles[m], (handles[m+1], ..., handles[n-1])
-
-            choose m so that (m + 1)/(n - m) ~= len(A)/len(B)
-
-                            n*la - lb
-                        m = ---------
-                             la + lb
         */
-        double la = A->length;
-        double lb = B->length;
-        double m_double = (num_handles*la - lb)/(la + lb);
-        slong m = m_double + (2*m_double > num_handles ? -0.5 : 0.5);
+        slong m = mpoly_divide_threads(num_handles, A->length, B->length);
         _divide_arg_t divide_arg;
 
         divide_arg->ctx = ctx;
@@ -2602,12 +2594,14 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     /* Gbits is bits for final answer in ZZ[x_0,...,x_(n-1)] */
     Gbits = FLINT_MIN(A->bits, B->bits);
 
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx, perm, shift, stride);
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx, perm, shift, stride);
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
+                                                 perm, shift, stride, NULL, 0);
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
+                                                 perm, shift, stride, NULL, 0);
 
     /* remove content from A and B */
-    success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx);
-    success = success && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx);
+    success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);
+    success = success && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx, NULL, 0);
     if (!success)
         goto cleanup;
     fmpz_mpolyu_divexact_mpoly(Abar, Auu, Acontent, uctx);
@@ -2615,7 +2609,8 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
 
     /* compute GCD of leading coefficients */
     FLINT_ASSERT(A->length > 0 && B->length > 0);
-    _fmpz_mpoly_gcd(Gamma, ABbits, Abar->coeffs + 0, Bbar->coeffs + 0, uctx);
+    _fmpz_mpoly_gcd(Gamma, ABbits, Abar->coeffs + 0, Bbar->coeffs + 0, uctx,
+                                                                      NULL, 0);
     if (!success)
         goto cleanup;
 
@@ -2625,7 +2620,8 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
         goto cleanup;
 
     /* put back content */
-    success = _fmpz_mpoly_gcd(Acontent, ABbits, Acontent, Bcontent, uctx);
+    success = _fmpz_mpoly_gcd(Acontent, ABbits, Acontent, Bcontent, uctx,
+                                                                      NULL, 0);
     if (!success)
         goto cleanup;
 

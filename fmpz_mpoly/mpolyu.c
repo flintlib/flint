@@ -233,6 +233,44 @@ fmpz_mpoly_struct * _fmpz_mpolyu_get_coeff(fmpz_mpolyu_t A,
 }
 
 
+typedef struct
+{
+    volatile slong index;
+    pthread_mutex_t mutex;
+    slong length;
+    fmpz_mpoly_struct * coeffs;
+    const fmpz_mpoly_ctx_struct * ctx;
+}
+_sort_arg_struct;
+
+typedef _sort_arg_struct _sort_arg_t[1];
+
+
+static void _worker_sort(void * varg)
+{
+    _sort_arg_struct * arg = (_sort_arg_struct *) varg;
+    slong i;
+
+get_next_index:
+
+    pthread_mutex_lock(&arg->mutex);
+    i = arg->index;
+    arg->index++;
+    pthread_mutex_unlock(&arg->mutex);
+
+    if (i >= arg->length)
+        goto cleanup;
+
+    fmpz_mpoly_sort_terms(arg->coeffs + i, arg->ctx);
+
+    goto get_next_index;
+
+cleanup:
+
+    return;
+}
+
+
 /*
     Convert B to A using the variable permutation perm.
     The uctx (m vars) should be the context of the coefficients of A.
@@ -254,7 +292,9 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(
     const fmpz_mpoly_ctx_t ctx,
     const slong * perm,
     const ulong * shift,
-    const ulong * stride)
+    const ulong * stride,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong i, j, k, l;
     slong n = ctx->minfo->nvars;
@@ -298,9 +338,34 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(
         Ac->length++;
     }
 
-    for (i = 0; i < A->length; i++)
+    if (num_handles > 0)
     {
-        fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+        _sort_arg_t arg;
+
+        pthread_mutex_init(&arg->mutex, NULL);
+        arg->index = 0;
+        arg->coeffs = A->coeffs;
+        arg->length = A->length;
+        arg->ctx = uctx;
+
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+        }
+        _worker_sort(arg);
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wait(global_thread_pool, handles[i]);
+        }
+
+        pthread_mutex_destroy(&arg->mutex);
+    }
+    else
+    {
+        for (i = 0; i < A->length; i++)
+        {
+            fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+        }
     }
 
     TMP_END;
@@ -418,7 +483,9 @@ void fmpz_mpoly_to_mpolyuu_perm_deflate(
     const fmpz_mpoly_ctx_t ctx,
     const slong * perm,
     const ulong * shift,
-    const ulong * stride)
+    const ulong * stride,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong i, j, k, l;
     slong n = ctx->minfo->nvars;
@@ -464,9 +531,34 @@ void fmpz_mpoly_to_mpolyuu_perm_deflate(
         Ac->length++;
     }
 
-    for (i = 0; i < A->length; i++)
+    if (num_handles > 0)
     {
-        fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+        _sort_arg_t arg;
+
+        pthread_mutex_init(&arg->mutex, NULL);
+        arg->index = 0;
+        arg->coeffs = A->coeffs;
+        arg->length = A->length;
+        arg->ctx = uctx;
+
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+        }
+        _worker_sort(arg);
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wait(global_thread_pool, handles[i]);
+        }
+
+        pthread_mutex_destroy(&arg->mutex);
+    }
+    else
+    {
+        for (i = 0; i < A->length; i++)
+        {
+            fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+        }
     }
 
     TMP_END;
@@ -958,7 +1050,9 @@ void fmpz_mpolyu_content_fmpz(
 int fmpz_mpolyu_content_mpoly(
     fmpz_mpoly_t g,
     const fmpz_mpolyu_t A,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong i, j;
     int success;
@@ -994,7 +1088,8 @@ int fmpz_mpolyu_content_mpoly(
     {
         j = 1;
     }
-    success = _fmpz_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx);
+    success = _fmpz_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx,
+                                                        handles, num_handles);
     if (!success)
     {
         return 0;
@@ -1006,7 +1101,8 @@ int fmpz_mpolyu_content_mpoly(
         {
             continue;
         }
-        success = _fmpz_mpoly_gcd(g, bits, g, A->coeffs + i, ctx);
+        success = _fmpz_mpoly_gcd(g, bits, g, A->coeffs + i, ctx,
+                                                         handles, num_handles);
         FLINT_ASSERT(g->bits == bits);
         if (!success)
         {

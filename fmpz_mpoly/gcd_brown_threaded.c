@@ -520,7 +520,7 @@ static void _final_join(
 
     The maximum fraction is now 0.666 which is not much bigger than n/m
 */
-static void _divide_master_threads(slong * l_, fmpq * v, slong n, slong m)
+static slong _divide_master_threads(fmpq * v, slong n, slong m)
 {
     slong l, i;
     double score_threashold;
@@ -569,7 +569,7 @@ static void _divide_master_threads(slong * l_, fmpq * v, slong n, slong m)
     fmpq_clear(left);
     fmpq_clear(right);
 
-    *l_ = l;
+    return l;
 }
 
 /* inputs A and B are modified */
@@ -691,11 +691,11 @@ compute_split:
         calculation of each image can itself also be done in parallel.
 
         An integer l := num_master_threads with 1 <= l <= min(n, m) is selected
-        and fractions a_i/b_i, 0 <= i < k are also selected with sum_i(a_i) = n
+        and fractions a_i/b_i, 0 <= i < l are also selected with sum_i(a_i) = n
         and sum_i(b_i) = m. Then l jobs are spawned, each doing a_i images
         where each image uses b_i threads.
     */
-    _divide_master_threads(&num_master_threads, qvec,
+    num_master_threads = _divide_master_threads(qvec,
                                 fmpz_clog_ui(temp, splitbase->p), num_threads);
     FLINT_ASSERT(num_master_threads > 0);
 
@@ -704,6 +704,8 @@ compute_split:
     {
         splitargs[i].idx = i;
         splitargs[i].base = splitbase;
+        FLINT_ASSERT(fmpz_fits_si(fmpq_numref(qvec + i)));
+        FLINT_ASSERT(fmpz_fits_si(fmpq_denref(qvec + i)));
         splitargs[i].required_images = fmpz_get_si(fmpq_numref(qvec + i));
         splitargs[i].num_workers = fmpz_get_si(fmpq_denref(qvec + i)) - 1;
         FLINT_ASSERT(splitargs[i].num_workers >= 0);
@@ -1086,8 +1088,10 @@ int fmpz_mpoly_gcd_brown_threaded(
     fmpz_mpolyu_init(Abaru, new_bits, uctx);
     fmpz_mpolyu_init(Bbaru, new_bits, uctx);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx, perm, shift, stride);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx, perm, shift, stride);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
+                                                 perm, shift, stride, NULL, 0);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
+                                                 perm, shift, stride, NULL, 0);
 
     /* calculate gcd */
     {
