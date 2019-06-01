@@ -196,6 +196,7 @@ void fmpz_mpolyu_ts_append(
         for (i = 0; i < Blen; i++)
         {
             FLINT_ASSERT((Bcoeff + i)->bits == bits);
+            FLINT_ASSERT((oldcoeffs + oldlength + i)->bits == bits);
             fmpz_mpoly_swap(oldcoeffs + oldlength + i, Bcoeff + i, ctx);
             oldexps[oldlength + i] = Bexps[i];
         }
@@ -222,7 +223,7 @@ void fmpz_mpolyu_ts_append(
             newcoeffs[i] = oldcoeffs[i]; /* just copy the bits */
             newexps[i] = oldexps[i];
         }
-        for (i = oldlength; i < Blen; i++)
+        for (i = oldlength; i < newalloc; i++)
         {
             fmpz_mpoly_init3(newcoeffs + i, 0, bits, ctx);
         }
@@ -230,6 +231,7 @@ void fmpz_mpolyu_ts_append(
         for (i = 0; i < Blen; i++)
         {
             FLINT_ASSERT((Bcoeff + i)->bits == bits);
+            FLINT_ASSERT((newcoeffs + oldlength + i)->bits == bits);
             fmpz_mpoly_swap(newcoeffs + oldlength + i, Bcoeff + i, ctx);
             newexps[oldlength + i] = Bexps[i];
         }
