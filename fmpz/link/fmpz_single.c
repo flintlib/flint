@@ -251,5 +251,4 @@ void _fmpz_clear_readonly_mpz(mpz_t z)
     {
         mpz_clear(z);
     }
-
 }

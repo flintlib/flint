@@ -223,7 +223,7 @@ int nmod_berlekamp_massey_reduce(
         (l - k)/2 is the expected number of required euclidean iterations.
         Either branch is OK anytime. TODO: find cutoff
     */
-    if (l - k < 2)
+    if (l - k < 10)
     {
         while (B->npoints <= 2*nmod_poly_degree(B->R1))
         {

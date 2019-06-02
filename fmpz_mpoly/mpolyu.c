@@ -24,7 +24,8 @@ int fmpz_mpolyu_is_canonical(const fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx)
 
     for (i = 0; i < A->length; i++)
     {
-        if (!fmpz_mpoly_is_canonical(A->coeffs + i, ctx))
+        if (   fmpz_mpoly_is_zero(A->coeffs + i, ctx)
+            || !fmpz_mpoly_is_canonical(A->coeffs + i, ctx))
         {
             return 0;
         }
@@ -232,20 +233,68 @@ fmpz_mpoly_struct * _fmpz_mpolyu_get_coeff(fmpz_mpolyu_t A,
 }
 
 
+typedef struct
+{
+    volatile slong index;
+    pthread_mutex_t mutex;
+    slong length;
+    fmpz_mpoly_struct * coeffs;
+    const fmpz_mpoly_ctx_struct * ctx;
+}
+_sort_arg_struct;
+
+typedef _sort_arg_struct _sort_arg_t[1];
+
+
+static void _worker_sort(void * varg)
+{
+    _sort_arg_struct * arg = (_sort_arg_struct *) varg;
+    slong i;
+
+get_next_index:
+
+    pthread_mutex_lock(&arg->mutex);
+    i = arg->index;
+    arg->index++;
+    pthread_mutex_unlock(&arg->mutex);
+
+    if (i >= arg->length)
+        goto cleanup;
+
+    fmpz_mpoly_sort_terms(arg->coeffs + i, arg->ctx);
+
+    goto get_next_index;
+
+cleanup:
+
+    return;
+}
+
+
 /*
     Convert B to A using the variable permutation perm.
-    The uctx should be the context of the coefficients of A.
-    The ctx should be the context of B.
+    The uctx (m vars) should be the context of the coefficients of A.
+    The ctx (n vars) should be the context of B.
 
     operation on each term:
 
-    for 0 <= k <= m
+    for 0 <= k < m + 1
         l = perm[k]
         Aexp[k] = (Bexp[l] - shift[l])/stride[l]
+
+    the most significant main variable uses k = 0
+    the coefficients of A use variables k = 1 ... m
 */
-void fmpz_mpoly_to_mpolyu_perm_deflate(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
-               const slong * perm, const ulong * shift, const ulong * stride,
-                       const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_to_mpolyu_perm_deflate(
+    fmpz_mpolyu_t A,
+    const fmpz_mpoly_ctx_t uctx,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t ctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong i, j, k, l;
     slong n = ctx->minfo->nvars;
@@ -273,25 +322,50 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
     for (j = 0; j < B->length; j++)
     {
         mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
-        for (k = 0; k <= m; k++)
+        for (k = 0; k < m + 1; k++)
         {
             l = perm[k];
             FLINT_ASSERT(stride[l] != UWORD(0));
             FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
             uexps[k] = (Bexps[l] - shift[l]) / stride[l];
         }
-        Ac = _fmpz_mpolyu_get_coeff(A, uexps[m], uctx);
+        Ac = _fmpz_mpolyu_get_coeff(A, uexps[0], uctx);
         FLINT_ASSERT(Ac->bits == A->bits);
 
         fmpz_mpoly_fit_length(Ac, Ac->length + 1, uctx);
         fmpz_set(Ac->coeffs + Ac->length, B->coeffs + j);
-        mpoly_set_monomial_ui(Ac->exps + NA*Ac->length, uexps, A->bits, uctx->minfo);
+        mpoly_set_monomial_ui(Ac->exps + NA*Ac->length, uexps + 1, A->bits, uctx->minfo);
         Ac->length++;
     }
 
-    for (i = 0; i < A->length; i++)
+    if (num_handles > 0)
     {
-        fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+        _sort_arg_t arg;
+
+        pthread_mutex_init(&arg->mutex, NULL);
+        arg->index = 0;
+        arg->coeffs = A->coeffs;
+        arg->length = A->length;
+        arg->ctx = uctx;
+
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+        }
+        _worker_sort(arg);
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wait(global_thread_pool, handles[i]);
+        }
+
+        pthread_mutex_destroy(&arg->mutex);
+    }
+    else
+    {
+        for (i = 0; i < A->length; i++)
+        {
+            fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+        }
     }
 
     TMP_END;
@@ -300,21 +374,27 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(fmpz_mpolyu_t A, const fmpz_mpoly_t B,
 
 /*
     Convert B to A using the variable permutation vector perm.
-    A must be constructed with bits = Abits.
+    This function inverts fmpz_mpoly_to_mpolyu_perm_deflate.
+    A will be constructed with bits = Abits.
 
     operation on each term:
 
         for 0 <= l < n
             Aexp[l] = shift[l]
 
-        for 0 <= k <= m
+        for 0 <= k < m + 1
             l = perm[k]
             Aexp[l] += scale[l]*Bexp[k]
 */
-void fmpz_mpoly_from_mpolyu_perm_inflate(fmpz_mpoly_t A, mp_bitcnt_t Abits,
-                                                        const fmpz_mpolyu_t B,
-                const slong * perm, const ulong * shift, const ulong * stride,
-                       const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_from_mpolyu_perm_inflate(
+    fmpz_mpoly_t A,
+    mp_bitcnt_t Abits,
+    const fmpz_mpoly_ctx_t ctx,
+    const fmpz_mpolyu_t B,
+    const fmpz_mpoly_ctx_t uctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride)
 {
     slong n = ctx->minfo->nvars;
     slong m = uctx->minfo->nvars;
@@ -356,13 +436,13 @@ void fmpz_mpoly_from_mpolyu_perm_inflate(fmpz_mpoly_t A, mp_bitcnt_t Abits,
         for (j = 0; j < Bc->length; j++)
         {
             fmpz_set(Acoeff + Alen + j, Bc->coeffs + j);
-            mpoly_get_monomial_ui(uexps, Bc->exps + NB*j, Bc->bits, uctx->minfo);
-            uexps[m] = B->exps[i];
+            mpoly_get_monomial_ui(uexps + 1, Bc->exps + NB*j, Bc->bits, uctx->minfo);
+            uexps[0] = B->exps[i];
             for (l = 0; l < n; l++)
             {
                 Aexps[l] = shift[l];
             }
-            for (k = 0; k <= m; k++)
+            for (k = 0; k < m + 1; k++)
             {
                 l = perm[k];
                 Aexps[l] += stride[l]*uexps[k];
@@ -398,12 +478,14 @@ void fmpz_mpoly_from_mpolyu_perm_inflate(fmpz_mpoly_t A, mp_bitcnt_t Abits,
 */
 void fmpz_mpoly_to_mpolyuu_perm_deflate(
     fmpz_mpolyu_t A,
+    const fmpz_mpoly_ctx_t uctx,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t ctx,
     const slong * perm,
     const ulong * shift,
     const ulong * stride,
-    const fmpz_mpoly_ctx_t uctx,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx)
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong i, j, k, l;
     slong n = ctx->minfo->nvars;
@@ -449,9 +531,34 @@ void fmpz_mpoly_to_mpolyuu_perm_deflate(
         Ac->length++;
     }
 
-    for (i = 0; i < A->length; i++)
+    if (num_handles > 0)
     {
-        fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+        _sort_arg_t arg;
+
+        pthread_mutex_init(&arg->mutex, NULL);
+        arg->index = 0;
+        arg->coeffs = A->coeffs;
+        arg->length = A->length;
+        arg->ctx = uctx;
+
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+        }
+        _worker_sort(arg);
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wait(global_thread_pool, handles[i]);
+        }
+
+        pthread_mutex_destroy(&arg->mutex);
+    }
+    else
+    {
+        for (i = 0; i < A->length; i++)
+        {
+            fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+        }
     }
 
     TMP_END;
@@ -476,10 +583,10 @@ void fmpz_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
     mp_bitcnt_t Abits,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_mpolyu_t B,
+    const fmpz_mpoly_ctx_t uctx,
     const slong * perm,
     const ulong * shift,
-    const ulong * stride,
-    const fmpz_mpoly_ctx_t uctx)
+    const ulong * stride)
 {
     slong n = ctx->minfo->nvars;
     slong m = uctx->minfo->nvars;
@@ -943,7 +1050,9 @@ void fmpz_mpolyu_content_fmpz(
 int fmpz_mpolyu_content_mpoly(
     fmpz_mpoly_t g,
     const fmpz_mpolyu_t A,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong i, j;
     int success;
@@ -979,7 +1088,8 @@ int fmpz_mpolyu_content_mpoly(
     {
         j = 1;
     }
-    success = _fmpz_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx);
+    success = _fmpz_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx,
+                                                        handles, num_handles);
     if (!success)
     {
         return 0;
@@ -991,7 +1101,8 @@ int fmpz_mpolyu_content_mpoly(
         {
             continue;
         }
-        success = _fmpz_mpoly_gcd(g, bits, g, A->coeffs + i, ctx);
+        success = _fmpz_mpoly_gcd(g, bits, g, A->coeffs + i, ctx,
+                                                         handles, num_handles);
         FLINT_ASSERT(g->bits == bits);
         if (!success)
         {

@@ -40,6 +40,30 @@
 
 #define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
 
+#define MPOLY_DEFAULT_THREAD_LIMIT (WORD(9999))
+
+/* choose m so that (m + 1)/(n - m) ~= la/lb, i.e. m = (n*la - lb)/(la + lb) */
+MPOLY_INLINE slong mpoly_divide_threads(slong n, double la, double lb)
+{
+    double m_double = (n*la - lb)/(la + lb);
+    slong m = m_double + (2*m_double > n ? -0.5 : 0.5);
+
+    /* input must satisfy */
+    FLINT_ASSERT(n > 0);
+
+    if (m <= 0)
+        m = 0;
+
+    if (m >= n - 1)
+        m = n - 1;
+
+    /* output must satisfy */
+    FLINT_ASSERT(m >= 0);
+    FLINT_ASSERT(m < n);
+    return m;
+}
+
+
 typedef enum {
    ORD_LEX, ORD_DEGLEX, ORD_DEGREVLEX
 } ordering_t;

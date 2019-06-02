@@ -94,6 +94,7 @@ cleanup:
 int
 main(void)
 {
+    const slong max_threads = 5;
     slong i, j, k, tmul = 15;
     FLINT_TEST_INIT(state);
 
@@ -115,8 +116,6 @@ main(void)
         fmpz_mpoly_set_str_pretty(b, "1 + x^100 + x^3*y + 2*t^15*x^78*y^3*z^13", vars, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
-
-        fmpz_mpoly_gcd(g, a, b, ctx);
 
         gcd_check(g, a, b, ctx, 0, 0, "example");
 
@@ -140,6 +139,7 @@ main(void)
         fmpz_mpoly_set_str_pretty(a, "x^3 + 1", vars, ctx);
         fmpz_mpoly_set_str_pretty(b, "x^9999999999999999999999 + x^3333333333333333333333 + x", vars, ctx);
 
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
         success = fmpz_mpoly_gcd(g, a, b, ctx);
         if (success)
         {
@@ -170,6 +170,7 @@ main(void)
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(a, a, g, ctx);
 
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
         gcd_check(g, a, b, ctx, 0, 0, "total dense example");
 
         fmpz_mpoly_clear(a, ctx);
@@ -219,6 +220,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             gcd_check(g, a, b, ctx, i, j, "monomial");
         }
 
@@ -268,6 +270,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             gcd_check(g, a, b, ctx, i, j, "monomial cofactors");
         }
 
@@ -315,6 +318,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             gcd_check(g, a, b, ctx, i, j, "sparse inputs");
         }
 
@@ -378,6 +382,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             gcd_check(g, a, b, ctx, i, j, "sparse input with repacking");
         }
 
@@ -448,6 +453,7 @@ main(void)
             fmpz_mpoly_inflate(a, a, shifts1, strides, ctx);
             fmpz_mpoly_inflate(b, b, shifts2, strides, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             gcd_check(g, a, b, ctx, i, j, "sparse input with inflation");
         }
 
@@ -517,6 +523,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len4, coeff_bits4, bits4, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             gcd_check(g, a, b, ctx, i, j, "dense input");
         }
 
@@ -594,6 +601,7 @@ main(void)
 
             fmpz_mpoly_randtest_bits(g, state, len4, coeff_bits4, bits4, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             gcd_check(g, a, b, ctx, i, j, "dense input with repacking");
         }
 
@@ -677,6 +685,7 @@ main(void)
             fmpz_mpoly_inflate(a, a, shifts1, strides, ctx);
             fmpz_mpoly_inflate(b, b, shifts2, strides, ctx);
 
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             gcd_check(g, a, b, ctx, i, j, "dense input with inflation");
         }
 
