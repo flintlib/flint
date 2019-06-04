@@ -403,6 +403,9 @@ static void _splitworker(void * varg)
     mp_limb_t gammaevalm;
     slong ldeg;
     int success;
+    nmod_poly_stack_t Sp;
+
+    nmod_poly_stack_init(Sp, bits, ctx);
 
     FLINT_ASSERT(var > 0);
 
@@ -461,9 +464,11 @@ static void _splitworker(void * varg)
         FLINT_ASSERT(Bevalm->length > 0);
 
         success = nmod_mpolyun_gcd_brown_smprime(
-                   Gevalp, Abarevalp, Bbarevalp, Aevalp, Bevalp, var - 1, ctx);
+                    Gevalp, Abarevalp, Bbarevalp, Aevalp, Bevalp, var - 1,
+                                                                      ctx, Sp);
         success = success && nmod_mpolyun_gcd_brown_smprime(
-                   Gevalm, Abarevalm, Bbarevalm, Aevalm, Bevalm, var - 1, ctx);
+                    Gevalm, Abarevalm, Bbarevalm, Aevalm, Bevalm, var - 1,
+                                                                      ctx, Sp);
         if (success == 0)
         {
             continue;
@@ -584,6 +589,8 @@ static void _splitworker(void * varg)
     nmod_mpolyun_clear(Abarevalm, ctx);
     nmod_mpolyun_clear(Bbarevalm, ctx);
     nmod_mpolyun_clear(T, ctx);
+
+    nmod_poly_stack_clear(Sp);
 }
 
 

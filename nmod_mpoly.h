@@ -175,6 +175,106 @@ typedef struct nmod_mpoly_geobucket
 typedef nmod_mpoly_geobucket_struct nmod_mpoly_geobucket_t[1];
 
 
+
+/* stack type used in gcd which are generally useful as well *****************/
+
+typedef struct
+{
+    nmod_poly_struct ** poly_array;
+    slong poly_alloc;
+    slong poly_top;
+    nmod_mpolyun_struct ** mpolyun_array;
+    slong mpolyun_alloc;
+    slong mpolyun_top;
+    const nmod_mpoly_ctx_struct * ctx;
+    mp_bitcnt_t bits;
+} nmod_poly_stack_struct;
+
+typedef nmod_poly_stack_struct nmod_poly_stack_t[1];
+
+FLINT_DLL void nmod_poly_stack_init(nmod_poly_stack_t S, mp_bitcnt_t bits,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_poly_stack_clear(nmod_poly_stack_t S);
+
+FLINT_DLL void nmod_poly_stack_set_ctx(nmod_poly_stack_t S,
+                                                   const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL nmod_poly_struct ** nmod_poly_stack_fit_request_poly(
+                                                 nmod_poly_stack_t S, slong k);
+
+FLINT_DLL nmod_mpolyun_struct ** nmod_poly_stack_fit_request_mpolyun(
+                                                 nmod_poly_stack_t S, slong k);
+
+
+NMOD_MPOLY_INLINE
+nmod_poly_struct ** nmod_poly_stack_request_poly(nmod_poly_stack_t S, slong k)
+{
+    nmod_poly_struct ** poly_top;
+    poly_top = nmod_poly_stack_fit_request_poly(S, k);
+    S->poly_top += k;
+    return poly_top;
+}
+
+NMOD_MPOLY_INLINE
+nmod_poly_struct * nmod_poly_stack_take_top_poly(nmod_poly_stack_t S)
+{
+    /* assume the request for 1 has already been fitted */
+    nmod_poly_struct ** poly_top;
+    FLINT_ASSERT(S->poly_top + 1 <= S->poly_alloc);
+    poly_top = S->poly_array + S->poly_top;
+    S->poly_top += 1;
+    return poly_top[0];
+}
+
+NMOD_MPOLY_INLINE
+void nmod_poly_stack_give_back_poly(nmod_poly_stack_t S, slong k)
+{
+    FLINT_ASSERT(S->poly_top >= k);
+    S->poly_top -= k;
+}
+
+NMOD_MPOLY_INLINE
+slong nmod_poly_stack_size_poly(const nmod_poly_stack_t S)
+{
+    return S->poly_top;
+}
+
+
+NMOD_MPOLY_INLINE
+nmod_mpolyun_struct ** nmod_poly_stack_request_mpolyun(nmod_poly_stack_t S, slong k)
+{
+    nmod_mpolyun_struct ** mpolyun_top;
+    mpolyun_top = nmod_poly_stack_fit_request_mpolyun(S, k);
+    S->mpolyun_top += k;
+    return mpolyun_top;
+}
+
+NMOD_MPOLY_INLINE
+nmod_mpolyun_struct * nmod_poly_stack_take_top_mpolyun(nmod_poly_stack_t S)
+{
+    /* assume the request for 1 has already been fitted */
+    nmod_mpolyun_struct ** mpolyun_top;
+    FLINT_ASSERT(S->mpolyun_top + 1 <= S->mpolyun_alloc);
+    mpolyun_top = S->mpolyun_array + S->mpolyun_top;
+    S->mpolyun_top += 1;
+    return mpolyun_top[0];
+}
+
+NMOD_MPOLY_INLINE
+void nmod_poly_stack_give_back_mpolyun(nmod_poly_stack_t S, slong k)
+{
+    FLINT_ASSERT(S->mpolyun_top >= k);
+    S->mpolyun_top -= k;
+}
+
+NMOD_MPOLY_INLINE
+slong nmod_poly_stack_size_mpolyun(const nmod_poly_stack_t S)
+{
+    return S->mpolyun_top;
+}
+
+
 /* Coefficient context object ************************************************/
 
 NMOD_MPOLY_INLINE
@@ -1390,11 +1490,13 @@ FLINT_DLL void nmod_mpolyu_setform_mpolyun(nmod_mpolyu_t A, nmod_mpolyun_t B,
 
 FLINT_DLL int nmod_mpolyun_gcd_brown_smprime_bivar(
                nmod_mpolyun_t G, nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar,
-               nmod_mpolyun_t A, nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx);
+               nmod_mpolyun_t A, nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx,
+                                                         nmod_poly_stack_t Sp);
 
 FLINT_DLL int nmod_mpolyun_gcd_brown_smprime(nmod_mpolyun_t G,
   nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar, nmod_mpolyun_t A, nmod_mpolyun_t B,
-                                        slong var, const nmod_mpoly_ctx_t ctx);
+                                        slong var, const nmod_mpoly_ctx_t ctx,
+                                                         nmod_poly_stack_t Sp);
 
 FLINT_DLL int nmod_mpolyun_gcd_brown_smprime_threaded(nmod_mpolyun_t G,
                 nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar, nmod_mpolyun_t A,

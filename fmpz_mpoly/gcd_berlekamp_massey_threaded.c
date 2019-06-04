@@ -108,6 +108,7 @@ typedef struct
     nmod_mpolyun_t Aeval_sp, Beval_sp, Geval_sp, Abareval_sp, Bbareval_sp;
     nmod_mpolycu_t Acur_sp, Bcur_sp;
     nmod_mpolyc_t Gammacur_sp;
+    nmod_poly_stack_t Sp_sp;
     slong thread_index;
     int success;
     int cur_is_uninited;
@@ -328,6 +329,7 @@ void _base_args_set_mod_sp(
         nmod_mpolyun_set_mod(args[i].Geval_sp, w->ctx_sp->ffinfo->mod);
         nmod_mpolyun_set_mod(args[i].Abareval_sp, w->ctx_sp->ffinfo->mod);
         nmod_mpolyun_set_mod(args[i].Bbareval_sp, w->ctx_sp->ffinfo->mod);
+        nmod_poly_stack_set_ctx(args[i].Sp_sp, w->ctx_sp);
     }
 
     for (i = 0; i < w->evals_sp_alloc; i++)
@@ -670,8 +672,8 @@ static void _worker_eval_sp(void * varg)
         FLINT_ASSERT(Gammaeval_sp != 0);
 
         ret->success = nmod_mpolyun_gcd_brown_smprime_bivar(arg->Geval_sp,
-                                   arg->Abareval_sp, arg->Bbareval_sp,
-                                   arg->Aeval_sp, arg->Beval_sp, w->ctx_sp);
+                             arg->Abareval_sp, arg->Bbareval_sp,
+                          arg->Aeval_sp, arg->Beval_sp, w->ctx_sp, arg->Sp_sp);
         if (!ret->success)
         {
             /* image gcd could not be computed */
@@ -1332,7 +1334,7 @@ next_bma_image_sp:
 
         success = nmod_mpolyun_gcd_brown_smprime_bivar(args->Geval_sp,
                                 args->Abareval_sp, args->Bbareval_sp,
-                                   args->Aeval_sp, args->Beval_sp, w->ctx_sp);
+                       args->Aeval_sp, args->Beval_sp, w->ctx_sp, args->Sp_sp);
         if (!success)
         {
             continue;
@@ -1822,6 +1824,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
         nmod_mpolycu_init(eval_sp_args[i].Acur_sp);
         nmod_mpolycu_init(eval_sp_args[i].Bcur_sp);
         nmod_mpolyc_init(eval_sp_args[i].Gammacur_sp);
+        nmod_poly_stack_init(eval_sp_args[i].Sp_sp, w->bits, w->ctx_sp);
     }
 
     nmod_mpolyc_init(w->Gammaone_sp);
@@ -1890,7 +1893,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
         }
         success = nmod_mpolyun_gcd_brown_smprime_bivar(arg->Geval_sp,
                                      arg->Abareval_sp, arg->Bbareval_sp,
-                                      arg->Aeval_sp, arg->Beval_sp, w->ctx_sp);
+                          arg->Aeval_sp, arg->Beval_sp, w->ctx_sp, arg->Sp_sp);
         if (success)
         {
             w->GdegboundXY = nmod_mpolyun_bidegree(arg->Geval_sp);
@@ -2358,6 +2361,7 @@ cleanup:
         nmod_mpolycu_clear(eval_sp_args[i].Acur_sp);
         nmod_mpolycu_clear(eval_sp_args[i].Bcur_sp);
         nmod_mpolyc_clear(eval_sp_args[i].Gammacur_sp);
+        nmod_poly_stack_clear(eval_sp_args[i].Sp_sp);
     }
     flint_free(eval_sp_args);
     nmod_mpolyc_clear(w->Gammaone_sp);

@@ -223,7 +223,7 @@ void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
 do_heap:
 
-    _fmpz_mpoly_mul_heap_threaded_maxfields(A, B, maxBfields, C, maxCfields, ctx);
+    _fmpz_mpoly_mul_heap_threaded_maxfields(A, B, maxBfields, C, maxCfields, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
 
 done:
 

@@ -2586,7 +2586,8 @@ random_check_ret_t static _random_check_sp(
     const fmpz_mpoly_t Gamma,
     const fmpz_mpoly_ctx_t ctx,
     const nmod_mpoly_ctx_t ctx_sp,
-    flint_rand_t randstate)
+    flint_rand_t randstate,
+    nmod_poly_stack_t Sp_sp)
 {
     mp_limb_t Gammaeval_sp;
     int success;
@@ -2618,7 +2619,7 @@ random_check_ret_t static _random_check_sp(
         FLINT_ASSERT(Gammaeval_sp != 0);
 
         success = nmod_mpolyun_gcd_brown_smprime_bivar(Geval_sp,
-                         Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp);
+                  Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp, Sp_sp);
         if (!success)
         {
             continue;
@@ -2797,6 +2798,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
     fmpz_t p, pm1, sshift, last_unlucky_sshift_plus_1, image_count;
     fmpz * checkalpha;
     /* single precision workspace */
+    nmod_poly_stack_t Sp_sp;
     nmod_bma_mpoly_t Lambda_sp;
     nmod_mpolyun_t Aeval_sp, Beval_sp, Geval_sp, Abareval_sp, Bbareval_sp;
     nmod_mpolycu_t Ainc_sp, Acur_sp, Binc_sp, Bcur_sp, Ared_sp, Bred_sp;
@@ -2864,6 +2866,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
 
     /* machine precision workspace "sp" */
     nmod_mpoly_ctx_init(ctx_sp, ctx->minfo->nvars, ctx->minfo->ord, 2); /* modulus no care */
+    nmod_poly_stack_init(Sp_sp, bits, ctx_sp);
     nmod_bma_mpoly_init(Lambda_sp);
 
     nmod_mpolyun_init(Aeval_sp, bits, ctx_sp);
@@ -2898,6 +2901,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
         p_sp = n_nextprime(p_sp, 1);
         nmod_mpoly_ctx_set_modulus(ctx_sp, p_sp);
         /* unfortunate nmod_poly's need mod set */
+        nmod_poly_stack_set_ctx(Sp_sp, ctx_sp);
         nmod_mpolyun_set_mod(Aeval_sp, ctx_sp->ffinfo->mod);
         nmod_mpolyun_set_mod(Beval_sp, ctx_sp->ffinfo->mod);
         nmod_mpolyun_set_mod(Geval_sp, ctx_sp->ffinfo->mod);
@@ -2918,7 +2922,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
             continue;
         }
         success = nmod_mpolyun_gcd_brown_smprime_bivar(Geval_sp,
-                         Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp);
+                  Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp, Sp_sp);
         if (success)
         {
             FLINT_ASSERT(Geval_sp->length > 0);
@@ -3075,6 +3079,7 @@ pick_bma_prime:
         nmod_bma_mpoly_zero(Lambda_sp);
 
         /* unfortunate nmod_poly's store their own ctx :( */
+        nmod_poly_stack_set_ctx(Sp_sp, ctx_sp);
         nmod_mpolyun_set_mod(Aeval_sp, ctx_sp->ffinfo->mod);
         nmod_mpolyun_set_mod(Beval_sp, ctx_sp->ffinfo->mod);
         nmod_mpolyun_set_mod(Geval_sp, ctx_sp->ffinfo->mod);
@@ -3133,7 +3138,7 @@ pick_bma_prime:
         FLINT_ASSERT(Gammaeval != 0);
 
         success = nmod_mpolyun_gcd_brown_smprime_bivar(Geval_sp,
-                         Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp);
+                  Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp, Sp_sp);
         if (!success)
         {
             sshift_sp += Lambda->pointcount + 1;
@@ -3207,7 +3212,7 @@ pick_bma_prime:
 
         switch (_random_check_sp(&GevaldegXY, GdegboundXY,
                     Aeval_sp, Beval_sp, Geval_sp, Abareval_sp, Bbareval_sp,
-                        checkalpha_sp, H, A, B, Gamma, ctx, ctx_sp, randstate))
+                 checkalpha_sp, H, A, B, Gamma, ctx, ctx_sp, randstate, Sp_sp))
         {
             default:
                 FLINT_ASSERT(0);
@@ -3446,6 +3451,7 @@ pick_zip_prime:
 
     nmod_mpoly_ctx_set_modulus(ctx_sp, p_sp);
     /* unfortunate nmod_poly's need mod set */
+    nmod_poly_stack_set_ctx(Sp_sp, ctx_sp);
     nmod_mpolyun_set_mod(Aeval_sp, ctx_sp->ffinfo->mod);
     nmod_mpolyun_set_mod(Beval_sp, ctx_sp->ffinfo->mod);
     nmod_mpolyun_set_mod(Geval_sp, ctx_sp->ffinfo->mod);
@@ -3495,7 +3501,7 @@ next_zip_image:
     FLINT_ASSERT(Gammaeval_sp != 0);
 
     success = nmod_mpolyun_gcd_brown_smprime_bivar(Geval_sp,
-                         Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp);
+                  Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp, Sp_sp);
     if (!success)
     {
         /* choose a bigger p if bivar gcd failed */
@@ -3625,6 +3631,7 @@ cleanup:
     nmod_mpolycu_clear(Bcur_sp);
     nmod_mpolycu_clear(Bred_sp);
     nmod_bma_mpoly_clear(Lambda_sp);
+    nmod_poly_stack_clear(Sp_sp);
     nmod_mpoly_ctx_clear(ctx_sp);
 
     /* multiprecision workspace */

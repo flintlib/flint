@@ -56,6 +56,7 @@ static void _splitworker(void * varg)
     int success;
     mp_limb_t p, gammared;
     nmod_mpoly_ctx_t pctx;
+    nmod_poly_stack_t Sp;
 
     mpoly_gen_offset_shift_sp(&offset, &shift,
                                       ctx->minfo->nvars - 1, bits, ctx->minfo);
@@ -66,6 +67,7 @@ static void _splitworker(void * varg)
     arg->image_count = 0;
 
     nmod_mpoly_ctx_init(pctx, ctx->minfo->nvars, ORD_LEX, 2);
+    nmod_poly_stack_init(Sp, bits, pctx);
     nmod_mpolyun_init(Ap, bits, pctx);
     nmod_mpolyun_init(Bp, bits, pctx);
     nmod_mpolyun_init(Gp, bits, pctx);
@@ -96,6 +98,7 @@ static void _splitworker(void * varg)
         nmod_mpoly_ctx_set_modulus(pctx, p);
 
         /* the unfortunate nmod poly's store their own context :( */
+        nmod_poly_stack_set_ctx(Sp, pctx);
         nmod_mpolyun_set_mod(Ap, pctx->ffinfo->mod);
         nmod_mpolyun_set_mod(Bp, pctx->ffinfo->mod);
         nmod_mpolyun_set_mod(Gp, pctx->ffinfo->mod);
@@ -111,7 +114,7 @@ static void _splitworker(void * varg)
         if (arg->num_workers == 0)
         {
             success = nmod_mpolyun_gcd_brown_smprime(Gp, Abarp, Bbarp,
-                                           Ap, Bp, ctx->minfo->nvars - 1, pctx);
+                                      Ap, Bp, ctx->minfo->nvars - 1, pctx, Sp);
         }
         else
         {
@@ -119,6 +122,7 @@ static void _splitworker(void * varg)
                                            Ap, Bp, ctx->minfo->nvars - 1, pctx,
                                         arg->worker_handles, arg->num_workers);
         }
+
         if (!success)
         {
             continue;
@@ -194,7 +198,7 @@ static void _splitworker(void * varg)
     nmod_mpolyun_clear(Gp, pctx);
     nmod_mpolyun_clear(Abarp, pctx);
     nmod_mpolyun_clear(Bbarp, pctx);
-
+    nmod_poly_stack_clear(Sp);
     nmod_mpoly_ctx_clear(pctx);
 }
 
@@ -706,6 +710,7 @@ compute_split:
         splitargs[i].base = splitbase;
         FLINT_ASSERT(fmpz_fits_si(fmpq_numref(qvec + i)));
         FLINT_ASSERT(fmpz_fits_si(fmpq_denref(qvec + i)));
+
         splitargs[i].required_images = fmpz_get_si(fmpq_numref(qvec + i));
         splitargs[i].num_workers = fmpz_get_si(fmpq_denref(qvec + i)) - 1;
         FLINT_ASSERT(splitargs[i].num_workers >= 0);

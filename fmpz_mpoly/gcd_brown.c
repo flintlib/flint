@@ -90,6 +90,7 @@ int fmpz_mpolyu_gcd_brown(
     nmod_mpoly_ctx_t pctx;
     mp_bitcnt_t bits = G->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
+    nmod_poly_stack_t Sp;
 
     FLINT_ASSERT(bits <= FLINT_BITS);
     FLINT_ASSERT(bits == A->bits);
@@ -140,6 +141,7 @@ int fmpz_mpolyu_gcd_brown(
     fmpz_mpolyu_init(T, bits, ctx);
 
     nmod_mpoly_ctx_init(pctx, ctx->minfo->nvars, ORD_LEX, 2);
+    nmod_poly_stack_init(Sp, bits, pctx);
     nmod_mpolyun_init(Ap, bits, pctx);
     nmod_mpolyun_init(Bp, bits, pctx);
     nmod_mpolyun_init(Gp, bits, pctx);
@@ -167,6 +169,7 @@ choose_prime:
 
     nmod_mpoly_ctx_set_modulus(pctx, p);
     /* the unfortunate nmod poly's store their own context :( */
+    nmod_poly_stack_set_ctx(Sp, pctx);
     nmod_mpolyun_set_mod(Ap, pctx->ffinfo->mod);
     nmod_mpolyun_set_mod(Bp, pctx->ffinfo->mod);
     nmod_mpolyun_set_mod(Gp, pctx->ffinfo->mod);
@@ -180,7 +183,7 @@ choose_prime:
     FLINT_ASSERT(Bp->length > 0);
 
     success = nmod_mpolyun_gcd_brown_smprime(Gp, Abarp, Bbarp,
-                                          Ap, Bp, ctx->minfo->nvars - 1, pctx);
+                                      Ap, Bp, ctx->minfo->nvars - 1, pctx, Sp);
     if (!success)
     {
         goto choose_prime;
@@ -306,7 +309,7 @@ cleanup:
     nmod_mpolyun_clear(Bbarp, pctx);
     nmod_mpolyun_clear(Ap, pctx);
     nmod_mpolyun_clear(Bp, pctx);
-
+    nmod_poly_stack_clear(Sp);
     nmod_mpoly_ctx_clear(pctx);
 
     fmpz_mpolyu_clear(T, ctx);

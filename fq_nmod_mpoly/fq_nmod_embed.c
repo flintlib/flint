@@ -105,7 +105,6 @@ void _fq_nmod_embed_array_init(_fq_nmod_embed_struct * emb,
     fq_nmod_t biggen;
     fmpz_t P;
     mp_limb_t lc_inv;
-    slong nullity;
     mp_limb_t p = smallctx->modulus->mod.n;
     slong n, m = nmod_poly_degree(smallctx->modulus);
 
@@ -224,8 +223,8 @@ flint_printf("**** emb[0]:\n"); _embed_print(emb + 0);
         {
             nmod_mat_entry(M, l, m*n) = nmod_poly_get_coeff_ui(t3, l);
         }
-        nullity = nmod_mat_nullspace(Msol, M);
-        FLINT_ASSERT(nullity == 1);
+        i = nmod_mat_nullspace(Msol, M);
+        FLINT_ASSERT(i == 1);
 
         /* this is the coefficient of x^n in h */
         FLINT_ASSERT(nmod_mat_entry(Msol, m*n, 0) != 0);

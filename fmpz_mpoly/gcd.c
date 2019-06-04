@@ -12,7 +12,6 @@
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
 
-
 /*
     Assume when B is converted to univar format, its length would be one.
     Gcd is gcd of coefficients of univar(A) and B (modulo some shifts).
@@ -801,7 +800,7 @@ static int _try_brown(
     FLINT_ASSERT(Au->length > 1);
     FLINT_ASSERT(Bu->length > 1);
 
-    success = (num_handles == 0)
+    success = (0 && num_handles == 0)
            ? fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx)
            : fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu, uctx,
                                                          handles, num_handles);
