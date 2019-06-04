@@ -557,7 +557,7 @@ static slong _divide_master_threads(fmpq * v, slong n, slong m)
                             ==  fmpz_get_ui(fmpq_denref(left))
                               + fmpz_get_ui(fmpq_denref(right)));
 
-            if (fmpq_get_d(right) < score_threashold)
+            if (fmpq_sgn(left) > 0 && fmpq_get_d(right) < score_threashold)
             {
                 /* delete v + i, add left and right */
                 FLINT_ASSERT(l < m);
@@ -710,9 +710,9 @@ compute_split:
         splitargs[i].base = splitbase;
         FLINT_ASSERT(fmpz_fits_si(fmpq_numref(qvec + i)));
         FLINT_ASSERT(fmpz_fits_si(fmpq_denref(qvec + i)));
-
         splitargs[i].required_images = fmpz_get_si(fmpq_numref(qvec + i));
         splitargs[i].num_workers = fmpz_get_si(fmpq_denref(qvec + i)) - 1;
+        FLINT_ASSERT(splitargs[i].required_images > 0);
         FLINT_ASSERT(splitargs[i].num_workers >= 0);
 
         if (i == 0)
