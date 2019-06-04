@@ -628,7 +628,7 @@ void _fmpz_mpoly_mul_heap_threaded(
     mp_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
-    thread_pool_handle * handles,
+    const thread_pool_handle * handles,
     slong num_handles)
 {
     slong i, j;
@@ -785,15 +785,14 @@ void _fmpz_mpoly_mul_heap_threaded_maxfields(
     const fmpz_mpoly_t B, fmpz * maxBfields,
     const fmpz_mpoly_t C, fmpz * maxCfields,
     const fmpz_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong N;
     mp_bitcnt_t exp_bits;
     ulong * cmpmask;
     ulong * Bexp, * Cexp;
     int freeBexp, freeCexp;
-    thread_pool_handle * handles;
-    slong i, max_num_handles, num_handles;
     TMP_INIT;
 
     TMP_START;
@@ -829,21 +828,6 @@ void _fmpz_mpoly_mul_heap_threaded_maxfields(
         Cexp = (ulong *) flint_malloc(N*C->length*sizeof(ulong));
         mpoly_repack_monomials(Cexp, exp_bits, C->exps, C->bits,
                                                         C->length, ctx->minfo);
-    }
-
-    handles = NULL;
-    num_handles = 0;
-    if (global_thread_pool_initialized)
-    {
-        max_num_handles = thread_pool_get_size(global_thread_pool);
-        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-        if (max_num_handles > 0)
-        {
-            handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_handles*sizeof(thread_pool_handle));
-            num_handles = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_handles);
-        }
     }
 
     /* deal with aliasing and do multiplication */
@@ -891,14 +875,6 @@ void _fmpz_mpoly_mul_heap_threaded_maxfields(
         }
     }
 
-    for (i = 0; i < num_handles; i++)
-    {
-        thread_pool_give_back(global_thread_pool, handles[i]);
-    }
-    if (handles)
-        flint_free(handles);
-
-
     if (freeBexp)
         flint_free(Bexp);
 
@@ -918,6 +894,8 @@ void fmpz_mpoly_mul_heap_threaded(
 {
     slong i;
     fmpz * maxBfields, * maxCfields;
+    thread_pool_handle * handles;
+    slong num_handles;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)
@@ -938,8 +916,33 @@ void fmpz_mpoly_mul_heap_threaded(
     mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
     mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
 
+    handles = NULL;
+    num_handles = 0;
+    if (global_thread_pool_initialized)
+    {
+        slong max_num_handles;
+        max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                                   max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                     handles, max_num_handles);
+        }
+    }
+
     _fmpz_mpoly_mul_heap_threaded_maxfields(A, B, maxBfields, C, maxCfields,
-                                                            ctx, thread_limit);
+                                                    ctx, handles, num_handles);
+
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
+    }
+    if (handles)
+    {
+        flint_free(handles);
+    }
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {

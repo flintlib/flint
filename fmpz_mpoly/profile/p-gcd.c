@@ -16,9 +16,9 @@
 /*
     export LD_LIBRARY_PATH=/tmpbig/schultz/flint2
     likwid-setFrequencies -g performance
-    nano fmpz_mpoly/profile/p-arithmetic.c
+    nano fmpz_mpoly/profile/p-gcd.c
     make profile MOD=fmpz_mpoly
-    ./build/fmpz_mpoly/profile/p-arithmetic
+    ./build/fmpz_mpoly/profile/p-gcd
 */
 
 slong max_threads;
@@ -152,6 +152,7 @@ void profile_gcd(
 int main(int argc, char *argv[])
 {
     slong i, m, n, k, l;
+    slong step;
 
     max_threads = argc > 1 ? atoi(argv[1]) : 2;
     max_threads = FLINT_MIN(max_threads, WORD(32));
@@ -163,10 +164,13 @@ int main(int argc, char *argv[])
     for (i = 0; i < max_threads; i++)
         cpu_affinities[i] = i;
 
-    for (m = 31 + max_threads/2; m <= 31 + max_threads/2; m += 4)
-    for (n = 29 + max_threads/2; n <= 29 + max_threads/2; n += 4)
-    for (k = 12; k <= 16; k += 4)
-    for (l = 12; l <= 16; l += 4)
+    step = FLINT_MIN(max_threads, 4 + max_threads/2);
+    step = FLINT_MAX(step, WORD(4));
+
+    for (m = 32 + 1*step; m <= 32 + 2*step; m += step)
+    for (n = 30 + 1*step; n <= 30 + 1*step; n += step)
+    for (k = 12 + 0*step; k <= 12 + 1*step; k += step)
+    for (l = 12 + 0*step; l <= 12 + 1*step; l += step)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, t, A, B, G;
@@ -182,17 +186,17 @@ int main(int argc, char *argv[])
 
         fmpz_mpoly_set_str_pretty(a, "1+x+y+z+x*y+x*z", vars, ctx);
         fmpz_mpoly_set_str_pretty(b, "1+x+y+z+y*z+y*z", vars, ctx);
-        fmpz_mpoly_pow_ui(A, a, m+k, ctx);
+        fmpz_mpoly_pow_ui(A, a, m + k, ctx);
         fmpz_mpoly_pow_ui(t, b, n, ctx);
         fmpz_mpoly_mul(A, A, t, ctx);
         fmpz_mpoly_pow_ui(B, a, m, ctx);
-        fmpz_mpoly_pow_ui(t, b, n+l, ctx);
+        fmpz_mpoly_pow_ui(t, b, n + l, ctx);
         fmpz_mpoly_mul(B, B, t, ctx);
         fmpz_mpoly_pow_ui(G, a, m, ctx);
         fmpz_mpoly_pow_ui(t, b, n, ctx);
         fmpz_mpoly_mul(G, G, t, ctx);
 
-        profile_gcd(G, A, B, ctx, "dense gcd", m+k, n, m, n+l);
+        profile_gcd(G, A, B, ctx, "dense gcd", m + k, n, m, n + l);
 
         fmpz_mpoly_clear(G, ctx);
         fmpz_mpoly_clear(B, ctx);

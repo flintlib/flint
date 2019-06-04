@@ -41,6 +41,15 @@ void nmod_poly_stack_clear(nmod_poly_stack_t S)
         flint_free(S->poly_array);
     S->poly_array = NULL;
 
+    for (i = 0; i < S->mpolyun_alloc; i++)
+    {
+        nmod_mpolyun_clear(S->mpolyun_array[i], S->ctx);
+        flint_free(S->mpolyun_array[i]);
+    }
+    if (S->mpolyun_array)
+        flint_free(S->mpolyun_array);
+    S->mpolyun_array = NULL;
+
     S->ctx = NULL;
 }
 

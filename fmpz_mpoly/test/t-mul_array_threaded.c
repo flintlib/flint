@@ -65,7 +65,7 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array_threaded(k, f, g, ctx);
+            result = fmpz_mpoly_mul_array_threaded(k, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             if (!result)
             {
                 continue;
@@ -121,7 +121,7 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array_threaded(f, f, g, ctx);
+            result = fmpz_mpoly_mul_array_threaded(f, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             if (!result)
                 continue;
 
@@ -175,7 +175,7 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array_threaded(g, f, g, ctx);
+            result = fmpz_mpoly_mul_array_threaded(g, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             if (!result)
                 continue;
 
