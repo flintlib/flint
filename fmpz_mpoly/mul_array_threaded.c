@@ -209,7 +209,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
 void _fmpz_mpoly_mul_array_chunked_threaded_LEX(
     fmpz_mpoly_t P,
     const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B, 
+    const fmpz_mpoly_t B,
     const ulong * mults,
     const fmpz_mpoly_ctx_t ctx,
     const thread_pool_handle * handles,
@@ -617,7 +617,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
 void _fmpz_mpoly_mul_array_chunked_threaded_DEG(
     fmpz_mpoly_t P,
     const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B, 
+    const fmpz_mpoly_t B,
     ulong degb,
     const fmpz_mpoly_ctx_t ctx,
     const thread_pool_handle * handles,
