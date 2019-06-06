@@ -34,10 +34,10 @@ typedef struct _worker_arg_struct
 typedef worker_arg_struct worker_arg_t[1];
 
 
-static void worker_gcd(void * varg)
+static void worker_divides(void * varg)
 {
     worker_arg_struct * W = (worker_arg_struct *) varg;
-    fmpz_mpoly_divides_monagan_pearce(W->Q, W->A, W->B, W->ctx);
+    fmpz_mpoly_divides_threaded(W->Q, W->A, W->B, W->ctx, 1);
 }
 
 void profile_divides(
@@ -95,11 +95,11 @@ void profile_divides(
             (worker_args + i)->ctx = ctx;
             if (i < num_workers)
             {
-                thread_pool_wake(global_thread_pool, handles[i], worker_gcd, worker_args + i);
+                thread_pool_wake(global_thread_pool, handles[i], worker_divides, worker_args + i);
             }
             else
             {
-                worker_gcd(worker_args + i);
+                worker_divides(worker_args + i);
             }
         }
         for (i = 0; i < num_workers; i++)
@@ -131,7 +131,7 @@ void profile_divides(
         fmpz_mpoly_clear(Q, ctx);
         fmpz_mpoly_init(Q, ctx);
         timeit_start(timer);
-        fmpz_mpoly_divides_heap_threaded(Q, A, B, ctx);
+        fmpz_mpoly_divides(Q, A, B, ctx);
         timeit_stop(timer);
         parallel_time = FLINT_MAX(WORD(1), timer->wall);
         if (!fmpz_mpoly_equal(Q, realQ, ctx))

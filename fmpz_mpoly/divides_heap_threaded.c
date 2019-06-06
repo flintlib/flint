@@ -1979,9 +1979,13 @@ static void worker_loop(void * varg)
 
 
 /* return 1 if quotient is exact */
-int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
-                  const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                    const fmpz_mpoly_ctx_t ctx)
+int _fmpz_mpoly_divides_heap_threaded(
+    fmpz_mpoly_t Q,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t ctx,
+    thread_pool_handle * handles,
+    slong num_handles)
 {
     ulong mask;
     int divides;
@@ -1992,9 +1996,7 @@ int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
     ulong * cmpmask;
     ulong * Aexp, * Bexp;
     int freeAexp, freeBexp;
-    slong max_num_workers, num_workers;
     worker_arg_struct * worker_args;
-    thread_pool_handle * handles;
     fmpz_t qcoeff, r;
     ulong * texps, * qexps;
     divides_heap_base_t H;
@@ -2004,19 +2006,8 @@ int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
     return fmpz_mpoly_divides_monagan_pearce(Q, A, B, ctx);
 #endif
 
-    if (!global_thread_pool_initialized || B->length < 2 || A->length < 2)
+    if (B->length < 2 || A->length < 2)
     {
-        if (B->length == 0)
-        {
-            flint_throw(FLINT_DIVZERO,
-                         "Divide by zero in nmod_mpoly_divides_heap_threaded");
-        }
-
-        if (A->length == 0)
-        {
-            fmpz_mpoly_zero(Q, ctx);
-            return 1;
-        }
         return fmpz_mpoly_divides_monagan_pearce(Q, A, B, ctx);
     }
 
@@ -2055,9 +2046,6 @@ int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
                                                     B->length, ctx->minfo);
     }
 
-    FLINT_ASSERT(global_thread_pool_initialized);
-    max_num_workers = thread_pool_get_size(global_thread_pool);
-
     fmpz_mpoly_ctx_init(zctx, ctx->minfo->nvars, ctx->minfo->ord);
     fmpz_mpoly_init(S, zctx);
 
@@ -2069,7 +2057,7 @@ int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
         goto cleanup1;
     }
 
-    if (mpoly_divides_select_exps(S, zctx, max_num_workers,
+    if (mpoly_divides_select_exps(S, zctx, num_handles,
                                    Aexp, A->length, Bexp, B->length, exp_bits))
     {
         divides = 0;
@@ -2079,14 +2067,9 @@ int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
 
     /*
         At this point A and B both have at least two terms
-            and the leading coefficients divide
+            and the leading coefficients and monomials divide
             and the exponent selection did not give an easy exit
     */
-
-    handles = (thread_pool_handle *) flint_malloc(max_num_workers
-                                                  *sizeof(thread_pool_handle));
-    num_workers = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_workers);
 
     divides_heap_base_init(H);
 
@@ -2137,7 +2120,7 @@ int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
     qexps = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
     mpoly_monomial_sub_mp(qexps + N*0, Aexp + N*0, Bexp + N*0, N);
-    fmpz_divexact(qcoeff, A->coeffs + 0, B->coeffs + 0);
+    fmpz_divexact(qcoeff, A->coeffs + 0, B->coeffs + 0); /* already checked */
 
     fmpz_mpoly_ts_init(H->polyQ, qcoeff, qexps, 1, H->bits, H->N);
 
@@ -2178,28 +2161,25 @@ int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
 
     pthread_mutex_init(&H->mutex, NULL);
 
-    worker_args = (worker_arg_struct *) flint_malloc((num_workers + 1)
+    worker_args = (worker_arg_struct *) flint_malloc((num_handles + 1)
                                                         *sizeof(worker_arg_t));
 
-    for (i = 0; i < num_workers; i++)
+    for (i = 0; i < num_handles; i++)
     {
         (worker_args + i)->H = H;
         thread_pool_wake(global_thread_pool, handles[i],
                                                  worker_loop, worker_args + i);
     }
-    (worker_args + num_workers)->H = H;
-    worker_loop(worker_args + num_workers);
-    for (i = 0; i < num_workers; i++)
+    (worker_args + num_handles)->H = H;
+    worker_loop(worker_args + num_handles);
+    for (i = 0; i < num_handles; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i]);
-        thread_pool_give_back(global_thread_pool, handles[i]);
     }
 
     flint_free(worker_args);
 
     pthread_mutex_destroy(&H->mutex);
-
-    flint_free(handles);
 
     divides = divides_heap_base_clear(Q, H);
 
@@ -2217,6 +2197,66 @@ cleanup1:
     fmpz_clear(r);
 
     TMP_END;
+
+    return divides;
+}
+
+
+int fmpz_mpoly_divides_heap_threaded(
+    fmpz_mpoly_t Q,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t ctx,
+    slong thread_limit)
+{
+    thread_pool_handle * handles;
+    slong num_handles;
+    int divides;
+    slong i;
+
+    if (B->length < 2 || A->length < 2)
+    {
+        if (B->length == 0)
+        {
+            flint_throw(FLINT_DIVZERO,
+                         "Divide by zero in fmpz_mpoly_divides_heap_threaded");
+        }
+
+        if (A->length == 0)
+        {
+            fmpz_mpoly_zero(Q, ctx);
+            return 1;
+        }
+        return fmpz_mpoly_divides_monagan_pearce(Q, A, B, ctx);
+    }
+
+    handles = NULL;
+    num_handles = 0;
+    if (thread_limit > 1 && global_thread_pool_initialized)
+    {
+        slong max_num_handles;
+        max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                                   max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                     handles, max_num_handles);
+        }
+    }
+
+    divides = _fmpz_mpoly_divides_heap_threaded(Q, A, B, ctx,
+                                                         handles, num_handles);
+
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
+    }
+    if (handles)
+    {
+        flint_free(handles);
+    }
 
     return divides;
 }
