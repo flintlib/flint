@@ -868,32 +868,34 @@ FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
 /* Division ******************************************************************/
 
 FLINT_DLL int nmod_mpoly_divides(nmod_mpoly_t Q,
-                        const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_divides_threaded(nmod_mpoly_t Q,
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
+
+FLINT_DLL int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t Q,
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
+
+FLINT_DLL int _nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
+                              thread_pool_handle * handles, slong num_handles);
+
+FLINT_DLL int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_div(nmod_mpoly_t Q,
-                                 const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_divrem(nmod_mpoly_t Q, nmod_mpoly_t R,
-                                  const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_divrem_ideal(nmod_mpoly_struct ** Q, nmod_mpoly_t R,
                 const nmod_mpoly_t A, nmod_mpoly_struct * const * B, slong len,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-
-FLINT_DLL int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
-                  const nmod_mpoly_t poly2, const nmod_mpoly_t poly3,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
-                        const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
-                          const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _nmod_mpoly_divides_monagan_pearce(

@@ -1697,10 +1697,17 @@ static void worker_loop(void * varg)
 }
 
 
-/* return 1 if quotient is exact */
-int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
-                  const nmod_mpoly_t A, const nmod_mpoly_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
+/*
+    return 1 if quotient is exact.
+    The leading coefficient of B should be invertible.
+*/
+int _nmod_mpoly_divides_heap_threaded(
+    nmod_mpoly_t Q,
+    const nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
+    thread_pool_handle * handles,
+    slong num_handles)
 {
     ulong mask;
     int divides;
@@ -1711,12 +1718,9 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     ulong * cmpmask;
     ulong * Aexp, * Bexp;
     int freeAexp, freeBexp;
-    slong max_num_workers, num_workers;
     worker_arg_struct * worker_args;
-    thread_pool_handle * handles;
     mp_limb_t qcoeff;
     ulong * texps, * qexps;
-    mp_limb_t lc_inv;
     divides_heap_base_t H;
 #if PROFILE_THIS
     slong idx = 0;
@@ -1727,19 +1731,8 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     return nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
 #endif
 
-    if (!global_thread_pool_initialized || B->length < 2 || A->length < 2)
+    if (B->length < 2 || A->length < 2)
     {
-        if (B->length == 0)
-        {
-            flint_throw(FLINT_DIVZERO,
-                         "Divide by zero in nmod_mpoly_divides_heap_threaded");
-        }
-
-        if (A->length == 0)
-        {
-            nmod_mpoly_zero(Q, ctx);
-            return 1;
-        }
         return nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
     }
 
@@ -1775,13 +1768,10 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
                                                     B->length, ctx->minfo);
     }
 
-    FLINT_ASSERT(global_thread_pool_initialized);
-    max_num_workers = thread_pool_get_size(global_thread_pool);
-
     fmpz_mpoly_ctx_init(zctx, ctx->minfo->nvars, ctx->minfo->ord);
     fmpz_mpoly_init(S, zctx);
 
-    if (mpoly_divides_select_exps(S, zctx, max_num_workers,
+    if (mpoly_divides_select_exps(S, zctx, num_handles,
                                    Aexp, A->length, Bexp, B->length, exp_bits))
     {
         divides = 0;
@@ -1791,19 +1781,13 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
 
     /*
         At this point A and B both have at least two terms and the exponent
-        selection did not give an easy exit. Lets run the inverse before
-        requesting threads.
+        selection did not give an easy exit. Since we are possibly holding
+        threads, we should try to not throw, so the leading coefficient should
+        already have been checked for invertibility.
     */
-    lc_inv = nmod_inv(B->coeffs[0], ctx->ffinfo->mod);
-
-    handles = (thread_pool_handle *) flint_malloc(max_num_workers
-                                                  *sizeof(thread_pool_handle));
-    num_workers = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_workers);
-
     divides_heap_base_init(H);
-
-    H->lc_inv = lc_inv;
+    qcoeff = n_gcdinv(&H->lc_inv, B->coeffs[0], ctx->ffinfo->mod.n);
+    FLINT_ASSERT(qcoeff == 1); /* gcd should be one */
     H->polyA->coeffs = A->coeffs;
     H->polyA->exps = Aexp;
     H->polyA->bits = exp_bits;
@@ -1853,7 +1837,7 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
     qexps = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
     mpoly_monomial_sub_mp(qexps + N*0, Aexp + N*0, Bexp + N*0, N);
-    qcoeff = nmod_mul(lc_inv, A->coeffs[0], ctx->ffinfo->mod);
+    qcoeff = nmod_mul(H->lc_inv, A->coeffs[0], ctx->ffinfo->mod);
 
     nmod_mpoly_ts_init(H->polyQ, &qcoeff, qexps, 1, H->bits, H->N);
 
@@ -1878,7 +1862,7 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
             H->failed = 1;
             break;
         }
-        qcoeff = nmod_mul(lc_inv, A->coeffs[k], ctx->ffinfo->mod);
+        qcoeff = nmod_mul(H->lc_inv, A->coeffs[k], ctx->ffinfo->mod);
         nmod_mpoly_ts_append(H->polyQ, &qcoeff, qexps, 1, H->N);
         k++;
     }
@@ -1887,35 +1871,34 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
 
     pthread_mutex_init(&H->mutex, NULL);
 
-    worker_args = (worker_arg_struct *) flint_malloc((num_workers + 1)
+    worker_args = (worker_arg_struct *) flint_malloc((num_handles + 1)
                                                         *sizeof(worker_arg_t));
 
 #if PROFILE_THIS
-    for (i = 0; i < num_workers + 1; i++)
+    for (i = 0; i < num_handles + 1; i++)
     {
         vec_slong_init((worker_args + i)->time_data);
     }
     timeit_start(H->timer);
 #endif
 
-    for (i = 0; i < num_workers; i++)
+    for (i = 0; i < num_handles; i++)
     {
         (worker_args + i)->H = H;
         thread_pool_wake(global_thread_pool, handles[i],
                                                  worker_loop, worker_args + i);
     }
-    (worker_args + num_workers)->H = H;
-    worker_loop(worker_args + num_workers);
-    for (i = 0; i < num_workers; i++)
+    (worker_args + num_handles)->H = H;
+    worker_loop(worker_args + num_handles);
+    for (i = 0; i < num_handles; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i]);
-        thread_pool_give_back(global_thread_pool, handles[i]);
     }
 
 #if PROFILE_THIS
     timeit_stop(H->timer);
     flint_printf("data = [");
-    for (i = 0; i < num_workers + 1; i++)
+    for (i = 0; i < num_handles + 1; i++)
     {
         flint_printf("[%wd,", i);
         vec_slong_print((worker_args + i)->time_data);
@@ -1930,8 +1913,6 @@ int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
 
     pthread_mutex_destroy(&H->mutex);
 
-    flint_free(handles);
-
     divides = divides_heap_base_clear(Q, H);
 
 cleanup1:
@@ -1945,6 +1926,73 @@ cleanup1:
         flint_free(Bexp);
 
     TMP_END;
+
+    return divides;
+}
+
+
+int nmod_mpoly_divides_heap_threaded(
+    nmod_mpoly_t Q,
+    const nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
+    slong thread_limit)
+{
+    thread_pool_handle * handles;
+    slong num_handles;
+    int divides;
+    slong i;
+
+    if (B->length < 2 || A->length < 2)
+    {
+        if (B->length == 0)
+        {
+            flint_throw(FLINT_DIVZERO,
+                         "Divide by zero in nmod_mpoly_divides_heap_threaded");
+        }
+
+        if (A->length == 0)
+        {
+            nmod_mpoly_zero(Q, ctx);
+            return 1;
+        }
+
+        return nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
+    }
+
+    if (1 != n_gcd(B->coeffs[0], ctx->ffinfo->mod.n))
+    {
+        flint_throw(FLINT_IMPINV, "Exception in nmod_mpoly_divides_heap"
+                               "_threaded: Cannot invert leading coefficient");
+    }
+
+    handles = NULL;
+    num_handles = 0;
+    if (thread_limit > 1 && global_thread_pool_initialized)
+    {
+        slong max_num_handles;
+        max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                                   max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                     handles, max_num_handles);
+        }
+    }
+
+    divides = _nmod_mpoly_divides_heap_threaded(Q, A, B, ctx,
+                                                         handles, num_handles);
+
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
+    }
+    if (handles)
+    {
+        flint_free(handles);
+    }
 
     return divides;
 }
