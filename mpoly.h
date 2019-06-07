@@ -32,6 +32,7 @@
 #include "fmpz.h"
 #include "fmpq.h"
 #include "ulong_extras.h"
+#include "thread_pool.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -941,13 +942,17 @@ FLINT_DLL int mpoly_degrees_fit_si(const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
-                                slong len, slong bits, const mpoly_ctx_t mctx);
+                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_degrees_si_threaded(slong * user_degs, const ulong * poly_exps,
+                         slong len,  mp_bitcnt_t bits, const mpoly_ctx_t mctx,
+                              thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
-                                slong len, slong bits, const mpoly_ctx_t mctx);
+                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
-                                slong len, slong bits, const mpoly_ctx_t mctx);
+                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL slong mpoly_degree_si(const ulong * poly_exps,
                slong len, mp_bitcnt_t bits, slong var, const mpoly_ctx_t mctx);

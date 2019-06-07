@@ -37,6 +37,29 @@ static int _nmod_mpoly_divides_try_dense(
             && total_dense_size/Alen < WORD(10);
 }
 
+
+typedef struct
+{
+    slong * degs;
+    ulong * exps;
+    slong length;
+    mp_bitcnt_t bits;
+    const mpoly_ctx_struct * mctx;
+    thread_pool_handle * handles;
+    slong num_handles;
+}
+_degrees_arg_struct;
+
+typedef _degrees_arg_struct _degrees_arg_t[1];
+
+static void _worker_degrees(void * varg)
+{
+    _degrees_arg_struct * arg = (_degrees_arg_struct *) varg;
+
+    mpoly_degrees_si_threaded(arg->degs, arg->exps, arg->length, arg->bits,
+                                    arg->mctx, arg->handles, arg->num_handles);
+}
+
 int nmod_mpoly_divides_threaded(
     nmod_mpoly_t Q,
     const nmod_mpoly_t A,
@@ -64,13 +87,54 @@ int nmod_mpoly_divides_threaded(
 
     TMP_START;
 
+    handles = NULL;
+    num_handles = 0;
+    if (thread_limit > 1 && global_thread_pool_initialized)
+    {
+        slong max_num_handles;
+        max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                                   max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                     handles, max_num_handles);
+        }
+    }
+
     divides = -1;
     if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS && A->length > 50)
     {
         Adegs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
         Bdegs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
-        mpoly_degrees_si(Adegs, A->exps, A->length, A->bits, ctx->minfo);
-        mpoly_degrees_si(Bdegs, B->exps, B->length, B->bits, ctx->minfo);
+
+        if (num_handles > 0)
+        {
+            slong m = mpoly_divide_threads(num_handles, A->length, B->length);
+            _degrees_arg_t arg;
+
+            FLINT_ASSERT(m >= 0);
+            FLINT_ASSERT(m < num_handles);
+
+            arg->degs = Bdegs;
+            arg->exps = B->exps;
+            arg->length = B->length;
+            arg->bits = B->bits;
+            arg->mctx = ctx->minfo;
+            arg->handles = handles + (m + 1);
+            arg->num_handles = num_handles - (m + 1);
+            thread_pool_wake(global_thread_pool, handles[m],
+                                                         _worker_degrees, arg);
+            mpoly_degrees_si_threaded(Adegs, A->exps, A->length, A->bits,
+                                                   ctx->minfo, handles + 0, m);
+            thread_pool_wait(global_thread_pool, handles[m]);
+        }
+        else
+        {
+            mpoly_degrees_si(Adegs, A->exps, A->length, A->bits, ctx->minfo);
+            mpoly_degrees_si(Bdegs, B->exps, B->length, B->bits, ctx->minfo);
+        }
 
         /* quick degree check */
         for (i = 0; i < ctx->minfo->nvars; i++)
@@ -95,22 +159,6 @@ int nmod_mpoly_divides_threaded(
         goto cleanup;
     }
 
-    handles = NULL;
-    num_handles = 0;
-    if (thread_limit > 1 && global_thread_pool_initialized)
-    {
-        slong max_num_handles;
-        max_num_handles = thread_pool_get_size(global_thread_pool);
-        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-        if (max_num_handles > 0)
-        {
-            handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_handles*sizeof(thread_pool_handle));
-            num_handles = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_handles);
-        }
-    }
-
     if (num_handles > 0)
     {
         divides = _nmod_mpoly_divides_heap_threaded(Q, A, B, ctx,
@@ -121,6 +169,8 @@ int nmod_mpoly_divides_threaded(
         divides = nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
     }
 
+cleanup:
+
     for (i = 0; i < num_handles; i++)
     {
         thread_pool_give_back(global_thread_pool, handles[i]);
@@ -129,8 +179,6 @@ int nmod_mpoly_divides_threaded(
     {
         flint_free(handles);
     }
-
-cleanup:
 
     TMP_END;
     return divides;

@@ -163,8 +163,8 @@ int main(int argc, char *argv[])
     for (i = 0; i < max_threads; i++)
         cpu_affinities[i] = i;
 
-    for (m = 6 + max_threads/4; m <= 12 + max_threads/4; m += 3)
-    for (n = 6 + max_threads/4; n <= 12 + max_threads/4; n += 3)
+    for (m = 7 + max_threads/4; m <= 13 + max_threads/4; m += 3)
+    for (n = 7 + max_threads/4; n <= 13 + max_threads/4; n += 3)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, A, B, Q;
