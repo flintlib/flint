@@ -433,21 +433,25 @@ Multiplication
 
 .. function:: void nmod_mpoly_mul(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
+.. function:: void nmod_mpoly_mul(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+
     Set ``A`` to ``B`` times ``C``.
+    The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
 
 .. function:: void nmod_mpoly_mul_johnson(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` times ``C`` using Johnson's heap-based method.
-
 .. function:: void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` times ``C`` using a heap and multiple threads.
-    This function should only be called once ``global_thread_pool`` has been initialized.
+    Set ``A`` to ``B`` times ``C`` using Johnson's heap-based method.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
+.. function:: int nmod_mpoly_mul_array_threaded(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+
     Try to set ``A`` to ``B`` times ``C`` using arrays.
-    If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
+    If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful, and the return is ``1``.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: int nmod_mpoly_mul_dense(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 

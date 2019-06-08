@@ -76,7 +76,7 @@ int nmod_mpoly_divides_threaded(
     if (B->length == 0)
     {
         flint_throw(FLINT_DIVZERO, "Exception in nmod_mpoly_divides_threaded: "
-                                                   "Cannot Divide by zero.\n");
+                                                   "Cannot divide by zero.\n");
     }
 
     if (1 != n_gcd(B->coeffs[0], ctx->ffinfo->mod.n))

@@ -787,26 +787,28 @@ FLINT_DLL void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
 /* Multiplication ************************************************************/
 
 FLINT_DLL void nmod_mpoly_mul(nmod_mpoly_t A,
-                                  const nmod_mpoly_t B, const nmod_mpoly_t C, 
-                                                   const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL void nmod_mpoly_mul_threaded(nmod_mpoly_t A,
+       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
 FLINT_DLL void nmod_mpoly_mul_johnson(nmod_mpoly_t A,
-                                 const nmod_mpoly_t B, const nmod_mpoly_t C, 
-                                                   const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A,
-                                 const nmod_mpoly_t B, const nmod_mpoly_t C,
-                                                   const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
-FLINT_DLL int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B,
-                             const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL int nmod_mpoly_mul_array(nmod_mpoly_t A,
+       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpoly_mul_array_threaded(nmod_mpoly_t A,
-                              const nmod_mpoly_t B, const nmod_mpoly_t C,
-                                                   const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
-FLINT_DLL int nmod_mpoly_mul_dense(nmod_mpoly_t A, const nmod_mpoly_t B,
-                             const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL int nmod_mpoly_mul_dense(nmod_mpoly_t A,
+       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
                  const mp_limb_t * coeff2, const ulong * exp2, slong len2,
@@ -819,9 +821,9 @@ FLINT_DLL void _nmod_mpoly_mul_johnson_maxfields(nmod_mpoly_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void _nmod_mpoly_mul_heap_threaded_maxfields(nmod_mpoly_t A,
-                                 const nmod_mpoly_t B, fmpz * maxBfields,
-                                 const nmod_mpoly_t C, fmpz * maxCfields,
-                                                   const nmod_mpoly_ctx_t ctx);
+           const nmod_mpoly_t B, fmpz * maxBfields,
+           const nmod_mpoly_t C, fmpz * maxCfields, const nmod_mpoly_ctx_t ctx,
+                        const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL int _nmod_mpoly_mul_array_DEG(nmod_mpoly_t A,
                                  const nmod_mpoly_t B, fmpz * maxBfields,
@@ -834,19 +836,14 @@ FLINT_DLL int _nmod_mpoly_mul_array_LEX(nmod_mpoly_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int _nmod_mpoly_mul_array_threaded_DEG(nmod_mpoly_t A,
-                                 const nmod_mpoly_t B, fmpz * maxBfields,
-                                 const nmod_mpoly_t C, fmpz * maxCfields,
-                                                   const nmod_mpoly_ctx_t ctx);
+           const nmod_mpoly_t B, fmpz * maxBfields,
+           const nmod_mpoly_t C, fmpz * maxCfields, const nmod_mpoly_ctx_t ctx,
+                        const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL int _nmod_mpoly_mul_array_threaded_LEX(nmod_mpoly_t A,
-                                 const nmod_mpoly_t B, fmpz * maxBfields,
-                                 const nmod_mpoly_t C, fmpz * maxCfields,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void _nmod_mpoly_mul_heap_threaded_maxfields(nmod_mpoly_t A,
-                                 const nmod_mpoly_t B, fmpz * maxBfields,
-                                 const nmod_mpoly_t C, fmpz * maxCfields,
-                                                   const nmod_mpoly_ctx_t ctx);
+           const nmod_mpoly_t B, fmpz * maxBfields,
+           const nmod_mpoly_t C, fmpz * maxCfields, const nmod_mpoly_ctx_t ctx,
+                        const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL int _nmod_mpoly_mul_dense(nmod_mpoly_t P,
                                  const nmod_mpoly_t A, fmpz * maxAfields,
