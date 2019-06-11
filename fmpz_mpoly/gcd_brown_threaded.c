@@ -38,7 +38,7 @@ typedef struct
     slong image_count;
     slong required_images;
     thread_pool_handle master_handle;
-    slong num_workers;
+    slong num_handles;
     thread_pool_handle * worker_handles;
 }
 _splitworker_arg_struct;
@@ -111,7 +111,7 @@ static void _splitworker(void * varg)
         FLINT_ASSERT(Ap->length > 0);
         FLINT_ASSERT(Bp->length > 0);
 
-        if (arg->num_workers == 0)
+        if (arg->num_handles == 0)
         {
             success = nmod_mpolyun_gcd_brown_smprime(Gp, Abarp, Bbarp,
                                       Ap, Bp, ctx->minfo->nvars - 1, pctx, Sp);
@@ -120,7 +120,7 @@ static void _splitworker(void * varg)
         {
             success = nmod_mpolyun_gcd_brown_smprime_threaded(Gp, Abarp, Bbarp,
                                            Ap, Bp, ctx->minfo->nvars - 1, pctx,
-                                        arg->worker_handles, arg->num_workers);
+                                        arg->worker_handles, arg->num_handles);
         }
 
         if (!success)
@@ -585,12 +585,12 @@ int fmpz_mpolyu_gcd_brown_threaded(
     fmpz_mpolyu_t B,
     const fmpz_mpoly_ctx_t ctx,
     const thread_pool_handle * handles,
-    slong num_workers)
+    slong num_handles)
 {
     slong i, j, k;
     mp_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
-    slong num_threads = num_workers + 1;
+    slong num_threads = num_handles + 1;
     slong num_master_threads;
     slong num_images;
     int success;
@@ -711,9 +711,9 @@ compute_split:
         FLINT_ASSERT(fmpz_fits_si(fmpq_numref(qvec + i)));
         FLINT_ASSERT(fmpz_fits_si(fmpq_denref(qvec + i)));
         splitargs[i].required_images = fmpz_get_si(fmpq_numref(qvec + i));
-        splitargs[i].num_workers = fmpz_get_si(fmpq_denref(qvec + i)) - 1;
+        splitargs[i].num_handles = fmpz_get_si(fmpq_denref(qvec + i)) - 1;
         FLINT_ASSERT(splitargs[i].required_images > 0);
-        FLINT_ASSERT(splitargs[i].num_workers >= 0);
+        FLINT_ASSERT(splitargs[i].num_handles >= 0);
 
         if (i == 0)
         {
@@ -723,14 +723,14 @@ compute_split:
         {
             splitargs[i].master_handle = handles[k++];
         }
-        FLINT_ASSERT(splitargs[i].num_workers <= num_workers);
-        for (j = 0; j < splitargs[i].num_workers; j++)
+        FLINT_ASSERT(splitargs[i].num_handles <= num_handles);
+        for (j = 0; j < splitargs[i].num_handles; j++)
         {
             splitargs[i].worker_handles[j] = handles[k++];
         }
     }
     /* all handles should have been distributed */
-    FLINT_ASSERT(k == num_workers);
+    FLINT_ASSERT(k == num_handles);
 
     for (i = 1; i < num_master_threads; i++)
     {
@@ -1004,6 +1004,30 @@ cleanup_split:
 }
 
 
+typedef struct
+{
+    fmpz_mpolyu_struct * Pu;
+    const fmpz_mpoly_ctx_struct * uctx;
+    const fmpz_mpoly_struct * P;
+    const fmpz_mpoly_ctx_struct * ctx;
+    const slong * perm;
+    const ulong * shift;
+    const ulong * stride;
+    const thread_pool_handle * handles;
+    slong num_handles;
+}
+_convertu_arg_struct;
+
+typedef _convertu_arg_struct _convertu_arg_t[1];
+
+static void _worker_convertu(void * varg)
+{
+    _convertu_arg_struct * arg = (_convertu_arg_struct *) varg;
+
+    fmpz_mpoly_to_mpolyu_perm_deflate(arg->Pu, arg->uctx, arg->P, arg->ctx,
+           arg->perm, arg->shift, arg->stride, arg->handles, arg->num_handles);
+}
+
 int fmpz_mpoly_gcd_brown_threaded(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -1015,9 +1039,11 @@ int fmpz_mpoly_gcd_brown_threaded(
     slong * perm;
     ulong * shift, * stride;
     slong i;
-    mp_bitcnt_t new_bits;
+    mp_bitcnt_t ABbits;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
+    thread_pool_handle * handles;
+    slong num_handles;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {
@@ -1084,55 +1110,79 @@ int fmpz_mpoly_gcd_brown_threaded(
         goto cleanup1;
     }
 
-    new_bits = FLINT_MAX(A->bits, B->bits);
+    ABbits = FLINT_MAX(A->bits, B->bits);
 
     fmpz_mpoly_ctx_init(uctx, ctx->minfo->nvars - 1, ORD_LEX);
-    fmpz_mpolyu_init(Au, new_bits, uctx);
-    fmpz_mpolyu_init(Bu, new_bits, uctx);
-    fmpz_mpolyu_init(Gu, new_bits, uctx);
-    fmpz_mpolyu_init(Abaru, new_bits, uctx);
-    fmpz_mpolyu_init(Bbaru, new_bits, uctx);
+    fmpz_mpolyu_init(Au, ABbits, uctx);
+    fmpz_mpolyu_init(Bu, ABbits, uctx);
+    fmpz_mpolyu_init(Gu, ABbits, uctx);
+    fmpz_mpolyu_init(Abaru, ABbits, uctx);
+    fmpz_mpolyu_init(Bbaru, ABbits, uctx);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
+    handles = NULL;
+    num_handles = 0;
+    if (global_thread_pool_initialized)
+    {
+        slong max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                               max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                 handles, max_num_handles);
+        }
+    }
+
+    /* convert inputs */
+    if (num_handles > 0)
+    {
+        slong m = mpoly_divide_threads(num_handles, A->length, B->length);
+        _convertu_arg_t arg;
+
+        FLINT_ASSERT(m >= 0);
+        FLINT_ASSERT(m < num_handles);
+
+        arg->Pu = Bu;
+        arg->uctx = uctx;
+        arg->P = B;
+        arg->ctx = ctx;
+        arg->perm = perm;
+        arg->shift = shift;
+        arg->stride = stride;
+        arg->handles = handles + (m + 1);
+        arg->num_handles = num_handles - (m + 1);
+
+        thread_pool_wake(global_thread_pool, handles[m], _worker_convertu, arg);
+
+        fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
+                                          perm, shift, stride, handles + 0, m);
+
+        thread_pool_wait(global_thread_pool, handles[m]);
+    }
+    else
+    {
+        fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
                                                  perm, shift, stride, NULL, 0);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
+        fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
                                                  perm, shift, stride, NULL, 0);
+    }
 
     /* calculate gcd */
+    success = fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu,
+                                               uctx, handles, num_handles);
+
+    for (i = 0; i < num_handles; i++)
     {
-        thread_pool_handle * handles;
-        slong i, max_num_workers, num_workers;
-
-        handles = NULL;
-        num_workers = 0;
-        if (global_thread_pool_initialized)
-        {
-            max_num_workers = thread_pool_get_size(global_thread_pool);
-            max_num_workers = FLINT_MIN(thread_limit - 1, max_num_workers);
-            if (max_num_workers > 0)
-            {
-                handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_workers*sizeof(thread_pool_handle));
-                num_workers = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_workers);
-            }
-        }
-
-        success = fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu,
-                                                   uctx, handles, num_workers);
-
-        for (i = 0; i < num_workers; i++)
-        {
-            thread_pool_give_back(global_thread_pool, handles[i]);
-        }
-
-        if (handles)
-            flint_free(handles);
+        thread_pool_give_back(global_thread_pool, handles[i]);
     }
+
+    if (handles)
+        flint_free(handles);
 
     if (success)
     {
-        fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits, ctx, Gu, uctx,
+        fmpz_mpoly_from_mpolyu_perm_inflate(G, ABbits, ctx, Gu, uctx,
                                                           perm, shift, stride);
         if (fmpz_sgn(G->coeffs + 0) < 0)
             fmpz_mpoly_neg(G, G, ctx);

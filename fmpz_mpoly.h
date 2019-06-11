@@ -896,20 +896,19 @@ fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
 FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A,
-                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL int fmpz_mpoly_gcd(fmpz_mpoly_t G,
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_gcd_threaded(fmpz_mpoly_t G,
-      const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                                                            slong thread_limit);
 
 FLINT_DLL int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
-        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
-                                const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors_sp(
                          fmpz_mpoly_t G, mp_bitcnt_t Gbits,
@@ -918,8 +917,7 @@ FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors_sp(
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors(fmpz_mpoly_t G,
-                                const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride,
                              const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);

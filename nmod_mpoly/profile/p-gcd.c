@@ -16,9 +16,9 @@
 /*
     export LD_LIBRARY_PATH=/tmpbig/schultz/flint2
     likwid-setFrequencies -g performance
-    nano fmpz_mpoly/profile/p-gcd.c
-    make profile MOD=fmpz_mpoly
-    ./build/fmpz_mpoly/profile/p-gcd
+    nano nmod_mpoly/profile/p-gcd.c
+    make profile MOD=nmod_mpoly
+    ./build/nmod_mpoly/profile/p-gcd
 */
 
 slong max_threads;

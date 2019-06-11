@@ -271,7 +271,7 @@ static int _try_zippel(
                                       zinfo->perm, Bmin_exp, Gstride, NULL, 0);
 
     FLINT_ASSERT(Au->bits == ABbits);
-    FLINT_ASSERT(Au->bits == ABbits);
+    FLINT_ASSERT(Bu->bits == ABbits);
     FLINT_ASSERT(Au->length > 1);
     FLINT_ASSERT(Bu->length > 1);
 
@@ -307,7 +307,6 @@ static int _try_zippel(
         goto cleanup;
 
     FLINT_ASSERT(Acontent->bits == ABbits);
-
     fmpz_mpolyu_mul_mpoly(Gu, Gbar, Acontent, uctx);
     fmpz_mpoly_from_mpolyu_perm_inflate(G, Gbits, ctx, Gu, uctx,
                                                  zinfo->perm, Gshift, Gstride);
@@ -583,10 +582,11 @@ static int _try_berlekamp_massey(
     if (!success)
         goto cleanup;
 
-    success = (num_handles == 0)
-           ? fmpz_mpolyuu_gcd_berlekamp_massey(Gbar, Abar, Bbar, Gamma, uctx)
-           : fmpz_mpolyuu_gcd_berlekamp_massey_threaded(Gbar, Abar, Bbar, Gamma,
-                                                   uctx, handles, num_handles);
+    success = (num_handles > 0)
+           ? fmpz_mpolyuu_gcd_berlekamp_massey_threaded(Gbar, Abar, Bbar, Gamma,
+                                                   uctx, handles, num_handles)
+           : fmpz_mpolyuu_gcd_berlekamp_massey(Gbar, Abar, Bbar, Gamma, uctx);
+
     if (!success)
         goto cleanup;
 
@@ -800,10 +800,11 @@ static int _try_brown(
     FLINT_ASSERT(Au->length > 1);
     FLINT_ASSERT(Bu->length > 1);
 
-    success = (0 && num_handles == 0)
-           ? fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx)
-           : fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu, uctx,
-                                                         handles, num_handles);
+    success = (num_handles > 0)
+           ? fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu, uctx,
+                                                         handles, num_handles)
+           : fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx);
+
     if (!success)
         goto cleanup;
 
@@ -1330,10 +1331,11 @@ int fmpz_mpoly_gcd_threaded(
     const fmpz_mpoly_ctx_t ctx,
     slong thread_limit)
 {
-    slong i, max_num_handles, num_handles;
-    thread_pool_handle * handles;
+    slong i;
     mp_bitcnt_t Gbits;
     int success;
+    thread_pool_handle * handles;
+    slong num_handles;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {
@@ -1379,7 +1381,7 @@ int fmpz_mpoly_gcd_threaded(
         num_handles = 0;
         if (global_thread_pool_initialized)
         {
-            max_num_handles = thread_pool_get_size(global_thread_pool);
+            slong max_num_handles = thread_pool_get_size(global_thread_pool);
             max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
             if (max_num_handles > 0)
             {

@@ -523,9 +523,14 @@ create_new:
 
 
 
-void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly_t B,
-               const slong * perm, const ulong * shift, const ulong * stride,
-                       const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_to_mpolyun_perm_deflate_bivar(
+    nmod_mpolyun_t A,
+    const nmod_mpoly_t B,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride,
+    const nmod_mpoly_ctx_t uctx,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong j;
     slong NB, NA;
@@ -552,8 +557,8 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly
         Bexp0 = ((B->exps + NB*j)[Boff0] >> Bshift0) & mask;
         Bexp1 = ((B->exps + NB*j)[Boff1] >> Bshift1) & mask;
 
-        Ac = _nmod_mpolyun_get_coeff(A, stride1 == 1 ? (Bexp1 - shift1)
-                                           : (Bexp1 - shift1) / stride1, uctx);
+        Ac = _nmod_mpolyun_get_coeff(A, stride0 == 1 ? (Bexp0 - shift0)
+                                           : (Bexp0 - shift0) / stride0, uctx);
         FLINT_ASSERT(Ac->bits == A->bits);
 
         if (Ac->length == 0)
@@ -563,8 +568,8 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly
         }
         Ac->length = 1;
 
-        nmod_poly_set_coeff_ui(Ac->coeffs + 0, stride0 == 1 ? (Bexp0 - shift0)
-                                   : (Bexp0 - shift0) / stride0, B->coeffs[j]);
+        nmod_poly_set_coeff_ui(Ac->coeffs + 0, stride1 == 1 ? (Bexp1 - shift1)
+                                   : (Bexp1 - shift1) / stride1, B->coeffs[j]);
 
         mpoly_monomial_zero(Ac->exps + NA*0, NA);
     }
@@ -578,20 +583,24 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(nmod_mpolyun_t A, const nmod_mpoly
 
     operation on each term:
 
-    for 0 <= k <= m
+    for 0 <= k < m + 1
         l = perm[k]
         Aexp[k] = (Bexp[l] - shift[l])/stride[l]
 
-    the variable of index m - 1 in uctx is moved to dense storage in nmod_poly
+    the most significant main variable uses k = 0
+    the coefficients of A use variables k = 1 ... m
+    the variable corresponding to k = m is moved to dense storage.
 */
 void nmod_mpoly_to_mpolyun_perm_deflate(
     nmod_mpolyun_t A,
+    const nmod_mpoly_ctx_t uctx,
     const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
     const slong * perm,
     const ulong * shift,
     const ulong * stride,
-    const nmod_mpoly_ctx_t uctx,
-    const nmod_mpoly_ctx_t ctx)
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong j, k, l;
     slong NA = mpoly_words_per_exp_sp(A->bits, uctx->minfo);
@@ -605,13 +614,12 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
     nmod_poly_struct * Acc;
     TMP_INIT;
 
-    FLINT_ASSERT(m > 0);
-
     A->length = 0;
 
     if (m == 1)
     {
-        nmod_mpoly_to_mpolyun_perm_deflate_bivar(A, B, perm, shift, stride, uctx, ctx);
+        nmod_mpoly_to_mpolyun_perm_deflate_bivar(A, B,
+                                               perm, shift, stride, uctx, ctx);
         return;
     }
 
@@ -619,7 +627,8 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
     {
         nmod_mpolyu_t Au;
         nmod_mpolyu_init(Au, A->bits, uctx);
-        nmod_mpoly_to_mpolyu_perm_deflate(Au, B, perm, shift, stride, uctx, ctx);
+        nmod_mpoly_to_mpolyu_perm_deflate(Au, uctx, B, ctx,
+                                    perm, shift, stride, handles, num_handles);
         nmod_mpolyu_cvtto_mpolyun(A, Au, m - 1, uctx);
         nmod_mpolyu_clear(Au, uctx);
         return;
@@ -639,19 +648,19 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
     for (j = 0; j < B->length; j++)
     {
         mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
-        l = perm[m];
+        l = perm[0];
         Ac = _nmod_mpolyun_get_coeff(A, stride[l] == 1 ? (Bexps[l] - shift[l]) : (Bexps[l] - shift[l]) / stride[l], uctx);
         FLINT_ASSERT(Ac->bits == A->bits);
 
         mpoly_monomial_zero(texp, NA);
-        for (k = 0; k + 1 < m; k++)
+        for (k = 1; k < m; k++)
         {
             l = perm[k];
-            texp[offs[k]] += (stride[l] == 1 ? (Bexps[l] - shift[l]) : (Bexps[l] - shift[l]) / stride[l]) << shifts[k];
+            texp[offs[k - 1]] += (stride[l] == 1 ? (Bexps[l] - shift[l]) : (Bexps[l] - shift[l]) / stride[l]) << shifts[k - 1];
         }
 
         Acc = _nmod_mpolyn_get_coeff(Ac, texp, uctx);
-        l = perm[m - 1];
+        l = perm[m];
         nmod_poly_set_coeff_ui(Acc, stride[l] == 1 ? (Bexps[l] - shift[l]) : (Bexps[l] - shift[l]) / stride[l], B->coeffs[j]);
     }
 
@@ -677,12 +686,12 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
 void nmod_mpoly_from_mpolyun_perm_inflate(
     nmod_mpoly_t A,
     mp_bitcnt_t Abits,
+    const nmod_mpoly_ctx_t ctx,
     const nmod_mpolyun_t B,
+    const nmod_mpoly_ctx_t uctx,
     const slong * perm,
     const ulong * shift,
-    const ulong * stride,
-    const nmod_mpoly_ctx_t uctx,
-    const nmod_mpoly_ctx_t ctx)
+    const ulong * stride)
 {
     slong n = ctx->minfo->nvars;
     slong m = uctx->minfo->nvars;
@@ -710,10 +719,10 @@ void nmod_mpoly_from_mpolyun_perm_inflate(
 
     tAexp = (ulong *) TMP_ALLOC(NA*sizeof(ulong));
     tAgexp = (ulong *) TMP_ALLOC(NA*sizeof(ulong));
-    mpoly_gen_monomial_sp(tAgexp, perm[m - 1], Abits, ctx->minfo);
+    mpoly_gen_monomial_sp(tAgexp, perm[m], Abits, ctx->minfo);
     for (i = 0; i < NA; i++)
     {
-        tAgexp[i] *= stride[perm[m - 1]];
+        tAgexp[i] *= stride[perm[m]];
     }
 
     nmod_mpoly_fit_bits(A, Abits, ctx);
@@ -730,14 +739,14 @@ void nmod_mpoly_from_mpolyun_perm_inflate(
 
         for (j = 0; j < Bc->length; j++)
         {
-            mpoly_get_monomial_ui(uexps, Bc->exps + NB*j, Bc->bits, uctx->minfo);
-            uexps[m] = B->exps[i];
-            FLINT_ASSERT(uexps[m - 1] == 0);
+            mpoly_get_monomial_ui(uexps + 1, Bc->exps + NB*j, Bc->bits, uctx->minfo);
+            uexps[0] = B->exps[i];
+            FLINT_ASSERT(uexps[m] == 0);
             for (l = 0; l < n; l++)
             {
                 Aexps[l] = shift[l];
             }
-            for (k = 0; k <= m; k++)
+            for (k = 0; k < m + 1; k++)
             {
                 l = perm[k];
                 Aexps[l] += stride[l]*uexps[k];
@@ -745,7 +754,7 @@ void nmod_mpoly_from_mpolyun_perm_inflate(
 
             mpoly_set_monomial_ui(tAexp, Aexps, Abits, ctx->minfo);
 
-            l = perm[m - 1];
+            l = perm[m];
             h = (Bc->coeffs + j)->length;
             _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + h, NA);
             for (h--; h >= 0; h--)
@@ -761,14 +770,13 @@ void nmod_mpoly_from_mpolyun_perm_inflate(
             }
         }
     }
-
-    TMP_END;
-
     A->coeffs = Acoeff;
     A->exps = Aexp;
     A->alloc = Aalloc;
     _nmod_mpoly_set_length(A, Alen, ctx);
+
     nmod_mpoly_sort_terms(A, ctx);
+    TMP_END;
 }
 
 

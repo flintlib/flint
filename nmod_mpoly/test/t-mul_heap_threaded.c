@@ -18,6 +18,9 @@ main(void)
 {
     int i, j, result, max_threads = 5;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 1;
+#endif
 
     flint_printf("mul_heap_threaded....");
     fflush(stdout);

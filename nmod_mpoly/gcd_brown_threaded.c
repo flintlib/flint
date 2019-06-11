@@ -766,8 +766,8 @@ static void _final_join(
 
 /*
     Do same as nmod_mpolyun_gcd_brown_smprime but use the threads in
-        handles[0], ..., handles[num_workers - 1]
-    num_workers is allowed to be zero.
+        handles[0], ..., handles[num_handles - 1]
+    num_handles is allowed to be zero.
 */
 int nmod_mpolyun_gcd_brown_smprime_threaded(
     nmod_mpolyun_t G,
@@ -778,7 +778,7 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     slong var,
     const nmod_mpoly_ctx_t ctx,
     const thread_pool_handle * handles,
-    slong num_workers)
+    slong num_handles)
 {
     slong i;
     mp_bitcnt_t bits = A->bits;
@@ -829,7 +829,7 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
         goto cleanup;
     }
 
-    num_threads = num_workers + 1;
+    num_threads = num_handles + 1;
     gptrs = (nmod_mpolyun_struct **) flint_malloc(
                                     num_threads*sizeof(nmod_mpolyun_struct *));
     abarptrs = (nmod_mpolyun_struct **) flint_malloc(
@@ -1061,24 +1061,27 @@ cleanup:
 
 typedef struct
 {
-    nmod_mpolyun_struct * output;
-    const nmod_mpoly_struct * input;
+    nmod_mpolyun_struct * Pn;
+    const nmod_mpoly_ctx_struct * uctx;
+    const nmod_mpoly_struct * P;
+    const nmod_mpoly_ctx_struct * ctx;
     const slong * perm;
     const ulong * shift;
     const ulong * stride;
-    const nmod_mpoly_ctx_struct * uctx;
-    const nmod_mpoly_ctx_struct * ctx;
+    const thread_pool_handle * handles;
+    slong num_handles;
 }
-_convertworker_arg_struct;
+_convertn_arg_struct;
 
-typedef _convertworker_arg_struct _convertworker_arg_t[1];
+typedef _convertn_arg_struct _convertn_arg_t[1];
 
-static void _convertworker(void * varg)
+static void _worker_convertn(void * varg)
 {
-    _convertworker_arg_struct * arg = (_convertworker_arg_struct *) varg;
+    _convertn_arg_struct * arg = (_convertn_arg_struct *) varg;
 
-    nmod_mpoly_to_mpolyun_perm_deflate(arg->output, arg->input,
-                      arg->perm, arg->shift, arg->stride, arg->uctx, arg->ctx);
+    nmod_mpoly_to_mpolyun_perm_deflate(arg->Pn, arg->uctx,
+                    arg->P, arg->ctx, arg->perm, arg->shift, arg->stride,
+                                               arg->handles, arg->num_handles);
 }
 
 
@@ -1093,9 +1096,11 @@ int nmod_mpoly_gcd_brown_threaded(
     slong * perm;
     ulong * shift, * stride;
     slong i;
-    mp_bitcnt_t new_bits;
+    mp_bitcnt_t ABbits;
     nmod_mpoly_ctx_t uctx;
     nmod_mpolyun_t An, Bn, Gn, Abarn, Bbarn;
+    thread_pool_handle * handles;
+    slong num_handles;
 
     if (nmod_mpoly_is_zero(A, ctx))
     {
@@ -1126,7 +1131,7 @@ int nmod_mpoly_gcd_brown_threaded(
     stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
-        perm[i] = i + 1 < ctx->minfo->nvars ? i + 1 : 0;
+        perm[i] = i;
         shift[i] = 0;
         stride[i] = 1;
     }
@@ -1154,94 +1159,91 @@ int nmod_mpoly_gcd_brown_threaded(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-    new_bits = FLINT_MAX(A->bits, B->bits);
+    ABbits = FLINT_MAX(A->bits, B->bits);
 
     nmod_mpoly_ctx_init(uctx, ctx->minfo->nvars - 1, ORD_LEX, ctx->ffinfo->mod.n);
-    nmod_mpolyun_init(An, new_bits, uctx);
-    nmod_mpolyun_init(Bn, new_bits, uctx);
-    nmod_mpolyun_init(Gn, new_bits, uctx);
-    nmod_mpolyun_init(Abarn, new_bits, uctx);
-    nmod_mpolyun_init(Bbarn, new_bits, uctx);
+    nmod_mpolyun_init(An, ABbits, uctx);
+    nmod_mpolyun_init(Bn, ABbits, uctx);
+    nmod_mpolyun_init(Gn, ABbits, uctx);
+    nmod_mpolyun_init(Abarn, ABbits, uctx);
+    nmod_mpolyun_init(Bbarn, ABbits, uctx);
+
+    handles = NULL;
+    num_handles = 0;
+    if (global_thread_pool_initialized)
+    {
+        slong max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                               max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                 handles, max_num_handles);
+        }
+    }
 
     /* convert inputs */
+    if (num_handles > 0)
     {
-        _convertworker_arg_t convertargs;
-        thread_pool_handle handles[8];
+        slong m = mpoly_divide_threads(num_handles, A->length, B->length);
+        _convertn_arg_t arg;
 
-        if (global_thread_pool_initialized
-            && thread_limit > 1
-            && thread_pool_request(global_thread_pool, handles, 1) > 0)
-        {
-            convertargs->output = An;
-            convertargs->input = A;
-            convertargs->perm = perm;
-            convertargs->shift = shift;
-            convertargs->stride = stride;
-            convertargs->uctx = uctx;
-            convertargs->ctx = ctx;
-            thread_pool_wake(global_thread_pool, handles[0],
-                                                 _convertworker, &convertargs);
-            nmod_mpoly_to_mpolyun_perm_deflate(Bn,
-                                            B, perm, shift, stride, uctx, ctx);
-            thread_pool_wait(global_thread_pool, handles[0]);
-            thread_pool_give_back(global_thread_pool, handles[0]);
-        }
-        else
-        {
-            nmod_mpoly_to_mpolyun_perm_deflate(An,
-                                            A, perm, shift, stride, uctx, ctx);
-            nmod_mpoly_to_mpolyun_perm_deflate(Bn,
-                                            B, perm, shift, stride, uctx, ctx);
-        }
+        FLINT_ASSERT(m >= 0);
+        FLINT_ASSERT(m < num_handles);
+
+        arg->Pn = Bn;
+        arg->uctx = uctx;
+        arg->P = B;
+        arg->ctx = ctx;
+        arg->perm = perm;
+        arg->shift = shift;
+        arg->stride = stride;
+        arg->handles = handles + (m + 1);
+        arg->num_handles = num_handles - (m + 1);
+
+        thread_pool_wake(global_thread_pool, handles[m], _worker_convertn, arg);
+
+        nmod_mpoly_to_mpolyun_perm_deflate(An, uctx, A, ctx,
+                                          perm, shift, stride, handles + 0, m);
+
+        thread_pool_wait(global_thread_pool, handles[m]);
+    }
+    else
+    {
+        nmod_mpoly_to_mpolyun_perm_deflate(An, uctx,
+                                         A, ctx, perm, shift, stride, NULL, 0);
+        nmod_mpoly_to_mpolyun_perm_deflate(Bn, uctx,
+                                         B, ctx, perm, shift, stride, NULL, 0);
     }
 
     /* calculate gcd */
-    {
-        thread_pool_handle * handles;
-        slong i, max_num_workers, num_workers;
-
-        handles = NULL;
-        num_workers = 0;
-        if (global_thread_pool_initialized)
-        {
-            max_num_workers = thread_pool_get_size(global_thread_pool);
-            max_num_workers = FLINT_MIN(thread_limit - 1, max_num_workers);
-            if (max_num_workers > 0)
-            {
-                handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_workers*sizeof(thread_pool_handle));
-                num_workers = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_workers);
-            }
-        }
-
-        success = nmod_mpolyun_gcd_brown_smprime_threaded(
+    success = nmod_mpolyun_gcd_brown_smprime_threaded(
                           Gn, Abarn, Bbarn, An, Bn,
-                          uctx->minfo->nvars - 1, uctx, handles, num_workers);
+                          uctx->minfo->nvars - 1, uctx, handles, num_handles);
 
-        for (i = 0; i < num_workers; i++)
-        {
-            thread_pool_give_back(global_thread_pool, handles[i]);
-        }
-
-        if (handles)
-            flint_free(handles);
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
     }
+
+    if (handles)
+        flint_free(handles);
 
     if (!success)
     {
-        nmod_mpoly_to_mpolyun_perm_deflate(An, A,
-                                               perm, shift, stride, uctx, ctx);
-        nmod_mpoly_to_mpolyun_perm_deflate(Bn, B,
-                                               perm, shift, stride, uctx, ctx);
+        nmod_mpoly_to_mpolyun_perm_deflate(An, uctx, A, ctx,
+                                                 perm, shift, stride, NULL, 0);
+        nmod_mpoly_to_mpolyun_perm_deflate(Bn, uctx, B, ctx,
+                                                 perm, shift, stride, NULL, 0);
         success = nmod_mpolyun_gcd_brown_lgprime(Gn, Abarn, Bbarn,
                                          An, Bn, uctx->minfo->nvars - 1, uctx);
     }
 
     if (success)
     {
-        nmod_mpoly_from_mpolyun_perm_inflate(G, new_bits,
-                                           Gn, perm, shift, stride, uctx, ctx);
+        nmod_mpoly_from_mpolyun_perm_inflate(G, ABbits, ctx,
+                                                Gn, uctx, perm, shift, stride);
         nmod_mpoly_make_monic(G, G, ctx);
     }
 
