@@ -1091,14 +1091,6 @@ FLINT_DLL void fmpz_mpolyu_one(fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx);
 FLINT_DLL void fmpz_mpolyu_set(fmpz_mpolyu_t A, const fmpz_mpolyu_t B,
                                                   const fmpz_mpoly_ctx_t uctx);
 
-FLINT_DLL void fmpz_mpoly_to_mpolyu_perm(fmpz_mpolyu_t A,
-                                      const fmpz_mpoly_t B, const slong * perm,
-                      const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_from_mpolyu_perm(fmpz_mpoly_t A,
-                       const fmpz_mpolyu_t B, int keepbits, const slong * perm,
-                      const fmpz_mpoly_ctx_t uctx, const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL void fmpz_mpoly_to_mpolyu_perm_deflate(
                                 fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx,
                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
@@ -1113,7 +1105,7 @@ FLINT_DLL void fmpz_mpoly_from_mpolyu_perm_inflate(
 FLINT_DLL void fmpz_mpoly_to_mpolyuu_perm_deflate(
                                 fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx,
                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
-                const slong * perm, const ulong * shift, const ulong * stride,
+                const slong * perm, const ulong * shift, const ulong * stride, const ulong * maxexps,
                         const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void fmpz_mpoly_from_mpolyuu_perm_inflate(

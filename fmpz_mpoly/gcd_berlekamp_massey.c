@@ -3808,9 +3808,9 @@ int fmpz_mpoly_gcd_berlekamp_massey(
     Gbits = FLINT_MIN(A->bits, B->bits);
 
     fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
     fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
 
     /* remove content from A and B */
     success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);

@@ -164,13 +164,13 @@ int main(int argc, char *argv[])
     for (i = 0; i < max_threads; i++)
         cpu_affinities[i] = i;
 
-    step = FLINT_MIN(max_threads, 4 + max_threads/2);
-    step = FLINT_MAX(step, WORD(4));
+    step = FLINT_MIN(max_threads, 2 + max_threads/7);
+    step = FLINT_MAX(step, WORD(3));
 
-    for (m = 0 + 1*step; m <= 0 + 2*step; m += step)
+    for (m = 0 + 1*step; m <= 0 + 1*step; m += step)
     for (n = 0 + 1*step; n <= 0 + 1*step; n += step)
-    for (k = 1 + 0*step; k <= 1 + 1*step; k += step)
-    for (l = 1 + 0*step; l <= 1 + 1*step; l += step)
+    for (k = 2 + 0*step; k <= 2 + 1*step; k += step)
+    for (l = 2 + 0*step; l <= 2 + 1*step; l += step)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, t, A, B, G;

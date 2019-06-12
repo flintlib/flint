@@ -348,7 +348,7 @@ typedef struct
     fmpz_mpoly_struct * Pcontent;
     fmpz_mpolyu_struct * Puu, * Pbar;
     const slong * perm;
-    const ulong * shift, * stride;
+    const ulong * shift, * stride, * maxexps;
     const fmpz_mpoly_ctx_struct * ctx;
     const fmpz_mpoly_ctx_struct * uctx;
     const thread_pool_handle * handles;
@@ -364,7 +364,8 @@ static void _worker_convertuu(void * varg)
     _convertuu_arg_struct * arg = (_convertuu_arg_struct *) varg;
 
     fmpz_mpoly_to_mpolyuu_perm_deflate(arg->Puu, arg->uctx, arg->P, arg->ctx,
-           arg->perm, arg->shift, arg->stride, arg->handles, arg->num_handles);
+                             arg->perm, arg->shift, arg->stride, arg->maxexps,
+                                               arg->handles, arg->num_handles);
 
     arg->success = fmpz_mpolyu_content_mpoly(arg->Pcontent, arg->Puu,
                                                            arg->uctx, NULL, 0);
@@ -484,8 +485,7 @@ static int _try_berlekamp_massey(
             j = perm[i];
             new_count = FLINT_MIN(Amax_exp_count[j], Bmax_exp_count[j]);
             new_deg = FLINT_MAX(Addeg[j], Bddeg[j]);
-
-            if (new_deg + new_count/2 < deg + count/2)
+            if (new_deg + new_count/256 < deg + count/256)
             {
                 count = new_count;
                 deg = new_deg;
@@ -532,13 +532,14 @@ static int _try_berlekamp_massey(
         arg->perm = perm;
         arg->shift = Bmin_exp;
         arg->stride = Gstride;
+        arg->maxexps = Bmax_exp;
         arg->handles = handles + (m + 1);
         arg->num_handles = num_handles - (m + 1);
 
         thread_pool_wake(global_thread_pool, handles[m], _worker_convertuu, arg);
 
         fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
-                                      perm, Amin_exp, Gstride, handles + 0, m);
+                            perm, Amin_exp, Gstride, Amax_exp, handles + 0, m);
         success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, handles + 0, m);
         if (success)
         {
@@ -554,9 +555,9 @@ static int _try_berlekamp_massey(
     else
     {
         fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
-                                             perm, Amin_exp, Gstride, NULL, 0);
+                                   perm, Amin_exp, Gstride, Amax_exp, NULL, 0);
         fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
-                                             perm, Bmin_exp, Gstride, NULL, 0);
+                                   perm, Bmin_exp, Gstride, Bmax_exp, NULL, 0);
 
         success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);
         success = success
@@ -587,6 +588,7 @@ static int _try_berlekamp_massey(
                                                    uctx, handles, num_handles)
            : fmpz_mpolyuu_gcd_berlekamp_massey(Gbar, Abar, Bbar, Gamma, uctx);
 
+
     if (!success)
         goto cleanup;
 
@@ -600,6 +602,7 @@ static int _try_berlekamp_massey(
 
     fmpz_mpoly_from_mpolyuu_perm_inflate(G, Gbits, ctx, Guu, uctx,
                                                         perm, Gshift, Gstride);
+
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
 

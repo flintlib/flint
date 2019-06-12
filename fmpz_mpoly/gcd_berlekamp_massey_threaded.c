@@ -875,14 +875,79 @@ cleanup:
     Reduce the berlekamp_massey coefficients of Lambda and try to convert
     them to a fmpz_mpolyu (in w->H)
 */
-static void _worker_reduce_get_sp(void * varg)
+static void _worker_reduce_sp(void * varg)
+{
+    _eval_sp_worker_arg_struct * arg = (_eval_sp_worker_arg_struct *) varg;
+    _base_struct * w = arg->w;
+    nmod_berlekamp_massey_struct * Lcoeffs = w->Lambda_sp->coeffs;
+    slong length = w->Lambda_sp->length;
+    int changed;
+    slong i;
+
+get_next_index:
+
+    pthread_mutex_lock(&w->mutex);
+    i = w->index;
+    w->index++;
+    pthread_mutex_unlock(&w->mutex);
+
+    if (i >= length)
+        goto cleanup;
+
+    changed = nmod_berlekamp_massey_reduce(Lcoeffs + i);
+    if (changed)
+    {
+        w->changed = 1; /* safe - only goes from 0 to 1 */
+    }
+
+    goto get_next_index;
+
+cleanup:
+
+    return;
+}
+
+static void _worker_reduce_mp(void * varg)
+{
+    _eval_mp_worker_arg_struct * arg = (_eval_mp_worker_arg_struct *) varg;
+    _base_struct * w = arg->w;
+    fmpz_mod_berlekamp_massey_struct * Lcoeffs = w->Lambda_mp->coeffs;
+    slong length = w->Lambda_mp->length;
+    int changed;
+    slong i;
+
+get_next_index:
+
+    pthread_mutex_lock(&w->mutex);
+    i = w->index;
+    w->index++;
+    pthread_mutex_unlock(&w->mutex);
+
+    if (i >= length)
+        goto cleanup;
+
+    changed = fmpz_mod_berlekamp_massey_reduce(Lcoeffs + i);
+    if (changed)
+    {
+        w->changed = 1; /* safe - only goes from 0 to 1 */
+    }
+
+    goto get_next_index;
+
+cleanup:
+
+    return;
+}
+
+
+static void _worker_get_mpoly_sp(void * varg)
 {
     _eval_sp_worker_arg_struct * arg = (_eval_sp_worker_arg_struct *) varg;
     _base_struct * w = arg->w;
     nmod_berlekamp_massey_struct * Lcoeffs = w->Lambda_sp->coeffs;
     fmpz_mpoly_struct * Hcoeffs = w->H->coeffs;
     slong length = w->H->length;
-    int changed, success;
+    int success;
     slong i;
 
     FLINT_ASSERT(length == w->Lambda_sp->length);
@@ -899,19 +964,14 @@ get_next_index:
         goto cleanup;
 
     w->H->exps[i] = w->Lambda_sp->exps[i];
-    changed = nmod_berlekamp_massey_reduce(Lcoeffs + i);
-    if (changed)
-    {
-        w->changed = 1; /* safe - only goes from 0 to 1 */
-    }
-    else if (!w->changed && !w->failed)
+    if (!w->failed)
     {
         success = nmod_mpoly_bma_get_fmpz_mpoly(Hcoeffs + i, w->ctx,
-             w->alphashift, Lcoeffs + i, w->Ictx, w->ctx_sp->ffinfo);
+                       w->alphashift, Lcoeffs + i, w->Ictx, w->ctx_sp->ffinfo);
 
         if (!success || (w->H->coeffs + i)->length == 0)
         {
-            w->failed = 1;
+            w->failed = 1; /* safe only goes from 0 to 1 */
         }
     }
 
@@ -922,14 +982,15 @@ cleanup:
     return;
 }
 
-static void _worker_reduce_get_mp(void * varg)
+
+static void _worker_get_mpoly_mp(void * varg)
 {
     _eval_mp_worker_arg_struct * arg = (_eval_mp_worker_arg_struct *) varg;
     _base_struct * w = arg->w;
     fmpz_mod_berlekamp_massey_struct * Lcoeffs = w->Lambda_mp->coeffs;
     fmpz_mpoly_struct * Hcoeffs = w->H->coeffs;
     slong length = w->H->length;
-    int changed, success;
+    int success;
     slong i;
 
     FLINT_ASSERT(length == w->Lambda_mp->length);
@@ -946,12 +1007,7 @@ get_next_index:
         goto cleanup;
 
     w->H->exps[i] = w->Lambda_mp->exps[i];
-    changed = fmpz_mod_berlekamp_massey_reduce(Lcoeffs + i);
-    if (changed)
-    {
-        w->changed = 1; /* safe - only goes from 0 to 1 */
-    }
-    else if (!w->changed && !w->failed)
+    if (!w->failed)
     {
         success = fmpz_mod_bma_get_fmpz_mpoly(Hcoeffs + i, w->alphashift_mp,
                                        Lcoeffs + i, w->Ictx, w->ctx, w->fpctx);
@@ -968,6 +1024,9 @@ cleanup:
 
     return;
 }
+
+
+
 
 
 /*
@@ -1147,8 +1206,9 @@ next_bma_image_sp:
            ? w->bma_target_count - w->Lambda_sp->pointcount
            : w->num_threads;
     j = FLINT_MAX(j, WORD(2)); /* updating with 1 point is not interesting */
-    j += w->num_threads - 1;
-    j /= w->num_threads;
+    j = (j + w->num_threads - 1)/w->num_threads;
+    j = FLINT_MAX(j, WORD(2));
+    j = FLINT_MIN(j, WORD(20));
     j *= w->num_threads;
     _base_set_num_images_sp(w, j);
 
@@ -1245,33 +1305,48 @@ next_bma_image_sp:
                                                             w->ctx_sp->ffinfo);
     }
 
-    if (w->Gamma->length > w->Lambda_sp->pointcount/2)
+    if (w->Gamma->length > w->Lambda_sp->pointcount/2
+        || w->bma_target_count > w->Lambda_sp->pointcount)
     {
         goto next_bma_image_sp;
     }
 
-    /* reduce and get_fmpz_mpolyu */
-    FLINT_ASSERT(cur_alpha_pow_sp >= w->Lambda_sp->pointcount);
+    /* reduce */
     w->changed = 0;
+    w->index = 0;
+    for (i = 1; i < w->num_threads; i++)
+    {
+        thread_pool_wake(global_thread_pool, handles[i - 1],
+                                              _worker_reduce_sp, &args[i]);
+    }
+    _worker_reduce_sp(&args[0]);
+    for (i = 1; i < w->num_threads; i++)
+    {
+        thread_pool_wait(global_thread_pool, handles[i - 1]);
+    }
+    if (w->changed)
+    {
+        goto next_bma_image_sp;
+    }
+
+    /* get fmpz_mpolyu */
+    FLINT_ASSERT(cur_alpha_pow_sp >= w->Lambda_sp->pointcount);
     w->index = 0;
     w->failed = 0;
     w->alphashift = cur_alpha_pow_sp - w->Lambda_sp->pointcount + 1;
     fmpz_mpolyu_fit_length(w->H, w->Lambda_sp->length, w->ctx);
     w->H->length = w->Lambda_sp->length;
-
     for (i = 1; i < w->num_threads; i++)
     {
         thread_pool_wake(global_thread_pool, handles[i - 1],
-                                              _worker_reduce_get_sp, &args[i]);
+                                              _worker_get_mpoly_sp, &args[i]);
     }
-    _worker_reduce_get_sp(&args[0]);
+    _worker_get_mpoly_sp(&args[0]);
     for (i = 1; i < w->num_threads; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i - 1]);
     }
-
-    if (w->changed || w->failed
-        || (w->H->coeffs + 0)->length != w->Gamma->length)
+    if (w->failed || (w->H->coeffs + 0)->length != w->Gamma->length)
     {
         goto next_bma_image_sp;
     }
@@ -1430,8 +1505,9 @@ next_bma_image_mp:
            ? w->bma_target_count - w->Lambda_mp->pointcount
            : w->num_threads;
     j = FLINT_MAX(j, WORD(2)); /* updating with 1 point is not interesting */
-    j += w->num_threads - 1;
-    j /= w->num_threads;
+    j = (j + w->num_threads - 1)/w->num_threads;
+    j = FLINT_MAX(j, WORD(2));
+    j = FLINT_MIN(j, WORD(20));
     j *= w->num_threads;
     _base_set_num_images_mp(w, j);
 
@@ -1524,13 +1600,32 @@ next_bma_image_mp:
                                                              w->ctx, w->fpctx);
     }
 
-    if (w->Gamma->length > w->Lambda_mp->pointcount/2)
+    if (w->Gamma->length > w->Lambda_mp->pointcount/2
+        || w->bma_target_count > w->Lambda_mp->pointcount)
     {
         goto next_bma_image_mp;
     }
 
-    /* reduce and get_fmpz_mpolyu */
+    /* reduce */
     w->changed = 0;
+    w->index = 0;
+    for (i = 1; i < w->num_threads; i++)
+    {
+        thread_pool_wake(global_thread_pool, handles[i - 1],
+                                              _worker_reduce_mp, &args[i]);
+    }
+    _worker_reduce_mp(&args[0]);
+    for (i = 1; i < w->num_threads; i++)
+    {
+        thread_pool_wait(global_thread_pool, handles[i - 1]);
+    }
+
+    if (w->changed)
+    {
+        goto next_bma_image_mp;
+    }
+
+    /* get fmpz_mpolyu */
     w->index = 0;
     w->failed = 0;
     fmpz_sub_ui(w->alphashift_mp, cur_alpha_pow_mp, w->Lambda_mp->pointcount);
@@ -1538,20 +1633,18 @@ next_bma_image_mp:
     fmpz_add_ui(w->alphashift_mp, w->alphashift_mp, 1);
     fmpz_mpolyu_fit_length(w->H, w->Lambda_mp->length, w->ctx);
     w->H->length = w->Lambda_mp->length;
-
     for (i = 1; i < w->num_threads; i++)
     {
         thread_pool_wake(global_thread_pool, handles[i - 1],
-                                              _worker_reduce_get_mp, &args[i]);
+                                              _worker_get_mpoly_mp, &args[i]);
     }
-    _worker_reduce_get_mp(&args[0]);
+    _worker_get_mpoly_mp(&args[0]);
     for (i = 1; i < w->num_threads; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i - 1]);
     }
 
-    if (w->changed || w->failed
-        || (w->H->coeffs + 0)->length != w->Gamma->length)
+    if (w->failed || (w->H->coeffs + 0)->length != w->Gamma->length)
     {
         goto next_bma_image_mp;
     }
@@ -1970,15 +2063,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     }
 
     /* find a image_count before which we do not try to reduce */
-    {
-        ulong Amax_len, Bmax_len;
-        w->bma_target_count = 1;
-        Amax_len = fmpz_mpolyu_max_coeff_length(A);
-        w->bma_target_count += Amax_len >> ((FLINT_BIT_COUNT(Amax_len))/2); 
-        Bmax_len = fmpz_mpolyu_max_coeff_length(B);
-        w->bma_target_count += Bmax_len >> ((FLINT_BIT_COUNT(Bmax_len))/2);
-        w->bma_target_count = FLINT_MAX(w->bma_target_count, 2*Gamma->length);
-    }
+    w->bma_target_count = FLINT_MAX(w->num_threads, 2*Gamma->length);
 
     /* initial choices for the ksub degrees are the strict degree bounds on H */
     for (i = 0; i < ctx->minfo->nvars; i++)
@@ -2599,9 +2684,9 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     Gbits = FLINT_MIN(A->bits, B->bits);
 
     fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
     fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
 
     /* remove content from A and B */
     success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);

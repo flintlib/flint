@@ -88,9 +88,9 @@ void bivar_divides_check(
     }
 
     fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uuctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
     fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uuctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
 
     uudivides = fmpz_mpolyuu_divides(Quu, Auu, Buu, 2, uuctx);
     divides = fmpz_mpoly_divides(Q, A, B, ctx);

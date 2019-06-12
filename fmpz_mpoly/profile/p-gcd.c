@@ -81,7 +81,6 @@ void profile_gcd(
         flint_set_thread_affinity(cpu_affinities, num_threads);
 
         /* find machine efficiency */
-
         handles = (thread_pool_handle *) flint_malloc((num_threads - 1)*sizeof(thread_pool_handle));
         num_workers = thread_pool_request(global_thread_pool, handles, num_threads - 1);
         worker_args = (worker_arg_struct *) flint_malloc((num_workers + 1)*sizeof(worker_arg_t));
@@ -167,7 +166,88 @@ int main(int argc, char *argv[])
     step = FLINT_MIN(max_threads, 4 + max_threads/2);
     step = FLINT_MAX(step, WORD(4));
 
-    for (m = 32 + 1*step; m <= 32 + 2*step; m += step)
+    for (m = 2; m <= 2; m += step)
+    for (n = 2; n <= 2; n += step)
+    for (k = 2; k <= 2; k += step)
+    for (l = 3; l <= 3; l += step)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, t, A, B, G;
+        const char * vars[] = {"x", "y", "z", "t", "u", "v", "w"};
+
+        fmpz_mpoly_ctx_init(ctx, 7, ORD_LEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(t, ctx);
+        fmpz_mpoly_init(A, ctx);
+        fmpz_mpoly_init(B, ctx);
+        fmpz_mpoly_init(G, ctx);
+
+        fmpz_mpoly_set_str_pretty(a, "1+x^1+y^2+z^3+t^4+u^5+v^6+w^7", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "1+w^1+v^2+u^3+t^4+z^5+y^6+x^7", vars, ctx);
+        fmpz_mpoly_pow_ui(A, a, m + k, ctx);
+        fmpz_mpoly_pow_ui(t, b, n, ctx);
+        fmpz_mpoly_mul(A, A, t, ctx);
+        fmpz_mpoly_pow_ui(B, a, m, ctx);
+        fmpz_mpoly_pow_ui(t, b, n + l, ctx);
+        fmpz_mpoly_mul(B, B, t, ctx);
+        fmpz_mpoly_pow_ui(G, a, m, ctx);
+        fmpz_mpoly_pow_ui(t, b, n, ctx);
+        fmpz_mpoly_mul(G, G, t, ctx);
+
+        profile_gcd(G, A, B, ctx, "sparse gcd", m + k, n, m, n + l);
+
+        fmpz_mpoly_clear(G, ctx);
+        fmpz_mpoly_clear(B, ctx);
+        fmpz_mpoly_clear(A, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t A, B, G;
+        flint_rand_t state;
+        ulong bounds[4] = {10, 10, 70, 70};
+
+        flint_randinit(state);
+
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
+        fmpz_mpoly_init(A, ctx);
+        fmpz_mpoly_init(B, ctx);
+        fmpz_mpoly_init(G, ctx);
+
+        fmpz_mpoly_randtest_bounds(G, state, 1000, 10, bounds, ctx);
+        fmpz_mpoly_randtest_bounds(A, state, 1000, 10, bounds, ctx);
+        fmpz_mpoly_randtest_bounds(B, state, 1000, 10, bounds, ctx);
+
+        bounds[0] = 11;
+        bounds[1] = 11;
+        bounds[2] = 0;
+        bounds[3] = 0;
+        fmpz_mpoly_set_coeff_ui_ui(G, 1, bounds, ctx);
+        fmpz_mpoly_set_coeff_ui_ui(A, 1, bounds, ctx);
+        fmpz_mpoly_set_coeff_ui_ui(B, 1, bounds, ctx);
+
+        fmpz_mpoly_mul(A, A, G, ctx);
+        fmpz_mpoly_mul(B, B, G, ctx);
+
+        if (fmpz_sgn(G->coeffs + 0) < 0)
+            fmpz_mpoly_neg(G, G, ctx);
+
+        profile_gcd(G, A, B, ctx, "sparse random gcd", 0, 0, 0, 0);
+
+        fmpz_mpoly_clear(G, ctx);
+        fmpz_mpoly_clear(B, ctx);
+        fmpz_mpoly_clear(A, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+
+        flint_randclear(state);
+    }
+
+    for (m = 32 + 1*step; m <= 32 + 1*step; m += step)
     for (n = 30 + 1*step; n <= 30 + 1*step; n += step)
     for (k = 12 + 0*step; k <= 12 + 1*step; k += step)
     for (l = 12 + 0*step; l <= 12 + 1*step; l += step)
