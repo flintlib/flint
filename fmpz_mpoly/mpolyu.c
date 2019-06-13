@@ -310,6 +310,122 @@ cleanup:
 }
 
 
+
+typedef struct
+{
+    fmpz_mpoly_t poly;
+    slong threadidx;
+}
+_arrayconvertu_base_elem_struct;
+
+
+typedef struct
+{
+    const fmpz_mpoly_ctx_struct * ctx, * uctx;
+    slong degbx;
+    const slong * perm;
+    const ulong * shift, * stride;
+    mp_bitcnt_t Abits;
+    const fmpz_mpoly_struct * B;
+    _arrayconvertu_base_elem_struct * array;
+    slong nthreads;
+}
+_arrayconvertu_base_struct;
+
+typedef _arrayconvertu_base_struct _arrayconvertu_base_t[1];
+
+
+typedef struct
+{
+    slong idx;
+    _arrayconvertu_base_struct * base;
+}
+_arrayconvertu_worker_arg_struct;
+
+
+void _arrayconvertu_worker(void * varg)
+{
+    _arrayconvertu_worker_arg_struct * arg = (_arrayconvertu_worker_arg_struct *) varg;
+    _arrayconvertu_base_struct * base = arg->base;
+    const fmpz_mpoly_ctx_struct * uctx = base->uctx;
+    const fmpz_mpoly_ctx_struct * ctx = base->ctx;
+    const slong * perm = base->perm;
+    const ulong * shift = base->shift;
+    const ulong * stride = base->stride;
+    const ulong shiftx  = shift[perm[0]];
+    const ulong stridex = stride[perm[0]];
+    const fmpz_mpoly_struct * B = base->B;
+    ulong mask = (-UWORD(1)) >> (FLINT_BITS - B->bits);
+    slong xoffset, xshift;
+    slong j, k, l, arrayidx;
+    slong n = ctx->minfo->nvars;
+    slong m = uctx->minfo->nvars;
+    slong NA, NB;
+    ulong * uexps;
+    ulong * Bexps;
+    fmpz_mpoly_struct * Ac;
+    TMP_INIT;
+
+    TMP_START;
+
+    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(ulong));
+    Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+
+    NA = mpoly_words_per_exp(base->Abits, uctx->minfo);
+    NB = mpoly_words_per_exp(B->bits, ctx->minfo);
+
+    mpoly_gen_offset_shift_sp(&xoffset, &xshift, perm[0], B->bits, ctx->minfo);
+
+    for (j = 0; j < B->length; j++)
+    {
+        ulong xexp = ((B->exps[NB*j + xoffset] >> xshift) & mask) - shiftx;
+        if (stridex != 1)
+        {
+            FLINT_ASSERT((xexp % stridex) == 0);
+            xexp /= stridex;
+        }
+        arrayidx = xexp;
+
+        FLINT_ASSERT(arrayidx < base->degbx);
+        if (base->array[arrayidx].threadidx == arg->idx)
+        {
+            mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
+            for (k = 0; k < m + 1; k++)
+            {
+                l = perm[k];
+                if (stride[l] == 1)
+                {
+                    uexps[k] = (Bexps[l] - shift[l]);
+                }
+                else
+                {
+                    FLINT_ASSERT(stride[l] != 0);
+                    FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == 0);
+                    uexps[k] = (Bexps[l] - shift[l]) / stride[l];
+                }
+            }
+            Ac = base->array[arrayidx].poly;
+            fmpz_mpoly_fit_length(Ac, Ac->length + 1, uctx);
+            fmpz_set(Ac->coeffs + Ac->length, B->coeffs + j);
+            mpoly_set_monomial_ui(Ac->exps + NA*Ac->length, uexps + 1, base->Abits, uctx->minfo);
+            Ac->length++;
+        }
+    }
+
+    /* sort all of ours */
+    for (arrayidx = base->degbx - 1; arrayidx >= 0; arrayidx--)
+    {
+        if (base->array[arrayidx].threadidx == arg->idx)
+        {
+            fmpz_mpoly_sort_terms(base->array[arrayidx].poly, uctx);
+        }
+    }
+
+    TMP_END;
+}
+
+
+
 /*
     Convert B to A using the variable permutation perm.
     The uctx (m vars) should be the context of the coefficients of A.
@@ -323,6 +439,7 @@ cleanup:
 
     the most significant main variable uses k = 0
     the coefficients of A use variables k = 1 ... m
+    maxexps if it exists is supposed to be a degree bound on B
 */
 void fmpz_mpoly_to_mpolyu_perm_deflate(
     fmpz_mpolyu_t A,
@@ -332,9 +449,12 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(
     const slong * perm,
     const ulong * shift,
     const ulong * stride,
+    const ulong * maxexps, /* nullptr is ok */
     const thread_pool_handle * handles,
     slong num_handles)
 {
+    slong limit = 1000;
+    slong degbx;
     slong i, j, k, l;
     slong n = ctx->minfo->nvars;
     slong m = uctx->minfo->nvars;
@@ -348,66 +468,131 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(
     FLINT_ASSERT(B->bits <= FLINT_BITS);
     FLINT_ASSERT(m + 1 <= n);
 
-    TMP_START;
-
-    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(fmpz));
-    Bexps = (ulong *) TMP_ALLOC(n*sizeof(fmpz));
-
     fmpz_mpolyu_zero(A, uctx);
 
-    NA = mpoly_words_per_exp(A->bits, uctx->minfo);
-    NB = mpoly_words_per_exp(B->bits, ctx->minfo);
-
-    for (j = 0; j < B->length; j++)
+    /* strict degree bounds on the result */
+    degbx = limit + 1;
+    if (maxexps != NULL)
     {
-        mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
-        for (k = 0; k < m + 1; k++)
-        {
-            l = perm[k];
-            FLINT_ASSERT(stride[l] != UWORD(0));
-            FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
-            uexps[k] = (Bexps[l] - shift[l]) / stride[l];
-        }
-        Ac = _fmpz_mpolyu_get_coeff(A, uexps[0], uctx);
-        FLINT_ASSERT(Ac->bits == A->bits);
-
-        fmpz_mpoly_fit_length(Ac, Ac->length + 1, uctx);
-        fmpz_set(Ac->coeffs + Ac->length, B->coeffs + j);
-        mpoly_set_monomial_ui(Ac->exps + NA*Ac->length, uexps + 1, A->bits, uctx->minfo);
-        Ac->length++;
+        degbx = (maxexps[perm[0]] - shift[perm[0]])/stride[perm[0]] + 1;
     }
 
-    if (num_handles > 0)
+    if (degbx <= limit)
     {
-        _sort_arg_t arg;
+        _arrayconvertu_base_t base;
+        _arrayconvertu_worker_arg_struct * args;
 
-        pthread_mutex_init(&arg->mutex, NULL);
-        arg->index = 0;
-        arg->coeffs = A->coeffs;
-        arg->length = A->length;
-        arg->ctx = uctx;
+        base->ctx = ctx;
+        base->uctx = uctx;
+        base->degbx = degbx;
+        base->perm = perm;
+        base->shift = shift;
+        base->stride = stride;
+        base->Abits = A->bits;
+        base->B = B;
+        base->nthreads = num_handles + 1;
+        base->array = (_arrayconvertu_base_elem_struct *) flint_malloc(
+                                degbx*sizeof(_arrayconvertu_base_elem_struct));
+        for (i = degbx - 1; i >= 0; i--)
+        {
+            base->array[i].threadidx = i % base->nthreads;
+            fmpz_mpoly_init3(base->array[i].poly, 0, A->bits, uctx);
+        }
+        args = (_arrayconvertu_worker_arg_struct *) flint_malloc(
+                     base->nthreads*sizeof(_arrayconvertu_worker_arg_struct));
 
         for (i = 0; i < num_handles; i++)
         {
-            thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+            args[i].idx = i;
+            args[i].base = base;
+            thread_pool_wake(global_thread_pool, handles[i],
+                                             _arrayconvertu_worker, &args[i]);
         }
-        _worker_sort(arg);
+        i = num_handles;
+        args[i].idx = i;
+        args[i].base = base;
+        _arrayconvertu_worker(&args[i]);
         for (i = 0; i < num_handles; i++)
         {
             thread_pool_wait(global_thread_pool, handles[i]);
         }
 
-        pthread_mutex_destroy(&arg->mutex);
+        A->length = 0;
+        for (i = degbx - 1; i >= 0; i--)
+        {
+            if (base->array[i].poly->length > 0)
+            {
+                fmpz_mpolyu_fit_length(A, A->length + 1, uctx);
+                A->exps[A->length] = i;
+                fmpz_mpoly_swap(A->coeffs + A->length, base->array[i].poly, uctx);
+                A->length++;
+            }
+            fmpz_mpoly_clear(base->array[i].poly, uctx);
+        }
+
+        flint_free(base->array);
+        flint_free(args);
     }
     else
     {
-        for (i = 0; i < A->length; i++)
-        {
-            fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
-        }
-    }
+        TMP_START;
 
-    TMP_END;
+        uexps = (ulong *) TMP_ALLOC((m + 2)*sizeof(ulong));
+        Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+        NA = mpoly_words_per_exp(A->bits, uctx->minfo);
+        NB = mpoly_words_per_exp(B->bits, ctx->minfo);
+
+        for (j = 0; j < B->length; j++)
+        {
+            mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
+            for (k = 0; k < m + 1; k++)
+            {
+                l = perm[k];
+                FLINT_ASSERT(stride[l] != UWORD(0));
+                FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
+                uexps[k] = (Bexps[l] - shift[l]) / stride[l];
+            }
+            Ac = _fmpz_mpolyu_get_coeff(A, uexps[0], uctx);
+            FLINT_ASSERT(Ac->bits == A->bits);
+
+            fmpz_mpoly_fit_length(Ac, Ac->length + 1, uctx);
+            fmpz_set(Ac->coeffs + Ac->length, B->coeffs + j);
+            mpoly_set_monomial_ui(Ac->exps + NA*Ac->length, uexps + 1, A->bits, uctx->minfo);
+            Ac->length++;
+        }
+
+        if (num_handles > 0)
+        {
+            _sort_arg_t arg;
+
+            pthread_mutex_init(&arg->mutex, NULL);
+            arg->index = 0;
+            arg->coeffs = A->coeffs;
+            arg->length = A->length;
+            arg->ctx = uctx;
+
+            for (i = 0; i < num_handles; i++)
+            {
+                thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+            }
+            _worker_sort(arg);
+            for (i = 0; i < num_handles; i++)
+            {
+                thread_pool_wait(global_thread_pool, handles[i]);
+            }
+
+            pthread_mutex_destroy(&arg->mutex);
+        }
+        else
+        {
+            for (i = 0; i < A->length; i++)
+            {
+                fmpz_mpoly_sort_terms(A->coeffs + i, uctx);
+            }
+        }
+
+        TMP_END;
+    }
 }
 
 
@@ -957,25 +1142,34 @@ void fmpz_mpolyu_divexact_fmpz(
 }
 
 
-/* The bit counts of A, B and c must all agree for this division */
+/*
+    The bit counts of A, B and c must all agree for this division
+    If saveB is zero, B may be clobbered by this operation.
+*/
 void fmpz_mpolyu_divexact_mpoly(
     fmpz_mpolyu_t A,
-    fmpz_mpolyu_t B,
+    fmpz_mpolyu_t B, int saveB,
     fmpz_mpoly_t c,
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     slong len;
     slong N;
-    mp_bitcnt_t exp_bits;
+    mp_bitcnt_t exp_bits = B->bits;
     ulong * cmpmask;
     TMP_INIT;
 
-    TMP_START;
+    FLINT_ASSERT(exp_bits == A->bits);
+    FLINT_ASSERT(exp_bits == B->bits);
+    FLINT_ASSERT(exp_bits == c->bits);
 
-    exp_bits = B->bits;
-    FLINT_ASSERT(A->bits == B->bits);
-    FLINT_ASSERT(A->bits == c->bits);
+    if (saveB == 0 && fmpz_mpoly_is_one(c, ctx))
+    {
+        fmpz_mpolyu_swap(A, B, ctx);
+        return;
+    }
+
+    TMP_START;
 
     fmpz_mpolyu_fit_length(A, B->length, ctx);
 

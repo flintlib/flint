@@ -106,9 +106,12 @@ int
 main(void)
 {
     slong i, j;
-    slong tmul = 5;
+    slong tmul = 10;
     slong max_threads = 5;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 1;
+#endif
 
     flint_printf("gcd_brown_threaded....");
     fflush(stdout);

@@ -407,9 +407,9 @@ int fmpz_mpoly_gcd_brown(
     fmpz_mpolyu_init(Bbaru, new_bits, uctx);
 
     fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
 
     success = fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx);
     if (success)

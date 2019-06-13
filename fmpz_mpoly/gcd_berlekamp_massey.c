@@ -3584,7 +3584,7 @@ next_zip_image:
 
     /* upgrade G to Hbits then try to pack down to bits */
     fmpz_mpolyu_set_bits(G, Hbits, ctx);
-    fmpz_mpolyu_divexact_mpoly(G, H, Hcontent, ctx);
+    fmpz_mpolyu_divexact_mpoly(G, H, 1, Hcontent, ctx);
     success = fmpz_mpolyu_repack_bits(G, bits, ctx);
     if (!success)
     {
@@ -3817,8 +3817,8 @@ int fmpz_mpoly_gcd_berlekamp_massey(
     success = success && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx, NULL, 0);
     if (!success)
         goto cleanup;
-    fmpz_mpolyu_divexact_mpoly(Abar, Auu, Acontent, uctx);
-    fmpz_mpolyu_divexact_mpoly(Bbar, Buu, Bcontent, uctx);
+    fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
+    fmpz_mpolyu_divexact_mpoly(Bbar, Buu, 0, Bcontent, uctx);
 
     /* compute GCD of leading coefficients */
     FLINT_ASSERT(A->length > 0 && B->length > 0);

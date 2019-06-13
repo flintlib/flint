@@ -196,9 +196,9 @@ void univar_divides_check(
     }
 
     fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
 
     udivides = fmpz_mpolyuu_divides(Qu, Au, Bu, 1, uctx);
     divides = fmpz_mpoly_divides(Q, A, B, ctx);

@@ -225,9 +225,9 @@ void univar_divides_check(
     }
 
     fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+                                           perm, shift, stride, NULL, NULL, 0);
 
     /*****************************/
     handles = NULL;

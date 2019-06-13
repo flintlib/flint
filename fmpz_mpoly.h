@@ -1094,7 +1094,8 @@ FLINT_DLL void fmpz_mpolyu_set(fmpz_mpolyu_t A, const fmpz_mpolyu_t B,
 FLINT_DLL void fmpz_mpoly_to_mpolyu_perm_deflate(
                                 fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx,
                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
-                const slong * perm, const ulong * shift, const ulong * stride,
+                                     const slong * perm, const ulong * shift,
+                                 const ulong * stride, const ulong * maxexps,
                         const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void fmpz_mpoly_from_mpolyu_perm_inflate(
@@ -1105,7 +1106,8 @@ FLINT_DLL void fmpz_mpoly_from_mpolyu_perm_inflate(
 FLINT_DLL void fmpz_mpoly_to_mpolyuu_perm_deflate(
                                 fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx,
                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
-                const slong * perm, const ulong * shift, const ulong * stride, const ulong * maxexps,
+                                     const slong * perm, const ulong * shift,
+                                 const ulong * stride, const ulong * maxexps,
                         const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void fmpz_mpoly_from_mpolyuu_perm_inflate(
@@ -1133,7 +1135,7 @@ FLINT_DLL void fmpz_mpolyu_divexact_fmpz(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
                                          fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpolyu_divexact_mpoly(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
-                                   fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx);
+                        int saveB, fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpolyu_mul_mpoly(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
                                    fmpz_mpoly_t c, const fmpz_mpoly_ctx_t ctx);
@@ -1164,8 +1166,8 @@ FLINT_DLL int fmpz_mpolyu_gcd_brown_threaded(fmpz_mpolyu_t G,
                                                    const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
-FLINT_DLL int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, fmpz_mpoly_t A,
-                                   fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A,
+                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpolyu_gcdm_zippel(fmpz_mpolyu_t G,
                  fmpz_mpolyu_t A, fmpz_mpolyu_t B, const fmpz_mpoly_ctx_t ctx,

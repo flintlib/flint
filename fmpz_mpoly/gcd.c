@@ -266,9 +266,9 @@ static int _try_zippel(
     fmpz_mpolyu_init(Gu, ABbits, uctx);
 
     fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                      zinfo->perm, Amin_exp, Gstride, NULL, 0);
+                            zinfo->perm, Amin_exp, Gstride, Amax_exp, NULL, 0);
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                      zinfo->perm, Bmin_exp, Gstride, NULL, 0);
+                            zinfo->perm, Bmin_exp, Gstride, Bmax_exp, NULL, 0);
 
     FLINT_ASSERT(Au->bits == ABbits);
     FLINT_ASSERT(Bu->bits == ABbits);
@@ -290,8 +290,8 @@ static int _try_zippel(
 
     FLINT_ASSERT(Acontent->bits == ABbits);
     FLINT_ASSERT(Bcontent->bits == ABbits);
-    fmpz_mpolyu_divexact_mpoly(Abar, Au, Acontent, uctx);
-    fmpz_mpolyu_divexact_mpoly(Bbar, Bu, Bcontent, uctx);
+    fmpz_mpolyu_divexact_mpoly(Abar, Au, 0, Acontent, uctx);
+    fmpz_mpolyu_divexact_mpoly(Bbar, Bu, 0, Bcontent, uctx);
 
     /* after removing content, degree bounds in zinfo are still valid bounds */
 
@@ -372,7 +372,7 @@ static void _worker_convertuu(void * varg)
 
     if (arg->success)
     {
-        fmpz_mpolyu_divexact_mpoly(arg->Pbar, arg->Puu, arg->Pcontent,
+        fmpz_mpolyu_divexact_mpoly(arg->Pbar, arg->Puu, 0, arg->Pcontent,
                                                                     arg->uctx);
     }
 }
@@ -408,6 +408,7 @@ static int _try_berlekamp_massey(
     fmpz_mpolyu_t Auu, Buu, Guu;
     fmpz_mpoly_t Acontent, Bcontent, Gamma;
     fmpz_mpolyu_t Abar, Bbar, Gbar;
+    slong max_main_degree, max_minor_degree;
 
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
@@ -501,7 +502,34 @@ static int _try_berlekamp_massey(
         }
     }
 
-    ABbits = FLINT_MAX(A->bits, B->bits);
+    max_main_degree = 0;
+    max_minor_degree = 0;
+    for (i = 0; i < m; i++)
+    {
+        j = perm[i];
+        if (i < 2)
+        {
+            max_main_degree = FLINT_MAX(max_main_degree, Addeg[j]);
+            max_main_degree = FLINT_MAX(max_main_degree, Bddeg[j]);
+        }
+        else
+        {
+            max_minor_degree = FLINT_MAX(max_minor_degree, Addeg[j]);
+            max_minor_degree = FLINT_MAX(max_minor_degree, Bddeg[j]);
+        }
+    }
+
+    /* two main variables must be packed into bits = FLINT_BITS/2 */
+    if (FLINT_BIT_COUNT(max_main_degree) >= FLINT_BITS/2)
+    {
+        success = 0;
+        goto cleanup1;
+    }
+
+    ABbits = 1 + FLINT_BIT_COUNT(max_minor_degree);
+    ABbits = FLINT_MAX(MPOLY_MIN_BITS, ABbits);
+    ABbits = mpoly_fix_bits(ABbits, uctx->minfo);
+    FLINT_ASSERT(ABbits <= FLINT_BITS);
 
     fmpz_mpolyu_init(Auu, ABbits, uctx);
     fmpz_mpolyu_init(Buu, ABbits, uctx);
@@ -517,11 +545,11 @@ static int _try_berlekamp_massey(
     /* convert to bivariate format and remove content from A and B */
     if (num_handles > 0)
     {
-        slong m = mpoly_divide_threads(num_handles, A->length, B->length);
+        slong s = mpoly_divide_threads(num_handles, A->length, B->length);
         _convertuu_arg_t arg;
 
-        FLINT_ASSERT(m >= 0);
-        FLINT_ASSERT(m < num_handles);
+        FLINT_ASSERT(s >= 0);
+        FLINT_ASSERT(s < num_handles);
 
         arg->ctx = ctx;
         arg->uctx = uctx;
@@ -533,20 +561,20 @@ static int _try_berlekamp_massey(
         arg->shift = Bmin_exp;
         arg->stride = Gstride;
         arg->maxexps = Bmax_exp;
-        arg->handles = handles + (m + 1);
-        arg->num_handles = num_handles - (m + 1);
+        arg->handles = handles + (s + 1);
+        arg->num_handles = num_handles - (s + 1);
 
-        thread_pool_wake(global_thread_pool, handles[m], _worker_convertuu, arg);
+        thread_pool_wake(global_thread_pool, handles[s], _worker_convertuu, arg);
 
         fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
-                            perm, Amin_exp, Gstride, Amax_exp, handles + 0, m);
-        success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, handles + 0, m);
+                            perm, Amin_exp, Gstride, Amax_exp, handles + 0, s);
+        success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, handles + 0, s);
         if (success)
         {
-            fmpz_mpolyu_divexact_mpoly(Abar, Auu, Acontent, uctx);
+            fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
         }
 
-        thread_pool_wait(global_thread_pool, handles[m]);
+        thread_pool_wait(global_thread_pool, handles[s]);
 
         success = success && arg->success;
         if (!success)
@@ -565,14 +593,14 @@ static int _try_berlekamp_massey(
         if (!success)
             goto cleanup;
 
-        fmpz_mpolyu_divexact_mpoly(Abar, Auu, Acontent, uctx);
-        fmpz_mpolyu_divexact_mpoly(Bbar, Buu, Bcontent, uctx);
+        fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
+        fmpz_mpolyu_divexact_mpoly(Bbar, Buu, 0, Bcontent, uctx);
     }
 
-    FLINT_ASSERT(Auu->bits == ABbits);
-    FLINT_ASSERT(Buu->bits == ABbits);
-    FLINT_ASSERT(Auu->length > 1);
-    FLINT_ASSERT(Buu->length > 1);
+    FLINT_ASSERT(Abar->bits == ABbits);
+    FLINT_ASSERT(Bbar->bits == ABbits);
+    FLINT_ASSERT(Abar->length > 1);
+    FLINT_ASSERT(Bbar->length > 1);
     FLINT_ASSERT(Acontent->bits == ABbits);
     FLINT_ASSERT(Bcontent->bits == ABbits);
 
@@ -587,7 +615,6 @@ static int _try_berlekamp_massey(
            ? fmpz_mpolyuu_gcd_berlekamp_massey_threaded(Gbar, Abar, Bbar, Gamma,
                                                    uctx, handles, num_handles)
            : fmpz_mpolyuu_gcd_berlekamp_massey(Gbar, Abar, Bbar, Gamma, uctx);
-
 
     if (!success)
         goto cleanup;
@@ -624,6 +651,8 @@ cleanup:
     fmpz_mpolyu_clear(Guu, uctx);
     fmpz_mpoly_ctx_clear(uctx);
 
+cleanup1:
+
     flint_free(Gshift);
     flint_free(Addeg);
     flint_free(Bddeg);
@@ -640,7 +669,7 @@ typedef struct
     const fmpz_mpoly_struct * P;
     const fmpz_mpoly_ctx_struct * ctx;
     const slong * perm;
-    const ulong * shift, * stride;
+    const ulong * shift, * stride, * maxexps;
     const thread_pool_handle * handles;
     slong num_handles;
 }
@@ -653,7 +682,8 @@ static void _worker_convertu(void * varg)
     _convertu_arg_struct * arg = (_convertu_arg_struct *) varg;
 
     fmpz_mpoly_to_mpolyu_perm_deflate(arg->Pu, arg->uctx, arg->P, arg->ctx,
-           arg->perm, arg->shift, arg->stride, arg->handles, arg->num_handles);
+                           arg->perm, arg->shift, arg->stride, arg->maxexps,
+                                               arg->handles, arg->num_handles);
 }
 
 /*
@@ -767,11 +797,11 @@ static int _try_brown(
     /* convert to univariate format */
     if (num_handles > 0)
     {
-        slong m = mpoly_divide_threads(num_handles, A->length, B->length);
+        slong s = mpoly_divide_threads(num_handles, A->length, B->length);
         _convertu_arg_t arg;
 
-        FLINT_ASSERT(m >= 0);
-        FLINT_ASSERT(m < num_handles);
+        FLINT_ASSERT(s >= 0);
+        FLINT_ASSERT(s < num_handles);
 
         arg->Pu = Bu;
         arg->uctx = uctx;
@@ -780,22 +810,23 @@ static int _try_brown(
         arg->perm = perm;
         arg->shift = Bmin_exp;
         arg->stride = Gstride;
-        arg->handles = handles + (m + 1);
-        arg->num_handles = num_handles - (m + 1);
+        arg->maxexps = Bmax_exp;
+        arg->handles = handles + (s + 1);
+        arg->num_handles = num_handles - (s + 1);
 
-        thread_pool_wake(global_thread_pool, handles[m], _worker_convertu, arg);
+        thread_pool_wake(global_thread_pool, handles[s], _worker_convertu, arg);
 
         fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                      perm, Amin_exp, Gstride, handles + 0, m);
+                            perm, Amin_exp, Gstride, Amax_exp, handles + 0, s);
 
-        thread_pool_wait(global_thread_pool, handles[m]);
+        thread_pool_wait(global_thread_pool, handles[s]);
     }
     else
     {
         fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                             perm, Amin_exp, Gstride, NULL, 0);
+                                   perm, Amin_exp, Gstride, Amax_exp, NULL, 0);
         fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                             perm, Bmin_exp, Gstride, NULL, 0);
+                                   perm, Bmin_exp, Gstride, Bmax_exp, NULL, 0);
     }
 
     FLINT_ASSERT(Au->bits == ABbits);

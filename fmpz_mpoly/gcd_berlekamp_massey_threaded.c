@@ -2339,7 +2339,7 @@ next_zip_image:
 
     /* upgrade G to Hbits then try to pack down to bits */
     fmpz_mpolyu_set_bits(G, Hbits, ctx);
-    fmpz_mpolyu_divexact_mpoly(G, w->H, Hcontent, ctx);
+    fmpz_mpolyu_divexact_mpoly(G, w->H, 1, Hcontent, ctx);
     success = fmpz_mpolyu_repack_bits(G, w->bits, ctx);
     if (!success)
     {
@@ -2541,6 +2541,41 @@ cleanup:
 }
 
 
+typedef struct
+{
+    const fmpz_mpoly_struct * P;
+    fmpz_mpoly_struct * Pcontent;
+    fmpz_mpolyu_struct * Puu, * Pbar;
+    const slong * perm;
+    const ulong * shift, * stride, * maxexps;
+    const fmpz_mpoly_ctx_struct * ctx;
+    const fmpz_mpoly_ctx_struct * uctx;
+    const thread_pool_handle * handles;
+    slong num_handles;
+    int success;
+}
+_convertuu_arg_struct;
+
+typedef _convertuu_arg_struct _convertuu_arg_t[1];
+
+static void _worker_convertuu(void * varg)
+{
+    _convertuu_arg_struct * arg = (_convertuu_arg_struct *) varg;
+
+    fmpz_mpoly_to_mpolyuu_perm_deflate(arg->Puu, arg->uctx, arg->P, arg->ctx,
+                             arg->perm, arg->shift, arg->stride, arg->maxexps,
+                                               arg->handles, arg->num_handles);
+
+    arg->success = fmpz_mpolyu_content_mpoly(arg->Pcontent, arg->Puu,
+                                                           arg->uctx, NULL, 0);
+
+    if (arg->success)
+    {
+        fmpz_mpolyu_divexact_mpoly(arg->Pbar, arg->Puu, 0, arg->Pcontent,
+                                                                    arg->uctx);
+    }
+}
+
 int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -2683,21 +2718,63 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     /* Gbits is bits for final answer in ZZ[x_0,...,x_(n-1)] */
     Gbits = FLINT_MIN(A->bits, B->bits);
 
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
-                                           perm, shift, stride, NULL, NULL, 0);
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
-                                           perm, shift, stride, NULL, NULL, 0);
+    if (num_handles > 0)
+    {
+        slong s = mpoly_divide_threads(num_handles, A->length, B->length);
+        _convertuu_arg_t arg;
 
-    /* remove content from A and B */
-    success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);
-    success = success && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx, NULL, 0);
-    if (!success)
-        goto cleanup;
-    fmpz_mpolyu_divexact_mpoly(Abar, Auu, Acontent, uctx);
-    fmpz_mpolyu_divexact_mpoly(Bbar, Buu, Bcontent, uctx);
+        FLINT_ASSERT(s >= 0);
+        FLINT_ASSERT(s < num_handles);
+
+        arg->ctx = ctx;
+        arg->uctx = uctx;
+        arg->P = B;
+        arg->Puu = Buu;
+        arg->Pcontent = Bcontent;
+        arg->Pbar = Bbar;
+        arg->perm = perm;
+        arg->shift = shift;
+        arg->stride = stride;
+        arg->maxexps = (const ulong *) Bdegs;
+        arg->handles = handles + (s + 1);
+        arg->num_handles = num_handles - (s + 1);
+
+        thread_pool_wake(global_thread_pool, handles[s], _worker_convertuu, arg);
+
+        fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
+                   perm, shift, stride, (const ulong *) Adegs, handles + 0, s);
+        success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, handles + 0, s);
+        if (success)
+        {
+            fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
+        }
+
+        thread_pool_wait(global_thread_pool, handles[s]);
+
+        success = success && arg->success;
+        if (!success)
+            goto cleanup;
+    }
+    else
+    {
+        fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
+                          perm, shift, stride, (const ulong *) Adegs, NULL, 0);
+        fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
+                          perm, shift, stride, (const ulong *) Bdegs, NULL, 0);
+
+        /* remove content from A and B */
+        success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);
+        success = success
+               && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx, NULL, 0);
+        if (!success)
+            goto cleanup;
+        fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
+        fmpz_mpolyu_divexact_mpoly(Bbar, Buu, 0, Bcontent, uctx);
+    }
 
     /* compute GCD of leading coefficients */
-    FLINT_ASSERT(A->length > 0 && B->length > 0);
+    FLINT_ASSERT(Abar->length > 0);
+    FLINT_ASSERT(Bbar->length > 0);
     _fmpz_mpoly_gcd(Gamma, ABbits, Abar->coeffs + 0, Bbar->coeffs + 0, uctx,
                                                                       NULL, 0);
     if (!success)

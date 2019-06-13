@@ -327,8 +327,8 @@ int fmpz_mpolyu_gcd_zippel(
             goto finished;
     }
 
-    fmpz_mpolyu_divexact_mpoly(Abar, A, content, ctx);
-    fmpz_mpolyu_divexact_mpoly(Bbar, B, content, ctx);
+    fmpz_mpolyu_divexact_mpoly(Abar, A, 0, content, ctx);
+    fmpz_mpolyu_divexact_mpoly(Bbar, B, 0, content, ctx);
 
     ABminshift = FLINT_MIN(Abar->exps[Abar->length - 1], Bbar->exps[Bbar->length - 1]);
     fmpz_mpolyu_shift_right(Abar, Abar->exps[Abar->length - 1]);
@@ -359,8 +359,8 @@ finished:
 */
 int _fmpz_mpoly_gcd_zippel(
     fmpz_mpoly_t G,
-    fmpz_mpoly_t A,
-    fmpz_mpoly_t B,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
@@ -422,9 +422,9 @@ int _fmpz_mpoly_gcd_zippel(
     fmpz_mpolyu_init(Gu, new_bits, uctx);
 
     fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                          zinfo->perm, shift, stride, NULL, 0);
+                                    zinfo->perm, shift, stride, NULL, NULL, 0);
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                          zinfo->perm, shift, stride, NULL, 0);
+                                    zinfo->perm, shift, stride, NULL, NULL, 0);
 
     success = fmpz_mpolyu_gcd_zippel(Gu, Au, Bu, uctx, zinfo, randstate);
     if (!success)
@@ -455,8 +455,11 @@ cleanup1:
 }
 
 
-int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G,
-        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_gcd_zippel(
+    fmpz_mpoly_t G,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     mp_bitcnt_t new_bits;
@@ -551,9 +554,9 @@ int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G,
     fmpz_mpolyu_init(Gu, new_bits, uctx);
 
     fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                          zinfo->perm, shift, stride, NULL, 0);
+                                    zinfo->perm, shift, stride, NULL, NULL, 0);
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                          zinfo->perm, shift, stride, NULL, 0);
+                                    zinfo->perm, shift, stride, NULL, NULL, 0);
 
     success = fmpz_mpolyu_gcd_zippel(Gu, Au, Bu, uctx, zinfo, randstate);
     if (!success)

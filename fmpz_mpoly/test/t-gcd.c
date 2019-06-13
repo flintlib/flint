@@ -97,6 +97,9 @@ main(void)
     const slong max_threads = 5;
     slong i, j, k, tmul = 15;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 1;
+#endif
 
     flint_printf("gcd....");
     fflush(stdout);
