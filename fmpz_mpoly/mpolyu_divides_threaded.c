@@ -1323,7 +1323,7 @@ int fmpz_mpolyuu_divides_threaded(
     FLINT_ASSERT(B->bits == minor_bits);
 
 #if !FLINT_KNOW_STRONG_ORDER
-    return fmpz_mpolyuu_divides(Q, A, B, nmainvars, ctx);
+    return fmpz_mpolyuu_divides(Q, A, B, main_nvars, ctx);
 #endif
 
     if (B->length < 2 || A->length < 2)
