@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod_poly.h"
 
 void nmod_poly_multi_crt_init(nmod_poly_multi_crt_t P)
 {

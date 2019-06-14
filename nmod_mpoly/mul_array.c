@@ -192,9 +192,12 @@ LEX_UNPACK_MACRO(
 
 
 
-void _nmod_mpoly_mul_array_chunked_LEX(nmod_mpoly_t P,
-                             const nmod_mpoly_t A, const nmod_mpoly_t B, 
-                               const ulong * mults, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_mul_array_chunked_LEX(
+    nmod_mpoly_t P,
+    const nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    const ulong * mults,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong num = ctx->minfo->nfields - 1;
     slong Pi, i, j, Plen, Pl, Al, Bl, array_size;
@@ -216,8 +219,8 @@ void _nmod_mpoly_mul_array_chunked_LEX(nmod_mpoly_t P,
     /* compute indices and lengths of coefficients of polys in main variable */
     Amain = (slong *) TMP_ALLOC((Al + 1)*sizeof(slong));
     Bmain = (slong *) TMP_ALLOC((Bl + 1)*sizeof(slong));
-    Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
-    Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
+    Apexp = (ulong *) flint_malloc(A->length*sizeof(ulong));
+    Bpexp = (ulong *) flint_malloc(B->length*sizeof(ulong));
     mpoly_main_variable_split_LEX(Amain, Apexp, A->exps, Al, A->length, mults, num, A->bits);
     mpoly_main_variable_split_LEX(Bmain, Bpexp, B->exps, Bl, B->length, mults, num, B->bits);
 
@@ -305,16 +308,22 @@ void _nmod_mpoly_mul_array_chunked_LEX(nmod_mpoly_t P,
         }
     }
 
-    TMP_END;
     _nmod_mpoly_set_length(P, Plen, ctx);
+
+    flint_free(Apexp);
+    flint_free(Bpexp);
+    TMP_END;
 }
 
 
 
-int _nmod_mpoly_mul_array_LEX(nmod_mpoly_t A,
-                                 const nmod_mpoly_t B, fmpz * maxBfields,
-                                 const nmod_mpoly_t C, fmpz * maxCfields,
-                                                    const nmod_mpoly_ctx_t ctx)
+int _nmod_mpoly_mul_array_LEX(
+    nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    fmpz * maxBfields,
+    const nmod_mpoly_t C,
+    fmpz * maxCfields,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i, exp_bits, array_size;
     ulong max, * mults;
@@ -645,9 +654,12 @@ DEGREVLEX_UNPACK_MACRO(
 )
 
 
-void _nmod_mpoly_mul_array_chunked_DEG(nmod_mpoly_t P,
-                             const nmod_mpoly_t A, const nmod_mpoly_t B, 
-                                        ulong degb, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_mul_array_chunked_DEG(
+    nmod_mpoly_t P,
+    const nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    ulong degb,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong nvars = ctx->minfo->nvars;
     slong Pi, i, j, Plen, Pl, Al, Bl, array_size;
@@ -681,8 +693,8 @@ void _nmod_mpoly_mul_array_chunked_DEG(nmod_mpoly_t P,
     /* compute indices and lengths of coefficients of polys in main variable */
     Amain = (slong *) TMP_ALLOC((Al + 1)*sizeof(slong));
     Bmain = (slong *) TMP_ALLOC((Bl + 1)*sizeof(slong));
-    Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
-    Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
+    Apexp = (ulong *) flint_malloc(A->length*sizeof(ulong));
+    Bpexp = (ulong *) flint_malloc(B->length*sizeof(ulong));
     mpoly_main_variable_split_DEG(Amain, Apexp, A->exps, Al, A->length,
                                                          degb, nvars, A->bits);
     mpoly_main_variable_split_DEG(Bmain, Bpexp, B->exps, Bl, B->length,
@@ -771,16 +783,20 @@ void _nmod_mpoly_mul_array_chunked_DEG(nmod_mpoly_t P,
         }
     }
 
-    TMP_END;
     _nmod_mpoly_set_length(P, Plen, ctx);
+
+    flint_free(Apexp);
+    flint_free(Bpexp);
+    TMP_END;
 }
 
 
 
-int _nmod_mpoly_mul_array_DEG(nmod_mpoly_t A,
-                                 const nmod_mpoly_t B, fmpz * maxBfields,
-                                 const nmod_mpoly_t C, fmpz * maxCfields,
-                                                    const nmod_mpoly_ctx_t ctx)
+int _nmod_mpoly_mul_array_DEG(
+    nmod_mpoly_t A,
+    const nmod_mpoly_t B, fmpz * maxBfields,
+    const nmod_mpoly_t C, fmpz * maxCfields,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i, exp_bits, array_size;
     ulong deg;

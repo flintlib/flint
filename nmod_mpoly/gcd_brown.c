@@ -28,6 +28,7 @@ int nmod_mpoly_gcd_brown(
     mp_bitcnt_t new_bits;
     nmod_mpoly_ctx_t uctx;
     nmod_mpolyun_t An, Bn, Gn, Abarn, Bbarn;
+    nmod_poly_stack_t Sp;
 
     if (nmod_mpoly_is_zero(A, ctx))
     {
@@ -58,7 +59,7 @@ int nmod_mpoly_gcd_brown(
     stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
-        perm[i] = i + 1 < ctx->minfo->nvars ? i + 1 : 0;
+        perm[i] = i;
         shift[i] = 0;
         stride[i] = 1;
     }
@@ -83,20 +84,21 @@ int nmod_mpoly_gcd_brown(
     new_bits = FLINT_MAX(A->bits, B->bits);
 
     nmod_mpoly_ctx_init(uctx, ctx->minfo->nvars - 1, ORD_LEX, ctx->ffinfo->mod.n);
+    nmod_poly_stack_init(Sp, new_bits, uctx);
     nmod_mpolyun_init(An, new_bits, uctx);
     nmod_mpolyun_init(Bn, new_bits, uctx);
     nmod_mpolyun_init(Gn, new_bits, uctx);
     nmod_mpolyun_init(Abarn, new_bits, uctx);
     nmod_mpolyun_init(Bbarn, new_bits, uctx);
 
-    nmod_mpoly_to_mpolyun_perm_deflate(An, A, perm, shift, stride, uctx, ctx);
-    nmod_mpoly_to_mpolyun_perm_deflate(Bn, B, perm, shift, stride, uctx, ctx);
+    nmod_mpoly_to_mpolyun_perm_deflate(An, uctx, A, ctx, perm, shift, stride, NULL, 0);
+    nmod_mpoly_to_mpolyun_perm_deflate(Bn, uctx, B, ctx, perm, shift, stride, NULL, 0);
     success = nmod_mpolyun_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn,
-                                                 uctx->minfo->nvars - 1, uctx);
+                                             uctx->minfo->nvars - 1, uctx, Sp);
     if (!success)
     {
-        nmod_mpoly_to_mpolyun_perm_deflate(An, A, perm, shift, stride, uctx, ctx);
-        nmod_mpoly_to_mpolyun_perm_deflate(Bn, B, perm, shift, stride, uctx, ctx);
+        nmod_mpoly_to_mpolyun_perm_deflate(An, uctx, A, ctx, perm, shift, stride, NULL, 0);
+        nmod_mpoly_to_mpolyun_perm_deflate(Bn, uctx, B, ctx, perm, shift, stride, NULL, 0);
 
         success = nmod_mpolyun_gcd_brown_lgprime(Gn, Abarn, Bbarn, An, Bn,
                                                  uctx->minfo->nvars - 1, uctx);
@@ -104,8 +106,8 @@ int nmod_mpoly_gcd_brown(
 
     if (success)
     {
-        nmod_mpoly_from_mpolyun_perm_inflate(G, new_bits,
-                                           Gn, perm, shift, stride, uctx, ctx);
+        nmod_mpoly_from_mpolyun_perm_inflate(G, new_bits, ctx,
+                                                Gn, uctx, perm, shift, stride);
         nmod_mpoly_make_monic(G, G, ctx);
     }
 
@@ -114,6 +116,7 @@ int nmod_mpoly_gcd_brown(
     nmod_mpolyun_clear(Gn, uctx);
     nmod_mpolyun_clear(Abarn, uctx);
     nmod_mpolyun_clear(Bbarn, uctx);
+    nmod_poly_stack_clear(Sp);
     nmod_mpoly_ctx_clear(uctx);
 
 cleanup1:

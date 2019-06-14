@@ -18,6 +18,9 @@ main(void)
 {
     int i, j, result, ret, max_threads = 5, tmul = 25;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 1;
+#endif
 
     flint_printf("divides....");
     fflush(stdout);
@@ -61,8 +64,6 @@ main(void)
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
             nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
 
-            flint_set_num_threads(n_randint(state, max_threads) + 1);
-
             nmod_mpoly_mul(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
             nmod_mpoly_set(hsave, h, ctx);
@@ -89,6 +90,8 @@ main(void)
                 flint_abort();
             }
         }
+
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
 
         nmod_mpoly_clear(f, ctx);
         nmod_mpoly_clear(g, ctx);

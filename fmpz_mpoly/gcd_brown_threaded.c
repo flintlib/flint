@@ -14,6 +14,7 @@
 #include "thread_pool.h"
 #include "fmpq.h"
 
+
 typedef struct
 {
     volatile int gcd_is_one;
@@ -38,10 +39,48 @@ typedef struct
     slong image_count;
     slong required_images;
     thread_pool_handle master_handle;
-    slong num_workers;
+    slong num_handles;
     thread_pool_handle * worker_handles;
+
+    nmod_mpoly_ctx_t pctx;
+    nmod_mpolyun_t Ap, Bp, Gp, Abarp, Bbarp;
+    fmpz_mpolyu_t T, T1, T2;
 }
 _splitworker_arg_struct;
+
+
+
+/* worker for reducing polynomial over ZZ to polynomial over Fp */
+static void _reduce_Bp_worker(void * varg)
+{
+    _splitworker_arg_struct * arg = (_splitworker_arg_struct *) varg;
+    fmpz_mpolyu_intp_reduce_p_mpolyun(arg->Bp, arg->pctx, arg->base->B,
+                                                               arg->base->ctx);
+}
+
+/* workers for crt'ing polynomials */
+static void _join_Abar_worker(void * varg)
+{
+    _splitworker_arg_struct * arg = (_splitworker_arg_struct *) varg;
+    if (!fmpz_is_one(arg->modulus))
+        fmpz_mpolyu_intp_crt_p_mpolyun(arg->Abar, arg->T1, arg->base->ctx,
+                                          arg->modulus, arg->Abarp, arg->pctx);
+    else
+        fmpz_mpolyu_intp_lift_p_mpolyun(arg->Abar, arg->base->ctx,
+                                                        arg->Abarp, arg->pctx);
+}
+
+static void _join_Bbar_worker(void * varg)
+{
+    _splitworker_arg_struct * arg = (_splitworker_arg_struct *) varg;
+    if (!fmpz_is_one(arg->modulus))
+        fmpz_mpolyu_intp_crt_p_mpolyun(arg->Bbar, arg->T2, arg->base->ctx,
+                                          arg->modulus, arg->Bbarp, arg->pctx);
+    else
+        fmpz_mpolyu_intp_lift_p_mpolyun(arg->Bbar, arg->base->ctx,
+                                                        arg->Bbarp, arg->pctx);
+}
+
 
 static void _splitworker(void * varg)
 {
@@ -51,26 +90,26 @@ static void _splitworker(void * varg)
     mp_bitcnt_t bits = base->A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     slong offset, shift;
-    nmod_mpolyun_t Ap, Bp, Gp, Abarp, Bbarp;
-    fmpz_mpolyu_t T;
     int success;
     mp_limb_t p, gammared;
-    nmod_mpoly_ctx_t pctx;
+    nmod_poly_stack_t Sp;
 
     mpoly_gen_offset_shift_sp(&offset, &shift,
                                       ctx->minfo->nvars - 1, bits, ctx->minfo);
 
-    fmpz_mpolyu_init(T, bits, ctx);
-
     fmpz_one(arg->modulus);
     arg->image_count = 0;
 
-    nmod_mpoly_ctx_init(pctx, ctx->minfo->nvars, ORD_LEX, 2);
-    nmod_mpolyun_init(Ap, bits, pctx);
-    nmod_mpolyun_init(Bp, bits, pctx);
-    nmod_mpolyun_init(Gp, bits, pctx);
-    nmod_mpolyun_init(Abarp, bits, pctx);
-    nmod_mpolyun_init(Bbarp, bits, pctx);
+    nmod_mpoly_ctx_init(arg->pctx, ctx->minfo->nvars, ORD_LEX, 2);
+    nmod_poly_stack_init(Sp, bits, arg->pctx);
+    nmod_mpolyun_init(arg->Ap, bits, arg->pctx);
+    nmod_mpolyun_init(arg->Bp, bits, arg->pctx);
+    nmod_mpolyun_init(arg->Gp, bits, arg->pctx);
+    nmod_mpolyun_init(arg->Abarp, bits, arg->pctx);
+    nmod_mpolyun_init(arg->Bbarp, bits, arg->pctx);
+    fmpz_mpolyu_init(arg->T, bits, ctx);
+    fmpz_mpolyu_init(arg->T1, bits, ctx);
+    fmpz_mpolyu_init(arg->T2, bits, ctx);
 
     while (arg->image_count < arg->required_images)
     {
@@ -93,40 +132,51 @@ static void _splitworker(void * varg)
             continue;
         }
 
-        nmod_mpoly_ctx_set_modulus(pctx, p);
+        nmod_mpoly_ctx_set_modulus(arg->pctx, p);
 
         /* the unfortunate nmod poly's store their own context :( */
-        nmod_mpolyun_set_mod(Ap, pctx->ffinfo->mod);
-        nmod_mpolyun_set_mod(Bp, pctx->ffinfo->mod);
-        nmod_mpolyun_set_mod(Gp, pctx->ffinfo->mod);
-        nmod_mpolyun_set_mod(Abarp, pctx->ffinfo->mod);
-        nmod_mpolyun_set_mod(Bbarp, pctx->ffinfo->mod);
+        nmod_poly_stack_set_ctx(Sp, arg->pctx);
+        nmod_mpolyun_set_mod(arg->Ap, arg->pctx->ffinfo->mod);
+        nmod_mpolyun_set_mod(arg->Bp, arg->pctx->ffinfo->mod);
+        nmod_mpolyun_set_mod(arg->Gp, arg->pctx->ffinfo->mod);
+        nmod_mpolyun_set_mod(arg->Abarp, arg->pctx->ffinfo->mod);
+        nmod_mpolyun_set_mod(arg->Bbarp, arg->pctx->ffinfo->mod);
 
-        /* reduction should kill neither A nor B */
-        fmpz_mpolyu_intp_reduce_p_mpolyun(Ap, pctx, base->A, ctx);
-        fmpz_mpolyu_intp_reduce_p_mpolyun(Bp, pctx, base->B, ctx);
-        FLINT_ASSERT(Ap->length > 0);
-        FLINT_ASSERT(Bp->length > 0);
-
-        if (arg->num_workers == 0)
+        /* reduce to Fp and calculate an image gcd */
+        if (arg->num_handles > 0)
         {
-            success = nmod_mpolyun_gcd_brown_smprime(Gp, Abarp, Bbarp,
-                                           Ap, Bp, ctx->minfo->nvars - 1, pctx);
+            thread_pool_wake(global_thread_pool, arg->worker_handles[0],
+                                                       _reduce_Bp_worker, arg);
+
+            fmpz_mpolyu_intp_reduce_p_mpolyun(arg->Ap, arg->pctx, base->A, ctx);
+
+            thread_pool_wait(global_thread_pool, arg->worker_handles[0]);
+
+            success = nmod_mpolyun_gcd_brown_smprime_threaded(
+                                    arg->Gp, arg->Abarp, arg->Bbarp,
+                           arg->Ap, arg->Bp, ctx->minfo->nvars - 1, arg->pctx,
+                                        arg->worker_handles, arg->num_handles);
         }
         else
         {
-            success = nmod_mpolyun_gcd_brown_smprime_threaded(Gp, Abarp, Bbarp,
-                                           Ap, Bp, ctx->minfo->nvars - 1, pctx,
-                                        arg->worker_handles, arg->num_workers);
+            /* reduction should kill neither A nor B */
+            fmpz_mpolyu_intp_reduce_p_mpolyun(arg->Ap, arg->pctx, base->A, ctx);
+            fmpz_mpolyu_intp_reduce_p_mpolyun(arg->Bp, arg->pctx, base->B, ctx);
+            FLINT_ASSERT(arg->Ap->length > 0);
+            FLINT_ASSERT(arg->Bp->length > 0);
+            success = nmod_mpolyun_gcd_brown_smprime(
+                            arg->Gp, arg->Abarp, arg->Bbarp, arg->Ap, arg->Bp,
+                                         ctx->minfo->nvars - 1, arg->pctx, Sp);
         }
+
         if (!success)
         {
             continue;
         }
 
-        FLINT_ASSERT(Gp->length > 0);
-        FLINT_ASSERT(Abarp->length > 0);
-        FLINT_ASSERT(Bbarp->length > 0);
+        FLINT_ASSERT(arg->Gp->length > 0);
+        FLINT_ASSERT(arg->Abarp->length > 0);
+        FLINT_ASSERT(arg->Bbarp->length > 0);
 
         /* check up */
         if (base->gcd_is_one)
@@ -134,7 +184,7 @@ static void _splitworker(void * varg)
             break;
         }
 
-        if (nmod_mpolyun_is_nonzero_nmod(Gp, pctx))
+        if (nmod_mpolyun_is_nonzero_nmod(arg->Gp, arg->pctx))
         {
             base->gcd_is_one = 1;
             break;
@@ -144,16 +194,16 @@ static void _splitworker(void * varg)
         {
             int cmp = 0;
             FLINT_ASSERT(arg->G->length > 0);
-            if (arg->G->exps[0] != Gp->exps[0])
+            if (arg->G->exps[0] != arg->Gp->exps[0])
             {
-                cmp = arg->G->exps[0] > Gp->exps[0] ? 1 : -1;
+                cmp = arg->G->exps[0] > arg->Gp->exps[0] ? 1 : -1;
             }
             if (cmp == 0)
             {
-                slong k = nmod_poly_degree((Gp->coeffs + 0)->coeffs + 0);
+                slong k = nmod_poly_degree((arg->Gp->coeffs + 0)->coeffs + 0);
                 cmp = mpoly_monomial_cmp_nomask_extra(
-                       (arg->G->coeffs + 0)->exps + N*0,
-                           (Gp->coeffs + 0)->exps + N*0, N, offset, k << shift);
+                     (arg->G->coeffs + 0)->exps + N*0,
+                     (arg->Gp->coeffs + 0)->exps + N*0, N, offset, k << shift);
             }
 
             if (cmp < 0)
@@ -167,35 +217,71 @@ static void _splitworker(void * varg)
             }
         }
 
-        FLINT_ASSERT(1 == nmod_mpolyun_leadcoeff(Gp, pctx));
-        nmod_mpolyun_scalar_mul_nmod(Gp, gammared, pctx);
+        FLINT_ASSERT(1 == nmod_mpolyun_leadcoeff(arg->Gp, arg->pctx));
+        nmod_mpolyun_scalar_mul_nmod(arg->Gp, gammared, arg->pctx);
 
-        if (!fmpz_is_one(arg->modulus))
+        /* crt image gcd */
+        if (arg->num_handles > 0)
         {
-            fmpz_mpolyu_intp_crt_p_mpolyun(arg->G, T, ctx, arg->modulus, Gp, pctx);
-            fmpz_mpolyu_intp_crt_p_mpolyun(arg->Abar, T, ctx, arg->modulus, Abarp, pctx);
-            fmpz_mpolyu_intp_crt_p_mpolyun(arg->Bbar, T, ctx, arg->modulus, Bbarp, pctx);
+            thread_pool_wake(global_thread_pool, arg->worker_handles[0],
+                                                       _join_Abar_worker, arg);
+            if (arg->num_handles > 1)
+            {
+                thread_pool_wake(global_thread_pool, arg->worker_handles[1],
+                                                       _join_Bbar_worker, arg);
+            }
+            else
+            {
+                _join_Bbar_worker(arg);
+            }
+
+            if (!fmpz_is_one(arg->modulus))
+                fmpz_mpolyu_intp_crt_p_mpolyun(arg->G, arg->T, ctx, arg->modulus,
+                                                           arg->Gp, arg->pctx);
+            else
+                fmpz_mpolyu_intp_lift_p_mpolyun(arg->G, ctx, arg->Gp, arg->pctx);
+
+            thread_pool_wait(global_thread_pool, arg->worker_handles[0]);
+            if (arg->num_handles > 1)
+                thread_pool_wait(global_thread_pool, arg->worker_handles[1]);
         }
         else
         {
-            fmpz_mpolyu_intp_lift_p_mpolyun(arg->G, ctx, Gp, pctx);
-            fmpz_mpolyu_intp_lift_p_mpolyun(arg->Abar, ctx, Abarp, pctx);
-            fmpz_mpolyu_intp_lift_p_mpolyun(arg->Bbar, ctx, Bbarp, pctx);
+            if (!fmpz_is_one(arg->modulus))
+            {
+                fmpz_mpolyu_intp_crt_p_mpolyun(arg->G, arg->T, ctx,
+                                             arg->modulus, arg->Gp, arg->pctx);
+                fmpz_mpolyu_intp_crt_p_mpolyun(arg->Abar, arg->T, ctx,
+                                          arg->modulus, arg->Abarp, arg->pctx);
+                fmpz_mpolyu_intp_crt_p_mpolyun(arg->Bbar, arg->T, ctx,
+                                          arg->modulus, arg->Bbarp, arg->pctx);
+            }
+            else
+            {
+                fmpz_mpolyu_intp_lift_p_mpolyun(arg->G, ctx,
+                                                           arg->Gp, arg->pctx);
+                fmpz_mpolyu_intp_lift_p_mpolyun(arg->Abar, ctx,
+                                                        arg->Abarp, arg->pctx);
+                fmpz_mpolyu_intp_lift_p_mpolyun(arg->Bbar, ctx,
+                                                        arg->Bbarp, arg->pctx);
+            }
         }
 
         fmpz_mul_ui(arg->modulus, arg->modulus, p);
         arg->image_count++;
     }
 
-    fmpz_mpolyu_clear(T, ctx);
+    fmpz_mpolyu_clear(arg->T, ctx);
+    fmpz_mpolyu_clear(arg->T1, ctx);
+    fmpz_mpolyu_clear(arg->T2, ctx);
 
-    nmod_mpolyun_clear(Ap, pctx);
-    nmod_mpolyun_clear(Bp, pctx);
-    nmod_mpolyun_clear(Gp, pctx);
-    nmod_mpolyun_clear(Abarp, pctx);
-    nmod_mpolyun_clear(Bbarp, pctx);
-
-    nmod_mpoly_ctx_clear(pctx);
+    nmod_mpolyun_clear(arg->Ap, arg->pctx);
+    nmod_mpolyun_clear(arg->Bp, arg->pctx);
+    nmod_mpolyun_clear(arg->Gp, arg->pctx);
+    nmod_mpolyun_clear(arg->Abarp, arg->pctx);
+    nmod_mpolyun_clear(arg->Bbarp, arg->pctx);
+    nmod_poly_stack_clear(Sp);
+    nmod_mpoly_ctx_clear(arg->pctx);
 }
 
 
@@ -553,7 +639,7 @@ static slong _divide_master_threads(fmpq * v, slong n, slong m)
                             ==  fmpz_get_ui(fmpq_denref(left))
                               + fmpz_get_ui(fmpq_denref(right)));
 
-            if (fmpq_get_d(right) < score_threashold)
+            if (fmpq_sgn(left) > 0 && fmpq_get_d(right) < score_threashold)
             {
                 /* delete v + i, add left and right */
                 FLINT_ASSERT(l < m);
@@ -581,12 +667,12 @@ int fmpz_mpolyu_gcd_brown_threaded(
     fmpz_mpolyu_t B,
     const fmpz_mpoly_ctx_t ctx,
     const thread_pool_handle * handles,
-    slong num_workers)
+    slong num_handles)
 {
     slong i, j, k;
     mp_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
-    slong num_threads = num_workers + 1;
+    slong num_threads = num_handles + 1;
     slong num_master_threads;
     slong num_images;
     int success;
@@ -707,8 +793,9 @@ compute_split:
         FLINT_ASSERT(fmpz_fits_si(fmpq_numref(qvec + i)));
         FLINT_ASSERT(fmpz_fits_si(fmpq_denref(qvec + i)));
         splitargs[i].required_images = fmpz_get_si(fmpq_numref(qvec + i));
-        splitargs[i].num_workers = fmpz_get_si(fmpq_denref(qvec + i)) - 1;
-        FLINT_ASSERT(splitargs[i].num_workers >= 0);
+        splitargs[i].num_handles = fmpz_get_si(fmpq_denref(qvec + i)) - 1;
+        FLINT_ASSERT(splitargs[i].required_images > 0);
+        FLINT_ASSERT(splitargs[i].num_handles >= 0);
 
         if (i == 0)
         {
@@ -718,14 +805,14 @@ compute_split:
         {
             splitargs[i].master_handle = handles[k++];
         }
-        FLINT_ASSERT(splitargs[i].num_workers <= num_workers);
-        for (j = 0; j < splitargs[i].num_workers; j++)
+        FLINT_ASSERT(splitargs[i].num_handles <= num_handles);
+        for (j = 0; j < splitargs[i].num_handles; j++)
         {
             splitargs[i].worker_handles[j] = handles[k++];
         }
     }
     /* all handles should have been distributed */
-    FLINT_ASSERT(k == num_workers);
+    FLINT_ASSERT(k == num_handles);
 
     for (i = 1; i < num_master_threads; i++)
     {
@@ -999,6 +1086,31 @@ cleanup_split:
 }
 
 
+typedef struct
+{
+    fmpz_mpolyu_struct * Pu;
+    const fmpz_mpoly_ctx_struct * uctx;
+    const fmpz_mpoly_struct * P;
+    const fmpz_mpoly_ctx_struct * ctx;
+    const slong * perm;
+    const ulong * shift;
+    const ulong * stride;
+    const thread_pool_handle * handles;
+    slong num_handles;
+}
+_convertu_arg_struct;
+
+typedef _convertu_arg_struct _convertu_arg_t[1];
+
+static void _worker_convertu(void * varg)
+{
+    _convertu_arg_struct * arg = (_convertu_arg_struct *) varg;
+
+    fmpz_mpoly_to_mpolyu_perm_deflate(arg->Pu, arg->uctx, arg->P, arg->ctx,
+                                    arg->perm, arg->shift, arg->stride, NULL,
+                                               arg->handles, arg->num_handles);
+}
+
 int fmpz_mpoly_gcd_brown_threaded(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -1010,9 +1122,11 @@ int fmpz_mpoly_gcd_brown_threaded(
     slong * perm;
     ulong * shift, * stride;
     slong i;
-    mp_bitcnt_t new_bits;
+    mp_bitcnt_t ABbits;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
+    thread_pool_handle * handles;
+    slong num_handles;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {
@@ -1079,55 +1193,79 @@ int fmpz_mpoly_gcd_brown_threaded(
         goto cleanup1;
     }
 
-    new_bits = FLINT_MAX(A->bits, B->bits);
+    ABbits = FLINT_MAX(A->bits, B->bits);
 
     fmpz_mpoly_ctx_init(uctx, ctx->minfo->nvars - 1, ORD_LEX);
-    fmpz_mpolyu_init(Au, new_bits, uctx);
-    fmpz_mpolyu_init(Bu, new_bits, uctx);
-    fmpz_mpolyu_init(Gu, new_bits, uctx);
-    fmpz_mpolyu_init(Abaru, new_bits, uctx);
-    fmpz_mpolyu_init(Bbaru, new_bits, uctx);
+    fmpz_mpolyu_init(Au, ABbits, uctx);
+    fmpz_mpolyu_init(Bu, ABbits, uctx);
+    fmpz_mpolyu_init(Gu, ABbits, uctx);
+    fmpz_mpolyu_init(Abaru, ABbits, uctx);
+    fmpz_mpolyu_init(Bbaru, ABbits, uctx);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+    handles = NULL;
+    num_handles = 0;
+    if (global_thread_pool_initialized)
+    {
+        slong max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                               max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                 handles, max_num_handles);
+        }
+    }
+
+    /* convert inputs */
+    if (num_handles > 0)
+    {
+        slong m = mpoly_divide_threads(num_handles, A->length, B->length);
+        _convertu_arg_t arg;
+
+        FLINT_ASSERT(m >= 0);
+        FLINT_ASSERT(m < num_handles);
+
+        arg->Pu = Bu;
+        arg->uctx = uctx;
+        arg->P = B;
+        arg->ctx = ctx;
+        arg->perm = perm;
+        arg->shift = shift;
+        arg->stride = stride;
+        arg->handles = handles + (m + 1);
+        arg->num_handles = num_handles - (m + 1);
+
+        thread_pool_wake(global_thread_pool, handles[m], _worker_convertu, arg);
+
+        fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
+                                    perm, shift, stride, NULL, handles + 0, m);
+
+        thread_pool_wait(global_thread_pool, handles[m]);
+    }
+    else
+    {
+        fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
+                                           perm, shift, stride, NULL, NULL, 0);
+        fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
+                                           perm, shift, stride, NULL, NULL, 0);
+    }
 
     /* calculate gcd */
+    success = fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu,
+                                               uctx, handles, num_handles);
+
+    for (i = 0; i < num_handles; i++)
     {
-        thread_pool_handle * handles;
-        slong i, max_num_workers, num_workers;
-
-        handles = NULL;
-        num_workers = 0;
-        if (global_thread_pool_initialized)
-        {
-            max_num_workers = thread_pool_get_size(global_thread_pool);
-            max_num_workers = FLINT_MIN(thread_limit - 1, max_num_workers);
-            if (max_num_workers > 0)
-            {
-                handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_workers*sizeof(thread_pool_handle));
-                num_workers = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_workers);
-            }
-        }
-
-        success = fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu,
-                                                   uctx, handles, num_workers);
-
-        for (i = 0; i < num_workers; i++)
-        {
-            thread_pool_give_back(global_thread_pool, handles[i]);
-        }
-
-        if (handles)
-            flint_free(handles);
+        thread_pool_give_back(global_thread_pool, handles[i]);
     }
+
+    if (handles)
+        flint_free(handles);
 
     if (success)
     {
-        fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits, ctx, Gu, uctx,
+        fmpz_mpoly_from_mpolyu_perm_inflate(G, ABbits, ctx, Gu, uctx,
                                                           perm, shift, stride);
         if (fmpz_sgn(G->coeffs + 0) < 0)
             fmpz_mpoly_neg(G, G, ctx);

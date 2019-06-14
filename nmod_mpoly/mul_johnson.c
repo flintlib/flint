@@ -294,10 +294,11 @@ slong _nmod_mpoly_mul_johnson(mp_limb_t ** coeff1, ulong ** exp1, slong * alloc,
 }
 
 /* maxBfields gets clobbered */
-void _nmod_mpoly_mul_johnson_maxfields(nmod_mpoly_t A,
-                                 const nmod_mpoly_t B, fmpz * maxBfields,
-                                 const nmod_mpoly_t C, fmpz * maxCfields,
-                                                    const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_mul_johnson_maxfields(
+    nmod_mpoly_t A,
+    const nmod_mpoly_t B, fmpz * maxBfields,
+    const nmod_mpoly_t C, fmpz * maxCfields,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong N;
     mp_bitcnt_t Abits;
@@ -398,8 +399,11 @@ void _nmod_mpoly_mul_johnson_maxfields(nmod_mpoly_t A,
     TMP_END;
 }
 
-void nmod_mpoly_mul_johnson(nmod_mpoly_t A, const nmod_mpoly_t B,
-                              const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_mul_johnson(
+    nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_t C,
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i;
     fmpz * maxBfields, * maxCfields;

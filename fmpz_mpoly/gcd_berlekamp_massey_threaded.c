@@ -108,6 +108,7 @@ typedef struct
     nmod_mpolyun_t Aeval_sp, Beval_sp, Geval_sp, Abareval_sp, Bbareval_sp;
     nmod_mpolycu_t Acur_sp, Bcur_sp;
     nmod_mpolyc_t Gammacur_sp;
+    nmod_poly_stack_t Sp_sp;
     slong thread_index;
     int success;
     int cur_is_uninited;
@@ -328,6 +329,7 @@ void _base_args_set_mod_sp(
         nmod_mpolyun_set_mod(args[i].Geval_sp, w->ctx_sp->ffinfo->mod);
         nmod_mpolyun_set_mod(args[i].Abareval_sp, w->ctx_sp->ffinfo->mod);
         nmod_mpolyun_set_mod(args[i].Bbareval_sp, w->ctx_sp->ffinfo->mod);
+        nmod_poly_stack_set_ctx(args[i].Sp_sp, w->ctx_sp);
     }
 
     for (i = 0; i < w->evals_sp_alloc; i++)
@@ -670,8 +672,8 @@ static void _worker_eval_sp(void * varg)
         FLINT_ASSERT(Gammaeval_sp != 0);
 
         ret->success = nmod_mpolyun_gcd_brown_smprime_bivar(arg->Geval_sp,
-                                   arg->Abareval_sp, arg->Bbareval_sp,
-                                   arg->Aeval_sp, arg->Beval_sp, w->ctx_sp);
+                             arg->Abareval_sp, arg->Bbareval_sp,
+                          arg->Aeval_sp, arg->Beval_sp, w->ctx_sp, arg->Sp_sp);
         if (!ret->success)
         {
             /* image gcd could not be computed */
@@ -873,14 +875,79 @@ cleanup:
     Reduce the berlekamp_massey coefficients of Lambda and try to convert
     them to a fmpz_mpolyu (in w->H)
 */
-static void _worker_reduce_get_sp(void * varg)
+static void _worker_reduce_sp(void * varg)
+{
+    _eval_sp_worker_arg_struct * arg = (_eval_sp_worker_arg_struct *) varg;
+    _base_struct * w = arg->w;
+    nmod_berlekamp_massey_struct * Lcoeffs = w->Lambda_sp->coeffs;
+    slong length = w->Lambda_sp->length;
+    int changed;
+    slong i;
+
+get_next_index:
+
+    pthread_mutex_lock(&w->mutex);
+    i = w->index;
+    w->index++;
+    pthread_mutex_unlock(&w->mutex);
+
+    if (i >= length)
+        goto cleanup;
+
+    changed = nmod_berlekamp_massey_reduce(Lcoeffs + i);
+    if (changed)
+    {
+        w->changed = 1; /* safe - only goes from 0 to 1 */
+    }
+
+    goto get_next_index;
+
+cleanup:
+
+    return;
+}
+
+static void _worker_reduce_mp(void * varg)
+{
+    _eval_mp_worker_arg_struct * arg = (_eval_mp_worker_arg_struct *) varg;
+    _base_struct * w = arg->w;
+    fmpz_mod_berlekamp_massey_struct * Lcoeffs = w->Lambda_mp->coeffs;
+    slong length = w->Lambda_mp->length;
+    int changed;
+    slong i;
+
+get_next_index:
+
+    pthread_mutex_lock(&w->mutex);
+    i = w->index;
+    w->index++;
+    pthread_mutex_unlock(&w->mutex);
+
+    if (i >= length)
+        goto cleanup;
+
+    changed = fmpz_mod_berlekamp_massey_reduce(Lcoeffs + i);
+    if (changed)
+    {
+        w->changed = 1; /* safe - only goes from 0 to 1 */
+    }
+
+    goto get_next_index;
+
+cleanup:
+
+    return;
+}
+
+
+static void _worker_get_mpoly_sp(void * varg)
 {
     _eval_sp_worker_arg_struct * arg = (_eval_sp_worker_arg_struct *) varg;
     _base_struct * w = arg->w;
     nmod_berlekamp_massey_struct * Lcoeffs = w->Lambda_sp->coeffs;
     fmpz_mpoly_struct * Hcoeffs = w->H->coeffs;
     slong length = w->H->length;
-    int changed, success;
+    int success;
     slong i;
 
     FLINT_ASSERT(length == w->Lambda_sp->length);
@@ -897,19 +964,14 @@ get_next_index:
         goto cleanup;
 
     w->H->exps[i] = w->Lambda_sp->exps[i];
-    changed = nmod_berlekamp_massey_reduce(Lcoeffs + i);
-    if (changed)
-    {
-        w->changed = 1; /* safe - only goes from 0 to 1 */
-    }
-    else if (!w->changed && !w->failed)
+    if (!w->failed)
     {
         success = nmod_mpoly_bma_get_fmpz_mpoly(Hcoeffs + i, w->ctx,
-             w->alphashift, Lcoeffs + i, w->Ictx, w->ctx_sp->ffinfo);
+                       w->alphashift, Lcoeffs + i, w->Ictx, w->ctx_sp->ffinfo);
 
         if (!success || (w->H->coeffs + i)->length == 0)
         {
-            w->failed = 1;
+            w->failed = 1; /* safe only goes from 0 to 1 */
         }
     }
 
@@ -920,14 +982,15 @@ cleanup:
     return;
 }
 
-static void _worker_reduce_get_mp(void * varg)
+
+static void _worker_get_mpoly_mp(void * varg)
 {
     _eval_mp_worker_arg_struct * arg = (_eval_mp_worker_arg_struct *) varg;
     _base_struct * w = arg->w;
     fmpz_mod_berlekamp_massey_struct * Lcoeffs = w->Lambda_mp->coeffs;
     fmpz_mpoly_struct * Hcoeffs = w->H->coeffs;
     slong length = w->H->length;
-    int changed, success;
+    int success;
     slong i;
 
     FLINT_ASSERT(length == w->Lambda_mp->length);
@@ -944,12 +1007,7 @@ get_next_index:
         goto cleanup;
 
     w->H->exps[i] = w->Lambda_mp->exps[i];
-    changed = fmpz_mod_berlekamp_massey_reduce(Lcoeffs + i);
-    if (changed)
-    {
-        w->changed = 1; /* safe - only goes from 0 to 1 */
-    }
-    else if (!w->changed && !w->failed)
+    if (!w->failed)
     {
         success = fmpz_mod_bma_get_fmpz_mpoly(Hcoeffs + i, w->alphashift_mp,
                                        Lcoeffs + i, w->Ictx, w->ctx, w->fpctx);
@@ -966,6 +1024,9 @@ cleanup:
 
     return;
 }
+
+
+
 
 
 /*
@@ -1145,8 +1206,9 @@ next_bma_image_sp:
            ? w->bma_target_count - w->Lambda_sp->pointcount
            : w->num_threads;
     j = FLINT_MAX(j, WORD(2)); /* updating with 1 point is not interesting */
-    j += w->num_threads - 1;
-    j /= w->num_threads;
+    j = (j + w->num_threads - 1)/w->num_threads;
+    j = FLINT_MAX(j, WORD(2));
+    j = FLINT_MIN(j, WORD(20));
     j *= w->num_threads;
     _base_set_num_images_sp(w, j);
 
@@ -1243,33 +1305,48 @@ next_bma_image_sp:
                                                             w->ctx_sp->ffinfo);
     }
 
-    if (w->Gamma->length > w->Lambda_sp->pointcount/2)
+    if (w->Gamma->length > w->Lambda_sp->pointcount/2
+        || w->bma_target_count > w->Lambda_sp->pointcount)
     {
         goto next_bma_image_sp;
     }
 
-    /* reduce and get_fmpz_mpolyu */
-    FLINT_ASSERT(cur_alpha_pow_sp >= w->Lambda_sp->pointcount);
+    /* reduce */
     w->changed = 0;
+    w->index = 0;
+    for (i = 1; i < w->num_threads; i++)
+    {
+        thread_pool_wake(global_thread_pool, handles[i - 1],
+                                              _worker_reduce_sp, &args[i]);
+    }
+    _worker_reduce_sp(&args[0]);
+    for (i = 1; i < w->num_threads; i++)
+    {
+        thread_pool_wait(global_thread_pool, handles[i - 1]);
+    }
+    if (w->changed)
+    {
+        goto next_bma_image_sp;
+    }
+
+    /* get fmpz_mpolyu */
+    FLINT_ASSERT(cur_alpha_pow_sp >= w->Lambda_sp->pointcount);
     w->index = 0;
     w->failed = 0;
     w->alphashift = cur_alpha_pow_sp - w->Lambda_sp->pointcount + 1;
     fmpz_mpolyu_fit_length(w->H, w->Lambda_sp->length, w->ctx);
     w->H->length = w->Lambda_sp->length;
-
     for (i = 1; i < w->num_threads; i++)
     {
         thread_pool_wake(global_thread_pool, handles[i - 1],
-                                              _worker_reduce_get_sp, &args[i]);
+                                              _worker_get_mpoly_sp, &args[i]);
     }
-    _worker_reduce_get_sp(&args[0]);
+    _worker_get_mpoly_sp(&args[0]);
     for (i = 1; i < w->num_threads; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i - 1]);
     }
-
-    if (w->changed || w->failed
-        || (w->H->coeffs + 0)->length != w->Gamma->length)
+    if (w->failed || (w->H->coeffs + 0)->length != w->Gamma->length)
     {
         goto next_bma_image_sp;
     }
@@ -1332,7 +1409,7 @@ next_bma_image_sp:
 
         success = nmod_mpolyun_gcd_brown_smprime_bivar(args->Geval_sp,
                                 args->Abareval_sp, args->Bbareval_sp,
-                                   args->Aeval_sp, args->Beval_sp, w->ctx_sp);
+                       args->Aeval_sp, args->Beval_sp, w->ctx_sp, args->Sp_sp);
         if (!success)
         {
             continue;
@@ -1428,8 +1505,9 @@ next_bma_image_mp:
            ? w->bma_target_count - w->Lambda_mp->pointcount
            : w->num_threads;
     j = FLINT_MAX(j, WORD(2)); /* updating with 1 point is not interesting */
-    j += w->num_threads - 1;
-    j /= w->num_threads;
+    j = (j + w->num_threads - 1)/w->num_threads;
+    j = FLINT_MAX(j, WORD(2));
+    j = FLINT_MIN(j, WORD(20));
     j *= w->num_threads;
     _base_set_num_images_mp(w, j);
 
@@ -1522,13 +1600,32 @@ next_bma_image_mp:
                                                              w->ctx, w->fpctx);
     }
 
-    if (w->Gamma->length > w->Lambda_mp->pointcount/2)
+    if (w->Gamma->length > w->Lambda_mp->pointcount/2
+        || w->bma_target_count > w->Lambda_mp->pointcount)
     {
         goto next_bma_image_mp;
     }
 
-    /* reduce and get_fmpz_mpolyu */
+    /* reduce */
     w->changed = 0;
+    w->index = 0;
+    for (i = 1; i < w->num_threads; i++)
+    {
+        thread_pool_wake(global_thread_pool, handles[i - 1],
+                                              _worker_reduce_mp, &args[i]);
+    }
+    _worker_reduce_mp(&args[0]);
+    for (i = 1; i < w->num_threads; i++)
+    {
+        thread_pool_wait(global_thread_pool, handles[i - 1]);
+    }
+
+    if (w->changed)
+    {
+        goto next_bma_image_mp;
+    }
+
+    /* get fmpz_mpolyu */
     w->index = 0;
     w->failed = 0;
     fmpz_sub_ui(w->alphashift_mp, cur_alpha_pow_mp, w->Lambda_mp->pointcount);
@@ -1536,20 +1633,18 @@ next_bma_image_mp:
     fmpz_add_ui(w->alphashift_mp, w->alphashift_mp, 1);
     fmpz_mpolyu_fit_length(w->H, w->Lambda_mp->length, w->ctx);
     w->H->length = w->Lambda_mp->length;
-
     for (i = 1; i < w->num_threads; i++)
     {
         thread_pool_wake(global_thread_pool, handles[i - 1],
-                                              _worker_reduce_get_mp, &args[i]);
+                                              _worker_get_mpoly_mp, &args[i]);
     }
-    _worker_reduce_get_mp(&args[0]);
+    _worker_get_mpoly_mp(&args[0]);
     for (i = 1; i < w->num_threads; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i - 1]);
     }
 
-    if (w->changed || w->failed
-        || (w->H->coeffs + 0)->length != w->Gamma->length)
+    if (w->failed || (w->H->coeffs + 0)->length != w->Gamma->length)
     {
         goto next_bma_image_mp;
     }
@@ -1822,6 +1917,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
         nmod_mpolycu_init(eval_sp_args[i].Acur_sp);
         nmod_mpolycu_init(eval_sp_args[i].Bcur_sp);
         nmod_mpolyc_init(eval_sp_args[i].Gammacur_sp);
+        nmod_poly_stack_init(eval_sp_args[i].Sp_sp, w->bits, w->ctx_sp);
     }
 
     nmod_mpolyc_init(w->Gammaone_sp);
@@ -1890,7 +1986,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
         }
         success = nmod_mpolyun_gcd_brown_smprime_bivar(arg->Geval_sp,
                                      arg->Abareval_sp, arg->Bbareval_sp,
-                                      arg->Aeval_sp, arg->Beval_sp, w->ctx_sp);
+                          arg->Aeval_sp, arg->Beval_sp, w->ctx_sp, arg->Sp_sp);
         if (success)
         {
             w->GdegboundXY = nmod_mpolyun_bidegree(arg->Geval_sp);
@@ -1967,15 +2063,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     }
 
     /* find a image_count before which we do not try to reduce */
-    {
-        ulong Amax_len, Bmax_len;
-        w->bma_target_count = 1;
-        Amax_len = fmpz_mpolyu_max_coeff_length(A);
-        w->bma_target_count += Amax_len >> ((FLINT_BIT_COUNT(Amax_len))/2); 
-        Bmax_len = fmpz_mpolyu_max_coeff_length(B);
-        w->bma_target_count += Bmax_len >> ((FLINT_BIT_COUNT(Bmax_len))/2);
-        w->bma_target_count = FLINT_MAX(w->bma_target_count, 2*Gamma->length);
-    }
+    w->bma_target_count = FLINT_MAX(w->num_threads, 2*Gamma->length);
 
     /* initial choices for the ksub degrees are the strict degree bounds on H */
     for (i = 0; i < ctx->minfo->nvars; i++)
@@ -2251,7 +2339,7 @@ next_zip_image:
 
     /* upgrade G to Hbits then try to pack down to bits */
     fmpz_mpolyu_set_bits(G, Hbits, ctx);
-    fmpz_mpolyu_divexact_mpoly(G, w->H, Hcontent, ctx);
+    fmpz_mpolyu_divexact_mpoly(G, w->H, 1, Hcontent, ctx);
     success = fmpz_mpolyu_repack_bits(G, w->bits, ctx);
     if (!success)
     {
@@ -2358,6 +2446,7 @@ cleanup:
         nmod_mpolycu_clear(eval_sp_args[i].Acur_sp);
         nmod_mpolycu_clear(eval_sp_args[i].Bcur_sp);
         nmod_mpolyc_clear(eval_sp_args[i].Gammacur_sp);
+        nmod_poly_stack_clear(eval_sp_args[i].Sp_sp);
     }
     flint_free(eval_sp_args);
     nmod_mpolyc_clear(w->Gammaone_sp);
@@ -2451,6 +2540,41 @@ cleanup:
     return success;
 }
 
+
+typedef struct
+{
+    const fmpz_mpoly_struct * P;
+    fmpz_mpoly_struct * Pcontent;
+    fmpz_mpolyu_struct * Puu, * Pbar;
+    const slong * perm;
+    const ulong * shift, * stride, * maxexps;
+    const fmpz_mpoly_ctx_struct * ctx;
+    const fmpz_mpoly_ctx_struct * uctx;
+    const thread_pool_handle * handles;
+    slong num_handles;
+    int success;
+}
+_convertuu_arg_struct;
+
+typedef _convertuu_arg_struct _convertuu_arg_t[1];
+
+static void _worker_convertuu(void * varg)
+{
+    _convertuu_arg_struct * arg = (_convertuu_arg_struct *) varg;
+
+    fmpz_mpoly_to_mpolyuu_perm_deflate(arg->Puu, arg->uctx, arg->P, arg->ctx,
+                             arg->perm, arg->shift, arg->stride, arg->maxexps,
+                                               arg->handles, arg->num_handles);
+
+    arg->success = fmpz_mpolyu_content_mpoly(arg->Pcontent, arg->Puu,
+                                                           arg->uctx, NULL, 0);
+
+    if (arg->success)
+    {
+        fmpz_mpolyu_divexact_mpoly(arg->Pbar, arg->Puu, 0, arg->Pcontent,
+                                                                    arg->uctx);
+    }
+}
 
 int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     fmpz_mpoly_t G,
@@ -2594,21 +2718,63 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     /* Gbits is bits for final answer in ZZ[x_0,...,x_(n-1)] */
     Gbits = FLINT_MIN(A->bits, B->bits);
 
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
-                                                 perm, shift, stride, NULL, 0);
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
-                                                 perm, shift, stride, NULL, 0);
+    if (num_handles > 0)
+    {
+        slong s = mpoly_divide_threads(num_handles, A->length, B->length);
+        _convertuu_arg_t arg;
 
-    /* remove content from A and B */
-    success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);
-    success = success && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx, NULL, 0);
-    if (!success)
-        goto cleanup;
-    fmpz_mpolyu_divexact_mpoly(Abar, Auu, Acontent, uctx);
-    fmpz_mpolyu_divexact_mpoly(Bbar, Buu, Bcontent, uctx);
+        FLINT_ASSERT(s >= 0);
+        FLINT_ASSERT(s < num_handles);
+
+        arg->ctx = ctx;
+        arg->uctx = uctx;
+        arg->P = B;
+        arg->Puu = Buu;
+        arg->Pcontent = Bcontent;
+        arg->Pbar = Bbar;
+        arg->perm = perm;
+        arg->shift = shift;
+        arg->stride = stride;
+        arg->maxexps = (const ulong *) Bdegs;
+        arg->handles = handles + (s + 1);
+        arg->num_handles = num_handles - (s + 1);
+
+        thread_pool_wake(global_thread_pool, handles[s], _worker_convertuu, arg);
+
+        fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
+                   perm, shift, stride, (const ulong *) Adegs, handles + 0, s);
+        success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, handles + 0, s);
+        if (success)
+        {
+            fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
+        }
+
+        thread_pool_wait(global_thread_pool, handles[s]);
+
+        success = success && arg->success;
+        if (!success)
+            goto cleanup;
+    }
+    else
+    {
+        fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
+                          perm, shift, stride, (const ulong *) Adegs, NULL, 0);
+        fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
+                          perm, shift, stride, (const ulong *) Bdegs, NULL, 0);
+
+        /* remove content from A and B */
+        success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);
+        success = success
+               && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx, NULL, 0);
+        if (!success)
+            goto cleanup;
+        fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
+        fmpz_mpolyu_divexact_mpoly(Bbar, Buu, 0, Bcontent, uctx);
+    }
 
     /* compute GCD of leading coefficients */
-    FLINT_ASSERT(A->length > 0 && B->length > 0);
+    FLINT_ASSERT(Abar->length > 0);
+    FLINT_ASSERT(Bbar->length > 0);
     _fmpz_mpoly_gcd(Gamma, ABbits, Abar->coeffs + 0, Bbar->coeffs + 0, uctx,
                                                                       NULL, 0);
     if (!success)
