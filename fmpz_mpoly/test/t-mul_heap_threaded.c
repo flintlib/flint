@@ -16,12 +16,12 @@
 int
 main(void)
 {
-    int i, j, result, max_threads = 5;
-    int tmul = 10;
-#ifdef _WIN32
-    tmul = 1;
-#endif
+    slong i, j, result, max_threads = 5;
+    slong tmul = 10;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 2;
+#endif
 
     flint_printf("mul_heap_threaded....");
     fflush(stdout);
