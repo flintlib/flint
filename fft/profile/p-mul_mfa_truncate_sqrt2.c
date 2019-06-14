@@ -19,7 +19,7 @@
 int
 main(void)
 {
-    mp_bitcnt_t depth, w;
+    flint_bitcnt_t depth, w;
     mp_size_t iters, j;
     double truncation;
 
@@ -38,8 +38,8 @@ main(void)
 
     {
        mp_size_t n = (UWORD(1)<<depth);
-       mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
-       mp_bitcnt_t bits = 2*n*bits1;
+       flint_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
+       flint_bitcnt_t bits = 2*n*bits1;
        mp_size_t int_limbs = ((mp_size_t)(truncation*bits))/FLINT_BITS;
        mp_size_t j;
        mp_limb_t * i1, *i2, *r1, *r2;

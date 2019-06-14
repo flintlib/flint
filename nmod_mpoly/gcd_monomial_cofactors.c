@@ -22,7 +22,7 @@
 
     The function should pack its answer into bits = Gbits <= FLINT_BITS
 */
-int _nmod_mpoly_gcd_monomial_cofactors_sp(nmod_mpoly_t G, mp_bitcnt_t Gbits,
+int _nmod_mpoly_gcd_monomial_cofactors_sp(nmod_mpoly_t G, flint_bitcnt_t Gbits,
          const nmod_mpoly_t A, const ulong * Amax_exp , const ulong * Amin_exp,
          const nmod_mpoly_t B, const ulong * Bmax_exp , const ulong * Bmin_exp,
                                                     const nmod_mpoly_ctx_t ctx)

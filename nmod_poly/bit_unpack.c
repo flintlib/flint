@@ -19,7 +19,7 @@
 
 /* Assumes len > 0, bits > 0. */
 void
-_nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, mp_bitcnt_t bits,
+_nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
                       nmod_t mod)
 {
     slong i;
@@ -199,7 +199,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, mp_bitcnt_t bits,
 }
 
 void
-nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
 {
     slong len;
     mpz_t tmp;

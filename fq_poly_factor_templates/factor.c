@@ -205,7 +205,7 @@ TEMPLATE(T, poly_factor) (TEMPLATE(T, poly_factor_t) result,
                           const TEMPLATE(T, poly_t) input,
                           const TEMPLATE(T, ctx_t) ctx)
 {
-    mp_bitcnt_t bits = fmpz_bits(TEMPLATE(T, ctx_prime) (ctx));
+    flint_bitcnt_t bits = fmpz_bits(TEMPLATE(T, ctx_prime) (ctx));
     slong n = TEMPLATE(T, poly_degree) (input, ctx);
 
     if (n < 10 + 50 / bits)

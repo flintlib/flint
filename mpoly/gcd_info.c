@@ -18,7 +18,7 @@
 */
 void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,
                        slong * Amax_exp_count, slong * Amin_exp_count,
-                       const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                       const ulong * Aexps, flint_bitcnt_t Abits, slong Alength,
                                                         const mpoly_ctx_t mctx)
 {
     ulong * exps;
@@ -83,9 +83,9 @@ void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,
     It is assumed that {A|B}{max|min}_exp are correct.
 */
 void mpoly_gcd_info_stride(ulong * strides,
-          const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+          const ulong * Aexps, flint_bitcnt_t Abits, slong Alength,
                              const ulong * Amax_exp, const ulong * Amin_exp,
-          const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+          const ulong * Bexps, flint_bitcnt_t Bbits, slong Blength,
                              const ulong * Bmax_exp, const ulong * Bmin_exp,
                                                         const mpoly_ctx_t mctx)
 {

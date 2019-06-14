@@ -14,7 +14,7 @@
 void _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(fq_nmod_mpoly_t poly,
             const fq_nmod_t c, const fmpz * exp, const fq_nmod_mpoly_ctx_t ctx)
 {
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     slong i, N, index;
     ulong * cmpmask;
     ulong * packed_exp;

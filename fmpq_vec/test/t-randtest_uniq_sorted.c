@@ -23,7 +23,7 @@ int main()
     {
         slong i;
         slong n;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
         fmpq * vec;
 
         n = n_randint(state, 20);

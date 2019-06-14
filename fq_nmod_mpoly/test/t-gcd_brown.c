@@ -130,7 +130,7 @@ main(void)
         fq_nmod_mpoly_t a, b, g;
         slong len, len1, len2;
         slong degbound;
-        mp_bitcnt_t pbits;
+        flint_bitcnt_t pbits;
         slong deg;
 
         pbits = 1 + n_randint(state, FLINT_BITS);

@@ -13,7 +13,7 @@
 
 
 void mpoly_monomials_deflation(fmpz * shift, fmpz * stride,
-                        const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                        const ulong * Aexps, flint_bitcnt_t Abits, slong Alength,
                                                         const mpoly_ctx_t mctx)
 {
     slong i, j;

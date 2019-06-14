@@ -139,20 +139,20 @@ values `0`, `1`, ``COEFF_MAX``, and ``WORD_MAX``.  On a
 polynomial level, the integer numerator has a reasonable chance 
 to have a non-trivial content.
 
-.. function:: void fmpq_poly_randtest(fmpq_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpq_poly_randtest(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with coefficients up to the given 
     length and where each coefficient has up to the given number of bits. 
     The coefficients are signed randomly.  One must call 
     ``flint_randinit()`` before calling this function.
 
-.. function:: void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with coefficients up to the given length 
     and where each coefficient has up to the given number of bits.  One must 
     call ``flint_randinit()`` before calling this function.
 
-.. function:: void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     As for ``fmpq_poly_randtest()`` except that ``len`` and ``bits`` 
     may not be zero and the polynomial generated is guaranteed not to be the 

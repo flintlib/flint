@@ -132,7 +132,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, t;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
@@ -187,7 +187,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, t1, t2;
         slong len, len1;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
@@ -290,7 +290,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, t;
         mp_limb_t rlimb;
-        mp_bitcnt_t newbits;
+        flint_bitcnt_t newbits;
         slong len, len1, len2;
         slong degbound;
         mp_limb_t modulus;
@@ -356,7 +356,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, t;
         fmpz * shifts1, * shifts2, * strides;
-        mp_bitcnt_t stride_bits, shift_bits;
+        flint_bitcnt_t stride_bits, shift_bits;
         slong len, len1, len2;
         slong degbound;
         mp_limb_t modulus;
@@ -441,7 +441,7 @@ main(void)
         ulong degbounds1[4];
         ulong degbounds2[4];
         ulong degbounds3[4];
-        mp_bitcnt_t bits4;
+        flint_bitcnt_t bits4;
         mp_limb_t modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
@@ -497,12 +497,12 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, t;
         mp_limb_t rlimb;
-        mp_bitcnt_t newbits;
+        flint_bitcnt_t newbits;
         slong len1, len2, len3, len4;
         ulong degbounds1[4];
         ulong degbounds2[4];
         ulong degbounds3[4];
-        mp_bitcnt_t bits4;
+        flint_bitcnt_t bits4;
         mp_limb_t modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
@@ -574,12 +574,12 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, t;
         fmpz * shifts1, * shifts2, * strides;
-        mp_bitcnt_t stride_bits, shift_bits;
+        flint_bitcnt_t stride_bits, shift_bits;
         slong len1, len2, len3, len4;
         ulong degbounds1[4];
         ulong degbounds2[4];
         ulong degbounds3[4];
-        mp_bitcnt_t bits4;
+        flint_bitcnt_t bits4;
         mp_limb_t modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;

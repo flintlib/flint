@@ -12,11 +12,11 @@
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_ctx_init_rand(fq_nmod_mpoly_ctx_t ctx, flint_rand_t state,
-                    slong max_nvars, mp_bitcnt_t p_bits_bound, slong deg_bound)
+                    slong max_nvars, flint_bitcnt_t p_bits_bound, slong deg_bound)
 {
     ulong p;
     slong d;
-    mp_bitcnt_t p_bits;
+    flint_bitcnt_t p_bits;
     nmod_poly_t poly;
 
     d = 1 + n_randint(state, deg_bound);

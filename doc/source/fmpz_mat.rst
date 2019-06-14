@@ -111,18 +111,18 @@ Random matrix generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     Sets the entries of ``mat`` to random signed integers whose absolute 
     values have the given number of binary bits.
 
-.. function:: void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     Sets the entries of ``mat`` to random signed integers whose 
     absolute values have a random number of bits up to the given number 
     of bits inclusive.
 
-.. function:: void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     Sets ``mat`` to be a random \emph{integer relations} matrix, with 
     signed entries up to the given number of bits.
@@ -132,7 +132,7 @@ Random matrix generation
     in the left hand column and an identity matrix in the remaining square 
     submatrix.
 
-.. function:: void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+.. function:: void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, flint_bitcnt_t bits2)
 
     Sets ``mat`` to a random \emph{simultaneous diophantine} matrix.
 
@@ -142,7 +142,7 @@ Random matrix generation
     Running down the rest of the diagonal are the values ``2^bits`` with 
     all remaining entries zero.
 
-.. function:: void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q)
+.. function:: void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
     Sets a square matrix ``mat`` of even dimension to a random 
     \emph{NTRU like} matrix.
@@ -155,7 +155,7 @@ Random matrix generation
     number of bits. Then entry `(i, j)` of the submatrix is set to 
     `h[i + j \bmod{r/2}]`. 
 
-.. function:: void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q)
+.. function:: void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
     Sets a square matrix ``mat`` of even dimension to a random 
     \emph{NTRU like} matrix.
@@ -186,7 +186,7 @@ Random matrix generation
     The return value is `0` or `1` depending on whether the permutation is
     even or odd.
 
-.. function:: void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, mp_bitcnt_t bits)
+.. function:: void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, flint_bitcnt_t bits)
 
     Sets ``mat`` to a random sparse matrix with the given rank, 
     having exactly as many non-zero elements as the rank, with the 
@@ -510,7 +510,7 @@ Matrix multiplication
     `C` is not allowed to be aliased with `A` or `B`. Uses Strassen
     multiplication (the Strassen-Winograd variant).
 
-.. function:: void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, mp_bitcnt_t bits)
+.. function:: void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, flint_bitcnt_t bits)
 
 .. function:: void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 

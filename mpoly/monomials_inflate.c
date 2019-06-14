@@ -12,8 +12,8 @@
 #include "fmpz_mpoly.h"
 
 
-void mpoly_monomials_inflate(ulong * Aexps, mp_bitcnt_t Abits,
-                       const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+void mpoly_monomials_inflate(ulong * Aexps, flint_bitcnt_t Abits,
+                       const ulong * Bexps, flint_bitcnt_t Bbits, slong Blength,
                const fmpz * shift, const fmpz * stride, const mpoly_ctx_t mctx)
 {
     slong i, j;

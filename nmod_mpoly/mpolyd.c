@@ -199,7 +199,7 @@ void nmod_mpoly_to_nmod_mpolyd_perm_deflate(nmod_mpolyd_t A, slong m,
 
 
 void nmod_mpoly_from_nmod_mpolyd_perm_inflate(nmod_mpoly_t A,
-         mp_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx, const nmod_mpolyd_t B,
+         flint_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx, const nmod_mpolyd_t B,
                  const slong * perm, const ulong * shift, const ulong * stride)
 {
     slong off;

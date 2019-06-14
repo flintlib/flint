@@ -31,7 +31,7 @@ main(void)
         ordering_t ord;
         mp_limb_t modulus;
         slong nvars, len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         nmod_mpoly_struct * qarr[1], * darr[1];
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;

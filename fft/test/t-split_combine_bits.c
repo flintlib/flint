@@ -36,7 +36,7 @@ main(void)
         mp_limb_t * in = flint_malloc(total_limbs*sizeof(mp_limb_t));
         mp_limb_t * out = flint_calloc(total_limbs, sizeof(mp_limb_t));
         
-        mp_bitcnt_t bits = n_randint(state, 200) + 1;
+        flint_bitcnt_t bits = n_randint(state, 200) + 1;
         mp_size_t limbs = (2*bits - 1)/FLINT_BITS + 1;
         slong length = (total_limbs*FLINT_BITS - 1)/bits + 1;
         

@@ -55,7 +55,7 @@ void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift,
 void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
                            slong shift2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     slong N;
     slong k;
     slong p_len;
@@ -119,7 +119,7 @@ void _fmpz_mpoly_to_fmpz_poly_deflate(
     fmpz * coeff = B->coeffs;
     ulong * exp = B->exps;
     ulong var_shift, var_stride;
-    mp_bitcnt_t bits = B->bits;
+    flint_bitcnt_t bits = B->bits;
 
     FLINT_ASSERT(len > 0);
     FLINT_ASSERT(bits <= FLINT_BITS);
@@ -165,7 +165,7 @@ void _fmpz_mpoly_to_fmpz_poly_deflate(
 */
 void _fmpz_mpoly_from_fmpz_poly_inflate(
     fmpz_mpoly_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     const fmpz_poly_t B,
     slong var,
     const ulong * Ashift,

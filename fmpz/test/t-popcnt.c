@@ -21,7 +21,7 @@ int
 main(void)
 {
     int i, result;
-    mp_bitcnt_t r1, r2;
+    flint_bitcnt_t r1, r2;
     FLINT_TEST_INIT(state);
 
     flint_printf("popcnt....");

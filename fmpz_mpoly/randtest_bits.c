@@ -12,7 +12,7 @@
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state,
-              slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
+              slong length, flint_bitcnt_t coeff_bits, flint_bitcnt_t exp_bits,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j, nvars = ctx->minfo->nvars;

@@ -14,7 +14,7 @@
 void fq_nmod_mpoly_gen(fq_nmod_mpoly_t A, slong var,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
 
     bits = mpoly_gen_bits_required(var, ctx->minfo);
     bits = mpoly_fix_bits(bits, ctx->minfo);

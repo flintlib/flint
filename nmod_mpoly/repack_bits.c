@@ -13,7 +13,7 @@
 
 
 int nmod_mpoly_repack_bits(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                 mp_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx)
+                                 flint_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx)
 {
     int success;
     nmod_mpoly_t T;

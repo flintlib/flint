@@ -460,12 +460,12 @@ Bit packing
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, mp_bitcnt_t bit_size, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit_size, const fq_nmod_ctx_t ctx)
 
     Packs ``op`` into bitfields of size ``bit_size``, writing the
     result to ``f``.
 
-.. function:: void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size, const fq_nmod_ctx_t ctx)
 
     Unpacks into ``rop`` the element with coefficients packed into
     fields of size ``bit_size`` as represented by the integer

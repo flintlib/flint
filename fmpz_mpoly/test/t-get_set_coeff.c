@@ -28,7 +28,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits2;
         slong len;
         fmpz_t c, d;
 
@@ -89,7 +89,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
         slong len;
         fmpz_t c, d;
 

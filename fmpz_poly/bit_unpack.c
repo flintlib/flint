@@ -16,11 +16,11 @@
 
 int
 _fmpz_poly_bit_unpack(fmpz * poly, slong len,
-                      mp_srcptr arr, mp_bitcnt_t bit_size, int negate)
+                      mp_srcptr arr, flint_bitcnt_t bit_size, int negate)
 {
-    mp_bitcnt_t bits = 0;
+    flint_bitcnt_t bits = 0;
     mp_size_t limbs = 0;
-    mp_bitcnt_t b = bit_size % FLINT_BITS;
+    flint_bitcnt_t b = bit_size % FLINT_BITS;
     mp_size_t l = bit_size / FLINT_BITS;
     int borrow = 0;
     slong i;
@@ -44,11 +44,11 @@ _fmpz_poly_bit_unpack(fmpz * poly, slong len,
 
 void
 _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len,
-                               mp_srcptr arr, mp_bitcnt_t bit_size)
+                               mp_srcptr arr, flint_bitcnt_t bit_size)
 {
-    mp_bitcnt_t bits = 0;
+    flint_bitcnt_t bits = 0;
     mp_size_t limbs = 0;
-    mp_bitcnt_t b = bit_size % FLINT_BITS;
+    flint_bitcnt_t b = bit_size % FLINT_BITS;
     mp_size_t l = bit_size / FLINT_BITS;
     slong i;
 
@@ -67,7 +67,7 @@ _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len,
 
 void
 fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
-                                        mp_bitcnt_t bit_size)
+                                        flint_bitcnt_t bit_size)
 {
     slong len;
     mpz_t tmp;
@@ -101,7 +101,7 @@ fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
 
 
 void
-fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
 {
     slong len;
     mpz_t tmp;

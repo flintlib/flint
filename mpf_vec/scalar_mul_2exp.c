@@ -14,7 +14,7 @@
 
 void
 _mpf_vec_scalar_mul_2exp(mpf * res, const mpf * vec, slong len,
-                         mp_bitcnt_t exp)
+                         flint_bitcnt_t exp)
 {
     slong i;
     for (i = 0; i < len; i++)

@@ -29,7 +29,7 @@ main(void)
         fmpz ** exp;
         fq_nmod_t cm, ce, q;
         slong len;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
         fq_nmod_mpoly_init(f, ctx);

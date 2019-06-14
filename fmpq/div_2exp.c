@@ -11,7 +11,7 @@
 
 #include "fmpq.h"
 
-void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp)
+void fmpq_div_2exp(fmpq_t res, const fmpq_t x, flint_bitcnt_t exp)
 {
     if (fmpq_is_zero(x) || exp == 0)
     {
@@ -19,7 +19,7 @@ void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp)
     }
     else
     {
-        mp_bitcnt_t v = fmpz_val2(fmpq_numref(x));
+        flint_bitcnt_t v = fmpz_val2(fmpq_numref(x));
 
         if (exp <= v)
         {

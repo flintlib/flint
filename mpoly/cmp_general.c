@@ -13,8 +13,8 @@
 
 /* !!! this file DOES need to change with new orderings */
 
-int mpoly_monomial_cmp_general(ulong * Aexp, mp_bitcnt_t Abits,
-                       ulong * Bexp, mp_bitcnt_t Bbits, const mpoly_ctx_t mctx)
+int mpoly_monomial_cmp_general(ulong * Aexp, flint_bitcnt_t Abits,
+                       ulong * Bexp, flint_bitcnt_t Bbits, const mpoly_ctx_t mctx)
 {
     slong N;
 
@@ -79,7 +79,7 @@ int mpoly_monomial_cmp_general(ulong * Aexp, mp_bitcnt_t Abits,
     else
     {
         int cmp;
-        mp_bitcnt_t newbits;
+        flint_bitcnt_t newbits;
         ulong * newAexp, * newBexp, * cmpmask;
         TMP_INIT;
 

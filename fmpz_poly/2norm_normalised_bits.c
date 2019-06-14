@@ -15,10 +15,10 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-mp_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len)
+flint_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len)
 {
    fmpz_t norm;
-   mp_bitcnt_t bits;
+   flint_bitcnt_t bits;
    fmpz_init(norm);
 
 	_fmpz_poly_2norm(norm, poly, len);

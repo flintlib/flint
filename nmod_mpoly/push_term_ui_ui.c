@@ -19,7 +19,7 @@ void _nmod_mpoly_push_exp_ui(nmod_mpoly_t A,
 {
     slong N;
     slong old_length = A->length;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
 
     exp_bits = mpoly_exp_bits_required_ui(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);

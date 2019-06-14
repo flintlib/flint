@@ -20,13 +20,13 @@
 typedef struct
 {
    ulong * composites;
-   mp_bitcnt_t bits;
+   flint_bitcnt_t bits;
 } fac_one_line_t;
 
 void sample(void * arg, ulong count)
 {
    fac_one_line_t * params = (fac_one_line_t *) arg;
-   mp_bitcnt_t bits = params->bits;
+   flint_bitcnt_t bits = params->bits;
    ulong i, j, res, primes = (WORD(1)<<(bits/3))/10 + 1;
    n_factor_t factors;
    mp_limb_t n2;
@@ -48,7 +48,7 @@ void sample(void * arg, ulong count)
    }
 }
 
-void fill_array(ulong * ret, mp_bitcnt_t bits, flint_rand_t state)
+void fill_array(ulong * ret, flint_bitcnt_t bits, flint_rand_t state)
 {
    ulong n;
    n_factor_t factors;

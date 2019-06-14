@@ -24,7 +24,7 @@ int main(void)
     gmp_randstate_t st;
     mp_ptr dinv;
     mp_size_t size;
-    mp_bitcnt_t norm;
+    flint_bitcnt_t norm;
     
     FLINT_TEST_INIT(state);
 

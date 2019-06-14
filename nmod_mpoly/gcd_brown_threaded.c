@@ -391,7 +391,7 @@ static void _splitworker(void * varg)
     _splitworker_arg_struct * arg = (_splitworker_arg_struct *) varg;
     _splitbase_struct * base = arg->base;
     const nmod_mpoly_ctx_struct * ctx = base->ctx;
-    mp_bitcnt_t bits = base->A->bits;
+    flint_bitcnt_t bits = base->A->bits;
     slong var = base->var;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     slong offset, shift;
@@ -781,7 +781,7 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     slong num_handles)
 {
     slong i;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     ulong num_threads;
     int success;
@@ -1096,7 +1096,7 @@ int nmod_mpoly_gcd_brown_threaded(
     slong * perm;
     ulong * shift, * stride;
     slong i;
-    mp_bitcnt_t ABbits;
+    flint_bitcnt_t ABbits;
     nmod_mpoly_ctx_t uctx;
     nmod_mpolyun_t An, Bn, Gn, Abarn, Bbarn;
     thread_pool_handle * handles;

@@ -13,12 +13,12 @@
 
 /* this file does not need to change with new orderings */
 
-slong mpoly_monomial_index_ui(const ulong * Aexps, mp_bitcnt_t Abits,
+slong mpoly_monomial_index_ui(const ulong * Aexps, flint_bitcnt_t Abits,
                       slong Alength, const ulong * exp, const mpoly_ctx_t mctx)
 {
     slong N, index;
     ulong * cmpmask, * packed_exp;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     int exists;
     TMP_INIT;
 
@@ -46,12 +46,12 @@ slong mpoly_monomial_index_ui(const ulong * Aexps, mp_bitcnt_t Abits,
         return index;
 }
 
-slong mpoly_monomial_index_pfmpz(const ulong * Aexps, mp_bitcnt_t Abits,
+slong mpoly_monomial_index_pfmpz(const ulong * Aexps, flint_bitcnt_t Abits,
                      slong Alength, fmpz * const * exp, const mpoly_ctx_t mctx)
 {
     slong N, index;
     ulong * cmpmask, * packed_exp;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     int exists;
     TMP_INIT;
 
@@ -79,8 +79,8 @@ slong mpoly_monomial_index_pfmpz(const ulong * Aexps, mp_bitcnt_t Abits,
         return index;
 }
 
-slong mpoly_monomial_index_monomial(const ulong * Aexps, mp_bitcnt_t Abits,
-                        slong Alength, const ulong * Mexp, mp_bitcnt_t Mbits,
+slong mpoly_monomial_index_monomial(const ulong * Aexps, flint_bitcnt_t Abits,
+                        slong Alength, const ulong * Mexp, flint_bitcnt_t Mbits,
                                                         const mpoly_ctx_t mctx)
 {
     slong N, index;

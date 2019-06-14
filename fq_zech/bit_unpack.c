@@ -12,7 +12,7 @@
 #include "fq_zech.h"
 
 void
-fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx)
 {
     fq_nmod_t ropn;

@@ -14,7 +14,7 @@
 
 slong _nmod_mpoly_derivative(mp_limb_t * coeff1,       ulong * exp1,
                        const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-          mp_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp,
+          flint_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp,
                                                         const nmodf_ctx_t fctx)
 {
     slong i, len1;
@@ -42,7 +42,7 @@ slong _nmod_mpoly_derivative(mp_limb_t * coeff1,       ulong * exp1,
 
 slong _nmod_mpoly_derivative_mp(mp_limb_t * coeff1,       ulong * exp1,
                           const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-          mp_bitcnt_t bits, slong N, slong offset,              ulong * oneexp,
+          flint_bitcnt_t bits, slong N, slong offset,              ulong * oneexp,
                                                         const nmodf_ctx_t fctx)
 {
     slong i, len1;
@@ -75,7 +75,7 @@ void nmod_mpoly_derivative(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                          slong var, const nmod_mpoly_ctx_t ctx)
 {
     slong N, offset, shift;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     ulong * oneexp;
     slong len1;
     TMP_INIT;

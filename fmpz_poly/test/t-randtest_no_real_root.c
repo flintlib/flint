@@ -23,7 +23,7 @@ int main()
     {
         fmpz_poly_t p;
         slong len, i;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
 
         bits = 1 + n_randint(state, 30);
         len = 1 + n_randint(state, 20);

@@ -118,7 +118,7 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        mp_bitcnt_t varibits;
+        flint_bitcnt_t varibits;
 
         if (i == main_var)
             continue;
@@ -253,7 +253,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
     fmpz * degrees;
     slong * offs;
     ulong * masks;
-    mp_bitcnt_t * bitcounts;
+    flint_bitcnt_t * bitcounts;
     fmpz_t s;
     nmod_poly_struct * powers;
     nmod_poly_t t, t2;
@@ -270,7 +270,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
 
     TMP_START;
 
-    bitcounts = (mp_bitcnt_t * ) TMP_ALLOC(nvars*sizeof(mp_bitcnt_t));
+    bitcounts = (flint_bitcnt_t * ) TMP_ALLOC(nvars*sizeof(flint_bitcnt_t));
     degrees = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
     for (i = 0; i < nvars; i++)
     {

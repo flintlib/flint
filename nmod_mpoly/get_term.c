@@ -15,7 +15,7 @@ void nmod_mpoly_get_term(nmod_mpoly_t M, const nmod_mpoly_t A,
                                            slong i, const nmod_mpoly_ctx_t ctx)
 {
     slong N;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
 
     if ((ulong) i >= (ulong) A->length)
     {

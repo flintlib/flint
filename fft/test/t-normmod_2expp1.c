@@ -17,7 +17,7 @@
 #include "fft.h"
 
 /* set p = 2^wn + 1 */
-void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
+void set_p(mpz_t p, mp_size_t n, flint_bitcnt_t w)
 {
    flint_mpz_set_ui(p, 1);
    mpz_mul_2exp(p, p, n*w);
@@ -27,7 +27,7 @@ void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
 int
 main(void)
 {
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     mp_size_t j, k, n, w, limbs;
     mp_limb_t * nn;
     mpz_t p, m1, m2;

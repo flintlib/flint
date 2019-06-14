@@ -56,7 +56,7 @@ main(void)
         fmpz_mpoly_t f, g, h;
         slong len, len1;
         ulong pow;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
 
@@ -108,7 +108,7 @@ main(void)
         fmpz_mpoly_t f, g;
         slong len, len1;
         ulong pow;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
 

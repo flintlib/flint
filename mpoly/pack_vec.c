@@ -57,7 +57,7 @@ void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
     }
 }
 
-void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, mp_bitcnt_t bits,
+void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, flint_bitcnt_t bits,
                                                       slong nfields, slong len)
 {
     if (bits <= FLINT_BITS)

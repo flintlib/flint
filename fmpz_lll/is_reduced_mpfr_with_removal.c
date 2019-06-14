@@ -16,7 +16,7 @@
 int
 fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                                       const fmpz_t gs_B, int newd,
-                                      mp_bitcnt_t prec)
+                                      flint_bitcnt_t prec)
 {
     if (fl->rt == Z_BASIS)
     {

@@ -13,7 +13,7 @@
 
 void
 fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank,
-                  mp_bitcnt_t bits)
+                  flint_bitcnt_t bits)
 {
     slong i;
     fmpz * diag;

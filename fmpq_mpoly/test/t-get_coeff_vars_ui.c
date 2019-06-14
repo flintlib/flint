@@ -55,7 +55,7 @@ main(void)
         fmpq_mpoly_t f, g, h, m;
         slong nvars, len;
         ulong exp_bound;
-        mp_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits;
         slong vars[1];
         ulong exps[1];
         slong var1;
@@ -112,7 +112,7 @@ main(void)
         fmpq_mpoly_t f, g, h, m;
         slong nvars, len;
         ulong exp_bound;
-        mp_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits;
         slong vars[2];
         ulong exps[2];
         slong var1, var2;

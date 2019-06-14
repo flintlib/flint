@@ -31,7 +31,7 @@ main(void)
     {
         fmpz_t a;
         mpz_t b, c;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
 
         mpz_init(b);
         mpz_init(c);

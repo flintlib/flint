@@ -24,7 +24,7 @@ main(void)
 
     {
         slong len1;
-        mp_bitcnt_t exp_bits1;
+        flint_bitcnt_t exp_bits1;
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, f1;
         char * str;

@@ -33,7 +33,7 @@ main(void)
         fmpz_t lhs, rhs;
         slong nreal, ncomplex, nreal_max, ncomplex_max, r1, r2;
         slong len = n_randint(state, 20) + 1;
-        mp_bitcnt_t bits = n_randint(state, 50) + 1;
+        flint_bitcnt_t bits = n_randint(state, 50) + 1;
         
         fmpz_poly_init2(poly, len);
         fmpz_poly_init2(linear, 2);

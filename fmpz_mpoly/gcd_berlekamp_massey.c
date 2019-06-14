@@ -2209,7 +2209,7 @@ int fmpz_mpolyu_addinterp_zip(
 
 int fmpz_mpoly_repack_bits_inplace(
     fmpz_mpoly_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     const fmpz_mpoly_ctx_t ctx)
 {
     int success;
@@ -2238,10 +2238,10 @@ int fmpz_mpoly_repack_bits_inplace(
 
 int fmpz_mpolyu_repack_bits(
     fmpz_mpolyu_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     const fmpz_mpoly_ctx_t ctx)
 {
-    mp_bitcnt_t org_bits = A->bits;
+    flint_bitcnt_t org_bits = A->bits;
     int success;
     slong i, j;
 
@@ -2267,7 +2267,7 @@ int fmpz_mpolyu_repack_bits(
 /* fit bits is not the best fxn to accomplish this */
 void fmpz_mpoly_set_bits(
     fmpz_mpoly_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_fit_bits(A, Abits, ctx);
@@ -2276,7 +2276,7 @@ void fmpz_mpoly_set_bits(
 
 void fmpz_mpolyu_set_bits(
     fmpz_mpolyu_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
@@ -2784,7 +2784,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
     const fmpz_mpoly_ctx_t ctx)
 {
     int changed, success, point_try_count;
-    mp_bitcnt_t bits = A->bits, Hbits;
+    flint_bitcnt_t bits = A->bits, Hbits;
     mpoly_bma_interpolate_ctx_t Ictx;
     fmpz_mod_ctx_t fpctx;
     nmod_mpoly_ctx_t ctx_sp;
@@ -2954,7 +2954,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
     Hbits = bits;
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
-        mp_bitcnt_t Hibits;
+        flint_bitcnt_t Hibits;
         Ictx->degbounds[i] = FLINT_MIN(Adegs[i], Bdegs[i]);
         Ictx->degbounds[i] = FLINT_MIN(Ictx->degbounds[i], Gdegbounds[i] + Gammadegs[i]);
         Hibits = 1 + FLINT_BIT_COUNT(Ictx->degbounds[i]);
@@ -3691,7 +3691,7 @@ int fmpz_mpoly_gcd_berlekamp_massey(
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
-    mp_bitcnt_t Gbits, ABbits;
+    flint_bitcnt_t Gbits, ABbits;
     int success = 0;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Auu, Buu, Guu, Abar, Bbar, Gbar;

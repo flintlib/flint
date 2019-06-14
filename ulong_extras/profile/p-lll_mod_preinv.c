@@ -17,7 +17,7 @@
 
 typedef struct
 {
-   mp_bitcnt_t bits;
+   flint_bitcnt_t bits;
    ulong type;
 } info_t;
 
@@ -26,7 +26,7 @@ void sample(void * arg, ulong count)
    mp_limb_t n, d, dinv, r = 0, norm;
    double dpre;
    info_t * info = (info_t *) arg;
-   mp_bitcnt_t bits = info->bits;
+   flint_bitcnt_t bits = info->bits;
    ulong type = info->type;
    ulong i;
    FLINT_TEST_INIT(state);

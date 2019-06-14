@@ -231,11 +231,11 @@ public:
 
     size_t sizeinbase(int b) const
         {return fmpz_sizeinbase(this->evaluate()._fmpz(), b);}
-    mp_bitcnt_t bits() const
+    flint_bitcnt_t bits() const
         {return fmpz_bits(this->evaluate()._fmpz());}
-    mp_bitcnt_t size() const
+    flint_bitcnt_t size() const
         {return fmpz_size(this->evaluate()._fmpz());}
-    mp_bitcnt_t val2() const
+    flint_bitcnt_t val2() const
         {return fmpz_val2(this->evaluate()._fmpz());}
     int sgn() const
         {return fmpz_sgn(this->evaluate()._fmpz());}
@@ -272,16 +272,16 @@ public:
 
     template<class Arg1, class Arg2>
     static FLINT_FIVEARY_ENABLE_RETTYPE(fmpzxx_bit_unpack,
-        Arg1, Arg2, mp_bitcnt_t, int, bool)
+        Arg1, Arg2, flint_bitcnt_t, int, bool)
     bit_unpack(const Arg1& arr, const Arg2& bits,
-            mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
+            flint_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
     {
         return fmpzxx_bit_unpack(arr, bits, shift, negate, borrow);
     }
     template<class Arg1, class Arg2>
     static FLINT_THREEARY_ENABLE_RETTYPE(fmpzxx_bit_unpack_unsigned,
-        Arg1, Arg2, mp_bitcnt_t)
-    bit_unpack_unsigned(const Arg1& arr, const Arg2& bits, mp_bitcnt_t shift = 0)
+        Arg1, Arg2, flint_bitcnt_t)
+    bit_unpack_unsigned(const Arg1& arr, const Arg2& bits, flint_bitcnt_t shift = 0)
     {
         return fmpzxx_bit_unpack_unsigned(arr, bits, shift);
     }
@@ -544,19 +544,19 @@ sizeinbase(const Fmpz& a, int b)
     return a.sizeinbase(b);
 }
 template<class Fmpz>
-inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, mp_bitcnt_t>::type
+inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, flint_bitcnt_t>::type
 bits(const Fmpz& a)
 {
     return a.bits();
 }
 template<class Fmpz>
-inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, mp_bitcnt_t>::type
+inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, flint_bitcnt_t>::type
 val2(const Fmpz& a)
 {
     return a.val2();
 }
 template<class Fmpz>
-inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, mp_bitcnt_t>::type
+inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, flint_bitcnt_t>::type
 size(const Fmpz& a)
 {
     return a.size();
@@ -569,8 +569,8 @@ sgn(const Fmpz& a)
 }
 
 template<class Fmpz>
-inline bool bit_pack(std::vector<mp_limb_t>& arr, mp_bitcnt_t bits,
-        const Fmpz& coeff, mp_bitcnt_t shift = 0, int negate = 0,
+inline bool bit_pack(std::vector<mp_limb_t>& arr, flint_bitcnt_t bits,
+        const Fmpz& coeff, flint_bitcnt_t shift = 0, int negate = 0,
         bool borrow = false,
         typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
 {
@@ -702,13 +702,13 @@ template<class T> struct is_mplimb_t_vec
     : mp::equal_types<T, std::vector<mp_limb_t> > { };
 }
 FLINT_DEFINE_FIVEARY_EXPR_COND5(fmpzxx_bit_unpack_op, rdetail::bool_fmpzxx_pair,
-        rdetail::is_mplimb_t_vec, traits::fits_into_mp_bitcnt_t,
-        traits::fits_into_mp_bitcnt_t, traits::is_integer, tools::is_bool,
+        rdetail::is_mplimb_t_vec, traits::fits_into_flint_bitcnt_t,
+        traits::fits_into_flint_bitcnt_t, traits::is_integer, tools::is_bool,
         to.template get<0>() = fmpz_bit_unpack(to.template get<1>()._fmpz(),
             &e1.front(), e3, e2, e4, e5))
 FLINT_DEFINE_THREEARY_EXPR_COND3(fmpzxx_bit_unpack_unsigned_op, fmpzxx,
-        rdetail::is_mplimb_t_vec, traits::fits_into_mp_bitcnt_t,
-        traits::fits_into_mp_bitcnt_t,
+        rdetail::is_mplimb_t_vec, traits::fits_into_flint_bitcnt_t,
+        traits::fits_into_flint_bitcnt_t,
         fmpz_bit_unpack_unsigned(to._fmpz(), &e1.front(), e3, e2))
 
 // standard math functions (c/f stdmath.h)

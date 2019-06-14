@@ -28,8 +28,8 @@ main(void)
         fmpz_t c, d;
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
-        mp_bitcnt_t coeff_bits;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
+        flint_bitcnt_t coeff_bits;
         slong len1, len2, len3;
 
         fmpz_init(c);

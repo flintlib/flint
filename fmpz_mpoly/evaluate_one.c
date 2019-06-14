@@ -20,7 +20,7 @@ void _fmpz_mpoly_evaluate_one_fmpz_sp(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 {
     int new;
     slong i, j, N;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     slong main_exp, main_shift, main_off;
     ulong * cmpmask, * one;
     slong Aalloc, Alen, Blen;

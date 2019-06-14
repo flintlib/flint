@@ -371,10 +371,10 @@ FLINT_DLL void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
 /* Bit packing ******************************************************/
 
-FLINT_DLL void fq_bit_pack(fmpz_t f, const fq_t op, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_bit_pack(fmpz_t f, const fq_t op, flint_bitcnt_t bit_size,
             const fq_ctx_t ctx);
 
-FLINT_DLL void fq_bit_unpack(fq_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_bit_unpack(fq_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
               const fq_ctx_t ctx);
 
 #ifdef T

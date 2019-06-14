@@ -16,7 +16,7 @@ void _fq_nmod_mpoly_push_exp_ffmpz(fq_nmod_mpoly_t A,
 {
     slong N;
     slong old_length = A->length;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
 
     exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
@@ -33,7 +33,7 @@ void _fq_nmod_mpoly_push_exp_pfmpz(fq_nmod_mpoly_t A,
 {
     slong N;
     slong old_length = A->length;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
 
     exp_bits = mpoly_exp_bits_required_pfmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);

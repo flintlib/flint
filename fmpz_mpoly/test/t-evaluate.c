@@ -33,7 +33,7 @@ main(void)
         fmpz ** vals;
         slong * perm;
         slong nvars, len1, exp_bound1;
-        mp_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -110,7 +110,7 @@ main(void)
         fmpz ** vals;
         slong * perm;
         slong nvars, len1;
-        mp_bitcnt_t exp_bits, coeff_bits;
+        flint_bitcnt_t exp_bits, coeff_bits;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;

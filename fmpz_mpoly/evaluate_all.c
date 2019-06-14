@@ -116,7 +116,7 @@ void _fmpz_mpoly_evaluate_all_fmpz_sp(fmpz_t ev, const fmpz_mpoly_t A,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        mp_bitcnt_t varibits;
+        flint_bitcnt_t varibits;
 
         if (i == main_var)
             continue;
@@ -263,7 +263,7 @@ void _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        mp_bitcnt_t varibits;
+        flint_bitcnt_t varibits;
 
         if (i == main_var)
             continue;

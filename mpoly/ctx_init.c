@@ -13,7 +13,7 @@
 
 void mpoly_ctx_init(mpoly_ctx_t mctx, slong nvars, const ordering_t ord)
 {
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
 
     mctx->nvars = nvars;
     mctx->ord = ord;
@@ -44,7 +44,7 @@ void mpoly_ctx_init(mpoly_ctx_t mctx, slong nvars, const ordering_t ord)
 
     for (bits = 1; bits <= FLINT_BITS; bits++)
     {
-        mp_bitcnt_t new_bits = FLINT_MAX(bits, MPOLY_MIN_BITS);
+        flint_bitcnt_t new_bits = FLINT_MAX(bits, MPOLY_MIN_BITS);
         while (new_bits < FLINT_BITS && mctx->lut_words_per_exp[new_bits - 1]
                                        == mctx->lut_words_per_exp[new_bits])
         {

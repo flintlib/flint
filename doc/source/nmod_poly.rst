@@ -94,7 +94,7 @@ Polynomial properties
     Returns the modulus of the polynomial ``poly``. This will be a
     positive integer.
 
-.. function:: mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
+.. function:: flint_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
 
     Returns the maximum number of bits of any coefficient of ``poly``.
 
@@ -436,7 +436,7 @@ Bit packing and unpacking
 --------------------------------------------------------------------------------
 
 
-.. function:: void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
+.. function:: void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, flint_bitcnt_t bits)
 
     Packs ``len`` coefficients of ``poly`` into fields of the given
     number of bits in the large integer ``res``, i.e.\ evaluates
@@ -454,12 +454,12 @@ Bit packing and unpacking
     There are no restrictions on the size of the actual coefficients as
     stored within the bitfields.
 
-.. function:: void nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly, mp_bitcnt_t bit_size)
+.. function:: void nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly, flint_bitcnt_t bit_size)
 
     Packs ``poly`` into bitfields of size ``bit_size``, writing the
     result to ``f``.
 
-.. function:: void nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+.. function:: void nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial from fields of size ``bit_size`` as
     represented by the integer ``f``.
@@ -570,14 +570,14 @@ Multiplication
     coefficients from ``start`` onwards into the high coefficients of
     ``res``, the remaining coefficients being arbitrary but reduced.
 
-.. function:: void _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, slong len1, mp_srcptr in2, slong len2, mp_bitcnt_t bits, nmod_t mod)
+.. function:: void _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, slong len1, mp_srcptr in2, slong len2, flint_bitcnt_t bits, nmod_t mod)
 
     Sets ``res`` to the product of ``in1`` and ``in2``
     assuming the output coefficients are at most the given number of
     bits wide. If ``bits`` is set to `0` an appropriate value is
     computed automatically.  Assumes that ``len1 >= len2 > 0``.
 
-.. function:: void nmod_poly_mul_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, mp_bitcnt_t bits)
+.. function:: void nmod_poly_mul_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, flint_bitcnt_t bits)
 
     Sets ``res`` to the product of ``poly1`` and ``poly2``
     assuming the output coefficients are at most the given number of
@@ -602,14 +602,14 @@ Multiplication
 
     Sets ``res`` to the product of ``poly1`` and ``poly2``.
 
-.. function:: void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1, mp_srcptr in2, slong len2, mp_bitcnt_t bits, slong n, nmod_t mod)
+.. function:: void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1, mp_srcptr in2, slong len2, flint_bitcnt_t bits, slong n, nmod_t mod)
 
     Sets ``out`` to the low `n` coefficients of ``in1`` of length
     ``len1`` times ``in2`` of length ``len2``. The output must have
     space for ``n`` coefficients. We assume that ``len1 >= len2 > 0``
     and that ``0 < n <= len1 + len2 - 1``.
 
-.. function:: void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, mp_bitcnt_t bits, slong n)
+.. function:: void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, flint_bitcnt_t bits, slong n)
 
     Set ``res`` to the low `n` coefficients of ``in1`` of length
     ``len1`` times ``in2`` of length ``len2``.

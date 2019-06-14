@@ -15,7 +15,7 @@ int
 _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
 {
     int s1, s2, res;
-    mp_bitcnt_t bp, bq, br, bs;
+    flint_bitcnt_t bp, bq, br, bs;
     fmpz_t t, u;
 
     if (fmpz_equal(q, s))

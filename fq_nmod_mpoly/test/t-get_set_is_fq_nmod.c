@@ -31,7 +31,7 @@ main(void)
         fq_nmod_t c, d;
         ulong b;
         slong len;
-        mp_bitcnt_t exp_bits;
+        flint_bitcnt_t exp_bits;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 

@@ -15,7 +15,7 @@ void fmpq_mpoly_get_term(fmpq_mpoly_t M, const fmpq_mpoly_t A,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
 {
     slong N;
-    mp_bitcnt_t bits = A->zpoly->bits;
+    flint_bitcnt_t bits = A->zpoly->bits;
 
     if ((ulong) i >= (ulong) A->zpoly->length)
     {

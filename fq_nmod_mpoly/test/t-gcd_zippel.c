@@ -28,7 +28,7 @@ main(void)
         ulong degbound;
         ulong * degbounds, * degbounds1, * degbounds2;
         int res;
-        mp_bitcnt_t pbits;
+        flint_bitcnt_t pbits;
         slong deg;
 
         pbits = 1 + n_randint(state, FLINT_BITS);

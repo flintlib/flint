@@ -15,7 +15,7 @@
 
 void nmod_mpolyun_init(
     nmod_mpolyun_t A,
-    mp_bitcnt_t bits,
+    flint_bitcnt_t bits,
     const nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
@@ -685,7 +685,7 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
 */
 void nmod_mpoly_from_mpolyun_perm_inflate(
     nmod_mpoly_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     const nmod_mpoly_ctx_t ctx,
     const nmod_mpolyun_t B,
     const nmod_mpoly_ctx_t uctx,

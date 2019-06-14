@@ -14,7 +14,7 @@
 #include "fmpz.h"
 
 int
-fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits,
+fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
               const fmpz_t coeff, int negate, int borrow)
 {
     mp_limb_t save = arr[0];

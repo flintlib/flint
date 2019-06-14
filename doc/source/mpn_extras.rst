@@ -46,7 +46,7 @@ Divisibility
 
     Divides `x` once by a known single-limb divisor, returns the new size.
 
-.. function:: mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits)
+.. function:: mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t *bits)
 
     Divides ``(x, xsize)`` by `2^n` where `n` is the number of trailing 
     zero bits in `x`. The new size of `x` is returned, and `n` is stored in 
@@ -193,7 +193,7 @@ Random Number Generation
     numbers have proven to be more likely to trigger corner-case bugs.
     
 
-.. function:: void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, mp_bitcnt_t n)
+.. function:: void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
 
     Generates a uniform random number ``n`` bits and stores 
     it on ``rp``.

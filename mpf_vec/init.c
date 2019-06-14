@@ -13,7 +13,7 @@
 #include "mpf_vec.h"
 
 mpf *
-_mpf_vec_init(slong len, mp_bitcnt_t prec)
+_mpf_vec_init(slong len, flint_bitcnt_t prec)
 {
     slong i;
 

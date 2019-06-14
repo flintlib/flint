@@ -31,7 +31,7 @@ main(void)
         fmpz_mpoly_t f;
         fmpz_t c, d;
         slong len, index;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
 
         fmpz_init(c);
         fmpz_init(d);

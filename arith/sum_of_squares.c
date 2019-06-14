@@ -48,7 +48,7 @@ sum_of_two_squares(fmpz_t r, const fmpz_t n)
 static void
 sum_of_four_squares(fmpz_t r, const fmpz_t n)
 {
-    const mp_bitcnt_t v = fmpz_val2(n);
+    const flint_bitcnt_t v = fmpz_val2(n);
 
     if (v == 0)
     {

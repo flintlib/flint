@@ -31,7 +31,7 @@ main(void)
         fmpz_init(c);
         fmpz_init(p);
 
-        fmpz_randtest_unsigned(a, state, (mp_bitcnt_t) (1.5 * FLINT_BITS));
+        fmpz_randtest_unsigned(a, state, (flint_bitcnt_t) (1.5 * FLINT_BITS));
         fmpz_set(b, a);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
 

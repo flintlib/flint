@@ -18,7 +18,7 @@
 */
 static int _try_missing_var(
     fmpz_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     slong var,
     const fmpz_mpoly_t A,
     ulong Ashift,
@@ -68,7 +68,7 @@ cleanup:
 */
 static int _try_zippel(
     fmpz_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     ulong * Gstride,
     const fmpz_mpoly_t A,
     const ulong * Amax_exp,
@@ -87,7 +87,7 @@ static int _try_zippel(
     int success;
     ulong * Gshift, * Addeg, * Bddeg;
     mpoly_zipinfo_t zinfo;
-    mp_bitcnt_t ABbits;
+    flint_bitcnt_t ABbits;
     flint_rand_t randstate;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu;
@@ -382,7 +382,7 @@ static void _worker_convertuu(void * varg)
 */
 static int _try_berlekamp_massey(
     fmpz_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     ulong * Gstride,
     const fmpz_mpoly_t A,
     const ulong * Amax_exp,
@@ -403,7 +403,7 @@ static int _try_berlekamp_massey(
     int success;
     ulong * Gshift, * Addeg, * Bddeg;
     slong * perm;
-    mp_bitcnt_t ABbits;
+    flint_bitcnt_t ABbits;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Auu, Buu, Guu;
     fmpz_mpoly_t Acontent, Bcontent, Gamma;
@@ -691,7 +691,7 @@ static void _worker_convertu(void * varg)
 */
 static int _try_brown(
     fmpz_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     ulong * Gstride,
     const fmpz_mpoly_t A,
     const ulong * Amax_exp,
@@ -709,7 +709,7 @@ static int _try_brown(
     slong m, n = ctx->minfo->nvars;
     slong * perm;
     ulong * Gshift;
-    mp_bitcnt_t ABbits;
+    flint_bitcnt_t ABbits;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
 
@@ -870,7 +870,7 @@ cleanup1:
 */
 static int _try_prs(
     fmpz_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     const fmpz_mpoly_t A,
     const ulong * Amax_exp,
     const ulong * Amin_exp,
@@ -1124,7 +1124,7 @@ cleanup:
 */
 int _fmpz_mpoly_gcd(
     fmpz_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
     const fmpz_mpoly_ctx_t ctx,
@@ -1366,7 +1366,7 @@ int fmpz_mpoly_gcd_threaded(
     slong thread_limit)
 {
     slong i;
-    mp_bitcnt_t Gbits;
+    flint_bitcnt_t Gbits;
     int success;
     thread_pool_handle * handles;
     slong num_handles;

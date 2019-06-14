@@ -176,7 +176,7 @@ main(void)
         fmpz_mpoly_t f;
         fmpz ** exp, ** deg;
         slong nvars, len;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
         fmpz_mpoly_init(f, ctx);

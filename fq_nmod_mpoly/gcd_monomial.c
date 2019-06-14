@@ -16,7 +16,7 @@
     This function is always successful and always returns 1.
     G is packed into bits = Gbits
 */
-int _fq_nmod_mpoly_gcd_monomial(fq_nmod_mpoly_t G, mp_bitcnt_t Gbits, 
+int _fq_nmod_mpoly_gcd_monomial(fq_nmod_mpoly_t G, flint_bitcnt_t Gbits, 
                              const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {

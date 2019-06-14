@@ -24,8 +24,8 @@ typedef struct _fmpz_mpoly_ts_struct
     ulong * volatile exps;       /* this is exp_array[idx] */
     volatile slong length;
     slong alloc;
-    mp_bitcnt_t bits;
-    mp_bitcnt_t idx;    
+    flint_bitcnt_t bits;
+    flint_bitcnt_t idx;    
     ulong * exp_array[FLINT_BITS];
     fmpz * coeff_array[FLINT_BITS];
 } fmpz_mpoly_ts_struct;
@@ -35,10 +35,10 @@ typedef fmpz_mpoly_ts_struct fmpz_mpoly_ts_t[1];
 /* Bcoeff is changed */
 void fmpz_mpoly_ts_init(fmpz_mpoly_ts_t A,
                               fmpz * Bcoeff, ulong * Bexp, slong Blen,
-                                                    mp_bitcnt_t bits, slong N)
+                                                    flint_bitcnt_t bits, slong N)
 {
     slong i;
-    mp_bitcnt_t idx = FLINT_BIT_COUNT(Blen);
+    flint_bitcnt_t idx = FLINT_BIT_COUNT(Blen);
     idx = (idx <= 8) ? 0 : idx - 8;
     for (i = 0; i < FLINT_BITS; i++)
     {
@@ -150,7 +150,7 @@ void fmpz_mpoly_ts_append(fmpz_mpoly_ts_t A,
         slong newalloc;
         ulong * newexps;
         fmpz * newcoeffs;
-        mp_bitcnt_t newidx;
+        flint_bitcnt_t newidx;
         newidx = FLINT_BIT_COUNT(newlength - 1);
         newidx = (newidx > 8) ? newidx - 8 : 0;
         FLINT_ASSERT(newidx > A->idx);
@@ -222,7 +222,7 @@ typedef struct
     const fmpz_mpoly_ctx_struct * ctx;
     slong length;
     slong N;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     slong polyBcoeff_bits;
     ulong * cmpmask;
     int failed;
@@ -914,7 +914,7 @@ slong _fmpz_mpoly_divides_stripe1(
                     const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
                                                    const fmpz_mpoly_stripe_t S)
 {
-    mp_bitcnt_t bits = S->bits;
+    flint_bitcnt_t bits = S->bits;
     ulong emin = S->emin[0];
     ulong cmpmask = S->cmpmask[0];
     ulong texp;
@@ -1251,7 +1251,7 @@ slong _fmpz_mpoly_divides_stripe(
                     const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
                                                    const fmpz_mpoly_stripe_t S)
 {
-    mp_bitcnt_t bits = S->bits;
+    flint_bitcnt_t bits = S->bits;
     slong N = S->N;
     int lt_divides;
     slong i, j, s;
@@ -1992,7 +1992,7 @@ int _fmpz_mpoly_divides_heap_threaded(
     fmpz_mpoly_ctx_t zctx;
     fmpz_mpoly_t S;
     slong i, k, N;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     ulong * cmpmask;
     ulong * Aexp, * Bexp;
     int freeAexp, freeBexp;

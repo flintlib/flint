@@ -17,7 +17,7 @@ void _fmpq_mpoly_evaluate_one_fmpq_sp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 {
     int new;
     slong i, j, N;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     slong main_shift, main_off;
     ulong main_exp, emin, emax;
     ulong * cmpmask, * one;

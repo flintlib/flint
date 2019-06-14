@@ -858,7 +858,7 @@ int nmod_mpolyn_intp_crt_lg_mpoly(
     slong N;
     fq_nmod_t u, v;
     nmod_poly_t w;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
@@ -2653,7 +2653,7 @@ int fq_nmod_mpolyn_intp_crt_sm_mpoly(
     slong i, j, k;
     slong N;
     fq_nmod_t v;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
@@ -2984,7 +2984,7 @@ int fq_nmod_mpolyn_intp_crt_lg_mpoly(
     slong N;
     fq_nmod_t u, v;
     fq_nmod_poly_t u_sm, w;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
