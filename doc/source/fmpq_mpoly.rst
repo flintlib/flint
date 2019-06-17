@@ -230,7 +230,7 @@ Coefficients
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_get_denominator(fmpz_t d, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     Set ``d`` to the denominator of ``A``, the smallest positive integer `d` such that `d*A` has integer coefficients.
 
@@ -556,6 +556,14 @@ Division
 Greatest Common Divisor
 --------------------------------------------------------------------------------
 
+.. function:: fmpq_mpoly_content(fmpq_t g, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``g`` to the (nonnegative) gcd of the coefficients of ``A``.
+
+.. function:: void fmpq_mpoly_term_content(fmpq_mpoly_t M, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Sets ``M`` to the GCD of the terms of ``A``.
+    If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with coefficient one.
 
 .. function:: int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 

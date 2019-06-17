@@ -344,7 +344,7 @@ slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A,
 /* Coefficients **************************************************************/
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t A,
+void fmpq_mpoly_get_denominator(fmpz_t d, const fmpq_mpoly_t A,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_set(d, fmpq_denref(A->content));
@@ -691,6 +691,13 @@ FLINT_DLL void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 /* GCD ***********************************************************************/
+
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_content(fmpq_t g, const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_abs(g, A->content);
+}
 
 FLINT_DLL void fmpq_mpoly_term_content(fmpq_mpoly_t M, const fmpq_mpoly_t A,
                                                    const fmpq_mpoly_ctx_t ctx);
