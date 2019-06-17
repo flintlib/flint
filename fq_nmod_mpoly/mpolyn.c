@@ -64,7 +64,7 @@ int fq_nmod_mpolyn_is_canonical(const fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ct
     return 1;
 }
 
-void fq_nmod_mpolyn_init(fq_nmod_mpolyn_t A, mp_bitcnt_t bits, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpolyn_init(fq_nmod_mpolyn_t A, flint_bitcnt_t bits, const fq_nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
     A->exps = NULL;

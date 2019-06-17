@@ -14,7 +14,7 @@
 
 void fmpz_mod_mpolyn_init(
     fmpz_mod_mpolyn_t A,
-    mp_bitcnt_t bits,
+    flint_bitcnt_t bits,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_mod_ctx_t fpctx)
 {
@@ -172,7 +172,7 @@ void fmpz_mod_mpolyn_fit_length(
 
 void fmpz_mod_mpolyun_init(
     fmpz_mod_mpolyun_t A,
-    mp_bitcnt_t bits,
+    flint_bitcnt_t bits,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_mod_ctx_t fpctx)
 {

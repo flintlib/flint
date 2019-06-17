@@ -15,7 +15,7 @@
 
 /* get the offset and shift where variable var is stored in packed form */
 void mpoly_gen_offset_shift_sp(slong * offset, slong * shift, slong var,
-                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     ulong fpw = FLINT_BITS/bits;
@@ -33,7 +33,7 @@ void mpoly_gen_offset_shift_sp(slong * offset, slong * shift, slong var,
 
 /* additionally get the monomial as well */
 void mpoly_gen_monomial_offset_shift_sp(ulong * mexp, slong * offset,
-            slong * shift, slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+            slong * shift, slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     ulong idx;
     ulong nvars = mctx->nvars;
@@ -59,7 +59,7 @@ void mpoly_gen_monomial_offset_shift_sp(ulong * mexp, slong * offset,
 }
 
 /* just get the monomial */
-void mpoly_gen_monomial_sp(ulong * mexp, slong var, mp_bitcnt_t bits,
+void mpoly_gen_monomial_sp(ulong * mexp, slong var, flint_bitcnt_t bits,
                                                         const mpoly_ctx_t mctx)
 {
     ulong nvars = mctx->nvars;
@@ -83,7 +83,7 @@ void mpoly_gen_monomial_sp(ulong * mexp, slong var, mp_bitcnt_t bits,
 }
 
 /* get the offset where the variable of index var is stored */
-slong mpoly_gen_offset_mp(slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+slong mpoly_gen_offset_mp(slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     ulong wpf = bits/FLINT_BITS;
@@ -101,7 +101,7 @@ slong mpoly_gen_offset_mp(slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 
 /* additionally get the monomial as well */
 slong mpoly_gen_monomial_offset_mp(ulong * mexp,
-                           slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                           slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     ulong nvars = mctx->nvars;
     ulong wpf = bits/FLINT_BITS;

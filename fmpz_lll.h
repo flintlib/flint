@@ -104,9 +104,9 @@ FLINT_DLL int fmpz_lll_d_heuristic(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t 
 
 FLINT_DLL int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, mpf_mat_t mu, mpf_mat_t r, mpf *s,
        mpf_mat_t appB, fmpz_gram_t A,
-       int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, mp_bitcnt_t prec, const fmpz_lll_t fl);
+       int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, flint_bitcnt_t prec, const fmpz_lll_t fl);
 
-FLINT_DLL int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec, const fmpz_lll_t fl);
+FLINT_DLL int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_lll_t fl);
 
 FLINT_DLL int fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
@@ -126,7 +126,7 @@ FLINT_DLL int fmpz_lll_d_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t g
 
 FLINT_DLL int fmpz_lll_d_heuristic_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl);
 
-FLINT_DLL int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec, const fmpz_t gs_B, const fmpz_lll_t fl);
+FLINT_DLL int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_t gs_B, const fmpz_lll_t fl);
 
 FLINT_DLL int fmpz_lll_mpf_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl);
 
@@ -144,15 +144,15 @@ FLINT_DLL int fmpz_lll_with_removal_ulll(fmpz_mat_t FM, fmpz_mat_t UM, slong new
 
 FLINT_DLL int fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl);
 
-FLINT_DLL int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec);
+FLINT_DLL int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec);
 
-FLINT_DLL int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec);
+FLINT_DLL int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec);
 
 FLINT_DLL int fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd);
 
-FLINT_DLL int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd,mp_bitcnt_t prec);
+FLINT_DLL int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd,flint_bitcnt_t prec);
 
-FLINT_DLL int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec);
+FLINT_DLL int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec);
 
 /* Default functions *********************************************************/
 

@@ -58,7 +58,7 @@ Memory management
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
     It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
 
-.. function:: void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
     It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
@@ -67,7 +67,7 @@ Memory management
 
     Ensure that ``A`` has space for at least ``len`` terms.
 
-.. function:: void fmpz_mpoly_fit_bits(fmpz_mpoly_t A, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_fit_bits(fmpz_mpoly_t A, flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 
     Ensure that the exponent fields of ``A`` have at least ``bits`` bits.
 

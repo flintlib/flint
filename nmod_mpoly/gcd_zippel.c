@@ -561,7 +561,7 @@ int _nmod_mpoly_gcd_zippel(
     mpoly_zipinfo_t zinfo;
     nmod_mpoly_ctx_t uctx;
     nmod_mpolyu_t Au, Bu, Gu;
-    mp_bitcnt_t new_bits;
+    flint_bitcnt_t new_bits;
 
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);

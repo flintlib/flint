@@ -32,8 +32,8 @@ main(void)
         fmpz_mpoly_t f, g, h;
         fmpz * strides, * shifts;
         slong len1, len2, len3;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
-        mp_bitcnt_t coeff_bits, stride_bits, shift_bits;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
+        flint_bitcnt_t coeff_bits, stride_bits, shift_bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
         fmpz_mpoly_init(f, ctx);
@@ -123,8 +123,8 @@ main(void)
         fmpz_mpoly_t f, g, h;
         fmpz * strides, * shifts;
         slong len1, len2, len3;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
-        mp_bitcnt_t coeff_bits, stride_bits, shift_bits;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
+        flint_bitcnt_t coeff_bits, stride_bits, shift_bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
         fmpz_mpoly_init(f, ctx);

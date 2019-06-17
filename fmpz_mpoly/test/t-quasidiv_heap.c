@@ -31,7 +31,7 @@ main(void)
         fmpz_mpoly_t f, g, h, k;
         ordering_t ord;
         slong nvars, len, len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;

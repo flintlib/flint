@@ -15,7 +15,7 @@
 void fq_nmod_pow_fmpz(fq_nmod_mod_t x, fq_nmod_mod_t a, const fmpz_t exp,
                                                        const fq_nmod_ctx_t ctx)
 {
-    mp_bitcnt_t i, bits;
+    flint_bitcnt_t i, bits;
     fq_nmod_t r;
 
     FLINT_ASSERT(n != 0);
@@ -74,7 +74,7 @@ void fq_nmod_mpoly_pow_fmpz(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
 {
     slong i;
     fmpz * maxBfields;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     TMP_INIT;
 
     if (fmpz_sgn(k) < 0)

@@ -15,7 +15,7 @@
 
 /* unpack the field-wise minimum of poly_exps into min_fields */
 void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
-                           slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                           slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, N;
     ulong * pmin, mask;
@@ -44,7 +44,7 @@ void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
 
 
 void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
-                           slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                           slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, N;
     ulong * pmin, mask;

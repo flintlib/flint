@@ -222,7 +222,7 @@ slong _fmpz_mpoly_mulsub(
                  const fmpz * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
                  const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
                  const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
-                              mp_bitcnt_t bits, slong N, const ulong * cmpmask)
+                              flint_bitcnt_t bits, slong N, const ulong * cmpmask)
 {
     slong i, j;
     slong next_loc;
@@ -477,7 +477,7 @@ int fmpz_mpolyuu_divides(
     slong nmainvars,
     const fmpz_mpoly_ctx_t ctx)
 {
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     fmpz_mpoly_struct * Bcoeff = B->coeffs;
     slong Blen = B->length;
     ulong * Bexp = B->exps;
@@ -717,7 +717,7 @@ int fmpz_mpolyu_divides(
     const fmpz_mpoly_ctx_t ctx)
 {
     int ret = 0;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     fmpz_mpolyu_t Q;
 
     FLINT_ASSERT(B->length > 0);

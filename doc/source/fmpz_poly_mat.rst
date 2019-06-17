@@ -82,17 +82,17 @@ Random matrix generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_poly_mat_randtest(fmpz_poly_mat_t mat, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_mat_randtest(fmpz_poly_mat_t mat, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     This is equivalent to applying ``fmpz_poly_randtest`` to all entries
     in the matrix.
 
-.. function:: void fmpz_poly_mat_randtest_unsigned(fmpz_poly_mat_t mat, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_mat_randtest_unsigned(fmpz_poly_mat_t mat, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     This is equivalent to applying ``fmpz_poly_randtest_unsigned`` to
     all entries in the matrix.
 
-.. function:: void fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, slong len, mp_bitcnt_t bits, float density)
+.. function:: void fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, slong len, flint_bitcnt_t bits, float density)
 
     Creates a random matrix with the amount of nonzero entries given
     approximately by the ``density`` variable, which should be a fraction

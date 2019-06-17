@@ -21,7 +21,7 @@ void nmod_mpoly_ctx_change_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t modulus)
 
 /*
     Find a bound on the bits of the coefficients of gcd(A,B).
-    If this overflows a mp_bitcnt_t, the max mp_bitcnt_t is returned.
+    If this overflows a flint_bitcnt_t, the max flint_bitcnt_t is returned.
     We will apply a Kronecker substitution and use the Landau-Mignotte bound
         for univariates.
 
@@ -33,14 +33,14 @@ void nmod_mpoly_ctx_change_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t modulus)
     This number is almost certainly not going to be used,
         so it just needs to be correct and not nececessary as tight as possible.
 */
-mp_bitcnt_t fmpz_mpolyu_gcd_bitbound(const fmpz_t gcdlc,
+flint_bitcnt_t fmpz_mpolyu_gcd_bitbound(const fmpz_t gcdlc,
                             const fmpz_mpolyu_t A, const fmpz_mpolyu_t B,
                        const fmpz_mpoly_ctx_t ctx, const mpoly_zipinfo_t zinfo)
 {
     slong i;
     fmpz_t n, an, bn;
     ulong max, len;
-    mp_bitcnt_t r;
+    flint_bitcnt_t r;
 
     /* find the degree of the kronecker substitution in the lesser variables */
     fmpz_init_set_ui(n, UWORD(1));
@@ -108,8 +108,8 @@ int fmpz_mpolyu_gcdm_zippel(
     mpoly_zipinfo_t zinfo,
     flint_rand_t randstate)
 {
-    mp_bitcnt_t coeffbitbound;
-    mp_bitcnt_t coeffbits;
+    flint_bitcnt_t coeffbitbound;
+    flint_bitcnt_t coeffbits;
     slong degbound;
     int success, changed;
     mp_limb_t p, t, gammap;
@@ -366,7 +366,7 @@ int _fmpz_mpoly_gcd_zippel(
     slong i;
     flint_rand_t randstate;
     int success = 0;
-    mp_bitcnt_t new_bits = A->bits;
+    flint_bitcnt_t new_bits = A->bits;
     mpoly_zipinfo_t zinfo;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu;
@@ -462,7 +462,7 @@ int fmpz_mpoly_gcd_zippel(
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
-    mp_bitcnt_t new_bits;
+    flint_bitcnt_t new_bits;
     flint_rand_t randstate;
     int success = 0;
     mpoly_zipinfo_t zinfo;

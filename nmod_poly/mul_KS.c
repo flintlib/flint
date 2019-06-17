@@ -18,14 +18,14 @@
 
 void
 _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, slong len1,
-                  mp_srcptr in2, slong len2, mp_bitcnt_t bits, nmod_t mod)
+                  mp_srcptr in2, slong len2, flint_bitcnt_t bits, nmod_t mod)
 {
     slong len_out = len1 + len2 - 1, limbs1, limbs2;
     mp_ptr mpn1, mpn2, res;
 
     if (bits == 0)
     {
-        mp_bitcnt_t bits1, bits2, loglen;
+        flint_bitcnt_t bits1, bits2, loglen;
         bits1  = _nmod_vec_max_bits(in1, len1);
         bits2  = (in1 == in2) ? bits1 : _nmod_vec_max_bits(in2, len2);
         loglen = FLINT_BIT_COUNT(len2);
@@ -59,7 +59,7 @@ _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, slong len1,
 void
 nmod_poly_mul_KS(nmod_poly_t res,
                  const nmod_poly_t poly1, const nmod_poly_t poly2,
-                 mp_bitcnt_t bits)
+                 flint_bitcnt_t bits)
 {
     slong len_out;
 

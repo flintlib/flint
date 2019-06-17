@@ -16,7 +16,7 @@
 int
 main(void)
 {
-    const mp_bitcnt_t bound = 1000;
+    const flint_bitcnt_t bound = 1000;
     slong i;
     FLINT_TEST_INIT(state);
 
@@ -25,7 +25,7 @@ main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mp_bitcnt_t num_bits, den_bits;
+        flint_bitcnt_t num_bits, den_bits;
         int sgn, result;
         double d;
         fmpq_t a;

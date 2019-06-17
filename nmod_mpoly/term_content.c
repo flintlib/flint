@@ -16,7 +16,7 @@ void nmod_mpoly_term_content(nmod_mpoly_t M, const nmod_mpoly_t A,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    mp_bitcnt_t Abits;
+    flint_bitcnt_t Abits;
     fmpz * minAfields, * min_degs;
     TMP_INIT;
 

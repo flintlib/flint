@@ -14,13 +14,13 @@
 #include "fft.h"
       
 void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1, 
-            mp_size_t i, mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp)
+            mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, mp_limb_t * temp)
 {
-   mp_bitcnt_t wn = limbs*FLINT_BITS;
+   flint_bitcnt_t wn = limbs*FLINT_BITS;
    mp_limb_t cy;
    mp_size_t j = i/2, k = w/2;
    mp_size_t y;
-   mp_bitcnt_t b1;
+   flint_bitcnt_t b1;
    int negate = 0;
 
    b1 = j + wn/4 + i*k;

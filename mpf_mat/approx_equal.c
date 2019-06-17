@@ -14,7 +14,7 @@
 
 int
 mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2,
-                     mp_bitcnt_t bits)
+                     flint_bitcnt_t bits)
 {
     slong j;
 

@@ -15,15 +15,15 @@
 #include "fft.h"
 
 void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n, 
-                   mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
                   mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt)
 {
    mp_size_t i, j, s;
    mp_size_t n2 = (2*n)/n1;
    mp_size_t trunc2 = (trunc - 2*n)/n1;
    mp_size_t limbs = (n*w)/FLINT_BITS;
-   mp_bitcnt_t depth = 0;
-   mp_bitcnt_t depth2 = 0;
+   flint_bitcnt_t depth = 0;
+   flint_bitcnt_t depth2 = 0;
    int k = 0;
 
    while ((UWORD(1)<<depth) < n2) depth++;

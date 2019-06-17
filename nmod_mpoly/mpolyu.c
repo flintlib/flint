@@ -12,7 +12,7 @@
 #include "nmod_mpoly.h"
 
 
-void nmod_mpolyu_init(nmod_mpolyu_t A, mp_bitcnt_t bits,
+void nmod_mpolyu_init(nmod_mpolyu_t A, flint_bitcnt_t bits,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
@@ -296,7 +296,7 @@ void nmod_mpoly_to_mpolyu_perm_deflate(
 */
 void nmod_mpoly_from_mpolyu_perm_inflate(
     nmod_mpoly_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     const nmod_mpoly_ctx_t ctx,
     const nmod_mpolyu_t B,
     const nmod_mpoly_ctx_t uctx,
@@ -802,7 +802,7 @@ void nmod_mpolyu_divexact_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
     slong i;
     slong len;
     slong N;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     nmod_mpoly_struct * poly1, * poly2, * poly3;
     ulong * cmpmask;
     TMP_INIT;
@@ -852,7 +852,7 @@ void nmod_mpolyu_mul_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
     slong i;
     slong len;
     slong N;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     nmod_mpoly_struct * poly1, * poly2, * poly3;
     ulong * cmpmask;
     TMP_INIT;
@@ -901,7 +901,7 @@ int nmod_mpolyu_content_mpoly(
 {
     slong i, j;
     int success;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
 
     FLINT_ASSERT(g->bits == bits);
 

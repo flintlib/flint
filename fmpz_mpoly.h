@@ -61,7 +61,7 @@ typedef struct
    ulong * exps;
    slong alloc;
    slong length;
-   mp_bitcnt_t bits;     /* number of bits per exponent */
+   flint_bitcnt_t bits;     /* number of bits per exponent */
 } fmpz_mpoly_struct;
 
 typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
@@ -95,7 +95,7 @@ typedef struct
    ulong * exps;
    slong alloc;
    slong length;
-   mp_bitcnt_t bits;    /* default bits to construct coeffs */
+   flint_bitcnt_t bits;    /* default bits to construct coeffs */
 } fmpz_mpolyu_struct;
 
 typedef fmpz_mpolyu_struct fmpz_mpolyu_t[1];
@@ -149,7 +149,7 @@ FLINT_DLL void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 FLINT_DLL void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc, 
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, mp_bitcnt_t bits,
+FLINT_DLL void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mpoly_realloc(fmpz ** Acoeff, ulong ** Aexp,
@@ -196,7 +196,7 @@ void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen,
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
-                                  mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
+                                  flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 {
    if (A->bits < bits)
    {
@@ -228,7 +228,7 @@ FLINT_DLL char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t A,
 
 FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                         const ulong * exps, slong len, const char ** x_in,
-                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                                     flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file, 
             const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx);
@@ -563,10 +563,10 @@ FLINT_DLL void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
-                              mp_bitcnt_t pos, ulong cmpmask, ulong totalmask);
+                              flint_bitcnt_t pos, ulong cmpmask, ulong totalmask);
 
 FLINT_DLL void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
-                                    mp_bitcnt_t pos, slong N, ulong * cmpmask);
+                                    flint_bitcnt_t pos, slong N, ulong * cmpmask);
 
 FLINT_DLL void _fmpz_mpoly_push_exp_ffmpz(fmpz_mpoly_t A,
                                  const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
@@ -581,15 +581,15 @@ FLINT_DLL void _fmpz_mpoly_push_exp_ui(fmpz_mpoly_t A,
 /* Random generation *********************************************************/
 
 FLINT_DLL void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state,
-                        slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
+                        slong length, flint_bitcnt_t coeff_bits, ulong exp_bound,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state,
-                     slong length, mp_bitcnt_t coeff_bits, ulong * exp_bounds,
+                     slong length, flint_bitcnt_t coeff_bits, ulong * exp_bounds,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
+                   slong length, flint_bitcnt_t coeff_bits, flint_bitcnt_t exp_bits,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 
@@ -719,7 +719,7 @@ FLINT_DLL int fmpz_mpoly_mul_dense(fmpz_mpoly_t A,
 FLINT_DLL slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                  const fmpz * poly3, const ulong * exp3, slong len3,
-                             mp_bitcnt_t bits, slong N, const ulong * cmpmask);
+                             flint_bitcnt_t bits, slong N, const ulong * cmpmask);
 
 FLINT_DLL void _fmpz_mpoly_mul_johnson_maxfields(fmpz_mpoly_t A,
                                  const fmpz_mpoly_t B, fmpz * maxBfields,
@@ -769,7 +769,7 @@ FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
 FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
                 slong * alloc, const fmpz * poly2, const ulong * exp2, 
-        slong len2, ulong k, mp_bitcnt_t bits, slong N, const ulong * cmpmask);
+        slong len2, ulong k, flint_bitcnt_t bits, slong N, const ulong * cmpmask);
 
 
 /* Division ******************************************************************/
@@ -804,12 +804,12 @@ FLINT_DLL int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1,
 
 FLINT_DLL int mpoly_divides_select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
                                 slong nworkers, ulong * Aexp, slong Alen,
-                                   ulong * Bexp, slong Blen, mp_bitcnt_t bits);
+                                   ulong * Bexp, slong Blen, flint_bitcnt_t bits);
 
 FLINT_DLL slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
                       ulong ** exp1, slong * alloc, const fmpz * poly2,
                     const ulong * exp2, slong len2, const fmpz * poly3,
-                    const ulong * exp3, slong len3, mp_bitcnt_t bits, slong N,
+                    const ulong * exp3, slong len3, flint_bitcnt_t bits, slong N,
                                                         const ulong * cmpmask);
 
 FLINT_DLL void fmpz_mpoly_divrem(fmpz_mpoly_t Q, fmpz_mpoly_t R,
@@ -903,15 +903,15 @@ FLINT_DLL int fmpz_mpoly_gcd_threaded(fmpz_mpoly_t G,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                                                            slong thread_limit);
 
-FLINT_DLL int _fmpz_mpoly_gcd(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
+FLINT_DLL int _fmpz_mpoly_gcd(fmpz_mpoly_t G, flint_bitcnt_t Gbits,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
-FLINT_DLL int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, mp_bitcnt_t Gbits,
+FLINT_DLL int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, flint_bitcnt_t Gbits,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int _fmpz_mpoly_gcd_monomial_cofactors_sp(
-                         fmpz_mpoly_t G, mp_bitcnt_t Gbits,
+                         fmpz_mpoly_t G, flint_bitcnt_t Gbits,
          const fmpz_mpoly_t A, const ulong * Amax_exp , const ulong * Amin_exp,
          const fmpz_mpoly_t B, const ulong * Bmax_exp , const ulong * Bmin_exp,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -959,24 +959,24 @@ FLINT_DLL void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A,
                             const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
-       mp_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
+       flint_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
                             const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
+                                flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
 
 typedef struct _fmpz_mpoly_stripe_struct
 {
     char * big_mem;
     slong big_mem_alloc;
     slong N;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     const ulong * cmpmask;
     slong * startidx;
     slong * endidx;
     ulong * emin;
     ulong * emax;
-    mp_bitcnt_t coeff_bits;
+    flint_bitcnt_t coeff_bits;
     int upperclosed;
     int flint_small;
 } fmpz_mpoly_stripe_struct;
@@ -1007,7 +1007,7 @@ FLINT_DLL void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t poly,
 FLINT_DLL void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1,
                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, mp_bitcnt_t bits1,
+FLINT_DLL void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, flint_bitcnt_t bits1,
                   const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1,
@@ -1067,7 +1067,7 @@ FLINT_DLL void fmpz_mpolyd_clear(fmpz_mpolyd_t poly);
 
 FLINT_DLL int fmpz_mpolyu_is_canonical(const fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpolyu_init(fmpz_mpolyu_t A, mp_bitcnt_t bits,
+FLINT_DLL void fmpz_mpolyu_init(fmpz_mpolyu_t A, flint_bitcnt_t bits,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpolyu_clear(fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx);
@@ -1099,7 +1099,7 @@ FLINT_DLL void fmpz_mpoly_to_mpolyu_perm_deflate(
                         const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void fmpz_mpoly_from_mpolyu_perm_inflate(
-               fmpz_mpoly_t A, mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx,
+               fmpz_mpoly_t A, flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx,
                          const fmpz_mpolyu_t B,  const fmpz_mpoly_ctx_t uctx,
                 const slong * perm, const ulong * shift, const ulong * stride);
 
@@ -1111,7 +1111,7 @@ FLINT_DLL void fmpz_mpoly_to_mpolyuu_perm_deflate(
                         const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void fmpz_mpoly_from_mpolyuu_perm_inflate(
-               fmpz_mpoly_t A, mp_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx,
+               fmpz_mpoly_t A, flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx,
                           const fmpz_mpolyu_t B, const fmpz_mpoly_ctx_t uctx,
                 const slong * perm, const ulong * shift, const ulong * stride);
 
@@ -1209,7 +1209,7 @@ FLINT_DLL void fmpz_mpolyu_intp_lift_p(
     const nmod_mpoly_ctx_t ctxp);
 
 FLINT_DLL int fmpz_mpolyu_intp_mcrt_p(
-    mp_bitcnt_t * coeffbits,
+    flint_bitcnt_t * coeffbits,
     fmpz_mpolyu_t H,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_t m,
@@ -1265,7 +1265,7 @@ typedef struct
     ulong * exps;
     slong alloc;
     slong length;
-    mp_bitcnt_t bits;   /* default bits to construct coeffs */
+    flint_bitcnt_t bits;   /* default bits to construct coeffs */
 } fmpz_mod_mpolyun_struct;
 
 typedef fmpz_mod_mpolyun_struct fmpz_mod_mpolyun_t[1];
@@ -1293,7 +1293,7 @@ FLINT_DLL void fmpz_mod_mpolyun_divexact_last(
 FLINT_DLL slong fmpz_mod_mpolyun_lastdeg(const fmpz_mod_mpolyun_t A,
                        const fmpz_mpoly_ctx_t ctx, const fmpz_mod_ctx_t fpctx);
 
-FLINT_DLL void fmpz_mod_mpolyun_init(fmpz_mod_mpolyun_t A, mp_bitcnt_t bits,
+FLINT_DLL void fmpz_mod_mpolyun_init(fmpz_mod_mpolyun_t A, flint_bitcnt_t bits,
                        const fmpz_mpoly_ctx_t ctx, const fmpz_mod_ctx_t fpctx);
 
 FLINT_DLL void fmpz_mod_mpolyun_clear(fmpz_mod_mpolyun_t A,
@@ -1700,16 +1700,16 @@ FLINT_DLL nmod_zip_find_coeffs_ret_t nmod_mpolyu_zip_find_coeffs(
 FLINT_DLL int fmpz_mpolyu_addinterp_zip(fmpz_mpolyu_t H, const fmpz_t Hmodulus,
                           const nmod_zip_mpolyu_t Z, const nmodf_ctx_t ffinfo);
 
-FLINT_DLL int fmpz_mpoly_repack_bits_inplace(fmpz_mpoly_t A, mp_bitcnt_t Abits,
+FLINT_DLL int fmpz_mpoly_repack_bits_inplace(fmpz_mpoly_t A, flint_bitcnt_t Abits,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpolyu_repack_bits(fmpz_mpolyu_t A, mp_bitcnt_t Abits,
+FLINT_DLL int fmpz_mpolyu_repack_bits(fmpz_mpolyu_t A, flint_bitcnt_t Abits,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_set_bits(fmpz_mpoly_t A, mp_bitcnt_t Abits,
+FLINT_DLL void fmpz_mpoly_set_bits(fmpz_mpoly_t A, flint_bitcnt_t Abits,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpolyu_set_bits(fmpz_mpolyu_t A, mp_bitcnt_t Abits,
+FLINT_DLL void fmpz_mpolyu_set_bits(fmpz_mpolyu_t A, flint_bitcnt_t Abits,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpolyuu_eval_all_but_one_nmod(slong * out_deg,

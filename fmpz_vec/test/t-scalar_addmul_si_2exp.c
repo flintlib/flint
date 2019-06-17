@@ -34,7 +34,7 @@ main(void)
     {
         fmpz *a, *b, *c, *d;
         slong len, x;
-        mp_bitcnt_t exp;
+        flint_bitcnt_t exp;
 
         len = n_randint(state, 100);
 

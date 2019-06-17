@@ -49,7 +49,7 @@
 NMOD_POLY_INLINE
 slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 {
-    const mp_bitcnt_t bits = 
+    const flint_bitcnt_t bits = 
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
     
     if (bits <= FLINT_BITS)
@@ -63,7 +63,7 @@ slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 NMOD_POLY_INLINE
 slong NMOD_DIV_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 {
-    const mp_bitcnt_t bits = 
+    const flint_bitcnt_t bits = 
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
     
     if (bits <= FLINT_BITS)
@@ -217,7 +217,7 @@ mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
 }
 
 NMOD_POLY_INLINE
-mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
+flint_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
 {
     return _nmod_vec_max_bits(poly->coeffs, poly->length);
 }
@@ -503,15 +503,15 @@ FLINT_DLL void _nmod_poly_KS2_recover_reduce(mp_ptr res, slong s, mp_srcptr op1,
                                   mp_srcptr op2, slong n, ulong b, nmod_t mod);
 
 FLINT_DLL void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
-                                                  slong len, mp_bitcnt_t bits);
+                                                  slong len, flint_bitcnt_t bits);
 
 FLINT_DLL void _nmod_poly_bit_unpack(mp_ptr res, slong len, 
-                                  mp_srcptr mpn, mp_bitcnt_t bits, nmod_t mod);
+                                  mp_srcptr mpn, flint_bitcnt_t bits, nmod_t mod);
 
 FLINT_DLL void nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
-                   mp_bitcnt_t bit_size);
+                   flint_bitcnt_t bit_size);
 
-FLINT_DLL void nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size);
+FLINT_DLL void nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size);
 
 /* Multiplication  ***********************************************************/
 
@@ -534,10 +534,10 @@ FLINT_DLL void nmod_poly_mulhigh_classical(nmod_poly_t res,
                   const nmod_poly_t poly1, const nmod_poly_t poly2, slong start);
 
 FLINT_DLL void _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, slong len1, 
-                        mp_srcptr in2, slong len2, mp_bitcnt_t bits, nmod_t mod);
+                        mp_srcptr in2, slong len2, flint_bitcnt_t bits, nmod_t mod);
 
 FLINT_DLL void nmod_poly_mul_KS(nmod_poly_t res, 
-             const nmod_poly_t poly1, const nmod_poly_t poly2, mp_bitcnt_t bits);
+             const nmod_poly_t poly1, const nmod_poly_t poly2, flint_bitcnt_t bits);
 
 FLINT_DLL void _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
                                             mp_srcptr op2, slong n2, nmod_t mod);
@@ -552,10 +552,10 @@ FLINT_DLL void nmod_poly_mul_KS4(nmod_poly_t res,
                                const nmod_poly_t poly1, const nmod_poly_t poly2);
 
 FLINT_DLL void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
-               mp_srcptr in2, slong len2, mp_bitcnt_t bits, slong n, nmod_t mod);
+               mp_srcptr in2, slong len2, flint_bitcnt_t bits, slong n, nmod_t mod);
 
 FLINT_DLL void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, 
-                             const nmod_poly_t poly2, mp_bitcnt_t bits, slong n);
+                             const nmod_poly_t poly2, flint_bitcnt_t bits, slong n);
 
 FLINT_DLL void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1, 
                                        mp_srcptr poly2, slong len2, nmod_t mod);

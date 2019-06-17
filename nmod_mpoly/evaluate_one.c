@@ -18,7 +18,7 @@ void _nmod_mpoly_evaluate_one_ui_sp(nmod_mpoly_t A, const nmod_mpoly_t B,
     int new;
     ulong acc0, acc1, acc2, pp0, pp1;
     slong i, j, N;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     slong main_exp, main_shift, main_off;
     ulong * cmpmask, * one;
     slong Aalloc, Alen, Blen;

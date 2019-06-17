@@ -145,7 +145,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g;
-        mp_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits;
         slong len, len1, len2;
         slong degbound;
 

@@ -39,7 +39,7 @@ int fmpz_mpolyu_is_canonical(const fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx)
     return 1;
 }
 
-void fmpz_mpolyu_init(fmpz_mpolyu_t A, mp_bitcnt_t bits,
+void fmpz_mpolyu_init(fmpz_mpolyu_t A, flint_bitcnt_t bits,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
@@ -325,7 +325,7 @@ typedef struct
     slong degbx;
     const slong * perm;
     const ulong * shift, * stride;
-    mp_bitcnt_t Abits;
+    flint_bitcnt_t Abits;
     const fmpz_mpoly_struct * B;
     _arrayconvertu_base_elem_struct * array;
     slong nthreads;
@@ -612,7 +612,7 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(
 */
 void fmpz_mpoly_from_mpolyu_perm_inflate(
     fmpz_mpoly_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_mpolyu_t B,
     const fmpz_mpoly_ctx_t uctx,
@@ -699,7 +699,7 @@ typedef struct
     slong degbx, degby;
     const slong * perm;
     const ulong * shift, * stride;
-    mp_bitcnt_t Abits;
+    flint_bitcnt_t Abits;
     const fmpz_mpoly_struct * B;
     _arrayconvertuu_base_elem_struct * array;
     slong nthreads;
@@ -1006,7 +1006,7 @@ void fmpz_mpoly_to_mpolyuu_perm_deflate(
 */
 void fmpz_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
     fmpz_mpoly_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_mpolyu_t B,
     const fmpz_mpoly_ctx_t uctx,
@@ -1155,7 +1155,7 @@ void fmpz_mpolyu_divexact_mpoly(
     slong i;
     slong len;
     slong N;
-    mp_bitcnt_t exp_bits = B->bits;
+    flint_bitcnt_t exp_bits = B->bits;
     ulong * cmpmask;
     TMP_INIT;
 
@@ -1213,7 +1213,7 @@ void fmpz_mpolyu_mul_mpoly(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
     slong i;
     slong len;
     slong N;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     ulong * cmpmask;
     TMP_INIT;
 
@@ -1306,7 +1306,7 @@ int fmpz_mpolyu_content_mpoly(
 {
     slong i, j;
     int success;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
 
     FLINT_ASSERT(g->bits == bits);
 

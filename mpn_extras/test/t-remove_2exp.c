@@ -19,7 +19,7 @@
 int main(void)
 {
     int zero, nonzero;
-    mp_bitcnt_t check;
+    flint_bitcnt_t check;
     mpz_t a;
     mpz_t b;
 

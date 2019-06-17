@@ -32,8 +32,8 @@ main(void)
         nmod_mpoly_t f, g, h;
         fmpz * strides, * shifts;
         slong len1, len2, len3;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
-        mp_bitcnt_t stride_bits, shift_bits;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
+        flint_bitcnt_t stride_bits, shift_bits;
         mp_limb_t modulus;
 
         modulus = FLINT_MAX(UWORD(2), n_randlimb(state));
@@ -125,8 +125,8 @@ main(void)
         nmod_mpoly_t f, g, h;
         fmpz * strides, * shifts;
         slong len1, len2, len3;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
-        mp_bitcnt_t stride_bits, shift_bits;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
+        flint_bitcnt_t stride_bits, shift_bits;
         mp_limb_t modulus;
 
         modulus = FLINT_MAX(UWORD(2), n_randlimb(state));

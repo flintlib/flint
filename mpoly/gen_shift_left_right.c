@@ -19,7 +19,7 @@
     that the result fits in the same number of bits.
 */
 
-void _mpoly_gen_shift_right(ulong * Aexp, mp_bitcnt_t Abits, slong Alength,
+void _mpoly_gen_shift_right(ulong * Aexp, flint_bitcnt_t Abits, slong Alength,
                                slong var, ulong amount, const mpoly_ctx_t mctx)
 {
     slong i, N;
@@ -52,7 +52,7 @@ void _mpoly_gen_shift_right(ulong * Aexp, mp_bitcnt_t Abits, slong Alength,
     TMP_END;
 }
 
-void _mpoly_gen_shift_left(ulong * Aexp, mp_bitcnt_t Abits, slong Alength,
+void _mpoly_gen_shift_left(ulong * Aexp, flint_bitcnt_t Abits, slong Alength,
                                slong var, ulong amount, const mpoly_ctx_t mctx)
 {
     slong i, N;

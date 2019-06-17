@@ -16,7 +16,7 @@ void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A,
                        slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
     slong N;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
 
     if ((ulong) i >= (ulong) A->length)
     {

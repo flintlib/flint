@@ -23,7 +23,7 @@ char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
     const mpoly_ctx_struct * mctx = qctx->zctx->minfo;
     char ** x = (char **) x_in;
     slong len = A->zpoly->length;
-    mp_bitcnt_t bits = A->zpoly->bits;
+    flint_bitcnt_t bits = A->zpoly->bits;
     char * str;
     TMP_INIT;
 

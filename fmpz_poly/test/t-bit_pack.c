@@ -33,7 +33,7 @@ main(void)
         fmpz_poly_t a, b;
 
         slong length = n_randint(state, 100) + 1;
-        mp_bitcnt_t bits = n_randint(state, 300) + 2;
+        flint_bitcnt_t bits = n_randint(state, 300) + 2;
         mp_ptr arr = (mp_ptr) flint_calloc((length * bits - 1) / FLINT_BITS + 1,
                                      sizeof(mp_limb_t));
         int negate;
@@ -72,7 +72,7 @@ main(void)
         fmpz_poly_t a, b;
 
         slong length = n_randint(state, 100) + 1;
-        mp_bitcnt_t bits = n_randint(state, 300) + 1;
+        flint_bitcnt_t bits = n_randint(state, 300) + 1;
         mp_ptr arr = (mp_ptr) flint_calloc((length * bits - 1) / FLINT_BITS + 1,
                                      sizeof(mp_limb_t));
 

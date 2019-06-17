@@ -16,12 +16,12 @@
 int
 main(void)
 {
-    int i, j, result, max_threads = 5;
-    int tmul = 10;
-#ifdef _WIN32
-    tmul = 1;
-#endif
+    slong i, j, result, max_threads = 5;
+    slong tmul = 10;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 2;
+#endif
 
     flint_printf("mul_heap_threaded....");
     fflush(stdout);
@@ -64,7 +64,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
 
@@ -119,7 +119,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
         slong len, len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
 
@@ -171,7 +171,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
         slong len, len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
 

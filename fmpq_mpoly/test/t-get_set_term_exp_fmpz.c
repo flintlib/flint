@@ -30,7 +30,7 @@ main(void)
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f;
         slong len, nvars, index;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 20);
         fmpq_mpoly_init(f, ctx);

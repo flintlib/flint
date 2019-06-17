@@ -28,7 +28,7 @@ main(void)
         mp_limb_t c, d;
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
         slong len1, len2, len3;
         mp_limb_t modulus;
 

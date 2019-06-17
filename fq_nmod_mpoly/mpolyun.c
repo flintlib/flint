@@ -15,7 +15,7 @@
 
 void fq_nmod_mpolyun_init(
     fq_nmod_mpolyun_t A,
-    mp_bitcnt_t bits,
+    flint_bitcnt_t bits,
     const fq_nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
@@ -440,7 +440,7 @@ void fq_nmod_mpoly_to_mpolyun_perm_deflate(
 
 void fq_nmod_mpoly_from_mpolyun_perm_inflate(
     fq_nmod_mpoly_t A,
-    mp_bitcnt_t Abits,
+    flint_bitcnt_t Abits,
     fq_nmod_mpolyun_t B,
     const slong * perm,
     const ulong * shift,

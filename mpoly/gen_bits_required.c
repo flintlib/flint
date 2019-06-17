@@ -14,7 +14,7 @@
 /* !!! this file DOES need to change with new orderings */
 
 /* bits required to represent the generator of index var */
-mp_bitcnt_t mpoly_gen_bits_required(slong var, const mpoly_ctx_t mctx)
+flint_bitcnt_t mpoly_gen_bits_required(slong var, const mpoly_ctx_t mctx)
 {
     return MPOLY_MIN_BITS; /* 2 bits suffice in every case */
 }

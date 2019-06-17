@@ -13,7 +13,7 @@
 
 slong _fq_nmod_mpoly_derivative(fq_nmod_struct * Acoeff,       ulong * Aexp,
                  const fq_nmod_struct * Bcoeff, const ulong * Bexp, slong Blen,
-          mp_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp,
+          flint_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp,
                                                      const fq_nmod_ctx_t fqctx)
 {
     slong i, Alen;
@@ -41,7 +41,7 @@ slong _fq_nmod_mpoly_derivative(fq_nmod_struct * Acoeff,       ulong * Aexp,
 
 slong _fq_nmod_mpoly_derivative_mp(fq_nmod_struct * Acoeff,       ulong * Aexp,
                  const fq_nmod_struct * Bcoeff, const ulong * Bexp, slong Blen,
-          mp_bitcnt_t bits, slong N, slong offset,              ulong * oneexp,
+          flint_bitcnt_t bits, slong N, slong offset,              ulong * oneexp,
                                                      const fq_nmod_ctx_t fqctx)
 {
     slong i, Alen;

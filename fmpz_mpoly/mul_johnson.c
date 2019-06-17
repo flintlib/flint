@@ -224,7 +224,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                  const fmpz * poly3, const ulong * exp3, slong len3,
-                              mp_bitcnt_t bits, slong N, const ulong * cmpmask)
+                              flint_bitcnt_t bits, slong N, const ulong * cmpmask)
 {
    slong i, j, k;
    slong next_loc;
@@ -468,7 +468,7 @@ void _fmpz_mpoly_mul_johnson_maxfields(
     const fmpz_mpoly_ctx_t ctx)
 {
     slong N, Alen;
-    mp_bitcnt_t Abits;
+    flint_bitcnt_t Abits;
     ulong * cmpmask;
     ulong * Bexp, * Cexp;
     int freeBexp, freeCexp;

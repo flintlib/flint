@@ -111,7 +111,7 @@ void fmpq_mpoly_init2(fmpq_mpoly_t A, slong alloc,
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_init3(fmpq_mpoly_t A, slong alloc, mp_bitcnt_t bits,
+void fmpq_mpoly_init3(fmpq_mpoly_t A, slong alloc, flint_bitcnt_t bits,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_init(A->content);
@@ -142,7 +142,7 @@ void fmpq_mpoly_clear(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_fit_bits(fmpq_mpoly_t A,
-                                  mp_bitcnt_t bits, const fmpq_mpoly_ctx_t ctx)
+                                  flint_bitcnt_t bits, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_fit_bits(A->zpoly, bits, ctx->zctx);
 }
@@ -522,7 +522,7 @@ FLINT_DLL void _fmpq_mpoly_push_rescale(fmpq_mpoly_t A,
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, ulong * exp_bounds,
+                   slong length, flint_bitcnt_t coeff_bits, ulong * exp_bounds,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_randtest_bounds(A->zpoly, state,
@@ -533,7 +533,7 @@ void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_t state,
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
+                   slong length, flint_bitcnt_t coeff_bits, ulong exp_bound,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_randtest_bound(A->zpoly, state,
@@ -544,7 +544,7 @@ void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_t state,
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_randtest_bits(fmpq_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
+                   slong length, flint_bitcnt_t coeff_bits, flint_bitcnt_t exp_bits,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_randtest_bits(A->zpoly, state,
@@ -708,7 +708,7 @@ FLINT_DLL void fmpq_mpoly_inflate(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 ******************************************************************************/
 
 FLINT_DLL int fmpq_mpoly_repack_bits(fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                                mp_bitcnt_t Abits, const fmpq_mpoly_ctx_t ctx);
+                                flint_bitcnt_t Abits, const fmpq_mpoly_ctx_t ctx);
 
 /* geobuckets ****************************************************************/
 typedef struct fmpq_mpoly_geobucket

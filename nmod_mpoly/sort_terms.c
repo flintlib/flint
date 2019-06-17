@@ -18,7 +18,7 @@
     and assuming that all bit positions that need to be sorted are in totalmask
 */
 void _nmod_mpoly_radix_sort1(nmod_mpoly_t A, slong left, slong right,
-                               mp_bitcnt_t pos, ulong cmpmask, ulong totalmask)
+                               flint_bitcnt_t pos, ulong cmpmask, ulong totalmask)
 {
     ulong mask = UWORD(1) << pos;
     ulong cmp = cmpmask & mask;
@@ -87,7 +87,7 @@ void _nmod_mpoly_radix_sort1(nmod_mpoly_t A, slong left, slong right,
             Low priority
 */
 void _nmod_mpoly_radix_sort(nmod_mpoly_t A, slong left, slong right,
-                                     mp_bitcnt_t pos, slong N, ulong * cmpmask)
+                                     flint_bitcnt_t pos, slong N, ulong * cmpmask)
 {
     ulong off = pos/FLINT_BITS;
     ulong bit = pos%FLINT_BITS;

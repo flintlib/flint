@@ -107,7 +107,7 @@ main(void)
         fq_nmod_mpoly_t f, g, h;
         fmpz_t fdeg, gdeg, hdeg;
         slong len1, len2;
-        mp_bitcnt_t exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
@@ -163,7 +163,7 @@ main(void)
         fq_nmod_mpoly_t f, g, h;
         fmpz_t fdeg, gdeg, hdeg;
         slong len1, len2;
-        mp_bitcnt_t exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 

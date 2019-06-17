@@ -164,7 +164,7 @@ slong _nmod_mpoly_mul_heap_part(mp_limb_t ** A_coeff, ulong ** A_exp, slong * A_
               const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
          slong * start, slong * end, slong * hind, const nmod_mpoly_stripe_t S)
 {
-    mp_bitcnt_t bits = S->bits;
+    flint_bitcnt_t bits = S->bits;
     slong N = S->N;
     const ulong * cmpmask = S->cmpmask;
     slong i, j;
@@ -353,7 +353,7 @@ typedef struct
     const ulong * Cexp;
     slong Clen;
     slong N;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     const ulong * cmpmask;
 }
 _base_struct;
@@ -581,7 +581,7 @@ void _nmod_mpoly_mul_heap_threaded(
     nmod_mpoly_t A,
     const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
     const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
-    mp_bitcnt_t bits,
+    flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
     const nmod_mpoly_ctx_t ctx,
@@ -731,7 +731,7 @@ void _nmod_mpoly_mul_heap_threaded_maxfields(
     slong num_handles)
 {
     slong N;
-    mp_bitcnt_t Abits;
+    flint_bitcnt_t Abits;
     ulong * cmpmask;
     ulong * Bexp, * Cexp;
     int freeBexp, freeCexp;

@@ -14,9 +14,9 @@
 #include "flint.h"
 #include "nmod_vec.h"
 
-mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
+flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
 {
-    mp_bitcnt_t bits = 0;
+    flint_bitcnt_t bits = 0;
     mp_limb_t mask   = ~(mp_limb_t) 0;
     slong i;
 

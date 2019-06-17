@@ -14,7 +14,7 @@
 int
 main(void)
 {
-    mp_bitcnt_t max_bits = 200;
+    flint_bitcnt_t max_bits = 200;
     slong i, j, k;
     FLINT_TEST_INIT(state);
 

@@ -30,7 +30,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f;
         slong nvars, len, index;
-        mp_bitcnt_t exp_bits;
+        flint_bitcnt_t exp_bits;
         mp_limb_t modulus;
 
         modulus = UWORD(2) + n_randint(state, -UWORD(2));

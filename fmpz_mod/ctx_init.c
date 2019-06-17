@@ -13,7 +13,7 @@
 
 void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
 {
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
 
     if  (fmpz_sgn(n) <= 0)
     {

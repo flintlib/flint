@@ -29,7 +29,7 @@ main(void)
         nmod_mpoly_t f, g, h, k;
         ulong a, b, c;
         slong len1, len2, len3, len4;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3, exp_bits4;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3, exp_bits4;
         mp_limb_t modulus;
 
         modulus = n_randbits(state, 1 + n_randint(state, FLINT_BITS));
@@ -110,7 +110,7 @@ main(void)
         nmod_mpoly_t f, g, h, k;
         ulong a, b;
         slong len1, len2, len3, len4;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3, exp_bits4;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3, exp_bits4;
         mp_limb_t modulus;
 
         modulus = n_randbits(state, 1 + n_randint(state, FLINT_BITS));

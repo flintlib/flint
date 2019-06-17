@@ -177,12 +177,12 @@ Random matrix generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     This is equivalent to applying ``fmpq_randbits`` to all entries
     in the matrix.
 
-.. function:: void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     This is equivalent to applying ``fmpq_randtest`` to all entries
     in the matrix.

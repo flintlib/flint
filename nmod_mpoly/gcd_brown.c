@@ -25,7 +25,7 @@ int nmod_mpoly_gcd_brown(
     slong * perm;
     ulong * shift, * stride;
     slong i;
-    mp_bitcnt_t new_bits;
+    flint_bitcnt_t new_bits;
     nmod_mpoly_ctx_t uctx;
     nmod_mpolyun_t An, Bn, Gn, Abarn, Bbarn;
     nmod_poly_stack_t Sp;

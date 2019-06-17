@@ -32,7 +32,7 @@ fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 
     for (i = 0; i < d; i++)
     {
-        mp_bitcnt_t bits = (mp_bitcnt_t) pow((double) (2 * d - i), alpha);
+        flint_bitcnt_t bits = (flint_bitcnt_t) pow((double) (2 * d - i), alpha);
 
         fmpz_one(tmp);
         fmpz_mul_2exp(tmp, tmp, bits);

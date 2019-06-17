@@ -128,7 +128,7 @@ public:
     template<class Fmpz>
     static typename mp::enable_if<traits::is_fmpzxx<Fmpz>,
         nmod_polyxx_expression>::type
-    bit_unpack(const Fmpz& a, mp_bitcnt_t bits, nmodxx_ctx_srcref modulus)
+    bit_unpack(const Fmpz& a, flint_bitcnt_t bits, nmodxx_ctx_srcref modulus)
     {
         nmod_polyxx_expression res(modulus);
         nmod_poly_bit_unpack(res._poly(), a.evaluate()._fmpz(), bits);
@@ -487,7 +487,7 @@ FLINT_DEFINE_UNARY_EXPR_COND(make_monic_op, nmod_polyxx, NMOD_POLYXX_COND_S,
         nmod_poly_make_monic(to._poly(), from._poly()))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(bit_pack_op, fmpzxx,
-        NMOD_POLYXX_COND_S, traits::fits_into_mp_bitcnt_t,
+        NMOD_POLYXX_COND_S, traits::fits_into_flint_bitcnt_t,
         nmod_poly_bit_pack(to._fmpz(), e1._poly(), e2))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(times, nmod_polyxx,

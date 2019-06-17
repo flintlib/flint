@@ -24,7 +24,7 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
     slong Alen;
     mp_limb_t * Acoeff;
     ulong * Aexp;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     mp_limb_t * powers;
     mp_limb_t t, r, acc0, acc1, acc2, pp0, pp1;
     TMP_INIT;
@@ -118,7 +118,7 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
     slong Alen;
     mp_limb_t * Acoeff;
     ulong * Aexp;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     mp_limb_t * powers;
     mp_limb_t t, r, acc0, acc1, acc2, pp0, pp1;
     TMP_INIT;

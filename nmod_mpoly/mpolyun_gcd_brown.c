@@ -550,7 +550,7 @@ int nmod_mpolyun_gcd_brown_smprime_ref(
     slong deggamma, ldegG, ldegAbar, ldegBbar, ldegA, ldegB;
     nmod_poly_t cA, cB, cG, cAbar, cBbar, gamma;
     nmod_poly_t modulus, modulus2;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 #if WANT_ASSERT
     nmod_poly_t leadA, leadB;
@@ -804,7 +804,7 @@ int nmod_mpolyun_gcd_brown_smprime(
     slong deggamma, ldegG, ldegAbar, ldegBbar, ldegA, ldegB;
     nmod_poly_struct * cA, * cB, * cG, * cAbar, * cBbar, * gamma;
     nmod_poly_struct * modulus, * modulus2, * alphapow;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 #if WANT_ASSERT
     nmod_poly_t leadA, leadB;
@@ -1323,7 +1323,7 @@ int nmod_mpolyun_gcd_brown_lgprime(
     slong deggamma, ldegG, ldegAbar, ldegBbar, ldegA, ldegB;
     nmod_poly_t cA, cB, cG, cAbar, cBbar, gamma;
     nmod_poly_t modulus;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     slong deg;
     fq_nmod_mpoly_ctx_t ectx;

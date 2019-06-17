@@ -24,7 +24,7 @@ void bivar_divides_check(
     fmpz_mpoly_ctx_t uuctx;
     fmpz_mpolyu_t Auu, Buu, Quu;
     fmpz_mpoly_t Q, Qcheck;
-    mp_bitcnt_t ABbits;
+    flint_bitcnt_t ABbits;
     slong * Adegs, * Bdegs;
     ulong * shift, * stride;
     slong * perm;
@@ -174,7 +174,7 @@ void univar_divides_check(
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Qu;
     fmpz_mpoly_t Q, Qcheck;
-    mp_bitcnt_t ABbits;
+    flint_bitcnt_t ABbits;
     ulong * shift, * stride;
     slong * perm;
     slong i, j, k;
@@ -313,9 +313,9 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b;
-        mp_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits;
         slong len1, len2;
-        mp_bitcnt_t exp_bits;
+        flint_bitcnt_t exp_bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 
@@ -350,9 +350,9 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, c;
-        mp_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits;
         slong len1, len2, len3;
-        mp_bitcnt_t exp_bits;
+        flint_bitcnt_t exp_bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 

@@ -12,7 +12,7 @@
 #include "fq_nmod.h"
 
 void
-fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_nmod_ctx_t ctx)
 {
     nmod_poly_bit_unpack(rop, f, bit_size);

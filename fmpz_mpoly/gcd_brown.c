@@ -88,7 +88,7 @@ int fmpz_mpolyu_gcd_brown(
     fmpz_mpolyu_t T;
     nmod_mpolyun_t Gp, Abarp, Bbarp, Ap, Bp;
     nmod_mpoly_ctx_t pctx;
-    mp_bitcnt_t bits = G->bits;
+    flint_bitcnt_t bits = G->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     nmod_poly_stack_t Sp;
 
@@ -328,7 +328,7 @@ int fmpz_mpoly_gcd_brown(
     slong * perm;
     ulong * shift, * stride;
     slong i;
-    mp_bitcnt_t new_bits;
+    flint_bitcnt_t new_bits;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
 

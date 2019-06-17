@@ -17,7 +17,7 @@ mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
     slong i, j, k;
     int flag, orig;
     mpf_t t, s, tmp, eps;
-    mp_bitcnt_t exp;
+    flint_bitcnt_t exp;
 
     if (Q->r != A->r || Q->c != A->c || R->r != A->c || R->c != A->c)
     {

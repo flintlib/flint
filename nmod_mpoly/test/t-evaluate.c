@@ -35,7 +35,7 @@ main(void)
         mp_limb_t * vals;
         slong * perm;
         slong nvars, len;
-        mp_bitcnt_t exp_bits;
+        flint_bitcnt_t exp_bits;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -101,7 +101,7 @@ main(void)
         mp_limb_t fe, ge, fge;
         mp_limb_t * vals;
         slong nvars, len1, len2;
-        mp_bitcnt_t exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -158,7 +158,7 @@ main(void)
         mp_limb_t fe, ge, fge;
         mp_limb_t * vals;
         slong nvars, len1, len2;
-        mp_bitcnt_t exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;

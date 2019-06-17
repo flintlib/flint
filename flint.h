@@ -144,6 +144,8 @@ FLINT_DLL void flint_set_abort(void (*func)(void));
     #define FLINT_D_BITS 31
 #endif
 
+#define flint_bitcnt_t ulong
+
 #if HAVE_TLS
 #if __STDC_VERSION__ >= 201112L
 #define FLINT_TLS_PREFIX _Thread_local
@@ -352,13 +354,22 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define TMP_START \
    __tmp_root = NULL
 
+#if WANT_ASSERT
 #define TMP_ALLOC(size) \
-   (((WANT_ASSERT) || (size) > 8192) ? \
+   (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
+       __tpx->next = __tmp_root, \
+       __tmp_root = __tpx, \
+       __tpx->block = flint_malloc(size))
+#else
+#define TMP_ALLOC(size) \
+   (((size) > 8192) ? \
       (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
        __tpx->next = __tmp_root, \
        __tmp_root = __tpx, \
        __tpx->block = flint_malloc(size)) : \
       alloca(size))
+#endif
+
 
 #define TMP_END \
    while (__tmp_root) { \

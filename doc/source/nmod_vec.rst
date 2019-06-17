@@ -149,7 +149,7 @@ Basic manipulation and comparison
     Reduces the entries of ``(vec, len)`` modulo ``mod.n`` and set 
     ``res`` to the result.
 
-.. function:: mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
+.. function:: flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
 
     Returns the maximum number of bits of any entry in the vector.
 

@@ -23,7 +23,7 @@ main(void)
     int i, result = 1;
     fmpz_mat_t mat, mat2, U;
     fmpz_lll_t fl;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
 
     FLINT_TEST_INIT(state);
 
@@ -313,7 +313,7 @@ main(void)
     /* test using simultaneous diophantine matrices */
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
-        mp_bitcnt_t bits2;
+        flint_bitcnt_t bits2;
         slong r, c;
 
         r = n_randint(state, 50) + 1;

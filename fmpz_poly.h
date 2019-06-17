@@ -191,16 +191,16 @@ FLINT_DLL void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slon
 /*  Randomisation  ***********************************************************/
 
 FLINT_DLL void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
-                                                slong len, mp_bitcnt_t bits);
+                                                slong len, flint_bitcnt_t bits);
 
 FLINT_DLL void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, 
-                                                slong len, mp_bitcnt_t bits);
+                                                slong len, flint_bitcnt_t bits);
 
 FLINT_DLL void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
-                                                slong len, mp_bitcnt_t bits);
+                                                slong len, flint_bitcnt_t bits);
 
 FLINT_DLL void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state,
-                                                slong len, mp_bitcnt_t bits);
+                                                slong len, flint_bitcnt_t bits);
 
 /*  Getting and setting coefficients  ****************************************/
 
@@ -383,22 +383,22 @@ FLINT_DLL void _fmpz_poly_scale_2exp(fmpz * pol, slong len, slong k);
 /*  Bit packing  *************************************************************/
 
 FLINT_DLL void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
-                                slong len, mp_bitcnt_t bit_size, int negate);
+                                slong len, flint_bitcnt_t bit_size, int negate);
 
 FLINT_DLL int _fmpz_poly_bit_unpack(fmpz * poly, slong len, 
-                           mp_srcptr arr, mp_bitcnt_t bit_size, int negate);
+                           mp_srcptr arr, flint_bitcnt_t bit_size, int negate);
 
 FLINT_DLL void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, 
-                                       mp_srcptr arr, mp_bitcnt_t bit_size);
+                                       mp_srcptr arr, flint_bitcnt_t bit_size);
 
 FLINT_DLL void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
-        mp_bitcnt_t bit_size);
+        flint_bitcnt_t bit_size);
 
 FLINT_DLL void fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f,
-        mp_bitcnt_t bit_size);
+        flint_bitcnt_t bit_size);
 
 FLINT_DLL void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
-        mp_bitcnt_t bit_size);
+        flint_bitcnt_t bit_size);
 
 
 /*  Multiplication  **********************************************************/
@@ -563,7 +563,7 @@ FLINT_DLL void _fmpz_poly_2norm(fmpz_t res, const fmpz * poly, slong len);
 
 FLINT_DLL void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly);
 
-FLINT_DLL mp_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len);
+FLINT_DLL flint_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len);
 
 FMPZ_POLY_INLINE
 ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)

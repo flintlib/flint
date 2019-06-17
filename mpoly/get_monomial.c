@@ -166,7 +166,7 @@ void mpoly_get_monomial_ui(ulong * user_exps, const ulong * poly_exps,
 
 
 void mpoly_get_monomial_ffmpz(fmpz * user_exps, const ulong * poly_exps,
-                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, nvars = mctx->nvars;
     fmpz * tmp_exps;
@@ -189,7 +189,7 @@ void mpoly_get_monomial_ffmpz(fmpz * user_exps, const ulong * poly_exps,
 }
 
 void mpoly_get_monomial_pfmpz(fmpz ** user_exps, const ulong * poly_exps,
-                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, nvars = mctx->nvars;
     fmpz * tmp_exps;

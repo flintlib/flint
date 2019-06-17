@@ -27,7 +27,7 @@ main(void)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f1, f2, m;
-        mp_bitcnt_t exp_bits;
+        flint_bitcnt_t exp_bits;
         fmpz ** exp, ** exp2;
         slong len, nvars;
         fq_nmod_t c, c2;

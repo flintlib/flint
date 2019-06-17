@@ -43,7 +43,7 @@ int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A,
     return 1;
 }
 
-void fq_nmod_mpolyu_init(fq_nmod_mpolyu_t A, mp_bitcnt_t bits,
+void fq_nmod_mpolyu_init(fq_nmod_mpolyu_t A, flint_bitcnt_t bits,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
@@ -258,7 +258,7 @@ void fq_nmod_mpoly_to_mpolyu_perm_deflate(
             Aexp[l] += scale[l]*Bexp[k]
 */
 void fq_nmod_mpoly_from_mpolyu_perm_inflate(fq_nmod_mpoly_t A,
-                        mp_bitcnt_t Abits, const fq_nmod_mpolyu_t B,
+                        flint_bitcnt_t Abits, const fq_nmod_mpolyu_t B,
                const slong * perm, const ulong * shift, const ulong * stride,
                  const fq_nmod_mpoly_ctx_t uctx, const fq_nmod_mpoly_ctx_t ctx)
 {
@@ -764,7 +764,7 @@ void fq_nmod_mpolyu_divexact_mpoly(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
     slong i;
     slong len;
     slong N;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     fq_nmod_mpoly_struct * poly1, * poly2, * poly3;
     ulong * cmpmask;
     TMP_INIT;
@@ -814,7 +814,7 @@ void fq_nmod_mpolyu_mul_mpoly(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
     slong i;
     slong len;
     slong N;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     fq_nmod_mpoly_struct * poly1, * poly2, * poly3;
     ulong * cmpmask;
     TMP_INIT;

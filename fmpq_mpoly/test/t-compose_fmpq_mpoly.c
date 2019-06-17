@@ -26,7 +26,7 @@ main(void)
     for (i = 0; i < 50*flint_test_multiplier(); i++)
     {
         slong nvars, len1;
-        mp_bitcnt_t exp_bits, coeff_bits;
+        flint_bitcnt_t exp_bits, coeff_bits;
         fmpq_mpoly_struct ** vals1;
         fmpq_mpoly_t f, g;
         fmpq_mpoly_ctx_t ctx;

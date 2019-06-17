@@ -12,7 +12,7 @@
 #include "fq_nmod_mpoly.h"
 
 int fq_nmod_mpoly_repack_bits(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
-                              mp_bitcnt_t Abits, const fq_nmod_mpoly_ctx_t ctx)
+                              flint_bitcnt_t Abits, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
     int success;

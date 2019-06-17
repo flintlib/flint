@@ -8,7 +8,7 @@ Memory management
 --------------------------------------------------------------------------------
 
 
-.. function:: mpfr * _mpfr_vec_init(slong len, mp_bitcnt_t prec)
+.. function:: mpfr * _mpfr_vec_init(slong len, flint_bitcnt_t prec)
 
     Returns a vector of the given length of initialised ``mpfr``'s 
     with the given exact precision.
@@ -41,7 +41,7 @@ Arithmetic
     Multiplies the vector with given length by the scalar `c` and 
     sets ``res`` to the result.
 
-.. function:: void _mpfr_vec_scalar_mul_2exp(mpfr * res, const mpfr * vec, slong len, mp_bitcnt_t exp)
+.. function:: void _mpfr_vec_scalar_mul_2exp(mpfr * res, const mpfr * vec, slong len, flint_bitcnt_t exp)
 
     Multiplies the given vector of the given length by ``2^exp``.
 

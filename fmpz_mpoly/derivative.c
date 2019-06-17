@@ -13,7 +13,7 @@
 
 slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
                        const fmpz * coeff2, const ulong * exp2, slong len2,
-          mp_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp)
+          flint_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp)
 {
     slong i, len1;
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
@@ -37,7 +37,7 @@ slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
 
 slong _fmpz_mpoly_derivative_mp(fmpz * coeff1, ulong * exp1,
                        const fmpz * coeff2, const ulong * exp2, slong len2,
-          mp_bitcnt_t bits, slong N, slong offset,              ulong * oneexp)
+          flint_bitcnt_t bits, slong N, slong offset,              ulong * oneexp)
 {
     slong i, len1;
     fmpz_t c;
@@ -66,7 +66,7 @@ void fmpz_mpoly_derivative(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                          slong var, const fmpz_mpoly_ctx_t ctx)
 {
     slong N, offset, shift;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     ulong * oneexp;
     slong len1;
     TMP_INIT;

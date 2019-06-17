@@ -247,7 +247,7 @@ void fq_nmod_mpoly_to_fq_nmod_mpolyd_perm_deflate(fq_nmod_mpolyd_t A, slong m,
 
 
 void fq_nmod_mpoly_from_fq_nmod_mpolyd_perm_inflate(fq_nmod_mpoly_t A,
-    mp_bitcnt_t Abits, const fq_nmod_mpoly_ctx_t ctx, const fq_nmod_mpolyd_t B,
+    flint_bitcnt_t Abits, const fq_nmod_mpoly_ctx_t ctx, const fq_nmod_mpolyd_t B,
                  const slong * perm, const ulong * shift, const ulong * stride)
 {
     slong off;

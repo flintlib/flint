@@ -22,7 +22,7 @@
 */
 int mpoly_divides_select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
                              slong nworkers, ulong * Aexp, slong Alen,
-                                    ulong * Bexp, slong Blen, mp_bitcnt_t bits)
+                                    ulong * Bexp, slong Blen, flint_bitcnt_t bits)
 {
     int failure;
     ulong mask;

@@ -268,7 +268,7 @@ failed:
     the assertion x->next == NULL would need to be removed and a loop put in place
     other asserts would need to be removed as well
 */
-void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, mp_bitcnt_t bits1,
+void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, flint_bitcnt_t bits1,
                    const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, bits, N;

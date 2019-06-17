@@ -97,7 +97,7 @@ The various Babai's
     rather than a purely floating point inner product. The heuristic will
     compute at full precision when there is cancellation.
 
-.. function:: int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, mpf_mat_t mu, mpf_mat_t r, mpf *s, mpf_mat_t appB, fmpz_gram_t A, int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, mp_bitcnt_t prec, const fmpz_lll_t fl)
+.. function:: int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, mpf_mat_t mu, mpf_mat_t r, mpf *s, mpf_mat_t appB, fmpz_gram_t A, int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, flint_bitcnt_t prec, const fmpz_lll_t fl)
 
     This function is like the ``mpf`` version of
     ``fmpz_lll_check_babai_heuristic_d()``. However, it also inherits some
@@ -156,7 +156,7 @@ These programs implement ideas from the book chapter \citep{Stehle2010}.
     ``fmpz_lll_d()`` but only uses the heuristic inner products which
     attempt to detect cancellations.
 
-.. function:: int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec, const fmpz_lll_t fl)
+.. function:: int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_lll_t fl)
 
     This is LLL using ``mpf`` with the given precision, ``prec`` for the
     underlying GSO. It reduces ``B`` in place like the other LLL functions.
@@ -202,7 +202,7 @@ These programs implement ideas from the book chapter \citep{Stehle2010}.
     ``gs_B``. The return value is the new dimension of ``B`` if removals
     are desired.
 
-.. function:: int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec, const fmpz_t gs_B, const fmpz_lll_t fl)
+.. function:: int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_t gs_B, const fmpz_lll_t fl)
 
     Same as ``fmpz_lll_mpf2()`` but with a removal bound, ``gs_B``. The
     return value is the new dimension of ``B`` if removals are desired.
@@ -273,7 +273,7 @@ These programs implement ideas from the paper \citep{Villard2007}.
 
     Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
 
-.. function:: int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec)
+.. function:: int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
 
     Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
     (``fl->delta``, ``fl->eta``), and otherwise returns zero. The
@@ -283,7 +283,7 @@ These programs implement ideas from the paper \citep{Villard2007}.
 
     Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
 
-.. function:: int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec)
+.. function:: int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
 
     Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
     (``fl->delta``, ``fl->eta``), and otherwise returns zero. The
@@ -307,7 +307,7 @@ These programs implement ideas from the paper \citep{Villard2007}.
 
     Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
 
-.. function:: int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
+.. function:: int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 
     Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
     (``fl->delta``, ``fl->eta``) and the squared Gram-Schmidt length of
@@ -319,7 +319,7 @@ These programs implement ideas from the paper \citep{Villard2007}.
 
     Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
 
-.. function:: int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
+.. function:: int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 
     Returns a non-zero value if the matrix ``B`` is LLL-reduced with factor
     (``fl->delta``, ``fl->eta``) and the squared Gram-Schmidt length of

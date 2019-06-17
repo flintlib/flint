@@ -17,7 +17,7 @@
     compute number of bits required to store user_exp in packed format
     the returned number of bits includes space for a zero'd signed bit
 */
-mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
+flint_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
                                                         const mpoly_ctx_t mctx)
 {
     slong i, nfields = mctx->nfields;
@@ -48,11 +48,11 @@ mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
     compute number of bits required to store user_exp in packed format
     the returned number of bits includes space for a zero'd signed bit
 */
-mp_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
+flint_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
                                                         const mpoly_ctx_t mctx)
 {
     slong i, nvars = mctx->nvars;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
 
     if (mctx->deg)
     {
@@ -82,11 +82,11 @@ mp_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
     compute number of bits required to store user_exp in packed format
     the returned number of bits includes space for a zero'd signed bit
 */
-mp_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
+flint_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
                                                         const mpoly_ctx_t mctx)
 {
     slong i, nvars = mctx->nvars;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
 
     if (mctx->deg)
     {

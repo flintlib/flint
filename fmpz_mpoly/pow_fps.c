@@ -331,7 +331,7 @@ void fmpz_set_mpn_signed(fmpz_t f, ulong * c_in, slong n)
 
 slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1, slong * alloc,
                  const fmpz * poly2, const ulong * exp2, slong len2, ulong k,
-                              mp_bitcnt_t bits, slong N, const ulong * cmpmask)
+                              flint_bitcnt_t bits, slong N, const ulong * cmpmask)
 {
    const slong topbit = (WORD(1) << (FLINT_BITS - 1));
    const slong mask = ~topbit;
@@ -633,7 +633,7 @@ void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 {
     slong i, N, len = 0;
     fmpz * maxBfields;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     ulong * cmpmask;
     ulong * Bexp = B->exps;
     int freeBexp = 0;

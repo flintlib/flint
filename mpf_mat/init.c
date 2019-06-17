@@ -16,7 +16,7 @@
 #include "mpf_mat.h"
 
 void
-mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, mp_bitcnt_t prec)
+mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec)
 {
 
     if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */

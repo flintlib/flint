@@ -50,7 +50,7 @@ typedef struct
     pthread_mutex_t mutex;
 
     slong num_threads;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     const fmpz_mpolyu_struct * A, * B;
     const fmpz_mpoly_struct * Gamma;
     slong * Gdegbounds, * Adegs, * Bdegs, * Gammadegs;
@@ -1816,7 +1816,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     slong num_handles)
 {
     int success, point_try_count;
-    mp_bitcnt_t Hbits;
+    flint_bitcnt_t Hbits;
     fmpz_mpoly_t Hcontent;
     _base_t w;
     _eval_sp_worker_arg_struct * eval_sp_args;
@@ -2030,7 +2030,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     Hbits = w->bits;
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
-        mp_bitcnt_t Hibits;
+        flint_bitcnt_t Hibits;
         w->Ictx->degbounds[i] = FLINT_MIN(w->Adegs[i], w->Bdegs[i]);
         w->Ictx->degbounds[i] = FLINT_MIN(w->Ictx->degbounds[i],
                                     w->Gdegbounds[i] + w->Gammadegs[i]);
@@ -2585,7 +2585,7 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
 {
     slong i, max_num_handles, num_handles;
     thread_pool_handle * handles;
-    mp_bitcnt_t Gbits, ABbits;
+    flint_bitcnt_t Gbits, ABbits;
     int success = 0;
     fmpz_mpoly_ctx_t uctx;
     fmpz_mpolyu_t Auu, Buu, Guu, Abar, Bbar, Gbar;

@@ -17,7 +17,7 @@ typedef struct _fmpz_mpolyu_stripe_struct
 {
     char * big_mem;
     slong big_mem_alloc;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     const ulong * cmpmask;
     slong * startidx;
     slong * endidx;
@@ -25,7 +25,7 @@ typedef struct _fmpz_mpolyu_stripe_struct
     ulong emax;
 
     const fmpz_mpoly_ctx_struct * ctx;
-    mp_bitcnt_t minor_bits;
+    flint_bitcnt_t minor_bits;
     slong minor_N;
     ulong * minor_cmpmask;
 
@@ -51,8 +51,8 @@ typedef struct _fmpz_mpolyu_ts_struct
     ulong * volatile exps;       /* this is exp_array[idx] */
     volatile slong length;
     slong alloc;
-    mp_bitcnt_t bits;
-    mp_bitcnt_t idx;    
+    flint_bitcnt_t bits;
+    flint_bitcnt_t idx;    
     ulong * exp_array[FLINT_BITS];
     fmpz_mpoly_struct * coeff_array[FLINT_BITS];
 } fmpz_mpolyu_ts_struct;
@@ -65,11 +65,11 @@ void fmpz_mpolyu_ts_init(
     fmpz_mpoly_struct * Bcoeff,
     ulong * Bexp,
     slong Blen,
-    mp_bitcnt_t Bbits,
+    flint_bitcnt_t Bbits,
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
-    mp_bitcnt_t idx = FLINT_BIT_COUNT(Blen);
+    flint_bitcnt_t idx = FLINT_BIT_COUNT(Blen);
     idx = (idx <= 8) ? 0 : idx - 8;
     for (i = 0; i < FLINT_BITS; i++)
     {
@@ -183,7 +183,7 @@ void fmpz_mpolyu_ts_append(
     const fmpz_mpoly_ctx_t ctx)
 {
 /* TODO: this needs barriers on non-x86 */
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong i;
     ulong * oldexps = A->exps;
     fmpz_mpoly_struct * oldcoeffs = A->coeffs;
@@ -206,7 +206,7 @@ void fmpz_mpolyu_ts_append(
         slong newalloc;
         ulong * newexps;
         fmpz_mpoly_struct * newcoeffs;
-        mp_bitcnt_t newidx;
+        flint_bitcnt_t newidx;
         newidx = FLINT_BIT_COUNT(newlength - 1);
         newidx = (newidx > 8) ? newidx - 8 : 0;
         FLINT_ASSERT(newidx > A->idx);
@@ -288,10 +288,10 @@ typedef struct
     const fmpz_mpoly_ctx_struct * ctx;
     slong minor_N;
     ulong * minor_cmpmask;
-    mp_bitcnt_t minor_bits;
+    flint_bitcnt_t minor_bits;
 
     slong main_nvars;
-    mp_bitcnt_t main_bits;
+    flint_bitcnt_t main_bits;
     ulong main_overflow_mask;
 
 } divides_heap_base_struct;
@@ -388,7 +388,7 @@ static void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chun
 
 void _fmpz_mpolyu_fit_length(fmpz_mpoly_struct ** coeffs,
                               ulong ** exps, slong * alloc, slong length,
-                                  mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
+                                  flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     slong old_alloc = *alloc;
@@ -459,7 +459,7 @@ slong _fmpz_mpoly_mulsub(
                  const fmpz * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
                  const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
                  const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
-                              mp_bitcnt_t bits, slong N, const ulong * cmpmask);
+                              flint_bitcnt_t bits, slong N, const ulong * cmpmask);
 
 
 /*
@@ -1305,13 +1305,13 @@ int fmpz_mpolyuu_divides_threaded(
     const thread_pool_handle * handles,
     slong num_handles)
 {
-    mp_bitcnt_t minor_bits = A->bits;
+    flint_bitcnt_t minor_bits = A->bits;
     int divides;
     fmpz_mpoly_ctx_t zctx;
     fmpz_mpoly_t S;
     slong i, k, minor_N;
     ulong * minor_cmpmask;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     worker_arg_struct * worker_args;
     fmpz_mpoly_t qcoeff;
     ulong texp, qexp;
@@ -1323,7 +1323,7 @@ int fmpz_mpolyuu_divides_threaded(
     FLINT_ASSERT(B->bits == minor_bits);
 
 #if !FLINT_KNOW_STRONG_ORDER
-    return fmpz_mpolyuu_divides(Q, A, B, nmainvars, ctx);
+    return fmpz_mpolyuu_divides(Q, A, B, main_nvars, ctx);
 #endif
 
     if (B->length < 2 || A->length < 2)

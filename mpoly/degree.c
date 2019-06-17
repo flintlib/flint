@@ -15,7 +15,7 @@
 
 
 slong mpoly_degree_si(const ulong * exps,
-                slong len, mp_bitcnt_t bits, slong var, const mpoly_ctx_t mctx)
+                slong len, flint_bitcnt_t bits, slong var, const mpoly_ctx_t mctx)
 {
     if (len == 0)
         return -WORD(1);
@@ -58,7 +58,7 @@ slong mpoly_degree_si(const ulong * exps,
 
 
 void mpoly_degree_fmpz(fmpz_t deg, const ulong * exps,
-                slong len, mp_bitcnt_t bits, slong var, const mpoly_ctx_t mctx)
+                slong len, flint_bitcnt_t bits, slong var, const mpoly_ctx_t mctx)
 {
     slong i;
     fmpz * degs;

@@ -29,7 +29,7 @@ int main(void)
     {
         mp_limb_t a, b, n, ninv;
         slong num, i;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
         mp_limb_t * sqrt;
         int btest;
         n_factor_t fac;
@@ -79,7 +79,7 @@ int main(void)
     for (i = 0; i < 500 * flint_test_multiplier(); i++) /* test random nonsquares */
     {
         mp_limb_t a, b, n, ninv;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
         mp_limb_t * sqrt;
         n_factor_t fac;
 

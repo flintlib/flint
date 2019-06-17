@@ -28,7 +28,7 @@ int fq_nmod_mpolyun_gcd_brown_smprime_bivar(
     slong deggamma, ldegG, ldegAbar, ldegBbar, ldegA, ldegB;
     fq_nmod_poly_t cA, cB, cG, cAbar, cBbar, gamma, trem;
     fq_nmod_poly_t modulus, tempmod;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
 #if WANT_ASSERT
     fq_nmod_poly_t leadA, leadB;
 #endif
@@ -258,7 +258,7 @@ int fq_nmod_mpolyun_gcd_brown_smprime(
     slong deggamma, ldegG, ldegAbar, ldegBbar, ldegA, ldegB;
     fq_nmod_poly_t cA, cB, cG, cAbar, cBbar, gamma, trem;
     fq_nmod_poly_t modulus, tempmod;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 #if WANT_ASSERT
     fq_nmod_poly_t leadA, leadB;
@@ -750,7 +750,7 @@ int fq_nmod_mpolyun_gcd_brown_lgprime(
     slong deggamma, ldegG, ldegAbar, ldegBbar, ldegA, ldegB;
     fq_nmod_poly_t cA, cB, cG, cAbar, cBbar, gamma, trem;
     fq_nmod_poly_t modulus;
-    mp_bitcnt_t bits = A->bits;
+    flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     flint_rand_t randstate;
     _fq_nmod_mpoly_embed_chooser_t embc;

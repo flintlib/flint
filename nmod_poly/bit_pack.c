@@ -19,7 +19,7 @@
 
 /* Assumes length > 0, bits > 0. */
 void
-_nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
+_nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, flint_bitcnt_t bits)
 {
     slong i;
     ulong current_bit = 0, current_limb = 0;
@@ -127,7 +127,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
 
 void
 nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
-                   mp_bitcnt_t bit_size)
+                   flint_bitcnt_t bit_size)
 {
     slong len, limbs;
     __mpz_struct * mpz;

@@ -35,7 +35,7 @@ void _fmpz_vec_content1(fmpz_t res, fmpz_t start, const fmpz * vec, slong len)
     This function is always successful and always returns 1.
     G is packed into bits = Gbits
 */
-int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, mp_bitcnt_t Gbits, 
+int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, flint_bitcnt_t Gbits, 
                                 const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {

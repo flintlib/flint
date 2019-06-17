@@ -27,7 +27,7 @@ main(void)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
         slong len1, len2, len3;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);

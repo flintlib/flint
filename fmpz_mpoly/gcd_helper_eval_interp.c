@@ -128,7 +128,7 @@ void fmpz_mpolyu_intp_lift_p(
     A is in Fp[x_0, ..., x_(n-1)]
 */
 int fmpz_mpoly_intp_mcrt_p(
-    mp_bitcnt_t * coeffbits,
+    flint_bitcnt_t * coeffbits,
     fmpz_mpoly_t H,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_t m,
@@ -168,7 +168,7 @@ int fmpz_mpoly_intp_mcrt_p(
     A is in Fp[X][x_0, ..., x_(n-1)]
 */
 int fmpz_mpolyu_intp_mcrt_p(
-    mp_bitcnt_t * coeffbits,
+    flint_bitcnt_t * coeffbits,
     fmpz_mpolyu_t H,
     const fmpz_mpoly_ctx_t ctx,
     const fmpz_t m,

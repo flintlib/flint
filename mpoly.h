@@ -90,7 +90,7 @@ FLINT_DLL void mpoly_ctx_init(mpoly_ctx_t ctx, slong nvars, const ordering_t ord
 
 FLINT_DLL void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars);
 
-FLINT_DLL void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state, mp_bitcnt_t exp_bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state, flint_bitcnt_t exp_bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_ctx_clear(mpoly_ctx_t mctx);
 
@@ -101,7 +101,7 @@ FLINT_DLL void mpoly_ctx_clear(mpoly_ctx_t mctx);
         (sp) MPOLY_MIN_BITS <= bits <= FLINT_BITS
 */
 MPOLY_INLINE
-slong mpoly_words_per_exp_sp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+slong mpoly_words_per_exp_sp(flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     FLINT_ASSERT(0 < bits);
     FLINT_ASSERT(bits <= FLINT_BITS);
@@ -111,14 +111,14 @@ slong mpoly_words_per_exp_sp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
 }
 
 MPOLY_INLINE
-slong mpoly_words_per_exp_mp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+slong mpoly_words_per_exp_mp(flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     FLINT_ASSERT(bits % FLINT_BITS == 0);
     return bits/FLINT_BITS*mctx->nfields;
 }
 
 MPOLY_INLINE
-slong mpoly_words_per_exp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+slong mpoly_words_per_exp(flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     if (bits <= FLINT_BITS)
         return mpoly_words_per_exp_sp(bits, mctx);
@@ -134,7 +134,7 @@ slong mpoly_words_per_exp(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
     The upgrade in (mp) is manditory, while the upgrade in (sp) is simply nice.
 */
 MPOLY_INLINE
-mp_bitcnt_t mpoly_fix_bits(mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+flint_bitcnt_t mpoly_fix_bits(flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     FLINT_ASSERT(bits > 0);
     if (bits <= FLINT_BITS)
@@ -365,7 +365,7 @@ void mpoly_monomial_min(ulong * exp1, const ulong * exp2, const ulong * exp3,
 
 MPOLY_INLINE
 void mpoly_monomial_max_mp(ulong * exp1, const ulong * exp2, const ulong * exp3,
-                                                     mp_bitcnt_t bits, slong N)
+                                                     flint_bitcnt_t bits, slong N)
 {
     slong i, j;
     for (i = 0; i < N; i += bits/FLINT_BITS)
@@ -389,7 +389,7 @@ void mpoly_monomial_max_mp(ulong * exp1, const ulong * exp2, const ulong * exp3,
 
 MPOLY_INLINE
 void mpoly_monomial_min_mp(ulong * exp1, const ulong * exp2, const ulong * exp3,
-                                                     mp_bitcnt_t bits, slong N)
+                                                     flint_bitcnt_t bits, slong N)
 {
     slong i, j;
     for (i = 0; i < N; i += bits/FLINT_BITS)
@@ -424,7 +424,7 @@ int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
 }
 
 MPOLY_INLINE
-int mpoly_monomial_overflows_mp(ulong * exp_ptr, slong N, mp_bitcnt_t bits)
+int mpoly_monomial_overflows_mp(ulong * exp_ptr, slong N, flint_bitcnt_t bits)
 {
     slong i = bits/FLINT_BITS - 1;
     do {
@@ -460,7 +460,7 @@ int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2,
 
 MPOLY_INLINE
 int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2,
-                                 const ulong * exp3, slong N, mp_bitcnt_t bits)
+                                 const ulong * exp3, slong N, flint_bitcnt_t bits)
 {
     slong i;
 
@@ -490,7 +490,7 @@ int mpoly_monomial_divides_test(const ulong * exp2,
 
 MPOLY_INLINE
 int mpoly_monomial_divides_mp_test(const ulong * exp2,
-                                 const ulong * exp3, slong N, mp_bitcnt_t bits)
+                                 const ulong * exp3, slong N, flint_bitcnt_t bits)
 {
     slong i, j;
 
@@ -826,22 +826,22 @@ FLINT_DLL void mpoly_gen_fields_ui(ulong * exp, slong var,
 FLINT_DLL void mpoly_gen_fields_fmpz(fmpz * exp, slong var,
                                                        const mpoly_ctx_t mctx);
 
-FLINT_DLL mp_bitcnt_t mpoly_gen_bits_required(slong var, const mpoly_ctx_t mctx);
+FLINT_DLL flint_bitcnt_t mpoly_gen_bits_required(slong var, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_gen_offset_shift_sp(slong * offset, slong * shift,
-                          slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                          slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_gen_monomial_offset_shift_sp(ulong * mexp, slong * offset,
-           slong * shift, slong var, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+           slong * shift, slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_gen_monomial_sp(ulong * oneexp, slong var,
-                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                                     flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL slong mpoly_gen_offset_mp(slong var, 
-                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                                     flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL slong mpoly_gen_monomial_offset_mp(ulong * mexp, slong var,
-                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                                     flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 /* Monomial arrays ***********************************************************/
 
@@ -851,21 +851,21 @@ FLINT_DLL void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
 FLINT_DLL void mpoly_get_ovfmask(ulong * ovfmask, slong N, slong bits,
                                                        const mpoly_ctx_t mctx);
 
-FLINT_DLL mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
+FLINT_DLL flint_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
                                                        const mpoly_ctx_t mctx);
-FLINT_DLL mp_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
+FLINT_DLL flint_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
                                                        const mpoly_ctx_t mctx);
-FLINT_DLL mp_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
+FLINT_DLL flint_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
                                                        const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
                                                      slong nfields, slong len);
-FLINT_DLL void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, mp_bitcnt_t bits,
+FLINT_DLL void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, flint_bitcnt_t bits,
                                                      slong nfields, slong len);
 
 FLINT_DLL void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
                                                      slong nfields, slong len);
-FLINT_DLL void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
+FLINT_DLL void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, flint_bitcnt_t bits,
                                                      slong nfields, slong len);
 
 FLINT_DLL void mpoly_get_monomial_ui_unpacked_ffmpz(ulong * user_exps,
@@ -890,17 +890,17 @@ FLINT_DLL void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps,
                                            slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_get_monomial_ffmpz(fmpz * exps, const ulong * poly_exps,
-                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                                     flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_get_monomial_pfmpz(fmpz ** exps, const ulong * poly_exps,
-                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                                     flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2,
                                            slong bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_set_monomial_ffmpz(ulong * exp1, const fmpz * exp2,
-                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                                     flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_set_monomial_pfmpz(ulong * exp1, fmpz * const * exp2,
-                                     mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                                     flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int mpoly_repack_monomials(ulong * exps1, slong bits1,
                                 const ulong * exps2, slong bits2, slong len,
@@ -916,21 +916,21 @@ FLINT_DLL void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
 FLINT_DLL int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
                  const ulong * exp, slong len, slong N, const ulong * cmpmask);
 
-FLINT_DLL slong mpoly_monomial_index_ui(const ulong * Aexp, mp_bitcnt_t Abits,
+FLINT_DLL slong mpoly_monomial_index_ui(const ulong * Aexp, flint_bitcnt_t Abits,
                      slong Alength, const ulong * exp, const mpoly_ctx_t mctx);
 
-FLINT_DLL slong mpoly_monomial_index_pfmpz(const ulong * Aexp, mp_bitcnt_t Abits,
+FLINT_DLL slong mpoly_monomial_index_pfmpz(const ulong * Aexp, flint_bitcnt_t Abits,
                     slong Alength, fmpz * const * exp, const mpoly_ctx_t mctx);
 
 FLINT_DLL slong mpoly_monomial_index_monomial(const ulong * Aexp,
-                      mp_bitcnt_t Abits, slong Alength, const ulong * Mexp,
-                                    mp_bitcnt_t Mbits, const mpoly_ctx_t mctx);
+                      flint_bitcnt_t Abits, slong Alength, const ulong * Mexp,
+                                    flint_bitcnt_t Mbits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
-                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                          slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
-                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                          slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_max_fields_ui_sp(ulong * max_fields, const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
@@ -942,23 +942,23 @@ FLINT_DLL int mpoly_degrees_fit_si(const ulong * poly_exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
-                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                          slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degrees_si_threaded(slong * user_degs, const ulong * poly_exps,
-                         slong len,  mp_bitcnt_t bits, const mpoly_ctx_t mctx,
+                         slong len,  flint_bitcnt_t bits, const mpoly_ctx_t mctx,
                               thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
-                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                          slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degrees_pfmpz(fmpz ** user_degs, const ulong * poly_exps,
-                          slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx);
+                          slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL slong mpoly_degree_si(const ulong * poly_exps,
-               slong len, mp_bitcnt_t bits, slong var, const mpoly_ctx_t mctx);
+               slong len, flint_bitcnt_t bits, slong var, const mpoly_ctx_t mctx);
 
 FLINT_DLL void mpoly_degree_fmpz(fmpz_t deg, const ulong * poly_exps,
-               slong len, mp_bitcnt_t bits, slong var, const mpoly_ctx_t mctx);
+               slong len, flint_bitcnt_t bits, slong var, const mpoly_ctx_t mctx);
 
 FLINT_DLL int  mpoly_total_degree_fits_si(const ulong * exps,
                                 slong len, slong bits, const mpoly_ctx_t mctx);
@@ -1004,36 +1004,36 @@ FLINT_DLL int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, 
 FLINT_DLL void mpoly_reverse(ulong * Aexp, const ulong * Bexp, slong len, slong N);
 
 FLINT_DLL void mpoly_monomials_deflation(fmpz * shift, fmpz * stride,
-                        const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                        const ulong * Aexps, flint_bitcnt_t Abits, slong Alength,
                                                        const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_monomials_deflate(ulong * Aexps, mp_bitcnt_t Abits,
-                        const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+FLINT_DLL void mpoly_monomials_deflate(ulong * Aexps, flint_bitcnt_t Abits,
+                        const ulong * Bexps, flint_bitcnt_t Bbits, slong Blength,
               const fmpz * shift, const fmpz * stride, const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_monomials_inflate(ulong * Aexps, mp_bitcnt_t Abits,
-                        const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+FLINT_DLL void mpoly_monomials_inflate(ulong * Aexps, flint_bitcnt_t Abits,
+                        const ulong * Bexps, flint_bitcnt_t Bbits, slong Blength,
               const fmpz * shift, const fmpz * stride, const mpoly_ctx_t mctx);
 
-FLINT_DLL void _mpoly_gen_shift_right(ulong * Aexp, mp_bitcnt_t Abits,
+FLINT_DLL void _mpoly_gen_shift_right(ulong * Aexp, flint_bitcnt_t Abits,
                slong Alength, slong var, ulong amount, const mpoly_ctx_t mctx);
 
-FLINT_DLL void _mpoly_gen_shift_left(ulong * Aexp, mp_bitcnt_t Abits,
+FLINT_DLL void _mpoly_gen_shift_left(ulong * Aexp, flint_bitcnt_t Abits,
                slong Alength, slong var, ulong amount, const mpoly_ctx_t mctx);
 
-FLINT_DLL int mpoly_monomial_cmp_general(ulong * Aexp, mp_bitcnt_t Abits,
-                      ulong * Bexp, mp_bitcnt_t Bbits, const mpoly_ctx_t mctx);
+FLINT_DLL int mpoly_monomial_cmp_general(ulong * Aexp, flint_bitcnt_t Abits,
+                      ulong * Bexp, flint_bitcnt_t Bbits, const mpoly_ctx_t mctx);
 
 /* info related to gcd calculation *******************************************/
 
 FLINT_DLL void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,
                        slong * Amax_exp_count, slong * Amin_exp_count,
-                       const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+                       const ulong * Aexps, flint_bitcnt_t Abits, slong Alength,
                                                        const mpoly_ctx_t mctx);
 FLINT_DLL void mpoly_gcd_info_stride(ulong * strides,
-          const ulong * Aexps, mp_bitcnt_t Abits, slong Alength,
+          const ulong * Aexps, flint_bitcnt_t Abits, slong Alength,
                              const ulong * Amax_exp, const ulong * Amin_exp,
-          const ulong * Bexps, mp_bitcnt_t Bbits, slong Blength,
+          const ulong * Bexps, flint_bitcnt_t Bbits, slong Blength,
                              const ulong * Bmax_exp, const ulong * Bmin_exp,
                                                        const mpoly_ctx_t mctx);
 

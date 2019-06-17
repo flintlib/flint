@@ -211,27 +211,27 @@ Randomisation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with up to the given length and where 
     each coefficient has up to the given number of bits. The coefficients 
     are signed randomly. One must call ``flint_randinit()`` before 
     calling this function.
 
-.. function:: void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. One must call 
     ``flint_randinit()`` before calling this function.
 
-.. function:: void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     As for ``fmpz_poly_randtest()`` except that ``len`` and bits may 
     not be zero and the polynomial generated is guaranteed not to be the 
     zero polynomial.  One must call ``flint_randinit()`` before 
     calling this function.
 
-.. function:: void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets ``p`` to a random polynomial without any real root, whose
     length is up to ``len`` and where each coefficient has up to the
@@ -514,13 +514,13 @@ Bit packing
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len, mp_bitcnt_t bit_size, int negate)
+.. function:: void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len, flint_bitcnt_t bit_size, int negate)
 
     Packs the coefficients of ``poly`` into bitfields of the given 
     ``bit_size``, negating the coefficients before packing 
     if ``negate`` is set to `-1`.
 
-.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong len, mp_srcptr arr, mp_bitcnt_t bit_size, int negate)
+.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong len, mp_srcptr arr, flint_bitcnt_t bit_size, int negate)
 
     Unpacks the polynomial of given length from the array as packed into 
     fields of the given ``bit_size``, finally negating the coefficients 
@@ -528,24 +528,24 @@ Bit packing
     leading term with coefficient `\pm1` should be added at
     position ``len`` of ``poly``.
 
-.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, mp_srcptr_t arr, mp_bitcnt_t bit_size)
+.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, mp_srcptr_t arr, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial of given length from the array as packed into 
     fields of the given ``bit_size``.  The coefficients are assumed to 
     be unsigned.
 
-.. function:: void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly, mp_bitcnt_t bit_size)
+.. function:: void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly, flint_bitcnt_t bit_size)
 
     Packs ``poly`` into bitfields of size ``bit_size``, writing the
     result to ``f``. The sign of ``f`` will be the same as that of
     the leading coefficient of ``poly``.
 
-.. function:: void fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+.. function:: void fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial with signed coefficients packed into
     fields of size ``bit_size`` as represented by the integer ``f``.
 
-.. function:: void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+.. function:: void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial with unsigned coefficients packed into
     fields of size ``bit_size`` as represented by the integer ``f``.

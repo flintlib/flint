@@ -17,7 +17,7 @@
 */
 static int _try_missing_var(
     nmod_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     slong var,
     const nmod_mpoly_t A,
     ulong Ashift,
@@ -67,7 +67,7 @@ cleanup:
 */
 static int _try_zippel(
     nmod_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     ulong * Gstride,
     const nmod_mpoly_t A,
     const ulong * Amax_exp,
@@ -86,7 +86,7 @@ static int _try_zippel(
     int success;
     ulong * Gshift, * Addeg, * Bddeg;
     mpoly_zipinfo_t zinfo;
-    mp_bitcnt_t ABbits;
+    flint_bitcnt_t ABbits;
     flint_rand_t randstate;
     nmod_mpoly_ctx_t uctx;
     nmod_mpolyu_t Au, Bu, Gu;
@@ -369,7 +369,7 @@ static void _worker_convertn(void * varg)
 */
 static int _try_brown(
     nmod_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     ulong * Gstride,
     const nmod_mpoly_t A,
     const ulong * Amax_exp,
@@ -387,7 +387,7 @@ static int _try_brown(
     slong m, n = ctx->minfo->nvars;
     slong * perm;
     ulong * Gshift;
-    mp_bitcnt_t ABbits;
+    flint_bitcnt_t ABbits;
     nmod_mpoly_ctx_t uctx;
     nmod_mpolyun_t An, Bn, Gn, Abarn, Bbarn;
     nmod_poly_stack_t Sp;
@@ -555,7 +555,7 @@ cleanup1:
 */
 int _nmod_mpoly_gcd(
     nmod_mpoly_t G,
-    mp_bitcnt_t Gbits,
+    flint_bitcnt_t Gbits,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
     const nmod_mpoly_ctx_t ctx,
@@ -767,7 +767,7 @@ int nmod_mpoly_gcd_threaded(
     slong thread_limit)
 {
     slong i;
-    mp_bitcnt_t Gbits;
+    flint_bitcnt_t Gbits;
     int success;
     thread_pool_handle * handles;
     slong num_handles;

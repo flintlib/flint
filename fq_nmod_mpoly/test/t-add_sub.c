@@ -28,7 +28,7 @@ main(void)
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
@@ -77,7 +77,7 @@ main(void)
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
@@ -126,7 +126,7 @@ main(void)
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
@@ -176,7 +176,7 @@ main(void)
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, k1, k2;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
@@ -230,7 +230,7 @@ main(void)
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, k1, k2;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
@@ -284,7 +284,7 @@ main(void)
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h;
         slong len1, len2;
-        mp_bitcnt_t exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 
@@ -330,7 +330,7 @@ main(void)
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
 

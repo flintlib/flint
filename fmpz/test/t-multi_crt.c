@@ -81,7 +81,7 @@ main(void)
         fmpz_multi_crt_t P;
         fmpz_t t, p;
         slong moduli_count;
-        mp_bitcnt_t moduli_bits;
+        flint_bitcnt_t moduli_bits;
         fmpz ** moduli, ** inputs;
         fmpz_t output;
 
@@ -194,7 +194,7 @@ main(void)
         fmpz_multi_crt_t P;
         fmpz_t t, p;
         slong moduli_count;
-        mp_bitcnt_t moduli_bits;
+        flint_bitcnt_t moduli_bits;
         fmpz * moduli, * inputs;
         fmpz_t output;
 
@@ -300,7 +300,7 @@ main(void)
     {
         fmpz_t t, p;
         slong moduli_count;
-        mp_bitcnt_t moduli_bits;
+        flint_bitcnt_t moduli_bits;
         fmpz * moduli, * inputs;
         fmpz_t output;
 

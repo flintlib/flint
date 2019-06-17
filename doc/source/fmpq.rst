@@ -128,7 +128,7 @@ Comparison
     Sets ``height`` to the height of `x`, defined as the larger of
     the absolute values of the numerator and denominator of `x`.
 
-.. function:: mp_bitcnt_t fmpq_height_bits(const fmpq_t x)
+.. function:: flint_bitcnt_t fmpq_height_bits(const fmpq_t x)
 
     Returns the number of bits in the height of `x`.
 
@@ -304,25 +304,25 @@ Random number generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpq_randtest(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
 
     Sets ``res`` to a random value, with numerator and denominator
     having up to ``bits`` bits. The fraction will be in canonical
     form. This function has an increased probability of generating
     special values which are likely to trigger corner cases.
 
-.. function:: void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
 
     Does the same thing as ``fmpq_randtest``, but for numerator
     and denominator given explicitly as ``fmpz_t`` variables. Aliasing
     of ``num`` and ``den`` is not allowed.
 
-.. function:: void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
 
     As per ``fmpq_randtest``, but the result will not be `0`. 
     If ``bits`` is set to `0`, an exception will result.
 
-.. function:: void fmpq_randbits(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpq_randbits(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
 
     Sets ``res`` to a random value, with numerator and denominator
     both having exactly ``bits`` bits before canonicalisation,
@@ -330,7 +330,7 @@ Random number generation
     of the canonicalisation, the resulting numerator and denominator can
     be slightly smaller than ``bits`` bits.
 
-.. function:: void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
 
     Does the same thing as ``fmpq_randbits``, but for numerator
     and denominator given explicitly as ``fmpz_t`` variables. Aliasing
@@ -435,11 +435,11 @@ Arithmetic
     Sets ``res`` to the quotient of the rational number ``op`` 
     and the integer ``x``.
 
-.. function:: void fmpq_mul_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp)
+.. function:: void fmpq_mul_2exp(fmpq_t res, const fmpq_t x, flint_bitcnt_t exp)
 
     Sets ``res`` to ``x`` multiplied by ``2^exp``.
 
-.. function:: void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp)
+.. function:: void fmpq_div_2exp(fmpq_t res, const fmpq_t x, flint_bitcnt_t exp)
 
     Sets ``res`` to ``x`` divided by ``2^exp``.
 

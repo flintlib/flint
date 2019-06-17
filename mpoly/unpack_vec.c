@@ -52,7 +52,7 @@ void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
     }
 }
 
-void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
+void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, flint_bitcnt_t bits,
                                                       slong nfields, slong len)
 {
     if (bits <= FLINT_BITS)

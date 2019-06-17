@@ -68,7 +68,7 @@ void fmpz_multi_crt_clear(fmpz_multi_crt_t P)
 
 typedef struct {
     slong idx;
-    mp_bitcnt_t degree;
+    flint_bitcnt_t degree;
 } index_deg_pair;
 
 /*
@@ -85,7 +85,7 @@ static slong _push_prog(
 {
     slong i, mid;
     slong b_idx, c_idx;
-    mp_bitcnt_t lefttot, righttot;
+    flint_bitcnt_t lefttot, righttot;
     slong leftret, rightret;
     fmpz * leftmodulus, * rightmodulus;
 

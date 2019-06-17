@@ -15,7 +15,7 @@ slong _fq_nmod_mpoly_divides_monagan_pearce(
                      fq_nmod_struct ** coeff1,      ulong ** exp1, slong * alloc,
                 const fq_nmod_struct * coeff2, const ulong * exp2, slong len2,
                 const fq_nmod_struct * coeff3, const ulong * exp3, slong len3,
-     mp_bitcnt_t bits, slong N, const ulong * cmpmask, const fq_nmod_ctx_t fqctx)
+     flint_bitcnt_t bits, slong N, const ulong * cmpmask, const fq_nmod_ctx_t fqctx)
 {
     int lt_divides;
     slong i, j, q_len, s;
@@ -254,7 +254,7 @@ int fq_nmod_mpoly_divides_monagan_pearce(fq_nmod_mpoly_t poly1,
                                                     const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, N, len = 0;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     fmpz * max_fields2, * max_fields3;
     ulong * cmpmask;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;

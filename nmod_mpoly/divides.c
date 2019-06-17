@@ -43,7 +43,7 @@ typedef struct
     slong * degs;
     ulong * exps;
     slong length;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     const mpoly_ctx_struct * mctx;
     thread_pool_handle * handles;
     slong num_handles;

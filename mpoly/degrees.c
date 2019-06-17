@@ -17,7 +17,7 @@ void mpoly_degrees_si(
     slong * user_degs,
     const ulong * poly_exps,
     slong len,
-    mp_bitcnt_t bits,
+    flint_bitcnt_t bits,
     const mpoly_ctx_t mctx)
 {
     slong i;
@@ -53,7 +53,7 @@ typedef struct
     slong * degs;
     const ulong * start;
     slong length;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     const mpoly_ctx_struct * mctx;
 }
 _degrees_si_arg_struct;
@@ -68,7 +68,7 @@ void mpoly_degrees_si_threaded(
     slong * user_degs,
     const ulong * poly_exps,
     slong len,
-    mp_bitcnt_t bits,
+    flint_bitcnt_t bits,
     const mpoly_ctx_t mctx,
     thread_pool_handle * handles,
     slong num_handles)
@@ -133,7 +133,7 @@ void mpoly_degrees_ffmpz(
     fmpz * user_degs,
     const ulong * poly_exps,
     slong len,
-    mp_bitcnt_t bits,
+    flint_bitcnt_t bits,
     const mpoly_ctx_t mctx)
 {
     slong i;
@@ -167,7 +167,7 @@ void mpoly_degrees_pfmpz(
     fmpz ** user_degs,
     const ulong * poly_exps,
     slong len,
-    mp_bitcnt_t bits,
+    flint_bitcnt_t bits,
     const mpoly_ctx_t mctx)
 {
     slong i;

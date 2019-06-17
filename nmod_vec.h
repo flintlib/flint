@@ -37,7 +37,7 @@ typedef struct
 {
    mp_limb_t n;
    mp_limb_t ninv;
-   mp_bitcnt_t norm;
+   flint_bitcnt_t norm;
 } nmod_t;
 
 
@@ -190,7 +190,7 @@ void _nmod_vec_zero(mp_ptr vec, slong len)
    flint_mpn_zero(vec, len);
 }
 
-FLINT_DLL mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
+FLINT_DLL flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
 
 NMOD_VEC_INLINE
 void _nmod_vec_set(mp_ptr res, mp_srcptr vec, slong len)
