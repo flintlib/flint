@@ -63,7 +63,7 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
         fmpz_t d;
         slong j, N;
 
-        N = fmpz_clog(u, p) + v;
+        N = fmpz_clog(u, p) + v + 1;
 
         if (!str)
         {
