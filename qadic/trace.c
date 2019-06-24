@@ -39,7 +39,7 @@ void _qadic_trace(fmpz_t rop, const fmpz *op, slong len,
     }
 
     fmpz_zero(rop);
-    for (i = 0; i < d; i++)
+    for (i = 0; i < len; i++)
     {
         fmpz_addmul(rop, op + i, t + i);
     }
