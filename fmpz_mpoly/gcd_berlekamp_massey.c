@@ -910,6 +910,7 @@ void nmod_bma_mpoly_add_point(
     {
         if (Li < Llen && Ai < Alen && Lexp[Li] == Aexp)
         {
+            /* L term present, A term present */
 add_same_exp:
             nmod_berlekamp_massey_add_point(Lcoeff + Li, (Acoeff + Ai)->coeffs[0].coeffs[ai]);
             Li++;
@@ -932,12 +933,14 @@ add_same_exp:
         }
         else if (Li < Llen && (Ai >= Alen || Lexp[Li] > Aexp))
         {
+            /* L term present, A term missing */
             nmod_berlekamp_massey_add_zeros(Lcoeff + Li, 1);
             Li++;
         }
         else
         {
-            FLINT_ASSERT(Li >= Llen || (Ai < Alen && Lexp[Li] < Aexp));
+            /* L term missing, A term present */
+            FLINT_ASSERT(Ai < Alen && (Li >= Llen || Lexp[Li] < Aexp));
             {
                 ulong texp;
                 nmod_berlekamp_massey_struct tcoeff;
@@ -948,7 +951,7 @@ add_same_exp:
 
                 texp = Lexp[Llen];
                 tcoeff = Lcoeff[Llen];
-                for (j = Li; j < Llen; j++)
+                for (j = Llen - 1; j >= Li; j--)
                 {
                     Lexp[j + 1] = Lexp[j];
                     Lcoeff[j + 1] = Lcoeff[j];
@@ -1180,8 +1183,8 @@ add_same_exp:
         }
         else
         {
-            /* L term mising, A term present */
-            FLINT_ASSERT(Li >= Llen || (Ai < Alen && Lexp[Li] < Aexp));
+            /* L term missing, A term present */
+            FLINT_ASSERT(Ai < Alen && (Li >= Llen || Lexp[Li] < Aexp));
             {
                 ulong texp;
                 fmpz_mod_berlekamp_massey_struct tcoeff;
@@ -1192,7 +1195,7 @@ add_same_exp:
 
                 texp = Lexp[Llen];
                 tcoeff = Lcoeff[Llen];
-                for (j = Li; j < Llen; j++)
+                for (j = Llen - 1; j >= Li; j--)
                 {
                     Lexp[j + 1] = Lexp[j];
                     Lcoeff[j + 1] = Lcoeff[j];
