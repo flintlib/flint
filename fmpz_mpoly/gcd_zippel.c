@@ -285,14 +285,12 @@ cleanup:
 }
 
 
+int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A,
+     const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, flint_rand_t randstate);
 
-int fmpz_mpolyu_gcd_zippel(
-    fmpz_mpolyu_t G,
-    fmpz_mpolyu_t A,
-    fmpz_mpolyu_t B,
-    fmpz_mpoly_ctx_t ctx,
-    mpoly_zipinfo_t zinfo,
-    flint_rand_t randstate)
+int fmpz_mpolyu_gcd_zippel(fmpz_mpolyu_t G,
+                    fmpz_mpolyu_t A, fmpz_mpolyu_t B, fmpz_mpoly_ctx_t ctx,
+                                mpoly_zipinfo_t zinfo, flint_rand_t randstate)
 {
     int success = 0;
     slong i;
@@ -314,7 +312,8 @@ int fmpz_mpolyu_gcd_zippel(
     {
         if (fmpz_mpoly_is_one(content, ctx))
             break;
-        success = _fmpz_mpoly_gcd_zippel(content, content, A->coeffs + i, ctx);
+        success = _fmpz_mpoly_gcd_zippel(content, content, A->coeffs + i,
+                                                               ctx, randstate);
         if (!success)
             goto finished;
     }
@@ -322,7 +321,8 @@ int fmpz_mpolyu_gcd_zippel(
     {
         if (fmpz_mpoly_is_one(content, ctx))
             break;
-        success = _fmpz_mpoly_gcd_zippel(content, content, B->coeffs + i, ctx);
+        success = _fmpz_mpoly_gcd_zippel(content, content, B->coeffs + i,
+                                                               ctx, randstate);
         if (!success)
             goto finished;
     }
@@ -354,17 +354,11 @@ finished:
 }
 
 
-/*
-    like fmpz_mpoly_gcd_zippel, but G and A and B all have the same bits
-*/
-int _fmpz_mpoly_gcd_zippel(
-    fmpz_mpoly_t G,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx)
+/* like fmpz_mpoly_gcd_zippel, but G and A and B all have the same bits */
+int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A,
+      const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, flint_rand_t randstate)
 {
     slong i;
-    flint_rand_t randstate;
     int success = 0;
     flint_bitcnt_t new_bits = A->bits;
     mpoly_zipinfo_t zinfo;
@@ -405,8 +399,6 @@ int _fmpz_mpoly_gcd_zippel(
         goto cleanup1;
     }
 
-    flint_randinit(randstate);
-
     /* TODO: choose nvars and perm more cleverly */
     mpoly_zipinfo_init(zinfo, ctx->minfo->nvars);
     fmpz_mpoly_degrees_si(zinfo->Adegs, A, ctx);
@@ -443,8 +435,6 @@ cleanup:
     fmpz_mpoly_ctx_clear(uctx);
 
     mpoly_zipinfo_clear(zinfo);
-
-    flint_randclear(randstate);
 
 cleanup1:
 

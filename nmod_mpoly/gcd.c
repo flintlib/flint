@@ -152,7 +152,7 @@ static int _try_zippel(
     /* interpolation will continue in m  variables */
     mpoly_zipinfo_init(zinfo, m);
 
-    /* uctx is context for Zp[y_0,...,y_{m-1}]*/
+    /* uctx is context for Zp[y_1,...,y_{m-1}]*/
     nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->ffinfo->mod.n);
 
     Gshift = (ulong *) flint_malloc(n*sizeof(ulong));
