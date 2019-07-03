@@ -363,38 +363,7 @@ static int _try_brown(fq_nmod_mpoly_t G, flint_bitcnt_t Gbits, ulong * Gstride,
     fq_nmod_mpolyun_t An, Bn, Gn, Abarn, Bbarn;
     TMP_INIT;
 
-    /*
-        Let the variables in A and B be
-            x_0, x_1, ..., x_{n-1}
-        where n = ctx->minfo->nvars, and x_0 is most significant
-
-        Recall from _fmpz_mpoly_gcd that all variables are either
-            missing from both ess(A) and ess(B) (non-essential), or
-            present in both ess(A) and ess(B) (essential)
-        and that there are at least 2 variables in the essential case.
-
-        Let y_0, ..., y_{m-1} with m >= 2 denote the variables present
-        in both ess(A) and ess(B). Each y_i is one of the x_j and the variables
-        are ordered as y_0 > ... > y_{m-1} with LEX order.
-        The Brown algorithm will operate in Z[y_0,...,y_{m-1}] and it
-        only operates with Z[y_0,...,y_{m-1}] in LEX because the coefficients
-        are stored in a dense format.
-
-        When converting to the mpolyd format via
-        fmpz_mpoly_to_mpolyd_perm_deflate, the non-essential variables
-        will be immediately striped out and the remaining variables will be
-        mapped according to the permutation in perm as
-
-            y_k = x_perm[k] ^ Gstride[perm[k]]
-
-        When converting out of the mpolyd format via
-        fmpz_mpoly_from_mpolyd_perm_inflate, the contribution of the
-        non-essential variables will be put back in.
-    */
-
-    /* first see if dense representation is a good idea */
-    if (n > 7)
-        return 0;
+    /* first see if a dense algorithm is a good idea */
 
     denseAsize = WORD(1);
     denseBsize = WORD(1);
@@ -464,12 +433,12 @@ static int _try_brown(fq_nmod_mpoly_t G, flint_bitcnt_t Gbits, ulong * Gstride,
 
     fq_nmod_mpoly_to_mpolyun_perm_deflate(An, A, perm, Amin_exp, Gstride, uctx, ctx);
     fq_nmod_mpoly_to_mpolyun_perm_deflate(Bn, B, perm, Bmin_exp, Gstride, uctx, ctx);
-    success = fq_nmod_mpolyun_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn, m - 1, uctx);
+    success = fq_nmod_mpolyun_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn, m - 2, uctx);
     if (!success)
     {
         fq_nmod_mpoly_to_mpolyun_perm_deflate(An, A, perm, Amin_exp, Gstride, uctx, ctx);
         fq_nmod_mpoly_to_mpolyun_perm_deflate(Bn, B, perm, Bmin_exp, Gstride, uctx, ctx);
-        success = fq_nmod_mpolyun_gcd_brown_lgprime(Gn, Abarn, Bbarn, An, Bn, m - 1, uctx);
+        success = fq_nmod_mpolyun_gcd_brown_lgprime(Gn, Abarn, Bbarn, An, Bn, m - 2, uctx);
     }
     if (success)
     {

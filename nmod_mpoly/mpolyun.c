@@ -303,6 +303,10 @@ void nmod_mpolyun_mul_last(
     nmod_poly_t t;
 
     FLINT_ASSERT(!nmod_poly_is_zero(b));
+
+    if (nmod_poly_is_one(b))
+        return;
+
     nmod_poly_init_mod(t, ctx->ffinfo->mod);
 
     for (i = 0; i < A->length; i++)
@@ -971,9 +975,13 @@ void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
-
     nmod_poly_t r;
-    nmod_poly_init(r, ctx->ffinfo->mod.n);
+
+    if (nmod_poly_is_one(b))
+        return;
+
+    nmod_poly_init_mod(r, ctx->ffinfo->mod);
+
     for (i = 0; i < A->length; i++)
     {
         for (j = 0; j < (A->coeffs + i)->length; j++)
@@ -983,5 +991,6 @@ void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
             FLINT_ASSERT(nmod_poly_is_zero(r));
         }
     }
+
     nmod_poly_clear(r);
 }
