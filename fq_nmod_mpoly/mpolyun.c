@@ -420,39 +420,30 @@ void fq_nmod_mpolyun_content_poly(
     fq_nmod_poly_clear(t, ctx->fqctx);
 }
 
-void fq_nmod_mpoly_to_mpolyun_perm_deflate(
-    fq_nmod_mpolyun_t A,
-    const fq_nmod_mpoly_t B,
-    const slong * perm,
-    const ulong * shift,
-    const ulong * stride,
-    const fq_nmod_mpoly_ctx_t uctx,
-    const fq_nmod_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_to_mpolyun_perm_deflate(
+                    fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t uctx,
+                    const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx,
+                 const slong * perm, const ulong * shift, const ulong * stride)
 {
     slong m = uctx->minfo->nvars;
     fq_nmod_mpolyu_t Au;
     fq_nmod_mpolyu_init(Au, A->bits, uctx);
-    fq_nmod_mpoly_to_mpolyu_perm_deflate(Au, B, perm, shift, stride, uctx, ctx);
+    _fq_nmod_mpoly_to_mpolyu_perm_deflate(Au, uctx, B, ctx, perm, shift, stride);
     fq_nmod_mpolyu_cvtto_mpolyun(A, Au, m - 1, uctx);
     fq_nmod_mpolyu_clear(Au, uctx);
     return;
 }
 
-void fq_nmod_mpoly_from_mpolyun_perm_inflate(
-    fq_nmod_mpoly_t A,
-    flint_bitcnt_t Abits,
-    fq_nmod_mpolyun_t B,
-    const slong * perm,
-    const ulong * shift,
-    const ulong * stride,
-    const fq_nmod_mpoly_ctx_t uctx,
-    const fq_nmod_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_from_mpolyun_perm_inflate(
+    fq_nmod_mpoly_t A, flint_bitcnt_t Abits, const fq_nmod_mpoly_ctx_t ctx,
+                        fq_nmod_mpolyun_t B, const fq_nmod_mpoly_ctx_t uctx,
+                 const slong * perm, const ulong * shift, const ulong * stride)
 {
     slong m = uctx->minfo->nvars;
     fq_nmod_mpolyu_t Au;
     fq_nmod_mpolyu_init(Au, B->bits, uctx);
     fq_nmod_mpolyu_cvtfrom_mpolyun(Au, B, m - 1, uctx);
-    fq_nmod_mpoly_from_mpolyu_perm_inflate(A, Abits, Au, perm, shift, stride, uctx, ctx);
+    _fq_nmod_mpoly_from_mpolyu_perm_inflate(A, Abits, ctx, Au, uctx, perm, shift, stride);
     fq_nmod_mpolyu_clear(Au, uctx);
     return;
 }

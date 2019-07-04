@@ -714,8 +714,6 @@ static int _try_brown(
     fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
 
     /* first see if a dense algo is a good idea */
-    if (n > 7)
-        return 0;
 
     denseAsize = WORD(1);
     denseBsize = WORD(1);

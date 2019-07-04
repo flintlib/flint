@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
 void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
                      fmpz_mpoly_ctx_t ctx, slong i, slong j, const char * name)
@@ -103,6 +102,48 @@ main(void)
 
     flint_printf("gcd....");
     fflush(stdout);
+
+    for (i = 3; i <= 8; i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t g, a, b, t;
+
+        fmpz_mpoly_ctx_init(ctx, i, ORD_DEGREVLEX);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(t, ctx);
+
+        fmpz_mpoly_one(g, ctx);
+        fmpz_mpoly_one(a, ctx);
+        fmpz_mpoly_one(b, ctx);
+        for (j = 0; j < i; j++)
+        {
+            fmpz_mpoly_gen(t, j, ctx);
+            fmpz_mpoly_add_ui(t, t, 1, ctx);
+            fmpz_mpoly_mul(g, g, t, ctx);
+            fmpz_mpoly_gen(t, j, ctx);
+            fmpz_mpoly_sub_ui(t, t, 2, ctx);
+            fmpz_mpoly_mul(a, a, t, ctx);
+            fmpz_mpoly_gen(t, j, ctx);
+            fmpz_mpoly_add_ui(t, t, 2, ctx);
+            fmpz_mpoly_mul(b, b, t, ctx);
+        }
+        fmpz_mpoly_sub_ui(g, g, 2, ctx);
+        fmpz_mpoly_add_ui(a, a, 2, ctx);
+        fmpz_mpoly_sub_ui(b, b, 2, ctx);
+
+        fmpz_mpoly_mul(a, a, g, ctx);
+        fmpz_mpoly_mul(b, b, g, ctx);
+
+        gcd_check(g, a, b, ctx, i, 0, "dense examples");
+
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
 
     {
         fmpz_mpoly_ctx_t ctx;

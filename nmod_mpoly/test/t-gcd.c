@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "nmod_mpoly.h"
 
 void gcd_check(nmod_mpoly_t g, nmod_mpoly_t a, nmod_mpoly_t b,
@@ -92,7 +94,7 @@ int
 main(void)
 {
     const slong max_threads = 5;
-    slong i, j, k, tmul = 10;
+    slong i, j, k, tmul = 15;
     FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;
@@ -100,6 +102,48 @@ main(void)
 
     flint_printf("gcd....");
     fflush(stdout);
+
+    for (i = 3; i <= 8; i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t g, a, b, t;
+
+        nmod_mpoly_ctx_init(ctx, i, ORD_DEGREVLEX, 43051);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(t, ctx);
+
+        nmod_mpoly_one(g, ctx);
+        nmod_mpoly_one(a, ctx);
+        nmod_mpoly_one(b, ctx);
+        for (j = 0; j < i; j++)
+        {
+            nmod_mpoly_gen(t, j, ctx);
+            nmod_mpoly_add_ui(t, t, 1, ctx);
+            nmod_mpoly_mul(g, g, t, ctx);
+            nmod_mpoly_gen(t, j, ctx);
+            nmod_mpoly_sub_ui(t, t, 2, ctx);
+            nmod_mpoly_mul(a, a, t, ctx);
+            nmod_mpoly_gen(t, j, ctx);
+            nmod_mpoly_add_ui(t, t, 2, ctx);
+            nmod_mpoly_mul(b, b, t, ctx);
+        }
+        nmod_mpoly_sub_ui(g, g, 2, ctx);
+        nmod_mpoly_add_ui(a, a, 2, ctx);
+        nmod_mpoly_sub_ui(b, b, 2, ctx);
+
+        nmod_mpoly_mul(a, a, g, ctx);
+        nmod_mpoly_mul(b, b, g, ctx);
+
+        gcd_check(g, a, b, ctx, i, 0, "dense examples");
+
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(t, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
 
     {
         nmod_mpoly_ctx_t ctx;

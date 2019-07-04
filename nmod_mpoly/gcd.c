@@ -152,7 +152,7 @@ static int _try_zippel(
     /* interpolation will continue in m  variables */
     mpoly_zipinfo_init(zinfo, m);
 
-    /* uctx is context for Zp[y_0,...,y_{m-1}]*/
+    /* uctx is context for Zp[y_1,...,y_{m-1}]*/
     nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->ffinfo->mod.n);
 
     Gshift = (ulong *) flint_malloc(n*sizeof(ulong));
@@ -392,9 +392,7 @@ static int _try_brown(
     nmod_mpolyun_t An, Bn, Gn, Abarn, Bbarn;
     nmod_poly_stack_t Sp;
 
-    /* first see if dense representation is a good idea */
-    if (n > 7)
-        return 0;
+    /* first see if a dense algorithm is a good idea */
 
     denseAsize = WORD(1);
     denseBsize = WORD(1);
@@ -507,9 +505,9 @@ static int _try_brown(
 
     success = (num_handles > 0)
         ? nmod_mpolyun_gcd_brown_smprime_threaded(Gn, Abarn, Bbarn, An, Bn,
-                                            m - 1, uctx, handles, num_handles)
+                                            m - 2, uctx, handles, num_handles)
         : nmod_mpolyun_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn,
-                                                              m - 1, uctx, Sp);
+                                                              m - 2, uctx, Sp);
 
     if (!success)
     {
@@ -518,7 +516,7 @@ static int _try_brown(
         nmod_mpoly_to_mpolyun_perm_deflate(Bn, uctx, B, ctx,
                                              perm, Bmin_exp, Gstride, NULL, 0);
         success = nmod_mpolyun_gcd_brown_lgprime(Gn, Abarn, Bbarn, An, Bn,
-                                                                  m - 1, uctx);
+                                                                  m - 2, uctx);
     }
 
     if (success)

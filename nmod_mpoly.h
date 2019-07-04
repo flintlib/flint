@@ -1242,10 +1242,6 @@ FLINT_DLL int nmod_mpoly_gcd_zippel(nmod_mpoly_t G,
                                 const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int _nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
-                              const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
-                                         int keepbits, flint_rand_t randstate);
-
 /* mpolyu ********************************************************************/
 
 FLINT_DLL void nmod_mpolyu_init(nmod_mpolyu_t A, flint_bitcnt_t bits,
@@ -1294,34 +1290,16 @@ FLINT_DLL void nmod_mpolyu_cvtfrom_poly(nmod_mpolyu_t A, nmod_poly_t a,
 FLINT_DLL void nmod_mpolyu_cvtfrom_poly_notmain(nmod_mpolyu_t A, nmod_poly_t a,
                                         slong var, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_to_mpolyu_perm(nmod_mpolyu_t A,
-                                      const nmod_mpoly_t B, const slong * perm,
-                      const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_from_mpolyu_perm(nmod_mpoly_t A,
-                       const nmod_mpolyu_t B, int keepbits, const slong * perm,
-                      const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void nmod_mpoly_to_mpolyu_perm_deflate(
-    nmod_mpolyu_t A,
-    const nmod_mpoly_ctx_t uctx,
-    const nmod_mpoly_t B,
-    const nmod_mpoly_ctx_t ctx,
-    const slong * perm,
-    const ulong * shift,
-    const ulong * stride,
-    const thread_pool_handle * handles,
-    slong num_handles);
+                nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx,
+                const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
+                const slong * perm, const ulong * shift, const ulong * stride,
+                       const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void nmod_mpoly_from_mpolyu_perm_inflate(
-    nmod_mpoly_t A,
-    flint_bitcnt_t Abits,
-    const nmod_mpoly_ctx_t ctx,
-    const nmod_mpolyu_t B,
-    const nmod_mpoly_ctx_t uctx,
-    const slong * perm,
-    const ulong * shift,
-    const ulong * stride);
+            nmod_mpoly_t A, flint_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx,
+                        const nmod_mpolyu_t B, const nmod_mpoly_ctx_t uctx,
+                const slong * perm, const ulong * shift, const ulong * stride);
 
 FLINT_DLL int nmod_mpolyu_divides(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                                    const nmod_mpoly_ctx_t ctx);
