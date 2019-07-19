@@ -1825,6 +1825,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     fmpz_t p, subprod, cAksub, cBksub;
     mp_limb_t p_sp;
     slong zip_evals;
+    ulong ABtotal_length;
 
     w->bits = A->bits;
 
@@ -1835,6 +1836,12 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     FLINT_ASSERT(w->bits == Gamma->bits);
 
     /* let's initialize everything at once to avoid complicated cleanup */
+
+    ABtotal_length = 0;
+    for (i = 0; i < A->length; i++)
+        ABtotal_length += (A->coeffs + i)->length;
+    for (i = 0; i < B->length; i++)
+        ABtotal_length += (B->coeffs + i)->length;
 
     flint_randinit(w->randstate);
     fmpz_init(p);
@@ -2117,6 +2124,10 @@ pick_bma_prime:
         that logs in Fp are possible. It should also be big enough so that the
         ksub is reversible.
     */
+
+    if (fmpz_cmp_ui(p, ABtotal_length) < 0)
+        fmpz_set_ui(p, ABtotal_length);
+
     if (fmpz_cmp(p, subprod) < 0)
         fmpz_set(p, subprod);
 
