@@ -12,6 +12,9 @@
 /* usage
 likwid-setFrequencies -g performance
 make profile MOD=fmpz_mpoly && ./build/fmpz_mpoly/profile/p-gcd 4 sparse 7 5 4 8
+
+p-gcd nthreads sparse m1 n1 m2 n2:
+    run the sparse benchmark on nthreads with powers (m1, n1) and (m2, n2)
 */
 
 #include <stdio.h>

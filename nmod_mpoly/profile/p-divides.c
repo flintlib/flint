@@ -12,6 +12,11 @@
 /* usage:
 likwid-setFrequencies -g performance
 make profile MOD=nmod_mpoly && ./build/nmod_mpoly/profile/p-divides 4 sparse 12 12
+
+p-divides nthreads sparse m n:
+    run the sparse benchmark on nthreads with powers (m, n)
+    divides((1+x+y+2*z^2+3*t^3+5*u^5)^m*(1+u+t+2*z^2+3*y^3+5*x^5)^n,
+                (1+u+t+2*z^2+3*y^3+5*x^5)^n)
 */
 
 #include <stdio.h>
