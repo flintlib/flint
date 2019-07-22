@@ -37,13 +37,15 @@ main(void)
         fmpz_mpoly_set_str_pretty(g, "(1+u+t+2*z^2+3*y^3+5*x^5)^6", vars, ctx);
 
         fmpz_mpoly_mul(p, f, g, ctx);
+        fmpz_mpoly_assert_canonical(p, ctx);
 
-        fmpz_mpoly_div_monagan_pearce(q, p, g, ctx);
+        fmpz_mpoly_div_monagan_pearce(q, p, f, ctx);
+        fmpz_mpoly_assert_canonical(q, ctx);
 
-        if (!fmpz_mpoly_equal(q, f, ctx))
+        if (!fmpz_mpoly_equal(q, g, ctx))
         {
             printf("FAIL\n");
-            flint_printf("Check example\n");
+            flint_printf("Check example1\n");
             flint_abort();
         }
 
@@ -60,7 +62,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_limb_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         flint_bitcnt_t coeff_bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);

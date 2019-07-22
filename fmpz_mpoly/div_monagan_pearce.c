@@ -66,13 +66,6 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) +
            FLINT_BITS - 2) && FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
-    /* whether intermediate computations q - a*b will fit in three words */
-    bits2 = _fmpz_vec_max_bits(poly2, len2);
-    bits3 = _fmpz_vec_max_bits(poly3, len3);
-    /* allow one bit for sign, one bit for subtraction */
-    small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + FLINT_BITS - 2)
-         && FLINT_ABS(bits3) <= FLINT_BITS - 2;
-
     /* alloc array of heap nodes which can be chained together */
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
@@ -167,7 +160,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
         }
         else
         {
-            /* general coeff arithmetic*/
+            /* general coeff arithmetic */
 
             fmpz_zero(acc_lg);  
             do
@@ -242,9 +235,8 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
 
         /* try to divide accumulated term by leading term */
         if (!lt_divides)
-        {
             continue;
-        }
+
         if (small)
         {
             ulong d0, d1, ds = acc_sm[2];
@@ -253,9 +245,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
             sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
             
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
-            {
                 continue;
-            }
 
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
@@ -263,40 +253,41 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
-                (void) rr;
+                (void) rr; /* silence compiler warning */
+
                 if (qq == 0)
-                {
                     continue;
-                }
+
                 if ((qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
                 {
                     _fmpz_demote(q_coeff + q_len);
                     q_coeff[q_len] = (qq^ds^lc_sign) - (ds^lc_sign);
-                } else
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_ui(q_coeff + q_len, qq);
                     if (ds != lc_sign)
                         fmpz_neg(q_coeff + q_len, q_coeff + q_len);
                 }
-            } else
+            }
+            else
             {
                 small = 0;
                 fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
-        } else
+        }
+        else
         {
             if (fmpz_is_zero(acc_lg))
-            {
                 continue;
-            }
+
 large_lt_divides:
+
             fmpz_fdiv_qr(q_coeff + q_len, r, acc_lg, poly3 + 0);
             if (fmpz_is_zero(q_coeff + q_len))
-            {
                 continue;
-            }
         }
 
         /* put newly generated quotient term back into the heap if neccesary */

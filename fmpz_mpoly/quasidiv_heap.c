@@ -33,7 +33,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
     ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
     fmpz_t lc_abs_lg, ns, gcd, acc_lg, r, tp;
     slong bits2, bits3;
-    int lt_divides, scaleis1, small;
+    int lt_divides, scale_is_one, small;
     fmpz * qs;
     slong qs_alloc;
     TMP_INIT;
@@ -47,7 +47,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
     fmpz_init(ns);
     fmpz_init(gcd);
     fmpz_set_ui(scale, 1);
-    scaleis1 = 1;
+    scale_is_one = 1;
 
     qs_alloc = 64;
     qs = (fmpz *) flint_calloc(qs_alloc, sizeof(fmpz));
@@ -110,35 +110,91 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
         lt_divides = mpoly_monomial_divides1(q_exp + q_len, exp, exp3[0], mask);
 
         /* accumulate terms from highest terms on heap */
-        if (small)
-            acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
-        else
-            fmpz_zero(acc_lg);  
 
-        while (heap_len > 1 && heap[1].exp == exp)
+        if (!lt_divides)
         {
-            x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
-            do            
-            {
-                *store++ = x->i;
-                *store++ = x->j;
-                if (x->i != -WORD(1))
-                    hind[x->i] |= WORD(1);
+            /* optimation: coeff arithmetic not needed */
 
-                if (small)
+            if (mpoly_monomial_gt1(exp3[0], exp, maskhi))
+            {
+                /* optimization: no more quotient terms possible */
+                goto cleanup;
+            }
+
+            do
+            {
+                x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                do
                 {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && heap[1].exp == exp);
+        }
+        else if (small)
+        {
+            /* optimization: small coeff arithmetic, acc_sm used below */
+
+            FLINT_ASSERT(scale_is_one);
+            acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
+
+            do
+            {
+                x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                do
+                {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
                     if (x->i == -WORD(1))
                        _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
                     else
                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], q_coeff[x->j]);
-                } else if (scaleis1)
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && heap[1].exp == exp);
+        }
+        else if (scale_is_one)
+        {
+            /* general coeff arithmetic with scale 1 */
+
+            fmpz_zero(acc_lg);
+            do
+            {
+                x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                do
                 {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
                     if (x->i == -WORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
                     else
                         fmpz_submul(acc_lg, poly3 + x->i, q_coeff + x->j);
-                } else
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && heap[1].exp == exp);
+        }
+        else
+        {
+            /* general coeff arithmetic */
+
+            fmpz_zero(acc_lg);
+            do
+            {
+                x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                do
                 {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
                     if (x->i == -WORD(1))
                         fmpz_addmul(acc_lg, scale, poly2 + x->j);
                     else
@@ -147,8 +203,8 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
                         fmpz_mul(tp, tp, q_coeff + x->j);
                         fmpz_submul(acc_lg, poly3 + x->i, tp);
                     }
-                }
-            } while ((x = x->next) != NULL);
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && heap[1].exp == exp);
         }
 
         /* process popped nodes */
@@ -167,7 +223,8 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
                     _mpoly_heap_insert1(heap, exp2[x->j], x,
                                                  &next_loc, &heap_len, maskhi);
                 }
-            } else
+            }
+            else
             {
                 if (  (i + 1 < len3)
                    && (hind[i + 1] == 2*j + 1)
@@ -199,57 +256,59 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
             }
         }
 
+        if (!lt_divides)
+            continue;
+
         /* try to divide accumulated term by leading term of divisor */
         if (small)
         {
             ulong d0, d1, ds = acc_sm[2];
+
+            FLINT_ASSERT(scale_is_one);
+
             sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
 
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
                 continue;
 
-            if (!lt_divides)
-            {
-                continue;
-            }
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
-                if (rr ==0 && (qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
+
+                if (rr == 0 && (qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
                 {
                     _fmpz_demote(q_coeff + q_len);
                     q_coeff[q_len] = (qq^ds^lc_sign) - (ds^lc_sign);
                     fmpz_set_ui(qs + q_len, 1);
-                } else
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                     goto large_lt_divides;
                 }
-            } else
+            }
+            else
             {
                 small = 0;
                 fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
-
-        } else
+        }
+        else
         {
             if (fmpz_is_zero(acc_lg))
                 continue;
 
-            if (!lt_divides)
-            {
-                continue;
-            } 
 large_lt_divides:
+
             fmpz_gcd(gcd, acc_lg, poly3 + 0);
             fmpz_divexact(ns, lc_abs_lg, gcd);
             if (!fmpz_is_one(ns))
-                scaleis1 = 0;
+                scale_is_one = 0;
             fmpz_mul(q_coeff + q_len, ns, acc_lg);
             fmpz_divexact(q_coeff + q_len, q_coeff + q_len, poly3 + 0);
             fmpz_mul(qs + q_len, scale, ns);
@@ -271,7 +330,7 @@ large_lt_divides:
         s = 1;
     }
 
-cleanup2:
+cleanup:
 
     (*polyq) = q_coeff;
     (*expq)  = q_exp;
@@ -301,7 +360,7 @@ exp_overflow:
     for (i = 0; i <= q_len; i++)
         _fmpz_demote(q_coeff + i);
     q_len = -WORD(1);
-    goto cleanup2;
+    goto cleanup;
 }
 
 
@@ -328,12 +387,10 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
     ulong acc_sm[3]; /* for accumulating coefficients */
     slong exp_next;
     ulong mask;
-
     ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
-
     fmpz_t lc_abs_lg, ns, gcd, acc_lg, r, tp;
     slong bits2, bits3;
-    int lt_divides, scaleis1, small;
+    int lt_divides, scale_is_one, small;
     fmpz * qs;
     slong qs_alloc;
 
@@ -354,7 +411,7 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
     fmpz_init(ns);
     fmpz_init(gcd);
     fmpz_set_ui(scale, 1);
-    scaleis1 = 1;
+    scale_is_one = 1;
 
     qs_alloc = 64;
     qs = (fmpz *) flint_calloc(qs_alloc, sizeof(fmpz));
@@ -444,37 +501,94 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
             lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
         }
 
-        /* accumulate terms from highest terms on heap */
-        if (small)
-            acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
-        else
-            fmpz_zero(acc_lg);  
-
-        while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N))
+        if (!lt_divides)
         {
-            exp_list[--exp_next] = heap[1].exp;
-            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            do            
-            {
-                *store++ = x->i;
-                *store++ = x->j;
-                if (x->i != -WORD(1))
-                    hind[x->i] |= WORD(1);
+            /* optimation: coeff arithmetic not needed */
 
-                if (small)
+            if (mpoly_monomial_gt(exp3 + 0, exp, N, cmpmask))
+            {
+                /* optimization: no more quotient terms possible */
+                goto cleanup;
+            }
+
+            do
+            {
+                exp_list[--exp_next] = heap[1].exp;
+                x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+                do
                 {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+        }
+        else if (small)
+        {
+            /* optimization: small coeff arithmetic, acc_sm used below */
+
+            FLINT_ASSERT(scale_is_one);
+            acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
+
+            do
+            {
+                exp_list[--exp_next] = heap[1].exp;
+                x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+                do
+                {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
                     if (x->i == -WORD(1))
                        _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
                     else
                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], q_coeff[x->j]);
-                } else if (scaleis1)
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+        }
+        else if (scale_is_one)
+        {
+            /* general coeff arithmetic with scale 1 */
+
+            fmpz_zero(acc_lg);
+            do
+            {
+                exp_list[--exp_next] = heap[1].exp;
+                x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+                do
                 {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
                     if (x->i == -WORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
                     else
                         fmpz_submul(acc_lg, poly3 + x->i, q_coeff + x->j);
-                } else
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+        }
+        else
+        {
+            /* general coeff arithmetic */
+
+            fmpz_zero(acc_lg);
+            do
+            {
+                exp_list[--exp_next] = heap[1].exp;
+                x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+                do
                 {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
                     if (x->i == -WORD(1))
                         fmpz_addmul(acc_lg, scale, poly2 + x->j);
                     else
@@ -483,8 +597,8 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                         fmpz_mul(tp, tp, q_coeff + x->j);
                         fmpz_submul(acc_lg, poly3 + x->i, tp);
                     }
-                }
-            } while ((x = x->next) != NULL);
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
         }
 
         /* process popped nodes */
@@ -553,58 +667,59 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
             }
         }
 
+        if (!lt_divides)
+            continue;
+
         /* try to divide accumulated term by leading term of divisor */
         if (small)
         {
             ulong d0, d1, ds = acc_sm[2];
+
+            FLINT_ASSERT(scale_is_one);
 
             sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
 
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
                 continue;
 
-            if (!lt_divides)
-            {
-                continue;
-            }
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
+
                 if (rr ==0 && (qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
                 {
                     _fmpz_demote(q_coeff + q_len);
                     q_coeff[q_len] = (qq^ds^lc_sign) - (ds^lc_sign);
                     fmpz_set_ui(qs + q_len, 1);
-                } else
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                     goto large_lt_divides;
                 }
-            } else
+            }
+            else
             {
                 small = 0;
                 fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
-
-        } else
+        }
+        else
         {
             if (fmpz_is_zero(acc_lg))
                 continue;
 
-            if (!lt_divides)
-            {
-                continue;
-            } 
 large_lt_divides:
+
             fmpz_gcd(gcd, acc_lg, poly3 + 0);
             fmpz_divexact(ns, lc_abs_lg, gcd);
             if (!fmpz_is_one(ns))
-                scaleis1 = 0;
+                scale_is_one = 0;
             fmpz_mul(q_coeff + q_len, ns, acc_lg);
             fmpz_divexact(q_coeff + q_len, q_coeff + q_len, poly3 + 0);
             fmpz_mul(qs + q_len, scale, ns);
@@ -634,7 +749,7 @@ large_lt_divides:
         s = 1;
     }
 
-cleanup2:
+cleanup:
 
     (*polyq) = q_coeff;
     (*expq)  = q_exp;
@@ -664,7 +779,7 @@ exp_overflow:
     for (i = 0; i <= q_len; i++)
         _fmpz_demote(q_coeff + i);
     q_len = -WORD(1);
-    goto cleanup2;
+    goto cleanup;
 }
 
 void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
