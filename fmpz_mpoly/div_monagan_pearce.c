@@ -119,8 +119,34 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
         lt_divides = mpoly_monomial_divides1(q_exp + q_len, exp, exp3[0], mask);
 
         /* take nodes from heap with exponent matching exp */
-        if (small)
+
+        if (!lt_divides)
         {
+            /* optimation: coeff arithmetic not needed */
+
+            if (mpoly_monomial_gt1(exp3[0], exp, maskhi))
+            {
+                /* optimization: no more quotient terms possible */
+                goto cleanup;
+            }
+
+            do
+            {
+                x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                do
+                {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && heap[1].exp == exp);
+        }
+        else if (small)
+        {
+            /* optimization: small coeff arithmetic, acc_sm used below */
+
             acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
             do
             {
@@ -138,8 +164,11 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], q_coeff[x->j]);
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && heap[1].exp == exp);
-        } else
+        }
+        else
         {
+            /* general coeff arithmetic*/
+
             fmpz_zero(acc_lg);  
             do
             {
@@ -422,8 +451,35 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
             lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
 
         /* take nodes from heap with exponent matching exp */
-        if (small) 
+
+        if (!lt_divides)
         {
+            /* optimation: coeff arithmetic not needed */
+
+            if (mpoly_monomial_gt(exp3 + 0, exp, N, cmpmask))
+            {
+                /* optimization: no more quotient terms possible */
+                goto cleanup;
+            }
+
+            do
+            {
+                exp_list[--exp_next] = heap[1].exp;
+                x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+                do
+                {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+        }
+        else if (small)
+        {
+            /* optimization: small coeff arithmetic, acc_sm used below */
+
             acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
             do
             {
@@ -442,8 +498,11 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], q_coeff[x->j]);
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
-        } else
+        }
+        else
         {
+            /* general coeff arithmetic*/
+
             fmpz_zero(acc_lg);
             do
             {
