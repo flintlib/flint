@@ -136,8 +136,8 @@ Assignment and basic manipulation
 .. function:: int fmpz_poly_set_str(fmpz_poly_t poly, const char * str)
 
     Imports a polynomial from a null-terminated string.  If the string 
-    ``str`` represents a valid polynomial returns `1`, otherwise 
-    returns `0`.
+    ``str`` represents a valid polynomial returns `0`, otherwise 
+    returns `1`.
     
     Returns `0` if no error occurred.  Otherwise, returns a non-zero value, 
     in which case the resulting value of ``poly`` is undefined.  If 
