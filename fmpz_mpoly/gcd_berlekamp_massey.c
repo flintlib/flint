@@ -2820,6 +2820,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
     fmpz_t Hmodulus;
     nmod_zip_mpolyu_t Z;
     slong zip_evals;
+    ulong ABtotal_length;
 
     FLINT_ASSERT(bits == A->bits);
     FLINT_ASSERT(bits == B->bits);
@@ -2827,6 +2828,12 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
     FLINT_ASSERT(bits == Gamma->bits);
 
     /* let's initialize everything at once to avoid complicated cleanup */
+
+    ABtotal_length = 0;
+    for (i = 0; i < A->length; i++)
+        ABtotal_length += (A->coeffs + i)->length;
+    for (i = 0; i < B->length; i++)
+        ABtotal_length += (B->coeffs + i)->length;
 
     flint_randinit(randstate);
     fmpz_init(p);
@@ -3040,6 +3047,10 @@ pick_bma_prime:
         that logs in Fp are possible. It should also be big enough so that the
         ksub is reversible.
     */
+
+    if (fmpz_cmp_ui(p, ABtotal_length) < 0)
+        fmpz_set_ui(p, ABtotal_length);
+
     if (fmpz_cmp(p, subprod) < 0)
         fmpz_set(p, subprod);
 
@@ -3114,6 +3125,7 @@ pick_bma_prime:
 
         /* image count is also the current power of alpha we are evaluating */
         image_count_sp++;
+
         FLINT_ASSERT(sshift_sp + Lambda_sp->pointcount == image_count_sp);
 
         if (image_count_sp >= p_sp - 1)
@@ -3168,14 +3180,14 @@ pick_bma_prime:
                 goto pick_bma_prime;
             }
             last_unlucky_sshift_plus_1_sp = sshift_sp + 1;
-            sshift_sp += Lambda->pointcount + 1;
+            sshift_sp += Lambda_sp->pointcount + 1;
             nmod_bma_mpoly_zero(Lambda_sp);
             goto next_bma_image_sp;        
         }
         else if (GdegboundXY > GevaldegXY)
         {
             /* new bound on deg_XY(G) */
-            sshift_sp += Lambda->pointcount;
+            sshift_sp += Lambda_sp->pointcount;
             nmod_bma_mpoly_zero(Lambda_sp);
             nmod_bma_mpoly_add_point(Lambda_sp, Geval_sp, ctx_sp->ffinfo);
             GdegboundXY = GevaldegXY;

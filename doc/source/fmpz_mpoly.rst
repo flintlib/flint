@@ -574,13 +574,13 @@ Division
 
 .. function:: int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
 
-    Perform the operation of func::fmpz_mpoly_divides uses the algorithm of Michael Monagan and Roman Pearce.
+    Perform the operation of func::fmpz_mpoly_divides using the algorithm of Michael Monagan and Roman Pearce.
     The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: void fmpz_mpoly_divrem(fmpz_mpoly_t Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Set ``Q`` and ``R`` to the quotient and remainder of ``A`` divided by ``B``. The monomials in ``R`` divisible by the leading monomial of ``B`` will have coefficients reduced modulo the absolute value of the leading coefficient of ``B``.
-    Note that this function is not very useful.
+    Note that this function is not very useful if the leading coefficient ``B`` is not a unit.
 
 .. function:: void fmpz_mpoly_quasidivrem(fmpz_t scale, fmpz_mpoly_t Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
@@ -589,7 +589,7 @@ Division
 .. function:: void fmpz_mpoly_div(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Perform the operation of :func:`fmpz_mpoly_divrem` and discard ``R``.
-    Note that this function is not very useful.
+    Note that this function is not very useful if the division is not exact and the leading coefficient ``B`` is not a unit.
 
 .. function:: void fmpz_mpoly_quasidiv(fmpz_t scale, fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
@@ -599,7 +599,7 @@ Division
 
     This function is as per :func:`fmpz_mpoly_divrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
     The number of divisor (and hence quotient) polynomials, is given by ``len``.
-    Note that this function is not very useful.
+    Note that this function is not very useful if the leading coefficient in the array ``B`` is not a unit.
 
 .. function:: void fmpz_mpoly_quasidivrem_ideal(fmpz_t scale, fmpz_mpoly_struct ** Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, fmpz_mpoly_struct * const * B, slong len, const fmpz_mpoly_ctx_t ctx)
 
@@ -634,9 +634,9 @@ Greatest Common Divisor
     Try to set ``G`` to the GCD of ``A`` and ``B`` using Brown's algorithm.
     The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
-.. function:: int fmpz_mpoly_gcd_zipple(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
-    Try to set ``G`` to the GCD of ``A`` and ``B`` using Zipple's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using Zippel's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
 
 .. function:: int fmpz_mpoly_gcd_berlekamp_massey(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 

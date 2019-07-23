@@ -9,20 +9,26 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+/* usage:
+likwid-setFrequencies -g performance
+make profile MOD=nmod_mpoly && ./build/nmod_mpoly/profile/p-divides 4 sparse 12 12
+
+p-divides nthreads sparse m n:
+    run the sparse benchmark on nthreads with powers (m, n)
+    divides((1+x+y+2*z^2+3*t^3+5*u^5)^m*(1+u+t+2*z^2+3*y^3+5*x^5)^n,
+                (1+u+t+2*z^2+3*y^3+5*x^5)^n)
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "profiler.h"
 #include "nmod_mpoly.h"
-/*
-    export LD_LIBRARY_PATH=/tmpbig/schultz/flint2
-    likwid-setFrequencies -g performance
-    nano fmpz_mpoly/profile/p-divides.c
-    make profile MOD=nmod_mpoly
-    ./build/nmod_mpoly/profile/p-divides
-*/
 
-slong max_threads;
+#define CALCULATE_MACHINE_EFFICIENCY 0
+
 int * cpu_affinities;
+
+#if CALCULATE_MACHINE_EFFICIENCY
 
 typedef struct _worker_arg_struct
 {
@@ -40,22 +46,22 @@ static void worker_divides(void * varg)
     nmod_mpoly_divides_threaded(W->Q, W->A, W->B, W->ctx, 1);
 }
 
+#endif
+
 void profile_divides(
     const nmod_mpoly_t realQ,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
     const nmod_mpoly_ctx_t ctx,
-    const char * name,
-    slong m1, slong n1)
+    slong max_threads)
 {
     nmod_mpoly_t Q;
     timeit_t timer;
     slong num_threads;
     slong serial_time;
 
-    flint_printf("\n******** starting %s (%wu, %wd):\n", name, m1, n1);
-
     flint_set_num_threads(1);
+    flint_set_thread_affinity(cpu_affinities, 1);
     nmod_mpoly_init(Q, ctx);
     timeit_start(timer);
     nmod_mpoly_divides(Q, A, B, ctx);
@@ -64,24 +70,26 @@ void profile_divides(
     flint_printf("serial time: %wd\n", serial_time);
     if (!nmod_mpoly_equal(Q, realQ, ctx))
     {
-        printf("quotient wrong\n");
+        printf("quotient wrong!!!\n");
         flint_abort();
     }
 
     for (num_threads = 2; num_threads <= max_threads; num_threads++)
     {
-        thread_pool_handle * handles;
-        slong num_workers;
-        worker_arg_struct * worker_args;
         slong parallel_time;
+        double parallel_efficiency;
+#if CALCULATE_MACHINE_EFFICIENCY
+        thread_pool_handle * handles;
+        worker_arg_struct * worker_args;
         slong i;
-        double machine_efficiency, parallel_efficiency;
+        double machine_efficiency;
+        slong num_workers;
+#endif
 
         flint_set_num_threads(num_threads);
         flint_set_thread_affinity(cpu_affinities, num_threads);
 
-        /* find machine efficiency */
-
+#if CALCULATE_MACHINE_EFFICIENCY
         handles = (thread_pool_handle *) flint_malloc((num_threads - 1)*sizeof(thread_pool_handle));
         num_workers = thread_pool_request(global_thread_pool, handles, num_threads - 1);
         worker_args = (worker_arg_struct *) flint_malloc((num_workers + 1)*sizeof(worker_arg_t));
@@ -127,6 +135,7 @@ void profile_divides(
         flint_free(handles);
 
         machine_efficiency = (double)(serial_time)/(double)(parallel_time);
+#endif
 
         nmod_mpoly_clear(Q, ctx);
         nmod_mpoly_init(Q, ctx);
@@ -136,13 +145,17 @@ void profile_divides(
         parallel_time = FLINT_MAX(WORD(1), timer->wall);
         if (!nmod_mpoly_equal(Q, realQ, ctx))
         {
-            printf("quotient wrong\n");
+            printf("quotient wrong!!!\n");
             flint_abort();
         }
 
         parallel_efficiency = (double)(serial_time)/(double)(parallel_time)/(double)(num_threads);
 
+#if CALCULATE_MACHINE_EFFICIENCY
         flint_printf("parallel %wd time: %wd, efficiency %f (machine %f)\n", num_threads, parallel_time, parallel_efficiency, machine_efficiency);
+#else
+        flint_printf("parallel %wd time: %wd, efficiency %f\n", num_threads, parallel_time, parallel_efficiency);
+#endif
     }
 
     nmod_mpoly_clear(Q, ctx);
@@ -151,40 +164,90 @@ void profile_divides(
 
 int main(int argc, char *argv[])
 {
-    slong i, m, n;
+    slong i, m, n, max_threads;
+    const slong thread_limit = 64;
+    const char * name;
 
-    max_threads = argc > 1 ? atoi(argv[1]) : 2;
-    max_threads = FLINT_MIN(max_threads, WORD(32));
-    max_threads = FLINT_MAX(max_threads, WORD(1));
-
-    flint_printf("setting max_threads = %wd\n", max_threads);
-
-    cpu_affinities = flint_malloc(max_threads*sizeof(int));
-    for (i = 0; i < max_threads; i++)
+    cpu_affinities = flint_malloc(thread_limit*sizeof(int));
+    for (i = 0; i < thread_limit; i++)
         cpu_affinities[i] = i;
 
-    for (m = 7 + max_threads/4; m <= 13 + max_threads/4; m += 3)
-    for (n = 7 + max_threads/4; n <= 13 + max_threads/4; n += 3)
+    if (argc == 5)
+    {
+        max_threads = atoi(argv[1]);
+        max_threads = FLINT_MIN(max_threads, thread_limit);
+        max_threads = FLINT_MAX(max_threads, WORD(1));
+        name = argv[2];
+        m = atoi(argv[3]);
+        n = atoi(argv[4]);
+    }
+    else
+    {
+        printf("  usage: p-divides nthreads {dense|sparse} m n\n");
+        printf("running: p-divides 4 sparse 12 12\n");
+        max_threads = 4;
+        name = "sparse";
+        m = 12;
+        n = 12;
+    }
+
+    m = FLINT_MIN(m, WORD(30));
+    m = FLINT_MAX(m, WORD(5));
+    n = FLINT_MIN(n, WORD(30));
+    n = FLINT_MAX(n, WORD(5));
+
+    flint_printf("setting up nmod_mpoly %s divides ... ", name, m, n);
+
+    if (strcmp(name, "dense") == 0)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, A, B, Q;
-        const char * vars[] = {"x", "y", "z", "t", "u"};
+        const char * vars[] = {"x", "y", "z", "t"};
 
-        nmod_mpoly_ctx_init(ctx, 5, ORD_LEX, n_nextprime(UWORD(1) << (FLINT_BITS - 2), 1));
+        nmod_mpoly_ctx_init(ctx, 4, ORD_DEGLEX, 536870909);
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(b, ctx);
         nmod_mpoly_init(A, ctx);
         nmod_mpoly_init(B, ctx);
         nmod_mpoly_init(Q, ctx);
 
-        nmod_mpoly_set_str_pretty(a, "1+x+1*y^2+1*z^3+1*t^4+1*u^5", vars, ctx);
-        nmod_mpoly_set_str_pretty(b, "1+u+1*t^2+1*z^3+1*y^4+1*x^5", vars, ctx);
-
+        nmod_mpoly_set_str_pretty(a, "1 + x + y + z + t", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "1 + x + y + z + t", vars, ctx);
         nmod_mpoly_pow_ui(Q, a, m, ctx);
         nmod_mpoly_pow_ui(B, b, n, ctx);
         nmod_mpoly_mul(A, Q, B, ctx);
 
-        profile_divides(Q, A, B, ctx, "sparse divides", m, n);
+        flint_printf("starting dense divides (%wu, %wd):\n", m, n);
+        profile_divides(Q, A, B, ctx, max_threads);
+
+        nmod_mpoly_clear(Q, ctx);
+        nmod_mpoly_clear(B, ctx);
+        nmod_mpoly_clear(A, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_ctx_clear(ctx);        
+    }
+    else /* sparse */
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, A, B, Q;
+        const char * vars[] = {"x", "y", "z", "t", "u"};
+
+        nmod_mpoly_ctx_init(ctx, 5, ORD_LEX, 536870909);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(A, ctx);
+        nmod_mpoly_init(B, ctx);
+        nmod_mpoly_init(Q, ctx);
+
+        nmod_mpoly_set_str_pretty(a, "1 + x + y + 2*z^2 + 3*t^3 + 5*u^5", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "1 + u + t + 2*z^2 + 3*y^3 + 5*x^5", vars, ctx);
+        nmod_mpoly_pow_ui(Q, a, m, ctx);
+        nmod_mpoly_pow_ui(B, b, n, ctx);
+        nmod_mpoly_mul(A, Q, B, ctx);
+
+        flint_printf("starting sparse divides (%wu, %wd):\n", m, n);
+        profile_divides(Q, A, B, ctx, max_threads);
 
         nmod_mpoly_clear(Q, ctx);
         nmod_mpoly_clear(B, ctx);

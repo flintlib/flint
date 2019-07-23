@@ -70,7 +70,7 @@ static int _try_array_LEX(slong * Bdegs, slong * Cdegs,
             return 0;
     }
 
-    return dense_size <= WORD(5000000)
+    return dense_size <= WORD(50000000)
             && dense_size/Blen/Clen < WORD(10);
 }
 
