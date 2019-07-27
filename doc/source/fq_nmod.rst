@@ -123,11 +123,11 @@ Memory management
 
 .. function:: void fq_nmod_init(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 
-    Initialises the element ``rop``, setting its value to~`0`.
+    Initialises the element ``rop``, setting its value to~`0`. Currently, the behaviour is identical to ``fq_nmod_init2``, as it also ensures ``rop`` has enough space for it to be an element of ``ctx``, this may change in the future.
 
 .. function:: void fq_nmod_init2(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 
-    Initialises ``poly`` with at least enough space for it to be an element
+    Initialises ``rop`` with at least enough space for it to be an element
     of ``ctx`` and sets it to~`0`.
 
 .. function:: void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
