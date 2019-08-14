@@ -161,6 +161,7 @@ typedef struct
     ulong num_threads;
     slong var;
     slong bound;
+    const mpoly_gcd_info_struct * I;
 }
 _splitbase_struct;
 
@@ -465,10 +466,10 @@ static void _splitworker(void * varg)
 
         success = nmod_mpolyun_gcd_brown_smprime(
                     Gevalp, Abarevalp, Bbarevalp, Aevalp, Bevalp, var - 1,
-                                                                      ctx, Sp);
+                                                             ctx, base->I, Sp);
         success = success && nmod_mpolyun_gcd_brown_smprime(
                     Gevalm, Abarevalm, Bbarevalm, Aevalm, Bevalm, var - 1,
-                                                                      ctx, Sp);
+                                                             ctx, base->I, Sp);
         if (success == 0)
         {
             continue;
@@ -777,6 +778,7 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     nmod_mpolyun_t B,
     slong var,
     const nmod_mpoly_ctx_t ctx,
+    const mpoly_gcd_info_t I,
     const thread_pool_handle * handles,
     slong num_handles)
 {
@@ -854,6 +856,7 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     splitbase->gamma = gamma;
     splitbase->var = var;
     splitbase->bound = bound;
+    splitbase->I = I;
 
 compute_split:
 
@@ -1219,8 +1222,8 @@ int nmod_mpoly_gcd_brown_threaded(
 
     /* calculate gcd */
     success = nmod_mpolyun_gcd_brown_smprime_threaded(
-                          Gn, Abarn, Bbarn, An, Bn,
-                          uctx->minfo->nvars - 1, uctx, handles, num_handles);
+                          Gn, Abarn, Bbarn, An, Bn, uctx->minfo->nvars - 1,
+                                             uctx, NULL, handles, num_handles);
 
     for (i = 0; i < num_handles; i++)
     {

@@ -94,7 +94,7 @@ int nmod_mpoly_gcd_brown(
     nmod_mpoly_to_mpolyun_perm_deflate(An, uctx, A, ctx, perm, shift, stride, NULL, 0);
     nmod_mpoly_to_mpolyun_perm_deflate(Bn, uctx, B, ctx, perm, shift, stride, NULL, 0);
     success = nmod_mpolyun_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn,
-                                             uctx->minfo->nvars - 1, uctx, Sp);
+                                       uctx->minfo->nvars - 1, uctx, NULL, Sp);
     if (!success)
     {
         nmod_mpoly_to_mpolyun_perm_deflate(An, uctx, A, ctx, perm, shift, stride, NULL, 0);

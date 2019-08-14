@@ -505,9 +505,9 @@ static int _try_brown(
 
     success = (num_handles > 0)
         ? nmod_mpolyun_gcd_brown_smprime_threaded(Gn, Abarn, Bbarn, An, Bn,
-                                            m - 2, uctx, handles, num_handles)
+                                       m - 2, uctx, NULL, handles, num_handles)
         : nmod_mpolyun_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn,
-                                                              m - 2, uctx, Sp);
+                                                        m - 2, uctx, NULL, Sp);
 
     if (!success)
     {

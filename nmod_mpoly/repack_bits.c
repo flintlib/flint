@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018, 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -50,3 +50,33 @@ int nmod_mpoly_repack_bits(nmod_mpoly_t A, const nmod_mpoly_t B,
 
     return success;
 }
+
+
+int nmod_mpoly_repack_bits_inplace(
+    nmod_mpoly_t A,
+    flint_bitcnt_t Abits,
+    const nmod_mpoly_ctx_t ctx)
+{
+    int success;
+    ulong * texps;
+    slong N = mpoly_words_per_exp(Abits, ctx->minfo);
+
+    if (A->bits == Abits)
+    {
+        return 1;
+    }
+
+    texps = (ulong *) flint_malloc(A->alloc*N*sizeof(ulong));
+    success = mpoly_repack_monomials(texps, Abits,
+                                      A->exps, A->bits, A->length, ctx->minfo);
+    if (success)
+    {
+        ulong * t = A->exps;
+        A->exps = texps;
+        texps = t;
+        A->bits = Abits;
+    }
+    flint_free(texps);
+    return success;
+}
+

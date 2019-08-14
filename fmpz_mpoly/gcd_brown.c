@@ -75,7 +75,8 @@ int fmpz_mpolyu_gcd_brown(
     fmpz_mpolyu_t Bbar,
     fmpz_mpolyu_t A,
     fmpz_mpolyu_t B,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t ctx,
+    const mpoly_gcd_info_t I)
 {
     int success;
     fmpz_t bound;
@@ -183,7 +184,7 @@ choose_prime:
     FLINT_ASSERT(Bp->length > 0);
 
     success = nmod_mpolyun_gcd_brown_smprime(Gp, Abarp, Bbarp,
-                                      Ap, Bp, ctx->minfo->nvars - 1, pctx, Sp);
+                                   Ap, Bp, ctx->minfo->nvars - 1, pctx, I, Sp);
     if (!success)
     {
         goto choose_prime;
@@ -411,7 +412,7 @@ int fmpz_mpoly_gcd_brown(
     fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
                                            perm, shift, stride, NULL, NULL, 0);
 
-    success = fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx);
+    success = fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx, NULL);
     if (success)
     {
         fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits, ctx, Gu, uctx,

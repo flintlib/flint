@@ -792,6 +792,7 @@ int nmod_mpolyun_gcd_brown_smprime(
     nmod_mpolyun_t B,
     slong var,
     const nmod_mpoly_ctx_t ctx,
+    const mpoly_gcd_info_t I,
     nmod_poly_stack_t Sp)
 {
     int success;
@@ -921,10 +922,10 @@ choose_prime:
     FLINT_ASSERT(Bevalm->length > 0);
 
     success = nmod_mpolyun_gcd_brown_smprime(Gevalp, Abarevalp, Bbarevalp,
-                                             Aevalp, Bevalp, var - 1, ctx, Sp);
+                                          Aevalp, Bevalp, var - 1, ctx, I, Sp);
     success = success
            && nmod_mpolyun_gcd_brown_smprime(Gevalm, Abarevalm, Bbarevalm,
-                                             Aevalm, Bevalm, var - 1, ctx, Sp);
+                                          Aevalm, Bevalm, var - 1, ctx, I, Sp);
     if (success == 0)
     {
         goto choose_prime;

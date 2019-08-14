@@ -1085,9 +1085,9 @@ static int _try_brown(
     FLINT_ASSERT(Bu->length > 1);
 
     success = (num_handles > 0)
-           ? fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu, uctx,
+           ? fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu, uctx, I,
                                                          handles, num_handles)
-           : fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx);
+           : fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx, I);
 
     if (!success)
         goto cleanup;
@@ -1689,7 +1689,7 @@ calculate_trivial_gcd:
     */
 
     mpoly_gcd_info_set_estimates(I, A, B, ctx, handles, num_handles);
-    mpoly_gcd_info_set_perm(I, A->length, B->length, ctx);
+    mpoly_gcd_info_set_perm(I, A->length, B->length, ctx->minfo);
 
     /* everything in I is valid now */
 
