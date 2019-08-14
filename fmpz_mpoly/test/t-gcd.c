@@ -326,6 +326,64 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
+    /* one input divides the other */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        fmpz_t c;
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t a, b, g, t1, t2;
+        slong len, len1, len2;
+        mp_limb_t exp_bound, exp_bound1, exp_bound2;
+        flint_bitcnt_t coeff_bits;
+
+        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
+
+        fmpz_init(c);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(a, ctx);
+        fmpz_mpoly_init(b, ctx);
+        fmpz_mpoly_init(t1, ctx);
+        fmpz_mpoly_init(t2, ctx);
+
+        len = n_randint(state, 5);
+        len1 = n_randint(state, 5);
+        len2 = n_randint(state, 5);
+
+        exp_bound = n_randint(state, 100) + 2;
+        exp_bound1 = n_randint(state, 100) + 2;
+        exp_bound2 = n_randint(state, 100) + 2;
+
+        coeff_bits = n_randint(state, 200);
+
+        for (j = 0; j < 4; j++)
+        {
+            fmpz_mpoly_randtest_bound(t1, state, len1, coeff_bits + 1, exp_bound1, ctx);
+            fmpz_mpoly_randtest_bound(t2, state, len2, coeff_bits + 1, exp_bound2, ctx);
+            fmpz_mpoly_mul(b, t1, t2, ctx);
+            fmpz_randtest(c, state, coeff_bits + 1);
+            fmpz_mpoly_scalar_mul_fmpz(a, t2, c, ctx);
+            fmpz_randtest(c, state, coeff_bits + 1);
+            fmpz_mpoly_scalar_mul_fmpz(b, b, c, ctx);
+
+            fmpz_mpoly_randtest_bound(g, state, len, coeff_bits, exp_bound, ctx);
+
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+            if ((j%2) == 0)
+                fmpz_mpoly_swap(a, b, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "one input divides the other");
+        }
+
+        fmpz_clear(c);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(a, ctx);
+        fmpz_mpoly_clear(b, ctx);
+        fmpz_mpoly_clear(t1, ctx);
+        fmpz_mpoly_clear(t2, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     /* sparse inputs */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {

@@ -1515,6 +1515,82 @@ cleanup:
     return success;
 }
 
+/*
+    Test if B divides A or A divides B
+        TODO: incorporate deflation
+*/
+static int _try_divides(
+    fmpz_mpoly_t G,
+    const fmpz_mpoly_t A,
+    int try_a,
+    const fmpz_mpoly_t B,
+    int try_b,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    int success, free_a, free_b;
+    fmpz_t cA, cB, cG;
+    fmpz_mpoly_t Q;
+    fmpz_mpoly_t AA, BB;
+
+    *AA = *A;
+    *BB = *B;
+    fmpz_init(cA);
+    fmpz_init(cB);
+    fmpz_init(cG);
+    fmpz_mpoly_init(Q, ctx);
+
+    _fmpz_vec_content(cA, A->coeffs, A->length);
+    _fmpz_vec_content(cB, B->coeffs, B->length);
+    fmpz_gcd(cG, cA, cB);
+
+    free_a = 0;
+    if (!fmpz_is_one(cA))
+    {
+        AA->coeffs = _fmpz_vec_init(A->alloc);
+        _fmpz_vec_scalar_divexact_fmpz(AA->coeffs, A->coeffs, A->length, cA);
+        free_a = 1;
+    }
+
+    free_b = 0;
+    if (!fmpz_is_one(cB))
+    {
+        BB->coeffs = _fmpz_vec_init(B->alloc);
+        _fmpz_vec_scalar_divexact_fmpz(BB->coeffs, B->coeffs, B->length, cB);
+        free_b = 1;
+    }
+
+    if (try_b && fmpz_mpoly_divides_threaded(Q, AA, BB, ctx, 1))
+    {
+        fmpz_mpoly_scalar_mul_fmpz(G, BB, cG, ctx);
+        success = 1;
+        goto cleanup;
+    }
+
+    if (try_a && fmpz_mpoly_divides_threaded(Q, BB, AA, ctx, 1))
+    {
+        fmpz_mpoly_scalar_mul_fmpz(G, AA, cG, ctx);
+        success = 1;
+        goto cleanup;
+    }
+
+    success = 0;
+
+cleanup:
+
+    fmpz_mpoly_clear(Q, ctx);
+    fmpz_clear(cA);
+    fmpz_clear(cB);
+    fmpz_clear(cG);
+
+    if (free_a)
+        _fmpz_vec_clear(AA->coeffs, A->alloc);
+
+    if (free_b)
+        _fmpz_vec_clear(BB->coeffs, B->alloc);
+
+    return success;
+}
+
 
 /*
     The function must pack a successful answer into bits = Gbits <= FLINT_BITS
@@ -1762,27 +1838,8 @@ calculate_trivial_gcd:
         if (gcd_is_trivial)
             goto calculate_trivial_gcd;
 
-        if (try_a || try_b)
-        {
-            fmpz_mpoly_t Q;
-            fmpz_mpoly_init(Q, ctx);
-
-            if (try_b && fmpz_mpoly_divides(Q, A, B, ctx))
-            {
-                fmpz_mpoly_set(G, B, ctx);
-                fmpz_mpoly_clear(Q, ctx);
-                goto successful;
-            }
-
-            if (try_a && fmpz_mpoly_divides(Q, B, A, ctx))
-            {
-                fmpz_mpoly_set(G, A, ctx);
-                fmpz_mpoly_clear(Q, ctx);
-                goto successful;
-            }
-
-            fmpz_mpoly_clear(Q, ctx);
-        }
+        if ((try_a || try_b) && _try_divides(G, A, try_a, B, try_b, ctx))
+            goto successful;
     }
 
     _measure_brown(I, A, B, ctx);
