@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018, 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,6 +11,46 @@
 
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
+
+
+void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars)
+{
+    char * d;
+
+    FLINT_ASSERT(nvars > 0);
+
+    d = (char *) flint_malloc(nvars*(8*sizeof(ulong) + 11*sizeof(slong)));
+
+    I->data = d;
+
+    I->Amax_exp         = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Amin_exp         = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Astride          = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Adeflate_deg     = (slong *) d; d += nvars*sizeof(slong);
+    I->Alead_count      = (slong *) d; d += nvars*sizeof(slong);
+    I->Atail_count      = (slong *) d; d += nvars*sizeof(slong);
+
+    I->Bmax_exp         = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Bmin_exp         = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Bstride          = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Bdeflate_deg     = (slong *) d; d += nvars*sizeof(slong);
+    I->Blead_count      = (slong *) d; d += nvars*sizeof(slong);
+    I->Btail_count      = (slong *) d; d += nvars*sizeof(slong);
+
+    I->Gmin_exp           = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Gstride            = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Gdeflate_deg_bound = (slong *) d; d += nvars*sizeof(slong);
+    I->Gterm_count_est    = (slong *) d; d += nvars*sizeof(slong);
+
+    I->brown_perm   = (slong *) d; d += nvars*sizeof(slong);
+    I->bma_perm     = (slong *) d; d += nvars*sizeof(slong);
+    I->zippel_perm  = (slong *) d; d += nvars*sizeof(slong);
+}
+
+void mpoly_gcd_info_clear(mpoly_gcd_info_t I)
+{
+    flint_free(I->data);
+}
 
 /*
     Scan A and fill in the min and max exponents of each variable along
@@ -147,3 +187,46 @@ cleanup:
 
     return;
 }
+
+void mpoly_gcd_info_set_perm(
+    mpoly_gcd_info_t I,
+    slong Alength,
+    slong Blength,
+    const mpoly_ctx_t mctx)
+{
+    slong j, m;
+
+    I->Adensity = Alength;
+    I->Bdensity = Blength;
+
+    m = 0;
+    for (j = 0; j < mctx->nvars; j++)
+    {
+        if (I->Amax_exp[j] > I->Amin_exp[j])
+        {
+            FLINT_ASSERT(I->Gstride[j] != UWORD(0));
+            FLINT_ASSERT((I->Amax_exp[j] - I->Amin_exp[j]) % I->Gstride[j] == 0);
+            FLINT_ASSERT((I->Bmax_exp[j] - I->Bmin_exp[j]) % I->Gstride[j] == 0);
+
+            I->Adensity /= UWORD(1) + (ulong)(I->Adeflate_deg[j]);
+            I->Bdensity /= UWORD(1) + (ulong)(I->Bdeflate_deg[j]);
+
+            I->brown_perm[m] = j;
+            I->bma_perm[m] = j;
+            I->zippel_perm[m] = j;
+            m++;
+        }
+        else
+        {
+            FLINT_ASSERT(I->Amax_exp[j] == I->Amin_exp[j]);
+            FLINT_ASSERT(I->Bmax_exp[j] == I->Bmin_exp[j]);
+        }
+    }
+
+    I->mvars = m;
+
+    I->can_use_brown = 0;
+    I->can_use_bma = 0;
+    I->can_use_zippel = 0;
+}
+

@@ -22,80 +22,7 @@
 
     The "try" function will then execute the method and return 1 for success.
 */
-typedef struct
-{
-    ulong * Amax_exp;
-    ulong * Amin_exp;
-    ulong * Astride;
-    slong * Adeflate_deg;
-    slong * Alead_count;
-    slong * Atail_count;
 
-    ulong * Bmax_exp;
-    ulong * Bmin_exp;
-    ulong * Bstride;
-    slong * Bdeflate_deg;
-    slong * Blead_count;
-    slong * Btail_count;
-
-    ulong * Gmin_exp;
-    ulong * Gstride;
-    slong * Gterm_count_est;
-    slong * Gdeflate_deg_bound;
-    int Gdeflate_deg_bounds_are_nice; /* all of Gdeflate_deg_bound came from real gcd computations */
-
-    slong mvars;
-
-    double Adensity;
-    double Bdensity;
-
-    double brown_time_est, bma_time_est, zippel_time_est;
-    slong * brown_perm, * bma_perm, * zippel_perm;
-    int can_use_brown, can_use_bma, can_use_zippel;
-
-    char * data;
-} mpoly_gcd_info_struct;
-
-typedef mpoly_gcd_info_struct mpoly_gcd_info_t[1];
-
-void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars)
-{
-    char * d;
-
-    FLINT_ASSERT(nvars > 0);
-
-    d = (char *) flint_malloc(nvars*(8*sizeof(ulong) + 11*sizeof(slong)));
-
-    I->data = d;
-
-    I->Amax_exp         = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Amin_exp         = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Astride          = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Adeflate_deg     = (slong *) d; d += nvars*sizeof(slong);
-    I->Alead_count      = (slong *) d; d += nvars*sizeof(slong);
-    I->Atail_count      = (slong *) d; d += nvars*sizeof(slong);
-
-    I->Bmax_exp         = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Bmin_exp         = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Bstride          = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Bdeflate_deg     = (slong *) d; d += nvars*sizeof(slong);
-    I->Blead_count      = (slong *) d; d += nvars*sizeof(slong);
-    I->Btail_count      = (slong *) d; d += nvars*sizeof(slong);
-
-    I->Gmin_exp           = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Gstride            = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Gdeflate_deg_bound = (slong *) d; d += nvars*sizeof(slong);
-    I->Gterm_count_est    = (slong *) d; d += nvars*sizeof(slong);
-
-    I->brown_perm   = (slong *) d; d += nvars*sizeof(slong);
-    I->bma_perm     = (slong *) d; d += nvars*sizeof(slong);
-    I->zippel_perm  = (slong *) d; d += nvars*sizeof(slong);
-}
-
-void mpoly_gcd_info_clear(mpoly_gcd_info_t I)
-{
-    flint_free(I->data);
-}
 
 /*
     For each j, set out[j] to the evaluation of A at x_i = alpha[i] (i != j)
@@ -441,50 +368,6 @@ cleanup:
 
     return;
 }
-
-
-void mpoly_gcd_info_set_perm(
-    mpoly_gcd_info_t I,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    slong j, m;
-
-    I->Adensity = A->length;
-    I->Bdensity = B->length;
-
-    m = 0;
-    for (j = 0; j < ctx->minfo->nvars; j++)
-    {
-        if (I->Amax_exp[j] > I->Amin_exp[j])
-        {
-            FLINT_ASSERT(I->Gstride[j] != UWORD(0));
-            FLINT_ASSERT((I->Amax_exp[j] - I->Amin_exp[j]) % I->Gstride[j] == 0);
-            FLINT_ASSERT((I->Bmax_exp[j] - I->Bmin_exp[j]) % I->Gstride[j] == 0);
-
-            I->Adensity /= UWORD(1) + (ulong)(I->Adeflate_deg[j]);
-            I->Bdensity /= UWORD(1) + (ulong)(I->Bdeflate_deg[j]);
-
-            I->brown_perm[m] = j;
-            I->bma_perm[m] = j;
-            I->zippel_perm[m] = j;
-            m++;
-        }
-        else
-        {
-            FLINT_ASSERT(I->Amax_exp[j] == I->Amin_exp[j]);
-            FLINT_ASSERT(I->Bmax_exp[j] == I->Bmin_exp[j]);
-        }
-    }
-
-    I->mvars = m;
-
-    I->can_use_brown = 0;
-    I->can_use_bma = 0;
-    I->can_use_zippel = 0;
-}
-
 
 
 static void _measure_zippel(
@@ -1806,7 +1689,7 @@ calculate_trivial_gcd:
     */
 
     mpoly_gcd_info_set_estimates(I, A, B, ctx, handles, num_handles);
-    mpoly_gcd_info_set_perm(I, A, B, ctx);
+    mpoly_gcd_info_set_perm(I, A->length, B->length, ctx);
 
     /* everything in I is valid now */
 
