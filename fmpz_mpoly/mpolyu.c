@@ -549,8 +549,15 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(
             {
                 l = perm[k];
                 FLINT_ASSERT(stride[l] != UWORD(0));
-                FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
-                uexps[k] = (Bexps[l] - shift[l]) / stride[l];
+                if (stride[l] > 1)
+                {
+                    FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
+                    uexps[k] = (Bexps[l] - shift[l]) / stride[l];
+                }
+                else
+                {
+                    uexps[k] = Bexps[l] - shift[l];
+                }
             }
             Ac = _fmpz_mpolyu_get_coeff(A, uexps[0], uctx);
             FLINT_ASSERT(Ac->bits == A->bits);

@@ -259,6 +259,6 @@ int main(int argc, char *argv[])
 
     flint_free(cpu_affinities);
 
-    flint_cleanup();
+    flint_cleanup_master();
     return 0;
 }

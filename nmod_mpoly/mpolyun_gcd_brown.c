@@ -783,6 +783,7 @@ cleanup:
     return success;
 }
 
+
 /* optimized version of nmod_mpolyun_gcd_brown_smprime_ref */
 int nmod_mpolyun_gcd_brown_smprime(
     nmod_mpolyun_t G,
@@ -796,18 +797,21 @@ int nmod_mpolyun_gcd_brown_smprime(
     nmod_poly_stack_t Sp)
 {
     int success;
+    int changed;
     slong bound;
+    slong upper_limit;
     slong offset, shift;
     mp_limb_t alpha, temp, gammaevalp, gammaevalm;
     nmod_mpolyun_struct * Aevalp, * Bevalp, * Gevalp, * Abarevalp, * Bbarevalp;
     nmod_mpolyun_struct * Aevalm, * Bevalm, * Gevalm, * Abarevalm, * Bbarevalm;
-    nmod_mpolyun_struct * T;
+    nmod_mpolyun_struct * T1, * T2;
     slong deggamma, ldegG, ldegAbar, ldegBbar, ldegA, ldegB;
     nmod_poly_struct * cA, * cB, * cG, * cAbar, * cBbar, * gamma;
     nmod_poly_struct * modulus, * modulus2, * alphapow;
     flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 #if WANT_ASSERT
+    nmod_mpolyun_t Aorg, Borg;
     nmod_poly_t leadA, leadB;
     slong Sp_size_poly = nmod_poly_stack_size_poly(Sp);
     slong Sp_size_mpolyun = nmod_poly_stack_size_mpolyun(Sp);
@@ -834,6 +838,10 @@ int nmod_mpolyun_gcd_brown_smprime(
     nmod_poly_init(leadB, ctx->ffinfo->mod.n);
     nmod_poly_set(leadA, nmod_mpolyun_leadcoeff_poly(A, ctx));
     nmod_poly_set(leadB, nmod_mpolyun_leadcoeff_poly(B, ctx));
+    nmod_mpolyun_init(Aorg, A->bits, ctx);
+    nmod_mpolyun_init(Borg, B->bits, ctx);
+    nmod_mpolyun_set(Aorg, A, ctx);
+    nmod_mpolyun_set(Borg, B, ctx);
 #endif
 
     nmod_poly_stack_fit_request_poly(Sp, 9);
@@ -847,7 +855,7 @@ int nmod_mpolyun_gcd_brown_smprime(
     modulus     = nmod_poly_stack_take_top_poly(Sp);
     modulus2    = nmod_poly_stack_take_top_poly(Sp);
 
-    nmod_poly_stack_fit_request_mpolyun(Sp, 11);
+    nmod_poly_stack_fit_request_mpolyun(Sp, 12);
     Aevalp      = nmod_poly_stack_take_top_mpolyun(Sp);
     Bevalp      = nmod_poly_stack_take_top_mpolyun(Sp);
     Gevalp      = nmod_poly_stack_take_top_mpolyun(Sp);
@@ -858,14 +866,15 @@ int nmod_mpolyun_gcd_brown_smprime(
     Gevalm      = nmod_poly_stack_take_top_mpolyun(Sp);
     Abarevalm   = nmod_poly_stack_take_top_mpolyun(Sp);
     Bbarevalm   = nmod_poly_stack_take_top_mpolyun(Sp);
-    T           = nmod_poly_stack_take_top_mpolyun(Sp);
+    T1          = nmod_poly_stack_take_top_mpolyun(Sp);
+    T2          = nmod_poly_stack_take_top_mpolyun(Sp);
 
     nmod_mpolyun_content_last(cA, A, ctx);
     nmod_mpolyun_content_last(cB, B, ctx);
     nmod_mpolyun_divexact_last(A, cA, ctx);
     nmod_mpolyun_divexact_last(B, cB, ctx);
 
-    nmod_poly_gcd_euclidean(cG, cA, cB);
+    nmod_poly_gcd(cG, cA, cB);
 
     nmod_poly_div(cAbar, cA, cG);
     nmod_poly_div(cBbar, cB, cG);
@@ -877,6 +886,8 @@ int nmod_mpolyun_gcd_brown_smprime(
     ldegB = nmod_mpolyun_lastdeg(B, ctx);
     deggamma = nmod_poly_degree(gamma);
     bound = 1 + deggamma + FLINT_MAX(ldegA, ldegB);
+
+    upper_limit = mpoly_gcd_info_get_brown_upper_limit(I, var + 1, bound);
 
     nmod_poly_fit_length(alphapow, FLINT_MAX(WORD(3), bound + 1));
 
@@ -1005,9 +1016,69 @@ choose_prime:
         temp = nmod_mul(temp, alpha, ctx->ffinfo->mod);
         temp = nmod_add(temp, temp, ctx->ffinfo->mod);
         nmod_poly_scalar_mul_nmod(modulus, modulus, n_invmod(temp, ctx->ffinfo->mod.n));
-        nmod_mpolyun_intp_crt_2sm_mpolyun(&ldegG, G, T, Gevalp, Gevalm, var, modulus, alphapow, ctx);
-        nmod_mpolyun_intp_crt_2sm_mpolyun(&ldegAbar, Abar, T, Abarevalp, Abarevalm, var, modulus, alphapow, ctx);
-        nmod_mpolyun_intp_crt_2sm_mpolyun(&ldegBbar, Bbar, T, Bbarevalp, Bbarevalm, var, modulus, alphapow, ctx);
+
+        changed = nmod_mpolyun_intp_crt_2sm_mpolyun(&ldegG, G, T1, Gevalp, Gevalm, var, modulus, alphapow, ctx);
+        if (!changed && nmod_poly_degree(modulus) < upper_limit)
+        {
+            nmod_mpolyun_content_last(modulus2, G, ctx);
+            nmod_mpolyun_divexact_last(G, modulus2, ctx);
+            success =            nmod_mpolyun_divides(T1, A, G, ctx);
+            success = success && nmod_mpolyun_divides(T2, B, G, ctx);
+            if (success)
+            {
+                nmod_mpolyun_swap(T1, Abar);
+                nmod_mpolyun_swap(T2, Bbar);
+successful_fix_lc:
+                temp = nmod_mpolyun_leadcoeff(G, ctx);
+                nmod_mpolyun_scalar_mul_nmod(Abar, temp, ctx);
+                nmod_mpolyun_scalar_mul_nmod(Bbar, temp, ctx);
+                temp = n_invmod(temp, ctx->ffinfo->mod.n);
+                nmod_mpolyun_scalar_mul_nmod(G, temp, ctx);
+                goto successful_put_content;
+            }
+            else
+            {
+                nmod_mpolyun_mul_last(G, modulus2, ctx); /* restore G */
+            }
+        }
+
+        changed = nmod_mpolyun_intp_crt_2sm_mpolyun(&ldegAbar, Abar, T1, Abarevalp, Abarevalm, var, modulus, alphapow, ctx);
+        if (!changed && nmod_poly_degree(modulus) < upper_limit)
+        {
+            nmod_mpolyun_content_last(modulus2, Abar, ctx);
+            nmod_mpolyun_divexact_last(Abar, modulus2, ctx);
+            success =            nmod_mpolyun_divides(T1, A, Abar, ctx);
+            success = success && nmod_mpolyun_divides(T2, B, T1, ctx);
+            if (success)
+            {
+                nmod_mpolyun_swap(T1, G);
+                nmod_mpolyun_swap(T2, Bbar);
+                goto successful_fix_lc;
+            }
+            else
+            {
+                nmod_mpolyun_mul_last(Abar, modulus2, ctx); /* restore Abar */
+            }
+        }
+
+        changed = nmod_mpolyun_intp_crt_2sm_mpolyun(&ldegBbar, Bbar, T1, Bbarevalp, Bbarevalm, var, modulus, alphapow, ctx);
+        if (!changed && nmod_poly_degree(modulus) < upper_limit)
+        {
+            nmod_mpolyun_content_last(modulus2, Bbar, ctx);
+            nmod_mpolyun_divexact_last(Bbar, modulus2, ctx);
+            success =            nmod_mpolyun_divides(T1, B, Bbar, ctx);
+            success = success && nmod_mpolyun_divides(T2, A, T1, ctx);
+            if (success)
+            {
+                nmod_mpolyun_swap(T1, G);
+                nmod_mpolyun_swap(T2, Abar);
+                goto successful_fix_lc;
+            }
+            else
+            {
+                nmod_mpolyun_mul_last(Bbar, modulus2, ctx); /* restore Bbar */
+            }
+        }
     }
     else
     {
@@ -1015,6 +1086,7 @@ choose_prime:
         nmod_mpolyun_intp_lift_2sm_mpolyun(&ldegAbar, Abar, Abarevalp, Abarevalm, var, alpha, ctx);
         nmod_mpolyun_intp_lift_2sm_mpolyun(&ldegBbar, Bbar, Bbarevalp, Bbarevalm, var, alpha, ctx);
     }
+
     temp = nmod_mul(alpha, alpha, ctx->ffinfo->mod);
     nmod_poly_scalar_mul_nmod(modulus2, modulus, temp);
     nmod_poly_shift_left(modulus, modulus, 2);
@@ -1040,8 +1112,8 @@ choose_prime:
 
 successful:
 
-    nmod_mpolyun_content_last(modulus, G, ctx);
-    nmod_mpolyun_divexact_last(G, modulus, ctx);
+    nmod_mpolyun_content_last(modulus2, G, ctx);
+    nmod_mpolyun_divexact_last(G, modulus2, ctx);
     nmod_mpolyun_divexact_last(Abar, nmod_mpolyun_leadcoeff_poly(G, ctx), ctx);
     nmod_mpolyun_divexact_last(Bbar, nmod_mpolyun_leadcoeff_poly(G, ctx), ctx);
 
@@ -1065,13 +1137,23 @@ cleanup:
         nmod_poly_mul(modulus, nmod_mpolyun_leadcoeff_poly(G, ctx),
                                nmod_mpolyun_leadcoeff_poly(Bbar, ctx));
         FLINT_ASSERT(nmod_poly_equal(modulus, leadB));
+
+        success =            nmod_mpolyun_divides(T1, Aorg, G, ctx);
+        success = success && nmod_mpolyun_divides(T2, Borg, G, ctx);
+        FLINT_ASSERT(success);
+        FLINT_ASSERT(nmod_mpolyun_equal(T1, Abar, ctx));
+        FLINT_ASSERT(nmod_mpolyun_equal(T2, Bbar, ctx));
+
+        success = 1;
     }
     nmod_poly_clear(leadA);
     nmod_poly_clear(leadB);
+    nmod_mpolyun_clear(Aorg, ctx);
+    nmod_mpolyun_clear(Borg, ctx);
 #endif
 
     nmod_poly_stack_give_back_poly(Sp, 9);
-    nmod_poly_stack_give_back_mpolyun(Sp, 11);
+    nmod_poly_stack_give_back_mpolyun(Sp, 12);
     FLINT_ASSERT(Sp_size_poly == nmod_poly_stack_size_poly(Sp));
     FLINT_ASSERT(Sp_size_mpolyun == nmod_poly_stack_size_mpolyun(Sp));
     return success;

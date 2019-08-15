@@ -11,7 +11,7 @@
 
 /* usage
 likwid-setFrequencies -g performance
-make profile MOD=fmpz_mpoly && ./build/fmpz_mpoly/profile/p-gcd 4 sparse 7 5 4 8
+make profile MOD=nmod_mpoly && ./build/nmod_mpoly/profile/p-gcd 4 sparse 7 5 4 8
 
 p-gcd nthreads sparse m1 n1 m2 n2:
     run the sparse benchmark on nthreads with powers (m1, n1) and (m2, n2)
@@ -20,7 +20,7 @@ p-gcd nthreads sparse m1 n1 m2 n2:
 #include <stdio.h>
 #include <stdlib.h>
 #include "profiler.h"
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly.h"
 
 #define CALCULATE_MACHINE_EFFICIENCY 0
 
@@ -30,9 +30,9 @@ int * cpu_affinities;
 
 typedef struct _worker_arg_struct
 {
-    fmpz_mpoly_t G;
-    const fmpz_mpoly_struct * A, * B;
-    const fmpz_mpoly_ctx_struct * ctx;
+    nmod_mpoly_t Q;
+    const nmod_mpoly_struct * A, * B;
+    const nmod_mpoly_ctx_struct * ctx;
 } worker_arg_struct;
 
 typedef worker_arg_struct worker_arg_t[1];
@@ -41,32 +41,32 @@ typedef worker_arg_struct worker_arg_t[1];
 static void worker_gcd(void * varg)
 {
     worker_arg_struct * W = (worker_arg_struct *) varg;
-    fmpz_mpoly_gcd_threaded(W->G, W->A, W->B, W->ctx, 1);
+    nmod_mpoly_gcd_threaded(W->Q, W->A, W->B, W->ctx, 1);
 }
 
 #endif
 
 void profile_gcd(
-    const fmpz_mpoly_t realG,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx,
+    const nmod_mpoly_t realG,
+    const nmod_mpoly_t A,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
     slong max_threads)
 {
-    fmpz_mpoly_t G;
+    nmod_mpoly_t G;
     timeit_t timer;
     slong num_threads;
     slong serial_time;
 
     flint_set_num_threads(1);
     flint_set_thread_affinity(cpu_affinities, 1);
-    fmpz_mpoly_init(G, ctx);
+    nmod_mpoly_init(G, ctx);
     timeit_start(timer);
-    fmpz_mpoly_gcd(G, A, B, ctx);
+    nmod_mpoly_gcd(G, A, B, ctx);
     timeit_stop(timer);
     serial_time = FLINT_MAX(WORD(1), timer->wall);
     flint_printf("serial time: %wd\n", serial_time);
-    if (!fmpz_mpoly_equal(G, realG, ctx))
+    if (!nmod_mpoly_equal(G, realG, ctx))
     {
         printf("gcd wrong\n");
         flint_abort();
@@ -95,13 +95,13 @@ void profile_gcd(
         timeit_start(timer);
         for (i = 0; i <= num_workers; i++)
         {
-            fmpz_mpoly_init((worker_args + i)->G, ctx);
+            nmod_mpoly_init((worker_args + i)->Q, ctx);
             (worker_args + i)->A = A;
             (worker_args + i)->B = B;
             (worker_args + i)->ctx = ctx;
             if (i < num_workers)
             {
-                thread_pool_wake(global_thread_pool, handles[i], worker_gcd, worker_args + i);
+                thread_pool_wake(global_thread_pool, handles[i], worker_divides, worker_args + i);
             }
             else
             {
@@ -117,12 +117,12 @@ void profile_gcd(
 
         for (i = 0; i <= num_workers; i++)
         {
-            if (!fmpz_mpoly_equal((worker_args + i)->G, realG, ctx))
+            if (!nmod_mpoly_equal((worker_args + i)->Q, realQ, ctx))
             {
                 printf("gcd wrong\n");
                 flint_abort();
             }
-            fmpz_mpoly_clear((worker_args + i)->G, ctx);
+            nmod_mpoly_clear((worker_args + i)->Q, ctx);
 
             if (i < num_workers)
             {
@@ -135,13 +135,13 @@ void profile_gcd(
         machine_efficiency = (double)(serial_time)/(double)(parallel_time);
 #endif
 
-        fmpz_mpoly_clear(G, ctx);
-        fmpz_mpoly_init(G, ctx);
+        nmod_mpoly_clear(G, ctx);
+        nmod_mpoly_init(G, ctx);
         timeit_start(timer);
-        fmpz_mpoly_gcd(G, A, B, ctx);
+        nmod_mpoly_gcd(G, A, B, ctx);
         timeit_stop(timer);
         parallel_time = FLINT_MAX(WORD(1), timer->wall);
-        if (!fmpz_mpoly_equal(G, realG, ctx))
+        if (!nmod_mpoly_equal(G, realG, ctx))
         {
             printf("gcd wrong\n");
             flint_abort();
@@ -156,51 +156,49 @@ void profile_gcd(
 #endif
     }
 
-    fmpz_mpoly_clear(G, ctx);
+    nmod_mpoly_clear(G, ctx);
 }
-
 
 void profile_power(const char * astr, const char * bstr, slong nvars,
   const char * name, slong m1, slong n1, slong m2, slong n2, slong max_threads)
 {
-    fmpz_mpoly_ctx_t ctx;
-    fmpz_mpoly_t a, b, t, A, B, G;
+    nmod_mpoly_ctx_t ctx;
+    nmod_mpoly_t a, b, t, A, B, G;
     const char * vars[] = {"x", "y", "z", "t", "u", "v" , "w"};
 
     FLINT_ASSERT(nvars <= 7);
 
-    fmpz_mpoly_ctx_init(ctx, nvars, ORD_LEX);
-    fmpz_mpoly_init(a, ctx);
-    fmpz_mpoly_init(b, ctx);
-    fmpz_mpoly_init(t, ctx);
-    fmpz_mpoly_init(A, ctx);
-    fmpz_mpoly_init(B, ctx);
-    fmpz_mpoly_init(G, ctx);
+    nmod_mpoly_ctx_init(ctx, nvars, ORD_LEX, 536870909);
+    nmod_mpoly_init(a, ctx);
+    nmod_mpoly_init(b, ctx);
+    nmod_mpoly_init(t, ctx);
+    nmod_mpoly_init(A, ctx);
+    nmod_mpoly_init(B, ctx);
+    nmod_mpoly_init(G, ctx);
 
-    fmpz_mpoly_set_str_pretty(a, astr, vars, ctx);
-    fmpz_mpoly_set_str_pretty(b, bstr, vars, ctx);
-    fmpz_mpoly_pow_ui(A, a, m1, ctx);
-    fmpz_mpoly_pow_ui(t, b, n1, ctx);
-    fmpz_mpoly_mul(A, A, t, ctx);
-    fmpz_mpoly_pow_ui(B, a, m2, ctx);
-    fmpz_mpoly_pow_ui(t, b, n2, ctx);
-    fmpz_mpoly_mul(B, B, t, ctx);
-    fmpz_mpoly_pow_ui(G, a, FLINT_MIN(m1, m2), ctx);
-    fmpz_mpoly_pow_ui(t, b, FLINT_MIN(n1, n2), ctx);
-    fmpz_mpoly_mul(G, G, t, ctx);
-    if (fmpz_sgn(G->coeffs + 0) < 0)
-        fmpz_mpoly_neg(G, G, ctx);
+    nmod_mpoly_set_str_pretty(a, astr, vars, ctx);
+    nmod_mpoly_set_str_pretty(b, bstr, vars, ctx);
+    nmod_mpoly_pow_ui(A, a, m1, ctx);
+    nmod_mpoly_pow_ui(t, b, n1, ctx);
+    nmod_mpoly_mul(A, A, t, ctx);
+    nmod_mpoly_pow_ui(B, a, m2, ctx);
+    nmod_mpoly_pow_ui(t, b, n2, ctx);
+    nmod_mpoly_mul(B, B, t, ctx);
+    nmod_mpoly_pow_ui(G, a, FLINT_MIN(m1, m2), ctx);
+    nmod_mpoly_pow_ui(t, b, FLINT_MIN(n1, n2), ctx);
+    nmod_mpoly_mul(G, G, t, ctx);
+    nmod_mpoly_make_monic(G, G, ctx);
 
     flint_printf("starting %s gcd (%wu, %wd), (%wd, %wd):\n", name, m1, n1, m2, n2);
     profile_gcd(G, A, B, ctx, max_threads);
 
-    fmpz_mpoly_clear(G, ctx);
-    fmpz_mpoly_clear(B, ctx);
-    fmpz_mpoly_clear(A, ctx);
-    fmpz_mpoly_clear(t, ctx);
-    fmpz_mpoly_clear(b, ctx);
-    fmpz_mpoly_clear(a, ctx);
-    fmpz_mpoly_ctx_clear(ctx);
+    nmod_mpoly_clear(G, ctx);
+    nmod_mpoly_clear(B, ctx);
+    nmod_mpoly_clear(A, ctx);
+    nmod_mpoly_clear(t, ctx);
+    nmod_mpoly_clear(b, ctx);
+    nmod_mpoly_clear(a, ctx);
+    nmod_mpoly_ctx_clear(ctx);
 }
 
 int main(int argc, char *argv[])
@@ -236,7 +234,7 @@ int main(int argc, char *argv[])
         n2 = 8;
     }
 
-    flint_printf("setting up fmpz_mpoly %s gcd ... ", name);
+    flint_printf("setting up nmod_mpoly %s gcd ... ", name);
 
     if (strcmp(name, "dense2") == 0)
     {

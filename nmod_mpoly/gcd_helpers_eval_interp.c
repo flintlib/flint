@@ -54,6 +54,7 @@ void _nmod_poly_eval2_pow(
                                                alphapow->coeffs[1], fctx->mod);
         }
         alphapow->length = Plen;
+        alpha_powers = alphapow->coeffs;
     }
 
     for (k = 0; k + 2 <= Plen; k += 2)

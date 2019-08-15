@@ -1080,6 +1080,18 @@ FLINT_DLL void mpoly_gcd_info_stride(ulong * strides,
 FLINT_DLL void mpoly_gcd_info_set_perm(mpoly_gcd_info_t I,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
+FLINT_DLL slong mpoly_gcd_info_get_brown_upper_limit(const mpoly_gcd_info_t I,
+                                                       slong var, slong bound);
+
+FLINT_DLL void mpoly_gcd_info_measure_brown(mpoly_gcd_info_t I,
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gcd_info_measure_bma(mpoly_gcd_info_t I,
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gcd_info_measure_zippel(mpoly_gcd_info_t I,
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+
 typedef struct
 {
     slong nvars;

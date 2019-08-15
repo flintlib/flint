@@ -103,6 +103,30 @@ main(void)
     flint_printf("gcd....");
     fflush(stdout);
 
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t g, a, b;
+        const char * vars[] = {"t" ,"x", "y", "z"};
+
+        nmod_mpoly_ctx_init(ctx, 4, ORD_LEX, 536870909);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(g, ctx);
+
+        nmod_mpoly_set_str_pretty(g, "39 - t*x + 39*x^100 - t*x^101 + 39*x^3*y - t*x^4*y - 7*x^2*y^3*z^11 - 7*x^102*y^3*z^11 - 7*x^5*y^4*z^11 + 78*t^15*x^78*y^3*z^13 - 2*t^16*x^79*y^3*z^13 + x^1000*y^3*z^20 + x^1100*y^3*z^20 + x^1003*y^4*z^20 - 14*t^15*x^80*y^6*z^24 + 2*t^15*x^1078*y^6*z^33", vars, ctx);
+        nmod_mpoly_set_str_pretty(a, "39 - t*x - 7*x^2*y^3*z^11 + x^1000*y^3*z^20", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "1 + x^100 + x^3*y + 2*t^15*x^78*y^3*z^13", vars, ctx);
+        nmod_mpoly_mul(a, a, g, ctx);
+        nmod_mpoly_mul(b, b, g, ctx);
+
+        gcd_check(g, a, b, ctx, 0, 0, "sparse example");
+
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
     for (i = 3; i <= 8; i++)
     {
         nmod_mpoly_ctx_t ctx;
@@ -269,6 +293,64 @@ main(void)
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
             gcd_check(g, a, b, ctx, i, j, "monomial cofactors");
+        }
+
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(t1, ctx);
+        nmod_mpoly_clear(t2, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+    /* one input divides the other */
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
+    {
+        mp_limb_t c;
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, g, t1, t2;
+        slong len, len1, len2;
+        mp_limb_t exp_bound, exp_bound1, exp_bound2;
+        mp_limb_t modulus;
+
+        modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        modulus = n_nextprime(modulus, 1);
+
+        nmod_mpoly_ctx_init_rand(ctx, state, 10, modulus);
+
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(t1, ctx);
+        nmod_mpoly_init(t2, ctx);
+
+        len = n_randint(state, 5);
+        len1 = n_randint(state, 5);
+        len2 = n_randint(state, 5);
+
+        exp_bound = n_randint(state, 100) + 2;
+        exp_bound1 = n_randint(state, 100) + 2;
+        exp_bound2 = n_randint(state, 100) + 2;
+
+        for (j = 0; j < 4; j++)
+        {
+            nmod_mpoly_randtest_bound(t1, state, len1, exp_bound1, ctx);
+            nmod_mpoly_randtest_bound(t2, state, len2, exp_bound2, ctx);
+            nmod_mpoly_mul(b, t1, t2, ctx);
+            c = n_randint(state, ctx->ffinfo->mod.n);
+            nmod_mpoly_scalar_mul_ui(a, t2, c, ctx);
+            c = n_randint(state, ctx->ffinfo->mod.n);
+            nmod_mpoly_scalar_mul_ui(b, b, c, ctx);
+
+            nmod_mpoly_randtest_bound(g, state, len, exp_bound, ctx);
+
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+            if ((j%2) == 0)
+                nmod_mpoly_swap(a, b, ctx);
+
+            gcd_check(g, a, b, ctx, i, j, "one input divides the other");
         }
 
         nmod_mpoly_clear(g, ctx);

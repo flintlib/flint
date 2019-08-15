@@ -1445,6 +1445,9 @@ FLINT_DLL void nmod_mpolyun_content_last(nmod_poly_t a, nmod_mpolyun_t B,
 FLINT_DLL void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
                                                    const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int nmod_mpolyun_divides(nmod_mpolyun_t Q, const nmod_mpolyun_t A,
+                           const nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpoly_to_mpolyun_perm_deflate(
     nmod_mpolyun_t A,
     const nmod_mpoly_ctx_t uctx,
