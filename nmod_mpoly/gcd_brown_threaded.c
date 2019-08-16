@@ -1100,8 +1100,6 @@ successful_fix_lc:
         }
     }
 
-printf("divisibility test failed\n");
-
     /* divisibility test failed - try again */
     best_est = bound;
     divisibility_test = 0;

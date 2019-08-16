@@ -288,8 +288,8 @@ int main(int argc, char *argv[])
     }
     else
     {
-        profile_power("1 + x^1 + y^5 + z^6 + t^40 + u^90",
-                      "1 + x^9 + y^2 + z^17 + t^7 + u^11", 5, "sparse", m1, n1, m2, n2, max_threads);
+        profile_power("1 + x^1 + y^5 + z^4 + t^40 + u^50",
+                      "1 + x^9 + y^2 + z^11 + t^7 + u^27", 5, "sparse", m1, n1, m2, n2, max_threads);
     }
 
     flint_free(cpu_affinities);
