@@ -1026,6 +1026,46 @@ FLINT_DLL int mpoly_monomial_cmp_general(ulong * Aexp, flint_bitcnt_t Abits,
 
 /* info related to gcd calculation *******************************************/
 
+typedef struct
+{
+    ulong * Amax_exp;
+    ulong * Amin_exp;
+    ulong * Astride;
+    slong * Adeflate_deg;
+    slong * Alead_count;
+    slong * Atail_count;
+
+    ulong * Bmax_exp;
+    ulong * Bmin_exp;
+    ulong * Bstride;
+    slong * Bdeflate_deg;
+    slong * Blead_count;
+    slong * Btail_count;
+
+    ulong * Gmin_exp;
+    ulong * Gstride;
+    slong * Gterm_count_est;
+    slong * Gdeflate_deg_bound;
+    int Gdeflate_deg_bounds_are_nice; /* all of Gdeflate_deg_bound came from real gcd computations */
+
+    slong mvars;
+
+    double Adensity;
+    double Bdensity;
+
+    double brown_time_est, bma_time_est, zippel_time_est;
+    slong * brown_perm, * bma_perm, * zippel_perm;
+    int can_use_brown, can_use_bma, can_use_zippel;
+
+    char * data;
+} mpoly_gcd_info_struct;
+
+typedef mpoly_gcd_info_struct mpoly_gcd_info_t[1];
+
+FLINT_DLL void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars);
+
+FLINT_DLL void mpoly_gcd_info_clear(mpoly_gcd_info_t I);
+
 FLINT_DLL void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,
                        slong * Amax_exp_count, slong * Amin_exp_count,
                        const ulong * Aexps, flint_bitcnt_t Abits, slong Alength,
@@ -1036,6 +1076,21 @@ FLINT_DLL void mpoly_gcd_info_stride(ulong * strides,
           const ulong * Bexps, flint_bitcnt_t Bbits, slong Blength,
                              const ulong * Bmax_exp, const ulong * Bmin_exp,
                                                        const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gcd_info_set_perm(mpoly_gcd_info_t I,
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+
+FLINT_DLL slong mpoly_gcd_info_get_brown_upper_limit(const mpoly_gcd_info_t I,
+                                                       slong var, slong bound);
+
+FLINT_DLL void mpoly_gcd_info_measure_brown(mpoly_gcd_info_t I,
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gcd_info_measure_bma(mpoly_gcd_info_t I,
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+
+FLINT_DLL void mpoly_gcd_info_measure_zippel(mpoly_gcd_info_t I,
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
 typedef struct
 {

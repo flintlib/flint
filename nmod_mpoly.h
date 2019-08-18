@@ -980,7 +980,10 @@ FLINT_DLL void _nmod_mpoly_from_nmod_poly_inflate(nmod_mpoly_t A, flint_bitcnt_t
                             const ulong * Astride, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpoly_repack_bits(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                flint_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx);
+                             flint_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_repack_bits_inplace(nmod_mpoly_t A,
+                             flint_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx);
 
 typedef struct
 {
@@ -1442,6 +1445,9 @@ FLINT_DLL void nmod_mpolyun_content_last(nmod_poly_t a, nmod_mpolyun_t B,
 FLINT_DLL void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
                                                    const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int nmod_mpolyun_divides(nmod_mpolyun_t Q, const nmod_mpolyun_t A,
+                           const nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpoly_to_mpolyun_perm_deflate(
     nmod_mpolyun_t A,
     const nmod_mpoly_ctx_t uctx,
@@ -1490,13 +1496,15 @@ FLINT_DLL int nmod_mpolyun_gcd_brown_smprime_bivar(
                                                          nmod_poly_stack_t Sp);
 
 FLINT_DLL int nmod_mpolyun_gcd_brown_smprime(nmod_mpolyun_t G,
-  nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar, nmod_mpolyun_t A, nmod_mpolyun_t B,
-                                        slong var, const nmod_mpoly_ctx_t ctx,
+                                  nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar,
+                                 nmod_mpolyun_t A, nmod_mpolyun_t B, slong var,
+                         const nmod_mpoly_ctx_t ctx, const mpoly_gcd_info_t I,
                                                          nmod_poly_stack_t Sp);
 
 FLINT_DLL int nmod_mpolyun_gcd_brown_smprime_threaded(nmod_mpolyun_t G,
-                nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar, nmod_mpolyun_t A,
-                     nmod_mpolyun_t B, slong var, const nmod_mpoly_ctx_t ctx,
+                                nmod_mpolyun_t Abar, nmod_mpolyun_t Bbar,
+                               nmod_mpolyun_t A, nmod_mpolyun_t B, slong var,
+                         const nmod_mpoly_ctx_t ctx, const mpoly_gcd_info_t I,
                         const thread_pool_handle * handles, slong num_workers);
 
 FLINT_DLL int nmod_mpolyun_gcd_brown_lgprime(nmod_mpolyun_t G,

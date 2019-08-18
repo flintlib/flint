@@ -25,6 +25,7 @@ typedef struct
     fmpz_mpolyu_struct * A, * B;
     ulong num_threads;
     slong var;
+    const mpoly_gcd_info_struct * I;
 }
 _splitbase_struct;
 
@@ -153,9 +154,9 @@ static void _splitworker(void * varg)
             thread_pool_wait(global_thread_pool, arg->worker_handles[0]);
 
             success = nmod_mpolyun_gcd_brown_smprime_threaded(
-                                    arg->Gp, arg->Abarp, arg->Bbarp,
-                           arg->Ap, arg->Bp, ctx->minfo->nvars - 1, arg->pctx,
-                                        arg->worker_handles, arg->num_handles);
+                                  arg->Gp, arg->Abarp, arg->Bbarp,
+                   arg->Ap, arg->Bp, ctx->minfo->nvars - 1, arg->pctx, base->I,
+                                       arg->worker_handles, arg->num_handles);
         }
         else
         {
@@ -166,7 +167,7 @@ static void _splitworker(void * varg)
             FLINT_ASSERT(arg->Bp->length > 0);
             success = nmod_mpolyun_gcd_brown_smprime(
                             arg->Gp, arg->Abarp, arg->Bbarp, arg->Ap, arg->Bp,
-                                         ctx->minfo->nvars - 1, arg->pctx, Sp);
+                                ctx->minfo->nvars - 1, arg->pctx, base->I, Sp);
         }
 
         if (!success)
@@ -666,6 +667,7 @@ int fmpz_mpolyu_gcd_brown_threaded(
     fmpz_mpolyu_t A,
     fmpz_mpolyu_t B,
     const fmpz_mpoly_ctx_t ctx,
+    const mpoly_gcd_info_t I,
     const thread_pool_handle * handles,
     slong num_handles)
 {
@@ -749,6 +751,7 @@ int fmpz_mpolyu_gcd_brown_threaded(
     splitbase->B = B;
     splitbase->ctx = ctx;
     splitbase->p = UWORD(1) << (FLINT_BITS - 2);
+    splitbase->I = I;
 
     pthread_mutex_init(&splitbase->mutex, NULL);
 
@@ -1253,7 +1256,7 @@ int fmpz_mpoly_gcd_brown_threaded(
 
     /* calculate gcd */
     success = fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu,
-                                               uctx, handles, num_handles);
+                                             uctx, NULL, handles, num_handles);
 
     for (i = 0; i < num_handles; i++)
     {

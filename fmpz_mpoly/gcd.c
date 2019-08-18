@@ -10,92 +10,6 @@
 */
 
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
-
-/*
-    Each gcd method has a "measure" function which tries to
-        - determine if the method can be used
-        - find a nice permutation of the variables for the method
-        - estimate the running time for the method with the chosen permutation
-            * these time estimates are very rough and can be very wrong with
-                sufficiently pathological input
-
-    The "try" function will then execute the method and return 1 for success.
-*/
-typedef struct
-{
-    ulong * Amax_exp;
-    ulong * Amin_exp;
-    ulong * Astride;
-    slong * Adeflate_deg;
-    slong * Alead_count;
-    slong * Atail_count;
-
-    ulong * Bmax_exp;
-    ulong * Bmin_exp;
-    ulong * Bstride;
-    slong * Bdeflate_deg;
-    slong * Blead_count;
-    slong * Btail_count;
-
-    ulong * Gmin_exp;
-    ulong * Gstride;
-    slong * Gterm_count_est;
-    slong * Gdeflate_deg_bound;
-    int Gdeflate_deg_bounds_are_nice; /* all of Gdeflate_deg_bound came from real gcd computations */
-
-    slong mvars;
-
-    double Adensity;
-    double Bdensity;
-
-    double brown_time_est, bma_time_est, zippel_time_est;
-    slong * brown_perm, * bma_perm, * zippel_perm;
-    int can_use_brown, can_use_bma, can_use_zippel;
-
-    char * data;
-} mpoly_gcd_info_struct;
-
-typedef mpoly_gcd_info_struct mpoly_gcd_info_t[1];
-
-void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars)
-{
-    char * d;
-
-    FLINT_ASSERT(nvars > 0);
-
-    d = (char *) flint_malloc(nvars*(8*sizeof(ulong) + 11*sizeof(slong)));
-
-    I->data = d;
-
-    I->Amax_exp         = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Amin_exp         = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Astride          = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Adeflate_deg     = (slong *) d; d += nvars*sizeof(slong);
-    I->Alead_count      = (slong *) d; d += nvars*sizeof(slong);
-    I->Atail_count      = (slong *) d; d += nvars*sizeof(slong);
-
-    I->Bmax_exp         = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Bmin_exp         = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Bstride          = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Bdeflate_deg     = (slong *) d; d += nvars*sizeof(slong);
-    I->Blead_count      = (slong *) d; d += nvars*sizeof(slong);
-    I->Btail_count      = (slong *) d; d += nvars*sizeof(slong);
-
-    I->Gmin_exp           = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Gstride            = (ulong *) d; d += nvars*sizeof(ulong);
-    I->Gdeflate_deg_bound = (slong *) d; d += nvars*sizeof(slong);
-    I->Gterm_count_est    = (slong *) d; d += nvars*sizeof(slong);
-
-    I->brown_perm   = (slong *) d; d += nvars*sizeof(slong);
-    I->bma_perm     = (slong *) d; d += nvars*sizeof(slong);
-    I->zippel_perm  = (slong *) d; d += nvars*sizeof(slong);
-}
-
-void mpoly_gcd_info_clear(mpoly_gcd_info_t I)
-{
-    flint_free(I->data);
-}
 
 /*
     For each j, set out[j] to the evaluation of A at x_i = alpha[i] (i != j)
@@ -316,7 +230,7 @@ void fmpz_mpoly_evals(
 }
 
 
-void mpoly_gcd_info_set_estimates(
+void mpoly_gcd_info_set_estimates_fmpz_mpoly(
     mpoly_gcd_info_t I,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
@@ -440,132 +354,6 @@ cleanup:
     flint_randclear(randstate);
 
     return;
-}
-
-
-void mpoly_gcd_info_set_perm(
-    mpoly_gcd_info_t I,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    slong j, m;
-
-    I->Adensity = A->length;
-    I->Bdensity = B->length;
-
-    m = 0;
-    for (j = 0; j < ctx->minfo->nvars; j++)
-    {
-        if (I->Amax_exp[j] > I->Amin_exp[j])
-        {
-            FLINT_ASSERT(I->Gstride[j] != UWORD(0));
-            FLINT_ASSERT((I->Amax_exp[j] - I->Amin_exp[j]) % I->Gstride[j] == 0);
-            FLINT_ASSERT((I->Bmax_exp[j] - I->Bmin_exp[j]) % I->Gstride[j] == 0);
-
-            I->Adensity /= UWORD(1) + (ulong)(I->Adeflate_deg[j]);
-            I->Bdensity /= UWORD(1) + (ulong)(I->Bdeflate_deg[j]);
-
-            I->brown_perm[m] = j;
-            I->bma_perm[m] = j;
-            I->zippel_perm[m] = j;
-            m++;
-        }
-        else
-        {
-            FLINT_ASSERT(I->Amax_exp[j] == I->Amin_exp[j]);
-            FLINT_ASSERT(I->Bmax_exp[j] == I->Bmin_exp[j]);
-        }
-    }
-
-    I->mvars = m;
-
-    I->can_use_brown = 0;
-    I->can_use_bma = 0;
-    I->can_use_zippel = 0;
-}
-
-
-
-static void _measure_zippel(
-    mpoly_gcd_info_t I,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, j, k;
-    slong m = I->mvars;
-    slong * perm = I->zippel_perm;
-
-    /* need at least two variables */
-    if (m < 2)
-        return;
-
-    /* figure out a main variable y_0 */
-    {
-        slong main_var;
-        ulong count, deg, new_count, new_deg;
-
-        main_var = 0;
-        j = I->zippel_perm[main_var];
-        count = FLINT_MIN(I->Atail_count[j], I->Alead_count[j]);
-        count = FLINT_MIN(count, I->Btail_count[j]);
-        count = FLINT_MIN(count, I->Blead_count[j]);
-        deg = FLINT_MAX(I->Adeflate_deg[j], I->Bdeflate_deg[j]);
-        for (i = 1; i < m; i++)
-        {
-            j = perm[i];
-            new_count = FLINT_MIN(I->Atail_count[j], I->Alead_count[j]);
-            new_count = FLINT_MIN(new_count, I->Btail_count[j]);
-            new_count = FLINT_MIN(new_count, I->Blead_count[j]);
-            new_deg = FLINT_MAX(I->Adeflate_deg[j], I->Bdeflate_deg[j]);
-            if (new_count < count || (new_count == count && new_deg < deg))
-            {
-                count = new_count;
-                deg = new_deg;
-                main_var = i;
-            }
-        }
-
-        if (main_var != 0)
-        {
-            slong t = perm[main_var];
-            perm[main_var] = perm[0];
-            perm[0] = t;
-        }
-    }
-
-    /* sort with hope that ddeg(G,y_1) >= ddeg(G,y_2) ... >= ddeg(G,y_m) */
-    for (k = 1; k + 1 < m; k++)
-    {
-        slong var;
-        ulong deg, new_deg;
-
-        var = k;
-        j = perm[var];
-        deg = FLINT_MIN(I->Adeflate_deg[j], I->Bdeflate_deg[j]);
-        for (i = k + 1; i < m; i++)
-        {
-            j = perm[i];
-            new_deg = FLINT_MIN(I->Adeflate_deg[j], I->Bdeflate_deg[j]);
-            if (new_deg > deg)
-            {
-                deg = new_deg;
-                var = i;
-            }
-        }
-        if (var != k)
-        {
-            slong t = I->zippel_perm[var];
-            perm[var] = perm[k];
-            perm[k] = t;
-        }
-    }
-
-    /* time comparison with zippel are not done yet - no need to time */
-
-    I->can_use_zippel = 1;
-    I->zippel_time_est = 1.0e100;
 }
 
 static int _try_zippel(
@@ -726,171 +514,6 @@ static void _worker_convertuu(void * varg)
                                                                     arg->uctx);
     }
 }
-
-
-static void _measure_bma(
-    mpoly_gcd_info_t I,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, j, k;
-    slong m = I->mvars;
-    slong * perm = I->bma_perm;
-    slong max_main_degree;
-    double Glength, Glead_count_X, Gtail_count_X, Glead_count_Y, Gtail_count_Y;
-    double evals, bivar, reconstruct;
-
-    /* need at least 3 variables */
-    if (m < 3)
-        return;
-
-    /* figure out the two main variables y_0, y_1 */
-    for (k = 0; k < 2; k++)
-    {
-        slong main_var;
-        ulong count, deg, new_count, new_deg;
-
-        main_var = k;
-        j = perm[main_var];
-        count = FLINT_MIN(I->Alead_count[j], I->Blead_count[j]);
-        deg = FLINT_MAX(I->Adeflate_deg[j], I->Bdeflate_deg[j]);
-        for (i = k + 1; i < m; i++)
-        {
-            j = perm[i];
-            new_count = FLINT_MIN(I->Alead_count[j], I->Blead_count[j]);
-            new_deg = FLINT_MAX(I->Adeflate_deg[j], I->Bdeflate_deg[j]);
-            if (new_deg + new_count/256 < deg + count/256)
-            {
-                count = new_count;
-                deg = new_deg;
-                main_var = i;
-            }
-        }
-
-        if (main_var != k)
-        {
-            slong t = perm[main_var];
-            perm[main_var] = perm[k];
-            perm[k] = t;
-        }
-    }
-
-    max_main_degree = 0;
-    for (i = 0; i < 2; i++)
-    {
-        k = perm[i];
-        max_main_degree = FLINT_MAX(max_main_degree, I->Adeflate_deg[k]);
-        max_main_degree = FLINT_MAX(max_main_degree, I->Bdeflate_deg[k]);
-    }
-
-    /* two main variables must be packed into bits = FLINT_BITS/2 */
-    if (FLINT_BIT_COUNT(max_main_degree) >= FLINT_BITS/2)
-        return;
-
-    /* estimate length of gcd */
-    Glength = 0.5*(I->Adensity + I->Bdensity);
-    for (i = 0; i < m; i++)
-    {
-        k = perm[i];
-        Glength *= UWORD(1) + (ulong)(I->Gdeflate_deg_bound[k]);
-    }
-
-    /* estimate number of lead/tail terms of G wrt X,Y */
-    {
-        double a, b;
-        double Alead_density_X, Atail_density_X;
-        double Blead_density_X, Btail_density_X;
-        double Alead_density_Y, Atail_density_Y;
-        double Blead_density_Y, Btail_density_Y;
-
-        k = perm[0];
-        a = I->Adensity*(UWORD(1) + (ulong)(I->Adeflate_deg[k]))/A->length;
-        b = I->Bdensity*(UWORD(1) + (ulong)(I->Bdeflate_deg[k]))/B->length;
-        Alead_density_X = a*I->Alead_count[k];
-        Atail_density_X = a*I->Atail_count[k];
-        Blead_density_X = b*I->Blead_count[k];
-        Btail_density_X = b*I->Btail_count[k];
-
-        k = perm[1];
-        a = I->Adensity*(UWORD(1) + (ulong)(I->Adeflate_deg[k]))/A->length;
-        b = I->Bdensity*(UWORD(1) + (ulong)(I->Bdeflate_deg[k]))/B->length;
-        Alead_density_Y = a*I->Alead_count[k];
-        Atail_density_Y = a*I->Atail_count[k];
-        Blead_density_Y = b*I->Blead_count[k];
-        Btail_density_Y = b*I->Btail_count[k];
-
-        Glead_count_X = 0.5*(Alead_density_X + Blead_density_X);
-        Gtail_count_X = 0.5*(Atail_density_X + Btail_density_X);
-        Glead_count_Y = 0.5*(Alead_density_Y + Blead_density_Y);
-        Gtail_count_Y = 0.5*(Atail_density_Y + Btail_density_Y);
-        for (i = 0; i < m; i++)
-        {
-            k = perm[i];
-            if (i != 0)
-            {
-                Glead_count_X *= UWORD(1) + (ulong)(I->Gdeflate_deg_bound[k]);
-                Gtail_count_X *= UWORD(1) + (ulong)(I->Gdeflate_deg_bound[k]);
-            }
-
-            if (i != 1)
-            {
-                Glead_count_Y *= UWORD(1) + (ulong)(I->Gdeflate_deg_bound[k]);
-                Gtail_count_Y *= UWORD(1) + (ulong)(I->Gdeflate_deg_bound[k]);
-            }
-        }
-    }
-
-    /* evaluations needed is the max length of the coefficients of G wrt X,Y */
-    {
-        double Gmax_terms_X, Gmax_terms_Y;
-
-        k = perm[0];
-        Gmax_terms_X = Glength/(UWORD(1) + (ulong)(I->Gterm_count_est[k]));
-        Gmax_terms_X = FLINT_MAX(Gmax_terms_X, Glead_count_X);
-        Gmax_terms_X = FLINT_MAX(Gmax_terms_X, Gtail_count_X);
-        Gmax_terms_X = FLINT_MAX(Gmax_terms_X, 1);
-
-        k = perm[1];
-        Gmax_terms_Y = Glength/(UWORD(1) + (ulong)(I->Gterm_count_est[k]));
-        Gmax_terms_Y = FLINT_MAX(Gmax_terms_Y, Glead_count_Y);
-        Gmax_terms_Y = FLINT_MAX(Gmax_terms_Y, Gtail_count_Y);
-        Gmax_terms_Y = FLINT_MAX(Gmax_terms_Y, 1);
-
-        evals = Gmax_terms_X*Gmax_terms_Y/(1 + Glength);
-    }
-
-    /* time for bivar gcd */
-    {
-        double te, tg, ta, tb;
-        te = tg = ta = tb = 1;
-        for (i = 0; i < 2; i++)
-        {
-            k = perm[i];
-            /* already checked reasonable degrees with max_main_degree above */
-            te *= 1 + FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
-            tg *= 1 + I->Gdeflate_deg_bound[k];
-            ta *= 1 + FLINT_MAX(0, I->Adeflate_deg[k] - I->Gdeflate_deg_bound[k]);
-            tb *= 1 + FLINT_MAX(0, I->Bdeflate_deg[k] - I->Gdeflate_deg_bound[k]);
-        }
-        bivar = te + (tg + ta + tb)*0.1;
-    }
-
-    /* time for reconstruction */
-    {
-        reconstruct = I->Gterm_count_est[perm[0]];
-        reconstruct += I->Gterm_count_est[perm[1]];
-        reconstruct = Glength*Glength/(1 + reconstruct);
-    }
-
-    I->can_use_bma = 1;
-    I->bma_time_est = 0.00000002*bivar*evals*(A->length + B->length)
-                    + 0.0003*reconstruct;
-}
-
-/*
-    return 1 for success or 0 for failure
-*/
 
 static int _try_bma(
     fmpz_mpoly_t G,
@@ -1081,48 +704,6 @@ static void _worker_convertu(void * varg)
                                                arg->handles, arg->num_handles);
 }
 
-
-static void _measure_brown(
-    mpoly_gcd_info_t I,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, k;
-    slong m = I->mvars;
-    slong * perm = I->brown_perm;
-    flint_bitcnt_t abits, bbits;
-    double te, tg, ta, tb;
-
-    /* need at least 2 variables */
-    if (m < 2)
-        return;
-
-    abits = FLINT_BIT_COUNT(A->length) + 10;
-    bbits = FLINT_BIT_COUNT(B->length) + 10;
-
-    te = tg = ta = tb = 1;
-    for (i = 0; i < m; i++)
-    {
-        k = perm[i];
-        if (   abits + FLINT_BIT_COUNT(I->Adeflate_deg[k]) > FLINT_BITS
-            || bbits + FLINT_BIT_COUNT(I->Bdeflate_deg[k]) > FLINT_BITS)
-        {
-            /* each variable is eventually converted to dense storage */
-            return;
-        }
-
-        te *= 1 + FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
-        tg *= 1 + I->Gdeflate_deg_bound[k];
-        ta *= 1 + FLINT_MAX(0, I->Adeflate_deg[k] - I->Gdeflate_deg_bound[k]);
-        tb *= 1 + FLINT_MAX(0, I->Bdeflate_deg[k] - I->Gdeflate_deg_bound[k]);
-    }
-
-    I->can_use_brown = 1;
-    I->brown_time_est = 0.005*te*(I->Adensity + I->Bdensity)
-                      + 0.004*(tg + ta + tb);
-}
-
 static int _try_brown(
     fmpz_mpoly_t G,
     flint_bitcnt_t Gbits,
@@ -1202,9 +783,9 @@ static int _try_brown(
     FLINT_ASSERT(Bu->length > 1);
 
     success = (num_handles > 0)
-           ? fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu, uctx,
+           ? fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu, uctx, I,
                                                          handles, num_handles)
-           : fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx);
+           : fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx, I);
 
     if (!success)
         goto cleanup;
@@ -1515,6 +1096,82 @@ cleanup:
     return success;
 }
 
+/*
+    Test if B divides A or A divides B
+        TODO: incorporate deflation
+*/
+static int _try_divides(
+    fmpz_mpoly_t G,
+    const fmpz_mpoly_t A,
+    int try_a,
+    const fmpz_mpoly_t B,
+    int try_b,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    int success, free_a, free_b;
+    fmpz_t cA, cB, cG;
+    fmpz_mpoly_t Q;
+    fmpz_mpoly_t AA, BB;
+
+    *AA = *A;
+    *BB = *B;
+    fmpz_init(cA);
+    fmpz_init(cB);
+    fmpz_init(cG);
+    fmpz_mpoly_init(Q, ctx);
+
+    _fmpz_vec_content(cA, A->coeffs, A->length);
+    _fmpz_vec_content(cB, B->coeffs, B->length);
+    fmpz_gcd(cG, cA, cB);
+
+    free_a = 0;
+    if (!fmpz_is_one(cA))
+    {
+        AA->coeffs = _fmpz_vec_init(A->alloc);
+        _fmpz_vec_scalar_divexact_fmpz(AA->coeffs, A->coeffs, A->length, cA);
+        free_a = 1;
+    }
+
+    free_b = 0;
+    if (!fmpz_is_one(cB))
+    {
+        BB->coeffs = _fmpz_vec_init(B->alloc);
+        _fmpz_vec_scalar_divexact_fmpz(BB->coeffs, B->coeffs, B->length, cB);
+        free_b = 1;
+    }
+
+    if (try_b && fmpz_mpoly_divides_threaded(Q, AA, BB, ctx, 1))
+    {
+        fmpz_mpoly_scalar_mul_fmpz(G, BB, cG, ctx);
+        success = 1;
+        goto cleanup;
+    }
+
+    if (try_a && fmpz_mpoly_divides_threaded(Q, BB, AA, ctx, 1))
+    {
+        fmpz_mpoly_scalar_mul_fmpz(G, AA, cG, ctx);
+        success = 1;
+        goto cleanup;
+    }
+
+    success = 0;
+
+cleanup:
+
+    fmpz_mpoly_clear(Q, ctx);
+    fmpz_clear(cA);
+    fmpz_clear(cB);
+    fmpz_clear(cG);
+
+    if (free_a)
+        _fmpz_vec_clear(AA->coeffs, A->alloc);
+
+    if (free_b)
+        _fmpz_vec_clear(BB->coeffs, B->alloc);
+
+    return success;
+}
+
 
 /*
     The function must pack a successful answer into bits = Gbits <= FLINT_BITS
@@ -1729,8 +1386,8 @@ calculate_trivial_gcd:
         and there are at least two in the latter case
     */
 
-    mpoly_gcd_info_set_estimates(I, A, B, ctx, handles, num_handles);
-    mpoly_gcd_info_set_perm(I, A, B, ctx);
+    mpoly_gcd_info_set_estimates_fmpz_mpoly(I, A, B, ctx, handles, num_handles);
+    mpoly_gcd_info_set_perm(I, A->length, B->length, ctx->minfo);
 
     /* everything in I is valid now */
 
@@ -1762,32 +1419,13 @@ calculate_trivial_gcd:
         if (gcd_is_trivial)
             goto calculate_trivial_gcd;
 
-        if (try_a || try_b)
-        {
-            fmpz_mpoly_t Q;
-            fmpz_mpoly_init(Q, ctx);
-
-            if (try_b && fmpz_mpoly_divides(Q, A, B, ctx))
-            {
-                fmpz_mpoly_set(G, B, ctx);
-                fmpz_mpoly_clear(Q, ctx);
-                goto successful;
-            }
-
-            if (try_a && fmpz_mpoly_divides(Q, B, A, ctx))
-            {
-                fmpz_mpoly_set(G, A, ctx);
-                fmpz_mpoly_clear(Q, ctx);
-                goto successful;
-            }
-
-            fmpz_mpoly_clear(Q, ctx);
-        }
+        if ((try_a || try_b) && _try_divides(G, A, try_a, B, try_b, ctx))
+            goto successful;
     }
 
-    _measure_brown(I, A, B, ctx);
-    _measure_bma(I, A, B, ctx);
-    _measure_zippel(I, A, B, ctx);
+    mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
+    mpoly_gcd_info_measure_bma(I, A->length, B->length, ctx->minfo);
+    mpoly_gcd_info_measure_zippel(I, A->length, B->length, ctx->minfo);
 
     if (I->mvars == 2)
     {

@@ -49,3 +49,32 @@ int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
     return success;
 }
+
+
+int fmpz_mpoly_repack_bits_inplace(
+    fmpz_mpoly_t A,
+    flint_bitcnt_t Abits,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    int success;
+    ulong * texps;
+    slong N = mpoly_words_per_exp(Abits, ctx->minfo);
+
+    if (A->bits == Abits)
+    {
+        return 1;
+    }
+
+    texps = (ulong *) flint_malloc(A->alloc*N*sizeof(ulong));
+    success = mpoly_repack_monomials(texps, Abits,
+                                      A->exps, A->bits, A->length, ctx->minfo);
+    if (success)
+    {
+        ulong * t = A->exps;
+        A->exps = texps;
+        texps = t;
+        A->bits = Abits;
+    }
+    flint_free(texps);
+    return success;
+}

@@ -161,6 +161,7 @@ typedef struct
     ulong num_threads;
     slong var;
     slong bound;
+    const mpoly_gcd_info_struct * I;
 }
 _splitbase_struct;
 
@@ -465,10 +466,10 @@ static void _splitworker(void * varg)
 
         success = nmod_mpolyun_gcd_brown_smprime(
                     Gevalp, Abarevalp, Bbarevalp, Aevalp, Bevalp, var - 1,
-                                                                      ctx, Sp);
+                                                             ctx, base->I, Sp);
         success = success && nmod_mpolyun_gcd_brown_smprime(
                     Gevalm, Abarevalm, Bbarevalm, Aevalm, Bevalm, var - 1,
-                                                                      ctx, Sp);
+                                                             ctx, base->I, Sp);
         if (success == 0)
         {
             continue;
@@ -777,19 +778,21 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     nmod_mpolyun_t B,
     slong var,
     const nmod_mpoly_ctx_t ctx,
+    const mpoly_gcd_info_t I,
     const thread_pool_handle * handles,
     slong num_handles)
 {
+    int divisibility_test = 0; /* 1: by G, 2: by Abar, 3: by Bbar */
     slong i;
     flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     ulong num_threads;
     int success;
-    ulong bound;
+    ulong bound, best_est;
+    slong g_stab_est, abar_stab_est, bbar_stab_est, upper_limit;
     mp_limb_t alpha;
     slong deggamma, ldegGs, ldegAbars, ldegBbars, ldegA, ldegB;
     nmod_poly_t cA, cB, cG, cAbar, cBbar, gamma;
-    nmod_poly_t cGs;
     slong Gexp0, Abarexp0, Bbarexp0;
     nmod_poly_struct ** mptrs;
     nmod_mpolyun_struct ** gptrs, ** abarptrs, ** bbarptrs;
@@ -797,6 +800,12 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     _splitbase_t splitbase;
     _joinworker_arg_struct * joinargs;
     _joinbase_t joinbase;
+    nmod_poly_t t1;
+    nmod_mpolyun_t T1, T2;
+
+    nmod_poly_init_mod(t1, ctx->ffinfo->mod);
+    nmod_mpolyun_init(T1, bits, ctx);
+    nmod_mpolyun_init(T2, bits, ctx);
 
     nmod_poly_init(cA, ctx->ffinfo->mod.n);
     nmod_poly_init(cB, ctx->ffinfo->mod.n);
@@ -821,6 +830,40 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     ldegB = nmod_mpolyun_lastdeg(B, ctx);
     deggamma = nmod_poly_degree(gamma);
     bound = 1 + deggamma + FLINT_MAX(ldegA, ldegB);
+    best_est = bound;
+
+    upper_limit = mpoly_gcd_info_get_brown_upper_limit(I, var + 1, bound);
+
+    if (I != NULL && I->Gdeflate_deg_bounds_are_nice)
+    {
+        slong k = I->brown_perm[var + 1];
+
+        FLINT_ASSERT(var + 1 < I->mvars);
+        
+        g_stab_est = 2 + deggamma + I->Gdeflate_deg_bound[k];
+        abar_stab_est = 2 + deggamma + I->Adeflate_deg[k] - I->Gdeflate_deg_bound[k];
+        bbar_stab_est = 2 + deggamma + I->Bdeflate_deg[k] - I->Gdeflate_deg_bound[k];
+
+        if (g_stab_est < upper_limit)
+        {
+            best_est = g_stab_est;
+            divisibility_test = 1;
+        }
+
+        if (abar_stab_est < upper_limit
+             && (divisibility_test == 0 || abar_stab_est < best_est))
+        {
+            best_est = abar_stab_est;
+            divisibility_test = 2;
+        }
+
+        if (bbar_stab_est < upper_limit
+             && (divisibility_test == 0 || bbar_stab_est < best_est))
+        {
+            best_est = bbar_stab_est;
+            divisibility_test = 3;
+        }
+    }
 
     alpha = (ctx->ffinfo->mod.n - UWORD(1))/UWORD(2);
     if ((ctx->ffinfo->mod.n & UWORD(1)) == UWORD(0))
@@ -853,9 +896,11 @@ int nmod_mpolyun_gcd_brown_smprime_threaded(
     splitbase->ctx = ctx;
     splitbase->gamma = gamma;
     splitbase->var = var;
-    splitbase->bound = bound;
+    splitbase->I = I;
 
 compute_split:
+
+    splitbase->bound = best_est;
 
     if (alpha <= num_threads)
     {
@@ -867,15 +912,11 @@ compute_split:
     splitbase->gcd_is_one = 0;
     for (i = 0; i < num_threads; i++)
     {
-        /*
-            ri = max(1, bound / num_threads + (i < (bound % num_threads)))
-            is also possible, but there is no need to live on the edge.
-        */
-        slong ri = bound / num_threads + 1;
+        slong ri = best_est / num_threads + (i < (best_est % num_threads));
         splitargs[i].idx = i;
         splitargs[i].base = splitbase;
         splitargs[i].alpha = alpha + i;
-        splitargs[i].required_images = ri;
+        splitargs[i].required_images = FLINT_MAX(ri, WORD(1));
     }
 
     for (i = 0; i + 1 < num_threads; i++)
@@ -1004,23 +1045,72 @@ compute_split:
     }
     flint_free(joinargs);
 
-    if (   deggamma + ldegA == ldegGs + ldegAbars
-        && deggamma + ldegB == ldegGs + ldegBbars)
+    if (divisibility_test == 1)
     {
-        goto successful;
+        nmod_mpolyun_content_last(t1, G, ctx);
+        nmod_mpolyun_divexact_last(G, t1, ctx);
+        success =            nmod_mpolyun_divides(T1, A, G, ctx);
+        success = success && nmod_mpolyun_divides(T2, B, G, ctx);
+        if (success)
+        {
+            ulong temp;
+            nmod_mpolyun_swap(T1, Abar);
+            nmod_mpolyun_swap(T2, Bbar);
+successful_fix_lc:
+            temp = nmod_mpolyun_leadcoeff(G, ctx);
+            nmod_mpolyun_scalar_mul_nmod(Abar, temp, ctx);
+            nmod_mpolyun_scalar_mul_nmod(Bbar, temp, ctx);
+            temp = n_invmod(temp, ctx->ffinfo->mod.n);
+            nmod_mpolyun_scalar_mul_nmod(G, temp, ctx);
+            goto successful_put_content;
+        }
+    }
+    else if (divisibility_test == 2)
+    {
+        nmod_mpolyun_content_last(t1, Abar, ctx);
+        nmod_mpolyun_divexact_last(Abar, t1, ctx);
+        success =            nmod_mpolyun_divides(T1, A, Abar, ctx);
+        success = success && nmod_mpolyun_divides(T2, B, T1, ctx);
+        if (success)
+        {
+            nmod_mpolyun_swap(T1, G);
+            nmod_mpolyun_swap(T2, Bbar);
+            goto successful_fix_lc;
+        }
+    }
+    else if (divisibility_test == 3)
+    {
+        nmod_mpolyun_content_last(t1, Bbar, ctx);
+        nmod_mpolyun_divexact_last(Bbar, t1, ctx);
+        success =            nmod_mpolyun_divides(T1, B, Bbar, ctx);
+        success = success && nmod_mpolyun_divides(T2, A, T1, ctx);
+        if (success)
+        {
+            nmod_mpolyun_swap(T1, G);
+            nmod_mpolyun_swap(T2, Abar);
+            goto successful_fix_lc;
+        }        
+    }
+    else /* divisibility test == 0 */
+    {
+        if (   deggamma + ldegA == ldegGs + ldegAbars
+            && deggamma + ldegB == ldegGs + ldegBbars)
+        {
+            goto successful;
+        }
     }
 
-    /* divisibility test failed - could try again or just fail */
+    /* divisibility test failed - try again */
+    best_est = bound;
+    divisibility_test = 0;
     goto compute_split;
 
 successful:
 
-    nmod_poly_init(cGs, ctx->ffinfo->mod.n);
-    nmod_mpolyun_content_last(cGs, G, ctx);
-    nmod_mpolyun_divexact_last(G, cGs, ctx);
+    nmod_mpolyun_content_last(t1, G, ctx);
+    nmod_mpolyun_divexact_last(G, t1, ctx);
     nmod_mpolyun_divexact_last(Abar, nmod_mpolyun_leadcoeff_poly(G, ctx), ctx);
     nmod_mpolyun_divexact_last(Bbar, nmod_mpolyun_leadcoeff_poly(G, ctx), ctx);
-    nmod_poly_clear(cGs);
 
 successful_put_content:
 
@@ -1054,6 +1144,10 @@ cleanup:
     nmod_poly_clear(cAbar);
     nmod_poly_clear(cBbar);
     nmod_poly_clear(gamma);
+
+    nmod_poly_clear(t1);
+    nmod_mpolyun_clear(T1, ctx);
+    nmod_mpolyun_clear(T2, ctx);
 
     return success;
 }
@@ -1219,8 +1313,8 @@ int nmod_mpoly_gcd_brown_threaded(
 
     /* calculate gcd */
     success = nmod_mpolyun_gcd_brown_smprime_threaded(
-                          Gn, Abarn, Bbarn, An, Bn,
-                          uctx->minfo->nvars - 1, uctx, handles, num_handles);
+                          Gn, Abarn, Bbarn, An, Bn, uctx->minfo->nvars - 1,
+                                             uctx, NULL, handles, num_handles);
 
     for (i = 0; i < num_handles; i++)
     {
