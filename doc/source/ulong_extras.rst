@@ -1143,7 +1143,7 @@ Factorisation
     required to be checked with a primality test, one may set 
     ``proved`` to `1`, otherwise set it to `0`, and they will only be 
     probable primes. N.B: at the present there is no difference because 
-    the probable prime tests have been exhaustively tested up to `2^64`.
+    the probable prime tests have been exhaustively tested up to `2^{64}`.
 
     However, in future, this flag may produce and separately check
     a primality certificate. This may be quite slow (and probably no
