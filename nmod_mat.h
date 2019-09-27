@@ -31,6 +31,7 @@
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
+#include "fmpz.h"
 
 #ifdef __cplusplus
  extern "C" {
