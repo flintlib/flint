@@ -82,6 +82,13 @@ typedef struct
 
 typedef nmod_mpoly_struct nmod_mpoly_t[1];
 
+NMOD_MPOLY_INLINE
+mp_limb_t * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(i < A->length);
+    return A->coeffs + i;
+}
 
 /* Internal type definitions *************************************************/
 

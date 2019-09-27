@@ -69,6 +69,16 @@ typedef struct
 } fq_nmod_mpoly_struct;
 typedef fq_nmod_mpoly_struct fq_nmod_mpoly_t[1];
 
+
+FQ_NMOD_MPOLY_INLINE
+fq_nmod_struct * fq_nmod_mpoly_term_coeff_ref(fq_nmod_mpoly_t A, slong i,
+                                                 const fq_nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(i < A->length);
+    return A->coeffs + i;
+}
+
+
 /* Internal type definitions *************************************************/
 
 /*

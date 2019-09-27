@@ -93,6 +93,26 @@ typedef struct
 typedef fmpq_mpoly_struct fmpq_mpoly_t[1];
 
 
+FMPQ_MPOLY_INLINE
+fmpq * fmpq_mpoly_content_ref(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+{
+    return A->content;
+}
+
+FMPQ_MPOLY_INLINE
+fmpz_mpoly_struct * fmpq_mpoly_zpoly_ref(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+{
+    return A->zpoly;
+}
+
+FMPQ_MPOLY_INLINE
+fmpz * fmpq_mpoly_zpoly_term_coeff_ref(fmpq_mpoly_t A, slong i,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(i < A->zpoly->length);
+    return A->zpoly->coeffs + i;
+}
+
 /*  Memory management ********************************************************/
 
 FMPQ_MPOLY_INLINE

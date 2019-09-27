@@ -66,6 +66,14 @@ typedef struct
 
 typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
 
+FMPZ_MPOLY_INLINE
+fmpz * fmpz_mpoly_term_coeff_ref(fmpz_mpoly_t A, slong i,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(i < A->length);
+    return A->coeffs + i;
+}
+
 
 /* Internal type definitions *************************************************/
 
