@@ -280,6 +280,18 @@ Container operations
     This means that even if nonzero terms with distinct exponents have been constructed in the correct order, a call to :func:`fmpq_mpoly_reduce` is necessary to ensure that the polynomial is in canonical form.
     As with the ``fmpz_mpoly`` module, a call to :func:`fmpq_mpoly_sort_terms` followed by a call to :func:`fmpq_mpoly_combine_like_terms` should leave the polynomial in canoncial form.
 
+.. function:: fmpq * fmpq_mpoly_content_ref(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Return a reference to the content of ``A``.
+
+.. function:: fmpz_mpoly_struct * fmpq_mpoly_zpoly_ref(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Return a reference to the integer polynomial of ``A``.
+
+.. function:: fmpz * fmpq_mpoly_zpoly_term_coeff_ref(fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Return a reference to the coefficient of index `i` of the integer polynomial of ``A``.
+
 .. function:: int fmpq_mpoly_is_canonical(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
