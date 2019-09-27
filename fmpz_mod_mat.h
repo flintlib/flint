@@ -264,13 +264,6 @@ void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz
     _fmpz_mod_mat_reduce(B);
 }
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_scalar_mul_fmpz_mod(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_mod_t c)
-{
-    fmpz_mat_scalar_mul_fmpz(B->mat, A->mat, c);
-    _fmpz_mod_mat_reduce(B);
-}
-
 /* Matrix multiplication */
 
 FMPZ_MOD_MAT_INLINE
