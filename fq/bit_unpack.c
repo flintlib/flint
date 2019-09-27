@@ -12,7 +12,7 @@
 #include "fq.h"
 
 void
-fq_bit_unpack(fq_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+fq_bit_unpack(fq_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
               const fq_ctx_t ctx)
 {
     fmpz_poly_bit_unpack_unsigned(rop, f, bit_size);

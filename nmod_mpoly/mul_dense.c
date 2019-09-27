@@ -12,8 +12,9 @@
 #include "nmod_poly.h"
 #include "nmod_mpoly.h"
 
-int nmod_mpoly_mul_dense(nmod_mpoly_t P,
-                        const nmod_mpoly_t A, const nmod_mpoly_t B,
+int _nmod_mpoly_mul_dense(nmod_mpoly_t P,
+                                 const nmod_mpoly_t A, fmpz * maxAfields,
+                                 const nmod_mpoly_t B, fmpz * maxBfields,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     int success = 1;
@@ -25,16 +26,11 @@ int nmod_mpoly_mul_dense(nmod_mpoly_t P,
     slong * Abounds, * Bbounds, * Pbounds;
     TMP_INIT;
 
-    if (A->length == 0 || B->length == 0)
-    {
-        nmod_mpoly_zero(P, ctx);
-        return 1;
-    }
+    FLINT_ASSERT(A->length != 0);
+    FLINT_ASSERT(B->length != 0);
 
-    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
-    {
-        return 0;
-    }
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
 
     TMP_START;
 
@@ -48,14 +44,14 @@ int nmod_mpoly_mul_dense(nmod_mpoly_t P,
     Abounds = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
     Bbounds = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
     Pbounds = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
-    mpoly_degrees_si(Abounds, A->exps, A->length, A->bits, ctx->minfo);
-    mpoly_degrees_si(Bbounds, B->exps, B->length, B->bits, ctx->minfo);
+    mpoly_get_monomial_ui_unpacked_ffmpz((ulong *)Abounds, maxAfields, ctx->minfo);
+    mpoly_get_monomial_ui_unpacked_ffmpz((ulong *)Bbounds, maxBfields, ctx->minfo);
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
         Abounds[i] = Abounds[i] + 1;
         Bbounds[i] = Bbounds[i] + 1;
         Pbounds[i] = Abounds[i] + Bbounds[i] - 1;
-        if ((slong)(Abounds[i] | Bbounds[i] | Pbounds[i]) < WORD(0))
+        if ((Abounds[i] | Bbounds[i] | Pbounds[i]) < WORD(0))
         {
             goto failed_stage1;
         }
@@ -119,6 +115,8 @@ int nmod_mpoly_mul_dense(nmod_mpoly_t P,
     nmod_mpoly_convert_from_nmod_mpolyd(P, ctx, Pd, dctx);
     nmod_mpolyd_clear(Pd);
 
+    nmod_mpolyd_ctx_clear(dctx);
+
 done:
     TMP_END;
     return success;
@@ -134,3 +132,46 @@ failed_stage1:
     goto done;
 }
 
+
+int nmod_mpoly_mul_dense(nmod_mpoly_t A, const nmod_mpoly_t B,
+                              const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    int success;
+    fmpz * maxBfields, * maxCfields;
+    TMP_INIT;
+
+    if (B->length == 0 || C->length == 0)
+    {
+        nmod_mpoly_zero(A, ctx);
+        return 1;
+    }
+
+    if (B->bits > FLINT_BITS || C->bits > FLINT_BITS)
+    {
+        return 0;
+    }
+
+    TMP_START;
+
+    maxBfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    maxCfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_init(maxBfields + i);
+        fmpz_init(maxCfields + i);
+    }
+    mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
+    mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
+
+    success = _nmod_mpoly_mul_dense(A, B, maxBfields, C, maxCfields, ctx);
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(maxBfields + i);
+        fmpz_clear(maxCfields + i);
+    }
+
+    TMP_END;
+    return success;
+}

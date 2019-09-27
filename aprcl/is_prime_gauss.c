@@ -375,6 +375,9 @@ is_prime_gauss(const fmpz_t n)
     primality_test_status result;
     aprcl_config config;
 
+    if (fmpz_cmp_ui(n, 2) < 0)
+       return 0;
+
     config_gauss_init_min_R(config, n, 180);
     result = _is_prime_gauss(n, config);
     R = config->R;
@@ -409,8 +412,14 @@ is_prime_gauss(const fmpz_t n)
         config_gauss_clear(config);
     }
 
+    if (result == PROBABPRIME || result == UNKNOWN)
+    {
+        flint_printf("is_prime_gauss: failed to prove n prime\n");
+        fmpz_print(n); flint_printf("\n");
+        flint_abort();
+    }
+
     if (result == PRIME)
         return 1;
     return 0;
 }
-

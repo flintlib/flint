@@ -16,6 +16,7 @@
 int
 main(void)
 {
+    slong tmul = 8;
     int i, j, result;
     FLINT_TEST_INIT(state);
 
@@ -23,12 +24,12 @@ main(void)
     fflush(stdout);
 
     /* Check f*(g + h) = f*g + f*h */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k1, k2, t1, t2;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -63,15 +64,15 @@ main(void)
             nmod_mpoly_randtest_bits(h, state, len2, exp_bits2, ctx);
 
             nmod_mpoly_add(t1, g, h, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
             nmod_mpoly_mul_johnson(k1, f, t1, ctx);
-            nmod_mpoly_test(k1, ctx);
+            nmod_mpoly_assert_canonical(k1, ctx);
             nmod_mpoly_mul_johnson(t1, f, g, ctx);
-            nmod_mpoly_test(t1, ctx);
+            nmod_mpoly_assert_canonical(t1, ctx);
             nmod_mpoly_mul_johnson(t2, f, h, ctx);
-            nmod_mpoly_test(t2, ctx);
+            nmod_mpoly_assert_canonical(t2, ctx);
             nmod_mpoly_add(k2, t1, t2, ctx);
-            nmod_mpoly_test(k2, ctx);
+            nmod_mpoly_assert_canonical(k2, ctx);
             result = nmod_mpoly_equal(k1, k2, ctx);
 
             if (!result)
@@ -93,12 +94,12 @@ main(void)
     }
 
     /* Check aliasing first argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -126,9 +127,9 @@ main(void)
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             nmod_mpoly_mul_johnson(f, f, g, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             result = nmod_mpoly_equal(h, f, ctx);
 
             if (!result)
@@ -146,12 +147,12 @@ main(void)
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -179,9 +180,9 @@ main(void)
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             nmod_mpoly_mul_johnson(g, f, g, ctx);
-            nmod_mpoly_test(g, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
             result = nmod_mpoly_equal(h, g, ctx);
 
             if (!result)

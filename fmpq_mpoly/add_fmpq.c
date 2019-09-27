@@ -11,19 +11,87 @@
 
 #include "fmpq_mpoly.h"
 
-void fmpq_mpoly_add_fmpq(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
-                                    const fmpq_t x, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_add_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                    const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_t t;
-    fmpz_init(t);
-    fmpz_mul(t, fmpq_numref(poly2->content), fmpq_denref(x));
-    fmpz_mpoly_scalar_mul_fmpz(poly1->zpoly, poly2->zpoly, t, ctx->zctx);
-    fmpz_mul(t, fmpq_denref(poly2->content), fmpq_numref(x));
-    fmpz_set_ui(fmpq_numref(poly1->content), 1);
-    fmpz_mul(fmpq_denref(poly1->content), fmpq_denref(poly2->content), fmpq_denref(x));
-    fmpz_mpoly_add_fmpz(poly1->zpoly, poly1->zpoly, t, ctx->zctx);
-    fmpz_clear(t);
 
-    fmpq_mpoly_canonicalise(poly1, ctx);
-    return;
+    if (fmpq_is_zero(c))
+    {
+        fmpq_mpoly_set(A, B, ctx);
+        return;
+    }
+    else if (fmpq_mpoly_is_zero(B, ctx))
+    {
+        fmpq_mpoly_set_fmpq(A, c, ctx);
+        return;
+    }
+    else
+    {
+        /*
+            if B->content != 0 and c != 0,
+                compute num/den = c / B->content
+                A->content = B->content / den
+                A->zpoly = den * B->zpoly + num
+        */
+        fmpq_t t;
+        slong Blen = B->zpoly->length;
+
+        fmpq_init(t);
+        fmpq_div(t, c, B->content);
+        if (!fmpz_is_one(fmpq_denref(t)))
+        {
+            fmpq_div_fmpz(A->content, B->content, fmpq_denref(t));
+            fmpz_mpoly_scalar_mul_fmpz(A->zpoly, B->zpoly,
+                                                    fmpq_denref(t), ctx->zctx);
+            fmpz_mpoly_add_fmpz(A->zpoly, A->zpoly, fmpq_numref(t), ctx->zctx);
+        }
+        else
+        {
+            fmpq_set(A->content, B->content);
+            fmpz_mpoly_add_fmpz(A->zpoly, B->zpoly, fmpq_numref(t), ctx->zctx);
+        }
+        /*
+            optimization: since gcd(num, den) = 1 and B->zpoly is primitive,
+                we do not need to reduce if the addition added a term
+        */
+        if (A->zpoly->length <= Blen)
+        {
+            fmpq_mpoly_reduce(A, ctx);
+        }
+        fmpq_clear(t);
+        return;
+    }
+}
+
+void fmpq_mpoly_add_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                    const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_t t;
+    fmpq_init(t);
+    fmpz_set(fmpq_numref(t), c);
+    fmpz_one(fmpq_denref(t));
+    fmpq_mpoly_add_fmpq(A, B, t, ctx);
+    fmpq_clear(t);
+}
+
+void fmpq_mpoly_add_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                           ulong c, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_t t;
+    fmpq_init(t);
+    fmpz_set_ui(fmpq_numref(t), c);
+    fmpz_one(fmpq_denref(t));
+    fmpq_mpoly_add_fmpq(A, B, t, ctx);
+    fmpq_clear(t);
+}
+
+void fmpq_mpoly_add_si(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                           slong c, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_t t;
+    fmpq_init(t);
+    fmpz_set_si(fmpq_numref(t), c);
+    fmpz_one(fmpq_denref(t));
+    fmpq_mpoly_add_fmpq(A, B, t, ctx);
+    fmpq_clear(t);
 }

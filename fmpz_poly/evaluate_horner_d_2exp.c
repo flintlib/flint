@@ -15,10 +15,10 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz * poly, slong n, double d)
+double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp)
 {
    slong i, size_p = FLINT_ABS(_fmpz_vec_max_bits(poly, n));
-   ulong vbits = ceil(fabs(log(fabs(d))/log(2.0)));
+   ulong vbits = ceil(fabs(dexp + log(fabs(d))/log(2.0)));
    ulong prec = vbits*(n - 1) + size_p + FLINT_BIT_COUNT(n);
    mpf_t mpf_d, mpf_coeff, output;
    double res;
@@ -35,7 +35,11 @@ double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz * poly, slong n
    fmpz_get_mpf(output, poly + n - 1);
    
    mpf_set_d(mpf_d, d); /* set fval to mpf from the double val */
-   
+   if (dexp >= 0)
+       mpf_mul_2exp(mpf_d, mpf_d, dexp);
+   else
+       mpf_div_2exp(mpf_d, mpf_d, -dexp);
+
    for (i = n - 2; i >= 0; i--)
    {
       mpf_mul(output, output, mpf_d);
@@ -43,7 +47,7 @@ double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz * poly, slong n
       mpf_add(output, output, mpf_coeff);
    }
 
-   res = mpf_get_d_2exp(exp, output);
+   res = flint_mpf_get_d_2exp(exp, output);
    
    if (mpf_sgn(output) < 0 && res >= 0.0)
       res = -res; /* work around bug in earlier versions of GMP/MPIR */
@@ -54,6 +58,23 @@ double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz * poly, slong n
 
    return res;
 }
+
+double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz * poly, slong n, double d)
+{
+    return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly, n, d, 0);
+}
+
+double fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz_poly_t poly, double d, slong dexp)
+{
+   if (poly->length == 0)
+   {
+      *exp = 0;
+      return 0.0;
+   }
+
+   return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly->coeffs, poly->length, d, dexp);
+}
+
 
 double fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz_poly_t poly, double d)
 {

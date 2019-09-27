@@ -96,9 +96,9 @@ FLINT_DLL void fmpq_mat_print(const fmpq_mat_t mat);
 
 /* Random matrix generation **************************************************/
 
-FLINT_DLL void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
 
 /* Special matrices **********************************************************/
 
@@ -198,6 +198,89 @@ FLINT_DLL void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
 /* Kronecker product *********************************************************/
 
 FLINT_DLL void fmpq_mat_kronecker_product(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
+
+/* Permutations **************************************************************/
+
+FMPQ_MAT_INLINE
+void fmpq_mat_swap_rows(fmpq_mat_t mat, slong * perm, slong r, slong s)
+{
+    if (r != s && !fmpq_mat_is_empty(mat))
+    {
+        fmpq * u;
+        slong t;
+
+        if (perm)
+        {
+            t = perm[s];
+            perm[s] = perm[r];
+            perm[r] = t;
+        }
+
+        u = mat->rows[s];
+        mat->rows[s] = mat->rows[r];
+        mat->rows[r] = u;
+    }
+}
+
+FMPQ_MAT_INLINE
+void fmpq_mat_invert_rows(fmpq_mat_t mat, slong * perm)
+{
+    slong i;
+
+    for (i = 0; i < mat->r/2; i++)
+        fmpq_mat_swap_rows(mat, perm, i, mat->r - i - 1);
+}
+
+FMPQ_MAT_INLINE
+void fmpq_mat_swap_cols(fmpq_mat_t mat, slong * perm, slong r, slong s)
+{
+    if (r != s && !fmpq_mat_is_empty(mat))
+    {
+        slong t;
+
+        if (perm)
+        {
+            t = perm[s];
+            perm[s] = perm[r];
+            perm[r] = t;
+        }
+
+       for (t = 0; t < mat->r; t++)
+       {
+           fmpq_swap(fmpq_mat_entry(mat, t, r), fmpq_mat_entry(mat, t, s));
+       }
+    }
+}
+
+FMPQ_MAT_INLINE
+void fmpq_mat_invert_cols(fmpq_mat_t mat, slong * perm)
+{
+    if (!fmpq_mat_is_empty(mat))
+    {
+        slong t;
+        slong i;
+        slong c = mat->c;
+        slong k = mat->c/2;
+
+        if (perm)
+        {
+            for (i =0; i < k; i++)
+            {
+                t = perm[i];
+                perm[i] = perm[c - i];
+                perm[c - i] = t;
+            }
+        }
+
+        for (t = 0; t < mat->r; t++)
+        {
+            for (i = 0; i < k; i++)
+            {
+                fmpq_swap(fmpq_mat_entry(mat, t, i), fmpq_mat_entry(mat, t, c - i - 1));
+            }
+        }
+    }
+}
 
 /* Trace *********************************************************************/
 

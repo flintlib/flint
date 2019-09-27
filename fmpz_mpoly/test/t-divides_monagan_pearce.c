@@ -62,7 +62,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 
@@ -112,67 +112,89 @@ main(void)
     }
 
     /* Check random polys don't divide */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-       fmpz_mpoly_ctx_t ctx;
-       fmpz_mpoly_t f, g, h, k;
-       ordering_t ord;
-       slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-       slong coeff_bits;
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g, h, k;
+        ordering_t ord;
+        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
+        slong coeff_bits;
+        fmpz * shifts, * strides;
 
-       ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 10) + 1;
+        ord = mpoly_ordering_randtest(state);
+        nvars = n_randint(state, 10) + 1;
 
-       fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
-       fmpz_mpoly_init(f, ctx);
-       fmpz_mpoly_init(g, ctx);
-       fmpz_mpoly_init(h, ctx);
-       fmpz_mpoly_init(k, ctx);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(h, ctx);
+        fmpz_mpoly_init(k, ctx);
 
-       len = n_randint(state, 20);
-       len1 = n_randint(state, 20);
-       len2 = n_randint(state, 20) + 1;
+        len = n_randint(state, 20);
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20) + 1;
 
-       exp_bound =  n_randint(state, 1000/nvars/nvars) + 1;
-       exp_bound1 = n_randint(state, 1000/nvars/nvars) + 1;
-       exp_bound2 = n_randint(state, 1000/nvars/nvars) + 1;
+        exp_bound =  n_randint(state, 1000/nvars/nvars) + 1;
+        exp_bound1 = n_randint(state, 1000/nvars/nvars) + 1;
+        exp_bound2 = n_randint(state, 1000/nvars/nvars) + 1;
 
-       coeff_bits = n_randint(state, 200);
+        coeff_bits = n_randint(state, 200);
 
-       for (j = 0; j < 4; j++)
-       {
-          fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
-          do {
-             fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits + 1, exp_bound2, ctx);
-          } while (g->length == 0);
-          fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
-          fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
+        shifts = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        strides = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            fmpz_init(shifts + j);
+            fmpz_init(strides + j);
+            fmpz_randtest_unsigned(shifts + j, state, 100);
+            fmpz_randtest_unsigned(strides + j, state, 100);
+            fmpz_add_ui(strides + j, strides + j, 1);
+        }
 
-          ok1 = fmpz_mpoly_divides_monagan_pearce(h, f, g, ctx);
-          fmpz_mpoly_assert_canonical(h, ctx);
+        for (j = 0; j < 4; j++)
+        {
+            fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
+            do {
+                fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits + 1, exp_bound2, ctx);
+            } while (g->length == 0);
+            fmpz_mpoly_randtest_bound(h, state, len, coeff_bits, exp_bound, ctx);
+            fmpz_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
 
-          if (ok1)
-          {
-             fmpz_mpoly_mul_johnson(k, h, g, ctx);
-             fmpz_mpoly_assert_canonical(k, ctx);
-          }
+            fmpz_mpoly_inflate(f, f, shifts, strides, ctx);
+            fmpz_mpoly_inflate(g, g, shifts, strides, ctx);
 
-          result = (ok1 == 0 || fmpz_mpoly_equal(f, k, ctx));
+            ok1 = fmpz_mpoly_divides_monagan_pearce(h, f, g, ctx);
+            fmpz_mpoly_assert_canonical(h, ctx);
 
-          if (!result)
-          {
-             printf("FAIL\n");
-             flint_printf("Check random polys don't divide\ni = %wd, j = %wd\n", i ,j);
-             flint_abort();
-          }
-       }
+            if (ok1 == 0)
+                continue;
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
-       fmpz_mpoly_ctx_clear(ctx);
+            fmpz_mpoly_mul_johnson(k, h, g, ctx);
+            fmpz_mpoly_assert_canonical(k, ctx);
+            result = fmpz_mpoly_equal(f, k, ctx);
+
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check random polys don't divide\ni = %wd, j = %wd\n", i ,j);
+                flint_abort();
+            }
+        }
+
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            fmpz_clear(shifts + j);
+            fmpz_clear(strides + j);
+        }
+        flint_free(shifts);
+        flint_free(strides);
+
+        fmpz_mpoly_clear(f, ctx);  
+        fmpz_mpoly_clear(g, ctx);  
+        fmpz_mpoly_clear(h, ctx);  
+        fmpz_mpoly_clear(k, ctx);  
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing first argument, exact division */
@@ -181,7 +203,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
 
@@ -295,7 +317,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
 

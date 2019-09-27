@@ -96,13 +96,13 @@ TEMPLATE(T, poly_divrem_newton_n_preinv) (TEMPLATE(T, poly_t) Q,
 
     if (Q == A || Q == B || Q == Binv)
     {
-        _TEMPLATE(T, vec_clear) (Q->coeffs, lenA - lenB + 1, ctx);
+        _TEMPLATE(T, vec_clear) (Q->coeffs, Q->alloc, ctx);
         Q->coeffs = q;
         Q->alloc = lenA - lenB + 1;
     }
     if (R == A || R == B || R == Binv)
     {
-        _TEMPLATE(T, vec_clear) (R->coeffs, lenB - 1, ctx);
+        _TEMPLATE(T, vec_clear) (R->coeffs, R->alloc, ctx);
         R->coeffs = r;
         R->alloc = lenB - 1;
     }

@@ -22,7 +22,9 @@ void _qadic_trace(fmpz_t rop, const fmpz *op, slong len,
     t = _fmpz_vec_init(d);
 
     fmpz_set_ui(t + 0, d);
-    for (i = 1; i < d; i++)
+    for (i = 1; i < len; i++)  /* simple Newton identities to                    */
+                               /* compute power sums = traces of basis elements  */
+                               /* we don't need them past len                    */
     {
         for (l = lena - 2; l >= 0 && j[l] >= d - (i - 1); l--)
         {
@@ -39,7 +41,7 @@ void _qadic_trace(fmpz_t rop, const fmpz *op, slong len,
     }
 
     fmpz_zero(rop);
-    for (i = 0; i < d; i++)
+    for (i = 0; i < len; i++)
     {
         fmpz_addmul(rop, op + i, t + i);
     }

@@ -4,18 +4,36 @@ include(CheckIPOSupported)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckPrototypeDefinition)
+include(CheckCCompilerFlag)
+include(CheckLibraryExists)
 include(TestBigEndian)
 
-project(flint C)
+project(flint LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+   set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build" FORCE)
+   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+option(BUILD_SHARED_LIBS "Build shared libs" on)
+option(WITH_NTL "Build with NTL or not" off)
+
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
+if (WITH_NTL)
+    find_package(NTL REQUIRED)
+endif()
 find_package(PythonInterp REQUIRED)
 
 if(MSVC)
     find_package(PThreads REQUIRED)
+else()
+    option(CMAKE_THREAD_PREFER_PTHREAD "Prefer pthreads" yes)
+    option(THREADS_PREFER_PTHREAD_FLAG "Prefer -pthread flag" yes)
+    find_package(Threads REQUIRED)
+    set(PThreads_LIBRARIES Threads::Threads)
 endif()
 
 # Find sources
@@ -28,9 +46,10 @@ set(BUILD_DIRS
     fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve 
     double_extras d_vec d_mat padic_poly padic_mat qadic  
     fq fq_vec fq_mat fq_poly fq_poly_factor
-    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor 
+    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_mpoly fq_nmod_poly_factor 
     fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor 
-    mpoly fmpz_mpoly nmod_mpoly fmpq_mpoly
+    fmpz_mod mpoly fmpz_mpoly nmod_mpoly fmpq_mpoly thread_pool
+    flintxx
 )
 
 set(TEMPLATE_DIRS
@@ -43,6 +62,10 @@ set(SOURCES
     memory_manager.c version.c profiler.c thread_support.c exception.c
     hashmap.c inlines.c fmpz/fmpz.c
 )
+
+if (WITH_NTL)
+    list(APPEND SOURCES interfaces/NTL-interface.cpp)
+endif()
 
 set(HEADERS
     NTL-interface.h flint.h longlong.h config.h gmpcompat.h fft_tuning.h
@@ -62,7 +85,7 @@ execute_process(
 from os.path import join
 
 with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
-    with open('CPimport.h', 'w+') as fout:
+    with open('CPimport.h.in', 'w+') as fout:
         while True:
             l = fin.readline()
             if not l:
@@ -73,6 +96,7 @@ with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
 "
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+configure_file(${CMAKE_BINARY_DIR}/CPimport.h.in ${CMAKE_BINARY_DIR}/CPimport.h COPYONLY)
 
 # Configuration checks
 test_big_endian(HAVE_BIG_ENDIAN)
@@ -126,14 +150,26 @@ check_function_exists(getpagesize HAVE_GETPAGESIZE)
 check_function_exists(getrusage HAVE_GETRUSAGE)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 
+check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
+check_c_compiler_flag("-funroll-loops" HAS_FLAG_UNROLL_LOOPS)
+
+check_library_exists(${PThreads_LIBRARIES} pthread_getaffinity_np "" HAVE_CPU_SET_T)
+
+set(HAVE_TLS ON CACHE BOOL "Use thread local storage.")
+
+set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
+set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
+
+if(MEMORY_MANAGER STREQUAL "reentrant")
+	set(FLINT_REENTRANT ON)
+else()
+	set(FLINT_REENTRANT OFF)
+endif()
 
 configure_file(
     config.h.in
     config.h
 )
-
-set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
-set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
 
 configure_file(
     fmpz-conversions-${MEMORY_MANAGER}.in
@@ -176,8 +212,8 @@ file(GLOB TEMP "${CMAKE_SOURCE_DIR}/*.h")
 list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
-target_link_libraries(flint 
-    ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES}
+target_link_libraries(flint PUBLIC
+    ${NTL_LIBRARY} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
 )
 
 # Include directories
@@ -185,13 +221,23 @@ target_link_libraries(flint
 target_include_directories(flint PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR} ${GMP_INCLUDE_DIRS} ${MPFR_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR} ${PThreads_INCLUDE_DIRS}
+    ${NTL_INCLUDE_DIR}
 )
 
 
-if(BUILD_SHARED_LIBS AND MSVC)
-    target_compile_definitions(flint PRIVATE "MSC_BUILD_DLL")
+if(BUILD_SHARED_LIBS AND WIN32)
+    # Export flint's functions
+    target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
+    # Use MPIR's dll import functions
+    target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
 endif()
 
+if (HAS_FLAG_MPOPCNT)
+    target_compile_options(flint PUBLIC "-mpopcnt")
+endif()
+if (HAS_FLAG_UNROLL_LOOPS)
+    target_compile_options(flint PUBLIC "-funroll-loops")
+endif()
 
 if(NOT DEFINED IPO_SUPPORTED)
     message(STATUS "Checking for IPO")
@@ -209,7 +255,7 @@ if(IPO_SUPPORTED)
 endif()
 
 if(NOT MSVC)
-    target_link_libraries(flint m)
+	target_link_libraries(flint PUBLIC m)
 endif()
 
 install(TARGETS flint
@@ -227,13 +273,6 @@ set_target_properties(flint
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-if(MSVC)
-    set_target_properties(flint
-        PROPERTIES
-        LINK_FLAGS "/EXPORT:__flint_clz_tab /EXPORT:flint_primes_small"
-    )
-endif()
-
 if(BUILD_TESTING)
     enable_testing()
     add_library(test_helpers STATIC test_helpers.c)
@@ -248,7 +287,6 @@ if(BUILD_TESTING)
             add_executable(${test_name} ${test_file})
             target_link_libraries(${test_name}
                 flint test_helpers
-                ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${PThreads_LIBRARIES}
             )
 
             add_test(

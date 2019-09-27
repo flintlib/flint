@@ -51,7 +51,7 @@ typedef struct
 {
    mp_ptr dinv;
    slong n;
-   mp_bitcnt_t norm;
+   flint_bitcnt_t norm;
 } fmpz_preinvn_struct;
 
 typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
@@ -167,29 +167,46 @@ void fmpz_init_set_si(fmpz_t f, slong g)
 FMPZ_INLINE
 void fmpz_clear(fmpz_t f)
 {
-	_fmpz_demote(f);
+    if (COEFF_IS_MPZ(*f))
+        _fmpz_clear_mpz(*f);
 }
 
-FLINT_DLL void fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
 
 FLINT_DLL void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m);
 
-FLINT_DLL void fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
 
-FLINT_DLL void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
 
 FLINT_DLL void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m);
 
 FLINT_DLL void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m);
 
 FLINT_DLL void fmpz_randprime(fmpz_t f, flint_rand_t state, 
-                              mp_bitcnt_t bits, int proved);
+                              flint_bitcnt_t bits, int proved);
 
 FLINT_DLL slong fmpz_get_si(const fmpz_t f);
 
 FLINT_DLL ulong fmpz_get_ui(const fmpz_t f);
+
+FMPZ_INLINE void
+fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+    {
+        *low = *f;
+        *hi  = 0;
+    }
+    else
+    {
+        __mpz_struct * mpz = COEFF_TO_PTR(*f);
+        *low = mpz->_mp_d[0];
+        *hi  = mpz->_mp_size == 2 ? mpz->_mp_d[1] : 0;
+    }
+}
 
 FMPZ_INLINE void
 fmpz_set_si(fmpz_t f, slong val)
@@ -420,9 +437,9 @@ FLINT_DLL mp_size_t fmpz_size(const fmpz_t f);
 
 FLINT_DLL int fmpz_sgn(const fmpz_t f);
 
-FLINT_DLL mp_bitcnt_t fmpz_bits(const fmpz_t f);
+FLINT_DLL flint_bitcnt_t fmpz_bits(const fmpz_t f);
 
-FLINT_DLL mp_bitcnt_t fmpz_val2(const fmpz_t x);
+FLINT_DLL flint_bitcnt_t fmpz_val2(const fmpz_t x);
 
 FMPZ_INLINE void
 fmpz_neg(fmpz_t f1, const fmpz_t f2)
@@ -467,7 +484,13 @@ FLINT_DLL void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+FLINT_DLL void fmpz_fmma(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d);
+
+FLINT_DLL void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d);
+
 FLINT_DLL void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp);
+
+FLINT_DLL void fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e);
 
 FLINT_DLL void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
 
@@ -489,7 +512,7 @@ FLINT_DLL void fmpz_or(fmpz_t r, const fmpz_t a, const fmpz_t b);
 
 FLINT_DLL void fmpz_xor(fmpz_t r, const fmpz_t a, const fmpz_t b);
 
-FLINT_DLL mp_bitcnt_t fmpz_popcnt(const fmpz_t c);
+FLINT_DLL flint_bitcnt_t fmpz_popcnt(const fmpz_t c);
 
 FLINT_DLL double fmpz_dlog(const fmpz_t x);
 FLINT_DLL slong fmpz_flog(const fmpz_t x, const fmpz_t b);
@@ -650,22 +673,20 @@ FLINT_DLL void fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong n);
 
 FLINT_DLL void fmpz_rfac_uiui(fmpz_t r, ulong x, ulong n);
 
-FLINT_DLL int fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits, 
+FLINT_DLL int fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits, 
                   const fmpz_t coeff, int negate, int borrow);
 
-FLINT_DLL int fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift, 
-                    mp_bitcnt_t bits, int negate, int borrow);
+FLINT_DLL int fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift, 
+                    flint_bitcnt_t bits, int negate, int borrow);
 
 FLINT_DLL void fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr, 
-                              mp_bitcnt_t shift, mp_bitcnt_t bits);
+                              flint_bitcnt_t shift, flint_bitcnt_t bits);
+
+/* crt ***********************************************************************/
 
 FLINT_DLL void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c,
         int sign);
-
-FLINT_DLL void _fmpz_CRT_ui_signed_precomp(fmpz_t out, const fmpz_t r1,
-        const fmpz_t m1, ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2,
-        const fmpz_t halfm1m2, mp_limb_t c);
 
 FLINT_DLL void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, int sign);
@@ -717,6 +738,61 @@ FMPZ_INLINE void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
     else
         fmpz_set_si(f, x - m);
 }
+
+/* instructions do A = B + I*(C - B) mod M */
+typedef struct
+{
+    slong a_idx; /* index of A */
+    slong b_idx; /* index of B */
+    slong c_idx; /* index of C */
+    fmpz_t idem;     /* I */
+    fmpz_t modulus;  /* M */
+} _fmpz_multi_crt_prog_instr;
+
+typedef struct
+{
+    _fmpz_multi_crt_prog_instr * prog; /* straight line program */
+    slong length; /* length of prog */
+    slong alloc;  /* alloc of prog */
+    slong localsize; /* length of outputs required in nmod_poly_crt_run */
+    slong temp1loc; /* index of temporary used in run */
+    slong temp2loc; /* index of another tempory used in run */
+    int good;   /* the moduli are good for CRT, essentially relatively prime */
+} fmpz_multi_crt_struct;
+
+typedef fmpz_multi_crt_struct fmpz_multi_crt_t[1];
+
+FLINT_DLL void fmpz_multi_crt_init(fmpz_multi_crt_t CRT);
+
+FLINT_DLL int fmpz_multi_crt_precompute(fmpz_multi_crt_t CRT,
+                                               const fmpz * moduli, slong len);
+
+FLINT_DLL int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT,
+                                       const fmpz * const * moduli, slong len);
+
+FLINT_DLL void fmpz_multi_crt_precomp(fmpz_t output, const fmpz_multi_crt_t P,
+                                                          const fmpz * inputs);
+
+FLINT_DLL void fmpz_multi_crt_precomp_p(fmpz_t output,
+                        const fmpz_multi_crt_t P, const fmpz * const * inputs);
+
+FLINT_DLL int fmpz_multi_crt(fmpz_t output, const fmpz * moduli,
+                                               const fmpz * values, slong len);
+
+FLINT_DLL void fmpz_multi_crt_clear(fmpz_multi_crt_t P);
+
+FMPZ_INLINE slong _fmpz_multi_crt_local_size(const fmpz_multi_crt_t CRT)
+{
+    return CRT->localsize;
+}
+
+FLINT_DLL void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT,
+                                                          const fmpz * inputs);
+
+FLINT_DLL void _fmpz_multi_crt_run_p(fmpz * outputs,
+                      const fmpz_multi_crt_t CRT, const fmpz * const * inputs);
+
+/*****************************************************************************/
 
 FLINT_DLL mp_limb_t fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits);
 
@@ -787,6 +863,16 @@ FLINT_DLL void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 FLINT_DLL int fmpz_moebius_mu(const fmpz_t n);
 
 FLINT_DLL void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
+
+/* Functions that should be in ulong extras */
+
+FLINT_DLL ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp,
+                                                          ulong n, ulong ninv);
+
+FMPZ_INLINE mp_limb_t nmod_pow_fmpz(mp_limb_t a, const fmpz_t exp, nmod_t mod)
+{
+    return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
+}
 
 #ifdef __cplusplus
 }

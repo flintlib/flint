@@ -17,5 +17,5 @@ void fmpq_mpoly_derivative(fmpq_mpoly_t poly1, const fmpq_mpoly_t poly2,
 {
     fmpz_mpoly_derivative(poly1->zpoly, poly2->zpoly, var, ctx->zctx);
     fmpq_set(poly1->content, poly2->content);
-    fmpq_mpoly_canonicalise(poly1, ctx);
+    fmpq_mpoly_reduce(poly1, ctx);
 }

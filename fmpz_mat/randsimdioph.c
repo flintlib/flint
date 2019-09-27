@@ -14,7 +14,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, flint_bitcnt_t bits2)
 {
     const slong c = mat->c, r = mat->r;
 

@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2017 William Hart
     Copyright (C) 2017 Daniel Schultz
 
     This file is part of FLINT.
@@ -9,13 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "longlong.h"
-#include "assert.h"
 
 /*
    Set poly1 to poly2/poly3 if the division is exact, and return the length
@@ -46,7 +41,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
     ulong acc_sm[3];
     int lt_divides, small;
     slong bits2, bits3;
-    ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
+    ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     TMP_INIT;
 
     TMP_START;
@@ -90,12 +85,14 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
     x->next = NULL;
     HEAP_ASSIGN(heap[1], exp2[0], x);
 
-    /* precompute leading cofficient info assuming "small" case */
-    lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN_EXT(poly3[0]);
-    count_leading_zeros(lc_norm, lc_abs);
-    lc_n = lc_abs << lc_norm;
-    invert_limb(lc_i, lc_n);
+    if (small)
+    {
+        lc_abs = FLINT_ABS(poly3[0]);
+        lc_sign = FLINT_SIGN_EXT(poly3[0]);
+        count_leading_zeros(lc_norm, lc_abs);
+        lc_n = lc_abs << lc_norm;
+        invert_limb(lc_i, lc_n);
+    }
 
     while (heap_len > 1)
     {
@@ -299,7 +296,7 @@ not_exact_division:
 
 slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-       const fmpz * poly3, const ulong * exp3, slong len3, mp_bitcnt_t bits, slong N,
+       const fmpz * poly3, const ulong * exp3, slong len3, flint_bitcnt_t bits, slong N,
                                                          const ulong * cmpmask)
 {
     slong i, j, k, s;
@@ -320,7 +317,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     slong * hind;
     int lt_divides, small;
     slong bits2, bits3;
-    ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
+    ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     TMP_INIT;
 
     /* if exponent vectors are all one word, call specialised version */
@@ -380,12 +377,14 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, exp2, N);
 
-    /* precompute leading cofficient info assuming "small" case */
-    lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN_EXT(poly3[0]);
-    count_leading_zeros(lc_norm, lc_abs);
-    lc_n = lc_abs << lc_norm;
-    invert_limb(lc_i, lc_n);
+    if (small)
+    {
+        lc_abs = FLINT_ABS(poly3[0]);
+        lc_sign = FLINT_SIGN_EXT(poly3[0]);
+        count_leading_zeros(lc_norm, lc_abs);
+        lc_n = lc_abs << lc_norm;
+        invert_limb(lc_i, lc_n);
+    }
 
     while (heap_len > 1)
     {
@@ -467,9 +466,8 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                     x->j = j + 1;
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             } else
             {
@@ -485,13 +483,14 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                     hind[x->i] = 2*(x->j + 1) + 0;
 
                     if (bits <= FLINT_BITS)
-                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
+                                                               e1 + x->j*N, N);
                     else
-                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);                        
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                               e1 + x->j*N, N);                        
 
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
                 /* should we go up? */
                 if (j + 1 == k)
@@ -508,13 +507,14 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                     hind[x->i] = 2*(x->j + 1) + 0;
 
                     if (bits <= FLINT_BITS)
-                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
+                                                               e1 + x->j*N, N);
                     else
-                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                               e1 + x->j*N, N);
 
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
@@ -545,8 +545,9 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 if ((qq & (WORD(3) << (FLINT_BITS - 2))) == WORD(0))
                 {
                     _fmpz_demote(p1 + k);
-                    p1[k] = (qq^ds^lc_sign) - (ds^lc_sign);
-                } else
+                    p1[k] = (qq^(ds^lc_sign)) - (ds^lc_sign);
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_ui(p1 + k, qq);
@@ -575,7 +576,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
         }
 
         if (!lt_divides ||
-                mpoly_monomial_gt(exp, exp2 + (len2 - 1)*N, N, cmpmask))
+                mpoly_monomial_gt(exp2 + (len2 - 1)*N, exp, N, cmpmask))
             goto not_exact_division;
 
         if (s > 1)
@@ -588,13 +589,14 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             hind[x->i] = 2*(x->j + 1) + 0;
 
             if (bits <= FLINT_BITS)
-                mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+                mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
+                                                               e1 + x->j*N, N);
             else
-                mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N);
+                mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                               e1 + x->j*N, N);
 
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, cmpmask))
-                exp_next--;
+            exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
         }
         s = 1;      
     }
@@ -626,7 +628,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, N, len = 0;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     fmpz * max_fields2, * max_fields3;
     ulong * cmpmask;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;

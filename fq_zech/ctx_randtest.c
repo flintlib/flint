@@ -27,7 +27,7 @@ fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state)
 
     fmpz_init(p);
     fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 4), 1));
-    max_d = floor(log(n_pow(2, 16)) / log(fmpz_get_ui(p)));
+    max_d = floor(log(n_pow(2, 15)) / log(fmpz_get_ui(p)));
     d = n_randint(state, max_d - 1) + 2;
     fq_nmod_ctx_init(fq_nmod_ctx, p, d, "a");
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);

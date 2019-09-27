@@ -23,10 +23,10 @@ void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    mp_size_t off, depth = 6;
    mp_size_t w = 1;
    mp_size_t n = ((mp_size_t) 1 << depth);
-   mp_bitcnt_t bits = (n*w - (depth+1))/2;
+   flint_bitcnt_t bits = (n*w - (depth+1))/2;
 
-   mp_bitcnt_t bits1 = n1*FLINT_BITS;
-   mp_bitcnt_t bits2 = n2*FLINT_BITS;
+   flint_bitcnt_t bits1 = n1*FLINT_BITS;
+   flint_bitcnt_t bits2 = n2*FLINT_BITS;
 
    mp_size_t j1 = (bits1 - 1)/bits + 1;
    mp_size_t j2 = (bits2 - 1)/bits + 1;

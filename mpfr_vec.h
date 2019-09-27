@@ -25,7 +25,7 @@
  extern "C" {
 #endif
 
-FLINT_DLL mpfr * _mpfr_vec_init(slong length, mp_bitcnt_t prec);
+FLINT_DLL mpfr * _mpfr_vec_init(slong length, flint_bitcnt_t prec);
 
 FLINT_DLL void _mpfr_vec_clear(mpfr * vec, slong length);
 
@@ -39,7 +39,7 @@ FLINT_DLL int _mpfr_vec_equal(const mpfr * vec1, const mpfr * vec2, slong len);
 
 FLINT_DLL void _mpfr_vec_add(mpfr * res, const mpfr * vec1, const mpfr * vec2, slong length);
 
-FLINT_DLL void _mpfr_vec_scalar_mul_2exp(mpfr * res, const mpfr * vec, slong length, mp_bitcnt_t exp);
+FLINT_DLL void _mpfr_vec_scalar_mul_2exp(mpfr * res, const mpfr * vec, slong length, flint_bitcnt_t exp);
 
 FLINT_DLL void _mpfr_vec_scalar_mul_mpfr(mpfr * res, const mpfr * vec, slong length, mpfr_t c);
 

@@ -30,7 +30,7 @@ main(void)
         fmpz ** exp;
         fmpq_t cm, ce, q;
         slong nvars, len;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 20);
         fmpq_mpoly_init(f, ctx);
@@ -70,7 +70,7 @@ main(void)
         /* check all monomials in f */
         for (j = 0; j < fmpq_mpoly_length(f, ctx); j++)
         {
-            fmpq_mpoly_get_termexp_fmpz(exp, f, j, ctx);
+            fmpq_mpoly_get_term_exp_fmpz(exp, f, j, ctx);
 
             fmpq_mpoly_zero(m, ctx);
             fmpq_mpoly_set_coeff_fmpq_fmpz(m, q, exp, ctx);

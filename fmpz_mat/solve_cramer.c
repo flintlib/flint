@@ -26,14 +26,9 @@ _fmpz_mat_solve_cramer_3x3(fmpz_mat_t X, fmpz_t den,
     fmpz_init(t16);
     fmpz_init(t17);
 
-    fmpz_mul(t17, AA(1,0), AA(2,1));
-    fmpz_submul(t17, AA(1,1), AA(2,0));
-
-    fmpz_mul(t16, AA(1,2), AA(2,0));
-    fmpz_submul(t16, AA(1,0), AA(2,2));
-
-    fmpz_mul(t15, AA(1,1), AA(2,2));
-    fmpz_submul(t15, AA(1,2), AA(2,1));
+    fmpz_fmms(t17, AA(1,0), AA(2,1), AA(1,1), AA(2,0));
+    fmpz_fmms(t16, AA(1,2), AA(2,0), AA(1,0), AA(2,2));
+    fmpz_fmms(t15, AA(1,1), AA(2,2), AA(1,2), AA(2,1));
 
     fmpz_mul   (den, t15, AA(0,0));
     fmpz_addmul(den, t16, AA(0,1));
@@ -55,14 +50,9 @@ _fmpz_mat_solve_cramer_3x3(fmpz_mat_t X, fmpz_t den,
 
         for (i = 0; i < n; i++)
         {
-            fmpz_mul(t14, AA(2,0), BB(1,i));
-            fmpz_submul(t14, AA(1,0), BB(2,i));
-
-            fmpz_mul(t13, AA(2,1), BB(1,i));
-            fmpz_submul(t13, AA(1,1), BB(2,i));
-
-            fmpz_mul(t12, AA(2,2), BB(1,i));
-            fmpz_submul(t12, AA(1,2), BB(2,i));
+            fmpz_fmms(t14, AA(2,0), BB(1,i), AA(1,0), BB(2,i));
+            fmpz_fmms(t13, AA(2,1), BB(1,i), AA(1,1), BB(2,i));
+            fmpz_fmms(t12, AA(2,2), BB(1,i), AA(1,2), BB(2,i));
 
             fmpz_mul   (x0, t15, BB(0,i));
             fmpz_addmul(x0, t13, AA(0,2));
@@ -122,7 +112,8 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
     {
         fmpz_t t, u;
 
-        _fmpz_mat_det_cofactor_2x2(den, A->rows);
+        fmpz_fmms(den, fmpz_mat_entry(A, 0, 0), fmpz_mat_entry(A, 1, 1),
+                       fmpz_mat_entry(A, 0, 1), fmpz_mat_entry(A, 1, 0));
 
         if (fmpz_is_zero(den))
             return 0;
@@ -132,11 +123,10 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
 
         for (i = 0; i < fmpz_mat_ncols(B); i++)
         {
-            fmpz_mul   (t, fmpz_mat_entry(A, 1, 1), fmpz_mat_entry(B, 0, i));
-            fmpz_submul(t, fmpz_mat_entry(A, 0, 1), fmpz_mat_entry(B, 1, i));
-            fmpz_mul   (u, fmpz_mat_entry(A, 0, 0), fmpz_mat_entry(B, 1, i));
-            fmpz_submul(u, fmpz_mat_entry(A, 1, 0), fmpz_mat_entry(B, 0, i));
-
+            fmpz_fmms(t, fmpz_mat_entry(A, 1, 1), fmpz_mat_entry(B, 0, i),
+                         fmpz_mat_entry(A, 0, 1), fmpz_mat_entry(B, 1, i));
+            fmpz_fmms(u, fmpz_mat_entry(A, 0, 0), fmpz_mat_entry(B, 1, i),
+                         fmpz_mat_entry(A, 1, 0), fmpz_mat_entry(B, 0, i));
             fmpz_swap(fmpz_mat_entry(X, 0, i), t);
             fmpz_swap(fmpz_mat_entry(X, 1, i), u);
         }

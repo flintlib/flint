@@ -28,6 +28,7 @@ unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
     while (fmpz_is_zero(power) == 0)
     {
         unity_zpq temp_pow;
+
         fmpz_fdiv_r_2exp(rem, power, 1);
         if (fmpz_is_zero(rem) == 0)
         {
@@ -58,9 +59,11 @@ void
 unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow)
 {
     fmpz_t p;
+
     fmpz_init_set_ui(p, pow);
+
     unity_zpq_pow(f, g, p);
+
     fmpz_clear(p);
 }
-
 

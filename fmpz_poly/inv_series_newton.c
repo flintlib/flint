@@ -27,7 +27,7 @@ _fmpz_poly_inv_series_basecase_rev(fmpz * Qinv, fmpz * W,
     _fmpz_poly_reverse(Qrev, Q, Qlen, Qlen);
     _fmpz_vec_zero(W, Wlen - 1);
     fmpz_one(W + Wlen - 1);
-    _fmpz_poly_div_basecase(Qinv, W, W, Wlen, Qrev, Qlen);
+    _fmpz_poly_div_basecase(Qinv, W, W, Wlen, Qrev, Qlen, 0);
     _fmpz_poly_reverse(Qinv, Qinv, n, n);
 }
 

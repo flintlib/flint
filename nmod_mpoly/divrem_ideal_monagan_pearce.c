@@ -313,13 +313,24 @@ slong _nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** polyq,
     /* precompute leading coeff info */
     lc_minus_inv = (mp_limb_t *) TMP_ALLOC(len*sizeof(mp_limb_t));
     for (w = 0; w < len; w++)
-        lc_minus_inv[w] = ctx->ffinfo->mod.n - nmod_inv(poly3[w]->coeffs[0], ctx->ffinfo->mod);
+    {
+        lc_minus_inv[w] = ctx->ffinfo->mod.n
+                             - nmod_inv(poly3[w]->coeffs[0], ctx->ffinfo->mod);
+    }
 
     while (heap_len > 1)
     {
         mpoly_monomial_set(exp, heap[1].exp, N);
-        if (mpoly_monomial_overflows(exp, N, mask))
-            goto exp_overflow;
+        if (bits <= FLINT_BITS)
+        {
+            if (mpoly_monomial_overflows(exp, N, mask))
+                goto exp_overflow;
+        }
+        else
+        {
+            if (mpoly_monomial_overflows_mp(exp, N, bits))
+                goto exp_overflow;
+        }
 
         acc0 = acc1 = acc2 = 0;
         do
@@ -364,9 +375,8 @@ slong _nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** polyq,
                     x->p = p;
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                       exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             } else
             {
@@ -381,11 +391,10 @@ slong _nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** polyq,
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3[x->p] + x->i*N,
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[x->p] + x->i*N,
                                                 polyq[x->p]->exps + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
 
                 /* should we go up? */
@@ -402,11 +411,10 @@ slong _nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** polyq,
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3[x->p] + x->i*N,
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[x->p] + x->i*N,
                                                 polyq[x->p]->exps + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
@@ -416,7 +424,18 @@ slong _nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** polyq,
 
         for (w = 0; w < len; w++)
         {
-            if (mpoly_monomial_divides(texp, exp, exp3[w] + N*0, N, mask))
+            int divides;
+
+            if (bits <= FLINT_BITS)
+            {
+                divides = mpoly_monomial_divides(texp, exp, exp3[w] + N*0, N, mask);
+            }
+            else
+            {
+                divides = mpoly_monomial_divides_mp(texp, exp, exp3[w] + N*0, N, bits);
+            }
+
+            if (divides)
             {
                 nmod_mpoly_fit_length(polyq[w], q_len[w] + 1, ctx);
                 polyq[w]->coeffs[q_len[w]] = nmod_mul(acc0, lc_minus_inv[w], ctx->ffinfo->mod);
@@ -430,11 +449,10 @@ slong _nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** polyq,
                     x->p = w;
                     x->next = NULL;
                     hinds[w][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3[w] + N*x->i, 
-                                                    polyq[w]->exps + N*x->j, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                              &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[w] + N*x->i, 
+                                                       polyq[w]->exps + N*x->j, N);
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
                 s[w] = 1;
                 q_len[w]++;
@@ -491,10 +509,13 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t
     TMP_INIT;
 
     for (i = 0; i < len; i++)
-    {  
+    {
         len3 = FLINT_MAX(len3, poly3[i]->length);
         if (poly3[i]->length == 0)
-            flint_throw(FLINT_DIVZERO, "Divide by zero in nmod_mpoly_divrem_ideal_monagan_pearce");
+        {
+            flint_throw(FLINT_DIVZERO,
+                   "Divide by zero in nmod_mpoly_divrem_ideal_monagan_pearce");
+        }
     }
 
     /* dividend is zero, write out quotients and remainder */
@@ -515,9 +536,6 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t
     exp_bits = poly2->bits;
     for (i = 0; i < len; i++)
         exp_bits = FLINT_MAX(exp_bits, poly3[i]->bits);
-
-    if (exp_bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in nmod_mpoly_divrem_ideal_monagan_pearce");
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
@@ -553,7 +571,7 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t
     /* check leading mon. of at least one divisor is at most that of dividend */
     for (i = 0; i < len; i++)
     {
-        if (!mpoly_monomial_lt(exp3[i], exp2, N, cmpmask))
+        if (!mpoly_monomial_lt(exp2, exp3[i], N, cmpmask))
             break;
     }
 
@@ -582,7 +600,7 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t
     }
 
     /* do division with remainder */
-    while (exp_bits <= FLINT_BITS)
+    while (1)
     {
         slong old_exp_bits = exp_bits;
         ulong * old_exp2 = exp2, * old_exp3;
@@ -598,9 +616,6 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t
         N = mpoly_words_per_exp(exp_bits, ctx->minfo);
         cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
-
-        if (exp_bits > FLINT_BITS)
-            break;
 
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
         mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
@@ -631,9 +646,6 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t
             q[i]->bits = exp_bits;
         }
     }
-
-    if (lenr < 0)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in nmod_mpoly_divrem_ideal_monagan_pearce");
 
     /* take care of aliasing */
     if (r == poly2)

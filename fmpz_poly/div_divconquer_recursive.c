@@ -18,13 +18,14 @@
 
 #define FLINT_DIV_DIVCONQUER_CUTOFF  16
 
-void
+int
 _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
-                                    const fmpz * A, const fmpz * B, slong lenB)
+                         const fmpz * A, const fmpz * B, slong lenB, int exact)
 {
     if (lenB <= FLINT_DIV_DIVCONQUER_CUTOFF)
     {
-        _fmpz_poly_div_basecase(Q, temp, A, 2 * lenB - 1, B, lenB);
+        return _fmpz_poly_div_basecase(Q, temp,
+                                              A, 2 * lenB - 1, B, lenB, exact);
     }
     else
     {
@@ -48,7 +49,10 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
            {A + 2 n2, 2 n1 - 1} divided by {B + n2, n1}
          */
 
-        _fmpz_poly_divremlow_divconquer_recursive(q1, r1, A + 2 * n2, B + n2, n1);
+        if (!_fmpz_poly_divremlow_divconquer_recursive(q1, r1,
+                                                A + 2 * n2, B + n2, n1, exact))
+            return 0;
+
         _fmpz_vec_sub(r1, A + 2 * n2, r1, n1 - 1);
 
         /*
@@ -88,7 +92,9 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
 
         t += (lenB & WORD(1));
         
-        _fmpz_poly_div_divconquer_recursive(q0, temp + lenB, t, B + n1, n2);
+        return _fmpz_poly_div_divconquer_recursive(q0, temp + lenB,
+                                                         t, B + n1, n2, exact);
+            
     }
 }
 

@@ -33,19 +33,19 @@ int main(void)
         slong c1, c2, r1;
         mp_limb_t mod;
 
-        c1 = n_randint(state, 50);
-        c2 = n_randint(state, 50);
-        r1 = n_randint(state, 50);
+        c1 = n_randint(state, 10);
+        c2 = n_randint(state, 10);
+        r1 = n_randint(state, 10);
         mod = n_randtest_prime(state, 0);
 
         nmod_poly_mat_init(A, r1, c1, mod);
         nmod_poly_mat_init(B, r1, c2, mod);
         nmod_poly_mat_init(C, r1, c1 + c2, mod);
 
-        nmod_poly_mat_randtest(A, state, n_randint(state, 200) + 1);
-        nmod_poly_mat_randtest(B, state, n_randint(state, 200) + 1);
+        nmod_poly_mat_randtest(A, state, n_randint(state, 10) + 1);
+        nmod_poly_mat_randtest(B, state, n_randint(state, 10) + 1);
         
-        nmod_poly_mat_randtest(C, state, n_randint(state, 200) + 1);
+        nmod_poly_mat_randtest(C, state, n_randint(state, 10) + 1);
 
         nmod_poly_mat_concat_horizontal(C, A, B);
         

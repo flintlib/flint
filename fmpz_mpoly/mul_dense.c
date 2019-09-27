@@ -239,11 +239,12 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
 
 
 
-int fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
-                        const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+int _fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
+                                 const fmpz_mpoly_t A, fmpz * maxAfields,
+                                 const fmpz_mpoly_t B, fmpz * maxBfields,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    int success = 1;
+    int success, P_is_stolen;
     slong i;
     slong nvars = ctx->minfo->nvars;
     fmpz_mpolyd_t Ad, Bd, Pd;
@@ -251,33 +252,28 @@ int fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
     slong * Abounds, * Bbounds, * Pbounds;
     TMP_INIT;
 
-    if (A->length == 0 || B->length == 0)
-    {
-        fmpz_mpoly_zero(P, ctx);
-        return 1;
-    }
+    FLINT_ASSERT(A->length != 0);
+    FLINT_ASSERT(B->length != 0);
 
-    if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
-    {
-        return 0;
-    }
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
 
     TMP_START;
     /*
-        for each variable v except for the most significant variable,
+        for each variable v except for the outer variable,
         we need to pack to degree deg_v(A) + deg_v(A)
     */
     Abounds = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
     Bbounds = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
     Pbounds = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
-    mpoly_degrees_si(Abounds, A->exps, A->length, A->bits, ctx->minfo);
-    mpoly_degrees_si(Bbounds, B->exps, B->length, B->bits, ctx->minfo);
+    mpoly_get_monomial_ui_unpacked_ffmpz((ulong *)Abounds, maxAfields, ctx->minfo);
+    mpoly_get_monomial_ui_unpacked_ffmpz((ulong *)Bbounds, maxBfields, ctx->minfo);
     for (i = 0; i < ctx->minfo->nvars; i++)
     {
         Abounds[i] = Abounds[i] + 1;
         Bbounds[i] = Bbounds[i] + 1;
         Pbounds[i] = Abounds[i] + Bbounds[i] - 1;
-        if ((slong)(Abounds[i] | Bbounds[i] | Pbounds[i]) < 0)
+        if ((Abounds[i] | Bbounds[i] | Pbounds[i]) < 0)
         {
             goto failed_stage1;
         }
@@ -291,6 +287,7 @@ int fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
     fmpz_mpolyd_init(Ad, nvars);
     fmpz_mpolyd_init(Bd, nvars);
 
+    P_is_stolen = 0;
     if (P != A && P != B && P->alloc > 0)
     {
         /* we may steal the coeffs of P in this case to init Pd */
@@ -306,7 +303,9 @@ int fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
 
         P->coeffs = (fmpz *) flint_calloc(P->alloc, sizeof(fmpz));
 
-    } else
+        P_is_stolen = 1;
+    }
+    else
     {
         fmpz_mpolyd_init(Pd, ctx->minfo->nvars);
     }
@@ -355,6 +354,12 @@ done:
 failed_stage2:
     fmpz_mpolyd_clear(Ad);
     fmpz_mpolyd_clear(Bd);
+    if (P_is_stolen)
+    {
+        fmpz * t = Pd->coeffs;
+        Pd->coeffs = P->coeffs;
+        P->coeffs = t;
+    }
     fmpz_mpolyd_clear(Pd);
 
 failed_stage1:
@@ -362,3 +367,47 @@ failed_stage1:
     goto done;
 }
 
+
+
+int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                              const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+    int success;
+    fmpz * maxBfields, * maxCfields;
+    TMP_INIT;
+
+    if (B->length == 0 || C->length == 0)
+    {
+        fmpz_mpoly_zero(A, ctx);
+        return 1;
+    }
+
+    if (B->bits > FLINT_BITS || C->bits > FLINT_BITS)
+    {
+        return 0;
+    }
+
+    TMP_START;
+
+    maxBfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    maxCfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_init(maxBfields + i);
+        fmpz_init(maxCfields + i);
+    }
+    mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
+    mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
+
+    success = _fmpz_mpoly_mul_dense(A, B, maxBfields, C, maxCfields, ctx);
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(maxBfields + i);
+        fmpz_clear(maxCfields + i);
+    }
+
+    TMP_END;
+    return success;
+}

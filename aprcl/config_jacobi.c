@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 ulong
-_R_value(const fmpz_t n)
+aprcl_R_value(const fmpz_t n)
 {
     ulong bits = fmpz_bits(n);
 
@@ -57,10 +57,10 @@ _R_value(const fmpz_t n)
     if (bits <= 12713) return 1396755360;
 
     /* 2^5 * 3^3 * 5^2 * 7 * 11 * 13 * 17 * 19 */
-    return 6983776800;
+    return UWORD(6983776800);
 }
 
-void
+static void
 _config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 {
     ulong i, j, q;
@@ -135,39 +135,7 @@ _config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
     flint_free(w);
 }
 
-void
-_config_jacobi_reduce_s(aprcl_config conf, const fmpz_t n)
-{
-    slong i;
-    fmpz_t new_s, new_s2, p;
-
-    fmpz_init(p);
-    fmpz_init(new_s2);
-    fmpz_init_set(new_s, conf->s);
-
-    for (i = conf->qs->num - 1; i >= 0; i--)
-    {
-        fmpz_pow_ui(p, conf->qs->p + i, conf->qs->exp[i]);
-        fmpz_fdiv_q(new_s, conf->s, p);
-
-        fmpz_mul(new_s2, new_s, new_s);
-        if (fmpz_cmp(new_s2, n) > 0)
-        {
-            fmpz_set(conf->s, new_s);
-            conf->qs_used[i] = 0;
-        }
-        else
-        {
-            conf->qs_used[i] = 1;
-        }
-    }
-
-    fmpz_clear(p);
-    fmpz_clear(new_s2);
-    fmpz_clear(new_s);
-}
-
-void
+static void
 _config_jacobi_update(aprcl_config conf)
 {
     ulong prime = 2;
@@ -206,7 +174,7 @@ config_jacobi_init(aprcl_config conf, const fmpz_t n)
 {
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
-    conf->R = _R_value(n);
+    conf->R = aprcl_R_value(n);
     _config_jacobi_update(conf);
 
     n_factor_init(&conf->rs);
@@ -223,4 +191,3 @@ config_jacobi_clear(aprcl_config conf)
     fmpz_factor_clear(conf->qs);
     flint_free(conf->qs_used);
 }
-

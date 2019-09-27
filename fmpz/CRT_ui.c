@@ -22,80 +22,30 @@ _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2,
     ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c, int sign)
 {
     mp_limb_t r1mod, s;
-    fmpz_t r1normal;
     fmpz_t tmp;
 
     fmpz_init(tmp);
 
-    /* FIXME: assume r1 moved to [0, m1); add tests for this */
     if (fmpz_sgn(r1) < 0)
-    {
-        fmpz_init(r1normal);
-        fmpz_add(r1normal, r1, m1);
-    }
+        fmpz_add(tmp, r1, m1);
     else
-    {
-        *r1normal = *r1;
-    }
+        fmpz_set(tmp, r1);
 
-    r1mod = fmpz_fdiv_ui(r1normal, m2);
+    r1mod = fmpz_fdiv_ui(tmp, m2);
     s = n_submod(r2, r1mod, m2);
     s = n_mulmod2_preinv(s, c, m2, m2inv);
-    fmpz_mul_ui(tmp, m1, s);
-    fmpz_add(tmp, tmp, r1normal);
-
-    if (fmpz_sgn(r1) < 0)
-        fmpz_clear(r1normal);
+    fmpz_addmul_ui(tmp, m1, s);
 
     if (sign)
     {
         fmpz_sub(out, tmp, m1m2);
         if (fmpz_cmpabs(tmp, out) <= 0)
-            fmpz_set(out, tmp);
+            fmpz_swap(out, tmp);
     }
     else
     {
-        fmpz_set(out, tmp);
+        fmpz_swap(out, tmp);
     }
-
-    fmpz_clear(tmp);
-}
-
-void
-_fmpz_CRT_ui_signed_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
-        ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2,
-        const fmpz_t halfm1m2, mp_limb_t c)
-{
-    mp_limb_t r1mod, s;
-    fmpz_t r1normal;
-    fmpz_t tmp;
-
-    fmpz_init(tmp);
-
-    /* FIXME: assume r1 moved to [0, m1); add tests for this */
-    if (fmpz_sgn(r1) < 0)
-    {
-        fmpz_init(r1normal);
-        fmpz_add(r1normal, r1, m1);
-    }
-    else
-    {
-        *r1normal = *r1;
-    }
-
-    r1mod = fmpz_fdiv_ui(r1normal, m2);
-    s = n_submod(r2, r1mod, m2);
-    s = n_mulmod2_preinv(s, c, m2, m2inv);
-    fmpz_mul_ui(tmp, m1, s);
-    fmpz_add(tmp, tmp, r1normal);
-
-    if (fmpz_sgn(r1) < 0)
-        fmpz_clear(r1normal);
-
-    if (fmpz_cmpabs(tmp, halfm1m2) > 0)
-        fmpz_sub(out, tmp, m1m2);
-    else
-        fmpz_set(out, tmp);
 
     fmpz_clear(tmp);
 }

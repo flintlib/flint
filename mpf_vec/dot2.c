@@ -14,7 +14,7 @@
 
 int
 _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2,
-              mp_bitcnt_t prec)
+              flint_bitcnt_t prec)
 {
     slong i;
     int r = 0;

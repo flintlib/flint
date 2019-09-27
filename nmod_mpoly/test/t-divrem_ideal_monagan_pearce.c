@@ -77,8 +77,8 @@ main(void)
             darr[0] = g;
 
             nmod_mpoly_divrem_ideal_monagan_pearce(qarr, r, h, darr, 1, ctx);
-            nmod_mpoly_test(qarr[0], ctx);
-            nmod_mpoly_test(r, ctx);
+            nmod_mpoly_assert_canonical(qarr[0], ctx);
+            nmod_mpoly_assert_canonical(r, ctx);
 
             result = nmod_mpoly_equal(f, k, ctx);
 
@@ -160,10 +160,10 @@ main(void)
             nmod_mpoly_randtest_bound(k2, state, len, exp_bound, ctx);
 
             nmod_mpoly_divrem_ideal_monagan_pearce(qarr, r, f, darr, num, ctx);
-            nmod_mpoly_test(r, ctx);
+            nmod_mpoly_assert_canonical(r, ctx);
             for (w = 0; w < num; w++)
             {
-                nmod_mpoly_test(qarr[w], ctx);
+                nmod_mpoly_assert_canonical(qarr[w], ctx);
                 nmod_mpoly_remainder_strongtest(r, darr[w], ctx);
             }
 
@@ -262,10 +262,10 @@ main(void)
             nmod_mpoly_set(r, f, ctx);
 
             nmod_mpoly_divrem_ideal_monagan_pearce(qarr, f, f, darr, num, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
             for (w = 0; w < num; w++)
             {
-                nmod_mpoly_test(qarr[w], ctx);
+                nmod_mpoly_assert_canonical(qarr[w], ctx);
                 nmod_mpoly_remainder_strongtest(f, darr[w], ctx);
             }
 

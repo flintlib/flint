@@ -80,7 +80,9 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
 
    if (usize == 1)
    {
-      ulong r, r2, n = fmpz_get_ui(f);
+      ulong r = 0;
+      ulong r2;
+      ulong n = fmpz_get_ui(f);
  
       int exp = n_is_perfect_power(&r, n);
 

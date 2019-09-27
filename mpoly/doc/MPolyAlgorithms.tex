@@ -1,0 +1,411 @@
+\documentclass[12pt,reqno]{amsart}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{xtab}
+\usepackage{color}
+\usepackage{hyperref}
+
+
+\numberwithin{equation}{section}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{entry}[theorem]{Entry}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{algorithm}[theorem]{Algorithm}
+
+\addtolength{\textwidth}{1.0in}
+\addtolength{\hoffset}{-0.5in}
+%\addtolength{\textheight}{0.6in}
+%\addtolength{\voffset}{-0.3in}
+
+\newcommand\T{\rule{0pt}{4.0ex}}       % Top strut
+\newcommand\B{\rule[-2.5ex]{0pt}{0pt}} % Bottom strut
+
+\newcommand{\smat}[4] {(\begin{smallmatrix} #1 & #2 \\ #3 & #4 \end{smallmatrix} )}
+\newcommand{\mattt}[4]  { \left(\begin{array}{cc} #1 & #2 \\ #3 & #4 \end{array} \right)}
+\newcommand{\matto}[2]  { \left(\begin{array}{cc} #1 \\ #2 \end{array} \right)}
+\newcommand{\schar}[2] {( \begin{smallmatrix} #1 \\ #2 \end{smallmatrix})}
+
+\newcommand{\op}[1]  { \operatorname{ #1 }}
+\newcommand{\olbbH}[0]  { \overline{\mathbb{H}}}
+\newcommand{\olbbQ}[0]  { \overline{\mathbb{Q}}}
+\newcommand{\olG}[0]  { \overline{\Gamma}}
+\newcommand{\bbH}[0]  { \mathbb{H}}
+\newcommand{\bbC}[0]  { \mathbb{C}}
+\newcommand{\bbZ}[0]  { \mathbb{Z}}
+\newcommand{\bbF}[0]  { \mathbb{F}}
+\newcommand{\bbQ}[0]  { \mathbb{Q}}
+\newcommand{\bbR}[0]  { \mathbb{R}}
+\newcommand{\gok}[0]  { \mathfrak{k}}
+\newcommand{\goe}[0]  { \mathfrak{e}}
+\newcommand{\goR}[0]  { \mathfrak{R}}
+
+\title{Algorithms for Multivariate Polynomials}
+\author{Daniel Schultz}
+
+\begin{document}
+
+\begin{abstract}
+Algorithms for multivariate polynomials in flint are discussed.
+\end{abstract}
+
+
+\maketitle
+
+\section{Introduction}
+
+A polynomial $A \in R[x_1,\dots,x_n]$ is representation as a sums of terms
+\begin{equation*}
+A = t_1 + \cdots + t_a
+\end{equation*}
+where the terms are ordered as $t_1 > t_2 > \cdots > t_a$. The basic operations of addition and subtraction are then equivalent to a merge operation and run in time proportional to the sum of the input term counts.
+
+\section{Monomial Representation}
+
+The {\tt mpoly} module implements the low level packing and unpacking of exponents
+for multivariate polynomials. If the variables in the polynomial are, say,
+$x$, $y$ and $z$ with $x > y > z$ in the monomial ordering, then the monomial
+$x^a y^b z^c$ is represented as the array $\{a, b, c\}$ from the user's perspective.
+
+Polynomial exponents are stored in packed format. This means that monomials are
+actually stored as an array of integer 'fields' that may be packed within
+a machine word or across multiple machine words if needed.
+This facilitates basic operations on the monomials, and we make the following assumptions about
+the correspondence between the variables' exponents and the
+fields in the packing:
+
+\begin{enumerate}
+\item {The monomial ordering is a total ordering, i.e. 1 is the smallest.}
+\item{Multiplication of monomials corresponds to field-wise addition.}
+\item{Monomials can be compared by comparing their packed representation possibly with an xor mask on certain fields.}
+\item{The exponent of each variable is itself one of the fields.}
+\item{The fields are all non-negative.}
+\end{enumerate}
+
+For the three supported ordering {\tt ORD\_LEX}, {\tt ORD\_DEGLEX}, and {\tt ORD\_DEGREVLEX}, the
+monomial $x^a y^b z^c$ is converted into fields in the following ways (the
+least significant field is on the left, the most significant is on the right),
+and the comparison mask is shown below.
+
+\begin{verbatim}
+    ORD_LEX:         | c | b | a |         ( 3 fields)
+                      000 000 000
+
+    ORD_DEGLEX:      | c | b | a | a+b+c | ( 4 fields)
+                      000 000 000  00000
+
+    ORD_DEGREVLEX:   | a | b | c | a+b+c |  ( 4 fields)
+                      111 111 111 0000000
+\end{verbatim}
+
+If one wanted to support, for example, a block ordering which was {\tt ORD\_DEGLEX}
+in $x, y$ and {\tt ORD\_DEGREVLEX} in $z, w$ with $x>y>z>w$,
+the monomial $x^a y^b z^c w^d$ would need to be stored as
+
+\begin{verbatim}
+    | c | d | c+d | b | a | a+b |    (6 fields)
+     111 111 00000 000 000 00000
+\end{verbatim}
+
+No such interface is currently implemented.
+
+
+There is no limit to the size of the fields. The fields themselves are packed
+to a uniform bit width, usually denoted by {\tt bits} in the functions. This bit
+count should contain extra sign bit used for overflow detection. Thus, if the
+maximum field is $15$, then the fields only fit into a packing with {\tt bits >= 5}.
+The total number of machine words taken by an exponent packed into fields
+is usually denoted by {\tt N} in the code.
+
+If {\tt bits <= FLINT\_BITS} then precisely a maximum of {\tt floor(FLINT\_BITS/bits)}
+number of fields may be packed into a single word. Within a word, the packing
+is from low to high, and unused fields (as well as unused bits) at the top of
+the word are zero.
+
+\section{Multiplication}
+\subsection{Dense multiplication in $\bbZ[x_1,\dots,x_n]$ or $\bbZ_p[x_1,\dots,x_n]$}\
+
+Given $A(x_1,\dots,x_n), B(x_1,\dots,x_n) \in R[x_1,\dots,x_n]$, set $r_i = 1 + \op{deg}_{x_i}(a) + \op{deg}_{x_i}(b)$. The Kronecker substitution
+\begin{equation*}
+x_1 \to x, \quad x_2 \to x^{r_1}, \quad x_3 \to x^{r_1 r_2}, \quad \dots, \quad x_n \to x^{r_1 \cdots r_{n-1}}
+\end{equation*}
+gives two univariate polynomials to multiply in $\bbZ[x]$ or $\bbZ_p[x]$. This Kronecker substitution is chosen so that it can be reversed to find $A \cdot B \in R[x_1,\dots,x_n]$ from the univariate product. The flint functions {\tt \{nmod|fmpz\}\_mpoly\_mul\_\{dense|array\}} implement such techniques. The {\tt \{nmod|fmpz\}\_mpoly\_mul\_dense} functions use the ordinary polynomial multiplication functions {\tt \{nmod|fmpz\}\_poly\_mul} while {\tt \{nmod|fmpz\}\_mpoly\_mul\_array} use a multiply and accumulate technique that might be better for semi-sparse polynomials.
+
+
+\subsection{Sparse multiplication in $\bbZ[x_1,\dots,x_n]$ or $\bbZ_p[x_1,\dots,x_n]$}\
+
+Given $A = t_1 + \cdots + t_a, B = s_1 + \cdots + s_b, \in R[x_1,\dots,x_n]$, we need to calculate all products $t_i s_j$, sort them, and combine like terms. This is done using a heap in the functions {\tt \{nmod|fmpz\}\_mpoly\_mul\_johnson} as in \cite{Johnson}. The essential idea is to read off the product terms in order from a heap. The heap never needs to become too large if one uses the relations
+\begin{equation*}
+t_i s_j > t_{i+1} s_j, \quad t_i s_j > t_i s_{j+1}\text{.}
+\end{equation*}
+
+
+\section{Division}
+
+The techniques used for multiplication (Kronecker substitutions in the dense case and heaps in the sparse case) apply to division as well.
+
+
+\section{Powering}
+
+Implements a corrected version of an algorithm called FPS and incorrectly stated in \cite{FPS}. The basic idea is to map the problem to $R[x]$ via a Kronecker substitution and use a recursion for the coefficients of $f^k$ derived from
+\begin{equation*}
+f (f^k)' = k f' (f^k)\text{.}
+\end{equation*}
+Since solving for the coefficients of $f^k$ involves division, this requires some modification for $R=\bbZ_p$.
+
+
+
+\section{Interpolation}
+
+\subsection{Dense Newton Interpolation}
+
+\subsection{Sparse Zippel Interpolation}
+
+\subsection{Sparse Interpolation with the Berlekamp-Massey Algorithm}
+Since the presentation in \cite{BMAR} is overly complicated, incomplete, and presents incorrect code, it seems reasonable to review the Berlekamp-Massey Algorithm here. Given a formal power series
+\begin{equation*}
+\frac{a_1}{x} + \frac{a_2}{x^2} + \frac{a_3}{x^3} + \cdots\text{,} \quad a_i \in \bbF
+\end{equation*}
+vanishing at $x = \infty$ and the fact that this power series represents a rational function, we are interested in computing this rational function. The following theorem says that we can use the extended euclidean algorithm and stop when the first remainder of degree $<\frac{n}{2}$ is obtained.
+
+\begin{theorem}
+Suppose that
+\begin{equation*}
+\frac{a_1}{x} + \frac{a_2}{x^2} + \frac{a_3}{x^3} + \cdots = -\frac{\bar{u}}{\bar{v}}
+\end{equation*}
+for some $\bar{u}, \bar{v} \in \bbF[x]$ with $\op{deg}(\bar{u}) < \op{deg}(\bar{v}) \le \frac{n}{2}$. Suppose further that
+\begin{equation}
+\label{equ_bma1}
+u x^{n} + v (a_1 x^{n-1} + a_2 x^{n-2} + \cdots + a_{n-1} x + a_{n}) = r
+\end{equation}
+for some $u, v, r \in \bbF[x]$ with $\op{deg}(u) < \op{deg}(v) \le \frac{n}{2}$ and $\op{deg}(r) < \frac{n}{2}$ and $\op{deg}(r) < \op{deg}(v)$. Then,
+\begin{equation*}
+\frac{\bar{u}}{\bar{v}} = \frac{u}{v}\text{.}
+\end{equation*}
+\end{theorem}
+\begin{proof}
+Dividing both sides of \eqref{equ_bma1} by $v x^{n}$ shows that
+\begin{equation*}
+\frac{\bar{u}}{\bar{v}} = \frac{u}{v} + O \left( \frac{1}{x^{n+1}}\right)\text{,}
+\end{equation*}
+which, on account of the degree bounds $\op{deg}(\bar{v}), \op{deg}(v) \le \frac{n}{2}$, proves the equality.
+\end{proof}
+
+This reconstruction may be applied to reconstruct an $f(\xi) = c_1 \xi^{e_1} + \cdots + c_t \xi^{e_t} \in \bbF[\xi]$ from the sequence of evaluation points
+\begin{equation*}
+a_i = f(\alpha^{s+i-1})\text{,} \quad \alpha \neq 0, \quad s \in \bbZ\text{,}
+\end{equation*}
+for in this case we have
+\begin{equation*}
+\frac{a_1}{x} + \frac{a_2}{x^2} + \frac{a_3}{x^3} + \cdots = \frac{c_1\alpha^{e_1 s}}{x - \alpha^{e_1}} + \cdots + \frac{c_t\alpha^{e_t s}}{x - \alpha^{e_t}}\text{.}
+\end{equation*}
+If this rational function is known and the $e_i$ can be found, then $f$ is known as well.
+
+The main problem with this approach is that the term bound $t$ is not known in advance. The approach we take is to calculate the $v$ in \eqref{equ_bma1} for some $n$ points $a_1, \dots, a_{n}$. Then, we add another $m$ points to form the sequence $a_1, \dots, a_{n+m}$ and calculate the corresponding $v'$. If $v=v'$, then it is likely that $v$ is the correct denominator. The extent to which previous computations may be reused is addressed in Theorem \ref{thm_nm}. 
+We follow \cite{YAP} for the presentation of the half gcd. An elementary matrix is one of the form $\smat{0}{1}{1}{q}$ for $\deg(q) > 0$ and a regular matrix is a product of zero or more elementary matrices. The notation $U \overset{M}{\longrightarrow} V$ shall mean that $M$ is a regular matrix and $U=MV$. If $\deg(A)>\deg(B)$ then $\op{hgcd}(A,B)$ is defined (see \cite{YAP}) as the (unique) regular matrix $M$ such that
+\begin{gather*}
+\matto{A}{B} \overset{M}{\longrightarrow} \matto{C'}{D'}\text{,}\\
+\deg(C') \ge \frac{\deg(A)}{2} > \deg(D')\text{.}
+\end{gather*}
+
+\begin{theorem}
+\label{thm_correctness}
+Suppose that
+\begin{align*}
+\matto{A_0}{B_0} &\overset{M}{\longrightarrow} \matto{A_0'}{B_0'}\\
+\op{deg}(A_0') &> \deg(B_0')\\
+\op{deg}(A_0) &\le 2 \op{deg}(A_0')
+\end{align*}
+Then, for any $A_1$, $B_1$ with $\deg(A_1),\deg(B_1) < m$,
+\begin{align*}
+\matto{A_0 x^m + A_1}{B_0 x^m + B_1} &\overset{M}{\longrightarrow} \matto{A'}{B'}\\
+\op{deg}(A') &= m + \op{deg}(A_0')\\
+\op{deg}(B') &\le m + \op{max}( \deg(B_0'), \deg(A_0')-1)\\
+\op{deg}(B') &\le m + \op{max}( \deg(B_0'), \frac{\deg(A_0)}{2}-1)
+\end{align*}
+\end{theorem}
+\begin{proof}
+This is a trivial rearrangement of Lemma 1 in \cite{YAP}.
+\end{proof}
+
+\begin{theorem}
+\label{thm_nm}
+Suppose $\deg(s_n) < n$, $\deg(s_m) < m$ and
+\begin{gather*}
+\matto{x^n}{s_n} \overset{M}{\longrightarrow} \matto{r_0}{r_1}\\
+\deg(r_0) \ge \frac{n}{2} > \deg(r_1)
+\end{gather*}
+Then, a regular matrix $M'$ (and thus $r_0', r_1'$) such that
+\begin{gather*}
+\matto{x^{n+m}}{s_n x^m + s_m} \overset{M'}{\longrightarrow} \matto{r_0'}{r_1'}\\
+\deg(r_0') \ge \frac{n+m}{2} > \deg(r_1')
+\end{gather*}
+may be calculated as follows. Define $A', B'$ by
+\begin{equation*}
+\matto{x^{n+m}}{s_n x^m + s_m} \overset{M}{\longrightarrow} \matto{A'}{B'}
+\end{equation*}
+It will be the case that $\deg(A') \ge \frac{n+m}{2}$. If $\frac{n+m}{2} > \deg(B')$, return with $M'=M$. Otherwise set $C = B'$, $D = \op{rem}(A',B')$ and $q=\op{quo}(A',B')$. Define $k := n + m - \deg(C)$. It will be the case that $0 < k \le \deg(C)$. Return with
+\begin{equation*}
+M' = M \cdot \mattt{0}{1}{1}{q} \cdot \op{hgcd} \matto{\op{quo}(C,x^k)}{\op{quo}(D,x^k)}
+\end{equation*}
+\end{theorem}
+\begin{proof}
+By Theorem \ref{thm_correctness}, $\deg(A') = m + \deg(r_0) \ge m + \frac{n}{2} \ge \frac{n+m}{2}$. Now suppose $\frac{n+m}{2} \le \deg(B')$. Thus the assertion $k \le \deg(C)$ is proved. By Theorem \ref{thm_correctness}, $\deg(B') \le m + \max(\deg(r_1), \deg(r_0) - 1) < m + n$. Thus, the assertion $0 < k$ is proved. Finally, suppose
+\begin{gather*}
+\matto{C_0 := \op{quo}(C,x^k)}{D_0 := \op{quo}(D,x^k)} \overset{H}{\longrightarrow} \matto{C_0'}{D_0'}\text{,}\\
+\deg(C_0') \ge \frac{\deg(C_0)}{2} > \deg(D_0')\text{.}
+\end{gather*}
+If $C', D'$ are defined by
+\begin{equation*}
+\matto{C}{D} \overset{H}{\longrightarrow} \matto{C'}{D'}\text{,}
+\end{equation*}
+it suffices to prove that $\deg(C') \ge \frac{n+m}{2} > \deg(D')$. By Theorem \ref{thm_correctness},
+\begin{align*}
+\deg(C') &= k + \deg(C_0')\\
+		 &\ge k + \frac{\deg(C_0)}{2}\\
+		 &= k + \frac{\deg(C) - k}{2}\\
+		 &= \frac{n+m}{2}\text{.}
+\end{align*}
+Also by Theorem \ref{thm_correctness},
+\begin{align*}
+\deg(D') &\le k + \max(\deg(D_0'), \frac{\deg(C_0)}{2} - 1)\\
+		 & < k + \max(\frac{\deg(C_0)}{2}, \frac{\deg(C_0)}{2})\\
+		 &= \frac{n+m}{2}\text{.}
+\end{align*}
+\end{proof}
+
+
+
+\section{Greatest Common Divisor}
+
+\subsection{Dense GCD in $\bbZ_p[x_1,\dots,x_n]$}\
+Brown's algorithm \cite{Brown} is used here. This comes in two versions - a small prime version and a large prime version. These refer not to the size of the $p$'s involved, but rather to the field from which evaluation points are chosen: it can either be $\bbF_p$ or an extension of $\bbF_p$. The small prime version interpolates in each variable by choosing evaluation points from $\bbF_p$. If this fails, then the large prime method use interpolation in $\bbF_p/(f(x_n))[x_1,\dots,x_{n-1}]$, i.e. $\bbF_q[x_1,\dots,x_{n-1}]$, for sufficiently many irreducible $f(x) \in \bbZ_p[x]$. No explicit divisibility checks are performed because the cofactors are reconstructed along with the GCD.
+
+\subsection{Dense GCD in $\bbZ[x_1,\dots,x_n]$}\
+We simply reconstruct the GCD from its image in $\bbZ_p[x_1,\dots,x_n]$ for sufficiently many $p$. Only large $p$'s are used, and dense GCD's in $\bbZ_p[x_1,\dots,x_n]$ only use the small prime version. Each image GCD in $\bbZ_p$ is correct and Brown's coefficient bounds \cite{Brown} are used instead of a divisibility check.
+
+\subsection{Sparse GCD in $\bbZ_p[x_1,\dots,x_n]$}\
+Implements a corrected version of an algorithm incorrectly stated in \cite{SULING}. The following is a high level summary.
+
+\ \\
+{\tt nmod\_mpoly\_gcd\_zippel}($\bbZ_p[x_1,\dots,x_n]$, $n \ge 2$):\\
+\indent $\left[\begin{tabular}{l}
+split into $\bbZ_p[x_1,\dots,x_{n-1}][X]$\\
+call {\tt nmod\_mpolyu\_gcd\_zippel}
+\end{tabular}\right.$
+\ \\
+{\tt nmod\_mpolyu\_gcd\_zippel}($\bbZ_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
+\indent $\left[\begin{tabular}{l}
+remove content in $x_1,\dots,x_n$ from the GCD via {\tt nmod\_mpoly\_gcd\_zippel}\\
+call {\tt nmod\_mpolyu\_gcdm\_zippel}\\
+multiply the content back into the GCD
+\end{tabular}\right.$
+\ \\
+{\tt nmod\_mpolyu\_gcdm\_zippel}($\bbZ_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
+\indent $\left[\begin{tabular}{l}
+(the GCD is assumed to have no content w.r.t. $x_1,\dots,x_n$)\\
+call {\tt nmod\_mpolyu\_gcdp\_zippel} and return if succeeded\\
+(small primes have failed, try large primes now)\\
+choose an irreducible $f(x_n)\in \bbZ_p[x_n]$\\
+compute $F=$ GCD modulo $f(x_n)$ via {\tt fq\_nmod\_mpolyu\_gcdp\_zippel}\\
+($F$ is the correct gcd when the inputs are reduced modulo $f(x_n)$)\\
+For several new irreducibles $f(x_n)\in \bbZ_p[x_n]$, \\
+compute the GCD modulo $f(x_n)$ via {\tt nmod\_mpolyu\_gcds\_zippel} using $F$\\
+combine via CRT and check divisibility every time the interpolant stabilizes\\
+start over if the interpolant coefficients have exceeded the obvious degree bound in $x_n$
+\end{tabular}\right.$
+
+\ \\
+The four functions {\tt [fq\_]nmod\_mpoly\_gcd\{p|s\}\_zippel} may be summarized as follows. The ``p'' versions produce a correct gcd when the inputs have no content in $\bbF_q[x_1,\dots,x_n]$. The ``s'' versions are the heart of Zippel's sparse interpolation. When the prefix {\tt fq\_} is present, $q$ is a power of $p$, otherwise $q$ is $p$.
+
+\ \\
+{\tt [fq\_]nmod\_mpolyu\_gcdp\_zippel}($\bbF_q[x_1,\dots,x_n][X]$, $n \ge 1$):\\
+\indent $\left[\begin{tabular}{l}
+if the GCD has content w.r.t. $x_n$, fail\\
+pick an evaluation point $x_n \to \alpha$ for $\alpha \in \bbF_q$\\
+(1) call {\tt [fq\_]nmod\_mpolyu\_gcdp\_zippel} on the evaluated inputs in $\bbF_q[x_1,\dots,x_{n-1}][X]$\\
+record the form $f$ of the GCD obtained for step (2) below\\
+pick severial evaluation points $x_n \to \alpha$ for $\alpha \in \bbF_q$\\
+(2) call {\tt [fq\_]nmod\_mpoly\_gcds\_zippel} on the evaluated inputs in $\bbF_q[x_1,\dots,x_{n-1}][X]$\\
+combine the answer from (1) and the answers from (2) via dense interpolation in $x_n$\\
+check divisibility on the proposed GCD when the interpolation stabilizes 
+\end{tabular}\right.$
+\ \\
+{\tt [fq\_]nmod\_mpolyu\_gcds\_zippel}($\bbF_q[x_1,\dots,x_n][X]$, assumed form $f$):\\
+\indent $\left[\begin{tabular}{l}
+via evaluations of the form $(x_1,\dots,x_n) \to (\alpha_1,\dots,\alpha_n) \in \bbF_q^n$\\ and GCD computations in $\bbF_q[X]$, try to compute the coefficients \\of the assumed form $f$ to match the GCD of the inputs (up to scalar multiples in $\bbF_q$)
+\end{tabular}\right.$
+
+\ \\
+\subsection{Sparse GCD in $\bbZ[x_1,\dots,x_n]$}\
+Implements a corrected version of an algorithm called LINZIP and incorrectly stated in \cite{LINZIP}. The following is a high level summary.
+
+\ \\
+{\tt fmpz\_mpoly\_gcd\_zippel}($\bbZ[x_1,\dots,x_n]$, $n \ge 2$):\\
+\indent $\left[\begin{tabular}{l}
+split into $\bbZ[x_1,\dots,x_{n-1}][X]$\\
+call {\tt fmpz\_mpolyu\_gcd\_zippel}
+\end{tabular}\right.$
+
+\ \\
+{\tt fmpz\_mpolyu\_gcd\_zippel}($\bbZ[x_1,\dots,x_n][X]$, $n \ge 1$):\\
+\indent $\left[\begin{tabular}{l}
+remove content in $\bbZ[x_1,\dots,x_n]$ from the GCD via {\tt fmpz\_mpoly\_gcd\_zippel}\\
+call {\tt fmpz\_mpolyu\_gcdm\_zippel}\\
+multiply the content back into the GCD
+\end{tabular}\right.$
+
+\ \\
+{\tt fmpz\_mpolyu\_gcdm\_zippel}($\bbZ[x_1,\dots,x_n][X]$, $n \ge 1$):\\
+\indent $\left[\begin{tabular}{l}
+(the GCD is assumed to have no content w.r.t. $x_1,\dots,x_n$)\\
+choose a prime $p$\\
+compute $F=$ GCD modulo $p$ via {\tt nmod\_mpolyu\_gcdp\_zippel}\\
+($F$ is the correct gcd when the inputs are reduced modulo $p$)\\
+For several new primes $p$, \\
+compute the GCD modulo $p$ via {\tt nmod\_mpolyu\_gcds\_zippel} using $f$\\
+combine via CRT and check divisibility every time the interpolant stabilizes\\
+start over if the interpolant coefficients have exceeded the Landau--Mignotte bound
+\end{tabular}\right.$
+
+\ \\
+\subsection{PRS}
+The PRS algorithm works over $R=\bbZ$ or $R=\bbZ_p$.
+\ \\
+{\tt \_mpoly\_gcd\_prs}($A,B \in R[x_1,\dots,x_n][X]$, $n \ge 1$):\\
+\indent $\left[\begin{tabular}{l}
+(recursively use GCD in fewer variables for content calculation)\\
+let $Ac = \op{content}(A) \in R(x_1,\dots,x_n)$\\
+let $Bc = \op{content}(B) \in R(x_1,\dots,x_n)$\\
+divide $A$ and $B$ by $Ac$ and $Bc$\\
+let $G$ be a pseudo GCD of $A$ and $B$ computed using a prs\\
+divide $G$ by $\op{content}(G)$\\
+multiply $G$ by $\op{gcd}(Ac,Bc)$
+\end{tabular}\right.$
+
+The content of $G$ can be computed without expensive recursive calls to gcd in the case when we know the leading or trailing coefficient of $G$ in the variable $X$ must be a monomial in $x_1,\dots,x_n$.
+
+
+\section{Factorization}
+
+\begin{thebibliography}{99}
+\bibitem{Brown} W. S. Brown. On Euclid’s Algorithm and the
+Computation of Polynomial Greatest Common Divisors.
+J. ACM 18 (1971), 478-504.
+\bibitem{Johnson} Johnson, S.C., 1974. Sparse polynomial arithmetic. ACM SIGSAM Bulletin 8 (3), pp. 63--71.
+\bibitem{FPS} Monagan M., Pearce R.: Sparse polynomial powering using heaps. “Computer Algebra in Scientific Computing”, Springer, 2012, s.236-247. 
+\bibitem{LINZIP}  J. de Kleine, M. Monagan and A. Wittkopf, Algorithms for the non-monic case of the sparse
+modular GCD algorithm. Proceedings of ISSAC ’05,
+ACM Press, pp. 124--131, 2005.
+\bibitem{SULING} Yang, Suling. Computing the Greatest Common Divisor of Multivariate Polynomials over Finite Fields. http://www.cecm.sfu.ca/CAG/theses/suling.pdf
+
+\bibitem{BMAR} The Berlekamp-Massey Algorithm revisited, N. B. Atti, G. M. Diaz–Toca, H. Lombardi, 9 March 2006
+
+\bibitem{YAP} A Unified Approach to HGCD Algorithms for polynomials and integers by Klaus Thull , Chee K. Yap
+ 
+\end{thebibliography}
+\end{document}

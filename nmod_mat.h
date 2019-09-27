@@ -205,9 +205,9 @@ FLINT_DLL int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A);
 NMOD_MAT_INLINE
 void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
 {
-    if (r != s)
+    if (r != s && !nmod_mat_is_empty(mat))
     {
-        mp_ptr u;
+        mp_limb_t * u;
         slong t;
 
         if (perm)
@@ -220,6 +220,71 @@ void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
         u = mat->rows[s];
         mat->rows[s] = mat->rows[r];
         mat->rows[r] = u;
+    }
+}
+
+NMOD_MAT_INLINE
+void nmod_mat_invert_rows(nmod_mat_t mat, slong * perm)
+{
+    slong i;
+
+    for (i = 0; i < mat->r/2; i++)
+        nmod_mat_swap_rows(mat, perm, i, mat->r - i - 1);
+}
+
+NMOD_MAT_INLINE
+void nmod_mat_swap_cols(nmod_mat_t mat, slong * perm, slong r, slong s)
+{
+    if (r != s && !nmod_mat_is_empty(mat))
+    {
+        slong t;
+
+        if (perm)
+        {
+            t = perm[s];
+            perm[s] = perm[r];
+            perm[r] = t;
+        }
+
+        for (t = 0; t < mat->r; t++)
+        {
+            mp_limb_t c = mat->rows[t][r];
+            mat->rows[t][r] = mat->rows[t][s];
+            mat->rows[t][s] = c;
+        }
+    }
+}
+
+NMOD_MAT_INLINE
+void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
+{
+    if (!(nmod_mat_is_empty(mat)))
+    {
+        slong t;
+        slong i;
+        slong c = mat->c;
+        slong k = mat->c/2;
+        mp_limb_t e;
+
+        if (perm)
+        {
+            for (i =0; i < k; i++)
+            {
+                t = perm[i];
+                perm[i] = perm[c - i];
+                perm[c - i] = t;
+            }
+        }
+
+        for (t = 0; t < mat->r; t++)
+        {
+            for (i = 0; i < k; i++)
+            {
+                e = mat->rows[t][i];
+                mat->rows[t][i] = mat->rows[t][c - i - 1];
+                mat->rows[t][c - i - 1] = e;
+            }
+        }
     }
 }
 
@@ -284,9 +349,6 @@ FLINT_DLL void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 
 /* Size at which pre-transposing becomes faster in classical multiplication */
 #define NMOD_MAT_MUL_TRANSPOSE_CUTOFF 20
-
-/* Strassen multiplication */
-#define NMOD_MAT_MUL_STRASSEN_CUTOFF 256
 
 /* Cutoff between classical and recursive triangular solving */
 #define NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64

@@ -111,56 +111,56 @@ public:
     }
 
     static fmpz_matxx_expression randbits(slong rows, slong cols,
-            frandxx& state, mp_bitcnt_t bits)
+            frandxx& state, flint_bitcnt_t bits)
     {
         fmpz_matxx_expression res(rows, cols);
         res.set_randbits(state, bits);
         return res;
     }
     static fmpz_matxx_expression randtest(slong rows, slong cols,
-            frandxx& state, mp_bitcnt_t bits)
+            frandxx& state, flint_bitcnt_t bits)
     {
         fmpz_matxx_expression res(rows, cols);
         res.set_randtest(state, bits);
         return res;
     }
     static fmpz_matxx_expression randintrel(slong rows, slong cols,
-            frandxx& state, mp_bitcnt_t bits)
+            frandxx& state, flint_bitcnt_t bits)
     {
         fmpz_matxx_expression res(rows, cols);
         res.set_randintrel(state, bits);
         return res;
     }
     static fmpz_matxx_expression randsimdioph(slong rows, slong cols,
-            frandxx& state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+            frandxx& state, flint_bitcnt_t bits, flint_bitcnt_t bits2)
     {
         fmpz_matxx_expression res(rows, cols);
         res.set_randsimdioph(state, bits, bits2);
         return res;
     }
     static fmpz_matxx_expression randntrulike(slong rows, slong cols,
-            frandxx& state, mp_bitcnt_t bits, ulong q)
+            frandxx& state, flint_bitcnt_t bits, ulong q)
     {
         fmpz_matxx_expression res(rows, cols);
         res.set_randntrulike(state, bits, q);
         return res;
     }
     static fmpz_matxx_expression randntrulike2(slong rows, slong cols,
-            frandxx& state, mp_bitcnt_t bits, ulong q)
+            frandxx& state, flint_bitcnt_t bits, ulong q)
     {
         fmpz_matxx_expression res(rows, cols);
         res.set_randntrulike2(state, bits, q);
         return res;
     }
     static fmpz_matxx_expression randajtai(slong rows, slong cols,
-            frandxx& state, mp_bitcnt_t bits, double alpha)
+            frandxx& state, flint_bitcnt_t bits, double alpha)
     {
         fmpz_matxx_expression res(rows, cols);
         res.set_randajtai(state, bits, alpha);
         return res;
     }
     static fmpz_matxx_expression randrank(slong rows, slong cols,
-            frandxx& state, slong rank, mp_bitcnt_t bits)
+            frandxx& state, slong rank, flint_bitcnt_t bits)
     {
         fmpz_matxx_expression res(rows, cols);
         res.set_randrank(state, rank, bits);
@@ -186,21 +186,21 @@ public:
     }
 
     // these only make sense with targets
-    void set_randbits(frandxx& state, mp_bitcnt_t bits)
+    void set_randbits(frandxx& state, flint_bitcnt_t bits)
         {fmpz_mat_randbits(_mat(), state._data(), bits);}
-    void set_randtest(frandxx& state, mp_bitcnt_t bits)
+    void set_randtest(frandxx& state, flint_bitcnt_t bits)
         {fmpz_mat_randtest(_mat(), state._data(), bits);}
-    void set_randintrel(frandxx& state, mp_bitcnt_t bits)
+    void set_randintrel(frandxx& state, flint_bitcnt_t bits)
         {fmpz_mat_randintrel(_mat(), state._data(), bits);}
-    void set_randsimdioph(frandxx& state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+    void set_randsimdioph(frandxx& state, flint_bitcnt_t bits, flint_bitcnt_t bits2)
         {fmpz_mat_randsimdioph(_mat(), state._data(), bits, bits2);}
-    void set_randntrulike(frandxx& state, mp_bitcnt_t bits, ulong q)
+    void set_randntrulike(frandxx& state, flint_bitcnt_t bits, ulong q)
         {fmpz_mat_randntrulike(_mat(), state._data(), bits, q);}
-    void set_randntrulike2(frandxx& state, mp_bitcnt_t bits, ulong q)
+    void set_randntrulike2(frandxx& state, flint_bitcnt_t bits, ulong q)
         {fmpz_mat_randntrulike2(_mat(), state._data(), bits, q);}
-    void set_randajtai(frandxx& state, mp_bitcnt_t bits, double alpha)
+    void set_randajtai(frandxx& state, flint_bitcnt_t bits, double alpha)
         {fmpz_mat_randajtai(_mat(), state._data(), bits, alpha);}
-    void set_randrank(frandxx& state, slong rank, mp_bitcnt_t bits)
+    void set_randrank(frandxx& state, slong rank, flint_bitcnt_t bits)
         {fmpz_mat_randrank(_mat(), state._data(), rank, bits);}
 
     template<class Fmpz>

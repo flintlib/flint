@@ -415,8 +415,15 @@ private:
             nmod_mat_init_set(data[i], o.data[i]);
     }
 
+    void clear(void)
+    {
+        for(std::size_t i = 0;i < size_;++i)
+            nmod_mat_clear(data[i]);
+        delete[] data;
+    }
+
 public:
-    ~nmod_mat_vector() {delete[] data;}
+    ~nmod_mat_vector() {clear();}
     nmod_mat_vector(slong rows, slong cols, const std::vector<mp_limb_t>& primes)
     {
         size_ = primes.size();
@@ -432,7 +439,7 @@ public:
 
     nmod_mat_vector& operator=(const nmod_mat_vector& o)
     {
-        delete[] data;
+        clear();
         init(o);
         return *this;
     }

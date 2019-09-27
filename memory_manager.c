@@ -2,6 +2,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2016 Claus Fieker
     Copyright (C) 2016 William Hart.
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -14,6 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "flint.h"
+#include "thread_pool.h"
 
 #if HAVE_GC
 #include "gc.h"
@@ -218,4 +220,12 @@ void flint_cleanup()
 
 }
 
-
+void flint_cleanup_master()
+{
+    if (global_thread_pool_initialized)
+    {
+        thread_pool_clear(global_thread_pool);
+        global_thread_pool_initialized = 0;
+    }
+    flint_cleanup();
+}

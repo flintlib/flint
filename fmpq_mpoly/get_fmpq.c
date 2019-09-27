@@ -11,10 +11,11 @@
 
 #include "fmpq_mpoly.h"
 
-void fmpq_mpoly_get_fmpq(fmpq_t x, const fmpq_mpoly_t poly,
+void fmpq_mpoly_get_fmpq(fmpq_t c, const fmpq_mpoly_t A,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_one(fmpq_denref(x));
-    fmpz_mpoly_get_fmpz(fmpq_numref(x), poly->zpoly, ctx->zctx); /* either 0 or 1 */
-    fmpq_mul(x, x, poly->content);
+    /* the easiest way to throw is to call fmpz_mpoly_get_fmpz */
+    fmpz_one(fmpq_denref(c));
+    fmpz_mpoly_get_fmpz(fmpq_numref(c), A->zpoly, ctx->zctx); /* either 0 or 1 */
+    fmpq_mul(c, c, A->content);
 }

@@ -15,14 +15,14 @@
 
 
 int
-fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t qpoly,
+fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t A,
                                const char ** x_in, const fmpq_mpoly_ctx_t qctx)
 {
     int r = 0;
     fmpq_t c;
     slong i, j, N;
     fmpz * exponents;
-    const fmpz_mpoly_struct * poly = qpoly->zpoly;
+    const fmpz_mpoly_struct * poly = A->zpoly;
     const mpoly_ctx_struct * mctx = qctx->zctx->minfo;
     char ** x = (char **) x_in;
     TMP_INIT;
@@ -58,7 +58,7 @@ fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t qpoly,
     {
         int first = 1;
 
-        fmpq_mul_fmpz(c, qpoly->content, poly->coeffs + i);
+        fmpq_mul_fmpz(c, A->content, poly->coeffs + i);
 
         r = flint_fprintf(file, (fmpq_sgn(c) >= 0) ? (i > 0 ? " + " : "")
                                                    : (i > 0 ? " - " : "-") );

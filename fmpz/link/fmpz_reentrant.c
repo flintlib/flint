@@ -94,4 +94,9 @@ void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
 
 void _fmpz_clear_readonly_mpz(mpz_t z)
 {
+    if (((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX))
+        || (z->_mp_size == 0))
+    {
+        mpz_clear(z);
+    }
 }

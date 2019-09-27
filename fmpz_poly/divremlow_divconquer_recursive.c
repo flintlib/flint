@@ -19,13 +19,15 @@
 
 #define FLINT_DIVREMLOW_DIVCONQUER_CUTOFF  16
 
-void
+int
 _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB, 
-                                          const fmpz * A, const fmpz * B, slong lenB)
+                         const fmpz * A, const fmpz * B, slong lenB, int exact)
 {
     if (lenB <= FLINT_DIVREMLOW_DIVCONQUER_CUTOFF)
     {
-        _fmpz_poly_divrem_basecase(Q, QB, A, 2 * lenB - 1, B, lenB);
+        if (!_fmpz_poly_divrem_basecase(Q, QB, A, 2 * lenB - 1, B, lenB, exact))
+           return 0;
+
         _fmpz_vec_sub(QB, A, QB, lenB - 1);
     }
     else
@@ -55,7 +57,8 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
            at most n1; {W, n1 - 1} is d1 * q1 is truncated to length n1 - 1
          */
 
-        _fmpz_poly_divremlow_divconquer_recursive(q1, W, p1, d1, n1);
+        if (!_fmpz_poly_divremlow_divconquer_recursive(q1, W, p1, d1, n1, exact))
+            return 0;
 
         /* 
            W is of length lenB, but we only care about the bottom n1 - 1 
@@ -112,7 +115,8 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
 
         d3q2 = QB;
 
-        _fmpz_poly_divremlow_divconquer_recursive(q2, d3q2, p2, B + n1, n2);
+        if (!_fmpz_poly_divremlow_divconquer_recursive(q2, d3q2, p2, B + n1, n2, exact))
+            return 0;
 
         _fmpz_vec_swap(QB + n1, d3q2, n2 - 1);
 
@@ -133,5 +137,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         _fmpz_vec_swap(QB, d4q2, n2);
         _fmpz_vec_add(QB + n2, QB + n2, d4q2 + n2, n1 - 1);
     }
+
+    return 1;
 }
 

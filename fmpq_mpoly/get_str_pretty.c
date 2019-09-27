@@ -13,20 +13,19 @@
 #include <string.h>
 #include "fmpq_mpoly.h"
 
-char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t qpoly,
+char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
                                   const char ** x_in, const fmpq_mpoly_ctx_t qctx)
 {
     fmpq_t c;
     slong i, j, N, bound, off;
     fmpz * exponents;
-    const fmpz_mpoly_struct * poly = qpoly->zpoly;
+    const fmpz_mpoly_struct * poly = A->zpoly;
     const mpoly_ctx_struct * mctx = qctx->zctx->minfo;
     char ** x = (char **) x_in;
-    slong len = qpoly->zpoly->length;
-    mp_bitcnt_t bits = qpoly->zpoly->bits;
+    slong len = A->zpoly->length;
+    flint_bitcnt_t bits = A->zpoly->bits;
     char * str;
     TMP_INIT;
-
 
     if (poly->length == 0)
     {
@@ -53,7 +52,7 @@ char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t qpoly,
     bound = 1;
     for (i = 0; i < len; i++)
     {
-        fmpq_mul_fmpz(c, qpoly->content, poly->coeffs + i);
+        fmpq_mul_fmpz(c, A->content, poly->coeffs + i);
         bound += fmpz_sizeinbase(fmpq_numref(c), 10);
         bound += fmpz_sizeinbase(fmpq_denref(c), 10);
         bound += 4;
@@ -74,7 +73,7 @@ char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t qpoly,
     {
         int first = 1;
 
-        fmpq_mul_fmpz(c, qpoly->content, poly->coeffs + i);
+        fmpq_mul_fmpz(c, A->content, poly->coeffs + i);
 
         off += flint_sprintf(str + off, "%s", (fmpq_sgn(c) >= 0)
                                                    ? (i > 0 ? " + " : "")

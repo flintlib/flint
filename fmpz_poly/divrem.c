@@ -16,13 +16,17 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_divrem(fmpz * Q, fmpz * R,
-                       const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+int _fmpz_poly_divrem(fmpz * Q, fmpz * R,
+     const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 {
+    int res;
+
     if (lenB < 6)
-        _fmpz_poly_divrem_basecase(Q, R, A, lenA, B, lenB);
+        res = _fmpz_poly_divrem_basecase(Q, R, A, lenA, B, lenB, exact);
     else
-        _fmpz_poly_divrem_divconquer(Q, R, A, lenA, B, lenB);
+        res = _fmpz_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, exact);
+
+    return res;
 }
 
 void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
@@ -64,7 +68,7 @@ void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_poly_divrem(q, r, A->coeffs, lenA, B->coeffs, lenB);
+    _fmpz_poly_divrem(q, r, A->coeffs, lenA, B->coeffs, lenB, 0);
 
     if (Q == A || Q == B)
     {

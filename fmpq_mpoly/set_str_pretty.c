@@ -273,7 +273,7 @@ failed:
 }
 
 
-int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t poly, const char * str,
+int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t A, const char * str,
                                  const char** x_in, const fmpq_mpoly_ctx_t ctx)
 {
 
@@ -292,7 +292,7 @@ int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t poly, const char * str,
             flint_sprintf(x[i], "x%wd", i + 1);
         }
     }
-    ret = _fmpq_mpoly_parse_pretty(poly, str, strlen(str), x, ctx);
+    ret = _fmpq_mpoly_parse_pretty(A, str, strlen(str), x, ctx);
     TMP_END;
     return ret;
 }

@@ -123,7 +123,7 @@ const char * _nmod_mpoly_parse_pretty_int(const char * s, const char * end,
     return s;
 }
 
-int _nmod_mpoly_parse_pretty(nmod_mpoly_t poly, const char * s, slong sn,
+int _nmod_mpoly_parse_pretty(nmod_mpoly_t A, const char * s, slong sn,
                                          char ** x, const nmod_mpoly_ctx_t ctx)
 {
     nmod_mpoly_geobucket_struct ** estack;
@@ -253,7 +253,7 @@ int _nmod_mpoly_parse_pretty(nmod_mpoly_t poly, const char * s, slong sn,
         goto failed;
 
     ret = 0;
-    nmod_mpoly_geobucket_empty(poly, estack[0], ctx);
+    nmod_mpoly_geobucket_empty(A, estack[0], ctx);
     nmod_mpoly_geobucket_clear(estack[0], ctx);
 
 done:
@@ -266,14 +266,14 @@ done:
 
 failed:
     ret = -1;
-    nmod_mpoly_set_ui(poly, 0, ctx);
+    nmod_mpoly_set_ui(A, 0, ctx);
     for (k = 0; k < ei; k++)
         nmod_mpoly_geobucket_clear(estack[k], ctx);
     goto done;
 }
 
 
-int nmod_mpoly_set_str_pretty(nmod_mpoly_t poly, const char * str,
+int nmod_mpoly_set_str_pretty(nmod_mpoly_t A, const char * str,
                                  const char** x_in, const nmod_mpoly_ctx_t ctx)
 {
 
@@ -292,7 +292,7 @@ int nmod_mpoly_set_str_pretty(nmod_mpoly_t poly, const char * str,
             flint_sprintf(x[i], "x%wd", i + 1);
         }
     }
-    ret = _nmod_mpoly_parse_pretty(poly, str, strlen(str), x, ctx);
+    ret = _nmod_mpoly_parse_pretty(A, str, strlen(str), x, ctx);
     TMP_END;
     return ret;
 }

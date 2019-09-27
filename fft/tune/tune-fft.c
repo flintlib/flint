@@ -20,7 +20,7 @@
 int
 main(void)
 {
-    mp_bitcnt_t depth, w, depth1, w1;
+    flint_bitcnt_t depth, w, depth1, w1;
     clock_t start, end;
     double elapsed;
     double best = 0.0;
@@ -47,11 +47,11 @@ main(void)
             int iters = 100*((mp_size_t) 1 << (3*(10 - depth)/2)), i;
             
             mp_size_t n = (UWORD(1)<<depth);
-            mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
+            flint_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
             mp_size_t len1 = 2*n;
             mp_size_t len2 = 2*n;
 
-            mp_bitcnt_t b1 = len1*bits1, b2 = len2*bits1;
+            flint_bitcnt_t b1 = len1*bits1, b2 = len2*bits1;
             mp_size_t n1, n2;
             mp_limb_t * i1, *i2, *r1;
    
@@ -109,7 +109,7 @@ main(void)
         {
             int iters, i;
             mp_size_t n = (UWORD(1)<<depth);
-            mp_bitcnt_t bits = n*w;
+            flint_bitcnt_t bits = n*w;
             mp_size_t int_limbs = (bits - 1)/FLINT_BITS + 1;
             mp_limb_t * i1, * i2, * r1, * tt;
         

@@ -95,6 +95,7 @@ FLINT_DLL void flint_free(void * ptr);
 typedef void (*flint_cleanup_function_t)(void);
 FLINT_DLL void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
 FLINT_DLL void flint_cleanup(void);
+FLINT_DLL void flint_cleanup_master(void);
 
 FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
      void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
@@ -143,13 +144,17 @@ FLINT_DLL void flint_set_abort(void (*func)(void));
     #define FLINT_D_BITS 31
 #endif
 
-#define mp_bitcnt_t ulong
+#define flint_bitcnt_t ulong
 
 #if HAVE_TLS
-#ifdef _MSC_VER
+#if __STDC_VERSION__ >= 201112L
+#define FLINT_TLS_PREFIX _Thread_local
+#elif defined(_MSC_VER)
 #define FLINT_TLS_PREFIX __declspec(thread)
-#else
+#elif defined(__GNUC__)
 #define FLINT_TLS_PREFIX __thread
+#else
+#error "thread local prefix defined in C11 or later"
 #endif
 #else
 #define FLINT_TLS_PREFIX
@@ -165,9 +170,11 @@ FLINT_DLL void flint_set_abort(void (*func)(void));
 
 FLINT_DLL int flint_get_num_threads(void);
 FLINT_DLL void flint_set_num_threads(int num_threads);
+FLINT_DLL int flint_set_thread_affinity(int * cpus, slong length);
+FLINT_DLL int flint_restore_thread_affinity();
 FLINT_DLL void flint_parallel_cleanup(void);
 
-FLINT_DLL int flint_test_multiplier(void);
+int flint_test_multiplier(void);
 
 typedef struct
 {
@@ -225,7 +232,7 @@ void flint_randclear(flint_rand_t state)
 }
 
 FLINT_INLINE
-flint_rand_s * flint_rand_alloc()
+flint_rand_s * flint_rand_alloc(void)
 {
     return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
 }
@@ -249,7 +256,7 @@ void flint_rand_free(flint_rand_s * state)
 
 #define FLINT_TEST_CLEANUP(xxx) \
    flint_randclear(xxx); \
-   flint_cleanup();
+   flint_cleanup_master();
 
 /*
   We define this here as there is no mpfr.h
@@ -347,13 +354,22 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define TMP_START \
    __tmp_root = NULL
 
+#if WANT_ASSERT
 #define TMP_ALLOC(size) \
-   ((size) > 8192 ? \
+   (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
+       __tpx->next = __tmp_root, \
+       __tmp_root = __tpx, \
+       __tpx->block = flint_malloc(size))
+#else
+#define TMP_ALLOC(size) \
+   (((size) > 8192) ? \
       (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
        __tpx->next = __tmp_root, \
        __tmp_root = __tpx, \
        __tpx->block = flint_malloc(size)) : \
       alloca(size))
+#endif
+
 
 #define TMP_END \
    while (__tmp_root) { \

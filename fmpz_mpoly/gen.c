@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,27 +10,24 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_gen(fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    slong j;
-    ulong * mon;
-    TMP_INIT;
+    flint_bitcnt_t bits;
 
-    TMP_START;
-    fmpz_mpoly_fit_length(poly, 1, ctx);
-    fmpz_set_ui(poly->coeffs + 0, 1);
+    bits = mpoly_gen_bits_required(var, ctx->minfo);
+    bits = mpoly_fix_bits(bits, ctx->minfo);
 
-    mon = (ulong *) TMP_ALLOC((ctx->minfo->nvars)*sizeof(ulong));
-    for (j = 0; j < ctx->minfo->nvars; j++)
-       mon[j] = (j == i);
-    mpoly_set_monomial_ui(poly->exps, mon, poly->bits, ctx->minfo);
+    fmpz_mpoly_fit_length(A, WORD(1), ctx);
+    fmpz_mpoly_fit_bits(A, bits, ctx);
+    A->bits = bits;
 
-    TMP_END;
-    _fmpz_mpoly_set_length(poly, 1, ctx);
+    fmpz_one(A->coeffs);
+    if (bits <= FLINT_BITS)
+        mpoly_gen_monomial_sp(A->exps, var, bits, ctx->minfo);
+    else
+        mpoly_gen_monomial_offset_mp(A->exps, var, bits, ctx->minfo);
+
+    _fmpz_mpoly_set_length(A, WORD(1), ctx);
 }

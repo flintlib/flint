@@ -19,7 +19,7 @@
 int
 main(void)
 {
-    mp_bitcnt_t depth, w;
+    flint_bitcnt_t depth, w;
     int iters;
 
     FLINT_TEST_INIT(state);
@@ -37,7 +37,7 @@ main(void)
             for (w = 1; w <= 2; w++)
             {
                 mp_size_t n = (UWORD(1)<<depth);
-                mp_bitcnt_t bits = n*w;
+                flint_bitcnt_t bits = n*w;
                 mp_size_t int_limbs = bits/FLINT_BITS;
                 mp_size_t j;
                 mp_limb_t c, * i1, * i2, * r1, * r2, * tt;
@@ -85,7 +85,7 @@ main(void)
             for (w = 1; w <= 2; w++)
             {
                 mp_size_t n = (UWORD(1)<<depth);
-                mp_bitcnt_t bits = n*w;
+                flint_bitcnt_t bits = n*w;
                 mp_size_t int_limbs = bits/FLINT_BITS;
                 mp_size_t j;
                 mp_limb_t c, * i1, * r1, * r2, * tt;

@@ -168,7 +168,7 @@ int main(void)
                 flint_printf("FAIL\n");
                 flint_printf("Testing number = ");
                 fmpz_print(n);
-                flint_printf("\nis_probabprime = %i, is_prime_gauss = %i\n", pbprime, cycloprime);
+                flint_printf("\nis_probabprime = %i, is_prime_jacobi = %i\n", pbprime, cycloprime);
                 abort();
             }
 
@@ -229,7 +229,6 @@ int main(void)
 
             fmpz_clear(n);
         }
-
     }
 
     FLINT_TEST_CLEANUP(state);
@@ -237,4 +236,3 @@ int main(void)
     flint_printf("PASS\n");
     return 0;
 }
-

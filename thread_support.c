@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -10,6 +11,7 @@
 */
 
 #include "flint.h"
+#include "thread_pool.h"
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -25,9 +27,40 @@ int flint_get_num_threads()
 void flint_set_num_threads(int num_threads)
 {
     _flint_num_threads = num_threads;
+    if (global_thread_pool_initialized)
+    {
+        if (!thread_pool_set_size(global_thread_pool, num_threads - 1))
+        {
+            flint_throw(FLINT_ERROR,
+               "flint_set_num_threads called while global thread pool in use");
+        }
+    }
+    else
+    {
+        thread_pool_init(global_thread_pool, num_threads - 1);
+        global_thread_pool_initialized = 1;
+    }
 #ifdef _OPENMP
     omp_set_num_threads(num_threads);
 #endif
+}
+
+/* return zero for success, nonzero for error */
+int flint_set_thread_affinity(int * cpus, slong length)
+{
+    if (!global_thread_pool_initialized)
+        return 1;
+
+    return thread_pool_set_affinity(global_thread_pool, cpus, length);
+}
+
+/* return zero for success, nonzero for error */
+int flint_restore_thread_affinity()
+{
+    if (!global_thread_pool_initialized)
+        return 1;
+
+    return thread_pool_restore_affinity(global_thread_pool);
 }
 
 void flint_parallel_cleanup()

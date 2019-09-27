@@ -12,7 +12,7 @@
 #include "fmpq_poly.h"
 #include "fmpq_vec.h"
 
-#define NRATS 50
+#define NRATS 20
 
 int main()
 {
@@ -50,7 +50,7 @@ int main()
         fmpq_poly_gegenbauer_c(T0, 0, a);
         fmpq_poly_gegenbauer_c(T1, 1, a);
 
-        for (n = 1; n <= 500; n++)
+        for (n = 1; n <= 20; n++)
         {
             fmpq_poly_gegenbauer_c(T2, n+1, a);
             fmpq_poly_set(t, T1);

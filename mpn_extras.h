@@ -89,7 +89,7 @@ mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
 
 FLINT_DLL void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
 
-FLINT_DLL mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits);
+FLINT_DLL mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t *bits);
 
 FLINT_DLL mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                                      mp_ptr p, mp_size_t psize, ulong *exp);
@@ -133,7 +133,7 @@ FLINT_DLL void flint_mpn_mulmod_preinvn(mp_ptr r,
         mp_srcptr d, mp_srcptr dinv, ulong norm);
 
 FLINT_DLL int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
-    int c, mp_bitcnt_t b, mp_ptr tp);
+    int c, flint_bitcnt_t b, mp_ptr tp);
 
 MPN_EXTRAS_INLINE
 void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
@@ -146,7 +146,7 @@ void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
 }
 
 MPN_EXTRAS_INLINE
-void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, mp_bitcnt_t n)
+void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
 {
   __mpz_struct str;
   str._mp_d = rp;

@@ -401,8 +401,17 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
     {
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (mpoly_monomial_overflows(exp, N, mask))
-            goto exp_overflow;
+        if (bits <= FLINT_BITS)
+        {
+            if (mpoly_monomial_overflows(exp, N, mask))
+                goto exp_overflow;
+        }
+        else
+        {
+            if (mpoly_monomial_overflows_mp(exp, N, bits))
+                goto exp_overflow;
+
+        }
 
         fmpz_zero(acc_lg);
         do
@@ -445,9 +454,8 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                     x->p = p;
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             } else
             {
@@ -462,11 +470,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3[x->p] + x->i*N,
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[x->p] + x->i*N,
                                                 polyq[x->p]->exps + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
 
                 /* should we go up? */
@@ -483,11 +490,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3[x->p] + x->i*N,
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[x->p] + x->i*N,
                                                 polyq[x->p]->exps + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
@@ -497,7 +503,14 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
 
         for (w = 0; w < len; w++)
         {
-            if (mpoly_monomial_divides(texp, exp, exp3[w] + N*0, N, mask))
+            int divides;
+
+            if (bits <= FLINT_BITS)
+                divides = mpoly_monomial_divides(texp, exp, exp3[w] + N*0, N, mask);
+            else
+                divides = mpoly_monomial_divides_mp(texp, exp, exp3[w] + N*0, N, bits);
+
+            if (divides)
             {
                 fmpz_mpoly_fit_length(polyq[w], q_len[w] + 1, ctx);
                 if (q_len[w] + 1 > qs_alloc[w])
@@ -528,11 +541,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                     x->next = NULL;
                     hinds[w][x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add(exp_list[exp_next], exp3[w] + N*x->i, 
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[w] + N*x->i, 
                                                     polyq[w]->exps + N*x->j, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                              &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
                 s[w] = 1;
 
@@ -663,8 +675,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
     for (i = 0; i < len; i++)
         exp_bits = FLINT_MAX(exp_bits, poly3[i]->bits);
 
-    if (exp_bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_quasidivrem_ideal_heap");
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
@@ -700,7 +711,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
     /* check leading mon. of at least one divisor is at most that of dividend */
     for (i = 0; i < len; i++)
     {
-        if (!mpoly_monomial_lt(exp3[i], exp2, N, cmpmask))
+        if (!mpoly_monomial_lt(exp2, exp3[i], N, cmpmask))
             break;
     }
 
@@ -729,7 +740,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
     }
 
     /* do division with remainder */
-    while (exp_bits <= FLINT_BITS)
+    while (1)
     {
         slong old_exp_bits = exp_bits;
         ulong * old_exp2 = exp2, * old_exp3;
@@ -746,9 +757,6 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
         N = mpoly_words_per_exp(exp_bits, ctx->minfo);
         cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
-
-        if (exp_bits > FLINT_BITS)
-            break;
 
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
         mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
@@ -779,9 +787,6 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
             q[i]->bits = exp_bits;
         }
     }
-
-    if (lenr < 0)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_divrem_ideal_monagan_pearce");
 
     /* take care of aliasing */
     if (r == poly2)

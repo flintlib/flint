@@ -28,7 +28,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -60,9 +60,9 @@ main(void)
             nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             ok1 = nmod_mpoly_divides_monagan_pearce(k, h, g, ctx);
-            nmod_mpoly_test(k, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
             result = (ok1 && nmod_mpoly_equal(f, k, ctx));
 
             if (!result)
@@ -120,12 +120,12 @@ main(void)
             nmod_mpoly_randtest_bound(k, state, len, exp_bound, ctx);
 
             ok1 = nmod_mpoly_divides_monagan_pearce(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
 
             if (ok1)
             {
                 nmod_mpoly_mul_johnson(k, h, g, ctx);
-                nmod_mpoly_test(k, ctx);
+                nmod_mpoly_assert_canonical(k, ctx);
             }
 
             result = (ok1 == 0 || nmod_mpoly_equal(f, k, ctx));
@@ -186,12 +186,12 @@ main(void)
             nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
 
             ok1 = nmod_mpoly_divides_monagan_pearce(k, h, g, ctx);
-            nmod_mpoly_test(k, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
             ok2 = nmod_mpoly_divides_monagan_pearce(h, h, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
 
             result = (ok1 == 1 && ok2 == 1 && nmod_mpoly_equal(h, k, ctx));
 
@@ -249,9 +249,9 @@ main(void)
             nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
 
             ok1 = nmod_mpoly_divides_monagan_pearce(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             ok2 = nmod_mpoly_divides_monagan_pearce(f, f, g, ctx);
-            nmod_mpoly_test(f, ctx);
+            nmod_mpoly_assert_canonical(f, ctx);
 
             result = ((ok1 == ok2) &&  (ok1 == 0 || nmod_mpoly_equal(f, h, ctx)));
 
@@ -311,12 +311,12 @@ main(void)
             nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
 
             ok1 = nmod_mpoly_divides_monagan_pearce(k, h, g, ctx);
-            nmod_mpoly_test(k, ctx);
+            nmod_mpoly_assert_canonical(k, ctx);
             ok2 = nmod_mpoly_divides_monagan_pearce(g, h, g, ctx);
-            nmod_mpoly_test(g, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
 
             result = (ok1 == 1 && ok2 == 1 && nmod_mpoly_equal(g, k, ctx));
 
@@ -374,9 +374,9 @@ main(void)
             nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
 
             ok1 = nmod_mpoly_divides_monagan_pearce(h, f, g, ctx);
-            nmod_mpoly_test(h, ctx);
+            nmod_mpoly_assert_canonical(h, ctx);
             ok2 = nmod_mpoly_divides_monagan_pearce(g, f, g, ctx);
-            nmod_mpoly_test(g, ctx);
+            nmod_mpoly_assert_canonical(g, ctx);
 
             result = ((ok1 == ok2) &&  (ok1 == 0 || nmod_mpoly_equal(g, h, ctx)));
 

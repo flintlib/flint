@@ -459,7 +459,7 @@ public:                                                                       \
 // Add a static randomisation function.
 // XXX this is not really useful because the arguments are often different.
 #define FLINTXX_DEFINE_RANDFUNC(CBase, name) \
-static CBase##xx_expression name(frandxx& state, mp_bitcnt_t bits) \
+static CBase##xx_expression name(frandxx& state, flint_bitcnt_t bits) \
 { \
     CBase##xx_expression res; \
     CBase##_##name(res._data().inner, state._data(), bits); \

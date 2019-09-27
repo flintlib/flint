@@ -11,68 +11,72 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_add_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+void nmod_mpoly_add_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                            ulong c, const nmod_mpoly_ctx_t ctx)
 {
-    mp_limb_t cr;
     slong i, N;
-    slong len2 = poly2->length;
+    slong Blen = B->length;
     const nmodf_ctx_struct * fctx = ctx->ffinfo;
 
-    if (len2 == 0)
+    if (Blen == 0)
     {
-        nmod_mpoly_set_ui(poly1, c, ctx);
+        nmod_mpoly_set_ui(A, c, ctx);
         return;
     }
 
-    NMOD_RED(cr, c, ctx->ffinfo->mod);
-    if (cr != 0)
+    if (c >= ctx->ffinfo->mod.n)
     {
-        N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
+        NMOD_RED(c, c, ctx->ffinfo->mod);
+    }
+    if (c != 0)
+    {
+        N = mpoly_words_per_exp(B->bits, ctx->minfo);
 
-        if (mpoly_monomial_is_zero(poly2->exps + (len2 - 1)*N, N))
+        if (mpoly_monomial_is_zero(B->exps + (Blen - 1)*N, N))
         {
-            if (poly1 != poly2)
+            if (A != B)
             {
-                nmod_mpoly_fit_length(poly1, poly2->length, ctx);
-                nmod_mpoly_fit_bits(poly1, poly2->bits, ctx);
+                nmod_mpoly_fit_length(A, B->length, ctx);
+                nmod_mpoly_fit_bits(A, B->bits, ctx);
+                A->bits = B->bits;
 
-                for (i = 0; i < len2 - 1; i++)
-                    poly1->coeffs[i] = poly2->coeffs[i];
+                for (i = 0; i < Blen - 1; i++)
+                    A->coeffs[i] = B->coeffs[i];
 
-                for (i = 0; i < len2; i++)
-                    mpoly_monomial_set(poly1->exps + i*N, poly2->exps + i*N, N);
+                for (i = 0; i < Blen; i++)
+                    mpoly_monomial_set(A->exps + i*N, B->exps + i*N, N);
 
-                _nmod_mpoly_set_length(poly1, poly2->length, ctx);
-                poly1->bits = poly2->bits;
+                _nmod_mpoly_set_length(A, B->length, ctx);
             }
 
-            poly1->coeffs[len2 - 1] = nmod_add(poly2->coeffs[len2 - 1], cr, fctx->mod);
-            if (poly1->coeffs[len2 - 1] == 0)
-                _nmod_mpoly_set_length(poly1, len2 - 1, ctx);
-        } else
-        {
-            nmod_mpoly_fit_length(poly1, len2 + 1, ctx);
-
-            if (poly1 != poly2)
-            {
-                nmod_mpoly_fit_bits(poly1, poly2->bits, ctx);
-                poly1->bits = poly2->bits;
-
-                for (i = 0; i < len2; i++)
-                    poly1->coeffs[i] = poly2->coeffs[i];
-
-                for (i = 0; i < len2; i++)
-                    mpoly_monomial_set(poly1->exps + i*N, poly2->exps + i*N, N);
-            }
-
-            mpoly_monomial_zero(poly1->exps + len2*N, N);
-
-            poly1->coeffs[len2] = cr;
-            _nmod_mpoly_set_length(poly1, poly2->length + 1, ctx);
+            A->coeffs[Blen - 1] = nmod_add(B->coeffs[Blen - 1], c, fctx->mod);
+            if (A->coeffs[Blen - 1] == 0)
+                _nmod_mpoly_set_length(A, Blen - 1, ctx);
         }
-    } else if (poly1 != poly2)
+        else
+        {
+            nmod_mpoly_fit_length(A, Blen + 1, ctx);
+
+            if (A != B)
+            {
+                nmod_mpoly_fit_bits(A, B->bits, ctx);
+                A->bits = B->bits;
+
+                for (i = 0; i < Blen; i++)
+                    A->coeffs[i] = B->coeffs[i];
+
+                for (i = 0; i < Blen; i++)
+                    mpoly_monomial_set(A->exps + i*N, B->exps + i*N, N);
+            }
+
+            mpoly_monomial_zero(A->exps + Blen*N, N);
+
+            A->coeffs[Blen] = c;
+            _nmod_mpoly_set_length(A, Blen + 1, ctx);
+        }
+    }
+    else if (A != B)
     {
-        nmod_mpoly_set(poly1, poly2, ctx);
+        nmod_mpoly_set(A, B, ctx);
     }
 }

@@ -11,11 +11,12 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_sub_ui(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
+void nmod_mpoly_sub_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                            ulong c, const nmod_mpoly_ctx_t ctx)
 {
-    mp_limb_t cr;
-    NMOD_RED(cr, c, ctx->ffinfo->mod);
-    cr = nmod_neg(cr, ctx->ffinfo->mod);
-    nmod_mpoly_add_ui(poly1, poly2, cr, ctx);
+    if (c >= ctx->ffinfo->mod.n)
+    {
+        NMOD_RED(c, c, ctx->ffinfo->mod);
+    }
+    nmod_mpoly_add_ui(A, B, nmod_neg(c, ctx->ffinfo->mod), ctx);
 }

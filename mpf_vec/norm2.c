@@ -14,7 +14,7 @@
 #include "mpf_vec.h"
 
 void
-_mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, mp_bitcnt_t prec)
+_mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec)
 {
     slong i;
     mpf_t tmp;

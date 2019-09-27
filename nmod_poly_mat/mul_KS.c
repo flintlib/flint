@@ -22,7 +22,7 @@ nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A,
 {
     slong i, j;
     slong A_len, B_len;
-    mp_bitcnt_t bit_size;
+    flint_bitcnt_t bit_size;
 
     fmpz_mat_t AA, BB, CC;
 

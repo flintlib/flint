@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -23,56 +23,76 @@ main(void)
     fflush(stdout);
 
     /* Check (f*a)*b = f*(a*b) */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
-        ordering_t ord;
-        mp_limb_t modulus;
         ulong a, b, c;
-        slong nvars, len, exp_bits;
+        slong len1, len2, len3, len4;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3, exp_bits4;
+        mp_limb_t modulus;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
+        modulus = n_randbits(state, 1 + n_randint(state, FLINT_BITS));
+        modulus = FLINT_MAX(UWORD(2), modulus);
 
-        modulus = n_randint(state, FLINT_BITS - 1) + 1;
-        modulus = n_randbits(state, modulus);
-        modulus = n_nextprime(modulus, 1);
-
-        nmod_mpoly_ctx_init(ctx, nvars, ord, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 2, modulus);
 
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(h, ctx);
         nmod_mpoly_init(k, ctx);
 
-        len = n_randint(state, 100);
-
-        exp_bits = n_randint(state, 200) + 2;
+        len1 = n_randint(state, 100);
+        len2 = n_randint(state, 100);
+        len3 = n_randint(state, 100);
+        len4 = n_randint(state, 100);
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
+        exp_bits3 = n_randint(state, 200) + 2;
+        exp_bits4 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
-            nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
-            nmod_mpoly_randtest_bits(g, state, len, exp_bits, ctx);
-            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
-            nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len3, exp_bits3, ctx);
+            nmod_mpoly_randtest_bits(k, state, len4, exp_bits4, ctx);
 
-            a = n_randbits(state, n_randint(state, FLINT_BITS/2) + 1);
-            b = n_randbits(state, n_randint(state, FLINT_BITS/2) + 1);
-            c = a*b;
+            a = n_randtest(state);
+            b = n_randtest(state);
 
             nmod_mpoly_scalar_mul_ui(g, f, a, ctx);
             nmod_mpoly_scalar_mul_ui(h, g, b, ctx);
-
+            NMOD_RED(a, a, ctx->ffinfo->mod);
+            NMOD_RED(b, b, ctx->ffinfo->mod);
+            c = nmod_mul(a, b, ctx->ffinfo->mod);
             nmod_mpoly_scalar_mul_ui(k, f, c, ctx);
-
             result = nmod_mpoly_equal(h, k, ctx);
 
             if (!result)
             {
                 printf("FAIL\n");
+                flint_printf("Check (f*a)*b = f*(a*b)\n"
+                                                   "i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
+
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+
+            nmod_mpoly_scalar_mul_ui(g, f, a, ctx);
+            nmod_mpoly_scalar_mul_ui(g, g, b, ctx);
+            nmod_mpoly_scalar_mul_ui(f, f, c, ctx);
+            result = nmod_mpoly_equal(f, g, ctx);
+
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check (f*a)*b = f*(a*b) with aliasing\n"
+                                                   "i = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
+
         }
 
         nmod_mpoly_clear(f, ctx);
@@ -83,58 +103,83 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    /* Check aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    /* Check f*a*inv(a) = f */
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
-        nmod_mpoly_t f, g, h;
-        ordering_t ord;
+        nmod_mpoly_t f, g, h, k;
+        ulong a, b;
+        slong len1, len2, len3, len4;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3, exp_bits4;
         mp_limb_t modulus;
-        ulong c;
-        slong nvars, len, exp_bits;
 
-        ord = mpoly_ordering_randtest(state);
-        nvars = n_randint(state, 20) + 1;
+        modulus = n_randbits(state, 1 + n_randint(state, FLINT_BITS));
+        modulus = FLINT_MAX(UWORD(2), modulus);
 
-        modulus = n_randint(state, FLINT_BITS - 1) + 1;
-        modulus = n_randbits(state, modulus);
-        modulus = n_nextprime(modulus, 1);
-
-        nmod_mpoly_ctx_init(ctx, nvars, ord, modulus);
+        nmod_mpoly_ctx_init_rand(ctx, state, 2, modulus);
 
         nmod_mpoly_init(f, ctx);
         nmod_mpoly_init(g, ctx);
         nmod_mpoly_init(h, ctx);
+        nmod_mpoly_init(k, ctx);
 
-        len = n_randint(state, 100);
-
-        exp_bits = n_randint(state, 200) + 2;
+        len1 = n_randint(state, 100);
+        len2 = n_randint(state, 100);
+        len3 = n_randint(state, 100);
+        len4 = n_randint(state, 100);
+        exp_bits1 = n_randint(state, 200) + 2;
+        exp_bits2 = n_randint(state, 200) + 2;
+        exp_bits3 = n_randint(state, 200) + 2;
+        exp_bits4 = n_randint(state, 200) + 2;
 
         for (j = 0; j < 10; j++)
         {
-            nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
-            nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+            nmod_mpoly_randtest_bits(h, state, len3, exp_bits3, ctx);
+            nmod_mpoly_randtest_bits(k, state, len4, exp_bits4, ctx);
 
-            c = n_randtest(state);
+            a = n_randtest(state);
 
-            nmod_mpoly_set(g, f, ctx);
+            nmod_mpoly_scalar_mul_ui(g, f, a, ctx);
 
-            nmod_mpoly_scalar_mul_ui(h, f, c, ctx);
+            NMOD_RED(a, a, ctx->ffinfo->mod);
+            if (n_gcd(a, ctx->ffinfo->mod.n) != UWORD(1))
+                continue;
 
-            nmod_mpoly_scalar_mul_ui(g, g, c, ctx);
-
-            result = nmod_mpoly_equal(g, h, ctx);
+            b = nmod_inv(a, ctx->ffinfo->mod);
+            nmod_mpoly_scalar_mul_ui(h, g, b, ctx);
+            result = nmod_mpoly_equal(h, f, ctx);
 
             if (!result)
             {
                 printf("FAIL\n");
+                flint_printf("Check f*a*inv(a) = f\n"
+                                                   "i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
+
+            nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
+
+            nmod_mpoly_scalar_mul_ui(g, f, a, ctx);
+            nmod_mpoly_scalar_mul_ui(g, g, b, ctx);
+            result = nmod_mpoly_equal(f, g, ctx);
+
+            if (!result)
+            {
+                printf("FAIL\n");
+                flint_printf("Check f*a*inv(a) = f with aliasing\n"
+                                                   "i = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
+
         }
 
         nmod_mpoly_clear(f, ctx);
         nmod_mpoly_clear(g, ctx);
         nmod_mpoly_clear(h, ctx);
+        nmod_mpoly_clear(k, ctx);
 
         nmod_mpoly_ctx_clear(ctx);
     }

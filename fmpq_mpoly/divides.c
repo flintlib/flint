@@ -13,30 +13,30 @@
 
 
 /* return 1 if quotient is exact */
-int fmpq_mpoly_divides(fmpq_mpoly_t poly1,
-                  const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
+int fmpq_mpoly_divides(fmpq_mpoly_t Q,
+                  const fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     int res;
 
-    if (fmpq_mpoly_is_zero(poly3, ctx))
+    if (fmpq_mpoly_is_zero(B, ctx))
     {
         flint_throw(FLINT_DIVZERO, "Divide by zero in fmpq_mpoly_divides");
     }
 
-    if (fmpq_mpoly_is_zero(poly2, ctx))
+    if (fmpq_mpoly_is_zero(A, ctx))
     {
-        fmpq_mpoly_zero(poly1, ctx);
+        fmpq_mpoly_zero(Q, ctx);
         return 1;
     }
 
-    res = fmpz_mpoly_divides_monagan_pearce(poly1->zpoly, poly2->zpoly, poly3->zpoly, ctx->zctx);
+    res = fmpz_mpoly_divides(Q->zpoly, A->zpoly, B->zpoly, ctx->zctx);
     if (!res)
     {
-        fmpq_mpoly_zero(poly1, ctx);
+        fmpq_mpoly_zero(Q, ctx);
         return 0;
     }
 
-    fmpq_div(poly1->content, poly2->content, poly3->content);
+    fmpq_div(Q->content, A->content, B->content);
     return 1;
 }

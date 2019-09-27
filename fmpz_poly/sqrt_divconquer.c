@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
-    Copyright (C) 2018 William Hart
-    
+    Copyright (C) 2018, 2019 William Hart
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -72,19 +72,10 @@ _fmpz_poly_sqrt_divconquer(fmpz * res, const fmpz * poly, slong len, int exact)
 
         _fmpz_vec_set(temp + n, r + n2, 2*n - 2*n2 - 1);
 
-        _fmpz_poly_divrem(res, r + n2, temp + n, 2*n - 2*n2 - 1, temp + 2*n2 - n, n - n2);
+        if (!_fmpz_poly_divrem(res, r + n2, temp + n, 2*n - 2*n2 - 1, temp + 2*n2 - n, n - n2, 1))
+            result = 0;
 
-        /* check division was possible; TODO: use early bailout divrem above instead */
-        for (i = n - n2 - 1; i < 2*n - 2*n2 - 1; i++)
-        {
-            if (!fmpz_is_zero(r + n2 + i))
-            {
-                result = 0;
-                break;
-            }
-        }
-
-        if (exact)
+        if (exact && result)
         {
             _fmpz_poly_mul(temp + 2*n2 - n, res, n - n2, res, n - n2);
 
@@ -95,7 +86,7 @@ _fmpz_poly_sqrt_divconquer(fmpz * res, const fmpz * poly, slong len, int exact)
 
             for (i = n; i < len && result; i++)
             {
-                 if (!fmpz_is_zero(r + len - 1 - i))
+                if (!fmpz_is_zero(r + len - 1 - i))
                 {
                     result = 0;
                     break;

@@ -44,5 +44,5 @@ void fmpq_mpoly_add(fmpq_mpoly_t poly1,
     fmpz_clear(d2n3);
     fmpz_clear(n2d3);
 
-    fmpq_mpoly_canonicalise(poly1, ctx);
+    fmpq_mpoly_reduce(poly1, ctx);
 }

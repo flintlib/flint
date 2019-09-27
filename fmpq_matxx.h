@@ -103,14 +103,14 @@ public:
     }
 
     static fmpq_matxx_expression randbits(slong rows, slong cols,
-            frandxx& state, mp_bitcnt_t bits)
+            frandxx& state, flint_bitcnt_t bits)
     {
         fmpq_matxx_expression res(rows, cols);
         res.set_randbits(state, bits);
         return res;
     }
     static fmpq_matxx_expression randtest(slong rows, slong cols,
-            frandxx& state, mp_bitcnt_t bits)
+            frandxx& state, flint_bitcnt_t bits)
     {
         fmpq_matxx_expression res(rows, cols);
         res.set_randtest(state, bits);
@@ -127,9 +127,9 @@ public:
     }
 
     // these only make sense with targets
-    void set_randbits(frandxx& state, mp_bitcnt_t bits)
+    void set_randbits(frandxx& state, flint_bitcnt_t bits)
         {fmpq_mat_randbits(_mat(), state._data(), bits);}
-    void set_randtest(frandxx& state, mp_bitcnt_t bits)
+    void set_randtest(frandxx& state, flint_bitcnt_t bits)
         {fmpq_mat_randtest(_mat(), state._data(), bits);}
     void set_hilbert_matrix()
         {fmpq_mat_hilbert_matrix(_mat());}

@@ -15,7 +15,7 @@
 #include "fft.h"
       
 void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v, 
-    mp_limb_t * s, mp_limb_t * t, mp_size_t limbs, mp_bitcnt_t b1, mp_bitcnt_t b2)
+    mp_limb_t * s, mp_limb_t * t, mp_size_t limbs, flint_bitcnt_t b1, flint_bitcnt_t b2)
 {
    mp_limb_t nw = limbs*FLINT_BITS;
    mp_size_t x, y;
@@ -46,7 +46,7 @@ void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
 }
 
 void fft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,
-      mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
+      mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
       mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs)
 {
    mp_size_t i;
@@ -77,7 +77,7 @@ void fft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,
 }
 
 void fft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
-      mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
+      mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
       mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
 {
    mp_size_t i;
@@ -108,15 +108,15 @@ void fft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
 }
 
 void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, 
-                   mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 {
    mp_size_t i, j, s;
    mp_size_t n2 = (2*n)/n1;
    mp_size_t trunc2 = (trunc - 2*n)/n1;
    mp_size_t limbs = (n*w)/FLINT_BITS;
-   mp_bitcnt_t depth = 0;
-   mp_bitcnt_t depth2 = 0;
+   flint_bitcnt_t depth = 0;
+   flint_bitcnt_t depth2 = 0;
    
    while ((UWORD(1)<<depth) < n2) depth++;
    while ((UWORD(1)<<depth2) < n1) depth2++;
@@ -219,15 +219,15 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
 }
 
 void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
-                   mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 {
    mp_size_t i, j;
    mp_size_t n2 = (2*n)/n1;
    mp_size_t trunc2 = (trunc - 2*n)/n1;
    mp_size_t limbs = (n*w)/FLINT_BITS;
-   mp_bitcnt_t depth = 0;
-   mp_bitcnt_t depth2 = 0;
+   flint_bitcnt_t depth = 0;
+   flint_bitcnt_t depth2 = 0;
    int k = 0;
 
    while ((UWORD(1)<<depth) < n2) depth++;

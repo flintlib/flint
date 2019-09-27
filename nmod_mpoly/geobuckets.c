@@ -199,7 +199,7 @@ void nmod_mpoly_geobucket_mul_inplace(nmod_mpoly_geobucket_t B1,
 }
 
 void nmod_mpoly_geobucket_pow_ui(nmod_mpoly_geobucket_t B1,
-                                           slong k, const nmod_mpoly_ctx_t ctx)
+                                           ulong k, const nmod_mpoly_ctx_t ctx)
 {
     nmod_mpoly_t a;
     nmod_mpoly_init(a, ctx);

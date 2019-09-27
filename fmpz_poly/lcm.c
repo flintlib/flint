@@ -40,7 +40,7 @@ void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, slong len1,
         slong lenV = len1 + len2 - lenW;
 
         V = _fmpz_vec_init(lenV);
-        _fmpz_poly_div(V, res, len1 + len2 - 1, W, lenW);
+        _fmpz_poly_div(V, res, len1 + len2 - 1, W, lenW, 0);
         if (fmpz_sgn(V + (lenV - 1)) > 0)
             _fmpz_vec_set(res, V, lenV);
         else

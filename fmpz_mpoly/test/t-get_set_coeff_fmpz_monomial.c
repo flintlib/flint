@@ -20,7 +20,7 @@ main(void)
     slong i, j, k;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get_set_coeff_fmpz_monomial....");
+    flint_printf("get/set_coeff_fmpz_monomial....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -30,7 +30,7 @@ main(void)
         fmpz ** exp;
         fmpz_t cm, ce, q;
         slong len;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
         fmpz_mpoly_init(f, ctx);
@@ -68,7 +68,7 @@ main(void)
         /* check all coeffs in f */
         for (j = 0; j < fmpz_mpoly_length(f, ctx); j++)
         {
-            fmpz_mpoly_get_termexp_fmpz(exp, f, j, ctx);
+            fmpz_mpoly_get_term_exp_fmpz(exp, f, j, ctx);
 
             fmpz_mpoly_zero(m, ctx);
             fmpz_mpoly_set_coeff_fmpz_fmpz(m, q, exp, ctx);

@@ -26,7 +26,7 @@ main(void)
         mpf_t dot, tmp;
         int j, k, l;
         mpf_mat_t A, B;
-        mp_bitcnt_t prec;
+        flint_bitcnt_t prec;
 
         slong m, n;
 

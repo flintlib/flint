@@ -13,6 +13,83 @@
 #include <stdlib.h>
 #include "fmpz_mpoly.h"
 
+/* check various degree operations */
+void _check_degrees(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+    int fits_si;
+    fmpz ** degs;
+    slong * degs_si;
+    slong nvars = ctx->minfo->nvars;
+
+    degs = (fmpz **) flint_malloc(nvars*sizeof(fmpz *));
+    for (i = 0; i < nvars; i++)
+    {
+        degs[i] = flint_malloc(sizeof(fmpz));
+        fmpz_init(degs[i]);
+    }
+
+    fmpz_mpoly_degrees_fmpz(degs, A, ctx);
+
+    fits_si = 1;
+    for (i = 0; i < nvars; i++)
+    {
+        fits_si = fits_si && fmpz_fits_si(degs[i]);
+    }
+
+    if (fits_si != fmpz_mpoly_degrees_fit_si(A, ctx))
+    {
+        printf("FAIL\n");
+        flint_printf("Check degrees_fit_si\n");
+        flint_abort();
+    }
+
+    if (fits_si)
+    {
+        degs_si = (slong *) flint_malloc(nvars*sizeof(slong));
+        fmpz_mpoly_degrees_si(degs_si, A, ctx);
+        for (i = 0; i < nvars; i++)
+        {
+            if (degs_si[i] != fmpz_get_si(degs[i]))
+            {
+                printf("FAIL\n");
+                flint_printf("Check degrees_si\n");
+                flint_abort();
+            }
+            if (degs_si[i] != fmpz_mpoly_degree_si(A, i, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check individual degree_si\n");
+                flint_abort();
+            }
+        }
+        flint_free(degs_si);
+    }
+
+    for (i = 0; i < nvars; i++)
+    {
+        fmpz_t degi;
+        fmpz_init(degi);
+
+        fmpz_mpoly_degree_fmpz(degi, A, i, ctx);
+
+        if (!fmpz_equal(degi, degs[i]))
+        {
+            printf("FAIL\n");
+            flint_printf("Check individual degree_fmpz\n");
+            flint_abort();
+        }
+        fmpz_clear(degi);
+    }
+
+    for (i = 0; i < nvars; i++)
+    {
+        fmpz_clear(degs[i]);
+        flint_free(degs[i]);
+    }
+    flint_free(degs);
+}
+
 int
 main(void)
 {
@@ -24,13 +101,13 @@ main(void)
     fflush(stdout);
 
     /* Check degree does not go up under addition */
-    for (i = 0; i < 40 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
         fmpz_t fdeg, gdeg, hdeg;
         slong len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 
@@ -55,6 +132,10 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
             fmpz_mpoly_add(h, f, g, ctx);
 
+            _check_degrees(h, ctx);
+            _check_degrees(f, ctx);
+            _check_degrees(g, ctx);
+
             fmpz_mpoly_degree_fmpz(hdeg, h, j, ctx);
             fmpz_mpoly_degree_fmpz(fdeg, f, j, ctx);
             fmpz_mpoly_degree_fmpz(gdeg, g, j, ctx);
@@ -77,14 +158,14 @@ main(void)
     }
 
     /* Check degree adds under multiplication */
-    for (i = 0; i < 40 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         int ok;
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
         fmpz_t fdeg, gdeg, hdeg;
         slong len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 
@@ -107,7 +188,11 @@ main(void)
         {
             fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits1, ctx);
             fmpz_mpoly_randtest_bits(g, state, len2, coeff_bits, exp_bits2, ctx);
-            fmpz_mpoly_mul_johnson(h, f, g, ctx);
+            fmpz_mpoly_mul(h, f, g, ctx);
+
+            _check_degrees(h, ctx);
+            _check_degrees(f, ctx);
+            _check_degrees(g, ctx);
 
             fmpz_mpoly_degree_fmpz(hdeg, h, j, ctx);
             fmpz_mpoly_degree_fmpz(fdeg, f, j, ctx);

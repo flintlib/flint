@@ -11,9 +11,9 @@
 
 #include "fmpq_mpoly.h"
 
-void fmpq_mpoly_scalar_div_fmpq(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_scalar_div_fmpq(fmpq_mpoly_t A,
+              const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpq_div(poly1->content, poly2->content, c);
-    fmpz_mpoly_set(poly1->zpoly, poly2->zpoly, ctx->zctx);
+    fmpq_div(A->content, B->content, c);
+    fmpz_mpoly_set(A->zpoly, B->zpoly, ctx->zctx);
 }

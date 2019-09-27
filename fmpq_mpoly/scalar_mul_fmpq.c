@@ -11,13 +11,16 @@
 
 #include "fmpq_mpoly.h"
 
-void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t poly1,
-         const fmpq_mpoly_t poly2, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t A,
+              const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpq_mul(poly1->content, poly2->content, c);
-    if (fmpq_is_zero(poly1->content)) {
-        fmpz_mpoly_zero(poly1->zpoly, ctx->zctx);
-    } else {
-        fmpz_mpoly_set(poly1->zpoly, poly2->zpoly, ctx->zctx);
+    fmpq_mul(A->content, B->content, c);
+    if (fmpq_is_zero(A->content))
+    {
+        fmpz_mpoly_zero(A->zpoly, ctx->zctx);
+    }
+    else
+    {
+        fmpz_mpoly_set(A->zpoly, B->zpoly, ctx->zctx);
     }
 }

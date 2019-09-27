@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017, 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -10,73 +10,91 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_add_fmpz(fmpz_mpoly_t poly1,
-          const fmpz_mpoly_t poly2, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, N;
-   slong len2 = poly2->length;
+    slong i, N;
+    slong Blen = B->length;
 
-   if (len2 == 0)
-   {
-      fmpz_mpoly_set_fmpz(poly1, c, ctx);
-      return;
-   }
+    if (Blen == 0)
+    {
+        fmpz_mpoly_set_fmpz(A, c, ctx);
+        return;
+    }
 
-   if (!fmpz_is_zero(c))
-   {
-      N = mpoly_words_per_exp(poly2->bits, ctx->minfo);
+    if (!fmpz_is_zero(c))
+    {
+        N = mpoly_words_per_exp(B->bits, ctx->minfo);
 
-      if (mpoly_monomial_is_zero(poly2->exps + (len2 - 1)*N, N))
-      {
-         if (poly1 != poly2)
-         {
-            fmpz_mpoly_fit_length(poly1, poly2->length, ctx);
-            fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
+        if (mpoly_monomial_is_zero(B->exps + (Blen - 1)*N, N))
+        {
+            if (A != B)
+            {
+                fmpz_mpoly_fit_length(A, B->length, ctx);
+                fmpz_mpoly_fit_bits(A, B->bits, ctx);
+                A->bits = B->bits;
 
-            for (i = 0; i < len2 - 1; i++)
-               fmpz_set(poly1->coeffs + i, poly2->coeffs + i);
+                for (i = 0; i < Blen - 1; i++)
+                    fmpz_set(A->coeffs + i, B->coeffs + i);
 
-            for (i = 0; i < len2*N; i++)
-               poly1->exps[i] = poly2->exps[i];
+                for (i = 0; i < Blen*N; i++)
+                    A->exps[i] = B->exps[i];
 
-            _fmpz_mpoly_set_length(poly1, poly2->length, ctx);
+                _fmpz_mpoly_set_length(A, B->length, ctx);
+            }
 
-            poly1->bits = poly2->bits;
-         }
+            fmpz_add(A->coeffs + Blen - 1, B->coeffs + Blen - 1, c);
 
-         fmpz_add(poly1->coeffs + len2 - 1, poly2->coeffs + len2 - 1, c);
+            if (fmpz_is_zero(A->coeffs + Blen - 1))
+                _fmpz_mpoly_set_length(A, Blen - 1, ctx);
+        }
+        else
+        {
+            fmpz_mpoly_fit_length(A, Blen + 1, ctx);
 
-         if (fmpz_is_zero(poly1->coeffs + len2 - 1))
-            _fmpz_mpoly_set_length(poly1, len2 - 1, ctx);
-      } else
-      {
-         fmpz_mpoly_fit_length(poly1, len2 + 1, ctx);
+            if (A != B)
+            {
+                fmpz_mpoly_fit_bits(A, B->bits, ctx);
+                A->bits = B->bits;
 
-         if (poly1 != poly2)
-         {
-            fmpz_mpoly_fit_bits(poly1, poly2->bits, ctx);
-            poly1->bits = poly2->bits;
+                for (i = 0; i < Blen; i++)
+                    fmpz_set(A->coeffs + i, B->coeffs + i);
 
-            for (i = 0; i < len2; i++)
-               fmpz_set(poly1->coeffs + i, poly2->coeffs + i);
+                for (i = 0; i < Blen*N; i++)
+                    A->exps[i] = B->exps[i];
+            } 
 
-            for (i = 0; i < len2*N; i++)
-               poly1->exps[i] = poly2->exps[i];
-         } 
-            
-         for (i = 0; i < N; i++)
-            poly1->exps[len2*N + i] = 0;
+            for (i = 0; i < N; i++)
+                A->exps[Blen*N + i] = 0;
 
-         fmpz_set(poly1->coeffs + len2, c);
+            fmpz_set(A->coeffs + Blen, c);
 
-         _fmpz_mpoly_set_length(poly1, poly2->length + 1, ctx);
-      }
-   } else if (poly1 != poly2)
-      fmpz_mpoly_set(poly1, poly2, ctx);
+            _fmpz_mpoly_set_length(A, Blen + 1, ctx);
+        }
+    }
+    else if (A != B)
+    {
+        fmpz_mpoly_set(A, B, ctx);
+    }
+}
+
+void fmpz_mpoly_add_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                           ulong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_ui(t, c);
+    fmpz_mpoly_add_fmpz(A, B, t, ctx);
+    fmpz_clear(t);
+}
+
+void fmpz_mpoly_add_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                           slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_set_si(t, c);
+    fmpz_mpoly_add_fmpz(A, B, t, ctx);
+    fmpz_clear(t);
 }

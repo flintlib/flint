@@ -19,7 +19,7 @@
 #include "ulong_extras.h"
 
 void
-fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
+fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 {
     ulong m;
 
@@ -31,7 +31,7 @@ fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 }
 
 void
-fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
+fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 {
     ulong m;
 
@@ -65,7 +65,7 @@ fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 }
 
 void
-fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
+fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 {
     if (bits == 0)
     {

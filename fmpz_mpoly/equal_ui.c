@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,21 +12,21 @@
 
 #include "fmpz_mpoly.h"
 
-int fmpz_mpoly_equal_ui(const fmpz_mpoly_t poly,
+int fmpz_mpoly_equal_ui(const fmpz_mpoly_t A,
                                            ulong c, const fmpz_mpoly_ctx_t ctx)
 {
     slong N;
 
     if (c == 0)
-        return poly->length == 0;
+        return A->length == 0;
 
-    if (poly->length != 1)
+    if (A->length != 1)
         return 0;
 
-    N = mpoly_words_per_exp(poly->bits, ctx->minfo);
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    if (!mpoly_monomial_is_zero(poly->exps + N*0, N))
+    if (!mpoly_monomial_is_zero(A->exps + N*0, N))
         return 0;
 
-    return fmpz_equal_ui(poly->coeffs + 0, c);
+    return fmpz_equal_ui(A->coeffs + 0, c);
 }

@@ -211,7 +211,7 @@ void fmpz_mpoly_geobucket_pow_ui_inplace(fmpz_mpoly_geobucket_t B1,
     fmpz_mpoly_init(a, ctx);
 
     fmpz_mpoly_geobucket_empty(a, B1, ctx);
-    fmpz_mpoly_pow_fps(a, a, k, ctx);
+    fmpz_mpoly_pow_ui(a, a, k, ctx);
     fmpz_mpoly_geobucket_set(B1, a, ctx);
 
     fmpz_mpoly_clear(a, ctx);

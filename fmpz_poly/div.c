@@ -16,10 +16,11 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void
-_fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+int
+_fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA,
+                                         const fmpz * B, slong lenB, int exact)
 {
-    _fmpz_poly_div_divconquer(Q, A, lenA, B, lenB);
+    return _fmpz_poly_div_divconquer(Q, A, lenA, B, lenB, exact);
 }
 
 void
@@ -51,7 +52,7 @@ fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
         q = Q->coeffs;
     }
 
-    _fmpz_poly_div(q, A->coeffs, A->length, B->coeffs, B->length);
+    _fmpz_poly_div(q, A->coeffs, A->length, B->coeffs, B->length, 0);
 
     if (Q == A || Q == B)
     {

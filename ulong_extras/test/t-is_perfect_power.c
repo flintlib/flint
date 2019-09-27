@@ -88,7 +88,7 @@ int main(void)
    /* exhaustively test all other powers */
    for (d = 2; d < (UWORD(1) << (FLINT_BITS/5)); d++)
    {
-      ulong hi = 0;
+      hi = 0;
       n = d*d;
       
       while (hi == 0)

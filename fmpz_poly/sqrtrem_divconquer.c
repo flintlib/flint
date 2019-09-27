@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
-    Copyright (C) 2018 William Hart
+    Copyright (C) 2018, 2019 William Hart
     
     This file is part of FLINT.
 
@@ -27,7 +27,6 @@ int
 _fmpz_poly_sqrtrem_divconquer(fmpz * res, fmpz * r, const fmpz * poly, slong len, fmpz * temp)
 {
     slong i, n, n2;
-    int result;
 
     if (len < FMPZ_POLY_SQRTREM_DIVCONQUER_CUTOFF)
         return _fmpz_poly_sqrtrem_classical(res, r, poly, len);
@@ -49,23 +48,15 @@ _fmpz_poly_sqrtrem_divconquer(fmpz * res, fmpz * r, const fmpz * poly, slong len
     if (r != poly)
         _fmpz_vec_set(r, poly, len);
         
-    result = _fmpz_poly_sqrtrem_divconquer(res + n - n2, r + len - 2*n2 + 1, r + len - 2*n2 + 1, 2*n2 - 1, temp);
-
-    if (!result)
+    if (!_fmpz_poly_sqrtrem_divconquer(res + n - n2, r + len - 2*n2 + 1, r + len - 2*n2 + 1, 2*n2 - 1, temp))
         return 0;
 
     _fmpz_vec_scalar_mul_ui(temp, res + n - n2, n2, 2);
 
    _fmpz_vec_set(temp + n, r + n2, 2*n - 2*n2 - 1);
 
-    _fmpz_poly_divrem(res, r + n2, temp + n, 2*n - 2*n2 - 1, temp + 2*n2 - n, n - n2);
-
-    /* check division was possible; TODO: use early bailout divrem above instead */
-    for (i = n - n2 - 1; i < 2*n - 2*n2 - 1; i++)
-    {
-        if (!fmpz_is_zero(r + n2 + i))
-           return 0;
-    }
+    if (!_fmpz_poly_divrem(res, r + n2, temp + n, 2*n - 2*n2 - 1, temp + 2*n2 - n, n - n2, 1))
+       return 0;
 
     _fmpz_poly_mul(temp + 2*n2 - n, res, n - n2, res, n - n2);
 

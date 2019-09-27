@@ -16,4 +16,3 @@ is_prime_aprcl(const fmpz_t n)
 {
     return is_prime_jacobi(n);
 }
-

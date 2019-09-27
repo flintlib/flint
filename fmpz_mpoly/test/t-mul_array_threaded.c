@@ -19,13 +19,17 @@ int
 main(void)
 {
     int i, j, result, max_threads = 5;
+    int tmul = 20;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 1;
+#endif
 
     flint_printf("mul_array_threaded....");
     fflush(stdout);
 
     /* Check mul_array_threaded matches mul_johnson */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k;
@@ -61,7 +65,7 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array_threaded(k, f, g, ctx);
+            result = fmpz_mpoly_mul_array_threaded(k, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             if (!result)
             {
                 continue;
@@ -76,14 +80,15 @@ main(void)
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(h, ctx);  
-        fmpz_mpoly_clear(k, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(k, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing first argument */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
@@ -116,7 +121,7 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array_threaded(f, f, g, ctx);
+            result = fmpz_mpoly_mul_array_threaded(f, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             if (!result)
                 continue;
 
@@ -130,13 +135,14 @@ main(void)
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(h, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
@@ -169,7 +175,7 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            result = fmpz_mpoly_mul_array_threaded(g, f, g, ctx);
+            result = fmpz_mpoly_mul_array_threaded(g, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             if (!result)
                 continue;
 
@@ -183,9 +189,10 @@ main(void)
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(h, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

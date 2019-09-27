@@ -20,7 +20,7 @@
 void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1, 
                                         const fmpz * poly2, slong len2)
 {
-    mp_bitcnt_t bits1, bits2, bound, pbits, curr_bits = 0; 
+    flint_bitcnt_t bits1, bits2, bound, pbits, curr_bits = 0; 
     slong i, num_primes;
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;

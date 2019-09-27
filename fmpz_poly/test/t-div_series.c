@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2019 William Hart
 
     This file is part of FLINT.
 
@@ -114,6 +114,47 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL (check Q * B = A):\n");
+            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
+            flint_printf("p = "), fmpz_poly_print(p), flint_printf("\n\n");
+            flint_printf("q = "), fmpz_poly_print(q), flint_printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(p);
+        fmpz_poly_clear(q);
+    }
+
+    /* Check that (A * B)/B == A */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        fmpz_poly_t a, b, p, q;
+        slong n = n_randint(state, 50) + 1;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(p);
+        fmpz_poly_init(q);
+
+        fmpz_poly_randtest(a, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100))
+;
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+
+        while (fmpz_is_zero(b->coeffs + 0))
+            fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+
+        fmpz_poly_mullow(p, a, b, n);
+
+        fmpz_poly_div_series(q, p, b, n);
+
+        fmpz_poly_truncate(a, n);
+
+        result = (fmpz_poly_equal(q, a));
+        if (!result)
+        {
+            flint_printf("FAIL (check (A * B)/B = A):\n");
             flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
             flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
             flint_printf("p = "), fmpz_poly_print(p), flint_printf("\n\n");

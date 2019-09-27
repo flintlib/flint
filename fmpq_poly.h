@@ -116,13 +116,13 @@ slong fmpq_poly_length(const fmpq_poly_t poly)
 /*  Randomisation  ***********************************************************/
 
 FLINT_DLL void fmpq_poly_randtest(fmpq_poly_t f, flint_rand_t state, 
-                                                slong len, mp_bitcnt_t bits_in);
+                                                slong len, flint_bitcnt_t bits_in);
 
 FLINT_DLL void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_t state, 
-                                                slong len, mp_bitcnt_t bits_in);
+                                                slong len, flint_bitcnt_t bits_in);
 
 FLINT_DLL void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state,
-                                                slong len, mp_bitcnt_t bits_in);
+                                                slong len, flint_bitcnt_t bits_in);
 
 /*  Assignment and basic manipulation  ***************************************/
 
@@ -141,6 +141,14 @@ FLINT_DLL void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
 FLINT_DLL void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
 
 FLINT_DLL void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op);
+
+FLINT_DLL void _fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op);
+
+FLINT_DLL void fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den);
+
+FLINT_DLL void fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op);
+
+FLINT_DLL void fmpq_poly_set_nmod_poly(fmpq_poly_t rop, const nmod_poly_t op);
 
 FLINT_DLL void _fmpq_poly_set_array_mpq(fmpz * poly, 
                                          fmpz_t den, const mpq_t * a, slong n);

@@ -34,6 +34,7 @@ int main(void)
 
         pow =  n_randint(state, 32);
 
+        fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 100);
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 100);

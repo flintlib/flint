@@ -79,6 +79,8 @@ TEMPLATE(T, mat_mul_KS) (TEMPLATE(T, mat_t) C,
     fmpz_mat_clear(fa);
     fmpz_mat_clear(fb);
     fmpz_mat_clear(fc);
+
+    fmpz_clear(beta);
 }
 
 

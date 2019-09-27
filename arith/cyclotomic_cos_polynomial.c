@@ -145,7 +145,7 @@ _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n)
     fmpz * alpha;
     fmpz_t half;
     mpfr_t t, u;
-    mp_bitcnt_t prec;
+    flint_bitcnt_t prec;
     slong exp;
 
     if (n <= MAX_32BIT)

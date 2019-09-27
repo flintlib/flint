@@ -178,6 +178,11 @@ main(void)
         fmpq_set_si(q, WORD(2), WORD(3));
         result = result && !fmpq_mpoly_equal_fmpq(f, q, ctx);
 
+        fmpq_mpoly_get_denominator(a, f, ctx);
+        result = result && fmpz_equal_si(a, WORD(3));
+        fmpq_mpoly_get_denominator(a, g, ctx);
+        result = result && fmpz_equal_si(a, WORD(1));
+
         fmpz_set_si(a, WORD(1));
         result = result && !fmpq_mpoly_equal_fmpz(f, a, ctx);
 
@@ -213,6 +218,11 @@ main(void)
 
         fmpq_set_si(q, WORD(2), WORD(3));
         result = result && !fmpq_mpoly_equal_fmpq(f, q, ctx);
+
+        fmpq_mpoly_get_denominator(a, f, ctx);
+        result = result && fmpz_equal_si(a, WORD(15));
+        fmpq_mpoly_get_denominator(a, g, ctx);
+        result = result && fmpz_equal_si(a, WORD(1));
 
         fmpz_set_si(a, WORD(1));
         result = result && !fmpq_mpoly_equal_fmpz(f, a, ctx);
