@@ -57,7 +57,8 @@ FLINT_DLL void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
    - the n×m change-of-basis matrix from k to K,
 
    Return the m×n matrix of the trace from K to k.
-   If m=n, res is the inverse of basis. */
+   If m=n, res is the inverse of basis.
+*/
 FLINT_DLL void TEMPLATE(T, trace_matrix)(TEMPLATE(B, mat_t) res,
                                          const TEMPLATE(B, mat_t) basis,
                                          const TEMPLATE(T, ctx_t) sub_ctx,

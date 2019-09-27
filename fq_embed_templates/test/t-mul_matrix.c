@@ -30,6 +30,7 @@ main(void)
     flint_printf("mul_matrix... ");
     fflush(stdout);
 
+    /* Check that Mat(a^2) = Mat(a)^2 for random a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;

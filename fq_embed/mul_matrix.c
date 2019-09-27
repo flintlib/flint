@@ -13,7 +13,8 @@
 
 void fq_mul_matrix(fmpz_mod_mat_t matrix,
                    const fq_t gen,
-                   const fq_ctx_t ctx) {
+                   const fq_ctx_t ctx)
+{
     slong i, j, len = fq_ctx_degree(ctx);
     fmpz_t lead;
 
@@ -27,11 +28,13 @@ void fq_mul_matrix(fmpz_mod_mat_t matrix,
         fmpz_zero(fmpz_mod_mat_entry(matrix, i, 0));
 
     /* M[i,j] = M[i-1,j-1] - M[len-1,j-1] * lead * ctx->modulus->coeffs[i] */
-    for (j = 1; j < len; j++) {
+    for (j = 1; j < len; j++)
+    {
         fmpz_mul(fmpz_mod_mat_entry(matrix, len-1, j),
                  fmpz_mod_mat_entry(matrix, len-1, j-1),
                  lead);
-        for (i = 0; i < len; i++) {
+        for (i = 0; i < len; i++)
+        {
             fmpz_mul(fmpz_mod_mat_entry(matrix, i, j),
                      fmpz_mod_mat_entry(matrix, len-1, j),
                      ctx->modulus->coeffs + i);
@@ -43,7 +46,7 @@ void fq_mul_matrix(fmpz_mod_mat_t matrix,
                      fmpz_mod_mat_entry(matrix, i, j));
         }
     }
-    
+
     _fmpz_mod_mat_reduce(matrix);
 
     fmpz_clear(lead);

@@ -27,10 +27,10 @@ main(void)
     
     FLINT_TEST_INIT(state);
 
-    flint_printf("mono_to_dual + dual_to_mono matrix... ");
+    flint_printf("mono_to/from_dual_matrix... ");
     fflush(stdout);
 
-    /* Check that they are inverse of one another */
+    /* Check that the two functions are inverse of one another */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;

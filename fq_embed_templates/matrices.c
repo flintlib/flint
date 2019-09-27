@@ -126,12 +126,6 @@ int __nmod_inv_degree(fmpz_t invd, slong d, mp_limb_t p)
     return 1;
 }
 
-static __inline__
-void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
-{
-    nmod_mat_scalar_mul(res, M, fmpz_get_ui(c));
-}
-
 #define fmpz_mod_mat_entry_is_zero(mat, i, j) (fmpz_is_zero(fmpz_mod_mat_entry((mat), (i), (j))))
 #define nmod_mat_entry_is_zero(mat, i, j) (nmod_mat_entry((mat), (i), (j)) == 0)
 
@@ -175,11 +169,13 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
     /* If this is an isomorphism, there is no need for correction */
     if (d == 1) {}
     /* If the extension degree is invertible mod p, multiply trace by 1/d */
-    else if (__TEMPLATE(B, inv_degree)(invd, d, TEMPLATE(B, poly_modulus)(gen_minpoly))) {
+    else if (__TEMPLATE(B, inv_degree)(invd, d, TEMPLATE(B, poly_modulus)(gen_minpoly))) 
+    {
         TEMPLATE(B, mat_scalar_mul_fmpz)(sup2gen, sup2gen, invd);
     }
     /* Otherwise pre-multiply by an element of trace equal to 1 */
-    else {
+    else
+    {
         int i;
         TEMPLATE(T, t) mul, trace;
         TEMPLATE(B, mat_t) column, tvec, mat_mul, tmp;
@@ -192,7 +188,8 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
 
         /* Look for a non-zero column in sup2gen
            (we know it has full rank, so first row is non-null) */
-        for (i = 1; i < n; i++) {
+        for (i = 1; i < n; i++)
+        {
             if (!TEMPLATE(B, mat_entry_is_zero(sup2gen, 0, i)))
                 break;
         }

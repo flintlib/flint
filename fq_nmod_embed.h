@@ -28,11 +28,4 @@
 #undef B
 #undef T
 
-FQ_NMOD_EMBED_INLINE void fq_nmod_modulus_derivative_inv(fq_nmod_t m_prime,
-							 fq_nmod_t m_prime_inv,
-							 const fq_nmod_ctx_t ctx) {
-    nmod_poly_derivative(m_prime, fq_nmod_ctx_modulus(ctx));
-    fq_nmod_inv(m_prime_inv, m_prime, ctx);
-}
-
 #endif

@@ -27,6 +27,7 @@ main(void)
     flint_printf("composition matrix... ");
     fflush(stdout);
 
+    /* Check that Mat(a^p) = Mat(x^p) * Mat(a) for random a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;

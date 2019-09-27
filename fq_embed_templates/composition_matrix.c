@@ -30,7 +30,8 @@ void TEMPLATE(T, composition_matrix_sub)(TEMPLATE(B, mat_t) matrix,
     TEMPLATE(T, one)(tmp, ctx);
 
     TEMPLATE(B, mat_zero)(matrix);
-    for (j = 0; j < trunc; j++) {
+    for (j = 0; j < trunc; j++)
+    {
         for (i = 0; i < tmp->length; i++)
             TEMPLATE(B, mat_set_entry)(matrix, i, j, 
                                        __TEMPLATE(B, poly_get_coeff)(tmp, i));

@@ -120,8 +120,10 @@ void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat)
 {
     slong i, j;
     fmpz *entry;
-    for (i = 0; i < mat->mat->r; i++) {
-        for (j = 0; j < mat->mat->c; j++) {
+    for (i = 0; i < mat->mat->r; i++)
+    {
+        for (j = 0; j < mat->mat->c; j++)
+        {
             entry = fmpz_mod_mat_entry(mat, i, j);
             fmpz_mod(entry, entry, mat->mod);
         }
@@ -143,7 +145,7 @@ void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat,
                               slong r1, slong c1, slong r2, slong c2)
 {
     fmpz_mat_window_init(window->mat, mat->mat, r1, c1, r2, c2);
-    fmpz_init_set(window->mod, mat->mod);    
+    fmpz_init_set(window->mod, mat->mod);
 }
 
 FMPZ_MOD_MAT_INLINE
@@ -163,7 +165,7 @@ void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res,
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res,
-                                  const fmpz_mod_mat_t mat1,  
+                                  const fmpz_mod_mat_t mat1,
                                   const fmpz_mod_mat_t mat2)
 {
     fmpz_mat_concat_vertical(res->mat, mat1->mat, mat2->mat);
@@ -257,6 +259,13 @@ void fmpz_mod_mat_scalar_mul_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong 
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_t c)
+{
+    fmpz_mat_scalar_mul_fmpz(B->mat, A->mat, c);
+    _fmpz_mod_mat_reduce(B);
+}
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_scalar_mul_fmpz_mod(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_mod_t c)
 {
     fmpz_mat_scalar_mul_fmpz(B->mat, A->mat, c);
     _fmpz_mod_mat_reduce(B);
