@@ -104,7 +104,7 @@ cleanup:
 int
 main(void)
 {
-    slong tmul = 5;
+    slong tmul = 10;
     slong i, j;
     FLINT_TEST_INIT(state);
 
@@ -145,9 +145,9 @@ main(void)
         fmpz_mpoly_init(a, ctx);
         fmpz_mpoly_init(b, ctx);
 
-        len = n_randint(state, 50) + 1;
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
+        len = n_randint(state, 40) + 1;
+        len1 = n_randint(state, 80);
+        len2 = n_randint(state, 80);
 
         degbound = 1 + 50/ctx->minfo->nvars/ctx->minfo->nvars;
 
@@ -180,3 +180,4 @@ main(void)
     printf("PASS\n");
     return 0;
 }
+

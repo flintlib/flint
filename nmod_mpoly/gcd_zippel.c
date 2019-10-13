@@ -118,8 +118,8 @@ int nmod_mpolyu_gcdm_zippel_bivar(
             goto outer_continue;
 
         /* make sure reduction does not kill either A or B */
-        nmod_mpolyun_intp_reduce_lg_mpolyu(Aeval, An, ffctx, ctx);
-        nmod_mpolyun_intp_reduce_lg_mpolyu(Beval, Bn, ffctx, ctx);
+        nmod_mpolyun_interp_reduce_lg_mpolyu(Aeval, An, ffctx, ctx);
+        nmod_mpolyun_interp_reduce_lg_mpolyu(Beval, Bn, ffctx, ctx);
         if (Aeval->length == 0 || Beval->length == 0)
             goto outer_continue;
 
@@ -155,7 +155,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
 
         if (nmod_poly_degree(modulus) > 0)
         {
-            changed = nmod_mpolyun_intp_crt_lg_mpolyu(&lastdeg, H, Ht,
+            changed = nmod_mpolyun_interp_crt_lg_mpolyu(&lastdeg, H, Ht,
                                                    modulus, ctx, Geval, ffctx);
             nmod_poly_mul(modulus, modulus, ffctx->fqctx->modulus);
 
@@ -188,7 +188,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
         }
         else
         {
-            nmod_mpolyun_intp_lift_lg_mpolyu(H, ctx, Geval, ffctx);
+            nmod_mpolyun_interp_lift_lg_mpolyu(H, ctx, Geval, ffctx);
             nmod_poly_set(modulus, ffctx->fqctx->modulus);
         }
 
@@ -334,8 +334,8 @@ choose_prime_outer:
         goto choose_prime_outer;
 
     /* make sure reduction does not kill either A or B */
-    nmod_mpolyun_intp_reduce_lg_mpolyu(Aff, An, ffctx, ctx);
-    nmod_mpolyun_intp_reduce_lg_mpolyu(Bff, Bn, ffctx, ctx);
+    nmod_mpolyun_interp_reduce_lg_mpolyu(Aff, An, ffctx, ctx);
+    nmod_mpolyun_interp_reduce_lg_mpolyu(Bff, Bn, ffctx, ctx);
     if (Aff->length == 0 || Bff->length == 0)
         goto choose_prime_outer;
 
@@ -359,7 +359,7 @@ choose_prime_outer:
     fq_nmod_mpolyu_scalar_mul_fq_nmod(Gff, t, ffctx);
 
     fq_nmod_mpolyu_setform(Gform, Gff, ffctx);
-    nmod_mpolyun_intp_lift_lg_mpolyu(Hn, ctx, Gff, ffctx);
+    nmod_mpolyun_interp_lift_lg_mpolyu(Hn, ctx, Gff, ffctx);
 
     nmod_poly_set(modulus, ffctx->fqctx->modulus);
 
@@ -393,8 +393,8 @@ choose_prime_inner:
         goto choose_prime_inner;
 
     /* make sure reduction does not kill either A or B */
-    nmod_mpolyun_intp_reduce_lg_mpolyu(Aff, An, ffctx, ctx);
-    nmod_mpolyun_intp_reduce_lg_mpolyu(Bff, Bn, ffctx, ctx);
+    nmod_mpolyun_interp_reduce_lg_mpolyu(Aff, An, ffctx, ctx);
+    nmod_mpolyun_interp_reduce_lg_mpolyu(Bff, Bn, ffctx, ctx);
     if (Aff->length == 0 || Bff->length == 0)
         goto choose_prime_inner;
 
@@ -422,7 +422,7 @@ choose_prime_inner:
     fq_nmod_mul(t, t, gammaff, ffctx->fqctx);
     fq_nmod_mpolyu_scalar_mul_fq_nmod(Gff, t, ffctx);
 
-    changed = nmod_mpolyun_intp_mcrt_lg_mpolyu(&lastdeg, Hn, ctx, modulus, Gff, ffctx);
+    changed = nmod_mpolyun_interp_mcrt_lg_mpolyu(&lastdeg, Hn, ctx, modulus, Gff, ffctx);
     nmod_poly_mul(modulus, modulus, ffctx->fqctx->modulus);
 
     have_enough = nmod_poly_degree(modulus) >= bound;
