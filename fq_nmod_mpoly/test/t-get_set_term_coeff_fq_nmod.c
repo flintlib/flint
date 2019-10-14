@@ -23,7 +23,7 @@ main(void)
     fflush(stdout);
 
     /* Set coeff and get coeff and compare */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f;
@@ -53,15 +53,22 @@ main(void)
             if (!fq_nmod_equal(c, d, ctx->fqctx))
             {
                 printf("FAIL\n");
-                flint_printf("Set coeff and get coeff and compare\ni = %wd, j = %wd\n", i, j);
+                flint_printf("check get and set match\ni = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
+
+            if (!fq_nmod_equal(fq_nmod_mpoly_term_coeff_ref(f, index, ctx), d, ctx->fqctx))
+            {
+                printf("FAIL\n");
+                flint_printf("check reference match\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
         }
 
         fq_nmod_mpoly_clear(f, ctx);
-        fq_nmod_clear(c, ctx->fqctx);      
+        fq_nmod_clear(c, ctx->fqctx);
         fq_nmod_clear(d, ctx->fqctx);
-        fq_nmod_mpoly_ctx_clear(ctx);  
+        fq_nmod_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

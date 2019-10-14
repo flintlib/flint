@@ -256,6 +256,10 @@ Container operations
     These functions deal with violations of the internal canonical representation.
     If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
 
+.. function:: mp_limb_t * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Return a reference to the coefficient of index `i` of ``A``.
+
 .. function:: int nmod_mpoly_is_canonical(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
