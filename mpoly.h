@@ -886,8 +886,27 @@ FLINT_DLL void mpoly_get_monomial_ui_sp(ulong * user_exps,
 FLINT_DLL void mpoly_get_monomial_ui_mp(ulong * user_exps,
                   const ulong * poly_exps, slong bits, const mpoly_ctx_t mctx);
 
-FLINT_DLL void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps,
-                                           slong bits, const mpoly_ctx_t mctx);
+FLINT_DLL void mpoly_get_monomial_si_mp(slong * user_exps,
+                  const ulong * poly_exps, slong bits, const mpoly_ctx_t mctx);
+
+MPOLY_INLINE void mpoly_get_monomial_ui(ulong * user_exps, const ulong * poly_exps,
+                                            slong bits, const mpoly_ctx_t mctx)
+{
+    if (bits <= FLINT_BITS)
+        mpoly_get_monomial_ui_sp(user_exps, poly_exps, bits, mctx);
+    else
+        mpoly_get_monomial_ui_mp(user_exps, poly_exps, bits, mctx);
+}
+
+MPOLY_INLINE void mpoly_get_monomial_si(slong * user_exps, const ulong * poly_exps,
+                                            slong bits, const mpoly_ctx_t mctx)
+{
+/* if bits <= FLINT_BITS and poly_exps is canonical, everything should be ok */
+    if (bits <= FLINT_BITS)
+        mpoly_get_monomial_ui_sp((ulong *) user_exps, poly_exps, bits, mctx);
+    else
+        mpoly_get_monomial_si_mp(user_exps, poly_exps, bits, mctx);
+}
 
 FLINT_DLL void mpoly_get_monomial_ffmpz(fmpz * exps, const ulong * poly_exps,
                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx);

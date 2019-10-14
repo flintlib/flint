@@ -155,15 +155,45 @@ void mpoly_get_monomial_ui_mp(ulong * user_exps, const ulong * poly_exps,
         flint_throw(FLINT_ERROR, "Exponent vector does not fit a ulong.");
 }
 
-void mpoly_get_monomial_ui(ulong * user_exps, const ulong * poly_exps,
+void mpoly_get_monomial_si_mp(slong * user_exps, const ulong * poly_exps,
                                             slong bits, const mpoly_ctx_t mctx)
 {
-    if (bits <= FLINT_BITS)
-        mpoly_get_monomial_ui_sp(user_exps, poly_exps, bits, mctx);
-    else
-        mpoly_get_monomial_ui_mp(user_exps, poly_exps, bits, mctx);
-}
+    slong nvars = mctx->nvars;
+    slong i, j;
+    slong * exp1;
+    const ulong * exp2;
+    ulong words_per_field = bits/FLINT_BITS;
+    ulong check_mask;
+    slong dir;
 
+    FLINT_ASSERT(bits%FLINT_BITS == 0);
+    FLINT_ASSERT(bits > FLINT_BITS);
+
+    exp2 = poly_exps;
+    exp1 = user_exps + nvars - 1;
+    dir = -WORD(1);
+    if (mctx->rev)
+    {
+        exp1 = user_exps;
+        dir = UWORD(1);
+    }
+
+    check_mask = 0;
+    for (i = 0; i < nvars; i++)
+    {
+        *exp1 = (slong) *exp2;
+        exp1 += dir;
+
+        check_mask |= FLINT_SIGN_EXT(exp2[0]);
+        for (j = 1; j < words_per_field; j++)
+            check_mask |= exp2[j];
+
+        exp2 += words_per_field;
+    }
+
+    if (check_mask != 0)
+        flint_throw(FLINT_ERROR, "Exponent vector does not fit an slong.");
+}
 
 void mpoly_get_monomial_ffmpz(fmpz * user_exps, const ulong * poly_exps,
                                       flint_bitcnt_t bits, const mpoly_ctx_t mctx)

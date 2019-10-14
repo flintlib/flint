@@ -11,7 +11,7 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A, 
+void nmod_mpoly_get_term_exp_si(slong * exp, const nmod_mpoly_t A, 
                                            slong i, const nmod_mpoly_ctx_t ctx)
 {
     slong N;
@@ -19,9 +19,9 @@ void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A,
     if ((ulong) i >= (ulong) A->length)
     {
         flint_throw(FLINT_ERROR,
-                         "Index out of range in nmod_mpoly_get_term_exp_fmpz");
+                           "Index out of range in nmod_mpoly_get_term_exp_si");
     }
 
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
-    mpoly_get_monomial_pfmpz(exp, A->exps + N*i, A->bits, ctx->minfo);
+    mpoly_get_monomial_si(exp, A->exps + N*i, A->bits, ctx->minfo);
 }

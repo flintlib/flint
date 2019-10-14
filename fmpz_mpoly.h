@@ -520,10 +520,13 @@ int fmpz_mpoly_term_exp_fits_si(const fmpz_mpoly_t A, slong i,
                      : mpoly_term_exp_fits_si(A->exps, A->bits, i, ctx->minfo);
 }
 
-FLINT_DLL void fmpz_mpoly_get_term_exp_fmpz(fmpz ** exp, const fmpz_mpoly_t A, 
+FLINT_DLL void fmpz_mpoly_get_term_exp_fmpz(fmpz ** exp, const fmpz_mpoly_t A,
                                           slong i, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_get_term_exp_ui(ulong * exp, const fmpz_mpoly_t A, 
+FLINT_DLL void fmpz_mpoly_get_term_exp_ui(ulong * exp, const fmpz_mpoly_t A,
+                                          slong i, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_get_term_exp_si(slong * exp, const fmpz_mpoly_t A,
                                           slong i, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i,
