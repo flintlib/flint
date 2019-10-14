@@ -507,8 +507,8 @@ int fq_nmod_mpolyn_gcd_brown_lgprime_bivar(
     fq_nmod_poly_t cA, cB, cG, cAbar, cBbar, gamma, tquo, trem;
     fq_nmod_poly_t modulus;
     flint_rand_t randstate;
-    _fq_nmod_mpoly_embed_chooser_t embc;
-    _fq_nmod_embed_struct * cur_emb;
+    bad_fq_nmod_mpoly_embed_chooser_t embc;
+    bad_fq_nmod_embed_struct * cur_emb;
     fq_nmod_mpoly_ctx_t ectx;
     slong N, off, shift;
     fq_nmod_poly_struct * Glead;
@@ -562,7 +562,7 @@ int fq_nmod_mpolyn_gcd_brown_lgprime_bivar(
     fq_nmod_poly_one(modulus, ctx->fqctx);
 
     flint_randinit(randstate);
-    cur_emb = _fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
 
     /*
         Once Aeval, Beval, ..., t are inited in ectx->fqctx, they do not need
@@ -581,7 +581,7 @@ int fq_nmod_mpolyn_gcd_brown_lgprime_bivar(
 
 choose_prime:
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
     if (cur_emb == NULL)
     {
         /* ran out of primes */
@@ -592,7 +592,7 @@ choose_prime:
 have_prime:
 
     /* make sure reduction does not kill both lc */
-    _fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
+    bad_fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
     if (fq_nmod_is_zero(gammaeval, ectx->fqctx))
     {
         goto choose_prime;
@@ -733,7 +733,7 @@ cleanup:
     fq_nmod_clear(gammaeval, ectx->fqctx);
     fq_nmod_clear(temp, ectx->fqctx);
 
-    _fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
+    bad_fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
 
     flint_randclear(randstate);
 
@@ -759,8 +759,8 @@ int fq_nmod_mpolyn_gcd_brown_lgprime(
     fq_nmod_poly_t cA, cB, cG, cAbar, cBbar, gamma, tquo, trem;
     fq_nmod_poly_t modulus;
     flint_rand_t randstate;
-    _fq_nmod_mpoly_embed_chooser_t embc;
-    _fq_nmod_embed_struct * cur_emb;
+    bad_fq_nmod_mpoly_embed_chooser_t embc;
+    bad_fq_nmod_embed_struct * cur_emb;
     fq_nmod_mpoly_ctx_t ectx;
     flint_bitcnt_t bits = A->bits;
     slong N, offset, shift;
@@ -820,7 +820,7 @@ int fq_nmod_mpolyn_gcd_brown_lgprime(
     fq_nmod_poly_one(modulus, ctx->fqctx);
 
     flint_randinit(randstate);
-    cur_emb = _fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
 
     /*
         Once Aeval, Beval, ..., t are inited in ectx->fqctx, they do not need
@@ -839,7 +839,7 @@ int fq_nmod_mpolyn_gcd_brown_lgprime(
 
 choose_prime: /* prime is irreducible element of Fq[v] (cur_emb->h) */
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
     if (cur_emb == NULL)
     {
         /* ran out of primes */
@@ -850,7 +850,7 @@ choose_prime: /* prime is irreducible element of Fq[v] (cur_emb->h) */
 have_prime:
 
     /* make sure reduction does not kill both lc */
-    _fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
+    bad_fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
     if (fq_nmod_is_zero(gammaeval, ectx->fqctx))
     {
         goto choose_prime;
@@ -998,7 +998,7 @@ cleanup:
     fq_nmod_clear(gammaeval, ectx->fqctx);
     fq_nmod_clear(temp, ectx->fqctx);
 
-    _fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
+    bad_fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
 
     flint_randclear(randstate);
 

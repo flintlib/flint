@@ -28,8 +28,8 @@ int fq_nmod_mpolyu_gcdm_zippel_bivar(
     int success = 0, changed, have_enough;
     fq_nmod_mpolyun_t An, Bn, H, Ht;
     fq_nmod_poly_t modulus, a, b, c, g;
-    _fq_nmod_mpoly_embed_chooser_t embc;
-    _fq_nmod_embed_struct * cur_emb;
+    bad_fq_nmod_mpoly_embed_chooser_t embc;
+    bad_fq_nmod_embed_struct * cur_emb;
     fq_nmod_mpoly_ctx_t ectx;
     fq_nmod_mpolyu_t Aeval, Beval, Geval;
     fq_nmod_t t, geval;
@@ -73,7 +73,7 @@ int fq_nmod_mpolyu_gcdm_zippel_bivar(
     fq_nmod_mpolyun_init(H, A->bits, ctx);
     fq_nmod_mpolyun_init(Ht, A->bits, ctx);
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
 
     /*
         Once Aeval, Beval, ..., t are inited in ectx->fqctx, they do not need
@@ -90,7 +90,7 @@ int fq_nmod_mpolyu_gcdm_zippel_bivar(
 
 choose_prime_outer:
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
     if (cur_emb == NULL)
     {
         /* ran out of primes */
@@ -103,7 +103,7 @@ have_prime:
     FLINT_ASSERT(cur_emb != NULL);
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    _fq_nmod_embed_sm_to_lg(geval, g, cur_emb);
+    bad_fq_nmod_embed_sm_to_lg(geval, g, cur_emb);
     if (fq_nmod_is_zero(geval, ectx->fqctx))
         goto choose_prime_outer;
 
@@ -202,7 +202,7 @@ finished:
     fq_nmod_clear(geval, ectx->fqctx);
     fq_nmod_clear(t, ectx->fqctx);
 
-    _fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
+    bad_fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
 
     return success;
 }
@@ -222,8 +222,8 @@ int fq_nmod_mpolyu_gcdm_zippel(
     int success, changed, have_enough;
     fq_nmod_mpolyun_t An, Bn, Hn, Ht;
     fq_nmod_poly_t modulus, gamma, hc;
-    _fq_nmod_mpoly_embed_chooser_t embc;
-    _fq_nmod_embed_struct * cur_emb;
+    bad_fq_nmod_mpoly_embed_chooser_t embc;
+    bad_fq_nmod_embed_struct * cur_emb;
     fq_nmod_mpoly_ctx_t ectx;
     fq_nmod_mpolyu_t Aeval, Beval, Geval, Gform;
     fq_nmod_t t, gammaeval;
@@ -278,7 +278,7 @@ int fq_nmod_mpolyu_gcdm_zippel(
     fq_nmod_mpolyun_init(Hn, A->bits, ctx);
     fq_nmod_mpolyun_init(Ht, A->bits, ctx);
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
 
     /*
         Once Aeval, Beval, ..., t are inited in ectx->fqctx, they do not need
@@ -296,7 +296,7 @@ int fq_nmod_mpolyu_gcdm_zippel(
 
 choose_prime_outer:
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
     if (cur_emb == NULL)
     {
         /* ran out of primes */
@@ -309,7 +309,7 @@ have_prime:
     FLINT_ASSERT(cur_emb != NULL);
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    _fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
+    bad_fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
     if (fq_nmod_is_zero(gammaeval, ectx->fqctx))
         goto choose_prime_outer;
 
@@ -349,7 +349,7 @@ have_prime:
 
 choose_prime_inner:
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
     if (cur_emb == NULL)
     {
         success = 0;
@@ -357,7 +357,7 @@ choose_prime_inner:
     }
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    _fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
+    bad_fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
     if (fq_nmod_is_zero(gammaeval, ectx->fqctx))
         goto choose_prime_inner;
 
@@ -441,7 +441,7 @@ finished:
     fq_nmod_clear(gammaeval, ectx->fqctx);
     fq_nmod_clear(t, ectx->fqctx);
 
-    _fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
+    bad_fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
 
     return success;
 }
