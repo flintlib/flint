@@ -75,7 +75,7 @@ main(void)
             {
                 result = result
                  && exp1[k] == exp2[k]
-                 && exp1[k] == fmpz_mpoly_get_term_var_exp_ui(f, index, k, ctx);
+                 && exp1[k] == fmpz_mpoly_get_term_var_exp_si(f, index, k, ctx);
             }
 
             if (!result)

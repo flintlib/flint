@@ -75,7 +75,7 @@ void mpoly_get_monomial_ui_unpacked_ui(ulong * user_exps,
 }
 
 void mpoly_get_monomial_ui_sp(ulong * user_exps, const ulong * poly_exps,
-                                            slong bits, const mpoly_ctx_t mctx)
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong i, shift;
@@ -117,7 +117,7 @@ void mpoly_get_monomial_ui_sp(ulong * user_exps, const ulong * poly_exps,
 }
 
 void mpoly_get_monomial_ui_mp(ulong * user_exps, const ulong * poly_exps,
-                                            slong bits, const mpoly_ctx_t mctx)
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong i, j;
@@ -156,7 +156,7 @@ void mpoly_get_monomial_ui_mp(ulong * user_exps, const ulong * poly_exps,
 }
 
 void mpoly_get_monomial_si_mp(slong * user_exps, const ulong * poly_exps,
-                                            slong bits, const mpoly_ctx_t mctx)
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong i, j;
@@ -196,7 +196,7 @@ void mpoly_get_monomial_si_mp(slong * user_exps, const ulong * poly_exps,
 }
 
 void mpoly_get_monomial_ffmpz(fmpz * user_exps, const ulong * poly_exps,
-                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx)
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, nvars = mctx->nvars;
     fmpz * tmp_exps;
@@ -219,7 +219,7 @@ void mpoly_get_monomial_ffmpz(fmpz * user_exps, const ulong * poly_exps,
 }
 
 void mpoly_get_monomial_pfmpz(fmpz ** user_exps, const ulong * poly_exps,
-                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx)
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, nvars = mctx->nvars;
     fmpz * tmp_exps;

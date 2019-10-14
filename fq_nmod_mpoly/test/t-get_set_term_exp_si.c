@@ -20,7 +20,7 @@ main(void)
     int result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get/set_term_exp_ui....");
+    flint_printf("get/set_term_exp_si....");
     fflush(stdout);
 
     /* check set and get match */
@@ -71,7 +71,7 @@ main(void)
             {
                 result = result
                  && exp1[k] == exp2[k]
-                 && exp1[k] == fq_nmod_mpoly_get_term_var_exp_ui(f, index, k, ctx);
+                 && exp1[k] == fq_nmod_mpoly_get_term_var_exp_si(f, index, k, ctx);
             }
 
             if (!result)

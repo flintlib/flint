@@ -12,13 +12,14 @@
 #include "mpoly.h"
 
 
-int mpoly_monomials_inorder_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx)
+int mpoly_monomials_inorder_test(ulong * exps, slong len,
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong N, i;
     ulong * cmpmask;
 
     N = mpoly_words_per_exp(bits, mctx);
-    cmpmask = flint_malloc((N+1)*sizeof(ulong));
+    cmpmask = flint_malloc((N + 1)*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, bits, mctx);
 
     for (i = 0; i + 1 < len; i++)

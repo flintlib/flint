@@ -11,7 +11,7 @@
 
 #include "mpoly.h"
 
-int mpoly_term_exp_fits_ui(ulong * exps, slong bits,
+int mpoly_term_exp_fits_ui(ulong * exps, flint_bitcnt_t bits,
                                                slong n, const mpoly_ctx_t mctx)
 {
     slong i, N;
@@ -39,7 +39,7 @@ int mpoly_term_exp_fits_ui(ulong * exps, slong bits,
     return ret;
 }
 
-int mpoly_term_exp_fits_si(ulong * exps, slong bits,
+int mpoly_term_exp_fits_si(ulong * exps, flint_bitcnt_t bits,
                                                slong n, const mpoly_ctx_t mctx)
 {
     slong i, N;

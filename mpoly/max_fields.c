@@ -15,7 +15,7 @@
 
 /* unpack the field-wise maximum of poly_exps into max_fields */
 void mpoly_max_fields_ui_sp(ulong * max_fields, const ulong * poly_exps,
-                                 slong len, slong bits, const mpoly_ctx_t mctx)
+                        slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, N;
     ulong * pmax, mask;
@@ -44,7 +44,7 @@ void mpoly_max_fields_ui_sp(ulong * max_fields, const ulong * poly_exps,
 
 
 void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps,
-                                 slong len, slong bits, const mpoly_ctx_t mctx)
+                        slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, N;
     ulong * pmax, mask;

@@ -532,6 +532,9 @@ FLINT_DLL void fmpz_mpoly_get_term_exp_si(slong * exp, const fmpz_mpoly_t A,
 FLINT_DLL ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i,
                                         slong var, const fmpz_mpoly_ctx_t ctx);
 
+FLINT_DLL slong fmpz_mpoly_get_term_var_exp_si(const fmpz_mpoly_t A, slong i,
+                                        slong var, const fmpz_mpoly_ctx_t ctx);
+
 FLINT_DLL void fmpz_mpoly_set_term_exp_fmpz(fmpz_mpoly_t A,
                       slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
 

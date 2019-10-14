@@ -570,6 +570,9 @@ FLINT_DLL void fq_nmod_mpoly_get_term_exp_si(slong * exp,
 FLINT_DLL ulong fq_nmod_mpoly_get_term_var_exp_ui(const fq_nmod_mpoly_t A,
                             slong i, slong var, const fq_nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL slong fq_nmod_mpoly_get_term_var_exp_si(const fq_nmod_mpoly_t A,
+                            slong i, slong var, const fq_nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void fq_nmod_mpoly_set_term_exp_fmpz(fq_nmod_mpoly_t A,
                    slong i, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx);
 

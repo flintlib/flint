@@ -457,12 +457,11 @@ FLINT_DLL void fmpq_mpoly_get_term_exp_ui(ulong * exps, const fmpq_mpoly_t A,
 FLINT_DLL void fmpq_mpoly_get_term_exp_si(slong * exps, const fmpq_mpoly_t A,
                                           slong i, const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-ulong fmpq_mpoly_get_term_var_exp_ui(const fmpq_mpoly_t A,
-                                slong i, slong var, const fmpq_mpoly_ctx_t ctx)
-{
-    return fmpz_mpoly_get_term_var_exp_ui(A->zpoly, i, var, ctx->zctx);
-}
+FLINT_DLL ulong fmpq_mpoly_get_term_var_exp_ui(const fmpq_mpoly_t A,
+                               slong i, slong var, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL slong fmpq_mpoly_get_term_var_exp_si(const fmpq_mpoly_t A,
+                               slong i, slong var, const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_set_term_exp_fmpz(fmpq_mpoly_t A,

@@ -11,8 +11,7 @@
 
 #include "mpoly.h"
 
-
-void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
+void mpoly_get_cmpmask(ulong * cmpmask, slong N, flint_bitcnt_t bits,
                                                         const mpoly_ctx_t mctx)
 {
     slong i;
@@ -25,15 +24,16 @@ void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits,
             for (i = 0; i + 1 < N; i++)
                 cmpmask[i] = -UWORD(1);
             cmpmask[N - 1] = (UWORD(1) << (mctx->nvars%(FLINT_BITS/bits)*bits)) - UWORD(1);
-
-        } else {
-
+        }
+        else
+        {
             for (i = 0; i < N - bits/FLINT_BITS; i++)
                 cmpmask[i] = -UWORD(1);
             for (; i < N; i++)
                 cmpmask[i] = UWORD(0);
         }
-    } else
+    }
+    else
     {
         /* LEX and DEGLEX use a clear mask */
         for (i = 0; i < N; i++)
