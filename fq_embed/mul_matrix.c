@@ -27,21 +27,21 @@ void fq_mul_matrix(fmpz_mod_mat_t matrix,
     for (i = gen->length; i < len; i++)
         fmpz_zero(fmpz_mod_mat_entry(matrix, i, 0));
 
-    /* M[i,j] = M[i-1,j-1] - M[len-1,j-1] * lead * ctx->modulus->coeffs[i] */
+    /* M[i, j] = M[i - 1, j - 1] - M[len - 1, j - 1] * lead * ctx->modulus->coeffs[i] */
     for (j = 1; j < len; j++)
     {
-        fmpz_mul(fmpz_mod_mat_entry(matrix, len-1, j),
-                 fmpz_mod_mat_entry(matrix, len-1, j-1),
+        fmpz_mul(fmpz_mod_mat_entry(matrix, len - 1, j),
+                 fmpz_mod_mat_entry(matrix, len - 1, j - 1),
                  lead);
         for (i = 0; i < len; i++)
         {
             fmpz_mul(fmpz_mod_mat_entry(matrix, i, j),
-                     fmpz_mod_mat_entry(matrix, len-1, j),
+                     fmpz_mod_mat_entry(matrix, len - 1, j),
                      ctx->modulus->coeffs + i);
             if (i > 0)
                 fmpz_sub(fmpz_mod_mat_entry(matrix, i, j),
                          fmpz_mod_mat_entry(matrix, i, j),
-                         fmpz_mod_mat_entry(matrix, i-1, j-1));
+                         fmpz_mod_mat_entry(matrix, i - 1, j - 1));
             fmpz_neg(fmpz_mod_mat_entry(matrix, i, j),
                      fmpz_mod_mat_entry(matrix, i, j));
         }

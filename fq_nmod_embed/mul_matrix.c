@@ -27,18 +27,18 @@ void fq_nmod_mul_matrix(nmod_mat_t matrix,
     for (i = gen->length; i < len; i++)
         nmod_mat_entry(matrix, i, 0) = 0;
 
-    /* M[i,j] = M[i-1,j-1] - M[len-1,j-1] * lead * ctx->modulus->coeffs[i] */
+    /* M[i, j] = M[i - 1, j - 1] - M[len - 1, j - 1] * lead * ctx->modulus->coeffs[i] */
     for (j = 1; j < len; j++) {
-        nmod_mat_entry(matrix, len-1, j) = 
-            nmod_mul(nmod_mat_entry(matrix, len-1, j-1), lead, mod);
+        nmod_mat_entry(matrix, len - 1, j) =
+            nmod_mul(nmod_mat_entry(matrix, len - 1, j - 1), lead, mod);
         for (i = 0; i < len; i++) {
-            nmod_mat_entry(matrix, i, j) = 
-                nmod_mul(nmod_mat_entry(matrix, len-1, j), 
+            nmod_mat_entry(matrix, i, j) =
+                nmod_mul(nmod_mat_entry(matrix, len - 1, j),
                          modulus->coeffs[i], mod);
             if (i > 0)
                 nmod_mat_entry(matrix, i, j) =
                     nmod_sub(nmod_mat_entry(matrix, i, j),
-                             nmod_mat_entry(matrix, i-1, j-1),
+                             nmod_mat_entry(matrix, i - 1, j - 1),
                              mod);
             nmod_mat_entry(matrix, i, j) = 
                 nmod_neg(nmod_mat_entry(matrix, i, j), mod);

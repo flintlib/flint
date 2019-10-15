@@ -70,7 +70,7 @@ main(void)
 
     /* Check random emebedding (degrees 1..5) */
     for (j = 1; j < 6; j++) {
-        for (i = 0; i < (6-j) * flint_test_multiplier(); i++)
+        for (i = 0; i < (6 - j) * flint_test_multiplier(); i++)
         {
             TEMPLATE(T, ctx_t) ctx1, ctx2;
             TEMPLATE(T, t) gen1, gen2;
