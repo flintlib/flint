@@ -76,7 +76,6 @@ main(void)
             TEMPLATE(T, t) gen1, gen2;
             TEMPLATE(B, poly_t) minpoly;
             const TEMPLATE(B, poly_struct) *modulus;
-            TEMPLATE(B, poly_t) modulus2;
             TEMPLATE(B, mat_t) embed, project, comp, one;
             slong m, n;
 
@@ -89,9 +88,7 @@ main(void)
             }
             modulus = TEMPLATE(T, ctx_modulus)(ctx1);
 
-            TEMPLATE(B, poly_init)(modulus2, TEMPLATE(B, poly_modulus)(modulus));
-            TEMPLATE(B, poly_randtest_monic_irreducible)(modulus2, state, n+1);
-            TEMPLATE(T, ctx_init_modulus)(ctx2, modulus2, "X");
+            TEMPLATE(T, ctx_randtest)(ctx2, state);
 
             TEMPLATE(T, init)(gen1, ctx1);
             TEMPLATE(T, init)(gen2, ctx2);
@@ -123,7 +120,6 @@ main(void)
             TEMPLATE(B, mat_clear)(comp);
             TEMPLATE(B, mat_clear)(one);
             TEMPLATE(B, poly_clear)(minpoly);
-            TEMPLATE(B, poly_clear)(modulus2);
             TEMPLATE(T, clear)(gen1, ctx1);
             TEMPLATE(T, ctx_clear)(ctx1);
             TEMPLATE(T, clear)(gen2, ctx2);
