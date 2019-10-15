@@ -272,6 +272,85 @@ create_new: /* new at position i */
 }
 
 
+
+
+
+
+/*
+    Convert B to A using the variable permutation perm.
+    The uctx (m vars) should be the context of A.
+    The ctx (n vars) should be the context of B.
+
+    operation on each term:
+
+    for 0 <= k < m
+        l = perm[k]
+        Aexp[k] = (Bexp[l] - shift[l])/stride[l]
+*/
+void fmpz_mpoly_to_mpoly_perm_deflate(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_ctx_t uctx,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t ctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride,
+    const thread_pool_handle * handles,
+    slong num_handles)
+{
+    slong j, k, l;
+    slong n = ctx->minfo->nvars;
+    slong m = uctx->minfo->nvars;
+    slong NA, NB;
+    ulong * uexps;
+    ulong * Bexps;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(m <= n);
+
+    TMP_START;
+
+    uexps = (ulong *) TMP_ALLOC(m*sizeof(ulong));
+    Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    NA = mpoly_words_per_exp(A->bits, uctx->minfo);
+    NB = mpoly_words_per_exp(B->bits, ctx->minfo);
+
+    fmpz_mpoly_fit_length(A, B->length, uctx);
+    for (j = 0; j < B->length; j++)
+    {
+        mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
+        for (k = 0; k < m; k++)
+        {
+            l = perm[k];
+            FLINT_ASSERT(stride[l] != UWORD(0));
+            if (stride[l] > 1)
+            {
+                FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
+                uexps[k] = (Bexps[l] - shift[l]) / stride[l];
+            }
+            else
+            {
+                uexps[k] = Bexps[l] - shift[l];
+            }
+        }
+
+        fmpz_set(A->coeffs + j, B->coeffs + j);
+        mpoly_set_monomial_ui(A->exps + NA*j, uexps, A->bits, uctx->minfo);
+    }
+    A->length = B->length;
+
+    fmpz_mpoly_sort_terms(A, uctx);
+
+    TMP_END;
+}
+
+
+
+
+
+
 typedef struct
 {
     volatile slong index;
@@ -601,6 +680,89 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(
         TMP_END;
     }
 }
+
+
+
+/*
+    Convert B to A using the variable permutation vector perm.
+    This function inverts fmpz_mpoly_to_mpoly_perm_deflate.
+    A will be constructed with bits = Abits.
+
+    operation on each term:
+
+        for 0 <= l < n
+            Aexp[l] = shift[l]
+
+        for 0 <= k < m
+            l = perm[k]
+            Aexp[l] += scale[l]*Bexp[k]
+*/
+
+void fmpz_mpoly_from_mpoly_perm_inflate(
+    fmpz_mpoly_t A,
+    flint_bitcnt_t Abits,
+    const fmpz_mpoly_ctx_t ctx,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t uctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride)
+{
+    slong n = ctx->minfo->nvars;
+    slong m = uctx->minfo->nvars;
+    slong j, k, l;
+    slong NA, NB;
+    fmpz * Acoeff;
+    ulong * Aexp;
+    slong Aalloc;
+    ulong * uexps;
+    ulong * Aexps;
+    TMP_INIT;
+
+    FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT(Abits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(m <= n);
+    TMP_START;
+
+    uexps = (ulong *) TMP_ALLOC(m*sizeof(ulong));
+    Aexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+
+    NA = mpoly_words_per_exp_sp(Abits, ctx->minfo);
+    NB = mpoly_words_per_exp_sp(B->bits, uctx->minfo);
+
+    fmpz_mpoly_fit_bits(A, Abits, ctx);
+    A->bits = Abits;
+
+    Acoeff = A->coeffs;
+    Aexp = A->exps;
+    Aalloc = A->alloc;
+    _fmpz_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, B->length, NA);
+    for (j = 0; j < B->length; j++)
+    {
+        fmpz_set(Acoeff + j, B->coeffs + j);
+        mpoly_get_monomial_ui(uexps, B->exps + NB*j, B->bits, uctx->minfo);
+        for (l = 0; l < n; l++)
+        {
+            Aexps[l] = shift[l];
+        }
+        for (k = 0; k < m; k++)
+        {
+            l = perm[k];
+            Aexps[l] += stride[l]*uexps[k];
+        }
+        mpoly_set_monomial_ui(Aexp + NA*j, Aexps, Abits, ctx->minfo);
+    }
+
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->alloc = Aalloc;
+    _fmpz_mpoly_set_length(A, B->length, ctx);
+
+    fmpz_mpoly_sort_terms(A, ctx);
+    TMP_END;
+}
+
 
 
 /*
@@ -1369,3 +1531,4 @@ int fmpz_mpolyu_content_mpoly(
 
     return 1;
 }
+

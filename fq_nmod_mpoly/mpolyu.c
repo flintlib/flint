@@ -680,3 +680,59 @@ void fq_nmod_mpolyu_mul_mpoly(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
     A->length = B->length;
     TMP_END;
 }
+
+int fq_nmod_mpolyu_content_mpoly(
+    fq_nmod_mpoly_t g,
+    const fq_nmod_mpolyu_t A,
+    const fq_nmod_mpoly_ctx_t ctx)
+{
+    slong i, j;
+    int success;
+    flint_bitcnt_t bits = A->bits;
+
+    FLINT_ASSERT(g->bits == bits);
+
+    if (A->length < 2)
+    {
+        if (A->length == 0)
+        {
+            fq_nmod_mpoly_zero(g, ctx);
+        }
+        else
+        {
+            fq_nmod_mpoly_make_monic(g, A->coeffs + 0, ctx);
+        }
+
+        FLINT_ASSERT(g->bits == bits);
+        return 1;
+    }
+
+    j = 0;
+    for (i = 1; i < A->length; i++)
+    {
+        if ((A->coeffs + i)->length < (A->coeffs + j)->length)
+        {
+            j = i;
+        }
+    }
+
+    if (j == 0)
+        j = 1;
+
+    success = _fq_nmod_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx);
+    if (!success)
+        return 0;
+
+    for (i = 1; i < A->length; i++)
+    {
+        if (i == j)
+            continue;
+
+        success = _fq_nmod_mpoly_gcd(g, bits, g, A->coeffs + i, ctx);
+        FLINT_ASSERT(g->bits == bits);
+        if (!success)
+            return 0;
+    }
+
+    return 1;
+}

@@ -13,7 +13,7 @@
 
 /* this file DOES NOT need to change with new orderings */
 
-void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
+void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, flint_bitcnt_t bits,
                                                       slong nfields, slong len)
 {
     if (bits <= FLINT_BITS)

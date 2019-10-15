@@ -24,6 +24,10 @@ void nmod_poly_stack_init(nmod_poly_stack_t S, flint_bitcnt_t bits, const nmod_m
     S->mpolyun_alloc = 0;
     S->mpolyun_array = NULL;
     S->mpolyun_top = 0;
+
+    S->mpolyn_alloc = 0;
+    S->mpolyn_array = NULL;
+    S->mpolyn_top = 0;
 }
 
 void nmod_poly_stack_clear(nmod_poly_stack_t S)
@@ -39,7 +43,6 @@ void nmod_poly_stack_clear(nmod_poly_stack_t S)
     }
     if (S->poly_array)
         flint_free(S->poly_array);
-    S->poly_array = NULL;
 
     for (i = 0; i < S->mpolyun_alloc; i++)
     {
@@ -48,7 +51,14 @@ void nmod_poly_stack_clear(nmod_poly_stack_t S)
     }
     if (S->mpolyun_array)
         flint_free(S->mpolyun_array);
-    S->mpolyun_array = NULL;
+
+    for (i = 0; i < S->mpolyn_alloc; i++)
+    {
+        nmod_mpolyn_clear(S->mpolyn_array[i], S->ctx);
+        flint_free(S->mpolyn_array[i]);
+    }
+    if (S->mpolyn_array)
+        flint_free(S->mpolyn_array);
 
     S->ctx = NULL;
 }
@@ -69,6 +79,11 @@ void nmod_poly_stack_set_ctx(nmod_poly_stack_t S, const nmod_mpoly_ctx_t ctx)
     for (i = 0; i < S->mpolyun_alloc; i++)
     {
         nmod_mpolyun_set_mod(S->mpolyun_array[i], S->ctx->ffinfo->mod);
+    }
+
+    for (i = 0; i < S->mpolyn_alloc; i++)
+    {
+        nmod_mpolyn_set_mod(S->mpolyn_array[i], S->ctx->ffinfo->mod);
     }
 }
 
@@ -139,5 +154,38 @@ nmod_mpolyun_struct ** nmod_poly_stack_fit_request_mpolyun(nmod_poly_stack_t S, 
     }
 
     return S->mpolyun_array + S->mpolyun_top;
+}
+
+nmod_mpolyn_struct ** nmod_poly_stack_fit_request_mpolyn(nmod_poly_stack_t S, slong k)
+{
+    slong newalloc, i;
+
+    FLINT_ASSERT(S->mpolyn_alloc >= S->mpolyn_top);
+
+    if (S->mpolyn_top + k > S->mpolyn_alloc)
+    {
+        newalloc = FLINT_MAX(WORD(1), S->mpolyn_top + k);
+
+        if (S->mpolyn_array)
+        {
+            S->mpolyn_array = (nmod_mpolyn_struct **) flint_realloc(S->mpolyn_array,
+                                           newalloc*sizeof(nmod_mpolyn_struct*));
+        }
+        else
+        {
+            S->mpolyn_array = (nmod_mpolyn_struct **) flint_malloc(
+                                           newalloc*sizeof(nmod_mpolyn_struct*));
+        }
+
+        for (i = S->mpolyn_alloc; i < newalloc; i++)
+        {
+            S->mpolyn_array[i] = (nmod_mpolyn_struct *) flint_malloc(
+                                                     sizeof(nmod_mpolyn_struct));
+            nmod_mpolyn_init(S->mpolyn_array[i], S->bits, S->ctx);
+        }
+        S->mpolyn_alloc = newalloc;
+    }
+
+    return S->mpolyn_array + S->mpolyn_top;
 }
 

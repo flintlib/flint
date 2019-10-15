@@ -22,8 +22,8 @@
 
     return 1 if the repacking was successful, 0 if it failed
 */
-int mpoly_repack_monomials(ulong * exps1, slong bits1,
-                      const ulong * exps2, slong bits2, slong len,
+int mpoly_repack_monomials(ulong * exps1, flint_bitcnt_t bits1,
+                     const ulong * exps2, flint_bitcnt_t bits2, slong len,
                                                         const mpoly_ctx_t mctx)
 {
     int success;

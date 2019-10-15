@@ -11,8 +11,15 @@
 
 #include "fq_nmod_mpoly.h"
 
-void gcd_check(fq_nmod_mpoly_t g, fq_nmod_mpoly_t a, fq_nmod_mpoly_t b,
-                  fq_nmod_mpoly_ctx_t ctx, slong i, slong j, const char * name)
+void gcd_check(
+    fq_nmod_mpoly_t g,
+    fq_nmod_mpoly_t a,
+    fq_nmod_mpoly_t b,
+    const fq_nmod_mpoly_t gdiv,
+    const fq_nmod_mpoly_ctx_t ctx,
+    slong i,
+    slong j,
+    const char * name)
 {
     int res;
     fq_nmod_mpoly_t ca, cb, cg;
@@ -29,6 +36,17 @@ void gcd_check(fq_nmod_mpoly_t g, fq_nmod_mpoly_t a, fq_nmod_mpoly_t b,
         flint_printf("Check gcd can be computed\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
+    }
+
+    if (!fq_nmod_mpoly_is_zero(gdiv, ctx))
+    {
+        if (!fq_nmod_mpoly_divides(ca, g, gdiv, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check divisor of gcd\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+            flint_abort();
+        }
     }
 
     if (fq_nmod_mpoly_is_zero(g, ctx))
@@ -136,7 +154,7 @@ main(void)
 
             fq_nmod_mpoly_randtest_bits(g, state, len, exp_bits, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "monomial");
+            gcd_check(g, a, b, t, ctx, i, j, "monomial");
         }
 
         fq_nmod_mpoly_clear(g, ctx);
@@ -179,11 +197,11 @@ main(void)
             } while (t2->length != 1);
             fq_nmod_mpoly_randtest_bits(a, state, len1, exp_bits, ctx);
             fq_nmod_mpoly_mul(b, a, t1, ctx);
-            fq_nmod_mpoly_mul(a, a, t2, ctx);
+            fq_nmod_mpoly_mul(t2, a, t2, ctx);
 
             fq_nmod_mpoly_randtest_bits(g, state, len, exp_bits, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "monomial cofactors");
+            gcd_check(g, t2, b, a, ctx, i, j, "monomial cofactors");
         }
 
         fq_nmod_mpoly_clear(g, ctx);
@@ -227,7 +245,7 @@ main(void)
 
             fq_nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "sparse inputs");
+            gcd_check(g, a, b, t, ctx, i, j, "sparse inputs");
         }
 
         fq_nmod_mpoly_clear(g, ctx);
@@ -287,7 +305,7 @@ main(void)
 
             fq_nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "sparse input with repacking");
+            gcd_check(g, a, b, t, ctx, i, j, "sparse input with repacking");
         }
 
         fq_nmod_mpoly_clear(g, ctx);
@@ -353,7 +371,14 @@ main(void)
             fq_nmod_mpoly_inflate(a, a, shifts1, strides, ctx);
             fq_nmod_mpoly_inflate(b, b, shifts2, strides, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "sparse input with inflation");
+            for (k = 0; k < ctx->minfo->nvars; k++)
+            {
+                if (fmpz_cmp(shifts1 + k, shifts2 + k) > 0)
+                    fmpz_set(shifts1 + k, shifts2 + k);
+            }
+            fq_nmod_mpoly_inflate(t, t, shifts1, strides, ctx);
+
+            gcd_check(g, a, b, t, ctx, i, j, "sparse input with inflation");
         }
 
         for (k = 0; k < ctx->minfo->nvars; k++)
@@ -416,7 +441,7 @@ main(void)
 
             fq_nmod_mpoly_randtest_bits(g, state, len4, bits4, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "dense input");
+            gcd_check(g, a, b, t, ctx, i, j, "dense input");
         }
 
         fq_nmod_mpoly_clear(g, ctx);
@@ -488,7 +513,7 @@ main(void)
 
             fq_nmod_mpoly_randtest_bits(g, state, len4, bits4, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "dense input with repacking");
+            gcd_check(g, a, b, t, ctx, i, j, "dense input with repacking");
         }
 
         fq_nmod_mpoly_clear(g, ctx);
@@ -565,7 +590,14 @@ main(void)
             fq_nmod_mpoly_inflate(a, a, shifts1, strides, ctx);
             fq_nmod_mpoly_inflate(b, b, shifts2, strides, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "dense input with inflation");
+            for (k = 0; k < ctx->minfo->nvars; k++)
+            {
+                if (fmpz_cmp(shifts1 + k, shifts2 + k) > 0)
+                    fmpz_set(shifts1 + k, shifts2 + k);
+            }
+            fq_nmod_mpoly_inflate(t, t, shifts1, strides, ctx);
+
+            gcd_check(g, a, b, t, ctx, i, j, "dense input with inflation");
         }
 
         for (k = 0; k < ctx->minfo->nvars; k++)

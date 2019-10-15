@@ -705,8 +705,8 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
             goto outer_continue;
 
         /* make sure evaluation point does not kill either A or B */
-        nmod_mpolyun_intp_reduce_sm_mpolyu(Aeval, An, alpha, ctx);
-        nmod_mpolyun_intp_reduce_sm_mpolyu(Beval, Bn, alpha, ctx);
+        nmod_mpolyun_interp_reduce_sm_mpolyu(Aeval, An, alpha, ctx);
+        nmod_mpolyun_interp_reduce_sm_mpolyu(Beval, Bn, alpha, ctx);
         if (Aeval->length == 0 || Beval->length == 0)
             goto outer_continue;
 
@@ -744,7 +744,7 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
             nmod_poly_scalar_mul_nmod(modulus, modulus,
                      n_invmod(nmod_poly_evaluate_nmod(modulus, alpha),
                                                           ctx->ffinfo->mod.n));
-            changed = nmod_mpolyun_intp_crt_sm_mpolyu(&lastdeg, H, Ht, Geval,
+            changed = nmod_mpolyun_interp_crt_sm_mpolyu(&lastdeg, H, Ht, Geval,
                                                           modulus, alpha, ctx);
             nmod_poly_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha);
             nmod_poly_mul(modulus, modulus, tempmod);
@@ -779,7 +779,7 @@ int nmod_mpolyu_gcdp_zippel_bivar(nmod_mpolyu_t G,
         }
         else
         {
-            nmod_mpolyun_intp_lift_sm_mpolyu(H, Geval, ctx);
+            nmod_mpolyun_interp_lift_sm_mpolyu(H, Geval, ctx);
             nmod_poly_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha);
             nmod_poly_mul(modulus, modulus, tempmod);
         }
@@ -931,8 +931,8 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
         }
 
         /* make sure evaluation point does not kill either A or B */
-        nmod_mpolyun_intp_reduce_sm_mpolyu(Aeval, An, alpha, ctx);
-        nmod_mpolyun_intp_reduce_sm_mpolyu(Beval, Bn, alpha, ctx);
+        nmod_mpolyun_interp_reduce_sm_mpolyu(Aeval, An, alpha, ctx);
+        nmod_mpolyun_interp_reduce_sm_mpolyu(Beval, Bn, alpha, ctx);
         if (Aeval->length == 0 || Beval->length == 0)
         {
             goto outer_continue;
@@ -977,7 +977,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
             temp = nmod_poly_evaluate_nmod(modulus, alpha);
             temp = n_invmod(temp, ctx->ffinfo->mod.n);
             nmod_poly_scalar_mul_nmod(modulus, modulus, temp);
-            changed = nmod_mpolyun_intp_crt_sm_mpolyu(&lastdeg, H, Ht, Geval,
+            changed = nmod_mpolyun_interp_crt_sm_mpolyu(&lastdeg, H, Ht, Geval,
                                                           modulus, alpha, ctx);
             if (!changed)
             {
@@ -996,7 +996,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
         }
         else
         {
-            nmod_mpolyun_intp_lift_sm_mpolyu(H, Geval, ctx);
+            nmod_mpolyun_interp_lift_sm_mpolyu(H, Geval, ctx);
         }
         nmod_poly_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha);
         nmod_poly_mul(modulus, modulus, tempmod);
@@ -1025,8 +1025,8 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
             }
 
             /* make sure evaluation does not kill either A or B */
-            nmod_mpolyun_intp_reduce_sm_mpolyu(Aeval, An, alpha, ctx);
-            nmod_mpolyun_intp_reduce_sm_mpolyu(Beval, Bn, alpha, ctx);
+            nmod_mpolyun_interp_reduce_sm_mpolyu(Aeval, An, alpha, ctx);
+            nmod_mpolyun_interp_reduce_sm_mpolyu(Beval, Bn, alpha, ctx);
             if (Aeval->length == 0 || Beval->length == 0)
             {
                 goto inner_continue;
@@ -1067,7 +1067,7 @@ int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
             temp = n_invmod(temp, ctx->ffinfo->mod.n);
             nmod_poly_scalar_mul_nmod(modulus, modulus, temp);
 
-            changed = nmod_mpolyun_intp_crt_sm_mpolyu(&lastdeg, H, Ht, Geval,
+            changed = nmod_mpolyun_interp_crt_sm_mpolyu(&lastdeg, H, Ht, Geval,
                                                           modulus, alpha, ctx);
             nmod_poly_set_coeff_ui(tempmod, 0, ctx->ffinfo->mod.n - alpha);
             nmod_poly_mul(modulus, modulus, tempmod);

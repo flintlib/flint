@@ -15,7 +15,6 @@
 ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i,
                                          slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    slong offset, shift;
     slong N;
 
     if ((ulong) i >= (ulong) A->length)
@@ -23,29 +22,6 @@ ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i,
         flint_throw(FLINT_ERROR, "Index out of range in fmpz_mpoly_get_term_var_exp_ui");
     }
 
-    if (A->bits <= FLINT_BITS)
-    {
-        mpoly_gen_offset_shift_sp(&offset, &shift, var, A->bits, ctx->minfo);
-
-        N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
-
-        return ((A->exps + N*i)[offset] >> shift)
-                     & ((-UWORD(1)) >> (FLINT_BITS - A->bits));
-    }
-    else
-    {
-        slong j;
-        ulong wpf = A->bits/FLINT_BITS;
-        offset = mpoly_gen_offset_mp(var, A->bits, ctx->minfo);
-
-        N = mpoly_words_per_exp_mp(A->bits, ctx->minfo);
-
-        for (j = 1; j < wpf; j++)
-        {
-            if ((A->exps + N*i)[offset + j] != 0)
-                flint_throw(FLINT_ERROR, "Exponent does not fit a ulong.");
-        }
-
-        return (A->exps + N*i)[offset + 0];
-    }
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    return mpoly_get_monomial_var_exp_ui(A->exps + N*i, var, A->bits, ctx->minfo);
 }
