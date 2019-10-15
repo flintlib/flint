@@ -107,7 +107,7 @@ Context Management
 .. function:: void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx)
 
     Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_nmod_ctx_init`` as not been called on ``ctx`` already.
+    ``fq_nmod_ctx_init`` has not been called on ``ctx`` already.
 
 
 .. function:: void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx)
