@@ -457,6 +457,9 @@ Special functions
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
 
+    This function can also be used to check primitivity of a generator of
+    a finite field whose defining polynomial is not primitive.
+
 .. function:: int fq_is_primitive(const fq_t op, const fq_ctx_t ctx)
 
     Returns whether ``op`` is primitive, i.e., whether it is a
