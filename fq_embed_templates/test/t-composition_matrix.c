@@ -24,7 +24,7 @@ main(void)
     
     FLINT_TEST_INIT(state);
 
-    flint_printf("composition matrix... ");
+    flint_printf("composition_matrix... ");
     fflush(stdout);
 
     /* Check that Mat(a^p) = Mat(x^p) * Mat(a) for random a */
@@ -51,15 +51,15 @@ main(void)
 
         TEMPLATE(T, gen)(frob, ctx);
         TEMPLATE(T, pow)(frob, frob, TEMPLATE(T, ctx_prime)(ctx), ctx);
-        TEMPLATE(T, composition_matrix)(mat_frob, frob, ctx);
+        TEMPLATE(T, embed_composition_matrix)(mat_frob, frob, ctx);
 
         TEMPLATE(T, randtest)(a, state, ctx);
-        TEMPLATE(T, composition_matrix)(mat_a, a, ctx);
+        TEMPLATE(T, embed_composition_matrix)(mat_a, a, ctx);
         
         TEMPLATE(B, mat_mul)(res, mat_frob, mat_a);
 
         TEMPLATE(T, pow)(a, a, TEMPLATE(T, ctx_prime)(ctx), ctx);
-        TEMPLATE(T, composition_matrix)(mat_aq, a, ctx);
+        TEMPLATE(T, embed_composition_matrix)(mat_aq, a, ctx);
 
         if (!TEMPLATE(B, mat_equal)(res, mat_aq)) {
             flint_printf("FAIL:\n\n");

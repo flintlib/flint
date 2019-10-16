@@ -49,10 +49,10 @@ main(void)
         TEMPLATE(B, mat_init)(mat_a_a, d, d, TEMPLATE(B, poly_modulus)(modulus));
 
         TEMPLATE(T, randtest)(a, state, ctx);
-        TEMPLATE(T, mul_matrix)(mat_a, a, ctx);
+        TEMPLATE(T, embed_mul_matrix)(mat_a, a, ctx);
 
         TEMPLATE(T, mul)(a, a, a, ctx);
-        TEMPLATE(T, mul_matrix)(mat_a_sq, a, ctx);
+        TEMPLATE(T, embed_mul_matrix)(mat_a_sq, a, ctx);
         
         TEMPLATE(B, mat_mul)(mat_a_a, mat_a, mat_a);
 

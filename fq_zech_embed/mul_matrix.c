@@ -11,13 +11,13 @@
 
 #include "fq_zech_embed.h"
 
-void fq_zech_mul_matrix(nmod_mat_t matrix,
+void fq_zech_embed_mul_matrix(nmod_mat_t matrix,
                         const fq_zech_t gen,
                         const fq_zech_ctx_t ctx) {
     fq_nmod_t gen_nmod;
     fq_nmod_ctx_struct *modulus = ctx->fq_nmod_ctx;
     fq_nmod_init(gen_nmod, modulus);
     fq_zech_get_fq_nmod(gen_nmod, gen, ctx);
-    fq_nmod_mul_matrix(matrix, gen_nmod, modulus);
+    fq_nmod_embed_mul_matrix(matrix, gen_nmod, modulus);
     fq_nmod_clear(gen_nmod, modulus);
 }

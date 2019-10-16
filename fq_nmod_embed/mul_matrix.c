@@ -11,7 +11,7 @@
 
 #include "fq_nmod_embed.h"
 
-void fq_nmod_mul_matrix(nmod_mat_t matrix,
+void fq_nmod_embed_mul_matrix(nmod_mat_t matrix,
                         const fq_nmod_t gen,
                         const fq_nmod_ctx_t ctx) {
     slong i, j, len = fq_nmod_ctx_degree(ctx);
