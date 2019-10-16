@@ -329,9 +329,17 @@ Concatenate
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2) Sets \code{res} to vertical concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $k \times n$, \code{res} : $(m + k) \times n$.
+.. function:: void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
-.. function:: void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2) Sets \code{res} to horizontal concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $m \times k$, \code{res}  : $m \times (n + k)$.
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``)
+    in that order. Matrix dimensions : ``mat1`` : `m \times n`,
+    ``mat2`` : `k \times n`, ``res`` : ``(m + k) \times n`.
+
+.. function:: void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
+
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``)
+    in that order. Matrix dimensions : ``mat1`` : `m \times n`,
+    ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
 
 
 Modular reduction and reconstruction
