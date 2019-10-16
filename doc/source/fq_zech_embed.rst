@@ -82,15 +82,6 @@ Computing isomorphisms and embeddings of finite fields
     `m=n`, ``basis`` represents a Frobenius, and the result is its
     inverse matrix.
 
-.. function:: void fq_zech_get_nmod_mat(nmod_mat_t col, const fq_zech_t a, const fq_zech_ctx_t ctx)
-
-    Convert ``a`` to a column vector of length ``degree(ctx)``.
-
-.. function:: void fq_zech_set_nmod_mat(fq_zech_t a, const nmod_mat_t col, const fq_zech_ctx_t ctx)
-
-    Convert a column vector ``col`` of length ``degree(ctx)`` to
-    an element of ``ctx``.
-
 .. function:: void fq_zech_embed_composition_matrix(nmod_mat_t matrix, const fq_zech_t gen, const fq_zech_ctx_t ctx)
 
     Compute the \emph{composition matrix} of ``gen``.
