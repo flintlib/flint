@@ -13,6 +13,11 @@
 
 void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_t c)
 {
-    fmpz_mat_scalar_mul_fmpz(B->mat, A->mat, c);
+    fmpz_t d;
+    fmpz_init(d);
+    fmpz_mod(d, c, A->mod);
+
+    fmpz_mat_scalar_mul_fmpz(B->mat, A->mat, d);
     _fmpz_mod_mat_reduce(B);
+    fmpz_clear(d);
 }
