@@ -35,7 +35,7 @@ fmpz_mod_mat_struct;
 /* fmpz_mod_mat_t allows reference-like semantics for fmpz_mod_mat_struct */
 typedef fmpz_mod_mat_struct fmpz_mod_mat_t[1];
 
-/* Memory management  ********************************************************/
+/* Element access  ********************************************************/
 
 FMPZ_MOD_MAT_INLINE
 fmpz * fmpz_mod_mat_entry(const fmpz_mod_mat_t mat, slong i, slong j)
@@ -49,8 +49,17 @@ void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t v
     fmpz_set(fmpz_mat_entry(mat->mat, i, j), val);
 }
 
-FMPZ_MOD_MAT_INLINE
-slong fmpz_mod_mat_nrows(const fmpz_mod_mat_t mat)
+/* Memory management  ********************************************************/
+
+FLINT_DLL void fmpz_mod_mat_init(fmpz_mod_mat_t mat, slong rows, slong cols, const fmpz_t n);
+
+FLINT_DLL void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src);
+
+FLINT_DLL void fmpz_mod_mat_clear(fmpz_mod_mat_t mat);
+
+/* Basic manipulation  ********************************************************/
+
+FMPZ_MOD_MAT_INLINE                                                                      slong fmpz_mod_mat_nrows(const fmpz_mod_mat_t mat)
 {
     return fmpz_mat_nrows(mat->mat);
 }
@@ -67,12 +76,6 @@ void _fmpz_mod_mat_set_mod(fmpz_mod_mat_t mat, const fmpz_t n)
     fmpz_set(mat->mod, n);
 }
 
-FLINT_DLL void fmpz_mod_mat_init(fmpz_mod_mat_t mat, slong rows, slong cols, const fmpz_t n);
-
-FLINT_DLL void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src);
-
-FLINT_DLL void fmpz_mod_mat_clear(fmpz_mod_mat_t mat);
-
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_one(fmpz_mod_mat_t mat)
 {
@@ -83,6 +86,18 @@ FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_zero(fmpz_mod_mat_t mat)
 {
     fmpz_mat_zero(mat->mat);
+}
+
+FMPZ_MOD_MAT_INLINE
+int fmpz_mod_mat_is_empty(const fmpz_mod_mat_t mat)
+{
+	    return fmpz_mat_is_empty(mat->mat);
+}
+
+FMPZ_MOD_MAT_INLINE
+int fmpz_mod_mat_is_square(const fmpz_mod_mat_t mat)
+{
+	    return fmpz_mat_is_square(mat->mat);
 }
 
 FLINT_DLL void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2);
@@ -115,13 +130,14 @@ void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res,
     fmpz_mat_concat_vertical(res->mat, mat1->mat, mat2->mat);
 }
 
-/* Inupt - Output */
+/* Input/output */
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat)
 {
     fmpz_mat_print_pretty(mat->mat);
 }
 
+/* Comparison */
 FMPZ_MOD_MAT_INLINE
 int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
 {
@@ -134,20 +150,7 @@ int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat)
     return fmpz_mat_is_zero(mat->mat);
 }
 
-
-FMPZ_MOD_MAT_INLINE
-int fmpz_mod_mat_is_empty(const fmpz_mod_mat_t mat)
-{
-    return fmpz_mat_is_empty(mat->mat);
-}
-
-FMPZ_MOD_MAT_INLINE
-int fmpz_mod_mat_is_square(const fmpz_mod_mat_t mat)
-{
-    return fmpz_mat_is_square(mat->mat);
-}
-
-
+/* Set and transpose */
 FLINT_DLL void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
 FMPZ_MOD_MAT_INLINE
