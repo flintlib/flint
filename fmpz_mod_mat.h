@@ -67,27 +67,11 @@ void _fmpz_mod_mat_set_mod(fmpz_mod_mat_t mat, const fmpz_t n)
     fmpz_set(mat->mod, n);
 }
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_init(fmpz_mod_mat_t mat, slong rows, slong cols, const fmpz_t n)
-{
-    fmpz_mat_init(mat->mat, rows, cols);
-    fmpz_init(mat->mod);
-    _fmpz_mod_mat_set_mod(mat, n);
-}
+FLINT_DLL void fmpz_mod_mat_init(fmpz_mod_mat_t mat, slong rows, slong cols, const fmpz_t n);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src)
-{
-    fmpz_mat_init_set(mat->mat, src->mat);
-    fmpz_init_set(mat->mod, src->mod);
-}
+FLINT_DLL void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_clear(fmpz_mod_mat_t mat)
-{
-    fmpz_mat_clear(mat->mat);
-    fmpz_clear(mat->mod);
-}
+FLINT_DLL void fmpz_mod_mat_clear(fmpz_mod_mat_t mat);
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_one(fmpz_mod_mat_t mat)
@@ -101,59 +85,19 @@ void fmpz_mod_mat_zero(fmpz_mod_mat_t mat)
     fmpz_mat_zero(mat->mat);
 }
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
-{
-    if (mat1 != mat2)
-    {
-        fmpz_mod_mat_struct tmp;
+FLINT_DLL void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2);
 
-        tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = tmp;
-    }
-}
-
-
-FMPZ_MOD_MAT_INLINE
-void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat)
-{
-    slong i, j;
-    fmpz *entry;
-    for (i = 0; i < mat->mat->r; i++)
-    {
-        for (j = 0; j < mat->mat->c; j++)
-        {
-            entry = fmpz_mod_mat_entry(mat, i, j);
-            fmpz_mod(entry, entry, mat->mod);
-        }
-    }
-}
+FLINT_DLL void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat);
 
 /* Random matrix generation */
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state)
-{
-    fmpz_mat_randtest(mat->mat, state, fmpz_bits(mat->mod));
-    _fmpz_mod_mat_reduce(mat);
-}
+FLINT_DLL void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state);
 
 /* Windows and concatenation */
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat,
-                              slong r1, slong c1, slong r2, slong c2)
-{
-    fmpz_mat_window_init(window->mat, mat->mat, r1, c1, r2, c2);
-    fmpz_init_set(window->mod, mat->mod);
-}
+FLINT_DLL void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat,
+                              slong r1, slong c1, slong r2, slong c2);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window)
-{
-    fmpz_mat_window_clear(window->mat);
-    fmpz_clear(window->mod);
-}
+FLINT_DLL void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window);
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res,
@@ -204,12 +148,7 @@ int fmpz_mod_mat_is_square(const fmpz_mod_mat_t mat)
 }
 
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
-{
-    fmpz_set(B->mod, A->mod);
-    fmpz_mat_set(B->mat, A->mat);
-}
+FLINT_DLL void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
@@ -220,74 +159,29 @@ void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
 
 /* Addition and subtraction */
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_add(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B)
-{
-    fmpz_mat_add(C->mat, A->mat, B->mat);
-    _fmpz_mod_mat_reduce(C);
-}
+FLINT_DLL void fmpz_mod_mat_add(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_sub(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B)
-{
-    fmpz_mat_sub(C->mat, A->mat, B->mat);
-    _fmpz_mod_mat_reduce(C);
-}
+FLINT_DLL void fmpz_mod_mat_sub(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_neg(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
-{
-    fmpz_mat_neg(B->mat, A->mat);
-    _fmpz_mod_mat_reduce(B);
-}
+FLINT_DLL void fmpz_mod_mat_neg(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
 /* Matrix-scalar arithmetic */
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_scalar_mul_si(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, slong c)
-{
-    fmpz_mat_scalar_mul_si(B->mat, A->mat, c);
-    _fmpz_mod_mat_reduce(B);
-}
+FLINT_DLL void fmpz_mod_mat_scalar_mul_si(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, slong c);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_scalar_mul_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong c)
-{
-    fmpz_mat_scalar_mul_ui(B->mat, A->mat, c);
-    _fmpz_mod_mat_reduce(B);
-}
+FLINT_DLL void fmpz_mod_mat_scalar_mul_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong c);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_t c)
-{
-    fmpz_mat_scalar_mul_fmpz(B->mat, A->mat, c);
-    _fmpz_mod_mat_reduce(B);
-}
+FLINT_DLL void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_t c);
 
 /* Matrix multiplication */
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_mul(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B)
-{
-    fmpz_mat_mul(C->mat, A->mat, B->mat);
-    _fmpz_mod_mat_reduce(C);
-}
+FLINT_DLL void fmpz_mod_mat_mul(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
-{
-    fmpz_mat_sqr(B->mat, A->mat);
-    _fmpz_mod_mat_reduce(B);
-}
+FLINT_DLL void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
 /* Trace */
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat)
-{
-    fmpz_mat_trace(trace, mat->mat);
-    fmpz_mod(trace, trace, mat->mod);
-}
+FLINT_DLL void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat);
 
 #ifdef __cplusplus
 }
