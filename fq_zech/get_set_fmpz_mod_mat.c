@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_embed.h"
+#include "fq_zech.h"
 
 void fq_zech_get_nmod_mat(nmod_mat_t col,
                           const fq_zech_t a,
