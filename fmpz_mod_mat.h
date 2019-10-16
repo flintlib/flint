@@ -175,7 +175,12 @@ int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat)
 }
 
 /* Set and transpose */
-FLINT_DLL void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
+{
+    fmpz_set(B->mod, A->mod);
+    fmpz_mat_set(B->mat, A->mat);
+}
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
