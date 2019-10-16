@@ -29,6 +29,16 @@ FLINT_DLL void TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
 FLINT_DLL int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,
                              const TEMPLATE(T, ctx_t) ctx);
 
+#ifdef B
+FLINT_DLL void TEMPLATE4(T, get, B, mat)(TEMPLATE(B, mat_t) col,
+                                         const TEMPLATE(T, t) a,
+                                         const TEMPLATE(T, ctx_t) ctx);
+FLINT_DLL void TEMPLATE4(T, set, B, mat)(TEMPLATE(T, t) a,
+                                         const TEMPLATE(B, mat_t) col,
+                                         const TEMPLATE(T, ctx_t) ctx);
+#endif
+
+
 FQ_TEMPLATES_INLINE
 int TEMPLATE(T, is_primitive)(const TEMPLATE(T, t) op, const TEMPLATE(T, ctx_t) ctx)
 {

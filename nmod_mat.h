@@ -31,6 +31,7 @@
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
+#include "fmpz.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -62,6 +63,9 @@ mp_limb_t * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
 {
    return mat->rows[i] + j;
 }
+
+/* See inlines.c */
+FLINT_DLL void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x);
 
 NMOD_MAT_INLINE
 slong nmod_mat_nrows(const nmod_mat_t mat)
@@ -153,6 +157,16 @@ FLINT_DLL void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 FLINT_DLL void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
 FLINT_DLL void nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X,
                                 const mp_limb_t b, const nmod_mat_t Y);
+NMOD_MAT_INLINE
+void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
+{
+    fmpz_t d;
+    fmpz_init(d);
+    fmpz_mod_ui(d, c, res->mod.n);
+    nmod_mat_scalar_mul(res, M, fmpz_get_ui(d));
+    fmpz_clear(d);
+}
+
 
 /* Matrix multiplication */
 

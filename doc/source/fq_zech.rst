@@ -391,6 +391,14 @@ Assignments and conversions
     Sets ``rop`` to the ``fq_zech_t`` element corresponding to
     ``op``.
 
+.. function:: void fq_zech_get_nmod_mat(nmod_mat_t col, const fq_zech_t a, const fq_zech_ctx_t ctx)
+
+    Convert ``a`` to a column vector of length ``degree(ctx)``.
+
+.. function:: void fq_zech_set_nmod_mat(fq_zech_t a, const nmod_mat_t col, const fq_zech_ctx_t ctx)
+
+    Convert a column vector ``col`` of length ``degree(ctx)`` to
+    an element of ``ctx``.
 
 
 Comparison

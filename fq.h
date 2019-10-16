@@ -23,6 +23,7 @@
 #endif
 
 #include "fmpz_mod_poly.h"
+#include "fmpz_mod_mat.h"
 #include "ulong_extras.h"
 
 /* Data types and context ****************************************************/
@@ -383,7 +384,9 @@ FLINT_DLL void fq_bit_unpack(fq_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
 
 #define T fq
 #define CAP_T FQ
+#define B fmpz_mod
 #include "fq_templates.h"
+#undef B
 #undef CAP_T
 #undef T
 

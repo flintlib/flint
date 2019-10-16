@@ -54,7 +54,7 @@ typedef struct
    ulong hash;
 } col_hash_t;
 
-/* Memory management  ********************************************************/
+/* Element access  ********************************************************/
 
 FMPZ_MAT_INLINE
 fmpz * fmpz_mat_entry(const fmpz_mat_t mat, slong i, slong j)
@@ -73,6 +73,8 @@ slong fmpz_mat_ncols(const fmpz_mat_t mat)
 {
    return mat->c;
 }
+
+/* Memory management  ********************************************************/
 
 FLINT_DLL void fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols);
 FLINT_DLL void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);
