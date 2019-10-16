@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fq_embed.h"
+#include "fq.h"
 
 void fq_get_fmpz_mod_mat(fmpz_mod_mat_t col,
                          const fq_t a,

@@ -324,7 +324,9 @@ FLINT_DLL void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, flint_bitcnt_t 
 
 #define T fq_zech
 #define CAP_T FQ_ZECH
+#define B nmod
 #include "fq_templates.h"
+#undef B
 #undef CAP_T
 #undef T
     
