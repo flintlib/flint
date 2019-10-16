@@ -100,9 +100,33 @@ int fmpz_mod_mat_is_square(const fmpz_mod_mat_t mat)
 	    return fmpz_mat_is_square(mat->mat);
 }
 
-FLINT_DLL void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2);
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
+{
+    if (mat1 != mat2)
+    {
+        fmpz_mod_mat_struct tmp;
 
-FLINT_DLL void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat);
+        tmp = *mat1;
+        *mat1 = *mat2;
+        *mat2 = tmp;
+    }
+}
+
+FMPZ_MOD_MAT_INLINE
+void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat)
+{
+    slong i, j;
+    fmpz *entry;
+    for (i = 0; i < mat->mat->r; i++)
+    {
+        for (j = 0; j < mat->mat->c; j++)
+        {
+            entry = fmpz_mod_mat_entry(mat, i, j);
+            fmpz_mod(entry, entry, mat->mod);
+        }
+    }
+}
 
 /* Random matrix generation */
 FLINT_DLL void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state);
