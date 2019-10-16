@@ -58,7 +58,7 @@ Computing isomorphisms and embeddings of finite fields
       matrix.
     \end{itemize}
 
-.. function:: void fq_nmod_trace_matrix(nmod_mat_t res, const nmod_mat_t basis, const fq_nmod_ctx_t sub_ctx, const fq_nmod_ctx_t sup_ctx)
+.. function:: void fq_nmod_embed_trace_matrix(nmod_mat_t res, const nmod_mat_t basis, const fq_nmod_ctx_t sub_ctx, const fq_nmod_ctx_t sup_ctx)
 
     Given:
 
@@ -74,9 +74,9 @@ Computing isomorphisms and embeddings of finite fields
 
     This matrix is computed as
     \[
-      \texttt{dual\_to\_mono\_matrix(\_, sub\_ctx)}
+      \texttt{embed\_dual\_to\_mono\_matrix(\_, sub\_ctx)}
       \times \texttt{basis}^t \times
-      \texttt{mono\_to\_dual\_matrix(\_, sup\_ctx)}.
+      \texttt{embed\_mono\_to\_dual\_matrix(\_, sup\_ctx)}.
     \]
     \textbf{Note:} if
     `m=n`, ``basis`` represents a Frobenius, and the result is its
@@ -91,19 +91,19 @@ Computing isomorphisms and embeddings of finite fields
     Convert a column vector ``col`` of length ``degree(ctx)`` to
     an element of ``ctx``.
 
-.. function:: void fq_nmod_composition_matrix(nmod_mat_t matrix, const fq_nmod_t gen, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_embed_composition_matrix(nmod_mat_t matrix, const fq_nmod_t gen, const fq_nmod_ctx_t ctx)
 
     Compute the \emph{composition matrix} of ``gen``.
 
     For an element `a\in\mathbf{F}_{p^n}`, its composition matrix is the
     matrix whose columns are `a^0, a^1, \ldots, a^{n-1}`.
 
-.. function:: void fq_nmod_composition_matrix_sub(nmod_mat_t matrix, const fq_nmod_t gen, const fq_nmod_ctx_t ctx, slong trunc)
+.. function:: void fq_nmod_embed_composition_matrix_sub(nmod_mat_t matrix, const fq_nmod_t gen, const fq_nmod_ctx_t ctx, slong trunc)
 
     Compute the \emph{composition matrix} of ``gen``, truncated to
     ``trunc`` columns.
 
-.. function:: void fq_nmod_mul_matrix(nmod_mat_t matrix, const fq_nmod_t gen, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_embed_mul_matrix(nmod_mat_t matrix, const fq_nmod_t gen, const fq_nmod_ctx_t ctx)
 
     Compute the \emph{multiplication matrix} of ``gen``.
 
@@ -111,12 +111,12 @@ Computing isomorphisms and embeddings of finite fields
     multiplication matrix is the matrix whose columns are `a, ax,
     \dots, ax^{n-1}`.
 
-.. function:: void fq_nmod_mono_to_dual_matrix(nmod_mat_t res, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_embed_mono_to_dual_matrix(nmod_mat_t res, const fq_nmod_ctx_t ctx)
 
     Compute the change of basis matrix from the monomial basis of
     ``ctx`` to its dual basis.
 
-.. function:: void fq_nmod_dual_to_mono_matrix(nmod_mat_t res, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_embed_dual_to_mono_matrix(nmod_mat_t res, const fq_nmod_ctx_t ctx)
 
     Compute the change of basis matrix from the dual basis of
     ``ctx`` to its monomial basis.

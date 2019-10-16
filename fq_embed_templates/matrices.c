@@ -18,7 +18,7 @@
 #define __fmpz_mod_poly_get_coeff(p,i) ((p)->coeffs + (i))
 
 
-void TEMPLATE(T, mono_to_dual_matrix)(TEMPLATE(B, mat_t) res,
+void TEMPLATE(T, embed_mono_to_dual_matrix)(TEMPLATE(B, mat_t) res,
                                       const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, j, n = TEMPLATE(T, ctx_degree)(ctx);
@@ -45,7 +45,7 @@ void TEMPLATE(T, mono_to_dual_matrix)(TEMPLATE(B, mat_t) res,
     TEMPLATE(B, poly_clear)(d_ctx);
 }
 
-void TEMPLATE(T, dual_to_mono_matrix)(TEMPLATE(B, mat_t) res,
+void TEMPLATE(T, embed_dual_to_mono_matrix)(TEMPLATE(B, mat_t) res,
                                       const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, j, n = TEMPLATE(T, ctx_degree)(ctx);
@@ -65,7 +65,7 @@ void TEMPLATE(T, dual_to_mono_matrix)(TEMPLATE(B, mat_t) res,
                                        __TEMPLATE(B, poly_get_coeff)(modulus, i + j + 1));
 
     TEMPLATE(T, modulus_derivative_inv)(d_ctx, d_ctx_inv, ctx);
-    TEMPLATE(T, mul_matrix)(mul_mat, d_ctx_inv, ctx);
+    TEMPLATE(T, embed_mul_matrix)(mul_mat, d_ctx_inv, ctx);
     TEMPLATE(B, mat_mul)(res, mul_mat, tmp);
 
     TEMPLATE(T, clear)(d_ctx, ctx);
@@ -82,13 +82,13 @@ void TEMPLATE(T, dual_to_mono_matrix)(TEMPLATE(B, mat_t) res,
 
    Return the m×n matrix of the trace from K to k.
    If m=n, res is the inverse of basis. */
-void TEMPLATE(T, trace_matrix)(TEMPLATE(B, mat_t) res,
+void TEMPLATE(T, embed_trace_matrix)(TEMPLATE(B, mat_t) res,
                                const TEMPLATE(B, mat_t) basis,
                                const TEMPLATE(T, ctx_t) sub_ctx,
                                const TEMPLATE(T, ctx_t) sup_ctx)
 {
     slong m = TEMPLATE(B, mat_ncols)(basis), 
-        n = TEMPLATE(B, mat_nrows)(basis);
+          n = TEMPLATE(B, mat_nrows)(basis);
     const TEMPLATE(B, poly_struct) *modulus = TEMPLATE(T, ctx_modulus)(sub_ctx);
     TEMPLATE(B, mat_t) m2d, d2m, tmp;
 
@@ -96,9 +96,9 @@ void TEMPLATE(T, trace_matrix)(TEMPLATE(B, mat_t) res,
     TEMPLATE(B, mat_init)(d2m, m, m, TEMPLATE(B, poly_modulus)(modulus));
     TEMPLATE(B, mat_init)(tmp, m, n, TEMPLATE(B, poly_modulus)(modulus));
 
-    TEMPLATE(T, mono_to_dual_matrix)(m2d, sup_ctx);
+    TEMPLATE(T, embed_mono_to_dual_matrix)(m2d, sup_ctx);
     TEMPLATE(B, mat_transpose)(res, basis);
-    TEMPLATE(T, dual_to_mono_matrix)(d2m, sub_ctx);
+    TEMPLATE(T, embed_dual_to_mono_matrix)(d2m, sub_ctx);
 
     TEMPLATE(B, mat_mul)(tmp, res, m2d);
     TEMPLATE(B, mat_mul)(res, d2m, tmp);
@@ -157,13 +157,13 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
     TEMPLATE(B, mat_init)(sup2gen, m, n, TEMPLATE(B, poly_modulus)(gen_minpoly));
 
     /* Gen -> Sub */
-    TEMPLATE(T, composition_matrix)(gen2sub, gen_sub, sub_ctx);
+    TEMPLATE(T, embed_composition_matrix)(gen2sub, gen_sub, sub_ctx);
     /* Sub -> Gen */
-    TEMPLATE(T, trace_matrix)(sub2gen, gen2sub, gen_ctx, sub_ctx);
+    TEMPLATE(T, embed_trace_matrix)(sub2gen, gen2sub, gen_ctx, sub_ctx);
     /* Gen -> Sup */
-    TEMPLATE(T, composition_matrix_sub)(gen2sup, gen_sup, sup_ctx, m);
+    TEMPLATE(T, embed_composition_matrix_sub)(gen2sup, gen_sup, sup_ctx, m);
     /* Sup -> Gen (trace) */
-    TEMPLATE(T, trace_matrix)(sup2gen, gen2sup, gen_ctx, sup_ctx);
+    TEMPLATE(T, embed_trace_matrix)(sup2gen, gen2sup, gen_ctx, sup_ctx);
 
     /* Correct the projection Sup -> Gen */
     /* If this is an isomorphism, there is no need for correction */
@@ -205,7 +205,7 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
         TEMPLATE(T, div)(mul, mul, trace, sup_ctx);
         
         /* Correct the matrix */
-        TEMPLATE(T, mul_matrix)(mat_mul, mul, sup_ctx);
+        TEMPLATE(T, embed_mul_matrix)(mat_mul, mul, sup_ctx);
         TEMPLATE(B, mat_mul)(tmp, sup2gen, mat_mul);
         TEMPLATE(B, mat_swap)(tmp, sup2gen);
         

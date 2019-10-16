@@ -59,32 +59,32 @@ FLINT_DLL void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
    Return the m×n matrix of the trace from K to k.
    If m=n, res is the inverse of basis.
 */
-FLINT_DLL void TEMPLATE(T, trace_matrix)(TEMPLATE(B, mat_t) res,
+FLINT_DLL void TEMPLATE(T, embed_trace_matrix)(TEMPLATE(B, mat_t) res,
                                          const TEMPLATE(B, mat_t) basis,
                                          const TEMPLATE(T, ctx_t) sub_ctx,
                                          const TEMPLATE(T, ctx_t) sup_ctx);
 
 /* Compute the matrix whose columns are (gen^0, gen^1, ..., gen^(trunc-1)) */
-FLINT_DLL void TEMPLATE(T, composition_matrix_sub)(TEMPLATE(B, mat_t) matrix,
+FLINT_DLL void TEMPLATE(T, embed_composition_matrix_sub)(TEMPLATE(B, mat_t) matrix,
                                                    const TEMPLATE(T, t) gen,
                                                    const TEMPLATE(T, ctx_t) ctx,
                                                    slong trunc);
 FQ_EMBED_TEMPLATES_INLINE
-void TEMPLATE(T, composition_matrix)(TEMPLATE(B, mat_t) matrix,
+void TEMPLATE(T, embed_composition_matrix)(TEMPLATE(B, mat_t) matrix,
                                      const TEMPLATE(T, t) gen,
                                      const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, composition_matrix_sub)(matrix, gen, ctx, 
+    TEMPLATE(T, embed_composition_matrix_sub)(matrix, gen, ctx, 
                                         TEMPLATE(T, ctx_degree(ctx)));
 }
 
-FLINT_DLL void TEMPLATE(T, mul_matrix)(TEMPLATE(B, mat_t) matrix,
+FLINT_DLL void TEMPLATE(T, embed_mul_matrix)(TEMPLATE(B, mat_t) matrix,
                                        const TEMPLATE(T, t) gen,
                                        const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void TEMPLATE(T, mono_to_dual_matrix)(TEMPLATE(B, mat_t) res,
+FLINT_DLL void TEMPLATE(T, embed_mono_to_dual_matrix)(TEMPLATE(B, mat_t) res,
                                                 const TEMPLATE(T, ctx_t) ctx);
-FLINT_DLL void TEMPLATE(T, dual_to_mono_matrix)(TEMPLATE(B, mat_t) res,
+FLINT_DLL void TEMPLATE(T, embed_dual_to_mono_matrix)(TEMPLATE(B, mat_t) res,
                                                 const TEMPLATE(T, ctx_t) ctx);
 
 FQ_EMBED_TEMPLATES_INLINE

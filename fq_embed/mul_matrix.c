@@ -11,7 +11,7 @@
 
 #include "fq_embed.h"
 
-void fq_mul_matrix(fmpz_mod_mat_t matrix,
+void fq_embed_mul_matrix(fmpz_mod_mat_t matrix,
                    const fq_t gen,
                    const fq_ctx_t ctx)
 {

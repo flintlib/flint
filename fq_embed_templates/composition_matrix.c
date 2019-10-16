@@ -15,10 +15,10 @@
 #include "templates.h"
 
 /* The naming of these macros is an abuse */
-#define __nmod_poly_get_coeff(p,i) ((p)->coeffs[(i)])
-#define __fmpz_mod_poly_get_coeff(p,i) ((p)->coeffs + (i))
+#define __nmod_poly_get_coeff(p, i) ((p)->coeffs[(i)])
+#define __fmpz_mod_poly_get_coeff(p, i) ((p)->coeffs + (i))
 
-void TEMPLATE(T, composition_matrix_sub)(TEMPLATE(B, mat_t) matrix,
+void TEMPLATE(T, embed_composition_matrix_sub)(TEMPLATE(B, mat_t) matrix,
                                          const TEMPLATE(T, t) gen,
                                          const TEMPLATE(T, ctx_t) ctx,
                                          slong trunc)

@@ -47,8 +47,8 @@ main(void)
         TEMPLATE(B, mat_init)(one, d, d, TEMPLATE(B, poly_modulus)(modulus));
         TEMPLATE(B, mat_init)(two, d, d, TEMPLATE(B, poly_modulus)(modulus));
         
-        TEMPLATE(T, mono_to_dual_matrix)(m2d, ctx);
-        TEMPLATE(T, dual_to_mono_matrix)(d2m, ctx);
+        TEMPLATE(T, embed_mono_to_dual_matrix)(m2d, ctx);
+        TEMPLATE(T, embed_dual_to_mono_matrix)(d2m, ctx);
         TEMPLATE(B, mat_mul)(one, m2d, d2m);
 
         TEMPLATE(B, mat_one)(two);
