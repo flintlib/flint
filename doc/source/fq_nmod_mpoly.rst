@@ -298,13 +298,17 @@ Container operations
 
 .. function:: void fq_nmod_mpoly_get_term_exp_ui(ulong * exp, const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
 
+.. function:: void fq_nmod_mpoly_get_term_exp_si(slong * exp, const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
+
     Set ``exp`` to the exponent vector of the term of index ``i``.
-    The ``_ui`` version throws if any entry does not fit into a ``ulong``.
+    The ``_ui`` (resp. ``_si``) version throws if any entry does not fit into a ``ulong`` (resp. ``slong``).
 
 .. function:: ulong fq_nmod_mpoly_get_term_var_exp_ui(const fq_nmod_mpoly_t A, slong i, slong var, const fq_nmod_mpoly_ctx_t ctx)
 
+.. function:: slong fq_nmod_mpoly_get_term_var_exp_si(const fq_nmod_mpoly_t A, slong i, slong var, const fq_nmod_mpoly_ctx_t ctx)
+
     Return the exponent of the variable ``var`` of the term of index ``i``.
-    This function throws if the exponent not fit into a ``ulong``.
+    This function throws if the exponent does not fit into a ``ulong`` (resp. ``slong``).
 
 .. function:: void fq_nmod_mpoly_set_term_exp_fmpz(fq_nmod_mpoly_t A, slong i, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx)
 

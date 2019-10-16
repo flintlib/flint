@@ -753,29 +753,23 @@ int nmod_mpolyu_content_mpoly(
     }
 
     if (j == 0)
-    {
         j = 1;
-    }
+
     success = _nmod_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx,
                                                         handles, num_handles);
     if (!success)
-    {
         return 0;
-    }
 
     for (i = 1; i < A->length; i++)
     {
         if (i == j)
-        {
             continue;
-        }
+
         success = _nmod_mpoly_gcd(g, bits, g, A->coeffs + i, ctx,
                                                          handles, num_handles);
         FLINT_ASSERT(g->bits == bits);
         if (!success)
-        {
             return 0;
-        }
     }
 
     return 1;

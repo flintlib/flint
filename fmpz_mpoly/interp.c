@@ -13,10 +13,10 @@
 #include "nmod_mpoly.h"
 
 /*
-    intp_reduce: map from Z to Z/pZ
-    intp_lift:   map from Z/pZ to Z
-    intp_crt:    update element of Z with a new image in Z/pZ
-    intp_mcrt:   same as intp_update, but monomial match, thus easier
+    interp_reduce: map from Z to Z/pZ
+    interp_lift:   map from Z/pZ to Z
+    interp_crt:    update element of Z with a new image in Z/pZ
+    interp_mcrt:   same as interp_crt, but monomial match, thus easier
 */
 
 /*****************************************************************************/
@@ -26,7 +26,7 @@
     Ap is in Fp[x_0, ..., x_(n-1)]
     A  is in ZZ[x_0, ..., x_(n-1)], n = ctx->minfo->nvars
 */
-void fmpz_mpoly_intp_reduce_p(
+void fmpz_mpoly_interp_reduce_p(
     nmod_mpoly_t Ap,
     const nmod_mpoly_ctx_t ctxp,
     fmpz_mpoly_t A,
@@ -53,7 +53,7 @@ void fmpz_mpoly_intp_reduce_p(
     Ap is in Fp[X][x_0, ..., x_(n-1)]
     A  is in ZZ[X][x_0, ..., x_(n-1)], n = ctx->minfo->nvars
 */
-void fmpz_mpolyu_intp_reduce_p(
+void fmpz_mpolyu_interp_reduce_p(
     nmod_mpolyu_t Ap,
     const nmod_mpoly_ctx_t ctxp,
     fmpz_mpolyu_t A,
@@ -68,7 +68,7 @@ void fmpz_mpolyu_intp_reduce_p(
     for (i = 0; i < A->length; i++)
     {
         Ap->exps[k] = A->exps[i];
-        fmpz_mpoly_intp_reduce_p(Ap->coeffs + k, ctxp, A->coeffs + i, ctx);
+        fmpz_mpoly_interp_reduce_p(Ap->coeffs + k, ctxp, A->coeffs + i, ctx);
         k += !nmod_mpoly_is_zero(Ap->coeffs + k, ctxp);
     }
     Ap->length = k;
@@ -80,7 +80,7 @@ void fmpz_mpolyu_intp_reduce_p(
     A  is in ZZ[x_0, ..., x_(n-1)], n = ctx->minfo->nvars
     Ap is in Fp[x_0, ..., x_(n-1)]
 */
-void fmpz_mpoly_intp_lift_p(
+void fmpz_mpoly_interp_lift_p(
     fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx,
     nmod_mpoly_t Ap,
@@ -103,7 +103,7 @@ void fmpz_mpoly_intp_lift_p(
     A  is in ZZ[X][x_0, ..., x_(n-1)], n = ctx->minfo->nvars
     Ap is in Fp[X][x_0, ..., x_(n-1)]
 */
-void fmpz_mpolyu_intp_lift_p(
+void fmpz_mpolyu_interp_lift_p(
     fmpz_mpolyu_t A,
     const fmpz_mpoly_ctx_t ctx,
     nmod_mpolyu_t Ap,
@@ -116,7 +116,7 @@ void fmpz_mpolyu_intp_lift_p(
     for (i = 0; i < Ap->length; i++)
     {
         A->exps[i] = Ap->exps[i];
-        fmpz_mpoly_intp_lift_p(A->coeffs + i, ctx, Ap->coeffs + i, ctxp);
+        fmpz_mpoly_interp_lift_p(A->coeffs + i, ctx, Ap->coeffs + i, ctxp);
     }
     A->length = Ap->length;
 }
@@ -127,7 +127,7 @@ void fmpz_mpolyu_intp_lift_p(
     H is in ZZ[x_0, ..., x_(n-1)], n = ctx->minfo->nvars
     A is in Fp[x_0, ..., x_(n-1)]
 */
-int fmpz_mpoly_intp_mcrt_p(
+int fmpz_mpoly_interp_mcrt_p(
     flint_bitcnt_t * coeffbits,
     fmpz_mpoly_t H,
     const fmpz_mpoly_ctx_t ctx,
@@ -167,7 +167,7 @@ int fmpz_mpoly_intp_mcrt_p(
     H is in ZZ[X][x_0, ..., x_(n-1)], n = ctx->minfo->nvars
     A is in Fp[X][x_0, ..., x_(n-1)]
 */
-int fmpz_mpolyu_intp_mcrt_p(
+int fmpz_mpolyu_interp_mcrt_p(
     flint_bitcnt_t * coeffbits,
     fmpz_mpolyu_t H,
     const fmpz_mpoly_ctx_t ctx,
@@ -185,7 +185,7 @@ int fmpz_mpolyu_intp_mcrt_p(
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT(H->exps[i] == A->exps[i]);
-        changed |= fmpz_mpoly_intp_mcrt_p(coeffbits, H->coeffs + i, ctx, m,
+        changed |= fmpz_mpoly_interp_mcrt_p(coeffbits, H->coeffs + i, ctx, m,
                                                           A->coeffs + i, ctxp);
     }
     H->length = A->length;
@@ -199,7 +199,7 @@ int fmpz_mpolyu_intp_mcrt_p(
     E is in Fp[x_0,...,x_(m-2)][x_(m-1)]
     A is in ZZ[x_0,...,x_(m-2), x_(m-1)], m = ctx->minfo->nvars
 */
-void fmpz_mpoly_intp_reduce_p_mpolyn(
+void fmpz_mpoly_interp_reduce_p_mpolyn(
     nmod_mpolyn_t E,
     const nmod_mpoly_ctx_t pctx,
     const fmpz_mpoly_t A,
@@ -263,47 +263,11 @@ void fmpz_mpoly_intp_reduce_p_mpolyn(
 }
 
 /*
-    E = A mod p
-    E is in Fp[X][x_0,...,x_(m-2)][x_(m-1)]
-    A is in ZZ[X][x_0,...,x_(m-2), x_(m-1)]
-*/
-void fmpz_mpolyu_intp_reduce_p_mpolyun(
-    nmod_mpolyun_t E,
-    const nmod_mpoly_ctx_t pctx,
-    const fmpz_mpolyu_t A,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_struct * Acoeff = A->coeffs;
-    ulong * Aexp = A->exps;
-    slong Alen = A->length;
-    slong Ai;
-    nmod_mpolyn_struct * Ecoeff;
-    ulong * Eexp;
-    slong Ei;
-
-    nmod_mpolyun_fit_length(E, Alen, pctx);
-    Ecoeff = E->coeffs;
-    Eexp = E->exps;
-
-    Ei = 0;
-    for (Ai = 0; Ai < Alen; Ai++)
-    {
-        fmpz_mpoly_intp_reduce_p_mpolyn(Ecoeff + Ei, pctx, Acoeff + Ai, ctx);
-        Eexp[Ei] = Aexp[Ai];
-        Ei += ((Ecoeff + Ei)->length != 0);
-    }
-    E->length = Ei;
-
-    FLINT_ASSERT(nmod_mpolyun_is_canonical(E, pctx));
-}
-
-
-/*
     A = B using symmetric range
     A is in ZZ[x_0, ..., x_(var-2), x_(m-1)]
     B is in Fp[x_0, ..., x_(var-2)][x_(m-1)]
 */
-void fmpz_mpoly_intp_lift_p_mpolyn(
+void fmpz_mpoly_interp_lift_p_mpolyn(
     fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx,
     const nmod_mpolyn_t B,
@@ -353,49 +317,17 @@ void fmpz_mpoly_intp_lift_p_mpolyn(
     A->length = Ai;
 }
 
-/*
-    A = B using symmetric range
-    A is in ZZ[X][x_0, ..., x_(var-2), x_(m-1)]
-    B is in Fp[X][x_0, ..., x_(var-2)][x_(m-1)]
-*/
-void fmpz_mpolyu_intp_lift_p_mpolyun(
-    fmpz_mpolyu_t A,
-    const fmpz_mpoly_ctx_t ctx,
-    const nmod_mpolyun_t B,
-    const nmod_mpoly_ctx_t pctx)
-{
-    slong i;
-    nmod_mpolyn_struct * Bcoeff = B->coeffs;
-    ulong * Bexp = B->exps;
-    slong Blen = B->length;
-
-    fmpz_mpoly_struct * Acoeff;
-    ulong * Aexp;
-
-    fmpz_mpolyu_fit_length(A, Blen, ctx);
-    Acoeff = A->coeffs;
-    Aexp = A->exps;
-
-    for (i = 0; i < Blen; i++)
-    {
-        Aexp[i] = Bexp[i];
-        fmpz_mpoly_intp_lift_p_mpolyn(Acoeff + i, ctx, Bcoeff + i, pctx);
-    }
-    A->length = Blen;
-
-    FLINT_ASSERT(fmpz_mpolyu_is_canonical(A, ctx));
-}
-
 
 /*
-    T = F + modulus*((A - F(mod p))/(modulus (mod p)))
+    F = F + modulus*((A - F(mod p))/(modulus (mod p)))
     no assumptions about matching monomials
     F is in ZZ[x_0, ..., x_(m-1), x_(m-1)]
     A is in Fp[x_0, ..., x_(m-2)][x_(m-1)]
 */
-int fmpz_mpoly_intp_crt_p_mpolyn(
+
+int fmpz_mpoly_interp_crt_p_mpolyn(
+    fmpz_mpoly_t F,
     fmpz_mpoly_t T,
-    const fmpz_mpoly_t F,
     const fmpz_mpoly_ctx_t ctx,
     fmpz_t modulus,
     const nmod_mpolyn_t A,
@@ -420,16 +352,17 @@ int fmpz_mpoly_intp_crt_p_mpolyn(
     ulong * Fexp = F->exps;
     slong Fi;
     fmpz_t zero;
-    slong var = ctx->minfo->nvars;
-
-    FLINT_ASSERT(var == pctx->minfo->nvars);
 
     fmpz_init(zero);
 
     FLINT_ASSERT(T->bits == A->bits);
     FLINT_ASSERT(F->bits == A->bits);
+    FLINT_ASSERT(pctx->minfo->nvars == ctx->minfo->nvars);
 
-    mpoly_gen_offset_shift_sp(&offset, &shift, var - 1, A->bits, ctx->minfo);
+    FLINT_ASSERT(fmpz_mpoly_is_canonical(F, ctx));
+    FLINT_ASSERT(nmod_mpolyn_is_canonical(A, pctx));
+
+    mpoly_gen_offset_shift_sp(&offset, &shift, pctx->minfo->nvars - 1, A->bits, ctx->minfo);
 
     Flen = F->length;
 
@@ -510,103 +443,12 @@ int fmpz_mpoly_intp_crt_p_mpolyn(
     }
     T->length = Ti;
 
+    if (changed)
+    {
+        fmpz_mpoly_swap(F, T, ctx);
+    }
+
     fmpz_clear(zero);
     return changed;
 }
 
-/*
-    F = F + modulus*((A - F(mod p))/(modulus (mod p)))
-    no assumptions about matching monomials
-    F is in ZZ[X][x_0, ..., x_(m-1), x_(m-1)]
-    A is in Fp[X][x_0, ..., x_(m-2)][x_(m-1)]
-*/
-int fmpz_mpolyu_intp_crt_p_mpolyun(
-    fmpz_mpolyu_t F,
-    fmpz_mpolyu_t T,
-    const fmpz_mpoly_ctx_t ctx,
-    fmpz_t modulus,
-    nmod_mpolyun_t A,
-    const nmod_mpoly_ctx_t pctx)
-{
-    int changed = 0;
-    slong i, j, k;
-    ulong * Texp;
-    ulong * Fexp;
-    ulong * Aexp;
-    slong Flen;
-    slong Alen;
-    fmpz_mpoly_struct * Tcoeff;
-    fmpz_mpoly_struct * Fcoeff;
-    nmod_mpolyn_struct  * Acoeff;
-    fmpz_mpoly_t zero;
-    nmod_mpolyn_t zerop;
-
-    FLINT_ASSERT(F->bits == T->bits);
-    FLINT_ASSERT(T->bits == A->bits);
-
-    Flen = F->length;
-    Alen = A->length;
-    fmpz_mpolyu_fit_length(T, Flen + Alen, ctx);
-
-    Tcoeff = T->coeffs;
-    Fcoeff = F->coeffs;
-    Acoeff = A->coeffs;
-    Texp = T->exps;
-    Fexp = F->exps;
-    Aexp = A->exps;   
-
-    fmpz_mpoly_init(zero, ctx);
-    zero->bits = A->bits;
-    zero->length = 0;
-
-    nmod_mpolyn_init(zerop, A->bits, pctx);
-    zerop->length = 0;
-
-    i = j = k = 0;
-    while (i < Flen || j < Alen)
-    {
-        if (i < Flen && j < Alen && (Fexp[i] == Aexp[j]))
-        {
-            /* F term ok, A term ok */
-            changed |= fmpz_mpoly_intp_crt_p_mpolyn(Tcoeff + k, Fcoeff + i, ctx,
-                                                    modulus, Acoeff + j, pctx);
-            Texp[k] = Aexp[j];
-            i++;
-            j++;
-        }
-        else if (i < Flen && (j >= Alen || Fexp[i] > Aexp[j]))
-        {
-            /* F term ok, A term missing */
-            changed |= fmpz_mpoly_intp_crt_p_mpolyn(Tcoeff + k, Fcoeff + i, ctx,
-                                                         modulus, zerop, pctx);
-            Texp[k] = Fexp[i];
-            i++;
-        }
-        else
-        {
-            FLINT_ASSERT(j < Alen && (i >= Flen || Aexp[j] > Fexp[i]));
-
-            /* F term missing, A term ok */
-            changed |= fmpz_mpoly_intp_crt_p_mpolyn(Tcoeff + k, zero, ctx,
-                                                    modulus, Acoeff + j, pctx);
-            Texp[k] = Aexp[j];
-            j++;
-        }
-
-        FLINT_ASSERT(!fmpz_mpoly_is_zero(Tcoeff + k, ctx));
-        k++;
-    }
-    T->length = k;
-
-    if (changed)
-    {
-        fmpz_mpolyu_swap(T, F, ctx);
-    }
-
-    fmpz_mpoly_clear(zero, ctx);
-    nmod_mpolyn_clear(zerop, pctx);
-
-    FLINT_ASSERT(fmpz_mpolyu_is_canonical(F, ctx));
-
-    return changed;    
-}

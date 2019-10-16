@@ -127,7 +127,7 @@ Context Management
 .. function:: void fq_zech_ctx_randtest(fq_zech_ctx_t ctx)
 
     Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_zech_ctx_init`` as not been called on ``ctx`` already.
+    ``fq_zech_ctx_init`` has not been called on ``ctx`` already.
 
 .. function:: void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx)
 
@@ -474,6 +474,11 @@ Special functions
     
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
+
+    Note that ``ctx`` must already correspond to a finite field defined by
+    a primitive polynomial and so this function cannot be used to check
+    primitivity of the generator, but can be used to check that other elements
+    are primitive.
 
 .. function:: int fq_zech_is_primitive(const fq_zech_t op, const fq_zech_ctx_t ctx)
 

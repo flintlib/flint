@@ -152,7 +152,7 @@ static void nmod_mpoly_evals(
         slong * LUToffset, * LUTvar;
         mp_limb_t * LUTvalue, * LUTvalueinv;
         mp_limb_t * vieval;
-        mp_limb_t t, xpoweval, xinvpoweval;
+        mp_limb_t t, xpoweval, xinvpoweval; /* TODO t again? */
 
         LUToffset   = (slong *) flint_malloc(N*FLINT_BITS*sizeof(slong));
         LUTmask     = (ulong *) flint_malloc(N*FLINT_BITS*sizeof(ulong));
@@ -289,7 +289,7 @@ try_again:
         {
             I->Gdeflate_deg_bound[j] = FLINT_MIN(I->Adeflate_deg[j],
                                                  I->Bdeflate_deg[j]);
-            I->Gterm_count_est[j] = (I->Gdeflate_deg_bound[j] + 1)/2;
+            I->Gterm_count_est[j] = 1 + I->Gdeflate_deg_bound[j]/2;
         }
 
         goto cleanup;
@@ -312,7 +312,7 @@ try_again:
         {
             I->Gdeflate_deg_bound[j] = FLINT_MIN(I->Adeflate_deg[j],
                                                  I->Bdeflate_deg[j]);
-            I->Gterm_count_est[j] = (I->Gdeflate_deg_bound[j] + 1)/2;
+            I->Gterm_count_est[j] = 1 + I->Gdeflate_deg_bound[j]/2;
         }
         else
         {
@@ -442,8 +442,7 @@ static int _try_zippel(
         goto cleanup;
 
     /* put back content */
-    success = _nmod_mpoly_gcd(Acontent, ABbits, Acontent, Bcontent, uctx,
-                                                                      NULL, 0);
+    success = _nmod_mpoly_gcd(Acontent, ABbits, Acontent, Bcontent, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 
@@ -474,11 +473,10 @@ cleanup:
 }
 
 
-
 typedef struct
 {
-    nmod_mpolyun_struct * Pn;
-    const nmod_mpoly_ctx_struct * uctx;
+    nmod_mpolyn_struct * Pn;
+    const nmod_mpoly_ctx_struct * nctx;
     const nmod_mpoly_struct * P;
     const nmod_mpoly_ctx_struct * ctx;
     const slong * perm;
@@ -494,7 +492,7 @@ static void _worker_convertn(void * varg)
 {
     _convertn_arg_struct * arg = (_convertn_arg_struct *) varg;
 
-    nmod_mpoly_to_mpolyun_perm_deflate(arg->Pn, arg->uctx, arg->P, arg->ctx,
+    nmod_mpoly_to_mpolyn_perm_deflate(arg->Pn, arg->nctx, arg->P, arg->ctx,
            arg->perm, arg->shift, arg->stride, arg->handles, arg->num_handles);
 }
 
@@ -511,8 +509,8 @@ static int _try_brown(
     int success;
     slong m = I->mvars;
     flint_bitcnt_t ABbits;
-    nmod_mpoly_ctx_t uctx;
-    nmod_mpolyun_t An, Bn, Gn, Abarn, Bbarn;
+    nmod_mpoly_ctx_t nctx;
+    nmod_mpolyn_t An, Bn, Gn, Abarn, Bbarn;
     nmod_poly_stack_t Sp;
 
     if (!I->can_use_brown)
@@ -526,13 +524,13 @@ static int _try_brown(
 
     ABbits = FLINT_MAX(A->bits, B->bits);
 
-    nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->ffinfo->mod.n);
-    nmod_poly_stack_init(Sp, ABbits, uctx);
-    nmod_mpolyun_init(An, ABbits, uctx);
-    nmod_mpolyun_init(Bn, ABbits, uctx);
-    nmod_mpolyun_init(Gn, ABbits, uctx);
-    nmod_mpolyun_init(Abarn, ABbits, uctx);
-    nmod_mpolyun_init(Bbarn, ABbits, uctx);
+    nmod_mpoly_ctx_init(nctx, m, ORD_LEX, ctx->ffinfo->mod.n);
+    nmod_poly_stack_init(Sp, ABbits, nctx);
+    nmod_mpolyn_init(An, ABbits, nctx);
+    nmod_mpolyn_init(Bn, ABbits, nctx);
+    nmod_mpolyn_init(Gn, ABbits, nctx);
+    nmod_mpolyn_init(Abarn, ABbits, nctx);
+    nmod_mpolyn_init(Bbarn, ABbits, nctx);
 
     if (num_handles > 0)
     {
@@ -543,7 +541,7 @@ static int _try_brown(
         FLINT_ASSERT(s < num_handles);
 
         arg->Pn = Bn;
-        arg->uctx = uctx;
+        arg->nctx = nctx;
         arg->P = B;
         arg->ctx = ctx;
         arg->perm = I->brown_perm;
@@ -554,7 +552,7 @@ static int _try_brown(
 
         thread_pool_wake(global_thread_pool, handles[s], _worker_convertn, arg);
 
-        nmod_mpoly_to_mpolyun_perm_deflate(An, uctx, A, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
                                    I->brown_perm, I->Amin_exp, I->Gstride,
                                                                handles + 0, s);
 
@@ -562,9 +560,9 @@ static int _try_brown(
     }
     else
     {
-        nmod_mpoly_to_mpolyun_perm_deflate(An, uctx, A, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
                               I->brown_perm, I->Amin_exp, I->Gstride, NULL, 0);
-        nmod_mpoly_to_mpolyun_perm_deflate(Bn, uctx, B, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate(Bn, nctx, B, ctx,
                               I->brown_perm, I->Bmin_exp, I->Gstride, NULL, 0);
     }
 
@@ -574,37 +572,37 @@ static int _try_brown(
     FLINT_ASSERT(Bn->length > 1);
 
     success = (num_handles > 0)
-        ? nmod_mpolyun_gcd_brown_smprime_threaded(Gn, Abarn, Bbarn, An, Bn,
-                                          m - 2, uctx, I, handles, num_handles)
-        : nmod_mpolyun_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn,
-                                                           m - 2, uctx, I, Sp);
+        ? nmod_mpolyn_gcd_brown_smprime_threaded(Gn, Abarn, Bbarn, An, Bn,
+                                          m - 1, nctx, I, handles, num_handles)
+        : nmod_mpolyn_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn,
+                                                           m - 1, nctx, I, Sp);
 
     if (!success)
     {
-        nmod_mpoly_to_mpolyun_perm_deflate(An, uctx, A, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
                               I->brown_perm, I->Amin_exp, I->Gstride, NULL, 0);
-        nmod_mpoly_to_mpolyun_perm_deflate(Bn, uctx, B, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate(Bn, nctx, B, ctx,
                               I->brown_perm, I->Bmin_exp, I->Gstride, NULL, 0);
-        success = nmod_mpolyun_gcd_brown_lgprime(Gn, Abarn, Bbarn, An, Bn,
-                                                                  m - 2, uctx);
+        success = nmod_mpolyn_gcd_brown_lgprime(Gn, Abarn, Bbarn, An, Bn,
+                                                                  m - 1, nctx);
     }
 
     if (!success)
         goto cleanup;
 
-    nmod_mpoly_from_mpolyun_perm_inflate(G, Gbits, ctx, Gn, uctx,
+    nmod_mpoly_from_mpolyn_perm_inflate(G, Gbits, ctx, Gn, nctx,
                                        I->brown_perm, I->Gmin_exp, I->Gstride);
     success = 1;
 
 cleanup:
 
-    nmod_mpolyun_clear(An, uctx);
-    nmod_mpolyun_clear(Bn, uctx);
-    nmod_mpolyun_clear(Gn, uctx);
-    nmod_mpolyun_clear(Abarn, uctx);
-    nmod_mpolyun_clear(Bbarn, uctx);
+    nmod_mpolyn_clear(An, nctx);
+    nmod_mpolyn_clear(Bn, nctx);
+    nmod_mpolyn_clear(Gn, nctx);
+    nmod_mpolyn_clear(Abarn, nctx);
+    nmod_mpolyn_clear(Bbarn, nctx);
     nmod_poly_stack_clear(Sp);
-    nmod_mpoly_ctx_clear(uctx);
+    nmod_mpoly_ctx_clear(nctx);
 
     return success;
 }
@@ -1162,4 +1160,5 @@ int nmod_mpoly_gcd(
 {
     return nmod_mpoly_gcd_threaded(G, A, B, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
 }
+
 

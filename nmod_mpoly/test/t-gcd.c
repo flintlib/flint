@@ -94,7 +94,7 @@ int
 main(void)
 {
     const slong max_threads = 5;
-    slong i, j, k, tmul = 15;
+    slong i, j, k, tmul = 10;
     FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;

@@ -13,8 +13,15 @@
 #include <stdlib.h>
 #include "fmpz_mpoly.h"
 
-void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
-                     fmpz_mpoly_ctx_t ctx, slong i, slong j, const char * name)
+void gcd_check(
+    fmpz_mpoly_t g,
+    fmpz_mpoly_t a,
+    fmpz_mpoly_t b,
+    const fmpz_mpoly_t gdiv,
+    fmpz_mpoly_ctx_t ctx,
+    slong i,
+    slong j,
+    const char * name)
 {
     int res;
     fmpz_mpoly_t ca, cb, cg;
@@ -31,6 +38,17 @@ void gcd_check(fmpz_mpoly_t g, fmpz_mpoly_t a, fmpz_mpoly_t b,
         flint_printf("Check gcd can be computed\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
+    }
+
+    if (!fmpz_mpoly_is_zero(gdiv, ctx))
+    {
+        if (!fmpz_mpoly_divides(ca, g, gdiv, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check divisor of gcd\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+            flint_abort();
+        }
     }
 
     if (fmpz_mpoly_is_zero(g, ctx))
@@ -94,7 +112,7 @@ int
 main(void)
 {
     const slong max_threads = 5;
-    slong i, j, k, tmul = 15;
+    slong i, j, k, tmul = 10;
     FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;
@@ -135,8 +153,9 @@ main(void)
 
         fmpz_mpoly_mul(a, a, g, ctx);
         fmpz_mpoly_mul(b, b, g, ctx);
+        fmpz_mpoly_set(t, g, ctx);
 
-        gcd_check(g, a, b, ctx, i, 0, "dense examples");
+        gcd_check(g, a, b, t, ctx, i, 0, "dense examples");
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
@@ -147,25 +166,27 @@ main(void)
 
     {
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t g, a, b;
+        fmpz_mpoly_t g, a, b, t;
         const char * vars[] = {"t" ,"x", "y", "z"};
 
         fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
         fmpz_mpoly_init(a, ctx);
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(t, ctx);
 
-        fmpz_mpoly_set_str_pretty(g, "39 - t*x + 39*x^100 - t*x^101 + 39*x^3*y - t*x^4*y - 7*x^2*y^3*z^11 - 7*x^102*y^3*z^11 - 7*x^5*y^4*z^11 + 78*t^15*x^78*y^3*z^13 - 2*t^16*x^79*y^3*z^13 + x^1000*y^3*z^20 + x^1100*y^3*z^20 + x^1003*y^4*z^20 - 14*t^15*x^80*y^6*z^24 + 2*t^15*x^1078*y^6*z^33", vars, ctx);
+        fmpz_mpoly_set_str_pretty(t, "39 - t*x + 39*x^100 - t*x^101 + 39*x^3*y - t*x^4*y - 7*x^2*y^3*z^11 - 7*x^102*y^3*z^11 - 7*x^5*y^4*z^11 + 78*t^15*x^78*y^3*z^13 - 2*t^16*x^79*y^3*z^13 + x^1000*y^3*z^20 + x^1100*y^3*z^20 + x^1003*y^4*z^20 - 14*t^15*x^80*y^6*z^24 + 2*t^15*x^1078*y^6*z^33", vars, ctx);
         fmpz_mpoly_set_str_pretty(a, "39 - t*x - 7*x^2*y^3*z^11 + x^1000*y^3*z^20", vars, ctx);
         fmpz_mpoly_set_str_pretty(b, "1 + x^100 + x^3*y + 2*t^15*x^78*y^3*z^13", vars, ctx);
-        fmpz_mpoly_mul(a, a, g, ctx);
-        fmpz_mpoly_mul(b, b, g, ctx);
+        fmpz_mpoly_mul(a, a, t, ctx);
+        fmpz_mpoly_mul(b, b, t, ctx);
 
-        gcd_check(g, a, b, ctx, 0, 0, "example");
+        gcd_check(g, a, b, t, ctx, 0, 0, "example");
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
         fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(t, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
 
@@ -200,26 +221,28 @@ main(void)
 
     {
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t g, a, b;
+        fmpz_mpoly_t g, a, b, t;
         const char * vars[] = {"x" ,"y", "z", "t"};
 
         fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
         fmpz_mpoly_init(a, ctx);
         fmpz_mpoly_init(b, ctx);
         fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(t, ctx);
 
-        fmpz_mpoly_set_str_pretty(a, "(1 + x)^15*(2 + y)^18*(1 + z)^20", vars, ctx);
-        fmpz_mpoly_set_str_pretty(b, "(2 + x)^15*(1 + y)^18*(1 - z)^20", vars, ctx);
-        fmpz_mpoly_set_str_pretty(g, "(1 - x)^15*(2 - y)^18*(1 - z)^20", vars, ctx);
-        fmpz_mpoly_mul(a, a, g, ctx);
-        fmpz_mpoly_mul(a, a, g, ctx);
+        fmpz_mpoly_set_str_pretty(a, "(1 + x)^1*(2 + y)^1*(1 + z)^2", vars, ctx);
+        fmpz_mpoly_set_str_pretty(b, "(2 + x)^1*(1 + y)^1*(1 - z)^2", vars, ctx);
+        fmpz_mpoly_set_str_pretty(t, "(1 - x)^1*(2 - y)^1*(1 - z)^2", vars, ctx);
+        fmpz_mpoly_mul(a, a, t, ctx);
+        fmpz_mpoly_mul(b, b, t, ctx);
 
         flint_set_num_threads(n_randint(state, max_threads) + 1);
-        gcd_check(g, a, b, ctx, 0, 0, "total dense example");
+        gcd_check(g, a, b, t, ctx, 0, 0, "total dense example");
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
         fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(t, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
 
@@ -265,7 +288,7 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, ctx, i, j, "monomial");
+            gcd_check(g, a, b, t, ctx, i, j, "monomial");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -310,12 +333,12 @@ main(void)
             } while (t2->length != 1);
             fmpz_mpoly_randtest_bits(a, state, len1, coeff_bits, exp_bits, ctx);
             fmpz_mpoly_mul(b, a, t1, ctx);
-            fmpz_mpoly_mul(a, a, t2, ctx);
+            fmpz_mpoly_mul(t2, a, t2, ctx);
 
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, ctx, i, j, "monomial cofactors");
+            gcd_check(g, t2, b, a, ctx, i, j, "monomial cofactors");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -372,7 +395,7 @@ main(void)
             if ((j%2) == 0)
                 fmpz_mpoly_swap(a, b, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "one input divides the other");
+            gcd_check(g, a, b, t2, ctx, i, j, "one input divides the other");
         }
 
         fmpz_clear(c);
@@ -421,7 +444,7 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, ctx, i, j, "sparse inputs");
+            gcd_check(g, a, b, t, ctx, i, j, "sparse inputs");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -485,7 +508,7 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, ctx, i, j, "sparse input with repacking");
+            gcd_check(g, a, b, t, ctx, i, j, "sparse input with repacking");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -555,8 +578,15 @@ main(void)
             fmpz_mpoly_inflate(a, a, shifts1, strides, ctx);
             fmpz_mpoly_inflate(b, b, shifts2, strides, ctx);
 
+            for (k = 0; k < ctx->minfo->nvars; k++)
+            {
+                if (fmpz_cmp(shifts1 + k, shifts2 + k) > 0)
+                    fmpz_set(shifts1 + k, shifts2 + k);
+            }
+            fmpz_mpoly_inflate(t, t, shifts1, strides, ctx);
+
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, ctx, i, j, "sparse input with inflation");
+            gcd_check(g, a, b, t, ctx, i, j, "sparse input with inflation");
         }
 
         for (k = 0; k < ctx->minfo->nvars; k++)
@@ -626,7 +656,7 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len4, coeff_bits4, bits4, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, ctx, i, j, "dense input");
+            gcd_check(g, a, b, t, ctx, i, j, "dense input");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -704,7 +734,7 @@ main(void)
             fmpz_mpoly_randtest_bits(g, state, len4, coeff_bits4, bits4, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, ctx, i, j, "dense input with repacking");
+            gcd_check(g, a, b, t, ctx, i, j, "dense input with repacking");
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -787,8 +817,15 @@ main(void)
             fmpz_mpoly_inflate(a, a, shifts1, strides, ctx);
             fmpz_mpoly_inflate(b, b, shifts2, strides, ctx);
 
+            for (k = 0; k < ctx->minfo->nvars; k++)
+            {
+                if (fmpz_cmp(shifts1 + k, shifts2 + k) > 0)
+                    fmpz_set(shifts1 + k, shifts2 + k);
+            }
+            fmpz_mpoly_inflate(t, t, shifts1, strides, ctx);
+
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, ctx, i, j, "dense input with inflation");
+            gcd_check(g, a, b, t, ctx, i, j, "dense input with inflation");
         }
 
         for (k = 0; k < ctx->minfo->nvars; k++)
@@ -813,3 +850,4 @@ main(void)
     printf("PASS\n");
     return 0;
 }
+

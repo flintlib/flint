@@ -100,8 +100,8 @@ int
 main(void)
 {
     slong i, j;
-    slong tmul = 5;
-    slong max_threads = 5;
+    slong tmul = 10;
+    slong max_threads = 6;
     FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;
@@ -120,9 +120,9 @@ main(void)
         nmod_mpoly_init(b, ctx);
         nmod_mpoly_init(g, ctx);
 
-        nmod_mpoly_set_str_pretty(a, "x^4+y^4+z^4", vars, ctx);
-        nmod_mpoly_set_str_pretty(b, "x^2+y^2+z^2", vars, ctx);
-        nmod_mpoly_set_str_pretty(g, "x^3+y^3+z^3", vars, ctx);
+        nmod_mpoly_set_str_pretty(a, "x^3+y^3+z^3", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "x^5+y^5+z^5", vars, ctx);
+        nmod_mpoly_set_str_pretty(g, "x^7+y^7+z^7", vars, ctx);
         nmod_mpoly_mul(a, a, g, ctx);
         nmod_mpoly_mul(b, b, g, ctx);
 
@@ -152,9 +152,9 @@ main(void)
         nmod_mpoly_init(a, ctx);
         nmod_mpoly_init(b, ctx);
 
-        len = n_randint(state, 30) + 1;
-        len1 = n_randint(state, 40);
-        len2 = n_randint(state, 40);
+        len = n_randint(state, 40) + 1;
+        len1 = n_randint(state, 80);
+        len2 = n_randint(state, 80);
 
         degbound = 1 + 20/ctx->minfo->nvars;
 
@@ -231,3 +231,4 @@ main(void)
 
     return 0;
 }
+

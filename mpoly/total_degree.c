@@ -10,7 +10,7 @@
 #include "mpoly.h"
 
 int mpoly_total_degree_fits_si(const ulong * exps,
-                                 slong len, slong bits, const mpoly_ctx_t mctx)
+                        slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     int r;
     fmpz_t td;
@@ -22,7 +22,7 @@ int mpoly_total_degree_fits_si(const ulong * exps,
 }
 
 slong mpoly_total_degree_si(const ulong * exps,
-                                 slong len, slong bits, const mpoly_ctx_t mctx)
+                        slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong r;
     fmpz_t td;
@@ -34,7 +34,7 @@ slong mpoly_total_degree_si(const ulong * exps,
 }
 
 void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
-                                 slong len, slong bits, const mpoly_ctx_t mctx)
+                        slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, j, N;
     fmpz_t tot;
@@ -82,7 +82,7 @@ void mpoly_total_degree_fmpz(fmpz_t totdeg, const ulong * exps,
 
 /* reference implementation */
 void mpoly_total_degree_fmpz_ref(fmpz_t totdeg, const ulong * exps,
-                                 slong len, slong bits, const mpoly_ctx_t mctx)
+                        slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, j, N;
     fmpz_t tot;

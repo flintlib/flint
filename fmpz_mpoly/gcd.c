@@ -682,8 +682,8 @@ cleanup:
 
 typedef struct
 {
-    fmpz_mpolyu_struct * Pu;
-    const fmpz_mpoly_ctx_struct * uctx;
+    fmpz_mpoly_struct * Pl;
+    const fmpz_mpoly_ctx_struct * lctx;
     const fmpz_mpoly_struct * P;
     const fmpz_mpoly_ctx_struct * ctx;
     const slong * perm;
@@ -691,16 +691,16 @@ typedef struct
     const thread_pool_handle * handles;
     slong num_handles;
 }
-_convertu_arg_struct;
+_convertl_arg_struct;
 
-typedef _convertu_arg_struct _convertu_arg_t[1];
+typedef _convertl_arg_struct _convertl_arg_t[1];
 
 static void _worker_convertu(void * varg)
 {
-    _convertu_arg_struct * arg = (_convertu_arg_struct *) varg;
+    _convertl_arg_struct * arg = (_convertl_arg_struct *) varg;
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(arg->Pu, arg->uctx, arg->P, arg->ctx,
-                           arg->perm, arg->shift, arg->stride, arg->maxexps,
+    fmpz_mpoly_to_mpoly_perm_deflate(arg->Pl, arg->lctx, arg->P, arg->ctx,
+                                         arg->perm, arg->shift, arg->stride,
                                                arg->handles, arg->num_handles);
 }
 
@@ -717,8 +717,8 @@ static int _try_brown(
     int success;
     slong m = I->mvars;
     flint_bitcnt_t ABbits;
-    fmpz_mpoly_ctx_t uctx;
-    fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
+    fmpz_mpoly_ctx_t lctx;
+    fmpz_mpoly_t Al, Bl, Gl, Abarl, Bbarl;
 
     if (!I->can_use_brown)
         return 0;
@@ -731,25 +731,24 @@ static int _try_brown(
 
     ABbits = FLINT_MAX(A->bits, B->bits);
 
-    /* uctx is for Z[y_1, ..., y_{m-1}] */
-    fmpz_mpoly_ctx_init(uctx, m - 1, ORD_LEX);
-    fmpz_mpolyu_init(Au, ABbits, uctx);
-    fmpz_mpolyu_init(Bu, ABbits, uctx);
-    fmpz_mpolyu_init(Gu, ABbits, uctx);
-    fmpz_mpolyu_init(Abaru, ABbits, uctx);
-    fmpz_mpolyu_init(Bbaru, ABbits, uctx);
+    fmpz_mpoly_ctx_init(lctx, m, ORD_LEX);
+    fmpz_mpoly_init3(Al, 0, ABbits, lctx);
+    fmpz_mpoly_init3(Bl, 0, ABbits, lctx);
+    fmpz_mpoly_init3(Gl, 0, ABbits, lctx);
+    fmpz_mpoly_init3(Abarl, 0, ABbits, lctx);
+    fmpz_mpoly_init3(Bbarl, 0, ABbits, lctx);
 
     /* convert to univariate format */
     if (num_handles > 0)
     {
         slong s = mpoly_divide_threads(num_handles, A->length, B->length);
-        _convertu_arg_t arg;
+        _convertl_arg_t arg;
 
         FLINT_ASSERT(s >= 0);
         FLINT_ASSERT(s < num_handles);
 
-        arg->Pu = Bu;
-        arg->uctx = uctx;
+        arg->Pl = Bl;
+        arg->lctx = lctx;
         arg->P = B;
         arg->ctx = ctx;
         arg->perm = I->brown_perm;
@@ -761,47 +760,45 @@ static int _try_brown(
 
         thread_pool_wake(global_thread_pool, handles[s], _worker_convertu, arg);
 
-        fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                        I->brown_perm, I->Amin_exp, I->Gstride, I->Amax_exp,
+        fmpz_mpoly_to_mpoly_perm_deflate(Al, lctx, A, ctx,
+                                    I->brown_perm, I->Amin_exp, I->Gstride,
                                                                handles + 0, s);
 
         thread_pool_wait(global_thread_pool, handles[s]);
     }
     else
     {
-        fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                        I->brown_perm, I->Amin_exp, I->Gstride, I->Amax_exp,
-                                                                      NULL, 0);
-        fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                        I->brown_perm, I->Bmin_exp, I->Gstride, I->Bmax_exp,
-                                                                      NULL, 0);
+        fmpz_mpoly_to_mpoly_perm_deflate(Al, lctx, A, ctx,
+                              I->brown_perm, I->Amin_exp, I->Gstride, NULL, 0);
+        fmpz_mpoly_to_mpoly_perm_deflate(Bl, lctx, B, ctx,
+                              I->brown_perm, I->Bmin_exp, I->Gstride, NULL, 0);
     }
 
-    FLINT_ASSERT(Au->bits == ABbits);
-    FLINT_ASSERT(Bu->bits == ABbits);
-    FLINT_ASSERT(Au->length > 1);
-    FLINT_ASSERT(Bu->length > 1);
+    FLINT_ASSERT(Al->bits == ABbits);
+    FLINT_ASSERT(Bl->bits == ABbits);
+    FLINT_ASSERT(Al->length > 1);
+    FLINT_ASSERT(Bl->length > 1);
 
     success = (num_handles > 0)
-           ? fmpz_mpolyu_gcd_brown_threaded(Gu, Abaru, Bbaru, Au, Bu, uctx, I,
+           ? fmpz_mpolyl_gcd_brown_threaded(Gl, Abarl, Bbarl, Al, Bl, lctx, I,
                                                          handles, num_handles)
-           : fmpz_mpolyu_gcd_brown(Gu, Abaru, Bbaru, Au, Bu, uctx, I);
+           : fmpz_mpolyl_gcd_brown(Gl, Abarl, Bbarl, Al, Bl, lctx, I);
 
     if (!success)
         goto cleanup;
 
-    fmpz_mpoly_from_mpolyu_perm_inflate(G, Gbits, ctx, Gu, uctx,
+    fmpz_mpoly_from_mpoly_perm_inflate(G, Gbits, ctx, Gl, lctx,
                                        I->brown_perm, I->Gmin_exp, I->Gstride);
     success = 1;
 
 cleanup:
 
-    fmpz_mpolyu_clear(Au, uctx);
-    fmpz_mpolyu_clear(Bu, uctx);
-    fmpz_mpolyu_clear(Gu, uctx);
-    fmpz_mpolyu_clear(Abaru, uctx);
-    fmpz_mpolyu_clear(Bbaru, uctx);
-    fmpz_mpoly_ctx_clear(uctx);
+    fmpz_mpoly_clear(Al, lctx);
+    fmpz_mpoly_clear(Bl, lctx);
+    fmpz_mpoly_clear(Gl, lctx);
+    fmpz_mpoly_clear(Abarl, lctx);
+    fmpz_mpoly_clear(Bbarl, lctx);
+    fmpz_mpoly_ctx_clear(lctx);
 
     return success;
 }
@@ -1694,3 +1691,4 @@ int fmpz_mpoly_gcd(
 {
     return fmpz_mpoly_gcd_threaded(G, A, B, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
 }
+

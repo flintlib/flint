@@ -11,8 +11,8 @@
 
 #include "mpoly.h"
 
-
-int mpoly_monomials_overflow_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx)
+int mpoly_monomials_overflow_test(ulong * exps, slong len, flint_bitcnt_t bits,
+                                                        const mpoly_ctx_t mctx)
 {
     slong N, i;
     N = mpoly_words_per_exp(bits, mctx);
@@ -23,12 +23,13 @@ int mpoly_monomials_overflow_test(ulong * exps, slong len, slong bits, const mpo
         for (i = 0; i < FLINT_BITS/bits; i++)
             mask = (mask << bits) + (UWORD(1) << (bits - 1));
 
-        for (i = 0; i + 1 < len; i++)
+        for (i = 0; i < len; i++)
             if (mpoly_monomial_overflows(exps + i*N, N, mask))
                 return 1;
-    } else
+    }
+    else
     {
-        for (i = 0; i + 1 < len; i++)
+        for (i = 0; i < len; i++)
             if (mpoly_monomial_overflows_mp(exps + i*N, N, bits))
                 return 1;
     }

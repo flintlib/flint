@@ -166,8 +166,8 @@ choose_prime_outer:
     nmod_mpoly_ctx_change_modulus(ctxp, p);
 
     /* make sure mod p reduction does not kill either A or B */
-    fmpz_mpolyu_intp_reduce_p(Ap, ctxp, A, ctx);
-    fmpz_mpolyu_intp_reduce_p(Bp, ctxp, B, ctx);
+    fmpz_mpolyu_interp_reduce_p(Ap, ctxp, A, ctx);
+    fmpz_mpolyu_interp_reduce_p(Bp, ctxp, B, ctx);
     if (Ap->length == 0 || Bp->length == 0)
         goto choose_prime_outer;
 
@@ -192,7 +192,7 @@ choose_prime_outer:
     }
 
     nmod_mpolyu_setform(Gform, Gp, ctxp);
-    fmpz_mpolyu_intp_lift_p(H, ctx, Gp, ctxp);
+    fmpz_mpolyu_interp_lift_p(H, ctx, Gp, ctxp);
     fmpz_set_ui(modulus, p);
 
 choose_prime_inner:
@@ -215,8 +215,8 @@ choose_prime_inner:
     nmod_mpoly_ctx_change_modulus(ctxp, p);
 
     /* make sure mod p reduction does not kill either A or B */
-    fmpz_mpolyu_intp_reduce_p(Ap, ctxp, A, ctx);
-    fmpz_mpolyu_intp_reduce_p(Bp, ctxp, B, ctx);
+    fmpz_mpolyu_interp_reduce_p(Ap, ctxp, A, ctx);
+    fmpz_mpolyu_interp_reduce_p(Bp, ctxp, B, ctx);
     if (Ap->length == 0 || Bp->length == 0)
         goto choose_prime_inner;
 
@@ -245,7 +245,7 @@ choose_prime_inner:
     t = nmod_mul(t, gammap, ctxp->ffinfo->mod);
     nmod_mpolyu_scalar_mul_nmod(Gp, t, ctxp);
 
-    changed = fmpz_mpolyu_intp_mcrt_p(&coeffbits, H, ctx, modulus, Gp, ctxp);
+    changed = fmpz_mpolyu_interp_mcrt_p(&coeffbits, H, ctx, modulus, Gp, ctxp);
     fmpz_mul_ui(modulus, modulus, p);
 
     if (changed)

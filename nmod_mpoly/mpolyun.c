@@ -191,6 +191,19 @@ slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
     return deg;
 }
 
+slong nmod_mpolyn_lastdeg(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    slong deg = -WORD(1);
+
+    for (i = 0; i < A->length; i++)
+    {
+        deg = FLINT_MAX(deg, nmod_poly_degree(A->coeffs + i));
+    }
+
+    return deg;
+}
+
 void nmod_mpolyun_set(nmod_mpolyun_t A, const nmod_mpolyun_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
@@ -248,6 +261,15 @@ void nmod_mpolyun_one(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
     A->length = 1;
 }
 
+void nmod_mpolyn_set_mod(nmod_mpolyn_t A, const nmod_t mod)
+{
+    slong i;
+
+    for (i = 0; i < A->alloc; i++)
+    {
+        (A->coeffs + i)->mod = mod;
+    }
+}
 
 void nmod_mpolyun_set_mod(nmod_mpolyun_t A, const nmod_t mod)
 {
@@ -269,10 +291,12 @@ void nmod_mpolyn_scalar_mul_nmod(
     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
+
+    if (c == 1)
+        return;
+
     for (i = 0; i < A->length; i++)
-    {
         nmod_poly_scalar_mul_nmod(A->coeffs + i, A->coeffs + i, c);
-    }
 }
 
 void nmod_mpolyun_scalar_mul_nmod(
@@ -286,6 +310,31 @@ void nmod_mpolyun_scalar_mul_nmod(
     {
         nmod_mpolyn_scalar_mul_nmod(A->coeffs + i, c, ctx);
     }
+}
+
+
+void nmod_mpolyn_mul_last(
+    nmod_mpolyn_t A,
+    nmod_poly_t b,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    nmod_poly_t t;
+
+    FLINT_ASSERT(!nmod_poly_is_zero(b));
+
+    if (nmod_poly_is_one(b))
+        return;
+
+    nmod_poly_init_mod(t, ctx->ffinfo->mod);
+
+    for (i = 0; i < A->length; i++)
+    {
+        nmod_poly_mul(t, A->coeffs + i, b);
+        nmod_poly_swap(t, A->coeffs + i);
+    }
+
+    nmod_poly_clear(t);
 }
 
 /*
@@ -671,6 +720,64 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
     TMP_END;
 }
 
+void nmod_mpoly_cvtto_mpolyn(nmod_mpolyn_t A, nmod_mpoly_t B,
+                                         slong var, const nmod_mpoly_ctx_t ctx);
+
+void nmod_mpoly_to_mpolyn_perm_deflate(
+    nmod_mpolyn_t A,
+    const nmod_mpoly_ctx_t nctx,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride,
+    const thread_pool_handle * handles,
+    slong num_handles)
+{
+    slong j, k, l;
+    slong NA = mpoly_words_per_exp_sp(A->bits, nctx->minfo);
+    slong NB = mpoly_words_per_exp_sp(B->bits, ctx->minfo);
+    slong n = ctx->minfo->nvars;
+    slong m = nctx->minfo->nvars;
+    ulong * Bexps;
+    slong * offs, * shifts;
+    nmod_mpoly_t T;
+    TMP_INIT;
+
+    FLINT_ASSERT(m <= n);
+
+    TMP_START;
+    Bexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+
+    offs   = (slong *) TMP_ALLOC(m*sizeof(ulong));
+    shifts = (slong *) TMP_ALLOC(m*sizeof(ulong));
+    for (k = 0; k < m; k++)
+    {
+        mpoly_gen_offset_shift_sp(offs + k, shifts + k, k, A->bits, nctx->minfo);
+    }
+
+    nmod_mpoly_init3(T, B->length, A->bits, nctx);
+    T->length = B->length;
+    for (j = 0; j < B->length; j++)
+    {
+        mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
+        T->coeffs[j] = B->coeffs[j];
+        mpoly_monomial_zero(T->exps + NA*j, NA);
+        for (k = 0; k < m; k++)
+        {
+            l = perm[k];
+            (T->exps + NA*j)[offs[k]] += ((Bexps[l] - shift[l]) / stride[l]) << shifts[k];
+        }
+    }
+
+    nmod_mpoly_sort_terms(T, nctx);
+
+    nmod_mpoly_cvtto_mpolyn(A, T, nctx->minfo->nvars - 1, nctx);
+
+    nmod_mpoly_clear(T, nctx);
+
+    TMP_END;
+}
 
 
 
@@ -778,6 +885,90 @@ void nmod_mpoly_from_mpolyun_perm_inflate(
     A->exps = Aexp;
     A->alloc = Aalloc;
     _nmod_mpoly_set_length(A, Alen, ctx);
+
+    nmod_mpoly_sort_terms(A, ctx);
+    TMP_END;
+}
+
+void nmod_mpoly_from_mpolyn_perm_inflate(
+    nmod_mpoly_t A,
+    flint_bitcnt_t Abits,
+    const nmod_mpoly_ctx_t ctx,
+    const nmod_mpolyn_t B,
+    const nmod_mpoly_ctx_t nctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride)
+{
+    slong n = ctx->minfo->nvars;
+    slong m = nctx->minfo->nvars;
+    slong i, h, k, l;
+    slong NA, NB;
+    slong Alen;
+    mp_limb_t * Acoeff;
+    ulong * Aexp;
+    slong Aalloc;
+    ulong * Bexps;
+    ulong * Aexps, * tAexp, * tAgexp;
+    TMP_INIT;
+
+    FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT(Abits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(m <= n);
+    TMP_START;
+
+    Bexps = (ulong *) TMP_ALLOC(m*sizeof(ulong));
+    Aexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+
+    NA = mpoly_words_per_exp(Abits, ctx->minfo);
+    NB = mpoly_words_per_exp(B->bits, nctx->minfo);
+
+    tAexp = (ulong *) TMP_ALLOC(NA*sizeof(ulong));
+    tAgexp = (ulong *) TMP_ALLOC(NA*sizeof(ulong));
+    mpoly_gen_monomial_sp(tAgexp, perm[m - 1], Abits, ctx->minfo);
+    for (i = 0; i < NA; i++)
+        tAgexp[i] *= stride[perm[m - 1]];
+
+    nmod_mpoly_fit_bits(A, Abits, ctx);
+    A->bits = Abits;
+
+    Acoeff = A->coeffs;
+    Aexp = A->exps;
+    Aalloc = A->alloc;
+    Alen = 0;
+    for (i = 0; i < B->length; i++)
+    {
+        mpoly_get_monomial_ui(Bexps, B->exps + NB*i, B->bits, nctx->minfo);
+        FLINT_ASSERT(Bexps[m - 1] == 0);
+        for (l = 0; l < n; l++)
+        {
+            Aexps[l] = shift[l];
+        }
+        for (k = 0; k < m; k++)
+        {
+            l = perm[k];
+            Aexps[l] += stride[l]*Bexps[k];
+        }
+
+        mpoly_set_monomial_ui(tAexp, Aexps, Abits, ctx->minfo);
+
+        h = (B->coeffs + i)->length;
+        _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + h, NA);
+        for (h--; h >= 0; h--)
+        {
+            mp_limb_t c = (B->coeffs + i)->coeffs[h];
+            if (c == 0)
+                continue;
+            mpoly_monomial_madd(Aexp + NA*Alen, tAexp, h, tAgexp, NA);
+            Acoeff[Alen] = c;
+            Alen++;
+        }
+    }
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->alloc = Aalloc;
+    A->length = Alen;
 
     nmod_mpoly_sort_terms(A, ctx);
     TMP_END;
@@ -971,6 +1162,21 @@ void nmod_mpolyun_content_last(nmod_poly_t a, nmod_mpolyun_t B,
     }
 }
 
+void nmod_mpolyn_content_last(
+    nmod_poly_t a,
+    nmod_mpolyn_t B,
+    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    nmod_poly_zero(a);
+    for (i = 0; i < B->length; i++)
+    {
+        nmod_poly_gcd(a, a, B->coeffs + i);
+        if (nmod_poly_degree(a) == 0)
+            break;
+    }
+}
+
 void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
                                                     const nmod_mpoly_ctx_t ctx)
 {
@@ -994,3 +1200,24 @@ void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
 
     nmod_poly_clear(r);
 }
+
+void nmod_mpolyn_divexact_last(nmod_mpolyn_t A, nmod_poly_t b,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    nmod_poly_t r;
+
+    if (nmod_poly_is_one(b))
+        return;
+
+    nmod_poly_init_mod(r, ctx->ffinfo->mod);
+
+    for (i = 0; i < A->length; i++)
+    {
+        nmod_poly_divrem(A->coeffs + i, r, A->coeffs + i, b);
+        FLINT_ASSERT(nmod_poly_is_zero(r));
+    }
+
+    nmod_poly_clear(r);
+}
+

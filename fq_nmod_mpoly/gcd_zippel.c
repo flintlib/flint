@@ -28,8 +28,8 @@ int fq_nmod_mpolyu_gcdm_zippel_bivar(
     int success = 0, changed, have_enough;
     fq_nmod_mpolyun_t An, Bn, H, Ht;
     fq_nmod_poly_t modulus, a, b, c, g;
-    _fq_nmod_mpoly_embed_chooser_t embc;
-    _fq_nmod_embed_struct * cur_emb;
+    bad_fq_nmod_mpoly_embed_chooser_t embc;
+    bad_fq_nmod_embed_struct * cur_emb;
     fq_nmod_mpoly_ctx_t ectx;
     fq_nmod_mpolyu_t Aeval, Beval, Geval;
     fq_nmod_t t, geval;
@@ -73,7 +73,7 @@ int fq_nmod_mpolyu_gcdm_zippel_bivar(
     fq_nmod_mpolyun_init(H, A->bits, ctx);
     fq_nmod_mpolyun_init(Ht, A->bits, ctx);
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
 
     /*
         Once Aeval, Beval, ..., t are inited in ectx->fqctx, they do not need
@@ -90,7 +90,7 @@ int fq_nmod_mpolyu_gcdm_zippel_bivar(
 
 choose_prime_outer:
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
     if (cur_emb == NULL)
     {
         /* ran out of primes */
@@ -103,13 +103,13 @@ have_prime:
     FLINT_ASSERT(cur_emb != NULL);
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    _fq_nmod_embed_sm_to_lg(geval, g, cur_emb);
+    bad_fq_nmod_embed_sm_to_lg(geval, g, cur_emb);
     if (fq_nmod_is_zero(geval, ectx->fqctx))
         goto choose_prime_outer;
 
     /* make sure reduction does not kill either A or B */
-    fq_nmod_mpolyun_intp_reduce_lg_mpolyu(Aeval, An, ectx, ctx, cur_emb);
-    fq_nmod_mpolyun_intp_reduce_lg_mpolyu(Beval, Bn, ectx, ctx, cur_emb);
+    fq_nmod_mpolyun_interp_reduce_lg_mpolyu(Aeval, An, ectx, ctx, cur_emb);
+    fq_nmod_mpolyun_interp_reduce_lg_mpolyu(Beval, Bn, ectx, ctx, cur_emb);
     if (Aeval->length == 0 || Beval->length == 0)
         goto choose_prime_outer;
 
@@ -145,7 +145,7 @@ have_prime:
 
     if (fq_nmod_poly_degree(modulus, ctx->fqctx) > 0)
     {
-        changed = fq_nmod_mpolyun_intp_crt_lg_mpolyu(&lastdeg,
+        changed = fq_nmod_mpolyun_interp_crt_lg_mpolyu(&lastdeg,
                                     H, Ht, modulus, ctx, Geval, ectx, cur_emb);
         fq_nmod_poly_mul(modulus, modulus, cur_emb->h, ctx->fqctx);
 
@@ -178,7 +178,7 @@ have_prime:
     }
     else
     {
-        fq_nmod_mpolyun_intp_lift_lg_mpolyu(H, ctx, Geval, ectx, cur_emb);
+        fq_nmod_mpolyun_interp_lift_lg_mpolyu(H, ctx, Geval, ectx, cur_emb);
         fq_nmod_poly_set(modulus, cur_emb->h, ctx->fqctx);
     }
 
@@ -202,7 +202,7 @@ finished:
     fq_nmod_clear(geval, ectx->fqctx);
     fq_nmod_clear(t, ectx->fqctx);
 
-    _fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
+    bad_fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
 
     return success;
 }
@@ -222,8 +222,8 @@ int fq_nmod_mpolyu_gcdm_zippel(
     int success, changed, have_enough;
     fq_nmod_mpolyun_t An, Bn, Hn, Ht;
     fq_nmod_poly_t modulus, gamma, hc;
-    _fq_nmod_mpoly_embed_chooser_t embc;
-    _fq_nmod_embed_struct * cur_emb;
+    bad_fq_nmod_mpoly_embed_chooser_t embc;
+    bad_fq_nmod_embed_struct * cur_emb;
     fq_nmod_mpoly_ctx_t ectx;
     fq_nmod_mpolyu_t Aeval, Beval, Geval, Gform;
     fq_nmod_t t, gammaeval;
@@ -278,7 +278,7 @@ int fq_nmod_mpolyu_gcdm_zippel(
     fq_nmod_mpolyun_init(Hn, A->bits, ctx);
     fq_nmod_mpolyun_init(Ht, A->bits, ctx);
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
 
     /*
         Once Aeval, Beval, ..., t are inited in ectx->fqctx, they do not need
@@ -296,7 +296,7 @@ int fq_nmod_mpolyu_gcdm_zippel(
 
 choose_prime_outer:
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
     if (cur_emb == NULL)
     {
         /* ran out of primes */
@@ -309,13 +309,13 @@ have_prime:
     FLINT_ASSERT(cur_emb != NULL);
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    _fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
+    bad_fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
     if (fq_nmod_is_zero(gammaeval, ectx->fqctx))
         goto choose_prime_outer;
 
     /* make sure reduction does not kill either A or B */
-    fq_nmod_mpolyun_intp_reduce_lg_mpolyu(Aeval, An, ectx, ctx, cur_emb);
-    fq_nmod_mpolyun_intp_reduce_lg_mpolyu(Beval, Bn, ectx, ctx, cur_emb);
+    fq_nmod_mpolyun_interp_reduce_lg_mpolyu(Aeval, An, ectx, ctx, cur_emb);
+    fq_nmod_mpolyun_interp_reduce_lg_mpolyu(Beval, Bn, ectx, ctx, cur_emb);
     if (Aeval->length == 0 || Beval->length == 0)
         goto choose_prime_outer;
 
@@ -343,13 +343,13 @@ have_prime:
     fq_nmod_mpolyu_scalar_mul_fq_nmod(Geval, t, ectx);
 
     fq_nmod_mpolyu_setform(Gform, Geval, ectx);
-    fq_nmod_mpolyun_intp_lift_lg_mpolyu(Hn, ctx, Geval, ectx, cur_emb);
+    fq_nmod_mpolyun_interp_lift_lg_mpolyu(Hn, ctx, Geval, ectx, cur_emb);
 
     fq_nmod_poly_set(modulus, cur_emb->h, ctx->fqctx);
 
 choose_prime_inner:
 
-    cur_emb = _fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
+    cur_emb = bad_fq_nmod_mpoly_embed_chooser_next(embc, ectx, ctx, randstate);
     if (cur_emb == NULL)
     {
         success = 0;
@@ -357,13 +357,13 @@ choose_prime_inner:
     }
 
     /* make sure reduction does not kill both lc(A) and lc(B) */
-    _fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
+    bad_fq_nmod_embed_sm_to_lg(gammaeval, gamma, cur_emb);
     if (fq_nmod_is_zero(gammaeval, ectx->fqctx))
         goto choose_prime_inner;
 
     /* make sure reduction does not kill either A or B */
-    fq_nmod_mpolyun_intp_reduce_lg_mpolyu(Aeval, An, ectx, ctx, cur_emb);
-    fq_nmod_mpolyun_intp_reduce_lg_mpolyu(Beval, Bn, ectx, ctx, cur_emb);
+    fq_nmod_mpolyun_interp_reduce_lg_mpolyu(Aeval, An, ectx, ctx, cur_emb);
+    fq_nmod_mpolyun_interp_reduce_lg_mpolyu(Beval, Bn, ectx, ctx, cur_emb);
     if (Aeval->length == 0 || Beval->length == 0)
         goto choose_prime_inner;
 
@@ -391,7 +391,7 @@ choose_prime_inner:
     fq_nmod_mul(t, t, gammaeval, ectx->fqctx);
     fq_nmod_mpolyu_scalar_mul_fq_nmod(Geval, t, ectx);
 
-    changed = fq_nmod_mpolyun_intp_mcrt_lg_mpolyu(&lastdeg, Hn, ctx, modulus, Geval, ectx, cur_emb);
+    changed = fq_nmod_mpolyun_interp_mcrt_lg_mpolyu(&lastdeg, Hn, ctx, modulus, Geval, ectx, cur_emb);
     fq_nmod_poly_mul(modulus, modulus, cur_emb->h, ctx->fqctx);
 
     have_enough = fq_nmod_poly_degree(modulus, ctx->fqctx) >= bound;
@@ -441,7 +441,7 @@ finished:
     fq_nmod_clear(gammaeval, ectx->fqctx);
     fq_nmod_clear(t, ectx->fqctx);
 
-    _fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
+    bad_fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
 
     return success;
 }
