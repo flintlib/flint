@@ -1,9 +1,5 @@
 /*
-    Copyright (C) 2007 David Howden
-    Copyright (C) 2007, 2008, 2009, 2010 William Hart
-    Copyright (C) 2008 Richard Howell-Peak
-    Copyright (C) 2011 Fredrik Johansson
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2019 Edouard Rousseau
 
     This file is part of FLINT.
 
@@ -48,7 +44,6 @@ TEMPLATE(T, poly_factor_split_single) (TEMPLATE(T, poly_t) linfactor,
                 };
                 TEMPLATE(T, poly_set) (pol, linfactor, ctx);
             }   
-
         }
         else
         {
@@ -71,14 +66,10 @@ TEMPLATE(T, poly_factor_split_single) (TEMPLATE(T, poly_t) linfactor,
                 };
                 TEMPLATE(T, poly_set) (pol, linfactor, ctx);
             }   
-
         }
 
         flint_randclear(state);
         TEMPLATE(T, poly_clear) (pol, ctx);
-
     }
 }
-
 #endif
-

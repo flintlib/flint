@@ -1,9 +1,5 @@
 /*
-    Copyright (C) 2007 David Howden
-    Copyright (C) 2007, 2008, 2009, 2010 William Hart
-    Copyright (C) 2008 Richard Howell-Peak
-    Copyright (C) 2011 Fredrik Johansson
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2019 Edouard Rousseau
 
     This file is part of FLINT.
 
@@ -29,7 +25,6 @@ main(void)
     /* Compute a random spliting polynomial then check factorization */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-
         int len;
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, q, r;
@@ -41,9 +36,10 @@ main(void)
         TEMPLATE(T, poly_init) (q, ctx);
         TEMPLATE(T, poly_init) (r, ctx);
 
+        /* random splitting monic polynomial of degree len */
+
         TEMPLATE(T, poly_randtest_monic) (a, state, 2, ctx);
 
-        /* random polynomial of degree len */
         while (TEMPLATE(T, poly_degree) (a, ctx) < len)
         {
             TEMPLATE(T, poly_randtest_monic) (b, state, 2, ctx);
@@ -80,6 +76,4 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
-
 #endif

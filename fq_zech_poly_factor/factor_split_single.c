@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2019 Edouard Rousseau
 
     This file is part of FLINT.
 
@@ -20,4 +20,3 @@
 #include "fq_poly_factor_templates/factor_split_single.c"
 #undef CAP_T
 #undef T
-
