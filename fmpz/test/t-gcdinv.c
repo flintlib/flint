@@ -128,7 +128,8 @@ int main(void)
       fmpz_mul(t, a, f);
       fmpz_mod(t, t, g);
 
-      result = (fmpz_equal(t, d) || fmpz_is_zero(f));
+      result = ((fmpz_equal(t, d) || fmpz_is_zero(f)) &&
+		fmpz_cmp_ui(a, 0) >= 0 && fmpz_cmp(a, g) < 0);
       if (!result)
       {
          flint_printf("FAIL:\n\n");
@@ -172,7 +173,8 @@ int main(void)
       fmpz_mul(t, a, f);
       fmpz_mod(t, t, g);
 
-      result = (fmpz_equal(t, d) || fmpz_is_zero(f));
+      result = ((fmpz_equal(t, d) || fmpz_is_zero(f)) &&
+	           fmpz_cmp_ui(a, 0) >= 0 && fmpz_cmp(a, g) < 0);
       if (!result)
       {
          flint_printf("FAIL:\n\n");

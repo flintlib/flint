@@ -24,6 +24,5 @@ void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
         flint_throw(FLINT_IMPINV, "Exception in fmpz_mod_inv: Cannot invert.\n");
     }
     fmpz_clear(d);
-    fmpz_mod(a, a, ctx->n); /* return of fmpz_gcdinv may be out of range :-( */
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }

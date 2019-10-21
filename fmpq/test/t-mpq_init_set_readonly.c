@@ -78,9 +78,9 @@ int main(void)
             gmp_printf("z = %Qd\n", z);
         }
 
-        fmpq_clear(f);
-        fmpq_clear(g);
         flint_mpq_clear_readonly(z);
+	fmpq_clear(f);
+        fmpq_clear(g);
     }
 
     FLINT_TEST_CLEANUP(state);
