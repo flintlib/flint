@@ -215,6 +215,16 @@ FLINT_DLL void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
 FLINT_DLL void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat);
 
+/* Gaussian elimination *********************************************/
+
+FLINT_DLL slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat);
+
+/* Howell and strong echelon form ***********************************/
+
+FLINT_DLL slong fmpz_mod_mat_howell_form(fmpz_mod_mat_t mat);
+
+FLINT_DLL void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat);
+
 #ifdef __cplusplus
 }
 #endif

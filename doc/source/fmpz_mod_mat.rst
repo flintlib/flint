@@ -221,4 +221,37 @@ Trace
 
     Set ``trace`` to the trace of the matrix ``mat``.
 
+Gaussian elimination
+--------------------------------------------------------------------------------
+
+
+.. function:: slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat)
+
+    Uses Gauss-Jordan elimination to set ``mat`` to its reduced row echelon
+    form and returns the rank of ``mat``.
+
+    If ``perm`` is non-``NULL``, the permutation of
+    rows in the matrix will also be applied to ``perm``.
+
+
+Strong echelon form and Howell form
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat)
+
+    Transforms `mat` into the strong echelon form of `mat`. The Howell form and the
+    strong echelon form are equal up to permutation of the rows, see
+    \cite{FieHof2014} for a definition of the strong echelon form and the
+    algorithm used here.
+
+    `mat` must have at least as many rows as columns.
+
+.. function:: slong fmpz_mat_howell_form_mod(fmpz_mod__mat_t mat)
+
+    Transforms `mat` into the Howell form of `mat`.  For a definition of the
+    Howell form see \cite{StoMul1998}. The Howell form is computed by first
+    putting `mat` into strong echelon form and then ordering the rows.
+
+    `mat` must have at least as many rows as columns.
 
