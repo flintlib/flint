@@ -117,6 +117,7 @@ extern double clock_accum[FLINT_NUM_CLOCKS];
 static __inline__ 
 double get_cycle_counter()
 {
+#if defined(__i686__) || defined(__x86_64__)
 #if defined( _MSC_VER )
     return (double)__rdtsc();
 #else
@@ -129,6 +130,9 @@ double get_cycle_counter()
        : "%edx", "%eax");
 
    return (double) hi * (1 << 30) * 4 + lo;
+#endif
+#else /* non-x86 */
+    return 0;
 #endif
 }
 
