@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,15 +12,12 @@
 
 #include "fmpq.h"
 
-#define ROT(u,v,t)   \
-    do { fmpz _t = *u; *u = *v; *v = *t; *t = _t; } while (0);
-
-int
-_fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
-    const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
+int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
+                const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 {
-    fmpz_t q, r, s, t;
     int success = 0;
+    fmpz_t Q, R, A, B;
+    _fmpz_mat22_t M;
 
     /* Quickly identify small integers */
     if (fmpz_cmp(a, N) <= 0)
@@ -35,52 +33,66 @@ _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
         return 1;
     }
 
-    fmpz_init(q);
-    fmpz_init(r);
-    fmpz_init(s);
-    fmpz_init(t);
+    _fmpz_mat22_init(M);
+    _fmpz_mat22_one(M);
 
-    fmpz_set(r, m); fmpz_zero(s);
-    fmpz_set(n, a); fmpz_one(d);
+    fmpz_init_set(A, m);
+    fmpz_init_set(B, a);
+    fmpz_init(Q);
+    fmpz_init(R);
+    FLINT_ASSERT(fmpz_sgn(B) > 0);
+    FLINT_ASSERT(fmpz_cmp(A, B) > 0);
+    FLINT_ASSERT(fmpz_cmpabs(B, N) > 0); /* at leat one quotient */
 
-    while (fmpz_cmpabs(n, N) > 0)
+    /* find quotients until A >= N > B */
+    while (fmpz_cmpabs(B, N) > 0)
     {
-        fmpz_fdiv_q(q, r, n);
-        fmpz_mul(t, q, n); fmpz_sub(t, r, t); ROT(r, n, t);
-        fmpz_mul(t, q, d); fmpz_sub(t, s, t); ROT(s, d, t);
+        /*
+            TODO: chop A and B and use _fmpz_hgcd(A>>k/B>>k) when
+                  fmpz_bits(B) - fmpz_bits(N) is large. may require backups
+        */
+        fmpz_fdiv_qr(Q, R, A, B);
+        _fmpz_mat22_rmul_elem(M, Q);
+        fmpz_swap(A, B);
+        fmpz_swap(B, R);
     }
 
-    if (fmpz_sgn(d) < 0)
+    /* write answer */
+    fmpz_swap(n, B);
+    if (M->det != 1)
     {
+        FLINT_ASSERT(M->det == -1);
         fmpz_neg(n, n);
-        fmpz_neg(d, d);
     }
+    fmpz_swap(d, M->_11);
 
+    /* check answer */
+    FLINT_ASSERT(fmpz_sgn(d) > 0);
     if (fmpz_cmp(d, D) <= 0)
     {
-        fmpz_gcd(t, n, d);
-        success = fmpz_is_one(t);
+        fmpz_gcd(R, n, d);
+        success = fmpz_is_one(R);
     }
 
-    fmpz_clear(q);
-    fmpz_clear(r);
-    fmpz_clear(s);
-    fmpz_clear(t);
+    fmpz_clear(Q);
+    fmpz_clear(R);
+    fmpz_clear(A);
+    fmpz_clear(B);
+    _fmpz_mat22_clear(M);
 
     return success;
 }
 
-int
-fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m,
+
+int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m,
                                         const fmpz_t N, const fmpz_t D)
 {
     return _fmpq_reconstruct_fmpz_2(fmpq_numref(res),
-                fmpq_denref(res), a, m, N, D);
+                                    fmpq_denref(res), a, m, N, D);
 }
 
-int
-_fmpq_reconstruct_fmpz(fmpz_t n, fmpz_t d,
-    const fmpz_t a, const fmpz_t m)
+
+int _fmpq_reconstruct_fmpz(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m)
 {
     fmpz_t N;
     int result;
@@ -94,9 +106,9 @@ _fmpq_reconstruct_fmpz(fmpz_t n, fmpz_t d,
     return result;
 }
 
-int
-fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
+
+int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
 {
-    return _fmpq_reconstruct_fmpz(fmpq_numref(res),
-                fmpq_denref(res), a, m);
+    return _fmpq_reconstruct_fmpz(fmpq_numref(res), fmpq_denref(res), a, m);
 }
+
