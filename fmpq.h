@@ -334,8 +334,16 @@ FLINT_DLL void _fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden,
 
 FLINT_DLL void fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x);
 
-FLINT_DLL void fmpq_farey_neighbors(fmpq_t left, fmpq_t right
-                                           , const fmpq_t mid, const fmpz_t Q);
+FLINT_DLL void fmpq_farey_neighbors(fmpq_t left, fmpq_t right,
+                                             const fmpq_t mid, const fmpz_t Q);
+
+FLINT_DLL void fmpq_simplest_between(fmpq_t mid, const fmpq_t l, const fmpq_t r);
+
+FLINT_DLL void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den,
+                                       const fmpz_t l_num, const fmpz_t l_den,
+                                       const fmpz_t r_num, const fmpz_t r_den);
+
+FLINT_DLL slong fmpq_get_cfrac_naive(fmpz * c, fmpq_t rem, const fmpq_t x, slong n);
 
 FLINT_DLL slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, slong n);
 
@@ -364,6 +372,98 @@ void _fmpq_vec_clear(fmpq * vec, slong len)
 {
     _fmpz_vec_clear((fmpz *) vec, 2 * len);
 }
+
+/*********************** 2x2 integer matrix **********************************/
+
+typedef struct {
+    fmpz_t _11, _12, _21, _22;
+    int det;    /* 0,1,or,-1: 0 -> don't know, 1 -> 1, -1 -> -1 */
+} _fmpz_mat22_struct;
+
+typedef _fmpz_mat22_struct _fmpz_mat22_t[1];
+
+typedef struct {
+    mp_limb_t _11, _12, _21, _22;
+    int det;    /* ditto */
+} _ui_mat22_struct;
+
+typedef _ui_mat22_struct _ui_mat22_t[1];
+
+FLINT_DLL void _fmpz_mat22_init(_fmpz_mat22_t M);
+
+FLINT_DLL void _fmpz_mat22_clear(_fmpz_mat22_t M);
+
+FLINT_DLL void _fmpz_mat22_one(_fmpz_mat22_t M);
+
+FLINT_DLL int _fmpz_mat22_is_one(_fmpz_mat22_t M);
+
+FLINT_DLL flint_bitcnt_t _fmpz_mat22_bits(const _fmpz_mat22_t N);
+
+FLINT_DLL void _fmpz_mat22_rmul(_fmpz_mat22_t M, const _fmpz_mat22_t N);
+
+FLINT_DLL void _fmpz_mat22_rmul_ui(_fmpz_mat22_t M, const _ui_mat22_t N);
+
+FLINT_DLL void _fmpz_mat22_rmul_inv_ui(_fmpz_mat22_t M, const _ui_mat22_t N);
+
+FLINT_DLL void _fmpz_mat22_rmul_elem(_fmpz_mat22_t M, const fmpz_t q);
+
+FLINT_DLL void _fmpz_mat22_rmul_inv_elem(_fmpz_mat22_t M, const fmpz_t q);
+
+FLINT_DLL void _fmpz_mat22_lmul_elem(_fmpz_mat22_t M, const fmpz_t q);
+
+/******************* resizable integer vector ********************************/
+
+typedef struct
+{
+    fmpz * array;
+    slong length;
+    slong alloc;
+    slong limit;
+} _fmpz_vector_struct;
+
+typedef _fmpz_vector_struct _fmpz_vector_t[1];
+
+FLINT_DLL void _fmpz_vector_init(_fmpz_vector_t v);
+
+FLINT_DLL void _fmpz_vector_init_nowrite(_fmpz_vector_t v);
+
+FLINT_DLL void _fmpz_vector_clear(_fmpz_vector_t v);
+
+FLINT_DLL void _fmpz_vector_fit_length(_fmpz_vector_t v, slong len);
+
+FLINT_DLL void _fmpz_vector_push_back(_fmpz_vector_t v, const fmpz_t a);
+
+FLINT_DLL void _fmpz_vector_push_back_zero(_fmpz_vector_t v);
+
+FLINT_DLL void _fmpz_vector_append_ui(_fmpz_vector_t v, const ulong * a, slong n);
+
+/************************** ball *********************************************/
+
+typedef struct {
+    fmpz_t left_num, left_den, right_num, right_den;
+    int exact;
+} _fmpq_ball_struct;
+
+typedef _fmpq_ball_struct _fmpq_ball_t[1];
+
+FLINT_DLL void _fmpq_ball_init(_fmpq_ball_t x);
+
+FLINT_DLL void _fmpq_ball_clear(_fmpq_ball_t x);
+
+FMPQ_INLINE void _fmpq_ball_swap(_fmpq_ball_t x, _fmpq_ball_t y)
+{
+   _fmpq_ball_struct t = *x;
+   *x = *y;
+   *y = t;
+}
+
+FLINT_DLL int _fmpq_ball_gt_one(const _fmpq_ball_t x);
+
+FLINT_DLL void _fmpq_hgcd(_fmpz_vector_t s, _fmpz_mat22_t M,
+                                                   fmpz_t x_num, fmpz_t x_den);
+
+FLINT_DLL void _fmpq_ball_get_cfrac(_fmpz_vector_t s, _fmpz_mat22_t M,
+                                                    int needM, _fmpq_ball_t x);
 
 #ifdef __cplusplus
 }

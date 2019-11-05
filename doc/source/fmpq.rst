@@ -566,6 +566,13 @@ Rational enumeration
     Set `left` and `right` to the fractions directly below and above `mid` in the Farey sequence of order `Q`.
     This function will throw if `mid` is not canonical or `Q` is less than the denominator of `mid`.
 
+.. function:: void fmpq_simplest_between(fmpq_t mid, const fmpq_t l, const fmpq_t r)
+
+.. function:: void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den, const fmpz_t l_num, const fmpz_t l_den, const fmpz_t r_num, const fmpz_t r_den)
+
+    Set ``mid`` to the simplest fraction between `l` and `r`. The underscore version makes the additional assumption that `l \le r`.
+    The endpoints `l` and `r` do not need to be reduced, but their denominators do need to be positive.
+    ``mid`` will be always be returned in canonical form. A canonical fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1<b_2` or `b_1=b_2` and `a_1<a_2`.
 
 
 Continued fractions
@@ -573,6 +580,8 @@ Continued fractions
 
 
 .. function:: slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, slong n)
+
+.. function:: slong fmpq_get_cfrac_naive(fmpz * c, fmpq_t rem, const fmpq_t x, slong n)
 
     Generates up to `n` terms of the (simple) continued fraction expansion
     of `x`, writing the coefficients to the vector `c` and the remainder `r`
@@ -595,11 +604,14 @@ Continued fractions
     expansion can be obtained by replacing the last coefficient
     `a_{k-1}` by the pair of coefficients `a_{k-1} - 1, 1`.
 
-    As a special case, the continued fraction expansion of zero consists
-    of a single zero (and not the empty sequence).
+    The behaviour of this function in corner cases is as follows:
+        - if `x` is infinite (anything over 0), ``rem`` will be zero and the return is `k=0` regardless of `n`.
+        - else (if `x` is finite),
+            - if `n <= 0`, ``rem`` will be `1/x` (allowing for infinite in the case `x=0`) and the return is `k=0`
+            - else (if `n > 0`), ``rem`` will finite and the return is `0 < k \le n`.
 
-    This function implements a simple algorithm, performing repeated
-    divisions. The running time is quadratic.
+    Essentially, if this function is called with canonical `x` and `n > 0`, then ``rem`` will be canonical.
+    Therefore, applications relying on canonical ``fmpq_t``'s should not call this function with `n <= 0`.
 
 .. function:: void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
 
