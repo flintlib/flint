@@ -117,7 +117,7 @@ Comparison
 
 .. function:: int fmpq_cmp(const fmpq_t x, const fmpq_t y)
 
-    Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
+.. function:: int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y)
 
 .. function:: int fmpq_cmp_ui(const fmpq_t x, ulong y)
 

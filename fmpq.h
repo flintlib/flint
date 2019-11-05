@@ -126,6 +126,10 @@ FLINT_DLL int _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fm
 
 FLINT_DLL int fmpq_cmp(const fmpq_t x, const fmpq_t y);
 
+FLINT_DLL int _fmpq_cmp_fmpz(const fmpz_t p, const fmpz_t q, const fmpz_t r);
+
+FLINT_DLL int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y);
+
 FLINT_DLL int _fmpq_cmp_ui(const fmpz_t p, const fmpz_t q, ulong c);
 
 FLINT_DLL int fmpq_cmp_ui(const fmpq_t x, ulong c);
