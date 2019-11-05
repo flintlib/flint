@@ -55,7 +55,7 @@ main(void)
         fmpq_t a, a2;
         mpq_t b;
         int ans, base;
-        char *str1, *str2, *str3;
+        char *str1, *str2;
 
         fmpq_init(a);
         fmpq_init(a2);

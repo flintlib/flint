@@ -21,7 +21,6 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
 
     flint_printf("height....");
     fflush(stdout);
@@ -39,7 +38,7 @@ main(void)
         fmpq_height(h, x);
         b = fmpq_height_bits(x);
 
-        if (!fmpz_bits(h) == b)
+        if (fmpz_bits(h) != b)
         {
             flint_printf("FAIL!\n");
             flint_printf("x: ");
@@ -52,8 +51,6 @@ main(void)
         fmpq_clear(x);
         fmpz_clear(h);
     }
-
-    
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
