@@ -10,73 +10,38 @@
 */
 
 #include "fmpq.h"
-#include "fmpz_mat.h"
 
-void
-_fmpq_set_cfrac_basecase(fmpz_t p, fmpz_t t, fmpz_t q, fmpz_t u,
-    const fmpz * c, slong n)
+
+void _fmpq_set_cfrac_divconquer(_fmpz_mat22_t M, const fmpz * c, slong n)
 {
-    slong i;
-
-    fmpz_set(p, c);
-    fmpz_one(q);
-    fmpz_one(t);
-    fmpz_zero(u);
-
-    for (i = 1; i < n; i++)
-    {
-        fmpz_addmul(t, c + i, p);
-        fmpz_addmul(u, c + i, q);
-        fmpz_swap(t, p);
-        fmpz_swap(u, q);
-    }
-}
-
-void
-_fmpq_set_cfrac_divconquer(fmpz_mat_t P, const fmpz * c, slong n)
-{
+    _fmpz_mat22_one(M);
     if (n < 32)
     {
-        _fmpq_set_cfrac_basecase(
-            fmpz_mat_entry(P, 0, 0), fmpz_mat_entry(P, 0, 1),
-            fmpz_mat_entry(P, 1, 0), fmpz_mat_entry(P, 1, 1), c, n);
+        slong i;
+        for (i = 0; i < n; i++)
+            _fmpz_mat22_rmul_elem(M, c + i);
     }
     else
     {
-        fmpz_mat_t L, R;
         slong m = n / 2;
-
-        fmpz_mat_init(L, 2, 2);
-        fmpz_mat_init(R, 2, 2);
-
-        _fmpq_set_cfrac_divconquer(L, c, m);
-        _fmpq_set_cfrac_divconquer(R, c + m, n - m);
-        fmpz_mat_mul_classical(P, L, R);  /* Should be Strassen */
-
-        fmpz_mat_clear(L);
-        fmpz_mat_clear(R);
+        _fmpz_mat22_t N;
+        _fmpz_mat22_init(N);
+        _fmpq_set_cfrac_divconquer(M, c, m);
+        _fmpq_set_cfrac_divconquer(N, c + m, n - m);
+        _fmpz_mat22_rmul(M, N);
+        _fmpz_mat22_clear(N);
     }
 }
 
-void
-fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
+
+void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
 {
-    if (n <= 64)
-    {
-        fmpz_t t, u;
-        fmpz_init(t);
-        fmpz_init(u);
-        _fmpq_set_cfrac_basecase(fmpq_numref(x), t, fmpq_denref(x), u, c, n);
-        fmpz_clear(t);
-        fmpz_clear(u);
-    }
-    else
-    {
-        fmpz_mat_t P;
-        fmpz_mat_init(P, 2, 2);
-        _fmpq_set_cfrac_divconquer(P, c, n);
-        fmpz_set(fmpq_numref(x), fmpz_mat_entry(P, 0, 0));
-        fmpz_set(fmpq_denref(x), fmpz_mat_entry(P, 1, 0));
-        fmpz_mat_clear(P);
-    }
+    _fmpz_mat22_t M;
+    _fmpz_mat22_init(M);
+    _fmpq_set_cfrac_divconquer(M, c, n);
+    fmpz_swap(fmpq_numref(x), M->_11);
+    fmpz_swap(fmpq_denref(x), M->_21);
+    _fmpz_mat22_clear(M);
+    FLINT_ASSERT(n <= 0 || fmpq_is_canonical(x));
 }
+
