@@ -570,7 +570,7 @@ Rational enumeration
 
 .. function:: void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den, const fmpz_t l_num, const fmpz_t l_den, const fmpz_t r_num, const fmpz_t r_den)
 
-    Set ``mid`` to the simplest fraction between `l` and `r`. The underscore version makes the additional assumption that `l \le r`.
+    Set ``mid`` to the simplest fraction in the closed interval `[l, r]`. The underscore version makes the additional assumption that `l \le r`.
     The endpoints `l` and `r` do not need to be reduced, but their denominators do need to be positive.
     ``mid`` will be always be returned in canonical form. A canonical fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1<b_2` or `b_1=b_2` and `a_1<a_2`.
 

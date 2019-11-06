@@ -16,17 +16,17 @@
 
 /***** gmp-impl.h ??? **************/
 
-#define MPN_EXTRACT_NUMB(count, xh, xl)				\
-  ((((xh) << ((count) - GMP_NAIL_BITS)) & GMP_NUMB_MASK) |	\
+#define MPN_EXTRACT_NUMB(count, xh, xl)                \
+  ((((xh) << ((count) - GMP_NAIL_BITS)) & GMP_NUMB_MASK) |    \
    ((xl) >> (GMP_LIMB_BITS - (count))))
 
 /* Realloc for an mpz_t WHAT if it has less than NEEDED limbs.  */
-#define MPZ_REALLOC(z,n) ((n) > ALLOC(z)			\
-			  ? (mp_ptr) _mpz_realloc(z,n)			\
-			  : PTR(z))
-#define MPZ_NEWALLOC(z,n) ((n) > ALLOC(z)			\
-			   ? (mp_ptr) _mpz_newalloc(z,n)		\
-			   : PTR(z))
+#define MPZ_REALLOC(z,n) ((n) > ALLOC(z)            \
+              ? (mp_ptr) _mpz_realloc(z,n)            \
+              : PTR(z))
+#define MPZ_NEWALLOC(z,n) ((n) > ALLOC(z)            \
+               ? (mp_ptr) _mpz_newalloc(z,n)        \
+               : PTR(z))
 
 /* Field access macros.  */
 #define SIZ(x) ((x)->_mp_size)
@@ -36,49 +36,49 @@
 #define PREC(x) ((x)->_mp_prec)
 #define ALLOC(x) ((x)->_mp_alloc)
 
-#define MP_LIMB_T_SWAP(x, y)						\
-  do {									\
-    mp_limb_t __mp_limb_t_swap__tmp = (x);				\
-    (x) = (y);								\
-    (y) = __mp_limb_t_swap__tmp;					\
+#define MP_LIMB_T_SWAP(x, y)                        \
+  do {                                    \
+    mp_limb_t __mp_limb_t_swap__tmp = (x);                \
+    (x) = (y);                                \
+    (y) = __mp_limb_t_swap__tmp;                    \
   } while (0)
-#define MP_SIZE_T_SWAP(x, y)						\
-  do {									\
-    mp_size_t __mp_size_t_swap__tmp = (x);				\
-    (x) = (y);								\
-    (y) = __mp_size_t_swap__tmp;					\
-  } while (0)
-
-
-#define MP_SRCPTR_SWAP(x, y)						\
-  do {									\
-    mp_srcptr __mp_srcptr_swap__tmp = (x);				\
-    (x) = (y);								\
-    (y) = __mp_srcptr_swap__tmp;					\
+#define MP_SIZE_T_SWAP(x, y)                        \
+  do {                                    \
+    mp_size_t __mp_size_t_swap__tmp = (x);                \
+    (x) = (y);                                \
+    (y) = __mp_size_t_swap__tmp;                    \
   } while (0)
 
-#define MPN_PTR_SWAP(xp,xs, yp,ys)					\
-  do {									\
-    MP_PTR_SWAP (xp, yp);						\
-    MP_SIZE_T_SWAP (xs, ys);						\
+
+#define MP_SRCPTR_SWAP(x, y)                        \
+  do {                                    \
+    mp_srcptr __mp_srcptr_swap__tmp = (x);                \
+    (x) = (y);                                \
+    (y) = __mp_srcptr_swap__tmp;                    \
+  } while (0)
+
+#define MPN_PTR_SWAP(xp,xs, yp,ys)                    \
+  do {                                    \
+    MP_PTR_SWAP (xp, yp);                        \
+    MP_SIZE_T_SWAP (xs, ys);                        \
   } while(0)
-#define MPN_SRCPTR_SWAP(xp,xs, yp,ys)					\
-  do {									\
-    MP_SRCPTR_SWAP (xp, yp);						\
-    MP_SIZE_T_SWAP (xs, ys);						\
+#define MPN_SRCPTR_SWAP(xp,xs, yp,ys)                    \
+  do {                                    \
+    MP_SRCPTR_SWAP (xp, yp);                        \
+    MP_SIZE_T_SWAP (xs, ys);                        \
   } while(0)
 
-#define MPZ_PTR_SWAP(x, y)						\
-  do {									\
-    mpz_ptr __mpz_ptr_swap__tmp = (x);					\
-    (x) = (y);								\
-    (y) = __mpz_ptr_swap__tmp;						\
+#define MPZ_PTR_SWAP(x, y)                        \
+  do {                                    \
+    mpz_ptr __mpz_ptr_swap__tmp = (x);                    \
+    (x) = (y);                                \
+    (y) = __mpz_ptr_swap__tmp;                        \
   } while (0)
-#define MPZ_SRCPTR_SWAP(x, y)						\
-  do {									\
-    mpz_srcptr __mpz_srcptr_swap__tmp = (x);				\
-    (x) = (y);								\
-    (y) = __mpz_srcptr_swap__tmp;					\
+#define MPZ_SRCPTR_SWAP(x, y)                        \
+  do {                                    \
+    mpz_srcptr __mpz_srcptr_swap__tmp = (x);                \
+    (x) = (y);                                \
+    (y) = __mpz_srcptr_swap__tmp;                    \
   } while (0)
 
 static void my_mpz_swap(mpz_ptr u, mpz_ptr v)
@@ -256,19 +256,19 @@ int _fmpq_ball_gt_one(const _fmpq_ball_t x)
         the hgcd returns terms for the open interval (a/(b+1), (a+1)/b)
         M is the product of the quotients {{q,1},{1,0}}
 
-	if xa/xb = M(ya/yb), then
+    if xa/xb = M(ya/yb), then
 
-	    det -1:
-		    M^-1 = {{m22, -m12}, {-m21, m11}}
-	          xa   xa+1       ya-m12  ya+m22
-		    (----, ----) = M((------, ------))
-		     xb+1   xb        yb+m11  yb-m21 
+        det -1:
+            M^-1 = {{m22, -m12}, {-m21, m11}}
+              xa   xa+1       ya-m12  ya+m22
+            (----, ----) = M((------, ------))
+             xb+1   xb        yb+m11  yb-m21
 
-	    det -1:
-		    M^-1 = {{-m22, m12}, {m21, -m11}}
-	          xa   xa+1       ya-m22  ya+m12
-		    (----, ----) = M((------, ------))
-		     xb+1   xb        yb+m21  yb-m11
+        det -1:
+            M^-1 = {{-m22, m12}, {m21, -m11}}
+              xa   xa+1       ya-m22  ya+m12
+            (----, ----) = M((------, ------))
+             xb+1   xb        yb+m21  yb-m11
 
     we say that ya/yb is ok w.r.t. M if the above intervals are > 1, i.e.
 
@@ -282,100 +282,100 @@ int _fmpq_ball_gt_one(const _fmpq_ball_t x)
 */
 static int _hgcd_ok(const _fmpz_mat22_t M, const fmpz_t a, const fmpz_t b)
 {
-	int r = 1;
-	fmpz_t t1, t2;
-	fmpz_init(t1);
-	fmpz_init(t2);
-	FLINT_ASSERT(fmpz_sgn(M->_11) >= 0);
-	FLINT_ASSERT(fmpz_sgn(M->_12) >= 0);
-	FLINT_ASSERT(fmpz_sgn(M->_21) >= 0);
-	FLINT_ASSERT(fmpz_sgn(M->_22) >= 0);
-	r = r && (fmpz_cmp(a, b) > 0);
-	r = r && (fmpz_sgn(b) > 0);
-	if (M->det == 1)
-	{
-		r = r && (fmpz_cmp(a, M->_12) > 0);
-		r = r && (fmpz_cmp(b, M->_21) > 0);
-		fmpz_add(t2, M->_11, M->_12);
-	}
-	else
-	{
-		FLINT_ASSERT(M->det == -1);
-		r = r && (fmpz_cmp(a, M->_22) > 0);
-		r = r && (fmpz_cmp(b, M->_11) > 0);
-		fmpz_add(t2, M->_21, M->_22);
-	}
-	fmpz_sub(t1, a, b);
-	r = r && (fmpz_cmp(t1, t2) >= 0);
-	fmpz_clear(t1);
-	fmpz_clear(t2);
-	return r;
+    int r = 1;
+    fmpz_t t1, t2;
+    fmpz_init(t1);
+    fmpz_init(t2);
+    FLINT_ASSERT(fmpz_sgn(M->_11) >= 0);
+    FLINT_ASSERT(fmpz_sgn(M->_12) >= 0);
+    FLINT_ASSERT(fmpz_sgn(M->_21) >= 0);
+    FLINT_ASSERT(fmpz_sgn(M->_22) >= 0);
+    r = r && (fmpz_cmp(a, b) > 0);
+    r = r && (fmpz_sgn(b) > 0);
+    if (M->det == 1)
+    {
+        r = r && (fmpz_cmp(a, M->_12) > 0);
+        r = r && (fmpz_cmp(b, M->_21) > 0);
+        fmpz_add(t2, M->_11, M->_12);
+    }
+    else
+    {
+        FLINT_ASSERT(M->det == -1);
+        r = r && (fmpz_cmp(a, M->_22) > 0);
+        r = r && (fmpz_cmp(b, M->_11) > 0);
+        fmpz_add(t2, M->_21, M->_22);
+    }
+    fmpz_sub(t1, a, b);
+    r = r && (fmpz_cmp(t1, t2) >= 0);
+    fmpz_clear(t1);
+    fmpz_clear(t2);
+    return r;
 }
 
 
 static flint_bitcnt_t _hgcd_split(
-	fmpz_t xa,
-	fmpz_t xb,
-	const fmpz_t ya,
-	const fmpz_t yb,
-	const _fmpz_mat22_t M,
-	flint_bitcnt_t shift)
+    fmpz_t xa,
+    fmpz_t xb,
+    const fmpz_t ya,
+    const fmpz_t yb,
+    const _fmpz_mat22_t M,
+    flint_bitcnt_t shift)
 {
-	flint_bitcnt_t r = 0;
-	fmpz_t ta, tb;
+    flint_bitcnt_t r = 0;
+    fmpz_t ta, tb;
 
-	FLINT_ASSERT(_hgcd_ok(M, ya, yb));
+    FLINT_ASSERT(_hgcd_ok(M, ya, yb));
 
-	fmpz_init(ta);
-	fmpz_init(tb);
+    fmpz_init(ta);
+    fmpz_init(tb);
 
-	if (M->det == 1)
-	{
-		fmpz_sub(xa, ya, M->_12);
-		fmpz_sub(xb, yb, M->_21);
-		fmpz_add(ta, ya, M->_22);
-		fmpz_add(tb, yb, M->_11);
-	}
-	else
-	{
-		FLINT_ASSERT(M->det == -1);
-		fmpz_sub(xa, ya, M->_22);
-		fmpz_sub(xb, yb, M->_11);
-		fmpz_add(ta, ya, M->_12);
-		fmpz_add(tb, yb, M->_21);		
-	}
+    if (M->det == 1)
+    {
+        fmpz_sub(xa, ya, M->_12);
+        fmpz_sub(xb, yb, M->_21);
+        fmpz_add(ta, ya, M->_22);
+        fmpz_add(tb, yb, M->_11);
+    }
+    else
+    {
+        FLINT_ASSERT(M->det == -1);
+        fmpz_sub(xa, ya, M->_22);
+        fmpz_sub(xb, yb, M->_11);
+        fmpz_add(ta, ya, M->_12);
+        fmpz_add(tb, yb, M->_21);
+    }
 
-	FLINT_ASSERT(fmpz_sgn(xa) > 0);
-	FLINT_ASSERT(fmpz_sgn(xb) > 0);
-	FLINT_ASSERT(fmpz_cmp(ta, xa) >= 0);
-	FLINT_ASSERT(fmpz_cmp(tb, xb) >= 0);
+    FLINT_ASSERT(fmpz_sgn(xa) > 0);
+    FLINT_ASSERT(fmpz_sgn(xb) > 0);
+    FLINT_ASSERT(fmpz_cmp(ta, xa) >= 0);
+    FLINT_ASSERT(fmpz_cmp(tb, xb) >= 0);
 
-	fmpz_fdiv_q_2exp(xa, xa, shift);
-	fmpz_fdiv_q_2exp(ta, ta, shift);
-	fmpz_fdiv_q_2exp(xb, xb, shift);
-	fmpz_fdiv_q_2exp(tb, tb, shift);
-	if (fmpz_sgn(xb) <= 0 || fmpz_cmp(xa, xb) <= 0)
-		goto cleanup;
+    fmpz_fdiv_q_2exp(xa, xa, shift);
+    fmpz_fdiv_q_2exp(ta, ta, shift);
+    fmpz_fdiv_q_2exp(xb, xb, shift);
+    fmpz_fdiv_q_2exp(tb, tb, shift);
+    if (fmpz_sgn(xb) <= 0 || fmpz_cmp(xa, xb) <= 0)
+        goto cleanup;
 
-	while (!fmpz_equal(xa, ta) || !fmpz_equal(xb, tb))
-	{
-		shift++;
-		fmpz_fdiv_q_2exp(xa, xa, 1);
-		fmpz_fdiv_q_2exp(ta, ta, 1);
-		fmpz_fdiv_q_2exp(xb, xb, 1);
-		fmpz_fdiv_q_2exp(tb, tb, 1);
-		if (fmpz_sgn(xb) <= 0 || fmpz_cmp(xa, xb) <= 0)
-			goto cleanup;
-	}
+    while (!fmpz_equal(xa, ta) || !fmpz_equal(xb, tb))
+    {
+        shift++;
+        fmpz_fdiv_q_2exp(xa, xa, 1);
+        fmpz_fdiv_q_2exp(ta, ta, 1);
+        fmpz_fdiv_q_2exp(xb, xb, 1);
+        fmpz_fdiv_q_2exp(tb, tb, 1);
+        if (fmpz_sgn(xb) <= 0 || fmpz_cmp(xa, xb) <= 0)
+            goto cleanup;
+    }
 
-	r = shift;
+    r = shift;
 
 cleanup:
 
-	fmpz_clear(ta);
-	fmpz_clear(tb);
+    fmpz_clear(ta);
+    fmpz_clear(tb);
 
-	return r;
+    return r;
 }
 
 /* hgcd for two-limb input */
@@ -651,9 +651,9 @@ again:
     if (n < 3)
         goto cleanup;
 
-	if ((flags & CFRAC_NEED_HGCD) && xd_len <= 3 + _fmpz_mat22_bits(M)/FLINT_BITS)
+    if ((flags & CFRAC_NEED_HGCD) && xd_len <= 3 + _fmpz_mat22_bits(M)/FLINT_BITS)
     {
-		goto cleanup;
+        goto cleanup;
     }
 
     if (n != xd_len && n != xd_len + 1)
@@ -706,20 +706,20 @@ again:
     }
 
     if (flags & CFRAC_NEED_HGCD)
-	{
+    {
         /* over-strict but fast _hcgd_ok(M, yn, yd) */
-		mp_size_t j;
-		FLINT_ASSERT(yn_len >= yd_len);
-	    _fmpz_mat22_rmul_ui(M, m);
-		for (j = 2 + _fmpz_mat22_bits(M)/FLINT_BITS; j < yn_len; j++)
-		{
-			mp_limb_t aa = yn_ptr[j];
-			mp_limb_t bb = j < yd_len ? yd_ptr[j] : 0;
-			if (aa > bb && aa - bb > 1)
-				goto its_ok;
-		}
-	    _fmpz_mat22_rmul_inv_ui(M, m);	
-		goto cleanup;
+        mp_size_t j;
+        FLINT_ASSERT(yn_len >= yd_len);
+        _fmpz_mat22_rmul_ui(M, m);
+        for (j = 2 + _fmpz_mat22_bits(M)/FLINT_BITS; j < yn_len; j++)
+        {
+            mp_limb_t aa = yn_ptr[j];
+            mp_limb_t bb = j < yd_len ? yd_ptr[j] : 0;
+            if (aa > bb && aa - bb > 1)
+                goto its_ok;
+        }
+        _fmpz_mat22_rmul_inv_ui(M, m);
+        goto cleanup;
     }
 
     if (flags & CFRAC_NEED_MATRIX)
@@ -950,82 +950,83 @@ static void _hgcd_step(
     fmpz_t ya,
     fmpz_t yb)
 {
-	fmpz_fdiv_r_2exp(xa, xa, shift);
-	fmpz_fdiv_r_2exp(xb, xb, shift);
-	if (M->det == 1)
-	{
-		fmpz_sub(xa, xa, M->_12);
-		fmpz_sub(xb, xb, M->_21);
-		fmpz_fdiv_r_2exp(xa, xa, shift);
-		fmpz_fdiv_r_2exp(xb, xb, shift);
-		fmpz_add(xa, xa, M->_12);
-		fmpz_add(xb, xb, M->_21);
-	}
-	else
-	{
-		fmpz_sub(xa, xa, M->_22);
-		fmpz_sub(xb, xb, M->_11);
-		fmpz_fdiv_r_2exp(xa, xa, shift);
-		fmpz_fdiv_r_2exp(xb, xb, shift);
-		fmpz_add(xa, xa, M->_22);
-		fmpz_add(xb, xb, M->_11);
-	}
+    fmpz_fdiv_r_2exp(xa, xa, shift);
+    fmpz_fdiv_r_2exp(xb, xb, shift);
+    if (M->det == 1)
+    {
+        fmpz_sub(xa, xa, M->_12);
+        fmpz_sub(xb, xb, M->_21);
+        fmpz_fdiv_r_2exp(xa, xa, shift);
+        fmpz_fdiv_r_2exp(xb, xb, shift);
+        fmpz_add(xa, xa, M->_12);
+        fmpz_add(xb, xb, M->_21);
+    }
+    else
+    {
+        FLINT_ASSERT(M->det == -1);
+        fmpz_sub(xa, xa, M->_22);
+        fmpz_sub(xb, xb, M->_11);
+        fmpz_fdiv_r_2exp(xa, xa, shift);
+        fmpz_fdiv_r_2exp(xb, xb, shift);
+        fmpz_add(xa, xa, M->_22);
+        fmpz_add(xb, xb, M->_11);
+    }
 
-	fmpz_mul_2exp(ya, ya, shift);
-	fmpz_mul_2exp(yb, yb, shift);
-	if (N->det == 1)
-	{
-		fmpz_addmul(ya, N->_22, xa);
-		fmpz_submul(ya, N->_12, xb);
-		fmpz_addmul(yb, N->_11, xb);
-		fmpz_submul(yb, N->_21, xa);
-	}
-	else
-	{
-		FLINT_ASSERT(N->det == -1);
-		fmpz_addmul(ya, N->_12, xb);
-		fmpz_submul(ya, N->_22, xa);
-		fmpz_addmul(yb, N->_21, xa);
-		fmpz_submul(yb, N->_11, xb);
-	}
-	fmpz_swap(xa, ya);
-	fmpz_swap(xb, yb);
-	_fmpz_mat22_rmul(M, N);
+    fmpz_mul_2exp(ya, ya, shift);
+    fmpz_mul_2exp(yb, yb, shift);
+    if (N->det == 1)
+    {
+        fmpz_addmul(ya, N->_22, xa);
+        fmpz_submul(ya, N->_12, xb);
+        fmpz_addmul(yb, N->_11, xb);
+        fmpz_submul(yb, N->_21, xa);
+    }
+    else
+    {
+        FLINT_ASSERT(N->det == -1);
+        fmpz_addmul(ya, N->_12, xb);
+        fmpz_submul(ya, N->_22, xa);
+        fmpz_addmul(yb, N->_21, xa);
+        fmpz_submul(yb, N->_11, xb);
+    }
+    fmpz_swap(xa, ya);
+    fmpz_swap(xb, yb);
+    _fmpz_mat22_rmul(M, N);
 }
 
 
 void _fmpq_hgcd(
     _fmpz_vector_t s,
     _fmpz_mat22_t M,
-	fmpz_t xa,
-	fmpz_t xb)
+    fmpz_t xa,
+    fmpz_t xb)
 {
-	flint_bitcnt_t k, km, shift;
-	fmpz_t ya, yb;
-	_fmpz_mat22_t N;
+    flint_bitcnt_t k, km, shift;
+    fmpz_t ya, yb;
+    _fmpz_mat22_t N;
 #if WANT_ASSERT
-	fmpz_t xa_org, xb_org;
-	fmpz_init_set(xa_org, xa);
-	fmpz_init_set(xb_org, xb);
+    fmpz_t xa_org, xb_org;
+    fmpz_init_set(xa_org, xa);
+    fmpz_init_set(xb_org, xb);
 #endif
 
-	fmpz_init(ya);
-	fmpz_init(yb);
-	_fmpz_mat22_init(N);
+    fmpz_init(ya);
+    fmpz_init(yb);
+    _fmpz_mat22_init(N);
 
-	_fmpz_mat22_one(M);
+    _fmpz_mat22_one(M);
 
 again:
 
-	FLINT_ASSERT(_hgcd_ok(M, xa, xb));
+    FLINT_ASSERT(_hgcd_ok(M, xa, xb));
 
     if (s->length >= s->limit)
         goto cleanup;
 
     k = fmpz_bits(xa);
-	km = _fmpz_mat22_bits(M);
-	FLINT_ASSERT(k >= km);
-	k -= km;
+    km = _fmpz_mat22_bits(M);
+    FLINT_ASSERT(k >= km);
+    k -= km;
 
     if (k > 500*FLINT_BITS)
         goto split;
@@ -1035,29 +1036,29 @@ again:
 gauss:
 
     FLINT_ASSERT(s->length <= s->limit);
-	FLINT_ASSERT(_hgcd_ok(M, xa, xb));
+    FLINT_ASSERT(_hgcd_ok(M, xa, xb));
 
     if (s->length >= s->limit)
         goto cleanup;
 
-	fmpz_fdiv_qr(ya, yb, xa, xb);
-	_fmpz_mat22_rmul_elem(M, ya);
-	if (!_hgcd_ok(M, xb, yb))
-	{
-		_fmpz_mat22_rmul_inv_elem(M, ya);
-		goto cleanup;
-	}
+    fmpz_fdiv_qr(ya, yb, xa, xb);
+    _fmpz_mat22_rmul_elem(M, ya);
+    if (!_hgcd_ok(M, xb, yb))
+    {
+        _fmpz_mat22_rmul_inv_elem(M, ya);
+        goto cleanup;
+    }
 
-	fmpz_swap(xa, xb);
-	fmpz_swap(xb, yb);
+    fmpz_swap(xa, xb);
+    fmpz_swap(xb, yb);
 
     _fmpz_vector_push_back(s, ya);
-	goto again;
+    goto again;
 
 lehmer:
 
     FLINT_ASSERT(s->length < s->limit);
-	FLINT_ASSERT(_hgcd_ok(M, xa, xb));
+    FLINT_ASSERT(_hgcd_ok(M, xa, xb));
 
     if (COEFF_IS_MPZ(*xa) && COEFF_IS_MPZ(*xb))
     {
@@ -1074,54 +1075,54 @@ lehmer:
 
 split:
 
-	shift = _hgcd_split(ya, yb, xa, xb, M, km + k/2);
-	if (shift == 0)
-		goto gauss;
+    shift = _hgcd_split(ya, yb, xa, xb, M, km + k/2);
+    if (shift == 0)
+        goto gauss;
 
-	_fmpq_hgcd(s, N, ya, yb);
-	if (_fmpz_mat22_is_one(N))
-		goto gauss;
-
-    _hgcd_step(M, xa, xb, shift, N, ya, yb);
-	FLINT_ASSERT(_hgcd_ok(M, xa, xb));
-
-	km = _fmpz_mat22_bits(M);
-	shift = _hgcd_split(ya, yb, xa, xb, M, km + 1);
-	if (shift == 0)
-		goto gauss;
-
-	_fmpq_hgcd(s, N, ya, yb);
-	if (_fmpz_mat22_is_one(N))
-		goto gauss;
+    _fmpq_hgcd(s, N, ya, yb);
+    if (_fmpz_mat22_is_one(N))
+        goto gauss;
 
     _hgcd_step(M, xa, xb, shift, N, ya, yb);
-	FLINT_ASSERT(_hgcd_ok(M, xa, xb));
+    FLINT_ASSERT(_hgcd_ok(M, xa, xb));
 
-	goto again;
+    km = _fmpz_mat22_bits(M);
+    shift = _hgcd_split(ya, yb, xa, xb, M, km + 1);
+    if (shift == 0)
+        goto gauss;
+
+    _fmpq_hgcd(s, N, ya, yb);
+    if (_fmpz_mat22_is_one(N))
+        goto gauss;
+
+    _hgcd_step(M, xa, xb, shift, N, ya, yb);
+    FLINT_ASSERT(_hgcd_ok(M, xa, xb));
+
+    goto again;
 
 cleanup:
 
 #if WANT_ASSERT
-	FLINT_ASSERT(_hgcd_ok(M, xa, xb));
-	fmpz_mul(ya, M->_11, xa);
-	fmpz_addmul(ya, M->_12, xb);
-	fmpz_mul(yb, M->_21, xa);
-	fmpz_addmul(yb, M->_22, xb);
-	FLINT_ASSERT(fmpz_equal(xa_org, ya));
-	FLINT_ASSERT(fmpz_equal(xb_org, yb));
-	fmpz_clear(xa_org);
-	fmpz_clear(xb_org);
+    FLINT_ASSERT(_hgcd_ok(M, xa, xb));
+    fmpz_mul(ya, M->_11, xa);
+    fmpz_addmul(ya, M->_12, xb);
+    fmpz_mul(yb, M->_21, xa);
+    fmpz_addmul(yb, M->_22, xb);
+    FLINT_ASSERT(fmpz_equal(xa_org, ya));
+    FLINT_ASSERT(fmpz_equal(xb_org, yb));
+    fmpz_clear(xa_org);
+    fmpz_clear(xb_org);
 #endif
 
-	fmpz_clear(ya);
-	fmpz_clear(yb);
-	_fmpz_mat22_clear(N);
+    fmpz_clear(ya);
+    fmpz_clear(yb);
+    _fmpz_mat22_clear(N);
 
     FLINT_ASSERT(s->length <= s->limit);
     FLINT_ASSERT(_hgcd_ok(M, xa, xb));
     FLINT_ASSERT(M->det == 1 || M->det == -1);
 
-	return;
+    return;
 }
 
 /* given a >= b > 0, return the smallest k with floor(a/2^k) = floor(b/2^k) */
@@ -1279,39 +1280,39 @@ split:
 
     k = k/2;
 
-	if (x->exact)
-	{
-		fmpz_fdiv_q_2exp(y->left_num, x->left_num, k);
-		fmpz_fdiv_q_2exp(y->left_den, x->left_den, k);
-		if (fmpz_sgn(y->left_den) <= 0 || fmpz_cmp(y->left_num, y->left_den) <= 0)
-			goto gauss;
+    if (x->exact)
+    {
+        fmpz_fdiv_q_2exp(y->left_num, x->left_num, k);
+        fmpz_fdiv_q_2exp(y->left_den, x->left_den, k);
+        if (fmpz_sgn(y->left_den) <= 0 || fmpz_cmp(y->left_num, y->left_den) <= 0)
+            goto gauss;
 
-		_fmpq_hgcd(s, N, y->left_num, y->left_den);
-	    if (_fmpz_mat22_is_one(N))
-	        goto gauss;
+        _fmpq_hgcd(s, N, y->left_num, y->left_den);
+        if (_fmpz_mat22_is_one(N))
+            goto gauss;
 
-		fmpz_fdiv_r_2exp(q, x->left_num, k);
-		fmpz_fdiv_r_2exp(r, x->left_den, k);
-		fmpz_mul_2exp(x->left_num, y->left_num, k);
-		fmpz_mul_2exp(x->left_den, y->left_den, k);
-		if (N->det == 1)
-		{
-			fmpz_addmul(x->left_num, N->_22, q);
-			fmpz_submul(x->left_num, N->_12, r);
-			fmpz_addmul(x->left_den, N->_11, r);
-			fmpz_submul(x->left_den, N->_21, q);
-		}
-		else
-		{
-			FLINT_ASSERT(N->det == -1);
-			fmpz_addmul(x->left_num, N->_12, r);
-			fmpz_submul(x->left_num, N->_22, q);
-			fmpz_addmul(x->left_den, N->_21, q);
-			fmpz_submul(x->left_den, N->_11, r);
-		}
-	}
-	else
-	{
+        fmpz_fdiv_r_2exp(q, x->left_num, k);
+        fmpz_fdiv_r_2exp(r, x->left_den, k);
+        fmpz_mul_2exp(x->left_num, y->left_num, k);
+        fmpz_mul_2exp(x->left_den, y->left_den, k);
+        if (N->det == 1)
+        {
+            fmpz_addmul(x->left_num, N->_22, q);
+            fmpz_submul(x->left_num, N->_12, r);
+            fmpz_addmul(x->left_den, N->_11, r);
+            fmpz_submul(x->left_den, N->_21, q);
+        }
+        else
+        {
+            FLINT_ASSERT(N->det == -1);
+            fmpz_addmul(x->left_num, N->_12, r);
+            fmpz_submul(x->left_num, N->_22, q);
+            fmpz_addmul(x->left_den, N->_21, q);
+            fmpz_submul(x->left_den, N->_11, r);
+        }
+    }
+    else
+    {
         fmpz_fdiv_q_2exp(y->left_num, x->left_num, k);
         fmpz_fdiv_q_2exp(y->left_den, x->left_den, k);
         fmpz_add_ui(y->left_den, y->left_den, 1);
@@ -1319,12 +1320,12 @@ split:
         fmpz_fdiv_q_2exp(y->right_den, x->right_den, k);
         fmpz_add_ui(y->right_num, y->right_num, 1);
         y->exact = 0;
-	    if (!_fmpq_ball_gt_one(y))
-	        goto gauss;
+        if (!_fmpq_ball_gt_one(y))
+            goto gauss;
 
-	    _fmpq_ball_get_cfrac(s, N, 1, y);
-	    if (_fmpz_mat22_is_one(N))
-	        goto gauss;
+        _fmpq_ball_get_cfrac(s, N, 1, y);
+        if (_fmpz_mat22_is_one(N))
+            goto gauss;
 
         if (N->det == 1)
         {
@@ -1334,10 +1335,10 @@ split:
             fmpz_sub(r, r, q);
             fmpz_fdiv_r_2exp(q, x->left_num, k);
 
-		    fmpz_mul_2exp(x->left_num, y->left_num, k);
+            fmpz_mul_2exp(x->left_num, y->left_num, k);
             fmpz_addmul(x->left_num, q, N->_22);
             fmpz_addmul(x->left_num, r, N->_12);
-		    fmpz_mul_2exp(x->left_den, y->left_den, k);
+            fmpz_mul_2exp(x->left_den, y->left_den, k);
             fmpz_submul(x->left_den, q, N->_21);
             fmpz_submul(x->left_den, r, N->_11);
 
@@ -1347,10 +1348,10 @@ split:
             fmpz_sub(q, q, r);
             fmpz_fdiv_r_2exp(r, x->right_den, k);
 
-		    fmpz_mul_2exp(x->right_num, y->right_num, k);
+            fmpz_mul_2exp(x->right_num, y->right_num, k);
             fmpz_submul(x->right_num, q, N->_22);
             fmpz_submul(x->right_num, r, N->_12);
-		    fmpz_mul_2exp(x->right_den, y->right_den, k);
+            fmpz_mul_2exp(x->right_den, y->right_den, k);
             fmpz_addmul(x->right_den, q, N->_21);
             fmpz_addmul(x->right_den, r, N->_11);
         }
@@ -1364,10 +1365,10 @@ split:
             fmpz_sub(r, r, q);
             fmpz_fdiv_r_2exp(q, x->left_num, k);
 
-		    fmpz_mul_2exp(x->left_num, y->right_num, k);
+            fmpz_mul_2exp(x->left_num, y->right_num, k);
             fmpz_submul(x->left_num, q, N->_22);
             fmpz_submul(x->left_num, r, N->_12);
-		    fmpz_mul_2exp(x->left_den, y->right_den, k);
+            fmpz_mul_2exp(x->left_den, y->right_den, k);
             fmpz_addmul(x->left_den, q, N->_21);
             fmpz_addmul(x->left_den, r, N->_11);
 
@@ -1377,22 +1378,22 @@ split:
             fmpz_sub(q, q, r);
             fmpz_fdiv_r_2exp(r, x->right_den, k);
 
-		    fmpz_mul_2exp(x->right_num, y->left_num, k);
+            fmpz_mul_2exp(x->right_num, y->left_num, k);
             fmpz_addmul(x->right_num, q, N->_22);
             fmpz_addmul(x->right_num, r, N->_12);
-		    fmpz_mul_2exp(x->right_den, y->left_den, k);
+            fmpz_mul_2exp(x->right_den, y->left_den, k);
             fmpz_submul(x->right_den, q, N->_21);
             fmpz_submul(x->right_den, r, N->_11);
 
             fmpz_swap(x->right_num, x->left_num);
             fmpz_swap(x->right_den, x->left_den);
         }
-	}
+    }
 
     FLINT_ASSERT(_fmpq_ball_gt_one(x));
 
-	if (!needM)
-		goto again;
+    if (!needM)
+        goto again;
 
     _fmpz_mat22_rmul(M, N);
     _fmpq_ball_get_cfrac(s, N, 1, x);
@@ -1407,12 +1408,12 @@ chop:
     FLINT_ASSERT(_fmpq_ball_gt_one(x));
     FLINT_ASSERT(_fmpz_mat22_is_one(M));
 
-	fmpz_fdiv_q_2exp(q, x->left_num, k);
-	fmpz_fdiv_q_2exp(r, x->left_den, k);
-	if (fmpz_sgn(r) <= 0 || fmpz_cmp(q, r) <= 0)
-		goto again;
+    fmpz_fdiv_q_2exp(q, x->left_num, k);
+    fmpz_fdiv_q_2exp(r, x->left_den, k);
+    if (fmpz_sgn(r) <= 0 || fmpz_cmp(q, r) <= 0)
+        goto again;
 
-	_fmpq_hgcd(s, M, q, r);
+    _fmpq_hgcd(s, M, q, r);
     if (_fmpz_mat22_is_one(M))
         goto again;
 
@@ -1426,29 +1427,29 @@ chop:
     fmpz_mul_2exp(x->right_num, q, k);
     fmpz_mul_2exp(x->right_den, r, k);
 
-	if (M->det == 1)
-	{
-		fmpz_addmul(x->left_num, M->_22, y->left_num);
-		fmpz_submul(x->left_num, M->_12, y->left_den);
-		fmpz_addmul(x->left_den, M->_11, y->left_den);
-		fmpz_submul(x->left_den, M->_21, y->left_num);
-		fmpz_addmul(x->right_num, M->_22, y->right_num);
-		fmpz_submul(x->right_num, M->_12, y->right_den);
-		fmpz_addmul(x->right_den, M->_11, y->right_den);
-		fmpz_submul(x->right_den, M->_21, y->right_num);
-	}
-	else
-	{
-		FLINT_ASSERT(M->det == -1);
-		fmpz_addmul(x->left_num, M->_12, y->right_den);
-		fmpz_submul(x->left_num, M->_22, y->right_num);
-		fmpz_addmul(x->left_den, M->_21, y->right_num);
-		fmpz_submul(x->left_den, M->_11, y->right_den);
-		fmpz_addmul(x->right_num, M->_12, y->left_den);
-		fmpz_submul(x->right_num, M->_22, y->left_num);
-		fmpz_addmul(x->right_den, M->_21, y->left_num);
-		fmpz_submul(x->right_den, M->_11, y->left_den);
-	}
+    if (M->det == 1)
+    {
+        fmpz_addmul(x->left_num, M->_22, y->left_num);
+        fmpz_submul(x->left_num, M->_12, y->left_den);
+        fmpz_addmul(x->left_den, M->_11, y->left_den);
+        fmpz_submul(x->left_den, M->_21, y->left_num);
+        fmpz_addmul(x->right_num, M->_22, y->right_num);
+        fmpz_submul(x->right_num, M->_12, y->right_den);
+        fmpz_addmul(x->right_den, M->_11, y->right_den);
+        fmpz_submul(x->right_den, M->_21, y->right_num);
+    }
+    else
+    {
+        FLINT_ASSERT(M->det == -1);
+        fmpz_addmul(x->left_num, M->_12, y->right_den);
+        fmpz_submul(x->left_num, M->_22, y->right_num);
+        fmpz_addmul(x->left_den, M->_21, y->right_num);
+        fmpz_submul(x->left_den, M->_11, y->right_den);
+        fmpz_addmul(x->right_num, M->_12, y->left_den);
+        fmpz_submul(x->right_num, M->_22, y->left_num);
+        fmpz_addmul(x->right_den, M->_21, y->left_num);
+        fmpz_submul(x->right_den, M->_11, y->left_den);
+    }
 
     goto gauss;
 
