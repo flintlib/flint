@@ -83,7 +83,9 @@ void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
         R->alloc  = lenB - 1;
     }
     _fmpz_poly_set_length(Q, lenA - lenB + 1);
+    FLINT_ASSERT(Q->length <= Q->alloc);
     _fmpz_poly_set_length(R, lenA);
+    FLINT_ASSERT(R->length <= R->alloc);
     _fmpz_poly_normalise(Q);
     _fmpz_poly_normalise(R);
 }
