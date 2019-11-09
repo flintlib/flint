@@ -16,6 +16,23 @@
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
 
+
+#define FLINT_MPN_EXTRACT_NUMB(count, xh, xl)               \
+  ((((xh) << ((count) - GMP_NAIL_BITS)) & GMP_NUMB_MASK) |  \
+   ((xl) >> (GMP_LIMB_BITS - (count))))
+
+#define FLINT_MPZ_REALLOC(z,n) ((n) > ((z)->_mp_alloc)      \
+              ? (mp_ptr) _mpz_realloc(z,n)                  \
+              : ((z)->_mp_d))
+
+#define FLINT_MPZ_PTR_SWAP(x, y)        \
+  do {                                  \
+    mpz_ptr __mpz_ptr_swap__tmp = (x);  \
+    (x) = (y);                          \
+    (y) = __mpz_ptr_swap__tmp;          \
+  } while (0)
+
+
 #if (defined(__MINGW64__) || defined(__mips64)) && !defined(__MPIR_VERSION)
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \

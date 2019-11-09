@@ -14,81 +14,6 @@
 #include "fmpq.h"
 #include "fmpz_poly.h"
 
-/***** gmp-impl.h ??? **************/
-
-#define MPN_EXTRACT_NUMB(count, xh, xl)                \
-  ((((xh) << ((count) - GMP_NAIL_BITS)) & GMP_NUMB_MASK) |    \
-   ((xl) >> (GMP_LIMB_BITS - (count))))
-
-/* Realloc for an mpz_t WHAT if it has less than NEEDED limbs.  */
-#define MPZ_REALLOC(z,n) ((n) > ALLOC(z)            \
-              ? (mp_ptr) _mpz_realloc(z,n)            \
-              : PTR(z))
-#define MPZ_NEWALLOC(z,n) ((n) > ALLOC(z)            \
-               ? (mp_ptr) _mpz_newalloc(z,n)        \
-               : PTR(z))
-
-/* Field access macros.  */
-#define SIZ(x) ((x)->_mp_size)
-#define ABSIZ(x) ABS (SIZ (x))
-#define PTR(x) ((x)->_mp_d)
-#define EXP(x) ((x)->_mp_exp)
-#define PREC(x) ((x)->_mp_prec)
-#define ALLOC(x) ((x)->_mp_alloc)
-
-#define MP_LIMB_T_SWAP(x, y)                        \
-  do {                                    \
-    mp_limb_t __mp_limb_t_swap__tmp = (x);                \
-    (x) = (y);                                \
-    (y) = __mp_limb_t_swap__tmp;                    \
-  } while (0)
-#define MP_SIZE_T_SWAP(x, y)                        \
-  do {                                    \
-    mp_size_t __mp_size_t_swap__tmp = (x);                \
-    (x) = (y);                                \
-    (y) = __mp_size_t_swap__tmp;                    \
-  } while (0)
-
-
-#define MP_SRCPTR_SWAP(x, y)                        \
-  do {                                    \
-    mp_srcptr __mp_srcptr_swap__tmp = (x);                \
-    (x) = (y);                                \
-    (y) = __mp_srcptr_swap__tmp;                    \
-  } while (0)
-
-#define MPN_PTR_SWAP(xp,xs, yp,ys)                    \
-  do {                                    \
-    MP_PTR_SWAP (xp, yp);                        \
-    MP_SIZE_T_SWAP (xs, ys);                        \
-  } while(0)
-#define MPN_SRCPTR_SWAP(xp,xs, yp,ys)                    \
-  do {                                    \
-    MP_SRCPTR_SWAP (xp, yp);                        \
-    MP_SIZE_T_SWAP (xs, ys);                        \
-  } while(0)
-
-#define MPZ_PTR_SWAP(x, y)                        \
-  do {                                    \
-    mpz_ptr __mpz_ptr_swap__tmp = (x);                    \
-    (x) = (y);                                \
-    (y) = __mpz_ptr_swap__tmp;                        \
-  } while (0)
-#define MPZ_SRCPTR_SWAP(x, y)                        \
-  do {                                    \
-    mpz_srcptr __mpz_srcptr_swap__tmp = (x);                \
-    (x) = (y);                                \
-    (y) = __mpz_srcptr_swap__tmp;                    \
-  } while (0)
-
-static void my_mpz_swap(mpz_ptr u, mpz_ptr v)
-{
-  MP_SIZE_T_SWAP(ALLOC(u), ALLOC(v));
-  MP_SIZE_T_SWAP(SIZ(u), SIZ(v));
-  MP_PTR_SWAP(PTR(v), PTR(u));
-}
-
-
 /* enable for debug printing of various types */
 #if 0
 static void _fmpz_mat22_print(const _fmpz_mat22_t M)
@@ -378,7 +303,10 @@ cleanup:
     return r;
 }
 
-/* hgcd for two-limb input */
+/*
+    hgcd for two-limb input
+    s should have at least 2*FLINT_BITS entries allocated
+*/
 static slong _uiui_hgcd(
     mp_limb_t * s,
     mp_limb_t A1, mp_limb_t A0,
@@ -600,45 +528,44 @@ static mp_size_t _msub(mp_ptr y, mp_limb_t a1, mp_ptr x1,
 }
 
 
-static void _lehmer_exact(
-    _fmpz_vector_t s,
-    _fmpz_mat22_t M,
-    int flags,
-    mpz_ptr xn,
-    mpz_ptr xd,
-    mpz_ptr yn,
-    mpz_ptr yd)
+static void _lehmer_exact(_fmpz_vector_t s, _fmpz_mat22_t M, int flags,
+                                    fmpz_t xa, fmpz_t xb, fmpz_t ya, fmpz_t yb)
 {
     mp_limb_t s_temp[2*FLINT_BITS];
     slong written;
-    mp_size_t xn_len;
-    mp_size_t xd_len;
-    mp_size_t yn_len;
-    mp_size_t yd_len;
-    mp_ptr xn_ptr;
-    mp_ptr xd_ptr;
-    mp_ptr yn_ptr;
-    mp_ptr yd_ptr;
+    mpz_ptr xn, xd, yn, yd;
+    mp_size_t xn_len, xd_len, yn_len, yd_len;
+    mp_ptr xn_ptr, xd_ptr, yn_ptr, yd_ptr;
     _ui_mat22_t m;
     mp_limb_t A0, A1, B0, B1;
     mp_size_t n;
 
-    /* fit everything to xn_len */
-    n = SIZ(xn);
+    if (!COEFF_IS_MPZ(*xa) || !COEFF_IS_MPZ(*xb))
+        return;
 
-    MPZ_REALLOC(xd, n);
-    MPZ_REALLOC(yn, n);
-    MPZ_REALLOC(yd, n);
+    xn = COEFF_TO_PTR(*xa);
+    xd = COEFF_TO_PTR(*xb);
+
+    yn = _fmpz_promote(ya);
+    yd = _fmpz_promote(yb);
+
+
+    /* fit everything to xn_len */
+    n = xn->_mp_size;
+
+    FLINT_MPZ_REALLOC(xd, n);
+    FLINT_MPZ_REALLOC(yn, n);
+    FLINT_MPZ_REALLOC(yd, n);
 
 again:
 
-    xn_len = SIZ(xn);
-    xd_len = SIZ(xd);
+    xn_len = xn->_mp_size;
+    xd_len = xd->_mp_size;
 
-    xn_ptr = PTR(xn);
-    xd_ptr = PTR(xd);
-    yn_ptr = PTR(yn);
-    yd_ptr = PTR(yd);
+    xn_ptr = xn->_mp_d;
+    xd_ptr = xd->_mp_d;
+    yn_ptr = yn->_mp_d;
+    yd_ptr = yd->_mp_d;
 
     /* supposed xn > xd > 0 */
     FLINT_ASSERT(xn_len >= xd_len);
@@ -673,11 +600,10 @@ again:
     {
         int shift;
         count_leading_zeros(shift, xn_ptr[n - 1]);
-        FLINT_ASSERT(shift > 0);
-        A1 = MPN_EXTRACT_NUMB(shift, xn_ptr[n - 1], xn_ptr[n - 2]);
-        A0 = MPN_EXTRACT_NUMB(shift, xn_ptr[n - 2], xn_ptr[n - 3]);
-        B1 = MPN_EXTRACT_NUMB(shift, xd_ptr[n - 1], xd_ptr[n - 2]);
-        B0 = MPN_EXTRACT_NUMB(shift, xd_ptr[n - 2], xd_ptr[n - 3]);
+        A1 = FLINT_MPN_EXTRACT_NUMB(shift, xn_ptr[n - 1], xn_ptr[n - 2]);
+        A0 = FLINT_MPN_EXTRACT_NUMB(shift, xn_ptr[n - 2], xn_ptr[n - 3]);
+        B1 = FLINT_MPN_EXTRACT_NUMB(shift, xd_ptr[n - 1], xd_ptr[n - 2]);
+        B0 = FLINT_MPN_EXTRACT_NUMB(shift, xd_ptr[n - 2], xd_ptr[n - 3]);
     }
 
     written = _uiui_hgcd(s_temp, A1, A0, B1, B0, m);
@@ -727,89 +653,96 @@ again:
 
 its_ok:
 
-    SIZ(yn) = yn_len;
-    SIZ(yd) = yd_len;
+    yn->_mp_size = yn_len;
+    yd->_mp_size = yd_len;
 
     _fmpz_vector_append_ui(s, s_temp, written);
 
-    my_mpz_swap(xn, yn);
-    my_mpz_swap(xd, yd);
+    FLINT_MPZ_PTR_SWAP(xn, yn);
+    FLINT_MPZ_PTR_SWAP(xd, yd);
+
     goto again;
 
 cleanup:
 
-    /* never wrong */
-    SIZ(yn) = 0;
-    SIZ(yd) = 0;
+    /* xn/xd are valid; make yn/yd valid */
+    yn->_mp_size = 0;
+    yd->_mp_size = 0;
+
+    *xa = PTR_TO_COEFF(xn);
+    *xb = PTR_TO_COEFF(xd);
+    *ya = PTR_TO_COEFF(yn);
+    *yb = PTR_TO_COEFF(yd);
+
+    _fmpz_demote_val(yb);
+    _fmpz_demote_val(ya);
+    _fmpz_demote_val(xb);
+    _fmpz_demote_val(xa);
 
     return;
 }
 
 
-static void _lehmer_inexact(
-    _fmpz_vector_t s,
-    _fmpz_mat22_t M,
-    int needM,
-    mpz_ptr xln,
-    mpz_ptr xld,
-    mpz_ptr xrn,
-    mpz_ptr xrd,
-    mpz_ptr yln,
-    mpz_ptr yld,
-    mpz_ptr yrn,
-    mpz_ptr yrd)
+static void _lehmer_inexact(_fmpz_vector_t s, _fmpz_mat22_t M, int needM,
+                                                _fmpq_ball_t x, _fmpq_ball_t y)
 {
     mp_limb_t s_temp[2*FLINT_BITS];
     slong written;
-    mp_size_t xln_len;
-    mp_size_t xld_len;
-    mp_size_t xrn_len;
-    mp_size_t xrd_len;
-    mp_size_t yln_len;
-    mp_size_t yld_len;
-    mp_size_t yrn_len;
-    mp_size_t yrd_len;
-    mp_ptr xln_ptr;
-    mp_ptr xld_ptr;
-    mp_ptr xrn_ptr;
-    mp_ptr xrd_ptr;
-    mp_ptr yln_ptr;
-    mp_ptr yld_ptr;
-    mp_ptr yrn_ptr;
-    mp_ptr yrd_ptr;
+    mpz_ptr xln, xld, xrn, xrd;
+    mpz_ptr yln, yld, yrn, yrd;
+    mp_size_t xln_len, xld_len, xrn_len, xrd_len;
+    mp_size_t yln_len, yld_len, yrn_len, yrd_len;
+    mp_ptr xln_ptr, xld_ptr, xrn_ptr, xrd_ptr;
+    mp_ptr yln_ptr, yld_ptr, yrn_ptr, yrd_ptr;
     _ui_mat22_t m;
     mp_limb_t A0, A1, B0, B1;
     mp_size_t n, nl, nr;
 
-    /* fit everything to xln_len */
-    nl = SIZ(xln);
-    nr = SIZ(xrn);
+    if (!COEFF_IS_MPZ(*x->left_num) || !COEFF_IS_MPZ(*x->left_den)
+        || !COEFF_IS_MPZ(*x->right_num) || !COEFF_IS_MPZ(*x->right_den))
+    {
+        return;
+    }
+
+    xln = COEFF_TO_PTR(*x->left_num);
+    xld = COEFF_TO_PTR(*x->left_den);
+    xrn = COEFF_TO_PTR(*x->right_num);
+    xrd = COEFF_TO_PTR(*x->right_den);
+
+    yln = _fmpz_promote(y->left_num);
+    yld = _fmpz_promote(y->left_den);
+    yrn = _fmpz_promote(y->right_num);
+    yrd = _fmpz_promote(y->right_den);
+
+    /* fit everything to max(xln_len) */
+    nl = xln->_mp_size;
+    nr = xrn->_mp_size;
     n = FLINT_MAX(nl, nr);
 
-    MPZ_REALLOC(xln, n);
-    MPZ_REALLOC(xld, n);
-    MPZ_REALLOC(yln, n);
-    MPZ_REALLOC(yld, n);
-    MPZ_REALLOC(xrn, n);
-    MPZ_REALLOC(xrd, n);
-    MPZ_REALLOC(yrn, n);
-    MPZ_REALLOC(yrd, n);
+    FLINT_MPZ_REALLOC(xln, n);
+    FLINT_MPZ_REALLOC(xld, n);
+    FLINT_MPZ_REALLOC(yln, n);
+    FLINT_MPZ_REALLOC(yld, n);
+    FLINT_MPZ_REALLOC(xrn, n);
+    FLINT_MPZ_REALLOC(xrd, n);
+    FLINT_MPZ_REALLOC(yrn, n);
+    FLINT_MPZ_REALLOC(yrd, n);
 
 again:
 
-    xln_len = SIZ(xln);
-    xld_len = SIZ(xld);
-    xrn_len = SIZ(xrn);
-    xrd_len = SIZ(xrd);
+    xln_len = xln->_mp_size;
+    xld_len = xld->_mp_size;
+    xrn_len = xrn->_mp_size;
+    xrd_len = xrd->_mp_size;
 
-    xln_ptr = PTR(xln);
-    xld_ptr = PTR(xld);
-    xrn_ptr = PTR(xrn);
-    xrd_ptr = PTR(xrd);
-    yln_ptr = PTR(yln);
-    yld_ptr = PTR(yld);
-    yrn_ptr = PTR(yrn);
-    yrd_ptr = PTR(yrd);
+    xln_ptr = xln->_mp_d;
+    xld_ptr = xld->_mp_d;
+    xrn_ptr = xrn->_mp_d;
+    xrd_ptr = xrd->_mp_d;
+    yln_ptr = yln->_mp_d;
+    yld_ptr = yld->_mp_d;
+    yrn_ptr = yrn->_mp_d;
+    yrd_ptr = yrd->_mp_d;
 
     /* supposed xln > xld > 0 */
     FLINT_ASSERT(xln_len >= xld_len);
@@ -819,10 +752,10 @@ again:
     FLINT_ASSERT(xrn_len >= xrd_len);
     FLINT_ASSERT(xrd_len > 0);
 
-    FLINT_ASSERT(xln_ptr[xln_len-1] != 0);
-    FLINT_ASSERT(xld_ptr[xld_len-1] != 0);
-    FLINT_ASSERT(xrn_ptr[xrn_len-1] != 0);
-    FLINT_ASSERT(xrd_ptr[xrd_len-1] != 0);
+    FLINT_ASSERT(xln_ptr[xln_len - 1] != 0);
+    FLINT_ASSERT(xld_ptr[xld_len - 1] != 0);
+    FLINT_ASSERT(xrn_ptr[xrn_len - 1] != 0);
+    FLINT_ASSERT(xrd_ptr[xrd_len - 1] != 0);
 
     nl = xln_len;
     nr = xrn_len;
@@ -845,7 +778,7 @@ again:
         xrd_ptr[nr - 1] = 0;
 
 
-    if ((slong)(xln_ptr[nl-1]) < 0)
+    if ((slong)(xln_ptr[nl - 1]) < 0)
     {
         A1 = xln_ptr[nl - 1];
         A0 = xln_ptr[nl - 2];
@@ -856,10 +789,10 @@ again:
     {
         int shift;
         count_leading_zeros(shift, xln_ptr[nl - 1]);
-        A1 = MPN_EXTRACT_NUMB(shift, xln_ptr[nl - 1], xln_ptr[nl - 2]);
-        A0 = MPN_EXTRACT_NUMB(shift, xln_ptr[nl - 2], xln_ptr[nl - 3]);
-        B1 = MPN_EXTRACT_NUMB(shift, xld_ptr[nl - 1], xld_ptr[nl - 2]);
-        B0 = MPN_EXTRACT_NUMB(shift, xld_ptr[nl - 2], xld_ptr[nl - 3]);
+        A1 = FLINT_MPN_EXTRACT_NUMB(shift, xln_ptr[nl - 1], xln_ptr[nl - 2]);
+        A0 = FLINT_MPN_EXTRACT_NUMB(shift, xln_ptr[nl - 2], xln_ptr[nl - 3]);
+        B1 = FLINT_MPN_EXTRACT_NUMB(shift, xld_ptr[nl - 1], xld_ptr[nl - 2]);
+        B0 = FLINT_MPN_EXTRACT_NUMB(shift, xld_ptr[nl - 2], xld_ptr[nl - 3]);
     }
 
     written = _uiui_hgcd(s_temp, A1, A0, B1, B0, m);
@@ -913,29 +846,50 @@ again:
             goto cleanup;
     }
 
-    SIZ(yln) = yln_len;
-    SIZ(yld) = yld_len;
-    SIZ(yrn) = yrn_len;
-    SIZ(yrd) = yrd_len;
+    yln->_mp_size = yln_len;
+    yld->_mp_size = yld_len;
+    yrn->_mp_size = yrn_len;
+    yrd->_mp_size = yrd_len;
 
     if (needM)
         _fmpz_mat22_rmul_ui(M, m);
 
+    /* already checked that s will fit new terms */
     _fmpz_vector_append_ui(s, s_temp, written);
 
-    my_mpz_swap(xln, yln);
-    my_mpz_swap(xld, yld);
-    my_mpz_swap(xrn, yrn);
-    my_mpz_swap(xrd, yrd);
+    FLINT_MPZ_PTR_SWAP(xln, yln);
+    FLINT_MPZ_PTR_SWAP(xld, yld);
+    FLINT_MPZ_PTR_SWAP(xrn, yrn);
+    FLINT_MPZ_PTR_SWAP(xrd, yrd);
+
     goto again;
 
 cleanup:
 
-    /* never wrong */
-    SIZ(yln) = 0;
-    SIZ(yld) = 0;
-    SIZ(yrn) = 0;
-    SIZ(yrd) = 0;
+    /* x is valid; make y valid */
+    yln->_mp_size = 0;
+    yld->_mp_size = 0;
+    yrn->_mp_size = 0;
+    yrd->_mp_size = 0;
+
+    *x->left_num  = PTR_TO_COEFF(xln);
+    *x->left_den  = PTR_TO_COEFF(xld);
+    *x->right_num = PTR_TO_COEFF(xrn);
+    *x->right_den = PTR_TO_COEFF(xrd);
+
+    *y->left_num  = PTR_TO_COEFF(yln);
+    *y->left_den  = PTR_TO_COEFF(yld);
+    *y->right_num = PTR_TO_COEFF(yrn);
+    *y->right_den = PTR_TO_COEFF(yrd);
+
+    _fmpz_demote_val(y->left_num);
+    _fmpz_demote_val(y->left_den);
+    _fmpz_demote_val(y->right_num);
+    _fmpz_demote_val(y->right_den);
+    _fmpz_demote_val(x->left_num);
+    _fmpz_demote_val(x->left_den);
+    _fmpz_demote_val(x->right_num);
+    _fmpz_demote_val(x->right_den);
 
     return;
 }
@@ -995,11 +949,18 @@ static void _hgcd_step(
 }
 
 
-void _fmpq_hgcd(
-    _fmpz_vector_t s,
-    _fmpz_mat22_t M,
-    fmpz_t xa,
-    fmpz_t xb)
+/*
+    Supposing a > b > 0, generate terms for all real numbers in the open
+    interval (a/(b+1), (a+1)/b). Since a and b will typically come from chopped
+    values, we want to only generate quotients that are valid for every number
+    in (a/(b+1), (a+1)/b). so
+
+        a/b = [[q1 1][1 0]] * ... * [[qn 1][1 0]](a'/b')
+
+    The qi are written to s, and the product is stored in M. This is an inplace
+    operation, so xa/xb is the input a/b and output a'/b'.
+*/
+void _fmpq_hgcd(_fmpz_vector_t s, _fmpz_mat22_t M, fmpz_t xa, fmpz_t xb)
 {
     flint_bitcnt_t k, km, shift;
     fmpz_t ya, yb;
@@ -1060,16 +1021,7 @@ lehmer:
     FLINT_ASSERT(s->length < s->limit);
     FLINT_ASSERT(_hgcd_ok(M, xa, xb));
 
-    if (COEFF_IS_MPZ(*xa) && COEFF_IS_MPZ(*xb))
-    {
-        _lehmer_exact(s, M, CFRAC_NEED_MATRIX | CFRAC_NEED_HGCD,
-                                         COEFF_TO_PTR(*xa), COEFF_TO_PTR(*xb),
-                                         _fmpz_promote(ya), _fmpz_promote(yb));
-        _fmpz_demote_val(ya);
-        _fmpz_demote_val(yb);
-        _fmpz_demote_val(xa);
-        _fmpz_demote_val(xb);
-    }
+    _lehmer_exact(s, M, CFRAC_NEED_MATRIX | CFRAC_NEED_HGCD, xa, xb, ya, yb);
 
     goto gauss;
 
@@ -1139,11 +1091,9 @@ static flint_bitcnt_t _fmpz_tail_bits(const fmpz_t a, const fmpz_t b)
     return k;
 }
 
-void _fmpq_ball_get_cfrac(
-    _fmpz_vector_t s,
-    _fmpz_mat22_t M,
-    int needM,
-    _fmpq_ball_t x)
+/* generate terms valid for every number in the closed ball x > 1 */
+void _fmpq_ball_get_cfrac(_fmpz_vector_t s, _fmpz_mat22_t M, int needM,
+                                                                _fmpq_ball_t x)
 {
     flint_bitcnt_t k;
     fmpz_t q, r;
@@ -1227,47 +1177,20 @@ lehmer:
     FLINT_ASSERT(_fmpq_ball_gt_one(x));
     FLINT_ASSERT(M->det == 1 || M->det == -1);
 
+    _fmpz_mat22_one(N);
+
     if (x->exact)
     {
-        if (COEFF_IS_MPZ(*x->left_num) && COEFF_IS_MPZ(*x->left_den))
-        {
-            _fmpz_mat22_one(N);
-            _lehmer_exact(s, N, needM ? CFRAC_NEED_MATRIX : 0,
-                       COEFF_TO_PTR(*x->left_num), COEFF_TO_PTR(*x->left_den),
-                       _fmpz_promote(y->left_num), _fmpz_promote(y->left_den));
-            _fmpz_demote_val(x->left_num);
-            _fmpz_demote_val(x->left_den);
-            _fmpz_demote_val(y->left_num);
-            _fmpz_demote_val(y->left_den);
-
-            if (needM)
-                _fmpz_mat22_rmul(M, N);
-        }
+        _lehmer_exact(s, N, needM ? CFRAC_NEED_MATRIX : 0,
+                           x->left_num, x->left_den, y->left_num, y->left_den);
     }
     else
     {
-        if (COEFF_IS_MPZ(*x->left_num) && COEFF_IS_MPZ(*x->left_den) &&
-            COEFF_IS_MPZ(*x->right_num) && COEFF_IS_MPZ(*x->right_den))
-        {
-            _fmpz_mat22_one(N);
-            _lehmer_inexact(s, N, needM,
-                       COEFF_TO_PTR(*x->left_num), COEFF_TO_PTR(*x->left_den),
-                     COEFF_TO_PTR(*x->right_num), COEFF_TO_PTR(*x->right_den),
-                       _fmpz_promote(y->left_num), _fmpz_promote(y->left_den),
-                     _fmpz_promote(y->right_num), _fmpz_promote(y->right_den));
-            _fmpz_demote_val(x->left_num);
-            _fmpz_demote_val(x->left_den);
-            _fmpz_demote_val(x->right_num);
-            _fmpz_demote_val(x->right_den);
-            _fmpz_demote_val(y->left_num);
-            _fmpz_demote_val(y->left_den);
-            _fmpz_demote_val(y->right_num);
-            _fmpz_demote_val(y->right_den);
-
-            if (needM)
-                _fmpz_mat22_rmul(M, N);
-        }
+        _lehmer_inexact(s, N, needM, x, y);
     }
+
+    if (needM && !_fmpz_mat22_is_one(N))
+        _fmpz_mat22_rmul(M, N);
 
     goto gauss;
 
@@ -1282,6 +1205,7 @@ split:
 
     if (x->exact)
     {
+        /* get a ball y containing x */
         fmpz_fdiv_q_2exp(y->left_num, x->left_num, k);
         fmpz_fdiv_q_2exp(y->left_den, x->left_den, k);
         if (fmpz_sgn(y->left_den) <= 0 || fmpz_cmp(y->left_num, y->left_den) <= 0)
@@ -1291,6 +1215,10 @@ split:
         if (_fmpz_mat22_is_one(N))
             goto gauss;
 
+        /* optimized form of
+            _fmpq_ball_apply_mat22_inv(y, N, x)
+            _fmpq_ball_swap(x, y)
+        */
         fmpz_fdiv_r_2exp(q, x->left_num, k);
         fmpz_fdiv_r_2exp(r, x->left_den, k);
         fmpz_mul_2exp(x->left_num, y->left_num, k);
@@ -1313,6 +1241,7 @@ split:
     }
     else
     {
+        /* get a ball y containing x */
         fmpz_fdiv_q_2exp(y->left_num, x->left_num, k);
         fmpz_fdiv_q_2exp(y->left_den, x->left_den, k);
         fmpz_add_ui(y->left_den, y->left_den, 1);
@@ -1327,6 +1256,10 @@ split:
         if (_fmpz_mat22_is_one(N))
             goto gauss;
 
+        /* optimized form of
+            _fmpq_ball_apply_mat22_inv(y, N, x)
+            _fmpq_ball_swap(x, y)
+        */
         if (N->det == 1)
         {
             fmpz_one(r);
