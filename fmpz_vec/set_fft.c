@@ -29,8 +29,7 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
 		for (i = 0; i < length; i++)
       {
          mpz_ptr = _fmpz_promote(coeffs_m);
-         if (mpz_ptr->_mp_alloc < limbs) _mpz_realloc(mpz_ptr, limbs);
-			data = mpz_ptr->_mp_d;
+         data = FLINT_MPZ_REALLOC(mpz_ptr, limbs);
 			
 			if ((coeffs_f[i][limbs - 1] >> (FLINT_BITS - 1)) || coeffs_f[i][limbs])
          {
@@ -56,8 +55,7 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
 		for (i = 0; i < length; i++)
       {
          mpz_ptr = _fmpz_promote(coeffs_m);
-         if (mpz_ptr->_mp_alloc < limbs) _mpz_realloc(mpz_ptr, limbs);
-			data = mpz_ptr->_mp_d;
+         data = FLINT_MPZ_REALLOC(mpz_ptr, limbs);
 			flint_mpn_copyi(data, coeffs_f[i], limbs); 
 			size = limbs;
 			while ((size) && (data[size - 1] == WORD(0))) size--; /* normalise */
