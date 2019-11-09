@@ -75,17 +75,25 @@ void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
         _fmpz_vec_clear(Q->coeffs, Q->alloc);
         Q->coeffs = q;
         Q->alloc  = lenA - lenB + 1;
+        Q->length = lenA - lenB + 1;
     }
+    else
+    {
+        _fmpz_poly_set_length(Q, lenA - lenB + 1);
+    }
+
     if (R == A || R == B)
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);
         R->coeffs = r;
-        R->alloc  = lenB - 1;
+        R->alloc  = lenA;
+        R->length = lenA;
     }
-    _fmpz_poly_set_length(Q, lenA - lenB + 1);
-    FLINT_ASSERT(Q->length <= Q->alloc);
-    _fmpz_poly_set_length(R, lenA);
-    FLINT_ASSERT(R->length <= R->alloc);
+    else
+    {
+        _fmpz_poly_set_length(R, lenA);
+    }
+
     _fmpz_poly_normalise(Q);
     _fmpz_poly_normalise(R);
 }

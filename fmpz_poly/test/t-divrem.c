@@ -21,7 +21,7 @@ int
 main(void)
 {
     int i, result;
-    slong tmul = 1;
+    slong tmul = 100;
     FLINT_TEST_INIT(state);
 
     flint_printf("divrem....");
