@@ -11,22 +11,24 @@
 
 #include "fmpq.h"
 
+/*
+    after initialization one may:
 
+        (1) set length to < 0: terms should not be stored, or
+        (2) set want_alt_sum to +-1: terms should be add/sub to alt_sum, or
+        (3) set limit to anything >= 0: stop generating terms after limit
+        (4) set length to < 0 and set want_alt_sum to +-1: combination of (1) and (2)
+
+    different combinations of these settings may or may not work
+*/
 void _fmpz_vector_init(_fmpz_vector_t v)
 {
     v->array = NULL;
     v->length = 0;
     v->alloc = 0;
     v->limit = WORD_MAX;
-}
-
-
-void _fmpz_vector_init_nowrite(_fmpz_vector_t v)
-{
-    v->array = NULL;
-    v->length = -1;
-    v->alloc = 0;
-    v->limit = WORD_MAX;
+    v->want_alt_sum = 0;
+    fmpz_init(v->alt_sum);
 }
 
 
@@ -39,6 +41,8 @@ void _fmpz_vector_clear(_fmpz_vector_t v)
 
     if (v->array)
         flint_free(v->array);
+
+    fmpz_clear(v->alt_sum);
 }
 
 
@@ -66,6 +70,15 @@ void _fmpz_vector_fit_length(_fmpz_vector_t v, slong len)
 
 void _fmpz_vector_push_back(_fmpz_vector_t v, const fmpz_t a)
 {
+    if (v->want_alt_sum)
+    {
+        v->want_alt_sum *= -1;
+        if (v->want_alt_sum > 0)
+            fmpz_sub(v->alt_sum, v->alt_sum, a);
+        else
+            fmpz_add(v->alt_sum, v->alt_sum, a);
+    }
+
     if (v->length < 0)
         return;
 
@@ -78,13 +91,14 @@ void _fmpz_vector_push_back(_fmpz_vector_t v, const fmpz_t a)
 
 void _fmpz_vector_push_back_zero(_fmpz_vector_t v)
 {
+    v->want_alt_sum *= -1;
+
     if (v->length < 0)
         return;
 
     _fmpz_vector_fit_length(v, v->length + 1);
     fmpz_zero(v->array + v->length);
     v->length++;
-
     FLINT_ASSERT(v->length <= v->limit);
 }
 
@@ -92,6 +106,49 @@ void _fmpz_vector_push_back_zero(_fmpz_vector_t v)
 void _fmpz_vector_append_ui(_fmpz_vector_t v, const ulong * a, slong n)
 {
     slong i;
+
+    if (v->want_alt_sum)
+    {
+        ulong hi = 0, lo = 0;
+        for (i = 0; i + 2 <= n; i += 2)
+        {
+            add_ssaaaa(hi,lo, hi,lo, 0,a[i]);
+            sub_ddmmss(hi,lo, hi,lo, 0,a[i + 1]);
+        }
+
+        if (i < n)
+        {
+            add_ssaaaa(hi,lo, hi,lo, 0,a[i]);
+        }
+
+        if (v->want_alt_sum < 0)
+        {
+            hi = -hi - (lo != 0);
+            lo = -lo;
+        }
+
+        if (i < n)
+        {
+            v->want_alt_sum *= -1;
+        }
+
+        if (hi == 0)
+        {
+            fmpz_add_ui(v->alt_sum, v->alt_sum, lo);
+        }
+        else if (lo != 0 && hi == -UWORD(1))
+        {
+            fmpz_sub_ui(v->alt_sum, v->alt_sum, -lo);
+        }
+        else
+        {
+            fmpz_t t;
+            fmpz_init(t);
+            fmpz_set_signed_uiui(t, hi, lo);
+            fmpz_add(v->alt_sum, v->alt_sum, t);
+            fmpz_clear(t);
+        }
+    }
 
     if (v->length < 0)
         return;

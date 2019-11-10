@@ -27,12 +27,14 @@ void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den,
 
     fmpz_init(q);
     fmpz_init(r);
-    _fmpz_vector_init_nowrite(s);
-    _fmpq_ball_init(x);
-    _fmpz_mat22_init(M);
 
+    _fmpz_vector_init(s);
+    s->length = -1; /* no write */
+
+    _fmpz_mat22_init(M);
     _fmpz_mat22_one(M);
 
+    _fmpq_ball_init(x);
     fmpz_set(x->left_num, l_num);
     fmpz_set(x->left_den, l_den);
     fmpz_set(x->right_num, r_num);

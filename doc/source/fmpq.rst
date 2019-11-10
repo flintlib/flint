@@ -692,66 +692,10 @@ computing GCD of `h` and `k`,
 Writing `s(h,k) = p/q`, some useful properties employed are
 `|s| < k / 12`, `q | 6k` and `2|p| < k^2`.
 
-.. function:: void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-    Computes `s(h,k)` for arbitrary `h` and `k` using a straightforward
-    implementation of the defining sum using ``fmpz`` arithmetic.
-    This function is slow except for very small `k` and is mainly
-    intended to be used for testing purposes.
-
-.. function:: double fmpq_dedekind_sum_coprime_d(double h, double k)
-
-    Returns an approximation of `s(h,k)` computed by evaluating the
-    remainder sequence sum using double-precision arithmetic.
-    Assumes that `0 < h < k` and `(h,k) = 1`, and that `h`, `k` and
-    their remainders can be represented exactly as doubles, e.g.
-    `k < 2^{53}`.
-
-    We give a rough error analysis with IEEE double precision arithmetic,
-    assuming `2 k^2 < 2^{53}`. By assumption, the terms in the sum evaluate
-    exactly apart from the division. Thus each term is bounded in magnitude
-    by `2k` and its absolute error is bounded by `k 2^{-52}`.
-    By worst-case analysis of the Euclidean algorithm, we also know that
-    no more than 40 terms will be added.
-
-    It follows that the absolute error is at most `C k 2^{-53}` for
-    some constant `C`. If we multiply the output by `6 k` in order
-    to obtain an integer numerator, the order of magnitude of the error
-    is around `6 C k^2 2^{-53}`, so rounding to the nearest integer gives
-    a correct numerator whenever `k < 2^{26-d}` for some small number of
-    guard bits `d`. A computation has shown that `d = 5` is sufficient,
-    i.e. this function can be used for exact computation when
-    `k < 2^{21} \approx 2 \times 10^6`. This bound can likely be improved.
-
-.. function:: void fmpq_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-    Computes `s(h,k)` for `h` and `k` satisfying `0 \le h \le k` and
-    `(h,k) = 1`. This function effectively evaluates the remainder
-    sequence sum using ``fmpz`` arithmetic, without optimising for
-    any special cases. To avoid rational arithmetic, we use
-    the integer algorithm of Knuth \cite{Knuth1977}.
-
-.. function:: void fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-    Computes `s(h,k)` for `h` and `k` satisfying `0 \le h \le k`
-    and `(h,k) = 1`.
-
-    This function calls ``fmpq_dedekind_sum_coprime_d`` if `k` is small
-    enough for a double-precision estimate of the sum to yield a correct
-    numerator upon multiplication by `6k` and rounding to the nearest integer.
-    Otherwise, it calls ``fmpq_dedekind_sum_coprime_large``.
-
 .. function:: void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    Computes `s(h,k)` for arbitrary `h` and `k`. If the caller
-    can guarantee `0 < h < k` and `(h,k) = 1` ahead of time, it is always
-    cheaper to call ``fmpq_dedekind_sum_coprime``.
+.. function:: void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    This function uses the following identities to reduce the general
-    case to the situation where `0 < h < k` and `(h,k) = 1`:
-    If `k \le 2` or `h = 0`, `s(h,k) = 0`.
-    If `h < 0`, `s(h,k) = -s(-h,k)`.
-    For any `q > 0`, `s(qh,qk) = s(h,k)`.
-    If `0 < k < h` and `(h,k) = 1`,
-    `s(h,k) = (1+h(h-3k)+k^2) / (12hk) - t(k,h).`
+    Computes `s(h,k)` for arbitrary `h` and `k`. The naive version using a straightforward
+    implementation of the defining sum using ``fmpz`` arithmetic and is slow for large `k`.
 

@@ -353,12 +353,6 @@ FLINT_DLL slong fmpq_cfrac_bound(const fmpq_t x);
 
 FLINT_DLL void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
-FLINT_DLL void fmpq_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
-
-FLINT_DLL double fmpq_dedekind_sum_coprime_d(double h, double k);
-
-FLINT_DLL void fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
-
 FLINT_DLL void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
 FLINT_DLL void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
@@ -419,13 +413,13 @@ typedef struct
     slong length;
     slong alloc;
     slong limit;
+    fmpz_t alt_sum;
+    int want_alt_sum;
 } _fmpz_vector_struct;
 
 typedef _fmpz_vector_struct _fmpz_vector_t[1];
 
 FLINT_DLL void _fmpz_vector_init(_fmpz_vector_t v);
-
-FLINT_DLL void _fmpz_vector_init_nowrite(_fmpz_vector_t v);
 
 FLINT_DLL void _fmpz_vector_clear(_fmpz_vector_t v);
 
