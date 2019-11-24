@@ -50,7 +50,7 @@ Basic properties and manipulation
     Directly accesses the entry in ``mat`` in row `i` and column `j`,
     indexed from zero. No bounds checking is performed.
 
-.. function:: fq_struct * fq_mat_entry_set(fq_mat_t mat, slong i, slong j, fq_t x, const fq_ctx_t ctx)
+.. function:: void fq_mat_entry_set(fq_mat_t mat, slong i, slong j, fq_t x, const fq_ctx_t ctx)
 
     Sets the entry in ``mat`` in row `i` and column `j` to ``x``.
 

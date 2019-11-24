@@ -51,7 +51,7 @@ Basic properties and manipulation
     Directly accesses the entry in ``mat`` in row `i` and column `j`,
     indexed from zero. No bounds checking is performed.
 
-.. function:: fq_zech_struct * fq_zech_mat_entry_set(fq_zech_mat_t mat, slong i, slong j, fq_zech_t x, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_mat_entry_set(fq_zech_mat_t mat, slong i, slong j, fq_zech_t x, const fq_zech_ctx_t ctx)
 
     Sets the entry in ``mat`` in row `i` and column `j` to ``x``.
 
