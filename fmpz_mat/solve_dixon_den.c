@@ -10,96 +10,23 @@
 */
 
 #include "fmpz_mat.h"
-
-mp_limb_t
-fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
-                                const fmpz_mat_t A, const fmpz_t det_bound)
-{
-    mp_limb_t p;
-    fmpz_t tested;
-
-    p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
-    fmpz_init(tested);
-    fmpz_one(tested);
-
-    while (1)
-    {
-        p = n_nextprime(p, 0);
-        _nmod_mat_set_mod(Ainv, p);
-        fmpz_mat_get_nmod_mat(Ainv, A);
-        if (nmod_mat_inv(Ainv, Ainv))
-            break;
-        fmpz_mul_ui(tested, tested, p);
-        if (fmpz_cmp(tested, det_bound) > 0)
-        {
-            p = 0;
-            break;
-        }
-    }
-
-    fmpz_clear(tested);
-    return p;
-}
-
-/* We need to perform several matrix-vector products Ay, and speed them
-   up by using modular multiplication (this is only faster if we
-   precompute the modular matrices). Note: we assume that all
-   primes are >= p. This allows reusing y_mod as the right-hand
-   side without reducing it. */
-
-#define USE_SLOW_MULTIPLICATION 0
-
-mp_limb_t * fmpz_mat_dixon_get_crt_primes(slong * num_primes, const fmpz_mat_t A, mp_limb_t p)
-{
-    fmpz_t bound, prod;
-    mp_limb_t * primes;
-    slong i, j;
-
-    fmpz_init(bound);
-    fmpz_init(prod);
-
-    for (i = 0; i < A->r; i++)
-        for (j = 0; j < A->c; j++)
-            if (fmpz_cmpabs(bound, fmpz_mat_entry(A, i, j)) < 0)
-                fmpz_abs(bound, fmpz_mat_entry(A, i, j));
-
-    fmpz_mul_ui(bound, bound, p - UWORD(1));
-    fmpz_mul_ui(bound, bound, A->r);
-    fmpz_mul_ui(bound, bound, UWORD(2));  /* signs */
-
-    primes = (mp_limb_t *) flint_malloc(sizeof(mp_limb_t) *
-		            (fmpz_bits(bound) / (FLINT_BIT_COUNT(p) - 1) + 2));
-    primes[0] = p;
-    fmpz_set_ui(prod, p);
-    *num_primes = 1;
-
-    while (fmpz_cmp(prod, bound) <= 0)
-    {
-        primes[*num_primes] = p = n_nextprime(p, 0);
-        *num_primes += 1;
-        fmpz_mul_ui(prod, prod, p);
-    }
-
-    fmpz_clear(bound);
-    fmpz_clear(prod);
-
-    return primes;
-}
-
+#include "fmpq_mat.h"
 
 void
-_fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
+_fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
                         const fmpz_mat_t A, const fmpz_mat_t B,
                     const nmod_mat_t Ainv, mp_limb_t p,
                     const fmpz_t N, const fmpz_t D)
 {
     fmpz_t bound, ppow;
     fmpz_mat_t x, d, y, Ay;
-    fmpz_t prod;
+    fmpq_mat_t x_q;
+    fmpz_t prod, mod;
     mp_limb_t * crt_primes;
     nmod_mat_t * A_mod;
     nmod_mat_t Ay_mod, d_mod, y_mod;
     slong i, n, cols, num_primes;
+    int stabilised = 0; /* whether p-adic lifting has stabilised */
 
     n = A->r;
     cols = B->c;
@@ -107,11 +34,14 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     fmpz_init(bound);
     fmpz_init(ppow);
     fmpz_init(prod);
+    fmpz_init(mod);
 
     fmpz_mat_init(x, n, cols);
     fmpz_mat_init(y, n, cols);
     fmpz_mat_init(Ay, n, cols);
     fmpz_mat_init_set(d, B);
+
+    fmpq_mat_init(x_q, n, cols);
 
     /* Compute bound for the needed modulus. TODO: if one of N and D
        is much smaller than the other, we could use a tighter bound (i.e. 2ND).
@@ -180,8 +110,11 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
         fmpz_mat_scalar_divexact_ui(d, d, p);
     }
 
-    fmpz_set(mod, ppow);
-    fmpz_mat_set(X, x);
+dixon_done:
+
+    /* TODO can be changed to one step */
+    fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, ppow);
+    fmpq_mat_get_fmpz_mat_matwise(X, den, x_q);
 
     nmod_mat_clear(y_mod);
     nmod_mat_clear(d_mod);
@@ -196,6 +129,9 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     fmpz_clear(bound);
     fmpz_clear(ppow);
     fmpz_clear(prod);
+    fmpz_clear(mod);
+
+    fmpq_mat_clear(x_q);
 
     fmpz_mat_clear(x);
     fmpz_mat_clear(y);
@@ -204,7 +140,7 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 }
 
 int
-fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
+fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
                         const fmpz_mat_t A, const fmpz_mat_t B)
 {
     nmod_mat_t Ainv;
@@ -213,7 +149,7 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
     if (!fmpz_mat_is_square(A))
     {
-        flint_printf("Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
+        flint_printf("Exception (fmpz_mat_solve_dixon_den). Non-square system matrix.\n");
         flint_abort();
     }
 
@@ -227,7 +163,7 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     nmod_mat_init(Ainv, A->r, A->r, 1);
     p = fmpz_mat_find_good_prime_and_invert(Ainv, A, D);
     if (p != 0)
-        _fmpz_mat_solve_dixon(X, mod, A, B, Ainv, p, N, D);
+        _fmpz_mat_solve_dixon_den(X, den, A, B, Ainv, p, N, D);
 
     nmod_mat_clear(Ainv);
     fmpz_clear(N);
