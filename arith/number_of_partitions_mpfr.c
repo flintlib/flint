@@ -368,7 +368,11 @@ void
 sinh_cosh_divk_precomp(mpfr_t sh, mpfr_t ch, mpfr_t ex, slong k)
 {
     mpfr_t t;
+#if MPFR_VERSION_MAJOR >= 4
+    mpfr_rootn_ui(ch, ex, k, MPFR_RNDN);
+#else
     mpfr_root(ch, ex, k, MPFR_RNDN);
+#endif
     /* The second term doesn't need full precision,
        but this doesn't affect performance that much... */
     mpfr_init2(t, mpfr_get_prec(ch));
