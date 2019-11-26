@@ -41,3 +41,4 @@ build.vc14/flint-profiles*.sln
 *.sdf
 build.vc12
 build
+flint2
