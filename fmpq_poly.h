@@ -422,6 +422,12 @@ FLINT_DLL void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
 
 FLINT_DLL void fmpq_poly_pow(fmpq_poly_t rpoly, const fmpq_poly_t poly, ulong e);
 
+FLINT_DLL void _fmpq_poly_pow_trunc(fmpz * res, fmpz_t resden,
+        const fmpz * f, const fmpz_t fden, slong flen, ulong exp, slong len);
+
+FLINT_DLL void fmpq_poly_pow_trunc(fmpq_poly_t res,
+                const fmpq_poly_t poly, ulong exp, slong len);
+
 /*  Shifting  ****************************************************************/
 
 FLINT_DLL void fmpq_poly_shift_left(fmpq_poly_t res, const fmpq_poly_t poly, slong n);

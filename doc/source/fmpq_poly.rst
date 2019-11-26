@@ -678,8 +678,17 @@ Powering
 
 .. function:: void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 
-    Sets ``res`` to ``pow^e``, where the only special case `0^0` is 
+    Sets ``res`` to ``poly^e``, where the only special case `0^0` is
     defined as `1`.
+
+.. function:: void _fmpq_poly_pow_trunc(fmpz * res, fmpz_t rden, const fmpz * f, const fmpz_t fden, slong flen, ulong exp, slong len)
+
+    Sets ``(rpoly, rden, len)`` to ``(poly, den)^e`` truncated to length ``len``,
+    where ``len`` is at most ``e * (flen - 1) + 1``.
+
+.. function:: void fmpq_poly_pow_trunc(fmpq_poly_t res, const fmpq_poly_t poly, ulong e, slong n)
+
+    Sets ``res`` to ``poly^e`` truncated to length ``n``.
 
 
 Shifting
