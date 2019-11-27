@@ -138,7 +138,7 @@ TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (TEMPLATE(T, poly_t) res,
     slong lenf = f->length;
     slong trunc = lenf - 1;
     int qcopy = 0;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
 
     if (lenf == 0)
     {

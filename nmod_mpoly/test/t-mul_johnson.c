@@ -16,6 +16,7 @@
 int
 main(void)
 {
+    slong tmul = 8;
     int i, j, result;
     FLINT_TEST_INIT(state);
 
@@ -23,12 +24,12 @@ main(void)
     fflush(stdout);
 
     /* Check f*(g + h) = f*g + f*h */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k1, k2, t1, t2;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -93,12 +94,12 @@ main(void)
     }
 
     /* Check aliasing first argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -146,12 +147,12 @@ main(void)
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;

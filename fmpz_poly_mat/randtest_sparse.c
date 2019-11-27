@@ -17,7 +17,7 @@
 
 void
 fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, slong len,
-    mp_bitcnt_t bits, float density)
+    flint_bitcnt_t bits, float density)
 {
     slong i, j;
 

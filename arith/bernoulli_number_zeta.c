@@ -15,7 +15,7 @@ void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
 {
     mpz_t r;
     mpfr_t t, u, z, pi;
-    mp_bitcnt_t prec, pi_prec;
+    flint_bitcnt_t prec, pi_prec;
 
     arith_bernoulli_number_denom(den, n);
 

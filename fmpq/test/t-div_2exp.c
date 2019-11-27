@@ -32,7 +32,7 @@ main(void)
     {
         fmpq_t x, y;
         mpq_t X, Y;
-        mp_bitcnt_t c;
+        flint_bitcnt_t c;
 
         fmpq_init(x);
         fmpq_init(y);
@@ -88,7 +88,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_t x, y;
-        mp_bitcnt_t c;
+        flint_bitcnt_t c;
 
         fmpq_init(x);
         fmpq_init(y);

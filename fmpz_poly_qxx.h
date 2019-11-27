@@ -63,7 +63,7 @@ public:
 
     // static methods which only make sense with fmpq_polyxx
     static fmpz_poly_qxx_expression randtest(frandxx& state,
-            slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+            slong len1, flint_bitcnt_t bits1, slong len2, flint_bitcnt_t bits2)
     {
         fmpz_poly_qxx_expression res;
         fmpz_poly_q_randtest(res._polyq(), state._data(),
@@ -71,7 +71,7 @@ public:
         return res;
     }
     static fmpz_poly_qxx_expression randtest_not_zero(frandxx& state,
-            slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+            slong len1, flint_bitcnt_t bits1, slong len2, flint_bitcnt_t bits2)
     {
         fmpz_poly_qxx_expression res;
         fmpz_poly_q_randtest_not_zero(res._polyq(), state._data(),

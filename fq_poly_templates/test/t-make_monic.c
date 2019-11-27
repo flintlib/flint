@@ -54,6 +54,7 @@ main(void)
         }
 
         TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
         TEMPLATE(T, ctx_clear) (ctx);
     }
 

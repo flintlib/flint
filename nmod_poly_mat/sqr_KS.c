@@ -21,7 +21,7 @@ nmod_poly_mat_sqr_KS(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 {
     slong i, j, n;
     slong A_len;
-    mp_bitcnt_t bit_size;
+    flint_bitcnt_t bit_size;
     fmpz_mat_t AA, BB;
 
     n = A->r;

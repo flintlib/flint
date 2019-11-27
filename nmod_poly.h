@@ -49,7 +49,7 @@
 NMOD_POLY_INLINE
 slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 {
-    const mp_bitcnt_t bits = 
+    const flint_bitcnt_t bits = 
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
     
     if (bits <= FLINT_BITS)
@@ -63,7 +63,7 @@ slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 NMOD_POLY_INLINE
 slong NMOD_DIV_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 {
-    const mp_bitcnt_t bits = 
+    const flint_bitcnt_t bits = 
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
     
     if (bits <= FLINT_BITS)
@@ -169,6 +169,21 @@ FLINT_DLL void nmod_poly_clear(nmod_poly_t poly);
 FLINT_DLL void nmod_poly_fit_length(nmod_poly_t poly, slong alloc);
 
 NMOD_POLY_INLINE
+void nmod_poly_init_mod(nmod_poly_t poly, const nmod_t mod)
+{
+    poly->coeffs = NULL;
+    poly->alloc = 0;
+    poly->length = 0;
+    poly->mod = mod;
+}
+
+NMOD_POLY_INLINE
+void nmod_poly_set_mod(nmod_poly_t poly, const nmod_t mod)
+{
+    poly->mod = mod;
+}
+
+NMOD_POLY_INLINE
 void _nmod_poly_set_length(nmod_poly_t poly, slong len)
 {
     poly->length = len;
@@ -202,7 +217,7 @@ mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
 }
 
 NMOD_POLY_INLINE
-mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
+flint_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
 {
     return _nmod_vec_max_bits(poly->coeffs, poly->length);
 }
@@ -488,15 +503,15 @@ FLINT_DLL void _nmod_poly_KS2_recover_reduce(mp_ptr res, slong s, mp_srcptr op1,
                                   mp_srcptr op2, slong n, ulong b, nmod_t mod);
 
 FLINT_DLL void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
-                                                  slong len, mp_bitcnt_t bits);
+                                                  slong len, flint_bitcnt_t bits);
 
 FLINT_DLL void _nmod_poly_bit_unpack(mp_ptr res, slong len, 
-                                  mp_srcptr mpn, mp_bitcnt_t bits, nmod_t mod);
+                                  mp_srcptr mpn, flint_bitcnt_t bits, nmod_t mod);
 
 FLINT_DLL void nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
-                   mp_bitcnt_t bit_size);
+                   flint_bitcnt_t bit_size);
 
-FLINT_DLL void nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size);
+FLINT_DLL void nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size);
 
 /* Multiplication  ***********************************************************/
 
@@ -519,10 +534,10 @@ FLINT_DLL void nmod_poly_mulhigh_classical(nmod_poly_t res,
                   const nmod_poly_t poly1, const nmod_poly_t poly2, slong start);
 
 FLINT_DLL void _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, slong len1, 
-                        mp_srcptr in2, slong len2, mp_bitcnt_t bits, nmod_t mod);
+                        mp_srcptr in2, slong len2, flint_bitcnt_t bits, nmod_t mod);
 
 FLINT_DLL void nmod_poly_mul_KS(nmod_poly_t res, 
-             const nmod_poly_t poly1, const nmod_poly_t poly2, mp_bitcnt_t bits);
+             const nmod_poly_t poly1, const nmod_poly_t poly2, flint_bitcnt_t bits);
 
 FLINT_DLL void _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
                                             mp_srcptr op2, slong n2, nmod_t mod);
@@ -537,10 +552,10 @@ FLINT_DLL void nmod_poly_mul_KS4(nmod_poly_t res,
                                const nmod_poly_t poly1, const nmod_poly_t poly2);
 
 FLINT_DLL void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
-               mp_srcptr in2, slong len2, mp_bitcnt_t bits, slong n, nmod_t mod);
+               mp_srcptr in2, slong len2, flint_bitcnt_t bits, slong n, nmod_t mod);
 
 FLINT_DLL void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, 
-                             const nmod_poly_t poly2, mp_bitcnt_t bits, slong n);
+                             const nmod_poly_t poly2, flint_bitcnt_t bits, slong n);
 
 FLINT_DLL void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1, 
                                        mp_srcptr poly2, slong len2, nmod_t mod);
@@ -1066,6 +1081,14 @@ FLINT_DLL slong _nmod_poly_hgcd(mp_ptr *M, slong *lenM,
                      mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
                      nmod_t mod);
 
+FLINT_DLL slong nmod_poly_hgcd_ref(
+        nmod_poly_t m11, nmod_poly_t m12, nmod_poly_t m21, nmod_poly_t m22,
+        nmod_poly_t A, nmod_poly_t B, const nmod_poly_t a, const nmod_poly_t b);
+
+FLINT_DLL slong nmod_poly_hgcd(
+        nmod_poly_t m11, nmod_poly_t m12, nmod_poly_t m21, nmod_poly_t m22,
+        nmod_poly_t A, nmod_poly_t B, const nmod_poly_t a, const nmod_poly_t b);
+
 FLINT_DLL slong _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, slong lenA, 
                                    mp_srcptr B, slong lenB, nmod_t mod);
 
@@ -1248,6 +1271,66 @@ FLINT_DLL void nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, 
 FLINT_DLL void _nmod_poly_product_roots_nmod_vec(mp_ptr poly,
     mp_srcptr xs, slong n, nmod_t mod);
 
+FLINT_DLL int nmod_poly_find_distinct_nonzero_roots(mp_limb_t * roots,
+                                                          const nmod_poly_t P);
+
+
+/* CRT ***********************************************************************/
+
+/* instructions do A = B + I*(C - B) mod M */
+typedef struct
+{
+    slong a_idx; /* index of A */
+    slong b_idx; /* index of B */
+    slong c_idx; /* index of C */
+    nmod_poly_t idem;     /* I */
+    nmod_poly_t modulus;  /* M */
+} _nmod_poly_multi_crt_prog_instr;
+
+typedef struct
+{
+    _nmod_poly_multi_crt_prog_instr * prog; /* straight line program */
+    slong length; /* length of prog */
+    slong alloc;  /* alloc of prog */
+    slong localsize; /* length of outputs required in nmod_poly_multi_crt_run */
+    slong temp1loc; /* index of temporary used in run */
+    slong temp2loc; /* index of another tempory used in run */
+    int good;   /* the moduli are good for CRT, essentially relatively prime */
+} nmod_poly_multi_crt_struct;
+
+typedef nmod_poly_multi_crt_struct nmod_poly_multi_crt_t[1];
+
+FLINT_DLL void nmod_poly_multi_crt_init(nmod_poly_multi_crt_t CRT);
+
+FLINT_DLL int nmod_poly_multi_crt_precompute(nmod_poly_multi_crt_t CRT,
+                                   const nmod_poly_struct * moduli, slong len);
+
+FLINT_DLL int nmod_poly_multi_crt_precompute_p(nmod_poly_multi_crt_t CRT,
+                           const nmod_poly_struct * const * moduli, slong len);
+
+FLINT_DLL void nmod_poly_multi_crt_precomp(nmod_poly_t output,
+             const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * values);
+
+FLINT_DLL void nmod_poly_multi_crt_precomp_p(nmod_poly_t output,
+     const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * values);
+
+FLINT_DLL int nmod_poly_multi_crt(nmod_poly_t output,
+  const nmod_poly_struct * moduli, const nmod_poly_struct * values, slong len);
+
+FLINT_DLL void nmod_poly_multi_crt_clear(nmod_poly_multi_crt_t CRT);
+
+NMOD_POLY_INLINE
+slong _nmod_poly_multi_crt_local_size(const nmod_poly_multi_crt_t CRT)
+{
+    return CRT->localsize;
+}
+
+FLINT_DLL void _nmod_poly_multi_crt_run(nmod_poly_struct * outputs,
+             const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * inputs);
+
+FLINT_DLL void _nmod_poly_multi_crt_run_p(nmod_poly_struct * outputs,
+     const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * inputs);
+
 /* Inflation and deflation ***************************************************/
 
 FLINT_DLL ulong nmod_poly_deflation(const nmod_poly_t input);
@@ -1285,6 +1368,73 @@ FLINT_DLL void nmod_mat_minpoly_with_gens(nmod_poly_t p,
                                                 const nmod_mat_t X, ulong * P);
 
 FLINT_DLL void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
+
+/* Berlekamp-Massey Algorithm - see nmod_poly/berlekamp_massey.c for more info ************/
+typedef struct {
+    slong npoints;
+    nmod_poly_t R0, R1;
+    nmod_poly_t V0, V1;
+    nmod_poly_t qt, rt;
+    nmod_poly_t points;
+} nmod_berlekamp_massey_struct;
+typedef nmod_berlekamp_massey_struct nmod_berlekamp_massey_t[1];
+
+FLINT_DLL void nmod_berlekamp_massey_init(
+                    nmod_berlekamp_massey_t B,
+                    mp_limb_t p);
+
+FLINT_DLL void nmod_berlekamp_massey_start_over(
+                    nmod_berlekamp_massey_t B);
+
+FLINT_DLL void nmod_berlekamp_massey_clear(
+                    nmod_berlekamp_massey_t B);
+
+FLINT_DLL void nmod_berlekamp_massey_set_prime(
+                    nmod_berlekamp_massey_t B,
+                    mp_limb_t p);
+
+FLINT_DLL void nmod_berlekamp_massey_print(
+                    const nmod_berlekamp_massey_t B);
+
+FLINT_DLL void nmod_berlekamp_massey_add_points(
+                    nmod_berlekamp_massey_t B,
+                    const mp_limb_t * a,
+                    slong count);
+
+FLINT_DLL void nmod_berlekamp_massey_add_zeros(
+                    nmod_berlekamp_massey_t B,
+                    slong count);
+
+FLINT_DLL void nmod_berlekamp_massey_add_point(
+                    nmod_berlekamp_massey_t B,
+                    mp_limb_t a);
+
+FLINT_DLL int nmod_berlekamp_massey_reduce(
+                    nmod_berlekamp_massey_t B);
+
+NMOD_POLY_INLINE const mp_limb_t * nmod_berlekamp_massey_points(
+                    const nmod_berlekamp_massey_t B)
+{
+    return B->points->coeffs;
+}
+
+NMOD_POLY_INLINE slong nmod_berlekamp_massey_point_count(
+                    const nmod_berlekamp_massey_t B)
+{
+    return B->points->length;
+}
+
+NMOD_POLY_INLINE const nmod_poly_struct * nmod_berlekamp_massey_V_poly(
+                    const nmod_berlekamp_massey_t B)
+{
+    return B->V1;
+}
+
+NMOD_POLY_INLINE const nmod_poly_struct * nmod_berlekamp_massey_R_poly(
+                    const nmod_berlekamp_massey_t B)
+{
+    return B->R1;
+}
 
 #ifdef __cplusplus
     }

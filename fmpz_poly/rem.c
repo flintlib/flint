@@ -27,7 +27,7 @@ _fmpz_poly_rem(fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
     {
         fmpz *Q = _fmpz_vec_init(lenA - lenB + 1);
 
-        _fmpz_poly_divrem(Q, R, A, lenA, B, lenB);
+        _fmpz_poly_divrem(Q, R, A, lenA, B, lenB, 0);
 
         _fmpz_vec_clear(Q, lenA - lenB + 1);
     }

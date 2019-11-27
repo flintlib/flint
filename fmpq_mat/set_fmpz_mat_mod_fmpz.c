@@ -39,11 +39,11 @@ fmpq_mat_set_fmpz_mat_mod_fmpz(fmpq_mat_t X,
 
             success = _fmpq_reconstruct_fmpz(num, den, t, mod);
 
-            fmpz_mul(den, den, d);
-            fmpz_set(d, den);
-
             if (!success)
-                goto cleanup;
+	       goto cleanup;
+
+	    fmpz_mul(den, den, d);
+            fmpz_set(d, den);
 
             fmpz_set(fmpq_mat_entry_num(X, i, j), num);
             fmpz_set(fmpq_mat_entry_den(X, i, j), den);

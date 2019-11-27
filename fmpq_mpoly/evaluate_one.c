@@ -17,7 +17,7 @@ void _fmpq_mpoly_evaluate_one_fmpq_sp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 {
     int new;
     slong i, j, N;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     slong main_shift, main_off;
     ulong main_exp, emin, emax;
     ulong * cmpmask, * one;
@@ -56,11 +56,11 @@ void _fmpq_mpoly_evaluate_one_fmpq_sp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 
     fmpq_init(u);
 
-    N = mpoly_words_per_exp(bits, ctx->zctx->minfo);
+    N = mpoly_words_per_exp_sp(bits, ctx->zctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(one, &main_off, &main_shift,
-                                               var, N, bits, ctx->zctx->minfo);
+    mpoly_gen_monomial_offset_shift_sp(one, &main_off, &main_shift,
+                                                  var, bits, ctx->zctx->minfo);
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->zctx->minfo);
 
     /* scan poly2 and put powers of var into tree */
@@ -276,7 +276,7 @@ void _fmpq_mpoly_evaluate_one_fmpq_mp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
     N = mpoly_words_per_exp(bits, ctx->zctx->minfo);
     main_one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_mp(main_one, &main_off, var, N, bits, ctx->zctx->minfo);
+    main_off = mpoly_gen_monomial_offset_mp(main_one, var, bits, ctx->zctx->minfo);
     mpoly_get_cmpmask(cmpmask, N, bits, ctx->zctx->minfo);
 
     /* scan poly2 and put powers of var into tree */

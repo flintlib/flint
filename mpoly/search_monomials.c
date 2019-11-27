@@ -147,8 +147,8 @@ void mpoly_search_monomials(
         */
         mpoly_monomial_add_mp(hexp, a + maxind*N, b + hind[maxind]*N, N);
 
-        FLINT_ASSERT(mpoly_monomial_lt(fexp, hexp, N, cmpmask));
-        FLINT_ASSERT(mpoly_monomial_lt(hexp, gexp, N, cmpmask));
+        FLINT_ASSERT(mpoly_monomial_lt(hexp, fexp, N, cmpmask));
+        FLINT_ASSERT(mpoly_monomial_lt(gexp, hexp, N, cmpmask));
 
         /*
             find new path for h through the point
@@ -165,7 +165,7 @@ void mpoly_search_monomials(
             {
                 mpoly_monomial_add_mp(temp_exp, a + i*N, b + j*N, N);
 
-                if (mpoly_monomial_lt(temp_exp, hexp, N, cmpmask))
+                if (mpoly_monomial_lt(hexp, temp_exp, N, cmpmask))
                 {
                     x = j + 1;
                     break;
@@ -184,7 +184,7 @@ void mpoly_search_monomials(
             for (j = FLINT_MAX(hind[i+1], find[i]); j < gind[i]; j++)
             {
                 mpoly_monomial_add_mp(temp_exp, a + i*N, b + j*N, N);
-                if (mpoly_monomial_lt(temp_exp, hexp, N, cmpmask))
+                if (mpoly_monomial_lt(hexp, temp_exp, N, cmpmask))
                     x = j + 1;
                 else
                     break;

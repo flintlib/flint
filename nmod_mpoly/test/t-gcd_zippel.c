@@ -20,7 +20,7 @@ main(void)
     flint_printf("gcd_zippel....");
     fflush(stdout);
 
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, ca, cb, cg, t;
@@ -44,9 +44,9 @@ main(void)
         nmod_mpoly_init(cg, ctx);
         nmod_mpoly_init(t, ctx);
 
-        len = n_randint(state, 15) + 1;
-        len1 = n_randint(state, 15);
-        len2 = n_randint(state, 15);
+        len = n_randint(state, 16) + 1;
+        len1 = n_randint(state, 16);
+        len2 = n_randint(state, 16);
 
         degbound = 100/(2*ctx->minfo->nvars - 1);
         degbounds = (ulong * ) flint_malloc(ctx->minfo->nvars*sizeof(ulong));

@@ -18,7 +18,8 @@ void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A,
 
     if ((ulong) i >= (ulong) A->length)
     {
-        flint_throw(FLINT_ERROR, "Index out of range in nmod_mpoly_get_term_exp_nmod");
+        flint_throw(FLINT_ERROR,
+                         "Index out of range in nmod_mpoly_get_term_exp_fmpz");
     }
 
     N = mpoly_words_per_exp(A->bits, ctx->minfo);

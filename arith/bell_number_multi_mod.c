@@ -19,7 +19,7 @@ arith_bell_number_multi_mod(fmpz_t res, ulong n)
     nmod_t mod;
     mp_ptr primes, residues;
     slong k, num_primes;
-    mp_bitcnt_t size, prime_bits;
+    flint_bitcnt_t size, prime_bits;
 
     size = arith_bell_number_size(n);
     prime_bits = FLINT_BITS - 1;

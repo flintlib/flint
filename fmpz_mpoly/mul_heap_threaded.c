@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2017-2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,23 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "thread_pool.h"
 #include "fmpz_mpoly.h"
-
-
-typedef struct _fmpz_mpoly_stripe_struct
-{
-    char * big_mem;
-    slong big_mem_alloc;
-    slong N;
-    mp_bitcnt_t bits;
-    const ulong * cmpmask;
-    int flint_small;
-} fmpz_mpoly_stripe_struct;
-
-typedef fmpz_mpoly_stripe_struct fmpz_mpoly_stripe_t[1];
-
-
 
 slong _fmpz_mpoly_mul_heap_part1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
               const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
@@ -198,7 +184,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc
          slong * start, slong * end, slong * hind, const fmpz_mpoly_stripe_t S)
 {
     const int flint_small = S->flint_small;
-    mp_bitcnt_t bits = S->bits;
+    flint_bitcnt_t bits = S->bits;
     slong N = S->N;
     const ulong * cmpmask = S->cmpmask;
     slong i, j;
@@ -405,6 +391,8 @@ typedef struct
     pthread_mutex_t mutex;
     slong nthreads;
     slong ndivs;
+    fmpz * Acoeff;
+    ulong * Aexp;
     const fmpz * Bcoeff;
     const ulong * Bexp;
     slong Blen;
@@ -412,7 +400,7 @@ typedef struct
     const ulong * Cexp;
     slong Clen;
     slong N;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     const ulong * cmpmask;
     int flint_small;
 }
@@ -424,6 +412,8 @@ typedef struct
 {
     slong lower;
     slong upper;
+    slong thread_idx;
+    slong Aoffset;
     slong Alen;
     slong Aalloc;
     ulong * Aexp;
@@ -458,7 +448,7 @@ _worker_arg_struct;
       yy = tt; \
    } while (0)
 
-void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
+static void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
 {
     _worker_arg_struct * arg = (_worker_arg_struct *) varg;
     fmpz_mpoly_stripe_struct * S = arg->S;
@@ -514,6 +504,9 @@ void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
 
     while (i >= 0)
     {
+        FLINT_ASSERT(divs[i].thread_idx == -WORD(1));
+        divs[i].thread_idx = arg->idx;
+
         /* calculate start */
         if (i + 1 < base-> ndivs)
         {
@@ -563,6 +556,9 @@ void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
         }
         /* t3 and t4 are free for workspace at this point */
 
+        /* join code assumes all divisions have been allocated */
+        _fmpz_mpoly_fit_length(&divs[i].Acoeff, &divs[i].Aexp, &divs[i].Aalloc,
+                                                                       256, N);
         /* calculate products in [start, end) */
         if (N == 1)
         {
@@ -596,46 +592,68 @@ void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
     flint_free(exp);
 }
 
-
-
-slong _fmpz_mpoly_mul_heap_threaded(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
-                 const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
-                 const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
-                              mp_bitcnt_t bits, slong N, const ulong * cmpmask)
+static void _join_worker(void * varg)
 {
-    slong i, j, ndivs2;
+    _worker_arg_struct * arg = (_worker_arg_struct *) varg;
+    _div_struct * divs = arg->divs;
+    _base_struct * base = arg->base;
+    slong N = base->N;
+    slong i;
+
+    for (i = base->ndivs - 2; i >= 0; i--)
+    {
+        FLINT_ASSERT(divs[i].thread_idx != -WORD(1));
+
+        if (divs[i].thread_idx != arg->idx)
+            continue;
+
+        FLINT_ASSERT(divs[i].Acoeff != NULL);
+        FLINT_ASSERT(divs[i].Aexp != NULL);
+
+        memcpy(base->Acoeff + divs[i].Aoffset, divs[i].Acoeff,
+                                                    divs[i].Alen*sizeof(fmpz));
+
+        memcpy(base->Aexp + N*divs[i].Aoffset, divs[i].Aexp,
+                                                 N*divs[i].Alen*sizeof(ulong));
+
+        flint_free(divs[i].Acoeff);
+        flint_free(divs[i].Aexp);
+    }
+}
+
+void _fmpz_mpoly_mul_heap_threaded(
+    fmpz_mpoly_t A,
+    const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
+    const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
+    flint_bitcnt_t bits,
+    slong N,
+    const ulong * cmpmask,
+    const thread_pool_handle * handles,
+    slong num_handles)
+{
+    slong i, j;
+    slong BClen, hi;
     _base_t base;
     _div_struct * divs;
     _worker_arg_struct * args;
+    slong Aalloc;
     slong Alen;
     fmpz * Acoeff;
     ulong * Aexp;
-    slong max_num_workers, num_workers;
-    thread_pool_handle * handles;
 
-    /* bail here if no workers */
-    FLINT_ASSERT(global_thread_pool_initialized);
-    max_num_workers = thread_pool_get_size(global_thread_pool);
-    max_num_workers = FLINT_MIN(max_num_workers, Clen/32);
-    if (max_num_workers == 0)
+    /* bail if product of lengths overflows a word */
+    umul_ppmm(hi, BClen, Blen, Clen);
+    if (hi != 0 || BClen < 0)
     {
-        return _fmpz_mpoly_mul_johnson(A_coeff, A_exp, A_alloc,
+        Alen = _fmpz_mpoly_mul_johnson(&A->coeffs, &A->exps, &A->alloc,
                                          Bcoeff, Bexp, Blen,
                                          Ccoeff, Cexp, Clen, bits, N, cmpmask);
-    }
-    handles = (thread_pool_handle *) flint_malloc(max_num_workers
-                                                  *sizeof(thread_pool_handle));
-    num_workers = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_workers);
-    if (num_workers == 0)
-    {
-        flint_free(handles);
-        return _fmpz_mpoly_mul_johnson(A_coeff, A_exp, A_alloc,
-                                         Bcoeff, Bexp, Blen,
-                                         Ccoeff, Cexp, Clen, bits, N, cmpmask);
+        _fmpz_mpoly_set_length(A, Alen, NULL);
+        return;
+
     }
 
-    base->nthreads = num_workers + 1;
+    base->nthreads = num_handles + 1;
     base->ndivs = base->nthreads*4;  /* number of divisons */
     base->Bcoeff = Bcoeff;
     base->Bexp = Bexp;
@@ -650,39 +668,47 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** A_coeff, ulong ** A_exp, slong * A_a
     base->flint_small =   _fmpz_mpoly_fits_small(Bcoeff, Blen)
                        && _fmpz_mpoly_fits_small(Ccoeff, Clen);
 
-    ndivs2 = base->ndivs*base->ndivs;
-
     divs = (_div_struct *) flint_malloc(base->ndivs*sizeof(_div_struct));
     args = (_worker_arg_struct *) flint_malloc(base->nthreads
                                                   *sizeof(_worker_arg_struct));
 
     /* allocate space and set the boundary for each division */
+    FLINT_ASSERT(BClen/Blen == Clen);
     for (i = base->ndivs - 1; i >= 0; i--)
     {
+        double d = (double)(i + 1) / (double)(base->ndivs);
+
         /* divisions decrease in size so that no worker finishes too early */
-        divs[i].lower = (i + 1)*(i + 1)*Blen*Clen/ndivs2;
+        divs[i].lower = (d * d) * BClen;
+        divs[i].lower = FLINT_MIN(divs[i].lower, BClen);
+        divs[i].lower = FLINT_MAX(divs[i].lower, WORD(0));
         divs[i].upper = divs[i].lower;
+        divs[i].Aoffset = -WORD(1);
+        divs[i].thread_idx = -WORD(1);
 
         divs[i].Alen = 0;
         if (i == base->ndivs - 1)
         {
             /* highest division writes to original poly */
-            divs[i].Aalloc = *A_alloc;
-            divs[i].Aexp = *A_exp;
-            divs[i].Acoeff = *A_coeff;
+            divs[i].Aalloc = A->alloc;
+            divs[i].Aexp = A->exps;
+            divs[i].Acoeff = A->coeffs;
+            /* must clear output coefficients before working in parallel */
+            for (j = 0; j < A->length; j++)
+               _fmpz_demote(A->coeffs + j);
         }
         else
         {
             /* lower divisions write to a new worker poly */
-            divs[i].Aalloc = Blen + Clen/base->ndivs;
-            divs[i].Aexp = (ulong *) flint_malloc(divs[i].Aalloc*N*sizeof(ulong)); 
-            divs[i].Acoeff = (fmpz *) flint_calloc(divs[i].Aalloc, sizeof(fmpz));
+            divs[i].Aalloc = 0;
+            divs[i].Aexp = NULL;
+            divs[i].Acoeff = NULL;
         }
     }
 
     /* compute each chunk in parallel */
     pthread_mutex_init(&base->mutex, NULL);
-    for (i = 0; i < num_workers; i++)
+    for (i = 0; i < num_handles; i++)
     {
         args[i].idx = i;
         args[i].base = base;
@@ -690,84 +716,84 @@ slong _fmpz_mpoly_mul_heap_threaded(fmpz ** A_coeff, ulong ** A_exp, slong * A_a
         thread_pool_wake(global_thread_pool, handles[i],
                                _fmpz_mpoly_mul_heap_threaded_worker, &args[i]);
     }
-    i = num_workers;
+    i = num_handles;
     args[i].idx = i;
     args[i].base = base;
     args[i].divs = divs;
     _fmpz_mpoly_mul_heap_threaded_worker(&args[i]);
-    for (i = 0; i < num_workers; i++)
+    for (i = 0; i < num_handles; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i]);
-        thread_pool_give_back(global_thread_pool, handles[i]);
     }
-    pthread_mutex_destroy(&base->mutex);
 
-    flint_free(handles);
-
-    /* concatenate the outputs */
-
+    /* calculate and allocate space for final answer */
     i = base->ndivs - 1;
     Alen = divs[i].Alen;
     Acoeff = divs[i].Acoeff;
     Aexp = divs[i].Aexp;
-    *A_alloc = divs[i].Aalloc;
-
-    /* make space for all coeffs in one call to fit length */
-    j = Alen;
-    for (i = base->ndivs - 2; i >= 0; i--)
-        j += divs[i].Alen;
-    _fmpz_mpoly_fit_length(&Acoeff, &Aexp, A_alloc, j, N);
-
+    Aalloc = divs[i].Aalloc;
     for (i = base->ndivs - 2; i >= 0; i--)
     {
-        /* transfer from worker poly to original poly */
-        /* swap coeffs */
-        for (j = 0; j < divs[i].Alen; j++)
-        {
-            fmpz_swap(Acoeff + Alen + j, divs[i].Acoeff + j);
-            fmpz_clear(divs[i].Acoeff + j);
-        }
-        /* clear remaining coeffs */
-        for ( ; j < divs[i].Aalloc; j++)
-        {
-            fmpz_clear(divs[i].Acoeff + j);
-        }
-        /* copy exps */
-        flint_mpn_copyi(Aexp + N*Alen, divs[i].Aexp, N*divs[i].Alen);
-
+        divs[i].Aoffset = Alen;
         Alen += divs[i].Alen;
-        flint_free(divs[i].Acoeff);
-        flint_free(divs[i].Aexp);
     }
+    if (Alen > Aalloc)
+    {
+        Acoeff = (fmpz *) flint_realloc(Acoeff, Alen*sizeof(fmpz));
+        Aexp = (ulong *) flint_realloc(Aexp, Alen*N*sizeof(ulong));
+        Aalloc = Alen;
+    }
+    base->Acoeff = Acoeff;
+    base->Aexp = Aexp;
+
+    /* join answers */
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_wake(global_thread_pool, handles[i], _join_worker, &args[i]);
+    }
+    _join_worker(&args[num_handles]);
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_wait(global_thread_pool, handles[i]);
+    }
+
+    pthread_mutex_destroy(&base->mutex);
 
     flint_free(args);
     flint_free(divs);
 
-    *A_coeff = Acoeff;
-    *A_exp = Aexp;
-    return Alen;
+    /* we should have managed to keep coefficients past length demoted */
+    FLINT_ASSERT(Alen <= Aalloc);
+#if WANT_ASSERT
+    for (i = Alen; i < Aalloc; i++)
+    {
+        FLINT_ASSERT(!COEFF_IS_MPZ(*(Acoeff + i)));
+    }
+#endif
+
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->alloc = Aalloc;
+    A->length = Alen;
 }
 
 
 
 /* maxBfields gets clobbered */
-void _fmpz_mpoly_mul_heap_threaded_maxfields(fmpz_mpoly_t A,
-                                 const fmpz_mpoly_t B, fmpz * maxBfields,
-                                 const fmpz_mpoly_t C, fmpz * maxCfields,
-                                                    const fmpz_mpoly_ctx_t ctx)
+void _fmpz_mpoly_mul_heap_threaded_maxfields(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_t B, fmpz * maxBfields,
+    const fmpz_mpoly_t C, fmpz * maxCfields,
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
-    slong N, Alen;
-    mp_bitcnt_t exp_bits;
+    slong N;
+    flint_bitcnt_t exp_bits;
     ulong * cmpmask;
     ulong * Bexp, * Cexp;
     int freeBexp, freeCexp;
     TMP_INIT;
-
-    if (!global_thread_pool_initialized)
-    {
-        _fmpz_mpoly_mul_johnson_maxfields(A, B, maxBfields, C, maxCfields, ctx);
-        return;
-    }
 
     TMP_START;
 
@@ -808,24 +834,22 @@ void _fmpz_mpoly_mul_heap_threaded_maxfields(fmpz_mpoly_t A,
     if (A == B || A == C)
     {
         fmpz_mpoly_t T;
-        fmpz_mpoly_init2(T, B->length + C->length - 1, ctx);
+        fmpz_mpoly_init(T, ctx);
         fmpz_mpoly_fit_bits(T, exp_bits, ctx);
         T->bits = exp_bits;
 
         /* algorithm more efficient if smaller poly first */
         if (B->length >= C->length)
         {
-            Alen = _fmpz_mpoly_mul_heap_threaded(&T->coeffs, &T->exps, &T->alloc,
-                                                  C->coeffs, Cexp, C->length,
-                                                  B->coeffs, Bexp, B->length,
-                                                         exp_bits, N, cmpmask);
+            _fmpz_mpoly_mul_heap_threaded(T, C->coeffs, Cexp, C->length,
+                                             B->coeffs, Bexp, B->length,
+                                   exp_bits, N, cmpmask, handles, num_handles);
         }
         else
         {
-            Alen = _fmpz_mpoly_mul_heap_threaded(&T->coeffs, &T->exps, &T->alloc,
-                                                  B->coeffs, Bexp, B->length,
-                                                  C->coeffs, Cexp, C->length,
-                                                         exp_bits, N, cmpmask);
+            _fmpz_mpoly_mul_heap_threaded(T, B->coeffs, Bexp, B->length,
+                                             C->coeffs, Cexp, C->length,
+                                   exp_bits, N, cmpmask, handles, num_handles);
         }
 
         fmpz_mpoly_swap(T, A, ctx);
@@ -833,24 +857,21 @@ void _fmpz_mpoly_mul_heap_threaded_maxfields(fmpz_mpoly_t A,
     }
     else
     {
-        fmpz_mpoly_fit_length(A, B->length + C->length - 1, ctx);
         fmpz_mpoly_fit_bits(A, exp_bits, ctx);
         A->bits = exp_bits;
 
         /* algorithm more efficient if smaller poly first */
         if (B->length > C->length)
         {
-            Alen = _fmpz_mpoly_mul_heap_threaded(&A->coeffs, &A->exps, &A->alloc,
-                                                  C->coeffs, Cexp, C->length,
-                                                  B->coeffs, Bexp, B->length,
-                                                         exp_bits, N, cmpmask);
+            _fmpz_mpoly_mul_heap_threaded(A, C->coeffs, Cexp, C->length,
+                                             B->coeffs, Bexp, B->length,
+                                   exp_bits, N, cmpmask, handles, num_handles);
         }
         else
         {
-            Alen = _fmpz_mpoly_mul_heap_threaded(&A->coeffs, &A->exps, &A->alloc,
-                                                  B->coeffs, Bexp, B->length,
-                                                  C->coeffs, Cexp, C->length,
-                                                         exp_bits, N, cmpmask);
+            _fmpz_mpoly_mul_heap_threaded(A, B->coeffs, Bexp, B->length,
+                                             C->coeffs, Cexp, C->length,
+                                   exp_bits, N, cmpmask, handles, num_handles);
         }
     }
 
@@ -860,17 +881,21 @@ void _fmpz_mpoly_mul_heap_threaded_maxfields(fmpz_mpoly_t A,
     if (freeCexp)
         flint_free(Cexp);
 
-    _fmpz_mpoly_set_length(A, Alen, ctx);
-
     TMP_END;
 }
 
 
-void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                              const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_mul_heap_threaded(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_t C,
+    const fmpz_mpoly_ctx_t ctx,
+    slong thread_limit)
 {
     slong i;
     fmpz * maxBfields, * maxCfields;
+    thread_pool_handle * handles;
+    slong num_handles;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)
@@ -891,7 +916,33 @@ void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
     mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
 
-    _fmpz_mpoly_mul_heap_threaded_maxfields(A, B, maxBfields, C, maxCfields, ctx);
+    handles = NULL;
+    num_handles = 0;
+    if (global_thread_pool_initialized)
+    {
+        slong max_num_handles;
+        max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                                   max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                     handles, max_num_handles);
+        }
+    }
+
+    _fmpz_mpoly_mul_heap_threaded_maxfields(A, B, maxBfields, C, maxCfields,
+                                                    ctx, handles, num_handles);
+
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
+    }
+    if (handles)
+    {
+        flint_free(handles);
+    }
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {

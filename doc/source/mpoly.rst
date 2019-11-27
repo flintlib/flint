@@ -78,7 +78,7 @@ Monomial arithemtic
     ``exp2`` has any of the nonzero bits in ``mask`` set. Assumes that
     ``bits <= FLINT_BITS``.
 
-.. function:: int mpoly_monomial_overflows_mp(ulong * exp_ptr, slong N, mp_bitcnt_t bits)
+.. function:: int mpoly_monomial_overflows_mp(ulong * exp_ptr, slong N, flint_bitcnt_t bits)
 
     Return true if any of the fields of the given monomial ``(exp_ptr, N)``
     has overflowed. Assumes that ``bits >= FLINT_BITS``.
@@ -145,7 +145,7 @@ Monomial divisibility
     with the high bit of each bit field set to 1. Assumes that
     ``bits <= FLINT_BITS``.
 
-.. function:: int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N, mp_bitcnt_t bits)
+.. function:: int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N, flint_bitcnt_t bits)
 
     Return 1 if the monomial ``(exp3, N)`` divides ``(exp2, N)``. If so
     set ``(exp_ptr, N)`` to the quotient monomial. Assumes that
@@ -168,12 +168,12 @@ Basic manipulation
 --------------------------------------------------------------------------------
 
 
-.. function:: mp_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp, const mpoly_ctx_t mctx)
+.. function:: flint_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp, const mpoly_ctx_t mctx)
 
     Returns the number of bits required to store ``user_exp`` in packed
     format. The returned number of bits includes space for a zeroed signed bit.
 
-.. function:: mp_bitcnt_t mpoly_exp_bits_required_fmpz(const fmpz * user_exp, const mpoly_ctx_t mctx)
+.. function:: flint_bitcnt_t mpoly_exp_bits_required_fmpz(const fmpz * user_exp, const mpoly_ctx_t mctx)
 
     Returns the number of bits required to store ``user_exp`` in packed
     format. The returned number of bits includes space for a zeroed signed bit.
@@ -243,12 +243,12 @@ Setting and getting monomials
     monomial from the user's perspective. The exponents are assumed to fit
     a ulong.
 
-.. function:: void mpoly_get_monomial_ffmpz(fmpz * exps, const ulong * poly_exps, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+.. function:: void mpoly_get_monomial_ffmpz(fmpz * exps, const ulong * poly_exps, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 
     Convert the packed exponent ``poly_exps`` of bit count ``bits`` to a
     monomial from the user's perspective.
 
-.. function:: void mpoly_get_monomial_pfmpz(fmpz ** exps, const ulong * poly_exps, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+.. function:: void mpoly_get_monomial_pfmpz(fmpz ** exps, const ulong * poly_exps, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 
     Convert the packed exponent ``poly_exps`` of bit count ``bits`` to a
     monomial from the user's perspective.
@@ -257,11 +257,11 @@ Setting and getting monomials
 
     Convert the user monomial ``exp2`` to packed format using ``bits``.
 
-.. function:: void mpoly_set_monomial_ffmpz(ulong * exp1, const fmpz * exp2, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+.. function:: void mpoly_set_monomial_ffmpz(ulong * exp1, const fmpz * exp2, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 
     Convert the user monomial ``exp2`` to packed format using ``bits``.
 
-.. function:: void mpoly_set_monomial_pfmpz(ulong * exp1, fmpz * const * exp2, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+.. function:: void mpoly_set_monomial_pfmpz(ulong * exp1, fmpz * const * exp2, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 
     Convert the user monomial ``exp2`` to packed format using ``bits``.
 
@@ -278,7 +278,7 @@ Packing and unpacking monomials
     ``nfields`` and the total number of vectors to unpack is ``len``.
     
 
-.. function:: void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, mp_bitcnt_t bits, slong nfields, slong len)
+.. function:: void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, flint_bitcnt_t bits, slong nfields, slong len)
 
     Packs a vector ``exp2`` into \{exp1} using a bit count of ``bits``.
     No checking is done to ensure that the vector actually fits
@@ -291,7 +291,7 @@ Packing and unpacking monomials
     The number of fields in each vector is
     ``nfields`` and the total number of vectors to unpack is ``len``.
 
-.. function:: void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits, slong nfields, slong len)
+.. function:: void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, flint_bitcnt_t bits, slong nfields, slong len)
 
     Unpacks vector ``exp2`` of bit count ``bits`` into ``exp1``.
     The number of fields in each vector is

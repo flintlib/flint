@@ -1,0 +1,37 @@
+Quick cmake configuring/building/testing instuctions for Unix (Linux/OSX/*BSD)
+
+Parameters:
+
+WITH_NTL (yes/no) - builds Flint with NTL support
+
+BUILD_TESTING (yes/no) - build tests
+
+CMAKE_BUILD_TYPE - type of the build
+
+Typically cmake buildig is done in a clean subdirectory:
+
+    mkdir build 
+    cd build
+    # creates a debug build of Flint without NTL support
+    cmake -G"Unix Makefiles" ..
+
+At the end of cmake run, it says where the build is located; in some settings it might be in the
+main Flint directory, i.e. you would have to
+
+    cd ..
+
+    make -j4    # builds Flint in lib/
+
+    # creates a realease build of Flint with NTL support and tests
+    cmake -G"Unix Makefiles" -DWITH_NTL=yes -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release ..
+    make -j4    # builds Flint in lib/
+    make test   # runs Flint tests  - this takes a while
+
+It is apparently more efficient to run tests directly using ctest, it will try to run slower
+tests first:
+
+    ctest -j4 # on 4 cores
+
+before running make. More details about parallel builds may be found in
+https://blog.kitware.com/cmake-building-with-all-your-cores/
+

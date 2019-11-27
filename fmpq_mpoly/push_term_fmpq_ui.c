@@ -11,42 +11,40 @@
 
 #include "fmpq_mpoly.h"
 
-/*
-    emplacebackterm clears c
-*/
-void _fmpq_mpoly_emplacebackterm_fmpq_ui(fmpq_mpoly_t poly,
-                       fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+void _fmpq_mpoly_push_rescale(fmpq_mpoly_t A,
+                                          fmpq_t C, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpz_mpoly_struct * zpoly = poly->zpoly;
+    fmpz_mpoly_struct * Z = A->zpoly;
 
-    if (!fmpz_is_one(fmpq_numref(poly->content)))
+    if (!fmpz_is_one(fmpq_numref(A->content)))
     {
-        _fmpz_vec_scalar_mul_fmpz(zpoly->coeffs, zpoly->coeffs,
-                                    zpoly->length, fmpq_numref(poly->content));
-        fmpz_one(fmpq_numref(poly->content));
+        _fmpz_vec_scalar_mul_fmpz(Z->coeffs, Z->coeffs, Z->length,
+                                                      fmpq_numref(A->content));
+        fmpz_one(fmpq_numref(A->content));
     }
 
-    fmpq_mul_fmpz(c, c, fmpq_denref(poly->content));
-    if (!fmpz_is_one(fmpq_denref(c)))
+    fmpq_mul_fmpz(C, C, fmpq_denref(A->content));
+    if (!fmpz_is_one(fmpq_denref(C)))
     {
-        _fmpz_vec_scalar_mul_fmpz(zpoly->coeffs, zpoly->coeffs,
-                                                zpoly->length, fmpq_denref(c));
-        fmpz_mul(fmpq_denref(poly->content), fmpq_denref(poly->content),
-                                                               fmpq_denref(c));
+        _fmpz_vec_scalar_mul_fmpz(Z->coeffs, Z->coeffs, Z->length,
+                                                               fmpq_denref(C));
+        fmpz_mul(fmpq_denref(A->content), fmpq_denref(A->content),
+                                                               fmpq_denref(C));
     }
-
-    _fmpz_mpoly_emplacebackterm_fmpz_ui(poly->zpoly, fmpq_numref(c), exp, ctx->zctx);
-    fmpz_clear(fmpq_denref(c));
 }
 
 void fmpq_mpoly_push_term_fmpq_ui(fmpq_mpoly_t A,
                  const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_t C;
-    fmpq_init(C);
-    fmpq_set(C, c);
-    _fmpq_mpoly_emplacebackterm_fmpq_ui(A, C, exp, ctx);
+    fmpz_init_set(fmpq_numref(C), fmpq_numref(c));
+    fmpz_init_set(fmpq_denref(C), fmpq_denref(c));
+    _fmpq_mpoly_push_rescale(A, C, ctx);
+    _fmpz_mpoly_push_exp_ui(A->zpoly, exp, ctx->zctx);
+    fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
+    fmpq_clear(C);
 }
+
 
 void fmpq_mpoly_push_term_fmpz_ui(fmpq_mpoly_t A,
                  const fmpz_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
@@ -54,7 +52,10 @@ void fmpq_mpoly_push_term_fmpz_ui(fmpq_mpoly_t A,
     fmpq_t C;
     fmpz_init_set(fmpq_numref(C), c);
     fmpz_init_set_ui(fmpq_denref(C), UWORD(1));
-    _fmpq_mpoly_emplacebackterm_fmpq_ui(A, C, exp, ctx);
+    _fmpq_mpoly_push_rescale(A, C, ctx);
+    _fmpz_mpoly_push_exp_ui(A->zpoly, exp, ctx->zctx);
+    fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
+    fmpq_clear(C);
 }
 
 void fmpq_mpoly_push_term_ui_ui(fmpq_mpoly_t A,
@@ -63,15 +64,20 @@ void fmpq_mpoly_push_term_ui_ui(fmpq_mpoly_t A,
     fmpq_t C;
     fmpz_init_set_ui(fmpq_numref(C), c);
     fmpz_init_set_ui(fmpq_denref(C), UWORD(1));
-    _fmpq_mpoly_emplacebackterm_fmpq_ui(A, C, exp, ctx);
+    _fmpq_mpoly_push_rescale(A, C, ctx);
+    _fmpz_mpoly_push_exp_ui(A->zpoly, exp, ctx->zctx);
+    fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
+    fmpq_clear(C);
 }
 
 void fmpq_mpoly_push_term_si_ui(fmpq_mpoly_t A,
                         slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_t C;
-    fmpz_init(fmpq_numref(C));
-    fmpz_set_si(fmpq_numref(C), c);
+    fmpz_init_set_si(fmpq_numref(C), c);
     fmpz_init_set_ui(fmpq_denref(C), UWORD(1));
-    _fmpq_mpoly_emplacebackterm_fmpq_ui(A, C, exp, ctx);
+    _fmpq_mpoly_push_rescale(A, C, ctx);
+    _fmpz_mpoly_push_exp_ui(A->zpoly, exp, ctx->zctx);
+    fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
+    fmpq_clear(C);
 }

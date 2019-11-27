@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -42,6 +43,24 @@ void flint_set_num_threads(int num_threads)
 #ifdef _OPENMP
     omp_set_num_threads(num_threads);
 #endif
+}
+
+/* return zero for success, nonzero for error */
+int flint_set_thread_affinity(int * cpus, slong length)
+{
+    if (!global_thread_pool_initialized)
+        return 1;
+
+    return thread_pool_set_affinity(global_thread_pool, cpus, length);
+}
+
+/* return zero for success, nonzero for error */
+int flint_restore_thread_affinity()
+{
+    if (!global_thread_pool_initialized)
+        return 1;
+
+    return thread_pool_restore_affinity(global_thread_pool);
 }
 
 void flint_parallel_cleanup()

@@ -21,7 +21,7 @@ void nmod_mpoly_init(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
     A->bits = MPOLY_MIN_BITS;
 }
 
-void nmod_mpoly_init3(nmod_mpoly_t A, slong alloc, mp_bitcnt_t bits,
+void nmod_mpoly_init3(nmod_mpoly_t A, slong alloc, flint_bitcnt_t bits,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp(bits, ctx->minfo);

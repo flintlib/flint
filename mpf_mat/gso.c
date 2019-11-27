@@ -17,7 +17,7 @@ mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
     slong i, j, k;
     int flag;
     mpf_t t, s, tmp, eps;
-    mp_bitcnt_t exp;
+    flint_bitcnt_t exp;
 
     if (B->r != A->r || B->c != A->c)
     {

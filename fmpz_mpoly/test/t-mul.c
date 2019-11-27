@@ -15,12 +15,17 @@ int
 main(void)
 {
     int i, j, result, max_threads = 5;
+    slong tmul = 10;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 2;
+#endif
 
     flint_printf("mul....");
     fflush(stdout);
 
     /* check fixed cases */
+    for (i = 0; i < 1 + tmul; i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k;
@@ -73,15 +78,17 @@ main(void)
         fmpz_mpoly_clear(h, ctx);
         fmpz_mpoly_clear(k, ctx);
         fmpz_mpoly_ctx_clear(ctx);
+
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
     }
 
     /* Check f*(g + h) = f*g + f*h */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, k1, k2, t1, t2;
         slong len, len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 
@@ -118,6 +125,7 @@ main(void)
             fmpz_mpoly_assert_canonical(k1, ctx);
             fmpz_mpoly_mul(t1, f, g, ctx);
             fmpz_mpoly_assert_canonical(t1, ctx);
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             fmpz_mpoly_mul(t2, f, h, ctx);
             fmpz_mpoly_assert_canonical(t2, ctx);
             fmpz_mpoly_add(k2, t1, t2, ctx);
@@ -142,12 +150,12 @@ main(void)
     }
 
     /* Check aliasing first argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
         slong len, len1, len2, nvars;
-        mp_bitcnt_t coeff_bits, exp_bound, exp_bound1, exp_bound2;
+        flint_bitcnt_t coeff_bits, exp_bound, exp_bound1, exp_bound2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 4);
         nvars = ctx->minfo->nvars;
@@ -185,6 +193,7 @@ main(void)
 
             fmpz_mpoly_mul(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             fmpz_mpoly_mul(f, f, g, ctx);
             fmpz_mpoly_assert_canonical(f, ctx);
             result = fmpz_mpoly_equal(h, f, ctx);
@@ -203,12 +212,12 @@ main(void)
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
         slong len, len1, len2, nvars;
-        mp_bitcnt_t coeff_bits, exp_bound, exp_bound1, exp_bound2;
+        flint_bitcnt_t coeff_bits, exp_bound, exp_bound1, exp_bound2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 4);
         nvars = ctx->minfo->nvars;
@@ -246,6 +255,7 @@ main(void)
 
             fmpz_mpoly_mul(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
+            flint_set_num_threads(n_randint(state, max_threads) + 1);
             fmpz_mpoly_mul(g, f, g, ctx);
             fmpz_mpoly_assert_canonical(g, ctx);
             result = fmpz_mpoly_equal(h, g, ctx);

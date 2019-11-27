@@ -53,11 +53,11 @@ Randomisation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state, slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+.. function:: void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state, slong len1, flint_bitcnt_t bits1, slong len2, flint_bitcnt_t bits2)
 
     Sets ``poly`` to a random rational function.
 
-.. function:: void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+.. function:: void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, slong len1, flint_bitcnt_t bits1, slong len2, flint_bitcnt_t bits2)
 
     Sets ``poly`` to a random non-zero rational function.
 

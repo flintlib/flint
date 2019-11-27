@@ -14,7 +14,7 @@
 int
 is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 {
-    int result;
+    int result = 1;
     ulong i;
     fmpz_t npow, nmul, rem;
 
@@ -23,13 +23,12 @@ is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
     fmpz_mod(npow, npow, s); /* npow = n mod s */
     fmpz_init_set(nmul, npow);
 
-    result = 1;
     for (i = 1; i <= r; i++)
     {
-        fmpz_mod(rem, n, npow);
-
-        if (fmpz_is_one(rem))
+        if (fmpz_is_one(npow))
             break;
+
+        fmpz_mod(rem, n, npow);
 
         /* if npow | n */
         if (fmpz_is_zero(rem))

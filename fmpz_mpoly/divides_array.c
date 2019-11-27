@@ -1326,9 +1326,9 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
     max_fields1 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     max_fields2 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
     max_fields3 = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
-    mpoly_max_fields_ui(max_fields2, poly2->exps, poly2->length,
+    mpoly_max_fields_ui_sp(max_fields2, poly2->exps, poly2->length,
                                                       poly2->bits, ctx->minfo);
-    mpoly_max_fields_ui(max_fields3, poly3->exps, poly3->length,
+    mpoly_max_fields_ui_sp(max_fields3, poly3->exps, poly3->length,
                                                       poly3->bits, ctx->minfo);
     max = 0;
     for (i = 0; i < ctx->minfo->nfields; i++)
@@ -1429,7 +1429,7 @@ int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
    */  
    if (len != 0)
    {
-      mpoly_max_fields_ui(max_fields1, poly1->exps, poly1->length,
+      mpoly_max_fields_ui_sp(max_fields1, poly1->exps, poly1->length,
                                                       poly1->bits, ctx->minfo);
 
       for (i = 0; i < ctx->minfo->nfields; i++)

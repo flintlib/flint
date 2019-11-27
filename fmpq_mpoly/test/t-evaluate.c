@@ -32,7 +32,7 @@ main(void)
         slong * perm;
         slong nvars;
         slong len1, exp_bound1;
-        mp_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 10);
         nvars = ctx->zctx->minfo->nvars;
@@ -106,7 +106,7 @@ main(void)
         slong * perm;
         slong nvars;
         slong len1;
-        mp_bitcnt_t exp_bits, coeff_bits;
+        flint_bitcnt_t exp_bits, coeff_bits;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 10);
         nvars = ctx->zctx->minfo->nvars;
@@ -180,7 +180,7 @@ main(void)
         fmpq_t fe, ge, fge, t;
         fmpq ** vals;
         slong nvars, len1, len2, exp_bound1, exp_bound2;
-        mp_bitcnt_t coeff_bits;
+        flint_bitcnt_t coeff_bits;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 10);
         nvars = ctx->zctx->minfo->nvars;

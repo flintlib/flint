@@ -26,7 +26,7 @@ main(void)
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, k;
         slong len, len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 20);
 

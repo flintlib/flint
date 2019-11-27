@@ -17,7 +17,7 @@
 #include "fft.h"
 
 /* set p = 2^wn + 1 */
-void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
+void set_p(mpz_t p, mp_size_t n, flint_bitcnt_t w)
 {
    flint_mpz_set_ui(p, 1);
    mpz_mul_2exp(p, p, n*w);
@@ -25,7 +25,7 @@ void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
 }
 
 void ref_fft_butterfly_twiddle(mpz_t s, mpz_t t, mpz_t i1, mpz_t i2, 
-                   mpz_t p, mp_size_t i, mp_size_t w, mp_bitcnt_t b1, mp_bitcnt_t b2)
+                   mpz_t p, mp_size_t i, mp_size_t w, flint_bitcnt_t b1, flint_bitcnt_t b2)
 {
    mpz_add(s, i1, i2);
    mpz_sub(t, i1, i2);
@@ -36,7 +36,7 @@ void ref_fft_butterfly_twiddle(mpz_t s, mpz_t t, mpz_t i1, mpz_t i2,
 }
 
 void ref_ifft_butterfly_twiddle(mpz_t s, mpz_t t, mpz_t i1, mpz_t i2, 
-      mpz_t p, mp_size_t i, mp_size_t n, mp_size_t w, mp_bitcnt_t b1, mp_bitcnt_t b2)
+      mpz_t p, mp_size_t i, mp_size_t n, mp_size_t w, flint_bitcnt_t b1, flint_bitcnt_t b2)
 {
    mpz_mul_2exp(i1, i1, 2*n*w - b1);
    mpz_mul_2exp(i2, i2, 2*n*w - b2);
@@ -52,7 +52,7 @@ main(void)
     mp_size_t c, bits, j, k, n, w, limbs;
     mpz_t p, ma, mb, m2a, m2b, mn1, mn2;
     mp_limb_t * nn1, * nn2, * r1, * r2;
-    mp_bitcnt_t b1, b2;
+    flint_bitcnt_t b1, b2;
    
     FLINT_TEST_INIT(state);
 

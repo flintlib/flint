@@ -15,10 +15,10 @@
 #include "mpn_extras.h"
 
 void mul_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1, 
-                        mp_srcptr i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
+                        mp_srcptr i2, mp_size_t n2, flint_bitcnt_t depth, flint_bitcnt_t w)
 {
    mp_size_t n = (UWORD(1)<<depth);
-   mp_bitcnt_t bits1 = (n*w - (depth+1))/2; 
+   flint_bitcnt_t bits1 = (n*w - (depth+1))/2; 
    
    mp_size_t r_limbs = n1 + n2;
    mp_size_t limbs = (n*w)/FLINT_BITS;

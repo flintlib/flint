@@ -58,7 +58,7 @@ Memory management
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
     It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
 
-.. function:: void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
     It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
@@ -67,7 +67,7 @@ Memory management
 
     Ensure that ``A`` has space for at least ``len`` terms.
 
-.. function:: void fmpz_mpoly_fit_bits(fmpz_mpoly_t A, mp_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_fit_bits(fmpz_mpoly_t A, flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 
     Ensure that the exponent fields of ``A`` have at least ``bits`` bits.
 
@@ -266,12 +266,31 @@ Coefficients
 
     Set the coefficient of the monomial with exponent vector ``exp`` to ``c``.
 
+.. function:: void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C, const fmpz_mpoly_t A, slong * vars, ulong * exps, slong length, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``C`` to the coefficient of ``A`` with respect to the variables in ``vars`` with powers in the corresponding array ``exps``.
+    Both ``vars`` and ``exps`` point to array of length ``length``. It is assumed that `0 < length \le nvars(A)` and that the variables in ``vars`` are distinct.
+
+
+Comparison
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpz_mpoly_cmp(const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Return ``1`` (resp. ``-1``, or ``0``) if the monomial of ``A`` is greater than (resp. less than, same as) the monomial of ``B``.
+    ``A`` and ``B`` should both have length one with coefficient one. This function will throw otherwise.
+
 
 Container operations
 --------------------------------------------------------------------------------
 
     These functions deal with violations of the internal canonical representation.
     If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
+
+.. function:: fmpz * fmpz_mpoly_term_coeff_ref(fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Return a reference to the coefficient of index `i` of ``A``.
 
 .. function:: int fmpz_mpoly_is_canonical(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
@@ -314,13 +333,31 @@ Container operations
 
 .. function:: void fmpz_mpoly_get_term_exp_ui(ulong * exp, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
 
+.. function:: void fmpz_mpoly_get_term_exp_si(slong * exp, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
     Set ``exp`` to the exponent vector of the term of index ``i``.
+    The ``_ui`` (resp. ``_si``) version throws if any entry does not fit into a ``ulong`` (resp. ``slong``).
 
-.. function:: void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A, slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i, slong var, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_set_termexp_ui(fmpz_mpoly_t A, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+.. function:: slong fmpz_mpoly_get_term_var_exp_si(const fmpz_mpoly_t A, slong i, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Return the exponent of the variable ``var`` of the term of index ``i``.
+    This function throws if the exponent does not fit into a ``ulong`` (resp. ``slong``).
+
+.. function:: void fmpz_mpoly_set_term_exp_fmpz(fmpz_mpoly_t A, slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
     Set the exponent vector of the term of index ``i`` to ``exp``.
+
+.. function:: void fmpz_mpoly_get_term(fmpz_mpoly_t M, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``M`` to the term of index ``i`` in ``A``.
+
+.. function:: void fmpz_mpoly_get_term_monomial(fmpz_mpoly_t M, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``M`` to the monomial of the term of index ``i`` in ``A``. The coefficient of ``M`` will be one.
 
 .. function:: void fmpz_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
 
@@ -487,27 +524,25 @@ Multiplication
 
 .. function:: void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
+.. function:: void fmpz_mpoly_mul_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
     Set ``A`` to ``B`` times ``C``.
+    The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
 
 .. function:: void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
+.. function:: void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
     Set ``A`` to ``B`` times ``C`` using Johnson's heap-based method.
-
-.. function:: void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``A`` to ``B`` times ``C`` using a heap and multiple threads.
-    This function should only be called once ``global_thread_pool`` has been initialized.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: int fmpz_mpoly_mul_array(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
-
-    Try to set ``A`` to ``B`` times ``C`` using arrays.
-    If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
 
 .. function:: int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
     Try to set ``A`` to ``B`` times ``C`` using arrays.
     If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
-    This function should only be called once ``global_thread_pool`` has been initialized.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
@@ -536,16 +571,24 @@ Powering
 Division
 --------------------------------------------------------------------------------
 
-
 .. function:: int fmpz_mpoly_divides(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
+.. function:: int fmpz_mpoly_divides_threaded(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
     If ``A`` is divisible by ``B``, set ``Q`` to the exact quotient and return ``1``. Otherwise, set ``Q`` to zero and return ``0``.
-    Note that the function :func:`fmpz_mpoly_div` may be faster if the quotient is known to be exact.
+    The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
+
+.. function:: int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
+    Perform the operation of func::fmpz_mpoly_divides using the algorithm of Michael Monagan and Roman Pearce.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: void fmpz_mpoly_divrem(fmpz_mpoly_t Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Set ``Q`` and ``R`` to the quotient and remainder of ``A`` divided by ``B``. The monomials in ``R`` divisible by the leading monomial of ``B`` will have coefficients reduced modulo the absolute value of the leading coefficient of ``B``.
-    Note that this function is not very useful.
+    Note that this function is not very useful if the leading coefficient ``B`` is not a unit.
 
 .. function:: void fmpz_mpoly_quasidivrem(fmpz_t scale, fmpz_mpoly_t Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
@@ -554,7 +597,7 @@ Division
 .. function:: void fmpz_mpoly_div(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Perform the operation of :func:`fmpz_mpoly_divrem` and discard ``R``.
-    Note that this function is not very useful.
+    Note that this function is not very useful if the division is not exact and the leading coefficient ``B`` is not a unit.
 
 .. function:: void fmpz_mpoly_quasidiv(fmpz_t scale, fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
@@ -564,7 +607,7 @@ Division
 
     This function is as per :func:`fmpz_mpoly_divrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
     The number of divisor (and hence quotient) polynomials, is given by ``len``.
-    Note that this function is not very useful.
+    Note that this function is not very useful if the leading coefficient in the array ``B`` is not a unit.
 
 .. function:: void fmpz_mpoly_quasidivrem_ideal(fmpz_t scale, fmpz_mpoly_struct ** Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, fmpz_mpoly_struct * const * B, slong len, const fmpz_mpoly_ctx_t ctx)
 
@@ -582,13 +625,53 @@ Greatest Common Divisor
 
 .. function:: int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
+.. function:: int fmpz_mpoly_gcd_threaded(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
     Try to set ``G`` to the GCD of ``A`` and ``B`` with positive leading coefficient. The GCD of zero and zero is defined to be zero.
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
+    The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
 
+.. function:: int fmpz_mpoly_gcd_prs(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using pseudo remainder sequences.
+
+.. function:: int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: int fmpz_mpoly_gcd_brown_threaded(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using Brown's algorithm.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
+
+.. function:: int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using Zippel's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
+
+.. function:: int fmpz_mpoly_gcd_berlekamp_massey(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: int fmpz_mpoly_gcd_berlekamp_massey_threaded(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using the Berlekamp-Massey algorithm to interpolate coefficients from bivariate images in the most significant two variables.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 Internal Functions
 --------------------------------------------------------------------------------
 
+.. function:: void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
+
+    Apply the function ``e -> shift[v] + stride[v]*e`` to each exponent ``e`` corresponding to the variable ``v``.
+    It is assumed that each shift and stride is not negative.
+
+.. function:: void fmpz_mpoly_deflate(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
+
+    Apply the function ``e -> (e - shift[v])/stride[v]`` to each exponent ``e`` corresponding to the variable ``v``.
+    If any ``stride[v]`` is zero, the corresponding numerator ``e - shift[v]`` is assumed to be zero, and the quotient is defined as zero.
+    This allows the function to undo the operation performed by :func:`fmpz_mpoly_inflate` when possible.
+
+.. function:: void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+
+    For each variable `v` let `S_v` be the set of exponents appearing on `v`.
+    Set ``shift[v]`` to `\operatorname{min}(S_v)` and set ``stride[v]`` to `\operatorname{gcd}(S-\operatorname{min}(S_v))`.
+    If ``A`` is zero, all shifts and strides are set to zero.
 
 .. function:: slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong * mults, slong num, slong bits)
 

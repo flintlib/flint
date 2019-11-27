@@ -51,4 +51,10 @@ void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ct
         if (fmpz_is_zero(A->coeffs + i))
             flint_throw(FLINT_ERROR, "Polynomial has a zero coefficient");
     }
+
+    for (i = A->length; i < A->alloc; i++)
+    {
+        if (COEFF_IS_MPZ(A->coeffs[i]))
+            flint_throw(FLINT_ERROR, "Polynomial has a big coeff past length");
+    }
 }

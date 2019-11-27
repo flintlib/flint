@@ -107,7 +107,7 @@ Context Management
 .. function:: void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx)
 
     Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_nmod_ctx_init`` as not been called on ``ctx`` already.
+    ``fq_nmod_ctx_init`` has not been called on ``ctx`` already.
 
 
 .. function:: void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx)
@@ -123,11 +123,11 @@ Memory management
 
 .. function:: void fq_nmod_init(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 
-    Initialises the element ``rop``, setting its value to~`0`.
+    Initialises the element ``rop``, setting its value to~`0`. Currently, the behaviour is identical to ``fq_nmod_init2``, as it also ensures ``rop`` has enough space for it to be an element of ``ctx``, this may change in the future.
 
 .. function:: void fq_nmod_init2(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 
-    Initialises ``poly`` with at least enough space for it to be an element
+    Initialises ``rop`` with at least enough space for it to be an element
     of ``ctx`` and sets it to~`0`.
 
 .. function:: void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
@@ -361,6 +361,15 @@ Assignments and conversions
     There is no guarantee this is a multiplicative generator of
     the finite field.
 
+.. function:: void fq_nmod_get_nmod_mat(nmod_mat_t col, const fq_nmod_t a, const fq_nmod_ctx_t ctx)
+
+    Convert ``a`` to a column vector of length ``degree(ctx)``.
+
+.. function:: void fq_nmod_set_nmod_mat(fq_nmod_t a, const nmod_mat_t col, const fq_nmod_ctx_t ctx)
+
+    Convert a column vector ``col`` of length ``degree(ctx)`` to
+    an element of ``ctx``.
+
 
 Comparison
 --------------------------------------------------------------------------------
@@ -450,6 +459,9 @@ Special functions
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
 
+    This function can also be used to check primitivity of a generator of
+    a finite field whose defining polynomial is not primitive.
+
 .. function:: int fq_nmod_is_primitive(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Returns whether ``op`` is primitive, i.e., whether it is a
@@ -460,12 +472,12 @@ Bit packing
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, mp_bitcnt_t bit_size, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit_size, const fq_nmod_ctx_t ctx)
 
     Packs ``op`` into bitfields of size ``bit_size``, writing the
     result to ``f``.
 
-.. function:: void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size, const fq_nmod_ctx_t ctx)
 
     Unpacks into ``rop`` the element with coefficients packed into
     fields of size ``bit_size`` as represented by the integer

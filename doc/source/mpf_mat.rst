@@ -9,7 +9,7 @@ Memory management
 --------------------------------------------------------------------------------
 
 
-.. function:: void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, mp_bitcnt_t prec)
+.. function:: void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec)
 
     Initialises a matrix with the given number of rows and columns and the
     given precision for use. The precision is at least the precision of the
@@ -55,7 +55,7 @@ Random matrix generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void mpf_mat_randtest(mpf_mat_t mat, flint_ranmpf_t state, mp_bitcnt_t bits)
+.. function:: void mpf_mat_randtest(mpf_mat_t mat, flint_ranmpf_t state, flint_bitcnt_t bits)
 
     Sets the entries of ``mat`` to random numbers in the 
     interval `[0, 1)` with ``bits`` significant bits in the mantissa or less if
@@ -80,7 +80,7 @@ Comparison
     Returns a non-zero value if ``mat1`` and ``mat2`` have 
     the same dimensions and entries, and zero otherwise.
     
-.. function:: int mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2, mp_bitcnt_t bits)
+.. function:: int mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2, flint_bitcnt_t bits)
 
     Returns a non-zero value if ``mat1`` and ``mat2`` have 
     the same dimensions and the first ``bits`` bits of their entries

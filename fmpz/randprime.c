@@ -13,7 +13,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-void fmpz_randprime(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits, int proved)
+void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int proved)
 {
     if (bits <= FLINT_BITS - 2)
     {

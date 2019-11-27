@@ -20,6 +20,10 @@ int
 main(void)
 {
     int i;
+    int tmul = 100;
+#ifdef _WIN32
+    tmul = 1;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("qr....");
@@ -28,7 +32,7 @@ main(void)
     /* check QR = A
      * check norm(column(Q)) = 1 or 0
      * check dot product of columns of Q is zero */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         double dot;
         int j, k, l;

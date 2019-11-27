@@ -139,6 +139,10 @@ FLINT_DLL void TEMPLATE(T, poly_iterated_frobenius_preinv)(TEMPLATE(T, poly_t)* 
                                             const TEMPLATE(T, poly_t) vinv,
                                             const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL void TEMPLATE(T, poly_factor_split_single)(TEMPLATE(T, poly_t) linfactor,
+                                            const TEMPLATE(T, poly_t) input,
+                                            const TEMPLATE(T, ctx_t) ctx);
+
 #ifdef __cplusplus
 }
 #endif

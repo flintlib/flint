@@ -24,7 +24,7 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
     slong Alen;
     mp_limb_t * Acoeff;
     ulong * Aexp;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     mp_limb_t * powers;
     mp_limb_t t, r, acc0, acc1, acc2, pp0, pp1;
     TMP_INIT;
@@ -66,7 +66,7 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
     for (i = 0; i < nvars; i++)
     {
         FLINT_ASSERT(k < entries);
-        mpoly_gen_offset_shift(&off, &shift, i, N, bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
         NMOD_RED(t, vals[i], ctx->ffinfo->mod);
         for (l = 0; l < bits; l++)
         {
@@ -118,7 +118,7 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
     slong Alen;
     mp_limb_t * Acoeff;
     ulong * Aexp;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     mp_limb_t * powers;
     mp_limb_t t, r, acc0, acc1, acc2, pp0, pp1;
     TMP_INIT;
@@ -161,7 +161,7 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
     {
         FLINT_ASSERT(k < entries);
         
-        off = mpoly_gen_offset_mp(i, N, bits, ctx->minfo);
+        off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
         NMOD_RED(t, vals[i], ctx->ffinfo->mod);
         for (l = 0; l < bits; l++)
         {

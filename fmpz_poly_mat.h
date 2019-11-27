@@ -102,13 +102,13 @@ FLINT_DLL void fmpz_poly_mat_one(fmpz_poly_mat_t mat);
 /* Random matrices ***********************************************************/
 
 FLINT_DLL void fmpz_poly_mat_randtest(fmpz_poly_mat_t mat, flint_rand_t state,
-                                slong len, mp_bitcnt_t bits);
+                                slong len, flint_bitcnt_t bits);
 
 FLINT_DLL void fmpz_poly_mat_randtest_unsigned(fmpz_poly_mat_t mat, flint_rand_t state,
-                             slong len, mp_bitcnt_t bits);
+                             slong len, flint_bitcnt_t bits);
 
 FLINT_DLL void fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state,
-                        slong len, mp_bitcnt_t bits, float density);
+                        slong len, flint_bitcnt_t bits, float density);
 
 /* Windows and concatenation */
 

@@ -15,7 +15,7 @@
 void _fmpz_binpow_fmpz(fmpz_t a, const fmpz * p, const fmpz_t e)
 {
     ulong i;
-    mp_bitcnt_t bits = fmpz_bits(e);
+    flint_bitcnt_t bits = fmpz_bits(e);
 
     fmpz_one(a);
     for (i = 0; i < bits; i++)
@@ -69,7 +69,7 @@ void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
     fmpz * Bcoeff;
     ulong * Bexp;
     fmpz * Buexp;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     fmpz * emin;
     fmpz * emax;
     fmpz ** powertable;
@@ -122,7 +122,7 @@ void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
     powertable = (fmpz **) TMP_ALLOC(nvars*sizeof(fmpz *));
     for (v = 0; v < nvars; v++)
     {
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
         fmpz * row;
 
         bits = FLINT_MAX(UWORD(1), fmpz_bits(emax + v));
@@ -207,7 +207,7 @@ void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
     }
     for (v = 0; v < nvars; v++)
     {
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
         bits = FLINT_MAX(UWORD(1), fmpz_bits(emax + v));
         for (j = 0; j < bits; j++)
         {

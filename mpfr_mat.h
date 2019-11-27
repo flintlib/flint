@@ -30,7 +30,7 @@ typedef struct
     __mpfr_struct * entries;
     slong r;
     slong c;
-    mp_bitcnt_t prec;
+    flint_bitcnt_t prec;
     __mpfr_struct ** rows;
 } mpfr_mat_struct;
 

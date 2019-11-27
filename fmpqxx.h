@@ -151,7 +151,7 @@ public:
     // TODO make this only work on immediates?
     slong cfrac_bound() const {return fmpq_cfrac_bound(this->evaluate()._fmpq());}
     int sgn() const {return fmpq_sgn(this->evaluate()._fmpq());}
-    mp_bitcnt_t height_bits() const
+    flint_bitcnt_t height_bits() const
         {return fmpq_height_bits(this->evaluate()._fmpq());}
 
     FLINTXX_DEFINE_MEMBER_UNOP_(next_minimal, fmpqxx_next_minimal)
@@ -330,7 +330,7 @@ FLINTXX_DEFINE_TERNARY(fmpqxx,
 
 // immediate functions
 template<class Fmpq>
-inline typename mp::enable_if<traits::is_fmpqxx<Fmpq>, mp_bitcnt_t>::type
+inline typename mp::enable_if<traits::is_fmpqxx<Fmpq>, flint_bitcnt_t>::type
 height_bits(const Fmpq& f)
 {
     return f.height_bits();

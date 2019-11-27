@@ -11,10 +11,10 @@
 
 #include "fmpq.h"
 
-mp_bitcnt_t
+flint_bitcnt_t
 fmpq_height_bits(const fmpq_t x)
 {
-    mp_bitcnt_t a, b;
+    flint_bitcnt_t a, b;
 
     a = fmpz_bits(fmpq_numref(x));
     b = fmpz_bits(fmpq_denref(x));

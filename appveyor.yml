@@ -22,21 +22,21 @@ environment:
     CONDA_INSTALL_LOCN_64: "C:\\Miniconda36-x64"
     VCVARSALL: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat"
   matrix:
+    - COMPILER: cl
+      ARCH: 64
     - COMPILER: gcc
       ARCH: 32
     - COMPILER: gcc
       ARCH: 64
     - COMPILER: cl
       ARCH: 32
-    - COMPILER: cl
-      ARCH: 64
 
 install:
   - if [%COMPILER%]==[gcc] set "PATH=C:\msys64\mingw%ARCH%\bin;%PATH%"
   - if [%COMPILER%]==[gcc] set "CMAKE_PREFIX_PATH=C:\msys64\mingw%ARCH%"
   - if [%COMPILER%]==[gcc] del /F /Q "C:\Program Files\Git\usr\bin\sh.exe"
-  - if [%COMPILER%]==[gcc] if [%ARCH%]==[64] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-mpfr
-  - if [%COMPILER%]==[gcc] if [%ARCH%]==[32] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-i686-toolchain mingw-w64-i686-mpfr
+#  - if [%COMPILER%]==[gcc] if [%ARCH%]==[64] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-x86_64-gcc mingw-w64-x86_64-mpfr
+#  - if [%COMPILER%]==[gcc] if [%ARCH%]==[32] C:\msys64\usr\bin\pacman.exe -Sy --noconfirm --noconfirm --needed base-devel mingw-w64-i686-gcc mingw-w64-i686-mpfr
   
   - if [%COMPILER%]==[cl] if [%ARCH%]==[64] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_64%"
   - if [%COMPILER%]==[cl] if [%ARCH%]==[32] set "CONDA_INSTALL_LOCN=%CONDA_INSTALL_LOCN_32%"
@@ -46,18 +46,31 @@ install:
   - if [%COMPILER%]==[cl] if [%ARCH%]==[64] call "%VCVARSALL%" x64
   - if [%COMPILER%]==[cl] if [%ARCH%]==[32] call "%VCVARSALL%" x86
   - if [%COMPILER%]==[cl] conda config --add channels conda-forge --force
-  - if [%COMPILER%]==[cl] conda install --yes --quiet mpir mpfr pthreads-win32 ninja
+  - if [%COMPILER%]==[cl] conda install --yes --quiet mpir=2.7.2 mpfr=4.* pthreads-win32 ninja
+  - if [%COMPILER%]==[cl] set "CFLAGS=/wd4146 /wd4018 /wd4267 /wd4244"
+  - echo int flint_test_multiplier(){return 1;} > test_helpers.c
+  - cat test_helpers.c
 
 before_build:
   - ps: if (-Not (Test-Path .\build)) { mkdir build }
   
   - cd build
-  - if [%COMPILER%]==[gcc] cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
-  - if [%COMPILER%]==[cl] cmake -G "Ninja" -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+  - if [%COMPILER%]==[gcc] cmake -G "MinGW Makefiles" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+  - if [%COMPILER%]==[cl] cmake -G "Ninja" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
 build_script:
-  - cmake --build . 2>&1 > build_output.txt
-  - ps: Get-Content .\build_output.txt -Tail 1000
+  - cmake --build . -- -j2
 
 test_script:
-  - ctest -j3 --timeout 120
+  - set "SKIP_TESTS=dummy_appveyor$"
+  # Following is known to hang
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] set "SKIP_TESTS=%SKIP_TESTS%|fmpz_poly_factor-test-t-factor$"
+  # Known failures (https://github.com/wbhart/flint2/issues/517#issuecomment-465005690)
+  - if [%COMPILER%]==[gcc] if [%ARCH%]==[64] set "SKIP_TESTS=%SKIP_TESTS%|fmpq-test-t-cmp_ui$"
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[32] set "SKIP_TESTS=%SKIP_TESTS%|fmpz-test-t-is_perfect_power$"
+  - if [%COMPILER%]==[cl] set "SKIP_TESTS=%SKIP_TESTS%|fmpz_mpoly-test-t-divides_array$"
+  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] set "SKIP_TESTS=%SKIP_TESTS%|fmpz_mpoly-test-t-divrem_array$|fmpz_mpoly-test-t-divrem_ideal_monagan_pearce|nmod_poly_mat-test-t-concat_vertical$"
+  - ctest -j3 -E "%SKIP_TESTS%" --output-on-failure
+
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

@@ -48,8 +48,5 @@ void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
     if (out < WORD(0) || !fmpz_is_zero(A->coeffs + out))
         out++;
 
-    A->length = out;
-
-    while (++out < A->alloc)
-        _fmpz_demote(A->coeffs + out);
+    _fmpz_mpoly_set_length(A, out, ctx);
 }

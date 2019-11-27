@@ -11,7 +11,8 @@
 
 #include "mpoly.h"
 
-int mpoly_is_gen(ulong * exps, slong var, slong bits, const mpoly_ctx_t mctx)
+int mpoly_is_gen(ulong * exps, slong var, flint_bitcnt_t bits,
+                                                        const mpoly_ctx_t mctx)
 {
     int ret;
     slong i;

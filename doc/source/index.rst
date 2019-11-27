@@ -79,6 +79,7 @@ Integers mod n
    nmod_mpoly.rst
    fmpz_mod_poly.rst
    fmpz_mod_poly_factor.rst
+   fmpz_mod_mat.rst
 
 Finite fields
 ---------------
@@ -91,6 +92,7 @@ Finite fields
    fq_mat.rst
    fq_poly.rst
    fq_poly_factor.rst
+   fq_embed.rst
 
 .. toctree::
    :maxdepth: 1
@@ -100,6 +102,7 @@ Finite fields
    fq_nmod_mat.rst
    fq_nmod_poly.rst
    fq_nmod_poly_factor.rst
+   fq_nmod_embed.rst
 
 .. toctree::
    :maxdepth: 1
@@ -109,6 +112,7 @@ Finite fields
    fq_zech_mat.rst
    fq_zech_poly.rst
    fq_zech_poly_factor.rst
+   fq_zech_embed.rst
 
 p-adic numbers
 ---------------

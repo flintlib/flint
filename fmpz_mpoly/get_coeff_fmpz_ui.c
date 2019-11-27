@@ -11,23 +11,19 @@
 
 #include "fmpz_mpoly.h"
 
-
-void fmpz_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mpoly_t poly,
+void fmpz_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mpoly_t A,
                                  const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, nvars = ctx->minfo->nvars;
-    fmpz * newexp;
-    TMP_INIT;
-
-    TMP_START;
-    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
-    for (i = 0; i < nvars; i++)
-        fmpz_init_set_ui(newexp + i, exp[i]);
-
-    _fmpz_mpoly_get_coeff_fmpz_fmpz(c, poly, newexp, ctx);
-
-    for (i = 0; i < nvars; i++)
-        fmpz_clear(newexp + i);
-
-    TMP_END;
+    slong index;
+    index = mpoly_monomial_index_ui(A->exps, A->bits, A->length,
+                                                              exp, ctx->minfo);
+    if (index < 0)
+    {
+        fmpz_zero(c);
+    }
+    else
+    {
+        FLINT_ASSERT(index < A->length);
+        fmpz_set(c, A->coeffs + index);
+    }
 }

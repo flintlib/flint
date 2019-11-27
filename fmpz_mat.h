@@ -54,7 +54,7 @@ typedef struct
    ulong hash;
 } col_hash_t;
 
-/* Memory management  ********************************************************/
+/* Element access  ********************************************************/
 
 FMPZ_MAT_INLINE
 fmpz * fmpz_mat_entry(const fmpz_mat_t mat, slong i, slong j)
@@ -73,6 +73,8 @@ slong fmpz_mat_ncols(const fmpz_mat_t mat)
 {
    return mat->c;
 }
+
+/* Memory management  ********************************************************/
 
 FLINT_DLL void fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols);
 FLINT_DLL void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);
@@ -175,15 +177,15 @@ int fmpz_mat_read(fmpz_mat_t mat)
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
-FLINT_DLL void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
-FLINT_DLL void fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
-FLINT_DLL void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
-FLINT_DLL void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2);
-FLINT_DLL void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q);
-FLINT_DLL void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q);
+FLINT_DLL void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, flint_bitcnt_t bits2);
+FLINT_DLL void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q);
+FLINT_DLL void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q);
 FLINT_DLL void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha);
-FLINT_DLL void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, mp_bitcnt_t bits);
+FLINT_DLL void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, flint_bitcnt_t bits);
 FLINT_DLL void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det);
 FLINT_DLL void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count);
 FLINT_DLL int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag, slong n);
@@ -241,7 +243,7 @@ FLINT_DLL void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
 
 FLINT_DLL void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
-    const fmpz_mat_t B, mp_bitcnt_t bits);
+    const fmpz_mat_t B, flint_bitcnt_t bits);
 
 FLINT_DLL void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
@@ -265,7 +267,7 @@ FLINT_DLL void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A);
 FMPZ_MAT_INLINE
 void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
 {
-    if (r != s)
+    if (r != s && !fmpz_mat_is_empty(mat))
     {
         fmpz * u;
         slong t;
@@ -280,6 +282,66 @@ void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
         u = mat->rows[s];
         mat->rows[s] = mat->rows[r];
         mat->rows[r] = u;
+    }
+}
+
+FMPZ_MAT_INLINE
+void fmpz_mat_invert_rows(fmpz_mat_t mat, slong * perm)
+{
+    slong i;
+
+    for (i = 0; i < mat->r/2; i++)
+        fmpz_mat_swap_rows(mat, perm, i, mat->r - i - 1);
+}
+
+FMPZ_MAT_INLINE
+void fmpz_mat_swap_cols(fmpz_mat_t mat, slong * perm, slong r, slong s)
+{
+    if (r != s && !fmpz_mat_is_empty(mat))
+    {
+        slong t;
+
+        if (perm)
+        {
+            t = perm[s];
+            perm[s] = perm[r];
+            perm[r] = t;
+        }
+
+       for (t = 0; t < mat->r; t++)
+       {
+           fmpz_swap(fmpz_mat_entry(mat, t, r), fmpz_mat_entry(mat, t, s));
+       }
+    }
+}
+
+FMPZ_MAT_INLINE
+void fmpz_mat_invert_cols(fmpz_mat_t mat, slong * perm)
+{
+    if (!fmpz_mat_is_empty(mat))
+    {
+        slong t;
+        slong i;
+        slong c = mat->c;
+        slong k = mat->c/2;
+
+        if (perm)
+        {
+            for (i =0; i < k; i++)
+            {
+                t = perm[i];
+                perm[i] = perm[c - i];
+                perm[c - i] = t;
+            }
+        }
+
+        for (t = 0; t < mat->r; t++)
+        {
+            for (i = 0; i < k; i++)
+            {
+                fmpz_swap(fmpz_mat_entry(mat, t, i), fmpz_mat_entry(mat, t, c - i - 1));
+            }
+        }
     }
 }
 
@@ -415,8 +477,32 @@ FLINT_DLL int fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
 FLINT_DLL void fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm,
         const fmpz_mat_t FFLU, const fmpz_mat_t B);
 
+FLINT_DLL mp_limb_t
+fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
+		                  const fmpz_mat_t A, const fmpz_t det_bound);
+
+FLINT_DLL mp_limb_t *
+fmpz_mat_dixon_get_crt_primes(slong * num_primes,
+		                             const fmpz_mat_t A, mp_limb_t p);
+
+FLINT_DLL void
+_fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
+		  const fmpz_mat_t A, const fmpz_mat_t B,
+			       const nmod_mat_t Ainv, mp_limb_t p,
+		                              const fmpz_t N, const fmpz_t D);
+
 FLINT_DLL int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
         const fmpz_mat_t A, const fmpz_mat_t B);
+
+FLINT_DLL void
+_fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
+                     const fmpz_mat_t A, const fmpz_mat_t B,
+                                 const nmod_mat_t Ainv, mp_limb_t p,
+                                              const fmpz_t N, const fmpz_t D);
+
+FLINT_DLL int
+fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
+		                      const fmpz_mat_t A, const fmpz_mat_t B);
 
 /* Nullspace ****************************************************************/
 

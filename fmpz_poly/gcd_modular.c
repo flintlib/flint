@@ -20,7 +20,7 @@
 void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1, 
                                         const fmpz * poly2, slong len2)
 {
-    mp_bitcnt_t bits1, bits2, nb1, nb2, bits_small, pbits, curr_bits = 0, new_bits;   
+    flint_bitcnt_t bits1, bits2, nb1, nb2, bits_small, pbits, curr_bits = 0, new_bits;   
     fmpz_t ac, bc, hc, d, g, l, eval_A, eval_B, eval_GCD, modulus;
     fmpz * A, * B, * Q, * lead_A, * lead_B;
     mp_ptr a, b, h;

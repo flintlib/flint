@@ -294,11 +294,23 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
     {
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (mpoly_monomial_overflows(exp, N, mask))
-            goto exp_overflow2;
+        if (bits <= FLINT_BITS)
+        {
+            if (mpoly_monomial_overflows(exp, N, mask))
+                goto exp_overflow2;
+        }
+        else
+        {
+            if (mpoly_monomial_overflows_mp(exp, N, bits))
+                goto exp_overflow2;
+        }
       
         _nmod_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
-        lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
+
+        if (bits <= FLINT_BITS)
+            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
+        else
+            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
 
         acc0 = acc1 = acc2 = 0;
         do
@@ -342,9 +354,8 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                     x->j = j + 1;
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             } else
             {
@@ -358,11 +369,10 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                     x->j = j;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                          q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                            q_exp + x->j*N, N);
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
                 /* should we go up? */
                 if (j + 1 == q_len)
@@ -377,11 +387,10 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
                     x->j = j + 1;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                          q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                             q_exp + x->j*N, N);
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
@@ -411,11 +420,10 @@ slong _nmod_mpoly_divrem_monagan_pearce(slong * lenr,
             x->j = q_len;
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
-            mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                  q_exp + x->j*N, N);
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, cmpmask))
-                exp_next--;
+            mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                     q_exp + x->j*N, N);
+            exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
         }
         s = 1;
         q_len++;
@@ -465,12 +473,10 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
         return;
     }
 
-    if (poly2->bits > FLINT_BITS || poly3->bits > FLINT_BITS)
-        flint_throw(FLINT_EXPOF, "Exponent overflow in nmod_mpoly_divrem_monagan_pearce");
-
     TMP_START;
 
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
+    exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
@@ -494,7 +500,7 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
     }
 
     /* check divisor leading monomial is at most that of the dividend */
-    if (mpoly_monomial_lt(exp3, exp2, N, cmpmask))
+    if (mpoly_monomial_lt(exp2, exp3, N, cmpmask))
     {
         nmod_mpoly_set(r, poly2, ctx);
         nmod_mpoly_zero(q, ctx);
@@ -535,7 +541,7 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
                       &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2, 
                        poly2->length, poly3->coeffs, exp3, poly3->length, exp_bits,
                                          N, cmpmask, ctx->ffinfo)) == 0
-          && lenr == 0 && exp_bits < FLINT_BITS)
+          && lenr == 0)
    {
         ulong * old_exp2 = exp2, * old_exp3 = exp3;
         slong old_exp_bits = exp_bits;
@@ -569,10 +575,6 @@ void nmod_mpoly_divrem_monagan_pearce(nmod_mpoly_t q, nmod_mpoly_t r,
         nmod_mpoly_fit_bits(tr, exp_bits, ctx);
         tr->bits = exp_bits;
     }
-
-    if (lenq == 0 && lenr == 0)
-        flint_throw(FLINT_EXPOF,
-                      "Exponent overflow in nmod_mpoly_divrem_monagan_pearce");
 
     /* deal with aliasing */
     if (q == poly2 || q == poly3)

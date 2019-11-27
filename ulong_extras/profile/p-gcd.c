@@ -21,8 +21,8 @@ typedef struct
 {
    ulong * rnums1;
    ulong * rnums2;
-   mp_bitcnt_t bits1;
-   mp_bitcnt_t bits2;
+   flint_bitcnt_t bits1;
+   flint_bitcnt_t bits2;
 } gcd_t;
 
 void sample(void * arg, ulong count)
@@ -41,7 +41,7 @@ void sample(void * arg, ulong count)
    }
 }
 
-void fill_array(ulong * ret, mp_bitcnt_t bits, flint_rand_t state)
+void fill_array(ulong * ret, flint_bitcnt_t bits, flint_rand_t state)
 {
    ulong n;
    ulong i;

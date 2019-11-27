@@ -19,7 +19,7 @@
 int
 main(void)
 {
-    mp_bitcnt_t depth, w;
+    flint_bitcnt_t depth, w;
     
     FLINT_TEST_INIT(state);
 

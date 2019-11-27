@@ -1146,6 +1146,84 @@ FLINT_DLL void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * x
 FLINT_DLL void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs,
                                                     slong n, const fmpz_t mod);
 
+FLINT_DLL int fmpz_mod_poly_find_distinct_nonzero_roots(fmpz * roots,
+                                                      const fmpz_mod_poly_t P);
+
+/* Berlekamp-Massey Algorithm - see fmpz_mod_poly/berlekamp_massey.c for more info ********/
+typedef struct {
+    slong npoints;
+    fmpz_mod_poly_t R0, R1;
+    fmpz_mod_poly_t V0, V1;
+    fmpz_mod_poly_t qt, rt;
+    fmpz_mod_poly_t points;
+} fmpz_mod_berlekamp_massey_struct;
+typedef fmpz_mod_berlekamp_massey_struct fmpz_mod_berlekamp_massey_t[1];
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_init(
+                        fmpz_mod_berlekamp_massey_t B,
+                        const fmpz_t p);
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_init_ui(
+                        fmpz_mod_berlekamp_massey_t B,
+                        ulong p);
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_start_over(
+                        fmpz_mod_berlekamp_massey_t B);
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_clear(
+                        fmpz_mod_berlekamp_massey_t B);
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_set_prime(
+                        fmpz_mod_berlekamp_massey_t B,
+                        const fmpz_t p);
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_print(
+                        const fmpz_mod_berlekamp_massey_t B);
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_add_points(
+                        fmpz_mod_berlekamp_massey_t B,
+                        const fmpz * a,
+                        slong count);
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_add_zeros(
+                        fmpz_mod_berlekamp_massey_t B,
+                        slong count);
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_add_point(
+                        fmpz_mod_berlekamp_massey_t B,
+                        const fmpz_t a);
+
+FLINT_DLL void fmpz_mod_berlekamp_massey_add_point_ui(
+                        fmpz_mod_berlekamp_massey_t B,
+                        ulong a);
+
+FLINT_DLL int fmpz_mod_berlekamp_massey_reduce(
+                        fmpz_mod_berlekamp_massey_t B);
+
+FMPZ_MOD_POLY_INLINE const fmpz * fmpz_mod_berlekamp_massey_points(
+                        const fmpz_mod_berlekamp_massey_t B)
+{
+    return B->points->coeffs;
+}
+
+FMPZ_MOD_POLY_INLINE slong fmpz_mod_berlekamp_massey_point_count(
+                        const fmpz_mod_berlekamp_massey_t B)
+{
+    return B->points->length;
+}
+
+FMPZ_MOD_POLY_INLINE const fmpz_mod_poly_struct * fmpz_mod_berlekamp_massey_V_poly(
+                        const fmpz_mod_berlekamp_massey_t B)
+{
+    return B->V1;
+}
+
+FMPZ_MOD_POLY_INLINE const fmpz_mod_poly_struct * fmpz_mod_berlekamp_massey_R_poly(
+                        const fmpz_mod_berlekamp_massey_t B)
+{
+    return B->R1;
+}
+
 #ifdef __cplusplus
 }
 #endif

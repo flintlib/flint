@@ -15,7 +15,7 @@
 
 int
 _mpf_vec_approx_equal(const mpf * vec1, const mpf * vec2, slong len,
-                      mp_bitcnt_t bits)
+                      flint_bitcnt_t bits)
 {
     slong i;
     if (vec1 == vec2)

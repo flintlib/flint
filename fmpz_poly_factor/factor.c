@@ -18,6 +18,8 @@ void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
     const slong lenG = G->length;
     fmpz_poly_t g;
 
+    fac->num = 0;
+
     if (lenG == 0)
     {
         fmpz_set_ui(&fac->c, 0);

@@ -32,20 +32,20 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
         slong nvars, len, index;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
         fmpz_mpoly_init(f, ctx);
 
         nvars = fmpz_mpoly_ctx_nvars(ctx);
 
-        len = n_randint(state, 50);
-        exp_bits = n_randint(state, 100) + 1;
-        coeff_bits = n_randint(state, 100);
+        len = n_randint(state, 50) + 1;
+        exp_bits = n_randint(state, 100) + 2;
+        coeff_bits = n_randint(state, 100) + 2;
 
-        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
-        if (f->length == WORD(0))
-            continue;
+        do {
+            fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        } while (fmpz_mpoly_length(f, ctx) == 0);
 
         for (j = 0; j < 10; j++)
         {
@@ -72,7 +72,11 @@ main(void)
 
             result = 1;
             for (k = 0; k < nvars; k++)
-                result = result && (exp1[k] == exp2[k]);
+            {
+                result = result
+                 && exp1[k] == exp2[k]
+                 && exp1[k] == fmpz_mpoly_get_term_var_exp_ui(f, index, k, ctx);
+            }
 
             if (!result)
             {
@@ -84,7 +88,8 @@ main(void)
             flint_free(exp2);
         }
 
-        fmpz_mpoly_clear(f, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

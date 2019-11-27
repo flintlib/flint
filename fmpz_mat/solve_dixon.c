@@ -11,8 +11,8 @@
 
 #include "fmpz_mat.h"
 
-static mp_limb_t
-find_good_prime_and_invert(nmod_mat_t Ainv,
+mp_limb_t
+fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
                                 const fmpz_mat_t A, const fmpz_t det_bound)
 {
     mp_limb_t p;
@@ -49,7 +49,7 @@ find_good_prime_and_invert(nmod_mat_t Ainv,
 
 #define USE_SLOW_MULTIPLICATION 0
 
-mp_limb_t * get_crt_primes(slong * num_primes, const fmpz_mat_t A, mp_limb_t p)
+mp_limb_t * fmpz_mat_dixon_get_crt_primes(slong * num_primes, const fmpz_mat_t A, mp_limb_t p)
 {
     fmpz_t bound, prod;
     mp_limb_t * primes;
@@ -67,8 +67,8 @@ mp_limb_t * get_crt_primes(slong * num_primes, const fmpz_mat_t A, mp_limb_t p)
     fmpz_mul_ui(bound, bound, A->r);
     fmpz_mul_ui(bound, bound, UWORD(2));  /* signs */
 
-    primes = flint_malloc(sizeof(mp_limb_t) * (fmpz_bits(bound) /
-                                            (FLINT_BIT_COUNT(p) - 1) + 2));
+    primes = (mp_limb_t *) flint_malloc(sizeof(mp_limb_t) *
+		            (fmpz_bits(bound) / (FLINT_BIT_COUNT(p) - 1) + 2));
     primes[0] = p;
     fmpz_set_ui(prod, p);
     *num_primes = 1;
@@ -87,7 +87,7 @@ mp_limb_t * get_crt_primes(slong * num_primes, const fmpz_mat_t A, mp_limb_t p)
 }
 
 
-static void
+void
 _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
                         const fmpz_mat_t A, const fmpz_mat_t B,
                     const nmod_mat_t Ainv, mp_limb_t p,
@@ -124,8 +124,8 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
         fmpz_mul(bound, N, N);
     fmpz_mul_ui(bound, bound, UWORD(2));  /* signs */
 
-    crt_primes = get_crt_primes(&num_primes, A, p);
-    A_mod = flint_malloc(sizeof(nmod_mat_t) * num_primes);
+    crt_primes = fmpz_mat_dixon_get_crt_primes(&num_primes, A, p);
+    A_mod = (nmod_mat_t *) flint_malloc(sizeof(nmod_mat_t) * num_primes);
     for (i = 0; i < num_primes; i++)
     {
         nmod_mat_init(A_mod[i], n, n, crt_primes[i]);
@@ -225,7 +225,7 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     fmpz_mat_solve_bound(N, D, A, B);
 
     nmod_mat_init(Ainv, A->r, A->r, 1);
-    p = find_good_prime_and_invert(Ainv, A, D);
+    p = fmpz_mat_find_good_prime_and_invert(Ainv, A, D);
     if (p != 0)
         _fmpz_mat_solve_dixon(X, mod, A, B, Ainv, p, N, D);
 

@@ -34,7 +34,6 @@ main(void)
         TEMPLATE(T, t) a, ainv, f, g;
 
         TEMPLATE(T, ctx_randtest_reducible)(ctx, state);
-        TEMPLATE(T, init)(f, ctx);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(f, ctx);

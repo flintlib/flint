@@ -50,7 +50,7 @@ _fmpz_poly_preinvert(fmpz * Binv, const fmpz * B, slong len)
 
             _fmpz_vec_zero(W, 2*n - 2);
             fmpz_one(W + (2*n - 2));
-            _fmpz_poly_div_basecase(Binv, W, W, 2*n - 1, Brev, n);
+            _fmpz_poly_div_basecase(Binv, W, W, 2*n - 1, Brev, n, 0);
             _fmpz_poly_reverse(Binv, Binv, n, n);
         }
         

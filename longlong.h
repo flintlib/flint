@@ -37,8 +37,22 @@
 #undef count_leading_zeros
 #undef count_trailing_zeros
 
+/* 1 if we know that the hardware is strongly-ordered */
+#define FLINT_KNOW_STRONG_ORDER 0
+
 /* x86 : 64 bit */
 #if (GMP_LIMB_BITS == 64 && defined (__amd64__)) 
+
+#undef FLINT_KNOW_STRONG_ORDER
+#define FLINT_KNOW_STRONG_ORDER 1
+
+#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
+  __asm__ ("addq %11,%q3\n\tadcq %9,%q2\n\tadcq %7,%q1\n\tadcq %5,%q0"    \
+       : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
+       : "0"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
+         "1"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
+         "2"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
+         "3"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))                 \
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addq %8,%q2\n\tadcq %6,%q1\n\tadcq %4,%q0"     \
@@ -113,6 +127,18 @@
 /* x86 : 32 bit */
 #if (GMP_LIMB_BITS == 32 && (defined (__i386__) \
    || defined (__i486__) || defined(__amd64__)))
+
+#undef FLINT_KNOW_STRONG_ORDER
+#define FLINT_KNOW_STRONG_ORDER 1
+
+
+#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
+  __asm__ ("addl %11,%k3\n\tadcl %9,%k2\n\tadcl %7,%k1\n\tadcl %5,%k0"    \
+       : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
+       : "0"  ((mp_limb_t)(a3)), "g" ((mp_limb_t)(b3)),                   \
+         "1"  ((mp_limb_t)(a2)), "g" ((mp_limb_t)(b2)),                   \
+         "2"  ((mp_limb_t)(a1)), "g" ((mp_limb_t)(b1)),                   \
+         "3"  ((mp_limb_t)(a0)), "g" ((mp_limb_t)(b0)))                   \
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addl %8,%k2\n\tadcl %6,%k1\n\tadcl %4,%k0"     \
@@ -349,6 +375,15 @@
     add_ssaaaa(__u, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);      \
     add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                      \
   } while (0)
+
+#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)       \
+  do {                                                                         \
+    mp_limb_t __tt;                                                            \
+    add_sssaaaaaa(__tt, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0); \
+    add_ssaaaa(s3, s2, a3, a2, b3, b2);                                        \
+    add_ssaaaa(s3, s2, s3, s2, (mp_limb_t) 0, __tt);                           \
+  } while (0)
+
 
 #if !((GMP_LIMB_BITS == 64 && defined (__ia64)) ||      \
       (GMP_LIMB_BITS == 32 && defined (__arm__)))

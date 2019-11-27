@@ -16,7 +16,7 @@
 int
 fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 {
-    mp_bitcnt_t prec = 0;
+    flint_bitcnt_t prec = 0;
     int result, num_loops = 0;
 
     do

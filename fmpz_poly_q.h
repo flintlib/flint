@@ -60,12 +60,12 @@ FLINT_DLL void fmpz_poly_q_clear(fmpz_poly_q_t rop);
 /* Randomisation *************************************************************/
 
 FLINT_DLL void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
-                          slong len1, mp_bitcnt_t bits1, 
-                          slong len2, mp_bitcnt_t bits2);
+                          slong len1, flint_bitcnt_t bits1, 
+                          slong len2, flint_bitcnt_t bits2);
 
 FLINT_DLL void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, 
-                                   slong len1, mp_bitcnt_t bits1, 
-                                   slong len2, mp_bitcnt_t bits2);
+                                   slong len1, flint_bitcnt_t bits1, 
+                                   slong len2, flint_bitcnt_t bits2);
 
 /* Assignment ****************************************************************/
 

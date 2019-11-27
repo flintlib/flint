@@ -64,6 +64,11 @@ Basic properties and manipulation
     Return a pointer to the entry at row `i` and column `j` of the matrix
     ``mat``.
 
+.. function:: void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x)
+
+    Set the entry at row `i` and column `j` of the matrix ``mat` to
+    ``x``.
+    
 .. function:: slong nmod_mat_nrows(nmod_mat_t mat)
 
     Returns the number of rows in ``mat``.
@@ -199,7 +204,27 @@ Transpose
     Sets `B` to the transpose of `A`. Dimensions must be compatible.
     `B` and `A` may be the same object if and only if the matrix is square.
 
+.. function:: void nmod_mat_swap_rows(nmod_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
 
+.. function:: void nmod_mat_swap_cols(nmod_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
+
+.. function:: void nmod_mat_invert_rows(nmod_mat_t, slong * perm)
+    
+    Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
+    ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: void nmod_mat_invert_cols(nmod_mat_t, slong * perm)
+    
+    Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
+    ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
 
 Addition and subtraction
 --------------------------------------------------------------------------------
@@ -233,6 +258,10 @@ Matrix-scalar arithmetic
     modulo the modulus. Dimensions of dest, X and Y must be identical.
     dest can be aliased with X or Y.
 
+.. function:: void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
+
+    Sets `B = cA`, where the scalar `c` is of type ``fmpz_t``. Dimensions of `A`
+    and `B` must be identical.
 
 
 Matrix multiplication

@@ -97,8 +97,10 @@ main(void)
             for (j = 0; j < g->length; j++)
             {
                 mpoly_monomial_add_mp(temp, fexp + i*N, gexp + j*N, N);
-                if (mpoly_monomial_lt(temp, e, N, cmpmask))
+                if (mpoly_monomial_lt(e, temp, N, cmpmask))
+                {
                     x = j + 1;
+                }
             }
             if (x != e_ind[i])
             {
@@ -141,8 +143,10 @@ main(void)
                         for (j = 0; j < g->length; j++)
                         {
                             mpoly_monomial_add_mp(temp, fexp + i*N, gexp + j*N, N);
-                            if (mpoly_monomial_lt(temp, temp1, N, cmpmask))
+                            if (mpoly_monomial_lt(temp1, temp, N, cmpmask))
+                            {
                                 x = j + 1;
+                            }
                         }
                         score += g->length - x;
                     }

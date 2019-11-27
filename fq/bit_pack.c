@@ -12,7 +12,7 @@
 #include "fq.h"
 
 void
-fq_bit_pack(fmpz_t f, const fq_t op, mp_bitcnt_t bit_size,
+fq_bit_pack(fmpz_t f, const fq_t op, flint_bitcnt_t bit_size,
             const fq_ctx_t ctx)
 {
     fmpz_poly_bit_pack(f, op, bit_size);

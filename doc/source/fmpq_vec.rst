@@ -27,12 +27,12 @@ Randomisation
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets the entries of a vector of the given length to random rationals with 
     numerator and denominator having up to the given number of bits per entry.
 
-.. function:: void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets the entries of a vector of the given length to random distinct
     rationals with numerator and denominator having up to the given number

@@ -13,11 +13,11 @@
 
 void
 _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
-    mp_bitcnt_t bits)
+    flint_bitcnt_t bits)
 {
     slong i, j, k;
     slong num_primes;
-    mp_bitcnt_t primes_bits;
+    flint_bitcnt_t primes_bits;
     mp_ptr primes;
 
     nmod_mat_t * mod_C;

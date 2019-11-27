@@ -139,20 +139,20 @@ values `0`, `1`, ``COEFF_MAX``, and ``WORD_MAX``.  On a
 polynomial level, the integer numerator has a reasonable chance 
 to have a non-trivial content.
 
-.. function:: void fmpq_poly_randtest(fmpq_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpq_poly_randtest(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with coefficients up to the given 
     length and where each coefficient has up to the given number of bits. 
     The coefficients are signed randomly.  One must call 
     ``flint_randinit()`` before calling this function.
 
-.. function:: void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with coefficients up to the given length 
     and where each coefficient has up to the given number of bits.  One must 
     call ``flint_randinit()`` before calling this function.
 
-.. function:: void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     As for ``fmpq_poly_randtest()`` except that ``len`` and ``bits`` 
     may not be zero and the polynomial generated is guaranteed not to be the 
@@ -198,6 +198,25 @@ Assignment, swap, negation
 
     Sets the rational polynomial ``rop`` to the same value 
     as the integer polynomial ``op``.
+
+.. function:: void fmpq_poly_set_nmod_poly(fmpq_poly_t rop, const nmod_poly_t op)
+
+    Sets the coefficients of ``op`` to the residues in ``op``,
+    normalised to the interval `-m/2 \le r < m/2` where `m` is the modulus.
+
+.. function:: void fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op)
+
+    Sets the coefficients of ``rop`` to the coefficients in the denominator of``op``,
+    reduced by the modulus of ``rop``. The result is multiplied by the inverse of the
+    denominator of ``op``. It is assumed that the reduction of the denominator of ``op``
+    is invertible.
+
+.. function:: void fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den)
+
+    Sets the coefficients of ``rop`` to the coefficients in the denominator
+    of ``op``, reduced by the modulus of ``rop``. If ``den == 1``, the result is
+    multiplied by the inverse of the denominator of ``op``. In this case it is
+    assumed that the reduction of the denominator of ``op`` is invertible.
 
 .. function:: void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
 

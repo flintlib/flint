@@ -31,7 +31,7 @@ int main(void)
 
    for (i = 0; i < 50 * flint_test_multiplier(); i++) /* Test random numbers */
    {
-      mp_bitcnt_t bits;
+      flint_bitcnt_t bits;
       mpz_t m, n;
       fmpz_t n1, n2, r;
 

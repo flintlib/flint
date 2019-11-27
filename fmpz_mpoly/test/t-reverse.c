@@ -29,81 +29,83 @@ main(void)
     /* Check rev(rev(a)) == a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-       fmpz_mpoly_ctx_t ctx;
-       fmpz_mpoly_t f, g, h;
-       ordering_t ord;
-       slong nvars, len, coeff_bits, exp_bits;
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g, h;
+        ordering_t ord;
+        slong nvars, len, coeff_bits, exp_bits;
 
-       ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 20) + 1;
+        ord = mpoly_ordering_randtest(state);
+        nvars = n_randint(state, 20) + 1;
 
-       fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
-       fmpz_mpoly_init(f, ctx);
-       fmpz_mpoly_init(g, ctx);
-       fmpz_mpoly_init(h, ctx);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(h, ctx);
 
-       len = n_randint(state, 100);
+        len = n_randint(state, 100);
 
-       exp_bits = n_randint(state, 200) + 1;
-       coeff_bits = n_randint(state, 200);
+        exp_bits = n_randint(state, 200) + 1;
+        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
-       fmpz_mpoly_reverse(h, f, ctx);
-       fmpz_mpoly_reverse(g, h, ctx);
+        fmpz_mpoly_reverse(h, f, ctx);
+        fmpz_mpoly_reverse(g, h, ctx);
 
-       result = fmpz_mpoly_equal(f, g, ctx);
+        result = fmpz_mpoly_equal(f, g, ctx);
 
-       if (!result)
-       {
-         printf("FAIL\n");
-         flint_printf("Check rev(rev(a)) == a\ni = %wd\n", i);
-         flint_abort();
-       }
+        if (!result)
+        {
+            printf("FAIL\n");
+            flint_printf("Check rev(rev(a)) == a\ni = %wd\n", i);
+            flint_abort();
+        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
+        fmpz_mpoly_clear(f, ctx);  
+        fmpz_mpoly_clear(g, ctx);  
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-       fmpz_mpoly_ctx_t ctx;
-       fmpz_mpoly_t f, g;
-       ordering_t ord;
-       slong nvars, len, coeff_bits, exp_bits;
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g;
+        ordering_t ord;
+        slong nvars, len, coeff_bits, exp_bits;
 
-       ord = mpoly_ordering_randtest(state);
-       nvars = n_randint(state, 20) + 1;
+        ord = mpoly_ordering_randtest(state);
+        nvars = n_randint(state, 20) + 1;
 
-       fmpz_mpoly_ctx_init(ctx, nvars, ord);
+        fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
-       fmpz_mpoly_init(f, ctx);
-       fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
 
-       len = n_randint(state, 100);
+        len = n_randint(state, 100);
 
-       exp_bits = n_randint(state, 200) + 1;
-       coeff_bits = n_randint(state, 200);
+        exp_bits = n_randint(state, 200) + 1;
+        coeff_bits = n_randint(state, 200);
 
-       fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
 
-       fmpz_mpoly_reverse(g, f, ctx);
-       fmpz_mpoly_reverse(g, g, ctx);
+        fmpz_mpoly_reverse(g, f, ctx);
+        fmpz_mpoly_reverse(g, g, ctx);
 
-       result = fmpz_mpoly_equal(f, g, ctx);
+        result = fmpz_mpoly_equal(f, g, ctx);
 
-       if (!result)
-       {
-          printf("FAIL\n");
-          flint_printf("Check aliasing\ni = %wd\n", i);
-          flint_abort();
-       }
+        if (!result)
+        {
+            printf("FAIL\n");
+            flint_printf("Check aliasing\ni = %wd\n", i);
+            flint_abort();
+        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
+        fmpz_mpoly_clear(f, ctx);  
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_ctx_clear(ctx); 
     }
 
     FLINT_TEST_CLEANUP(state);
@@ -111,4 +113,3 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-

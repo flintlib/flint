@@ -62,6 +62,10 @@ int
 main(void)
 {
     int i, result;
+    int tmul = 100;
+#ifdef _WIN32
+    tmul = 1;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("factor....");
@@ -89,7 +93,7 @@ main(void)
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/H2_flint", "H2");
 #endif
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_t c;
         fmpz_poly_t f, g, h, t;

@@ -12,7 +12,7 @@
 #include "nmod_mpoly.h"
 
 
-void nmod_mpolyn_init(nmod_mpolyn_t A, mp_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyn_init(nmod_mpolyn_t A, flint_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -182,6 +182,39 @@ void nmod_mpolyn_fit_bits(nmod_mpolyn_t A, slong bits, const nmod_mpoly_ctx_t ct
 
       A->bits = bits;
    }
+}
+
+int nmod_mpolyn_is_canonical(const nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    if (!mpoly_monomials_valid_test(A->exps, A->length, A->bits, ctx->minfo))
+    {
+        return 0;
+    }
+
+    if (mpoly_monomials_overflow_test(A->exps, A->length, A->bits, ctx->minfo))
+        return 0;
+
+    if (!mpoly_monomials_inorder_test(A->exps, A->length, A->bits, ctx->minfo))
+        return 0;
+
+    for (i = 0; i < A->length; i++)
+    {
+        slong l = (A->coeffs + i)->length;
+
+        if (l == 0)
+        {
+            return 0;
+        }
+
+        if ((A->coeffs + i)->coeffs[l - 1] == 0)
+        {
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 void nmod_mpolyn_set(nmod_mpolyn_t A, const nmod_mpolyn_t B, const nmod_mpoly_ctx_t ctx)

@@ -15,13 +15,13 @@
       
 void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, 
                     mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, 
-                         mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp)
+                         mp_size_t limbs, flint_bitcnt_t w, mp_limb_t * temp)
 {
-   mp_bitcnt_t wn = limbs*FLINT_BITS;
+   flint_bitcnt_t wn = limbs*FLINT_BITS;
    mp_limb_t cy = 0;
    mp_size_t j = i/2, k = w/2;
    mp_size_t y;
-   mp_bitcnt_t b1;
+   flint_bitcnt_t b1;
    int negate = 0;
 
    b1 = j + wn/4 + i*k;
@@ -57,7 +57,7 @@ void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t,
        mpn_sub_n(t, temp, t, limbs + 1);
 }
 
-void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
        mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
 {
     mp_size_t i;

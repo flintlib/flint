@@ -35,8 +35,8 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
         ulong c, mask;
 
         mask = (-UWORD(1)) >> (FLINT_BITS - bits);        
-        mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift,
-                                                     var, N, bits, mctx);
+        mpoly_gen_monomial_offset_shift_sp(oneexp, &offset, &shift,
+                                                              var, bits, mctx);
 
         /* scan once to find required denominator */
         for (i = 0; i < len2; i++)
@@ -65,7 +65,7 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
         fmpz_t c;
         fmpz_init(c);
 
-        mpoly_gen_oneexp_offset_mp(oneexp, &offset, var, N, bits, mctx);
+        offset = mpoly_gen_monomial_offset_mp(oneexp, var, bits, mctx);
 
         /* scan once to find required denominator */
         for (i = 0; i < len2; i++)

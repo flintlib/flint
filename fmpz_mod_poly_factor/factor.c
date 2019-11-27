@@ -17,7 +17,7 @@ fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res,
                      const fmpz_mod_poly_t f)
 {
     slong n = fmpz_mod_poly_degree(f);
-    mp_bitcnt_t bits = fmpz_bits(&f->p);
+    flint_bitcnt_t bits = fmpz_bits(&f->p);
 
     if (5 * bits + n > 75)
         fmpz_mod_poly_factor_kaltofen_shoup(res, f);

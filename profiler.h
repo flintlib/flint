@@ -80,6 +80,14 @@ void timeit_start(timeit_t t)
 }
 
 static __inline__
+slong timeit_query_wall(timeit_t t)
+{
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    return t->wall + tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+
+static __inline__
 void timeit_stop(timeit_t t)
 {
     struct timeval tv;
@@ -90,9 +98,13 @@ void timeit_stop(timeit_t t)
 
 /******************************************************************************
 
-    Timer based on the cycle counter
+    Timer based on the x86 cycle counter
    
 ******************************************************************************/
+
+#if (defined( _MSC_VER ) || (GMP_LIMB_BITS == 64 && defined (__amd64__)) || \
+     (GMP_LIMB_BITS == 32 && (defined (__i386__) || \
+			      defined (__i486__) || defined(__amd64__))))
 
 #define FLINT_NUM_CLOCKS 20
 
@@ -179,6 +191,8 @@ FLINT_DLL void prof_repeat(double* min, double* max, profile_target_t target, vo
 #define DURATION_THRESHOLD 5000.0
 
 #define DURATION_TARGET 10000.0
+
+#endif
 
 /******************************************************************************
 

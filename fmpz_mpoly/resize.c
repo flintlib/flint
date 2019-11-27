@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly.h"
 
-
 void fmpz_mpoly_resize(fmpz_mpoly_t A, slong new_length,
                                                     const fmpz_mpoly_ctx_t ctx)
 {

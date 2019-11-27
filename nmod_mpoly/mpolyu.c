@@ -12,7 +12,7 @@
 #include "nmod_mpoly.h"
 
 
-void nmod_mpolyu_init(nmod_mpolyu_t A, mp_bitcnt_t bits,
+void nmod_mpolyu_init(nmod_mpolyu_t A, flint_bitcnt_t bits,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
@@ -43,11 +43,6 @@ void nmod_mpolyu_swap(nmod_mpolyu_t A, nmod_mpolyu_t B,
 
 void nmod_mpolyu_zero(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
 {
-    slong i;
-    for (i = 0; i < A->alloc; i++) {
-        nmod_mpoly_clear(A->coeffs + i, uctx);
-        nmod_mpoly_init(A->coeffs + i, uctx);
-    }
     A->length = 0;
 }
 
@@ -148,6 +143,232 @@ nmod_mpoly_struct * _nmod_mpolyu_get_coeff(nmod_mpolyu_t A,
 }
 
 
+typedef struct
+{
+    volatile slong index;
+    pthread_mutex_t mutex;
+    slong length;
+    nmod_mpoly_struct * coeffs;
+    const nmod_mpoly_ctx_struct * ctx;
+}
+_sort_arg_struct;
+
+typedef _sort_arg_struct _sort_arg_t[1];
+
+
+static void _worker_sort(void * varg)
+{
+    _sort_arg_struct * arg = (_sort_arg_struct *) varg;
+    slong i;
+
+get_next_index:
+
+    pthread_mutex_lock(&arg->mutex);
+    i = arg->index;
+    arg->index++;
+    pthread_mutex_unlock(&arg->mutex);
+
+    if (i >= arg->length)
+        goto cleanup;
+
+    nmod_mpoly_sort_terms(arg->coeffs + i, arg->ctx);
+
+    goto get_next_index;
+
+cleanup:
+
+    return;
+}
+
+/*
+    Convert B to A using the variable permutation perm.
+    The uctx (m vars) should be the context of the coefficients of A.
+    The ctx (n vars) should be the context of B.
+
+    operation on each term:
+
+    for 0 <= k < m + 1
+        l = perm[k]
+        Aexp[k] = (Bexp[l] - shift[l])/stride[l]
+
+    the most significant main variable uses k = 0
+    the coefficients of A use variables k = 1 ... m
+*/
+void nmod_mpoly_to_mpolyu_perm_deflate(
+    nmod_mpolyu_t A,
+    const nmod_mpoly_ctx_t uctx,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride,
+    const thread_pool_handle * handles,
+    slong num_handles)
+{
+    slong i, j, k, l;
+    slong n = ctx->minfo->nvars;
+    slong m = uctx->minfo->nvars;
+    slong NA, NB;
+    ulong * uexps;
+    ulong * Bexps;
+    nmod_mpoly_struct * Ac;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(m + 1 <= n);
+
+    TMP_START;
+
+    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(fmpz));
+    Bexps = (ulong *) TMP_ALLOC(n*sizeof(fmpz));
+
+    nmod_mpolyu_zero(A, uctx);
+
+    NA = mpoly_words_per_exp(A->bits, uctx->minfo);
+    NB = mpoly_words_per_exp(B->bits, ctx->minfo);
+
+    for (j = 0; j < B->length; j++)
+    {
+        mpoly_get_monomial_ui(Bexps, B->exps + NB*j, B->bits, ctx->minfo);
+        for (k = 0; k < m + 1; k++)
+        {
+            l = perm[k];
+            FLINT_ASSERT(stride[l] != UWORD(0));
+            FLINT_ASSERT(((Bexps[l] - shift[l]) % stride[l]) == UWORD(0));
+            uexps[k] = (Bexps[l] - shift[l]) / stride[l];
+        }
+        Ac = _nmod_mpolyu_get_coeff(A, uexps[0], uctx);
+        FLINT_ASSERT(Ac->bits == A->bits);
+
+        nmod_mpoly_fit_length(Ac, Ac->length + 1, uctx);
+        Ac->coeffs[Ac->length] = B->coeffs[j];
+        mpoly_set_monomial_ui(Ac->exps + NA*Ac->length, uexps + 1, A->bits, uctx->minfo);
+        Ac->length++;
+    }
+
+    if (num_handles > 0)
+    {
+        _sort_arg_t arg;
+
+        pthread_mutex_init(&arg->mutex, NULL);
+        arg->index = 0;
+        arg->coeffs = A->coeffs;
+        arg->length = A->length;
+        arg->ctx = uctx;
+
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+        }
+        _worker_sort(arg);
+        for (i = 0; i < num_handles; i++)
+        {
+            thread_pool_wait(global_thread_pool, handles[i]);
+        }
+
+        pthread_mutex_destroy(&arg->mutex);
+    }
+    else
+    {
+        for (i = 0; i < A->length; i++)
+        {
+            nmod_mpoly_sort_terms(A->coeffs + i, uctx);
+        }
+    }
+
+    TMP_END;
+}
+
+/*
+    Convert B to A using the variable permutation vector perm.
+    This function inverts nmod_mpoly_to_mpolyu_perm_deflate.
+    A will be constructed with bits = Abits.
+
+    operation on each term:
+
+        for 0 <= l < n
+            Aexp[l] = shift[l]
+
+        for 0 <= k < m + 1
+            l = perm[k]
+            Aexp[l] += scale[l]*Bexp[k]
+*/
+void nmod_mpoly_from_mpolyu_perm_inflate(
+    nmod_mpoly_t A,
+    flint_bitcnt_t Abits,
+    const nmod_mpoly_ctx_t ctx,
+    const nmod_mpolyu_t B,
+    const nmod_mpoly_ctx_t uctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride)
+{
+    slong n = ctx->minfo->nvars;
+    slong m = uctx->minfo->nvars;
+    slong i, j, k, l;
+    slong NA, NB;
+    slong Alen;
+    mp_limb_t * Acoeff;
+    ulong * Aexp;
+    slong Aalloc;
+    ulong * uexps;
+    ulong * Aexps;
+    TMP_INIT;
+
+    FLINT_ASSERT(B->length > 0);
+    FLINT_ASSERT(Abits <= FLINT_BITS);
+    FLINT_ASSERT(B->bits <= FLINT_BITS);
+    FLINT_ASSERT(m + 1 <= n);
+    TMP_START;
+
+    uexps = (ulong *) TMP_ALLOC((m + 1)*sizeof(ulong));
+    Aexps = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+
+    NA = mpoly_words_per_exp(Abits, ctx->minfo);
+    NB = mpoly_words_per_exp(B->bits, uctx->minfo);
+
+    nmod_mpoly_fit_bits(A, Abits, ctx);
+    A->bits = Abits;
+
+    Acoeff = A->coeffs;
+    Aexp = A->exps;
+    Aalloc = A->alloc;
+    Alen = 0;
+    for (i = 0; i < B->length; i++)
+    {
+        nmod_mpoly_struct * Bc = B->coeffs + i;
+        _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Bc->length, NA);
+        FLINT_ASSERT(Bc->bits == B->bits);
+
+        for (j = 0; j < Bc->length; j++)
+        {
+            Acoeff[Alen + j] = Bc->coeffs[j];
+            mpoly_get_monomial_ui(uexps + 1, Bc->exps + NB*j, Bc->bits, uctx->minfo);
+            uexps[0] = B->exps[i];
+            for (l = 0; l < n; l++)
+            {
+                Aexps[l] = shift[l];
+            }
+            for (k = 0; k < m + 1; k++)
+            {
+                l = perm[k];
+                Aexps[l] += stride[l]*uexps[k];
+            }
+            mpoly_set_monomial_ui(Aexp + NA*(Alen + j), Aexps, Abits, ctx->minfo);
+        }
+        Alen += Bc->length;
+    }
+    A->coeffs = Acoeff;
+    A->exps = Aexp;
+    A->alloc = Aalloc;
+    _nmod_mpoly_set_length(A, Alen, ctx);
+
+    nmod_mpoly_sort_terms(A, ctx);
+    TMP_END;
+}
+
+
 void nmod_mpolyu_shift_right(nmod_mpolyu_t A, ulong s)
 {
     slong i;
@@ -223,16 +444,16 @@ void nmod_mpoly_cvtfrom_poly_notmain(nmod_mpoly_t A, nmod_poly_t a,
     slong i;
     slong k;
     ulong * oneexp;
-    slong offset, shift;
     slong N;
     TMP_INIT;
     TMP_START;
 
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    FLINT_ASSERT(A->bits <= FLINT_BITS);
+
+    N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
 
     oneexp = (ulong *)TMP_ALLOC(N*sizeof(ulong));
-    mpoly_gen_oneexp_offset_shift(oneexp, &offset, &shift, var,
-                                                       N, A->bits, ctx->minfo);
+    mpoly_gen_monomial_sp(oneexp, var, A->bits, ctx->minfo);
 
     nmod_mpoly_fit_length(A, nmod_poly_length(a), ctx);
 
@@ -312,183 +533,6 @@ void nmod_mpolyu_cvtfrom_poly(nmod_mpolyu_t A, nmod_poly_t a,
     }
     A->length = k;
 }
-
-
-void nmod_mpoly_to_mpolyu_perm(nmod_mpolyu_t A, const nmod_mpoly_t B,
-                              const slong * perm, const nmod_mpoly_ctx_t uctx,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    slong i, j;
-    slong n = ctx->minfo->nvars;
-    slong N, NA;
-    nmod_mpoly_struct * Ac;
-    fmpz * uexps;
-    fmpz * exps;
-    TMP_INIT;
-
-    FLINT_ASSERT(uctx->minfo->nvars == n - 1);
-
-    TMP_START;
-
-    uexps = (fmpz *) TMP_ALLOC(n*sizeof(fmpz));
-    exps  = (fmpz *) TMP_ALLOC(n*sizeof(fmpz));
-    for (i = 0; i < n; i++)
-    {
-        fmpz_init(uexps + i);
-        fmpz_init(exps + i);
-    }
-
-    A->bits = B->bits;
-    nmod_mpolyu_zero(A, uctx);
-
-    N = mpoly_words_per_exp(B->bits, ctx->minfo);
-    NA = mpoly_words_per_exp(A->bits, uctx->minfo);
-
-    for (j = 0; j < B->length; j++)
-    {
-        mpoly_get_monomial_ffmpz(exps, B->exps + N*j, B->bits, ctx->minfo);
-
-        for (i = 0; i < n; i++)
-        {
-            fmpz_swap(uexps + i, exps + perm[i]);
-        }
-        Ac = _nmod_mpolyu_get_coeff(A, uexps[n - 1], uctx);
-
-        FLINT_ASSERT(Ac->bits == B->bits);
-
-        nmod_mpoly_fit_length(Ac, Ac->length + 1, uctx);
-        Ac->coeffs[Ac->length] = B->coeffs[j];
-        mpoly_set_monomial_ffmpz(Ac->exps + NA*Ac->length, uexps, A->bits,
-                                                                  uctx->minfo);
-        Ac->length++;
-    }
-
-    for (i = 0; i < A->length; i++)
-    {
-        nmod_mpoly_sort_terms(A->coeffs + i, uctx);
-    }
-
-    for (i = 0; i < n; i++)
-    {
-        fmpz_clear(uexps + i);
-        fmpz_clear(exps + i);
-    }
-
-    TMP_END;
-}
-
-/*
-    Convert B to A using the variable permutation vector perm.
-    If keepbits != 0, A is constructed with the same bit count as B.
-    If keepbits == 0, A is constructed with the default bit count.
-*/
-void nmod_mpoly_from_mpolyu_perm(nmod_mpoly_t A,
-                       const nmod_mpolyu_t B, int keepbits, const slong * perm,
-                       const nmod_mpoly_ctx_t uctx, const nmod_mpoly_ctx_t ctx)
-
-{
-    slong i, j, k, bits;
-    slong NB, N;
-    slong Alen;
-    mp_limb_t * Acoeff;
-    ulong * Aexp;
-    slong Aalloc;
-    slong n = ctx->minfo->nvars;
-    fmpz * texps;
-    fmpz * uexps;
-    fmpz * exps;
-    TMP_INIT;
-
-    FLINT_ASSERT(uctx->minfo->nvars == n - 1);
-
-    if (B->length == 0)
-    {
-        nmod_mpoly_zero(A, ctx);
-        return;        
-    }
-
-    TMP_START;
-
-    /* find bits required to represent result */
-    texps = (fmpz *) TMP_ALLOC(n*sizeof(fmpz));
-    uexps = (fmpz *) TMP_ALLOC(n*sizeof(fmpz));
-    exps  = (fmpz *) TMP_ALLOC(n*sizeof(fmpz));
-    for (i = 0; i < n; i++)
-    {
-        fmpz_init(texps + i);
-        fmpz_init(uexps + i);
-        fmpz_init(exps + i);
-    }
-    for (i = 0; i < B->length; i++)
-    {
-        nmod_mpoly_struct * pi = B->coeffs + i;
-        mpoly_degrees_ffmpz(texps, pi->exps, pi->length, pi->bits, uctx->minfo);
-        _fmpz_vec_max_inplace(uexps, texps, n - 1);
-    }
-    fmpz_set_ui(uexps + n - 1, B->exps[0]);
-    for (i = 0; i < n; i++)
-    {
-        fmpz_swap(uexps + i, exps + perm[i]);
-    }
-    bits = mpoly_exp_bits_required_ffmpz(exps, ctx->minfo);
-
-    if (keepbits)
-    {
-        /* the bit count of B should be sufficient to represent A */
-        FLINT_ASSERT(bits <= B->bits);
-        bits = B->bits;
-    } else {
-        /* upgrade the bit count to the default */
-        bits = FLINT_MAX(MPOLY_MIN_BITS, bits);
-        bits = mpoly_fix_bits(bits, ctx->minfo);
-    }
-
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-
-    nmod_mpoly_fit_bits(A, bits, ctx);
-    A->bits = bits;
-
-    Acoeff = A->coeffs;
-    Aexp = A->exps;
-    Aalloc = A->alloc;
-    Alen = 0;
-    for (i = 0; i < B->length; i++)
-    {
-        nmod_mpoly_struct * Bc = B->coeffs + i;
-        _nmod_mpoly_fit_length(&Acoeff, &Aexp, &Aalloc, Alen + Bc->length, N);
-        NB = mpoly_words_per_exp(Bc->bits, uctx->minfo);
-        for (j = 0; j < Bc->length; j++)
-        {
-            Acoeff[Alen + j] = Bc->coeffs[j];
-            mpoly_get_monomial_ffmpz(uexps, Bc->exps + NB*j, Bc->bits, uctx->minfo);
-            fmpz_set_ui(uexps + n - 1, B->exps[i]);
-
-            for (k = 0; k < n; k++)
-            {
-                fmpz_swap(uexps + k, exps + perm[k]);
-            }
-
-            mpoly_set_monomial_ffmpz(Aexp + N*(Alen + j), exps, bits, ctx->minfo);
-        }
-        Alen += (B->coeffs + i)->length;
-    }
-    A->coeffs = Acoeff;
-    A->exps = Aexp;
-    A->alloc = Aalloc;
-    _nmod_mpoly_set_length(A, Alen, ctx);
-
-    for (i = 0; i < n; i++)
-    {
-        fmpz_clear(texps + i);
-        fmpz_clear(uexps + i);
-        fmpz_clear(exps + i);
-    }
-
-    nmod_mpoly_sort_terms(A, ctx);
-    TMP_END;
-}
-
-
 
 
 void nmod_mpolyu_msub(nmod_mpolyu_t R, nmod_mpolyu_t A, nmod_mpolyu_t B,
@@ -581,7 +625,7 @@ void nmod_mpolyu_divexact_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
     slong i;
     slong len;
     slong N;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     nmod_mpoly_struct * poly1, * poly2, * poly3;
     ulong * cmpmask;
     TMP_INIT;
@@ -631,7 +675,7 @@ void nmod_mpolyu_mul_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
     slong i;
     slong len;
     slong N;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     nmod_mpoly_struct * poly1, * poly2, * poly3;
     ulong * cmpmask;
     TMP_INIT;
@@ -669,4 +713,64 @@ void nmod_mpolyu_mul_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
     }
     A->length = B->length;
     TMP_END;
+}
+
+int nmod_mpolyu_content_mpoly(
+    nmod_mpoly_t g,
+    const nmod_mpolyu_t A,
+    const nmod_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
+{
+    slong i, j;
+    int success;
+    flint_bitcnt_t bits = A->bits;
+
+    FLINT_ASSERT(g->bits == bits);
+
+    if (A->length < 2)
+    {
+        if (A->length == 0)
+        {
+            nmod_mpoly_zero(g, ctx);
+        }
+        else
+        {
+            nmod_mpoly_make_monic(g, A->coeffs + 0, ctx);
+        }
+
+        FLINT_ASSERT(g->bits == bits);
+        return 1;
+    }
+
+    j = 0;
+    for (i = 1; i < A->length; i++)
+    {
+        if ((A->coeffs + i)->length < (A->coeffs + j)->length)
+        {
+            j = i;
+        }
+    }
+
+    if (j == 0)
+        j = 1;
+
+    success = _nmod_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx,
+                                                        handles, num_handles);
+    if (!success)
+        return 0;
+
+    for (i = 1; i < A->length; i++)
+    {
+        if (i == j)
+            continue;
+
+        success = _nmod_mpoly_gcd(g, bits, g, A->coeffs + i, ctx,
+                                                         handles, num_handles);
+        FLINT_ASSERT(g->bits == bits);
+        if (!success)
+            return 0;
+    }
+
+    return 1;
 }

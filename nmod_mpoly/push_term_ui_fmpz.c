@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018, 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,17 +11,12 @@
 
 #include "nmod_mpoly.h"
 
-/*
-    emplaceterm assumes that c is valid modulo ctx->ffinfo->mod.n
-*/
-
-void _nmod_mpoly_emplacebackterm_ui_ffmpz(nmod_mpoly_t A,
-                   mp_limb_t c, const fmpz * exp, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_push_exp_ffmpz(nmod_mpoly_t A,
+                                  const fmpz * exp, const nmod_mpoly_ctx_t ctx)
 {
     slong N;
     slong old_length = A->length;
-    mp_bitcnt_t exp_bits;
-    FLINT_ASSERT(c < ctx->ffinfo->mod.n);
+    flint_bitcnt_t exp_bits;
 
     exp_bits = mpoly_exp_bits_required_ffmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
@@ -31,17 +26,15 @@ void _nmod_mpoly_emplacebackterm_ui_ffmpz(nmod_mpoly_t A,
 
     nmod_mpoly_fit_length(A, old_length + 1, ctx);
     A->length = old_length + 1;
-    A->coeffs[old_length] = c;
     mpoly_set_monomial_ffmpz(A->exps + N*old_length, exp, A->bits, ctx->minfo);
 }
 
-void _nmod_mpoly_emplacebackterm_ui_pfmpz(nmod_mpoly_t A,
-                   mp_limb_t c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_push_exp_pfmpz(nmod_mpoly_t A,
+                                fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 {
     slong N;
     slong old_length = A->length;
-    mp_bitcnt_t exp_bits;
-    FLINT_ASSERT(c < ctx->ffinfo->mod.n);
+    flint_bitcnt_t exp_bits;
 
     exp_bits = mpoly_exp_bits_required_pfmpz(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
@@ -51,7 +44,6 @@ void _nmod_mpoly_emplacebackterm_ui_pfmpz(nmod_mpoly_t A,
 
     nmod_mpoly_fit_length(A, old_length + 1, ctx);
     A->length = old_length + 1;
-    A->coeffs[old_length] = c;
     mpoly_set_monomial_pfmpz(A->exps + N*old_length, exp, A->bits, ctx->minfo);
 }
 
@@ -59,9 +51,10 @@ void _nmod_mpoly_emplacebackterm_ui_pfmpz(nmod_mpoly_t A,
 void nmod_mpoly_push_term_ui_fmpz(nmod_mpoly_t A, ulong c,
                                 fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 {
+    _nmod_mpoly_push_exp_pfmpz(A, exp, ctx);
     if (c >= ctx->ffinfo->mod.n)
     {
         NMOD_RED(c, c, ctx->ffinfo->mod);
     }
-    _nmod_mpoly_emplacebackterm_ui_pfmpz(A, c, exp, ctx);    
+    A->coeffs[A->length - 1] = c;   
 }

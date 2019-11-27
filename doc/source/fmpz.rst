@@ -157,22 +157,22 @@ initialised with a call to ``flint_randinit()``.  When one is
 finished generating random numbers, one should call 
 ``flint_randclear()`` to clean up.
 
-.. function:: void fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
     Generates a random signed integer whose absolute value has precisely
     the given number of bits.
 
-.. function:: void fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
     Generates a random signed integer whose absolute value has a number
     of bits which is random from `0` up to ``bits`` inclusive.
 
-.. function:: void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
     Generates a random unsigned integer whose value has a number
     of bits which is random from `0` up to ``bits`` inclusive.
 
-.. function:: void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
     As per ``fmpz_randtest``, but the result will not be `0`. 
     If ``bits`` is set to `0`, an exception will result.
@@ -193,7 +193,7 @@ finished generating random numbers, one should call
     increased probability of generating values close to the
     endpoints or close to zero.
 
-.. function:: void fmpz_randprime(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits, int proved)
+.. function:: void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int proved)
 
     Generates a random prime number with the given number of bits.
 
@@ -510,7 +510,7 @@ Basic properties and manipulation
     Returns the size of the absolute value of `f` in base `b`, measured in
     numbers of digits. The base `b` can be between `2` and `62`, inclusive.
 
-.. function:: mp_bitcnt_t fmpz_bits(const fmpz_t f)
+.. function:: flint_bitcnt_t fmpz_bits(const fmpz_t f)
 
     Returns the number of bits required to store the absolute
     value of `f`.  If `f` is `0` then `0` is returned.
@@ -525,7 +525,7 @@ Basic properties and manipulation
     Returns `-1` if the sign of `f` is negative, `+1` if it is positive,
     otherwise returns `0`.
 
-.. function:: mp_bitcnt_t fmpz_val2(const fmpz_t f)
+.. function:: flint_bitcnt_t fmpz_val2(const fmpz_t f)
 
     Returns the exponent of the largest power of two dividing `f`, or
     equivalently the number of trailing zeros in the binary expansion of `f`.
@@ -1080,7 +1080,7 @@ Bit packing and unpacking
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits, fmpz_t coeff, int negate, int borrow)
+.. function:: int fmpz_bit_pack(mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, fmpz_t coeff, int negate, int borrow)
 
     Shifts the given coefficient to the left by ``shift`` bits and adds 
     it to the integer in ``arr`` in a field of the given number of bits::
@@ -1100,7 +1100,7 @@ Bit packing and unpacking
     The value of ``coeff`` may also be optionally (and notionally) negated 
     before it is used, by setting the ``negate`` parameter to `-1`.
 
-.. function:: int fmpz_bit_unpack(fmpz_t coeff, mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits, int negate, int borrow)
+.. function:: int fmpz_bit_unpack(fmpz_t coeff, mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, int negate, int borrow)
 
     A bit field of the given number of bits is extracted from ``arr``,
     starting after ``shift`` bits, and placed into ``coeff``.  An 
@@ -1110,7 +1110,7 @@ Bit packing and unpacking
 
     The value of ``shift`` is expected to be less than ``FLINT_BITS``.
 
-.. function:: void fmpz_bit_unpack_unsigned(fmpz_t coeff, const mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits)
+.. function:: void fmpz_bit_unpack_unsigned(fmpz_t coeff, const mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits)
 
     A bit field of the given number of bits is extracted from ``arr``,
     starting after ``shift`` bits, and placed into ``coeff``.
@@ -1172,6 +1172,7 @@ structure and temporary working space with ``fmpz_comb_init`` and
 For simple demonstration programs showing how to use the CRT functions,
 see ``crt.c`` and ``multi_crt.c`` in the ``examples``
 directory.
+The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it performs error checking and works with arbitrary moduli.
 
 .. function:: void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2, int sign)
 
@@ -1242,6 +1243,45 @@ directory.
 
     Clears temporary space ``temp`` used by multimodular and CRT functions
     using the given ``comb`` structure.
+
+
+.. function:: void fmpz_multi_crt_init(fmpz_multi_crt_t CRT)
+
+    Initialize ``CRT`` for chinese remaindering.
+
+.. function:: int fmpz_multi_crt_precompute(fmpz_multi_crt_t CRT, const fmpz * moduli, slong len)
+
+.. function:: int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT, const fmpz * const * moduli, slong len)
+
+    Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
+    A return of ``0`` indicates that the compilation failed and future calls to func::fmpz_crt_precomp will leave the output undefined.
+    A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) no modulus is `0,1,-1` and all moduli are pairwise relatively prime.
+
+.. function:: void fmpz_multi_crt_precomp(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * inputs)
+
+.. function:: void fmpz_multi_crt_precomp_p(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * const * inputs)
+
+    Set ``output`` to an integer of smallest absolute value that is congruent to ``values + i`` modulo the ``moduli + i`` in func::fmpz_crt_precompute.
+
+.. function:: int fmpz_multi_crt(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len);
+
+    Perform the same operation as func::fmpz_multi_crt_precomp while internally constructing and destroying the precomputed data.
+    All of the remarks in func::fmpz_multi_crt_precompute apply.
+
+.. function:: void fmpz_multi_crt_clear(fmpz_multi_crt_t P)
+
+    Free all space used by ``CRT``.
+
+.. function:: slong _nmod_poly_crt_local_size(const nmod_poly_crt_t CRT)
+
+    Return the required length of the output for func::_nmod_poly_crt_run.
+
+.. function:: void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * inputs)
+
+.. function:: void _fmpz_multi_crt_run_p(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * const * inputs)
+
+    Perform the same operation as fmpz::fmpz_multi_crt_precomp using supplied temporary space.
+    The actual output is placed in ``outputs + 0``, and ``outputs`` should contain space for all temporaries and should be at least as long as ``_fmpz_multi_crt_local_size(CRT)``.
 
 
 Primality testing

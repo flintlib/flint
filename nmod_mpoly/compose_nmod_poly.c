@@ -12,16 +12,6 @@
 #include "nmod_mpoly.h"
 
 
-void
-nmod_poly_init_mod(nmod_poly_t poly, nmod_t mod)
-{
-    poly->coeffs = NULL;
-    poly->alloc = 0;
-    poly->length = 0;
-    poly->mod = mod;
-}
-
-
 /*
     Given a polynomial tree with exponents stored in the keys and
     coefficients stored in the data member,
@@ -128,12 +118,12 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        mp_bitcnt_t varibits;
+        flint_bitcnt_t varibits;
 
         if (i == main_var)
             continue;
 
-        mpoly_gen_offset_shift(&off, &shift, i, N, bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
         varibits = FLINT_BIT_COUNT(degrees[i]);
         for (j = 0; j < varibits; j++)
         {
@@ -151,7 +141,7 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
     FLINT_ASSERT(k_len == entries);
 
     /* accumulate coefficients of the main variable */
-    mpoly_gen_offset_shift(&main_off, &main_shift, main_var, N, bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&main_off, &main_shift, main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     nmod_poly_init_mod(t, ctx->ffinfo->mod);
     nmod_poly_init_mod(t2, ctx->ffinfo->mod);
@@ -263,7 +253,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
     fmpz * degrees;
     slong * offs;
     ulong * masks;
-    mp_bitcnt_t * bitcounts;
+    flint_bitcnt_t * bitcounts;
     fmpz_t s;
     nmod_poly_struct * powers;
     nmod_poly_t t, t2;
@@ -280,7 +270,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
 
     TMP_START;
 
-    bitcounts = (mp_bitcnt_t * ) TMP_ALLOC(nvars*sizeof(mp_bitcnt_t));
+    bitcounts = (flint_bitcnt_t * ) TMP_ALLOC(nvars*sizeof(flint_bitcnt_t));
     degrees = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
     for (i = 0; i < nvars; i++)
     {
@@ -318,7 +308,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
         if (i == main_var)
             continue;
 
-        off = mpoly_gen_offset_mp(i, N, bits, ctx->minfo);
+        off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
 
         for (l = 0; l < bitcounts[i]; l++)
         {
@@ -338,7 +328,7 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
     FLINT_ASSERT(k_len == entries);
 
     /* accumulate coefficients of the main variable */
-    main_off = mpoly_gen_offset_mp(main_var, N, bits, ctx->minfo);
+    main_off = mpoly_gen_offset_mp(main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     nmod_poly_init_mod(t, ctx->ffinfo->mod);
     nmod_poly_init_mod(t2, ctx->ffinfo->mod);

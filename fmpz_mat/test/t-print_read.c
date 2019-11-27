@@ -98,6 +98,9 @@ int main(void)
             }
 
             fclose(out);
+            for (i = 0; i < k; ++i)
+                fmpz_mat_clear(M[i]);
+            flint_free(M);
             exit(0);
         }
         else  /* Parent process */

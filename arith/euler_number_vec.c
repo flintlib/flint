@@ -52,7 +52,7 @@ void __euler_number_vec_multi_mod(fmpz * res, slong n)
     mp_ptr temppoly;
     nmod_t mod;
     slong i, j, k, m, num_primes, num_primes_k, resolution;
-    mp_bitcnt_t size, prime_bits;
+    flint_bitcnt_t size, prime_bits;
 
     if (n < 1)
         return;

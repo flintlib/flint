@@ -206,9 +206,14 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
 }
 
 
-void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
-                               const ulong * mults, const fmpz_mpoly_ctx_t ctx)
+void _fmpz_mpoly_mul_array_chunked_threaded_LEX(
+    fmpz_mpoly_t P,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const ulong * mults,
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong nvars = ctx->minfo->nvars;
     slong Pi, i, j, Plen, Pl, Al, Bl, array_size;
@@ -218,8 +223,6 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
     _base_t base;
     _worker_arg_struct * args;
     _chunk_struct * Pchunks;
-    slong max_num_workers, num_workers;
-    thread_pool_handle * handles;
     slong * perm;
     TMP_INIT;
 
@@ -232,37 +235,17 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
     Al = 1 + (slong) (A->exps[0] >> (A->bits*(nvars - 1)));
     Bl = 1 + (slong) (B->exps[0] >> (B->bits*(nvars - 1)));
 
-    /* bail here if no workers */
-    FLINT_ASSERT(global_thread_pool_initialized);
-    max_num_workers = thread_pool_get_size(global_thread_pool);
-    max_num_workers = FLINT_MIN(max_num_workers, 1 + (Al + Bl)/2);
-    if (max_num_workers == 0)
-    {
-        _fmpz_mpoly_mul_array_chunked_LEX(P, A, B, mults, ctx);
-        return;
-    }
-    handles = (thread_pool_handle *) flint_malloc(max_num_workers
-                                                  *sizeof(thread_pool_handle));
-    num_workers = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_workers);
-    if (num_workers == 0)
-    {
-        flint_free(handles);
-        _fmpz_mpoly_mul_array_chunked_LEX(P, A, B, mults, ctx);
-        return;
-    }
-
     TMP_START;
 
     /* compute indices and lengths of coefficients of polys in main variable */
-    Amain = (slong *) TMP_ALLOC((Al + 1)*sizeof(slong));
-    Bmain = (slong *) TMP_ALLOC((Bl + 1)*sizeof(slong));
-    Asum  = (slong *) TMP_ALLOC(Al*sizeof(slong));
-    Amax  = (slong *) TMP_ALLOC(Al*sizeof(slong));
-    Bsum  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
-    Bmax  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
-    Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
-    Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
+    Amain = (slong *) TMP_ALLOC(((Al + 1) + Al + Al + (Bl + 1) + Bl + Bl)*sizeof(slong));
+    Asum  = Amain + Al + 1;
+    Amax  = Asum + Al;
+    Bmain = Amax + Al;
+    Bsum  = Bmain + Bl + 1;
+    Bmax  = Bsum + Bl;
+    Apexp = (ulong *) flint_malloc(A->length*sizeof(ulong));
+    Bpexp = (ulong *) flint_malloc(B->length*sizeof(ulong));
     mpoly_main_variable_split_LEX(Amain, Apexp, A->exps, Al, A->length,
                                                     mults, nvars - 1, A->bits);
     mpoly_main_variable_split_LEX(Bmain, Bpexp, B->exps, Bl, B->length,
@@ -312,7 +295,7 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
         }
     }
 
-    base->nthreads = num_workers + 1;
+    base->nthreads = num_handles + 1;
     base->Al = Al;
     base->Bl = Bl;
     base->Pl = Pl;
@@ -337,25 +320,22 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
                                                   *sizeof(_worker_arg_struct));
 
     pthread_mutex_init(&base->mutex, NULL);
-    for (i = 0; i < num_workers; i++)
+    for (i = 0; i < num_handles; i++)
     {
         args[i].idx = i;
         args[i].base = base;
         thread_pool_wake(global_thread_pool, handles[i],
                           _fmpz_mpoly_mul_array_threaded_worker_LEX, &args[i]);
     }
-    i = num_workers;
+    i = num_handles;
     args[i].idx = i;
     args[i].base = base;
     _fmpz_mpoly_mul_array_threaded_worker_LEX(&args[i]);
-    for (i = 0; i < num_workers; i++)
+    for (i = 0; i < num_handles; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i]);
-        thread_pool_give_back(global_thread_pool, handles[i]);
     }
     pthread_mutex_destroy(&base->mutex);
-
-    flint_free(handles);
 
     /* join answers */
     Plen = 0;
@@ -375,15 +355,21 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(fmpz_mpoly_t P,
         flint_free((Pchunks + Pi)->poly->exps);
     }
 
-    TMP_END;
     _fmpz_mpoly_set_length(P, Plen, ctx);
+
+    flint_free(Apexp);
+    flint_free(Bpexp);
+    TMP_END;
 }
 
 
-int _fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
-                                 const fmpz_mpoly_t B, fmpz * maxBfields,
-                                 const fmpz_mpoly_t C, fmpz * maxCfields,
-                                                    const fmpz_mpoly_ctx_t ctx)
+int _fmpz_mpoly_mul_array_threaded_LEX(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_t B, fmpz * maxBfields,
+    const fmpz_mpoly_t C, fmpz * maxCfields,
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong i, exp_bits, array_size;
     ulong max, * mults;
@@ -399,11 +385,6 @@ int _fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
     FLINT_ASSERT(1 == mpoly_words_per_exp(C->bits, ctx->minfo));
 
     TMP_START;
-
-    if (!global_thread_pool_initialized)
-    {
-        return _fmpz_mpoly_mul_array_LEX(A, B, maxBfields, C, maxCfields, ctx);
-    }
 
     /* compute maximum exponents for each variable */
     mults = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
@@ -455,7 +436,8 @@ int _fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
         fmpz_mpoly_init2(T, B->length + C->length - 1, ctx);
         fmpz_mpoly_fit_bits(T, exp_bits, ctx);
         T->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_LEX(T, C, B, mults, ctx);
+        _fmpz_mpoly_mul_array_chunked_threaded_LEX(T, C, B, mults, ctx,
+                                                         handles, num_handles);
         fmpz_mpoly_swap(T, A, ctx);
         fmpz_mpoly_clear(T, ctx);
     }
@@ -464,7 +446,8 @@ int _fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
         fmpz_mpoly_fit_length(A, B->length + C->length - 1, ctx);
         fmpz_mpoly_fit_bits(A, exp_bits, ctx);
         A->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_LEX(A, C, B, mults, ctx);
+        _fmpz_mpoly_mul_array_chunked_threaded_LEX(A, C, B, mults, ctx,
+                                                         handles, num_handles);
     }
     success = 1;
 
@@ -631,9 +614,14 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
 
 
 
-void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
-                                        ulong degb, const fmpz_mpoly_ctx_t ctx)
+void _fmpz_mpoly_mul_array_chunked_threaded_DEG(
+    fmpz_mpoly_t P,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    ulong degb,
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong nvars = ctx->minfo->nvars;
     slong Pi, i, j, Plen, Pl, Al, Bl, array_size;
@@ -644,8 +632,6 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
     _worker_arg_struct * args;
     _chunk_struct * Pchunks;
     slong * perm;
-    slong max_num_workers, num_workers;
-    thread_pool_handle * handles;
     TMP_INIT;
 
     /* compute lengths of poly2 and poly3 in chunks */
@@ -657,37 +643,17 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
         array_size *= degb;
     }
 
-    /* bail here if no workers */
-    FLINT_ASSERT(global_thread_pool_initialized);
-    max_num_workers = thread_pool_get_size(global_thread_pool);
-    max_num_workers = FLINT_MIN(max_num_workers, 1 + (Al + Bl)/2);
-    if (max_num_workers == 0)
-    {
-        _fmpz_mpoly_mul_array_chunked_DEG(P, A, B, degb, ctx);
-        return;
-    }
-    handles = (thread_pool_handle *) flint_malloc(max_num_workers
-                                                  *sizeof(thread_pool_handle));
-    num_workers = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_workers);
-    if (num_workers == 0)
-    {
-        flint_free(handles);
-        _fmpz_mpoly_mul_array_chunked_DEG(P, A, B, degb, ctx);
-        return;
-    }
-
     TMP_START;
 
     /* compute indices and lengths of coefficients of polys in main variable */
-    Amain = (slong *) TMP_ALLOC((Al + 1)*sizeof(slong));
-    Bmain = (slong *) TMP_ALLOC((Bl + 1)*sizeof(slong));
-    Asum  = (slong *) TMP_ALLOC(Al*sizeof(slong));
-    Amax  = (slong *) TMP_ALLOC(Al*sizeof(slong));
-    Bsum  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
-    Bmax  = (slong *) TMP_ALLOC(Bl*sizeof(slong));
-    Apexp = (ulong *) TMP_ALLOC(A->length*sizeof(ulong));
-    Bpexp = (ulong *) TMP_ALLOC(B->length*sizeof(ulong));
+    Amain = (slong *) TMP_ALLOC(((Al + 1) + Al + Al + (Bl + 1) + Bl + Bl)*sizeof(slong));
+    Asum  = Amain + Al + 1;
+    Amax  = Asum + Al;
+    Bmain = Amax + Al;
+    Bsum  = Bmain + Bl + 1;
+    Bmax  = Bsum + Bl;
+    Apexp = (ulong *) flint_malloc(A->length*sizeof(ulong));
+    Bpexp = (ulong *) flint_malloc(B->length*sizeof(ulong));
     mpoly_main_variable_split_DEG(Amain, Apexp, A->exps, Al, A->length,
                                                          degb, nvars, A->bits);
     mpoly_main_variable_split_DEG(Bmain, Bpexp, B->exps, Bl, B->length,
@@ -738,7 +704,7 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
         }
     }
 
-    base->nthreads = num_workers + 1;
+    base->nthreads = num_handles + 1;
     base->Al = Al;
     base->Bl = Bl;
     base->Pl = Pl;
@@ -764,7 +730,7 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
                                                   *sizeof(_worker_arg_struct));
 
     pthread_mutex_init(&base->mutex, NULL);
-    for (i = 0; i < num_workers; i++)
+    for (i = 0; i < num_handles; i++)
     {
         args[i].idx = i;
         args[i].base = base;
@@ -772,18 +738,15 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
         thread_pool_wake(global_thread_pool, handles[i],
                           _fmpz_mpoly_mul_array_threaded_worker_DEG, &args[i]);
     }
-    i = num_workers;
+    i = num_handles;
     args[i].idx = i;
     args[i].base = base;
     _fmpz_mpoly_mul_array_threaded_worker_DEG(&args[i]);
-    for (i = 0; i < num_workers; i++)
+    for (i = 0; i < num_handles; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i]);
-        thread_pool_give_back(global_thread_pool, handles[i]);
     }
     pthread_mutex_destroy(&base->mutex);
-
-    flint_free(handles);
 
     /* join answers */
     Plen = 0;
@@ -803,15 +766,21 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(fmpz_mpoly_t P,
         flint_free((Pchunks + Pi)->poly->exps);
     }
 
-    TMP_END;
     _fmpz_mpoly_set_length(P, Plen, ctx);
+
+    flint_free(Apexp);
+    flint_free(Bpexp);
+    TMP_END;
 }
 
 
-int _fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
-                                 const fmpz_mpoly_t B, fmpz * maxBfields,
-                                 const fmpz_mpoly_t C, fmpz * maxCfields,
-                                                    const fmpz_mpoly_ctx_t ctx)
+int _fmpz_mpoly_mul_array_threaded_DEG(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_t B, fmpz * maxBfields,
+    const fmpz_mpoly_t C, fmpz * maxCfields,
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong i, exp_bits, array_size;
     ulong deg;
@@ -825,11 +794,6 @@ int _fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
 
     FLINT_ASSERT(1 == mpoly_words_per_exp(B->bits, ctx->minfo));
     FLINT_ASSERT(1 == mpoly_words_per_exp(C->bits, ctx->minfo));
-
-    if (!global_thread_pool_initialized)
-    {
-        return _fmpz_mpoly_mul_array_DEG(A, B, maxBfields, C, maxCfields, ctx);
-    }
 
     /* the field of index n-1 is the one that wil be pulled out */
     i = ctx->minfo->nfields - 1;
@@ -873,7 +837,8 @@ int _fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
         fmpz_mpoly_init2(T, B->length + C->length - 1, ctx);
         fmpz_mpoly_fit_bits(T, exp_bits, ctx);
         T->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_DEG(T, C, B, deg, ctx);
+        _fmpz_mpoly_mul_array_chunked_threaded_DEG(T, C, B, deg, ctx,
+                                                         handles, num_handles);
         fmpz_mpoly_swap(T, A, ctx);
         fmpz_mpoly_clear(T, ctx);
     }
@@ -882,7 +847,8 @@ int _fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
         fmpz_mpoly_fit_length(A, B->length + C->length - 1, ctx);
         fmpz_mpoly_fit_bits(A, exp_bits, ctx);
         A->bits = exp_bits;
-        _fmpz_mpoly_mul_array_chunked_threaded_DEG(A, C, B, deg, ctx);
+        _fmpz_mpoly_mul_array_chunked_threaded_DEG(A, C, B, deg, ctx,
+                                                         handles, num_handles);
     }
     success = 1;
 
@@ -892,13 +858,18 @@ cleanup:
 }
 
 
-
-int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                              const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_mul_array_threaded(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_t C,
+    const fmpz_mpoly_ctx_t ctx,
+    slong thread_limit)
 {
     slong i;
     int success;
     fmpz * maxBfields, * maxCfields;
+    thread_pool_handle * handles;
+    slong num_handles;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)
@@ -926,19 +897,35 @@ int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
     mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
 
+    handles = NULL;
+    num_handles = 0;
+    if (global_thread_pool_initialized)
+    {
+        slong max_num_handles;
+        max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                                   max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                     handles, max_num_handles);
+        }
+    }
+
     switch (ctx->minfo->ord)
     {
         case ORD_LEX:
         {
-            success = _fmpz_mpoly_mul_array_threaded_LEX(A, B, maxBfields,
-                                                           C, maxCfields, ctx);
+            success = _fmpz_mpoly_mul_array_threaded_LEX(A,
+                      B, maxBfields, C, maxCfields, ctx, handles, num_handles);
             break;
         }
         case ORD_DEGREVLEX:
         case ORD_DEGLEX:
         {
-            success = _fmpz_mpoly_mul_array_threaded_DEG(A, B, maxBfields,
-                                                           C, maxCfields, ctx);
+            success = _fmpz_mpoly_mul_array_threaded_DEG(A,
+                      B, maxBfields, C, maxCfields, ctx, handles, num_handles);
             break;
         }
         default:
@@ -946,6 +933,15 @@ int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B,
             success = 0;
             break;
         }
+    }
+
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
+    }
+    if (handles)
+    {
+        flint_free(handles);
     }
 
     for (i = 0; i < ctx->minfo->nfields; i++)

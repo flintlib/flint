@@ -15,7 +15,7 @@
 
 int
 fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
-                                 const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
+                                 const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 {
     return (gs_B !=
             NULL) ? ((fmpz_lll_is_reduced_d_with_removal(B, fl, gs_B, newd)

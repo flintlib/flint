@@ -18,6 +18,8 @@ fmpz_mat_solve(fmpz_mat_t X, fmpz_t den,
 {
     if (fmpz_mat_nrows(A) <= 3)
         return fmpz_mat_solve_cramer(X, den, A, B);
-    else
+    else if (fmpz_mat_nrows(A) <= 20 && fmpz_mat_ncols(A) <= 20)
         return fmpz_mat_solve_fflu(X, den, A, B);
+    else
+	return fmpz_mat_solve_dixon_den(X, den, A, B);
 }

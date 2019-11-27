@@ -312,10 +312,10 @@ FLINT_DLL void fq_zech_norm(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t 
 
 /* Bit packing ******************************************************/
 
-FLINT_DLL void fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, flint_bitcnt_t bit_size,
                  const fq_zech_ctx_t ctx);
 
-FLINT_DLL void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx);
 
 #ifdef T
@@ -324,7 +324,9 @@ FLINT_DLL void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit
 
 #define T fq_zech
 #define CAP_T FQ_ZECH
+#define B nmod
 #include "fq_templates.h"
+#undef B
 #undef CAP_T
 #undef T
     

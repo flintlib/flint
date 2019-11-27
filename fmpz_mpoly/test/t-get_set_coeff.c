@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2017 William Hart
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -27,7 +28,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
-        mp_bitcnt_t coeff_bits, exp_bits, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits, exp_bits2;
         slong len;
         fmpz_t c, d;
 
@@ -46,18 +47,19 @@ main(void)
 
         for (j = 0; j < 10; j++)
         {
-            fmpz * exp = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+            fmpz ** exp = (fmpz **) flint_malloc(ctx->minfo->nvars*sizeof(fmpz*));
 
             fmpz_randtest_unsigned(c, state, 200);
             for (k = 0; k < fmpz_mpoly_ctx_nvars(ctx); k++)
             {
-                fmpz_init(exp + k);
-                fmpz_randtest_unsigned(exp + k, state, exp_bits2);
+                exp[k] = (fmpz *) flint_malloc(sizeof(fmpz));
+                fmpz_init(exp[k]);
+                fmpz_randtest_unsigned(exp[k], state, exp_bits2);
             }
 
-            _fmpz_mpoly_set_coeff_fmpz_fmpz(f, c, exp, ctx);
+            fmpz_mpoly_set_coeff_fmpz_fmpz(f, c, exp, ctx);
             fmpz_mpoly_assert_canonical(f, ctx);
-            _fmpz_mpoly_get_coeff_fmpz_fmpz(d, f, exp, ctx);
+            fmpz_mpoly_get_coeff_fmpz_fmpz(d, f, exp, ctx);
             result = fmpz_equal(c, d);
 
             if (!result)
@@ -68,7 +70,10 @@ main(void)
             }
 
             for (k = 0; k < fmpz_mpoly_ctx_nvars(ctx); k++)
-                fmpz_clear(exp + k);
+            {
+                fmpz_clear(exp[k]);
+                flint_free(exp[k]);
+            }
 
             flint_free(exp);
         }
@@ -84,7 +89,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
         slong len;
         fmpz_t c, d;
 
@@ -128,8 +133,6 @@ main(void)
         fmpz_clear(d);
         fmpz_mpoly_ctx_clear(ctx);
     }
-
-
 
     FLINT_TEST_CLEANUP(state);
     

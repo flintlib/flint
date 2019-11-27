@@ -34,7 +34,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz * a, * b;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
         slong len, limbs;
         mp_limb_t ** ii, * ptr;
         slong i, bt;
@@ -75,7 +75,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz * a, * b;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
         slong len, limbs;
         mp_limb_t ** ii, * ptr;
         slong i, bt;

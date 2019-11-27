@@ -22,7 +22,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                mpf_mat_t mu, mpf_mat_t r, mpf * s,
                                mpf_mat_t appB, fmpz_gram_t A, int a, int zeros,
                                int kappamax, int n, mpf_t tmp, mpf_t rtmp,
-                               mp_bitcnt_t prec, const fmpz_lll_t fl)
+                               flint_bitcnt_t prec, const fmpz_lll_t fl)
 {
     if (fl->rt == Z_BASIS && fl->gt == APPROX)
     {

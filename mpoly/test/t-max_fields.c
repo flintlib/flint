@@ -65,7 +65,7 @@ main(void)
             /* FLINT_BITS => bits */
             mpoly_pack_vec_ui(b, a, bits, nfields, length);
 
-            mpoly_max_fields_ui(max2, b, length, bits, mctx);
+            mpoly_max_fields_ui_sp(max2, b, length, bits, mctx);
 
             for (i = 0; i < nfields; i++)
                 if (max[i] != max2[i])

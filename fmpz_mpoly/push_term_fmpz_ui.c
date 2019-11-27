@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018, 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,15 +11,12 @@
 
 #include "fmpz_mpoly.h"
 
-/*
-    emplaceterm clears c
-*/
-void _fmpz_mpoly_emplacebackterm_fmpz_ui(fmpz_mpoly_t A,
-                       fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+void _fmpz_mpoly_push_exp_ui(fmpz_mpoly_t A,
+                                 const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
     slong N;
     slong old_length = A->length;
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
 
     exp_bits = mpoly_exp_bits_required_ui(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
@@ -28,9 +25,7 @@ void _fmpz_mpoly_emplacebackterm_fmpz_ui(fmpz_mpoly_t A,
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
     fmpz_mpoly_fit_length(A, old_length + 1, ctx);
-    fmpz_swap(A->coeffs + old_length, c);
     A->length = old_length + 1;
-    fmpz_clear(c);
     mpoly_set_monomial_ui(A->exps + N*old_length, exp, A->bits, ctx->minfo);
 }
 
@@ -38,25 +33,21 @@ void _fmpz_mpoly_emplacebackterm_fmpz_ui(fmpz_mpoly_t A,
 void fmpz_mpoly_push_term_fmpz_ui(fmpz_mpoly_t A,
                  const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
-    fmpz_t C;
-    fmpz_init_set(C, c);
-    _fmpz_mpoly_emplacebackterm_fmpz_ui(A, C, exp, ctx);    
+    _fmpz_mpoly_push_exp_ui(A, exp, ctx);
+    fmpz_set(A->coeffs + A->length - 1, c);
 }
 
 void fmpz_mpoly_push_term_ui_ui(fmpz_mpoly_t A,
                         ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
-    fmpz_t C;
-    fmpz_init_set_ui(C, c);
-    _fmpz_mpoly_emplacebackterm_fmpz_ui(A, C, exp, ctx);    
+    _fmpz_mpoly_push_exp_ui(A, exp, ctx);
+    fmpz_set_ui(A->coeffs + A->length - 1, c);
 }
 
 void fmpz_mpoly_push_term_si_ui(fmpz_mpoly_t A,
                         slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
-    fmpz_t C;
-    fmpz_init(C);
-    fmpz_set_si(C, c);
-    _fmpz_mpoly_emplacebackterm_fmpz_ui(A, C, exp, ctx);    
+    _fmpz_mpoly_push_exp_ui(A, exp, ctx);
+    fmpz_set_si(A->coeffs + A->length - 1, c);
 }
 

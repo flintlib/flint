@@ -24,7 +24,7 @@
 #define ncases 2
 
 int
-get_timings(double* s, slong degree, mp_bitcnt_t bits, slong length)
+get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
 {
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, poly_t) f, *h, finv;
@@ -236,7 +236,7 @@ void write_array(fmpz_mat_t array, char * filename)
 int
 main(int argc, char** argv)
 {
-    mp_bitcnt_t bits, max_bits, max_bits_used, max_bits_e;
+    flint_bitcnt_t bits, max_bits, max_bits_used, max_bits_e;
     int is_hit, bigger_length;
     slong degree, length, max_degree, max_length, imin, imax, imid, diff;
     fmpz_mat_t array;

@@ -13,9 +13,9 @@
 #include "flint.h"
 #include "fft.h"
       
-void fft_adjust(mp_limb_t * r, mp_limb_t * i1, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+void fft_adjust(mp_limb_t * r, mp_limb_t * i1, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
 {
-   mp_bitcnt_t b1;
+   flint_bitcnt_t b1;
    mp_limb_t cy;
    mp_size_t x;
 

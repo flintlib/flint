@@ -15,7 +15,7 @@
 #include "fmpz.h"
 
 #ifdef POPCNT_INTRINSICS
-static __inline__ mp_bitcnt_t shortCount(slong val)
+static __inline__ flint_bitcnt_t shortCount(slong val)
 {
 #if defined(_WIN64) || defined(__mips64)
    return __builtin_popcountll(val);  
@@ -26,9 +26,9 @@ static __inline__ mp_bitcnt_t shortCount(slong val)
 #else
 /* A naive implementation if neither your processor nor your compiler want to
  * do the work. */
-static __inline__ mp_bitcnt_t shortCount(slong val)
+static __inline__ flint_bitcnt_t shortCount(slong val)
 {
-        mp_bitcnt_t cnt;
+        flint_bitcnt_t cnt;
         for(cnt=0; val; val >>= 1) {
                 cnt += val & 1;
         }
@@ -36,7 +36,7 @@ static __inline__ mp_bitcnt_t shortCount(slong val)
 }
 #endif
 
-mp_bitcnt_t fmpz_popcnt(const fmpz_t c)
+flint_bitcnt_t fmpz_popcnt(const fmpz_t c)
 {
         fmpz c1;
         c1 = *c;

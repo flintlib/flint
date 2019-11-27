@@ -37,10 +37,10 @@ void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, mp_limb_t * jj, mp_s
 }
 
 void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, 
-                 mp_size_t r_limbs, mp_bitcnt_t depth, mp_bitcnt_t w)
+                 mp_size_t r_limbs, flint_bitcnt_t depth, flint_bitcnt_t w)
 {
    mp_size_t n = (UWORD(1)<<depth);
-   mp_bitcnt_t bits1 = (r_limbs*FLINT_BITS)/(2*n);
+   flint_bitcnt_t bits1 = (r_limbs*FLINT_BITS)/(2*n);
    
    mp_size_t limb_add, limbs = (n*w)/FLINT_BITS;
    mp_size_t size = limbs + 1;
@@ -166,7 +166,7 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 {
    mp_size_t bits = n*w;
    mp_size_t limbs = bits/FLINT_BITS;
-   mp_bitcnt_t depth1, depth = 1;
+   flint_bitcnt_t depth1, depth = 1;
 
    mp_size_t w1, off;
 

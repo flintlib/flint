@@ -11,8 +11,10 @@
 
 #include "mpoly.h"
 
+/* !!! this file DOES need to change with new orderings */
 
-void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx)
+/* get the (unpacked) fields for the generator of index var */
+void mpoly_gen_fields_ui(ulong * gexp, slong var, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong nfields = mctx->nfields;
@@ -21,15 +23,15 @@ void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx)
     slong i;
 
     for (i = 0; i < nfields; i++)
-        exp[i] = WORD(0);
+        gexp[i] = WORD(0);
 
-    exp[rev ? var : nvars - 1 - var] = WORD(1);
+    gexp[rev ? var : nvars - 1 - var] = WORD(1);
     if (deg)
-        exp[nvars] = WORD(1);
+        gexp[nvars] = WORD(1);
 
 }
 
-void mpoly_gen_fields_fmpz(fmpz * exp, slong var, const mpoly_ctx_t mctx)
+void mpoly_gen_fields_fmpz(fmpz * gexp, slong var, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong nfields = mctx->nfields;
@@ -38,10 +40,10 @@ void mpoly_gen_fields_fmpz(fmpz * exp, slong var, const mpoly_ctx_t mctx)
     slong i;
 
     for (i = 0; i < nfields; i++)
-        fmpz_zero(exp + i);
+        fmpz_zero(gexp + i);
 
-    fmpz_set_ui(exp + (rev ? var : nvars - 1 - var), WORD(1));
+    fmpz_one(gexp + (rev ? var : nvars - 1 - var));
     if (deg)
-        fmpz_set_ui(exp + nvars, WORD(1));
+        fmpz_one(gexp + nvars);
 }
 

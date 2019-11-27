@@ -23,12 +23,12 @@ Randomisation
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_vec_randtest(fmpz * f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void _fmpz_vec_randtest(fmpz * f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets the entries of a vector of the given length to random integers with 
     up to the given number of bits per entry.
 
-.. function:: void _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets the entries of a vector of the given length to random unsigned 
     integers with up to the given number of bits per entry.

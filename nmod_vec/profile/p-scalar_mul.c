@@ -18,7 +18,7 @@
 
 typedef struct
 {
-   mp_bitcnt_t bits;
+   flint_bitcnt_t bits;
    slong length;
 } info_t;
 
@@ -27,7 +27,7 @@ void sample(void * arg, ulong count)
    mp_limb_t n, c;
    nmod_t mod;
    info_t * info = (info_t *) arg;
-   mp_bitcnt_t bits = info->bits;
+   flint_bitcnt_t bits = info->bits;
    slong length = info->length;
    slong i, j;
    mp_ptr vec = _nmod_vec_init(length);
@@ -60,7 +60,7 @@ int main(void)
 {
    double min1, min2, max;
    info_t info;
-   mp_bitcnt_t i;
+   flint_bitcnt_t i;
 
    for (i = 2; i <= FLINT_BITS; i++)
    {

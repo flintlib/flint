@@ -93,6 +93,26 @@ typedef struct
 typedef fmpq_mpoly_struct fmpq_mpoly_t[1];
 
 
+FMPQ_MPOLY_INLINE
+fmpq * fmpq_mpoly_content_ref(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+{
+    return A->content;
+}
+
+FMPQ_MPOLY_INLINE
+fmpz_mpoly_struct * fmpq_mpoly_zpoly_ref(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+{
+    return A->zpoly;
+}
+
+FMPQ_MPOLY_INLINE
+fmpz * fmpq_mpoly_zpoly_term_coeff_ref(fmpq_mpoly_t A, slong i,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(i < A->zpoly->length);
+    return A->zpoly->coeffs + i;
+}
+
 /*  Memory management ********************************************************/
 
 FMPQ_MPOLY_INLINE
@@ -111,7 +131,7 @@ void fmpq_mpoly_init2(fmpq_mpoly_t A, slong alloc,
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_init3(fmpq_mpoly_t A, slong alloc, mp_bitcnt_t bits,
+void fmpq_mpoly_init3(fmpq_mpoly_t A, slong alloc, flint_bitcnt_t bits,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_init(A->content);
@@ -142,7 +162,7 @@ void fmpq_mpoly_clear(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_fit_bits(fmpq_mpoly_t A,
-                                  mp_bitcnt_t bits, const fmpq_mpoly_ctx_t ctx)
+                                  flint_bitcnt_t bits, const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_fit_bits(A->zpoly, bits, ctx->zctx);
 }
@@ -344,7 +364,7 @@ slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A,
 /* Coefficients **************************************************************/
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_denominator(fmpz_t d, const fmpq_mpoly_t A,
+void fmpq_mpoly_get_denominator(fmpz_t d, const fmpq_mpoly_t A,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_set(d, fmpq_denref(A->content));
@@ -375,6 +395,15 @@ FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t A,
 
 FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t A,
                                 const ulong * exp, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_get_coeff_vars_ui(fmpq_mpoly_t C, const fmpq_mpoly_t A,
+                                   slong * vars, ulong * exps, slong length,
+                                                   const fmpq_mpoly_ctx_t ctx);
+
+/* comparison ****************************************************************/
+
+FLINT_DLL int fmpq_mpoly_cmp(const fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                                   const fmpq_mpoly_ctx_t ctx);
 
 
 /* container operations ******************************************************/
@@ -419,19 +448,20 @@ int fmpq_mpoly_term_exp_fits_si(const fmpq_mpoly_t A,
                                           A->zpoly->bits, i, ctx->zctx->minfo);
 }
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_get_term_exp_fmpz(fmpz ** exps, const fmpq_mpoly_t A,
-                                           slong i, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_get_term_exp_fmpz(exps, A->zpoly, i, ctx->zctx);
-}
+FLINT_DLL void fmpq_mpoly_get_term_exp_fmpz(fmpz ** exps, const fmpq_mpoly_t A,
+                                          slong i, const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_get_term_exp_ui(ulong * exps, const fmpq_mpoly_t A,
-                                          slong i, const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_get_term_exp_ui(exps, A->zpoly, i, ctx->zctx);
-}
+FLINT_DLL void fmpq_mpoly_get_term_exp_ui(ulong * exps, const fmpq_mpoly_t A,
+                                          slong i, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_get_term_exp_si(slong * exps, const fmpq_mpoly_t A,
+                                          slong i, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL ulong fmpq_mpoly_get_term_var_exp_ui(const fmpq_mpoly_t A,
+                               slong i, slong var, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL slong fmpq_mpoly_get_term_var_exp_si(const fmpq_mpoly_t A,
+                               slong i, slong var, const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_set_term_exp_fmpz(fmpq_mpoly_t A,
@@ -446,6 +476,12 @@ void fmpq_mpoly_set_term_exp_ui(fmpq_mpoly_t A,
 {
     fmpz_mpoly_set_term_exp_ui(A->zpoly, i, exps, ctx->zctx);
 }
+
+FLINT_DLL void fmpq_mpoly_get_term(fmpq_mpoly_t M, const fmpq_mpoly_t A,
+                                          slong i, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpq_mpoly_get_term_monomial(fmpq_mpoly_t M, const fmpq_mpoly_t A,
+                                          slong i, const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpq_mpoly_push_term_fmpq_fmpz(fmpq_mpoly_t A,
                const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
@@ -492,18 +528,15 @@ FLINT_DLL void fmpq_mpoly_reverse(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 FLINT_DLL void fmpq_mpoly_assert_canonical(const fmpq_mpoly_t poly,
                                                    const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_ui(fmpq_mpoly_t poly,
-                       fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpq_mpoly_emplacebackterm_fmpq_fmpz(fmpq_mpoly_t poly,
-                     fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void _fmpq_mpoly_push_rescale(fmpq_mpoly_t A,
+                                         fmpq_t C, const fmpq_mpoly_ctx_t ctx);
 
 
 /* Random generation *********************************************************/
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, ulong * exp_bounds,
+                   slong length, flint_bitcnt_t coeff_bits, ulong * exp_bounds,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_randtest_bounds(A->zpoly, state,
@@ -514,7 +547,7 @@ void fmpq_mpoly_randtest_bounds(fmpq_mpoly_t A, flint_rand_t state,
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
+                   slong length, flint_bitcnt_t coeff_bits, ulong exp_bound,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_randtest_bound(A->zpoly, state,
@@ -525,7 +558,7 @@ void fmpq_mpoly_randtest_bound(fmpq_mpoly_t A, flint_rand_t state,
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_randtest_bits(fmpq_mpoly_t A, flint_rand_t state,
-                   slong length, mp_bitcnt_t coeff_bits, mp_bitcnt_t exp_bits,
+                   slong length, flint_bitcnt_t coeff_bits, flint_bitcnt_t exp_bits,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_randtest_bits(A->zpoly, state,
@@ -673,26 +706,30 @@ FLINT_DLL void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** q, fmpq_mpoly_t r,
 
 /* GCD ***********************************************************************/
 
+FMPQ_MPOLY_INLINE
+void fmpq_mpoly_content(fmpq_t g, const fmpq_mpoly_t A,
+                                                    const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_abs(g, A->content);
+}
+
 FLINT_DLL void fmpq_mpoly_term_content(fmpq_mpoly_t M, const fmpq_mpoly_t A,
                                                    const fmpq_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A,
                              const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
-/*
-not implemented yet
-FLINT_DLL void fmpq_mpoly_resultant(fmpq_mpoly_t poly1,
-                const fmpq_mpoly_t poly2, const fmpq_mpoly_t poly3,
-                                        slong var, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_discriminant(fmpq_mpoly_t poly1,
-              const fmpq_mpoly_t poly2, slong var, const fmpq_mpoly_ctx_t ctx);
-*/
+FLINT_DLL void fmpq_mpoly_inflate(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+          const fmpz * shift, const fmpz * stride, const fmpq_mpoly_ctx_t ctx);
 
 /******************************************************************************
 
    Internal functions (guaranteed to change without notice)
 
 ******************************************************************************/
+
+FLINT_DLL int fmpq_mpoly_repack_bits(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                flint_bitcnt_t Abits, const fmpq_mpoly_ctx_t ctx);
 
 /* geobuckets ****************************************************************/
 typedef struct fmpq_mpoly_geobucket

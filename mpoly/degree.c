@@ -15,23 +15,50 @@
 
 
 slong mpoly_degree_si(const ulong * exps,
-                      slong len, slong bits, slong var, const mpoly_ctx_t mctx)
+                slong len, flint_bitcnt_t bits, slong var, const mpoly_ctx_t mctx)
 {
-    slong * degs, r;
-    TMP_INIT;
+    if (len == 0)
+        return -WORD(1);
 
-    TMP_START;
-    degs = (slong *) TMP_ALLOC(mctx->nvars*sizeof(slong));
-    mpoly_degrees_si(degs, exps, len, bits, mctx);
-    r = degs[var];
+    /* sometimes we don't have to look very far */
+    if (mctx->ord == ORD_LEX && var == 0)
+        len = 1;
 
-    TMP_END;
-    return r;
+    if (bits <= FLINT_BITS)
+    {
+        slong r;
+        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
+        slong offset, shift, N, i;
+
+        mpoly_gen_offset_shift_sp(&offset, &shift, var, bits, mctx);
+        N = mpoly_words_per_exp_sp(bits, mctx);
+
+        i = 0;
+        r = (exps[N*i + offset] >> shift) & mask;
+        for (i = 1; i < len; i++)
+        {
+            ulong k = (exps[N*i + offset] >> shift) & mask;
+            if (r < k)
+                r = k;
+        }
+        return r;
+    }
+    else
+    {
+        slong * degs, r;
+        TMP_INIT;
+        TMP_START;
+        degs = (slong *) TMP_ALLOC(mctx->nvars*sizeof(slong));
+        mpoly_degrees_si(degs, exps, len, bits, mctx);
+        r = degs[var];
+        TMP_END;
+        return r;
+    }
 }
 
 
 void mpoly_degree_fmpz(fmpz_t deg, const ulong * exps,
-                      slong len, slong bits, slong var, const mpoly_ctx_t mctx)
+                slong len, flint_bitcnt_t bits, slong var, const mpoly_ctx_t mctx)
 {
     slong i;
     fmpz * degs;

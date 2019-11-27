@@ -30,7 +30,7 @@ main(void)
         ordering_t ord;
         mp_limb_t modulus;
         slong nvars, len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
 
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -50,9 +50,9 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100) + 1;
 
-        exp_bits = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits1 = n_randint(state, FLINT_BITS - 2) + 1;
-        exp_bits2 = n_randint(state, FLINT_BITS - 2) + 1;
+        exp_bits = n_randint(state, 200) + 1;
+        exp_bits1 = n_randint(state, 200) + 1;
+        exp_bits2 = n_randint(state, 200) + 1;
 
         for (j = 0; j < 4; j++)
         {

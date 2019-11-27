@@ -23,6 +23,7 @@
 #endif
 
 #include "nmod_poly.h"
+#include "nmod_mat.h"
 #include "ulong_extras.h"
 
 /* Data types and context ****************************************************/
@@ -404,10 +405,10 @@ FLINT_DLL void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t 
 
 /* Bit packing ******************************************************/
 
-FLINT_DLL void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit_size,
                  const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_nmod_ctx_t ctx);
 
 #ifdef T
@@ -416,7 +417,9 @@ FLINT_DLL void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit
 
 #define T fq_nmod
 #define CAP_T FQ_NMOD
+#define B nmod
 #include "fq_templates.h"
+#undef B
 #undef CAP_T
 #undef T
 

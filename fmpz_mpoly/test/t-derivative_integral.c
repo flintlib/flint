@@ -17,6 +17,7 @@ int
 main(void)
 {
     int i, j, result;
+    slong tmul = 5;
     FLINT_TEST_INIT(state);
 
     flint_printf("derivative/integral....");
@@ -37,9 +38,9 @@ main(void)
         result = fmpz_mpoly_set_str_pretty(f, "-2*x^2*(y+z)+z*y^126", vars, ctx);
         if (result)
         {
-                printf("FAIL\n");
-                flint_printf("set_str_pretty\n");
-                flint_abort();
+            printf("FAIL\n");
+            flint_printf("set_str_pretty\n");
+            flint_abort();
         }
 
         fmpz_mpoly_integral(g, s, f, 1, ctx);
@@ -49,9 +50,9 @@ main(void)
         result = fmpz_mpoly_equal(f, g, ctx);
         if (!result)
         {
-                printf("FAIL\n");
-                flint_printf("manual integral check\n");
-                flint_abort();
+            printf("FAIL\n");
+            flint_printf("manual integral check\n");
+            flint_abort();
         }
 
         fmpz_clear(s);
@@ -59,10 +60,8 @@ main(void)
         fmpz_mpoly_clear(g, ctx);
     }
 
-
-
     /* Check d(f*g) = df*g + f*dg */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, fp, gp, hp, t1, t2;
@@ -142,7 +141,7 @@ main(void)
 
 
     /* Check d(f*g) = df*g + f*dg with aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h, fp, gp, t1, t2;
@@ -224,7 +223,7 @@ main(void)
     }
 
     /* Check d(int(f)) = f with aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, f1;

@@ -67,6 +67,27 @@ Basic assignment and manipulation
     and zeroes elsewhere. If ``mat`` is nonsquare, it is set to the
     truncation of a unit matrix.
 
+.. function:: void fmpz_mat_swap_rows(fmpz_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: void fmpz_mat_swap_cols(fmpz_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
+
+.. function:: void fmpz_mat_invert_rows(fmpz_mat_t, slong * perm)
+    
+    Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
+    ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: void fmpz_mat_invert_cols(fmpz_mat_t, slong * perm)
+    
+    Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
+    ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
 
 Window
 --------------------------------------------------------------------------------
@@ -90,18 +111,18 @@ Random matrix generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     Sets the entries of ``mat`` to random signed integers whose absolute 
     values have the given number of binary bits.
 
-.. function:: void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     Sets the entries of ``mat`` to random signed integers whose 
     absolute values have a random number of bits up to the given number 
     of bits inclusive.
 
-.. function:: void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     Sets ``mat`` to be a random \emph{integer relations} matrix, with 
     signed entries up to the given number of bits.
@@ -111,7 +132,7 @@ Random matrix generation
     in the left hand column and an identity matrix in the remaining square 
     submatrix.
 
-.. function:: void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+.. function:: void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, flint_bitcnt_t bits2)
 
     Sets ``mat`` to a random \emph{simultaneous diophantine} matrix.
 
@@ -121,7 +142,7 @@ Random matrix generation
     Running down the rest of the diagonal are the values ``2^bits`` with 
     all remaining entries zero.
 
-.. function:: void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q)
+.. function:: void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
     Sets a square matrix ``mat`` of even dimension to a random 
     \emph{NTRU like} matrix.
@@ -134,7 +155,7 @@ Random matrix generation
     number of bits. Then entry `(i, j)` of the submatrix is set to 
     `h[i + j \bmod{r/2}]`. 
 
-.. function:: void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q)
+.. function:: void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
     Sets a square matrix ``mat`` of even dimension to a random 
     \emph{NTRU like} matrix.
@@ -165,7 +186,7 @@ Random matrix generation
     The return value is `0` or `1` depending on whether the permutation is
     even or odd.
 
-.. function:: void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, mp_bitcnt_t bits)
+.. function:: void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, flint_bitcnt_t bits)
 
     Sets ``mat`` to a random sparse matrix with the given rank, 
     having exactly as many non-zero elements as the rank, with the 
@@ -308,9 +329,17 @@ Concatenate
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2) Sets \code{res} to vertical concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $k \times n$, \code{res} : $(m + k) \times n$.
+.. function:: void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
-.. function:: void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2) Sets \code{res} to horizontal concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $m \times k$, \code{res}  : $m \times (n + k)$.
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``)
+    in that order. Matrix dimensions : ``mat1`` : `m \times n`,
+    ``mat2`` : `k \times n`, ``res`` : ``(m + k) \times n`.
+
+.. function:: void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
+
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``)
+    in that order. Matrix dimensions : ``mat1`` : `m \times n`,
+    ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
 
 
 Modular reduction and reconstruction
@@ -489,7 +518,7 @@ Matrix multiplication
     `C` is not allowed to be aliased with `A` or `B`. Uses Strassen
     multiplication (the Strassen-Winograd variant).
 
-.. function:: void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, mp_bitcnt_t bits)
+.. function:: void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, flint_bitcnt_t bits)
 
 .. function:: void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
@@ -850,6 +879,31 @@ allowed between arguments.
 
     Aliasing between input and output matrices is allowed.
 
+
+FLINT_DLL void
+_fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
+                     const fmpz_mat_t A, const fmpz_mat_t B,
+                                 const nmod_mat_t Ainv, mp_limb_t p,
+                                               const fmpz_t N, const fmpz_t D)
+
+    Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}` using a 
+    ``p``-adic algorithm for the supplied prime ``p``. The values ``N`` and
+    ``D`` are absolute value bounds for the numerator and denominator of the
+    solution.
+
+    Uses the Dixon lifting algorithm with early termination once the lifting
+    stabilises.
+
+.. function:: int
+fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
+                                       const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.                            Returns 1 if `A` is nonsingular and 0 if `A` is singular.                                 The computed denominator will not generally be minimal.
+
+    Uses the Dixon lifting algorithm with early termination once the lifting
+    stabilises.
 
 Row reduction
 --------------------------------------------------------------------------------

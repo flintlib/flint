@@ -14,13 +14,13 @@
 #include "fmpz_vec.h"
 
 void _fmpz_factor_randtest(fmpz_factor_t f, flint_rand_t state,
-        slong num, mp_bitcnt_t bits);
+        slong num, flint_bitcnt_t bits);
 void _fmpz_factor_set(fmpz_factor_t z, const fmpz_factor_t x);
 int _fmpz_factor_equal(const fmpz_factor_t x, const fmpz_factor_t y);
 
 void
 _fmpz_factor_randtest(fmpz_factor_t f, flint_rand_t state,
-        slong num, mp_bitcnt_t bits)
+        slong num, flint_bitcnt_t bits)
 {
     slong i;
     ulong n;
@@ -119,7 +119,7 @@ int main(void)
         int i;
         fmpz_factor_t f, g;
         slong num;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
 
         bits = n_randint(state, 80) + 2;
         num = n_randint(state, 10);

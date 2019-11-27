@@ -139,7 +139,7 @@ int _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
         bits = polyA->bits;
         mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         N = mpoly_words_per_exp(bits, ctx->minfo);
-        mpoly_gen_offset_shift(&off, &shift, v, N, bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, v, bits, ctx->minfo);
 
         if (a_degs[v] != 0)
         {
@@ -151,7 +151,7 @@ int _fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t polyA,
         bits = polyB->bits;
         mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         N = mpoly_words_per_exp(bits, ctx->minfo);
-        mpoly_gen_offset_shift(&off, &shift, v, N, bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, v, bits, ctx->minfo);
 
         if (b_degs[v] != 0)
         {

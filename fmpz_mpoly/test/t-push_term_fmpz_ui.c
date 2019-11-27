@@ -19,7 +19,7 @@ main(void)
     slong i, j, k;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pushback_fmpz_ui....");
+    flint_printf("push_term_fmpz_ui....");
     fflush(stdout);
 
     /* Check pushback matches add */
@@ -27,7 +27,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f1, f2, m;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
         ulong * exp, * exp2;
         slong len, nvars;
         fmpz_t c, c2;

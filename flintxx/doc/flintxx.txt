@@ -200,9 +200,9 @@ slong Fmpz_expr::to<slong>() const
 
     Convert self to \code{slong}. See \code{fmpz_get_si}.
 
-slong Fmpz_expr::to<ulong>() const
+ulong Fmpz_expr::to<ulong>() const
 
-    Convert self to \code{ulong}. See \code{fmpz_get_si}.
+    Convert self to \code{ulong}. See \code{fmpz_get_ui}.
 
 double Fmpz_expr::to<double>() const
 

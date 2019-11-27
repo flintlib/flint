@@ -22,7 +22,7 @@ Randomisation
 --------------------------------------------------------------------------------
 
 
-.. function:: void _mpf_vec_randtest(mpf * f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void _mpf_vec_randtest(mpf * f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets the entries of a vector of the given length to random numbers in the 
     interval `[0, 1)` with ``bits`` significant bits in the mantissa or less if
@@ -56,7 +56,7 @@ Comparison
 
     Returns `1` if ``(vec, len)`` is zero, and `0` otherwise.
     
-.. function:: int _mpf_vec_approx_equal(const mpf * vec1, const mpf * vec2, slong len, mp_bitcnt_t bits)
+.. function:: int _mpf_vec_approx_equal(const mpf * vec1, const mpf * vec2, slong len, flint_bitcnt_t bits)
 
     Compares two vectors of the given length and returns `1` if the first
     ``bits`` bits of their entries are equal, otherwise returns `0`.
@@ -85,7 +85,7 @@ Scalar multiplication
     Multiplies the vector with given length by the scalar `c` and 
     sets ``res`` to the result.
 
-.. function:: void _mpf_vec_scalar_mul_2exp(mpf * res, const mpf * vec, slong len, mp_bitcnt_t exp)
+.. function:: void _mpf_vec_scalar_mul_2exp(mpf * res, const mpf * vec, slong len, flint_bitcnt_t exp)
 
     Multiplies the given vector of the given length by ``2^exp``.
 
@@ -104,14 +104,14 @@ Dot product and norm
     Sets ``res`` to the sqaure of the Euclidean norm of 
     ``(vec, len)``.
 
-.. function:: int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, mp_bitcnt_t prec)
+.. function:: int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec)
 
     Sets ``res`` to the dot product of ``(vec1, len2)`` with
     ``(vec2, len2)``. The temporary variable used has its precision
     set to be at least ``prec`` bits. Returns 0 if a probable
     cancellation is detected, and otherwise returns a non-zero value.
 
-.. function:: void _mpf_vec_norm2(mpf_t res, mpf * vec, slong len, mp_bitcnt_t prec)
+.. function:: void _mpf_vec_norm2(mpf_t res, mpf * vec, slong len, flint_bitcnt_t prec)
 
     Sets ``res`` to the sqaure of the Euclidean norm of 
     ``(vec, len)``. The temporary variable used has its precision

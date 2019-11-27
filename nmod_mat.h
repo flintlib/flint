@@ -31,6 +31,7 @@
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
+#include "fmpz.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -62,6 +63,9 @@ mp_limb_t * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
 {
    return mat->rows[i] + j;
 }
+
+/* See inlines.c */
+FLINT_DLL void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x);
 
 NMOD_MAT_INLINE
 slong nmod_mat_nrows(const nmod_mat_t mat)
@@ -153,6 +157,16 @@ FLINT_DLL void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 FLINT_DLL void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
 FLINT_DLL void nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X,
                                 const mp_limb_t b, const nmod_mat_t Y);
+NMOD_MAT_INLINE
+void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
+{
+    fmpz_t d;
+    fmpz_init(d);
+    fmpz_mod_ui(d, c, res->mod.n);
+    nmod_mat_scalar_mul(res, M, fmpz_get_ui(d));
+    fmpz_clear(d);
+}
+
 
 /* Matrix multiplication */
 
@@ -196,9 +210,9 @@ FLINT_DLL int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A);
 NMOD_MAT_INLINE
 void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
 {
-    if (r != s)
+    if (r != s && !nmod_mat_is_empty(mat))
     {
-        mp_ptr u;
+        mp_limb_t * u;
         slong t;
 
         if (perm)
@@ -211,6 +225,71 @@ void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
         u = mat->rows[s];
         mat->rows[s] = mat->rows[r];
         mat->rows[r] = u;
+    }
+}
+
+NMOD_MAT_INLINE
+void nmod_mat_invert_rows(nmod_mat_t mat, slong * perm)
+{
+    slong i;
+
+    for (i = 0; i < mat->r/2; i++)
+        nmod_mat_swap_rows(mat, perm, i, mat->r - i - 1);
+}
+
+NMOD_MAT_INLINE
+void nmod_mat_swap_cols(nmod_mat_t mat, slong * perm, slong r, slong s)
+{
+    if (r != s && !nmod_mat_is_empty(mat))
+    {
+        slong t;
+
+        if (perm)
+        {
+            t = perm[s];
+            perm[s] = perm[r];
+            perm[r] = t;
+        }
+
+        for (t = 0; t < mat->r; t++)
+        {
+            mp_limb_t c = mat->rows[t][r];
+            mat->rows[t][r] = mat->rows[t][s];
+            mat->rows[t][s] = c;
+        }
+    }
+}
+
+NMOD_MAT_INLINE
+void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
+{
+    if (!(nmod_mat_is_empty(mat)))
+    {
+        slong t;
+        slong i;
+        slong c = mat->c;
+        slong k = mat->c/2;
+        mp_limb_t e;
+
+        if (perm)
+        {
+            for (i =0; i < k; i++)
+            {
+                t = perm[i];
+                perm[i] = perm[c - i];
+                perm[c - i] = t;
+            }
+        }
+
+        for (t = 0; t < mat->r; t++)
+        {
+            for (i = 0; i < k; i++)
+            {
+                e = mat->rows[t][i];
+                mat->rows[t][i] = mat->rows[t][c - i - 1];
+                mat->rows[t][c - i - 1] = e;
+            }
+        }
     }
 }
 

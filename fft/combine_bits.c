@@ -33,9 +33,9 @@ void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length,
 }
 
 void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length, 
-                  mp_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
+                  flint_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
 {
-   mp_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);
+   flint_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);
    mp_size_t coeff_limbs, i;
    mp_limb_t * temp, * limb_ptr, * end;
    

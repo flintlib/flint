@@ -12,7 +12,8 @@
 #include "mpoly.h"
 
 
-int mpoly_monomials_valid_test(ulong * exps, slong len, slong bits, const mpoly_ctx_t mctx)
+int mpoly_monomials_valid_test(ulong * exps, slong len,
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     int ret =  1;
     slong N, i, j;

@@ -15,7 +15,7 @@
 
 int
 fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
-                         mp_bitcnt_t prec)
+                         flint_bitcnt_t prec)
 {
     if (fl->rt == Z_BASIS)
     {

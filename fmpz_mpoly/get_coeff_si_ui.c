@@ -11,17 +11,19 @@
 
 #include "fmpz_mpoly.h"
 
-
-slong fmpz_mpoly_get_coeff_si_ui(const fmpz_mpoly_t poly,
+slong fmpz_mpoly_get_coeff_si_ui(const fmpz_mpoly_t A,
                                  const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 {
-    fmpz_t newc;
-    slong ret;
-
-    fmpz_init(newc);
-    fmpz_mpoly_get_coeff_fmpz_ui(newc, poly, exp, ctx);
-
-    ret = fmpz_get_si(newc);
-    fmpz_clear(newc);
-    return ret;
+    slong index;
+    index = mpoly_monomial_index_ui(A->exps, A->bits, A->length,
+                                                              exp, ctx->minfo);
+    if (index < 0)
+    {
+        return 0;
+    }
+    else
+    {
+        FLINT_ASSERT(index < A->length);
+        return fmpz_get_si(A->coeffs + index);
+    }
 }

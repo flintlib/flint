@@ -32,7 +32,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
         slong nvars, len, index;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
         fmpz_mpoly_init(f, ctx);
@@ -91,9 +91,10 @@ main(void)
 
             flint_free(exp1);
             flint_free(exp2);
-       }
+        }
 
-       fmpz_mpoly_clear(f, ctx);  
+        fmpz_mpoly_clear(f, ctx);  
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

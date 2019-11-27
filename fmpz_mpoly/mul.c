@@ -71,7 +71,7 @@ static int _try_array_LEX(slong * Bdegs, slong * Cdegs,
             return 0;
     }
 
-    return dense_size <= WORD(5000000)
+    return dense_size <= WORD(50000000)
             && dense_size/Blen/Clen < WORD(10);
 }
 
@@ -107,14 +107,20 @@ static int _try_array_DEG(slong Btotaldeg, slong Ctotaldeg,
 }
 
 
-void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                              const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_mul_threaded(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_t C,
+    const fmpz_mpoly_ctx_t ctx,
+    slong thread_limit)
 {
     slong i;
     slong nvars = ctx->minfo->nvars;
     int success, try_array;
     slong * Bdegs, * Cdegs;
     fmpz * maxBfields, * maxCfields;
+    thread_pool_handle * handles;
+    slong num_handles;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)
@@ -138,6 +144,22 @@ void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     }
     mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
     mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
+
+    handles = NULL;
+    num_handles = 0;
+    if (global_thread_pool_initialized)
+    {
+        slong max_num_handles;
+        max_num_handles = thread_pool_get_size(global_thread_pool);
+        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
+        if (max_num_handles > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                                   max_num_handles*sizeof(thread_pool_handle));
+            num_handles = thread_pool_request(global_thread_pool,
+                                                     handles, max_num_handles);
+        }
+    }
 
     /*
         If one polynomial is tiny or if both polynomials are small,
@@ -206,16 +228,26 @@ void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     {
         goto do_heap;
     }
+
     if (ctx->minfo->ord == ORD_LEX)
     {
-        success = _fmpz_mpoly_mul_array_threaded_LEX(A,
-                                            B, maxBfields, C, maxCfields, ctx);
+        success = (num_handles == 0)
+                ? _fmpz_mpoly_mul_array_LEX(
+                                    A, B, maxBfields, C, maxCfields, ctx)
+                : _fmpz_mpoly_mul_array_threaded_LEX(
+                                    A, B, maxBfields, C, maxCfields, ctx,
+                                                         handles, num_handles);
     }
     else if (ctx->minfo->ord == ORD_DEGLEX || ctx->minfo->ord == ORD_DEGREVLEX)
     {
-        success = _fmpz_mpoly_mul_array_threaded_DEG(A,
-                                            B, maxBfields, C, maxCfields, ctx);
+        success = (num_handles == 0)
+                ? _fmpz_mpoly_mul_array_DEG(
+                                    A, B, maxBfields, C, maxCfields, ctx)
+                : _fmpz_mpoly_mul_array_threaded_DEG(
+                                    A, B, maxBfields, C, maxCfields, ctx,
+                                                         handles, num_handles);
     }
+
     if (success)
     {
         goto done;
@@ -223,9 +255,26 @@ void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
 do_heap:
 
-    _fmpz_mpoly_mul_heap_threaded_maxfields(A, B, maxBfields, C, maxCfields, ctx);
+    if (num_handles == 0)
+    {
+        _fmpz_mpoly_mul_johnson_maxfields(A, B, maxBfields, C, maxCfields, ctx);
+    }
+    else
+    {
+        _fmpz_mpoly_mul_heap_threaded_maxfields(A,
+                      B, maxBfields, C, maxCfields, ctx, handles, num_handles);
+    }
 
 done:
+
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
+    }
+    if (handles)
+    {
+        flint_free(handles);
+    }
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
@@ -234,4 +283,13 @@ done:
     }
 
     TMP_END;
+}
+
+void fmpz_mpoly_mul(
+    fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_t C,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_mul_threaded(A, B, C, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
 }

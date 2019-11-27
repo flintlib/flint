@@ -106,7 +106,7 @@ void time_algs(double* times, flint_rand_t state, const fmpz* primes, slong len)
     
 int main(void)
 {
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     fmpz primes[NUMEX];
     double times[2];
     slong i, len, len2, lower, upper;

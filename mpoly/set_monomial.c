@@ -11,9 +11,10 @@
 
 #include "mpoly.h"
 
+/* !!! this file DOES need to change with new orderings */
 
 void mpoly_set_monomial_ui(ulong * poly_exps, const ulong * user_exps,
-                                            slong bits, const mpoly_ctx_t mctx)
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong nfields = mctx->nfields;
@@ -61,7 +62,7 @@ big_case:
 
 
 void mpoly_set_monomial_ffmpz(ulong * poly_exps, const fmpz * user_exps,
-                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong nfields = mctx->nfields;
@@ -93,7 +94,7 @@ void mpoly_set_monomial_ffmpz(ulong * poly_exps, const fmpz * user_exps,
 }
 
 void mpoly_set_monomial_pfmpz(ulong * poly_exps, fmpz * const * user_exps,
-                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong nvars = mctx->nvars;
     slong nfields = mctx->nfields;

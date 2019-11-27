@@ -54,7 +54,7 @@ void sample(void * arg, ulong count)
     FLINT_TEST_INIT(state);
 
     mp_ptr dinv;
-    mp_bitcnt_t norm;
+    flint_bitcnt_t norm;
     
     mpz_init(a);
     mpz_init(b);

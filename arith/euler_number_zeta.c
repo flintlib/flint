@@ -15,7 +15,7 @@ void _arith_euler_number_zeta(fmpz_t res, ulong n)
 {
     mpz_t r;
     mpfr_t t, z, pi;
-    mp_bitcnt_t prec, pi_prec;
+    flint_bitcnt_t prec, pi_prec;
 
     if (n % 2)
     {

@@ -27,7 +27,7 @@ main(void)
     {
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f1, f2, m;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
         ulong * exp, * exp2;
         slong len, nvars;
         fmpq_t c, c2;

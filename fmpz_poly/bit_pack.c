@@ -16,11 +16,11 @@
 
 void
 _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len,
-                    mp_bitcnt_t bit_size, int negate)
+                    flint_bitcnt_t bit_size, int negate)
 {
-    mp_bitcnt_t bits = 0;
+    flint_bitcnt_t bits = 0;
     mp_size_t limbs = 0;
-    mp_bitcnt_t b = bit_size % FLINT_BITS;
+    flint_bitcnt_t b = bit_size % FLINT_BITS;
     mp_size_t l = bit_size / FLINT_BITS;
     int borrow = 0;
     slong i;
@@ -42,7 +42,7 @@ _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len,
 
 void
 fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
-                   mp_bitcnt_t bit_size)
+                   flint_bitcnt_t bit_size)
 {
     slong len;
     __mpz_struct * mpz;

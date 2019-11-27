@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018-2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -10,7 +10,6 @@
 */
 
 #include "thread_pool.h"
-
 
 thread_pool_t global_thread_pool;
 int global_thread_pool_initialized = 0;
@@ -63,6 +62,14 @@ void thread_pool_init(thread_pool_t T, slong size)
 
     pthread_mutex_init(&T->mutex, NULL);
     T->length = size;
+
+#if HAVE_CPU_SET_T
+    if (0 != pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t),
+                                                        &T->original_affinity))
+    {
+        CPU_ZERO(&T->original_affinity);
+    }
+#endif
 
     if (size == 0)
     {

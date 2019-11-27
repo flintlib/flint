@@ -45,7 +45,7 @@ TEMPLATE(T, mat_mul_KS) (TEMPLATE(T, mat_t) C,
     fmpz_set(beta, TEMPLATE(T, ctx_prime) (ctx));
     fmpz_sub_ui(beta, beta, 1);
     fmpz_mul(beta, beta, beta);
-    fmpz_mul_si(beta, beta, A->r);
+    fmpz_mul_si(beta, beta, A->c);
     fmpz_mul_si(beta, beta, TEMPLATE(T, ctx_degree) (ctx));
     bits = fmpz_bits(beta) + 1;
 
@@ -79,6 +79,8 @@ TEMPLATE(T, mat_mul_KS) (TEMPLATE(T, mat_t) C,
     fmpz_mat_clear(fa);
     fmpz_mat_clear(fb);
     fmpz_mat_clear(fc);
+
+    fmpz_clear(beta);
 }
 
 

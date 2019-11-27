@@ -104,6 +104,12 @@
 
 #cmakedefine HAVE_STD__LOCALE 1
 
+/* Define if the compiler supports and should use thread-local storage */
+#cmakedefine HAVE_TLS 1
+
+/* Define if the library should be thread-safe, no matter whether HAVE_TLS is used */
+#cmakedefine FLINT_REENTRANT 1
+
 /* Define if you have the `localeconv' function. */
 #cmakedefine HAVE_LOCALECONV		1
 
@@ -281,6 +287,9 @@
 /* ./configure --enable-assert option, to enable some ASSERT()s */
 #cmakedefine WANT_ASSERT
 
+/* Define if you cpu_set_t in sched.h */
+#cmakedefine HAVE_CPU_SET_T
+
 /* Define if your processor stores words with the most significant byte first
    (like Motorola and SPARC, unlike Intel and VAX). */
 #cmakedefine WORDS_BIGENDIAN
@@ -314,10 +323,9 @@
 #define MSC_C_(x) #x  
 #define MSC_CC_(x)  MSC_C_(x)
 #define MSC_VERSION "Microsoft C++ (Version " MSC_CC_(_MSC_FULL_VER) ")"
-
 #endif
 
-#if defined (MSC_BUILD_DLL)
+#if defined (FLINT_BUILD_DLL)
 #define FLINT_DLL __declspec(dllexport)
 #elif defined(MSC_USE_DLL)
 #define FLINT_DLL __declspec(dllimport)

@@ -50,7 +50,7 @@ Basic properties and manipulation
     Directly accesses the entry in ``mat`` in row `i` and column `j`,
     indexed from zero. No bounds checking is performed.
 
-.. function:: fq_nmod_struct * fq_nmod_mat_entry_set(fq_nmod_mat_t mat, slong i, slong j, fq_nmod_t x, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_mat_entry_set(fq_nmod_mat_t mat, slong i, slong j, fq_nmod_t x, const fq_nmod_ctx_t ctx)
 
     Sets the entry in ``mat`` in row `i` and column `j` to ``x``.
 
@@ -71,6 +71,27 @@ Basic properties and manipulation
 
     Sets all entries of ``mat`` to 0.
 
+.. function:: void fq_nmod_mat_swap_rows(fq_nmod_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: void fq_nmod_mat_swap_cols(fq_nmod_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
+
+.. function:: void fq_nmod_mat_invert_rows(fq_nmod_mat_t, slong * perm)
+    
+    Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
+    ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: void fq_nmod_mat_invert_cols(fq_nmod_mat_t, slong * perm)
+    
+    Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
+    ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
 
 Concatenate
 --------------------------------------------------------------------------------

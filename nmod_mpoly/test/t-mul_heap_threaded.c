@@ -16,8 +16,12 @@
 int
 main(void)
 {
-    int i, j, result, max_threads = 5;
+    slong i, j, result, max_threads = 5;
+    slong tmul = 10;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 2;
+#endif
 
     flint_printf("mul_heap_threaded....");
     fflush(stdout);
@@ -38,7 +42,8 @@ main(void)
 
         nmod_mpoly_mul(h1, f, g, ctx);
         flint_set_num_threads(2);
-        nmod_mpoly_mul_heap_threaded(h2, f, g, ctx);
+        nmod_mpoly_mul_heap_threaded(h2, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
+
         if (!nmod_mpoly_equal(h1, h2, ctx))
         {
             printf("FAIL\n");
@@ -54,13 +59,13 @@ main(void)
     }
 
     /* Check mul_heap_threaded matches mul_johnson */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         mp_limb_t modulus;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -91,7 +96,7 @@ main(void)
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
-            nmod_mpoly_mul_heap_threaded(k, f, g, ctx);
+            nmod_mpoly_mul_heap_threaded(k, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(k, ctx);
             result = nmod_mpoly_equal(h, k, ctx);
 
@@ -113,7 +118,7 @@ main(void)
 
 
     /* Check aliasing first argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
@@ -148,7 +153,7 @@ main(void)
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
-            nmod_mpoly_mul_heap_threaded(f, f, g, ctx);
+            nmod_mpoly_mul_heap_threaded(f, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(f, ctx);
             result = nmod_mpoly_equal(h, f, ctx);
 
@@ -168,7 +173,7 @@ main(void)
     }
 
     /* Check aliasing second argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
@@ -203,7 +208,7 @@ main(void)
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
-            nmod_mpoly_mul_heap_threaded(g, f, g, ctx);
+            nmod_mpoly_mul_heap_threaded(g, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(g, ctx);
             result = nmod_mpoly_equal(h, g, ctx);
 

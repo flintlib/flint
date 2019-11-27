@@ -27,6 +27,8 @@ polynomials/matrices over $\F_q$, Finite fields with Zech logarithm
 representation, Fast factorisation of polynomials over $\F_q$ (supported by
 Macaulay2 developers NSF Grant 1002171)
 
+$\bullet$ Luca De Feo, Edouard Rousseau -- Finite field embeddings
+
 $\bullet$ Martin Lee -- Fast factorisation of polynomials over $\Z/n\Z$,
 faster Brent-Kung modular composition
 

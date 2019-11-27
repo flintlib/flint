@@ -95,7 +95,7 @@ typedef struct qs_s
 {
    fmpz_t n;               /* Number to factor */
 
-   mp_bitcnt_t bits;       /* Number of bits of n */
+   flint_bitcnt_t bits;       /* Number of bits of n */
 
    ulong ks_primes;        /* number of Knuth-Schroeppel primes */
 

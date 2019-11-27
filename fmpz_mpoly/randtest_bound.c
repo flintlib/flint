@@ -13,11 +13,10 @@
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state,
-                         slong length, mp_bitcnt_t coeff_bits, ulong exp_bound,
+                         slong length, flint_bitcnt_t coeff_bits, ulong exp_bound,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j, nvars = ctx->minfo->nvars;
-    fmpz_t coeff;
     ulong * exp;
     TMP_INIT;
 
@@ -31,10 +30,8 @@ void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state,
         for (j = 0; j < nvars; j++)
             exp[j] = n_randint(state, exp_bound);
 
-        fmpz_init(coeff);
-        fmpz_randtest(coeff, state, coeff_bits);
-        _fmpz_mpoly_emplacebackterm_fmpz_ui(A, coeff, exp, ctx);
-        /* emplace stole coeff */
+        _fmpz_mpoly_push_exp_ui(A, exp, ctx);
+        fmpz_randtest(A->coeffs + A->length - 1, state, coeff_bits);
     }
 
     TMP_END;

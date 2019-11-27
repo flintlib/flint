@@ -11,7 +11,7 @@
 
 #include "fmpz_poly.h"
 
-void _quadratic(fmpz_poly_t p, flint_rand_t state, mp_bitcnt_t bits)
+void _quadratic(fmpz_poly_t p, flint_rand_t state, flint_bitcnt_t bits)
 {
     fmpz *a, *b, *c;
 
@@ -33,7 +33,7 @@ void _quadratic(fmpz_poly_t p, flint_rand_t state, mp_bitcnt_t bits)
     _fmpz_poly_set_length(p, 3);
 }
 
-void _even(fmpz_poly_t p, flint_rand_t state, slong len, mp_bitcnt_t bits)
+void _even(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
 {
     slong n, i;
 
@@ -67,7 +67,7 @@ void _even(fmpz_poly_t p, flint_rand_t state, slong len, mp_bitcnt_t bits)
     _fmpz_poly_normalise(p);
 }
 
-void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong len, mp_bitcnt_t bits)
+void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
 {
 
     if (len <= 0)
@@ -94,7 +94,7 @@ void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong le
         /* we make a product of a quadratic and a polynomial of the   */
         /* form a0 + a2 X^2 + a4 X^4 + ... with a0 > 0 and a{2i} >= 0 */
         fmpz_poly_t q;
-        mp_bitcnt_t bits1;
+        flint_bitcnt_t bits1;
 
         fmpz_poly_init(q);
         bits1 = 1 + n_randint(state, bits - 2);

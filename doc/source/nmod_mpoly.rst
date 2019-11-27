@@ -63,7 +63,7 @@ Memory management
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
     It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
 
-.. function:: void nmod_mpoly_init3(nmod_mpoly_t A, slong alloc, mp_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_init3(nmod_mpoly_t A, slong alloc, flint_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
     It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
@@ -72,7 +72,7 @@ Memory management
 
     Ensure that ``A`` has space for at least ``len`` terms.
 
-.. function:: void nmod_mpoly_fit_bits(nmod_mpoly_t A, mp_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_fit_bits(nmod_mpoly_t A, flint_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
 
     Ensure that the exponent fields of ``A`` have at least ``bits`` bits.
 
@@ -157,7 +157,7 @@ Constants
 
     Set ``A`` to the constant ``0``.
 
-.. function:: void fmpz_mpoly_one(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_one(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Set ``A`` to the constant ``1``.
 
@@ -234,12 +234,31 @@ Coefficients
 
     Set the coefficient of the monomial with exponent ``exp`` to `c`.
 
+.. function:: void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A, slong * vars, ulong * exps, slong length, const nmod_mpoly_ctx_t ctx)
+
+    Set ``C`` to the coefficient of ``A`` with respect to the variables in ``vars`` with powers in the corresponding array ``exps``.
+    Both ``vars`` and ``exps`` point to array of length ``length``. It is assumed that `0 < length \le nvars(A)` and that the variables in ``vars`` are distinct. 
+
+
+Comparison
+--------------------------------------------------------------------------------
+
+
+.. function:: int nmod_mpoly_cmp(const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+    Return ``1`` (resp. ``-1``, or ``0``) if the monomial of ``A`` is greater than (resp. less than, same as) the monomial of ``B``.
+    ``A`` and ``B`` should both have length one with coefficient one. This function will throw otherwise.
+
 
 Container operations
 --------------------------------------------------------------------------------
 
     These functions deal with violations of the internal canonical representation.
     If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
+
+.. function:: mp_limb_t * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Return a reference to the coefficient of index `i` of ``A``.
 
 .. function:: int nmod_mpoly_is_canonical(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
@@ -274,13 +293,31 @@ Container operations
 
 .. function:: void nmod_mpoly_get_term_exp_ui(ulong * exp, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
 
+.. function:: void nmod_mpoly_get_term_exp_si(slong * exp, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
     Set ``exp`` to the exponent vector of the term of index ``i``.
+    The ``_ui`` (resp. ``_si``) version throws if any entry does not fit into a ``ulong`` (resp. ``slong``).
+
+.. function:: ulong nmod_mpoly_get_term_var_exp_ui(const nmod_mpoly_t A, slong i, slong var, const nmod_mpoly_ctx_t ctx)
+
+.. function:: slong nmod_mpoly_get_term_var_exp_si(const nmod_mpoly_t A, slong i, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Return the exponent of the variable ``var`` of the term of index ``i``.
+    This function throws if the exponent does not fit into a ``ulong`` (resp. ``slong``).
 
 .. function:: void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 
 .. function:: void nmod_mpoly_set_term_exp_ui(nmod_mpoly_t A, slong i, const ulong * exp, const nmod_mpoly_ctx_t ctx)
 
     Set the exponent of the term of index ``i`` to ``exp``.
+
+.. function:: void nmod_mpoly_get_term(nmod_mpoly_t M, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Set ``M`` to the term of index ``i`` in ``A``.
+
+.. function:: void nmod_mpoly_get_term_monomial(nmod_mpoly_t M, const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Set ``M`` to the monomial of the term of index ``i`` in ``A``. The coefficient of ``M`` will be one.
 
 .. function:: void nmod_mpoly_push_term_ui_fmpz(nmod_mpoly_t A, ulong c, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
 
@@ -404,21 +441,25 @@ Multiplication
 
 .. function:: void nmod_mpoly_mul(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
+.. function:: void nmod_mpoly_mul(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+
     Set ``A`` to ``B`` times ``C``.
+    The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
 
 .. function:: void nmod_mpoly_mul_johnson(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` times ``C`` using Johnson's heap-based method.
-
 .. function:: void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
-    Set ``A`` to ``B`` times ``C`` using a heap and multiple threads.
-    This function should only be called once ``global_thread_pool`` has been initialized.
+    Set ``A`` to ``B`` times ``C`` using Johnson's heap-based method.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
+.. function:: int nmod_mpoly_mul_array_threaded(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+
     Try to set ``A`` to ``B`` times ``C`` using arrays.
-    If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
+    If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful, and the return is ``1``.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: int nmod_mpoly_mul_dense(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
@@ -465,7 +506,7 @@ The division functions will generally throw if the leading coefficient of a divi
 
 .. function:: void nmod_mpoly_divrem_ideal(nmod_mpoly_struct ** Q, nmod_mpoly_t R, const nmod_mpoly_t A, nmod_mpoly_struct * const * B, slong len, const nmod_mpoly_ctx_t ctx)
 
-    This function is as per :func:`fmpq_mpoly_divrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
+    This function is as per :func:`nmod_mpoly_divrem` except that it takes an array of divisor polynomials ``B`` and it returns an array of quotient polynomials ``Q``.
     The number of divisor (and hence quotient) polynomials, is given by ``len``.
 
 
@@ -493,6 +534,17 @@ Greatest Common Divisor
     Try to set ``G`` to the monic GCD of ``A`` and ``B``. The GCD of zero and zero is defined to be zero.
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
     If the modulus is not prime, this function will probably return ``0`` quickly.
+
+.. function:: int nmod_mpoly_gcd_brown(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+.. function:: int nmod_mpoly_gcd_brown_threaded(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using Brown's algorithm.
+    The threaded version takes an upper limit on the number of threads to use, while the non-threaded version always uses one thread.
+
+.. function:: int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` using Zipple's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
 
 
 Internal Functions
@@ -525,18 +577,4 @@ Internal Functions
     quotient) polynomials, is given by ``len``. The function computes
     polynomials `q_i = q[i]` such that ``poly2`` is
     `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
-
-
-.. function:: int nmod_mpoly_gcd_brown(nmod_mpoly_t poly1, const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
-
-    If the return is nonzero, used Brown's dense modular algorithm to set
-    ``poly1`` to the GCD of ``poly2`` and ``poly3``, where
-    ``poly1`` is monic.
-
-.. function:: int nmod_mpoly_gcd_zippel(nmod_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    If the return is nonzero, used a modular algorithm with Zippel's sparse
-    interpolation to set
-    ``poly1`` to the GCD of ``poly2`` and ``poly3``, where
-    ``poly1`` is monic.
 

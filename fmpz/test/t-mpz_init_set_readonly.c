@@ -76,9 +76,9 @@ int main(void)
             gmp_printf("z = %Zd\n", z);
         }
 
-        fmpz_clear(f);
-        fmpz_clear(g);
         flint_mpz_clear_readonly(z);
+	fmpz_clear(f);
+        fmpz_clear(g);
     }
 
     FLINT_TEST_CLEANUP(state);

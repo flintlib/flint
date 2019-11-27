@@ -64,11 +64,12 @@ main(void)
     for (k = 0; k < 1 * flint_test_multiplier(); k++)
     {
         /* do FLINT_BITS => bits1 => bits2 => FLINT_BITS and compare */
-        for (bits1 = 8; bits1 <= FLINT_BITS; bits1 += 1)
+        for (bits1 = MPOLY_MIN_BITS; bits1 <= FLINT_BITS; bits1 += 1)
         {
-        for (bits2 = 8; bits2 <= FLINT_BITS; bits2 += 1)
+        for (bits2 = MPOLY_MIN_BITS; bits2 <= FLINT_BITS; bits2 += 1)
         {
-
+            ulong mask = (l_shift(UWORD(1), bits1 - 1) - 1)
+                       & (l_shift(UWORD(1), bits2 - 1) - 1);
             mpoly_ctx_t mctx;
 
             length = n_randint(state, max_length) + 1;
@@ -77,20 +78,24 @@ main(void)
             mpoly_ctx_init(mctx, nfields, ORD_LEX);
 
             for (i = 0; i < length*nfields; i++)
-                a[i] = n_randint(state, 0) & (l_shift(UWORD(1), bits1) - 1)
-                                           & (l_shift(UWORD(1), bits2) - 1);
+            {
+                /* leave room for sign bit in the repacking */
+                a[i] = n_randlimb(state) & mask;
+            }
 
             mpoly_repack_monomials(b, bits1,      a, FLINT_BITS, length, mctx);
             mpoly_repack_monomials(c, bits2,      b, bits1,      length, mctx);
             mpoly_repack_monomials(d, FLINT_BITS, c, bits2,      length, mctx);
 
             for (i = 0; i < length*nfields; i++)
+            {
                 if (a[i] != d[i])
                 {
                     printf("FAIL\n");
                     flint_printf("bits1 = %wd, bits2 = %wd\n", bits1, bits2);
                     flint_abort();
                 }
+            }
 
             mpoly_ctx_clear(mctx);
         }

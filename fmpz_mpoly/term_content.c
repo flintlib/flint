@@ -16,7 +16,7 @@ void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
-    mp_bitcnt_t Abits;
+    flint_bitcnt_t Abits;
     fmpz * minAfields, * min_degs;
     fmpz_t g;
     TMP_INIT;

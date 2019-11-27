@@ -11,24 +11,19 @@
 
 #include "nmod_mpoly.h"
 
-ulong nmod_mpoly_get_coeff_ui_ui( const nmod_mpoly_t A,
+ulong nmod_mpoly_get_coeff_ui_ui(const nmod_mpoly_t A,
                                  const ulong * exp, const nmod_mpoly_ctx_t ctx)
 {
-    ulong c;
-    slong i, nvars = ctx->minfo->nvars;
-    fmpz * newexp;
-    TMP_INIT;
-
-    TMP_START;
-    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
-    for (i = 0; i < nvars; i++)
-        fmpz_init_set_ui(newexp + i, exp[i]);
-
-    c = _nmod_mpoly_get_coeff_ui_fmpz(A, newexp, ctx);
-
-    for (i = 0; i < nvars; i++)
-        fmpz_clear(newexp + i);
-
-    TMP_END;
-    return c;
+    slong index;
+    index = mpoly_monomial_index_ui(A->exps, A->bits, A->length,
+                                                              exp, ctx->minfo);
+    if (index < 0)
+    {
+        return 0;
+    }
+    else
+    {
+        FLINT_ASSERT(index < A->length);
+        return A->coeffs[index];
+    }
 }

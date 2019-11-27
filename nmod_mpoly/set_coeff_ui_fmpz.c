@@ -9,13 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
-
+#include "nmod_mpoly.h"
 
 void _nmod_mpoly_set_coeff_ui_fmpz(nmod_mpoly_t A,
                          ulong c, const fmpz * exp, const nmod_mpoly_ctx_t ctx)
 {
-    mp_bitcnt_t exp_bits;
+    flint_bitcnt_t exp_bits;
     slong i, N, index;
     ulong * cmpmask;
     ulong * packed_exp;

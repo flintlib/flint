@@ -35,7 +35,8 @@ endif()
 if(GMP_INCLUDE_DIRS)
   # Since the GMP version macros may be in a file included by gmp.h of the form
   # gmp-.*[_]?.*.h (e.g., gmp-x86_64.h), we search each of them.
-  file(GLOB GMP_HEADERS "${GMP_INCLUDE_DIRS}/gmp.h" "${GMP_INCLUDE_DIRS}/gmp-*.h")
+  file(GLOB GMP_HEADERS "${GMP_INCLUDE_DIRS}/gmp.h" "${GMP_INCLUDE_DIRS}/gmp-*.h"
+	  "${GMP_INCLUDE_DIRS}/x86*/gmp.h")
   foreach(gmp_header_filename ${GMP_HEADERS})
     file(READ "${gmp_header_filename}" _gmp_version_header)
     string(REGEX MATCH

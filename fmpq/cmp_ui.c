@@ -16,7 +16,7 @@ int
 _fmpq_cmp_ui(const fmpz_t p, const fmpz_t q, ulong c)
 {
     int s1, s2, res;
-    mp_bitcnt_t bp, bq, bc;
+    flint_bitcnt_t bp, bq, bc;
     fmpz_t u;
 
     if (fmpz_is_one(q))

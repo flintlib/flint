@@ -9,12 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_mpoly.h"
+#include "mpoly.h"
 
-int mpoly_degrees_fit_si(const ulong * poly_exps,
-                                 slong len, slong bits, const mpoly_ctx_t mctx)
+int mpoly_degrees_fit_si(const ulong * poly_exps, slong len,
+                                   flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, j, N;
     int ret;

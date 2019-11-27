@@ -114,7 +114,7 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
 
     if (fmpz_bits(order) > FLINT_BITS)
     {
-        flint_printf("Exception (fq_zech_ctx_init_nmod_ctx). Requires q < 2^FLINT_BITS\n");
+        flint_printf("Exception (fq_zech_ctx_init_fq_nmod_ctx). Requires q < 2^FLINT_BITS\n");
         flint_abort();
     }
 
@@ -136,7 +136,16 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
 
     ctx->qm1opm1 = ctx->qm1 / (up - 1);
 
-    ctx->prime_root = n_primitive_root_prime(ctx->p);
+/* 1. The field may not be defined with a Conway polynomial
+ * 2. need to ensure prime_root is the norm of the generator
+ * 3. so we take prime_root = (-1)^d * a_0, where d is the degree
+ *    of the minimum polynomial P of the generator, and a_0 is the constant term of
+ *    the generator.
+ * 4. this is because if P(t) = (t-x_0)...(t-x_{d-1}), then the constant term of
+ * P is the product of the x_i (ie the norm) and is equal to (-1)^d * a_0
+ */
+    ctx->prime_root = (fq_nmod_ctx_degree(fq_nmod_ctx) & 1) ? 
+        ctx->p - fq_nmod_ctx->a[0] : fq_nmod_ctx->a[0];
 
     ctx->zech_log_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
     ctx->prime_field_table = (mp_limb_t *) flint_malloc(up * sizeof(mp_limb_t));
@@ -161,7 +170,7 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
         nmod_poly_evaluate_fmpz(result, r, fq_nmod_ctx_prime(fq_nmod_ctx));
         result_ui = fmpz_get_ui(result);
         if (n_reverse_table[result_ui] != ctx->qm1) {
-            flint_printf("Exception (fq_zech_ctx_init_nmod_ctx). Polynomial is not primitive.\n");
+            flint_printf("Exception (fq_zech_ctx_init_fq_nmod_ctx). Polynomial is not primitive.\n");
             flint_abort();
         }
         n_reverse_table[result_ui] = i;

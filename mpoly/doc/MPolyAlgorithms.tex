@@ -26,7 +26,8 @@
 \newcommand\B{\rule[-2.5ex]{0pt}{0pt}} % Bottom strut
 
 \newcommand{\smat}[4] {(\begin{smallmatrix} #1 & #2 \\ #3 & #4 \end{smallmatrix} )}
-\newcommand{\mat}[4]  { \left(\begin{array}{cc} #1 & #2 \\ #3 & #4 \end{array} \right)}
+\newcommand{\mattt}[4]  { \left(\begin{array}{cc} #1 & #2 \\ #3 & #4 \end{array} \right)}
+\newcommand{\matto}[2]  { \left(\begin{array}{cc} #1 \\ #2 \end{array} \right)}
 \newcommand{\schar}[2] {( \begin{smallmatrix} #1 \\ #2 \end{smallmatrix})}
 
 \newcommand{\op}[1]  { \operatorname{ #1 }}
@@ -156,10 +157,133 @@ f (f^k)' = k f' (f^k)\text{.}
 \end{equation*}
 Since solving for the coefficients of $f^k$ involves division, this requires some modification for $R=\bbZ_p$.
 
+
+
+\section{Interpolation}
+
+\subsection{Dense Newton Interpolation}
+
+\subsection{Sparse Zippel Interpolation}
+
+\subsection{Sparse Interpolation with the Berlekamp-Massey Algorithm}
+Since the presentation in \cite{BMAR} is overly complicated, incomplete, and presents incorrect code, it seems reasonable to review the Berlekamp-Massey Algorithm here. Given a formal power series
+\begin{equation*}
+\frac{a_1}{x} + \frac{a_2}{x^2} + \frac{a_3}{x^3} + \cdots\text{,} \quad a_i \in \bbF
+\end{equation*}
+vanishing at $x = \infty$ and the fact that this power series represents a rational function, we are interested in computing this rational function. The following theorem says that we can use the extended euclidean algorithm and stop when the first remainder of degree $<\frac{n}{2}$ is obtained.
+
+\begin{theorem}
+Suppose that
+\begin{equation*}
+\frac{a_1}{x} + \frac{a_2}{x^2} + \frac{a_3}{x^3} + \cdots = -\frac{\bar{u}}{\bar{v}}
+\end{equation*}
+for some $\bar{u}, \bar{v} \in \bbF[x]$ with $\op{deg}(\bar{u}) < \op{deg}(\bar{v}) \le \frac{n}{2}$. Suppose further that
+\begin{equation}
+\label{equ_bma1}
+u x^{n} + v (a_1 x^{n-1} + a_2 x^{n-2} + \cdots + a_{n-1} x + a_{n}) = r
+\end{equation}
+for some $u, v, r \in \bbF[x]$ with $\op{deg}(u) < \op{deg}(v) \le \frac{n}{2}$ and $\op{deg}(r) < \frac{n}{2}$ and $\op{deg}(r) < \op{deg}(v)$. Then,
+\begin{equation*}
+\frac{\bar{u}}{\bar{v}} = \frac{u}{v}\text{.}
+\end{equation*}
+\end{theorem}
+\begin{proof}
+Dividing both sides of \eqref{equ_bma1} by $v x^{n}$ shows that
+\begin{equation*}
+\frac{\bar{u}}{\bar{v}} = \frac{u}{v} + O \left( \frac{1}{x^{n+1}}\right)\text{,}
+\end{equation*}
+which, on account of the degree bounds $\op{deg}(\bar{v}), \op{deg}(v) \le \frac{n}{2}$, proves the equality.
+\end{proof}
+
+This reconstruction may be applied to reconstruct an $f(\xi) = c_1 \xi^{e_1} + \cdots + c_t \xi^{e_t} \in \bbF[\xi]$ from the sequence of evaluation points
+\begin{equation*}
+a_i = f(\alpha^{s+i-1})\text{,} \quad \alpha \neq 0, \quad s \in \bbZ\text{,}
+\end{equation*}
+for in this case we have
+\begin{equation*}
+\frac{a_1}{x} + \frac{a_2}{x^2} + \frac{a_3}{x^3} + \cdots = \frac{c_1\alpha^{e_1 s}}{x - \alpha^{e_1}} + \cdots + \frac{c_t\alpha^{e_t s}}{x - \alpha^{e_t}}\text{.}
+\end{equation*}
+If this rational function is known and the $e_i$ can be found, then $f$ is known as well.
+
+The main problem with this approach is that the term bound $t$ is not known in advance. The approach we take is to calculate the $v$ in \eqref{equ_bma1} for some $n$ points $a_1, \dots, a_{n}$. Then, we add another $m$ points to form the sequence $a_1, \dots, a_{n+m}$ and calculate the corresponding $v'$. If $v=v'$, then it is likely that $v$ is the correct denominator. The extent to which previous computations may be reused is addressed in Theorem \ref{thm_nm}. 
+We follow \cite{YAP} for the presentation of the half gcd. An elementary matrix is one of the form $\smat{0}{1}{1}{q}$ for $\deg(q) > 0$ and a regular matrix is a product of zero or more elementary matrices. The notation $U \overset{M}{\longrightarrow} V$ shall mean that $M$ is a regular matrix and $U=MV$. If $\deg(A)>\deg(B)$ then $\op{hgcd}(A,B)$ is defined (see \cite{YAP}) as the (unique) regular matrix $M$ such that
+\begin{gather*}
+\matto{A}{B} \overset{M}{\longrightarrow} \matto{C'}{D'}\text{,}\\
+\deg(C') \ge \frac{\deg(A)}{2} > \deg(D')\text{.}
+\end{gather*}
+
+\begin{theorem}
+\label{thm_correctness}
+Suppose that
+\begin{align*}
+\matto{A_0}{B_0} &\overset{M}{\longrightarrow} \matto{A_0'}{B_0'}\\
+\op{deg}(A_0') &> \deg(B_0')\\
+\op{deg}(A_0) &\le 2 \op{deg}(A_0')
+\end{align*}
+Then, for any $A_1$, $B_1$ with $\deg(A_1),\deg(B_1) < m$,
+\begin{align*}
+\matto{A_0 x^m + A_1}{B_0 x^m + B_1} &\overset{M}{\longrightarrow} \matto{A'}{B'}\\
+\op{deg}(A') &= m + \op{deg}(A_0')\\
+\op{deg}(B') &\le m + \op{max}( \deg(B_0'), \deg(A_0')-1)\\
+\op{deg}(B') &\le m + \op{max}( \deg(B_0'), \frac{\deg(A_0)}{2}-1)
+\end{align*}
+\end{theorem}
+\begin{proof}
+This is a trivial rearrangement of Lemma 1 in \cite{YAP}.
+\end{proof}
+
+\begin{theorem}
+\label{thm_nm}
+Suppose $\deg(s_n) < n$, $\deg(s_m) < m$ and
+\begin{gather*}
+\matto{x^n}{s_n} \overset{M}{\longrightarrow} \matto{r_0}{r_1}\\
+\deg(r_0) \ge \frac{n}{2} > \deg(r_1)
+\end{gather*}
+Then, a regular matrix $M'$ (and thus $r_0', r_1'$) such that
+\begin{gather*}
+\matto{x^{n+m}}{s_n x^m + s_m} \overset{M'}{\longrightarrow} \matto{r_0'}{r_1'}\\
+\deg(r_0') \ge \frac{n+m}{2} > \deg(r_1')
+\end{gather*}
+may be calculated as follows. Define $A', B'$ by
+\begin{equation*}
+\matto{x^{n+m}}{s_n x^m + s_m} \overset{M}{\longrightarrow} \matto{A'}{B'}
+\end{equation*}
+It will be the case that $\deg(A') \ge \frac{n+m}{2}$. If $\frac{n+m}{2} > \deg(B')$, return with $M'=M$. Otherwise set $C = B'$, $D = \op{rem}(A',B')$ and $q=\op{quo}(A',B')$. Define $k := n + m - \deg(C)$. It will be the case that $0 < k \le \deg(C)$. Return with
+\begin{equation*}
+M' = M \cdot \mattt{0}{1}{1}{q} \cdot \op{hgcd} \matto{\op{quo}(C,x^k)}{\op{quo}(D,x^k)}
+\end{equation*}
+\end{theorem}
+\begin{proof}
+By Theorem \ref{thm_correctness}, $\deg(A') = m + \deg(r_0) \ge m + \frac{n}{2} \ge \frac{n+m}{2}$. Now suppose $\frac{n+m}{2} \le \deg(B')$. Thus the assertion $k \le \deg(C)$ is proved. By Theorem \ref{thm_correctness}, $\deg(B') \le m + \max(\deg(r_1), \deg(r_0) - 1) < m + n$. Thus, the assertion $0 < k$ is proved. Finally, suppose
+\begin{gather*}
+\matto{C_0 := \op{quo}(C,x^k)}{D_0 := \op{quo}(D,x^k)} \overset{H}{\longrightarrow} \matto{C_0'}{D_0'}\text{,}\\
+\deg(C_0') \ge \frac{\deg(C_0)}{2} > \deg(D_0')\text{.}
+\end{gather*}
+If $C', D'$ are defined by
+\begin{equation*}
+\matto{C}{D} \overset{H}{\longrightarrow} \matto{C'}{D'}\text{,}
+\end{equation*}
+it suffices to prove that $\deg(C') \ge \frac{n+m}{2} > \deg(D')$. By Theorem \ref{thm_correctness},
+\begin{align*}
+\deg(C') &= k + \deg(C_0')\\
+		 &\ge k + \frac{\deg(C_0)}{2}\\
+		 &= k + \frac{\deg(C) - k}{2}\\
+		 &= \frac{n+m}{2}\text{.}
+\end{align*}
+Also by Theorem \ref{thm_correctness},
+\begin{align*}
+\deg(D') &\le k + \max(\deg(D_0'), \frac{\deg(C_0)}{2} - 1)\\
+		 & < k + \max(\frac{\deg(C_0)}{2}, \frac{\deg(C_0)}{2})\\
+		 &= \frac{n+m}{2}\text{.}
+\end{align*}
+\end{proof}
+
+
+
 \section{Greatest Common Divisor}
 
 \subsection{Dense GCD in $\bbZ_p[x_1,\dots,x_n]$}\
-Brown's algorithm \cite{Brown} is used here. This comes in two version - a small prime version and a large prime version. The small prime version interpolates in each variable by choosing evaluation points from $\bbZ_p$. If this fails, then interpolation continues in $\bbZ_p/(f(x_n))[x_1,\dots,x_{n-1}]$, for sufficiently many irreducible $f(x) \in \bbZ_p[x]$. Thus the large prime version uses arithmetic in finite fields. No explicit divisibility checks are performed.
+Brown's algorithm \cite{Brown} is used here. This comes in two versions - a small prime version and a large prime version. These refer not to the size of the $p$'s involved, but rather to the field from which evaluation points are chosen: it can either be $\bbF_p$ or an extension of $\bbF_p$. The small prime version interpolates in each variable by choosing evaluation points from $\bbF_p$. If this fails, then the large prime method use interpolation in $\bbF_p/(f(x_n))[x_1,\dots,x_{n-1}]$, i.e. $\bbF_q[x_1,\dots,x_{n-1}]$, for sufficiently many irreducible $f(x) \in \bbZ_p[x]$. No explicit divisibility checks are performed because the cofactors are reconstructed along with the GCD.
 
 \subsection{Dense GCD in $\bbZ[x_1,\dots,x_n]$}\
 We simply reconstruct the GCD from its image in $\bbZ_p[x_1,\dots,x_n]$ for sufficiently many $p$. Only large $p$'s are used, and dense GCD's in $\bbZ_p[x_1,\dots,x_n]$ only use the small prime version. Each image GCD in $\bbZ_p$ is correct and Brown's coefficient bounds \cite{Brown} are used instead of a divisibility check.
@@ -177,19 +301,26 @@ call {\tt nmod\_mpolyu\_gcd\_zippel}
 {\tt nmod\_mpolyu\_gcd\_zippel}($\bbZ_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
 remove content in $x_1,\dots,x_n$ from the GCD via {\tt nmod\_mpoly\_gcd\_zippel}\\
-call {\tt nmod\_mpolyu\_gcdm\_zippel}
+call {\tt nmod\_mpolyu\_gcdm\_zippel}\\
+multiply the content back into the GCD
 \end{tabular}\right.$
 \ \\
 {\tt nmod\_mpolyu\_gcdm\_zippel}($\bbZ_p[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
+(the GCD is assumed to have no content w.r.t. $x_1,\dots,x_n$)\\
 call {\tt nmod\_mpolyu\_gcdp\_zippel} and return if succeeded\\
-choose several irreducibles $f(x_n) \in \bbZ_p[x_n]$\\
-compute the GCD modulo $f(x_n)$ via {\tt fq\_nmod\_mpolyu\_gcd\{p|s\}\_zippel}\\
-combine answers via CRT and check divisibility
+(small primes have failed, try large primes now)\\
+choose an irreducible $f(x_n)\in \bbZ_p[x_n]$\\
+compute $F=$ GCD modulo $f(x_n)$ via {\tt fq\_nmod\_mpolyu\_gcdp\_zippel}\\
+($F$ is the correct gcd when the inputs are reduced modulo $f(x_n)$)\\
+For several new irreducibles $f(x_n)\in \bbZ_p[x_n]$, \\
+compute the GCD modulo $f(x_n)$ via {\tt nmod\_mpolyu\_gcds\_zippel} using $F$\\
+combine via CRT and check divisibility every time the interpolant stabilizes\\
+start over if the interpolant coefficients have exceeded the obvious degree bound in $x_n$
 \end{tabular}\right.$
 
 \ \\
-The four functions {\tt [fq\_]nmod\_mpoly\_gcd\{p|s\}\_zippel} may be summarized as follows. When the prefix {\tt fq\_} is present, $q$ is a power of $p$, otherwise $q$ is $p$.
+The four functions {\tt [fq\_]nmod\_mpoly\_gcd\{p|s\}\_zippel} may be summarized as follows. The ``p'' versions produce a correct gcd when the inputs have no content in $\bbF_q[x_1,\dots,x_n]$. The ``s'' versions are the heart of Zippel's sparse interpolation. When the prefix {\tt fq\_} is present, $q$ is a power of $p$, otherwise $q$ is $p$.
 
 \ \\
 {\tt [fq\_]nmod\_mpolyu\_gcdp\_zippel}($\bbF_q[x_1,\dots,x_n][X]$, $n \ge 1$):\\
@@ -201,7 +332,7 @@ record the form $f$ of the GCD obtained for step (2) below\\
 pick severial evaluation points $x_n \to \alpha$ for $\alpha \in \bbF_q$\\
 (2) call {\tt [fq\_]nmod\_mpoly\_gcds\_zippel} on the evaluated inputs in $\bbF_q[x_1,\dots,x_{n-1}][X]$\\
 combine the answer from (1) and the answers from (2) via dense interpolation in $x_n$\\
-?? check divisibility ??
+check divisibility on the proposed GCD when the interpolation stabilizes 
 \end{tabular}\right.$
 \ \\
 {\tt [fq\_]nmod\_mpolyu\_gcds\_zippel}($\bbF_q[x_1,\dots,x_n][X]$, assumed form $f$):\\
@@ -223,20 +354,40 @@ call {\tt fmpz\_mpolyu\_gcd\_zippel}
 \ \\
 {\tt fmpz\_mpolyu\_gcd\_zippel}($\bbZ[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
-remove content in $x_1,\dots,x_n$ from the GCD via {\tt fmpz\_mpoly\_gcd\_zippel}\\
-call {\tt fmpz\_mpolyu\_gcdm\_zippel}
+remove content in $\bbZ[x_1,\dots,x_n]$ from the GCD via {\tt fmpz\_mpoly\_gcd\_zippel}\\
+call {\tt fmpz\_mpolyu\_gcdm\_zippel}\\
+multiply the content back into the GCD
 \end{tabular}\right.$
 
 \ \\
 {\tt fmpz\_mpolyu\_gcdm\_zippel}($\bbZ[x_1,\dots,x_n][X]$, $n \ge 1$):\\
 \indent $\left[\begin{tabular}{l}
-choose several primes $p$\\
-compute the GCD modulo $p$ via {\tt nmod\_mpolyu\_gcd\{p|s\}\_zippel}\\
-combine answers via CRT and check divisibility
+(the GCD is assumed to have no content w.r.t. $x_1,\dots,x_n$)\\
+choose a prime $p$\\
+compute $F=$ GCD modulo $p$ via {\tt nmod\_mpolyu\_gcdp\_zippel}\\
+($F$ is the correct gcd when the inputs are reduced modulo $p$)\\
+For several new primes $p$, \\
+compute the GCD modulo $p$ via {\tt nmod\_mpolyu\_gcds\_zippel} using $f$\\
+combine via CRT and check divisibility every time the interpolant stabilizes\\
+start over if the interpolant coefficients have exceeded the Landau--Mignotte bound
 \end{tabular}\right.$
 
 \ \\
 \subsection{PRS}
+The PRS algorithm works over $R=\bbZ$ or $R=\bbZ_p$.
+\ \\
+{\tt \_mpoly\_gcd\_prs}($A,B \in R[x_1,\dots,x_n][X]$, $n \ge 1$):\\
+\indent $\left[\begin{tabular}{l}
+(recursively use GCD in fewer variables for content calculation)\\
+let $Ac = \op{content}(A) \in R(x_1,\dots,x_n)$\\
+let $Bc = \op{content}(B) \in R(x_1,\dots,x_n)$\\
+divide $A$ and $B$ by $Ac$ and $Bc$\\
+let $G$ be a pseudo GCD of $A$ and $B$ computed using a prs\\
+divide $G$ by $\op{content}(G)$\\
+multiply $G$ by $\op{gcd}(Ac,Bc)$
+\end{tabular}\right.$
+
+The content of $G$ can be computed without expensive recursive calls to gcd in the case when we know the leading or trailing coefficient of $G$ in the variable $X$ must be a monomial in $x_1,\dots,x_n$.
 
 
 \section{Factorization}
@@ -251,5 +402,10 @@ J. ACM 18 (1971), 478-504.
 modular GCD algorithm. Proceedings of ISSAC ’05,
 ACM Press, pp. 124--131, 2005.
 \bibitem{SULING} Yang, Suling. Computing the Greatest Common Divisor of Multivariate Polynomials over Finite Fields. http://www.cecm.sfu.ca/CAG/theses/suling.pdf
+
+\bibitem{BMAR} The Berlekamp-Massey Algorithm revisited, N. B. Atti, G. M. Diaz–Toca, H. Lombardi, 9 March 2006
+
+\bibitem{YAP} A Unified Approach to HGCD Algorithms for polynomials and integers by Klaus Thull , Chee K. Yap
+ 
 \end{thebibliography}
 \end{document}

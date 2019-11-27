@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2015, 2019 William Hart
 
     This file is part of FLINT.
 
@@ -9,16 +9,57 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fq.h"
 #include "fq_mat.h"
-#include "fq_poly.h"
-#include "fq_vec.h"
 
-#ifdef T
-#undef T
-#endif
+slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L, 
+                                         slong m, const fq_ctx_t ctx)
+{
+   slong n = A->c, i, j, r, res = -WORD(1);
+   fmpz_poly_t h;
 
-#define T fq
-#define CAP_T FQ
-#include "fq_mat_templates/reduce_row.c"
-#undef CAP_T
-#undef T
+   fmpz_poly_init(h);
+
+   for (i = 0; i < n; i++)
+   {
+      if (i != 0)
+         fq_reduce(fq_mat_entry(A, m, i), ctx);
+
+      if (!fq_is_zero(fq_mat_entry(A, m, i), ctx))
+      {
+         r = P[i];
+         if (r != -WORD(1))
+         {
+            for (j = i + 1; j < L[r]; j++)
+            {
+               fmpz_poly_mul(h, fq_mat_entry(A, r, j), fq_mat_entry(A, m, i));
+               fmpz_poly_sub(fq_mat_entry(A, m, j), fq_mat_entry(A, m, j), h);
+            }
+ 
+            fq_zero(fq_mat_entry(A, m, i), ctx);
+         } else
+         {
+            fq_inv(h, fq_mat_entry(A, m, i), ctx);
+            fq_one(fq_mat_entry(A, m, i), ctx);
+           
+            for (j = i + 1; j < L[m]; j++)
+            {
+               fq_reduce(fq_mat_entry(A, m, j), ctx);
+
+               fq_mul(fq_mat_entry(A, m, j), fq_mat_entry(A, m, j), h, ctx);
+            }
+
+            P[i] = m;
+
+            res = i;
+
+            break;
+         }
+      }
+   }
+
+   fmpz_poly_clear(h);
+   
+   return res;
+}
+

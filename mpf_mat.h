@@ -32,7 +32,7 @@ typedef struct
     mpf * entries;
     slong r;
     slong c;
-    mp_bitcnt_t prec;
+    flint_bitcnt_t prec;
     mpf ** rows;
 } mpf_mat_struct;
 
@@ -46,7 +46,7 @@ mpf * mpf_mat_entry(const mpf_mat_t mat, slong i, slong j)
 
 /* Memory management  ********************************************************/
 
-FLINT_DLL void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, mp_bitcnt_t prec);
+FLINT_DLL void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec);
 
 FLINT_DLL void mpf_mat_swap(mpf_mat_t mat1, mpf_mat_t mat2);
 
@@ -56,7 +56,7 @@ FLINT_DLL void mpf_mat_clear(mpf_mat_t mat);
 
 FLINT_DLL int mpf_mat_equal(const mpf_mat_t mat1, const mpf_mat_t mat2);
 
-FLINT_DLL int mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2, mp_bitcnt_t bits);
+FLINT_DLL int mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2, flint_bitcnt_t bits);
 
 FLINT_DLL int mpf_mat_is_zero(const mpf_mat_t mat);
 
@@ -82,7 +82,7 @@ FLINT_DLL void mpf_mat_print(const mpf_mat_t mat);
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void mpf_mat_randtest(mpf_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void mpf_mat_randtest(mpf_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
 
 /* Multiplication */
 

@@ -14,11 +14,10 @@
 #include "padic.h"
 #include "long_extras.h"
 
-char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
+char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_print_mode mode)
 {
     const fmpz *u = padic_unit(op);
-    const slong v  = padic_val(op);
-    const fmpz *p = ctx->p;
+    const slong v = padic_val(op);
 
     if (fmpz_is_zero(u))
     {
@@ -31,7 +30,7 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
         return str;
     }
 
-    if (ctx->mode == PADIC_TERSE)
+    if (mode == PADIC_TERSE)
     {
         if (v == 0)
         {
@@ -57,14 +56,14 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
             fmpz_clear(t);
         }
     }
-    else if (ctx->mode == PADIC_SERIES)
+    else if (mode == PADIC_SERIES)
     {
         char *s;
         fmpz_t x;
         fmpz_t d;
         slong j, N;
 
-        N = fmpz_clog(u, p) + v;
+        N = fmpz_clog(u, p) + v + 1;
 
         if (!str)
         {
@@ -195,6 +194,11 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
         }
     }
 
-    return str;
+    return str;   
+}
+
+char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
+{
+    return _padic_get_str(str, op, ctx->p, ctx->mode);
 }
 

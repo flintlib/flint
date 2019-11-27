@@ -25,7 +25,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
     fmpz_t prod;
     int stabilised = 0, first;
     mp_limb_t p;
-    mp_bitcnt_t s_bits = 0, t_bits = 0;
+    flint_bitcnt_t s_bits = 0, t_bits = 0;
 
     /* Compute resultant of input polys */
     _fmpz_poly_resultant(r, poly1, len1, poly2, len2);
@@ -119,7 +119,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
             }
             else /* Otherwise do CRT */
             {
-                mp_bitcnt_t new_s_bits, new_t_bits;
+                flint_bitcnt_t new_s_bits, new_t_bits;
 
                 _fmpz_poly_CRT_ui(s, s, len2, prod, S, len2, mod.n, mod.ninv, 1);
                 _fmpz_poly_CRT_ui(t, t, len1, prod, T, len1, mod.n, mod.ninv, 1);

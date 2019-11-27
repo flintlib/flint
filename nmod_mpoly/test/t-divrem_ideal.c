@@ -30,9 +30,8 @@ main(void)
         nmod_mpoly_t f, g, h, k, r;
         ordering_t ord;
         mp_limb_t modulus;
-        slong maxbits;
-        slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
-        slong exp_bits, exp_bits1, exp_bits2;
+        slong nvars, len, len1, len2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         nmod_mpoly_struct * qarr[1], * darr[1];
         ord = mpoly_ordering_randtest(state);
         nvars = n_randint(state, 10) + 1;
@@ -52,24 +51,19 @@ main(void)
         len1 = n_randint(state, 100);
         len2 = n_randint(state, 100) + 1;
 
-        maxbits = FLINT_BITS - mpoly_ordering_isdeg(ctx->minfo)*FLINT_BIT_COUNT(nvars);
-        exp_bits = n_randint(state, maxbits - 1) + 1;
-        exp_bits1 = n_randint(state, maxbits - 2) + 1;
-        exp_bits2 = n_randint(state, maxbits - 2) + 1;
-
-        exp_bound = n_randbits(state, exp_bits);
-        exp_bound1 = n_randbits(state, exp_bits1);
-        exp_bound2 = n_randbits(state, exp_bits2);
+        exp_bits = n_randint(state, 200) + 1;
+        exp_bits1 = n_randint(state, 200) + 1;
+        exp_bits2 = n_randint(state, 200) + 1;
 
         for (j = 0; j < 4; j++)
         {
-            nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
+            nmod_mpoly_randtest_bound(f, state, len1, exp_bits1, ctx);
             do {
-                nmod_mpoly_randtest_bound(g, state, len2, exp_bound2 + 1, ctx);
+                nmod_mpoly_randtest_bound(g, state, len2, exp_bits2 + 1, ctx);
             } while (g->length == 0);
-            nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest_bound(k, state, len, exp_bound, ctx);
-            nmod_mpoly_randtest_bound(r, state, len, exp_bound, ctx);
+            nmod_mpoly_randtest_bound(h, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bound(k, state, len, exp_bits, ctx);
+            nmod_mpoly_randtest_bound(r, state, len, exp_bits, ctx);
 
             nmod_mpoly_mul(h, f, g, ctx);
 
@@ -109,6 +103,7 @@ main(void)
         mp_limb_t modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
         nmod_mpoly_struct * qarr[5], * darr[5];
+        fmpz * shifts, * strides;
 
         num = n_randint(state, 5) + 1;
 
@@ -146,14 +141,27 @@ main(void)
         exp_bound1 = n_randint(state, 25/nvars + 1) + 2;
         exp_bound2 = n_randint(state, 20/nvars + 1) + 1;
 
+        shifts = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        strides = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            fmpz_init(shifts + j);
+            fmpz_init(strides + j);
+            fmpz_randtest_unsigned(shifts + j, state, 100);
+            fmpz_randtest_unsigned(strides + j, state, 100);
+            fmpz_add_ui(strides + j, strides + j, 1);
+        }
+
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
+            nmod_mpoly_inflate(f, f, shifts, strides, ctx);
             for (w = 0; w < num; w++)
             {
                 do {
                     nmod_mpoly_randtest_bound(darr[w], state, len2, exp_bound2 + 1, ctx);
                 } while (darr[w]->length == 0);
+                nmod_mpoly_inflate(darr[w], darr[w], shifts, strides, ctx);
                 nmod_mpoly_randtest_bound(qarr[w], state, len, exp_bound, ctx);
             }
             nmod_mpoly_randtest_bound(k1, state, len, exp_bound, ctx);
@@ -184,6 +192,14 @@ main(void)
                 flint_abort();
             }
         }
+
+        for (j = 0; j < ctx->minfo->nvars; j++)
+        {
+            fmpz_clear(shifts + j);
+            fmpz_clear(strides + j);
+        }
+        flint_free(shifts);
+        flint_free(strides);
 
         for (w = 0; w < num; w++)
             nmod_mpoly_clear(qarr[w], ctx);

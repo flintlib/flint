@@ -97,6 +97,27 @@ Basic assignment
     Sets the matrix ``rop`` to the transpose of the matrix ``op``, 
     assuming that their dimensions are compatible.
 
+.. function:: void fmpq_mat_swap_rows(fmpq_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: void fmpq_mat_swap_cols(fmpq_mat_t, slong * perm, slong r, slong r)
+    
+    Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
+
+.. function:: void fmpq_mat_invert_rows(fmpq_mat_t, slong * perm)
+    
+    Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
+    ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: void fmpq_mat_invert_cols(fmpq_mat_t, slong * perm)
+    
+    Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
+    ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
 
 Addition, scalar multiplication
 --------------------------------------------------------------------------------
@@ -156,12 +177,12 @@ Random matrix generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     This is equivalent to applying ``fmpq_randbits`` to all entries
     in the matrix.
 
-.. function:: void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     This is equivalent to applying ``fmpq_randtest`` to all entries
     in the matrix.

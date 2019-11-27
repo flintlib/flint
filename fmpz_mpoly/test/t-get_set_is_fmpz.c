@@ -31,7 +31,7 @@ main(void)
         fmpz_mpoly_t f;
         fmpz_t c, d;
         slong len;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
 
         fmpz_init(c);
         fmpz_init(d);
@@ -72,10 +72,10 @@ main(void)
             flint_abort();
         }
 
-        fmpz_mpoly_clear(f, ctx);
-
         fmpz_clear(c);
         fmpz_clear(d);
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

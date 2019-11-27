@@ -17,7 +17,7 @@
 int
 _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                         const ulong * exps, slong len, const char ** x_in,
-                                      mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
    slong i, j, N;
    fmpz * exponents;

@@ -79,7 +79,7 @@ TEMPLATE(T, poly_div_newton_n_preinv) (TEMPLATE(T, poly_t) Q,
 
     if (Q == A || Q == B || Q == Binv)
     {
-        flint_free(Q->coeffs);
+        TEMPLATE(T, poly_clear) (Q, ctx);
         Q->coeffs = q;
         Q->alloc = lenQ;
     }

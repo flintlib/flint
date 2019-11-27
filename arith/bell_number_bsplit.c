@@ -73,7 +73,7 @@ void
 arith_bell_number_bsplit(fmpz_t b, ulong n)
 {
     slong N;
-    mp_bitcnt_t prec;
+    flint_bitcnt_t prec;
     mpz_t P, Q;
     mpfr_t Pf, Qf, E, one;
 

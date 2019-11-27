@@ -119,6 +119,8 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
             
             fmpz_factor_no_trial(factor, n2);
 
+            fmpz_clear(n2);
+
             goto cleanup;
         }
     }

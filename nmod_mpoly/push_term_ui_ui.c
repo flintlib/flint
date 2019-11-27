@@ -14,13 +14,12 @@
 /*
     emplaceterm assumes that c is valid modulo ctx->ffinfo->mod.n
 */
-void _nmod_mpoly_emplacebackterm_ui_ui(nmod_mpoly_t A,
-                    mp_limb_t c, const ulong * exp, const nmod_mpoly_ctx_t ctx)
+void _nmod_mpoly_push_exp_ui(nmod_mpoly_t A,
+                                 const ulong * exp, const nmod_mpoly_ctx_t ctx)
 {
     slong N;
     slong old_length = A->length;
-    mp_bitcnt_t exp_bits;
-    FLINT_ASSERT(c < ctx->ffinfo->mod.n);
+    flint_bitcnt_t exp_bits;
 
     exp_bits = mpoly_exp_bits_required_ui(exp, ctx->minfo);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
@@ -30,7 +29,6 @@ void _nmod_mpoly_emplacebackterm_ui_ui(nmod_mpoly_t A,
 
     nmod_mpoly_fit_length(A, old_length + 1, ctx);
     A->length = old_length + 1;
-    A->coeffs[old_length] = c;
     mpoly_set_monomial_ui(A->exps + N*old_length, exp, A->bits, ctx->minfo);
 }
 
@@ -38,9 +36,10 @@ void _nmod_mpoly_emplacebackterm_ui_ui(nmod_mpoly_t A,
 void nmod_mpoly_push_term_ui_ui(nmod_mpoly_t A, ulong c,
                                  const ulong * exp, const nmod_mpoly_ctx_t ctx)
 {
+    _nmod_mpoly_push_exp_ui(A, exp, ctx);
     if (c >= ctx->ffinfo->mod.n)
     {
         NMOD_RED(c, c, ctx->ffinfo->mod);
     }
-    _nmod_mpoly_emplacebackterm_ui_ui(A, c, exp, ctx);    
+    A->coeffs[A->length - 1] = c;   
 }

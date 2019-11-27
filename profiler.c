@@ -17,6 +17,10 @@
 #include <string.h>
 #include "profiler.h"
 
+#if (defined( _MSC_VER ) || (GMP_LIMB_BITS == 64 && defined (__amd64__)) || \
+	                    (GMP_LIMB_BITS == 32 && (defined (__i386__) || \
+			       defined (__i486__) || defined(__amd64__))))
+
 /*
    clock_last[i] is the last read clock value for clock #i.
    clock_accum[i] is the total time attributed to clock #i so far.
@@ -96,6 +100,8 @@ prof_repeat(double *min, double *max, profile_target_t target, void *arg)
     if (max)
         *max = max_time;
 }
+
+#endif
 
 void get_memory_usage(meminfo_t meminfo)
 {

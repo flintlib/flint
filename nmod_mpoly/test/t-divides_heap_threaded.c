@@ -18,8 +18,11 @@
 int
 main(void)
 {
-    int i, j, result, result2, max_threads = 5;
+    int i, j, result, result2, max_threads = 5, tmul = 30;
     FLINT_TEST_INIT(state);
+#ifdef _WIN32
+    tmul = 1;
+#endif
 
     flint_printf("divides_heap_threaded....");
     fflush(stdout);
@@ -28,6 +31,7 @@ main(void)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t p, f, g, h, h2;
         const char * vars[] = {"x","y","z","t","u"};
+        int aff[] = {0, 1};
 
         nmod_mpoly_ctx_init(ctx, 5, ORD_DEGLEX, 179424691);
         nmod_mpoly_init(f, ctx);
@@ -42,8 +46,10 @@ main(void)
         result = nmod_mpoly_divides_monagan_pearce(h, p, f, ctx);
         nmod_mpoly_assert_canonical(h, ctx);
         flint_set_num_threads(2);
-        result2 = nmod_mpoly_divides_heap_threaded(h2, p, f, ctx);
+        flint_set_thread_affinity(aff, 2);
+        result2 = nmod_mpoly_divides_heap_threaded(h2, p, f, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
         nmod_mpoly_assert_canonical(h2, ctx);
+        flint_restore_thread_affinity();
 
         if (!result || !result2
                     || !nmod_mpoly_equal(h, g, ctx)
@@ -63,12 +69,12 @@ main(void)
     }
 
     /* Check f*g/g = f */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -103,7 +109,7 @@ main(void)
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
-            result = nmod_mpoly_divides_heap_threaded(k, h, g, ctx);
+            result = nmod_mpoly_divides_heap_threaded(k, h, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(k, ctx);
             result = result && nmod_mpoly_equal(f, k, ctx);
 
@@ -123,12 +129,12 @@ main(void)
     }
 
     /* Check f*g/g = f with divisor aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -161,7 +167,7 @@ main(void)
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
-            result = nmod_mpoly_divides_heap_threaded(g, h, g, ctx);
+            result = nmod_mpoly_divides_heap_threaded(g, h, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(g, ctx);
             result = result && nmod_mpoly_equal(f, g, ctx);
 
@@ -180,12 +186,12 @@ main(void)
     }
 
     /* Check f*g/g = f with dividend aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -218,7 +224,7 @@ main(void)
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
-            result = nmod_mpoly_divides_heap_threaded(h, h, g, ctx);
+            result = nmod_mpoly_divides_heap_threaded(h, h, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(h, ctx);
             result = result && nmod_mpoly_equal(f, h, ctx);
 
@@ -237,12 +243,12 @@ main(void)
     }
 
     /* Check random polys don't divide */
-    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, p, h1, h2;
         slong len1, len2, len3;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bound3;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bound3;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -279,7 +285,7 @@ main(void)
             nmod_mpoly_add(f, f, p, ctx);
             result = nmod_mpoly_divides_monagan_pearce(h1, f, g, ctx);
             nmod_mpoly_assert_canonical(h1, ctx);
-            result2 = nmod_mpoly_divides_heap_threaded(h2, f, g, ctx);
+            result2 = nmod_mpoly_divides_heap_threaded(h2, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(h2, ctx);
 
             if (result != result2 || !nmod_mpoly_equal(h1, h2, ctx))
@@ -300,12 +306,12 @@ main(void)
     }
 
     /* Check random polys don't divide alias dividend */
-    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, p, h1;
         slong len1, len2, len3;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bound3;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bound3;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -341,7 +347,7 @@ main(void)
             nmod_mpoly_add(f, f, p, ctx);
             result = nmod_mpoly_divides_monagan_pearce(h1, f, g, ctx);
             nmod_mpoly_assert_canonical(h1, ctx);
-            result2 = nmod_mpoly_divides_heap_threaded(f, f, g, ctx);
+            result2 = nmod_mpoly_divides_heap_threaded(f, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(f, ctx);
 
             if (result != result2 || !nmod_mpoly_equal(h1, f, ctx))
@@ -361,12 +367,12 @@ main(void)
     }
 
     /* Check random polys don't divide alias divisor */
-    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, p, h1;
         slong len1, len2, len3;
-        mp_bitcnt_t exp_bits1, exp_bits2, exp_bound3;
+        flint_bitcnt_t exp_bits1, exp_bits2, exp_bound3;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -402,7 +408,7 @@ main(void)
             nmod_mpoly_add(f, f, p, ctx);
             result = nmod_mpoly_divides_monagan_pearce(h1, f, g, ctx);
             nmod_mpoly_assert_canonical(h1, ctx);
-            result2 = nmod_mpoly_divides_heap_threaded(g, f, g, ctx);
+            result2 = nmod_mpoly_divides_heap_threaded(g, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(g, ctx);
 
             if (result != result2 || !nmod_mpoly_equal(h1, g, ctx))

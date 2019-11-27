@@ -67,7 +67,7 @@ struct fits_into_slong<T, typename mp::enable_if<traits::is_integer<T> >::type>
             >
         > { };
 
-template<class T> struct fits_into_mp_bitcnt_t : is_unsigned_integer<T> { };
+template<class T> struct fits_into_flint_bitcnt_t : is_unsigned_integer<T> { };
 
 // Compute if T is like const char*
 template<class T> struct is_string : mp::false_ { };

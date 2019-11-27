@@ -59,6 +59,7 @@ void qsieve_poly_clear(qs_t qs_inf)
       flint_free(qs_inf->poly[i].small);
       flint_free(qs_inf->poly[i].factor);
    }
+   flint_free(qs_inf->poly);
 #else
    fmpz_clear(qs_inf->poly[0].B);
    flint_free(qs_inf->poly[0].posn1);
@@ -67,6 +68,7 @@ void qsieve_poly_clear(qs_t qs_inf)
    flint_free(qs_inf->poly[0].soln2);
    flint_free(qs_inf->poly[0].small);
    flint_free(qs_inf->poly[0].factor);
+   flint_free(qs_inf->poly);
 #endif
 
    qs_inf->B_terms = NULL;

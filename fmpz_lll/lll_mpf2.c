@@ -21,7 +21,7 @@
 #undef TYPE
 #endif
 
-#define FUNC_HEAD int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec, const fmpz_lll_t fl)
+#define FUNC_HEAD int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_lll_t fl)
 #define TYPE 0                  /* indicates removals aren't desired */
 #include "mpf2_lll.c"
 #undef FUNC_HEAD

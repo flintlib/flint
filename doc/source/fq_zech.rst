@@ -127,7 +127,7 @@ Context Management
 .. function:: void fq_zech_ctx_randtest(fq_zech_ctx_t ctx)
 
     Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_zech_ctx_init`` as not been called on ``ctx`` already.
+    ``fq_zech_ctx_init`` has not been called on ``ctx`` already.
 
 .. function:: void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx)
 
@@ -391,6 +391,14 @@ Assignments and conversions
     Sets ``rop`` to the ``fq_zech_t`` element corresponding to
     ``op``.
 
+.. function:: void fq_zech_get_nmod_mat(nmod_mat_t col, const fq_zech_t a, const fq_zech_ctx_t ctx)
+
+    Convert ``a`` to a column vector of length ``degree(ctx)``.
+
+.. function:: void fq_zech_set_nmod_mat(fq_zech_t a, const nmod_mat_t col, const fq_zech_ctx_t ctx)
+
+    Convert a column vector ``col`` of length ``degree(ctx)`` to
+    an element of ``ctx``.
 
 
 Comparison
@@ -467,6 +475,11 @@ Special functions
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
 
+    Note that ``ctx`` must already correspond to a finite field defined by
+    a primitive polynomial and so this function cannot be used to check
+    primitivity of the generator, but can be used to check that other elements
+    are primitive.
+
 .. function:: int fq_zech_is_primitive(const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Returns whether ``op`` is primitive, i.e., whether it is a
@@ -477,12 +490,12 @@ Bit packing
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, mp_bitcnt_t bit_size, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, flint_bitcnt_t bit_size, const fq_zech_ctx_t ctx)
 
     Packs ``op`` into bitfields of size ``bit_size``, writing the
     result to ``f``.
 
-.. function:: void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, flint_bitcnt_t bit_size, const fq_zech_ctx_t ctx)
 
     Unpacks into ``rop`` the element with coefficients packed into
     fields of size ``bit_size`` as represented by the integer

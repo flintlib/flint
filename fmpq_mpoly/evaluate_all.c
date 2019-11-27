@@ -117,12 +117,12 @@ void _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t poly,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        mp_bitcnt_t varibits;
+        flint_bitcnt_t varibits;
 
         if (i == main_var)
             continue;
 
-        mpoly_gen_offset_shift(&off, &shift, i, N, bits, ctx->minfo);
+        mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
         varibits = FLINT_BIT_COUNT(degrees[i]);
         for (j = 0; j < varibits; j++)
         {
@@ -140,7 +140,7 @@ void _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t poly,
     FLINT_ASSERT(k_len == entries);
 
     /* accumulate coefficients of the main variable */
-    mpoly_gen_offset_shift(&main_off, &main_shift, main_var, N, bits, ctx->minfo);
+    mpoly_gen_offset_shift_sp(&main_off, &main_shift, main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     fmpq_init(t);
     mask = (-UWORD(1)) >> (FLINT_BITS - bits);
@@ -284,12 +284,12 @@ void _fmpz_mpoly_evaluate_all_tree_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        mp_bitcnt_t varibits;
+        flint_bitcnt_t varibits;
 
         if (i == main_var)
             continue;
 
-        off = mpoly_gen_offset_mp(i, N, bits, ctx->minfo);
+        off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
         varibits = fmpz_bits(degrees + i);
         if (varibits >= FLINT_BITS && !fmpz_is_one(fmpq_denref(vals[i]))
                                   && (fmpz_is_zero(fmpq_denref(vals[i]))
@@ -313,7 +313,7 @@ void _fmpz_mpoly_evaluate_all_tree_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
     FLINT_ASSERT(k_len == entries);
 
     /* accumulate coefficients of the main variable */
-    main_off = mpoly_gen_offset_mp(main_var, N, bits, ctx->minfo);
+    main_off = mpoly_gen_offset_mp(main_var, bits, ctx->minfo);
     mpoly_rbtree_init(tree);
     fmpq_init(t);
     fmpz_init(main_exp);

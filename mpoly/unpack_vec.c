@@ -11,7 +11,7 @@
 
 #include "mpoly.h"
 
-void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
+void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, flint_bitcnt_t bits,
                                                      slong nfields, slong len)
 {
     if (bits <= FLINT_BITS)
@@ -38,8 +38,8 @@ void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
                 shift += bits;      /* number of bits to encode ith field */
             }
         }
-
-    } else
+    }
+    else
     {
         slong j;
         ulong words_per_field = bits/FLINT_BITS;
@@ -52,7 +52,7 @@ void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits,
     }
 }
 
-void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
+void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, flint_bitcnt_t bits,
                                                       slong nfields, slong len)
 {
     if (bits <= FLINT_BITS)
@@ -79,7 +79,8 @@ void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
                 shift += bits;      /* number of bits to encode ith field */
             }
         }
-    } else
+    }
+    else
     {
         slong j;
         ulong words_per_field = bits/FLINT_BITS;
@@ -87,20 +88,22 @@ void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, mp_bitcnt_t bits,
 
         for (j = 0; j < len*nfields; j++, exp2 += words_per_field)
         {
-                ulong size = words_per_field;
-                while (size > 1 && exp2[size - 1] == 0)
-                    size--;
-                if (size == 1)
-                {
-                    fmpz_set_ui(exp1, exp2[0]);
-                } else
-                {
-                    __mpz_struct * mpz = _fmpz_promote(exp1);
+            ulong size = words_per_field;
+            while (size > 1 && exp2[size - 1] == 0)
+                size--;
+            if (size == 1)
+            {
+                fmpz_set_ui(exp1, exp2[0]);
+            }
+            else
+            {
+                __mpz_struct * mpz = _fmpz_promote(exp1);
+                if (mpz->_mp_alloc < words_per_field)
                     mpz_realloc2(mpz, bits);
-                    mpn_copyi(mpz->_mp_d, exp2, size);
-                    mpz->_mp_size = size;
-                }
-                exp1++;
+                mpz->_mp_size = size;
+                flint_mpn_copyi(mpz->_mp_d, exp2, size);
+            }
+            exp1++;
         }
     }
 }

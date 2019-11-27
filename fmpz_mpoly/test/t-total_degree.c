@@ -18,43 +18,12 @@
 void _check_total_degree(const fmpz_t totdeg_check, const fmpz_mpoly_t A,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, j, N;
-    fmpz_t tot, totdeg;
-    fmpz * tmp_exps;
-    const ulong * exps = A->exps;
-    slong len = A->length;
-    mp_bitcnt_t bits = A->bits;
-    const mpoly_ctx_struct * mctx = ctx->minfo;
-    TMP_INIT;
-
+    fmpz_t totdeg;
     fmpz_init(totdeg);
-    fmpz_set_si(totdeg, -WORD(1));
-
-    TMP_START;
-    fmpz_init(tot);
-    tmp_exps = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
-    for (j = 0; j < mctx->nvars; j++)
-        fmpz_init(tmp_exps + j);
-    N = mpoly_words_per_exp(bits, mctx);
-    for (i = 0; i < len; i++)
-    {
-        mpoly_get_monomial_ffmpz(tmp_exps, exps + N*i, bits, mctx);
-        fmpz_zero(tot);
-        for (j = 0; j < mctx->nvars; j++)
-            fmpz_add(tot, tot, tmp_exps + j);
-        if (fmpz_cmp(totdeg, tot) < 0)
-            fmpz_swap(totdeg, tot);
-    }
-    fmpz_clear(tot);
-    for (j = 0; j < mctx->nvars; j++)
-        fmpz_clear(tmp_exps + j);
-
+    mpoly_total_degree_fmpz_ref(totdeg, A->exps, A->length, A->bits, ctx->minfo);
     if (!fmpz_equal(totdeg_check, totdeg))
         flint_throw(FLINT_ERROR, "Total degree is wrong");
-
     fmpz_clear(totdeg);
-
-    TMP_END;
 }
 
 
@@ -75,7 +44,7 @@ main(void)
         fmpz_mpoly_t f, g, h;
         fmpz_t fdeg, gdeg, hdeg;
         slong len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 
@@ -132,7 +101,7 @@ main(void)
         fmpz_mpoly_t f, g, h;
         fmpz_t fdeg, gdeg, hdeg;
         slong len1, len2;
-        mp_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
 

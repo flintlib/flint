@@ -9,8 +9,22 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#ifndef THREAD_POOL_H
+#define THREAD_POOL_H
+
+/* for some reason this define needs to be outside of the next if */
+#define _GNU_SOURCE
+#if HAVE_CPU_SET_T
+#include <sched.h>
+#endif
+
 #include <pthread.h>
+
 #include "flint.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 typedef struct
 {
@@ -30,6 +44,9 @@ typedef thread_pool_entry_struct thread_pool_entry_t[1];
 
 typedef struct
 {
+#if HAVE_CPU_SET_T
+    cpu_set_t original_affinity;
+#endif
     pthread_mutex_t mutex;
     thread_pool_entry_struct * tdata;
     slong length;
@@ -39,12 +56,17 @@ typedef thread_pool_struct thread_pool_t[1];
 
 typedef int thread_pool_handle;
 
-extern thread_pool_t global_thread_pool;
-extern int global_thread_pool_initialized;
+FLINT_DLL extern thread_pool_t global_thread_pool;
+FLINT_DLL extern int global_thread_pool_initialized;
 
 FLINT_DLL void * thread_pool_idle_loop(void * varg);
 
 FLINT_DLL void thread_pool_init(thread_pool_t T, slong l);
+
+FLINT_DLL int thread_pool_set_affinity(thread_pool_t T,
+                                                     int * cpus, slong length);
+
+FLINT_DLL int thread_pool_restore_affinity(thread_pool_t T);
 
 FLINT_DLL slong thread_pool_get_size(thread_pool_t T);
 
@@ -61,3 +83,9 @@ FLINT_DLL void thread_pool_wait(thread_pool_t T, thread_pool_handle i);
 FLINT_DLL void thread_pool_give_back(thread_pool_t T, thread_pool_handle i);
 
 FLINT_DLL void thread_pool_clear(thread_pool_t T);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

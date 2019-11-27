@@ -135,6 +135,12 @@ Factorisation
     factors.  Requires that ``pol`` be monic, non-constant and
     squarefree.
 
+.. function:: void fq_zech_poly_factor_split_single(fq_zech_poly_t linfactor, const fq_zech_poly_t input, const fq_zech_ctx_t ctx)
+
+    Assuming ``input`` is a product of factors all of degree 1, finds a single
+    linear factor of ``input`` and places it in ``linfactor``.
+    Requires that ``input`` be monic and non-constant.
+
 .. function:: void fq_zech_poly_factor_distinct_deg(fq_zech_poly_factor_t res, const fq_zech_poly_t poly, slong * const *degs, const fq_zech_ctx_t ctx)
 
     Factorises a monic non-constant squarefree polymnomial ``poly``

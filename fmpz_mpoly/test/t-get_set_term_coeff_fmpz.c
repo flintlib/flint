@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
 int
 main(void)
@@ -25,13 +24,13 @@ main(void)
     fflush(stdout);
 
     /* Set coeff and get coeff and compare */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
         fmpz_t c, d;
         slong len, index;
-        mp_bitcnt_t coeff_bits, exp_bits;
+        flint_bitcnt_t coeff_bits, exp_bits;
 
         fmpz_init(c);
         fmpz_init(d);
@@ -43,28 +42,37 @@ main(void)
         exp_bits = n_randint(state, 200) + 1;
         coeff_bits = n_randint(state, 200);
         fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
-        if (f->length == WORD(0))
-            continue;
 
-        for (j = 0; j < 10; j++)
+        if (f->length > 0)
         {
-            fmpz_randtest(c, state, n_randint(state, 200));
-
-            index = n_randint(state, f->length);
-
-            fmpz_mpoly_set_term_coeff_fmpz(f, index, c, ctx);
-            fmpz_mpoly_get_term_coeff_fmpz(d, f, index, ctx);
-            if (!fmpz_equal(c, d))
+            for (j = 0; j < 10; j++)
             {
-                printf("FAIL\n");
-                flint_printf("Set coeff and get coeff and compare\ni = %wd, j = %wd\n", i, j);
-                flint_abort();
+                fmpz_randtest(c, state, n_randint(state, 200));
+
+                index = n_randint(state, f->length);
+
+                fmpz_mpoly_set_term_coeff_fmpz(f, index, c, ctx);
+                fmpz_mpoly_get_term_coeff_fmpz(d, f, index, ctx);
+                if (!fmpz_equal(c, d))
+                {
+                    printf("FAIL\n");
+                    flint_printf("check get and set match\ni = %wd, j = %wd\n", i, j);
+                    flint_abort();
+                }
+
+                if (!fmpz_equal(fmpz_mpoly_term_coeff_ref(f, index, ctx), d))
+                {
+                    printf("FAIL\n");
+                    flint_printf("check reference match\ni = %wd, j = %wd\n", i, j);
+                    flint_abort();
+                }
             }
         }
 
         fmpz_mpoly_clear(f, ctx);
         fmpz_clear(c);      
-        fmpz_clear(d);      
+        fmpz_clear(d);
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

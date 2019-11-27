@@ -11,13 +11,11 @@
 
 #include "mpoly.h"
 
+/* this file does not need to change with new orderings */
 
-/*
-    unpack the field-wise minimum of poly_exps into max_fields
-    must have len > 0
-*/
-void mpoly_min_fields_ui(ulong * min_fields, const ulong * poly_exps,
-                           slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+/* unpack the field-wise minimum of poly_exps into min_fields */
+void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
+                           slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong i, N;
     ulong * pmin, mask;
@@ -26,23 +24,18 @@ void mpoly_min_fields_ui(ulong * min_fields, const ulong * poly_exps,
     FLINT_ASSERT(len > 0);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
-    N = mpoly_words_per_exp(bits, mctx);
+    N = mpoly_words_per_exp_sp(bits, mctx);
 
     mask = 0;
     for (i = 0; i < FLINT_BITS/bits; i++)
-    {
         mask = (mask << bits) + (UWORD(1) << (bits - 1));
-    }
 
     TMP_START;
 
     pmin = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    i = 0;
-    mpoly_monomial_set(pmin, poly_exps + N*i, N);
+    mpoly_monomial_set(pmin, poly_exps + N*0, N);
     for (i = 1; i < len; i++)
-    {
         mpoly_monomial_min(pmin, pmin, poly_exps + N*i, bits, N, mask);
-    }
 
     mpoly_unpack_vec_ui(min_fields, pmin, bits, mctx->nfields, 1);
 
@@ -51,52 +44,36 @@ void mpoly_min_fields_ui(ulong * min_fields, const ulong * poly_exps,
 
 
 void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
-                           slong len, mp_bitcnt_t bits, const mpoly_ctx_t mctx)
+                           slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
-    slong i, j, N;
+    slong i, N;
+    ulong * pmin, mask;
     TMP_INIT;
 
     FLINT_ASSERT(len > 0);
 
     TMP_START;
 
+    N = mpoly_words_per_exp(bits, mctx);
+    pmin = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_monomial_set(pmin, poly_exps + N*0, N);
+
     if (bits <= FLINT_BITS)
     {
-        ulong * min_uis = (ulong *) TMP_ALLOC(mctx->nfields*sizeof(ulong));
-        mpoly_min_fields_ui(min_uis, poly_exps, len, bits, mctx);
-        for (j = 0; j < mctx->nfields; j++)
-        {
-            fmpz_set_ui(min_fields + j, min_uis[j]);
-        }
+        mask = 0;
+        for (i = 0; i < FLINT_BITS/bits; i++)
+            mask = (mask << bits) + (UWORD(1) << (bits - 1));
+
+        for (i = 1; i < len; i++)
+            mpoly_monomial_min(pmin, pmin, poly_exps + N*i, bits, N, mask);
     }
     else
     {
-        fmpz * tmp_exps;
-        tmp_exps = (fmpz *) TMP_ALLOC(mctx->nfields*sizeof(fmpz));
-        for (j = 0; j < mctx->nfields; j++)
-        {
-            fmpz_init(tmp_exps + j);
-        }
-
-        N = mpoly_words_per_exp(bits, mctx);
-
-        i = 0;
-        mpoly_unpack_vec_fmpz(min_fields, poly_exps + N*i, bits, mctx->nfields, 1);
         for (i = 1; i < len; i++)
-        {
-            mpoly_unpack_vec_fmpz(tmp_exps, poly_exps + N*i, bits, mctx->nfields, 1);
-            for (j = 0; j < mctx->nfields; j++)
-            {
-                if (fmpz_cmp(min_fields + j, tmp_exps + j) > 0)
-                    fmpz_set(min_fields + j, tmp_exps + j);
-            }
-        }
-
-        for (j = 0; j < mctx->nfields; j++)
-        {
-            fmpz_clear(tmp_exps + j);
-        }
+            mpoly_monomial_min_mp(pmin, pmin, poly_exps + N*i, bits, N);
     }
+
+    mpoly_unpack_vec_fmpz(min_fields, pmin, bits, mctx->nfields, 1);
 
     TMP_END;
 }

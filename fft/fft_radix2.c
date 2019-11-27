@@ -14,10 +14,10 @@
 #include "fft.h"
       
 void fft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
-                   mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+                   mp_limb_t * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
 {
    mp_size_t y;
-   mp_bitcnt_t b1;
+   flint_bitcnt_t b1;
 
    b1 = i*w;
    y  = b1/FLINT_BITS;
@@ -28,7 +28,7 @@ void fft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1,
 }
 
 void fft_radix2(mp_limb_t ** ii, 
-      mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
+      mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
 {
    mp_size_t i;
    mp_size_t limbs = (w*n)/GMP_LIMB_BITS;

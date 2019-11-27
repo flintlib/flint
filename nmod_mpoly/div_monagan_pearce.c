@@ -75,29 +75,55 @@ slong _nmod_mpoly_div_monagan_pearce1(
         lt_divides = mpoly_monomial_divides1(q_exp + q_len, exp, exp3[0], mask);
 
         acc0 = acc1 = acc2 = 0;
-        do
+        if (!lt_divides)
         {
-            x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+            /* optimation: coeff arithmetic not needed */
+
+            if (mpoly_monomial_gt1(exp3[0], exp, maskhi))
+            {
+                /* optimization: no more quotient terms possible */
+                goto cleanup;
+            }
+
             do
             {
-                *store++ = x->i;
-                *store++ = x->j;
-                if (x->i != -WORD(1))
-                    hind[x->i] |= WORD(1);
-
-                if (x->i == -WORD(1))
+                x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                do
                 {
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), WORD(0), fctx->mod.n - coeff2[x->j]);
-                } else
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && heap[1].exp == exp);
+        }
+        else
+        {
+            do
+            {
+                x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
+                do
                 {
-                    umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
-                }
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
 
-            } while ((x = x->next) != NULL);
-        } while (heap_len > 1 && heap[1].exp == exp);
+                    if (x->i == -WORD(1))
+                    {
+                        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), WORD(0), fctx->mod.n - coeff2[x->j]);
+                    } else
+                    {
+                        umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
+                        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
+                    }
 
-        NMOD_RED3(acc0, acc2, acc1, acc0, fctx->mod);
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && heap[1].exp == exp);
+
+            NMOD_RED3(acc0, acc2, acc1, acc0, fctx->mod);
+        }
 
         /* process nodes taken from the heap */
         while (store > store_base)
@@ -152,14 +178,12 @@ slong _nmod_mpoly_div_monagan_pearce1(
         }
 
         /* try to divide accumulated term by leading term */
-        if (acc0 == 0)
-        {
-            continue;
-        }
         if (!lt_divides)
-        {
             continue;
-        }
+
+        if (acc0 == 0)
+            continue;
+
         q_coeff[q_len] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
 
         /* put newly generated quotient term back into the heap if neccesary */
@@ -274,47 +298,74 @@ slong _nmod_mpoly_div_monagan_pearce(
     {
         mpoly_monomial_set(exp, heap[1].exp, N);
 
+        _nmod_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
+
         if (bits <= FLINT_BITS)
         {
             if (mpoly_monomial_overflows(exp, N, mask))
-                goto exp_overflow2;
+                goto exp_overflow;
+
+            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
         }
         else
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto exp_overflow2;
-        }
-      
-        _nmod_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
+                goto exp_overflow;
 
-        if (bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
-        else
             lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
+        }
 
         acc0 = acc1 = acc2 = 0;
-        do
+
+        if (!lt_divides)
         {
-            exp_list[--exp_next] = heap[1].exp;
-            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+            /* optimation: coeff arithmetic not needed */
+
+            if (mpoly_monomial_gt(exp3 + 0, exp, N, cmpmask))
+            {
+                /* optimization: no more quotient terms possible */
+                goto cleanup;
+            }
+
             do
             {
-                *store++ = x->i;
-                *store++ = x->j;
-                if (x->i != -WORD(1))
-                    hind[x->i] |= WORD(1);
+                exp_list[--exp_next] = heap[1].exp;
+                x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+                do
+                {
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+        }
+        else
+        {
+            do
+            {
+                exp_list[--exp_next] = heap[1].exp;
+                x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+                do
                 {
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
-                                 WORD(0), WORD(0), fctx->mod.n - coeff2[x->j]);
-                } else
-                {
-                    umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
-                }
-            } while ((x = x->next) != NULL);
-        } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+                    *store++ = x->i;
+                    *store++ = x->j;
+                    if (x->i != -WORD(1))
+                        hind[x->i] |= WORD(1);
+
+                    if (x->i == -WORD(1))
+                    {
+                        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
+                                     WORD(0), WORD(0), fctx->mod.n - coeff2[x->j]);
+                    } else
+                    {
+                        umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
+                        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
+                    }
+                } while ((x = x->next) != NULL);
+            } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
+        }
 
         NMOD_RED3(acc0, acc2, acc1, acc0, fctx->mod);
 
@@ -334,9 +385,8 @@ slong _nmod_mpoly_div_monagan_pearce(
                     x->j = j + 1;
                     x->next = NULL;
                     mpoly_monomial_set(exp_list[exp_next], exp2 + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             } else
             {
@@ -350,11 +400,16 @@ slong _nmod_mpoly_div_monagan_pearce(
                     x->j = j;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
-                                                          q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
+                                                           q_exp + x->j*N, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                           q_exp + x->j*N, N);
+
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
                 /* should we go up? */
                 if (j + 1 == q_len)
@@ -369,24 +424,28 @@ slong _nmod_mpoly_div_monagan_pearce(
                     x->j = j + 1;
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
-                                                          q_exp + x->j*N, N);
-                    if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                      &next_loc, &heap_len, N, cmpmask))
-                        exp_next--;
+
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
+                                                           q_exp + x->j*N, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
+                                                           q_exp + x->j*N, N);
+
+                    exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
                 }
             }
         }
 
         /* try to divide accumulated term by leading term */
-        if (acc0 == 0)
-        {
-            continue;
-        }
+
         if (!lt_divides)
-        {
             continue;
-        }
+
+        if (acc0 == 0)
+            continue;
+
         q_coeff[q_len] = nmod_mul(acc0, lc_minus_inv, fctx->mod);
 
         /* put newly generated quotient term back into the heap if neccesary */
@@ -400,16 +459,14 @@ slong _nmod_mpoly_div_monagan_pearce(
             hind[x->i] = 2*(x->j + 1) + 0;
             mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
                                                       q_exp + x->j*N, N);
-            if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
-                                  &next_loc, &heap_len, N, cmpmask))
-                exp_next--;
+            exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
+                                             &next_loc, &heap_len, N, cmpmask);
         }
         s = 1;
         q_len++;
     }
 
-
-cleanup2:
+cleanup:
 
     (*polyq) = q_coeff;
     (*expq) = q_exp;
@@ -419,9 +476,9 @@ cleanup2:
     /* return quotient poly length */
     return q_len;
 
-exp_overflow2:
+exp_overflow:
     q_len = -WORD(1);
-    goto cleanup2;
+    goto cleanup;
 }
 
 void nmod_mpoly_div_monagan_pearce(nmod_mpoly_t q,
@@ -471,7 +528,7 @@ void nmod_mpoly_div_monagan_pearce(nmod_mpoly_t q,
     }
 
     /* check divisor leading monomial is at most that of the dividend */
-    if (mpoly_monomial_lt(exp3, exp2, N, cmpmask))
+    if (mpoly_monomial_lt(exp2, exp3, N, cmpmask))
     {
         nmod_mpoly_zero(q, ctx);
         goto cleanup3;

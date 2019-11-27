@@ -16,13 +16,17 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_divrem(fmpz * Q, fmpz * R,
-                       const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+int _fmpz_poly_divrem(fmpz * Q, fmpz * R,
+     const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 {
+    int res;
+
     if (lenB < 6)
-        _fmpz_poly_divrem_basecase(Q, R, A, lenA, B, lenB);
+        res = _fmpz_poly_divrem_basecase(Q, R, A, lenA, B, lenB, exact);
     else
-        _fmpz_poly_divrem_divconquer(Q, R, A, lenA, B, lenB);
+        res = _fmpz_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, exact);
+
+    return res;
 }
 
 void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
@@ -64,22 +68,32 @@ void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_poly_divrem(q, r, A->coeffs, lenA, B->coeffs, lenB);
+    _fmpz_poly_divrem(q, r, A->coeffs, lenA, B->coeffs, lenB, 0);
 
     if (Q == A || Q == B)
     {
         _fmpz_vec_clear(Q->coeffs, Q->alloc);
         Q->coeffs = q;
         Q->alloc  = lenA - lenB + 1;
+        Q->length = lenA - lenB + 1;
     }
+    else
+    {
+        _fmpz_poly_set_length(Q, lenA - lenB + 1);
+    }
+
     if (R == A || R == B)
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);
         R->coeffs = r;
-        R->alloc  = lenB - 1;
+        R->alloc  = lenA;
+        R->length = lenA;
     }
-    _fmpz_poly_set_length(Q, lenA - lenB + 1);
-    _fmpz_poly_set_length(R, lenA);
+    else
+    {
+        _fmpz_poly_set_length(R, lenA);
+    }
+
     _fmpz_poly_normalise(Q);
     _fmpz_poly_normalise(R);
 }

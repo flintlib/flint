@@ -86,7 +86,7 @@ int main(void)
     {
         mp_limb_t a, b, p, pow, pow2, pinv;
         slong exp, maxexp, num, i;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
         mp_limb_t * sqrt;
         int btest;
 
@@ -148,7 +148,7 @@ int main(void)
     {
         mp_limb_t a, b, p, pow, pinv;
         slong exp, maxexp;
-        mp_bitcnt_t bits;
+        flint_bitcnt_t bits;
         mp_limb_t * sqrt;
         
         bits = n_randint(state, 18) + 2;

@@ -107,7 +107,7 @@ Context Management
 .. function:: void fq_ctx_randtest(fq_ctx_t ctx)
 
     Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_ctx_init`` as not been called on ``ctx`` already.
+    ``fq_ctx_init`` has not been called on ``ctx`` already.
 
 .. function:: void fq_ctx_randtest_reducible(fq_ctx_t ctx)
 
@@ -368,6 +368,15 @@ Assignments and conversions
     There is no guarantee this is a multiplicative generator of
     the finite field.
 
+.. function:: void fq_get_fmpz_mod_mat(fmpz_mod_mat_t col, const fq_t a, const fq_ctx_t ctx)
+
+    Convert ``a`` to a column vector of length ``degree(ctx)``.
+
+.. function:: void fq_set_fmpz_mod_mat(fq_t a, const fmpz_mod_mat_t col, const fq_ctx_t ctx)
+
+    Convert a column vector ``col`` of length ``degree(ctx)`` to
+    an element of ``ctx``.
+
 
 Comparison
 --------------------------------------------------------------------------------
@@ -457,6 +466,9 @@ Special functions
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
 
+    This function can also be used to check primitivity of a generator of
+    a finite field whose defining polynomial is not primitive.
+
 .. function:: int fq_is_primitive(const fq_t op, const fq_ctx_t ctx)
 
     Returns whether ``op`` is primitive, i.e., whether it is a
@@ -467,12 +479,12 @@ Bit packing
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_bit_pack(fmpz_t f, const fq_t op, mp_bitcnt_t bit_size, const fq_ctx_t ctx)
+.. function:: void fq_bit_pack(fmpz_t f, const fq_t op, flint_bitcnt_t bit_size, const fq_ctx_t ctx)
 
     Packs ``op`` into bitfields of size ``bit_size``, writing the
     result to ``f``.
 
-.. function:: void fq_bit_unpack(fq_t rop, const fmpz_t f, mp_bitcnt_t bit_size, const fq_ctx_t ctx)
+.. function:: void fq_bit_unpack(fq_t rop, const fmpz_t f, flint_bitcnt_t bit_size, const fq_ctx_t ctx)
 
     Unpacks into ``rop`` the element with coefficients packed into
     fields of size ``bit_size`` as represented by the integer

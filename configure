@@ -680,6 +680,26 @@ rm -f build/test-fenv.h
 
 CONFIG_PTHREAD="#define HAVE_PTHREAD ${PTHREAD}"
 
+#cpu_set_t configuration
+
+CONFIG_CPU_SET_T="#define HAVE_CPU_SET_T 0"
+
+mkdir -p build
+MSG="Testing cpu_set_t..."
+printf "%s" "$MSG"
+echo "#define _GNU_SOURCE
+#include <sched.h>
+int main(){cpu_set_t s;CPU_ZERO(&s);return 0;}" > build/test-cpu_set_t.c
+$CC build/test-cpu_set_t.c -o ./build/test-cpu_set_t > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    rm -f build/test-cpu_set_t
+    printf "%s\n" "yes"
+    CONFIG_CPU_SET_T="#define HAVE_CPU_SET_T 1"
+else
+    printf "%s\n" "no"
+fi
+rm -f build/test-cpu_set_t.c
+
 
 #external modules
 
@@ -733,6 +753,7 @@ echo "$CONFIG_FENV" >> config.h
 echo "$CONFIG_PTHREAD" >> config.h
 echo "$CONFIG_OPENMP" >> config.h
 echo "$CONFIG_GC" >> config.h
+echo "$CONFIG_CPU_SET_T" >> config.h
 echo "#define FLINT_REENTRANT $REENTRANT" >> config.h
 echo "#define WANT_ASSERT $ASSERT" >> config.h
 if [ "$FLINT_DLL" = "1" ]; then

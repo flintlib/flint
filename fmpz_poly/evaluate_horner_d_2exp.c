@@ -47,7 +47,7 @@ double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong 
       mpf_add(output, output, mpf_coeff);
    }
 
-   res = mpf_get_d_2exp(exp, output);
+   res = flint_mpf_get_d_2exp(exp, output);
    
    if (mpf_sgn(output) < 0 && res >= 0.0)
       res = -res; /* work around bug in earlier versions of GMP/MPIR */

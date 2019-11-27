@@ -57,7 +57,7 @@ aprcl_R_value(const fmpz_t n)
     if (bits <= 12713) return 1396755360;
 
     /* 2^5 * 3^3 * 5^2 * 7 * 11 * 13 * 17 * 19 */
-    return 6983776800;
+    return UWORD(6983776800);
 }
 
 static void
@@ -134,42 +134,6 @@ _config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
     fmpz_clear(p);
     flint_free(w);
 }
-
-/*
-This is not used anywhere.
-
-static void
-_config_jacobi_reduce_s(aprcl_config conf, const fmpz_t n)
-{
-    slong i;
-    fmpz_t new_s, new_s2, p;
-
-    fmpz_init(p);
-    fmpz_init(new_s2);
-    fmpz_init_set(new_s, conf->s);
-
-    for (i = conf->qs->num - 1; i >= 0; i--)
-    {
-        fmpz_pow_ui(p, conf->qs->p + i, conf->qs->exp[i]);
-        fmpz_fdiv_q(new_s, conf->s, p);
-
-        fmpz_mul(new_s2, new_s, new_s);
-        if (fmpz_cmp(new_s2, n) > 0)
-        {
-            fmpz_set(conf->s, new_s);
-            conf->qs_used[i] = 0;
-        }
-        else
-        {
-            conf->qs_used[i] = 1;
-        }
-    }
-
-    fmpz_clear(p);
-    fmpz_clear(new_s2);
-    fmpz_clear(new_s);
-}
-*/
 
 static void
 _config_jacobi_update(aprcl_config conf)

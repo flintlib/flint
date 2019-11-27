@@ -67,21 +67,21 @@ public:
 
     // static methods which only make sense with fmpq_polyxx
     static fmpq_polyxx_expression randtest(frandxx& state, slong len,
-            mp_bitcnt_t bits)
+            flint_bitcnt_t bits)
     {
         fmpq_polyxx_expression res;
         fmpq_poly_randtest(res._poly(), state._data(), len, bits);
         return res;
     }
     static fmpq_polyxx_expression randtest_unsigned(frandxx& state, slong len,
-            mp_bitcnt_t bits)
+            flint_bitcnt_t bits)
     {
         fmpq_polyxx_expression res;
         fmpq_poly_randtest_unsigned(res._poly(), state._data(), len, bits);
         return res;
     }
     static fmpq_polyxx_expression randtest_not_zero(frandxx& state, slong len,
-            mp_bitcnt_t bits)
+            flint_bitcnt_t bits)
     {
         fmpq_polyxx_expression res;
         fmpq_poly_randtest_not_zero(res._poly(), state._data(), len, bits);

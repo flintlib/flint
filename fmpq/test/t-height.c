@@ -30,7 +30,7 @@ main(void)
     {
         fmpq_t x;
         fmpz_t h;
-        mp_bitcnt_t b;
+        flint_bitcnt_t b;
 
         fmpz_init(h);
         fmpq_init(x);

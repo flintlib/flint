@@ -136,8 +136,8 @@ Assignment and basic manipulation
 .. function:: int fmpz_poly_set_str(fmpz_poly_t poly, const char * str)
 
     Imports a polynomial from a null-terminated string.  If the string 
-    ``str`` represents a valid polynomial returns `1`, otherwise 
-    returns `0`.
+    ``str`` represents a valid polynomial returns `0`, otherwise 
+    returns `1`.
     
     Returns `0` if no error occurred.  Otherwise, returns a non-zero value, 
     in which case the resulting value of ``poly`` is undefined.  If 
@@ -211,27 +211,27 @@ Randomisation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with up to the given length and where 
     each coefficient has up to the given number of bits. The coefficients 
     are signed randomly. One must call ``flint_randinit()`` before 
     calling this function.
 
-.. function:: void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. One must call 
     ``flint_randinit()`` before calling this function.
 
-.. function:: void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     As for ``fmpz_poly_randtest()`` except that ``len`` and bits may 
     not be zero and the polynomial generated is guaranteed not to be the 
     zero polynomial.  One must call ``flint_randinit()`` before 
     calling this function.
 
-.. function:: void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets ``p`` to a random polynomial without any real root, whose
     length is up to ``len`` and where each coefficient has up to the
@@ -514,13 +514,13 @@ Bit packing
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len, mp_bitcnt_t bit_size, int negate)
+.. function:: void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len, flint_bitcnt_t bit_size, int negate)
 
     Packs the coefficients of ``poly`` into bitfields of the given 
     ``bit_size``, negating the coefficients before packing 
     if ``negate`` is set to `-1`.
 
-.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong len, mp_srcptr arr, mp_bitcnt_t bit_size, int negate)
+.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong len, mp_srcptr arr, flint_bitcnt_t bit_size, int negate)
 
     Unpacks the polynomial of given length from the array as packed into 
     fields of the given ``bit_size``, finally negating the coefficients 
@@ -528,24 +528,24 @@ Bit packing
     leading term with coefficient `\pm1` should be added at
     position ``len`` of ``poly``.
 
-.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, mp_srcptr_t arr, mp_bitcnt_t bit_size)
+.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, mp_srcptr_t arr, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial of given length from the array as packed into 
     fields of the given ``bit_size``.  The coefficients are assumed to 
     be unsigned.
 
-.. function:: void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly, mp_bitcnt_t bit_size)
+.. function:: void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly, flint_bitcnt_t bit_size)
 
     Packs ``poly`` into bitfields of size ``bit_size``, writing the
     result to ``f``. The sign of ``f`` will be the same as that of
     the leading coefficient of ``poly``.
 
-.. function:: void fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+.. function:: void fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial with signed coefficients packed into
     fields of size ``bit_size`` as represented by the integer ``f``.
 
-.. function:: void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+.. function:: void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial with unsigned coefficients packed into
     fields of size ``bit_size`` as represented by the integer ``f``.
@@ -1363,7 +1363,7 @@ Euclidean division
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that 
     `A = B Q + R` and each coefficient of `R` beyond ``lenB`` is reduced 
@@ -1375,6 +1375,16 @@ Euclidean division
     ``(A, lenA)``.  `R` and `A` may be aliased, but apart from this no 
     aliasing of input and output operands is allowed.
 
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
 .. function:: void fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes `Q`, `R` such that `A = B Q + R` and each coefficient of `R` 
@@ -1383,7 +1393,7 @@ Euclidean division
     this is the same thing as division over `\mathbb{Q}`.  An exception is raised 
     if `B` is zero.
 
-.. function:: void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, const fmpz * A, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, const fmpz * A, const fmpz * B, slong lenB, int exact)
 
     Computes ``(Q, lenB)``, ``(BQ, 2 lenB - 1)`` such that 
     `BQ = B \times Q` and `A = B Q + R` where each coefficient of `R` beyond 
@@ -1400,7 +1410,17 @@ Euclidean division
     `A`, which means that they might not even need to exist in allocated 
     memory.
 
-.. function:: void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
+.. function:: int _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that 
     `A = B Q + R` and each coefficient of `R` beyond `\operatorname{len}(B) - 1` is 
@@ -1412,6 +1432,16 @@ Euclidean division
     ``(A, lenA)``.  No aliasing of input and output operands is 
     allowed.
 
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
 .. function:: void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes `Q`, `R` such that `A = B Q + R` and each coefficient of `R` 
@@ -1420,7 +1450,7 @@ Euclidean division
     this is the same as division over `\mathbb{Q}`.  An exception is raised if `B` 
     is zero.
 
-.. function:: void _fmpz_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that 
     `A = B Q + R` and each coefficient of `R` beyond `\operatorname{len}(B) - 1` is 
@@ -1432,6 +1462,16 @@ Euclidean division
     ``(A, lenA)``.  No aliasing of input and output operands is 
     allowed.
 
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
 .. function:: void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes `Q`, `R` such that `A = B Q + R` and each coefficient of `R` 
@@ -1440,7 +1480,7 @@ Euclidean division
     this is the same as division over `\mathbb{Q}`.  An exception is raised if `B` 
     is zero.
 
-.. function:: void _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes the quotient ``(Q, lenA - lenB + 1)`` of ``(A, lenA)`` 
     divided by ``(B, lenB)``.
@@ -1458,6 +1498,16 @@ Euclidean division
     aliased, but apart from this no aliasing of input and output operands 
     is allowed.
 
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
 .. function:: void fmpz_poly_div_basecase(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes the quotient `Q` of `A` divided by `Q`.
@@ -1470,7 +1520,7 @@ Euclidean division
     this is the same as division over `\mathbb{Q}`.  An exception is raised if `B` 
     is zero.
 
-.. function:: void _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * BQ, const fmpz * A, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * BQ, const fmpz * A, const fmpz * B, slong lenB, int exact)
 
     Divide and conquer division of ``(A, 2 lenB - 1)`` by ``(B, lenB)``, 
     computing only the bottom `\operatorname{len}(B) - 1` coefficients of `B Q`.
@@ -1480,7 +1530,17 @@ Euclidean division
     carry meaningful output.  Does not support any aliasing.  Allows 
     zero-padding in `A`, but not in `B`.
 
-.. function:: void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, const fmpz * A, const fmpz * B, slong lenB)
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
+.. function:: int _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, const fmpz * A, const fmpz * B, slong lenB, int exact)
 
     Recursive short division in the balanced case.
 
@@ -1491,11 +1551,31 @@ Euclidean division
 
     For further details, see \citep{Mul2000}.
 
-.. function:: void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
+
+.. function:: int _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes the quotient ``(Q, lenA - lenB + 1)`` of ``(A, lenA)`` 
     upon division by ``(B, lenB)``.  Assumes that 
     `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Does not support aliasing.
+
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
 
 .. function:: fmpz_poly_div_divconquer(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
@@ -1509,7 +1589,7 @@ Euclidean division
     this is the same as division over `\mathbb{Q}`.  An exception is raised if `B` 
     is zero.
 
-.. function:: void _fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+.. function:: int _fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, int exact)
 
     Computes the quotient ``(Q, lenA - lenB + 1)`` of ``(A, lenA)`` 
     divided by ``(B, lenB)``.
@@ -1522,6 +1602,16 @@ Euclidean division
     Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in 
     ``(A, lenA)``.  Aliasing of input and output operands is not 
     allowed.
+
+    If the flag ``exact`` is `1`, the function stops if an inexact division
+    is encountered, upon which the function will return `0`. If no inexact
+    division is encountered, the function returns `1`. Note that this does not
+    guarantee the remainder of the polynomial division is zero, merely that
+    its length is less than that of B. This feature is useful for series
+    division and for divisibility testing (upon testing the remainder).
+
+    For ordinary use set the flag ``exact`` to `0`. In this case, no checks
+    or early aborts occur and the function always returns `1`.
 
 .. function:: void fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
@@ -1766,17 +1856,44 @@ Power series division
     Computes the first `n` terms of the inverse power series of `Q`, 
     assuming `Q` has constant term `\pm 1` and `n \geq 1`.
 
+.. function:: void _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
+
+    Divides ``(A, Alen)`` by ``(B, Blen)`` as power series over `\mathbb{Z}`,
+    assuming `B` has constant term `\pm 1` and `n \geq 1`.
+    Aliasing is not supported.
+
+.. function:: void _fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
+
+    Divides ``(A, Alen)`` by ``(B, Blen)`` as power series over `\mathbb{Z}`,
+    assuming `B` has constant term `\pm 1` and `n \geq 1`.
+    Aliasing is not supported.
+
 .. function:: void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
 
     Divides ``(A, Alen)`` by ``(B, Blen)`` as power series over `\mathbb{Z}`, 
     assuming `B` has constant term `\pm 1` and `n \geq 1`.
     Aliasing is not supported.
 
-.. function:: void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
+.. function:: void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
 
     Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function 
     considers the polynomials `A` and `B` as power series of length `n` 
     starting with the constant terms.  The function assumes that `B` has 
+    constant term `\pm 1` and `n \geq 1`.
+
+.. function:: void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
+
+    Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function
+    considers the polynomials `A` and `B` as power series of length `n`
+    starting with the constant terms.  The function assumes that `B` has
+    constant term `\pm 1` and `n \geq 1`.
+
+.. function:: void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_po
+ly_t B, slong n)
+
+    Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function
+    considers the polynomials `A` and `B` as power series of length `n`
+    starting with the constant terms.  The function assumes that `B` has
     constant term `\pm 1` and `n \geq 1`.
 
 

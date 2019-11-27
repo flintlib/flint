@@ -18,20 +18,21 @@ int
 main(void)
 {
     int i, j, result;
+    slong tmul = 5;
     FLINT_TEST_INIT(state);
 
     flint_printf("derivative....");
     fflush(stdout);
 
     /* Check d(f*g) = df*g + f*dg */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, fp, gp, hp, t1, t2;
         ordering_t ord;
         mp_limb_t modulus;
         slong nvars, len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         slong idx;
 
         ord = mpoly_ordering_randtest(state);
@@ -114,14 +115,14 @@ main(void)
     }
 
     /* Check d(f*g) = df*g + f*dg with aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, fp, gp, t1, t2;
         ordering_t ord;
         mp_limb_t modulus;
         slong nvars, len, len1, len2;
-        mp_bitcnt_t exp_bits, exp_bits1, exp_bits2;
+        flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         slong idx;
 
         ord = mpoly_ordering_randtest(state);

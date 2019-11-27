@@ -14,10 +14,10 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-mp_bitcnt_t fmpz_val2(const fmpz_t x)
+flint_bitcnt_t fmpz_val2(const fmpz_t x)
 {
     fmpz c = *x;
-    mp_bitcnt_t t;
+    flint_bitcnt_t t;
 
     if (!COEFF_IS_MPZ(c))
     {
@@ -29,7 +29,7 @@ mp_bitcnt_t fmpz_val2(const fmpz_t x)
     else
     {
         mp_limb_t *d = (COEFF_TO_PTR(c))->_mp_d;
-        mp_bitcnt_t u;
+        flint_bitcnt_t u;
 
         t = 0;
         while (*d == 0)

@@ -18,10 +18,12 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-static void
+static int
 __fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, 
-                                     const fmpz * B, slong lenB)
+                                     const fmpz * B, slong lenB, int exact)
 {
+    int res;
+
     if (lenA < 2 * lenB - 1)
     {
         /*
@@ -33,7 +35,8 @@ __fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA,
 
         fmpz * temp = _fmpz_vec_init(2 * q1 - 1);
 
-        _fmpz_poly_div_divconquer_recursive(Q, temp, A + q2, B + q2, q1);
+        res = _fmpz_poly_div_divconquer_recursive(Q, temp,
+                                                    A + q2, B + q2, q1, exact);
 
         _fmpz_vec_clear(temp, 2 * q1 - 1);
     }
@@ -41,10 +44,12 @@ __fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA,
     {
         fmpz * temp = _fmpz_vec_init(lenA);
 
-        _fmpz_poly_div_divconquer_recursive(Q, temp, A, B, lenB);
+        res = _fmpz_poly_div_divconquer_recursive(Q, temp, A, B, lenB, exact);
 
         _fmpz_vec_clear(temp, lenA);
     }
+
+    return res;
 }
 
 /* needed due to partial overlap */
@@ -57,18 +62,19 @@ _fmpz_vec_sub_dec(fmpz * a, const fmpz * b, const fmpz * c, slong n)
         fmpz_sub(a + i, b + i, c + i);
 }
 
-void _fmpz_poly_div_divconquer(fmpz *Q, 
+int _fmpz_poly_div_divconquer(fmpz *Q, 
                                const fmpz *A, slong lenA, 
-                               const fmpz *B, slong lenB)
+                               const fmpz *B, slong lenB, int exact)
 {
     if (lenA <= 2 * lenB - 1)
     {
-        __fmpz_poly_div_divconquer(Q, A, lenA, B, lenB);
+        return __fmpz_poly_div_divconquer(Q, A, lenA, B, lenB, exact);
     }
     else  /* lenA > 2 * lenB - 1 */
     {
         fmpz *S, *T;
         slong shift, next, n = 2 * lenB - 1;
+        int res = 1;
 
         S = _fmpz_vec_init(2 * n);
         T = S + n;
@@ -81,7 +87,14 @@ void _fmpz_poly_div_divconquer(fmpz *Q,
         while (lenA >= n)
         {
             shift = lenA - n;
-            _fmpz_poly_divremlow_divconquer_recursive(Q + shift, T, S, B, lenB);
+            if (!_fmpz_poly_divremlow_divconquer_recursive(Q + shift,
+                                                         T, S, B, lenB, exact))
+            {
+                _fmpz_vec_clear(S, 2 * n);
+
+                return 0;
+            }
+
             next = FLINT_MIN(lenB, shift);
             _fmpz_vec_sub_dec(S + next, S, T, lenB - 1);
             _fmpz_vec_set(S, A + shift - next, next);
@@ -89,9 +102,11 @@ void _fmpz_poly_div_divconquer(fmpz *Q,
         }
 
         if (lenA >= lenB)
-            __fmpz_poly_div_divconquer(Q, S, lenA, B, lenB);
+            res = __fmpz_poly_div_divconquer(Q, S, lenA, B, lenB, exact);
 
         _fmpz_vec_clear(S, 2 * n);
+
+        return res;
     }
 }
 
@@ -127,7 +142,7 @@ fmpz_poly_div_divconquer(fmpz_poly_t Q,
         q = Q->coeffs;
     }
 
-    _fmpz_poly_div_divconquer(q, A->coeffs, lenA, B->coeffs, lenB);
+    _fmpz_poly_div_divconquer(q, A->coeffs, lenA, B->coeffs, lenB, 0);
 
     if (Q == A || Q == B)
     {

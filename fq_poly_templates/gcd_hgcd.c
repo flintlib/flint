@@ -158,6 +158,8 @@ void TEMPLATE(T, poly_gcd_hgcd) (TEMPLATE(T, poly_t) G,
                 TEMPLATE(T, one) (G->coeffs, ctx);
             else
                 TEMPLATE(T, poly_make_monic) (G, G, ctx);
+
+            TEMPLATE(T, clear) (invB, ctx);
         }
     }
 }

@@ -121,21 +121,21 @@ public:
 
     // static methods which only make sense with fmpz_polyxx
     static fmpz_polyxx_expression randtest(frandxx& state, slong len,
-            mp_bitcnt_t bits)
+            flint_bitcnt_t bits)
     {
         fmpz_polyxx_expression res;
         fmpz_poly_randtest(res._poly(), state._data(), len, bits);
         return res;
     }
     static fmpz_polyxx_expression randtest_unsigned(frandxx& state, slong len,
-            mp_bitcnt_t bits)
+            flint_bitcnt_t bits)
     {
         fmpz_polyxx_expression res;
         fmpz_poly_randtest_unsigned(res._poly(), state._data(), len, bits);
         return res;
     }
     static fmpz_polyxx_expression randtest_not_zero(frandxx& state, slong len,
-            mp_bitcnt_t bits)
+            flint_bitcnt_t bits)
     {
         fmpz_polyxx_expression res;
         fmpz_poly_randtest_not_zero(res._poly(), state._data(), len, bits);
@@ -624,15 +624,15 @@ FLINT_DEFINE_BINARY_EXPR_COND2(smod_op, fmpz_polyxx,
         fmpz_poly_scalar_smod_fmpz(to._poly(), e1._poly(), e2._fmpz()))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(bit_pack_op, fmpzxx,
-        FMPZ_POLYXX_COND_S, traits::fits_into_mp_bitcnt_t,
+        FMPZ_POLYXX_COND_S, traits::fits_into_flint_bitcnt_t,
         fmpz_poly_bit_pack(to._fmpz(), e1._poly(), e2))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(fmpz_polyxx_bit_unpack_op, fmpz_polyxx,
-        FMPZXX_COND_S, traits::fits_into_mp_bitcnt_t,
+        FMPZXX_COND_S, traits::fits_into_flint_bitcnt_t,
         fmpz_poly_bit_unpack(to._poly(), e1._fmpz(), e2))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(fmpz_polyxx_bit_unpack_unsigned_op, fmpz_polyxx,
-        FMPZXX_COND_S, traits::fits_into_mp_bitcnt_t,
+        FMPZXX_COND_S, traits::fits_into_flint_bitcnt_t,
         fmpz_poly_bit_unpack_unsigned(to._poly(), e1._fmpz(), e2))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(times, fmpz_polyxx,

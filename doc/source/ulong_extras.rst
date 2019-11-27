@@ -783,10 +783,10 @@ Primality testing
 
     Tests if `n` is a prime. This first sieves for small prime factors,
     then simply calls ``n_is_probabprime()``. This has been checked
-    against the tables of Feitsma and Galway 
-    \url{http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html} and thus 
-    constitutes a check for primality (rather than just pseudoprimality) 
-    up to `2^64`.
+    against the tables of Feitsma and Galway
+    \url{http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html} and thus
+    constitutes a check for primality (rather than just pseudoprimality)
+    up to `2^{64}`.
 
     In future, this test may produce and check a certificate of 
     primality. This is likely to be significantly slower for prime
@@ -855,7 +855,7 @@ Primality testing
 
     There are no known counterexamples to this being a primality test.
 
-    Up to `2^64` the test we use has been checked against tables of 
+    Up to `2^{64}` the test we use has been checked against tables of
     pseudoprimes. Thus it is a primality test up to this limit.
 
 .. function:: int n_is_probabprime_lucas(ulong n)
@@ -883,7 +883,7 @@ Primality testing
     calling the function ``n_is_probabprime_BPSW()``. There are no known 
     counterexamples, and it has been checked against the tables of Feitsma
     and Galway and up to the accuracy of those tables, this is an exhaustive
-    check up to `2^64`, i.e. there are no counterexamples.
+    check up to `2^{64}`, i.e. there are no counterexamples.
 
 
 Square root and perfect power testing
@@ -1143,7 +1143,7 @@ Factorisation
     required to be checked with a primality test, one may set 
     ``proved`` to `1`, otherwise set it to `0`, and they will only be 
     probable primes. N.B: at the present there is no difference because 
-    the probable prime tests have been exhaustively tested up to `2^64`.
+    the probable prime tests have been exhaustively tested up to `2^{64}`.
 
     However, in future, this flag may produce and separately check
     a primality certificate. This may be quite slow (and probably no

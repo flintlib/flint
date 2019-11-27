@@ -29,14 +29,14 @@ typedef __mpf_struct mpf;
 
 /*  Memory management  *******************************************************/
 
-FLINT_DLL mpf * _mpf_vec_init(slong len, mp_bitcnt_t prec);
+FLINT_DLL mpf * _mpf_vec_init(slong len, flint_bitcnt_t prec);
 
 FLINT_DLL void _mpf_vec_clear(mpf * vec, slong len);
 
 /*  Randomisation  ***********************************************************/
 
 FLINT_DLL void _mpf_vec_randtest(mpf * f, flint_rand_t state, 
-                        slong len, mp_bitcnt_t bits);
+                        slong len, flint_bitcnt_t bits);
 
 /*  Assignment and basic manipulation  ***************************************/
 
@@ -48,7 +48,7 @@ FLINT_DLL void _mpf_vec_set(mpf * vec1, const mpf * vec2, slong len2);
 
 FLINT_DLL int _mpf_vec_equal(const mpf * vec1, const mpf * vec2, slong len);
 
-FLINT_DLL int _mpf_vec_approx_equal(const mpf * vec1, const mpf * vec2, slong len, mp_bitcnt_t bits);
+FLINT_DLL int _mpf_vec_approx_equal(const mpf * vec1, const mpf * vec2, slong len, flint_bitcnt_t bits);
 
 FLINT_DLL int _mpf_vec_is_zero(const mpf * vec, slong len);
 
@@ -60,7 +60,7 @@ FLINT_DLL void _mpf_vec_sub(mpf * res, const mpf * vec1, const mpf * vec2, slong
 
 /*  Scalar multiplication  **************************************/
 
-FLINT_DLL void _mpf_vec_scalar_mul_2exp(mpf * res, const mpf * vec, slong len, mp_bitcnt_t exp);
+FLINT_DLL void _mpf_vec_scalar_mul_2exp(mpf * res, const mpf * vec, slong len, flint_bitcnt_t exp);
 
 FLINT_DLL void _mpf_vec_scalar_mul_mpf(mpf * res, const mpf * vec, slong len, mpf_t c);
 
@@ -70,9 +70,9 @@ FLINT_DLL void _mpf_vec_dot(mpf_t res, const mpf * vec1, const mpf * vec2, slong
 
 FLINT_DLL void _mpf_vec_norm(mpf_t res, const mpf * vec, slong len);
 
-FLINT_DLL int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, mp_bitcnt_t prec);
+FLINT_DLL int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec);
 
-FLINT_DLL void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, mp_bitcnt_t prec);
+FLINT_DLL void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec);
 
 #ifdef __cplusplus
 }

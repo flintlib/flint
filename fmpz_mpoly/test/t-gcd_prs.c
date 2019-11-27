@@ -11,28 +11,105 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
+
+void gcd_check(
+    fmpz_mpoly_t g,
+    fmpz_mpoly_t a,
+    fmpz_mpoly_t b,
+    fmpz_mpoly_ctx_t ctx,
+    slong i,
+    slong j,
+    const char * name)
+{
+    int res;
+    fmpz_mpoly_t ca, cb, cg;
+
+    fmpz_mpoly_init(ca, ctx);
+    fmpz_mpoly_init(cb, ctx);
+    fmpz_mpoly_init(cg, ctx);
+
+    res = fmpz_mpoly_gcd_prs(g, a, b, ctx);
+    fmpz_mpoly_assert_canonical(g, ctx);
+
+    if (!res)
+    {
+        flint_printf("Check gcd can be computed\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    if (fmpz_mpoly_is_zero(g, ctx))
+    {
+        if (!fmpz_mpoly_is_zero(a, ctx) || !fmpz_mpoly_is_zero(b, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check zero gcd only results from zero inputs\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+            flint_abort();
+        }
+        goto cleanup;
+    }
+
+    if (fmpz_sgn(g->coeffs + 0) <= 0)
+    {
+        printf("FAIL\n");
+        flint_printf("Check gcd has positive lc\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    res = 1;
+    res = res && fmpz_mpoly_divides(ca, a, g, ctx);
+    res = res && fmpz_mpoly_divides(cb, b, g, ctx);
+    if (!res)
+    {
+        printf("FAIL\n");
+        flint_printf("Check divisibility\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    res = fmpz_mpoly_gcd_prs(cg, ca, cb, ctx);
+    fmpz_mpoly_assert_canonical(cg, ctx);
+
+    if (!res)
+    {
+        printf("FAIL\n");
+        flint_printf("Check gcd of cofactors can be computed\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    if (!fmpz_mpoly_is_one(cg, ctx))
+    {
+        printf("FAIL\n");
+        flint_printf("Check gcd of cofactors is one\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+cleanup:
+
+    fmpz_mpoly_clear(ca, ctx);
+    fmpz_mpoly_clear(cb, ctx);
+    fmpz_mpoly_clear(cg, ctx);
+}
+
 
 int
 main(void)
 {
-    int i, j, success;
+    int i, j;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd_prs....");
     fflush(stdout);
 
-
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        int ok;
-        fmpz_t ac, bc, d;
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t a, b, c, g, t;
+        fmpz_mpoly_t a, b, g;
         ordering_t ord;
         slong nvars, len1, len2, len3, exp_bound1, exp_bound2, exp_bound3;
         slong coeff_bits;
@@ -42,14 +119,9 @@ main(void)
 
         fmpz_mpoly_ctx_init(ctx, nvars, ord);
 
-        fmpz_init(ac);
-        fmpz_init(bc);
-        fmpz_init(d);
         fmpz_mpoly_init(a, ctx);
         fmpz_mpoly_init(b, ctx);
-        fmpz_mpoly_init(c, ctx);
         fmpz_mpoly_init(g, ctx);
-        fmpz_mpoly_init(t, ctx);
 
         for (j = 0; j < 4; j++)
         {
@@ -62,51 +134,21 @@ main(void)
             coeff_bits = n_randint(state, 3) + 1;
             fmpz_mpoly_randtest_bound(a, state, len1, coeff_bits, exp_bound1, ctx);
             fmpz_mpoly_randtest_bound(b, state, len2, coeff_bits, exp_bound2, ctx);
-            fmpz_mpoly_randtest_bound(c, state, len3, coeff_bits, exp_bound3, ctx);
+            fmpz_mpoly_randtest_bound(g, state, len3, coeff_bits, exp_bound3, ctx);
 
-            fmpz_mpoly_mul_johnson(a, a, c, ctx);
-            fmpz_mpoly_mul_johnson(b, b, c, ctx);
+            fmpz_mpoly_mul_johnson(a, a, g, ctx);
+            fmpz_mpoly_mul_johnson(b, b, g, ctx);
 
-            success = fmpz_mpoly_gcd_prs(g, a, b, ctx);
-            if (!success)
-                continue;
+            fmpz_mpoly_randtest_bound(g, state, len3, coeff_bits, exp_bound3, ctx);
 
-            fmpz_mpoly_assert_canonical(g, ctx);
-
-            if (fmpz_mpoly_is_zero(g, ctx))
-            {
-                if (!fmpz_mpoly_is_zero(a, ctx) || !fmpz_mpoly_is_zero(b, ctx))
-                {
-                    flint_printf("FAIL\ngcd is zero but both inputs are not\n"
-                                                     "i: %wd  j: %wd\n", i, j);
-                    flint_abort();
-                }
-                continue;
-            }
-
-            ok = fmpz_mpoly_divides_monagan_pearce(a, a, g, ctx);
-            ok = ok && fmpz_mpoly_divides_monagan_pearce(b, b, g, ctx);
-            if (!ok)
-            {
-                flint_printf("FAIL\ngcd doesn't divide both inputs\n"
-                                                     "i: %wd  j: %wd\n", i, j);
-                flint_abort();
-            }
-
-            if (!fmpz_mpoly_gcd_is_unit(a, b, ctx))
-                flint_printf("FAIL\ncofactors are not relatively prime\n"
-                                                     "i: %wd  j: %wd\n", i, j);
-
+            gcd_check(g, a, b, ctx, i, j, "random small");
         }
 
-        fmpz_clear(ac);
-        fmpz_clear(bc);
-        fmpz_clear(d);
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
-        fmpz_mpoly_clear(c, ctx);
-        fmpz_mpoly_clear(g, ctx);       
-        fmpz_mpoly_clear(t, ctx);
+        fmpz_mpoly_clear(g, ctx);
+
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

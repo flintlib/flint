@@ -100,7 +100,7 @@ Modular reduction and arithmetic
 
 .. function:: mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
 
-    Returns `a^{-1}` modulo ``mod.n``. The inverse of `b` is assumed to
+    Returns `ab^{-1}` modulo ``mod.n``. The inverse of `b` is assumed to
     exist. It is assumed that `a` is already reduced modulo ``mod.n``.
 
 .. function:: mp_limb_t nmod_pow_ui(mp_limb_t a, ulong e, nmod_t mod)
@@ -149,7 +149,7 @@ Basic manipulation and comparison
     Reduces the entries of ``(vec, len)`` modulo ``mod.n`` and set 
     ``res`` to the result.
 
-.. function:: mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
+.. function:: flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
 
     Returns the maximum number of bits of any entry in the vector.
 
@@ -233,3 +233,29 @@ Dot products
     ``vec2[i][offset]``. The ``nlimbs`` parameter should be
     0, 1, 2 or 3, specifying the number of limbs needed to represent the
     unreduced result.
+
+
+Discrete Logarithms via Pohlig-Hellman
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_discrete_log_pohlig_hellman_init(nmod_discrete_log_pohlig_hellman_t L)
+
+    Initialize ``L``. Upon initilization ``L`` is not ready for computation.
+
+.. function:: void nmod_discrete_log_pohlig_hellman_clear(nmod_discrete_log_pohlig_hellman_t L)
+
+    Free any space used by ``L``.
+
+.. function:: double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohlig_hellman_t L, mp_limb_t p)
+
+    Configure ``L`` for discrete logarithms modulo ``p`` to an internally chosen base. It is assumed that ``p`` is prime.
+    The return is an estimate on the number of multiplications needed for one run.
+
+.. function:: mp_limb_t nmod_discrete_log_pohlig_hellman_primitive_root(const nmod_discrete_log_pohlig_hellman_t L)
+
+    Return the internally stored base.
+
+.. function:: ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, mp_limb_t y)
+
+    Return the logarithm of ``y`` with repect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
+    The function is undefined if the logarithm does not exist.

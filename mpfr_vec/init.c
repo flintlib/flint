@@ -16,7 +16,7 @@
 #include "mpfr_vec.h"
 
 mpfr *
-_mpfr_vec_init(slong length, mp_bitcnt_t prec)
+_mpfr_vec_init(slong length, flint_bitcnt_t prec)
 {
     slong i;
 

@@ -22,7 +22,7 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
         const fmpz * poly1, slong len1, 
         const fmpz * poly2, slong len2, const fmpz_t divisor, slong nbits)
 {
-    mp_bitcnt_t pbits;
+    flint_bitcnt_t pbits;
     slong i, num_primes;
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;

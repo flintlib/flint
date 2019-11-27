@@ -85,7 +85,7 @@ main(void)
         slong nvars1, nvars2;
         slong len1, len2;
         slong exp_bound1;
-        mp_bitcnt_t exp_bits2;
+        flint_bitcnt_t exp_bits2;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -171,7 +171,7 @@ main(void)
         mp_limb_t * vals2;
         slong nvars1;
         slong len1;
-        mp_bitcnt_t exp_bits1;
+        flint_bitcnt_t exp_bits1;
         mp_limb_t modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;

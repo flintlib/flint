@@ -17,7 +17,7 @@
 ulong
 n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp, ulong n, ulong ninv)
 {
-    mp_bitcnt_t i, bits;
+    flint_bitcnt_t i, bits;
     ulong x, norm;
 
     FLINT_ASSERT(n != 0);

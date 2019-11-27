@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fmpq_mpoly.h"
-#include "ulong_extras.h"
 
 int
 main(void)
@@ -24,7 +23,7 @@ main(void)
     fflush(stdout);
 
     /* check get and set match */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f;
@@ -55,6 +54,15 @@ main(void)
             {
                 printf("FAIL\n");
                 flint_printf("check get and set match\ni = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
+
+            fmpq_mul_fmpz(c, fmpq_mpoly_content_ref(f, ctx),
+                        fmpq_mpoly_zpoly_term_coeff_ref(f, index, ctx));
+            if (!fmpq_equal(c, d))
+            {
+                printf("FAIL\n");
+                flint_printf("check reference match\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
         }

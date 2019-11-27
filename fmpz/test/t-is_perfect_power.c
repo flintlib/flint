@@ -30,6 +30,7 @@ int main(void)
    fmpz_init(n);
    fmpz_init(n2);
    fmpz_init(pow);
+   fmpz_init(root);
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that perfect powers pass the test */
    {
@@ -137,6 +138,7 @@ int main(void)
    fmpz_clear(n);
    fmpz_clear(n2);
    fmpz_clear(d);
+   fmpz_clear(pow);
    fmpz_clear(root);
 
    FLINT_TEST_CLEANUP(state);
