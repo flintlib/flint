@@ -18,7 +18,7 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
                     const nmod_mat_t Ainv, mp_limb_t p,
                     const fmpz_t N, const fmpz_t D)
 {
-    fmpz_t bound, ppow;
+    fmpz_t bound, ppow, t, u, dmul;
     fmpz_mat_t x, d, y, Ay, AX, Bden;
     fmpq_mat_t x_q;
     fmpz_t prod, mod, xknum, xkden;
@@ -39,6 +39,9 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     fmpz_init(mod);
     fmpz_init(xknum);
     fmpz_init(xkden);
+    fmpz_init(t);
+    fmpz_init(u);
+    fmpz_init(dmul);
 
     fmpz_mat_init(Bden, B->r, B->c);
     fmpz_mat_init(AX, B->r, B->c);
@@ -93,7 +96,7 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
         if (fmpz_cmp(ppow, bound) > 0)
             break;
 
-	if ((i & (i - 1)) == 0) /* check if v is a power of 2 */
+	/* check if stabilised */
         {
            /* on first iteration, identify five nonzero entries */
 	   if (nz_count == 0)
@@ -136,12 +139,19 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
 	   /* check if the five nonzero entries are stabilised */
 	   stabilised = nz_count != 0;
 
-           for (s = 0; s < 5 && stabilised; s++)
+           fmpz_one(dmul);
+	   
+	   for (s = 0; s < 5 && stabilised; s++)
            {
-	      /* set stabilised to success of reconstruction */
-              if ((stabilised = _fmpq_reconstruct_fmpz(xknum, xkden,
-			fmpz_mat_entry(x, nz_r[s], nz_c[s]), ppow)))
+	      fmpz_mul(t, dmul, fmpz_mat_entry(x, nz_r[s], nz_c[s]));
+	      fmpz_fdiv_qr(u, t, t, ppow);
+			      
+              /* set stabilised to success of reconstruction */
+              if ((stabilised = _fmpq_reconstruct_fmpz(xknum, xkden, t, ppow)))
               {
+                 fmpz_mul(xkden, xkden, dmul);
+                 fmpz_set(dmul, xkden);
+
                  _fmpq_canonicalise(xknum, xkden);
 
 		 stabilised &= fmpz_equal(xknum, xvec_num + s);
@@ -221,6 +231,9 @@ dixon_done:
     fmpz_clear(ppow);
     fmpz_clear(prod);
     fmpz_clear(mod);
+    fmpz_clear(dmul);
+    fmpz_clear(u);
+    fmpz_clear(t);
 
     fmpq_mat_clear(x_q);
 
