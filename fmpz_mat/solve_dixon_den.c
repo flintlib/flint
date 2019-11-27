@@ -12,6 +12,8 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
+#define USE_SLOW_MULTIPLICATION 1
+
 void
 _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
                         const fmpz_mat_t A, const fmpz_mat_t B,
@@ -26,8 +28,7 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     mp_limb_t * crt_primes;
     nmod_mat_t * A_mod;
     nmod_mat_t Ay_mod, d_mod, y_mod;
-    slong i, j, k, l, n, s, cols, num_primes, nz_count = 0;
-    slong nz_r[5], nz_c[5]; /* rows and cols of nonzero entries of x */
+    slong i, j, k, jstart = 0, kstart = 0, n, cols, num_primes;
     int stabilised; /* has lifting stabilised (at 5 nonzero entries) */
 
     n = A->r;
@@ -82,6 +83,8 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
 
     i = 1; /* working with p^i */
     
+    fmpz_one(dmul);
+    
     while (fmpz_cmp(ppow, bound) <= 0)
     {
         /* y = A^(-1) * d  (mod p) */
@@ -96,86 +99,48 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
         if (fmpz_cmp(ppow, bound) > 0)
             break;
 
-	/* check if stabilised */
-        {
-           /* on first iteration, identify five nonzero entries */
-	   if (nz_count == 0)
+	stabilised = 1;
+        fmpz_one(dmul);
+
+        /* check if stabilised */
+        for (j = jstart; j < x->r && stabilised; j++)
+	{
+           for (k = kstart; k < x->c && stabilised; k++)
            {
-              slong stride;
-              
-              /* count nonzero entries */
-	      for (k = 0; k < x->r; k++)
-	         for (l = 0; l < x->c; l++)
-	            if (!fmpz_is_zero(fmpz_mat_entry(x, k, l)))
-		       nz_count++;
-
-              stride = (nz_count - 1)/5;
-
-	      nz_count = 0;
-
-              /* find five nonzero entries equally spaced */
-              for (k = 0, s = 0; k < x->r && s < 5; k++)
-              {
-                 for (l = 0; l < x->c && s < 5; l++)
-                 {
-                    if (!fmpz_is_zero(fmpz_mat_entry(x, k, l)))
-		    {
-		       nz_count++;
-
-                       if (stride == 0)
-		       {
-		          for ( ; s < 5; s++)
-			     nz_r[s] = k, nz_c[s] = l;
-		       } else if (stride == 1 || (nz_count % stride) == 1)
-                       {
-                          nz_r[s] = k, nz_c[s] = l;
-		          s++;
-                       }
-		    }
-                 }
-              }
-	   }
-
-	   /* check if the five nonzero entries are stabilised */
-	   stabilised = nz_count != 0;
-
-           fmpz_one(dmul);
-	   
-	   for (s = 0; s < 5 && stabilised; s++)
-           {
-	      fmpz_mul(t, dmul, fmpz_mat_entry(x, nz_r[s], nz_c[s]));
+	      fmpz_mul(t, dmul, fmpz_mat_entry(x, j, k));
 	      fmpz_fdiv_qr(u, t, t, ppow);
 			      
               /* set stabilised to success of reconstruction */
               if ((stabilised = _fmpq_reconstruct_fmpz(xknum, xkden, t, ppow)))
               {
-                 fmpz_mul(xkden, xkden, dmul);
+                 /* save starting point for next time */
+		 jstart = j;
+		 kstart = k + 1;
+		 
+		 if (kstart == x->c)
+	            kstart = 0, jstart = j + 1;
+		 
+		 fmpz_mul(xkden, xkden, dmul);
                  fmpz_set(dmul, xkden);
-
-                 _fmpq_canonicalise(xknum, xkden);
-
-		 stabilised &= fmpz_equal(xknum, xvec_num + s);
-                 stabilised &= fmpz_equal(xkden, xvec_den + s);
-
-		 fmpz_set(xvec_num + s, xknum);
-		 fmpz_set(xvec_den + s, xkden);
 	      }     
            }
+        }
 
-	   /* full matrix stabilisation check */
-	   if (stabilised || i == 1)
+        /* full matrix stabilisation check */
+	if (stabilised)
+        {
+           stabilised = fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, ppow);
+	   if (stabilised)
            {
-              fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, ppow);
-              fmpq_mat_get_fmpz_mat_matwise(X, den, x_q);
+	      fmpq_mat_get_fmpz_mat_matwise(X, den, x_q);
 
               fmpz_mat_mul(AX, A, X);
               fmpz_mat_scalar_mul_fmpz(Bden, B, den);
 
 	      if (fmpz_mat_equal(AX, Bden))
 	         goto dixon_done;
-           }
-	}
-
+	   }
+        }
 	i++;
 
         /* d = (d - Ay) / p */
