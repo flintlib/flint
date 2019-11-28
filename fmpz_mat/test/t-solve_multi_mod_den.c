@@ -29,7 +29,7 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("solve_dixon_den....");
+    flint_printf("solve_multi_mod_den....");
     fflush(stdout);    
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -50,7 +50,7 @@ main(void)
         if (n_randint(state, 2))
             fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
-        success = fmpz_mat_solve_dixon_den(X, den, A, B);
+        success = fmpz_mat_solve_multi_mod_den(X, den, A, B);
 
         fmpz_mat_mul(AX, A, X);
         fmpz_mat_scalar_divexact_fmpz(AX, AX, den);
@@ -94,7 +94,7 @@ main(void)
         if (n_randint(state, 2))
             fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
-        success = fmpz_mat_solve_dixon_den(X, den, A, B);
+        success = fmpz_mat_solve_multi_mod_den(X, den, A, B);
 
         if (!fmpz_is_zero(den) || success)
         {
