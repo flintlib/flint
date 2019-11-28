@@ -905,6 +905,16 @@ fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     Uses the Dixon lifting algorithm with early termination once the lifting
     stabilises.
 
+.. function:: int
+fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
+                                       const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.                            Returns 1 if `A` is nonsingular and 0 if `A` is singular.                                 The computed denominator will not generally be minimal.
+
+    Uses a Chinese remainder algorithm with early termination once the lifting
+    stabilises.
+
 Row reduction
 --------------------------------------------------------------------------------
 

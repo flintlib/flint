@@ -24,12 +24,11 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     fmpz_mat_t x, d, y, Ay, AX, Bden;
     fmpq_mat_t x_q;
     fmpz_t prod, mod, xknum, xkden;
-    fmpz * xvec_num, * xvec_den;
     mp_limb_t * crt_primes;
     nmod_mat_t * A_mod;
     nmod_mat_t Ay_mod, d_mod, y_mod;
     slong i, j, k, jstart = 0, kstart = 0, n, cols, num_primes;
-    int stabilised; /* has lifting stabilised (at 5 nonzero entries) */
+    int stabilised; /* has lifting stabilised */
 
     n = A->r;
     cols = B->c;
@@ -52,9 +51,6 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     fmpz_mat_init_set(d, B);
 
     fmpq_mat_init(x_q, n, cols);
-
-    xvec_num = _fmpz_vec_init(5);
-    xvec_den = _fmpz_vec_init(5);
 
     /* Compute bound for the needed modulus. TODO: if one of N and D
        is much smaller than the other, we could use a tighter bound (i.e. 2ND).
@@ -82,8 +78,6 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     fmpz_one(ppow);
 
     i = 1; /* working with p^i */
-    
-    fmpz_one(dmul);
     
     while (fmpz_cmp(ppow, bound) <= 0)
     {
@@ -176,9 +170,6 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     fmpq_mat_get_fmpz_mat_matwise(X, den, x_q);
 
 dixon_done:
-
-    _fmpz_vec_clear(xvec_num, 5);
-    _fmpz_vec_clear(xvec_den, 5);
 
     nmod_mat_clear(y_mod);
     nmod_mat_clear(d_mod);
