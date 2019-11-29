@@ -61,7 +61,7 @@ fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
         fmpz_mat_init(I, dim, dim);
         for (i = 0; i < dim; i++)
             fmpz_one(fmpz_mat_entry(I, i, i));
-        success = fmpz_mat_solve_fflu(B, den, A, I);
+        success = fmpz_mat_solve(B, den, A, I);
         fmpz_mat_clear(I);
         return success;
     }

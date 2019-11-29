@@ -138,7 +138,20 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
     }
     else if (dim == 3)
     {
-        return _fmpz_mat_solve_cramer_3x3(X, den, A, B);
+        if (X == A)
+        {
+            int success;
+            fmpz_mat_t T;
+            fmpz_mat_init(T, 3, 3);
+            success = _fmpz_mat_solve_cramer_3x3(T, den, A, B);
+            fmpz_mat_swap(T, X);
+            fmpz_mat_clear(T);
+            return success;
+        }
+        else
+        {
+            return _fmpz_mat_solve_cramer_3x3(X, den, A, B);
+        }
     }
     else
     {

@@ -71,30 +71,13 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 
         /* solve B*E2 = den*C */
         fmpz_mat_init(E2, rank, n - rank);
-        if (rank < 25)                 /* small matrices use solve */
+        if (!fmpz_mat_solve(E2, den, B, C))
         {
-            if (!fmpz_mat_solve(E2, den, B, C))
-            {
-                flint_printf("Exception (fmpz_mat_rref_mul). "
-                             "Singular input matrix for solve.");
-                flint_abort();
-            }
+            flint_printf("Exception (fmpz_mat_rref_mul). "
+                         "Singular input matrix for solve.");
+            flint_abort();
         }
-        else                        /* larger matrices use dixon */
-        {
-            fmpq_mat_t E2_q;
-            if (!fmpz_mat_solve_dixon(E2, den, B, C))
-            {
-                flint_printf("Exception (fmpz_mat_rref_mul). "
-                             "Singular input matrix for solve.");
-                flint_abort();
-            }
-            fmpq_mat_init(E2_q, rank, n - rank);
-            /* TODO can be changed to one step */
-            fmpq_mat_set_fmpz_mat_mod_fmpz(E2_q, E2, den);
-            fmpq_mat_get_fmpz_mat_matwise(E2, den, E2_q);
-            fmpq_mat_clear(E2_q);
-        }
+
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);
         fmpz_mat_init(E, rank, n);
