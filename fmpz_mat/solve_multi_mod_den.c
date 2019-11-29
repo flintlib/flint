@@ -51,11 +51,10 @@ _fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
                      nmod_mat_t Xmod, nmod_mat_t Amod, nmod_mat_t Bmod,
 		                   mp_limb_t p, const fmpz_t N, const fmpz_t D)
 {
-    fmpz_t bound, pprod, t, u, dmul;
-    fmpz_mat_t x, d, AX, Bden;
+    fmpz_t bound, pprod;
+    fmpz_mat_t x, AX, Bden;
     fmpq_mat_t x_q;
-    fmpz_t xknum, xkden;
-    slong i, j, k, jstart = 0, kstart = 0, n, cols;
+    slong i, n, nexti, cols;
     int stabilised; /* has CRT stabilised */
 
     n = A->r;
@@ -63,16 +62,10 @@ _fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
 
     fmpz_init(bound);
     fmpz_init(pprod);
-    fmpz_init(xknum);
-    fmpz_init(xkden);
-    fmpz_init(t);
-    fmpz_init(u);
-    fmpz_init(dmul);
 
     fmpz_mat_init(Bden, B->r, B->c);
     fmpz_mat_init(AX, B->r, B->c);
     fmpz_mat_init(x, n, cols);
-    fmpz_mat_init_set(d, B);
 
     fmpq_mat_init(x_q, n, cols);
 
@@ -91,35 +84,13 @@ _fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
     fmpz_mat_set_nmod_mat(x, Xmod);
 
     i = 1; /* working with i primes */
-    
+    nexti = 1; /* when to do next termination test */
+
     while (fmpz_cmp(pprod, bound) <= 0)
     {
-	stabilised = 1;
-        fmpz_one(dmul);
-
-        /* check if stabilised */
-        for (j = jstart; j < x->r && stabilised; j++)
-	{
-           for (k = kstart; k < x->c && stabilised; k++)
-           {
-	      fmpz_mul(t, dmul, fmpz_mat_entry(x, j, k));
-	      fmpz_fdiv_qr(u, t, t, pprod);
-			      
-              /* set stabilised to success of reconstruction */
-              if ((stabilised = _fmpq_reconstruct_fmpz(xknum, xkden, t, pprod)))
-              {
-                 /* save starting point for next time */
-		 jstart = j;
-		 kstart = k + 1;
-		 
-		 if (kstart == x->c)
-	            kstart = 0, jstart = j + 1;
-		 
-		 fmpz_mul(xkden, xkden, dmul);
-                 fmpz_set(dmul, xkden);
-	      }     
-           }
-        }
+	stabilised = i == nexti;
+	if (stabilised) /* set next termination test iteration */
+	   nexti = (slong)(i*1.4) + 1;
 
         /* full matrix stabilisation check */
 	if (stabilised)
@@ -162,20 +133,14 @@ _fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
 
 multi_mod_done:
 
-    fmpz_clear(xknum);
-    fmpz_clear(xkden);
     fmpz_clear(bound);
     fmpz_clear(pprod);
-    fmpz_clear(dmul);
-    fmpz_clear(u);
-    fmpz_clear(t);
 
     fmpq_mat_clear(x_q);
 
     fmpz_mat_clear(AX);
     fmpz_mat_clear(Bden);
     fmpz_mat_clear(x);
-    fmpz_mat_clear(d);
 }
 
 int

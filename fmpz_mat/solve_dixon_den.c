@@ -20,14 +20,14 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
                     const nmod_mat_t Ainv, mp_limb_t p,
                     const fmpz_t N, const fmpz_t D)
 {
-    fmpz_t bound, ppow, t, u, dmul;
-    fmpz_mat_t x, d, y, Ay, AX, Bden;
+    fmpz_t bound, ppow;
+    fmpz_mat_t x, y, d, Ay, AX, Bden;
     fmpq_mat_t x_q;
-    fmpz_t prod, mod, xknum, xkden;
+    fmpz_t prod;
     mp_limb_t * crt_primes;
     nmod_mat_t * A_mod;
     nmod_mat_t Ay_mod, d_mod, y_mod;
-    slong i, j, k, jstart = 0, kstart = 0, n, cols, num_primes;
+    slong i, j, n, nexti, cols, num_primes;
     int stabilised; /* has lifting stabilised */
 
     n = A->r;
@@ -36,12 +36,6 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     fmpz_init(bound);
     fmpz_init(ppow);
     fmpz_init(prod);
-    fmpz_init(mod);
-    fmpz_init(xknum);
-    fmpz_init(xkden);
-    fmpz_init(t);
-    fmpz_init(u);
-    fmpz_init(dmul);
 
     fmpz_mat_init(Bden, B->r, B->c);
     fmpz_mat_init(AX, B->r, B->c);
@@ -78,7 +72,8 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     fmpz_one(ppow);
 
     i = 1; /* working with p^i */
-    
+    nexti = 1; /* iteration of next termination test */
+
     while (fmpz_cmp(ppow, bound) <= 0)
     {
         /* y = A^(-1) * d  (mod p) */
@@ -93,32 +88,9 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
         if (fmpz_cmp(ppow, bound) > 0)
             break;
 
-	stabilised = 1;
-        fmpz_one(dmul);
-
-        /* check if stabilised */
-        for (j = jstart; j < x->r && stabilised; j++)
-	{
-           for (k = kstart; k < x->c && stabilised; k++)
-           {
-	      fmpz_mul(t, dmul, fmpz_mat_entry(x, j, k));
-	      fmpz_fdiv_qr(u, t, t, ppow);
-			      
-              /* set stabilised to success of reconstruction */
-              if ((stabilised = _fmpq_reconstruct_fmpz(xknum, xkden, t, ppow)))
-              {
-                 /* save starting point for next time */
-		 jstart = j;
-		 kstart = k + 1;
-		 
-		 if (kstart == x->c)
-	            kstart = 0, jstart = j + 1;
-		 
-		 fmpz_mul(xkden, xkden, dmul);
-                 fmpz_set(dmul, xkden);
-	      }     
-           }
-        }
+	stabilised = i == nexti;
+	if (stabilised)
+	   nexti = (slong)(i*1.4) + 1; /* set iteration of next test */
 
         /* full matrix stabilisation check */
 	if (stabilised)
@@ -181,23 +153,17 @@ dixon_done:
     flint_free(A_mod);
     flint_free(crt_primes);
 
-    fmpz_clear(xknum);
-    fmpz_clear(xkden);
     fmpz_clear(bound);
     fmpz_clear(ppow);
     fmpz_clear(prod);
-    fmpz_clear(mod);
-    fmpz_clear(dmul);
-    fmpz_clear(u);
-    fmpz_clear(t);
 
     fmpq_mat_clear(x_q);
 
+    fmpz_mat_clear(d);
     fmpz_mat_clear(AX);
     fmpz_mat_clear(Bden);
     fmpz_mat_clear(x);
     fmpz_mat_clear(y);
-    fmpz_mat_clear(d);
     fmpz_mat_clear(Ay);
 }
 
