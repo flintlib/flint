@@ -412,28 +412,35 @@ Nonsingular solving
 
 .. function:: int fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 
-    Solves ``AX = B`` for nonsingular ``A`` by clearing denominators
-    and solving the rescaled system over the integers using a fraction-free
-    algorithm. This is usually the fastest algorithm for small systems.
-    Returns nonzero if ``X`` is nonsingular or if the right hand side
-    is empty, and zero otherwise.
-
 .. function:: int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 
-    Solves ``AX = B`` for nonsingular ``A`` by clearing denominators
-    and solving the rescaled system over the integers using Dixon's algorithm.
-    The rational solution matrix is generated using rational reconstruction.
-    This is usually the fastest algorithm for large systems.
-    Returns nonzero if ``X`` is nonsingular or if the right hand side
+.. function:: int fmpq_mat_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
+
+.. function:: int fmpq_mat_solve(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
+
+    Solves ``AX = B`` for nonsingular ``A``.
+    Returns nonzero if ``A`` is nonsingular or if the right hand side
     is empty, and zero otherwise.
+
+    All algorithms clear denominators to obtain a rescaled system over the integers.
+    The *fraction_free* algorithm uses FFLU solving over the integers.
+    The *dixon* and *multi_mod* algorithms use Dixon p-adic lifting
+    or multimodular solving, followed by rational reconstruction
+    with an adaptive stopping test. The *dixon* and *multi_mod* algorithms
+    are generally the best choice for large systems.
+
+    The default method chooses an algorithm automatically.
+
+.. function:: int fmpq_mat_solve_fmpz_mat_fraction_free(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
+
+.. function:: int fmpq_mat_solve_fmpz_mat_dixon(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
+
+.. function:: int fmpq_mat_solve_fmpz_mat_multi_mod(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
 
 .. function:: int fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Solves ``AX = B`` for integer matrices ``A`` and ``B`` with
-    ``A`` nonsingular by choosing between ``fmpz_mat_solve`` and
-    ``fmpz_mat_solve_dixon`` and restoring the solution ``X`` from the
-    output of these functions.
-    Returns nonzero if ``X`` is nonsingular or if the right hand side
+    Solves ``AX = B`` for nonsingular ``A``, where *A* and *B* are integer
+    matrices. Returns nonzero if ``A`` is nonsingular or if the right hand side
     is empty, and zero otherwise.
 
 
