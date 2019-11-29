@@ -88,26 +88,26 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
         if (fmpz_cmp(ppow, bound) > 0)
             break;
 
-	stabilised = i == nexti;
-	if (stabilised)
-	   nexti = (slong)(i*1.4) + 1; /* set iteration of next test */
+        stabilised = i == nexti;
+	    if (stabilised)
+            nexti = (slong)(i*1.4) + 1; /* set iteration of next test */
 
         /* full matrix stabilisation check */
-	if (stabilised)
+	    if (stabilised)
         {
-           stabilised = fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, ppow);
-	   if (stabilised)
-           {
-	      fmpq_mat_get_fmpz_mat_matwise(X, den, x_q);
+            stabilised = fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, ppow);
+            if (stabilised)
+            {
+                fmpq_mat_get_fmpz_mat_matwise(X, den, x_q);
 
-              fmpz_mat_mul(AX, A, X);
-              fmpz_mat_scalar_mul_fmpz(Bden, B, den);
+                fmpz_mat_mul(AX, A, X);
+                fmpz_mat_scalar_mul_fmpz(Bden, B, den);
 
-	      if (fmpz_mat_equal(AX, Bden))
-	         goto dixon_done;
-	   }
+                if (fmpz_mat_equal(AX, Bden))
+                    goto dixon_done;
+            }
         }
-	i++;
+        i++;
 
         /* d = (d - Ay) / p */
 #if USE_SLOW_MULTIPLICATION

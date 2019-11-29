@@ -26,9 +26,9 @@ fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
     fmpz_init(mod);
 
     fmpq_mat_get_fmpz_mat_rowwise_2(Anum, Bnum, NULL, A, B);
-    success = fmpz_mat_solve_dixon(Xnum, mod, Anum, Bnum);
+    success = fmpz_mat_solve_dixon_den(Xnum, mod, Anum, Bnum);
     if (success)
-        success = fmpq_mat_set_fmpz_mat_mod_fmpz(X, Xnum, mod);
+        fmpq_mat_set_fmpz_mat_div_fmpz(X, Xnum, mod);
 
     fmpz_mat_clear(Anum);
     fmpz_mat_clear(Bnum);

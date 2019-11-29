@@ -27,10 +27,10 @@ mp_limb_t fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
     {
         p = n_nextprime(p, 0);
         _nmod_mat_set_mod(Xmod, p);
-	_nmod_mat_set_mod(Amod, p);
+        _nmod_mat_set_mod(Amod, p);
         _nmod_mat_set_mod(Bmod, p);
         fmpz_mat_get_nmod_mat(Amod, A);
-	fmpz_mat_get_nmod_mat(Bmod, B);
+        fmpz_mat_get_nmod_mat(Bmod, B);
         if (nmod_mat_solve(Xmod, Amod, Bmod))
             break;
         fmpz_mul_ui(tested, tested, p);
@@ -88,26 +88,26 @@ _fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
 
     while (fmpz_cmp(pprod, bound) <= 0)
     {
-	stabilised = i == nexti;
-	if (stabilised) /* set next termination test iteration */
-	   nexti = (slong)(i*1.4) + 1;
+        stabilised = i == nexti;
+        if (stabilised) /* set next termination test iteration */
+            nexti = (slong)(i*1.4) + 1;
 
         /* full matrix stabilisation check */
-	if (stabilised)
+        if (stabilised)
         {
-           stabilised = fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, pprod);
-	   if (stabilised)
-           {
-	      fmpq_mat_get_fmpz_mat_matwise(X, den, x_q);
+            stabilised = fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, pprod);
+	        if (stabilised)
+            {
+                fmpq_mat_get_fmpz_mat_matwise(X, den, x_q);
 
-              fmpz_mat_mul(AX, A, X);
-              fmpz_mat_scalar_mul_fmpz(Bden, B, den);
+                fmpz_mat_mul(AX, A, X);
+                fmpz_mat_scalar_mul_fmpz(Bden, B, den);
 
-	      if (fmpz_mat_equal(AX, Bden))
-	         goto multi_mod_done;
-	   }
+                if (fmpz_mat_equal(AX, Bden))
+                    goto multi_mod_done;
+            }
         }
-	i++;
+        i++;
 
         while (1)
         {
@@ -123,7 +123,6 @@ _fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
         }
 
         fmpz_mat_CRT_ui(x, x, pprod, Xmod, 0); 
-
         fmpz_mul_ui(pprod, pprod, p);
     }
 
