@@ -68,13 +68,12 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
     }
     else
     {
-        fmpz_mat_t Aclear, Bclear, I;
+        fmpz_mat_t Aclear, I;
         fmpz * den;
         slong i;
         int success;
 
         fmpz_mat_init(Aclear, n, n);
-        fmpz_mat_init(Bclear, n, n);
         fmpz_mat_init(I, n, n);
         den = _fmpz_vec_init(n);
 
@@ -82,12 +81,9 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
         for (i = 0; i < n; i++)
             fmpz_set(fmpz_mat_entry(I, i, i), den + i);
 
-        success = fmpz_mat_solve(Bclear, den, Aclear, I);
-        if (success)
-            fmpq_mat_set_fmpz_mat_div_fmpz(B, Bclear, den);
+        success = fmpq_mat_solve_fmpz_mat(B, Aclear, I);
 
         fmpz_mat_clear(Aclear);
-        fmpz_mat_clear(Bclear);
         fmpz_mat_clear(I);
         _fmpz_vec_clear(den, A->r);
 

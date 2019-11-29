@@ -22,7 +22,9 @@ fmpq_mat_solve_fmpz_mat_fraction_free(fmpq_mat_t X, const fmpz_mat_t A,
     fmpz_mat_init(Xnum, B->r, B->c);
     fmpz_init(den);
 
-    success = fmpz_mat_solve_fflu(Xnum, den, A, B);
+    /* call solve instead of solve_fflu explicitly because we also want
+       to use cramer where applicable */
+    success = fmpz_mat_solve(Xnum, den, A, B);
 
     if (success)
         fmpq_mat_set_fmpz_mat_div_fmpz(X, Xnum, den);
@@ -49,7 +51,9 @@ fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
     fmpz_init(den);
 
     fmpq_mat_get_fmpz_mat_rowwise_2(Anum, Bnum, NULL, A, B);
-    success = fmpz_mat_solve_fflu(Xnum, den, Anum, Bnum);
+    /* call solve instead of solve_fflu explicitly because we also want
+       to use cramer where applicable */
+    success = fmpz_mat_solve(Xnum, den, Anum, Bnum);
 
     if (success)
         fmpq_mat_set_fmpz_mat_div_fmpz(X, Xnum, den);
