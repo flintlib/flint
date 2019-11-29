@@ -14,7 +14,7 @@
 int
 fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    if (fmpz_mat_nrows(A) <= 20)
+    if (fmpz_mat_nrows(A) <= 15)
         return fmpq_mat_solve_fmpz_mat_fraction_free(X, A, B);
     else if (fmpz_mat_ncols(B) == 1)
     	return fmpq_mat_solve_fmpz_mat_dixon(X, A, B);
@@ -25,7 +25,7 @@ fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
 int
 fmpq_mat_solve(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 {
-    if (fmpq_mat_nrows(A) <= 20)
+    if (fmpq_mat_nrows(A) <= 15)
         return fmpq_mat_solve_fraction_free(X, A, B);
     else if (fmpq_mat_ncols(B) == 1)
     	return fmpq_mat_solve_dixon(X, A, B);
