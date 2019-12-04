@@ -86,6 +86,7 @@ void _fmpz_mat22_rmul(_fmpz_mat22_t M, const _fmpz_mat22_t N)
 }
 
 
+/* M = M*N */
 void _fmpz_mat22_rmul_ui(_fmpz_mat22_t M, const _ui_mat22_t N)
 {
     fmpz_t a;
@@ -110,6 +111,7 @@ void _fmpz_mat22_rmul_ui(_fmpz_mat22_t M, const _ui_mat22_t N)
 }
 
 
+/* M = M*N^-1 */
 void _fmpz_mat22_rmul_inv_ui(_fmpz_mat22_t M, const _ui_mat22_t N)
 {
     fmpz_t a, b;
