@@ -117,7 +117,7 @@ Comparison
 
 .. function:: int fmpq_cmp(const fmpq_t x, const fmpq_t y)
 
-    Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
+.. function:: int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y)
 
 .. function:: int fmpq_cmp_ui(const fmpq_t x, ulong y)
 
@@ -566,6 +566,13 @@ Rational enumeration
     Set `left` and `right` to the fractions directly below and above `mid` in the Farey sequence of order `Q`.
     This function will throw if `mid` is not canonical or `Q` is less than the denominator of `mid`.
 
+.. function:: void fmpq_simplest_between(fmpq_t mid, const fmpq_t l, const fmpq_t r)
+
+.. function:: void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den, const fmpz_t l_num, const fmpz_t l_den, const fmpz_t r_num, const fmpz_t r_den)
+
+    Set ``mid`` to the simplest fraction in the closed interval `[l, r]`. The underscore version makes the additional assumption that `l \le r`.
+    The endpoints `l` and `r` do not need to be reduced, but their denominators do need to be positive.
+    ``mid`` will be always be returned in canonical form. A canonical fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1<b_2` or `b_1=b_2` and `a_1<a_2`.
 
 
 Continued fractions
@@ -573,6 +580,8 @@ Continued fractions
 
 
 .. function:: slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, slong n)
+
+.. function:: slong fmpq_get_cfrac_naive(fmpz * c, fmpq_t rem, const fmpq_t x, slong n)
 
     Generates up to `n` terms of the (simple) continued fraction expansion
     of `x`, writing the coefficients to the vector `c` and the remainder `r`
@@ -595,11 +604,14 @@ Continued fractions
     expansion can be obtained by replacing the last coefficient
     `a_{k-1}` by the pair of coefficients `a_{k-1} - 1, 1`.
 
-    As a special case, the continued fraction expansion of zero consists
-    of a single zero (and not the empty sequence).
+    The behaviour of this function in corner cases is as follows:
+        - if `x` is infinite (anything over 0), ``rem`` will be zero and the return is `k=0` regardless of `n`.
+        - else (if `x` is finite),
+            - if `n <= 0`, ``rem`` will be `1/x` (allowing for infinite in the case `x=0`) and the return is `k=0`
+            - else (if `n > 0`), ``rem`` will finite and the return is `0 < k \le n`.
 
-    This function implements a simple algorithm, performing repeated
-    divisions. The running time is quadratic.
+    Essentially, if this function is called with canonical `x` and `n > 0`, then ``rem`` will be canonical.
+    Therefore, applications relying on canonical ``fmpq_t``'s should not call this function with `n <= 0`.
 
 .. function:: void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
 
@@ -680,66 +692,10 @@ computing GCD of `h` and `k`,
 Writing `s(h,k) = p/q`, some useful properties employed are
 `|s| < k / 12`, `q | 6k` and `2|p| < k^2`.
 
-.. function:: void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-    Computes `s(h,k)` for arbitrary `h` and `k` using a straightforward
-    implementation of the defining sum using ``fmpz`` arithmetic.
-    This function is slow except for very small `k` and is mainly
-    intended to be used for testing purposes.
-
-.. function:: double fmpq_dedekind_sum_coprime_d(double h, double k)
-
-    Returns an approximation of `s(h,k)` computed by evaluating the
-    remainder sequence sum using double-precision arithmetic.
-    Assumes that `0 < h < k` and `(h,k) = 1`, and that `h`, `k` and
-    their remainders can be represented exactly as doubles, e.g.
-    `k < 2^{53}`.
-
-    We give a rough error analysis with IEEE double precision arithmetic,
-    assuming `2 k^2 < 2^{53}`. By assumption, the terms in the sum evaluate
-    exactly apart from the division. Thus each term is bounded in magnitude
-    by `2k` and its absolute error is bounded by `k 2^{-52}`.
-    By worst-case analysis of the Euclidean algorithm, we also know that
-    no more than 40 terms will be added.
-
-    It follows that the absolute error is at most `C k 2^{-53}` for
-    some constant `C`. If we multiply the output by `6 k` in order
-    to obtain an integer numerator, the order of magnitude of the error
-    is around `6 C k^2 2^{-53}`, so rounding to the nearest integer gives
-    a correct numerator whenever `k < 2^{26-d}` for some small number of
-    guard bits `d`. A computation has shown that `d = 5` is sufficient,
-    i.e. this function can be used for exact computation when
-    `k < 2^{21} \approx 2 \times 10^6`. This bound can likely be improved.
-
-.. function:: void fmpq_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-    Computes `s(h,k)` for `h` and `k` satisfying `0 \le h \le k` and
-    `(h,k) = 1`. This function effectively evaluates the remainder
-    sequence sum using ``fmpz`` arithmetic, without optimising for
-    any special cases. To avoid rational arithmetic, we use
-    the integer algorithm of Knuth \cite{Knuth1977}.
-
-.. function:: void fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-    Computes `s(h,k)` for `h` and `k` satisfying `0 \le h \le k`
-    and `(h,k) = 1`.
-
-    This function calls ``fmpq_dedekind_sum_coprime_d`` if `k` is small
-    enough for a double-precision estimate of the sum to yield a correct
-    numerator upon multiplication by `6k` and rounding to the nearest integer.
-    Otherwise, it calls ``fmpq_dedekind_sum_coprime_large``.
-
 .. function:: void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    Computes `s(h,k)` for arbitrary `h` and `k`. If the caller
-    can guarantee `0 < h < k` and `(h,k) = 1` ahead of time, it is always
-    cheaper to call ``fmpq_dedekind_sum_coprime``.
+.. function:: void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    This function uses the following identities to reduce the general
-    case to the situation where `0 < h < k` and `(h,k) = 1`:
-    If `k \le 2` or `h = 0`, `s(h,k) = 0`.
-    If `h < 0`, `s(h,k) = -s(-h,k)`.
-    For any `q > 0`, `s(qh,qk) = s(h,k)`.
-    If `0 < k < h` and `(h,k) = 1`,
-    `s(h,k) = (1+h(h-3k)+k^2) / (12hk) - t(k,h).`
+    Computes `s(h,k)` for arbitrary `h` and `k`. The naive version using a straightforward
+    implementation of the defining sum using ``fmpz`` arithmetic and is slow for large `k`.
 

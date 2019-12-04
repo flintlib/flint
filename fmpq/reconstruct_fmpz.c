@@ -45,6 +45,13 @@ _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
 
     while (fmpz_cmpabs(n, N) > 0)
     {
+    /*
+        TODO: the following is correct but might be slow in this loop.
+        Set k = bits(n) - bits(N). If k is large, we may
+            keep track of d in a 2x2 matrix, and
+            chop r and n and use _fmpq_hgcd(r>>j/n>>j) for j ~= k/2.
+        This may require backup step(s)!
+    */
         fmpz_fdiv_q(q, r, n);
         fmpz_mul(t, q, n); fmpz_sub(t, r, t); ROT(r, n, t);
         fmpz_mul(t, q, d); fmpz_sub(t, s, t); ROT(s, d, t);
@@ -100,3 +107,4 @@ fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
     return _fmpq_reconstruct_fmpz(fmpq_numref(res),
                 fmpq_denref(res), a, m);
 }
+

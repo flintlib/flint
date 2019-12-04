@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -21,26 +22,43 @@
 int
 main(void)
 {
-    int i;
+    slong i;
     FLINT_TEST_INIT(state);
-    
 
     flint_printf("get_cfrac....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_t x, r;
         fmpz *c1, *c2;
-        slong n1, n2, bound;
+        slong k, n1, n2, bound;
 
         fmpq_init(x);
         fmpq_init(r);
 
-        fmpq_randtest(x, state, 1 + n_randint(state, 1000));
-        bound = fmpq_cfrac_bound(x);
+        if (i % 2)
+        {
+            fmpq_randtest(x, state, 1 + n_randint(state, 1000));
+            bound = fmpq_cfrac_bound(x);
+            c1 = _fmpz_vec_init(bound);
+        }
+        else
+        {
+            bound = 1 + n_randint(state, 100);
+            c1 = _fmpz_vec_init(bound);
 
-        c1 = _fmpz_vec_init(bound);
+            fmpz_randtest(c1 + 0, state, 2*FLINT_BITS);
+            for (k = 1; k < bound; k++)
+            {
+                fmpz_randtest_unsigned(c1 + k, state, 3*FLINT_BITS);
+                fmpz_add_ui(c1 + k, c1 + k, 1);
+            }
+
+            fmpq_set_cfrac(x, c1, bound);
+        }
+
+
         c2 = _fmpz_vec_init(bound);
 
         n1 = fmpq_get_cfrac(c1, r, x, bound);
@@ -48,7 +66,7 @@ main(void)
         if (!fmpq_is_zero(r))
         {
             flint_printf("FAIL: expected zero remainder\n");
-            abort();
+            flint_abort();
         }
 
         /* Test chaining */
@@ -63,16 +81,16 @@ main(void)
 
         if (n1 != n2)
         {
-            flint_printf("FAIL: n1 = %wd, n2 = %wd\n", n1, n2);
-            abort();
+            flint_printf("FAIL: i = %wd, n1 = %wd, n2 = %wd\n", i, n1, n2);
+            flint_abort();
         }
 
         if (!_fmpz_vec_equal(c1, c2, n1))
         {
-            flint_printf("FAIL: vectors not equal\n");
+            flint_printf("FAIL: i = %wd, vectors not equal\n", i);
             _fmpz_vec_print(c1, n1); flint_printf("\n");
             _fmpz_vec_print(c2, n2); flint_printf("\n");
-            abort();
+            flint_abort();
         }
 
         _fmpz_vec_clear(c1, bound);
@@ -81,9 +99,8 @@ main(void)
         fmpq_clear(r);
     }
 
-    
-
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }
+

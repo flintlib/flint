@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,60 +12,125 @@
 
 #include "fmpq.h"
 
-void
-fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
+#define _UI_MAT22_RMUL_ELEM(m11, m12, m21, m22, q) \
+  do {                                             \
+    mp_limb_t __t1 = m12 + q*m11;                  \
+    mp_limb_t __t2 = m22 + q*m21;                  \
+    m12 = m11;                                     \
+    m22 = m21;                                     \
+    m11 = __t1;                                    \
+    m21 = __t2;                                    \
+  } while (0)
+
+void fmpq_dedekind_sum(fmpq_t sum, const fmpz_t h, const fmpz_t k)
 {
-    if (fmpz_cmp_ui(k, UWORD(2)) <= 0 || fmpz_is_zero(h) || fmpz_equal(h, k))
+    if (fmpz_cmp_ui(k, 2) <= 0 || fmpz_is_zero(h))
     {
-        fmpq_zero(s);
+        fmpq_zero(sum);
+        return;
     }
-    else if (fmpz_sgn(h) < 0)
+    else if (fmpz_fits_si(k))
     {
-        fmpz_t t;
-        fmpz_init(t);
-        fmpz_neg(t, h);
-        fmpq_dedekind_sum(s, t, k);
-        fmpq_neg(s, s);
-        fmpz_clear(t);
+        /*
+            since the alternating sum of quotients
+                s1 - s2 + - ... + sn - 3, n odd
+                s1 - s2 + - ... - sn,     n even
+            is < k in absolute value, we have a version for machine k
+        */
+        ulong a = fmpz_get_ui(k);
+        ulong b = fmpz_fdiv_ui(h, a);
+        ulong m11 = 1, m12 = 0, m21 = 0, m22 = 1;
+        ulong sum_hi, sum_lo, t = 0, q, r;
+
+        while (b != 0)
+        {
+            udiv_qrnnd(q, r, 0, a, b);
+            a = b;
+            b = r;
+            t += q;
+            _UI_MAT22_RMUL_ELEM(m11, m12, m21, m22, q);
+
+            if (b == 0)
+            {
+                /* break with det -1 */
+                t -= 3;
+                smul_ppmm(sum_hi, sum_lo, t, m11);
+                add_ssaaaa(sum_hi, sum_lo, sum_hi, sum_lo, 0, m21 + m12);
+                goto set_sum;
+            }
+
+            udiv_qrnnd(q, r, 0, a, b);
+            a = b;
+            b = r;
+            t -= q;
+            _UI_MAT22_RMUL_ELEM(m11, m12, m21, m22, q);
+        }
+
+        /* break with det +1 */
+        smul_ppmm(sum_hi, sum_lo, t, m11);
+        t = m21 - m12;
+        add_ssaaaa(sum_hi, sum_lo, sum_hi, sum_lo, FLINT_SIGN_EXT(t), t);
+
+set_sum:
+
+        fmpz_set_signed_uiui(fmpq_numref(sum), sum_hi, sum_lo);
+        fmpz_set_ui(fmpq_denref(sum), m11);
     }
     else
     {
-        fmpz_t t, u, q;
+        _fmpz_vector_t s;
+        _fmpz_mat22_t M;
+        _fmpq_ball_t x;
 
-        fmpz_init(t);
-        fmpz_init(u);
-        fmpz_init(q);
+        _fmpz_vector_init(s);
+        s->length = -1;
+        s->want_alt_sum = 1;
 
-        fmpz_gcd(q, h, k);
-        fmpz_divexact(t, h, q);
-        fmpz_divexact(u, k, q);
+        _fmpz_mat22_init(M);
+        _fmpz_mat22_one(M);
 
-        if (fmpz_cmp(t, u) > 0)
+        _fmpq_ball_init(x);
+        x->exact = 1;
+        fmpz_set(x->left_num, k);
+        fmpz_fdiv_r(x->left_den, h, k);
+
+        if (!fmpz_is_zero(x->left_den))
         {
-            fmpq_t r;
-            fmpq_init(r);
+            _fmpq_ball_get_cfrac(s, M, 1, x);
 
-            /* r = (1 + h(h-3k) + k^2) / (12hk) */
-            fmpz_mul_ui(fmpq_numref(r), u, UWORD(3));
-            fmpz_sub(fmpq_numref(r), t, fmpq_numref(r));
-            fmpz_mul(fmpq_numref(r), fmpq_numref(r), t);
-            fmpz_addmul(fmpq_numref(r), u, u);
-            fmpz_add_ui(fmpq_numref(r), fmpq_numref(r), UWORD(1));
-            fmpz_mul(fmpq_denref(r), t, u);
-            fmpz_mul_ui(fmpq_denref(r), fmpq_denref(r), UWORD(12));
-            fmpq_canonicalise(r);
-            fmpq_dedekind_sum_coprime(s, u, t);
-            fmpq_sub(s, r, s);
+            /* exactly one extra iteration needed if get_cfrac is working */
+            FLINT_ASSERT(fmpz_divisible(x->left_num, x->left_den));
 
-            fmpq_clear(r);
+            do {
+                fmpz_fdiv_qr(x->right_num, x->left_num, x->left_num, x->left_den);
+                _fmpz_mat22_rmul_elem(M, x->right_num);
+                _fmpz_vector_push_back(s, x->right_num);
+                fmpz_swap(x->left_num, x->left_den);
+            } while (!fmpz_is_zero(x->left_den));
+        }
+
+        FLINT_ASSERT(!fmpz_is_zero(M->_11));
+
+        FLINT_ASSERT(s->want_alt_sum == M->det);
+        if (M->det == 1)
+        {
+            fmpz_sub(fmpq_numref(sum), M->_21, M->_12);
         }
         else
         {
-            fmpq_dedekind_sum_coprime(s, t, u);
+            FLINT_ASSERT(M->det == -1);
+            fmpz_sub_ui(s->alt_sum, s->alt_sum, 3);
+            fmpz_add(fmpq_numref(sum), M->_21, M->_12);
         }
 
-        fmpz_clear(t);
-        fmpz_clear(u);
-        fmpz_clear(q);
+        fmpz_swap(fmpq_denref(sum), M->_11);
+        fmpz_addmul(fmpq_numref(sum), s->alt_sum, fmpq_denref(sum));
+
+        _fmpq_ball_clear(x);
+        _fmpz_vector_clear(s);
+        _fmpz_mat22_clear(M);
     }
+
+    fmpz_mul_ui(fmpq_denref(sum), fmpq_denref(sum), 12);
+    fmpq_canonicalise(sum); /* extra gcd seems to be unavoidable */
 }

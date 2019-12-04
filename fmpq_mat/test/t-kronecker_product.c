@@ -19,14 +19,12 @@
 int
 main(void)
 {
-    int r, result;
-    FLINT_TEST_INIT(state);
-    
+    int r, result;    
     fmpq_mat_t A, B, C;
     fmpq_mat_t window1, window2;
     slong m, n, k, l, i, j;
     slong bits;
-
+    FLINT_TEST_INIT(state);
 
     flint_printf("kronecker_product....");
     fflush(stdout);

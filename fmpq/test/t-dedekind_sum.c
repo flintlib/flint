@@ -156,13 +156,86 @@ int main(void)
     }
 
 
-    /* Just check that nothing crashes with bignums */
-    for (i = 0; i < 1000; i++)
+    /* check reciprocity law  12*b*c(S(b,c) + S(c,b)) = (b - c)^2 - b*c + 1 */
+    for (i = 0; i < 500*flint_test_multiplier(); i++)
     {
-        fmpz_randtest(hh, state, 300);
-        fmpz_randtest(kk, state, 300);
+        fmpq_t x, r1, r2;
+        fmpz_t b1, c1, b2, c2, t, s;
 
-        fmpq_dedekind_sum(s1, hh, kk);
+        fmpq_init(x);
+        fmpq_init(r1);
+        fmpq_init(r2);
+        fmpz_init(b1);
+        fmpz_init(c1);
+        fmpz_init(b2);
+        fmpz_init(c2);
+        fmpz_init(t);
+        fmpz_init(s);
+
+        if (i % 2)
+        {
+            fmpq_randtest_not_zero(x, state, 2000);
+            fmpq_abs(x, x);
+        }
+        else
+        {
+            fmpz * v;
+            h = 1 + n_randint(state, 100);
+            v = _fmpz_vec_init(h);
+
+            for (k = 0; k < h; k++)
+            {
+                fmpz_randtest_unsigned(v + k, state, 3*FLINT_BITS);
+                fmpz_add_ui(v + k, v + k, 1);
+            }
+
+            fmpq_set_cfrac(x, v, h);
+
+            _fmpz_vec_clear(v, h);
+        }
+
+        /* inflate one input */
+        fmpz_randtest_unsigned(t, state, 100);
+        fmpz_add_ui(t, t, 1);
+        fmpz_mul(b1, fmpq_numref(x), t);
+        fmpz_mul(c1, fmpq_denref(x), t);
+
+        /* inflate the reciprocal input */
+        fmpz_randtest_unsigned(t, state, 100);
+        fmpz_add_ui(t, t, 1);
+        fmpz_mul(b2, fmpq_denref(x), t);
+        fmpz_mul(c2, fmpq_numref(x), t);
+
+        /* rhs */
+        fmpz_mul(t, fmpq_numref(x), fmpq_denref(x));
+        fmpz_sub(s, fmpq_numref(x), fmpq_denref(x));
+        fmpz_mul(s, s, s);
+        fmpz_sub(s, s, t);
+        fmpz_add_ui(s, s, 1);
+
+        /* lhs */
+        fmpq_dedekind_sum(r1, b1, c1);
+        fmpq_dedekind_sum(r2, b2, c2);
+        fmpq_add(r1, r1, r2);
+        fmpz_mul_ui(t, t, 12);
+        fmpq_mul_fmpz(r1, r1, t);
+
+        if (!fmpz_is_one(fmpq_denref(r1)) || !fmpz_equal(fmpq_numref(r1), s))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("check reciprocity law i = %wd\n", i);
+            flint_abort();
+        }
+
+        fmpq_clear(x);
+        fmpq_clear(r1);
+        fmpq_clear(r2);
+        fmpz_clear(b1);
+        fmpz_clear(c1);
+        fmpz_clear(b2);
+        fmpz_clear(c2);
+        fmpz_clear(t);
+        fmpz_clear(s);
     }
 
     fmpz_clear(hh);
