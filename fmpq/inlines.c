@@ -42,7 +42,7 @@ fmpz * fmpq_denominator_ptr(fmpq_t q)
 
 int fmpq_equal_si(fmpq_t q, slong n)
 {
-   return q->num == n && q->den == WORD(1);
+   return fmpz_equal_si(fmpq_numref(q), n) && q->den == WORD(1);
 }
 
 int fmpq_equal_fmpz(fmpq_t q, fmpz_t n)
