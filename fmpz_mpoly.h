@@ -84,10 +84,9 @@ fmpz * fmpz_mpoly_term_coeff_ref(fmpz_mpoly_t A, slong i,
 typedef struct
 {
    fmpz_mpoly_struct * coeffs; /* multivariate coefficients */
-   ulong * exps;
+   fmpz * exps;
    slong alloc;
    slong length;
-   slong var; /* univariate variable number */
 } fmpz_mpoly_univar_struct;
 
 typedef fmpz_mpoly_univar_struct fmpz_mpoly_univar_t[1];
@@ -1000,32 +999,32 @@ typedef fmpz_mpoly_stripe_struct fmpz_mpoly_stripe_t[1];
 
 /* Univariates ***************************************************************/
 
-FLINT_DLL void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t poly,
+FLINT_DLL void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t poly,
+FLINT_DLL void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t poly1,
-                        fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t A,
+                            fmpz_mpoly_univar_t B, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t poly,
+FLINT_DLL void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t A,
                                      slong length, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t poly,
+FLINT_DLL void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t A,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t poly,
+FLINT_DLL void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_from_univar(fmpz_mpoly_t poly1,
-                  const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t A,
+                  const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, flint_bitcnt_t bits1,
-                  const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t A, flint_bitcnt_t Abits,
+           const fmpz_mpoly_univar_t B, slong var, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1,
-              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
+FLINT_DLL void fmpz_mpoly_from_univar(fmpz_mpoly_t A,
+           const fmpz_mpoly_univar_t B, slong var, const fmpz_mpoly_ctx_t ctx);
 
 /* mpolyd ********************************************************************/
 

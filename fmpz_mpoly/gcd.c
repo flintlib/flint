@@ -826,9 +826,7 @@ static int _try_missing_var(
     fmpz_mpoly_init(tG, ctx);
     fmpz_mpoly_univar_init(Ax, ctx);
 
-    success = fmpz_mpoly_to_univar(Ax, A, var, ctx);
-    if (!success)
-        goto cleanup;
+    fmpz_mpoly_to_univar(Ax, A, var, ctx);
 
     FLINT_ASSERT(Ax->length > 0);
     success = _fmpz_mpoly_gcd(tG, Gbits, B, Ax->coeffs + 0, ctx, NULL, 0);

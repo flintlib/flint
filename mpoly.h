@@ -334,6 +334,49 @@ void mpoly_monomial_msub_mp(ulong * exp1, const ulong * exp2, ulong scalar,
     mpn_submul_1(exp1, exp3, N, scalar);
 }
 
+MPOLY_INLINE
+void mpoly_monomial_msub_ui_array(ulong * exp1, const ulong * exp2,
+                                     const ulong * scalar, slong scalar_limbs,
+                                                   const ulong * exp3, slong N)
+{
+    slong i;
+    for (i = 0; i < N; i++)
+        exp1[i] = exp2[i];
+    FLINT_ASSERT(scalar_limbs <= N);
+    for (i = 0; i < scalar_limbs; i++)
+        mpn_submul_1(exp1 + i, exp3, N - i, scalar[i]);
+}
+
+MPOLY_INLINE
+void mpoly_monomial_madd_ui_array(ulong * exp1, const ulong * exp2,
+                                     const ulong * scalar, slong scalar_limbs,
+                                                   const ulong * exp3, slong N)
+{
+    slong i;
+    for (i = 0; i < N; i++)
+        exp1[i] = exp2[i];
+    FLINT_ASSERT(scalar_limbs <= N);
+    for (i = 0; i < scalar_limbs; i++)
+        mpn_addmul_1(exp1 + i, exp3, N - i, scalar[i]);
+}
+
+MPOLY_INLINE
+void mpoly_monomial_madd_fmpz(ulong * exp1, const ulong * exp2,
+                             const fmpz_t scalar, const ulong * exp3, slong N)
+{
+    if (COEFF_IS_MPZ(*scalar))
+    {
+        __mpz_struct * mpz = COEFF_TO_PTR(*scalar);
+        mpoly_monomial_madd_ui_array(exp1, exp2,
+                                           mpz->_mp_d, mpz->_mp_size, exp3, N);
+    }
+    else
+    {
+        mpoly_monomial_madd_mp(exp1, exp2, *scalar, exp3, N);
+    }
+}
+
+
 
 MPOLY_INLINE
 void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
