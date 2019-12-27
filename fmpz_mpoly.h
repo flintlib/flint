@@ -1027,39 +1027,6 @@ FLINT_DLL void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t poly1, flint_bitcnt_t bi
 FLINT_DLL int fmpz_mpoly_to_univar(fmpz_mpoly_univar_t poly1,
               const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_univar_equal(fmpz_mpoly_univar_t poly1,
-                  const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_univar_add(fmpz_mpoly_univar_t poly1,
-            const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_univar_mul(fmpz_mpoly_univar_t poly1,
-            const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_univar_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * shift1,
-              const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1,
-        const fmpz_poly_t poly2, slong shift2, slong var,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void fmpz_mpoly_univar_derivative(fmpz_mpoly_univar_t poly1,
-                  const fmpz_mpoly_univar_t poly2, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_univar_prem(fmpz_mpoly_univar_t polyA,
-            const fmpz_mpoly_univar_t polyB, fmpz_mpoly_univar_t polyC,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_univar_pgcd(fmpz_mpoly_univar_t poly1,
-            const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mpoly_univar_pgcd_ducos(fmpz_mpoly_univar_t poly1,
-            const fmpz_mpoly_univar_t polyP, const fmpz_mpoly_univar_t polyQ,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
 /* mpolyd ********************************************************************/
 
 typedef struct
