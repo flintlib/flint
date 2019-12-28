@@ -1026,6 +1026,44 @@ FLINT_DLL void fmpz_mpoly_from_univar_bits(fmpz_mpoly_t A, flint_bitcnt_t Abits,
 FLINT_DLL void fmpz_mpoly_from_univar(fmpz_mpoly_t A,
            const fmpz_mpoly_univar_t B, slong var, const fmpz_mpoly_ctx_t ctx);
 
+FMPZ_MPOLY_INLINE
+int fmpz_mpoly_univar_degree_fits_si(const fmpz_mpoly_univar_t A,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    return A->length == 0 || fmpz_fits_si(A->exps + 0);
+}
+
+FMPZ_MPOLY_INLINE
+slong fmpz_mpoly_univar_length(const fmpz_mpoly_univar_t A,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    return A->length;
+}
+
+FMPZ_MPOLY_INLINE
+slong fmpz_mpoly_univar_get_term_exp_si(fmpz_mpoly_univar_t A, slong i,
+                                                    const fmpz_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    return fmpz_get_si(A->exps + i);
+}
+
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_univar_get_term_coeff(fmpz_mpoly_t c,
+              const fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    fmpz_mpoly_set(c, A->coeffs + i, ctx);
+}
+
+FMPZ_MPOLY_INLINE
+void fmpz_mpoly_univar_swap_term_coeff(fmpz_mpoly_t c,
+                    fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    fmpz_mpoly_swap(c, A->coeffs + i, ctx);
+}
+
 /* mpolyd ********************************************************************/
 
 typedef struct

@@ -653,6 +653,51 @@ Greatest Common Divisor
     Try to set ``G`` to the GCD of ``A`` and ``B`` using the Berlekamp-Massey algorithm to interpolate coefficients from bivariate images in the most significant two variables.
     The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
+
+Univariate Functions
+--------------------------------------------------------------------------------
+
+    An ``fmpz_mpoly_univar_t`` holds a univariate polynomial in some main variable
+    with ``fmpz_mpoly_t`` coefficients in the remaining variables. These functions
+    are useful when one wants to rewrite an element of `\mathbb{Z}[x_1, \dots, x_n]`
+    as an element of `(\mathbb{Z}[x_1, \dots, x_{v-1}, x_{v+1}, \dots, x_n])[x_v]`
+    and vise versa.
+
+.. function:: void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t A, fmpz_mpoly_univar_t B, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to a univariate form of ``B`` by pulling out the variable of index ``var``.
+    The coefficients of ``A`` will still belong to the content ``ctx`` but will not depend on the variable of index ``var``.
+
+.. function:: void fmpz_mpoly_from_univar(fmpz_mpoly_t A, const fmpz_mpoly_univar_t B, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to the normal form of ``B`` by putting in the variable of index ``var``.
+    This function is undefined if the coefficients of ``B`` depend on the variable of index ``var``.
+
+.. function:: int fmpz_mpoly_univar_degree_fits_si(const fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
+
+    Return `1` if the degree of ``A`` with respect to the main variable fit an ``slong``. Otherwise, return `0`.
+
+.. function:: slong fmpz_mpoly_univar_length(const fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
+
+    Return the number of terms in ``A`` with respect to the main variable.
+
+.. function:: slong fmpz_mpoly_univar_get_term_exp_si(fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Return the exponent of the term of index ``i`` of ``A``.
+
+.. function:: void fmpz_mpoly_univar_get_term_coeff(fmpz_mpoly_t c, const fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_univar_swap_term_coeff(fmpz_mpoly_t c, fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+
+    Set (resp. swap) ``c`` to (resp. with) the coefficient of the term of index ``i`` of ``A``.
+
+
 Internal Functions
 --------------------------------------------------------------------------------
 

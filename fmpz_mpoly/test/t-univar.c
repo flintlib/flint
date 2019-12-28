@@ -20,7 +20,7 @@
 int
 main(void)
 {
-    slong i, j;
+    slong i, j, k;
 
     FLINT_TEST_INIT(state);
 
@@ -28,19 +28,20 @@ main(void)
     fflush(stdout);
 
     /* Check mpoly -> mpoly_univar -> mpoly */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f, g, h;
-        fmpz_mpoly_univar_t fx;
-        slong len1, len2;
+        fmpz_mpoly_univar_t fx, gx;
+        slong len1, len2, n;
         flint_bitcnt_t coeff_bits, exp_bits1, exp_bits2, bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 20);
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(g, ctx);
         fmpz_mpoly_init(h, ctx);
-        fmpz_mpoly_univar_init(fx, ctx);       
+        fmpz_mpoly_univar_init(fx, ctx);
+        fmpz_mpoly_univar_init(gx, ctx);
 
         len1 = n_randint(state, 50);
         len2 = n_randint(state, 50);
@@ -75,11 +76,32 @@ main(void)
                 flint_printf("Check mpoly -> mpoly_univar -> mpoly with bits\ni: %wd  j: %wd\n",i,j);
                 flint_abort();
             }
+
+            if (!fmpz_mpoly_univar_degree_fits_si(fx, ctx))
+                continue;
+
+            n = fmpz_mpoly_univar_length(fx, ctx);
+            fmpz_mpoly_univar_fit_length(gx, n, ctx);
+            gx->length = n;
+            for (k = 0; k < n; k++)
+            {
+                fmpz_mpoly_univar_swap_term_coeff(gx->coeffs + k, fx, k, ctx);
+                fmpz_set_si(gx->exps + k, fmpz_mpoly_univar_get_term_exp_si(fx, k, ctx));
+            }
+
+            fmpz_mpoly_from_univar(g, gx, j, ctx);
+            if (!fmpz_mpoly_equal(f, g, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check construction\ni: %wd  j: %wd\n",i,j);
+                flint_abort();
+            }
         }
 
         fmpz_mpoly_clear(f, ctx);
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_univar_clear(gx, ctx);
         fmpz_mpoly_univar_clear(fx, ctx);       
     }
 
