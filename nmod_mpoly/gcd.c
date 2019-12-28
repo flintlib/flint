@@ -630,9 +630,7 @@ static int _try_missing_var(
     nmod_mpoly_init(tG, ctx);
     nmod_mpoly_univar_init(Ax, ctx);
 
-    success = nmod_mpoly_to_univar(Ax, A, var, ctx);
-    if (!success)
-        goto cleanup;
+    nmod_mpoly_to_univar(Ax, A, var, ctx);
 
     FLINT_ASSERT(Ax->length > 0);
     success = _nmod_mpoly_gcd(tG, Gbits, B, Ax->coeffs + 0, ctx, NULL, 0);

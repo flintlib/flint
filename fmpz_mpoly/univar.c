@@ -463,7 +463,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t A, const fmpz_mpoly_univar_t B,
     if (B->length == 0)
     {
         fmpz_mpoly_zero(A, ctx);
-        return;        
+        return;
     }
 
     TMP_START;

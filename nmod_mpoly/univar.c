@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,204 +12,490 @@
 #include "nmod_mpoly.h"
 
 
-void nmod_mpoly_univar_init(nmod_mpoly_univar_t poly, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_univar_init(nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
 {
-    poly->coeffs = NULL;
-    poly->exps = NULL;
-    poly->alloc = 0;
-    poly->length = 0;
-    poly->var = -WORD(1);
+    A->coeffs = NULL;
+    A->exps = NULL;
+    A->alloc = 0;
+    A->length = 0;
 }
 
 
-void nmod_mpoly_univar_clear(nmod_mpoly_univar_t poly, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_univar_clear(nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    for (i = 0; i < poly->alloc; i++)
-        nmod_mpoly_clear(poly->coeffs + i, ctx);
-    flint_free(poly->coeffs);
-    flint_free(poly->exps);
-}
-
-
-void nmod_mpoly_univar_swap(nmod_mpoly_univar_t poly1,
-                         nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx)
-{
-   nmod_mpoly_univar_struct t = *poly1;
-   *poly1 = *poly2;
-   *poly2 = t;
-}
-
-void nmod_mpoly_univar_print_pretty(const nmod_mpoly_univar_t poly,
-                                   const char ** x, const nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-    if (poly->length == 0)
-        flint_printf("0");
-    for (i = 0; i < poly->length; i++)
+    for (i = 0; i < A->alloc; i++)
     {
-        if (i != 0)
-            flint_printf("+");
-        flint_printf("(");
-        nmod_mpoly_print_pretty(poly->coeffs + i,x,ctx);
-        if (x==NULL)
-            flint_printf(")*x%wd^%wd", poly->var+1,poly->exps[i]);
-        else
-            flint_printf(")*%s^%wd", x[poly->var],poly->exps[i]);
+        nmod_mpoly_clear(A->coeffs + i, ctx);
+        fmpz_clear(A->exps + i);
     }
+
+    if (A->coeffs)
+        flint_free(A->coeffs);
+
+    if (A->exps)
+        flint_free(A->exps);
 }
 
 
-void nmod_mpoly_univar_fit_length(nmod_mpoly_univar_t poly,
+void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A, nmod_mpoly_univar_t B,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    nmod_mpoly_univar_struct t = *A;
+    *A = *B;
+    *B = t;
+}
+
+void nmod_mpoly_univar_fit_length(nmod_mpoly_univar_t A,
                                       slong length, const nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    slong old_alloc = poly->alloc;
-    slong new_alloc = FLINT_MAX(length, 2*poly->alloc);
+    slong old_alloc = A->alloc;
+    slong new_alloc = FLINT_MAX(length, 2*A->alloc);
 
     if (length > old_alloc)
     {
         if (old_alloc == 0)
         {
-            poly->exps = (ulong *) flint_malloc(new_alloc*sizeof(ulong));
-            poly->coeffs = (nmod_mpoly_struct *) flint_malloc(
+            A->exps = (fmpz *) flint_malloc(new_alloc*sizeof(fmpz));
+            A->coeffs = (nmod_mpoly_struct *) flint_malloc(
                                           new_alloc*sizeof(nmod_mpoly_struct));
-        } else
+        }
+        else
         {
-            poly->exps = (ulong *) flint_realloc(poly->exps,
-                                                      new_alloc*sizeof(ulong));
-            poly->coeffs = (nmod_mpoly_struct *) flint_realloc(poly->coeffs,
+            A->exps = (fmpz *) flint_realloc(A->exps, new_alloc*sizeof(fmpz));
+            A->coeffs = (nmod_mpoly_struct *) flint_realloc(A->coeffs,
                                           new_alloc*sizeof(nmod_mpoly_struct));
         }
 
         for (i = old_alloc; i < new_alloc; i++)
         {
-            nmod_mpoly_init(poly->coeffs + i, ctx);
+            fmpz_init(A->exps + i);
+            nmod_mpoly_init(A->coeffs + i, ctx);
         }
-        poly->alloc = new_alloc;
+        A->alloc = new_alloc;
     }
-
 }
 
-
-/* if the coefficient doesn't exist, a new one is created */
-nmod_mpoly_struct * _nmod_mpoly_univar_get_coeff(nmod_mpoly_univar_t poly,
-                             ulong pow, slong bits, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_univar_assert_canonical(nmod_mpoly_univar_t A,
+                                                    const nmod_mpoly_ctx_t ctx)
 {
-    slong i, j;
-    nmod_mpoly_struct * xk;
+    slong i;
 
-    for (i = 0; i < poly->length && poly->exps[i] >= pow; i++)
+    for (i = 0; i + 1 < A->length; i++)
     {
-        if (poly->exps[i] == pow) 
+        if (fmpz_cmp(A->exps + i, A->exps + i + 1) <= 0
+            || fmpz_sgn(A->exps + i) < 0
+            || fmpz_sgn(A->exps + i + 1) < 0)
         {
-            return poly->coeffs + i;
+            flint_throw(FLINT_ERROR, "Univariate polynomial exponents out of order");
         }
     }
 
-    nmod_mpoly_univar_fit_length(poly, poly->length + 1, ctx);
+    for (i = 0; i < A->length; i++)
+        nmod_mpoly_assert_canonical(A->coeffs + i, ctx);
+}
 
-    for (j = poly->length; j > i; j--)
+void nmod_mpoly_univar_print_pretty(const nmod_mpoly_univar_t A,
+                                   const char ** x, const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    if (A->length == 0)
+        flint_printf("0");
+    for (i = 0; i < A->length; i++)
     {
-        poly->exps[j] = poly->exps[j - 1];
-        nmod_mpoly_swap(poly->coeffs + j, poly->coeffs + j - 1, ctx);
+        if (i != 0)
+            flint_printf("+");
+        flint_printf("(");
+        nmod_mpoly_print_pretty(A->coeffs + i,x,ctx);
+        flint_printf(")*X^");
+        fmpz_print(A->exps + i);
     }
-    
-    poly->length++;
-    poly->exps[i] = pow;
-    xk = poly->coeffs + i;
-    xk->length = 0;
-    nmod_mpoly_fit_bits(xk, bits, ctx);
-    xk->bits = bits;
-    return xk;
+}
+
+static void _mpoly_rbnode_clear_sp(
+    nmod_mpoly_univar_t A,
+    mpoly_rbtree_t tree,
+    mpoly_rbnode_t node)
+{
+    mpoly_rbnode_struct * left = node->left;
+
+    if (node->right != tree->null)
+        _mpoly_rbnode_clear_sp(A, tree, node->right);
+
+    FLINT_ASSERT(A->length < A->alloc);
+
+    fmpz_set_si(A->exps + A->length, node->key);
+    nmod_mpoly_swap(A->coeffs + A->length, (nmod_mpoly_struct *)(node->data), NULL);
+    A->length++;
+
+    nmod_mpoly_clear(node->data, NULL);
+    flint_free(node->data);
+    flint_free(node);
+
+    if (left != tree->null)
+        _mpoly_rbnode_clear_sp(A, tree, left);
+}
+
+static void _mpoly_rbnode_clear_mp(
+    nmod_mpoly_univar_t A,
+    mpoly_rbtree_t tree,
+    mpoly_rbnode_t node)
+{
+    mpoly_rbnode_struct * left = node->left;
+
+    if (node->right != tree->null)
+        _mpoly_rbnode_clear_mp(A, tree, node->right);
+
+    FLINT_ASSERT(A->length < A->alloc);
+
+    fmpz_swap(A->exps + A->length, (fmpz*)(&node->key));
+    nmod_mpoly_swap(A->coeffs + A->length, (nmod_mpoly_struct *)(node->data), NULL);
+    A->length++;
+
+    fmpz_clear((fmpz*)(&node->key));
+    nmod_mpoly_clear(node->data, NULL);
+    flint_free(node->data);
+    flint_free(node);
+
+    if (left != tree->null)
+        _mpoly_rbnode_clear_mp(A, tree, left);
 }
 
 
-/*
-    the coefficients of poly1 should be constructed with the same bitcounts
-    as that of poly2
-*/
-int nmod_mpoly_to_univar(nmod_mpoly_univar_t poly1, const nmod_mpoly_t poly2,
+/* the coefficients of A should be constructed with the same bits as B */
+void nmod_mpoly_to_univar(nmod_mpoly_univar_t A, const nmod_mpoly_t B,
                                          slong var, const nmod_mpoly_ctx_t ctx)
 {
-    slong i, shift, off, bits, N;
-    ulong k;
-    slong poly1_old_length = poly1->length;
-    slong len = poly2->length;
-    mp_limb_t * coeff = poly2->coeffs;
-    ulong * exp = poly2->exps;
+    flint_bitcnt_t bits = B->bits;
+    slong N = mpoly_words_per_exp(bits, ctx->minfo);
+    slong shift, off;
+    slong Blen = B->length;
+    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Bexp = B->exps;
+    slong i;
+    int new;
     ulong * one;
-    nmod_mpoly_struct * xk;
-    slong xk_len;
+    mpoly_rbtree_t tree;
+    mpoly_rbnode_struct * node;
+    nmod_mpoly_struct * d;
+#define LUT_limit (48)
+    nmod_mpoly_struct LUT[LUT_limit];
     TMP_INIT;
 
-    TMP_START;
-    
-    bits = poly2->bits;
+    if (B->length == 0)
+    {
+        A->length = 0;
+        return;
+    }
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
+    TMP_START;
+
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+
+    mpoly_rbtree_init(tree);
 
     if (bits <= FLINT_BITS)
     {
+        ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         mpoly_gen_monomial_offset_shift_sp(one, &off, &shift,
                                                         var, bits, ctx->minfo);
-        poly1->length = 0;
-        poly1->var = var;
-        for (i = 0; i < len; i++)
+        for (i = 0; i < LUT_limit; i++)
+            nmod_mpoly_init3(LUT + i, 4, bits, ctx);
+
+        /* fill in tree/LUT from B */
+        for (i = 0; i < Blen; i++)
         {
-            ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
-            k = (exp[N*i + off] >> shift) & mask;
-            xk = _nmod_mpoly_univar_get_coeff(poly1, k, bits, ctx);
-            xk_len = xk->length;
-            nmod_mpoly_fit_length(xk, xk_len + 1, ctx);
-            xk->coeffs[xk_len] = coeff[i];
-            xk->length = xk_len + 1;
-            mpoly_monomial_msub(xk->exps + N*xk_len, exp + N*i, k, one, N);
+            ulong k = (Bexp[N*i + off] >> shift) & mask;
+            if (k < LUT_limit)
+            {
+                d = LUT + k;
+            }
+            else
+            {
+                node = mpoly_rbtree_get(&new, tree, k);
+                if (new)
+                {
+                    d = flint_malloc(sizeof(nmod_mpoly_struct));
+                    nmod_mpoly_init3(d, 4, bits, ctx);
+                    node->data = d;
+                }
+                else
+                {
+                    d = node->data;
+                }
+            }
+            nmod_mpoly_fit_length(d, d->length + 1, ctx);
+            d->coeffs[d->length] = Bcoeff[i];
+            mpoly_monomial_msub(d->exps + N*d->length, Bexp + N*i, k, one, N);
+            d->length++;
+        }
+
+        /* clear out tree to A */
+        nmod_mpoly_univar_fit_length(A, tree->size + LUT_limit, ctx);
+        A->length = 0;
+        if (tree->size > 0)
+            _mpoly_rbnode_clear_sp(A, tree, tree->head->left);
+
+        for (i = LUT_limit - 1; i >= 0; i--)
+        {
+            d = LUT + i;
+            if (d->length > 0)
+            {
+                FLINT_ASSERT(A->length < A->alloc);
+                fmpz_set_si(A->exps + A->length, i);
+                nmod_mpoly_swap(A->coeffs + A->length, d, ctx);
+                A->length++;
+            }
+            nmod_mpoly_clear(d, ctx);
         }
     }
     else
     {
-        fmpz_t c;
-        fmpz_init(c);
+        fmpz_t k;
+        fmpz_init(k);
 
         off = mpoly_gen_monomial_offset_mp(one, var, bits, ctx->minfo);
 
-        poly1->length = 0;
-        poly1->var = var;
-        for (i = 0; i < len; i++)
+        /* fill in tree from B */
+        for (i = 0; i < Blen; i++)
         {
-            fmpz_set_ui_array(c, exp + N*i + off, bits/FLINT_BITS);
-            if (!fmpz_fits_si(c))
-            {
-                fmpz_clear(c);
-                goto failed;
-            }
-            k = fmpz_get_si(c);
-            xk = _nmod_mpoly_univar_get_coeff(poly1, k, bits, ctx);
-            xk_len = xk->length;
-            nmod_mpoly_fit_length(xk, xk_len + 1, ctx);
-            xk->coeffs[xk_len] = coeff[i];
-            xk->length = xk_len + 1;
-            mpoly_monomial_msub_mp(xk->exps + N*xk_len, exp + N*i, k, one, N);
-        }        
+            fmpz_set_ui_array(k, Bexp + N*i + off, bits/FLINT_BITS);
 
-        fmpz_clear(c);
+            node = mpoly_rbtree_get_fmpz(&new, tree, k);
+            if (new)
+            {
+                d = flint_malloc(sizeof(nmod_mpoly_struct));
+                nmod_mpoly_init3(d, 4, bits, ctx);
+                node->data = d;
+            }
+            else
+            {
+                d = node->data;
+            }
+            nmod_mpoly_fit_length(d, d->length + 1, ctx);
+            d->coeffs[d->length] = Bcoeff[i];
+            mpoly_monomial_msub_ui_array(d->exps + N*d->length, Bexp + N*i,
+                                    Bexp + N*i + off, bits/FLINT_BITS, one, N);
+            d->length++;
+        }
+
+        /* clear out tree to A */
+        nmod_mpoly_univar_fit_length(A, tree->size, ctx);
+        A->length = 0;
+        FLINT_ASSERT(tree->size > 0);
+        _mpoly_rbnode_clear_mp(A, tree, tree->head->left);
+
+        fmpz_clear(k);
     }
 
-    /* demote remaining coefficients */
-    for (i = poly1->length; i < poly1_old_length; i++)
-    {
-        nmod_mpoly_clear(poly1->coeffs + i, ctx);
-        nmod_mpoly_init(poly1->coeffs + i, ctx);
-    }    
-
     TMP_END;
-    return 1;
-
-failed:
-    nmod_mpoly_univar_clear(poly1, ctx);
-    nmod_mpoly_univar_init(poly1, ctx);
-    TMP_END;
-    return 0;
 }
+
+
+/*
+    Currently this function does not work if the coefficients depend on "var".
+    The assertion x->next == NULL would need to be replaced by a loop.
+    Other asserts would need to be removed as well.
+*/
+void nmod_mpoly_from_univar_bits(nmod_mpoly_t A, flint_bitcnt_t Abits,
+            const nmod_mpoly_univar_t B, slong var, const nmod_mpoly_ctx_t ctx)
+{
+    slong N = mpoly_words_per_exp(Abits, ctx->minfo);
+    slong i;
+    slong next_loc, heap_len = 1;
+    ulong * cmpmask;
+    slong total_len;
+    mpoly_heap_s * heap;
+    slong Alen;
+    ulong ** Btexp;
+    ulong * exp;
+    ulong * one;
+    mpoly_heap_t * chain, * x;
+    TMP_INIT;
+
+    if (B->length == 0)
+    {
+        nmod_mpoly_fit_bits(A, Abits, ctx);
+        A->bits = Abits;
+        A->length = 0;
+        return;
+    }
+
+    TMP_START;
+
+    /* pack everything into Abits */
+
+    one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    Btexp = (ulong **) TMP_ALLOC(B->length*sizeof(ulong*));
+
+    total_len = 0;
+    for (i = 0; i < B->length; i++)
+    {
+        nmod_mpoly_struct * Bi = B->coeffs + i;
+        total_len += Bi->length;
+        Btexp[i] = Bi->exps;
+        if (Abits != Bi->bits)
+        {
+            Btexp[i] = (ulong *) flint_malloc(N*Bi->length*sizeof(ulong));
+            if (!mpoly_repack_monomials(Btexp[i], Abits,
+                                   Bi->exps, Bi->bits, Bi->length, ctx->minfo))
+            {
+                FLINT_ASSERT(0 && "repack does not fit");
+            }
+        }
+    }
+
+    nmod_mpoly_fit_length(A, total_len, ctx);
+    nmod_mpoly_fit_bits(A, Abits, ctx);
+    A->bits = Abits;
+
+    next_loc = B->length + 2;
+    heap = (mpoly_heap_s *) TMP_ALLOC((B->length + 1)*sizeof(mpoly_heap_s));
+    exp = (ulong *) TMP_ALLOC(B->length*N*sizeof(ulong));
+    chain = (mpoly_heap_t *) TMP_ALLOC(B->length*sizeof(mpoly_heap_t));
+
+    mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
+
+    Alen = 0;
+    if (Abits <= FLINT_BITS)
+    {
+        mpoly_gen_monomial_sp(one, var, Abits, ctx->minfo);
+
+        for (i = 0; i < B->length; i++)
+        {
+            FLINT_ASSERT(fmpz_fits_si(B->exps + i));
+            x = chain + i;
+            x->i = i;
+            x->j = 0;
+            x->next = NULL;
+            mpoly_monomial_madd(exp + N*x->i, Btexp[x->i] + N*x->j,
+                                             fmpz_get_si(B->exps + i), one, N);
+            _mpoly_heap_insert(heap, exp + N*i, x, &next_loc, &heap_len,
+                                                                   N, cmpmask);
+        }
+
+        while (heap_len > 1)
+        {
+            FLINT_ASSERT(Alen < A->alloc);
+            mpoly_monomial_set(A->exps + N*Alen, heap[1].exp, N);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+            A->coeffs[Alen] = (B->coeffs + x->i)->coeffs[x->j];
+            Alen++;
+
+            FLINT_ASSERT(x->next == NULL);
+
+            if (x->j + 1 < (B->coeffs + x->i)->length)
+            {
+                FLINT_ASSERT(fmpz_fits_si(B->exps + x->i));
+                x->j = x->j + 1;
+                x->next = NULL;
+                mpoly_monomial_madd(exp + N*x->i, Btexp[x->i] + N*x->j,
+                                          fmpz_get_si(B->exps + x->i), one, N);
+                _mpoly_heap_insert(heap, exp + N*x->i, x, &next_loc, &heap_len,
+                                                                   N, cmpmask);
+            }
+        }
+    }
+    else
+    {
+        mpoly_gen_monomial_offset_mp(one, var, Abits, ctx->minfo);
+
+        for (i = 0; i < B->length; i++)
+        {
+            x = chain + i;
+            x->i = i;
+            x->j = 0;
+            x->next = NULL;
+            mpoly_monomial_madd_fmpz(exp + N*x->i, Btexp[x->i] + N*x->j,
+                                                          B->exps + i, one, N);
+            _mpoly_heap_insert(heap, exp + N*i, x, &next_loc, &heap_len,
+                                                                   N, cmpmask);
+        }
+
+        while (heap_len > 1)
+        {
+            FLINT_ASSERT(Alen < A->alloc);
+            mpoly_monomial_set(A->exps + N*Alen, heap[1].exp, N);
+            x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
+            A->coeffs[Alen] = (B->coeffs + x->i)->coeffs[x->j];
+            Alen++;
+
+            FLINT_ASSERT(x->next == NULL);
+
+            if (x->j + 1 < (B->coeffs + x->i)->length)
+            {
+                x->j = x->j + 1;
+                x->next = NULL;
+                mpoly_monomial_madd_fmpz(exp + N*x->i, Btexp[x->i] + N*x->j,
+                                                       B->exps + x->i, one, N);
+                _mpoly_heap_insert(heap, exp + N*x->i, x, &next_loc, &heap_len,
+                                                                   N, cmpmask);
+            }
+        }
+    }
+
+    A->length = Alen;
+
+    for (i = 0; i < B->length; i++)
+    {
+        if (Btexp[i] != (B->coeffs + i)->exps)
+            flint_free(Btexp[i]);
+    }
+
+    TMP_END;
+}
+
+void nmod_mpoly_from_univar(nmod_mpoly_t A, const nmod_mpoly_univar_t B,
+                                         slong var, const nmod_mpoly_ctx_t ctx)
+{
+    slong n = ctx->minfo->nfields;
+    flint_bitcnt_t bits;
+    slong i;
+    fmpz * gen_fields, * tmp_fields, * max_fields;
+    TMP_INIT;
+
+    if (B->length == 0)
+    {
+        nmod_mpoly_zero(A, ctx);
+        return;
+    }
+
+    TMP_START;
+
+    /* find bits required to represent result */
+    gen_fields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    tmp_fields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    max_fields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_init(gen_fields + i);
+        fmpz_init(tmp_fields + i);
+        fmpz_init(max_fields + i);
+    }
+
+    mpoly_gen_fields_fmpz(gen_fields, var, ctx->minfo);
+
+    for (i = 0; i < B->length; i++)
+    {
+        nmod_mpoly_struct * Bi = B->coeffs + i;
+        mpoly_max_fields_fmpz(tmp_fields, Bi->exps, Bi->length, Bi->bits, ctx->minfo);
+        _fmpz_vec_scalar_addmul_fmpz(tmp_fields, gen_fields, n, B->exps + i);
+        _fmpz_vec_max_inplace(max_fields, tmp_fields, n);
+    }
+    bits = _fmpz_vec_max_bits(max_fields, n);
+    bits = FLINT_MAX(MPOLY_MIN_BITS, bits + 1);
+    bits = mpoly_fix_bits(bits, ctx->minfo);
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(gen_fields + i);
+        fmpz_clear(tmp_fields + i);
+        fmpz_clear(max_fields + i);
+    }
+    TMP_END;
+
+    nmod_mpoly_from_univar_bits(A, bits, B, var, ctx);
+}
+

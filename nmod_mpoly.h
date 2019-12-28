@@ -100,10 +100,9 @@ mp_limb_t * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i,
 typedef struct
 {
    nmod_mpoly_struct * coeffs; /* multivariate coefficients */
-   ulong * exps;
+   fmpz * exps;
    slong alloc;
    slong length;
-   slong var; /* univariate variable number */
 } nmod_mpoly_univar_struct;
 
 typedef nmod_mpoly_univar_struct nmod_mpoly_univar_t[1];
@@ -1070,62 +1069,70 @@ typedef nmod_mpoly_stripe_struct nmod_mpoly_stripe_t[1];
 
 /* Univariates ***************************************************************/
 
-FLINT_DLL void nmod_mpoly_univar_init(nmod_mpoly_univar_t poly,
+FLINT_DLL void nmod_mpoly_univar_init(nmod_mpoly_univar_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_univar_clear(nmod_mpoly_univar_t poly,
+FLINT_DLL void nmod_mpoly_univar_clear(nmod_mpoly_univar_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_univar_swap(nmod_mpoly_univar_t poly1,
-                        nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A,
+                            nmod_mpoly_univar_t B, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_univar_fit_length(nmod_mpoly_univar_t poly,
+FLINT_DLL void nmod_mpoly_univar_fit_length(nmod_mpoly_univar_t A,
                                      slong length, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_univar_print_pretty(const nmod_mpoly_univar_t poly,
+FLINT_DLL void nmod_mpoly_univar_print_pretty(const nmod_mpoly_univar_t A,
                                   const char ** x, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_from_univar(nmod_mpoly_t poly1,
-                  const nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_from_univar_bits(nmod_mpoly_t poly1, flint_bitcnt_t bits1,
-                  const nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_to_univar(nmod_mpoly_univar_t poly1,
-              const nmod_mpoly_t poly2, slong var, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int nmod_mpoly_univar_equal(nmod_mpoly_univar_t poly1,
-                  const nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_univar_add(nmod_mpoly_univar_t poly1,
-            const nmod_mpoly_univar_t poly2, const nmod_mpoly_univar_t poly3,
+FLINT_DLL void nmod_mpoly_univar_assert_canonical(nmod_mpoly_univar_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_univar_mul(nmod_mpoly_univar_t poly1,
-            const nmod_mpoly_univar_t poly2, const nmod_mpoly_univar_t poly3,
-                                                   const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_to_univar(nmod_mpoly_univar_t A,
+                  const nmod_mpoly_t B, slong var, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_to_nmod_poly(nmod_poly_t poly1, slong * shift1,
-              const nmod_mpoly_t poly2, slong var, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_from_univar_bits(nmod_mpoly_t A, flint_bitcnt_t Abits,
+           const nmod_mpoly_univar_t B, slong var, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_from_nmod_poly(nmod_mpoly_t poly1,
-        const nmod_poly_t poly2, slong shift2, slong var,
-                                                   const nmod_mpoly_ctx_t ctx);
+FLINT_DLL void nmod_mpoly_from_univar(nmod_mpoly_t A,
+           const nmod_mpoly_univar_t B, slong var, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_univar_derivative(nmod_mpoly_univar_t poly1,
-                  const nmod_mpoly_univar_t poly2, const nmod_mpoly_ctx_t ctx);
+NMOD_MPOLY_INLINE
+int nmod_mpoly_univar_degree_fits_si(const nmod_mpoly_univar_t A,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    return A->length == 0 || fmpz_fits_si(A->exps + 0);
+}
 
-FLINT_DLL void _nmod_mpoly_univar_prem(nmod_mpoly_univar_t polyA,
-            const nmod_mpoly_univar_t polyB, nmod_mpoly_univar_t polyC,
-                                                   const nmod_mpoly_ctx_t ctx);
+NMOD_MPOLY_INLINE
+slong nmod_mpoly_univar_length(const nmod_mpoly_univar_t A,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    return A->length;
+}
 
-FLINT_DLL void _nmod_mpoly_univar_pgcd(nmod_mpoly_univar_t poly1,
-            const nmod_mpoly_univar_t polyP, const nmod_mpoly_univar_t polyQ,
-                                                   const nmod_mpoly_ctx_t ctx);
+NMOD_MPOLY_INLINE
+slong nmod_mpoly_univar_get_term_exp_si(nmod_mpoly_univar_t A, slong i,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    return fmpz_get_si(A->exps + i);
+}
 
-FLINT_DLL void _nmod_mpoly_univar_pgcd_ducos(nmod_mpoly_univar_t poly1,
-            const nmod_mpoly_univar_t polyP, const nmod_mpoly_univar_t polyQ,
-                                                   const nmod_mpoly_ctx_t ctx);
+NMOD_MPOLY_INLINE
+void nmod_mpoly_univar_get_term_coeff(nmod_mpoly_t c,
+              const nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    nmod_mpoly_set(c, A->coeffs + i, ctx);
+}
+
+NMOD_MPOLY_INLINE
+void nmod_mpoly_univar_swap_term_coeff(nmod_mpoly_t c,
+                    nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    nmod_mpoly_swap(c, A->coeffs + i, ctx);
+}
 
 /* Helpers for array methods *************************************************/
 
