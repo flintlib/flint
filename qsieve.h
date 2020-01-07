@@ -33,9 +33,9 @@
  extern "C" {
 #endif
 
-#define QS_DEBUG 0
+#define QS_DEBUG 0 /* whether or not to print debug information */
 
-#define BITS_ADJUST 25 /* added to sieve entries to compensate for approximations */
+#define BITS_ADJUST 25 /* add to sieve entries to compensate approximations */
 
 #define BLOCK_SIZE 65536 /* size of sieving cache block */
 
@@ -95,7 +95,7 @@ typedef struct qs_s
 {
    fmpz_t n;               /* Number to factor */
 
-   flint_bitcnt_t bits;       /* Number of bits of n */
+   flint_bitcnt_t bits;    /* Number of bits of n */
 
    ulong ks_primes;        /* number of Knuth-Schroeppel primes */
 
@@ -119,43 +119,47 @@ typedef struct qs_s
                        POLYNOMIAL DATA
     **************************************************************************/
 
-   fmpz_t A;                /* current value of coefficient A */
-   fmpz_t A0;               /* coefficient A excluding the non-factor-base
-                               prime  */
-   slong q_idx;             /* offset of q0 in factor base */
+   fmpz_t A;                /* current value of coeff A of poly Ax^2 + Bx + C */
+   fmpz_t B;                /* B value of poly */
 
-   fmpz_t B;                /* B values corresponding to current value of A */
-   mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
-   fmpz_t * A0_divp;        /* (A0 / p) for each prime dividing A0 */
-   fmpz_t * B_terms;        /* B_terms[i] = A_divp[i] * (B0_terms[i] * q0^(-1)) % p,
-                               where 'p' is a prime factor of 'A0' */
+   mp_limb_t * A_ind;       /* indices of factor base primes dividing A */
 
-   mp_limb_t * B0_terms;    /* B0_terms[i] = (sqrt(kn) * (A0_divp[i])^(-1)) modulo p,
-                               where 'p' is a prime factor of 'A0' */
+   fmpz_t * A_divp;         /* A_divp[i] = (A/p_i),
+                               where the p_i are the prime factors of A */
+   mp_limb_t * B0_terms;    /* B0_terms[i] = min(gamma_i, p - gamma_i) where
+                               gamma_i = (sqrt(kn)*(A_divp[i])^(-1)) mod p_i,
+                               where the p_i are the prime factors of A */
 
-   mp_limb_t * A0_inv;      /* A0^(-1) mod p, for factor base primes p */
-   mp_limb_t ** A_inv2B;    /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
-   int * soln1;       /* first root of poly */
-   int * soln2;       /* second root of poly */
+   fmpz_t * B_terms;        /* B_terms[i] = A_divp[i]*B0_terms[i] (multprec) */
+
+   mp_limb_t * A_inv;       /* A_inv[k] = A^(-1) mod p_k, for FB prime p_k */
+   mp_limb_t ** A_inv2B;    /* A_inv2B[i][k] = 2 * B_terms[i] * A^(-1) mod p_k
+                               for FB prime p_k */
+
+   int * soln1;             /* soln1[k] = first poly root mod FB prime p_k */
+   int * soln2;             /* soln2[k] = second poly root mod FB prime p_k */
 
    fmpz_t target_A;         /* approximate target value for A coeff of poly */
 
-   fmpz_t upp_bound;
-   fmpz_t low_bound;
+   fmpz_t upp_bound;        /* upper bound on desired A = 2*target_A */
+   fmpz_t low_bound;        /* lower bound on desired A = target_A/2 */
 
-   slong s;                 /* number of prime factors of A0 */
+   slong s;                 /* number of prime factors of A */
    slong low;               /* minimum offset in factor base,
-                               for possible factors of 'A0' */
-
+                               for possible factors of A */
    slong high;              /* maximum offset in factor base,
-                               for possible factors of 'A0' */
-   slong span;              /* total number of possible factors for 'A0' */
+                               for possible factors of A */
+   slong span;              /* total number of possible factors for A */
 
-   /* parameters for calculating next subset of possible factor of 'A0' */
-
-   slong h;
-   slong m;
-   mp_limb_t * curr_subset;
+   /*
+      parameters for calculating next subset of possible factors of A, giving
+      a lexicographic ordering of all such tuples
+   */
+   slong h; /* tuple entry we just set, numbered from 1 at end of tuple */
+   slong m; /* last value we just set a tuple entry to */
+   mp_limb_t * curr_subset; /* current tuple */
+   mp_limb_t * first_subset; /* first tuple, in case of restart */
+   mp_limb_t j; /* index of s-th factor of first A, if s > 3 */
 
 #if QS_DEBUG
    slong poly_count;         /* keep track of the number of polynomials used */
@@ -312,13 +316,11 @@ FLINT_DLL mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta);
 
 mp_limb_t qsieve_poly_init(qs_t qs_inf);
 
-mp_limb_t qsieve_next_A0(qs_t qs_inf);
+int qsieve_init_A(qs_t qs_inf);
 
-void qsieve_re_init_A0(qs_t qs_inf);
+void qsieve_reinit_A(qs_t qs_inf);
 
-int qsieve_init_A0(qs_t qs_inf);
-
-void qsieve_compute_pre_data(qs_t qs_inf);
+mp_limb_t qsieve_next_A(qs_t qs_inf);
 
 void qsieve_init_poly_first(qs_t qs_inf);
 
