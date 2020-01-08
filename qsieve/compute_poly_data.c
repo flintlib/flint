@@ -692,7 +692,8 @@ void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly)
 }
 
 /*
-    Make a copy of a poly structure
+    Make a copy of a poly structure. Used by threads so they have their own
+    poly structure to modify.
 */
 void qsieve_poly_copy(qs_poly_t poly, qs_t qs_inf)
 {
