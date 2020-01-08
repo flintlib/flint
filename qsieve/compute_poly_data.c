@@ -221,17 +221,17 @@ int qsieve_init_A(qs_t qs_inf)
             
             while (i < j)
             {
-                mid = i + (j - i + 1) / 2;
+                mid = i + (j - i) / 2;
                 
                 fmpz_mul_ui(temp, prod, factor_base[4*mid + low].p);
  
                 if (fmpz_cmp(lower_bound, temp) > 0)
                 {
-                    i = mid;
+                    i = mid + (i == mid);
                 }
                 else if (fmpz_cmp(temp, upper_bound) > 0)
                 {
-                    j = mid;
+                    j = mid - (j == mid);
                 }
                 else
                 {
@@ -240,7 +240,7 @@ int qsieve_init_A(qs_t qs_inf)
                 }
             }
             
-            if (j != 0) break; /* success */
+            if (j > 1) break; /* success */
 
             /* (s - 1)-tuple failed, do lexicographic step to next (s - 1)-tuple */
             h = (m >= span/4 - h) ? h + 1 : 1;
@@ -395,8 +395,7 @@ int qsieve_next_A(qs_t qs_inf)
         }
         else
            ret = 0;
-    }
-    else
+    } else
     {
         if (4*(curr_subset[0] + s - 2)/3 < span) /* haven't run out of A's */
         {
@@ -414,20 +413,20 @@ int qsieve_next_A(qs_t qs_inf)
             /* binary search for final prime */
             i = 0;
             j = span/4 - 1;
-            
+
             while (i < j)
             {
-                mid = i + (j - i + 1) / 2;
+                mid = i + (j - i) / 2;
                 
                 fmpz_mul_ui(temp, prod, factor_base[4*mid + low].p);
  
                 if (fmpz_cmp(qs_inf->low_bound, temp) > 0)
                 {
-                    i = mid;
+                    i = mid + (i == mid);
                 }
                 else if (fmpz_cmp(temp, qs_inf->upp_bound) > 0)
                 {
-                    j = mid;
+                    j = mid - (j == mid);
                 }
                 else
                 {
@@ -435,8 +434,8 @@ int qsieve_next_A(qs_t qs_inf)
                     break;
                 }
             }
-            
-            if (j == 0) /* didn't find final prime so out of A's */
+
+            if (j <= 1) /* didn't find final prime so out of A's */
             {
                 ret = 0;
                 goto next_A_cleanup;   
