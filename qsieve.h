@@ -368,7 +368,7 @@ int qsieve_compare_relation(const void * a, const void * b);
 
 int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations);
 
-void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list,
+void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list,
                                                           slong num_relations);
 
 int qsieve_process_relation(qs_t qs_inf);

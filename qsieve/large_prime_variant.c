@@ -16,8 +16,15 @@
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
 #define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (7)))
 
-/* some helper function, used for debugging */
+/******************************************************************************
+ * 
+ *  Some helper function, used for debugging 
+ * 
+ *****************************************************************************/
 
+/*
+    Display a relation for debugging purposes
+*/
 void qsieve_display_relation(qs_t qs_inf, relation_t a)
 {
     slong i;
@@ -36,8 +43,9 @@ void qsieve_display_relation(qs_t qs_inf, relation_t a)
     flint_printf("\n");
 }
 
-/* check relation is valid */
-
+/*
+    Check a relation is valid (debugging)
+*/
 int qsieve_is_relation(qs_t qs_inf, relation_t a)
 {
     slong i;
@@ -80,7 +88,9 @@ int qsieve_is_relation(qs_t qs_inf, relation_t a)
     return 1;
 }
 
-/* write partial or full relation to file */
+/*
+    Write partial or full relation to file
+*/
 void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly)
 {
     slong i;
@@ -89,37 +99,38 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly
     slong * small = poly->small;
     fac_t * factor = poly->factor;
 
-    flint_fprintf(qs_inf->siqs, "%X ", prime);  /* write large prime */
+    flint_fprintf(qs_inf->siqs, "%X ", prime); /* write large prime */
 
-    for (i = 0; i < qs_inf->small_primes; i++)   /* write small primes */
+    for (i = 0; i < qs_inf->small_primes; i++) /* write small primes */
         flint_fprintf(qs_inf->siqs, "%X ", small[i]);
 
-    flint_fprintf(qs_inf->siqs, "%X ", num_factors);  /* write number of factors */
+    flint_fprintf(qs_inf->siqs, "%X ", num_factors); /* write number of factors */
 
-    for (i = 0; i < num_factors; i++)               /* write factor along with exponent */
+    for (i = 0; i < num_factors; i++) /* write factor along with exponent */
         flint_fprintf(qs_inf->siqs, "%wx %X ", factor[i].ind, factor[i].exp);
 
-    str = fmpz_get_str(str, 16, Y);    /* converting value of 'Y'  to hex */
+    str = fmpz_get_str(str, 16, Y); /* converting value of 'Y'  to hex */
 
-    flint_fprintf(qs_inf->siqs, "%s\n", str);   /* write value of 'Y' */
+    flint_fprintf(qs_inf->siqs, "%s\n", str); /* write value of 'Y' */
     flint_free(str);
 }
 
-/*********************************************************
-    main function starts here
-**********************************************************/
+/******************************************************************************
+ * 
+ *  Hash table
+ * 
+ *****************************************************************************/
 
 /*
-   hash table used to keep count of large prime, idea is taken from "msieve" implementation
-   each new prime is filled at last unoccupied position in array and primes which have same
-   hash value are linked with each other keeping 'offset'
+   Hash table used to keep count of large primes, idea is taken from msieve
+   Each new prime is filled at last unoccupied position in array and primes
+   which have same hash value are linked with each other keeping offset
 */
 
 /*
    return a pointer to location of 'prime' in table if it exists else
    create an entry for it and return pointer to that
 */
-
 hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
 {
     mp_limb_t offset, first_offset;
@@ -128,17 +139,20 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
     hash_t * table = qs_inf->table;
     slong table_size = qs_inf->table_size;
 
-    if (qs_inf->vertices + 1 >= table_size)
+    /* reallocate table if not large enough */
+    if (3*qs_inf->vertices/2 + 1 >= table_size)
     {
-        table_size *= 1.1;
+        table_size *= 1.4;
         table = flint_realloc(table, table_size*sizeof(hash_t));
         qs_inf->table_size = table_size;
         qs_inf->table = table;
     }
 
+    /* find first offset with that hash */
     first_offset = HASH(prime);
     offset = hash_table[first_offset];
     
+    /* check linked offsets to see if prime is there, return if so */
     while (offset != 0)
     {
         entry = table + offset;
@@ -147,6 +161,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
         offset = entry->next;
     }
 
+    /* if we didn't find it, make a new entry in hash table and return it */
     if (offset == 0)
     {
         qs_inf->vertices++;
@@ -161,10 +176,9 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
 }
 
 /*
-   add prime to hashtable, increase size of table if neccessay
+   add prime to hashtable, increase size of table if neccessary
    and increment count for the added prime
 */
-
 void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
 {
     hash_t * entry;
@@ -173,11 +187,16 @@ void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
     entry->count++;
 }
 
+/******************************************************************************
+ * 
+ *  Large prime functionality
+ * 
+ *****************************************************************************/
+
 /*
    given a string representing a relation, parse it to
    obtain relation
 */
-
 relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
 {
     slong i;
@@ -232,7 +251,6 @@ relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
    given two partials with same large prime, merge them to
    obtain a full relation
 */
-
 relation_t qsieve_merge_relation(qs_t qs_inf, relation_t a, relation_t b)
 {
     slong i = 0, j = 0, k = 0;
@@ -322,7 +340,6 @@ relation_t qsieve_merge_relation(qs_t qs_inf, relation_t a, relation_t b)
    compare two relations in the following order,
    large_prime, number of factors, factor, small_prime
 */
-
 int qsieve_compare_relation(const void * a, const void * b)
 {
     slong i;
@@ -371,7 +388,6 @@ int qsieve_compare_relation(const void * a, const void * b)
 /*
    given a list of relations, remove duplicate relations from it
 */
-
 int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations)
 {
     slong i, j;
@@ -405,8 +421,7 @@ int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations)
 /*
    give a list of relations, add those relations to matrix
 */
-
-void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list, slong num_relations)
+void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list, slong num_relations)
 {
     slong i, j, num_factors, fac_num;
     slong * small;
@@ -462,7 +477,6 @@ void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list, slong num_relat
 /*
    process relations from the file
 */
-
 int qsieve_process_relation(qs_t qs_inf)
 {
     char buf[1024];
@@ -559,7 +573,7 @@ int qsieve_process_relation(qs_t qs_inf)
        done = 1;
        num_relations2 = qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels;
        qsort(rlist, (size_t) num_relations2, sizeof(relation_t), qsieve_compare_relation);
-       qsieve_insert_relation2(qs_inf, rlist, num_relations2);
+       qsieve_insert_relation(qs_inf, rlist, num_relations2);
     }
 
 cleanup:
