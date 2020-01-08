@@ -385,7 +385,6 @@ more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
         }
 
         qs_inf->second_prime = j;
-        qs_inf->q_idx = qs_inf->num_primes;
 
         qs_inf->s = 0; /* indicate polynomials need setting up again */
 
