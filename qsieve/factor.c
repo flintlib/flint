@@ -26,10 +26,10 @@ int compare_facs(const void * a, const void * b)
 }
 
 /*
-   Returns a factor of n.
+   Finds at least one nontrivial factor of n using the self initialising
+   multiple polynomial quadratic sieve with single large prime variation.
    Assumes n is not prime and not a perfect power.
 */
-
 void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 {
     qs_t qs_inf;
@@ -101,9 +101,9 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
         while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
         {
-	    fmpz_divexact_ui(temp, qs_inf->n, small_factor);
-	    fmpz_init_set(qs_inf->n, temp);
-	    expt++;
+	       fmpz_divexact_ui(temp, qs_inf->n, small_factor);
+	       fmpz_init_set(qs_inf->n, temp);
+	       expt++;
         }
 
         _fmpz_factor_append_ui(factors, small_factor, expt);
@@ -193,7 +193,6 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 #endif
 
-    qs_inf->q_idx = qs_inf->num_primes;
     qs_inf->siqs = fopen("siqs.dat", "w");
 
     for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
@@ -210,68 +209,60 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
     while (1)
     {
-        if (qs_inf->s)
-            qsieve_re_init_A0(qs_inf);
+        if (qs_inf->s) /* we have already tried factoring, so restart */
+            qsieve_reinit_A(qs_inf);
         else
         {
-            if (!qsieve_init_A0(qs_inf))
-                goto more_primes;
+            if (!qsieve_init_A(qs_inf))
+                goto more_primes; /* initialisation failed, increase FB */
         }
 
         do
-        {
-            qsieve_compute_pre_data(qs_inf);
-            
-            for (j = qs_inf->num_primes; j < qs_inf->num_primes + qs_inf->ks_primes; j++)
-            {
-#if QS_DEBUG
-                printf("j = %ld, num_primes + ks_primes = %ld\n", j, qs_inf->num_primes + qs_inf->ks_primes);
-#endif
-                qs_inf->q_idx  = j;
-                relation += qsieve_collect_relations(qs_inf, sieve);
+        {           
+            relation += qsieve_collect_relations(qs_inf, sieve);
                 
-                qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
+            qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
 
 #if QS_DEBUG
-                flint_printf("full relations = %wd, num cycles = %wd, ks_primes = %wd, "
-                              "extra rels = %wd, poly_count = %wd\n", qs_inf->full_relation,
-                              qs_inf->num_cycles, qs_inf->ks_primes,
-                              qs_inf->extra_rels, qs_inf->poly_count);
+            flint_printf("full relations = %wd, num cycles = %wd, ks_primes = %wd, "
+                         "extra rels = %wd, poly_count = %wd\n", qs_inf->full_relation,
+                          qs_inf->num_cycles, qs_inf->ks_primes,
+                          qs_inf->extra_rels, qs_inf->poly_count);
 #endif
  
-                if (qs_inf->full_relation + qs_inf->num_cycles >= 
-                   ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
+            if (qs_inf->full_relation + qs_inf->num_cycles >= 
+                ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
+            {
+                int ok;
+
+                fclose(qs_inf->siqs);
+
+                ok = qsieve_process_relation(qs_inf);
+
+                if (ok == -1)
                 {
-                    int ok;
-
-                    fclose(qs_inf->siqs);
-
-                    ok = qsieve_process_relation(qs_inf);
-
-                    if (ok == -1)
-                    {
-                       small_factor = qs_inf->small_factor;
+                    small_factor = qs_inf->small_factor;
 #if QS_DEBUG
-                       flint_printf("found small factor %wu while incrementing factor base\n, small_factor");
+                    flint_printf("found small factor %wu while incrementing factor base\n, small_factor");
 #endif
-                       goto found_small_factor;
-                    }
+                    goto found_small_factor;
+                }
 
-                    if (ok)
-                    {
+                if (ok)
+                {
 
     /**************************************************************************
         REDUCE MATRIX:
         Perform some light filtering on the matrix
     **************************************************************************/
 
-                       num_primes = qs_inf->num_primes;
-                       qs_inf->num_primes += qs_inf->ks_primes;
+                    num_primes = qs_inf->num_primes;
+                    qs_inf->num_primes += qs_inf->ks_primes;
 
-                       ncols = qs_inf->num_primes + qs_inf->extra_rels;
-                       nrows = qs_inf->num_primes;
+                    ncols = qs_inf->num_primes + qs_inf->extra_rels;
+                    nrows = qs_inf->num_primes;
 
-                       reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
+                    reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
 
 
    /**************************************************************************
@@ -280,26 +271,26 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     **************************************************************************/
 
 #if QS_DEBUG
-                       flint_printf("\nBlock Lanczos\n");
+                    flint_printf("\nBlock Lanczos\n");
 #endif
  
-                       flint_randinit(state); /* initialise the random generator */
+                    flint_randinit(state); /* initialise the random generator */
 
-                       do /* repeat block lanczos until it succeeds */
-                       {
-                           nullrows = block_lanczos(state, nrows, 0, ncols, qs_inf->matrix);
-                       } while (nullrows == NULL);
+                    do /* repeat block lanczos until it succeeds */
+                    {
+                        nullrows = block_lanczos(state, nrows, 0, ncols, qs_inf->matrix);
+                    } while (nullrows == NULL);
 
-                       for (i = 0, mask = 0; i < ncols; i++) /* create mask of nullspace vectors */
-                           mask |= nullrows[i];
+                    for (i = 0, mask = 0; i < ncols; i++) /* create mask of nullspace vectors */
+                        mask |= nullrows[i];
 
-                       for (i = count = 0; i < 64; i++) /* count nullspace vectors found */
-                       {
-                           if (mask & ((uint64_t)(1) << i))
-                               count++;
-                       }
+                    for (i = count = 0; i < 64; i++) /* count nullspace vectors found */
+                    {
+                        if (mask & ((uint64_t)(1) << i))
+                            count++;
+                    }
 
-                       flint_randclear(state); /* clean up random state */
+                    flint_randclear(state); /* clean up random state */
 
     /**************************************************************************
         SQUARE ROOT:
@@ -307,43 +298,43 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     **************************************************************************/
 
 #if QS_DEBUG
-                       flint_printf("\nSquare Root\n");
-                       flint_printf("Found %ld kernel vectors\n", count);
+                    flint_printf("\nSquare Root\n");
+                    flint_printf("Found %ld kernel vectors\n", count);
 #endif
 
-                       facs = _fmpz_vec_init(100);
-                       num_facs = 0;
+                    facs = _fmpz_vec_init(100);
+                    num_facs = 0;
 
-                       for (i = 0; i < 64; i++)
-                       {
-                           if (mask & ((uint64_t)(1) << i))
-                           {
-                               qsieve_square_root(X, Y, qs_inf, nullrows, ncols, i, qs_inf->kn);
+                    for (i = 0; i < 64; i++)
+                    {
+                        if (mask & ((uint64_t)(1) << i))
+                        {
+                            qsieve_square_root(X, Y, qs_inf, nullrows, ncols, i, qs_inf->kn);
 
-                               fmpz_sub(X, X, Y);
-                               fmpz_gcd(X, X, qs_inf->n);
+                            fmpz_sub(X, X, Y);
+                            fmpz_gcd(X, X, qs_inf->n);
 
-                               if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
-                                   fmpz_set(facs + num_facs++, X);
-                           }
-                       }
+                            if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
+                                fmpz_set(facs + num_facs++, X);
+                        }
+                    }
 
-                       if (num_facs > 0)
-                       {
-                          fmpz_t temp, temp2;
+                    if (num_facs > 0)
+                    {
+                        fmpz_t temp, temp2;
 
-                          fmpz_init(temp);
-                          fmpz_init(temp2);
+                        fmpz_init(temp);
+                        fmpz_init(temp2);
 
-                          _fmpz_factor_append(factors, qs_inf->n, 1);
+                        _fmpz_factor_append(factors, qs_inf->n, 1);
 
-                          qsort((void *) facs, num_facs, sizeof(fmpz), compare_facs);
+                        qsort((void *) facs, num_facs, sizeof(fmpz), compare_facs);
 
-                          for (i = 0; i < num_facs; i++)
-                          {
-                             fmpz_gcd(temp, factors->p + factors->num - 1, facs + i);
-                             if (!fmpz_is_one(temp))
-                             {
+                        for (i = 0; i < num_facs; i++)
+                        {
+                            fmpz_gcd(temp, factors->p + factors->num - 1, facs + i);
+                            if (!fmpz_is_one(temp))
+                            {
                                 factors->exp[factors->num - 1] = fmpz_remove(temp2, factors->p + factors->num - 1, temp);
                                 fmpz_set(factors->p + factors->num - 1, temp);
                                 
@@ -352,34 +343,33 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                                 else
                                    _fmpz_factor_append(factors, temp2, 1);
                              }  
-                          }
+                        }
 
-                          fmpz_clear(temp);
-                          fmpz_clear(temp2);
+                        fmpz_clear(temp);
+                        fmpz_clear(temp2);
 
-                          _fmpz_vec_clear(facs, 100);
+                        _fmpz_vec_clear(facs, 100);
 
-                          goto cleanup;
-                       }
-
-                       _fmpz_vec_clear(facs, 100);
-
-                       qs_inf->siqs = fopen("siqs.dat", "w");
-                       qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
-                       goto more_primes; /* need more primes */
+                        goto cleanup;
                     }
+
+                    _fmpz_vec_clear(facs, 100);
+
+                    qs_inf->siqs = fopen("siqs.dat", "w");
+                    qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
+                    goto more_primes; /* factoring failed, may need more primes */
                 }
             }
-        } while (qsieve_next_A0(qs_inf));
+        } while (qsieve_next_A(qs_inf));
 
-more_primes:
+more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
 
 #if QS_DEBUG
         printf("Increasing factor base.\n");
 #endif
 
         delta = qs_inf->num_primes / 10;
-        delta = FLINT_MAX(delta, 100);
+        delta = FLINT_MAX(delta, 100); /* add at least 100 more primes */
         
 #if QS_DEBUG
         flint_printf("\nfactor base increment\n");
