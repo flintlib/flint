@@ -320,7 +320,7 @@ int qsieve_init_A(qs_t qs_inf);
 
 void qsieve_reinit_A(qs_t qs_inf);
 
-mp_limb_t qsieve_next_A(qs_t qs_inf);
+int qsieve_next_A(qs_t qs_inf);
 
 void qsieve_init_poly_first(qs_t qs_inf);
 
@@ -352,9 +352,8 @@ int qsieve_relations_cmp(const void * a, const void * b);
 
 slong qsieve_merge_relations(qs_t qs_inf);
 
-slong qsieve_insert_relation(qs_t qs_inf, fmpz_t Y);
-
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly);
+void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime,
+                                                     fmpz_t Y, qs_poly_t poly);
 
 hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 

@@ -30,7 +30,7 @@ void qsieve_poly_clear(qs_t qs_inf)
 
    flint_free(qs_inf->B_terms);
    flint_free(qs_inf->A_ind);
-   flint_free(qs_inf->A0_divp);
+   flint_free(qs_inf->A_divp);
    flint_free(qs_inf->B0_terms);
    flint_free(qs_inf->A_inv);
    flint_free(qs_inf->soln1);

@@ -47,14 +47,14 @@
 */
 int qsieve_init_A(qs_t qs_inf)
 {
-    slong i;
+    slong i, j;
     slong s, low, high, span, m, h;
     mp_limb_t bits, num_factors, rem, mid;
     mp_limb_t factor_bound[40];
     mp_limb_t * A_ind;
-    mp_limb_t * curr_subset;
+    mp_limb_t * curr_subset, * first_subset;
     prime_t * factor_base = qs_inf->factor_base;
-    fmpz_t prod, temp, temp2, upper_bound, lower_bound;
+    fmpz_t prod, temp, upper_bound, lower_bound;
     int ret = 1;
 
     fmpz_init(temp);
@@ -157,6 +157,7 @@ int qsieve_init_A(qs_t qs_inf)
 
     A_ind = qs_inf->A_ind; /* indices of primes dividing A */
     curr_subset = qs_inf->curr_subset;
+    first_subset = qs_inf->first_subset;
 
     span = high - low;
 
@@ -478,6 +479,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     mp_limb_t * A_inv = qs_inf->A_inv;
     mp_limb_t * B0_terms = qs_inf->B0_terms;
     mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
+    fmpz_t * B_terms = qs_inf->B_terms;
     fmpz_t * A_divp = qs_inf->A_divp;
     prime_t * factor_base = qs_inf->factor_base;
     int * sqrts = qs_inf->sqrts;
@@ -560,12 +562,12 @@ void qsieve_init_poly_first(qs_t qs_inf)
         /* compute first root of poly */
         temp = fmpz_fdiv_ui(qs_inf->B, p);
         temp = sqrts[k] + p - temp;
-        temp = n_mulmod2_preinv(temp, Ainv[k], p, pinv);
+        temp = n_mulmod2_preinv(temp, A_inv[k], p, pinv);
         temp += qs_inf->sieve_size / 2;
         temp = n_mod2_preinv(temp, p, pinv);
 
         /* compute second root of poly */
-        temp2 = n_mulmod2_preinv(sqrts[k], Ainv, p, pinv);
+        temp2 = n_mulmod2_preinv(sqrts[k], A_inv[k], p, pinv);
         temp2 *= 2;
         if (temp2 >= p)
            temp2 -= p;
@@ -585,7 +587,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
         
         /* recompute A_inv2B[i][k]'s for next B */ 
         for (i = 0; i < s; i++)
-            A_inv2B[i][k] = n_mulmod2_preinv(A_inv2B[i][k], Ainv, p, pinv);
+            A_inv2B[i][k] = n_mulmod2_preinv(A_inv2B[i][k], A_inv[k], p, pinv);
     }
 
     /* zero out roots corresponding to factors of A */
