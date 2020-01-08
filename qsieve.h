@@ -344,9 +344,7 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve);
 
 void qsieve_linalg_init(qs_t qs_inf);
 
-void qsieve_linalg_re_init(qs_t qs_inf);
-
-void qsieve_linalg_re_alloc(qs_t qs_inf);
+void qsieve_linalg_realloc(qs_t qs_inf);
 
 void qsieve_linalg_clear(qs_t qs_inf);
 

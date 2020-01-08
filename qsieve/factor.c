@@ -415,7 +415,7 @@ found_small_factor:
             goto cleanup;
         }
 
-        qsieve_linalg_re_alloc(qs_inf);
+        qsieve_linalg_realloc(qs_inf);
         relation = 0;
     }
 

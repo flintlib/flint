@@ -12,6 +12,9 @@
 
 #include "qsieve.h"
 
+/*
+    Initialise linear algebra.
+*/
 void qsieve_linalg_init(qs_t qs_inf)
 {
     slong i, num_primes;
@@ -56,37 +59,10 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->table = flint_malloc(qs_inf->table_size * sizeof(hash_t));
 }
 
-/* re-initialize all the linear algebra parameter */
-
-void qsieve_linalg_re_init(qs_t qs_inf)
-{
-    slong i;
-    qs_inf->curr_rel = qs_inf->relation;
-
-    for (i = 0; i < qs_inf->buffer_size; i++)
-    {
-        fmpz_init(qs_inf->Y_arr + i);
-        qs_inf->matrix[i].weight = 0;
-        qs_inf->matrix[i].data = NULL;
-    }
-
-    qs_inf->num_unmerged = 0;
-    qs_inf->columns = 0;
-    qs_inf->num_relations = 0;
-
-    /* parameters related to partials */
-    qs_inf->full_relation = 0;
-    qs_inf->edges = 0;
-    qs_inf->vertices = 0;
-    qs_inf->components = 1;
-    qs_inf->num_cycles = 0;
-
-    memset(qs_inf->hash_table, 0, (1 << 25) * sizeof(mp_limb_t));
-}
-
-/* increase size of different array after factor base increment*/
-
-void qsieve_linalg_re_alloc(qs_t qs_inf)
+/* 
+    Increase size of linear algebra allocations after factor base increment
+*/
+void qsieve_linalg_realloc(qs_t qs_inf)
 {
     slong num_primes;
 
