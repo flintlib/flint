@@ -33,7 +33,7 @@
  extern "C" {
 #endif
 
-#define QS_DEBUG 0 /* level of debug information printed, 0 = none */
+#define QS_DEBUG 1 /* level of debug information printed, 0 = none */
 
 #define BITS_ADJUST 25 /* add to sieve entries to compensate approximations */
 
