@@ -1075,9 +1075,6 @@ FLINT_DLL void nmod_mpoly_univar_init(nmod_mpoly_univar_t A,
 FLINT_DLL void nmod_mpoly_univar_clear(nmod_mpoly_univar_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A,
-                            nmod_mpoly_univar_t B, const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void nmod_mpoly_univar_fit_length(nmod_mpoly_univar_t A,
                                      slong length, const nmod_mpoly_ctx_t ctx);
 
@@ -1095,6 +1092,15 @@ FLINT_DLL void nmod_mpoly_from_univar_bits(nmod_mpoly_t A, flint_bitcnt_t Abits,
 
 FLINT_DLL void nmod_mpoly_from_univar(nmod_mpoly_t A,
            const nmod_mpoly_univar_t B, slong var, const nmod_mpoly_ctx_t ctx);
+
+NMOD_MPOLY_INLINE
+void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A, nmod_mpoly_univar_t B,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    nmod_mpoly_univar_struct t = *A;
+    *A = *B;
+    *B = t;
+}
 
 NMOD_MPOLY_INLINE
 int nmod_mpoly_univar_degree_fits_si(const nmod_mpoly_univar_t A,

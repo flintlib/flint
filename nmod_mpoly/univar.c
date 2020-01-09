@@ -38,14 +38,6 @@ void nmod_mpoly_univar_clear(nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
 }
 
 
-void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A, nmod_mpoly_univar_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    nmod_mpoly_univar_struct t = *A;
-    *A = *B;
-    *B = t;
-}
-
 void nmod_mpoly_univar_fit_length(nmod_mpoly_univar_t A,
                                       slong length, const nmod_mpoly_ctx_t ctx)
 {

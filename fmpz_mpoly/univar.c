@@ -43,14 +43,6 @@ void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
 }
 
 
-void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t A, fmpz_mpoly_univar_t B,
-                                                    const fmpz_mpoly_ctx_t ctx)
-{
-   fmpz_mpoly_univar_struct t = *A;
-   *A = *B;
-   *B = t;
-}
-
 void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t A,
                                       slong length, const fmpz_mpoly_ctx_t ctx)
 {

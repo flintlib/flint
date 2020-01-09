@@ -808,16 +808,13 @@ FLINT_DLL void fq_nmod_mpoly_ctx_change_modulus(fq_nmod_mpoly_ctx_t ctx,
                                                                     slong deg);
 
 
-/* Univariates ********************************************************************/
+/* Univariates ***************************************************************/
 
 FLINT_DLL void fq_nmod_mpoly_univar_init(fq_nmod_mpoly_univar_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_mpoly_univar_clear(fq_nmod_mpoly_univar_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void fq_nmod_mpoly_univar_swap(fq_nmod_mpoly_univar_t A,
-                      fq_nmod_mpoly_univar_t B, const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_mpoly_univar_fit_length(fq_nmod_mpoly_univar_t A,
                                   slong length, const fq_nmod_mpoly_ctx_t ctx);
@@ -836,6 +833,15 @@ FLINT_DLL void fq_nmod_mpoly_from_univar_bits(fq_nmod_mpoly_t A, flint_bitcnt_t 
 
 FLINT_DLL void fq_nmod_mpoly_from_univar(fq_nmod_mpoly_t A,
      const fq_nmod_mpoly_univar_t B, slong var, const fq_nmod_mpoly_ctx_t ctx);
+
+FQ_NMOD_MPOLY_INLINE
+void fq_nmod_mpoly_univar_swap(fq_nmod_mpoly_univar_t A,
+                       fq_nmod_mpoly_univar_t B, const fq_nmod_mpoly_ctx_t ctx)
+{
+   fq_nmod_mpoly_univar_struct t = *A;
+   *A = *B;
+   *B = t;
+}
 
 FQ_NMOD_MPOLY_INLINE
 int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A,
@@ -867,7 +873,7 @@ void fq_nmod_mpoly_univar_get_term_coeff(fq_nmod_mpoly_t c,
     fq_nmod_mpoly_set(c, A->coeffs + i, ctx);
 }
 
-NMOD_MPOLY_INLINE
+FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_univar_swap_term_coeff(fq_nmod_mpoly_t c,
               fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
 {

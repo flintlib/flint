@@ -265,6 +265,9 @@ FLINT_DLL void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
 FLINT_DLL void fmpq_inv(fmpq_t dest, const fmpq_t src);
 
+FLINT_DLL void _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+                const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
+
 FLINT_DLL void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
 FLINT_DLL void fmpq_div_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
