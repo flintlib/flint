@@ -533,12 +533,13 @@ void qsieve_init_poly_first(qs_t qs_inf)
     }
 
     /*
-        calculate A_inv2B[i][k] = 2 * B_terms[i] * A^(-1) modulo p_k
-        for factor base primes p_k,
+        calculate A_inv2B[i][k] = 2 * B_terms[i] * A^-1 modulo p_k
+        for factor base primes p_k, will be multiplied by A_inv[k] below
     */
     for (k = 3; k < qs_inf->num_primes; k++)
     {
-        p = factor_base[i].p;
+        p = factor_base[k].p;
+        pinv = factor_base[k].pinv;
 
         for (i = 0; i < s; i++)
         {
@@ -546,7 +547,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
             temp *= 2;
             if (temp >= p)
                temp -= p;
-            A_inv2B[i][k] = temp;
+            A_inv2B[i][k] = n_mulmod2_preinv(temp, A_inv[k], p, pinv);
         }
     }
 
@@ -583,10 +584,6 @@ void qsieve_init_poly_first(qs_t qs_inf)
             soln1[k] = temp2;
             soln2[k] = temp;
         }
-        
-        /* recompute A_inv2B[i][k]'s for next B */ 
-        for (i = 0; i < s; i++)
-            A_inv2B[i][k] = n_mulmod2_preinv(A_inv2B[i][k], A_inv[k], p, pinv);
     }
 
     /* zero out roots corresponding to factors of A */

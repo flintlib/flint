@@ -345,7 +345,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
       if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
       {
 #if QS_DEBUG
-         if (qs_inf->full_relation % 100 == 0)
+         if (qs_inf->full_relation % 1 == 0)
             printf("%ld relations\n", qs_inf->full_relation);
 #endif
          /* set sign amongst small factors */
