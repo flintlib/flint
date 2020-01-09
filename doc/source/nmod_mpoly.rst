@@ -547,6 +547,56 @@ Greatest Common Divisor
     Try to set ``G`` to the GCD of ``A`` and ``B`` using Zipple's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
 
 
+Univariate Functions
+--------------------------------------------------------------------------------
+
+    An ``nmod_mpoly_univar_t`` holds a univariate polynomial in some main variable
+    with ``nmod_mpoly_t`` coefficients in the remaining variables. These functions
+    are useful when one wants to rewrite an element of `\mathbb{Z}/n\mathbb{Z}[x_1, \dots, x_m]`
+    as an element of `(\mathbb{Z}/n\mathbb{Z}[x_1, \dots, x_{v-1}, x_{v+1}, \dots, x_m])[x_v]`
+    and vise versa.
+
+.. function:: void nmod_mpoly_univar_init(nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
+
+    Initialize `A`.
+
+.. function:: void nmod_mpoly_univar_clear(nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
+
+    Clear `A`.
+
+.. function:: void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A, nmod_mpoly_univar_t B, const nmod_mpoly_ctx_t ctx)
+
+    Swap `A` and `B`.
+
+.. function:: void nmod_mpoly_to_univar(nmod_mpoly_univar_t A, const nmod_mpoly_t B, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to a univariate form of ``B`` by pulling out the variable of index ``var``.
+    The coefficients of ``A`` will still belong to the content ``ctx`` but will not depend on the variable of index ``var``.
+
+.. function:: void nmod_mpoly_from_univar(nmod_mpoly_t A, const nmod_mpoly_univar_t B, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the normal form of ``B`` by putting in the variable of index ``var``.
+    This function is undefined if the coefficients of ``B`` depend on the variable of index ``var``.
+
+.. function:: int nmod_mpoly_univar_degree_fits_si(const nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return `1` if the degree of ``A`` with respect to the main variable fits an ``slong``. Otherwise, return `0`.
+
+.. function:: slong nmod_mpoly_univar_length(const nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return the number of terms in ``A`` with respect to the main variable.
+
+.. function:: slong nmod_mpoly_univar_get_term_exp_si(nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Return the exponent of the term of index ``i`` of ``A``.
+
+.. function:: void nmod_mpoly_univar_get_term_coeff(nmod_mpoly_t c, const nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+.. function:: void nmod_mpoly_univar_swap_term_coeff(nmod_mpoly_t c, nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Set (resp. swap) ``c`` to (resp. with) the coefficient of the term of index ``i`` of ``A``.
+
+
 Internal Functions
 --------------------------------------------------------------------------------
 

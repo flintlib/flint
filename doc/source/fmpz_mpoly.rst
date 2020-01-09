@@ -659,15 +659,21 @@ Univariate Functions
 
     An ``fmpz_mpoly_univar_t`` holds a univariate polynomial in some main variable
     with ``fmpz_mpoly_t`` coefficients in the remaining variables. These functions
-    are useful when one wants to rewrite an element of `\mathbb{Z}[x_1, \dots, x_n]`
-    as an element of `(\mathbb{Z}[x_1, \dots, x_{v-1}, x_{v+1}, \dots, x_n])[x_v]`
+    are useful when one wants to rewrite an element of `\mathbb{Z}[x_1, \dots, x_m]`
+    as an element of `(\mathbb{Z}[x_1, \dots, x_{v-1}, x_{v+1}, \dots, x_m])[x_v]`
     and vise versa.
 
 .. function:: void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
 
+    Initialize `A`.
+
 .. function:: void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
 
+    Clear `A`.
+
 .. function:: void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t A, fmpz_mpoly_univar_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Swap `A` and `B`.
 
 .. function:: void fmpz_mpoly_to_univar(fmpz_mpoly_univar_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
 
@@ -681,7 +687,7 @@ Univariate Functions
 
 .. function:: int fmpz_mpoly_univar_degree_fits_si(const fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
 
-    Return `1` if the degree of ``A`` with respect to the main variable fit an ``slong``. Otherwise, return `0`.
+    Return `1` if the degree of ``A`` with respect to the main variable fits an ``slong``. Otherwise, return `0`.
 
 .. function:: slong fmpz_mpoly_univar_length(const fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
 
