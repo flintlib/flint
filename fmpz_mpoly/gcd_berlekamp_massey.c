@@ -3089,7 +3089,7 @@ pick_bma_prime:
         }
 
         /* the evaluation killed neither lc(A) nor lc(B) */
-        FLINT_ASSERT(Gammaeval != 0);
+        FLINT_ASSERT(Gammaeval_sp != 0);
 
         success = nmod_mpolyn_gcd_brown_smprime_bivar(Geval_sp,
                   Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp, Sp_sp);
