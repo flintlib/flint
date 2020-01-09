@@ -14,7 +14,7 @@
 #include "qsieve.h"
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
-#define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (7)))
+#define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (12)))
 
 /******************************************************************************
  * 
@@ -530,7 +530,7 @@ int qsieve_process_relation(qs_t qs_inf)
 #endif
 
     rlist = flint_malloc(num_relations * sizeof(relation_t));
-    memset(hash_table, 0, (1 << 25) * sizeof(mp_limb_t));
+    memset(hash_table, 0, (1 << 20) * sizeof(mp_limb_t));
     qs_inf->vertices = 0;
 
     for (i = 0, j = 0; i < num_relations; i++)

@@ -375,7 +375,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
             qs_inf->full_relation++;
          }
          relations++;
-      } else /* not a relations, perhaps a partial? */
+      } else /* not a relation, perhaps a partial? */
       {
           /* set sign */
           if (fmpz_sgn(res) < 0)

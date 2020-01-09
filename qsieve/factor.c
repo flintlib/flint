@@ -225,9 +225,9 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
 #if QS_DEBUG
             flint_printf("full relations = %wd, num cycles = %wd, ks_primes = %wd, "
-                         "extra rels = %wd, poly_count = %wd\n", qs_inf->full_relation,
+                         "extra rels = %wd, poly_count = %wd, num_primes = %wd\n", qs_inf->full_relation,
                           qs_inf->num_cycles, qs_inf->ks_primes,
-                          qs_inf->extra_rels, qs_inf->poly_count);
+                          qs_inf->extra_rels, qs_inf->poly_count, qs_inf->num_primes);
 #endif
  
             if (qs_inf->full_relation + qs_inf->num_cycles >= 
