@@ -262,7 +262,10 @@ int qsieve_init_A(qs_t qs_inf)
     }
 
     if (s > 3)
-       qs_inf->j = A_ind[s - 1]; /* save s-th factor of A if s > 3 (restart) */
+    {
+        qs_inf->j = A_ind[s - 1]; /* save s-th factor of A if s > 3 (restart) */
+        qs_inf->A_ind_diff = 1;
+    }
 
     qs_inf->h = h;
     qs_inf->m = m;
@@ -350,15 +353,15 @@ void qsieve_reinit_A(qs_t qs_inf)
 }
 
 /*
-    Compute next A coefficient (lexicographically in sequence from previous
-    tuple of factors). This is called every time we run out of B coefficients
+    Compute next A coefficient (differing from previous tuple in at least two
+    positions). This is called every time we run out of B coefficients
     for a given A coefficient and need to compute a new A coefficient. If the
     return value is 0, we have run out of possible coefficients (should not
     ever happen unless tuning parameters are way off).
 */
 int qsieve_next_A(qs_t qs_inf)
 {
-    slong i, j, mid;
+    slong i, j, mid, diff;
     slong s = qs_inf->s;
     slong low = qs_inf->low;
     slong span = qs_inf->span;
@@ -397,13 +400,22 @@ int qsieve_next_A(qs_t qs_inf)
            ret = 0;
     } else
     {
-        if (4*(curr_subset[0] + s - 2)/3 < span) /* haven't run out of A's */
+        diff = qs_inf->A_ind_diff;
+        
+        if (4*(curr_subset[0] + s + diff)/3 < span) /* haven't run out of A's */
         {
-            h = (m >= span - h) ? h + 1 : 1;
-            m = curr_subset[s - 1 - h] + 1;
+            h = (m >= span - diff - h - 1) ? h + 1 : 1;
+            m = curr_subset[s - 2 - h] + 1 + ((m%diff) == 0);
+            if (h != 1)
+            {
+                diff += 1;
+                qs_inf->A_ind_diff = diff;
+            }
 
             for (j = 0; j < h; j++)
-                curr_subset[s + j - h - 1] = m + j;
+                curr_subset[s + j - h - 2] = m + j;
+            
+            curr_subset[s - 2] = curr_subset[s - 3] + diff;
 
             fmpz_set_ui(prod, 1);
 

@@ -405,8 +405,10 @@ int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations)
             flint_free(rel_list[i].small);
             flint_free(rel_list[i].factor);
             fmpz_clear(rel_list[i].Y);
+        } else
+        {
+            rel_list[++j] = rel_list[i];
         }
-        else { rel_list[++j] = rel_list[i]; }
     }
 
     j++;

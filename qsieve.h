@@ -33,7 +33,7 @@
  extern "C" {
 #endif
 
-#define QS_DEBUG 1 /* level of debug information printed, 0 = none */
+#define QS_DEBUG 0 /* level of debug information printed, 0 = none */
 
 #define BITS_ADJUST 25 /* add to sieve entries to compensate approximations */
 
@@ -157,6 +157,7 @@ typedef struct qs_s
    */
    slong h; /* tuple entry we just set, numbered from 1 at end of tuple */
    slong m; /* last value we just set a tuple entry to */
+   slong A_ind_diff; /* diff. between indices of (s-1) and (s-2)-th A-factor */
    mp_limb_t * curr_subset; /* current tuple */
    mp_limb_t * first_subset; /* first tuple, in case of restart */
    mp_limb_t j; /* index of s-th factor of first A, if s > 3 */

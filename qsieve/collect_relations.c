@@ -151,7 +151,10 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
                 (*pos) += size, pos += d1;
                 posn2[pind] = d2;
             }
-            else { posn2[pind] = d1; }
+            else 
+            { 
+                posn2[pind] = d1;
+            }
 
             posn1[pind] = (pos - sieve);
         }
@@ -482,7 +485,7 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
     qsieve_init_poly_first(qs_inf);
 
 #pragma omp parallel for
-    for (i = 0; i < (1 << qs_inf->s); i++)
+    for (i = 0; i < (1 << (qs_inf->s - 1)); i++)
     {
 #if HAVE_OPENMP
         unsigned char * thread_sieve = sieve + (qs_inf->sieve_size + sizeof(ulong) + 64)*omp_get_thread_num();
