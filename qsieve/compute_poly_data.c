@@ -402,8 +402,14 @@ int qsieve_next_A(qs_t qs_inf)
     {
         diff = qs_inf->A_ind_diff;
         
-        if (4*(curr_subset[0] + s + diff)/3 < span) /* haven't run out of A's */
+        while (1)
         {
+            if (4*(curr_subset[0] + s + diff)/3 >= span) /* have run out of A's */
+            {
+                ret = 0;
+                goto next_A_cleanup;
+            }
+
             h = (m >= span - diff - h - 1) ? h + 1 : 1;
             m = curr_subset[s - 2 - h] + 1 + ((m%diff) == 0);
             if (h != 1)
@@ -447,22 +453,27 @@ int qsieve_next_A(qs_t qs_inf)
                 }
             }
 
-            if (j <= 1) /* didn't find final prime so out of A's */
+            if (j > 1) /* didn't find final prime so out of A's */
             {
-                ret = 0;
-                goto next_A_cleanup;   
+                A_ind[s - 1] = j;
+
+                fmpz_mul_ui(prod, prod, qs_inf->factor_base[j].p);
+
+                for (j = 0; j < s - 1; j++)
+                    A_ind[j] = 4*curr_subset[j]/3 + 1 + low;
+
+                break;
             }
-
-            A_ind[s - 1] = j;
-
-            fmpz_mul_ui(prod, prod, qs_inf->factor_base[j].p);
-
-            for (j = 0; j < s - 1; j++)
-                A_ind[j] = 4*curr_subset[j]/3 + 1 + low;
-         }
-         else
-            ret = 0;
+        }
     }
+
+#if QS_DEBUG
+    printf("A_ind = (");
+    for (i = 0; i < s - 1; i++)
+        printf("%ld, ", A_ind[i]);
+    printf("%ld", A_ind[s - 1]);
+    printf(")\n");
+#endif
 
     qs_inf->h = h;
     qs_inf->m = m;
