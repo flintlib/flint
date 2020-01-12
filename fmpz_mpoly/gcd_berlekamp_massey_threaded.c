@@ -54,9 +54,10 @@ typedef struct
     slong num_threads;
     flint_bitcnt_t bits;
     const fmpz_mpolyu_struct * A, * B;
+    fmpz_mpolyu_struct * Abar, * Bbar;
     const fmpz_mpoly_struct * Gamma;
     slong * Gdegbounds, * Adegs, * Bdegs, * Gammadegs;
-    fmpz_mpolyu_t H, Abar, Bbar;
+    fmpz_mpolyu_t H;
     fmpz_t Hmodulus;
 
     nmod_zip_mpolyu_t Z;
@@ -1132,7 +1133,7 @@ static void _divide_worker(void * varg)
     else
     {
         arg->success = fmpz_mpolyuu_divides(arg->quo, arg->num,
-                        arg->den, 2, arg->ctx);
+                                                        arg->den, 2, arg->ctx);
     }
 }
 
@@ -1742,12 +1743,13 @@ done:
 
 int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     fmpz_mpolyu_t G,
-    const fmpz_mpolyu_t A,
-    const fmpz_mpolyu_t B,
+    fmpz_mpolyu_t Abar,
+    fmpz_mpolyu_t Bbar,
+    fmpz_mpolyu_t A,
+    fmpz_mpolyu_t B,
     const fmpz_mpoly_t Gamma,
     const fmpz_mpoly_ctx_t ctx,
-    const thread_pool_handle * handles,
-    slong num_handles)
+    const thread_pool_handle * handles, slong num_handles)
 {
     int success, point_try_count;
     flint_bitcnt_t Hbits;
@@ -1767,6 +1769,8 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     FLINT_ASSERT(w->bits == A->bits);
     FLINT_ASSERT(w->bits == B->bits);
     FLINT_ASSERT(w->bits == G->bits);
+    FLINT_ASSERT(w->bits == Abar->bits);
+    FLINT_ASSERT(w->bits == Bbar->bits);
     FLINT_ASSERT(w->bits == Gamma->bits);
 
     /* let's initialize everything at once to avoid complicated cleanup */
@@ -1787,6 +1791,8 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     w->A = A;
     w->B = B;
     w->Gamma = Gamma;
+    w->Abar = Abar;
+    w->Bbar = Bbar;
     w->ctx = ctx;
 
     mpoly_bma_interpolate_ctx_init(w->Ictx, ctx->minfo->nvars);
@@ -1982,8 +1988,6 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
         w->Ictx->degbounds[i]++;
     }
 
-    fmpz_mpolyu_init(w->Abar, w->bits, ctx);
-    fmpz_mpolyu_init(w->Bbar, w->bits, ctx);
     fmpz_mpolyu_init(w->H, Hbits, ctx);
     fmpz_mpoly_init3(Hcontent, 0, Hbits, ctx);
 
@@ -1992,6 +1996,8 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
     if (w->GdegboundXY == 0)
     {
         fmpz_mpolyu_one(G, ctx);
+        fmpz_mpolyu_swap(Abar, A, ctx);
+        fmpz_mpolyu_swap(Bbar, B, ctx);
         success = 1;
         goto cleanup;
     }
@@ -2097,6 +2103,8 @@ pick_bma_prime:
             goto pick_bma_prime;
         case gcd_is_one:
             fmpz_mpolyu_one(G, ctx);
+            fmpz_mpolyu_swap(Abar, A, ctx);
+            fmpz_mpolyu_swap(Bbar, B, ctx);
             success = 1;
             goto cleanup;
         case bma_loop_good:
@@ -2190,6 +2198,8 @@ next_zip_image:
             if (w->GdegboundXY == 0)
             {
                 fmpz_mpolyu_one(G, ctx);
+                fmpz_mpolyu_swap(Abar, A, ctx);
+                fmpz_mpolyu_swap(Bbar, B, ctx);
                 success = 1;
                 goto cleanup;
             }
@@ -2312,7 +2322,7 @@ next_zip_image:
             divide_arg->num_handles = num_handles - 1;
             thread_pool_wake(global_thread_pool, handles[0],
                                                    _divide_worker, divide_arg);
-            fmpz_mpolyuu_divides(w->Abar, A, G, 2, ctx);
+            success = fmpz_mpolyuu_divides(w->Abar, A, G, 2, ctx);
             thread_pool_wait(global_thread_pool, handles[0]);
         }
         else if (m >= num_handles - 1)
@@ -2324,7 +2334,7 @@ next_zip_image:
             divide_arg->num_handles = num_handles - 1;
             thread_pool_wake(global_thread_pool, handles[0],
                                                    _divide_worker, divide_arg);
-            fmpz_mpolyuu_divides(w->Bbar, B, G, 2, ctx);
+            success = fmpz_mpolyuu_divides(w->Bbar, B, G, 2, ctx);
             thread_pool_wait(global_thread_pool, handles[0]);
         }
         else
@@ -2335,17 +2345,18 @@ next_zip_image:
             divide_arg->num_handles = num_handles - (m + 1);
             thread_pool_wake(global_thread_pool, handles[m],
                                                    _divide_worker, divide_arg);
-            fmpz_mpolyuu_divides_threaded(w->Abar, A, G, 2, ctx, handles + 0, m);
+            success = fmpz_mpolyuu_divides_threaded(w->Abar, A, G, 2,
+                                                          ctx, handles + 0, m);
             thread_pool_wait(global_thread_pool, handles[m]);
         }
+
+        if (!success || !divide_arg->success)
+            goto pick_zip_prime;
     }    
     else
     {
-        if (!fmpz_mpolyuu_divides(w->Abar, A, G, 2, ctx))
-        {
-            goto pick_zip_prime;
-        }
-        if (!fmpz_mpolyuu_divides(w->Bbar, B, G, 2, ctx))
+        if (   !fmpz_mpolyuu_divides(Abar, A, G, 2, ctx)
+            || !fmpz_mpolyuu_divides(Bbar, B, G, 2, ctx))
         {
             goto pick_zip_prime;
         }
@@ -2357,8 +2368,6 @@ cleanup:
 
     fmpz_mpoly_clear(Hcontent, ctx);
     fmpz_mpolyu_clear(w->H, ctx);
-    fmpz_mpolyu_clear(w->Bbar, ctx);
-    fmpz_mpolyu_clear(w->Abar, ctx);
 
     flint_free(w->Gdegbounds);
     flint_free(w->Adegs);
@@ -2471,10 +2480,14 @@ cleanup:
     if (success)
     {
         FLINT_ASSERT(G->bits == w->bits);
+        FLINT_ASSERT(Abar->bits == w->bits);
+        FLINT_ASSERT(Bbar->bits == w->bits);
     }
     else
     {
         fmpz_mpolyu_set_bits(G, w->bits, ctx);
+        fmpz_mpolyu_set_bits(Abar, w->bits, ctx);
+        fmpz_mpolyu_set_bits(Bbar, w->bits, ctx);
     }
 
     return success;
@@ -2485,7 +2498,7 @@ typedef struct
 {
     const fmpz_mpoly_struct * P;
     fmpz_mpoly_struct * Pcontent;
-    fmpz_mpolyu_struct * Puu, * Pbar;
+    fmpz_mpolyu_struct * Puu;
     const slong * perm;
     const ulong * shift, * stride, * maxexps;
     const fmpz_mpoly_ctx_struct * ctx;
@@ -2508,11 +2521,9 @@ static void _worker_convertuu(void * varg)
 
     arg->success = fmpz_mpolyu_content_mpoly(arg->Pcontent, arg->Puu,
                                                            arg->uctx, NULL, 0);
-
     if (arg->success)
     {
-        fmpz_mpolyu_divexact_mpoly(arg->Pbar, arg->Puu, 0, arg->Pcontent,
-                                                                    arg->uctx);
+        fmpz_mpolyu_divexact_mpoly_inplace(arg->Puu, arg->Pcontent, arg->uctx);
     }
 }
 
@@ -2525,11 +2536,11 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
 {
     slong i, max_num_handles, num_handles;
     thread_pool_handle * handles;
-    flint_bitcnt_t Gbits, ABbits;
+    flint_bitcnt_t wbits;
     int success = 0;
     fmpz_mpoly_ctx_t uctx;
-    fmpz_mpolyu_t Auu, Buu, Guu, Abar, Bbar, Gbar;
-    fmpz_mpoly_t Acontent, Bcontent, Gamma;
+    fmpz_mpolyu_t Auu, Buu, Guu, Abaruu, Bbaruu;
+    fmpz_mpoly_t Ac, Bc, Gc, Gamma;
     slong * Adegs, * Bdegs, * perm;
     ulong * shift, * stride;
     ulong max_main_degree, max_minor_degree;
@@ -2632,21 +2643,21 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
 
     fmpz_mpoly_ctx_init(uctx, ctx->minfo->nvars - 2, ORD_LEX);
 
-    /* ABbits is bits for intermediates in ZZ[x_0,x_1][x_2,...,x_(n-1)] */
-    ABbits = 1 + FLINT_BIT_COUNT(max_minor_degree);
-    ABbits = FLINT_MAX(MPOLY_MIN_BITS, ABbits);
-    ABbits = mpoly_fix_bits(ABbits, uctx->minfo);
-    FLINT_ASSERT(ABbits <= FLINT_BITS);
+    /* wbits is bits for intermediates in ZZ[x_0,x_1][x_2,...,x_(n-1)] */
+    wbits = 1 + FLINT_BIT_COUNT(max_minor_degree);
+    wbits = FLINT_MAX(MPOLY_MIN_BITS, wbits);
+    wbits = mpoly_fix_bits(wbits, uctx->minfo);
+    FLINT_ASSERT(wbits <= FLINT_BITS);
 
-    fmpz_mpolyu_init(Auu, ABbits, uctx);
-    fmpz_mpolyu_init(Buu, ABbits, uctx);
-    fmpz_mpolyu_init(Guu, ABbits, uctx);
-    fmpz_mpoly_init3(Acontent, 0, ABbits, uctx);
-    fmpz_mpoly_init3(Bcontent, 0, ABbits, uctx);
-    fmpz_mpoly_init3(Gamma, 0, ABbits, uctx);
-    fmpz_mpolyu_init(Abar, ABbits, uctx);
-    fmpz_mpolyu_init(Bbar, ABbits, uctx);
-    fmpz_mpolyu_init(Gbar, ABbits, uctx);
+    fmpz_mpolyu_init(Auu, wbits, uctx);
+    fmpz_mpolyu_init(Buu, wbits, uctx);
+    fmpz_mpolyu_init(Guu, wbits, uctx);
+    fmpz_mpolyu_init(Abaruu, wbits, uctx);
+    fmpz_mpolyu_init(Bbaruu, wbits, uctx);
+    fmpz_mpoly_init3(Ac, 0, wbits, uctx);
+    fmpz_mpoly_init3(Bc, 0, wbits, uctx);
+    fmpz_mpoly_init3(Gc, 0, wbits, uctx);
+    fmpz_mpoly_init3(Gamma, 0, wbits, uctx);
 
     /* two main variables must be packed into bits = FLINT_BITS/2 */
     if (FLINT_BIT_COUNT(max_main_degree) >= FLINT_BITS/2)
@@ -2654,9 +2665,6 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
         success = 0;
         goto cleanup;
     }
-
-    /* Gbits is bits for final answer in ZZ[x_0,...,x_(n-1)] */
-    Gbits = FLINT_MIN(A->bits, B->bits);
 
     if (num_handles > 0)
     {
@@ -2670,8 +2678,7 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
         arg->uctx = uctx;
         arg->P = B;
         arg->Puu = Buu;
-        arg->Pcontent = Bcontent;
-        arg->Pbar = Bbar;
+        arg->Pcontent = Bc;
         arg->perm = perm;
         arg->shift = shift;
         arg->stride = stride;
@@ -2683,10 +2690,10 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
 
         fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
                    perm, shift, stride, (const ulong *) Adegs, handles + 0, s);
-        success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, handles + 0, s);
+        success = fmpz_mpolyu_content_mpoly(Ac, Auu, uctx, handles + 0, s);
         if (success)
         {
-            fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
+            fmpz_mpolyu_divexact_mpoly_inplace(Auu, Ac, uctx);
         }
 
         thread_pool_wait(global_thread_pool, handles[s]);
@@ -2703,51 +2710,43 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
                           perm, shift, stride, (const ulong *) Bdegs, NULL, 0);
 
         /* remove content from A and B */
-        success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);
-        success = success
-               && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx, NULL, 0);
+        success = fmpz_mpolyu_content_mpoly(Ac, Auu, uctx, NULL, 0);
+        success = success && fmpz_mpolyu_content_mpoly(Bc, Buu, uctx, NULL, 0);
         if (!success)
             goto cleanup;
-        fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
-        fmpz_mpolyu_divexact_mpoly(Bbar, Buu, 0, Bcontent, uctx);
+
+        fmpz_mpolyu_divexact_mpoly_inplace(Auu, Ac, uctx);
+        fmpz_mpolyu_divexact_mpoly_inplace(Buu, Bc, uctx);
     }
 
-    /* compute GCD of leading coefficients */
-    FLINT_ASSERT(Abar->length > 0);
-    FLINT_ASSERT(Bbar->length > 0);
-    _fmpz_mpoly_gcd(Gamma, ABbits, Abar->coeffs + 0, Bbar->coeffs + 0, uctx,
-                                                                      NULL, 0);
+    success = _fmpz_mpoly_gcd(Gamma, wbits, Auu->coeffs + 0,
+                                  Buu->coeffs + 0, uctx, handles, num_handles);
     if (!success)
         goto cleanup;
 
-    success = fmpz_mpolyuu_gcd_berlekamp_massey_threaded(Gbar, Abar, Bbar,
-                                            Gamma, uctx, handles, num_handles);
+    success = fmpz_mpolyuu_gcd_berlekamp_massey_threaded(Guu, Abaruu, Bbaruu,
+                                  Auu, Buu, Gamma, uctx, handles, num_handles);
     if (!success)
         goto cleanup;
 
-    /* put back content */
-    success = _fmpz_mpoly_gcd(Acontent, ABbits, Acontent, Bcontent, uctx,
-                                                                      NULL, 0);
+    success = _fmpz_mpoly_gcd(Gc, wbits, Ac, Bc, uctx, handles, num_handles);
     if (!success)
         goto cleanup;
 
-    fmpz_mpolyu_mul_mpoly(Guu, Gbar, Acontent, uctx);
+    fmpz_mpolyu_mul_mpoly_inplace(Guu, Gc, uctx);
 
-    fmpz_mpoly_from_mpolyuu_perm_inflate(G, Gbits, ctx, Guu, uctx,
-                                                          perm, shift, stride);
+    fmpz_mpoly_from_mpolyuu_perm_inflate(G, FLINT_MIN(A->bits, B->bits), ctx,
+                                               Guu, uctx, perm, shift, stride);
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
-
-    FLINT_ASSERT(G->bits == Gbits);
 
     success = 1;
 
 cleanup:
 
     for (i = 0; i < num_handles; i++)
-    {
         thread_pool_give_back(global_thread_pool, handles[i]);
-    }
+
     if (handles)
         flint_free(handles);
 
@@ -2757,16 +2756,16 @@ cleanup:
     flint_free(shift);
     flint_free(stride);
 
-    fmpz_mpolyu_clear(Abar, uctx);
-    fmpz_mpolyu_clear(Bbar, uctx);
-    fmpz_mpolyu_clear(Gbar, uctx);
-    fmpz_mpoly_clear(Acontent, uctx);
-    fmpz_mpoly_clear(Bcontent, uctx);
-    fmpz_mpoly_clear(Gamma, uctx);
-
     fmpz_mpolyu_clear(Auu, uctx);
     fmpz_mpolyu_clear(Buu, uctx);
     fmpz_mpolyu_clear(Guu, uctx);
+    fmpz_mpolyu_clear(Abaruu, uctx);
+    fmpz_mpolyu_clear(Bbaruu, uctx);
+    fmpz_mpoly_clear(Ac, uctx);
+    fmpz_mpoly_clear(Bc, uctx);
+    fmpz_mpoly_clear(Gc, uctx);
+    fmpz_mpoly_clear(Gamma, uctx);
+
     fmpz_mpoly_ctx_clear(uctx);
 
     return success;

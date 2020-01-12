@@ -1137,10 +1137,13 @@ typedef struct
     slong * Btail_count;
 
     ulong * Gmin_exp;
+    ulong * Abarmin_exp;
+    ulong * Bbarmin_exp;
     ulong * Gstride;
     slong * Gterm_count_est;
     slong * Gdeflate_deg_bound;
-    int Gdeflate_deg_bounds_are_nice; /* all of Gdeflate_deg_bound came from real gcd computations */
+
+    flint_bitcnt_t Gbits, Abarbits, Bbarbits;
 
     slong mvars;
 
@@ -1150,6 +1153,7 @@ typedef struct
     double brown_time_est, bma_time_est, zippel_time_est;
     slong * brown_perm, * bma_perm, * zippel_perm;
     int can_use_brown, can_use_bma, can_use_zippel;
+    int Gdeflate_deg_bounds_are_nice; /* all of Gdeflate_deg_bound came from real gcd computations */
 
     char * data;
 } mpoly_gcd_info_struct;

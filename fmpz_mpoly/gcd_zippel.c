@@ -102,6 +102,8 @@ flint_bitcnt_t fmpz_mpolyu_gcd_bitbound(const fmpz_t gcdlc,
 
 int fmpz_mpolyu_gcdm_zippel(
     fmpz_mpolyu_t G,
+    fmpz_mpolyu_t Abar,
+    fmpz_mpolyu_t Bbar,
     fmpz_mpolyu_t A,
     fmpz_mpolyu_t B,
     const fmpz_mpoly_ctx_t ctx,
@@ -187,6 +189,8 @@ choose_prime_outer:
         FLINT_ASSERT(nmod_mpoly_is_ui(Gp->coeffs + 0, ctxp));
         FLINT_ASSERT(!nmod_mpoly_is_zero(Gp->coeffs + 0, ctxp));
         fmpz_mpolyu_one(G, ctx);
+        fmpz_mpolyu_swap(Abar, A, ctx);
+        fmpz_mpolyu_swap(Bbar, B, ctx);
         success = 1;
         goto cleanup;
     }
@@ -260,8 +264,11 @@ choose_prime_inner:
     fmpz_mpolyu_fmpz_content(pp, H, ctx);
     fmpz_mpolyu_divexact_fmpz(G, H, pp, ctx);
 
-    if (!fmpz_mpolyu_divides(A, G, ctx) || !fmpz_mpolyu_divides(B, G, ctx))
+    if (   !fmpz_mpolyuu_divides(Abar, A, G, 1, ctx)
+        || !fmpz_mpolyuu_divides(Bbar, B, G, 1, ctx))
+    {
         goto choose_prime_inner;
+    }
 
     success = 1;
 
@@ -285,166 +292,6 @@ cleanup:
 }
 
 
-int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A,
-     const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, flint_rand_t randstate);
-
-int fmpz_mpolyu_gcd_zippel(fmpz_mpolyu_t G,
-                    fmpz_mpolyu_t A, fmpz_mpolyu_t B, fmpz_mpoly_ctx_t ctx,
-                                mpoly_zipinfo_t zinfo, flint_rand_t randstate)
-{
-    int success = 0;
-    slong i;
-    slong ABminshift;
-    fmpz_mpoly_t content;
-    fmpz_mpolyu_t Abar, Bbar, Gbar;
-
-    FLINT_ASSERT(A->bits == B->bits);
-    FLINT_ASSERT(A->length > 0);
-    FLINT_ASSERT(B->length > 0);
-
-    fmpz_mpoly_init(content, ctx);
-    fmpz_mpolyu_init(Abar, A->bits, ctx);
-    fmpz_mpolyu_init(Bbar, A->bits, ctx);
-    fmpz_mpolyu_init(Gbar, A->bits, ctx);
-
-    fmpz_mpoly_set(content, A->coeffs + 0, ctx);
-    for (i = 1; i < A->length; i++)
-    {
-        if (fmpz_mpoly_is_one(content, ctx))
-            break;
-        success = _fmpz_mpoly_gcd_zippel(content, content, A->coeffs + i,
-                                                               ctx, randstate);
-        if (!success)
-            goto finished;
-    }
-    for (i = 0; i < B->length; i++)
-    {
-        if (fmpz_mpoly_is_one(content, ctx))
-            break;
-        success = _fmpz_mpoly_gcd_zippel(content, content, B->coeffs + i,
-                                                               ctx, randstate);
-        if (!success)
-            goto finished;
-    }
-
-    fmpz_mpolyu_divexact_mpoly(Abar, A, 0, content, ctx);
-    fmpz_mpolyu_divexact_mpoly(Bbar, B, 0, content, ctx);
-
-    ABminshift = FLINT_MIN(Abar->exps[Abar->length - 1], Bbar->exps[Bbar->length - 1]);
-    fmpz_mpolyu_shift_right(Abar, Abar->exps[Abar->length - 1]);
-    fmpz_mpolyu_shift_right(Bbar, Bbar->exps[Bbar->length - 1]);
-
-    success = fmpz_mpolyu_gcdm_zippel(Gbar, Abar, Bbar, ctx, zinfo, randstate);
-    if (!success)
-        goto finished;
-
-    fmpz_mpolyu_shift_left(Gbar, ABminshift);
-    fmpz_mpolyu_mul_mpoly(G, Gbar, content, ctx);
-
-    success = 1;
-
-finished:
-
-    fmpz_mpolyu_clear(Abar, ctx);
-    fmpz_mpolyu_clear(Bbar, ctx);
-    fmpz_mpolyu_clear(Gbar, ctx);
-    fmpz_mpoly_clear(content, ctx);
-
-    return 1;
-}
-
-
-/* like fmpz_mpoly_gcd_zippel, but G and A and B all have the same bits */
-int _fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A,
-      const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, flint_rand_t randstate)
-{
-    slong i;
-    int success = 0;
-    flint_bitcnt_t new_bits = A->bits;
-    mpoly_zipinfo_t zinfo;
-    fmpz_mpoly_ctx_t uctx;
-    fmpz_mpolyu_t Au, Bu, Gu;
-    ulong * shift, * stride;
-
-    FLINT_ASSERT(new_bits == A->bits);
-    FLINT_ASSERT(new_bits == B->bits);
-    FLINT_ASSERT(new_bits == G->bits);
-    FLINT_ASSERT(new_bits <= FLINT_BITS);
-    FLINT_ASSERT(!fmpz_mpoly_is_zero(A, ctx));
-    FLINT_ASSERT(!fmpz_mpoly_is_zero(B, ctx));
-
-    shift = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
-    stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
-    for (i = 0; i < ctx->minfo->nvars; i++)
-    {
-        shift[i] = 0;
-        stride[i] = 1;
-    }
-
-    if (ctx->minfo->nvars == 1)
-    {
-        fmpz_poly_t a, b, g;
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(g);
-        _fmpz_mpoly_to_fmpz_poly_deflate(a, A, 0, shift, stride, ctx);
-        _fmpz_mpoly_to_fmpz_poly_deflate(b, B, 0, shift, stride, ctx);
-        fmpz_poly_gcd(g, a, b);
-        _fmpz_mpoly_from_fmpz_poly_inflate(G, A->bits, g, 0, shift, stride, ctx);
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(g);
-
-        success = 1;
-        goto cleanup1;
-    }
-
-    /* TODO: choose nvars and perm more cleverly */
-    mpoly_zipinfo_init(zinfo, ctx->minfo->nvars);
-    fmpz_mpoly_degrees_si(zinfo->Adegs, A, ctx);
-    fmpz_mpoly_degrees_si(zinfo->Bdegs, B, ctx);
-    for (i = 0; i < ctx->minfo->nvars; i++)
-    {
-        zinfo->perm[i] = i;
-    }
-
-    fmpz_mpoly_ctx_init(uctx, ctx->minfo->nvars - 1, ORD_LEX);
-    fmpz_mpolyu_init(Au, new_bits, uctx);
-    fmpz_mpolyu_init(Bu, new_bits, uctx);
-    fmpz_mpolyu_init(Gu, new_bits, uctx);
-
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                    zinfo->perm, shift, stride, NULL, NULL, 0);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                    zinfo->perm, shift, stride, NULL, NULL, 0);
-
-    success = fmpz_mpolyu_gcd_zippel(Gu, Au, Bu, uctx, zinfo, randstate);
-    if (!success)
-        goto cleanup;
-
-    fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits, ctx, Gu, uctx,
-                                                   zinfo->perm, shift, stride);
-    if (fmpz_sgn(G->coeffs + 0) < 0)
-        fmpz_mpoly_neg(G, G, ctx);
-
-cleanup:
-
-    fmpz_mpolyu_clear(Au, uctx);
-    fmpz_mpolyu_clear(Bu, uctx);
-    fmpz_mpolyu_clear(Gu, uctx);
-    fmpz_mpoly_ctx_clear(uctx);
-
-    mpoly_zipinfo_clear(zinfo);
-
-cleanup1:
-
-    flint_free(shift);
-    flint_free(stride);
-
-    return success;
-}
-
-
 int fmpz_mpoly_gcd_zippel(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -452,13 +299,15 @@ int fmpz_mpoly_gcd_zippel(
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
-    flint_bitcnt_t new_bits;
+    flint_bitcnt_t wbits;
     flint_rand_t randstate;
     int success = 0;
     mpoly_zipinfo_t zinfo;
     fmpz_mpoly_ctx_t uctx;
-    fmpz_mpolyu_t Au, Bu, Gu;
+    fmpz_mpolyu_t Au, Bu, Gu, Abaru, Bbaru;
+    fmpz_mpoly_t Ac, Bc, Gc;
     ulong * shift, * stride;
+    ulong amin, bmin;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {
@@ -467,11 +316,13 @@ int fmpz_mpoly_gcd_zippel(
             fmpz_mpoly_zero(G, ctx);
             return 1;
         }
+
         if (fmpz_sgn(B->coeffs + 0) < 0)
         {
             fmpz_mpoly_neg(G, B, ctx);
             return 1;
-        } else
+        }
+        else
         {
             fmpz_mpoly_set(G, B, ctx);
             return 1;
@@ -484,7 +335,8 @@ int fmpz_mpoly_gcd_zippel(
         {
             fmpz_mpoly_neg(G, A, ctx);
             return 1;
-        } else
+        }
+        else
         {
             fmpz_mpoly_set(G, A, ctx);
             return 1;
@@ -492,7 +344,9 @@ int fmpz_mpoly_gcd_zippel(
     }
 
     if (A->bits > FLINT_BITS || B->bits > FLINT_BITS)
+    {
         return 0;
+    }
 
     shift = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
     stride = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
@@ -522,38 +376,68 @@ int fmpz_mpoly_gcd_zippel(
 
     FLINT_ASSERT(A->bits <= FLINT_BITS);
     FLINT_ASSERT(B->bits <= FLINT_BITS);
-
-    FLINT_ASSERT(ctx->minfo->nvars > WORD(1));
     FLINT_ASSERT(!fmpz_mpoly_is_zero(A, ctx));
     FLINT_ASSERT(!fmpz_mpoly_is_zero(B, ctx));
+    FLINT_ASSERT(ctx->minfo->nvars > WORD(1));
 
     flint_randinit(randstate);
 
-    /* TODO: choose nvars and perm more cleverly */
     mpoly_zipinfo_init(zinfo, ctx->minfo->nvars);
     fmpz_mpoly_degrees_si(zinfo->Adegs, A, ctx);
     fmpz_mpoly_degrees_si(zinfo->Bdegs, B, ctx);
     for (i = 0; i < ctx->minfo->nvars; i++)
         zinfo->perm[i] = i;
 
-    new_bits = FLINT_MAX(A->bits, B->bits);
+    wbits = FLINT_MAX(A->bits, B->bits);
 
     fmpz_mpoly_ctx_init(uctx, ctx->minfo->nvars - 1, ORD_LEX);
-    fmpz_mpolyu_init(Au, new_bits, uctx);
-    fmpz_mpolyu_init(Bu, new_bits, uctx);
-    fmpz_mpolyu_init(Gu, new_bits, uctx);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
-                                    zinfo->perm, shift, stride, NULL, NULL, 0);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
-                                    zinfo->perm, shift, stride, NULL, NULL, 0);
+    fmpz_mpolyu_init(Au, wbits, uctx);
+    fmpz_mpolyu_init(Bu, wbits, uctx);
+    fmpz_mpolyu_init(Gu, wbits, uctx);
+    fmpz_mpolyu_init(Abaru, wbits, uctx);
+    fmpz_mpolyu_init(Bbaru, wbits, uctx);
+    fmpz_mpoly_init3(Ac, 0, wbits, uctx);
+    fmpz_mpoly_init3(Bc, 0, wbits, uctx);
+    fmpz_mpoly_init3(Gc, 0, wbits, uctx);
 
-    success = fmpz_mpolyu_gcd_zippel(Gu, Au, Bu, uctx, zinfo, randstate);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx, zinfo->perm,
+                                                 shift, stride, NULL, NULL, 0);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx, zinfo->perm,
+                                                 shift, stride, NULL, NULL, 0);
+
+    FLINT_ASSERT(Au->length > 0);
+    FLINT_ASSERT(Bu->length > 0);
+    amin = Au->exps[Au->length - 1];
+    bmin = Bu->exps[Bu->length - 1];
+    fmpz_mpolyu_shift_right(Au, amin);
+    fmpz_mpolyu_shift_right(Bu, bmin);
+
+    success = fmpz_mpolyu_content_mpoly(Ac, Au, uctx, NULL, 0);
+    success = success && fmpz_mpolyu_content_mpoly(Bc, Bu, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 
-    fmpz_mpoly_from_mpolyu_perm_inflate(G, new_bits, ctx, Gu, uctx,
-                                                   zinfo->perm, shift, stride);
+    fmpz_mpolyu_divexact_mpoly_inplace(Au, Ac, uctx);
+    fmpz_mpolyu_divexact_mpoly_inplace(Bu, Bc, uctx);
+
+    /* after removing content, degree bounds in zinfo are still valid bounds */
+    success = fmpz_mpolyu_gcdm_zippel(Gu, Abaru, Bbaru, Au, Bu,
+                                                       uctx, zinfo, randstate);
+    if (!success)
+        goto cleanup;
+
+    success = _fmpz_mpoly_gcd(Gc, wbits, Ac, Bc, uctx, NULL, 0);
+    if (!success)
+        goto cleanup;
+
+    fmpz_mpolyu_mul_mpoly_inplace(Gu, Gc, uctx);
+    fmpz_mpolyu_shift_left(Gu, FLINT_MIN(amin, bmin));
+
+    fmpz_mpoly_from_mpolyu_perm_inflate(G, FLINT_MIN(A->bits, B->bits), ctx,
+                                         Gu, uctx, zinfo->perm, shift, stride);
+    success = 1;
+
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
 
@@ -562,6 +446,12 @@ cleanup:
     fmpz_mpolyu_clear(Au, uctx);
     fmpz_mpolyu_clear(Bu, uctx);
     fmpz_mpolyu_clear(Gu, uctx);
+    fmpz_mpolyu_clear(Abaru, uctx);
+    fmpz_mpolyu_clear(Bbaru, uctx);
+    fmpz_mpoly_clear(Ac, uctx);
+    fmpz_mpoly_clear(Bc, uctx);
+    fmpz_mpoly_clear(Gc, uctx);
+
     fmpz_mpoly_ctx_clear(uctx);
 
     mpoly_zipinfo_clear(zinfo);
