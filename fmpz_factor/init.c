@@ -18,7 +18,7 @@
 void
 fmpz_factor_init(fmpz_factor_t factor)
 {
-    factor->sign  = 0;
+    factor->sign  = 1;
     factor->p     = NULL;
     factor->exp   = NULL;
     factor->num   = 0;
