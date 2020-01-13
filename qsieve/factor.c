@@ -42,7 +42,7 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
     uint64_t * nullrows = NULL;
     uint64_t mask;
     flint_rand_t state;
-    fmpz_t temp, X, Y;
+    fmpz_t temp, temp2, X, Y;
     slong num_facs;
     fmpz * facs;
     thread_pool_handle * handles;
@@ -64,8 +64,6 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
        return;
     }
 
-    fmpz_init(temp);
-       
     /**************************************************************************
         INITIALISATION:
         Initialise the qs_t structure.
@@ -102,13 +100,9 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
 #if QS_DEBUG
         flint_printf("found small factor %wu in Knuth-Schroeppel\n", small_factor);
 #endif
+        fmpz_init_set_ui(temp, small_factor);
 
-        while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
-        {
-	       fmpz_divexact_ui(temp, qs_inf->n, small_factor);
-	       fmpz_init_set(qs_inf->n, temp);
-	       expt++;
-        }
+        expt += fmpz_remove(temp, qs_inf->n, temp);
 
         _fmpz_factor_append_ui(factors, small_factor, expt);
         
@@ -149,12 +143,9 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
         flint_printf("found small factor %wu while generating factor base\n", small_factor);
 #endif
 
-        while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
-        {
-            fmpz_divexact_ui(temp, qs_inf->n, small_factor);
-            fmpz_init_set(qs_inf->n, temp);
-            expt++;
-        }
+        fmpz_init_set_ui(temp, small_factor);
+
+        expt += fmpz_remove(temp, qs_inf->n, temp);
 
         _fmpz_factor_append_ui(factors, small_factor, expt);
         
@@ -167,6 +158,8 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
         return;
     }
 
+    fmpz_init(temp);
+    fmpz_init(temp2);
     fmpz_init(X);
     fmpz_init(Y);
 
@@ -327,11 +320,6 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
 
                     if (num_facs > 0)
                     {
-                        fmpz_t temp, temp2;
-
-                        fmpz_init(temp);
-                        fmpz_init(temp2);
-
                         _fmpz_factor_append(factors, qs_inf->n, 1);
 
                         qsort((void *) facs, num_facs, sizeof(fmpz), compare_facs);
@@ -350,9 +338,6 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
                                    _fmpz_factor_append(factors, temp2, 1);
                              }  
                         }
-
-                        fmpz_clear(temp);
-                        fmpz_clear(temp2);
 
                         _fmpz_vec_clear(facs, 100);
 
@@ -407,12 +392,9 @@ more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
 
 found_small_factor:
 
-            while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
-            {
-               fmpz_divexact_ui(temp, qs_inf->n, small_factor);
-               fmpz_init_set(qs_inf->n, temp);
-               expt++;
-            }
+            fmpz_set_ui(temp, small_factor);
+
+            expt += fmpz_remove(temp, qs_inf->n, temp);
 
             _fmpz_factor_append_ui(factors, small_factor, expt);
         
@@ -447,4 +429,5 @@ cleanup:
     fmpz_clear(X);
     fmpz_clear(Y);
     fmpz_clear(temp);
+    fmpz_clear(temp2);
 }
