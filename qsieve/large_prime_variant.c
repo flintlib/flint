@@ -484,6 +484,7 @@ int qsieve_process_relation(qs_t qs_inf)
     char buf[1024];
     char * str;
     slong i, j, num_relations = 0, num_relations2, full = 0;
+    slong rel_list_length;
     mp_limb_t prime;
     hash_t * entry;
     mp_limb_t * hash_table = qs_inf->hash_table;
@@ -524,6 +525,7 @@ int qsieve_process_relation(qs_t qs_inf)
 #endif
 
     num_relations = qsieve_remove_duplicates(rel_list, num_relations);
+    rel_list_length = num_relations;
 
 #if QS_DEBUG & 64
     printf("Merging relations\n");
@@ -580,12 +582,24 @@ int qsieve_process_relation(qs_t qs_inf)
 
 cleanup:
 
-    for (i = 0; i < num_relations; i++)
+    for (i = 0; i < rel_list_length; i++)
     {
-       flint_free(rel_list[i].small);
-       flint_free(rel_list[i].factor);
+        /* it looks like rlist stole our data if rel_list[i].lp == UWORD(1)) */
+        if (rel_list[i].lp != UWORD(1))
+        {
+            flint_free(rel_list[i].small);
+            flint_free(rel_list[i].factor);
+            fmpz_clear(rel_list[i].Y);
+        }
     }
     flint_free(rel_list);
+
+    for (i = 0; i < num_relations; i++)
+    {
+       flint_free(rlist[i].small);
+       flint_free(rlist[i].factor);
+       fmpz_clear(rlist[i].Y);
+    }
     flint_free(rlist);
 
     return done;
