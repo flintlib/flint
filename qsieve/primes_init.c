@@ -53,6 +53,7 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
 
         if (nmod == 0)
         {
+            n_primes_clear(iter);
             *small_factor = p;
             return factor_base;
         }
