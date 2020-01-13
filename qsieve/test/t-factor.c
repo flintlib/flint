@@ -31,6 +31,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qsieve.h"
+#include "thread_support.h"
 
 void randprime(fmpz_t p, flint_rand_t state, slong bits)
 {
@@ -51,7 +52,12 @@ int main(void)
    slong i;
    fmpz_t n, x, y, z;
    fmpz_factor_t factors;
+   slong max_threads = 5;
+   slong tmul = 3;
    FLINT_TEST_INIT(state);
+#ifdef _WIN32
+   tmul = 1;
+#endif
 
    fmpz_init(x);
    fmpz_init(y);
@@ -67,11 +73,12 @@ int main(void)
     
       fmpz_factor_init(factors);
 
-      qsieve_factor(factors, n);
+      qsieve_factor_threaded(factors, n, FLINT_DEFAULT_THREAD_LIMIT);
 
       if (factors->num < 5)
       {
          flint_printf("FAIL:\n");
+         flint_printf("Test n with large prime factor\n");
          flint_printf("%ld factors found\n", factors->num);
          abort();
       }
@@ -79,7 +86,8 @@ int main(void)
       fmpz_factor_clear(factors);
    }
 
-   for (i = 0; i < 30; i++) /* Test random n, two factors */
+   /* Test random n, two factors */
+   for (i = 0; i < tmul*flint_test_multiplier(); i++)
    {
       slong bits = 40;
 
@@ -87,16 +95,19 @@ int main(void)
       do {
          randprime(y, state, bits);
       } while (fmpz_equal(x, y));
-      
+
       fmpz_mul(n, x, y);
 
       fmpz_factor_init(factors);
 
-      qsieve_factor(factors, n);
+      flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+      qsieve_factor_threaded(factors, n, FLINT_DEFAULT_THREAD_LIMIT);
 
       if (factors->num < 2)
       {
          flint_printf("FAIL:\n");
+         flint_printf("Test random n, two factors\ni = %wd\n", i);
          flint_printf("%ld factors found\n", factors->num);
          abort();
       }
@@ -104,7 +115,8 @@ int main(void)
       fmpz_factor_clear(factors);
    }
 
-   for (i = 0; i < 30; i++) /* Test random n, three factors */
+   /* Test random n, three factors */
+   for (i = 0; i < tmul*flint_test_multiplier(); i++)
    {
       randprime(x, state, 40);
       do {
@@ -119,11 +131,14 @@ int main(void)
 
       fmpz_factor_init(factors);
 
-      qsieve_factor(factors, n);
+      flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+      qsieve_factor_threaded(factors, n, FLINT_DEFAULT_THREAD_LIMIT);
 
       if (factors->num < 3)
       {
          flint_printf("FAIL:\n");
+         flint_printf("Test random n, three factors\ni = %wd\n", i);
          flint_printf("%ld factors found\n", factors->num);
          abort();
       }
@@ -131,7 +146,8 @@ int main(void)
       fmpz_factor_clear(factors);
    }
 
-   for (i = 0; i < 30; i++) /* Test random n, small factors */
+   /* Test random n, small factors */
+   for (i = 0; i < tmul*flint_test_multiplier(); i++)
    {
       randprime(x, state, 10);
       do {
@@ -144,11 +160,14 @@ int main(void)
 
       fmpz_factor_init(factors);
 
-      qsieve_factor(factors, n);
+      flint_set_num_threads(n_randint(state, max_threads) + 1);
+
+      qsieve_factor_threaded(factors, n, FLINT_DEFAULT_THREAD_LIMIT);
 
       if (factors->num < 3)
       {
          flint_printf("FAIL:\n");
+         flint_printf("Test random n, small factors\ni = %wd\n", i);
          flint_printf("%ld factors found\n", factors->num);
          abort();
       }

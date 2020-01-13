@@ -220,7 +220,7 @@ typedef qs_s qs_t[1];
 
 /*
    Tuning parameters { bits, ks_primes, fb_primes, small_primes, sieve_size}
-   for qsieve_factor where:
+   for qsieve_factor_threaded where:
      * bits is the number of bits of n
      * ks_primes is the max number of primes to try in Knuth-Schroeppel function
      * fb_primes is the number of factor base primes to use (including k and 2)
@@ -309,7 +309,8 @@ FLINT_DLL mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
 
 FLINT_DLL void qsieve_clear(qs_t qs_inf);
 
-FLINT_DLL void qsieve_factor(fmpz_factor_t factors, const fmpz_t n);
+FLINT_DLL void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
+                                                           slong thread_limit);
 
 prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
                                                              slong num_primes);

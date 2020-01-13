@@ -12,6 +12,7 @@
 
 #include "qsieve.h"
 #include "fmpz_factor.h"
+#include "thread_support.h"
 
 #include <inttypes.h>
 #define _STDC_FORMAT_MACROS
@@ -30,7 +31,8 @@ int compare_facs(const void * a, const void * b)
    multiple polynomial quadratic sieve with single large prime variation.
    Assumes n is not prime and not a perfect power.
 */
-void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
+void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
+                                                            slong thread_limit)
 {
     qs_t qs_inf;
     mp_limb_t small_factor, delta;
@@ -43,6 +45,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     fmpz_t temp, X, Y;
     slong num_facs;
     fmpz * facs;
+    thread_pool_handle * handles;
+    slong num_handles;
 
     if (fmpz_sgn(n) < 0)
     {
@@ -53,7 +57,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
        factors->sign *= -1;
        
-       qsieve_factor(factors, n2);
+       qsieve_factor_threaded(factors, n2, thread_limit);
 
        fmpz_clear(n2);
        
@@ -206,6 +210,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 #if QS_DEBUG
     flint_printf("second prime index = %wd\n", qs_inf->second_prime);
 #endif
+
+    num_handles = flint_request_threads(&handles, thread_limit);
 
     while (1)
     {
@@ -424,11 +430,13 @@ found_small_factor:
         Clean up allocated memory
     **************************************************************************/
 
+cleanup:
+
 #if QS_DEBUG
     flint_printf("\nCleanup\n");
 #endif
 
-cleanup:
+    flint_give_back_threads(handles, num_handles);
 
     flint_free(nullrows);
     flint_free(sieve);
