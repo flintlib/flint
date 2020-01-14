@@ -247,10 +247,10 @@ int qsieve_init_A(qs_t qs_inf)
 
             /* (s - 1)-tuple failed, step to next (s - 1)-tuple */
             h = (4*(m + h + 1)/3 >= span) ? h + 1 : 1;
-            m = curr_subset[s - h - 2] + 1;
+            m = curr_subset[s - h - 1] + 1;
 
             for (j = 0; j < h; j++)
-                curr_subset[s + j - h - 2] = m + j;
+                curr_subset[s + j - h - 1] = m + j;
         }
 
         A_ind[s - 1] = j;
