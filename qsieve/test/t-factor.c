@@ -59,6 +59,8 @@ int main(void)
    tmul = 1;
 #endif
 
+tmul = 20;
+
    fmpz_init(x);
    fmpz_init(y);
    fmpz_init(z);

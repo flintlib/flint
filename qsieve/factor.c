@@ -357,7 +357,7 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
 
 more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
 
-#if QS_DEBUG
+#if 1 /* QS_DEBUG */
         printf("Increasing factor base.\n");
 #endif
 
