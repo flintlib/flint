@@ -55,7 +55,7 @@ int qsieve_init_A(qs_t qs_inf)
     mp_limb_t * curr_subset, * first_subset;
     prime_t * factor_base = qs_inf->factor_base;
     fmpz_t prod, temp, upper_bound, lower_bound;
-    int ret = 1;
+    int ret = 1, found_j;
 
     fmpz_init(temp);
     fmpz_init(upper_bound);
@@ -219,6 +219,8 @@ int qsieve_init_A(qs_t qs_inf)
             i = 0;
             j = span/4 - 1;
             
+            found_j = 0;
+
             while (i < j)
             {
                 mid = i + (j - i) / 2;
@@ -236,18 +238,19 @@ int qsieve_init_A(qs_t qs_inf)
                 else
                 {
                     j = 4*mid + low;
+                    found_j = 1;
                     break;
                 }
             }
             
-            if (j > 1) break; /* success */
+            if (found_j) break; /* success */
 
-            /* (s - 1)-tuple failed, do lexicographic step to next (s - 1)-tuple */
-            h = (m >= span/4 - h) ? h + 1 : 1;
-            m = curr_subset[s - h - 1] + 1;
+            /* (s - 1)-tuple failed, step to next (s - 1)-tuple */
+            h = (4*(m + h + 1)/3 >= span) ? h + 1 : 1;
+            m = curr_subset[s - h - 2] + 1;
 
             for (j = 0; j < h; j++)
-                curr_subset[s + j - h - 1] = m + j;
+                curr_subset[s + j - h - 2] = m + j;
         }
 
         A_ind[s - 1] = j;
@@ -372,6 +375,7 @@ int qsieve_next_A(qs_t qs_inf)
     mp_limb_t * A_ind = qs_inf->A_ind;
     prime_t * factor_base = qs_inf->factor_base;
     fmpz_t prod, temp;
+    int found_j;
 
     fmpz_init(prod);
     fmpz_init(temp);
@@ -410,7 +414,7 @@ int qsieve_next_A(qs_t qs_inf)
                 goto next_A_cleanup;
             }
 
-            h = (m >= span - diff - h - 1) ? h + 1 : 1;
+            h = (4*(m + diff + h + 1)/3 >= span) ? h + 1 : 1;
             m = curr_subset[s - 2 - h] + 1 + ((m%diff) == 0);
             if (h != 1)
             {
@@ -432,6 +436,8 @@ int qsieve_next_A(qs_t qs_inf)
             i = 0;
             j = span/4 - 1;
 
+            found_j = 0;
+
             while (i < j)
             {
                 mid = i + (j - i) / 2;
@@ -449,11 +455,12 @@ int qsieve_next_A(qs_t qs_inf)
                 else
                 {
                     j = 4*mid + low;
+                    found_j = 1;
                     break;
                 }
             }
 
-            if (j > 1)
+            if (found_j)
             {
                 A_ind[s - 1] = j;
 
