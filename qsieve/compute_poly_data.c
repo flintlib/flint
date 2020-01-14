@@ -125,10 +125,9 @@ int qsieve_init_A(qs_t qs_inf)
         else if (i - rem <= num_factors)
         {
             /* can make a new factor with remaining bits plus not too many extra bits */
-            if (factor_bound[i + 1] > 0 && factor_bound[i - 2] > 0)
+            if (factor_bound[i + 1] > 0 && factor_bound[i - 1 - (++num_factors <= 5)] > 0)
             {
-                num_factors += 1;
-                low = factor_bound[i - 2]; /* need smaller primes in this case */
+                low = factor_bound[i - 1 - (num_factors <= 5)];
                 high = factor_bound[i + 1];
                 break;
             }
@@ -261,7 +260,15 @@ int qsieve_init_A(qs_t qs_inf)
             A_ind[j] = 4*curr_subset[j]/3 + 1 + low;
 
         for (j = 0; j < s; j++)
-            first_subset[j] = curr_subset[j]; /* save 1st tuple for restarts */ 
+            first_subset[j] = curr_subset[j]; /* save 1st tuple for restarts */
+
+#if QS_DEBUG
+        printf("First A_ind = (");
+        for (i = 0; i < s - 1; i++)
+            printf("%ld, ", A_ind[i]);
+        printf("%ld", A_ind[s - 1]);
+        printf(")\n");
+#endif
     }
 
     if (s > 3)
