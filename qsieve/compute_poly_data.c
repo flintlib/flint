@@ -125,10 +125,10 @@ int qsieve_init_A(qs_t qs_inf)
         else if (i - rem <= num_factors)
         {
             /* can make a new factor with remaining bits plus not too many extra bits */
-            if (factor_bound[i + 1] > 0 && factor_bound[i - 1] > 0)
+            if (factor_bound[i + 1] > 0 && factor_bound[i - 2] > 0)
             {
                 num_factors += 1;
-                low = factor_bound[i - 1];
+                low = factor_bound[i - 2]; /* need smaller primes in this case */
                 high = factor_bound[i + 1];
                 break;
             }
@@ -453,7 +453,7 @@ int qsieve_next_A(qs_t qs_inf)
                 }
             }
 
-            if (j > 1) /* didn't find final prime so out of A's */
+            if (j > 1)
             {
                 A_ind[s - 1] = j;
 

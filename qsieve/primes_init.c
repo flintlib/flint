@@ -148,7 +148,7 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     fmpz_init(qs_inf->target_A);
     fmpz_mul_2exp(qs_inf->target_A, qs_inf->kn, 1);
     fmpz_sqrt(qs_inf->target_A, qs_inf->target_A);
-    fmpz_tdiv_q_ui(qs_inf->target_A, qs_inf->target_A, qs_inf->sieve_size/2); 
+    fmpz_tdiv_q_ui(qs_inf->target_A, qs_inf->target_A, qs_inf->sieve_size/2);
 
     /* consider k and 2 and -1 as factor base primes */
     factor_base[0].p = k;
