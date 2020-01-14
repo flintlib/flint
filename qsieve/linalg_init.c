@@ -62,7 +62,7 @@ void qsieve_linalg_init(qs_t qs_inf)
 */
 void qsieve_linalg_realloc(qs_t qs_inf)
 {
-    slong num_primes;
+    slong i, num_primes;
 
     num_primes = qs_inf->num_primes;
     qs_inf->num_primes += qs_inf->ks_primes;
@@ -74,5 +74,26 @@ void qsieve_linalg_realloc(qs_t qs_inf)
 
     qs_inf->prime_count = flint_realloc(qs_inf->prime_count, qs_inf->num_primes*sizeof(slong));
     qs_inf->num_primes = num_primes;
-    qsieve_linalg_init(qs_inf);
+
+    qs_inf->extra_rels = 64; /* number of opportunities to factor n */
+    qs_inf->max_factors = 60; /* maximum number of factors a (merged) relation can have */
+
+    for (i = 0; i < qs_inf->buffer_size; i++)
+    {
+        fmpz_init(qs_inf->Y_arr + i);
+        qs_inf->matrix[i].weight = 0;
+        qs_inf->matrix[i].data = NULL;
+    }
+
+    qs_inf->columns = 0;
+    qs_inf->num_relations = 0;
+
+    /* parameter related to partials */
+    qs_inf->full_relation = 0;
+    qs_inf->edges = 0;
+    qs_inf->vertices = 0;
+    qs_inf->components = 1;
+    qs_inf->num_cycles = 0;
+
+    memset(qs_inf->hash_table, 0, (1 << 20)*sizeof(mp_limb_t));
 }

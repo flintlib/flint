@@ -901,7 +901,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 
 	/* free unneeded storage */
 
-   flint_free(vnext);
+    flint_free(vnext);
 	flint_free(scratch);
 	flint_free(v0);
 	flint_free(vt_a_v[0]);
