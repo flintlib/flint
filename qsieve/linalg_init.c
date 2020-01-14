@@ -63,6 +63,7 @@ void qsieve_linalg_init(qs_t qs_inf)
 void qsieve_linalg_realloc(qs_t qs_inf)
 {
     slong i, num_primes;
+    slong old_buffer_size = qs_inf->buffer_size;
 
     num_primes = qs_inf->num_primes;
     qs_inf->num_primes += qs_inf->ks_primes;
@@ -78,7 +79,18 @@ void qsieve_linalg_realloc(qs_t qs_inf)
     qs_inf->extra_rels = 64; /* number of opportunities to factor n */
     qs_inf->max_factors = 60; /* maximum number of factors a (merged) relation can have */
 
-    for (i = 0; i < qs_inf->buffer_size; i++)
+    for (i = 0; i < old_buffer_size; i++)
+    {
+        fmpz_zero(qs_inf->Y_arr + i);
+
+        if (qs_inf->matrix[i].weight)
+            flint_free(qs_inf->matrix[i].data);
+
+        qs_inf->matrix[i].weight = 0;
+        qs_inf->matrix[i].data = NULL;
+    }
+
+    for ( ; i < qs_inf->buffer_size; i++)
     {
         fmpz_init(qs_inf->Y_arr + i);
         qs_inf->matrix[i].weight = 0;
