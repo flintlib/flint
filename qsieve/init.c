@@ -35,7 +35,6 @@ void qsieve_init(qs_t qs_inf, const fmpz_t n)
     qs_inf->num_relations = 0;
     qs_inf->full_relation = 0;
     qs_inf->num_cycles = 0;
-    qs_inf->num_unmerged = 0;
     qs_inf->columns = 0;
     qs_inf->vertices = 0;
     qs_inf->components = 0;

@@ -28,7 +28,6 @@ void qsieve_linalg_init(qs_t qs_inf)
 
     qs_inf->buffer_size = 2*(qs_inf->num_primes + qs_inf->extra_rels);
     qs_inf->matrix = flint_malloc((qs_inf->buffer_size)*sizeof(la_col_t));
-    qs_inf->unmerged = qs_inf->matrix + qs_inf->buffer_size;
     qs_inf->Y_arr = flint_malloc(qs_inf->buffer_size*sizeof(fmpz));
     qs_inf->curr_rel = qs_inf->relation
                      = flint_malloc(2*qs_inf->buffer_size*qs_inf->max_factors*sizeof(slong));
@@ -43,7 +42,6 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->prime_count = flint_malloc(qs_inf->num_primes*sizeof(slong));
 
     qs_inf->num_primes = num_primes;
-    qs_inf->num_unmerged = 0;
     qs_inf->columns = 0;
     qs_inf->num_relations = 0;
 
@@ -70,7 +68,6 @@ void qsieve_linalg_realloc(qs_t qs_inf)
     qs_inf->num_primes += qs_inf->ks_primes;
     qs_inf->buffer_size = 2*(qs_inf->num_primes + qs_inf->extra_rels);
     qs_inf->matrix = flint_realloc(qs_inf->matrix, qs_inf->buffer_size*sizeof(la_col_t));
-    qs_inf->unmerged = qs_inf->matrix + qs_inf->buffer_size;
     qs_inf->Y_arr = flint_realloc(qs_inf->Y_arr, qs_inf->buffer_size*sizeof(fmpz));
     qs_inf->curr_rel = qs_inf->relation
                      = flint_realloc(qs_inf->relation, 2*qs_inf->buffer_size*qs_inf->max_factors*sizeof(slong));

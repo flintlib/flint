@@ -318,6 +318,8 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
                         }
                     }
 
+                    flint_free(nullrows);
+
                     if (num_facs > 0)
                     {
                         _fmpz_factor_append(factors, qs_inf->n, 1);
@@ -420,7 +422,6 @@ cleanup:
 
     flint_give_back_threads(handles, num_handles);
 
-    flint_free(nullrows);
     flint_free(sieve);
     qsieve_clear(qs_inf);
     qsieve_linalg_clear(qs_inf);

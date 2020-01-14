@@ -202,10 +202,8 @@ typedef struct qs_s
    ***************************************************************************/
 
    la_col_t * matrix; /* the main matrix over GF(2) in sparse format */
-   la_col_t * unmerged; /* unmerged matrix columns */
    la_col_t ** qsort_arr; /* array of columns ready to be sorted */
 
-   slong num_unmerged; /* number of columns unmerged */
    slong columns; /* number of columns in matrix so far */
 
    /***************************************************************************

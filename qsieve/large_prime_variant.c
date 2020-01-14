@@ -483,8 +483,9 @@ int qsieve_process_relation(qs_t qs_inf)
 {
     char buf[1024];
     char * str;
-    slong i, j, num_relations = 0, num_relations2, full = 0;
+    slong i, num_relations = 0, num_relations2, full = 0;
     slong rel_list_length;
+    slong rlist_length;
     mp_limb_t prime;
     hash_t * entry;
     mp_limb_t * hash_table = qs_inf->hash_table;
@@ -535,11 +536,12 @@ int qsieve_process_relation(qs_t qs_inf)
     memset(hash_table, 0, (1 << 20) * sizeof(mp_limb_t));
     qs_inf->vertices = 0;
 
-    for (i = 0, j = 0; i < num_relations; i++)
+    rlist_length = 0;
+    for (i = 0; i < num_relations; i++)
     {
         if (rel_list[i].lp == UWORD(1))
         {
-            rlist[j++] = rel_list[i];
+            rlist[rlist_length++] = rel_list[i];
             full++;
         }
         else
@@ -556,18 +558,18 @@ int qsieve_process_relation(qs_t qs_inf)
                    done = -1;
                    goto cleanup;
                 }
-                rlist[j++] = qsieve_merge_relation(qs_inf, rel_list[i], rel_list[entry->count]);
+                rlist[rlist_length++] = qsieve_merge_relation(qs_inf, rel_list[i], rel_list[entry->count]);
             }
         }
     }
 
-    num_relations = j;
+    num_relations = rlist_length;
 
 #if QS_DEBUG & 64
     printf("Sorting relations\n");
 #endif
 
-    if (j < qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels)
+    if (rlist_length < qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels)
     {
        qs_inf->edges -= 100;
        done = 0;
@@ -594,7 +596,7 @@ cleanup:
     }
     flint_free(rel_list);
 
-    for (i = 0; i < num_relations; i++)
+    for (i = 0; i < rlist_length; i++)
     {
        flint_free(rlist[i].small);
        flint_free(rlist[i].factor);
