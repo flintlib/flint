@@ -94,7 +94,8 @@ int qsieve_init_A(qs_t qs_inf)
     if (bits > 210) i = 15;
     else if (bits > 190) i = 13;
     else if (bits > 180) i = 12;
-    else i = 11;
+    else if (bits > 40) i = 11;
+    else i = 10;
 
     for ( ; i > 7; i--)
     {
@@ -125,9 +126,10 @@ int qsieve_init_A(qs_t qs_inf)
         else if (i - rem <= num_factors)
         {
             /* can make a new factor with remaining bits plus not too many extra bits */
-            if (factor_bound[i + 1] > 0 && factor_bound[i - 1 - (++num_factors <= 5)] > 0)
+            if (factor_bound[i + 1] > 0 && factor_bound[i - 1 - (num_factors < 5)] > 0)
             {
-                low = factor_bound[i - 1 - (num_factors <= 5)];
+                num_factors++;
+                low = factor_bound[i - 1 - (num_factors < 6)];
                 high = factor_bound[i + 1];
                 break;
             }
@@ -382,7 +384,7 @@ int qsieve_next_A(qs_t qs_inf)
     mp_limb_t * A_ind = qs_inf->A_ind;
     prime_t * factor_base = qs_inf->factor_base;
     fmpz_t prod, temp;
-    int found_j;
+    int found_j, inc_diff;
 
     fmpz_init(prod);
     fmpz_init(temp);
@@ -412,7 +414,8 @@ int qsieve_next_A(qs_t qs_inf)
     } else
     {
         diff = qs_inf->A_ind_diff;
-        
+        inc_diff = 0;
+
         while (1)
         {
             if (4*(curr_subset[0] + s + diff)/3 >= span) /* have run out of A's */
@@ -423,11 +426,10 @@ int qsieve_next_A(qs_t qs_inf)
 
             h = (4*(m + diff + h + 1)/3 >= span) ? h + 1 : 1;
             m = curr_subset[s - 2 - h] + 1 + ((m%diff) == 0);
-            if (h != 1)
-            {
-                diff += 1;
-                qs_inf->A_ind_diff = diff;
-            }
+            if (h == 2)
+               inc_diff = 1;
+            else if (h > 2)
+               diff = 1;
 
             for (j = 0; j < h; j++)
                 curr_subset[s + j - h - 2] = m + j;
@@ -463,6 +465,11 @@ int qsieve_next_A(qs_t qs_inf)
                 {
                     j = 4*mid + low;
                     found_j = 1;
+                    if (inc_diff)
+                    {
+                        diff += 1;
+                        qs_inf->A_ind_diff = diff;
+                    }
                     break;
                 }
             }
