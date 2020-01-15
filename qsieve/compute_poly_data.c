@@ -71,7 +71,7 @@ int qsieve_init_A(qs_t qs_inf)
        compute indices of points in factor base where number of bits of primes
        increases, starting with the first non-small prime, i.e. factor_bound[0]
        will be the index of the first non-small prime, and then factor_bound[j]
-       will be the first prime that doesn't have j bits
+       will be the first prime that has more than j bits
     */
     for (i = 0; i < 40; i++)
        factor_bound[i] = 0;
@@ -94,8 +94,9 @@ int qsieve_init_A(qs_t qs_inf)
     if (bits > 210) i = 15;
     else if (bits > 190) i = 13;
     else if (bits > 180) i = 12;
-    else if (bits > 40) i = 11;
-    else i = 10;
+    else i = 11;
+
+    high = low = 0;
 
     for ( ; i > 7; i--)
     {
@@ -105,31 +106,48 @@ int qsieve_init_A(qs_t qs_inf)
         if (factor_bound[i] == 0 || num_factors == 1)
             continue; /* factor too large or not enough factors */
 
-        /* distribute bits with each factor being at most 1 or 2 bits from optimal */
-        if (rem == 0 && num_factors > 2 && factor_bound[i + 1] > 0)
+        /* 
+            let n = bits, num_factors = floor(n/i), rem = n - i*num_factors
+            we can only guarantee that bounds cover [2^(n - 1), 2^n]
+            when factor base is very small, the algorithm is forced to use
+            very small primes which grow too rapidly; to compensate we
+            allow primes that are half the size on the lower end
+        */
+        if (rem == 0 && num_factors > 2 && factor_bound[i + 1] > 0 && factor_bound[i - 1 - (i <= 10)] > 0)
         {
-            /* optimal case, primes can have i or i + 1 bits */
-            low = factor_bound[i - 1];
+            /*
+                optimal case, primes in range [2^(i-1), 2^(i+1)]
+                products cover [2^(n - n/i), 2^(n + n/i)]
+            */
+            low = factor_bound[i - 1 - (i <= 10)];
             high = factor_bound[i + 1];
             break;
         }
         else if (rem <= num_factors)
         {
-            /* there's some left over bits, so allow primes to have i + 1 or i + 2 bits */
-            if (num_factors > 2 && factor_bound[i + 1] > 0 && factor_bound[i + 2] > 0)
+            /*
+                some left over bits, let primes be in [2^i, 2^(i+2)]
+                products in [2^(n - rem), 2^(n - rem + 2*num_factors)]
+            */
+            if (num_factors > 2 && factor_bound[i + 2] > 0 && factor_bound[i + - (i <= 9)] > 0)
             {
-                low = factor_bound[i];
+                low = factor_bound[i - (i <= 9)];
                 high = factor_bound[i + 2];
                 break;
             }
         }
         else if (i - rem <= num_factors)
         {
-            /* can make a new factor with remaining bits plus not too many extra bits */
-            if (factor_bound[i + 1] > 0 && factor_bound[i - 1 - (num_factors < 5)] > 0)
+            /*
+                nearly enough bits for extra factor
+                primes will be in range [2^(i-1), 2^(i+1)]
+                product will be in [2^(n + (i - rem) - num_factors - 1),
+                                    2^(n + (i - rem) + num_factors + 1)]
+            */
+            if (factor_bound[i + 1] > 0 && factor_bound[i - 1 - (i <= 10)] > 0)
             {
                 num_factors++;
-                low = factor_bound[i - 1 - (num_factors < 6)];
+                low = factor_bound[i - 1 - (i <= 10)];
                 high = factor_bound[i + 1];
                 break;
             }
@@ -418,7 +436,7 @@ int qsieve_next_A(qs_t qs_inf)
 
         while (1)
         {
-            if (4*(curr_subset[0] + s + diff)/3 >= span) /* have run out of A's */
+            if (4*(curr_subset[0] + s + diff)/3 + 1 >= span) /* have run out of A's */
             {
                 ret = 0;
                 goto next_A_cleanup;
