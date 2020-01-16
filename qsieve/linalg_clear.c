@@ -22,7 +22,7 @@ void qsieve_linalg_clear(qs_t qs_inf)
 
     if (qs_inf->matrix != NULL)
     {
-        for (i = 0; i < qs_inf->buffer_size + qs_inf->num_unmerged; i++)
+        for (i = 0; i < qs_inf->buffer_size; i++)
         {
             la_col_t * col = qs_inf->matrix + i;
 

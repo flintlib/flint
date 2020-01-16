@@ -24,20 +24,17 @@
 #include "ulong_extras.h"
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
-
-#if HAVE_OPENMP
-#include <omp.h> /* must include flint.h first */
-#endif
+#include "thread_support.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#define QS_DEBUG 0
+#define QS_DEBUG 0 /* level of debug information printed, 0 = none */
 
-#define BITS_ADJUST 25 /* added to sieve entries to compensate for approximations */
+#define BITS_ADJUST 25 /* add to sieve entries to compensate approximations */
 
-#define BLOCK_SIZE 65536 /* size of sieving cache block */
+#define BLOCK_SIZE (4*65536) /* size of sieving cache block */
 
 typedef struct prime_t
 {
@@ -93,9 +90,14 @@ typedef qs_poly_s qs_poly_t[1];
 
 typedef struct qs_s
 {
+   volatile slong index_j;
+   pthread_mutex_t mutex;
+   thread_pool_handle * handles;
+   slong num_handles;
+
    fmpz_t n;               /* Number to factor */
 
-   flint_bitcnt_t bits;       /* Number of bits of n */
+   flint_bitcnt_t bits;    /* Number of bits of n */
 
    ulong ks_primes;        /* number of Knuth-Schroeppel primes */
 
@@ -119,43 +121,48 @@ typedef struct qs_s
                        POLYNOMIAL DATA
     **************************************************************************/
 
-   fmpz_t A;                /* current value of coefficient A */
-   fmpz_t A0;               /* coefficient A excluding the non-factor-base
-                               prime  */
-   slong q_idx;             /* offset of q0 in factor base */
+   fmpz_t A;                /* current value of coeff A of poly Ax^2 + Bx + C */
+   fmpz_t B;                /* B value of poly */
 
-   fmpz_t B;                /* B values corresponding to current value of A */
-   mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
-   fmpz_t * A0_divp;        /* (A0 / p) for each prime dividing A0 */
-   fmpz_t * B_terms;        /* B_terms[i] = A_divp[i] * (B0_terms[i] * q0^(-1)) % p,
-                               where 'p' is a prime factor of 'A0' */
+   mp_limb_t * A_ind;       /* indices of factor base primes dividing A */
 
-   mp_limb_t * B0_terms;    /* B0_terms[i] = (sqrt(kn) * (A0_divp[i])^(-1)) modulo p,
-                               where 'p' is a prime factor of 'A0' */
+   fmpz_t * A_divp;         /* A_divp[i] = (A/p_i),
+                               where the p_i are the prime factors of A */
+   mp_limb_t * B0_terms;    /* B0_terms[i] = min(gamma_i, p - gamma_i) where
+                               gamma_i = (sqrt(kn)*(A_divp[i])^(-1)) mod p_i,
+                               where the p_i are the prime factors of A */
 
-   mp_limb_t * A0_inv;      /* A0^(-1) mod p, for factor base primes p */
-   mp_limb_t ** A_inv2B;    /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
-   int * soln1;       /* first root of poly */
-   int * soln2;       /* second root of poly */
+   fmpz_t * B_terms;        /* B_terms[i] = A_divp[i]*B0_terms[i] (multprec) */
+
+   mp_limb_t * A_inv;       /* A_inv[k] = A^(-1) mod p_k, for FB prime p_k */
+   mp_limb_t ** A_inv2B;    /* A_inv2B[i][k] = 2 * B_terms[i] * A^(-1) mod p_k
+                               for FB prime p_k */
+
+   int * soln1;             /* soln1[k] = first poly root mod FB prime p_k */
+   int * soln2;             /* soln2[k] = second poly root mod FB prime p_k */
 
    fmpz_t target_A;         /* approximate target value for A coeff of poly */
 
-   fmpz_t upp_bound;
-   fmpz_t low_bound;
+   fmpz_t upp_bound;        /* upper bound on desired A = 2*target_A */
+   fmpz_t low_bound;        /* lower bound on desired A = target_A/2 */
 
-   slong s;                 /* number of prime factors of A0 */
+   slong s;                 /* number of prime factors of A */
    slong low;               /* minimum offset in factor base,
-                               for possible factors of 'A0' */
-
+                               for possible factors of A */
    slong high;              /* maximum offset in factor base,
-                               for possible factors of 'A0' */
-   slong span;              /* total number of possible factors for 'A0' */
+                               for possible factors of A */
+   slong span;              /* total number of possible factors for A */
 
-   /* parameters for calculating next subset of possible factor of 'A0' */
-
-   slong h;
-   slong m;
-   mp_limb_t * curr_subset;
+   /*
+      parameters for calculating next subset of possible factors of A, giving
+      a lexicographic ordering of all such tuples
+   */
+   slong h; /* tuple entry we just set, numbered from 1 at end of tuple */
+   slong m; /* last value we just set a tuple entry to */
+   slong A_ind_diff; /* diff. between indices of (s-1) and (s-2)-th A-factor */
+   mp_limb_t * curr_subset; /* current tuple */
+   mp_limb_t * first_subset; /* first tuple, in case of restart */
+   mp_limb_t j; /* index of s-th factor of first A, if s > 3 */
 
 #if QS_DEBUG
    slong poly_count;         /* keep track of the number of polynomials used */
@@ -197,10 +204,8 @@ typedef struct qs_s
    ***************************************************************************/
 
    la_col_t * matrix; /* the main matrix over GF(2) in sparse format */
-   la_col_t * unmerged; /* unmerged matrix columns */
    la_col_t ** qsort_arr; /* array of columns ready to be sorted */
 
-   slong num_unmerged; /* number of columns unmerged */
    slong columns; /* number of columns in matrix so far */
 
    /***************************************************************************
@@ -215,7 +220,7 @@ typedef qs_s qs_t[1];
 
 /*
    Tuning parameters { bits, ks_primes, fb_primes, small_primes, sieve_size}
-   for qsieve_factor where:
+   for qsieve_factor_threaded where:
      * bits is the number of bits of n
      * ks_primes is the max number of primes to try in Knuth-Schroeppel function
      * fb_primes is the number of factor base primes to use (including k and 2)
@@ -261,33 +266,36 @@ static const mp_limb_t qsieve_tune[][6] =
 
 static const mp_limb_t qsieve_tune[][6] =
 {
-   {10,   50,   100,  5,   2 *  2000,  30}, /* */
-   {20,   50,   120,  6,   2 *  2500,  30}, /* */
-   {30,   50,   150,  6,   2 *  2000,  31}, /* */
-   {40,   50,   150,  8,   2 *  3000,  32}, /* 12 digits */
-   {50,   50,   150,  8,   2 *  4000,  34}, /* 15 digits */
-   {60,   50,   150,  9,   2 *  5000,  36}, /* 18 digits */
-   {70,  100,   200,  9,   2 *  6000,  42}, /* 21 digits */
-   {80,  100,   200,  9,   2 *  8000,  44}, /* 24 digits */
-   {90,  100,   200,  9,   2 *  9000,  50}, /* */
-   {100, 100,   300,  9,   2 *  10000,  54}, /* */
-   {110, 100,   500,  9,   2 *  30000, 62}, /* 31 digits */
-   {120, 100,   800,  9,   2 *  40000, 64}, /* */
-   {130, 100,  1000,  9,   2 *  50000, 64}, /* 41 digits */
-   {140, 100,  1200,  9,   2 *  65536, 66}, /* */
-   {150, 100,  1500, 10,   2 *  65536, 68}, /* 45 digit */
-   {160, 150,  1800, 11,   3 *  65536, 70}, /* */
-   {170, 150,  2000, 12,   4 *  65536, 72}, /* 50 digits */
-   {180, 150,  2500, 12,   5 *  65536, 73}, /* */
-   {190, 150,  2800, 12,   6 *  65536, 76}, /* */
-   {200, 200,  4000, 12,   6 *  65536, 80}, /* 60 digits */
-   {210, 100,  3600, 12,   7 *  65536, 83}, /* */
-   {220, 300,  6000, 15,   9 *  65536, 87}, /* */
-   {230, 350,  8500, 17,   10 *  65536, 90}, /* 70 digits */
-   {240, 400, 10000, 19,   12 *  65536, 93}, /* */
-   {250, 500, 15000, 19,   14 *  65536, 97}, /* 75 digits */
-   {260, 600, 25000, 25,   15 *  65536, 100}, /* 80 digits */
-   {270, 800, 35000, 27,   16 *  65536, 104}  /* */
+   {10,   50,   90,  5,   2 *  1500,  18}, /* */
+   {20,   50,   90,  6,   2 *  1600,  18}, /* */
+   {30,   50,   100,  6,   2 *  1800,  19}, /* */
+   {40,   50,   100,  8,   2 *  2000,  20}, /* 13 digits */
+   {50,   50,   100,  8,   2 *  2500,  22}, /* 16 digits */
+   {60,   50,   100,  9,   2 *  3000,  24}, /* 19 digits */
+   {70,  100,   250,  9,   2 *  6000,  25}, /* 22 digits */
+   {80,  100,   250,  9,   2 *  8000,  26}, /* 25 digits */
+   {90,  100,   250,  9,   2 *  9000,  30}, /* 28 digits */
+   {100, 100,   250,  9,   2 *  10000, 34}, /* 31 digits */
+   {110, 100,   250,  9,   2 *  30000, 38}, /* 34 digits */
+   {120, 100,   700,  9,   2 *  40000, 49}, /* 37 digits */
+   {130, 100,   800,  9,   2 *  50000, 59}, /* 40 digits */
+   {140, 100,  1200,  9,   2 *  65536, 66}, /* 43 digits */
+   {150, 100,  1500, 10,   2 *  65536, 70}, /* 46 digit */
+   {160, 150,  2000, 11,   4 *  65536, 73}, /* 49 digit */
+   {170, 150,  2000, 12,   4 *  65536, 75}, /* 52 digits */
+   {180, 150,  3000, 12,   4 *  65536, 76}, /* 55 digits */
+   {190, 150,  3000, 13,   4 *  65536, 78}, /* 58 digit */
+   {200, 200,  4500, 14,   4 *  65536, 81}, /* 61 digits */
+   {210, 100,  8000, 14,   12 *  65536, 84}, /* 64 digits */
+   {220, 300, 10000, 15,   12 *  65536, 88}, /* 67 digits */
+   {230, 400, 20000, 17,   20 *  65536, 90}, /* 70 digits */
+   {240, 450, 20000, 19,   20 *  65536, 93}, /* 73 digis */
+   {250, 500, 22000, 22,   24 *  65536, 97}, /* 76 digits */
+   {260, 600, 25000, 25,   24 *  65536, 100}, /* 79 digits */
+   {270, 800, 35000, 27,   28 *  65536, 102}, /* 82 digits */
+   {280, 900, 40000, 29,   28 *  65536, 104}, /* 85 digits */
+   {290, 1000, 60000, 29,  32 *  65536, 106}, /* 88 digits */
+   {300, 1100, 140000, 30,  32 * 65536, 108} /* 91 digits */ 
 };
 
 #endif
@@ -301,7 +309,8 @@ FLINT_DLL mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
 
 FLINT_DLL void qsieve_clear(qs_t qs_inf);
 
-FLINT_DLL void qsieve_factor(fmpz_factor_t factors, const fmpz_t n);
+FLINT_DLL void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
+                                                           slong thread_limit);
 
 prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
                                                              slong num_primes);
@@ -312,13 +321,11 @@ FLINT_DLL mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta);
 
 mp_limb_t qsieve_poly_init(qs_t qs_inf);
 
-mp_limb_t qsieve_next_A0(qs_t qs_inf);
+int qsieve_init_A(qs_t qs_inf);
 
-void qsieve_re_init_A0(qs_t qs_inf);
+void qsieve_reinit_A(qs_t qs_inf);
 
-int qsieve_init_A0(qs_t qs_inf);
-
-void qsieve_compute_pre_data(qs_t qs_inf);
+int qsieve_next_A(qs_t qs_inf);
 
 void qsieve_init_poly_first(qs_t qs_inf);
 
@@ -342,9 +349,7 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve);
 
 void qsieve_linalg_init(qs_t qs_inf);
 
-void qsieve_linalg_re_init(qs_t qs_inf);
-
-void qsieve_linalg_re_alloc(qs_t qs_inf);
+void qsieve_linalg_realloc(qs_t qs_inf);
 
 void qsieve_linalg_clear(qs_t qs_inf);
 
@@ -352,9 +357,8 @@ int qsieve_relations_cmp(const void * a, const void * b);
 
 slong qsieve_merge_relations(qs_t qs_inf);
 
-slong qsieve_insert_relation(qs_t qs_inf, fmpz_t Y);
-
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly);
+void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime,
+                                                     fmpz_t Y, qs_poly_t poly);
 
 hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 
@@ -368,7 +372,7 @@ int qsieve_compare_relation(const void * a, const void * b);
 
 int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations);
 
-void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list,
+void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list,
                                                           slong num_relations);
 
 int qsieve_process_relation(qs_t qs_inf);

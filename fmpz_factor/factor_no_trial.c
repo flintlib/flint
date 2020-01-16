@@ -16,6 +16,7 @@
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 #include "qsieve.h"
+#include "thread_support.h"
 
 void
 fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
@@ -51,7 +52,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 
          /* insert call to ecm here */
 
-         qsieve_factor(fac, n);
+         qsieve_factor_threaded(fac, n, FLINT_DEFAULT_THREAD_LIMIT);
 
          for (i = 0; i < fac->num; i++)
          {
