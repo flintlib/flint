@@ -48,8 +48,7 @@ void qsieve_poly_clear(qs_t qs_inf)
 
    flint_free(qs_inf->A_inv2B);
 
-#if HAVE_OPENMP
-   for (i = 0; i < omp_get_max_threads(); i++)
+   for (i = 0; i <= qs_inf->num_handles; i++)
    {
       fmpz_clear(qs_inf->poly[i].B);
       flint_free(qs_inf->poly[i].posn1);
@@ -60,16 +59,6 @@ void qsieve_poly_clear(qs_t qs_inf)
       flint_free(qs_inf->poly[i].factor);
    }
    flint_free(qs_inf->poly);
-#else
-   fmpz_clear(qs_inf->poly[0].B);
-   flint_free(qs_inf->poly[0].posn1);
-   flint_free(qs_inf->poly[0].posn2);
-   flint_free(qs_inf->poly[0].soln1);
-   flint_free(qs_inf->poly[0].soln2);
-   flint_free(qs_inf->poly[0].small);
-   flint_free(qs_inf->poly[0].factor);
-   flint_free(qs_inf->poly);
-#endif
 
    qs_inf->B_terms = NULL;
    qs_inf->A_ind = NULL;

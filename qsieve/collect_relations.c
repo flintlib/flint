@@ -368,12 +368,13 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 
          poly->num_factors = num_factors;
 
-#pragma omp critical
+         pthread_mutex_lock(&qs_inf->mutex);
          {
             qsieve_write_to_file(qs_inf, 1, Y, poly);
          
             qs_inf->full_relation++;
          }
+         pthread_mutex_unlock(&qs_inf->mutex);
          relations++;
       } else /* not a relation, perhaps a partial? */
       {
@@ -408,7 +409,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 
                   poly->num_factors = num_factors;
 
-#pragma omp critical
+                  pthread_mutex_lock(&qs_inf->mutex);
                   {
                      /* store this partial in file */
 
@@ -418,6 +419,8 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 
                      qsieve_add_to_hashtable(qs_inf, prime);
                   }
+                  pthread_mutex_unlock(&qs_inf->mutex);
+
               }
           }
       }
@@ -478,46 +481,92 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 
 /* procedure to call polynomial initialization and sieving procedure */
 
-slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
+typedef struct
 {
-    slong relations = 0, rels, i, j = 0;
+    qs_s * inf;
+    unsigned char * sieve;
+    slong thread_idx;
+    qs_poly_s * thread_poly;
+    unsigned char * thread_sieve;
+    slong rels;
+}
+_worker_arg_struct;
 
-    qsieve_init_poly_first(qs_inf);
+static void qsieve_collect_relations_worker(void * varg)
+{
+    _worker_arg_struct * arg = (_worker_arg_struct *) varg;
+    qs_s * qs_inf = arg->inf;
+    qs_poly_s * thread_poly = arg->thread_poly;
+    unsigned char * thread_sieve = arg->thread_sieve;
+    slong j, iterations = (1 << (qs_inf->s - 1));
 
-#pragma omp parallel for
-    for (i = 0; i < (1 << (qs_inf->s - 1)); i++)
+    while (1)
     {
-#if HAVE_OPENMP
-        unsigned char * thread_sieve = sieve + (qs_inf->sieve_size + sizeof(ulong) + 64)*omp_get_thread_num();
-        qs_poly_s * thread_poly = qs_inf->poly + omp_get_thread_num();
-#else
-        unsigned char * thread_sieve = sieve;
-        qs_poly_s * thread_poly = qs_inf->poly;
-#endif
-
-#pragma omp critical
+        pthread_mutex_lock(&qs_inf->mutex);
+        j = qs_inf->index_j;
+        qs_inf->index_j = j + 1;
+        if (j < iterations)
         {
            /* copy poly data for thread we are in */
-           if (j == 0)
-              qsieve_poly_copy(thread_poly, qs_inf);
-           else
-           {
-              qsieve_init_poly_next(qs_inf, j);
-              qsieve_poly_copy(thread_poly, qs_inf);
-           }
-           j++;
+            if (j > 0)
+                qsieve_init_poly_next(qs_inf, j);
+            qsieve_poly_copy(thread_poly, qs_inf);
         }
+        pthread_mutex_unlock(&qs_inf->mutex);
+
+        if (j >= iterations)
+            return;
 
         if (qs_inf->sieve_size < 2*BLOCK_SIZE)
            qsieve_do_sieving(qs_inf, thread_sieve, thread_poly);
         else
            qsieve_do_sieving2(qs_inf, thread_sieve, thread_poly);
 
-        rels = qsieve_evaluate_sieve(qs_inf, thread_sieve, thread_poly);
-
-#pragma omp atomic
-        relations += rels;
+        arg->rels += qsieve_evaluate_sieve(qs_inf, thread_sieve, thread_poly);
     }
+}
+
+
+slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
+{
+    slong i;
+    _worker_arg_struct * args;
+    slong relations;
+    const thread_pool_handle* handles = qs_inf->handles;
+    slong num_handles = qs_inf->num_handles;
+
+    args = (_worker_arg_struct *) flint_malloc((1 + num_handles)
+                                                  *sizeof(_worker_arg_struct));
+
+    qs_inf->index_j = 0;
+    qsieve_init_poly_first(qs_inf);
+
+    for (i = 0; i <= num_handles; i++)
+    {
+        args[i].inf = qs_inf;
+        args[i].thread_idx = i;
+        args[i].thread_poly = qs_inf->poly + i;
+        args[i].thread_sieve = sieve + (qs_inf->sieve_size + sizeof(ulong) + 64)*i;
+        args[i].rels = 0;
+    }
+
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_wake(global_thread_pool, handles[i],
+                                    qsieve_collect_relations_worker, &args[i]);
+    }
+
+    qsieve_collect_relations_worker(&args[num_handles]);
+
+    relations = args[num_handles].rels;
+
+    for (i = 0; i < num_handles; i++)
+    {
+        thread_pool_wait(global_thread_pool, handles[i]);
+        relations += args[i].rels;
+    }
+
+    flint_free(args);
 
     return relations;
 }

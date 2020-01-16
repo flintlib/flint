@@ -45,8 +45,6 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
     fmpz_t temp, temp2, X, Y;
     slong num_facs;
     fmpz * facs;
-    thread_pool_handle * handles;
-    slong num_handles;
 
     if (fmpz_sgn(n) < 0)
     {
@@ -183,12 +181,13 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
     flint_printf("\nPolynomial Initialisation and Sieving\n");
 #endif
 
-#if HAVE_OPENMP
-    /* ensure cache lines don't overlap */
-    sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulong) + 64)*omp_get_max_threads());
-#else
-    sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
-#endif
+    qs_inf->num_handles = flint_request_threads(&qs_inf->handles, thread_limit);
+
+    /* ensure cache lines don't overlap if num_handles > 0 */
+    sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulong)
+               + (qs_inf->num_handles > 0 ? 64 : 0))*(qs_inf->num_handles + 1));
+
+    pthread_mutex_init(&qs_inf->mutex, NULL);
 
     qs_inf->siqs = fopen("siqs.dat", "w");
 
@@ -203,8 +202,6 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
 #if QS_DEBUG
     flint_printf("second prime index = %wd\n", qs_inf->second_prime);
 #endif
-
-    num_handles = flint_request_threads(&handles, thread_limit);
 
     while (1)
     {
@@ -420,7 +417,9 @@ cleanup:
     flint_printf("\nCleanup\n");
 #endif
 
-    flint_give_back_threads(handles, num_handles);
+    pthread_mutex_destroy(&qs_inf->mutex);
+
+    flint_give_back_threads(qs_inf->handles, qs_inf->num_handles);
 
     flint_free(sieve);
     qsieve_clear(qs_inf);

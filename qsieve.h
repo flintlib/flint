@@ -24,16 +24,13 @@
 #include "ulong_extras.h"
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
-
-#if HAVE_OPENMP
-#include <omp.h> /* must include flint.h first */
-#endif
+#include "thread_support.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#define QS_DEBUG 1 /* level of debug information printed, 0 = none */
+#define QS_DEBUG 0 /* level of debug information printed, 0 = none */
 
 #define BITS_ADJUST 25 /* add to sieve entries to compensate approximations */
 
@@ -93,6 +90,11 @@ typedef qs_poly_s qs_poly_t[1];
 
 typedef struct qs_s
 {
+   volatile slong index_j;
+   pthread_mutex_t mutex;
+   thread_pool_handle * handles;
+   slong num_handles;
+
    fmpz_t n;               /* Number to factor */
 
    flint_bitcnt_t bits;    /* Number of bits of n */
