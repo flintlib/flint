@@ -33,7 +33,7 @@
  extern "C" {
 #endif
 
-#define QS_DEBUG 0 /* level of debug information printed, 0 = none */
+#define QS_DEBUG 1 /* level of debug information printed, 0 = none */
 
 #define BITS_ADJUST 25 /* add to sieve entries to compensate approximations */
 
@@ -283,7 +283,7 @@ static const mp_limb_t qsieve_tune[][6] =
    {170, 150,  2000, 12,   4 *  65536, 75}, /* 52 digits */
    {180, 150,  3000, 12,   4 *  65536, 76}, /* 55 digits */
    {190, 150,  3000, 13,   4 *  65536, 78}, /* 58 digit */
-   {200, 200,  4500, 14,   8 *  65536, 81}, /* 61 digits */
+   {200, 200,  4500, 14,   4 *  65536, 81}, /* 61 digits */
    {210, 100,  8000, 14,   12 *  65536, 84}, /* 64 digits */
    {220, 300, 10000, 15,   12 *  65536, 88}, /* 67 digits */
    {230, 400, 20000, 17,   20 *  65536, 90}, /* 70 digits */
@@ -293,7 +293,7 @@ static const mp_limb_t qsieve_tune[][6] =
    {270, 800, 35000, 27,   28 *  65536, 102}, /* 82 digits */
    {280, 900, 40000, 29,   28 *  65536, 104}, /* 85 digits */
    {290, 1000, 60000, 29,  32 *  65536, 106}, /* 88 digits */
-   {300, 1100, 110000, 30,  32 * 65536, 108} /* 91 digits */ 
+   {300, 1100, 140000, 30,  32 * 65536, 108} /* 91 digits */ 
 };
 
 #endif
