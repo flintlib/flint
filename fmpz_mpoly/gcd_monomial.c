@@ -11,25 +11,6 @@
 
 #include "fmpz_mpoly.h"
 
-
-/*
-    like _fmpz_vec_content, but "start" is included in the content, and we bail
-    as soon as the content is known
-*/
-void _fmpz_vec_content1(fmpz_t res, fmpz_t start, const fmpz * vec, slong len)
-{
-    slong i;
-    fmpz_set(res, start);
-    for (i = 0; i < len; i++)
-    {
-        fmpz_gcd(res, res, vec + i);
-        if (fmpz_is_one(res))
-        {
-            return;
-        }
-    }
-}
-
 /*
     It is assumed that A is not zero, and B is a monomial.
     This function is always successful and always returns 1.
@@ -75,8 +56,8 @@ int _fmpz_mpoly_gcd_monomial(fmpz_mpoly_t G, flint_bitcnt_t Gbits,
     G->bits = Gbits;
     mpoly_set_monomial_ffmpz(G->exps, minBdegs, Gbits, ctx->minfo);
 
-    fmpz_init(g);
-    _fmpz_vec_content1(g, B->coeffs + 0, A->coeffs, A->length);
+    fmpz_init_set(g, B->coeffs + 0);
+    _fmpz_vec_content_chained(g, A->coeffs, A->length);
     fmpz_swap(G->coeffs + 0, g);
     fmpz_clear(g);
 

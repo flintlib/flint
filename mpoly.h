@@ -376,7 +376,19 @@ void mpoly_monomial_madd_fmpz(ulong * exp1, const ulong * exp2,
     }
 }
 
+MPOLY_INLINE
+ulong mpoly_overflow_mask_sp(flint_bitcnt_t bits)
+{
+    slong i;
+    ulong mask = 0;
 
+    FLINT_ASSERT(bits <= FLINT_BITS);
+
+    for (i = 0; i < FLINT_BITS/bits; i++)
+        mask = (mask << bits) + (UWORD(1) << (bits - 1));
+
+    return mask;
+}
 
 MPOLY_INLINE
 void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
@@ -1118,6 +1130,14 @@ FLINT_DLL void _mpoly_gen_shift_left(ulong * Aexp, flint_bitcnt_t Abits,
 FLINT_DLL int mpoly_monomial_cmp_general(ulong * Aexp, flint_bitcnt_t Abits,
                       ulong * Bexp, flint_bitcnt_t Bbits, const mpoly_ctx_t mctx);
 
+FLINT_DLL void mpoly_monomials_shift_right_ui(ulong * Aexps, flint_bitcnt_t Abits,
+               slong Alength, const ulong * user_exps, const mpoly_ctx_t mctx);
+
+FLINT_DLL int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
+                                    const ulong * Aexps, flint_bitcnt_t Abits,
+                                    const ulong * Bexps, flint_bitcnt_t Bbits,
+                                        slong length,  const mpoly_ctx_t mctx);
+
 /* info related to gcd calculation *******************************************/
 
 typedef struct
@@ -1202,6 +1222,8 @@ typedef mpoly_zipinfo_struct mpoly_zipinfo_t[1];
 void mpoly_zipinfo_init(mpoly_zipinfo_t zinfo, slong nvars);
 
 void mpoly_zipinfo_clear(mpoly_zipinfo_t zinfo);
+
+void _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len);
 
 /* Heap **********************************************************************/
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -27,9 +27,7 @@ void gcd_check(
 {
     int res;
     fmpz_mpoly_t ca, cb, cg, u, v, w;
-/*
-flint_printf("%s: i = %wd, j = %wd\n", name, i, j);
-*/
+
     fmpz_mpoly_init(ca, ctx);
     fmpz_mpoly_init(cb, ctx);
     fmpz_mpoly_init(cg, ctx);
@@ -160,7 +158,7 @@ flint_printf("%s: i = %wd, j = %wd\n", name, i, j);
     fmpz_mpoly_gcd_cofactors(u, v, w, u, w, ctx);
     if (!fmpz_mpoly_equal(g, u, ctx) || !fmpz_mpoly_equal(abar, v, ctx) || !fmpz_mpoly_equal(bbar, w, ctx))
     {
-        flint_printf("FAIL (u, v, w), (v, u): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL (u, v, w), (u, w): i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -169,7 +167,7 @@ flint_printf("%s: i = %wd, j = %wd\n", name, i, j);
     fmpz_mpoly_gcd_cofactors(u, v, w, w, u, ctx);
     if (!fmpz_mpoly_equal(g, u, ctx) || !fmpz_mpoly_equal(abar, v, ctx) || !fmpz_mpoly_equal(bbar, w, ctx))
     {
-        flint_printf("FAIL (u, v, w), (v, u): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL (u, v, w), (w, u): i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -178,7 +176,7 @@ flint_printf("%s: i = %wd, j = %wd\n", name, i, j);
     fmpz_mpoly_gcd_cofactors(u, v, w, v, w, ctx);
     if (!fmpz_mpoly_equal(g, u, ctx) || !fmpz_mpoly_equal(abar, v, ctx) || !fmpz_mpoly_equal(bbar, w, ctx))
     {
-        flint_printf("FAIL (u, v, w), (v, u): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL (u, v, w), (v, w): i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -187,7 +185,7 @@ flint_printf("%s: i = %wd, j = %wd\n", name, i, j);
     fmpz_mpoly_gcd_cofactors(u, v, w, w, v, ctx);
     if (!fmpz_mpoly_equal(g, u, ctx) || !fmpz_mpoly_equal(abar, v, ctx) || !fmpz_mpoly_equal(bbar, w, ctx))
     {
-        flint_printf("FAIL (u, v, w), (v, u): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL (u, v, w), (w, v): i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
@@ -214,7 +212,18 @@ flint_printf("%s: i = %wd, j = %wd\n", name, i, j);
     if (!fmpz_mpoly_equal(ca, abar, ctx) || !fmpz_mpoly_equal(cb, bbar, ctx))
     {
         printf("FAIL\n");
-        flint_printf("Check cofactors of cofactori\n"
+        flint_printf("Check cofactors of cofactors\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    res = fmpz_mpoly_gcd_cofactors(cg, abar, bbar, abar, bbar, ctx);
+    fmpz_mpoly_assert_canonical(cg, ctx);
+
+    if (!fmpz_mpoly_equal(ca, abar, ctx) || !fmpz_mpoly_equal(cb, bbar, ctx))
+    {
+        printf("FAIL\n");
+        flint_printf("Check cofactors of cofactors with aliasing\n"
                                          "i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
