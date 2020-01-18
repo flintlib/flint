@@ -356,6 +356,297 @@ cleanup:
     return;
 }
 
+
+/*********************** Easy when B is a monomial ***************************/
+static int _try_monomial_gcd(
+    fmpz_mpoly_t G, flint_bitcnt_t Gbits,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+    fmpz_t g;
+    fmpz * minAfields, * minAdegs, * minBdegs;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(B->length == 1);
+
+    TMP_START;
+
+    /* get the field-wise minimum of A */
+    minAfields = (fmpz *) TMP_ALLOC(ctx->minfo->nfields*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nfields; i++)
+        fmpz_init(minAfields + i);
+    mpoly_min_fields_fmpz(minAfields, A->exps, A->length, A->bits, ctx->minfo);
+
+    /* unpack to get the min degrees of each variable in A */
+    minAdegs = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nvars; i++)
+        fmpz_init(minAdegs + i);
+    mpoly_get_monomial_ffmpz_unpacked_ffmpz(minAdegs, minAfields, ctx->minfo);
+
+    /* get the degree of each variable in B */
+    minBdegs = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
+    for (i = 0; i < ctx->minfo->nvars; i++)
+        fmpz_init(minBdegs + i);
+    mpoly_get_monomial_ffmpz(minBdegs, B->exps, B->bits, ctx->minfo);
+
+    /* compute the degree of each variable in G */
+    _fmpz_vec_min_inplace(minBdegs, minAdegs, ctx->minfo->nvars);
+
+    /* compute the coefficient of G */
+    fmpz_init_set(g, B->coeffs + 0);
+    _fmpz_vec_content_chained(g, A->coeffs, A->length);
+
+    /* write G */
+    fmpz_mpoly_fit_length(G, 1, ctx);
+    fmpz_mpoly_fit_bits(G, Gbits, ctx);
+    G->bits = Gbits;
+    mpoly_set_monomial_ffmpz(G->exps, minBdegs, Gbits, ctx->minfo);
+    fmpz_swap(G->coeffs + 0, g);
+    fmpz_clear(g);
+    _fmpz_mpoly_set_length(G, 1, ctx);
+
+    for (i = 0; i < ctx->minfo->nfields; i++)
+    {
+        fmpz_clear(minAfields + i);
+    }
+    for (i = 0; i < ctx->minfo->nvars; i++)
+    {
+        fmpz_clear(minAdegs + i);
+        fmpz_clear(minBdegs + i);
+    }
+
+    TMP_END;
+
+    return 1;
+}
+
+
+/********************** See if cofactors are monomials ***********************/
+static int _try_monomial_cofactors(
+    fmpz_mpoly_t G, flint_bitcnt_t Gbits,
+    const fmpz_mpoly_t A,
+    const fmpz_mpoly_t B,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    int success;
+    slong i, j;
+    slong NA, NG;
+    slong nvars = ctx->minfo->nvars;
+    fmpz * Abarexps, * Bbarexps, * Texps;
+    fmpz_t t1, t2;
+    fmpz_t gA, gB;
+    fmpz_mpoly_t T;
+    TMP_INIT;
+
+    FLINT_ASSERT(A->length > 0);
+    FLINT_ASSERT(B->length > 0);
+
+    if (A->length != B->length)
+        return 0;
+
+    fmpz_init(t1);
+    fmpz_init(t2);
+    fmpz_init_set(gA, A->coeffs + 0);
+    fmpz_init_set(gB, B->coeffs + 0);
+
+    for (i = A->length - 1; i > 0; i--)
+    {
+        fmpz_mul(t1, A->coeffs + 0, B->coeffs + i);
+        fmpz_mul(t2, B->coeffs + 0, A->coeffs + i);
+        success = fmpz_equal(t1, t2);
+        if (!success)
+            goto cleanup;
+
+        fmpz_gcd(gA, gA, A->coeffs + i);
+        fmpz_gcd(gB, gB, B->coeffs + i);
+    }
+
+    TMP_START;
+
+    Abarexps = (fmpz *) TMP_ALLOC(3*nvars*sizeof(fmpz));
+    Bbarexps = Abarexps + 1*nvars;
+    Texps    = Abarexps + 2*nvars;
+    for (j = 0; j < nvars; j++)
+    {
+        fmpz_init(Abarexps + j);
+        fmpz_init(Bbarexps + j);
+        fmpz_init(Texps + j);
+    }
+
+    success = mpoly_monomial_cofactors(Abarexps, Bbarexps, A->exps, A->bits,
+                                      B->exps, B->bits, A->length, ctx->minfo);
+    if (!success)
+        goto cleanup_tmp;
+
+    /* put A's cofactor coefficient in t1 */
+    fmpz_gcd(t2, gA, gB);
+    fmpz_divexact(t1, gA, t2);
+    if (fmpz_sgn(A->coeffs + 0) < 0)
+        fmpz_neg(t1, t1);
+
+    fmpz_mpoly_init3(T, A->length, Gbits, ctx);
+    NG = mpoly_words_per_exp(Gbits, ctx->minfo);
+    NA = mpoly_words_per_exp(A->bits, ctx->minfo);
+    T->length = A->length;
+    for (i = 0; i < A->length; i++)
+    {
+        mpoly_get_monomial_ffmpz(Texps, A->exps + NA*i, A->bits, ctx->minfo);
+        _fmpz_vec_sub(Texps, Texps, Abarexps, nvars);
+        mpoly_set_monomial_ffmpz(T->exps + NG*i, Texps, Gbits, ctx->minfo);
+        fmpz_divexact(T->coeffs + i, A->coeffs + i, t1);
+    }
+    fmpz_mpoly_swap(G, T, ctx);
+    fmpz_mpoly_clear(T, ctx);
+
+    success = 1;
+
+cleanup_tmp:
+
+    for (j = 0; j < nvars; j++)
+    {
+        fmpz_clear(Abarexps + j);
+        fmpz_clear(Bbarexps + j);
+        fmpz_clear(Texps + j);
+    }
+
+    TMP_END;
+
+cleanup:
+
+    fmpz_clear(t1);
+    fmpz_clear(t2);
+    fmpz_clear(gA);
+    fmpz_clear(gB);
+
+    return success;
+}
+
+
+/********* Assume B has length one when converted to univar format ***********/
+static int _try_missing_var(
+    fmpz_mpoly_t G, flint_bitcnt_t Gbits,
+    slong var,
+    const fmpz_mpoly_t A, ulong Ashift,
+    const fmpz_mpoly_t B, ulong Bshift,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    int success;
+    slong i;
+    fmpz_mpoly_t tG;
+    fmpz_mpoly_univar_t Ax;
+
+    fmpz_mpoly_init(tG, ctx);
+    fmpz_mpoly_univar_init(Ax, ctx);
+
+    fmpz_mpoly_to_univar(Ax, A, var, ctx);
+
+    FLINT_ASSERT(Ax->length > 0);
+    success = _fmpz_mpoly_gcd(tG, Gbits, B, Ax->coeffs + 0, ctx, NULL, 0);
+    if (!success)
+        goto cleanup;
+
+    for (i = 1; i < Ax->length; i++)
+    {
+        success = _fmpz_mpoly_gcd(tG, Gbits, tG, Ax->coeffs + i, ctx, NULL, 0);
+        if (!success)
+            goto cleanup;
+    }
+
+    fmpz_mpoly_swap(G, tG, ctx);
+    _mpoly_gen_shift_left(G->exps, G->bits, G->length,
+                                   var, FLINT_MIN(Ashift, Bshift), ctx->minfo);
+
+cleanup:
+
+    fmpz_mpoly_clear(tG, ctx);
+    fmpz_mpoly_univar_clear(Ax, ctx);
+
+    return success;
+}
+
+
+/******************* Test if B divides A or A divides B **********************/
+static int _try_divides(
+    fmpz_mpoly_t G,
+    const fmpz_mpoly_t A, int try_a,
+    const fmpz_mpoly_t B, int try_b,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    int success;
+    fmpz_t cA, cB, cG;
+    fmpz_mpoly_t Q;
+    fmpz_mpoly_t AA, BB;
+    slong AA_alloc, BB_alloc;
+
+    *AA = *A;
+    *BB = *B;
+    fmpz_init(cA);
+    fmpz_init(cB);
+    fmpz_init(cG);
+    fmpz_mpoly_init(Q, ctx);
+
+    _fmpz_vec_content(cA, A->coeffs, A->length);
+    _fmpz_vec_content(cB, B->coeffs, B->length);
+    fmpz_gcd(cG, cA, cB);
+
+    AA_alloc = 0;
+    if (!fmpz_is_one(cA))
+    {
+        AA_alloc = A->length;
+        AA->coeffs = _fmpz_vec_init(A->length);
+        _fmpz_vec_scalar_divexact_fmpz(AA->coeffs, A->coeffs, A->length, cA);
+        FLINT_ASSERT(AA_alloc > 0);
+    }
+
+    BB_alloc = 0;
+    if (!fmpz_is_one(cB))
+    {
+        BB_alloc = B->length;
+        BB->coeffs = _fmpz_vec_init(B->length);
+        _fmpz_vec_scalar_divexact_fmpz(BB->coeffs, B->coeffs, B->length, cB);
+        FLINT_ASSERT(BB_alloc > 0);
+    }
+
+    fmpz_divexact(cA, cA, cG);
+    fmpz_divexact(cB, cB, cG);
+
+    if (try_b && fmpz_mpoly_divides_threaded(Q, AA, BB, ctx, 1))
+    {
+        fmpz_mpoly_scalar_divexact_fmpz(G, B, cB, ctx);
+        success = 1;
+        goto cleanup;
+    }
+
+    if (try_a && fmpz_mpoly_divides_threaded(Q, BB, AA, ctx, 1))
+    {
+        fmpz_mpoly_scalar_divexact_fmpz(G, A, cA, ctx);
+        success = 1;
+        goto cleanup;
+    }
+
+    success = 0;
+
+cleanup:
+
+    if (AA_alloc > 0)
+        _fmpz_vec_clear(AA->coeffs, AA_alloc);
+
+    if (BB_alloc > 0)
+        _fmpz_vec_clear(BB->coeffs, BB_alloc);
+
+    fmpz_mpoly_clear(Q, ctx);
+    fmpz_clear(cA);
+    fmpz_clear(cB);
+    fmpz_clear(cG);
+
+    return success;
+}
+
+
+/********************** Hit A and B with zippel ******************************/
 static int _try_zippel(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -463,6 +754,7 @@ cleanup:
 }
 
 
+/************************ Hit A and B with bma *******************************/
 typedef struct
 {
     const fmpz_mpoly_struct * P;
@@ -652,6 +944,7 @@ cleanup:
 }
 
 
+/*********************** Hit A and B with brown ******************************/
 typedef struct
 {
     fmpz_mpoly_struct * Pl;
@@ -776,131 +1069,8 @@ cleanup:
 
 
 /*
-    Assume when B is converted to univar format, its length would be one.
-    Gcd is gcd of coefficients of univar(A) and B (modulo some shifts).
-*/
-static int _try_missing_var(
-    fmpz_mpoly_t G,
-    slong var,
-    const fmpz_mpoly_t A, ulong Ashift,
-    const fmpz_mpoly_t B, ulong Bshift,
-    mpoly_gcd_info_t I,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    int success;
-    slong i;
-    fmpz_mpoly_t tG;
-    fmpz_mpoly_univar_t Ax;
-
-    fmpz_mpoly_init(tG, ctx);
-    fmpz_mpoly_univar_init(Ax, ctx);
-
-    fmpz_mpoly_to_univar(Ax, A, var, ctx);
-
-    FLINT_ASSERT(Ax->length > 0);
-    success = _fmpz_mpoly_gcd(tG, I->Gbits, B, Ax->coeffs + 0, ctx, NULL, 0);
-
-    if (!success)
-        goto cleanup;
-
-    for (i = 1; i < Ax->length; i++)
-    {
-        success = _fmpz_mpoly_gcd(tG, I->Gbits, tG, Ax->coeffs + i, ctx, NULL, 0);
-        if (!success)
-            goto cleanup;
-    }
-
-    fmpz_mpoly_swap(G, tG, ctx);
-    _mpoly_gen_shift_left(G->exps, G->bits, G->length,
-                                   var, FLINT_MIN(Ashift, Bshift), ctx->minfo);
-
-cleanup:
-
-    fmpz_mpoly_clear(tG, ctx);
-    fmpz_mpoly_univar_clear(Ax, ctx);
-
-    return success;
-}
-
-/*
-    Test if B divides A or A divides B
-        TODO: incorporate deflation
-*/
-static int _try_divides(
-    fmpz_mpoly_t G,
-    const fmpz_mpoly_t A, int try_a,
-    const fmpz_mpoly_t B, int try_b,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    int success, free_a, free_b;
-    fmpz_t cA, cB, cG;
-    fmpz_mpoly_t Q;
-    fmpz_mpoly_t AA, BB;
-
-    *AA = *A;
-    *BB = *B;
-    fmpz_init(cA);
-    fmpz_init(cB);
-    fmpz_init(cG);
-    fmpz_mpoly_init(Q, ctx);
-
-    _fmpz_vec_content(cA, A->coeffs, A->length);
-    _fmpz_vec_content(cB, B->coeffs, B->length);
-    fmpz_gcd(cG, cA, cB);
-
-    free_a = 0;
-    if (!fmpz_is_one(cA))
-    {
-        AA->coeffs = _fmpz_vec_init(A->alloc);
-        _fmpz_vec_scalar_divexact_fmpz(AA->coeffs, A->coeffs, A->length, cA);
-        free_a = 1;
-    }
-
-    free_b = 0;
-    if (!fmpz_is_one(cB))
-    {
-        BB->coeffs = _fmpz_vec_init(B->alloc);
-        _fmpz_vec_scalar_divexact_fmpz(BB->coeffs, B->coeffs, B->length, cB);
-        free_b = 1;
-    }
-
-    if (try_b && fmpz_mpoly_divides_threaded(Q, AA, BB, ctx, 1))
-    {
-        fmpz_mpoly_scalar_mul_fmpz(G, BB, cG, ctx);
-        success = 1;
-        goto cleanup;
-    }
-
-    if (try_a && fmpz_mpoly_divides_threaded(Q, BB, AA, ctx, 1))
-    {
-        fmpz_mpoly_scalar_mul_fmpz(G, AA, cG, ctx);
-        success = 1;
-        goto cleanup;
-    }
-
-    success = 0;
-
-cleanup:
-
-    fmpz_mpoly_clear(Q, ctx);
-    fmpz_clear(cA);
-    fmpz_clear(cB);
-    fmpz_clear(cG);
-
-    if (free_a)
-        _fmpz_vec_clear(AA->coeffs, A->alloc);
-
-    if (free_b)
-        _fmpz_vec_clear(BB->coeffs, B->alloc);
-
-    return success;
-}
-
-
-/*
-    The function must pack a successful answer into bits = Gbits <= FLINT_BITS
-    Both A and B have to be packed into bits <= FLINT_BITS
-
+    The function must pack a successful answer into bits = Gbits <= FLINT_BITS.
+    Both A and B have to be packed into bits <= FLINT_BITS.
     return is 1 for success, 0 for failure.
 */
 int _fmpz_mpoly_gcd(
@@ -928,11 +1098,11 @@ int _fmpz_mpoly_gcd(
 
     if (A->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, Gbits, B, A, ctx);
+        return _try_monomial_gcd(G, Gbits, B, A, ctx);
     }
     else if (B->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, Gbits, A, B, ctx);
+        return _try_monomial_gcd(G, Gbits, A, B, ctx);
     }
 
     mpoly_gcd_info_init(I, nvars);
@@ -949,15 +1119,17 @@ int _fmpz_mpoly_gcd(
     /* set ess(p) := p/term_content(p) */
 
     /* check if the cofactors could be monomials, i.e. ess(A) == ess(B) */
-    if (A->length == B->length)
+    for (j = 0; j < nvars; j++)
     {
-        if (_fmpz_mpoly_gcd_monomial_cofactors_sp(G, Gbits,
-                                             A, I->Amax_exp, I->Amin_exp,
-                                             B, I->Bmax_exp, I->Bmin_exp, ctx))
-        {
-            goto successful;
-        }
+        if (I->Amax_exp[j] - I->Amin_exp[j] != I->Bmax_exp[j] - I->Bmin_exp[j])
+            goto skip_monomial_cofactors;
     }
+    if (_try_monomial_cofactors(G, I->Gbits, A, B, ctx))
+    {
+        goto successful;
+    }
+
+skip_monomial_cofactors:
 
     mpoly_gcd_info_stride(I->Gstride,
             A->exps, A->bits, A->length, I->Amax_exp, I->Amin_exp,
@@ -1091,16 +1263,20 @@ calculate_trivial_gcd:
     }
     if (v_in_A_only != -WORD(1))
     {
-        success = _try_missing_var(G, v_in_A_only,
-                                             A, I->Amin_exp[v_in_A_only],
-                                             B, I->Bmin_exp[v_in_A_only], I, ctx);
+        success = _try_missing_var(G, I->Gbits,
+                                   v_in_A_only,
+                                   A, I->Amin_exp[v_in_A_only],
+                                   B, I->Bmin_exp[v_in_A_only],
+                                   ctx);
         goto cleanup;
     }
     if (v_in_B_only != -WORD(1))
     {
-        success = _try_missing_var(G, v_in_B_only,
-                                             B, I->Bmin_exp[v_in_B_only],
-                                             A, I->Amin_exp[v_in_B_only], I, ctx);
+        success = _try_missing_var(G, I->Gbits,
+                                   v_in_B_only,
+                                   B, I->Bmin_exp[v_in_B_only],
+                                   A, I->Amin_exp[v_in_B_only],
+                                   ctx);
         goto cleanup;
     }
 
@@ -1150,7 +1326,6 @@ calculate_trivial_gcd:
 
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
     mpoly_gcd_info_measure_bma(I, A->length, B->length, ctx->minfo);
-    mpoly_gcd_info_measure_zippel(I, A->length, B->length, ctx->minfo);
 
     if (I->mvars == 2)
     {
@@ -1178,6 +1353,8 @@ calculate_trivial_gcd:
         if (_try_bma(G, A, B, I, ctx, handles, num_handles))
             goto successful;
     }
+
+    mpoly_gcd_info_measure_zippel(I, A->length, B->length, ctx->minfo);
 
     if (_try_zippel(G, A, B, I, ctx))
         goto successful;
@@ -1289,13 +1466,13 @@ int fmpz_mpoly_gcd_threaded(
 
     if (A->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, Gbits, B, A, ctx);
+        return _try_monomial_gcd(G, Gbits, B, A, ctx);
     }
     else if (B->length == 1)
     {
-        return _fmpz_mpoly_gcd_monomial(G, Gbits, A, B, ctx);
+        return _try_monomial_gcd(G, Gbits, A, B, ctx);
     }
-    else if (_fmpz_mpoly_gcd_monomial_cofactors(G, A, B, ctx))
+    else if (_try_monomial_cofactors(G, Gbits, A, B, ctx))
     {
         return 1;
     }

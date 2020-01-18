@@ -310,10 +310,11 @@ static int _try_divides(
     const fmpz_mpoly_t B, int try_b,
     const fmpz_mpoly_ctx_t ctx)
 {
-    int success, free_a, free_b;
+    int success;
     fmpz_t cA, cB, cG;
     fmpz_mpoly_t Q;
     fmpz_mpoly_t AA, BB;
+    slong AA_alloc, BB_alloc;
 
     *AA = *A;
     *BB = *B;
@@ -326,20 +327,22 @@ static int _try_divides(
     _fmpz_vec_content(cB, B->coeffs, B->length);
     fmpz_gcd(cG, cA, cB);
 
-    free_a = 0;
+    AA_alloc = 0;
     if (!fmpz_is_one(cA))
     {
-        AA->coeffs = _fmpz_vec_init(A->alloc);
+        AA_alloc = A->length;
+        AA->coeffs = _fmpz_vec_init(A->length);
         _fmpz_vec_scalar_divexact_fmpz(AA->coeffs, A->coeffs, A->length, cA);
-        free_a = 1;
+        FLINT_ASSERT(AA_alloc > 0);
     }
 
-    free_b = 0;
+    BB_alloc = 0;
     if (!fmpz_is_one(cB))
     {
-        BB->coeffs = _fmpz_vec_init(B->alloc);
+        BB_alloc = B->length;
+        BB->coeffs = _fmpz_vec_init(B->length);
         _fmpz_vec_scalar_divexact_fmpz(BB->coeffs, B->coeffs, B->length, cB);
-        free_b = 1;
+        FLINT_ASSERT(BB_alloc > 0);
     }
 
     fmpz_divexact(cA, cA, cG);
@@ -347,47 +350,33 @@ static int _try_divides(
 
     if (try_b && fmpz_mpoly_divides_threaded(Q, AA, BB, ctx, 1))
     {
-        if (free_a)
-            _fmpz_vec_clear(AA->coeffs, A->alloc);
-
-        if (free_b)
-            _fmpz_vec_clear(BB->coeffs, B->alloc);
-
         fmpz_mpoly_scalar_divexact_fmpz(G, B, cB, ctx);
         fmpz_mpoly_swap(Abar, Q, ctx);
         _fmpz_vec_scalar_mul_fmpz(Abar->coeffs, Abar->coeffs, Abar->length, cA);
         fmpz_mpoly_set_fmpz(Bbar, cB, ctx);
-
         success = 1;
         goto cleanup;
     }
 
     if (try_a && fmpz_mpoly_divides_threaded(Q, BB, AA, ctx, 1))
     {
-        if (free_a)
-            _fmpz_vec_clear(AA->coeffs, A->alloc);
-
-        if (free_b)
-            _fmpz_vec_clear(BB->coeffs, B->alloc);
-
         fmpz_mpoly_scalar_divexact_fmpz(G, A, cA, ctx);
         fmpz_mpoly_swap(Bbar, Q, ctx);
         _fmpz_vec_scalar_mul_fmpz(Bbar->coeffs, Bbar->coeffs, Bbar->length, cB);
         fmpz_mpoly_set_fmpz(Abar, cA, ctx);
-
         success = 1;
         goto cleanup;
     }
 
-    if (free_a)
-        _fmpz_vec_clear(AA->coeffs, A->alloc);
-
-    if (free_b)
-        _fmpz_vec_clear(BB->coeffs, B->alloc);
-
     success = 0;
 
 cleanup:
+
+    if (AA_alloc > 0)
+        _fmpz_vec_clear(AA->coeffs, AA_alloc);
+
+    if (BB_alloc > 0)
+        _fmpz_vec_clear(BB->coeffs, BB_alloc);
 
     fmpz_mpoly_clear(Q, ctx);
     fmpz_clear(cA);
