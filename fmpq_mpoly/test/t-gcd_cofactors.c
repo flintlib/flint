@@ -15,6 +15,8 @@
 
 void gcd_check(
     fmpq_mpoly_t g,
+    fmpq_mpoly_t abar,
+    fmpq_mpoly_t bbar,
     fmpq_mpoly_t a,
     fmpq_mpoly_t b,
     const fmpq_mpoly_t gdiv,
@@ -25,15 +27,21 @@ void gcd_check(
 {
     int res;
     fmpq_t lc;
-    fmpq_mpoly_t ca, cb, cg;
+    fmpq_mpoly_t ca, cb, cg, u, v, w;
 
     fmpq_init(lc);
     fmpq_mpoly_init(ca, ctx);
     fmpq_mpoly_init(cb, ctx);
     fmpq_mpoly_init(cg, ctx);
+    fmpq_mpoly_init(u, ctx);
+    fmpq_mpoly_init(v, ctx);
+    fmpq_mpoly_init(w, ctx);
 
-    res = fmpq_mpoly_gcd(g, a, b, ctx);
+    res = fmpq_mpoly_gcd_cofactors(g, abar, bbar, a, b, ctx);
+
     fmpq_mpoly_assert_canonical(g, ctx);
+    fmpq_mpoly_assert_canonical(abar, ctx);
+    fmpq_mpoly_assert_canonical(bbar, ctx);
 
     if (!res)
     {
@@ -51,6 +59,15 @@ void gcd_check(
                                          "i = %wd, j = %wd, %s\n", i, j, name);
             flint_abort();
         }
+    }
+
+    fmpq_mpoly_mul(ca, g, abar, ctx);
+    fmpq_mpoly_mul(cb, g, bbar, ctx);
+    if (!fmpq_mpoly_equal(ca, a, ctx) || !fmpq_mpoly_equal(cb, b, ctx))
+    {
+        printf("FAIL\n");
+        flint_printf("Check cofactors i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
     }
 
     if (fmpq_mpoly_is_zero(g, ctx))
@@ -74,44 +91,146 @@ void gcd_check(
         flint_abort();
     }
 
-    if ((i + j % 11) == 0)
+    fmpq_mpoly_set(u, b, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, a, u, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
     {
-        fmpq_mpoly_set(cg, b, ctx);
-        fmpq_mpoly_gcd(cg, cg, a, ctx);
-        if (!fmpq_mpoly_equal(cg, g, ctx))
-        {
-            printf("FAIL\n");
-            flint_printf("Check aliasing 1\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
-            flint_abort();
-        }
-    }
-
-    if ((i + j % 9) == 0)
-    {
-        fmpq_mpoly_set(cg, b, ctx);
-        fmpq_mpoly_gcd(cg, a, cg, ctx);
-        if (!fmpq_mpoly_equal(cg, g, ctx))
-        {
-            printf("FAIL\n");
-            flint_printf("Check aliasing 2\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
-            flint_abort();
-        }
-    }
-
-    res = 1;
-    res = res && fmpq_mpoly_divides(ca, a, g, ctx);
-    res = res && fmpq_mpoly_divides(cb, b, g, ctx);
-    if (!res)
-    {
-        printf("FAIL\n");
-        flint_printf("Check divisibility\n"
-                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_printf("FAIL (u, v, w), (a, u): i = %wd, j = %wd, %s\n", i, j, name);
         flint_abort();
     }
 
-    res = fmpq_mpoly_gcd(cg, ca, cb, ctx);
+    fmpq_mpoly_set(v, b, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, a, v, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (a, v): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(w, b, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, a, w, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (a, w): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(u, a, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, u, b, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (u, b): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(v, a, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, v, b, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (v, b): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(w, a, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, w, b, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (w, b): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(u, a, ctx);
+    fmpq_mpoly_set(v, b, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, u, v, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (u, v): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(v, a, ctx);
+    fmpq_mpoly_set(u, b, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, v, u, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (v, u): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(u, a, ctx);
+    fmpq_mpoly_set(w, b, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, u, w, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (u, w): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(w, a, ctx);
+    fmpq_mpoly_set(u, b, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, w, u, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (w, u): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(v, a, ctx);
+    fmpq_mpoly_set(w, b, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, v, w, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (v, w): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    fmpq_mpoly_set(w, a, ctx);
+    fmpq_mpoly_set(v, b, ctx);
+    fmpq_mpoly_gcd_cofactors(u, v, w, w, v, ctx);
+    fmpq_mpoly_assert_canonical(u, ctx);
+    fmpq_mpoly_assert_canonical(v, ctx);
+    fmpq_mpoly_assert_canonical(w, ctx);
+    if (!fmpq_mpoly_equal(g, u, ctx) || !fmpq_mpoly_equal(abar, v, ctx) || !fmpq_mpoly_equal(bbar, w, ctx))
+    {
+        flint_printf("FAIL (u, v, w), (w, v): i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+
+    res = fmpq_mpoly_gcd_cofactors(cg, ca, cb, abar, bbar, ctx);
     fmpq_mpoly_assert_canonical(cg, ctx);
 
     if (!res)
@@ -130,43 +249,67 @@ void gcd_check(
         flint_abort();
     }
 
+    if (!fmpq_mpoly_equal(ca, abar, ctx) || !fmpq_mpoly_equal(cb, bbar, ctx))
+    {
+        printf("FAIL\n");
+        flint_printf("Check cofactors of cofactors\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
+    res = fmpq_mpoly_gcd_cofactors(cg, abar, bbar, abar, bbar, ctx);
+    fmpq_mpoly_assert_canonical(cg, ctx);
+
+    if (!fmpq_mpoly_equal(ca, abar, ctx) || !fmpq_mpoly_equal(cb, bbar, ctx))
+    {
+        printf("FAIL\n");
+        flint_printf("Check cofactors of cofactors with aliasing\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+        flint_abort();
+    }
+
 cleanup:
 
     fmpq_clear(lc);
     fmpq_mpoly_clear(ca, ctx);
     fmpq_mpoly_clear(cb, ctx);
     fmpq_mpoly_clear(cg, ctx);
+    fmpq_mpoly_clear(u, ctx);
+    fmpq_mpoly_clear(v, ctx);
+    fmpq_mpoly_clear(w, ctx);
 }
 
 int
 main(void)
 {
     const slong max_threads = 5;
-    slong i, j, k, tmul = 5;
+    slong i, j, k, tmul = 3;
     FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;
 #endif
 
-    flint_printf("gcd....");
+    flint_printf("gcd_cofactors....");
     fflush(stdout);
 
     {
         int success;
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t g, a, b;
+        fmpq_mpoly_t g, abar, bbar, a, b;
         const char * vars[] = {"x" ,"y", "z", "t"};
 
         fmpq_mpoly_ctx_init(ctx, 4, ORD_LEX);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
 
         fmpq_mpoly_set_str_pretty(a, "x^3 + 1", vars, ctx);
         fmpq_mpoly_set_str_pretty(b, "x^9999999999999999999999 + x^3333333333333333333333 + x", vars, ctx);
 
         flint_set_num_threads(n_randint(state, max_threads) + 1);
-        success = fmpq_mpoly_gcd(g, a, b, ctx);
+        success = fmpq_mpoly_gcd_cofactors(g, abar, bbar, a, b, ctx);
         if (success)
         {
             printf("FAIL\n");
@@ -177,6 +320,8 @@ main(void)
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_ctx_clear(ctx);
     }
 
@@ -184,13 +329,15 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t a, b, g, t;
+        fmpq_mpoly_t a, b, g, abar, bbar, t;
         slong len, len1, len2;
         flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 10);
 
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(t, ctx);
@@ -222,10 +369,12 @@ main(void)
             fmpq_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, t, ctx, i, j, "monomial");
+            gcd_check(g, abar, bbar, a, b, t, ctx, i, j, "monomial");
         }
 
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(t, ctx);
@@ -236,13 +385,15 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t a, b, g, t1, t2;
+        fmpq_mpoly_t a, b, g, abar, bbar, t1, t2;
         slong len, len1;
         flint_bitcnt_t coeff_bits, exp_bits, exp_bits1, exp_bits2;
 
         fmpq_mpoly_ctx_init_rand(ctx, state, 10);
 
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(t1, ctx);
@@ -272,10 +423,12 @@ main(void)
             fmpq_mpoly_randtest_bits(g, state, len, coeff_bits, exp_bits, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, t2, b, a, ctx, i, j, "monomial cofactors");
+            gcd_check(g, abar, bbar, t2, b, a, ctx, i, j, "monomial cofactors");
         }
 
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(t1, ctx);
@@ -288,7 +441,7 @@ main(void)
     {
         fmpz_t c;
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t a, b, g, t1, t2;
+        fmpq_mpoly_t a, b, g, abar, bbar, t1, t2;
         slong len, len1, len2;
         mp_limb_t exp_bound, exp_bound1, exp_bound2;
         flint_bitcnt_t coeff_bits;
@@ -297,6 +450,8 @@ main(void)
 
         fmpz_init(c);
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(t1, ctx);
@@ -329,11 +484,13 @@ main(void)
             if ((j%2) == 0)
                 fmpq_mpoly_swap(a, b, ctx);
 
-            gcd_check(g, a, b, t2, ctx, i, j, "one input divides the other");
+            gcd_check(g, abar, bbar, a, b, t2, ctx, i, j, "one input divides the other");
         }
 
         fmpz_clear(c);
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(t1, ctx);
@@ -345,7 +502,7 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t a, b, g, t;
+        fmpq_mpoly_t a, b, g, abar, bbar, t;
         flint_bitcnt_t coeff_bits;
         slong len, len1, len2;
         slong degbound;
@@ -353,15 +510,17 @@ main(void)
         fmpq_mpoly_ctx_init_rand(ctx, state, 5);
 
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(t, ctx);
 
-        len = n_randint(state, 20) + 1;
-        len1 = n_randint(state, 30);
-        len2 = n_randint(state, 30);
+        len = n_randint(state, 10) + 1;
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20);
 
-        degbound = 30/(2*ctx->zctx->minfo->nvars - 1);
+        degbound = 25/(2*ctx->zctx->minfo->nvars - 1);
 
         coeff_bits = n_randint(state, 200);
 
@@ -378,10 +537,12 @@ main(void)
             fmpq_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, t, ctx, i, j, "sparse inputs");
+            gcd_check(g, abar, bbar, a, b, t, ctx, i, j, "sparse inputs");
         }
 
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(t, ctx);
@@ -392,7 +553,7 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t a, b, g, t;
+        fmpq_mpoly_t a, b, g, abar, bbar, t;
         mp_limb_t rlimb;
         flint_bitcnt_t coeff_bits, newbits;
         slong len, len1, len2;
@@ -401,15 +562,17 @@ main(void)
         fmpq_mpoly_ctx_init_rand(ctx, state, 5);
 
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(t, ctx);
 
-        len = n_randint(state, 20) + 1;
-        len1 = n_randint(state, 30);
-        len2 = n_randint(state, 30);
+        len = n_randint(state, 10) + 1;
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20);
 
-        degbound = 30/(2*ctx->zctx->minfo->nvars - 1);
+        degbound = 25/(2*ctx->zctx->minfo->nvars - 1);
 
         coeff_bits = n_randint(state, 200);
 
@@ -442,10 +605,12 @@ main(void)
             fmpq_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, t, ctx, i, j, "sparse input with repacking");
+            gcd_check(g, abar, bbar, a, b, t, ctx, i, j, "sparse input with repacking");
         }
 
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(t, ctx);
@@ -456,7 +621,7 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t a, b, g, t;
+        fmpq_mpoly_t a, b, g, abar, bbar, t;
         flint_bitcnt_t coeff_bits;
         fmpz * shifts1, * shifts2, * strides;
         flint_bitcnt_t stride_bits, shift_bits;
@@ -466,15 +631,17 @@ main(void)
         fmpq_mpoly_ctx_init_rand(ctx, state, 5);
 
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(t, ctx);
 
-        len = n_randint(state, 20) + 1;
-        len1 = n_randint(state, 30);
-        len2 = n_randint(state, 30);
+        len = n_randint(state, 10) + 1;
+        len1 = n_randint(state, 20);
+        len2 = n_randint(state, 20);
 
-        degbound = 30/(2*ctx->zctx->minfo->nvars - 1);
+        degbound = 25/(2*ctx->zctx->minfo->nvars - 1);
 
         coeff_bits = n_randint(state, 200);
 
@@ -520,7 +687,7 @@ main(void)
             fmpq_mpoly_inflate(t, t, shifts1, strides, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, t, ctx, i, j, "sparse input with inflation");
+            gcd_check(g, abar, bbar, a, b, t, ctx, i, j, "sparse input with inflation");
         }
 
         for (k = 0; k < ctx->zctx->minfo->nvars; k++)
@@ -534,6 +701,8 @@ main(void)
         flint_free(strides);
 
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(t, ctx);
@@ -544,7 +713,7 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t a, b, g, t;
+        fmpq_mpoly_t a, b, g, abar, bbar, t;
         flint_bitcnt_t coeff_bits1, coeff_bits2, coeff_bits3, coeff_bits4;
         slong len1, len2, len3, len4;
         ulong degbounds1[4];
@@ -555,27 +724,29 @@ main(void)
         fmpq_mpoly_ctx_init_rand(ctx, state, 4);
 
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(t, ctx);
 
-        len1 = n_randint(state, 300) + 1;
-        len2 = n_randint(state, 300);
-        len3 = n_randint(state, 300);
-        len4 = n_randint(state, 300);
- 
+        len1 = n_randint(state, 150) + 1;
+        len2 = n_randint(state, 150);
+        len3 = n_randint(state, 150);
+        len4 = n_randint(state, 150);
+
         for (j = 0; j < ctx->zctx->minfo->nvars; j++)
         {
-            degbounds1[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);
-            degbounds2[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);
-            degbounds3[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);
+            degbounds1[j] = 1 + n_randint(state, 12/ctx->zctx->minfo->nvars);
+            degbounds2[j] = 1 + n_randint(state, 12/ctx->zctx->minfo->nvars);
+            degbounds3[j] = 1 + n_randint(state, 12/ctx->zctx->minfo->nvars);
         }
 
-        bits4 = n_randint(state, 200);
-        coeff_bits1 = n_randint(state, 200);
-        coeff_bits2 = n_randint(state, 200);
-        coeff_bits3 = n_randint(state, 200);
-        coeff_bits4 = n_randint(state, 200);
+        bits4 = n_randint(state, 100);
+        coeff_bits1 = n_randint(state, 100);
+        coeff_bits2 = n_randint(state, 100);
+        coeff_bits3 = n_randint(state, 100);
+        coeff_bits4 = n_randint(state, 100);
 
         for (j = 0; j < 4; j++)
         {
@@ -590,10 +761,12 @@ main(void)
             fmpq_mpoly_randtest_bits(g, state, len4, coeff_bits4, bits4, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, t, ctx, i, j, "dense input");
+            gcd_check(g, abar, bbar, a, b, t, ctx, i, j, "dense input");
         }
 
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(t, ctx);
@@ -604,7 +777,7 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t a, b, g, t;
+        fmpq_mpoly_t a, b, g, abar, bbar, t;
         mp_limb_t rlimb;
         flint_bitcnt_t newbits;
         flint_bitcnt_t coeff_bits1, coeff_bits2, coeff_bits3, coeff_bits4;
@@ -617,27 +790,29 @@ main(void)
         fmpq_mpoly_ctx_init_rand(ctx, state, 4);
 
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(t, ctx);
 
-        len1 = n_randint(state, 300) + 1;
-        len2 = n_randint(state, 300);
-        len3 = n_randint(state, 300);
-        len4 = n_randint(state, 300);
+        len1 = n_randint(state, 150) + 1;
+        len2 = n_randint(state, 150);
+        len3 = n_randint(state, 150);
+        len4 = n_randint(state, 150);
 
         for (j = 0; j < ctx->zctx->minfo->nvars; j++)
         {
-            degbounds1[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);
-            degbounds2[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);
-            degbounds3[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);
+            degbounds1[j] = 1 + n_randint(state, 12/ctx->zctx->minfo->nvars);
+            degbounds2[j] = 1 + n_randint(state, 12/ctx->zctx->minfo->nvars);
+            degbounds3[j] = 1 + n_randint(state, 12/ctx->zctx->minfo->nvars);
         }
 
-        bits4 = n_randint(state, 200);
-        coeff_bits1 = n_randint(state, 200);
-        coeff_bits2 = n_randint(state, 200);
-        coeff_bits3 = n_randint(state, 200);
-        coeff_bits4 = n_randint(state, 200);
+        bits4 = n_randint(state, 100);
+        coeff_bits1 = n_randint(state, 100);
+        coeff_bits2 = n_randint(state, 100);
+        coeff_bits3 = n_randint(state, 100);
+        coeff_bits4 = n_randint(state, 100);
 
         for (j = 0; j < 4; j++)
         {
@@ -668,10 +843,12 @@ main(void)
             fmpq_mpoly_randtest_bits(g, state, len4, coeff_bits4, bits4, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, t, ctx, i, j, "dense input with repacking");
+            gcd_check(g, abar, bbar, a, b, t, ctx, i, j, "dense input with repacking");
         }
 
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(t, ctx);
@@ -682,7 +859,7 @@ main(void)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpq_mpoly_ctx_t ctx;
-        fmpq_mpoly_t a, b, g, t;
+        fmpq_mpoly_t a, b, g, abar, bbar, t;
         fmpz * shifts1, * shifts2, * strides;
         flint_bitcnt_t stride_bits, shift_bits;
         flint_bitcnt_t coeff_bits1, coeff_bits2, coeff_bits3, coeff_bits4;
@@ -695,27 +872,29 @@ main(void)
         fmpq_mpoly_ctx_init_rand(ctx, state, 4);
 
         fmpq_mpoly_init(g, ctx);
+        fmpq_mpoly_init(abar, ctx);
+        fmpq_mpoly_init(bbar, ctx);
         fmpq_mpoly_init(a, ctx);
         fmpq_mpoly_init(b, ctx);
         fmpq_mpoly_init(t, ctx);
 
-        len1 = n_randint(state, 300) + 1;
-        len2 = n_randint(state, 300);
-        len3 = n_randint(state, 300);
-        len4 = n_randint(state, 300);
+        len1 = n_randint(state, 150) + 1;
+        len2 = n_randint(state, 150);
+        len3 = n_randint(state, 150);
+        len4 = n_randint(state, 150);
 
         for (j = 0; j < ctx->zctx->minfo->nvars; j++)
         {
-            degbounds1[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);
-            degbounds2[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);
-            degbounds3[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);
+            degbounds1[j] = 1 + n_randint(state, 12/ctx->zctx->minfo->nvars);
+            degbounds2[j] = 1 + n_randint(state, 12/ctx->zctx->minfo->nvars);
+            degbounds3[j] = 1 + n_randint(state, 12/ctx->zctx->minfo->nvars);
         }
 
-        bits4 = n_randint(state, 200);
-        coeff_bits1 = n_randint(state, 200);
-        coeff_bits2 = n_randint(state, 200);
-        coeff_bits3 = n_randint(state, 200);
-        coeff_bits4 = n_randint(state, 200);
+        bits4 = n_randint(state, 100);
+        coeff_bits1 = n_randint(state, 100);
+        coeff_bits2 = n_randint(state, 100);
+        coeff_bits3 = n_randint(state, 100);
+        coeff_bits4 = n_randint(state, 100);
 
         stride_bits = n_randint(state, 100) + 2;
         shift_bits = n_randint(state, 100) + 2;
@@ -759,7 +938,7 @@ main(void)
             fmpq_mpoly_inflate(t, t, shifts1, strides, ctx);
 
             flint_set_num_threads(n_randint(state, max_threads) + 1);
-            gcd_check(g, a, b, t, ctx, i, j, "dense input with inflation");
+            gcd_check(g, abar, bbar, a, b, t, ctx, i, j, "dense input with inflation");
         }
 
         for (k = 0; k < ctx->zctx->minfo->nvars; k++)
@@ -773,6 +952,8 @@ main(void)
         flint_free(strides);
 
         fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(abar, ctx);
+        fmpq_mpoly_clear(bbar, ctx);
         fmpq_mpoly_clear(a, ctx);
         fmpq_mpoly_clear(b, ctx);
         fmpq_mpoly_clear(t, ctx);

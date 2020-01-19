@@ -12,22 +12,31 @@
 #include "fmpq_mpoly.h"
 
 
-int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A,
-                          const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+int fmpq_mpoly_gcd_threaded(fmpq_mpoly_t G, const fmpq_mpoly_t A,
+         const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit)
 {
     int success;
 
-    if (fmpq_mpoly_is_zero(A, ctx) && fmpq_mpoly_is_zero(B, ctx))
+    success = fmpz_mpoly_gcd_threaded(G->zpoly, A->zpoly, B->zpoly,
+                                                      ctx->zctx, thread_limit);
+    if (!success)
+        return 0;
+
+    if (G->zpoly->length > 0)
     {
-        fmpq_mpoly_zero(G, ctx);
-        return 1;
+        fmpz_one(fmpq_numref(G->content));
+        fmpz_set(fmpq_denref(G->content), G->zpoly->coeffs + 0);
+    }
+    else
+    {
+        fmpq_zero(G->content);
     }
 
-    success = fmpz_mpoly_gcd(G->zpoly, A->zpoly, B->zpoly, ctx->zctx);
-    if (success)
-    {
-        _fmpq_mpoly_make_monic_inplace(G, ctx);
-    }
+    return 1;
+}
 
-    return success;
+int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A,
+                              const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+{
+    return fmpq_mpoly_gcd_threaded(G, A, B, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
 }
