@@ -994,18 +994,6 @@ FLINT_DLL int _nmod_mpoly_gcd(nmod_mpoly_t G, flint_bitcnt_t Gbits,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
-FLINT_DLL int _nmod_mpoly_gcd_monomial(nmod_mpoly_t G, flint_bitcnt_t Gbits,
-       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int _nmod_mpoly_gcd_monomial_cofactors_sp(
-                         nmod_mpoly_t G, flint_bitcnt_t Gbits,
-         const nmod_mpoly_t A, const ulong * Amax_exp , const ulong * Amin_exp,
-         const nmod_mpoly_t B, const ulong * Bmax_exp , const ulong * Bmin_exp,
-                                                   const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL int _nmod_mpoly_gcd_monomial_cofactors(nmod_mpoly_t G,
-       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void nmod_mpoly_deflation(fmpz * shift, fmpz * stride,
                              const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
 
