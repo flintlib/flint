@@ -620,7 +620,7 @@ Greatest Common Divisor
 
 .. function:: void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-    Sets ``M`` to the GCD of the terms of ``A``.
+    Set ``M`` to the GCD of the terms of ``A``.
     If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with positive coefficient.
 
 .. function:: int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
@@ -631,9 +631,11 @@ Greatest Common Divisor
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
     The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
 
-.. function:: int fmpz_mpoly_gcd_prs(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_gcd_cofactors(fmpz_mpoly_t G, fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
-    Try to set ``G`` to the GCD of ``A`` and ``B`` using pseudo remainder sequences.
+.. function:: int fmpz_mpoly_gcd_cofactors_threaded(fmpz_mpoly_t G, fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
+    Do the operation of :func:`fmpz_mpoly_gcd` / :func:`fmpz_mpoly_gcd_threaded` but also compute the cofactors ``Abar = A/G`` and ``Bbar = B/G`` if successful.
 
 .. function:: int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
@@ -645,13 +647,6 @@ Greatest Common Divisor
 .. function:: int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Try to set ``G`` to the GCD of ``A`` and ``B`` using Zippel's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
-
-.. function:: int fmpz_mpoly_gcd_berlekamp_massey(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
-
-.. function:: int fmpz_mpoly_gcd_berlekamp_massey_threaded(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
-
-    Try to set ``G`` to the GCD of ``A`` and ``B`` using the Berlekamp-Massey algorithm to interpolate coefficients from bivariate images in the most significant two variables.
-    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 
 Univariate Functions
@@ -860,35 +855,4 @@ Internal Functions
     quotient) polynomials, is given by ``len``. The function computes
     polynomials `q_i = q[i]` such that ``poly2`` is
     `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
-
-
-.. function:: int fmpz_mpoly_gcd_prs(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    If the return is nonzero, used psuedo-remainder sequences to set 
-    ``poly1`` to the GCD of ``poly2`` and ``poly3``, where
-    ``poly1`` has positive leading term.
-
-.. function:: int fmpz_mpoly_gcd_brown(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    If the return is nonzero, used Brown's dense modular algorithm to set
-    ``poly1`` to the GCD of ``poly2`` and ``poly3``, where
-    ``poly1`` has positive leading term.
-
-.. function:: int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
-
-    If the return is nonzero, used a modular algorithm with Zippel's sparse
-    interpolation to set
-    ``poly1`` to the GCD of ``poly2`` and ``poly3``, where
-    ``poly1`` has positive leading term.
-
-.. function:: int fmpz_mpoly_resultant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, slong var, const fmpz_mpoly_ctx_t ctx)
-
-    If the return is nonzero, set ``poly1`` to the resultant of 
-    ``poly2`` and ``poly3`` with respect to the variable of
-    index ``var``.
-
-.. function:: int fmpz_mpoly_discriminant(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
-
-    If the return is nonzero, set ``poly1`` to the discriminant of
-    ``poly2`` with respect to the variable of index ``var``.
 
