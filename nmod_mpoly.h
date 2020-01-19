@@ -792,6 +792,11 @@ FLINT_DLL void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
 FLINT_DLL void nmod_mpoly_sub(nmod_mpoly_t A, const nmod_mpoly_t B,
                              const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL slong _nmod_mpoly_add(mp_limb_t * coeff1,       ulong * exp1,
+                const mp_limb_t * coeff2, const ulong * exp2, slong len2,
+                const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+                       slong N, const ulong * cmpmask, const nmodf_ctx_t fctx);
+
 FLINT_DLL slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
                     const ulong * coeff2, const ulong * exp2, slong len2,
                     const ulong * coeff3, const ulong * exp3, slong len3,
@@ -991,6 +996,20 @@ FLINT_DLL int nmod_mpoly_gcd_threaded(nmod_mpoly_t G,
                                                            slong thread_limit);
 
 FLINT_DLL int _nmod_mpoly_gcd(nmod_mpoly_t G, flint_bitcnt_t Gbits,
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
+                        const thread_pool_handle * handles, slong num_handles);
+
+FLINT_DLL int nmod_mpoly_gcd_cofactors(nmod_mpoly_t G,
+                nmod_mpoly_t Abar, nmod_mpoly_t Bbar, const nmod_mpoly_t A,
+                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int nmod_mpoly_gcd_cofactors_threaded(nmod_mpoly_t G,
+                 nmod_mpoly_t Abar, nmod_mpoly_t Bbar, const nmod_mpoly_t A,
+         const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx, slong thread_limit);
+
+FLINT_DLL int _nmod_mpoly_gcd_cofactors(nmod_mpoly_t G, flint_bitcnt_t Gbits,
+                                   nmod_mpoly_t Abar, flint_bitcnt_t Abarbits,
+                                   nmod_mpoly_t Bbar, flint_bitcnt_t Bbarbits,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
@@ -1356,22 +1375,30 @@ FLINT_DLL void nmod_mpoly_from_mpolyu_perm_inflate(
                         const nmod_mpolyu_t B, const nmod_mpoly_ctx_t uctx,
                 const slong * perm, const ulong * shift, const ulong * stride);
 
+FLINT_DLL int nmod_mpolyuu_divides(nmod_mpolyu_t Q, const nmod_mpolyu_t A,
+           const nmod_mpolyu_t B, slong nmainvars, const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL int nmod_mpolyu_divides(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpolyu_divexact_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                    nmod_mpoly_t c, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void nmod_mpolyu_divexact_mpoly_inplace(nmod_mpolyu_t A,
+                                   nmod_mpoly_t c, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpolyu_mul_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                    nmod_mpoly_t c, const nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void nmod_mpolyu_mul_mpoly_inplace(nmod_mpolyu_t A, nmod_mpoly_t c,
+                                                   const nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void nmod_mpolyu_setform(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpolyu_gcdm_zippel(nmod_mpolyu_t G, nmod_mpolyu_t A,
-               nmod_mpolyu_t B, nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo,
-                                                       flint_rand_t randstate);
+FLINT_DLL int nmod_mpolyu_gcdm_zippel(nmod_mpolyu_t G, nmod_mpolyu_t Abar,
+                       nmod_mpolyu_t Bbar, nmod_mpolyu_t A, nmod_mpolyu_t B,
+         nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo, flint_rand_t randstate);
 
 NMOD_MPOLY_INLINE mp_limb_t nmod_mpolyu_leadcoeff(
                                    nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctx)
@@ -1645,10 +1672,9 @@ FLINT_DLL nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
                                         slong var, const nmod_mpoly_ctx_t ctx,
                                      flint_rand_t randstate, slong * degbound);
 
-FLINT_DLL int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G,
-                             nmod_mpolyu_t A, nmod_mpolyu_t B, slong var,
-                            const nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo,
-                                                       flint_rand_t randstate);
+FLINT_DLL int nmod_mpolyu_gcdp_zippel(nmod_mpolyu_t G, nmod_mpolyu_t Abar,
+             nmod_mpolyu_t Bbar, nmod_mpolyu_t A, nmod_mpolyu_t B, slong var,
+    const nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo, flint_rand_t randstate);
 
 /* interp ********************************************************************/
 

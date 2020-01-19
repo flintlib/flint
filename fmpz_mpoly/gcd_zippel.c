@@ -116,7 +116,7 @@ int fmpz_mpolyu_gcdm_zippel(
     int success, changed;
     mp_limb_t p, t, gammap;
     fmpz_t gamma, pp, gammapp, modulus;
-    nmod_mpolyu_t Ap, Bp, Gp, Gform;
+    nmod_mpolyu_t Ap, Bp, Gp, Abarp, Bbarp, Gform;
     fmpz_mpolyu_t H;
     nmod_mpoly_ctx_t ctxp;
 
@@ -142,6 +142,8 @@ int fmpz_mpolyu_gcdm_zippel(
     nmod_mpolyu_init(Ap, A->bits, ctxp);
     nmod_mpolyu_init(Bp, A->bits, ctxp);
     nmod_mpolyu_init(Gp, A->bits, ctxp);
+    nmod_mpolyu_init(Abarp, A->bits, ctxp);
+    nmod_mpolyu_init(Bbarp, A->bits, ctxp);
     nmod_mpolyu_init(Gform, A->bits, ctxp);
 
     fmpz_mpolyu_init(H, A->bits, ctx);
@@ -173,8 +175,8 @@ choose_prime_outer:
     if (Ap->length == 0 || Bp->length == 0)
         goto choose_prime_outer;
 
-    success = nmod_mpolyu_gcdp_zippel(Gp, Ap, Bp, ctx->minfo->nvars - 1,
-                                                       ctxp, zinfo, randstate);
+    success = nmod_mpolyu_gcdp_zippel(Gp, Abarp, Bbarp, Ap, Bp,
+                                ctx->minfo->nvars - 1, ctxp, zinfo, randstate);
     if (!success || Gp->exps[0] > degbound)
         goto choose_prime_outer;
     degbound = Gp->exps[0];
@@ -277,6 +279,8 @@ cleanup:
     nmod_mpolyu_clear(Ap, ctxp);
     nmod_mpolyu_clear(Bp, ctxp);
     nmod_mpolyu_clear(Gp, ctxp);
+    nmod_mpolyu_clear(Abarp, ctxp);
+    nmod_mpolyu_clear(Bbarp, ctxp);
     nmod_mpolyu_clear(Gform, ctxp);
 
     fmpz_mpolyu_clear(H, ctx);

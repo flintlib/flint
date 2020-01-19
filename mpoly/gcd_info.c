@@ -586,7 +586,7 @@ void mpoly_gcd_info_measure_zippel(
     Glength = FLINT_MAX(1, Glength);
 
     I->can_use_zippel = 1;
-    I->zippel_time_est = 0.01*Glength*Glength
-                        + 0.0001*(Alength + Blength)*Glength*gsum_deg;
+    I->zippel_time_est = 0.00002*Glength*Glength
+                       + 0.00002*(Alength + Blength)*Glength*gsum_deg;
 }
 

@@ -745,7 +745,8 @@ static int _try_brown(
     const fmpz_mpoly_t B,
     mpoly_gcd_info_t I,
     const fmpz_mpoly_ctx_t ctx,
-    const thread_pool_handle * handles, slong num_handles)
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     int success;
     slong m = I->mvars;
@@ -825,7 +826,6 @@ static int _try_brown(
                                     I->brown_perm, I->Abarmin_exp, I->Gstride);
     fmpz_mpoly_from_mpoly_perm_inflate(Bbar, I->Bbarbits, ctx, Bbarl, lctx,
                                     I->brown_perm, I->Bbarmin_exp, I->Gstride);
-
     success = 1;
 
 cleanup:
@@ -1006,7 +1006,6 @@ calculate_trivial_gcd:
                                                       I->Gmin_exp, ctx->minfo);
         mpoly_monomials_shift_right_ui(Bbar->exps, Bbar->bits, Bbar->length,
                                                       I->Gmin_exp, ctx->minfo);
-
         fmpz_clear(cG);
 
         goto successful;
@@ -1397,7 +1396,6 @@ could_not_repack:
         Gbits = FLINT_MIN(Anew->bits, Bnew->bits);
         success = _fmpz_mpoly_gcd_cofactors(G, Gbits, Abar, Anew->bits,
                                    Bbar, Bnew->bits, Anew, Bnew, ctx, NULL, 0);
-
         if (!success)
             goto deflate_cleanup;
 
@@ -1421,6 +1419,8 @@ could_not_repack:
             fmpz_mpoly_neg(Abar, Abar, ctx);
             fmpz_mpoly_neg(Bbar, Bbar, ctx);
         }
+
+        success = 1;
 
 deflate_cleanup:
 
