@@ -53,6 +53,32 @@ void gcd_check(nmod_mpoly_t g, nmod_mpoly_t a, nmod_mpoly_t b,
         flint_abort();
     }
 
+    if ((i + j % 11) == 0)
+    {
+        nmod_mpoly_set(cg, b, ctx);
+        nmod_mpoly_gcd(cg, cg, a, ctx);
+        if (!nmod_mpoly_equal(cg, g, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check aliasing 1\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+            flint_abort();
+        }
+    }
+
+    if ((i + j % 9) == 0)
+    {
+        nmod_mpoly_set(cg, b, ctx);
+        nmod_mpoly_gcd(cg, a, cg, ctx);
+        if (!nmod_mpoly_equal(cg, g, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check aliasing 2\n"
+                                         "i = %wd, j = %wd, %s\n", i, j, name);
+            flint_abort();
+        }
+    }
+
     res = 1;
     res = res && nmod_mpoly_divides(ca, a, g, ctx);
     res = res && nmod_mpoly_divides(cb, b, g, ctx);
