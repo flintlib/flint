@@ -1378,9 +1378,6 @@ FLINT_DLL void nmod_mpoly_from_mpolyu_perm_inflate(
 FLINT_DLL int nmod_mpolyuu_divides(nmod_mpolyu_t Q, const nmod_mpolyu_t A,
            const nmod_mpolyu_t B, slong nmainvars, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpolyu_divides(nmod_mpolyu_t A, nmod_mpolyu_t B,
-                                                   const nmod_mpoly_ctx_t ctx);
-
 FLINT_DLL void nmod_mpolyu_divexact_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                    nmod_mpoly_t c, const nmod_mpoly_ctx_t ctx);
 

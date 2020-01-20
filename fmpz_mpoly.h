@@ -1159,9 +1159,6 @@ FLINT_DLL int fmpz_mpolyuu_divides_threaded(fmpz_mpolyu_t Q, const fmpz_mpolyu_t
           const fmpz_mpolyu_t B, slong main_nvars, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
-FLINT_DLL int fmpz_mpolyu_divides(fmpz_mpolyu_t A, fmpz_mpolyu_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
 FLINT_DLL void fmpz_mpolyu_fmpz_content(fmpz_t c, fmpz_mpolyu_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 

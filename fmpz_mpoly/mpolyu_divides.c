@@ -710,28 +710,3 @@ not_exact_division:
     goto cleanup;
 }
 
-
-int fmpz_mpolyu_divides(
-    fmpz_mpolyu_t A,
-    fmpz_mpolyu_t B,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    int ret = 0;
-    flint_bitcnt_t bits = A->bits;
-    fmpz_mpolyu_t Q;
-
-    FLINT_ASSERT(B->length > 0);
-    FLINT_ASSERT(bits == A->bits);
-    FLINT_ASSERT(bits == B->bits);
-
-    if (A->length == 0)
-    {
-        return 1;
-    }
-
-    fmpz_mpolyu_init(Q, bits, ctx);
-    fmpz_mpolyuu_divides(Q, A, B, 1, ctx);
-    ret = Q->length > 0;
-    fmpz_mpolyu_clear(Q, ctx);
-    return ret;
-}

@@ -228,15 +228,23 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
         {
             /* impossible to find scale factors in this case */
             return nmod_gcds_scales_not_found;
-        } else {
+        }
+        else
+        {
             /* otherwise set the coeff of the monomial to one */
+            nmod_gcds_ret_t ret;
+            FLINT_ASSERT((f->coeffs + 0)->length == 1);
             nmod_mpolyu_set(G, f, ctx);
             (G->coeffs + 0)->coeffs[0] = UWORD(1);
-            if (!nmod_mpolyu_divides(A, G, ctx))
-                return nmod_gcds_form_wrong;
-            if (!nmod_mpolyu_divides(B, G, ctx))
-                return nmod_gcds_form_wrong;
-            return nmod_gcds_success;
+            nmod_mpolyu_init(Aevalsk1, f->bits, ctx);
+            ret = nmod_gcds_form_wrong;
+            if (   nmod_mpolyuu_divides(Aevalsk1, A, G, 1, ctx)
+                && nmod_mpolyuu_divides(Aevalsk1, B, G, 1, ctx))
+            {
+                ret = nmod_gcds_success;
+            }
+            nmod_mpolyu_clear(Aevalsk1, ctx);
+            return ret;
         }
     }
 
