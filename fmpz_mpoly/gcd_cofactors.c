@@ -864,6 +864,15 @@ int _fmpz_mpoly_gcd_cofactors(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
+#if WANT_ASSERT
+    fmpz_mpoly_t T, Asave, Bsave;
+
+    fmpz_mpoly_init(T, ctx);
+    fmpz_mpoly_init(Asave, ctx);
+    fmpz_mpoly_init(Bsave, ctx);
+    fmpz_mpoly_set(Asave, A, ctx);
+    fmpz_mpoly_set(Bsave, B, ctx);
+#endif
 
     mpoly_gcd_info_init(I, nvars);
     I->Gbits = Gbits;
@@ -1205,7 +1214,20 @@ cleanup:
             fmpz_mpoly_neg(Abar, Abar, ctx);
             fmpz_mpoly_neg(Bbar, Bbar, ctx);
         }
+
+#if WANT_ASSERT
+        fmpz_mpoly_mul_threaded(T, G, Abar, ctx, 0);
+        FLINT_ASSERT(fmpz_mpoly_equal(T, Asave, ctx));
+        fmpz_mpoly_mul_threaded(T, G, Bbar, ctx, 0);
+        FLINT_ASSERT(fmpz_mpoly_equal(T, Bsave, ctx));
+#endif
     }
+
+#if WANT_ASSERT
+    fmpz_mpoly_clear(T, ctx);
+    fmpz_mpoly_clear(Asave, ctx);
+    fmpz_mpoly_clear(Bsave, ctx);
+#endif
 
     mpoly_gcd_info_clear(I);
 

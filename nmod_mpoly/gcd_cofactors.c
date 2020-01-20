@@ -612,6 +612,15 @@ int _nmod_mpoly_gcd_cofactors(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
+#if WANT_ASSERT
+    nmod_mpoly_t T, Asave, Bsave;
+
+    nmod_mpoly_init(T, ctx);
+    nmod_mpoly_init(Asave, ctx);
+    nmod_mpoly_init(Bsave, ctx);
+    nmod_mpoly_set(Asave, A, ctx);
+    nmod_mpoly_set(Bsave, B, ctx);
+#endif
 
     mpoly_gcd_info_init(I, nvars);
     I->Gbits = Gbits;
@@ -929,7 +938,20 @@ cleanup:
             _nmod_vec_scalar_mul_nmod(G->coeffs, G->coeffs, G->length,
                    nmod_inv(G->coeffs[0], ctx->ffinfo->mod), ctx->ffinfo->mod);
         }
+
+#if WANT_ASSERT
+        nmod_mpoly_mul_threaded(T, G, Abar, ctx, 0);
+        FLINT_ASSERT(nmod_mpoly_equal(T, Asave, ctx));
+        nmod_mpoly_mul_threaded(T, G, Bbar, ctx, 0);
+        FLINT_ASSERT(nmod_mpoly_equal(T, Bsave, ctx));
+#endif
     }
+
+#if WANT_ASSERT
+    nmod_mpoly_clear(T, ctx);
+    nmod_mpoly_clear(Asave, ctx);
+    nmod_mpoly_clear(Bsave, ctx);
+#endif
 
     mpoly_gcd_info_clear(I);
 
