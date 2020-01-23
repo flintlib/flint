@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010, 2016 William Hart
+    Copyright (C) 2010, 2016, 2020 William Hart
     Copyright (C) 2010 Andy Novocin
 
     This file is part of FLINT.
@@ -17,6 +17,8 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+
+#define CLD_EPS 0.00000001
 
 static double _log2(double n)  
 {  
@@ -64,26 +66,6 @@ static int _d_cmp_2exp(double a, slong a_exp, double b, slong b_exp)
    }
 }
 
-static slong
-fmpz_poly_evaluate_2exp(const fmpz_poly_t poly, slong v)
-{
-    slong i, b, s = 0;
-
-    for (i = 0; i < fmpz_poly_length(poly); i++)
-    {
-        b = fmpz_bits(poly->coeffs + i);
-        /* 2^s = 2^s + poly[i] * (2^v)^i */
-        if (b != 0)
-            s = 1 + FLINT_MAX(s, b + v * i);
-    }
-
-    return s;
-}
-
-double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp);
-
-double fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz_poly_t poly, double d, slong dexp);
-
 void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
 {
    /*
@@ -120,7 +102,7 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
    double step = 1.0;
    slong size_f = FLINT_ABS(fmpz_poly_max_bits(f));
    slong hi_exp = 0, lo_exp = 0;
-   slong rbits, max_exp;
+   slong rbits, max_exp, rexp = 0;
    int too_much = 0;
 
    fmpz_poly_init(lo);
@@ -141,24 +123,20 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
       rbits = fabs(rpow);
       max_exp = rbits*hi->length + size_f + 1;
 
-      if (rbits > 200)
+      if (rbits > 200 || rexp != 0) /* r itself has a large exponent */
       {
-#if 1
-        hi_exp = fmpz_poly_evaluate_2exp(hi, rpow);
-        lo_exp = fmpz_poly_evaluate_2exp(lo, -rpow);
-        hi_eval = lo_eval = 1.0;
-#else
-        hi_eval = fmpz_poly_evaluate_horner_d_2exp2(&hi_exp, hi, 1.0, rpow);
-        lo_eval = fmpz_poly_evaluate_horner_d_2exp2(&lo_exp, lo, 1.0, -rpow);
-#endif
+         /* r is really 2^rpow * 2^rexp */
+         double r = pow(2.0, rpow);
+         hi_eval = fmpz_poly_evaluate_horner_d_2exp2(&hi_exp, hi, r, rexp, 100);
+         lo_eval = fmpz_poly_evaluate_horner_d_2exp2(&lo_exp, lo, 1/r, -rexp, 100);
       }  /* if max exponent may overwhelm a double (with safety margin) */
-      else if (max_exp > 950 || too_much)
+      else if (max_exp > 950 || too_much) /* result of eval has large exponent */
       {
          double r = pow(2.0, rpow);
          hi_eval = fmpz_poly_evaluate_horner_d_2exp(&hi_exp, hi, r);
          lo_eval = fmpz_poly_evaluate_horner_d_2exp(&lo_exp, lo, 1/r);
       }
-      else
+      else /* everything can be handled with doubles */
       {
          double r = pow(2.0, rpow);
          hi_eval = fmpz_poly_evaluate_horner_d(hi, r);
@@ -187,7 +165,7 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
          {
             /* doubles were insufficient after all */
             too_much = 1; 
-         } else
+         } else /* we are done */
          {
             if (hi_eval > lo_eval)
                max_eval = hi_eval;
@@ -210,11 +188,11 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
          int cmp;
 
          /* just compare exponents, because it's probably not going to converge otherwise */
-         if (rbits > 200)
+         if (rbits > 200 || rexp != 0)
          {
-             if ((hi_exp + _log2(hi_eval)) > 1.5 * (lo_exp + _log2(lo_eval)))
+             if ((hi_exp + _log2(hi_eval)) > 1.01 * (lo_exp + _log2(lo_eval)))
                 cmp = 2;
-             else if ((lo_exp + _log2(lo_eval)) > 1.5 * (hi_exp + _log2(hi_eval)))
+             else if ((lo_exp + _log2(lo_eval)) > 1.01 * (hi_exp + _log2(hi_eval)))
                 cmp = -2;
              else if ((hi_exp + _log2(hi_eval)) >= (lo_exp + _log2(lo_eval)))
                 cmp = 1;
@@ -224,6 +202,11 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
          else
          {
              cmp = _d_cmp_2exp(hi_eval, hi_exp, lo_eval, lo_exp);
+         }
+
+         if (fabs(step) < CLD_EPS) /* give up if step is now very small */
+         {
+            cmp = cmp == 2 ? 1 : -1;
          }
 
          switch (cmp)
@@ -247,6 +230,16 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
             fmpz_set_d_2exp(res, lo_eval*(f->length - 1)*(1.0 + f->length*ldexp(2.0, -51)), lo_exp);
             goto cleanup;
          }
+      }
+
+      if (rpow > 1000.0)
+      {
+         rpow -= 1000.0;
+         rexp += 1000;
+      } else if (rpow < -1000.0)
+      {
+         rpow += 1000.0;
+         rexp -= 1000;
       }
    }
 

@@ -15,26 +15,30 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp)
+double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp, ulong prec_in)
 {
    slong i, size_p = FLINT_ABS(_fmpz_vec_max_bits(poly, n));
    ulong vbits = ceil(fabs(dexp + log(fabs(d))/log(2.0)));
    ulong prec = vbits*(n - 1) + size_p + FLINT_BIT_COUNT(n);
    mpf_t mpf_d, mpf_coeff, output;
    double res;
-   
+
+   if (prec_in > 0)
+       prec = prec_in;
+
    if (d == 0)
       return fmpz_get_d(poly + 0);
 
    mpf_set_default_prec(prec);
-   
+
    mpf_init(mpf_coeff);   
    mpf_init(output);   
    mpf_init(mpf_d);
 
    fmpz_get_mpf(output, poly + n - 1);
-   
+ 
    mpf_set_d(mpf_d, d); /* set fval to mpf from the double val */
+
    if (dexp >= 0)
        mpf_mul_2exp(mpf_d, mpf_d, dexp);
    else
@@ -61,10 +65,10 @@ double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong 
 
 double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz * poly, slong n, double d)
 {
-    return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly, n, d, 0);
+    return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly, n, d, 0, 0);
 }
 
-double fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz_poly_t poly, double d, slong dexp)
+double fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz_poly_t poly, double d, slong dexp, ulong prec)
 {
    if (poly->length == 0)
    {
@@ -72,7 +76,7 @@ double fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz_poly_t poly, do
       return 0.0;
    }
 
-   return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly->coeffs, poly->length, d, dexp);
+   return _fmpz_poly_evaluate_horner_d_2exp2(exp, poly->coeffs, poly->length, d, dexp, prec);
 }
 
 

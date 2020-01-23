@@ -945,6 +945,9 @@ FLINT_DLL double _fmpz_poly_evaluate_horner_d_2exp(slong * exp,
 FLINT_DLL double fmpz_poly_evaluate_horner_d_2exp(slong * exp, 
                                              const fmpz_poly_t poly, double d);
 
+FLINT_DLL double fmpz_poly_evaluate_horner_d_2exp2(slong * exp,
+		     const fmpz_poly_t poly, double d, slong dexp, ulong prec);
+
 /*  Composition  *************************************************************/
 
 FLINT_DLL void _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, slong len1, 
