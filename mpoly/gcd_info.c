@@ -19,7 +19,7 @@ void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars)
 
     FLINT_ASSERT(nvars > 0);
 
-    d = (char *) flint_malloc(nvars*(8*sizeof(ulong) + 11*sizeof(slong)));
+    d = (char *) flint_malloc(nvars*(10*sizeof(ulong) + 11*sizeof(slong)));
 
     I->data = d;
 
@@ -38,6 +38,8 @@ void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars)
     I->Btail_count      = (slong *) d; d += nvars*sizeof(slong);
 
     I->Gmin_exp           = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Abarmin_exp        = (ulong *) d; d += nvars*sizeof(ulong);
+    I->Bbarmin_exp        = (ulong *) d; d += nvars*sizeof(ulong);
     I->Gstride            = (ulong *) d; d += nvars*sizeof(ulong);
     I->Gdeflate_deg_bound = (slong *) d; d += nvars*sizeof(slong);
     I->Gterm_count_est    = (slong *) d; d += nvars*sizeof(slong);
@@ -584,7 +586,7 @@ void mpoly_gcd_info_measure_zippel(
     Glength = FLINT_MAX(1, Glength);
 
     I->can_use_zippel = 1;
-    I->zippel_time_est = 0.01*Glength*Glength
-                        + 0.0001*(Alength + Blength)*Glength*gsum_deg;
+    I->zippel_time_est = 0.00002*Glength*Glength
+                       + 0.00002*(Alength + Blength)*Glength*gsum_deg;
 }
 

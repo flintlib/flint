@@ -207,7 +207,7 @@ Degrees
     Set ``degs`` to the degrees of ``A`` with respect to each variable.
     If ``A`` is zero, all degrees are set to ``-1``.
 
-.. function:: void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
 
 .. function:: slong fmpq_mpoly_degree_si(const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
 
@@ -355,26 +355,26 @@ Container operations
 
     Set ``M`` to the monomial of the term of index ``i`` in ``A``. The coefficient of ``M`` will be one.
 
-.. function:: void fmpq_mpoly_push_term_fmpq_fmpz(fmpz_mpoly_t A, const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_fmpq_fmpz(fmpq_mpoly_t A, const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_fmpz_fmpz(fmpq_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_push_term_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_ui_fmpz(fmpq_mpoly_t A, ulong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_push_term_si_fmpz(fmpz_mpoly_t A, slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_si_fmpz(fmpq_mpoly_t A, slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_push_term_fmpq_ui(fmpz_mpoly_t A, const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_fmpq_ui(fmpq_mpoly_t A, const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_push_term_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_fmpz_ui(fmpq_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_push_term_ui_ui(fmpz_mpoly_t A, ulong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_ui_ui(fmpq_mpoly_t A, ulong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
-.. function:: void fmpq_mpoly_push_term_si_ui(fmpz_mpoly_t A, slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_push_term_si_ui(fmpq_mpoly_t A, slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to ``A`` with coefficient ``c`` and exponent vector ``exp``.
     This function should run in constant average time if the terms pushed have bounded denominator.
 
-.. function:: void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     Factor out necessary content from ``A->zpoly`` so that it is reduced.
     If the terms of ``A`` were nonzero and sorted with distinct exponents to begin with, the result will be in canonical form.
@@ -384,7 +384,7 @@ Container operations
     Sort the internal ``A->zpoly`` into the canonical ordering dictated by the ordering in ``ctx``.
     This function does not combine like terms, nor does it delete terms with coefficient zero, nor does it reduce.
 
-.. function:: void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_combine_like_terms(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     Combine adjacent like terms in the internal ``A->zpoly`` and then factor out content via a call to :func:`fmpq_mpoly_reduce`.
     If the terms of ``A`` were sorted to begin with, the result will be in canonical form.
@@ -578,11 +578,71 @@ Greatest Common Divisor
 
 .. function:: void fmpq_mpoly_term_content(fmpq_mpoly_t M, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Sets ``M`` to the GCD of the terms of ``A``.
+    Set ``M`` to the GCD of the terms of ``A``.
     If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with coefficient one.
 
 .. function:: int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 
+.. function:: int fmpq_mpoly_gcd_threaded(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit)
+
     Try to set ``G`` to the monic GCD of ``A`` and ``B``. The GCD of zero and zero is defined to be zero.
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
+    The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
+
+.. function:: int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar, fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+
+.. function:: int fmpq_mpoly_gcd_cofactors_threaded(fmpq_mpoly_t G, fmpq_mpoly_t Abar, fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit)
+
+    Do the operation of :func:`fmpq_mpoly_gcd` / :func:`fmpq_mpoly_gcd_threaded` but also compute the cofactors ``Abar = A/G`` and ``Bbar = B/G`` if successful.
+
+
+Univariate Functions
+--------------------------------------------------------------------------------
+
+    An ``fmpq_mpoly_univar_t`` holds a univariate polynomial in some main variable
+    with ``fmpq_mpoly_t`` coefficients in the remaining variables. These functions
+    are useful when one wants to rewrite an element of `\mathbb{Q}[x_1, \dots, x_m]`
+    as an element of `(\mathbb{Q}[x_1, \dots, x_{v-1}, x_{v+1}, \dots, x_m])[x_v]`
+    and vise versa.
+
+.. function:: void fmpq_mpoly_univar_init(fmpq_mpoly_univar_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Initialize `A`.
+
+.. function:: void fmpq_mpoly_univar_clear(fmpq_mpoly_univar_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Clear `A`.
+
+.. function:: void fmpq_mpoly_univar_swap(fmpq_mpoly_univar_t A, fmpq_mpoly_univar_t B, const fmpq_mpoly_ctx_t ctx)
+
+    Swap `A` and `B`.
+
+.. function:: void fmpq_mpoly_to_univar(fmpq_mpoly_univar_t A, const fmpq_mpoly_t B, slong var, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to a univariate form of ``B`` by pulling out the variable of index ``var``.
+    The coefficients of ``A`` will still belong to the content ``ctx`` but will not depend on the variable of index ``var``.
+
+.. function:: void fmpq_mpoly_from_univar(fmpq_mpoly_t A, const fmpq_mpoly_univar_t B, slong var, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to the normal form of ``B`` by putting in the variable of index ``var``.
+    This function is undefined if the coefficients of ``B`` depend on the variable of index ``var``.
+
+.. function:: int fmpq_mpoly_univar_degree_fits_si(const fmpq_mpoly_univar_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Return `1` if the degree of ``A`` with respect to the main variable fits an ``slong``. Otherwise, return `0`.
+
+.. function:: slong fmpq_mpoly_univar_length(const fmpq_mpoly_univar_t A, const fmpq_mpoly_ctx_t ctx)
+
+    Return the number of terms in ``A`` with respect to the main variable.
+
+.. function:: slong fmpq_mpoly_univar_get_term_exp_si(fmpq_mpoly_univar_t A, slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Return the exponent of the term of index ``i`` of ``A``.
+
+.. function:: void fmpq_mpoly_univar_get_term_coeff(fmpq_mpoly_t c, const fmpq_mpoly_univar_t A, slong i, const fmpq_mpoly_ctx_t ctx)
+
+.. function:: void fmpq_mpoly_univar_swap_term_coeff(fmpq_mpoly_t c, fmpq_mpoly_univar_t A, slong i, const fmpq_mpoly_ctx_t ctx)
+
+    Set (resp. swap) ``c`` to (resp. with) the coefficient of the term of index ``i`` of ``A``.
+
 

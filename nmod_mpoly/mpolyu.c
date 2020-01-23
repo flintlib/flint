@@ -583,39 +583,6 @@ void nmod_mpolyu_msub(nmod_mpolyu_t R, nmod_mpolyu_t A, nmod_mpolyu_t B,
     R->length = k;
 }
 
-int nmod_mpolyu_divides(nmod_mpolyu_t A, nmod_mpolyu_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    int ret = 0;
-    nmod_mpolyu_t P, R;
-    nmod_mpoly_t t;
-    nmod_mpoly_init(t, ctx);
-    nmod_mpolyu_init(P, A->bits, ctx);
-    nmod_mpolyu_init(R, A->bits, ctx);
-    nmod_mpolyu_set(R, A, ctx);
-
-    FLINT_ASSERT(B->length > 0);
-
-    while (R->length > 0)
-    {
-        if (R->exps[0] < B->exps[0])
-            goto done;
-
-        if (!nmod_mpoly_divides(t, R->coeffs + 0, B->coeffs + 0, ctx))
-            goto done;
-        nmod_mpolyu_msub(P, R, B, t, R->exps[0] - B->exps[0], ctx);
-        nmod_mpolyu_swap(P, R, ctx);
-    }
-    ret = 1;
-
-done:
-    nmod_mpoly_clear(t, ctx);
-    nmod_mpolyu_clear(P, ctx);
-    nmod_mpolyu_clear(R, ctx);
-    return ret;
-}
-
-
 /*
     A = B / c and preserve the bit packing
 */
@@ -666,6 +633,67 @@ void nmod_mpolyu_divexact_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
     TMP_END;
 }
 
+void nmod_mpolyu_divexact_mpoly_inplace(nmod_mpolyu_t A, nmod_mpoly_t c,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    slong i, N, len;
+    flint_bitcnt_t bits;
+    ulong * cmpmask;
+    nmod_mpoly_t t;
+    TMP_INIT;
+
+    FLINT_ASSERT(c->length > 0);
+
+    if (nmod_mpoly_is_ui(c, ctx))
+    {
+        if (c->coeffs[0] == 1)
+            return;
+
+        for (i = 0; i < A->length; i++)
+        {
+            nmod_mpoly_struct * Ai = A->coeffs + i;
+            _nmod_vec_scalar_mul_nmod(Ai->coeffs, Ai->coeffs, Ai->length,
+                   nmod_inv(c->coeffs[0], ctx->ffinfo->mod), ctx->ffinfo->mod);
+        }
+
+        return;
+    }
+
+    bits = A->bits;
+    FLINT_ASSERT(bits == c->bits);
+
+    nmod_mpoly_init3(t, 0, bits, ctx);
+
+    N = mpoly_words_per_exp(bits, ctx->minfo);
+
+    TMP_START;
+
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
+
+    for (i = A->length - 1; i >= 0; i--)
+    {
+        nmod_mpoly_struct * poly1 = t;
+        nmod_mpoly_struct * poly2 = A->coeffs + i;
+        nmod_mpoly_struct * poly3 = c;
+
+        FLINT_ASSERT(poly2->bits == bits);
+
+        len = _nmod_mpoly_divides_monagan_pearce(&poly1->coeffs, &poly1->exps,
+                            &poly1->alloc, poly2->coeffs, poly2->exps, poly2->length,
+                              poly3->coeffs, poly3->exps, poly3->length, bits, N,
+                                                  cmpmask, ctx->ffinfo);
+        FLINT_ASSERT(len > 0);
+        poly1->length = len;
+        nmod_mpoly_swap(poly2, poly1, ctx);
+    }
+
+    TMP_END;
+
+    nmod_mpoly_clear(t, ctx);
+}
+
+
 /*
     A = B * c and preserve the bit packing
 */
@@ -714,6 +742,72 @@ void nmod_mpolyu_mul_mpoly(nmod_mpolyu_t A, nmod_mpolyu_t B,
     A->length = B->length;
     TMP_END;
 }
+
+
+void nmod_mpolyu_mul_mpoly_inplace(nmod_mpolyu_t A, nmod_mpoly_t c,
+                                                    const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+    slong len;
+    slong N;
+    flint_bitcnt_t bits;
+    ulong * cmpmask;
+    nmod_mpoly_t t;
+    TMP_INIT;
+
+    FLINT_ASSERT(c->length > 0);
+
+    if (nmod_mpoly_is_ui(c, ctx))
+    {
+        if (c->coeffs[0] == 1)
+            return;
+
+        for (i = 0; i < A->length; i++)
+        {
+            nmod_mpoly_struct * Ai = A->coeffs + i;
+            _nmod_vec_scalar_mul_nmod(Ai->coeffs, Ai->coeffs, Ai->length,
+                                               c->coeffs[0], ctx->ffinfo->mod);
+        }
+
+        return;
+    }
+
+    bits = A->bits;
+    FLINT_ASSERT(bits == c->bits);
+
+    nmod_mpoly_init3(t, 0, bits, ctx);
+
+    N = mpoly_words_per_exp(bits, ctx->minfo);
+
+    TMP_START;
+
+    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
+
+    for (i = A->length - 1; i >= 0; i--)
+    {
+        nmod_mpoly_struct * poly1 = t;
+        nmod_mpoly_struct * poly2 = A->coeffs + i;
+        nmod_mpoly_struct * poly3 = c;
+
+        FLINT_ASSERT(poly2->bits == bits);
+
+        len = _nmod_mpoly_mul_johnson(&poly1->coeffs, &poly1->exps,
+                       &poly1->alloc, poly2->coeffs, poly2->exps, poly2->length,
+                        poly3->coeffs, poly3->exps, poly3->length, bits, N,
+                                                  cmpmask, ctx->ffinfo);
+
+        FLINT_ASSERT(len > 0);
+        poly1->length = len;
+        nmod_mpoly_swap(poly2, poly1, ctx);
+    }
+
+    TMP_END;
+
+    nmod_mpoly_clear(t, ctx);
+}
+
+
 
 int nmod_mpolyu_content_mpoly(
     nmod_mpoly_t g,

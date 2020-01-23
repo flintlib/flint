@@ -489,7 +489,7 @@ Powering
 Division
 --------------------------------------------------------------------------------
 
-The division functions will generally throw if the leading coefficient of a divisor polynomial is not invertible.
+The division functions assume that the modulus is prime.
 
 .. function:: int nmod_mpoly_divides(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
@@ -528,12 +528,26 @@ The division functions will generally throw if the leading coefficient of a divi
 Greatest Common Divisor
 --------------------------------------------------------------------------------
 
+The greatest common divisor functions assume that the modulus is prime.
+
+.. function:: void nmod_mpoly_term_content(nmod_mpoly_t M, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
+
+    Set ``M`` to the GCD of the terms of ``A``.
+    If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with coefficient one.
 
 .. function:: int nmod_mpoly_gcd(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
-    Try to set ``G`` to the monic GCD of ``A`` and ``B``. The GCD of zero and zero is defined to be zero.
+.. function:: int nmod_mpoly_gcd_threaded(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+
+    Try to set ``G`` to the GCD of ``A`` and ``B`` with positive leading coefficient. The GCD of zero and zero is defined to be zero.
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
-    If the modulus is not prime, this function will probably return ``0`` quickly.
+    The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
+
+.. function:: int nmod_mpoly_gcd_cofactors(nmod_mpoly_t G, nmod_mpoly_t Abar, nmod_mpoly_t Bbar, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
+
+.. function:: int nmod_mpoly_gcd_cofactors_threaded(nmod_mpoly_t G, nmod_mpoly_t Abar, nmod_mpoly_t Bbar, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+
+    Do the operation of :func:`nmod_mpoly_gcd` / :func:`nmod_mpoly_gcd_threaded` but also compute the cofactors ``Abar = A/G`` and ``Bbar = B/G`` if successful.
 
 .. function:: int nmod_mpoly_gcd_brown(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
@@ -542,9 +556,59 @@ Greatest Common Divisor
     Try to set ``G`` to the GCD of ``A`` and ``B`` using Brown's algorithm.
     The threaded version takes an upper limit on the number of threads to use, while the non-threaded version always uses one thread.
 
-.. function:: int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+.. function:: int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
     Try to set ``G`` to the GCD of ``A`` and ``B`` using Zipple's interpolation algorithm to interpolate coefficients from univariate images in the most significant variable.
+
+
+Univariate Functions
+--------------------------------------------------------------------------------
+
+    An ``nmod_mpoly_univar_t`` holds a univariate polynomial in some main variable
+    with ``nmod_mpoly_t`` coefficients in the remaining variables. These functions
+    are useful when one wants to rewrite an element of `\mathbb{Z}/n\mathbb{Z}[x_1, \dots, x_m]`
+    as an element of `(\mathbb{Z}/n\mathbb{Z}[x_1, \dots, x_{v-1}, x_{v+1}, \dots, x_m])[x_v]`
+    and vise versa.
+
+.. function:: void nmod_mpoly_univar_init(nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
+
+    Initialize `A`.
+
+.. function:: void nmod_mpoly_univar_clear(nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
+
+    Clear `A`.
+
+.. function:: void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A, nmod_mpoly_univar_t B, const nmod_mpoly_ctx_t ctx)
+
+    Swap `A` and `B`.
+
+.. function:: void nmod_mpoly_to_univar(nmod_mpoly_univar_t A, const nmod_mpoly_t B, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to a univariate form of ``B`` by pulling out the variable of index ``var``.
+    The coefficients of ``A`` will still belong to the content ``ctx`` but will not depend on the variable of index ``var``.
+
+.. function:: void nmod_mpoly_from_univar(nmod_mpoly_t A, const nmod_mpoly_univar_t B, slong var, const nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the normal form of ``B`` by putting in the variable of index ``var``.
+    This function is undefined if the coefficients of ``B`` depend on the variable of index ``var``.
+
+.. function:: int nmod_mpoly_univar_degree_fits_si(const nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return `1` if the degree of ``A`` with respect to the main variable fits an ``slong``. Otherwise, return `0`.
+
+.. function:: slong nmod_mpoly_univar_length(const nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
+
+    Return the number of terms in ``A`` with respect to the main variable.
+
+.. function:: slong nmod_mpoly_univar_get_term_exp_si(nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Return the exponent of the term of index ``i`` of ``A``.
+
+.. function:: void nmod_mpoly_univar_get_term_coeff(nmod_mpoly_t c, const nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+.. function:: void nmod_mpoly_univar_swap_term_coeff(nmod_mpoly_t c, nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx)
+
+    Set (resp. swap) ``c`` to (resp. with) the coefficient of the term of index ``i`` of ``A``.
 
 
 Internal Functions

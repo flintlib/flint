@@ -110,7 +110,7 @@ cleanup:
 int
 main(void)
 {
-    slong i, j, tmul = 10;
+    slong i, j, tmul = 20;
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd_berlekamp_massey....");

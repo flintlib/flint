@@ -314,7 +314,7 @@ int fmpz_mpoly_gcd_brown(
     slong * perm;
     ulong * shift, * stride;
     slong i;
-    flint_bitcnt_t new_bits;
+    flint_bitcnt_t wbits;
     fmpz_mpoly_ctx_t lctx;
     fmpz_mpoly_t Al, Bl, Gl, Abarl, Bbarl;
 
@@ -383,14 +383,14 @@ int fmpz_mpoly_gcd_brown(
         goto cleanup1;
     }
 
-    new_bits = FLINT_MAX(A->bits, B->bits);
+    wbits = FLINT_MAX(A->bits, B->bits);
 
     fmpz_mpoly_ctx_init(lctx, ctx->minfo->nvars, ORD_LEX);
-    fmpz_mpoly_init3(Al, 0, new_bits, lctx);
-    fmpz_mpoly_init3(Bl, 0, new_bits, lctx);
-    fmpz_mpoly_init3(Gl, 0, new_bits, lctx);
-    fmpz_mpoly_init3(Abarl, 0, new_bits, lctx);
-    fmpz_mpoly_init3(Bbarl, 0, new_bits, lctx);
+    fmpz_mpoly_init3(Al, 0, wbits, lctx);
+    fmpz_mpoly_init3(Bl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Gl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Abarl, 0, wbits, lctx);
+    fmpz_mpoly_init3(Bbarl, 0, wbits, lctx);
 
     fmpz_mpoly_to_mpoly_perm_deflate(Al, lctx, A, ctx,
                                                  perm, shift, stride, NULL, 0);
@@ -398,13 +398,15 @@ int fmpz_mpoly_gcd_brown(
                                                  perm, shift, stride, NULL, 0);
 
     success = fmpz_mpolyl_gcd_brown(Gl, Abarl, Bbarl, Al, Bl, lctx, NULL);
-    if (success)
-    {
-        fmpz_mpoly_from_mpoly_perm_inflate(G, new_bits, ctx, Gl, lctx,
-                                                          perm, shift, stride);
-        if (fmpz_sgn(G->coeffs + 0) < 0)
-            fmpz_mpoly_neg(G, G, ctx);
-    }
+    if (!success)
+        goto cleanup;
+
+    fmpz_mpoly_from_mpoly_perm_inflate(G, FLINT_MIN(A->bits, B->bits), ctx,
+                                                Gl, lctx, perm, shift, stride);
+    if (fmpz_sgn(G->coeffs + 0) < 0)
+        fmpz_mpoly_neg(G, G, ctx);
+
+cleanup:
 
     fmpz_mpoly_clear(Al, lctx);
     fmpz_mpoly_clear(Bl, lctx);

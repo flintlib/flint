@@ -2725,8 +2725,10 @@ random_check_ret_t static _random_check(
 
 int fmpz_mpolyuu_gcd_berlekamp_massey(
     fmpz_mpolyu_t G,
-    const fmpz_mpolyu_t A,
-    const fmpz_mpolyu_t B,
+    fmpz_mpolyu_t Abar,
+    fmpz_mpolyu_t Bbar,
+    fmpz_mpolyu_t A,
+    fmpz_mpolyu_t B,
     const fmpz_mpoly_t Gamma,
     const fmpz_mpoly_ctx_t ctx)
 {
@@ -2735,7 +2737,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
     mpoly_bma_interpolate_ctx_t Ictx;
     nmod_mpoly_ctx_t ctx_sp;
     fmpz_mod_mpoly_ctx_t ctx_mp;
-    fmpz_mpolyu_t H, Abar, Bbar;
+    fmpz_mpolyu_t H;
     fmpz_mpoly_t Hcontent;
     /* multi precision workspace */
     fmpz_mod_bma_mpoly_t Lambda;
@@ -2769,6 +2771,8 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
     FLINT_ASSERT(bits == A->bits);
     FLINT_ASSERT(bits == B->bits);
     FLINT_ASSERT(bits == G->bits);
+    FLINT_ASSERT(bits == Abar->bits);
+    FLINT_ASSERT(bits == Bbar->bits);
     FLINT_ASSERT(bits == Gamma->bits);
 
     /* let's initialize everything at once to avoid complicated cleanup */
@@ -2928,6 +2932,8 @@ int fmpz_mpolyuu_gcd_berlekamp_massey(
     if (GdegboundXY == 0)
     {
         fmpz_mpolyu_one(G, ctx);
+        fmpz_mpolyu_swap(Abar, A, ctx);
+        fmpz_mpolyu_swap(Bbar, B, ctx);
         success = 1;
         goto cleanup;
     }
@@ -3089,7 +3095,7 @@ pick_bma_prime:
         }
 
         /* the evaluation killed neither lc(A) nor lc(B) */
-        FLINT_ASSERT(Gammaeval != 0);
+        FLINT_ASSERT(Gammaeval_sp != 0);
 
         success = nmod_mpolyn_gcd_brown_smprime_bivar(Geval_sp,
                   Abareval_sp, Bbareval_sp, Aeval_sp, Beval_sp, ctx_sp, Sp_sp);
@@ -3103,7 +3109,6 @@ pick_bma_prime:
         FLINT_ASSERT(Geval_sp->length > 0);
         GevaldegXY = nmod_mpolyn_bidegree(Geval_sp);
         nmod_mpolyn_scalar_mul_nmod(Geval_sp, Gammaeval_sp, ctx_sp);
-
 
         FLINT_ASSERT(Gammaeval_sp == nmod_mpolyn_leadcoeff(Geval_sp, ctx_sp));
 
@@ -3134,6 +3139,8 @@ pick_bma_prime:
             if (GdegboundXY == 0)
             {
                 fmpz_mpolyu_one(G, ctx);
+                fmpz_mpolyu_swap(Abar, A, ctx);
+                fmpz_mpolyu_swap(Bbar, B, ctx);
                 success = 1;
                 goto cleanup;
             }
@@ -3182,6 +3189,8 @@ pick_bma_prime:
                 if (GdegboundXY == 0)
                 {
                     fmpz_mpolyu_one(G, ctx);
+                    fmpz_mpolyu_swap(Abar, A, ctx);
+                    fmpz_mpolyu_swap(Bbar, B, ctx);
                     success = 1;
                     goto cleanup;
                 }
@@ -3313,6 +3322,8 @@ pick_bma_prime:
             if (GdegboundXY == 0)
             {
                 fmpz_mpolyu_one(G, ctx);
+                fmpz_mpolyu_swap(Abar, A, ctx);
+                fmpz_mpolyu_swap(Bbar, B, ctx);
                 success = 1;
                 goto cleanup;
             }
@@ -3361,6 +3372,8 @@ pick_bma_prime:
                 if (GdegboundXY == 0)
                 {
                     fmpz_mpolyu_one(G, ctx);
+                    fmpz_mpolyu_swap(Abar, A, ctx);
+                    fmpz_mpolyu_swap(Bbar, B, ctx);
                     success = 1;
                     goto cleanup;
                 }
@@ -3479,6 +3492,8 @@ next_zip_image:
         if (GdegboundXY == 0)
         {
             fmpz_mpolyu_one(G, ctx);
+            fmpz_mpolyu_swap(Abar, A, ctx);
+            fmpz_mpolyu_swap(Bbar, B, ctx);
             success = 1;
             goto cleanup;
         }
@@ -3559,8 +3574,6 @@ cleanup:
 
     fmpz_mpoly_clear(Hcontent, ctx);
     fmpz_mpolyu_clear(H, ctx);
-    fmpz_mpolyu_clear(Bbar, ctx);
-    fmpz_mpolyu_clear(Abar, ctx);
 
     flint_free(Gdegbounds);
     flint_free(Adegs);
@@ -3630,10 +3643,14 @@ cleanup:
     if (success)
     {
         FLINT_ASSERT(G->bits == bits);
+        FLINT_ASSERT(Abar->bits == bits);
+        FLINT_ASSERT(Bbar->bits == bits);
     }
     else
     {
         fmpz_mpolyu_set_bits(G, bits, ctx);
+        fmpz_mpolyu_set_bits(Abar, bits, ctx);
+        fmpz_mpolyu_set_bits(Bbar, bits, ctx);
     }
 
     return success;
@@ -3647,11 +3664,11 @@ int fmpz_mpoly_gcd_berlekamp_massey(
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
-    flint_bitcnt_t Gbits, ABbits;
+    flint_bitcnt_t wbits;
     int success = 0;
     fmpz_mpoly_ctx_t uctx;
-    fmpz_mpolyu_t Auu, Buu, Guu, Abar, Bbar, Gbar;
-    fmpz_mpoly_t Acontent, Bcontent, Gamma;
+    fmpz_mpolyu_t Auu, Buu, Guu, Abaruu, Bbaruu;
+    fmpz_mpoly_t Ac, Bc, Gc, Gamma;
     slong * Adegs, * Bdegs, * perm;
     ulong * shift, * stride;
     ulong max_main_degree, max_minor_degree;
@@ -3737,21 +3754,21 @@ int fmpz_mpoly_gcd_berlekamp_massey(
 
     fmpz_mpoly_ctx_init(uctx, ctx->minfo->nvars - 2, ORD_LEX);
 
-    /* ABbits is bits for intermediates in ZZ[x_0,x_1][x_2,...,x_(n-1)] */
-    ABbits = 1 + FLINT_BIT_COUNT(max_minor_degree);
-    ABbits = FLINT_MAX(MPOLY_MIN_BITS, ABbits);
-    ABbits = mpoly_fix_bits(ABbits, uctx->minfo);
-    FLINT_ASSERT(ABbits <= FLINT_BITS);
+    /* wbits is bits for intermediates in ZZ[x_0,x_1][x_2,...,x_(n-1)] */
+    wbits = 1 + FLINT_BIT_COUNT(max_minor_degree);
+    wbits = FLINT_MAX(MPOLY_MIN_BITS, wbits);
+    wbits = mpoly_fix_bits(wbits, uctx->minfo);
+    FLINT_ASSERT(wbits <= FLINT_BITS);
 
-    fmpz_mpolyu_init(Auu, ABbits, uctx);
-    fmpz_mpolyu_init(Buu, ABbits, uctx);
-    fmpz_mpolyu_init(Guu, ABbits, uctx);
-    fmpz_mpoly_init3(Acontent, 0, ABbits, uctx);
-    fmpz_mpoly_init3(Bcontent, 0, ABbits, uctx);
-    fmpz_mpoly_init3(Gamma, 0, ABbits, uctx);
-    fmpz_mpolyu_init(Abar, ABbits, uctx);
-    fmpz_mpolyu_init(Bbar, ABbits, uctx);
-    fmpz_mpolyu_init(Gbar, ABbits, uctx);
+    fmpz_mpolyu_init(Auu, wbits, uctx);
+    fmpz_mpolyu_init(Buu, wbits, uctx);
+    fmpz_mpolyu_init(Guu, wbits, uctx);
+    fmpz_mpolyu_init(Abaruu, wbits, uctx);
+    fmpz_mpolyu_init(Bbaruu, wbits, uctx);
+    fmpz_mpoly_init3(Ac, 0, wbits, uctx);
+    fmpz_mpoly_init3(Bc, 0, wbits, uctx);
+    fmpz_mpoly_init3(Gc, 0, wbits, uctx);
+    fmpz_mpoly_init3(Gamma, 0, wbits, uctx);
 
     /* two main variables must be packed into bits = FLINT_BITS/2 */
     if (FLINT_BIT_COUNT(max_main_degree) >= FLINT_BITS/2)
@@ -3760,47 +3777,39 @@ int fmpz_mpoly_gcd_berlekamp_massey(
         goto cleanup;
     }
 
-    /* Gbits is bits for final answer in ZZ[x_0,...,x_(n-1)] */
-    Gbits = FLINT_MIN(A->bits, B->bits);
-
     fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
                                            perm, shift, stride, NULL, NULL, 0);
     fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
                                            perm, shift, stride, NULL, NULL, 0);
 
-    /* remove content from A and B */
-    success = fmpz_mpolyu_content_mpoly(Acontent, Auu, uctx, NULL, 0);
-    success = success && fmpz_mpolyu_content_mpoly(Bcontent, Buu, uctx, NULL, 0);
-    if (!success)
-        goto cleanup;
-    fmpz_mpolyu_divexact_mpoly(Abar, Auu, 0, Acontent, uctx);
-    fmpz_mpolyu_divexact_mpoly(Bbar, Buu, 0, Bcontent, uctx);
-
-    /* compute GCD of leading coefficients */
-    FLINT_ASSERT(A->length > 0 && B->length > 0);
-    _fmpz_mpoly_gcd(Gamma, ABbits, Abar->coeffs + 0, Bbar->coeffs + 0, uctx,
-                                                                      NULL, 0);
+    success = fmpz_mpolyu_content_mpoly(Ac, Auu, uctx, NULL, 0);
+    success = success && fmpz_mpolyu_content_mpoly(Bc, Buu, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 
-    success = fmpz_mpolyuu_gcd_berlekamp_massey(Gbar, Abar, Bbar, Gamma, uctx);
+    fmpz_mpolyu_divexact_mpoly_inplace(Auu, Ac, uctx);
+    fmpz_mpolyu_divexact_mpoly_inplace(Buu, Bc, uctx);
+
+    success = _fmpz_mpoly_gcd(Gamma, wbits, Auu->coeffs + 0,
+                                            Buu->coeffs + 0, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 
-    /* put back content */
-    success = _fmpz_mpoly_gcd(Acontent, ABbits, Acontent, Bcontent, uctx,
-                                                                      NULL, 0);
+    success = fmpz_mpolyuu_gcd_berlekamp_massey(Guu, Abaruu, Bbaruu,
+                                                        Auu, Buu, Gamma, uctx);
     if (!success)
         goto cleanup;
 
-    fmpz_mpolyu_mul_mpoly(Guu, Gbar, Acontent, uctx);
+    success = _fmpz_mpoly_gcd(Gc, wbits, Ac, Bc, uctx, NULL, 0);
+    if (!success)
+        goto cleanup;
 
-    fmpz_mpoly_from_mpolyuu_perm_inflate(G, Gbits, ctx, Guu, uctx,
-                                                          perm, shift, stride);
+    fmpz_mpolyu_mul_mpoly_inplace(Guu, Gc, uctx);
+
+    fmpz_mpoly_from_mpolyuu_perm_inflate(G, FLINT_MIN(A->bits, B->bits), ctx,
+                                               Guu, uctx, perm, shift, stride);
     if (fmpz_sgn(G->coeffs + 0) < 0)
         fmpz_mpoly_neg(G, G, ctx);
-
-    FLINT_ASSERT(G->bits == Gbits);
 
     success = 1;
 
@@ -3812,16 +3821,16 @@ cleanup:
     flint_free(shift);
     flint_free(stride);
 
-    fmpz_mpolyu_clear(Abar, uctx);
-    fmpz_mpolyu_clear(Bbar, uctx);
-    fmpz_mpolyu_clear(Gbar, uctx);
-    fmpz_mpoly_clear(Acontent, uctx);
-    fmpz_mpoly_clear(Bcontent, uctx);
-    fmpz_mpoly_clear(Gamma, uctx);
-
     fmpz_mpolyu_clear(Auu, uctx);
     fmpz_mpolyu_clear(Buu, uctx);
     fmpz_mpolyu_clear(Guu, uctx);
+    fmpz_mpolyu_clear(Abaruu, uctx);
+    fmpz_mpolyu_clear(Bbaruu, uctx);
+    fmpz_mpoly_clear(Ac, uctx);
+    fmpz_mpoly_clear(Bc, uctx);
+    fmpz_mpoly_clear(Gc, uctx);
+    fmpz_mpoly_clear(Gamma, uctx);
+
     fmpz_mpoly_ctx_clear(uctx);
 
     return success;

@@ -468,3 +468,53 @@ Greatest Common Divisor
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.
 
 
+Univariate Functions
+--------------------------------------------------------------------------------
+
+    An ``fq_nmod_mpoly_univar_t`` holds a univariate polynomial in some main variable
+    with ``fq_nmod_mpoly_t`` coefficients in the remaining variables. These functions
+    are useful when one wants to rewrite an element of `\mathbb{F}_q[x_1, \dots, x_m]`
+    as an element of `(\mathbb{F}_q[x_1, \dots, x_{v-1}, x_{v+1}, \dots, x_m])[x_v]`
+    and vise versa.
+
+.. function:: void fq_nmod_mpoly_univar_init(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t ctx)
+
+    Initialize `A`.
+
+.. function:: void fq_nmod_mpoly_univar_clear(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t ctx)
+
+    Clear `A`.
+
+.. function:: void fq_nmod_mpoly_univar_swap(fq_nmod_mpoly_univar_t A, fq_nmod_mpoly_univar_t B, const fq_nmod_mpoly_ctx_t ctx)
+
+    Swap `A` and `B`.
+
+.. function:: void fq_nmod_mpoly_to_univar(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_t B, slong var, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to a univariate form of ``B`` by pulling out the variable of index ``var``.
+    The coefficients of ``A`` will still belong to the content ``ctx`` but will not depend on the variable of index ``var``.
+
+.. function:: void fq_nmod_mpoly_from_univar(fq_nmod_mpoly_t A, const fq_nmod_mpoly_univar_t B, slong var, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the normal form of ``B`` by putting in the variable of index ``var``.
+    This function is undefined if the coefficients of ``B`` depend on the variable of index ``var``.
+
+.. function:: int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t ctx)
+
+    Return `1` if the degree of ``A`` with respect to the main variable fits an ``slong``. Otherwise, return `0`.
+
+.. function:: slong fq_nmod_mpoly_univar_length(const fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t ctx)
+
+    Return the number of terms in ``A`` with respect to the main variable.
+
+.. function:: slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
+
+    Return the exponent of the term of index ``i`` of ``A``.
+
+.. function:: void fq_nmod_mpoly_univar_get_term_coeff(fq_nmod_mpoly_t c, const fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
+
+.. function:: void fq_nmod_mpoly_univar_swap_term_coeff(fq_nmod_mpoly_t c, fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set (resp. swap) ``c`` to (resp. with) the coefficient of the term of index ``i`` of ``A``.
+
+

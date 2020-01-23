@@ -183,7 +183,7 @@ int _fmpq_ball_gt_one(const _fmpq_ball_t x)
 
     if xa/xb = M(ya/yb), then
 
-        det -1:
+        det +1:
             M^-1 = {{m22, -m12}, {-m21, m11}}
               xa   xa+1       ya-m12  ya+m22
             (----, ----) = M((------, ------))
@@ -950,15 +950,14 @@ static void _hgcd_step(
 
 
 /*
-    Supposing a > b > 0, generate terms for all real numbers in the open
-    interval (a/(b+1), (a+1)/b). Since a and b will typically come from chopped
-    values, we want to only generate quotients that are valid for every number
-    in (a/(b+1), (a+1)/b). so
+    Supposing a > b > 0, generate terms valid for all real numbers in the open
+    interval M^-1(a/(b+1), (a+1)/b).
 
         a/b = [[q1 1][1 0]] * ... * [[qn 1][1 0]](a'/b')
 
-    The qi are written to s, and the product is stored in M. This is an inplace
-    operation, so xa/xb is the input a/b and output a'/b'.
+    The qi are written to s, and M is multiplied on the right. This is an
+    inplace operation, so (M, xa/xb) is the input ball M^-1(a/(b+1), (a+1)/b)
+    and output ball M^-1(a'/(b'+1), (a'+1)/b').
 */
 void _fmpq_hgcd(_fmpz_vector_t s, _fmpz_mat22_t M, fmpz_t xa, fmpz_t xb)
 {
@@ -974,8 +973,6 @@ void _fmpq_hgcd(_fmpz_vector_t s, _fmpz_mat22_t M, fmpz_t xa, fmpz_t xb)
     fmpz_init(ya);
     fmpz_init(yb);
     _fmpz_mat22_init(N);
-
-    _fmpz_mat22_one(M);
 
 again:
 
@@ -1031,6 +1028,7 @@ split:
     if (shift == 0)
         goto gauss;
 
+    _fmpz_mat22_one(N);
     _fmpq_hgcd(s, N, ya, yb);
     if (_fmpz_mat22_is_one(N))
         goto gauss;
@@ -1043,6 +1041,7 @@ split:
     if (shift == 0)
         goto gauss;
 
+    _fmpz_mat22_one(N);
     _fmpq_hgcd(s, N, ya, yb);
     if (_fmpz_mat22_is_one(N))
         goto gauss;
@@ -1211,6 +1210,7 @@ split:
         if (fmpz_sgn(y->left_den) <= 0 || fmpz_cmp(y->left_num, y->left_den) <= 0)
             goto gauss;
 
+        _fmpz_mat22_one(N);
         _fmpq_hgcd(s, N, y->left_num, y->left_den);
         if (_fmpz_mat22_is_one(N))
             goto gauss;
@@ -1346,6 +1346,7 @@ chop:
     if (fmpz_sgn(r) <= 0 || fmpz_cmp(q, r) <= 0)
         goto again;
 
+    _fmpz_mat22_one(M);
     _fmpq_hgcd(s, M, q, r);
     if (_fmpz_mat22_is_one(M))
         goto again;
