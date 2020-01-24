@@ -89,7 +89,7 @@ main(void)
 {
     fmpz_mod_mat_t A;
     fmpz_t p;
-    slong i, m, n, b, d, r, rank;
+    slong i, m, n, d, r, rank;
     slong *perm;
 
     FLINT_TEST_INIT(state);
@@ -108,8 +108,6 @@ main(void)
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            b = 1 + n_randint(state, 10) * n_randint(state, 10);
-
             fmpz_mod_mat_init(A, m, n, p);
 
             fmpz_mod_mat_randrank(A, state, r);
@@ -144,7 +142,6 @@ main(void)
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            b = 1 + n_randint(state, 10) * n_randint(state, 10);
             d = n_randint(state, 2 * m * n + 1);
 
             fmpz_mod_mat_init(A, m, n, p);
