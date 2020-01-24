@@ -167,8 +167,6 @@ FLINT_TLS_PREFIX size_t flint_num_cleanup_functions = 0;
 
 FLINT_TLS_PREFIX flint_cleanup_function_t * flint_cleanup_functions = NULL;
 
-#pragma omp threadprivate(flint_num_cleanup_functions, flint_cleanup_functions)
-
 #if FLINT_REENTRANT && !HAVE_TLS
 void register_init()
 {
