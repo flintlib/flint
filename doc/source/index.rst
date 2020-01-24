@@ -7,7 +7,7 @@ FLINT: Fast Library for Number Theory
 ======================================
 
 Welcome to FLINT's documentation! FLINT is a C library for doing number theory,
-maintained by William Hart.
+maintained by William Hart and Fredrik Johansson.
 
 * Source code on GitHub: https://github.com/wbhart/flint2
 * Issue tracker: https://github.com/wbhart/flint2/issues

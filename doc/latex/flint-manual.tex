@@ -282,10 +282,12 @@ architectures. To this end, the library is threadsafe, with few exceptions
 noted in the appropriate place.
 
 FLINT is currently maintained by William Hart of Technishe Universit\"{a}t
-in Kaiserslautern. FLINT was originally designed by William Hart and David
-Harvey. Since then FLINT was rewritten as FLINT 2 by William Hart, Fredrik
-Johansson and Sebastian Pancratz. Many other substantial contributions have
-been made by other authors. (See the Contributors list below for a list.)
+in Kaiserslautern and Fredrik Johansson of INRIA Bordeaux.
+
+FLINT was originally designed by William Hart and David Harvey. Since then
+FLINT was rewritten as FLINT 2 by William Hart, Fredrik Johansson and
+Sebastian Pancratz. Many other substantial contributions have been made
+by other authors. (See the Contributors list below for a list.)
 
 FLINT 2 and following should compile on any machine with GCC and a standard
 GNU toolchain, however it is specially optimised for x86 (32 and 64 bit)
@@ -332,7 +334,7 @@ or alternatively when using MPIR
 \begin{lstlisting}[language=bash]
 ./configure --with-mpir=/my/directory/ --with-mpfr=/my/directory/
 \end{lstlisting}
-FLINT can also handle source build of GMP/MPIR and MPFR. Though
+FLINT can also handle a source build of GMP/MPIR and MPFR. Though
 programs using FLINT will require GMP/MPIR and MPFR to be
 installed (via \code{make install} if built from sources). This is
 in particular true for the test code for FLINT: running \code{make check}
