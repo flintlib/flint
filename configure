@@ -17,8 +17,6 @@ SHARED=1
 STATIC=1
 TLS=1
 PTHREAD=1
-WANT_OPENMP=0
-OPENMP=0
 REENTRANT=0
 WANT_GC=0
 WANT_TLS=0
@@ -81,8 +79,6 @@ usage()
    echo "     --with-gc=<path>     GC safe build with path to gc"
    echo "     --enable-pthread     Use pthread (default)"
    echo "     --disable-pthread    Do not use pthread"
-   echo "     --enable-openmp      Use OpenMP"
-   echo "     --disable-openmp     Do not use OpenMP (default)"
    echo "     --enable-tls         Use thread-local storage (default)"
    echo "     --disable-tls        Do not use thread-local storage"
    echo "     --enable-assert      Enable use of asserts (use for debug builds only)"
@@ -175,13 +171,6 @@ while [ "$1" != "" ]; do
          if [ ! -z "$VALUE" ]; then
             GC_DIR="$VALUE"
          fi
-         ;;
-      --enable-openmp)
-         OPENMP=1
-         WANT_OPENMP=1
-         ;;
-      --disable-openmp)
-         OPENMP=0
          ;;
       --enable-pthread)
          PTHREAD=1
@@ -337,26 +326,11 @@ if [ -z "$AR" ]; then
    AR=ar
 fi
 
-#openmp provides tls
-if [ "$OPENMP" = "1" -a "$TLS" = "0" ]; then
-   if [ "$WANT_TLS" = "2" -a "$WANT_OPENMP" = "1" ]; then
-      echo "****WARNING**** Cannot have OpenMP without TLS. Disabling OpenMP."
-      OPENMP=0
-   elif [ "$WANT_OPENMP" = "1" ]; then
-      TLS=1
-   else
-      OPENMP=0
-   fi
-fi
-
 #handle gc and reentrant flags
 
 if [ "$WANT_GC" = "1" ]; then
       TLS=0
-      OPENMP=0
-      if [ "$WANT_OPENMP" = "1" ]; then
-          echo "****WARNING**** GC does not support TLS, which is implied by OpenMP....disabling both"
-      elif [ "$WANT_TLS" = "1" ]; then
+      if [ "$WANT_TLS" = "1" ]; then
           echo "****WARNING**** GC does not support TLS....disabling TLS"
       fi
       cp fmpz/link/fmpz_gc.c fmpz/fmpz.c
@@ -591,28 +565,20 @@ else
    printf "%s\n" "no"
 fi
 
-#get flag for OpenMP
-if [ "$OPENMP" = "1" ]; then
-    OPENMP_FLAG="-fopenmp"
-else
-    OPENMP_FLAG="-Wno-unknown-pragmas"
-fi
-CONFIG_OPENMP="#define HAVE_OPENMP ${WANT_OPENMP}"
-
 #defaults for CFLAGS
 
 if [ -z "$CFLAGS" ]; then
    if [ "$OS" = "MINGW64" ]; then
-      CFLAGS="-std=c99 -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
+      CFLAGS="-std=c99 -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    elif [ "$OS" = "CYGWIN64" ]; then
-      CFLAGS="-O2 -funroll-loops -g -D _WIN64 $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
+      CFLAGS="-O2 -funroll-loops -g -D _WIN64 $POPCNT_FLAG $ABI_FLAG"
    elif [ "$MACHINE" = "mips64" ]; then
-      CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
+      CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    elif [ "$KERNEL" = FreeBSD ]; then
-      CFLAGS="-std=c99 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
-      CXXFLAGS="-std=c++11 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
+      CFLAGS="-std=c99 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+      CXXFLAGS="-std=c++11 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    else
-      CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG $OPENMP_FLAG"
+      CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    fi
 fi
 
@@ -751,7 +717,6 @@ echo "$CONFIG_BLAS" >> config.h
 echo "$CONFIG_TLS" >> config.h
 echo "$CONFIG_FENV" >> config.h
 echo "$CONFIG_PTHREAD" >> config.h
-echo "$CONFIG_OPENMP" >> config.h
 echo "$CONFIG_GC" >> config.h
 echo "$CONFIG_CPU_SET_T" >> config.h
 echo "#define FLINT_REENTRANT $REENTRANT" >> config.h
