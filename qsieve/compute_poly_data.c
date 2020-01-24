@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2016, 2020 William Hart
     Copyright (C) 2015 Nitin Kumar
 
     This file is part of FLINT.

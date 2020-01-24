@@ -1,6 +1,7 @@
 /*
-    Copyright (C) 2006, 2011, 2016 William Hart
+    Copyright (C) 2006, 2011, 2016, 2020 William Hart
     Copyright (C) 2015 Nitin Kumar
+    Copyright (C) 2020 Dan Schultz
 
     This file is part of FLINT.
 

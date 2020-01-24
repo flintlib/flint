@@ -21,6 +21,7 @@
 
     Copyright (C) 2015 Nitin Kumar
     Copyright (C) 2016 William Hart
+    Copyright (C) 2020 Dan Schultz
 
 ******************************************************************************/
 
