@@ -30,28 +30,31 @@ int
 main(void)
 {
     int i;
+    slong max_threads = 3;
     FLINT_TEST_INIT(state);
     
     flint_printf("compose_mod_brent_kung_vec_preinv_threaded....");
     fflush(stdout);
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, ainv, b, c;
         mp_limb_t m = n_randtest_prime(state, 0);
         slong j, k, l;
         nmod_poly_struct * pow, * res;
 
-        flint_set_num_threads(1 + n_randint(state, 3));
+        flint_set_num_threads(1 + max_threads); /* n_randint(state, max_threads)); */
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
         nmod_poly_init(c, m);
         nmod_poly_init(ainv, m);
 
-        nmod_poly_randtest(b, state, 1+n_randint(state, 20));
-        nmod_poly_randtest_not_zero(a, state, 1+n_randint(state, 20));
-        l= n_randint(state, 20) + 1;
+        nmod_poly_randtest(b, state, 1+n_randint(state, 1000));
+        nmod_poly_randtest_not_zero(a, state, 1+n_randint(state, 1000));
+        l= n_randint(state, 1000) + 1;
         k= n_randint(state, l ) + 1;
 
         nmod_poly_rem(b, b, a);
@@ -63,15 +66,18 @@ main(void)
         for (j = 0; j < l - 1; j++)
         {
             nmod_poly_init(pow + j, m);
-            nmod_poly_randtest(pow + j, state, n_randint(state, 20) + 1);
+            nmod_poly_randtest(pow + j, state, n_randint(state, 1000) + 1);
             nmod_poly_rem(pow + j, pow + j, a);
         }
 
         nmod_poly_init(pow + l - 1, m);
         nmod_poly_set(pow + l - 1, b);
 
+	for (j = 0; j < k; j++)
+	    nmod_poly_init(res + j, m);
+
         nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(res, pow, l, k,
-                                                             a, ainv);
+                                           a, ainv, FLINT_DEFAULT_THREAD_LIMIT);
 
         for (j = 0; j < k; j++)
         {
@@ -100,9 +106,14 @@ main(void)
         flint_free(pow);
     }
 
-
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
+#else
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+#endif
+
     return 0;
 }

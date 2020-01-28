@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -17,62 +18,70 @@
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
+#include "thread_support.h"
 
 typedef struct
 {
-    nmod_poly_struct res;
-    nmod_poly_struct g;
+    nmod_poly_struct * res;
     nmod_mat_struct C;
     mp_srcptr h;
     mp_srcptr poly;
     mp_srcptr polyinv;
     nmod_t p;
-    slong j;
+    mp_ptr t;
+    volatile slong * j;
     slong k;
     slong m;
     slong len;
     slong leninv;
+    slong len2;
+    pthread_mutex_t * mutex;
 }
 compose_vec_arg_t;
 
-void *
+void
 _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
 {
-    compose_vec_arg_t arg= *((compose_vec_arg_t *) arg_ptr);
-    slong i, n;
-    mp_ptr t;
+    compose_vec_arg_t arg = *((compose_vec_arg_t *) arg_ptr);
+    slong i, j, k = arg.k, n = arg.len - 1;
+    mp_ptr t = arg.t;
 
-    n = arg.len - 1;
-    t = _nmod_vec_init(n);
-
-    _nmod_vec_set(arg.res.coeffs, arg.C.rows[(arg.j + 1) * arg.k - 1], n);
-    for (i = 2; i <= arg.k; i++)
+    while (1)
     {
-        _nmod_poly_mulmod_preinv(t, arg.res.coeffs, n, arg.h, n, arg.poly,
+        pthread_mutex_lock(arg.mutex);
+        j = *arg.j;
+        *arg.j = j + 1;
+        pthread_mutex_unlock(arg.mutex);
+
+        if (j >= arg.len2)
+            return;
+
+        _nmod_vec_set(arg.res[j].coeffs, arg.C.rows[(j + 1) * k - 1], n);
+        for (i = 2; i <= k; i++)
+        {
+            _nmod_poly_mulmod_preinv(t, arg.res[j].coeffs, n, arg.h, n, arg.poly,
                                      arg.len, arg.polyinv, arg.leninv, arg.p);
-        _nmod_poly_add(arg.res.coeffs, t, n,
-                           arg.C.rows[(arg.j + 1) * arg.k - i], n, arg.p);
+            _nmod_poly_add(arg.res[j].coeffs, t, n,
+                           arg.C.rows[(j + 1) * k - i], n, arg.p);
+        }
     }
-
-    _nmod_vec_clear(t);
-
-    flint_cleanup();
-    return NULL;
 }
 
 void
-_nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
+_nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
                                              const nmod_poly_struct * polys,
                                              slong lenpolys, slong l,
                                              mp_srcptr poly, slong len,
                                              mp_srcptr polyinv, slong leninv,
-                                             nmod_t mod)
+                                             nmod_t mod,
+                                             thread_pool_handle * threads,
+                                             slong num_threads)
 {
     nmod_mat_t A, B, C;
-    slong i, j, n, m, k, len2 = l, len1, num_threads, c;
+    slong i, j, n, m, k, len2 = l, len1, shared_j = 0;
     mp_ptr h;
-    pthread_t *threads;
     compose_vec_arg_t * args;
+    pthread_mutex_t mutex;
 
     n = len - 1;
 
@@ -112,42 +121,46 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
     _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
                              len, polyinv, leninv, mod);
 
-    num_threads = flint_get_num_threads();
+    args = flint_malloc(sizeof(compose_vec_arg_t) * (num_threads + 1));
 
-    threads = flint_malloc(sizeof(pthread_t) * num_threads);
-    args = flint_malloc(sizeof(compose_vec_arg_t) * num_threads);
-
-    for (j = 0; j < len2 / num_threads + 1; j++)
+    for (i = 0; i < num_threads + 1; i++)
     {
-        c = 0;
-        for (i = 0; i < num_threads; i++)
-        {
-            if (i + j * num_threads < len2)
-            {
-                c++;
-                args[i].res     = res[i + j * num_threads];
-                args[i].C       = *C;
-                args[i].g       = polys[i + j * num_threads];
-                args[i].h       = h;
-                args[i].k       = k;
-                args[i].m       = m;
-                args[i].j       = i + j * num_threads;
-                args[i].poly    = poly;
-                args[i].len     = len;
-                args[i].polyinv = polyinv;
-                args[i].leninv  = leninv;
-                args[i].p       = mod;
-
-                pthread_create(&threads[i], NULL,
-                        _nmod_poly_compose_mod_brent_kung_vec_preinv_worker,
-                        &args[i]);
-            }
-        }
-        for (i = 0; i < c; i++)
-            pthread_join(threads[i], NULL);
+        args[i].res     = res;
+        args[i].C       = *C;
+        args[i].h       = h;
+        args[i].k       = k;
+        args[i].m       = m;
+        args[i].j       = &shared_j;
+        args[i].poly    = poly;
+        args[i].t       = _nmod_vec_init(len);
+        args[i].len     = len;
+        args[i].polyinv = polyinv;
+        args[i].leninv  = leninv;
+        args[i].p       = mod;
+        args[i].len2    = len2;
+        args[i].mutex   = &mutex;
     }
 
-    flint_free(threads);
+    pthread_mutex_init(&mutex, NULL);
+
+    for (i = 0; i < num_threads; i++)
+    {
+        thread_pool_wake(global_thread_pool, threads[i],
+                _nmod_poly_compose_mod_brent_kung_vec_preinv_worker, &args[i]);
+    }
+
+    _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(&args[num_threads]);
+
+    for (i = 0; i < num_threads; i++)
+    {
+        thread_pool_wait(global_thread_pool, threads[i]);
+    }
+
+    pthread_mutex_destroy(&mutex);
+
+    for (i = 0; i < num_threads + 1; i++)
+       _nmod_vec_clear(args[i].t);
+    
     flint_free(args);
 
     _nmod_vec_clear(h);
@@ -158,19 +171,69 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
 }
 
 void
+nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
+                                            const nmod_poly_struct * polys,
+                                            slong len1, slong n,
+                                            const nmod_poly_t poly,
+                                            const nmod_poly_t polyinv,
+                                            thread_pool_handle * threads,
+                                            slong num_threads)
+{
+    slong len2 = poly->length;
+    slong i;
+
+    if (n == 0)
+        return;
+
+    if (len2 == 1)
+    {
+        for (i = 0; i < n; i++)
+            nmod_poly_zero(res + i);
+
+        return;
+    }
+
+    if (len2 == 2)
+    {
+        for (i = 0; i < n; i++)
+            nmod_poly_set(res + i, polys + i);
+
+        return;
+    }
+
+    for (i = 0; i < n; i++)
+    {
+        nmod_poly_fit_length(res + i, len2 - 1);
+        _nmod_poly_set_length(res + i, len2 - 1);
+    }
+
+    _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(res, polys, len1, n,
+                                                          poly->coeffs, len2,
+                                                          polyinv->coeffs,
+                                                          polyinv->length,
+                                                          poly->mod,
+                                                          threads,
+                                                          num_threads);
+
+    for (i = 0; i < n; i++)
+        _nmod_poly_normalise(res + i);
+}
+
+void
 nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
                                             const nmod_poly_struct * polys,
                                             slong len1, slong n,
                                             const nmod_poly_t poly,
-                                            const nmod_poly_t polyinv)
+                                            const nmod_poly_t polyinv,
+                                            slong thread_limit)
 {
-    slong len2 = poly->length;
-    slong len3, i;
-
+    slong i, len2 = poly->length;
+    thread_pool_handle * threads;
+    slong num_threads;
+    
     for (i = 0; i < len1; i++)
     {
-        len3 = (polys + i)->length;
-        if (len3 >= len2)
+        if ((polys + i)->length >= len2)
         {
             flint_printf
                 ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
@@ -194,34 +257,36 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
     if (len2 == 1)
     {
         for (i = 0; i < n; i++)
-        {
-            nmod_poly_init_preinv(res + i, poly->mod.n, poly->mod.ninv);
             nmod_poly_zero(res + i);
-        }
+
         return;
     }
 
     if (len2 == 2)
     {
         for (i = 0; i < n; i++)
-        {
-            nmod_poly_init_preinv(res + i, poly->mod.n, poly->mod.ninv);
             nmod_poly_set(res + i, polys + i);
-        }
+
         return;
     }
 
     for (i = 0; i < n; i++)
     {
-        nmod_poly_init2_preinv(res + i, poly->mod.n, poly->mod.ninv, len2 - 1);
+        nmod_poly_fit_length(res + i, len2 - 1);
         _nmod_poly_set_length(res + i, len2 - 1);
     }
 
-    _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(res, polys, len1, n,
+    num_threads = flint_request_threads(&threads, thread_limit);
+
+    _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(res, polys, len1, n,
                                                           poly->coeffs, len2,
                                                           polyinv->coeffs,
                                                           polyinv->length,
-                                                          poly->mod);
+                                                          poly->mod,
+                                                          threads,
+                                                          num_threads);
+
+    flint_give_back_threads(threads, num_threads);
 
     for (i = 0; i < n; i++)
         _nmod_poly_normalise(res + i);

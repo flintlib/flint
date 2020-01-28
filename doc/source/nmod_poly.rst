@@ -1449,7 +1449,6 @@ Modular composition
     Sets ``res`` to the composition `f(g)` modulo `h`. We require that
     `h` is nonzero. The algorithm used is Horner's rule.
 
-
 .. function:: void _nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod)
 
     Sets ``res`` to the composition `f(g)` modulo `h`. We require that
@@ -1561,7 +1560,7 @@ Modular composition
     where `f_i` are the first ``n`` elements of ``polys`` and `g` is the
     last element of ``polys``. We require ``res`` to have enough memory
     allocated to hold ``n`` ``nmod_poly_struct``. The entries of
-    ``res`` need to be uninitialised and ``n`` needs to be less than
+    ``res`` need to be initialised and ``n`` needs to be less than
     ``len1``. We require that `h` is nonzero and that `f_i` and `g` have
     smaller degree than `h`. Furthermore, we require ``hinv`` to be the
     inverse of the reverse of ``h``. No aliasing of ``res`` and

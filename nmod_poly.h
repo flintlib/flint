@@ -34,6 +34,7 @@
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
+#include "thread_support.h"
 
 #ifdef __cplusplus
     extern "C" {
@@ -993,13 +994,15 @@ FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_s
                                              slong lenpolys, slong l,
                                              mp_srcptr poly, slong len,
                                              mp_srcptr polyinv, slong leninv,
-                                             nmod_t mod);
+                                             nmod_t mod, thread_pool_handle * threads,
+					     slong num_threads);
 
 FLINT_DLL void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
                                             const nmod_poly_struct * polys,
                                             slong len1, slong n,
                                             const nmod_poly_t poly,
-                                            const nmod_poly_t polyinv);
+                                            const nmod_poly_t polyinv,
+					    slong thread_limit);
 
 FLINT_DLL void _nmod_poly_compose_mod_horner(mp_ptr res,
     mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod);

@@ -23,6 +23,7 @@
 #define ulong mp_limb_t
 
 #include "nmod_poly.h"
+#include "thread_support.h"
 
 void *
 _nmod_poly_interval_poly_worker(void* arg_ptr)
@@ -136,12 +137,12 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                                                         *(h + 1),
                                                         (1 << (i - 1)),
                                                         (1 << (i - 1)), v,
-                                                        vinv);
+                                                        vinv, FLINT_DEFAULT_THREAD_LIMIT);
         nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(*(h + 1 +
                                                     (1 << (i - 1))), *(h + 1),
                                                     (1 << (i - 1)),
                                                     l - (1 << (i - 1)), v,
-                                                    vinv);
+                                                    vinv, FLINT_DEFAULT_THREAD_LIMIT);
     }
     else
     {
