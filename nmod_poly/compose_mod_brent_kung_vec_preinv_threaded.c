@@ -121,7 +121,8 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
     _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
                              len, polyinv, leninv, mod);
 
-    args = flint_malloc(sizeof(compose_vec_arg_t) * (num_threads + 1));
+    args = (compose_vec_arg_t *)
+	    flint_malloc(sizeof(compose_vec_arg_t) * (num_threads + 1));
 
     for (i = 0; i < num_threads + 1; i++)
     {
