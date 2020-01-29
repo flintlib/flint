@@ -658,6 +658,13 @@ FLINT_DLL void nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
                            const nmod_poly_t poly, mpz_srcptr e,
                            const nmod_poly_t f, const nmod_poly_t finv);
 
+FLINT_DLL void _nmod_poly_powers_mod_preinv_naive(mp_ptr * res, mp_srcptr f,
+		 slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv,
+		                              slong ginvlen, const nmod_t mod);
+
+FLINT_DLL void nmod_poly_powers_mod_naive(nmod_poly_struct * res,
+                            const nmod_poly_t f, slong n, const nmod_poly_t g);
+
 /* Division  *****************************************************************/
 
 FLINT_DLL void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
