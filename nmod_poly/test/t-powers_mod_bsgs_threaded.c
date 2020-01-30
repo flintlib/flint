@@ -103,7 +103,7 @@ main(void)
 #else
     FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
+    flint_printf("SKIPPED\n");
 #endif
 
     return 0;

@@ -172,6 +172,8 @@ void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c
 
 FLINT_DLL void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 FLINT_DLL void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+FLINT_DLL void nmod_mat_mul_classical_threaded(nmod_mat_t C,
+		   const nmod_mat_t A, const nmod_mat_t B, slong thread_limit);
 FLINT_DLL void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
 FLINT_DLL void _nmod_mat_mul_classical(nmod_mat_t D, const nmod_mat_t C,
