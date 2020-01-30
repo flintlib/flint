@@ -189,6 +189,110 @@ _nmod_mat_addmul_transpose_threaded_pool(mp_ptr * D, const mp_ptr * C,
     flint_free(tmp);
 }
 
+typedef struct 
+{
+    slong block;
+    volatile slong * i;
+    volatile slong * j;
+    slong M;
+    slong K;
+    slong N;
+    slong Kpack;
+    const mp_ptr * A;
+    const mp_ptr * C;
+    mp_ptr * D;
+    mp_ptr tmp;
+    nmod_t mod;
+    mp_limb_t mask;
+    pthread_mutex_t * mutex;
+    int pack;
+    int pack_bits;
+    int op;
+} nmod_mat_packed_arg_t;
+
+void
+_nmod_mat_addmul_packed_worker(void * arg_ptr)
+{
+    nmod_mat_packed_arg_t arg = *((nmod_mat_packed_arg_t *) arg_ptr);
+    slong i, j, k, iend, jend, jstart;
+    slong block = arg.block;
+    slong M = arg.M;
+    slong K = arg.K;
+    slong N = arg.N;
+    slong Kpack = arg.Kpack;
+    const mp_ptr * A = arg.A;
+    const mp_ptr * C = arg.C;
+    mp_ptr * D = arg.D;
+    mp_ptr tmp = arg.tmp;
+    nmod_t mod = arg.mod;
+    mp_limb_t mask = arg.mask;
+    int pack = arg.pack;
+    int pack_bits = arg.pack_bits;
+    int op = arg.op;
+    mp_limb_t c, d;
+    mp_ptr Aptr, Tptr;
+    
+    while (1)
+    {
+        pthread_mutex_lock(arg.mutex);
+        i = *arg.i;
+        j = *arg.j;
+        if (j >= Kpack)
+        {
+            i += block;
+            *arg.i = i;
+            j = 0;
+        }
+        *arg.j = j + block;
+        pthread_mutex_unlock(arg.mutex);
+
+        if (i >= M)
+            return;
+
+        iend = FLINT_MIN(i + block, M);
+        jend = FLINT_MIN(j + block, Kpack);
+        jstart = j;
+
+        /* multiply */
+        for ( ; i < iend; i++)
+        {
+            for (j = jstart; j < jend; j++)
+            {
+                Aptr = A[i];
+                Tptr = tmp + j * N;
+
+                c = 0;
+
+                /* unroll by 4 */
+                for (k = 0; k + 4 <= N; k += 4)
+                {
+                    c += Aptr[k + 0] * Tptr[k + 0];
+                    c += Aptr[k + 1] * Tptr[k + 1];
+                    c += Aptr[k + 2] * Tptr[k + 2];
+                    c += Aptr[k + 3] * Tptr[k + 3];
+                }
+
+                for ( ; k < N; k++)
+                    c += Aptr[k] * Tptr[k];
+
+                /* unpack and reduce */
+                for (k = 0; k < pack && j * pack + k < K; k++)
+                {
+                    d = (c >> (k * pack_bits)) & mask;
+                    NMOD_RED(d, d, mod);
+
+                    if (op == 1)
+                        d = nmod_add(C[i][j * pack + k], d, mod);
+                    else if (op == -1)
+                        d = nmod_sub(C[i][j * pack + k], d, mod);
+
+                    D[i][j * pack + k] = d;
+                }
+            }
+        }
+    }
+}
+
 /* requires nlimbs = 1 */
 void
 _nmod_mat_addmul_packed_threaded_pool(mp_ptr * D,
@@ -197,11 +301,13 @@ _nmod_mat_addmul_packed_threaded_pool(mp_ptr * D,
                                thread_pool_handle * threads, slong num_threads)
 {
     slong i, j, k;
-    slong Kpack;
+    slong Kpack, block;
     int pack, pack_bits;
-    mp_limb_t c, d, mask;
+    mp_limb_t c, mask;
     mp_ptr tmp;
-    mp_ptr Aptr, Tptr;
+    slong shared_i = 0, shared_j = 0;
+    nmod_mat_packed_arg_t * args;
+    pthread_mutex_t mutex;
 
     /* bound unreduced entry */
     c = N * (mod.n-1) * (mod.n-1);
@@ -230,43 +336,53 @@ _nmod_mat_addmul_packed_threaded_pool(mp_ptr * D,
         }
     }
 
-    /* multiply */
-    for (i = 0; i < M; i++)
+    /* compute optimal block width */
+    block = FLINT_MAX(FLINT_MIN(M/(num_threads + 1), Kpack/(num_threads + 1)), 1);
+    
+    while (2*block*N > FLINT_MUL_CLASSICAL_CACHE_SIZE && block > 1)
+        block >>= 1;
+
+    args = flint_malloc(sizeof(nmod_mat_packed_arg_t) * (num_threads + 1));
+
+    for (i = 0; i < num_threads + 1; i++)
     {
-        for (j = 0; j < Kpack; j++)
-        {
-            Aptr = A[i];
-            Tptr = tmp + j * N;
-
-            c = 0;
-
-            /* unroll by 4 */
-            for (k = 0; k + 4 <= N; k += 4)
-            {
-                c += Aptr[k + 0] * Tptr[k + 0];
-                c += Aptr[k + 1] * Tptr[k + 1];
-                c += Aptr[k + 2] * Tptr[k + 2];
-                c += Aptr[k + 3] * Tptr[k + 3];
-            }
-
-            for ( ; k < N; k++)
-                c += Aptr[k] * Tptr[k];
-
-            /* unpack and reduce */
-            for (k = 0; k < pack && j * pack + k < K; k++)
-            {
-                d = (c >> (k * pack_bits)) & mask;
-                NMOD_RED(d, d, mod);
-
-                if (op == 1)
-                    d = nmod_add(C[i][j * pack + k], d, mod);
-                else if (op == -1)
-                    d = nmod_sub(C[i][j * pack + k], d, mod);
-
-                D[i][j * pack + k] = d;
-            }
-        }
+        args[i].block     = block;
+        args[i].i         = &shared_i;
+        args[i].j         = &shared_j;
+        args[i].M         = M;
+        args[i].K         = K;
+        args[i].N         = N;
+        args[i].Kpack     = Kpack;
+        args[i].A         = A;
+        args[i].C         = C;
+        args[i].D         = D;
+        args[i].tmp       = tmp;
+        args[i].mod       = mod;
+        args[i].mask      = mask;
+        args[i].mutex     = &mutex;
+        args[i].pack      = pack;
+        args[i].pack_bits = pack_bits;
+        args[i].op        = op;
     }
+
+    pthread_mutex_init(&mutex, NULL);
+
+    for (i = 0; i < num_threads; i++)
+    {
+        thread_pool_wake(global_thread_pool, threads[i],
+                _nmod_mat_addmul_packed_worker, &args[i]);
+    }
+
+    _nmod_mat_addmul_packed_worker(&args[num_threads]);
+
+    for (i = 0; i < num_threads; i++)
+    {
+        thread_pool_wait(global_thread_pool, threads[i]);
+    }
+
+    pthread_mutex_destroy(&mutex);
+
+    flint_free(args);
 
     _nmod_vec_clear(tmp);
 }
