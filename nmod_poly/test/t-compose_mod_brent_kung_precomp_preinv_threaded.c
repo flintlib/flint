@@ -26,6 +26,7 @@
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
+#include "thread_support.h"
 
 int
 main(void)
@@ -36,6 +37,7 @@ main(void)
     flint_printf("compose_mod_brent_kung_precomp_preinv_threaded....");
     fflush(stdout);
 
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     /* check precomputation */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -44,40 +46,40 @@ main(void)
         mp_limb_t m = n_randtest_prime(state, 0);
         slong j, num_threads;
         nmod_poly_matrix_precompute_arg_t * args1;
-        pthread_t *threads;
+        thread_pool_handle * threads;
 
         flint_set_num_threads(1 + n_randint(state, 3));
 
-        num_threads = flint_get_num_threads();
+        num_threads = flint_request_threads(&threads, FLINT_DEFAULT_THREAD_LIMIT);
 
-        threads = flint_malloc(sizeof(pthread_t) * num_threads);
-        tmp = flint_malloc(sizeof(nmod_poly_t) * num_threads);
+        tmp = flint_malloc(sizeof(nmod_poly_t)*(num_threads + 1));
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
         nmod_poly_init(c, m);
         nmod_poly_init(cinv, m);
-        for (j= 0; j < num_threads; j++)
+
+        for (j = 0; j < num_threads + 1; j++)
             nmod_poly_init(tmp[j], m);
 
-        nmod_poly_randtest_not_zero(a, state, 1+n_randint(state, 20));
-        nmod_poly_randtest_not_zero(b, state, 1+n_randint(state, 20));
+        nmod_poly_randtest_not_zero(a, state, 1 + n_randint(state, 20));
+        nmod_poly_randtest_not_zero(b, state, 1 + n_randint(state, 20));
         do
         {
-            nmod_poly_randtest_not_zero(c, state, 1+n_randint(state, 20));
+            nmod_poly_randtest_not_zero(c, state, 1 + n_randint(state, 20));
         } while (c->length < 2);
 
         nmod_poly_reverse(cinv, c, c->length);
         nmod_poly_inv_series(cinv, cinv, c->length);
 
-        nmod_mat_init (B, n_sqrt (c->length-1)+1, c->length-1, m);
-        nmod_poly_precompute_matrix (B, b, c, cinv);
+        nmod_mat_init(B, n_sqrt (c->length - 1) + 1, c->length - 1, m);
+        nmod_poly_precompute_matrix(B, b, c, cinv);
 
         args1 = flint_malloc(sizeof(nmod_poly_matrix_precompute_arg_t)
-                             * num_threads);
-        C = flint_malloc(sizeof(nmod_mat_t) * num_threads);
+                             *(num_threads + 1));
+        C = flint_malloc(sizeof(nmod_mat_t)*(num_threads + 1));
 
-        for (j = 0; j < num_threads; j++)
+        for (j = 0; j < num_threads + 1; j++)
         {
             nmod_mat_init(C[j], n_sqrt(c->length - 1) + 1, c->length - 1, m);
             nmod_poly_set(tmp[j], b);
@@ -93,14 +95,17 @@ main(void)
             args1[j].poly1    = *tmp[j];
             args1[j].poly2    = *c;
             args1[j].poly2inv = *cinv;
-
-            pthread_create(&threads[j], NULL,
+        }
+	for (j = 1; j < num_threads + 1; j++)
+        {
+	    thread_pool_wake(global_thread_pool, threads[j - 1],
                            _nmod_poly_precompute_matrix_worker, &args1[j]);
         }
-        for (j = 0; j < num_threads; j++)
-            pthread_join(threads[j], NULL);
+	_nmod_poly_precompute_matrix_worker(&args1[0]);
+        for (j = 1; j < num_threads + 1; j++)
+            thread_pool_wait(global_thread_pool, threads[j - 1]);
 
-        for (j = 0; j < num_threads; j++)
+        for (j = 0; j < num_threads + 1; j++)
         {
             if (!nmod_mat_equal(B, C[j]))
             {
@@ -114,23 +119,24 @@ main(void)
             }
         }
 
+	flint_give_back_threads(threads, num_threads);
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_mat_clear (B);
         nmod_poly_clear(c);
         nmod_poly_clear(cinv);
-        for (j = 0; j < num_threads; j++)
+        
+	for (j = 0; j < num_threads + 1; j++)
         {
             nmod_poly_clear(tmp[j]);
             nmod_mat_clear(C[j]);
         }
-        flint_free(C);
+        
+	flint_free(C);
         flint_free(tmp);
         flint_free(args1);
-        flint_free(threads);
     }
-
-#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
 
     /* check composition */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -140,25 +146,24 @@ main(void)
         mp_limb_t m = n_randtest_prime(state, 0);
         slong j, num_threads;
         nmod_poly_compose_mod_precomp_preinv_arg_t * args1;
-        pthread_t *threads;
+        thread_pool_handle * threads;
 
         flint_set_num_threads(1 + n_randint(state, 3));
 
-        num_threads = flint_get_num_threads();
+        num_threads = flint_request_threads(&threads, FLINT_DEFAULT_THREAD_LIMIT);
 
-        threads = flint_malloc(sizeof(pthread_t) * num_threads);
-        res = flint_malloc(sizeof(nmod_poly_t) * num_threads);
+        res = flint_malloc(sizeof(nmod_poly_t)*(num_threads + 1));
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
         nmod_poly_init(c, m);
         nmod_poly_init(cinv, m);
         nmod_poly_init(d, m);
-        for (j= 0; j < num_threads; j++)
+        for (j = 0; j < num_threads + 1; j++)
             nmod_poly_init(res[j], m);
 
-        nmod_poly_randtest_not_zero(a, state, 1+n_randint(state, 20));
-        nmod_poly_randtest_not_zero(b, state, 1+n_randint(state, 20));
+        nmod_poly_randtest_not_zero(a, state, 1 + n_randint(state, 20));
+        nmod_poly_randtest_not_zero(b, state, 1 + n_randint(state, 20));
         do
         {
             nmod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1);
@@ -167,16 +172,16 @@ main(void)
         nmod_poly_reverse(cinv, c, c->length);
         nmod_poly_inv_series(cinv, cinv, c->length);
 
-        nmod_mat_init (B, n_sqrt (c->length-1)+1, c->length-1, m);
-        nmod_poly_precompute_matrix (B, b, c, cinv);
+        nmod_mat_init(B, n_sqrt(c->length - 1) + 1, c->length - 1, m);
+        nmod_poly_precompute_matrix(B, b, c, cinv);
 
         nmod_poly_rem(a, a, c);
         nmod_poly_compose_mod(d, a, b, c);
 
-        args1 = flint_malloc(num_threads *
+        args1 = flint_malloc((num_threads + 1)*
                         sizeof(nmod_poly_compose_mod_precomp_preinv_arg_t));
 
-        for (j = 0; j < num_threads; j++)
+        for (j = 0; j < num_threads + 1; j++)
         {
             nmod_poly_fit_length(res[j], c->length - 1);
             _nmod_poly_set_length(res[j], c->length - 1);
@@ -186,17 +191,21 @@ main(void)
             args1[j].poly1    = *a;
             args1[j].poly3    = *c;
             args1[j].poly3inv = *cinv;
-
-            pthread_create(&threads[j], NULL,
-                           _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args1[j]);
+	}
+        for (j = 1; j < num_threads + 1; j++)
+	{
+            thread_pool_wake(global_thread_pool, threads[j - 1],
+                _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args1[j]);
         }
-        for (j = 0; j < num_threads; j++)
+	_nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(&args1[0]);
+        _nmod_poly_normalise(res[0]);
+	for (j = 1; j < num_threads + 1; j++)
         {
-            pthread_join(threads[j], NULL);
+            thread_pool_wait(global_thread_pool, threads[j - 1]);
             _nmod_poly_normalise(res[j]);
         }
 
-        for (j = 0; j < num_threads; j++)
+        for (j = 0; j < num_threads + 1; j++)
         {
             if (!nmod_poly_equal(d, res[j]))
             {
@@ -210,17 +219,20 @@ main(void)
             }
         }
 
+	flint_give_back_threads(threads, num_threads);
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_mat_clear (B);
         nmod_poly_clear(c);
         nmod_poly_clear(cinv);
         nmod_poly_clear(d);
-        for (j = 0; j < num_threads; j++)
+
+        for (j = 0; j < num_threads + 1; j++)
             nmod_poly_clear(res[j]);
-        flint_free(res);
+        
+	flint_free(res);
         flint_free(args1);
-        flint_free(threads);
     }
 
     FLINT_TEST_CLEANUP(state);
