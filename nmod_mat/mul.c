@@ -14,6 +14,7 @@
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
+#include "thread_support.h"
 
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
@@ -29,7 +30,9 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     else
         cutoff = 200;
 
-    if (m < cutoff || n < cutoff || k < cutoff)
+    if (flint_get_num_threads() > 1)
+	nmod_mat_mul_classical_threaded(C, A, B, FLINT_DEFAULT_THREAD_LIMIT);
+    else if (m < cutoff || n < cutoff || k < cutoff)
         nmod_mat_mul_classical(C, A, B);
     else
         nmod_mat_mul_strassen(C, A, B);
