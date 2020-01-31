@@ -30,7 +30,7 @@ int
 main(void)
 {
     int i;
-    slong max_threads = 3;
+    slong max_threads = 5;
     FLINT_TEST_INIT(state);
     
     flint_printf("compose_mod_brent_kung_vec_preinv_threaded....");
@@ -38,23 +38,23 @@ main(void)
 
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
 
-    for (i = 0; i < 1 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, ainv, b, c;
         mp_limb_t m = n_randtest_prime(state, 0);
         slong j, k, l;
         nmod_poly_struct * pow, * res;
 
-        flint_set_num_threads(1 + max_threads); /* n_randint(state, max_threads)); */
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
         nmod_poly_init(c, m);
         nmod_poly_init(ainv, m);
 
-        nmod_poly_randtest(b, state, 1+n_randint(state, 1500000));
-        nmod_poly_randtest_not_zero(a, state, 1+n_randint(state, 15));
-        l= n_randint(state, 30) + 1;
+        nmod_poly_randtest(b, state, 1+n_randint(state, 200));
+        nmod_poly_randtest_not_zero(a, state, 1+n_randint(state, 200));
+        l= n_randint(state, 100) + 1;
         k= n_randint(state, l ) + 1;
 
         nmod_poly_rem(b, b, a);
@@ -66,7 +66,7 @@ main(void)
         for (j = 0; j < l - 1; j++)
         {
             nmod_poly_init(pow + j, m);
-            nmod_poly_randtest(pow + j, state, n_randint(state, 1500000) + 1);
+            nmod_poly_randtest(pow + j, state, n_randint(state, 200) + 1);
             nmod_poly_rem(pow + j, pow + j, a);
         }
 
@@ -79,7 +79,6 @@ main(void)
         nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(res, pow, l, k,
                                            a, ainv, FLINT_DEFAULT_THREAD_LIMIT);
 
-       /*
 	for (j = 0; j < k; j++)
         {
             nmod_poly_compose_mod(c, pow + j, b, a);
@@ -95,7 +94,6 @@ main(void)
                 abort();
             }
         }
-	*/
 
         nmod_poly_clear(a);
         nmod_poly_clear(ainv);

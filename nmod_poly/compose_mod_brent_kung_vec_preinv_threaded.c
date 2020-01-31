@@ -106,23 +106,18 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
     }
 
     /* Set rows of A to powers of last element of polys */
-    A->rows[0][0] = UWORD(1);
-    _nmod_vec_set(A->rows[1], (polys + lenpolys - 1)->coeffs,
-                  (polys + lenpolys - 1)->length);
-    flint_mpn_zero(A->rows[1] + (polys + lenpolys - 1)->length,
-                   n - (polys + lenpolys - 1)->length);
-    for (i = 2; i < m; i++)
-        _nmod_poly_mulmod_preinv(A->rows[i], A->rows[i - 1], n, A->rows[1],
-                                     n, poly, len, polyinv, leninv, mod);
+    _nmod_poly_powers_mod_preinv_threaded_pool(A->rows,
+     (polys + lenpolys - 1)->coeffs, (polys + lenpolys - 1)->length,
+	                 m, poly, len, polyinv, leninv, mod, threads, num_threads);
 
-    nmod_mat_mul(C, B, A);
+    _nmod_mat_mul_classical_threaded_pool(C, NULL, B, A, 0,
+                                                         threads, num_threads);
 
     /* Evaluate block composition using the Horner scheme */
     _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
                              len, polyinv, leninv, mod);
 
-    args = (compose_vec_arg_t *)
-	    flint_malloc(sizeof(compose_vec_arg_t) * (num_threads + 1));
+    args = flint_malloc(sizeof(compose_vec_arg_t) * (num_threads + 1));
 
     for (i = 0; i < num_threads + 1; i++)
     {
