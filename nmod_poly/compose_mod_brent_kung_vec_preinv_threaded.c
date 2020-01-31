@@ -71,6 +71,7 @@ void
 _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
                                              const nmod_poly_struct * polys,
                                              slong lenpolys, slong l,
+                                             const mp_srcptr g, slong glen,
                                              mp_srcptr poly, slong len,
                                              mp_srcptr polyinv, slong leninv,
                                              nmod_t mod,
@@ -105,9 +106,8 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
                       len1 % m);
     }
 
-    /* Set rows of A to powers of last element of polys */
-    _nmod_poly_powers_mod_preinv_threaded_pool(A->rows,
-     (polys + lenpolys - 1)->coeffs, (polys + lenpolys - 1)->length,
+    /* Set rows of A to powers of g */
+    _nmod_poly_powers_mod_preinv_threaded_pool(A->rows, g, glen,
 	                 m, poly, len, polyinv, leninv, mod, threads, num_threads);
 
     _nmod_mat_mul_classical_threaded_pool(C, NULL, B, A, 0,
@@ -170,6 +170,7 @@ void
 nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
                                             const nmod_poly_struct * polys,
                                             slong len1, slong n,
+                                            const nmod_poly_t g,
                                             const nmod_poly_t poly,
                                             const nmod_poly_t polyinv,
                                             thread_pool_handle * threads,
@@ -204,6 +205,7 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res
     }
 
     _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(res, polys, len1, n,
+                                                          g->coeffs, g->length,
                                                           poly->coeffs, len2,
                                                           polyinv->coeffs,
                                                           polyinv->length,
@@ -219,6 +221,7 @@ void
 nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
                                             const nmod_poly_struct * polys,
                                             slong len1, slong n,
+                                            const nmod_poly_t g,
                                             const nmod_poly_t poly,
                                             const nmod_poly_t polyinv,
                                             slong thread_limit)
@@ -275,6 +278,7 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
     num_threads = flint_request_threads(&threads, thread_limit);
 
     _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(res, polys, len1, n,
+                                                          g->coeffs, g->length,
                                                           poly->coeffs, len2,
                                                           polyinv->coeffs,
                                                           polyinv->length,
@@ -287,4 +291,3 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
     for (i = 0; i < n; i++)
         _nmod_poly_normalise(res + i);
 }
-

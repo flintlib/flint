@@ -977,7 +977,7 @@ FLINT_DLL void _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t
 FLINT_DLL void _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
                slong len2, mp_srcptr poly2inv, slong len2inv, nmod_t mod);
 
-FLINT_DLL void * _nmod_poly_precompute_matrix_worker (void * arg_ptr);
+FLINT_DLL void _nmod_poly_precompute_matrix_worker (void * arg_ptr);
 
 FLINT_DLL void nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
                           const nmod_poly_t poly2, const nmod_poly_t poly2inv);
@@ -987,7 +987,7 @@ FLINT_DLL void _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_s
                             slong len3, mp_srcptr poly3inv, slong len3inv,
                             nmod_t mod);
 
-FLINT_DLL void * _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr);
+FLINT_DLL void _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr);
 
 FLINT_DLL void nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_mat_t A,
@@ -1009,11 +1009,18 @@ FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv (nmod_poly_struct * 
 FLINT_DLL void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
                     const nmod_poly_struct * polys, slong len1, slong n,
                     const nmod_poly_t poly, const nmod_poly_t polyinv);
-
+FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr);
+FLINT_DLL void
+nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
+           const nmod_poly_struct * polys, slong len1, slong n,
+                          const nmod_poly_t g, const nmod_poly_t poly,
+                     const nmod_poly_t polyinv, thread_pool_handle * threads,
+                                                                slong num_threads); 
 FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
                                              const nmod_poly_struct * polys,
                                              slong lenpolys, slong l,
-                                             mp_srcptr poly, slong len,
+                                             mp_srcptr g, slong glen,
+					     mp_srcptr poly, slong len,
                                              mp_srcptr polyinv, slong leninv,
                                              nmod_t mod, thread_pool_handle * threads,
 					     slong num_threads);
@@ -1021,7 +1028,8 @@ FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_s
 FLINT_DLL void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
                                             const nmod_poly_struct * polys,
                                             slong len1, slong n,
-                                            const nmod_poly_t poly,
+                                            const nmod_poly_t g,
+					    const nmod_poly_t poly,
                                             const nmod_poly_t polyinv,
 					    slong thread_limit);
 

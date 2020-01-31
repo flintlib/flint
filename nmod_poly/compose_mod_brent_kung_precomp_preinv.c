@@ -36,7 +36,7 @@ _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
     _nmod_vec_clear (tmp1);
 }
 
-void *
+void
 _nmod_poly_precompute_matrix_worker (void * arg_ptr)
 {
     nmod_poly_matrix_precompute_arg_t arg =
@@ -54,8 +54,6 @@ _nmod_poly_precompute_matrix_worker (void * arg_ptr)
         _nmod_poly_mulmod_preinv(arg.A.rows[i], arg.A.rows[i - 1], n,
                                  arg.poly1.coeffs, n, arg.poly2.coeffs, n + 1,
                                  arg.poly2inv.coeffs, n + 1, arg.poly2.mod);
-    flint_cleanup();
-    return NULL;
 }
 
 void
@@ -125,7 +123,7 @@ nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
     _nmod_vec_clear (ptr1);
 }
 
-void *
+void
 _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 {
     nmod_poly_compose_mod_precomp_preinv_arg_t arg=
@@ -137,15 +135,11 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     n = arg.poly3.length - 1;
 
     if (arg.poly3.length == 1)
-    {
-        flint_cleanup();
-        return NULL;
-    }
+        return;
     if (arg.poly1.length == 1)
     {
         arg.res.coeffs[0] = arg.poly1.coeffs[0];
-        flint_cleanup();
-        return NULL;
+        return;
     }
 
     if (arg.poly3.length == 2)
@@ -153,8 +147,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
         arg.res.coeffs[0] = _nmod_poly_evaluate_nmod(arg.poly1.coeffs,
                                              arg.poly1.length, arg.A.rows[1][0],
                                              arg.poly3.mod);
-        flint_cleanup();
-        return NULL;
+        return;
     }
 
     m = n_sqrt(n) + 1;
@@ -193,8 +186,6 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 
     nmod_mat_clear(B);
     nmod_mat_clear(C);
-    flint_cleanup();
-    return NULL;
 }
 
 void

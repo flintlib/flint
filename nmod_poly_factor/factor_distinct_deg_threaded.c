@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013, 2014 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -23,10 +24,9 @@
 #define ulong mp_limb_t
 
 #include "nmod_poly.h"
-#include "thread_support.h"
 
-void *
-_nmod_poly_interval_poly_worker(void* arg_ptr)
+void
+_nmod_poly_interval_poly_worker(void * arg_ptr)
 {
     nmod_poly_interval_poly_arg_t arg =
                                *((nmod_poly_interval_poly_arg_t *) arg_ptr);
@@ -55,20 +55,18 @@ _nmod_poly_interval_poly_worker(void* arg_ptr)
     }
 
     _nmod_vec_clear(tmp);
-    flint_cleanup();
-    return NULL;
 }
 
 void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
-                                   const nmod_poly_t poly, slong * const *degs)
+               const nmod_poly_t poly, slong * const *degs, slong thread_limit)
 {
     nmod_poly_t f, g, v, vinv, tmp, II;
     nmod_poly_t *h, *H, *I, *scratch;
     slong i, j, k, l, m, n, index, d, c1 = 1, c2;
-    slong num_threads = flint_get_num_threads();
     nmod_mat_t * HH;
     double beta;
-    pthread_t *threads;
+    thread_pool_handle * threads;
+    slong num_threads;
     nmod_poly_matrix_precompute_arg_t * args1;
     nmod_poly_compose_mod_precomp_preinv_arg_t * args2;
     nmod_poly_interval_poly_arg_t * args3;
@@ -95,54 +93,55 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
     nmod_poly_init_preinv(tmp, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(II, poly->mod.n, poly->mod.ninv);
 
-    if (!(h = flint_malloc((2 * m + l + 1 + num_threads) *
+    num_threads = flint_request_threads(&threads, thread_limit);
+
+    if (!(h = flint_malloc((2 * m + l + 2 + num_threads) *
                            sizeof(nmod_poly_struct))))
     {
         flint_printf("Exception (nmod_poly_factor_distinct_deg):\n");
         flint_printf("Not enough memory.\n");
         flint_abort();
     }
+
+    for (i = 0; i < 2*m + l + 1 + num_threads; i++)
+       nmod_poly_init_mod(h[i], poly->mod);
+
     H = h + (l + 1);
     I = H + m;
     scratch = I + m;
-    nmod_poly_init_preinv(h[0], poly->mod.n, poly->mod.ninv);
-    nmod_poly_init_preinv(h[1], poly->mod.n, poly->mod.ninv);
-    for (i = 0; i < m; i++)
-    {
-        nmod_poly_init_preinv(H[i], poly->mod.n, poly->mod.ninv);
-        nmod_poly_init_preinv(I[i], poly->mod.n, poly->mod.ninv);
-    }
-    for (i = 0; i < num_threads; i++)
-        nmod_poly_init_preinv(scratch[i], poly->mod.n, poly->mod.ninv);
 
     HH      = flint_malloc(sizeof(nmod_mat_t) * (num_threads + 1));
-    threads = flint_malloc(sizeof(pthread_t) * num_threads);
-    args1   = flint_malloc(num_threads *
+    args1   = flint_malloc((num_threads + 1) *
                            sizeof(nmod_poly_matrix_precompute_arg_t));
-    args2   = flint_malloc(num_threads *
+    args2   = flint_malloc((num_threads + 1) *
                            sizeof(nmod_poly_compose_mod_precomp_preinv_arg_t));
-    args3   = flint_malloc(num_threads *
+    args3   = flint_malloc((num_threads + 1) *
                            sizeof(nmod_poly_interval_poly_arg_t));
 
     nmod_poly_reverse(vinv, v, v->length);
     nmod_poly_inv_series(vinv, vinv, v->length);
-    /* compute baby steps: h[i]=x^{p^i}mod v */
+    /* compute baby steps: h[i] = x^{p^i} mod v */
     nmod_poly_set_coeff_ui(h[0], 1, 1);
     nmod_poly_powmod_x_ui_preinv(h[1], poly->mod.n, v, vinv);
     if (FLINT_BIT_COUNT(poly->mod.n) > ((n_sqrt(v->length - 1) + 1) * 3) / 4)
     {
         for (i = 1; i < FLINT_BIT_COUNT(l); i++)
-            nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(*(h + 1 +
+            nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(*(h + 1 +
                                                         (1 << (i - 1))),
                                                         *(h + 1),
                                                         (1 << (i - 1)),
-                                                        (1 << (i - 1)), v,
-                                                        vinv, FLINT_DEFAULT_THREAD_LIMIT);
-        nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(*(h + 1 +
-                                                    (1 << (i - 1))), *(h + 1),
+                                                        (1 << (i - 1)),
+                                                        *(h + (1 << (i - 1))),
+                                                        v, vinv,
+                                                        threads, num_threads);
+        nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(*(h + 1 +
+                                                    (1 << (i - 1))),
+                                                    *(h + 1),
                                                     (1 << (i - 1)),
-                                                    l - (1 << (i - 1)), v,
-                                                    vinv, FLINT_DEFAULT_THREAD_LIMIT);
+                                                    l - (1 << (i - 1)),
+                                                    *(h + (1 << (i - 1))),
+                                                    v, vinv,
+                                                    threads, num_threads);
     }
     else
     {
@@ -160,19 +159,19 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
     nmod_mat_init(HH[0], n_sqrt(v->length - 1) + 1, v->length - 1, poly->mod.n);
     nmod_poly_precompute_matrix(HH[0], H[0], v, vinv);
     d = 1;
-    for (j = 0; j < m / num_threads + 1; j++)
+    for (j = 0; j < m / (num_threads + 1) + 1; j++)
     {
         if (j == 0)
         {
-            for (i = 0; i < num_threads; i++)
+            for (i = 0; i < (num_threads + 1); i++)
             {
                 if (i > 0 && I[i - 1]->length > 1)
                 {
-                    _nmod_poly_reduce_matrix_mod_poly(HH[num_threads], HH[0],
+                    _nmod_poly_reduce_matrix_mod_poly(HH[num_threads + 1], HH[0],
                                                       v);
                     nmod_mat_clear(HH[0]);
-                    nmod_mat_init_set(HH[0], HH[num_threads]);
-                    nmod_mat_clear(HH[num_threads]);
+                    nmod_mat_init_set(HH[0], HH[num_threads + 1]);
+                    nmod_mat_clear(HH[num_threads + 1]);
                     nmod_poly_rem(tmp, H[i - 1], v);
                     nmod_poly_compose_mod_brent_kung_precomp_preinv(H[i], tmp,
                                                                     HH[0], v,
@@ -206,19 +205,20 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
             if (v->length - 1 < 2 * d)
                 break;
         }
-        else if (j == 1 && num_threads < m)
+        else if (j == 1 && num_threads + 1 < m)
         {
-            if (I[num_threads - 1]->length > 1)
+            if (I[num_threads]->length > 1)
             {
-                _nmod_poly_reduce_matrix_mod_poly(HH[num_threads], HH[0],
+                _nmod_poly_reduce_matrix_mod_poly(HH[num_threads + 1], HH[0],
                                                       v);
                 nmod_mat_clear(HH[0]);
-                nmod_mat_init_set(HH[0], HH[num_threads]);
-                nmod_mat_clear(HH[num_threads]);
+                nmod_mat_init_set(HH[0], HH[num_threads + 1]);
+                nmod_mat_clear(HH[num_threads + 1]);
             }
 
+            /* we make thread 0 the master thread, but don't use it in this loop */
             c1 = 1;
-            for (i = 1; i < num_threads && i + num_threads < m; i++, c1++)
+            for (i = 1; i < num_threads + 1 && i + num_threads + 1 < m; i++, c1++)
             {
                 nmod_mat_init(HH[i], n_sqrt(v->length - 1) + 1, v->length - 1,
                               poly->mod.n);
@@ -235,59 +235,66 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                 args1[i].poly2    = *v;
                 args1[i].poly2inv = *vinv;
 
-                pthread_create(&threads[i], NULL,
+                thread_pool_wake(global_thread_pool, threads[i - 1],
                             _nmod_poly_precompute_matrix_worker, &args1[i]);
             }
             for (i = 1; i < c1; i++)
-                pthread_join(threads[i], NULL);
+                thread_pool_wait(global_thread_pool, threads[i - 1]);
 
-            nmod_poly_rem(tmp, H[num_threads - 1], v);
+            nmod_poly_rem(tmp, H[num_threads], v);
             for (i = 0; i < c1; i++)
             {
-                nmod_poly_fit_length(H[num_threads + i], v->length - 1);
-                _nmod_poly_set_length(H[num_threads + i], v->length - 1);
-                flint_mpn_zero(H[num_threads + i]->coeffs, v->length - 1);
+                nmod_poly_fit_length(H[num_threads + 1 + i], v->length - 1);
+                _nmod_poly_set_length(H[num_threads + 1 + i], v->length - 1);
+                flint_mpn_zero(H[num_threads + 1 + i]->coeffs, v->length - 1);
                 args2[i].A        = *HH[i];
-                args2[i].res      = *H[num_threads + i];
+                args2[i].res      = *H[num_threads + 1 + i];
                 args2[i].poly1    = *tmp;
                 args2[i].poly3    = *v;
                 args2[i].poly3inv = *vinv;
-
-                pthread_create(&threads[i], NULL,
+            }
+            for (i = 1; i < c1; i++)
+            {
+                thread_pool_wake(global_thread_pool, threads[i - 1],
         _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args2[i]);
             }
-            for (i = 0; i < c1; i++)
+            _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(&args2[0]);
+            _nmod_poly_normalise(H[num_threads + 1]);
+            for (i = 1; i < c1; i++)
             {
-                pthread_join(threads[i], NULL);
-                _nmod_poly_normalise(H[num_threads + i]);
+                thread_pool_wait(global_thread_pool, threads[i - 1]);
+                _nmod_poly_normalise(H[num_threads + 1 + i]);
             }
 
             for (i = 0; i < c1; i++)
             {
-                nmod_poly_fit_length(I[num_threads + i], v->length - 1);
-                _nmod_poly_set_length(I[num_threads + i], v->length - 1);
-                flint_mpn_zero(I[num_threads + i]->coeffs, v->length - 1);
+                nmod_poly_fit_length(I[num_threads + 1 + i], v->length - 1);
+                _nmod_poly_set_length(I[num_threads + 1 + i], v->length - 1);
+                flint_mpn_zero(I[num_threads + i + 1]->coeffs, v->length - 1);
                 args3[i].baby = *h;
-                args3[i].H    = *H[num_threads + i];
+                args3[i].H    = *H[num_threads + 1 + i];
                 args3[i].m    = l;
-                args3[i].res  = *I[num_threads + i];
+                args3[i].res  = *I[num_threads + 1 + i];
                 args3[i].v    = *v;
                 args3[i].vinv = *vinv;
-
-                pthread_create(&threads[i], NULL,
+            }
+            for (i = 1; i < c1; i++)
+            {
+                thread_pool_wake(global_thread_pool, threads[i - 1],
                                _nmod_poly_interval_poly_worker, &args3[i]);
             }
-
-            for (i = 0; i < c1; i++)
+            _nmod_poly_interval_poly_worker(&args3[0]);
+            _nmod_poly_normalise(I[num_threads + 1]);
+            for (i = 1; i < c1; i++)
             {
-                pthread_join(threads[i], NULL);
-                _nmod_poly_normalise(I[num_threads + i]);
+                thread_pool_wait(global_thread_pool, threads[i - 1]);
+                _nmod_poly_normalise(I[num_threads + 1 + i]);
             }
 
             nmod_poly_one(II);
 
             for (i = 0; i < c1; i++)
-                nmod_poly_mulmod_preinv(II, II, I[num_threads + i], v,
+                nmod_poly_mulmod_preinv(II, II, I[num_threads + 1 + i], v,
                                             vinv);
 
             nmod_poly_gcd(II, v, II);
@@ -298,85 +305,92 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                 nmod_poly_inv_series_newton(vinv, vinv, v->length);
                 for (i = 0; i < c1; i++)
                 {
-                    nmod_poly_gcd(I[num_threads + i], I[num_threads + i],
+                    nmod_poly_gcd(I[num_threads + 1 + i], I[num_threads + 1 + i],
                                       II);
-                    if (I[num_threads + i]->length > 1)
-                        nmod_poly_remove(II, I[num_threads + i]);
+                    if (I[num_threads + 1 + i]->length > 1)
+                        nmod_poly_remove(II, I[num_threads + 1 + i]);
                 }
             }
             else
             {
                 for (i = 0; i < c1; i++)
-                    nmod_poly_one(I[num_threads + i]);
+                    nmod_poly_one(I[num_threads + 1 + i]);
             }
             d = d + c1 * l;
             if (v->length-1 < 2 * d)
                 break;
         }
-        else if (j*num_threads < m)
+        else if (j*(num_threads + 1) < m)
         {
             c2 = 0;
-            for (i = 0; i < num_threads && j*num_threads + i < m; i++, c2++)
+            for (i = 0; i < num_threads + 1 && j*(num_threads + 1) + i < m; i++, c2++)
             {
                 if (HH[i] -> c > v -> length - 1)
                 {
-                    _nmod_poly_reduce_matrix_mod_poly(HH[num_threads],
+                    _nmod_poly_reduce_matrix_mod_poly(HH[num_threads + 1],
                                                           HH[i], v);
                     nmod_mat_clear(HH[i]);
-                    nmod_mat_init_set(HH[i], HH[num_threads]);
-                    nmod_mat_clear(HH[num_threads]);
+                    nmod_mat_init_set(HH[i], HH[num_threads + 1]);
+                    nmod_mat_clear(HH[num_threads + 1]);
                 }
             }
 
-            nmod_poly_rem(tmp, H[j * num_threads - 1], v);
+            nmod_poly_rem(tmp, H[j * (num_threads + 1) - 1], v);
             for (i = 0; i < c2; i++)
             {
-                nmod_poly_fit_length(H[j * num_threads + i], v->length - 1);
-                _nmod_poly_set_length(H[j * num_threads + i],
+                nmod_poly_fit_length(H[j * (num_threads + 1) + i], v->length - 1);
+                _nmod_poly_set_length(H[j * (num_threads + 1) + i],
                                           v->length - 1);
-                flint_mpn_zero(H[j * num_threads + i]->coeffs, v->length - 1);
+                flint_mpn_zero(H[j * (num_threads + 1) + i]->coeffs, v->length - 1);
                 args2[i].A        = *HH[i];
-                args2[i].res      = *H[j * num_threads + i];
+                args2[i].res      = *H[j * (num_threads + 1) + i];
                 args2[i].poly1    = *tmp;
                 args2[i].poly3    = *v;
                 args2[i].poly3inv = *vinv;
-
-                pthread_create(&threads[i], NULL,
+            }
+            for (i = 1; i < c2; i++)
+            {
+                thread_pool_wake(global_thread_pool, threads[i - 1],
         _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args2[i]);
             }
-            for (i = 0; i < c2; i++)
+            _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(&args2[0]);
+            _nmod_poly_normalise(H[j * (num_threads + 1)]);
+            for (i = 1; i < c2; i++)
             {
-                pthread_join(threads[i], NULL);
-                _nmod_poly_normalise(H[j * num_threads + i]);
+                thread_pool_wait(global_thread_pool, threads[i - 1]);
+                _nmod_poly_normalise(H[j*(num_threads + 1) + i]);
             }
 
             for (i = 0; i < c2; i++)
             {
-                nmod_poly_fit_length(I[j * num_threads + i], v->length - 1);
-                _nmod_poly_set_length(I[j * num_threads + i],
+                nmod_poly_fit_length(I[j*(num_threads + 1) + i], v->length - 1);
+                _nmod_poly_set_length(I[j*(num_threads + 1) + i],
                                           v->length - 1);
-                flint_mpn_zero(I[j * num_threads + i]->coeffs, v->length - 1);
+                flint_mpn_zero(I[j*(num_threads + 1) + i]->coeffs, v->length - 1);
                 args3[i].baby = *h;
-                args3[i].H    = *H[j * num_threads + i];
+                args3[i].H    = *H[j*(num_threads + 1) + i];
                 args3[i].m    = l;
-                args3[i].res  = *I[j * num_threads + i];
+                args3[i].res  = *I[j*(num_threads + 1) + i];
                 args3[i].v    = *v;
                 args3[i].vinv = *vinv;
-
-                pthread_create(&threads[i], NULL,
+            }
+            for (i = 1; i < c2; i++)
+            {
+                thread_pool_wake(global_thread_pool, threads[i - 1],
                                _nmod_poly_interval_poly_worker, &args3[i]);
             }
-
-            for (i = 0; i < c2; i++)
+            _nmod_poly_interval_poly_worker(&args3[0]);
+            _nmod_poly_normalise(I[j*(num_threads + 1)]);
+            for (i = 1; i < c2; i++)
             {
-                pthread_join(threads[i], NULL);
-                _nmod_poly_normalise(I[j * num_threads + i]);
+                thread_pool_wait(global_thread_pool, threads[i - 1]);
+                _nmod_poly_normalise(I[j*(num_threads + 1) + i]);
             }
 
             nmod_poly_one(II);
 
             for (i = 0; i < c2; i++)
-                nmod_poly_mulmod_preinv(II, II, I[j * num_threads + i], v,
+                nmod_poly_mulmod_preinv(II, II, I[j*(num_threads + 1) + i], v,
                                             vinv);
 
             nmod_poly_gcd(II, v, II);
@@ -387,16 +401,16 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                 nmod_poly_inv_series_newton(vinv, vinv, v->length);
                 for (i = 0; i < c2; i++)
                 {
-                    nmod_poly_gcd(I[j * num_threads + i],
-                                      I[j * num_threads + i], II);
-                    if (I[j * num_threads + i]->length > 1)
-                        nmod_poly_remove(II, I[j * num_threads + i]);
+                    nmod_poly_gcd(I[j*(num_threads + 1) + i],
+                                      I[j*(num_threads + 1) + i], II);
+                    if (I[j*(num_threads + 1) + i]->length > 1)
+                        nmod_poly_remove(II, I[j*(num_threads + 1) + i]);
                 }
             }
             else
             {
                 for (i = 0; i < c2; i++)
-                    nmod_poly_one(I[j * num_threads + i]);
+                    nmod_poly_one(I[j*(num_threads + 1) + i]);
             }
             d = d + c2 * l;
             if (v->length - 1 < 2 * d)
@@ -439,6 +453,8 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
         }
     }
 
+    flint_give_back_threads(threads, num_threads);
+
     /* cleanup */
     nmod_poly_clear(f);
     nmod_poly_clear(g);
@@ -447,15 +463,9 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
     nmod_poly_clear(tmp);
     nmod_poly_clear(II);
 
-    for (i = 0; i < l + 1; i++)
+    for (i = 0; i < 2*m + l + 2 + num_threads; i++)
         nmod_poly_clear(h[i]);
-    for (i = 0; i < m; i++)
-    {
-        nmod_poly_clear(H[i]);
-        nmod_poly_clear(I[i]);
-    }
-    for (i = 0; i < num_threads; i++)
-        nmod_poly_clear(scratch[i]);
+
     for (i = 0; i < c1; i++)
         nmod_mat_clear(HH[i]);
 
@@ -464,5 +474,4 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
     flint_free(args1);
     flint_free(args2);
     flint_free(args3);
-    flint_free(threads);
 }
