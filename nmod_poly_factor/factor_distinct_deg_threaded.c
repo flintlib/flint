@@ -103,14 +103,14 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
         flint_abort();
     }
 
-    for (i = 0; i < 2*m + l + 1 + num_threads; i++)
+    for (i = 0; i < 2*m + l + 2 + num_threads; i++)
        nmod_poly_init_mod(h[i], poly->mod);
 
     H = h + (l + 1);
     I = H + m;
     scratch = I + m;
 
-    HH      = flint_malloc(sizeof(nmod_mat_t) * (num_threads + 1));
+    HH      = flint_malloc(sizeof(nmod_mat_t) * (num_threads + 2));
     args1   = flint_malloc((num_threads + 1) *
                            sizeof(nmod_poly_matrix_precompute_arg_t));
     args2   = flint_malloc((num_threads + 1) *
@@ -258,7 +258,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                 thread_pool_wake(global_thread_pool, threads[i - 1],
         _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args2[i]);
             }
-            _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(&args2[0]);
+            _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(&args2[0]);
             _nmod_poly_normalise(H[num_threads + 1]);
             for (i = 1; i < c1; i++)
             {
