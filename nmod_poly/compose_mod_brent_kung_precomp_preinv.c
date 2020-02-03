@@ -45,15 +45,16 @@ _nmod_poly_precompute_matrix_worker(void * arg_ptr)
     /* Set rows of A to powers of poly1 */
     slong i, n, m;
     nmod_poly_struct * poly1 = arg.poly1;
+    nmod_mat_struct * A = arg.A;
 
     n = arg.poly2.length - 1;
     m = n_sqrt(n) + 1;
 
-    arg.A.rows[0][0] = UWORD(1);
-    _nmod_vec_set(arg.A.rows[1], poly1->coeffs, n);
+    A->rows[0][0] = UWORD(1);
+    _nmod_vec_set(A->rows[1], poly1->coeffs, n);
 
     for (i = 2; i < m; i++)
-        _nmod_poly_mulmod_preinv(arg.A.rows[i], arg.A.rows[i - 1], n,
+        _nmod_poly_mulmod_preinv(A->rows[i], A->rows[i - 1], n,
                                  poly1->coeffs, n, arg.poly2.coeffs, n + 1,
                                  arg.poly2inv.coeffs, n + 1, arg.poly2.mod);
 }
@@ -134,6 +135,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     mp_ptr t, h;
     slong i, n, m;
     nmod_poly_struct * res = arg.res;
+    nmod_mat_struct * A = arg.A;
 
     n = arg.poly3.length - 1;
 
@@ -148,7 +150,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     if (arg.poly3.length == 2)
     {
         res->coeffs[0] = _nmod_poly_evaluate_nmod(arg.poly1.coeffs,
-                                             arg.poly1.length, arg.A.rows[1][0],
+                                             arg.poly1.length, A->rows[1][0],
                                              arg.poly3.mod);
         return;
     }
@@ -167,11 +169,11 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 
     _nmod_vec_set(B->rows[i], arg.poly1.coeffs + i * m, arg.poly1.length % m);
 
-    nmod_mat_mul(C, B, &arg.A);
+    nmod_mat_mul(C, B, A);
 
     /* Evaluate block composition using the Horner scheme */
     _nmod_vec_set(res->coeffs, C->rows[m - 1], n);
-    _nmod_poly_mulmod_preinv(h, arg.A.rows[m - 1], n, arg.A.rows[1], n,
+    _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n,
                              arg.poly3.coeffs, arg.poly3.length,
                              arg.poly3inv.coeffs, arg.poly3inv.length,
                              arg.poly3.mod);
