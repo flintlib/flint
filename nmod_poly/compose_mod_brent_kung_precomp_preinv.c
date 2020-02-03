@@ -18,7 +18,7 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
+_nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,
                                    const nmod_poly_t f)
 {
     mp_ptr tmp1;
@@ -37,27 +37,29 @@ _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
 }
 
 void
-_nmod_poly_precompute_matrix_worker (void * arg_ptr)
+_nmod_poly_precompute_matrix_worker(void * arg_ptr)
 {
     nmod_poly_matrix_precompute_arg_t arg =
                            *((nmod_poly_matrix_precompute_arg_t *) arg_ptr);
+
     /* Set rows of A to powers of poly1 */
     slong i, n, m;
+    nmod_poly_struct * poly1 = arg.poly1;
 
     n = arg.poly2.length - 1;
-
     m = n_sqrt(n) + 1;
 
     arg.A.rows[0][0] = UWORD(1);
-    _nmod_vec_set(arg.A.rows[1], arg.poly1.coeffs, n);
+    _nmod_vec_set(arg.A.rows[1], poly1->coeffs, n);
+
     for (i = 2; i < m; i++)
         _nmod_poly_mulmod_preinv(arg.A.rows[i], arg.A.rows[i - 1], n,
-                                 arg.poly1.coeffs, n, arg.poly2.coeffs, n + 1,
+                                 poly1->coeffs, n, arg.poly2.coeffs, n + 1,
                                  arg.poly2inv.coeffs, n + 1, arg.poly2.mod);
 }
 
 void
-_nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
+_nmod_poly_precompute_matrix(nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
                               slong len2, mp_srcptr poly2inv, slong len2inv,
                               nmod_t mod)
 {
@@ -76,7 +78,7 @@ _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
 }
 
 void
-nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
+nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
                             const nmod_poly_t poly2, const nmod_poly_t poly2inv)
 {
     slong len1 = poly1->length;
@@ -126,11 +128,12 @@ nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
 void
 _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 {
-    nmod_poly_compose_mod_precomp_preinv_arg_t arg=
+    nmod_poly_compose_mod_precomp_preinv_arg_t arg =
                    *((nmod_poly_compose_mod_precomp_preinv_arg_t*) arg_ptr);
     nmod_mat_t B, C;
     mp_ptr t, h;
     slong i, n, m;
+    nmod_poly_struct * res = arg.res;
 
     n = arg.poly3.length - 1;
 
@@ -138,13 +141,13 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
         return;
     if (arg.poly1.length == 1)
     {
-        arg.res.coeffs[0] = arg.poly1.coeffs[0];
+        res->coeffs[0] = arg.poly1.coeffs[0];
         return;
     }
 
     if (arg.poly3.length == 2)
     {
-        arg.res.coeffs[0] = _nmod_poly_evaluate_nmod(arg.poly1.coeffs,
+        res->coeffs[0] = _nmod_poly_evaluate_nmod(arg.poly1.coeffs,
                                              arg.poly1.length, arg.A.rows[1][0],
                                              arg.poly3.mod);
         return;
@@ -167,7 +170,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     nmod_mat_mul(C, B, &arg.A);
 
     /* Evaluate block composition using the Horner scheme */
-    _nmod_vec_set(arg.res.coeffs, C->rows[m - 1], n);
+    _nmod_vec_set(res->coeffs, C->rows[m - 1], n);
     _nmod_poly_mulmod_preinv(h, arg.A.rows[m - 1], n, arg.A.rows[1], n,
                              arg.poly3.coeffs, arg.poly3.length,
                              arg.poly3inv.coeffs, arg.poly3inv.length,
@@ -175,10 +178,10 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 
     for (i = m - 2; i >= 0; i--)
     {
-        _nmod_poly_mulmod_preinv(t, arg.res.coeffs, n, h, n, arg.poly3.coeffs,
+        _nmod_poly_mulmod_preinv(t, res->coeffs, n, h, n, arg.poly3.coeffs,
                                  arg.poly3.length, arg.poly3inv.coeffs,
                                  arg.poly3.length, arg.poly3.mod);
-        _nmod_poly_add(arg.res.coeffs, t, n, C->rows[i], n, arg.poly3.mod);
+        _nmod_poly_add(res->coeffs, t, n, C->rows[i], n, arg.poly3.mod);
     }
 
     _nmod_vec_clear(h);

@@ -50,8 +50,8 @@ typedef struct
 typedef struct
 {
     nmod_poly_struct * baby;
-    nmod_poly_struct res;
-    nmod_poly_struct H;
+    nmod_poly_struct * res;
+    nmod_poly_struct * H;
     nmod_poly_struct v;
     nmod_poly_struct vinv;
     slong m;

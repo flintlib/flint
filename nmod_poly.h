@@ -115,7 +115,7 @@ typedef nmod_poly_res_struct nmod_poly_res_t[1];
 typedef struct
 {
     nmod_mat_struct A;
-    nmod_poly_struct poly1;
+    nmod_poly_struct * poly1;
     nmod_poly_struct poly2;
     nmod_poly_struct poly2inv;
 }
@@ -124,7 +124,7 @@ nmod_poly_matrix_precompute_arg_t;
 typedef struct
 {
     nmod_mat_struct A;
-    nmod_poly_struct res;
+    nmod_poly_struct * res;
     nmod_poly_struct poly1;
     nmod_poly_struct poly3;
     nmod_poly_struct poly3inv;
@@ -971,15 +971,15 @@ FLINT_DLL void nmod_poly_compose_mod_brent_kung(nmod_poly_t res,
                     const nmod_poly_t f, const nmod_poly_t g,
                     const nmod_poly_t h);
 
-FLINT_DLL void _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
+FLINT_DLL void _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,
                           const nmod_poly_t f);
 
-FLINT_DLL void _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
+FLINT_DLL void _nmod_poly_precompute_matrix(nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
                slong len2, mp_srcptr poly2inv, slong len2inv, nmod_t mod);
 
-FLINT_DLL void _nmod_poly_precompute_matrix_worker (void * arg_ptr);
+FLINT_DLL void _nmod_poly_precompute_matrix_worker(void * arg_ptr);
 
-FLINT_DLL void nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
+FLINT_DLL void nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
                           const nmod_poly_t poly2, const nmod_poly_t poly2inv);
 
 FLINT_DLL void _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
