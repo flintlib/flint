@@ -130,7 +130,7 @@ _nmod_poly_interval_poly_worker(void * arg_ptr)
     nmod_poly_struct * vinv = arg.vinv;
     nmod_poly_struct * baby = arg.baby;
     nmod_t mod = v->mod;
-    mp_ptr tmp = _nmod_vec_init(v->length - 1);
+    mp_ptr tmp = arg.tmp;
     
     res->coeffs[0] = UWORD(1);
 
@@ -151,8 +151,6 @@ _nmod_poly_interval_poly_worker(void * arg_ptr)
                                  v->coeffs, v->length,
                                  vinv->coeffs, vinv->length, mod);
     }
-
-    _nmod_vec_clear(tmp);
 }
 
 void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
@@ -398,12 +396,14 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                 nmod_poly_fit_length(I + num_threads + i + 1, v->length - 1);
                 _nmod_poly_set_length(I + num_threads + i + 1, v->length - 1);
                 flint_mpn_zero(I[num_threads + i + 1].coeffs, v->length - 1);
+                
                 args3[i].baby = h;
                 args3[i].H    = H + num_threads + i + 1;
                 args3[i].m    = l;
                 args3[i].res  = I + num_threads + i + 1;
                 args3[i].v    = v;
                 args3[i].vinv = vinv;
+                args3[i].tmp = _nmod_vec_init(v->length - 1);
             }
 
             for (i = 1; i < c1; i++)
@@ -420,6 +420,11 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
             {
                 thread_pool_wait(global_thread_pool, threads[i - 1]);
                 _nmod_poly_normalise(I + num_threads + i + 1);
+            }
+
+            for (i = 0; i < c1; i++)
+            {
+               _nmod_vec_clear(args3[i].tmp);
             }
 
             nmod_poly_one(II);
@@ -515,6 +520,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                 args3[i].res  = I + j*(num_threads + 1) + i;
                 args3[i].v    = v;
                 args3[i].vinv = vinv;
+                args3[i].tmp = _nmod_vec_init(v->length - 1);
             }
 
             for (i = 1; i < c2; i++)
@@ -532,6 +538,11 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                 _nmod_poly_normalise(I + j*(num_threads + 1) + i);
             }
 
+            for (i = 0; i < c2; i++)
+            {
+               _nmod_vec_clear(args3[i].tmp);
+            }
+            
             nmod_poly_one(II);
 
             for (i = 0; i < c2; i++)

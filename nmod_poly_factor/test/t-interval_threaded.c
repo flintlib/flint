@@ -110,6 +110,7 @@ main(void)
             args1[j].v = c;
             args1[j].vinv = cinv;
             args1[j].m = l;
+	    args1[j].tmp = _nmod_vec_init(c->length - 1);
         }
 
 	for (j = 0; j < num_threads; j++)
@@ -122,7 +123,10 @@ main(void)
             thread_pool_wait(global_thread_pool, threads[j]);
 
 	for (j = 0; j < num_threads + 1; j++)
+        {
             _nmod_poly_normalise(e + j);
+	    _nmod_vec_clear(args1[j].tmp);
+	}
 
         for (j = 0; j < num_threads + 1; j++)
         {

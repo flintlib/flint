@@ -54,6 +54,7 @@ typedef struct
     nmod_poly_struct * H;
     nmod_poly_struct * v;
     nmod_poly_struct * vinv;
+    mp_ptr tmp;
     slong m;
 }
 nmod_poly_interval_poly_arg_t;
