@@ -26,6 +26,99 @@
 #include "nmod_poly.h"
 
 void
+_nmod_poly_precompute_matrix_worker(void * arg_ptr)
+{
+    nmod_poly_matrix_precompute_arg_t arg =
+                           *((nmod_poly_matrix_precompute_arg_t *) arg_ptr);
+
+    /* Set rows of A to powers of poly1 */
+    slong i, n, m;
+    nmod_poly_struct * poly1 = arg.poly1;
+    nmod_poly_struct * poly2 = arg.poly2;
+    nmod_poly_struct * poly2inv = arg.poly2inv;
+    nmod_mat_struct * A = arg.A;
+    nmod_t mod = poly2->mod;
+
+    n = poly2->length - 1;
+    m = n_sqrt(n) + 1;
+
+    A->rows[0][0] = UWORD(1);
+    _nmod_vec_set(A->rows[1], poly1->coeffs, n);
+
+    for (i = 2; i < m; i++)
+        _nmod_poly_mulmod_preinv(A->rows[i], A->rows[i - 1], n,
+                                 poly1->coeffs, n, poly2->coeffs, n + 1,
+                                 poly2inv->coeffs, n + 1, mod);
+}
+
+void
+_nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
+{
+    nmod_poly_compose_mod_precomp_preinv_arg_t arg =
+                   *((nmod_poly_compose_mod_precomp_preinv_arg_t*) arg_ptr);
+    nmod_mat_t B, C;
+    mp_ptr t, h;
+    slong i, n, m;
+    nmod_poly_struct * res = arg.res;
+    nmod_poly_struct * poly1 = arg.poly1;
+    nmod_poly_struct * poly3 = arg.poly3;
+    nmod_poly_struct * poly3inv = arg.poly3inv;
+    nmod_mat_struct * A = arg.A;
+    nmod_t mod = poly3->mod;
+
+    if (poly3->length == 1)
+        return;
+
+    if (poly1->length == 1)
+    {
+        res->coeffs[0] = poly1->coeffs[0];
+        return;
+    }
+
+    if (poly3->length == 2)
+    {
+        res->coeffs[0] = _nmod_poly_evaluate_nmod(poly1->coeffs,
+                                             poly1->length, A->rows[1][0], mod);
+        return;
+    }
+
+    n = poly3->length - 1;
+    m = n_sqrt(n) + 1;
+
+    nmod_mat_init(B, m, m, mod.n);
+    nmod_mat_init(C, m, n, mod.n);
+
+    h = _nmod_vec_init(n);
+    t = _nmod_vec_init(n);
+
+    /* Set rows of B to the segments of poly1 */
+    for (i = 0; i < poly1->length / m; i++)
+        _nmod_vec_set(B->rows[i], poly1->coeffs + i * m, m);
+
+    _nmod_vec_set(B->rows[i], poly1->coeffs + i * m, poly1->length % m);
+
+    nmod_mat_mul(C, B, A);
+
+    /* Evaluate block composition using the Horner scheme */
+    _nmod_vec_set(res->coeffs, C->rows[m - 1], n);
+    _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n,
+        poly3->coeffs, poly3->length, poly3inv->coeffs, poly3inv->length, mod);
+
+    for (i = m - 2; i >= 0; i--)
+    {
+        _nmod_poly_mulmod_preinv(t, res->coeffs, n, h, n, poly3->coeffs,
+                          poly3->length, poly3inv->coeffs, poly3->length, mod);
+        _nmod_poly_add(res->coeffs, t, n, C->rows[i], n, mod);
+    }
+
+    _nmod_vec_clear(h);
+    _nmod_vec_clear(t);
+
+    nmod_mat_clear(B);
+    nmod_mat_clear(C);
+}
+
+void
 _nmod_poly_interval_poly_worker(void * arg_ptr)
 {
     nmod_poly_interval_poly_arg_t arg =
@@ -259,8 +352,8 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
                 args1[i].A        = HH + i;
                 args1[i].poly1    = scratch + i;
-                args1[i].poly2    = *v;
-                args1[i].poly2inv = *vinv;
+                args1[i].poly2    = v;
+                args1[i].poly2inv = vinv;
 
                 thread_pool_wake(global_thread_pool, threads[i - 1],
                             _nmod_poly_precompute_matrix_worker, &args1[i]);
@@ -279,9 +372,9 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
                 args2[i].A        = HH + i;
                 args2[i].res      = H + num_threads + i + 1;
-                args2[i].poly1    = *tmp;
-                args2[i].poly3    = *v;
-                args2[i].poly3inv = *vinv;
+                args2[i].poly1    = tmp;
+                args2[i].poly3    = v;
+                args2[i].poly3inv = vinv;
             }
 
             for (i = 1; i < c1; i++)
@@ -388,9 +481,9 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
                 args2[i].A        = HH + i;
                 args2[i].res      = H + j*(num_threads + 1) + i;
-                args2[i].poly1    = *tmp;
-                args2[i].poly3    = *v;
-                args2[i].poly3inv = *vinv;
+                args2[i].poly1    = tmp;
+                args2[i].poly3    = v;
+                args2[i].poly3inv = vinv;
             }
 
             for (i = 1; i < c2; i++)

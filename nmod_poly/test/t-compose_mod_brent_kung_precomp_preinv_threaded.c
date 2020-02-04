@@ -77,7 +77,8 @@ main(void)
         nmod_mat_init(B, n_sqrt (c->length - 1) + 1, c->length - 1, m);
         nmod_poly_precompute_matrix(B, b, c, cinv);
 
-        args1 = flint_malloc(sizeof(nmod_poly_matrix_precompute_arg_t)
+        args1 = (nmod_poly_matrix_precompute_arg_t *)
+		 flint_malloc(sizeof(nmod_poly_matrix_precompute_arg_t)
                              *(num_threads + 1));
         C = (nmod_mat_struct *)
 	               flint_malloc(sizeof(nmod_mat_struct)*(num_threads + 1));
@@ -88,17 +89,17 @@ main(void)
             nmod_poly_set(tmp + j, b);
             nmod_poly_rem(tmp + j, tmp + j, c);
 
-	    if ((tmp + j)->length < c->length - 1)
+	    if (tmp[j].length < c->length - 1)
             {
                 nmod_poly_fit_length(tmp + j, c->length - 1);
-                _nmod_vec_zero((tmp + j)->coeffs + (tmp + j)->length,
+                _nmod_vec_zero(tmp[j].coeffs + tmp[j].length,
                                c->length - 1 - b->length);
             }
 
             args1[j].A        = C + j;
             args1[j].poly1    = tmp + j;
-            args1[j].poly2    = *c;
-            args1[j].poly2inv = *cinv;
+            args1[j].poly2    = c;
+            args1[j].poly2inv = cinv;
         }
 
 	for (j = 1; j < num_threads + 1; j++)
@@ -160,7 +161,8 @@ main(void)
 
         num_threads = flint_request_threads(&threads, FLINT_DEFAULT_THREAD_LIMIT);
 
-        res = flint_malloc(sizeof(nmod_poly_struct)*(num_threads + 1));
+        res = (nmod_poly_struct *)
+		flint_malloc(sizeof(nmod_poly_struct)*(num_threads + 1));
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -187,20 +189,21 @@ main(void)
         nmod_poly_rem(a, a, c);
         nmod_poly_compose_mod(d, a, b, c);
 
-        args1 = flint_malloc((num_threads + 1)*
+        args1 = (nmod_poly_compose_mod_precomp_preinv_arg_t *)
+		flint_malloc((num_threads + 1)*
                         sizeof(nmod_poly_compose_mod_precomp_preinv_arg_t));
 
         for (j = 0; j < num_threads + 1; j++)
         {
             nmod_poly_fit_length(res + j, c->length - 1);
             _nmod_poly_set_length(res + j, c->length - 1);
-            flint_mpn_zero((res + j)->coeffs, c->length - 1);
+            flint_mpn_zero(res[j].coeffs, c->length - 1);
 
 	    args1[j].A        = B;
             args1[j].res      = res + j;
-            args1[j].poly1    = *a;
-            args1[j].poly3    = *c;
-            args1[j].poly3inv = *cinv;
+            args1[j].poly1    = a;
+            args1[j].poly3    = c;
+            args1[j].poly3inv = cinv;
 	}
 
         for (j = 1; j < num_threads + 1; j++)

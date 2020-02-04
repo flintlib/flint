@@ -116,8 +116,8 @@ typedef struct
 {
     nmod_mat_struct * A;
     nmod_poly_struct * poly1;
-    nmod_poly_struct poly2;
-    nmod_poly_struct poly2inv;
+    nmod_poly_struct * poly2;
+    nmod_poly_struct * poly2inv;
 }
 nmod_poly_matrix_precompute_arg_t;
 
@@ -125,9 +125,9 @@ typedef struct
 {
     nmod_mat_struct * A;
     nmod_poly_struct * res;
-    nmod_poly_struct poly1;
-    nmod_poly_struct poly3;
-    nmod_poly_struct poly3inv;
+    nmod_poly_struct * poly1;
+    nmod_poly_struct * poly3;
+    nmod_poly_struct * poly3inv;
 }
 nmod_poly_compose_mod_precomp_preinv_arg_t;
 
