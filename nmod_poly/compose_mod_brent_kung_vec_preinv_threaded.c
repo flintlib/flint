@@ -23,7 +23,7 @@
 typedef struct
 {
     nmod_poly_struct * res;
-    nmod_mat_struct C;
+    nmod_mat_struct * C;
     mp_srcptr h;
     mp_srcptr poly;
     mp_srcptr polyinv;
@@ -36,15 +36,21 @@ typedef struct
     slong leninv;
     slong len2;
     pthread_mutex_t * mutex;
-}
-compose_vec_arg_t;
+} compose_vec_arg_t;
 
 void
 _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
 {
     compose_vec_arg_t arg = *((compose_vec_arg_t *) arg_ptr);
     slong i, j, k = arg.k, n = arg.len - 1;
+    slong len = arg.len, leninv = arg.leninv;
     mp_ptr t = arg.t;
+    mp_srcptr h = arg.h;
+    mp_srcptr poly = arg.poly;
+    mp_srcptr polyinv = arg.polyinv;
+    nmod_poly_struct * res = arg.res;
+    nmod_mat_struct * C = arg.C;
+    nmod_t p = arg.p;
 
     while (1)
     {
@@ -56,13 +62,13 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
         if (j >= arg.len2)
             return;
 
-        _nmod_vec_set(arg.res[j].coeffs, arg.C.rows[(j + 1) * k - 1], n);
+        _nmod_vec_set(res[j].coeffs, C->rows[(j + 1) * k - 1], n);
         for (i = 2; i <= k; i++)
         {
-            _nmod_poly_mulmod_preinv(t, arg.res[j].coeffs, n, arg.h, n, arg.poly,
-                                     arg.len, arg.polyinv, arg.leninv, arg.p);
-            _nmod_poly_add(arg.res[j].coeffs, t, n,
-                           arg.C.rows[(j + 1) * k - i], n, arg.p);
+            _nmod_poly_mulmod_preinv(t, res[j].coeffs, n, h, n, poly,
+                                                      len, polyinv, leninv, p);
+            _nmod_poly_add(res[j].coeffs, t, n,
+                                               C->rows[(j + 1) * k - i], n, p);
         }
     }
 }
@@ -99,10 +105,10 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
     /* Set rows of B to the segments of polys */
     for (j = 0; j < len2; j++)
     {
-        len1 = (polys + j)->length;
+        len1 = polys[j].length;
         for (i = 0; i < len1 / m; i++)
-            _nmod_vec_set(B->rows[i + j * k], (polys + j)->coeffs + i * m, m);
-        _nmod_vec_set(B->rows[i + j * k], (polys + j)->coeffs + i * m,
+            _nmod_vec_set(B->rows[i + j * k], polys[j].coeffs + i * m, m);
+        _nmod_vec_set(B->rows[i + j * k], polys[j].coeffs + i * m,
                       len1 % m);
     }
 
@@ -117,12 +123,13 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
     _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
                              len, polyinv, leninv, mod);
 
-    args = flint_malloc(sizeof(compose_vec_arg_t) * (num_threads + 1));
+    args = (compose_vec_arg_t *)
+                   flint_malloc(sizeof(compose_vec_arg_t) * (num_threads + 1));
 
     for (i = 0; i < num_threads + 1; i++)
     {
         args[i].res     = res;
-        args[i].C       = *C;
+        args[i].C       = C;
         args[i].h       = h;
         args[i].k       = k;
         args[i].m       = m;
@@ -232,7 +239,7 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
     
     for (i = 0; i < len1; i++)
     {
-        if ((polys + i)->length >= len2)
+        if (polys[i].length >= len2)
         {
             flint_printf
                 ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
