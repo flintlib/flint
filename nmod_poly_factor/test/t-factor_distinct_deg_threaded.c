@@ -90,11 +90,8 @@ main(void)
             num_of_deg[nmod_poly_degree(poly)]++;
         }
 
-        if (!(degs = flint_malloc((poly1->length - 1) * sizeof(slong))))
-        {
-            flint_printf("Fatal error: not enough memory.");
-            abort();
-        }
+        degs = (slong *) flint_malloc((poly1->length - 1) * sizeof(slong));
+	
         nmod_poly_factor_init(res);
         nmod_poly_factor_distinct_deg_threaded(res, poly1, &degs, FLINT_DEFAULT_THREAD_LIMIT);
 

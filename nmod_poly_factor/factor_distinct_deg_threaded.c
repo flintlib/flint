@@ -212,12 +212,16 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
     I = H + m;
     scratch = I + m;
 
-    HH      = flint_malloc(sizeof(nmod_mat_struct)*(num_threads + 2));
-    args1   = flint_malloc((num_threads + 1)*
+    HH      = (nmod_mat_struct *)
+	               flint_malloc(sizeof(nmod_mat_struct)*(num_threads + 2));
+    args1   = (nmod_poly_matrix_precompute_arg_t *)
+	               flint_malloc((num_threads + 1)*
                            sizeof(nmod_poly_matrix_precompute_arg_t));
-    args2   = flint_malloc((num_threads + 1)*
+    args2   = (nmod_poly_compose_mod_precomp_preinv_arg_t *)
+	               flint_malloc((num_threads + 1)*
                            sizeof(nmod_poly_compose_mod_precomp_preinv_arg_t));
-    args3   = flint_malloc((num_threads + 1)*
+    args3   = (nmod_poly_interval_poly_arg_t *)
+	               flint_malloc((num_threads + 1)*
                            sizeof(nmod_poly_interval_poly_arg_t));
 
     nmod_poly_reverse(vinv, v, v->length);
