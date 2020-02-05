@@ -81,12 +81,14 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
                                                         (1 << (i - 1))),
                                                         *(h + 1),
                                                         (1 << (i - 1)),
-                                                        (1 << (i - 1)), v,
-                                                        vinv);
+                                                        (1 << (i - 1)),
+							*(h + (1 << (i - 1))),
+							v, vinv);
         nmod_poly_compose_mod_brent_kung_vec_preinv(*(h + 1 + (1 << (i - 1))),
                                                     *(h + 1), (1 << (i - 1)),
-                                                    l - (1 << (i - 1)), v,
-                                                    vinv);
+                                                    l - (1 << (i - 1)),
+						    *(h + (1 << (i - 1))),
+						    v, vinv);
     }
     else
     {

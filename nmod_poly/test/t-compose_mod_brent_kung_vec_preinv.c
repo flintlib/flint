@@ -58,17 +58,14 @@ main(void)
         pow = (nmod_poly_struct *) flint_malloc((l + k)*sizeof(nmod_poly_struct));
         res = pow + l;
 
-        for (j = 0; j < l - 1; j++)
+        for (j = 0; j < l; j++)
         {
             nmod_poly_init(pow + j, m);
             nmod_poly_randtest(pow + j, state, n_randint(state, 20) + 1);
             nmod_poly_rem(pow + j, pow + j, a);
         }
 
-        nmod_poly_init(pow + l - 1, m);
-        nmod_poly_set(pow + l - 1, b);
-
-        nmod_poly_compose_mod_brent_kung_vec_preinv(res, pow, l, k, a, ainv);
+        nmod_poly_compose_mod_brent_kung_vec_preinv(res, pow, l, k, b, a, ainv);
 
         for (j = 0; j < k; j++)
         {

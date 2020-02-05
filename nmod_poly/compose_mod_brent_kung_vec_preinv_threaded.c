@@ -118,8 +118,10 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
     for (j = 0; j < len2; j++)
     {
         len1 = polys[j].length;
+
         for (i = 0; i < len1 / m; i++)
             _nmod_vec_set(B->rows[i + j * k], polys[j].coeffs + i * m, m);
+            
         _nmod_vec_set(B->rows[i + j * k], polys[j].coeffs + i * m,
                       len1 % m);
     }
