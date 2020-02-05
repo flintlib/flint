@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010, 2020 William Hart
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2013 Martin Lee
 
