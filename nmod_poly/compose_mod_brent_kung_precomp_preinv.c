@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2013 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -44,18 +45,14 @@ _nmod_poly_precompute_matrix(nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
                               nmod_t mod)
 {
     /* Set rows of A to powers of poly1 */
-    slong i, n, m;
+    slong n, m;
 
     n = len2 - 1;
 
     m = n_sqrt(n) + 1;
 
-    A->rows[0][0] = UWORD(1);
-    _nmod_vec_set(A->rows[1], poly1, n);
-
-    for (i = 2; i < m; i++)
-        _nmod_poly_mulmod_preinv(A->rows[i], A->rows[i - 1],
-            n, poly1, n, poly2, len2, poly2inv, len2inv, mod);
+    _nmod_poly_powers_mod_preinv_naive(A->rows, poly1, n, m,
+                                          poly2, len2, poly2inv, len2inv, mod);
 }
 
 void
@@ -195,23 +192,30 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
     if (len1 == 0 || len3 == 1)
     {
         nmod_poly_zero(res);
+
         return;
     }
 
     if (len1 == 1)
     {
         nmod_poly_set(res, poly1);
+
         return;
     }
 
     if (res == poly3 || res == poly1 || res == poly3inv)
     {
         nmod_poly_t tmp;
+        
         nmod_poly_init_preinv(tmp, res->mod.n, res->mod.ninv);
+        
         nmod_poly_compose_mod_brent_kung_precomp_preinv(tmp, poly1, A,
                                                 poly3, poly3inv);
+        
         nmod_poly_swap(tmp, res);
+        
         nmod_poly_clear(tmp);
+
         return;
     }
 
@@ -224,5 +228,4 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
     res->length = len;
     
     _nmod_poly_normalise(res);
-
 }

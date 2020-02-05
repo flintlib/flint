@@ -1585,8 +1585,8 @@ Modular composition
     have enough memory allocated to hold ``l`` ``nmod_poly_struct``.
     The entries of ``res`` need to be initialised and ``l`` needs to be
     less than ``len1`` Furthermore, we require ``hinv`` to be the inverse
-    of the reverse of ``h``. The output is not allowed to be aliased with any
-    of the inputs.
+    of the reverse of ``h``. The length of ``h`` must be at least `2`. The
+    output is not allowed to be aliased with any of the inputs.
 
     The algorithm used is the Brent-Kung matrix algorithm.
 
