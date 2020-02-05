@@ -1575,7 +1575,7 @@ Modular composition
     modular composition is particularly useful if one has to perform several
     modular composition of the form `f(g)` modulo `h` for fixed `g` and `h`.
 
-.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv (nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong l, mp_srcptr g, slong leng, mp_srcptr h, slong lenh, mp_srcptr hinv, slong lenhinv, nmod_t mod)
+.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong l, mp_srcptr g, slong leng, mp_srcptr h, slong lenh, mp_srcptr hinv, slong lenhinv, nmod_t mod)
 
     Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq l`,
     where `f_i` are the first ``l`` elements of ``polys``. We require that `h`

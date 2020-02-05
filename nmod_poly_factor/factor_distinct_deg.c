@@ -62,13 +62,9 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
     }
     H = h + (l + 1);
     I = H + m;
-    nmod_poly_init_preinv(h[0], poly->mod.n, poly->mod.ninv);
-    nmod_poly_init_preinv(h[1], poly->mod.n, poly->mod.ninv);
-    for (i = 0; i < m; i++)
-    {
-        nmod_poly_init_preinv(H[i], poly->mod.n, poly->mod.ninv);
-        nmod_poly_init_preinv(I[i], poly->mod.n, poly->mod.ninv);
-    }
+
+    for (i = 0; i < 2*m + l + 1; i++)
+	nmod_poly_init_mod(h[i], poly->mod);
 
     nmod_poly_reverse(vinv, v, v->length);
     nmod_poly_inv_series(vinv, vinv, v->length);

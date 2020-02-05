@@ -65,6 +65,9 @@ main(void)
             nmod_poly_rem(pow + j, pow + j, a);
         }
 
+	for (j = 0; j < k; j++)
+	    nmod_poly_init(res + j, m);
+
         nmod_poly_compose_mod_brent_kung_vec_preinv(res, pow, l, k, b, a, ainv);
 
         for (j = 0; j < k; j++)

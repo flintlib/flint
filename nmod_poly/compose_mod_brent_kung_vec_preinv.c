@@ -142,27 +142,23 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
     if (len2 == 1)
     {
         for (i = 0; i < n; i++)
-        {
-            nmod_poly_init_preinv(res + i, poly->mod.n, poly->mod.ninv);
             nmod_poly_zero(res + i);
-        }
-        return;
+
+	return;
     }
 
     if (len2 == 2)
     {
         for (i = 0; i < n; i++)
-        {
-            nmod_poly_init_preinv(res + i, poly->mod.n, poly->mod.ninv);
             nmod_poly_set(res + i, polys + i);
-        }
-        return;
+
+	return;
     }
 
     for (i = 0; i < n; i++)
     {
-        nmod_poly_init2_preinv(res + i, poly->mod.n, poly->mod.ninv, len2 - 1);
-        _nmod_poly_set_length(res + i, len2 - 1);
+        nmod_poly_fit_length(res + i, len2 - 1);
+	_nmod_poly_set_length(res + i, len2 - 1);
     }
 
     _nmod_poly_compose_mod_brent_kung_vec_preinv(res, polys, len1, n,

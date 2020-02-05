@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2014 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
