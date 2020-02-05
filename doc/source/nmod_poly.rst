@@ -1583,10 +1583,10 @@ Modular composition
     length of `g` is less than the length of `h`. We also require that the
     length of `f_i` is less than the length of `h`. We require ``res`` to
     have enough memory allocated to hold ``l`` ``nmod_poly_struct``.
-    The entries of ``res`` need to be initialised and ``l`` needs to be
-    less than ``len1`` Furthermore, we require ``hinv`` to be the inverse
-    of the reverse of ``h``. The length of ``h`` must be at least `2`. The
-    output is not allowed to be aliased with any of the inputs.
+    The entries of ``res`` need to be initialised and ``l`` needs to be less
+    than ``len1`` Furthermore, we require ``hinv`` to be the inverse of the
+    reverse of ``h``. The output is not allowed to be aliased with any of the
+    inputs.
 
     The algorithm used is the Brent-Kung matrix algorithm.
 

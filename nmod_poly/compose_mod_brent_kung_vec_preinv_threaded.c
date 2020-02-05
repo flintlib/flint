@@ -63,12 +63,24 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
             return;
 
         _nmod_vec_set(res[j].coeffs, C->rows[(j + 1) * k - 1], n);
-        for (i = 2; i <= k; i++)
-        {
-            _nmod_poly_mulmod_preinv(t, res[j].coeffs, n, h, n, poly,
+
+        if (n == 1) /* special case, constant polynomials */
+        {    
+            for (i = 2; i <= k; i++)
+            {
+                t[0] = n_mulmod2_preinv(res[j].coeffs[0], h[0], p.n, p.ninv);
+                res[j].coeffs[0] = n_addmod(t[0],
+                                             C->rows[(j + 1) * k - i][0], p.n);
+            }
+        } else
+        { 
+            for (i = 2; i <= k; i++)
+            {
+                _nmod_poly_mulmod_preinv(t, res[j].coeffs, n, h, n, poly,
                                                       len, polyinv, leninv, p);
-            _nmod_poly_add(res[j].coeffs, t, n,
+                _nmod_poly_add(res[j].coeffs, t, n,
                                                C->rows[(j + 1) * k - i], n, p);
+            }
         }
     }
 }
