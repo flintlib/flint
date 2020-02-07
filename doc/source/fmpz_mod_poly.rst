@@ -625,7 +625,22 @@ Powering
     Sets ``res`` to ``x`` raised to the power ``e``
     modulo ``f``, using sliding window exponentiation. We require
     ``e >= 0``. We require ``finv`` to be the inverse of the reverse of
-    ``f``.
+    ``
+
+.. function:: void _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p)
+
+    Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
+    and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
+    spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
+    at least ``glen - 1`` coefficients and that ``flen > 0``. We require that
+    ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
+    reverse of ``g``.
+
+.. function:: void fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res, const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g)
+
+    Set the entries of the array ``res`` to ``f^0, f^1, ..., f^(n-1) mod g``.
+    No aliasing is permitted between the entries of ``res`` and either of the
+    inputs.
 
 .. function:: void fmpz_mod_poly_frobenius_powers_2exp_precomp( fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
 
