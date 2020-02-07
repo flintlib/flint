@@ -230,6 +230,20 @@ void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
    _fmpz_mod_poly_set_length(poly, 0);
 }
 
+FMPZ_MOD_POLY_INLINE
+void fmpz_mod_poly_one(fmpz_mod_poly_t poly)
+{
+   if (fmpz_is_one(&poly->p))
+   {
+      _fmpz_mod_poly_set_length(poly, 0);
+   } else
+   {
+      fmpz_mod_poly_fit_length(poly, 1);
+      _fmpz_mod_poly_set_length(poly, 1);
+      fmpz_set_ui(poly->coeffs + 0, 1);
+   }
+}
+
 FLINT_DLL void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j);
 
 /*  Conversion ***************************************************************/
@@ -471,6 +485,13 @@ FLINT_DLL void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, c
 
 FLINT_DLL void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+
+FLINT_DLL void _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res,
+                    const fmpz * f, slong flen, slong n, const fmpz * g,
+                 slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p);
+ 
+FLINT_DLL void fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res,
+                    const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g);
 
 FLINT_DLL void fmpz_mod_poly_frobenius_powers_2exp_precomp(fmpz_mod_poly_frobenius_powers_2exp_t pow, 
                  const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m);

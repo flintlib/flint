@@ -192,6 +192,10 @@ Assignment and basic manipulation
 
     Sets ``poly`` to the zero polynomial.
 
+.. function:: void fmpz_mod_poly_one(fmpz_mod_poly_t poly)
+
+    Sets ``poly`` to the constant polynomial `1`.
+
 .. function:: void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j)
 
     Sets the coefficients of `X^k` for `k \in [i, j)` in the polynomial
