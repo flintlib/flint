@@ -853,6 +853,7 @@ Powering
     reverse of ``g``.
 
 .. function:: void _nmod_poly_powers_mod_preinv_bsgs_threaded(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod, slong thread_limit)   
+
     Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
     and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
     spaced). Assumes ``res`` is an array of ``n`` arrays each with space for

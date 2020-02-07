@@ -20,12 +20,13 @@
 int
 main(void)
 {
-    int i, result;
+    int i, result, max_threads = 5;
     FLINT_TEST_INIT(state);
 
-    flint_printf("powers_mod_naive....");
+    flint_printf("powers_mod_bsgs_threaded....");
     fflush(stdout);
 
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     /* Compare with powmod */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -36,6 +37,8 @@ main(void)
         slong j;
 
         fmpz_init(n);
+
+        flint_set_num_threads(n_randint(state, max_threads));
 
         fmpz_randprime(n, state, 100, 0);
         exp = n_randint(state, 32);
@@ -51,16 +54,17 @@ main(void)
 
         fmpz_mod_poly_randtest(f, state, n_randint(state, 50));
         fmpz_mod_poly_randtest_not_zero(g, state, n_randint(state, 50) + 1);
-        
-        fmpz_mod_poly_powers_mod_naive(res, f, exp, g);
+
+        fmpz_mod_poly_powers_mod_bsgs_threaded(res, f, exp, g,
+			                           FLINT_DEFAULT_THREAD_LIMIT);
 
         result = 1;
         j = 0;
 
         if (exp > 0)
         {
-            fmpz_mod_poly_one(pow);
-            result = fmpz_mod_poly_equal(res + 0, pow);
+           fmpz_mod_poly_one(pow);
+           result = fmpz_mod_poly_equal(res + 0, pow);
         }
 
         for (j = 1 ; j < exp && result; j++)
@@ -98,5 +102,11 @@ main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
+#else
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("SKIPPED\n");
+#endif
+
     return 0;
 }
