@@ -307,15 +307,23 @@ nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(fq_nmod_mpolyu_t G,
         {
             /* impossible to find scale factors in this case */
             return nmod_gcds_scales_not_found;
-        } else {
+        }
+        else
+        {
             /* otherwise set the coeff of the monomial to one */
+            nmod_gcds_ret_t ret;
+            FLINT_ASSERT((f->coeffs + 0)->length == 1);
             fq_nmod_mpolyu_set(G, f, ctx);
             fq_nmod_one((G->coeffs + 0)->coeffs + 0, ctx->fqctx);
-            if (!fq_nmod_mpolyu_divides(A, G, ctx))
-                return nmod_gcds_form_wrong;
-            if (!fq_nmod_mpolyu_divides(B, G, ctx))
-                return nmod_gcds_form_wrong;
-            return nmod_gcds_success;
+            fq_nmod_mpolyu_init(Aevalsk1, f->bits, ctx);
+            ret = nmod_gcds_form_wrong;
+            if (   fq_nmod_mpolyuu_divides(Aevalsk1, A, G, 1, ctx)
+                && fq_nmod_mpolyuu_divides(Aevalsk1, B, G, 1, ctx))
+            {
+                ret = nmod_gcds_success;
+            }
+            fq_nmod_mpolyu_clear(Aevalsk1, ctx);
+            return ret;
         }
     }
 
@@ -752,8 +760,42 @@ void fq_nmod_mpolyu_setform_mpolyun(fq_nmod_mpolyu_t A, fq_nmod_mpolyun_t B,
 }
 
 
-int fq_nmod_mpolyu_gcdp_zippel_univar(fq_nmod_mpolyu_t G,
-         fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B, const fq_nmod_mpoly_ctx_t ctx)
+int fq_nmod_mpolyu_gcdp_zippel_univar(
+    fq_nmod_mpolyu_t G,
+    fq_nmod_mpolyu_t Abar,
+    fq_nmod_mpolyu_t Bbar,
+    fq_nmod_mpolyu_t A,
+    fq_nmod_mpolyu_t B,
+    const fq_nmod_mpoly_ctx_t ctx)
+{
+    fq_nmod_poly_t a, b, g, t, r;
+    FLINT_ASSERT(A->bits == B->bits);
+    fq_nmod_poly_init(a, ctx->fqctx);
+    fq_nmod_poly_init(b, ctx->fqctx);
+    fq_nmod_poly_init(g, ctx->fqctx);
+    fq_nmod_poly_init(t, ctx->fqctx);
+    fq_nmod_poly_init(r, ctx->fqctx);
+    fq_nmod_mpolyu_cvtto_poly(a, A, ctx);
+    fq_nmod_mpolyu_cvtto_poly(b, B, ctx);
+    fq_nmod_poly_gcd(g, a, b, ctx->fqctx);
+    fq_nmod_mpolyu_cvtfrom_poly(G, g, ctx);
+    fq_nmod_poly_divrem(t, r, a, g, ctx->fqctx);
+    fq_nmod_mpolyu_cvtfrom_poly(Abar, t, ctx);
+    fq_nmod_poly_divrem(t, r, b, g, ctx->fqctx);
+    fq_nmod_mpolyu_cvtfrom_poly(Bbar, t, ctx);
+    fq_nmod_poly_clear(a, ctx->fqctx);
+    fq_nmod_poly_clear(b, ctx->fqctx);
+    fq_nmod_poly_clear(g, ctx->fqctx);
+    fq_nmod_poly_clear(t, ctx->fqctx);
+    fq_nmod_poly_clear(r, ctx->fqctx);
+    return 1;
+}
+
+int fq_nmod_mpolyu_gcdp_zippel_univar_no_cofactors(
+    fq_nmod_mpolyu_t G,
+    fq_nmod_mpolyu_t A,
+    fq_nmod_mpolyu_t B,
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     fq_nmod_poly_t a, b, g;
     FLINT_ASSERT(A->bits == B->bits);
@@ -777,15 +819,20 @@ int fq_nmod_mpolyu_gcdp_zippel_univar(fq_nmod_mpolyu_t G,
 }
 
 
-int fq_nmod_mpolyu_gcdp_zippel_bivar(fq_nmod_mpolyu_t G,
-                          fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
-                         const fq_nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo,
-                                                        flint_rand_t randstate)
+int fq_nmod_mpolyu_gcdp_zippel_bivar(
+    fq_nmod_mpolyu_t G,
+    fq_nmod_mpolyu_t Abar,
+    fq_nmod_mpolyu_t Bbar,
+    fq_nmod_mpolyu_t A,
+    fq_nmod_mpolyu_t B,
+    const fq_nmod_mpoly_ctx_t ctx,
+    mpoly_zipinfo_t zinfo,
+    flint_rand_t randstate)
 {
     slong var = 0;
     slong Alastdeg;
     slong Blastdeg;
-    ulong ABminshift;
+    ulong Ashift, Bshift, Gshift;
     slong lastdeg;
     slong bound;
     int success = 0, changed, have_enough;
@@ -812,9 +859,11 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(fq_nmod_mpolyu_t G,
     FLINT_ASSERT(An->length > 0);
     FLINT_ASSERT(Bn->length > 0);
 
-    ABminshift = FLINT_MIN(A->exps[A->length - 1], B->exps[B->length - 1]);
-    fq_nmod_mpolyun_shift_right(An, A->exps[A->length - 1]);
-    fq_nmod_mpolyun_shift_right(Bn, B->exps[B->length - 1]);
+    Ashift = A->exps[A->length - 1];
+    Bshift = B->exps[B->length - 1];
+    Gshift = FLINT_MIN(Ashift, Bshift);
+    fq_nmod_mpolyun_shift_right(An, Ashift);
+    fq_nmod_mpolyun_shift_right(Bn, Bshift);
 
     fq_nmod_poly_init(a, ctx->fqctx);
     fq_nmod_poly_init(b, ctx->fqctx);
@@ -827,6 +876,7 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(fq_nmod_mpolyu_t G,
     fq_nmod_mpolyun_divexact_poly(An, An, a, ctx);
     fq_nmod_mpolyun_divexact_poly(Bn, Bn, b, ctx);
     fq_nmod_poly_gcd(c, a, b, ctx->fqctx);
+
     fq_nmod_poly_gcd(g, fq_nmod_mpolyun_leadcoeff_poly(An, ctx),
                         fq_nmod_mpolyun_leadcoeff_poly(Bn, ctx), ctx->fqctx);
     Alastdeg = fq_nmod_mpolyun_lastdeg(An, ctx);
@@ -890,12 +940,16 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(fq_nmod_mpolyu_t G,
         if (Aeval->length == 0 || Beval->length == 0)
             goto outer_continue;
 
-        fq_nmod_mpolyu_gcdp_zippel_univar(Geval, Aeval, Beval, ctx);
+        fq_nmod_mpolyu_gcdp_zippel_univar_no_cofactors(Geval, Aeval, Beval, ctx);
 
         if (fq_nmod_mpolyu_is_one(Geval, ctx))
         {
-            fq_nmod_mpolyu_cvtfrom_poly_notmain(G, c, var, ctx);
-            fq_nmod_mpolyu_shift_left(G, ABminshift);
+            fq_nmod_mpolyu_one(G, ctx);
+            fq_nmod_mpolyu_swap(Abar, A);
+            fq_nmod_mpolyu_swap(Bbar, B);
+            fq_nmod_mpolyu_shift_left(G, Gshift);
+            fq_nmod_mpolyu_shift_left(Abar, Ashift - Gshift);
+            fq_nmod_mpolyu_shift_left(Bbar, Bshift - Gshift);
             success = 1;
             goto finished;
         }
@@ -940,10 +994,11 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(fq_nmod_mpolyu_t G,
             {
                 fq_nmod_mpolyun_content_poly(a, H, ctx);
                 fq_nmod_mpolyun_divexact_poly(Ht, H, a, ctx);
-                fq_nmod_mpolyun_shift_left(Ht, ABminshift);
+                fq_nmod_mpolyun_shift_left(Ht, Gshift);
                 fq_nmod_mpolyu_cvtfrom_mpolyun(G, Ht, var, ctx);
-                if (    fq_nmod_mpolyu_divides(A, G, ctx)
-                     && fq_nmod_mpolyu_divides(B, G, ctx))
+
+                if (    fq_nmod_mpolyuu_divides(Abar, A, G, 1, ctx)
+                     && fq_nmod_mpolyuu_divides(Bbar, B, G, 1, ctx))
                 {
                     success = 1;
                     goto finished;
@@ -996,22 +1051,28 @@ finished:
 
 
 
-int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
-                   fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B, slong var,
-                       const fq_nmod_mpoly_ctx_t ctx, mpoly_zipinfo_t zinfo,
-                                                        flint_rand_t randstate)
+int fq_nmod_mpolyu_gcdp_zippel(
+    fq_nmod_mpolyu_t G,
+    fq_nmod_mpolyu_t Abar,
+    fq_nmod_mpolyu_t Bbar,
+    fq_nmod_mpolyu_t A,
+    fq_nmod_mpolyu_t B,
+    slong var,
+    const fq_nmod_mpoly_ctx_t ctx,
+    mpoly_zipinfo_t zinfo,
+    flint_rand_t randstate)
 {
     slong lastdeg;
     slong Alastdeg;
     slong Blastdeg;
-    ulong ABminshift;
+    ulong Ashift, Bshift, Gshift;
     slong degbound;
     slong bound;
     int success = 0, changed, have_enough;
     fq_nmod_mpolyun_t An, Bn;
     fq_nmod_poly_t a, b, c, g;
     fq_nmod_poly_t modulus, tempmod;
-    fq_nmod_mpolyu_t Aeval, Beval, Geval, Gform;
+    fq_nmod_mpolyu_t Aeval, Beval, Geval, Abareval, Bbareval, Gform;
     fq_nmod_mpolyun_t H, Ht;
     fq_nmod_t geval, temp;
     fq_nmod_t alpha, alphastart;
@@ -1031,22 +1092,25 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
     if (var == -WORD(1))
     {
         /* no more variables left to interpolate */
-        return fq_nmod_mpolyu_gcdp_zippel_univar(G, A, B, ctx);
+        return fq_nmod_mpolyu_gcdp_zippel_univar(G, Abar, Bbar, A, B, ctx);
     }
 
     if (var == WORD(0))
     {
         /* bivariate is more comfortable separated */
-        return fq_nmod_mpolyu_gcdp_zippel_bivar(G, A, B, ctx, zinfo, randstate);
+        return fq_nmod_mpolyu_gcdp_zippel_bivar(G, Abar, Bbar, A, B, ctx, zinfo, randstate);
     }
 
     fq_nmod_mpolyun_init(An, A->bits, ctx);
     fq_nmod_mpolyun_init(Bn, A->bits, ctx);
     fq_nmod_mpolyu_cvtto_mpolyun(An, A, var, ctx);
     fq_nmod_mpolyu_cvtto_mpolyun(Bn, B, var, ctx);
-    ABminshift = FLINT_MIN(A->exps[A->length - 1], B->exps[B->length - 1]);
-    fq_nmod_mpolyun_shift_right(An, A->exps[A->length - 1]);
-    fq_nmod_mpolyun_shift_right(Bn, B->exps[B->length - 1]);
+
+    Ashift = A->exps[A->length - 1];
+    Bshift = B->exps[B->length - 1];
+    Gshift = FLINT_MIN(Ashift, Bshift);
+    fq_nmod_mpolyun_shift_right(An, Ashift);
+    fq_nmod_mpolyun_shift_right(Bn, Bshift);
 
     fq_nmod_poly_init(a, ctx->fqctx);
     fq_nmod_poly_init(b, ctx->fqctx);
@@ -1079,6 +1143,8 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
     fq_nmod_mpolyu_init(Aeval, A->bits, ctx);
     fq_nmod_mpolyu_init(Beval, A->bits, ctx);
     fq_nmod_mpolyu_init(Geval, A->bits, ctx);
+    fq_nmod_mpolyu_init(Abareval, A->bits, ctx);
+    fq_nmod_mpolyu_init(Bbareval, A->bits, ctx);
     fq_nmod_mpolyu_init(Gform, A->bits, ctx);
     fq_nmod_mpolyun_init(H, A->bits, ctx);
     fq_nmod_mpolyun_init(Ht, A->bits, ctx);
@@ -1133,9 +1199,8 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
             goto outer_continue;
         }
 
-        success = fq_nmod_mpolyu_gcdp_zippel(Geval, Aeval, Beval, var - 1,
-                                                        ctx, zinfo, randstate);
-
+        success = fq_nmod_mpolyu_gcdp_zippel(Geval, Abareval, Bbareval,
+                                 Aeval, Beval, var - 1, ctx, zinfo, randstate);
         if (!success || Geval->exps[0] > degbound)
         {
             success = 0;
@@ -1146,8 +1211,12 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
 
         if (fq_nmod_mpolyu_is_one(Geval, ctx))
         {
-            fq_nmod_mpolyu_cvtfrom_poly_notmain(G, c, var, ctx);
-            fq_nmod_mpolyu_shift_left(G, ABminshift);
+            fq_nmod_mpolyu_one(G, ctx);
+            fq_nmod_mpolyu_swap(Abar, A);
+            fq_nmod_mpolyu_swap(Bbar, B);
+            fq_nmod_mpolyu_shift_left(G, Gshift);
+            fq_nmod_mpolyu_shift_left(Abar, Ashift - Gshift);
+            fq_nmod_mpolyu_shift_left(Bbar, Bshift - Gshift);
             success = 1;
             goto finished;
         }
@@ -1179,12 +1248,12 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
             {
                 fq_nmod_mpolyun_content_poly(a, H, ctx);
                 fq_nmod_mpolyun_divexact_poly(Ht, H, a, ctx);
-                fq_nmod_mpolyun_shift_left(Ht, ABminshift);
+                fq_nmod_mpolyun_shift_left(Ht, Gshift);
                 fq_nmod_mpolyu_cvtfrom_mpolyun(G, Ht, var, ctx);
-                if (    !fq_nmod_mpolyu_divides(A, G, ctx)
-                     || !fq_nmod_mpolyu_divides(B, G, ctx))
+                if (   !fq_nmod_mpolyuu_divides(Abar, A, G, 1, ctx)
+                    || !fq_nmod_mpolyuu_divides(Bbar, B, G, 1, ctx))
                 {
-                    fq_nmod_poly_one(modulus, ctx->fqctx);
+FLINT_ASSERT(0);
                     goto outer_continue;
                 }
                 success = 1;
@@ -1280,10 +1349,10 @@ int fq_nmod_mpolyu_gcdp_zippel(fq_nmod_mpolyu_t G,
             {
                 fq_nmod_mpolyun_content_poly(a, H, ctx);
                 fq_nmod_mpolyun_divexact_poly(Ht, H, a, ctx);
-                fq_nmod_mpolyun_shift_left(Ht, ABminshift);
+                fq_nmod_mpolyun_shift_left(Ht, Gshift);
                 fq_nmod_mpolyu_cvtfrom_mpolyun(G, Ht, var, ctx);
-                if (    fq_nmod_mpolyu_divides(A, G, ctx)
-                     && fq_nmod_mpolyu_divides(B, G, ctx))
+                if (    fq_nmod_mpolyuu_divides(Abar, A, G, 1, ctx)
+                     && fq_nmod_mpolyuu_divides(Bbar, B, G, 1, ctx))
                 {
                     success = 1;
                     goto finished;
@@ -1323,6 +1392,8 @@ finished:
     fq_nmod_mpolyu_clear(Aeval, ctx);
     fq_nmod_mpolyu_clear(Beval, ctx);
     fq_nmod_mpolyu_clear(Geval, ctx);
+    fq_nmod_mpolyu_clear(Abareval, ctx);
+    fq_nmod_mpolyu_clear(Bbareval, ctx);
     fq_nmod_mpolyu_clear(Gform, ctx);
     fq_nmod_mpolyun_clear(An, ctx);
     fq_nmod_mpolyun_clear(Bn, ctx);
