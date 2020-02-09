@@ -753,6 +753,17 @@ FLINT_DLL int _fq_nmod_mpoly_gcd(fq_nmod_mpoly_t G, flint_bitcnt_t Gbits,
                             const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL int fq_nmod_mpoly_gcd_cofactors(fq_nmod_mpoly_t G,
+          fq_nmod_mpoly_t Abar, fq_nmod_mpoly_t Bbar, const fq_nmod_mpoly_t A,
+                       const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int _fq_nmod_mpoly_gcd_cofactors(
+                                fq_nmod_mpoly_t G, flint_bitcnt_t Gbits,
+                                fq_nmod_mpoly_t Abar, flint_bitcnt_t Abarbits,
+                                fq_nmod_mpoly_t Bbar, flint_bitcnt_t Bbarbits,
+                             const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL int fq_nmod_mpoly_gcd_brown(fq_nmod_mpoly_t G,
                             const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
                                                 const fq_nmod_mpoly_ctx_t ctx);
