@@ -1087,7 +1087,7 @@ int nmod_mpoly_gcd_cofactors_threaded(
         Ause = A;
         if (A->bits > FLINT_BITS)
         {
-            if (!nmod_mpoly_repack_bits(Anew, A, FLINT_BITS, ctx));
+            if (!nmod_mpoly_repack_bits(Anew, A, FLINT_BITS, ctx))
                 goto could_not_repack;
             Ause = Anew;
         }

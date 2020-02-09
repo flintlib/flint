@@ -544,10 +544,8 @@ cleanup:
 */
 static int _try_divides(
     nmod_mpoly_t G,
-    const nmod_mpoly_t A,
-    int try_a,
-    const nmod_mpoly_t B,
-    int try_b,
+    const nmod_mpoly_t A, int try_a,
+    const nmod_mpoly_t B, int try_b,
     const nmod_mpoly_ctx_t ctx)
 {
     int success;
@@ -722,7 +720,7 @@ static int _try_brown(
 {
     int success;
     slong m = I->mvars;
-    flint_bitcnt_t ABbits;
+    flint_bitcnt_t wbits;
     nmod_mpoly_ctx_t nctx;
     nmod_mpolyn_t An, Bn, Gn, Abarn, Bbarn;
     nmod_poly_stack_t Sp;
@@ -736,15 +734,15 @@ static int _try_brown(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-    ABbits = FLINT_MAX(A->bits, B->bits);
+    wbits = FLINT_MAX(A->bits, B->bits);
 
     nmod_mpoly_ctx_init(nctx, m, ORD_LEX, ctx->ffinfo->mod.n);
-    nmod_poly_stack_init(Sp, ABbits, nctx);
-    nmod_mpolyn_init(An, ABbits, nctx);
-    nmod_mpolyn_init(Bn, ABbits, nctx);
-    nmod_mpolyn_init(Gn, ABbits, nctx);
-    nmod_mpolyn_init(Abarn, ABbits, nctx);
-    nmod_mpolyn_init(Bbarn, ABbits, nctx);
+    nmod_poly_stack_init(Sp, wbits, nctx);
+    nmod_mpolyn_init(An, wbits, nctx);
+    nmod_mpolyn_init(Bn, wbits, nctx);
+    nmod_mpolyn_init(Gn, wbits, nctx);
+    nmod_mpolyn_init(Abarn, wbits, nctx);
+    nmod_mpolyn_init(Bbarn, wbits, nctx);
 
     if (num_handles > 0)
     {
@@ -780,8 +778,8 @@ static int _try_brown(
                               I->brown_perm, I->Bmin_exp, I->Gstride, NULL, 0);
     }
 
-    FLINT_ASSERT(An->bits == ABbits);
-    FLINT_ASSERT(Bn->bits == ABbits);
+    FLINT_ASSERT(An->bits == wbits);
+    FLINT_ASSERT(Bn->bits == wbits);
     FLINT_ASSERT(An->length > 1);
     FLINT_ASSERT(Bn->length > 1);
 
@@ -820,7 +818,6 @@ cleanup:
 
     return success;
 }
-
 
 
 /*
@@ -1066,10 +1063,7 @@ calculate_trivial_gcd:
 
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
     mpoly_gcd_info_measure_zippel(I, A->length, B->length, ctx->minfo);
-/*
-printf("I->brown_time_est: %f\n", I->brown_time_est);
-printf("I->zippel_time_est: %f\n", I->zippel_time_est);
-*/
+
     if (I->zippel_time_est < I->brown_time_est)
     {
         if (_try_zippel(G, A, B, I, ctx))
