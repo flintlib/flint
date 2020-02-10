@@ -240,6 +240,9 @@ FLINT_DLL void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len);
 
 FLINT_DLL void _fmpz_vec_dot(fmpz_t res, const fmpz * vec1, const fmpz * vec2, slong len2);
 
+FLINT_DLL void _fmpz_vec_dot_ptr(fmpz_t c, const fmpz * vec1,
+		                 fmpz ** const vec2, slong offset, slong len);
+
 #ifdef __cplusplus
 }
 #endif

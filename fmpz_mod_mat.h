@@ -25,6 +25,8 @@
  extern "C" {
 #endif
 
+#define FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF 10
+
 typedef struct
 {
     fmpz_mat_t mat;
@@ -208,6 +210,9 @@ FLINT_DLL void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat
 /* Matrix multiplication */
 
 FLINT_DLL void fmpz_mod_mat_mul(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
+
+FLINT_DLL void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C,
+           const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, slong thread_limit);
 
 FLINT_DLL void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
