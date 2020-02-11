@@ -103,7 +103,10 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
         pthread_mutex_unlock(arg.mutex);
 
         if (i >= m)
+        {
+            fmpz_clear(c);
             return;
+        }
 
         iend = FLINT_MIN(i + block, m);
         jend = FLINT_MIN(j + block, n);
@@ -124,8 +127,6 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
             }
         }
     }
-
-    fmpz_clear(c);
 }
 
 static __inline__ void

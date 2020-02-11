@@ -2,6 +2,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2014 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -26,6 +27,7 @@
 #include "flint.h"
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
+#include "thread_support.h"
 
 int
 main(void)
@@ -69,18 +71,18 @@ main(void)
         res = pow + l;
 
         fmpz_mod_poly_rem(b, b, a);
-        for (j = 0; j < l - 1; j++)
+        for (j = 0; j < l; j++)
         {
             fmpz_mod_poly_init(pow + j, p);
             fmpz_mod_poly_randtest(pow + j, state, n_randint(state, 20) + 1);
             fmpz_mod_poly_rem(pow + j, pow + j, a);
         }
 
-        fmpz_mod_poly_init(pow + l - 1, p);
-        fmpz_mod_poly_set(pow + l - 1, b);
-
+        for (j = 0; j < k; j++)
+            fmpz_mod_poly_init(res + j, p);
+            
         fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(res, pow, l,
-                                                                 k, a, ainv);
+                                       k, b, a, ainv, FLINT_DEFAULT_THREAD_LIMIT);
 
         for (j = 0; j < k; j++)
         {
