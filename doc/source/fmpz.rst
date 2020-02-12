@@ -712,6 +712,12 @@ Basic arithmetic
 
     Sets `f` to `a \times b - c \times d`.
 
+.. function:: void fmpz_cdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
+
+    Sets `f` to the quotient of `g` by `h`, rounding up towards
+    infinity and `s` to the remainder.  If `h` is `0` an exception
+    is raised.
+
 .. function:: void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the quotient of `g` by `h`, rounding up towards
