@@ -46,29 +46,6 @@ _fmpz_mod_poly_reduce_matrix_mod_poly (fmpz_mat_t A, const fmpz_mat_t B,
     fmpz_clear(invf);
 }
 
-void *
-_fmpz_mod_poly_precompute_matrix_worker (void * arg_ptr)
-{
-    fmpz_mod_poly_matrix_precompute_arg_t arg =
-                           *((fmpz_mod_poly_matrix_precompute_arg_t *) arg_ptr);
-    /* Set rows of A to powers of poly1 */
-    slong i, n, m;
-
-    n = arg.poly2.length - 1;
-
-    m = n_sqrt(n) + 1;
-
-    fmpz_one(arg.A.rows[0]);
-    _fmpz_vec_set(arg.A.rows[1], arg.poly1.coeffs, n);
-    for (i = 2; i < m; i++)
-        _fmpz_mod_poly_mulmod_preinv(arg.A.rows[i], arg.A.rows[i - 1], n,
-                                     arg.poly1.coeffs, n, arg.poly2.coeffs,
-                                     n + 1, arg.poly2inv.coeffs, n + 1,
-                                     &arg.poly2.p);
-    flint_cleanup();
-    return NULL;
-}
-
 void
 _fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * poly1,
                           const fmpz * poly2, slong len2, const fmpz * poly2inv,
@@ -141,82 +118,6 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
                                  poly2inv->coeffs, poly2inv->length, &poly1->p);
 
     _fmpz_vec_clear(ptr, vec_len);
-}
-
-void *
-_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
-{
-    fmpz_mod_poly_compose_mod_precomp_preinv_arg_t arg=
-                   *((fmpz_mod_poly_compose_mod_precomp_preinv_arg_t*) arg_ptr);
-    fmpz_mat_t B, C;
-    fmpz * t, * h;
-    slong i, j, n, m;
-
-    n = arg.poly3.length - 1;
-
-    if (arg.poly3.length == 1)
-    {
-        flint_cleanup();
-        return NULL;
-    }
-    if (arg.poly1.length == 1)
-    {
-        fmpz_set(arg.res.coeffs, arg.poly1.coeffs);
-        flint_cleanup();
-        return NULL;
-    }
-
-    if (arg.poly3.length == 2)
-    {
-        _fmpz_mod_poly_evaluate_fmpz(arg.res.coeffs, arg.poly1.coeffs,
-                                     arg.poly1.length, arg.A.rows[1],
-                                     &arg.poly3.p);
-        flint_cleanup();
-        return NULL;
-    }
-
-    m = n_sqrt(n) + 1;
-
-    fmpz_mat_init(B, m, m);
-    fmpz_mat_init(C, m, n);
-
-    h = _fmpz_vec_init(n);
-    t = _fmpz_vec_init(n);
-
-    /* Set rows of B to the segments of poly1 */
-    for (i = 0; i < arg.poly1.length / m; i++)
-        _fmpz_vec_set(B->rows[i], arg.poly1.coeffs + i * m, m);
-
-    _fmpz_vec_set(B->rows[i], arg.poly1.coeffs + i * m, arg.poly1.length % m);
-
-    fmpz_mat_mul(C, B, &arg.A);
-    for (i = 0; i < m; i++)
-        for (j = 0; j < n; j++)
-            fmpz_mod(C->rows[i] + j, C->rows[i] + j, &arg.poly3.p);
-
-    /* Evaluate block composition using the Horner scheme */
-    _fmpz_vec_set(arg.res.coeffs, C->rows[m - 1], n);
-    _fmpz_mod_poly_mulmod_preinv(h, arg.A.rows[m - 1], n, arg.A.rows[1], n,
-                                 arg.poly3.coeffs, arg.poly3.length,
-                                 arg.poly3inv.coeffs, arg.poly3inv.length,
-                                 &arg.poly3.p);
-
-    for (i = m - 2; i >= 0; i--)
-    {
-        _fmpz_mod_poly_mulmod_preinv(t, arg.res.coeffs, n, h, n,
-                                     arg.poly3.coeffs, arg.poly3.length,
-                                     arg.poly3inv.coeffs, arg.poly3.length,
-                                     &arg.poly3.p);
-        _fmpz_mod_poly_add(arg.res.coeffs, t, n, C->rows[i], n, &arg.poly3.p);
-    }
-
-    _fmpz_vec_clear(h, n);
-    _fmpz_vec_clear(t, n);
-
-    fmpz_mat_clear(B);
-    fmpz_mat_clear(C);
-    flint_cleanup();
-    return NULL;
 }
 
 void
