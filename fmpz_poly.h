@@ -173,6 +173,14 @@ FLINT_DLL void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, slong len, slon
 
 FLINT_DLL void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, slong n);
 
+FLINT_DLL ulong fmpz_poly_deflation(const fmpz_poly_t input);
+
+FLINT_DLL void fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input,
+                                                              ulong deflation);
+
+FLINT_DLL void fmpz_poly_inflate(fmpz_poly_t result, const fmpz_poly_t input,
+                                                              ulong inflation);
+
 FMPZ_POLY_INLINE
 void fmpz_poly_truncate(fmpz_poly_t poly, slong newlen)
 {

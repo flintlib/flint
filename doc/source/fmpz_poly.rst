@@ -2286,6 +2286,28 @@ Composition
     sets `f(t) = g(h(t))`.
 
 
+Inflation and deflation
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_poly_inflate(fmpz_poly_t result, const fmpz_poly_t input, ulong inflation)
+
+    Sets ``result`` to the inflated polynomial `p(x^n)` where
+    `p` is given by ``input`` and `n` is given by ``inflation``.
+
+.. function:: fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input, ulong deflation)
+
+    Sets ``result`` to the deflated polynomial `p(x^{1/n})` where
+    `p` is given by ``input`` and `n` is given by ``deflation``.
+    Requires `n > 0`.
+
+.. function:: ulong fmpz_poly_deflation(const fmpz_poly_t input)
+
+    Returns the largest integer by which ``input`` can be deflated.
+    As special cases, returns 0 if ``input`` is the zero polynomial
+    and 1 of ``input`` is a constant polynomial.
+
+
 Taylor shift
 --------------------------------------------------------------------------------
 
