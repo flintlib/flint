@@ -1526,7 +1526,7 @@ Modular composition
     `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
     a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
 
-.. function:: void * _nmod_poly_precompute_matrix_worker (void * arg_ptr)
+.. function:: void _nmod_poly_precompute_matrix_worker (void * arg_ptr)
 
     Worker function version of ``_nmod_poly_precompute_matrix``.
     Input/output is stored in ``nmod_poly_matrix_precompute_arg_t``.
@@ -1547,7 +1547,7 @@ Modular composition
     a `\sqrt{\deg(g)}\times \deg(g)` matrix. We require
     ``ginv`` to be the inverse of the reverse of ``g``.
 
-.. function:: void * _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
+.. function:: void _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 
     Worker function version of
     ``_nmod_poly_compose_mod_brent_kung_precomp_preinv``.
