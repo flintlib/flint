@@ -733,6 +733,11 @@ Basic arithmetic
     Sets `f` to the quotient of `g` by `h`, rounding up towards
     infinity.  If `h` is `0` an exception is raised.
 
+.. function:: void fmpz_cdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+
+    Sets `f` to the remainder of `g` upon division by ``2^exp``, 
+    where the remainder is non-positive.
+
 .. function:: void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets `f` to `g` divided by ``2^exp``, rounding down 
