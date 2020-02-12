@@ -642,8 +642,6 @@ fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res,
         }
     }
 
-    flint_give_back_threads(threads, num_threads);
-
     /* cleanup */
     fmpz_mod_poly_clear(f);
     fmpz_mod_poly_clear(g);

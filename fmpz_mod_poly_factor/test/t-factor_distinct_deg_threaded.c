@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2007 David Howden
-    Copyright (C) 2007, 2008, 2009, 2010 William Hart
+    Copyright (C) 2007, 2008, 2009, 2010, 2020 William Hart
     Copyright (C) 2008 Richard Howell-Peak
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
@@ -37,7 +37,7 @@ int main(void)
         fmpz_mod_poly_factor_t res;
         fmpz_t modulus;
         slong i, length, num;
-        slong *degs;
+        slong * degs;
         slong num_of_deg[MAX_DEG + 1];
 
         for (i = 0; i < MAX_DEG + 1; i++)
@@ -96,7 +96,8 @@ int main(void)
             abort();
         }
         fmpz_mod_poly_factor_init(res);
-        fmpz_mod_poly_factor_distinct_deg_threaded(res, poly1, &degs);
+        fmpz_mod_poly_factor_distinct_deg_threaded(res, poly1, &degs,
+			                           FLINT_DEFAULT_THREAD_LIMIT);
 
         fmpz_mod_poly_init(product, &poly1->p);
         fmpz_mod_poly_set_coeff_ui(product, 0, 1);
@@ -143,12 +144,10 @@ int main(void)
     flint_printf("PASS\n");
     return 0;
 #else
-
    FLINT_TEST_CLEANUP(state);
 
    flint_printf("SKIPPED\n");
    return 0;
-
 #endif
 
 }
