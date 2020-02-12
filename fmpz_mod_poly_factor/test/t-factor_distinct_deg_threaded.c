@@ -18,6 +18,7 @@
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 #include "flint.h"
+#include "thread_support.h"
 
 #define MAX_DEG 7
 
