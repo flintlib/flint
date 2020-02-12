@@ -796,6 +796,11 @@ Basic arithmetic
     Set `f` to the quotient of `g` by `h`, rounding down towards
     zero.  If `h` is `0` an exception is raised.
 
+.. function:: void fmpz_tdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+
+    Sets `f` to the remainder of `g` upon division by ``2^exp``,
+    where the remainder has the same sign as `g`.
+
 .. function:: ulong fmpz_tdiv_ui(const fmpz_t g, ulong h)
 
     Returns the absolute value of the remainder from dividing `g`
