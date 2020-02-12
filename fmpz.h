@@ -590,6 +590,8 @@ FLINT_DLL void fmpz_cdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
 FLINT_DLL void fmpz_cdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
+FLINT_DLL ulong fmpz_cdiv_ui(const fmpz_t g, ulong h);
+
 FLINT_DLL void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, 

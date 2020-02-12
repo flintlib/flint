@@ -738,6 +738,12 @@ Basic arithmetic
     Sets `f` to the remainder of `g` upon division by ``2^exp``, 
     where the remainder is non-positive.
 
+.. function:: ulong fmpz_cdiv_ui(const fmpz_t g, ulong h)
+
+    Returns the negative of the remainder from dividing `g`
+    by `h`, rounding towards minus infinity. If `h` is `0` an exception is
+    raised.
+
 .. function:: void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets `f` to `g` divided by ``2^exp``, rounding down 
@@ -774,6 +780,12 @@ Basic arithmetic
 
     Sets `f` to the remainder of `g` upon division by ``2^exp``, 
     where the remainder is non-negative.
+
+.. function:: ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
+
+    Returns the remainder of `g` modulo `x` where `x` is an
+    ``ulong``, without changing `g`.  If `x` is `0` an
+    exception will result.
 
 .. function:: void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -858,12 +870,6 @@ Basic arithmetic
 
     Sets `f` to the signed remainder `y \equiv g \bmod h` satisfying
     `-\abs{h}/2 < y \leq \abs{h}/2`.
-
-.. function:: ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
-
-    Returns the remainder of `g` modulo `x` where `x` is an 
-    ``ulong``, without changing `g`.  If `x` is `0` an
-    exception will result.
 
 .. function:: void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 
