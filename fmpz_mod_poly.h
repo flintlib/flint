@@ -1089,12 +1089,14 @@ FLINT_DLL void fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_
 
 FLINT_DLL void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
                  const fmpz_mod_poly_struct * polys, slong len1, slong l,
-                 const fmpz * poly, slong len, const fmpz * polyinv,
-                 slong leninv, const fmpz_t p);
+                 const fmpz * g, slong glen, const fmpz * poly, slong len,
+		 const fmpz * polyinv, slong leninv, const fmpz_t p);
 
 FLINT_DLL void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
-                    const fmpz_mod_poly_struct * polys, slong len1, slong n,
-                    const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv);
+                    const fmpz_mod_poly_struct * polys, slong len1,
+                    slong n, const fmpz_mod_poly_t g,
+		    const fmpz_mod_poly_t poly,
+		    const fmpz_mod_poly_t polyinv);
 
 FLINT_DLL void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,
              const fmpz_mod_poly_struct * polys, slong lenpolys, slong l,

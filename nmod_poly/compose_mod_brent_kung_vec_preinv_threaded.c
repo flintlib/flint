@@ -134,8 +134,16 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
                                                          threads, num_threads);
 
     /* Evaluate block composition using the Horner scheme */
-    _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
+    if (n == 1)
+    {
+        h[0] = n_mulmod2_preinv(A->rows[m - 1][0],
+                                               A->rows[1][0], mod.n, mod.ninv);
+    } else
+    {
+        
+	_nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
                              len, polyinv, leninv, mod);
+    }
 
     args = (compose_vec_arg_t *)
                    flint_malloc(sizeof(compose_vec_arg_t) * (num_threads + 1));

@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -66,13 +67,9 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     }
     H = h + (l + 1);
     I = H + m;
-    fmpz_mod_poly_init(h[0], p);
-    fmpz_mod_poly_init(h[1], p);
-    for (i = 0; i < m; i++)
-    {
-        fmpz_mod_poly_init(H[i], p);
-        fmpz_mod_poly_init(I[i], p);
-    }
+
+    for (i = 0; i < 2*m + l + 1; i++)
+        fmpz_mod_poly_init(h[i], p);
 
     fmpz_mod_poly_reverse(vinv, v, v->length);
     fmpz_mod_poly_inv_series_newton(vinv, vinv, v->length);
@@ -87,14 +84,16 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
                                                              (1 << (i - 1))),
                                                              *(h + 1),
                                                              (1 << (i - 1)),
-                                                             (1 << (i - 1)), v,
-                                                             vinv);
+                                                             (1 << (i - 1)),
+                                                             *(h + (1 << (i - 1))),
+                                                             v, vinv);
         fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(*(h + 1 +
                                                          (1 << (i - 1))),
                                                          *(h + 1),
                                                          (1 << (i - 1)),
-                                                         l - (1 << (i - 1)), v,
-                                                         vinv);
+                                                         l - (1 << (i - 1)),
+                                                         *(h + (1 << (i - 1))),
+                                                         v, vinv);
     }
     else
     {

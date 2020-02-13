@@ -2,6 +2,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2014 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -20,12 +21,12 @@
 
 void
 _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
-                                                 const fmpz_mod_poly_struct *
-                                                 polys, slong lenpolys,
-                                                 slong l, const fmpz * poly,
-                                                 slong len,
-                                                 const fmpz * polyinv,
-                                                 slong leninv, const fmpz_t p)
+                                                const fmpz_mod_poly_struct *
+                                                polys, slong lenpolys, slong l,
+                                                const fmpz * g, slong glen,
+						const fmpz * poly, slong len,
+                                                const fmpz * polyinv,
+                                                slong leninv, const fmpz_t p)
 {
     fmpz_mat_t A, B, C;
     fmpz *t, *h;
@@ -55,14 +56,8 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
     }
 
     /* Set rows of A to powers of last element of polys */
-    fmpz_one(A->rows[0]);
-    _fmpz_vec_set(A->rows[1], (polys + lenpolys - 1)->coeffs,
-                  (polys + lenpolys - 1)->length);
-    _fmpz_vec_zero(A->rows[1] + (polys + lenpolys - 1)->length,
-                   n - (polys + lenpolys - 1)->length);
-    for (i = 2; i < m; i++)
-        _fmpz_mod_poly_mulmod_preinv(A->rows[i], A->rows[i - 1], n, A->rows[1],
-                                     n, poly, len, polyinv, leninv, p);
+    _fmpz_mod_poly_powers_mod_preinv_naive(A->rows, g, glen,
+                                            m, poly, len, polyinv, leninv, p);
 
     fmpz_mat_mul(C, B, A);
     for (i = 0; i < k * len2; i++)
@@ -70,19 +65,37 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
             fmpz_mod(C->rows[i] + j, C->rows[i] + j, p);
 
     /* Evaluate block composition using the Horner scheme */
-    _fmpz_mod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
+    if (n == 1)
+    {
+        fmpz_mul(h + 0, A->rows[m - 1] + 0, A->rows[1] + 0);
+	fmpz_mod(h + 0, h + 0, p);
+    } else
+    {                                                                                            _fmpz_mod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
                                  len, polyinv, leninv, p);
+    }
 
     for (j = 0; j < len2; j++)
     {
         _fmpz_vec_set((res + j)->coeffs, C->rows[(j + 1) * k - 1], n);
-        for (i = 2; i <= k; i++)
+
+	if (n == 1)
         {
-            _fmpz_mod_poly_mulmod_preinv(t, (res + j)->coeffs, n, h, n, poly,
+            for (i = 2; i <= k; i++)
+            {
+               fmpz_mul(t + 0, res[j].coeffs + 0, h + 0);
+	       fmpz_add(res[j].coeffs + 0, t + 0, C->rows[(j + 1)*k - i] + 0);
+	       fmpz_mod(res[j].coeffs + 0, res[j].coeffs + 0, p);
+            }
+        } else
+        {
+            for (i = 2; i <= k; i++)
+            {
+                _fmpz_mod_poly_mulmod_preinv(t, res[j].coeffs, n, h, n, poly,
                                          len, polyinv, leninv, p);
-            _fmpz_mod_poly_add((res + j)->coeffs, t, n,
-                               C->rows[(j + 1) * k - i], n, p);
-        }
+                _fmpz_mod_poly_add(res[j].coeffs, t, n,
+                               C->rows[(j + 1)*k - i], n, p);
+            }
+	}
     }
 
     _fmpz_vec_clear(h, n);
@@ -97,6 +110,7 @@ void
 fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
                                                 const fmpz_mod_poly_struct *
                                                 polys, slong len1, slong n,
+                                                const fmpz_mod_poly_t g,
                                                 const fmpz_mod_poly_t poly,
                                                 const fmpz_mod_poly_t polyinv)
 {
@@ -134,6 +148,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
             fmpz_mod_poly_init(res + i, &poly->p);
             fmpz_mod_poly_zero(res + i);
         }
+
         return;
     }
 
@@ -144,16 +159,18 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
             fmpz_mod_poly_init(res + i, &poly->p);
             fmpz_mod_poly_set(res + i, polys + i);
         }
+
         return;
     }
 
     for (i = 0; i < n; i++)
     {
-        fmpz_mod_poly_init2(res + i, &poly->p, len2 - 1);
-        _fmpz_mod_poly_set_length(res + i, len2 - 1);
+        fmpz_mod_poly_fit_length(res + i, len2 - 1);
+	_fmpz_mod_poly_set_length(res + i, len2 - 1);
     }
 
     _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(res, polys, len1, n,
+                                                     g->coeffs, g->length,
                                                      poly->coeffs, len2,
                                                      polyinv->coeffs,
                                                      polyinv->length,
