@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013, 2014 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -62,13 +63,9 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly)
     }
     H = h + (l + 1);
     I = H + m;
-    fmpz_mod_poly_init(h[0], p);
-    fmpz_mod_poly_init(h[1], p);
-    for (i = 0; i < m; i++)
-    {
-        fmpz_mod_poly_init(H[i], p);
-        fmpz_mod_poly_init(I[i], p);
-    }
+
+    for (i = 0; i < 2*m + l + 1; i++)
+        fmpz_mod_poly_init(h[i], p);
 
     fmpz_mod_poly_make_monic(v, poly);
 
@@ -84,14 +81,16 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly)
                                                              (1 << (i - 1))),
                                                              *(h + 1),
                                                              (1 << (i - 1)),
-                                                             (1 << (i - 1)), v,
-                                                             vinv);
+                                                             (1 << (i - 1)),
+                                                             *(h + (1 << (i - 1))),
+                                                             v, vinv);
         fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (*(h + 1 +
                                                          (1 << (i - 1))),
                                                          *(h + 1),
                                                          (1 << (i - 1)),
-                                                         l - (1 << (i - 1)), v,
-                                                         vinv);
+                                                         l - (1 << (i - 1)),
+                                                         *(h + (1 << (i - 1))),
+                                                         v, vinv);
     }
     else
     {

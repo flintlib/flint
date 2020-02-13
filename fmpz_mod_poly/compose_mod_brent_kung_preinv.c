@@ -2,6 +2,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -60,11 +61,8 @@ _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * poly1,
     _fmpz_vec_set(B->rows[i], poly1 + i * m, len1 % m);
 
     /* Set rows of A to powers of poly2 */
-    fmpz_one(A->rows[0]);
-    _fmpz_vec_set(A->rows[1], poly2, n);
-    for (i = 2; i < m; i++)
-        _fmpz_mod_poly_mulmod_preinv (A->rows[i], A->rows[i - 1], n, poly2, n,
-                                      poly3, len3, poly3inv, len3inv, p);
+    _fmpz_mod_poly_powers_mod_preinv_naive(A->rows, poly2, n,
+                                         m, poly3, len3, poly3inv, len3inv, p);
 
     fmpz_mat_mul(C, B, A);
     for (i = 0; i < m; i++)

@@ -844,7 +844,8 @@ Powering
     No aliasing is permitted between the entries of ``res`` and either of the
     inputs.
 
-.. function:: void _nmod_poly_powers_mod_preinv_bsgs_threaded_pool(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod, thread_pool_handle * threads, slong num_threads)   
+.. function:: void _nmod_poly_powers_mod_preinv_bsgs_threaded_pool(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod, thread_pool_handle * threads, slong num_threads)
+
     Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
     and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
     spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
@@ -853,6 +854,7 @@ Powering
     reverse of ``g``.
 
 .. function:: void _nmod_poly_powers_mod_preinv_bsgs_threaded(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod, slong thread_limit)   
+
     Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
     and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
     spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
@@ -1525,7 +1527,7 @@ Modular composition
     `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
     a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
 
-.. function:: void * _nmod_poly_precompute_matrix_worker (void * arg_ptr)
+.. function:: void _nmod_poly_precompute_matrix_worker (void * arg_ptr)
 
     Worker function version of ``_nmod_poly_precompute_matrix``.
     Input/output is stored in ``nmod_poly_matrix_precompute_arg_t``.
@@ -1546,7 +1548,7 @@ Modular composition
     a `\sqrt{\deg(g)}\times \deg(g)` matrix. We require
     ``ginv`` to be the inverse of the reverse of ``g``.
 
-.. function:: void * _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
+.. function:: void _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 
     Worker function version of
     ``_nmod_poly_compose_mod_brent_kung_precomp_preinv``.
@@ -1600,13 +1602,19 @@ Modular composition
     of the reverse of ``h``. No aliasing of ``res`` and ``polys`` is allowed.
     The algorithm used is the Brent-Kung matrix algorithm.
 
-.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res, const nmod_poly_struct * polys, slong lenpolys, slong l, mp_srcptr poly, slong len, mp_srcptr polyinv, slong leninv, nmod_t mod)
+.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong lenpolys, slong l, const mp_srcptr g, slong glen, mp_srcptr poly, slong len, mp_srcptr polyinv, slong leninv, nmod_t mod, thread_pool_handle * threads, slong num_threads)
 
     Multithreaded version of
     ``_nmod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the
     Horner evaluations across ``flint_get_num_threads()`` threads.
 
-.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t poly, const nmod_poly_t polyinv)
+.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t poly, const nmod_poly_t polyinv, thread_pool_handle * threads, slong num_threads) 
+
+    Multithreaded version of
+    ``nmod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the
+    Horner evaluations across ``flint_get_num_threads()`` threads.
+
+.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t poly, const nmod_poly_t polyinv, slong thread_limit)
 
     Multithreaded version of
     ``nmod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the

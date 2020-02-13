@@ -274,6 +274,11 @@ Matrix multiplication
     `C` is not allowed to be aliased with `A` or `B`. This function
     automatically chooses between classical and Strassen multiplication.
 
+.. function:: void _nmod_mat_mul_classical(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
+
+   Sets ``D = A*B op C`` where ``op`` is ``+1`` for addition, ``-1`` for
+   subtraction and ``0`` to ignore ``C``.
+
 .. function:: void nmod_mat_mul_classical(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
@@ -282,6 +287,18 @@ Matrix multiplication
     to improve memory locality if the matrices are large enough,
     and packing several entries of `B` into each word if the modulus
     is very small.
+
+.. function:: void _nmod_mat_mul_classical_threaded_pool(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op, thread_pool_handle * threads, slong num_threads)
+ 
+    Multithreaded version of ``_nmod_mat_mul_classical``.
+
+.. function:: void _nmod_mat_mul_classical_threaded(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op, slong thread_limit)
+
+    Multithreaded version of ``_nmod_mat_mul_classical``.
+
+.. function:: void nmod_mat_mul_classical_threaded(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, slong thread_limit)
+
+    Multithreaded version of ``nmod_mat_mul_classical``.
 
 .. function:: void nmod_mat_mul_strassen(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 

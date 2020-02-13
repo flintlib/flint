@@ -199,7 +199,7 @@ Factorisation
     Currently Cantor-Zassenhaus is used by default unless the modulus is 2, in
     which case Berlekamp is used.
 
-.. function:: void * _nmod_poly_interval_poly_worker(void* arg_ptr)
+.. function:: void _nmod_poly_interval_poly_worker(void* arg_ptr)
 
     Worker function to compute interval polynomials in distinct degree
     factorisation. Input/output is stored in

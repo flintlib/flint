@@ -111,7 +111,7 @@ nmod_poly_powers_mod_naive(nmod_poly_struct * res, const nmod_poly_t f,
     for (i = 0; i < n; i++)
     {
        nmod_poly_fit_length(res + i, nmod_poly_length(g) - 1);
-       res_arr[i] = (res + i)->coeffs;
+       res_arr[i] = res[i].coeffs;
        _nmod_poly_set_length(res + i, nmod_poly_length(g) - 1);
     }
 

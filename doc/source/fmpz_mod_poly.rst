@@ -192,6 +192,10 @@ Assignment and basic manipulation
 
     Sets ``poly`` to the zero polynomial.
 
+.. function:: void fmpz_mod_poly_one(fmpz_mod_poly_t poly)
+
+    Sets ``poly`` to the constant polynomial `1`.
+
 .. function:: void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j)
 
     Sets the coefficients of `X^k` for `k \in [i, j)` in the polynomial
@@ -621,7 +625,64 @@ Powering
     Sets ``res`` to ``x`` raised to the power ``e``
     modulo ``f``, using sliding window exponentiation. We require
     ``e >= 0``. We require ``finv`` to be the inverse of the reverse of
-    ``f``.
+    ``
+
+.. function:: void _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p)
+
+    Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
+    and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
+    spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
+    at least ``glen - 1`` coefficients and that ``flen > 0``. We require that
+    ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
+    reverse of ``g``.
+
+.. function:: void fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res, const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g)
+
+    Set the entries of the array ``res`` to ``f^0, f^1, ..., f^(n-1) mod g``.
+    No aliasing is permitted between the entries of ``res`` and either of the
+    inputs.
+
+.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
+
+    Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
+    and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
+    spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
+    at least ``glen - 1`` coefficients and that ``flen > 0``. We require that
+    ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
+    reverse of ``g``.
+
+.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, slong thread_limit)
+
+    Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
+    and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
+    spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
+    at least ``glen - 1`` coefficients and that ``flen > 0``. We require that
+    ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
+    reverse of ``g``.
+
+.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
+
+    Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
+    and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
+    spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
+    at least ``glen - 1`` coefficients and that ``flen > 0``. We require that
+    ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
+    reverse of ``g``.
+
+.. function:: _fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, slong thread_limit)
+
+    Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
+    and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
+    spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
+    at least ``glen - 1`` coefficients and that ``flen > 0``. We require that
+    ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
+    reverse of ``g``.
+
+.. function:: void fmpz_mod_poly_powers_mod_bsgs_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g, slong thread_limit)
+
+    Set the entries of the array ``res`` to ``f^0, f^1, ..., f^(n-1) mod g``.
+    No aliasing is permitted between the entries of ``res`` and either of the
+    inputs.
 
 .. function:: void fmpz_mod_poly_frobenius_powers_2exp_precomp( fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
 
@@ -1680,7 +1741,7 @@ Modular composition
     `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
     a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
 
-.. function:: void * _fmpz_mod_poly_precompute_matrix_worker(void * arg_ptr)
+.. function:: void _fmpz_mod_poly_precompute_matrix_worker(void * arg_ptr)
 
     Worker function version of ``_fmpz_mod_poly_precompute_matrix``.
     Input/output is stored in ``fmpz_mod_poly_matrix_precompute_arg_t``.
@@ -1701,7 +1762,7 @@ Modular composition
     a `\sqrt{\deg(g)}\times \deg(g)` matrix. We require
     ``ginv`` to be the inverse of the reverse of ``g``.
 
-.. function:: void * _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
+.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 
     Worker function version of
     ``_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv``.
@@ -1748,42 +1809,46 @@ Modular composition
     we require ``hinv`` to be the inverse of the reverse of ``h``.
     The algorithm used is the Brent-Kung matrix algorithm.
 
-.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong l, const fmpz * h, slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_t p)
+.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong l, const fmpz * g, slong glen, const fmpz * h, slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_t p)
 
     Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq l`,
-    where `f_i` are the first ``l`` elements of ``polys`` and `g` is the
-    last element of ``polys``. We require that `h` is nonzero and that the
-    length of `g` is less than the length of `h`. We also require that the
-    length of `f_i` is less than the length of `h`. We require ``res`` to
-    have enough memory allocated to hold ``l`` ``fmpz_mod_poly_struct``.
-    The entries of ``res`` need to be initialised and ``l`` needs to be
-    less than ``len1`` Furthermore, we require ``hinv`` to be the inverse
-    of the reverse of ``h``. The output is not allowed to be aliased with any
-    of the inputs.
+    where `f_i` are the ``l`` elements of ``polys``. We require that `h` is
+    nonzero and that the length of `g` is less than the length of `h`. We
+    also require that the length of `f_i` is less than the length of `h`. We
+    require ``res`` to have enough memory allocated to hold ``l``
+    ``fmpz_mod_poly_struct``'s. The entries of ``res`` need to be initialised
+    and ``l`` needs to be less than ``len1`` Furthermore, we require ``hinv``
+    to be the inverse of the reverse of ``h``. The output is not allowed to be
+    aliased with any of the inputs.
 
     The algorithm used is the Brent-Kung matrix algorithm.
 
-
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
+.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
 
     Sets ``res`` to the composition `f_i(g)` modulo `h` for `1\leq i \leq n`
-    where `f_i` are the first ``n`` elements of ``polys`` and `g` is the
-    last element of ``polys``. We require ``res`` to have enough memory
-    allocated to hold ``n`` ``fmpz_mod_poly_struct``. The entries of
-    ``res`` need to be uninitialised and ``n`` needs to be less than
-    ``len1``. We require that `h` is nonzero and that `f_i` and `g` have
+    where `f_i` are the ``n`` elements of ``polys``. We require ``res`` to
+    have enough memory allocated to hold ``n`` ``fmpz_mod_poly_struct``'s.
+    The entries of ``res`` need to be initialised and ``n`` needs to be less
+    than ``len1``. We require that `h` is nonzero and that `f_i` and `g` have
     smaller degree than `h`. Furthermore, we require ``hinv`` to be the
     inverse of the reverse of ``h``. No aliasing of ``res`` and
     ``polys`` is allowed.
     The algorithm used is the Brent-Kung matrix algorithm.
 
-.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong lenpolys, slong l, const fmpz * poly, slong len, const fmpz * polyinv, slong leninv, const fmpz_t p)
+.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong lenpolys, slong l, const fmpz * g, slong glen, const fmpz * poly, slong len, const fmpz * polyinv, slong leninv, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
 
     Multithreaded version of
     ``_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the
     Horner evaluations across ``flint_get_num_threads()`` threads.
 
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv)
+.. function:: void
+fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, thread_pool_handle * threads, slong num_threads)
+ 
+    Multithreaded version of
+    ``fmpz_mod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the
+    Horner evaluations across ``flint_get_num_threads()`` threads.
+
+.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, slong thread_limit)
 
     Multithreaded version of
     ``fmpz_mod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the

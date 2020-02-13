@@ -415,3 +415,8 @@ Dot product
 
     Sets ``res`` to the dot product of ``(vec1, len2)`` and
     ``(vec2, len2)``.
+
+.. function:: void _fmpz_vec_dot_ptr(fmpz_t res, const fmpz * vec1, fmpz ** const vec2, slong offset, slong len)
+
+    Sets ``res`` to the dot product of ``len`` values at ``vec1`` and the
+    ``len`` values ``vec2[i] + offset`` for ``0 \leq i < len``.

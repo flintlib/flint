@@ -62,17 +62,19 @@ main(void)
         res = pow + l;
 
         fmpz_mod_poly_rem(b, b, a);
-        for (j = 0; j < l - 1; j++)
+        for (j = 0; j < l; j++)
         {
             fmpz_mod_poly_init(pow + j, p);
             fmpz_mod_poly_randtest(pow + j, state, n_randint(state, 20) + 1);
             fmpz_mod_poly_rem(pow + j, pow + j, a);
         }
 
-        fmpz_mod_poly_init(pow + l - 1, p);
-        fmpz_mod_poly_set(pow + l - 1, b);
+        for (j = 0; j < k; j++)
+        {
+            fmpz_mod_poly_init(res + j, p);
+        }
 
-        fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(res, pow, l, k, a, ainv);
+        fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(res, pow, l, k, b, a, ainv);
 
         for (j = 0; j < k; j++)
         {

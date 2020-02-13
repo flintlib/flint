@@ -142,7 +142,7 @@ Factorisation
 
     Requires that ``degs`` has enough space for `(n/2)+1 * sizeof(slong)`.
 
-.. function:: void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const *degs)
+.. function:: void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const *degs, slong num_threads)
 
     Multithreaded version of ``fmpz_mod_poly_factor_distinct_deg``.
 
@@ -175,7 +175,7 @@ Factorisation
     Factorises a non-constant polynomial ``f`` into monic irreducible
     factors using the Berlekamp algorithm.
 
-.. function:: void * _fmpz_mod_poly_interval_poly_worker(void* arg_ptr)
+.. function:: void _fmpz_mod_poly_interval_poly_worker(void* arg_ptr)
 
     Worker function to compute interval polynomials in distinct degree
     factorisation. Input/output is stored in
