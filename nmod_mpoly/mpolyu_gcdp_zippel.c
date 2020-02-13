@@ -618,7 +618,7 @@ static int nmod_mpolyu_gcdp_zippel_univar(
     nmod_poly_init_mod(a, ctx->ffinfo->mod);
     nmod_poly_init_mod(b, ctx->ffinfo->mod);
     nmod_poly_init_mod(g, ctx->ffinfo->mod);
-    nmod_poly_init_mod(g, ctx->ffinfo->mod);
+    nmod_poly_init_mod(t, ctx->ffinfo->mod);
     nmod_mpolyu_cvtto_poly(a, A, ctx);
     nmod_mpolyu_cvtto_poly(b, B, ctx);
     nmod_poly_gcd(g, a, b);
@@ -916,9 +916,6 @@ int nmod_mpolyu_gcdp_zippel(
     Gshift = FLINT_MIN(Ashift, Bshift);
     nmod_mpolyun_shift_right(An, Ashift);
     nmod_mpolyun_shift_right(Bn, Bshift);
-
-    Alastdeg = nmod_mpolyun_lastdeg(An, ctx);
-    Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
 
     nmod_poly_init(a, ctx->ffinfo->mod.n);
     nmod_poly_init(b, ctx->ffinfo->mod.n);

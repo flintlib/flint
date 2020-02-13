@@ -295,8 +295,7 @@ void nmod_mpoly_to_mpolyu_perm_deflate(
             Aexp[l] += scale[l]*Bexp[k]
 */
 void nmod_mpoly_from_mpolyu_perm_inflate(
-    nmod_mpoly_t A,
-    flint_bitcnt_t Abits,
+    nmod_mpoly_t A, flint_bitcnt_t Abits,
     const nmod_mpoly_ctx_t ctx,
     const nmod_mpolyu_t B,
     const nmod_mpoly_ctx_t uctx,

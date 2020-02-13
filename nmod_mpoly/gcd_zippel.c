@@ -60,8 +60,8 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     Blastdeg = nmod_mpolyun_lastdeg(Bn, ctx);
     bound = 1 + nmod_poly_degree(gamma) + FLINT_MIN(Alastdeg, Blastdeg);
 
-    nmod_poly_init(hc, ctx->ffinfo->mod.n);
-    nmod_poly_init(modulus, ctx->ffinfo->mod.n);
+    nmod_poly_init_mod(hc, ctx->ffinfo->mod);
+    nmod_poly_init_mod(modulus, ctx->ffinfo->mod);
     nmod_poly_one(modulus);
     nmod_mpolyun_init(H, A->bits, ctx);
     nmod_mpolyun_init(Ht, A->bits, ctx);
@@ -120,7 +120,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
         FLINT_ASSERT(fq_nmod_mpolyu_is_canonical(Aeval, ffctx));
         FLINT_ASSERT(fq_nmod_mpolyu_is_canonical(Beval, ffctx));
 
-        fq_nmod_mpolyu_gcdp_zippel_univar(Geval, Aeval, Beval, ffctx);
+        fq_nmod_mpolyu_gcdp_zippel_univar_no_cofactors(Geval, Aeval, Beval, ffctx);
 
         if (fq_nmod_mpolyu_is_one(Geval, ffctx))
         {
@@ -231,7 +231,7 @@ int nmod_mpolyu_gcdm_zippel(
     nmod_mpolyun_t An, Bn, Hn, Ht;
     slong deg;
     fq_nmod_mpoly_ctx_t ffctx;
-    fq_nmod_mpolyu_t Aff, Bff, Gff, Gform;
+    fq_nmod_mpolyu_t Aff, Bff, Gff, Abarff, Bbarff, Gform;
     nmod_poly_t modulus, gamma, hc;
     fq_nmod_t t, gammaff;
 
@@ -297,6 +297,8 @@ int nmod_mpolyu_gcdm_zippel(
     fq_nmod_mpolyu_init(Aff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Bff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Gff, A->bits, ffctx);
+    fq_nmod_mpolyu_init(Abarff, A->bits, ffctx);
+    fq_nmod_mpolyu_init(Bbarff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Gform, A->bits, ffctx);
     fq_nmod_init(gammaff, ffctx->fqctx);
     fq_nmod_init(t, ffctx->fqctx);
@@ -315,6 +317,8 @@ choose_prime_outer:
     fq_nmod_mpolyu_clear(Aff, ffctx);
     fq_nmod_mpolyu_clear(Bff, ffctx);
     fq_nmod_mpolyu_clear(Gff, ffctx);
+    fq_nmod_mpolyu_clear(Abarff, ffctx);
+    fq_nmod_mpolyu_clear(Bbarff, ffctx);
     fq_nmod_mpolyu_clear(Gform, ffctx);
     fq_nmod_clear(gammaff, ffctx->fqctx);
     fq_nmod_clear(t, ffctx->fqctx);
@@ -324,6 +328,8 @@ choose_prime_outer:
     fq_nmod_mpolyu_init(Aff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Bff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Gff, A->bits, ffctx);
+    fq_nmod_mpolyu_init(Abarff, A->bits, ffctx);
+    fq_nmod_mpolyu_init(Bbarff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Gform, A->bits, ffctx);
     fq_nmod_init(gammaff, ffctx->fqctx);
     fq_nmod_init(t, ffctx->fqctx);
@@ -339,8 +345,8 @@ choose_prime_outer:
     if (Aff->length == 0 || Bff->length == 0)
         goto choose_prime_outer;
 
-    success = fq_nmod_mpolyu_gcdp_zippel(Gff, Aff, Bff, ctx->minfo->nvars - 2,
-                                                      ffctx, zinfo, randstate);
+    success = fq_nmod_mpolyu_gcdp_zippel(Gff, Abarff, Bbarff, Aff, Bff,
+                               ctx->minfo->nvars - 2, ffctx, zinfo, randstate);
     if (!success || Gff->exps[0] > degbound)
         goto choose_prime_outer;
     degbound = Gff->exps[0];
@@ -352,7 +358,6 @@ choose_prime_outer:
         nmod_mpolyu_one(G, ctx);
         nmod_mpolyu_swap(Abar, A, ctx);
         nmod_mpolyu_swap(Bbar, B, ctx);
-        nmod_mpolyu_one(G, ctx);
         success = 1;
         goto finished;
     }
@@ -379,6 +384,8 @@ choose_prime_inner:
     fq_nmod_mpolyu_clear(Aff, ffctx);
     fq_nmod_mpolyu_clear(Bff, ffctx);
     fq_nmod_mpolyu_clear(Gff, ffctx);
+    fq_nmod_mpolyu_clear(Abarff, ffctx);
+    fq_nmod_mpolyu_clear(Bbarff, ffctx);
     fq_nmod_clear(gammaff, ffctx->fqctx);
     fq_nmod_clear(t, ffctx->fqctx);
 
@@ -387,6 +394,8 @@ choose_prime_inner:
     fq_nmod_mpolyu_init(Aff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Bff, A->bits, ffctx);
     fq_nmod_mpolyu_init(Gff, A->bits, ffctx);
+    fq_nmod_mpolyu_init(Abarff, A->bits, ffctx);
+    fq_nmod_mpolyu_init(Bbarff, A->bits, ffctx);
     fq_nmod_init(gammaff, ffctx->fqctx);
     fq_nmod_init(t, ffctx->fqctx);
 
@@ -472,6 +481,8 @@ finished:
     fq_nmod_mpolyu_clear(Aff, ffctx);
     fq_nmod_mpolyu_clear(Bff, ffctx);
     fq_nmod_mpolyu_clear(Gff, ffctx);
+    fq_nmod_mpolyu_clear(Abarff, ffctx);
+    fq_nmod_mpolyu_clear(Bbarff, ffctx);
     fq_nmod_mpolyu_clear(Gform, ffctx);
     fq_nmod_clear(gammaff, ffctx->fqctx);
     fq_nmod_clear(t, ffctx->fqctx);

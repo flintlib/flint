@@ -578,6 +578,8 @@ FLINT_DLL int fmpz_divisible(const fmpz_t f, const fmpz_t g);
 
 FLINT_DLL int fmpz_divisible_si(const fmpz_t f, slong g);
 
+FLINT_DLL void fmpz_cdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
+
 FLINT_DLL void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h);
@@ -585,6 +587,10 @@ FLINT_DLL void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h);
 FLINT_DLL void fmpz_cdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 FLINT_DLL void fmpz_cdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+
+FLINT_DLL void fmpz_cdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+
+FLINT_DLL ulong fmpz_cdiv_ui(const fmpz_t g, ulong h);
 
 FLINT_DLL void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 
@@ -610,6 +616,8 @@ FLINT_DLL void fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 FLINT_DLL void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 FLINT_DLL void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, slong h);
+
+FLINT_DLL void fmpz_tdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
 FLINT_DLL ulong fmpz_tdiv_ui(const fmpz_t g, ulong h);
 
