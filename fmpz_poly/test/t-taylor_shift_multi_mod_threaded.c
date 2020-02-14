@@ -108,12 +108,10 @@ main(void)
     return 0;
 
 #else
-
    FLINT_TEST_CLEANUP(state);
 
    flint_printf("SKIPPED\n");
    return 0;
-
 #endif
 
 }
