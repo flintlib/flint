@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2020 Claus Fieker
 
     This file is part of FLINT.
 
@@ -33,26 +34,27 @@ void qadic_ctx_init(qadic_ctx_t ctx,
 
     if (fmpz_cmp_ui(p, 109987) <= 0)
     {  
-      for (position = 0; flint_conway_polynomials[position] != 0; position += 3+flint_conway_polynomials[position+1])
+      for (position = 0; flint_conway_polynomials[position] != 0;
+                               position += 3 + flint_conway_polynomials[position + 1])
       {
           /* Different prime? */
           if (fmpz_cmp_ui(p, flint_conway_polynomials[position]))
               continue;
 
           /* Same degree? */
-          if (d == flint_conway_polynomials[position+1])
+          if (d == flint_conway_polynomials[position + 1])
           {
               /* Find number of non-zero coefficients */
               ctx->len = 1;
 
               for (i = 0; i < d; i++)
               {
-                  if (flint_conway_polynomials[position+2+i])
+                  if (flint_conway_polynomials[position + 2 + i])
                       ctx->len ++;
               }
 
               ctx->a = _fmpz_vec_init(ctx->len);
-              ctx->j = flint_malloc(ctx->len * sizeof(slong));
+              ctx->j = flint_malloc(ctx->len*sizeof(slong));
 
               /* Copy the polynomial */
               j = 0;
@@ -94,12 +96,12 @@ void qadic_ctx_init(qadic_ctx_t ctx,
 
     for (i = 0; i < d; i++)
     {
-       if (!fmpz_is_zero(poly->coeffs+i))
+       if (!fmpz_is_zero(poly->coeffs + i))
           ctx->len ++;
     }
 
     ctx->a = _fmpz_vec_init(ctx->len);
-    ctx->j = flint_malloc(ctx->len * sizeof(slong));
+    ctx->j = flint_malloc(ctx->len*sizeof(slong));
 
     /* Copy the polynomial */
     j = 0;
@@ -108,7 +110,7 @@ void qadic_ctx_init(qadic_ctx_t ctx,
     {
        if (!fmpz_is_zero(poly->coeffs+i))
        {
-           fmpz_set(ctx->a + j, poly->coeffs+i);
+           fmpz_set(ctx->a + j, poly->coeffs + i);
            ctx->j[j] = i;
            j++;
        }
