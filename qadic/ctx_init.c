@@ -61,7 +61,7 @@ void qadic_ctx_init(qadic_ctx_t ctx,
 
               for (i = 0; i < d; i++)
               {
-                  int coeff = flint_conway_polynomials[position+2+i];
+                  int coeff = flint_conway_polynomials[position + 2 + i];
 
                   if (coeff)
                   {
@@ -88,7 +88,9 @@ void qadic_ctx_init(qadic_ctx_t ctx,
     flint_randinit(state);
 
     fmpz_mod_poly_init2(poly, p, d + 1);
+    
     fmpz_mod_poly_randtest_sparse_irreducible(poly, state, d + 1);
+    
     flint_randclear(state);
 
     /* Find number of non-zero coefficients */
