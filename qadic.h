@@ -73,6 +73,10 @@ FLINT_DLL void qadic_ctx_init_conway(qadic_ctx_t ctx,
                            const fmpz_t p, slong d, slong min, slong max, 
                            const char *var, enum padic_print_mode mode);
 
+FLINT_DLL void qadic_ctx_init(qadic_ctx_t ctx, 
+                           const fmpz_t p, slong d, slong min, slong max, 
+                           const char *var, enum padic_print_mode mode);
+
 FLINT_DLL void qadic_ctx_clear(qadic_ctx_t ctx);
 
 QADIC_INLINE slong qadic_ctx_degree(const qadic_ctx_t ctx)
