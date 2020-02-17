@@ -35,10 +35,35 @@ The field ``var`` contains the name of a generator
 of the extension, which is used when printing the 
 elements.
 
+.. function:: void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d, slong min, slong max, const char *var, enum padic_print_mode mode)
+
+    Initialises the context ``ctx`` with prime `p`, extension degree `d`, 
+    variable name ``var`` and printing mode ``mode``. The defining polynomial
+    is chosen as a Conway polynomial if possible and otherwise as a random
+    sparse polynomial.
+
+    Stores powers of `p` with exponents between ``min`` (inclusive) and 
+    ``max`` exclusive.  Assumes that ``min`` is at most ``max``. 
+
+    Assumes that `p` is a prime.
+
+    Assumes that the string ``var`` is a null-terminated string 
+    of length at least one.
+
+    Assumes that the printing mode is one of ``PADIC_TERSE``, 
+    ``PADIC_SERIES``, or ``PADIC_VAL_UNIT``.
+
+    This function also carries out some relevant precomputation for 
+    arithmetic in `\mathbf{Q}_p / (p^N)` such as powers of `p` close 
+    to `p^N`.
+
+
 .. function:: void qadic_ctx_init_conway(qadic_ctx_t ctx, const fmpz_t p, slong d, slong min, slong max, const char *var, enum padic_print_mode mode)
 
     Initialises the context ``ctx`` with prime `p`, extension degree `d`, 
-    variable name ``var`` and printing mode ``mode``.
+    variable name ``var`` and printing mode ``mode``. The defining polynomial
+    is chosen as a Conway polynomial, hence has restrictions on the
+    prime and the degree.
 
     Stores powers of `p` with exponents between ``min`` (inclusive) and 
     ``max`` exclusive.  Assumes that ``min`` is at most ``max``. 
