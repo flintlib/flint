@@ -12,12 +12,8 @@
 
 #include "flint.h"
 #include "thread_pool.h"
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 FLINT_TLS_PREFIX int _flint_num_threads = 1;
-#pragma omp threadprivate(_flint_num_threads)
 
 int flint_get_num_threads()
 {
@@ -40,9 +36,6 @@ void flint_set_num_threads(int num_threads)
         thread_pool_init(global_thread_pool, num_threads - 1);
         global_thread_pool_initialized = 1;
     }
-#ifdef _OPENMP
-    omp_set_num_threads(num_threads);
-#endif
 }
 
 /* return zero for success, nonzero for error */
@@ -61,16 +54,6 @@ int flint_restore_thread_affinity()
         return 1;
 
     return thread_pool_restore_affinity(global_thread_pool);
-}
-
-void flint_parallel_cleanup()
-{
-    int needs_cleanup = 1;
-#pragma omp master
-    needs_cleanup = 0;
-
-    if (needs_cleanup)
-        flint_cleanup();
 }
 
 slong flint_request_threads(thread_pool_handle ** handles, slong thread_limit)
