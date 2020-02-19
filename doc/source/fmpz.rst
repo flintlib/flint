@@ -850,7 +850,7 @@ Basic arithmetic
 
 .. function:: int fmpz_divisible(const fmpz_t f, const fmpz_t g)
 
-    Returns whether `f` is divisible by `g > 0`.
+    Returns `1` if there is an integer `q` with `f = q g` and `0` if not.
 
 .. function:: int fmpz_divisible_si(const fmpz_t f, slong g)
 

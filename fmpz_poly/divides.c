@@ -18,7 +18,15 @@
 int _fmpz_poly_divides(fmpz * q, const fmpz * a, 
                        slong len1, const fmpz * b, slong len2)
 {
-    fmpz * r = _fmpz_vec_init(len1);
+    fmpz * r;
+
+    FLINT_ASSERT(len1 >= len2);
+    FLINT_ASSERT(len2 > 0);
+
+    if (!fmpz_divisible(a + 0, b + 0))
+        return 0;
+
+    r = _fmpz_vec_init(len1);
 
     if (!_fmpz_poly_divrem(q, r, a, len1, b, len2, 1))
     {
