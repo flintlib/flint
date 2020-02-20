@@ -553,7 +553,7 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
 
     for (i = 0; i < num_handles; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i],
+        thread_pool_wake(global_thread_pool, handles[i], 0,
                                     qsieve_collect_relations_worker, &args[i]);
     }
 

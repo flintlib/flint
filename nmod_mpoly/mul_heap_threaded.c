@@ -664,7 +664,7 @@ void _nmod_mpoly_mul_heap_threaded(
         args[i].idx = i;
         args[i].base = base;
         args[i].divs = divs;
-        thread_pool_wake(global_thread_pool, handles[i],
+        thread_pool_wake(global_thread_pool, handles[i], 0,
                                _nmod_mpoly_mul_heap_threaded_worker, &args[i]);
     }
     i = num_handles;
@@ -700,7 +700,7 @@ void _nmod_mpoly_mul_heap_threaded(
     /* join answers */
     for (i = 0; i < num_handles; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i], _join_worker, &args[i]);
+        thread_pool_wake(global_thread_pool, handles[i], 0, _join_worker, &args[i]);
     }
     _join_worker(&args[num_handles]);
 

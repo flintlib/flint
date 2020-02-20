@@ -626,7 +626,7 @@ static int _try_bma(
         arg->handles = handles + (s + 1);
         arg->num_handles = num_handles - (s + 1);
 
-        thread_pool_wake(global_thread_pool, handles[s], _worker_convertuu, arg);
+        thread_pool_wake(global_thread_pool, handles[s], 0, _worker_convertuu, arg);
 
         fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
                           I->bma_perm, I->Amin_exp, I->Gstride, I->Amax_exp,
@@ -791,7 +791,7 @@ static int _try_brown(
         arg->handles = handles + (s + 1);
         arg->num_handles = num_handles - (s + 1);
 
-        thread_pool_wake(global_thread_pool, handles[s], _worker_convertu, arg);
+        thread_pool_wake(global_thread_pool, handles[s], 0, _worker_convertu, arg);
 
         fmpz_mpoly_to_mpoly_perm_deflate(Al, lctx, A, ctx,
                                     I->brown_perm, I->Amin_exp, I->Gstride,

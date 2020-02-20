@@ -259,7 +259,7 @@ void nmod_mpoly_to_mpolyu_perm_deflate(
 
         for (i = 0; i < num_handles; i++)
         {
-            thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+            thread_pool_wake(global_thread_pool, handles[i], 0, _worker_sort, arg);
         }
         _worker_sort(arg);
         for (i = 0; i < num_handles; i++)

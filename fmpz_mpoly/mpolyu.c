@@ -584,7 +584,7 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(
         {
             args[i].idx = i;
             args[i].base = base;
-            thread_pool_wake(global_thread_pool, handles[i],
+            thread_pool_wake(global_thread_pool, handles[i], 0,
                                              _arrayconvertu_worker, &args[i]);
         }
         i = num_handles;
@@ -659,7 +659,7 @@ void fmpz_mpoly_to_mpolyu_perm_deflate(
 
             for (i = 0; i < num_handles; i++)
             {
-                thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+                thread_pool_wake(global_thread_pool, handles[i], 0, _worker_sort, arg);
             }
             _worker_sort(arg);
             for (i = 0; i < num_handles; i++)
@@ -1058,7 +1058,7 @@ void fmpz_mpoly_to_mpolyuu_perm_deflate(
         {
             args[i].idx = i;
             args[i].base = base;
-            thread_pool_wake(global_thread_pool, handles[i],
+            thread_pool_wake(global_thread_pool, handles[i], 0,
                                              _arrayconvertuu_worker, &args[i]);
         }
         i = num_handles;
@@ -1137,7 +1137,7 @@ void fmpz_mpoly_to_mpolyuu_perm_deflate(
 
             for (i = 0; i < num_handles; i++)
             {
-                thread_pool_wake(global_thread_pool, handles[i], _worker_sort, arg);
+                thread_pool_wake(global_thread_pool, handles[i], 0, _worker_sort, arg);
             }
             _worker_sort(arg);
             for (i = 0; i < num_handles; i++)

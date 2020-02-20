@@ -34,6 +34,7 @@ typedef struct
     pthread_cond_t sleep2;
     volatile int idx;
     volatile int available;
+    volatile int max_workers;
     void (* fxn)(void *);
     void * fxnarg;
     volatile int working;
@@ -76,7 +77,7 @@ FLINT_DLL slong thread_pool_request(thread_pool_t T,
                                     thread_pool_handle * out, slong requested);
 
 FLINT_DLL void thread_pool_wake(thread_pool_t T, thread_pool_handle i,
-                                                   void (*f)(void*), void * a);
+                                  int max_workers, void (*f)(void*), void * a);
 
 FLINT_DLL void thread_pool_wait(thread_pool_t T, thread_pool_handle i);
 

@@ -294,7 +294,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_LEX(
     {
         args[i].idx = i;
         args[i].base = base;
-        thread_pool_wake(global_thread_pool, handles[i],
+        thread_pool_wake(global_thread_pool, handles[i], 0,
                           _nmod_mpoly_mul_array_threaded_worker_LEX, &args[i]);
     }
     i = num_handles;
@@ -670,7 +670,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_DEG(
         args[i].idx = i;
         args[i].base = base;
 
-        thread_pool_wake(global_thread_pool, handles[i],
+        thread_pool_wake(global_thread_pool, handles[i], 0,
                           _nmod_mpoly_mul_array_threaded_worker_DEG, &args[i]);
     }
     i = num_handles;

@@ -89,7 +89,7 @@ _fmpz_vec_multi_mod_ui_threaded(mp_ptr * residues, fmpz * vec, slong len,
     }
 
     for (i = 0; i < num_threads; i++)
-        thread_pool_wake(global_thread_pool, threads[i],
+        thread_pool_wake(global_thread_pool, threads[i], 0,
                                _fmpz_vec_multi_mod_ui_worker, &args[i]);
 
     _fmpz_vec_multi_mod_ui_worker(&args[num_threads]);
@@ -157,7 +157,7 @@ _fmpz_poly_multi_taylor_shift_threaded(mp_ptr * residues, slong len,
     }
 
     for (i = 0; i < num_threads; i++)
-        thread_pool_wake(global_thread_pool, threads[i],
+        thread_pool_wake(global_thread_pool, threads[i], 0,
                                _fmpz_poly_multi_taylor_shift_worker, &args[i]);
 
     _fmpz_poly_multi_taylor_shift_worker(&args[num_threads]);

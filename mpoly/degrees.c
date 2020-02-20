@@ -109,7 +109,7 @@ void mpoly_degrees_si_threaded(
     for (i = 0; i < num_handles; i++)
     {
         thread_pool_wake(global_thread_pool,
-                                     handles[i], _worker_degrees_si, args + i);
+                                  handles[i], 0, _worker_degrees_si, args + i);
     }
 
     i = num_handles;

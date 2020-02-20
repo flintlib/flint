@@ -115,7 +115,7 @@ main(void)
         }
 
 	for (j = 0; j < num_threads; j++)
-		thread_pool_wake(global_thread_pool, threads[j],
+		thread_pool_wake(global_thread_pool, threads[j], 0,
 				   _nmod_poly_interval_poly_worker, &args1[j]);
 
 	_nmod_poly_interval_poly_worker(&args1[num_threads]);

@@ -23,6 +23,7 @@ void * thread_pool_idle_loop(void * varg)
 
 thread_pool_DoWork:
 
+    _flint_set_num_workers(arg->max_workers);
     arg->fxn(arg->fxnarg);
 
 thread_pool_Lock:
@@ -91,6 +92,7 @@ void thread_pool_init(thread_pool_t T, slong size)
         D[i].fxn = NULL;
         D[i].fxnarg = NULL;
         D[i].working = -1;
+	D[i].max_workers = 0;
         D[i].exit = 0;
         pthread_mutex_lock(&D[i].mutex);
         pthread_create(&D[i].pth, NULL, thread_pool_idle_loop, &D[i]);

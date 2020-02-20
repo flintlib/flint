@@ -37,9 +37,11 @@ Thread pool
     handles written is returned. These threads must be released by a call to
     ``thread_pool_give_back``.
 
-.. function:: void thread_pool_wake(thread_pool_t T, thread_pool_handle i, void (*f)(void*), void * a)
+.. function:: void thread_pool_wake(thread_pool_t T, thread_pool_handle i, int max_workers, void (*f)(void*), void * a)
 
-    Wake up a sleeping thread `i` and have it work on ``f(a)``.
+    Wake up a sleeping thread `i` and have it work on ``f(a)``. The thread
+    being woken will be allowed to start ``max_workers`` additional worker
+    threads. Usually this value should be set to `0`.
 
 .. function:: void thread_pool_wait(thread_pool_t T, thread_pool_handle i)
 

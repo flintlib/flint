@@ -544,7 +544,7 @@ static void _set_skels_sp(
     w->index = 0;
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                                     _worker_skel_sp, w);
     }
     nmod_mpoly_set_skel(w->Gammaone_sp, w->ctx_sp, w->Gamma, w->alphas_sp, w->ctx);
@@ -581,7 +581,7 @@ static void _set_skels_mp(
     w->index = 0;
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                                     _worker_skel_mp, w);
     }
     fmpz_mod_mpoly_set_skel(w->Gammaone_mp, w->ctx_mp, w->Gamma, w->alphas_mp, w->ctx);
@@ -1208,7 +1208,7 @@ next_bma_image_sp:
 
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                         _worker_eval_sp, &args[i]);
     }
     _worker_eval_sp(&args[0]);
@@ -1298,7 +1298,7 @@ next_bma_image_sp:
     w->index = 0;
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                               _worker_reduce_sp, &args[i]);
     }
     _worker_reduce_sp(&args[0]);
@@ -1320,7 +1320,7 @@ next_bma_image_sp:
     w->H->length = w->Lambda_sp->length;
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                               _worker_get_mpoly_sp, &args[i]);
     }
     _worker_get_mpoly_sp(&args[0]);
@@ -1363,7 +1363,7 @@ next_bma_image_sp:
         w->index = 0;
         for (i = 1; i < w->num_threads; i++)
         {
-            thread_pool_wake(global_thread_pool, handles[i - 1],
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                                         _worker_check_eval_sp, w);
         }
         Gammaeval_sp = fmpz_mpoly_eval_nmod(w->ctx_sp->ffinfo, w->Gamma,
@@ -1507,7 +1507,7 @@ next_bma_image_mp:
 
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                         _eval_mp_worker, &args[i]);
     }
     _eval_mp_worker(&args[0]);
@@ -1593,7 +1593,7 @@ next_bma_image_mp:
     w->index = 0;
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                               _worker_reduce_mp, &args[i]);
     }
     _worker_reduce_mp(&args[0]);
@@ -1617,7 +1617,7 @@ next_bma_image_mp:
     w->H->length = w->Lambda_mp->length;
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                               _worker_get_mpoly_mp, &args[i]);
     }
     _worker_get_mpoly_mp(&args[0]);
@@ -1658,7 +1658,7 @@ next_bma_image_mp:
         w->index = 0;
         for (i = 1; i < w->num_threads; i++)
         {
-            thread_pool_wake(global_thread_pool, handles[i - 1],
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                                      _worker_check_eval_mp, w);
         }
         fmpz_mpoly_eval_fmpz_mod(Gammaeval_mp, w->ctx_mp->ffinfo,
@@ -1895,7 +1895,7 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
         w->index = 0;
         for (i = 1; i < w->num_threads; i++)
         {
-            thread_pool_wake(global_thread_pool, handles[i - 1],
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                               _bound_worker, &eval_sp_args[i]);
         }
     }
@@ -2173,7 +2173,7 @@ next_zip_image:
 
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                             _worker_eval_sp, &eval_sp_args[i]);
     }
     _worker_eval_sp(&eval_sp_args[0]);
@@ -2231,7 +2231,7 @@ next_zip_image:
     w->index = 0;
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                     _worker_find_zip_coeffs, &eval_sp_args[i]);
     }
     _worker_find_zip_coeffs(&eval_sp_args[0]);
@@ -2260,7 +2260,7 @@ next_zip_image:
     w->index = 0;
     for (i = 1; i < w->num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i - 1],
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
                                      _worker_crt_zip_coeffs, &eval_sp_args[i]);
     }
     _worker_crt_zip_coeffs(&eval_sp_args[0]);
@@ -2320,7 +2320,7 @@ next_zip_image:
             divide_arg->num = B;
             divide_arg->handles = handles + 1;
             divide_arg->num_handles = num_handles - 1;
-            thread_pool_wake(global_thread_pool, handles[0],
+            thread_pool_wake(global_thread_pool, handles[0], 0,
                                                    _divide_worker, divide_arg);
             success = fmpz_mpolyuu_divides(w->Abar, A, G, 2, ctx);
             thread_pool_wait(global_thread_pool, handles[0]);
@@ -2332,7 +2332,7 @@ next_zip_image:
             divide_arg->num = A;
             divide_arg->handles = handles + 1;
             divide_arg->num_handles = num_handles - 1;
-            thread_pool_wake(global_thread_pool, handles[0],
+            thread_pool_wake(global_thread_pool, handles[0], 0,
                                                    _divide_worker, divide_arg);
             success = fmpz_mpolyuu_divides(w->Bbar, B, G, 2, ctx);
             thread_pool_wait(global_thread_pool, handles[0]);
@@ -2343,7 +2343,7 @@ next_zip_image:
             divide_arg->num = B;
             divide_arg->handles = handles + (m + 1);
             divide_arg->num_handles = num_handles - (m + 1);
-            thread_pool_wake(global_thread_pool, handles[m],
+            thread_pool_wake(global_thread_pool, handles[m], 0,
                                                    _divide_worker, divide_arg);
             success = fmpz_mpolyuu_divides_threaded(w->Abar, A, G, 2,
                                                           ctx, handles + 0, m);
@@ -2686,7 +2686,7 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
         arg->handles = handles + (s + 1);
         arg->num_handles = num_handles - (s + 1);
 
-        thread_pool_wake(global_thread_pool, handles[s], _worker_convertuu, arg);
+        thread_pool_wake(global_thread_pool, handles[s], 0, _worker_convertuu, arg);
 
         fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
                    perm, shift, stride, (const ulong *) Adegs, handles + 0, s);

@@ -100,7 +100,7 @@ void profile_mul(
             (worker_args + i)->ctx = ctx;
             if (i < num_workers)
             {
-                thread_pool_wake(global_thread_pool, handles[i], worker_mul, worker_args + i);
+                thread_pool_wake(global_thread_pool, handles[i], 0, worker_mul, worker_args + i);
             }
             else
             {

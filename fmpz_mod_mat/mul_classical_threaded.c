@@ -179,7 +179,7 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool(fmpz ** D, fmpz ** const C,
 
     for (i = 0; i < num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, threads[i],
+        thread_pool_wake(global_thread_pool, threads[i], 0,
                 _fmpz_mod_mat_addmul_transpose_worker, &args[i]);
     }
 
