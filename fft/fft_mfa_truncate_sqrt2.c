@@ -234,12 +234,12 @@ typedef struct
     mp_limb_t * temp;
     pthread_mutex_t * mutex;
 }
-fft_outer1_arg_t;
+fft_outer_arg_t;
 
 void
 _fft_outer1_worker(void * arg_ptr)
 {
-    fft_outer1_arg_t arg = *((fft_outer1_arg_t *) arg_ptr);
+    fft_outer_arg_t arg = *((fft_outer_arg_t *) arg_ptr);
     mp_size_t n1 = arg.n1;
     mp_size_t n2 = arg.n2;
     mp_size_t n = arg.n;
@@ -316,20 +316,60 @@ _fft_outer1_worker(void * arg_ptr)
     }
 }
 
+void
+_fft_outer2_worker(void * arg_ptr)
+{
+    fft_outer_arg_t arg = *((fft_outer_arg_t *) arg_ptr);
+    mp_size_t n1 = arg.n1;
+    mp_size_t n2 = arg.n2;
+    mp_size_t trunc2 = arg.trunc;
+    flint_bitcnt_t depth = arg.depth;
+    flint_bitcnt_t w = arg.w;
+    mp_limb_t ** ii = arg.ii;
+    mp_limb_t ** t1 = arg.t1;
+    mp_limb_t ** t2 = arg.t2;
+    mp_size_t i, j, end;
+
+    while (1)
+    {
+        pthread_mutex_lock(arg.mutex);
+        i = *arg.i;
+        end = *arg.i = FLINT_MIN(i + 16, n1);
+        pthread_mutex_unlock(arg.mutex);
+
+        if (i >= n1)
+            return;
+
+        for ( ; i < end; i++)
+        {
+            /*
+                FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+                of 1 starting at row 0, where z => w bits
+            */
+      
+            fft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1, trunc2);
+            for (j = 0; j < n2; j++)
+            {
+                mp_size_t s = n_revbin(j, depth);
+                if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
+            }
+        }
+    }
+}
+
 void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
                    flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 {
-    mp_size_t i, j, shared_i = 0;
+    mp_size_t i, shared_i = 0;
     mp_size_t n2 = (2*n)/n1;
     mp_size_t trunc2 = (trunc - 2*n)/n1;
     mp_size_t limbs = (n*w)/FLINT_BITS;
     flint_bitcnt_t depth = 0;
-    int k = 0;
     pthread_mutex_t mutex;
     slong num_threads;
     thread_pool_handle * threads;
-    fft_outer1_arg_t * args;
+    fft_outer_arg_t * args;
 
     while ((UWORD(1)<<depth) < n2) depth++;
 
@@ -340,10 +380,10 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
     /* FFTs on columns */
 
     num_threads = flint_request_threads(&threads,
-                     FLINT_MIN(flint_get_num_threads(), (n1 + 15)/16));
+                             FLINT_MIN(flint_get_num_threads(), (n1 + 15)/16));
 
-    args = (fft_outer1_arg_t *)
-                      flint_malloc(sizeof(fft_outer1_arg_t)*(num_threads + 1));
+    args = (fft_outer_arg_t *)
+                       flint_malloc(sizeof(fft_outer_arg_t)*(num_threads + 1));
 
     for (i = 0; i < num_threads + 1; i++)
     {
@@ -371,33 +411,32 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
     for (i = 0; i < num_threads; i++)
         thread_pool_wait(global_thread_pool, threads[i]);
 
-    flint_give_back_threads(threads, num_threads);
-
-    flint_free(args);
-
-    pthread_mutex_destroy(&mutex);
-      
     /* second half matrix fourier FFT : n2 rows, n1 cols */
     ii += 2*n;
 
     /* FFTs on columns */
 
-#pragma omp parallel for private(i, j, k)
-    for (i = 0; i < n1; i++)
-    {   
-#if HAVE_OPENMP
-        k = omp_get_thread_num();
-#endif
-        /*
-            FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
-            of 1 starting at row 0, where z => w bits
-        */
-      
-        fft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1 + k, t2 + k, w, 0, i, 1, trunc2);
-        for (j = 0; j < n2; j++)
-        {
-            mp_size_t s = n_revbin(j, depth);
-            if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
-        }
+    shared_i = 0;
+
+    
+    for (i = 0; i < num_threads + 1; i++)
+    {
+       args[i].trunc = trunc2;
+       args[i].ii = ii;
     }
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wake(global_thread_pool, threads[i], 0,
+                                                 _fft_outer2_worker, &args[i]);
+
+    _fft_outer2_worker(&args[num_threads]);
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wait(global_thread_pool, threads[i]);
+
+    flint_give_back_threads(threads, num_threads);
+
+    flint_free(args);
+
+    pthread_mutex_destroy(&mutex);
 }
