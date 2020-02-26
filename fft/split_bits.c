@@ -1,5 +1,5 @@
 /* 
-    Copyright (C) 2009, 2011 William Hart
+    Copyright (C) 2009, 2011, 2020 William Hart
 
     This file is part of FLINT.
 
@@ -12,32 +12,106 @@
 #include "gmp.h"
 #include "flint.h"
 #include "fft.h"
+#include "thread_support.h"
+
+typedef struct
+{
+   volatile slong * i;
+   slong num;
+   mp_size_t coeff_limbs;
+   mp_size_t output_limbs;
+   mp_srcptr limbs;
+   mp_limb_t ** poly;
+   pthread_mutex_t * mutex;
+}
+split_limbs_arg_t;
+
+void
+_split_limbs_worker(void * arg_ptr)
+{
+    split_limbs_arg_t arg = *((split_limbs_arg_t *) arg_ptr);
+    slong num = arg.num;
+    mp_size_t skip;
+    mp_size_t coeff_limbs = arg.coeff_limbs;
+    mp_size_t output_limbs = arg.output_limbs;
+    mp_srcptr limbs = arg.limbs;
+    mp_limb_t ** poly = arg.poly;
+    slong i, end;
+
+    while (1)
+    {
+        pthread_mutex_lock(arg.mutex);
+        i = *arg.i;
+        end = *arg.i = FLINT_MIN(i + 16, num);
+        pthread_mutex_unlock(arg.mutex);
+
+        if (i >= num)
+            return;
+
+        for ( ; i < end; i++)
+        {
+           skip = i*coeff_limbs;
+
+           flint_mpn_zero(poly[i], output_limbs + 1);
+           flint_mpn_copyi(poly[i], limbs + skip, coeff_limbs);
+        }
+    }
+}
 
 mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs, 
-                mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
+          mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
 {
-   mp_size_t i, skip, length = (total_limbs - 1)/coeff_limbs + 1;
-   mp_size_t num = total_limbs/coeff_limbs;
+    mp_size_t i, shared_i = 0, skip, length = (total_limbs - 1)/coeff_limbs + 1;
+    mp_size_t num = total_limbs/coeff_limbs;
+    pthread_mutex_t mutex;
+    slong num_threads;
+    thread_pool_handle * threads;
+    split_limbs_arg_t * args;
+    
+    pthread_mutex_init(&mutex, NULL);
 
-#pragma omp parallel for private(i, skip)
-   for (i = 0; i < num; i++)
-   {
-      skip = i*coeff_limbs;
+    num_threads = flint_request_threads(&threads,
+                            FLINT_MIN(flint_get_num_threads(), (num + 15)/16));
 
-      flint_mpn_zero(poly[i], output_limbs + 1);
-      flint_mpn_copyi(poly[i], limbs + skip, coeff_limbs);
-   }
+    args = (split_limbs_arg_t *)
+                     flint_malloc(sizeof(split_limbs_arg_t)*(num_threads + 1));
 
-   i = num;
-   skip = i*coeff_limbs;
+    for (i = 0; i < num_threads + 1; i++)
+    {
+       args[i].i = &shared_i;
+       args[i].num = num;
+       args[i].coeff_limbs = coeff_limbs;
+       args[i].output_limbs = output_limbs;
+       args[i].limbs = limbs;
+       args[i].poly = poly;
+       args[i].mutex = &mutex;       
+    }
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wake(global_thread_pool, threads[i], 0,
+                                                _split_limbs_worker, &args[i]);
+
+    _split_limbs_worker(&args[num_threads]);
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wait(global_thread_pool, threads[i]);
+
+    flint_give_back_threads(threads, num_threads);
+
+    flint_free(args);
+
+    pthread_mutex_destroy(&mutex);
+
+    i = num;
+    skip = i*coeff_limbs;
    
-   if (i < length) 
-      flint_mpn_zero(poly[i], output_limbs + 1);
+    if (i < length) 
+        flint_mpn_zero(poly[i], output_limbs + 1);
    
-   if (total_limbs > skip) 
-      flint_mpn_copyi(poly[i], limbs + skip, total_limbs - skip);
+    if (total_limbs > skip) 
+        flint_mpn_copyi(poly[i], limbs + skip, total_limbs - skip);
    
-   return length;
+    return length;
 }
 
 mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs, 
