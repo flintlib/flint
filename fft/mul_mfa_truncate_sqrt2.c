@@ -1,5 +1,5 @@
 /* 
-    Copyright (C) 2009, 2011 William Hart
+    Copyright (C) 2009, 2011, 2020 William Hart
 
     This file is part of FLINT.
 
@@ -33,25 +33,19 @@ void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    mp_limb_t ** ii, ** jj, * ptr;
    mp_limb_t ** s1, ** t1, ** t2, ** tt;
 
-#if HAVE_OPENMP
    int N;
-#endif
 
    TMP_INIT;
 
    TMP_START;
 
-#if HAVE_OPENMP
-   N = omp_get_max_threads();
+   N = flint_get_num_threads();
    ii = flint_malloc((4*(n + n*size) + 5*size*N)*sizeof(mp_limb_t));
-#else
-   ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
-#endif
    for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
    {
       ii[i] = ptr;
    }
-#if HAVE_OPENMP
+
    s1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
    t1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
    t2 = TMP_ALLOC(N*sizeof(mp_limb_t *));
@@ -68,18 +62,7 @@ void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
       t1[i] = t1[i - 1] + size;
       t2[i] = t2[i - 1] + size;
       tt[i] = tt[i - 1] + 2*size;
-   }
-#else
-   s1 = TMP_ALLOC(sizeof(mp_limb_t *));
-   t1 = TMP_ALLOC(sizeof(mp_limb_t *));
-   t2 = TMP_ALLOC(sizeof(mp_limb_t *));
-   tt = TMP_ALLOC(sizeof(mp_limb_t *));
-
-   s1[0] = ptr;
-   t1[0] = s1[0] + size;
-   t2[0] = t1[0] + size;
-   tt[0] = t2[0] + size;
-#endif   
+   } 
 
    if (i1 != i2)
    {
