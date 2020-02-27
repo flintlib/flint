@@ -1,5 +1,5 @@
 /* 
-    Copyright (C) 2009, 2011 William Hart
+    Copyright (C) 2009, 2011, 2020 William Hart
 
     This file is part of FLINT.
 
@@ -182,7 +182,7 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
       for (j = 0; j < n1; j++)
       {
          mp_size_t t = n_revbin(j, depth2);
-         if (j < t) SWAP_PTRS(ii[i*n1+j], ii[i*n1+t]);
+         if (j < t) SWAP_PTRS(ii[i*n1 + j], ii[i*n1 + t]);
       }      
       
       ifft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
@@ -245,119 +245,247 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
    }
 }
 
+typedef struct
+{
+    volatile slong * i;
+    mp_size_t n1;
+    mp_size_t n2;
+    mp_size_t n;
+    mp_size_t trunc;
+    mp_size_t trunc2;
+    mp_size_t limbs;
+    flint_bitcnt_t depth;
+    flint_bitcnt_t depth2;
+    flint_bitcnt_t w;
+    mp_limb_t ** ii;
+    mp_limb_t ** t1;
+    mp_limb_t ** t2;
+    mp_limb_t * temp;
+    pthread_mutex_t * mutex;
+}
+ifft_outer_arg_t;
+
+void
+_ifft_outer1_worker(void * arg_ptr)
+{
+    ifft_outer_arg_t arg = *((ifft_outer_arg_t *) arg_ptr);
+    mp_size_t n1 = arg.n1;
+    mp_size_t n2 = arg.n2;
+    flint_bitcnt_t depth = arg.depth;
+    flint_bitcnt_t w = arg.w;
+    mp_limb_t ** ii = arg.ii;
+    mp_limb_t ** t1 = arg.t1;
+    mp_limb_t ** t2 = arg.t2;
+    mp_size_t i, j, end;
+
+    while (1)
+    {
+        pthread_mutex_lock(arg.mutex);
+        i = *arg.i;
+        end = *arg.i = FLINT_MIN(i + 16, n1);
+        pthread_mutex_unlock(arg.mutex);
+
+        if (i >= n1)
+            return;
+
+        for ( ; i < end; i++)
+        {
+            for (j = 0; j < n2; j++)
+            {
+                mp_size_t s = n_revbin(j, depth);
+                if (j < s) SWAP_PTRS(ii[i + j*n1], ii[i + s*n1]);
+            }
+      
+            /*
+                IFFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+                of 1 starting at row 0, where z => w bits
+            */
+            ifft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1);
+        }
+    }
+}
+
+void
+_ifft_outer2_worker(void * arg_ptr)
+{
+    ifft_outer_arg_t arg = *((ifft_outer_arg_t *) arg_ptr);
+    mp_size_t n1 = arg.n1;
+    mp_size_t n2 = arg.n2;
+    mp_size_t n = arg.n;
+    mp_size_t trunc = arg.trunc;
+    mp_size_t trunc2 = arg.trunc2;
+    mp_size_t limbs = arg.limbs;
+    flint_bitcnt_t depth = arg.depth;
+    flint_bitcnt_t depth2 = arg.depth2;
+    flint_bitcnt_t w = arg.w;
+    mp_limb_t ** ii = arg.ii;
+    mp_limb_t ** t1 = arg.t1;
+    mp_limb_t ** t2 = arg.t2;
+    mp_limb_t * temp = arg.temp;
+    mp_size_t i, j, end;
+
+    while (1)
+    {
+        pthread_mutex_lock(arg.mutex);
+        i = *arg.i;
+        end = *arg.i = FLINT_MIN(i + 16, n1);
+        pthread_mutex_unlock(arg.mutex);
+
+        if (i >= n1)
+            return;
+
+        for ( ; i < end; i++)
+        {
+            for (j = 0; j < trunc2; j++)
+            {
+                mp_size_t s = n_revbin(j, depth);
+                if (j < s) SWAP_PTRS(ii[i + j*n1], ii[i + s*n1]);
+            }
+
+            for ( ; j < n2; j++)
+            {
+                mp_size_t u = i + j*n1;
+                if (w & 1)
+                {
+                    if (i & 1)
+                        fft_adjust_sqrt2(ii[i + j*n1], ii[u - 2*n], u, limbs, w, temp); 
+                    else
+                        fft_adjust(ii[i + j*n1], ii[u - 2*n], u/2, limbs, w); 
+                } else
+                    fft_adjust(ii[i + j*n1], ii[u - 2*n], u, limbs, w/2);
+            }
+
+            /* 
+                IFFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+                of 1 starting at row 0, where z => w bits
+            */
+            ifft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1, trunc2);
+      
+            /* relevant components of final sqrt2 layer of IFFT */
+            if (w & 1)
+            {
+                for (j = i; j < trunc - 2*n; j+=n1) 
+                {   
+                    if (j & 1)
+                        ifft_butterfly_sqrt2(*t1, *t2, ii[j - 2*n], ii[j], j, limbs, w, temp); 
+                    else
+                        ifft_butterfly(*t1, *t2, ii[j - 2*n], ii[j], j/2, limbs, w);
+
+                    SWAP_PTRS(ii[j - 2*n], *t1);
+                    SWAP_PTRS(ii[j],       *t2);
+                }
+            } else
+            {
+                for (j = i; j < trunc - 2*n; j+=n1) 
+                {   
+                    ifft_butterfly(*t1, *t2, ii[j - 2*n], ii[j], j, limbs, w/2);
+   
+                    SWAP_PTRS(ii[j - 2*n], *t1);
+                    SWAP_PTRS(ii[j],       *t2);
+                }
+            }
+
+            for (j = trunc + i - 2*n; j < 2*n; j+=n1)
+                mpn_add_n(ii[j - 2*n], ii[j - 2*n], ii[j - 2*n], limbs + 1);
+
+            for (j = 0; j < trunc2; j++)
+            {
+                mp_size_t t = j*n1 + i;
+                mpn_div_2expmod_2expp1(ii[t], ii[t], limbs, depth + depth2 + 1);
+                mpn_normmod_2expp1(ii[t], limbs);
+            }
+
+            for (j = 0; j < n2; j++)
+            {
+                mp_size_t t = j*n1 + i - 2*n;
+                mpn_div_2expmod_2expp1(ii[t], ii[t], limbs, depth + depth2 + 1);
+                mpn_normmod_2expp1(ii[t], limbs);
+            }
+        }
+    }
+}
+
 void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
    mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 {
-   mp_size_t i, j;
-   mp_size_t n2 = (2*n)/n1;
-   mp_size_t trunc2 = (trunc - 2*n)/n1;
-   flint_bitcnt_t depth = 0;
-   flint_bitcnt_t depth2 = 0;
-   flint_bitcnt_t limbs = (w*n)/FLINT_BITS;
-   int k = 0;
+    mp_size_t i, shared_i = 0;
+    mp_size_t n2 = (2*n)/n1;
+    mp_size_t trunc2 = (trunc - 2*n)/n1;
+    flint_bitcnt_t depth = 0;
+    flint_bitcnt_t depth2 = 0;
+    flint_bitcnt_t limbs = (w*n)/FLINT_BITS;
+    pthread_mutex_t mutex;
+    slong num_threads;
+    thread_pool_handle * threads;
+    ifft_outer_arg_t * args;
   
-   while ((UWORD(1)<<depth) < n2) depth++;
-   while ((UWORD(1)<<depth2) < n1) depth2++;
+    while ((UWORD(1)<<depth) < n2) depth++;
+    while ((UWORD(1)<<depth2) < n1) depth2++;
+
+    pthread_mutex_init(&mutex, NULL);
 
    /* first half mfa IFFT : n2 rows, n1 cols */
    
    /* column IFFTs */
-#pragma omp parallel for private(i, j, k)
-   for (i = 0; i < n1; i++)
-   {   
-#if HAVE_OPENMP
-      k = omp_get_thread_num();
-#endif
 
-      for (j = 0; j < n2; j++)
-      {
-         mp_size_t s = n_revbin(j, depth);
-         if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
-      }
-      
-      /*
-         IFFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
-         of 1 starting at row 0, where z => w bits
-      */
-      ifft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1 + k, t2 + k, w, 0, i, 1);
-   }
+    num_threads = flint_request_threads(&threads,
+                             FLINT_MIN(flint_get_num_threads(), (n1 + 15)/16));
+
+    args = (ifft_outer_arg_t *)
+                      flint_malloc(sizeof(ifft_outer_arg_t)*(num_threads + 1));
+
+    for (i = 0; i < num_threads + 1; i++)
+    {
+       args[i].i = &shared_i;
+       args[i].n1 = n1;
+       args[i].n2 = n2;
+       args[i].n = n;
+       args[i].trunc = trunc;
+       args[i].trunc2 = trunc2;
+       args[i].limbs = limbs;
+       args[i].depth = depth;
+       args[i].depth2 = depth2;
+       args[i].w = w;
+       args[i].ii = ii;
+       args[i].t1 = t1 + i;
+       args[i].t2 = t2 + i;
+       args[i].temp = temp[i];
+       args[i].mutex = &mutex;       
+    }
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wake(global_thread_pool, threads[i], 0,
+                                                _ifft_outer1_worker, &args[i]);
+
+    _ifft_outer1_worker(&args[num_threads]);
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wait(global_thread_pool, threads[i]);
    
-   /* second half IFFT : n2 rows, n1 cols */
-   ii += 2*n;
+    /* second half IFFT : n2 rows, n1 cols */
+    ii += 2*n;
 
-   /* column IFFTs with relevant sqrt2 layer butterflies combined */
+    /* column IFFTs with relevant sqrt2 layer butterflies combined */
 
-#pragma omp parallel for private(i, j, k)
-   for (i = 0; i < n1; i++)
-   {   
-#if HAVE_OPENMP
-      k = omp_get_thread_num();
-#endif
+    shared_i = 0;
 
-      for (j = 0; j < trunc2; j++)
-      {
-         mp_size_t s = n_revbin(j, depth);
-         if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
-      }
+    for (i = 0; i < num_threads + 1; i++)
+    {
+       args[i].ii = ii;
+    }
 
-      for ( ; j < n2; j++)
-      {
-         mp_size_t u = i + j*n1;
-         if (w & 1)
-         {
-            if (i & 1)
-               fft_adjust_sqrt2(ii[i + j*n1], ii[u - 2*n], u, limbs, w, temp[k]); 
-            else
-               fft_adjust(ii[i + j*n1], ii[u - 2*n], u/2, limbs, w); 
-         } else
-            fft_adjust(ii[i + j*n1], ii[u - 2*n], u, limbs, w/2);
-      }
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wake(global_thread_pool, threads[i], 0,
+                                                _ifft_outer2_worker, &args[i]);
 
-      /* 
-         IFFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
-         of 1 starting at row 0, where z => w bits
-      */
-      ifft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1 + k, t2 + k, w, 0, i, 1, trunc2);
-      
-      /* relevant components of final sqrt2 layer of IFFT */
-      if (w & 1)
-      {
-         for (j = i; j < trunc - 2*n; j+=n1) 
-         {   
-            if (j & 1)
-               ifft_butterfly_sqrt2(t1[k], t2[k], ii[j - 2*n], ii[j], j, limbs, w, temp[k]); 
-            else
-               ifft_butterfly(t1[k], t2[k], ii[j - 2*n], ii[j], j/2, limbs, w);
+    _ifft_outer2_worker(&args[num_threads]);
 
-            SWAP_PTRS(ii[j-2*n], t1[k]);
-            SWAP_PTRS(ii[j],     t2[k]);
-         }
-      } else
-      {
-         for (j = i; j < trunc - 2*n; j+=n1) 
-         {   
-            ifft_butterfly(t1[k], t2[k], ii[j - 2*n], ii[j], j, limbs, w/2);
-   
-            SWAP_PTRS(ii[j-2*n], t1[k]);
-            SWAP_PTRS(ii[j],     t2[k]);
-         }
-      }
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wait(global_thread_pool, threads[i]);
 
-      for (j = trunc + i - 2*n; j < 2*n; j+=n1)
-           mpn_add_n(ii[j - 2*n], ii[j - 2*n], ii[j - 2*n], limbs + 1);
+    flint_give_back_threads(threads, num_threads);
 
-      for (j = 0; j < trunc2; j++)
-      {
-         mp_size_t t = j*n1 + i;
-         mpn_div_2expmod_2expp1(ii[t], ii[t], limbs, depth + depth2 + 1);
-         mpn_normmod_2expp1(ii[t], limbs);
-      }
+    flint_free(args);
 
-      for (j = 0; j < n2; j++)
-      {
-         mp_size_t t = j*n1 + i - 2*n;
-         mpn_div_2expmod_2expp1(ii[t], ii[t], limbs, depth + depth2 + 1);
-         mpn_normmod_2expp1(ii[t], limbs);
-      }
-   }
+    pthread_mutex_destroy(&mutex);
 }
