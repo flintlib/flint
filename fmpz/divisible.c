@@ -24,6 +24,11 @@ int fmpz_divisible(const fmpz_t x, const fmpz_t p)
         return 1;
     }
 
+    if (q == WORD(0))
+    {
+        return 0;
+    }
+
     if (!COEFF_IS_MPZ(y))
     {
         if (!COEFF_IS_MPZ(q))
@@ -39,7 +44,7 @@ int fmpz_divisible(const fmpz_t x, const fmpz_t p)
     {
         if (!COEFF_IS_MPZ(q))
         {
-            return flint_mpz_divisible_ui_p(COEFF_TO_PTR(y), q);
+            return flint_mpz_divisible_ui_p(COEFF_TO_PTR(y), FLINT_ABS(q));
         }
         else
         {

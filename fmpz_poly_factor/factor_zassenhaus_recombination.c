@@ -23,7 +23,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     const slong r = lifted_fac->num;
 
     slong k, *used_arr, *sub_arr;
-    fmpz_poly_t f, Q, R, tryme;
+    fmpz_poly_t f, Q, tryme;
     fmpz *leadF;
 
     used_arr = flint_calloc(2 * r, sizeof(slong));
@@ -31,7 +31,6 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
 
     fmpz_poly_init(f);
     fmpz_poly_init(Q);
-    fmpz_poly_init(R);
     fmpz_poly_init(tryme);
     fmpz_poly_set(f, F);
 
@@ -76,14 +75,8 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
 
                 fmpz_poly_scalar_smod_fmpz(tryme, tryme, P);
                 fmpz_poly_primitive_part(tryme, tryme);
-                fmpz_poly_divrem(Q, R, f, tryme);
 
-#if TRACE == 1
-                fmpz_poly_print(tryme); flint_printf(" is tryme\n");
-                fmpz_poly_print(R); flint_printf(" is R\n");
-#endif
-
-                if (fmpz_poly_is_zero(R))
+                if (fmpz_poly_divides(Q, f, tryme))
                 {
                     fmpz_poly_factor_insert(final_fac, tryme, exp);
 
@@ -124,7 +117,6 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     fmpz_poly_clear(f);
     fmpz_poly_clear(tryme);
     fmpz_poly_clear(Q);
-    fmpz_poly_clear(R);
     flint_free(used_arr);
 }
 

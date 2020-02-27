@@ -25,8 +25,6 @@ main(void)
     flint_printf("divisible....");
     fflush(stdout);
 
-    
-
     /* Compare with MPIR:  random */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -39,8 +37,7 @@ main(void)
         mpz_init(c);
         mpz_init(d);
 
-        fmpz_randtest_unsigned(a, state, 200);
-        fmpz_add_ui(a, a, 1);
+        fmpz_randtest(a, state, 200);
         fmpz_randtest(b, state, 200);
 
         fmpz_get_mpz(c, a);
@@ -75,8 +72,7 @@ main(void)
         mpz_init(c);
         mpz_init(d);
 
-        fmpz_randtest_unsigned(a, state, 200);
-        fmpz_add_ui(a, a, 1);
+        fmpz_randtest(a, state, 200);
         fmpz_randtest(b, state, 200);
         fmpz_mul(b, a, b);
 
@@ -108,8 +104,7 @@ main(void)
 
         fmpz_init(a);
 
-        fmpz_randtest_unsigned(a, state, 200);
-        fmpz_add_ui(a, a, 1);
+        fmpz_randtest(a, state, 200);
 
         b = fmpz_divisible(a, a);
 
