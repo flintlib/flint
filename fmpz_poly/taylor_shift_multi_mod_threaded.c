@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -14,6 +15,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "thread_support.h"
 
 typedef struct
 {
@@ -27,7 +29,7 @@ typedef struct
 }
 mod_ui_arg_t;
 
-void *
+void
 _fmpz_vec_multi_mod_ui_worker(void * arg_ptr)
 {
     mod_ui_arg_t arg = *((mod_ui_arg_t *) arg_ptr);
@@ -60,41 +62,43 @@ _fmpz_vec_multi_mod_ui_worker(void * arg_ptr)
     flint_free(tmp);
     fmpz_comb_clear(comb);
     fmpz_comb_temp_clear(comb_temp);
-
-    flint_cleanup();
-    return NULL;
 }
 
 void
 _fmpz_vec_multi_mod_ui_threaded(mp_ptr * residues, fmpz * vec, slong len,
-    mp_srcptr primes, slong num_primes, int crt)
+    mp_srcptr primes, slong num_primes, int crt, slong thread_limit)
 {
-    pthread_t * threads;
     mod_ui_arg_t * args;
     slong i, num_threads;
+    thread_pool_handle * threads;
 
-    num_threads = flint_get_num_threads();
-    threads = flint_malloc(sizeof(pthread_t) * num_threads);
-    args = flint_malloc(sizeof(mod_ui_arg_t) * num_threads);
+    num_threads = flint_request_threads(&threads, thread_limit);
 
-    for (i = 0; i < num_threads; i++)
+    args = (mod_ui_arg_t *)
+                          flint_malloc(sizeof(mod_ui_arg_t)*(num_threads + 1));
+
+    for (i = 0; i < num_threads + 1; i++)
     {
         args[i].vec = vec;
         args[i].residues = residues;
-        args[i].n0 = (len * i) / num_threads;
-        args[i].n1 = (len * (i + 1)) / num_threads;
+        args[i].n0 = (len * i) / (num_threads + 1);
+        args[i].n1 = (len * (i + 1)) / (num_threads + 1);
         args[i].primes = (mp_ptr) primes;
         args[i].num_primes = num_primes;
         args[i].crt = crt;
-
-        pthread_create(&threads[i], NULL,
-            _fmpz_vec_multi_mod_ui_worker, &args[i]);
     }
 
     for (i = 0; i < num_threads; i++)
-        pthread_join(threads[i], NULL);
+        thread_pool_wake(global_thread_pool, threads[i], 0,
+                               _fmpz_vec_multi_mod_ui_worker, &args[i]);
 
-    flint_free(threads);
+    _fmpz_vec_multi_mod_ui_worker(&args[num_threads]);
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wait(global_thread_pool, threads[i]);
+
+    flint_give_back_threads(threads, num_threads);
+
     flint_free(args);
 }
 
@@ -110,7 +114,7 @@ typedef struct
 }
 taylor_shift_arg_t;
 
-void *
+void
 _fmpz_poly_multi_taylor_shift_worker(void * arg_ptr)
 {
     taylor_shift_arg_t arg = *((taylor_shift_arg_t *) arg_ptr);
@@ -126,46 +130,49 @@ _fmpz_poly_multi_taylor_shift_worker(void * arg_ptr)
         cm = fmpz_fdiv_ui(arg.c, p);
         _nmod_poly_taylor_shift(arg.residues[i], cm, arg.len, mod);
     }
-
-    flint_cleanup();
-    return NULL;
 }
 
 void
 _fmpz_poly_multi_taylor_shift_threaded(mp_ptr * residues, slong len,
-    const fmpz_t c, mp_srcptr primes, slong num_primes)
+        const fmpz_t c, mp_srcptr primes, slong num_primes, slong thread_limit)
 {
-    pthread_t * threads;
     taylor_shift_arg_t * args;
     slong i, num_threads;
+    thread_pool_handle * threads;
 
-    num_threads = flint_get_num_threads();
-    threads = flint_malloc(sizeof(pthread_t) * num_threads);
-    args = flint_malloc(sizeof(taylor_shift_arg_t) * num_threads);
+    num_threads = flint_request_threads(&threads, thread_limit);
 
-    for (i = 0; i < num_threads; i++)
+    args = (taylor_shift_arg_t *)
+                    flint_malloc(sizeof(taylor_shift_arg_t)*(num_threads + 1));
+
+    for (i = 0; i < num_threads + 1; i++)
     {
         args[i].residues = residues;
         args[i].len = len;
-        args[i].p0 = (num_primes * i) / num_threads;
-        args[i].p1 = (num_primes * (i + 1)) / num_threads;
+        args[i].p0 = (num_primes * i) / (num_threads + 1);
+        args[i].p1 = (num_primes * (i + 1)) / (num_threads + 1);
         args[i].primes = (mp_ptr) primes;
         args[i].num_primes = num_primes;
         args[i].c = (fmpz *) c;
-
-        pthread_create(&threads[i], NULL,
-            _fmpz_poly_multi_taylor_shift_worker, &args[i]);
     }
 
     for (i = 0; i < num_threads; i++)
-        pthread_join(threads[i], NULL);
+        thread_pool_wake(global_thread_pool, threads[i], 0,
+                               _fmpz_poly_multi_taylor_shift_worker, &args[i]);
 
-    flint_free(threads);
+    _fmpz_poly_multi_taylor_shift_worker(&args[num_threads]);
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wait(global_thread_pool, threads[i]);
+
+    flint_give_back_threads(threads, num_threads);
+
     flint_free(args);
 }
 
 void
-_fmpz_poly_taylor_shift_multi_mod_threaded(fmpz * poly, const fmpz_t c, slong len)
+_fmpz_poly_taylor_shift_multi_mod_threaded(fmpz * poly, const fmpz_t c,
+                                                 slong len, slong thread_limit)
 {
     slong xbits, ybits, num_primes, i;
     mp_ptr primes;
@@ -205,9 +212,12 @@ _fmpz_poly_taylor_shift_multi_mod_threaded(fmpz * poly, const fmpz_t c, slong le
     for (i = 0; i < num_primes; i++)
         residues[i] = flint_malloc(sizeof(mp_limb_t) * len);
 
-    _fmpz_vec_multi_mod_ui_threaded(residues, poly, len, primes, num_primes, 0);
-    _fmpz_poly_multi_taylor_shift_threaded(residues, len, c, primes, num_primes);
-    _fmpz_vec_multi_mod_ui_threaded(residues, poly, len, primes, num_primes, 1);
+    _fmpz_vec_multi_mod_ui_threaded(residues, poly, len, primes,
+                                                  num_primes, 0, thread_limit);
+    _fmpz_poly_multi_taylor_shift_threaded(residues, len, c,
+                                             primes, num_primes, thread_limit);
+    _fmpz_vec_multi_mod_ui_threaded(residues, poly, len, primes,
+                                                  num_primes, 1, thread_limit);
 
     for (i = 0; i < num_primes; i++)
         flint_free(residues[i]);

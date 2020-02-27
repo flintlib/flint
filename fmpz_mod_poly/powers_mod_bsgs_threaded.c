@@ -145,7 +145,7 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
     pthread_mutex_init(&mutex, NULL);
 
     for (i = 0; i < num_threads; i++)
-        thread_pool_wake(global_thread_pool, threads[i],
+        thread_pool_wake(global_thread_pool, threads[i], 0,
                 _fmpz_mod_poly_powers_mod_preinv_worker, &args[i]);
 
     _fmpz_mod_poly_powers_mod_preinv_worker(&args[num_threads]);

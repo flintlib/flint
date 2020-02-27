@@ -679,7 +679,7 @@ Multiplication
     It is required that ``len1 < lenf`` and ``len2 < lenf``.
     Otherwise, simply use ``_nmod_poly_mul`` instead.
 
-    Aliasing of ``f`` or ``finv`` and ``res`` is not permitted.
+    Aliasing of ```res`` with any of the inputs is not permitted.
 
 .. function:: void nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, const nmod_poly_t f, const nmod_poly_t finv)
 

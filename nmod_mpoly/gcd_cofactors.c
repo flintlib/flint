@@ -525,7 +525,7 @@ static int _try_brown(
         arg->handles = handles + (s + 1);
         arg->num_handles = num_handles - (s + 1);
 
-        thread_pool_wake(global_thread_pool, handles[s], _worker_convertn, arg);
+        thread_pool_wake(global_thread_pool, handles[s], 0, _worker_convertn, arg);
 
         nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
                                    I->brown_perm, I->Amin_exp, I->Gstride,

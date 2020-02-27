@@ -968,7 +968,7 @@ compute_split:
 
     for (i = 0; i + 1 < num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, handles[i],
+        thread_pool_wake(global_thread_pool, handles[i], 0,
                   var == 1 ? _splitworker_bivar : _splitworker, &splitargs[i]);
     }
     (var == 1 ? _splitworker_bivar : _splitworker)(&splitargs[num_threads - 1]);
@@ -1089,7 +1089,7 @@ compute_split:
     for (i = 0; i + 1 < num_threads; i++)
     {
         thread_pool_wake(global_thread_pool,
-                                    handles[i], _joinworker, joinargs + i);
+                                 handles[i], 0, _joinworker, joinargs + i);
     }
     _joinworker(joinargs + num_threads - 1);
     for (i = 0; i + 1 < num_threads; i++)
@@ -1127,7 +1127,7 @@ compute_split:
     for (i = 0; i + 1 < num_threads; i++)
     {
         thread_pool_wake(global_thread_pool,
-                                   handles[i], _finaljoinworker, joinargs + i);
+                                handles[i], 0, _finaljoinworker, joinargs + i);
     }
     _finaljoinworker(joinargs + num_threads - 1);
     for (i = 0; i + 1 < num_threads; i++)
@@ -1418,7 +1418,7 @@ int nmod_mpoly_gcd_brown_threaded(
         arg->handles = handles + (m + 1);
         arg->num_handles = num_handles - (m + 1);
 
-        thread_pool_wake(global_thread_pool, handles[m], _worker_convertn, arg);
+        thread_pool_wake(global_thread_pool, handles[m], 0, _worker_convertn, arg);
 
         nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
                                           perm, shift, stride, handles + 0, m);

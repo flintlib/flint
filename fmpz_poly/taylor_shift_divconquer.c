@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012, 2016 Fredrik Johansson
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -22,32 +23,28 @@ typedef struct
     fmpz * poly;
     const fmpz * c;
     slong len;
-    slong num_threads;
-    slong num_total_threads;
 }
 worker_t;
 
-void _fmpz_poly_taylor_shift_dc(fmpz * poly,
-    const fmpz_t c, slong len, slong num_total_threads);
+void _fmpz_poly_taylor_shift_divconquer(fmpz * poly,
+                                                    const fmpz_t c, slong len);
 
-static void *
-_fmpz_poly_taylor_shift_dc_worker(void * arg_ptr)
+static void
+_fmpz_poly_taylor_shift_divconquer_worker(void * arg_ptr)
 {
     worker_t * data = (worker_t *) arg_ptr;
-    flint_set_num_threads(data->num_threads);
-    _fmpz_poly_taylor_shift_dc(data->poly, data->c, data->len,
-                               data->num_total_threads);
-    flint_cleanup();
-    return NULL;
+    _fmpz_poly_taylor_shift_divconquer(data->poly, data->c, data->len);
 }
 
 void
-_fmpz_poly_taylor_shift_dc(fmpz * poly, const fmpz_t c, slong len,
-                                        slong num_total_threads)
+_fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
 {
     fmpz *tmp, *tmp2;
     slong k, len1, len2;
     slong bits, max_horner;
+    slong nt, nw;
+    thread_pool_handle * threads;
+    worker_t args[2];
 
     if (len < 64 || fmpz_is_zero(c))
     {
@@ -58,12 +55,14 @@ _fmpz_poly_taylor_shift_dc(fmpz * poly, const fmpz_t c, slong len,
     bits = _fmpz_vec_max_bits(poly, len);
     bits = FLINT_ABS(bits);
 
+    nt = flint_get_num_threads();
+
     /* A big problem for parallel tuning is that we have no
        multithreading in shift_horner. Moreover, shift_horner is
        currently implemented without good cache locality, which makes
        it perform much worse when run on several instances in parallel.
        Therefore, only use it for smaller lengths. */
-    if (num_total_threads == 1)
+    if (nt == 1)
         max_horner = 3000;
     else
         max_horner = 200;
@@ -72,46 +71,44 @@ _fmpz_poly_taylor_shift_dc(fmpz * poly, const fmpz_t c, slong len,
     if (len < max_horner && bits > pow(2.0, 7.0 + len * 0.005))
     {
         _fmpz_poly_taylor_shift_horner(poly, c, len);
+
         return;
     }
 
     len1 = len / 2;
     len2 = len - len1;
 
-    if (len < 200 || len + bits < 2000 || flint_get_num_threads() == 1)
+    nw = flint_request_threads(&threads, 2); /* request one extra worker */
+
+    if (len < 200 || len + bits < 2000 || nw == 0)
     {
-        _fmpz_poly_taylor_shift_dc(poly, c, len1, num_total_threads);
-        _fmpz_poly_taylor_shift_dc(poly + len1, c, len2, num_total_threads);
+        _fmpz_poly_taylor_shift_divconquer(poly, c, len1);
+        _fmpz_poly_taylor_shift_divconquer(poly + len1, c, len2);
     }
     else
     {
-        pthread_t threads[2];
-        worker_t args[2];
-
+        slong nw_save;
+        
         args[0].poly = poly;
         args[0].c = c;
         args[0].len = len1;
-        args[0].num_threads = flint_get_num_threads() / 2;
-
-        if (num_total_threads == 1)
-            args[0].num_total_threads = flint_get_num_threads();
-        else
-            args[0].num_total_threads = num_total_threads;
 
         args[1].poly = poly + len1;
         args[1].c = c;
         args[1].len = len2;
-        args[1].num_threads = args[0].num_threads;
-        args[1].num_total_threads = args[0].num_total_threads;
 
-        pthread_create(&threads[0], NULL,
-            _fmpz_poly_taylor_shift_dc_worker, &args[0]);
-        pthread_create(&threads[1], NULL,
-            _fmpz_poly_taylor_shift_dc_worker, &args[1]);
+        nw_save = flint_set_num_workers(nt - nt/2 - 1);
+        
+        thread_pool_wake(global_thread_pool, threads[0], nt/2 - 1,
+                          _fmpz_poly_taylor_shift_divconquer_worker, &args[1]);
 
-        pthread_join(threads[0], NULL);
-        pthread_join(threads[1], NULL);
+        _fmpz_poly_taylor_shift_divconquer_worker(&args[0]);
+        flint_reset_num_workers(nw_save);
+
+        thread_pool_wait(global_thread_pool, threads[0]);
     }
+
+    flint_give_back_threads(threads, nw);
 
     tmp = _fmpz_vec_init(len1 + 1);
     tmp2 = _fmpz_vec_init(len);
@@ -160,12 +157,6 @@ _fmpz_poly_taylor_shift_dc(fmpz * poly, const fmpz_t c, slong len,
 
     _fmpz_vec_clear(tmp, len1 + 1);
     _fmpz_vec_clear(tmp2, len);
-}
-
-void
-_fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
-{
-    _fmpz_poly_taylor_shift_dc(poly, c, len, 1);
 }
 
 void

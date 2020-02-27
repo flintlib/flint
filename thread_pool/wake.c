@@ -13,7 +13,7 @@
 
 
 void thread_pool_wake(thread_pool_t T, thread_pool_handle i,
-                                                    void (*f)(void*), void * a)
+                                   int max_workers, void (*f)(void*), void * a)
 {
     thread_pool_entry_struct * D;
 
@@ -28,6 +28,7 @@ void thread_pool_wake(thread_pool_t T, thread_pool_handle i,
     /* should not be trying to wake an available thread */
     FLINT_ASSERT(D[i].available == 0);
 
+    D[i].max_workers = max_workers;
     D[i].working = 1;
     D[i].fxn = f;
     D[i].fxnarg = a;

@@ -540,13 +540,9 @@ Multiplication
     and ``poly2`` upon polynomial division by ``f``.
 
     It is required that ``finv`` is the inverse of the reverse of
-    ``f`` mod ``x^lenf``. It is required that
-    ``len1 + len2 - lenf > 0``, which is equivalent to requiring that
-    the result will actually be reduced.  Otherwise, simply use
-    ``_fq_nmod_poly_mul`` instead.
+    ``f`` mod ``x^lenf``.
 
-    Aliasing of ``f`` or ``finv`` and ``res`` is not
-    permitted.
+    Aliasing of ``res`` with any of the inputs is not permitted.
 
 .. function:: void fq_nmod_poly_mulmod_preinv(fq_nmod_poly_t res, const fq_nmod_poly_t poly1, const fq_nmod_poly_t poly2, const fq_nmod_poly_t f, const fq_nmod_poly_t finv, const fq_nmod_ctx_t ctx)
 

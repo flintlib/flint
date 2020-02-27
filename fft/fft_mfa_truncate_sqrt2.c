@@ -1,5 +1,5 @@
 /* 
-    Copyright (C) 2009, 2011 William Hart
+    Copyright (C) 2009, 2011, 2020 William Hart
 
     This file is part of FLINT.
 
@@ -218,100 +218,225 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
    }
 }
 
+typedef struct
+{
+    volatile slong * i;
+    mp_size_t n1;
+    mp_size_t n2;
+    mp_size_t n;
+    mp_size_t trunc;
+    mp_size_t limbs;
+    flint_bitcnt_t depth;
+    flint_bitcnt_t w;
+    mp_limb_t ** ii;
+    mp_limb_t ** t1;
+    mp_limb_t ** t2;
+    mp_limb_t * temp;
+    pthread_mutex_t * mutex;
+}
+fft_outer_arg_t;
+
+void
+_fft_outer1_worker(void * arg_ptr)
+{
+    fft_outer_arg_t arg = *((fft_outer_arg_t *) arg_ptr);
+    mp_size_t n1 = arg.n1;
+    mp_size_t n2 = arg.n2;
+    mp_size_t n = arg.n;
+    mp_size_t trunc = arg.trunc;
+    mp_size_t limbs = arg.limbs;
+    flint_bitcnt_t depth = arg.depth;
+    flint_bitcnt_t w = arg.w;
+    mp_limb_t ** ii = arg.ii;
+    mp_limb_t ** t1 = arg.t1;
+    mp_limb_t ** t2 = arg.t2;
+    mp_limb_t * temp = arg.temp;
+    mp_size_t i, j, end;
+
+    while (1)
+    {
+        pthread_mutex_lock(arg.mutex);
+        i = *arg.i;
+        end = *arg.i = FLINT_MIN(i + 16, n1);
+        pthread_mutex_unlock(arg.mutex);
+
+        if (i >= n1)
+            return;
+
+        for ( ; i < end; i++)
+        {
+            /* relevant part of first layer of full sqrt2 FFT */
+            if (w & 1)
+            {
+                for (j = i; j < trunc - 2*n; j+=n1) 
+                {   
+                    if (j & 1)
+                        fft_butterfly_sqrt2(*t1, *t2, ii[j], ii[2*n+j],
+                                                            j, limbs, w, temp);
+                    else
+                        fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j/2, limbs, w);     
+
+                    SWAP_PTRS(ii[j],     *t1);
+                    SWAP_PTRS(ii[2*n+j], *t2);
+                }
+
+                for ( ; j < 2*n; j+=n1)
+                {
+                    if (i & 1)
+                        fft_adjust_sqrt2(ii[j + 2*n], ii[j], j, limbs, w, temp); 
+                    else
+                        fft_adjust(ii[j + 2*n], ii[j], j/2, limbs, w); 
+                }
+            } else
+            {
+                for (j = i; j < trunc - 2*n; j+=n1) 
+                {   
+                    fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j, limbs, w/2);
+   
+                    SWAP_PTRS(ii[j],     *t1);
+                    SWAP_PTRS(ii[2*n+j], *t2);
+                }
+
+                for ( ; j < 2*n; j+=n1)
+                    fft_adjust(ii[j + 2*n], ii[j], j, limbs, w/2);
+            }
+   
+            /* 
+                FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+                of 1 starting at row 0, where z => w bits
+            */
+      
+            fft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1);
+            for (j = 0; j < n2; j++)
+            {
+                mp_size_t s = n_revbin(j, depth);
+                if (j < s) SWAP_PTRS(ii[i + j*n1], ii[i + s*n1]);
+            }
+        }
+    }
+}
+
+void
+_fft_outer2_worker(void * arg_ptr)
+{
+    fft_outer_arg_t arg = *((fft_outer_arg_t *) arg_ptr);
+    mp_size_t n1 = arg.n1;
+    mp_size_t n2 = arg.n2;
+    mp_size_t trunc2 = arg.trunc;
+    flint_bitcnt_t depth = arg.depth;
+    flint_bitcnt_t w = arg.w;
+    mp_limb_t ** ii = arg.ii;
+    mp_limb_t ** t1 = arg.t1;
+    mp_limb_t ** t2 = arg.t2;
+    mp_size_t i, j, end;
+
+    while (1)
+    {
+        pthread_mutex_lock(arg.mutex);
+        i = *arg.i;
+        end = *arg.i = FLINT_MIN(i + 16, n1);
+        pthread_mutex_unlock(arg.mutex);
+
+        if (i >= n1)
+            return;
+
+        for ( ; i < end; i++)
+        {
+            /*
+                FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+                of 1 starting at row 0, where z => w bits
+            */
+      
+            fft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1, trunc2);
+            for (j = 0; j < n2; j++)
+            {
+                mp_size_t s = n_revbin(j, depth);
+                if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
+            }
+        }
+    }
+}
+
 void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
                    flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 {
-   mp_size_t i, j;
-   mp_size_t n2 = (2*n)/n1;
-   mp_size_t trunc2 = (trunc - 2*n)/n1;
-   mp_size_t limbs = (n*w)/FLINT_BITS;
-   flint_bitcnt_t depth = 0;
-   flint_bitcnt_t depth2 = 0;
-   int k = 0;
+    mp_size_t i, shared_i = 0;
+    mp_size_t n2 = (2*n)/n1;
+    mp_size_t trunc2 = (trunc - 2*n)/n1;
+    mp_size_t limbs = (n*w)/FLINT_BITS;
+    flint_bitcnt_t depth = 0;
+    pthread_mutex_t mutex;
+    slong num_threads;
+    thread_pool_handle * threads;
+    fft_outer_arg_t * args;
 
-   while ((UWORD(1)<<depth) < n2) depth++;
-   while ((UWORD(1)<<depth2) < n1) depth2++;
+    while ((UWORD(1)<<depth) < n2) depth++;
 
-   /* first half matrix fourier FFT : n2 rows, n1 cols */
+    pthread_mutex_init(&mutex, NULL);
+
+    /* first half matrix fourier FFT : n2 rows, n1 cols */
    
-   /* FFTs on columns */
+    /* FFTs on columns */
 
-#pragma omp parallel for private(i, j, k)
-   for (i = 0; i < n1; i++)
-   {   
-#if HAVE_OPENMP
-      k = omp_get_thread_num();
-#endif
-      /* relevant part of first layer of full sqrt2 FFT */
-      if (w & 1)
-      {
-         for (j = i; j < trunc - 2*n; j+=n1) 
-         {   
-            if (j & 1)
-               fft_butterfly_sqrt2(t1[k], t2[k], ii[j], ii[2*n+j], j, limbs, w, temp[k]);
-            else
-               fft_butterfly(t1[k], t2[k], ii[j], ii[2*n+j], j/2, limbs, w);     
+    num_threads = flint_request_threads(&threads,
+                             FLINT_MIN(flint_get_num_threads(), (n1 + 15)/16));
 
-            SWAP_PTRS(ii[j],     t1[k]);
-            SWAP_PTRS(ii[2*n+j], t2[k]);
-         }
+    args = (fft_outer_arg_t *)
+                       flint_malloc(sizeof(fft_outer_arg_t)*(num_threads + 1));
 
-         for ( ; j < 2*n; j+=n1)
-         {
-             if (i & 1)
-                fft_adjust_sqrt2(ii[j + 2*n], ii[j], j, limbs, w, temp[k]); 
-             else
-                fft_adjust(ii[j + 2*n], ii[j], j/2, limbs, w); 
-         }
-      } else
-      {
-         for (j = i; j < trunc - 2*n; j+=n1) 
-         {   
-            fft_butterfly(t1[k], t2[k], ii[j], ii[2*n+j], j, limbs, w/2);
-   
-            SWAP_PTRS(ii[j],     t1[k]);
-            SWAP_PTRS(ii[2*n+j], t2[k]);
-         }
+    for (i = 0; i < num_threads + 1; i++)
+    {
+       args[i].i = &shared_i;
+       args[i].n1 = n1;
+       args[i].n2 = n2;
+       args[i].n = n;
+       args[i].trunc = trunc;
+       args[i].limbs = limbs;
+       args[i].depth = depth;
+       args[i].w = w;
+       args[i].ii = ii;
+       args[i].t1 = t1 + i;
+       args[i].t2 = t2 + i;
+       args[i].temp = temp[i];
+       args[i].mutex = &mutex;       
+    }
 
-         for ( ; j < 2*n; j+=n1)
-            fft_adjust(ii[j + 2*n], ii[j], j, limbs, w/2);
-      }
-   
-      /* 
-         FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
-         of 1 starting at row 0, where z => w bits
-      */
-      
-      fft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1 + k, t2 + k, w, 0, i, 1);
-      for (j = 0; j < n2; j++)
-      {
-         mp_size_t s = n_revbin(j, depth);
-         if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
-      }
-   }
-      
-   /* second half matrix fourier FFT : n2 rows, n1 cols */
-   ii += 2*n;
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wake(global_thread_pool, threads[i], 0,
+                                                 _fft_outer1_worker, &args[i]);
 
-   /* FFTs on columns */
+    _fft_outer1_worker(&args[num_threads]);
 
-#pragma omp parallel for private(i, j, k)
-   for (i = 0; i < n1; i++)
-   {   
-#if HAVE_OPENMP
-      k = omp_get_thread_num();
-#endif
-      /*
-         FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
-         of 1 starting at row 0, where z => w bits
-      */
-      
-      fft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1 + k, t2 + k, w, 0, i, 1, trunc2);
-      for (j = 0; j < n2; j++)
-      {
-         mp_size_t s = n_revbin(j, depth);
-         if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
-      }
-   }
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wait(global_thread_pool, threads[i]);
+
+    /* second half matrix fourier FFT : n2 rows, n1 cols */
+    ii += 2*n;
+
+    /* FFTs on columns */
+
+    shared_i = 0;
+
+    
+    for (i = 0; i < num_threads + 1; i++)
+    {
+       args[i].trunc = trunc2;
+       args[i].ii = ii;
+    }
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wake(global_thread_pool, threads[i], 0,
+                                                 _fft_outer2_worker, &args[i]);
+
+    _fft_outer2_worker(&args[num_threads]);
+
+    for (i = 0; i < num_threads; i++)
+        thread_pool_wait(global_thread_pool, threads[i]);
+
+    flint_give_back_threads(threads, num_threads);
+
+    flint_free(args);
+
+    pthread_mutex_destroy(&mutex);
 }

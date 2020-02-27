@@ -357,7 +357,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                 args1[i].poly2    = v;
                 args1[i].poly2inv = vinv;
 
-                thread_pool_wake(global_thread_pool, threads[i - 1],
+                thread_pool_wake(global_thread_pool, threads[i - 1], 0,
                             _nmod_poly_precompute_matrix_worker, &args1[i]);
             }
 
@@ -381,7 +381,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
             for (i = 1; i < c1; i++)
             {
-                thread_pool_wake(global_thread_pool, threads[i - 1],
+                thread_pool_wake(global_thread_pool, threads[i - 1], 0,
         _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args2[i]);
             }
 
@@ -412,7 +412,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
             for (i = 1; i < c1; i++)
             {
-                thread_pool_wake(global_thread_pool, threads[i - 1],
+                thread_pool_wake(global_thread_pool, threads[i - 1], 0,
                                _nmod_poly_interval_poly_worker, &args3[i]);
             }
 
@@ -497,7 +497,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
             for (i = 1; i < c2; i++)
             {
-                thread_pool_wake(global_thread_pool, threads[i - 1],
+                thread_pool_wake(global_thread_pool, threads[i - 1], 0,
         _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args2[i]);
             }
 
@@ -529,7 +529,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
             for (i = 1; i < c2; i++)
             {
-                thread_pool_wake(global_thread_pool, threads[i - 1],
+                thread_pool_wake(global_thread_pool, threads[i - 1], 0,
                                _nmod_poly_interval_poly_worker, &args3[i]);
             }
 

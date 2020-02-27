@@ -112,7 +112,7 @@ main(void)
         }
 
         for (j = 1; j < num_threads + 1; j++)
-                thread_pool_wake(global_thread_pool, threads[j - 1],
+                thread_pool_wake(global_thread_pool, threads[j - 1], 0,
                            _fmpz_mod_poly_precompute_matrix_worker, &args1[j]);
 
         _fmpz_mod_poly_precompute_matrix_worker(&args1[0]);
@@ -220,7 +220,7 @@ main(void)
         }
         
         for (j = 1; j < num_threads + 1; j++)
-          thread_pool_wake(global_thread_pool, threads[j - 1],
+          thread_pool_wake(global_thread_pool, threads[j - 1], 0,
               _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker,
 		                                                    &args1[j]);
 

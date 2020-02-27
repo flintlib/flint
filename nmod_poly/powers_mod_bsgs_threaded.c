@@ -137,7 +137,7 @@ _nmod_poly_powers_mod_preinv_threaded_pool(mp_ptr * res, mp_srcptr f,
     pthread_mutex_init(&mutex, NULL);
 
     for (i = 0; i < num_threads; i++)
-        thread_pool_wake(global_thread_pool, threads[i],
+        thread_pool_wake(global_thread_pool, threads[i], 0,
                 _nmod_poly_powers_mod_preinv_worker, &args[i]);
 
     _nmod_poly_powers_mod_preinv_worker(&args[num_threads]);

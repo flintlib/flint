@@ -15,10 +15,6 @@
 #include "fft_tuning.h"
 #include "flint.h"
 
-#if HAVE_OPENMP
-#include <omp.h> /* must be after flint.h */
-#endif
-
 void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1, 
                const fmpz * input2, slong len2, slong trunc)
 {

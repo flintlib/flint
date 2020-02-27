@@ -145,7 +145,7 @@ static void _splitworker(void * varg)
         /* reduce to Fp and calculate an image gcd */
         if (arg->num_handles > 0)
         {
-            thread_pool_wake(global_thread_pool, arg->worker_handles[0],
+            thread_pool_wake(global_thread_pool, arg->worker_handles[0], 0,
                                                        _reduce_Bp_worker, arg);
 
             fmpz_mpoly_interp_reduce_p_mpolyn(arg->Ap, arg->pctx, base->A, ctx);
@@ -217,11 +217,11 @@ static void _splitworker(void * varg)
         /* crt image gcd */
         if (arg->num_handles > 0)
         {
-            thread_pool_wake(global_thread_pool, arg->worker_handles[0],
+            thread_pool_wake(global_thread_pool, arg->worker_handles[0], 0,
                                                        _join_Abar_worker, arg);
             if (arg->num_handles > 1)
             {
-                thread_pool_wake(global_thread_pool, arg->worker_handles[1],
+                thread_pool_wake(global_thread_pool, arg->worker_handles[1], 0,
                                                        _join_Bbar_worker, arg);
             }
             else
@@ -861,7 +861,7 @@ compute_split:
 
     for (i = 1; i < num_master_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, splitargs[i].master_handle,
+        thread_pool_wake(global_thread_pool, splitargs[i].master_handle, 0,
                                                  _splitworker, &splitargs[i]);
     }
     _splitworker(&splitargs[0]);
@@ -1016,7 +1016,7 @@ compute_split:
     for (i = 0; i + 1 < num_threads; i++)
     {
         thread_pool_wake(global_thread_pool,
-                                    handles[i], _joinworker, joinargs + i);
+                                 handles[i], 0, _joinworker, joinargs + i);
     }
     _joinworker(joinargs + num_threads - 1);
     for (i = 0; i + 1 < num_threads; i++)
@@ -1065,7 +1065,7 @@ compute_split:
     for (i = 0; i + 1 < num_threads; i++)
     {
         thread_pool_wake(global_thread_pool,
-                               handles[i], _finaljoinworker, joinargs + i);
+                            handles[i], 0, _finaljoinworker, joinargs + i);
     }
     _finaljoinworker(joinargs + num_threads - 1);
     for (i = 0; i + 1 < num_threads; i++)
@@ -1322,7 +1322,7 @@ int fmpz_mpoly_gcd_brown_threaded(
         arg->handles = handles + (m + 1);
         arg->num_handles = num_handles - (m + 1);
 
-        thread_pool_wake(global_thread_pool, handles[m], _worker_convertu, arg);
+        thread_pool_wake(global_thread_pool, handles[m], 0, _worker_convertu, arg);
 
         fmpz_mpoly_to_mpoly_perm_deflate(Al, lctx, A, ctx,
                                          perm, shift, stride, handles + 0, m);

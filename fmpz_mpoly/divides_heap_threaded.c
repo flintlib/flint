@@ -2167,7 +2167,7 @@ int _fmpz_mpoly_divides_heap_threaded(
     for (i = 0; i < num_handles; i++)
     {
         (worker_args + i)->H = H;
-        thread_pool_wake(global_thread_pool, handles[i],
+        thread_pool_wake(global_thread_pool, handles[i], 0,
                                                  worker_loop, worker_args + i);
     }
     (worker_args + num_handles)->H = H;

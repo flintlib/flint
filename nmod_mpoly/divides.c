@@ -124,7 +124,7 @@ int nmod_mpoly_divides_threaded(
             arg->mctx = ctx->minfo;
             arg->handles = handles + (m + 1);
             arg->num_handles = num_handles - (m + 1);
-            thread_pool_wake(global_thread_pool, handles[m],
+            thread_pool_wake(global_thread_pool, handles[m], 0,
                                                          _worker_degrees, arg);
             mpoly_degrees_si_threaded(Adegs, A->exps, A->length, A->bits,
                                                    ctx->minfo, handles + 0, m);

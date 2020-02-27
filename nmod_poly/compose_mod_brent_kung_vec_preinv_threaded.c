@@ -170,7 +170,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
 
     for (i = 0; i < num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, threads[i],
+        thread_pool_wake(global_thread_pool, threads[i], 0,
                 _nmod_poly_compose_mod_brent_kung_vec_preinv_worker, &args[i]);
     }
 

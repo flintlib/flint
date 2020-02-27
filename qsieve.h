@@ -229,7 +229,7 @@ typedef qs_s qs_t[1];
      * sieve_bits - sieve_fill
 */
 
-#if HAVE_OPENMP
+#if 0 /* TODO have the tuning values taken from here if multithreaded */
 
 static const mp_limb_t qsieve_tune[][6] =
 {

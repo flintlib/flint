@@ -171,7 +171,7 @@ _nmod_mat_addmul_transpose_threaded_pool(mp_ptr * D, const mp_ptr * C,
 
     for (i = 0; i < num_threads; i++)
     {
-        thread_pool_wake(global_thread_pool, threads[i],
+        thread_pool_wake(global_thread_pool, threads[i], 0,
                 _nmod_mat_addmul_transpose_worker, &args[i]);
     }
 
@@ -370,7 +370,7 @@ _nmod_mat_addmul_packed_threaded_pool(mp_ptr * D,
     for (i = 0; i < num_threads; i++)
     {
         thread_pool_wake(global_thread_pool, threads[i],
-                _nmod_mat_addmul_packed_worker, &args[i]);
+             0, _nmod_mat_addmul_packed_worker, &args[i]);
     }
 
     _nmod_mat_addmul_packed_worker(&args[num_threads]);

@@ -119,9 +119,6 @@ FLINT_DLL extern const unsigned int flint_primes_small[];
 extern FLINT_TLS_PREFIX ulong * _flint_primes[FLINT_BITS];
 extern FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
 extern FLINT_TLS_PREFIX int _flint_primes_used;
-#if defined(_OPENMP) && !defined(HAVE_TLS)
-#pragma omp threadprivate(_flint_primes, _flint_prime_inverses, _flint_primes_used)
-#endif
 
 FLINT_DLL void n_compute_primes(ulong num_primes);
 
