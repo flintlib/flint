@@ -2096,7 +2096,8 @@ int _fmpz_mpoly_divides_heap_threaded(
     for (i = 0; i + 1 < S->length; i++)
     {
         divides_heap_chunk_struct * L;
-        L = (divides_heap_chunk_struct *) malloc(sizeof(divides_heap_chunk_struct));
+        L = (divides_heap_chunk_struct *) flint_malloc(
+                                            sizeof(divides_heap_chunk_struct));
         L->ma = 0;
         L->mq = 0;
         L->emax = S->exps + N*i;
