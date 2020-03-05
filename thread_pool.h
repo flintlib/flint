@@ -13,7 +13,9 @@
 #define THREAD_POOL_H
 
 /* for some reason this define needs to be outside of the next if */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #if HAVE_CPU_SET_T
 #include <sched.h>
 #endif
