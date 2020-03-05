@@ -101,8 +101,14 @@ FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
      void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
                                                               void (*free_func) (void *));
 
-FLINT_DLL void flint_abort(void);
-FLINT_DLL void flint_set_abort(void (*func)(void));
+#ifdef __GNUC__
+#define FLINT_NORETURN __attribute__ ((noreturn))
+#else
+#define FLINT_NORETURN
+#endif
+
+FLINT_DLL FLINT_NORETURN void flint_abort(void);
+FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
   /* flint_abort is calling abort by default
    * if flint_set_abort is used, then instead of abort this function
    * is called. EXPERIMENTALLY use at your own risk!
