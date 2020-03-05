@@ -24,9 +24,7 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     slong bits1, bits2;
     ulong size1, size2;
     int sign = 0;
-#if HAVE_OPENMP
     int N;
-#endif
     TMP_INIT;
 
     TMP_START;
@@ -55,15 +53,10 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
 
     /* allocate space for ffts */
 
-#if HAVE_OPENMP
-    N = omp_get_max_threads();
+    N = flint_get_num_threads();
     ii = flint_malloc((4*(n + n*size) + 5*size*N)*sizeof(mp_limb_t));
-#else
-    ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
-#endif
     for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
         ii[i] = ptr;
-#if HAVE_OPENMP
    t1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
    t2 = TMP_ALLOC(N*sizeof(mp_limb_t *));
    s1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
@@ -81,17 +74,6 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
       s1[i] = s1[i - 1] + size;
       tt[i] = tt[i - 1] + 2*size;
    }
-#else
-   t1 = TMP_ALLOC(sizeof(mp_limb_t *));
-   t2 = TMP_ALLOC(sizeof(mp_limb_t *));
-   s1 = TMP_ALLOC(sizeof(mp_limb_t *));
-   tt = TMP_ALLOC(sizeof(mp_limb_t *));
-
-   t1[0] = ptr;
-   t2[0] = t1[0] + size;
-   s1[0] = t2[0] + size;
-   tt[0] = s1[0] + size;
-#endif   
 
     if (input1 != input2)
     {
