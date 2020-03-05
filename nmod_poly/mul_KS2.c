@@ -155,8 +155,8 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
          compute h(-B) = f1(-B)^2
          v3m_neg is cleared (since f1(-B)^2 is never negative)
       */
-      mpn_mul(v3m, v1m, k1, v1m, k1);
-      mpn_mul(v3p, v1p, k1, v1p, k1);
+      mpn_sqr(v3m, v1m, k1);
+      mpn_sqr(v3p, v1p, k1);
       v3m_neg = 0;
    }
    

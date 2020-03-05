@@ -190,8 +190,8 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
             and h(-B) = |f1(-B)|^2
          hn_neg is cleared since h(-B) is never negative
       */
-      mpn_mul(v3pn, v1pn, k1, v1pn, k1);
-      mpn_mul(v3mn, v1mn, k1, v1mn, k1);
+      mpn_sqr(v3pn, v1pn, k1);
+      mpn_sqr(v3mn, v1mn, k1);
       v3m_neg = 0;
    }
 
@@ -292,8 +292,8 @@ _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
              and B^(n3-1) * h(-1/B) = |B^(n1-1) * f1(-1/B)|^2
          hr_neg is cleared since h(-1/B) is never negative
       */
-      mpn_mul(v3pr, v1pr, k1, v1pr, k1);
-      mpn_mul(v3mr, v1mr, k1, v1mr, k1);
+      mpn_sqr(v3pr, v1pr, k1);
+      mpn_sqr(v3mr, v1mr, k1);
       v3m_neg = 0;
    }
 
