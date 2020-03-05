@@ -83,7 +83,7 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
             if (flint_mpn_divisible_1_p(xd, xsize, p))
             {
                 /* TODO: when searching for squarefree numbers
-                   (Moebius function, etc), we can flint_abort here. */
+                   (Moebius function, etc), we can abort here. */
                 xsize = flint_mpn_divexact_1(xd, xsize, p);
                 exp = 2;
             }
