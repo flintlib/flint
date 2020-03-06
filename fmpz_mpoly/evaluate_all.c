@@ -189,7 +189,8 @@ static void _mpoly_rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
     fmpz_init(xp);
 
     fmpz_sub((fmpz*)(&node->key), (fmpz*)(&node->key), s);
-    fmpz_pow_fmpz(xp, x, (fmpz*)(&node->key));
+    if (!fmpz_pow_fmpz(xp, x, (fmpz*)(&node->key)))
+        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
     fmpz_add(r, r, (fmpz*)(&node->data));
     fmpz_addmul(l, xp, r);
 

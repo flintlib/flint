@@ -249,7 +249,7 @@ FLINT_DLL void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden,
 
 FLINT_DLL void fmpq_pow_si(fmpq_t rop, const fmpq_t op, slong e);
 
-FLINT_DLL void fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e);
+FLINT_DLL int fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e);
 
 FLINT_DLL void _fmpq_addmul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);

@@ -323,7 +323,8 @@ looper:
 
     mpoly_monomial_mul_fmpz(main_exps + N*i, main_one, N, &root->key);
     fmpz_init(powers + i);
-    fmpz_pow_fmpz(powers + i, val, (fmpz*)(&root->key));
+    if (!fmpz_pow_fmpz(powers + i, val, (fmpz*)(&root->key)))
+        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
 
 
     x = chain + i;

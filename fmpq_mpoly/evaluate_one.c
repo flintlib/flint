@@ -333,8 +333,10 @@ void _fmpq_mpoly_evaluate_one_fmpq_mp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
     fmpz_clear(main_exp);
     FLINT_ASSERT(fmpz_cmp(emax, emin) >= 0);
 
-    fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), emin);
-    fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), emax);
+    if (!fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), emin))
+        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
+    if (!fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), emax))
+        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
     fmpq_mul(A->content, B->content, u);
 
     /* manually traverse tree and add node data to heap */
@@ -367,9 +369,11 @@ looper:
     mpoly_monomial_mul_fmpz(main_exps + N*i, main_one, N, &root->key);
 
     fmpz_sub(t, &root->key, emin);
-    fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), t);
+    if (!fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), t))
+        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
     fmpz_sub(t, emax, &root->key);
-    fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), t);
+    if (!fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), t))
+        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
     fmpz_mul(powers + i, fmpq_numref(u), fmpq_denref(u));
 
 

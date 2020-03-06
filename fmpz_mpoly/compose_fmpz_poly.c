@@ -212,15 +212,16 @@ static void _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
             fmpz_t t;
             fmpz_init(t);
             fmpz_poly_get_coeff_fmpz(t, x, 0);
-            fmpz_pow_fmpz(t ,t, &node->key);
+            if (!fmpz_pow_fmpz(t ,t, &node->key))
+                flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
             fmpz_poly_set_fmpz(xp, t);
             fmpz_clear(t);
         }
         else if (degree > WORD(0))
         {
-            /* lets not try to power a multinomial */
+            /* lets not try to power a non-constant */
             flint_throw(FLINT_EXPOF,
-                      "Exponent overflow in nmod_mpoly_evaluate_nmod_poly");
+                      "Exponent overflow in fmpz_mpoly_evaluate_fmpz_poly");
         }
     
     }
