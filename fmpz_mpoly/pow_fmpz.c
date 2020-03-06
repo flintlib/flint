@@ -12,7 +12,7 @@
 #include "fmpz_mpoly.h"
 
 
-void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+int fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                     const fmpz_t k, const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
@@ -21,36 +21,27 @@ void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     TMP_INIT;
 
     if (fmpz_sgn(k) < 0)
-    {
         flint_throw(FLINT_ERROR, "Negative power in fmpz_mpoly_pow_fmpz");
-    }
 
-    if (fmpz_abs_fits_ui(k))
-    {
-        fmpz_mpoly_pow_ui(A, B, fmpz_get_ui(k), ctx);
-        return;
-    }
+    if (fmpz_fits_si(k))
+        return fmpz_mpoly_pow_ui(A, B, fmpz_get_ui(k), ctx);
 
     /*
         we are raising a polynomial to an unreasonable exponent
         It must either be zero or a monomial with unit coefficient
     */
 
-    if (B->length == WORD(0))
+    if (B->length == 0)
     {
         fmpz_mpoly_zero(A, ctx);
-        return;
+        return 1;
     }
 
-    if (B->length != WORD(1))
-    {
-        flint_throw(FLINT_ERROR, "Multinomial in fmpz_mpoly_pow_fmpz");
-    }
+    if (B->length != 1)
+        return 0;
 
-    if (!fmpz_is_pm1(B->coeffs))
-    {
-        flint_throw(FLINT_ERROR, "Non-unit coefficient in fmpz_mpoly_pow_fmpz");
-    }
+    if (!fmpz_is_pm1(B->coeffs + 0))
+        return 0;
 
     TMP_START;
 
@@ -71,8 +62,7 @@ void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     A->bits = exp_bits;
 
     fmpz_set_si(A->coeffs + 0,
-             (fmpz_is_one(B->coeffs + 0) || fmpz_is_even(k)) ? +WORD(1)
-                                                                   : -WORD(1));
+                     (fmpz_is_one(B->coeffs + 0) || fmpz_is_even(k)) ? 1 : -1);
 
     mpoly_pack_vec_fmpz(A->exps + 0, maxBfields, exp_bits, ctx->minfo->nfields, 1);
 
@@ -82,4 +72,6 @@ void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
         fmpz_clear(maxBfields + i);
 
     TMP_END;
+
+    return 1;
 }

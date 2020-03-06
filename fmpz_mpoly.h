@@ -771,10 +771,10 @@ FLINT_DLL int _fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
 
 /* Powering ******************************************************************/
 
-FLINT_DLL void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+FLINT_DLL int fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                   const fmpz_t k, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_pow_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+FLINT_DLL int fmpz_mpoly_pow_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                           ulong k, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,

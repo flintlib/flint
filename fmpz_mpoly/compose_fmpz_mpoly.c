@@ -46,24 +46,34 @@ typedef stack_entry_struct stack_entry_t[1];
 
 
 /* A = A * X^pow */
-void _fmpz_mpoly_pmul(fmpz_mpoly_t A, const fmpz_mpoly_t X, const fmpz_t pow,
-                                       fmpz_mpoly_t T, const fmpz_mpoly_ctx_t ctx)
+static int _fmpz_mpoly_pmul(fmpz_mpoly_t A, const fmpz_mpoly_t X,
+                  const fmpz_t pow, fmpz_mpoly_t T, const fmpz_mpoly_ctx_t ctx)
 {
     ulong p;
     FLINT_ASSERT(fmpz_sgn(pow) > 0);
 
-    if (!fmpz_abs_fits_ui(pow))
+    if (!fmpz_fits_si(pow))
     {
-        fmpz_mpoly_pow_fmpz(T, X, pow, ctx);
+        if (!fmpz_mpoly_pow_fmpz(T, X, pow, ctx))
+        {
+            fmpz_mpoly_zero(A, ctx);
+            return 0;
+        }
+
         fmpz_mpoly_mul(A, A, T, ctx);
-        return;
+        return 1;
     }
 
     p = fmpz_get_ui(pow);
 
     if (X->length <= WORD(2) || A->length/p < X->length)
     {
-        fmpz_mpoly_pow_ui(T, X, p, ctx);
+        if (!fmpz_mpoly_pow_ui(T, X, p, ctx))
+        {
+            fmpz_mpoly_zero(A, ctx);
+            return 0;
+        }
+
         fmpz_mpoly_mul(A, A, T, ctx);
     }
     else
@@ -75,15 +85,18 @@ void _fmpz_mpoly_pmul(fmpz_mpoly_t A, const fmpz_mpoly_t X, const fmpz_t pow,
             p--;
         }
     }
+
+    return 1;
 }
 
 /*
     evaluate B(xbar) at xbar = C
 */
-void _fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
+int _fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
                      const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
 {
+    int success = 1;
     int ret;
     slong nvars = ctxB->minfo->nvars;
     slong i, j, k, N, cur, next, f, r, f_prev, r_prev, v, bits;
@@ -148,6 +161,7 @@ void _fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
     fmpz_init((stack + sp)->v_exp);
     (stack + sp)->ret = 0;
     (stack + sp)->f = 0;
+
 HornerForm:
 
     f = (stack + sp)->f;
@@ -198,7 +212,10 @@ HornerForm:
     else if (totalcounts == 1)
     {
         FLINT_ASSERT(!fmpz_is_zero(Buexp + nvars*f + v)); /* this term should not be a scalar */
-        fmpz_mpoly_pow_fmpz(regs + rp, C[v], Buexp + nvars*f + v, ctxAC);
+        if (!fmpz_mpoly_pow_fmpz(regs + rp, C[v], Buexp + nvars*f + v, ctxAC))
+        {
+            success = 0;
+        }
         fmpz_mpoly_scalar_mul_fmpz(regs + rp, regs + rp, Bcoeff + f, ctxAC);
 
         if (Blist[f] != -WORD(1)) /* if f has a second term */
@@ -291,6 +308,7 @@ HornerForm:
     (stack + sp)->ret = 1;
     (stack + sp)->f = f;
     goto HornerForm;
+
 HornerForm1:
 
     /* convert the remainder */
@@ -299,30 +317,45 @@ HornerForm1:
     {
         /* remainder is non zero */
         rp++;
+        FLINT_ASSERT(0 <= rp && rp <= nvars);
         sp++;
         fmpz_init((stack + sp)->v_exp);
         (stack + sp)->ret = 2;
         (stack + sp)->f = r;
         goto HornerForm;
+
 HornerForm2:
 
         if (rtypes[rp - 1] == -WORD(1) && rtypes[rp] == -WORD(1))
         {
             /* both quotient and remainder are polynomials */
-            _fmpz_mpoly_pmul(regs + rp - 1, C[(stack + sp)->v_var], (stack + sp)->v_exp, temp, ctxAC);
+            if (!_fmpz_mpoly_pmul(regs + rp - 1, C[(stack + sp)->v_var],
+                                             (stack + sp)->v_exp, temp, ctxAC))
+            {
+                success = 0;
+            }
             fmpz_mpoly_add(temp, regs + rp - 1, regs + rp, ctxAC);
             fmpz_mpoly_swap(temp, regs + rp - 1, ctxAC);
         }
         else if (rtypes[rp - 1] == -WORD(1) && rtypes[rp] != -WORD(1))
         {
             /* quotient is a polynomial, remainder is a scalar */
-            _fmpz_mpoly_pmul(regs + rp - 1, C[(stack + sp)->v_var], (stack + sp)->v_exp, temp, ctxAC);
-            fmpz_mpoly_add_fmpz(regs + rp - 1, regs + rp - 1, Bcoeff + rtypes[rp], ctxAC);
+            if (!_fmpz_mpoly_pmul(regs + rp - 1, C[(stack + sp)->v_var],
+                                             (stack + sp)->v_exp, temp, ctxAC))
+            {
+                success = 0;
+            }
+            fmpz_mpoly_add_fmpz(regs + rp - 1, regs + rp - 1,
+                                                   Bcoeff + rtypes[rp], ctxAC);
         }
         else if (rtypes[rp - 1] != -WORD(1) && rtypes[rp] == -WORD(1))
         {
             /* quotient is a scalar, remainder is a polynomial */
-            fmpz_mpoly_pow_fmpz(temp, C[(stack + sp)->v_var], (stack + sp)->v_exp, ctxAC);
+            if (!fmpz_mpoly_pow_fmpz(temp, C[(stack + sp)->v_var],
+                                                   (stack + sp)->v_exp, ctxAC))
+            {
+                success = 0;
+            }
             fmpz_mpoly_scalar_mul_fmpz(temp, temp, Bcoeff + rtypes[rp - 1], ctxAC);
             fmpz_mpoly_add(regs + rp - 1, temp, regs + rp, ctxAC);
         }
@@ -331,27 +364,36 @@ HornerForm2:
             /* quotient is a scalar, remainder is a scalar */
             FLINT_ASSERT(0);    /* this should have been handled by simple case */
         }
-        rp--;        
-
-    } else
+        rp--;
+        FLINT_ASSERT(0 <= rp && rp <= nvars);
+    }
+    else
     {
         /* remainder is zero */
-        if (rtypes[rp] == -WORD(1))
-        {
-            /* quotient is a polynomial */
-            _fmpz_mpoly_pmul(regs + rp, C[(stack + sp)->v_var], (stack + sp)->v_exp, temp, ctxAC);
+        FLINT_ASSERT(rtypes[rp] == -WORD(1)); /* quotient is not a scalar */
 
-        } else
+        /* quotient is a polynomial */
+        if (!_fmpz_mpoly_pmul(regs + rp, C[(stack + sp)->v_var],
+                                            (stack + sp)->v_exp, temp, ctxAC))
         {
-            /* quotient is a scalar */
-            FLINT_ASSERT(0);    /* this should have been handled by simple case */
+            success = 0;
         }
     }
 
     rtypes[rp] = -WORD(1);
 
-
 HornerFormReturn:
+
+    if (!success)
+    {
+        while (sp >= 0)
+        {
+            fmpz_clear((stack + sp)->v_exp);
+            sp--;
+        }
+
+        goto cleanup;
+    }
 
     ret = (stack + sp)->ret;
     fmpz_clear((stack + sp)->v_exp);
@@ -359,17 +401,19 @@ HornerFormReturn:
     if (ret == 1) goto HornerForm1;
     if (ret == 2) goto HornerForm2;
 
-
     FLINT_ASSERT(rp == 0);
     FLINT_ASSERT(sp == -WORD(1));
 
     if (rtypes[rp] == -WORD(1))
     {
         fmpz_mpoly_swap(A, regs + rp, ctxAC);
-    } else
+    }
+    else
     {
         fmpz_mpoly_set_fmpz(A, Bcoeff + rtypes[rp], ctxAC);
     }
+
+cleanup:
 
     for (i = 0; i < nvars; i++)
         fmpz_mpoly_clear(regs + i, ctxAC);
@@ -382,7 +426,7 @@ HornerFormReturn:
 
     TMP_END;
 
-    return;
+    return success;
 }
 
 
@@ -397,6 +441,7 @@ void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
         return;
     }
     
-    _fmpz_mpoly_compose_fmpz_mpoly(A, B, C, ctxB, ctxAC);
+    if (!_fmpz_mpoly_compose_fmpz_mpoly(A, B, C, ctxB, ctxAC))
+        flint_throw(FLINT_ERROR, "_fmpz_mpoly_compose_fmpz_mpoly failed");
 }
 
