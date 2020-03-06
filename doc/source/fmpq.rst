@@ -425,6 +425,11 @@ Arithmetic
     is a ``slong``.  If `e` is `0` and ``op`` is `0`, then 
     ``res`` will be set to `1`.
 
+.. function:: int fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e)
+
+    Set ``res`` to ``op`` raised to the power~`e`.
+    Return `1` for success and `0` for failure.
+
 .. function:: void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
 
     Sets ``res`` to the product of the rational number ``op`` 

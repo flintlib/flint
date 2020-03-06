@@ -412,6 +412,7 @@ Differentiation
 Evaluation
 --------------------------------------------------------------------------------
 
+    These functions return `0` when the operation would imply unreasonable arithmetic.
 
 .. function:: ulong nmod_mpoly_evaluate_all_ui(nmod_mpoly_t A, const ulong * vals, const nmod_mpoly_ctx_t ctx)
 
@@ -421,18 +422,24 @@ Evaluation
 
     Set ``A`` to the evaluation of ``B`` where the variable of index ``var`` is replaced by ``val``.
 
-.. function:: void nmod_mpoly_compose_nmod_poly(nmod_poly_t A, const nmod_mpoly_t B, nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
+.. function:: int nmod_mpoly_compose_nmod_poly(nmod_poly_t A, const nmod_mpoly_t B, nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
 
     Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
     The context object of ``B`` is ``ctxB``.
+    Return `1` for success and `0` for failure.
 
-.. function:: void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A, const nmod_mpoly_t B, nmod_mpoly_struct * const * C, const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC)
+.. function:: int nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A, const nmod_mpoly_t B, nmod_mpoly_struct * const * C, const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC)
 
     Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
     Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
     Neither of ``A`` and ``B`` is allowed to alias any other polynomial.
+    Return `1` for success and `0` for failure.
 
-    The compose functions try to guard against unreasonable arithmetic by throwing.
+.. function:: void nmod_mpoly_compose_nmod_mpoly_gen(nmod_mpoly_t A, const nmod_mpoly_t B, const slong * c, const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC)
+
+    Set ``A`` to the evaluation of ``B`` where the variable of index ``i`` in ``ctxB`` is replaced by the variable of index ``c[i]`` in ``ctxAC``.
+    The length of the array ``C`` is the number of variables in ``ctxB``.
+    If any ``c[i]`` is negative, the corresponding variable of ``B`` is replaced by zero. Otherwise, it is expected that ``c[i]`` is less than the number of variables in ``ctxAC``.
 
 
 Multiplication
@@ -471,19 +478,17 @@ Multiplication
 Powering
 --------------------------------------------------------------------------------
 
+    These functions return `0` when the operation would imply unreasonable arithmetic.
 
 .. function:: void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B, const fmpz_t k, const nmod_mpoly_ctx_t ctx)
 
     Set `A` to `B` raised to the `k`-th power.
-    This function throws if `k < 0` or if `k` does not fit an ``slong`` and `A` has more than one term.
+    Return `1` for success and `0` for failure.
 
 .. function:: void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B, ulong k, const nmod_mpoly_ctx_t ctx)
 
     Set `A` to `B` raised to the `k`-th power.
-
-.. function:: void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B, ulong k, const nmod_mpoly_ctx_t ctx)
-
-    Set `A` to `B` raised to the `k`-th power using repeated multiplications.
+    Return `1` for success and `0` for failure.
 
 
 Division
@@ -614,6 +619,9 @@ Univariate Functions
 Internal Functions
 --------------------------------------------------------------------------------
 
+.. function:: void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B, ulong k, const nmod_mpoly_ctx_t ctx)
+
+    Set `A` to `B` raised to the `k`-th power using repeated multiplications.
 
 .. function:: void nmod_mpoly_div_monagan_pearce(nmod_mpoly_t polyq, const nmod_mpoly_t poly2, const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
 

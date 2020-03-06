@@ -495,27 +495,37 @@ Differentiation/Integration
 Evaluation
 --------------------------------------------------------------------------------
 
+    These functions return `0` when the operation would imply unreasonable arithmetic.
 
-.. function:: void fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A, fmpz * const * vals, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A, fmpz * const * vals, const fmpz_mpoly_ctx_t ctx)
 
     Set ``ev`` to the evaluation of ``A`` where the variables are replaced by the corresponding elements of the array ``vals``.
+    Return `1` for success and `0` for failure.
 
-.. function:: void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_t val, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_t val, const fmpz_mpoly_ctx_t ctx)
 
     Set ``A`` to the evaluation of ``B`` where the variable of index ``var`` is replaced by ``val``.
+    Return `1` for success and `0` for failure.
 
-.. function:: void fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B, fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctxB)
+.. function:: int fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B, fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctxB)
 
     Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
     The context object of ``B`` is ``ctxB``.
+    Return `1` for success and `0` for failure.
 
-.. function:: void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
+.. function:: int fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
 
     Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
     Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
-    Neither of ``A`` and ``B`` is allowed to alias any other polynomial.
+    The length of the array ``C`` is the number of variables in ``ctxB``.
+    Neither ``A`` nor ``B`` is allowed to alias any other polynomial.
+    Return `1` for success and `0` for failure.
 
-    These functions try to guard against unreasonable arithmetic by throwing.
+.. function:: void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A, const fmpz_mpoly_t B, const slong * c, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
+
+    Set ``A`` to the evaluation of ``B`` where the variable of index ``i`` in ``ctxB`` is replaced by the variable of index ``c[i]`` in ``ctxAC``.
+    The length of the array ``C`` is the number of variables in ``ctxB``.
+    If any ``c[i]`` is negative, the corresponding variable of ``B`` is replaced by zero. Otherwise, it is expected that ``c[i]`` is less than the number of variables in ``ctxAC``.
 
 
 Multiplication
@@ -553,19 +563,17 @@ Multiplication
 Powering
 --------------------------------------------------------------------------------
 
-.. function:: void fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t k, const fmpz_mpoly_ctx_t ctx)
+    These functions return `0` when the operation would imply unreasonable arithmetic.
+
+.. function:: int fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t k, const fmpz_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` raised to the `k`-th power.
-    This function throws if `k < 0` or if `k` is large and the polynomial is not a monomial with coefficient `\pm1`.
+    Return `1` for success and `0` for failure.
 
-.. function:: void fmpz_mpoly_pow_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong k, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_pow_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong k, const fmpz_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` raised to the `k`-th power.
-
-.. function:: void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong k, const fmpz_mpoly_ctx_t ctx)
-
-    Set ``A`` to ``B`` raised to the `k`-th power, using the Monagan and Pearce FPS algorithm.
-    It is assumed that ``B`` is not zero and `k \geq 2`.
+    Return `1` for success and `0` for failure.
 
 
 Division
@@ -718,6 +726,12 @@ Internal Functions
     For each variable `v` let `S_v` be the set of exponents appearing on `v`.
     Set ``shift[v]`` to `\operatorname{min}(S_v)` and set ``stride[v]`` to `\operatorname{gcd}(S-\operatorname{min}(S_v))`.
     If ``A`` is zero, all shifts and strides are set to zero.
+
+
+.. function:: void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong k, const fmpz_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` raised to the `k`-th power, using the Monagan and Pearce FPS algorithm.
+    It is assumed that ``B`` is not zero and `k \geq 2`.
 
 .. function:: slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong * mults, slong num, slong bits)
 
