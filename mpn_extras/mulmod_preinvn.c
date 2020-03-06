@@ -64,11 +64,11 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
 
       /* mpn_mul_n(t + 2*n, t + 4*n, d, n) */
       umul_ppmm(t[5], t[4], t[8], d[0]);
-      umul_ppmm(t[7], t[6], t[9], d[1]);
+      t[6] = t[9]*d[1];
       umul_ppmm(p2, p1, t[8], d[1]);
-      add_sssaaaaaa(t[7], t[6], t[5], t[7], t[6], t[5], 0, p2, p1);
+      add_ssaaaa(t[6], t[5], t[6], t[5], p2, p1);
       umul_ppmm(p2, p1, t[9], d[0]);
-      add_sssaaaaaa(t[7], t[6], t[5], t[7], t[6], t[5], 0, p2, p1);
+      add_ssaaaa(t[6], t[5], t[6], t[5], p2, p1);
 
       /* cy = t[n] - t[3*n] - mpn_sub_n(r, t, t + 2*n, n) */
       sub_dddmmmsss(cy, r[1], r[0], t[2], t[1], t[0], t[6], t[5], t[4]);
