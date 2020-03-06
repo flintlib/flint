@@ -10,10 +10,13 @@ Types, macros and constants
 
 .. type:: fmpq
 
+    An fmpq is implemented as a struct containing two fmpz's, one for the
+    numerator, and one for the denominator.
+
 .. type:: fmpq_t
 
-    Description.
-
+    An array of length 1 of fmpq's.  This is used to pass fmpq's around by
+    reference without fuss, similar to the way mpq_t's work.
 
 Memory management
 --------------------------------------------------------------------------------
@@ -177,7 +180,7 @@ Conversion
     denominator of ``z`` for read only operations only. The user must not
     run ``fmpq_clear`` on ``z``.
 
-.. function:: double fmpz_get_d(const fmpz_t f)
+.. function:: double fmpq_get_d(const fmpq_t f)
 
     Returns `f` as a ``double``, rounding towards zero if ``f`` cannot be represented exactly. The return is undefined if ``f`` is too large or too small to fit in a ``double``.
 
