@@ -333,7 +333,7 @@ Concatenate
 
     Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``)
     in that order. Matrix dimensions : ``mat1`` : `m \times n`,
-    ``mat2`` : `k \times n`, ``res`` : ``(m + k) \times n`.
+    ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
 
 .. function:: void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
@@ -880,11 +880,7 @@ allowed between arguments.
     Aliasing between input and output matrices is allowed.
 
 
-FLINT_DLL void
-_fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
-                     const fmpz_mat_t A, const fmpz_mat_t B,
-                                 const nmod_mat_t Ainv, mp_limb_t p,
-                                               const fmpz_t N, const fmpz_t D)
+.. function:: FLINT_DLL void _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv, mp_limb_t p, const fmpz_t N, const fmpz_t D)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}` using a 
@@ -895,9 +891,7 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     Uses the Dixon lifting algorithm with early termination once the lifting
     stabilises.
 
-.. function:: int
-fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
-                                       const fmpz_mat_t A, const fmpz_mat_t B)
+.. function:: int fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}`.                            Returns 1 if `A` is nonsingular and 0 if `A` is singular.                                 The computed denominator will not generally be minimal.
@@ -905,9 +899,7 @@ fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     Uses the Dixon lifting algorithm with early termination once the lifting
     stabilises.
 
-.. function:: int
-fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
-                                       const fmpz_mat_t A, const fmpz_mat_t B)
+.. function:: int fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}`.                            Returns 1 if `A` is nonsingular and 0 if `A` is singular.                                 The computed denominator will not generally be minimal.
