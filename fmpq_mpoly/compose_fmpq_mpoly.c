@@ -288,17 +288,11 @@ int fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
     newB->coeffs = _fmpz_vec_init(B->zpoly->length);
 
     if (!_fmpq_mpoly_rescale(A->content, newB->coeffs, B, scales, ctxB))
-    {
-printf("rescale failed\n");
         goto cleanup;
-    }
 
     if (!fmpz_mpoly_compose_fmpz_mpoly(A->zpoly, newB, Czpoly,
                                                       ctxB->zctx, ctxAC->zctx))
-    {
-printf("z compose failed\n");
         goto cleanup;
-    }
 
     fmpq_mpoly_reduce(A, ctxAC);
 

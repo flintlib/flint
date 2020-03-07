@@ -30,6 +30,7 @@
 #include "string.h"
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpq.h"
 #include "ulong_extras.h"
 #include "thread_pool.h"
@@ -66,7 +67,9 @@ MPOLY_INLINE slong mpoly_divide_threads(slong n, double la, double lb)
 
 
 typedef enum {
-   ORD_LEX, ORD_DEGLEX, ORD_DEGREVLEX
+    ORD_LEX,
+    ORD_DEGLEX,
+    ORD_DEGREVLEX
 } ordering_t;
 
 #define MPOLY_NUM_ORDERINGS 3
@@ -883,6 +886,12 @@ FLINT_DLL void mpoly_gen_fields_fmpz(fmpz * exp, slong var,
 
 FLINT_DLL flint_bitcnt_t mpoly_gen_bits_required(slong var, const mpoly_ctx_t mctx);
 
+/* return the index in the fields where the generator of index v is stored */
+MPOLY_INLINE slong mpoly_gen_index(slong v, const mpoly_ctx_t mctx)
+{
+    return mctx->rev ? v : mctx->nvars - 1 - v;
+}
+
 FLINT_DLL void mpoly_gen_offset_shift_sp(slong * offset, slong * shift,
                           slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
@@ -897,6 +906,15 @@ FLINT_DLL slong mpoly_gen_offset_mp(slong var,
 
 FLINT_DLL slong mpoly_gen_monomial_offset_mp(ulong * mexp, slong var,
                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx);
+
+FLINT_DLL void fmpz_mat_mul_vec(fmpz * v, const fmpz_mat_t M, fmpz * u);
+
+FLINT_DLL void mpoly_compose_mat_gen(fmpz_mat_t M, const slong * c,
+                            const mpoly_ctx_t mctxB, const mpoly_ctx_t mctxAC);
+
+FLINT_DLL void mpoly_compose_mat_fill_column(fmpz_mat_t M, const ulong * Cexp,
+                    flint_bitcnt_t Cbits, slong Bvar, const mpoly_ctx_t mctxB,
+                                                     const mpoly_ctx_t mctxAC);
 
 /* Monomial arrays ***********************************************************/
 

@@ -513,6 +513,10 @@ Evaluation
     The context object of ``B`` is ``ctxB``.
     Return `1` for success and `0` for failure.
 
+.. function:: int fmpz_mpoly_compose_fmpz_mpoly_geobucket(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
+
+.. function:: int fmpz_mpoly_compose_fmpz_mpoly_horner(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
+
 .. function:: int fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
 
     Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
@@ -520,6 +524,7 @@ Evaluation
     The length of the array ``C`` is the number of variables in ``ctxB``.
     Neither ``A`` nor ``B`` is allowed to alias any other polynomial.
     Return `1` for success and `0` for failure.
+    The main method attemps to perform the calculation using matrices and chooses heuristically between the ``geobucket`` and ``horner`` methods if needed.
 
 .. function:: void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A, const fmpz_mpoly_t B, const slong * c, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
 

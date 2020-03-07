@@ -702,8 +702,24 @@ FLINT_DLL int fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A,
                          const fmpz_mpoly_t B, fmpz_poly_struct * const * C,
                                                   const fmpz_mpoly_ctx_t ctxB);
 
+FLINT_DLL void _fmpz_mpoly_compose_mat(fmpz_mpoly_t A,
+                            const fmpz_mpoly_t B, const fmpz_mat_t M,
+                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
+
+FLINT_DLL int fmpz_mpoly_compose_fmpz_mpoly_geobucket(fmpz_mpoly_t A,
+                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
+                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
+
+FLINT_DLL int fmpz_mpoly_compose_fmpz_mpoly_horner(fmpz_mpoly_t A,
+                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
+                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
+
 FLINT_DLL int fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
                    const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
+                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
+
+FLINT_DLL void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A,
+                             const fmpz_mpoly_t B, const slong * c,
                     const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
 
 
