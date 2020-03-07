@@ -10,15 +10,22 @@ Types, macros and constants
 
 .. type:: fmpq_mpoly_ctx_struct
 
+    Context structure for ``fmpq_mpoly``.  This is a structure holding a
+    ``fmpz_mpoly_ctx_struct``.
+
 .. type:: fmpq_mpoly_ctx_t
 
-    Description.
+    An array of length 1 of ``fmpq_mpoly_ctx_struct``.
 
 .. type:: fmpq_mpoly_struct
 
+    A structure holding a multivariate rational polynomial.  It is implemented as a
+    ``fmpq_t`` holding the content of the polynomial and a primitive integer
+    polynomial.
+
 .. type:: fmpq_mpoly_t
 
-    Description.
+    An array of length 1 holding a ``fmpq_mpoly_struct``.
 
 
 Context object
@@ -297,8 +304,8 @@ Container operations
     Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
     An ``fmpq_mpoly_t`` is represented as the product of an ``fmpq_t content`` and an ``fmpz_mpoly_t zpoly``.
     The representation is considered canonical when either
-        (1) both ``content`` and ``zpoly`` are zero, or
-        (2) both ``content`` and ``zpoly`` are nonzero and canonical and ``zpoly`` is reduced.
+    (1) both ``content`` and ``zpoly`` are zero, or
+    (2) both ``content`` and ``zpoly`` are nonzero and canonical and ``zpoly`` is reduced.
     A nonzero ``zpoly`` is considered reduced when the coefficients have GCD one and the leading coefficient is positive.
 
 .. function:: slong fmpq_mpoly_length(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
