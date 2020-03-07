@@ -12,9 +12,10 @@
 #include "fmpq_mpoly.h"
 
 /* exponents of B are not multiprecision */
-void _fmpq_mpoly_evaluate_one_fmpq_sp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+int _fmpq_mpoly_evaluate_one_fmpq_sp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                        slong var, const fmpq_t val, const fmpq_mpoly_ctx_t ctx)
 {
+    int success = 1;
     int new;
     slong i, j, N;
     flint_bitcnt_t bits;
@@ -109,9 +110,17 @@ void _fmpq_mpoly_evaluate_one_fmpq_sp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
     }
     FLINT_ASSERT(emin <= emax);
 
-    fmpz_pow_ui(fmpq_numref(u), fmpq_numref(val), emin);
-    fmpz_pow_ui(fmpq_denref(u), fmpq_denref(val), emax);
-    fmpq_mul(A->content, B->content, u);
+
+    success = success && !_fmpz_pow_ui_is_not_feasible(
+                                            fmpz_bits(fmpq_numref(val)), emin);
+    success = success && !_fmpz_pow_ui_is_not_feasible(
+                                            fmpz_bits(fmpq_denref(val)), emax);
+    if (success)
+    {
+        fmpz_pow_ui(fmpq_numref(u), fmpq_numref(val), emin);
+        fmpz_pow_ui(fmpq_denref(u), fmpq_denref(val), emax);
+        fmpq_mul(A->content, B->content, u);
+    }
 
     /* manually traverse tree and add node data to heap */
     heap_len = 1;
@@ -131,22 +140,32 @@ void _fmpq_mpoly_evaluate_one_fmpq_sp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
     root = tree->head->left;
 
 looper:
+
     while (root != tree->null)
     {
         stack[stack_size++] = root;
         root = root->left;
     }
+
     if (stack_size == 0)
         goto done;
+
     root = stack[--stack_size];
 
     FLINT_ASSERT(root->key >= emin);
     FLINT_ASSERT(root->key <= emax);
     mpoly_monomial_mul_ui(main_exps + N*i, one, N, root->key);
-    
-    fmpz_pow_ui(fmpq_numref(u), fmpq_numref(val), root->key - emin);
-    fmpz_pow_ui(fmpq_denref(u), fmpq_denref(val), emax - root->key);
-    fmpz_mul(powers + i, fmpq_numref(u), fmpq_denref(u));
+
+    success = success && !_fmpz_pow_ui_is_not_feasible(
+                                fmpz_bits(fmpq_numref(val)), root->key - emin);
+    success = success && !_fmpz_pow_ui_is_not_feasible(
+                                fmpz_bits(fmpq_numref(val)), root->key - emin);
+    if (success)
+    {
+        fmpz_pow_ui(fmpq_numref(u), fmpq_numref(val), root->key - emin);
+        fmpz_pow_ui(fmpq_denref(u), fmpq_denref(val), emax - root->key);
+        fmpz_mul(powers + i, fmpq_numref(u), fmpq_denref(u));
+    }
 
     x = chain + i;
     x->i = i;
@@ -163,7 +182,9 @@ looper:
     root = node;
 
     goto looper;
+
 done:
+
     FLINT_ASSERT(i == tree->size);
 
     /* take from heap and put into A */
@@ -223,12 +244,15 @@ done:
     fmpq_clear(u);
 
     TMP_END;
+
+    return success;
 }
 
 /* exponents of B are multiprecision */
-void _fmpq_mpoly_evaluate_one_fmpq_mp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+int _fmpq_mpoly_evaluate_one_fmpq_mp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                        slong var, const fmpq_t val, const fmpq_mpoly_ctx_t ctx)
 {
+    int success = 1;
     int new;
     slong i, j, N, bits;
     slong main_off;
@@ -333,10 +357,8 @@ void _fmpq_mpoly_evaluate_one_fmpq_mp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
     fmpz_clear(main_exp);
     FLINT_ASSERT(fmpz_cmp(emax, emin) >= 0);
 
-    if (!fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), emin))
-        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
-    if (!fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), emax))
-        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
+    success = success && fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), emin);
+    success = success && fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), emax);
     fmpq_mul(A->content, B->content, u);
 
     /* manually traverse tree and add node data to heap */
@@ -357,25 +379,25 @@ void _fmpq_mpoly_evaluate_one_fmpq_mp(fmpq_mpoly_t A, const fmpq_mpoly_t B,
     root = tree->head->left;
 
 looper:
+
     while (root != tree->null)
     {
         stack[stack_size++] = root;
         root = root->left;
     }
+
     if (stack_size == 0)
         goto done;
+
     root = stack[--stack_size];
 
     mpoly_monomial_mul_fmpz(main_exps + N*i, main_one, N, &root->key);
 
     fmpz_sub(t, &root->key, emin);
-    if (!fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), t))
-        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
+    success = success && fmpz_pow_fmpz(fmpq_numref(u), fmpq_numref(val), t);
     fmpz_sub(t, emax, &root->key);
-    if (!fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), t))
-        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
+    success = success && fmpz_pow_fmpz(fmpq_denref(u), fmpq_denref(val), t);
     fmpz_mul(powers + i, fmpq_numref(u), fmpq_denref(u));
-
 
     x = chain + i;
     x->i = i;
@@ -393,7 +415,9 @@ looper:
     root = node;
 
     goto looper;
+
 done:
+
     FLINT_ASSERT(i == tree->size);
 
     /* take from heap and put into A */
@@ -455,34 +479,38 @@ done:
     fmpq_mpoly_reduce(A, ctx);
 
     TMP_END;
+
+    return success;
 }
 
-void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
+int fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
                            const fmpq_mpoly_t B, slong var, const fmpq_t val,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
     if (B->zpoly->length == 0)
     {
         fmpq_mpoly_zero(A, ctx);
-        return;
+        return 1;
     }
 
     if (A == B)
     {
+        int success;
         fmpq_mpoly_t T;
         fmpq_mpoly_init(T, ctx);
-        fmpq_mpoly_evaluate_one_fmpq(T, B, var, val, ctx);
+        success = fmpq_mpoly_evaluate_one_fmpq(T, B, var, val, ctx);
         fmpq_mpoly_swap(A, T, ctx);
         fmpq_mpoly_clear(T, ctx);
-        return;
+        return success;
     }
 
     if (B->zpoly->bits <= FLINT_BITS)
     {
-        _fmpq_mpoly_evaluate_one_fmpq_sp(A, B, var, val, ctx);
-    } else
+        return _fmpq_mpoly_evaluate_one_fmpq_sp(A, B, var, val, ctx);
+    }
+    else
     {
-        _fmpq_mpoly_evaluate_one_fmpq_mp(A, B, var, val, ctx);
+        return _fmpq_mpoly_evaluate_one_fmpq_mp(A, B, var, val, ctx);
     }
 }
 

@@ -15,9 +15,10 @@
 /*
     evaluate a B(xbar) at x_var = val,
 */
-void _fmpz_mpoly_evaluate_one_fmpz_sp(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+int _fmpz_mpoly_evaluate_one_fmpz_sp(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                        slong var, const fmpz_t val, const fmpz_mpoly_ctx_t ctx)
 {
+    int success = 1;
     int new;
     slong i, j, N;
     flint_bitcnt_t bits;
@@ -119,18 +120,24 @@ void _fmpz_mpoly_evaluate_one_fmpz_sp(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     root = tree->head->left;
 
 looper:
+
     while (root != tree->null)
     {
         stack[stack_size++] = root;
         root = root->left;
     }
+
     if (stack_size == 0)
         goto done;
+
     root = stack[--stack_size];
 
     mpoly_monomial_mul_ui(main_exps + N*i, one, N, root->key);
     fmpz_init(powers + i);
-    fmpz_pow_ui(powers + i, val, root->key);
+
+    success = success && !_fmpz_pow_ui_is_not_feasible(fmpz_bits(val), root->key);
+    if (success)
+        fmpz_pow_ui(powers + i, val, root->key);
 
     x = chain + i;
     x->i = i;
@@ -147,7 +154,9 @@ looper:
     root = node;
 
     goto looper;
+
 done:
+
     FLINT_ASSERT(i == tree->size);
 
     /* take from heap and put into poly1 */
@@ -205,13 +214,16 @@ done:
         fmpz_clear(powers + i);
 
     TMP_END;
+
+    return success;
 }
 
 
 /* exponents of B are multiprecision */
-void _fmpz_mpoly_evaluate_one_fmpz_mp(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+int _fmpz_mpoly_evaluate_one_fmpz_mp(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                        slong var, const fmpz_t val, const fmpz_mpoly_ctx_t ctx)
 {
+    int success = 1;
     int new;
     slong i, j, N, bits;
     slong main_off;
@@ -312,20 +324,21 @@ void _fmpz_mpoly_evaluate_one_fmpz_mp(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     root = tree->head->left;
 
 looper:
+
     while (root != tree->null)
     {
         stack[stack_size++] = root;
         root = root->left;
     }
+
     if (stack_size == 0)
         goto done;
+
     root = stack[--stack_size];
 
     mpoly_monomial_mul_fmpz(main_exps + N*i, main_one, N, &root->key);
     fmpz_init(powers + i);
-    if (!fmpz_pow_fmpz(powers + i, val, (fmpz*)(&root->key)))
-        flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
-
+    success = success && fmpz_pow_fmpz(powers + i, val, (fmpz*)(&root->key));
 
     x = chain + i;
     x->i = i;
@@ -343,7 +356,9 @@ looper:
     root = node;
 
     goto looper;
+
 done:
+
     FLINT_ASSERT(i == tree->size);
 
     /* take from heap and put into A */
@@ -400,34 +415,37 @@ done:
         fmpz_clear(powers + i);
 
     TMP_END;
+
+    return success;
 }
 
-void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A,
+int fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A,
                            const fmpz_mpoly_t B, slong var, const fmpz_t val,
                                                    const fmpz_mpoly_ctx_t ctx)
 {
     if (B->length == 0)
     {
         fmpz_mpoly_zero(A, ctx);
-        return;
+        return 1;
     }
 
     if (A == B)
     {
+        int success;
         fmpz_mpoly_t T;
         fmpz_mpoly_init(T, ctx);
-        fmpz_mpoly_evaluate_one_fmpz(T, B, var, val, ctx);
+        success = fmpz_mpoly_evaluate_one_fmpz(T, B, var, val, ctx);
         fmpz_mpoly_swap(A, T, ctx);
         fmpz_mpoly_clear(T, ctx);
-        return;
+        return success;
     }
 
     if (B->bits <= FLINT_BITS)
     {
-        _fmpz_mpoly_evaluate_one_fmpz_sp(A, B, var, val, ctx);
+        return _fmpz_mpoly_evaluate_one_fmpz_sp(A, B, var, val, ctx);
     }
     else
     {
-        _fmpz_mpoly_evaluate_one_fmpz_mp(A, B, var, val, ctx);
+        return _fmpz_mpoly_evaluate_one_fmpz_mp(A, B, var, val, ctx);
     }
 }

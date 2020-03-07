@@ -68,10 +68,21 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fmpq_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
-            fmpq_mpoly_evaluate_all_fmpq(fe, f, vals, ctx);
+            if (!fmpq_mpoly_evaluate_all_fmpq(fe, f, vals, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                flint_abort();
+            }
+
             for (v = 0; v < nvars; v++)
             {
-                fmpq_mpoly_evaluate_one_fmpq(f, f, perm[v], vals[perm[v]], ctx);
+                if (!fmpq_mpoly_evaluate_one_fmpq(f, f, perm[v], vals[perm[v]], ctx))
+                {
+                    printf("FAIL\n");
+                    flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                    flint_abort();
+                }
                 fmpq_mpoly_assert_canonical(f, ctx);
             }
             if (!fmpq_mpoly_equal_fmpq(f, fe, ctx))
@@ -143,11 +154,22 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx);
-            fmpq_mpoly_evaluate_all_fmpq(fe, f, vals, ctx);
+            if (!fmpq_mpoly_evaluate_all_fmpq(fe, f, vals, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                flint_abort();
+            }
 
             for (v = 0; v < nvars; v++)
             {
-                fmpq_mpoly_evaluate_one_fmpq(f, f, perm[v], vals[perm[v]], ctx);
+                if (!fmpq_mpoly_evaluate_one_fmpq(f, f, perm[v], vals[perm[v]], ctx))
+                {
+                    printf("FAIL\n");
+                    flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                    flint_abort();
+                }
+
                 fmpq_mpoly_assert_canonical(f, ctx);
             }
             if (!fmpq_mpoly_equal_fmpq(f, fe, ctx))
@@ -217,9 +239,14 @@ main(void)
             fmpq_mpoly_add(fg, f, g, ctx);
 
 
-            fmpq_mpoly_evaluate_all_fmpq(fe, f, vals, ctx);
-            fmpq_mpoly_evaluate_all_fmpq(ge, g, vals, ctx);
-            fmpq_mpoly_evaluate_all_fmpq(fge, fg, vals, ctx);
+            if (!fmpq_mpoly_evaluate_all_fmpq(fe, f, vals, ctx) ||
+                !fmpq_mpoly_evaluate_all_fmpq(ge, g, vals, ctx) ||
+                !fmpq_mpoly_evaluate_all_fmpq(fge, fg, vals, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluation success\ni: %wd  j: %wd\n", i, j);
+                flint_abort();
+            }
 
             fmpq_add(t, fe, ge);
             if (!fmpq_equal(t, fge))

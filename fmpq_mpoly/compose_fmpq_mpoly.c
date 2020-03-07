@@ -12,7 +12,7 @@
 #include "fmpq_mpoly.h"
 
 
-void _fmpz_binpow_fmpz(fmpz_t a, const fmpz * p, const fmpz_t e)
+static void _fmpz_binpow_fmpz(fmpz_t a, const fmpz * p, const fmpz_t e)
 {
     ulong i;
     flint_bitcnt_t bits = fmpz_bits(e);
@@ -60,16 +60,17 @@ b1           bn
 
 */
 
-void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
+int _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff, const fmpq_mpoly_t B,
                                const fmpq * scales, const fmpq_mpoly_ctx_t ctx)
 {
+    int success = 1;
     slong i, j, v;
     slong nvars, N;
     slong Blen;
     fmpz * Bcoeff;
     ulong * Bexp;
     fmpz * Buexp;
-    flint_bitcnt_t bits;
+    flint_bitcnt_t Bbits, tbits;
     fmpz * emin;
     fmpz * emax;
     fmpz ** powertable;
@@ -90,16 +91,16 @@ void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
     Blen = B->zpoly->length;
     Bcoeff = B->zpoly->coeffs;
     Bexp = B->zpoly->exps;
-    bits = B->zpoly->bits;
+    Bbits = B->zpoly->bits;
 
     FLINT_ASSERT(Blen > 0);
 
-    N = mpoly_words_per_exp(bits, ctx->zctx->minfo);
+    N = mpoly_words_per_exp(Bbits, ctx->zctx->minfo);
 
     Buexp = _fmpz_vec_init(nvars*Blen);
 
     i = 0;
-    mpoly_get_monomial_ffmpz(Buexp + nvars*i, Bexp + N*i, bits, ctx->zctx->minfo);
+    mpoly_get_monomial_ffmpz(Buexp + nvars*i, Bexp + N*i, Bbits, ctx->zctx->minfo);
     emin = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
     emax = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
     for (v = 0; v < nvars; v++)
@@ -109,7 +110,7 @@ void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
     }
     for (i = 1; i < Blen; i++)
     {
-        mpoly_get_monomial_ffmpz(Buexp + nvars*i, Bexp + N*i, bits, ctx->zctx->minfo);
+        mpoly_get_monomial_ffmpz(Buexp + nvars*i, Bexp + N*i, Bbits, ctx->zctx->minfo);
         for (v = 0; v < nvars; v++)
         {
             if (fmpz_cmp(emin + v, Buexp + nvars*i + v) > 0)
@@ -119,20 +120,30 @@ void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
         }
     }
 
+    /* check that the powers in the powertable loop do not get too big */
+    for (v = 0; v < nvars; v++)
+    {
+        if (_fmpz_pow_fmpz_is_not_feasible(fmpq_height_bits(scales + v), emax + v))
+        {
+            success = 0;
+            goto cleanup_exp_bounds;
+        }
+    }
+
     powertable = (fmpz **) TMP_ALLOC(nvars*sizeof(fmpz *));
     for (v = 0; v < nvars; v++)
     {
-        flint_bitcnt_t bits;
         fmpz * row;
 
-        bits = FLINT_MAX(UWORD(1), fmpz_bits(emax + v));
-        row = (fmpz *) TMP_ALLOC(2*bits*sizeof(fmpz));
+        tbits = fmpz_bits(emax + v);
+        tbits = FLINT_MAX(UWORD(1), tbits);
+        row = (fmpz *) flint_malloc(2*tbits*sizeof(fmpz));
         powertable[v] = row;
 
         j = 0;
         fmpz_init_set(row + 2*j + 0, fmpq_numref(scales + v));
         fmpz_init_set(row + 2*j + 1, fmpq_denref(scales + v));
-        for (j = 1; j < bits; j++)
+        for (j = 1; j < tbits; j++)
         {
             fmpz_init(row + 2*j + 0);
             fmpz_init(row + 2*j + 1);
@@ -207,14 +218,18 @@ void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
     }
     for (v = 0; v < nvars; v++)
     {
-        flint_bitcnt_t bits;
-        bits = FLINT_MAX(UWORD(1), fmpz_bits(emax + v));
-        for (j = 0; j < bits; j++)
+        tbits = fmpz_bits(emax + v);
+        tbits = FLINT_MAX(UWORD(1), tbits);
+        for (j = 0; j < tbits; j++)
         {
             fmpz_clear(powertable[v] + 2*j + 0);
-            fmpz_clear(powertable[v]+ 2*j + 1);
+            fmpz_clear(powertable[v] + 2*j + 1);
         }
+        flint_free(powertable[v]);
     }
+
+cleanup_exp_bounds:
+
     for (v = 0; v < nvars; v++)
     {
         fmpz_clear(emin + v);
@@ -229,13 +244,16 @@ void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,  const fmpq_mpoly_t B,
     fmpq_clear(q);
 
     TMP_END;
+
+    return success;
 }
 
 
-void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
+int fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
                    const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C,
                      const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC)
 {
+    int success = 0;
     slong i;
     fmpq * scales;
     fmpz_mpoly_struct ** Czpoly;
@@ -246,7 +264,7 @@ void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
     if (fmpq_mpoly_is_zero(B, ctxB))
     {
         fmpq_mpoly_zero(A, ctxAC);
-        return;
+        return 1;
     }
 
     TMP_START;
@@ -268,14 +286,31 @@ void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
     }
     *newB = *B->zpoly;
     newB->coeffs = _fmpz_vec_init(B->zpoly->length);
-    _fmpq_mpoly_rescale(A->content, newB->coeffs, B, scales, ctxB);
 
-    fmpz_mpoly_compose_fmpz_mpoly(A->zpoly, newB, Czpoly, ctxB->zctx, ctxAC->zctx);
+    if (!_fmpq_mpoly_rescale(A->content, newB->coeffs, B, scales, ctxB))
+    {
+printf("rescale failed\n");
+        goto cleanup;
+    }
+
+    if (!fmpz_mpoly_compose_fmpz_mpoly(A->zpoly, newB, Czpoly,
+                                                      ctxB->zctx, ctxAC->zctx))
+    {
+printf("z compose failed\n");
+        goto cleanup;
+    }
+
     fmpq_mpoly_reduce(A, ctxAC);
+
+    success = 1;
+
+cleanup:
+
+    TMP_END;
 
     _fmpz_vec_clear(newB->coeffs, B->zpoly->length);
 
-    TMP_END;
+    return success;
 }
 
 

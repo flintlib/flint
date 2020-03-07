@@ -37,7 +37,9 @@ int fmpz_mpoly_pow_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     }
     else
     {
-        if (B->length > 1 && k > (ulong)(WORD_MAX)/(ulong)(B->length - 1))
+        ulong limit = (ulong)(WORD_MAX)/(ulong)(2*sizeof(fmpz));
+
+        if (B->length > 1 && k > limit/(ulong)(B->length - 1))
             return 0;
 
         fmpz_mpoly_pow_fps(A, B, k, ctx);

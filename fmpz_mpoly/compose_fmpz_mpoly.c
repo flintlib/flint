@@ -430,18 +430,18 @@ cleanup:
 }
 
 
-void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
+int fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
                      const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
                      const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
 {
     FLINT_ASSERT(A != B);
+
     if (B->length == 0)
     {
         fmpz_mpoly_zero(A, ctxAC);
-        return;
+        return 1;
     }
     
-    if (!_fmpz_mpoly_compose_fmpz_mpoly(A, B, C, ctxB, ctxAC))
-        flint_throw(FLINT_ERROR, "_fmpz_mpoly_compose_fmpz_mpoly failed");
+    return _fmpz_mpoly_compose_fmpz_mpoly(A, B, C, ctxB, ctxAC);
 }
 

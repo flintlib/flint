@@ -49,7 +49,12 @@ main(void)
         exp_bits = n_randint(state, 100) + 1;
         coeff_bits = n_randint(state, 100) + 1;
         fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx);
-        fmpq_mpoly_compose_fmpq_mpoly(g, f, vals1, ctx, ctx);
+        if (!fmpq_mpoly_compose_fmpq_mpoly(g, f, vals1, ctx, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check composition success\ni: %wd\n", i);
+            flint_abort();
+        }
 
         if (!fmpq_mpoly_equal(f, g, ctx))
         {
@@ -122,16 +127,31 @@ main(void)
         {
             vals3[v] = (fmpq *) flint_malloc(sizeof(fmpq)); 
             fmpq_init(vals3[v]);
-            fmpq_mpoly_evaluate_all_fmpq(vals3[v], vals1[v], vals2, ctx2);
+            if (!fmpq_mpoly_evaluate_all_fmpq(vals3[v], vals1[v], vals2, ctx2))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluation success\ni: %wd\n", i);
+                flint_abort();
+            }
         }
 
         fmpq_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx1);
 
-        fmpq_mpoly_compose_fmpq_mpoly(g, f, vals1, ctx1, ctx2);
+        if (!fmpq_mpoly_compose_fmpq_mpoly(g, f, vals1, ctx1, ctx2))
+        {
+            printf("FAIL\n");
+            flint_printf("Check composition success\ni: %wd\n", i);
+            flint_abort();
+        }
         fmpq_mpoly_assert_canonical(g, ctx2);
 
-        fmpq_mpoly_evaluate_all_fmpq(fe, f, vals3, ctx1);
-        fmpq_mpoly_evaluate_all_fmpq(ge, g, vals2, ctx2);
+        if (!fmpq_mpoly_evaluate_all_fmpq(fe, f, vals3, ctx1) ||
+            !fmpq_mpoly_evaluate_all_fmpq(ge, g, vals2, ctx2))
+        {
+            printf("FAIL\n");
+            flint_printf("Check evaluation success\ni: %wd\n", i);
+            flint_abort();
+        }
 
         if (!fmpq_equal(fe, ge))
         {

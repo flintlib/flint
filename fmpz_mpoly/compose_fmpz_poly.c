@@ -11,6 +11,47 @@
 
 #include "fmpz_mpoly.h"
 
+static int _fmpz_poly_pow_fmpz_is_not_feasible(const fmpz_poly_t b, const fmpz_t e)
+{
+    if (b->length < 2)
+    {
+        if (b->length == 1)
+        {
+            return _fmpz_pow_fmpz_is_not_feasible(fmpz_bits(b->coeffs + 0), e);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        ulong limit = (ulong)(WORD_MAX)/(ulong)(2*sizeof(fmpz));
+        return fmpz_cmp_ui(e, limit/(ulong)(b->length)) >= 0;
+    }
+}
+
+static int _fmpz_poly_pow_ui_is_not_feasible(const fmpz_poly_t b, ulong e)
+{
+    if (b->length < 2)
+    {
+        if (b->length == 1)
+        {
+            return _fmpz_pow_ui_is_not_feasible(fmpz_bits(b->coeffs + 0), e);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        ulong limit = (ulong)(WORD_MAX)/(ulong)(2*sizeof(fmpz));
+        return e >= limit/(ulong)(b->length);
+    }
+}
+
+
 /*
     Given a polynomial tree with exponents stored in the keys and
     coefficients stored in the data member,
@@ -60,9 +101,10 @@ static void _rbnode_clear_sp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
 
 
 
-void _fmpz_mpoly_compose_fmpz_poly_sp(fmpz_poly_t A, const fmpz_mpoly_t B,
+int _fmpz_mpoly_compose_fmpz_poly_sp(fmpz_poly_t A, const fmpz_mpoly_t B,
                       fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctx)
 {
+    int success = 1;
     int new;
     slong i, j, k, N, bits, nvars = ctx->minfo->nvars;
     slong main_exp, main_var, main_shift, main_off, shift, off;
@@ -104,8 +146,15 @@ void _fmpz_mpoly_compose_fmpz_poly_sp(fmpz_poly_t A, const fmpz_mpoly_t B,
     entries = 0;
     for (i = 0; i < nvars; i++)
     {
+        if (_fmpz_poly_pow_ui_is_not_feasible(C[i], degrees[i]))
+        {
+            success = 0;
+            goto cleanup_degrees;
+        }
+
         if (i == main_var)
             continue;
+
         entries += FLINT_BIT_COUNT(degrees[i]);
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
@@ -177,24 +226,35 @@ void _fmpz_mpoly_compose_fmpz_poly_sp(fmpz_poly_t A, const fmpz_mpoly_t B,
     /* use tree method to evaluate in the main variable */
     _rbnode_clear_sp(tree, tree->head->left, WORD(0), A, C[main_var], ctx);
 
+cleanup_degrees:
+
     TMP_END;
+
+    return success;
 }
 
 
-static void _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
+static int _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
                        const fmpz_t s, fmpz_poly_t l, const fmpz_poly_t x,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
+    int success = 1;
     fmpz_poly_t r, xp;
     FLINT_ASSERT(fmpz_cmp(&node->key, s) >= 0);
 
     fmpz_poly_init(r);
     if (node->right != tree->null)
-        _rbnode_clear_mp(tree, node->right, &node->key, r, x, ctx);
+    {
+        if (!_rbnode_clear_mp(tree, node->right, &node->key, r, x, ctx))
+            success = 0;
+    }
 
     fmpz_poly_zero(l);
     if (node->left != tree->null)
-        _rbnode_clear_mp(tree, node->left, s, l, x, ctx);
+    {
+        if (!_rbnode_clear_mp(tree, node->left, s, l, x, ctx))
+            success = 0;
+    }
 
     fmpz_poly_init(xp);
     fmpz_sub(&node->key, &node->key, s);
@@ -207,21 +267,19 @@ static void _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
     {
         slong degree = fmpz_poly_degree(x);
         fmpz_poly_zero(xp);
-        if (degree == WORD(0))
+        if (degree == 0)
         {
             fmpz_t t;
             fmpz_init(t);
             fmpz_poly_get_coeff_fmpz(t, x, 0);
             if (!fmpz_pow_fmpz(t ,t, &node->key))
-                flint_throw(FLINT_ERROR, "fmpz_pow_fmpz failed");
+                success = 0;
             fmpz_poly_set_fmpz(xp, t);
             fmpz_clear(t);
         }
-        else if (degree > WORD(0))
+        else if (degree > 0)
         {
-            /* lets not try to power a non-constant */
-            flint_throw(FLINT_EXPOF,
-                      "Exponent overflow in fmpz_mpoly_evaluate_fmpz_poly");
+            success = 0;
         }
     
     }
@@ -235,13 +293,16 @@ static void _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
     fmpz_poly_clear(node->data);
     flint_free(node->data);
     flint_free(node);
+
+    return success;
 }
 
 
 
-void _fmpz_mpoly_compose_fmpz_poly_mp(fmpz_poly_t A, const fmpz_mpoly_t B,
+int _fmpz_mpoly_compose_fmpz_poly_mp(fmpz_poly_t A, const fmpz_mpoly_t B,
                       fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctx)
 {
+    int success = 1;
     int new;
     ulong l;
     slong i, k, N, bits, nvars = ctx->minfo->nvars;
@@ -291,9 +352,17 @@ void _fmpz_mpoly_compose_fmpz_poly_mp(fmpz_poly_t A, const fmpz_mpoly_t B,
     entries = 0;
     for (i = 0; i < nvars; i++)
     {
+        if (_fmpz_poly_pow_fmpz_is_not_feasible(C[i], degrees + i))
+        {
+            success = 0;
+            goto cleanup_degrees;
+        }
+
         bitcounts[i] = fmpz_bits(degrees + i);
+
         if (i == main_var)
             continue;
+
         entries += bitcounts[i];
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
@@ -361,35 +430,39 @@ void _fmpz_mpoly_compose_fmpz_poly_mp(fmpz_poly_t A, const fmpz_mpoly_t B,
     for (k = 0; k < k_len; k++)
         fmpz_poly_clear(powers + k);
 
+    /* use tree method to evaluate in the main variable */
+    fmpz_init(s);
+    if (!_rbnode_clear_mp(tree, tree->head->left, s, A, C[main_var], ctx))
+        success = 0;
+    fmpz_clear(s);
+
+cleanup_degrees:
+
     for (i = 0; i < nvars; i++)
         fmpz_clear(degrees + i);
 
-    /* use tree method to evaluate in the main variable */
-    fmpz_init(s);
-    _rbnode_clear_mp(tree, tree->head->left, s, A, C[main_var], ctx);
-    fmpz_clear(s);
-
     TMP_END;
+
+    return success;
 }
 
 
-void fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B,
+int fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B,
                       fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctx)
 {
     if (B->length == 0)
     {
         fmpz_poly_zero(A);
-        return;
+        return 1;
     }
-    else if (B->bits <= FLINT_BITS)
+
+    if (B->bits <= FLINT_BITS)
     {
-        _fmpz_mpoly_compose_fmpz_poly_sp(A, B, C, ctx);
-        return;
+        return _fmpz_mpoly_compose_fmpz_poly_sp(A, B, C, ctx);
     }
     else
     {
-        _fmpz_mpoly_compose_fmpz_poly_mp(A, B, C, ctx);
-        return;
+        return _fmpz_mpoly_compose_fmpz_poly_mp(A, B, C, ctx);
     }
 }
 

@@ -687,18 +687,22 @@ FLINT_DLL void fmpz_mpoly_integral(fmpz_mpoly_t A, fmpz_t scale,
 
 /* Evaluation ****************************************************************/
 
-FLINT_DLL void fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A,
+FLINT_DLL int _fmpz_pow_ui_is_not_feasible(flint_bitcnt_t bbits, ulong e);
+
+FLINT_DLL int _fmpz_pow_fmpz_is_not_feasible(flint_bitcnt_t bbits, const fmpz_t e);
+
+FLINT_DLL int fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A,
                               fmpz * const * vals, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A,
+FLINT_DLL int fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A,
                            const fmpz_mpoly_t B, slong var, const fmpz_t val,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A,
+FLINT_DLL int fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A,
                          const fmpz_mpoly_t B, fmpz_poly_struct * const * C,
                                                   const fmpz_mpoly_ctx_t ctxB);
 
-FLINT_DLL void fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
+FLINT_DLL int fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
                    const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
                     const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
 

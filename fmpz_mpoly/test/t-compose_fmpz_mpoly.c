@@ -22,6 +22,65 @@ main(void)
     flint_printf("compose_fmpz_mpoly....");
     fflush(stdout);
 
+    {
+        fmpz_mpoly_t A, B;
+        fmpz_mpoly_struct * Cp[3];
+        fmpz_mpoly_struct C[3];
+        fmpz_mpoly_ctx_t ctxAC, ctxB;
+
+        fmpz_mpoly_ctx_init(ctxB, 3, ORD_LEX);
+        fmpz_mpoly_ctx_init(ctxAC, 2, ORD_LEX);
+
+        fmpz_mpoly_init(B, ctxB);
+        fmpz_mpoly_init(A, ctxAC);
+        for (i = 0; i < 3; i++)
+        {
+            Cp[i] = C + i;
+            fmpz_mpoly_init(C + i, ctxAC);
+        }
+
+        fmpz_mpoly_set_str_pretty(B,
+                "1 + x1*x2^2 + x2^9999999999999999999999999*x3^9", NULL, ctxB);
+
+        fmpz_mpoly_set_str_pretty(C + 0, "x1 + x2", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 1, "x1 - x2", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (fmpz_mpoly_compose_fmpz_mpoly(A, B, Cp, ctxB, ctxAC))
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example 1\n", i);
+            flint_abort();
+        }
+
+        fmpz_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (fmpz_mpoly_compose_fmpz_mpoly(A, B, Cp, ctxB, ctxAC))
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example 2\n", i);
+            flint_abort();
+        }
+
+        fmpz_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (!fmpz_mpoly_compose_fmpz_mpoly(A, B, Cp, ctxB, ctxAC))
+        {
+            printf("FAIL\n");
+            flint_printf("Check example 3\n", i);
+            flint_abort();
+        }
+
+        fmpz_mpoly_clear(B, ctxB);
+        fmpz_mpoly_clear(A, ctxAC);
+        for (i = 0; i < 3; i++)
+            fmpz_mpoly_clear(C + i, ctxAC);
+
+        fmpz_mpoly_ctx_clear(ctxB);
+        fmpz_mpoly_ctx_clear(ctxAC);
+    }
+
     /* Check composition with identity */
     for (i = 0; i < 50*flint_test_multiplier(); i++)
     {
@@ -49,7 +108,13 @@ main(void)
         exp_bits = n_randint(state, 100) + 1;
         coeff_bits = n_randint(state, 100) + 1;
         fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx);
-        fmpz_mpoly_compose_fmpz_mpoly(g, f, vals1, ctx, ctx);
+
+        if (!fmpz_mpoly_compose_fmpz_mpoly(g, f, vals1, ctx, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check composition success\ni: %wd\n", i);
+            flint_abort();
+        }
 
         if (!fmpz_mpoly_equal(f, g, ctx))
         {
@@ -125,16 +190,32 @@ main(void)
         {
             vals3[v] = (fmpz *) flint_malloc(sizeof(fmpz)); 
             fmpz_init(vals3[v]);
-            fmpz_mpoly_evaluate_all_fmpz(vals3[v], vals1[v], vals2, ctx2);
+            if (!fmpz_mpoly_evaluate_all_fmpz(vals3[v], vals1[v], vals2, ctx2))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluation success\ni: %wd\n", i);
+                flint_abort();
+            }
         }
 
         fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx1);
 
-        fmpz_mpoly_compose_fmpz_mpoly(g, f, vals1, ctx1, ctx2);
+        if (!fmpz_mpoly_compose_fmpz_mpoly(g, f, vals1, ctx1, ctx2))
+        {
+            printf("FAIL\n");
+            flint_printf("Check composition success\ni: %wd\n", i);
+            flint_abort();
+        }
+
         fmpz_mpoly_assert_canonical(g, ctx2);
 
-        fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1);
-        fmpz_mpoly_evaluate_all_fmpz(ge, g, vals2, ctx2);
+        if (!fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1) ||
+            !fmpz_mpoly_evaluate_all_fmpz(ge, g, vals2, ctx2))
+        {
+            printf("FAIL\n");
+            flint_printf("Check evaluation success\ni: %wd\n", i);
+            flint_abort();
+        }
 
         if (!fmpz_equal(fe, ge))
         {
