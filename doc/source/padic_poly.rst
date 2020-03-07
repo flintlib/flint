@@ -9,13 +9,13 @@ Module documentation
 We represent a polynomial in `\mathbf{Q}_p[x]` as a 
 product `p^v f(x)`, where `p` is a prime number, 
 `v \in \mathbf{Z}` and `f(x) \in \mathbf{Z}[x]`.
-As a data structure, we call this polynomial \emph{normalised} 
-if the polynomial `f(x)` is \emph{normalised}, that is, if the top 
+As a data structure, we call this polynomial *normalised* 
+if the polynomial `f(x)` is *normalised*, that is, if the top 
 coefficient is non-zero.
-We say this polynomial is in \emph{canonical form} if one of the 
+We say this polynomial is in *canonical form* if one of the 
 coefficients of `f(x)` is a `p`-adic unit.  If `f(x)` is the zero 
 polynomial, we require that `v = 0`.
-We say this polynomial is \emph{reduced} modulo `p^N` if it is 
+We say this polynomial is *reduced* modulo `p^N` if it is 
 canonical form and if all coefficients lie in the range `[0, p^N)`.
 
 
@@ -80,7 +80,7 @@ Memory management
 .. function:: void padic_poly_canonicalise(padic_poly_t poly, const fmpz_t p)
 
     Brings the polynomial ``poly`` into canonical form, 
-    assuming that it is normalised already.  Does \emph{not} 
+    assuming that it is normalised already.  Does *not* 
     carry out any reduction.
 
 .. function:: void padic_poly_reduce(padic_poly_t poly, const padic_ctx_t ctx)

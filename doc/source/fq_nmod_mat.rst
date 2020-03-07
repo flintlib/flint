@@ -97,9 +97,14 @@ Concatenate
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_mat_concat_vertical(fq_nmod_mat_t res, const fq_nmod_mat_t mat1, const fq_nmod_mat_t mat2, const fq_nmod_ctx_t ctx) Sets \code{res} to vertical concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $k \times n$, \code{res} : $(m + k) \times n$.
+.. function:: void fq_nmod_mat_concat_vertical(fq_nmod_mat_t res, const fq_nmod_mat_t mat1, const fq_nmod_mat_t mat2, const fq_nmod_ctx_t ctx)
 
-.. function:: void fq_nmod_mat_concat_horizontal(fq_nmod_mat_t res, const fq_nmod_mat_t mat1, const fq_nmod_mat_t mat2, const fq_nmod_ctx_t ctx) Sets \code{res} to horizontal concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $m \times k$, \code{res}  : $m \times (n + k)$.
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : $m \times n$, ``mat2`` : $k \times n$, ``res`` : $(m + k) \times n$.
+
+
+.. function:: void fq_nmod_mat_concat_horizontal(fq_nmod_mat_t res, const fq_nmod_mat_t mat1, const fq_nmod_mat_t mat2, const fq_nmod_ctx_t ctx)
+
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : $m \times n$, ``mat2`` : $m \times k$, ``res``  : $m \times (n + k)$.
 
 
 Printing

@@ -42,7 +42,7 @@ Memory management
 
 .. function:: void nmod_mat_swap(nmod_mat_t mat1, nmod_mat_t mat2)
 
-.. function:: 	Exchanges \code{mat1} and \code{mat2}.
+    Exchanges ``mat1`` and ``mat2``.
 
 
 Basic properties and manipulation
@@ -101,9 +101,13 @@ Concatenate
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2) Sets \code{res} to vertical concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $k \times n$, \code{res} : $(m + k) \times n$.
+.. function:: void nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
 
-.. function:: void nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2) Sets \code{res} to horizontal concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $m \times k$, \code{res}  : $m \times (n + k)$.
+    Sets ``res`` to vertical concatenation of (`mat1`, ``mat2``) in that order. Matrix dimensions : ``mat1`` : $m \times n$, ``mat2`` : $k \times n$, ``res`` : $(m + k) \times n$.
+
+.. function:: void nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
+
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : $m \times n$, ``mat2`` : $m \times k$, ``res``  : $m \times (n + k)$.
 
 
 Printing
@@ -324,7 +328,7 @@ Matrix Exponentiation
 
 .. function:: void _nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
 
-.. function:: 	Sets $dest = mat^pow$. \code{dest} and \code{mat} cannot be aliased. Implements exponentiation by squaring.
+.. function:: 	Sets $dest = mat^pow$. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
 
 .. function:: void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
 

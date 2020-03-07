@@ -9,10 +9,10 @@ Module documentation
 We represent a matrix over `\mathbf{Q}_p` as a product `p^v M`, 
 where `p` is a prime number, `v \in \mathbf{Z}` and `M` a matrix 
 over `\mathbf{Z}`.
-We say this matrix is in \emph{canonical form} if either `M` is zero, 
+We say this matrix is in *canonical form* if either `M` is zero, 
 in which case we choose `v = 0`, too, or if `M` contains at least one 
 `p`-adic unit.
-We say this matrix is \emph{reduced} modulo `p^N` if it is canonical 
+We say this matrix is *reduced* modulo `p^N` if it is canonical 
 form and if all coefficients of `M` lie in the range `[0, p^{N-v})`.
 
 
@@ -58,8 +58,8 @@ Macros
 
     Returns the valuation of the matrix.
 
-    This is implemented as a macro and can be used as an \emph{lvalue} 
-    as well as an \emph{rvalue}.
+    This is implemented as a macro and can be used as an *lvalue* 
+    as well as an *rvalue*.
 
 .. function:: slong padic_mat_nrows(const padic_mat_t A)
 
@@ -200,7 +200,7 @@ Input and output
 
 .. function:: int padic_mat_fprint_pretty(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 
-    Prints a \emph{pretty} representation of the matrix `A` 
+    Prints a *pretty* representation of the matrix `A` 
     to the output stream ``file``.  
 
     In the current implementation, always returns `1`.

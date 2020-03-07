@@ -1888,8 +1888,7 @@ Power series division
     starting with the constant terms.  The function assumes that `B` has
     constant term `\pm 1` and `n \geq 1`.
 
-.. function:: void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_po
-ly_t B, slong n)
+.. function:: void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
 
     Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function
     considers the polynomials `A` and `B` as power series of length `n`

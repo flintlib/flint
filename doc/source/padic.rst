@@ -24,7 +24,7 @@ data layout.
 
     Note that this function is implemented as a macro and that 
     the expression ``padic_val(op)`` can be used as both an 
-    \emph{lvalue} and an \emph{rvalue}.
+    *lvalue* and an *rvalue*.
 
 .. function:: slong padic_get_val(const padic_t op)
 
@@ -36,7 +36,7 @@ data layout.
 
     Note that this function is implemented as a macro and that 
     the expression ``padic_prec(op)`` can be used as both an 
-    \emph{lvalue} and an \emph{rvalue}.
+    *lvalue* and an *rvalue*.
 
 .. function:: slong padic_get_prec(const padic_t op)
 

@@ -121,7 +121,7 @@ Windows and concatenation
 
 .. function:: void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
 
-    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``)                            in that order. Matrix dimensions : ``mat1`` : `m \times n`,                               ``mat2`` : `k \times n`, ``res`` : ``(m + k) \times n`.
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``)                            in that order. Matrix dimensions : ``mat1`` : `m \times n`,                               ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
 
 .. function:: void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
 
@@ -260,7 +260,7 @@ Strong echelon form and Howell form
 
     `mat` must have at least as many rows as columns.
 
-.. function:: slong fmpz_mat_howell_form_mod(fmpz_mod__mat_t mat)
+.. function:: slong fmpz_mod_mat_howell_form_mod(fmpz_mod_mat_t mat)
 
     Transforms `mat` into the Howell form of `mat`.  For a definition of the
     Howell form see \cite{StoMul1998}. The Howell form is computed by first
