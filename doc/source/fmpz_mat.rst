@@ -124,7 +124,7 @@ Random matrix generation
 
 .. function:: void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
-    Sets ``mat`` to be a random \emph{integer relations} matrix, with 
+    Sets ``mat`` to be a random *integer relations* matrix, with 
     signed entries up to the given number of bits.
 
     The number of columns of ``mat`` must be equal to one more than 
@@ -134,7 +134,7 @@ Random matrix generation
 
 .. function:: void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, flint_bitcnt_t bits2)
 
-    Sets ``mat`` to a random \emph{simultaneous diophantine} matrix.
+    Sets ``mat`` to a random *simultaneous diophantine* matrix.
 
     The matrix must be square. The top left entry is set to ``2^bits2``. 
     The remainder of that row is then set to signed random integers of the 
@@ -145,7 +145,7 @@ Random matrix generation
 .. function:: void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
     Sets a square matrix ``mat`` of even dimension to a random 
-    \emph{NTRU like} matrix.
+    *NTRU like* matrix.
 
     The matrix is broken into four square submatrices. The top left submatrix
     is set to the identity. The bottom left submatrix is set to the zero 
@@ -158,7 +158,7 @@ Random matrix generation
 .. function:: void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
     Sets a square matrix ``mat`` of even dimension to a random 
-    \emph{NTRU like} matrix.
+    *NTRU like* matrix.
 
     The matrix is broken into four square submatrices. The top left submatrix
     is set to `q` times the identity matrix. The top right submatrix is set to 
@@ -170,7 +170,7 @@ Random matrix generation
 
 .. function:: void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 
-    Sets a square matrix ``mat`` to a random \emph{ajtai} matrix. 
+    Sets a square matrix ``mat`` to a random *ajtai* matrix. 
     The diagonal entries `(i, i)` are set to a random entry in the range 
     `[1, 2^{b-1}]` inclusive where `b = \floor{(2 r - i)^\alpha}` for some 
     double parameter~`\alpha`. The entries below the diagonal in column~`i` 

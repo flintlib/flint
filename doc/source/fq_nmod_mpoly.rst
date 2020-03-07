@@ -1,7 +1,7 @@
 .. _fq_nmod-mpoly:
 
 **fq_nmod_mpoly.h** -- multivariate polynomials over finite fields of word-sized characteristic
-===============================================================================
+================================================================================================
 
 Description.
 
@@ -145,7 +145,7 @@ Constants
     Assuming that ``A`` is a constant, set ``c`` to this constant.
     This function throws if ``A`` is not a constant.
 
-.. function:: void nmod_mpoly_set_ui(nmod_mpoly_t A, ulong c, const nmod_mpoly_ctx_t ctx)
+.. function:: void fq_nmod_mpoly_set_ui(fq_nmod_mpoly_t A, ulong c, const fq_nmod_mpoly_ctx_t ctx)
 
 
 .. function:: void fq_nmod_mpoly_set_fq_nmod(fq_nmod_mpoly_t A, const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx)

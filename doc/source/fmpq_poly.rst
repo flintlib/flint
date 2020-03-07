@@ -416,7 +416,7 @@ Addition and subtraction
     be in canonical form and are also allowed to be of length~`0`.
     
     ``(rpoly, rden)`` and ``(poly1, den1)`` may be aliased, 
-    but ``(rpoly, rden)`` and ``(poly2, den2)`` may \emph{not} 
+    but ``(rpoly, rden)`` and ``(poly2, den2)`` may *not* 
     be aliased.
 
 .. function:: void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, int can)
@@ -471,7 +471,7 @@ Addition and subtraction
     canonical form and are also allowed to be of length~`0`.
     
     ``(rpoly, rden)`` and ``(poly1, den1, len1)`` may be aliased, 
-    but ``(rpoly, rden)`` and ``(poly2, den2, len2)`` may \emph{not} be 
+    but ``(rpoly, rden)`` and ``(poly2, den2, len2)`` may *not* be 
     aliased.
 
 .. function:: void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, int can)
@@ -815,7 +815,7 @@ Euclidean division
 
     This function is only faster if `m \leq 2*n - 1`.
 
-    The output of this function is \emph{not} canonicalised.
+    The output of this function is *not* canonicalised.
 
 .. function:: void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv)
 
@@ -824,7 +824,7 @@ Euclidean division
 
     This function is only faster if ``A->length <= 2*B->length - 1``.
 
-    The output of this function is \emph{not} canonicalised.
+    The output of this function is *not* canonicalised.
 
 
 Power series division
