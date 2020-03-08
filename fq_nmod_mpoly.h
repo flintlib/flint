@@ -685,7 +685,7 @@ FLINT_DLL void _fq_nmod_mpoly_compose_mat(fq_nmod_mpoly_t A,
 
 FLINT_DLL void fq_nmod_mpoly_compose_fq_nmod_mpoly_gen(fq_nmod_mpoly_t A,
                              const fq_nmod_mpoly_t B, const slong * c,
-               const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC)
+              const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC);
 
 
 /* Multiplication ************************************************************/
