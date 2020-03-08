@@ -835,7 +835,7 @@ FLINT_DLL void nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
                         const nmod_mpoly_t B, nmod_poly_struct * const * C,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
+FLINT_DLL int nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
                     const nmod_mpoly_t B, nmod_mpoly_struct * const * C,
                     const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC);
 

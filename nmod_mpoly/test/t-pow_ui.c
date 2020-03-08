@@ -125,7 +125,6 @@ main(void)
                 flint_printf("Check aliasing\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
-
         }
 
         nmod_mpoly_clear(f, ctx);

@@ -22,6 +22,69 @@ main(void)
     flint_printf("compose_nmod_mpoly....");
     fflush(stdout);
 
+    {
+        nmod_mpoly_t A, A1, A2, B;
+        nmod_mpoly_struct * Cp[3];
+        nmod_mpoly_struct C[3];
+        nmod_mpoly_ctx_t ctxAC, ctxB;
+
+        nmod_mpoly_ctx_init(ctxB, 3, ORD_LEX, 13);
+        nmod_mpoly_ctx_init(ctxAC, 2, ORD_LEX, 13);
+
+        nmod_mpoly_init(B, ctxB);
+        nmod_mpoly_init(A, ctxAC);
+        nmod_mpoly_init(A1, ctxAC);
+        nmod_mpoly_init(A2, ctxAC);
+        for (i = 0; i < 3; i++)
+        {
+            Cp[i] = C + i;
+            nmod_mpoly_init(C + i, ctxAC);
+        }
+
+        nmod_mpoly_set_str_pretty(B,
+                "1 + x1*x2^2 + x2^9999999999999999999999999*x3^9", NULL, ctxB);
+
+        nmod_mpoly_set_str_pretty(C + 0, "x1 + x2", NULL, ctxAC);
+        nmod_mpoly_set_str_pretty(C + 1, "x1 - x2", NULL, ctxAC);
+        nmod_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (nmod_mpoly_compose_nmod_mpoly(A, B, Cp, ctxB, ctxAC))
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example 1\n", i);
+            flint_abort();
+        }
+
+        nmod_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC);
+        nmod_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC);
+        nmod_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (!nmod_mpoly_compose_nmod_mpoly(A, B, Cp, ctxB, ctxAC))
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example 2\n", i);
+            flint_abort();
+        }
+
+        nmod_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
+        nmod_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
+        nmod_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (!nmod_mpoly_compose_nmod_mpoly(A, B, Cp, ctxB, ctxAC))
+        {
+            printf("FAIL\n");
+            flint_printf("Check example 3\n", i);
+            flint_abort();
+        }
+
+        nmod_mpoly_clear(B, ctxB);
+        nmod_mpoly_clear(A, ctxAC);
+        nmod_mpoly_clear(A1, ctxAC);
+        nmod_mpoly_clear(A2, ctxAC);
+        for (i = 0; i < 3; i++)
+            nmod_mpoly_clear(C + i, ctxAC);
+
+        nmod_mpoly_ctx_clear(ctxB);
+        nmod_mpoly_ctx_clear(ctxAC);
+    }
+
     /* Check composition with identity */
     for (i = 0; i < 20*flint_test_multiplier(); i++)
     {
@@ -51,7 +114,12 @@ main(void)
         exp_bits = n_randint(state, 300) + 1;
         nmod_mpoly_randtest_bits(g, state, len, exp_bits, ctx);
         nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
-        nmod_mpoly_compose_nmod_mpoly(g, f, vals1, ctx, ctx);
+        if (!nmod_mpoly_compose_nmod_mpoly(g, f, vals1, ctx, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check composition success\ni: %wd\n", i);
+            flint_abort();
+        }
         nmod_mpoly_assert_canonical(g, ctx);
 
         if (!nmod_mpoly_equal(f, g, ctx))
@@ -130,7 +198,12 @@ main(void)
         if (nmod_mpoly_total_degree_si(f, ctx1)
                                          <= 4000/(1+len2*len2*nvars2*nvars2))
         {
-            nmod_mpoly_compose_nmod_mpoly(g, f, vals1, ctx1, ctx2);
+            if (!nmod_mpoly_compose_nmod_mpoly(g, f, vals1, ctx1, ctx2))
+            {
+                printf("FAIL\n");
+                flint_printf("Check composition success\ni: %wd\n", i);
+                flint_abort();
+            }
             nmod_mpoly_assert_canonical(g, ctx2);
 
             fe = nmod_mpoly_evaluate_all_ui(f, vals3, ctx1);
@@ -200,7 +273,12 @@ main(void)
             nmod_mpoly_set_ui(vals1[v], vals2[v], ctx2);
         }
 
-        nmod_mpoly_compose_nmod_mpoly(g, f, vals1, ctx1, ctx2);
+        if (!nmod_mpoly_compose_nmod_mpoly(g, f, vals1, ctx1, ctx2))
+        {
+            printf("FAIL\n");
+            flint_printf("Check composition success\ni: %wd\n", i);
+            flint_abort();
+        }
         nmod_mpoly_assert_canonical(g, ctx2);
 
         if (!nmod_mpoly_is_ui(g, ctx2)
