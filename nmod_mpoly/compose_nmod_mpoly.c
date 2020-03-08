@@ -54,7 +54,8 @@ void _nmod_mpoly_pmul(nmod_mpoly_t A, const nmod_mpoly_t X, const fmpz_t pow,
 
     if (!fmpz_fits_si(pow))
     {
-        nmod_mpoly_pow_fmpz(T, X, pow, ctx);
+        if (!nmod_mpoly_pow_fmpz(T, X, pow, ctx))
+            flint_throw(FLINT_ERROR, "nmod_mpoly_pow_fmpz failed");
         nmod_mpoly_mul(A, A, T, ctx);
         return;
     }
@@ -63,7 +64,8 @@ void _nmod_mpoly_pmul(nmod_mpoly_t A, const nmod_mpoly_t X, const fmpz_t pow,
     
     if (X->length <= WORD(2) || A->length/p < X->length)
     {
-        nmod_mpoly_pow_ui(T, X, p, ctx);
+        if (!nmod_mpoly_pow_ui(T, X, p, ctx))
+            flint_throw(FLINT_ERROR, "nmod_mpoly_pow_ui failed");
         nmod_mpoly_mul(A, A, T, ctx);
         return;
     }
@@ -204,7 +206,8 @@ HornerForm:
     else if (totalcounts == 1)
     {
         FLINT_ASSERT(!fmpz_is_zero(Buexp + nvars*f + v)); /* this term should not be a scalar */
-        nmod_mpoly_pow_fmpz(regs + rp, C[v], Buexp + nvars*f + v, ctxAC);
+        if (!nmod_mpoly_pow_fmpz(regs + rp, C[v], Buexp + nvars*f + v, ctxAC))
+            flint_throw(FLINT_ERROR, "nmod_mpoly_pow_fmpz failed");
         nmod_mpoly_scalar_mul_ui(regs + rp, regs + rp, Bcoeff[f], ctxAC);
 
         if (Blist[f] != -WORD(1)) /* if f has a second term */
@@ -328,7 +331,8 @@ HornerForm2:
         else if (rtypes[rp - 1] != -WORD(1) && rtypes[rp] == -WORD(1))
         {
             /* quotient is a scalar, remainder is a polynomial */
-            nmod_mpoly_pow_fmpz(temp, C[(stack + sp)->v_var], (stack + sp)->v_exp, ctxAC);
+            if (!nmod_mpoly_pow_fmpz(temp, C[(stack + sp)->v_var], (stack + sp)->v_exp, ctxAC))
+                flint_throw(FLINT_ERROR, "nmod_mpoly_pow_fmpz failed");
             nmod_mpoly_scalar_mul_ui(temp, temp, Bcoeff[rtypes[rp - 1]], ctxAC);
             nmod_mpoly_add(regs + rp - 1, temp, regs + rp, ctxAC);
         }

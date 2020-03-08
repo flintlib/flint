@@ -480,12 +480,12 @@ Powering
 
     These functions return `0` when the operation would imply unreasonable arithmetic.
 
-.. function:: void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B, const fmpz_t k, const nmod_mpoly_ctx_t ctx)
+.. function:: int nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B, const fmpz_t k, const nmod_mpoly_ctx_t ctx)
 
     Set `A` to `B` raised to the `k`-th power.
     Return `1` for success and `0` for failure.
 
-.. function:: void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B, ulong k, const nmod_mpoly_ctx_t ctx)
+.. function:: int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B, ulong k, const nmod_mpoly_ctx_t ctx)
 
     Set `A` to `B` raised to the `k`-th power.
     Return `1` for success and `0` for failure.

@@ -205,7 +205,8 @@ void nmod_mpoly_geobucket_pow_ui(nmod_mpoly_geobucket_t B1,
     nmod_mpoly_init(a, ctx);
 
     nmod_mpoly_geobucket_empty(a, B1, ctx);
-    nmod_mpoly_pow_ui(a, a, k, ctx);
+    if (!nmod_mpoly_pow_ui(a, a, k, ctx))
+        flint_throw(FLINT_ERROR, "nmod_mpoly_pow_ui failed");
     nmod_mpoly_geobucket_set(B1, a, ctx);
 
     nmod_mpoly_clear(a, ctx);
@@ -218,7 +219,8 @@ void nmod_mpoly_geobucket_pow_fmpz_inplace(nmod_mpoly_geobucket_t B1,
     nmod_mpoly_init(a, ctx);
 
     nmod_mpoly_geobucket_empty(a, B1, ctx);
-    nmod_mpoly_pow_fmpz(a, a, k, ctx);
+    if (!nmod_mpoly_pow_fmpz(a, a, k, ctx))
+        flint_throw(FLINT_ERROR, "nmod_mpoly_pow_fmpz failed");
     nmod_mpoly_geobucket_set(B1, a, ctx);
 
     nmod_mpoly_clear(a, ctx);
