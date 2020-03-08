@@ -422,6 +422,7 @@ Evaluation
 .. function:: void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, fq_nmod_mpoly_t A, fq_nmod_struct * const *  vals, const fq_nmod_mpoly_ctx_t ctx)
 
     Set ``ev`` the evaluation of ``A`` where the variables are replaced by the corresponding elements of the array ``vals``.
+    This function is not implemented yet.
 
 .. function:: void fq_nmod_mpoly_evaluate_one_fq_nmod(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, slong var, fq_nmod_t val, const fq_nmod_mpoly_ctx_t ctx)
 
@@ -432,6 +433,7 @@ Evaluation
     Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
     The context object of ``B`` is ``ctxB``.
     Return `1` for success and `0` for failure.
+    This function is not implemented yet.
 
 .. function:: int fq_nmod_mpoly_compose_fq_nmod_mpoly(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, fq_nmod_mpoly_struct * const * C, const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC)
 
@@ -439,6 +441,7 @@ Evaluation
     Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
     Neither ``A`` nor ``B`` is allowed to alias any other polynomial.
     Return `1` for success and `0` for failure.
+    This function is not implemented yet.
 
 .. function:: void fq_nmod_mpoly_compose_fq_nmod_mpoly_gen(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const slong * c, const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC)
 

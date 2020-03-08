@@ -9,12 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 /* essentially exps(A) = M*exps(B) */
-void _nmod_mpoly_compose_mat(nmod_mpoly_t A,
-                            const nmod_mpoly_t B, const fmpz_mat_t M,
-                     const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC)
+void _fq_nmod_mpoly_compose_mat(fq_nmod_mpoly_t A,
+                            const fq_nmod_mpoly_t B, const fmpz_mat_t M,
+               const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC)
 {
     slong i;
     fmpz * u, * v;
@@ -23,7 +23,7 @@ void _nmod_mpoly_compose_mat(nmod_mpoly_t A,
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);
     const ulong * Bexp = B->exps;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const fq_nmod_struct * Bcoeffs = B->coeffs;
     slong AN;
 
     FLINT_ASSERT(A != B);
@@ -34,9 +34,9 @@ void _nmod_mpoly_compose_mat(nmod_mpoly_t A,
     u = _fmpz_vec_init(ctxB->minfo->nfields);
     v = _fmpz_vec_init(ctxAC->minfo->nfields + 1);
 
-    nmod_mpoly_fit_length(A, Blen, ctxAC);
+    fq_nmod_mpoly_fit_length(A, Blen, ctxAC);
     A->length = 0;
-    nmod_mpoly_fit_bits(A, MPOLY_MIN_BITS, ctxAC);
+    fq_nmod_mpoly_fit_bits(A, MPOLY_MIN_BITS, ctxAC);
     A->bits = MPOLY_MIN_BITS;
     for (i = 0; i < Blen; i++)
     {
@@ -46,8 +46,8 @@ void _nmod_mpoly_compose_mat(nmod_mpoly_t A,
             continue;
         vbits = _fmpz_vec_max_bits(v, ctxAC->minfo->nfields);
         FLINT_ASSERT(vbits >= 0);
-        nmod_mpoly_fit_bits(A, mpoly_fix_bits(vbits + 1, ctxAC->minfo), ctxAC);
-        A->coeffs[A->length] = Bcoeffs[i];
+        fq_nmod_mpoly_fit_bits(A, mpoly_fix_bits(vbits + 1, ctxAC->minfo), ctxAC);
+        fq_nmod_set(A->coeffs + A->length, Bcoeffs + i, ctxAC->fqctx);
         AN = mpoly_words_per_exp(A->bits, ctxAC->minfo);
         mpoly_pack_vec_fmpz(A->exps + AN*A->length, v, A->bits, ctxAC->minfo->nfields, 1);
         A->length++;
@@ -56,8 +56,8 @@ void _nmod_mpoly_compose_mat(nmod_mpoly_t A,
     _fmpz_vec_clear(u, ctxB->minfo->nfields);
     _fmpz_vec_clear(v, ctxAC->minfo->nfields + 1);
 
-    nmod_mpoly_sort_terms(A, ctxAC);
-    nmod_mpoly_combine_like_terms(A, ctxAC);
+    fq_nmod_mpoly_sort_terms(A, ctxAC);
+    fq_nmod_mpoly_combine_like_terms(A, ctxAC);
     return;
 }
 
