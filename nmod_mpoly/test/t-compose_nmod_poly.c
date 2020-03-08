@@ -22,6 +22,67 @@ main(void)
     flint_printf("compose_nmod_poly....");
     fflush(stdout);
 
+    {
+        nmod_poly_t A;
+        nmod_mpoly_t B;
+        nmod_poly_struct * Cp[3];
+        nmod_poly_struct C[3];
+        nmod_mpoly_ctx_t ctxB;
+
+        nmod_mpoly_ctx_init(ctxB, 3, ORD_LEX, 13);
+
+        nmod_mpoly_init(B, ctxB);
+        nmod_poly_init_mod(A, ctxB->ffinfo->mod);
+        for (i = 0; i < 3; i++)
+        {
+            Cp[i] = C + i;
+            nmod_poly_init_mod(C + i, ctxB->ffinfo->mod);
+        }
+
+        nmod_mpoly_set_str_pretty(B,
+                "1 + x1*x2^2 + x2^9999999999999999999999999*x3^9", NULL, ctxB);
+
+        nmod_poly_zero(C + 0);
+        nmod_poly_zero(C + 1);
+        nmod_poly_zero(C + 2);
+        nmod_poly_set_coeff_ui(C + 0, 1, 1);
+        nmod_poly_set_coeff_ui(C + 1, 2, 2);
+        nmod_poly_set_coeff_ui(C + 2, 3, 3);
+        if (nmod_mpoly_compose_nmod_poly(A, B, Cp, ctxB))
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example 1\n", i);
+            flint_abort();
+        }
+
+        nmod_poly_zero(C + 0);
+        nmod_poly_zero(C + 1);
+        nmod_poly_zero(C + 2);
+        nmod_poly_set_coeff_ui(C + 0, 0, 1);
+        nmod_poly_set_coeff_ui(C + 1, 0, 2);
+        nmod_poly_set_coeff_ui(C + 2, 0, 3);
+        if (!nmod_mpoly_compose_nmod_poly(A, B, Cp, ctxB))
+        {
+            printf("FAIL\n");
+            flint_printf("Check example 2\n", i);
+            flint_abort();
+        }
+
+        if (!nmod_poly_is_zero(A))
+        {
+            printf("FAIL\n");
+            flint_printf("Check example 2 equality\n", i);
+            flint_abort();
+        }
+
+        nmod_mpoly_clear(B, ctxB);
+        nmod_poly_clear(A);
+        for (i = 0; i < 3; i++)
+            nmod_poly_clear(C + i);
+
+        nmod_mpoly_ctx_clear(ctxB);
+    }
+
     /* Check composition and evalall commute */
     for (i = 0; i < 50*flint_test_multiplier(); i++)
     {
@@ -70,7 +131,12 @@ main(void)
 
         if (nmod_mpoly_total_degree_si(f, ctx1) < 100)
         {
-            nmod_mpoly_compose_nmod_poly(g, f, vals1, ctx1);
+            if (!nmod_mpoly_compose_nmod_poly(g, f, vals1, ctx1))
+            {
+                printf("FAIL\n");
+                flint_printf("Check composition success\ni: %wd\n", i);
+                flint_abort();
+            }
 
             fe = nmod_mpoly_evaluate_all_ui(f, vals3, ctx1);
             ge = nmod_poly_evaluate_nmod(g, vals2);

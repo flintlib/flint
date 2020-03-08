@@ -281,7 +281,6 @@ static int _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
         {
             success = 0;
         }
-    
     }
     fmpz_poly_add(r, r, node->data);
     fmpz_poly_mul(r, xp, r);

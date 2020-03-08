@@ -42,7 +42,7 @@ int nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
         }
         else
         {
-            if (!fmpz_is_one(C[i]->coeffs + 0))
+            if (C[i]->coeffs[0] != 1)
                 goto matrix_no_good;
 
             mpoly_compose_mat_fill_column(M, C[i]->exps, C[i]->bits, i,
