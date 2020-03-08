@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,12 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly.h"
 
 /* essentially exps(A) = M*exps(B) */
-void _fmpz_mpoly_compose_mat(fmpz_mpoly_t A,
-                            const fmpz_mpoly_t B, const fmpz_mat_t M,
-                     const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC)
+void _nmod_mpoly_compose_mat(nmod_mpoly_t A,
+                            const nmod_mpoly_t B, const fmpz_mat_t M,
+                     const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC)
 {
     slong i;
     fmpz * u, * v;
@@ -23,8 +23,7 @@ void _fmpz_mpoly_compose_mat(fmpz_mpoly_t A,
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);
     const ulong * Bexp = B->exps;
-    const fmpz * Bcoeffs = B->coeffs;
-    slong Alen_old = A->length;
+    const mp_limb_t * Bcoeffs = B->coeffs;
     slong AN;
 
     FLINT_ASSERT(A != B);
@@ -35,9 +34,9 @@ void _fmpz_mpoly_compose_mat(fmpz_mpoly_t A,
     u = _fmpz_vec_init(ctxB->minfo->nfields);
     v = _fmpz_vec_init(ctxAC->minfo->nfields + 1);
 
-    fmpz_mpoly_fit_length(A, Blen, ctxAC);
+    nmod_mpoly_fit_length(A, Blen, ctxAC);
     A->length = 0;
-    fmpz_mpoly_fit_bits(A, MPOLY_MIN_BITS, ctxAC);
+    nmod_mpoly_fit_bits(A, MPOLY_MIN_BITS, ctxAC);
     A->bits = MPOLY_MIN_BITS;
     for (i = 0; i < Blen; i++)
     {
@@ -47,21 +46,18 @@ void _fmpz_mpoly_compose_mat(fmpz_mpoly_t A,
             continue;
         vbits = _fmpz_vec_max_bits(v, ctxAC->minfo->nfields);
         FLINT_ASSERT(vbits >= 0);
-        fmpz_mpoly_fit_bits(A, mpoly_fix_bits(vbits + 1, ctxAC->minfo), ctxAC);
-        fmpz_set(A->coeffs + A->length, Bcoeffs + i);
+        nmod_mpoly_fit_bits(A, mpoly_fix_bits(vbits + 1, ctxAC->minfo), ctxAC);
+        A->coeffs[A->length] = Bcoeffs[i];
         AN = mpoly_words_per_exp(A->bits, ctxAC->minfo);
         mpoly_pack_vec_fmpz(A->exps + AN*A->length, v, A->bits, ctxAC->minfo->nfields, 1);
         A->length++;
     }
 
-    while (--Alen_old >= A->length)
-        _fmpz_demote(A->coeffs + Alen_old);
-
     _fmpz_vec_clear(u, ctxB->minfo->nfields);
     _fmpz_vec_clear(v, ctxAC->minfo->nfields + 1);
 
-    fmpz_mpoly_sort_terms(A, ctxAC);
-    fmpz_mpoly_combine_like_terms(A, ctxAC);
+    nmod_mpoly_sort_terms(A, ctxAC);
+    nmod_mpoly_combine_like_terms(A, ctxAC);
     return;
 }
 

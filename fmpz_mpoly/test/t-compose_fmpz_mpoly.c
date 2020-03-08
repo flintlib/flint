@@ -92,7 +92,7 @@ main(void)
     }
 
     /* check composition with generators */
-    for (i = 0; i < 50*flint_test_multiplier(); i++)
+    for (i = 0; i < 20*flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctxB, ctxAC;
         fmpz_mpoly_t B, A, A1, A2, A3;
@@ -186,7 +186,7 @@ main(void)
     }
 
     /* Check composition with identity */
-    for (i = 0; i < 50*flint_test_multiplier(); i++)
+    for (i = 0; i < 20*flint_test_multiplier(); i++)
     {
         slong len1;
         flint_bitcnt_t exp_bits, coeff_bits;
@@ -331,6 +331,8 @@ main(void)
         }
 
         fmpz_mpoly_assert_canonical(g, ctx2);
+        fmpz_mpoly_assert_canonical(g1, ctx2);
+        fmpz_mpoly_assert_canonical(g2, ctx2);
 
         if (!fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1) ||
             !fmpz_mpoly_evaluate_all_fmpz(ge, g, vals2, ctx2))
