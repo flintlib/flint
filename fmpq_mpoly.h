@@ -688,6 +688,9 @@ FLINT_DLL int fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
                    const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C,
                     const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC);
 
+FLINT_DLL void fmpq_mpoly_compose_fmpq_mpoly_gen(fmpq_mpoly_t A,
+                     const fmpq_mpoly_t B, const slong * c,
+                    const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC);
 
 
 /* Multiplication ************************************************************/
