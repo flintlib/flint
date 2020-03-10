@@ -413,7 +413,7 @@ Special functions
     For an element `a \in \mathbf{F}_q`, multiplication by `a` defines
     a `\mathbf{F}_p`-linear map on `\mathbf{F}_q`.  We define the
     trace of `a` as the trace of this map.  Equivalently, if `\Sigma`
-    generates `\Gal(\mathbf{F}_q / \mathbf{F}_p)` then the trace of
+    generates `\operatorname{Gal}(\mathbf{F}_q / \mathbf{F}_p)` then the trace of
     `a` is equal to `\sum_{i=0}^{d-1} \Sigma^i (a)`, where `d =
     \log_{p} q`.
 
@@ -429,7 +429,7 @@ Special functions
     For an element `a \in \mathbf{F}_q`, multiplication by `a` defines
     a `\mathbf{F}_p`-linear map on `\mathbf{F}_q`.  We define the norm
     of `a` as the determinant of this map.  Equivalently, if `\Sigma` generates
-    `\Gal(\mathbf{F}_q / \mathbf{F}_p)` then the trace of `a` is equal to
+    `\operatorname{Gal}(\mathbf{F}_q / \mathbf{F}_p)` then the trace of `a` is equal to
     `\prod_{i=0}^{d-1} \Sigma^i (a)`, where
     `d = \text{dim}_{\mathbf{F}_p}(\mathbf{F}_q)`.
 
@@ -448,7 +448,7 @@ Special functions
     Recall that `\mathbf{F}_q / \mathbf{F}_p` is Galois with Galois group
     `\langle \sigma \rangle`, which is also isomorphic to
     `\mathbf{Z}/d\mathbf{Z}`, where
-    `\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
+    `\sigma \in \operatorname{Gal}(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
     `\sigma \colon x \mapsto x^p`.
 
 .. function:: int fq_nmod_multiplicative_order(fmpz_t ord, const fq_nmod_t op, const fq_nmod_ctx_t ctx)

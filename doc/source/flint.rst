@@ -36,7 +36,7 @@
 
     Use ``thread_pool_wake`` to set this number for a given worker thread.
 
-.. function int flint_set_num_workers(int num_workers)
+.. function:: int flint_set_num_workers(int num_workers)
 
     Restricts the number of worker threads that can be started by the current
     thread to ``num_workers``. This function can be called from any thread.
@@ -58,7 +58,7 @@
     a function that one wishes to call from a thread, and cheaply restore the
     number of workers to its original value before exiting the current thread.
 
-.. function void flint_reset_num_workers(int num_workers)
+.. function:: void flint_reset_num_workers(int num_workers)
 
     After a call to ``flint_set_num_workers`` this function must be called to
     set the number of workers that may be started by the current thread back to

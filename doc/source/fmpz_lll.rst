@@ -18,7 +18,7 @@ matrix to be used during L^2 (approximate or exact).
 .. function:: void fmpz_lll_context_init_default(fmpz_lll_t fl)
 
     Sets ``fl->delta``, ``fl->eta``, ``fl->rt`` and ``fl->gt`` to
-    their default values, 0.99, 0.51, `Z_BASIS` and `APPROX` respectively.
+    their default values, 0.99, 0.51, `Z\_BASIS` and `APPROX` respectively.
 
 .. function:: void fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta, rep_type rt, gram_type gt)
 
@@ -27,10 +27,10 @@ matrix to be used during L^2 (approximate or exact).
     respectively. ``delta`` and ``eta`` are the L^2 parameters.
     ``delta`` and ``eta`` must lie in the intervals `(0.25, 1)` and
     (0.5, \sqrt{``delta``}) respectively. The representation type is input
-    using ``rt`` and can have the values `Z_BASIS` for a lattice basis and
+    using ``rt`` and can have the values `Z\_BASIS` for a lattice basis and
     `GRAM` for a Gram matrix. The Gram type to be used during computation can
     be specified using ``gt`` which can assume the values `APPROX` and
-    `EXACT`. Note that ``gt`` has meaning only when ``rt`` is `Z_BASIS`.
+    `EXACT`. Note that ``gt`` has meaning only when ``rt`` is `Z\_BASIS`.
 
 
 Random parameter generation
@@ -41,7 +41,7 @@ Random parameter generation
 
     Sets ``fl->delta`` and ``fl->eta`` to random values in the interval
     `(0.25, 1)` and (0.5, \sqrt{``delta``}) respectively. ``fl->rt`` is
-    set to `GRAM` or `Z_BASIS` and ``fl->gt`` is set to `APPROX` or `EXACT`
+    set to `GRAM` or `Z\_BASIS` and ``fl->gt`` is set to `APPROX` or `EXACT`
     in a pseudo random way.
 
 
@@ -148,7 +148,7 @@ These programs implement ideas from the book chapter \citep{Stehle2010}.
     well as its Gram matrix. The type of lattice representation can be
     specified via the parameter ``fl->rt``. The type of Gram matrix to be
     used in computation (approximate or exact) can also be specified through
-    the variable ``fl->gt`` (applies only if ``fl->rt`` == `Z_BASIS`).
+    the variable ``fl->gt`` (applies only if ``fl->rt`` == `Z\_BASIS`).
 
 .. function:: int fmpz_lll_d_heuristic(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
@@ -176,7 +176,7 @@ These programs implement ideas from the book chapter \citep{Stehle2010}.
 
     A wrapper of the above procedures. It begins with the greediest version
     (``fmpz_lll_d()``), then adapts to the version using heuristic inner
-    products only (``fmpz_lll_d_heuristic()``) if `fl->rt == Z_BASIS` and
+    products only (``fmpz_lll_d_heuristic()``) if `fl->rt == Z\_BASIS` and
     `fl->gt == APPROX`, and finally to the mpf version (``fmpz_lll_mpf()``)
     if needed.
 
@@ -188,7 +188,7 @@ These programs implement ideas from the book chapter \citep{Stehle2010}.
     well as its Gram matrix. The type of lattice representation can be
     specified via the parameter ``fl->rt``. The type of Gram matrix to be
     used in computation (approximate or exact) can also be specified through
-    the variable ``fl->gt`` (applies only if ``fl->rt`` == `Z_BASIS`).
+    the variable ``fl->gt`` (applies only if ``fl->rt`` == `Z\_BASIS`).
 
 
 .. function:: int fmpz_lll_d_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
@@ -222,7 +222,7 @@ These programs implement ideas from the book chapter \citep{Stehle2010}.
     addition of the removal boundary. It begins with the greediest version
     (``fmpz_lll_d_with_removal()``), then adapts to the version using
     heuristic inner products only (``fmpz_lll_d_heuristic_with_removal()``)
-    if `fl->rt == Z_BASIS` and `fl->gt == APPROX`, and finally to the mpf
+    if `fl->rt == Z\_BASIS` and `fl->gt == APPROX`, and finally to the mpf
     version (``fmpz_lll_mpf_with_removal()``) if needed.
 
 .. function:: int fmpz_lll_d_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
@@ -238,7 +238,7 @@ These programs implement ideas from the book chapter \citep{Stehle2010}.
     knapsack-type lattices. It begins with the greediest version and the engine
     of this version, (``fmpz_lll_d_with_removal_knapsack()``), then adapts
     to the version using heuristic inner products only
-    (``fmpz_lll_d_heuristic_with_removal()``) if `fl->rt == Z_BASIS` and
+    (``fmpz_lll_d_heuristic_with_removal()``) if `fl->rt == Z\_BASIS` and
     `fl->gt == APPROX`, and finally to the mpf version
     (``fmpz_lll_mpf_with_removal()``) if needed.
 
@@ -367,7 +367,7 @@ Main LLL functions
     well as its Gram matrix. The type of lattice representation can be
     specified via the parameter ``fl->rt``. The type of Gram matrix to be
     used in computation (approximate or exact) can also be specified through
-    the variable ``fl->gt`` (applies only if ``fl->rt`` == `Z_BASIS`).
+    the variable ``fl->gt`` (applies only if ``fl->rt`` == `Z\_BASIS`).
 
 
 .. function:: int fmpz_lll_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)

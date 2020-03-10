@@ -117,7 +117,7 @@ Factoring algorithms
     precision to lift the factors to, hensel lifts, and finally calls 
     Zassenhaus recombination.
 
-    Assumes that `\len(f) \geq 2`.
+    Assumes that `\operatorname{len}(f) \geq 2`.
 
     Assumes that `f` is primitive.
 

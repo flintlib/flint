@@ -794,7 +794,8 @@ Euclidean division
     the given length. This is used as a kind of precomputed inverse in
     the remainder routine below.
 
-.. function:: void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, fmpq_poly_t poly) Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of the given length. This is used as a kind of precomputed inverse in the remainder routine below.
+.. function:: void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, fmpq_poly_t poly)
+    Computes ``2*len - 1`` powers of $x$ modulo the polynomial $B$ of the given length. This is used as a kind of precomputed inverse in the remainder routine below.
 
 .. function:: void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)
 
@@ -865,7 +866,7 @@ Power series division
 .. function:: void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, const fmpz * A, const fmpz_t denA, slong lenA, const fmpz * B, const fmpz_t denB, slong lenB, slong n)
 
     Divides ``(A, denA, lenA)`` by ``(B, denB, lenB)`` as power series 
-    over `\Q`, assuming `B` has non-zero constant term and that
+    over `\mathbb{Q}`, assuming `B` has non-zero constant term and that
     all lengths are positive.
 
     Aliasing is not supported.
@@ -875,7 +876,7 @@ Power series division
 
 .. function:: void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, const fmpq_poly_t B, slong n)
 
-    Performs power series division in `\Q[[x]] / (x^n)`.  The function 
+    Performs power series division in `\mathbb{Q}[[x]] / (x^n)`.  The function 
     considers the polynomials `A` and `B` as power series of length~`n` 
     starting with the constant terms.  The function assumes that `B` has 
     non-zero constant term and `n \geq 1`.
@@ -889,8 +890,8 @@ Greatest common divisor
 
     Computes the monic greatest common divisor `G` of `A` and `B`.
 
-    Assumes that `G` has space for `\len(B)` coefficients, 
-    where `\len(A) \geq \len(B) > 0`.
+    Assumes that `G` has space for `\operatorname{len}(B)` coefficients, 
+    where `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
 
     Aliasing between the output and input arguments is not supported.
 
@@ -908,9 +909,9 @@ Greatest common divisor
     `G = \gcd(A, B) = S A + T B`, where `G` is the monic 
     greatest common divisor of `A` and `B`.
 
-    Assumes that `G`, `S`, and `T` have space for `\len(B)`, 
-    `\len(B)`, and `\len(A)` coefficients, respectively, 
-    where it is also assumed that `\len(A) \geq \len(B) > 0`.
+    Assumes that `G`, `S`, and `T` have space for `\operatorname{len}(B)`, 
+    `\operatorname{len}(B)`, and `\operatorname{len}(A)` coefficients, respectively, 
+    where it is also assumed that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
 
     Does not support zero padding of the input arguments.
 
@@ -929,8 +930,8 @@ Greatest common divisor
 
     Computes the monic least common multiple `L` of `A` and `B`.
 
-    Assumes that `L` has space for `\len(A) + \len(B) - 1` coefficients, 
-    where `\len(A) \geq \len(B) > 0`.
+    Assumes that `L` has space for `\operatorname{len}(A) + \operatorname{len}(B) - 1` coefficients, 
+    where `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
 
     Aliasing between the output and input arguments is not supported.
 
