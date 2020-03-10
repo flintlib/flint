@@ -30,7 +30,7 @@ Element access
 
 .. function:: void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val)
 
-    Set the entry at row ``i`` and column ``j` of ``mat`` to ``val``.
+    Set the entry at row ``i`` and column ``j`` of ``mat`` to ``val``.
 
 
 Memory management
@@ -56,7 +56,8 @@ Basic manipulation                                                              
 
 
 .. function:: slong fmpz_mod_mat_nrows(const fmpz_mod_mat_t mat)
-                                                                                              Return the number of rows of ``mat``.
+
+   Return the number of rows of ``mat``.
 
 .. function:: slong fmpz_mod_mat_ncols(const fmpz_mod_mat_t mat)
 

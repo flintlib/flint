@@ -172,7 +172,7 @@ Random matrix generation
 
     Sets a square matrix ``mat`` to a random *ajtai* matrix. 
     The diagonal entries `(i, i)` are set to a random entry in the range 
-    `[1, 2^{b-1}]` inclusive where `b = \floor{(2 r - i)^\alpha}` for some 
+    `[1, 2^{b-1}]` inclusive where `b = \lfloor(2 r - i)^\alpha\rfloor` for some 
     double parameter~`\alpha`. The entries below the diagonal in column~`i` 
     are set to a random entry in the range `(-2^b + 1, 2^b - 1)` whilst the 
     entries to the right of the diagonal in row~`i` are set to zero. 

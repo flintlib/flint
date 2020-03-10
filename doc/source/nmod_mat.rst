@@ -103,11 +103,11 @@ Concatenate
 
 .. function:: void nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
 
-    Sets ``res`` to vertical concatenation of (`mat1`, ``mat2``) in that order. Matrix dimensions : ``mat1`` : $m \times n$, ``mat2`` : $k \times n$, ``res`` : $(m + k) \times n$.
+    Sets ``res`` to vertical concatenation of (`mat1`, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
 
 .. function:: void nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
 
-    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : $m \times n$, ``mat2`` : $m \times k$, ``res``  : $m \times (n + k)$.
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
 
 
 Printing
@@ -120,12 +120,11 @@ Printing
     by the rows enclosed in brackets. Each column is right-aligned to the 
     width of the modulus written in decimal, and the columns are separated by 
     spaces.
-    For example:
-    \begin{lstlisting}
-    <2 x 3 integer matrix mod 2903>
-    [   0    0 2607]
-    [ 622    0    0]
-    \end{lstlisting}
+    For example::
+    
+        <2 x 3 integer matrix mod 2903>
+        [   0    0 2607]
+        [ 622    0    0]
 
 
 Random matrix generation
@@ -328,7 +327,7 @@ Matrix Exponentiation
 
 .. function:: void _nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
 
-.. function:: 	Sets $dest = mat^pow$. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
+.. function:: 	Sets `dest = mat^pow`. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
 
 .. function:: void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
 
@@ -406,11 +405,11 @@ Triangular solving
 
     Uses the block inversion formula
 
-    ``
-    \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
-    \begin{pmatrix} X \\ Y \end{pmatrix} =
-    \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-    ``
+    .. math ::
+        \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
+        \begin{pmatrix} X \\ Y \end{pmatrix} =
+        \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
+    
 
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
@@ -442,11 +441,11 @@ Triangular solving
 
     Uses the block inversion formula
 
-    ``
-    \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
-    \begin{pmatrix} X \\ Y \end{pmatrix} =
-    \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-    ``
+    .. math ::
+        \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
+        \begin{pmatrix} X \\ Y \end{pmatrix} =
+        \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
+    
 
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
@@ -459,7 +458,7 @@ Nonsingular square solving
 
 .. function:: int nmod_mat_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
 
-    Solves the matrix-matrix equation `AX = B` over `\Z / p \Z` where `p`
+    Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
     should have the same moduli.
 
@@ -468,7 +467,7 @@ Nonsingular square solving
 
 .. function:: int nmod_mat_solve_vec(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
 
-    Solves the matrix-vector equation `Ax = b` over `\Z / p \Z` where `p`
+    Solves the matrix-vector equation `Ax = b` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `A` which must be a prime number.
 
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the

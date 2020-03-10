@@ -56,11 +56,11 @@ Monomial arithemtic
 
 .. function:: void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 
-    Set \code{(exp_ptr, N)} to the difference of the monomials \code{(exp2, N)} and \code{(exp3, N)}, assuming \code{bits <= FLINT_BITS}
+    Set ``(exp_ptr, N)`` to the difference of the monomials ``(exp2, N)`` and ``(exp3, N)``, assuming ``bits <= FLINT_BITS``
 
 .. function:: void mpoly_monomial_sub_mp(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 
-    Set \code{(exp_ptr, N)} to the difference of the monomials \code{(exp2, N)} and \code{(exp3, N)}.
+    Set ``(exp_ptr, N)`` to the difference of the monomials ``(exp2, N)`` and ``(exp3, N)``.
 
 .. function:: int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
 

@@ -731,37 +731,37 @@ Division
 .. function:: void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
-    `A = B Q + R` with `0 \leq \len(R) < \len(B)`.
+    `A = B Q + R` with `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible
     modulo `p`, and that ``invB`` is the inverse.
 
-    Assumes that `\len(A), \len(B) > 0`.  Allows zero-padding in
+    Assumes that `\operatorname{len}(A), \operatorname{len}(B) > 0`.  Allows zero-padding in
     ``(A, lenA)``.  `R` and `A` may be aliased, but apart from this no
     aliasing of input and output operands is allowed.
 
 .. function:: void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \len(R) < \len(B)`.
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible
     modulo `p`.
 
 .. function:: void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A, slong lenA, const fmpz* B, slong lenB, const fmpz* Binv, slong lenBinv, const fmpz_t mod)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R)` less than
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
     ``lenB``, where `A` is of length ``lenA`` and `B` is of length
     ``lenB``. We require that `Q` have space for ``lenA - lenB + 1``
     coefficients. Furthermore, we assume that `Binv` is the inverse of the
-    reverse of `B` mod `x^{\len(B)}`. The algorithm used is to call
+    reverse of `B` mod `x^{\operatorname{len}(B)}`. The algorithm used is to call
     ``div_newton_n_preinv()`` and then multiply out and compute
     the remainder.
 
 .. function:: void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R) < \len(B)`.
-    We assume `Binv` is the inverse of the reverse of `B` mod `x^{\len(B)}`.
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
+    We assume `Binv` is the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
 
     It is required that the length of `A` is less than or equal to
     2*the length of `B` - 2.
@@ -772,7 +772,7 @@ Division
 .. function:: void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \len(R) < \len(B)` but only sets ``(Q, lenA - lenB + 1)``.
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
 
     Requires temporary space ``(R, lenA)``.  Allows aliasing
     only between `A` and `R`.  Allows zero-padding in `A` but
@@ -782,18 +782,18 @@ Division
 .. function:: void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \len(R) < \len(B)` assuming that the leading term
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` assuming that the leading term
     of `B` is a unit.
 
 .. function:: void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA, const fmpz* B, slong lenB, const fmpz* Binv, slong lenBinv, const fmpz_t mod)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\len(R)` less than ``lenB``, where ``A`` is of length ``lenA``
+    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
     and ``B`` is of length ``lenB``, but return only `Q`.
 
     We require that `Q` have space for ``lenA - lenB + 1`` coefficients
     and assume that the leading coefficient of `B` is a unit. Furthermore, we
-    assume that `Binv` is the inverse of the reverse of `B` mod `x^{\len(B)}`.
+    assume that `Binv` is the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
 
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
@@ -801,10 +801,10 @@ Division
 .. function:: void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv)
 
     Notionally computes `Q` and `R` such that `A = BQ + R` with
-    `\len(R) < \len(B)`, but returns only `Q`.
+    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
 
     We assume that the leading coefficient of `B` is a unit and that `Binv` is
-    the inverse of the reverse of `B` mod `x^{\len(B)}`.
+    the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
 
     It is required that the length of `A` is less than or equal to
     2*the length of `B` - 2.
@@ -820,7 +820,7 @@ Division
 .. function:: void _fmpz_mod_poly_rem_basecase(fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \len(R) < \len(B)` but only sets ``(R, lenB - 1)``.
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(R, lenB - 1)``.
 
     Allows aliasing only between `A` and `R`.  Allows zero-padding
     in `A` but not in `B`.  Assumes that the leading coefficient
@@ -829,40 +829,40 @@ Division
 .. function:: void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \len(R) < \len(B)` assuming that the leading term
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` assuming that the leading term
     of `B` is a unit.
 
 .. function:: void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, const fmpz * A, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Computes ``(Q, lenB)``, ``(BQ, 2 lenB - 1)`` such that
-    `BQ = B \times Q` and `A = B Q + R` where `0 \leq \len(R) < \len(B)`.
+    `BQ = B \times Q` and `A = B Q + R` where `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible
     modulo `p`, and that ``invB`` is the inverse.
 
-    Assumes `\len(B) > 0`.  Allows zero-padding in ``(A, lenA)``.  Requires
+    Assumes `\operatorname{len}(B) > 0`.  Allows zero-padding in ``(A, lenA)``.  Requires
     a temporary array ``(W, 2 lenB - 1)``.  No aliasing of input and output
     operands is allowed.
 
-    This function does not read the bottom `\len(B) - 1` coefficients from
+    This function does not read the bottom `\operatorname{len}(B) - 1` coefficients from
     `A`, which means that they might not even need to exist in allocated
     memory.
 
 .. function:: void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenB - 1)`` such that
-    `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+    `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible
     modulo `p`, and that ``invB`` is the inverse.
 
-    Assumes `\len(A) \geq \len(B) > 0`.  Allows zero-padding in
+    Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in
     ``(A, lenA)``.  No aliasing of input and output operands is
     allowed.
 
 .. function:: void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Computes `Q`, `R` such that `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+    Computes `Q`, `R` such that `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that `B` is non-zero and that the leading coefficient
     of `B` is invertible modulo `p`.
@@ -870,20 +870,20 @@ Division
 .. function:: void _fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenB - 1)`` such that
-    `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+    `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that `B` is non-zero, that the leading coefficient
     of `B` is invertible modulo `p` and that ``invB`` is
     the inverse.
 
-    Assumes `\len(A) \geq \len(B) > 0`.  Allows zero-padding in
+    Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in
     ``(A, lenA)``.  No aliasing of input and output operands is
     allowed.
 
 .. function:: void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Computes `Q`, `R` such that `A = B Q + R` and
-    `0 \leq \len(R) < \len(B)`.
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that `B` is non-zero and that the leading coefficient
     of `B` is invertible modulo `p`.
@@ -891,7 +891,7 @@ Division
 .. function:: void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Either finds a non-trivial factor~`f` of the modulus~`p`, or computes
-    `Q`, `R` such that `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+    `Q`, `R` such that `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     If the leading coefficient of `B` is invertible in `\mathbf{Z}/(p)`,
     the division with remainder operation is carried out, `Q` and `R` are
@@ -903,14 +903,14 @@ Division
 .. function:: void _fmpz_mod_poly_rem(fmpz *R, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Notationally, computes ``(Q, lenA - lenB + 1)``, ``(R, lenB - 1)``
-    such that `A = B Q + R` and `0 \leq \len(R) < \len(B)`, returning
+    such that `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`, returning
     only the remainder part.
 
     Assumes that `B` is non-zero, that the leading coefficient
     of `B` is invertible modulo `p` and that ``invB`` is
     the inverse.
 
-    Assumes `\len(A) \geq \len(B) > 0`.  Allows zero-padding in
+    Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in
     ``(A, lenA)``.  No aliasing of input and output operands is
     allowed.
 
@@ -923,7 +923,7 @@ Division
 .. function:: void fmpz_mod_poly_rem(fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R`
-    and `0 \leq \len(R) < \len(B)`, returning only the remainder
+    and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`, returning only the remainder
     part.
 
     Assumes that `B` is non-zero and that the leading coefficient
@@ -1008,10 +1008,10 @@ Greatest common divisor
 
 .. function:: slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
-    Sets `G` to the greatest common divisor of `(A, \len(A))`
-    and `(B, \len(B))` and returns its length.
+    Sets `G` to the greatest common divisor of `(A, \operatorname{len}(A))`
+    and `(B, \operatorname{len}(B))` and returns its length.
 
-    Assumes that `\len(A) \geq \len(B) > 0` and that the vector `G` has
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0` and that the vector `G` has
     space for sufficiently many coefficients.
 
     Assumes that ``invB`` is the inverse of the leading coefficients
@@ -1030,10 +1030,10 @@ Greatest common divisor
 
 .. function:: slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
-    Sets `G` to the greatest common divisor of `(A, \len(A))`
-    and `(B, \len(B))` and returns its length.
+    Sets `G` to the greatest common divisor of `(A, \operatorname{len}(A))`
+    and `(B, \operatorname{len}(B))` and returns its length.
 
-    Assumes that `\len(A) \geq \len(B) > 0` and that the vector `G` has
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0` and that the vector `G` has
     space for sufficiently many coefficients.
 
     Assumes that ``invB`` is the inverse of the leading coefficients
@@ -1050,11 +1050,11 @@ Greatest common divisor
 .. function:: slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
 
     Either sets `f = 1` and `G` to the greatest common divisor
-    of `(A, \len(A))` and `(B, \len(B))` and returns its length,
+    of `(A, \operatorname{len}(A))` and `(B, \operatorname{len}(B))` and returns its length,
     or sets `f \in (1,p)` to a non-trivial factor of `p` and
     leaves the contents of the vector `(G, lenB)` undefined.
 
-    Assumes that `\len(A) \geq \len(B) > 0` and that the vector `G` has
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0` and that the vector `G` has
     space for sufficiently many coefficients.
 
     Does not support aliasing of any of the input arguments
@@ -1072,11 +1072,11 @@ Greatest common divisor
 .. function:: slong _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
 
     Either sets `f = 1` and `G` to the greatest common divisor
-    of `(A, \len(A))` and `(B, \len(B))` and returns its length,
+    of `(A, \operatorname{len}(A))` and `(B, \operatorname{len}(B))` and returns its length,
     or sets `f \in (1,p)` to a non-trivial factor of `p` and
     leaves the contents of the vector `(G, lenB)` undefined.
 
-    Assumes that `\len(A) \geq \len(B) > 0` and that the vector `G` has
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0` and that the vector `G` has
     space for sufficiently many coefficients.
 
     Does not support aliasing of any of the input arguments
@@ -1103,21 +1103,21 @@ Greatest common divisor
 
 
 
-    Assumes that `\len(a) > \len(b) > 0`.
+    Assumes that `\operatorname{len}(a) > \operatorname{len}(b) > 0`.
 
-    Assumes that `A` and `B` have space of size at least `\len(a)`
-    and `\len(b)`, respectively.  On exit, ``*lenA`` and ``*lenB``
+    Assumes that `A` and `B` have space of size at least `\operatorname{len}(a)`
+    and `\operatorname{len}(b)`, respectively.  On exit, ``*lenA`` and ``*lenB``
     will contain the correct lengths of `A` and `B`.
 
     Assumes that ``M[0]``, ``M[1]``, ``M[2]``, and ``M[3]``
-    each point to a vector of size at least `\len(a)`.
+    each point to a vector of size at least `\operatorname{len}(a)`.
 
 .. function:: slong _fmpz_mod_poly_gcd_hgcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t mod)
 
     Computes the monic GCD of `A` and `B`, assuming that
-    `\len(A) \geq \len(B) > 0`.
+    `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
 
-    Assumes that `G` has space for `\len(B)` coefficients and
+    Assumes that `G` has space for `\operatorname{len}(B)` coefficients and
     returns the length of `G` on output.
 
 .. function:: void fmpz_mod_poly_gcd_hgcd(fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
@@ -1135,15 +1135,15 @@ Greatest common divisor
     Computes the GCD of `A` and `B` together with cofactors `S` and `T`
     such that `S A + T B = G`.  Returns the length of `G`.
 
-    Assumes that `\len(A) \geq \len(B) \geq 1` and
-    `(\len(A),\len(B)) \neq (1,1)`.
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
+    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
 
     No attempt is made to make the GCD monic.
 
-    Requires that `G` have space for `\len(B)` coefficients.  Writes
-    `\len(B)-1` and `\len(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\len(S) \leq \max(\len(B) - \len(G), 1)` and
-    `\len(T) \leq \max(\len(A) - \len(G), 1)`.
+    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
+    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
+    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
+    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
 
     No aliasing of input and output operands is permitted.
 
@@ -1172,16 +1172,16 @@ Greatest common divisor
 
 .. function:: slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t mod)
 
-    Computes the GCD of `A` and `B`, where `\len(A) \geq \len(B) > 0`,
+    Computes the GCD of `A` and `B`, where `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`,
     together with cofactors `S` and `T` such that `S A + T B = G`. Returns
     the length of `G`.
 
     No attempt is made to make the GCD monic.
 
-    Requires that `G` have space for `\len(B)` coefficients.  Writes
-    `\len(B) - 1` and `\len(A) - 1` coefficients to `S` and `T`,
-    respectively.  Note that, in fact, `\len(S) \leq \len(B) - \len(G)`
-    and `\len(T) \leq \len(A) - \len(G)`.
+    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
+    `\operatorname{len}(B) - 1` and `\operatorname{len}(A) - 1` coefficients to `S` and `T`,
+    respectively.  Note that, in fact, `\operatorname{len}(S) \leq \operatorname{len}(B) - \operatorname{len}(G)`
+    and `\operatorname{len}(T) \leq \operatorname{len}(A) - \operatorname{len}(G)`.
 
     Both `S` and `T` must have space for at least `2` coefficients.
 
@@ -1203,15 +1203,15 @@ Greatest common divisor
     Computes the GCD of `A` and `B` together with cofactors `S` and `T`
     such that `S A + T B = G`.  Returns the length of `G`.
 
-    Assumes that `\len(A) \geq \len(B) \geq 1` and
-    `(\len(A),\len(B)) \neq (1,1)`.
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
+    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
 
     No attempt is made to make the GCD monic.
 
-    Requires that `G` have space for `\len(B)` coefficients.  Writes
-    `\len(B)-1` and `\len(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\len(S) \leq \max(\len(B) - \len(G), 1)` and
-    `\len(T) \leq \max(\len(A) - \len(G), 1)`.
+    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
+    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
+    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
+    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
 
     No aliasing of input and output operands is permitted.
 
@@ -1237,13 +1237,13 @@ Greatest common divisor
     Computes ``(G, lenA)``, ``(S, lenB-1)`` such that
     `G \cong S A \pmod{B}`, returning the actual length of `G`.
 
-    Assumes that `0 < \len(A) < \len(B)`.
+    Assumes that `0 < \operatorname{len}(A) < \operatorname{len}(B)`.
 
 .. function:: void fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Computes polynomials `G` and `S`, both reduced modulo~`B`,
     such that `G \cong S A \pmod{B}`, where `B` is assumed to
-    have `\len(B) \geq 2`.
+    have `\operatorname{len}(B) \geq 2`.
 
     In the case that `A = 0 \pmod{B}`, returns `G = S = 0`.
 
@@ -1264,7 +1264,7 @@ Greatest common divisor
     Computes ``(G, lenA)``, ``(S, lenB-1)`` such that
     `G \cong S A \pmod{B}`, returning the actual length of `G`.
 
-    Assumes that `0 < \len(A) < \len(B)`.
+    Assumes that `0 < \operatorname{len}(A) < \operatorname{len}(B)`.
 
 .. function:: slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
 
@@ -1276,7 +1276,7 @@ Greatest common divisor
 
     Computes polynomials `G` and `S`, both reduced modulo~`B`,
     such that `G \cong S A \pmod{B}`, where `B` is assumed to
-    have `\len(B) \geq 2`.
+    have `\operatorname{len}(B) \geq 2`.
 
     In the case that `A = 0 \pmod{B}`, returns `G = S = 0`.
 
@@ -1292,7 +1292,7 @@ Greatest common divisor
     modulo the polynomial ``(P, lenP)``.  Returns `1` if ``(B, lenB)``
     is invertible and `0` otherwise.
 
-    Assumes that `0 < \len(B) < \len(P)`, and hence also `\len(P) \geq 2`,
+    Assumes that `0 < \operatorname{len}(B) < \operatorname{len}(P)`, and hence also `\operatorname{len}(P) \geq 2`,
     but supports zero-padding in ``(B, lenB)``.
 
     Does not support aliasing.
@@ -1587,7 +1587,9 @@ Multipoint evaluation
 
     Uses Horner's method iteratively.
 
-.. function:: void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly, slong plen, fmpz_poly_struct * const * tree, slong len, const fmpz_t mod) Evaluates (\code{poly}, \code{plen}) at the \code{len} values given by the precomputed subproduct tree \code{tree}.
+.. function:: void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly, slong plen, fmpz_poly_struct * const * tree, slong len, const fmpz_t mod)
+
+    Evaluates (``poly``, ``plen``) at the ``len`` values given by the precomputed subproduct tree ``tree``.
 
 .. function:: void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz * poly, slong plen, const fmpz * xs, slong n, const fmpz_t mod)
 
@@ -1887,7 +1889,7 @@ a polynomial `f(X)` with respect to a given radix `r(X)` as
     f(X) = \sum_{i = 0}^{N} b_i(X) r(X)^i
 
 
-where `N = \floor{\deg(f) / \deg(r)}`.
+where `N = \lfloor\deg(f) / \deg(r)\rfloor`.
 The algorithm implemented here is a recursive one, which performs
 Euclidean divisions by powers of `r` of the form `r^{2^i}`, and it
 has time complexity `\Theta(\deg(f) \log \deg(f))`.
@@ -1915,7 +1917,7 @@ depends on~`r` and an upper bound on the degree of~`f`.
     only assume that `p \geq 2`.
 
     Note that this precomputed data can be used for any `F` such that
-    `\len(F) \leq 2^k \deg(R)`.
+    `\operatorname{len}(F) \leq 2^k \deg(R)`.
 
 .. function:: void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, const fmpz_mod_poly_t R, slong degF)
 
@@ -1939,7 +1941,7 @@ depends on~`r` and an upper bound on the degree of~`f`.
     including zero-padding.
 
     Assumes that `W` is a vector providing temporary space
-    of length `\len(F) = 2^{i+1} \deg(R)`.
+    of length `\operatorname{len}(F) = 2^{i+1} \deg(R)`.
 
     The entire computation takes place over `\mathbf{Z} / p \mathbf{Z}`,
     where `p \geq 2` is a natural number.
@@ -1959,7 +1961,7 @@ depends on~`r` and an upper bound on the degree of~`f`.
         F = B_0 + B_1 R + \dotsb + B_N R^N,
 
 
-    where necessarily `N = \floor{\deg(F) / \deg(R)}`.
+    where necessarily `N = \lfloor\deg(F) / \deg(R)\rfloor`.
 
     Assumes that `R` is non-constant, i.e.\ `\deg(R) \geq 1`,
     and that the leading coefficient is a unit.
@@ -2017,13 +2019,13 @@ representation is ``"5*x^3+2*x+1"``.
 Berlekamp-Massey Algorithm
 --------------------------------------------------------------------------------
 
-    The fmpz_mod_berlekamp_massey_t manages an unlimited stream of points `a_1, a_2, \dots `.
+    The fmpz_mod_berlekamp_massey_t manages an unlimited stream of points `a_1, a_2, \dots .`
     At any point in time, after, say, `n` points have been added, a call to func::fmpz_mod_berlekamp_massey_reduce will
     calculate the polynomials `U`, `V` and `R` in the extended euclidean remainder sequence with
 
     .. math ::
 
-        `U*x^n + V*(a_1*x^(n-1) + a_{n-1}*x + \cdots + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2`.
+        `U*x^n + V*(a_1*x^{n-1} + \cdots + a_{n-1}*x + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2.`
 
     The polynomials `V` and `R` may be obtained with func::fmpz_mod_berlekamp_massey_V_poly and func::fmpz_mod_berlekamp_massey_R_poly.
     This class differs from func::fmpz_mod_poly_minpoly in the following respect. Let `v_i` denote the coefficient of `x^i` in `V`.

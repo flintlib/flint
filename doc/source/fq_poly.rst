@@ -791,19 +791,19 @@ Euclidean division
 .. function:: void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R, const fq_struct *A, slong lenA, const fq_struct *B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
-    `A = B Q + R` with `0 \leq \len(R) < \len(B)`.
+    `A = B Q + R` with `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible
     and that ``invB`` is its inverse.
 
-    Assumes that `\len(A), \len(B) > 0`.  Allows zero-padding in
+    Assumes that `\operatorname{len}(A), \operatorname{len}(B) > 0`.  Allows zero-padding in
     ``(A, lenA)``.  `R` and `A` may be aliased, but apart from
     this no aliasing of input and output operands is allowed.
 
 .. function:: void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R, const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
 
     Computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \len(R) < \len(B)`.
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible.  This can
     be taken for granted the context is for a finite field, that is, when
@@ -812,19 +812,19 @@ Euclidean division
 .. function:: void _fq_poly_divrem(fq_struct *Q, fq_struct *R, const fq_struct *A, slong lenA, const fq_struct *B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
-    `A = B Q + R` with `0 \leq \len(R) < \len(B)`.
+    `A = B Q + R` with `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible
     and that ``invB`` is its inverse.
 
-    Assumes that `\len(A), \len(B) > 0`.  Allows zero-padding in
+    Assumes that `\operatorname{len}(A), \operatorname{len}(B) > 0`.  Allows zero-padding in
     ``(A, lenA)``.  `R` and `A` may be aliased, but apart from
     this no aliasing of input and output operands is allowed.
 
 .. function:: void fq_poly_divrem(fq_poly_t Q, fq_poly_t R, const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
 
     Computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \len(R) < \len(B)`.
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible.  This can
     be taken for granted the context is for a finite field, that is, when
@@ -834,7 +834,7 @@ Euclidean division
 
     Either finds a non-trivial factor~`f` of the modulus of
     ``ctx``, or computes `Q`, `R` such that `A = B Q + R` and
-    `0 \leq \len(R) < \len(B)`.
+    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     If the leading coefficient of `B` is invertible, the division with
     remainder operation is carried out, `Q` and `R` are computed
@@ -857,7 +857,7 @@ Euclidean division
 .. function:: void _fq_poly_div_basecase(fq_struct *Q, fq_struct *R, const fq_struct *A, slong lenA, const fq_struct *B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with `0
-    \leq \len(R) < \len(B)` but only sets ``(Q, lenA - lenB + 1)``.
+    \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
 
     Requires temporary space ``(R, lenA)``.  If ``R`` is
     ``NULL``, then the temporary space will be allocated.  Allows
@@ -868,40 +868,40 @@ Euclidean division
 .. function:: void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
 
     Notionally finds polynomials `Q` and `R` such that `A = B Q + R` with
-    `\len(R) < \len(B)`, but returns only ``Q``. If `\len(B) = 0` an
+    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
     exception is raised.
 
 .. function:: void _fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * W, const fq_struct * A, const fq_struct * B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
 
     Computes ``(Q, lenB)``, ``(BQ, 2 lenB - 1)`` such that
-    `BQ = B \times Q` and `A = B Q + R` where `0 \leq \len(R) < \len(B)`.
+    `BQ = B \times Q` and `A = B Q + R` where `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible and that
     ``invB`` is the inverse.
 
-    Assumes `\len(B) > 0`.  Allows zero-padding in ``(A, lenA)``.  Requires
+    Assumes `\operatorname{len}(B) > 0`.  Allows zero-padding in ``(A, lenA)``.  Requires
     a temporary array ``(W, 2 lenB - 1)``.  No aliasing of input and output
     operands is allowed.
 
-    This function does not read the bottom `\len(B) - 1` coefficients from
+    This function does not read the bottom `\operatorname{len}(B) - 1` coefficients from
     `A`, which means that they might not even need to exist in allocated
     memory.
 
 .. function:: void _fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R, const fq_struct * A, slong lenA, const fq_struct * B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
-    `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+    `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible and that
     ``invB`` is the inverse.
 
-    Assumes `\len(A) \geq \len(B) > 0`.  Allows zero-padding in
+    Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in
     ``(A, lenA)``.  No aliasing of input and output operands is
     allowed.
 
 .. function:: void fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R, const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
 
-    Computes `Q`, `R` such that `A = B Q + R` and `0 \leq \len(R) < \len(B)`.
+    Computes `Q`, `R` such that `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that `B` is non-zero and that the leading coefficient of
     `B` is invertible.
@@ -909,12 +909,12 @@ Euclidean division
 .. function:: void _fq_poly_div_newton_n_preinv(fq_struct* Q, const fq_struct* A, slong lenA, const fq_struct* B, slong lenB, const fq_struct* Binv, slong lenBinv, const fq_struct ctx_t)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\len(R)` less than ``lenB``, where ``A`` is of length ``lenA``
+    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
     and ``B`` is of length ``lenB``, but return only `Q`.
 
     We require that `Q` have space for ``lenA - lenB + 1`` coefficients
     and assume that the leading coefficient of `B` is a unit. Furthermore, we
-    assume that `Binv` is the inverse of the reverse of `B` mod `x^{\len(B)}`.
+    assume that `Binv` is the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
 
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
@@ -922,10 +922,10 @@ Euclidean division
 .. function:: void fq_poly_div_newton_n_preinv(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B, const fq_poly_t Binv, const fq_ctx_t ctx)
 
     Notionally computes `Q` and `R` such that `A = BQ + R` with
-    `\len(R) < \len(B)`, but returns only `Q`.
+    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
 
     We assume that the leading coefficient of `B` is a unit and that `Binv` is
-    the inverse of the reverse of `B` mod `x^{\len(B)}`.
+    the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
 
     It is required that the length of `A` is less than or equal to
     2*the length of `B` - 2.
@@ -935,19 +935,19 @@ Euclidean division
 
 .. function:: void _fq_poly_divrem_newton_n_preinv(fq_struct* Q, fq_struct* R, const fq_struct* A, slong lenA, const fq_struct* B, slong lenB, const fq_struct* Binv, slong lenBinv, const fq_ctx_t ctx)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R)` less
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less
     than ``lenB``, where `A` is of length ``lenA`` and `B` is of
     length ``lenB``. We require that `Q` have space for
     ``lenA - lenB + 1`` coefficients. Furthermore, we assume that `Binv` is
-    the inverse of the reverse of `B` mod `x^{\len(B)}`. The algorithm
+    the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`. The algorithm
     used is to call ``div_newton_n_preinv()`` and then multiply out
     and compute the remainder.
 
 .. function:: void fq_poly_divrem_newton_preinv(fq_poly_t Q, fq_poly_t R, const fq_poly_t A, const fq_poly_t B, const fq_poly_t Binv, const fq_ctx_t ctx)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R) <
-    \len(B)`.  We assume `Binv` is the inverse of the reverse of `B`
-    mod `x^{\len(B)}`.
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) <
+    \operatorname{len}(B)`.  We assume `Binv` is the inverse of the reverse of `B`
+    mod `x^{\operatorname{len}(B)}`.
 
     It is required that the length of `A` is less than or equal to
     2*the length of `B` - 2.
@@ -1048,14 +1048,14 @@ Greatest common divisor
 
 
 
-    Assumes that `\len(a) > \len(b) > 0`.
+    Assumes that `\operatorname{len}(a) > \operatorname{len}(b) > 0`.
 
-    Assumes that `A` and `B` have space of size at least `\len(a)`
-    and `\len(b)`, respectively.  On exit, ``*lenA`` and ``*lenB``
+    Assumes that `A` and `B` have space of size at least `\operatorname{len}(a)`
+    and `\operatorname{len}(b)`, respectively.  On exit, ``*lenA`` and ``*lenB``
     will contain the correct lengths of `A` and `B`.
 
     Assumes that ``M[0]``, ``M[1]``, ``M[2]``, and ``M[3]``
-    each point to a vector of size at least `\len(a)`.
+    each point to a vector of size at least `\operatorname{len}(a)`.
 
 .. function:: void fq_poly_gcd_hgcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx)
 
@@ -1078,11 +1078,11 @@ Greatest common divisor
 .. function:: slong _fq_poly_gcd_euclidean_f(fq_t f, fq_struct *G, const fq_struct *A, slong lenA, const fq_struct *B, slong lenB, const fq_ctx_t ctx)
 
     Either sets `f = 1` and `G` to the greatest common divisor of
-    `(A,\len(A))` and `(B, \len(B))` and returns its length, or sets
+    `(A,\operatorname{len}(A))` and `(B, \operatorname{len}(B))` and returns its length, or sets
     `f` to a non-trivial factor of the modulus of ``ctx`` and leaves
     the contents of the vector `(G, lenB)` undefined.
 
-    Assumes that `\len(A) \geq \len(B) > 0` and that the vector `G`
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0` and that the vector `G`
     has space for sufficiently many coefficients.
 
 .. function:: void fq_poly_gcd_euclidean_f(fq_t f, fq_poly_t G, const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
@@ -1095,15 +1095,15 @@ Greatest common divisor
     Computes the GCD of `A` and `B` together with cofactors `S` and `T`
     such that `S A + T B = G`.  Returns the length of `G`.
 
-    Assumes that `\len(A) \geq \len(B) \geq 1` and
-    `(\len(A),\len(B)) \neq (1,1)`.
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
+    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
 
     No attempt is made to make the GCD monic.
 
-    Requires that `G` have space for `\len(B)` coefficients.  Writes
-    `\len(B)-1` and `\len(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\len(S) \leq \max(\len(B) - \len(G), 1)` and
-    `\len(T) \leq \max(\len(A) - \len(G), 1)`.
+    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
+    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
+    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
+    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
 
     No aliasing of input and output operands is permitted.
 
@@ -1123,15 +1123,15 @@ Greatest common divisor
     Computes the GCD of `A` and `B` together with cofactors `S` and `T`
     such that `S A + T B = G`.  Returns the length of `G`.
 
-    Assumes that `\len(A) \geq \len(B) \geq 1` and
-    `(\len(A),\len(B)) \neq (1,1)`.
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
+    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
 
     No attempt is made to make the GCD monic.
 
-    Requires that `G` have space for `\len(B)` coefficients.  Writes
-    `\len(B)-1` and `\len(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\len(S) \leq \max(\len(B) - \len(G), 1)` and
-    `\len(T) \leq \max(\len(A) - \len(G), 1)`.
+    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
+    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
+    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
+    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
 
     No aliasing of input and output operands is permitted.
 
@@ -1153,15 +1153,15 @@ Greatest common divisor
     sets `f` to a non-trivial factor of the modulus of ``ctx`` and
     leaves `G`, `S`, and `T` undefined.  Returns the length of `G`.
 
-    Assumes that `\len(A) \geq \len(B) \geq 1` and
-    `(\len(A),\len(B)) \neq (1,1)`.
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
+    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
 
     No attempt is made to make the GCD monic.
 
-    Requires that `G` have space for `\len(B)` coefficients.  Writes
-    `\len(B)-1` and `\len(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\len(S) \leq \max(\len(B) - \len(G), 1)` and
-    `\len(T) \leq \max(\len(A) - \len(G), 1)`.
+    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
+    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
+    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
+    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
 
     No aliasing of input and output operands is permitted.
 
@@ -1190,8 +1190,8 @@ Divisibility testing
     Returns `1` if ``(B, lenB)`` divides ``(A, lenA)`` exactly and
     sets `Q` to the quotient, otherwise returns `0`.
 
-    It is assumed that `\len(A) \geq \len(B) > 0` and that `Q` has space
-    for `\len(A) - \len(B) + 1` coefficients.
+    It is assumed that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0` and that `Q` has space
+    for `\operatorname{len}(A) - \operatorname{len}(B) + 1` coefficients.
 
     Aliasing of `Q` with either of the inputs is not permitted.
 

@@ -88,13 +88,13 @@ Basic arithmetic
 
 .. function:: ulong n_flog(ulong n, ulong b)
 
-    Returns `\floor{\log_b x}`.
+    Returns `\lfloor\log_b x\rfloor`.
 
     Assumes that `x \geq 1` and `b \geq 2`.
 
 .. function:: ulong n_clog(ulong n, ulong b)
 
-    Returns `\ceil{\log_b x}`.
+    Returns `\lceil\log_b x\rceil`.
 
     Assumes that `x \geq 1` and `b \geq 2`.
 
@@ -366,8 +366,8 @@ Greatest common divisor
     values `a` and `b` such that `a x - b y = g`. We require `x \geq y`.
 
     We claim that computing the extended greatest common divisor via the 
-    Euclidean algorithm always results in cofactor `\abs{a} < x/2`, 
-    `\abs{b} < x/2`, with perhaps some small degenerate exceptions.
+    Euclidean algorithm always results in cofactor `\lvert a \rvert < x/2`, 
+    `\lvert b\rvert < x/2`, with perhaps some small degenerate exceptions.
 
     We proceed by induction.
 
@@ -1332,19 +1332,20 @@ Primitive Roots and Discrete Logarithms
 
 .. function:: ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
 
-    Returns a primitive root for the multiplicative subgroup of `\Z/p\Z`
-    where `p` is prime given the factorisation (`factors`) of `p - 1`.
+    Returns a primitive root for the multiplicative subgroup of `\mathbb{Z}/p\mathbb{Z}`
+    where `p` is prime given the factorisation (``factors``) of `p - 1`.
 
 
 .. function:: ulong n_primitive_root_prime(ulong p)
 
-    Returns a primitive root for the multiplicative subgroup of `\Z/p\Z`
+    Returns a primitive root for the multiplicative subgroup of `\mathbb{Z}/p\mathbb{Z}`
     where `p` is prime.
 
 .. function:: ulong n_discrete_log_bsgs(ulong b, ulong a, ulong n)
 
-    Returns the discrete logarithm of `b` with respect to `a` in the
-    multiplicative subgroup of `\Z/n\Z` when `\Z/n\Z` is cyclic That is,
+    Returns the discrete logarithm of `b` with  respect to `a` in the
+    multiplicative subgroup of `\mathbb{Z}/n\mathbb{Z}` when `\mathbb{Z}/n\mathbb{Z}`
+    is cyclic That is,
     it returns an number `x` such that `a^x = b \bmod n`.  The
     multiplicative subgroup is only cyclic when `n` is `2`, `4`,
     `p^k`, or `2p^k` where `p` is an odd prime and `k` is a positive
@@ -1352,7 +1353,7 @@ Primitive Roots and Discrete Logarithms
 
 
 
-Elliptic curve method for factorization of \code{mp_limb_t}
+Elliptic curve method for factorization of ``mp_limb_t``
 --------------------------------------------------------------------------------
 
 
@@ -1369,7 +1370,7 @@ Elliptic curve method for factorization of \code{mp_limb_t}
     Montgomery projective coordinates.
 
 .. function:: void n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1, mp_limb_t x2, mp_limb_t z2, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf)
-
+ fs
     Sets the point `(x : z)` to the sum of `(x_1 : z_1)` and `(x_2 : z_2)`
     modulo `n`, given the difference `(x_0 : z_0)` according to the formula
 

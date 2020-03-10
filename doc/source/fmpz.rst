@@ -325,7 +325,7 @@ Conversion
 
     Assuming that the nonnegative integer ``in`` can be represented in the
     form ``out[0] + out[1]*X + ... + out[out_len - 1]*X^(out_len - 1)``,
-    where `X = 2^FLINT_BITS`, sets the corresponding elements of ``out``
+    where `X = 2^{FLINT\_BITS}`, sets the corresponding elements of ``out``
     so that this is true. It is assumed that ``out_len > 0``.
 
 .. function:: void fmpz_set_mpz(fmpz_t f, const mpz_t x)
@@ -602,8 +602,8 @@ Comparison
 
 .. function:: int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
 
-    Returns a negative value if `\abs{f} < \abs{g}`, positive value if 
-    `\abs{g} < \abs{f}`, otherwise returns `0`.
+    Returns a negative value if `\lvert f\rvert < \lvert g\rvert`, positive value if 
+    `\lvert g\rvert < \lvert f \rvert`, otherwise returns `0`.
 
 .. function:: int fmpz_equal(const fmpz_t f, const fmpz_t g)
 
@@ -869,7 +869,7 @@ Basic arithmetic
 .. function:: void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the signed remainder `y \equiv g \bmod h` satisfying
-    `-\abs{h}/2 < y \leq \abs{h}/2`.
+    `-\lvert h \rvert/2 < y \leq \lvert h\rvert/2`.
 
 .. function:: void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 
@@ -910,7 +910,7 @@ Basic arithmetic
 
 .. function:: slong fmpz_clog_ui(const fmpz_t x, ulong b)
 
-    Returns `\ceil{\log_b x}`.
+    Returns `\lceil\log_b x\rceil`.
 
     Assumes that `x \geq 1` and `b \geq 2` and that 
     the return value fits into a signed ``slong``.
@@ -919,7 +919,7 @@ Basic arithmetic
 
 .. function:: slong fmpz_flog_ui(const fmpz_t x, ulong b)
 
-    Returns `\floor{\log_b x}`.
+    Returns `\lfloor\log_b x\rfloor`.
 
     Assumes that `x \geq 1` and `b \geq 2` and that 
     the return value fits into a signed ``slong``.

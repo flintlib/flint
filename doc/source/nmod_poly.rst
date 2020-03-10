@@ -874,32 +874,32 @@ Division
 
 .. function:: void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W, mp_srcptr A, slong A_len, mp_srcptr B, slong B_len, nmod_t mod)
 
-    Finds `Q` and `R` such that `A = B Q + R` with `\len(R) < \len(B)`.
-    If `\len(B) = 0` an exception is raised. We require that ``W``
+    Finds `Q` and `R` such that `A = B Q + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
+    If `\operatorname{len}(B) = 0` an exception is raised. We require that ``W``
     is temporary space of ``NMOD_DIVREM_BC_ITCH(A_len, B_len, mod)``
     coefficients.
 
 .. function:: void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
-    Finds `Q` and `R` such that `A = B Q + R` with `\len(R) < \len(B)`.
-    If `\len(B) = 0` an exception is raised.
+    Finds `Q` and `R` such that `A = B Q + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
+    If `\operatorname{len}(B) = 0` an exception is raised.
 
 .. function:: void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, slong A_len, mp_srcptr B, slong B_len, nmod_t mod);
 
     Notionally finds polynomials `Q` and `R` such that `A = B Q + R` with
-    `\len(R) < \len(B)`, but returns only ``Q``. If `\len(B) = 0` an
+    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
     exception is raised. We require that ``W`` is temporary space of
     ``NMOD_DIV_BC_ITCH(A_len, B_len, mod)`` coefficients.
 
 .. function:: void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
 
     Notionally finds polynomials `Q` and `R` such that `A = B Q + R` with
-    `\len(R) < \len(B)`, but returns only ``Q``. If `\len(B) = 0` an
+    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
     exception is raised.
 
 .. function:: void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V, mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R)` less than
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
     ``lenB``, where ``A`` is of length ``2 * lenB - 1`` and ``B``
     is of length ``lenB``. Sets ``BQ`` to the low ``lenB - 1``
     coefficients of ``B * Q``. We require that ``Q`` have space for
@@ -909,49 +909,49 @@ Division
 
 .. function:: void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R)` less than
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
     ``lenB``, where ``A`` is of length ``lenA`` and ``B`` is of
     length ``lenB``. We require that ``Q`` have space for
     ``lenA - lenB + 1`` coefficients.
 
 .. function:: void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R) < \len(B)`.
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
 
 .. function:: void _nmod_poly_divrem_q0(mp_ptr Q, mp_ptr R, mp_srcptr A, mp_srcptr B, slong lenA, nmod_t mod)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R) < \len(B)`,
-    where `\len(A) = \len(B) > 0`.
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`,
+    where `\operatorname{len}(A) = \operatorname{len}(B) > 0`.
 
-    Requires that `Q` and `R` have space for `1` and `\len(B) - 1`
+    Requires that `Q` and `R` have space for `1` and `\operatorname{len}(B) - 1`
     coefficients, respectively.
 
     Does not support aliasing or zero-padding.
 
 .. function:: void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R) < \len(B)`,
-    where `\len(A) = \len(B) + 1 \geq \len(B) > 0`.
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`,
+    where `\operatorname{len}(A) = \operatorname{len}(B) + 1 \geq \operatorname{len}(B) > 0`.
 
-    Requires that `Q` and `R` have space for `\len(A) - \len(B) + 1` and
-    `\len(B) - 1` coefficients, respectively.
+    Requires that `Q` and `R` have space for `\operatorname{len}(A) - \operatorname{len}(B) + 1` and
+    `\operatorname{len}(B) - 1` coefficients, respectively.
 
     Does not support aliasing or zero-padding.
 
 .. function:: void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R)` less than
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
     ``lenB``, where ``A`` is of length ``lenA`` and ``B`` is of
     length ``lenB``. We require that ``Q`` have space for
     ``lenA - lenB + 1`` coefficients.
 
 .. function:: void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R) < \len(B)`.
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
 
 .. function:: void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V, mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R)` less than
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
     ``lenB``, where ``A`` is of length ``2 * lenB - 1`` and ``B``
     is of length ``lenB``. We require that ``Q`` have space for
     ``lenB`` coefficients and that ``W`` be temporary space of size
@@ -961,19 +961,19 @@ Division
 .. function:: void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\len(R)` less than ``lenB``, where ``A`` is of length ``lenA``
+    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
     and ``B`` is of length ``lenB``, but returns only ``Q``. We
     require that ``Q`` have space for ``lenA - lenB + 1`` coefficients.
 
 .. function:: void nmod_poly_div_divconquer(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 
     Notionally computes `Q` and `R` such that `A = BQ + R` with
-    `\len(R) < \len(B)`, but returns only `Q`.
+    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
 
 .. function:: void _nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\len(R)` less than ``lenB``, where ``A`` is of length ``lenA``
+    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
     and ``B`` is of length ``lenB``, but returns only ``Q``. We
     require that ``Q`` have space for ``lenA - lenB + 1`` coefficients.
 
@@ -989,10 +989,10 @@ Division
 .. function:: void _nmod_poly_rem_q1(mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Notationally, computes `Q` and `R` such that `A = BQ + R` with
-    `\len(R) < \len(B)`, where `\len(A) = \len(B) + 1 \geq \len(B) > 0`,
+    `\operatorname{len}(R) < \operatorname{len}(B)`, where `\operatorname{len}(A) = \operatorname{len}(B) + 1 \geq \operatorname{len}(B) > 0`,
     but returns only the remainder.
 
-    Requires that `R` has space for `\len(B) - 1` coefficients,
+    Requires that `R` has space for `\operatorname{len}(B) - 1` coefficients,
     respectively.
 
     Does not support aliasing or zero-padding.
@@ -1092,7 +1092,7 @@ Division
 .. function:: void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, slong Alen, mp_srcptr B, slong Blen, nmod_t mod)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\len(R)` less than ``lenB``, where ``A`` is of length ``lenA``
+    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
     and ``B`` is of length ``lenB``, but return only `Q`.
 
     We require that `Q` have space for ``lenA - lenB + 1`` coefficients
@@ -1104,7 +1104,7 @@ Division
 .. function:: void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 
     Notionally computes `Q` and `R` such that `A = BQ + R` with
-    `\len(R) < \len(B)`, but returns only `Q`.
+    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
 
     We assume that the leading coefficient of `B` is a unit.
 
@@ -1114,12 +1114,12 @@ Division
 .. function:: void _nmod_poly_div_newton_n_preinv (mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\len(R)` less than ``lenB``, where ``A`` is of length ``lenA``
+    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
     and ``B`` is of length ``lenB``, but return only `Q`.
 
     We require that `Q` have space for ``lenA - lenB + 1`` coefficients
     and assume that the leading coefficient of `B` is a unit. Furthermore, we
-    assume that `Binv` is the inverse of the reverse of `B` mod `x^{\len(B)}`.
+    assume that `Binv` is the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
 
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
@@ -1127,10 +1127,10 @@ Division
 .. function:: void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv)
 
     Notionally computes `Q` and `R` such that `A = BQ + R` with
-    `\len(R) < \len(B)`, but returns only `Q`.
+    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
 
     We assume that the leading coefficient of `B` is a unit and that `Binv` is
-    the inverse of the reverse of `B` mod `x^{\len(B)}`.
+    the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
 
     It is required that the length of `A` is less than or equal to
     2*the length of `B` - 2.
@@ -1140,7 +1140,7 @@ Division
 
 .. function:: void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, slong Alen, mp_srcptr B, slong Blen, nmod_t mod)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R)` less than
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
     ``lenB``, where `A` is of length ``lenA`` and `B` is of length
     ``lenB``. We require that `Q` have space for ``lenA - lenB + 1``
     coefficients. The algorithm used is to call ``div_newton()`` and then
@@ -1148,24 +1148,24 @@ Division
 
 .. function:: void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R) < \len(B)`.
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
     The algorithm used is to call ``div_newton()`` and then multiply out
     and compute the remainder.
 
 .. function:: void _nmod_poly_divrem_newton_n_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R)` less than
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
     ``lenB``, where `A` is of length ``lenA`` and `B` is of length
     ``lenB``. We require that `Q` have space for ``lenA - lenB + 1``
     coefficients. Furthermore, we assume that `Binv` is the inverse of the
-    reverse of `B` mod `x^{\len(B)}`. The algorithm used is to call
+    reverse of `B` mod `x^{\operatorname{len}(B)}`. The algorithm used is to call
     ``div_newton_n_preinv()`` and then multiply out and compute
     the remainder.
 
 .. function:: void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv)
 
-    Computes `Q` and `R` such that `A = BQ + R` with `\len(R) < \len(B)`.
-    We assume `Binv` is the inverse of the reverse of `B` mod `x^{\len(B)}`.
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
+    We assume `Binv` is the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
 
     It is required that the length of `A` is less than or equal to
     2*the length of `B` - 2.
@@ -1666,21 +1666,21 @@ Greatest common divisor
     and `A` and `B` are consecutive remainders in the Euclidean remainder
     sequence for the division of `a` by `b` satisfying \deg(A) \ge \frac{\deg(a)}{2} > \deg(B).
     Furthermore, `M` will be the product of ``[[q 1][1 0]]`` for the quotients ``q`` generated by such a remainder sequence.
-    Assumes that `\len(a) > \len(b) > 0`, i.e. `\deg(a) > `deg(b) > 1`.
+    Assumes that `\operatorname{len}(a) > \operatorname{len}(b) > 0`, i.e. `\deg(a) > `deg(b) > 1`.
 
-    Assumes that `A` and `B` have space of size at least `\len(a)`
-    and `\len(b)`, respectively.  On exit, ``*lenA`` and ``*lenB``
+    Assumes that `A` and `B` have space of size at least `\operatorname{len}(a)`
+    and `\operatorname{len}(b)`, respectively.  On exit, ``*lenA`` and ``*lenB``
     will contain the correct lengths of `A` and `B`.
 
     Assumes that ``M[0]``, ``M[1]``, ``M[2]``, and ``M[3]``
-    each point to a vector of size at least `\len(a)`.
+    each point to a vector of size at least `\operatorname{len}(a)`.
 
 .. function:: slong _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Computes the monic GCD of `A` and `B`, assuming that
-    `\len(A) \geq \len(B) > 0`.
+    `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
 
-    Assumes that `G` has space for `\len(B)` coefficients and
+    Assumes that `G` has space for `\operatorname{len}(B)` coefficients and
     returns the length of `G` on output.
 
 .. function:: void nmod_poly_gcd_hgcd(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B)
@@ -1712,15 +1712,15 @@ Greatest common divisor
     Computes the GCD of `A` and `B` together with cofactors `S` and `T`
     such that `S A + T B = G`.  Returns the length of `G`.
 
-    Assumes that `\len(A) \geq \len(B) \geq 1` and
-    `(\len(A),\len(B)) \neq (1,1)`.
+    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
+    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
 
     No attempt is made to make the GCD monic.
 
-    Requires that `G` have space for `\len(B)` coefficients.  Writes
-    `\len(B)-1` and `\len(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\len(S) \leq \max(\len(B) - \len(G), 1)` and
-    `\len(T) \leq \max(\len(A) - \len(G), 1)`.
+    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
+    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
+    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
+    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
 
     No aliasing of input and output operands is permitted.
 
@@ -1737,16 +1737,16 @@ Greatest common divisor
 
 .. function:: slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, mp_srcptr A, slong A_len, mp_srcptr B, slong B_len, nmod_t mod)
 
-    Computes the GCD of `A` and `B`, where `\len(A) \geq \len(B) > 0`,
+    Computes the GCD of `A` and `B`, where `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`,
     together with cofactors `S` and `T` such that `S A + T B = G`. Returns
     the length of `G`.
 
     No attempt is made to make the GCD monic.
 
-    Requires that `G` have space for `\len(B)` coefficients.  Writes
-    `\len(B) - 1` and `\len(A) - 1` coefficients to `S` and `T`,
-    respectively.  Note that, in fact, `\len(S) \leq \len(B) - \len(G)`
-    and `\len(T) \leq \len(A) - \len(G)`.
+    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
+    `\operatorname{len}(B) - 1` and `\operatorname{len}(A) - 1` coefficients to `S` and `T`,
+    respectively.  Note that, in fact, `\operatorname{len}(S) \leq \operatorname{len}(B) - \operatorname{len}(G)`
+    and `\operatorname{len}(T) \leq \operatorname{len}(A) - \operatorname{len}(G)`.
 
     Both `S` and `T` must have space for at least `2` coefficients.
 
@@ -1765,16 +1765,16 @@ Greatest common divisor
 
 .. function:: slong _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
-    Computes the GCD of `A` and `B`, where `\len(A) \geq \len(B) > 0`,
+    Computes the GCD of `A` and `B`, where `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`,
     together with cofactors `S` and `T` such that `S A + T B = G`. Returns
     the length of `G`.
 
     No attempt is made to make the GCD monic.
 
-    Requires that `G` have space for `\len(B)` coefficients.  Writes
-    `\len(B) - 1` and `\len(A) - 1` coefficients to `S` and `T`,
-    respectively.  Note that, in fact, `\len(S) \leq \len(B) - \len(G)`
-    and `\len(T) \leq \len(A) - \len(G)`.
+    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
+    `\operatorname{len}(B) - 1` and `\operatorname{len}(A) - 1` coefficients to `S` and `T`,
+    respectively.  Note that, in fact, `\operatorname{len}(S) \leq \operatorname{len}(B) - \operatorname{len}(G)`
+    and `\operatorname{len}(T) \leq \operatorname{len}(A) - \operatorname{len}(G)`.
 
     No aliasing of input and output operands is permitted.
 
@@ -1901,13 +1901,13 @@ Greatest common divisor
     Computes ``(G, lenA)``, ``(S, lenB-1)`` such that
     `G \cong S A \pmod{B}`, returning the actual length of `G`.
 
-    Assumes that `0 < \len(A) < \len(B)`.
+    Assumes that `0 < \operatorname{len}(A) < \operatorname{len}(B)`.
 
 .. function:: void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S, const nmod_poly_t A, const nmod_poly_t B)
 
     Computes polynomials `G` and `S`, both reduced modulo~`B`,
     such that `G \cong S A \pmod{B}`, where `B` is assumed to
-    have `\len(B) \geq 2`.
+    have `\operatorname{len}(B) \geq 2`.
 
     In the case that `A = 0 \pmod{B}`, returns `G = S = 0`.
 
@@ -1917,7 +1917,7 @@ Greatest common divisor
     modulo the polynomial ``(P, lenP)``.  Returns `1` if ``(B, lenB)``
     is invertible and `0` otherwise.
 
-    Assumes that `0 < \len(B) < \len(P)`, and hence also `\len(P) \geq 2`,
+    Assumes that `0 < \operatorname{len}(B) < \operatorname{len}(P)`, and hence also `\operatorname{len}(P) \geq 2`,
     but supports zero-padding in ``(B, lenB)``.
 
     Does not support aliasing.
@@ -1930,7 +1930,7 @@ Greatest common divisor
     ring `(\mathbf{Z}/p\mathbf{Z})[X]`, where we assume that `p` is a prime
     number.
 
-    If `\len(P) < 2`, raises an exception.
+    If `\operatorname{len}(P) < 2`, raises an exception.
 
     If the greatest common divisor of `B` and `P` is~`1`, returns~`1` and
     sets `A` to the inverse of `B`.  Otherwise, returns~`0` and the value
@@ -2267,12 +2267,19 @@ Transcendental functions
 
 The elementary transcendental functions of a formal power series `h`
 are defined as
-``\exp(h(x)) = \sum_{k=0}^{\infty} \frac{(h(x))^k}{k!}``
-``\log(h(x)) = \int_0^x \frac{h'(t)}{h(t)} dt``
-``\operatorname{atan}(h(x)) = \int_0^x\frac{h'(t)}{1+(h(t))^2} dt``
-``\operatorname{atanh}(h(x)) = \int_0^x\frac{h'(t)}{1-(h(t))^2} dt``
-``\operatorname{asin}(h(x)) = \int_0^x\frac{h'(t)}{\sqrt{1-(h(t))^2}} dt``
-``\operatorname{asinh}(h(x)) = \int_0^x\frac{h'(t)}{\sqrt{1+(h(t))^2}} dt``
+
+`\exp(h(x)) = \sum_{k=0}^{\infty} \frac{(h(x))^k}{k!}`
+
+`\log(h(x)) = \int_0^x \frac{h'(t)}{h(t)} dt`
+
+`\operatorname{atan}(h(x)) = \int_0^x\frac{h'(t)}{1+(h(t))^2} dt`
+
+`\operatorname{atanh}(h(x)) = \int_0^x\frac{h'(t)}{1-(h(t))^2} dt`
+
+`\operatorname{asin}(h(x)) = \int_0^x\frac{h'(t)}{\sqrt{1-(h(t))^2}} dt`
+
+`\operatorname{asinh}(h(x)) = \int_0^x\frac{h'(t)}{\sqrt{1+(h(t))^2}} dt`
+
 The functions sin, cos, tan, etc. are defined using standard inverse
 or functional relations.
 The logarithm function assumes that `h` has constant term `1`. All
@@ -2570,20 +2577,20 @@ Chinese Remaindering
 .. function:: int nmod_poly_multi_crt_precompute_p(nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * moduli, slong len)
 
     Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
-    A return of ``0`` indicates that the compilation failed and future calls to func::nmod_poly_multi_crt_precomp will leave the output undefined.
+    A return of ``0`` indicates that the compilation failed and future calls to :func:`nmod_poly_multi_crt_precomp` will leave the output undefined.
     A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) all of the moduli have positive degree and are pairwise relatively prime.
 
 .. function:: void nmod_poly_multi_crt_precomp(nmod_poly_t output, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * values)
 
 .. function:: void nmod_poly_multi_crt_precomp_p(nmod_poly_t output, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * values)
 
-    Set ``output`` to the polynomial of lowest possible degree that is congruent to ``values + i`` modulo the ``moduli + i`` in func::nmod_poly_multi_crt_precompute.
-    The inputs ``values + 0, ..., values + len - 1`` where ``len`` was used in func::nmod_poly_multi_crt_precompute are expected to be valid and have modulus matching the modulus of the moduli used in func::nmod_poly_multi_crt_precompute.
+    Set ``output`` to the polynomial of lowest possible degree that is congruent to ``values + i`` modulo the ``moduli + i`` in :func:`nmod_poly_multi_crt_precompute`.
+    The inputs ``values + 0, ..., values + len - 1`` where ``len`` was used in :func:`nmod_poly_multi_crt_precompute` are expected to be valid and have modulus matching the modulus of the moduli used in :func:`nmod_poly_multi_crt_precompute`.
 
 .. function:: int nmod_poly_multi_crt(nmod_poly_t output, const nmod_poly_struct * moduli, const nmod_poly_struct * values, slong len)
 
-    Perform the same operation as func::nmod_poly_multi_crt_precomp while internally constructing and destroying the precomputed data.
-    All of the remarks in func::nmod_poly_multi_crt_precompute apply.
+    Perform the same operation as :func:`nmod_poly_multi_crt_precomp` while internally constructing and destroying the precomputed data.
+    All of the remarks in :func:`nmod_poly_multi_crt_precompute` apply.
 
 .. function:: void nmod_poly_multi_crt_clear(nmod_poly_multi_crt_t CRT)
 
@@ -2591,13 +2598,13 @@ Chinese Remaindering
 
 .. function:: slong _nmod_poly_multi_crt_local_size(const nmod_poly_multi_crt_t CRT)
 
-    Return the required length of the output for func::_nmod_poly_multi_crt_run.
+    Return the required length of the output for :func:`_nmod_poly_multi_crt_run`.
 
 .. function:: void _nmod_poly_multi_crt_run(nmod_poly_struct * outputs, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * inputs)
 
 .. function:: void _nmod_poly_multi_crt_run_p(nmod_poly_struct * outputs, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * inputs)
 
-    Perform the same operation as func::nmod_poly_multi_crt_precomp using supplied temporary space.
+    Perform the same operation as :func:`nmod_poly_multi_crt_precomp` using supplied temporary space.
     The actual output is placed in ``outputs + 0``, and ``outputs`` should contain space for all temporaries and should be at least as long as ``_nmod_poly_multi_crt_local_size(CRT)``.
     Of course the moduli of these temporaries should match the modulus of the inputs.
 
@@ -2605,17 +2612,17 @@ Chinese Remaindering
 Berlekamp-Massey Algorithm
 --------------------------------------------------------------------------------
 
-    The nmod_berlekamp_massey_t manages an unlimited stream of points `a_1, a_2, \dots `.
-    At any point in time, after, say, `n` points have been added, a call to func::nmod_berlekamp_massey_reduce will
+    The nmod_berlekamp_massey_t manages an unlimited stream of points `a_1, a_2, \dots.`
+    At any point in time, after, say, `n` points have been added, a call to :func:`nmod_berlekamp_massey_reduce` will
     calculate the polynomials `U`, `V` and `R` in the extended euclidean remainder sequence with
 
     .. math ::
 
         `U*x^n + V*(a_1*x^(n-1) + a_{n-1}*x + \cdots + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2`.
 
-    The polynomials `V` and `R` may be obtained with func::nmod_berlekamp_massey_V_poly and func::nmod_berlekamp_massey_R_poly.
-    This class differs from func::fmpz_mod_poly_minpoly in the following respect. Let `v_i` denote the coefficient of `x^i` in `V`.
-    func::fmpz_mod_poly_minpoly will return a polynomial `V` of lowest degree that annihilates the whole sequence `a_1, \dots, a_n` as
+    The polynomials `V` and `R` may be obtained with :func:`nmod_berlekamp_massey_V_poly` and :func:`nmod_berlekamp_massey_R_poly`.
+    This class differs from :func:`fmpz_mod_poly_minpoly` in the following respect. Let `v_i` denote the coefficient of `x^i` in `V`.
+    :func:`fmpz_mod_poly_minpoly` will return a polynomial `V` of lowest degree that annihilates the whole sequence `a_1, \dots, a_n` as
 
     .. math ::
 
@@ -2666,7 +2673,7 @@ Berlekamp-Massey Algorithm
 
 .. function:: const mp_limb_t * nmod_berlekamp_massey_points(const nmod_berlekamp_massey_t B)
 
-    Return a pointer to the array of points stored in ``B``. This may be ``NULL`` if func::nmod_berlekamp_massey_point_count returns ``0``.
+    Return a pointer to the array of points stored in ``B``. This may be ``NULL`` if :func:`nmod_berlekamp_massey_point_count` returns ``0``.
 
 .. function:: const nmod_poly_struct * nmod_berlekamp_massey_V_poly(const nmod_berlekamp_massey_t B)
 
