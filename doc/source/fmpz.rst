@@ -894,6 +894,11 @@ Basic arithmetic
     Sets `f` to `g^x` where `x` is an ``ulong``.  If 
     `x` is `0` and `g` is `0`, then `f` will be set to `1`.
 
+.. function:: int fmpz_pow_fmpz(fmpz_t f, const fmpz_t g, const fmpz_t x)
+
+    Set `f` to `g^x`. Return `1` for success and `0` for failure.
+    The function throws only if `x` is negative.
+
 .. function:: void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
 
     Sets `f` to `g^e \bmod{m}`.  If `e = 0`, sets `f` to `1`.

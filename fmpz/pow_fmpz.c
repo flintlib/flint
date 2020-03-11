@@ -11,28 +11,32 @@
 
 #include "fmpz.h"
 
-void fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e)
+int fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e)
 {
-    slong r = WORD(1);
-    FLINT_ASSERT(fmpz_sgn(e) >= 0);
+    int e_sgn = fmpz_sgn(e);
 
-    if (fmpz_is_zero(b))
+    if (e_sgn < 0)
     {
-        if (!fmpz_is_zero(e))
-            r = 0;
+        flint_throw(FLINT_ERROR, "Negative exponent in fmpz_pow_fmpz");
+    }
+    else if (e_sgn == 0)
+    {
+        fmpz_one(a);
+    }
+    else if (fmpz_is_zero(b))
+    {
+        fmpz_zero(a);
     }
     else if (fmpz_is_pm1(b))
     {
-        if (!fmpz_is_one(b) && !fmpz_is_even(e))
-            r = -WORD(1);
+        fmpz_set_si(a, fmpz_is_one(b) || fmpz_is_even(e) ? 1 : -1);
     }
     else
     {
-        if (fmpz_abs_fits_ui(e))
-            fmpz_pow_ui(a, b, fmpz_get_ui(e));
-        else
-            flint_throw(FLINT_ERROR, "Exponent too large in fmpz_pow_fmpz");
-        return;
+        if (!fmpz_fits_si(e))
+            return 0;
+
+        fmpz_pow_ui(a, b, fmpz_get_si(e));
     }
-    fmpz_set_si(a, r);
+    return 1;
 }

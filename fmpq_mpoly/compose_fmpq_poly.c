@@ -12,10 +12,11 @@
 #include "fmpq_mpoly.h"
 
 
-void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
+int fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
                          const fmpq_mpoly_t B, fmpq_poly_struct * const * C,
                                                   const fmpq_mpoly_ctx_t ctxB)
 {
+    int success = 0;
     slong i;
     fmpq * scales;
     fmpz_poly_struct ** Czpoly;
@@ -25,10 +26,10 @@ void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
     slong nvarsB = ctxB->zctx->minfo->nvars;
     TMP_INIT;
 
-    if (fmpq_mpoly_is_zero(B, ctxB))
+    if (B->zpoly->length == 0)
     {
         fmpq_poly_zero(A);
-        return;
+        return 1;
     }
 
     TMP_START;
@@ -60,11 +61,19 @@ void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
 
     *newB = *B->zpoly;
     newB->coeffs = _fmpz_vec_init(B->zpoly->length);
-    _fmpq_mpoly_rescale(Acontent, newB->coeffs, B, scales, ctxB);
 
-    fmpz_mpoly_compose_fmpz_poly(Azpoly, newB, Czpoly, ctxB->zctx);
+    if (!_fmpq_mpoly_rescale(Acontent, newB->coeffs, B, scales, ctxB))
+        goto cleanup;
+
+    if (!fmpz_mpoly_compose_fmpz_poly(Azpoly, newB, Czpoly, ctxB->zctx))
+        goto cleanup;
+
     fmpq_poly_set_fmpz_poly(A, Azpoly);
     fmpq_poly_scalar_mul_fmpq(A, A, Acontent);
+
+    success = 1;
+
+cleanup:
 
     _fmpz_vec_clear(newB->coeffs, B->zpoly->length);
 
@@ -78,6 +87,8 @@ void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
     fmpz_poly_clear(Azpoly);
 
     TMP_END;
+
+    return success;
 }
 
 

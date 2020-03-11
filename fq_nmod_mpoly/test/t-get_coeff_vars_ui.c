@@ -82,15 +82,20 @@ main(void)
             fq_nmod_mpoly_get_coeff_vars_ui(g, f, vars, exps, 1, ctx);
             fq_nmod_mpoly_assert_canonical(g, ctx);
             fq_nmod_mpoly_gen(m, var1, ctx);
-            fq_nmod_mpoly_pow_ui(m, m, j1, ctx);
+            if (!fq_nmod_mpoly_pow_ui(m, m, j1, ctx))
+            {
+                flint_printf("FAIL\n");
+                flint_printf("Check power success\ni = %wd, j1 = %wd\n", i, j1);
+                flint_abort();                
+            }
             fq_nmod_mpoly_mul(g, g, m, ctx);
             fq_nmod_mpoly_add(h, h, g, ctx);
         }
 
         if (!fq_nmod_mpoly_equal(f, h, ctx))
         {
-            flint_printf("FAIL\n"
-                         "check 1 variable sum of coefficients\ni = %wd\n", i);
+            flint_printf("FAIL\n");
+            flint_printf("Check 1 variable sum of coefficients\ni = %wd\n", i);
             flint_abort();
         }
 
@@ -146,10 +151,21 @@ main(void)
             fq_nmod_mpoly_get_coeff_vars_ui(g, f, vars, exps, 2, ctx);
             fq_nmod_mpoly_assert_canonical(g, ctx);
             fq_nmod_mpoly_gen(m, var1, ctx);
-            fq_nmod_mpoly_pow_ui(m, m, j1, ctx);
+            if (!fq_nmod_mpoly_pow_ui(m, m, j1, ctx))
+            {
+                flint_printf("FAIL\n");
+                flint_printf("Check power success\ni = %wd, j1 = %wd, j2 = %wd\n", i, j1, j2);
+                flint_abort();
+            }
             fq_nmod_mpoly_mul(g, g, m, ctx);
             fq_nmod_mpoly_gen(m, var2, ctx);
-            fq_nmod_mpoly_pow_ui(m, m, j2, ctx);
+            if (!fq_nmod_mpoly_pow_ui(m, m, j2, ctx))
+            {
+                flint_printf("FAIL\n");
+                flint_printf("Check power success\ni = %wd, j1 = %wd, j2 = %wd\n", i, j1, j2);
+                flint_abort();
+            }
+
             fq_nmod_mpoly_mul(g, g, m, ctx);
             fq_nmod_mpoly_add(h, h, g, ctx);
         }

@@ -11,37 +11,38 @@
 
 #include "fmpq_mpoly.h"
 
-void fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+int fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                            ulong k, const fmpq_mpoly_ctx_t ctx)
 {
-    slong kk = k;
+    slong success;
 
-    if (kk >= 0)
+    /* we have to work around the fact that there is no fmpq_pow_ui */
+    if (k <= WORD_MAX)
     {
-        fmpq_pow_si(A->content, B->content, kk);
+        fmpq_pow_si(A->content, B->content, k);
+        success = 1;
     }
     else if (fmpq_is_zero(B->content))
     {
         fmpq_mpoly_zero(A, ctx);
-        return;
+        return 1;
     }
     else
     {
-        /* we have to work around the fact that there is no fmpq_pow_ui */
         if (!fmpq_is_pm1(B->content))
         {
-            flint_throw(FLINT_ERROR, "Non-unit coefficient in fmpq_mpoly_pow_ui");
-        }
-
-        if ((k % UWORD(2)) == 0 || fmpq_is_one(B->content))
-        {
-            fmpq_one(A->content);
+            success = 0;
         }
         else
         {
-            fmpq_one(A->content);
-            fmpq_neg(A->content, A->content);
+            fmpz_set_si(fmpq_numref(A->content),
+                      (k % UWORD(2)) == 0 || fmpq_is_one(B->content) ? 1 : -1);
+            fmpz_one(fmpq_denref(A->content));
+            success = 1;
         }
     }
-    fmpz_mpoly_pow_ui(A->zpoly, B->zpoly, k, ctx->zctx);
+
+    success = success && fmpz_mpoly_pow_ui(A->zpoly, B->zpoly, k, ctx->zctx);
+
+    return success;
 }

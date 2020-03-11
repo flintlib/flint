@@ -22,6 +22,69 @@ main(void)
     flint_printf("compose_fmpz_poly....");
     fflush(stdout);
 
+    {
+        fmpz_poly_t A;
+        fmpz_mpoly_t B;
+        fmpz_poly_struct * Cp[3];
+        fmpz_poly_struct C[3];
+        fmpz_mpoly_ctx_t ctxB;
+
+        fmpz_mpoly_ctx_init(ctxB, 3, ORD_LEX);
+
+        fmpz_mpoly_init(B, ctxB);
+        fmpz_poly_init(A);
+        for (i = 0; i < 3; i++)
+        {
+            Cp[i] = C + i;
+            fmpz_poly_init(C + i);
+        }
+
+        fmpz_mpoly_set_str_pretty(B,
+                "1 + x1*x2^2 + x2^9999999999999999999999999*x3^9", NULL, ctxB);
+
+        fmpz_poly_zero(C + 0);
+        fmpz_poly_zero(C + 1);
+        fmpz_poly_zero(C + 2);
+        fmpz_poly_set_coeff_si(C + 0, 1, 1);
+        fmpz_poly_set_coeff_si(C + 1, 2, 2);
+        fmpz_poly_set_coeff_si(C + 2, 3, 3);
+        if (fmpz_mpoly_compose_fmpz_poly(A, B, Cp, ctxB))
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example 1\n", i);
+            flint_abort();
+        }
+
+        fmpz_poly_zero(C + 0);
+        fmpz_poly_zero(C + 1);
+        fmpz_poly_zero(C + 2);
+        fmpz_poly_set_coeff_si(C + 0, 0, 1);
+        fmpz_poly_set_coeff_si(C + 1, 0, 1);
+        fmpz_poly_set_coeff_si(C + 2, 0, 1);
+        if (!fmpz_mpoly_compose_fmpz_poly(A, B, Cp, ctxB))
+        {
+            printf("FAIL\n");
+            flint_printf("Check example 2\n", i);
+            flint_abort();
+        }
+
+        fmpz_poly_zero(C + 0);
+        fmpz_poly_set_coeff_si(C + 0, 0, 3);
+        if (!fmpz_poly_equal(A, C + 0))
+        {
+            printf("FAIL\n");
+            flint_printf("Check example 2 equality\n", i);
+            flint_abort();
+        }
+
+        fmpz_mpoly_clear(B, ctxB);
+        fmpz_poly_clear(A);
+        for (i = 0; i < 3; i++)
+            fmpz_poly_clear(C + i);
+
+        fmpz_mpoly_ctx_clear(ctxB);
+    }
+
     /* Check composition and evalall commute */
     for (i = 0; i < 50*flint_test_multiplier(); i++)
     {
@@ -77,9 +140,16 @@ main(void)
 
         if (fmpz_mpoly_total_degree_si(f, ctx1) < 50)
         {
-            fmpz_mpoly_compose_fmpz_poly(g, f, vals1, ctx1);
-            fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1);
+            if (!fmpz_mpoly_compose_fmpz_poly(g, f, vals1, ctx1) ||
+                !fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluation success\ni: %wd\n", i);
+                flint_abort();
+            }
+
             fmpz_poly_evaluate_fmpz(ge, g, vals2);
+
             if (!fmpz_equal(fe, ge))
             {
                 printf("FAIL\n");
@@ -162,8 +232,15 @@ main(void)
         if (fmpz_mpoly_total_degree_si(f, ctx1) < 50)
         {
             fmpz_poly_t t;
-            fmpz_mpoly_compose_fmpz_poly(g, f, vals1, ctx1);
-            fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1);
+
+            if (!fmpz_mpoly_compose_fmpz_poly(g, f, vals1, ctx1) ||
+                !fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluation success\ni: %wd\n", i);
+                flint_abort();
+            }
+
             fmpz_poly_init(t);
             fmpz_poly_set_fmpz(t, fe);
             if (!fmpz_poly_equal(g, t))
@@ -246,8 +323,15 @@ main(void)
 
         {
             fmpz_poly_t t;
-            fmpz_mpoly_compose_fmpz_poly(g, f, vals1, ctx1);
-            fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1);
+
+            if (!fmpz_mpoly_compose_fmpz_poly(g, f, vals1, ctx1) ||
+                !fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluation success\ni: %wd\n", i);
+                flint_abort();
+            }
+
             fmpz_poly_init(t);
             fmpz_poly_set_fmpz(t, fe);
             if (!fmpz_poly_equal(g, t))

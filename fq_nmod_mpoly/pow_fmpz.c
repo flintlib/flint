@@ -11,65 +11,8 @@
 
 #include "fq_nmod_mpoly.h"
 
-/*
-void fq_nmod_pow_fmpz(fq_nmod_mod_t x, fq_nmod_mod_t a, const fmpz_t exp,
-                                                       const fq_nmod_ctx_t ctx)
-{
-    flint_bitcnt_t i, bits;
-    fq_nmod_t r;
 
-    FLINT_ASSERT(n != 0);
-    FLINT_ASSERT(a < n);
-    FLINT_ASSERT(fmpz_sgn(exp) >= 0);
-
-    if (fmpz_is_zero(exp))
-    {
-        fq_nmod_one(r, ctx);
-        return;
-    }
-
-    if (fq_nmod_is_zero(a, ctx))
-    {
-        fq_nmod_one(r, ctx);
-        return;
-    }
-
-    if (fq_nmod_is_one(a, ctx))
-    {
-        fq_nmod_one(r, ctx);
-        return;
-    }
-
-    bits = fmpz_bits(exp);
-    i = 0;
-
-    fq_nmod_init(r, ctx);
-    fq_nmod_set(r, a);
-
-    while (i < bits && fmpz_tstbit(exp, i) == 0)
-    {
-        fq_nmod_mul(r, r, r, ctx);
-        i++;
-    }
-
-    fq_nmod_set(x, r, ctx);
-
-    i++;
-    while (i < bits)
-    {
-        fq_nmod_mul(r, r, r, ctx);
-        if (fmpz_tstbit(exp, i) != 0)
-        {
-            fq_nmod_mul(x, x, r, ctx);
-        }
-        i++;
-    }
-
-    fq_nmod_clear(r, ctx);
-}
-*/
-
-void fq_nmod_mpoly_pow_fmpz(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
+int fq_nmod_mpoly_pow_fmpz(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
                                  const fmpz_t k, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -78,15 +21,10 @@ void fq_nmod_mpoly_pow_fmpz(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
     TMP_INIT;
 
     if (fmpz_sgn(k) < 0)
-    {
         flint_throw(FLINT_ERROR, "Negative power in fq_nmod_mpoly_pow_fmpz");
-    }
 
-    if (fmpz_abs_fits_ui(k))
-    {
-        fq_nmod_mpoly_pow_ui(A, B, fmpz_get_ui(k), ctx);
-        return;
-    }
+    if (fmpz_fits_si(k))
+        return fq_nmod_mpoly_pow_ui(A, B, fmpz_get_ui(k), ctx);
 
     /*
         we are raising a polynomial to an unreasonable exponent
@@ -96,13 +34,11 @@ void fq_nmod_mpoly_pow_fmpz(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
     if (B->length == 0)
     {
         fq_nmod_mpoly_zero(A, ctx);
-        return;
+        return 1;
     }
 
     if (B->length != 1)
-    {
-        flint_throw(FLINT_ERROR, "Multinomial in fq_nmod_mpoly_pow_fmpz");
-    }
+        return 0;
 
     TMP_START;
 
@@ -130,4 +66,6 @@ void fq_nmod_mpoly_pow_fmpz(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
         fmpz_clear(maxBfields + i);
 
     TMP_END;
+
+    return 1;
 }

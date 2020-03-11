@@ -825,18 +825,38 @@ FLINT_DLL void nmod_mpoly_derivative(nmod_mpoly_t A,
 
 /* Evaluation ****************************************************************/
 
+FLINT_DLL int _ff_poly_pow_fmpz_is_not_feasible(slong length, const fmpz_t e);
+
+FLINT_DLL int _ff_poly_pow_ui_is_not_feasible(slong length, ulong e);
+
 FLINT_DLL ulong nmod_mpoly_evaluate_all_ui(nmod_mpoly_t A,
                                const ulong * vals, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_evaluate_one_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                              slong var, ulong val, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
+FLINT_DLL int nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
                         const nmod_mpoly_t B, nmod_poly_struct * const * C,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
+FLINT_DLL void _nmod_mpoly_compose_mat(nmod_mpoly_t A,
+                            const nmod_mpoly_t B, const fmpz_mat_t M,
+                    const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC);
+
+FLINT_DLL int nmod_mpoly_compose_nmod_mpoly_geobucket(nmod_mpoly_t A,
                     const nmod_mpoly_t B, nmod_mpoly_struct * const * C,
+                    const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC);
+
+FLINT_DLL int nmod_mpoly_compose_nmod_mpoly_horner(nmod_mpoly_t A,
+                    const nmod_mpoly_t B, nmod_mpoly_struct * const * C,
+                    const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC);
+
+FLINT_DLL int nmod_mpoly_compose_nmod_mpoly(nmod_mpoly_t A,
+                    const nmod_mpoly_t B, nmod_mpoly_struct * const * C,
+                    const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC);
+
+FLINT_DLL void nmod_mpoly_compose_nmod_mpoly_gen(nmod_mpoly_t A,
+                    const nmod_mpoly_t B, const slong * c,
                     const nmod_mpoly_ctx_t ctxB, const nmod_mpoly_ctx_t ctxAC);
 
 
@@ -908,13 +928,10 @@ FLINT_DLL int _nmod_mpoly_mul_dense(nmod_mpoly_t P,
 
 /* Powering ******************************************************************/
 
-FLINT_DLL void nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B,
+FLINT_DLL int nmod_mpoly_pow_fmpz(nmod_mpoly_t A, const nmod_mpoly_t B,
                                    const fmpz_t k, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
-                                          ulong k, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
+FLINT_DLL int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                           ulong k, const nmod_mpoly_ctx_t ctx);
 
 
@@ -1028,6 +1045,9 @@ FLINT_DLL void nmod_mpoly_inflate(nmod_mpoly_t A, const nmod_mpoly_t B,
    Internal functions (guaranteed to change without notice)
 
 ******************************************************************************/
+
+FLINT_DLL void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
+                                          ulong k, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void _nmod_mpoly_to_nmod_poly_deflate(nmod_poly_t A, const nmod_mpoly_t B,
                         slong var, const ulong * Bshift, const ulong * Bstride,

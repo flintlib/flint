@@ -12,48 +12,52 @@
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly.h"
 
-void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
+int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                            ulong k, const nmod_mpoly_ctx_t ctx)
 {
+    int success = 1;
     slong i, exp_bits, N;
     fmpz * maxBfields;
     ulong * cmpmask;
     ulong * Bexp;
     int freeBexp;
+    fmpz_mpoly_t T;
+    slong Tlen;
+    fmpz * Bcoeffs_fmpz;
     TMP_INIT;
 
     if (k == 0)
     {
-        nmod_mpoly_set_ui(A, 1, ctx);
-        return;
+        nmod_mpoly_set_ui(A, ctx->ffinfo->mod.n > 1, ctx);
+        return 1;
     }
 
     if (B->length == 0)
     {
         nmod_mpoly_zero(A, ctx);
-        return;
+        return 1;
     }
 
     if (k == 1)
     {
         nmod_mpoly_set(A, B, ctx);
-        return;
+        return 1;
     }
 
     if (k == 2)
     {
         nmod_mpoly_mul_johnson(A, B, B, ctx);
-        return;
+        return 1;
     }
 
     if (A == B)
     {
         nmod_mpoly_t T;
         nmod_mpoly_init(T, ctx);
-        nmod_mpoly_pow_ui(T, B, k, ctx);
+        success = nmod_mpoly_pow_ui(T, B, k, ctx);
         nmod_mpoly_swap(A, T, ctx);
         nmod_mpoly_clear(T, ctx);
-        return;
+        return success;
     }
 
     TMP_START;
@@ -86,7 +90,7 @@ void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
                                                         B->length, ctx->minfo);
     }
 
-    if (B->length == WORD(1))
+    if (B->length == 1)
     {
         /* powering a monomial */
         nmod_mpoly_fit_length(A, WORD(1), ctx);
@@ -103,10 +107,6 @@ void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
     }
     else
     {
-        fmpz_mpoly_t T;
-        slong Tlen;
-        fmpz * Bcoeffs_fmpz;
-
         cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
@@ -119,26 +119,34 @@ void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
         Bcoeffs_fmpz = _fmpz_vec_init(B->length);
         _fmpz_vec_set_nmod_vec(Bcoeffs_fmpz, B->coeffs, B->length, ctx->ffinfo->mod);
 
-        if (!n_is_prime(ctx->ffinfo->mod.n))
+        if (ctx->ffinfo->mod.n > 99999 || !n_is_prime(ctx->ffinfo->mod.n))
         {
             slong Alen, Tlen;
+            ulong limit = (ulong)(WORD_MAX)/(ulong)(2*sizeof(fmpz));
 
-            Tlen = _fmpz_mpoly_pow_fps(&T->coeffs, &T->exps, &T->alloc,
-                       Bcoeffs_fmpz, Bexp, B->length, k, exp_bits, N, cmpmask);
-
-            nmod_mpoly_fit_length(A, Tlen, ctx);
-            nmod_mpoly_fit_bits(A, exp_bits, ctx);
-            A->bits = exp_bits;
-
-            Alen = 0;
-            for (i = 0; i < Tlen; i++)
+            if (B->length > 1 && k > limit/(ulong)(B->length - 1))
             {
-                A->coeffs[Alen] = fmpz_fdiv_ui(T->coeffs + i, ctx->ffinfo->mod.n);
-                mpoly_monomial_set(A->exps + N*Alen, T->exps + N*i, N);
-                Alen += (A->coeffs[Alen] != UWORD(0));
+                success = 0;
             }
+            else
+            {
+                Tlen = _fmpz_mpoly_pow_fps(&T->coeffs, &T->exps, &T->alloc,
+                           Bcoeffs_fmpz, Bexp, B->length, k, exp_bits, N, cmpmask);
 
-            _nmod_mpoly_set_length(A, Alen, ctx);
+                nmod_mpoly_fit_length(A, Tlen, ctx);
+                nmod_mpoly_fit_bits(A, exp_bits, ctx);
+                A->bits = exp_bits;
+
+                Alen = 0;
+                for (i = 0; i < Tlen; i++)
+                {
+                    A->coeffs[Alen] = fmpz_fdiv_ui(T->coeffs + i, ctx->ffinfo->mod.n);
+                    mpoly_monomial_set(A->exps + N*Alen, T->exps + N*i, N);
+                    Alen += (A->coeffs[Alen] != UWORD(0));
+                }
+
+                _nmod_mpoly_set_length(A, Alen, ctx);
+            }
         }
         else
         {
@@ -250,5 +258,6 @@ void nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
     }
 
     TMP_END;
-    return;
+
+    return success;
 }
