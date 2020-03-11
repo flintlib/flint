@@ -141,3 +141,10 @@ Floating-point support code
    mpfr_vec.rst
    mpfr_mat.rst
 
+References
+----------------
+
+.. toctree::
+   :maxdepth: 1
+
+   references.rst

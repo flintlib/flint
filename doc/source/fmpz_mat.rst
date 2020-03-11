@@ -193,7 +193,7 @@ Random matrix generation
     nonzero elements being random integers of the given bit size.
 
     The matrix can be transformed into a dense matrix with unchanged
-    rank by subsequently calling ``fmpz_mat_randops()``.
+    rank by subsequently calling :func:`fmpz_mat_randops`.
 
 .. function:: void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
 
@@ -202,10 +202,10 @@ Random matrix generation
 
     Note that the matrix will be zero if ``det`` is zero.  
     In order to generate a non-zero singular matrix, the function 
-    ``fmpz_mat_randrank()`` can be used.
+    :func:`fmpz_mat_randrank` can be used.
 
     The matrix can be transformed into a dense matrix with unchanged
-    determinant by subsequently calling ``fmpz_mat_randops()``.
+    determinant by subsequently calling :func:`fmpz_mat_randops`.
 
 .. function:: void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count)
 
@@ -243,12 +243,12 @@ Input and output
 .. function:: int fmpz_mat_print(const fmpz_mat_t mat)
 
     Prints the given matrix to the stream ``stdout``.  For further 
-    details, see ``fmpz_mat_fprint()``.
+    details, see :func:`fmpz_mat_fprint`.
 
 .. function:: int fmpz_mat_print_pretty(const fmpz_mat_t mat)
 
     Prints the given matrix to ``stdout``.  For further details, 
-    see ``fmpz_mat_fprint_pretty()``.
+    see :func:`fmpz_mat_fprint_pretty`.
 
 .. function:: int fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
 
@@ -396,7 +396,7 @@ Modular reduction and reconstruction
 
     This function is provided for convenience purposes.
     For reducing or reconstructing multiple integer matrices over the same
-    set of moduli, it is faster to use\\ ``fmpz_mat_multi_CRT_ui_precomp``.
+    set of moduli, it is faster to use :func:`fmpz_mat_multi_CRT_ui_precomp`.
 
 
 Addition and subtraction
@@ -460,7 +460,7 @@ Matrix-scalar arithmetic
 
     Set ``A = A + B*c`` where ``B`` is an ``nmod_mat_t`` and ``c``
     is a scalar respectively of type ``ulong`` or ``fmpz_t``.
-    The dimensions of ``A`` and ``B`` must be compatible.
+    The dimensions of ``A`` and ``B`` must be compat fsible.
 
 .. function:: void fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, slong c)
 
@@ -530,8 +530,8 @@ Matrix multiplication
     The ``bits`` parameter is a bound for the bit size of largest 
     element of `C`, or twice the absolute value of the largest element 
     if any elements of `C` are negative. The function
-    ``fmpz_mat_mul_multi_mod`` calculates a rigorous bound automatically.
-    If the default bound is too pessimistic, ``_fmpz_mat_mul_multi_mod``
+    :func:`fmpz_mat_mul_multi_mod` calculates a rigorous bound automatically.
+    If the default bound is too pessimistic, :func:`_fmpz_mat_mul_multi_mod`
     can be used with a custom bound.
 
     The matrices must have compatible dimensions for matrix multiplication.
@@ -541,8 +541,8 @@ Matrix multiplication
 
     Sets ``B`` to the square of the matrix ``A``, which must be
     a square matrix. Aliasing is allowed.
-    The function calls ``fmpz_mat_mul`` for dimensions less than 12 and
-    calls ``fmpz_mat_sqr_bodrato`` for cases in which the latter is faster.
+    The function calls :func:`fmpz_mat_mul` for dimensions less than 12 and
+    calls :func:`fmpz_mat_sqr_bodrato` for cases in which the latter is faster.
 
 .. function:: void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
@@ -620,9 +620,9 @@ Determinant
     Sets ``det`` to the determinant of the square matrix `A`.
     The matrix of dimension `0 \times 0` is defined to have determinant 1.
 
-    This function automatically chooses between ``fmpz_mat_det_cofactor``,\\
-    ``fmpz_mat_det_bareiss``, ``fmpz_mat_det_modular`` and\\
-    ``fmpz_mat_det_modular_accelerated``
+    This function automatically chooses between :func:`fmpz_mat_det_cofactor`,
+    :func:`fmpz_mat_det_bareiss`, :func:`fmpz_mat_det_modular` and
+    :func:`fmpz_mat_det_modular_accelerated`
     (with ``proved`` = 1), depending on the size of the matrix
     and its entries.
 
