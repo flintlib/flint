@@ -256,7 +256,7 @@ Strong echelon form and Howell form
 
     Transforms `mat` into the strong echelon form of `mat`. The Howell form and the
     strong echelon form are equal up to permutation of the rows, see
-    \cite{FieHof2014} for a definition of the strong echelon form and the
+    [FieHof2014]_ for a definition of the strong echelon form and the
     algorithm used here.
 
     `mat` must have at least as many rows as columns.
@@ -264,7 +264,7 @@ Strong echelon form and Howell form
 .. function:: slong fmpz_mod_mat_howell_form_mod(fmpz_mod_mat_t mat)
 
     Transforms `mat` into the Howell form of `mat`.  For a definition of the
-    Howell form see \cite{StoMul1998}. The Howell form is computed by first
+    Howell form see [StoMul1998]_. The Howell form is computed by first
     putting `mat` into strong echelon form and then ordering the rows.
 
     `mat` must have at least as many rows as columns.

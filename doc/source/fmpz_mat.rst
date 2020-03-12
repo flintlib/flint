@@ -460,7 +460,7 @@ Matrix-scalar arithmetic
 
     Set ``A = A + B*c`` where ``B`` is an ``nmod_mat_t`` and ``c``
     is a scalar respectively of type ``ulong`` or ``fmpz_t``.
-    The dimensions of ``A`` and ``B`` must be compat fsible.
+    The dimensions of ``A`` and ``B`` must be compatible.
 
 .. function:: void fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, slong c)
 
@@ -548,7 +548,7 @@ Matrix multiplication
 
     Sets ``B`` to the square of the matrix ``A``, which must be
     a square matrix. Aliasing is allowed.
-    The bodrato algorithm is described in \cite{Bodrato2010}.
+    The bodrato algorithm is described in [Bodrato2010]_.
     It is highly efficient for squaring matrices which satisfy both the 
     following conditions  : (a) large elements  (b) dimensions less than 150.
 
@@ -668,7 +668,7 @@ Determinant
     small primes not dividing `d`. This typically accelerates the
     computation by requiring fewer primes for large matrices, since `d`
     with high probability will be nearly as large as the determinant.
-    This trick is described in \citep{AbbottBronsteinMulders1999}.
+    This trick is described in [AbbottBronsteinMulders1999]_.
 
 .. function:: void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A, const fmpz_t d, int proved)
 
@@ -894,7 +894,9 @@ allowed between arguments.
 .. function:: int fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
-    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.                            Returns 1 if `A` is nonsingular and 0 if `A` is singular.                                 The computed denominator will not generally be minimal.
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.
+    Returns 1 if `A` is nonsingular and 0 if `A` is singular.
+    The computed denominator will not generally be minimal.
 
     Uses the Dixon lifting algorithm with early termination once the lifting
     stabilises.
@@ -902,7 +904,9 @@ allowed between arguments.
 .. function:: int fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
-    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.                            Returns 1 if `A` is nonsingular and 0 if `A` is singular.                                 The computed denominator will not generally be minimal.
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.
+    Returns 1 if `A` is nonsingular and 0 if `A` is singular.
+    The computed denominator will not generally be minimal.
 
     Uses a Chinese remainder algorithm with early termination once the lifting
     stabilises.
@@ -942,7 +946,7 @@ Row reduction
     and the sign is decided by the parity of the permutation. Note that the
     determinant is not generally the minimal denominator.
 
-    The fraction-free LU decomposition is defined in \citep{NakTurWil1997}.
+    The fraction-free LU decomposition is defined in [NakTurWil1997]_.
 
 .. function:: slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
@@ -966,7 +970,7 @@ Row reduction
     using back substitution. Scaling each completed row in the back
     substitution to the denominator ``den``, we avoid introducing
     new fractions. This strategy is equivalent to the fraction-free
-    Gauss-Jordan elimination in \citep{NakTurWil1997}, but faster since
+    Gauss-Jordan elimination in [NakTurWil1997]_, but faster since
     only the part `V` corresponding to the null space has to be updated.
 
     The denominator ``den`` is set to `\pm \operatorname{det}(S)` where
@@ -984,7 +988,7 @@ Row reduction
     of this matrix will then define a non-singular submatrix of ``A``,
     nonsingular solving and matrix multiplication can then be used to determine 
     the reduced row echelon form of the whole of ``A``. This procedure is
-    described in \cite{Stein2007}.
+    described in [Stein2007]_.
 
 .. function:: int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den, slong rank)
 
@@ -1015,7 +1019,7 @@ Strong echelon form and Howell form
 
     Transforms `A` such that `A` modulo ``mod`` is the strong echelon form
     of the input matrix modulo ``mod``. The Howell form and the strong
-    echelon form are equal up to permutation of the rows, see \cite{FieHof2014}
+    echelon form are equal up to permutation of the rows, see [FieHof2014]_
     for a definition of the strong echelon form and the algorithm used here.
 
     `A` must have at least as many rows as columns.
@@ -1024,7 +1028,7 @@ Strong echelon form and Howell form
 
     Transforms `A` such that `A` modulo ``mod`` is the Howell form of the
     input matrix modulo ``mod``. 
-    For a definition of the Howell form see \cite{StoMul1998}. The Howell form
+    For a definition of the Howell form see [StoMul1998]_. The Howell form
     is computed by first putting `A` into strong echelon form and then ordering
     the rows.
 
@@ -1095,14 +1099,14 @@ Hermite normal form
     implementations in FLINT as per ``fmpz_mat_hnf``.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
-    the same as that of ``A`` and ``U`` must be square of compatible 
+    the same as that of ``A`` and ``U`` must be square of \compatible 
     dimension (having the same number of rows as ``A``).
 
 .. function:: void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
 
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of ``A``. The algorithm used is straightforward and
-    is described, for example, in \cite[Algorithm 2.4.4]{Coh1996}.
+    is described, for example, in [Algorithm 2.4.4] [Coh1996]_.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1112,7 +1116,7 @@ Hermite normal form
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of ``A``. The algorithm used is an improvement on the
     basic algorithm and uses extended gcds to speed up computation, this method
-    is described, for example, in \cite[Algorithm 2.4.5]{Coh1996}.
+    is described, for example, in [Algorithm 2.4.5] [Coh1996]_.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1123,8 +1127,8 @@ Hermite normal form
     Hermite normal form of the `m\times n` matrix ``A``, where ``A`` is
     assumed to be of rank `n` and ``D`` is known to be a positive multiple of
     the determinant of the non-zero rows of ``H``. The algorithm used here is
-    due to Domich, Kannan and Trotter \cite{DomKanTro1987} and is also described
-    in \cite[Algorithm 2.4.8]{Coh1996}.
+    due to Domich, Kannan and Trotter [DomKanTro1987]_ and is also described
+    in [Algorithm 2.4.8] [Coh1996]_.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1134,14 +1138,14 @@ Hermite normal form
     Transforms the `m\times n` matrix ``A`` into Hermite normal form,
     where ``A`` is assumed to be of rank `n` and ``D`` is known to be a
     positive multiple of the largest elementary divisor of ``A``.
-    The algorithm used here is described in \cite{FieHof2014}.
+    The algorithm used here is described in [FieHof2014]_.
 
 .. function:: void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
 
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of the `m\times n` matrix ``A``, where ``A`` is
     assumed to be of rank `n`. The algorithm used here is due to Kannan and
-    Bachem \cite{KanBac1979} and takes the principal minors to Hermite normal
+    Bachem [KanBac1979]_ and takes the principal minors to Hermite normal
     form in turn.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
@@ -1151,7 +1155,7 @@ Hermite normal form
 
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of the `m\times n` matrix ``A``. The algorithm used
-    here is due to Pernet and Stein \cite{PernetStein2010}.
+    here is due to Pernet and Stein [PernetStein2010]_.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1189,7 +1193,7 @@ Smith normal form
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
     normal form of the diagonal matrix ``A``. The algorithm used here is due
-    to Kannan and Bachem \cite{KanBac1979} 
+    to Kannan and Bachem [KanBac1979]_ 
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
@@ -1198,7 +1202,7 @@ Smith normal form
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
     normal form of the nonsingular `n\times n` matrix ``A``. The algorithm
-    used is due to Iliopoulos \cite{Iliopoulos1989}.
+    used is due to Iliopoulos [Iliopoulos1989]_.
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.

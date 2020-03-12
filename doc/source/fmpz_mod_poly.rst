@@ -1128,7 +1128,7 @@ Greatest common divisor
     the zero polynomial.
 
     The time complexity of the algorithm is `\mathcal{O}(n \log^2 n)`
-    ring operations. For further details, see~\citep{ThullYap1990}.
+    ring operations. For further details, see~[ThullYap1990]_.
 
 .. function:: slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 

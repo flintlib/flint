@@ -1246,7 +1246,7 @@ Evaluation
     and stores the result in ``dest``. The dimension and modulus of
     ``dest`` is assumed to be same as that of ``c``. ``dest`` and
     ``c`` may be aliased. Paterson-Stockmeyer algorithm is used to compute
-    the result. The algorithm is described in \cite{Paterson1973}.
+    the result. The algorithm is described in [Paterson1973]_.
 
 .. function:: void nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
 
@@ -1691,7 +1691,7 @@ Greatest common divisor
     the zero polynomial.
 
     The time complexity of the algorithm is `\mathcal{O}(n \log^2 n)`.
-    For further details, see~\citep{ThullYap1990}.
+    For further details, see~[ThullYap1990]_.
 
 .. function:: slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
@@ -1995,7 +1995,7 @@ Power series composition
     space for ``n`` coefficients. Does not support aliasing between any
     of the inputs and the output.
 
-    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
 
 .. function:: void nmod_poly_compose_series_brent_kung(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
 
@@ -2003,7 +2003,7 @@ Power series composition
     modulo `x^n`, where the constant term of ``poly2`` is required
     to be zero.
 
-    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
 
 .. function:: void _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong N, nmod_t mod)
 
@@ -2112,7 +2112,7 @@ Power series reversion
     It is required that `Q_0 = 0` and that `Q_1` as well as the integers
     `1, 2, \ldots, n-1` are invertible modulo the modulus.
 
-    This implementation uses Newton iteration \cite{BrentKung1978}.
+    This implementation uses Newton iteration [BrentKung1978]_.
 
 .. function:: void nmod_poly_revert_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 
@@ -2123,7 +2123,7 @@ Power series reversion
     It is required that `Q_0 = 0` and that `Q_1` as well as the integers
     `1, 2, \ldots, n-1` are invertible modulo the modulus.
 
-    This implementation uses Newton iteration \cite{BrentKung1978}.
+    This implementation uses Newton iteration [BrentKung1978]_.
 
 .. function:: void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
 
@@ -2340,7 +2340,7 @@ of polynomial multiplication.
     Set `f = \exp(h) + O(x^n)` where ``h`` is a polynomial. Assume
     `n > 0`. Aliasing of `g` and `h` is not allowed.
 
-    Uses Newton iteration (the version given in \cite{HanZim2004}).
+    Uses Newton iteration (the version given in [HanZim2004]_).
     For small `n`, falls back to the basecase algorithm.
 
 .. function:: void _nmod_poly_exp_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
@@ -2356,7 +2356,7 @@ of polynomial multiplication.
     Assumes `n > 0` and that `h` is zero-padded
     as necessary to length `n`. Aliasing is not allowed.
 
-    Uses Newton iteration (the version given in \cite{HanZim2004}).
+    Uses Newton iteration (the version given in [HanZim2004]_).
     For small `n`, falls back to the basecase algorithm.
 
 .. function:: void nmod_poly_exp_series(nmod_poly_t g, const nmod_poly_t h, slong n)

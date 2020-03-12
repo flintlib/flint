@@ -660,7 +660,7 @@ Dedekind sums
 --------------------------------------------------------------------------------
 
 Most of the definitions and relations used in the following section
-are given by Apostol \cite{Apostol1997}. The Dedekind sum `s(h,k)` is
+are given by Apostol [Apostol1997]_. The Dedekind sum `s(h,k)` is
 defined for all integers `h` and `k` as
 
 .. math ::

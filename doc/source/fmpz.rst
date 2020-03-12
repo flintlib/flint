@@ -1319,7 +1319,7 @@ Primality testing
 .. function:: int fmpz_is_probabprime_lucas(const fmpz_t n)
 
     Performs a Lucas probable prime test with parameters chosen by Selfridge's
-    method `A` as per \citep{BaiWag1980}.
+    method `A` as per [BaiWag1980]_.
 
     Return `1` if `n` is a Lucas probable prime, otherwise return `0`. This
     function declares some composites probably prime, but no primes composite.
@@ -1327,7 +1327,7 @@ Primality testing
 .. function:: int fmpz_is_probabprime_BPSW(const fmpz_t n)
 
     Perform a Baillie-PSW probable prime test with parameters chosen by 
-    Selfridge's method `A` as per \citep{BaiWag1980}.
+    Selfridge's method `A` as per [BaiWag1980]_.
 
     Return `1` if `n` is a Lucas probable prime, otherwise return `0`. 
 

@@ -821,10 +821,10 @@ Primality testing
     Implements a Baillie--Pomerance--Selfridge--Wagstaff probable primality
     test. This is a variant of the usual BPSW test (which only uses strong
     base-2 probable prime and Lucas-Selfridge tests, see Baillie and
-    Wagstaff \citep{BaiWag1980}).
+    Wagstaff [BaiWag1980]_).
 
     This implementation makes use of a weakening of the usual Baillie-PSW
-    test given in  \citep{Chen2003}, namely replacing the Lucas test with a
+    test given in  [Chen2003]_, namely replacing the Lucas test with a
     Fibonacci test when `n \equiv 2, 3 \pmod{5}`, (see also the comment on 
     page 143 of [CraPom2005]_) regarding Fibonacci pseudoprimes.
 
