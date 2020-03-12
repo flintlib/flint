@@ -131,7 +131,7 @@ Shift
 Varieties of LLL
 --------------------------------------------------------------------------------
 
-These programs implement ideas from the book chapter \citep{Stehle2010}.
+These programs implement ideas from the book chapter [Stehle2010]_.
 
 .. function:: int fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
@@ -262,7 +262,7 @@ ULLL
 LLL-reducedness
 --------------------------------------------------------------------------------
 
-These programs implement ideas from the paper \citep{Villard2007}.
+These programs implement ideas from the paper [Villard2007]_.
 
 .. function:: int fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
 

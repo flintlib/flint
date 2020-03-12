@@ -122,7 +122,7 @@ Basic arithmetic with precomputed inverses
 
 .. function:: ulong n_preinvert_limb(ulong n)
 
-    Returns a precomputed inverse of `n`, as defined in \citep{GraMol2010}.
+    Returns a precomputed inverse of `n`, as defined in [GraMol2010]_.
     This precomputed inverse can be used with all of the functions that
     take a precomputed inverse whose names are suffixed by ``_preinv``.
     
@@ -139,7 +139,7 @@ Basic arithmetic with precomputed inverses
 .. function:: ulong n_mod_precomp(ulong a, ulong n, double ninv)
 
     Returns `a \bmod{n}` given a precomputed inverse of `n` computed 
-    by\\ ``n_precompute_inverse()``. We require ``n < 2^FLINT_D_BITS``
+    by :func:`n_precompute_inverse`. We require ``n < 2^FLINT_D_BITS``
     and ``a < 2^(FLINT_BITS-1)`` and `0 \leq a < n^2`.
 
     We assume the processor is in the standard round to nearest
@@ -168,62 +168,58 @@ Basic arithmetic with precomputed inverses
 
 .. function:: ulong n_mod2_precomp(ulong a, ulong n, double ninv)
 
-    Returns `a \bmod{n}` given a precomputed inverse of `n` computed by\\ 
-    ``n_precompute_inverse()``. There are no restrictions on `a` or 
+    Returns `a \bmod{n}` given a precomputed inverse of `n` computed by 
+    :func:`n_precompute_inverse`. There are no restrictions on `a` or 
     on `n`.
 
-    As for ``n_mod_precomp()`` for `n < 2^{53}` and `a < n^2` the 
+    As for :func:`n_mod_precomp` for `n < 2^{53}` and `a < n^2` the 
     computed quotient is either what we are after or one too large or small. 
     We deal with these cases. Otherwise we can be sure that the 
     top `52` bits of the quotient are computed correctly. We take
     the remainder and adjust the quotient by multiplying the
     remainder by ``ninv`` to compute another approximate quotient as
-    per ``mod_precomp``. Now the remainder may be either 
+    per :func:`mod_precomp`. Now the remainder may be either 
     negative or positive, so the quotient we compute may be one
     out in either direction.
 
 .. function:: ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv)
 
     Returns `a \bmod{n}` and sets `q` to the quotient of `a` by `n`, given a
-    precomputed inverse of `n` computed by ``n_preinvert_limb()``. There are
+    precomputed inverse of `n` computed by :func:`n_preinvert_limb()`. There are
     no restrictions on `a` and the only restriction on `n` is that it be
     nonzero. 
 
-    This uses the algorithm of Granlund and M\"oller \citep{GraMol2010}. First
+    This uses the algorithm of Granlund and M\"oller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim and the remainder shifted back.
 
 .. function:: ulong n_div2_preinv(ulong a, ulong n, ulong ninv)
 
     Returns the Euclidean quotient of `a` by `n` given a precomputed inverse of
-    `n` computed by ``n_preinvert_limb()``. There are no restrictions on `a`
+    `n` computed by :func:`n_preinvert_limb`. There are no restrictions on `a`
     and the only restriction on `n` is that it be nonzero. 
 
-    This uses the algorithm of Granlund and M\"oller \citep{GraMol2010}. First
+    This uses the algorithm of Granlund and M\"oller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim.
 
 .. function:: ulong n_mod2_preinv(ulong a, ulong n, ulong ninv)
 
     Returns `a \bmod{n}` given a precomputed inverse of `n` computed by 
-    ``n_preinvert_limb()``. There are no restrictions on `a` and the only
+    :func:`n_preinvert_limb()`. There are no restrictions on `a` and the only
     restriction on `n` is that it be nonzero. 
 
-    This uses the algorithm of Granlund and M\"oller \citep{GraMol2010}. First
+    This uses the algorithm of Granlund and M\"oller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim and the result shifted back.
 
-    % Torbjorn Granlund and Niels Moller
-    % Improved Division by Invariant Integers
-    % https://gmplib.org/ tege/division-paper.pdf
-
 .. function:: ulong n_divrem2_precomp(ulong * q, ulong a, ulong n, double npre)
 
-    Returns `a \bmod{n}` given a precomputed inverse of `n` computed by\\ 
-    ``n_precompute_inverse()`` and sets `q` to the quotient. There 
+    Returns `a \bmod{n}` given a precomputed inverse of `n` computed by 
+    :func:`n_precompute_inverse` and sets `q` to the quotient. There 
     are no restrictions on `a` or on `n`.
 
-    This is as for ``n_mod2_precomp()`` with some additional care taken
+    This is as for :func:`n_mod2_precomp` with some additional care taken
     to retain the quotient information. There are also special
     cases to deal with the case where `a` is already reduced modulo 
     `n` and where `n` is `64` bits and `a` is not reduced modulo `n`.
@@ -231,40 +227,33 @@ Basic arithmetic with precomputed inverses
 .. function:: ulong n_ll_mod_preinv(ulong a_hi, ulong a_lo, ulong n, ulong ninv)
 
     Returns `a \bmod{n}` given a precomputed inverse of `n` computed by 
-    ``n_preinvert_limb()``. There are no restrictions on `a`, which
+    :func:`n_preinvert_limb`. There are no restrictions on `a`, which
     will be two limbs ``(a_hi, a_lo)``, or on `n`.
 
     The old version of this function merely reduced the top limb 
-    ``a_hi`` modulo `n` so that ``udiv_qrnnd_preinv()`` could 
+    ``a_hi`` modulo `n` so that :func:`udiv_qrnnd_preinv()` could 
     be used.
 
     The new version reduces the top limb modulo `n` as per 
-    ``n_mod2_preinv()`` and then the algorithm of Granlund and 
-    M\"oller \citep{GraMol2010} is used again to reduce modulo `n`.
-
-    % Torbjorn Granlund and Niels Moller
-    % Improved Division by Invariant Integers
-    % http://www.lysator.liu.se/ nisse/archive/draft-division-paper.pdf
+    :func:`n_mod2_preinv` and then the algorithm of Granlund and 
+    M\"oller [GraMol2010]_ is used again to reduce modulo `n`.
 
 .. function:: ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv)
 
     Returns `a \bmod{n}`, where `a` has three limbs ``(a_hi, a_mi, a_lo)``, 
-    given a precomputed inverse of `n` computed by ``n_preinvert_limb()``. 
+    given a precomputed inverse of `n` computed by :func:`n_preinvert_limb`. 
     It is assumed that ``a_hi`` is reduced modulo `n`. There are no 
     restrictions on `n`.
 
     This function uses the algorithm of Granlund and 
-    M\"oller \citep{GraMol2010} to first reduce the top two limbs 
+    M\"oller [GraMol2010]_ to first reduce the top two limbs 
     modulo `n`, then does the same on the bottom two limbs.
 
-    % Torbjorn Granlund and Niels Moller
-    % Improved Division by Invariant Integers
-    % http://www.lysator.liu.se/ nisse/archive/draft-division-paper.pdf
 
 .. function:: ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv)
 
     Returns `a b \bmod{n}` given a precomputed inverse of `n` 
-    computed by\\ ``n_precompute_inverse()``. We require 
+    computed by :func:`n_precompute_inverse`. We require 
     ``n < 2^FLINT_D_BITS`` and `0 \leq a, b < n`.
 
     We assume the processor is in the standard round to nearest
@@ -278,29 +267,29 @@ Basic arithmetic with precomputed inverses
     an integer which reduces the value by less than `1`. We end up with a 
     value which can be no more than two above the quotient we are after and 
     no less than two below. However an argument similar to that for 
-    ``n_mod_precomp()`` shows that the truncated computed quotient cannot 
+    :func:`n_mod_precomp` shows that the truncated computed quotient cannot 
     be two smaller than the truncated exact quotient. In other words the 
     computed integer quotient is at most two above and one below the quotient 
     we are after.
 
 .. function:: ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
 
-    Returns `a b \bmod{n}` given a precomputed inverse of `n` computed by\\ 
-    ``n_preinvert_limb()``. There are no restrictions on `a`, `b` or 
-    on `n`. This is implemented by multiplying using ``umul_ppmm()`` and 
-    then reducing using ``n_ll_mod_preinv()``.
+    Returns `a b \bmod{n}` given a precomputed inverse of `n` computed by 
+    :func:`n_preinvert_limb`. There are no restrictions on `a`, `b` or 
+    on `n`. This is implemented by multiplying using :func:`umul_ppmm` and 
+    then reducing using :func:`n_ll_mod_preinv`.
 
 .. function:: ulong n_mulmod2(ulong a, ulong b, ulong n)
 
     Returns `a b \bmod{n}`. There are no restrictions on `a`, `b` or 
-    on `n`. This is implemented by multiplying using ``umul_ppmm()`` and 
-    then reducing using ``n_ll_mod_preinv()`` after computing a precomputed
+    on `n`. This is implemented by multiplying using :func:`umul_ppmm` and 
+    then reducing using :func:`n_ll_mod_preinv` after computing a precomputed
     inverse.
 
 .. function:: ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm)
 
-    Returns `a b \pmod{n}` given a precomputed inverse of `n` computed by\\ 
-    ``n_preinvert_limb()``, assuming `a` and `b` are reduced modulo `n` 
+    Returns `a b \pmod{n}` given a precomputed inverse of `n` computed by 
+    :func:`n_preinvert_limb`, assuming `a` and `b` are reduced modulo `n` 
     and `n` is normalised, i.e. with most significant bit set. There are 
     no other restrictions on `a`, `b` or `n`.
 
@@ -311,11 +300,7 @@ Basic arithmetic with precomputed inverses
     ``norm`` will shift the product right by this many bits before
     reducing it.
 
-    The algorithm use is that of Granlund and M\"oller \citep{GraMol2010}.
-
-    % Torbjorn Granlund and Niels Moller
-    % Improved Division by Invariant Integers
-    % http://www.lysator.liu.se/ nisse/archive/draft-division-paper.pdf
+    The algorithm use is that of Granlund and M\"oller [GraMol2010]_.
 
 
 
@@ -332,7 +317,7 @@ Greatest common divisor
     which uses some branches to avoid most divisions.
 
     One wishes to compute the quotient and remainder of `u_3 / v_3` without 
-    division where possible. This is accomplished when `u_3 < 4 v_3`, i.e.\ 
+    division where possible. This is accomplished when `u_3 < 4 v_3`, i.e. 
     the quotient is either `1`, `2` or `3`.
 
     We first compute `s = u_3 - v_3`. If `s < v_3`, i.e.\ `u_3 < 2 v_3`, we 
@@ -385,7 +370,7 @@ Greatest common divisor
 
     Then `s + t q < r/2 + y_n / 2 q = (r + q y_n)/2 = x_n / 2`. 
 
-    See the documentation of ``n_gcd()`` for a description of the 
+    See the documentation of :func:`n_gcd` for a description of the 
     branching in the algorithm, which is faster than using division.
 
 
@@ -430,8 +415,8 @@ Modular Arithmetic
 .. function:: ulong n_powmod_precomp(ulong a, mp_limb_signed_t exp, ulong n, double npre)
 
     Returns ``a^exp`` modulo `n` given a precomputed inverse of `n` 
-    computed by\\ ``n_precompute_inverse()``. We require `n < 2^{53}` 
-    and `0 \leq a < n`. There are no restrictions on ``exp``, i.e.\ 
+    computed by :func:`n_precompute_inverse`. We require `n < 2^{53}` 
+    and `0 \leq a < n`. There are no restrictions on ``exp``, i.e. 
     it can be negative.
 
     This is implemented as a standard binary powering algorithm using
@@ -440,9 +425,9 @@ Modular Arithmetic
 .. function:: ulong n_powmod_ui_precomp(ulong a, ulong exp, ulong n, double npre)
 
     Returns ``a^exp`` modulo `n` given a precomputed inverse of `n` 
-    computed by\\ ``n_precompute_inverse()``. We require `n < 2^{53}` 
+    computed by :func:`n_precompute_inverse`. We require `n < 2^{53}` 
     and `0 \leq a < n`. The exponent ``exp`` is unsigned and so
-    can be larger than allowed by ``n_powmod_precomp``.
+    can be larger than allowed by :func:`n_powmod_precomp`.
 
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo `n` at each step.
@@ -459,7 +444,7 @@ Modular Arithmetic
 .. function:: ulong n_powmod2_preinv(ulong a, mp_limb_signed_t exp, ulong n, ulong ninv)
 
     Returns ``(a^exp) % n`` given a precomputed inverse of `n` computed 
-    by ``n_preinvert_limb()``. We require `0 \leq a < n`, but there are no 
+    by :func:`n_preinvert_limb`. We require `0 \leq a < n`, but there are no 
     restrictions on `n` or on ``exp``, i.e.\ it can be negative.
 
     This is implemented as a standard binary powering algorithm using
@@ -482,9 +467,9 @@ Modular Arithmetic
 .. function:: ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv)
 
     Returns ``(a^exp) % n`` given a precomputed inverse of `n` computed 
-    by ``n_preinvert_limb()``. We require `0 \leq a < n`, but there are no 
+    by :func:`n_preinvert_limb`. We require `0 \leq a < n`, but there are no 
     restrictions on `n`. The exponent ``exp`` is unsigned and so can be
-    larger than allowed by ``n_powmod2_preinv``.
+    larger than allowed by :func:`n_powmod2_preinv`.
 
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo `n` at each step.
@@ -492,7 +477,7 @@ Modular Arithmetic
 .. function:: ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp, ulong n, ulong ninv)
 
     Returns ``(a^exp) % n`` given a precomputed inverse of `n` computed 
-    by ``n_preinvert_limb()``. We require `0 \leq a < n`, but there are no 
+    by :func:`n_preinvert_limb`. We require `0 \leq a < n`, but there are no 
     restrictions on `n`. The exponent ``exp`` must not be negative.
 
     This is implemented as a standard binary powering algorithm using
@@ -537,7 +522,7 @@ Modular Arithmetic
     factorisation of ``m`` in ``fac``. The roots are stored in an array 
     which is created and whose address is stored in the location pointed to by 
     ``sqrt``. The array of roots is allocated by the function but must be 
-    cleaned up by the user by calling ``flint_free``. The number of roots 
+    cleaned up by the user by calling :func:`flint_free`. The number of roots 
     is returned by the function. If ``a`` is not a quadratic residue modulo 
     ``m`` then 0 is returned by the function and the location ``sqrt`` 
     points to is set to NULL. 
@@ -545,15 +530,15 @@ Modular Arithmetic
 .. function:: mp_limb_t n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
 
     Returns `w t \bmod{p}` given a precomputed scaled approximation of `w / p` 
-    computed by ``n_mulmod_precomp_shoup()``. The value of `p` should be 
-    less than `2^{\mathtt{FLINT_BITS} - 1}`. `w` and `t` should be less than `p`. 
-    Works faster than ``n_mulmod2_preinv()`` if `w` fixed and `t` from array
+    computed by :func:`n_mulmod_precomp_shoup`. The value of `p` should be 
+    less than `2^{\mathtt{FLINT\_BITS} - 1}`. `w` and `t` should be less than `p`. 
+    Works faster than :func:`n_mulmod2_preinv` if `w` fixed and `t` from array
     (for example, scalar multiplication of vector).
 
 .. function:: mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
 
     Returns `w'`, scaled approximation of `w / p`. `w'`  is equal to the integer 
-    part of `w * 2^{\mathtt{FLINT_BITS}} / p`.
+    part of `w * 2^{\mathtt{FLINT\_BITS}} / p`.
 
 
 Prime number generation and counting
@@ -575,7 +560,7 @@ Prime number generation and counting
 
     Small primes are looked up from ``flint_small_primes``.
     When this table is exhausted, primes are generated in blocks
-    by calling ``n_primes_sieve_range``.
+    by calling :func:`n_primes_sieve_range`.
 
 .. function:: void n_primes_jump_after(n_primes_t iter, ulong n)
 
@@ -606,7 +591,7 @@ Prime number generation and counting
 
     Returns a pointer to a read-only array of the first ``num_primes``
     prime numbers. The computed primes are cached for repeated calls.
-    The pointer is valid until the user calls ``n_cleanup_primes``
+    The pointer is valid until the user calls :func:`n_cleanup_primes`
     in the same thread.
 
 .. function:: const double * n_prime_inverses_arr_readonly(ulong n)
@@ -614,13 +599,13 @@ Prime number generation and counting
     Returns a pointer to a read-only array of inverses of the first
     ``num_primes`` prime numbers. The computed primes are cached for
     repeated calls. The pointer is valid until the user calls
-    ``n_cleanup_primes`` in the same thread.
+    :func:`n_cleanup_primes` in the same thread.
 
 .. function:: void n_cleanup_primes()
 
     Frees the internal cache of prime numbers used by the current thread.
     This will invalidate any pointers returned by
-    ``n_primes_arr_readonly`` or ``n_prime_inverses_arr_readonly``.
+    :func:`n_primes_arr_readonly` or :func:`n_prime_inverses_arr_readonly`.
 
 .. function:: ulong n_nextprime(ulong n, int proved)
 
@@ -648,7 +633,7 @@ Prime number generation and counting
 
     The upper approximation is `1.25506 n / \ln n`, and the 
     lower is `n / \ln n`.  These bounds are due to Rosser and 
-    Schoenfeld \citep{RosSch1962} and valid for `n \geq 17`.
+    Schoenfeld [RosSch1962]_ and valid for `n \geq 17`.
 
     We use the number of bits in `n` (or one less) to form an 
     approximation to `\ln n`, taking care to use a value too
@@ -664,33 +649,28 @@ Prime number generation and counting
 
 .. function:: void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n)
 
-    Calculates lower and upper bounds for the `n`th prime number `p_n`,
+    Calculates lower and upper bounds for the  `n` th prime number `p_n` ,
     ``lo <= p_n <= hi``. If ``lo`` and ``hi`` point to the same 
     location, the high value will be stored. Note that this function will 
     overflow for sufficiently large `n`.
 
-    We use the following estimates, valid for `n > 5`:
-    \begin{align*}
-    p_n  & >  n (\ln n + \ln \ln n - 1) \\
-    p_n  & <  n (\ln n + \ln \ln n) \\
-    p_n  & <  n (\ln n + \ln \ln n - 0.9427) \quad (n \geq 15985)
-    \end{align*}
+    We use the following estimates, valid for `n > 5` :
 
-    The first inequality was proved by Dusart \citep{Dus1999}, and the last 
-    is due to Massias and Robin \citep{MasRob1996}.  For a further overview, 
-    see \url{http://primes.utm.edu/howmany.shtml}.
+    .. math ::
+
+        \begin{align*}
+        p_n  & >  n (\ln n + \ln \ln n - 1) \\
+        p_n  & <  n (\ln n + \ln \ln n) \\
+        p_n  & <  n (\ln n + \ln \ln n - 0.9427) \quad (n \geq 15985)
+        \end{align*}
+
+    The first inequality was proved by Dusart [Dus1999]_, and the last 
+    is due to Massias and Robin [MasRob1996]_.  For a further overview, 
+    see http://primes.utm.edu/howmany.shtml .
 
     We bound `\ln n` using the number of bits in `n` as in 
     ``n_prime_pi_bounds()``, and estimate `\ln \ln n` to the nearest 
     integer; this function is nearly constant.
-
-    % P. Dusart, "The kth prime is greater than k(ln k+ln ln k-1) for k> 2,"
-    % Math. Comp., 68:225 (January 1999) 411--415.
-
-    % J. Massias and G. Robin, "Bornes effectives pour certaines fonctions
-    % concernant les nombres premiers," J. Theorie Nombres Bordeaux, 8
-    % (1996) 215-242.
-
 
 Primality testing
 --------------------------------------------------------------------------------
@@ -712,7 +692,7 @@ Primality testing
     `1`, otherwise `0`. For the algorithm to operate correctly 
     `n` should be odd and at least `17`. 
 
-    Lower and upper bounds are computed with ``n_prime_pi_bounds()``.
+    Lower and upper bounds are computed with :func:`n_prime_pi_bounds`.
     Once we have bounds on where to look in the table, we 
     refine our search with a simple binary algorithm, taking
     the top or bottom of the current interval as necessary.
@@ -725,30 +705,25 @@ Primality testing
     either way due to the number of iterations being too small. 
 
     The most time consuming part of the algorithm is factoring 
-    `n - 1`. For this reason ``n_factor_partial()`` is used, 
+    `n - 1`. For this reason :func:`n_factor_partial` is used, 
     which uses a combination of trial factoring and Hart's one 
-    line factor algorithm \citep{Har2009} to try to quickly factor `n - 1`. 
+    line factor algorithm [Har2012]_ to try to quickly factor `n - 1`. 
     Additionally if the cofactor is less than the square root of 
     `n - 1` the algorithm can still proceed.
 
     One can also specify a number of iterations if less time 
-    should be taken. Simply set this to `` WORD(0)`` if this is irrelevant.
+    should be taken. Simply set this to ``WORD(0)`` if this is irrelevant.
     In most cases a greater number of iterations will not 
     significantly affect timings as most of the time is spent 
     factoring.
 
     See 
-    \url{http://mathworld.wolfram.com/PocklingtonsTheorem.html}
+    http://mathworld.wolfram.com/PocklingtonsTheorem.html
     for a description of the algorithm.
 
 .. function:: int n_is_prime_pseudosquare(ulong n)
 
-    Tests if `n` is a prime according to \citep[Theorem 2.7]{LukPatWil1996}.
-
-    % "Some results on pseudosquares" by Lukes, Patterson and Williams,
-    % Math. Comp. vol 65, No. 213. pp 361-372. See 
-    % http://www.ams.org/mcom/1996-65-213/S0025-5718-96-00678-3/
-    %   S0025-5718-96-00678-3.pdf
+    Tests if `n` is a prime according to Theorem 2.7 [LukPatWil1996]_.
 
     We first factor `N` using trial division up to some limit `B`.
     In fact, the number of primes used in the trial factoring is at 
@@ -756,7 +731,7 @@ Primality testing
 
     Next we compute `N/B` and find the next pseudosquare `L_p` above
     this value, using a static table as per
-    \url{http://oeis.org/A002189/b002189.txt}.
+    http://oeis.org/A002189/b002189.txt .
 
     As noted in the text, if `p` is prime then Step 3 will pass. This
     test rejects many composites, and so by this time we suspect
@@ -782,9 +757,9 @@ Primality testing
 .. function:: int n_is_prime(ulong n)
 
     Tests if `n` is a prime. This first sieves for small prime factors,
-    then simply calls ``n_is_probabprime()``. This has been checked
+    then simply calls :func:`n_is_probabprime`. This has been checked
     against the tables of Feitsma and Galway
-    \url{http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html} and thus
+    http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html and thus
     constitutes a check for primality (rather than just pseudoprimality)
     up to `2^{64}`.
 
@@ -797,7 +772,7 @@ Primality testing
     Tests if `n` is a strong probable prime to the base `a`. We 
     require that `d` is set to the largest odd factor of `n - 1` and 
     ``npre`` is a precomputed inverse of `n` computed with 
-    ``n_precompute_inverse()``.  We also require that `n < 2^{53}`, 
+    :func:`n_precompute_inverse`.  We also require that `n < 2^{53}`, 
     `a` to be reduced modulo `n` and not `0` and `n` to be odd.
 
     If we write `n - 1 = 2^s d` where `d` is odd then `n` is a strong 
@@ -806,13 +781,13 @@ Primality testing
     than `s`.
 
     A description of strong probable primes is given here:
-    \url{http://mathworld.wolfram.com/StrongPseudoprime.html}
+    http://mathworld.wolfram.com/StrongPseudoprime.html
 
 .. function:: int n_is_strong_probabprime2_preinv(ulong n, ulong ninv, ulong a, ulong d)
 
     Tests if `n` is a strong probable prime to the base `a`. We require 
     that `d` is set to the largest odd factor of `n - 1` and ``npre`` 
-    is a precomputed inverse of `n` computed with ``n_preinvert_limb()``.
+    is a precomputed inverse of `n` computed with :func:`n_preinvert_limb`.
     We require a to be reduced modulo `n` and not `0` and `n` to be odd.
 
     If we write `n - 1 = 2^s d` where `d` is odd then `n` is a strong 
@@ -820,7 +795,7 @@ Primality testing
     or `(a^d)^{2^r} = -1 \pmod n` for some `r` less than `s`.
 
     A description of strong probable primes is given here:
-    \url{http://mathworld.wolfram.com/StrongPseudoprime.html}
+    http://mathworld.wolfram.com/StrongPseudoprime.html
 
 .. function:: int n_is_probabprime_fermat(ulong n, ulong i)
 
@@ -837,7 +812,7 @@ Primality testing
     we have `F_{n - (n/5)} = 0 \pmod n`, where `(n/5)` is the Jacobi
     symbol.
 
-    For further details, see \citep[pp. 142]{CraPom2005}.
+    For further details, see  pp. 142 [CraPom2005]_.
 
     We require that `n` is not divisible by `2` or `5`. 
 
@@ -846,12 +821,12 @@ Primality testing
     Implements a Baillie--Pomerance--Selfridge--Wagstaff probable primality
     test. This is a variant of the usual BPSW test (which only uses strong
     base-2 probable prime and Lucas-Selfridge tests, see Baillie and
-    Wagstaff \citep{BaiWag1980}).
+    Wagstaff [BaiWag1980]_).
 
     This implementation makes use of a weakening of the usual Baillie-PSW
-    test given in  \citep{Chen2003}, namely replacing the Lucas test with a
+    test given in  [Chen2003]_, namely replacing the Lucas test with a
     Fibonacci test when `n \equiv 2, 3 \pmod{5}`, (see also the comment on 
-    page 143 of \citep{CraPom2005}) regarding Fibonacci pseudoprimes.
+    page 143 of [CraPom2005]_) regarding Fibonacci pseudoprimes.
 
     There are no known counterexamples to this being a primality test.
 
@@ -860,27 +835,27 @@ Primality testing
 
 .. function:: int n_is_probabprime_lucas(ulong n)
 
-    For details on Lucas pseudoprimes, see \citep[pp. 143]{CraPom2005}.
+    For details on Lucas pseudoprimes, see [pp. 143] [CraPom2005]_.
 
     We implement a variant of the Lucas pseudoprime test similar to that
-    described by Baillie and Wagstaff \citep{BaiWag1980}.
+    described by Baillie and Wagstaff [BaiWag1980]_.
 
 .. function:: int n_is_probabprime(ulong n)
 
     Tests if `n` is a probable prime. Up to ``FLINT_ODDPRIME_SMALL_CUTOFF`` 
-    this algorithm uses ``n_is_oddprime_small()`` which uses a lookup table.
+    this algorithm uses :func:`n_is_oddprime_small` which uses a lookup table.
 
-    Next it calls ``n_compute_primes()`` with the maximum table size and 
+    Next it calls :func:`n_compute_primes` with the maximum table size and 
     uses this table to perform a binary search for `n` up to the table limit.
 
     Then up to `1050535501` it uses a number of strong probable prime tests,
-    ``n_is_strong_probabprime_preinv()``, etc., for various bases. The 
+    :func:`n_is_strong_probabprime_preinv`, etc., for various bases. The 
     output of the algorithm is guaranteed to be correct up to this bound due 
     to exhaustive tables, described at 
-    \url{http://uucode.com/obf/dalbec/alg.html}.
+    http://uucode.com/obf/dalbec/alg.html .
 
     Beyond that point the BPSW probabilistic primality test is used, by 
-    calling the function ``n_is_probabprime_BPSW()``. There are no known 
+    calling the function :func:`n_is_probabprime_BPSW`. There are no known 
     counterexamples, and it has been checked against the tables of Feitsma
     and Galway and up to the accuracy of those tables, this is an exhaustive
     check up to `2^{64}`, i.e. there are no counterexamples.
@@ -959,7 +934,7 @@ Square root and perfect power testing
     This function uses the Newton iteration method to calculate the nth root of
     a number.
     First approximation is calculated by an algorithm mentioned in this 
-    article :  \url{http://en.wikipedia.org/wiki/Fast_inverse_square_root}. 
+    article :  http://en.wikipedia.org/wiki/Fast_inverse_square_root . 
     Instead of the inverse square root, the nth root is calculated.
     
     Returns the integer part of ``n ^ 1/root``. Remainder is set as
@@ -969,13 +944,13 @@ Square root and perfect power testing
     
     This function returns the integer truncation of the cube root of `n`.
     First approximation is calculated by an algorithm mentioned in this 
-    article : \url{http://en.wikipedia.org/wiki/Fast_inverse_square_root}.
+    article : http://en.wikipedia.org/wiki/Fast_inverse_square_root .
     Instead of the inverse sqare root, the cube root is calculated.
     This functions uses different algorithms to calculate the cube root,
     depending upon the size of `n`. For numbers greater than `2^46`, it uses
-    ``n_cbrt_chebyshev_approx()``. Otherwise, it makes use of the iteration, 
+    :func:`n_cbrt_chebyshev_approx`. Otherwise, it makes use of the iteration, 
     `x \leftarrow x - (x*x*x - a)*x/(2*x*x*x + a)` for getting a good estimate, 
-    as mentioned in the paper by W. Kahan \citep{Kahan1991}.
+    as mentioned in the paper by W. Kahan [Kahan1991]_ .
 
 .. function:: ulong n_cbrt_newton_iteration(ulong n)
 
@@ -995,7 +970,7 @@ Square root and perfect power testing
     `x` is in the range [0.5, 1]. Cube root of x is calculated using
     Chebyshev's approximation polynomial for the function `y = x^1/3`. The
     values of the coefficient are calculated from the python module mpmath, 
-    \url{http://mpmath.org}, using the function chebyfit. x is multiplied 
+    http://mpmath.org, using the function chebyfit. x is multiplied 
     by ``2^exp`` and the cube root of 1, 2 or 4 (according to ``exp%3``).
 
 .. function:: ulong n_cbrtrem(ulong* remainder, ulong n)
@@ -1027,17 +1002,17 @@ Factorisation
     `n` with the quotient. The return value is that highest 
     power of `p` that divided `n`. Assumes `n` is not `0`. We require
     ``ppre`` to be set to a precomputed inverse of `p` computed 
-    with ``n_precompute_inverse()``.
+    with :func:`n_precompute_inverse`.
 
     For `p = 2` trailing zeroes are counted. For other primes
-    `p` we make repeated use of ``n_divrem2_precomp()`` until division
+    `p` we make repeated use of :func:`n_divrem2_precomp` until division
     by `p` is no longer possible.
 
 .. function:: void n_factor_insert(n_factor_t * factors, ulong p, ulong exp)
 
     Inserts the given prime power factor ``p^exp`` into 
     the ``n_factor_t`` ``factors``. See the documentation for 
-    ``n_factor_trial()`` for a description of the ``n_factor_t`` type. 
+    :func:`n_factor_trial` for a description of the ``n_factor_t`` type. 
 
     The algorithm performs a simple search to see if `p` already 
     exists as a prime factor in the structure. If so the exponent
@@ -1054,7 +1029,7 @@ Factorisation
 
     One requires an initialised ``n_factor_t`` structure, but factors
     will be added by default to an already used ``n_factor_t``. Use 
-    the function ``n_factor_init()`` defined in ``ulong_extras`` if 
+    the function :func:`n_factor_init` defined in ``ulong_extras`` if 
     initialisation has not already been completed on factors.
 
     Once completed, ``num`` will contain the number of distinct 
@@ -1065,7 +1040,7 @@ Factorisation
     The return value is the unfactored cofactor after trial 
     factoring is done.
 
-    The function calls ``n_compute_primes()`` automatically. See
+    The function calls :func:`n_compute_primes` automatically. See
     the documentation for that function regarding limits.
 
     The algorithm stops when the current prime has a square 
@@ -1073,12 +1048,12 @@ Factorisation
     unless `n` is prime.
 
     The precomputed inverses of all the primes computed by
-    ``n_compute_primes()`` are utilised with the ``n_remove2_precomp()``
+    :func:`n_compute_primes` are utilised with the :func:`n_remove2_precomp`
     function.
 
 .. function:: ulong n_factor_trial(n_factor_t * factors, ulong n, ulong num_primes)
 
-    This function calls ``n_factor_trial_range()``, with the value of 
+    This function calls :func:`n_factor_trial_range`, with the value of 
     `0` for ``start``. By default this adds factors to an already existing
     ``n_factor_t`` or to a newly initialised one.
 
@@ -1102,7 +1077,7 @@ Factorisation
 
 .. function:: ulong n_factor_one_line(ulong n, ulong iters)
 
-    This implements Bill Hart's one line factoring algorithm \citep{Har2009}.
+    This implements Bill Hart's one line factoring algorithm [Har2012]_.
     It is a variant of Fermat's algorithm which cycles through a large number 
     of multipliers instead of incrementing the square root. It is faster than 
     SQUFOF for `n` less than about `2^{40}`.
@@ -1120,12 +1095,8 @@ Factorisation
     persistence.
 
     The version of SQUFOF imlemented here is as described by Gower 
-    and Wagstaff \citep{GowWag2008}.
+    and Wagstaff [GowWag2008]_.
 
-    % Jason Gower and Sam Wagstaff
-    % "Square form factoring"
-    % Math. Comp. 77, 2008, pp 551-588, see:
-    % http://www.ams.org/mcom/2008-77-261/S0025-5718-07-02010-8/home.html
 
     We start by trying SQUFOF directly on `n`. If that fails we
     multiply it by each of the primes in ``flint_primes_small`` in
@@ -1150,7 +1121,7 @@ Factorisation
     less reliable in practice).
 
     For details on the ``n_factor_t`` structure, see 
-    ``n_factor_trial()``.
+    :func:`n_factor_trial`.
 
     This function first tries trial factoring with a number of primes
     specified by the constant ``FLINT_FACTOR_TRIAL_PRIMES``. If the 
@@ -1162,10 +1133,10 @@ Factorisation
     determine if it is a perfect power. If so it is replaced by the power 
     that has been found. Next if the factor is small enough and composite, 
     in particular, less than ``FLINT_FACTOR_ONE_LINE_MAX`` then 
-    ``n_factor_one_line()`` is called with 
+    :func:`n_factor_one_line` is called with 
     ``FLINT_FACTOR_ONE_LINE_ITERS`` to try and split the factor. If 
-    that fails or the factor is too large for ``n_factor_one_line()`` 
-    then ``n_factor_SQUFOF()`` is called, with 
+    that fails or the factor is too large for :func:`n_factor_one_line` 
+    then :func:`n_factor_SQUFOF` is called, with 
     ``FLINT_FACTOR_SQUFOF_ITERS``. If that fails an error results and
     the program aborts. However this should not happen in practice.
 
@@ -1176,7 +1147,7 @@ Factorisation
 
     One requires an initialised ``n_factor_t`` structure, but factors
     will be added by default to an already used ``n_factor_t``. Use 
-    the function ``n_factor_init()`` defined in ``ulong_extras`` if 
+    the function :func:`n_factor_init` defined in ``ulong_extras`` if 
     initialisation has not already been completed on ``factors``.
 
     Once completed, ``num`` will contain the number of distinct 
@@ -1188,7 +1159,7 @@ Factorisation
     factoring is done. The value ``prod`` will be set to the product
     of the factors found.
 
-    The function calls ``n_compute_primes()`` automatically. See
+    The function calls :func:`n_compute_primes` automatically. See
     the documentation for that function regarding limits.
 
     The algorithm stops when the current prime has a square 
@@ -1196,7 +1167,7 @@ Factorisation
     unless `n` is prime.
 
     The precomputed inverses of all the primes computed by
-    ``n_compute_primes()`` are utilised with the ``n_remove2_precomp()``
+    :func:`n_compute_primes` are utilised with the :func:`n_remove2_precomp`
     function.
 
 .. function:: ulong n_factor_partial(n_factor_t * factors, ulong n, ulong limit, int proved)
@@ -1240,7 +1211,7 @@ Factorisation
     factorization, just one factor. Returns 1 if factorization is successfull 
     (non trivial factor is found), else returns 0. Assumes `n` is normalized,
     (shifted by normbits bits), and takes as input a precomputed inverse of `n` as 
-    computed by ``n_preinvert_limb()``. `ai` and `xi` should also be shifted
+    computed by :func:`n_preinvert_limb`. `ai` and `xi` should also be shifted
     left by `normbits`.
 
     `ai` is the constant of the polynomial used, `xi` is the initial value. 
@@ -1249,13 +1220,13 @@ Factorisation
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
     suggested by Richard Brent in the paper, availible at
-    http://maths-people.anu.edu.au/ brent/pd/rpb051i.pdf
+    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
 .. function:: int n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in, mp_limb_t max_tries, mp_limb_t max_iters)
 
     Pollard Rho algorithm, modified as suggested by Richar Brent. Makes a call to 
-    ``n_factor_pollard_brent_single``. The input parameters ai and xi for
-    ``n_factor_pollard_brent_single`` are selected at random. 
+    :func:`n_factor_pollard_brent_single`. The input parameters ai and xi for
+    :func:`n_factor_pollard_brent_single` are selected at random. 
 
     If the algorithm fails to find a non trivial factor in one call, it tries again 
     (this time with a different set of random values). This process is repeated a 
@@ -1311,14 +1282,14 @@ Factorials
 .. function:: ulong n_factorial_fast_mod2_preinv(ulong n, ulong p, ulong pinv)
 
     Returns `n! \bmod p` given a precomputed inverse of `p` as computed
-    by ``n_preinvert_limb()``. `p` is not required to be a prime, but
+    by :func:`n_preinvert_limb`. `p` is not required to be a prime, but
     no special optimisations are made for composite `p`.
     Uses fast multipoint evaluation, running in about `O(n^{1/2})` time.
 
 .. function:: ulong n_factorial_mod2_preinv(ulong n, ulong p, ulong pinv)
 
     Returns `n! \bmod p` given a precomputed inverse of `p` as computed
-    by ``n_preinvert_limb()``. `p` is not required to be a prime, but
+    by :func:`n_preinvert_limb`. `p` is not required to be a prime, but
     no special optimisations are made for composite `p`.
 
     Uses a lookup table for small `n`, otherwise computes the product

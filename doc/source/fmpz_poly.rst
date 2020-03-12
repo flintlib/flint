@@ -921,7 +921,7 @@ Powering
 .. function:: void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, slong len, ulong e)
 
     Sets ``res = poly^e`` using left-to-right binary exponentiation as 
-    described in \citep[p. 461]{Knu1997}.
+    described in [p. 461][Knu1997]_.
     
     Assumes that ``len > 0``, ``e > 1``.  Assumes that ``res`` is 
     an array of length at least ``e*(len - 1) + 1``.  Does not support 
@@ -1072,7 +1072,7 @@ Greatest common divisor
     ``poly2``, normalised to have non-negative leading coefficient.
 
     This function uses the subresultant algorithm as described 
-    in \citep[Algorithm 3.3.1]{Coh1996}.
+    in [Algorithm 3.3.1][Coh1996]_.
 
 .. function:: int _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
@@ -1233,7 +1233,7 @@ Greatest common divisor
     of the two polynomials is zero.
 
     This function uses the modular algorithm described 
-    in \citep{Col1971}.
+    in [Col1971]_.
 
 .. function:: void fmpz_poly_resultant_modular_div(fmpz_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t div, slong nbits)
 
@@ -1265,7 +1265,7 @@ Greatest common divisor
     of the two polynomials is zero.
 
     This function uses the algorithm described 
-    in \citep[Algorithm 3.3.7]{Coh1996}.
+    in [Algorithm 3.3.7][Coh1996]_.
 
 .. function:: void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
@@ -1549,7 +1549,7 @@ Euclidean division
     temporary array ``temp`` of length `2 \operatorname{len}(B) - 1`.  Does not support 
     any aliasing.
 
-    For further details, see \citep{Mul2000}.
+    For further details, see [Mul2000]_.
 
     If the flag ``exact`` is `1`, the function stops if an inexact division
     is encountered, upon which the function will return `0`. If no inexact
@@ -1979,7 +1979,7 @@ Pseudo division
     e.g.\ when `\operatorname{len}(B) < 32`.
 
     This function uses the algorithm described 
-    in \citep[Algorithm 3.1.2]{Coh1996}.
+    in [Algorithm 3.1.2][Coh1996]_.
 
 .. function:: void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
@@ -2387,7 +2387,7 @@ Power series composition
     space for ``n`` coefficients. Does not support aliasing between any
     of the inputs and the output.
 
-    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
 
 .. function:: void fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)
 
@@ -2395,7 +2395,7 @@ Power series composition
     modulo `x^n`, where the constant term of ``poly2`` is required
     to be zero.
 
-    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
 
 .. function:: void _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong n)
 
@@ -2474,7 +2474,7 @@ Power series reversion
     aliased, and ``Qlen`` must be at least 2.
     It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
 
-    This implementation uses Newton iteration \cite{BrentKung1978}.
+    This implementation uses Newton iteration [BrentKung1978]_.
 
 .. function:: void fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
@@ -2483,7 +2483,7 @@ Power series reversion
     `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
     It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
 
-    This implementation uses Newton iteration \cite{BrentKung1978}.
+    This implementation uses Newton iteration [BrentKung1978]_.
 
 .. function:: void _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
@@ -2683,7 +2683,7 @@ Signature
     exception may be raised.
 
     This function uses the algorithm described 
-    in \citep[Algorithm 4.1.11]{Coh1996}.
+    in [Algorithm 4.1.11][Coh1996]_.
 
 
 Hensel lifting
@@ -3160,7 +3160,7 @@ Minimal polynomials
     in reverse order, since  `\Phi_n(x)` is a palindrome for `n \ne 1`.
 
     We use the sparse power series algorithm described as Algorithm 4
-    \cite{ArnoldMonagan2011}. The algorithm is based on the identity
+    [ArnoldMonagan2011]_. The algorithm is based on the identity
 
     .. math ::
 
@@ -3173,7 +3173,7 @@ Minimal polynomials
 
     To improve efficiency for small `n`, we treat the ``fmpz``
     coefficients as machine integers when there is no risk of overflow.
-    The following bounds are given in Table 6 of \cite{ArnoldMonagan2011}:
+    The following bounds are given in Table 6 of [ArnoldMonagan2011]_:
 
     For `n < 10163195`, the largest coefficient in any `\Phi_n(x)`
     has 27 bits, so machine arithmetic is safe on 32 bits.

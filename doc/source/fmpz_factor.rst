@@ -101,32 +101,32 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 .. function:: int fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi, fmpz_t ai, mp_limb_t max_iters)
 
     Pollard Rho algorithm for integer factorization. Assumes that the `n` is
-    not prime. `factor` is set as the factor if found. Takes as input the initial
+    not prime. ``factor`` is set as the factor if found. Takes as input the initial
     value `y`, to start polynomial evaluation and `a`, the constant of the polynomial
     used. It is not assured that the factor found will be prime. Does not compute 
     the complete factorization, just one factor. Returns the number of limbs of 
     factor if factorization is successfull (non trivial factor is found), else returns 0. 
 
-    `max_iters` is the number of iterations tried in process of finding the cycle. 
+    ``max_iters`` is the number of iterations tried in process of finding the cycle. 
     If the algorithm fails to find a non trivial factor in one call, it tries again 
     (this time with a different set of random values). 
     
 .. function:: int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, fmpz_t n, mp_limb_t max_tries, mp_limb_t max_iters)
 
     Pollard Rho algorithm for integer factorization. Assumes that the `n` is
-    not prime. `factor` is set as the factor if found. It is not assured that the 
+    not prime. ``factor`` is set as the factor if found. It is not assured that the 
     factor found will be prime. Does not compute the complete factorization, 
     just one factor. Returns the number of limbs of factor if factorization is 
     successfull (non trivial factor is found), else returns 0. 
 
-    `max_iters` is the number of iterations tried in process of finding the cycle. 
+    ``max_iters`` is the number of iterations tried in process of finding the cycle. 
     If the algorithm fails to find a non trivial factor in one call, it tries again 
     (this time with a different set of random values). This process is repeated a 
-    maximum of `max_tries` times. 
+    maximum of ``max_tries`` times. 
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
     suggested by Richard Brent. It can be found in the paper availible at
-    http://maths-people.anu.edu.au/ brent/pd/rpb051i.pdf 
+    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
 
 
 Elliptic curve (ECM) method
@@ -164,9 +164,13 @@ Factoring of ``fmpz`` integers using ECM
     Sets the point `(x : z)` to two times `(x_0 : z_0)` modulo `n` according
     to the formula
 
-    ``x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,``
+    .. math ::
 
-    ``z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.``
+        x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,
+
+    .. math ::
+
+        z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.
 
     ``ecm_inf`` is used just to use temporary ``mp_ptr``'s in the
     structure. This group doubling is valid only for points expressed in
@@ -177,7 +181,9 @@ Factoring of ``fmpz`` integers using ECM
     Sets the point `(x : z)` to the sum of `(x_1 : z_1)` and `(x_2 : z_2)`
     modulo `n`, given the difference `(x_0 : z_0)` according to the formula
 
-    ``x = 4z_0(x_1x_2 - z_1z_2)^2 \mod n, z = 4x_0(x_2z_1 - x_1z_2)^2 \mod n.``
+    .. math ::
+
+        x = 4z_0(x_1x_2 - z_1z_2)^2 \mod n, \\ z = 4x_0(x_2z_1 - x_1z_2)^2 \mod n.
 
     ``ecm_inf`` is used just to use temporary ``mp_ptr``'s in the
     structure. This group addition is valid only for points expressed in

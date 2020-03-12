@@ -612,7 +612,7 @@ Strong echelon form and Howell form
 .. function:: void nmod_mat_strong_echelon_form(nmod_mat_t A)
 
     Puts `A` into strong echelon form. The Howell form and the strong echelon
-    form are equal up to permutation of the rows, see \cite{FieHof2014} for a
+    form are equal up to permutation of the rows, see [FieHof2014]_ for a
     definition of the strong echelon form and the algorithm used here.
 
     `A` must have at least as many rows as columns.
@@ -620,7 +620,7 @@ Strong echelon form and Howell form
 .. function:: slong nmod_mat_howell_form(nmod_mat_t A)
 
     Puts `A` into Howell form and returns the number of non-zero rows.
-    For a definition of the Howell form see \cite{StoMul1998}. The Howell form
+    For a definition of the Howell form see [StoMul1998]_. The Howell form
     is computed by first putting `A` into strong echelon form and then ordering
     the rows.
 

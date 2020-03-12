@@ -1428,7 +1428,7 @@ Power series composition
     space for ``n`` coefficients. Does not support aliasing between any
     of the inputs and the output.
 
-    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
     The default ``fmpz_poly`` composition algorithm is automatically
     used when the composition can be performed over the integers.
 
@@ -1438,7 +1438,7 @@ Power series composition
     modulo `x^n`, where the constant term of ``poly2`` is required
     to be zero.
 
-    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
     The default ``fmpz_poly`` composition algorithm is automatically
     used when the composition can be performed over the integers.
 
