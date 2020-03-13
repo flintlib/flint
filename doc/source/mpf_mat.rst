@@ -122,7 +122,7 @@ Gram-Schmidt Orthogonalisation and QR Decomposition
 
     Takes a subset of `R^m` `S = {a_1, a_2, \ldots ,a_n}` (as the columns of
     a `m x n` matrix ``A``) and generates an orthonormal set
-    `S^' = {b_1, b_2, \ldots ,b_n}` (as the columns of the `m x n` matrix 
+    `S' = {b_1, b_2, \ldots ,b_n}` (as the columns of the `m x n` matrix 
     ``B``) that spans the same subspace of `R^m` as `S`.
 
     This uses an algorithm of Schwarz-Rutishauser. See pp. 9 of

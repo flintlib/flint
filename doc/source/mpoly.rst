@@ -308,7 +308,7 @@ Packing and unpacking monomials
     Given an array of possibly packed exponent vectors ``exp2`` of length
     ``len``, where each field of each exponent vector is packed into the
     given number of bits, return the corresponding array of monomial vectors
-    packed using a factorial numbering scheme. The ``bases'' for the factorial
+    packed using a factorial numbering scheme. The "bases" for the factorial
     numbering scheme are given as an array of integers ``mults``, the first
     entry of which corresponds to the field of least significance in each 
     input exponent vector. Obviously the maximum exponent to be packed must be
@@ -323,7 +323,7 @@ Packing and unpacking monomials
     Given an array of exponent vectors ``e2`` of length ``len`` packed
     using a factorial numbering scheme, unpack the monomials into an array
     ``e1`` of exponent vectors in standard packed format, where each field
-    has the given number of bits. The ``bases'' for the factorial
+    has the given number of bits. The "bases" for the factorial
     numbering scheme are given as an array of integers ``mults``, the first
     entry of which corresponds to the field of least significance in each 
     exponent vector.

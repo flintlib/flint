@@ -658,11 +658,9 @@ Prime number generation and counting
 
     .. math ::
 
-        \begin{align*}
         p_n  & >  n (\ln n + \ln \ln n - 1) \\
         p_n  & <  n (\ln n + \ln \ln n) \\
         p_n  & <  n (\ln n + \ln \ln n - 0.9427) \quad (n \geq 15985)
-        \end{align*}
 
     The first inequality was proved by Dusart [Dus1999]_, and the last 
     is due to Massias and Robin [MasRob1996]_.  For a further overview, 

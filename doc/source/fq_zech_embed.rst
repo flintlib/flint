@@ -64,9 +64,9 @@ Computing isomorphisms and embeddings of finite fields
 
     This matrix is computed as
 
-    `\texttt{embed_dual_to_mono_matrix(_, sub_ctx)}
-    \times \texttt{basis}^t \times
-    \texttt{embed_mono_to_dual_matrix(_, sup_ctx)}.`
+    ``embed_dual_to_mono_matrix(_, sub_ctx)``
+    `\times` ``basis``:sup:`t` ``\times``
+    ``embed_mono_to_dual_matrix(_, sup_ctx)}``.
       
     \textbf{Note:} if
     `m=n`, ``basis`` represents a Frobenius, and the result is its

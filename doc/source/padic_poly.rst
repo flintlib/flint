@@ -393,7 +393,7 @@ Series inversion
     Moreover, assumes that the valuation of the constant coefficient 
     of `f` is minimal among the coefficients of `f`.
 
-    Note that the result `g` is zero if and only if  `- \ord_p(f) \geq N`.
+    Note that the result `g` is zero if and only if  `- \operatorname{ord}_p(f) \geq N`.
 
 
 Derivative
@@ -441,7 +441,7 @@ Evaluation
     reduced in the given context.
 
     Suppose that the polynomial can be written as `F(X) = p^w f(X)` 
-    with `\ord_p(f) = 1`, that `\ord_p(a) = b` and that both are 
+    with `\operatorname{ord}_p(f) = 1`, that `\operatorname{ord}_p(a) = b` and that both are 
     defined to precision~`N`.  Then `f` is defined to precision 
     `N-w` and so `f(a)` is defined to precision `N-w` when `a` is 
     integral and `N-w+(n-1)b` when `b < 0`, where `n = \deg(f)`.  Thus, 

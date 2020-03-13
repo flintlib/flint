@@ -358,7 +358,6 @@ Special functions
 
     .. math ::
 
-
         z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
 
 
@@ -368,12 +367,10 @@ Special functions
 
     .. math ::
 
-        \begin{align*}
         \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
-        \end{align*}
 
-    Assumes that `y = 1 - x` is non-zero and that `v = \ord_p(y)` 
+    Assumes that `y = 1 - x` is non-zero and that `v = \operatorname{ord}_p(y)` 
     is at least `1` when `p` is odd and at least `2` when `p = 2` 
     so that the series converges.
 
@@ -399,7 +396,7 @@ Special functions
 
 
 
-    Assumes that `v = \ord_p(y)` is at least `1` when `p` is odd and 
+    Assumes that `v = \operatorname{ord}_p(y)` is at least `1` when `p` is odd and 
     at least `2` when `p = 2` so that the series converges.
 
     Supports aliasing between `z` and `y`.
@@ -423,12 +420,10 @@ Special functions
 
     .. math ::
 
-        \begin{align*}
         \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
-        \end{align*}
 
-    Assumes that `y = 1 - x` is non-zero and that `v = \ord_p(y)` 
+    Assumes that `y = 1 - x` is non-zero and that `v = \operatorname{ord}_p(y)` 
     is at least `1` when `p` is odd and at least `2` when `p = 2` 
     so that the series converges.
 
@@ -451,7 +446,7 @@ Special functions
         \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
 
 
-    but this only converges when `\ord_p(x)` is at least `2` or `1` 
+    but this only converges when `\operatorname{ord}_p(x)` is at least `2` or `1` 
     when `p = 2` or `p > 2`, respectively.
 
 .. function:: void _qadic_frobenius_a(fmpz *rop, slong e, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
@@ -484,9 +479,9 @@ Special functions
     Recall that `\mathbf{Q}_q / \mathbf{Q}_p` is Galois with Galois group 
     `\langle \Sigma \rangle \cong \langle \sigma \rangle`, which is also 
     isomorphic to `\mathbf{Z}/d\mathbf{Z}`, where 
-    `\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element 
+    `\sigma \in \operatorname{Gal}(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element 
     `\sigma \colon x \mapsto x^p` and `\Sigma` is its lift to 
-    `\Gal(\mathbf{Q}_q/\mathbf{Q}_p)`.
+    `\operatorname{Gal}(\mathbf{Q}_q/\mathbf{Q}_p)`.
 
     This functionality is implemented as ``GaloisImage()`` in Magma.
 
@@ -518,7 +513,7 @@ Special functions
     For an element `a \in \mathbf{Q}_q`, multiplication by `a` defines 
     a `\mathbf{Q}_p`-linear map on `\mathbf{Q}_q`.  We define the trace 
     of `a` as the trace of this map.  Equivalently, if `\Sigma` generates 
-    `\Gal(\mathbf{Q}_q / \mathbf{Q}_p)` then the trace of `a` is equal to 
+    `\operatorname{Gal}(\mathbf{Q}_q / \mathbf{Q}_p)` then the trace of `a` is equal to 
     `\sum_{i=0}^{d-1} \Sigma^i (a)`.
 
 .. function:: void _qadic_norm(fmpz_t rop, const fmpz *op, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
@@ -547,12 +542,12 @@ Special functions
     .. math ::
 
 
-        \Norm (x) = \exp \Bigl( \bigl( \Trace \log (x) \bigr) \Bigr).
+        \operatorname{Norm} (x) = \exp \Bigl( \bigl( \operatorname{Trace} \log (x) \bigr) \Bigr).
 
 
 
     In the special case that ``op`` lies in `\mathbf{Q}_p`, returns 
-    its norm as `\Norm(x) = x^d`, where `d` is the extension degree.
+    its norm as `\operatorname{Norm}(x) = x^d`, where `d` is the extension degree.
 
     Otherwise, raises an ``abort`` signal.
 
@@ -566,7 +561,7 @@ Special functions
     .. math ::
 
 
-        \Norm(x) = \ell(f)^{-\deg(a)} \Res(f(X), a(X)),
+        \operatorname{Norm}(x) = \ell(f)^{-\deg(a)} \operatorname{Res}(f(X), a(X)),
 
 
     where `\mathbf{Q}_q \cong \mathbf{Q}_p[X] / (f(X))`, `\ell(f)` is the 

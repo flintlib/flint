@@ -134,7 +134,7 @@ Randomisation
 .. function:: void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 
     Sets ``rop`` to a random `p`-adic number modulo `p^N` with valuation 
-    in the range `[- \ceil{N/10}, N)`, `[N - \ceil{-N/10}, N)`, or `[-10, 0)` 
+    in the range `[- \lceil N/10\rceil, N)`, `[N - \lceil -N/10\rceil, N)`, or `[-10, 0)` 
     as `N` is positive, negative or zero, whenever ``rop`` is non-zero.
 
 .. function:: void padic_randtest_not_zero(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
@@ -251,8 +251,8 @@ Arithmetic operations
 .. function:: slong * _padic_lifts_exps(slong *n, slong N)
 
     Given a positive integer `N` define the sequence 
-    `a_0 = N, a_1 = \ceil{a_0/2}, \dotsc, a_{n-1} = \ceil{a_{n-2}/2} = 1`.
-    Then `n = \ceil{\log_2 N} + 1`.
+    `a_0 = N, a_1 = \lceil a_0/2\rceil, \dotsc, a_{n-1} = \lceil a_{n-2}/2\rceil = 1`.
+    Then `n = \lceil\log_2 N\rceil + 1`.
 
     This function sets `n` and allocates and returns the array `a`.
 
@@ -363,11 +363,11 @@ Exponential
 .. function:: slong _padic_exp_bound(slong v, slong N, const fmpz_t p)
 
     Returns an integer `i` such that for all `j \geq i` we have 
-    `\ord_p(x^j / j!) \geq N`, where `\ord_p(x) = v`.
+    `\operatorname{ord}_p(x^j / j!) \geq N`, where `\operatorname{ord}_p(x) = v`.
 
     When `p` is a word-sized prime, 
-    returns `\ceil{\frac{(p-1)N - 1}{(p-1)v - 1}}`.
-    Otherwise, returns `\ceil{N/v}`.
+    returns `\lceil \frac{(p-1)N - 1}{(p-1)v - 1}\rceil`.
+    Otherwise, returns `\lceil N/v\rceil`.
 
     Assumes that `v < N`.  Moreover, `v` has to be at least `2` or `1`, 
     depending on whether `p` is `2` or odd.
@@ -381,8 +381,8 @@ Exponential
     Sets ``rop`` to the `p`-exponential function evaluated at 
     `x = p^v u`, reduced modulo `p^N`.
 
-    Assumes that `x \neq 0`, that `\ord_p(x) < N` and that 
-    `\exp(x)` converges, that is, that `\ord_p(x)` is at least 
+    Assumes that `x \neq 0`, that `\operatorname{ord}_p(x) < N` and that 
+    `\exp(x)` converges, that is, that `\operatorname{ord}_p(x)` is at least 
     `2` or `1` depending on whether the prime `p` is `2` or odd.
 
     Supports aliasing between ``rop`` and `u`.
@@ -400,9 +400,9 @@ Exponential
         \exp_p(x) = \sum_{i = 0}^{\infty} \frac{x^i}{i!}
 
 
-    but this only converges only when `\ord_p(x) > 1 / (p - 1)`.  For 
-    elements `x \in \mathbf{Q}_p`, this means that `\ord_p(x) \geq 1` 
-    when `p \geq 3` and `\ord_2(x) \geq 2` when `p = 2`.
+    but this only converges only when `\operatorname{ord}_p(x) > 1 / (p - 1)`.  For 
+    elements `x \in \mathbf{Q}_p`, this means that `\operatorname{ord}_p(x) \geq 1` 
+    when `p \geq 3` and `\operatorname{ord}_2(x) \geq 2` when `p = 2`.
 
 .. function:: int padic_exp_rectangular(padic_t y, const padic_t x, const padic_ctx_t ctx)
 
@@ -433,7 +433,7 @@ Logarithm
     .. math ::
 
 
-        i v - \ord_p(i) \geq N
+        i v - \operatorname{ord}_p(i) \geq N
 
 
     where `v \geq 1`.
@@ -463,12 +463,10 @@ Logarithm
 
     .. math ::
 
-        \begin{align*}
         \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
-        \end{align*}
 
-    Assumes that `y = 1 - x` is non-zero and that `v = \ord_p(y)` 
+    Assumes that `y = 1 - x` is non-zero and that `v = \operatorname{ord}_p(y)` 
     is at least `1` when `p` is odd and at least `2` when `p = 2` 
     so that the series converges.
 
@@ -488,7 +486,7 @@ Logarithm
 
         \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
 
-    but this only converges when `\ord_p(x)` is at least `2` or `1` 
+    but this only converges when `\operatorname{ord}_p(x)` is at least `2` or `1` 
     when `p = 2` or `p > 2`, respectively.
 
 .. function:: int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
@@ -507,7 +505,7 @@ Logarithm
     value.
 
     Uses an algorithm based on a result of Satoh, Skjernaa and Taguchi 
-    that `\ord_p\bigl(a^{p^k} - 1\bigr) > k`, which implies that 
+    that `\operatorname{ord}_p\bigl(a^{p^k} - 1\bigr) > k`, which implies that 
 
     .. math ::
 
@@ -548,14 +546,14 @@ Special functions
     Computes the `2`-adic valuation of `n!`.
 
     Note that since `n` fits into an ``ulong``, so does 
-    `\ord_2(n!)` since `\ord_2(n!) \leq (n - 1) / (p - 1) = n - 1`.
+    `\operatorname{ord}_2(n!)` since `\operatorname{ord}_2(n!) \leq (n - 1) / (p - 1) = n - 1`.
 
 .. function:: ulong padic_val_fac_ui(ulong n, const fmpz_t p)
 
     Computes the `p`-adic valuation of `n!`.
 
     Note that since `n` fits into an ``ulong``, so does 
-    `\ord_p(n!)` since `\ord_p(n!) \leq (n - 1) / (p - 1)`.
+    `\operatorname{ord}_p(n!)` since `\operatorname{ord}_p(n!) \leq (n - 1) / (p - 1)`.
 
 .. function:: void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
 
