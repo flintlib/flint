@@ -141,7 +141,7 @@ Randomisation
 
     Sets ``rop`` to a random non-zero `p`-adic number modulo `p^N`, 
     where the range of the valuation is as for the function 
-    ``padic_randtest()``.
+    :func:`padic_randtest`.
 
 .. function:: void padic_randtest_int(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 
@@ -212,7 +212,7 @@ reduced to the precision of ``rop``.
 
     Note that this includes swapping the precisions.  In particular, this 
     operation is not equivalent to swapping ``op1`` and ``op2`` 
-    using ``padic_set()`` and an auxiliary variable whenever the 
+    using :func:`padic_set` and an auxiliary variable whenever the 
     precisions of the two elements are different.
 
 .. function:: void padic_zero(padic_t rop)
@@ -304,11 +304,11 @@ Arithmetic operations
     change in future versions.
 
     Uses some data `S` precomputed by calling the function 
-    ``_padic_inv_precompute()``.  Note that this object 
+    :func:`_padic_inv_precompute`.  Note that this object 
     is not declared ``const`` and in fact it carries a field 
     providing temporary work space.  This allows repeated calls of 
     this function to avoid repeated memory allocations, as used 
-    e.g. by the function ``padic_log()``.
+    e.g. by the function :func:`padic_log`.
 
 .. function:: void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 
@@ -366,7 +366,7 @@ Exponential
     `\operatorname{ord}_p(x^j / j!) \geq N`, where `\operatorname{ord}_p(x) = v`.
 
     When `p` is a word-sized prime, 
-    returns `\lceil \frac{(p-1)N - 1}{(p-1)v - 1}\rceil`.
+    returns `\left\lceil \frac{(p-1)N - 1}{(p-1)v - 1}\right\rceil`.
     Otherwise, returns `\lceil N/v\rceil`.
 
     Assumes that `v < N`.  Moreover, `v` has to be at least `2` or `1`, 

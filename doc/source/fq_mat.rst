@@ -184,7 +184,7 @@ Random matrix generation
     `\mathbf{F}_{q}`.
 
     The matrix can be transformed into a dense matrix with unchanged
-    rank by subsequently calling ``fq_mat_randops()``.
+    rank by subsequently calling :func:`fq_mat_randops`.
 
 .. function:: void fq_mat_randops(fq_mat_t mat, slong count, flint_rand_t state, const fq_ctx_t ctx)
 

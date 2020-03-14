@@ -469,7 +469,7 @@ Cyclotomic polynomials
     coefficient in the binomial expansion of `(x+1)^d`.
 
     When `n` is an odd prime, we use a direct formula for the coefficients
-    (\url{http://mathworld.wolfram.com/TrigonometryAngles.html}).
+    (http://mathworld.wolfram.com/TrigonometryAngles.html ).
 
 .. function:: void arith_cos_minpoly(fmpz_poly_t poly, ulong n)
 

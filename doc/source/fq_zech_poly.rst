@@ -22,7 +22,7 @@ Memory management
 .. function:: void fq_zech_poly_init(fq_zech_poly_t poly, const fq_zech_ctx_t ctx)
 
     Initialises ``poly`` for use, with context ctx, and setting its
-    length to zero. A corresponding call to ``fq_zech_poly_clear()``
+    length to zero. A corresponding call to :func:`fq_zech_poly_clear`
     must be made after finishing with the ``fq_zech_poly_t`` to free the
     memory used by the polynomial.
 
@@ -31,7 +31,7 @@ Memory management
     Initialises ``poly`` with space for at least ``alloc``
     coefficients and sets the length to zero.  The allocated
     coefficients are all set to zero.  A corresponding call to
-    ``fq_zech_poly_clear()`` must be made after finishing with the
+    :func:`fq_zech_poly_clear` must be made after finishing with the
     ``fq_zech_poly_t`` to free the memory used by the polynomial.
 
 .. function:: void fq_zech_poly_realloc(fq_zech_poly_t poly, slong alloc, const fq_zech_ctx_t ctx)
@@ -80,28 +80,28 @@ Memory management
 
 .. function:: void fq_zech_poly_truncate(fq_zech_poly_t poly, slong newlen, const fq_zech_ctx_t ctx)
 
-    Truncates the polynomial to length at most~`n`.
+    Truncates the polynomial to length at most `n`.
 
 .. function:: void fq_zech_poly_set_trunc(fq_zech_poly_t poly1, fq_zech_poly_t poly2, slong newlen, const fq_ctx_t ctx)
 
-    Sets ``poly1`` to ``poly2`` truncated to length~`n`.
+    Sets ``poly1`` to ``poly2`` truncated to length `n`.
 
 .. function:: void _fq_zech_poly_reverse(fq_zech_struct* output, const fq_zech_struct* input, slong len, slong m, const fq_zech_ctx_t ctx)
 
     Sets ``output`` to the reverse of ``input``, which is of
     length ``len``, but thinking of it as a polynomial of
-    length~``m``, notionally zero-padded if necessary. The
-    length~``m`` must be non-negative, but there are no other
+    length ``m``, notionally zero-padded if necessary. The
+    length ``m`` must be non-negative, but there are no other
     restrictions. The polynomial ``output`` must have space for
     ``m`` coefficients.
 
 .. function:: void fq_zech_poly_reverse(fq_zech_poly_t output, const fq_zech_poly_t input, slong m, const fq_zech_ctx_t ctx)
 
     Sets ``output`` to the reverse of ``input``, thinking of it
-    as a polynomial of length~``m``, notionally zero-padded if
-    necessary).  The length~``m`` must be non-negative, but there
+    as a polynomial of length ``m``, notionally zero-padded if
+    necessary).  The length ``m`` must be non-negative, but there
     are no other restrictions. The output polynomial will be set to
-    length~``m`` and then normalised.
+    length ``m`` and then normalised.
 
 
 Polynomial parameters
@@ -185,11 +185,11 @@ Assignment and basic manipulation
 
 .. function:: void void fq_zech_poly_one(fq_zech_poly_t poly, const fq_zech_ctx_t ctx)
 
-    Sets ``poly`` to the constant polynomial~`1`.
+    Sets ``poly`` to the constant polynomial `1`.
 
 .. function:: void void fq_zech_poly_gen(fq_zech_poly_t poly, const fq_zech_ctx_t ctx)
 
-    Sets ``poly`` to the polynomial~`x`.
+    Sets ``poly`` to the polynomial `x`.
 
 .. function:: void fq_zech_poly_make_monic(fq_zech_poly_t rop, const fq_zech_poly_t op, const fq_zech_ctx_t ctx)
 
@@ -241,12 +241,12 @@ Comparison
 .. function:: int fq_zech_poly_is_one(const fq_zech_poly_t op)
 
     Returns whether the polynomial ``poly`` is equal
-    to the constant polynomial~`1`.
+    to the constant polynomial `1`.
 
 .. function:: int fq_zech_poly_is_gen(const fq_zech_poly_t op, const fq_zech_ctx_t ctx)
 
     Returns whether the polynomial ``poly`` is equal
-    to the polynomial~`x`.
+    to the polynomial `x`.
 
 .. function:: int fq_zech_poly_is_unit(const fq_zech_poly_t op, const fq_zech_ctx_t ctx)
 
@@ -373,7 +373,7 @@ Multiplication
     Suppose `\mathbf{F}_q = \mathbf{F}_p[X]/ (f(X))` and recall
     that elements of `\mathbf{F}_q` are internally represented
     by elements of type ``fmpz_poly``.  For small degree extensions
-    but polynomials in `\mathbf{F}_q[Y]` of large degree~`n`, we
+    but polynomials in `\mathbf{F}_q[Y]` of large degree `n`, we
     change the representation to
 
 
@@ -390,7 +390,7 @@ Multiplication
     This allows us to use a poor algorithm (such as classical multiplication)
     in the `X`-direction and leverage the existing fast integer
     multiplication routines in the `Y`-direction where the polynomial
-    degree~`n` is large.
+    degree `n` is large.
 
 .. function:: void _fq_zech_poly_mul_KS(fq_zech_struct *rop, const fq_zech_struct *op1, slong len1, const fq_zech_struct *op2, slong len2, const fq_zech_ctx_t ctx)
 
@@ -787,7 +787,7 @@ Euclidean division
 
 .. function:: void fq_zech_poly_divrem_f(fq_zech_t f, fq_zech_poly_t Q, fq_zech_poly_t R, const fq_zech_poly_t A, const fq_zech_poly_t B, const fq_zech_ctx_t ctx)
 
-    Either finds a non-trivial factor~`f` of the modulus of
+    Either finds a non-trivial factor `f` of the modulus of
     ``ctx``, or computes `Q`, `R` such that `A = B Q + R` and
     `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
@@ -895,7 +895,7 @@ Euclidean division
     length ``lenB``. We require that `Q` have space for
     ``lenA - lenB + 1`` coefficients. Furthermore, we assume that `Binv` is
     the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`. The algorithm
-    used is to call ``div_newton_preinv()`` and then multiply out
+    used is to call :func:`div_newton_preinv` and then multiply out
     and compute the remainder.
 
 .. function:: void fq_zech_poly_divrem_newton_n_preinv(fq_zech_poly_t Q, fq_zech_poly_t R, const fq_zech_poly_t A, const fq_zech_poly_t B, const fq_zech_poly_t Binv, const fq_zech_ctx_t ctx)
@@ -907,7 +907,7 @@ Euclidean division
     It is required that the length of `A` is less than or equal to
     2*the length of `B` - 2.
 
-    The algorithm used is to call ``div_newton()`` and then
+    The algorithm used is to call :func:`div_newton` and then
     multiply out and compute the remainder.
 
 .. function:: void _fq_zech_poly_inv_series_newton(fq_zech_struct* Qinv, const fq_zech_struct* Q, slong n, const fq_zech_ctx_t ctx)
@@ -993,7 +993,7 @@ Greatest common divisor
 
 .. function:: slong _fq_zech_poly_hgcd(fq_zech_struct **M, slong *lenM, fq_zech_struct *A, slong *lenA, fq_zech_struct *B, slong *lenB, const fq_zech_struct * a, slong lena, const fq_zech_struct *b, slong lenb, const fq_zech_ctx_t ctx)
 
-    Computes the HGCD of `a` and `b`, that is, a matrix~`M`, a sign~`\sigma`
+    Computes the HGCD of `a` and `b`, that is, a matrix `M`, a sign `\sigma`
     and two polynomials `A` and `B` such that
 
     .. math ::
@@ -1483,12 +1483,12 @@ Output
 .. function:: char * _fq_zech_poly_get_str_pretty(const fq_zech_struct * poly, slong len, const char * x, const fq_zech_ctx_t ctx)
 
     Returns a pretty representation of the polynomial
-    ``(poly, len)`` using the null-terminated string~``x`` as the
+    ``(poly, len)`` using the null-terminated string ``x`` as the
     variable name.
 
 .. function:: char * fq_zech_poly_get_str_pretty(const fq_zech_poly_t poly, const char * x, const fq_zech_ctx_t ctx)
 
-    Returns a pretty representation of the polynomial~``poly`` using the
+    Returns a pretty representation of the polynomial ``poly`` using the
     null-terminated string ``x`` as the variable name
 
 

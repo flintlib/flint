@@ -23,7 +23,7 @@ Memory management
 .. function:: void fmpz_poly_init(fmpz_poly_t poly)
 
     Initialises ``poly`` for use, setting its length to zero.  
-    A corresponding call to ``fmpz_poly_clear()`` must be made after 
+    A corresponding call to :func:`fmpz_poly_clear` must be made after 
     finishing with the ``fmpz_poly_t`` to free the memory used by 
     the polynomial.
 
@@ -215,27 +215,27 @@ Randomisation
 
     Sets `f` to a random polynomial with up to the given length and where 
     each coefficient has up to the given number of bits. The coefficients 
-    are signed randomly. One must call ``flint_randinit()`` before 
+    are signed randomly. One must call :func:`flint_randinit` before 
     calling this function.
 
 .. function:: void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. One must call 
-    ``flint_randinit()`` before calling this function.
+    :func:`flint_randinit` before calling this function.
 
 .. function:: void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
-    As for ``fmpz_poly_randtest()`` except that ``len`` and bits may 
+    As for :func:`fmpz_poly_randtest` except that ``len`` and bits may 
     not be zero and the polynomial generated is guaranteed not to be the 
-    zero polynomial.  One must call ``flint_randinit()`` before 
+    zero polynomial.  One must call :func:`flint_randinit` before 
     calling this function.
 
 .. function:: void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets ``p`` to a random polynomial without any real root, whose
     length is up to ``len`` and where each coefficient has up to the
-    given number of bits. One must call ``flint_randinit()`` before
+    given number of bits. One must call :func:`flint_randinit` before
     calling this function.
 
 
@@ -1300,9 +1300,9 @@ Discriminant
 .. function:: void fmpz_poly_discriminant(fmpz_t res, const fmpz_poly_t poly)
 
     Set ``res`` to the discriminant of ``poly``. We normalise the
-    discriminant so that `\operatorname{disc}(f) = (-1)^(n(n-1)/2)
+    discriminant so that `\operatorname{disc}(f) = (-1)^{(n(n-1)/2)}
     \operatorname{res}(f, f')/\operatorname{lc}(f)`, thus
-    `\operatorname{disc}(f) = \operatorname{lc}(f)^(2n - 2) \prod_{i < j} (r_i
+    `\operatorname{disc}(f) = \operatorname{lc}(f)^{(2n - 2)} \prod_{i < j} (r_i
     - r_j)^2`, where `\operatorname{lc}(f)` is the leading coefficient of `f`,
     `n` is the degree of `f` and `r_i` are the roots of `f`.
 
@@ -1968,7 +1968,7 @@ Pseudo division
 
 .. function:: void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
-    This is a variant of ``fmpz_poly_pseudo_rem()`` which computes 
+    This is a variant of :func:`fmpz_poly_pseudo_rem` which computes 
     polynomials `Q` and `R` such that `\ell^d A = B Q + R`, but only 
     returns `R`.  However, the value of `d` is fixed at 
     `\max{\{0, \operatorname{len}(A) - \operatorname{len}(B) + 1\}}`.
@@ -2137,7 +2137,7 @@ Evaluation
     Evaluates ``(poly, len)`` at the value `a` modulo `n` and 
     returns the result.  The last argument ``ninv`` must be set 
     to the precomputed inverse of `n`, which can be obtained using 
-    the function ``n_preinvert_limb()``.
+    the function :func:`n_preinvert_limb`.
 
 .. function:: mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, mp_limb_t n)
 
@@ -2178,7 +2178,8 @@ Evaluation
     Flint for quick and dirty evaluations of polynomials with all coefficients
     positive.
 
-.. function:: double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp, ulong prec_in)                                                                              
+.. function:: double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp, ulong prec_in) 
+
     Evaluate ``poly`` at ``d*2^dexp``. Return the result as a double
     and an exponent ``exp`` combination. No attempt is made to do this
     efficiently or in a numerically stable way. It is currently only used in
@@ -2334,13 +2335,13 @@ Taylor shift
 
     Performs the Taylor shift composing ``poly`` by `x+c` in-place.
     Uses a multimodular algorithm, distributing the computation
-    across ``flint_get_num_threads()`` threads.
+    across :func:`flint_get_num_threads` threads.
 
 .. function:: void fmpz_poly_taylor_shift_multi_mod(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)
 
     Performs the Taylor shift composing ``f`` by `x+c`.
     Uses a multimodular algorithm, distributing the computation
-    across ``flint_get_num_threads()`` threads.
+    across :func:`flint_get_num_threads` threads.
 
 .. function:: void _fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, slong n)
 
@@ -2757,14 +2758,14 @@ Hensel lifting
     Given polynomials such that `f = gh \pmod p` and `ag + bh = 1 \pmod p`, 
     lifts only the factors `g` and `h` modulo `P = p p_1`.
 
-    See ``fmpz_poly_hensel_lift()``.
+    See :func:`fmpz_poly_hensel_lift`.
 
 .. function:: void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout, const fmpz_poly_t G, const fmpz_poly_t H, const fmpz_poly_t a, const fmpz_poly_t b, const fmpz_t p, const fmpz_t p1)
 
     Given polynomials such that `f = gh \pmod p` and `ag + bh = 1 \pmod p`, 
     lifts only the cofactors `a` and `b` modulo `P = p p_1`.
 
-    See ``fmpz_poly_hensel_lift()``.
+    See :func:`fmpz_poly_hensel_lift`.
 
 .. function:: void fmpz_poly_hensel_lift_tree_recursive(slong *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, slong j, slong inv, const fmpz_t p0, const fmpz_t p1)
 
@@ -2792,9 +2793,9 @@ Hensel lifting
     wish to lift, made monic mod `p^b`. As usual, ``(link, v, w)`` is an 
     initialised tree.
 
-    This starts the recursion on lifting the \emph{product tree} for lifting 
+    This starts the recursion on lifting the *product tree* for lifting 
     from `p^{e_0}` to `p^{e_1}`. The value of ``inv`` corresponds to that 
-    given for the function ``fmpz_poly_hensel_lift_tree_recursive()``. We 
+    given for the function :func:`fmpz_poly_hensel_lift_tree_recursive`. We 
     set `r` to the number of local factors of `f`.
 
     In terms of the notation, above `P = p^{e_1}`, `p_0 = p^{e_0}` and 
@@ -2818,7 +2819,7 @@ Hensel lifting
     later. The product of local factors must be squarefree.
 
     The return value is an exponent which must be passed to the function 
-    ``_fmpz_poly_hensel_continue_lift()`` as ``prev_exp`` if the 
+    :func:`_fmpz_poly_hensel_continue_lift` as ``prev_exp`` if the 
     Hensel lifting is to be resumed.
 
     Currently, supports the case when `N = 1` for convenience, 
@@ -2832,8 +2833,8 @@ Hensel lifting
 
     It lifts from ``curr`` to `N`. It also requires ``prev`` 
     (to lift the cofactors) given as the return value of the function 
-    ``_fmpz_poly_hensel_start_lift()`` or the function
-    ``_fmpz_poly_hensel_continue_lift()``. The current lifted factors 
+    :func:`_fmpz_poly_hensel_start_lift` or the function
+    :func:`_fmpz_poly_hensel_continue_lift`. The current lifted factors 
     are supplied in ``lifted_fac`` and upon return are updated
     there. As usual ``link``, ``v``, and ``w`` describe the 
     current Hensel tree, `r` is the number of local factors and `p` is 
@@ -2966,7 +2967,7 @@ Some examples of the ``_pretty`` representation are::
     Reads a polynomial in pretty format from ``stdin``.
 
     For further details, see the documentation for the function 
-    ``fmpz_poly_fread_pretty()``.
+    :func:`fmpz_poly_fread_pretty`.
 
 .. function:: int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 
@@ -3251,7 +3252,7 @@ Orthogonal polynomials
 .. function:: void _fmpz_poly_legendre_pt(fmpz * coeffs, ulong n)
 
     Sets ``coeffs`` to the coefficient array of the shifted Legendre
-    polynomial `\tilde{P_n}(x)`, defined by `\tilde{P_n(x)} = P_n(2x-1)`, for `n\ge0`.
+    polynomial `\tilde{P_n}(x)`, defined by `\tilde{P_n}(x) = P_n(2x-1)`, for `n\ge0`.
     The coefficients are calculated using a hypergeometric recurrence.
     The length of the array will be ``n+1``.
     See ``fmpq_poly`` for the Legendre polynomials.
@@ -3259,7 +3260,7 @@ Orthogonal polynomials
 .. function:: void fmpz_poly_legendre_pt(fmpz_poly_t poly, ulong n)
 
     Sets ``poly`` to the shifted Legendre polynomial `\tilde{P_n}(x)`,
-    defined by `\tilde{P_n(x)} = P_n(2x-1)`, for `n\ge0`. The coefficients are
+    defined by `\tilde{P_n}(x) = P_n(2x-1)`, for `n\ge0`. The coefficients are
     calculated using a hypergeometric recurrence. See ``fmpq_poly``
     for the Legendre polynomials.
 

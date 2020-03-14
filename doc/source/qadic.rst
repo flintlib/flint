@@ -23,11 +23,11 @@ where `f \in \mathbf{Q}_p[X]` is a monic, irreducible
 polynomial which we assume to actually be in `\mathbf{Z}[X]`.
 The first field in the context structure is a `p`-adic 
 context struct ``pctx``, which contains data about 
-the prime~`p`, precomputed powers, the printing mode etc.
+the prime `p`, precomputed powers, the printing mode etc.
 The polynomial `f` is represented as a sparse polynomial 
 using two arrays `j` and `a` of length ``len``, where 
 `f(X) = \sum_{i} a_{i} X^{j_{i}}`.  We also assume that 
-the array~`j` is sorted in ascending order.
+the array `j` is sorted in ascending order.
 We choose this data structure to improve reduction 
 modulo `f(X)` in `\mathbf{Q}_p[X]`, assuming a sparse 
 polynomial `f(X)` is chosen.
@@ -99,12 +99,12 @@ Memory management
 
 .. function:: void qadic_init(qadic_t rop)
 
-    Initialises the element ``rop``, setting its value to~`0`.
+    Initialises the element ``rop``, setting its value to `0`.
 
 .. function:: void qadic_init2(qadic_t rop, slong prec)
 
     Initialises the element ``rop`` with the given output precision, 
-    setting the value to~`0`.
+    setting the value to `0`.
 
 .. function:: void qadic_clear(qadic_t rop)
 
@@ -114,7 +114,7 @@ Memory management
 
     Reduces a polynomial ``(R, lenR)`` modulo a sparse monic 
     polynomial `f(X) = \sum_{i} a_{i} X^{j_{i}}` of degree at 
-    least~`2`.
+    least `2`.
 
     Assumes that the array `j` of positive length ``len`` is 
     sorted in ascending order.
@@ -125,7 +125,7 @@ Memory management
 
     Reduces a polynomial ``(R, lenR)`` modulo a sparse monic 
     polynomial `f(X) = \sum_{i} a_{i} X^{j_{i}}` of degree at 
-    least~`2` in `\mathbf{Z}/(p)`, where `p` is typically a prime 
+    least `2` in `\mathbf{Z}/(p)`, where `p` is typically a prime 
     power.
 
     Assumes that the array `j` of positive length ``len`` is 
@@ -208,7 +208,7 @@ Assignments and conversions
 .. function:: int qadic_get_padic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     If the element ``op`` lies in `\mathbf{Q}_p`, sets ``rop`` 
-    to its value and returns~`1`;  otherwise, returns~`0`.
+    to its value and returns `1`;  otherwise, returns `0`.
 
 
 Comparison
@@ -264,7 +264,7 @@ Basic arithmetic
     Sets ``(rop, d)`` to the inverse of ``(op, len)`` 
     modulo `f(X)` given by ``(a,j,lena)`` and `p^N`.
 
-    Assumes that ``(op,len)`` has valuation~`0`, that is, 
+    Assumes that ``(op,len)`` has valuation `0`, that is, 
     that it represents a `p`-adic unit.
 
     Assumes that ``len`` is at most `d`.
@@ -277,21 +277,21 @@ Basic arithmetic
 
 .. function:: void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, const fmpz *a, const slong *j, slong lena, const fmpz_t p)
 
-    Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power~`e`, 
+    Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`, 
     reduced modulo `f(X)` given by ``(a, j, lena)`` and `p`, which 
     is expected to be a prime power.
 
-    Assumes that `e \geq 0` and that ``len`` is positive and at most~`d`.
+    Assumes that `e \geq 0` and that ``len`` is positive and at most `d`.
 
     Although we require that ``rop`` provides space for 
     `2d - 1` coefficients, the output will be reduces modulo 
-    `f(X)`, which is a polynomial of degree~`d`.
+    `f(X)`, which is a polynomial of degree `d`.
 
     Does not support aliasing.
 
 .. function:: void qadic_pow(qadic_t rop, const qadic_t op, const fmpz_t e, const qadic_ctx_t ctx)
 
-    Sets ``rop`` the ``op`` raised to the power~`e`.
+    Sets ``rop`` the ``op`` raised to the power `e`.
 
     Currently assumes that `e \geq 0`.
 
@@ -350,7 +350,7 @@ Special functions
     context.
 
     The exponential series converges if the valuation of ``op`` 
-    is at least~`2` or `1` when `p` is even or odd, respectively.
+    is at least `2` or `1` when `p` is even or odd, respectively.
 
 .. function:: void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
 
@@ -454,19 +454,19 @@ Special functions
     Computes `\sigma^e(X) \bmod{p^N}` where `X` is such that 
     `\mathbf{Q}_q \cong \mathbf{Q}_p[X]/(f(X))`.
 
-    Assumes that the precision `N` is at least~`2` and that the 
+    Assumes that the precision `N` is at least `2` and that the 
     extension is non-trivial, i.e.\ `d \geq 2`.
 
     Assumes that `0 < e < d`.
 
     Sets ``(rop, 2*d-1)``, although the actual length of the 
-    output will be at most~`d`.
+    output will be at most `d`.
 
 .. function:: void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
 
     Sets ``(rop, 2*d-1)`` to `\Sigma` evaluated at ``(op, len)``.
 
-    Assumes that ``len`` is positive but at most~`d`.
+    Assumes that ``len`` is positive but at most `d`.
 
     Assumes that `0 < e < d`.
 
@@ -488,7 +488,7 @@ Special functions
 .. function:: void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
 
     Sets ``(rop, d)`` to the Teichm\"uller lift of ``(op, len)`` 
-    modulo~`p^N`.
+    modulo `p^N`.
 
     Does not support aliasing.
 
@@ -498,7 +498,7 @@ Special functions
     precision given in the context.
 
     For a unit ``op``, this is the unique `(q-1)`th root of unity 
-    which is congruent to ``op`` modulo~`p`.
+    which is congruent to ``op`` modulo `p`.
 
     Sets ``rop`` to zero if ``op`` is zero in the given context.
 
@@ -581,7 +581,7 @@ Output
 
     Prints a pretty representation of ``op`` to ``file``.
 
-    In the current implementation, always returns~`1`.  The return code is 
+    In the current implementation, always returns `1`.  The return code is 
     part of the function's signature to allow for a later implementation to 
     return the number of characters printed or a non-positive error code.
 
@@ -589,6 +589,6 @@ Output
 
     Prints a pretty representation of ``op`` to ``stdout``.
 
-    In the current implementation, always returns~`1`.  The return code is 
+    In the current implementation, always returns `1`.  The return code is 
     part of the function's signature to allow for a later implementation to 
     return the number of characters printed or a non-positive error code.

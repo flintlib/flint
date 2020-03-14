@@ -3,6 +3,14 @@
 **flint.h** -- global definitions
 ===============================================================================
 
+.. type:: flint_rand_s
+
+    A structure holding the state of a flint pseudo random number generator.
+
+.. type:: flint_rand_t
+
+    An array of length 1 of :type:`flint_rand_s`
+
 .. function:: flint_rand_s * flint_rand_alloc()
 
     Allocates a ``flint_rand_t`` object to be used like a heap-allocated
@@ -11,7 +19,7 @@
 
 .. function:: void flint_rand_free(flint_rand_s * state)
    
-    Frees a random state object as allocated using ``flint_rand_alloc``.
+    Frees a random state object as allocated using :func:`flint_rand_alloc`.
 
 .. function:: void flint_set_num_threads(int num_threads)
 
@@ -34,7 +42,7 @@
     In general, this function returns one more than the number of additional
     worker threads that can be started by the current thread.
 
-    Use ``thread_pool_wake`` to set this number for a given worker thread.
+    Use :func:`thread_pool_wake` to set this number for a given worker thread.
 
 .. function:: int flint_set_num_workers(int num_workers)
 
@@ -50,16 +58,16 @@
     higher number is passed, the function has no effect.
 
     The number of workers must be restored to the original value by a call to
-    ``flint_reset_num_workers`` before the thread is returned to the thread
+    :func:`flint_reset_num_workers` before the thread is returned to the thread
     pool.
 
-    The main use of this function and ``flint_reset_num_workers`` is to cheaply
+    The main use of this function and :func:`flint_reset_num_workers` is to cheaply
     and temporarily restrict the number of workers that can be started, e.g. by
     a function that one wishes to call from a thread, and cheaply restore the
     number of workers to its original value before exiting the current thread.
 
 .. function:: void flint_reset_num_workers(int num_workers)
 
-    After a call to ``flint_set_num_workers`` this function must be called to
+    After a call to :func:`flint_set_num_workers` this function must be called to
     set the number of workers that may be started by the current thread back to
     its original value.

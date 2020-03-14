@@ -33,7 +33,7 @@ Memory management
 
     Clears the matrix and releases any memory it used. The matrix
     cannot be used again until it is initialised. This function must be
-    called exactly once when finished using an ``fq_nmod_mat_t`` object.
+    called exactly once when finished using an :type:`fq_nmod_mat_t` object.
 
 .. function:: void fq_nmod_mat_set(fq_nmod_mat_t mat, fq_nmod_mat_t src, const fq_nmod_ctx_t ctx)
 
@@ -185,7 +185,7 @@ Random matrix generation
     `\mathbf{F}_{q}`.
 
     The matrix can be transformed into a dense matrix with unchanged
-    rank by subsequently calling ``fq_nmod_mat_randops()``.
+    rank by subsequently calling :func:`fq_nmod_mat_randops`.
 
 .. function:: void fq_nmod_mat_randops(fq_nmod_mat_t mat, slong count, flint_rand_t state, const fq_nmod_ctx_t ctx)
 

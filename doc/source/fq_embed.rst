@@ -40,7 +40,7 @@ Computing isomorphisms and embeddings of finite fields
     * a generator ``gen_sub`` of ``sub_ctx``, its minimal
       polynomial ``gen_minpoly``, and a root ``gen_sup`` of
       ``gen_minpoly`` in ``sup_ctx``, as returned by
-      ``fq_embed_gens``;
+      :func:`fq_embed_gens`;
     
     Compute:
 

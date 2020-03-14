@@ -65,10 +65,10 @@ Computing isomorphisms and embeddings of finite fields
     This matrix is computed as
 
     ``embed_dual_to_mono_matrix(_, sub_ctx)``
-    `\times` ``basis``:sup:`t` ``\times``
+    `\times` ``basis``:sup:`t` `\times`
     ``embed_mono_to_dual_matrix(_, sup_ctx)}``.
       
-    \textbf{Note:} if
+    **Note:** if
     `m=n`, ``basis`` represents a Frobenius, and the result is its
     inverse matrix.
 

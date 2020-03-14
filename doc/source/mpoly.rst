@@ -6,7 +6,16 @@
 
 Orderings
 --------------------------------------------------------------------------------
+.. type:: ordering_t
 
+     An enumeration of supported term orderings.  Currently one of ``ORD_LEX``, 
+     ``ORD_DEGLEX`` or ``ORD_DEGREVLEX``.
+
+.. type:: mpoly_ctx_struct
+          mpoly_ctx_t
+
+     An mpoly_ctx_struct is a structure holding information about the number of
+     variables and the term ordering of an multivariate polynomial.
 
 .. function:: void mpoly_ctx_init(mpoly_ctx_t ctx, slong nvars, const ordering_t ord)
 

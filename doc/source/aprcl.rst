@@ -16,7 +16,7 @@ Primality test functions
 .. function:: int is_prime_aprcl(const fmpz_t n)
 
     Tests `n` for primality using the APRCL test.
-    This is the same as :func:`is_prime_jacobi()`.
+    This is the same as :func:`is_prime_jacobi`.
 
 .. function:: int is_prime_jacobi(const fmpz_t n)
 
@@ -25,8 +25,8 @@ Primality test functions
     "A Course in Computational Algebraic Number Theory" by H. Cohen.
 
     It is theoretically possible that this function fails to prove that
-    `n` is prime. In this event, ``flint_abort()`` is called.
-    To handle this condition, the :func:`_is_prime_jacobi()` function
+    `n` is prime. In this event, :func:`flint_abort` is called.
+    To handle this condition, the :func:`_is_prime_jacobi` function
     can be used.
 
 .. function:: int is_prime_gauss(const fmpz_t n)
@@ -38,8 +38,8 @@ Primality test functions
 
     By default `R \ge 180`. In some cases this function fails to prove
     that `n` is prime. This means that we select a too small `R` value.
-    In this event, ``flint_abort()`` is called.
-    To handle this condition, the :func:`_is_prime_jacobi()` function
+    In this event, :func:`flint_abort` is called.
+    To handle this condition, the :func:`_is_prime_jacobi` function
     can be used.
 
 .. function:: primality_test_status _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
