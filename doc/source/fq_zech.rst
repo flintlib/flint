@@ -31,7 +31,7 @@ Context Management
     use a Conway polynomial; if one is not available, a random
     primitive polynomial will be used.
 
-    Assumes that `p` is a prime and `p^d < 2^\texttt{FLINT_BITS}`.
+    Assumes that `p` is a prime and :math:`p^d < 2^{\mathtt{FLINT\_BITS}}`.
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
@@ -46,7 +46,7 @@ Context Management
     given size and the initialization is successful; otherwise,
     returns `0`.
 
-    Assumes that `p` is a prime and `p^d < 2^\texttt{FLINT_BITS}`.
+    Assumes that `p` is a prime and `p^d < 2^\mathtt{FLINT\_BITS}`.
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
@@ -57,7 +57,7 @@ Context Management
     with name ``var`` for the generator using a Conway polynomial
     for the modulus.
 
-    Assumes that `p` is a prime and `p^d < 2^\texttt{FLINT_BITS}`.
+    Assumes that `p` is a prime and `p^d < 2^\mathtt{FLINT\_BITS}`.
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
@@ -68,7 +68,7 @@ Context Management
     with name ``var`` for the generator using a random primitive
     polynomial.
 
-    Assumes that `p` is a prime and `p^d < 2^\texttt{FLINT_BITS}`.
+    Assumes that `p` is a prime and `p^d < 2^\mathtt{FLINT\_BITS}`.
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.

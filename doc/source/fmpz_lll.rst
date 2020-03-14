@@ -165,7 +165,7 @@ These programs implement ideas from the book chapter [Stehle2010]_.
 .. function:: int fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     A wrapper of :func:`fmpz_lll_mpf2`. This currently begins with
-    `prec == \D_BITS`, then for the first 20 loops, increases the precision one
+    `prec == D_BITS`, then for the first 20 loops, increases the precision one
     limb at a time. After 20 loops, it doubles the precision each time. There
     is a proof that this will eventually work. The return value of this
     function is 0 if the LLL is successful or -1 if the precision maxes out
