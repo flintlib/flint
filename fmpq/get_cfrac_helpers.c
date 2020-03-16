@@ -314,7 +314,6 @@ static slong _uiui_hgcd(
     mp_limb_t B1, mp_limb_t B0,
     _ui_mat22_t M)
 {
-    int i;
     slong written = 0;
     mp_limb_t d0, d1;
     mp_limb_t t0, t1, t2, r0, r1;
@@ -337,57 +336,7 @@ static slong _uiui_hgcd(
 
     while (1)
     {
-        FLINT_ASSERT(a1 != 0);
-        FLINT_ASSERT(b1 != 0);
-        FLINT_ASSERT(b1 <= a1);
-        FLINT_ASSERT(b1 < a1 || (b1 == a1 && b0 < a0));
-        q = 1;
-
-        sub_ddmmss(r1,r0, a1,a0, b1,b0);
-
-subtract:
-
-        for (i = 2; i <= 4; i++)
-        {
-            sub_dddmmmsss(t2,t1,t0, 0,r1,r0, 0,b1,b0);
-            if (t2 != 0)
-                goto quotient_found;
-            q += 1;
-            r0 = t0;
-            r1 = t1;
-        }
-
-        if (r1 != 0)
-        {
-            int ncnt, dcnt;
-            mp_limb_t Q = 0;
-
-            count_leading_zeros(ncnt, r1);
-            count_leading_zeros(dcnt, b1);
-            dcnt -= ncnt;
-            if (dcnt <= 0)
-                goto subtract;
-
-            d1 = (b1 << dcnt) | (b0 >> (FLINT_BITS - dcnt));
-            d0 = b0 << dcnt;
-
-            while (dcnt >= 0)
-            {
-                sub_dddmmmsss(t2,t1,t0, 0,r1,r0, 0,d1,d0);
-                Q = 2*Q + 1 + t2;
-                r1 = t2 ? r1 : t1;
-                r0 = t2 ? r0 : t0;
-                d0 = (d1 << (FLINT_BITS - 1)) | (d0 >> 1);
-                d1 = d1 >> 1;
-                dcnt--;
-            }
-
-            q += Q;
-        }
-
-quotient_found:
-
-        FLINT_ASSERT(r1 < b1 || (r1 == b1 && r0 < b0));
+        eudiv_qrrnndd(q, r1, r0, a1, a0, b1, b0, hgcd_);
 
         t1 = m12 + q*m11;
         t2 = m22 + q*m21;
