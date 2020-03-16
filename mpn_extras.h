@@ -96,6 +96,9 @@ FLINT_DLL mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
 
 FLINT_DLL int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop);
 
+FLINT_DLL mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1,
+                                      mp_limb_t a2, mp_srcptr x2, mp_size_t n);
+
 FLINT_DLL int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
          mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
 

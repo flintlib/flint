@@ -13,6 +13,7 @@
 #include "longlong.h"
 #include "fmpq.h"
 #include "fmpz_poly.h"
+#include "mpn_extras.h"
 
 /* enable for debug printing of various types */
 #if 0
@@ -509,25 +510,6 @@ fix:
 
 }
 
-/* y = a1*x1 - a2*x2 */
-static mp_size_t _msub(mp_ptr y, mp_limb_t a1, mp_ptr x1,
-                                 mp_limb_t a2, mp_ptr x2, mp_size_t n)
-{
-    mp_limb_t h0, h1;
-
-    h0 =    mpn_mul_1(y, x1, n, a1);
-    h1 = mpn_submul_1(y, x2, n, a2);
-
-    if (h1 != h0)
-        return -1;
-
-    while (n > 0 && y[n - 1] == 0)
-        n--;
-
-    return n;
-}
-
-
 static void _lehmer_exact(_fmpz_vector_t s, _fmpz_mat22_t M, int flags,
                                     fmpz_t xa, fmpz_t xb, fmpz_t ya, fmpz_t yb)
 {
@@ -612,21 +594,21 @@ again:
 
     if (m->det == 1)
     {
-        yn_len = _msub(yn_ptr, m->_22, xn_ptr, m->_12, xd_ptr, n);
+        yn_len = flint_mpn_fmms1(yn_ptr, m->_22, xn_ptr, m->_12, xd_ptr, n);
         if (yn_len <= 0)
             goto cleanup;
 
-        yd_len = _msub(yd_ptr, m->_11, xd_ptr, m->_21, xn_ptr, n);
+        yd_len = flint_mpn_fmms1(yd_ptr, m->_11, xd_ptr, m->_21, xn_ptr, n);
         if (yd_len <= 0)
             goto cleanup;
     }
     else
     {
-        yn_len = _msub(yn_ptr, m->_12, xd_ptr, m->_22, xn_ptr, n);
+        yn_len = flint_mpn_fmms1(yn_ptr, m->_12, xd_ptr, m->_22, xn_ptr, n);
         if (yn_len <= 0)
             goto cleanup;
 
-        yd_len = _msub(yd_ptr, m->_21, xn_ptr, m->_11, xd_ptr, n);
+        yd_len = flint_mpn_fmms1(yd_ptr, m->_21, xn_ptr, m->_11, xd_ptr, n);
         if (yd_len <= 0)
             goto cleanup;
     }
@@ -801,37 +783,37 @@ again:
 
     if (m->det == 1)
     {
-        yln_len = _msub(yln_ptr, m->_22, xln_ptr, m->_12, xld_ptr, nl);
+        yln_len = flint_mpn_fmms1(yln_ptr, m->_22, xln_ptr, m->_12, xld_ptr, nl);
         if (yln_len <= 0)
             goto cleanup;
 
-        yld_len = _msub(yld_ptr, m->_11, xld_ptr, m->_21, xln_ptr, nl);
+        yld_len = flint_mpn_fmms1(yld_ptr, m->_11, xld_ptr, m->_21, xln_ptr, nl);
         if (yld_len <= 0)
             goto cleanup;
 
-        yrn_len = _msub(yrn_ptr, m->_22, xrn_ptr, m->_12, xrd_ptr, nr);
+        yrn_len = flint_mpn_fmms1(yrn_ptr, m->_22, xrn_ptr, m->_12, xrd_ptr, nr);
         if (yrn_len <= 0)
             goto cleanup;
 
-        yrd_len = _msub(yrd_ptr, m->_11, xrd_ptr, m->_21, xrn_ptr, nr);
+        yrd_len = flint_mpn_fmms1(yrd_ptr, m->_11, xrd_ptr, m->_21, xrn_ptr, nr);
         if (yrd_len <= 0)
             goto cleanup;
     }
     else
     {
-        yrn_len = _msub(yrn_ptr, m->_12, xld_ptr, m->_22, xln_ptr, nl);
+        yrn_len = flint_mpn_fmms1(yrn_ptr, m->_12, xld_ptr, m->_22, xln_ptr, nl);
         if (yrn_len <= 0)
             goto cleanup;
 
-        yrd_len = _msub(yrd_ptr, m->_21, xln_ptr, m->_11, xld_ptr, nl);
+        yrd_len = flint_mpn_fmms1(yrd_ptr, m->_21, xln_ptr, m->_11, xld_ptr, nl);
         if (yrd_len <= 0)
             goto cleanup;
 
-        yln_len = _msub(yln_ptr, m->_12, xrd_ptr, m->_22, xrn_ptr, nr);
+        yln_len = flint_mpn_fmms1(yln_ptr, m->_12, xrd_ptr, m->_22, xrn_ptr, nr);
         if (yln_len <= 0)
             goto cleanup;
 
-        yld_len = _msub(yld_ptr, m->_21, xrn_ptr, m->_11, xrd_ptr, nr);
+        yld_len = flint_mpn_fmms1(yld_ptr, m->_21, xrn_ptr, m->_11, xrd_ptr, nr);
         if (yld_len <= 0)
             goto cleanup;
     }
