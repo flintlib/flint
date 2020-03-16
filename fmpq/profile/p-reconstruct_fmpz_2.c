@@ -148,9 +148,8 @@ printf("---- balanced ----\n");
     profile_it(state,    8,  20000,  20000,  40000,1);
     profile_it(state,    6,  40000,  40000,  80000,1);
     profile_it(state,    6,  40000,  40000,  80000,1);
-    profile_it(state,    4, 100000, 100000, 200000,1);
-    profile_it(state,    2, 200000, 200000, 400000,1);
-    profile_it(state,    1, 400000, 400000, 800000,1);
+    profile_it(state,    4,  80000,  80000, 160000,1);
+    profile_it(state,    1, 160000, 160000, 320000,1);
 
 printf("---- imbalanced ----\n");
 
