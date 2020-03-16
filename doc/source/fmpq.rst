@@ -501,8 +501,7 @@ Modular reduction and rational reconstruction
 
     Reconstructs a rational number from its residue `a` modulo `m`,
     returning 1 if successful and 0 if no solution exists.
-    Uses the balanced bounds `N = D = \lfloor\sqrt{m/2}\rfloor`.
-
+    Uses the balanced bounds `N = D = \lfloor\sqrt{\frac{m-1}{2}}\rfloor`.
 
 
 Rational enumeration

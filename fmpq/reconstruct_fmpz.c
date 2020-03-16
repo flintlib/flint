@@ -20,6 +20,8 @@ int _fmpq_reconstruct_fmpz(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m)
 
     fmpz_init(N);
     fmpz_fdiv_q_2exp(N, m, 1);
+    if (fmpz_is_even(m))
+        fmpz_sub_ui(N, N, 1);
     fmpz_sqrt(N, N);
     result = _fmpq_reconstruct_fmpz_2(n, d, a, m, N, N);
     fmpz_clear(N);
