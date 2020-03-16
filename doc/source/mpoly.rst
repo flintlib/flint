@@ -3,6 +3,17 @@
 **mpoly.h** -- support functions for multivariate polynomials
 ===============================================================================
 
+    An array of type ``ulong *`` or ``fmpz **`` is used to communicate
+    exponent vectors. These exponent vectors must have length equal to the
+    number of variables in the polynmial ring.
+    The element of this exponent vector at index `0`
+    corresponds to the most significant variable in the monomial ordering.
+    For example, if the polynomial is `7*x^2*y+8*y*z+9` and the variables are
+    ordered so that `x>y>z`, the degree function will return `{2,1,1}`.
+    Similarly, the exponent vector of the `0`-index term of this polynomial is
+    `{2,1,0}`, while the `2`-index term has exponent vector `{0,0,0}` and
+    coefficient `9`.
+
 
 Orderings
 --------------------------------------------------------------------------------

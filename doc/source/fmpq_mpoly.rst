@@ -3,15 +3,15 @@
 **fmpq_mpoly.h** -- multivariate polynomials over the rational numbers
 ===============================================================================
 
-Description.
+    The exponents follow the ``mpoly`` interface.
+    No references to the coefficients are avaiable.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fmpq_mpoly_ctx_struct
 
-    Context structure for ``fmpq_mpoly``.  This is a structure holding a
-    ``fmpz_mpoly_ctx_struct``.
+    Context structure for ``fmpq_mpoly``.
 
 .. type:: fmpq_mpoly_ctx_t
 
@@ -25,23 +25,12 @@ Types, macros and constants
 
 .. type:: fmpq_mpoly_t
 
-    An array of length 1 holding a ``fmpq_mpoly_struct``.
+    An array of length 1 of ``fmpq_mpoly_struct``.
 
 
 Context object
 --------------------------------------------------------------------------------
 
-
-    An array of type ``ulong *`` or ``fmpz **`` is used to communicate
-    exponent vectors. These exponent vectors must have length equal to the
-    number of variables in the polynmial ring.
-    The element of this exponent vector at index `0`
-    corresponds to the most significant variable in the monomial ordering.
-    For example, if the polynomial is `7*x^2*y+8*y*z+9` and the variables are
-    ordered so that `x>y>z`, the degree function will return `{2,1,1}`.
-    Similarly, the exponent vector of the `0`-index term in this polynomial is
-    `{2,1,0}`, while the `2`-index term has exponent vector `{0,0,0}` and
-    coefficient `9`.
 
 .. function:: void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx, slong nvars, const ordering_t ord)
 
@@ -68,17 +57,16 @@ Memory management
 .. function:: void fmpq_mpoly_init(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    By default 8 bits are allocated for the exponent widths.
 
 .. function:: void fmpq_mpoly_init2(fmpq_mpoly_t A, slong alloc, const fmpq_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and at least ``MPOLY_MIN_BITS`` bits for the exponents.
 
 .. function:: void fmpq_mpoly_init3(fmpq_mpoly_t A, slong alloc, flint_bitcnt_t bits, const fmpq_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and ``bits`` bits for the exponents.
 
 .. function:: void fmpq_mpoly_fit_length(fmpq_mpoly_t A, slong len, const fmpq_mpoly_ctx_t ctx)
 

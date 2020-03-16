@@ -3,22 +3,27 @@
 **nmod_mpoly.h** -- multivariate polynomials over integers mod n (word-size n)
 ===============================================================================
 
-Description.
+    The exponents follow the ``mpoly`` interface.
+    A coefficient may be referenced as a ``mp_limb_t *``.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: nmod_mpoly_ctx_struct
 
+    Context structure for ``nmod_mpoly``.
+
 .. type:: nmod_mpoly_ctx_t
 
-    Description.
+    An array of length 1 of ``nmod_mpoly_ctx_struct``.
 
 .. type:: nmod_mpoly_struct
 
+    A structure holding a multivariate polynomial over the integers modulo `n` for word-sized `n`.
+
 .. type:: nmod_mpoly_t
 
-    Description.
+    An array of length 1 of ``fmpz_mpoly_struct``.
 
 
 Context object
@@ -56,17 +61,16 @@ Memory management
 .. function:: void nmod_mpoly_init(nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    By default 8 bits are allocated for the exponent widths.
 
 .. function:: void nmod_mpoly_init2(nmod_mpoly_t A, slong alloc, const nmod_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and at least ``MPOLY_MIN_BITS`` bits for the exponent widths.
 
 .. function:: void nmod_mpoly_init3(nmod_mpoly_t A, slong alloc, flint_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and ``bits`` bits for the exponents.
 
 .. function:: void nmod_mpoly_fit_length(nmod_mpoly_t A, slong len, const nmod_mpoly_ctx_t ctx)
 
