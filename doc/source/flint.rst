@@ -3,13 +3,38 @@
 **flint.h** -- global definitions
 ===============================================================================
 
+
+Allocation Functions
+-----------------------------------------------
+
+.. function::  void * flint_malloc(size_t size)
+
+   Allocate ``size`` bytes of memory.
+
+.. function::  void * flint_realloc(void * ptr, size_t size)
+
+   Reallocate an area of memory previously allocated by :func:`flint_malloc`,
+   :func:`flint_realloc`, or :func:`flint_calloc`.
+
+.. function::  void * flint_calloc(size_t num, size_t size)
+
+   Allocate ``num`` objects of ``size`` bytes each, and zero the allocated memory.
+
+.. function ::   void flint_free(void * ptr)       
+
+   Free a section of memory allocated by  :func:`flint_malloc`,
+   :func:`flint_realloc`, or :func:`flint_calloc`.
+
+Random Numbers
+------------------
+
 .. type:: flint_rand_s
 
     A structure holding the state of a flint pseudo random number generator.
 
 .. type:: flint_rand_t
 
-    An array of length 1 of :type:`flint_rand_s`
+    An array of length 1 of :type:`flint_rand_s`.
 
 .. function:: flint_rand_s * flint_rand_alloc()
 
@@ -20,6 +45,9 @@
 .. function:: void flint_rand_free(flint_rand_s * state)
    
     Frees a random state object as allocated using :func:`flint_rand_alloc`.
+
+Thread functions
+-----------------------
 
 .. function:: void flint_set_num_threads(int num_threads)
 
@@ -71,3 +99,26 @@
     After a call to :func:`flint_set_num_workers` this function must be called to
     set the number of workers that may be started by the current thread back to
     its original value.
+
+Input/Output
+-----------------
+
+.. function::  int flint_printf(const char * str, ...)
+               int flint_vprintf(const char * str, va_list ap)
+               int flint_fprintf(FILE * f, const char * str, ...)
+               int flint_sprintf(char * s, const char * str, ...)
+
+    These are equivalent to the standard library functions ``printf``,
+    ``vprintf``, ``fprintf``, and ``sprintf`` with an additional length modifier
+    "w" for use with an :type:`mp_limb_t` type. This modifier can be used with
+    format specifiers "d", "x", or "u", thereby outputting the limb as a signed
+    decimal, hexadecimal, or unsigned decimal integer.
+
+           
+.. function::  int flint_scanf(const char * str, ...)
+               int flint_fscanf(FILE * f, const char * str, ...)
+               int flint_sscanf(const char * s, const char * str, ...)
+
+     These are equivalent to the standard library functions ``scanf``,
+     ``fscanf``, and ``sscanf`` with an additional length modifier "w" for
+     reading an :type:`mp_limb_t` type.

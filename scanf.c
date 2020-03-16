@@ -76,7 +76,7 @@ int flint_scanf(const char * str, ...)
                goto cleanup;
          }
          break;
-      default: /* pass to printf */
+      default: /* pass to scanf */
          args = parse_fmt(&floating, str2);
          if (args) 
          {
