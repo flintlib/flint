@@ -149,8 +149,8 @@ FLINT_DLL void fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z,
                                                      mp_limb_t k, mp_ptr n,
                                                      ecm_t ecm_inf);
 
-FLINT_DLL int fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n,
-                                           ecm_t ecm_inf);
+FLINT_DLL int fmpz_factor_ecm_select_curve(mp_ptr f,
+		                          mp_ptr sig, mp_ptr n, ecm_t ecm_inf);
 
 FLINT_DLL int fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array,
                                       mp_limb_t num, mp_limb_t B1, mp_ptr n, 

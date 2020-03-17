@@ -102,7 +102,7 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
 
       while (cy > 0)
          cy -= mpn_sub_n(r, r, d, n);
-   
+
       if (mpn_cmp(r, d, n) >= 0)
          mpn_sub_n(r, r, d, n);
    }

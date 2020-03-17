@@ -48,7 +48,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
                 flint_rand_t state, const fmpz_t n_in)
 {
     fmpz_t sig, nm8;
-    mp_limb_t P, num, maxD, mmin, mmax, mdiff, prod, maxj, n_size, cy;
+    mp_limb_t P, num, maxP, mmin, mmax, mdiff, prod, maxj, n_size, cy;
     int i, j, ret;
     ecm_t ecm_inf;
     __mpz_struct *fac, *mpz_ptr;
@@ -62,16 +62,16 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     fmpz_factor_ecm_init(ecm_inf, n_size);
 
     TMP_START;
-
-    n     = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    mpsig = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-
+    
     if (n_size == 1)
     {
         ret = n_factor_ecm(&P, curves, B1, B2, state, fmpz_get_ui(n_in));
         fmpz_set_ui(f, P);
         return ret;
     }
+
+    n      = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    mpsig  = TMP_ALLOC(n_size * sizeof(mp_limb_t));
 
     if ((!COEFF_IS_MPZ(* n_in)))
     {
@@ -83,7 +83,10 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     {
         mpz_ptr = COEFF_TO_PTR(* n_in);
         count_leading_zeros(ecm_inf->normbits, mpz_ptr->_mp_d[n_size - 1]);
-        mpn_lshift(n, mpz_ptr->_mp_d, n_size, ecm_inf->normbits);
+        if (ecm_inf->normbits)
+           mpn_lshift(n, mpz_ptr->_mp_d, n_size, ecm_inf->normbits);
+        else
+           flint_mpn_copyi(n, mpz_ptr->_mp_d, n_size);
     }
 
     flint_mpn_preinvn(ecm_inf->ninv, n, n_size);
@@ -106,12 +109,12 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     /************************ STAGE II PRECOMPUTATIONS ***********************/
 
-    maxD = n_sqrt(B2);
+    maxP = n_sqrt(B2);
 
     /* Selecting primorial */
 
     j = 1;
-    while ((j < num_n_ecm_primorials) && (n_ecm_primorial[j] < maxD))
+    while ((j < num_n_ecm_primorials) && (n_ecm_primorial[j] < maxP))
         j += 1;
 
     P = n_ecm_primorial[j - 1]; 
@@ -151,9 +154,9 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
         {
             ecm_inf->prime_table[i][j] = 0;
 
-            /* if (i + mmin)*D + j
+            /* if (i + mmin)*P + j
                is prime, mark 1. Can be possibly prime
-               only if gcd(j, D) = 1 */
+               only if gcd(j, P) = 1 */
 
             if (ecm_inf->GCD_table[j] == 1)
             {
@@ -176,21 +179,31 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
         fmpz_randm(sig, state, nm8);
         fmpz_add_ui(sig, sig, 7);
 
+        mpn_zero(mpsig, ecm_inf->n_size);
+        
         if ((!COEFF_IS_MPZ(*sig)))
         {
             mpsig[0] = fmpz_get_ui(sig);
-            cy = mpn_lshift(mpsig, mpsig, 1, ecm_inf->normbits);
-            if (cy)
-                mpsig[1] = cy;
+            if (ecm_inf->normbits)
+            {
+                cy = mpn_lshift(mpsig, mpsig, 1, ecm_inf->normbits);
+                if (cy)
+                   mpsig[1] = cy;
+            }
         }
         else
         {
             mpz_ptr = COEFF_TO_PTR(*sig);
 
-            cy = mpn_lshift(mpsig, mpz_ptr->_mp_d, mpz_ptr->_mp_size, ecm_inf->normbits);
-            if (cy)
-                mpsig[mpz_ptr->_mp_size] = cy;
-
+            if (ecm_inf->normbits)
+            {
+                cy = mpn_lshift(mpsig, mpz_ptr->_mp_d, mpz_ptr->_mp_size, ecm_inf->normbits);
+                if (cy)
+                    mpsig[mpz_ptr->_mp_size] = cy;
+            } else
+            {
+                mpn_copyi(mpsig, mpz_ptr->_mp_d, mpz_ptr->_mp_size);
+            }
         }
 
         /************************ SELECT CURVE ************************/
@@ -202,12 +215,12 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
             /* Found factor while selecting curve,
                very very lucky :) */
 
-            mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
+            if (ecm_inf->normbits)
+               mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
             MPN_NORM(fac->_mp_d, ret);
 
             fac->_mp_size = ret;
             _fmpz_demote_val(f);    
-
             ret = -1;
             goto cleanup;
         }
@@ -222,12 +235,12 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
             if (ret)
             {
                 /* Found factor after stage I */
-                mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
+                if (ecm_inf->normbits)
+                   mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
                 MPN_NORM(fac->_mp_d, ret);
 
                 fac->_mp_size = ret;
                 _fmpz_demote_val(f);    
-
                 ret = 1;
                 goto cleanup;
             }  
@@ -237,12 +250,12 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
             if (ret)
             {
-                /* Found factor after stage I */
-                mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
+                /* Found factor after stage II */
+                if (ecm_inf->normbits)
+                   mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
                 MPN_NORM(fac->_mp_d, ret);
                 fac->_mp_size = ret;
                 _fmpz_demote_val(f);  
-
                 ret = 2;
                 goto cleanup;
             }

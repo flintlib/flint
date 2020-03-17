@@ -49,8 +49,8 @@ fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array, mp_limb_t num,
            condition two -> gcd = n
            if neither is true, factor found */
 
-        if ((((gcdlimbs == 1) && f[0] == ecm_inf->one[0]) || 
-            ((gcdlimbs == ecm_inf->n_size) && mpn_cmp(f, n, ecm_inf->n_size) == 0)) == 0)
+        if (!(gcdlimbs == 1 && f[0] == ecm_inf->one[0]) &&
+            !(gcdlimbs == ecm_inf->n_size && mpn_cmp(f, n, ecm_inf->n_size) == 0))
         {
             /* Found factor in stage I */
             return gcdlimbs;

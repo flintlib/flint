@@ -17,7 +17,7 @@
 /* Select Montgomery Elliptic Curve given a sigma
    (Suyama's parameterization) 
    Returns 1 in case factor is found while selecting
-   the curev. */
+   the curve. */
 
 /* Also selects initial point Q0 [x0 :: z0]  (z0 = 1) */
 
@@ -46,7 +46,8 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     temp[0] = UWORD(4);
     ret = 0;
 
-    mpn_lshift(temp, temp, ecm_inf->n_size, ecm_inf->normbits);   /* temp = (4 << norm) */
+    if (ecm_inf->normbits)
+       mpn_lshift(temp, temp, ecm_inf->n_size, ecm_inf->normbits);   /* temp = (4 << norm) */
 
     flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->u, temp, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
@@ -113,10 +114,11 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
 
     gcdlimbs = mpn_gcdext(tempf, tempi, &invlimbs, tempv, sz, tempn, ecm_inf->n_size);
 
-    if ((((gcdlimbs == 1) && tempf[0] == ecm_inf->one[0]) || 
-        ((gcdlimbs == ecm_inf->n_size) && mpn_cmp(tempf, n, ecm_inf->n_size) == 0)) == 0)
+    if (!(gcdlimbs == 1 && tempf[0] == ecm_inf->one[0]) && 
+        !(gcdlimbs == ecm_inf->n_size && mpn_cmp(tempf, n, ecm_inf->n_size) == 0))
     {
         /* Found factor */
+        mpn_copyi(f, tempf, gcdlimbs);
         ret = gcdlimbs;
         goto cleanup;
     }
@@ -125,17 +127,23 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     {
         invlimbs *= -1;
 
-        cy = mpn_lshift(tempi, tempi, invlimbs, ecm_inf->normbits);
-        if (cy)
-            tempi[invlimbs] = cy;
+        if (ecm_inf->normbits)
+        {
+            cy = mpn_lshift(tempi, tempi, invlimbs, ecm_inf->normbits);
+            if (cy)
+                tempi[invlimbs] = cy;
+        }
 
         mpn_sub_n(tempi, n, tempi, ecm_inf->n_size);\
     }
     else
     {
-        cy = mpn_lshift(tempi, tempi, invlimbs, ecm_inf->normbits);
-        if (cy)
-            tempi[invlimbs] = cy;
+        if (ecm_inf->normbits)
+        {
+            cy = mpn_lshift(tempi, tempi, invlimbs, ecm_inf->normbits);
+            if (cy)
+                tempi[invlimbs] = cy;
+        }
     }
 
     MPN_NORM(tempi, invlimbs);
@@ -156,11 +164,13 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
 
     mpn_zero(temp, sz);
     temp[0] = UWORD(2);
-    mpn_lshift(temp, temp, ecm_inf->n_size, ecm_inf->normbits);
+    if (ecm_inf->normbits)
+        mpn_lshift(temp, temp, ecm_inf->n_size, ecm_inf->normbits);
 
     fmpz_factor_ecm_addmod(ecm_inf->a24, ecm_inf->w, temp, n, ecm_inf->n_size);
-    mpn_rshift(ecm_inf->a24, ecm_inf->a24, ecm_inf->n_size, 2 + ecm_inf->normbits);
-    mpn_lshift(ecm_inf->a24, ecm_inf->a24, ecm_inf->n_size, ecm_inf->normbits);
+    mpn_rshift(ecm_inf->a24, ecm_inf->a24, ecm_inf->n_size, 2);
+    if (ecm_inf->normbits)
+       ecm_inf->a24[0] &= ~((UWORD(1)<<ecm_inf->normbits) - 1);
 
     mpn_copyi(ecm_inf->z, ecm_inf->one, ecm_inf->n_size);
 
