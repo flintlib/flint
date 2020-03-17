@@ -27,7 +27,7 @@ double profile_it(
     fmpz_t N, D, m, r;
     timeit_t timer;
     double new_time, old_time;
-    slong outer_reps = 8;
+    slong outer_reps = 9;
 
     fmpq_init(x);
     fmpq_init(y);
@@ -35,26 +35,6 @@ double profile_it(
     fmpz_init(D);
     fmpz_init(m);
     fmpz_init(r);
-
-    fmpz_randbits(N, state, Nbits);
-    fmpz_randbits(D, state, Dbits);
-    fmpz_randbits(m, state, mbits);
-
-    fmpz_abs(N, N);
-    fmpz_abs(D, D);
-    fmpz_abs(m, m);
-
-    fmpz_mul_ui(r, N, 2);
-
-    fmpz_randm(fmpq_numref(x), state, r);
-    fmpz_sub(fmpq_numref(x), fmpq_numref(x), N);
-    fmpz_randm(fmpq_denref(x), state, D);
-    fmpz_add_ui(fmpq_denref(x), fmpq_denref(x), 1);
-    fmpq_canonicalise(x);
-
-    fmpz_addmul(m, r, D);
-    do fmpz_add_ui(m, m, 1);
-    while (!fmpq_mod_fmpz(r, x, m));
 
     new_time = 0;
     old_time = 0;
@@ -64,6 +44,26 @@ double profile_it(
     for (j = 0; j < outer_reps; j++)
     {
         fmpq_zero(y);
+
+        fmpz_randbits(N, state, Nbits);
+        fmpz_randbits(D, state, Dbits);
+        fmpz_randbits(m, state, mbits);
+
+        fmpz_abs(N, N);
+        fmpz_abs(D, D);
+        fmpz_abs(m, m);
+
+        fmpz_mul_ui(r, N, 2);
+
+        fmpz_randm(fmpq_numref(x), state, r);
+        fmpz_sub(fmpq_numref(x), fmpq_numref(x), N);
+        fmpz_randm(fmpq_denref(x), state, D);
+        fmpz_add_ui(fmpq_denref(x), fmpq_denref(x), 1);
+        fmpq_canonicalise(x);
+
+        fmpz_addmul(m, r, D);
+        do fmpz_add_ui(m, m, 1);
+        while (!fmpq_mod_fmpz(r, x, m));
 
         if ((j + k) & 1)
         {
@@ -127,12 +127,12 @@ printf("---- balanced ----\n");
         total = 0;
         count = 0;
         i = (j < 2) ? 10 : FLINT_BITS*(j - 1) + 1;
-        for (; i <= FLINT_BITS*j; i += 2)
+        for (; i <= FLINT_BITS*j; i += 1)
         {
             total += profile_it(state, 200000/i, i/2, i/2, i, 0);
             count++;
         }
-        flint_printf("size %wd average: %f\n", j, total/count);
+        flint_printf("size %wd average speedup ratio: %f\n", j, total/count);
     }
 
     profile_it(state,  100,    500,    500,   1000,1);
