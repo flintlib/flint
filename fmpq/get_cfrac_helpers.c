@@ -464,6 +464,7 @@ static void _lehmer_exact(_fmpz_vector_t s, _fmpz_mat22_t M, int flags,
 {
     mp_limb_t s_temp[2*FLINT_BITS];
     slong written;
+    unsigned int x_lzcnt;
     mpz_ptr xn, xd, yn, yd;
     mp_size_t xn_len, xd_len, yn_len, yd_len;
     mp_ptr xn_ptr, xd_ptr, yn_ptr, yd_ptr;
@@ -520,22 +521,11 @@ again:
     if (n == xd_len + 1)
         xd_ptr[n - 1] = 0;
 
-    if ((slong)(xn_ptr[n - 1]) < 0)
-    {
-        A1 = xn_ptr[n - 1];
-        A0 = xn_ptr[n - 2];
-        B1 = xd_ptr[n - 1];
-        B0 = xd_ptr[n - 2];
-    }
-    else
-    {
-        int shift;
-        count_leading_zeros(shift, xn_ptr[n - 1]);
-        A1 = FLINT_MPN_EXTRACT_NUMB(shift, xn_ptr[n - 1], xn_ptr[n - 2]);
-        A0 = FLINT_MPN_EXTRACT_NUMB(shift, xn_ptr[n - 2], xn_ptr[n - 3]);
-        B1 = FLINT_MPN_EXTRACT_NUMB(shift, xd_ptr[n - 1], xd_ptr[n - 2]);
-        B0 = FLINT_MPN_EXTRACT_NUMB(shift, xd_ptr[n - 2], xd_ptr[n - 3]);
-    }
+    count_leading_zeros(x_lzcnt, xn_ptr[n - 1]);
+    A1 = MPN_LEFT_SHIFT_HI(xn_ptr[n - 1], xn_ptr[n - 2], x_lzcnt);
+    A0 = MPN_LEFT_SHIFT_HI(xn_ptr[n - 2], xn_ptr[n - 3], x_lzcnt);
+    B1 = MPN_LEFT_SHIFT_HI(xd_ptr[n - 1], xd_ptr[n - 2], x_lzcnt);
+    B0 = MPN_LEFT_SHIFT_HI(xd_ptr[n - 2], xd_ptr[n - 3], x_lzcnt);
 
     written = _uiui_hgcd(s_temp, A1, A0, B1, B0, m);
     if (written <= 0 || s->length + written > s->limit)
@@ -619,6 +609,7 @@ static void _lehmer_inexact(_fmpz_vector_t s, _fmpz_mat22_t M, int needM,
 {
     mp_limb_t s_temp[2*FLINT_BITS];
     slong written;
+    unsigned int x_lzcnt;
     mpz_ptr xln, xld, xrn, xrd;
     mpz_ptr yln, yld, yrn, yrd;
     mp_size_t xln_len, xld_len, xrn_len, xrd_len;
@@ -708,23 +699,11 @@ again:
     if (nr == xrd_len + 1)
         xrd_ptr[nr - 1] = 0;
 
-
-    if ((slong)(xln_ptr[nl - 1]) < 0)
-    {
-        A1 = xln_ptr[nl - 1];
-        A0 = xln_ptr[nl - 2];
-        B1 = xld_ptr[nl - 1];
-        B0 = xld_ptr[nl - 2];
-    }
-    else
-    {
-        int shift;
-        count_leading_zeros(shift, xln_ptr[nl - 1]);
-        A1 = FLINT_MPN_EXTRACT_NUMB(shift, xln_ptr[nl - 1], xln_ptr[nl - 2]);
-        A0 = FLINT_MPN_EXTRACT_NUMB(shift, xln_ptr[nl - 2], xln_ptr[nl - 3]);
-        B1 = FLINT_MPN_EXTRACT_NUMB(shift, xld_ptr[nl - 1], xld_ptr[nl - 2]);
-        B0 = FLINT_MPN_EXTRACT_NUMB(shift, xld_ptr[nl - 2], xld_ptr[nl - 3]);
-    }
+    count_leading_zeros(x_lzcnt, xln_ptr[nl - 1]);
+    A1 = MPN_LEFT_SHIFT_HI(xln_ptr[nl - 1], xln_ptr[nl - 2], x_lzcnt);
+    A0 = MPN_LEFT_SHIFT_HI(xln_ptr[nl - 2], xln_ptr[nl - 3], x_lzcnt);
+    B1 = MPN_LEFT_SHIFT_HI(xld_ptr[nl - 1], xld_ptr[nl - 2], x_lzcnt);
+    B0 = MPN_LEFT_SHIFT_HI(xld_ptr[nl - 2], xld_ptr[nl - 3], x_lzcnt);
 
     written = _uiui_hgcd(s_temp, A1, A0, B1, B0, m);
     if (written <= 0 || s->length + written > s->limit)

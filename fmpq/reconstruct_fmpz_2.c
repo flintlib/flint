@@ -186,13 +186,17 @@ again:
     if (u > v)
     {
         u -= v;
-        do {u = u/2;} while ((u & 1) == 0);
+        do {
+            u = u >> 1;
+        } while ((u & 1) == 0);
         goto again;
     }
     else if (u < v)
     {
         v -= u;
-        do {v = v/2;} while ((v & 1) == 0);
+        do {
+            v = v >> 1;
+        } while ((v & 1) == 0);
         goto again;
     }
     else
@@ -201,19 +205,17 @@ again:
     }
 }
 
-#define SHIFT_RIGHT(hi, lo)                     \
-do {                                            \
-    lo = (hi << (FLINT_BITS - 1)) | (lo >> 1);  \
-    hi = hi >> 1;                               \
-} while (0)
-
 /* u is odd */
 static int coprime_uiui(mp_limb_t u1, mp_limb_t u0, mp_limb_t v1, mp_limb_t v0)
 {
     FLINT_ASSERT(u1 > 0 || u0 > 0);
     FLINT_ASSERT(v1 > 0 || v0 > 0);
 
-    while ((v0 & 1) == 0) {SHIFT_RIGHT(v1, v0);}
+    while ((v0 & 1) == 0)
+    {
+        v0 = MPN_RIGHT_SHIFT_LOW(v1, v0, 1);
+        v1 = v1 >> 1;
+    }
 
 again:
 
@@ -223,13 +225,19 @@ again:
     if (u1 > v1)
     {
         sub_ddmmss(u1, u0, u1, u0, v1, v0);
-        do {SHIFT_RIGHT(u1, u0);} while ((u0 & 1) == 0);
+        do {
+            u0 = MPN_RIGHT_SHIFT_LOW(u1, u0, 1);
+            u1 = u1 >> 1;
+        } while ((u0 & 1) == 0);
         goto again;
     }
     else if (v1 > u1)
     {
         sub_ddmmss(v1, v0, v1, v0, u1, u0);
-        do {SHIFT_RIGHT(v1, v0);} while ((v0 & 1) == 0);
+        do {
+            v0 = MPN_RIGHT_SHIFT_LOW(v1, v0, 1);
+            v1 = v1 >> 1;
+        } while ((v0 & 1) == 0);
         goto again;
     }
     else if (u0 > v0)
@@ -467,20 +475,10 @@ again:
     /* zero-extend B to length of A in the case Alen - 1 == Blen */
     B[Blen] = 0;
 
-    if (a_lzcnt > 0)
-    {
-        A1 = FLINT_MPN_EXTRACT_NUMB(a_lzcnt, A[Alen - 1], A[Alen - 2]);
-        A0 = FLINT_MPN_EXTRACT_NUMB(a_lzcnt, A[Alen - 2], A[Alen - 3]);
-        B1 = FLINT_MPN_EXTRACT_NUMB(a_lzcnt, B[Alen - 1], B[Alen - 2]);
-        B0 = FLINT_MPN_EXTRACT_NUMB(a_lzcnt, B[Alen - 2], B[Alen - 3]);
-    }
-    else
-    {
-        A1 = A[Alen - 1];
-        A0 = A[Alen - 2];
-        B1 = B[Alen - 1];
-        B0 = B[Alen - 2];
-    }
+    A1 = MPN_LEFT_SHIFT_HI(A[Alen - 1], A[Alen - 2], a_lzcnt);
+    A0 = MPN_LEFT_SHIFT_HI(A[Alen - 2], A[Alen - 3], a_lzcnt);
+    B1 = MPN_LEFT_SHIFT_HI(B[Alen - 1], B[Alen - 2], a_lzcnt);
+    B0 = MPN_LEFT_SHIFT_HI(B[Alen - 2], B[Alen - 3], a_lzcnt);
 
     written = _hgcd_uiui_no_write(A1, A0, B1, B0, h);
     if (written <= 0)
@@ -723,20 +721,10 @@ again:
     if (a_len - 1 == b_len)
         b_ptr[a_len - 1] = 0;
 
-    if (a_lzcnt > 0)
-    {
-        A1 = FLINT_MPN_EXTRACT_NUMB(a_lzcnt, a_ptr[a_len - 1], a_ptr[a_len - 2]);
-        A0 = FLINT_MPN_EXTRACT_NUMB(a_lzcnt, a_ptr[a_len - 2], a_ptr[a_len - 3]);
-        B1 = FLINT_MPN_EXTRACT_NUMB(a_lzcnt, b_ptr[a_len - 1], b_ptr[a_len - 2]);
-        B0 = FLINT_MPN_EXTRACT_NUMB(a_lzcnt, b_ptr[a_len - 2], b_ptr[a_len - 3]);
-    }
-    else
-    {
-        A1 = a_ptr[a_len - 1];
-        A0 = a_ptr[a_len - 2];
-        B1 = b_ptr[a_len - 1];
-        B0 = b_ptr[a_len - 2];
-    }
+    A1 = MPN_LEFT_SHIFT_HI(a_ptr[a_len - 1], a_ptr[a_len - 2], a_lzcnt);
+    A0 = MPN_LEFT_SHIFT_HI(a_ptr[a_len - 2], a_ptr[a_len - 3], a_lzcnt);
+    B1 = MPN_LEFT_SHIFT_HI(b_ptr[a_len - 1], b_ptr[a_len - 2], a_lzcnt);
+    B0 = MPN_LEFT_SHIFT_HI(b_ptr[a_len - 2], b_ptr[a_len - 3], a_lzcnt);
 
     written = _hgcd_uiui_no_write(A1, A0, B1, B0, h);
     if (written <= 0)

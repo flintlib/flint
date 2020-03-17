@@ -47,6 +47,19 @@
 
 #define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
+/*
+    return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.
+    Note: if GMP_NAIL_BITS != 0, the rest of flint is already broken anyways.
+*/
+#define MPN_LEFT_SHIFT_HI(hi, lo, n)                                \
+    ((n) > 0 ? (((hi) << (n)) | ((lo) >> (GMP_LIMB_BITS - (n))))    \
+             : (hi))
+
+#define MPN_RIGHT_SHIFT_LOW(hi, lo, n)                                \
+    ((n) > 0 ? (((lo) >> (n)) | ((hi) << (GMP_LIMB_BITS - (n))))    \
+             : (lo))
+
+
 /* Not defined in gmp.h
 mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
                                  mp_limb_t divisor);
