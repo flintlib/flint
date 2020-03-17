@@ -280,7 +280,11 @@ gauss:
     if (fmpz_cmp_ui(DD, m11) < 0)
         return 0;
 
-    (mdet == 1) ? fmpz_set_ui(n, B) : fmpz_neg_ui(n, B);
+    if (mdet > 0)
+        fmpz_set_ui(n, B);
+    else
+        fmpz_neg_ui(n, B);
+
     fmpz_set_ui(d, m11);
 
     FLINT_ASSERT(m11 != 0);
@@ -349,8 +353,11 @@ gauss:
     if (D1 < m11[1] || (D1 == m11[1] && D0 < m11[0]))
         return 0;
 
-    (mdet == 1) ? fmpz_set_uiui(n, B1, B0)
-                : fmpz_neg_uiui(n, B1, B0);
+    if (mdet > 0)
+        fmpz_set_uiui(n, B1, B0);
+    else
+        fmpz_neg_uiui(n, B1, B0);
+
     fmpz_set_uiui(d, m11[1], m11[0]);
 
     if (B1 == 0 && B0 == 0)
@@ -367,7 +374,6 @@ gauss:
 int _fmpq_reconstruct_fmpz_2_ui_array(fmpz_t n, fmpz_t d,
               const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 {
-    int i;
     mp_limb_t ex0, ex1, ex2, ex3, A1, A0, B1, B0;
     unsigned int n_lzcnt, a_lzcnt;
     _ui_mat22_t h;
@@ -416,10 +422,9 @@ int _fmpq_reconstruct_fmpz_2_ui_array(fmpz_t n, fmpz_t d,
     }
 
     /* m12 is supposed to be zero-extended to the length of m11 (= m_len) */
-    for (i = 0; i <= FMPQ_RECONSTRUCT_ARRAY_LIMIT; i++)
-        m11[i] = m12[i] = 0;
-
-    /* m11 = 1, m12 = 0*/
+    flint_mpn_zero(m11, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    flint_mpn_zero(m12, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    /* m11 = 1, m12 = 0 */
     m_len = 1;
     m11[0] = 1;
 
@@ -434,9 +439,14 @@ again:
     FLINT_ASSERT(Blen > 0 && B[Blen - 1] > 0);
     FLINT_ASSERT(Alen > Blen || (Alen == Blen && mpn_cmp(A, B, Blen) > 0));
     FLINT_ASSERT(Blen > n_len || (Blen == n_len && mpn_cmp(B, n_ptr, n_len) > 0));
+    FLINT_ASSERT(m_len > 0 && m11[m_len - 1] > 0);
+    FLINT_ASSERT(mpn_cmp(m11, m12, m_len) >= 0);
 
     if (Alen < 3 || Blen <= n_len)
+    {
+        /* too small or too close to the end */
         goto gauss;
+    }
 
     count_leading_zeros(a_lzcnt, A[Alen - 1]);
 
@@ -446,16 +456,16 @@ again:
         goto gauss;
     }
 
-    if (Alen - 1 == n_len && n_lzcnt <= a_lzcnt)
+    if (Alen - 1 == n_len && n_lzcnt < a_lzcnt)
     {
         /* too small or too close to the end */
         goto gauss;
     }
 
-    if (Alen - 1 == Blen)
-        B[Alen - 1] = 0;
-    else
-        FLINT_ASSERT(Alen == Blen);
+    FLINT_ASSERT(Alen == Blen || Alen - 1 == Blen);
+
+    /* zero-extend B to length of A in the case Alen - 1 == Blen */
+    B[Blen] = 0;
 
     if (a_lzcnt > 0)
     {
@@ -496,18 +506,16 @@ again:
 
     if (Qlen < n_len || (Qlen == n_len && mpn_cmp(Q, n_ptr, n_len) <= 0))
     {
-        /* overshot with too many quotients */
+        /* overshot with too many quotients. rare (impossible?) due to above
+           lzcnt restriction. can trigger by using n_lzcnt + 1 < a_lzcnt. */
         goto gauss;
     }
 
     /* copy (Q, R) to (A, B) */
     Alen = Qlen;
     Blen = Rlen;
-    for (i = 0; i < FMPQ_RECONSTRUCT_ARRAY_LIMIT; i++)
-    {
-        A[i] = Q[i];
-        B[i] = R[i];
-    }
+    flint_mpn_copyi(A, Q, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    flint_mpn_copyi(B, R, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
 
     /* multiply first row of m by h, use R for temp */
     mdet *= h->det;
@@ -516,17 +524,16 @@ again:
     ex2 = mpn_mul_1(m12, m12, m_len, h->_22);
     ex3 = mpn_addmul_1(m12, m11, m_len, h->_12);
     add_ssaaaa(m12[m_len + 1], m12[m_len], 0, ex2, 0, ex3);
-    for (i = 0; i < m_len; i++)
-        m11[i] = R[i];
+    flint_mpn_copyi(m11, R, m_len);
     add_ssaaaa(m11[m_len + 1], m11[m_len], 0, ex0, 0, ex1);
     m_len += (m11[m_len + 1] != 0) ? 2 : (m11[m_len] != 0);
 
-    FLINT_ASSERT(m_len > 0 && m11[m_len - 1] > 0);
-    FLINT_ASSERT(mpn_cmp(m11, m12, m_len) >= 0);
-
     /* so A > N. see if further A > N >= B */
     if (Blen < n_len || (Blen == n_len && mpn_cmp(B, n_ptr, n_len) <= 0))
+    {
+        /* got lucky. can happen */
         goto done;
+    }
 
     goto again;
 
@@ -536,8 +543,8 @@ gauss:
     FLINT_ASSERT(Blen > 0 && B[Blen - 1] > 0);
     FLINT_ASSERT(Alen > Blen || (Alen == Blen && mpn_cmp(A, B, Blen) > 0));
     FLINT_ASSERT(Blen > n_len || (Blen == n_len && mpn_cmp(B, n_ptr, n_len) > 0));
-    FLINT_ASSERT(m_len > 0);
-    FLINT_ASSERT(m11[m_len - 1] > 0);
+    FLINT_ASSERT(m_len > 0 && m11[m_len - 1] > 0);
+    FLINT_ASSERT(mpn_cmp(m11, m12, m_len) >= 0);
 
     /* (A, B) = (B, A mod B) */
     mpn_tdiv_qr(Q, R, 0, A, Alen, B, Blen);
@@ -547,11 +554,8 @@ gauss:
     MPN_NORM(R, Rlen);
     Alen = Blen;
     Blen = Rlen;
-    for (i = 0; i < FMPQ_RECONSTRUCT_ARRAY_LIMIT; i++)
-    {
-        A[i] = B[i];
-        B[i] = R[i];
-    }
+    flint_mpn_copyi(A, B, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
+    flint_mpn_copyi(B, R, FMPQ_RECONSTRUCT_ARRAY_LIMIT);
 
     /* (m11, m12) = (m12 + Q*m11, m11), use R for temp */
     mdet *= -1;
@@ -561,11 +565,8 @@ gauss:
     ex0 = mpn_add_n(R, R, m12, m_len);
     R[m_len] = ex0;
     m_len += ex0;
-    for (i = 0; i < m_len; i++)
-    {
-        m12[i] = m11[i];
-        m11[i] = R[i];
-    }
+    flint_mpn_copyi(m12, m11, m_len);
+    flint_mpn_copyi(m11, R, m_len);
 
     /* see if further A > N >= B */
     if (Blen > n_len || (Blen == n_len && mpn_cmp(B, n_ptr, n_len) > 0))
@@ -580,9 +581,17 @@ done:
         return 0;
 
     fmpz_set_ui_array(d, m11, m_len);
-    fmpz_set_ui_array(n, B, Blen);
-    if (mdet < 0)
-        fmpz_neg(n, n);
+
+    if (Blen > 0)
+    {
+        fmpz_set_ui_array(n, B, Blen);
+        if (mdet < 0)
+            fmpz_neg(n, n);
+    }
+    else
+    {
+        fmpz_zero(n);
+    }
 
     FLINT_ASSERT(m_len > 0);
     if (Blen == 0)
@@ -692,7 +701,7 @@ again:
         goto cleanup;
     }
 
-    if (a_len > b_len + 1)
+    if (a_len - 1 > b_len)
     {
         /* large quotient */
         ret = 0;
@@ -702,17 +711,17 @@ again:
     FLINT_ASSERT(a_ptr[a_len - 1] != 0);
     count_leading_zeros(a_lzcnt, a_ptr[a_len - 1]);
 
-    if (a_len - 1 == n_len && n_lzcnt <= a_lzcnt)
+    if (a_len - 1 == n_len && n_lzcnt < a_lzcnt)
     {
         /* too small or too close to the end */
         ret = -1;
         goto cleanup;
     }
 
+    FLINT_ASSERT(a_len == b_len || a_len - 1 == b_len);
+
     if (a_len - 1 == b_len)
         b_ptr[a_len - 1] = 0;
-    else
-        FLINT_ASSERT(a_len == b_len);
 
     if (a_lzcnt > 0)
     {
@@ -774,9 +783,10 @@ again:
     FLINT_MPZ_PTR_SWAP(a, s);
     FLINT_MPZ_PTR_SWAP(b, t);
 
-    /* so a > n. see if further a > n >= b. rare */
+    /* so a > n. see if further a > n >= b. */
     if (t_len < n_len || (t_len == n_len && mpn_cmp(t_ptr, n_ptr, n_len) <= 0))
     {
+        /* lucky finish */
         ret = 1;
         goto cleanup;
     }
