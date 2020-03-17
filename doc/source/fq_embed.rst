@@ -40,7 +40,7 @@ Computing isomorphisms and embeddings of finite fields
     * a generator ``gen_sub`` of ``sub_ctx``, its minimal
       polynomial ``gen_minpoly``, and a root ``gen_sup`` of
       ``gen_minpoly`` in ``sup_ctx``, as returned by
-      ``fq_embed_gens``;
+      :func:`fq_embed_gens`;
     
     Compute:
 
@@ -64,9 +64,9 @@ Computing isomorphisms and embeddings of finite fields
 
     This matrix is computed as
 
-    `\texttt{embed_dual_to_mono_matrix(_, sub_ctx)}
-    \times \texttt{basis}^t \times
-    \texttt{embed_mono_to_dual_matrix(_, sup_ctx)}`.
+    ``embed_dual_to_mono_matrix(_, sub_ctx)``
+    `\times` ``basis``:sup:`t` `\times`
+    ``embed_mono_to_dual_matrix(_, sup_ctx)``.
 
     **Note:** if
     `m=n`, ``basis`` represents a Frobenius, and the result is its

@@ -68,6 +68,8 @@ References
 
 .. [StoMul1998] Storjohann, Arne and Mulders, Thom : Fast algorithms for linear algebra modulo :math:`N` : Algorithms---{ESA} '98 (Venice), Lecture Notes in Comput. Sci. 1461 139--150
 
+.. [ThullYap1990] Thull, K. and Yap, C. : A Unified Approach to {HGCD} Algorithms for Polynomials and Integers, (1990)
+
 .. [Villard2007] Villard, Gilles :  Certification of the QR Factor R and of Lattice Basis Reducedness, In proceedings of ACM International Symposium on Symbolic
     and Algebraic Computation (2007) 361--368 ACM Press. 
 

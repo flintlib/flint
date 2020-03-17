@@ -44,7 +44,7 @@ Random functions
     Returns a uniformly pseudo random number up to but not including
     the given limit. If zero is passed as a parameter, an entire
     random limb is returned. This function provides somewhat better
-    randomness as compared to ``n_randint``, especially for larger
+    randomness as compared to :func:`n_randint`, especially for larger
     values of limit.
 
 .. function:: ulong n_randtest(flint_rand_t state)
@@ -58,18 +58,20 @@ Random functions
 
 .. function:: ulong n_randtest_not_zero(flint_rand_t state)
 
-    As for ``n_randtest()``, but does not return `0`.
+    As for :func:`n_randtest`, but does not return `0`.
     This function is intended for use in test code. 
 
 .. function:: ulong n_randprime(flint_rand_t state, unsigned slong bits, int proved)
 
-    Returns a random prime number (proved = 1) or probable prime (proved = 0)
+    Returns a random prime number ``(proved = 1)`` or probable prime
+    ``(proved = 0)``
     with ``bits`` bits, where ``bits`` must be at least 2 and
     at most ``FLINT_BITS``.
 
 .. function:: ulong n_randtest_prime(flint_rand_t state, int proved)
 
-    Returns a random prime number (proved = 1) or probable prime (proved = 0)
+    Returns a random prime number ``(proved = 1)`` or probable
+    prime ``(proved = 0)``
     with size randomly chosen between 2 and ``FLINT_BITS`` bits.
     This function is intended for use in test code.
 
@@ -658,11 +660,9 @@ Prime number generation and counting
 
     .. math ::
 
-        \begin{align*}
         p_n  & >  n (\ln n + \ln \ln n - 1) \\
         p_n  & <  n (\ln n + \ln \ln n) \\
         p_n  & <  n (\ln n + \ln \ln n - 0.9427) \quad (n \geq 15985)
-        \end{align*}
 
     The first inequality was proved by Dusart [Dus1999]_, and the last 
     is due to Massias and Robin [MasRob1996]_.  For a further overview, 

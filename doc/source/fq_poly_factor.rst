@@ -21,7 +21,7 @@ Memory Management
 
 .. function:: void fq_poly_factor_init(fq_poly_factor_t fac, const fq_ctx_t ctx)
 
-    Initialises ``fac`` for use. An ``fq_poly_factor_t``
+    Initialises ``fac`` for use. An :type:`fq_poly_factor_t`
     represents a polynomial in factorised form as a product of
     polynomials with associated exponents.
 
@@ -70,7 +70,7 @@ Basic Operations
 
     Concatenates two factorisations.
 
-    This is equivalent to calling ``fq_poly_factor_insert()``
+    This is equivalent to calling :func:`fq_poly_factor_insert`
     repeatedly with the individual factors of ``fac``.
 
     Does not support aliasing between ``res`` and ``fac``.
@@ -151,7 +151,7 @@ Factorisation
     ``degs`` in the same order as factors.
 
     Requires that ``degs`` have enough space for irreducible polynomials'
-    powers (maximum space required is `n * sizeof(slong)`).
+    powers (maximum space required is ``n * sizeof(slong)``).
 
 .. function:: void fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f, const fq_ctx_t ctx)
 
@@ -217,7 +217,7 @@ Factorisation
 
 .. function:: void fq_poly_iterated_frobenius_preinv(fq_poly_t *rop, slong n, const fq_poly_t v, const fq_poly_t vinv, const fq_ctx_t ctx)
 
-    Sets ``rop[i]`` to be `x^{q^i} mod v` for `0 <= i < n`.
+    Sets ``rop[i]`` to be `x^{q^i}\mod v` for `0 <= i < n`.
 
     It is required that ``vinv`` is the inverse of the reverse of
     ``v`` mod ``x^lenv``.

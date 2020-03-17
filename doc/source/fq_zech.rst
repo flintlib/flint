@@ -26,49 +26,49 @@ Context Management
 
 .. function:: void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 
-    Initialises the context for prime~`p` and extension degree~`d`,
+    Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator.  By default, it will try
     use a Conway polynomial; if one is not available, a random
     primitive polynomial will be used.
 
-    Assumes that `p` is a prime and `p^d < 2^\texttt{FLINT\_BITS}`.
+    Assumes that `p` is a prime and :math:`p^d < 2^{\mathtt{FLINT\_BITS}}`.
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
 .. function:: int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 
-    Attempts to initialise the context for prime~`p` and extension
-    degree~`d`, with name ``var`` for the generator using a Conway
+    Attempts to initialise the context for prime `p` and extension
+    degree `d`, with name ``var`` for the generator using a Conway
     polynomial for the modulus.
 
     Returns `1` if the Conway polynomial is in the database for the
     given size and the initialization is successful; otherwise,
     returns `0`.
 
-    Assumes that `p` is a prime and `p^d < 2^\texttt{FLINT\_BITS}`.
+    Assumes that `p` is a prime and `p^d < 2^\mathtt{FLINT\_BITS}`.
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
 .. function:: void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 
-    Initialises the context for prime~`p` and extension degree~`d`,
+    Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a Conway polynomial
     for the modulus.
 
-    Assumes that `p` is a prime and `p^d < 2^\texttt{FLINT\_BITS}`.
+    Assumes that `p` is a prime and `p^d < 2^\mathtt{FLINT\_BITS}`.
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
 .. function:: void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 
-    Initialises the context for prime~`p` and extension degree~`d`,
+    Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a random primitive
     polynomial.
 
-    Assumes that `p` is a prime and `p^d < 2^\texttt{FLINT\_BITS}`.
+    Assumes that `p` is a prime and `p^d < 2^\mathtt{FLINT\_BITS}`.
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
@@ -142,12 +142,12 @@ Memory management
 
 .. function:: void fq_zech_init(fq_zech_t rop, const fq_zech_ctx_t ctx)
 
-    Initialises the element ``rop``, setting its value to~`0`.
+    Initialises the element ``rop``, setting its value to `0`.
 
 .. function:: void fq_zech_init2(fq_zech_t rop, const fq_zech_ctx_t ctx)
 
     Initialises ``poly`` with at least enough space for it to be an element
-    of ``ctx`` and sets it to~`0`.
+    of ``ctx`` and sets it to `0`.
 
 .. function:: void fq_zech_clear(fq_zech_t rop, const fq_zech_ctx_t ctx)
 
@@ -242,33 +242,33 @@ Basic arithmetic
 
 .. function:: void _fq_zech_pow(mp_ptr *rop, mp_srcptr *op, slong len, const fmpz_t e, const fq_zech_ctx_t ctx)
 
-    Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power~`e`,
+    Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`,
     reduced modulo `f(X)`, the modulus of ``ctx``.
 
-    Assumes that `e \geq 0` and that ``len`` is positive and at most~`d`.
+    Assumes that `e \geq 0` and that ``len`` is positive and at most `d`.
 
     Although we require that ``rop`` provides space for
     `2d - 1` coefficients, the output will be reduced modulo
-    `f(X)`, which is a polynomial of degree~`d`.
+    `f(X)`, which is a polynomial of degree `d`.
 
     Does not support aliasing.
 
 .. function:: void fq_zech_pow(fq_zech_t rop, const fq_zech_t op, const fmpz_t e, const fq_zech_ctx_t ctx)
 
-    Sets ``rop`` the ``op`` raised to the power~`e`.
+    Sets ``rop`` the ``op`` raised to the power `e`.
 
     Currently assumes that `e \geq 0`.
 
-    Note that for any input ``op``, ``rop`` is set to~`1`
+    Note that for any input ``op``, ``rop`` is set to `1`
     whenever `e = 0`.
 
 .. function:: void fq_zech_pow_ui(fq_zech_t rop, const fq_zech_t op, const ulong e, const fq_zech_ctx_t ctx)
 
-    Sets ``rop`` the ``op`` raised to the power~`e`.
+    Sets ``rop`` the ``op`` raised to the power `e`.
 
     Currently assumes that `e \geq 0`.
 
-    Note that for any input ``op``, ``rop`` is set to~`1`
+    Note that for any input ``op``, ``rop`` is set to `1`
     whenever `e = 0`.
 
 
@@ -291,7 +291,7 @@ Output
 
     Prints a pretty representation of ``op`` to ``file``.
 
-    In the current implementation, always returns~`1`.  The return code is
+    In the current implementation, always returns `1`.  The return code is
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
@@ -299,7 +299,7 @@ Output
 
     Prints a pretty representation of ``op`` to ``stdout``.
 
-    In the current implementation, always returns~`1`.  The return code is
+    In the current implementation, always returns `1`.  The return code is
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
@@ -318,7 +318,7 @@ Output
 
 .. function:: char * fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
 
-    Returns a pretty representation of the element~``op`` using the
+    Returns a pretty representation of the element ``op`` using the
     null-terminated string ``x`` as the variable name.
 
 
@@ -440,7 +440,7 @@ Special functions
     For an element `a \in \mathbf{F}_q`, multiplication by `a` defines
     a `\mathbf{F}_p`-linear map on `\mathbf{F}_q`.  We define the
     trace of `a` as the trace of this map.  Equivalently, if `\Sigma`
-    generates `\Gal(\mathbf{F}_q / \mathbf{F}_p)` then the trace of
+    generates `\operatorname{Gal}(\mathbf{F}_q / \mathbf{F}_p)` then the trace of
     `a` is equal to `\sum_{i=0}^{d-1} \Sigma^i (a)`, where `d =
     \log_{p} q`.
 
@@ -451,7 +451,7 @@ Special functions
     For an element `a \in \mathbf{F}_q`, multiplication by `a` defines
     a `\mathbf{F}_p`-linear map on `\mathbf{F}_q`.  We define the norm
     of `a` as the determinant of this map.  Equivalently, if `\Sigma` generates
-    `\Gal(\mathbf{F}_q / \mathbf{F}_p)` then the trace of `a` is equal to
+    `\operatorname{Gal}(\mathbf{F}_q / \mathbf{F}_p)` then the trace of `a` is equal to
     `\prod_{i=0}^{d-1} \Sigma^i (a)`, where
     `d = \text{dim}_{\mathbf{F}_p}(\mathbf{F}_q)`.
 
@@ -464,7 +464,7 @@ Special functions
     Recall that `\mathbf{F}_q / \mathbf{F}_p` is Galois with Galois group
     `\langle \sigma \rangle`, which is also isomorphic to
     `\mathbf{Z}/d\mathbf{Z}`, where
-    `\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
+    `\sigma \in \operatorname{Gal}(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
     `\sigma \colon x \mapsto x^p`.
 
 .. function:: int fq_zech_multiplicative_order(fmpz_t ord, const fq_zech_t op, const fq_zech_ctx_t ctx)

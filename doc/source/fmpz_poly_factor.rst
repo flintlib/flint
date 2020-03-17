@@ -62,7 +62,7 @@ Manipulating factors
 
     Concatenates two factorisations.
 
-    This is equivalent to calling ``fmpz_poly_factor_insert()`` 
+    This is equivalent to calling :func:`fmpz_poly_factor_insert` 
     repeatedly with the individual factors of ``fac``.
 
     Does not support aliasing between ``res`` and ``fac``.

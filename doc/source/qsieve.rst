@@ -64,9 +64,9 @@
 
 .. function:: void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
 
-    First initialize the sieve array to zero, then for each `p \in factor base`, add
-    `log_2(p)` to the locations `soln1 _p + i * p` and `soln2 _p + i * p` for 
-    `i = 0, 1, 2,\dots`, where `soln1 _p` and `soln2 _p` are the sieve offsets calculated
+    First initialize the sieve array to zero, then for each `p \in` ``factor base``, add
+    `\log_2(p)` to the locations `\operatorname{soln1} _p + i * p` and `\operatorname{soln2} _p + i * p` for 
+    `i = 0, 1, 2,\dots`, where `\operatorname{soln1} _p` and `\operatorname{soln2} _p` are the sieve offsets calculated
     for `p`.
 
 .. function:: void qsieve_do_sieving2(qs_t qs_inf)
@@ -146,3 +146,4 @@
     threads to use.
 
 
+ 

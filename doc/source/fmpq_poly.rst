@@ -44,7 +44,7 @@ Memory management
     allocated, then the polynomial is reallocated to have space for at
     least ``len`` coefficients. No data is lost when calling this 
     function. The function efficiently deals with the case where 
-    ``fit_length()`` is called many times in small increments by at 
+    :func:`fit_length` is called many times in small increments by at 
     least doubling the number of allocated coefficients when ``len`` 
     is larger than the number of coefficients currently allocated.
 
@@ -115,8 +115,8 @@ Accessing the numerator and denominator
 
     Note that, because of a delayed initialisation approach, this might 
     be ``NULL`` for zero polynomials.  This situation can be salvaged 
-    by calling either ``fmpq_poly_fit_length()`` or 
-    ``fmpq_poly_realloc()``.
+    by calling either :func:`fmpq_poly_fit_length` or 
+    :func:`fmpq_poly_realloc`.
     
     This function is implemented as a macro returning ``(poly)->coeffs``.
 
@@ -131,7 +131,7 @@ Accessing the numerator and denominator
 Random testing
 --------------------------------------------------------------------------------
 
-The functions ``fmpq_poly_randtest_foo()`` provide random 
+The functions :func:`fmpq_poly_randtest_foo` provide random 
 polynomials suitable for testing.  On an integer level, this 
 means that long strings of zeros and ones in the binary 
 representation are favoured as well as the special absolute 
@@ -144,19 +144,19 @@ to have a non-trivial content.
     Sets `f` to a random polynomial with coefficients up to the given 
     length and where each coefficient has up to the given number of bits. 
     The coefficients are signed randomly.  One must call 
-    ``flint_randinit()`` before calling this function.
+    :func:`flint_randinit` before calling this function.
 
 .. function:: void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with coefficients up to the given length 
     and where each coefficient has up to the given number of bits.  One must 
-    call ``flint_randinit()`` before calling this function.
+    call :func:`flint_randinit` before calling this function.
 
 .. function:: void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
-    As for ``fmpq_poly_randtest()`` except that ``len`` and ``bits`` 
+    As for :func:`fmpq_poly_randtest` except that ``len`` and ``bits`` 
     may not be zero and the polynomial generated is guaranteed not to be the 
-    zero polynomial.  One must call ``flint_randinit()`` before calling
+    zero polynomial.  One must call :func:`flint_randinit` before calling
     this function.
 
 
@@ -289,7 +289,7 @@ Assignment, swap, negation
 
     Sets ``poly1`` to the multiplicative inverse of ``poly2`` 
     if possible.  Otherwise, if ``poly2`` is not a unit, leaves 
-    ``poly1`` unmodified and calls ``abort()``.
+    ``poly1`` unmodified and calls :func:`abort`.
 
 .. function:: void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 

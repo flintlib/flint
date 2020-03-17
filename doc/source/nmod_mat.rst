@@ -327,12 +327,12 @@ Matrix Exponentiation
 
 .. function:: void _nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
 
-.. function:: 	Sets `dest = mat^pow`. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
+ 	   Sets `dest = mat^pow`. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
 
 .. function:: void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
 
     Sets `dest = mat^pow`. ``dest`` and ``mat`` may be aliased. Implements
-.. function:: 	exponentiation by squaring.
+   	exponentiation by squaring.
 
 
 Trace
@@ -497,19 +497,19 @@ LU decomposition
     function will abandon the output matrix in an undefined state and
     return 0 if `A` is detected to be rank-deficient.
 
-    This function calls ``nmod_mat_lu_recursive``.
+    This function calls :func:`nmod_mat_lu_recursive`.
 
 .. function:: slong nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
 
     Computes a generalised LU decomposition `LU = PA` of a given
     matrix `A`, returning the rank of `A`. The behavior of this function
-    is identical to that of ``nmod_mat_lu``. Uses Gaussian elimination.
+    is identical to that of :func:`nmod_mat_lu`. Uses Gaussian elimination.
 
 .. function:: slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 
     Computes a generalised LU decomposition `LU = PA` of a given
     matrix `A`, returning the rank of `A`. The behavior of this function
-    is identical to that of ``nmod_mat_lu``. Uses recursive block
+    is identical to that of :func:`nmod_mat_lu`. Uses recursive block
     decomposition, switching to classical Gaussian elimination for
     sufficiently small blocks.
 

@@ -1,4 +1,3 @@
-.. _fmpz-lll:
 
 **fmpz_lll.h** -- LLL reduction
 ==================================================================================================
@@ -93,14 +92,14 @@ The various Babai's
 
 .. function:: int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
-    Same as ``fmpz_lll_check_babai()`` but using the heuristic inner product
+    Same as :func:`fmpz_lll_check_babai` but using the heuristic inner product
     rather than a purely floating point inner product. The heuristic will
     compute at full precision when there is cancellation.
 
 .. function:: int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, mpf_mat_t mu, mpf_mat_t r, mpf *s, mpf_mat_t appB, fmpz_gram_t A, int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, flint_bitcnt_t prec, const fmpz_lll_t fl)
 
     This function is like the ``mpf`` version of
-    ``fmpz_lll_check_babai_heuristic_d()``. However, it also inherits some
+    :func:`fmpz_lll_check_babai_heuristic_d`. However, it also inherits some
     temporary ``mpf_t`` variables ``tmp`` and ``rtmp``.
 
 .. function:: int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
@@ -113,7 +112,7 @@ The various Babai's
 
 .. function:: int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
-    Same as ``fmpz_lll_advance_check_babai()`` but using the heuristic inner
+    Same as :func:`fmpz_lll_advance_check_babai` but using the heuristic inner
     product rather than a purely floating point inner product. The heuristic
     will compute at full precision when there is cancellation.
 
@@ -137,8 +136,8 @@ These programs implement ideas from the book chapter [Stehle2010]_.
 
     This is a mildly greedy version of floating point LLL using doubles only.
     It tries the fast version of the Babai algorithm
-    (``fmpz_lll_check_babai()``). If that fails, then it switches to the
-    heuristic version (``fmpz_lll_check_babai_heuristic_d()``) for only one
+    (:func:`fmpz_lll_check_babai`). If that fails, then it switches to the
+    heuristic version (:func:`fmpz_lll_check_babai_heuristic_d`) for only one
     loop and switches right back to the fast version. It reduces ``B`` in
     place. ``U`` is the matrix used to capture the unimodular
     transformations if it is not `NULL`. An exception is raised if `U != NULL`
@@ -153,7 +152,7 @@ These programs implement ideas from the book chapter [Stehle2010]_.
 .. function:: int fmpz_lll_d_heuristic(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     This LLL reduces ``B`` in place using doubles only. It is similar to
-    ``fmpz_lll_d()`` but only uses the heuristic inner products which
+    :func:`fmpz_lll_d` but only uses the heuristic inner products which
     attempt to detect cancellations.
 
 .. function:: int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_lll_t fl)
@@ -165,7 +164,7 @@ These programs implement ideas from the book chapter [Stehle2010]_.
 
 .. function:: int fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
-    A wrapper of ``fmpz_lll_mpf2()``. This currently begins with
+    A wrapper of :func:`fmpz_lll_mpf2`. This currently begins with
     `prec == D_BITS`, then for the first 20 loops, increases the precision one
     limb at a time. After 20 loops, it doubles the precision each time. There
     is a proof that this will eventually work. The return value of this
@@ -175,9 +174,9 @@ These programs implement ideas from the book chapter [Stehle2010]_.
 .. function:: int fmpz_lll_wrapper(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     A wrapper of the above procedures. It begins with the greediest version
-    (``fmpz_lll_d()``), then adapts to the version using heuristic inner
-    products only (``fmpz_lll_d_heuristic()``) if `fl->rt == Z\_BASIS` and
-    `fl->gt == APPROX`, and finally to the mpf version (``fmpz_lll_mpf()``)
+    (:func:`fmpz_lll_d`), then adapts to the version using heuristic inner
+    products only (:func:`fmpz_lll_d_heuristic`) if `fl->rt == Z\_BASIS` and
+    `fl->gt == APPROX`, and finally to the mpf version (:func:`fmpz_lll_mpf`)
     if needed.
 
     ``U`` is the matrix used to capture the unimodular
@@ -193,24 +192,24 @@ These programs implement ideas from the book chapter [Stehle2010]_.
 
 .. function:: int fmpz_lll_d_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
 
-    Same as ``fmpz_lll_d()`` but with a removal bound, ``gs_B``. The
+    Same as :func:`fmpz_lll_d` but with a removal bound, ``gs_B``. The
     return value is the new dimension of ``B`` if removals are desired.
 
 .. function:: int fmpz_lll_d_heuristic_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
 
-    Same as ``fmpz_lll_d_heuristic()`` but with a removal bound,
+    Same as :func:`fmpz_lll_d_heuristic` but with a removal bound,
     ``gs_B``. The return value is the new dimension of ``B`` if removals
     are desired.
 
 .. function:: int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_t gs_B, const fmpz_lll_t fl)
 
-    Same as ``fmpz_lll_mpf2()`` but with a removal bound, ``gs_B``. The
+    Same as :func:`fmpz_lll_mpf2` but with a removal bound, ``gs_B``. The
     return value is the new dimension of ``B`` if removals are desired.
 
 .. function:: int fmpz_lll_mpf_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
 
-    A wrapper of ``fmpz_lll_mpf2_with_removal()``. This currently begins
-    with `prec == D_BITS`, then for the first 20 loops, increases the precision
+    A wrapper of :func:`fmpz_lll_mpf2_with_removal`. This currently begins
+    with `prec == D\_BITS`, then for the first 20 loops, increases the precision
     one limb at a time. After 20 loops, it doubles the precision each time.
     There is a proof that this will eventually work. The return value of this
     function is the new dimension of ``B`` if removals are desired or -1 if
@@ -220,10 +219,10 @@ These programs implement ideas from the book chapter [Stehle2010]_.
 
     A wrapper of the procedures implementing the base case LLL with the
     addition of the removal boundary. It begins with the greediest version
-    (``fmpz_lll_d_with_removal()``), then adapts to the version using
-    heuristic inner products only (``fmpz_lll_d_heuristic_with_removal()``)
+    (:func:`fmpz_lll_d_with_removal`), then adapts to the version using
+    heuristic inner products only (:func:`fmpz_lll_d_heuristic_with_removal`)
     if `fl->rt == Z\_BASIS` and `fl->gt == APPROX`, and finally to the mpf
-    version (``fmpz_lll_mpf_with_removal()``) if needed.
+    version (:func:`fmpz_lll_mpf_with_removal`) if needed.
 
 .. function:: int fmpz_lll_d_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
 
@@ -236,11 +235,11 @@ These programs implement ideas from the book chapter [Stehle2010]_.
 
     A wrapper of the procedures implementing the LLL specialized to
     knapsack-type lattices. It begins with the greediest version and the engine
-    of this version, (``fmpz_lll_d_with_removal_knapsack()``), then adapts
+    of this version, (:func:`fmpz_lll_d_with_removal_knapsack`), then adapts
     to the version using heuristic inner products only
-    (``fmpz_lll_d_heuristic_with_removal()``) if `fl->rt == Z\_BASIS` and
+    (:func:`fmpz_lll_d_heuristic_with_removal`) if `fl->rt == Z\_BASIS` and
     `fl->gt == APPROX`, and finally to the mpf version
-    (``fmpz_lll_mpf_with_removal()``) if needed.
+    (:func:`fmpz_lll_mpf_with_removal`) if needed.
 
 
 ULLL
@@ -271,7 +270,7 @@ These programs implement ideas from the paper [Villard2007]_.
     function is mainly intended to be used for testing purposes. It will not
     always work, but if it does the result is guaranteed.
 
-    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
+    Uses the algorithm of Villard (see http://arxiv.org/abs/cs/0701183 ).
 
 .. function:: int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
 
@@ -281,7 +280,7 @@ These programs implement ideas from the paper [Villard2007]_.
     ``prec`` bits. The function is mainly intended to be used for testing
     purposes. It will not always work, but if it does the result is guaranteed.
 
-    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
+    Uses the algorithm of Villard (see http://arxiv.org/abs/cs/0701183 ).
 
 .. function:: int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
 
@@ -290,9 +289,9 @@ These programs implement ideas from the paper [Villard2007]_.
     ``mpfr`` variables used, if any, have their precision set to be exactly
     ``prec`` bits. The function is mainly intended to be used for testing
     purposes. It first tests for LLL reducedness using
-    ``fmpz_lll_is_reduced_d()``, followed by
-    ``fmpz_lll_is_reduced_mpfr()`` and finally calls
-    ``fmpz_mat_is_reduced()`` or ``fmpz_mat_is_reduced_gram()``
+    :func:`fmpz_lll_is_reduced_d`, followed by
+    :func:`fmpz_lll_is_reduced_mpfr` and finally calls
+    :func:`fmpz_mat_is_reduced` or :func:`fmpz_mat_is_reduced_gram`
     (depending on the type of input as determined by ``fl->rt``), if
     required.
 
@@ -305,7 +304,7 @@ These programs implement ideas from the paper [Villard2007]_.
     testing purposes. It will not always work, but if it does the result is
     guaranteed.
 
-    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
+    Uses the algorithm of Villard (see http://arxiv.org/abs/cs/0701183 ).
 
 .. function:: int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 
@@ -317,7 +316,7 @@ These programs implement ideas from the paper [Villard2007]_.
     intended to be used for testing purposes. It will not always work, but if
     it does the result is guaranteed.
 
-    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
+    Uses the algorithm of Villard (see http://arxiv.org/abs/cs/0701183 ).
 
 .. function:: int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
 
@@ -327,10 +326,10 @@ These programs implement ideas from the paper [Villard2007]_.
     and otherwise returns zero. The ``mpfr`` variables used, if any, have
     their precision set to be exactly ``prec`` bits. The function is mainly
     intended to be used for testing purposes. It first tests for LLL
-    reducedness using ``fmpz_lll_is_reduced_d_with_removal()``, followed by
-    ``fmpz_lll_is_reduced_mpfr_with_removal()`` and finally calls
-    ``fmpz_mat_is_reduced_with_removal()`` or
-    ``fmpz_mat_is_reduced_gram_with_removal()`` (depending on the type of
+    reducedness using :func:`fmpz_lll_is_reduced_d_with_removal`, followed by
+    :func:`fmpz_lll_is_reduced_mpfr_with_removal` and finally calls
+    :func:`fmpz_mat_is_reduced_with_removal` or
+    :func:`fmpz_mat_is_reduced_gram_with_removal` (depending on the type of
     input as determined by ``fl->rt``), if required.
 
 
@@ -340,7 +339,7 @@ Modified ULLL
 
 .. function:: void fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl)
 
-    Performs ULLL using ``fmpz_mat_lll_storjohann()`` as the LLL function.
+    Performs ULLL using :func:`fmpz_mat_lll_storjohann` as the LLL function.
 
 
 Main LLL functions

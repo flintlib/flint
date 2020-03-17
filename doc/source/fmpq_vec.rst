@@ -84,5 +84,5 @@ Input and output
 
     Prints the vector of given length to ``stdout``.
 
-    For further details, see ``_fmpq_vec_fprint()``.
+    For further details, see :func:`_fmpq_vec_fprint()`.
 

@@ -21,7 +21,7 @@ Memory Management
 
 .. function:: void fq_nmod_poly_factor_init(fq_nmod_poly_factor_t fac, const fq_nmod_ctx_t ctx)
 
-    Initialises ``fac`` for use. An ``fq_nmod_poly_factor_t``
+    Initialises ``fac`` for use. An :type:`fq_nmod_poly_factor_t`
     represents a polynomial in factorised form as a product of
     polynomials with associated exponents.
 
@@ -70,7 +70,7 @@ Basic Operations
 
     Concatenates two factorisations.
 
-    This is equivalent to calling ``fq_nmod_poly_factor_insert()``
+    This is equivalent to calling :func:`fq_nmod_poly_factor_insert`
     repeatedly with the individual factors of ``fac``.
 
     Does not support aliasing between ``res`` and ``fac``.

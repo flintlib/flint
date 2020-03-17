@@ -60,7 +60,7 @@ Factorisation
 
     Concatenates two factorisations.
 
-    This is equivalent to calling ``fmpz_mod_poly_factor_insert()``
+    This is equivalent to calling :func:`fmpz_mod_poly_factor_insert`
     repeatedly with the individual factors of ``fac``.
 
     Does not support aliasing between ``res`` and ``fac``.
@@ -102,7 +102,7 @@ Factorisation
 .. function:: int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz_t p)
 
     If `fac` returns with the value `1` then the function operates as per
-    ``_fmpz_mod_poly_is_squarefree``, otherwise `f` is set to a nontrivial
+    :func:`_fmpz_mod_poly_is_squarefree`, otherwise `f` is set to a nontrivial
     factor of `p`.
 
 .. function:: int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f)
@@ -113,7 +113,7 @@ Factorisation
 .. function:: int fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz_mod_poly_t f)
 
     If `fac` returns with the value `1` then the function operates as per
-    ``fmpz_mod_poly_is_squarefree``, otherwise `f` is set to a nontrivial
+    :func:`fmpz_mod_poly_is_squarefree`, otherwise `f` is set to a nontrivial
     factor of `p`.
 
 .. function:: int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor, flint_rand_t state, const fmpz_mod_poly_t pol, slong d)
@@ -144,7 +144,7 @@ Factorisation
 
 .. function:: void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const *degs, slong num_threads)
 
-    Multithreaded version of ``fmpz_mod_poly_factor_distinct_deg``.
+    Multithreaded version of :func:`fmpz_mod_poly_factor_distinct_deg`.
 
 .. function:: void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t f)
 
@@ -167,8 +167,8 @@ Factorisation
     factors using the fast version of Cantor-Zassenhaus algorithm proposed by
     Kaltofen and Shoup (1998). More precisely this algorithm uses a
     baby step/giant step strategy for the distinct-degree factorization
-    step. If ``flint_get_num_threads()`` is greater than one
-    ``fmpz_mod_poly_factor_distinct_deg_threaded`` is used.
+    step. If :func:`flint_get_num_threads` is greater than one
+    :func:`fmpz_mod_poly_factor_distinct_deg_threaded` is used.
 
 .. function:: void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors, const fmpz_mod_poly_t f)
 
@@ -179,6 +179,6 @@ Factorisation
 
     Worker function to compute interval polynomials in distinct degree
     factorisation. Input/output is stored in
-    ``fmpz_mod_poly_interval_poly_arg_t``.
+    :type:`fmpz_mod_poly_interval_poly_arg_t`.
 
 

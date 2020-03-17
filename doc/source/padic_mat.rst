@@ -218,8 +218,8 @@ Random matrix generation
 
     Sets `A` to a random matrix.
 
-    The valuation will be in the range `[- \ceil{N/10}, N)`, 
-    `[N - \ceil{-N/10}, N)`, or `[-10, 0)` as `N` is positive, 
+    The valuation will be in the range `[- \lceil N/10\rceil, N)`, 
+    `[N - \lceil -N/10\rceil, N)`, or `[-10, 0)` as `N` is positive, 
     negative or zero.
 
 

@@ -156,32 +156,28 @@ Radix 2 transforms
 
     Input: ``[i0, i1, ..., i(m-1)]``, for `m = 2n` a power of `2`.
 
-    Output: ``[r0, r1, ..., r(m-1)]``\\ `` = FFT[i0, i1, ..., i(m-1)]``.
+    Output: ``[r0, r1, ..., r(m-1)]`` `` = FFT[i0, i1, ..., i(m-1)]``.
 
     Algorithm:
 
-    `\bullet` Recursively compute ``[r0, r2, r4, ...., r(m-2)]``\\
-         ``= FFT[i0+i(m/2), i1+i(m/2+1), ..., i(m/2-1)+i(m-1)]``
-
-    `\bullet` Let ``[t0, t1, ..., t(m/2-1)]``\\
-         ``= [i0-i(m/2), i1-i(m/2+1), ..., i(m/2-1)-i(m-1)]``
-
-    `\bullet` Let ``[u0, u1, ..., u(m/2-1)]``\\
-         ``= [z1^0*t0, z1^1*t1, ..., z1^(m/2-1)*t(m/2-1)]``
-         where ``z1 = exp(2*Pi*I/m)`` corresponds to multiplication
-         by `2^w`.
-
-    `\bullet` Recursively compute ``[r1, r3, ..., r(m-1)]``\\
-         ``= FFT[u0, u1, ..., u(m/2-1)]``
+    | `\bullet` Recursively compute ``[r0, r2, r4, ...., r(m-2)]``
+    |     ``= FFT[i0+i(m/2), i1+i(m/2+1), ..., i(m/2-1)+i(m-1)]``
+    |
+    | `\bullet` Let ``[t0, t1, ..., t(m/2-1)]``
+    |     ``= [i0-i(m/2), i1-i(m/2+1), ..., i(m/2-1)-i(m-1)]``
+    |
+    | `\bullet` Let ``[u0, u1, ..., u(m/2-1)]``
+    |     ``= [z1^0*t0, z1^1*t1, ..., z1^(m/2-1)*t(m/2-1)]``
+    |     where ``z1 = exp(2*Pi*I/m)`` corresponds to multiplication by `2^w`.
+    |
+    | `\bullet` Recursively compute ``[r1, r3, ..., r(m-1)]``
+    |     ``= FFT[u0, u1, ..., u(m/2-1)]``
 
     The parameters are as follows:
 
-    `\bullet` ``2*n`` is the length of the input and output
-         arrays
+    `\bullet` ``2*n`` is the length of the input and output arrays
 
-    `\bullet` `w` is such that `2^w` is an `2n`-th root of unity
-         in the ring `\mathbf{Z}/p\mathbf{Z}` that we are working in,
-         i.e. `p = 2^{wn} + 1` (here `n` is divisible by
+    `\bullet` `w` is such that `2^w` is an `2n`-th root of unity in the ring `\mathbf{Z}/p\mathbf{Z}` that we are working in, i.e. `p = 2^{wn} + 1` (here `n` is divisible by
          ``GMP_LIMB_BITS``)
 
     `\bullet` ``ii`` is the array of inputs (each input is an
@@ -218,17 +214,16 @@ Radix 2 transforms
 
     Algorithm:
 
-    `\bullet` Recursively compute ``[s0, s1, ...., s(m/2-1)]``\\
+    `\bullet` Recursively compute ``[s0, s1, ...., s(m/2-1)]``
          ``= IFFT[i0, i2, ..., i(m-2)]``
 
-    `\bullet` Recursively compute ``[t(m/2), t(m/2+1), ..., t(m-1)]``\\
+    `\bullet` Recursively compute ``[t(m/2), t(m/2+1), ..., t(m-1)]``
          ``= IFFT[i1, i3, ..., i(m-1)]``
 
-    `\bullet` Let ``[r0, r1, ..., r(m/2-1)]``\\
-         ``= [s0+z1^0*t0, s1+z1^1*t1, ..., s(m/2-1)+z1^(m/2-1)*t(m/2-1)]``
-         where ``z1 = exp(-2*Pi*I/m)`` corresponds to division by `2^w`.
+    `\bullet` Let ``[r0, r1, ..., r(m/2-1)]``
+         ``= [s0+z1^0*t0, s1+z1^1*t1, ..., s(m/2-1)+z1^(m/2-1)*t(m/2-1)]`` where ``z1 = exp(-2*Pi*I/m)`` corresponds to division by `2^w`.
 
-    `\bullet` Let ``[r(m/2), r(m/2+1), ..., r(m-1)]``\\
+    `\bullet` Let ``[r(m/2), r(m/2+1), ..., r(m-1)]``
         ``= [s0-z1^0*t0, s1-z1^1*t1, ..., s(m/2-1)-z1^(m/2-1)*t(m/2-1)]``
 
     The parameters are as follows:
@@ -236,15 +231,10 @@ Radix 2 transforms
     `\bullet` ``2*n`` is the length of the input and output
         arrays
 
-    `\bullet` `w` is such that `2^w` is an `2n`-th root of unity
-        in the ring `\mathbf{Z}/p\mathbf{Z}` that we are working in,
-        i.e. `p = 2^{wn} + 1` (here `n` is divisible by
+    `\bullet` `w` is such that `2^w` is an `2n`-th root of unity in the ring `\mathbf{Z}/p\mathbf{Z}` that we are working in, i.e. `p = 2^{wn} + 1` (here `n` is divisible by
         ``GMP_LIMB_BITS``)
 
-    `\bullet` ``ii`` is the array of inputs (each input is an
-        array of limbs of length ``wn/GMP_LIMB_BITS + 1`` (the
-        extra limbs being a "carry limb"). Outputs are written
-        in-place.
+    `\bullet` ``ii`` is the array of inputs (each input is an array of limbs of length ``wn/GMP_LIMB_BITS + 1`` (the extra limbs being a "carry limb"). Outputs are written in-place.
 
     We require `nw` to be at least 64 and the two temporary space pointers
     to point to blocks of size ``n*w + FLINT_BITS`` bits.

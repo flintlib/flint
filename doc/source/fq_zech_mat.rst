@@ -79,11 +79,11 @@ Concatenate
 
 .. function:: void fq_zech_mat_concat_vertical(fq_zech_mat_t res, const fq_zech_mat_t mat1, const fq_zech_mat_t mat2, const fq_zech_ctx_t ctx)
 
-    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : $m \times n$, ``mat2`` : $k \times n$, ``res`` : $(m + k) \times n$.
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
 
 .. function:: void fq_zech_mat_concat_horizontal(fq_zech_mat_t res, const fq_zech_mat_t mat1, const fq_zech_mat_t mat2, const fq_zech_ctx_t ctx)
 
-    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : $m \times n$, ``mat2`` : $m \times k$, ``res``  : $m \times (n + k)$.
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
 
 
 Printing
@@ -163,7 +163,7 @@ Random matrix generation
     `\mathbf{F}_{q}`.
 
     The matrix can be transformed into a dense matrix with unchanged
-    rank by subsequently calling ``fq_zech_mat_randops()``.
+    rank by subsequently calling :func:`fq_zech_mat_randops`.
 
 .. function:: void fq_zech_mat_randops(fq_zech_mat_t mat, slong count, flint_rand_t state, const fq_zech_ctx_t ctx)
 

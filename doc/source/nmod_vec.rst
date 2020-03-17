@@ -185,7 +185,7 @@ Arithmetic operations
 .. function:: void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec, slong len, mp_limb_t c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c` using
-    ``n_mulmod_shoup()``. `mod.n` should be less than `2^{\mathtt{FLINT_BITS} - 1}`. `c` 
+    :func:`n_mulmod_shoup`. `mod.n` should be less than `2^{\mathtt{FLINT\_BITS} - 1}`. `c` 
     and all elements of `vec` should be less than `mod.n`.
 
 .. function:: void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, slong len, mp_limb_t c, nmod_t mod)

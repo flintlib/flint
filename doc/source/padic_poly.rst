@@ -27,8 +27,8 @@ Memory management
 
     Initialises ``poly`` for use, setting its length to zero.  
     The precision of the polynomial is set to ``PADIC_DEFAULT_PREC``. 
-    A corresponding call to ``padic_poly_clear()`` must be made 
-    after finishing with the ``padic_poly_t`` to free the memory 
+    A corresponding call to :func:`padic_poly_clear` must be made 
+    after finishing with the :type:`padic_poly_t` to free the memory 
     used by the polynomial.
 
 .. function:: void padic_poly_init2(padic_poly_t poly, slong alloc, slong prec)
@@ -76,8 +76,7 @@ Memory management
     is mainly used internally, as all functions guarantee normalisation.
 
 .. function:: void _padic_poly_canonicalise(fmpz *poly, slong *v, slong len, const fmpz_t p)
-
-.. function:: void padic_poly_canonicalise(padic_poly_t poly, const fmpz_t p)
+              void padic_poly_canonicalise(padic_poly_t poly, const fmpz_t p)
 
     Brings the polynomial ``poly`` into canonical form, 
     assuming that it is normalised already.  Does *not* 
@@ -124,7 +123,7 @@ Polynomial parameters
     used as either a ``lvalue`` or a ``rvalue``.
 
     Note that increasing the precision might require 
-    a call to ``padic_poly_reduce()``.
+    a call to :func:`padic_poly_reduce`.
 
 
 Randomisation
@@ -393,7 +392,7 @@ Series inversion
     Moreover, assumes that the valuation of the constant coefficient 
     of `f` is minimal among the coefficients of `f`.
 
-    Note that the result `g` is zero if and only if  `- \ord_p(f) \geq N`.
+    Note that the result `g` is zero if and only if  `- \operatorname{ord}_p(f) \geq N`.
 
 
 Derivative
@@ -441,7 +440,7 @@ Evaluation
     reduced in the given context.
 
     Suppose that the polynomial can be written as `F(X) = p^w f(X)` 
-    with `\ord_p(f) = 1`, that `\ord_p(a) = b` and that both are 
+    with `\operatorname{ord}_p(f) = 1`, that `\operatorname{ord}_p(a) = b` and that both are 
     defined to precision~`N`.  Then `f` is defined to precision 
     `N-w` and so `f(a)` is defined to precision `N-w` when `a` is 
     integral and `N-w+(n-1)b` when `b < 0`, where `n = \deg(f)`.  Thus, 
@@ -500,8 +499,7 @@ Input and output
     In the current implementation, always returns `1`.
 
 .. function:: int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len, const padic_ctx_t ctx)
-
-.. function:: int padic_poly_fprint(FILE *file, const padic_poly_t poly, const padic_ctx_t ctx)
+              int padic_poly_fprint(FILE *file, const padic_poly_t poly, const padic_ctx_t ctx)
 
     Prints a simple representation of the polynomial ``poly`` 
     to the stream ``file``.
@@ -524,8 +522,7 @@ Input and output
     In the current implementation, always returns `1`.
 
 .. function:: int _padic_poly_print(const fmpz *poly, slong val, slong len, const padic_ctx_t ctx)
-
-.. function:: int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx)
+              int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx)
 
     Prints a simple representation of the polynomial ``poly`` 
     to ``stdout``.
@@ -533,12 +530,9 @@ Input and output
     In the current implementation, always returns `1`.
 
 .. function:: int _padic_poly_fprint_pretty(FILE *file, const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
-
-.. function:: int padic_poly_fprint_pretty(FILE *file, const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
-
-.. function:: int _padic_poly_print_pretty(FILE *file, const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
-
-.. function:: int padic_poly_print_pretty(const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
+              int padic_poly_fprint_pretty(FILE *file, const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
+              int _padic_poly_print_pretty(FILE *file, const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
+              int padic_poly_print_pretty(const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
 
 
 Testing
@@ -546,10 +540,7 @@ Testing
 
 
 .. function:: int _padic_poly_is_canonical(const fmpz *op, slong val, slong len, const padic_ctx_t ctx)
-
-.. function:: int padic_poly_is_canonical(const padic_poly_t op, const padic_ctx_t ctx)
-
-.. function:: int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N, const padic_ctx_t ctx)
-
-.. function:: int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx)
+              int padic_poly_is_canonical(const padic_poly_t op, const padic_ctx_t ctx)
+              int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N, const padic_ctx_t ctx)
+              int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx)
 

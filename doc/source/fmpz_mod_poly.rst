@@ -24,8 +24,8 @@ Memory management
     Initialises ``poly`` for use over `\mathbf{Z} / p \mathbf{Z}`,
     setting its length to zero.
 
-    A corresponding call to ``fmpz_mod_poly_clear()`` must be made after
-    finishing with the ``fmpz_mod_poly_t`` to free the memory used by
+    A corresponding call to :func:`fmpz_mod_poly_clear` must be made after
+    finishing with the :func:`fmpz_mod_poly_t` to free the memory used by
     the polynomial.  The user is also responsible to clearing the
     integer~`p`.
 
@@ -686,12 +686,12 @@ Powering
 
 .. function:: void fmpz_mod_poly_frobenius_powers_2exp_precomp( fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
 
-    If ``p = f->p``, compute `x^(p^1)`, `x^(p^2)`, `x^(p^4)`, ...,
-    `x^(p^(2^l)) \pmod{f}` where `2^l` is the greatest power of `2` less than
+    If ``p = f->p``, compute `x^{(p^1)}`, `x^{(p^2)}`, `x^{(p^4)}`, ...,
+    `x^{(p^{(2^l)})} \pmod{f}` where `2^l` is the greatest power of `2` less than
     or equal to `m`.
 
-    Allows construction of `x^(p^k)` for `k = 0`, `1`, ..., `x^(p^m) \pmod{f}`
-    using ``fmpz_mod_poly_frobenius_power()``.
+    Allows construction of `x^{(p^k)}` for `k = 0`, `1`, ..., `x^{(p^m)} \pmod{f}`
+    using :func:`fmpz_mod_poly_frobenius_power`.
 
     Requires precomputed inverse of `f`, i.e. newton inverse.
 
@@ -702,7 +702,7 @@ Powering
 
 .. function:: void fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res, fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f, ulong m)
 
-    If ``p = f->p``, compute `x^(p^m) \pmod{f}`.
+    If ``p = f->p``, compute `x^{(p^m)} \pmod{f}`.
 
     Requires precomputed frobenius powers supplied by
     ``fmpz_mod_poly_frobenius_powers_2exp_precomp``.
@@ -713,8 +713,8 @@ Powering
 
 .. function:: void fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
 
-    If ``p = f->p``, compute `x^(p^0)`, `x^(p^1)`, `x^(p^2)`, `x^(p^3)`,
-    ..., `x^(p^m) \pmod{f}`.
+    If ``p = f->p``, compute `x^{(p^0)}`, `x^{(p^1)}`, `x^{(p^2)}`, `x^{(p^3)}`,
+    ..., `x^{(p^m)} \pmod{f}`.
 
     Requires precomputed inverse of `f`, i.e. newton inverse.
 
@@ -755,7 +755,7 @@ Division
     ``lenB``. We require that `Q` have space for ``lenA - lenB + 1``
     coefficients. Furthermore, we assume that `Binv` is the inverse of the
     reverse of `B` mod `x^{\operatorname{len}(B)}`. The algorithm used is to call
-    ``div_newton_n_preinv()`` and then multiply out and compute
+    :func:`div_newton_n_preinv` and then multiply out and compute
     the remainder.
 
 .. function:: void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv)
@@ -766,7 +766,7 @@ Division
     It is required that the length of `A` is less than or equal to
     2*the length of `B` - 2.
 
-    The algorithm used is to call ``div_newton_n()`` and then multiply out
+    The algorithm used is to call :func:`div_newton_n` and then multiply out
     and compute the remainder.
 
 .. function:: void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
@@ -1128,7 +1128,7 @@ Greatest common divisor
     the zero polynomial.
 
     The time complexity of the algorithm is `\mathcal{O}(n \log^2 n)`
-    ring operations. For further details, see~[ThullYap1990]_.
+    ring operations. For further details, see [ThullYap1990]_.
 
 .. function:: slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
@@ -1250,13 +1250,13 @@ Greatest common divisor
 .. function:: slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
 
     If `f` returns with value `1` then the function operates as per
-    ``_fmpz_mod_poly_gcdinv_euclidean``, otherwise `f` is set to a
+    :func:`_fmpz_mod_poly_gcdinv_euclidean`, otherwise `f` is set to a
     nontrivial factor of `p`.
 
 .. function:: void fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     If `f` returns with value `1` then the function operates as per
-    ``fmpz_mod_poly_gcdinv_euclidean``, otherwise `f` is set to a
+    :func:`fmpz_mod_poly_gcdinv_euclidean`, otherwise `f` is set to a
     nontrivial factor of the modulus of `A`.
 
 .. function:: slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
@@ -1269,7 +1269,7 @@ Greatest common divisor
 .. function:: slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
 
     If `f` returns with value `1` then the function operates as per
-    ``_fmpz_mod_poly_gcdinv``, otherwise `f` will be set to a nontrivial
+    :func:`_fmpz_mod_poly_gcdinv`, otherwise `f` will be set to a nontrivial
     factor of `p`.
 
 .. function:: void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
@@ -1283,7 +1283,7 @@ Greatest common divisor
 .. function:: void fmpz_mod_poly_gcdinv_f(fmpz_t fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     If `f` returns with value `1` then the function operates as per
-    ``fmpz_mod_poly_gcdinv``, otherwise `f` will be set to a nontrivial
+    :func:`fmpz_mod_poly_gcdinv`, otherwise `f` will be set to a nontrivial
     factor of `p`.
 
 .. function:: int _fmpz_mod_poly_invmod(fmpz *A, const fmpz *B, slong lenB, const fmpz *P, slong lenP, const fmpz_t p)
@@ -1302,7 +1302,7 @@ Greatest common divisor
 .. function:: int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A, const fmpz *B, slong lenB, const fmpz *P, slong lenP, const fmpz_t p)
 
     If `f` returns with the value `1`, then the function operates as per
-    ``_fmpz_mod_poly_invmod``. Otherwise `f` is set to a nontrivial
+    :func:`_fmpz_mod_poly_invmod`. Otherwise `f` is set to a nontrivial
     factor of `p`.
 
 .. function:: int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
@@ -1320,7 +1320,7 @@ Greatest common divisor
 .. function:: int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
 
     If `f` returns with the value `1`, then the function operates as per
-    ``fmpz_mod_poly_invmod``. Otherwise `f` is set to a nontrivial
+    :func:`fmpz_mod_poly_invmod`. Otherwise `f` is set to a nontrivial
     factor of `p`.
 
 
@@ -1437,7 +1437,7 @@ Resultant
     ``(B, lenB)`` using the half-gcd algorithm.
 
     This algorithm computes the half-gcd as per
-    ``_fmpz_mod_poly_gcd_hgcd()``
+    :func:`_fmpz_mod_poly_gcd_hgcd`
     but additionally updates the resultant every time a division occurs. The
     half-gcd algorithm computes the GCD recursively. Given inputs `a` and `b`
     it lets ``m = len(a)/2`` and (recursively) performs all quotients in
@@ -1767,7 +1767,7 @@ Modular composition
 .. function:: void _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 
     Worker function version of
-    ``_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv``.
+    :func:`_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv`.
     Input/output is stored in
     ``fmpz_mod_poly_compose_mod_precomp_preinv_arg_t``.
 
@@ -1840,20 +1840,20 @@ Modular composition
 .. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong lenpolys, slong l, const fmpz * g, slong glen, const fmpz * poly, slong len, const fmpz * polyinv, slong leninv, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
 
     Multithreaded version of
-    ``_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the
-    Horner evaluations across ``flint_get_num_threads()`` threads.
+    :func:`_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
+    Horner evaluations across :func:`flint_get_num_threads` threads.
 
 .. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, thread_pool_handle * threads, slong num_threads)
  
     Multithreaded version of
-    ``fmpz_mod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the
-    Horner evaluations across ``flint_get_num_threads()`` threads.
+    :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
+    Horner evaluations across :func:`flint_get_num_threads` threads.
 
 .. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, slong thread_limit)
 
     Multithreaded version of
-    ``fmpz_mod_poly_compose_mod_brent_kung_vec_preinv``. Distributing the
-    Horner evaluations across ``flint_get_num_threads()`` threads.
+    :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
+    Horner evaluations across :func:`flint_get_num_threads` threads.
 
 
 Subproduct trees
@@ -1885,8 +1885,7 @@ a polynomial `f(X)` with respect to a given radix `r(X)` as
 
     .. math ::
 
-
-    f(X) = \sum_{i = 0}^{N} b_i(X) r(X)^i
+        f(X) = \sum_{i = 0}^{N} b_i(X) r(X)^i
 
 
 where `N = \lfloor\deg(f) / \deg(r)\rfloor`.
@@ -1896,7 +1895,7 @@ has time complexity `\Theta(\deg(f) \log \deg(f))`.
 It facilitates the repeated use of precomputed data, namely the
 powers of `r` and their power series inverses.  This data is stored
 in objects of type ``fmpz_mod_poly_radix_t`` and it is computed
-using the function ``fmpz_mod_poly_radix_init()``, which only
+using the function :func:`fmpz_mod_poly_radix_init`, which only
 depends on~`r` and an upper bound on the degree of~`f`.
 
 .. function:: void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv, const fmpz *R, slong lenR, slong k, const fmpz_t invL, const fmpz_t p)
@@ -1907,7 +1906,7 @@ depends on~`r` and an upper bound on the degree of~`f`.
     Assumes that the vectors ``Rpow[i]`` and ``Rinv[i]`` have space
     for `2^i \deg(R) + 1` and `2^i \deg(R)` coefficients, respectively.
 
-    Assumes that the polynomial `R` is non-constant, i.e.\ `\deg(R) \geq 1`.
+    Assumes that the polynomial `R` is non-constant, i.e. `\deg(R) \geq 1`.
 
     Assumes that the leading coefficient of `R` is a unit and that the
     argument ``invL`` is the inverse of the coefficient modulo~`p`.
@@ -1924,13 +1923,13 @@ depends on~`r` and an upper bound on the degree of~`f`.
     Carries out the precomputation necessary to perform radix conversion
     to radix~`R` for polynomials~`F` of degree at most ``degF``.
 
-    Assumes that `R` is non-constant, i.e.\ `\deg(R) \geq 1`,
+    Assumes that `R` is non-constant, i.e. `\deg(R) \geq 1`,
     and that the leading coefficient is a unit.
 
 .. function:: void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, slong degR, slong k, slong i, fmpz *W, const fmpz_t p)
 
     This is the main recursive function used by the
-    function ``fmpz_mod_poly_radix()``.
+    function :func:`fmpz_mod_poly_radix`.
 
     Assumes that, for all `i = 0, \dotsc, N`, the vector
     ``B[i]`` has space for `\deg(R)` coefficients.
@@ -1956,7 +1955,6 @@ depends on~`r` and an upper bound on the degree of~`f`.
     such that
 
     .. math ::
-
 
         F = B_0 + B_1 R + \dotsb + B_N R^N,
 
@@ -2020,33 +2018,32 @@ Berlekamp-Massey Algorithm
 --------------------------------------------------------------------------------
 
     The fmpz_mod_berlekamp_massey_t manages an unlimited stream of points `a_1, a_2, \dots .`
-    At any point in time, after, say, `n` points have been added, a call to func::fmpz_mod_berlekamp_massey_reduce will
+    At any point in time, after, say, `n` points have been added, a call to :func:`fmpz_mod_berlekamp_massey_reduce` will
     calculate the polynomials `U`, `V` and `R` in the extended euclidean remainder sequence with
 
     .. math ::
 
-        `U*x^n + V*(a_1*x^{n-1} + \cdots + a_{n-1}*x + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2.`
+        U*x^n + V*(a_1*x^{n-1} + \cdots + a_{n-1}*x + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2.
 
-    The polynomials `V` and `R` may be obtained with func::fmpz_mod_berlekamp_massey_V_poly and func::fmpz_mod_berlekamp_massey_R_poly.
-    This class differs from func::fmpz_mod_poly_minpoly in the following respect. Let `v_i` denote the coefficient of `x^i` in `V`.
-    func::fmpz_mod_poly_minpoly will return a polynomial `V` of lowest degree that annihilates the whole sequence `a_1, \dots, a_n` as
+    The polynomials `V` and `R` may be obtained with :func:`fmpz_mod_berlekamp_massey_V_poly` and :func:`fmpz_mod_berlekamp_massey_R_poly`.
+    This class differs from :func:`fmpz_mod_poly_minpoly` in the following respect. Let `v_i` denote the coefficient of `x^i` in `V`.
+    :func:`fmpz_mod_poly_minpoly` will return a polynomial `V` of lowest degree that annihilates the whole sequence `a_1, \dots, a_n` as
 
     .. math ::
 
-        `\sum_{i} v_i a_{j + i} = 0, \quad 1 \le j \le n - \deg(V)`.
+        \sum_{i} v_i a_{j + i} = 0, \quad 1 \le j \le n - \deg(V).
 
     The cost is that a polynomial of degree `n-1` might be returned and the return is not generally uniquely determined by the input sequence.
     For the fmpz_mod_berlekamp_massey_t we have
 
     .. math ::
 
-        `\sum_{i,j} v_i a_{j+i} x^{-j} = -U + \frac{R}{x^n}\text{,}
+        \sum_{i,j} v_i a_{j+i} x^{-j} = -U + \frac{R}{x^n}\text{,}
 
     and it can be seen that `\sum_{i} v_i a_{j + i}` is zero for `1 \le j < n - \deg(R)`. Thus whether or not `V` has annihilated the whole sequence may be checked by comparing the degrees of `V` and `R`.
 
 .. function:: void fmpz_mod_berlekamp_massey_init(fmpz_mod_berlekamp_massey_t B, const fmpz_t p)
-
-.. function:: void fmpz_mod_berlekamp_massey_init_ui(fmpz_mod_berlekamp_massey_t B, ulong p)
+              void fmpz_mod_berlekamp_massey_init_ui(fmpz_mod_berlekamp_massey_t B, ulong p)
 
     Initialize ``B`` in characteristic ``p`` with an empty stream.
 
@@ -2063,10 +2060,8 @@ Berlekamp-Massey Algorithm
     Set the characteristic of the field and empty the stream of points in ``B``.
 
 .. function:: void fmpz_mod_berlekamp_massey_add_points(fmpz_mod_berlekamp_massey_t B, const fmpz * a, slong count)
-
-.. function:: void fmpz_mod_berlekamp_massey_add_zeros(fmpz_mod_berlekamp_massey_t B, slong count)
-
-.. function:: void fmpz_mod_berlekamp_massey_add_point(fmpz_mod_berlekamp_massey_t B, const fmpz_t a)
+              void fmpz_mod_berlekamp_massey_add_zeros(fmpz_mod_berlekamp_massey_t B, slong count)
+              void fmpz_mod_berlekamp_massey_add_point(fmpz_mod_berlekamp_massey_t B, const fmpz_t a)
 
     Add point(s) to the stream processed by ``B``. The addition of any number of points will not update the `V` and `R` polynomial.
 
