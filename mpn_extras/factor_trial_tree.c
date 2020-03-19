@@ -117,7 +117,7 @@ _factor_trial_tree_init()
 int flint_mpn_factor_trial_tree(slong * factors,
 		                mp_srcptr x, mp_size_t xsize, slong num_primes)
 {
-    slong i, j, m, n, n2;
+    slong i, j, m, n, n2, nmax;
     const mp_limb_t * primes;
     mp_ptr gtemp; /* temporary space for recursive gcd's */
     mp_ptr temp; /* temporary space for flint_mpn_gcd_full2 */
@@ -137,10 +137,13 @@ int flint_mpn_factor_trial_tree(slong * factors,
     temp = gtemp + 2*4096/(FLINT_BITS/16);
 
     /* compute gcd of x with top level in tree */
-    m  = 12 - (FLINT_BITS/32); /* top level in tree */
-    n  = 3512/(FLINT_BITS/16); /* number of words of integer in tree */
-    n2 = 4096/(FLINT_BITS/16); /* number of words per entry at this level */
-    
+    m  = FLINT_MAX(FLINT_BIT_COUNT(num_primes) - (FLINT_BITS/32), 0); /* top level in tree */
+    n  = 4096/(FLINT_BITS/16); /* number of words of integer in tree */
+    for (i = 12 - (FLINT_BITS/32); i > m; i--)
+        n /= 2;
+    n2 = n; /* number of words per entry at this level */
+    nmax = n; /* save for later */
+
     MPN_NORM(_factor_trial_tree[m] + 0, n);
 
     rlimbs[m] = flint_mpn_gcd_full2(gtemp, x, xsize,
@@ -163,7 +166,7 @@ int flint_mpn_factor_trial_tree(slong * factors,
     for (i = 0; i < (num_primes + (FLINT_BITS/16) - 1)/(FLINT_BITS/16); i++)
     {
         gcd1 = 0;
-	    n2 = 4096/(FLINT_BITS/16); /* number of words per entry */
+	    n2 = nmax; /* number of words per entry */
         offset = 0; /* offset into gtemp */
         
 	    /* compute gcd's down the tree for this i */
