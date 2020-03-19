@@ -66,6 +66,22 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     The function returns 1 if `n` is completely factored, otherwise it returns
     `0`.
 
+.. function:: int fmpz_factor_trial(fmpz_factor_t factor, const fmpz_t n, slong num_primes)
+
+    Factors `n` into prime factors using trial division. If `n` is
+    zero or negative, the sign field of the ``factor`` object will be
+    set accordingly.
+
+    The algorithm uses the given number of primes, which must be in the range
+    `[0, 3512]`. An exception is raised if a number outside this range is
+    passed.
+
+    The function returns 1 if `n` is completely factored, otherwise it returns
+    `0`.
+
+    The final entry in the factor struct is set to the cofactor after removing
+    prime factors, if this is not `1`.
+
 .. function:: void fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f)
 
     Attempts to improve a partial factorization of an integer by "refining"
