@@ -114,7 +114,7 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
             fmpz_init2(n2, FLINT_BITS*xsize);
 
             data = _fmpz_promote(n2);
-            mpn_copyi(data->_mp_d, xd, xsize);
+            flint_mpn_copyi(data->_mp_d, xd, xsize);
             data->_mp_size = xsize;
             
             fmpz_factor_no_trial(factor, n2);

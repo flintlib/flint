@@ -59,8 +59,8 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     ret = 0;
 
     /* arr[0] = Q0 */
-    mpn_copyi(arrx, ecm_inf->x, ecm_inf->n_size);
-    mpn_copyi(arrz, ecm_inf->z, ecm_inf->n_size);
+    flint_mpn_copyi(arrx, ecm_inf->x, ecm_inf->n_size);
+    flint_mpn_copyi(arrz, ecm_inf->z, ecm_inf->n_size);
 
     /* Q0x2, Q0z2 = 2Q0 */
     fmpz_factor_ecm_double(Q0x2, Q0z2, arrx, arrz, n, ecm_inf);
@@ -120,16 +120,16 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
             }
         }
 
-        mpn_copyi(a, Rx, ecm_inf->n_size);
-        mpn_copyi(b, Rz, ecm_inf->n_size);
+        flint_mpn_copyi(a, Rx, ecm_inf->n_size);
+        flint_mpn_copyi(b, Rz, ecm_inf->n_size);
 
         /* R = R + Q    
            difference is stored in Qd, initially (Mmin - 1)Q */
 
         fmpz_factor_ecm_add(Rx, Rz, Rx, Rz, Qx, Qz, Qdx, Qdz, n, ecm_inf);
 
-        mpn_copyi(Qdx, a, ecm_inf->n_size);
-        mpn_copyi(Qdz, b, ecm_inf->n_size);
+        flint_mpn_copyi(Qdx, a, ecm_inf->n_size);
+        flint_mpn_copyi(Qdz, b, ecm_inf->n_size);
     }
 
     sz = ecm_inf->n_size;

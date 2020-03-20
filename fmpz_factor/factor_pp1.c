@@ -48,8 +48,8 @@ ulong pp1_primorial[9] =
 void pp1_set(mp_ptr x1, mp_ptr y1, 
               mp_srcptr x2, mp_srcptr y2, mp_size_t nn)
 {
-   mpn_copyi(x1, x2, nn);
-   mpn_copyi(y1, y2, nn);
+   flint_mpn_copyi(x1, x2, nn);
+   flint_mpn_copyi(y1, y2, nn);
 }
 
 void pp1_set_ui(mp_ptr x, mp_size_t nn, ulong norm, ulong c)
@@ -71,8 +71,8 @@ void pp1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
       mpn_rshift(ty, y, nn, norm);
    } else
    {
-       mpn_copyi(tx, x, nn);
-       mpn_copyi(ty, y, nn);
+       flint_mpn_copyi(tx, x, nn);
+       flint_mpn_copyi(ty, y, nn);
    }
 
    flint_printf("["), gmp_printf("%Nd", tx, nn), flint_printf(", "), gmp_printf("%Nd", ty, nn), flint_printf("]");
@@ -114,7 +114,7 @@ void pp1_pow_ui(mp_ptr x, mp_ptr y, mp_size_t nn,
 
    if (nn > 30)
       x0 = flint_malloc(nn*sizeof(mp_limb_t));
-   mpn_copyi(x0, x, nn);
+   flint_mpn_copyi(x0, x, nn);
 
    pp1_mulmod(y, x, x, nn, n, ninv, norm);
    if (mpn_sub_1(y, y, nn, UWORD(2) << norm))
@@ -145,12 +145,12 @@ mp_size_t pp1_factor(mp_ptr factor, mp_srcptr n,
    if (norm)
       mpn_rshift(n2, n, nn, norm);
    else
-      mpn_copyi(n2, n, nn);
+      flint_mpn_copyi(n2, n, nn);
 
    if (norm)
       mpn_rshift(x2, x, nn, norm);
    else
-      mpn_copyi(x2, x, nn);
+      flint_mpn_copyi(x2, x, nn);
    
    if (mpn_sub_1(x2, x2, nn, 2))
       mpn_add_n(x2, x2, n2, nn);
@@ -228,7 +228,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       if (norm)
          mpn_lshift(n, np, nn, norm);
       else
-         mpn_copyi(n, np, nn);
+         flint_mpn_copyi(n, np, nn);
    }
 
    flint_mpn_preinvn(ninv, n, nn);
@@ -444,7 +444,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
 
                if (j < k) /* pair not found, compute using pow_ui */
                {
-                  mpn_copyi(ptr_2, x, nn);
+                  flint_mpn_copyi(ptr_2, x, nn);
                   pp1_pow_ui(ptr_2, y, nn, 2*(s + i) + 1, n, ninv, norm);
                }
              
@@ -461,10 +461,10 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
 #endif
 
       /* v_1 */
-      mpn_copyi(oldx, x, nn);
+      flint_mpn_copyi(oldx, x, nn);
       pp1_pow_ui(oldx, y, nn, B2sqrt, n, ninv, norm);
       ptr_0 = COEFF_TO_PTR(roots2[0])->_mp_d;
-      mpn_copyi(ptr_0, oldx, nn);
+      flint_mpn_copyi(ptr_0, oldx, nn);
 
       /* v_2 */
       ptr_1 = COEFF_TO_PTR(roots2[1])->_mp_d;
@@ -498,8 +498,11 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
          ptr_1 = m1->_mp_d;
          ptr_2 = m2->_mp_d;
       
-         mpn_rshift(ptr_1, ptr_1, nn, norm);
-         mpn_rshift(ptr_2, ptr_2, nn, norm);
+         if (norm)
+	 {
+	     mpn_rshift(ptr_1, ptr_1, nn, norm);
+             mpn_rshift(ptr_2, ptr_2, nn, norm);
+	 }
 
          sn = nn;
          MPN_NORM(ptr_1, sn);
@@ -568,7 +571,7 @@ cleanup:
    {
       __mpz_struct * fm = _fmpz_promote(fac);
       mpz_realloc(fm, r);
-      mpn_copyi(fm->_mp_d, factor, r);
+      flint_mpn_copyi(fm->_mp_d, factor, r);
       fm->_mp_size = r;
       _fmpz_demote_val(fac);
    }
