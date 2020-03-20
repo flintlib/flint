@@ -15,7 +15,7 @@
 #include "fmpz_vec.h"
 #include "mpn_extras.h"
 
-/* Implementation of the stage I of ECM */
+/* Implementation of the stage II of ECM */
 
 int
 fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
@@ -78,7 +78,7 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     for (j = 2; j <= (maxj >> 1); j += 1)
     {
         /* jQ0 = (j - 2)Q0 + 2Q0 
-           Differnce is (j - 4)Q0 */
+           Difference is (j - 4)Q0 */
 
         fmpz_factor_ecm_add(arrx + j * ecm_inf->n_size, arrz + j * ecm_inf->n_size,
                              arrx + (j - 1) * ecm_inf->n_size, arrz + (j - 1) * ecm_inf->n_size,
@@ -147,10 +147,10 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
        condition two -> gcd = n
        if neither is true, factor found */
 
-    if ((((gcdlimbs == 1) && f[0] == ecm_inf->one[0]) || 
-        ((gcdlimbs == ecm_inf->n_size) && mpn_cmp(f, n, ecm_inf->n_size) == 0)) == 0)
+    if (!(gcdlimbs == 1 && f[0] == ecm_inf->one[0]) && 
+        !(gcdlimbs == ecm_inf->n_size && mpn_cmp(f, n, ecm_inf->n_size) == 0))
     {
-        /* Found factor in stage I */
+        /* Found factor in stage II */
         ret = gcdlimbs;
         goto cleanup;
     }

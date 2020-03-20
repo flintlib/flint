@@ -71,6 +71,19 @@ Divisibility
     ``flint_primes[i]`` is a factor, otherwise returns `0` if no factor 
     is found. It is assumed that ``start >= 1``.
 
+.. function:: int flint_mpn_factor_trial_tree(slong * factors, mp_srcptr x, mp_size_t xsize, slong num_primes)
+
+    Searches for a factor of ``(x, xsize)`` among the primes in positions
+    approximately in the range ``0, ..., num_primes - 1`` of ``flint_primes``.
+    
+    Returns the number of prime factors found and fills ``factors`` with their
+    indices in ``flint_primes``. It is assumed that ``num_primes`` is in the
+    range ``0, ..., 3512``.
+
+    If the input fits in a small ``fmpz`` the number is fully factored instead.
+
+    The algorithm used is a tree based gcd with a product of primes, the tree
+    for which is cached globally (it is threadsafe).
 
 Division
 --------------------------------------------------------------------------------
@@ -169,6 +182,18 @@ Division
 GCD
 --------------------------------------------------------------------------------
 
+
+.. function:: mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2, mp_ptr temp)
+
+    Sets ``(arrayg, retvalue)`` to the gcd of ``(array1, limbs1)`` and
+        ``(array2, limbs2)``.
+
+    The only assumption is that neither ``limbs1`` or ``limbs2`` is
+    zero.
+
+    The function must be supplied with ``limbs1 + limbs2`` limbs of temporary
+    space, or ``NULL`` must be passed to ``temp`` if the function should
+    allocate its own space.
 
 .. function:: mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
 

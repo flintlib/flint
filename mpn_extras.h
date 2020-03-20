@@ -89,18 +89,27 @@ mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
 
 FLINT_DLL void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
 
-FLINT_DLL mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t *bits);
+FLINT_DLL mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize,
+		                                      flint_bitcnt_t *bits);
 
-FLINT_DLL mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
-                                     mp_ptr p, mp_size_t psize, ulong *exp);
+FLINT_DLL mp_size_t flint_mpn_remove_power_ascending(mp_ptr x,
+		    mp_size_t xsize, mp_ptr p, mp_size_t psize, ulong *exp);
 
-FLINT_DLL int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop);
+FLINT_DLL int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize,
+		                                   slong start, slong stop);
+
+FLINT_DLL int flint_mpn_factor_trial_tree(slong * factors,
+                            mp_srcptr x, mp_size_t xsize, slong num_primes);
 
 FLINT_DLL int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
          mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
 
+FLINT_DLL mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
+		                 mp_srcptr array1, mp_size_t limbs1,
+			   mp_srcptr array2, mp_size_t limbs2, mp_ptr temp);
+
 FLINT_DLL mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
-          mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2);
+    mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2);
 
 FLINT_DLL mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 
