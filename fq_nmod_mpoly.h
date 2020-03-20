@@ -679,8 +679,27 @@ FLINT_DLL void fq_nmod_mpoly_evaluate_one_fq_nmod(fq_nmod_mpoly_t A,
                     const fq_nmod_mpoly_t B, slong var, const fq_nmod_t val,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
+FLINT_DLL void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, const fq_nmod_mpoly_t A,
+                 fq_nmod_struct * const * vals, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_DLL int fq_nmod_mpoly_compose_fq_nmod_poly(fq_nmod_poly_t A,
+                     const fq_nmod_mpoly_t B, fq_nmod_poly_struct * const * C,
+                                                const fq_nmod_mpoly_ctx_t ctx);
+
 FLINT_DLL void _fq_nmod_mpoly_compose_mat(fq_nmod_mpoly_t A,
                             const fq_nmod_mpoly_t B, const fmpz_mat_t M,
+              const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC);
+
+FLINT_DLL int fq_nmod_mpoly_compose_fq_nmod_mpoly_geobucket(fq_nmod_mpoly_t A,
+              const fq_nmod_mpoly_t B, fq_nmod_mpoly_struct * const * C,
+              const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC);
+
+FLINT_DLL int fq_nmod_mpoly_compose_fq_nmod_mpoly_horner(fq_nmod_mpoly_t A,
+              const fq_nmod_mpoly_t B, fq_nmod_mpoly_struct * const * C,
+              const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC);
+
+FLINT_DLL int fq_nmod_mpoly_compose_fq_nmod_mpoly(fq_nmod_mpoly_t A,
+              const fq_nmod_mpoly_t B, fq_nmod_mpoly_struct * const * C,
               const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC);
 
 FLINT_DLL void fq_nmod_mpoly_compose_fq_nmod_mpoly_gen(fq_nmod_mpoly_t A,

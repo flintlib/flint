@@ -3,23 +3,27 @@
 **fmpz_mpoly.h** -- multivariate polynomials over the integers
 ===============================================================================
 
-Description.
-
+    The exponents follow the ``mpoly`` interface.
+    A coefficient may be referenced as a ``fmpz *``.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fmpz_mpoly_struct
 
+    Context structure for ``fmpz_mpoly``.
+
 .. type:: fmpz_mpoly_t
 
-    Description.
+    An array of length 1 of ``fmpz_mpoly_ctx_struct``.
 
 .. type:: fmpz_mpoly_ctx_struct
 
+    A structure holding a multivariate integer polynomial.
+
 .. type:: fmpz_mpoly_ctx_t
 
-    Description.
+    An array of length 1 of ``fmpz_mpoly_struct``.
 
 
 Context object
@@ -51,17 +55,16 @@ Memory management
 .. function:: void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    By default 8 bits are allocated for the exponent widths.
 
 .. function:: void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc, const fmpz_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and at least ``MPOLY_MIN_BITS`` bits for the exponents.
 
 .. function:: void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and ``bits`` bits for the exponents.
 
 .. function:: void fmpz_mpoly_fit_length(fmpz_mpoly_t A, slong len, const fmpz_mpoly_ctx_t ctx)
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,11 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 
-ulong _nmod_mpoly_evaluate_all_ui_sp(const nmod_mpoly_t A,
-                                const ulong * vals, const nmod_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_evaluate_all_fq_nmod_sp(fq_nmod_t ev, const fq_nmod_mpoly_t A,
+                  fq_nmod_struct * const * vals, const fq_nmod_mpoly_ctx_t ctx)
 {
     ulong l;
     slong i, j, k, N, nvars = ctx->minfo->nvars;
@@ -22,12 +22,14 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(const nmod_mpoly_t A,
     slong * offs;
     slong entries, k_len;
     slong Alen;
-    const mp_limb_t * Acoeff;
+    const fq_nmod_struct * Acoeff;
     ulong * Aexp;
     flint_bitcnt_t bits;
-    mp_limb_t * powers;
-    mp_limb_t t, r, acc0, acc1, acc2, pp0, pp1;
+    fq_nmod_struct * powers;
+    fq_nmod_t t;
     TMP_INIT;
+
+    fq_nmod_init(t, ctx->fqctx);
 
     Alen = A->length;
     Acoeff = A->coeffs;
@@ -59,7 +61,7 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(const nmod_mpoly_t A,
     entries = N*FLINT_BITS;
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
     masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
-    powers = (mp_limb_t *) TMP_ALLOC(entries*sizeof(mp_limb_t));
+    powers = (fq_nmod_struct *) TMP_ALLOC(entries*sizeof(fq_nmod_struct));
 
     /* store bit masks for needed powers of two of the variables */
     k = 0;
@@ -67,47 +69,48 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(const nmod_mpoly_t A,
     {
         FLINT_ASSERT(k < entries);
         mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
-        NMOD_RED(t, vals[i], ctx->ffinfo->mod);
+        fq_nmod_set(t, vals[i], ctx->fqctx);
         for (l = 0; l < bits; l++)
         {
             masks[k] = UWORD(1) << (shift + l);
             if ((masks[k] & ormask[off]) != UWORD(0))
             {
                 offs[k] = off;
-                powers[k] = t;
+                fq_nmod_init(powers + k, ctx->fqctx);
+                fq_nmod_set(powers + k, t, ctx->fqctx);
                 k++;
             }
-            t = nmod_mul(t, t, ctx->ffinfo->mod);
+            fq_nmod_mul(t, t, t, ctx->fqctx);
         }
     }
     k_len = k;
     FLINT_ASSERT(k_len <= entries);
 
     /* accumulate the final answer */
-    acc0 = acc1 = acc2 = 0;    
+    fq_nmod_zero(ev, ctx->fqctx);
     for (i = 0; i < Alen; i++)
     {
-        t = UWORD(1);
+        fq_nmod_set(t, Acoeff + i, ctx->fqctx);
         for (k = 0; k < k_len; k++)
         {
             if ((Aexp[N*i + offs[k]] & masks[k]) != UWORD(0))
             {
-                t = nmod_mul(t, powers[k], ctx->ffinfo->mod);
+                fq_nmod_mul(t, t, powers + k, ctx->fqctx);
             }
         }
-        umul_ppmm(pp1, pp0, Acoeff[i], t);
-        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
+        fq_nmod_add(ev, ev, t, ctx->fqctx);
     }
-    NMOD_RED3(r, acc2, acc1, acc0, ctx->ffinfo->mod);
+
+    for (i = 0; i < k_len; i++)
+        fq_nmod_clear(powers + i, ctx->fqctx);
 
     TMP_END;
-    return r;
+
+    fq_nmod_clear(t, ctx->fqctx);
 }
 
-
-
-ulong _nmod_mpoly_evaluate_all_ui_mp(const nmod_mpoly_t A,
-                                const ulong * vals, const nmod_mpoly_ctx_t ctx)
+void _fq_nmod_mpoly_evaluate_all_fq_nmod_mp(fq_nmod_t ev, const fq_nmod_mpoly_t A,
+                  fq_nmod_struct * const * vals, const fq_nmod_mpoly_ctx_t ctx)
 {
     ulong l;
     slong i, j, k, N, nvars = ctx->minfo->nvars;
@@ -116,12 +119,14 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(const nmod_mpoly_t A,
     slong * offs;
     slong entries, k_len;
     slong Alen;
-    const mp_limb_t * Acoeff;
+    fq_nmod_struct * Acoeff;
     ulong * Aexp;
     flint_bitcnt_t bits;
-    mp_limb_t * powers;
-    mp_limb_t t, r, acc0, acc1, acc2, pp0, pp1;
+    fq_nmod_struct * powers;
+    fq_nmod_t t;
     TMP_INIT;
+
+    fq_nmod_init(t, ctx->fqctx);
 
     Alen = A->length;
     Acoeff = A->coeffs;
@@ -153,7 +158,7 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(const nmod_mpoly_t A,
     entries = N*FLINT_BITS;
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
     masks = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
-    powers = (mp_limb_t *) TMP_ALLOC(entries*sizeof(mp_limb_t));
+    powers = (fq_nmod_struct *) TMP_ALLOC(entries*sizeof(fq_nmod_struct));
 
     /* store bit masks for needed powers of two of the variables */
     k = 0;
@@ -162,7 +167,7 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(const nmod_mpoly_t A,
         FLINT_ASSERT(k < entries);
         
         off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
-        NMOD_RED(t, vals[i], ctx->ffinfo->mod);
+        fq_nmod_set(t, vals[i], ctx->fqctx);
         for (l = 0; l < bits; l++)
         {
             ulong l1 = l/FLINT_BITS;
@@ -171,51 +176,56 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(const nmod_mpoly_t A,
             if ((masks[k] & ormask[off + l1]) != UWORD(0))
             {
                 offs[k] = off + l1;
-                powers[k] = t;
+                fq_nmod_init(powers + k, ctx->fqctx);
+                fq_nmod_set(powers + k, t, ctx->fqctx);
                 k++;
             }
-            t = nmod_mul(t, t, ctx->ffinfo->mod);
+            fq_nmod_mul(t, t, t, ctx->fqctx);
         }
     }
     k_len = k;
     FLINT_ASSERT(k_len <= entries);
 
     /* accumulate the final answer */
-    acc0 = acc1 = acc2 = 0;    
+    fq_nmod_zero(ev, ctx->fqctx);
     for (i = 0; i < Alen; i++)
     {
-        t = UWORD(1);
+        fq_nmod_set(t, Acoeff + i, ctx->fqctx);
         for (k = 0; k < k_len; k++)
         {
             if ((Aexp[N*i + offs[k]] & masks[k]) != UWORD(0))
             {
-                t = nmod_mul(t, powers[k], ctx->ffinfo->mod);
+                fq_nmod_mul(t, t, powers + k, ctx->fqctx);
             }
         }
-        umul_ppmm(pp1, pp0, Acoeff[i], t);
-        add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
+        fq_nmod_add(ev, ev, t, ctx->fqctx);
     }
-    NMOD_RED3(r, acc2, acc1, acc0, ctx->ffinfo->mod);
+
+    for (i = 0; i < k_len; i++)
+        fq_nmod_clear(powers + i, ctx->fqctx);
 
     TMP_END;
-    return r;
+
+    fq_nmod_clear(t, ctx->fqctx);
 }
 
 
-ulong nmod_mpoly_evaluate_all_ui(const nmod_mpoly_t A,
-                                const ulong * vals, const nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, const fq_nmod_mpoly_t A,
+                  fq_nmod_struct * const * vals, const fq_nmod_mpoly_ctx_t ctx)
 {
     if (A->length == 0)
     {
-        return 0;
+        fq_nmod_zero(ev, ctx->fqctx);
+        return;
     }
-    else if (A->bits <= FLINT_BITS)
+
+    if (A->bits <= FLINT_BITS)
     {
-        return _nmod_mpoly_evaluate_all_ui_sp(A, vals, ctx);
+        _fq_nmod_mpoly_evaluate_all_fq_nmod_sp(ev, A, vals, ctx);
     }
     else
     {
-        return _nmod_mpoly_evaluate_all_ui_mp(A, vals, ctx);
+        _fq_nmod_mpoly_evaluate_all_fq_nmod_mp(ev, A, vals, ctx);
     }
 }
 
