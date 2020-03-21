@@ -72,6 +72,9 @@ FLINT_DLL void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
 
 FLINT_DLL void fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n);
 
+FLINT_DLL int fmpz_factor_smooth(fmpz_factor_t factor,
+		                              const fmpz_t n, slong bits);
+
 FLINT_DLL void fmpz_factor_si(fmpz_factor_t factor, slong n);
 
 FLINT_DLL int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, 
