@@ -202,7 +202,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
                     mpsig[mpz_ptr->_mp_size] = cy;
             } else
             {
-                mpn_copyi(mpsig, mpz_ptr->_mp_d, mpz_ptr->_mp_size);
+                flint_mpn_copyi(mpsig, mpz_ptr->_mp_d, mpz_ptr->_mp_size);
             }
         }
 
