@@ -277,7 +277,6 @@ int main(void)
           flint_printf("%ld factors found\n", factors->num);
           abort();
        }
-
        fmpz_factor_clear(factors);
     }
 

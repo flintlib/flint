@@ -325,7 +325,7 @@ Conversion
 
     Assuming that the nonnegative integer ``in`` can be represented in the
     form ``out[0] + out[1]*X + ... + out[out_len - 1]*X^(out_len - 1)``,
-    where `X = 2^FLINT_BITS`, sets the corresponding elements of ``out``
+    where `X = 2^{FLINT\_BITS}`, sets the corresponding elements of ``out``
     so that this is true. It is assumed that ``out_len > 0``.
 
 .. function:: void fmpz_set_mpz(fmpz_t f, const mpz_t x)
@@ -602,8 +602,8 @@ Comparison
 
 .. function:: int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
 
-    Returns a negative value if `\abs{f} < \abs{g}`, positive value if 
-    `\abs{g} < \abs{f}`, otherwise returns `0`.
+    Returns a negative value if `\lvert f\rvert < \lvert g\rvert`, positive value if 
+    `\lvert g\rvert < \lvert f \rvert`, otherwise returns `0`.
 
 .. function:: int fmpz_equal(const fmpz_t f, const fmpz_t g)
 
@@ -869,7 +869,7 @@ Basic arithmetic
 .. function:: void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the signed remainder `y \equiv g \bmod h` satisfying
-    `-\abs{h}/2 < y \leq \abs{h}/2`.
+    `-\lvert h \rvert/2 < y \leq \lvert h\rvert/2`.
 
 .. function:: void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 
@@ -894,6 +894,11 @@ Basic arithmetic
     Sets `f` to `g^x` where `x` is an ``ulong``.  If 
     `x` is `0` and `g` is `0`, then `f` will be set to `1`.
 
+.. function:: int fmpz_pow_fmpz(fmpz_t f, const fmpz_t g, const fmpz_t x)
+
+    Set `f` to `g^x`. Return `1` for success and `0` for failure.
+    The function throws only if `x` is negative.
+
 .. function:: void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
 
     Sets `f` to `g^e \bmod{m}`.  If `e = 0`, sets `f` to `1`.
@@ -910,7 +915,7 @@ Basic arithmetic
 
 .. function:: slong fmpz_clog_ui(const fmpz_t x, ulong b)
 
-    Returns `\ceil{\log_b x}`.
+    Returns `\lceil\log_b x\rceil`.
 
     Assumes that `x \geq 1` and `b \geq 2` and that 
     the return value fits into a signed ``slong``.
@@ -919,7 +924,7 @@ Basic arithmetic
 
 .. function:: slong fmpz_flog_ui(const fmpz_t x, ulong b)
 
-    Returns `\floor{\log_b x}`.
+    Returns `\lfloor\log_b x\rfloor`.
 
     Assumes that `x \geq 1` and `b \geq 2` and that 
     the return value fits into a signed ``slong``.
@@ -1150,11 +1155,11 @@ Logic Operations
 
 .. function:: void fmpz_clrbit(fmpz_t f, ulong i)
 
-    Sets the ``i``th bit in ``f`` to zero.
+    Sets the ``i``\th bit in ``f`` to zero.
 
 .. function:: void fmpz_combit(fmpz_t f, ulong i)
 
-    Complements the ``i``th bit in ``f``.
+    Complements the ``i``\th bit in ``f``.
 
 .. function:: void fmpz_and(fmpz_t r, const fmpz_t a, const fmpz_t b)
 
@@ -1276,19 +1281,20 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
 .. function:: int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT, const fmpz * const * moduli, slong len)
 
     Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
-    A return of ``0`` indicates that the compilation failed and future calls to func::fmpz_crt_precomp will leave the output undefined.
+    A return of ``0`` indicates that the compilation failed and future
+    calls to :func:`fmpz_crt_precomp` will leave the output undefined.
     A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) no modulus is `0,1,-1` and all moduli are pairwise relatively prime.
 
 .. function:: void fmpz_multi_crt_precomp(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * inputs)
 
 .. function:: void fmpz_multi_crt_precomp_p(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * const * inputs)
 
-    Set ``output`` to an integer of smallest absolute value that is congruent to ``values + i`` modulo the ``moduli + i`` in func::fmpz_crt_precompute.
+    Set ``output`` to an integer of smallest absolute value that is congruent to ``values + i`` modulo the ``moduli + i`` in :func:`fmpz_crt_precompute`.
 
 .. function:: int fmpz_multi_crt(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len);
 
-    Perform the same operation as func::fmpz_multi_crt_precomp while internally constructing and destroying the precomputed data.
-    All of the remarks in func::fmpz_multi_crt_precompute apply.
+    Perform the same operation as :func:`fmpz_multi_crt_precomp` while internally constructing and destroying the precomputed data.
+    All of the remarks in :func:`fmpz_multi_crt_precompute` apply.
 
 .. function:: void fmpz_multi_crt_clear(fmpz_multi_crt_t P)
 
@@ -1296,7 +1302,7 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
 
 .. function:: slong _nmod_poly_crt_local_size(const nmod_poly_crt_t CRT)
 
-    Return the required length of the output for func::_nmod_poly_crt_run.
+    Return the required length of the output for :func:`_nmod_poly_crt_run`.
 
 .. function:: void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * inputs)
 
@@ -1318,7 +1324,7 @@ Primality testing
 .. function:: int fmpz_is_probabprime_lucas(const fmpz_t n)
 
     Performs a Lucas probable prime test with parameters chosen by Selfridge's
-    method `A` as per \citep{BaiWag1980}.
+    method `A` as per [BaiWag1980]_.
 
     Return `1` if `n` is a Lucas probable prime, otherwise return `0`. This
     function declares some composites probably prime, but no primes composite.
@@ -1326,7 +1332,7 @@ Primality testing
 .. function:: int fmpz_is_probabprime_BPSW(const fmpz_t n)
 
     Perform a Baillie-PSW probable prime test with parameters chosen by 
-    Selfridge's method `A` as per \citep{BaiWag1980}.
+    Selfridge's method `A` as per [BaiWag1980]_.
 
     Return `1` if `n` is a Lucas probable prime, otherwise return `0`. 
 
@@ -1351,12 +1357,7 @@ Primality testing
     `94` bits) the function fails silently and returns `-1`, otherwise, if 
     `n` is proven prime by the pseudosquares method, return `1`.
 
-    Tests if `n` is a prime according to \citep[Theorem 2.7]{LukPatWil1996}.
-
-    % "Some results on pseudosquares" by Lukes, Patterson and Williams,
-    % Math. Comp. vol 65, No. 213. pp 361-372. See 
-    % http://www.ams.org/mcom/1996-65-213/S0025-5718-96-00678-3/
-    %   S0025-5718-96-00678-3.pdf
+    Tests if `n` is a prime according to [Theorem 2.7] [LukPatWil1996]_.
 
     We first factor `N` using trial division up to some limit `B`.
     In fact, the number of primes used in the trial factoring is at 
@@ -1364,7 +1365,7 @@ Primality testing
 
     Next we compute `N/B` and find the next pseudosquare `L_p` above
     this value, using a static table as per
-    \url{http://oeis.org/A002189/b002189.txt}.
+    http://oeis.org/A002189/b002189.txt.
 
     As noted in the text, if `p` is prime then Step 3 will pass. This
     test rejects many composites, and so by this time we suspect
@@ -1416,7 +1417,6 @@ Primality testing
 
 .. function:: void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1, slong * num_pm1, ulong limit)
 
-    
     Trial factors `n - 1` up to the given limit (approximately) and stores
     the factors in an array ``pm1`` whose length is written out to
     ``num_pm1``.
@@ -1451,12 +1451,10 @@ Primality testing
     on how long one is prepared to wait, then to trial factor up to the
     limit. (See ``_fmpz_np1_trial_factors``.)
 
-
     Requires `n` to be odd and non-square.
 
 .. function:: void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong limit)
 
-    
     Trial factors `n + 1` up to the given limit (approximately) and stores
     the factors in an array ``pp1`` whose length is written out to
     ``num_pp1``.

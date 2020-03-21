@@ -47,8 +47,23 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     Factors `n` into prime numbers. If `n` is zero or negative, the
     sign field of the ``factor`` object will be set accordingly.
 
-    This currently only uses trial division, falling back to ``n_factor()``
-    as soon as the number shrinks to a single limb.
+.. function:: int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits)
+
+    Factors `n` into prime numbers up to approximately the given number of
+    bits and possibly one additional cofactor, which may or may not be prime.
+
+    If the number is definitely factored fully, the return value is `1`,
+    otherwise the final factor is composite and needs to be factored further.
+
+    If the number has a factor of around the given number of bits, there is
+    at least a two-thirds chance of finding it. Smaller factors should be
+    found with a much higher probability.
+    
+    The amount of time spent factoring can be controlled by lowering or
+    increasing ``bits``. However, the quadratic sieve may be faster if
+    ``bits`` is set to more than one third of the number of bits of `n`.
+
+    The function uses trial factoring and the elliptic curve method.
 
 .. function:: void fmpz_factor_si(fmpz_factor_t factor, slong n)
 
@@ -65,6 +80,22 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 
     The function returns 1 if `n` is completely factored, otherwise it returns
     `0`.
+
+.. function:: int fmpz_factor_trial(fmpz_factor_t factor, const fmpz_t n, slong num_primes)
+
+    Factors `n` into prime factors using trial division. If `n` is
+    zero or negative, the sign field of the ``factor`` object will be
+    set accordingly.
+
+    The algorithm uses the given number of primes, which must be in the range
+    `[0, 3512]`. An exception is raised if a number outside this range is
+    passed.
+
+    The function returns 1 if `n` is completely factored, otherwise it returns
+    `0`.
+
+    The final entry in the factor struct is set to the cofactor after removing
+    prime factors, if this is not `1`.
 
 .. function:: void fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f)
 
@@ -101,32 +132,32 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 .. function:: int fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi, fmpz_t ai, mp_limb_t max_iters)
 
     Pollard Rho algorithm for integer factorization. Assumes that the `n` is
-    not prime. `factor` is set as the factor if found. Takes as input the initial
+    not prime. ``factor`` is set as the factor if found. Takes as input the initial
     value `y`, to start polynomial evaluation and `a`, the constant of the polynomial
     used. It is not assured that the factor found will be prime. Does not compute 
     the complete factorization, just one factor. Returns the number of limbs of 
     factor if factorization is successfull (non trivial factor is found), else returns 0. 
 
-    `max_iters` is the number of iterations tried in process of finding the cycle. 
+    ``max_iters`` is the number of iterations tried in process of finding the cycle. 
     If the algorithm fails to find a non trivial factor in one call, it tries again 
     (this time with a different set of random values). 
     
 .. function:: int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, fmpz_t n, mp_limb_t max_tries, mp_limb_t max_iters)
 
     Pollard Rho algorithm for integer factorization. Assumes that the `n` is
-    not prime. `factor` is set as the factor if found. It is not assured that the 
+    not prime. ``factor`` is set as the factor if found. It is not assured that the 
     factor found will be prime. Does not compute the complete factorization, 
     just one factor. Returns the number of limbs of factor if factorization is 
     successfull (non trivial factor is found), else returns 0. 
 
-    `max_iters` is the number of iterations tried in process of finding the cycle. 
+    ``max_iters`` is the number of iterations tried in process of finding the cycle. 
     If the algorithm fails to find a non trivial factor in one call, it tries again 
     (this time with a different set of random values). This process is repeated a 
-    maximum of `max_tries` times. 
+    maximum of ``max_tries`` times. 
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
     suggested by Richard Brent. It can be found in the paper availible at
-    http://maths-people.anu.edu.au/ brent/pd/rpb051i.pdf 
+    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
 
 
 Elliptic curve (ECM) method
@@ -164,9 +195,13 @@ Factoring of ``fmpz`` integers using ECM
     Sets the point `(x : z)` to two times `(x_0 : z_0)` modulo `n` according
     to the formula
 
-    ``x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,``
+    .. math ::
 
-    ``z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.``
+        x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,
+
+    .. math ::
+
+        z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.
 
     ``ecm_inf`` is used just to use temporary ``mp_ptr``'s in the
     structure. This group doubling is valid only for points expressed in
@@ -177,7 +212,9 @@ Factoring of ``fmpz`` integers using ECM
     Sets the point `(x : z)` to the sum of `(x_1 : z_1)` and `(x_2 : z_2)`
     modulo `n`, given the difference `(x_0 : z_0)` according to the formula
 
-    ``x = 4z_0(x_1x_2 - z_1z_2)^2 \mod n, z = 4x_0(x_2z_1 - x_1z_2)^2 \mod n.``
+    .. math ::
+
+        x = 4z_0(x_1x_2 - z_1z_2)^2 \mod n, \\ z = 4x_0(x_2z_1 - x_1z_2)^2 \mod n.
 
     ``ecm_inf`` is used just to use temporary ``mp_ptr``'s in the
     structure. This group addition is valid only for points expressed in

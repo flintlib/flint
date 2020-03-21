@@ -1,24 +1,29 @@
 .. _fq_nmod-mpoly:
 
 **fq_nmod_mpoly.h** -- multivariate polynomials over finite fields of word-sized characteristic
-===============================================================================
+================================================================================================
 
-Description.
+    The exponents follow the ``mpoly`` interface.
+    A coefficient may be referenced as a ``fq_nmod_struct *``.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_nmod_mpoly_ctx_struct
 
+    Context structure for ``fq_nmod_mpoly``.
+
 .. type:: fq_nmod_mpoly_ctx_t
 
-    Description.
+    An array of length 1 of ``fq_nmod_mpoly_ctx_struct``.
 
 .. type:: fq_nmod_mpoly_struct
 
+    A structure holding a multivariate polynomial over a finite field of word-sized characteristic.
+
 .. type:: fq_nmod_mpoly_t
 
-    Description.
+    An array of length 1 of ``fq_nmod_mpoly_struct``.
 
 
 Context object
@@ -44,7 +49,6 @@ Context object
     Release any space allocated by an ``fq_nmod_mpoly_ctx_t``.
 
 
-
 Memory management
 --------------------------------------------------------------------------------
 
@@ -52,17 +56,16 @@ Memory management
 .. function:: void fq_nmod_mpoly_init(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    By default 8 bits are allocated for the exponent widths.
 
 .. function:: void fq_nmod_mpoly_init2(fq_nmod_mpoly_t A, slong alloc, const fq_nmod_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and at least ``MPOLY_MIN_BITS`` bits for the exponents.
 
 .. function:: void fq_nmod_mpoly_init3(fq_nmod_mpoly_t A, slong alloc, flint_bitcnt_t bits, const fq_nmod_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and ``bits`` bits for the exponents.
 
 .. function:: void fq_nmod_mpoly_fit_length(fq_nmod_mpoly_t A, slong len, const fq_nmod_mpoly_ctx_t ctx)
 
@@ -144,9 +147,6 @@ Constants
 
     Assuming that ``A`` is a constant, set ``c`` to this constant.
     This function throws if ``A`` is not a constant.
-
-.. function:: void nmod_mpoly_set_ui(nmod_mpoly_t A, ulong c, const nmod_mpoly_ctx_t ctx)
-
 
 .. function:: void fq_nmod_mpoly_set_fq_nmod(fq_nmod_mpoly_t A, const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx)
 
@@ -414,6 +414,39 @@ Differentiation
     Set ``A`` to the derivative of ``B`` with respect to the variable of index ``idx``.
 
 
+Evaluation
+--------------------------------------------------------------------------------
+
+    These functions return `0` when the operation would imply unreasonable arithmetic.
+
+.. function:: void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, fq_nmod_mpoly_t A, fq_nmod_struct * const *  vals, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set ``ev`` the evaluation of ``A`` where the variables are replaced by the corresponding elements of the array ``vals``.
+
+.. function:: void fq_nmod_mpoly_evaluate_one_fq_nmod(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, slong var, fq_nmod_t val, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the evaluation of ``B`` where the variable of index ``var`` is replaced by ``val``.
+
+.. function:: int fq_nmod_mpoly_compose_fq_nmod_poly(fq_nmod_poly_t A, const fq_nmod_mpoly_t B, fq_nmod_poly_struct * const * C, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
+    The context object of ``B`` is ``ctxB``.
+    Return `1` for success and `0` for failure.
+
+.. function:: int fq_nmod_mpoly_compose_fq_nmod_mpoly(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, fq_nmod_mpoly_struct * const * C, const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC)
+
+    Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
+    Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
+    Neither ``A`` nor ``B`` is allowed to alias any other polynomial.
+    Return `1` for success and `0` for failure.
+
+.. function:: void fq_nmod_mpoly_compose_fq_nmod_mpoly_gen(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const slong * c, const fq_nmod_mpoly_ctx_t ctxB, const fq_nmod_mpoly_ctx_t ctxAC)
+
+    Set ``A`` to the evaluation of ``B`` where the variable of index ``i`` in ``ctxB`` is replaced by the variable of index ``c[i]`` in ``ctxAC``.
+    The length of the array ``C`` is the number of variables in ``ctxB``.
+    If any ``c[i]`` is negative, the corresponding variable of ``B`` is replaced by zero. Otherwise, it is expected that ``c[i]`` is less than the number of variables in ``ctxAC``.
+
+
 Multiplication
 --------------------------------------------------------------------------------
 
@@ -426,19 +459,22 @@ Multiplication
 Powering
 --------------------------------------------------------------------------------
 
+    These functions return `0` when the operation would imply unreasonable arithmetic.
 
-.. function:: void fq_nmod_mpoly_pow_fmpz(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fmpz_t k, const fq_nmod_mpoly_ctx_t ctx)
-
-    Set `A` to `B` raised to the `k`-th power.
-    This function throws if `k < 0` or if `k` does not fit an ``slong`` and `A` has more than one term.
-
-.. function:: void fq_nmod_mpoly_pow_ui(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, ulong k, const fq_nmod_mpoly_ctx_t ctx)
+.. function:: int fq_nmod_mpoly_pow_fmpz(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fmpz_t k, const fq_nmod_mpoly_ctx_t ctx)
 
     Set `A` to `B` raised to the `k`-th power.
+    Return `1` for success and `0` for failure.
+
+.. function:: int fq_nmod_mpoly_pow_ui(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, ulong k, const fq_nmod_mpoly_ctx_t ctx)
+
+    Set `A` to `B` raised to the `k`-th power.
+    Return `1` for success and `0` for failure.
 
 
 Division
 --------------------------------------------------------------------------------
+
 
 .. function:: int fq_nmod_mpoly_divides(fq_nmod_mpoly_t Q, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx)
 

@@ -61,7 +61,7 @@ Factorisation
 
     Concatenates two factorisations.
 
-    This is equivalent to calling ``nmod_poly_factor_insert()`` 
+    This is equivalent to calling :func:`nmod_poly_factor_insert` 
     repeatedly with the individual factors of ``fac``.
 
     Does not support aliasing between ``res`` and ``fac``.
@@ -128,11 +128,11 @@ Factorisation
     of the irreducible factors is stored in ``degs`` in the same order
     as the factors.
 
-    Requires that ``degs`` has enough space for `(n/2)+1 * sizeof(slong)`.
+    Requires that ``degs`` has enough space for ``(n/2)+1 * sizeof(slong)``.
 
 .. function:: void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res, const nmod_poly_t poly, slong * const *degs)
 
-    Multithreaded version of ``nmod_poly_factor_distinct_deg``.
+    Multithreaded version of :func:`nmod_poly_factor_distinct_deg`.
 
 .. function:: void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
 
@@ -150,8 +150,8 @@ Factorisation
     factors using the fast version of Cantor-Zassenhaus algorithm proposed by
     Kaltofen and Shoup (1998). More precisely this algorithm uses a
     “baby step/giant step” strategy for the distinct-degree factorization
-    step. If ``flint_get_num_threads()`` is greater than one
-    ``nmod_poly_factor_distinct_deg_threaded`` is used.
+    step. If :func:`flint_get_num_threads` is greater than one
+    :func:`nmod_poly_factor_distinct_deg_threaded` is used.
 
 .. function:: mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
 

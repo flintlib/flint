@@ -3,10 +3,30 @@
 **mpoly.h** -- support functions for multivariate polynomials
 ===============================================================================
 
+    An array of type ``ulong *`` or ``fmpz **`` is used to communicate
+    exponent vectors. These exponent vectors must have length equal to the
+    number of variables in the polynmial ring.
+    The element of this exponent vector at index `0`
+    corresponds to the most significant variable in the monomial ordering.
+    For example, if the polynomial is `7*x^2*y+8*y*z+9` and the variables are
+    ordered so that `x>y>z`, the degree function will return `{2,1,1}`.
+    Similarly, the exponent vector of the `0`-index term of this polynomial is
+    `{2,1,0}`, while the `2`-index term has exponent vector `{0,0,0}` and
+    coefficient `9`.
+
 
 Orderings
 --------------------------------------------------------------------------------
+.. type:: ordering_t
 
+     An enumeration of supported term orderings.  Currently one of ``ORD_LEX``, 
+     ``ORD_DEGLEX`` or ``ORD_DEGREVLEX``.
+
+.. type:: mpoly_ctx_struct
+          mpoly_ctx_t
+
+     An mpoly_ctx_struct is a structure holding information about the number of
+     variables and the term ordering of an multivariate polynomial.
 
 .. function:: void mpoly_ctx_init(mpoly_ctx_t ctx, slong nvars, const ordering_t ord)
 
@@ -56,11 +76,11 @@ Monomial arithemtic
 
 .. function:: void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 
-    Set \code{(exp_ptr, N)} to the difference of the monomials \code{(exp2, N)} and \code{(exp3, N)}, assuming \code{bits <= FLINT_BITS}
+    Set ``(exp_ptr, N)`` to the difference of the monomials ``(exp2, N)`` and ``(exp3, N)``, assuming ``bits <= FLINT_BITS``
 
 .. function:: void mpoly_monomial_sub_mp(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 
-    Set \code{(exp_ptr, N)} to the difference of the monomials \code{(exp2, N)} and \code{(exp3, N)}.
+    Set ``(exp_ptr, N)`` to the difference of the monomials ``(exp2, N)`` and ``(exp3, N)``.
 
 .. function:: int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
 
@@ -308,7 +328,7 @@ Packing and unpacking monomials
     Given an array of possibly packed exponent vectors ``exp2`` of length
     ``len``, where each field of each exponent vector is packed into the
     given number of bits, return the corresponding array of monomial vectors
-    packed using a factorial numbering scheme. The ``bases'' for the factorial
+    packed using a factorial numbering scheme. The "bases" for the factorial
     numbering scheme are given as an array of integers ``mults``, the first
     entry of which corresponds to the field of least significance in each 
     input exponent vector. Obviously the maximum exponent to be packed must be
@@ -323,7 +343,7 @@ Packing and unpacking monomials
     Given an array of exponent vectors ``e2`` of length ``len`` packed
     using a factorial numbering scheme, unpack the monomials into an array
     ``e1`` of exponent vectors in standard packed format, where each field
-    has the given number of bits. The ``bases'' for the factorial
+    has the given number of bits. The "bases" for the factorial
     numbering scheme are given as an array of integers ``mults``, the first
     entry of which corresponds to the field of least significance in each 
     exponent vector.

@@ -124,7 +124,7 @@ Random matrix generation
 
 .. function:: void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
-    Sets ``mat`` to be a random \emph{integer relations} matrix, with 
+    Sets ``mat`` to be a random *integer relations* matrix, with 
     signed entries up to the given number of bits.
 
     The number of columns of ``mat`` must be equal to one more than 
@@ -134,7 +134,7 @@ Random matrix generation
 
 .. function:: void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, flint_bitcnt_t bits2)
 
-    Sets ``mat`` to a random \emph{simultaneous diophantine} matrix.
+    Sets ``mat`` to a random *simultaneous diophantine* matrix.
 
     The matrix must be square. The top left entry is set to ``2^bits2``. 
     The remainder of that row is then set to signed random integers of the 
@@ -145,7 +145,7 @@ Random matrix generation
 .. function:: void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
     Sets a square matrix ``mat`` of even dimension to a random 
-    \emph{NTRU like} matrix.
+    *NTRU like* matrix.
 
     The matrix is broken into four square submatrices. The top left submatrix
     is set to the identity. The bottom left submatrix is set to the zero 
@@ -158,7 +158,7 @@ Random matrix generation
 .. function:: void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
     Sets a square matrix ``mat`` of even dimension to a random 
-    \emph{NTRU like} matrix.
+    *NTRU like* matrix.
 
     The matrix is broken into four square submatrices. The top left submatrix
     is set to `q` times the identity matrix. The top right submatrix is set to 
@@ -170,9 +170,9 @@ Random matrix generation
 
 .. function:: void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 
-    Sets a square matrix ``mat`` to a random \emph{ajtai} matrix. 
+    Sets a square matrix ``mat`` to a random *ajtai* matrix. 
     The diagonal entries `(i, i)` are set to a random entry in the range 
-    `[1, 2^{b-1}]` inclusive where `b = \floor{(2 r - i)^\alpha}` for some 
+    `[1, 2^{b-1}]` inclusive where `b = \lfloor(2 r - i)^\alpha\rfloor` for some 
     double parameter~`\alpha`. The entries below the diagonal in column~`i` 
     are set to a random entry in the range `(-2^b + 1, 2^b - 1)` whilst the 
     entries to the right of the diagonal in row~`i` are set to zero. 
@@ -193,7 +193,7 @@ Random matrix generation
     nonzero elements being random integers of the given bit size.
 
     The matrix can be transformed into a dense matrix with unchanged
-    rank by subsequently calling ``fmpz_mat_randops()``.
+    rank by subsequently calling :func:`fmpz_mat_randops`.
 
 .. function:: void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
 
@@ -202,10 +202,10 @@ Random matrix generation
 
     Note that the matrix will be zero if ``det`` is zero.  
     In order to generate a non-zero singular matrix, the function 
-    ``fmpz_mat_randrank()`` can be used.
+    :func:`fmpz_mat_randrank` can be used.
 
     The matrix can be transformed into a dense matrix with unchanged
-    determinant by subsequently calling ``fmpz_mat_randops()``.
+    determinant by subsequently calling :func:`fmpz_mat_randops`.
 
 .. function:: void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count)
 
@@ -243,12 +243,12 @@ Input and output
 .. function:: int fmpz_mat_print(const fmpz_mat_t mat)
 
     Prints the given matrix to the stream ``stdout``.  For further 
-    details, see ``fmpz_mat_fprint()``.
+    details, see :func:`fmpz_mat_fprint`.
 
 .. function:: int fmpz_mat_print_pretty(const fmpz_mat_t mat)
 
     Prints the given matrix to ``stdout``.  For further details, 
-    see ``fmpz_mat_fprint_pretty()``.
+    see :func:`fmpz_mat_fprint_pretty`.
 
 .. function:: int fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
 
@@ -333,7 +333,7 @@ Concatenate
 
     Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``)
     in that order. Matrix dimensions : ``mat1`` : `m \times n`,
-    ``mat2`` : `k \times n`, ``res`` : ``(m + k) \times n`.
+    ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
 
 .. function:: void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
@@ -396,7 +396,7 @@ Modular reduction and reconstruction
 
     This function is provided for convenience purposes.
     For reducing or reconstructing multiple integer matrices over the same
-    set of moduli, it is faster to use\\ ``fmpz_mat_multi_CRT_ui_precomp``.
+    set of moduli, it is faster to use :func:`fmpz_mat_multi_CRT_ui_precomp`.
 
 
 Addition and subtraction
@@ -530,8 +530,8 @@ Matrix multiplication
     The ``bits`` parameter is a bound for the bit size of largest 
     element of `C`, or twice the absolute value of the largest element 
     if any elements of `C` are negative. The function
-    ``fmpz_mat_mul_multi_mod`` calculates a rigorous bound automatically.
-    If the default bound is too pessimistic, ``_fmpz_mat_mul_multi_mod``
+    :func:`fmpz_mat_mul_multi_mod` calculates a rigorous bound automatically.
+    If the default bound is too pessimistic, :func:`_fmpz_mat_mul_multi_mod`
     can be used with a custom bound.
 
     The matrices must have compatible dimensions for matrix multiplication.
@@ -541,14 +541,14 @@ Matrix multiplication
 
     Sets ``B`` to the square of the matrix ``A``, which must be
     a square matrix. Aliasing is allowed.
-    The function calls ``fmpz_mat_mul`` for dimensions less than 12 and
-    calls ``fmpz_mat_sqr_bodrato`` for cases in which the latter is faster.
+    The function calls :func:`fmpz_mat_mul` for dimensions less than 12 and
+    calls :func:`fmpz_mat_sqr_bodrato` for cases in which the latter is faster.
 
 .. function:: void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
     Sets ``B`` to the square of the matrix ``A``, which must be
     a square matrix. Aliasing is allowed.
-    The bodrato algorithm is described in \cite{Bodrato2010}.
+    The bodrato algorithm is described in [Bodrato2010]_.
     It is highly efficient for squaring matrices which satisfy both the 
     following conditions  : (a) large elements  (b) dimensions less than 150.
 
@@ -620,9 +620,9 @@ Determinant
     Sets ``det`` to the determinant of the square matrix `A`.
     The matrix of dimension `0 \times 0` is defined to have determinant 1.
 
-    This function automatically chooses between ``fmpz_mat_det_cofactor``,\\
-    ``fmpz_mat_det_bareiss``, ``fmpz_mat_det_modular`` and\\
-    ``fmpz_mat_det_modular_accelerated``
+    This function automatically chooses between :func:`fmpz_mat_det_cofactor`,
+    :func:`fmpz_mat_det_bareiss`, :func:`fmpz_mat_det_modular` and
+    :func:`fmpz_mat_det_modular_accelerated`
     (with ``proved`` = 1), depending on the size of the matrix
     and its entries.
 
@@ -668,7 +668,7 @@ Determinant
     small primes not dividing `d`. This typically accelerates the
     computation by requiring fewer primes for large matrices, since `d`
     with high probability will be nearly as large as the determinant.
-    This trick is described in \citep{AbbottBronsteinMulders1999}.
+    This trick is described in [AbbottBronsteinMulders1999]_.
 
 .. function:: void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A, const fmpz_t d, int proved)
 
@@ -880,11 +880,7 @@ allowed between arguments.
     Aliasing between input and output matrices is allowed.
 
 
-FLINT_DLL void
-_fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
-                     const fmpz_mat_t A, const fmpz_mat_t B,
-                                 const nmod_mat_t Ainv, mp_limb_t p,
-                                               const fmpz_t N, const fmpz_t D)
+.. function:: FLINT_DLL void _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv, mp_limb_t p, const fmpz_t N, const fmpz_t D)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}` using a 
@@ -895,22 +891,22 @@ _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
     Uses the Dixon lifting algorithm with early termination once the lifting
     stabilises.
 
-.. function:: int
-fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
-                                       const fmpz_mat_t A, const fmpz_mat_t B)
+.. function:: int fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
-    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.                            Returns 1 if `A` is nonsingular and 0 if `A` is singular.                                 The computed denominator will not generally be minimal.
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.
+    Returns 1 if `A` is nonsingular and 0 if `A` is singular.
+    The computed denominator will not generally be minimal.
 
     Uses the Dixon lifting algorithm with early termination once the lifting
     stabilises.
 
-.. function:: int
-fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
-                                       const fmpz_mat_t A, const fmpz_mat_t B)
+.. function:: int fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
-    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.                            Returns 1 if `A` is nonsingular and 0 if `A` is singular.                                 The computed denominator will not generally be minimal.
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}`.
+    Returns 1 if `A` is nonsingular and 0 if `A` is singular.
+    The computed denominator will not generally be minimal.
 
     Uses a Chinese remainder algorithm with early termination once the lifting
     stabilises.
@@ -950,7 +946,7 @@ Row reduction
     and the sign is decided by the parity of the permutation. Note that the
     determinant is not generally the minimal denominator.
 
-    The fraction-free LU decomposition is defined in \citep{NakTurWil1997}.
+    The fraction-free LU decomposition is defined in [NakTurWil1997]_.
 
 .. function:: slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
@@ -974,7 +970,7 @@ Row reduction
     using back substitution. Scaling each completed row in the back
     substitution to the denominator ``den``, we avoid introducing
     new fractions. This strategy is equivalent to the fraction-free
-    Gauss-Jordan elimination in \citep{NakTurWil1997}, but faster since
+    Gauss-Jordan elimination in [NakTurWil1997]_, but faster since
     only the part `V` corresponding to the null space has to be updated.
 
     The denominator ``den`` is set to `\pm \operatorname{det}(S)` where
@@ -992,7 +988,7 @@ Row reduction
     of this matrix will then define a non-singular submatrix of ``A``,
     nonsingular solving and matrix multiplication can then be used to determine 
     the reduced row echelon form of the whole of ``A``. This procedure is
-    described in \cite{Stein2007}.
+    described in [Stein2007]_.
 
 .. function:: int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den, slong rank)
 
@@ -1023,7 +1019,7 @@ Strong echelon form and Howell form
 
     Transforms `A` such that `A` modulo ``mod`` is the strong echelon form
     of the input matrix modulo ``mod``. The Howell form and the strong
-    echelon form are equal up to permutation of the rows, see \cite{FieHof2014}
+    echelon form are equal up to permutation of the rows, see [FieHof2014]_
     for a definition of the strong echelon form and the algorithm used here.
 
     `A` must have at least as many rows as columns.
@@ -1032,7 +1028,7 @@ Strong echelon form and Howell form
 
     Transforms `A` such that `A` modulo ``mod`` is the Howell form of the
     input matrix modulo ``mod``. 
-    For a definition of the Howell form see \cite{StoMul1998}. The Howell form
+    For a definition of the Howell form see [StoMul1998]_. The Howell form
     is computed by first putting `A` into strong echelon form and then ordering
     the rows.
 
@@ -1103,14 +1099,14 @@ Hermite normal form
     implementations in FLINT as per ``fmpz_mat_hnf``.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
-    the same as that of ``A`` and ``U`` must be square of compatible 
+    the same as that of ``A`` and ``U`` must be square of \compatible 
     dimension (having the same number of rows as ``A``).
 
 .. function:: void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
 
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of ``A``. The algorithm used is straightforward and
-    is described, for example, in \cite[Algorithm 2.4.4]{Coh1996}.
+    is described, for example, in [Algorithm 2.4.4] [Coh1996]_.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1120,7 +1116,7 @@ Hermite normal form
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of ``A``. The algorithm used is an improvement on the
     basic algorithm and uses extended gcds to speed up computation, this method
-    is described, for example, in \cite[Algorithm 2.4.5]{Coh1996}.
+    is described, for example, in [Algorithm 2.4.5] [Coh1996]_.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1131,8 +1127,8 @@ Hermite normal form
     Hermite normal form of the `m\times n` matrix ``A``, where ``A`` is
     assumed to be of rank `n` and ``D`` is known to be a positive multiple of
     the determinant of the non-zero rows of ``H``. The algorithm used here is
-    due to Domich, Kannan and Trotter \cite{DomKanTro1987} and is also described
-    in \cite[Algorithm 2.4.8]{Coh1996}.
+    due to Domich, Kannan and Trotter [DomKanTro1987]_ and is also described
+    in [Algorithm 2.4.8] [Coh1996]_.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1142,14 +1138,14 @@ Hermite normal form
     Transforms the `m\times n` matrix ``A`` into Hermite normal form,
     where ``A`` is assumed to be of rank `n` and ``D`` is known to be a
     positive multiple of the largest elementary divisor of ``A``.
-    The algorithm used here is described in \cite{FieHof2014}.
+    The algorithm used here is described in [FieHof2014]_.
 
 .. function:: void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
 
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of the `m\times n` matrix ``A``, where ``A`` is
     assumed to be of rank `n`. The algorithm used here is due to Kannan and
-    Bachem \cite{KanBac1979} and takes the principal minors to Hermite normal
+    Bachem [KanBac1979]_ and takes the principal minors to Hermite normal
     form in turn.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
@@ -1159,7 +1155,7 @@ Hermite normal form
 
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of the `m\times n` matrix ``A``. The algorithm used
-    here is due to Pernet and Stein \cite{PernetStein2010}.
+    here is due to Pernet and Stein [PernetStein2010]_.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1197,7 +1193,7 @@ Smith normal form
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
     normal form of the diagonal matrix ``A``. The algorithm used here is due
-    to Kannan and Bachem \cite{KanBac1979} 
+    to Kannan and Bachem [KanBac1979]_ 
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
@@ -1206,7 +1202,7 @@ Smith normal form
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
     normal form of the nonsingular `n\times n` matrix ``A``. The algorithm
-    used is due to Iliopoulos \cite{Iliopoulos1989}.
+    used is due to Iliopoulos [Iliopoulos1989]_.
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.

@@ -670,24 +670,27 @@ FLINT_DLL void fmpq_mpoly_integral(fmpq_mpoly_t A,
 
 /* Evaluation ****************************************************************/
 
-FLINT_DLL void _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,
+FLINT_DLL int _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff,
        const fmpq_mpoly_t B, const fmpq * scales,  const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A,
+FLINT_DLL int fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A,
                               fmpq * const * vals, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
+FLINT_DLL int fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
                            const fmpq_mpoly_t B, slong var, const fmpq_t val,
                                                    const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
+FLINT_DLL int fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A,
                          const fmpq_mpoly_t B, fmpq_poly_struct * const * C,
                                                   const fmpq_mpoly_ctx_t ctxB);
 
-FLINT_DLL void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
+FLINT_DLL int fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
                    const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C,
                     const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC);
 
+FLINT_DLL void fmpq_mpoly_compose_fmpq_mpoly_gen(fmpq_mpoly_t A,
+                     const fmpq_mpoly_t B, const slong * c,
+                    const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC);
 
 
 /* Multiplication ************************************************************/
@@ -697,10 +700,10 @@ FLINT_DLL void fmpq_mpoly_mul(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 
 /* Powering ******************************************************************/
 
-FLINT_DLL void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+FLINT_DLL int fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                    const fmpz_t k, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
+FLINT_DLL int fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                           ulong k, const fmpq_mpoly_ctx_t ctx);
 
 /* Division ******************************************************************/

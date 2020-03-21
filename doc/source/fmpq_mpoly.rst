@@ -3,38 +3,34 @@
 **fmpq_mpoly.h** -- multivariate polynomials over the rational numbers
 ===============================================================================
 
-Description.
+    The exponents follow the ``mpoly`` interface.
+    No references to the coefficients are avaiable.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fmpq_mpoly_ctx_struct
 
+    Context structure for ``fmpq_mpoly``.
+
 .. type:: fmpq_mpoly_ctx_t
 
-    Description.
+    An array of length 1 of ``fmpq_mpoly_ctx_struct``.
 
 .. type:: fmpq_mpoly_struct
 
+    A structure holding a multivariate rational polynomial.  It is implemented as a
+    ``fmpq_t`` holding the content of the polynomial and a primitive integer
+    polynomial.
+
 .. type:: fmpq_mpoly_t
 
-    Description.
+    An array of length 1 of ``fmpq_mpoly_struct``.
 
 
 Context object
 --------------------------------------------------------------------------------
 
-
-    An array of type ``ulong *`` or ``fmpz **`` is used to communicate
-    exponent vectors. These exponent vectors must have length equal to the
-    number of variables in the polynmial ring.
-    The element of this exponent vector at index `0`
-    corresponds to the most significant variable in the monomial ordering.
-    For example, if the polynomial is `7*x^2*y+8*y*z+9` and the variables are
-    ordered so that `x>y>z`, the degree function will return `{2,1,1}`.
-    Similarly, the exponent vector of the `0`-index term in this polynomial is
-    `{2,1,0}`, while the `2`-index term has exponent vector `{0,0,0}` and
-    coefficient `9`.
 
 .. function:: void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx, slong nvars, const ordering_t ord)
 
@@ -61,17 +57,16 @@ Memory management
 .. function:: void fmpq_mpoly_init(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    By default 8 bits are allocated for the exponent widths.
 
 .. function:: void fmpq_mpoly_init2(fmpq_mpoly_t A, slong alloc, const fmpq_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and 8 bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and at least ``MPOLY_MIN_BITS`` bits for the exponents.
 
 .. function:: void fmpq_mpoly_init3(fmpq_mpoly_t A, slong alloc, flint_bitcnt_t bits, const fmpq_mpoly_ctx_t ctx)
 
     Initialise ``A`` for use with the given an initialised context object. Its value is set to zero.
-    It is allocated with space for ``alloc`` terms, and ``bits`` bits are allocated for the exponents.
+    It is allocated with space for ``alloc`` terms and ``bits`` bits for the exponents.
 
 .. function:: void fmpq_mpoly_fit_length(fmpq_mpoly_t A, slong len, const fmpq_mpoly_ctx_t ctx)
 
@@ -297,8 +292,8 @@ Container operations
     Return ``1`` if ``A`` is in canonical form. Otherwise, return ``0``.
     An ``fmpq_mpoly_t`` is represented as the product of an ``fmpq_t content`` and an ``fmpz_mpoly_t zpoly``.
     The representation is considered canonical when either
-        (1) both ``content`` and ``zpoly`` are zero, or
-        (2) both ``content`` and ``zpoly`` are nonzero and canonical and ``zpoly`` is reduced.
+    (1) both ``content`` and ``zpoly`` are zero, or
+    (2) both ``content`` and ``zpoly`` are nonzero and canonical and ``zpoly`` is reduced.
     A nonzero ``zpoly`` is considered reduced when the coefficients have GCD one and the leading coefficient is positive.
 
 .. function:: slong fmpq_mpoly_length(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
@@ -419,23 +414,17 @@ Addition/Subtraction
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mpoly_add_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
-
-.. function:: void fmpq_mpoly_add_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
-
-.. function:: void fmpq_mpoly_add_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx);
-
-.. function:: void fmpq_mpoly_add_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx);
+.. function:: void fmpq_mpoly_add_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_add_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_add_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_add_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` plus ``c``.
 
-.. function:: void fmpq_mpoly_sub_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
-
-.. function:: void fmpq_mpoly_sub_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
-
-.. function:: void fmpq_mpoly_sub_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx);
-
-.. function:: void fmpq_mpoly_sub_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx);
+.. function:: void fmpq_mpoly_sub_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_sub_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_sub_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_sub_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` minus ``c``.
 
@@ -457,22 +446,16 @@ Scalar operations
     Set ``A`` to `-```B``.
 
 .. function:: void fmpq_mpoly_scalar_mul_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_scalar_mul_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_scalar_mul_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_scalar_mul_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_scalar_mul_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_scalar_mul_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_scalar_mul_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` times `c`.
 
 .. function:: void fmpq_mpoly_scalar_div_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_scalar_div_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_scalar_div_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_scalar_div_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_scalar_div_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong c, const fmpq_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` divided by `c`.
 
@@ -500,27 +483,36 @@ Differentiation/Integration
 Evaluation
 --------------------------------------------------------------------------------
 
+    These functions return `0` when the operation would imply unreasonable arithmetic.
 
-.. function:: void fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A, fmpq * const * vals, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A, fmpq * const * vals, const fmpq_mpoly_ctx_t ctx)
 
     Set ``ev`` the evaluation of ``A`` where the variables are replaced by the corresponding elements of the array ``vals``.
+    Return `1` for success and `0` for failure.
 
-.. function:: void fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong var, const fmpq_t val, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong var, const fmpq_t val, const fmpq_mpoly_ctx_t ctx)
 
     Set ``A`` to the evaluation of ``B`` where the variable of index ``var`` is replaced by ``val``.
+    Return `1` for success and `0` for failure.
 
-.. function:: void fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A, const fmpq_mpoly_t B, fmpq_poly_struct * const * C, const fmpq_mpoly_ctx_t ctxB)
+.. function:: int fmpq_mpoly_compose_fmpq_poly(fmpq_poly_t A, const fmpq_mpoly_t B, fmpq_poly_struct * const * C, const fmpq_mpoly_ctx_t ctxB)
 
     Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
     The context object of ``B`` is ``ctxB``.
+    Return `1` for success and `0` for failure.
 
-.. function:: void fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A, const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C, const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC)
+.. function:: int fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A, const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C, const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC)
 
     Set ``A`` to the evaluation of ``B`` where the variables are replaced by the corresponding elements of the array ``C``.
     Both ``A`` and the elements of ``C`` have context object ``ctxAC``, while ``B`` has context object ``ctxB``.
-    Neither of ``A`` and ``B`` is allowed to alias any other polynomial.
+    Neither ``A`` nor ``B`` is allowed to alias any other polynomial.
+    Return `1` for success and `0` for failure.
 
-    These functions try to guard against unreasonable arithmetic by throwing.
+.. function:: void fmpq_mpoly_compose_fmpq_mpoly_gen(fmpq_mpoly_t A, const fmpq_mpoly_t B, const slong * c, const fmpq_mpoly_ctx_t ctxB, const fmpq_mpoly_ctx_t ctxAC)
+
+    Set ``A`` to the evaluation of ``B`` where the variable of index ``i`` in ``ctxB`` is replaced by the variable of index ``c[i]`` in ``ctxAC``.
+    The length of the array ``C`` is the number of variables in ``ctxB``.
+    If any ``c[i]`` is negative, the corresponding variable of ``B`` is replaced by zero. Otherwise, it is expected that ``c[i]`` is less than the number of variables in ``ctxAC``.
 
 
 Multiplication
@@ -535,15 +527,17 @@ Multiplication
 Powering
 --------------------------------------------------------------------------------
 
+    These functions return `0` when the operation would imply unreasonable arithmetic.
 
-.. function:: void fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t k, const fmpq_mpoly_ctx_t ctx)
-
-    Set ``A`` to ``B`` raised to the `k`-th power.
-    This function throws if `k < 0` or if `k` is large and the polynomial is not a monomial with coefficient `\pm1`.
-
-.. function:: void fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong k, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpq_mpoly_pow_fmpz(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpz_t k, const fmpq_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` raised to the `k`-th power.
+    Return `1` for success and `0` for failure.
+
+.. function:: int fmpq_mpoly_pow_ui(fmpq_mpoly_t A, const fmpq_mpoly_t B, ulong k, const fmpq_mpoly_ctx_t ctx)
+
+    Set ``A`` to ``B`` raised to the `k`-th power.
+    Return `1` for success and `0` for failure.
 
 
 Division
@@ -590,8 +584,7 @@ Greatest Common Divisor
     The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
 
 .. function:: int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar, fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: int fmpq_mpoly_gcd_cofactors_threaded(fmpq_mpoly_t G, fmpq_mpoly_t Abar, fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit)
+              int fmpq_mpoly_gcd_cofactors_threaded(fmpq_mpoly_t G, fmpq_mpoly_t Abar, fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit)
 
     Do the operation of :func:`fmpq_mpoly_gcd` / :func:`fmpq_mpoly_gcd_threaded` but also compute the cofactors ``Abar = A/G`` and ``Bbar = B/G`` if successful.
 
@@ -640,8 +633,7 @@ Univariate Functions
     Return the exponent of the term of index ``i`` of ``A``.
 
 .. function:: void fmpq_mpoly_univar_get_term_coeff(fmpq_mpoly_t c, const fmpq_mpoly_univar_t A, slong i, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_univar_swap_term_coeff(fmpq_mpoly_t c, fmpq_mpoly_univar_t A, slong i, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_univar_swap_term_coeff(fmpq_mpoly_t c, fmpq_mpoly_univar_t A, slong i, const fmpq_mpoly_ctx_t ctx)
 
     Set (resp. swap) ``c`` to (resp. with) the coefficient of the term of index ``i`` of ``A``.
 

@@ -44,7 +44,7 @@ Memory management
     allocated, then the polynomial is reallocated to have space for at
     least ``len`` coefficients. No data is lost when calling this 
     function. The function efficiently deals with the case where 
-    ``fit_length()`` is called many times in small increments by at 
+    :func:`fit_length` is called many times in small increments by at 
     least doubling the number of allocated coefficients when ``len`` 
     is larger than the number of coefficients currently allocated.
 
@@ -115,8 +115,8 @@ Accessing the numerator and denominator
 
     Note that, because of a delayed initialisation approach, this might 
     be ``NULL`` for zero polynomials.  This situation can be salvaged 
-    by calling either ``fmpq_poly_fit_length()`` or 
-    ``fmpq_poly_realloc()``.
+    by calling either :func:`fmpq_poly_fit_length` or 
+    :func:`fmpq_poly_realloc`.
     
     This function is implemented as a macro returning ``(poly)->coeffs``.
 
@@ -131,7 +131,7 @@ Accessing the numerator and denominator
 Random testing
 --------------------------------------------------------------------------------
 
-The functions ``fmpq_poly_randtest_foo()`` provide random 
+The functions :func:`fmpq_poly_randtest_foo` provide random 
 polynomials suitable for testing.  On an integer level, this 
 means that long strings of zeros and ones in the binary 
 representation are favoured as well as the special absolute 
@@ -144,19 +144,19 @@ to have a non-trivial content.
     Sets `f` to a random polynomial with coefficients up to the given 
     length and where each coefficient has up to the given number of bits. 
     The coefficients are signed randomly.  One must call 
-    ``flint_randinit()`` before calling this function.
+    :func:`flint_randinit` before calling this function.
 
 .. function:: void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with coefficients up to the given length 
     and where each coefficient has up to the given number of bits.  One must 
-    call ``flint_randinit()`` before calling this function.
+    call :func:`flint_randinit` before calling this function.
 
 .. function:: void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
-    As for ``fmpq_poly_randtest()`` except that ``len`` and ``bits`` 
+    As for :func:`fmpq_poly_randtest` except that ``len`` and ``bits`` 
     may not be zero and the polynomial generated is guaranteed not to be the 
-    zero polynomial.  One must call ``flint_randinit()`` before calling
+    zero polynomial.  One must call :func:`flint_randinit` before calling
     this function.
 
 
@@ -289,7 +289,7 @@ Assignment, swap, negation
 
     Sets ``poly1`` to the multiplicative inverse of ``poly2`` 
     if possible.  Otherwise, if ``poly2`` is not a unit, leaves 
-    ``poly1`` unmodified and calls ``abort()``.
+    ``poly1`` unmodified and calls :func:`abort`.
 
 .. function:: void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 
@@ -416,7 +416,7 @@ Addition and subtraction
     be in canonical form and are also allowed to be of length~`0`.
     
     ``(rpoly, rden)`` and ``(poly1, den1)`` may be aliased, 
-    but ``(rpoly, rden)`` and ``(poly2, den2)`` may \emph{not} 
+    but ``(rpoly, rden)`` and ``(poly2, den2)`` may *not* 
     be aliased.
 
 .. function:: void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, int can)
@@ -471,7 +471,7 @@ Addition and subtraction
     canonical form and are also allowed to be of length~`0`.
     
     ``(rpoly, rden)`` and ``(poly1, den1, len1)`` may be aliased, 
-    but ``(rpoly, rden)`` and ``(poly2, den2, len2)`` may \emph{not} be 
+    but ``(rpoly, rden)`` and ``(poly2, den2, len2)`` may *not* be 
     aliased.
 
 .. function:: void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, int can)
@@ -794,7 +794,8 @@ Euclidean division
     the given length. This is used as a kind of precomputed inverse in
     the remainder routine below.
 
-.. function:: void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, fmpq_poly_t poly) Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of the given length. This is used as a kind of precomputed inverse in the remainder routine below.
+.. function:: void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, fmpq_poly_t poly)
+    Computes ``2*len - 1`` powers of $x$ modulo the polynomial $B$ of the given length. This is used as a kind of precomputed inverse in the remainder routine below.
 
 .. function:: void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)
 
@@ -815,7 +816,7 @@ Euclidean division
 
     This function is only faster if `m \leq 2*n - 1`.
 
-    The output of this function is \emph{not} canonicalised.
+    The output of this function is *not* canonicalised.
 
 .. function:: void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv)
 
@@ -824,7 +825,7 @@ Euclidean division
 
     This function is only faster if ``A->length <= 2*B->length - 1``.
 
-    The output of this function is \emph{not} canonicalised.
+    The output of this function is *not* canonicalised.
 
 
 Power series division
@@ -865,7 +866,7 @@ Power series division
 .. function:: void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, const fmpz * A, const fmpz_t denA, slong lenA, const fmpz * B, const fmpz_t denB, slong lenB, slong n)
 
     Divides ``(A, denA, lenA)`` by ``(B, denB, lenB)`` as power series 
-    over `\Q`, assuming `B` has non-zero constant term and that
+    over `\mathbb{Q}`, assuming `B` has non-zero constant term and that
     all lengths are positive.
 
     Aliasing is not supported.
@@ -875,7 +876,7 @@ Power series division
 
 .. function:: void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, const fmpq_poly_t B, slong n)
 
-    Performs power series division in `\Q[[x]] / (x^n)`.  The function 
+    Performs power series division in `\mathbb{Q}[[x]] / (x^n)`.  The function 
     considers the polynomials `A` and `B` as power series of length~`n` 
     starting with the constant terms.  The function assumes that `B` has 
     non-zero constant term and `n \geq 1`.
@@ -889,8 +890,8 @@ Greatest common divisor
 
     Computes the monic greatest common divisor `G` of `A` and `B`.
 
-    Assumes that `G` has space for `\len(B)` coefficients, 
-    where `\len(A) \geq \len(B) > 0`.
+    Assumes that `G` has space for `\operatorname{len}(B)` coefficients, 
+    where `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
 
     Aliasing between the output and input arguments is not supported.
 
@@ -908,9 +909,9 @@ Greatest common divisor
     `G = \gcd(A, B) = S A + T B`, where `G` is the monic 
     greatest common divisor of `A` and `B`.
 
-    Assumes that `G`, `S`, and `T` have space for `\len(B)`, 
-    `\len(B)`, and `\len(A)` coefficients, respectively, 
-    where it is also assumed that `\len(A) \geq \len(B) > 0`.
+    Assumes that `G`, `S`, and `T` have space for `\operatorname{len}(B)`, 
+    `\operatorname{len}(B)`, and `\operatorname{len}(A)` coefficients, respectively, 
+    where it is also assumed that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
 
     Does not support zero padding of the input arguments.
 
@@ -929,8 +930,8 @@ Greatest common divisor
 
     Computes the monic least common multiple `L` of `A` and `B`.
 
-    Assumes that `L` has space for `\len(A) + \len(B) - 1` coefficients, 
-    where `\len(A) \geq \len(B) > 0`.
+    Assumes that `L` has space for `\operatorname{len}(A) + \operatorname{len}(B) - 1` coefficients, 
+    where `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
 
     Aliasing between the output and input arguments is not supported.
 
@@ -1427,7 +1428,7 @@ Power series composition
     space for ``n`` coefficients. Does not support aliasing between any
     of the inputs and the output.
 
-    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
     The default ``fmpz_poly`` composition algorithm is automatically
     used when the composition can be performed over the integers.
 
@@ -1437,7 +1438,7 @@ Power series composition
     modulo `x^n`, where the constant term of ``poly2`` is required
     to be zero.
 
-    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
     The default ``fmpz_poly`` composition algorithm is automatically
     used when the composition can be performed over the integers.
 

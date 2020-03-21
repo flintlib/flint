@@ -12,7 +12,7 @@
 #include "nmod_mpoly.h"
 
 
-ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
+ulong _nmod_mpoly_evaluate_all_ui_sp(const nmod_mpoly_t A,
                                 const ulong * vals, const nmod_mpoly_ctx_t ctx)
 {
     ulong l;
@@ -22,7 +22,7 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
     slong * offs;
     slong entries, k_len;
     slong Alen;
-    mp_limb_t * Acoeff;
+    const mp_limb_t * Acoeff;
     ulong * Aexp;
     flint_bitcnt_t bits;
     mp_limb_t * powers;
@@ -39,7 +39,7 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
 
     TMP_START;
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
+    N = mpoly_words_per_exp_sp(bits, ctx->minfo);
 
     /* get a mask of present exponent bits */
     ormask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
@@ -106,7 +106,7 @@ ulong _nmod_mpoly_evaluate_all_ui_sp(nmod_mpoly_t A,
 
 
 
-ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
+ulong _nmod_mpoly_evaluate_all_ui_mp(const nmod_mpoly_t A,
                                 const ulong * vals, const nmod_mpoly_ctx_t ctx)
 {
     ulong l;
@@ -116,7 +116,7 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
     slong * offs;
     slong entries, k_len;
     slong Alen;
-    mp_limb_t * Acoeff;
+    const mp_limb_t * Acoeff;
     ulong * Aexp;
     flint_bitcnt_t bits;
     mp_limb_t * powers;
@@ -133,7 +133,7 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
 
     TMP_START;
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
+    N = mpoly_words_per_exp_mp(bits, ctx->minfo);
 
     /* get a mask of present exponent bits */
     ormask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
@@ -202,7 +202,7 @@ ulong _nmod_mpoly_evaluate_all_ui_mp(nmod_mpoly_t A,
 }
 
 
-ulong nmod_mpoly_evaluate_all_ui(nmod_mpoly_t A,
+ulong nmod_mpoly_evaluate_all_ui(const nmod_mpoly_t A,
                                 const ulong * vals, const nmod_mpoly_ctx_t ctx)
 {
     if (A->length == 0)

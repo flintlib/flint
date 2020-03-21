@@ -59,14 +59,21 @@ FLINT_DLL void _fmpz_factor_concat(fmpz_factor_t factor1,
 
 /* Factoring *****************************************************************/
 
-FLINT_DLL void _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n);
+FLINT_DLL void _fmpz_factor_extend_factor_ui(fmpz_factor_t factor,
+		                                                  mp_limb_t n);
 
 FLINT_DLL int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n,
                                        ulong start, ulong num_primes);
 
+FLINT_DLL int fmpz_factor_trial(fmpz_factor_t factor, const fmpz_t n,
+		                                             slong num_primes);
+	
 FLINT_DLL void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
 
 FLINT_DLL void fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n);
+
+FLINT_DLL int fmpz_factor_smooth(fmpz_factor_t factor,
+		                              const fmpz_t n, slong bits);
 
 FLINT_DLL void fmpz_factor_si(fmpz_factor_t factor, slong n);
 
@@ -75,16 +82,16 @@ FLINT_DLL int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n,
 
 FLINT_DLL void fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f);
 
-FLINT_DLL void flint_mpn_sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, mp_limb_t n_size, 
-                                       mp_ptr ninv, mp_limb_t normbits);
+FLINT_DLL void flint_mpn_sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, 
+		            mp_limb_t n_size, mp_ptr ninv, mp_limb_t normbits);
 
-FLINT_DLL int flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, 
-                                                    mp_ptr a, mp_ptr y, mp_limb_t n_size, 
-                                                    mp_limb_t normbits, mp_limb_t max_iters);
+FLINT_DLL int flint_mpn_factor_pollard_brent_single(mp_ptr factor,
+            mp_ptr n, mp_ptr ninv, mp_ptr a, mp_ptr y, mp_limb_t n_size, 
+                                      mp_limb_t normbits, mp_limb_t max_iters);
 
 FLINT_DLL int fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, 
-                                               fmpz_t yi, fmpz_t ai, 
-                                               mp_limb_t max_iters);
+                                                         fmpz_t yi, fmpz_t ai, 
+                                                          mp_limb_t max_iters);
 
 FLINT_DLL int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state,
                                         fmpz_t n, mp_limb_t max_tries, 
@@ -149,8 +156,8 @@ FLINT_DLL void fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z,
                                                      mp_limb_t k, mp_ptr n,
                                                      ecm_t ecm_inf);
 
-FLINT_DLL int fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n,
-                                           ecm_t ecm_inf);
+FLINT_DLL int fmpz_factor_ecm_select_curve(mp_ptr f,
+		                          mp_ptr sig, mp_ptr n, ecm_t ecm_inf);
 
 FLINT_DLL int fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array,
                                       mp_limb_t num, mp_limb_t B1, mp_ptr n, 

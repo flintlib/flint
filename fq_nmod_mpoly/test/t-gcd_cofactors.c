@@ -243,7 +243,7 @@ main(void)
     slong i, j, k, tmul = 2;
     FLINT_TEST_INIT(state);
 
-    flint_printf("gcd....");
+    flint_printf("gcd_cofactors....");
     fflush(stdout);
 
     /* The gcd should always work when one input is a monomial */

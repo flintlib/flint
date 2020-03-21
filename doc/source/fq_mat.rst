@@ -97,9 +97,13 @@ Concatenate
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_mat_concat_vertical(fq_mat_t res, const fq_mat_t mat1, const fq_mat_t mat2, const fq_ctx_t ctx) Sets \code{res} to vertical concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $k \times n$, \code{res} : $(m + k) \times n$.
+.. function:: void fq_mat_concat_vertical(fq_mat_t res, const fq_mat_t mat1, const fq_mat_t mat2, const fq_ctx_t ctx)
 
-.. function:: void fq_mat_concat_horizontal(fq_mat_t res, const fq_mat_t mat1, const fq_mat_t mat2, const fq_ctx_t ctx) Sets \code{res} to horizontal concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $m \times k$, \code{res}  : $m \times (n + k)$.
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
+
+.. function:: void fq_mat_concat_horizontal(fq_mat_t res, const fq_mat_t mat1, const fq_mat_t mat2, const fq_ctx_t ctx)
+
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
 
 
 Printing
@@ -180,7 +184,7 @@ Random matrix generation
     `\mathbf{F}_{q}`.
 
     The matrix can be transformed into a dense matrix with unchanged
-    rank by subsequently calling ``fq_mat_randops()``.
+    rank by subsequently calling :func:`fq_mat_randops`.
 
 .. function:: void fq_mat_randops(fq_mat_t mat, slong count, flint_rand_t state, const fq_ctx_t ctx)
 
@@ -391,11 +395,11 @@ Triangular solving
 
     Uses the block inversion formula
 
-    ``
-    \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
-    \begin{pmatrix} X \\ Y \end{pmatrix} =
-    \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-    ``
+    .. math ::
+        \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
+        \begin{pmatrix} X \\ Y \end{pmatrix} =
+        \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
+      
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
@@ -427,11 +431,11 @@ Triangular solving
 
     Uses the block inversion formula
 
-    ``
-    \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
-    \begin{pmatrix} X \\ Y \end{pmatrix} =
-    \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-    ``
+    .. math ::
+        \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
+        \begin{pmatrix} X \\ Y \end{pmatrix} =
+        \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
+    
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.

@@ -46,26 +46,48 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
          fmpz_factor_clear(fac);
       } else
       {
-         fmpz_factor_t fac, fac2;
+         fmpz_factor_t fac, fac2, fac3;
+	 slong bits = fmpz_sizeinbase(n, 2);
+         int done;
 
-         fmpz_factor_init(fac);
+         fmpz_factor_init(fac3);
 
-         /* insert call to ecm here */
+	 done = fmpz_factor_smooth(fac3, n, FLINT_MAX(bits/3 - 17, 2));
 
-         qsieve_factor_threaded(fac, n, FLINT_DEFAULT_THREAD_LIMIT);
+         if (!done)
+	 {
+            fmpz_t n2;
+	    
+	    fmpz_init(n2);
+	    
+	    /* take out cofactor and factor it */
+	    fmpz_set(n2, fac3->p + fac3->num - 1);
+	    fac3->exp[fac3->num - 1] = 0;
+	    fac3->num--;
 
-         for (i = 0; i < fac->num; i++)
-         {
-            fmpz_factor_init(fac2);
+	    fmpz_factor_init(fac);
 
-            fmpz_factor_no_trial(fac2, fac->p + i);
+	    qsieve_factor_threaded(fac, n2, FLINT_DEFAULT_THREAD_LIMIT);
 
-            _fmpz_factor_concat(factor, fac2, fac->exp[i]);
+            for (i = 0; i < fac->num; i++)
+            {
+	       fmpz_factor_init(fac2);
+
+               fmpz_factor_no_trial(fac2, fac->p + i);
+
+               _fmpz_factor_concat(fac3, fac2, fac->exp[i]);
  
-            fmpz_factor_clear(fac2);
-         }
+               fmpz_factor_clear(fac2);
+            }
 
-         fmpz_factor_clear(fac);
+            fmpz_factor_clear(fac);
+
+	    fmpz_clear(n2);
+	 }
+
+	 _fmpz_factor_concat(factor, fac3, 1);
+
+	 fmpz_factor_clear(fac3);
       }
    }
 }

@@ -94,7 +94,12 @@ main(void)
             nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
 
-            nmod_mpoly_pow_ui(g, f, pow, ctx);
+            if (!nmod_mpoly_pow_ui(g, f, pow, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check pow_ui success\ni = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
             nmod_mpoly_assert_canonical(g, ctx);
             nmod_mpoly_pow_rmul(h, f, pow, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
@@ -106,7 +111,12 @@ main(void)
                 flint_abort();
             }
 
-            nmod_mpoly_pow_ui(f, f, pow, ctx);
+            if (!nmod_mpoly_pow_ui(f, f, pow, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check pow_ui success\ni = %wd, j = %wd\n", i, j);
+                flint_abort();
+            }
             nmod_mpoly_assert_canonical(f, ctx);
 
             if (!nmod_mpoly_equal(g, f, ctx))
@@ -115,7 +125,6 @@ main(void)
                 flint_printf("Check aliasing\ni = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
-
         }
 
         nmod_mpoly_clear(f, ctx);
