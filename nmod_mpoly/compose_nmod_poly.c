@@ -12,6 +12,32 @@
 #include "nmod_mpoly.h"
 
 
+int _ff_poly_pow_fmpz_is_not_feasible(slong length, const fmpz_t e)
+{
+    if (length < 2)
+    {
+        return 0;
+    }
+    else
+    {
+        ulong limit = (ulong)(WORD_MAX)/(ulong)(2*sizeof(fmpz));
+        return fmpz_cmp_ui(e, limit/(ulong)(length)) >= 0;
+    }
+}
+
+int _ff_poly_pow_ui_is_not_feasible(slong length, ulong e)
+{
+    if (length < 2)
+    {
+        return 0;
+    }
+    else
+    {
+        ulong limit = (ulong)(WORD_MAX)/(ulong)(2*sizeof(fmpz));
+        return e >= limit/(ulong)(length);
+    }
+}
+
 /*
     Given a polynomial tree with exponents stored in the keys and
     coefficients stored in the data member,
@@ -60,9 +86,10 @@ static void _rbnode_clear_sp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
 }
 
 
-void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
+int _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
                       nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
 {
+    int success = 1;
     int new;
     slong i, j, k, N, bits, nvars = ctx->minfo->nvars;
     slong main_exp, main_var, main_shift, main_off, shift, off;
@@ -104,8 +131,15 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
     entries = 0;
     for (i = 0; i < nvars; i++)
     {
+        if (_ff_poly_pow_ui_is_not_feasible(C[i]->length, degrees[i]))
+        {
+            success = 0;
+            goto cleanup_degrees;
+        }
+
         if (i == main_var)
             continue;
+
         entries += FLINT_BIT_COUNT(degrees[i]);
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
@@ -179,25 +213,36 @@ void _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
     /* use tree method to evaluate in the main variable */
     _rbnode_clear_sp(tree, tree->head->left, WORD(0), A, C[main_var], ctx);
 
+cleanup_degrees:
+
     TMP_END;
+
+    return success;
 }
 
 
-static void _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
+static int _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
                        const fmpz_t s, nmod_poly_t l, const nmod_poly_t x,
                                                     const nmod_mpoly_ctx_t ctx)
 {
+    int success = 1;
     nmod_poly_t r, xp;
     FLINT_ASSERT(fmpz_cmp(&node->key, s) >= 0);
 
     nmod_poly_init_mod(r, ctx->ffinfo->mod);
     nmod_poly_zero(r);
     if (node->right != tree->null)
-        _rbnode_clear_mp(tree, node->right, &node->key, r, x, ctx);
+    {
+        if (!_rbnode_clear_mp(tree, node->right, &node->key, r, x, ctx))
+            success = 0;
+    }
 
     nmod_poly_zero(l);
     if (node->left != tree->null)
-        _rbnode_clear_mp(tree, node->left, s, l, x, ctx);
+    {
+        if (!_rbnode_clear_mp(tree, node->left, s, l, x, ctx))
+            success = 0;
+    }
 
     nmod_poly_init_mod(xp, ctx->ffinfo->mod);
     fmpz_sub(&node->key, &node->key, s);
@@ -210,19 +255,16 @@ static void _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
     {
         slong degree = nmod_poly_degree(x);
         nmod_poly_zero(xp);
-        if (degree == WORD(0))
+        if (degree == 0)
         {
             nmod_poly_set_coeff_ui(xp, 0, 
                        nmod_pow_fmpz(nmod_poly_get_coeff_ui(x, 0),
                                                 &node->key, ctx->ffinfo->mod));
         }
-        else if (degree > WORD(0))
+        else if (degree > 0)
         {
-            /* lets not try to power a multinomial */
-            flint_throw(FLINT_EXPOF,
-                      "Exponent overflow in nmod_mpoly_evaluate_nmod_poly");
+            success = 0;
         }
-    
     }
     nmod_poly_add(r, r, node->data);
     nmod_poly_mul(r, xp, r);
@@ -234,13 +276,16 @@ static void _rbnode_clear_mp(mpoly_rbtree_t tree, mpoly_rbnode_t node,
     nmod_poly_clear(node->data);
     flint_free(node->data);
     flint_free(node);
+
+    return success;
 }
 
 
 
-void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
+int _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
                       nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
 {
+    int success = 1;
     int new;
     ulong l;
     slong i, k, N, bits, nvars = ctx->minfo->nvars;
@@ -290,9 +335,17 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
     entries = 0;
     for (i = 0; i < nvars; i++)
     {
+        if (_ff_poly_pow_fmpz_is_not_feasible(C[i]->length, degrees + i))
+        {
+            success = 0;
+            goto cleanup_degrees;
+        }
+
         bitcounts[i] = fmpz_bits(degrees + i);
+
         if (i == main_var)
             continue;
+
         entries += bitcounts[i];
     }
     offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
@@ -312,10 +365,8 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
 
         for (l = 0; l < bitcounts[i]; l++)
         {
-            ulong l1 = l/FLINT_BITS;
-            ulong l2 = l%FLINT_BITS;
-            offs[k] = off + l1;
-            masks[k] = UWORD(1) << l2;
+            offs[k] = off + (l/FLINT_BITS);
+            masks[k] = UWORD(1) << (l%FLINT_BITS);
             nmod_poly_init_mod(powers + k, ctx->ffinfo->mod);
             if (l == 0)
                 nmod_poly_set(powers + k, C[i]);
@@ -364,37 +415,40 @@ void _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
     for (k = 0; k < k_len; k++)
         nmod_poly_clear(powers + k);
 
+    /* use tree method to evaluate in the main variable */
+    fmpz_init(s);
+    if (!_rbnode_clear_mp(tree, tree->head->left, s, A, C[main_var], ctx))
+        success = 0;
+    fmpz_clear(s);
+
+cleanup_degrees:
+
     for (i = 0; i < nvars; i++)
         fmpz_clear(degrees + i);
 
-    /* use tree method to evaluate in the main variable */
-    fmpz_init(s);
-    _rbnode_clear_mp(tree, tree->head->left, s, A, C[main_var], ctx);
-    fmpz_clear(s);
-
     TMP_END;
+
+    return success;
 }
 
 
-void nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
+int nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
                         const nmod_mpoly_t B, nmod_poly_struct * const * C,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     if (B->length == 0)
     {
         nmod_poly_zero(A);
-        return;
+        return 1;
     }
-    else if (B->bits <= FLINT_BITS)
+
+    if (B->bits <= FLINT_BITS)
     {
-        _nmod_mpoly_compose_nmod_poly_sp(A, B, C, ctx);
-        return;
+        return _nmod_mpoly_compose_nmod_poly_sp(A, B, C, ctx);
     }
     else
     {
-        _nmod_mpoly_compose_nmod_poly_mp(A, B, C, ctx);
-        return;
+        return _nmod_mpoly_compose_nmod_poly_mp(A, B, C, ctx);
     }
-
 }
 

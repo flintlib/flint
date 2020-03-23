@@ -24,7 +24,7 @@ General utilities
 
    flint.rst
    profiler.rst
-   threadpool.rst
+   thread_pool.rst
    perm.rst
    mpoly.rst
 
@@ -77,6 +77,7 @@ Integers mod n
    nmod_poly_mat.rst
    nmod_poly_factor.rst
    nmod_mpoly.rst
+   fmpz_mod.rst
    fmpz_mod_poly.rst
    fmpz_mod_poly_factor.rst
    fmpz_mod_mat.rst
@@ -103,6 +104,7 @@ Finite fields
    fq_nmod_poly.rst
    fq_nmod_poly_factor.rst
    fq_nmod_embed.rst
+   fq_nmod_mpoly.rst
 
 .. toctree::
    :maxdepth: 1
@@ -139,3 +141,10 @@ Floating-point support code
    mpfr_vec.rst
    mpfr_mat.rst
 
+References
+----------------
+
+.. toctree::
+   :maxdepth: 1
+
+   references.rst

@@ -206,7 +206,8 @@ void fmpq_mpoly_geobucket_pow_fmpz_inplace(fmpq_mpoly_geobucket_t B1,
     fmpq_mpoly_init(a, ctx);
 
     fmpq_mpoly_geobucket_empty(a, B1, ctx);
-    fmpq_mpoly_pow_fmpz(a, a, k, ctx);
+    if (!fmpq_mpoly_pow_fmpz(a, a, k, ctx))
+        flint_throw(FLINT_ERROR, "fmpq_mpoly_pow_fmpz failed");
     fmpq_mpoly_geobucket_set(B1, a, ctx);
 
     fmpq_mpoly_clear(a, ctx);

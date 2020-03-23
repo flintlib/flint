@@ -15,8 +15,9 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
-mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
-    mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
+mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, 
+                               mp_srcptr array1, mp_size_t limbs1,
+		               mp_srcptr array2, mp_size_t limbs2, mp_ptr temp)
 {
    mp_size_t s1 = 0, s2 = 0, m, b1, b2, mb, len1, len2, leng;
    mp_ptr in1, in2;
@@ -36,7 +37,10 @@ mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
    flint_mpn_zero(arrayg, m);
 
    /* set in1 to shifted array1 */
-   in1 = flint_malloc(len1*sizeof(mp_limb_t));
+   if (temp != NULL)
+      in1 = temp;
+   else
+      in1 = flint_malloc(len1*sizeof(mp_limb_t));
    if (b1 == 0)
       flint_mpn_copyi(in1, array1 + s1, len1);
    else
@@ -44,7 +48,10 @@ mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
    len1 -= (in1[len1 - 1] == 0); 
 
    /* set in2 to shifted array2 */
-   in2 = flint_malloc(len2*sizeof(mp_limb_t));
+   if (temp != NULL)
+      in2 = temp + len1;
+   else
+      in2 = flint_malloc(len2*sizeof(mp_limb_t));
    if (b2 == 0)
       flint_mpn_copyi(in2, array2 + s2, len2);
    else
@@ -66,9 +73,19 @@ mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
    }
 
    /* clean up */
-   flint_free(in1);
-   flint_free(in2);
+   if (temp == NULL)
+   {
+      flint_free(in1);
+      flint_free(in2);
+   }
 
    /* return total number of limbs in output */
    return m + leng;
 }
+
+mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
+        mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2)
+{
+   return flint_mpn_gcd_full2(arrayg, array1, limbs1, array2, limbs2, NULL);
+}
+

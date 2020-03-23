@@ -201,7 +201,7 @@ Bell numbers
 
     Returns `b` such that `B_n < 2^{\lfloor b \rfloor}`, using the inequality
     ``B_n < \left(\frac{0.792n}{\log(n+1)}\right)^n``
-    which is given in \cite{BerTas2010}.
+    which is given in [BerTas2010]_.
 
 
 Bernoulli numbers and polynomials
@@ -320,7 +320,7 @@ Bernoulli numbers and polynomials
     which is evaluated modulo several limb-size primes using ``nmod_poly``
     arithmetic to yield the numerators of the Bernoulli numbers after
     multiplication by the denominators and CRT reconstruction. This formula,
-    given (incorrectly) in \citep{BuhlerCrandallSompolski1992}, saves about
+    given (incorrectly) in [BuhlerCrandallSompolski1992]_, saves about
     half of the time compared to the usual generating function `x/(e^x-1)`
     since the odd terms vanish.
 
@@ -456,7 +456,7 @@ Cyclotomic polynomials
     `\Psi_n(x)` of `\cos(2 \pi / n)`, scaled to have integer coefficients
     by multiplying by `2^d` (`2^{d-1}` when `n` is a power of two).
 
-    The polynomial `\Psi_n(x)` is described in \cite{WaktinsZeitlin1993}.
+    The polynomial `\Psi_n(x)` is described in [WaktinsZeitlin1993]_.
     As proved in that paper, the roots of `\Psi_n(x)` for `n \ge 3` are
     `\cos(2 \pi k / n)` where `0 \le k < d` and where `\gcd(k, n) = 1`.
 
@@ -469,7 +469,7 @@ Cyclotomic polynomials
     coefficient in the binomial expansion of `(x+1)^d`.
 
     When `n` is an odd prime, we use a direct formula for the coefficients
-    (\url{http://mathworld.wolfram.com/TrigonometryAngles.html}).
+    (http://mathworld.wolfram.com/TrigonometryAngles.html ).
 
 .. function:: void arith_cos_minpoly(fmpz_poly_t poly, ulong n)
 
@@ -493,7 +493,7 @@ Landau's function
     of an element of the symmetric group `S_n`.
 
     Implements the "basic algorithm" given in
-    \cite{DelegliseNicolasZimmermann2009}. The running time is
+    [DelegliseNicolasZimmermann2009]_. The running time is
     `O(n^{3/2} / \sqrt{\log n})`.
 
 
@@ -544,7 +544,7 @@ Number of partitions
 
     Rather than evaluating the sum naively, we factor `A_k(n)` into a
     product of cosines based on the prime factorisation of `k`. This
-    process is based on the identities given in \cite{Whiteman1956}.
+    process is based on the identities given in [Whiteman1956]_.
 
     The special ``trig_prod_t`` structure ``prod`` represents a
     product of cosines of rational arguments, multiplied by an algebraic
@@ -564,7 +564,7 @@ Number of partitions
     to allow computing an approximation of `p(n)` to smaller precision.
 
     The Hardy-Ramanujan-Rademacher formula is given with error bounds
-    in \cite{Rademacher1937}. We evaluate it in the form
+    in [Rademacher1937]_. We evaluate it in the form
 
     .. math ::
 

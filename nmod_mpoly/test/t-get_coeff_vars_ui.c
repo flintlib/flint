@@ -40,7 +40,7 @@ main(void)
         nmod_mpoly_get_coeff_vars_ui(f, f, varl, expl, 2, ctx);
         if (!nmod_mpoly_equal(f, g, ctx))
         {
-            flint_printf("FAIL\ncheck simple example\n");
+            flint_printf("FAIL\nCheck simple example\n");
             flint_abort();
         }
         nmod_mpoly_clear(f, ctx);
@@ -85,15 +85,20 @@ main(void)
             nmod_mpoly_get_coeff_vars_ui(g, f, vars, exps, 1, ctx);
             nmod_mpoly_assert_canonical(g, ctx);
             nmod_mpoly_gen(m, var1, ctx);
-            nmod_mpoly_pow_ui(m, m, j1, ctx);
+            if (!nmod_mpoly_pow_ui(m, m, j1, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check pow_ui success\ni = %wd, j1 = %wd\n", i, j1);
+                flint_abort();
+            }
             nmod_mpoly_mul(g, g, m, ctx);
             nmod_mpoly_add(h, h, g, ctx);
         }
 
         if (!nmod_mpoly_equal(f, h, ctx))
         {
-            flint_printf("FAIL\n"
-                         "check 1 variable sum of coefficients\ni = %wd\n", i);
+            flint_printf("FAIL\n");
+            flint_printf("Check 1 variable sum of coefficients\ni = %wd\n", i);
             flint_abort();
         }
 
@@ -146,10 +151,20 @@ main(void)
             nmod_mpoly_get_coeff_vars_ui(g, f, vars, exps, 2, ctx);
             nmod_mpoly_assert_canonical(g, ctx);
             nmod_mpoly_gen(m, var1, ctx);
-            nmod_mpoly_pow_ui(m, m, j1, ctx);
+            if (!nmod_mpoly_pow_ui(m, m, j1, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check pow_ui success\ni = %wd, j1 = %wd, j2 = %wd\n", i, j1, j2);
+                flint_abort();
+            }
             nmod_mpoly_mul(g, g, m, ctx);
             nmod_mpoly_gen(m, var2, ctx);
-            nmod_mpoly_pow_ui(m, m, j2, ctx);
+            if (!nmod_mpoly_pow_ui(m, m, j2, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check pow_ui success\ni = %wd, j1 = %wd, j2 = %wd\n", i, j1, j2);
+                flint_abort();
+            }
             nmod_mpoly_mul(g, g, m, ctx);
             nmod_mpoly_add(h, h, g, ctx);
         }
@@ -157,8 +172,8 @@ main(void)
 
         if (!nmod_mpoly_equal(f, h, ctx))
         {
-            flint_printf("FAIL\n"
-                         "check 2 variable sum of coefficients\ni = %wd\n", i);
+            flint_printf("FAIL\n");
+            flint_printf("Check 2 variable sum of coefficients\ni = %wd\n", i);
             flint_abort();
         }
 

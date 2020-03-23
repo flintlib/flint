@@ -42,7 +42,7 @@ Memory management
 
 .. function:: void nmod_mat_swap(nmod_mat_t mat1, nmod_mat_t mat2)
 
-.. function:: 	Exchanges \code{mat1} and \code{mat2}.
+    Exchanges ``mat1`` and ``mat2``.
 
 
 Basic properties and manipulation
@@ -101,9 +101,13 @@ Concatenate
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2) Sets \code{res} to vertical concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $k \times n$, \code{res} : $(m + k) \times n$.
+.. function:: void nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
 
-.. function:: void nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2) Sets \code{res} to horizontal concatenation of (\code{mat1}, \code{mat2}) in that order. Matrix dimensions : \code{mat1} : $m \times n$, \code{mat2} : $m \times k$, \code{res}  : $m \times (n + k)$.
+    Sets ``res`` to vertical concatenation of (`mat1`, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
+
+.. function:: void nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
+
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
 
 
 Printing
@@ -116,12 +120,11 @@ Printing
     by the rows enclosed in brackets. Each column is right-aligned to the 
     width of the modulus written in decimal, and the columns are separated by 
     spaces.
-    For example:
-    \begin{lstlisting}
-    <2 x 3 integer matrix mod 2903>
-    [   0    0 2607]
-    [ 622    0    0]
-    \end{lstlisting}
+    For example::
+    
+        <2 x 3 integer matrix mod 2903>
+        [   0    0 2607]
+        [ 622    0    0]
 
 
 Random matrix generation
@@ -324,12 +327,12 @@ Matrix Exponentiation
 
 .. function:: void _nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
 
-.. function:: 	Sets $dest = mat^pow$. \code{dest} and \code{mat} cannot be aliased. Implements exponentiation by squaring.
+ 	   Sets `dest = mat^pow`. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
 
 .. function:: void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
 
     Sets `dest = mat^pow`. ``dest`` and ``mat`` may be aliased. Implements
-.. function:: 	exponentiation by squaring.
+   	exponentiation by squaring.
 
 
 Trace
@@ -402,11 +405,11 @@ Triangular solving
 
     Uses the block inversion formula
 
-    ``
-    \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
-    \begin{pmatrix} X \\ Y \end{pmatrix} =
-    \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-    ``
+    .. math ::
+        \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
+        \begin{pmatrix} X \\ Y \end{pmatrix} =
+        \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
+    
 
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
@@ -438,11 +441,11 @@ Triangular solving
 
     Uses the block inversion formula
 
-    ``
-    \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
-    \begin{pmatrix} X \\ Y \end{pmatrix} =
-    \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-    ``
+    .. math ::
+        \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
+        \begin{pmatrix} X \\ Y \end{pmatrix} =
+        \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
+    
 
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
@@ -455,7 +458,7 @@ Nonsingular square solving
 
 .. function:: int nmod_mat_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
 
-    Solves the matrix-matrix equation `AX = B` over `\Z / p \Z` where `p`
+    Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
     should have the same moduli.
 
@@ -464,7 +467,7 @@ Nonsingular square solving
 
 .. function:: int nmod_mat_solve_vec(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
 
-    Solves the matrix-vector equation `Ax = b` over `\Z / p \Z` where `p`
+    Solves the matrix-vector equation `Ax = b` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `A` which must be a prime number.
 
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
@@ -494,19 +497,19 @@ LU decomposition
     function will abandon the output matrix in an undefined state and
     return 0 if `A` is detected to be rank-deficient.
 
-    This function calls ``nmod_mat_lu_recursive``.
+    This function calls :func:`nmod_mat_lu_recursive`.
 
 .. function:: slong nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
 
     Computes a generalised LU decomposition `LU = PA` of a given
     matrix `A`, returning the rank of `A`. The behavior of this function
-    is identical to that of ``nmod_mat_lu``. Uses Gaussian elimination.
+    is identical to that of :func:`nmod_mat_lu`. Uses Gaussian elimination.
 
 .. function:: slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 
     Computes a generalised LU decomposition `LU = PA` of a given
     matrix `A`, returning the rank of `A`. The behavior of this function
-    is identical to that of ``nmod_mat_lu``. Uses recursive block
+    is identical to that of :func:`nmod_mat_lu`. Uses recursive block
     decomposition, switching to classical Gaussian elimination for
     sufficiently small blocks.
 
@@ -609,7 +612,7 @@ Strong echelon form and Howell form
 .. function:: void nmod_mat_strong_echelon_form(nmod_mat_t A)
 
     Puts `A` into strong echelon form. The Howell form and the strong echelon
-    form are equal up to permutation of the rows, see \cite{FieHof2014} for a
+    form are equal up to permutation of the rows, see [FieHof2014]_ for a
     definition of the strong echelon form and the algorithm used here.
 
     `A` must have at least as many rows as columns.
@@ -617,7 +620,7 @@ Strong echelon form and Howell form
 .. function:: slong nmod_mat_howell_form(nmod_mat_t A)
 
     Puts `A` into Howell form and returns the number of non-zero rows.
-    For a definition of the Howell form see \cite{StoMul1998}. The Howell form
+    For a definition of the Howell form see [StoMul1998]_. The Howell form
     is computed by first putting `A` into strong echelon form and then ordering
     the rows.
 

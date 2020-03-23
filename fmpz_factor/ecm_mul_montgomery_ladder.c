@@ -36,8 +36,8 @@ fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
 
     if (k == 1)
     {
-        mpn_copyi(x, x0, ecm_inf->n_size);
-        mpn_copyi(z, z0, ecm_inf->n_size);
+        flint_mpn_copyi(x, x0, ecm_inf->n_size);
+        flint_mpn_copyi(z, z0, ecm_inf->n_size);
         return;
     }
     
@@ -48,8 +48,8 @@ fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
     z2 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
 
 
-    mpn_copyi(x1, x0, ecm_inf->n_size);    /* Q <- P0 */
-    mpn_copyi(z1, z0, ecm_inf->n_size);
+    flint_mpn_copyi(x1, x0, ecm_inf->n_size);    /* Q <- P0 */
+    flint_mpn_copyi(z1, z0, ecm_inf->n_size);
     mpn_zero(x2, ecm_inf->n_size);
     mpn_zero(z2, ecm_inf->n_size);
 
@@ -80,8 +80,8 @@ fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
             len -= 1;
     }
 
-    mpn_copyi(x, x1, ecm_inf->n_size);
-    mpn_copyi(z, z1, ecm_inf->n_size);
+    flint_mpn_copyi(x, x1, ecm_inf->n_size);
+    flint_mpn_copyi(z, z1, ecm_inf->n_size);
 
     TMP_END;
 }

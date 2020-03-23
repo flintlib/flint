@@ -19,8 +19,81 @@ main(void)
     slong i, j, v;
     FLINT_TEST_INIT(state);
 
-    flint_printf("evaluate....");
+    flint_printf("evaluate_one_fmpz/all_fmpz....");
     fflush(stdout);
+
+    {
+        fmpz_t A1;
+        fmpz_mpoly_t A, B;
+        fmpz * Cp[3];
+        fmpz C[3];
+        fmpz_mpoly_ctx_t ctx;
+
+        fmpz_mpoly_ctx_init(ctx, 3, ORD_LEX);
+
+        fmpz_init(A1);
+        fmpz_mpoly_init(B, ctx);
+        fmpz_mpoly_init(A, ctx);
+        for (i = 0; i < 3; i++)
+        {
+            Cp[i] = C + i;
+            fmpz_init(C + i);
+        }
+
+        fmpz_mpoly_set_str_pretty(B,
+                "1 + x1*x2^2 + x2^9999999999999999999999999*x3^9", NULL, ctx);
+
+        fmpz_set_si(C + 0, 2);
+        fmpz_set_si(C + 1, 2);
+        fmpz_set_si(C + 2, 2);
+        if (fmpz_mpoly_evaluate_all_fmpz(A1, B, Cp, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example 1\n", i);
+            flint_abort();
+        }
+
+        if (fmpz_mpoly_evaluate_one_fmpz(A, B, 1, C + 1, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example 2\n", i);
+            flint_abort();
+        }
+
+        fmpz_set_si(C + 0, 1);
+        fmpz_set_si(C + 1, 1);
+        fmpz_set_si(C + 2, 1);
+        if (!fmpz_mpoly_evaluate_all_fmpz(A1, B, Cp, ctx) ||
+            !fmpz_equal_si(A1, 3))
+        {
+            printf("FAIL\n");
+            flint_printf("Check example 3\n", i);
+            flint_abort();
+        }
+
+        if (!fmpz_mpoly_evaluate_one_fmpz(A, B, 1, C + 1, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check example 4\n", i);
+            flint_abort();
+        }
+
+        fmpz_mpoly_set_str_pretty(B, "1 + x1 + x3^9", NULL, ctx);
+        if (!fmpz_mpoly_equal(A, B, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check example 4 equality\n", i);
+            flint_abort();
+        }
+
+        fmpz_clear(A1);
+        fmpz_mpoly_clear(B, ctx);
+        fmpz_mpoly_clear(A, ctx);
+        for (i = 0; i < 3; i++)
+            fmpz_clear(C + i);
+
+        fmpz_mpoly_ctx_clear(ctx);
+    }
 
 
     /* Check repeated evalone matches evalall */
@@ -71,11 +144,22 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx);
-            fmpz_mpoly_evaluate_all_fmpz(fe, f, vals, ctx);
+
+            if (!fmpz_mpoly_evaluate_all_fmpz(fe, f, vals, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                flint_abort();
+            }
 
             for (v = 0; v < nvars; v++)
             {
-                fmpz_mpoly_evaluate_one_fmpz(f, f, perm[v], vals[perm[v]], ctx);
+                if (!fmpz_mpoly_evaluate_one_fmpz(f, f, perm[v], vals[perm[v]], ctx))
+                {
+                    printf("FAIL\n");
+                    flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                    flint_abort();
+                }
                 fmpz_mpoly_assert_canonical(f, ctx);
             }
             if (!fmpz_mpoly_equal_fmpz(f, fe, ctx))
@@ -149,11 +233,22 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx);
-            fmpz_mpoly_evaluate_all_fmpz(fe, f, vals, ctx);
+            if (!fmpz_mpoly_evaluate_all_fmpz(fe, f, vals, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                flint_abort();
+            }
 
             for (v = 0; v < nvars; v++)
             {
-                fmpz_mpoly_evaluate_one_fmpz(f, f, perm[v], vals[perm[v]], ctx);
+                if (!fmpz_mpoly_evaluate_one_fmpz(f, f, perm[v], vals[perm[v]], ctx))
+                {
+                    printf("FAIL\n");
+                    flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                    flint_abort();
+                }
+
                 fmpz_mpoly_assert_canonical(f, ctx);
             }
             if (!fmpz_mpoly_equal_fmpz(f, fe, ctx))
@@ -226,9 +321,14 @@ main(void)
             fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
             fmpz_mpoly_add(fg, f, g, ctx);
 
-            fmpz_mpoly_evaluate_all_fmpz(fe, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz(ge, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz(fge, fg, vals, ctx);
+            if (!fmpz_mpoly_evaluate_all_fmpz(fe, f, vals, ctx) ||
+                !fmpz_mpoly_evaluate_all_fmpz(ge, g, vals, ctx) ||
+                !fmpz_mpoly_evaluate_all_fmpz(fge, fg, vals, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                flint_abort();
+            }
 
             fmpz_add(t, fe, ge);
             if (!fmpz_equal(t, fge))
@@ -304,9 +404,14 @@ main(void)
             fmpz_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
             fmpz_mpoly_mul_johnson(fg, f, g, ctx);
 
-            fmpz_mpoly_evaluate_all_fmpz(fe, f, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz(ge, g, vals, ctx);
-            fmpz_mpoly_evaluate_all_fmpz(fge, fg, vals, ctx);
+            if (!fmpz_mpoly_evaluate_all_fmpz(fe, f, vals, ctx) ||
+                !fmpz_mpoly_evaluate_all_fmpz(ge, g, vals, ctx) ||
+                !fmpz_mpoly_evaluate_all_fmpz(fge, fg, vals, ctx))
+            {
+                printf("FAIL\n");
+                flint_printf("Check evaluations success\ni: %wd  j: %wd\n", i, j);
+                flint_abort();
+            }
 
             fmpz_mul(t, fe, ge);
             if (!fmpz_equal(t, fge))

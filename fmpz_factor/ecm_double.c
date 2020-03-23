@@ -29,7 +29,7 @@ fmpz_factor_ecm_double(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
 {
     if (flint_mpn_zero_p(z0, ecm_inf->n_size))
     {
-        mpn_copyi(x, x0, ecm_inf->n_size);
+        flint_mpn_copyi(x, x0, ecm_inf->n_size);
         mpn_zero(z, ecm_inf->n_size);
         return;
     }

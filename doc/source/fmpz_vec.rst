@@ -375,7 +375,7 @@ Sums and products
     Uses binary splitting.
 
 
-Reduction mod $p$
+Reduction mod `p`
 --------------------------------------------------------------------------------
 
 

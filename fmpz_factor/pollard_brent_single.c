@@ -71,7 +71,7 @@ flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_p
     m = 100;
     iter = 1;
     do {
-        mpn_copyi(x, y, n_size);
+        flint_mpn_copyi(x, y, n_size);
         k = 0;
 
         for (i = 0; i < iter; i++)
@@ -82,7 +82,7 @@ flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_p
             if (m < minval)
                 minval = m;
 
-            mpn_copyi(ys, y, n_size);
+            flint_mpn_copyi(ys, y, n_size);
 
             for (i = 0; i < minval; i++)
             {
@@ -100,7 +100,7 @@ flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_p
                 gcdlimbs = flint_mpn_gcd_full(factor, q, n_size, n, n_size);
             else
             {
-                mpn_copyi(factor, n, n_size);
+                flint_mpn_copyi(factor, n, n_size);
                 gcdlimbs = n_size;
             }
 
@@ -131,7 +131,7 @@ flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_p
                 gcdlimbs = flint_mpn_gcd_full(factor, q, n_size, n, n_size);
             else
             {
-                mpn_copyi(factor, n, n_size);
+                flint_mpn_copyi(factor, n, n_size);
                 gcdlimbs = n_size;
             }
 
@@ -219,7 +219,7 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     if (normbits)
         mpn_lshift(n, temp, n_size, normbits);
     else
-        mpn_copyi(n, temp, n_size);
+        flint_mpn_copyi(n, temp, n_size);
 
     flint_mpn_preinvn(ninv, n, n_size);
 
@@ -270,9 +270,9 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     else
     {
         temp = COEFF_TO_PTR(*yi)->_mp_d;
-        mpn_copyi(y, temp, n_size);
+        flint_mpn_copyi(y, temp, n_size);
         temp = COEFF_TO_PTR(*ai)->_mp_d;
-        mpn_copyi(a, temp, n_size);
+        flint_mpn_copyi(a, temp, n_size);
     }
 
     ret = flint_mpn_factor_pollard_brent_single(fac->_mp_d, n, ninv, a, y, n_size, normbits, max_iters);
