@@ -53,7 +53,8 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     bits and possibly one additional cofactor, which may or may not be prime.
 
     If the number is definitely factored fully, the return value is `1`,
-    otherwise the final factor is composite and needs to be factored further.
+    otherwise the final factor (which may have exponent greater than `1`)
+    is composite and needs to be factored further.
 
     If the number has a factor of around the given number of bits, there is
     at least a two-thirds chance of finding it. Smaller factors should be

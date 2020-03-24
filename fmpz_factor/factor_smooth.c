@@ -161,55 +161,76 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits)
             _fmpz_factor_append(factor, n2, 1);
 
             ret = 1; 
-        } else if (bits >= 16) /* trial factored already up to 15 bits */
+        } else
         {
-            int found;
-            flint_rand_t state;
+            fmpz_t root;
 
-            fmpz_init(f);
-            flint_randinit(state);
+            fmpz_init(root);
 
-            /* currently only tuning values up to factors of 100 bits */
-            bits = FLINT_MIN(bits, 100);
-            bits2 = (bits + 1)/2;
+            exp = fmpz_is_perfect_power(root, n2);
 
-            /* tuning is in increments of 2 bits, start with 16 bits */
-            for (i = 9 + (bits2 % 3); i <= bits2; i += 3)
+            if (exp != 0)
             {
-                found = fmpz_factor_ecm(f, ecm_tuning[i][2],
+                fmpz_factor_t fac;
+
+                fmpz_factor_init(fac);
+
+                ret = fmpz_factor_smooth(fac, root, bits);
+                fmpz_set_ui(n2, 1);
+
+                _fmpz_factor_concat(factor, fac, exp);
+
+                fmpz_factor_clear(fac);
+            } else if (bits >= 16) /* trial factored already up to 15 bits */
+            {
+                int found;
+                flint_rand_t state;
+
+                fmpz_init(f);
+                flint_randinit(state);
+
+                /* currently only tuning values up to factors of 100 bits */
+                bits = FLINT_MIN(bits, 100);
+                bits2 = (bits + 1)/2;
+
+                /* tuning is in increments of 2 bits, start with 16 bits */
+                for (i = 9 + (bits2 % 3); i <= bits2; i += 3)
+                {
+                    found = fmpz_factor_ecm(f, ecm_tuning[i][2],
                             ecm_tuning[i][1], ecm_tuning[i][1]*100, state, n2);
 
-                if (found != 0)
-                {
-                    fmpz_tdiv_q(n2, n2, f);
-
-                    fmpz_factor_no_trial(factor, f);
-
-                    /* if what remains is below the bound, just factor it */
-                    if (fmpz_sizeinbase(n2, 2) < bits)
+                    if (found != 0)
                     {
-                       fmpz_factor_no_trial(factor, n2);
+                        fmpz_tdiv_q(n2, n2, f);
 
-                       ret = 1;
+                        fmpz_factor_no_trial(factor, f);
 
-                       break;
+                        /* if what remains is below the bound, just factor it */
+                        if (fmpz_sizeinbase(n2, 2) < bits)
+                        {
+                            fmpz_factor_no_trial(factor, n2);
+
+                            ret = 1;
+
+                            break;
+                        }
+
+                        if (fmpz_is_prime(n2))
+                        {
+                            _fmpz_factor_append(factor, n2, 1);
+
+                            ret = 1;
+
+                            break;
+                        }
+
+                        i--; /* redo with the same parameters if factor found */
                     }
-
-                    if (fmpz_is_prime(n2))
-                    {
-                       _fmpz_factor_append(factor, n2, 1);
-
-                       ret = 1;
-
-                       break;
-                    }
-
-                    i--; /* redo with the same parameters if factor found */
                 }    
-            }
 
-            flint_randclear(state);
-            fmpz_clear(f);
+                flint_randclear(state);
+                fmpz_clear(f);
+            }
         }
 
         if (ret != 1 && !fmpz_is_one(n2))
