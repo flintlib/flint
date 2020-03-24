@@ -27,6 +27,7 @@ if (WITH_NTL)
 endif()
 find_package(PythonInterp REQUIRED)
 
+
 if(MSVC)
     find_package(PThreads REQUIRED)
 else()
@@ -303,4 +304,17 @@ if(BUILD_TESTING)
             )
         endforeach()
     endforeach ()
+endif()
+
+
+if(BUILD_DOCS)
+    find_package(Sphinx REQUIRED)
+    file(GLOB DOC_SOURCES doc/source/*.rst)
+    add_custom_target(html
+        COMMAND ${SPHINX_EXECUTABLE} -b html "${CMAKE_SOURCE_DIR}/doc/source" "${CMAKE_BINARY_DIR}/html"
+        SOURCES ${DOC_SOURCES})  
+    add_custom_target(latex
+        COMMAND ${SPHINX_EXECUTABLE} -b latex "${CMAKE_SOURCE_DIR}/doc/source" "${CMAKE_BINARY_DIR}/latex"
+        SOURCES ${DOC_SOURCES})  
+    add_custom_target(pdf DEPENDS latex COMMAND make WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/latex") 
 endif()
