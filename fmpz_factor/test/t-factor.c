@@ -92,8 +92,6 @@ int main(void)
     mpz_t y1;
     FLINT_TEST_INIT(state);
 
-    srand(1234); /* ensure qsieve doesn't use same filename as other tests */
-
     flint_printf("factor....");
     fflush(stdout);
 

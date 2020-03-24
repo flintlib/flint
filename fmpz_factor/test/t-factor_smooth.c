@@ -92,8 +92,6 @@ int main(void)
     mpz_t y1;
     FLINT_TEST_INIT(state);
 
-    srand(4321); /* ensure qsieve doesn't use same filename as other tests */
-
     flint_printf("factor_smooth....");
     fflush(stdout);
 
