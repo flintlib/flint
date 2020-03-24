@@ -494,7 +494,7 @@ int qsieve_process_relation(qs_t qs_inf)
     relation_t * rlist;
     int done = 0;
   
-    qs_inf->siqs = fopen("siqs.dat", "r");
+    qs_inf->siqs = fopen(qs_inf->fname, "r");
 
 #if QS_DEBUG & 64
     printf("Getting relations\n");
@@ -573,7 +573,7 @@ int qsieve_process_relation(qs_t qs_inf)
     {
        qs_inf->edges -= 100;
        done = 0;
-       qs_inf->siqs = fopen("siqs.dat", "a");
+       qs_inf->siqs = fopen(qs_inf->fname, "a");
     } else
     {
        done = 1;

@@ -17,7 +17,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-void check(fmpz_t n)
+void checkb(fmpz_t n, slong bits)
 {
     fmpz_factor_t factor;
     fmpz_t m;
@@ -26,7 +26,7 @@ void check(fmpz_t n)
     fmpz_factor_init(factor);
     fmpz_init(m);
 
-    fmpz_factor(factor, n);
+    fmpz_factor_smooth(factor, n, bits, 0);
     fmpz_factor_expand(m, factor);
 
     if (!fmpz_equal(n, m))
@@ -92,9 +92,9 @@ int main(void)
     mpz_t y1;
     FLINT_TEST_INIT(state);
 
-    srand(1234); /* ensure qsieve doesn't use same filename as other tests */
+    srand(4321); /* ensure qsieve doesn't use same filename as other tests */
 
-    flint_printf("factor....");
+    flint_printf("factor_smooth....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -102,21 +102,21 @@ int main(void)
 
     /* Some corner cases */
     fmpz_set_ui(x, UWORD_MAX);
-    check(x);
+    checkb(x, 32);
     fmpz_set_si(x, WORD_MAX);
-    check(x);
+    checkb(x, 32);
     fmpz_set_si(x, WORD_MIN);
-    check(x);
+    checkb(x, 32);
     fmpz_set_si(x, COEFF_MAX);
-    check(x);
+    checkb(x, 32);
     fmpz_set_si(x, COEFF_MIN);
-    check(x);
+    checkb(x, 32);
 
     /* Small integers */
     for (i = -10000; i < 10000; i++)
     {
         fmpz_set_si(x, i);
-        check(x);
+        checkb(x, 16);
     }
 
     /* Powers */
@@ -126,7 +126,7 @@ int main(void)
         {
             fmpz_set_ui(x, i);
             fmpz_pow_ui(x, x, j);
-            check(x);
+            checkb(x, 10);
         }
     }
 
@@ -135,7 +135,7 @@ int main(void)
     {
         flint_mpz_fac_ui(y1, i);
         fmpz_set_mpz(x, y1);
-        check(x);
+        checkb(x, 12);
     }
 
     /* Powers of factorials */
@@ -146,7 +146,7 @@ int main(void)
             flint_mpz_fac_ui(y1, i);
             fmpz_set_mpz(x, y1);
             fmpz_pow_ui(x, x, j);
-            check(x);
+            checkb(x, 12);
         }
     }
 
@@ -156,45 +156,24 @@ int main(void)
         fmpz_set_ui(x, n_randtest(state));
         if (n_randint(state, 2))
             fmpz_neg(x, x);
-        check(x);
+        checkb(x, 32);
     }
 
     /* Large negative integers */
     fmpz_set_ui(x, 10);
     fmpz_pow_ui(x, x, 100);
     fmpz_neg(x, x);
-    check(x);
+    checkb(x, 8);
     flint_mpz_fac_ui(y1, 50);
     mpz_neg(y1, y1);
     fmpz_set_mpz(x, y1);
-    check(x);
+    checkb(x, 8);
 
     mpz_clear(y1);
 
     fmpz_init(y);
     fmpz_init(z);
     fmpz_init(n);
-
-    for (i = 0; i < 20; i++) /* Test random n, two factors */
-    {
-       randprime(x, state, 50);
-       randprime(y, state, 50);
-
-       fmpz_mul(n, x, y);
-
-       fmpz_factor_init(factors);
-
-       fmpz_factor(factors, n);
-
-       if (factors->num < 2)
-       {
-          flint_printf("FAIL:\n");
-          flint_printf("%ld factors found\n", factors->num);
-          abort();
-       }
-
-       fmpz_factor_clear(factors);
-    }
 
     for (i = 0; i < 20; i++) /* Test random n, three factors */
     {
@@ -207,7 +186,7 @@ int main(void)
 
        fmpz_factor_init(factors);
 
-       fmpz_factor(factors, n);
+       fmpz_factor_smooth(factors, n, 60, 1);
 
        if (factors->num < 3)
        {
@@ -230,7 +209,7 @@ int main(void)
 
        fmpz_factor_init(factors);
 
-       fmpz_factor(factors, n);
+       fmpz_factor_smooth(factors, n, 20, 1);
 
        if (factors->num < 3 && !fmpz_equal(x, y))
        {
@@ -250,7 +229,7 @@ int main(void)
 
        fmpz_factor_init(factors);
 
-       fmpz_factor(factors, n);
+       fmpz_factor_smooth(factors, n, 60, 1);
 
        if (factors->num < 1)
        {
@@ -271,7 +250,7 @@ int main(void)
 
        fmpz_factor_init(factors);
 
-       fmpz_factor(factors, n);
+       fmpz_factor_smooth(factors, n, 60, 1);
 
        if (factors->num < 1)
        {
