@@ -38,7 +38,16 @@ static slong ecm_tuning[][3] =
     {100, 470000, 430} 
 };
 
-int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits)
+int _is_prime(const fmpz_t n, int proved)
+{
+    if (proved)
+        return fmpz_is_prime(n);
+    else
+	return fmpz_is_probabprime(n);
+}
+
+int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
+		                                        slong bits, int proved)
 {
     ulong exp;
     mp_limb_t p;
@@ -156,7 +165,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits)
         flint_mpn_copyi(data->_mp_d, xd, xsize);
         data->_mp_size = xsize;
 
-        if (fmpz_is_prime(n2))
+        if (_is_prime(n2, proved))
         {
             _fmpz_factor_append(factor, n2, 1);
 
@@ -175,7 +184,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits)
 
                 fmpz_factor_init(fac);
 
-                ret = fmpz_factor_smooth(fac, root, bits);
+                ret = fmpz_factor_smooth(fac, root, bits, proved);
                 fmpz_set_ui(n2, 1);
 
                 _fmpz_factor_concat(factor, fac, exp);
@@ -215,7 +224,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits)
                             break;
                         }
 
-                        if (fmpz_is_prime(n2))
+                        if (_is_prime(n2, proved))
                         {
                             _fmpz_factor_append(factor, n2, 1);
 

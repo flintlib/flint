@@ -52,7 +52,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 
          fmpz_factor_init(fac3);
 
-	 done = fmpz_factor_smooth(fac3, n, FLINT_MAX(bits/3 - 17, 2));
+	 done = fmpz_factor_smooth(fac3, n, FLINT_MAX(bits/3 - 17, 2), 1);
 
          if (!done)
 	 {
