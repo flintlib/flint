@@ -75,9 +75,9 @@ set(HEADERS
 )
 
 foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
-    file(GLOB TEMP "${build_dir}/*.c")
+    file(GLOB TEMP RELATIVE "${CMAKE_SOURCE_DIR}" "${build_dir}/*.c")
     list(APPEND SOURCES ${TEMP})
-    file(GLOB TEMP "${build_dir}/*.h")
+    file(GLOB TEMP RELATIVE "${CMAKE_SOURCE_DIR}" "${build_dir}/*.h")
     list(APPEND HEADERS ${TEMP})
 endforeach ()
 
