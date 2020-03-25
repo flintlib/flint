@@ -174,30 +174,31 @@ typedef struct qs_s
                        RELATION DATA
    ***************************************************************************/
 
-   FILE * siqs;          /* pointer to file for storing relations */
+   FILE * siqs;           /* pointer to file for storing relations */
+   char * fname;          /* name of file used for relations */
 
-   slong full_relation;  /* number of full relations */
-   slong num_cycles;     /* number of possible full relations from partials */
+   slong full_relation;   /* number of full relations */
+   slong num_cycles;      /* number of possible full relations from partials */
 
-   slong vertices;       /* number of different primes in partials */
-   slong components;     /* equal to 1 */
-   slong edges;          /* total number of partials */
+   slong vertices;        /* number of different primes in partials */
+   slong components;      /* equal to 1 */
+   slong edges;           /* total number of partials */
 
-   slong table_size;     /* size of table */
-   hash_t * table;       /* store 'prime' occurring in partial */
+   slong table_size;      /* size of table */
+   hash_t * table;        /* store 'prime' occurring in partial */
    mp_limb_t * hash_table;  /* to keep track of location of primes in 'table' */
 
-   slong extra_rels;     /* number of extra relations beyond num_primes */
-   slong max_factors;    /* maximum number of factors a relation can have */
+   slong extra_rels;      /* number of extra relations beyond num_primes */
+   slong max_factors;     /* maximum number of factors a relation can have */
 
-   fmpz * Y_arr;         /* array of Y's corresponding to relations */
-   slong * curr_rel;     /* current relation in array of relations */
-   slong * relation;     /* relation array */
+   fmpz * Y_arr;          /* array of Y's corresponding to relations */
+   slong * curr_rel;      /* current relation in array of relations */
+   slong * relation;      /* relation array */
 
-   slong buffer_size;    /* size of buffer of relations */
-   slong num_relations;  /* number of relations so far */
+   slong buffer_size;     /* size of buffer of relations */
+   slong num_relations;   /* number of relations so far */
 
-   ulong small_factor;   /* small factor found when merging relations */
+   ulong small_factor;    /* small factor found when merging relations */
 
    /***************************************************************************
                        LINEAR ALGEBRA DATA

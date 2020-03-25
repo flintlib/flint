@@ -27,6 +27,7 @@ if (WITH_NTL)
 endif()
 find_package(PythonInterp REQUIRED)
 
+
 if(MSVC)
     find_package(PThreads REQUIRED)
 else()
@@ -42,7 +43,7 @@ set(BUILD_DIRS
     aprcl ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly 
     fmpq_poly fmpz_mat fmpz_lll mpfr_vec mpfr_mat mpf_vec mpf_mat nmod_vec nmod_poly 
     nmod_poly_factor arith mpn_extras nmod_mat fmpq fmpq_vec fmpq_mat padic 
-    fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly 
+    fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_mat 
     fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve 
     double_extras d_vec d_mat padic_poly padic_mat qadic  
     fq fq_vec fq_mat fq_poly fq_poly_factor
@@ -303,4 +304,17 @@ if(BUILD_TESTING)
             )
         endforeach()
     endforeach ()
+endif()
+
+
+if(BUILD_DOCS)
+    find_package(Sphinx REQUIRED)
+    file(GLOB DOC_SOURCES doc/source/*.rst)
+    add_custom_target(html
+        COMMAND ${SPHINX_EXECUTABLE} -b html "${CMAKE_SOURCE_DIR}/doc/source" "${CMAKE_BINARY_DIR}/html"
+        SOURCES ${DOC_SOURCES})  
+    add_custom_target(latex
+        COMMAND ${SPHINX_EXECUTABLE} -b latex "${CMAKE_SOURCE_DIR}/doc/source" "${CMAKE_BINARY_DIR}/latex"
+        SOURCES ${DOC_SOURCES})  
+    add_custom_target(pdf DEPENDS latex COMMAND make WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/latex") 
 endif()
