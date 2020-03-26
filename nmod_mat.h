@@ -192,6 +192,13 @@ void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c
 
 /* Matrix multiplication */
 
+NMOD_MAT_INLINE
+void nmod_mat_mul_vec(mp_ptr y, const nmod_mat_t A, const mp_ptr x) {
+    slong i;
+    slong limbs = _nmod_vec_dot_bound_limbs(A->c, A->mod);
+    for(i=0; i<A->r; ++i) 
+        y[i] = _nmod_vec_dot(A->rows[i], x, A->c, A->mod, limbs);
+}
 FLINT_DLL void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
 FLINT_DLL int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
