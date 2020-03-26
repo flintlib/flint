@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 William Hart
+    Copyright (C) 2010,2011 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,13 +16,16 @@
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 
-void nmod_sparse_mat_from_entries(nmod_sparse_mat_t M, slong * rows, slong * cols, mp_limb_t * vals, slong nnz)
+
+void
+nmod_sparse_mat_init(nmod_sparse_mat_t mat, slong rows, mp_limb_t n)
 {
-    slong r, i, j;
-    for (r = i = 0; r < M->r; ++r, i = j)
-    {
-        M->rows[r].nnz = 0;
-        for (j = i; j < nnz && rows[j]==r; ++j);
-        nmod_sparse_vec_from_entries(&M->rows[r], cols+i, vals+i, j-i);
+    memset(mat, 0, sizeof(*mat));
+    mat->r = rows;
+    mat->c = 0;
+    if(rows > 0) {
+        mat->row_starts = flint_calloc(rows, rows*sizeof(*mat->row_starts));
+        mat->row_nnz = flint_calloc(rows, rows*sizeof(*mat->row_nnz));
     }
+    _nmod_sparse_mat_set_mod(mat, n);
 }

@@ -66,6 +66,7 @@ main(void)
         if (!nmod_sparse_mat_equal(A, B))
         {
             flint_printf("FAIL: A != B\n");
+<<<<<<< HEAD
             flint_printf("A = ");
             nmod_sparse_mat_print_pretty(A);
             flint_printf("B = ");
@@ -81,6 +82,18 @@ main(void)
             nmod_sparse_mat_print_pretty(A);
             flint_printf("C = ");
             nmod_sparse_mat_print_pretty(C);
+=======
+            abort();
+        }
+        /* Construct C from rows of A */
+        for(i=0; i<A->r; ++i) {
+            nmod_sparse_mat_append_row(C, i, cols + A->row_starts[i], vals + A->row_starts[i], A->row_nnz[i]);
+        }
+
+        if (!nmod_sparse_mat_equal(A, C))
+        {
+            flint_printf("FAIL: A != C\n");
+>>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
             abort();
         }
         flint_free(rows);
@@ -88,6 +101,10 @@ main(void)
         flint_free(vals);
         nmod_sparse_mat_clear(A);
         nmod_sparse_mat_clear(B);
+<<<<<<< HEAD
+=======
+        nmod_sparse_mat_clear(C);
+>>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
     }
 
     FLINT_TEST_CLEANUP(state);

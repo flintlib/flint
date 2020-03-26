@@ -15,13 +15,12 @@
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 
-void nmod_sparse_mat_from_entries(nmod_sparse_mat_t M, slong * rows, slong * cols, mp_limb_t * vals, slong nnz)
+void
+nmod_sparse_mat_zero(nmod_sparse_mat_t mat)
 {
-    slong r, i, j;
-    for (r = i = 0; r < M->r; ++r, i = j)
-    {
-        M->rows[r].nnz = 0;
-        for (j = i; j < nnz && rows[j]==r; ++j);
-        nmod_sparse_vec_from_entries(&M->rows[r], cols+i, vals+i, j-i);
-    }
+    memset(mat->row_nnz, 0, mat->r*sizeof(*mat->row_nnz));
+    memset(mat->row_starts, 0, mat->r*sizeof(*mat->row_starts));
+    flint_free(mat->entries);
+    mat->entries = NULL;
+    mat->nnz = 0;
 }
