@@ -18,6 +18,16 @@
 #include <inttypes.h>
 #define _STDC_FORMAT_MACROS
 #include <time.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <sys/types.h>
+#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
+#include <unistd.h>
+#endif
+#if defined (__WIN32) && !defined(__CYGWIN__)
+#include <windows.h>
+#endif
 
 int compare_facs(const void * a, const void * b)
 {
@@ -46,6 +56,7 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
     fmpz_t temp, temp2, X, Y;
     slong num_facs;
     fmpz * facs;
+    int nchars;
 
     if (fmpz_sgn(n) < 0)
     {
@@ -190,7 +201,15 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
 
     pthread_mutex_init(&qs_inf->mutex, NULL);
 
-    qs_inf->siqs = fopen("siqs.dat", "w");
+#if defined (__WIN32) && !defined(__CYGWIN__)
+    srand((int) GetCurrentProcessId());
+#else
+    srand((int) getpid());
+#endif
+    nchars = sprintf(qs_inf->fname, "%d", (int) rand());
+    strcat(qs_inf->fname + nchars, "siqs.dat");
+
+    qs_inf->siqs = fopen(qs_inf->fname, "w");
 
     for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
     {
@@ -346,7 +365,7 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
 
                     _fmpz_vec_clear(facs, 100);
 
-                    qs_inf->siqs = fopen("siqs.dat", "w");
+                    qs_inf->siqs = fopen(qs_inf->fname, "w");
                     qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
                     goto more_primes; /* factoring failed, may need more primes */
                 }
@@ -423,10 +442,10 @@ cleanup:
     flint_give_back_threads(qs_inf->handles, qs_inf->num_handles);
 
     flint_free(sieve);
+    remove(qs_inf->fname);
     qsieve_clear(qs_inf);
     qsieve_linalg_clear(qs_inf);
     qsieve_poly_clear(qs_inf);
-    remove("siqs.dat");
     fmpz_clear(X);
     fmpz_clear(Y);
     fmpz_clear(temp);

@@ -271,7 +271,10 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     flint_free(ecm_inf->prime_table);
 
     fmpz_factor_ecm_clear(ecm_inf);
-    
+   
+    fmpz_clear(nm8);
+    fmpz_clear(sig);
+
     TMP_END;
 
     return ret;

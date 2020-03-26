@@ -52,7 +52,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 
          fmpz_factor_init(fac3);
 
-	 done = fmpz_factor_smooth(fac3, n, FLINT_MAX(bits/3 - 17, 2));
+	 done = fmpz_factor_smooth(fac3, n, FLINT_MAX(bits/3 - 17, 2), 1);
 
          if (!done)
 	 {
@@ -62,6 +62,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 	    
 	    /* take out cofactor and factor it */
 	    fmpz_set(n2, fac3->p + fac3->num - 1);
+	    exp = fac3->exp[fac3->num - 1];
 	    fac3->exp[fac3->num - 1] = 0;
 	    fac3->num--;
 
@@ -75,7 +76,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 
                fmpz_factor_no_trial(fac2, fac->p + i);
 
-               _fmpz_factor_concat(fac3, fac2, fac->exp[i]);
+               _fmpz_factor_concat(fac3, fac2, exp*fac->exp[i]);
  
                fmpz_factor_clear(fac2);
             }

@@ -16,6 +16,8 @@ void qsieve_init(qs_t qs_inf, const fmpz_t n)
 {
     slong i;
 
+    qs_inf->fname = (char *) flint_malloc(20); /* space for filename */
+
     /* store n in struct */
     fmpz_init_set(qs_inf->n, n);
 

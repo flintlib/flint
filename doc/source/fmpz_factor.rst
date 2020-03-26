@@ -47,13 +47,14 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     Factors `n` into prime numbers. If `n` is zero or negative, the
     sign field of the ``factor`` object will be set accordingly.
 
-.. function:: int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits)
+.. function:: int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n, slong bits, int proved)
 
     Factors `n` into prime numbers up to approximately the given number of
     bits and possibly one additional cofactor, which may or may not be prime.
 
     If the number is definitely factored fully, the return value is `1`,
-    otherwise the final factor is composite and needs to be factored further.
+    otherwise the final factor (which may have exponent greater than `1`)
+    is composite and needs to be factored further.
 
     If the number has a factor of around the given number of bits, there is
     at least a two-thirds chance of finding it. Smaller factors should be
@@ -62,6 +63,10 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     The amount of time spent factoring can be controlled by lowering or
     increasing ``bits``. However, the quadratic sieve may be faster if
     ``bits`` is set to more than one third of the number of bits of `n`.
+
+    If ``proved`` is set to `1` the function will prove all factors prime
+    (other than the last factor, if the return value is `0`), otherwise they
+    will be probable primes.
 
     The function uses trial factoring and the elliptic curve method.
 
