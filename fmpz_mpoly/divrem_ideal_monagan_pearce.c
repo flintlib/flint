@@ -77,6 +77,8 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
     small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) + FLINT_BIT_COUNT(len3) + FLINT_BITS - 2)
           && FLINT_ABS(bits3) <= FLINT_BITS - 2;
 
+    small = 0;
+
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap1_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap1_s));
     store = store_base = (slong *) TMP_ALLOC(3*len3*sizeof(mpoly_nheap_t *));
@@ -390,6 +392,8 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
     small = FLINT_ABS(bits2) <= (FLINT_ABS(bits3) +
            FLINT_BIT_COUNT(len3) + FLINT_BITS - 2) &&
            FLINT_ABS(bits3) <= FLINT_BITS - 2;
+
+    small = 0;
 
     next_loc = len3 + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap_s *) TMP_ALLOC((len3 + 1)*sizeof(mpoly_heap_s));
