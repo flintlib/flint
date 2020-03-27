@@ -200,6 +200,7 @@ FLINT_DLL void nmod_sparse_mat_invert_cols(nmod_sparse_mat_t mat, slong * perm);
 FLINT_DLL void nmod_sparse_mat_apply_permutation(nmod_sparse_mat_t A, slong * P, slong n);
  */
 /* Nonsingular solving */
+int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b, flint_rand_t state);
 
 /* FLINT_DLL int nmod_sparse_mat_solve(nmod_mat_t X, const nmod_sparse_mat_t A, const nmod_mat_t B);
 FLINT_DLL int nmod_sparse_mat_solve_vec(mp_ptr x, const nmod_sparse_mat_t A, mp_srcptr b);
