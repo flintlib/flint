@@ -236,35 +236,40 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
             {
                 fmpz_set_signed_uiuiui(r_coeff + r_len, acc_sm[2], acc_sm[1], acc_sm[0]);
                 r_exp[r_len] = exp;
-                fmpz_set_ui(rs + r_len, 1);
+                fmpz_one(rs + r_len);
                 r_len++;
                 continue;
             }
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
+                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
-                if (rr ==0 && (qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
+                if (rr == 0 && qq <= COEFF_MAX)
                 {
                     _fmpz_demote(q_coeff + q_len);
-                    q_coeff[q_len] = (qq^ds^lc_sign) - (ds^lc_sign);
-                    fmpz_set_ui(qs + q_len, 1);
-                } else
+                    q_coeff[q_len] = qq;
+                    if (ds != lc_sign)
+                        q_coeff[q_len] = -q_coeff[q_len];
+                    fmpz_one(qs + q_len);
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                     goto large_lt_divides;
                 }
-            } else
+            }
+            else
             {
                 small = 0;
                 fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
-
-        } else
+        }
+        else
         {
             if (fmpz_is_zero(acc_lg))
                 continue;
@@ -625,35 +630,40 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
             {
                 fmpz_set_signed_uiuiui(r_coeff + r_len, acc_sm[2], acc_sm[1], acc_sm[0]);
                 mpoly_monomial_set(r_exp + r_len*N, exp, N);
-                fmpz_set_ui(rs + r_len, 1);
+                fmpz_one(rs + r_len);
                 r_len++;
                 continue;
             }
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
+                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
-                if (rr ==0 && (qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
+                if (rr == 0 && qq <= COEFF_MAX)
                 {
                     _fmpz_demote(q_coeff + q_len);
-                    q_coeff[q_len] = (qq^ds^lc_sign) - (ds^lc_sign);
-                    fmpz_set_ui(qs + q_len, 1);
-                } else
+                    q_coeff[q_len] = qq;
+                    if (ds != lc_sign)
+                        q_coeff[q_len] = -q_coeff[q_len];
+                    fmpz_one(qs + q_len);
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                     goto large_lt_divides;
                 }
-            } else
+            }
+            else
             {
                 small = 0;
                 fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
-
-        } else
+        }
+        else
         {
             if (fmpz_is_zero(acc_lg))
                 continue;

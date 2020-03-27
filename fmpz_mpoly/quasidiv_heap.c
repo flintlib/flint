@@ -277,6 +277,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
+                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
@@ -691,6 +692,7 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
+                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);

@@ -253,6 +253,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
+                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
@@ -261,10 +262,12 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                 if (qq == 0)
                     continue;
 
-                if ((qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
+                if (qq <= COEFF_MAX)
                 {
                     _fmpz_demote(q_coeff + q_len);
-                    q_coeff[q_len] = (qq^ds^lc_sign) - (ds^lc_sign);
+                    q_coeff[q_len] = qq;
+                    if (ds != lc_sign)
+                        q_coeff[q_len] = -q_coeff[q_len];
                 }
                 else
                 {
@@ -609,32 +612,38 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
+                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
                 (void) rr;
+
                 if (qq == 0)
-                {
                     continue;
-                }
-                if ((qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
+
+                if (qq <= COEFF_MAX)
                 {
                     _fmpz_demote(q_coeff + q_len);
-                    q_coeff[q_len] = (qq^ds^lc_sign) - (ds^lc_sign);
-                } else
+                    q_coeff[q_len] = qq;
+                    if (ds != lc_sign)
+                        q_coeff[q_len] = -q_coeff[q_len];
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_ui(q_coeff + q_len, qq);
                     if (ds != lc_sign)
                         fmpz_neg(q_coeff + q_len, q_coeff + q_len);
                 }
-            } else
+            }
+            else
             {
                 small = 0;
                 fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
-        } else
+        }
+        else
         {
             if (fmpz_is_zero(acc_lg))
             {
