@@ -38,7 +38,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
     ulong * r_exp = *expr;
     ulong acc_sm[3]; /* for accumulating coefficients */
     ulong mask, exp;
-    ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
+    ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     fmpz_t lc_abs_lg, ns, gcd, acc_lg, r, tp;
     slong bits2, bits3;
     int lt_divides, scaleis1, small;
@@ -93,11 +93,14 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
 
     /* precompute leading cofficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
-    lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN_EXT(poly3[0]);
-    count_leading_zeros(lc_norm, lc_abs);
-    lc_n = lc_abs << lc_norm;
-    invert_limb(lc_i, lc_n);
+    if (small)
+    {
+        lc_abs = FLINT_ABS(poly3[0]);
+        lc_sign = FLINT_SIGN_EXT(poly3[0]);
+        count_leading_zeros(lc_norm, lc_abs);
+        lc_n = lc_abs << lc_norm;
+        invert_limb(lc_i, lc_n);
+    }
 
     while (heap_len > 1)
     {
@@ -364,7 +367,6 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
     slong * store, * store_base;
     mpoly_heap_t * x;
     slong * hind;
-
     fmpz * q_coeff = *polyq;
     fmpz * r_coeff = *polyr;
     ulong * q_exp = *expq;
@@ -374,9 +376,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
     ulong acc_sm[3]; /* for accumulating coefficients */
     slong exp_next;
     ulong mask;
-
-    ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
-
+    ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     fmpz_t lc_abs_lg, ns, gcd, acc_lg, r, tp;
     slong bits2, bits3;
     int lt_divides, scaleis1, small;
@@ -453,11 +453,14 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
 
     /* precompute leading cofficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
-    lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN_EXT(poly3[0]);
-    count_leading_zeros(lc_norm, lc_abs);
-    lc_n = lc_abs << lc_norm;
-    invert_limb(lc_i, lc_n);
+    if (small)
+    {
+        lc_abs = FLINT_ABS(poly3[0]);
+        lc_sign = FLINT_SIGN_EXT(poly3[0]);
+        count_leading_zeros(lc_norm, lc_abs);
+        lc_n = lc_abs << lc_norm;
+        invert_limb(lc_i, lc_n);
+    }
 
     while (heap_len > 1)
     {
