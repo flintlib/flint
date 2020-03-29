@@ -81,22 +81,13 @@ int main(void)
             flint_printf("FAIL: results not equal\n");
             abort();
         }
-<<<<<<< HEAD
 
         nmod_sparse_mat_window_clear(window1);
         nmod_sparse_mat_window_clear(window2);
-=======
->>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
         
         nmod_sparse_mat_clear(A);
         nmod_sparse_mat_clear(B);
         nmod_sparse_mat_clear(C);
-<<<<<<< HEAD
-=======
-
-        nmod_sparse_mat_window_clear(window1);
-        nmod_sparse_mat_window_clear(window2);
->>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
     }
 
 

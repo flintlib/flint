@@ -56,7 +56,6 @@ int main(void)
             nmod_sparse_mat_print_pretty(A);
             flint_printf("B = \n");
             nmod_sparse_mat_print_pretty(B);
-<<<<<<< HEAD
             flint_printf("A | B = \n");
             nmod_sparse_mat_print_pretty(C);
             flint_printf("window1 = \n");
@@ -81,9 +80,6 @@ int main(void)
             flint_printf("B = \n");
             nmod_sparse_mat_print_pretty(B);
             flint_printf("A | B = \n");
-=======
-            flint_printf("A concat_horizontal B = \n");
->>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
             nmod_sparse_mat_print_pretty(C);
             flint_printf("window1 = \n");
             nmod_sparse_mat_print_pretty(window1);
@@ -92,7 +88,6 @@ int main(void)
             flint_printf("FAIL: results not equal\n");
             abort();
         }
-<<<<<<< HEAD
 
         nmod_sparse_mat_window_clear(window1);
         nmod_sparse_mat_window_clear(window2);
@@ -100,15 +95,6 @@ int main(void)
         nmod_sparse_mat_clear(A);
         nmod_sparse_mat_clear(B);
         nmod_sparse_mat_clear(C);
-=======
-         
-        nmod_sparse_mat_clear(A);
-        nmod_sparse_mat_clear(B);
-        nmod_sparse_mat_clear(C);
-
-         nmod_sparse_mat_window_clear(window1);
-        nmod_sparse_mat_window_clear(window2);
->>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
     }
 
 

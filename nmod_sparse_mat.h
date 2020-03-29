@@ -84,7 +84,6 @@ void nmod_sparse_mat_zero(nmod_sparse_mat_t M)
     slong i;
     for (i = 0; i < M->r; ++i) nmod_sparse_vec_zero(&M->rows[i]);
 }
-
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_one(nmod_sparse_mat_t M) 
 {
@@ -92,6 +91,7 @@ void nmod_sparse_mat_one(nmod_sparse_mat_t M)
     for (i = 0; i < M->r; ++i) nmod_sparse_vec_one(&M->rows[i], i);
 }
 
+/* One-time instantiation */
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_set(nmod_sparse_mat_t M, const nmod_sparse_mat_t src) 
 {
@@ -305,6 +305,25 @@ void nmod_sparse_mat_scalar_submul_nmod(nmod_sparse_mat_t O, const nmod_sparse_m
 {
     slong i;
     for (i = 0; i < O->r; ++i) nmod_sparse_vec_scalar_submul_nmod(&O->rows[i], &M->rows[i], &N->rows[i], c, O->mod);
+}
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_addmul(nmod_sparse_mat_t C, const nmod_sparse_mat_t A, const nmod_sparse_mat_t B, mp_limb_t c) 
+{
+    slong i;
+    for(i=0; i<C->r; ++i) nmod_sparse_vec_scalar_addmul(&C->rows[i], &A->rows[i], &B->rows[i], c, C->mod);
+}
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_add(nmod_sparse_mat_t C, const nmod_sparse_mat_t A, const nmod_sparse_mat_t B) 
+{
+    nmod_sparse_mat_addmul(C, A, B, UWORD(1));
+}
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_sub(nmod_sparse_mat_t C, const nmod_sparse_mat_t A, const nmod_sparse_mat_t B) 
+{
+    nmod_sparse_mat_addmul(C, A, B, C->mod.n-UWORD(1));
 }
 
 /* Matrix-vector and matrix-matrix multipliciation */
