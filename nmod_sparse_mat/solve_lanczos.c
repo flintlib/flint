@@ -16,20 +16,22 @@
 #include "nmod_sparse_mat.h"
 
 
-int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b, flint_rand_t state) {
+int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b, flint_rand_t state)
+{
+    slong j, ret;
+    const slong nlimbs = _nmod_vec_dot_bound_limbs(A->c, A->mod);
+    nmod_sparse_mat_t At;
+    mp_ptr w[2], Aw, AtAw, Atb;
+    mp_limb_t delta[2];
+
     _nmod_vec_zero(x, A->c);
 
     /* Construct transpose */
-    nmod_sparse_mat_t At;
     nmod_sparse_mat_init(At, A->c, A->r, A->mod);
     nmod_sparse_mat_transpose(At, A);
 
     /* Construct auxiliary vectors */
     /* Rather than storing the whole sequence of values w_j, we alternate between two vectors */
-    slong j, iter;
-    const slong nlimbs = _nmod_vec_dot_bound_limbs(A->c, A->mod);
-    mp_ptr w[2], Aw, AtAw, Atb;
-    mp_limb_t delta[2];
     w[0] = _nmod_vec_init(A->c);
     w[1] = _nmod_vec_init(A->c);
     Aw = _nmod_vec_init(A->r);
@@ -40,12 +42,13 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_
     /* Make 0th vector random (and -1st vector trivial) */
     _nmod_vec_randtest(w[0], state, A->c, A->mod);
     _nmod_vec_zero(w[1], A->c); delta[1] = 1;  
-    for(j=0; ; j=1-j) {
+    for (j = 0; ; j = 1-j)
+    {
         /* Compute A^T A w_j and check if it is orthogonal to w_j */
         nmod_sparse_mat_mul_vec(Aw, A, w[j]);
         nmod_sparse_mat_mul_vec(AtAw, At, Aw);
         delta[j] = _nmod_vec_dot(w[j], AtAw, A->c, A->mod, nlimbs);
-        if (delta[j]==UWORD(0)) break; // Can't make any more progress
+        if (delta[j] == UWORD(0)) break; /* Can't make any more progress */
 
         /* Update putative solution by <w_j, A^T b>/delta_j * w_j */
         const mp_limb_t wAtb = nmod_div(_nmod_vec_dot(w[j], Atb, A->c, A->mod, nlimbs), delta[j], A->mod);
@@ -63,7 +66,7 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_
     /* Check result */
     nmod_sparse_mat_mul_vec(Aw, A, x);
     nmod_sparse_mat_mul_vec(AtAw, At, Aw);
-    int ret = _nmod_vec_equal(AtAw, Atb, A->c);
+    ret = _nmod_vec_equal(AtAw, Atb, A->c);
 
     /* Clear auxiliary vectors and transpose */
     _nmod_vec_clear(w[0]);

@@ -17,9 +17,10 @@
 
 void nmod_sparse_vec_set(nmod_sparse_vec_t vec, const nmod_sparse_vec_t src) 
 {
-    if(vec==src) return;
-    if(src->nnz == 0) nmod_sparse_vec_clear(vec);
-    else {
+    if (vec==src) return;
+    if (src->nnz == 0) nmod_sparse_vec_clear(vec);
+    else 
+    {
         vec->entries = flint_realloc(vec->entries, src->nnz*sizeof(*vec->entries));
         memcpy(vec->entries, src->entries, src->nnz*sizeof(*vec->entries));
         vec->nnz = src->nnz;

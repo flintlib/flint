@@ -27,7 +27,6 @@ main(void)
     mp_ptr x, x2, b, Atb, Ax, AtAx;
     FLINT_TEST_INIT(state);
     
-
     flint_printf("solving Ax=b....");
     fflush(stdout);
     int niters = 0, nosol = 0, psolved = 0, nusolved = 0;
@@ -37,7 +36,7 @@ main(void)
         r = n_randint(state, 200);
         c = n_randint(state, 200);
         do n = n_randtest_not_zero(state);
-        while(n <= 32 || !n_is_prime(n));
+        while (n <= 32 || !n_is_prime(n));
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r, c, mod);
         nmod_sparse_mat_init(At, c, r, mod);
@@ -55,9 +54,10 @@ main(void)
         nmod_sparse_mat_mul_vec(b, A, x);
         nmod_sparse_mat_mul_vec(Atb, At, b);
         int iter, ret;
-        for(iter=1; iter<=10; ++iter) 
-            if(ret=nmod_sparse_mat_solve_lanczos(x2, A, b, state)) break;
-        if(iter==11) {
+        for (iter=1; iter<=10; ++iter) 
+            if (ret=nmod_sparse_mat_solve_lanczos(x2, A, b, state)) break;
+        if (iter==11)
+        {
             nosol += 1;
             continue;
         }
@@ -68,9 +68,13 @@ main(void)
         {
             flint_printf("FAIL: AtAx != Atb for mod=%wd, got ret %d\n", mod, ret);
             abort();
-        } else if(!_nmod_vec_equal(b, Ax, A->r)) {
+        } 
+        else if (!_nmod_vec_equal(b, Ax, A->r))
+        {
             psolved += 1;
-        } else if(!_nmod_vec_equal(x, x2, A->c)) {
+        } 
+        else if (!_nmod_vec_equal(x, x2, A->c))
+        {
             nusolved += 1;
         }
         flint_free(x);
@@ -81,7 +85,7 @@ main(void)
         flint_free(Atb);
         nmod_sparse_mat_clear(A);
         nmod_sparse_mat_clear(At);
-     }
+    }
     flint_printf("No solution found for %wd/%wd examples\n", nosol, 1000);
     flint_printf("Average number of iters to find solution: %f\n", niters/1000.);
     flint_printf("Pseudo-solution found for %wd/%wd examples\n", psolved, 1000);

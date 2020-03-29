@@ -35,7 +35,7 @@ main(void)
         len = n_randint(state, 50);
         nnz = 2; //n_randint(state, len+1);
         do n = n_randtest_not_zero(state);
-        while(n==UWORD(1));
+        while (n == UWORD(1));
         c = 2; //n_randint(state, n);
         nmod_init(&mod, n);
 

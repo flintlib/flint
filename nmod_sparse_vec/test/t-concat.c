@@ -33,7 +33,7 @@ int main(void)
         len = n_randint(state, 200);
         nnz = n_randint(state, len+1);
         do n = n_randtest_not_zero(state);
-        while(n==UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
 
         nmod_sparse_vec_init(u);

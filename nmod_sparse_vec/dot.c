@@ -15,16 +15,19 @@
 #include "flint.h"
 #include "nmod_sparse_vec.h"
 
-mp_limb_t nmod_sparse_vec_dot(const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod) {
+mp_limb_t nmod_sparse_vec_dot(const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
+{
     slong i, j;
     mp_limb_t ret = UWORD(0);
-    for(i=j=0; i<u->nnz && j<v->nnz; ) {
-        if(u->entries[i].ind == v->entries[j].ind) {
+    for (i = j = 0; i < u->nnz && j < v->nnz; )
+    {
+        if (u->entries[i].ind == v->entries[j].ind)
+        {
             ret = nmod_addmul(ret, u->entries[i].val, v->entries[j].val, mod);
             ++i; ++j;
         }
-        else if(u->entries[i].ind < v->entries[j].ind) ++i;
-        else if(u->entries[i].ind > v->entries[j].ind) ++j;
+        else if (u->entries[i].ind < v->entries[j].ind) ++i;
+        else if (u->entries[i].ind > v->entries[j].ind) ++j;
     }
     return ret;
 }

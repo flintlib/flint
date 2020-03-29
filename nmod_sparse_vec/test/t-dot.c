@@ -37,7 +37,7 @@ main(void)
         len = n_randint(state, 50);
         nnz = n_randint(state, len+1);
         do n = n_randtest_not_zero(state);
-        while(n == UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
 
         nmod_sparse_vec_init(u);
@@ -62,7 +62,8 @@ main(void)
 
         a = nmod_sparse_vec_dot_dense(u, x, mod);
 
-        if (a != b) {
+        if (a != b)
+        {
             flint_printf("Fail: sparse dot dense\n");
             abort();
         }

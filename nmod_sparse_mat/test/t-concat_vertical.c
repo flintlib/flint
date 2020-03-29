@@ -36,7 +36,7 @@ int main(void)
         r2 = n_randint(state, 100);
         c = n_randint(state, 100);
         do n = n_randtest_not_zero(state);
-        while(n == UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r1, c, mod);
         nmod_sparse_mat_init(B, r2, c, mod);

@@ -16,7 +16,8 @@
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 
-void nmod_sparse_mat_window_init(nmod_sparse_mat_t window, const nmod_sparse_mat_t mat, slong r1, slong c1, slong r2, slong c2) {
+void nmod_sparse_mat_window_init(nmod_sparse_mat_t window, const nmod_sparse_mat_t mat, slong r1, slong c1, slong r2, slong c2)
+{
     slong i;
     r2 = FLINT_MIN(r2, mat->r), r1 = FLINT_MIN(r1, r2);
     c2 = FLINT_MIN(c2, mat->c), c1 = FLINT_MIN(c1, c2);
@@ -25,6 +26,6 @@ void nmod_sparse_mat_window_init(nmod_sparse_mat_t window, const nmod_sparse_mat
     window->c = c2-c1;
     window->c_off = c1;
     window->rows = flint_malloc(window->r*sizeof(*window->rows));
-    for(i=0; i<window->r; ++i)
+    for (i = 0; i < window->r; ++i)
         nmod_sparse_vec_window_init(&window->rows[i], &mat->rows[i+r1], c1, c2);
 }

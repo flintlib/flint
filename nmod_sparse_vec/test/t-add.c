@@ -35,7 +35,7 @@ main(void)
         len = n_randint(state, 40);
         nnz = n_randint(state, len+1);
         do n = n_randtest_not_zero(state);
-        while(n == UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
 
         nmod_sparse_vec_init(u);
@@ -56,13 +56,15 @@ main(void)
         }
 
         nmod_sparse_vec_add(u, u, v, mod);
-        if (!nmod_sparse_vec_equal(u, w, 0)) {
+        if (!nmod_sparse_vec_equal(u, w, 0))
+        {
             flint_printf("FAIL: (u += v) != u + v\n");
             abort();
         }
 
         nmod_sparse_vec_sub(u, u, v, mod);
-        if (!nmod_sparse_vec_equal(u, x, 0)) {
+        if (!nmod_sparse_vec_equal(u, x, 0))
+        {
             flint_printf("FAIL: ((u += v) -= v) != u+v-v\n");
             abort();
         }

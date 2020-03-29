@@ -26,7 +26,6 @@ main(void)
     nmod_sparse_mat_t A, B, C, D;
     FLINT_TEST_INIT(state);
     
-
     flint_printf("neg....");
     fflush(stdout);
 
@@ -35,7 +34,7 @@ main(void)
         r = n_randint(state, 200);
         c = n_randint(state, 200);
         do n = n_randtest_not_zero(state);
-        while(n == UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r, c, mod);
         nmod_sparse_mat_init(B, r, c, mod);

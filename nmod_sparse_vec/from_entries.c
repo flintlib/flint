@@ -17,12 +17,13 @@
 
 void nmod_sparse_vec_from_entries(nmod_sparse_vec_t vec, slong * inds, mp_limb_t * vals, slong nnz) 
 {
-    if(nnz == 0) nmod_sparse_vec_clear(vec);
+    if (nnz == 0) nmod_sparse_vec_clear(vec);
     else {
         slong i;
         vec->nnz = nnz;
         vec->entries = flint_realloc(vec->entries, nnz*sizeof(*vec->entries));
-        for(i=0; i<nnz; ++i) {
+        for (i = 0; i < nnz; ++i)
+        {
             vec->entries[i].ind = inds[i];
             vec->entries[i].val = vals[i];
         }

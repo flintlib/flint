@@ -38,7 +38,7 @@ main(void)
         c = n_randint(state, 200);
         k = n_randint(state, 200);
         do n = n_randtest_not_zero(state);
-        while(n == UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r, c, mod);
         nmod_sparse_mat_randtest(A, state, 0, c);
@@ -65,7 +65,8 @@ main(void)
         nmod_sparse_mat_mul_mat(Y, A, X);
         nmod_mat_mul(Y2, B, X);
 
-        if (!nmod_mat_equal(Y, Y2)) {
+        if (!nmod_mat_equal(Y, Y2))
+        {
             flint_printf("Fail: Y != Y2\n");
             abort();
         }
