@@ -124,6 +124,15 @@ mp_limb_t nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
 }
 
 NMOD_VEC_INLINE
+mp_limb_t nmod_addmul(mp_limb_t a, mp_limb_t b, mp_limb_t c, nmod_t mod)
+{
+    if(c==UWORD(1)) return nmod_add(a, b, mod);
+    if(c==mod.n-UWORD(1)) return nmod_sub(a, b, mod);
+    NMOD_ADDMUL(a, b, c, mod);
+    return a;
+}
+
+NMOD_VEC_INLINE
 mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
 {
    if (a)
@@ -208,6 +217,18 @@ void _nmod_vec_swap(mp_ptr a, mp_ptr b, slong length)
         a[i] = b[i];
         b[i] = t;
     }
+}
+
+NMOD_VEC_INLINE
+void _nmod_vec_print_pretty(mp_ptr a, slong length, nmod_t mod)
+{
+    slong i;
+    flint_printf("[");
+    for(i=0; i<length; ++i) {
+        flint_printf("%wd ", a[i]);
+    }
+    flint_printf("]\n");
+    
 }
 
 NMOD_VEC_INLINE
