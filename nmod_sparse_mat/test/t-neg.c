@@ -20,7 +20,10 @@
 int
 main(void)
 {
-    slong m, n, mod, rep;
+    slong rep, r, c, i;
+    mp_limb_t n;
+    nmod_t mod;
+    nmod_sparse_mat_t A, B, C, D;
     FLINT_TEST_INIT(state);
     
 
@@ -29,20 +32,20 @@ main(void)
 
     for (rep = 0; rep < 1000; rep++)
     {
-        nmod_sparse_mat_t A, B, C, D;
+        r = n_randint(state, 200);
+        c = n_randint(state, 200);
+        do n = n_randtest_not_zero(state);
+        while(n == UWORD(1));
+        nmod_init(&mod, n);
+        nmod_sparse_mat_init(A, r, c, mod);
+        nmod_sparse_mat_init(B, r, c, mod);
+        nmod_sparse_mat_init(C, r, c, mod);
+        nmod_sparse_mat_init(D, r, c, mod);
 
-        m = n_randint(state, 200);
-        do
-            mod = n_randlimb(state);
-        while(mod <= UWORD(1));
-
-        nmod_sparse_mat_init(A, m, mod);
-        nmod_sparse_mat_init(B, m, mod);
-        nmod_sparse_mat_init(C, m, mod);
-        nmod_sparse_mat_init(D, m, mod);
-
-        nmod_sparse_mat_randtest(A, state);
-        nmod_sparse_mat_randtest(B, state);
+        nmod_sparse_mat_randtest(A, state, 0, c);
+        nmod_sparse_mat_randtest(B, state, 0, c);
+        nmod_sparse_mat_randtest(C, state, 0, c);
+        nmod_sparse_mat_randtest(D, state, 0, c);
 
         nmod_sparse_mat_sub(C, A, B);
         nmod_sparse_mat_neg(B, B);

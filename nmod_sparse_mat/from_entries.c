@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,26 +15,12 @@
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 
-/* Elements must be ordered by row then col */
-void nmod_sparse_mat_set_from_entries(nmod_sparse_mat_t mat, slong * rows, slong * cols, mp_limb_t * vals, slong nnz) 
+void nmod_sparse_mat_from_entries(nmod_sparse_mat_t mat, slong * rows, slong * cols, mp_limb_t * vals, slong nnz)
 {
-    if(nnz==0) {
-        nmod_sparse_mat_zero(mat);
-        return;
+    slong r, i, j;
+    for(r=i=0; r<mat->r; ++r, i=j) {
+        mat->rows[r].nnz = 0;
+        for(j=i; j<nnz && rows[j]==r; ++j);
+        nmod_sparse_vec_from_entries(&mat->rows[r], cols+i, vals+i, j-i);
     }
-    slong i;
-    mat->entries = flint_realloc(mat->entries, nnz * sizeof(*mat->entries));
-    memset(mat->row_starts, 0, sizeof(*mat->row_starts));
-    memset(mat->row_nnz, 0, sizeof(*mat->row_nnz));
-    mat->c = 0;
-    for(i = 0; i < nnz; i++) {
-        if(i > 0  && rows[i] != rows[i-1]) {
-            mat->row_starts[rows[i]] = i;
-        }
-        mat->entries[i].col = cols[i];
-        mat->entries[i].val = vals[i];
-        mat->row_nnz[rows[i]]++;
-    }
-    _nmod_sparse_mat_set_c(mat);
-    mat->nnz = nnz;
 }

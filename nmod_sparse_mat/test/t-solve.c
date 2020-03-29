@@ -20,7 +20,11 @@
 int
 main(void)
 {
-    slong m, n, mod, rep;
+    slong rep, r, c, i;
+    mp_limb_t n, a;
+    nmod_t mod;
+    nmod_sparse_mat_t A, At;
+    mp_ptr x, x2, b, Atb, Ax, AtAx;
     FLINT_TEST_INIT(state);
     
 
@@ -30,28 +34,24 @@ main(void)
 
     for (rep = 0; rep < 1000; rep++)
     {
-        nmod_sparse_mat_t A, At;
-        mp_ptr x, x2, b, Atb, Ax, AtAx;
+        r = n_randint(state, 200);
+        c = n_randint(state, 200);
+        do n = n_randtest_not_zero(state);
+        while(n <= 32 || !n_is_prime(n));
+        nmod_init(&mod, n);
+        nmod_sparse_mat_init(A, r, c, mod);
+        nmod_sparse_mat_init(At, c, r, mod);
 
-        m = n_randint(state, 20);
-        n = n_randint(state, 20);
-
-        do
-            mod = n_randtest_not_zero(state);
-        while(mod <= 32 || !n_is_prime(mod));
-
-        nmod_sparse_mat_init(A, m, mod);
-        nmod_sparse_mat_randtest(A, state);
-        nmod_sparse_mat_init(At, A->c, mod);
+        nmod_sparse_mat_randtest(A, state, 0, c);
         nmod_sparse_mat_transpose(At, A);
-        x = _nmod_vec_init(A->c);
-        x2 = _nmod_vec_init(A->c);
-        b = _nmod_vec_init(A->r);
-        Ax = _nmod_vec_init(A->r);
-        AtAx = _nmod_vec_init(A->c);
-        Atb = _nmod_vec_init(A->c);
+        x = _nmod_vec_init(c);
+        x2 = _nmod_vec_init(c);
+        b = _nmod_vec_init(r);
+        Ax = _nmod_vec_init(r);
+        AtAx = _nmod_vec_init(c);
+        Atb = _nmod_vec_init(c);
 
-        _nmod_vec_randtest(x, state, A->c, A->mod);
+        _nmod_vec_randtest(x, state, c, mod);
         nmod_sparse_mat_mul_vec(b, A, x);
         nmod_sparse_mat_mul_vec(Atb, At, b);
         int iter, ret;

@@ -19,9 +19,11 @@
 
 int main(void)
 {
+    slong rep, r1, r2, c, i;
+    mp_limb_t n;
+    nmod_t mod;
     nmod_sparse_mat_t A, B, C;
     nmod_sparse_mat_t window1, window2;
-    slong i;
     FLINT_TEST_INIT(state);
 
 
@@ -30,26 +32,24 @@ int main(void)
 
     for (i = 0; i < 100; i++)
     {
-        slong r1, r2, c1, mod;
+        r1 = n_randint(state, 100);
+        r2 = n_randint(state, 100);
+        c = n_randint(state, 100);
+        do n = n_randtest_not_zero(state);
+        while(n == UWORD(1));
+        nmod_init(&mod, n);
+        nmod_sparse_mat_init(A, r1, c, mod);
+        nmod_sparse_mat_init(B, r2, c, mod);
+        nmod_sparse_mat_init(C, r1+r2, c, mod);
 
-        r1 = n_randint(state, 50);
-        r2 = n_randint(state, 50);
-        do
-            mod = n_randlimb(state);
-        while(mod <= 1);
-
-        nmod_sparse_mat_init(A, r1, mod);
-        nmod_sparse_mat_init(B, r2, mod);
-        nmod_sparse_mat_init(C, (r1+r2), mod);
-
-        nmod_sparse_mat_randtest(A, state);
-        nmod_sparse_mat_randtest(B, state);
-        nmod_sparse_mat_randtest(C, state);
+        nmod_sparse_mat_randtest(A, state, 0, c);
+        nmod_sparse_mat_randtest(B, state, 0, c);
+        nmod_sparse_mat_randtest(C, state, 0, c);
 
         nmod_sparse_mat_concat_vertical(C, A, B);
         
-        nmod_sparse_mat_window_init(window1, C, 0, 0, r1, C->c);
-        nmod_sparse_mat_window_init(window2, C, r1, 0, (r1+r2), C->c);
+        nmod_sparse_mat_window_init(window1, C, 0, 0, r1, c);
+        nmod_sparse_mat_window_init(window2, C, r1, 0, r1+r2, c);
 
         if (!(nmod_sparse_mat_equal(window1, A) && nmod_sparse_mat_equal(window2, B)))
         {

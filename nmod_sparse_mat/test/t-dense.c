@@ -20,7 +20,11 @@
 int
 main(void)
 {
-    slong m, mod, rep;
+    slong rep, r, c, i, j, k, nnz;
+    mp_limb_t n;
+    nmod_t mod;
+    nmod_sparse_mat_t A, B;
+    nmod_mat_t C, D;
     FLINT_TEST_INIT(state);
     
 
@@ -29,24 +33,18 @@ main(void)
 
     for (rep = 0; rep < 1000; rep++)
     {
-        nmod_sparse_mat_t A, B;
-        nmod_mat_t C, D;
-
-        m = n_randint(state, 20);
-
-        do
-            mod = n_randtest_not_zero(state);
-        while(mod <= 1);
-
-        nmod_sparse_mat_init(A, m, mod);
-        nmod_sparse_mat_randtest(A, state);
-
+        r = n_randint(state, 10);
+        c = n_randint(state, 10);
+        do n = n_randtest_not_zero(state);
+        while(n == UWORD(1));
+        nmod_init(&mod, n);
+        nmod_sparse_mat_init(A, r, c, mod);
+        nmod_sparse_mat_init(B, r, c, mod);
+        nmod_mat_init(C, r, c, n);
+        nmod_mat_init(D, r, c, n);
         
-        nmod_mat_init(C, m, A->c, mod);
+        nmod_sparse_mat_randtest(A, state, 0, c);
         nmod_sparse_mat_to_dense(C, A);
-
-        nmod_sparse_mat_init(B, m, mod);
-        nmod_sparse_mat_randtest(B, state);
         nmod_sparse_mat_from_dense(B, C);
         
         if (!nmod_sparse_mat_equal(A, B))
@@ -57,8 +55,6 @@ main(void)
 
         nmod_mat_randtest(C, state);
         nmod_sparse_mat_from_dense(A, C);
-
-        nmod_mat_init(D, m, C->c, mod);
         nmod_sparse_mat_to_dense(D, A);
         
         if(!nmod_mat_equal(C, D)) {
@@ -68,6 +64,7 @@ main(void)
         nmod_sparse_mat_clear(A);
         nmod_sparse_mat_clear(B);
         nmod_mat_clear(C);
+        nmod_mat_clear(D);
     }
 
     FLINT_TEST_CLEANUP(state);
