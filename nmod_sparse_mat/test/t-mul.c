@@ -20,7 +20,12 @@
 int
 main(void)
 {
-    slong m, n, mod, rep;
+    slong rep, r, c, i, k;
+    mp_limb_t n, a;
+    nmod_t mod;
+    nmod_sparse_mat_t A;
+    mp_ptr x, y, y2;
+    nmod_mat_t B, X, Y, Y2;
     FLINT_TEST_INIT(state);
     
 
@@ -29,26 +34,21 @@ main(void)
 
     for (rep = 0; rep < 10; rep++)
     {
-        nmod_sparse_mat_t A;
-        mp_ptr x, y, y2;
-        nmod_mat_t B, X, Y, Y2;
-
-        m = n_randint(state, 20);
-        n = n_randint(state, 20);
-
-        do
-            mod = n_randtest_not_zero(state);
-        while(mod <= 1);
-
-        nmod_sparse_mat_init(A, m, mod);
-        nmod_sparse_mat_randtest(A, state);
-        nmod_mat_init(B, m, A->c, mod);
+        r = n_randint(state, 200);
+        c = n_randint(state, 200);
+        k = n_randint(state, 200);
+        do n = n_randtest_not_zero(state);
+        while(n == UWORD(1));
+        nmod_init(&mod, n);
+        nmod_sparse_mat_init(A, r, c, mod);
+        nmod_sparse_mat_randtest(A, state, 0, c);
+        nmod_mat_init(B, r, c, n);
         nmod_sparse_mat_to_dense(B, A);
 
-        x = _nmod_vec_init(A->c);
-        y = _nmod_vec_init(A->r);
-        y2 = _nmod_vec_init(A->r);
-        _nmod_vec_randtest(x, state, A->c, A->mod);
+        x = _nmod_vec_init(c);
+        y = _nmod_vec_init(r);
+        y2 = _nmod_vec_init(r);
+        _nmod_vec_randtest(x, state, c, mod);
         nmod_sparse_mat_mul_vec(y, A, x);
         nmod_mat_mul_vec(y2, B, x);
 
@@ -58,9 +58,9 @@ main(void)
             abort();
         }
 
-        nmod_mat_init(X, A->c, n, mod);
-        nmod_mat_init(Y, A->r, n, mod);
-        nmod_mat_init(Y2, A->r, n, mod);
+        nmod_mat_init(X, c, k, n);
+        nmod_mat_init(Y, r, k, n);
+        nmod_mat_init(Y2, r, k, n);
         nmod_mat_randtest(X, state);
         nmod_sparse_mat_mul_mat(Y, A, X);
         nmod_mat_mul(Y2, B, X);
@@ -72,12 +72,12 @@ main(void)
 
         nmod_sparse_mat_clear(A);
         nmod_mat_clear(B);
-        nmod_mat_clear(X);
-        nmod_mat_clear(Y);
-        nmod_mat_clear(Y2);
         _nmod_vec_clear(x);
         _nmod_vec_clear(y);
         _nmod_vec_clear(y2);
+        nmod_mat_clear(X);
+        nmod_mat_clear(Y);
+        nmod_mat_clear(Y2);
      }
 
     FLINT_TEST_CLEANUP(state);

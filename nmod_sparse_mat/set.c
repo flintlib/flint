@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,21 +15,13 @@
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 
-/* Assumes B->r == A->r */
-void
-nmod_sparse_mat_set(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
+void nmod_sparse_mat_set(nmod_sparse_mat_t mat, const nmod_sparse_mat_t src) 
 {
-    if (B == A)
-        return;
-    B->c = A->c;
-    B->nnz = A->nnz;
-    if(B->nnz == 0) {
-        flint_free(B->entries);
-        B->entries = NULL;
-    } else {
-        B->entries = flint_realloc(B->entries, A->nnz * sizeof(*B->entries));
-        memcpy(B->entries, A->entries, A->nnz * sizeof(*B->entries));
-    }
-    memcpy(B->row_starts, A->row_starts, A->r * sizeof(*B->row_starts));
-    memcpy(B->row_nnz, A->row_nnz, A->r * sizeof(*B->row_nnz));
+    slong i;
+    if(mat==src || mat->r==0) return;
+    mat->r = src->r;
+    mat->c = src->c;
+    mat->c_off = src->c_off;
+    mat->rows = realloc(mat->rows, mat->r*sizeof(*mat->rows));
+    for(i=0; i<mat->r; ++i) nmod_sparse_vec_set(&mat->rows[i], &src->rows[i]);
 }

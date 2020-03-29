@@ -18,33 +18,38 @@
 void
 nmod_sparse_mat_transpose(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
 {
-
-    slong i, j;
-    B->c = A->r;
-    B->nnz = A->nnz;
-    B->entries = flint_realloc(B->entries, B->nnz * sizeof(*B->entries));
-    memset(B->row_starts, 0, B->r * sizeof(*B->row_starts));
-    memset(B->row_nnz, 0, B->r * sizeof(*B->row_nnz));
-    if(A->nnz == 0) return;
-
-    /* Clear row counts for B and set row starts */
-    nmod_sparse_mat_entry_struct *Ae, *Be;
-    Ae = A->entries;
-    for(i=0; i<A->nnz; ++i)
-        if(Ae[i].col + 1 < B->r)
-            B->row_starts[Ae[i].col + 1] += 1;
-    for(i=1; i<B->r; ++i)
-        B->row_starts[i] += B->row_starts[i-1];
-
-    /* Assign entries */
-    Ae = A->entries;
-    Be = B->entries;
-    for(i=0; i<A->r; ++i) {
-        for(j=0; j<A->row_nnz[i]; ++j, ++Ae) {
-            slong pos = B->row_starts[Ae->col] + B->row_nnz[Ae->col]++;
-            Be[pos].col = i;
-            Be[pos].val = Ae->val;
-        }
-        flint_printf("\n");
+    slong r, c, i, j;
+    /* Get number of nnzs in each column of A (thus each row of B) */
+    for(c=0; c<A->c; ++c) 
+    {
+        B->rows[c].nnz = 0;
     }
+    for(r=0; r<A->r; ++r) 
+    {
+        for(i=0; i<A->rows[r].nnz; ++i) 
+        {
+            c = A->rows[r].entries[i].ind;
+            B->rows[c].nnz += 1;
+        }
+    }
+    /* Allocate space for nnz and reset counters */
+    for(c=0; c<A->c; ++c) 
+    {
+        nmod_sparse_vec_struct *row = &B->rows[c];
+        if(row->nnz == 0) nmod_sparse_vec_clear(row);
+        else row->entries = flint_realloc(row->entries, row->nnz*sizeof(*row->entries));
+        row->nnz = 0;
+    }
+    /* Put entries into transposed matrix */
+    for(r=0; r<A->r; ++r)
+    {
+        for(i=0; i<A->rows[r].nnz; ++i) 
+        {
+            nmod_sparse_entry_struct *Ae = &A->rows[r].entries[i];
+            c = Ae->ind, j = B->rows[c].nnz++;
+            nmod_sparse_entry_struct *Be = &B->rows[c].entries[j];
+            Be->ind = r, Be->val = Ae->val;
+        }
+    }
+    B->c_off = 0;
 }

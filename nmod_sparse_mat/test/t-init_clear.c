@@ -20,7 +20,10 @@
 int
 main(void)
 {
-    slong m, n, mod, i, j, rep;
+    slong rep, r, c, i;
+    mp_limb_t n;
+    nmod_t mod;
+    nmod_sparse_mat_t A;
     FLINT_TEST_INIT(state);
     
 
@@ -29,45 +32,24 @@ main(void)
 
     for (rep = 0; rep < 100; rep++)
     {
-        nmod_sparse_mat_t A;
+        r = n_randint(state, 200);
+        c = n_randint(state, 200);
+        do n = n_randtest_not_zero(state);
+        while(n == UWORD(1));
+        nmod_init(&mod, n);
+        nmod_sparse_mat_init(A, r, c, mod);
 
-        m = n_randint(state, 50);
-        do
-            mod = n_randtest_not_zero(state);
-        while(mod <= 1);
-
-        nmod_sparse_mat_init(A, m, mod);
-        if(A->nnz != UWORD(0)) {
-            flint_printf("FAIL: nnz not zero!\n");
+        if(!nmod_sparse_mat_is_zero(A)) {
+            flint_printf("FAIL: A not zero!\n");
             abort();
         }
-        if(A->entries != NULL) {
-            flint_printf("FAIL: entries not null!\n");
-            abort();
-        }
-        if(A->c != UWORD(0)) {
-            flint_printf("FAIL: c not 0!\n");
-            abort();
-        }
-        
-        for (i = 0; i < m; i++)
+        for (i = 0; i < r; i++)
         {
-            if (A->row_starts[i] != UWORD(0))
+            if(!nmod_sparse_vec_is_zero(&A->rows[i])) 
             {
-                flint_printf("FAIL: row start not zero!\n");
+                flint_printf("FAIL: row %wd not zero!\n", i);
                 abort();
             }
-            if (A->row_nnz[i] != UWORD(0))
-            {
-                flint_printf("FAIL: row nnz not zero!\n");
-                abort();
-            }
-        }
-
-        if (A->mod.n != mod)
-        {
-            flint_printf("FAIL: bad modulus\n");
-            abort();
         }
 
         nmod_sparse_mat_clear(A);

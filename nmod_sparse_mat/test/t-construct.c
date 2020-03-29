@@ -20,57 +20,53 @@
 int
 main(void)
 {
-    slong m, mod, rep;
+    slong rep, r, c, i, j, k, nnz;
+    mp_limb_t n;
+    nmod_t mod;
+    nmod_sparse_mat_t A, B;
+    slong *rows;
+    slong *cols;
+    mp_limb_t *vals;
     FLINT_TEST_INIT(state);
     
-    flint_printf("conversion to/from dense matrix....");
+    flint_printf("construction from entries....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000; rep++)
     {
-        slong i, j, k;
-        nmod_sparse_mat_t A, B, C;
-        slong *rows, *cols;
-        mp_limb_t *vals;
-        nmod_sparse_mat_entry_struct *Ae;
+        r = n_randint(state, 10);
+        c = n_randint(state, 10);
+        do n = n_randtest_not_zero(state);
+        while(n == UWORD(1));
+        nmod_init(&mod, n);
+        nmod_sparse_mat_init(A, r, c, mod);
+        nmod_sparse_mat_init(B, r, c, mod);
 
-        m = n_randint(state, 200);
+        nmod_sparse_mat_randtest(A, state, 2, 2);
+        nmod_sparse_mat_randtest(B, state, 2, 2);
+        nnz = 0;
+        for(i=0; i<r; ++i) nnz += A->rows[i].nnz;
 
-        do
-            mod = n_randtest_not_zero(state);
-        while(mod <= 1);
-
-        nmod_sparse_mat_init(A, m, mod);
-        nmod_sparse_mat_init(B, m, mod);
-        nmod_sparse_mat_init(C, m, mod);
-        nmod_sparse_mat_randtest(A, state);
-        
         /* Construct B from entries of A */
-        rows = flint_malloc(A->nnz * sizeof(*rows));
-        cols = flint_malloc(A->nnz * sizeof(*cols));
-        vals = flint_malloc(A->nnz * sizeof(*vals));
-        for(i=0, k=0; i<A->r; ++i) {
-            for(j=0; j<A->row_nnz[i]; ++j, ++k) {
+        rows = flint_malloc(nnz * sizeof(*rows));
+        cols = flint_malloc(nnz * sizeof(*cols));
+        vals = flint_malloc(nnz * sizeof(*vals));
+        for(i=k=0; i<r; ++i) {
+            for(j=0; j<A->rows[i].nnz; ++j, ++k) {
                 rows[k] = i;
-                cols[k] = A->entries[k].col;
-                vals[k] = A->entries[k].val;
+                cols[k] = A->rows[i].entries[j].ind;
+                vals[k] = A->rows[i].entries[j].val;
             }
         }
-        nmod_sparse_mat_set_from_entries(B, rows, cols, vals, A->nnz);
+        nmod_sparse_mat_from_entries(B, rows, cols, vals, nnz);
 
         if (!nmod_sparse_mat_equal(A, B))
         {
             flint_printf("FAIL: A != B\n");
-            abort();
-        }
-        /* Construct C from rows of A */
-        for(i=0; i<A->r; ++i) {
-            nmod_sparse_mat_append_row(C, i, cols + A->row_starts[i], vals + A->row_starts[i], A->row_nnz[i]);
-        }
-
-        if (!nmod_sparse_mat_equal(A, C))
-        {
-            flint_printf("FAIL: A != C\n");
+            flint_printf("A = ");
+            nmod_sparse_mat_print_pretty(A);
+            flint_printf("B = ");
+            nmod_sparse_mat_print_pretty(B);
             abort();
         }
         flint_free(rows);
@@ -78,7 +74,6 @@ main(void)
         flint_free(vals);
         nmod_sparse_mat_clear(A);
         nmod_sparse_mat_clear(B);
-        nmod_sparse_mat_clear(C);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -19,42 +19,17 @@
 void
 nmod_sparse_mat_print_pretty(const nmod_sparse_mat_t mat)
 {
-    slong i, j, k=0;;
-    int width;
+    slong i;;
     char row_fmt[FLINT_BITS + 5];
-    char col_fmt[FLINT_BITS + 5];
-    char val_fmt[FLINT_BITS + 5];
+    flint_sprintf(row_fmt, "%%%dwd: ", n_sizeinbase(mat->r, 10));
 
-    flint_printf("<%wd x %wd sparse integer matrix mod %wu (%wd nonzeroes)>\n", 
-                mat->r, mat->c, mat->mod.n, mat->nnz);
-
-    if (!(mat->c) || !(mat->r))
-        return;
-
-    width = n_sizeinbase(mat->r, 10);
-    flint_sprintf(row_fmt, "%%%dwd: [", width);
-
-    width = n_sizeinbase(mat->c, 10);
-    flint_sprintf(col_fmt, "%%%dwd:", width);
-
-    width = n_sizeinbase(mat->mod.n, 10);
-    flint_sprintf(val_fmt, "%%%dwd", width);
+    flint_printf("<%wd x %wd sparse integer matrix mod %w>\n", 
+                mat->r, mat->c, mat->mod.n);
 
     for (i = 0; i < mat->r; i++)
     {
         flint_printf(row_fmt, i);
-
-        nmod_sparse_mat_entry_struct *e = mat->entries + mat->row_starts[i];
-
-        for (j = 0; j < mat->row_nnz[i]; j++, e++)
-        {
-            flint_printf(col_fmt, e->col - mat->c_off);
-            flint_printf(val_fmt, e->val);
-            if (j + 1 < mat->row_nnz[i])
-                flint_printf(" ");
-        }
-
-        flint_printf("]\n");
+        nmod_sparse_vec_print_pretty(&mat->rows[i], mat->c_off, mat->c, mat->mod);
     }
 }
 

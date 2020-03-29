@@ -21,7 +21,7 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_
 
     /* Construct transpose */
     nmod_sparse_mat_t At;
-    nmod_sparse_mat_init(At, A->c, A->mod.n);
+    nmod_sparse_mat_init(At, A->c, A->r, A->mod);
     nmod_sparse_mat_transpose(At, A);
 
     /* Construct auxiliary vectors */
