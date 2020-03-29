@@ -1,9 +1,13 @@
 /*
 <<<<<<< HEAD
+<<<<<<< HEAD
     Copyright (C) 2011 Fredrik Johansson
 =======
     Copyright (C) 2010 Fredrik Johansson
 >>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
+=======
+    Copyright (C) 2011 Fredrik Johansson
+>>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
 
     This file is part of FLINT.
 
