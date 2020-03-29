@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD
     Copyright (C) 2011 Fredrik Johansson
+=======
+    Copyright (C) 2010 Fredrik Johansson
+>>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
 
     This file is part of FLINT.
 
