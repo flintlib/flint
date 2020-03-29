@@ -168,6 +168,7 @@ void nmod_sparse_mat_concat_vertical(nmod_sparse_mat_t B, const nmod_sparse_mat_
     for (i = M1->r; i < B->r; ++i)
         nmod_sparse_vec_set(&B->rows[i], &M2->rows[i-M1->r], M2->c_off);
 }
+<<<<<<< HEAD
 
 /* Split block matrix B = [M1 M2] into submatrices M1 and M2 */
 /* M1->r and M2->r must equal B->r */
@@ -188,7 +189,35 @@ void nmod_sparse_mat_split_vertical(nmod_sparse_mat_t M1, nmod_sparse_mat_t M2, 
     for (i = r; i < B->r; ++i) nmod_sparse_vec_set(&M2->rows[i-r], &B->rows[i], B->c_off);
 }
 
+<<<<<<< HEAD
 
+=======
+=======
+
+/* res->r must equal mat1->r and mat2->r */
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_concat_horizontal(nmod_sparse_mat_t res,
+                                    const nmod_sparse_mat_t mat1,  const nmod_sparse_mat_t mat2) 
+{
+    slong i;
+    res->c = mat1->c + mat2->c;
+    for(i=0; i<res->r; ++i)
+        nmod_sparse_vec_concat(&res->rows[i], &mat1->rows[i], &mat2->rows[i], mat1->c);
+}
+/* res->r must equal mat1->r + mat2->r */
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_concat_vertical(nmod_sparse_mat_t res, const nmod_sparse_mat_t mat1,  const nmod_sparse_mat_t mat2) 
+{
+    slong i;
+    res->c = FLINT_MAX(mat1->c, mat2->c);
+    for(i=0; i<mat1->r; ++i)
+        nmod_sparse_vec_set(&res->rows[i], &mat1->rows[i]);
+    for(i=mat1->r; i<res->r; ++i)
+        nmod_sparse_vec_set(&res->rows[i], &mat2->rows[i-mat1->r]);
+}
+
+>>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
+>>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
 /* Matrix permutation */
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_mat_permute_cols(nmod_sparse_mat_t M, slong *Q) 
@@ -339,9 +368,9 @@ void nmod_sparse_mat_mul_mat(nmod_mat_t Y, const nmod_sparse_mat_t M, const nmod
     slong i, j;
     nmod_mat_zero(Y);
     for (i = 0; i < M->r; ++i)
-{
+    {
         for (j = 0; j < M->rows[i].nnz; ++j)
-{
+        {
             nmod_sparse_entry_struct *e = &M->rows[i].entries[j];
             _nmod_vec_scalar_addmul_nmod(Y->rows[i], X->rows[e->ind], X->c, e->val, Y->mod);
         }
@@ -421,9 +450,15 @@ FLINT_DLL
 mp_limb_t nmod_sparse_mat_det(const nmod_sparse_mat_t M);
 
 /* Nullspace */
+<<<<<<< HEAD
 /* NMOD_SPARSE_MAT_INLINE
 slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t M);
  */
+=======
+NMOD_SPARSE_MAT_INLINE
+slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
+
+>>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
 #ifdef __cplusplus
 }
 #endif

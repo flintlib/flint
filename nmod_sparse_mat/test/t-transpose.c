@@ -20,8 +20,13 @@
 int
 main(void)
 {
+<<<<<<< HEAD
     slong rep, r, c;
     mp_limb_t n;
+=======
+    slong rep, r, c, i;
+    mp_limb_t n, a;
+>>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
     nmod_t mod;
     nmod_sparse_mat_t A, B, C;
     FLINT_TEST_INIT(state);
