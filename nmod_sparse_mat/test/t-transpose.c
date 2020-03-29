@@ -20,10 +20,14 @@
 int
 main(void)
 {
+<<<<<<< HEAD
     slong rep, r, c, i;
     mp_limb_t n, a;
     nmod_t mod;
     nmod_sparse_mat_t A, B, C;
+=======
+    slong m, n, mod, mod2, rep;
+>>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
     FLINT_TEST_INIT(state);
     
 
@@ -33,6 +37,7 @@ main(void)
     /* Rectangular transpose, same modulus */
     for (rep = 0; rep < 1000; rep++)
     {
+<<<<<<< HEAD
         r = n_randint(state, 200);
         c = n_randint(state, 200);
         do n = n_randtest_not_zero(state);
@@ -47,6 +52,23 @@ main(void)
         nmod_sparse_mat_randtest(C, state, 0, c);
 
         nmod_sparse_mat_transpose(B, A);
+=======
+        nmod_sparse_mat_t A, B, C;
+
+        m = n_randint(state, 40);
+
+        do
+        mod = n_randtest_not_zero(state);
+        while(mod <= 1);
+
+        nmod_sparse_mat_init(A, m, mod);
+        nmod_sparse_mat_randtest(A, state);
+        
+        nmod_sparse_mat_init(B, A->c, mod);
+        nmod_sparse_mat_transpose(B, A);
+        
+        nmod_sparse_mat_init(C, m, mod);
+>>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
         nmod_sparse_mat_transpose(C, B);
         
         if (!nmod_sparse_mat_equal(C, A))

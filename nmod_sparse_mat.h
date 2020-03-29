@@ -287,9 +287,9 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_
 int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
 
 /* Nullspace */
-NMOD_SPARSE_MAT_INLINE
+/* NMOD_SPARSE_MAT_INLINE
 slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
-
+ */
 #ifdef __cplusplus
 }
 #endif
