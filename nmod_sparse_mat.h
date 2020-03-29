@@ -101,8 +101,14 @@ void nmod_sparse_mat_one(nmod_sparse_mat_t mat)
     for (i = 0; i < mat->r; ++i) nmod_sparse_vec_one(&mat->rows[i], i);
 }
 
-FLINT_DLL
-void nmod_sparse_mat_set(nmod_sparse_mat_t mat, const nmod_sparse_mat_t src);
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_set(nmod_sparse_mat_t mat, const nmod_sparse_mat_t src) 
+{
+    slong i;
+    if(mat==src || mat->r == 0) return;
+    mat->c_off = src->c_off;
+    for(i=0; i<mat->r; ++i) nmod_sparse_vec_set(&mat->rows[i], &src->rows[i]);
+}
 
 FLINT_DLL
 void nmod_sparse_mat_from_entries(nmod_sparse_mat_t mat, slong * rows, slong * cols, mp_limb_t * vals, slong nnz);
@@ -290,19 +296,9 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_
 int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
 
 /* Nullspace */
-<<<<<<< HEAD
-<<<<<<< HEAD
 /* NMOD_SPARSE_MAT_INLINE
 slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
  */
-=======
-NMOD_SPARSE_MAT_INLINE
-slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
-=======
-// slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
->>>>>>> Spacing and cuddling fixed
-
->>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
 #ifdef __cplusplus
 }
 #endif
