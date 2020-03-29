@@ -496,19 +496,9 @@ FLINT_DLL
 mp_limb_t nmod_sparse_mat_det(const nmod_sparse_mat_t M);
 
 /* Nullspace */
-<<<<<<< HEAD
-<<<<<<< HEAD
 /* NMOD_SPARSE_MAT_INLINE
 slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t M);
  */
-=======
-NMOD_SPARSE_MAT_INLINE
-slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
-=======
-// slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
->>>>>>> Spacing and cuddling fixed
-
->>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
 #ifdef __cplusplus
 }
 #endif
