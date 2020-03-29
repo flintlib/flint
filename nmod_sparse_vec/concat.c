@@ -18,12 +18,13 @@
 void nmod_sparse_vec_concat(nmod_sparse_vec_t res, const nmod_sparse_vec_t vec1,  const nmod_sparse_vec_t vec2, slong len1) 
 {
     res->nnz = vec1->nnz+vec2->nnz;
-    if(res->nnz == 0) nmod_sparse_vec_clear(res);
-    else {
+    if (res->nnz == 0) nmod_sparse_vec_clear(res);
+    else 
+    {
         slong i;
         res->entries = flint_realloc(res->entries, res->nnz*sizeof(*res->entries));
         memcpy(res->entries, vec1->entries, vec1->nnz*sizeof(*res->entries));
         memcpy(res->entries+vec1->nnz, vec2->entries, vec2->nnz*sizeof(*res->entries));
-        for(i=vec1->nnz; i<res->nnz; ++i) res->entries[i].ind += len1;
+        for (i = vec1->nnz; i < res->nnz; ++i) res->entries[i].ind += len1;
     }
 }

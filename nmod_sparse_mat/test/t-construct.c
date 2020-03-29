@@ -37,7 +37,7 @@ main(void)
         r = n_randint(state, 10);
         c = n_randint(state, 10);
         do n = n_randtest_not_zero(state);
-        while(n == UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r, c, mod);
         nmod_sparse_mat_init(B, r, c, mod);
@@ -45,14 +45,16 @@ main(void)
         nmod_sparse_mat_randtest(A, state, 2, 2);
         nmod_sparse_mat_randtest(B, state, 2, 2);
         nnz = 0;
-        for(i=0; i<r; ++i) nnz += A->rows[i].nnz;
+        for (i = 0; i < r; ++i) nnz += A->rows[i].nnz;
 
         /* Construct B from entries of A */
         rows = flint_malloc(nnz * sizeof(*rows));
         cols = flint_malloc(nnz * sizeof(*cols));
         vals = flint_malloc(nnz * sizeof(*vals));
-        for(i=k=0; i<r; ++i) {
-            for(j=0; j<A->rows[i].nnz; ++j, ++k) {
+        for (i = k = 0; i < r; ++i)
+        {
+            for (j = 0; j < A->rows[i].nnz; ++j, ++k)
+            {
                 rows[k] = i;
                 cols[k] = A->rows[i].entries[j].ind;
                 vals[k] = A->rows[i].entries[j].val;

@@ -36,7 +36,7 @@ main(void)
         len = n_randint(state, 200);
         nnz = n_randint(state, len+1);
         do n = n_randtest_not_zero(state);
-        while(n == UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
 
         nmod_sparse_vec_init(u);
@@ -47,7 +47,7 @@ main(void)
         /* Construct v from entries of u */
         inds = flint_malloc(nnz * sizeof(*inds));
         vals = flint_malloc(nnz * sizeof(*vals));
-        for(i=0; i<nnz; ++i) 
+        for (i = 0; i < nnz; ++i) 
         {
             inds[i] = u->entries[i].ind;
             vals[i] = u->entries[i].val;

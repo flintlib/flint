@@ -113,10 +113,11 @@ FLINT_DLL
 void nmod_sparse_vec_from_dense(nmod_sparse_vec_t vec, mp_srcptr src, slong len);
 
 NMOD_SPARSE_VEC_INLINE
-void nmod_sparse_vec_to_dense(mp_ptr vec, const nmod_sparse_vec_t src, slong len) {
+void nmod_sparse_vec_to_dense(mp_ptr vec, const nmod_sparse_vec_t src, slong len)
+{
     slong i;
     _nmod_vec_zero(vec, len);
-    for(i=0; i<src->nnz; ++i) vec[src->entries[i].ind] = src->entries[i].val;
+    for (i = 0; i < src->nnz; ++i) vec[src->entries[i].ind] = src->entries[i].val;
 }
 
 /* Windows and concatenation */
@@ -138,7 +139,7 @@ NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_permute_inds(nmod_sparse_vec_t vec, slong *P) 
 {
     slong i;
-    for(i=0; i<vec->nnz; ++i) vec->entries[i].ind = P[vec->entries[i].ind];
+    for (i = 0; i < vec->nnz; ++i) vec->entries[i].ind = P[vec->entries[i].ind];
 }
 
 /* Random vector generation */
@@ -151,17 +152,19 @@ void nmod_sparse_vec_print_pretty(const nmod_sparse_vec_t vec, slong ioff, slong
 
 /* Vector operations */
 NMOD_SPARSE_VEC_INLINE
-void nmod_sparse_vec_neg(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, nmod_t mod) {
+void nmod_sparse_vec_neg(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, nmod_t mod)
+{
     slong i;
     nmod_sparse_vec_set(v, u);
-    for(i=0; i<v->nnz; ++i) v->entries[i].val = nmod_neg(v->entries[i].val, mod);
+    for (i = 0; i < v->nnz; ++i) v->entries[i].val = nmod_neg(v->entries[i].val, mod);
 }
 
 FLINT_DLL
 void nmod_sparse_vec_scalar_mul(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, mp_limb_t c, nmod_t mod);
 
 NMOD_SPARSE_VEC_INLINE
-void nmod_sparse_vec_scalar_mul_fmpz(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, const fmpz_t c, nmod_t mod) {
+void nmod_sparse_vec_scalar_mul_fmpz(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, const fmpz_t c, nmod_t mod)
+{
     fmpz_t d;
     fmpz_init(d);
     fmpz_mod_ui(d, c, mod.n);
@@ -173,12 +176,14 @@ FLINT_DLL
 void nmod_sparse_vec_scalar_addmul(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, mp_limb_t c, nmod_t mod);
 
 NMOD_SPARSE_VEC_INLINE
-void nmod_sparse_vec_add(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod) {
+void nmod_sparse_vec_add(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
+{
     nmod_sparse_vec_scalar_addmul(w, u, v, UWORD(1), mod);
 }
 
 NMOD_SPARSE_VEC_INLINE
-void nmod_sparse_vec_sub(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod) {
+void nmod_sparse_vec_sub(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
+{
     nmod_sparse_vec_scalar_addmul(w, u, v, mod.n-1, mod);
 }
 

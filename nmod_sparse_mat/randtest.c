@@ -19,7 +19,8 @@ nmod_sparse_mat_randtest(nmod_sparse_mat_t mat, flint_rand_t state, slong min_nn
 {
     slong i, nnz;
 
-    for(i=0; i<mat->r; ++i) {
+    for (i = 0; i < mat->r; ++i)
+    {
         nnz = n_randint(state, max_nnz+1);
         nnz = FLINT_MAX(nnz, min_nnz);
         nmod_sparse_vec_randtest(&mat->rows[i], state, nnz, mat->c, mat->mod);

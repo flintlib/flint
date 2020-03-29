@@ -75,7 +75,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_clear(nmod_sparse_mat_t mat) 
 {
     slong i;
-    for(i=0; i<mat->r; ++i) nmod_sparse_vec_clear(&mat->rows[i]);
+    for (i = 0; i < mat->r; ++i) nmod_sparse_vec_clear(&mat->rows[i]);
     flint_free(mat->rows);
     memset(mat, 0, sizeof(*mat));
 }
@@ -91,14 +91,14 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_zero(nmod_sparse_mat_t mat) 
 {
     slong i;
-    for(i=0; i<mat->r; ++i) nmod_sparse_vec_zero(&mat->rows[i]);
+    for (i = 0; i < mat->r; ++i) nmod_sparse_vec_zero(&mat->rows[i]);
 }
 
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_one(nmod_sparse_mat_t mat) 
 {
     slong i;
-    for(i=0; i<mat->r; ++i) nmod_sparse_vec_one(&mat->rows[i], i);
+    for (i = 0; i < mat->r; ++i) nmod_sparse_vec_one(&mat->rows[i], i);
 }
 
 FLINT_DLL
@@ -112,12 +112,13 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_from_dense(nmod_sparse_mat_t mat, const nmod_mat_t src)
 {
     slong i;
-    for(i=0; i<src->r; ++i) nmod_sparse_vec_from_dense(&mat->rows[i], src->rows[i], src->c);
+    for (i = 0; i < src->r; ++i) nmod_sparse_vec_from_dense(&mat->rows[i], src->rows[i], src->c);
 }
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_to_dense(nmod_mat_t mat, const nmod_sparse_mat_t src) {
+void nmod_sparse_mat_to_dense(nmod_mat_t mat, const nmod_sparse_mat_t src)
+{
     slong i;
-    for(i=0; i<src->r; ++i) nmod_sparse_vec_to_dense(mat->rows[i], &src->rows[i], mat->c);
+    for (i = 0; i < src->r; ++i) nmod_sparse_vec_to_dense(mat->rows[i], &src->rows[i], mat->c);
 }
 
 /* Windows and concatenation */
@@ -130,7 +131,6 @@ void nmod_sparse_mat_window_clear(nmod_sparse_mat_t window)
     flint_free(window->rows);
     memset(window, 0, sizeof(*window));
 }
-<<<<<<< HEAD
 
 /* res->r must equal mat1->r and mat2->r */
 NMOD_SPARSE_MAT_INLINE
@@ -139,7 +139,7 @@ void nmod_sparse_mat_concat_horizontal(nmod_sparse_mat_t res,
 {
     slong i;
     res->c = mat1->c + mat2->c;
-    for(i=0; i<res->r; ++i)
+    for (i = 0; i < res->r; ++i)
         nmod_sparse_vec_concat(&res->rows[i], &mat1->rows[i], &mat2->rows[i], mat1->c);
 }
 /* res->r must equal mat1->r + mat2->r */
@@ -148,43 +148,18 @@ void nmod_sparse_mat_concat_vertical(nmod_sparse_mat_t res, const nmod_sparse_ma
 {
     slong i;
     res->c = FLINT_MAX(mat1->c, mat2->c);
-    for(i=0; i<mat1->r; ++i)
+    for (i = 0; i < mat1->r; ++i)
         nmod_sparse_vec_set(&res->rows[i], &mat1->rows[i]);
-    for(i=mat1->r; i<res->r; ++i)
+    for (i = mat1->r; i < res->r; ++i)
         nmod_sparse_vec_set(&res->rows[i], &mat2->rows[i-mat1->r]);
 }
 
-=======
-
-/* res->r must equal mat1->r and mat2->r */
-NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_concat_horizontal(nmod_sparse_mat_t res,
-                                    const nmod_sparse_mat_t mat1,  const nmod_sparse_mat_t mat2) 
-{
-    slong i;
-    res->c = mat1->c + mat2->c;
-    for(i=0; i<res->r; ++i)
-        nmod_sparse_vec_concat(&res->rows[i], &mat1->rows[i], &mat2->rows[i], mat1->c);
-}
-/* res->r must equal mat1->r + mat2->r */
-NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_concat_vertical(nmod_sparse_mat_t res, const nmod_sparse_mat_t mat1,  const nmod_sparse_mat_t mat2) 
-{
-    slong i;
-    res->c = FLINT_MAX(mat1->c, mat2->c);
-    for(i=0; i<mat1->r; ++i)
-        nmod_sparse_vec_set(&res->rows[i], &mat1->rows[i]);
-    for(i=mat1->r; i<res->r; ++i)
-        nmod_sparse_vec_set(&res->rows[i], &mat2->rows[i-mat1->r]);
-}
-
->>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
 /* Matrix permutation */
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_mat_permute_cols(nmod_sparse_mat_t mat, slong *Q) 
 {
     slong i;
-    for(i=0; i<mat->r; ++i) nmod_sparse_vec_permute_inds(&mat->rows[i], Q);
+    for (i = 0; i < mat->r; ++i) nmod_sparse_vec_permute_inds(&mat->rows[i], Q);
 }
 
 /* Random matrix generation */
@@ -205,9 +180,9 @@ NMOD_SPARSE_MAT_INLINE
 int nmod_sparse_mat_equal(const nmod_sparse_mat_t mat1, const nmod_sparse_mat_t mat2) 
 {
     slong i;
-    if(mat1->r != mat2->r) return 0;
-    for(i=0; i<mat1->r; ++i)
-        if(nmod_sparse_vec_equal(&mat1->rows[i], &mat2->rows[i], mat1->c_off-mat2->c_off)==0) return 0;
+    if (mat1->r != mat2->r) return 0;
+    for (i = 0; i < mat1->r; ++i)
+        if (nmod_sparse_vec_equal(&mat1->rows[i], &mat2->rows[i], mat1->c_off-mat2->c_off) == 0) return 0;
     return 1;
 }
 
@@ -215,8 +190,8 @@ NMOD_SPARSE_MAT_INLINE
 int nmod_sparse_mat_is_zero(const nmod_sparse_mat_t mat) 
 {
     slong i;
-    for(i=0; i<mat->r; ++i) 
-        if(!nmod_sparse_vec_is_zero(&mat->rows[i])) return 0;
+    for (i = 0; i < mat->r; ++i) 
+        if (!nmod_sparse_vec_is_zero(&mat->rows[i])) return 0;
     return 1;
 }
 
@@ -235,17 +210,17 @@ void nmod_sparse_mat_neg(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
 {
     slong i;
     nmod_sparse_mat_set(B, A);
-    for(i=0; i<B->r; ++i) nmod_sparse_vec_neg(&B->rows[i], &B->rows[i], B->mod);
+    for (i = 0; i < B->r; ++i) nmod_sparse_vec_neg(&B->rows[i], &B->rows[i], B->mod);
 }
 
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_scalar_mul(nmod_sparse_mat_t B, const nmod_sparse_mat_t A, mp_limb_t c) 
 {
-    if(c==UWORD(0)) nmod_sparse_mat_zero(B);
+    if (c == UWORD(0)) nmod_sparse_mat_zero(B);
     else {
         slong i;
         nmod_sparse_mat_set(B, A);
-        for(i=0; i<B->r; ++i) nmod_sparse_vec_scalar_mul(&B->rows[i], &B->rows[i], c, B->mod);    
+        for (i = 0; i < B->r; ++i) nmod_sparse_vec_scalar_mul(&B->rows[i], &B->rows[i], c, B->mod);    
     }
 }
 
@@ -263,7 +238,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_addmul(nmod_sparse_mat_t C, const nmod_sparse_mat_t A, const nmod_sparse_mat_t B, mp_limb_t c) 
 {
     slong i;
-    for(i=0; i<C->r; ++i) nmod_sparse_vec_scalar_addmul(&C->rows[i], &A->rows[i], &B->rows[i], c, C->mod);
+    for (i = 0; i < C->r; ++i) nmod_sparse_vec_scalar_addmul(&C->rows[i], &A->rows[i], &B->rows[i], c, C->mod);
 }
 
 NMOD_SPARSE_MAT_INLINE
@@ -283,14 +258,16 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t A, const mp_ptr x) 
 {
     slong i;
-    for(i=0; i<A->r; ++i) y[i] = nmod_sparse_vec_dot_dense(&A->rows[i], x, A->mod);
+    for (i = 0; i < A->r; ++i) y[i] = nmod_sparse_vec_dot_dense(&A->rows[i], x, A->mod);
 }
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_mul_mat(nmod_mat_t Y, const nmod_sparse_mat_t A, const nmod_mat_t X) 
 {
     slong i, j;
-    for(i=0; i<A->r; ++i) {
-        for(j=0; j<A->rows[i].nnz; ++j) {
+    for (i = 0; i < A->r; ++i)
+{
+        for (j = 0; j < A->rows[i].nnz; ++j)
+{
             nmod_sparse_entry_struct *e = &A->rows[i].entries[j];
             _nmod_vec_scalar_addmul_nmod(Y->rows[i], X->rows[e->ind], X->c, e->val, Y->mod);
         }
@@ -314,12 +291,16 @@ int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b
 
 /* Nullspace */
 <<<<<<< HEAD
+<<<<<<< HEAD
 /* NMOD_SPARSE_MAT_INLINE
 slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
  */
 =======
 NMOD_SPARSE_MAT_INLINE
 slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
+=======
+// slong nmod_sparse_mat_nullspace(nmod_mat_t X, const nmod_sparse_mat_t A);
+>>>>>>> Spacing and cuddling fixed
 
 >>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
 #ifdef __cplusplus

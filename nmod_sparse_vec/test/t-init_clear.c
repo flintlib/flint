@@ -17,12 +17,15 @@
 #include "nmod_sparse_vec.h"
 #include "ulong_extras.h"
 
-static void check_zero(nmod_sparse_vec_t vec) {
-    if(vec->nnz != UWORD(0)) {
+static void check_zero(nmod_sparse_vec_t vec)
+{
+    if (vec->nnz != UWORD(0))
+{
         flint_printf("FAIL: nnz not zero!\n");
         abort();
     }
-    if(vec->entries != NULL) {
+    if (vec->entries != NULL)
+{
         flint_printf("FAIL: entries not null!\n");
         abort();
     }
@@ -45,7 +48,7 @@ main(void)
         len = n_randint(state, 50);
         nnz = n_randint(state, len+1);
         do n = n_randtest_not_zero(state);
-        while(n == UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
 
         nmod_sparse_vec_init(vec);
@@ -53,20 +56,24 @@ main(void)
 
         nmod_sparse_vec_randtest(vec, state, nnz, len, mod);
         
-        if(nnz == 0) check_zero(vec);
+        if (nnz == 0) check_zero(vec);
         else 
         {
-            for(i = 0; i<nnz; ++i) {
+            for (i = 0; i < nnz; ++i)
+            {
                 nmod_sparse_entry_struct *e = &vec->entries[i];
-                if(e->ind >= len) {
+                if (e->ind >= len)
+                {
                     flint_printf("FAIL: found index %wd >= %wd!\n", e->ind, len);
                     abort();
                 }
-                if(e->val==UWORD(0) || e->val >= n) {
+                if (e->val == UWORD(0) || e->val >= n)
+                {
                     flint_printf("FAIL: found value %wd (not in (0,%wd))\n", e->val, n);
                     abort();
                 }
-                if(i>0 && e->ind <= e[-1].ind) {
+                if (i>0 && e->ind <= e[-1].ind)
+                {
                     flint_printf("FAIL: found index %wd <= previous index %wd\n", e->ind, e[-1].ind);
                     abort();
                 }

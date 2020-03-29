@@ -20,30 +20,30 @@ nmod_sparse_mat_transpose(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
 {
     slong r, c, i, j;
     /* Get number of nnzs in each column of A (thus each row of B) */
-    for(c=0; c<A->c; ++c) 
+    for (c = 0; c < A->c; ++c) 
     {
         B->rows[c].nnz = 0;
     }
-    for(r=0; r<A->r; ++r) 
+    for (r = 0; r < A->r; ++r) 
     {
-        for(i=0; i<A->rows[r].nnz; ++i) 
+        for (i = 0; i < A->rows[r].nnz; ++i) 
         {
             c = A->rows[r].entries[i].ind;
             B->rows[c].nnz += 1;
         }
     }
     /* Allocate space for nnz and reset counters */
-    for(c=0; c<A->c; ++c) 
+    for (c = 0; c < A->c; ++c) 
     {
         nmod_sparse_vec_struct *row = &B->rows[c];
-        if(row->nnz == 0) nmod_sparse_vec_clear(row);
+        if (row->nnz == 0) nmod_sparse_vec_clear(row);
         else row->entries = flint_realloc(row->entries, row->nnz*sizeof(*row->entries));
         row->nnz = 0;
     }
     /* Put entries into transposed matrix */
-    for(r=0; r<A->r; ++r)
+    for (r = 0; r < A->r; ++r)
     {
-        for(i=0; i<A->rows[r].nnz; ++i) 
+        for (i = 0; i < A->rows[r].nnz; ++i) 
         {
             nmod_sparse_entry_struct *Ae = &A->rows[r].entries[i];
             c = Ae->ind, j = B->rows[c].nnz++;

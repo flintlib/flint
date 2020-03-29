@@ -35,17 +35,18 @@ main(void)
         r = n_randint(state, 200);
         c = n_randint(state, 200);
         do n = n_randtest_not_zero(state);
-        while(n == UWORD(1));
+        while (n == UWORD(1));
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r, c, mod);
 
-        if(!nmod_sparse_mat_is_zero(A)) {
+        if (!nmod_sparse_mat_is_zero(A))
+        {
             flint_printf("FAIL: A not zero!\n");
             abort();
         }
         for (i = 0; i < r; i++)
         {
-            if(!nmod_sparse_vec_is_zero(&A->rows[i])) 
+            if (!nmod_sparse_vec_is_zero(&A->rows[i])) 
             {
                 flint_printf("FAIL: row %wd not zero!\n", i);
                 abort();
