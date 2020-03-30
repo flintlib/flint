@@ -32,8 +32,8 @@ main(void)
     {
         nmod_mat_t a, w;
         slong r1, r2, c1, c2, n;
-        slong rows = n_randint(state, 100);
-        slong cols = n_randint(state, 100);
+        slong rows = n_randint(state, 10);
+        slong cols = n_randint(state, 10);
         n = n_randint(state, 50) + 1;
 
         nmod_mat_init(a, rows, cols, n);
