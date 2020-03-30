@@ -40,10 +40,11 @@ int main(void)
         smul_ppmm(ph, pl, d, q);
         add_ssaaaa(ph, pl, ph, pl, FLINT_SIGN_EXT(r), r);
 
+        /* check n = q*d + r and |r| < |d| when possible */
         if (ph != nh ||
             pl != nl ||
-            (d > 0 && r >= d) ||
-            (d < 0 && r <= d))
+            (d > 0 && WORD_MIN + d <= 0 && (r >= d || r <= -d)) ||
+            (d < 0 && WORD_MAX + d >= 0 && (r <= d || r >= -d)))
         {
             flint_printf("FAIL:\n");
             flint_printf("nh = %wd, nl = %wd\n", nh, nl);
