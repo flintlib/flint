@@ -21,7 +21,7 @@ fmpz_poly_mat_init(fmpz_poly_mat_t A, slong rows, slong cols)
     {
         slong i;
 
-        A->entries = (fmpz_poly_struct *) flint_malloc(rows * cols * sizeof(fmpz_poly_struct));
+        A->entries = (fmpz_poly_struct *) flint_malloc(flint_mul_sizes(rows, cols) * sizeof(fmpz_poly_struct));
         A->rows = (fmpz_poly_struct **) flint_malloc(rows * sizeof(fmpz_poly_struct *));
 
         for (i = 0; i < rows * cols; i++)
