@@ -61,10 +61,10 @@ int main(void)
         }
 
         /* check rounding of q was towards zero */
-        if ((nsgn >= 0 && d > 0 && !(0 <= r && r <= d)) ||
-            (nsgn >= 0 && d < 0 && WORD_MAX + d >= 0 && !(0 <= r && r <= -d)) ||
-            (nsgn < 0 && d > 0 && WORD_MIN + d <= 0 && !(-d <= r && r <= 0)) ||
-            (nsgn < 0 && d < 0 && !(d <= r && r <= 0)))
+        if ((nsgn >= 0 && d > 0 && !(0 <= r && r < d)) ||
+            (nsgn >= 0 && d < 0 && WORD_MAX + d >= 0 && !(0 <= r && r < -d)) ||
+            (nsgn < 0 && d > 0 && WORD_MIN + d <= 0 && !(-d < r && r <= 0)) ||
+            (nsgn < 0 && d < 0 && !(d < r && r <= 0)))
         {
             flint_printf("FAIL: check remainder\n");
             flint_printf("nsgn: %d\n", nsgn);
