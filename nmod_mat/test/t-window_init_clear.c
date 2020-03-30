@@ -32,15 +32,16 @@ main(void)
     {
         nmod_mat_t a, w;
         slong r1, r2, c1, c2, n;
-        slong rows = n_randint(state, 100) + 1;
-        slong cols = n_randint(state, 100) + 1;
+        slong rows = n_randint(state, 100);
+        slong cols = n_randint(state, 100);
         n = n_randint(state, 50) + 1;
 
         nmod_mat_init(a, rows, cols, n);
         nmod_mat_randtest(a, state);
 
-        r2 = n_randint(state, rows);
-        c2 = n_randint(state, cols);
+        r2 = n_randint(state, rows + 1);
+        c2 = n_randint(state, cols + 1);
+
         if (r2)
             r1 = n_randint(state, r2);
         else
