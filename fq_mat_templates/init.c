@@ -21,7 +21,7 @@ TEMPLATE(T, mat_init) (TEMPLATE(T, mat_t) mat, slong rows, slong cols,
     if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
     {
         slong i, j;
-        mat->entries = (TEMPLATE(T, struct) *) flint_malloc(rows * cols
+        mat->entries = (TEMPLATE(T, struct) *) flint_malloc(flint_mul_sizes(rows, cols)
                                                 * sizeof(TEMPLATE(T, struct)));
         mat->rows = (TEMPLATE(T, struct) **) flint_malloc(rows
                                               * sizeof(TEMPLATE(T, struct) *));

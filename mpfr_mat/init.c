@@ -23,7 +23,7 @@ mpfr_mat_init(mpfr_mat_t mat, slong rows, slong cols, mpfr_prec_t prec)
     {
         slong i;
         mat->entries =
-            (__mpfr_struct *) flint_malloc(rows * cols * sizeof(__mpfr_struct));
+            (__mpfr_struct *) flint_malloc(flint_mul_sizes(rows, cols) * sizeof(__mpfr_struct));
         mat->rows = (__mpfr_struct **) flint_malloc(rows * sizeof(__mpfr_struct *));  /* Initialise rows */
 
         for (i = 0; i < rows * cols; i++)

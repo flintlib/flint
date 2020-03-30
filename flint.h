@@ -435,6 +435,19 @@ FLINT_DLL int flint_scanf(const char * str, ...); /* flint version of scanf */
 FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
 FLINT_DLL int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
 
+FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
+{
+    ulong hi, lo;
+
+    umul_ppmm(hi, lo, (ulong) x, (ulong) y);
+    if (hi != 0 || lo > WORD_MAX)
+    {
+        flint_printf("Exception (flint). Overflow creating size %wd x %wd object.\n", x, y);
+        flint_abort();
+    }
+    return lo;
+}
+
 #include "gmpcompat.h"
 #include "exception.h"
 
