@@ -24,8 +24,8 @@
 
 int fmpz_is_prime(const fmpz_t n)
 {
-   double logd = fmpz_dlog(n);
-   ulong p, ppi, limit = (ulong) (logd*logd*logd/100.0) + 20;
+   double logd;
+   ulong p, ppi, limit;
    ulong * pp1, * pm1;
    slong i, l, num, num_pp1, num_pm1;
    const ulong * primes; 
@@ -36,12 +36,19 @@ int fmpz_is_prime(const fmpz_t n)
    
    if (fmpz_cmp_ui(n, 1) <= 0)
       return 0;
-   
+
    if (fmpz_is_even(n))
       return (fmpz_cmp_ui(n, 2) == 0);
 
+   if (fmpz_abs_fits_ui(n))
+      return n_is_prime(fmpz_get_ui(n));
+
+   /* todo: use fmpz_is_perfect_power? */
    if (fmpz_is_square(n))
       return 0;
+
+   logd = fmpz_dlog(n);
+   limit = (ulong) (logd*logd*logd/100.0) + 20;
 
    fmpz_init(F1);
    fmpz_init(R);
