@@ -104,10 +104,10 @@ void nmod_sparse_mat_one(nmod_sparse_mat_t mat)
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_set(nmod_sparse_mat_t mat, const nmod_sparse_mat_t src) 
 {
-    slong i;
+    slong i, rmax = FLINT_MIN(mat->r, src->r);
     if(mat==src || mat->r == 0) return;
     mat->c_off = src->c_off;
-    for(i=0; i<mat->r; ++i) nmod_sparse_vec_set(&mat->rows[i], &src->rows[i]);
+    for(i=0; i<rmax; ++i) nmod_sparse_vec_set(&mat->rows[i], &src->rows[i]);
 }
 
 FLINT_DLL
@@ -117,14 +117,14 @@ void nmod_sparse_mat_from_entries(nmod_sparse_mat_t mat, slong * rows, slong * c
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_from_dense(nmod_sparse_mat_t mat, const nmod_mat_t src)
 {
-    slong i;
-    for (i = 0; i < src->r; ++i) nmod_sparse_vec_from_dense(&mat->rows[i], src->rows[i], src->c);
+    slong i, rmax = FLINT_MIN(mat->r, src->r);
+    for (i = 0; i < rmax; ++i) nmod_sparse_vec_from_dense(&mat->rows[i], src->rows[i], src->c);
 }
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_to_dense(nmod_mat_t mat, const nmod_sparse_mat_t src)
 {
-    slong i;
-    for (i = 0; i < src->r; ++i) nmod_sparse_vec_to_dense(mat->rows[i], &src->rows[i], mat->c);
+    slong i, rmax = FLINT_MIN(mat->r, src->r);
+    for (i = 0; i < rmax; ++i) nmod_sparse_vec_to_dense(mat->rows[i], &src->rows[i], mat->c);
 }
 
 /* Windows and concatenation */
@@ -165,7 +165,22 @@ NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_mat_permute_cols(nmod_sparse_mat_t mat, slong *Q) 
 {
     slong i;
-    for (i = 0; i < mat->r; ++i) nmod_sparse_vec_permute_inds(&mat->rows[i], Q);
+    for (i = 0; i < mat->r; ++i) {
+        if(!mat->rows[i].nnz) continue;
+        nmod_sparse_vec_permute_inds(&mat->rows[i], Q);
+        qsort(mat->rows[i].entries, mat->rows[i].nnz, sizeof(*mat->rows[i].entries), nmod_sparse_entry_cmp);
+    }
+}
+
+NMOD_SPARSE_VEC_INLINE
+void nmod_sparse_mat_permute_rows(nmod_sparse_mat_t mat, slong *P) 
+{
+    slong i;
+    nmod_sparse_vec_struct *prows;
+    prows = flint_calloc(mat->r, sizeof(*prows));
+    for (i = 0; i < mat->r; ++i) prows[P[i]] = mat->rows[i];
+    memcpy(mat->rows, prows, mat->r*sizeof(*mat->rows));
+    flint_free(prows);
 }
 
 /* Random matrix generation */
@@ -289,7 +304,7 @@ FLINT_DLL void nmod_sparse_mat_apply_permutation(nmod_sparse_mat_t A, slong * P,
  */
 
 /* Decomposition */
-void nmod_sparse_mat_lu(slong *P, slong *Q, nmod_sparse_mat_t L, nmod_sparse_mat_t U, const nmod_sparse_mat_t A);
+slong nmod_sparse_mat_lu(slong *P, slong *Q, nmod_sparse_mat_t L, nmod_sparse_mat_t U, const nmod_sparse_mat_t A);
 
 /* Nonsingular solving */
 int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b, flint_rand_t state);

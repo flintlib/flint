@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <gmp.h>
+#include <sys/time.h>
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 #include "ulong_extras.h"
@@ -20,19 +21,23 @@
 int
 main(void)
 {
+    int iter, ret;
+    int niters = 0, nosol = 0, psolved = 0;
     slong rep, r, c, i;
     mp_limb_t n, a;
     nmod_t mod;
     nmod_sparse_mat_t A, At;
     mp_ptr x, x2, b, Atb, Ax, AtAx;
+    double l_elapsed = 0, d_elapsed = 0;
+    struct timeval start, end;
     FLINT_TEST_INIT(state);
     
     flint_printf("solving Ax=b....");
     fflush(stdout);
-    int niters = 0, nosol = 0, psolved = 0, nusolved = 0;
-
-    for (rep = 0; rep < 1000; rep++)
+    
+    for (rep = 0; rep < 100; rep++)
     {
+        if(rep % 5==0) {flint_printf("."); fflush(stdout);}
         r = n_randint(state, 200);
         c = n_randint(state, 200);
         do n = n_randtest_not_zero(state);
@@ -52,10 +57,26 @@ main(void)
 
         _nmod_vec_randtest(x, state, c, mod);
         nmod_sparse_mat_mul_vec(b, A, x);
-        nmod_sparse_mat_mul_vec(Atb, At, b);
-        int iter, ret;
-        for (iter=1; iter<=10; ++iter) 
+
+        /* Solve directly */
+        gettimeofday(&start, NULL);
+        ret = nmod_sparse_mat_solve_lu(x2, A, b);
+        gettimeofday(&end, NULL);
+        d_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
+        nmod_sparse_mat_mul_vec(Ax, A, x2);
+        if(!_nmod_vec_equal(b, Ax, A->r))
+        {
+            flint_printf("FAIL: Ax != b, got ret %d\n", ret);
+            abort();
+        } 
+
+        /* Solve iteratively */
+        gettimeofday(&start, NULL);
+        for (iter=1; iter<=10; ++iter) /* TODO: set number of trials based on params */
             if (ret=nmod_sparse_mat_solve_lanczos(x2, A, b, state)) break;
+        gettimeofday(&end, NULL);
+        l_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
+
         if (iter==11)
         {
             nosol += 1;
@@ -64,19 +85,17 @@ main(void)
         niters += iter;
         nmod_sparse_mat_mul_vec(Ax, A, x2);
         nmod_sparse_mat_mul_vec(AtAx, At, Ax);
+        nmod_sparse_mat_mul_vec(Atb, At, b);
         if (!_nmod_vec_equal(AtAx, Atb, A->c))
         {
-            flint_printf("FAIL: AtAx != Atb for mod=%wd, got ret %d\n", mod, ret);
+            flint_printf("FAIL: AtAx != Atb, got ret %d\n", ret);
             abort();
         } 
         else if (!_nmod_vec_equal(b, Ax, A->r))
         {
             psolved += 1;
         } 
-        else if (!_nmod_vec_equal(x, x2, A->c))
-        {
-            nusolved += 1;
-        }
+
         flint_free(x);
         flint_free(x2);
         flint_free(b);
@@ -86,12 +105,11 @@ main(void)
         nmod_sparse_mat_clear(A);
         nmod_sparse_mat_clear(At);
     }
-    flint_printf("No solution found for %wd/%wd examples\n", nosol, 1000);
-    flint_printf("Average number of iters to find solution: %f\n", niters/1000.);
-    flint_printf("Pseudo-solution found for %wd/%wd examples\n", psolved, 1000);
-    flint_printf("Alternate solution found for %wd/%wd examples\n", nusolved, 1000);
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
+    flint_printf("Average time for Lanzcos: %lf\n", l_elapsed/1000);
+    flint_printf("Average time for direct: %lf\n", d_elapsed/1000);
+    flint_printf("Lanczos found no solution for %wd/%wd examples, pseudo-solution for %wd/%wd examples, and required %f iters per solution.\n", nosol, 1000, psolved, 1000, niters/1000.);
     return 0;
 }
