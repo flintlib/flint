@@ -290,6 +290,16 @@ int fmpz_is_prime(const fmpz_t n)
 
    }
 
+   /* is_prime_aprcl() actually throws, but it does not hurt to have
+      this fallback here */
+   if (res < 0)
+   {
+      flint_printf("Exception in fmpz_is_prime: failed to prove ");
+      fmpz_print(n);
+      flint_printf(" prime or composite\n");
+      flint_abort();
+   }
+
    fmpz_clear(F1);
    fmpz_clear(R);
    fmpz_clear(Fsqr);

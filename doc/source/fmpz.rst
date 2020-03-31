@@ -1481,9 +1481,9 @@ Primality testing
     tests. If any of these tests fails to give a proof, it falls back to
     performing an APRCL test.
 
-    If the algorithm fails to prove that `n` is prime, returns `-1`.
-    This outcome is theoretically possible but unlikely to happen
-    in practice.
+    The APRCL test could theoretically fail to prove that `n` is prime
+    or composite. In that case, the program aborts. This is not expected to
+    occur in practice.
 
 .. function:: void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t m, const fmpz_t n)
 
