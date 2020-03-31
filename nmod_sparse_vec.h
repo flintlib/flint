@@ -53,6 +53,17 @@ typedef struct {
 
 typedef nmod_sparse_vec_struct nmod_sparse_vec_t[1];
 
+NMOD_SPARSE_VEC_INLINE
+int nmod_sparse_entry_cmp(const void *va, const void *vb)
+{
+    const nmod_sparse_entry_struct *a = va;
+    const nmod_sparse_entry_struct *b = vb;
+    if (a->ind < b->ind) return -1;
+    if (b->ind < a->ind) return 1;
+    return 0;
+}
+
+
 /* Memory management */
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_init(nmod_sparse_vec_t vec) 

@@ -15,15 +15,6 @@
 #include "flint.h"
 #include "nmod_sparse_vec.h"
 
-static int nmod_sparse_entry_cmp(const void *va, const void *vb)
-{
-    const nmod_sparse_entry_struct *a = va;
-    const nmod_sparse_entry_struct *b = vb;
-    if (a->ind < b->ind) return -1;
-    if (b->ind < a->ind) return 1;
-    return 0;
-}
-
 void nmod_sparse_vec_randtest(nmod_sparse_vec_t vec, flint_rand_t state, mp_limb_signed_t nnz, mp_limb_signed_t len, nmod_t mod)
 {
     nnz = FLINT_MIN(nnz, len);
