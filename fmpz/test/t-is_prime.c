@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 William Hart
+    Copyright (C) 2020 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -16,6 +17,30 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+/* Composite strong pseudoprimes from
+   http://oeis.org/A014233 and https://doi.org/10.1090/mcom/3134 */
+static const char * composites[] = {
+    "2047",
+    "1373653",
+    "25326001",
+    "3215031751",
+    "2152302898747",
+    "3474749660383",
+    "341550071728321",
+    "230245660726188031",
+    "3825123056546413051",
+    "7395010240794120709381",
+    "164280218643672633986221",
+    "318665857834031151167461",
+    "360681321802296925566181",
+    "552727880697763694556181",
+    "667636712015520329618581",
+    "2995741773170734841812261",
+    "3317044064679887385961981",
+    "3404730287403079539471001",
+    NULL,
+};
+
 int
 main(void)
 {
@@ -24,6 +49,24 @@ main(void)
 
     flint_printf("is_prime....");
     fflush(stdout);
+
+    /* test table of composites */
+    for (i = 0; composites[i] != NULL; i++)
+    {
+        fmpz_t n;
+        fmpz_init(n);
+        fmpz_set_str(n, composites[i], 10);
+
+        r1 = fmpz_is_prime(n);
+        if (r1 != 0)
+        {
+            flint_printf("FAIL:\n");
+            fmpz_print(n); printf("\n");
+            flint_abort();
+        }
+
+        fmpz_clear(n);
+    }
 
     /* test primes always pass */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)

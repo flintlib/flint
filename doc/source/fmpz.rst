@@ -1465,18 +1465,25 @@ Primality testing
 
 .. function:: int fmpz_is_prime(const fmpz_t n)
 
-    Attempts to prove `n` prime. 
+    Attempts to prove `n` prime.  If `n` is proven prime, the function
+    returns `1`. If `n` is definitely composite, the function returns `0`.
 
-    If `n` is proven prime, the function returns `1`. If `n` is definitely
-    composite, the function returns `0`. Otherwise the function returns
-    `-1`.
+    This function calls :func:`n_is_prime` for `n` that fits in a single word.
+    For `n` larger than one word, it tests divisibility by a few small primes
+    and whether `n` is a perfect square to rule out trivial composites.
+    For `n` up to about 81 bits, it then uses a strong probable prime test
+    (Miller-Rabin test) with the first 13 primes as witnesses. This has
+    been shown to prove primality [SorWeb2016]_.
 
-    The function assumes that `n` is likely prime, i.e. it is not very
-    efficient if `n` is composite. A strong probable prime test should be
-    run first to ensure that `n` is probably prime.
+    For larger `n`, it does a single base-2 strong probable prime test
+    to eliminate most composite numbers. If `n` passes, it does a
+    combination of Pocklington, Morrison and Brillhart, Lehmer, Selfridge
+    tests. If any of these tests fails to give a proof, it falls back to
+    performing an APRCL test.
 
-    Currently due to the lack of an APR-CL or ECPP implementation, this
-    function does not succeed often.
+    If the algorithm fails to prove that `n` is prime, returns `-1`.
+    This outcome is theoretically possible but unlikely to happen
+    in practice.
 
 .. function:: void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t m, const fmpz_t n)
 
