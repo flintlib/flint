@@ -122,6 +122,16 @@ void nmod_sparse_vec_set_entry(nmod_sparse_vec_t v, slong ind, mp_limb_t val)
     else *oval = val;
 }
 
+NMOD_SPARSE_VEC_INLINE
+void _nmod_sparse_vec_append_entry(nmod_sparse_vec_t v, slong ind, mp_limb_t val)
+{
+    if (val == UWORD(0)) return;
+    v->entries = flint_realloc(v->entries, (v->nnz+1)*sizeof(*v->entries));
+    v->entries[v->nnz].ind = ind;
+    v->entries[v->nnz].val = val;
+    v->nnz += 1;
+}
+
 FLINT_DLL
 void nmod_sparse_vec_from_entries(nmod_sparse_vec_t vec, slong * inds, mp_limb_t * vals, slong nnz);
 
