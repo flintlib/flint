@@ -1216,9 +1216,9 @@ cleanup:
         }
 
 #if WANT_ASSERT
-        fmpz_mpoly_mul_threaded(T, G, Abar, ctx, 0);
+        fmpz_mpoly_mul(T, G, Abar, ctx);
         FLINT_ASSERT(fmpz_mpoly_equal(T, Asave, ctx));
-        fmpz_mpoly_mul_threaded(T, G, Bbar, ctx, 0);
+        fmpz_mpoly_mul(T, G, Bbar, ctx);
         FLINT_ASSERT(fmpz_mpoly_equal(T, Bsave, ctx));
 #endif
     }

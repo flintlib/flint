@@ -728,10 +728,6 @@ FLINT_DLL void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A,
 FLINT_DLL void fmpz_mpoly_mul(fmpz_mpoly_t A,
        const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpz_mpoly_mul_threaded(fmpz_mpoly_t A,
-       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx,
-                                                           slong thread_limit);
-
 FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A,
        const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 

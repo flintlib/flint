@@ -542,10 +542,7 @@ Multiplication
 
 .. function:: void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: void fmpz_mpoly_mul_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
-
     Set ``A`` to ``B`` times ``C``.
-    The threaded version takes an upper limit on the number of threads to use, while the first version calls the threaded version with ``thread_limit = MPOLY_DEFAULT_THREAD_LIMIT``.
 
 .. function:: void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
@@ -564,7 +561,7 @@ Multiplication
 
 .. function:: int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
-    Try to set ``A`` to ``B`` times ``C`` using univariate arithmetic.
+    Try to set ``A`` to ``B`` times ``C`` using dense arithmetic.
     If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
 
 
