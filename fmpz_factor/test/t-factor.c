@@ -98,6 +98,20 @@ int main(void)
     fmpz_init(x);
     mpz_init(y1);
 
+    /* Fredrik's example */
+#if FLINT64
+    fmpz_set_ui(x, 3);
+    fmpz_mul_ui(x, x, 73);
+    fmpz_mul_ui(x, x, 137);
+    fmpz_mul_ui(x, x, 1676321);
+    fmpz_mul_ui(x, x, 1676321);
+    fmpz_mul_ui(x, x, 1676321);
+    fmpz_mul_ui(x, x, 5964848081);
+    fmpz_mul_ui(x, x, 78875943472201);
+    fmpz_mul_ui(x, x, 78875943472201);
+    check(x);
+#endif
+
     /* Some corner cases */
     fmpz_set_ui(x, UWORD_MAX);
     check(x);

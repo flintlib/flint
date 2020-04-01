@@ -57,7 +57,8 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
          if (!done)
 	 {
             fmpz_t n2;
-	    
+	    slong exp2;
+
 	    fmpz_init(n2);
 	    
 	    /* take out cofactor and factor it */
@@ -68,7 +69,13 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 
 	    fmpz_factor_init(fac);
 
-	    qsieve_factor_threaded(fac, n2, FLINT_DEFAULT_THREAD_LIMIT);
+	    /* qsieve can't factor perfect powers */
+	    exp2 = fmpz_is_perfect_power(root, n2);
+
+	    if (exp2)
+                _fmpz_factor_append(fac, root, exp2);
+	    else
+	        qsieve_factor_threaded(fac, n2, FLINT_DEFAULT_THREAD_LIMIT);
 
             for (i = 0; i < fac->num; i++)
             {
@@ -90,5 +97,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 
 	 fmpz_factor_clear(fac3);
       }
+
+      fmpz_clear(root);
    }
 }
