@@ -573,7 +573,9 @@ static int _try_divides(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A, int try_a,
     const fmpz_mpoly_t B, int try_b,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     int success;
     fmpz_t cA, cB, cG;
@@ -613,14 +615,20 @@ static int _try_divides(
     fmpz_divexact(cA, cA, cG);
     fmpz_divexact(cB, cB, cG);
 
-    if (try_b && fmpz_mpoly_divides_threaded(Q, AA, BB, ctx, 1))
+    if (try_b &&
+        ((num_handles > 0) ? _fmpz_mpoly_divides_heap_threaded(Q, AA, BB,
+                                                     ctx, handles, num_handles)
+                           : fmpz_mpoly_divides_monagan_pearce(Q, AA, BB, ctx)))
     {
         fmpz_mpoly_scalar_divexact_fmpz(G, B, cB, ctx);
         success = 1;
         goto cleanup;
     }
 
-    if (try_a && fmpz_mpoly_divides_threaded(Q, BB, AA, ctx, 1))
+    if (try_a &&
+        ((num_handles > 0) ? _fmpz_mpoly_divides_heap_threaded(Q, BB, AA,
+                                                     ctx, handles, num_handles)
+                           : fmpz_mpoly_divides_monagan_pearce(Q, BB, AA, ctx)))
     {
         fmpz_mpoly_scalar_divexact_fmpz(G, A, cA, ctx);
         success = 1;
@@ -1320,8 +1328,11 @@ calculate_trivial_gcd:
         if (gcd_is_trivial)
             goto calculate_trivial_gcd;
 
-        if ((try_a || try_b) && _try_divides(G, A, try_a, B, try_b, ctx))
+        if ((try_a || try_b) &&
+            _try_divides(G, A, try_a, B, try_b, ctx, handles, num_handles))
+        {
             goto successful;
+        }
     }
 
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);

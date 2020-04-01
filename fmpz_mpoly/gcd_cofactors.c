@@ -103,8 +103,8 @@ static void _try_monomial_gcd(
 
     TMP_END;
 
-    fmpz_mpoly_divides_threaded(_Abar, A, _G, ctx, 0);
-    fmpz_mpoly_divides_threaded(_Bbar, B, _G, ctx, 0);
+    fmpz_mpoly_divides(_Abar, A, _G, ctx);
+    fmpz_mpoly_divides(_Bbar, B, _G, ctx);
 
     fmpz_mpoly_swap(G, _G, ctx);
     fmpz_mpoly_swap(Abar, _Abar, ctx);
@@ -279,9 +279,9 @@ static int _try_missing_var(
     _mpoly_gen_shift_left(tG->exps, tG->bits, tG->length,
                                    var, FLINT_MIN(Ashift, Bshift), ctx->minfo);
 
-    success = fmpz_mpoly_divides_threaded(tAbar, A, tG, ctx, 0);
+    success = fmpz_mpoly_divides(tAbar, A, tG, ctx);
     FLINT_ASSERT(success);
-    success = fmpz_mpoly_divides_threaded(tBbar, B, tG, ctx, 0);
+    success = fmpz_mpoly_divides(tBbar, B, tG, ctx);
     FLINT_ASSERT(success);
 
     fmpz_mpoly_swap(G, tG, ctx);
@@ -308,7 +308,9 @@ static int _try_divides(
     fmpz_mpoly_t Bbar,
     const fmpz_mpoly_t A, int try_a,
     const fmpz_mpoly_t B, int try_b,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     int success;
     fmpz_t cA, cB, cG;
@@ -348,7 +350,10 @@ static int _try_divides(
     fmpz_divexact(cA, cA, cG);
     fmpz_divexact(cB, cB, cG);
 
-    if (try_b && fmpz_mpoly_divides_threaded(Q, AA, BB, ctx, 1))
+    if (try_b &&
+        ((num_handles > 0) ? _fmpz_mpoly_divides_heap_threaded(Q, AA, BB,
+                                                     ctx, handles, num_handles)
+                           : fmpz_mpoly_divides_monagan_pearce(Q, AA, BB, ctx)))
     {
         fmpz_mpoly_scalar_divexact_fmpz(G, B, cB, ctx);
         fmpz_mpoly_swap(Abar, Q, ctx);
@@ -358,7 +363,10 @@ static int _try_divides(
         goto cleanup;
     }
 
-    if (try_a && fmpz_mpoly_divides_threaded(Q, BB, AA, ctx, 1))
+    if (try_a &&
+        ((num_handles > 0) ? _fmpz_mpoly_divides_heap_threaded(Q, BB, AA,
+                                                     ctx, handles, num_handles)
+                           : fmpz_mpoly_divides_monagan_pearce(Q, BB, AA, ctx)))
     {
         fmpz_mpoly_scalar_divexact_fmpz(G, A, cA, ctx);
         fmpz_mpoly_swap(Bbar, Q, ctx);
@@ -1150,7 +1158,7 @@ calculate_trivial_gcd:
             goto calculate_trivial_gcd;
 
         if ((try_a || try_b) && _try_divides(G, Abar, Bbar,
-                                                      A, try_a, B, try_b, ctx))
+                                A, try_a, B, try_b, ctx, handles, num_handles))
         {
             goto successful;
         }

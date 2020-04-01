@@ -806,10 +806,6 @@ FLINT_DLL slong _fmpz_mpoly_pow_fps(fmpz ** poly1, ulong ** exp1,
 FLINT_DLL int fmpz_mpoly_divides(fmpz_mpoly_t Q,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_divides_threaded(fmpz_mpoly_t Q,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
-                                                           slong thread_limit);
-
 FLINT_DLL int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t Q,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
@@ -819,7 +815,7 @@ FLINT_DLL int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
 
 FLINT_DLL int _fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
-                              thread_pool_handle * handles, slong num_handles);
+                        const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
