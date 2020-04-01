@@ -8,6 +8,9 @@ include(CheckCCompilerFlag)
 include(CheckLibraryExists)
 include(TestBigEndian)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 11)
+
 project(flint LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
