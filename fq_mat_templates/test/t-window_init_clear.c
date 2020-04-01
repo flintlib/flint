@@ -35,16 +35,16 @@ main(void)
 
     	TEMPLATE(T, mat_t) a, w;
         slong j, r1, r2, c1, c2;
-        slong rows = n_randint(state, 10) + 1;
-        slong cols = n_randint(state, 10) + 1;
+        slong rows = n_randint(state, 10);
+        slong cols = n_randint(state, 10);
 
         TEMPLATE(T, ctx_randtest) (ctx, state);
 
         TEMPLATE(T, mat_init) (a, rows, cols, ctx);
         TEMPLATE(T, mat_randtest) (a, state, ctx);
 
-        r2 = n_randint(state, rows);
-        c2 = n_randint(state, cols);
+        r2 = n_randint(state, rows + 1);
+        c2 = n_randint(state, cols + 1);
         if (r2)
             r1 = n_randint(state, r2);
         else

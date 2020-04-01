@@ -16,6 +16,24 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+/* Composite strong pseudoprimes from http://oeis.org/A014233 */
+static const char * composites[] = {
+    "2047",
+    "1373653",
+    "25326001",
+    "3215031751",
+    "2152302898747",
+    "3474749660383",
+    "341550071728321",
+    "341550071728321",
+    "3825123056546413051",
+    "3825123056546413051",
+    "3825123056546413051",
+    "318665857834031151167461",
+    "3317044064679887385961981",
+    NULL,
+};
+
 int
 main(void)
 {
@@ -24,6 +42,47 @@ main(void)
 
     flint_printf("is_strong_probabprime....");
     fflush(stdout);
+
+    /* test table */
+    {
+        for (i = 0; composites[i] != NULL; i++)
+        {
+            int j;
+            fmpz_t n, a;
+            fmpz_init(n);
+            fmpz_init(a);
+
+            fmpz_set_str(n, composites[i], 10);
+
+            for (j = 0; j <= i; j++)
+            {
+                fmpz_set_ui(a, n_nth_prime(j + 1));
+
+                if (!fmpz_is_strong_probabprime(n, a))
+                {
+                    flint_printf("FAIL (composite expected to pass test):\n");
+                    fmpz_print(n); printf("\n");
+                    fmpz_print(a); printf("\n");
+                    abort();
+                }
+            }
+
+            fmpz_set_ui(a, n_nth_prime(i + 2
+                    + (i == 6) + 2*(i==8) + (i==9))  /* because of repeated entries */
+                );
+
+            if (fmpz_is_strong_probabprime(n, a))
+            {
+                flint_printf("FAIL (composite expected to fail test):\n");
+                fmpz_print(n); printf("\n");
+                fmpz_print(a); printf("\n");
+                abort();
+            }
+
+            fmpz_clear(n);
+            fmpz_clear(a);
+        }
+    }
 
     /* test primes always pass */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)

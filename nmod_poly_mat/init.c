@@ -21,7 +21,7 @@ nmod_poly_mat_init(nmod_poly_mat_t A, slong rows, slong cols, mp_limb_t n)
     {
         slong i;
 
-        A->entries = (nmod_poly_struct *) flint_malloc(rows * cols * sizeof(nmod_poly_struct));
+        A->entries = (nmod_poly_struct *) flint_malloc(flint_mul_sizes(rows, cols) * sizeof(nmod_poly_struct));
         A->rows = (nmod_poly_struct **) flint_malloc(rows * sizeof(nmod_poly_struct *));
 
         for (i = 0; i < rows * cols; i++)

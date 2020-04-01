@@ -35,7 +35,6 @@ int fmpz_is_strong_probabprime(const fmpz_t n, const fmpz_t base)
    fmpz_init(nm1);
    
    fmpz_sub_ui(nm1, n, 1);
-   fmpz_set(t, nm1);
 
    if (fmpz_cmp(base, n) >= 0)
       fmpz_mod(a, base, n);
@@ -49,12 +48,9 @@ int fmpz_is_strong_probabprime(const fmpz_t n, const fmpz_t base)
       slong s = 0;
 
       fmpz_init(y);
+      s = fmpz_val2(nm1);
 
-      while (!fmpz_tstbit(n, s))
-         s++;
-
-      fmpz_tdiv_q_2exp(t, t, s);
-
+      fmpz_tdiv_q_2exp(t, nm1, s);
       fmpz_powm(y, a, t, n);
 
       if (fmpz_is_one(y))

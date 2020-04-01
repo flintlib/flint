@@ -62,6 +62,8 @@ References
 
 .. [RosSch1962] Rosser, J. Barkley; Schoenfeld, Lowell: Approximate formulas for some functions of prime numbers. Illinois J. Math. 6 (1962), no. 1, 64--94. 
 
+.. [SorWeb2016] Sorenson, Jonathan and Webster, Jonathan : Strong pseudoprimes to twelve prime bases. Math. Comp. 86 (2017), 985-1003, https://doi.org/10.1090/mcom/3134 
+
 .. [Stehle2010] Stehl\'e, Damien : Floating-Point LLL: Theoretical and Practical Aspects, in Nguyen, Phong Q. and Vall\'ee, Brigitte : The LLL Algorithm: Survey and Applications (2010) 179--213
 
 .. [Stein2007] Stein, William A.: Modular forms, a computational approach. American Mathematical Society. 2007
@@ -70,9 +72,9 @@ References
 
 .. [ThullYap1990] Thull, K. and Yap, C. : A Unified Approach to {HGCD} Algorithms for Polynomials and Integers, (1990)
 
-.. [Villard2007] Villard, Gilles :  Certification of the QR Factor R and of Lattice Basis Reducedness, In proceedings of ACM International Symposium on Symbolic
-    and Algebraic Computation (2007) 361--368 ACM Press. 
+.. [Villard2007] Villard, Gilles :  Certification of the QR Factor R and of Lattice Basis Reducedness, In proceedings of ACM International Symposium on Symbolic and Algebraic Computation (2007) 361--368 ACM Press. 
 
 .. [WaktinsZeitlin1993] Watkins, W. and Zeitlin, J. : The minimal polynomial of $\cos(2\pi/n)$ The American Mathematical Monthly 100:5 (1993) 471--474
 
 .. [Whiteman1956] Whiteman, A. L. : A sum connected with the series for the partition function, Pacific Journal of Mathematics 6:1 (1956) 159--176
+
