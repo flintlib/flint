@@ -43,7 +43,7 @@ int _is_prime(const fmpz_t n, int proved)
     if (proved)
         return fmpz_is_prime(n);
     else
-	return fmpz_is_probabprime(n);
+    	return fmpz_is_probabprime(n);
 }
 
 int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
@@ -154,7 +154,8 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
             _fmpz_factor_extend_factor_ui(factor, xd[0]);
 
         ret = 1;
-    } else 
+    }
+    else 
     {
         fmpz_t n2, f;
         __mpz_struct * data;
@@ -165,12 +166,12 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
         flint_mpn_copyi(data->_mp_d, xd, xsize);
         data->_mp_size = xsize;
 
-        if (_is_prime(n2, proved))
+        if (proved != -1 && _is_prime(n2, proved))
         {
             _fmpz_factor_append(factor, n2, 1);
-
             ret = 1; 
-        } else
+        }
+        else
         {
             fmpz_t root;
 
@@ -190,7 +191,8 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                 _fmpz_factor_concat(factor, fac, exp);
 
                 fmpz_factor_clear(fac);
-            } else if (bits >= 16) /* trial factored already up to 15 bits */
+            }
+            else if (bits >= 16) /* trial factored already up to 15 bits */
             {
                 int found;
                 flint_rand_t state;

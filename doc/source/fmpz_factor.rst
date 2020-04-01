@@ -64,11 +64,26 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     increasing ``bits``. However, the quadratic sieve may be faster if
     ``bits`` is set to more than one third of the number of bits of `n`.
 
-    If ``proved`` is set to `1` the function will prove all factors prime
-    (other than the last factor, if the return value is `0`), otherwise they
-    will be probable primes.
+    The function uses trial factoring up to ``bits = 15``, followed by
+    a primality test and a perfect power test to check if the factorisation
+    is complete. If ``bits`` is at least 16, it proceeds to use the
+    elliptic curve method to look for larger factors.
 
-    The function uses trial factoring and the elliptic curve method.
+    The behavior of primality testing is determined by the ``proved``
+    parameter:
+
+    If ``proved`` is set to `1` the function will prove all factors prime
+    (other than the last factor, if the return value is `0`).
+
+    If ``proved`` is set to `0`, the function will only check that factors are
+    probable primes.
+
+    If ``proved`` is set to `-1`, the function will not test primality
+    after performing trial division. A perfect power test is still performed.
+
+    As an exception to the rules stated above, this function will call
+    ``n_factor`` internally if `n` or the remainder after trial division
+    is smaller than one word, guaranteeing a complete factorisation.
 
 .. function:: void fmpz_factor_si(fmpz_factor_t factor, slong n)
 
