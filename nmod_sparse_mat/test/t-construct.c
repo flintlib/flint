@@ -23,7 +23,7 @@ main(void)
     slong rep, r, c, i, j, k, nnz;
     mp_limb_t n;
     nmod_t mod;
-    nmod_sparse_mat_t A, B;
+    nmod_sparse_mat_t A, B, C;
     slong *rows;
     slong *cols;
     mp_limb_t *vals;
@@ -41,6 +41,7 @@ main(void)
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r, c, mod);
         nmod_sparse_mat_init(B, r, c, mod);
+        nmod_sparse_mat_init(C, 0, c, mod);
 
         nmod_sparse_mat_randtest(A, state, 2, 2);
         nmod_sparse_mat_randtest(B, state, 2, 2);
@@ -69,6 +70,17 @@ main(void)
             nmod_sparse_mat_print_pretty(A);
             flint_printf("B = ");
             nmod_sparse_mat_print_pretty(B);
+            abort();
+        }
+        
+        for (i = 0; i < r; ++i) nmod_sparse_mat_append_row(C, &A->rows[i]);
+        if (!nmod_sparse_mat_equal(A, C))
+        {
+            flint_printf("FAIL: A != C\n");
+            flint_printf("A = ");
+            nmod_sparse_mat_print_pretty(A);
+            flint_printf("C = ");
+            nmod_sparse_mat_print_pretty(C);
             abort();
         }
         flint_free(rows);

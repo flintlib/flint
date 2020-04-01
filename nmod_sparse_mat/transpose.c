@@ -29,6 +29,7 @@ nmod_sparse_mat_transpose(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
         for (i = 0; i < A->rows[r].nnz; ++i) 
         {
             c = A->rows[r].entries[i].ind;
+            if(c >= A->c) break;
             B->rows[c].nnz += 1;
         }
     }
@@ -46,7 +47,9 @@ nmod_sparse_mat_transpose(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
         for (i = 0; i < A->rows[r].nnz; ++i) 
         {
             nmod_sparse_entry_struct *Ae = &A->rows[r].entries[i];
-            c = Ae->ind, j = B->rows[c].nnz++;
+            c = Ae->ind;
+            if(c >= A->c) break;
+            j = B->rows[c].nnz++;
             nmod_sparse_entry_struct *Be = &B->rows[c].entries[j];
             Be->ind = r, Be->val = Ae->val;
         }
