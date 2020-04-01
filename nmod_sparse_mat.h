@@ -113,6 +113,23 @@ void nmod_sparse_mat_set(nmod_sparse_mat_t mat, const nmod_sparse_mat_t src)
 FLINT_DLL
 void nmod_sparse_mat_from_entries(nmod_sparse_mat_t mat, slong * rows, slong * cols, mp_limb_t * vals, slong nnz);
 
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_append_col(nmod_sparse_mat_t mat, const mp_ptr vec) 
+{
+    slong i;
+    for(i=0; i<mat->r; ++i) _nmod_sparse_vec_append_entry(&mat->rows[i], mat->c, vec[i]);
+    mat->c += 1;
+}
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_append_row(nmod_sparse_mat_t mat, const nmod_sparse_vec_t vec) 
+{
+    mat->rows = realloc(mat->rows, (mat->r+1)*sizeof(*mat->rows));
+    memset(mat->rows + mat->r, 0, sizeof(*mat->rows));
+    nmod_sparse_vec_set(&mat->rows[mat->r], vec);
+    mat->r += 1;
+}
+
 /* Convert from/to dense matrix */
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_from_dense(nmod_sparse_mat_t mat, const nmod_mat_t src)
@@ -304,11 +321,24 @@ FLINT_DLL void nmod_sparse_mat_apply_permutation(nmod_sparse_mat_t A, slong * P,
  */
 
 /* Decomposition */
+FLINT_DLL
 slong nmod_sparse_mat_lu(slong *P, slong *Q, nmod_sparse_mat_t L, nmod_sparse_mat_t U, const nmod_sparse_mat_t A);
 
+FLINT_DLL
+slong nmod_sparse_mat_rref(nmod_sparse_mat_t A);
+
 /* Nonsingular solving */
+FLINT_DLL
 int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b, flint_rand_t state);
+
+FLINT_DLL
 int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
+
+FLINT_DLL
+int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
+
+FLINT_DLL
+void nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t A);
 
 /* Nullspace */
 /* NMOD_SPARSE_MAT_INLINE
