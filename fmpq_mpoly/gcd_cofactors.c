@@ -12,15 +12,15 @@
 #include "fmpq_mpoly.h"
 
 
-int fmpq_mpoly_gcd_cofactors_threaded(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
+int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
               fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                                const fmpq_mpoly_ctx_t ctx, slong thread_limit)
+                                                    const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_t cAbar, cBbar;
     int success;
 
-    success = fmpz_mpoly_gcd_cofactors_threaded(G->zpoly, Abar->zpoly,
-                     Bbar->zpoly, A->zpoly, B->zpoly, ctx->zctx, thread_limit);
+    success = fmpz_mpoly_gcd_cofactors(G->zpoly, Abar->zpoly, Bbar->zpoly,
+                                                A->zpoly, B->zpoly, ctx->zctx);
     if (!success)
         return 0;
 
@@ -48,10 +48,3 @@ int fmpq_mpoly_gcd_cofactors_threaded(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
     return 1;
 }
 
-int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
-             fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    return fmpq_mpoly_gcd_cofactors_threaded(G, Abar, Bbar, A, B, ctx,
-                                                   MPOLY_DEFAULT_THREAD_LIMIT);
-}

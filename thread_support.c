@@ -85,7 +85,7 @@ slong flint_request_threads(thread_pool_handle ** handles, slong thread_limit)
 
     *handles = NULL;
 
-    if (global_thread_pool_initialized)
+    if (global_thread_pool_initialized && thread_limit > 1)
     {
         slong max_num_handles;
         max_num_handles = thread_pool_get_size(global_thread_pool);

@@ -928,10 +928,6 @@ FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
 FLINT_DLL int fmpz_mpoly_gcd(fmpz_mpoly_t G,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpoly_gcd_threaded(fmpz_mpoly_t G,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
-                                                           slong thread_limit);
-
 FLINT_DLL int _fmpz_mpoly_gcd(fmpz_mpoly_t G, flint_bitcnt_t Gbits,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
@@ -939,10 +935,6 @@ FLINT_DLL int _fmpz_mpoly_gcd(fmpz_mpoly_t G, flint_bitcnt_t Gbits,
 FLINT_DLL int fmpz_mpoly_gcd_cofactors(fmpz_mpoly_t G,
                 fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, const fmpz_mpoly_t A,
                              const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpz_mpoly_gcd_cofactors_threaded(fmpz_mpoly_t G,
-                 fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, const fmpz_mpoly_t A,
-         const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit);
 
 FLINT_DLL int _fmpz_mpoly_gcd_cofactors(fmpz_mpoly_t G, flint_bitcnt_t Gbits,
                                    fmpz_mpoly_t Abar, flint_bitcnt_t Abarbits,
