@@ -344,9 +344,12 @@ slong nmod_sparse_mat_lu(slong *P, slong *Q, nmod_sparse_mat_t L, nmod_sparse_ma
 FLINT_DLL
 slong nmod_sparse_mat_rref(nmod_sparse_mat_t A);
 
-/* Solving */
+/* Solve Ax=b */
 FLINT_DLL
 int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b, flint_rand_t state);
+
+FLINT_DLL
+int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
 
 FLINT_DLL
 int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
@@ -354,15 +357,23 @@ int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b
 FLINT_DLL
 int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
 
+/* Find single nullvector */
+int nmod_sparse_mat_nullvector_wiedemann(mp_ptr x, const nmod_sparse_mat_t A, flint_rand_t state);
+
+int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t A, flint_rand_t state);
+
 /* Note: this should take in uninitialized matrix X */
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
+
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
+
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t A);
 
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t A);
-
-FLINT_DLL
-slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
 slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t A);

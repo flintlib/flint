@@ -22,13 +22,13 @@ int
 main(void)
 {
     int iter, ret;
-    slong rep, nreps = 100, r, c, i, lanczos_discrep = 0;
+    slong rep, nreps = 100, r, c, i, lanczos_discrep = 0, wied_discrep = 0;
     mp_limb_t n, a;
     nmod_t mod;
     nmod_sparse_mat_t A;
     nmod_mat_t X, AX;
     slong rk[3];
-    double elapsed[3] = {0, 0, 0};
+    double elapsed[4] = {0, 0, 0, 0};
     struct timeval start, end;
     FLINT_TEST_INIT(state);
     
@@ -45,7 +45,7 @@ main(void)
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r, c, mod);
         nmod_sparse_mat_randtest(A, state, c/20, c/10);
-        for (i = 0; i < 3; ++i) 
+        for (i = 0; i < 4; ++i) 
         {
             gettimeofday(&start, NULL);
             switch (i) 
@@ -53,6 +53,7 @@ main(void)
             case 0: rk[0] = nmod_sparse_mat_nullspace_rref(X, A); break;
             case 1: rk[1] = nmod_sparse_mat_nullspace_lu(X, A); break;
             case 2: rk[2] = nmod_sparse_mat_nullspace_lanczos(X, A, state, 2); break;
+            case 3: rk[3] = nmod_sparse_mat_nullspace_wiedemann(X, A, state, 2); break;
             }
             gettimeofday(&end, NULL);
             elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
@@ -69,9 +70,13 @@ main(void)
                 nmod_mat_print_pretty(X);
                 abort();
             }
-            if (i == 2 && rk[i] != rk[i-1])
+            if (i == 2 && rk[i] != rk[0])
             {
                 lanczos_discrep += 1;
+            }
+            if (i == 3 && rk[i] != rk[0])
+            {
+                wied_discrep += 1;
             }
             
             nmod_mat_clear(X);
@@ -85,6 +90,8 @@ main(void)
     flint_printf("Average time for rref: %lf\n", elapsed[0]/nreps);
     flint_printf("Average time for LU: %lf\n", elapsed[1]/nreps);
     flint_printf("Average time for Lanzcos: %lf\n", elapsed[2]/nreps);
+    flint_printf("Average time for Wiedemann: %lf\n", elapsed[3]/nreps);
     flint_printf("Lanczos did not find full nullspace for %wd/%wd examples\n", lanczos_discrep, nreps);
+    flint_printf("Wiedemann did not find full nullspace for %wd/%wd examples\n", lanczos_discrep, nreps);
     return 0;
 }
