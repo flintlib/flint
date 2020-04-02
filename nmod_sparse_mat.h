@@ -508,32 +508,54 @@ FLINT_DLL
 slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 /* Solving */
 >>>>>>> Now with additional utilities, more correct basic functions, and nullspace and inversion functions
+=======
+/* Solve Ax=b */
+>>>>>>> Added nullvector functions for Lanzcos, everything for basic Wiedemann
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_block_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
+<<<<<<< HEAD
 slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M);
+=======
+int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
+
+FLINT_DLL
+int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
+>>>>>>> Added nullvector functions for Lanzcos, everything for basic Wiedemann
 
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /* Determinant */
 FLINT_DLL
 mp_limb_t nmod_sparse_mat_det(const nmod_sparse_mat_t M);
 =======
+=======
+/* Find single nullvector */
+int nmod_sparse_mat_nullvector_wiedemann(mp_ptr x, const nmod_sparse_mat_t A, flint_rand_t state);
+
+int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t A, flint_rand_t state);
+
+>>>>>>> Added nullvector functions for Lanzcos, everything for basic Wiedemann
 /* Note: this should take in uninitialized matrix X */
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
+
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
+
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t A);
 
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t A);
-
-FLINT_DLL
-slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
 slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t A);
