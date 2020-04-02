@@ -29,7 +29,7 @@ FLINT_TLS_PREFIX int _factor_trial_tree_initialised = 0;
 #if FLINT_REENTRANT && !HAVE_TLS
 void _tree_mutex_init()
 {
-    pthread_mutex_init(&factor_trial_lock, NULL);
+    pthread_mutex_init(&_factor_trial_lock, NULL);
 }
 #endif
 
