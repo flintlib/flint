@@ -197,6 +197,7 @@ void nmod_sparse_mat_split_vertical(nmod_sparse_mat_t M1, nmod_sparse_mat_t M2, 
 =======
 >>>>>>> Spacing and cuddling fixed
 
+
 /* res->r must equal mat1->r and mat2->r */
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_concat_horizontal(nmod_sparse_mat_t res,
@@ -214,16 +215,36 @@ void nmod_sparse_mat_concat_vertical(nmod_sparse_mat_t res, const nmod_sparse_ma
     slong i;
     res->c = FLINT_MAX(mat1->c, mat2->c);
     for (i = 0; i < mat1->r; ++i)
-        nmod_sparse_vec_set(&res->rows[i], &mat1->rows[i]);
+        nmod_sparse_vec_set(&res->rows[i], &mat1->rows[i], mat1->c_off);
     for (i = mat1->r; i < res->r; ++i)
-        nmod_sparse_vec_set(&res->rows[i], &mat2->rows[i-mat1->r]);
+        nmod_sparse_vec_set(&res->rows[i], &mat2->rows[i-mat1->r], mat2->c_off);
 }
 
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_split_horizontal(nmod_sparse_mat_t res1, nmod_sparse_mat_t res2, const nmod_sparse_mat_t mat, slong c)
+{
+    slong i;
+    for(i=0; i<mat->r; ++i) nmod_sparse_vec_split(&res1->rows[i], &res2->rows[i], &mat->rows[i], c);
+}
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_split_vertical(nmod_sparse_mat_t res1, nmod_sparse_mat_t res2, const nmod_sparse_mat_t mat, slong r)
+{
+    slong i;
+    r = FLINT_MIN(r, mat->r);
+    for(i=0; i<r; ++i) nmod_sparse_vec_set(&res1->rows[i], &mat->rows[i], mat->c_off);
+    for(i=r; i<mat->r; ++i) nmod_sparse_vec_set(&res2->rows[i-r], &mat->rows[i], mat->c_off);
+}
+
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
 >>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
 =======
 >>>>>>> Spacing and cuddling fixed
+=======
+
+>>>>>>> Now with additional utilities, more correct basic functions, and nullspace and inversion functions
 /* Matrix permutation */
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_mat_permute_cols(nmod_sparse_mat_t M, slong *Q) 
@@ -476,12 +497,20 @@ int nmod_sparse_mat_nullvector_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
 
+<<<<<<< HEAD
+=======
+/* Decomposition/reduction */
+>>>>>>> Now with additional utilities, more correct basic functions, and nullspace and inversion functions
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_block_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
 
+<<<<<<< HEAD
+=======
+/* Solving */
+>>>>>>> Now with additional utilities, more correct basic functions, and nullspace and inversion functions
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_block_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters);
 
@@ -491,9 +520,24 @@ slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M);
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M);
 
+<<<<<<< HEAD
 /* Determinant */
 FLINT_DLL
 mp_limb_t nmod_sparse_mat_det(const nmod_sparse_mat_t M);
+=======
+/* Note: this should take in uninitialized matrix X */
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t A);
+
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t A);
+
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
+
+FLINT_DLL
+slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t A);
+>>>>>>> Now with additional utilities, more correct basic functions, and nullspace and inversion functions
 
 /* Nullspace */
 /* NMOD_SPARSE_MAT_INLINE
