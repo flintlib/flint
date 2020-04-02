@@ -22,31 +22,33 @@ int
 main(void)
 {
     int iter, ret;
-    int niters = 0, nosol = 0, psolved = 0;
-    slong rep, r, c, i;
+    int niters = 0, wied_nosol = 0, nosol = 0, psolved = 0;
+    slong rep, r, c, i, nrep = 100;
     mp_limb_t n, a;
     nmod_t mod;
     nmod_sparse_mat_t A, At;
     mp_ptr x, x2, b, Atb, Ax, AtAx;
-    double rref_elapsed = 0, lu_elapsed = 0, lanczos_elapsed = 0;
+    double rref_elapsed = 0, lu_elapsed = 0, lanczos_elapsed = 0, wiedemann_elapsed;
     struct timeval start, end;
     FLINT_TEST_INIT(state);
     
     flint_printf("solving Ax=b....");
     fflush(stdout);
     
-    for (rep = 0; rep < 100; rep++)
+    for (rep = 0; rep < nrep; rep++)
     {
         if(rep % 5==0) {flint_printf("."); fflush(stdout);}
-        r = n_randint(state, 400);
-        c = n_randint(state, 400);
+        
+        do c = r = n_randint(state, 200);
+        while(c == 0 || r == 0);
+
         do n = n_randtest_not_zero(state);
         while (n <= 32 || !n_is_prime(n));
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r, c, mod);
         nmod_sparse_mat_init(At, c, r, mod);
 
-        nmod_sparse_mat_randtest(A, state, c/20, c/10);
+        nmod_sparse_mat_randtest(A, state, 30, 30);
         nmod_sparse_mat_transpose(At, A);
         x = _nmod_vec_init(c);
         x2 = _nmod_vec_init(c);
@@ -84,29 +86,50 @@ main(void)
 
         /* Solve iteratively */
         gettimeofday(&start, NULL);
-        for (iter=1; iter<=10; ++iter) /* TODO: set number of trials based on params */
-            if (ret=nmod_sparse_mat_solve_lanczos(x2, A, b, state)) break;
+        ret=nmod_sparse_mat_solve_wiedemann(x2, A, b);
+        gettimeofday(&end, NULL);
+        wiedemann_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
+        if (ret == 0)
+        {
+            wied_nosol += 1;
+        }
+        else
+        {
+            nmod_sparse_mat_mul_vec(Ax, A, x2);
+            if (!_nmod_vec_equal(b, Ax, A->r))
+            {
+                flint_printf("FAIL: Ax != b\n");
+                abort();
+            }
+        }
+
+        gettimeofday(&start, NULL);
+        iter = 0;
+        do ret=nmod_sparse_mat_solve_lanczos(x2, A, b, state);
+        while(ret==0 && ++iter < 30);
         gettimeofday(&end, NULL);
         lanczos_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
-
-        if (iter==11)
+        if (ret==0)
         {
             nosol += 1;
             continue;
         }
-        niters += iter;
-        nmod_sparse_mat_mul_vec(Ax, A, x2);
-        nmod_sparse_mat_mul_vec(AtAx, At, Ax);
-        nmod_sparse_mat_mul_vec(Atb, At, b);
-        if (!_nmod_vec_equal(AtAx, Atb, A->c))
+        else
         {
-            flint_printf("FAIL: AtAx != Atb, got ret %d\n", ret);
-            abort();
-        } 
-        else if (!_nmod_vec_equal(b, Ax, A->r))
-        {
-            psolved += 1;
-        } 
+            niters += iter;
+            nmod_sparse_mat_mul_vec(Ax, A, x2);
+            nmod_sparse_mat_mul_vec(AtAx, At, Ax);
+            nmod_sparse_mat_mul_vec(Atb, At, b);
+            if (!_nmod_vec_equal(AtAx, Atb, A->c))
+            {
+                flint_printf("FAIL: AtAx != Atb, got ret %d\n", ret);
+                abort();
+            } 
+            else if (!_nmod_vec_equal(b, Ax, A->r))
+            {
+                psolved += 1;
+            }
+        }
 
         flint_free(x);
         flint_free(x2);
@@ -120,9 +143,11 @@ main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-    flint_printf("Average time for Lanzcos: %lf\n", lanczos_elapsed/1000);
-    flint_printf("Average time for LU: %lf\n", lu_elapsed/1000);
-    flint_printf("Average time for rref: %lf\n", rref_elapsed/1000);
-    flint_printf("Lanczos found no solution for %wd/%wd examples, pseudo-solution for %wd/%wd examples, and required %f iters per solution.\n", nosol, 1000, psolved, 1000, niters/1000.);
+    flint_printf("Average time for Wiedemann: %lf\n", wiedemann_elapsed/nrep);
+    flint_printf("Average time for Lanzcos: %lf\n", lanczos_elapsed/nrep);
+    flint_printf("Average time for LU: %lf\n", lu_elapsed/nrep);
+    flint_printf("Average time for rref: %lf\n", rref_elapsed/nrep);
+    flint_printf("Wiedemann found no solution for %wd/%wd examples.\n", wied_nosol, nrep);
+    flint_printf("Lanczos found no solution for %wd/%wd examples, pseudo-solution for %wd/%wd examples, and required %f extra iters per solution (on average).\n", nosol, nrep, psolved, nrep, (double)niters/nrep);
     return 0;
 }

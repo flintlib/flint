@@ -16,7 +16,7 @@
 #include "nmod_sparse_vec.h"
 #include "nmod_sparse_mat.h"
 
-slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters)
+slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters)
 {
     /* Generate random solutions to a random system Ax=b and stop when nullspace filled */
     int ret;
@@ -28,7 +28,7 @@ slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t A,
     xps = NULL;
     for(iter = 0; iter < max_iters; )
     {
-        if(nmod_sparse_mat_nullvector_lanczos(x, A, state) == 0) {++iter; continue;}
+        if(nmod_sparse_mat_nullvector_wiedemann(x, A, state) == 0) {++iter; continue;}
         
         /* Reduce by existing kernel vectors */
         for (j = nxs-1; j >= 0; --j) {
