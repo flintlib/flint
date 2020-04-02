@@ -62,13 +62,32 @@ int main(void)
             flint_printf("FAIL: results not equal\n");
             abort();
         }
+
+        nmod_sparse_mat_window_clear(window1);
+        nmod_sparse_mat_window_clear(window2);
+
+        nmod_sparse_mat_init(window1, r1, c, mod);
+        nmod_sparse_mat_init(window2, r2, c, mod);
+        nmod_sparse_mat_split_vertical(window1, window2, C, r1);
+        
+        if (!(nmod_sparse_mat_equal(window1, A) && nmod_sparse_mat_equal(window2, B)))
+        {
+            flint_printf("A = \n");
+            nmod_sparse_mat_print_pretty(A);
+            flint_printf("B = \n");
+            nmod_sparse_mat_print_pretty(B);
+            flint_printf("A concat_vertical B = \n");
+            nmod_sparse_mat_print_pretty(C);
+            flint_printf("FAIL: results not equal\n");
+            abort();
+        }
+
+        nmod_sparse_mat_window_clear(window1);
+        nmod_sparse_mat_window_clear(window2);
         
         nmod_sparse_mat_clear(A);
         nmod_sparse_mat_clear(B);
         nmod_sparse_mat_clear(C);
-
-        nmod_sparse_mat_window_clear(window1);
-        nmod_sparse_mat_window_clear(window2);
     }
 
 

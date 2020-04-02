@@ -77,8 +77,8 @@ slong nmod_sparse_mat_lu(slong *P, slong *Q,
     {
         nmod_sparse_mat_zero(L);
         nmod_sparse_mat_zero(U);
-        memset(P, 0, (A->r)*sizeof(*P));
-        memset(Q, 0, (A->c)*sizeof(*Q));
+        for (i = 0; i < A->r; ++i) P[i] = i;
+        for (i = 0; i < A->c; ++i) Q[i] = i;
         return 0;
     }
     nmod_sparse_mat_init(Lt, L->c, L->r, A->mod);

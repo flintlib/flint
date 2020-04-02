@@ -56,6 +56,7 @@ int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b
         for(i = 0; i < A->c; ++i) x[i] = xp[Q[i]];
         flint_free(xp);
     }
+    flint_free(Q);
     flint_free(y);
     U->r = A->r;
     nmod_sparse_mat_clear(U);

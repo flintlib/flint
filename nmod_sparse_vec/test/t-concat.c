@@ -55,12 +55,33 @@ int main(void)
             nmod_sparse_vec_print_pretty(u, 0, len, mod);
             flint_printf("v = \n");
             nmod_sparse_vec_print_pretty(v, 0, len, mod);
-            flint_printf("A concat_horizontal B = \n");
+            flint_printf("u | v = \n");
             nmod_sparse_vec_print_pretty(w, 0, len, mod);
             flint_printf("window1 = \n");
             nmod_sparse_vec_print_pretty(window1, 0, len, mod);
             flint_printf("window2 = \n");
             nmod_sparse_vec_print_pretty(window2, len, len, mod);
+            flint_printf("FAIL: results not equal\n");
+            abort();
+        }
+        nmod_sparse_vec_window_clear(window1);
+        nmod_sparse_vec_window_clear(window2);
+
+        nmod_sparse_vec_init(window1);
+        nmod_sparse_vec_init(window2);
+        nmod_sparse_vec_split(window1, window2, w, len);
+        if (!(nmod_sparse_vec_equal(window1, u, 0) && nmod_sparse_vec_equal(window2, v, 0)))
+        {
+            flint_printf("u = ");
+            nmod_sparse_vec_print_pretty(u, 0, len, mod);
+            flint_printf("v = \n");
+            nmod_sparse_vec_print_pretty(v, 0, len, mod);
+            flint_printf("u | v = \n");
+            nmod_sparse_vec_print_pretty(w, 0, len, mod);
+            flint_printf("window1 = \n");
+            nmod_sparse_vec_print_pretty(window1, 0, len, mod);
+            flint_printf("window2 = \n");
+            nmod_sparse_vec_print_pretty(window2, 0, len, mod);
             flint_printf("FAIL: results not equal\n");
             abort();
         }

@@ -106,8 +106,7 @@ void nmod_sparse_mat_set(nmod_sparse_mat_t mat, const nmod_sparse_mat_t src)
 {
     slong i, rmax = FLINT_MIN(mat->r, src->r);
     if(mat==src || mat->r == 0) return;
-    mat->c_off = src->c_off;
-    for(i=0; i<rmax; ++i) nmod_sparse_vec_set(&mat->rows[i], &src->rows[i]);
+    for(i=0; i<rmax; ++i) nmod_sparse_vec_set(&mat->rows[i], &src->rows[i], src->c_off);
 }
 
 FLINT_DLL
@@ -126,7 +125,7 @@ void nmod_sparse_mat_append_row(nmod_sparse_mat_t mat, const nmod_sparse_vec_t v
 {
     mat->rows = realloc(mat->rows, (mat->r+1)*sizeof(*mat->rows));
     memset(mat->rows + mat->r, 0, sizeof(*mat->rows));
-    nmod_sparse_vec_set(&mat->rows[mat->r], vec);
+    nmod_sparse_vec_set(&mat->rows[mat->r], vec, 0);
     mat->r += 1;
 }
 
@@ -155,6 +154,7 @@ void nmod_sparse_mat_window_clear(nmod_sparse_mat_t window)
     memset(window, 0, sizeof(*window));
 }
 
+
 /* res->r must equal mat1->r and mat2->r */
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_concat_horizontal(nmod_sparse_mat_t res,
@@ -172,10 +172,27 @@ void nmod_sparse_mat_concat_vertical(nmod_sparse_mat_t res, const nmod_sparse_ma
     slong i;
     res->c = FLINT_MAX(mat1->c, mat2->c);
     for (i = 0; i < mat1->r; ++i)
-        nmod_sparse_vec_set(&res->rows[i], &mat1->rows[i]);
+        nmod_sparse_vec_set(&res->rows[i], &mat1->rows[i], mat1->c_off);
     for (i = mat1->r; i < res->r; ++i)
-        nmod_sparse_vec_set(&res->rows[i], &mat2->rows[i-mat1->r]);
+        nmod_sparse_vec_set(&res->rows[i], &mat2->rows[i-mat1->r], mat2->c_off);
 }
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_split_horizontal(nmod_sparse_mat_t res1, nmod_sparse_mat_t res2, const nmod_sparse_mat_t mat, slong c)
+{
+    slong i;
+    for(i=0; i<mat->r; ++i) nmod_sparse_vec_split(&res1->rows[i], &res2->rows[i], &mat->rows[i], c);
+}
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_split_vertical(nmod_sparse_mat_t res1, nmod_sparse_mat_t res2, const nmod_sparse_mat_t mat, slong r)
+{
+    slong i;
+    r = FLINT_MIN(r, mat->r);
+    for(i=0; i<r; ++i) nmod_sparse_vec_set(&res1->rows[i], &mat->rows[i], mat->c_off);
+    for(i=r; i<mat->r; ++i) nmod_sparse_vec_set(&res2->rows[i-r], &mat->rows[i], mat->c_off);
+}
+
 
 /* Matrix permutation */
 NMOD_SPARSE_VEC_INLINE
@@ -320,14 +337,14 @@ FLINT_DLL void nmod_sparse_mat_invert_cols(nmod_sparse_mat_t mat, slong * perm);
 FLINT_DLL void nmod_sparse_mat_apply_permutation(nmod_sparse_mat_t A, slong * P, slong n);
  */
 
-/* Decomposition */
+/* Decomposition/reduction */
 FLINT_DLL
 slong nmod_sparse_mat_lu(slong *P, slong *Q, nmod_sparse_mat_t L, nmod_sparse_mat_t U, const nmod_sparse_mat_t A);
 
 FLINT_DLL
 slong nmod_sparse_mat_rref(nmod_sparse_mat_t A);
 
-/* Nonsingular solving */
+/* Solving */
 FLINT_DLL
 int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b, flint_rand_t state);
 
@@ -337,8 +354,18 @@ int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b
 FLINT_DLL
 int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b);
 
+/* Note: this should take in uninitialized matrix X */
 FLINT_DLL
-void nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t A);
+slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t A);
+
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t A);
+
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
+
+FLINT_DLL
+slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t A);
 
 /* Nullspace */
 /* NMOD_SPARSE_MAT_INLINE

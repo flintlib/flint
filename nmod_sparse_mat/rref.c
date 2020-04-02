@@ -33,7 +33,7 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t A)
     remr = A->r;
     for (r = 0; r<A->r; ++r) 
     {
-        if (!A->rows[r].nnz) P[r] = --remr; 
+        if (!A->rows[r].nnz || A->rows[r].entries[0].ind >= A->c) P[r] = --remr; 
         else P[r] = -1;
     }
     
@@ -65,7 +65,7 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t A)
 
             cc = nmod_neg(nmod_sparse_vec_at(row, pc), A->mod);
             nmod_sparse_vec_scalar_addmul(row, row, prow, cc, A->mod);
-            if (row->nnz == 0) P[r] = --remr;
+            if (row->nnz == 0 || row->entries[0].ind >= A->c) P[r] = --remr;
         }
         /* Gaussian eliminate cols */
         nmod_sparse_vec_scalar_mul(pcol, pcol, cinv, A->mod);

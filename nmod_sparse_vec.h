@@ -93,13 +93,14 @@ void nmod_sparse_vec_zero(nmod_sparse_vec_t vec)
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_one(nmod_sparse_vec_t vec, slong ind) 
 {
+    vec->nnz = 1;
     vec->entries = realloc(vec->entries, sizeof(*vec->entries));
     vec->entries[0].ind = ind;
     vec->entries[0].val = UWORD(1);
 }
 
 FLINT_DLL
-void nmod_sparse_vec_set(nmod_sparse_vec_t vec, const nmod_sparse_vec_t src);
+void nmod_sparse_vec_set(nmod_sparse_vec_t vec, const nmod_sparse_vec_t src, slong ioff);
 
 NMOD_SPARSE_VEC_INLINE
 void _nmod_sparse_vec_append_entry(nmod_sparse_vec_t v, slong ind, mp_limb_t val)
@@ -155,6 +156,9 @@ void nmod_sparse_vec_window_clear(nmod_sparse_vec_t window)
 FLINT_DLL
 void nmod_sparse_vec_concat(nmod_sparse_vec_t res, const nmod_sparse_vec_t vec1,  const nmod_sparse_vec_t vec2, slong len1);
 
+FLINT_DLL
+void nmod_sparse_vec_split(nmod_sparse_vec_t res1, nmod_sparse_vec_t res2, const nmod_sparse_vec_t vec, slong ind);
+
 /* Vector permutation */
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_permute_inds(nmod_sparse_vec_t vec, slong *P) 
@@ -176,7 +180,7 @@ NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_neg(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, nmod_t mod)
 {
     slong i;
-    nmod_sparse_vec_set(v, u);
+    nmod_sparse_vec_set(v, u, 0);
     for (i = 0; i < v->nnz; ++i) v->entries[i].val = nmod_neg(v->entries[i].val, mod);
 }
 
