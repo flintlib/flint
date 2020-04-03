@@ -553,3 +553,17 @@ Convolution
     limbs of space and ``tt`` must have ``2*(limbs + 1)`` of free 
     space.
 
+FFT Precaching
+-------------------------------------------------------------------------------
+
+
+.. function:: void fft_precache(mp_limb_t ** jj, slong depth, slong limbs, slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1)
+
+    Precompute the FFT of ``jj`` for use with precache functions. The
+    parameters are as for ``fft_convolution``.
+    
+.. function:: void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, slong limbs, slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt)
+
+    As per ``fft_convolution`` except that it is assumed ``fft_precache`` has
+    been called on ``jj`` with the same parameters. This will then run faster
+    than if ``fft_convolution`` had been run with the original ``jj``.
