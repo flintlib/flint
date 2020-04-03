@@ -1066,7 +1066,7 @@ FLINT_DLL void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
 
 FLINT_DLL void mpoly_degrees_si_threaded(slong * user_degs, const ulong * poly_exps,
                          slong len,  flint_bitcnt_t bits, const mpoly_ctx_t mctx,
-                              thread_pool_handle * handles, slong num_handles);
+                        const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
                           slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);

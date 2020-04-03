@@ -936,9 +936,9 @@ FLINT_DLL int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
 FLINT_DLL int nmod_mpoly_divides(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpoly_divides_threaded(nmod_mpoly_t Q,
+FLINT_DLL int _nmod_mpoly_divides(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
-                                                           slong thread_limit);
+                        const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
@@ -949,7 +949,7 @@ FLINT_DLL int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
 
 FLINT_DLL int _nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
-                              thread_pool_handle * handles, slong num_handles);
+                        const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);

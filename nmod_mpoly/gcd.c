@@ -546,21 +546,23 @@ static int _try_divides(
     nmod_mpoly_t G,
     const nmod_mpoly_t A, int try_a,
     const nmod_mpoly_t B, int try_b,
-    const nmod_mpoly_ctx_t ctx)
+    const nmod_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     int success;
     nmod_mpoly_t Q;
 
     nmod_mpoly_init(Q, ctx);
 
-    if (try_b && nmod_mpoly_divides_threaded(Q, A, B, ctx, 1))
+    if (try_b && _nmod_mpoly_divides(Q, A, B, ctx, handles, num_handles))
     {
         nmod_mpoly_set(G, B, ctx);
         success = 1;
         goto cleanup;
     }
 
-    if (try_a && nmod_mpoly_divides_threaded(Q, B, A, ctx, 1))
+    if (try_a && _nmod_mpoly_divides(Q, B, A, ctx, handles, num_handles))
     {
         nmod_mpoly_set(G, A, ctx);
         success = 1;
@@ -1057,8 +1059,11 @@ calculate_trivial_gcd:
         if (gcd_is_trivial)
             goto calculate_trivial_gcd;
 
-        if ((try_a || try_b) && _try_divides(G, A, try_a, B, try_b, ctx))
+        if ((try_a || try_b) &&
+            _try_divides(G, A, try_a, B, try_b, ctx, handles, num_handles))
+        {
             goto successful;
+        }
     }
 
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);

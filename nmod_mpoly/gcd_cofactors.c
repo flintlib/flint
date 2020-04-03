@@ -97,8 +97,8 @@ static void _try_monomial_gcd(
 
     TMP_END;
 
-    nmod_mpoly_divides_threaded(_Abar, A, _G, ctx, 0);
-    nmod_mpoly_divides_threaded(_Bbar, B, _G, ctx, 0);
+    _nmod_mpoly_divides(_Abar, A, _G, ctx, NULL, 0);
+    _nmod_mpoly_divides(_Bbar, B, _G, ctx, NULL, 0);
 
     nmod_mpoly_swap(G, _G, ctx);
     nmod_mpoly_swap(Abar, _Abar, ctx);
@@ -252,9 +252,9 @@ static int _try_missing_var(
     _mpoly_gen_shift_left(tG->exps, tG->bits, tG->length,
                                    var, FLINT_MIN(Ashift, Bshift), ctx->minfo);
 
-    success = nmod_mpoly_divides_threaded(tAbar, A, tG, ctx, 0);
+    success = _nmod_mpoly_divides(tAbar, A, tG, ctx, NULL, 0);
     FLINT_ASSERT(success);
-    success = nmod_mpoly_divides_threaded(tBbar, B, tG, ctx, 0);
+    success = _nmod_mpoly_divides(tBbar, B, tG, ctx, NULL, 0);
     FLINT_ASSERT(success);
 
     nmod_mpoly_swap(G, tG, ctx);
@@ -285,14 +285,16 @@ static int _try_divides(
     nmod_mpoly_t Bbar,
     const nmod_mpoly_t A, int try_a,
     const nmod_mpoly_t B, int try_b,
-    const nmod_mpoly_ctx_t ctx)
+    const nmod_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     int success;
     nmod_mpoly_t Q;
 
     nmod_mpoly_init(Q, ctx);
 
-    if (try_b && nmod_mpoly_divides_threaded(Q, A, B, ctx, 1))
+    if (try_b && _nmod_mpoly_divides(Q, A, B, ctx, handles, num_handles))
     {
         nmod_mpoly_set(G, B, ctx);
         nmod_mpoly_swap(Abar, Q, ctx);
@@ -301,7 +303,7 @@ static int _try_divides(
         goto cleanup;
     }
 
-    if (try_a && nmod_mpoly_divides_threaded(Q, B, A, ctx, 1))
+    if (try_a && _nmod_mpoly_divides(Q, B, A, ctx, handles, num_handles))
     {
         nmod_mpoly_set(G, A, ctx);
         nmod_mpoly_swap(Bbar, Q, ctx);
@@ -888,8 +890,10 @@ calculate_trivial_gcd:
             goto calculate_trivial_gcd;
 
         if ((try_a || try_b) && _try_divides(G, Abar, Bbar,
-                                                      A, try_a, B, try_b, ctx))
+                                A, try_a, B, try_b, ctx, handles, num_handles))
+        {
             goto successful;
+        }
     }
 
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
@@ -967,7 +971,6 @@ int nmod_mpoly_gcd_cofactors(
     const nmod_mpoly_t B,
     const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
     flint_bitcnt_t Gbits;
     int success;
     thread_pool_handle * handles;

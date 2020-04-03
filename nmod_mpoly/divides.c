@@ -45,7 +45,7 @@ typedef struct
     slong length;
     flint_bitcnt_t bits;
     const mpoly_ctx_struct * mctx;
-    thread_pool_handle * handles;
+    const thread_pool_handle * handles;
     slong num_handles;
 }
 _degrees_arg_struct;
@@ -60,51 +60,24 @@ static void _worker_degrees(void * varg)
                                     arg->mctx, arg->handles, arg->num_handles);
 }
 
-int nmod_mpoly_divides_threaded(
+int _nmod_mpoly_divides(
     nmod_mpoly_t Q,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
     const nmod_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     slong i, * Adegs, * Bdegs;
-    thread_pool_handle * handles;
-    slong num_handles;
     int divides;
     TMP_INIT;
 
-    if (B->length == 0)
-    {
-        flint_throw(FLINT_DIVZERO, "Exception in nmod_mpoly_divides_threaded: "
-                                                   "Cannot divide by zero.\n");
-    }
-
-    if (1 != n_gcd(B->coeffs[0], ctx->ffinfo->mod.n))
-    {
-        flint_throw(FLINT_IMPINV, "Exception in nmod_mpoly_divides_threaded: "
-                                       "Cannot invert leading coefficient.\n");
-    }
-
     TMP_START;
-
-    handles = NULL;
-    num_handles = 0;
-    if (thread_limit > 1 && global_thread_pool_initialized)
-    {
-        slong max_num_handles;
-        max_num_handles = thread_pool_get_size(global_thread_pool);
-        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-        if (max_num_handles > 0)
-        {
-            handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_handles*sizeof(thread_pool_handle));
-            num_handles = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_handles);
-        }
-    }
-
     divides = -1;
-    if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS && A->length > 50)
+
+    if (A->bits <= FLINT_BITS &&
+        B->bits <= FLINT_BITS &&
+        A->length > 50)
     {
         Adegs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
         Bdegs = (slong *) TMP_ALLOC(ctx->minfo->nvars*sizeof(slong));
@@ -146,6 +119,7 @@ int nmod_mpoly_divides_threaded(
                 goto cleanup;
             }
         }
+
         if (_nmod_mpoly_divides_try_dense(Adegs, Bdegs, ctx->minfo->nvars,
                                                          A->length, B->length))
         {
@@ -171,15 +145,6 @@ int nmod_mpoly_divides_threaded(
 
 cleanup:
 
-    for (i = 0; i < num_handles; i++)
-    {
-        thread_pool_give_back(global_thread_pool, handles[i]);
-    }
-    if (handles)
-    {
-        flint_free(handles);
-    }
-
     TMP_END;
     return divides;
 }
@@ -190,5 +155,34 @@ int nmod_mpoly_divides(
     const nmod_mpoly_t B,
     const nmod_mpoly_ctx_t ctx)
 {
-    return nmod_mpoly_divides_threaded(Q, A, B, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
+    thread_pool_handle * handles;
+    slong num_handles;
+    slong thread_limit;
+    int divides;
+
+    if (B->length == 0)
+    {
+        flint_throw(FLINT_DIVZERO, "Exception in nmod_mpoly_divides_threaded: "
+                                                   "Cannot divide by zero.\n");
+    }
+
+    if (1 != n_gcd(B->coeffs[0], ctx->ffinfo->mod.n))
+    {
+        flint_throw(FLINT_IMPINV, "Exception in nmod_mpoly_divides_threaded: "
+                                       "Cannot invert leading coefficient.\n");
+    }
+
+    thread_limit = A->length/1024;
+
+    if (A->length <= 50)
+    {
+        return nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
+    }
+
+    num_handles = flint_request_threads(&handles, thread_limit);
+    divides = _nmod_mpoly_divides(Q, A, B, ctx, handles, num_handles);
+    flint_give_back_threads(handles, num_handles);
+
+    return divides;
 }
+
