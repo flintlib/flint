@@ -220,21 +220,21 @@ void fmpz_mpoly_mul(
 
     if (ctx->minfo->ord == ORD_LEX)
     {
-        success = (num_handles == 0)
-                ? _fmpz_mpoly_mul_array_LEX(
-                                    A, B, maxBfields, C, maxCfields, ctx)
-                : _fmpz_mpoly_mul_array_threaded_LEX(
+        success = (num_handles > 0)
+                ? _fmpz_mpoly_mul_array_threaded_LEX(
                                     A, B, maxBfields, C, maxCfields, ctx,
-                                                         handles, num_handles);
+                                                         handles, num_handles)
+                : _fmpz_mpoly_mul_array_LEX(
+                                    A, B, maxBfields, C, maxCfields, ctx);
     }
     else if (ctx->minfo->ord == ORD_DEGLEX || ctx->minfo->ord == ORD_DEGREVLEX)
     {
-        success = (num_handles == 0)
-                ? _fmpz_mpoly_mul_array_DEG(
-                                    A, B, maxBfields, C, maxCfields, ctx)
-                : _fmpz_mpoly_mul_array_threaded_DEG(
+        success = (num_handles > 0)
+                ? _fmpz_mpoly_mul_array_threaded_DEG(
                                     A, B, maxBfields, C, maxCfields, ctx,
-                                                         handles, num_handles);
+                                                         handles, num_handles)
+                : _fmpz_mpoly_mul_array_DEG(
+                                    A, B, maxBfields, C, maxCfields, ctx);
     }
 
     if (success)
@@ -244,14 +244,14 @@ void fmpz_mpoly_mul(
 
 do_heap:
 
-    if (num_handles == 0)
-    {
-        _fmpz_mpoly_mul_johnson_maxfields(A, B, maxBfields, C, maxCfields, ctx);
-    }
-    else
+    if (num_handles > 0)
     {
         _fmpz_mpoly_mul_heap_threaded_maxfields(A,
                       B, maxBfields, C, maxCfields, ctx, handles, num_handles);
+    }
+    else
+    {
+        _fmpz_mpoly_mul_johnson_maxfields(A, B, maxBfields, C, maxCfields, ctx);
     }
 
 cleanup_threads:

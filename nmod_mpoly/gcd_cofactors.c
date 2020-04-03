@@ -940,9 +940,9 @@ cleanup:
         }
 
 #if WANT_ASSERT
-        nmod_mpoly_mul_threaded(T, G, Abar, ctx, 0);
+        nmod_mpoly_mul(T, G, Abar, ctx);
         FLINT_ASSERT(nmod_mpoly_equal(T, Asave, ctx));
-        nmod_mpoly_mul_threaded(T, G, Bbar, ctx, 0);
+        nmod_mpoly_mul(T, G, Bbar, ctx);
         FLINT_ASSERT(nmod_mpoly_equal(T, Bsave, ctx));
 #endif
     }

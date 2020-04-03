@@ -865,10 +865,6 @@ FLINT_DLL void nmod_mpoly_compose_nmod_mpoly_gen(nmod_mpoly_t A,
 FLINT_DLL void nmod_mpoly_mul(nmod_mpoly_t A,
        const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_mul_threaded(nmod_mpoly_t A,
-       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx,
-                                                           slong thread_limit);
-
 FLINT_DLL void nmod_mpoly_mul_johnson(nmod_mpoly_t A,
        const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
