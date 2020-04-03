@@ -38,7 +38,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
     ulong * r_exp = *expr;
     ulong acc_sm[3]; /* for accumulating coefficients */
     ulong mask, exp;
-    ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
+    ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     fmpz_t lc_abs_lg, ns, gcd, acc_lg, r, tp;
     slong bits2, bits3;
     int lt_divides, scaleis1, small;
@@ -93,11 +93,14 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
 
     /* precompute leading cofficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
-    lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN_EXT(poly3[0]);
-    count_leading_zeros(lc_norm, lc_abs);
-    lc_n = lc_abs << lc_norm;
-    invert_limb(lc_i, lc_n);
+    if (small)
+    {
+        lc_abs = FLINT_ABS(poly3[0]);
+        lc_sign = FLINT_SIGN_EXT(poly3[0]);
+        count_leading_zeros(lc_norm, lc_abs);
+        lc_n = lc_abs << lc_norm;
+        invert_limb(lc_i, lc_n);
+    }
 
     while (heap_len > 1)
     {
@@ -233,35 +236,40 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
             {
                 fmpz_set_signed_uiuiui(r_coeff + r_len, acc_sm[2], acc_sm[1], acc_sm[0]);
                 r_exp[r_len] = exp;
-                fmpz_set_ui(rs + r_len, 1);
+                fmpz_one(rs + r_len);
                 r_len++;
                 continue;
             }
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
+                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
-                if (rr ==0 && (qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
+                if (rr == 0 && qq <= COEFF_MAX)
                 {
                     _fmpz_demote(q_coeff + q_len);
-                    q_coeff[q_len] = (qq^ds^lc_sign) - (ds^lc_sign);
-                    fmpz_set_ui(qs + q_len, 1);
-                } else
+                    q_coeff[q_len] = qq;
+                    if (ds != lc_sign)
+                        q_coeff[q_len] = -q_coeff[q_len];
+                    fmpz_one(qs + q_len);
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                     goto large_lt_divides;
                 }
-            } else
+            }
+            else
             {
                 small = 0;
                 fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
-
-        } else
+        }
+        else
         {
             if (fmpz_is_zero(acc_lg))
                 continue;
@@ -364,7 +372,6 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
     slong * store, * store_base;
     mpoly_heap_t * x;
     slong * hind;
-
     fmpz * q_coeff = *polyq;
     fmpz * r_coeff = *polyr;
     ulong * q_exp = *expq;
@@ -374,9 +381,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
     ulong acc_sm[3]; /* for accumulating coefficients */
     slong exp_next;
     ulong mask;
-
-    ulong lc_norm, lc_abs, lc_sign, lc_n, lc_i;
-
+    ulong lc_norm = 0, lc_abs = 0, lc_sign = 0, lc_n = 0, lc_i = 0;
     fmpz_t lc_abs_lg, ns, gcd, acc_lg, r, tp;
     slong bits2, bits3;
     int lt_divides, scaleis1, small;
@@ -453,11 +458,14 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
 
     /* precompute leading cofficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
-    lc_abs = FLINT_ABS(poly3[0]);
-    lc_sign = FLINT_SIGN_EXT(poly3[0]);
-    count_leading_zeros(lc_norm, lc_abs);
-    lc_n = lc_abs << lc_norm;
-    invert_limb(lc_i, lc_n);
+    if (small)
+    {
+        lc_abs = FLINT_ABS(poly3[0]);
+        lc_sign = FLINT_SIGN_EXT(poly3[0]);
+        count_leading_zeros(lc_norm, lc_abs);
+        lc_n = lc_abs << lc_norm;
+        invert_limb(lc_i, lc_n);
+    }
 
     while (heap_len > 1)
     {
@@ -622,35 +630,40 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
             {
                 fmpz_set_signed_uiuiui(r_coeff + r_len, acc_sm[2], acc_sm[1], acc_sm[0]);
                 mpoly_monomial_set(r_exp + r_len*N, exp, N);
-                fmpz_set_ui(rs + r_len, 1);
+                fmpz_one(rs + r_len);
                 r_len++;
                 continue;
             }
             if (ds == FLINT_SIGN_EXT(acc_sm[1]) && d1 < lc_abs)
             {
                 ulong qq, rr, nhi, nlo;
+                FLINT_ASSERT(0 < lc_norm && lc_norm < FLINT_BITS);
                 nhi = (d1 << lc_norm) | (d0 >> (FLINT_BITS - lc_norm));
                 nlo = d0 << lc_norm;
                 udiv_qrnnd_preinv(qq, rr, nhi, nlo, lc_n, lc_i);
-                if (rr ==0 && (qq & (WORD(3) << (FLINT_BITS - 2))) == 0)
+                if (rr == 0 && qq <= COEFF_MAX)
                 {
                     _fmpz_demote(q_coeff + q_len);
-                    q_coeff[q_len] = (qq^ds^lc_sign) - (ds^lc_sign);
-                    fmpz_set_ui(qs + q_len, 1);
-                } else
+                    q_coeff[q_len] = qq;
+                    if (ds != lc_sign)
+                        q_coeff[q_len] = -q_coeff[q_len];
+                    fmpz_one(qs + q_len);
+                }
+                else
                 {
                     small = 0;
                     fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                     goto large_lt_divides;
                 }
-            } else
+            }
+            else
             {
                 small = 0;
                 fmpz_set_signed_uiuiui(acc_lg, acc_sm[2], acc_sm[1], acc_sm[0]);
                 goto large_lt_divides;
             }
-
-        } else
+        }
+        else
         {
             if (fmpz_is_zero(acc_lg))
                 continue;

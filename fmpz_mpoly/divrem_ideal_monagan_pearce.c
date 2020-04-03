@@ -226,7 +226,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                             slong r1;
                             slong tq;
                             sdiv_qrnnd(tq, r1, c[1], c[0], mb[w]);
-                            if (COEFF_IS_MPZ(FLINT_ABS(tq))) /* quotient too large */
+                            if (tq > COEFF_MAX || tq < COEFF_MIN)
                             {
                                 small = 0;
                                 fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
@@ -242,7 +242,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                                     polyq[w]->exps[k[w]] = texp;
                                 }
                                 c[0] = r1;
-                                c[2] = c[1] = r1 < 0 ? ~WORD(0) : WORD(0);
+                                c[2] = c[1] = -(slong)(r1 < 0);
                             }
                         }
                     } 
@@ -574,7 +574,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                             slong r1;
                             slong tq;
                             sdiv_qrnnd(tq, r1, c[1], c[0], mb[w]);
-                            if (COEFF_IS_MPZ(FLINT_ABS(tq))) /* quotient too large */
+                            if (tq > COEFF_MAX || tq < COEFF_MIN)
                             {
                                 small = 0;
                                 fmpz_set_signed_uiuiui(qc, c[2], c[1], c[0]);
@@ -590,7 +590,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                                     mpoly_monomial_set(polyq[w]->exps + k[w]*N, texp, N);
                                 }
                                 c[0] = r1;
-                                c[2] = c[1] = r1 < 0 ? ~WORD(0) : WORD(0);
+                                c[2] = c[1] = -(slong)(r1 < 0);
                             }
                         }
                     } 

@@ -18,43 +18,66 @@
 
 int main(void)
 {
-   int i, result;
-   FLINT_TEST_INIT(state);
-   
+    slong i;
+    FLINT_TEST_INIT(state);
 
-   flint_printf("sdiv_qrnnd....");
-   fflush(stdout);
+    flint_printf("sdiv_qrnnd....");
+    fflush(stdout);
 
-   for (i = 0; i < 1000000; i++)
-   {
-      mp_limb_signed_t d, nh, nl, q, r, ph, pl;
+    for (i = 0; i < 1000000*flint_test_multiplier(); i++)
+    {
+        int nsgn;
+        mp_limb_signed_t d, nh, nl, q, r, ph, pl;
 
-      do 
-      {
-         d = n_randtest_not_zero(state);
-         nh = n_randtest(state);
-      } while ((FLINT_ABS(nh) >= FLINT_ABS(d)/2) || (nh == WORD_MIN));
+        do
+        {
+            d = n_randtest_not_zero(state);
+            nh = n_randtest(state);
+        } while ((FLINT_ABS(nh) >= FLINT_ABS(d)/2) || (nh == WORD_MIN));
 
-      nl = n_randtest(state);
+        nl = n_randtest(state);
 
-      sdiv_qrnnd(q, r, nh, nl, d);
-      smul_ppmm(ph, pl, d, q);
-      if (r < WORD(0)) sub_ddmmss(ph, pl, ph, pl, UWORD(0), -r);
-      else add_ssaaaa(ph, pl, ph, pl, UWORD(0), r);
+        if (nh < 0)
+            nsgn = -1;
+        else if (nh > 0 || nl != 0)
+            nsgn = +1;
+        else
+            nsgn = 0;
 
-      result = ((ph == nh) && (pl == nl));
+        sdiv_qrnnd(q, r, nh, nl, d);
+        smul_ppmm(ph, pl, d, q);
+        add_ssaaaa(ph, pl, ph, pl, FLINT_SIGN_EXT(r), r);
 
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("nh = %wu, nl = %wu, d = %wu\n", nh, nl, d); 
-         flint_printf("ph = %wu, pl = %wu\n", ph, pl);
-         flint_abort();
-      }
-   }
+        /* check n = q*d + r */
+        if (ph != nh || pl != nl)
+        {
+            flint_printf("FAIL: check identity\n");
+            flint_printf("nh = %wd, nl = %wd\n", nh, nl);
+            flint_printf("d = %wd\n", d);
+            flint_printf("q = %wd\n", q);
+            flint_printf("r = %wd\n", r);
+            flint_printf("ph = %wu, pl = %wu\n", ph, pl);
+            flint_abort();
+        }
 
-   FLINT_TEST_CLEANUP(state);
-   
-   flint_printf("PASS\n");
-   return 0;
+        /* check rounding of q was towards zero */
+        if ((nsgn >= 0 && d > 0 && !(0 <= r && r < d)) ||
+            (nsgn >= 0 && d < 0 && WORD_MAX + d >= 0 && !(0 <= r && r < -d)) ||
+            (nsgn < 0 && d > 0 && WORD_MIN + d <= 0 && !(-d < r && r <= 0)) ||
+            (nsgn < 0 && d < 0 && !(d < r && r <= 0)))
+        {
+            flint_printf("FAIL: check remainder\n");
+            flint_printf("nsgn: %d\n", nsgn);
+            flint_printf("nh = %wd, nl = %wd\n", nh, nl);
+            flint_printf("d = %wd\n", d);
+            flint_printf("q = %wd\n", q);
+            flint_printf("r = %wd\n", r);
+            flint_abort();
+        }
+    }
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return 0;
 }

@@ -531,42 +531,32 @@
           udiv_qrnnd_int((q), (r), (n1), (n0), (d)); \
     } while (0)
 
-#define sdiv_qrnnd(q, r, n1, n0, d) \
-  do {                              \
-    mp_limb_t __n1, __n0, __d;      \
-    int __sgn1 = 0, __sgn2 = 0;     \
-    if ((n1) & __highbit)           \
-    {                               \
-       __n0 = -(n0);                \
-       __n1 = ~(n1) + (__n0 == 0);  \
-       __sgn1 = ~__sgn1;            \
-    } else                          \
-    {                               \
-      __n0 = (n0);                  \
-      __n1 = (n1);                  \
-    }                               \
-    if ((d) & __highbit)            \
-    {                               \
-        __d = -(d);                 \
-        __sgn2 = ~__sgn2;           \
-    } else                          \
-    {                               \
-        __d = (d);                  \
-    }                               \
-    udiv_qrnnd((q), (r), (mp_limb_t) __n1, (mp_limb_t) __n0, (mp_limb_t) __d); \
-    if (__sgn1 ^ __sgn2)            \
-    {                               \
-        (q) = -(q);                 \
-        if (!__sgn2)                \
-        {                           \
-            (q)--;                  \
-            (r) = (__d) - (r);      \
-        }                           \
-    } else if (__sgn1 && __sgn2)    \
-    {                               \
-       (q)++;                       \
-       (r) = (__d) - (r);           \
-    }                               \
+#define sdiv_qrnnd(q, r, n1, n0, d)         \
+  do {                                      \
+    mp_limb_t __n1, __n0, __d;              \
+    mp_limb_t __q, __r;                     \
+    unsigned int __sgn_n = 0, __sgn_d = 0;  \
+    if ((n1) & __highbit)                   \
+    {                                       \
+       __n0 = -(n0);                        \
+       __n1 = ~(n1) + (__n0 == 0);          \
+       __sgn_n = ~__sgn_n;                  \
+    } else                                  \
+    {                                       \
+      __n0 = (n0);                          \
+      __n1 = (n1);                          \
+    }                                       \
+    if ((d) & __highbit)                    \
+    {                                       \
+        __d = -(d);                         \
+        __sgn_d = ~__sgn_d;                 \
+    } else                                  \
+    {                                       \
+        __d = (d);                          \
+    }                                       \
+    udiv_qrnnd(__q, __r, __n1, __n0, __d);  \
+    q = (__sgn_n == __sgn_d) ? __q : -__q;  \
+    r = (__sgn_n == 0) ? __r : -__r;        \
   } while (0)
 
 #if GMP_LIMB_BITS == 32

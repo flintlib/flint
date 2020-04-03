@@ -33,7 +33,7 @@
   } while (0)
 
 
-#if (defined(__MINGW64__) || defined(__mips64)) && !defined(__MPIR_VERSION)
+#if defined(__MINGW64__) && !defined(__MPIR_VERSION)
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
