@@ -16,10 +16,8 @@
 # Copyright (c) 2008, 2009 Gael Guennebaud, <g.gael@free.fr>
 # Copyright (c) 2010 Jitse Niesen, <jitse@maths.leeds.ac.uk>
 # Copyright (c) 2015 Jack Poulson, <jack.poulson@gmail.com>
+# Copyright (c) 2020, Mahrud Sayrafi, <mahrud@umn.edu>
 # Redistribution and use is allowed according to the terms of the BSD license.
-
-find_path(MPFR_INCLUDE_DIRS NAMES mpfr.h PATHS $ENV{GMPDIR} $ENV{MPFRDIR}
-  ${INCLUDE_INSTALL_DIR})
 
 # Set MPFR_FIND_VERSION to 1.0.0 if no minimum version is specified
 if(NOT MPFR_FIND_VERSION)
@@ -36,7 +34,7 @@ if(NOT MPFR_FIND_VERSION)
     "${MPFR_FIND_VERSION_MAJOR}.${MPFR_FIND_VERSION_MINOR}.${MPFR_FIND_VERSION_PATCH}")
 endif()
 
-if(MPFR_INCLUDE_DIRS)
+macro(_mpfr_check_version)
   # Query MPFR_VERSION
   file(READ "${MPFR_INCLUDE_DIRS}/mpfr.h" _mpfr_version_header)
 
@@ -61,12 +59,38 @@ if(MPFR_INCLUDE_DIRS)
   else()
     set(MPFR_VERSION_OK TRUE)
   endif()
+endmacro(_mpfr_check_version)
+
+if(NOT MPFR_VERSION_OK)
+  set(MPFR_INCLUDE_DIRS NOTFOUND)
+  set(MPFR_LIBRARIES NOTFOUND)
+
+  # search first if an MPFRConfig.cmake is available in the system,
+  # if successful this would set MPFR_INCLUDE_DIRS and the rest of
+  # the script will work as usual
+  find_package(MPFR ${MPFR_FIND_VERSION} NO_MODULE QUIET)
+
+  if(NOT MPFR_INCLUDE_DIRS)
+    find_path(MPFR_INCLUDE_DIRS NAMES mpfr.h
+      HINTS ENV MPFRDIR ENV GMPDIR
+      PATHS ${INCLUDE_INSTALL_DIR} ${CMAKE_INSTALL_PREFIX}/include
+      )
+  endif()
+
+  if(MPFR_INCLUDE_DIRS)
+    _MPFR_check_version()
+  endif()
+
+  if(NOT MPFR_LIBRARIES)
+    find_library(MPFR_LIBRARIES NAMES mpfr
+      HINTS ENV MPFRDIR ENV GMPDIR
+      PATHS ${LIB_INSTALL_DIR} ${CMAKE_INSTALL_PREFIX}/lib
+      )
+  endif()
+
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(MPFR DEFAULT_MSG MPFR_INCLUDE_DIRS MPFR_LIBRARIES MPFR_VERSION_OK)
+
+  mark_as_advanced(MPFR_INCLUDE_DIRS MPFR_LIBRARIES)
+
 endif()
-
-find_library(MPFR_LIBRARIES mpfr
-  PATHS $ENV{GMPDIR} $ENV{MPFRDIR} ${LIB_INSTALL_DIR})
-
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(MPFR DEFAULT_MSG
-                                  MPFR_INCLUDE_DIRS MPFR_LIBRARIES MPFR_VERSION_OK)
-mark_as_advanced(MPFR_INCLUDE_DIRS MPFR_LIBRARIES)

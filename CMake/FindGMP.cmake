@@ -1,23 +1,22 @@
-# Try to find the GMP library
-# https://gmplib.org/
+# Try to find the GNU Multiple Precision Arithmetic Library (GMP)
+# See http://gmplib.org/
 #
 # This module supports requiring a minimum version, e.g. you can do
-#   find_package(GMP 6.0.0)
-# to require version 6.0.0 to newer of GMP.
+#   find_package(GMP 6.1.0)
+# to require version 6.1.0 to newer of GMP.
 #
 # Once done this will define
 #
-#  GMP_FOUND - system has GMP lib with correct version
-#  GMP_INCLUDE_DIRS - the GMP include directory
-#  GMP_LIBRARIES - the GMP library
-#  GMP_VERSION - GMP version
-#
+#  GMP_FOUND             - system has GMP lib
+#  GMP_INCLUDE_DIRS      - the GMP include directory
+#  GMP_LIBRARIES         - Libraries needed to use GMP
+#  GMP_VERSION           - GMP version
+
 # Copyright (c) 2016 Jack Poulson, <jack.poulson@gmail.com>
+# Copyright (c) 2020, Mahrud Sayrafi, <mahrud@umn.edu>
 # Redistribution and use is allowed according to the terms of the BSD license.
 
-find_path(GMP_INCLUDE_DIRS NAMES gmp.h PATHS $ENV{GMPDIR} ${INCLUDE_INSTALL_DIR})
-
-# Set GMP_FIND_VERSION to 5.1.0 if no minimum version is specified
+# Set GMP_FIND_VERSION to 1.0.0 if no minimum version is specified
 if(NOT GMP_FIND_VERSION)
   if(NOT GMP_FIND_VERSION_MAJOR)
     set(GMP_FIND_VERSION_MAJOR 5)
@@ -32,11 +31,10 @@ if(NOT GMP_FIND_VERSION)
     "${GMP_FIND_VERSION_MAJOR}.${GMP_FIND_VERSION_MINOR}.${GMP_FIND_VERSION_PATCH}")
 endif()
 
-if(GMP_INCLUDE_DIRS)
+macro(_gmp_check_version)
   # Since the GMP version macros may be in a file included by gmp.h of the form
   # gmp-.*[_]?.*.h (e.g., gmp-x86_64.h), we search each of them.
-  file(GLOB GMP_HEADERS "${GMP_INCLUDE_DIRS}/gmp.h" "${GMP_INCLUDE_DIRS}/gmp-*.h"
-	  "${GMP_INCLUDE_DIRS}/x86*/gmp.h")
+  file(GLOB GMP_HEADERS "${GMP_INCLUDE_DIRS}/gmp.h" "${GMP_INCLUDE_DIRS}/gmp-*.h")
   foreach(gmp_header_filename ${GMP_HEADERS})
     file(READ "${gmp_header_filename}" _gmp_version_header)
     string(REGEX MATCH
@@ -55,6 +53,9 @@ if(GMP_INCLUDE_DIRS)
     endif()
   endforeach()
 
+  set(GMP_VERSION
+    ${GMP_MAJOR_VERSION}.${GMP_MINOR_VERSION}.${GMP_PATCHLEVEL_VERSION})
+
   # Check whether found version exists and exceeds the minimum requirement
   if(NOT GMP_VERSION)
     set(GMP_VERSION_OK FALSE)
@@ -66,11 +67,38 @@ if(GMP_INCLUDE_DIRS)
   else()
     set(GMP_VERSION_OK TRUE)
   endif()
+endmacro(_gmp_check_version)
+
+if(NOT GMP_VERSION_OK)
+  set(GMP_INCLUDE_DIRS NOTFOUND)
+  set(GMP_LIBRARIES NOTFOUND)
+
+  # search first if an GMPConfig.cmake is available in the system,
+  # if successful this would set GMP_INCLUDE_DIRS and the rest of
+  # the script will work as usual
+  find_package(GMP ${GMP_FIND_VERSION} NO_MODULE QUIET)
+
+  if(NOT GMP_INCLUDE_DIRS)
+    find_path(GMP_INCLUDE_DIRS NAMES gmp.h
+      HINTS ENV GMPDIR ENV GMPDIR
+      PATHS ${INCLUDE_INSTALL_DIR} ${CMAKE_INSTALL_PREFIX}/include
+      )
+  endif()
+
+  if(GMP_INCLUDE_DIRS)
+    _GMP_check_version()
+  endif()
+
+  if(NOT GMP_LIBRARIES)
+    find_library(GMP_LIBRARIES NAMES gmp
+      HINTS ENV GMPDIR ENV GMPDIR
+      PATHS ${LIB_INSTALL_DIR} ${CMAKE_INSTALL_PREFIX}/lib
+      )
+  endif()
+
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(GMP DEFAULT_MSG GMP_INCLUDE_DIRS GMP_LIBRARIES GMP_VERSION_OK)
+
+  mark_as_advanced(GMP_INCLUDE_DIRS GMP_LIBRARIES)
+
 endif()
-
-find_library(GMP_LIBRARIES gmp PATHS $ENV{GMPDIR} ${LIB_INSTALL_DIR})
-
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(GMP DEFAULT_MSG
-                                  GMP_INCLUDE_DIRS GMP_LIBRARIES GMP_VERSION_OK)
-mark_as_advanced(GMP_INCLUDE_DIRS GMP_LIBRARIES)
