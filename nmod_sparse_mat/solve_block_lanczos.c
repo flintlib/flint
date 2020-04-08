@@ -80,7 +80,6 @@ static int compute_nWi_S(nmod_mat_t nWi, int *S, const nmod_mat_t Torig)
             _nmod_vec_zero(nWi->rows[pc], b);
         }
     }
-
     nmod_mat_neg(nWi, nWi);
     nmod_mat_clear(T);
 

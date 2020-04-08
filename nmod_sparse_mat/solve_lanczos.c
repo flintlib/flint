@@ -103,20 +103,20 @@ int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t M, flin
     return ret;
 }
 
-int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t A, flint_rand_t state) {
+int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t M, flint_rand_t state) {
     int ret = 1;
     mp_ptr x2, b;
-    x2 = _nmod_vec_init(A->c);
-    b = _nmod_vec_init(A->r);
+    x2 = _nmod_vec_init(M->c);
+    b = _nmod_vec_init(M->r);
 
-    _nmod_vec_randtest(x, state, A->c, A->mod);
-    nmod_sparse_mat_mul_vec(b, A, x);
-    if(nmod_sparse_mat_solve_lanczos(x2, A, b, state) == 0) ret = 0; /* Lanczos failed */
+    _nmod_vec_randtest(x, state, M->c, M->mod);
+    nmod_sparse_mat_mul_vec(b, M, x);
+    if(nmod_sparse_mat_solve_lanczos(x2, M, b, state) == 0) ret = 0; /* Lanczos failed */
     if (ret)
     {
-        _nmod_vec_sub(x, x, x2, A->c, A->mod);
-        nmod_sparse_mat_mul_vec(b, A, x);
-        ret = _nmod_vec_is_zero(x, A->c) || !_nmod_vec_is_zero(b, A->r);
+        _nmod_vec_sub(x, x, x2, M->c, M->mod);
+        nmod_sparse_mat_mul_vec(b, M, x);
+        ret = !_nmod_vec_is_zero(x, M->c) && _nmod_vec_is_zero(b, M->r);
     }
     _nmod_vec_clear(x2);
     _nmod_vec_clear(b);

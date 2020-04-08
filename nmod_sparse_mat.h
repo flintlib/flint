@@ -148,6 +148,7 @@ void nmod_sparse_mat_window_clear(nmod_sparse_mat_t W)
 
 /* Combine M1 and M2 into block matrix B = [M1 M2] */
 /* B->r must equal M1->r and M2->r */
+<<<<<<< HEAD
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_concat_horizontal(nmod_sparse_mat_t B,
                                     const nmod_sparse_mat_t M1,  const nmod_sparse_mat_t M2) 
@@ -199,41 +200,46 @@ void nmod_sparse_mat_split_vertical(nmod_sparse_mat_t M1, nmod_sparse_mat_t M2, 
 
 
 /* res->r must equal mat1->r and mat2->r */
+=======
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_concat_horizontal(nmod_sparse_mat_t res,
-                                    const nmod_sparse_mat_t mat1,  const nmod_sparse_mat_t mat2) 
+void nmod_sparse_mat_concat_horizontal(nmod_sparse_mat_t B,
+                                    const nmod_sparse_mat_t M1,  const nmod_sparse_mat_t M2) 
 {
     slong i;
-    res->c = mat1->c + mat2->c;
-    for (i = 0; i < res->r; ++i)
-        nmod_sparse_vec_concat(&res->rows[i], &mat1->rows[i], &mat2->rows[i], mat1->c);
+    B->c = M1->c + M2->c;
+    for (i = 0; i < B->r; ++i)
+        nmod_sparse_vec_concat(&B->rows[i], &M1->rows[i], &M2->rows[i], M1->c);
 }
-/* res->r must equal mat1->r + mat2->r */
+/* Combine M1 and M2 into block matrix B = [M1^t M1^t]^t */
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_concat_vertical(nmod_sparse_mat_t res, const nmod_sparse_mat_t mat1,  const nmod_sparse_mat_t mat2) 
+void nmod_sparse_mat_concat_vertical(nmod_sparse_mat_t B, const nmod_sparse_mat_t M1,  const nmod_sparse_mat_t M2) 
 {
     slong i;
-    res->c = FLINT_MAX(mat1->c, mat2->c);
-    for (i = 0; i < mat1->r; ++i)
-        nmod_sparse_vec_set(&res->rows[i], &mat1->rows[i], mat1->c_off);
-    for (i = mat1->r; i < res->r; ++i)
-        nmod_sparse_vec_set(&res->rows[i], &mat2->rows[i-mat1->r], mat2->c_off);
-}
-
-NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_split_horizontal(nmod_sparse_mat_t res1, nmod_sparse_mat_t res2, const nmod_sparse_mat_t mat, slong c)
-{
-    slong i;
-    for(i=0; i<mat->r; ++i) nmod_sparse_vec_split(&res1->rows[i], &res2->rows[i], &mat->rows[i], c);
+    B->c = FLINT_MAX(M1->c, M2->c);
+    for (i = 0; i < M1->r; ++i)
+        nmod_sparse_vec_set(&B->rows[i], &M1->rows[i], M1->c_off);
+    for (i = M1->r; i < B->r; ++i)
+        nmod_sparse_vec_set(&B->rows[i], &M2->rows[i-M1->r], M2->c_off);
 }
 
+/* Split block matrix B = [M1 M2] into submatrices M1 and M2 */
+/* M1->r and M2->r must equal B->r */
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_split_vertical(nmod_sparse_mat_t res1, nmod_sparse_mat_t res2, const nmod_sparse_mat_t mat, slong r)
+void nmod_sparse_mat_split_horizontal(nmod_sparse_mat_t M1, nmod_sparse_mat_t M2, const nmod_sparse_mat_t B, slong c)
 {
     slong i;
-    r = FLINT_MIN(r, mat->r);
-    for(i=0; i<r; ++i) nmod_sparse_vec_set(&res1->rows[i], &mat->rows[i], mat->c_off);
-    for(i=r; i<mat->r; ++i) nmod_sparse_vec_set(&res2->rows[i-r], &mat->rows[i], mat->c_off);
+    for(i=0; i<B->r; ++i) nmod_sparse_vec_split(&M1->rows[i], &M2->rows[i], &B->rows[i], c);
+}
+
+/* Split block matix B = [M1^t M1^t]^t into submatrices M1 and M2 */
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_split_vertical(nmod_sparse_mat_t M1, nmod_sparse_mat_t M2, const nmod_sparse_mat_t B, slong r)
+{
+    slong i;
+    r = FLINT_MIN(r, B->r);
+    for(i=0; i<r; ++i) nmod_sparse_vec_set(&M1->rows[i], &B->rows[i], B->c_off);
+    for(i=r; i<B->r; ++i) nmod_sparse_vec_set(&M2->rows[i-r], &B->rows[i], B->c_off);
 }
 
 <<<<<<< HEAD
@@ -251,9 +257,14 @@ void nmod_sparse_mat_permute_cols(nmod_sparse_mat_t M, slong *Q)
 {
     slong i;
 <<<<<<< HEAD
+<<<<<<< HEAD
     for (i = 0; i < M->r; ++i) 
     {
         if (!M->rows[i].nnz) continue;
+=======
+    for (i = 0; i < M->r; ++i) {
+        if(!M->rows[i].nnz) continue;
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
         nmod_sparse_vec_permute_inds(&M->rows[i], Q);
         qsort(M->rows[i].entries, M->rows[i].nnz, sizeof(*M->rows[i].entries), nmod_sparse_entry_cmp);
     }
@@ -292,6 +303,7 @@ int nmod_sparse_mat_equal(const nmod_sparse_mat_t M1, const nmod_sparse_mat_t M2
 {
     slong i;
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (M1->r != M2->r) return 0;
     for (i = 0; i < M1->r; ++i)
         if (nmod_sparse_vec_equal(&M1->rows[i], &M2->rows[i], M1->c_off-M2->c_off) == 0) return 0;
@@ -300,6 +312,11 @@ int nmod_sparse_mat_equal(const nmod_sparse_mat_t M1, const nmod_sparse_mat_t M2
     for (i = 0; i < mat1->r; ++i)
         if (nmod_sparse_vec_equal(&mat1->rows[i], &mat2->rows[i], mat1->c_off-mat2->c_off) == 0) return 0;
 >>>>>>> Spacing and cuddling fixed
+=======
+    if (M1->r != M2->r) return 0;
+    for (i = 0; i < M1->r; ++i)
+        if (nmod_sparse_vec_equal(&M1->rows[i], &M2->rows[i], M1->c_off-M2->c_off) == 0) return 0;
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
     return 1;
 }
 
@@ -307,6 +324,7 @@ NMOD_SPARSE_MAT_INLINE
 int nmod_sparse_mat_is_zero(const nmod_sparse_mat_t M) 
 {
     slong i;
+<<<<<<< HEAD
 <<<<<<< HEAD
     for (i = 0; i < M->r; ++i) 
         if (!nmod_sparse_vec_is_zero(&M->rows[i])) return 0;
@@ -317,6 +335,19 @@ int nmod_sparse_mat_is_zero(const nmod_sparse_mat_t M)
     return 1;
 }
 
+=======
+    for (i = 0; i < M->r; ++i) 
+        if (!nmod_sparse_vec_is_zero(&M->rows[i])) return 0;
+    return 1;
+}
+
+NMOD_SPARSE_MAT_INLINE
+int nmod_sparse_mat_is_square(const nmod_sparse_mat_t M)
+{
+    return (M->r == M->c);
+}
+
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
 /* Must have M->r == N->c and M->c == N->r */
 FLINT_DLL void nmod_sparse_mat_transpose(nmod_sparse_mat_t N, const nmod_sparse_mat_t M);
 
@@ -325,6 +356,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_neg(nmod_sparse_mat_t N, const nmod_sparse_mat_t M) 
 {
     slong i;
+<<<<<<< HEAD
 <<<<<<< HEAD
     nmod_sparse_mat_set(N, M);
     for (i = 0; i < N->r; ++i) nmod_sparse_vec_neg(&N->rows[i], &N->rows[i], N->mod);
@@ -350,6 +382,20 @@ void nmod_sparse_mat_scalar_mul_nmod(nmod_sparse_mat_t N, const nmod_sparse_mat_
         nmod_sparse_mat_set(B, A);
         for (i = 0; i < B->r; ++i) nmod_sparse_vec_scalar_mul(&B->rows[i], &B->rows[i], c, B->mod);    
 >>>>>>> Spacing and cuddling fixed
+=======
+    nmod_sparse_mat_set(N, M);
+    for (i = 0; i < N->r; ++i) nmod_sparse_vec_neg(&N->rows[i], &N->rows[i], N->mod);
+}
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_scalar_mul(nmod_sparse_mat_t N, const nmod_sparse_mat_t M, mp_limb_t c) 
+{
+    if (c == UWORD(0)) nmod_sparse_mat_zero(N);
+    else {
+        slong i;
+        nmod_sparse_mat_set(N, M);
+        for (i = 0; i < N->r; ++i) nmod_sparse_vec_scalar_mul(&N->rows[i], &N->rows[i], c, N->mod);    
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
     }
 }
 
@@ -359,11 +405,16 @@ void nmod_sparse_mat_scalar_mul_fmpz(nmod_sparse_mat_t N, const nmod_sparse_mat_
     fmpz_t d;
     fmpz_init(d);
     fmpz_mod_ui(d, c, N->mod.n);
+<<<<<<< HEAD
     nmod_sparse_mat_scalar_mul_nmod(N, M, fmpz_get_ui(d));
+=======
+    nmod_sparse_mat_scalar_mul(N, M, fmpz_get_ui(d));
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
     fmpz_clear(d);
 }
 
 NMOD_SPARSE_MAT_INLINE
+<<<<<<< HEAD
 void nmod_sparse_mat_add(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N) 
 {
     slong i;
@@ -393,25 +444,29 @@ void nmod_sparse_mat_scalar_submul_nmod(nmod_sparse_mat_t O, const nmod_sparse_m
 
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_addmul(nmod_sparse_mat_t C, const nmod_sparse_mat_t A, const nmod_sparse_mat_t B, mp_limb_t c) 
+=======
+void nmod_sparse_mat_addmul(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N, mp_limb_t c) 
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
 {
     slong i;
-    for (i = 0; i < C->r; ++i) nmod_sparse_vec_scalar_addmul(&C->rows[i], &A->rows[i], &B->rows[i], c, C->mod);
+    for (i = 0; i < O->r; ++i) nmod_sparse_vec_scalar_addmul(&O->rows[i], &M->rows[i], &N->rows[i], c, O->mod);
 }
 
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_add(nmod_sparse_mat_t C, const nmod_sparse_mat_t A, const nmod_sparse_mat_t B) 
+void nmod_sparse_mat_add(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N) 
 {
-    nmod_sparse_mat_addmul(C, A, B, UWORD(1));
+    nmod_sparse_mat_addmul(O, M, N, UWORD(1));
 }
 
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_sub(nmod_sparse_mat_t C, const nmod_sparse_mat_t A, const nmod_sparse_mat_t B) 
+void nmod_sparse_mat_sub(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N) 
 {
-    nmod_sparse_mat_addmul(C, A, B, C->mod.n-UWORD(1));
+    nmod_sparse_mat_addmul(O, M, N, O->mod.n-UWORD(1));
 }
 
 /* Matrix-vector and matrix-matrix multipliciation */
 NMOD_SPARSE_MAT_INLINE
+<<<<<<< HEAD
 void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t M, mp_srcptr x) 
 {
     slong i;
@@ -420,11 +475,18 @@ void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t M, mp_srcptr x)
 =======
     for (i = 0; i < A->r; ++i) y[i] = nmod_sparse_vec_dot_dense(&A->rows[i], x, A->mod);
 >>>>>>> Spacing and cuddling fixed
+=======
+void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t M, const mp_ptr x) 
+{
+    slong i;
+    for (i = 0; i < M->r; ++i) y[i] = nmod_sparse_vec_dot_dense(&M->rows[i], x, M->mod);
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
 }
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_mul_mat(nmod_mat_t Y, const nmod_sparse_mat_t M, const nmod_mat_t X) 
 {
     slong i, j;
+<<<<<<< HEAD
 <<<<<<< HEAD
     nmod_mat_zero(Y);
     for (i = 0; i < M->r; ++i)
@@ -434,22 +496,40 @@ void nmod_sparse_mat_mul_mat(nmod_mat_t Y, const nmod_sparse_mat_t M, const nmod
             nmod_sparse_entry_struct *e = &M->rows[i].entries[j];
 =======
     for (i = 0; i < A->r; ++i)
+=======
+    for (i = 0; i < M->r; ++i)
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
 {
-        for (j = 0; j < A->rows[i].nnz; ++j)
+        for (j = 0; j < M->rows[i].nnz; ++j)
 {
+<<<<<<< HEAD
             nmod_sparse_entry_struct *e = &A->rows[i].entries[j];
 >>>>>>> Spacing and cuddling fixed
+=======
+            nmod_sparse_entry_struct *e = &M->rows[i].entries[j];
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
             _nmod_vec_scalar_addmul_nmod(Y->rows[i], X->rows[e->ind], X->c, e->val, Y->mod);
         }
     }
 }
 
+<<<<<<< HEAD
 FLINT_DLL
 slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t M);
+=======
+/* Permutations */
+/* FLINT_DLL void nmod_sparse_mat_swap_rows(nmod_sparse_mat_t M, slong * perm, slong r, slong s);
+FLINT_DLL void nmod_sparse_mat_invert_rows(nmod_sparse_mat_t M, slong * perm);
+FLINT_DLL void nmod_sparse_mat_swap_cols(nmod_sparse_mat_t M, slong * perm, slong r, slong s);
+FLINT_DLL void nmod_sparse_mat_invert_cols(nmod_sparse_mat_t M, slong * perm);
+FLINT_DLL void nmod_sparse_mat_apply_permutation(nmod_sparse_mat_t M, slong * P, slong n);
+ */
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
 
 /* Decomposition/reduction */
 FLINT_DLL
 slong nmod_sparse_mat_lu(slong *P, slong *Q, nmod_sparse_mat_t L, nmod_sparse_mat_t U, const nmod_sparse_mat_t M);
+<<<<<<< HEAD
 
 FLINT_DLL
 slong nmod_sparse_mat_rref(nmod_sparse_mat_t M);
@@ -496,6 +576,11 @@ int nmod_sparse_mat_nullvector_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M
 /* Note: this should take in uninitialized matrix X */
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
+=======
+
+FLINT_DLL
+slong nmod_sparse_mat_rref(nmod_sparse_mat_t M);
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
 
 <<<<<<< HEAD
 =======
@@ -516,6 +601,7 @@ slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t 
 /* Solve Ax=b */
 >>>>>>> Added nullvector functions for Lanzcos, everything for basic Wiedemann
 FLINT_DLL
+<<<<<<< HEAD
 slong nmod_sparse_mat_nullspace_block_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
@@ -530,6 +616,24 @@ int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b
 
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M);
+=======
+int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b, flint_rand_t state);
+
+FLINT_DLL
+int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b);
+
+FLINT_DLL
+int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b);
+
+FLINT_DLL
+int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b);
+
+FLINT_DLL
+int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b, slong block_size, flint_rand_t state);
+
+FLINT_DLL
+int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, slong block_size, flint_rand_t state);
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -539,27 +643,39 @@ mp_limb_t nmod_sparse_mat_det(const nmod_sparse_mat_t M);
 =======
 =======
 /* Find single nullvector */
-int nmod_sparse_mat_nullvector_wiedemann(mp_ptr x, const nmod_sparse_mat_t A, flint_rand_t state);
+FLINT_DLL
+int nmod_sparse_mat_nullvector_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, flint_rand_t state);
 
-int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t A, flint_rand_t state);
+FLINT_DLL
+int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t M, flint_rand_t state);
+
+FLINT_DLL
+int nmod_sparse_mat_nullvector_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state); 
+
+FLINT_DLL
+int nmod_sparse_mat_nullvector_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state); 
 
 >>>>>>> Added nullvector functions for Lanzcos, everything for basic Wiedemann
 /* Note: this should take in uninitialized matrix X */
 FLINT_DLL
-slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
+slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
-slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t A, flint_rand_t state, slong max_iters);
+slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
-slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t A);
+slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M);
 
 FLINT_DLL
-slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t A);
+slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M);
 
 FLINT_DLL
+<<<<<<< HEAD
 slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t A);
 >>>>>>> Now with additional utilities, more correct basic functions, and nullspace and inversion functions
+=======
+slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t M);
+>>>>>>> Created sparse vector and matrix utilities for all the fq variants
 
 /* Nullspace */
 /* NMOD_SPARSE_MAT_INLINE
