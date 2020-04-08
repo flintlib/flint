@@ -16,72 +16,72 @@
 #include "nmod_sparse_vec.h"
 #include "nmod_sparse_mat.h"
 
-slong nmod_sparse_mat_rref(nmod_sparse_mat_t A)
+slong nmod_sparse_mat_rref(nmod_sparse_mat_t M)
 {
-    if (A->r == 0 || A->c == 0) return 0;
+    if (M->r == 0 || M->c == 0) return 0;
     slong *P;
     slong i, j, r, c, pr, pc, rank, remr;
-    nmod_sparse_mat_t At;
+    nmod_sparse_mat_t Mt;
     nmod_sparse_vec_struct *pcol, *prow, *row, *col;
     mp_limb_t cinv, cc;
 
-    nmod_sparse_mat_init(At, A->c, A->r, A->mod);
-    nmod_sparse_mat_transpose(At, A);
+    nmod_sparse_mat_init(Mt, M->c, M->r, M->mod);
+    nmod_sparse_mat_transpose(Mt, M);
     
     /* Set up permutations */
-    P = flint_malloc(A->r*sizeof(*P));
-    remr = A->r;
-    for (r = 0; r<A->r; ++r) 
+    P = flint_malloc(M->r*sizeof(*P));
+    remr = M->r;
+    for (r = 0; r<M->r; ++r) 
     {
-        if (!A->rows[r].nnz || A->rows[r].entries[0].ind >= A->c) P[r] = --remr; 
+        if (!M->rows[r].nnz || M->rows[r].entries[0].ind >= M->c) P[r] = --remr; 
         else P[r] = -1;
     }
     
     /* Run elimination */
     rank = 0;
-    for (pc=0; pc<A->c; ++pc)
+    for (pc=0; pc<M->c; ++pc)
     {
-        pcol = &At->rows[pc];
+        pcol = &Mt->rows[pc];
 
         /* Get lowest weight incident row not used as previous pivot */
         pr = -1, prow = NULL;
         for (j = 0; j < pcol->nnz; ++j)
         {
-            r = pcol->entries[j].ind, row = &A->rows[r];
+            r = pcol->entries[j].ind, row = &M->rows[r];
             if (P[r] >= 0) continue;
             if (pr==-1 || (row->nnz < prow->nnz)) pr = r, prow = row;
         }
         if(pr == -1) continue;
         P[pr] = rank; 
 
-        cinv = nmod_inv(nmod_sparse_vec_at(prow, pc), A->mod);
-        nmod_sparse_vec_scalar_mul(prow, prow, cinv, A->mod);
+        cinv = nmod_inv(nmod_sparse_vec_at(prow, pc), M->mod);
+        nmod_sparse_vec_scalar_mul(prow, prow, cinv, M->mod);
 
         /* Gaussian eliminate rows */
         for (j = 0; j < pcol->nnz; ++j)
         {
-            r = pcol->entries[j].ind, row = &A->rows[r];
+            r = pcol->entries[j].ind, row = &M->rows[r];
             if(r==pr) {pcol->entries[j].val = UWORD(0); continue;}
 
-            cc = nmod_neg(nmod_sparse_vec_at(row, pc), A->mod);
-            nmod_sparse_vec_scalar_addmul(row, row, prow, cc, A->mod);
-            if (row->nnz == 0 || row->entries[0].ind >= A->c) P[r] = --remr;
+            cc = nmod_neg(nmod_sparse_vec_at(row, pc), M->mod);
+            nmod_sparse_vec_scalar_addmul(row, row, prow, cc, M->mod);
+            if (row->nnz == 0 || row->entries[0].ind >= M->c) P[r] = --remr;
         }
         /* Gaussian eliminate cols */
-        nmod_sparse_vec_scalar_mul(pcol, pcol, cinv, A->mod);
+        nmod_sparse_vec_scalar_mul(pcol, pcol, cinv, M->mod);
         for (j = 0; j < prow->nnz; ++j)
         {
-            c = prow->entries[j].ind, col = &At->rows[c];
-            if(c >= A->c || c==pc) continue;
-            cc = nmod_neg(nmod_sparse_vec_at(col, pr), A->mod);
-            nmod_sparse_vec_scalar_addmul(col, col, pcol, cc, A->mod);
+            c = prow->entries[j].ind, col = &Mt->rows[c];
+            if(c >= M->c || c==pc) continue;
+            cc = nmod_neg(nmod_sparse_vec_at(col, pr), M->mod);
+            nmod_sparse_vec_scalar_addmul(col, col, pcol, cc, M->mod);
         }
         rank += 1;
     }
-    nmod_sparse_mat_clear(At);
+    nmod_sparse_mat_clear(Mt);
 
     /* Reorder rows */
-    nmod_sparse_mat_permute_rows(A, P);
+    nmod_sparse_mat_permute_rows(M, P);
     flint_free(P);
     return rank;
 }

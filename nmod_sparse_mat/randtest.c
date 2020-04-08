@@ -15,14 +15,14 @@
 #include "nmod_sparse_mat.h"
 
 void
-nmod_sparse_mat_randtest(nmod_sparse_mat_t mat, flint_rand_t state, slong min_nnz, slong max_nnz)
+nmod_sparse_mat_randtest(nmod_sparse_mat_t M, flint_rand_t state, slong min_nnz, slong max_nnz)
 {
     slong i, nnz;
 
-    for (i = 0; i < mat->r; ++i)
+    for (i = 0; i < M->r; ++i)
     {
         nnz = n_randint(state, max_nnz+1);
         nnz = FLINT_MAX(nnz, min_nnz);
-        nmod_sparse_vec_randtest(&mat->rows[i], state, nnz, mat->c, mat->mod);
+        nmod_sparse_vec_randtest(&M->rows[i], state, nnz, M->c, M->mod);
     }
 }

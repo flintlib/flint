@@ -16,31 +16,31 @@
 #include "nmod_sparse_vec.h"
 #include "nmod_sparse_mat.h"
 
-int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b)
+int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b)
 {
     int good = 1;
     slong i;
-    nmod_sparse_mat_t AB;
+    nmod_sparse_mat_t Mb;
     nmod_sparse_vec_struct *row;
     nmod_sparse_entry_struct *le, *re;
-    nmod_sparse_mat_init(AB, A->r, A->c, A->mod);
-    nmod_sparse_mat_set(AB, A);
-    nmod_sparse_mat_append_col(AB, b);
-    AB->c = A->c;
-    nmod_sparse_mat_rref(AB);
-    AB->c = A->c+1;
+    nmod_sparse_mat_init(Mb, M->r, M->c, M->mod);
+    nmod_sparse_mat_set(Mb, M);
+    nmod_sparse_mat_append_col(Mb, b);
+    Mb->c = M->c;
+    nmod_sparse_mat_rref(Mb);
+    Mb->c = M->c+1;
 
-    memset(x, 0, A->c*sizeof(*x));
-    for (i = 0; i < A->r; ++i) 
+    memset(x, 0, M->c*sizeof(*x));
+    for (i = 0; i < M->r; ++i) 
     {
-        row = &AB->rows[i];
+        row = &Mb->rows[i];
         if (row->nnz == 0) continue;
         le = &row->entries[0];
         re = &row->entries[row->nnz-1];
-        /* If any row has leading col A->c, system is not solvable */
-        if (le->ind==A->c) {good = 0; break;}
+        /* If any row has leading col M->c, system is not solvable */
+        if (le->ind==M->c) {good = 0; break;}
         /* Otherwise, x[lc] = lagging value */
-        if (re->ind==A->c) {x[le->ind] = re->val;}
+        if (re->ind==M->c) {x[le->ind] = re->val;}
     }
-    nmod_sparse_mat_clear(AB);
+    nmod_sparse_mat_clear(Mb);
 }

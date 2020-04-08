@@ -15,25 +15,25 @@
 #include "flint.h"
 #include "nmod_sparse_vec.h"
 #include "nmod_sparse_mat.h"
-slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t A)
+slong nmod_sparse_mat_inv(nmod_sparse_mat_t Mi, const nmod_sparse_mat_t M)
 {
     slong rk;
-    nmod_sparse_mat_t I, AI;
+    nmod_sparse_mat_t I, MI;
     nmod_sparse_vec_struct *row;
     nmod_sparse_entry_struct *le, *re;
 
-    /* Create block matrix [A | I] */
-    nmod_sparse_mat_init(I, A->r, A->r, A->mod);
+    /* Create block matrix [M | I] */
+    nmod_sparse_mat_init(I, M->r, M->r, M->mod);
     nmod_sparse_mat_one(I);
-    nmod_sparse_mat_init(AI, A->r, A->r + A->c, A->mod);
-    nmod_sparse_mat_concat_horizontal(AI, A, I);
+    nmod_sparse_mat_init(MI, M->r, M->r + M->c, M->mod);
+    nmod_sparse_mat_concat_horizontal(MI, M, I);
 
     /* Run Gaussian elimination on first half */
-    AI->c = A->c;
-    rk = nmod_sparse_mat_rref(AI);
-    AI->c = A->c+A->r;
-    nmod_sparse_mat_split_horizontal(I, Ai, AI, A->c);
+    MI->c = M->c;
+    rk = nmod_sparse_mat_rref(MI);
+    MI->c = M->c+M->r;
+    nmod_sparse_mat_split_horizontal(I, Mi, MI, M->c);
     nmod_sparse_mat_clear(I);
-    nmod_sparse_mat_clear(AI); 
+    nmod_sparse_mat_clear(MI); 
     return rk;
 }

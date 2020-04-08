@@ -16,7 +16,7 @@
 #include "nmod_sparse_vec.h"
 #include "nmod_sparse_mat.h"
 
-slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t A)
+slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M)
 {
     int good = 1;
     slong rk, *P, *Q, *Qi, i, j;
@@ -24,32 +24,32 @@ slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t A)
     nmod_sparse_entry_struct *e;
     nmod_sparse_vec_struct *Urow;
     mp_limb_t *Xrow;
-    P = flint_malloc(A->r * sizeof(*P));
-    Q = flint_malloc(A->c * sizeof(*Q));
-    nmod_sparse_mat_init(L, A->r, A->c, A->mod);
-    nmod_sparse_mat_init(U, A->r, A->c, A->mod);
-    rk = nmod_sparse_mat_lu(P, Q, L, U, A);
+    P = flint_malloc(M->r * sizeof(*P));
+    Q = flint_malloc(M->c * sizeof(*Q));
+    nmod_sparse_mat_init(L, M->r, M->c, M->mod);
+    nmod_sparse_mat_init(U, M->r, M->c, M->mod);
+    rk = nmod_sparse_mat_lu(P, Q, L, U, M);
     flint_free(P);
     nmod_sparse_mat_clear(L);
     for(i=0; i<rk; ++i)
-        nmod_sparse_vec_scalar_mul(&U->rows[i], &U->rows[i], nmod_inv(U->rows[i].entries[0].val, A->mod), A->mod);
-    nmod_mat_init(X, A->c, A->c-rk, A->mod.n);
-    if (rk != A->c) 
+        nmod_sparse_vec_scalar_mul(&U->rows[i], &U->rows[i], nmod_inv(U->rows[i].entries[0].val, M->mod), M->mod);
+    nmod_mat_init(X, M->c, M->c-rk, M->mod.n);
+    if (rk != M->c) 
     {
         /* Invert permutation */
-        Qi = flint_malloc(A->c * sizeof(*Qi));
-        for (i = 0; i < A->c; ++i) Qi[Q[i]] = i;
+        Qi = flint_malloc(M->c * sizeof(*Qi));
+        for (i = 0; i < M->c; ++i) Qi[Q[i]] = i;
 
-        /* Assign unit vectors to non-pivot columns */
-        for (i = A->c-1; i >= rk; --i) X->rows[Qi[i]][i-rk] = 1;
+        /* Mssign unit vectors to non-pivot columns */
+        for (i = M->c-1; i >= rk; --i) X->rows[Qi[i]][i-rk] = 1;
         for (i = rk-1; i >= 0; --i) {
             Urow = &U->rows[i];
             Xrow = X->rows[Qi[i]];
             for(j = 1; j<Urow->nnz; ++j) {
                 e = &Urow->entries[j];
                 /* Do in-place row elimination */
-                if(e->ind < rk) _nmod_vec_scalar_addmul_nmod(Xrow, X->rows[Qi[e->ind]], X->c, nmod_neg(e->val, A->mod), A->mod);
-                else Xrow[e->ind-rk] = nmod_sub(Xrow[e->ind-rk], e->val, A->mod);
+                if(e->ind < rk) _nmod_vec_scalar_addmul_nmod(Xrow, X->rows[Qi[e->ind]], X->c, nmod_neg(e->val, M->mod), M->mod);
+                else Xrow[e->ind-rk] = nmod_sub(Xrow[e->ind-rk], e->val, M->mod);
             }
 
         }
