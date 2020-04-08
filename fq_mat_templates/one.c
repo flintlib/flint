@@ -21,7 +21,7 @@ void TEMPLATE(T, mat_one) (TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)
         {
-            if(i==j)
+            if (i == j)
                 TEMPLATE(T, one) (TEMPLATE(T, mat_entry) (A, i, j), ctx);
             else
                 TEMPLATE(T, zero) (TEMPLATE(T, mat_entry) (A, i, j), ctx);

@@ -105,7 +105,7 @@ void nmod_sparse_mat_set(nmod_sparse_mat_t M, const nmod_sparse_mat_t src)
 {
     slong i, rmax = FLINT_MIN(M->r, src->r);
     if(M==src || M->r == 0) return;
-    for(i=0; i<rmax; ++i) nmod_sparse_vec_set(&M->rows[i], &src->rows[i], src->c_off);
+    for (i = 0; i < rmax; ++i) nmod_sparse_vec_set(&M->rows[i], &src->rows[i], src->c_off);
 }
 
 FLINT_DLL
@@ -115,7 +115,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_append_col(nmod_sparse_mat_t M, const mp_ptr v) 
 {
     slong i;
-    for(i=0; i<M->r; ++i) _nmod_sparse_vec_append_entry(&M->rows[i], M->c, v[i]);
+    for (i = 0; i < M->r; ++i) _nmod_sparse_vec_append_entry(&M->rows[i], M->c, v[i]);
     M->c += 1;
 }
 
@@ -183,7 +183,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_split_horizontal(nmod_sparse_mat_t M1, nmod_sparse_mat_t M2, const nmod_sparse_mat_t B, slong c)
 {
     slong i;
-    for(i=0; i<B->r; ++i) nmod_sparse_vec_split(&M1->rows[i], &M2->rows[i], &B->rows[i], c);
+    for (i = 0; i < B->r; ++i) nmod_sparse_vec_split(&M1->rows[i], &M2->rows[i], &B->rows[i], c);
 }
 
 /* Split block matix B = [M1^t M1^t]^t into submatrices M1 and M2 */
@@ -192,8 +192,8 @@ void nmod_sparse_mat_split_vertical(nmod_sparse_mat_t M1, nmod_sparse_mat_t M2, 
 {
     slong i;
     r = FLINT_MIN(r, B->r);
-    for(i=0; i<r; ++i) nmod_sparse_vec_set(&M1->rows[i], &B->rows[i], B->c_off);
-    for(i=r; i<B->r; ++i) nmod_sparse_vec_set(&M2->rows[i-r], &B->rows[i], B->c_off);
+    for (i = 0; i < r; ++i) nmod_sparse_vec_set(&M1->rows[i], &B->rows[i], B->c_off);
+    for (i = r; i < B->r; ++i) nmod_sparse_vec_set(&M2->rows[i-r], &B->rows[i], B->c_off);
 }
 
 
@@ -347,7 +347,7 @@ slong nmod_sparse_mat_lu(slong *P, slong *Q, nmod_sparse_mat_t L, nmod_sparse_ma
 FLINT_DLL
 slong nmod_sparse_mat_rref(nmod_sparse_mat_t M);
 
-/* Solve Ax=b */
+/* Solve Ax = b */
 FLINT_DLL
 int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b, flint_rand_t state);
 

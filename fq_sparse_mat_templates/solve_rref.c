@@ -21,7 +21,7 @@ int TEMPLATE(T, sparse_mat_solve_rref) (TEMPLATE(T, struct) *x, const TEMPLATE(T
     TEMPLATE(T, sparse_mat_t) Mb;
     TEMPLATE(T, sparse_vec_struct) *row;
     TEMPLATE(T, sparse_entry_struct) *le, *re;
-    if(_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
+    if (_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
     {
         _TEMPLATE(T, vec_zero) (x, M->c, ctx);
         return 1;

@@ -30,7 +30,7 @@ static slong find_min_poly(mp_limb_t *s, slong N, nmod_t mod)
 
 	for (n = 0, m = 1; n < N; n++, m++)
 	{
-		/* d_C = sum_{i=0}^L C_i * s_{n-i} */
+		/* d_C = sum_{i = 0}^L C_i * s_{n-i} */
 		d_C = s[n];
 		for (i = 1; i <= L; i++)
 			d_C = nmod_addmul(d_C, C[i], s[n-i], mod);
@@ -59,7 +59,7 @@ static slong find_min_poly(mp_limb_t *s, slong N, nmod_t mod)
 	return L;
 }
 
-/* Compute s_ij=(A^j y)_i for i=0,...,ns-1, j=0,...,num-1*/
+/* Compute s_ij=(A^j y)_i for i = 0,...,ns-1, j = 0,...,num-1*/
 static void make_sequences(mp_limb_t **s, slong ns, slong len, const nmod_sparse_mat_t A, mp_srcptr b) 
 {
     slong i, j;
@@ -70,13 +70,13 @@ static void make_sequences(mp_limb_t **s, slong ns, slong len, const nmod_sparse
     for (j = 0; j < len; ++j) 
     {
         if(j > 0) nmod_sparse_mat_mul_vec(Ay, A, y), memcpy(y, Ay, A->r*sizeof(*y));
-        for(i = 0; i < ns; ++i) s[i][j] = y[i];
+        for (i = 0; i < ns; ++i) s[i][j] = y[i];
     }
     _nmod_vec_clear(y);
     _nmod_vec_clear(Ay);
 }
 
-/* Compute x = \Sigma_{i=0}^{L-1} s_i * A^i * b = 0 */
+/* Compute x = \Sigma_{i = 0}^{L-1} s_i * A^i * b = 0 */
 static void make_sum(mp_ptr x, mp_limb_t *s, slong L, const nmod_sparse_mat_t A, mp_srcptr b)
 {
     slong i;
@@ -114,7 +114,7 @@ int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t A, const m
         L = find_min_poly(s[i], len, A->mod);
         if(s[i][0]==0) continue;
 
-        /* If \sum_{j=0}^L s_ijA^jb = 0 => x = -1/s[0]\sum_{j=0}^{L-1} s_i(j-1) A^jb solves Ax=b */
+        /* If \sum_{j = 0}^L s_ijA^jb = 0 => x = -1/s[0]\sum_{j = 0}^{L-1} s_i(j-1) A^jb solves Ax = b */
         make_sum(x, s[i]+1, L, A, b);
         _nmod_vec_scalar_mul_nmod(x, x, A->r, nmod_neg(nmod_inv(s[i][0], A->mod), A->mod), A->mod);
 
@@ -151,7 +151,7 @@ int nmod_sparse_mat_nullvector_wiedemann(mp_ptr x, const nmod_sparse_mat_t A, fl
         /* Get minimal polynomial */
         L = find_min_poly(s[i], len, A->mod);
 
-        /* \sum_{j=0}^L s_ijA^jb = 0 => x = \sum_{j=0}^L s_ijA^jx solves Ax=0 */
+        /* \sum_{j = 0}^L s_ijA^jb = 0 => x = \sum_{j = 0}^L s_ijA^jx solves Ax = 0 */
         make_sum(x, s[i], L+1, A, x);
         nmod_sparse_mat_mul_vec(Ax, A, x);
         ret = _nmod_vec_is_zero(Ax, A->r);

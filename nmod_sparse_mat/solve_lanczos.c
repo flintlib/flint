@@ -43,7 +43,7 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, const mp_
 
     /* Make 0th vector random (and -1st vector trivial) */
     //_nmod_vec_set(v[0], Mtb, M->c);
-    //for(j = 0; j < M->c; ++j) v[0][j] = n_randint(state, M->mod.n);
+    //for (j = 0; j < M->c; ++j) v[0][j] = n_randint(state, M->mod.n);
     _nmod_vec_randtest(v[0], state, M->c, M->mod);
     _nmod_vec_zero(v[1], M->c); vtAv[1] = 1;  
     for (j = 0; ; j = 1-j)

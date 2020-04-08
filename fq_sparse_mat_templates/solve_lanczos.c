@@ -23,7 +23,7 @@ int TEMPLATE(T, sparse_mat_solve_lanczos) (TEMPLATE(T, struct) *x, const TEMPLAT
     TEMPLATE(T, struct) *v[2], *Mv, *Av, *Mtb, vtAv[2];
     TEMPLATE(T, sparse_mat_t) Mt;
 
-    if(_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
+    if (_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
     {
         _TEMPLATE(T, vec_zero) (x, M->c, ctx);
         return 1;
@@ -102,7 +102,8 @@ int TEMPLATE(T, sparse_mat_solve_lanczos) (TEMPLATE(T, struct) *x, const TEMPLAT
     return ret;
 }
 
-int TEMPLATE(T, sparse_mat_nullvector_lanczos) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t) M, flint_rand_t state, const TEMPLATE(T, ctx_t) ctx) {
+int TEMPLATE(T, sparse_mat_nullvector_lanczos) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t) M, flint_rand_t state, const TEMPLATE(T, ctx_t) ctx) 
+{
     int ret = 1;
     TEMPLATE(T, struct) *x2, *b;
     x2 = _TEMPLATE(T, vec_init) (M->c, ctx);
@@ -110,7 +111,7 @@ int TEMPLATE(T, sparse_mat_nullvector_lanczos) (TEMPLATE(T, struct) *x, const TE
 
     _TEMPLATE(T, vec_randtest) (x, state, M->c, ctx);
     TEMPLATE(T, sparse_mat_mul_vec) (b, M, x, ctx);
-    if(TEMPLATE(T, sparse_mat_solve_lanczos) (x2, M, b, state, ctx) == 0) ret = 0; /* Lanczos failed */
+    if (TEMPLATE(T, sparse_mat_solve_lanczos) (x2, M, b, state, ctx) == 0) ret = 0; /* Lanczos failed */
     if (ret)
     {
         _TEMPLATE(T, vec_sub) (x, x, x2, M->c, ctx);

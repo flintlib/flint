@@ -30,7 +30,7 @@ TEMPLATE(T, sparse_mat_transpose) (TEMPLATE(T, sparse_mat_t) B, const TEMPLATE(T
         for (i = 0; i < A->rows[r].nnz; ++i) 
         {
             c = A->rows[r].entries[i].ind - A->c_off;
-            if(c >= A->c) break;
+            if (c >= A->c) break;
             nnz[c]++;
         }
     }
@@ -47,7 +47,7 @@ TEMPLATE(T, sparse_mat_transpose) (TEMPLATE(T, sparse_mat_t) B, const TEMPLATE(T
         {
             Ae = &A->rows[r].entries[i];
             c = Ae->ind - A->c_off;
-            if(c >= A->c) break;
+            if (c >= A->c) break;
             j = nnz[c]++;
             Be = &B->rows[c].entries[j];
             Be->ind = r;

@@ -56,7 +56,7 @@ static void coppersmith_aux_gauss(TEMPLATE(T, mat_t) M, slong *d, const TEMPLATE
         /* Set the pivot row to be the minimum degree row incident on column pc */
         pr = b + pc;
         for (r = 0; r < b; r++)
-            if(gamma[r] && !TEMPLATE(T, is_zero) (&M->rows[r][pc], ctx) && d[r] < d[pr]) pr = r;
+            if (gamma[r] && !TEMPLATE(T, is_zero) (&M->rows[r][pc], ctx) && d[r] < d[pr]) pr = r;
         
         /* Try to move pivot row to appropriate position (if not already there) */
         if (pr != b + pc)
@@ -72,7 +72,7 @@ static void coppersmith_aux_gauss(TEMPLATE(T, mat_t) M, slong *d, const TEMPLATE
 
         /* Do Gaussian elimination on first b rows */
         for (r = 0; r < b; ++k)
-            if(gamma[r] && !TEMPLATE(T, is_zero) (&M->rows[r][pc], ctx))
+            if (gamma[r] && !TEMPLATE(T, is_zero) (&M->rows[r][pc], ctx))
             {
                 TEMPLATE(T, mul) (cc, &M->rows[r][pc], cinv, ctx);
                 TEMPLATE(T, neg) (cc, cc, ctx);
@@ -132,7 +132,7 @@ static int find_block_min_poly(TEMPLATE(T, mat_struct) *S, slong *d, slong n, co
         TEMPLATE(T, mat_window_init) (D, M, 0, 0, 2*b, b, ctx);
         TEMPLATE(T, mat_window_init) (tau, M, 0, b, 2*b, 3*b, ctx);
         TEMPLATE(T, mat_zero) (D, ctx);
-        for(k = 0; k <= t; ++k) TEMPLATE(T, mat_addmul) (D, D, &F[k], &S[t-k], ctx);
+        for (k = 0; k <= t; ++k) TEMPLATE(T, mat_addmul) (D, D, &F[k], &S[t-k], ctx);
         TEMPLATE(T, mat_one) (tau, ctx);
         TEMPLATE(T, mat_window_clear) (D, ctx);
         TEMPLATE(T, mat_window_clear) (tau, ctx);
@@ -144,18 +144,18 @@ static int find_block_min_poly(TEMPLATE(T, mat_struct) *S, slong *d, slong n, co
         for (k = f_len-1; k > 0; --k)
             TEMPLATE(T, mat_mul) (&F[k], tau, &F[k-1], ctx); /* Every row multiplied by x */
         for (k = 0; k < f_len; ++k)
-            for(r = 0; r < b; ++r) /* Divide first b rows by x */
+            for (r = 0; r < b; ++r) /* Divide first b rows by x */
                 (k < f_len - 1) ? _TEMPLATE(T, vec_set) (F[k].rows[r], F[k+1].rows[r], b, ctx) : _TEMPLATE(T, vec_zero) (F[k].rows[r], b, ctx);
         for (r = b; r < 2*b; ++r) d[r] += 1;
         TEMPLATE(T, mat_window_clear) (tau, ctx);
     }
 
     /* Copy C to S, with each row reversed according to its degree */
-    for(r = 0; r < b; ++r)
-        for(k = 0; k <= d[r]; k++)
+    for (r = 0; r < b; ++r)
+        for (k = 0; k <= d[r]; k++)
             _TEMPLATE(T, vec_set) (S[d[r] - k].rows[r], F[k].rows[r], b, ctx);
     
-    for(k = 0; k < f_len; ++k) TEMPLATE(T, mat_clear) (&F[i], ctx);
+    for (k = 0; k < f_len; ++k) TEMPLATE(T, mat_clear) (&F[i], ctx);
     TEMPLATE(T, mat_clear) (M, ctx);
     flint_free(F);
     flint_free(d);
@@ -172,7 +172,7 @@ static void make_block_sum(TEMPLATE(T, struct) *x, const TEMPLATE(T, mat_struct)
     dd = flint_malloc(b*sizeof(*dd));
     for (nu = 0; nu < b; nu++);
         for (dd[nu] = 0; dd[nu] <= d[l]; ++dd[nu])  
-            if(!TEMPLATE(T, is_zero) (&S[dd[nu]].rows[l][nu], ctx)) break;
+            if (!TEMPLATE(T, is_zero) (&S[dd[nu]].rows[l][nu], ctx)) break;
 
     /* Simulaneously apply all polynomials in row l to iteration of M on Z */
     v = _TEMPLATE(T, vec_init) (b, ctx);
@@ -180,8 +180,8 @@ static void make_block_sum(TEMPLATE(T, struct) *x, const TEMPLATE(T, mat_struct)
     _TEMPLATE(T, vec_zero) (x, M->r, ctx);
     for (i = iter = 0; iter < d[l]; ++iter, i = 1 - i)
     {
-        if(iter > 0) TEMPLATE(T, sparse_mat_mul_mat) (&Z[i], M, &Z[1-i], ctx);
-        for(nu = 0; nu < b; nu++)
+        if (iter > 0) TEMPLATE(T, sparse_mat_mul_mat) (&Z[i], M, &Z[1-i], ctx);
+        for (nu = 0; nu < b; nu++)
         {
             if (dd[nu] <= d[l]) TEMPLATE(T, set) (&v[nu], &S[dd[nu]++].rows[l][nu], ctx);
             else TEMPLATE(T, zero) (&v[nu], ctx);
@@ -204,7 +204,7 @@ int TEMPLATE(T, sparse_mat_solve_block_wiedemann) (TEMPLATE(T, struct) *x, const
     TEMPLATE(T, sparse_vec_struct) *row;
     TEMPLATE(T, sparse_entry_struct) *le, *re;
     if (M->r != M->c) return 0; /* TODO */
-    if(_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
+    if (_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
     {
         _TEMPLATE(T, vec_zero) (x, M->c, ctx);
         return 1;
@@ -221,7 +221,7 @@ int TEMPLATE(T, sparse_mat_solve_block_wiedemann) (TEMPLATE(T, struct) *x, const
     TEMPLATE(T, sparse_vec_clear) (z, ctx);
     TEMPLATE(T, sparse_mat_clear) (Mb, ctx);
 
-    if(!TEMPLATE(T, is_zero) (&x1[M->c], ctx))
+    if (!TEMPLATE(T, is_zero) (&x1[M->c], ctx))
     {
         TEMPLATE(T, inv) (&x1[M->c], &x1[M->c], ctx);
         _TEMPLATE(T, TEMPLATE(vec_scalar_mul, T)) (x, x1, M->c, &x1[M->c], ctx);

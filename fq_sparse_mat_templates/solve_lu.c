@@ -22,7 +22,7 @@ int TEMPLATE(T, sparse_mat_solve_lu) (TEMPLATE(T, struct) *x, const TEMPLATE(T, 
     TEMPLATE(T, t) cc;
     TEMPLATE(T, struct) *bp, *y, *xp;
     TEMPLATE(T, sparse_mat_t) L, U;
-    if(_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
+    if (_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
     {
         _TEMPLATE(T, vec_zero) (x, M->c, ctx);
         return 1;
@@ -62,7 +62,7 @@ int TEMPLATE(T, sparse_mat_solve_lu) (TEMPLATE(T, struct) *x, const TEMPLATE(T, 
             TEMPLATE(T, sub) (&xp[i], &y[i], &xp[i], ctx);
             TEMPLATE(T, div) (&xp[i], &xp[i], U->rows[i].entries[0].val, ctx);
         }
-        for(i = 0; i < M->c; ++i) TEMPLATE(T, set) (&x[i], &xp[Q[i]], ctx);
+        for (i = 0; i < M->c; ++i) TEMPLATE(T, set) (&x[i], &xp[Q[i]], ctx);
     }
     TEMPLATE(T, sparse_mat_clear) (L, ctx);
     TEMPLATE(T, sparse_mat_clear) (U, ctx);

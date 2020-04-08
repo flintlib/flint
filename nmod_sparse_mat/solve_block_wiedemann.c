@@ -15,7 +15,7 @@
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 
-/* Compute S_i=(M^j Y)_{0...b-1}^T for i=0,...,ns-1 */
+/* Compute S_i=(M^j Y)_{0...b-1}^T for i = 0,...,ns-1 */
 static void make_block_sequences(nmod_mat_struct *S, slong ns, const nmod_sparse_mat_t M, nmod_mat_struct Y[2]) 
 {
     slong iter, i, j, k, b = Y->c;
@@ -127,7 +127,7 @@ static int find_block_min_poly(nmod_mat_struct *S, slong *d, slong n)
         nmod_mat_window_init(D, M, 0, 0, 2*b, b);
         nmod_mat_window_init(tau, M, 0, b, 2*b, 3*b);
         nmod_mat_zero(D);
-        for(k = 0; k <= t; ++k) nmod_mat_addmul(D, D, &F[k], &S[t-k]);
+        for (k = 0; k <= t; ++k) nmod_mat_addmul(D, D, &F[k], &S[t-k]);
         nmod_mat_one(tau);
         nmod_mat_window_clear(D);
         nmod_mat_window_clear(tau);
@@ -139,18 +139,18 @@ static int find_block_min_poly(nmod_mat_struct *S, slong *d, slong n)
         for (k = f_len-1; k > 0; --k)
             nmod_mat_mul(&F[k], tau, &F[k-1]); /* Every row multiplied by x */
         for (k = 0; k < f_len; ++k)
-            for(r = 0; r < b; ++r) /* Divide first b rows by x */
+            for (r = 0; r < b; ++r) /* Divide first b rows by x */
                 (k < f_len - 1) ? _nmod_vec_set(F[k].rows[r], F[k+1].rows[r], b) : _nmod_vec_zero(F[k].rows[r], b);
         for (r = b; r < 2*b; ++r) d[r] += 1;
         nmod_mat_window_clear(tau);
     }
 
     /* Copy C to S, with each row reversed according to its degree */
-    for(r = 0; r < b; ++r)
-        for(k = 0; k <= d[r]; k++)
+    for (r = 0; r < b; ++r)
+        for (k = 0; k <= d[r]; k++)
             _nmod_vec_set(S[d[r] - k].rows[r], F[k].rows[r], b);
     
-    for(k = 0; k < f_len; ++k) nmod_mat_clear(&F[i]);
+    for (k = 0; k < f_len; ++k) nmod_mat_clear(&F[i]);
     nmod_mat_clear(M);
     flint_free(F);
     flint_free(d);
@@ -176,7 +176,7 @@ static void make_block_sum(mp_ptr x, const nmod_mat_struct *S, const slong *d, c
     for (i = iter = 0; iter < d[l]; ++iter, i = 1 - i)
     {
         if(iter > 0) nmod_sparse_mat_mul_mat(&Z[i], M, &Z[1-i]);
-        for(nu = 0; nu < b; nu++)
+        for (nu = 0; nu < b; nu++)
             v[nu] = (dd[nu] <= d[l]) ? S[dd[nu]++].rows[l][nu] : UWORD(0);
         nmod_sparse_mat_mul_vec(xi, M, v);
         _nmod_vec_add(x, x, xi, M->c, M->mod);

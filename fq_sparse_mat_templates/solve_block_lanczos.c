@@ -24,7 +24,8 @@
 /* the column c + b and zero out the row c. In addition, we reorder   */
 /* columns so that ones corresponding to zero entries in S go first.  */
 /* See Figure 1 in the above reference for details. */
-static int compute_nWi_S(TEMPLATE(T, mat_t) nWi, int *S, const TEMPLATE(T, mat_t) Torig, const TEMPLATE(T, ctx_t) ctx) {
+static int compute_nWi_S(TEMPLATE(T, mat_t) nWi, int *S, const TEMPLATE(T, mat_t) Torig, const TEMPLATE(T, ctx_t) ctx) 
+{
     
     const slong b = Torig->r;
     slong pc, i, j, rk = 0;
@@ -40,8 +41,8 @@ static int compute_nWi_S(TEMPLATE(T, mat_t) nWi, int *S, const TEMPLATE(T, mat_t
 
     /* Set permutation to have previously dependent vectors at front */
     P = flint_malloc(b*sizeof(*P));
-    for (i = j = 0; i < b; ++i) if(!S[i]) P[j++] = i;
-    for (i = j = 0; i < b; ++i) if(S[i]) P[j++] = i;
+    for (i = j = 0; i < b; ++i) if (!S[i]) P[j++] = i;
+    for (i = j = 0; i < b; ++i) if (S[i]) P[j++] = i;
     
     for (j = 0; j < b; ++j) 
     {
@@ -60,7 +61,7 @@ static int compute_nWi_S(TEMPLATE(T, mat_t) nWi, int *S, const TEMPLATE(T, mat_t
         _TEMPLATE(T, TEMPLATE(vec_scalar_mul, T)) (nWi->rows[pc], nWi->rows[pc], b, cc, ctx);
 
         /* Kill all other entries in pivot column */
-        for(i = 0; i < b; ++i)
+        for (i = 0; i < b; ++i)
         {
             TEMPLATE(T, neg) (cc, &X->rows[P[i]][pc], ctx);
             if (i == j || TEMPLATE(T, is_zero) (cc, ctx)) continue;
@@ -85,12 +86,13 @@ static void kill_columns(TEMPLATE(T, mat_t) M, int *good, const TEMPLATE(T, ctx_
 {
     slong r, c;
     for (c = 0; c < M->c; ++c)
-        if(good[c] == 0)
+        if (good[c] == 0)
             for (r = 0; r < M->r; ++r)
                 TEMPLATE(T, zero) (&M->rows[r][c], ctx);
 }
 
-int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, struct) *b, slong block_size, flint_rand_t state, const TEMPLATE(T, ctx_t) ctx) {
+int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, struct) *b, slong block_size, flint_rand_t state, const TEMPLATE(T, ctx_t) ctx) 
+{
     int ret = 0;
     slong i, j, prev_i, next_i, iter, cur_dim, total_dim = 0;
     TEMPLATE(T, sparse_mat_t) Mt; /* Transpose of M, we work with A = MtM */
@@ -106,7 +108,7 @@ int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const T
     TEMPLATE(T, mat_t) DEF; /* Used to store coefficient matrices D, E, and F */
     TEMPLATE(T, mat_t) I; /* I_{b x b} */
     TEMPLATE(T, struct) *SStVtb, *WiSStVtb, *VSStWiSStVtb; /* Intermediate elements in x update */
-    if(_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
+    if (_TEMPLATE(T, vec_is_zero) (b, M->r, ctx))
     {
         _TEMPLATE(T, vec_zero) (x, M->c, ctx);
         return 1;
@@ -136,12 +138,12 @@ int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const T
     for (i = 0; i < V[0].r*V[0].c; ++i)
         TEMPLATE(T, randtest) (&V[0].entries[i], state, ctx);
 
-    for(iter = 0; ; ++iter) 
+    for (iter = 0; ; ++iter) 
     {
         i = iter % 3;
         next_i = (iter + 1) % 3;
         prev_i = (iter + 2) % 3;
-        if(iter>=2)
+        if (iter >= 2)
         {
             /* Compute the F value for this round (minus the final term) */
             TEMPLATE(T, mat_addmul) (DEF, I, VtAV, nWi[prev_i], ctx);
@@ -178,13 +180,13 @@ int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const T
          *   F = -W_{i-2}^-1(I - V_{i-1}^tAV_{i-1}W_{i-1}^-1)
          *                  ((AV_{i-1})^tAV_{i-1}S_{i-1}S_{i-1}^t + V_{i-1}^tAV_{i-1})S_iS_i^t
          **/
-        if(iter >= 2)
+        if (iter >= 2)
         {
             /* V_{i+1} = V_{i-2} F */
             kill_columns(DEF, SSt, ctx);
             TEMPLATE(T, mat_mul) (&V[next_i], &V[next_i], DEF, ctx);
         }
-        if(iter >= 1)
+        if (iter >= 1)
         {
             /* V_{i+1} += V_{i-1} E */
             TEMPLATE(T, mat_mul) (DEF, nWi[prev_i], VtAV, ctx);
@@ -203,7 +205,7 @@ int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const T
         kill_columns(AV, SSt, ctx);
         TEMPLATE(T, mat_add) (&V[next_i], &V[next_i], AV, ctx);
 
-        if(TEMPLATE(T, mat_is_zero) (&V[i], ctx)) {ret = 1; break;}
+        if (TEMPLATE(T, mat_is_zero) (&V[i], ctx)) {ret = 1; break;}
     }
      TEMPLATE(T, sparse_mat_clear) (Mt, ctx);
     for (i = 0; i < 3; ++i) TEMPLATE(T, mat_clear) (&V[i], ctx);
@@ -222,7 +224,8 @@ int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const T
     return ret;
 }
 
-int TEMPLATE(T, sparse_mat_nullvector_block_lanczos) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t) M, slong block_size, flint_rand_t state, const TEMPLATE(T, ctx_t) ctx) {
+int TEMPLATE(T, sparse_mat_nullvector_block_lanczos) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t) M, slong block_size, flint_rand_t state, const TEMPLATE(T, ctx_t) ctx) 
+{
     int ret = 1;
     TEMPLATE(T, struct) *x2, *b;
     x2 = _TEMPLATE(T, vec_init) (M->c, ctx);
@@ -230,7 +233,7 @@ int TEMPLATE(T, sparse_mat_nullvector_block_lanczos) (TEMPLATE(T, struct) *x, co
 
     _TEMPLATE(T, vec_randtest) (x, state, M->c, ctx);
     TEMPLATE(T, sparse_mat_mul_vec) (b, M, x, ctx);
-    if(TEMPLATE(T, sparse_mat_solve_block_lanczos) (x2, M, b, block_size, state, ctx) == 0) ret = 0; /* Lanczos failed */
+    if (TEMPLATE(T, sparse_mat_solve_block_lanczos) (x2, M, b, block_size, state, ctx) == 0) ret = 0; /* Lanczos failed */
     if (ret)
     {
         _TEMPLATE(T, vec_sub) (x, x, x2, M->c, ctx);

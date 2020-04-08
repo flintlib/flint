@@ -54,7 +54,7 @@ static slong find_min_poly(TEMPLATE(T, struct) *s, slong N, const TEMPLATE(T, ct
             TEMPLATE(T, add) (&C[m+i], &C[m+i], cc, ctx);
         }
         deg_C = FLINT_MAX(deg_C, deg_B + m);
-        while(TEMPLATE(T, is_zero) (&C[deg_C], ctx)) --deg_C;  /* Probably unnecessary */
+        while (TEMPLATE(T, is_zero) (&C[deg_C], ctx)) --deg_C;  /* Probably unnecessary */
 
         if (2*L <= n) /* Increase number of errors */
         {
@@ -82,8 +82,8 @@ static void make_sequences(TEMPLATE(T, struct) **s, slong ns, slong len, const T
     slong iter, i, j;
     for (i = iter = 0; iter < len; ++iter, i = 1-i) 
     {
-        if(iter > 0) TEMPLATE(T, sparse_mat_mul_vec) (y[i], A, y[1-i], ctx);
-        for(j = 0; j < ns; ++j) TEMPLATE(T, set) (&s[j][iter], &y[i][j], ctx);
+        if (iter > 0) TEMPLATE(T, sparse_mat_mul_vec) (y[i], A, y[1-i], ctx);
+        for (j = 0; j < ns; ++j) TEMPLATE(T, set) (&s[j][iter], &y[i][j], ctx);
     }
 }
 
@@ -104,8 +104,8 @@ int TEMPLATE(T, sparse_mat_solve_wiedemann) (TEMPLATE(T, struct) *x, const TEMPL
     slong i, L, ret = 0, ns = FLINT_MIN(A->r, 2), len = 2*A->r + 1;
     TEMPLATE(T, t) cc;  
     TEMPLATE(T, struct) **s, *y[2];
-    if(A->r != A->c) return 0; /* TBD: reduce to square */
-    if(_TEMPLATE(T, vec_is_zero) (b, A->r, ctx))
+    if (A->r != A->c) return 0; /* TBD: reduce to square */
+    if (_TEMPLATE(T, vec_is_zero) (b, A->r, ctx))
     {
         _TEMPLATE(T, vec_zero) (x, A->c, ctx);
         return 1;
@@ -125,7 +125,7 @@ int TEMPLATE(T, sparse_mat_solve_wiedemann) (TEMPLATE(T, struct) *x, const TEMPL
     {
         /* Get minimal polynomial */
         L = find_min_poly(s[i], len, ctx);
-        if(TEMPLATE(T, is_zero) (&s[i][0], ctx)) continue;
+        if (TEMPLATE(T, is_zero) (&s[i][0], ctx)) continue;
 
         /* If \sum_{j=0}^L s_ijA^jb = 0 => x = -1/s[0]\sum_{j=0}^{L-1} s_i(j-1) A^jb solves Ax=b */
         _TEMPLATE(T, vec_set) (y[0], b, A->r, ctx);
@@ -151,7 +151,7 @@ int TEMPLATE(T, sparse_mat_nullvector_wiedemann) (TEMPLATE(T, struct) *x, const 
     slong i, L, ret = 0, ns = FLINT_MIN(A->r, 2), len = 2*A->r + 1;
     TEMPLATE(T, struct) **s, *y[3]; 
 
-    if(A->r != A->c) return 0; /* TBD: reduce to square */
+    if (A->r != A->c) return 0; /* TBD: reduce to square */
 
     s = flint_malloc(ns * sizeof(*s));
     for (i = 0; i < ns; ++i) s[i] = _TEMPLATE(T, vec_init) (len, ctx);

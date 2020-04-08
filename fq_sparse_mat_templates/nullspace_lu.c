@@ -32,7 +32,7 @@ slong TEMPLATE(T, sparse_mat_nullspace_lu) (TEMPLATE(T, mat_t) X, const TEMPLATE
     rk = TEMPLATE(T, sparse_mat_lu) (P, Q, L, U, M, ctx);
     flint_free(P);
     TEMPLATE(T, sparse_mat_clear) (L, ctx);
-    for(i=0; i<rk; ++i)
+    for (i = 0; i < rk; ++i)
     {
         TEMPLATE(T, inv) (cc, U->rows[i].entries[0].val, ctx);
         TEMPLATE(T, sparse_vec_scalar_mul) (&U->rows[i], &U->rows[i], cc, ctx);
@@ -46,14 +46,16 @@ slong TEMPLATE(T, sparse_mat_nullspace_lu) (TEMPLATE(T, mat_t) X, const TEMPLATE
 
         /* Mssign unit vectors to non-pivot columns */
         for (i = M->c-1; i >= rk; --i) TEMPLATE(T, one) (&X->rows[Qi[i]][i-rk], ctx);
-        for (i = rk-1; i >= 0; --i) {
+        for (i = rk-1; i >= 0; --i) 
+        {
             Urow = &U->rows[i];
             Xrow = X->rows[Qi[i]];
-            for(j = 1; j<Urow->nnz; ++j) {
+            for (j = 1; j < Urow->nnz; ++j) 
+            {
                 e = &Urow->entries[j];
                 /* Do in-place row elimination */
                 TEMPLATE(T, neg) (cc, e->val, ctx);
-                if(e->ind < rk) _TEMPLATE(T, TEMPLATE(vec_scalar_addmul, T)) (Xrow, X->rows[Qi[e->ind]], X->c, cc, ctx);
+                if (e->ind < rk) _TEMPLATE(T, TEMPLATE(vec_scalar_addmul, T)) (Xrow, X->rows[Qi[e->ind]], X->c, cc, ctx);
                 else  TEMPLATE(T, sub) (&Xrow[e->ind-rk], &Xrow[e->ind-rk], e->val, ctx);
             }
 

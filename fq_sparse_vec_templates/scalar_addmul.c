@@ -19,7 +19,7 @@ void TEMPLATE(T, sparse_vec_scalar_addmul)(TEMPLATE(T, sparse_vec_t) w, const TE
     slong i, nnz, unnz, vnnz;
     TEMPLATE(T, t) tmp;
     TEMPLATE(T, sparse_entry_struct) *ue, *ve, *we;
-    if(u->nnz == 0) TEMPLATE(T, sparse_vec_scalar_mul) (w, v, c, ctx);
+    if (u->nnz == 0) TEMPLATE(T, sparse_vec_scalar_mul) (w, v, c, ctx);
     else if (v->nnz == 0 || TEMPLATE(T, is_zero) (c, ctx)) TEMPLATE(T, sparse_vec_set) (w, u, 0, ctx);
     else 
     {
@@ -47,7 +47,7 @@ void TEMPLATE(T, sparse_vec_scalar_addmul)(TEMPLATE(T, sparse_vec_t) w, const TE
         if (nnz == 0) TEMPLATE(T, sparse_vec_clear) (w, ctx);
         else if (nnz < w->nnz)
         {
-            for(i = 0; i < w->nnz - nnz; ++i) TEMPLATE(T, clear) (w->entries[i].val, ctx);
+            for (i = 0; i < w->nnz - nnz; ++i) TEMPLATE(T, clear) (w->entries[i].val, ctx);
             memmove(w->entries, we + 1, nnz*sizeof(*w->entries));
             w->entries = flint_realloc(w->entries, nnz*sizeof(*w->entries));
             w->nnz = nnz;

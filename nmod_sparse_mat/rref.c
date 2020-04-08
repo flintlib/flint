@@ -31,7 +31,7 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t M)
     /* Set up permutations */
     P = flint_malloc(M->r*sizeof(*P));
     remr = M->r;
-    for (r = 0; r<M->r; ++r) 
+    for (r = 0; r < M->r; ++r) 
     {
         if (!M->rows[r].nnz || M->rows[r].entries[0].ind >= M->c) P[r] = --remr; 
         else P[r] = -1;
@@ -39,7 +39,7 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t M)
     
     /* Run elimination */
     rank = 0;
-    for (pc=0; pc<M->c; ++pc)
+    for (pc = 0; pc < M->c; ++pc)
     {
         pcol = &Mt->rows[pc];
 

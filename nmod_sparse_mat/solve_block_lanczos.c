@@ -61,7 +61,7 @@ static int compute_nWi_S(nmod_mat_t nWi, int *S, const nmod_mat_t Torig) {
         _nmod_vec_scalar_mul_nmod(nWi->rows[pc], nWi->rows[pc], b, cc, T->mod);
 
         /* Kill all other entries in pivot column */
-        for(i = 0; i < b; ++i)
+        for (i = 0; i < b; ++i)
         {
             cc = nmod_neg(X->rows[P[i]][pc], T->mod);
             if (i == j || cc == 0) continue;
@@ -132,7 +132,7 @@ int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_
     for (i = 0; i < V[0].r*V[0].c; ++i)
         V[0].entries[i] = n_randint(state, V[0].mod.n);
 
-    for(iter = 0; ; ++iter) 
+    for (iter = 0; ; ++iter) 
     {
         i = iter % 3;
         next_i = (iter + 1) % 3;

@@ -41,7 +41,7 @@ slong TEMPLATE(T, sparse_mat_rref) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(
     
     /* Run elimination */
     rank = 0;
-    for (pc=0; pc<M->c; ++pc)
+    for (pc = 0; pc<M->c; ++pc)
     {
         pcol = &Mt->rows[pc];
 
@@ -53,7 +53,7 @@ slong TEMPLATE(T, sparse_mat_rref) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(
             if (P[r] >= 0) continue;
             if (pr==-1 || (row->nnz < prow->nnz)) pr = r, prow = row;
         }
-        if(pr == -1) continue;
+        if (pr == -1) continue;
         P[pr] = rank; 
 
         TEMPLATE(T, inv) (cinv, *TEMPLATE(T, sparse_vec_at) (prow, pc, ctx), ctx);
@@ -63,7 +63,7 @@ slong TEMPLATE(T, sparse_mat_rref) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(
         for (j = 0; j < pcol->nnz; ++j)
         {
             r = pcol->entries[j].ind, row = &M->rows[r];
-            if(r==pr) {TEMPLATE(T, zero) (pcol->entries[j].val, ctx); continue;}
+            if (r == pr) {TEMPLATE(T, zero) (pcol->entries[j].val, ctx); continue;}
 
             TEMPLATE(T, neg) (cc, *TEMPLATE(T, sparse_vec_at) (row, pc, ctx), ctx);
             TEMPLATE(T, sparse_vec_scalar_addmul) (row, row, prow, cc, ctx);
@@ -74,7 +74,7 @@ slong TEMPLATE(T, sparse_mat_rref) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(
         for (j = 0; j < prow->nnz; ++j)
         {
             c = prow->entries[j].ind, col = &Mt->rows[c];
-            if(c >= M->c || c==pc) continue;
+            if (c >= M->c || c == pc) continue;
             TEMPLATE(T, neg) (cc, *TEMPLATE(T, sparse_vec_at) (col, pr, ctx), ctx);
             TEMPLATE(T, sparse_vec_scalar_addmul) (col, col, pcol, cc, ctx);
         }
