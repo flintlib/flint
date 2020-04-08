@@ -35,7 +35,7 @@ main(void)
     
     for (rep = 0; rep < 100; rep++)
     {
-        if(rep % 5==0) {flint_printf("."); fflush(stdout);}
+        if (rep % 5==0) {flint_printf("."); fflush(stdout);}
         TEMPLATE(T, ctx_randtest) (ctx, state);
         do r = n_randint(state, 200), c = n_randint(state, 200);
         while (r==UWORD(0) || c==UWORD(0));
@@ -50,7 +50,7 @@ main(void)
         rk = TEMPLATE(T, sparse_mat_inv) (Ai, A, ctx);
         TEMPLATE(T, sparse_mat_mul_mat) (dAiA, Ai, dA, ctx);
         TEMPLATE(T, mat_rref) (dA, ctx);
-        if(!TEMPLATE(T, mat_equal) (dAiA, dA, ctx)) {
+        if (!TEMPLATE(T, mat_equal) (dAiA, dA, ctx)) {
             flint_printf("FAIL!\n");
             flint_printf("A^-1 x A = ");
             TEMPLATE(T, mat_print_pretty) (dAiA, ctx);

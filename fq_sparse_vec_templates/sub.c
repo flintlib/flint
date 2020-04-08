@@ -18,7 +18,7 @@ void TEMPLATE(T, sparse_vec_sub)(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, 
 {
     slong i, nnz, unnz, vnnz;
     TEMPLATE(T, sparse_entry_struct) *ue, *ve, *we;
-    if(u->nnz == 0) TEMPLATE(T, sparse_vec_neg) (w, v, ctx);
+    if (u->nnz == 0) TEMPLATE(T, sparse_vec_neg) (w, v, ctx);
     else if (v->nnz == 0) TEMPLATE(T, sparse_vec_set) (w, u, 0, ctx);
     else
     {
@@ -44,7 +44,7 @@ void TEMPLATE(T, sparse_vec_sub)(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, 
         if (nnz == 0) TEMPLATE(T, sparse_vec_clear) (w, ctx);
         else if (nnz < w->nnz)
         {
-            for(i = 0; i < w->nnz - nnz; ++i) TEMPLATE(T, clear) (w->entries[i].val, ctx);
+            for (i = 0; i < w->nnz - nnz; ++i) TEMPLATE(T, clear) (w->entries[i].val, ctx);
             memmove(w->entries, we + 1, nnz*sizeof(*w->entries));
             w->entries = flint_realloc(w->entries, nnz*sizeof(*w->entries));
             w->nnz = nnz;

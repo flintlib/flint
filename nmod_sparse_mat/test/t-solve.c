@@ -32,7 +32,7 @@ main(void)
     struct timeval start, end;
     FLINT_TEST_INIT(state);
     
-    flint_printf("solving Ax=b....");
+    flint_printf("solving Ax = b....");
     fflush(stdout);
     
     for (rep = 0; rep < nrep; rep++)
@@ -86,7 +86,7 @@ main(void)
 
         /* Solve iteratively */
         gettimeofday(&start, NULL);
-        ret=nmod_sparse_mat_solve_wiedemann(x2, A, b);
+        ret = nmod_sparse_mat_solve_wiedemann(x2, A, b);
         gettimeofday(&end, NULL);
         wiedemann_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
         if (ret == 0)
@@ -105,7 +105,7 @@ main(void)
 
         gettimeofday(&start, NULL);
         iter = 0;
-        do ret=nmod_sparse_mat_solve_lanczos(x2, A, b, state);
+        do ret = nmod_sparse_mat_solve_lanczos(x2, A, b, state);
         while(ret==0 && ++iter < 30);
         gettimeofday(&end, NULL);
         lanczos_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);

@@ -16,7 +16,7 @@
 #include "nmod_sparse_vec.h"
 #include "nmod_sparse_mat.h"
 
-/* PAQ = LU, Ax = b => set b' = Pb, solve Ly = b', solve Ux' = y, set x=Qx' */
+/* PAQ = LU, Ax = b => set b' = Pb, solve Ly = b', solve Ux' = y, set x = Qx' */
 int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b)
 {
     int good = 1;
@@ -53,7 +53,7 @@ int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b
             xp[i] = nmod_div(nmod_sub(y[i], nmod_sparse_vec_dot_dense(&U->rows[i], xp, M->mod), M->mod), U->rows[i].entries[0].val, M->mod);
         nmod_sparse_mat_mul_vec(y, U, xp);
 
-        for(i = 0; i < M->c; ++i) x[i] = xp[Q[i]];
+        for (i = 0; i < M->c; ++i) x[i] = xp[Q[i]];
         flint_free(xp);
     }
     flint_free(Q);

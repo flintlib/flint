@@ -21,7 +21,7 @@ TEMPLATE(T, mat_scalar_mul) (TEMPLATE(T, mat_t) B,
                          const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
-    for(i = 0; i < B->r; i++)
+    for (i = 0; i < B->r; i++)
     {
         _TEMPLATE(T, TEMPLATE(vec_scalar_mul, T)) (B->rows[i], A->rows[i], A->c, c, ctx);
     }

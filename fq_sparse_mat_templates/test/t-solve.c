@@ -37,7 +37,7 @@ main(void)
     
     for (rep = 0; rep < nrep; rep++)
     {
-        if(rep % 5==0) {flint_printf("."); fflush(stdout);}
+        if (rep % 5==0) {flint_printf("."); fflush(stdout);}
         TEMPLATE(T, ctx_randtest) (ctx, state);
 
         do c = r = n_randint(state, 200);
@@ -63,7 +63,7 @@ main(void)
         gettimeofday(&end, NULL);
         rref_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
         TEMPLATE(T, sparse_mat_mul_vec) (Ax, A, x2, ctx);
-        if(!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx))
+        if (!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx))
         {
             flint_printf("FAIL: Ax != b, got ret %d\n", ret);
             abort();
@@ -75,7 +75,7 @@ main(void)
         gettimeofday(&end, NULL);
         lu_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
         TEMPLATE(T, sparse_mat_mul_vec) (Ax, A, x2, ctx);
-        if(!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx))
+        if (!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx))
         {
             flint_printf("FAIL: Ax != b, got ret %d\n", ret);
             abort();

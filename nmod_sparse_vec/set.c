@@ -25,7 +25,7 @@ void nmod_sparse_vec_set(nmod_sparse_vec_t vec, const nmod_sparse_vec_t src, slo
         vec->entries = flint_realloc(vec->entries, src->nnz*sizeof(*vec->entries));
         memcpy(vec->entries, src->entries, src->nnz*sizeof(*vec->entries));
         vec->nnz = src->nnz;
-        for(i=0; i<vec->nnz; ++i)
+        for (i = 0; i < vec->nnz; ++i)
         {
             vec->entries[i].ind -= ioff;
         }

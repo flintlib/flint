@@ -31,7 +31,7 @@ slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M)
     rk = nmod_sparse_mat_lu(P, Q, L, U, M);
     flint_free(P);
     nmod_sparse_mat_clear(L);
-    for(i=0; i<rk; ++i)
+    for (i = 0; i < rk; ++i)
         nmod_sparse_vec_scalar_mul(&U->rows[i], &U->rows[i], nmod_inv(U->rows[i].entries[0].val, M->mod), M->mod);
     nmod_mat_init(X, M->c, M->c-rk, M->mod.n);
     if (rk != M->c) 
@@ -45,7 +45,7 @@ slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M)
         for (i = rk-1; i >= 0; --i) {
             Urow = &U->rows[i];
             Xrow = X->rows[Qi[i]];
-            for(j = 1; j<Urow->nnz; ++j) {
+            for (j = 1; j < Urow->nnz; ++j) {
                 e = &Urow->entries[j];
                 /* Do in-place row elimination */
                 if(e->ind < rk) _nmod_vec_scalar_addmul_nmod(Xrow, X->rows[Qi[e->ind]], X->c, nmod_neg(e->val, M->mod), M->mod);

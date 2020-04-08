@@ -22,7 +22,7 @@ TEMPLATE(T, mat_scalar_submul) (TEMPLATE(T, mat_t) C,
                          const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
-    for(i = 0; i < C->r; i++)
+    for (i = 0; i < C->r; i++)
     {
         _TEMPLATE(T, vec_set) (C->rows[i], A->rows[i], A->c, ctx);
         _TEMPLATE(T, TEMPLATE(vec_scalar_submul, T)) (C->rows[i], B->rows[i], A->c, c, ctx);

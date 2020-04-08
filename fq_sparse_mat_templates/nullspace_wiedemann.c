@@ -27,12 +27,13 @@ slong TEMPLATE(T, sparse_mat_nullspace_wiedemann) (TEMPLATE(T, mat_t) X, const T
     nxs = 0;
     xs = NULL;
     xps = NULL;
-    for(iter = 0; iter < max_iters; )
+    for (iter = 0; iter < max_iters; )
     {
-        if(TEMPLATE(T, sparse_mat_nullvector_wiedemann) (x, M, state, ctx) == 0) {++iter; continue;}
+        if (TEMPLATE(T, sparse_mat_nullvector_wiedemann) (x, M, state, ctx) == 0) {++iter; continue;}
 
         /* Reduce by existing kernel vectors */
-        for (j = nxs-1; j >= 0; --j) {
+        for (j = nxs-1; j >= 0; --j) 
+        {
             TEMPLATE(T, neg) (cc, &x[xps[j]], ctx);
             _TEMPLATE(T, TEMPLATE(vec_scalar_addmul, T)) (x, xs[j], M->c, cc, ctx);
         }
@@ -44,7 +45,8 @@ slong TEMPLATE(T, sparse_mat_nullspace_wiedemann) (TEMPLATE(T, mat_t) X, const T
         _TEMPLATE(T, TEMPLATE(vec_scalar_mul, T)) (x, x, M->c, cc, ctx);
 
         /* Reduce previous vectors by this one */
-        for (j = 0; j < nxs; ++j) {
+        for (j = 0; j < nxs; ++j) 
+        {
             TEMPLATE(T, neg) (cc, &xs[j][i], ctx);
             _TEMPLATE(T, TEMPLATE(vec_scalar_addmul, T)) (xs[j], x, M->c, cc, ctx);
         }

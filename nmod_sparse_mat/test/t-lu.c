@@ -28,7 +28,7 @@ main(void)
     nmod_mat_t dL, dU, dLU;
     FLINT_TEST_INIT(state);
     
-    flint_printf("decomposing PAQ=LU....");
+    flint_printf("decomposing PAQ = LU....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000; rep++)
@@ -54,12 +54,12 @@ main(void)
         nmod_mat_init(dLU, r, c, n);
         
         /* Check that L is lower triangular (with ones on diagonal up to rank) */
-        for(i=0; i<r; ++i) {
+        for (i = 0; i < r; ++i) {
             if(i < rk && nmod_sparse_vec_at(&L->rows[i], i) != UWORD(1))
             {
                 flint_printf("FAIL: L does not have unit diagonal up to the rank\n");
             }
-            for(j=0; j<L->rows[i].nnz; ++j) {
+            for (j = 0; j < L->rows[i].nnz; ++j) {
                 nmod_sparse_entry_struct *e = &L->rows[i].entries[j];
                 if(e->ind > i) {
                     flint_printf("FAIL: L not lower triangular\n");
@@ -73,7 +73,7 @@ main(void)
             }
         }
         /* Check that U is upper triangular (with nonzero diagonal up to rank) */
-        for(i=0; i<r; ++i) {
+        for (i = 0; i < r; ++i) {
             if(i < rk && nmod_sparse_vec_at(&U->rows[i], i) == UWORD(0))
             {
                 flint_printf("FAIL: U does not have nonzero diagonal\n");
@@ -84,7 +84,7 @@ main(void)
                 flint_printf("FAIL: U not trivial pas the rank\n");
                 abort();
             }
-            for(j=0; j<U->rows[i].nnz; ++j) {
+            for (j = 0; j < U->rows[i].nnz; ++j) {
                 nmod_sparse_entry_struct *e = &U->rows[i].entries[j];
                 if(e->ind < i) {
                     flint_printf("FAIL: U not upper triangular\n");

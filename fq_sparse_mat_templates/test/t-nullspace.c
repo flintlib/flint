@@ -38,7 +38,7 @@ main(void)
     
     for (rep = 0; rep < nreps; )
     {
-        if(rep % 5==0) {flint_printf("."); fflush(stdout);}
+        if (rep % 5==0) {flint_printf("."); fflush(stdout);}
         TEMPLATE(T, ctx_randtest) (ctx, state);
         r = c = n_randint(state, 200);
         TEMPLATE(T, sparse_mat_init) (A, r, c, ctx);
@@ -57,7 +57,7 @@ main(void)
             else ++rep;
             gettimeofday(&end, NULL);
             elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
-            if(rk[i]!=0) 
+            if (rk[i]!=0) 
             {
                 TEMPLATE(T, mat_init) (AX, A->r, X->c, ctx);
                 TEMPLATE(T, sparse_mat_mul_mat) (AX, A, X, ctx); 

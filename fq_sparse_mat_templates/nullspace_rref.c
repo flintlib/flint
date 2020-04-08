@@ -25,7 +25,7 @@ slong TEMPLATE(T, sparse_mat_nullspace_rref) (TEMPLATE(T, mat_t) X, const TEMPLA
     TEMPLATE(T, sparse_mat_set) (R, M, ctx);
     rk = TEMPLATE(T, sparse_mat_rref) (R, ctx);
     TEMPLATE(T, mat_init) (X, M->c, M->c-rk, ctx);
-    if(rk != M->c) 
+    if (rk != M->c) 
     {
         numc = 0;
         /* Mark which cols are pivots and enumerate the nonpivots */
@@ -33,7 +33,7 @@ slong TEMPLATE(T, sparse_mat_nullspace_rref) (TEMPLATE(T, mat_t) X, const TEMPLA
         for (i = 0; i < rk; ++i) 
             Q[R->rows[i].entries->ind] = -1;
         for (i = 0; i < M->c; ++i)
-            if(Q[i]==UWORD(0)) Q[i] = numc++, TEMPLATE(T, one) (&X->rows[i][Q[i]], ctx);
+            if (Q[i]==UWORD(0)) Q[i] = numc++, TEMPLATE(T, one) (&X->rows[i][Q[i]], ctx);
 
         /* For each pivot col, set the corresponding row in X as */
         /* the negative of the associated row in R (reordered by Q) */

@@ -18,7 +18,7 @@
 
 slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters)
 {
-    /* Generate random solutions to a random system Mx=b and stop when nullspace filled */
+    /* Generate random solutions to a random system Mx = b and stop when nullspace filled */
     int ret;
     slong i, j, iter, nxs, *xps;
     mp_ptr x, *xs;
@@ -26,7 +26,7 @@ slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M,
     nxs = 0;
     xs = NULL;
     xps = NULL;
-    for(iter = 0; iter < max_iters; )
+    for (iter = 0; iter < max_iters; )
     {
         if(nmod_sparse_mat_nullvector_lanczos(x, M, state) == 0) {++iter; continue;}
         

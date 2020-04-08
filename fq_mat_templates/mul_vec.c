@@ -19,7 +19,7 @@ TEMPLATE(T, mat_mul_vec) (TEMPLATE(T, struct) *y,
                       const TEMPLATE(T, struct) *x, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
-    for(i = 0; i < A->r; ++i)
+    for (i = 0; i < A->r; ++i)
         _TEMPLATE(T, vec_dot) (&y[i], A->rows[i], x, A->c, ctx);
 }
 
