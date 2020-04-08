@@ -96,7 +96,11 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_set(nmod_sparse_mat_t M, const nmod_sparse_mat_t src) 
 {
     slong i, rmax = FLINT_MIN(M->r, src->r);
+<<<<<<< HEAD
     if (M==src || M->r == 0) return;
+=======
+    if(M==src || M->r == 0) return;
+>>>>>>> Fixed spacing
     for (i = 0; i < rmax; ++i) nmod_sparse_vec_set(&M->rows[i], &src->rows[i], src->c_off);
 }
 
@@ -107,7 +111,11 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_append_col(nmod_sparse_mat_t M, mp_srcptr v) 
 {
     slong i;
+<<<<<<< HEAD
     for (i = 0; i < M->r; ++i) nmod_sparse_vec_set_entry(&M->rows[i], M->c, v[i]);
+=======
+    for (i = 0; i < M->r; ++i) _nmod_sparse_vec_append_entry(&M->rows[i], M->c, v[i]);
+>>>>>>> Fixed spacing
     M->c += 1;
 }
 
@@ -229,7 +237,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_split_horizontal(nmod_sparse_mat_t M1, nmod_sparse_mat_t M2, const nmod_sparse_mat_t B, slong c)
 {
     slong i;
-    for(i=0; i<B->r; ++i) nmod_sparse_vec_split(&M1->rows[i], &M2->rows[i], &B->rows[i], c);
+    for (i = 0; i < B->r; ++i) nmod_sparse_vec_split(&M1->rows[i], &M2->rows[i], &B->rows[i], c);
 }
 
 /* Split block matix B = [M1^t M1^t]^t into submatrices M1 and M2 */
@@ -238,8 +246,8 @@ void nmod_sparse_mat_split_vertical(nmod_sparse_mat_t M1, nmod_sparse_mat_t M2, 
 {
     slong i;
     r = FLINT_MIN(r, B->r);
-    for(i=0; i<r; ++i) nmod_sparse_vec_set(&M1->rows[i], &B->rows[i], B->c_off);
-    for(i=r; i<B->r; ++i) nmod_sparse_vec_set(&M2->rows[i-r], &B->rows[i], B->c_off);
+    for (i = 0; i < r; ++i) nmod_sparse_vec_set(&M1->rows[i], &B->rows[i], B->c_off);
+    for (i = r; i < B->r; ++i) nmod_sparse_vec_set(&M2->rows[i-r], &B->rows[i], B->c_off);
 }
 
 <<<<<<< HEAD
@@ -594,12 +602,16 @@ slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t 
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 /* Solving */
 >>>>>>> Now with additional utilities, more correct basic functions, and nullspace and inversion functions
 =======
 /* Solve Ax=b */
 >>>>>>> Added nullvector functions for Lanzcos, everything for basic Wiedemann
+=======
+/* Solve Ax = b */
+>>>>>>> Fixed spacing
 FLINT_DLL
 <<<<<<< HEAD
 slong nmod_sparse_mat_nullspace_block_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters);
