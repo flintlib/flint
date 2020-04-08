@@ -193,7 +193,7 @@ void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c
 /* Matrix multiplication */
 
 NMOD_MAT_INLINE
-void nmod_mat_mul_vec(mp_ptr y, const nmod_mat_t A, const mp_ptr x) {
+void nmod_mat_mul_vec(mp_ptr y, const nmod_mat_t A, mp_srcptr x) {
     slong i;
     slong limbs = _nmod_vec_dot_bound_limbs(A->c, A->mod);
     for(i=0; i<A->r; ++i) 

@@ -17,19 +17,19 @@
 #include "ulong_extras.h"
 
 void
-nmod_sparse_mat_print_pretty(const nmod_sparse_mat_t mat)
+nmod_sparse_mat_print_pretty(const nmod_sparse_mat_t M)
 {
     slong i;;
     char row_fmt[FLINT_BITS + 5];
-    flint_sprintf(row_fmt, "%%%dwd: ", n_sizeinbase(mat->r, 10));
+    flint_sprintf(row_fmt, "%%%dwd: ", n_sizeinbase(M->r, 10));
 
     flint_printf("<%wd x %wd sparse integer matrix mod %w>\n", 
-                mat->r, mat->c, mat->mod.n);
+                M->r, M->c, M->mod.n);
 
-    for (i = 0; i < mat->r; i++)
+    for (i = 0; i < M->r; i++)
     {
         flint_printf(row_fmt, i);
-        nmod_sparse_vec_print_pretty(&mat->rows[i], mat->c_off, mat->c, mat->mod);
+        nmod_sparse_vec_print_pretty(&M->rows[i], M->c_off, M->c, M->mod);
     }
 }
 

@@ -23,13 +23,13 @@
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 
-void nmod_sparse_mat_from_entries(nmod_sparse_mat_t mat, slong * rows, slong * cols, mp_limb_t * vals, slong nnz)
+void nmod_sparse_mat_from_entries(nmod_sparse_mat_t M, slong * rows, slong * cols, mp_limb_t * vals, slong nnz)
 {
     slong r, i, j;
-    for (r = i = 0; r < mat->r; ++r, i = j)
+    for (r = i = 0; r < M->r; ++r, i = j)
     {
-        mat->rows[r].nnz = 0;
+        M->rows[r].nnz = 0;
         for (j = i; j < nnz && rows[j]==r; ++j);
-        nmod_sparse_vec_from_entries(&mat->rows[r], cols+i, vals+i, j-i);
+        nmod_sparse_vec_from_entries(&M->rows[r], cols+i, vals+i, j-i);
     }
 }

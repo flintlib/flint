@@ -16,25 +16,25 @@
 #include "nmod_sparse_vec.h"
 #include "nmod_sparse_mat.h"
 
-slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t A)
+slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M)
 {
     slong i, j, rk, numc, *Q;
     nmod_sparse_mat_t R;
     nmod_sparse_vec_struct *Rrow;
     mp_limb_t *Xrow;
     nmod_sparse_entry_struct *le, *e;
-    nmod_sparse_mat_init(R, A->r, A->c, A->mod);
-    nmod_sparse_mat_set(R, A);
+    nmod_sparse_mat_init(R, M->r, M->c, M->mod);
+    nmod_sparse_mat_set(R, M);
     rk = nmod_sparse_mat_rref(R);
-    nmod_mat_init(X, A->c, A->c-rk, A->mod.n);
-    if(rk != A->c) 
+    nmod_mat_init(X, M->c, M->c-rk, M->mod.n);
+    if(rk != M->c) 
     {
         numc = 0;
         /* Mark which cols are pivots and enumerate the nonpivots */
-        Q = flint_calloc(A->c, sizeof(*Q));
+        Q = flint_calloc(M->c, sizeof(*Q));
         for (i = 0; i < rk; ++i) 
             Q[R->rows[i].entries->ind] = -1;
-        for (i = 0; i < A->c; ++i)
+        for (i = 0; i < M->c; ++i)
             if(Q[i]==UWORD(0)) Q[i] = numc++, X->rows[i][Q[i]] = 1;
 
         /* For each pivot col, set the corresponding row in X as */
@@ -44,7 +44,7 @@ slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t A)
             Rrow = &R->rows[i];
             Xrow = X->rows[Rrow->entries[0].ind];
             for (j = 1; j < Rrow->nnz; ++j) 
-                Xrow[Q[Rrow->entries[j].ind]] = nmod_neg(Rrow->entries[j].val, A->mod);
+                Xrow[Q[Rrow->entries[j].ind]] = nmod_neg(Rrow->entries[j].val, M->mod);
         }
         flint_free(Q);
     }

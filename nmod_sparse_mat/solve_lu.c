@@ -17,29 +17,29 @@
 #include "nmod_sparse_mat.h"
 
 /* PAQ = LU, Ax = b => set b' = Pb, solve Ly = b', solve Ux' = y, set x=Qx' */
-int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b)
+int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b)
 {
     int good = 1;
     slong rk, *P, *Q, i, j;
     nmod_sparse_mat_t L, U;
     mp_ptr bp, y, xp;
-    P = flint_malloc(A->r * sizeof(*P));
-    Q = flint_malloc(A->c * sizeof(*Q));
-    nmod_sparse_mat_init(L, A->r, A->c, A->mod);
-    nmod_sparse_mat_init(U, A->r, A->c, A->mod);
-    rk = nmod_sparse_mat_lu(P, Q, L, U, A);
+    P = flint_malloc(M->r * sizeof(*P));
+    Q = flint_malloc(M->c * sizeof(*Q));
+    nmod_sparse_mat_init(L, M->r, M->c, M->mod);
+    nmod_sparse_mat_init(U, M->r, M->c, M->mod);
+    rk = nmod_sparse_mat_lu(P, Q, L, U, M);
     L->c = U->r = rk;
 
     /* Solve Ly = b' = Pb */
-    bp = flint_malloc(A->r * sizeof(*bp));
+    bp = flint_malloc(M->r * sizeof(*bp));
     y = flint_calloc(rk, sizeof(*y));
-    for (i = 0; i < A->r; ++i) bp[P[i]] = b[i];
+    for (i = 0; i < M->r; ++i) bp[P[i]] = b[i];
 
     flint_free(P);
     for (i = 0; i < rk; ++i)
-        y[i] = nmod_sub(bp[i], nmod_sparse_vec_dot_dense(&L->rows[i], y, A->mod), A->mod);
-    for (i = rk; i < A->r; ++i)
-        if (bp[i] != nmod_sparse_vec_dot_dense(&L->rows[i], y, A->mod)) {good = 0; break;}
+        y[i] = nmod_sub(bp[i], nmod_sparse_vec_dot_dense(&L->rows[i], y, M->mod), M->mod);
+    for (i = rk; i < M->r; ++i)
+        if (bp[i] != nmod_sparse_vec_dot_dense(&L->rows[i], y, M->mod)) {good = 0; break;}
     nmod_sparse_mat_mul_vec(bp, L, y);
 
     flint_free(bp);
@@ -48,17 +48,17 @@ int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b
     if (good) 
     {
         /* Find a solution for Ux' = y */
-        xp = flint_calloc(A->c, sizeof(*xp));
+        xp = flint_calloc(M->c, sizeof(*xp));
         for (i = rk-1; i >= 0; --i) 
-            xp[i] = nmod_div(nmod_sub(y[i], nmod_sparse_vec_dot_dense(&U->rows[i], xp, A->mod), A->mod), U->rows[i].entries[0].val, A->mod);
+            xp[i] = nmod_div(nmod_sub(y[i], nmod_sparse_vec_dot_dense(&U->rows[i], xp, M->mod), M->mod), U->rows[i].entries[0].val, M->mod);
         nmod_sparse_mat_mul_vec(y, U, xp);
 
-        for(i = 0; i < A->c; ++i) x[i] = xp[Q[i]];
+        for(i = 0; i < M->c; ++i) x[i] = xp[Q[i]];
         flint_free(xp);
     }
     flint_free(Q);
     flint_free(y);
-    U->r = A->r;
+    U->r = M->r;
     nmod_sparse_mat_clear(U);
     return good;
 }
