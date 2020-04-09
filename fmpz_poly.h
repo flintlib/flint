@@ -75,6 +75,7 @@ typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
 typedef struct
 {
    mp_limb_t ** jj; /* used by fft_convolution_precache */
+   mp_limb_t ** ii; /* used by mul, must be in struct due to ptr swaps */
    slong n;
    slong len2;
    slong loglen;
@@ -512,7 +513,7 @@ FLINT_DLL void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 /* FFT precached multiplication **********************************************/
 
 FLINT_DLL void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
-                slong len1, slong bits1, const fmpz_poly_t poly2, slong trunc);
+                             slong len1, slong bits1, const fmpz_poly_t poly2);
 
 FLINT_DLL void fmpz_poly_mul_precache_clear(fmpz_poly_precache_t pre);
 
