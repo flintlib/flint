@@ -262,9 +262,22 @@ FLINT_DLL void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 FLINT_DLL void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2);
 
+FLINT_DLL void fft_convolution_basic(mp_limb_t ** ii, mp_limb_t ** jj,
+		     slong depth, slong limbs, slong trunc, mp_limb_t ** t1, 
+                            mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
+	
 FLINT_DLL void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, 
-                                 slong limbs, slong trunc, mp_limb_t ** t1, 
-                                mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
+                                    slong limbs, slong trunc, mp_limb_t ** t1, 
+                            mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
+
+/***** FFT Precaching *****/
+
+FLINT_DLL void fft_precache(mp_limb_t ** jj, slong depth, slong limbs,
+               slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1);
+
+FLINT_DLL void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj,
+               slong depth, slong limbs, slong trunc, mp_limb_t ** t1,
+	                    mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
 
 #ifdef __cplusplus
 }
