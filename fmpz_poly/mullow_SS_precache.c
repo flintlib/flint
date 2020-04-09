@@ -70,7 +70,8 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
         pre->tt[i] = pre->tt[i - 1] + 2*size;
     }
 
-    pre->ii = flint_malloc(4*(pre->n + pre->n*size)*sizeof(mp_limb_t));
+    pre->ii = (mp_limb_t **)
+                      flint_malloc(4*(pre->n + pre->n*size)*sizeof(mp_limb_t));
     for (i = 0, ptr = (mp_limb_t *) pre->ii + 4*pre->n; i < 4*pre->n; i++, ptr += size) 
         pre->ii[i] = ptr;
 
@@ -112,7 +113,7 @@ void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1,
     slong len_out;
     slong size, i;
 
-    len_out = FLINT_MAX(len1 + pre->len2 - 1, 2*pre->n);
+    len_out = FLINT_MAX(len1 + pre->len2 - 1, 2*pre->n + 1);
 
     size = pre->limbs + 1;
 
