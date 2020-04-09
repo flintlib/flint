@@ -23,6 +23,12 @@ int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr
     nmod_sparse_mat_t Mb;
     nmod_sparse_vec_struct *row;
     nmod_sparse_entry_struct *le, *re;
+    if (_nmod_vec_is_zero(b, M->c))
+    {
+        _nmod_vec_zero(x, M->c);
+        return 1;
+    }
+    
     nmod_sparse_mat_init(Mb, M->r, M->c, M->mod);
     nmod_sparse_mat_set(Mb, M);
     nmod_sparse_mat_append_col(Mb, b);
@@ -43,4 +49,5 @@ int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr
         if (re->ind==M->c) {x[le->ind] = re->val;}
     }
     nmod_sparse_mat_clear(Mb);
+    return good;
 }

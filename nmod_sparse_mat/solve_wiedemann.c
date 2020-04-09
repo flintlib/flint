@@ -59,105 +59,110 @@ static slong find_min_poly(mp_limb_t *s, slong N, nmod_t mod)
 	return L;
 }
 
-/* Compute s_ij=(A^j y)_i for i = 0,...,ns-1, j = 0,...,num-1*/
-static void make_sequences(mp_limb_t **s, slong ns, slong len, const nmod_sparse_mat_t A, mp_srcptr b) 
+/* Compute s_ij=(M^j y)_i for i = 0,...,ns-1, j = 0,...,num-1*/
+static void make_sequences(mp_limb_t **s, slong ns, slong len, const nmod_sparse_mat_t M, mp_srcptr b) 
 {
     slong i, j;
-    mp_ptr y, Ay;
-    y = _nmod_vec_init(A->r);
-    Ay = _nmod_vec_init(A->r);
-    memcpy(y, b, A->r*sizeof(*y));
+    mp_ptr y, My;
+    y = _nmod_vec_init(M->r);
+    My = _nmod_vec_init(M->r);
+    memcpy(y, b, M->r*sizeof(*y));
     for (j = 0; j < len; ++j) 
     {
-        if(j > 0) nmod_sparse_mat_mul_vec(Ay, A, y), memcpy(y, Ay, A->r*sizeof(*y));
+        if(j > 0) nmod_sparse_mat_mul_vec(My, M, y), memcpy(y, My, M->r*sizeof(*y));
         for (i = 0; i < ns; ++i) s[i][j] = y[i];
     }
     _nmod_vec_clear(y);
-    _nmod_vec_clear(Ay);
+    _nmod_vec_clear(My);
 }
 
-/* Compute x = \Sigma_{i = 0}^{L-1} s_i * A^i * b = 0 */
-static void make_sum(mp_ptr x, mp_limb_t *s, slong L, const nmod_sparse_mat_t A, mp_srcptr b)
+/* Compute x = \Sigma_{i = 0}^{L-1} s_i * M^i * b = 0 */
+static void make_sum(mp_ptr x, mp_limb_t *s, slong L, const nmod_sparse_mat_t M, mp_srcptr b)
 {
     slong i;
-    mp_ptr y, Ay;
-    y = _nmod_vec_init(A->r);
-    Ay = _nmod_vec_init(A->r);
-    memcpy(y, b, A->r*sizeof(*y));
-    _nmod_vec_scalar_mul_nmod(x, b, A->r, s[0], A->mod);
+    mp_ptr y, My;
+    y = _nmod_vec_init(M->r);
+    My = _nmod_vec_init(M->r);
+    memcpy(y, b, M->r*sizeof(*y));
+    _nmod_vec_scalar_mul_nmod(x, b, M->r, s[0], M->mod);
     for (i = 1; i < L; ++i) 
     {
-        nmod_sparse_mat_mul_vec(Ay, A, y), memcpy(y, Ay, A->r*sizeof(*y));
-        _nmod_vec_scalar_addmul_nmod(x, y, A->r, s[i], A->mod);
+        nmod_sparse_mat_mul_vec(My, M, y), memcpy(y, My, M->r*sizeof(*y));
+        _nmod_vec_scalar_addmul_nmod(x, y, M->r, s[i], M->mod);
     }
     _nmod_vec_clear(y);
-    _nmod_vec_clear(Ay);
+    _nmod_vec_clear(My);
 }
 
-int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t A, const mp_ptr b)
+int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b)
 {
-    slong i, L, ret = 0, ns = FLINT_MIN(A->r, 2), len = 2*A->r + 1;
+    slong i, L, ret = 0, ns = FLINT_MIN(M->r, 2), len = 2*M->r + 1;
     mp_limb_t **s; 
-    mp_ptr Ax;
-    if(A->r != A->c) return 0; /* TBD: reduce to square */
+    mp_ptr Mx;
+    if(M->r != M->c) return 0; /* TBD: reduce to square */
+    if (_nmod_vec_is_zero(b, M->c))
+    {
+        _nmod_vec_zero(x, M->c);
+        return 1;
+    }
 
-    Ax = _nmod_vec_init(A->r);
+    Mx = _nmod_vec_init(M->r);
     s = flint_malloc(ns * sizeof(*s));
     for (i = 0; i < ns; ++i) s[i] = flint_malloc(len*sizeof(*s[i]));
     
-    make_sequences(s, ns, len, A, b);
+    make_sequences(s, ns, len, M, b);
 
     /* Don't have block Berlekamp yet, just try each one */
     for (i = 0; i < ns && ret == 0; ++i)
     {
         /* Get minimal polynomial */
-        L = find_min_poly(s[i], len, A->mod);
+        L = find_min_poly(s[i], len, M->mod);
         if(s[i][0]==0) continue;
 
-        /* If \sum_{j = 0}^L s_ijA^jb = 0 => x = -1/s[0]\sum_{j = 0}^{L-1} s_i(j-1) A^jb solves Ax = b */
-        make_sum(x, s[i]+1, L, A, b);
-        _nmod_vec_scalar_mul_nmod(x, x, A->r, nmod_neg(nmod_inv(s[i][0], A->mod), A->mod), A->mod);
+        /* If \sum_{j = 0}^L s_ijM^jb = 0 => x = -1/s[0]\sum_{j = 0}^{L-1} s_i(j-1) M^jb solves Mx = b */
+        make_sum(x, s[i]+1, L, M, b);
+        _nmod_vec_scalar_mul_nmod(x, x, M->r, nmod_neg(nmod_inv(s[i][0], M->mod), M->mod), M->mod);
 
         /* Check if successful */
-        nmod_sparse_mat_mul_vec(Ax, A, x);
-        ret = _nmod_vec_equal(Ax, b, A->r);
+        nmod_sparse_mat_mul_vec(Mx, M, x);
+        ret = _nmod_vec_equal(Mx, b, M->r);
     }
 
-    _nmod_vec_clear(Ax);
+    _nmod_vec_clear(Mx);
     for (i = 0; i < ns; ++i) flint_free(s[i]);
     flint_free(s);
     return ret;
 }
 
-int nmod_sparse_mat_nullvector_wiedemann(mp_ptr x, const nmod_sparse_mat_t A, flint_rand_t state) 
+int nmod_sparse_mat_nullvector_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, flint_rand_t state) 
 {
-    slong i, L, ret = 0, ns = FLINT_MIN(A->r, 2), len = 2*A->r + 1;
+    slong i, L, ret = 0, ns = FLINT_MIN(M->r, 2), len = 2*M->r + 1;
     mp_limb_t **s; 
-    mp_ptr Ax, b;
-    Ax = _nmod_vec_init(A->r);
-    b = _nmod_vec_init(A->r);
+    mp_ptr Mx, b;
+    Mx = _nmod_vec_init(M->r);
+    b = _nmod_vec_init(M->r);
 
     s = flint_malloc(ns * sizeof(*s));
     for (i = 0; i < ns; ++i) s[i] = flint_malloc(len*sizeof(*s[i]));
 
-    _nmod_vec_randtest(x, state, A->r, A->mod);
-    nmod_sparse_mat_mul_vec(b, A, x);
+    _nmod_vec_randtest(x, state, M->r, M->mod);
+    nmod_sparse_mat_mul_vec(b, M, x);
 
-    if(A->r != A->c) return 0; /* TBD: reduce to square */
-    make_sequences(s, ns, len, A, b);
+    if(M->r != M->c) return 0; /* TBD: reduce to square */
+    make_sequences(s, ns, len, M, b);
 
     for (i = 0; i < ns && ret == 0; ++i)
     {
         /* Get minimal polynomial */
-        L = find_min_poly(s[i], len, A->mod);
+        L = find_min_poly(s[i], len, M->mod);
 
-        /* \sum_{j = 0}^L s_ijA^jb = 0 => x = \sum_{j = 0}^L s_ijA^jx solves Ax = 0 */
-        make_sum(x, s[i], L+1, A, x);
-        nmod_sparse_mat_mul_vec(Ax, A, x);
-        ret = _nmod_vec_is_zero(Ax, A->r);
+        /* \sum_{j = 0}^L s_ijM^jb = 0 => x = \sum_{j = 0}^L s_ijM^jx solves Mx = 0 */
+        make_sum(x, s[i], L+1, M, x);
+        nmod_sparse_mat_mul_vec(Mx, M, x);
+        ret = !_nmod_vec_is_zero(x, M->c) && _nmod_vec_is_zero(Mx, M->r);
     }
 
-    _nmod_vec_clear(Ax);
+    _nmod_vec_clear(Mx);
     _nmod_vec_clear(b);
     for (i = 0; i < ns; ++i) flint_free(s[i]);
     flint_free(s);

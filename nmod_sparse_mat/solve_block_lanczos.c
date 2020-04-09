@@ -251,7 +251,7 @@ int nmod_sparse_mat_nullvector_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M
     {
         _nmod_vec_sub(x, x, x2, M->c, M->mod);
         nmod_sparse_mat_mul_vec(b, M, x);
-        ret = _nmod_vec_is_zero(x, M->c) || !_nmod_vec_is_zero(b, M->r);
+        ret = !_nmod_vec_is_zero(x, M->c) && _nmod_vec_is_zero(b, M->r);
     }
     _nmod_vec_clear(x2);
     _nmod_vec_clear(b);

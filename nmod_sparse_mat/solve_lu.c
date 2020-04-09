@@ -23,6 +23,12 @@ int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b
     slong rk, *P, *Q, i, j;
     nmod_sparse_mat_t L, U;
     mp_ptr bp, y, xp;
+    if (_nmod_vec_is_zero(b, M->c))
+    {
+        _nmod_vec_zero(x, M->c);
+        return 1;
+    }
+
     P = flint_malloc(M->r * sizeof(*P));
     Q = flint_malloc(M->c * sizeof(*Q));
     nmod_sparse_mat_init(L, M->r, M->c, M->mod);

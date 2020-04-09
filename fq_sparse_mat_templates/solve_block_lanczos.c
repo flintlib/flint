@@ -250,7 +250,7 @@ int TEMPLATE(T, sparse_mat_nullvector_block_lanczos) (TEMPLATE(T, struct) *x, co
     {
         _TEMPLATE(T, vec_sub) (x, x, x2, M->c, ctx);
         TEMPLATE(T, sparse_mat_mul_vec) (b, M, x, ctx);
-        ret = _TEMPLATE(T, vec_is_zero) (x, M->c, ctx) || !_TEMPLATE(T, vec_is_zero) (b, M->r, ctx);
+        ret = !_TEMPLATE(T, vec_is_zero) (x, M->c, ctx) && _TEMPLATE(T, vec_is_zero) (b, M->r, ctx);
     }
     _TEMPLATE(T, vec_clear) (x2, M->c, ctx);
     _TEMPLATE(T, vec_clear) (b, M->r, ctx);

@@ -20,10 +20,10 @@ static void make_block_sequences(nmod_mat_struct *S, slong ns, const nmod_sparse
 {
     slong iter, i, j, k, b = Y->c;
     nmod_mat_struct W[2];
-    for (i = 0; i < 2; ++i) nmod_mat_window_init(&W[i], Y, 0, 0, b, b);
+    for (i = 0; i < 2; ++i) nmod_mat_window_init(&W[i], &Y[i], 0, 0, b, b);
     for (i = iter = 0; iter < ns; ++iter, i = 1-i) 
     {
-        if (i > 0) nmod_sparse_mat_mul_mat(&Y[i], M, &Y[1-i]);
+        if (iter > 0) nmod_sparse_mat_mul_mat(&Y[i], M, &Y[1-i]); 
         nmod_mat_transpose(&S[iter], &W[i]);
     }
     for (i = 0; i < 2; ++i) nmod_mat_window_clear(&W[i]);
@@ -57,7 +57,9 @@ static void coppersmith_aux_gauss(nmod_mat_t M, slong *d)
         pr = b + pc;
         for (r = 0; r < b; r++)
             if(gamma[r] && M->rows[r][pc] && d[r] < d[pr]) pr = r;
-        
+        if(M->rows[pr][pc] == UWORD(0)) continue;
+
+
         /* Try to move pivot row to appropriate position (if not already there) */
         if (pr != b + pc)
         {
@@ -71,7 +73,7 @@ static void coppersmith_aux_gauss(nmod_mat_t M, slong *d)
         cinv = nmod_inv(M->rows[pr][pc], M->mod);
 
         /* Do Gaussian elimination on first b rows */
-        for (r = 0; r < b; ++k)
+        for (r = 0; r < b; ++r)
             if(gamma[r] && M->rows[r][pc])
                 _nmod_vec_scalar_addmul_nmod(M->rows[r], M->rows[pr], M->c,
                                              nmod_neg(nmod_mul(M->rows[r][pc], cinv, M->mod), M->mod), M->mod);
@@ -104,24 +106,25 @@ static int coppersmith_stopping_criterion(slong *d, slong delta, slong b)
  *  - the first b are the current (reversed) generating polynomials
  *  - the last b are certain auxiliary polynomials.
 **/
-static int find_block_min_poly(nmod_mat_struct *S, slong *d, slong n) 
+static int find_block_min_poly(nmod_mat_struct *S, slong *d, slong n, slong delta) 
 {
     int ret;
     slong t, sigma, beta, mu;
     slong i, j, k, r, b = S->r;
     slong f_len;
     nmod_mat_struct *F;
-    nmod_mat_t M, D, tau;
+    nmod_mat_t M, D, tau, tmp;
 
     f_len = 1;
-    F = flint_malloc(n*sizeof(*F));
+    F = flint_malloc((n+1)*sizeof(*F));
     nmod_mat_init(&F[0], 2*b, b, S->mod.n);
+    nmod_mat_init(tmp, b, b, S->mod.n);
     for (i = 0; i < b; ++i) d[i] = 0, d[b + i] = 1, F[0].rows[i][i] = 1;
 
     /* [ D | I ] -> [ ? | tau ]*/
     nmod_mat_init(M, 2*b, 3*b, S->mod.n);
 
-    for (t = 0; (ret = coppersmith_stopping_criterion(d, n, b)) == -1; ++t)
+    for (t = 0, ret = -1; t < n && ret == -1; ++t)
     {
         /* Compute discrepancy matrix and tau */
         nmod_mat_window_init(D, M, 0, 0, 2*b, b);
@@ -140,62 +143,61 @@ static int find_block_min_poly(nmod_mat_struct *S, slong *d, slong n)
             nmod_mat_mul(&F[k], tau, &F[k-1]); /* Every row multiplied by x */
         for (k = 0; k < f_len; ++k)
             for (r = 0; r < b; ++r) /* Divide first b rows by x */
-                (k < f_len - 1) ? _nmod_vec_set(F[k].rows[r], F[k+1].rows[r], b) : _nmod_vec_zero(F[k].rows[r], b);
-        for (r = b; r < 2*b; ++r) d[r] += 1;
+            {
+                if (k < f_len - 1) _nmod_vec_set(F[k].rows[r], F[k+1].rows[r], b);
+                else _nmod_vec_zero(F[k].rows[r], b);
+            }
+        for (r = b; r < 2*b; ++r) _nmod_vec_zero(F[0].rows[r], b), d[r] += 1;
         nmod_mat_window_clear(tau);
+        ret = coppersmith_stopping_criterion(d, delta, b);
     }
 
     /* Copy C to S, with each row reversed according to its degree */
     for (r = 0; r < b; ++r)
         for (k = 0; k <= d[r]; k++)
-            _nmod_vec_set(S[d[r] - k].rows[r], F[k].rows[r], b);
-    
-    for (k = 0; k < f_len; ++k) nmod_mat_clear(&F[i]);
+            _nmod_vec_set(S[k].rows[r], F[d[r]-k].rows[r], b);
+
+    for (k = 0; k < f_len; ++k) nmod_mat_clear(&F[k]);
     nmod_mat_clear(M);
     flint_free(F);
-    flint_free(d);
     return ret;
 }
 
 static void make_block_sum(mp_ptr x, const nmod_mat_struct *S, const slong *d, const nmod_sparse_mat_t M, nmod_mat_struct Z[2], slong l)
 {
-    slong i, iter, k, nu, b = S->r;
-    slong *dd;
-    mp_ptr v, xi;
+    slong i, iter, b = S->r;
+    slong dd;
+    mp_ptr xi;
 
-    /* Compute differences between nominal and real degrees of each coordinate polynomial in row l */
-    dd = flint_malloc(b*sizeof(*dd));
-    for (nu = 0; nu < b; nu++);
-        for (dd[nu] = 0; dd[nu] <= d[l]; ++dd[nu])  
-            if(S[dd[nu]].rows[l][nu]) break;
+    /* Compute differences between nominal and real degree */
+    dd = 0;
+    while (_nmod_vec_is_zero(S[dd].rows[l], b)) ++dd;
 
     /* Simulaneously apply all polynomials in row l to iteration of M on Z */
-    v = _nmod_vec_init(b);
     xi = _nmod_vec_init(M->c);
-    _nmod_vec_zero(x, M->r);
-    for (i = iter = 0; iter < d[l]; ++iter, i = 1 - i)
+    _nmod_vec_zero(x, M->c);
+    for (i = iter = 0; iter <= d[l]; ++iter, i = 1 - i)
     {
         if(iter > 0) nmod_sparse_mat_mul_mat(&Z[i], M, &Z[1-i]);
-        for (nu = 0; nu < b; nu++)
-            v[nu] = (dd[nu] <= d[l]) ? S[dd[nu]++].rows[l][nu] : UWORD(0);
-        nmod_sparse_mat_mul_vec(xi, M, v);
+        nmod_mat_mul_vec(xi, &Z[i], S[dd + iter].rows[l]);
         _nmod_vec_add(x, x, xi, M->c, M->mod);
     }
-    _nmod_vec_clear(v);
     _nmod_vec_clear(xi);
-    flint_free(dd);
 }
 
 int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b, slong block_size, flint_rand_t state)
 {
-    int good = 0;
+    int good = 0, ret;
     slong i;
     mp_ptr x1;
     nmod_sparse_vec_t z;
     nmod_sparse_mat_t Mb;
-    nmod_sparse_vec_struct *row;
-    nmod_sparse_entry_struct *le, *re;
     if (M->r != M->c) return 0; /* TODO */
+    if (_nmod_vec_is_zero(b, M->c))
+    {
+        _nmod_vec_zero(x, M->c);
+        return 1;
+    }
 
     /* TODO: Precondition M */
     x1 = _nmod_vec_init(M->c + 1);
@@ -204,12 +206,15 @@ int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, c
     nmod_sparse_mat_set(Mb, M);
     nmod_sparse_mat_append_col(Mb, b);
     nmod_sparse_mat_append_row(Mb, z);
-    nmod_sparse_mat_nullvector_block_wiedemann(x1, Mb, block_size, state);
+
+    ret = nmod_sparse_mat_nullvector_block_wiedemann(x1, Mb, block_size, state);
+    if(ret && x1[M->c] != UWORD(0)) 
+    {
+        _nmod_vec_scalar_mul_nmod(x, x1, M->c, nmod_neg(nmod_inv(x1[M->c], M->mod), M->mod), M->mod);
+        good = 1;
+    }
     nmod_sparse_vec_clear(z);
     nmod_sparse_mat_clear(Mb);
-
-    if(x1[M->c]) 
-        memcpy(x, x1, M->c*sizeof(*x)), good = 1;
     _nmod_vec_clear(x1);
     return good;
 }
@@ -217,7 +222,7 @@ int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, c
 int nmod_sparse_mat_nullvector_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state) 
 {
     int ret = 0;
-    slong l, ns;
+    slong l, ns, k;
     slong *d;
     mp_ptr b;
     nmod_mat_t Z;
@@ -225,21 +230,24 @@ int nmod_sparse_mat_nullvector_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t
     if (M->r != M->c) return 0; /* TODO */
 
     ns = 2*M->r/block_size + 3; /* Maybe 5? */
+    S = flint_malloc(ns*sizeof(*S));
     d = flint_calloc(2*block_size, sizeof(*d));
     b = _nmod_vec_init(M->r);
-    for (l = 0; l < 3; ++l)
-        nmod_mat_init(&Y[l], M->c, block_size, M->mod.n);
-    nmod_mat_randtest(&Y[0], state);
+    for (k = 0; k < ns; ++k) nmod_mat_init(&S[k], block_size, block_size, M->mod.n);
+    for (l = 0; l < 3; ++l) nmod_mat_init(&Y[l], M->c, block_size, M->mod.n);
+    do nmod_mat_randfull(&Y[0], state);
+    while(nmod_mat_is_zero(&Y[0]));
+
     nmod_sparse_mat_mul_mat(&Y[1], M, &Y[0]);
     make_block_sequences(S, ns, M, &Y[1]);
-    find_block_min_poly(S, d, ns);
+    find_block_min_poly(S, d, ns, M->r);
 
     for (l = 0; l < block_size; ++l)
     {
         nmod_mat_set(&Y[1], &Y[0]);
         make_block_sum(x, S, d, M, Y + 1, l);
         nmod_sparse_mat_mul_vec(b, M, x);
-        if (_nmod_vec_is_zero(b, M->r)) {ret = 1; break;};
+        if (!_nmod_vec_is_zero(x, M->c) && _nmod_vec_is_zero(b, M->r)) {ret = 1; break;};
     }    
     return ret;
 }
