@@ -96,11 +96,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_set(nmod_sparse_mat_t M, const nmod_sparse_mat_t src) 
 {
     slong i, rmax = FLINT_MIN(M->r, src->r);
-<<<<<<< HEAD
     if (M==src || M->r == 0) return;
-=======
-    if(M==src || M->r == 0) return;
->>>>>>> Fixed spacing
     for (i = 0; i < rmax; ++i) nmod_sparse_vec_set(&M->rows[i], &src->rows[i], src->c_off);
 }
 
@@ -111,11 +107,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_append_col(nmod_sparse_mat_t M, mp_srcptr v) 
 {
     slong i;
-<<<<<<< HEAD
     for (i = 0; i < M->r; ++i) nmod_sparse_vec_set_entry(&M->rows[i], M->c, v[i]);
-=======
-    for (i = 0; i < M->r; ++i) _nmod_sparse_vec_append_entry(&M->rows[i], M->c, v[i]);
->>>>>>> Fixed spacing
     M->c += 1;
 }
 
@@ -475,6 +467,7 @@ void nmod_sparse_mat_sub(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const n
 /* Matrix-vector and matrix-matrix multipliciation */
 NMOD_SPARSE_MAT_INLINE
 <<<<<<< HEAD
+<<<<<<< HEAD
 void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t M, mp_srcptr x) 
 {
     slong i;
@@ -485,6 +478,9 @@ void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t M, mp_srcptr x)
 >>>>>>> Spacing and cuddling fixed
 =======
 void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t M, const mp_ptr x) 
+=======
+void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t M, mp_srcptr x) 
+>>>>>>> Fixed bug in multiply, block Lanczos now works for solving (but not for nullspace)
 {
     slong i;
     for (i = 0; i < M->r; ++i) y[i] = nmod_sparse_vec_dot_dense(&M->rows[i], x, M->mod);
@@ -496,6 +492,7 @@ void nmod_sparse_mat_mul_mat(nmod_mat_t Y, const nmod_sparse_mat_t M, const nmod
     slong i, j;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     nmod_mat_zero(Y);
     for (i = 0; i < M->r; ++i)
     {
@@ -505,6 +502,9 @@ void nmod_sparse_mat_mul_mat(nmod_mat_t Y, const nmod_sparse_mat_t M, const nmod
 =======
     for (i = 0; i < A->r; ++i)
 =======
+=======
+    nmod_mat_zero(Y);
+>>>>>>> Fixed bug in multiply, block Lanczos now works for solving (but not for nullspace)
     for (i = 0; i < M->r; ++i)
 >>>>>>> Created sparse vector and matrix utilities for all the fq variants
 {
@@ -673,7 +673,13 @@ FLINT_DLL
 slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
+slong nmod_sparse_mat_nullspace_block_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters);
+
+FLINT_DLL
 slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
+
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_block_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M);
