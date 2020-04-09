@@ -27,23 +27,24 @@ main(void)
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, sparse_mat_t) A;
     TEMPLATE(T, mat_t) X, AX;
-    slong rk[4];
-    slong discrep[4] = {0, 0, 0, 0};
-    double elapsed[4] = {0, 0, 0, 0};
+    slong rk[6];
+    slong discrep[6] = {0, 0, 0, 0};
+    double elapsed[6] = {0, 0, 0, 0};
+    char *names[6] = {"rref", "lu", "Lanczos", "block Lanczos", "Wiedemann", "block Wiedemann"};
     struct timeval start, end;
     FLINT_TEST_INIT(state);
     
     flint_printf("finding nullspace of A....");
     fflush(stdout);
     
-    for (rep = 0; rep < nreps; )
+    for (rep = 0; rep < nreps; ++rep)
     {
         if (rep % 5==0) {flint_printf("."); fflush(stdout);}
         TEMPLATE(T, ctx_randtest) (ctx, state);
-        r = c = n_randint(state, 200);
+        r = c = 100 + n_randint(state, 100);
         TEMPLATE(T, sparse_mat_init) (A, r, c, ctx);
-        TEMPLATE(T, sparse_mat_randtest) (A, state, c/5, c/2, ctx);
-        for (i = 0; i < 4; ++i) 
+        TEMPLATE(T, sparse_mat_randtest) (A, state, c/20, c/10, ctx);
+        for (i = 0; i < 6; ++i) 
         {
             gettimeofday(&start, NULL);
             switch (i) 
@@ -51,10 +52,12 @@ main(void)
             case 0: rk[0] = TEMPLATE(T, sparse_mat_nullspace_rref) (X, A, ctx); break;
             case 1: rk[1] = TEMPLATE(T, sparse_mat_nullspace_lu) (X, A, ctx); break;
             case 2: rk[2] = TEMPLATE(T, sparse_mat_nullspace_lanczos) (X, A, state, 5, ctx); break;
-            case 3: rk[3] = TEMPLATE(T, sparse_mat_nullspace_wiedemann) (X, A, state, 5, ctx); break;
+            case 3: rk[3] = TEMPLATE(T, sparse_mat_nullspace_block_lanczos) (X, A, 8, state, 2, ctx); break;
+            case 4: rk[4] = TEMPLATE(T, sparse_mat_nullspace_wiedemann) (X, A, state, 5, ctx); break;
+            case 5: rk[5] = TEMPLATE(T, sparse_mat_nullspace_block_wiedemann) (X, A, 8, state, 2, ctx); break;
             }
-            if (i == 0 && rk[0] == UWORD(0) ) { TEMPLATE(T, mat_clear) (X, ctx); break;}
-            else ++rep;
+            //if (i == 0 && rk[0] == UWORD(0) ) { TEMPLATE(T, mat_clear) (X, ctx); break;}
+            //else ++rep;
             gettimeofday(&end, NULL);
             elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
             if (rk[i]!=0) 
@@ -72,10 +75,7 @@ main(void)
                 }
                 TEMPLATE(T, mat_clear) (AX, ctx);
             }
-            if (rk[i] != rk[0]) 
-            {
-                discrep[i] += 1;
-            }
+            if (rk[i] != rk[0]) discrep[i] += 1;
             TEMPLATE(T, mat_clear) (X, ctx);
         }
         TEMPLATE(T, sparse_mat_clear) (A, ctx);
@@ -84,13 +84,14 @@ main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-    flint_printf("Average time for rref: %lf\n", elapsed[0]/nreps);
-    flint_printf("Average time for LU: %lf\n", elapsed[1]/nreps);
-    flint_printf("Average time for Lanzcos: %lf\n", elapsed[2]/nreps);
-    flint_printf("Average time for Wiedemann: %lf\n", elapsed[3]/nreps);
-    flint_printf("LU did not find full nullspace for %wd/%wd examples\n", discrep[1], nreps);
-    flint_printf("Lanczos did not find full nullspace for %wd/%wd examples\n", discrep[2], nreps);
-    flint_printf("Wiedemann did not find full nullspace for %wd/%wd examples\n", discrep[3], nreps);
+    for(i = 0; i < 6; ++i)
+    {
+        flint_printf("Finding nullspace with %s took average time %lf\n",
+                     names[i], elapsed[i]/nreps);
+        if(discrep[i] > 0)
+            flint_printf("\tFailed to find full nullspace in %wd/%wd trials\n", 
+                         discrep[i], nreps);
+    }
     return 0;
 }
 

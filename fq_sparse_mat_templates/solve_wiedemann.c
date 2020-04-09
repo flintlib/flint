@@ -171,7 +171,7 @@ int TEMPLATE(T, sparse_mat_nullvector_wiedemann) (TEMPLATE(T, struct) *x, const 
         _TEMPLATE(T, vec_set) (y[1], y[0], A->r, ctx);
         make_sum(x, s[i], L+1, A, &y[1], ctx);
         TEMPLATE(T, sparse_mat_mul_vec) (y[1], A, x, ctx);
-        ret = _TEMPLATE(T, vec_is_zero) (y[1], A->r, ctx);
+        ret = !_TEMPLATE(T, vec_is_zero) (x, A->c, ctx) && _TEMPLATE(T, vec_is_zero) (y[1], A->r, ctx);
     }
     for (i = 0; i < ns; ++i) _TEMPLATE(T, vec_clear) (s[i], len, ctx);
     for (i = 0; i < 3; ++i) _TEMPLATE(T, vec_clear) (y[i], A->r, ctx);

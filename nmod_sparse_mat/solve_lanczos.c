@@ -27,6 +27,7 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, const mp_
     mp_limb_t vtAv[2], AvtAv, vMtb, alpha, beta;
 
     _nmod_vec_zero(x, M->c);
+    if (_nmod_vec_is_zero(b, M->c)) return 1;
 
     /* Construct transpose */
     nmod_sparse_mat_init(Mt, M->c, M->r, M->mod);

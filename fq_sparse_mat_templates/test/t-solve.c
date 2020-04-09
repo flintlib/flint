@@ -22,162 +22,107 @@ int
 main(void)
 {
     int iter, ret;
-    int niters = 0, wied_nosol = 0, nosol = 0, psolved = 0;
-    int block_lanczos_niters = 0, block_lanczos_nosol = 0, block_lanczos_psolved = 0;
-    slong rep, r, c, i, nrep = 100;
+    slong rep, nreps = 100, r, c, i;
     TEMPLATE(T, t) a;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, sparse_mat_t) A, At;
     TEMPLATE(T, struct) *x, *x2, *b, *Atb, *Ax, *AtAx;
-    double block_lanczos_elapsed = 0, rref_elapsed = 0, lu_elapsed = 0, lanczos_elapsed = 0, wiedemann_elapsed;
+    slong niters[6] = {0, 0, 0, 0, 0, 0};
+    slong psol[6] = {0, 0, 0, 0, 0, 0};
+    slong nosol[6] = {0, 0, 0, 0, 0, 0};
+    double elapsed[6] = {0, 0, 0, 0, 0};
+    char *names[6] = {"rref", "lu", "Lanczos", "block Lanczos", "Wiedemann", "block Wiedemann"};
     struct timeval start, end;
     FLINT_TEST_INIT(state);
     
     flint_printf("solving Ax=b....");
     fflush(stdout);
     
-    for (rep = 0; rep < nrep; rep++)
+    for (rep = 0; rep < nreps; rep++)
     {
         if (rep % 5==0) {flint_printf("."); fflush(stdout);}
         TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        do c = r = 100 + n_randint(state, 100);
-        while(c == 0 || r == 0);
+        c = r = 50 + n_randint(state, 10);
 
         TEMPLATE(T, sparse_mat_init) (A, r, c, ctx);
-        TEMPLATE(T, sparse_mat_init) (At, c, r, ctx);
         x = _TEMPLATE(T, vec_init) (c, ctx);
         x2 = _TEMPLATE(T, vec_init) (c, ctx);
         b = _TEMPLATE(T, vec_init) (r, ctx);
         Ax = _TEMPLATE(T, vec_init) (r, ctx);
-        AtAx = _TEMPLATE(T, vec_init) (c, ctx);
-        Atb = _TEMPLATE(T, vec_init) (c, ctx);
 
-        TEMPLATE(T, sparse_mat_randtest) (A, state, c/20, c/10, ctx);
-        TEMPLATE(T, sparse_mat_transpose) (At, A, ctx);
-
+        TEMPLATE(T, sparse_mat_randtest) (A, state, c/10, c/5, ctx);
         _TEMPLATE(T, vec_randtest) (x, state, c, ctx);
         TEMPLATE(T, sparse_mat_mul_vec) (b, A, x, ctx);
-        /* Solve via reduced row echelon form */
-         gettimeofday(&start, NULL);
-        ret = TEMPLATE(T, sparse_mat_solve_rref) (x2, A, b, ctx);
-        gettimeofday(&end, NULL);
-        rref_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
-        TEMPLATE(T, sparse_mat_mul_vec) (Ax, A, x2, ctx);
-        if (!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx))
-        {
-            flint_printf("FAIL: Ax != b, got ret %d\n", ret);
-            abort();
-        } 
 
-        /* Solve via lu decomposition */
-        gettimeofday(&start, NULL);
-        ret = TEMPLATE(T, sparse_mat_solve_lu) (x2, A, b, ctx);
-        gettimeofday(&end, NULL);
-        lu_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
-        TEMPLATE(T, sparse_mat_mul_vec) (Ax, A, x2, ctx);
-        if (!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx))
+        for (i = 0; i < 6; ++i)
         {
-            flint_printf("FAIL: Ax != b, got ret %d\n", ret);
-            abort();
-        } 
-
-        /* Solve iteratively */
-/**/         gettimeofday(&start, NULL);
-        ret=TEMPLATE(T, sparse_mat_solve_wiedemann) (x2, A, b, ctx);
-        gettimeofday(&end, NULL);
-        wiedemann_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
-        if (ret == 0)
-        {
-            wied_nosol += 1;
-        }
-        else
-        {
-            TEMPLATE(T, sparse_mat_mul_vec) (Ax, A, x2, ctx);
-            if (!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx))
+            iter = 0;
+            gettimeofday(&start, NULL);
+            switch (i) 
             {
-                flint_printf("FAIL: Ax != b\n");
-                abort();
+            case 0: ret = TEMPLATE(T, sparse_mat_solve_rref) (x2, A, b, ctx); break;
+            case 1: ret = TEMPLATE(T, sparse_mat_solve_lu) (x2, A, b, ctx); break;
+            case 2: do ret = TEMPLATE(T, sparse_mat_solve_lanczos) (x2, A, b, state, ctx); while(ret == 0 && ++iter < 3); break;
+            case 3: do ret = TEMPLATE(T, sparse_mat_solve_block_lanczos) (x2, A, b, 8, state, ctx); while(ret == 0 && ++iter < 3); break;
+            case 4: ret = TEMPLATE(T, sparse_mat_solve_wiedemann) (x2, A, b, ctx); break;
+            case 5: do ret = TEMPLATE(T, sparse_mat_solve_block_wiedemann) (x2, A, b, 8, state, ctx); while(ret == 0 && ++iter < 3); break;
+            }
+            gettimeofday(&end, NULL);
+            elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
+            if (ret == 0) nosol[i] += 1;
+            else 
+            {
+                niters[i] += iter;
+                TEMPLATE(T, sparse_mat_mul_vec) (Ax, A, x2, ctx);
+                if (!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx)) 
+                {
+                    if (i == 2 || i == 3)
+                    {
+                        TEMPLATE(T, sparse_mat_init) (At, c, r, ctx);
+                        AtAx = _TEMPLATE(T, vec_init) (c, ctx);
+                        Atb = _TEMPLATE(T, vec_init) (c, ctx);
+                        TEMPLATE(T, sparse_mat_transpose) (At, A, ctx);
+                        TEMPLATE(T, sparse_mat_mul_vec) (AtAx, At, Ax, ctx);
+                        TEMPLATE(T, sparse_mat_mul_vec) (Atb, At, b, ctx);
+                        if (!_TEMPLATE(T, vec_equal) (AtAx, Atb, A->c, ctx))
+                        {
+                            flint_printf("FAIL on %s: AtAx != Atb\n", names[i]);
+                            abort();
+                        } 
+                        else psol[i] += 1;
+                        _TEMPLATE(T, vec_clear) (AtAx, c, ctx);
+                        _TEMPLATE(T, vec_clear) (Atb, c, ctx);
+                        TEMPLATE(T, sparse_mat_clear) (At, ctx);
+                    }
+                    else
+                    {
+                        flint_printf("FAIL on %s: Ax != b\n", names[i]);
+                        abort();
+                    }
+                }
             }
         }
-
-        gettimeofday(&start, NULL);
-        iter = 0;
-        do ret=TEMPLATE(T, sparse_mat_solve_lanczos) (x2, A, b, state, ctx);
-        while(ret==0 && ++iter < 30);
-        gettimeofday(&end, NULL);
-        lanczos_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
-        if (ret==0)
-        {
-            nosol += 1;
-            continue;
-        }
-        else
-        {
-            niters += iter;
-            TEMPLATE(T, sparse_mat_mul_vec) (Ax, A, x2, ctx);
-            TEMPLATE(T, sparse_mat_mul_vec) (AtAx, At, Ax, ctx);
-            TEMPLATE(T, sparse_mat_mul_vec) (Atb, At, b, ctx);
-            if (!_TEMPLATE(T, vec_equal) (AtAx, Atb, A->c, ctx))
-            {
-                flint_printf("FAIL: AtAx != Atb, got ret %d\n", ret);
-                abort();
-            } 
-            else if (!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx))
-            {
-                psolved += 1;
-            }
-        }
-
-        gettimeofday(&start, NULL);
-        iter = 0;
-        do ret=TEMPLATE(T, sparse_mat_solve_block_lanczos) (x2, A, b, 8, state, ctx);
-        while(ret==0 && ++iter < 30);
-        gettimeofday(&end, NULL);
-        block_lanczos_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
-        if (ret==0)
-        {
-            block_lanczos_nosol += 1;
-            continue;
-        }
-        else
-        {
-            block_lanczos_niters += iter;
-            TEMPLATE(T, sparse_mat_mul_vec) (Ax, A, x2, ctx);
-            TEMPLATE(T, sparse_mat_mul_vec) (AtAx, At, Ax, ctx);
-            TEMPLATE(T, sparse_mat_mul_vec) (Atb, At, b, ctx);
-            if (!_TEMPLATE(T, vec_equal) (AtAx, Atb, A->c, ctx))
-            {
-                flint_printf("FAIL: AtAx != Atb, got ret %d\n", ret);
-                abort();
-            } 
-            else if (!_TEMPLATE(T, vec_equal) (b, Ax, A->r, ctx))
-            {
-                psolved += 1;
-            }
-        }
- 
         _TEMPLATE(T, vec_clear) (x, c, ctx);
         _TEMPLATE(T, vec_clear) (x2, c, ctx);
         _TEMPLATE(T, vec_clear) (b, r, ctx);
         _TEMPLATE(T, vec_clear) (Ax, r, ctx);
-        _TEMPLATE(T, vec_clear) (AtAx, c, ctx);
-        _TEMPLATE(T, vec_clear) (Atb, c, ctx);
         TEMPLATE(T, sparse_mat_clear) (A, ctx);
-        TEMPLATE(T, sparse_mat_clear) (At, ctx);
         TEMPLATE(T, ctx_clear) (ctx);
     }
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-    flint_printf("Average time for Wiedemann: %lf\n", wiedemann_elapsed/nrep);
-    flint_printf("Average time for Lanzcos: %lf\n", lanczos_elapsed/nrep);
-    flint_printf("Average time for block Lanzcos: %lf\n", block_lanczos_elapsed/nrep);
-    flint_printf("Average time for LU: %lf\n", lu_elapsed/nrep);
-    flint_printf("Average time for rref: %lf\n", rref_elapsed/nrep);
-    flint_printf("Wiedemann found no solution for %wd/%wd examples.\n", wied_nosol, nrep);
-    flint_printf("Lanczos found no solution for %wd/%wd examples, pseudo-solution for %wd/%wd examples, and required %f extra iters per solution (on average).\n", nosol, nrep, psolved, nrep, (double)niters/nrep);
-    flint_printf("Block Lanczos found no solution for %wd/%wd examples, pseudo-solution for %wd/%wd examples, and required %f extra iters per solution (on average).\n", block_lanczos_nosol, nrep, block_lanczos_psolved, nrep, (double)block_lanczos_niters/nrep);
+    for (i = 0; i < 6; ++i)
+    {
+        flint_printf("Solving with %s took average time %lf\n", names[i], elapsed[i]/nreps);
+        if (nosol[i])
+            flint_printf("\tFound no solution for %wd/%wd examples\n", nosol[i], nreps);
+        if (psol[i])    
+            flint_printf("\tFound pseudo-solution for %wd/%wd examples\n", psol[i], nreps);
+        if (niters[i])
+            flint_printf("\tRequired %f extra iters per solution (on average).\n", (double)niters[i]/nreps);
+    }
     return 0;
 }
 

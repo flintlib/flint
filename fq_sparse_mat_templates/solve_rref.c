@@ -48,6 +48,7 @@ int TEMPLATE(T, sparse_mat_solve_rref) (TEMPLATE(T, struct) *x, const TEMPLATE(T
         if (re->ind==M->c) TEMPLATE(T, set) (&x[le->ind], re->val, ctx);
     }
     TEMPLATE(T, sparse_mat_clear) (Mb, ctx);
+    return good;
 }
 
 #endif
