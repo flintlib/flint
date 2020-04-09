@@ -75,16 +75,11 @@ typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
 typedef struct
 {
    mp_limb_t ** jj; /* used by fft_convolution_precache */
-   mp_limb_t ** ii; /* used by mul, must be in struct due to ptr swaps */
    slong n;
    slong len2;
    slong loglen;
    slong bits2;
    slong limbs;
-   mp_limb_t ** t1;
-   mp_limb_t ** t2;
-   mp_limb_t ** s1;
-   mp_limb_t ** tt;
    fmpz_poly_t poly2;
 } fmpz_poly_precache_struct;
 

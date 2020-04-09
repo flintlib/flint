@@ -22,6 +22,7 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
     slong output_bits, size;
     ulong size1, size2;
     mp_limb_t * ptr;
+    mp_limb_t ** t1, ** t2, ** s1;
     int N;
 
     pre->len2 = poly2->length;
@@ -49,31 +50,24 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
     /* allocate space for ffts */
     N = flint_get_num_threads();
     pre->jj = (mp_limb_t **)
-        flint_malloc((4*(pre->n + pre->n*size) + 5*size*N)*sizeof(mp_limb_t));
+        flint_malloc((4*(pre->n + pre->n*size) + 3*size*N + 3*N)*sizeof(mp_limb_t));
     for (i = 0, ptr = (mp_limb_t *) pre->jj + 4*pre->n; i < 4*pre->n; i++, ptr += size) 
         pre->jj[i] = ptr;
-    pre->t1 = (mp_limb_t **) flint_malloc(4*N*sizeof(mp_limb_t *));
-    pre->t2 = (mp_limb_t **) pre->t1 + N;
-    pre->s1 = (mp_limb_t **) pre->t2 + N;
-    pre->tt = (mp_limb_t **) pre->s1 + N;
+    t1 = (mp_limb_t **) ptr;
+    t2 = (mp_limb_t **) t1 + N;
+    s1 = (mp_limb_t **) t2 + N;
+    ptr += 3*N;
 
-    pre->t1[0] = ptr;
-    pre->t2[0] = pre->t1[0] + size*N;
-    pre->s1[0] = pre->t2[0] + size*N;
-    pre->tt[0] = pre->s1[0] + size*N;
+    t1[0] = ptr;
+    t2[0] = t1[0] + size*N;
+    s1[0] = t2[0] + size*N;
 
     for (i = 1; i < N; i++)
     {
-        pre->t1[i] = pre->t1[i - 1] + size;
-        pre->t2[i] = pre->t2[i - 1] + size;
-        pre->s1[i] = pre->s1[i - 1] + size;
-        pre->tt[i] = pre->tt[i - 1] + 2*size;
+        t1[i] = t1[i - 1] + size;
+        t2[i] = t2[i - 1] + size;
+        s1[i] = s1[i - 1] + size;
     }
-
-    pre->ii = (mp_limb_t **)
-                      flint_malloc(4*(pre->n + pre->n*size)*sizeof(mp_limb_t));
-    for (i = 0, ptr = (mp_limb_t *) pre->ii + 4*pre->n; i < 4*pre->n; i++, ptr += size) 
-        pre->ii[i] = ptr;
 
     /* put coefficients into FFT vecs */
     pre->bits2 = _fmpz_vec_get_fft(pre->jj, poly2->coeffs,
@@ -92,8 +86,7 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
     pre->limbs = (output_bits - 1) / FLINT_BITS + 1;
     pre->limbs = fft_adjust_limbs(pre->limbs); /* round up limbs for Nussbaumer */
 
-    fft_precache(pre->jj, pre->loglen - 2, pre->limbs, len_out,
-                                                    pre->t1, pre->t2, pre->s1);
+    fft_precache(pre->jj, pre->loglen - 2, pre->limbs, len_out, t1, t2, s1);
 
     fmpz_poly_init(pre->poly2);
     fmpz_poly_set(pre->poly2, poly2);
@@ -102,8 +95,6 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
 void fmpz_poly_mul_precache_clear(fmpz_poly_precache_t pre)
 {
     flint_free(pre->jj);
-    flint_free(pre->ii);
-    flint_free(pre->t1);
     fmpz_poly_clear(pre->poly2);
 }
 
@@ -112,20 +103,48 @@ void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1,
 {
     slong len_out;
     slong size, i;
+    mp_limb_t ** ii, ** t1, ** t2, ** s1, ** tt;
+    mp_limb_t * ptr;
+    int N;
 
     len_out = FLINT_MAX(len1 + pre->len2 - 1, 2*pre->n + 1);
 
     size = pre->limbs + 1;
 
+    /* allocate space for ffts */
+    N = flint_get_num_threads();
+    ii = (mp_limb_t **)
+        flint_malloc((4*(pre->n + pre->n*size) + 5*size*N + 4*N)*sizeof(mp_limb_t));
+    for (i = 0, ptr = (mp_limb_t *) ii + 4*pre->n; i < 4*pre->n; i++, ptr += size) 
+        ii[i] = ptr;
+    t1 = (mp_limb_t **) ptr;
+    t2 = (mp_limb_t **) t1 + N;
+    s1 = (mp_limb_t **) t2 + N;
+    tt = (mp_limb_t **) s1 + N;
+    ptr += 4*N;
+
+    t1[0] = ptr;
+    t2[0] = t1[0] + size*N;
+    s1[0] = t2[0] + size*N;
+    tt[0] = s1[0] + size*N;
+
+    for (i = 1; i < N; i++)
+    {
+        t1[i] = t1[i - 1] + size;
+        t2[i] = t2[i - 1] + size;
+        s1[i] = s1[i - 1] + size;
+        tt[i] = tt[i - 1] + 2*size;
+    }
+
     /* put coefficients into FFT vecs */
-    _fmpz_vec_get_fft(pre->ii, input1, pre->limbs, len1);
+    _fmpz_vec_get_fft(ii, input1, pre->limbs, len1);
     for (i = len1; i < 4*pre->n; i++)
-        flint_mpn_zero(pre->ii[i], size);
+        flint_mpn_zero(ii[i], size);
 
-    fft_convolution_precache(pre->ii, pre->jj, pre->loglen - 2, pre->limbs,
-                                  len_out, pre->t1, pre->t2, pre->s1, pre->tt);
+    fft_convolution_precache(ii, pre->jj, pre->loglen - 2, pre->limbs,
+                                                      len_out, t1, t2, s1, tt);
 
-    _fmpz_vec_set_fft(output, trunc, pre->ii, pre->limbs, 1); /* write output */
+    _fmpz_vec_set_fft(output, trunc, ii, pre->limbs, 1); /* write output */
 }
 
 void
