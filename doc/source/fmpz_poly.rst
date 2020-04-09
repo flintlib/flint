@@ -757,8 +757,8 @@ FFT precached multiplication
     multiplication using ``pre``. Then internally ``len`` is rounded up to
     a power of two, `2^n` say. The truncated FFT algorithm is used to smooth
     performance but note that it can only do this in the range
-    `[2^{n-1}, 2^n]`. Therefore, it may be more efficient to recompute `pre`
-    for cases where the output length will fall below `2^{n-1}`. Otherwise
+    `(2^{n-1}, 2^n]`. Therefore, it may be more efficient to recompute `pre`
+    for cases where the output length will fall below `2^{n-1} + 1`. Otherwise
     the implementation will zero pad them up to that length.
 
     Note that the Schoenhage-Strassen algorithm is only efficient for
