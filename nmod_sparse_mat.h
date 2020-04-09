@@ -313,7 +313,7 @@ void nmod_sparse_mat_sub(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const n
 
 /* Matrix-vector and matrix-matrix multipliciation */
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t M, const mp_ptr x) 
+void nmod_sparse_mat_mul_vec(mp_ptr y, const nmod_sparse_mat_t M, mp_srcptr x) 
 {
     slong i;
     for (i = 0; i < M->r; ++i) y[i] = nmod_sparse_vec_dot_dense(&M->rows[i], x, M->mod);
@@ -322,6 +322,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_mul_mat(nmod_mat_t Y, const nmod_sparse_mat_t M, const nmod_mat_t X) 
 {
     slong i, j;
+    nmod_mat_zero(Y);
     for (i = 0; i < M->r; ++i)
 {
         for (j = 0; j < M->rows[i].nnz; ++j)
@@ -384,7 +385,13 @@ FLINT_DLL
 slong nmod_sparse_mat_nullspace_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
+slong nmod_sparse_mat_nullspace_block_lanczos(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters);
+
+FLINT_DLL
 slong nmod_sparse_mat_nullspace_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, flint_rand_t state, slong max_iters);
+
+FLINT_DLL
+slong nmod_sparse_mat_nullspace_block_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters);
 
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M);

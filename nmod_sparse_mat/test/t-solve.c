@@ -23,12 +23,15 @@ main(void)
 {
     int iter, ret;
     int niters = 0, wied_nosol = 0, nosol = 0, psolved = 0;
+    int block_lanczos_niters = 0, block_lanczos_nosol = 0, block_lanczos_psolved = 0;
     slong rep, r, c, i, nrep = 100;
     mp_limb_t n, a;
     nmod_t mod;
     nmod_sparse_mat_t A, At;
+    nmod_mat_t dA;
     mp_ptr x, x2, b, Atb, Ax, AtAx;
-    double rref_elapsed = 0, lu_elapsed = 0, lanczos_elapsed = 0, wiedemann_elapsed;
+    double rref_elapsed = 0, lu_elapsed = 0, lanczos_elapsed = 0;
+    double block_lanczos_elapsed = 0, block_wiedemann_elapsed = 0, wiedemann_elapsed = 0;
     struct timeval start, end;
     FLINT_TEST_INIT(state);
     
@@ -39,16 +42,17 @@ main(void)
     {
         if(rep % 5==0) {flint_printf("."); fflush(stdout);}
         
-        do c = r = n_randint(state, 200);
-        while(c == 0 || r == 0);
+        c = r = 500 + n_randint(state, 100);
 
         do n = n_randtest_not_zero(state);
         while (n <= 32 || !n_is_prime(n));
         nmod_init(&mod, n);
         nmod_sparse_mat_init(A, r, c, mod);
+        nmod_mat_init(dA, r, c, n);
         nmod_sparse_mat_init(At, c, r, mod);
 
-        nmod_sparse_mat_randtest(A, state, 30, 30);
+        nmod_sparse_mat_randtest(A, state, c/20, c/10);
+        nmod_sparse_mat_to_dense(dA, A);
         nmod_sparse_mat_transpose(At, A);
         x = _nmod_vec_init(c);
         x2 = _nmod_vec_init(c);
@@ -122,12 +126,40 @@ main(void)
             nmod_sparse_mat_mul_vec(Atb, At, b);
             if (!_nmod_vec_equal(AtAx, Atb, A->c))
             {
-                flint_printf("FAIL: AtAx != Atb, got ret %d\n", ret);
+                flint_printf("FAIL: AtAx != Atb, got ret %d\n", 5, ret);
                 abort();
             } 
             else if (!_nmod_vec_equal(b, Ax, A->r))
             {
                 psolved += 1;
+            }
+        }
+
+        gettimeofday(&start, NULL);
+        iter = 0;
+        do ret = nmod_sparse_mat_solve_block_lanczos(x2, A, b, 8, state);
+        while(ret==0 && ++iter < 10);
+        gettimeofday(&end, NULL);
+        block_lanczos_elapsed += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
+        if (ret==0)
+        {
+            block_lanczos_nosol += 1;
+            continue;
+        }
+        else
+        {
+            block_lanczos_niters += iter;
+            nmod_sparse_mat_mul_vec(Ax, A, x2);
+            nmod_sparse_mat_mul_vec(AtAx, At, Ax);
+            nmod_sparse_mat_mul_vec(Atb, At, b);
+            if (!_nmod_vec_equal(AtAx, Atb, A->c))
+            {
+                flint_printf("FAIL: AtAx != Atb, got ret %d\n", ret);
+                abort();
+            } 
+            else if (!_nmod_vec_equal(b, Ax, A->r))
+            {
+                block_lanczos_psolved += 1;
             }
         }
 
@@ -145,9 +177,11 @@ main(void)
     flint_printf("PASS\n");
     flint_printf("Average time for Wiedemann: %lf\n", wiedemann_elapsed/nrep);
     flint_printf("Average time for Lanzcos: %lf\n", lanczos_elapsed/nrep);
+    flint_printf("Average time for block Lanzcos: %lf\n", block_lanczos_elapsed/nrep);
     flint_printf("Average time for LU: %lf\n", lu_elapsed/nrep);
     flint_printf("Average time for rref: %lf\n", rref_elapsed/nrep);
     flint_printf("Wiedemann found no solution for %wd/%wd examples.\n", wied_nosol, nrep);
     flint_printf("Lanczos found no solution for %wd/%wd examples, pseudo-solution for %wd/%wd examples, and required %f extra iters per solution (on average).\n", nosol, nrep, psolved, nrep, (double)niters/nrep);
+    flint_printf("Block Lanczos found no solution for %wd/%wd examples, pseudo-solution for %wd/%wd examples, and required %f extra iters per solution (on average).\n", block_lanczos_nosol, nrep, block_lanczos_psolved, nrep, (double)block_lanczos_niters/nrep);
     return 0;
 }
