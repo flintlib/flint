@@ -523,6 +523,13 @@ FLINT_DLL void _fmpz_poly_mullow_SS_precache(fmpz * output,
 FLINT_DLL void fmpz_poly_mullow_SS_precache(fmpz_poly_t res,
                    const fmpz_poly_t poly1, fmpz_poly_precache_t pre, slong n);
 
+FMPZ_POLY_INLINE void fmpz_poly_mul_SS_precache(fmpz_poly_t res,
+                             const fmpz_poly_t poly1, fmpz_poly_precache_t pre)
+{
+    fmpz_poly_mullow_SS_precache(res, poly1, pre,
+		                  FLINT_MAX(poly1->length + pre->len2 - 1, 0));
+}
+
 /* Squaring ******************************************************************/
 
 FLINT_DLL void _fmpz_poly_sqr_KS(fmpz * rop, const fmpz * op, slong len);

@@ -738,6 +738,69 @@ Multiplication
     precisely `n` coefficients in length, zero padded if necessary.  The 
     remaining `n - 1` coefficients may be arbitrary.
 
+FFT precached multiplication
+--------------------------------------------------------------------------------
+
+
+.. function:: void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre, slong len1, slong bits1, const fmpz_poly_t poly2)
+
+    Precompute the FFT of ``poly2`` to enable repeated multiplication of
+    ``poly2`` by polynomials whose length does not exceed ``len1`` and
+    whose number of bits per coefficient does not exceed ``bits1``.
+
+    The value ``bits1`` may be negative, i.e. it may be the result of
+    calling ``fmpz_poly_max_bits``. The function only considers the
+    absolute value of ``bits1``.
+
+    Suppose ``len2`` is the length of ``poly2`` and
+    ``len = len1 + len2 - 1`` is the maximum output length of a polynomial
+    multiplication using ``pre``. Then internally ``len`` is rounded up to
+    a power of two, `2^n` say. The truncated FFT algorithm is used to smooth
+    performance but note that it can only do this in the range
+    `[2^{n-1}, 2^n]`. Therefore, it may be more efficient to recompute `pre`
+    for cases where the output length will fall below `2^{n-1}`. Otherwise
+    the implementation will zero pad them up to that length.
+
+    Note that the Schoenhage-Strassen algorithm is only efficient for
+    polynomials with relatively large coefficients relative to the length of
+    the polynomials.
+
+    Also note that there are no restrictions on the polynomials. In particular
+    the polynomial whose FFT is being precached does not have to be either
+    longer or shorter than the polynomials it is to be multiplied by.
+
+    The same ``fmpz_poly_precache_t`` should not be used from multiple threads.
+    It must be recomputed in each thread that it will be used in.
+
+.. function:: void fmpz_poly_mul_precache_clear(fmpz_poly_precache_t pre)
+
+    Clear the space allocated by ``fmpz_poly_mul_SS_precache_init``.
+
+.. function:: void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1, slong len1, fmpz_poly_precache_t pre, slong trunc)
+
+    Write into ``output`` the first ``trunc`` coefficients of
+    the polynomial ``(input1, len1)`` by the polynomial whose FFT was precached
+    by ``fmpz_poly_mul_SS_precache_init`` and stored in ``pre``.
+
+    For performance reasons it is recommended that all polynomials be truncated
+    to at most ``trunc`` coefficients if possible.
+
+.. function:: void fmpz_poly_mullow_SS_precache(fmpz_poly_t res, const fmpz_poly_t poly1, fmpz_poly_precache_t pre, slong n)
+
+    Set ``res`` to the product of ``poly1`` by the polynomial whose FFT was
+    precached by ``fmpz_poly_mul_SS_precache_init`` (and stored in pre). The
+    result is truncated to `n` coefficients (and normalised).
+
+    There are no restrictions on the length of ``poly1`` other than those given
+    in the call to ``fmpz_poly_mul_SS_precache_init``.
+
+.. function:: void fmpz_poly_mul_SS_precache(fmpz_poly_t res, const fmpz_poly_t poly1, fmpz_poly_precache_t pre)
+
+    Set ``res`` to the product of ``poly1`` by the polynomial whose FFT was
+    precached by ``fmpz_poly_mul_SS_precache_init`` (and stored in pre).
+
+    There are no restrictions on the length of ``poly1`` other than those given
+    in the call to ``fmpz_poly_mul_SS_precache_init``.
 
 Squaring
 --------------------------------------------------------------------------------
