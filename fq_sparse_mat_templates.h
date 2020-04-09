@@ -286,6 +286,7 @@ FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_mul_mat) (TEMPLATE(T, mat_t) Y, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i, j;
+    TEMPLATE(T, mat_zero) (Y, ctx);
     for (i = 0; i < M->r; ++i)
     {
         for (j = 0; j < M->rows[i].nnz; ++j)
@@ -349,6 +350,12 @@ slong TEMPLATE(T, sparse_mat_nullspace_lanczos) (TEMPLATE(T, mat_t) X, const TEM
 
 FLINT_DLL
 slong TEMPLATE(T, sparse_mat_nullspace_wiedemann) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, flint_rand_t state, slong max_iters, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL
+slong TEMPLATE(T, sparse_mat_nullspace_block_lanczos) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, slong block_size, flint_rand_t state, slong max_iters, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL
+slong TEMPLATE(T, sparse_mat_nullspace_block_wiedemann) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, slong block_size, flint_rand_t state, slong max_iters, const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL
 slong TEMPLATE(T, sparse_mat_nullspace_rref) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx);
