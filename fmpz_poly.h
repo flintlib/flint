@@ -75,20 +75,15 @@ typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
 typedef struct
 {
    mp_limb_t ** jj; /* used by fft_convolution_precache */
-   mp_limb_t ** ii; /* used by mul, must be in struct due to ptr swaps */
    slong n;
    slong len2;
    slong loglen;
    slong bits2;
    slong limbs;
-   mp_limb_t ** t1;
-   mp_limb_t ** t2;
-   mp_limb_t ** s1;
-   mp_limb_t ** tt;
    fmpz_poly_t poly2;
-} fmpz_poly_precache_struct;
+} fmpz_poly_mul_precache_struct;
 
-typedef fmpz_poly_precache_struct fmpz_poly_precache_t[1];
+typedef fmpz_poly_mul_precache_struct fmpz_poly_mul_precache_t[1];
 
 /*  Memory management ********************************************************/
 
@@ -512,19 +507,19 @@ FLINT_DLL void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 /* FFT precached multiplication **********************************************/
 
-FLINT_DLL void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
+FLINT_DLL void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
                              slong len1, slong bits1, const fmpz_poly_t poly2);
 
-FLINT_DLL void fmpz_poly_mul_precache_clear(fmpz_poly_precache_t pre);
+FLINT_DLL void fmpz_poly_mul_precache_clear(fmpz_poly_mul_precache_t pre);
 
 FLINT_DLL void _fmpz_poly_mullow_SS_precache(fmpz * output,
-       const fmpz * input1, slong len1, fmpz_poly_precache_t pre, slong trunc);
+   const fmpz * input1, slong len1, fmpz_poly_mul_precache_t pre, slong trunc);
 
 FLINT_DLL void fmpz_poly_mullow_SS_precache(fmpz_poly_t res,
-                   const fmpz_poly_t poly1, fmpz_poly_precache_t pre, slong n);
+               const fmpz_poly_t poly1, fmpz_poly_mul_precache_t pre, slong n);
 
 FMPZ_POLY_INLINE void fmpz_poly_mul_SS_precache(fmpz_poly_t res,
-                             const fmpz_poly_t poly1, fmpz_poly_precache_t pre)
+                         const fmpz_poly_t poly1, fmpz_poly_mul_precache_t pre)
 {
     fmpz_poly_mullow_SS_precache(res, poly1, pre,
 		                  FLINT_MAX(poly1->length + pre->len2 - 1, 0));
