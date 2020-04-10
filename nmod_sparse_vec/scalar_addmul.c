@@ -15,11 +15,11 @@
 #include "flint.h"
 #include "nmod_sparse_vec.h"
 
-void nmod_sparse_vec_scalar_addmul(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, mp_limb_t c, nmod_t mod)
+void nmod_sparse_vec_scalar_addmul_nmod(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, mp_limb_t c, nmod_t mod)
 {
     if (c == UWORD(0) || (u->nnz == 0 && v->nnz == 0)) {nmod_sparse_vec_zero(w); return;}
     if (v->nnz == 0) {nmod_sparse_vec_set(w, u, 0); return;}
-    if (u->nnz == 0) {nmod_sparse_vec_scalar_mul(w, v, c, mod); return;}
+    if (u->nnz == 0) {nmod_sparse_vec_scalar_mul_nmod(w, v, c, mod); return;}
 
     nmod_sparse_vec_t u2; u2->nnz = u->nnz;
     if (u==w)

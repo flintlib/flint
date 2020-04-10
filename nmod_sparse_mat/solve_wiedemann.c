@@ -94,7 +94,7 @@ static void make_sum(mp_ptr x, mp_limb_t *s, slong L, const nmod_sparse_mat_t M,
     _nmod_vec_clear(My);
 }
 
-int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b)
+int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b)
 {
     slong i, L, ret = 0, ns = FLINT_MIN(M->r, 2), len = 2*M->r + 1;
     mp_limb_t **s; 

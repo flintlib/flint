@@ -91,6 +91,18 @@ void TEMPLATE(T, sparse_vec_swap)(TEMPLATE(T, sparse_vec_t) vec1, TEMPLATE(T, sp
     *tmp = *vec1, *vec1 = *vec2, *vec2 = *tmp;
 }
 
+/* Vector indexing */
+FQ_SPARSE_VEC_TEMPLATES_INLINE
+TEMPLATE(T, t) *TEMPLATE(T, sparse_vec_at)(TEMPLATE(T, sparse_vec_t) vec, slong i,
+                                    const TEMPLATE(T, ctx_t) ctx)
+{
+    slong j;
+    for (j = 0; j < vec->nnz; ++j)
+        if (vec->entries[j].ind==i) 
+            return &vec->entries[j].val;
+    return NULL;
+}
+
 /* One-time instantiation */
 FQ_SPARSE_VEC_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_vec_zero)(TEMPLATE(T, sparse_vec_t) vec, 
@@ -124,15 +136,20 @@ void TEMPLATE(T, sparse_vec_set)(TEMPLATE(T, sparse_vec_t) dst, const TEMPLATE(T
 }
 
 FQ_SPARSE_VEC_TEMPLATES_INLINE
-void TEMPLATE(T, sparse_vec_append_entry)(TEMPLATE(T, sparse_vec_t) v, slong ind, const TEMPLATE(T, t) val, 
+void TEMPLATE(T, sparse_vec_set_entry)(TEMPLATE(T, sparse_vec_t) v, slong ind, const TEMPLATE(T, t) val, 
                                     const TEMPLATE(T, ctx_t) ctx)
 {
     if (TEMPLATE(T, is_zero) (val, ctx)) return;
-    _TEMPLATE(T, sparse_vec_resize) (v, v->nnz + 1, ctx);
-    TEMPLATE(T, set) (v->entries[v->nnz-1].val, val, ctx);
-    v->entries[v->nnz-1].ind = ind;
-    if(v->nnz >= 2 && ind < v->entries[v->nnz-2].ind)
-        qsort(v->entries, v->nnz, sizeof(*v->entries), TEMPLATE(T, sparse_entry_cmp));
+    TEMPLATE(T, t) *oval = TEMPLATE(T, sparse_vec_at) (v, ind, ctx);
+    if (oval == NULL)
+    {
+        _TEMPLATE(T, sparse_vec_resize) (v, v->nnz + 1, ctx);
+        TEMPLATE(T, set) (v->entries[v->nnz-1].val, val, ctx);
+        v->entries[v->nnz-1].ind = ind;
+        if(v->nnz >= 2 && ind < v->entries[v->nnz-2].ind)
+            qsort(v->entries, v->nnz, sizeof(*v->entries), TEMPLATE(T, sparse_entry_cmp));
+    }
+    else TEMPLATE(T, set) (*oval, val, ctx);
 }
 
 FQ_SPARSE_VEC_TEMPLATES_INLINE
@@ -168,18 +185,6 @@ int TEMPLATE(T, sparse_vec_equal)(const TEMPLATE(T, sparse_vec_t) vec1, const TE
            !TEMPLATE(T, equal)(vec1->entries[i].val, vec2->entries[i].val, ctx)) return 0;
     }
     return 1;
-}
-
-/* Vector indexing */
-FQ_SPARSE_VEC_TEMPLATES_INLINE
-TEMPLATE(T, t) *TEMPLATE(T, sparse_vec_at)(TEMPLATE(T, sparse_vec_t) vec, slong i,
-                                    const TEMPLATE(T, ctx_t) ctx)
-{
-    slong j;
-    for (j = 0; j < vec->nnz; ++j)
-        if (vec->entries[j].ind==i) 
-            return &vec->entries[j].val;
-    return NULL;
 }
 
 /* Convert from/to dense vector */
@@ -290,7 +295,7 @@ void TEMPLATE(T, sparse_vec_neg)(TEMPLATE(T, sparse_vec_t) v, const TEMPLATE(T, 
 }
 
 FQ_SPARSE_VEC_TEMPLATES_INLINE
-void TEMPLATE(T, sparse_vec_scalar_mul)(TEMPLATE(T, sparse_vec_t) v, const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, t) c,
+void TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T))(TEMPLATE(T, sparse_vec_t) v, const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, t) c,
                                     const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
@@ -323,7 +328,11 @@ void TEMPLATE(T, sparse_vec_sub)(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, 
                                     const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL 
-void TEMPLATE(T, sparse_vec_scalar_addmul)(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, sparse_vec_t) v, const TEMPLATE(T, t) c,
+void TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T))(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, sparse_vec_t) v, const TEMPLATE(T, t) c,
+                                    const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL 
+void TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T))(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, sparse_vec_t) v, const TEMPLATE(T, t) c,
                                     const TEMPLATE(T, ctx_t) ctx);
 
 FQ_SPARSE_VEC_TEMPLATES_INLINE

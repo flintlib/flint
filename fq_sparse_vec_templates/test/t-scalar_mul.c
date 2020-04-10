@@ -45,8 +45,8 @@ main(void)
         TEMPLATE(T, sparse_vec_randtest) (v, state, nnz, len, ctx);
         TEMPLATE(T, randtest) (c, state, ctx);
 
-        TEMPLATE(T, sparse_vec_scalar_addmul) (w, u, v, c, ctx);
-        TEMPLATE(T, sparse_vec_scalar_mul) (x, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (w, u, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (x, v, c, ctx);
         TEMPLATE(T, sparse_vec_add) (x, x, u, ctx);
 
         if (!TEMPLATE(T, sparse_vec_equal) (w, x, 0, ctx))
@@ -55,8 +55,8 @@ main(void)
             abort();
         }
 
-        TEMPLATE(T, sparse_vec_scalar_addmul) (w, u, v, c, ctx);
-        TEMPLATE(T, sparse_vec_scalar_addmul) (u, u, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (w, u, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (u, u, v, c, ctx);
 
         if (!TEMPLATE(T, sparse_vec_equal) (u, w, 0, ctx))
         {
@@ -64,8 +64,8 @@ main(void)
             abort();
         }
 
-        TEMPLATE(T, sparse_vec_scalar_mul) (x, v, c, ctx);
-        TEMPLATE(T, sparse_vec_scalar_mul) (v, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (x, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (v, v, c, ctx);
 
         if (!TEMPLATE(T, sparse_vec_equal) (v, x, 0, ctx))
         {

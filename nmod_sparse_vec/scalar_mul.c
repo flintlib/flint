@@ -15,7 +15,7 @@
 #include "flint.h"
 #include "nmod_sparse_vec.h"
 
-void nmod_sparse_vec_scalar_mul(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, mp_limb_t c, nmod_t mod)
+void nmod_sparse_vec_scalar_mul_nmod(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, mp_limb_t c, nmod_t mod)
 {
     if (c == UWORD(0)) nmod_sparse_vec_zero(v);
     else if (c == UWORD(1)) nmod_sparse_vec_set(v, u, 0);

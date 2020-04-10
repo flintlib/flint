@@ -129,25 +129,25 @@ slong nmod_sparse_mat_lu(slong *P, slong *Q,
         P[pr] = rank; /* Move pivot row to front */
         
         /* Invert pivot */
-        cinv = nmod_inv(nmod_sparse_vec_at(prow, pc), M->mod);
+        cinv = nmod_inv(*nmod_sparse_vec_at(prow, pc), M->mod);
 
         /* Gaussian eliminate rows */
         for (j = 0; j < pcol->nnz; ++j)
         {
             r = pcol->entries[j].ind, row = &U->rows[r];
             if (P[r] >= 0) continue; /* Skip previous pivot rows */
-            cc = nmod_neg(nmod_mul(cinv, nmod_sparse_vec_at(row, pc), M->mod), M->mod);
-            nmod_sparse_vec_scalar_addmul(row, row, prow, cc, M->mod);
+            cc = nmod_neg(nmod_mul(cinv, *nmod_sparse_vec_at(row, pc), M->mod), M->mod);
+            nmod_sparse_vec_scalar_addmul_nmod(row, row, prow, cc, M->mod);
             if (row->nnz == 0) P[r] = --remr;
         }
         /* Gaussian eliminate cols */
-        nmod_sparse_vec_scalar_mul(pcol, pcol, cinv, M->mod);
+        nmod_sparse_vec_scalar_mul_nmod(pcol, pcol, cinv, M->mod);
         for (j = 0; j < prow->nnz; ++j)
         {
             c = prow->entries[j].ind, col = &Lt->rows[c];
             if (Q[c] >= 0) continue; /* Skip previous pivot columns */
-            cc = nmod_neg(nmod_sparse_vec_at(col, pr), M->mod);
-            nmod_sparse_vec_scalar_addmul(col, col, pcol, cc, M->mod);
+            cc = nmod_neg(*nmod_sparse_vec_at(col, pr), M->mod);
+            nmod_sparse_vec_scalar_addmul_nmod(col, col, pcol, cc, M->mod);
             if (col->nnz == 0) Q[c] = --remc;
             scores[c] = col->nnz;
             heap_up(heap, heap_idx, scores, heap_idx[c]);

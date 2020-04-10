@@ -138,17 +138,17 @@ slong TEMPLATE(T, sparse_mat_lu)(slong *P, slong *Q,
             if (P[r] >= 0) continue; /* Skip previous pivot rows */
             TEMPLATE(T, mul) (cc, cinv, *TEMPLATE(T, sparse_vec_at) (row, pc, ctx), ctx);
             TEMPLATE(T, neg) (cc, cc, ctx);
-            TEMPLATE(T, sparse_vec_scalar_addmul) (row, row, prow, cc, ctx);
+            TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (row, row, prow, cc, ctx);
             if (row->nnz == 0) P[r] = --remr;
         }
         /* Gaussian eliminate cols */
-        TEMPLATE(T, sparse_vec_scalar_mul) (pcol, pcol, cinv, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (pcol, pcol, cinv, ctx);
         for (j = 0; j < prow->nnz; ++j)
         {
             c = prow->entries[j].ind, col = &Lt->rows[c];
             if (Q[c] >= 0) continue; /* Skip previous pivot columns */
             TEMPLATE(T, neg) (cc, *TEMPLATE(T, sparse_vec_at) (col, pr, ctx), ctx);
-            TEMPLATE(T, sparse_vec_scalar_addmul) (col, col, pcol, cc, ctx);
+            TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (col, col, pcol, cc, ctx);
             if (col->nnz == 0) Q[c] = --remc;
             scores[c] = col->nnz;
             heap_up(heap, heap_idx, scores, heap_idx[c]);

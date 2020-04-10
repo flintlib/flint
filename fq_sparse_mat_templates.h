@@ -78,11 +78,11 @@ void TEMPLATE(T, sparse_mat_one) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T,
 }
 
 FQ_SPARSE_MAT_TEMPLATES_INLINE
-void TEMPLATE(T, sparse_mat_set) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) src, const TEMPLATE(T, ctx_t) ctx) 
+void TEMPLATE(T, sparse_mat_set) (TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx) 
 {
-    slong i, rmax = FLINT_MIN(M->r, src->r);
-    if(M==src || M->r == 0) return;
-    for(i=0; i<rmax; ++i) TEMPLATE(T, sparse_vec_set)(&M->rows[i], &src->rows[i], src->c_off, ctx);
+    slong i, rmax = FLINT_MIN(M->r, M->r);
+    if(M==N) return;
+    for(i=0; i<rmax; ++i) TEMPLATE(T, sparse_vec_set)(&N->rows[i], &M->rows[i], M->c_off, ctx);
 }
 
 FLINT_DLL
@@ -92,7 +92,7 @@ FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_append_col) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, struct) *v, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
-    for(i=0; i<M->r; ++i) TEMPLATE(T, sparse_vec_append_entry)(&M->rows[i], M->c, &v[i], ctx);
+    for(i=0; i<M->r; ++i) TEMPLATE(T, sparse_vec_set_entry)(&M->rows[i], M->c, &v[i], ctx);
     M->c += 1;
 }
 
@@ -229,12 +229,6 @@ int TEMPLATE(T, sparse_mat_is_zero) (const TEMPLATE(T, sparse_mat_t) M, const TE
     return 1;
 }
 
-FQ_SPARSE_MAT_TEMPLATES_INLINE
-int TEMPLATE(T, sparse_mat_is_square) (const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx)
-{
-    return (M->r == M->c);
-}
-
 /* Must have M->r == N->c and M->c == N->r */
 FLINT_DLL void TEMPLATE(T, sparse_mat_transpose) (TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx);
 
@@ -247,19 +241,12 @@ void TEMPLATE(T, sparse_mat_neg) (TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T,
 }
 
 FQ_SPARSE_MAT_TEMPLATES_INLINE
-void TEMPLATE(T, sparse_mat_scalar_mul) (TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
+void TEMPLATE(T, TEMPLATE(sparse_mat_scalar_mul, T)) (TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
-    for (i = 0; i < N->r; ++i) TEMPLATE(T, sparse_vec_scalar_mul)(&N->rows[i], &M->rows[i], c, ctx);    
+    for (i = 0; i < N->r; ++i) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T))(&N->rows[i], &M->rows[i], c, ctx);    
 }
 
-
-FQ_SPARSE_MAT_TEMPLATES_INLINE
-void TEMPLATE(T, sparse_mat_addmul) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
-{
-    slong i;
-    for (i = 0; i < O->r; ++i) TEMPLATE(T, sparse_vec_scalar_addmul)(&O->rows[i], &M->rows[i], &N->rows[i], c, ctx);
-}
 
 FQ_SPARSE_MAT_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_mat_add) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, ctx_t) ctx) 
@@ -273,6 +260,20 @@ void TEMPLATE(T, sparse_mat_sub) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T,
 {
     slong i;
     for (i = 0; i < O->r; ++i) TEMPLATE(T, sparse_vec_sub)(&O->rows[i], &M->rows[i], &N->rows[i], ctx);
+}
+
+FQ_SPARSE_MAT_TEMPLATES_INLINE
+void TEMPLATE(T, sparse_mat_addmul) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
+{
+    slong i;
+    for (i = 0; i < O->r; ++i) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T))(&O->rows[i], &M->rows[i], &N->rows[i], c, ctx);
+}
+
+FQ_SPARSE_MAT_TEMPLATES_INLINE
+void TEMPLATE(T, sparse_mat_submul) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
+{
+    slong i;
+    for (i = 0; i < O->r; ++i) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T))(&O->rows[i], &M->rows[i], &N->rows[i], c, ctx);
 }
 
 /* Matrix-vector and matrix-matrix multipliciation */
@@ -297,13 +298,8 @@ void TEMPLATE(T, sparse_mat_mul_mat) (TEMPLATE(T, mat_t) Y, const TEMPLATE(T, sp
     }
 }
 
-/* Permutations */
-/* FLINT_DLL void TEMPLATE(T, sparse_mat_swap_rows)(TEMPLATE(T, sparse_mat_t) M, slong * perm, slong r, slong s);
-FLINT_DLL void TEMPLATE(T, sparse_mat_invert_rows)(TEMPLATE(T, sparse_mat_t) M, slong * perm);
-FLINT_DLL void TEMPLATE(T, sparse_mat_swap_cols)(TEMPLATE(T, sparse_mat_t) M, slong * perm, slong r, slong s);
-FLINT_DLL void TEMPLATE(T, sparse_mat_invert_cols)(TEMPLATE(T, sparse_mat_t) M, slong * perm);
-FLINT_DLL void TEMPLATE(T, sparse_mat_apply_permutation)(TEMPLATE(T, sparse_mat_t) M, slong * P, slong n);
- */
+FLINT_DLL
+slong TEMPLATE(T, sparse_mat_inv) (TEMPLATE(T, sparse_mat_t) Mi, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx);
 
 /* Decomposition/reduction */
 FLINT_DLL
@@ -346,6 +342,12 @@ int TEMPLATE(T, sparse_mat_nullvector_block_lanczos) (TEMPLATE(T, struct) *x, co
 
 /* Note: this should take in uninitialized matrix X */
 FLINT_DLL
+slong TEMPLATE(T, sparse_mat_nullspace_rref) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL
+slong TEMPLATE(T, sparse_mat_nullspace_lu) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL
 slong TEMPLATE(T, sparse_mat_nullspace_lanczos) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, flint_rand_t state, slong max_iters, const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL
@@ -356,15 +358,6 @@ slong TEMPLATE(T, sparse_mat_nullspace_block_lanczos) (TEMPLATE(T, mat_t) X, con
 
 FLINT_DLL
 slong TEMPLATE(T, sparse_mat_nullspace_block_wiedemann) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, slong block_size, flint_rand_t state, slong max_iters, const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL
-slong TEMPLATE(T, sparse_mat_nullspace_rref) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL
-slong TEMPLATE(T, sparse_mat_nullspace_lu) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL
-slong TEMPLATE(T, sparse_mat_inv) (TEMPLATE(T, sparse_mat_t) Ai, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx);
 
 /* Nullspace */
 /* NMOD_SPARSE_MAT_INLINE

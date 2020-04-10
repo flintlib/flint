@@ -51,7 +51,8 @@ main(void)
 
         for (i = 0; i < len; ++i)
         {
-            if (nmod_sparse_vec_at(u, i) != w[i])
+            mp_limb_t *val = nmod_sparse_vec_at(u, i);
+            if ((w[i] == 0 && val != NULL) || (w[i] != 0 && (val == NULL || *val != w[i])))
         {
                 flint_printf("FAIL: u[%wd] != v[%wd]\n", i, i);
                 abort();

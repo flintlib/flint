@@ -47,8 +47,8 @@ main(void)
         nmod_sparse_vec_randtest(u, state, nnz, len, mod);
         nmod_sparse_vec_randtest(v, state, nnz, len, mod);
 
-        nmod_sparse_vec_scalar_addmul(w, u, v, c, mod);
-        nmod_sparse_vec_scalar_mul(x, v, c, mod);
+        nmod_sparse_vec_scalar_addmul_nmod(w, u, v, c, mod);
+        nmod_sparse_vec_scalar_mul_nmod(x, v, c, mod);
         nmod_sparse_vec_add(x, x, u, mod);
 
         if (!nmod_sparse_vec_equal(w, x, 0))
@@ -57,8 +57,8 @@ main(void)
             abort();
         }
 
-        nmod_sparse_vec_scalar_addmul(w, u, v, c, mod);
-        nmod_sparse_vec_scalar_addmul(u, u, v, c, mod);
+        nmod_sparse_vec_scalar_addmul_nmod(w, u, v, c, mod);
+        nmod_sparse_vec_scalar_addmul_nmod(u, u, v, c, mod);
 
         if (!nmod_sparse_vec_equal(u, w, 0))
         {
@@ -66,8 +66,8 @@ main(void)
             abort();
         }
 
-        nmod_sparse_vec_scalar_mul(x, v, c, mod);
-        nmod_sparse_vec_scalar_mul(v, v, c, mod);
+        nmod_sparse_vec_scalar_mul_nmod(x, v, c, mod);
+        nmod_sparse_vec_scalar_mul_nmod(v, v, c, mod);
 
         if (!nmod_sparse_vec_equal(v, x, 0))
         {

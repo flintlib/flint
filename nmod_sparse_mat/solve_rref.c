@@ -16,7 +16,7 @@
 #include "nmod_sparse_vec.h"
 #include "nmod_sparse_mat.h"
 
-int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b)
+int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b)
 {
     int good = 1;
     slong i;
@@ -28,7 +28,7 @@ int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr
         _nmod_vec_zero(x, M->c);
         return 1;
     }
-    
+
     nmod_sparse_mat_init(Mb, M->r, M->c, M->mod);
     nmod_sparse_mat_set(Mb, M);
     nmod_sparse_mat_append_col(Mb, b);

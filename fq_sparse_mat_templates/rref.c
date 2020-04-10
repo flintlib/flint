@@ -57,7 +57,7 @@ slong TEMPLATE(T, sparse_mat_rref) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(
         P[pr] = rank; 
 
         TEMPLATE(T, inv) (cinv, *TEMPLATE(T, sparse_vec_at) (prow, pc, ctx), ctx);
-        TEMPLATE(T, sparse_vec_scalar_mul) (prow, prow, cinv, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (prow, prow, cinv, ctx);
 
         /* Gaussian eliminate rows */
         for (j = 0; j < pcol->nnz; ++j)
@@ -66,17 +66,17 @@ slong TEMPLATE(T, sparse_mat_rref) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(
             if (r == pr) {TEMPLATE(T, zero) (pcol->entries[j].val, ctx); continue;}
 
             TEMPLATE(T, neg) (cc, *TEMPLATE(T, sparse_vec_at) (row, pc, ctx), ctx);
-            TEMPLATE(T, sparse_vec_scalar_addmul) (row, row, prow, cc, ctx);
+            TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (row, row, prow, cc, ctx);
             if (row->nnz == 0 || row->entries[0].ind >= M->c) P[r] = --remr;
         }
         /* Gaussian eliminate cols */
-        TEMPLATE(T, sparse_vec_scalar_mul) (pcol, pcol, cinv, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (pcol, pcol, cinv, ctx);
         for (j = 0; j < prow->nnz; ++j)
         {
             c = prow->entries[j].ind, col = &Mt->rows[c];
             if (c >= M->c || c == pc) continue;
             TEMPLATE(T, neg) (cc, *TEMPLATE(T, sparse_vec_at) (col, pr, ctx), ctx);
-            TEMPLATE(T, sparse_vec_scalar_addmul) (col, col, pcol, cc, ctx);
+            TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (col, col, pcol, cc, ctx);
         }
         rank += 1;
     }

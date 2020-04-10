@@ -15,7 +15,7 @@
 #include "flint.h"
 #include "nmod_sparse_vec.h"
 
-mp_limb_t nmod_sparse_vec_at(nmod_sparse_vec_t vec, slong i)
+mp_limb_t *nmod_sparse_vec_at(nmod_sparse_vec_t vec, slong i)
 {
     slong pc, pr;
     slong numr = 0, numc = 0;
@@ -24,7 +24,7 @@ mp_limb_t nmod_sparse_vec_at(nmod_sparse_vec_t vec, slong i)
     /* TODO: binary search */
     slong j;
     for (j = 0; j < vec->nnz; ++j)
-        if (vec->entries[j].ind==i) return vec->entries[j].val;
-    return 0;
+        if (vec->entries[j].ind==i) return &vec->entries[j].val;
+    return NULL;
 }
 

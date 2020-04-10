@@ -13,13 +13,17 @@
 #include <string.h>
 #include "templates.h"
 
-void TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T))(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, sparse_vec_t) v, const TEMPLATE(T, t) c, 
+void TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T))(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, sparse_vec_t) v, const TEMPLATE(T, t) c, 
                 const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, nnz, unnz, vnnz;
     TEMPLATE(T, t) tmp;
     TEMPLATE(T, sparse_entry_struct) *ue, *ve, *we;
-    if (u->nnz == 0) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (w, v, c, ctx);
+    if (u->nnz == 0) 
+    {
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (w, v, c, ctx);
+        TEMPLATE(T, sparse_vec_neg) (w, w, ctx);
+    }
     else if (v->nnz == 0 || TEMPLATE(T, is_zero) (c, ctx)) TEMPLATE(T, sparse_vec_set) (w, u, 0, ctx);
     else 
     {
@@ -34,14 +38,24 @@ void TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T))(TEMPLATE(T, sparse_vec_t
             if (ue->ind == ve->ind) 
             {
                 TEMPLATE(T, mul) (tmp, (ve--)->val, c, ctx);
-                TEMPLATE(T, add) (we->val, tmp, (ue--)->val, ctx);
+                TEMPLATE(T, sub) (we->val, tmp, (ue--)->val, ctx);
                 if (!TEMPLATE(T, is_zero) (we->val, ctx)) we--;
             }
             else if (ue->ind == we->ind) TEMPLATE(T, set) ((we--)->val, (ue--)->val, ctx);
-            else if (ve->ind == we->ind) TEMPLATE(T, mul) ((we--)->val, (ve--)->val, c, ctx);
+            else if (ve->ind == we->ind) 
+            {
+                TEMPLATE(T, mul) (we->val, (ve--)->val, c, ctx);
+                TEMPLATE(T, neg) (we->val, we->val, c, ctx); we--;
+            }
         }
         while (ue >= u->entries) we->ind = ue->ind, TEMPLATE(T, set) ((we--)->val, (ue--)->val, ctx);
-        while (ve >= v->entries) we->ind = ve->ind, TEMPLATE(T, mul) ((we--)->val, (ve--)->val, c, ctx);
+        while (ve >= v->entries) 
+        {
+            we->ind = ve->ind;
+            TEMPLATE(T, mul) (we->val, (ve--)->val, c, ctx);
+            TEMPLATE(T, neg) (we->val, we->val, c, ctx);
+            we--;
+        }
 
         nnz = w->nnz - (we + 1 - w->entries);
         if (nnz == 0) TEMPLATE(T, sparse_vec_clear) (w, ctx);

@@ -52,14 +52,6 @@ nmod_sparse_mat_struct;
 
 typedef nmod_sparse_mat_struct nmod_sparse_mat_t[1];
 
-NMOD_SPARSE_MAT_INLINE
-void _nmod_sparse_mat_set_mod(nmod_sparse_mat_t M, mp_limb_t n)
-{
-    M->mod.n = n;
-    count_leading_zeros(M->mod.norm, n);
-    invert_limb(M->mod.ninv, n << M->mod.norm);
-}
-
 /* Memory management */
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_init(nmod_sparse_mat_t M, slong rows, slong cols, nmod_t mod) 
@@ -112,10 +104,10 @@ FLINT_DLL
 void nmod_sparse_mat_from_entries(nmod_sparse_mat_t M, slong * rows, slong * cols, mp_limb_t * vals, slong nnz);
 
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_append_col(nmod_sparse_mat_t M, const mp_ptr v) 
+void nmod_sparse_mat_append_col(nmod_sparse_mat_t M, mp_srcptr v) 
 {
     slong i;
-    for (i = 0; i < M->r; ++i) _nmod_sparse_vec_append_entry(&M->rows[i], M->c, v[i]);
+    for (i = 0; i < M->r; ++i) nmod_sparse_vec_set_entry(&M->rows[i], M->c, v[i]);
     M->c += 1;
 }
 
@@ -253,12 +245,6 @@ int nmod_sparse_mat_is_zero(const nmod_sparse_mat_t M)
     return 1;
 }
 
-NMOD_SPARSE_MAT_INLINE
-int nmod_sparse_mat_is_square(const nmod_sparse_mat_t M)
-{
-    return (M->r == M->c);
-}
-
 /* Must have M->r == N->c and M->c == N->r */
 FLINT_DLL void nmod_sparse_mat_transpose(nmod_sparse_mat_t N, const nmod_sparse_mat_t M);
 
@@ -272,13 +258,13 @@ void nmod_sparse_mat_neg(nmod_sparse_mat_t N, const nmod_sparse_mat_t M)
 }
 
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_scalar_mul(nmod_sparse_mat_t N, const nmod_sparse_mat_t M, mp_limb_t c) 
+void nmod_sparse_mat_scalar_mul_nmod(nmod_sparse_mat_t N, const nmod_sparse_mat_t M, mp_limb_t c) 
 {
     if (c == UWORD(0)) nmod_sparse_mat_zero(N);
     else {
         slong i;
         nmod_sparse_mat_set(N, M);
-        for (i = 0; i < N->r; ++i) nmod_sparse_vec_scalar_mul(&N->rows[i], &N->rows[i], c, N->mod);    
+        for (i = 0; i < N->r; ++i) nmod_sparse_vec_scalar_mul_nmod(&N->rows[i], &N->rows[i], c, N->mod);    
     }
 }
 
@@ -288,27 +274,33 @@ void nmod_sparse_mat_scalar_mul_fmpz(nmod_sparse_mat_t N, const nmod_sparse_mat_
     fmpz_t d;
     fmpz_init(d);
     fmpz_mod_ui(d, c, N->mod.n);
-    nmod_sparse_mat_scalar_mul(N, M, fmpz_get_ui(d));
+    nmod_sparse_mat_scalar_mul_nmod(N, M, fmpz_get_ui(d));
     fmpz_clear(d);
 }
 
 NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_addmul(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N, mp_limb_t c) 
+void nmod_sparse_mat_scalar_addmul_nmod(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N, mp_limb_t c) 
 {
     slong i;
-    for (i = 0; i < O->r; ++i) nmod_sparse_vec_scalar_addmul(&O->rows[i], &M->rows[i], &N->rows[i], c, O->mod);
+    for (i = 0; i < O->r; ++i) nmod_sparse_vec_scalar_addmul_nmod(&O->rows[i], &M->rows[i], &N->rows[i], c, O->mod);
+}
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_scalar_submul_nmod(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N, mp_limb_t c) 
+{
+    nmod_sparse_mat_scalar_addmul_nmod(O, M, N, nmod_neg(c, O->mod));
 }
 
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_add(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N) 
 {
-    nmod_sparse_mat_addmul(O, M, N, UWORD(1));
+    nmod_sparse_mat_scalar_addmul_nmod(O, M, N, UWORD(1));
 }
 
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_sub(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N) 
 {
-    nmod_sparse_mat_addmul(O, M, N, O->mod.n-UWORD(1));
+    nmod_sparse_mat_scalar_addmul_nmod(O, M, N, O->mod.n-UWORD(1));
 }
 
 /* Matrix-vector and matrix-matrix multipliciation */
@@ -333,13 +325,8 @@ void nmod_sparse_mat_mul_mat(nmod_mat_t Y, const nmod_sparse_mat_t M, const nmod
     }
 }
 
-/* Permutations */
-/* FLINT_DLL void nmod_sparse_mat_swap_rows(nmod_sparse_mat_t M, slong * perm, slong r, slong s);
-FLINT_DLL void nmod_sparse_mat_invert_rows(nmod_sparse_mat_t M, slong * perm);
-FLINT_DLL void nmod_sparse_mat_swap_cols(nmod_sparse_mat_t M, slong * perm, slong r, slong s);
-FLINT_DLL void nmod_sparse_mat_invert_cols(nmod_sparse_mat_t M, slong * perm);
-FLINT_DLL void nmod_sparse_mat_apply_permutation(nmod_sparse_mat_t M, slong * P, slong n);
- */
+FLINT_DLL
+slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t M);
 
 /* Decomposition/reduction */
 FLINT_DLL
@@ -350,19 +337,19 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t M);
 
 /* Solve Ax = b */
 FLINT_DLL
-int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b, flint_rand_t state);
+int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, flint_rand_t state);
 
 FLINT_DLL
-int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b);
+int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b);
 
 FLINT_DLL
-int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b);
+int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b);
 
 FLINT_DLL
-int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b);
+int nmod_sparse_mat_solve_rref(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b);
 
 FLINT_DLL
-int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b, slong block_size, flint_rand_t state);
+int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, slong block_size, flint_rand_t state);
 
 FLINT_DLL
 int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, slong block_size, flint_rand_t state);
@@ -398,9 +385,6 @@ slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M);
 
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M);
-
-FLINT_DLL
-slong nmod_sparse_mat_inv(nmod_sparse_mat_t Ai, const nmod_sparse_mat_t M);
 
 /* Nullspace */
 /* NMOD_SPARSE_MAT_INLINE
