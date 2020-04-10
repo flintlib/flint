@@ -247,7 +247,7 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
 
 typedef struct
 {
-    volatile slong * i;
+    volatile mp_size_t * i;
     mp_size_t n1;
     mp_size_t n2;
     mp_size_t n;

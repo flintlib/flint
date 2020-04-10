@@ -16,7 +16,7 @@
 
 typedef struct
 {
-    volatile slong * i;
+    volatile mp_size_t * i;
     mp_size_t n1;
     mp_size_t n2;
     mp_size_t n;

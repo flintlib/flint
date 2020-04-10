@@ -16,7 +16,7 @@
 
 typedef struct
 {
-    volatile slong * i;
+    volatile mp_size_t * i;
     slong num;
     mp_size_t coeff_limbs;
     mp_size_t output_limbs;
@@ -36,7 +36,7 @@ _split_limbs_worker(void * arg_ptr)
     mp_size_t output_limbs = arg.output_limbs;
     mp_srcptr limbs = arg.limbs;
     mp_limb_t ** poly = arg.poly;
-    slong i, end;
+    mp_size_t i, end;
 
     while (1)
     {
@@ -116,7 +116,7 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
 
 typedef struct
 {
-    volatile slong * i;
+    volatile mp_size_t * i;
     slong length;
     mp_size_t coeff_limbs;
     mp_size_t output_limbs;
@@ -141,7 +141,7 @@ _split_bits_worker(void * arg_ptr)
     mp_limb_t ** poly = arg.poly;
     flint_bitcnt_t shift_bits;
     mp_srcptr limb_ptr;
-    slong i, end;
+    mp_size_t i, end;
 
     while (1)
     {
