@@ -125,11 +125,17 @@ void nmod_sparse_vec_set_entry(nmod_sparse_vec_t v, slong ind, mp_limb_t val)
 NMOD_SPARSE_VEC_INLINE
 void _nmod_sparse_vec_append_entry(nmod_sparse_vec_t v, slong ind, mp_limb_t val)
 {
-    if (val == UWORD(0)) return;
-    v->entries = flint_realloc(v->entries, (v->nnz+1)*sizeof(*v->entries));
-    v->entries[v->nnz].ind = ind;
-    v->entries[v->nnz].val = val;
-    v->nnz += 1;
+    mp_limb_t *oval = nmod_sparse_vec_at(v, ind);
+    if(oval == NULL)
+    {
+        v->entries = flint_realloc(v->entries, (v->nnz+1)*sizeof(*v->entries));
+        v->entries[v->nnz].ind = ind;
+        v->entries[v->nnz].val = val;
+        v->nnz += 1;
+        if (v->nnz >= 2 && v->entries[v->nnz-2].ind > ind)
+            qsort(v->entries, v->nnz, sizeof(*v->entries), nmod_sparse_entry_cmp);
+    }
+    else *oval = val;
 }
 
 FLINT_DLL
