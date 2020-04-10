@@ -15,7 +15,7 @@
 #include "fft_tuning.h"
 #include "flint.h"
 
-void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
+void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
                               slong len1, slong bits1, const fmpz_poly_t poly2)
 {
     slong i, len_out, loglen2;
@@ -92,14 +92,14 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
     fmpz_poly_set(pre->poly2, poly2);
 }
 
-void fmpz_poly_mul_precache_clear(fmpz_poly_precache_t pre)
+void fmpz_poly_mul_precache_clear(fmpz_poly_mul_precache_t pre)
 {
     flint_free(pre->jj);
     fmpz_poly_clear(pre->poly2);
 }
 
 void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1,
-                             slong len1, fmpz_poly_precache_t pre, slong trunc)
+                         slong len1, fmpz_poly_mul_precache_t pre, slong trunc)
 {
     slong len_out;
     slong size, i;
@@ -149,7 +149,7 @@ void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1,
 
 void
 fmpz_poly_mullow_SS_precache(fmpz_poly_t res,
-                    const fmpz_poly_t poly1, fmpz_poly_precache_t pre, slong n)
+                    const fmpz_poly_t poly1, fmpz_poly_mul_precache_t pre, slong n)
 {
     const slong len1 = poly1->length;
 

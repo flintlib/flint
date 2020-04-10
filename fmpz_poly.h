@@ -81,9 +81,9 @@ typedef struct
    slong bits2;
    slong limbs;
    fmpz_poly_t poly2;
-} fmpz_poly_precache_struct;
+} fmpz_poly_mul_precache_struct;
 
-typedef fmpz_poly_precache_struct fmpz_poly_precache_t[1];
+typedef fmpz_poly_mul_precache_struct fmpz_poly_mul_precache_t[1];
 
 /*  Memory management ********************************************************/
 
@@ -507,19 +507,19 @@ FLINT_DLL void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 /* FFT precached multiplication **********************************************/
 
-FLINT_DLL void fmpz_poly_mul_SS_precache_init(fmpz_poly_precache_t pre,
+FLINT_DLL void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
                              slong len1, slong bits1, const fmpz_poly_t poly2);
 
-FLINT_DLL void fmpz_poly_mul_precache_clear(fmpz_poly_precache_t pre);
+FLINT_DLL void fmpz_poly_mul_precache_clear(fmpz_poly_mul_precache_t pre);
 
 FLINT_DLL void _fmpz_poly_mullow_SS_precache(fmpz * output,
-       const fmpz * input1, slong len1, fmpz_poly_precache_t pre, slong trunc);
+   const fmpz * input1, slong len1, fmpz_poly_mul_precache_t pre, slong trunc);
 
 FLINT_DLL void fmpz_poly_mullow_SS_precache(fmpz_poly_t res,
-                   const fmpz_poly_t poly1, fmpz_poly_precache_t pre, slong n);
+               const fmpz_poly_t poly1, fmpz_poly_mul_precache_t pre, slong n);
 
 FMPZ_POLY_INLINE void fmpz_poly_mul_SS_precache(fmpz_poly_t res,
-                             const fmpz_poly_t poly1, fmpz_poly_precache_t pre)
+                         const fmpz_poly_t poly1, fmpz_poly_mul_precache_t pre)
 {
     fmpz_poly_mullow_SS_precache(res, poly1, pre,
 		                  FLINT_MAX(poly1->length + pre->len2 - 1, 0));

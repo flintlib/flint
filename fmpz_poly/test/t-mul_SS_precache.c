@@ -30,7 +30,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
-	fmpz_poly_precache_t pre;
+	fmpz_poly_mul_precache_t pre;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -63,7 +63,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, d;
-        fmpz_poly_precache_t pre;
+        fmpz_poly_mul_precache_t pre;
 	int k;
 
         fmpz_poly_init(a);
