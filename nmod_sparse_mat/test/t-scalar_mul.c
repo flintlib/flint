@@ -45,8 +45,8 @@ main(void)
 
         nmod_sparse_mat_randtest(A, state, 0, c);
 
-        nmod_sparse_mat_scalar_mul(B, A, c);
-        nmod_sparse_mat_scalar_mul(C, A, nmod_sub(c, UWORD(1), A->mod));
+        nmod_sparse_mat_scalar_mul_nmod(B, A, c);
+        nmod_sparse_mat_scalar_mul_nmod(C, A, nmod_sub(c, UWORD(1), A->mod));
 
         /* c*A - (c-1)*A == A */
         nmod_sparse_mat_sub(D, B, C);
@@ -58,8 +58,8 @@ main(void)
         }
 
          /* Aliasing */
-        nmod_sparse_mat_scalar_mul(C, A, c);
-        nmod_sparse_mat_scalar_mul(A, A, c);
+        nmod_sparse_mat_scalar_mul_nmod(C, A, c);
+        nmod_sparse_mat_scalar_mul_nmod(A, A, c);
 
         if (!nmod_sparse_mat_equal(A, C))
         {

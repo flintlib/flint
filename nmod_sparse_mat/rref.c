@@ -54,8 +54,8 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t M)
         if(pr == -1) continue;
         P[pr] = rank; 
 
-        cinv = nmod_inv(nmod_sparse_vec_at(prow, pc), M->mod);
-        nmod_sparse_vec_scalar_mul(prow, prow, cinv, M->mod);
+        cinv = nmod_inv(*nmod_sparse_vec_at(prow, pc), M->mod);
+        nmod_sparse_vec_scalar_mul_nmod(prow, prow, cinv, M->mod);
 
         /* Gaussian eliminate rows */
         for (j = 0; j < pcol->nnz; ++j)
@@ -63,18 +63,18 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t M)
             r = pcol->entries[j].ind, row = &M->rows[r];
             if(r==pr) {pcol->entries[j].val = UWORD(0); continue;}
 
-            cc = nmod_neg(nmod_sparse_vec_at(row, pc), M->mod);
-            nmod_sparse_vec_scalar_addmul(row, row, prow, cc, M->mod);
+            cc = nmod_neg(*nmod_sparse_vec_at(row, pc), M->mod);
+            nmod_sparse_vec_scalar_addmul_nmod(row, row, prow, cc, M->mod);
             if (row->nnz == 0 || row->entries[0].ind >= M->c) P[r] = --remr;
         }
         /* Gaussian eliminate cols */
-        nmod_sparse_vec_scalar_mul(pcol, pcol, cinv, M->mod);
+        nmod_sparse_vec_scalar_mul_nmod(pcol, pcol, cinv, M->mod);
         for (j = 0; j < prow->nnz; ++j)
         {
             c = prow->entries[j].ind, col = &Mt->rows[c];
             if(c >= M->c || c==pc) continue;
-            cc = nmod_neg(nmod_sparse_vec_at(col, pr), M->mod);
-            nmod_sparse_vec_scalar_addmul(col, col, pcol, cc, M->mod);
+            cc = nmod_neg(*nmod_sparse_vec_at(col, pr), M->mod);
+            nmod_sparse_vec_scalar_addmul_nmod(col, col, pcol, cc, M->mod);
         }
         rank += 1;
     }

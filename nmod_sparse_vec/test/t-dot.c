@@ -29,7 +29,7 @@ main(void)
     FLINT_TEST_INIT(state);
     
 
-    flint_printf("dot product....\n");
+    flint_printf("dot product....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000; rep++)

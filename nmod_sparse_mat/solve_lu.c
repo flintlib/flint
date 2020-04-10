@@ -17,7 +17,7 @@
 #include "nmod_sparse_mat.h"
 
 /* PAQ = LU, Ax = b => set b' = Pb, solve Ly = b', solve Ux' = y, set x = Qx' */
-int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b)
+int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b)
 {
     int good = 1;
     slong rk, *P, *Q, i, j;

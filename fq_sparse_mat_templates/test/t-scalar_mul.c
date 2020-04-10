@@ -44,10 +44,10 @@ main(void)
 
         TEMPLATE(T, sparse_mat_randtest) (A, state, 0, c, ctx);
 
-        TEMPLATE(T, sparse_mat_scalar_mul) (B, A, a, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_mat_scalar_mul, T)) (B, A, a, ctx);
         TEMPLATE(T, one) (cc, ctx);
         TEMPLATE(T, sub) (cc, a, cc, ctx);
-        TEMPLATE(T, sparse_mat_scalar_mul) (C, A, cc, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_mat_scalar_mul, T)) (C, A, cc, ctx);
 
         /* c*A - (c-1)*A == A */
         TEMPLATE(T, sparse_mat_sub) (D, B, C, ctx);
@@ -59,8 +59,8 @@ main(void)
         }
 
          /* Aliasing */
-        TEMPLATE(T, sparse_mat_scalar_mul) (C, A, a, ctx);
-        TEMPLATE(T, sparse_mat_scalar_mul) (A, A, a, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_mat_scalar_mul, T)) (C, A, a, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_mat_scalar_mul, T)) (A, A, a, ctx);
 
         if (!TEMPLATE(T, sparse_mat_equal) (A, C, ctx))
         {

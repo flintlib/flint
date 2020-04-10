@@ -55,7 +55,7 @@ main(void)
         
         /* Check that L is lower triangular (with ones on diagonal up to rank) */
         for (i = 0; i < r; ++i) {
-            if(i < rk && nmod_sparse_vec_at(&L->rows[i], i) != UWORD(1))
+            if(i < rk && *nmod_sparse_vec_at(&L->rows[i], i) != UWORD(1))
             {
                 flint_printf("FAIL: L does not have unit diagonal up to the rank\n");
             }
@@ -74,7 +74,7 @@ main(void)
         }
         /* Check that U is upper triangular (with nonzero diagonal up to rank) */
         for (i = 0; i < r; ++i) {
-            if(i < rk && nmod_sparse_vec_at(&U->rows[i], i) == UWORD(0))
+            if(i < rk && *nmod_sparse_vec_at(&U->rows[i], i) == UWORD(0))
             {
                 flint_printf("FAIL: U does not have nonzero diagonal\n");
                 abort();

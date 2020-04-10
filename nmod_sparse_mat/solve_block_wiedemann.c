@@ -185,7 +185,7 @@ static void make_block_sum(mp_ptr x, const nmod_mat_struct *S, const slong *d, c
     _nmod_vec_clear(xi);
 }
 
-int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b, slong block_size, flint_rand_t state)
+int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, slong block_size, flint_rand_t state)
 {
     int good = 0, ret;
     slong i;

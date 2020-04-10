@@ -83,6 +83,10 @@ void nmod_sparse_vec_swap(nmod_sparse_vec_t vec1, nmod_sparse_vec_t vec2)
     *tmp = *vec1, *vec1 = *vec2, *vec2 = *tmp;
 }
 
+/* Vector indexing */
+FLINT_DLL 
+mp_limb_t * nmod_sparse_vec_at(nmod_sparse_vec_t vec, slong i);
+
 /* One-time instantiation */
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_zero(nmod_sparse_vec_t vec) 
@@ -103,18 +107,23 @@ FLINT_DLL
 void nmod_sparse_vec_set(nmod_sparse_vec_t vec, const nmod_sparse_vec_t src, slong ioff);
 
 NMOD_SPARSE_VEC_INLINE
-void _nmod_sparse_vec_append_entry(nmod_sparse_vec_t v, slong ind, mp_limb_t val)
+void nmod_sparse_vec_set_entry(nmod_sparse_vec_t v, slong ind, mp_limb_t val)
 {
-    if (val == UWORD(0)) return;
-    v->entries = flint_realloc(v->entries, (v->nnz+1)*sizeof(*v->entries));
-    v->entries[v->nnz].ind = ind;
-    v->entries[v->nnz].val = val;
-    v->nnz += 1;
+    mp_limb_t *oval = nmod_sparse_vec_at(v, ind);
+    if(oval == NULL)
+    {
+        v->entries = flint_realloc(v->entries, (v->nnz+1)*sizeof(*v->entries));
+        v->entries[v->nnz].ind = ind;
+        v->entries[v->nnz].val = val;
+        v->nnz += 1;
+        if (v->nnz >= 2 && v->entries[v->nnz-2].ind > ind)
+            qsort(v->entries, v->nnz, sizeof(*v->entries), nmod_sparse_entry_cmp);
+    }
+    else *oval = val;
 }
 
 FLINT_DLL
 void nmod_sparse_vec_from_entries(nmod_sparse_vec_t vec, slong * inds, mp_limb_t * vals, slong nnz);
-
 
 /* Vector comparison */
 NMOD_SPARSE_VEC_INLINE
@@ -125,10 +134,6 @@ int nmod_sparse_vec_is_zero(const nmod_sparse_vec_t vec)
 
 FLINT_DLL
 int nmod_sparse_vec_equal(const nmod_sparse_vec_t vec1, const nmod_sparse_vec_t vec2, slong ioff);
-
-/* Vector indexing */
-FLINT_DLL 
-mp_limb_t nmod_sparse_vec_at(nmod_sparse_vec_t vec, slong i);
 
 /* Convert from/to dense vector */
 FLINT_DLL
@@ -185,7 +190,7 @@ void nmod_sparse_vec_neg(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, nmod_t 
 }
 
 FLINT_DLL
-void nmod_sparse_vec_scalar_mul(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, mp_limb_t c, nmod_t mod);
+void nmod_sparse_vec_scalar_mul_nmod(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, mp_limb_t c, nmod_t mod);
 
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_scalar_mul_fmpz(nmod_sparse_vec_t v, const nmod_sparse_vec_t u, const fmpz_t c, nmod_t mod)
@@ -193,23 +198,29 @@ void nmod_sparse_vec_scalar_mul_fmpz(nmod_sparse_vec_t v, const nmod_sparse_vec_
     fmpz_t d;
     fmpz_init(d);
     fmpz_mod_ui(d, c, mod.n);
-    nmod_sparse_vec_scalar_mul(v, u, fmpz_get_ui(d), mod);
+    nmod_sparse_vec_scalar_mul_nmod(v, u, fmpz_get_ui(d), mod);
     fmpz_clear(d);
 }
 
 FLINT_DLL 
-void nmod_sparse_vec_scalar_addmul(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, mp_limb_t c, nmod_t mod);
+void nmod_sparse_vec_scalar_addmul_nmod(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, const mp_limb_t c, nmod_t mod);
+
+NMOD_SPARSE_VEC_INLINE
+void nmod_sparse_vec_scalar_submul_nmod(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, const mp_limb_t c, nmod_t mod)
+{
+    nmod_sparse_vec_scalar_addmul_nmod(w, u, v, nmod_neg(c, mod), mod);
+}
 
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_add(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
 {
-    nmod_sparse_vec_scalar_addmul(w, u, v, UWORD(1), mod);
+    nmod_sparse_vec_scalar_addmul_nmod(w, u, v, UWORD(1), mod);
 }
 
 NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_sub(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
 {
-    nmod_sparse_vec_scalar_addmul(w, u, v, mod.n-1, mod);
+    nmod_sparse_vec_scalar_addmul_nmod(w, u, v, mod.n-1, mod);
 }
 
 FLINT_DLL

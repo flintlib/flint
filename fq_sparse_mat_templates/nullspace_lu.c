@@ -35,7 +35,7 @@ slong TEMPLATE(T, sparse_mat_nullspace_lu) (TEMPLATE(T, mat_t) X, const TEMPLATE
     for (i = 0; i < rk; ++i)
     {
         TEMPLATE(T, inv) (cc, U->rows[i].entries[0].val, ctx);
-        TEMPLATE(T, sparse_vec_scalar_mul) (&U->rows[i], &U->rows[i], cc, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (&U->rows[i], &U->rows[i], cc, ctx);
     }
     TEMPLATE(T, mat_init) (X, M->c, M->c-rk, ctx);
     if (rk != M->c) 

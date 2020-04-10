@@ -16,7 +16,7 @@
 #include "nmod_sparse_mat.h"
 
 
-int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, const mp_ptr b, flint_rand_t state)
+int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, flint_rand_t state)
 {
     slong j, ret;
     const slong nlimbs = _nmod_vec_dot_bound_limbs(M->c, M->mod);

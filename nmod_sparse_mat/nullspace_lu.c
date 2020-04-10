@@ -32,7 +32,7 @@ slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M)
     flint_free(P);
     nmod_sparse_mat_clear(L);
     for (i = 0; i < rk; ++i)
-        nmod_sparse_vec_scalar_mul(&U->rows[i], &U->rows[i], nmod_inv(U->rows[i].entries[0].val, M->mod), M->mod);
+        nmod_sparse_vec_scalar_mul_nmod(&U->rows[i], &U->rows[i], nmod_inv(U->rows[i].entries[0].val, M->mod), M->mod);
     nmod_mat_init(X, M->c, M->c-rk, M->mod.n);
     if (rk != M->c) 
     {
