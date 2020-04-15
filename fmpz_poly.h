@@ -1365,6 +1365,10 @@ FLINT_DLL void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
                                         slong num_factors, ulong phi);
 FLINT_DLL void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n);
 
+FLINT_DLL ulong _fmpz_poly_is_cyclotomic(const fmpz * poly, slong len);
+
+FLINT_DLL ulong fmpz_poly_is_cyclotomic(const fmpz_poly_t poly);
+
 FLINT_DLL void _fmpz_poly_cos_minpoly(fmpz * f, ulong n);
 
 FLINT_DLL void fmpz_poly_cos_minpoly(fmpz_poly_t f, ulong n);
