@@ -18,6 +18,16 @@ TEMPLATE(T, mat_mul) (TEMPLATE(T, mat_t) C,
                       const TEMPLATE(T, mat_t) A,
                       const TEMPLATE(T, mat_t) B, const TEMPLATE(T, ctx_t) ctx)
 {
+    if (C == A || C == B)
+    {
+        TEMPLATE(T, mat_t) TT;
+        TEMPLATE(T, mat_init) (TT, A->r, B->c, ctx);
+        TEMPLATE(T, mat_mul) (TT, A, B, ctx);
+        TEMPLATE(T, mat_swap) (TT, C, ctx);
+        TEMPLATE(T, mat_clear) (TT, ctx);
+        return;
+    }
+
     if (TEMPLATE(CAP_T, MAT_MUL_KS_CUTOFF) (A->r, B->c, ctx))
         TEMPLATE(T, mat_mul_KS) (C, A, B, ctx);
     else

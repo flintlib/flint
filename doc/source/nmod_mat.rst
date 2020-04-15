@@ -274,8 +274,8 @@ Matrix multiplication
 .. function:: void nmod_mat_mul(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
-    `C` is not allowed to be aliased with `A` or `B`. This function
-    automatically chooses between classical and Strassen multiplication.
+    Aliasing is allowed. This function automatically chooses between classical
+    and Strassen multiplication.
 
 .. function:: void _nmod_mat_mul_classical(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
 
