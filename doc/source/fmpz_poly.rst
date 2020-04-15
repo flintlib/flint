@@ -3260,6 +3260,14 @@ Minimal polynomials
     We factor `n` into `n = qs` where `q` is squarefree,
     and compute `\Phi_q(x)`. Then `\Phi_n(x) = \Phi_q(x^s)`.
 
+.. function:: ulong _fmpz_poly_is_cyclotomic(const fmpz * poly, slong len)
+
+.. function:: ulong fmpz_poly_is_cyclotomic(fmpz_poly_t poly)
+
+    If ``poly`` is a cyclotomic polynomial, returns the index `n` of this
+    cyclotomic polynomial. If ``poly`` is not a cyclotomic polynomial,
+    returns 0.
+
 .. function:: void _fmpz_poly_cos_minpoly(fmpz * coeffs, ulong n)
 
 .. function:: void fmpz_poly_cos_minpoly(fmpz_poly_t poly, ulong n)
