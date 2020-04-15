@@ -127,6 +127,14 @@ Accessing the numerator and denominator
     
     This function is implemented as a macro returning ``(poly)->den``.
 
+.. function:: void fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
+
+    Sets ``res`` to the numerator of ``poly``, e.g. the primitive part
+    as an ``fmpz_poly_t`` if it is in cannoical form .
+
+.. function:: void fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly)
+
+    Sets ``res`` to the denominator of ``poly``.
 
 Random testing
 --------------------------------------------------------------------------------
@@ -201,7 +209,7 @@ Assignment, swap, negation
 
 .. function:: void fmpq_poly_set_nmod_poly(fmpq_poly_t rop, const nmod_poly_t op)
 
-    Sets the coefficients of ``op`` to the residues in ``op``,
+    Sets the coefficients of ``rop`` to the residues in ``op``,
     normalised to the interval `-m/2 \le r < m/2` where `m` is the modulus.
 
 .. function:: void fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op)
@@ -321,6 +329,10 @@ Assignment, swap, negation
 Getting and setting coefficients
 --------------------------------------------------------------------------------
 
+
+.. function:: void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n)
+
+    Retrieves the `n`th coefficient of the numerator of ``poly``.
 
 .. function:: void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, slong n)
 
@@ -493,7 +505,7 @@ Addition and subtraction
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
 
-.. function:: void _fmpq_poly_series_sub(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
+.. function:: void _fmpq_poly_sub_series(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 
     As per ``_fmpq_poly_sub`` but the inputs are first notionally truncated
     to length `n`. If `n` is less than ``len1`` or ``len2`` then the
@@ -631,17 +643,13 @@ Scalar multiplication and division
     ``(rpoly, poly)``.
 
 .. function:: void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
+              void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
+              void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz_t c)
+              void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c)
+              void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
+              void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c)
 
-.. function:: void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
-
-.. function:: void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz_t c);
-
-.. function:: void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c);
-
-.. function:: void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c);
-
-.. function:: void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c);
-
+    Sets ``rop`` to ``op`` divided by the scalar ``c``.
 
 Multiplication
 --------------------------------------------------------------------------------
@@ -800,14 +808,12 @@ Euclidean division
 .. function:: void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)
 
     Clean up resources used by precomputed powers which have been computed
-    by\\
-    ``_fmpq_poly_powers_precompute``.
+    by ``_fmpq_poly_powers_precompute``.
 
 .. function:: void fmpq_poly_powers_clear(fmpq_poly_powers_precomp_t pinv)
 
     Clean up resources used by precomputed powers which have been computed
-    by\\
-    ``fmpq_poly_powers_precompute``.
+    by ``fmpq_poly_powers_precompute``.
 
 .. function:: void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, const fmpz * B, const fmpz_t denB, slong n, const fmpq_poly_struct * const powers)
 
@@ -972,7 +978,7 @@ Greatest common divisor
     the resultant is zero.  Note that otherwise if one of the polynomials is 
     constant, the last term in the above expression is the empty product.
 
-.. function:: void fmpq_poly_resultant_(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g, fmpz_t div, slong nbits)
+.. function:: void fmpq_poly_resultant_div(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g, fmpz_t div, slong nbits)
 
     Returns the resultant of `f` and `g` divided by ``div`` under the
     assumption that the result has at most ``nbits`` bits. The result must

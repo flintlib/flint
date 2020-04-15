@@ -651,9 +651,15 @@ FLINT_DLL void fmpq_poly_tanh_series(fmpq_poly_t res, const fmpq_poly_t poly, sl
 
 /* Orthogonal polynomials  ***************************************************/
 
+FLINT_DLL void _fmpq_poly_legendre_p(fmpz * coeffs, fmpz_t den, ulong n);
+
 FLINT_DLL void fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n);
 
+FLINT_DLL void _fmpq_poly_laguerre_l(fmpz * coeffs, fmpz_t den, ulong n);
+
 FLINT_DLL void fmpq_poly_laguerre_l(fmpq_poly_t poly, ulong n);
+
+FLINT_DLL void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, const fmpq_t a);
 
 FLINT_DLL void fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, const fmpq_t a);
 
