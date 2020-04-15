@@ -111,6 +111,17 @@ main(void)
             abort();
         }
 
+        if (n == k)
+        {
+            nmod_mat_mul(A, A, B);
+
+            if (!nmod_mat_equal(A, C))
+            {
+                flint_printf("FAIL: aliasing failed\n");
+                flint_abort();
+            }
+        }
+
         nmod_mat_clear(A);
         nmod_mat_clear(B);
         nmod_mat_clear(C);

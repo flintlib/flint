@@ -260,9 +260,8 @@ Matrix multiplication
 .. function:: void fq_mat_mul(fq_mat_t C, const fq_mat_t A, const fq_mat_t B, const fq_ctx_t ctx)
 
     Sets `C = AB`. Dimensions must be compatible for matrix
-    multiplication.  `C` is not allowed to be aliased with `A` or
-    `B`. This function automatically chooses between classical and
-    KS multiplication.
+    multiplication.  Aliasing is allowed. This function automatically chooses
+    between classical and KS multiplication.
 
 .. function:: void fq_mat_mul_classical(fq_mat_t C, const fq_mat_t A, const fq_mat_t B, const fq_ctx_t ctx)
 

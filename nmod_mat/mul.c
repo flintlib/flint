@@ -26,6 +26,16 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     k = A->c;
     n = B->c;
 
+    if (C == A || C == B)
+    {
+        nmod_mat_t T;
+        nmod_mat_init(T, m, n, A->mod.n);
+        nmod_mat_mul(T, A, B);
+        nmod_mat_swap(C, T);
+        nmod_mat_clear(T);
+        return;
+    }
+
     if (FLINT_BITS == 64 && C->mod.n < 2048)
         cutoff = 400;
     else
