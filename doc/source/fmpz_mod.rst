@@ -64,7 +64,7 @@ Comparison of elements against each other or against zero can be accomplished wi
 .. function:: void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
 
     Set `a` to `b^{-1}` modulo `n`.
-    This function expects that `b` is not invertible modulo `n` and throws if this not the case.
+    This function expects that `b` is invertible modulo `n` and throws if this not the case.
     Invertibility maybe tested with func:`fmpz_mod_pow_fmpz` or func:`fmpz_mod_divides`.
 
 .. function:: int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
