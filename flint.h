@@ -174,7 +174,7 @@ FLINT_DLL void flint_reset_num_workers(int max_workers);
 FLINT_DLL int flint_set_thread_affinity(int * cpus, slong length);
 FLINT_DLL int flint_restore_thread_affinity();
 
-int flint_test_multiplier(void);
+FLINT_DLL int flint_test_multiplier(void);
 
 typedef struct
 {

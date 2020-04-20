@@ -106,7 +106,8 @@ main(void)
 
         if (n == m)
         {
-            TEMPLATE(T, mat_mul) (A, A, B, ctx);
+            TEMPLATE(T, mat_mul) (C, A, B, ctx);
+	    TEMPLATE(T, mat_mul) (A, A, B, ctx);
 
             if (!TEMPLATE(T, mat_equal) (A, C, ctx))
             {

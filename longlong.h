@@ -323,7 +323,9 @@
 #define __ll_highpart(t) ((mp_limb_t) (t) >> (GMP_LIMB_BITS / 2))
 #define __highbit (~(mp_limb_t)0 ^ ((~(mp_limb_t)0) >> 1))
 
+#ifndef NEED_CLZ_TAB
 #define NEED_CLZ_TAB
+#endif
 
 #if !(GMP_LIMB_BITS == 32 && defined (__arm__))
 #if !(GMP_LIMB_BITS == 64 && defined (__ia64))
