@@ -219,8 +219,6 @@ FLINT_DLL void arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_
 
 /* Number of partitions ******************************************************/
 
-FLINT_DLL const unsigned int partitions_lookup[128];
-
 FLINT_DLL void arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod);
 FLINT_DLL void arith_number_of_partitions_vec(fmpz * res, slong len);
 FLINT_DLL void arith_number_of_partitions_mpfr(mpfr_t x, ulong n);
