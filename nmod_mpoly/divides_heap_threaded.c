@@ -1706,7 +1706,7 @@ int _nmod_mpoly_divides_heap_threaded(
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
     const nmod_mpoly_ctx_t ctx,
-    thread_pool_handle * handles,
+    const thread_pool_handle * handles,
     slong num_handles)
 {
     ulong mask;

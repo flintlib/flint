@@ -546,21 +546,23 @@ static int _try_divides(
     nmod_mpoly_t G,
     const nmod_mpoly_t A, int try_a,
     const nmod_mpoly_t B, int try_b,
-    const nmod_mpoly_ctx_t ctx)
+    const nmod_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     int success;
     nmod_mpoly_t Q;
 
     nmod_mpoly_init(Q, ctx);
 
-    if (try_b && nmod_mpoly_divides_threaded(Q, A, B, ctx, 1))
+    if (try_b && _nmod_mpoly_divides(Q, A, B, ctx, handles, num_handles))
     {
         nmod_mpoly_set(G, B, ctx);
         success = 1;
         goto cleanup;
     }
 
-    if (try_a && nmod_mpoly_divides_threaded(Q, B, A, ctx, 1))
+    if (try_a && _nmod_mpoly_divides(Q, B, A, ctx, handles, num_handles))
     {
         nmod_mpoly_set(G, A, ctx);
         success = 1;
@@ -1057,8 +1059,11 @@ calculate_trivial_gcd:
         if (gcd_is_trivial)
             goto calculate_trivial_gcd;
 
-        if ((try_a || try_b) && _try_divides(G, A, try_a, B, try_b, ctx))
+        if ((try_a || try_b) &&
+            _try_divides(G, A, try_a, B, try_b, ctx, handles, num_handles))
+        {
             goto successful;
+        }
     }
 
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
@@ -1102,18 +1107,19 @@ cleanup:
 }
 
 
-int nmod_mpoly_gcd_threaded(
+int nmod_mpoly_gcd(
     nmod_mpoly_t G,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
-    const nmod_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const nmod_mpoly_ctx_t ctx)
 {
-    slong i;
     flint_bitcnt_t Gbits;
     int success;
     thread_pool_handle * handles;
     slong num_handles;
+    slong thread_limit;
+
+    thread_limit = FLINT_MIN(A->length, B->length)/256;
 
     if (nmod_mpoly_is_zero(A, ctx))
     {
@@ -1134,35 +1140,9 @@ int nmod_mpoly_gcd_threaded(
 
     if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS)
     {
-        /* usual gcd's go right down here */
-
-        /* get workers */
-        handles = NULL;
-        num_handles = 0;
-        if (global_thread_pool_initialized)
-        {
-            slong max_num_handles = thread_pool_get_size(global_thread_pool);
-            max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-            if (max_num_handles > 0)
-            {
-                handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_handles*sizeof(thread_pool_handle));
-                num_handles = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_handles);
-            }
-        }
-
+        num_handles = flint_request_threads(&handles, thread_limit);
         success = _nmod_mpoly_gcd(G, Gbits, A, B, ctx, handles, num_handles);
-
-        for (i = 0; i < num_handles; i++)
-        {
-            thread_pool_give_back(global_thread_pool, handles[i]);
-        }
-        if (handles)
-        {
-            flint_free(handles);
-        }
-
+        flint_give_back_threads(handles, num_handles);
         return success;
     }
 
@@ -1187,34 +1167,38 @@ int nmod_mpoly_gcd_threaded(
         */
 
         int success;
-        int useAnew = 0;
-        int useBnew = 0;
         slong k;
         fmpz * Ashift, * Astride;
         fmpz * Bshift, * Bstride;
         fmpz * Gshift, * Gstride;
-        nmod_mpoly_t Anew;
-        nmod_mpoly_t Bnew;
+        nmod_mpoly_t Anew, Bnew;
+        const nmod_mpoly_struct * Ause, * Buse;
 
         nmod_mpoly_init(Anew, ctx);
         nmod_mpoly_init(Bnew, ctx);
 
+        Ause = A;
         if (A->bits > FLINT_BITS)
         {
-            useAnew = nmod_mpoly_repack_bits(Anew, A, FLINT_BITS, ctx);
-            if (!useAnew)
+            if (!nmod_mpoly_repack_bits(Anew, A, FLINT_BITS, ctx))
                 goto could_not_repack;
+            Ause = Anew;
         }
 
+        Buse = B;
         if (B->bits > FLINT_BITS)
         {
-            useBnew = nmod_mpoly_repack_bits(Bnew, B, FLINT_BITS, ctx);
-            if (!useBnew)
+            if (!nmod_mpoly_repack_bits(Bnew, B, FLINT_BITS, ctx))
                 goto could_not_repack;
+            Buse = Bnew;
         }
 
-        success = _nmod_mpoly_gcd(G, FLINT_BITS, useAnew ? Anew : A,
-                                             useBnew ? Bnew : B, ctx, NULL, 0);
+        num_handles = flint_request_threads(&handles, thread_limit);
+        Gbits = FLINT_MIN(Ause->bits, Buse->bits);
+        success = _nmod_mpoly_gcd(G, Gbits, Ause, Buse, ctx,
+                                                         handles, num_handles);
+        flint_give_back_threads(handles, num_handles);
+
         goto cleanup;
 
 could_not_repack:
@@ -1255,7 +1239,12 @@ could_not_repack:
                 goto deflate_cleanup;
         }
 
-        success = _nmod_mpoly_gcd(G, FLINT_BITS, Anew, Bnew, ctx, NULL, 0);
+
+        num_handles = flint_request_threads(&handles, thread_limit);
+        Gbits = FLINT_MIN(Anew->bits, Bnew->bits);
+        success = _nmod_mpoly_gcd(G, Gbits, Anew, Bnew, ctx,
+                                                         handles, num_handles);
+        flint_give_back_threads(handles, num_handles);
 
         if (success)
         {
@@ -1280,14 +1269,4 @@ cleanup:
         return success;
     }
 }
-
-int nmod_mpoly_gcd(
-    nmod_mpoly_t G,
-    const nmod_mpoly_t A,
-    const nmod_mpoly_t B,
-    const nmod_mpoly_ctx_t ctx)
-{
-    return nmod_mpoly_gcd_threaded(G, A, B, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
-}
-
 

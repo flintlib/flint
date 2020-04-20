@@ -251,7 +251,7 @@ main(void)
     flint_printf("gcd_cofactors....");
     fflush(stdout);
 
-    if (0) {
+    {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t g, abar, bbar, a, b, t;
         const char * vars[] = {"t" ,"x", "y", "z"};
@@ -318,6 +318,8 @@ main(void)
         nmod_mpoly_set(t, g, ctx);
 
         gcd_check(g, abar, bbar, a, b, t, ctx, i, 0, "dense examples");
+
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
 
         nmod_mpoly_clear(a, ctx);
         nmod_mpoly_clear(b, ctx);

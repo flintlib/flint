@@ -70,7 +70,7 @@ void mpoly_degrees_si_threaded(
     slong len,
     flint_bitcnt_t bits,
     const mpoly_ctx_t mctx,
-    thread_pool_handle * handles,
+    const thread_pool_handle * handles,
     slong num_handles)
 {
     slong i, j;

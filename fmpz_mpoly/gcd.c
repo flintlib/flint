@@ -573,7 +573,9 @@ static int _try_divides(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A, int try_a,
     const fmpz_mpoly_t B, int try_b,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles)
 {
     int success;
     fmpz_t cA, cB, cG;
@@ -613,14 +615,20 @@ static int _try_divides(
     fmpz_divexact(cA, cA, cG);
     fmpz_divexact(cB, cB, cG);
 
-    if (try_b && fmpz_mpoly_divides_threaded(Q, AA, BB, ctx, 1))
+    if (try_b &&
+        ((num_handles > 0) ? _fmpz_mpoly_divides_heap_threaded(Q, AA, BB,
+                                                     ctx, handles, num_handles)
+                           : fmpz_mpoly_divides_monagan_pearce(Q, AA, BB, ctx)))
     {
         fmpz_mpoly_scalar_divexact_fmpz(G, B, cB, ctx);
         success = 1;
         goto cleanup;
     }
 
-    if (try_a && fmpz_mpoly_divides_threaded(Q, BB, AA, ctx, 1))
+    if (try_a &&
+        ((num_handles > 0) ? _fmpz_mpoly_divides_heap_threaded(Q, BB, AA,
+                                                     ctx, handles, num_handles)
+                           : fmpz_mpoly_divides_monagan_pearce(Q, BB, AA, ctx)))
     {
         fmpz_mpoly_scalar_divexact_fmpz(G, A, cA, ctx);
         success = 1;
@@ -1320,8 +1328,11 @@ calculate_trivial_gcd:
         if (gcd_is_trivial)
             goto calculate_trivial_gcd;
 
-        if ((try_a || try_b) && _try_divides(G, A, try_a, B, try_b, ctx))
+        if ((try_a || try_b) &&
+            _try_divides(G, A, try_a, B, try_b, ctx, handles, num_handles))
+        {
             goto successful;
+        }
     }
 
     mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
@@ -1382,18 +1393,19 @@ cleanup:
 }
 
 
-int fmpz_mpoly_gcd_threaded(
+int fmpz_mpoly_gcd(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const fmpz_mpoly_ctx_t ctx)
 {
-    slong i;
     flint_bitcnt_t Gbits;
     int success;
     thread_pool_handle * handles;
     slong num_handles;
+    slong thread_limit;
+
+    thread_limit = FLINT_MIN(A->length, B->length)/256;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {
@@ -1432,35 +1444,9 @@ int fmpz_mpoly_gcd_threaded(
 
     if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS)
     {
-        /* usual gcd's go right down here */
-
-        /* get workers */
-        handles = NULL;
-        num_handles = 0;
-        if (global_thread_pool_initialized)
-        {
-            slong max_num_handles = thread_pool_get_size(global_thread_pool);
-            max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-            if (max_num_handles > 0)
-            {
-                handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_handles*sizeof(thread_pool_handle));
-                num_handles = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_handles);
-            }
-        }
-
+        num_handles = flint_request_threads(&handles, thread_limit);
         success = _fmpz_mpoly_gcd(G, Gbits, A, B, ctx, handles, num_handles);
-
-        for (i = 0; i < num_handles; i++)
-        {
-            thread_pool_give_back(global_thread_pool, handles[i]);
-        }
-        if (handles)
-        {
-            flint_free(handles);
-        }
-
+        flint_give_back_threads(handles, num_handles);
         return success;
     }
 
@@ -1484,35 +1470,38 @@ int fmpz_mpoly_gcd_threaded(
             Then, try deflation as a last resort.
         */
 
-        int success;
-        int useAnew = 0;
-        int useBnew = 0;
         slong k;
         fmpz * Ashift, * Astride;
         fmpz * Bshift, * Bstride;
         fmpz * Gshift, * Gstride;
-        fmpz_mpoly_t Anew;
-        fmpz_mpoly_t Bnew;
+        fmpz_mpoly_t Anew, Bnew;
+        const fmpz_mpoly_struct * Ause, * Buse;
 
         fmpz_mpoly_init(Anew, ctx);
         fmpz_mpoly_init(Bnew, ctx);
 
+        Ause = A;
         if (A->bits > FLINT_BITS)
         {
-            useAnew = fmpz_mpoly_repack_bits(Anew, A, FLINT_BITS, ctx);
-            if (!useAnew)
+            if (!fmpz_mpoly_repack_bits(Anew, A, FLINT_BITS, ctx))
                 goto could_not_repack;
+            Ause = Anew;
         }
 
+        Buse = B;
         if (B->bits > FLINT_BITS)
         {
-            useBnew = fmpz_mpoly_repack_bits(Bnew, B, FLINT_BITS, ctx);
-            if (!useBnew)
+            if (!fmpz_mpoly_repack_bits(Bnew, B, FLINT_BITS, ctx))
                 goto could_not_repack;
+            Buse = Bnew;
         }
 
-        success = _fmpz_mpoly_gcd(G, FLINT_BITS, useAnew ? Anew : A,
-                                             useBnew ? Bnew : B, ctx, NULL, 0);
+        num_handles = flint_request_threads(&handles, thread_limit);
+        Gbits = FLINT_MIN(Ause->bits, Buse->bits);
+        success = _fmpz_mpoly_gcd(G, Gbits, Ause, Buse, ctx,
+                                                         handles, num_handles);
+        flint_give_back_threads(handles, num_handles);
+
         goto cleanup;
 
 could_not_repack:
@@ -1553,7 +1542,11 @@ could_not_repack:
                 goto deflate_cleanup;
         }
 
-        success = _fmpz_mpoly_gcd(G, FLINT_BITS, Anew, Bnew, ctx, NULL, 0);
+        num_handles = flint_request_threads(&handles, thread_limit);
+        Gbits = FLINT_MIN(Anew->bits, Bnew->bits);
+        success = _fmpz_mpoly_gcd(G, Gbits, Anew, Bnew, ctx,
+                                                         handles, num_handles);
+        flint_give_back_threads(handles, num_handles);
 
         if (success)
         {
@@ -1583,14 +1576,5 @@ cleanup:
 
         return success;
     }
-}
-
-int fmpz_mpoly_gcd(
-    fmpz_mpoly_t G,
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx)
-{
-    return fmpz_mpoly_gcd_threaded(G, A, B, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
 }
 
