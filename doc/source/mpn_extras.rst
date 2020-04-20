@@ -31,6 +31,17 @@ Utility functions
     Returns `1` if all limbs of ``(x, xsize)`` are zero, otherwise `0`.
 
 
+Multiplication
+--------------------------------------------------------------------------------
+
+
+.. function:: mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1, mp_limb_t a2, mp_srcptr x2, mp_size_t n);
+
+    Given not-necessarily-normalized `x_1` and `x_2` of length `n > 0` and output `y` of length `n`, try to compute `y = a_1*x_1 - a_2*x_2`.
+    Return the normalized length of `y` if `y \ge 0` and `y` fits into `n` limbs. Otherwise, return `-1`.
+    `y` may alias `x1` but is not allowed to alias `x_2`.
+
+
 Divisibility
 --------------------------------------------------------------------------------
 

@@ -480,13 +480,15 @@ Modular reduction and rational reconstruction
     If such an `a` exists, 1 will be returned, otherwise 0 will
     be returned.
 
+.. function:: int _fmpq_reconstruct_fmpz_2_naive(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
+
 .. function:: int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 
 .. function:: int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 
     Reconstructs a rational number from its residue `a` modulo `m`.
 
-    Given a modulus `m > 1`, a residue `0 \le a < m`, and positive `N, D`
+    Given a modulus `m > 2`, a residue `0 \le a < m`, and positive `N, D`
     satisfying `2ND < m`, this function attempts to find a fraction `n/d` with
     `0 \le |n| \le N` and `0 < d \le D` such that `\gcd(n,d) = 1` and
     `n \equiv ad \pmod m`. If a solution exists, then it is also unique.
@@ -499,8 +501,7 @@ Modular reduction and rational reconstruction
 
     Reconstructs a rational number from its residue `a` modulo `m`,
     returning 1 if successful and 0 if no solution exists.
-    Uses the balanced bounds `N = D = \lfloor\sqrt{m/2}\rfloor`.
-
+    Uses the balanced bounds `N = D = \lfloor\sqrt{\frac{m-1}{2}}\rfloor`.
 
 
 Rational enumeration
