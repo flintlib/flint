@@ -70,6 +70,7 @@ main(void)
 
     flint_printf("factor....");
     fflush(stdout);
+flint_printf("start\n");
 
 #if TEST_HARD
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P1_flint", "P1");
@@ -93,6 +94,8 @@ main(void)
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/H2_flint", "H2");
 #endif
 
+flint_printf("skipped\n");
+
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_t c;
@@ -100,7 +103,7 @@ main(void)
         fmpz_poly_factor_t fac;
         slong j, k, n = n_randint(state, 10*FAC_MULT);
         slong facs1 = 0, facs2 = 0;
-
+flint_printf("%wd\n", i);
         fmpz_init(c);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
@@ -124,8 +127,11 @@ main(void)
                facs1++; /* rough lower bound of factors of f */
             fmpz_poly_mul(f, f, g);
         }
-
+flint_printf("Start factor\n");
+fmpz_poly_print(f);
+flint_printf("\n");
         fmpz_poly_factor(fac, f);
+flint_printf("done\n");
 
         fmpz_poly_set_fmpz(h, &fac->c);
         for (j = 0; j < fac->num; j++)
@@ -157,6 +163,7 @@ main(void)
         fmpz_poly_clear(h);
         fmpz_poly_clear(t);
         fmpz_poly_factor_clear(fac);
+flint_printf("next\n");
     }
 
     FLINT_TEST_CLEANUP(state);
