@@ -61,7 +61,7 @@ void factor_poly(const char * file_str, const char * name)
 int
 main(void)
 {
-    int i, result;
+    int i, result, k;
     int tmul = 100;
 #ifdef _WIN32
     tmul = 1;
@@ -129,6 +129,11 @@ flint_printf("%wd\n", i);
         }
 flint_printf("Start factor\n");
 flint_printf("f->length = %wd\n", f->length);
+for (k = 0; k < f->length; k++)
+{
+fmpz_print(f->coeffs + k);
+flint_printf("\n");
+}
 fmpz_poly_print(f);
 flint_printf("\n");
         fmpz_poly_factor(fac, f);
