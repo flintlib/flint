@@ -55,6 +55,9 @@ TEMPLATE3(T, poly_scalar_addmul, T) (TEMPLATE(T, poly_t) rop,
         (TEMPLATE(T, is_zero) (x, ctx) || TEMPLATE(T, poly_is_zero) (op, ctx)))
     {
         TEMPLATE(T, poly_fit_length) (rop, op->length, ctx);
+	if (op->length > rop->length)
+            _TEMPLATE(T, vec_zero) (rop->coeffs + rop->length,
+			            op->length - rop->length, ctx);
         _TEMPLATE3(T, poly_scalar_addmul, T) (rop->coeffs, op->coeffs,
                                               op->length, x, ctx);
         _TEMPLATE(T, poly_set_length) (rop, FLINT_MAX(rop->length, op->length),
