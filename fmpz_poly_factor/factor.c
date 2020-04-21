@@ -19,7 +19,7 @@ void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
     fmpz_poly_t g;
 
     fac->num = 0;
-
+flint_printf("start factor\n");
     if (lenG == 0)
     {
         fmpz_set_ui(&fac->c, 0);
@@ -58,6 +58,7 @@ void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
             fmpz_poly_factor_insert(fac, t, k);
             fmpz_poly_clear(t);
         }
+flint_printf("end presearch\n");
 
         fmpz_poly_shift_right(g, G, k);
 
@@ -65,13 +66,18 @@ void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
            maybe take advantage of the composition algorithm */
         fmpz_poly_factor_init(sq_fr_fac);
         fmpz_poly_factor_squarefree(sq_fr_fac, g);
-
+flint_printf("end squarefree\n");
         fmpz_set(&fac->c, &sq_fr_fac->c);
 
         /* Factor each square-free part */
         for (j = 0; j < sq_fr_fac->num; j++)
-            _fmpz_poly_factor_zassenhaus(fac, sq_fr_fac->exp[j], sq_fr_fac->p + j, 10, 1);
-
+	{
+flint_printf("factor %wd\n", j);
+fmpz_poly_print(sq_fr_fac->p + j);
+flint_printf("\n");
+    		_fmpz_poly_factor_zassenhaus(fac, sq_fr_fac->exp[j], sq_fr_fac->p + j, 10, 1);
+flint_printf("end sq_fac\n");
+        }
         fmpz_poly_factor_clear(sq_fr_fac);
     }
     fmpz_poly_clear(g);

@@ -119,8 +119,9 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
  
    /* compute Mignotte bound */
    fmpz_init(B);
-   
+flint_printf("factor_mignotte\n");
    fmpz_poly_factor_mignotte(B, f);
+flint_printf("done_mignotte\n");
    fmpz_mul_ui(B, B, 2);
    fmpz_add_ui(B, B, 1);
    a = fmpz_clog_ui(B, p);
@@ -198,8 +199,9 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
             if (do_lll)
             {
+flint_printf("start LLL\n");
                num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
-
+flint_printf("done LLL\n");
                fmpz_mat_van_hoeij_resize_matrix(M, num_rows);
 
                if (fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
