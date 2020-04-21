@@ -18,5 +18,5 @@ ${MAKE} > /dev/null 2>&1
 ${MAKE} install > /dev/null 2>&1
 cd ..
 
-echo "int flint_test_multiplier(){return 1;}" >> test_helpers.c
+echo "int flint_test_multiplier(){return 1;}" > test_helpers.c
 
