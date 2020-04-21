@@ -39,7 +39,7 @@ main(void)
         y = n_randtest(state);
 
         fmpq_get_mpq(X, x);
-        mpq_set_ui(Y, y, 1);
+        flint_mpq_set_ui(Y, y, 1);
 
         c1 = fmpq_cmp_ui(x, y);
         c2 = mpq_cmp(X, Y);
