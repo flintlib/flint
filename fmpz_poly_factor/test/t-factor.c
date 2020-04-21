@@ -134,8 +134,9 @@ for (k = 0; k < f->length; k++)
 fmpz_print(f->coeffs + k);
 flint_printf("\n");
 }
-fmpz_poly_print(f);
-flint_printf("\n");
+k = fmpz_poly_print(f);
+flint_printf("%wd\n", k);
+flint_printf("not here?\n");
         fmpz_poly_factor(fac, f);
 flint_printf("done\n");
 
