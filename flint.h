@@ -272,9 +272,16 @@ typedef __mpfr_struct mpfr;
 #if defined(__GNUC__)
 #define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
 #define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
+#if __GNUC__ >= 4
+#define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 #else
+#define FLINT_WARN_UNUSED
+#endif
+#else
+#define __attribute__(x)
 #define FLINT_UNUSED(x) x
 #define FLINT_SET_BUT_UNUSED(x) x
+#define FLINT_WARN_UNUSED
 #endif
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))

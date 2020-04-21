@@ -86,7 +86,7 @@ void * _flint_malloc(size_t size)
    return ptr;
 }
 
-void * flint_malloc(size_t size)
+FLINT_WARN_UNUSED void * flint_malloc(size_t size)
 {
    void * ptr = (*__flint_allocate_func)(size);
 
@@ -110,7 +110,7 @@ void * _flint_realloc(void * ptr, size_t size)
 }
 
 
-void * flint_realloc(void * ptr, size_t size)
+FLINT_WARN_UNUSED void * flint_realloc(void * ptr, size_t size)
 {
     void * ptr2;
   
@@ -138,7 +138,7 @@ void * _flint_calloc(size_t num, size_t size)
     return ptr;
 }
 
-void * flint_calloc(size_t num, size_t size)
+FLINT_WARN_UNUSED void * flint_calloc(size_t num, size_t size)
 {
    void * ptr;
 
