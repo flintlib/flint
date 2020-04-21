@@ -128,6 +128,7 @@ flint_printf("%wd\n", i);
             fmpz_poly_mul(f, f, g);
         }
 flint_printf("Start factor\n");
+flint_printf("f->length = %wd\n", f->length);
 fmpz_poly_print(f);
 flint_printf("\n");
         fmpz_poly_factor(fac, f);
