@@ -61,7 +61,7 @@ void factor_poly(const char * file_str, const char * name)
 int
 main(void)
 {
-    int i, result, k;
+    int i, result;
     int tmul = 100;
 #ifdef _WIN32
     tmul = 1;
@@ -125,6 +125,9 @@ flint_printf("%wd\n", i);
             facs1 += k; /* count powers of x separately */
             if (k < g->length - 1)
                facs1++; /* rough lower bound of factors of f */
+flint_printf("factor %wd\n", j);
+fmpz_poly_print(g);
+flint_printf("\n");
             fmpz_poly_mul(f, f, g);
         }
 flint_printf("Start factor\n");
