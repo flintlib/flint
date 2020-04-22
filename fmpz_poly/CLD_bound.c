@@ -27,7 +27,7 @@ static double _log2(double n)
 
 static int _d_cmp_2exp(double a, slong a_exp, double b, slong b_exp)
 {
-   long t;
+   slong t;
 
    if (a_exp == 0)
    {
@@ -43,7 +43,7 @@ static int _d_cmp_2exp(double a, slong a_exp, double b, slong b_exp)
             return -1;
       }
 
-      t = 1 + (long) _log2(a);
+      t = 1 + (slong) _log2(a);
 
       if (t >= b_exp + 2) /* a, a_exp >= 2*(b, b_exp) */ 
          return 2;

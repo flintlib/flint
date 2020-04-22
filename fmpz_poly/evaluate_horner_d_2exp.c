@@ -40,9 +40,9 @@ double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong 
    mpf_set_d(mpf_d, d); /* set fval to mpf from the double val */
 
    if (dexp >= 0)
-       mpf_mul_2exp(mpf_d, mpf_d, dexp);
+       mpf_mul_2exp(mpf_d, mpf_d, (mp_bitcnt_t) dexp);
    else
-       mpf_div_2exp(mpf_d, mpf_d, -dexp);
+       mpf_div_2exp(mpf_d, mpf_d, -(mp_bitcnt_t) dexp);
 
    for (i = n - 2; i >= 0; i--)
    {
