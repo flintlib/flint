@@ -154,6 +154,7 @@ flint_printf("done_mignotte\n");
    fmpz_init(lc);
    fmpz_set(lc, f->coeffs + N);
 
+flint_printf("start hensel\n");
    /* main hensel loop */
    hensel_loops = 0;
    fmpz_init(P);
@@ -165,9 +166,12 @@ flint_printf("done_mignotte\n");
    fmpz_mat_init(col, r, 1);
    fmpz_lll_context_init_default(fl);
 
+flint_printf("start while\n");
+
    while (!fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
    {
-      if (hensel_loops < 3 && 3*r > N + 1)
+flint_printf("not solved\n");
+	if (hensel_loops < 3 && 3*r > N + 1)
          num_coeffs = r > 200 ? 50 : 30;
       else
          num_coeffs = 10;
@@ -177,8 +181,9 @@ flint_printf("done_mignotte\n");
 
       do {
          fmpz_mat_init(data, r + 1, 2*num_coeffs);
-         num_data_cols = _fmpz_poly_factor_CLD_mat(data, f, lifted_fac, P, num_coeffs);
-
+flint_printf("CLD mat\n");
+       		num_data_cols = _fmpz_poly_factor_CLD_mat(data, f, lifted_fac, P, num_coeffs);
+flint_printf("CLD mat done\n");
          for (next_col = prev_num_coeffs; next_col < num_data_cols - prev_num_coeffs; next_col++)
          {
             /* we alternate taking columns from the right and left */
@@ -195,6 +200,7 @@ flint_printf("done_mignotte\n");
             for (i = 0; i < r; i++)
                fmpz_set(col->rows[i], data->rows[i] + alt_col);
 
+flint_printf("do lll\n");
             do_lll = fmpz_mat_next_col_van_hoeij(M, P, col, worst_exp, U_exp);
 
             if (do_lll)

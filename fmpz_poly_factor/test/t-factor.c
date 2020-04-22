@@ -72,7 +72,7 @@ main(void)
     fflush(stdout);
 flint_printf("start\n");
 
-#if TEST_HARD
+#if 0
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P1_flint", "P1");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P2_flint", "P2");
     factor_poly("/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/P3_flint", "P3");
