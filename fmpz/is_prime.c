@@ -22,12 +22,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "aprcl.h"
-
-#if FLINT_BITS == 64
-#define ODD_PRIMORIAL UWORD(16294579238595022365)
-#else
-#define ODD_PRIMORIAL UWORD(3234846615)
-#endif
+#include "mpn_extras.h"
 
 int fmpz_is_prime(const fmpz_t n)
 {
@@ -47,8 +42,11 @@ int fmpz_is_prime(const fmpz_t n)
    if (fmpz_abs_fits_ui(n))
       return n_is_prime(fmpz_get_ui(n));
 
-   if (fmpz_is_even(n) || n_gcd(ODD_PRIMORIAL, fmpz_fdiv_ui(n, ODD_PRIMORIAL)) != 1)
+   if (fmpz_is_even(n))
       return 0;
+
+   if (flint_mpn_factor_trial(COEFF_TO_PTR(*n)->_mp_d, COEFF_TO_PTR(*n)->_mp_size, 1, fmpz_bits(n)))
+        return 0;
 
    /* todo: use fmpz_is_perfect_power? */
    if (fmpz_is_square(n))
