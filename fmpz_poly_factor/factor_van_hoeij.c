@@ -123,8 +123,11 @@ flint_printf("factor_mignotte\n");
    fmpz_poly_factor_mignotte(B, f);
 flint_printf("done_mignotte\n");
    fmpz_mul_ui(B, B, 2);
+flint_printf("here1\n");
    fmpz_add_ui(B, B, 1);
+flint_printf("here2\n");
    a = fmpz_clog_ui(B, p);
+flint_printf("here3\n");
                 
    /* compute heuristic starting precision */
 flint_printf("start precision\n");
