@@ -56,7 +56,7 @@ build_script:
   - cmake --build . --target fmpz_poly_factor-test-t-factor -- -j2
 
 test_script:
-  - ctest -j3 --verbose --timeout 600 -R fmpz_poly_factor-test-t-factor
+  - ctest -j3 --verbose --timeout 600 -R "^fmpz_poly_factor-test-t-factor$"
 
 #on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
