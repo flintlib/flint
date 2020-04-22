@@ -82,7 +82,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
       for (i = 0; i < r; i++)
       {
          zeroes = 0;
-         while (lifted_fac->p[i].coeffs + zeroes)
+         while (fmpz_is_zero(lifted_fac->p[i].coeffs + zeroes))
             zeroes++;
 
          fmpz_poly_attach_truncate(trunc_fac, lifted_fac->p + i, lo_n + zeroes + 1);
