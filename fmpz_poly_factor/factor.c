@@ -73,7 +73,6 @@ flint_printf("end squarefree\n");
         for (j = 0; j < sq_fr_fac->num; j++)
 	{
 flint_printf("factor %wd\n", j);
-fmpz_poly_print(sq_fr_fac->p + j);
 flint_printf("\n");
     		_fmpz_poly_factor_zassenhaus(fac, sq_fr_fac->exp[j], sq_fr_fac->p + j, 10, 1);
 flint_printf("end sq_fac\n");

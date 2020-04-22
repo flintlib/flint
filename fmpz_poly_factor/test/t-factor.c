@@ -126,20 +126,11 @@ flint_printf("%wd\n", i);
             if (k < g->length - 1)
                facs1++; /* rough lower bound of factors of f */
 flint_printf("factor %wd\n", j);
-fmpz_poly_print(g);
 flint_printf("\n");
             fmpz_poly_mul(f, f, g);
         }
 flint_printf("Start factor\n");
 flint_printf("f->length = %wd\n", f->length);
-for (k = 0; k < f->length; k++)
-{
-fmpz_print(f->coeffs + k);
-flint_printf("\n");
-}
-k = fmpz_poly_print(f);
-flint_printf("%wd\n", k);
-flint_printf("not here?\n");
         fmpz_poly_factor(fac, f);
 flint_printf("done\n");
 
