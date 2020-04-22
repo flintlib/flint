@@ -119,10 +119,9 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
  
    /* compute Mignotte bound */
    fmpz_init(B);
-flint_printf("factor_mignott\n");
    fmpz_poly_factor_mignotte(B, f);
 flint_printf("done_mignotte\n");
-flint_printf("done_mignotte2\n");
+flint_printf("done_mig2\n");
 fmpz_print(B);
 flint_printf("\n");
    fmpz_mul_ui(B, B, 2);
