@@ -53,10 +53,10 @@ before_build:
   - if [%COMPILER%]==[cl] cmake -G "Ninja" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
 build_script:
-  - cmake --build . -- -j2
+  - cmake --build . --target fmpz_poly_factor-test-t-factor -- -j2
 
 test_script:
-  - ctest -j3 --verbose --timeout 600
+  - ctest -j3 --verbose --timeout 600 -R fmpz_poly_factor-test-t-factor
 
 #on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
