@@ -127,8 +127,10 @@ flint_printf("done_mignotte\n");
    a = fmpz_clog_ui(B, p);
                 
    /* compute heuristic starting precision */
+flint_printf("start precision\n");
    a = FLINT_MIN(a, _heuristic_van_hoeij_starting_precision(f, r, p));
-   
+flint_printf("done start precision\n");
+
    /* start Hensel lift */
    fmpz_poly_factor_init(lifted_fac);
 
@@ -142,8 +144,10 @@ flint_printf("done_mignotte\n");
       fmpz_poly_init(w[i]);
    }
 
+flint_printf("start hensel lift\n");
    prev_exp = _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, fac, a);
-   
+flint_printf("done hensel start\n");
+
    /* compute bound */
    fmpz_set_ui(B, r + 1);
    fmpz_mul_2exp(B, B, 2*U_exp);
@@ -154,7 +158,7 @@ flint_printf("done_mignotte\n");
    fmpz_init(lc);
    fmpz_set(lc, f->coeffs + N);
 
-flint_printf("start hensel\n");
+flint_printf("start main hensel\n");
    /* main hensel loop */
    hensel_loops = 0;
    fmpz_init(P);
