@@ -16,7 +16,7 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_add(flint_mpfr * res, const flint_mpfr * vec1, const flint_mpfr * vec2, long length)
+_mpfr_vec_add(flint_mpfr * res, const flint_mpfr * vec1, const flint_mpfr * vec2, slong length)
 {
     slong i;
     for (i = 0; i < length; i++)
