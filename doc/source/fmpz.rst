@@ -202,6 +202,9 @@ finished generating random numbers, one should call
     give a uniform distribution over the set of primes with that
     many bits.
 
+    Random number generation is performed using the standard Flint
+    random number generator, which is not suitable for cryptographic use.
+
     If ``proved`` is nonzero, then the integer returned is
     guaranteed to actually be prime.
 
@@ -1549,10 +1552,12 @@ Primality testing
     Finds the next prime number larger than `n`.
 
     If ``proved`` is nonzero, then the integer returned is
-    guaranteed to actually be prime.
-
-
-
+    guaranteed to actually be prime. Otherwise if `n` fits in
+    ``FLINT_BITS - 3`` bits ``n_nextprime`` is called, and if not then
+    the GMP ``mpz_nextprime`` function is called. Up to an including
+    GMP 6.1.2 this used Miller-Rabin iterations, and thereafter uses
+    a BPSW test.
+    
 Special functions
 --------------------------------------------------------------------------------
 
