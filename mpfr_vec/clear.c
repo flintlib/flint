@@ -16,7 +16,7 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_clear(mpfr * vec, slong length)
+_mpfr_vec_clear(flint_mpfr * vec, slong length)
 {
     slong i;
     for (i = 0; i < length; i++)

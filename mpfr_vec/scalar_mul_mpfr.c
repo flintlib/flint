@@ -16,7 +16,7 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_scalar_mul_mpfr(mpfr * res, const mpfr * vec, slong length, mpfr_t c)
+_mpfr_vec_scalar_mul_mpfr(flint_mpfr * res, const flint_mpfr * vec, slong length, mpfr_t c)
 {
     slong i;
     for (i = 0; i < length; i++)
