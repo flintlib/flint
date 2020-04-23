@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 William Hart
+    Copyright (C) 2020 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,22 +14,46 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
+#include "mpn_extras.h"
 
 int
-fmpz_is_probabprime(const fmpz_t p)
+fmpz_is_probabprime(const fmpz_t n)
 {
-    fmpz c = *p;
-    
-    if (fmpz_sgn(p) <= 0)
-       return 0;
+    if (!COEFF_IS_MPZ(*n))
+    {
+        slong v = *n;
 
-    if (!COEFF_IS_MPZ(c))
-       return n_is_probabprime(c);
+        if (v <= 1)
+            return 0;
+        return n_is_probabprime(v);
+    }
     else
     {
-       int ret;
-       
-       ret = (mpz_probab_prime_p(COEFF_TO_PTR(c), 25) != 0);
-       return ret;
+        __mpz_struct * z;
+        mp_ptr d;
+        slong size, bits, trial_primes;
+
+        z = COEFF_TO_PTR(*n);
+        size = z->_mp_size;
+        d = z->_mp_d;
+
+        if (size < 0)
+            return 0;
+        if (size == 1)
+            return n_is_probabprime(d[0]);
+
+        if (d[0] % 2 == 0)
+            return 0;
+
+        bits = size * FLINT_BITS + FLINT_BIT_COUNT(d[size-1]);
+        trial_primes = bits;
+
+        if (flint_mpn_factor_trial(d, size, 1, trial_primes))
+            return 0;
+
+        if (fmpz_is_square(n))
+            return 0;
+
+        return fmpz_is_probabprime_BPSW(n);
     }
 }
