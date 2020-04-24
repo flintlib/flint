@@ -160,6 +160,15 @@ Conversion
     Sets ``(rnum, rden)`` to the canonical form of the fraction
     ``p / q``. ``rnum`` and ``rden`` may not be aliased.
 
+.. function:: void fmpq_set_ui(fmpq_t res, ulong p, ulong q)
+
+    Sets ``res`` to the canonical form of the fraction ``p / q``.
+
+.. function:: void _fmpq_set_ui(fmpz_t rnum, fmpz_t rden, ulong p, ulong q)
+
+    Sets ``(rnum, rden)`` to the canonical form of the fraction
+    ``p / q``. ``rnum`` and ``rden`` may not be aliased.
+
 .. function:: void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
 
     Sets the value of ``dest`` to that of the ``mpq_t`` variable
