@@ -65,6 +65,10 @@ set(SOURCES
     hashmap.c inlines.c fmpz/fmpz.c
 )
 
+if (MSVC)
+    list(APPEND SOURCES gettimeofday.c)
+endif()
+
 if (WITH_NTL)
     list(APPEND SOURCES interfaces/NTL-interface.cpp)
 endif()
