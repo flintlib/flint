@@ -9,7 +9,7 @@
 #ifndef _TIMEVAL_H
 #define _TIMEVAL_H
 
-#include <flint.h>
+#include "flint.h"
 #include <winsock2.h>
 
 #define EPOCHFILETIME (116444736000000000LL)
