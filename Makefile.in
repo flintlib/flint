@@ -212,7 +212,7 @@ install: library
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
-	$(AT)if [ "$(OS)" = "Darwin" ]; then \
+	$(AT)if [ "$(OS)" = "Darwin" ] && [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		install_name_tool -id "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
 	fi
 
