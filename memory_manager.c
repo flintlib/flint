@@ -195,7 +195,7 @@ void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function)
 
 void _fmpz_cleanup();
 
-void flint_cleanup()
+void _flint_cleanup()
 {
     size_t i;
 
@@ -219,6 +219,13 @@ void flint_cleanup()
 
 }
 
+void flint_cleanup()
+{
+#if !FLINT_REENTRANT || HAVE_TLS
+   _flint_cleanup();
+#endif
+}
+
 void flint_cleanup_master()
 {
     if (global_thread_pool_initialized)
@@ -226,5 +233,5 @@ void flint_cleanup_master()
         thread_pool_clear(global_thread_pool);
         global_thread_pool_initialized = 0;
     }
-    flint_cleanup();
+    _flint_cleanup();
 }
