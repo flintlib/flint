@@ -146,15 +146,23 @@ FLINT_DLL int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den);
 
 FLINT_DLL int fmpq_is_canonical(const fmpq_t x);
 
+FLINT_DLL void _fmpq_set_ui(fmpz_t rnum, fmpz_t rden, ulong p, ulong q);
+
+FLINT_DLL void fmpq_set_ui(fmpq_t res, ulong p, ulong q);
 
 FLINT_DLL void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q);
 
 FLINT_DLL void fmpq_set_si(fmpq_t res, slong p, ulong q);
 
-FLINT_DLL void _fmpq_set_ui(fmpz_t rnum, fmpz_t rden, ulong p, ulong q);
+FMPQ_INLINE int fmpq_equal_ui(fmpq_t q, slong n)
+{
+    return fmpz_equal_ui(fmpq_numref(q), n) && q->den == WORD(1);
+}
 
-FLINT_DLL void fmpq_set_ui(fmpq_t res, ulong p, ulong q);
-
+FMPQ_INLINE int fmpq_equal_si(fmpq_t q, slong n)
+{
+    return fmpz_equal_si(fmpq_numref(q), n) && q->den == WORD(1);
+}
 
 FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 

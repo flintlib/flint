@@ -130,6 +130,14 @@ Comparison
 
      Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
 
+.. function:: int fmpq_equal_ui(const fmpq_t x, ulong y)
+
+    Returns `1` if `x = y`, otherwise returns `0`.
+
+.. function:: int fmpq_equal_si(const fmpq_t x, slong y)
+
+    Returns `1` if `x = y`, otherwise returns `0`.
+
 .. function:: void fmpq_height(fmpz_t height, const fmpq_t x)
 
     Sets ``height`` to the height of `x`, defined as the larger of
