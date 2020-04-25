@@ -130,7 +130,7 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
 }
 
 static __inline__ void
-_fmpz_mod_mat_addmul_transpose_threaded_pool(fmpz ** D, fmpz ** const C,
+_fmpz_mod_mat_addmul_transpose_threaded(fmpz ** D, fmpz ** const C,
                             fmpz ** const A, fmpz ** const B, slong m,
                                        slong k, slong n, int op, fmpz_t p,
                                thread_pool_handle * threads, slong num_threads)
@@ -198,7 +198,7 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool(fmpz ** D, fmpz ** const C,
 }
 
 void
-_fmpz_mod_mat_mul_classical_threaded_pool(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
+_fmpz_mod_mat_mul_classical_threaded_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
                             const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op,
                                thread_pool_handle * threads, slong num_threads)
 {
@@ -208,14 +208,14 @@ _fmpz_mod_mat_mul_classical_threaded_pool(fmpz_mod_mat_t D, const fmpz_mod_mat_t
     k = A->mat->c;
     n = B->mat->c;
 
-    _fmpz_mod_mat_addmul_transpose_threaded_pool(D->mat->rows, 
+    _fmpz_mod_mat_addmul_transpose_threaded(D->mat->rows, 
                 (op == 0) ? NULL : C->mat->rows, A->mat->rows, B->mat->rows,
                                     m, k, n, op, D->mod, threads, num_threads);
 }
 
 void
-_fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
-            const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op, slong thread_limit)
+fmpz_mod_mat_mul_classical_threaded_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
+            const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op)
 {
     thread_pool_handle * threads;
     slong num_threads;
@@ -242,16 +242,16 @@ _fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
         return;
     }
 
-    num_threads = flint_request_threads(&threads, thread_limit);
+    num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
-    _fmpz_mod_mat_mul_classical_threaded_pool(D, C, A, B, op, threads, num_threads);
+    _fmpz_mod_mat_mul_classical_threaded_op(D, C, A, B, op, threads, num_threads);
 
     flint_give_back_threads(threads, num_threads);
 }
 
 void
 fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C, const fmpz_mod_mat_t A,
-                                        const fmpz_mod_mat_t B, slong thread_limit)
+                                        const fmpz_mod_mat_t B)
 {
-    _fmpz_mod_mat_mul_classical_threaded(C, NULL, A, B, 0, thread_limit);
+    fmpz_mod_mat_mul_classical_threaded_op(C, NULL, A, B, 0);
 }
