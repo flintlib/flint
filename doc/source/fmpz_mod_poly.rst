@@ -642,7 +642,7 @@ Powering
     No aliasing is permitted between the entries of ``res`` and either of the
     inputs.
 
-.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
+.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
 
     Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
     and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
@@ -651,34 +651,7 @@ Powering
     ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
     reverse of ``g``.
 
-.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, slong thread_limit)
-
-    Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
-    and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
-    spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
-    at least ``glen - 1`` coefficients and that ``flen > 0``. We require that
-    ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
-    reverse of ``g``.
-
-.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
-
-    Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
-    and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
-    spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
-    at least ``glen - 1`` coefficients and that ``flen > 0``. We require that
-    ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
-    reverse of ``g``.
-
-.. function:: _fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, slong thread_limit)
-
-    Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
-    and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
-    spaced). Assumes ``res`` is an array of ``n`` arrays each with space for
-    at least ``glen - 1`` coefficients and that ``flen > 0``. We require that
-    ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
-    reverse of ``g``.
-
-.. function:: void fmpz_mod_poly_powers_mod_bsgs_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g, slong thread_limit)
+.. function:: void fmpz_mod_poly_powers_mod_bsgs(fmpz_mod_poly_struct * res, const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g)
 
     Set the entries of the array ``res`` to ``f^0, f^1, ..., f^(n-1) mod g``.
     No aliasing is permitted between the entries of ``res`` and either of the

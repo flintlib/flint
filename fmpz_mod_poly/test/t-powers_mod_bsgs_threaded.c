@@ -55,8 +55,7 @@ main(void)
         fmpz_mod_poly_randtest(f, state, n_randint(state, 50));
         fmpz_mod_poly_randtest_not_zero(g, state, n_randint(state, 50) + 1);
 
-        fmpz_mod_poly_powers_mod_bsgs_threaded(res, f, exp, g,
-			                           FLINT_DEFAULT_THREAD_LIMIT);
+        fmpz_mod_poly_powers_mod_bsgs(res, f, exp, g);
 
         result = 1;
         j = 0;
