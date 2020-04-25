@@ -418,6 +418,22 @@ Arithmetic
    Sets ``res`` to the sum or difference respectively, of the fraction 
    ``op1`` and the integer `c`.
 
+.. function:: void _fmpq_mul_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
+
+   Sets ``(rnum, rden)`` to the product of ``(p, q)`` and the integer `r`.
+
+.. function:: void fmpq_mul_si(fmpq_t res, const fmpq_t op1, slong c)
+
+   Sets ``res`` to the product of ``op1`` and the integer `c`.
+
+.. function:: void _fmpq_mul_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)                                                            
+
+   Sets ``(rnum, rden)`` to the product of ``(p, q)`` and the integer `r`.     
+
+.. function:: void fmpq_mul_ui(fmpq_t res, const fmpq_t op1, ulong c)
+
+   Sets ``res`` to the product of ``op1`` and the integer `c`.
+
 .. function:: void fmpq_addmul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
 .. function:: void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)

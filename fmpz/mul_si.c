@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 

@@ -254,6 +254,16 @@ FLINT_DLL void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
 
 FLINT_DLL void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
 
+FLINT_DLL void _fmpq_mul_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
+                                                      const fmpz_t q, slong r);
+
+FLINT_DLL void fmpq_mul_si(fmpq_t res, const fmpq_t op1, slong c);
+
+FLINT_DLL void _fmpq_mul_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
+                                                      const fmpz_t q, ulong r);
+
+FLINT_DLL void fmpq_mul_ui(fmpq_t res, const fmpq_t op1, ulong c);
+
 FLINT_DLL void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
 
