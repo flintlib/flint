@@ -662,6 +662,10 @@ Basic arithmetic
 
     Sets `f` to `g + x` where `x` is an ``ulong``.
 
+.. function:: void fmpz_add_si(fmpz_t f, const fmpz_t g, slong x)
+
+    Sets `f` to `g + x` where `x` is an ``slong``.
+
 .. function:: void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to `g - h`.
@@ -669,6 +673,10 @@ Basic arithmetic
 .. function:: void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets `f` to `g - x` where `x` is an ``ulong``.
+
+.. function:: void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
+
+    Sets `f` to `g - x` where `x` is an ``slong``.
 
 .. function:: void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 

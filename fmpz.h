@@ -476,6 +476,22 @@ FLINT_DLL void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x);
 
 FLINT_DLL void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x);
 
+FMPZ_INLINE void fmpz_add_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    if (x >= 0)
+        fmpz_add_ui(f, g, (ulong) x);
+    else
+        fmpz_sub_ui(f, g, (ulong) -x);
+}
+
+FMPZ_INLINE void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    if (x >= 0)
+        fmpz_sub_ui(f, g, (ulong) x);
+    else
+        fmpz_add_ui(f, g, (ulong) -x);
+}
+
 FLINT_DLL void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x);
 
 FLINT_DLL void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x);
