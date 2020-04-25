@@ -142,7 +142,7 @@ Factorisation
 
     Requires that ``degs`` has enough space for `(n/2)+1 * sizeof(slong)`.
 
-.. function:: void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const *degs, slong num_threads)
+.. function:: void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const *degs)
 
     Multithreaded version of :func:`fmpz_mod_poly_factor_distinct_deg`.
 

@@ -97,8 +97,7 @@ int main(void)
             abort();
         }
         fmpz_mod_poly_factor_init(res);
-        fmpz_mod_poly_factor_distinct_deg_threaded(res, poly1, &degs,
-			                           FLINT_DEFAULT_THREAD_LIMIT);
+        fmpz_mod_poly_factor_distinct_deg_threaded(res, poly1, &degs);
 
         fmpz_mod_poly_init(product, &poly1->p);
         fmpz_mod_poly_set_coeff_ui(product, 0, 1);
