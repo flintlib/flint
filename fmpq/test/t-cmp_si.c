@@ -14,6 +14,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
+#include "long_extras.h"
 
 int
 main(void)
@@ -21,13 +22,13 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
     
-    flint_printf("cmp_ui....");
+    flint_printf("cmp_si....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
         fmpq_t x;
-        ulong y;
+        slong y;
         mpq_t X, Y;
         int c1, c2;
 
@@ -36,12 +37,12 @@ main(void)
         mpq_init(Y);
 
         fmpq_randtest(x, state, 200);
-        y = n_randtest(state);
+        y = z_randtest(state);
 
         fmpq_get_mpq(X, x);
-        flint_mpq_set_ui(Y, y, 1);
+        flint_mpq_set_si(Y, y, 1);
 
-        c1 = fmpq_cmp_ui(x, y);
+        c1 = fmpq_cmp_si(x, y);
         c2 = mpq_cmp(X, Y);
 
         if (c1 < 0) c1 = -1;
@@ -55,7 +56,7 @@ main(void)
             flint_printf("FAIL\n");
             flint_printf("x = ");
             fmpq_print(x);
-            flint_printf("\ny = %wu", y);
+            flint_printf("\ny = %wd", y);
             flint_printf("\ncmp(x,y) = %d, cmp(X,Y) = %d\n", c1, c2);
             abort();
         }

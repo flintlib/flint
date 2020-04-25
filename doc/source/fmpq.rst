@@ -126,6 +126,10 @@ Comparison
 
     Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
 
+.. function:: int fmpq_cmp_si(const fmpq_t x, slong y)
+
+     Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
+
 .. function:: void fmpq_height(fmpz_t height, const fmpq_t x)
 
     Sets ``height`` to the height of `x`, defined as the larger of

@@ -134,6 +134,10 @@ FLINT_DLL int _fmpq_cmp_ui(const fmpz_t p, const fmpz_t q, ulong c);
 
 FLINT_DLL int fmpq_cmp_ui(const fmpq_t x, ulong c);
 
+FLINT_DLL int _fmpq_cmp_si(const fmpz_t p, const fmpz_t q, slong c);
+
+FLINT_DLL int fmpq_cmp_si(const fmpq_t x, slong c);
+
 FLINT_DLL void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
 
 FLINT_DLL void fmpq_canonicalise(fmpq_t res);
