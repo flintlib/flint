@@ -82,7 +82,7 @@ main(void)
             fmpz_mod_poly_init(res + j, p);
             
         fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(res, pow, l,
-                                       k, b, a, ainv, FLINT_DEFAULT_THREAD_LIMIT);
+                                                                k, b, a, ainv);
 
         for (j = 0; j < k; j++)
         {

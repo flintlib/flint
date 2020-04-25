@@ -1822,7 +1822,7 @@ Modular composition
     :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
     Horner evaluations across :func:`flint_get_num_threads` threads.
 
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, slong thread_limit)
+.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv)
 
     Multithreaded version of
     :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the

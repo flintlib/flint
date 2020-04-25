@@ -253,8 +253,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
                                             slong len1, slong n,
                                             const fmpz_mod_poly_t g,
                                             const fmpz_mod_poly_t poly,
-                                            const fmpz_mod_poly_t polyinv,
-                                            slong thread_limit)
+                                            const fmpz_mod_poly_t polyinv)
 {
     slong i, len2 = poly->length;
     thread_pool_handle * threads;
@@ -305,7 +304,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
         _fmpz_mod_poly_set_length(res + i, len2 - 1);
     }
 
-    num_threads = flint_request_threads(&threads, thread_limit);
+    num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
     _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(res, polys,
                                                           len1, n,

@@ -1109,7 +1109,7 @@ FLINT_DLL void
 fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res,
                     const fmpz_mod_poly_struct * polys, slong len1, slong n,
                     const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly,
-                            const fmpz_mod_poly_t polyinv, slong thread_limit);
+                                                const fmpz_mod_poly_t polyinv);
  
 /*  Radix conversion *********************************************************/
 
