@@ -133,7 +133,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
     _fmpz_mod_poly_powers_mod_preinv_threaded(A->mat->rows, g, glen,
 	               m, poly, len, polyinv, leninv, p, threads, num_threads);
 
-    _fmpz_mod_mat_mul_classical_threaded_op(C, NULL, B, A, 0,
+    _fmpz_mod_mat_mul_classical_threaded_pool_op(C, NULL, B, A, 0,
                                                          threads, num_threads);
 
     /* Evaluate block composition using the Horner scheme */
