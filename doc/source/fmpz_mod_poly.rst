@@ -642,7 +642,7 @@ Powering
     No aliasing is permitted between the entries of ``res`` and either of the
     inputs.
 
-.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
+.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
 
     Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
     and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero

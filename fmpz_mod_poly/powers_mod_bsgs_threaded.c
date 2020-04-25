@@ -74,7 +74,7 @@ _fmpz_mod_poly_powers_mod_preinv_worker(void * arg_ptr)
     {ginv, ginvlen} must be set to the power series inverse of the reverse of g
 */
 void
-_fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res, const fmpz * f,
+_fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
 		 slong flen, slong n, const fmpz * g, slong glen,
            const fmpz * ginv, slong ginvlen, const fmpz_t p,
 	                       thread_pool_handle * threads, slong num_threads)
@@ -217,7 +217,7 @@ fmpz_mod_poly_powers_mod_bsgs(fmpz_mod_poly_struct * res,
 
     num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
-    _fmpz_mod_poly_powers_mod_preinv_threaded(res_arr, f->coeffs,
+    _fmpz_mod_poly_powers_mod_preinv_threaded_pool(res_arr, f->coeffs,
 		       f->length, n, g->coeffs, g->length, ginv->coeffs,
 		                    ginv->length, &g->p, threads, num_threads);
 

@@ -130,7 +130,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
     }
 
     /* Set rows of A to powers of last element of polys */
-    _fmpz_mod_poly_powers_mod_preinv_threaded(A->mat->rows, g, glen,
+    _fmpz_mod_poly_powers_mod_preinv_threaded_pool(A->mat->rows, g, glen,
 	               m, poly, len, polyinv, leninv, p, threads, num_threads);
 
     _fmpz_mod_mat_mul_classical_threaded_pool_op(C, NULL, B, A, 0,

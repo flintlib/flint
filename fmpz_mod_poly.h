@@ -494,7 +494,7 @@ FLINT_DLL void _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res,
 FLINT_DLL void fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res,
                     const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g);
 
-FLINT_DLL void _fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res,
+FLINT_DLL void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res,
        const fmpz * f, slong flen, slong n, const fmpz * g, slong glen,
                           const fmpz * ginv, slong ginvlen, const fmpz_t p,
 	                      thread_pool_handle * threads, slong num_threads);
