@@ -390,7 +390,11 @@ Arithmetic
 .. function:: void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
 
 .. function:: void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
-    
+
+.. function:: void _fmpq_add_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)
+
+.. function:: void _fmpq_sub_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)
+
 .. function:: void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
 
 .. function:: void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
@@ -403,6 +407,10 @@ Arithmetic
 
 .. function:: void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c)
 
+.. function:: void fmpq_add_ui(fmpq_t res, const fmpq_t op1, ulong c)
+
+.. function:: void fmpq_sub_ui(fmpq_t res, const fmpq_t op1, ulong c)
+                                                                               
 .. function:: void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
 
 .. function:: void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
