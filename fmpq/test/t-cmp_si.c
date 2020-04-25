@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
-    Copyright (C) 2016 William Hart
+    Copyright (C) 2016, 2020 William Hart
 
     This file is part of FLINT.
     
