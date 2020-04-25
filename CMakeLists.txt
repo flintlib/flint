@@ -20,13 +20,20 @@ endif()
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build with NTL or not" off)
 
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure" CONFIGURE_CONTENTS)
+string(REGEX MATCH "FLINT_MAJOR=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+set(FLINT_MAJOR ${CMAKE_MATCH_1})
+string(REGEX MATCH "FLINT_MINOR=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+set(FLINT_MINOR ${CMAKE_MATCH_1})
+string(REGEX MATCH "FLINT_PATCH=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+set(FLINT_PATCH ${CMAKE_MATCH_1})
+
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()
 find_package(PythonInterp REQUIRED)
-
 
 if(MSVC)
     find_package(PThreads REQUIRED)
@@ -243,6 +250,28 @@ if (HAS_FLAG_MPOPCNT)
 endif()
 if (HAS_FLAG_UNROLL_LOOPS)
     target_compile_options(flint PUBLIC "-funroll-loops")
+endif()
+
+# Versioning
+
+set_target_properties(flint PROPERTIES
+    VERSION ${FLINT_MAJOR}.${FLINT_MINOR}.${FLINT_PATCH}
+    SOVERSION ${FLINT_MAJOR}
+)
+
+# Following versioning parts are optional
+# Match versioning scheme in configure based build system.
+if (APPLE)
+    if(${CMAKE_VERSION} VERSION_LESS "3.17.0")
+        message(WARNING "To match the versioning scheme of configure based build system, switch to cmake 3.17.0")
+    else ()
+        set_target_properties(flint PROPERTIES
+            MACHO_COMPATIBILITY_VERSION ${FLINT_MAJOR}.${FLINT_MINOR}
+            MACHO_CURRENT_VERSION ${FLINT_MAJOR}.${FLINT_MINOR}.${FLINT_PATCH}
+        )
+    endif()
+elseif (WIN32)
+    set_target_properties(flint PROPERTIES RUNTIME_OUTPUT_NAME "flint-${FLINT_MAJOR}")
 endif()
 
 if(NOT DEFINED IPO_SUPPORTED)
