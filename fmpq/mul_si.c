@@ -35,7 +35,7 @@ _fmpq_mul_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
 
 	fmpz_gcd(u, u, q);
 
-        if (r == -r && !fmpz_fits_si(u)) /* deal with SLONG_MIN */
+        if (r == WORD_MIN && !fmpz_fits_si(u)) /* deal with SLONG_MIN */
         {
             fmpz_t fr;
             fmpz_init_set_si(fr, r);
