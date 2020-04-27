@@ -1,0 +1,89 @@
+QUIET_CC  = @echo '   ' CC  ' ' $@;
+
+AT=@
+
+SOURCES = $(wildcard *.c)
+
+HEADERS = $(wildcard ../*.h)
+TEST_HEADERS = $(wildcard *.h)
+
+OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
+
+LOBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
+MOD_LOBJ = $(BUILD_DIR)/../$(MOD_DIR).lo
+
+TEST_SOURCES = $(wildcard test/*.c)
+TESTXX_SOURCES = $(wildcard test/*.cpp)
+
+PROF_SOURCES = $(wildcard profile/*.c)
+
+TUNE_SOURCES = $(wildcard tune/*.c)
+
+TESTS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(TEST_SOURCES)) \
+        $(patsubst %.cpp, $(BUILD_DIR)/%$(EXEEXT), $(TESTXX_SOURCES))
+
+TESTS_RUN = $(patsubst %, %_RUN, $(TESTS))
+
+VALGRIND_RUN = $(patsubst %, %_VALGRIND_RUN, $(TESTS))
+
+PROFS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(PROF_SOURCES))
+
+TUNE = $(patsubst %.c, %$(EXEEXT), $(TUNE_SOURCES))
+
+all: shared static
+
+shared: $(MOD_LOBJ)
+
+static: $(OBJS)
+
+profile: $(PROFS)
+
+-include $(patsubst %, %.d, $(PROFS))
+
+$(BUILD_DIR)/profile/%$(EXEEXT): profile/%.c $(BUILD_DIR)/../profiler.o
+	$(QUIET_CC) $(CC) $(ABI_FLAG) -O2 -std=c99 -g $(INCS) $< $(BUILD_DIR)/../profiler.o -o $@ $(LDLFAGS) $(LIBS)  -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+
+tune: $(TUNE_SOURCES) $(HEADERS)
+	$(AT)$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LDLFAGS) $(LIBS) || exit $$?;)
+
+-include $(OBJS:.o=.d)
+
+$(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@ -MMD -MP -MF "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$@"
+
+$(MOD_LOBJ): $(LOBJS)
+	$(QUIET_CC) $(CC) $(ABI_FLAG) -r $^ -o $@ -nostdlib
+
+-include $(LOBJS:.lo=.d)
+
+$(BUILD_DIR)/%.lo: %.c
+	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@ -MMD -MP -MF "$(BUILD_DIR)/$*.d" -MT "$(BUILD_DIR)/$*.d" -MT "$@"
+
+clean:
+	rm -rf $(BUILD_DIR) $(MOD_LOBJ)
+
+tests: $(TESTS)
+
+check: tests $(TESTS_RUN)
+
+valgrind: tests $(VALGRIND_RUN)
+
+-include $(patsubst %, %.d, $(TESTS))
+
+ifeq ($(ARB_SHARED), 0)
+$(BUILD_DIR)/test/%$(EXEEXT): $(BUILD_DIR)/../../libarb.a
+endif
+
+$(BUILD_DIR)/test/%$(EXEEXT): test/%.c
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< -o $@ $(LDLFAGS) $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+
+$(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o
+	$(QUIET_CC) $(CXX) $(CFLAGS) $(INCS) $< -o $@ $(LDLFAGS) $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+
+%_RUN: %
+	@time -f "%e" $<
+
+%_VALGRIND_RUN: %
+	valgrind --track-origins=yes --leak-check=full --show-reachable=yes --log-file="$*.valgrind" $<
+
+.PHONY: profile tune clean check tests all shared static valgrind %_RUN %_VALGRIND_RUN

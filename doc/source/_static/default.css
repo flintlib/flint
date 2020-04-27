@@ -1,0 +1,8 @@
+@import url("classic.css");
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+div.body {
+    min-width: 450px;
+    max-width: 100%;
+}
+

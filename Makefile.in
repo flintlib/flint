@@ -1,0 +1,183 @@
+ifdef $(DLPATH)
+  $(DLPATH):=$($(DLPATH)):$(DLPATH_ADD)
+else
+  $(DLPATH):=$(DLPATH_ADD)
+endif
+
+LIBDIR=lib
+
+QUIET_CC  = @echo '   ' CC  ' ' $@;
+QUIET_CXX = @echo '   ' CXX ' ' $@;
+QUIET_AR  = @echo '   ' AR  ' ' $@;
+
+AT=@
+
+BUILD_DIRS = calcium ca_qqbar $(EXTRA_BUILD_DIRS)
+
+TEMPLATE_DIRS = 
+
+export
+
+SOURCES = 
+LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
+
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS))
+
+OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
+LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
+
+LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
+LIB_LOBJS = $(patsubst %, build/%/*.lo, $(BUILD_DIRS))
+MOD_LOBJS = $(patsubst %, build/%.lo, $(BUILD_DIRS))
+
+EXMP_SOURCES = $(wildcard examples/*.c)
+EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
+
+TEST_SOURCES = $(wildcard test/*.c)
+TESTS = $(patsubst %.c, build/%$(EXEEXT), $(TEST_SOURCES))
+
+PROF_SOURCES = $(wildcard profile/*.c)
+PROFS = $(patsubst %.c, %$(EXEEXT), $(PROF_SOURCES))
+
+TUNE_SOURCES = $(wildcard tune/*.c)
+TUNE = $(patsubst %.c, %$(EXEEXT), $(TUNE_SOURCES))
+
+EXT_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/*.c)))
+EXT_TEST_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/test/t-*.c)))
+EXT_TUNE_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/tune/*.c)))
+EXT_PROF_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/profile/p-*.c)))
+EXT_OBJS = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), build/$(dir).lo))
+EXT_HEADERS = $(foreach ext, $(EXTENSIONS), $(wildcard $(ext)/*.h))
+
+all: library
+
+quiet: library
+
+verbose:
+	$(MAKE) AT= QUIET_CC= QUIET_CXX= QUIET_AR=
+
+clean:
+	$(AT)$(foreach dir, $(BUILD_DIRS), BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) clean || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) clean || exit $$?;))
+	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(wildcard $(CALCIUM_LIBNAME)*) libcalcium.a
+	rm -rf build
+
+distclean: clean
+	rm -f Makefile
+
+profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) build/profiler.o
+	mkdir -p build/profile
+ifndef MOD
+	$(AT)$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c build/profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) profile || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/profile; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) profile || exit $$?;))
+else
+	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/profile; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) profile || exit $$?;)
+endif
+
+tune: library $(TUNE_SOURCES) $(EXT_TUNE_SOURCES)
+	mkdir -p build/tune
+	$(AT)$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
+	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) tune || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/tune; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) tune || exit $$?;))
+
+examples: library $(EXMP_SOURCES)
+	mkdir -p build/examples
+	$(AT)$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
+
+$(CALCIUM_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir); BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) shared || exit $$?;))
+	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) shared || exit $$?;)
+	$(CC) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(CALCIUM_LIB) $(LDFLAGS) $(LIBS2); \
+	-$(AT)if [ "$(CALCIUM_SOLIB)" -eq "1" ]; then \
+		$(LDCONFIG) -n "$(CURDIR)"; \
+	fi
+	ln -sf "$(CALCIUM_LIB)" "$(CALCIUM_LIBNAME)"; \
+	ln -sf "$(CALCIUM_LIB)" "$(CALCIUM_LIBNAME).$(CALCIUM_MAJOR)"; \
+
+libcalcium.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir); BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) static || exit $$?;))
+	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) static || exit $$?;)
+	$(AT)if [ "$(CALCIUM_SHARED)" -eq "0" ]; then \
+		touch test/t-*.c; \
+		$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
+		$(foreach ext, $(EXTENSIONS), $(foreach mod, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), touch $(ext)/$(mod)/test/t-*.c;)) \
+	fi
+	$(AT)$(foreach mod, $(BUILD_DIRS), $(AR) rcs libcalcium.a build/$(mod)/*.o || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(AR) rcs libcalcium.a build/$(mod)/*.o || exit $$?;))
+
+library:
+	$(AT)if [ "$(CALCIUM_SHARED)" -eq "1" ]; then \
+		$(MAKE) shared; \
+	fi
+	$(AT)if [ "$(CALCIUM_STATIC)" -eq "1" ]; then \
+		$(MAKE) static; \
+	fi
+
+shared: $(CALCIUM_LIB)
+
+static: libcalcium.a
+
+tests: library $(TESTS)
+	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) tests || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) tests || exit $$?;))
+	mkdir -p build/interfaces/test
+
+check: library
+ifndef MOD
+	$(AT)$(MAKE) $(TESTS)
+	$(AT)$(foreach prog, $(TESTS), $(prog) || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
+	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
+	mkdir -p build/interfaces/test
+else
+	$(AT)$(foreach dir, $(MOD), test ! -d $(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; test ! -d $(dir) || $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach dir, $(MOD), MOD_DIR=$(dir); export MOD_DIR; test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; test ! -d $(ext)/$(dir) || $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
+endif
+
+valgrind: library
+ifndef MOD
+	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) valgrind || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) valgrind || exit $$?;))
+else
+	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) valgrind || exit $$?;)
+endif
+
+install: library
+	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR)
+	mkdir -p $(DESTDIR)$(PREFIX)/include
+	$(AT)if [ "$(CALCIUM_SHARED)" -eq "1" ]; then \
+		cp $(CALCIUM_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+		cp -a $(shell ls $(CALCIUM_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+	fi
+	$(AT)if [ "$(CALCIUM_STATIC)" -eq "1" ]; then \
+		cp libcalcium.a $(DESTDIR)$(PREFIX)/$(LIBDIR); \
+	fi
+	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include
+	$(AT)if [ ! -z $(EXT_HEADERS) ]; then \
+		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include; \
+	fi
+
+build:
+	mkdir -p build
+
+build/%.lo: %.c $(HEADERS) | build
+	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
+
+build/%.o: %.c $(HEADERS) | build
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@;
+
+build/test/%$(EXEEXT): test/%.c $(HEADERS) | build/test
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
+
+build/test:
+	mkdir -p build/test
+
+build/interfaces:
+	mkdir -p build/interfaces
+
+print-%:
+	@echo '$*=$($*)'
+
+.PHONY: profile library shared static clean examples tune check tests distclean dist install all valgrind
+
