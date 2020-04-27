@@ -10,7 +10,7 @@
 */.deps/*
 fmpz/fmpz.c
 build/
-config.h
+flint-config.h
 config.log
 fft_tuning.h
 fmpz-conversions.h

@@ -31,7 +31,7 @@
 #endif
 #include "limits.h"
 #include "longlong.h"
-#include "config.h"
+#include "flint-config.h"
 #undef ulong
 
 #ifdef FLINT_INLINES_C

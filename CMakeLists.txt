@@ -81,7 +81,7 @@ if (WITH_NTL)
 endif()
 
 set(HEADERS
-    NTL-interface.h flint.h longlong.h config.h gmpcompat.h fft_tuning.h
+    NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
     fmpz-conversions.h profiler.h templates.h exception.h hashmap.h
 )
 
@@ -121,7 +121,7 @@ else()
     set(HAVE_DOUBLE_IEEE_BIG_ENDIAN ON)
 endif()
 
-# setup for config.h
+# setup for flint-config.h
 check_include_files(alloca.h HAVE_ALLOCA_H)
 check_include_files(dlfcn.h HAVE_DLFCN_H)
 check_include_files(fcntl.h HAVE_FCNTL_H)
@@ -181,7 +181,7 @@ endif()
 
 configure_file(
     config.h.in
-    config.h
+    flint-config.h
 )
 
 configure_file(
