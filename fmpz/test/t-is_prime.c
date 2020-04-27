@@ -93,7 +93,7 @@ main(void)
 
         fmpz_clear(p);
         fmpz_clear(F);
-    }
+    }  
 
     /* test composites never pass */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -143,6 +143,22 @@ main(void)
         }
 
         fmpz_clear(t);
+    }
+
+    /* regression test */
+    {
+        fmpz_t p;
+	fmpz_init_set_ui(p, 13567);
+	fmpz_pow_ui(p, p, 145);
+        result = fmpz_is_prime(p);
+        if (result)
+        {
+            printf("FAIL\n");
+            fmpz_print(p);
+            printf("\n");
+	    abort();
+        }
+        fmpz_clear(p);
     }
 
     FLINT_TEST_CLEANUP(state);
