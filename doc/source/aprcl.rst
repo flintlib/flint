@@ -13,12 +13,12 @@ Authors:
 Primality test functions
 --------------------------------------------------------------------------------
 
-.. function:: int is_prime_aprcl(const fmpz_t n)
+.. function:: int aprcl_is_prime(const fmpz_t n)
 
     Tests `n` for primality using the APRCL test.
-    This is the same as :func:`is_prime_jacobi`.
+    This is the same as :func:`aprcl_is_prime_jacobi`.
 
-.. function:: int is_prime_jacobi(const fmpz_t n)
+.. function:: int aprcl_is_prime_jacobi(const fmpz_t n)
 
     If `n` prime returns 1; otherwise returns 0. The algorithm is well described
     in "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra and
@@ -26,10 +26,10 @@ Primality test functions
 
     It is theoretically possible that this function fails to prove that
     `n` is prime. In this event, :func:`flint_abort` is called.
-    To handle this condition, the :func:`_is_prime_jacobi` function
+    To handle this condition, the :func:`_aprcl_is_prime_jacobi` function
     can be used.
 
-.. function:: int is_prime_gauss(const fmpz_t n)
+.. function:: int aprcl_is_prime_gauss(const fmpz_t n)
 
     If `n` is prime returns 1; otherwise returns 0.
     Uses the Cyclotomic primality testing algorithm described in
@@ -39,26 +39,26 @@ Primality test functions
     By default `R \ge 180`. In some cases this function fails to prove
     that `n` is prime. This means that we select a too small `R` value.
     In this event, :func:`flint_abort` is called.
-    To handle this condition, the :func:`_is_prime_jacobi` function
+    To handle this condition, the :func:`_aprcl_is_prime_jacobi` function
     can be used.
 
-.. function:: primality_test_status _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
+.. function:: primality_test_status _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 
     Jacobi sum test for `n`. Possible return values:
     ``PRIME``, ``COMPOSITE`` and ``UNKNOWN`` (if we cannot
     prove primality).
 
-.. function:: primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config)
+.. function:: primality_test_status _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
 
     Tests `n` for primality with fixed ``config``. Possible return values:
     ``PRIME``, ``COMPOSITE`` and ``PROBABPRIME``
     (if we cannot prove primality).
 
-.. function:: is_prime_gauss_min_R(const fmpz_t n, ulong R)
+.. function:: aprcl_is_prime_gauss_min_R(const fmpz_t n, ulong R)
 
-    Same as :func:`is_prime_gauss` with fixed minimum value of `R`.
+    Same as :func:`aprcl_is_prime_gauss` with fixed minimum value of `R`.
 
-.. function:: int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
+.. function:: int aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 
     Returns 0 if for some `a = n^k \bmod s`, where `k \in [1, r - 1]`, 
     we have that `a | n`; otherwise returns 1.
@@ -72,18 +72,18 @@ Configuration functions
 
     Holds precomputed parameters.
 
-.. function:: void config_gauss_init(aprcl_config conf, const fmpz_t n)
+.. function:: void aprcl_config_gauss_init(aprcl_config conf, const fmpz_t n)
 
     Computes the `s` and `R` values used in the cyclotomic primality test,
     `s^2 > n` and `s=\prod\limits_{\substack{q-1|R \\ q \text{ prime}}}q`.
     Also stores factors of `R` and `s`.
 
-.. function:: void config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
+.. function:: void aprcl_config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 
     Computes the `s` with fixed minimum `R` such that `a^R \equiv 1 \mod{s}`
     for all integer `a` coprime to `s`. 
 
-.. function:: void config_gauss_clear(aprcl_config conf)
+.. function:: void aprcl_config_gauss_clear(aprcl_config conf)
 
     Clears the given ``aprcl_config`` element. It must be reinitialised in
     order to be used again.
@@ -94,13 +94,13 @@ Configuration functions
     corresponding `s` value is greater than `\sqrt{n}`. The maximum
     stored value `6983776800` allows to test numbers up to `6000` digits.
 
-.. function:: void config_jacobi_init(aprcl_config conf, const fmpz_t n)
+.. function:: void aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n)
 
     Computes the `s` and `R` values used in the cyclotomic primality test,
     `s^2 > n` and `a^R \equiv 1 \mod{s}` for all `a` coprime to `s`.
     Also stores factors of `R` and `s`.
 
-.. function:: void config_jacobi_clear(aprcl_config conf)
+.. function:: void aprcl_config_jacobi_clear(aprcl_config conf)
 
     Clears the given ``aprcl_config`` element. It must be reinitialised in
     order to be used again.

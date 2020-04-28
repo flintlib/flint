@@ -19,7 +19,7 @@
     f_table[x - 1] = f(x).
 */
 mp_ptr
-f_table(const ulong q)
+aprcl_f_table(const ulong q)
 {
     int i;
     ulong g, g_pow, qinv;

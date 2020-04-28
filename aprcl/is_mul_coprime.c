@@ -15,7 +15,7 @@
     Returns 1 if gcd(x * y, n) == 1; otherwise returns 0.
 */
 int
-is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n)
+aprcl_is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n)
 {
     ulong a, rem;
     int result = 0;
@@ -36,7 +36,7 @@ is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n)
     Returns 1 if gcd(x * y, n) == 1; otherwise returns 0.
 */
 int
-is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n)
+aprcl_is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n)
 {
     int is_coprime = 0;
     ulong a, rem;

@@ -32,7 +32,7 @@ int main(void)
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
 
-        config_gauss_init(conf, n);
+        aprcl_config_gauss_init(conf, n);
 
         fmpz_mul(s2, conf->s, conf->s);
         if (fmpz_cmp(s2, n) <= 0)
@@ -45,7 +45,7 @@ int main(void)
             abort();
         }
 
-        config_gauss_clear(conf);
+        aprcl_config_gauss_clear(conf);
         fmpz_clear(n);
         fmpz_clear(s2);
     }

@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 int
-is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
+aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 {
     int result = 1;
     ulong i;

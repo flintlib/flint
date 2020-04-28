@@ -51,7 +51,7 @@ int main(void)
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        table = f_table(q);
+        table = aprcl_f_table(q);
 
         unity_zp_init(f, p, k, n);
         unity_zp_init(g, p, k, n);
@@ -103,7 +103,7 @@ int main(void)
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        table = f_table(q);
+        table = aprcl_f_table(q);
 
         unity_zp_init(f, p, k, n);
         unity_zp_init(g, p, k, n);
@@ -157,7 +157,7 @@ int main(void)
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        table = f_table(q);
+        table = aprcl_f_table(q);
 
         unity_zp_init(f, p, k, n);
         unity_zp_init(g, p, k, n);

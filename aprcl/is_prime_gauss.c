@@ -22,7 +22,7 @@
         there \sigma_n is the ring automorphism
 */
 int
-_is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
+_aprcl_is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
 {
     int result;
     fmpz_t npow, nval, ncmp;
@@ -70,7 +70,7 @@ _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
         there \sigma_n is the ring automorphism
 */
 int
-_is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
+_aprcl_is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
 {
     int result;
     fmpz_t npow, nval, ncmp;
@@ -110,7 +110,7 @@ _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
         there \sigma_n is the ring automorphism
 */
 slong
-_is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
+_aprcl_is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
 {
     slong result;
     ulong i;
@@ -149,7 +149,7 @@ _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
 }
 
 primality_test_status
-_is_prime_gauss(const fmpz_t n, const aprcl_config config)
+_aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
 {
     int *lambdas;
     ulong i, j, k, nmod4;
@@ -201,7 +201,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
 
             p = q_factors.p[j];
 
-            pind = _p_ind(config, p);
+            pind = _aprcl_p_ind(config, p);
             state = lambdas[pind];
 
             /*
@@ -211,7 +211,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
             */
             if (p == 2 && state == 0 && nmod4 == 1)
             {
-                if (_is_gausspower_2q_equal_first(q, n) == 1)
+                if (_aprcl_is_gausspower_2q_equal_first(q, n) == 1)
                 {
                     state = 3;
                     lambdas[pind] = state;
@@ -233,7 +233,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
             */
             if (p == 2 && (state == 0 || state == 2) && nmod4 == 3)
             {
-                if (_is_gausspower_2q_equal_second(q, n) == 1)
+                if (_aprcl_is_gausspower_2q_equal_second(q, n) == 1)
                 {
                     if (state == 2)
                         state = 3;
@@ -253,7 +253,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
                 r = n_pow(p, k);
 
                 /* if gcd(q*r, n) != 1 */
-                if (is_mul_coprime_ui_ui(q, r, n) == 0)
+                if (aprcl_is_mul_coprime_ui_ui(q, r, n) == 0)
                 {
                     result = COMPOSITE;
                     break;
@@ -263,7 +263,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
                     if exists z such that \tau(\chi^n) = \zeta_r^z*\tau^n(\chi) 
                     unity_power = z; otherwise unity_power = -1
                 */
-                unity_power = _is_gausspower_from_unity_p(q, r, n);
+                unity_power = _aprcl_is_gausspower_from_unity_p(q, r, n);
 
                 /* if unity_power < 0 then n is composite */
                 if (unity_power < 0)
@@ -332,7 +332,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
     if (result == UNKNOWN || result == PROBABPRIME)
     {
         int f_division;
-        f_division = is_prime_final_division(n, config->s, config->R);
+        f_division = aprcl_is_prime_final_division(n, config->s, config->R);
         /* if (Lp) is true for all p | R and f_division == 1 then n - prime */
         if (result == PROBABPRIME && f_division == 1)
             result = PRIME;
@@ -353,15 +353,15 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
 }
 
 int
-is_prime_gauss_min_R(const fmpz_t n, ulong R)
+aprcl_is_prime_gauss_min_R(const fmpz_t n, ulong R)
 {
     primality_test_status result;
     aprcl_config config;
 
-    config_gauss_init_min_R(config, n, R);
-    result = _is_prime_gauss(n, config);
+    aprcl_config_gauss_init_min_R(config, n, R);
+    result = _aprcl_is_prime_gauss(n, config);
 
-    config_gauss_clear(config);
+    aprcl_config_gauss_clear(config);
 
     if (result == PRIME)
         return 1;
@@ -369,7 +369,7 @@ is_prime_gauss_min_R(const fmpz_t n, ulong R)
 }
 
 int
-is_prime_gauss(const fmpz_t n)
+aprcl_is_prime_gauss(const fmpz_t n)
 {
     ulong R;
     primality_test_status result;
@@ -378,10 +378,10 @@ is_prime_gauss(const fmpz_t n)
     if (fmpz_cmp_ui(n, 2) < 0)
        return 0;
 
-    config_gauss_init_min_R(config, n, 180);
-    result = _is_prime_gauss(n, config);
+    aprcl_config_gauss_init_min_R(config, n, 180);
+    result = _aprcl_is_prime_gauss(n, config);
     R = config->R;
-    config_gauss_clear(config);
+    aprcl_config_gauss_clear(config);
 
     /* 
         if result == PROBABPRIME it means that we have
@@ -391,30 +391,30 @@ is_prime_gauss(const fmpz_t n)
     if (result == PROBABPRIME)
     {
         R = R * 2;
-        config_gauss_init_min_R(config, n, R);
-        result = _is_prime_gauss(n, config);
-        config_gauss_clear(config);
+        aprcl_config_gauss_init_min_R(config, n, R);
+        result = _aprcl_is_prime_gauss(n, config);
+        aprcl_config_gauss_clear(config);
     }
 
     if (result == PROBABPRIME)
     {
         R = R * 3;
-        config_gauss_init_min_R(config, n, R);
-        result = _is_prime_gauss(n, config);
-        config_gauss_clear(config);
+        aprcl_config_gauss_init_min_R(config, n, R);
+        result = _aprcl_is_prime_gauss(n, config);
+        aprcl_config_gauss_clear(config);
     }
 
     if (result == PROBABPRIME)
     {
         R = R * 5;
-        config_gauss_init_min_R(config, n, R);
-        result = _is_prime_gauss(n, config);
-        config_gauss_clear(config);
+        aprcl_config_gauss_init_min_R(config, n, R);
+        result = _aprcl_is_prime_gauss(n, config);
+        aprcl_config_gauss_clear(config);
     }
 
     if (result == PROBABPRIME || result == UNKNOWN)
     {
-        flint_printf("is_prime_gauss: failed to prove n prime\n");
+        flint_printf("aprcl_is_prime_gauss: failed to prove n prime\n");
         fmpz_print(n); flint_printf("\n");
         flint_abort();
     }

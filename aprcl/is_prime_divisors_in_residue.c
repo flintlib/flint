@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 int
-is_prime_divisors_in_residue(const fmpz_t n, const fmpz_t s, ulong r)
+aprcl_is_prime_divisors_in_residue(const fmpz_t n, const fmpz_t s, ulong r)
 {
     int result;
     ulong i;

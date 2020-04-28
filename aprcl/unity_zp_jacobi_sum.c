@@ -58,8 +58,8 @@ unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p)
     ulong k;
     mp_ptr table;
 
-    table = f_table(q);
-    k = p_power_in_q(q - 1, p);
+    table = aprcl_f_table(q);
+    k = aprcl_p_power_in_q(q - 1, p);
 
     _unity_zp_jacobi_sum_pq_general(f, table, p, q, k, 1, 1);
 
@@ -75,8 +75,8 @@ unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q)
     ulong k;
     mp_ptr table;
 
-    table = f_table(q);
-    k = p_power_in_q(q - 1, 2);
+    table = aprcl_f_table(q);
+    k = aprcl_p_power_in_q(q - 1, 2);
 
     _unity_zp_jacobi_sum_pq_general(f, table, 2, q, k, 2, 1);
 
@@ -93,8 +93,8 @@ unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
     ulong a, b, k;
     mp_ptr table;
 
-    table = f_table(q);
-    k = p_power_in_q(q - 1, 2);
+    table = aprcl_f_table(q);
+    k = aprcl_p_power_in_q(q - 1, 2);
     b = n_pow(2, k - 3);    /* b = 2^{k - 3}        */
     a = 3 * b;              /* a = 3 * 2^{k - 3}    */
 

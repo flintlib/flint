@@ -35,14 +35,14 @@ int main(void)
 
 
         pbprime = fmpz_is_probabprime(n);
-        cycloprime = is_prime_gauss(n);
+        cycloprime = aprcl_is_prime_gauss(n);
         
         if (pbprime != cycloprime)
         {
             flint_printf("FAIL\n");
             flint_printf("Testing number = ");
             fmpz_print(n);
-            flint_printf("\nis_probabprime = %i, is_prime_gauss = %i\n", pbprime, cycloprime);
+            flint_printf("\nis_probabprime = %i, aprcl_is_prime_gauss = %i\n", pbprime, cycloprime);
             abort();
         }
 
@@ -57,12 +57,12 @@ int main(void)
 
         /* Test big primes. */
         fmpz_set_str(n, "40206835204840513073", 10);
-        if (is_prime_gauss(n) == 0)
+        if (aprcl_is_prime_gauss(n) == 0)
             result = 0;
 
         /* 521419622856657689423872613771 % 4 == 3 */
         fmpz_set_str(n, "521419622856657689423872613771", 10);
-        if (is_prime_gauss(n) == 0)
+        if (aprcl_is_prime_gauss(n) == 0)
             result = 0;
 
         /* Very slow. */
@@ -70,24 +70,24 @@ int main(void)
         {
             /* 5991810554633396517767024967580894321153 % 4 == 1 */
             fmpz_set_str(n, "5991810554633396517767024967580894321153", 10);
-            if (is_prime_gauss(n) == 0)
+            if (aprcl_is_prime_gauss(n) == 0)
                 result = 0;
         }
 
         /* Test big composite. */
         /* 1500450271 * 5915587277 */
         fmpz_set_str(n, "8876044532898802067", 10);
-        if (is_prime_gauss(n) == 1)
+        if (aprcl_is_prime_gauss(n) == 1)
             result = 0;
 
         /* 5915587277 * 54673257461630679457 */
         fmpz_set_str(n, "323424426232167763068694468589", 10);
-        if (is_prime_gauss(n) == 1)
+        if (aprcl_is_prime_gauss(n) == 1)
             result = 0;
 
         /* 48112959837082048697 * 66405897020462343733 */
         fmpz_set_str(n, "3194984256290911228520362769161858765901", 10);
-        if (is_prime_gauss(n) == 1)
+        if (aprcl_is_prime_gauss(n) == 1)
             result = 0;
 
         if (result == 0)

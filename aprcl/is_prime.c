@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 int
-is_prime_aprcl(const fmpz_t n)
+aprcl_is_prime(const fmpz_t n)
 {
-    return is_prime_jacobi(n);
+    return aprcl_is_prime_jacobi(n);
 }

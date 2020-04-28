@@ -34,14 +34,14 @@ int main(void)
             fmpz_randtest_unsigned(n, state, 1000);
 
         pbprime = fmpz_is_probabprime(n);
-        cycloprime = is_prime_jacobi(n);
+        cycloprime = aprcl_is_prime_jacobi(n);
         
         if (pbprime != cycloprime)
         {
             flint_printf("FAIL\n");
             flint_printf("Testing number = ");
             fmpz_print(n);
-            flint_printf("\nis_probabprime = %i, is_prime_gauss = %i\n", pbprime, cycloprime);
+            flint_printf("\nis_probabprime = %i, aprcl_is_prime_jacobi = %i\n", pbprime, cycloprime);
             abort();
         }
 

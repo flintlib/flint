@@ -265,7 +265,7 @@ int fmpz_is_prime(const fmpz_t n)
                               fmpz_clear(r);
                            } else /* apr-cl primality test */
                            {
-                              res = is_prime_aprcl(n);
+                              res = aprcl_is_prime(n);
                            }
 
                            fmpz_clear(d);
@@ -288,7 +288,7 @@ int fmpz_is_prime(const fmpz_t n)
 
    }
 
-   /* is_prime_aprcl() actually throws, but it does not hurt to have
+   /* aprcl_is_prime() actually throws, but it does not hurt to have
       this fallback here */
    if (res < 0)
    {

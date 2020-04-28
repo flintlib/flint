@@ -68,75 +68,75 @@ typedef enum
 } primality_test_status;
 
 /* Useful functions */
-FLINT_DLL int _p_ind(const aprcl_config conf, ulong p);
+FLINT_DLL int _aprcl_p_ind(const aprcl_config conf, ulong p);
 
-FLINT_DLL ulong p_power_in_q(ulong q, ulong p);
+FLINT_DLL ulong aprcl_p_power_in_q(ulong q, ulong p);
 
-FLINT_DLL int is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n);
+FLINT_DLL int aprcl_is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n);
 
-FLINT_DLL int is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n);
+FLINT_DLL int aprcl_is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n);
 
 /* 
                             Primality tests
 --------------------------------------------------------------------------------
 */
 
-FLINT_DLL int is_prime_aprcl(const fmpz_t n);
+FLINT_DLL int aprcl_is_prime(const fmpz_t n);
 
 /* Gauss test configuration */
-FLINT_DLL void config_gauss_init(aprcl_config conf, const fmpz_t n);
+FLINT_DLL void aprcl_config_gauss_init(aprcl_config conf, const fmpz_t n);
 
-FLINT_DLL void config_gauss_init_min_R(aprcl_config conf,
+FLINT_DLL void aprcl_config_gauss_init_min_R(aprcl_config conf,
         const fmpz_t n, ulong R);
 
-FLINT_DLL void config_gauss_clear(aprcl_config conf);
+FLINT_DLL void aprcl_config_gauss_clear(aprcl_config conf);
 
 /* Jacobi test configuration */
 FLINT_DLL ulong aprcl_R_value(const fmpz_t n);
 
-FLINT_DLL void config_jacobi_init(aprcl_config conf, const fmpz_t n);
+FLINT_DLL void aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n);
 
-FLINT_DLL void config_jacobi_clear(aprcl_config conf);
+FLINT_DLL void aprcl_config_jacobi_clear(aprcl_config conf);
 
 /*  Gauss sums primality test */
-FLINT_DLL int is_prime_gauss(const fmpz_t n);
+FLINT_DLL int aprcl_is_prime_gauss(const fmpz_t n);
 
-FLINT_DLL int is_prime_gauss_min_R(const fmpz_t n, ulong R);
+FLINT_DLL int aprcl_is_prime_gauss_min_R(const fmpz_t n, ulong R);
 
-FLINT_DLL primality_test_status _is_prime_gauss(const fmpz_t n,
+FLINT_DLL primality_test_status _aprcl_is_prime_gauss(const fmpz_t n,
         const aprcl_config config);
 
-FLINT_DLL int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
+FLINT_DLL int _aprcl_is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
 
-FLINT_DLL int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
+FLINT_DLL int _aprcl_is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
 
-FLINT_DLL slong _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
+FLINT_DLL slong _aprcl_is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
 
 /* Jacobi sums primality test */
-FLINT_DLL int is_prime_jacobi(const fmpz_t n);
+FLINT_DLL int aprcl_is_prime_jacobi(const fmpz_t n);
 
-FLINT_DLL primality_test_status _is_prime_jacobi(const fmpz_t n,
+FLINT_DLL primality_test_status _aprcl_is_prime_jacobi(const fmpz_t n,
         const aprcl_config config);
 
-FLINT_DLL slong _is_prime_jacobi_check_pk(const unity_zp j,
+FLINT_DLL slong _aprcl_is_prime_jacobi_check_pk(const unity_zp j,
         const fmpz_t u, ulong v);
 
-FLINT_DLL slong _is_prime_jacobi_check_21(ulong q,
+FLINT_DLL slong _aprcl_is_prime_jacobi_check_21(ulong q,
         const fmpz_t n);
 
-FLINT_DLL slong _is_prime_jacobi_check_22(const unity_zp j,
+FLINT_DLL slong _aprcl_is_prime_jacobi_check_22(const unity_zp j,
         const fmpz_t u, ulong v, ulong q);
 
-FLINT_DLL slong _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
+FLINT_DLL slong _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
         const unity_zp j2_2, const fmpz_t u, ulong v);
 
-FLINT_DLL int _is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
+FLINT_DLL int _aprcl_is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
 
 /* Final division functions */
-FLINT_DLL int is_prime_divisors_in_residue(const fmpz_t n,
+FLINT_DLL int aprcl_is_prime_divisors_in_residue(const fmpz_t n,
         const fmpz_t s, ulong r);
 
-FLINT_DLL int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
+FLINT_DLL int aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 
 /*
                         Z[unity_root]/(n) operations
@@ -272,7 +272,7 @@ FLINT_DLL void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);
 FLINT_DLL void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
 
 /* Jacobi sum computation. */
-FLINT_DLL mp_ptr f_table(const ulong q);
+FLINT_DLL mp_ptr aprcl_f_table(const ulong q);
 
 FLINT_DLL void _unity_zp_jacobi_sum_pq_general(unity_zp f,
         const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
