@@ -58,7 +58,7 @@ void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
    {
       fmpz_mul(res + k, tf->coeffs + i, cinv); 
 
-      fmpz_mods(res + k, res + k, p);
+      fmpz_smod(res + k, res + k, p);
 
       _fmpz_vec_scalar_submul_fmpz(tf->coeffs + i,  g->coeffs + zeroes,
                                 FLINT_MIN(g->length - zeroes, n - k), res + k);

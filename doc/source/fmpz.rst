@@ -877,7 +877,7 @@ Basic arithmetic
     Sets `f` to `g` reduced modulo `x` where `x` is an 
     ``ulong``.  If `x` is `0` an exception will result.
 
-.. function:: void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h)
+.. function:: void fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the signed remainder `y \equiv g \bmod h` satisfying
     `-\lvert h \rvert/2 < y \leq \lvert h\rvert/2`.

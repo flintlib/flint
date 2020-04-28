@@ -426,7 +426,7 @@ void _fmpz_multi_crt_run(
         fmpz_sub(t1, B, C);
         fmpz_mul(t2, P->prog[i].idem, t1);
         fmpz_sub(t1, B, t2);
-        fmpz_mods(A, t1, P->prog[i].modulus);
+        fmpz_smod(A, t1, P->prog[i].modulus);
 
         /* last calculation should write answer to outputs[0] */
         if (i + 1 >= P->length)
@@ -463,7 +463,7 @@ void _fmpz_multi_crt_run_p(
         fmpz_sub(t1, B, C);
         fmpz_mul(t2, P->prog[i].idem, t1);
         fmpz_sub(t1, B, t2);
-        fmpz_mods(A, t1, P->prog[i].modulus);
+        fmpz_smod(A, t1, P->prog[i].modulus);
 
         /* last calculation should write answer to outputs[0] */
         if (i + 1 >= P->length)

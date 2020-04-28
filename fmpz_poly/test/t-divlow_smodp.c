@@ -79,7 +79,7 @@ main(void)
         result = 1;
         for (j = 0; j < n && result; j++)
         {
-           fmpz_mods(t, a->coeffs + j, P);
+           fmpz_smod(t, a->coeffs + j, P);
            result = fmpz_equal(t, vec + j);
         }
 

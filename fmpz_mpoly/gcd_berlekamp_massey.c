@@ -1395,7 +1395,7 @@ void fmpz_mpolyu_symmetrize_coeffs(
         Ac = A->coeffs + i;
         for (j = 0; j < Ac->length; j++)
         {
-            fmpz_mods(Ac->coeffs + j, Ac->coeffs + j,
+            fmpz_smod(Ac->coeffs + j, Ac->coeffs + j,
                                                   fmpz_mod_ctx_modulus(fpctx));
         }
     }
