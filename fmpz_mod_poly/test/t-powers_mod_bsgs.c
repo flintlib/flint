@@ -23,7 +23,7 @@ main(void)
     int i, result, max_threads = 5;
     FLINT_TEST_INIT(state);
 
-    flint_printf("powers_mod_bsgs_threaded....");
+    flint_printf("powers_mod_bsgs....");
     fflush(stdout);
 
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)

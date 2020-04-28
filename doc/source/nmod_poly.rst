@@ -1,5 +1,5 @@
-.. _nmod-poly:
 
+.. _nmod-poly:
 **nmod_poly.h** -- univariate polynomials over integers mod n (word-size n)
 ===============================================================================
 
@@ -844,7 +844,7 @@ Powering
     No aliasing is permitted between the entries of ``res`` and either of the
     inputs.
 
-.. function:: void _nmod_poly_powers_mod_preinv_bsgs_threaded_pool(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod, thread_pool_handle * threads, slong num_threads)
+.. function:: void _nmod_poly_powers_mod_preinv_threaded_pool(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod, thread_pool_handle * threads, slong num_threads)
 
     Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
     and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
@@ -853,7 +853,7 @@ Powering
     ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
     reverse of ``g``.
 
-.. function:: void _nmod_poly_powers_mod_preinv_bsgs_threaded(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod, slong thread_limit)   
+.. function:: void _nmod_poly_powers_mod_preinv_threaded(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod)   
 
     Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
     and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
@@ -862,7 +862,7 @@ Powering
     ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
     reverse of ``g``.
 
-.. function:: void nmod_poly_powers_mod_bsgs_threaded(nmod_poly_struct * res, const nmod_poly_t f, slong n, const nmod_poly_t g, slong thread_limit)
+.. function:: void nmod_poly_powers_mod_bsgs(nmod_poly_struct * res, const nmod_poly_t f, slong n, const nmod_poly_t g)
 
     Set the entries of the array ``res`` to ``f^0, f^1, ..., f^(n-1) mod g``.
     No aliasing is permitted between the entries of ``res`` and either of the
