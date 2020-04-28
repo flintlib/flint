@@ -154,7 +154,7 @@ _nmod_poly_interval_poly_worker(void * arg_ptr)
 }
 
 void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
-               const nmod_poly_t poly, slong * const *degs, slong thread_limit)
+                                   const nmod_poly_t poly, slong * const *degs)
 {
     nmod_poly_t f, g, v, vinv, tmp, II;
     nmod_poly_struct * h, * H, * I, * scratch;
@@ -193,7 +193,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
     nmod_poly_init_mod(tmp, poly->mod);
     nmod_poly_init_mod(II, poly->mod);
 
-    num_threads = flint_request_threads(&threads, thread_limit);
+    num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
     h = (nmod_poly_struct *) flint_malloc((2*m + l + num_threads + 2)*
                            sizeof(nmod_poly_struct));

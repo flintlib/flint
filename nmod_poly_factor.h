@@ -95,8 +95,7 @@ FLINT_DLL void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
 FLINT_DLL ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
 FLINT_DLL void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
-                                   const nmod_poly_t poly, slong * const *degs,
-				   slong thread_limit);
+                                  const nmod_poly_t poly, slong * const *degs);
 
 FLINT_DLL int nmod_poly_is_irreducible(const nmod_poly_t f);
 
