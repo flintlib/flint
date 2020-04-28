@@ -142,8 +142,7 @@
 
     Factor `n` using the quadratic sieve method. It is required that `n` is not a
     prime and not a perfect power. There is no guarantee that the factors found will
-    be prime, or distinct. ``thread_limit`` is an upper limit on the number of
-    threads to use.
+    be prime, or distinct.
 
 
  
