@@ -42,7 +42,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         cutoff = 200;
 
     if (flint_get_num_threads() > 1)
-	nmod_mat_mul_classical_threaded(C, A, B, FLINT_DEFAULT_THREAD_LIMIT);
+	nmod_mat_mul_classical_threaded(C, A, B);
     else if (m < cutoff || n < cutoff || k < cutoff)
         nmod_mat_mul_classical(C, A, B);
     else

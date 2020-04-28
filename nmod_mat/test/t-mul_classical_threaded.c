@@ -102,7 +102,7 @@ main(void)
 
         nmod_mat_randtest(C, state);  /* make sure noise in the output is ok */
 
-        nmod_mat_mul_classical_threaded(C, A, B, FLINT_DEFAULT_THREAD_LIMIT);
+        nmod_mat_mul_classical_threaded(C, A, B);
         nmod_mat_mul_check(D, A, B);
 
         if (!nmod_mat_equal(C, D))

@@ -130,7 +130,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
     _nmod_poly_powers_mod_preinv_threaded_pool(A->rows, g, glen,
 	                 m, poly, len, polyinv, leninv, mod, threads, num_threads);
 
-    _nmod_mat_mul_classical_threaded_pool(C, NULL, B, A, 0,
+    _nmod_mat_mul_classical_threaded_pool_op(C, NULL, B, A, 0,
                                                          threads, num_threads);
 
     /* Evaluate block composition using the Horner scheme */
