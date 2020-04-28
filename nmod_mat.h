@@ -181,7 +181,7 @@ FLINT_DLL void nmod_mat_mul_classical_threaded(nmod_mat_t C,
 		                       const nmod_mat_t A, const nmod_mat_t B);
 FLINT_DLL void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
-FLINT_DLL void _nmod_mat_mul_classical(nmod_mat_t D, const nmod_mat_t C,
+FLINT_DLL void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B, int op);
 
 FLINT_DLL void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
