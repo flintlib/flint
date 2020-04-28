@@ -26,7 +26,7 @@ with op = -1, computes D = C - A*B
 */
 
 static __inline__ void
-_fmpz_mod_mat_addmul_basic(fmpz ** D, fmpz ** const C, fmpz ** const A,
+_fmpz_mod_mat_addmul_basic_op(fmpz ** D, fmpz ** const C, fmpz ** const A,
                fmpz ** const B, slong m, slong k, slong n, int op, fmpz_t p)
 {
     slong i, j;
@@ -130,7 +130,7 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
 }
 
 static __inline__ void
-_fmpz_mod_mat_addmul_transpose_threaded_pool(fmpz ** D, fmpz ** const C,
+_fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
                             fmpz ** const A, fmpz ** const B, slong m,
                                        slong k, slong n, int op, fmpz_t p,
                                thread_pool_handle * threads, slong num_threads)
@@ -208,7 +208,7 @@ _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D, const fmpz_mod_ma
     k = A->mat->c;
     n = B->mat->c;
 
-    _fmpz_mod_mat_addmul_transpose_threaded_pool(D->mat->rows, 
+    _fmpz_mod_mat_addmul_transpose_threaded_pool_op(D->mat->rows, 
                 (op == 0) ? NULL : C->mat->rows, A->mat->rows, B->mat->rows,
                                     m, k, n, op, D->mod, threads, num_threads);
 }
@@ -234,7 +234,7 @@ fmpz_mod_mat_mul_classical_threaded_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
         || A->mat->c < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF
         || B->mat->c < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
-        _fmpz_mod_mat_addmul_basic(D->mat->rows,
+        _fmpz_mod_mat_addmul_basic_op(D->mat->rows,
                                          (op == 0) ? NULL : C->mat->rows,
                                       A->mat->rows, B->mat->rows, A->mat->r,
                                              A->mat->c, B->mat->c, op, D->mod);
