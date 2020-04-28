@@ -56,8 +56,14 @@ aprcl_R_value(const fmpz_t n)
     if (bits <= 9977) return 367567200;
     if (bits <= 12713) return 1396755360;
 
+#if FLINT64
     /* 2^5 * 3^3 * 5^2 * 7 * 11 * 13 * 17 * 19 */
     return UWORD(6983776800);
+#else
+    flint_printf("APRCL not supported for huge numbers on 32 bits\n");
+    flint_abort();
+    return 0;
+#endif
 }
 
 static void
