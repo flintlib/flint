@@ -111,6 +111,51 @@ add FLINT_DLL to inline functions. Rather, add a single FLINT_DLL to the
 non-inline branch inside the relevant BLAH_INLINES_C #define at the top of the
 .h file.
 
+Underscores in function names
+-----------------------------
+
+Generally, underscores should not be used in function names to "hide" them.
+Instead, append _internal or _helper or just make the function static in the
+file in which it is used and give it a very descriptive name.
+
+Underscores at the beginning of function names have a special meaning in Flint.
+Functions without underscores generally are user facing in the sense that they
+handle aliasing (if appropriate), memory management and deal with objects that
+have structs associated to them.
+
+Functions with underscores are lower level and may have restrictions, such as
+not handling aliasing, assuming all objects have already been resized to have
+enough space for the output to be written and typically take many more
+arguments, corresponding to the various entries of higher level structs, e.g.
+an array of coefficients and a length instead of a polynomial struct.
+
+
+Threading
+---------
+
+Flint uses a custom thread pool for threading. This involves creating a worker
+function, requesting threads from the thread pool, starting the threads,
+waiting for them to finish, then giving the threads back to the pool. Simple
+examples of this include fmpz_mod_mat_mul_classical_threaded and
+fmpz_poly_taylor_shift_multi_mod.
+
+The user should not have to run specialised versions of functions to get
+threading. This means that user facing functions should generally not have
+_threaded appended to their name. Either there is a single function that does
+the job, and it happens to be threaded, or there is a best-of-breed function
+that calls the appropriate threaded function when this is the best strategy.
+
+There are some instances where it may be desirable (e.g. for testing purposes,
+or because naming proves difficult) where one wants a _threaded in the name.
+But these cases should be rare.
+
+In some cases, one does not want functions to request threads from the pool
+themselves, but to accept threads from another function which has already
+obtained them. Such functions will accept an array of thread pool handles
+and a number of threads. The naming convention for such functions is to append
+_threaded_pool to the end of their name. However, the usual distinctions
+between underscore and non-underscore functions should still apply.
+
 Code formatting
 ---------------
 
