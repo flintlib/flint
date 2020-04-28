@@ -42,8 +42,7 @@ int compare_facs(const void * a, const void * b)
    multiple polynomial quadratic sieve with single large prime variation.
    Assumes n is not prime and not a perfect power.
 */
-void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
-                                                            slong thread_limit)
+void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 {
     qs_t qs_inf;
     mp_limb_t small_factor, delta;
@@ -67,7 +66,7 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
 
        factors->sign *= -1;
        
-       qsieve_factor_threaded(factors, n2, thread_limit);
+       qsieve_factor(factors, n2);
 
        fmpz_clear(n2);
        
@@ -193,7 +192,7 @@ void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
     flint_printf("\nPolynomial Initialisation and Sieving\n");
 #endif
 
-    qs_inf->num_handles = flint_request_threads(&qs_inf->handles, thread_limit);
+    qs_inf->num_handles = flint_request_threads(&qs_inf->handles, flint_get_num_threads());
 
     /* ensure cache lines don't overlap if num_handles > 0 */
     sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulong)
