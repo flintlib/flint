@@ -20,7 +20,6 @@ main(void)
 {
     slong rep, r, c, min_nnz, max_nnz, bits, rk, rk2, nreps = 10;
     fmpz_t mod;
-    slong *P;
     fmpz_mat_t dH;
     fmpz_sparse_mat_t A, H, H2;
     FLINT_TEST_INIT(state);
@@ -30,7 +29,7 @@ main(void)
 
     for (rep = 0; rep < nreps; rep++)
     {
-        bits = 64 + n_randint(state, 10);
+        bits = 64 + n_randint(state, 70);
         c = n_randint(state, 10); 
         r = c + n_randint(state, 10); 
         min_nnz = 0;

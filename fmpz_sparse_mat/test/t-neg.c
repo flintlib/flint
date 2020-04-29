@@ -28,7 +28,7 @@ main(void)
     for (rep = 0; rep < 1000; rep++)
     {
         do bits = n_randint(state, 200);
-        while ((bits < UWORD(2));
+        while (bits < UWORD(2));
         r = n_randint(state, 200);
         c = n_randint(state, 200);
         fmpz_sparse_mat_init(A, r, c);

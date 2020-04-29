@@ -31,7 +31,7 @@ main(void)
     for (rep = 0; rep < 1000; rep++)
     {
         do bits = n_randint(state, 70);
-        while ((bits < UWORD(2));
+        while (bits < UWORD(2));
         r = 1 + n_randint(state, 20);
         c = 1 + n_randint(state, 20);
         k = 1 + n_randint(state, 20);
