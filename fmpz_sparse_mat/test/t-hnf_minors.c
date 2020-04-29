@@ -30,7 +30,6 @@ main(void)
 
     for (rep = 0; rep < nreps; rep++)
     {
-        if (rep % 20 == 0) {flint_printf("."); fflush(stdout);}
         bits = 2 + n_randint(state, 100);
         r = n_randint(state, 20);
         c = n_randint(state, 20);

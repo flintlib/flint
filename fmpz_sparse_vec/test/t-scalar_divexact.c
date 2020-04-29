@@ -46,11 +46,8 @@ main(void)
 
         fmpz_sparse_vec_randtest(u, state, nnz, len, bits);
         fmpz_sparse_vec_randtest(v, state, nnz, len, bits);
-        flint_printf("u = "), fmpz_sparse_vec_print_pretty(u, 0, 0);
-        flint_printf("v = "), fmpz_sparse_vec_print_pretty(v, 0, 0);
 
         fmpz_sparse_vec_scalar_mul_fmpz(v, u, c);
-        flint_printf("v = "), fmpz_sparse_vec_print_pretty(v, 0, 0);
         fmpz_sparse_vec_scalar_divexact_fmpz(w, v, c);
 
         if (!fmpz_sparse_vec_equal(w, u, 0))

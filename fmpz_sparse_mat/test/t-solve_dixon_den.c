@@ -87,6 +87,6 @@ main(void)
 
     FLINT_TEST_CLEANUP(state);
     
-    flint_printf("PASS\nNum bad fail: %wd\n", num_bad_fail);
+    flint_printf("PASS\n");
     return 0;
 }
