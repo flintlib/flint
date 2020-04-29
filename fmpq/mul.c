@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2020 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,6 +15,12 @@ void
 _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den,
             const fmpz_t op2num, const fmpz_t op2den)
 {
+    if (!COEFF_IS_MPZ(*op1num) && !COEFF_IS_MPZ(*op1den) && !COEFF_IS_MPZ(*op2num) && !COEFF_IS_MPZ(*op2den))
+    {
+        _fmpq_mul_small(rnum, rden, *op1num, *op1den, *op2num, *op2den);
+        return;
+    }
+
     /* Common special cases: squaring, same denominator (e.g. both integers) */
     if (((op1num == op2num) && (op1den == op2den)) ||
          fmpz_equal(op1den, op2den))

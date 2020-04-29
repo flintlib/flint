@@ -18,6 +18,12 @@ _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
 {
     fmpz_t u;
 
+    if (!COEFF_IS_MPZ(*p) && !COEFF_IS_MPZ(*q) && r >= COEFF_MIN && r <= COEFF_MAX)
+    {
+        _fmpq_add_small(rnum, rden, *p, *q, r, 1);
+        return;
+    }
+
     /* both are integers */
     if (fmpz_is_one(q))
     {

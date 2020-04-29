@@ -18,13 +18,17 @@ _fmpq_add_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
 {
     fmpz_t u;
 
+    if (!COEFF_IS_MPZ(*p) && !COEFF_IS_MPZ(*q) && r <= COEFF_MAX)
+    {
+        _fmpq_add_small(rnum, rden, *p, *q, r, 1);
+        return;
+    }
+
     /* both are integers */
     if (fmpz_is_one(q))
     {
         fmpz_add_ui(rnum, p, r);
-
         fmpz_set(rden, q);
-        
         return;
     }
 

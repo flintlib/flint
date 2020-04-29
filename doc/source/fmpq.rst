@@ -365,8 +365,6 @@ Random number generation
 Arithmetic
 --------------------------------------------------------------------------------
 
-
-
 .. function:: void fmpq_add(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
 .. function:: void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
@@ -419,9 +417,9 @@ Arithmetic
 
 .. function:: void fmpq_sub_ui(fmpq_t res, const fmpq_t op1, ulong c)
                                                                                
-.. function:: void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
+.. function:: void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
 
-.. function:: void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
+.. function:: void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
 
    Sets ``res`` to the sum or difference respectively, of the fraction 
    ``op1`` and the integer `c`.
@@ -465,9 +463,9 @@ Arithmetic
     Sets ``dest`` to ``1 / src``. The result is placed in canonical
     form, assuming that ``src`` is already in canonical form.
 
-.. function:: void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, const fmpz_t opnum, const fmpz_t opden, slong e);
+.. function:: void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, const fmpz_t opnum, const fmpz_t opden, slong e)
 
-.. function:: void fmpq_pow_si(fmpq_t res, const fmpq_t op, slong e);
+.. function:: void fmpq_pow_si(fmpq_t res, const fmpq_t op, slong e)
 
     Sets ``res`` to ``op`` raised to the power~`e`, where~`e` 
     is a ``slong``.  If `e` is `0` and ``op`` is `0`, then 
@@ -509,6 +507,18 @@ Arithmetic
 
     Set ``res`` to the gcd of ``op1`` and ``op2``. See the low
     level function ``_fmpq_gcd`` for our definition of gcd.
+
+.. function:: void _fmpq_add_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2)
+
+    Sets ``(rnum, rden)`` to the sum of ``(p1, q1)`` and ``(p2, q2)``.
+    Assumes that ``(p1, q1)`` and ``(p2, q2)`` are in canonical form
+    and that all inputs are between ``COEFF_MIN`` and ``COEFF_MAX``.
+
+.. function:: void _fmpq_mul_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2)
+
+    Sets ``(rnum, rden)`` to the product of ``(p1, q1)`` and ``(p2, q2)``.
+    Assumes that ``(p1, q1)`` and ``(p2, q2)`` are in canonical form
+    and that all inputs are between ``COEFF_MIN`` and ``COEFF_MAX``.
 
 
 Modular reduction and rational reconstruction
