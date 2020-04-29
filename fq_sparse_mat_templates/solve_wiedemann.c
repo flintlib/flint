@@ -35,7 +35,7 @@ static slong find_min_poly(TEMPLATE(T, struct) *s, slong N, const TEMPLATE(T, ct
 
 	for (n = 0, m = 1; n < N; n++, m++)
 	{
-		/* d_C = sum_{i=0}^L C_i * s_{n-i} */
+		/* d_C = sum_{i = 0}^L C_i * s_{n-i} */
 		TEMPLATE(T, set) (d_C, &s[n], ctx);
 		for (i = 1; i <= L; i++)
         {
@@ -76,7 +76,7 @@ static slong find_min_poly(TEMPLATE(T, struct) *s, slong N, const TEMPLATE(T, ct
 	return L;
 }
 
-/* Compute s_ij=(A^j y)_i for i=0,...,ns-1, j=0,...,num-1*/
+/* Compute s_ij=(A^j y)_i for i = 0,...,ns-1, j = 0,...,num-1*/
 static void make_sequences(TEMPLATE(T, struct) **s, slong ns, slong len, const TEMPLATE(T, sparse_mat_t) A, TEMPLATE(T, struct) **y, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong iter, i, j;
@@ -87,7 +87,7 @@ static void make_sequences(TEMPLATE(T, struct) **s, slong ns, slong len, const T
     }
 }
 
-/* Compute x = \Sigma_{i=0}^{L-1} s_i * A^i * b = 0 */
+/* Compute x = \Sigma_{i = 0}^{L-1} s_i * A^i * b = 0 */
 static void make_sum(TEMPLATE(T, struct) *x, TEMPLATE(T, struct) *s, slong L, const TEMPLATE(T, sparse_mat_t) A, TEMPLATE(T, struct) **y, const TEMPLATE(T, ctx_t) ctx)
 {
     slong iter, i;
@@ -127,7 +127,7 @@ int TEMPLATE(T, sparse_mat_solve_wiedemann) (TEMPLATE(T, struct) *x, const TEMPL
         L = find_min_poly(s[i], len, ctx);
         if (TEMPLATE(T, is_zero) (&s[i][0], ctx)) continue;
 
-        /* If \sum_{j=0}^L s_ijA^jb = 0 => x = -1/s[0]\sum_{j=0}^{L-1} s_i(j-1) A^jb solves Ax=b */
+        /* If \sum_{j = 0}^L s_ijA^jb = 0 => x = -1/s[0]\sum_{j = 0}^{L-1} s_i(j-1) A^jb solves Ax = b */
         _TEMPLATE(T, vec_set) (y[0], b, A->r, ctx);
         make_sum(x, s[i]+1, L, A, y, ctx);
         TEMPLATE(T, inv) (cc, &s[i][0], ctx);
@@ -167,7 +167,7 @@ int TEMPLATE(T, sparse_mat_nullvector_wiedemann) (TEMPLATE(T, struct) *x, const 
         /* Get minimal polynomial */
         L = find_min_poly(s[i], len, ctx);
 
-        /* \sum_{j=0}^L s_ijA^jb = 0 => x = \sum_{j=0}^L s_ijA^jx solves Ax=0 */
+        /* \sum_{j = 0}^L s_ijA^jb = 0 => x = \sum_{j = 0}^L s_ijA^jx solves Ax = 0 */
         _TEMPLATE(T, vec_set) (y[1], y[0], A->r, ctx);
         make_sum(x, s[i], L+1, A, &y[1], ctx);
         TEMPLATE(T, sparse_mat_mul_vec) (y[1], A, x, ctx);

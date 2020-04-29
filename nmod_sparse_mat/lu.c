@@ -51,10 +51,13 @@ static void heap_down(slong *heap, slong *heap_idx, slong *scores, slong size, s
     heap_idx[c] = pos;
 }
 
-/* static void print_heap(slong *heap, slong *scores, slong size) {
+/* static void print_heap(slong *heap, slong *scores, slong size) 
+{
     slong level, i;
-    for (level = 1; level<=size; level<<=1) {
-        for (i = level; i<=size && i < 2*level; ++i) {
+    for (level = 1; level <= size; level<<=1) 
+    {
+        for (i = level; i <= size && i < 2*level; ++i) 
+        {
             flint_printf("%wd:%wd,%wd\t", i-1, heap[i-1], scores[heap[i-1]]);
         }
         flint_printf("\n");

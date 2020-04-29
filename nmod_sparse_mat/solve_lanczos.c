@@ -82,7 +82,8 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr
     return ret;
 }
 
-int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t M, flint_rand_t state) {
+int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t M, flint_rand_t state) 
+{
     int ret = 1;
     mp_ptr x2, b;
     x2 = _nmod_vec_init(M->c);
@@ -90,7 +91,7 @@ int nmod_sparse_mat_nullvector_lanczos(mp_ptr x, const nmod_sparse_mat_t M, flin
 
     _nmod_vec_randtest(x, state, M->c, M->mod);
     nmod_sparse_mat_mul_vec(b, M, x);
-    if(nmod_sparse_mat_solve_lanczos(x2, M, b, state) == 0) ret = 0; /* Lanczos failed */
+    if (nmod_sparse_mat_solve_lanczos(x2, M, b, state) == 0) ret = 0; /* Lanczos failed */
     if (ret)
     {
         _nmod_vec_sub(x, x, x2, M->c, M->mod);

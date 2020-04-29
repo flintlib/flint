@@ -38,7 +38,7 @@ main(void)
     
     for (rep = 0; rep < nreps; ++rep)
     {
-        if(rep % 5==0) {flint_printf("."); fflush(stdout);}
+        if (rep % 5==0) {flint_printf("."); fflush(stdout);}
         c = r = 200 + n_randint(state, 100);
         do n = n_randtest_not_zero(state);
         while (n <= 32 || !n_is_prime(n));
@@ -60,7 +60,7 @@ main(void)
             /* if (i == 0 && rk[0] == UWORD(0) ) { nmod_mat_clear(X); break;} */
 /*             gettimeofday(&end, NULL);
             elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec); */
-            if(X->c==0) continue;
+            if (X->c==0) continue;
             nmod_mat_init(AX, A->r, X->c, n);
             nmod_sparse_mat_mul_mat(AX, A, X); 
             /*nmod_mat_print_pretty(AX); */
@@ -73,7 +73,7 @@ main(void)
                 nmod_mat_print_pretty(X);
                 abort();
             }
-            if(rk[i] != rk[0]) discrep[i] += 1;
+            if (rk[i] != rk[0]) discrep[i] += 1;
             
             nmod_mat_clear(X);
             nmod_mat_clear(AX);
@@ -83,11 +83,11 @@ main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-    for(i = 0; i < 6; ++i)
+    for (i = 0; i < 6; ++i)
     {
         flint_printf("Found nullspace with %s\n", names[i]);
 /*         flint_printf("\tAverage time %lf:\n", elapsed[i]/nreps); */
-        if(discrep[i] > 0)
+        if (discrep[i] > 0)
             flint_printf("\tFailed to find full nullspace in %wd/%wd trials\n", 
                          discrep[i], nreps);        
     }

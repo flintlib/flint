@@ -42,7 +42,7 @@ static slong find_min_poly(mp_limb_t *s, slong N, nmod_t mod)
         for (i = 0; i <= deg_B; ++i)
             C[m+i] = nmod_addmul(C[m+i], B[i], c, mod);
         deg_C = FLINT_MAX(deg_C, deg_B + m);
-        while(C[deg_C] == UWORD(0)) --deg_C;  /* Probably unnecessary */
+        while (C[deg_C] == UWORD(0)) --deg_C;  /* Probably unnecessary */
 
         if (2*L <= n) /* Increase number of errors */
         {
@@ -69,7 +69,7 @@ static void make_sequences(mp_limb_t **s, slong ns, slong len, const nmod_sparse
     memcpy(y, b, M->r*sizeof(*y));
     for (j = 0; j < len; ++j) 
     {
-        if(j > 0) nmod_sparse_mat_mul_vec(My, M, y), memcpy(y, My, M->r*sizeof(*y));
+        if (j > 0) nmod_sparse_mat_mul_vec(My, M, y), memcpy(y, My, M->r*sizeof(*y));
         for (i = 0; i < ns; ++i) s[i][j] = y[i];
     }
     _nmod_vec_clear(y);
@@ -99,7 +99,7 @@ int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, mp_srcp
     slong i, L, ret = 0, ns = FLINT_MIN(M->r, 2), len = 2*M->r + 1;
     mp_limb_t **s; 
     mp_ptr Mx;
-    if(M->r != M->c) return 0; /* TBD: reduce to square */
+    if (M->r != M->c) return 0; /* TBD: reduce to square */
     if (_nmod_vec_is_zero(b, M->c))
     {
         _nmod_vec_zero(x, M->c);
@@ -117,7 +117,7 @@ int nmod_sparse_mat_solve_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, mp_srcp
     {
         /* Get minimal polynomial */
         L = find_min_poly(s[i], len, M->mod);
-        if(s[i][0]==0) continue;
+        if (s[i][0]==0) continue;
 
         /* If \sum_{j = 0}^L s_ijM^jb = 0 => x = -1/s[0]\sum_{j = 0}^{L-1} s_i(j-1) M^jb solves Mx = b */
         make_sum(x, s[i]+1, L, M, b);
@@ -148,7 +148,7 @@ int nmod_sparse_mat_nullvector_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, fl
     _nmod_vec_randtest(x, state, M->r, M->mod);
     nmod_sparse_mat_mul_vec(b, M, x);
 
-    if(M->r != M->c) return 0; /* TBD: reduce to square */
+    if (M->r != M->c) return 0; /* TBD: reduce to square */
     make_sequences(s, ns, len, M, b);
 
     for (i = 0; i < ns && ret == 0; ++i)

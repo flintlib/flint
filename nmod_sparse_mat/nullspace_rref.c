@@ -26,7 +26,7 @@ slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M)
     nmod_sparse_mat_set(R, M);
     rk = nmod_sparse_mat_rref(R);
     nmod_mat_init(X, M->c, M->c-rk, M->mod.n);
-    if(rk != M->c) 
+    if (rk != M->c) 
     {
         numc = 0;
         /* Mark which cols are pivots and enumerate the nonpivots */
@@ -34,7 +34,7 @@ slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M)
         for (i = 0; i < rk; ++i) 
             Q[R->rows[i].entries->ind] = -1;
         for (i = 0; i < M->c; ++i)
-            if(Q[i]==UWORD(0)) Q[i] = numc++, X->rows[i][Q[i]] = 1;
+            if (Q[i]==UWORD(0)) Q[i] = numc++, X->rows[i][Q[i]] = 1;
 
         /* For each pivot col, set the corresponding row in X as */
         /* the negative of the associated row in R (reordered by Q) */

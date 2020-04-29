@@ -15,7 +15,8 @@
 #include "flint.h"
 #include "fmpz_sparse_vec.h"
 
-void fmpz_sparse_vec_dot_dense(fmpz_t ret, const fmpz_sparse_vec_t u, const fmpz *v) {
+void fmpz_sparse_vec_dot_dense(fmpz_t ret, const fmpz_sparse_vec_t u, const fmpz *v) 
+{
     slong i;
     fmpz_zero(ret);
     for (i = 0; i < u->nnz; ++i) fmpz_addmul(ret, u->entries[i].val, &v[u->entries[i].ind]);

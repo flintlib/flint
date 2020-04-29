@@ -110,7 +110,7 @@ NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_vec_set_entry(nmod_sparse_vec_t v, slong ind, mp_limb_t val)
 {
     mp_limb_t *oval = nmod_sparse_vec_at(v, ind);
-    if(oval == NULL)
+    if (oval == NULL)
     {
         v->entries = flint_realloc(v->entries, (v->nnz+1)*sizeof(*v->entries));
         v->entries[v->nnz].ind = ind;
@@ -232,9 +232,9 @@ slong _nmod_sparse_vector_merge_descend(nmod_sparse_entry_struct **we,
 {
     slong uind = (*ue==u->entries) ? -1 : (*ue-1)->ind;
     slong vind = (*ve==v->entries) ? -1 : (*ve-1)->ind;
-    if(uind == -1 && vind == -1) return -1;
-    if(uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
-    if(uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
+    if (uind == -1 && vind == -1) return -1;
+    if (uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
+    if (uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
     --*ue, --*we; (*we)->ind = uind; return 0;
 }
 
@@ -243,7 +243,7 @@ NMOD_SPARSE_VEC_INLINE
 void _nmod_sparse_vector_shift_left (nmod_sparse_vec_t v, slong amt)
 {
     if (amt == v->nnz) nmod_sparse_vec_clear(v);
-    else if(amt > 0)
+    else if (amt > 0)
     {
         v->nnz -= amt;
         memmove(v->entries, v->entries + amt, v->nnz*sizeof(*v->entries));

@@ -34,10 +34,10 @@ void fmpz_sparse_vec_gauss_elim(fmpz_sparse_vec_t u, const fmpz_sparse_vec_t v)
 {
     fmpz_t q, *uc;
     fmpz_sparse_entry_struct *lu = u->entries, *lv = v->entries;
-    if(u->nnz == 0 || v->nnz == 0 || lu->ind > lv->ind) return;
+    if (u->nnz == 0 || v->nnz == 0 || lu->ind > lv->ind) return;
     fmpz_init(q);
     if (lu->ind == lv->ind) fmpz_fdiv_q(q, lu->val, lv->val);
-    else if((uc = fmpz_sparse_vec_at(u, lv->ind))) fmpz_fdiv_q(q, *uc, lv->val);
+    else if ((uc = fmpz_sparse_vec_at(u, lv->ind))) fmpz_fdiv_q(q, *uc, lv->val);
     fmpz_sparse_vec_scalar_submul_fmpz(u, u, v, q);
     fmpz_clear(q);
 }
@@ -50,17 +50,17 @@ void fmpz_sparse_vec_gauss_elim_ext(fmpz_sparse_vec_t u, fmpz_sparse_vec_t v)
     fmpz_sparse_entry_struct *lv = v->entries;
     fmpz_t g, vv, vu, uv, uu, a, b;
     fmpz_sparse_entry_struct *ue, *ve, *nue, *nve;
-    if(u->nnz == 0 || v->nnz == 0) return;
-    if(lu->ind != lv->ind) {fmpz_sparse_vec_gauss_elim(u, v); return;}
+    if (u->nnz == 0 || v->nnz == 0) return;
+    if (lu->ind != lv->ind) {fmpz_sparse_vec_gauss_elim(u, v); return;}
     pc = lu->ind;
-    if(fmpz_cmpabs(lu->val, lv->val) < 0) /* Pre-apply transform [[0, -1], [1, 0]] */
+    if (fmpz_cmpabs(lu->val, lv->val) < 0) /* Pre-apply transform [[0, -1], [1, 0]] */
     {
         fmpz_sparse_vec_swap(u, v);
         fmpz_sparse_vec_neg(u, u);
         lu = u->entries, lv = v->entries;
         vnnz = v->nnz, unnz = u->nnz;
     }
-    if(fmpz_sgn(lv->val) < 0) /* Pre-apply transform [[-1, 0], [0, -1]] */
+    if (fmpz_sgn(lv->val) < 0) /* Pre-apply transform [[-1, 0], [0, -1]] */
     {
         fmpz_sparse_vec_neg(v, v);
         fmpz_sparse_vec_neg(u, u);

@@ -29,7 +29,7 @@ int main(void)
     for (rep = 0; rep < nreps; rep++)
     {
         do bits = n_randint(state, 200);
-        while(bits < UWORD(2));
+        while (bits < UWORD(2));
         r1 = n_randint(state, 100);
         r2 = n_randint(state, 100);
         c = n_randint(state, 100);

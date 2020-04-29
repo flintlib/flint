@@ -19,7 +19,7 @@ void fmpz_sparse_vec_split(fmpz_sparse_vec_t res1, fmpz_sparse_vec_t res2, const
 {
     slong i, nnz1;
     fmpz_sparse_entry_struct *e1, *e2, *e;
-    for(nnz1=0; nnz1<vec->nnz; ++nnz1) if(vec->entries[nnz1].ind >= ind) break;
+    for (nnz1 = 0; nnz1 < vec->nnz; ++nnz1) if (vec->entries[nnz1].ind >= ind) break;
 
     _fmpz_sparse_vec_resize(res1, nnz1);
     _fmpz_sparse_vec_resize(res2, vec->nnz - nnz1);

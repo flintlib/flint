@@ -31,7 +31,7 @@ fmpz_sparse_vec_multi_CRT_ui_precomp(fmpz_sparse_vec_t v, nmod_sparse_vec_struct
 
     rpos = flint_calloc(nres, sizeof(*rpos));
     r = flint_malloc(nres * sizeof (*r));
-    for(pos = 0; ; ++pos)
+    for (pos = 0; ; ++pos)
     {
         if (pos == max_nnz) max_nnz *= 2, _fmpz_sparse_vec_resize(v, max_nnz);
         e = &v->entries[pos];

@@ -20,7 +20,7 @@ void fmpz_sparse_vec_set(fmpz_sparse_vec_t dst, const fmpz_sparse_vec_t src, slo
     slong i;
     if (dst == src) return;
     _fmpz_sparse_vec_resize(dst, src->nnz);
-    for(i=0; i<dst->nnz; ++i)
+    for (i = 0; i < dst->nnz; ++i)
     {
         dst->entries[i].ind = src->entries[i].ind - ioff;
         fmpz_set(dst->entries[i].val, src->entries[i].val);

@@ -25,7 +25,8 @@
 /* the column c + b and zero out the row c. In addition, we reorder   */
 /* columns so that ones corresponding to zero entries in S go first.  */
 /* See Figure 1 in the above reference for details. */
-static int compute_nWi_S(nmod_mat_t nWi, int *S, const nmod_mat_t Torig) {
+static int compute_nWi_S(nmod_mat_t nWi, int *S, const nmod_mat_t Torig) 
+{
     
     const slong b = Torig->r;
     slong pc, i, j, rk = 0;
@@ -42,8 +43,8 @@ static int compute_nWi_S(nmod_mat_t nWi, int *S, const nmod_mat_t Torig) {
     /* Set permutation to have previously dependent vectors at front */
     P = flint_malloc(b*sizeof(*P));
     j = 0;
-    for (i = 0; i < b; ++i) if(!S[i]) P[j++] = i;
-    for (i = 0; i < b; ++i) if(S[i]) P[j++] = i;
+    for (i = 0; i < b; ++i) if (!S[i]) P[j++] = i;
+    for (i = 0; i < b; ++i) if (S[i]) P[j++] = i;
     
     for (j = 0; j < b; ++j) 
     {
@@ -90,12 +91,13 @@ static void kill_columns(nmod_mat_t M, int *good)
 {
     slong r, c;
     for (c = 0; c < M->c; ++c)
-        if(good[c] == 0)
+        if (good[c] == 0)
             for (r = 0; r < M->r; ++r)
                 M->rows[r][c] = UWORD(0);
 }
 
-int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, slong block_size, flint_rand_t state) {
+int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, slong block_size, flint_rand_t state) 
+{
     int ret = 0;
     slong i, prev_i, next_i, iter, cur_dim, total_dim = 0;
     nmod_sparse_mat_t Mt; /* Transpose of M, we work with A = MtM */
@@ -151,7 +153,7 @@ int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_
         i = iter % 3;
         next_i = (iter + 1) % 3;
         prev_i = (iter + 2) % 3;
-        if(iter>=2)
+        if (iter >= 2)
         {
             /* Compute the F value for this round (minus the final term) */
             nmod_mat_addmul(DEF, I, VtAV, &nWi[prev_i]);
@@ -189,14 +191,14 @@ int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_
          *   F = -W_{i-2}^-1(I - V_{i-1}^tAV_{i-1}W_{i-1}^-1)
          *                  ((AV_{i-1})^tAV_{i-1}S_{i-1}S_{i-1}^t + V_{i-1}^tAV_{i-1})S_iS_i^t
          **/
-        if(iter >= 2)
+        if (iter >= 2)
         {
             /* V_{i+1} = V_{i-2} F */
             kill_columns(DEF, SSt);
             nmod_mat_mul(VSSt, &V[next_i], DEF);
             nmod_mat_set(&V[next_i], VSSt);
         }
-        if(iter >= 1)
+        if (iter >= 1)
         {
             /* V_{i+1} += V_{i-1} E */
             nmod_mat_mul(DEF, &nWi[prev_i], VtAV);
@@ -238,7 +240,8 @@ int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_
     return ret;
 }
 
-int nmod_sparse_mat_nullvector_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state) {
+int nmod_sparse_mat_nullvector_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state) 
+{
     int ret = 1;
     mp_ptr x2, b;
     x2 = _nmod_vec_init(M->c);
@@ -246,7 +249,7 @@ int nmod_sparse_mat_nullvector_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M
 
     _nmod_vec_randtest(x, state, M->c, M->mod);
     nmod_sparse_mat_mul_vec(b, M, x);
-    if(nmod_sparse_mat_solve_block_lanczos(x2, M, b, block_size, state) == 0) ret = 0; /* Lanczos failed */
+    if (nmod_sparse_mat_solve_block_lanczos(x2, M, b, block_size, state) == 0) ret = 0; /* Lanczos failed */
     if (ret)
     {
         _nmod_vec_sub(x, x, x2, M->c, M->mod);

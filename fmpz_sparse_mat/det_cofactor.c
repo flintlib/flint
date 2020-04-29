@@ -14,7 +14,7 @@ void
 fmpz_sparse_mat_det_cofactor(fmpz_t det, const fmpz_sparse_mat_t M)
 {
     fmpz_mat_t dM;
-    if(M->r != M->c) {fmpz_zero(det); return;}
+    if (M->r != M->c) {fmpz_zero(det); return;}
     if (M->r > 4)
     {
         flint_printf("Exception (fmpz_sparse_mat_det_cofactor). dim > 4 not implemented.");

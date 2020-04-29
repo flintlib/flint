@@ -34,7 +34,7 @@ main(void)
     /* struct timeval start, end; */
     FLINT_TEST_INIT(state);
     
-    flint_printf("solving Ax=b....");
+    flint_printf("solving Ax = b....");
     fflush(stdout);
     
     for (rep = 0; rep < nreps; rep++)
@@ -62,10 +62,10 @@ main(void)
             {
             case 0: ret = TEMPLATE(T, sparse_mat_solve_rref) (x2, A, b, ctx); break;
             case 1: ret = TEMPLATE(T, sparse_mat_solve_lu) (x2, A, b, ctx); break;
-            case 2: do ret = TEMPLATE(T, sparse_mat_solve_lanczos) (x2, A, b, state, ctx); while(ret == 0 && ++iter < 3); break;
-            case 3: do ret = TEMPLATE(T, sparse_mat_solve_block_lanczos) (x2, A, b, 8, state, ctx); while(ret == 0 && ++iter < 3); break;
+            case 2: do ret = TEMPLATE(T, sparse_mat_solve_lanczos) (x2, A, b, state, ctx); while (ret == 0 && ++iter < 3); break;
+            case 3: do ret = TEMPLATE(T, sparse_mat_solve_block_lanczos) (x2, A, b, 8, state, ctx); while (ret == 0 && ++iter < 3); break;
             case 4: ret = TEMPLATE(T, sparse_mat_solve_wiedemann) (x2, A, b, ctx); break;
-            case 5: do ret = TEMPLATE(T, sparse_mat_solve_block_wiedemann) (x2, A, b, 8, state, ctx); while(ret == 0 && ++iter < 3); break;
+            case 5: do ret = TEMPLATE(T, sparse_mat_solve_block_wiedemann) (x2, A, b, 8, state, ctx); while (ret == 0 && ++iter < 3); break;
             }
             /* gettimeofday(&end, NULL);
             elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec); */

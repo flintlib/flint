@@ -19,7 +19,7 @@ fmpz_sparse_mat_det_divisor(fmpz_t d, const fmpz_sparse_mat_t M)
     slong i;
     fmpz_mat_t X, B;
     fmpz_t t, u, v, mod;
-    if(M->r != M->c) {fmpz_zero(d); return;}
+    if (M->r != M->c) {fmpz_zero(d); return;}
 
     fmpz_mat_init(X, M->c, 1);
     fmpz_mat_init(B, M->r, 1);

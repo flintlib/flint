@@ -46,7 +46,7 @@ _n_ppio(mp_ptr ppi, mp_ptr ppo, mp_limb_t a, mp_limb_t b)
     c = n_gcd(a, b);
     M->r = a/c;
     g = n_gcd(c, M->r);
-    while( g != 1 )
+    while ( g != 1 )
     {
         c = c * g;
         M->r = M->r/g;

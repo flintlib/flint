@@ -14,7 +14,7 @@
 #include <string.h>
 #include "templates.h"
 
-/* PAQ = LU, Ax = b => set b' = Pb, solve Ly = b', solve Ux' = y, set x=Qx' */
+/* PAQ = LU, Ax = b => set b' = Pb, solve Ly = b', solve Ux' = y, set x = Qx' */
 int TEMPLATE(T, sparse_mat_solve_lu) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, struct) *b, const TEMPLATE(T, ctx_t) ctx)
 {
     int good = 1;

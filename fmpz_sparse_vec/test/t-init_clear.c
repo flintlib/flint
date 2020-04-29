@@ -44,7 +44,7 @@ main(void)
     for (rep = 0; rep < 1000; rep++)
     {
         do bits = n_randint(state, 200);
-        while(bits < UWORD(2));
+        while (bits < UWORD(2));
         len = n_randint(state, 50);
         nnz = n_randint(state, len+1);
         fmpz_sparse_vec_init(vec);
@@ -68,7 +68,7 @@ main(void)
                     flint_printf("FAIL: found zero value\n");
                     abort();
                 }
-                if (i>0 && e->ind <= e[-1].ind)
+                if (i > 0 && e->ind <= e[-1].ind)
                 {
                     flint_printf("FAIL: found index %wd <= previous index %wd\n", e->ind, e[-1].ind);
                     abort();

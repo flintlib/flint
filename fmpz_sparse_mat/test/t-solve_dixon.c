@@ -35,7 +35,7 @@ main(void)
     for (rep = 0; rep < nreps; rep++)
     {
         do bits = n_randint(state, 100);
-        while(bits < UWORD(2));
+        while (bits < UWORD(2));
         r = n_randint(state, 20);
         c = n_randint(state, 20);
 
@@ -52,7 +52,8 @@ main(void)
         {
             fmpz_init(det);
             fmpz_sparse_mat_det(det, A);
-            if (!fmpz_is_zero(det)) {
+            if (!fmpz_is_zero(det)) 
+            {
                 num_bad_fail++;
             }
             fmpz_clear(det);
