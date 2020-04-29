@@ -17,7 +17,7 @@ static ulong _fmpz_gcd_ui(const fmpz_t g, ulong h)
     if (!COEFF_IS_MPZ(*g))
         return n_gcd(FLINT_ABS(*g), h);
     else
-        return n_gcd(mpz_fdiv_ui(COEFF_TO_PTR(*g), h), h);
+        return n_gcd(flint_mpz_fdiv_ui(COEFF_TO_PTR(*g), h), h);
 }
 
 void
