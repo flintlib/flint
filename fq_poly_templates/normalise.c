@@ -27,8 +27,8 @@ _TEMPLATE(T, poly_normalise) (TEMPLATE(T, poly_t) poly,
 }
 
 void
-_TEMPLATE(T, poly_normalise2) (TEMPLATE(T, struct) * poly, slong * length,
-                               const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_normalise2) (const TEMPLATE(T, struct) * poly,
+		slong * length, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
     for (i = (*length) - 1; (i >= 0) && TEMPLATE(T, is_zero) (poly + i, ctx);

@@ -12,7 +12,7 @@
 #include "fq_nmod_poly.h"
 
 void
-_fq_nmod_poly_mul_univariate (fq_nmod_struct * rop,
+_fq_nmod_poly_mul_univariate_no_pad (fq_nmod_struct * rop,
                         const fq_nmod_struct * op1, slong len1,
                         const fq_nmod_struct * op2, slong len2,
                         const fq_nmod_ctx_t ctx)
@@ -60,6 +60,7 @@ _fq_nmod_poly_mul_univariate (fq_nmod_struct * rop,
     }
 
     crop = (mp_limb_t *) flint_malloc(crlen*sizeof(mp_limb_t));
+
     if (clen1 >= clen2)
         _nmod_poly_mul(crop, cop1, clen1, cop2, clen2, mod);
     else
@@ -93,6 +94,27 @@ _fq_nmod_poly_mul_univariate (fq_nmod_struct * rop,
         flint_free(cop2);
     }
     flint_free(crop);
+}
+
+void
+_fq_nmod_poly_mul_univariate (fq_nmod_struct * rop,                                             const fq_nmod_struct * op1, slong len1,                                        const fq_nmod_struct * op2, slong len2,                                        const fq_nmod_ctx_t ctx)
+{
+   slong len1n = len1, len2n = len2;
+
+   _fq_nmod_poly_normalise2(op1, &len1n, ctx);
+   _fq_nmod_poly_normalise2(op2, &len2n, ctx);
+
+   if (len1n == 0)
+      _fq_nmod_vec_zero(rop, len1 + len2 - 1, ctx);
+   else if (len2n == 0)
+      _fq_nmod_vec_zero(rop, len1 + len2 - 1, ctx);
+   else
+   {
+       _fq_nmod_poly_mul_univariate_no_pad(rop, op1, len1n, op2, len2n, ctx);
+
+       _fq_nmod_vec_zero(rop + len1n + len2n - 1,
+		      len1 + len2 - len1n - len2n, ctx);
+   }
 }
 
 void

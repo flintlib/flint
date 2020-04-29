@@ -54,7 +54,7 @@ FLINT_DLL void TEMPLATE(T, poly_clear)(TEMPLATE(T, poly_t) poly,
 FLINT_DLL void _TEMPLATE(T, poly_normalise)(TEMPLATE(T, poly_t) poly,
                              const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void _TEMPLATE(T, poly_normalise2)(TEMPLATE(T, struct) *poly, slong *length,
+FLINT_DLL void _TEMPLATE(T, poly_normalise2)(const TEMPLATE(T, struct) *poly, slong *length,
                               const TEMPLATE(T, ctx_t) ctx);
 
 FQ_POLY_TEMPLATES_INLINE void

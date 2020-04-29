@@ -406,8 +406,8 @@ Multiplication
     Sets ``(rop, len1 + len2 - 1)`` to the product of ``(op1, len1)``
     and ``(op2, len2)``.
 
-    Permits zero padding and places no assumptions on the
-    lengths ``len1`` and ``len2``.  Supports aliasing.
+    Permits zero padding and makes no assumptions on ``len1`` and ``len2``. 
+    Supports aliasing.
 
 .. function:: void fq_nmod_poly_mul_univariate(fq_nmod_poly_t rop, const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
 
