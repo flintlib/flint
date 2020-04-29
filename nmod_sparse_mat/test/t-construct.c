@@ -62,19 +62,13 @@ main(void)
             }
         }
         nmod_sparse_mat_from_entries(B, rows, cols, vals, nnz);
-
         if (!nmod_sparse_mat_equal(A, B))
         {
             flint_printf("FAIL: A != B\n");
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
             flint_printf("A = ");
             nmod_sparse_mat_print_pretty(A);
             flint_printf("B = ");
             nmod_sparse_mat_print_pretty(B);
-<<<<<<< HEAD
             abort();
         }
         
@@ -86,20 +80,6 @@ main(void)
             nmod_sparse_mat_print_pretty(A);
             flint_printf("C = ");
             nmod_sparse_mat_print_pretty(C);
-=======
-            abort();
-        }
-        /* Construct C from rows of A */
-        for(i=0; i<A->r; ++i) {
-            nmod_sparse_mat_append_row(C, i, cols + A->row_starts[i], vals + A->row_starts[i], A->row_nnz[i]);
-        }
-
-        if (!nmod_sparse_mat_equal(A, C))
-        {
-            flint_printf("FAIL: A != C\n");
->>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
-=======
->>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
             abort();
         }
         flint_free(rows);
@@ -107,13 +87,7 @@ main(void)
         flint_free(vals);
         nmod_sparse_mat_clear(A);
         nmod_sparse_mat_clear(B);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         nmod_sparse_mat_clear(C);
->>>>>>> Initial code for sparse matrices mod limb size integers, just construction and arithmetic for starters
-=======
->>>>>>> Added sparse vector class to nmod, changed sparse matrix class to use it for underlying, added (untested) LU decomposition
     }
 
     FLINT_TEST_CLEANUP(state);
