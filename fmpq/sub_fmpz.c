@@ -18,14 +18,18 @@ _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
 {
     fmpz_t u;
 
+    if (!COEFF_IS_MPZ(*p) && !COEFF_IS_MPZ(*q) && !COEFF_IS_MPZ(*r))
+    {
+        _fmpq_add_small(rnum, rden, *p, *q, -(*r), 1);
+        return;
+    }
+
     /* both are integers */
     if (fmpz_is_one(q))
     {
         fmpz_sub(rnum, p, r);
-        
         fmpz_set(rden, q);
-        
-        return;
+                return;
     }
 
     /*
