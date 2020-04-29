@@ -21,8 +21,8 @@
 int
 main(void)
 {
-    slong rep, r, c, i, j, m, rk;
-    mp_limb_t n, *P, *Q;
+    slong rep, r, c, i, j, rk, *P, *Q;
+    mp_limb_t n;
     nmod_t mod;
     nmod_sparse_mat_t A, LU, L, U;
     nmod_mat_t dL, dU, dLU;
@@ -42,7 +42,6 @@ main(void)
         nmod_init(&mod, n);
         P = flint_malloc(r*sizeof(*P));
         Q = flint_malloc(c*sizeof(*P));
-        m = FLINT_MIN(r, c);
         nmod_sparse_mat_init(A, r, c, mod);
         nmod_sparse_mat_init(LU, r, c, mod);
         nmod_sparse_mat_init(L, r, c, mod);

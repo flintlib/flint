@@ -16,7 +16,6 @@
 
 slong TEMPLATE(T, sparse_mat_nullspace_lu) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx)
 {
-    int good = 1;
     slong rk, *P, *Q, *Qi, i, j;
     TEMPLATE(T, t) cc;
     TEMPLATE(T, sparse_mat_t) L, U;

@@ -29,7 +29,6 @@ main(void)
 
     for (rep = 0; rep < 1000; rep++)
     {
-        TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, ctx_randtest) (ctx, state);
         r = n_randint(state, 200);
         c = n_randint(state, 200);

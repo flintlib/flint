@@ -202,26 +202,67 @@ void nmod_sparse_vec_scalar_mul_fmpz(nmod_sparse_vec_t v, const nmod_sparse_vec_
     fmpz_clear(d);
 }
 
+/* Utility macros used by binary vector operations */
+/* Compute total number of indices between two sparse vectors */
+NMOD_SPARSE_VEC_INLINE
+slong _nmod_sparse_vec_union_nnz(const nmod_sparse_vec_t u, const nmod_sparse_vec_t v)
+{
+    slong i, j, nnz = 0;
+    for (i = j = 0; i < u->nnz && j < v->nnz; ++nnz)
+    {
+        if (u->entries[i].ind == v->entries[j].ind) ++i, ++j;
+        else if (u->entries[i].ind < v->entries[j].ind) ++i;
+        else if (u->entries[i].ind > v->entries[j].ind) ++j;
+    }
+    nnz += u->nnz - i + v->nnz - j;
+    return nnz;
+}
+
+/* Iterate through u and v in descending order, assigning sorted indices to w */
+/* Returns -1 if u and v are both exhausted, 
+    2 if we->ind = ue->ind == ve->ind
+    1 if we->ind = ve->ind > ue->ind (or u exhausted), 
+    0 if we->ind = ue->ind > ve->ind (or v exhausted). */
+NMOD_SPARSE_VEC_INLINE
+slong _nmod_sparse_vector_merge_descend(nmod_sparse_entry_struct **we, 
+                                        nmod_sparse_entry_struct **ue, 
+                                        nmod_sparse_entry_struct **ve, 
+                                        const nmod_sparse_vec_t u, 
+                                        const nmod_sparse_vec_t v)
+{
+    slong uind = (*ue==u->entries) ? -1 : (*ue-1)->ind;
+    slong vind = (*ve==v->entries) ? -1 : (*ve-1)->ind;
+    if(uind == -1 && vind == -1) return -1;
+    if(uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
+    if(uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
+    --*ue, --*we; (*we)->ind = uind; return 0;
+}
+
+/* Like resize, but removes entries from the front of the vector */
+NMOD_SPARSE_VEC_INLINE
+void _nmod_sparse_vector_shift_left (nmod_sparse_vec_t v, slong amt)
+{
+    if (amt == v->nnz) nmod_sparse_vec_clear(v);
+    else if(amt > 0)
+    {
+        v->nnz -= amt;
+        memmove(v->entries, v->entries + amt, v->nnz*sizeof(*v->entries));
+        v->entries = flint_realloc(v->entries, v->nnz*sizeof(*v->entries));
+    }
+}
+
+FLINT_DLL 
+void nmod_sparse_vec_add(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod);
+
+FLINT_DLL 
+void nmod_sparse_vec_sub(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod);
+
 FLINT_DLL 
 void nmod_sparse_vec_scalar_addmul_nmod(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, const mp_limb_t c, nmod_t mod);
 
-NMOD_SPARSE_VEC_INLINE
-void nmod_sparse_vec_scalar_submul_nmod(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, const mp_limb_t c, nmod_t mod)
-{
-    nmod_sparse_vec_scalar_addmul_nmod(w, u, v, nmod_neg(c, mod), mod);
-}
+FLINT_DLL 
+void nmod_sparse_vec_scalar_submul_nmod(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, const mp_limb_t c, nmod_t mod);
 
-NMOD_SPARSE_VEC_INLINE
-void nmod_sparse_vec_add(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
-{
-    nmod_sparse_vec_scalar_addmul_nmod(w, u, v, UWORD(1), mod);
-}
-
-NMOD_SPARSE_VEC_INLINE
-void nmod_sparse_vec_sub(nmod_sparse_vec_t w, const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod)
-{
-    nmod_sparse_vec_scalar_addmul_nmod(w, u, v, mod.n-1, mod);
-}
 
 FLINT_DLL
 mp_limb_t nmod_sparse_vec_dot(const nmod_sparse_vec_t u, const nmod_sparse_vec_t v, nmod_t mod);

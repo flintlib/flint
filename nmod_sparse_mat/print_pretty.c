@@ -19,7 +19,7 @@
 void
 nmod_sparse_mat_print_pretty(const nmod_sparse_mat_t M)
 {
-    slong i;;
+    slong i;
     char row_fmt[FLINT_BITS + 5];
     flint_sprintf(row_fmt, "%%%dwd: ", n_sizeinbase(M->r, 10));
 

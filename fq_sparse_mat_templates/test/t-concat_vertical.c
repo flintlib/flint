@@ -19,7 +19,7 @@
 
 int main(void)
 {
-    slong rep, r1, r2, c, i;
+    slong rep, r1, r2, c, nreps = 100;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, sparse_mat_t) A, B, C;
     TEMPLATE(T, sparse_mat_t) window1, window2;
@@ -29,7 +29,7 @@ int main(void)
     flint_printf("concat_vertical....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (rep = 0; rep < nreps; rep++)
     {
         TEMPLATE(T, ctx_randtest) (ctx, state);
         r1 = n_randint(state, 100);

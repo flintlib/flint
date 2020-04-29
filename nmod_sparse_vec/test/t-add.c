@@ -68,6 +68,20 @@ main(void)
             flint_printf("FAIL: ((u += v) -= v) != u+v-v\n");
             abort();
         }
+
+        nmod_sparse_vec_add(u, v, u, mod);
+        if (!nmod_sparse_vec_equal(u, w, 0))
+        {
+            flint_printf("FAIL: (u = v + u) != u+v\n");
+            abort();
+        }
+
+        nmod_sparse_vec_sub(v, u, v, mod);
+        if (!nmod_sparse_vec_equal(v, x, 0))
+        {
+            flint_printf("FAIL: (u = v + u) != u+v\n");
+            abort();
+        }
         nmod_sparse_vec_clear(u);
         nmod_sparse_vec_clear(v);
         nmod_sparse_vec_clear(w);

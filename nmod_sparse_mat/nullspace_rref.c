@@ -22,7 +22,6 @@ slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M)
     nmod_sparse_mat_t R;
     nmod_sparse_vec_struct *Rrow;
     mp_limb_t *Xrow;
-    nmod_sparse_entry_struct *le, *e;
     nmod_sparse_mat_init(R, M->r, M->c, M->mod);
     nmod_sparse_mat_set(R, M);
     rk = nmod_sparse_mat_rref(R);

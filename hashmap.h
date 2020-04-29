@@ -14,109 +14,33 @@
 
 #include "flint.h"
 
-#define HASHMAP_START_SIZE 1024
-#define HASHMAP_START_MASK (HASHMAP_START_SIZE - 1)
+#define MIN_HASHMAP_BITS 5
 
-/******************************************************************************
-
-   Hashmap types with one word key
-
-******************************************************************************/
-
-typedef struct hashmap1_elem_s
+typedef struct
 {
-   ulong key;
-   void * value;
-   int in_use;
-} hashmap1_elem_s;
-
-typedef struct hashmap1_s
-{
-   slong alloc;
-   slong num_used;
+   ulong size;
    ulong mask;
-   hashmap1_elem_s * data;
-} hashmap1_s;
+   ulong num;
+   ulong *table;
+   slong *keys;
+   void **vals;
+} hashmap_struct;
 
-typedef hashmap1_s hashmap1_t[1];
+typedef hashmap_struct hashmap_t[1];
 
-/******************************************************************************
+/* Initialize hash table to accomodate size elements */
+void hashmap_init(hashmap_t h, slong size);
 
-   Hash functions
+/* Clear hash table */
+void hashmap_clear(hashmap_t h);
 
-******************************************************************************/
+/* Get value associated with given key */
+void * hashmap_get(hashmap_t h, slong key);
 
-/* from lookup3.c, by Bob Jenkins, May 2006, Public Domain. */
+/* Assign value to a given key */
+void hashmap_put(hashmap_t h, slong key, void *val);
 
-#define hash_rot(x, k) (((x) << (k)) | ((x) >> (32 - (k))))
-
-#define hash_mix(a,b,c) \
-{ \
-  c ^= b; c -= hash_rot(b, 14); \
-  a ^= c; a -= hash_rot(c, 11); \
-  b ^= a; b -= hash_rot(a, 25); \
-  c ^= b; c -= hash_rot(b, 16); \
-  a ^= c; a -= hash_rot(c,  4); \
-  b ^= a; b -= hash_rot(a, 14); \
-  c ^= b; c -= hash_rot(b, 24); \
-}
-
-/* End of Public Domain code. */
-
-#if FLINT64
-
-static __inline__
-ulong hash_word(ulong val)
-{
-   int * ptr = (int * ) &val;
-   int a = ptr[0], b = ptr[1], c = 0;
-
-   hash_mix(a, b, c);
-   
-   ptr[0] = b;
-   ptr[1] = c;
-
-   return val;
-}
-
-#else
-
-static __inline__
-ulong hash_word(ulong a)
-{
-   int b = 0, c = 0;
-
-   hash_mix(a, b, c);
-   
-   return c;
-}
-
-#endif
-
-/******************************************************************************
-
-   Hashmap functions with one word key
-
-******************************************************************************/
-
-FLINT_DLL void hashmap1_init(hashmap1_t h);
-
-FLINT_DLL void hashmap1_init2(hashmap1_t h, slong size);
-
-FLINT_DLL void hashmap1_clear(hashmap1_t h);
-
-static __inline__
-ulong hashmap1_hash_key(ulong key, hashmap1_t h)
-{
-   return hash_word(key) & h->mask;
-}
-
-FLINT_DLL slong hashmap1_hash(ulong key, hashmap1_t h);
-
-FLINT_DLL void hashmap1_rehash(hashmap1_t h);
-
-FLINT_DLL void hashmap1_insert(ulong key, void * value, hashmap1_t h);
-
-FLINT_DLL int hashmap1_find(void ** ptr, ulong key, hashmap1_t h);
+/* Remove value with a given key */
+void hashmap_rem(hashmap_t h, slong key);
 
 #endif

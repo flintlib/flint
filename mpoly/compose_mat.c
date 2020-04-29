@@ -11,17 +11,6 @@
 
 #include "mpoly.h"
 
-/* unfortunate function missing from fmpz_mat */
-void fmpz_mat_mul_vec(fmpz * v, const fmpz_mat_t M, fmpz * u)
-{
-    slong i;
-    slong r = fmpz_mat_nrows(M);
-    slong c = fmpz_mat_ncols(M);
-
-    for (i = 0; i < r; i++)
-        _fmpz_vec_dot(v + i, M->rows[i], u, c);
-}
-
 /* Fill the compose matrix for the T_mpoly_compose_T_mpoly_gen functions */
 void mpoly_compose_mat_gen(fmpz_mat_t M, const slong * c,
                              const mpoly_ctx_t mctxB, const mpoly_ctx_t mctxAC)

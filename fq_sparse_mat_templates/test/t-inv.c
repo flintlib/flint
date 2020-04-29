@@ -21,23 +21,20 @@
 int
 main(void)
 {
-    int ret;
-    slong rep, r, c, i, rk;
-    TEMPLATE(T, t) a;
+    slong rep, r, c;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, sparse_mat_t) A, Ai;
     TEMPLATE(T, mat_t) dA, dAiA;
-    struct timeval start, end;
     FLINT_TEST_INIT(state);
     
     flint_printf("inverting A....");
     fflush(stdout);
     
-    for (rep = 0; rep < 100; rep++)
+    for (rep = 0; rep < 200; rep++)
     {
         if (rep % 5==0) {flint_printf("."); fflush(stdout);}
         TEMPLATE(T, ctx_randtest) (ctx, state);
-        do r = n_randint(state, 200), c = n_randint(state, 200);
+        do r = n_randint(state, 100), c = n_randint(state, 100);
         while (r==UWORD(0) || c==UWORD(0));
         
         TEMPLATE(T, sparse_mat_init) (A, r, c, ctx);
@@ -47,7 +44,7 @@ main(void)
         TEMPLATE(T, mat_init) (dAiA, r, c, ctx);
         TEMPLATE(T, sparse_mat_to_dense) (dA, A, ctx);
 
-        rk = TEMPLATE(T, sparse_mat_inv) (Ai, A, ctx);
+        TEMPLATE(T, sparse_mat_inv) (Ai, A, ctx);
         TEMPLATE(T, sparse_mat_mul_mat) (dAiA, Ai, dA, ctx);
         TEMPLATE(T, mat_rref) (dA, ctx);
         if (!TEMPLATE(T, mat_equal) (dAiA, dA, ctx)) {

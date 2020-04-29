@@ -18,7 +18,7 @@
 int TEMPLATE(T, sparse_mat_solve_lu) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, struct) *b, const TEMPLATE(T, ctx_t) ctx)
 {
     int good = 1;
-    slong rk, *P, *Q, i, j;
+    slong rk, *P, *Q, i;
     TEMPLATE(T, t) cc;
     TEMPLATE(T, struct) *bp, *y, *xp;
     TEMPLATE(T, sparse_mat_t) L, U;

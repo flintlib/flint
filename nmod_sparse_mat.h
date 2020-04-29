@@ -279,6 +279,20 @@ void nmod_sparse_mat_scalar_mul_fmpz(nmod_sparse_mat_t N, const nmod_sparse_mat_
 }
 
 NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_add(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N) 
+{
+    slong i;
+    for (i = 0; i < O->r; ++i) nmod_sparse_vec_add(&O->rows[i], &M->rows[i], &N->rows[i], O->mod);
+}
+
+NMOD_SPARSE_MAT_INLINE
+void nmod_sparse_mat_sub(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N) 
+{
+    slong i;
+    for (i = 0; i < O->r; ++i) nmod_sparse_vec_sub(&O->rows[i], &M->rows[i], &N->rows[i], O->mod);
+}
+
+NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_scalar_addmul_nmod(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N, mp_limb_t c) 
 {
     slong i;
@@ -288,19 +302,8 @@ void nmod_sparse_mat_scalar_addmul_nmod(nmod_sparse_mat_t O, const nmod_sparse_m
 NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_scalar_submul_nmod(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N, mp_limb_t c) 
 {
-    nmod_sparse_mat_scalar_addmul_nmod(O, M, N, nmod_neg(c, O->mod));
-}
-
-NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_add(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N) 
-{
-    nmod_sparse_mat_scalar_addmul_nmod(O, M, N, UWORD(1));
-}
-
-NMOD_SPARSE_MAT_INLINE
-void nmod_sparse_mat_sub(nmod_sparse_mat_t O, const nmod_sparse_mat_t M, const nmod_sparse_mat_t N) 
-{
-    nmod_sparse_mat_scalar_addmul_nmod(O, M, N, O->mod.n-UWORD(1));
+    slong i;
+    for (i = 0; i < O->r; ++i) nmod_sparse_vec_scalar_submul_nmod(&O->rows[i], &M->rows[i], &N->rows[i], c, O->mod);
 }
 
 /* Matrix-vector and matrix-matrix multipliciation */
@@ -334,6 +337,13 @@ slong nmod_sparse_mat_lu(slong *P, slong *Q, nmod_sparse_mat_t L, nmod_sparse_ma
 
 FLINT_DLL
 slong nmod_sparse_mat_rref(nmod_sparse_mat_t M);
+
+NMOD_SPARSE_MAT_INLINE
+slong nmod_sparse_mat_strong_echelon_form(nmod_sparse_mat_t M)
+{
+    /* TODO */
+    return 0;
+}
 
 /* Solve Ax = b */
 FLINT_DLL
@@ -385,6 +395,10 @@ slong nmod_sparse_mat_nullspace_rref(nmod_mat_t X, const nmod_sparse_mat_t M);
 
 FLINT_DLL
 slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M);
+
+/* Determinant */
+FLINT_DLL
+mp_limb_t nmod_sparse_mat_det(const nmod_sparse_mat_t M);
 
 /* Nullspace */
 /* NMOD_SPARSE_MAT_INLINE

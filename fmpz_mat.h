@@ -232,6 +232,14 @@ FLINT_DLL void fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const 
 
 /* Multiplication */
 
+FMPZ_MAT_INLINE
+void fmpz_mat_mul_vec(fmpz *y, const fmpz_mat_t A, fmpz *x)
+{
+    slong i;
+    for (i = 0; i < A->r; ++i)
+        _fmpz_vec_dot(&y[i], A->rows[i], x, A->c);
+}
+
 FLINT_DLL void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
 FLINT_DLL void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A,

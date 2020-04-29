@@ -16,13 +16,13 @@
 
 slong TEMPLATE(T, sparse_mat_rref) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, ctx_t) ctx)
 {
-    if (M->r == 0 || M->c == 0) return 0;
     slong *P;
-    slong i, j, r, c, pr, pc, rank, remr;
+    slong j, r, c, pr, pc, rank, remr;
     TEMPLATE(T, t) cinv, cc;
     TEMPLATE(T, sparse_mat_t) Mt;
     TEMPLATE(T, sparse_vec_struct) *pcol, *prow, *row, *col;
 
+    if (M->r == 0 || M->c == 0) return 0;
     P = flint_malloc(M->r*sizeof(*P));
     TEMPLATE(T, init) (cinv, ctx);
     TEMPLATE(T, init) (cc, ctx);

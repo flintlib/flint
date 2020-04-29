@@ -19,8 +19,6 @@ slong nmod_sparse_mat_inv(nmod_sparse_mat_t Mi, const nmod_sparse_mat_t M)
 {
     slong rk;
     nmod_sparse_mat_t I, MI;
-    nmod_sparse_vec_struct *row;
-    nmod_sparse_entry_struct *le, *re;
 
     /* Create block matrix [M | I] */
     nmod_sparse_mat_init(I, M->r, M->r, M->mod);

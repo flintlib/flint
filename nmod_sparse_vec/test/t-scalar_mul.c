@@ -33,10 +33,10 @@ main(void)
     for (rep = 0; rep < 1000; rep++)
     {
         len = n_randint(state, 50);
-        nnz = 2; //n_randint(state, len+1);
+        nnz = n_randint(state, len+1);
         do n = n_randtest_not_zero(state);
         while (n == UWORD(1));
-        c = 2; //n_randint(state, n);
+        c = n_randint(state, n);
         nmod_init(&mod, n);
 
         nmod_sparse_vec_init(u);
@@ -57,10 +57,47 @@ main(void)
             abort();
         }
 
+        nmod_sparse_vec_scalar_submul_nmod(w, u, v, c, mod);
+        nmod_sparse_vec_scalar_mul_nmod(x, v, c, mod);
+        nmod_sparse_vec_sub(x, u, x, mod);
+
+        if (!nmod_sparse_vec_equal(w, x, 0))
+        {
+            flint_printf("FAIL: u - c*v != u - (c*v)\n");
+            abort();
+        }
+
         nmod_sparse_vec_scalar_addmul_nmod(w, u, v, c, mod);
         nmod_sparse_vec_scalar_addmul_nmod(u, u, v, c, mod);
 
         if (!nmod_sparse_vec_equal(u, w, 0))
+        {
+            flint_printf("FAIL: u + c*v != (u += c*v)\n");
+            abort();
+        }
+
+        nmod_sparse_vec_scalar_addmul_nmod(w, u, v, c, mod);
+        nmod_sparse_vec_scalar_addmul_nmod(v, u, v, c, mod);
+
+        if (!nmod_sparse_vec_equal(v, w, 0))
+        {
+            flint_printf("FAIL: u + c*v != (u += c*v)\n");
+            abort();
+        }
+
+        nmod_sparse_vec_scalar_submul_nmod(w, u, v, c, mod);
+        nmod_sparse_vec_scalar_submul_nmod(u, u, v, c, mod);
+
+        if (!nmod_sparse_vec_equal(u, w, 0))
+        {
+            flint_printf("FAIL: u + c*v != (u += c*v)\n");
+            abort();
+        }
+
+        nmod_sparse_vec_scalar_submul_nmod(w, u, v, c, mod);
+        nmod_sparse_vec_scalar_submul_nmod(v, u, v, c, mod);
+
+        if (!nmod_sparse_vec_equal(v, w, 0))
         {
             flint_printf("FAIL: u + c*v != (u += c*v)\n");
             abort();

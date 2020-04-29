@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <gmp.h>
-#include <sys/time.h>
+/*#include <sys/time.h>*/
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 #include "ulong_extras.h"
@@ -23,7 +23,7 @@ main(void)
 {
     int iter, ret;
     slong rep, nreps = 100, r, c, i;
-    mp_limb_t n, a;
+    mp_limb_t n;
     nmod_t mod;
     nmod_mat_t dA;
     nmod_sparse_mat_t A, At;
@@ -31,9 +31,9 @@ main(void)
     slong niters[6] = {0, 0, 0, 0, 0, 0};
     slong psol[6] = {0, 0, 0, 0, 0, 0};
     slong nosol[6] = {0, 0, 0, 0, 0, 0};
-    double elapsed[6] = {0, 0, 0, 0, 0};
+    /*double elapsed[6] = {0, 0, 0, 0, 0};*/
     char *names[6] = {"rref", "lu", "Lanczos", "block Lanczos", "Wiedemann", "block Wiedemann"};
-    struct timeval start, end;
+    /*struct timeval start, end;*/
     FLINT_TEST_INIT(state);
     
     flint_printf("solving Ax = b....");
@@ -62,7 +62,7 @@ main(void)
         for (i = 0; i < 6; ++i)
         {
             iter = 0;
-            gettimeofday(&start, NULL);
+            /*gettimeofday(&start, NULL);*/
             switch (i) 
             {
             case 0: ret = nmod_sparse_mat_solve_rref(x2, A, b); break;
@@ -72,8 +72,8 @@ main(void)
             case 4: ret = nmod_sparse_mat_solve_wiedemann(x2, A, b); break;
             case 5: do ret = nmod_sparse_mat_solve_block_wiedemann(x2, A, b, 4, state); while(ret == 0 && ++iter < 3); break;
             }
-            gettimeofday(&end, NULL);
-            elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
+            /*gettimeofday(&end, NULL);
+            elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);*/
             if (ret == 0) nosol[i] += 1;
             else 
             {
@@ -128,7 +128,8 @@ main(void)
     flint_printf("PASS\n");
     for (i = 0; i < 6; ++i)
     {
-        flint_printf("Solving with %s took average time %lf\n", names[i], elapsed[i]/nreps);
+        flint_printf("Solved with %s\n", names[i]);
+        /*flint_printf("\tAverage time: %lf\n", elapsed[i]/nreps);*/
         if (nosol[i])
             flint_printf("\tFound no solution for %wd/%wd examples\n", nosol[i], nreps);
         if (psol[i])    

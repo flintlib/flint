@@ -20,8 +20,7 @@
 int
 main(void)
 {
-    slong rep, r, c, i;
-    TEMPLATE(T, t) n;
+    slong rep, r, c;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, sparse_mat_t) A, B;
     TEMPLATE(T, mat_t) dA;
@@ -30,7 +29,7 @@ main(void)
     flint_printf("converting A to reduced row echelon form....");
     fflush(stdout);
     
-    for (rep = 0; rep < 1000; rep++)
+    for (rep = 0; rep < 200; rep++)
     {
         if (rep % 20 == 0) {flint_printf("."); fflush(stdout);}
         TEMPLATE(T, ctx_randtest) (ctx, state);

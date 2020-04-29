@@ -20,7 +20,6 @@ slong TEMPLATE(T, sparse_mat_nullspace_rref) (TEMPLATE(T, mat_t) X, const TEMPLA
     TEMPLATE(T, struct) *Xrow;
     TEMPLATE(T, sparse_mat_t) R;
     TEMPLATE(T, sparse_vec_struct) *Rrow;
-    TEMPLATE(T, sparse_entry_struct) *le, *e;
     TEMPLATE(T, sparse_mat_init) (R, M->r, M->c, ctx);
     TEMPLATE(T, sparse_mat_set) (R, M, ctx);
     rk = TEMPLATE(T, sparse_mat_rref) (R, ctx);

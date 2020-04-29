@@ -97,7 +97,7 @@ static void kill_columns(nmod_mat_t M, int *good)
 
 int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, slong block_size, flint_rand_t state) {
     int ret = 0;
-    slong i, j, prev_i, next_i, iter, cur_dim, total_dim = 0;
+    slong i, prev_i, next_i, iter, cur_dim, total_dim = 0;
     nmod_sparse_mat_t Mt; /* Transpose of M, we work with A = MtM */
     nmod_mat_struct V[3]; /* Keep track of current vector and two previous ones */
     nmod_mat_t MV; /* Application of M to V */
@@ -127,8 +127,8 @@ int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_
     nmod_mat_init(VSSt, M->c, block_size, M->mod.n);
     nmod_mat_init(T, block_size, M->c, M->mod.n); /* Transpose for computing matrix dot products */
     nmod_mat_init(VtAV, block_size, block_size, M->mod.n);
-    nmod_mat_init(AVtAVSSt_VtAV, block_size, block_size, M->mod.n); // (AV)^T(AV) + VtAV
-    nmod_mat_init(DEF, block_size, block_size, M->mod.n); // Shared by D, E, and F
+    nmod_mat_init(AVtAVSSt_VtAV, block_size, block_size, M->mod.n); /* (AV)^T(AV) + VtAV */
+    nmod_mat_init(DEF, block_size, block_size, M->mod.n); /* Shared by D, E, and F */
     nmod_mat_init(I, block_size, block_size, M->mod.n);
     nmod_mat_init(tmp, block_size, block_size, M->mod.n);
     Mtb = _nmod_vec_init(M->c);
@@ -142,7 +142,7 @@ int nmod_sparse_mat_solve_block_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_
     nmod_mat_one(I);
     nmod_sparse_mat_mul_vec(Mtb, Mt, b);
 
-    // Initialize V[0] randomly
+    /* Initialize V[0] randomly */
     for (i = 0; i < V[0].r*V[0].c; ++i)
         V[0].entries[i] = n_randint(state, V[0].mod.n);
 

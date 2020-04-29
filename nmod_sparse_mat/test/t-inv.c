@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <gmp.h>
-#include <sys/time.h>
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 #include "ulong_extras.h"
@@ -21,13 +20,11 @@
 int
 main(void)
 {
-    int ret, badct = 0;
-    slong rep, r, c, i, rk;
-    mp_limb_t n, a;
+    slong rep, r, c;
+    mp_limb_t n;
     nmod_t mod;
     nmod_sparse_mat_t A, Ai;
     nmod_mat_t dA, dAiA;
-    struct timeval start, end;
     FLINT_TEST_INIT(state);
     
     flint_printf("inverting A....");
@@ -49,7 +46,7 @@ main(void)
         nmod_mat_init(dAiA, r, c, n);
         nmod_sparse_mat_to_dense(dA, A);
 
-        rk = nmod_sparse_mat_inv(Ai, A);
+        nmod_sparse_mat_inv(Ai, A);
         nmod_sparse_mat_mul_mat(dAiA, Ai, dA);
         nmod_mat_rref(dA);
         if(!nmod_mat_equal(dAiA, dA)) {

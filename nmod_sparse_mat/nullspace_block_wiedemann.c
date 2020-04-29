@@ -19,7 +19,6 @@
 slong nmod_sparse_mat_nullspace_block_wiedemann(nmod_mat_t X, const nmod_sparse_mat_t M, slong block_size, flint_rand_t state, slong max_iters)
 {
     /* Generate random solutions to a random system Mx = b and stop when nullspace filled */
-    int ret;
     slong i, j, iter, nxs, *xps;
     mp_ptr x, *xs;
     x = _nmod_vec_init(M->c);

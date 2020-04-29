@@ -40,8 +40,8 @@ endif()
 # Find sources
 
 set(BUILD_DIRS
-    aprcl ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly 
-    fmpq_poly fmpz_mat fmpz_lll mpfr_vec mpfr_mat mpf_vec mpf_mat nmod_vec nmod_sparse_vec nmod_poly 
+    aprcl ulong_extras long_extras perm fmpz fmpz_vec fmpz_sparse_vec fmpz_poly 
+    fmpq_poly fmpz_mat fmpz_sparse_mat fmpz_lll mpfr_vec mpfr_mat mpf_vec mpf_mat nmod_vec nmod_sparse_vec nmod_poly 
     nmod_poly_factor arith mpn_extras nmod_mat nmod_sparse_mat fmpq fmpq_vec fmpq_mat padic 
     fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_mat
     fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve 
@@ -62,7 +62,7 @@ set(TEMPLATE_DIRS
 set(SOURCES
     printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c
     memory_manager.c version.c profiler.c thread_support.c exception.c
-    hashmap.c inlines.c fmpz/fmpz.c
+    heap.c hashmap.c inlines.c fmpz/fmpz.c
 )
 
 if (WITH_NTL)
@@ -71,7 +71,7 @@ endif()
 
 set(HEADERS
     NTL-interface.h flint.h longlong.h config.h gmpcompat.h fft_tuning.h
-    fmpz-conversions.h profiler.h templates.h exception.h hashmap.h
+    fmpz-conversions.h profiler.h templates.h exception.h heap.h hashmap.h
 )
 
 foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)

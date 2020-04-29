@@ -18,8 +18,6 @@ slong TEMPLATE(T, sparse_mat_inv) (TEMPLATE(T, sparse_mat_t) Mi, const TEMPLATE(
 {
     slong rk;
     TEMPLATE(T, sparse_mat_t) I, MI;
-    TEMPLATE(T, sparse_vec_struct) *row;
-    TEMPLATE(T, sparse_entry_struct) *le, *re;
 
     /* Create block matrix [M | I] */
     TEMPLATE(T, sparse_mat_init) (I, M->r, M->r, ctx);

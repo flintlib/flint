@@ -20,8 +20,7 @@
 int
 main(void)
 {
-    slong rep, r, c, i, k;
-    TEMPLATE(T, t) a;
+    slong rep, r, c, k;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, sparse_mat_t) A;
     TEMPLATE(T, struct) *x, *y, *y2;

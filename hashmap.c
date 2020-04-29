@@ -9,141 +9,92 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "flint.h"
 #include "hashmap.h"
 
-void hashmap1_init(hashmap1_t h)
+void hashmap_init(hashmap_t h, slong size)
 {
-   h->data = (hashmap1_elem_s *) flint_calloc(HASHMAP_START_SIZE, 
-                                                       sizeof(hashmap1_elem_s));
-   h->alloc = HASHMAP_START_SIZE;
-   h->mask  = HASHMAP_START_MASK;
-   h->num_used = 0;
+    memset(h, 0, sizeof(*h));
+    h->size = (UWORD(1)) << MIN_HASHMAP_BITS;
+    while (h->size < size) h->size <<= UWORD(1);
+
+    h->mask = 2*h->size - 1;
+    h->num = 0;
+    h->table = flint_calloc(2*h->size, sizeof(*h->table));
+    h->keys = flint_malloc(h->size*sizeof(*h->keys));
+    h->vals = flint_malloc(h->size*sizeof(*h->vals));
 }
 
-void hashmap1_init2(hashmap1_t h, slong size)
+void hashmap_clear(hashmap_t h)
 {
-   slong bits = 10;
-
-   if (2*size >= 0)
-      size *= 2;
-
-   while ((WORD(1) << bits) < size)
-      bits++;
- 
-   h->alloc = (WORD(1) << bits);
-   h->mask  = h->alloc - 1;
-   h->num_used = 0;
-
-   h->data = (hashmap1_elem_s *) flint_calloc(h->alloc, 
-                                                       sizeof(hashmap1_elem_s));
+    flint_free(h->table);
+    flint_free(h->keys);
+    flint_free(h->vals);
+    memset(h, 0, sizeof(*h));
 }
 
-void hashmap1_clear(hashmap1_t h)
+static void _hashmap_rehash(hashmap_t h)
 {
-   flint_free(h->data);
+    slong i, num = h->num;
+    h->size <<= 1;
+    h->mask = 2*h->size - 1;
+    h->table = realloc(h->table, 2*h->size*sizeof(*h->table));
+    h->keys = realloc(h->keys, h->size*sizeof(*h->keys));
+    h->vals = realloc(h->vals, h->size*sizeof(*h->vals));
+    memset(h->table, 0, 2*h->size*sizeof(*h->table));
+    h->num = 0;
+    for (i = 0; i < num; ++i)
+        hashmap_put(h, h->keys[i], h->vals[i]);
 }
 
-/* find location in data to store value with 1 word key */
-slong hashmap1_hash(ulong key, hashmap1_t h)
+static slong _hashmap_pos(hashmap_t h, slong key, int skip_deleted)
 {
-   slong loc, i;
-
-   if (h->num_used == h->alloc/2)
-      return -WORD(1); /* hashmap is full */
-
-   loc = (slong) hashmap1_hash_key(key, h);
-
-   for (i = 0; i < h->alloc; i++)
-   {
-      if (h->data[loc].in_use == 0 || h->data[loc].key == key)
-         return loc;
-
-      loc++;
-      if (loc == h->alloc)
-         loc = 0;
-   }
-
-   return -WORD(1); /* map needs rehashing */
+    slong ind, pos = key*UWORD(13282407956253574709) + UWORD(286824421);
+    for(; (ind = h->table[pos & h->mask]); pos++)
+    {
+        if (!skip_deleted && ind == -1) break;
+        if (ind != -1 && h->keys[ind - 1] == key) break;
+    }
+    return pos & h->mask;
 }
 
-/* rehash a full hashmap to twice current size */
-void hashmap1_rehash(hashmap1_t h)
+void * hashmap_get(hashmap_t h, slong key)
 {
-   slong i;
-   hashmap1_elem_s * tmp;
-
-   tmp = h->data;
-   h->data = (hashmap1_elem_s *) flint_calloc(2*h->alloc, sizeof(hashmap1_elem_s));
-
-   h->alloc = 2*h->alloc;
-   h->mask = h->alloc - 1;
-   h->num_used = 0;
-
-   for (i = 0; i < h->alloc/2; i++)
-   {
-      if (tmp[i].in_use == 1)
-         hashmap1_insert(tmp[i].key, tmp[i].value, h);
-   }
-   
-   flint_free(tmp);
+    slong pos = _hashmap_pos(h, key, 1), ind = h->table[pos];
+    return (ind = h->table[pos]) ? h->vals[ind - 1] : NULL;
 }
 
-/* insert key, value pair into hashmap */
-void hashmap1_insert(ulong key, void * value, hashmap1_t h)
+void hashmap_put(hashmap_t h, slong key, void *val)
 {
-   slong loc;
-
-   loc = hashmap1_hash(key, h);
-   if (loc == -WORD(1))
-   {
-      hashmap1_rehash(h);
-      loc = hashmap1_hash(key, h);
-
-      if (loc == -WORD(1))
-      {
-         /* should never be reached */
-         flint_printf("Rehashing unsuccessful\n");
-         flint_abort();
-      }
-   }
-
-   h->data[loc].value = value;
-   h->data[loc].key = key;
-   h->data[loc].in_use = 1;
-   h->num_used += 1;
+    slong pos = _hashmap_pos(h, key, 1), ind = h->table[pos];
+    if(ind > 0) h->vals[ind - 1] = val;
+    else if(h->num < h->size)
+    {
+        pos = _hashmap_pos(h, key, 0);
+        h->keys[h->num] = key;
+        h->vals[h->num] = val;
+        h->table[pos] = ++h->num;
+    }
+    else
+    {
+        _hashmap_rehash(h);
+        hashmap_put(h, key, val);
+    }
 }
 
-/*
-   set *ptr to location of value corresponding to key in hashmap
-   return 1 if found, otherwise return 0 (in which case *ptr = NULL)
-*/
-int hashmap1_find(void ** ptr, ulong key, hashmap1_t h)
+void hashmap_rem(hashmap_t h, slong key)
 {
-   slong i, loc;
-
-   loc = hashmap1_hash_key(key, h);
-
-   for (i = 0; i < h->alloc; i++)
-   {
-      if (h->data[loc].in_use == 0)
-      {
-          (*ptr) = NULL;
-          return 0;
-      }
-
-      if (h->data[loc].key == key)
-      {
-         (*ptr) = h->data[loc].value;
-         return 1;
-      }
-
-      loc++;
-      if (loc == h->alloc)
-         loc = 0;
-   }
-
-   (*ptr) = NULL;
-
-   return 0;
+    slong pos = _hashmap_pos(h, key, 1), ind = h->table[pos];
+    if(ind > 0)
+    {
+        h->table[pos] = -1; /* Mark as deleted, new entries can be put here */
+        if (ind < h->num)
+        {
+            h->keys[ind - 1] = h->keys[h->num - 1];
+            h->vals[ind - 1] = h->vals[h->num - 1];
+            h->table[_hashmap_pos(h, h->keys[ind - 1], 1)] = ind;
+        }
+        h->num--;
+    }
 }

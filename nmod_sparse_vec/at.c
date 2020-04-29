@@ -17,10 +17,6 @@
 
 mp_limb_t *nmod_sparse_vec_at(nmod_sparse_vec_t vec, slong i)
 {
-    slong pc, pr;
-    slong numr = 0, numc = 0;
-    nmod_sparse_vec_struct *pcol, *prow, *row, *col;
-
     /* TODO: binary search */
     slong j;
     for (j = 0; j < vec->nnz; ++j)

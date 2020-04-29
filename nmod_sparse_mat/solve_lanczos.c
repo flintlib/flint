@@ -24,7 +24,7 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr
     /* We assume that M is not symmetric, and work with A = M^t M */
     nmod_sparse_mat_t Mt;
     mp_ptr v[2], Mv, Av, Mtb;
-    mp_limb_t vtAv[2], AvtAv, vMtb, alpha, beta;
+    mp_limb_t vtAv[2], AvtAv, vMtb;
 
     _nmod_vec_zero(x, M->c);
     if (_nmod_vec_is_zero(b, M->c)) return 1;
@@ -43,8 +43,8 @@ int nmod_sparse_mat_solve_lanczos(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr
     nmod_sparse_mat_mul_vec(Mtb, Mt, b);
 
     /* Make 0th vector random (and -1st vector trivial) */
-    //_nmod_vec_set(v[0], Mtb, M->c);
-    //for (j = 0; j < M->c; ++j) v[0][j] = n_randint(state, M->mod.n);
+    /*_nmod_vec_set(v[0], Mtb, M->c);
+    for (j = 0; j < M->c; ++j) v[0][j] = n_randint(state, M->mod.n); */
     _nmod_vec_randtest(v[0], state, M->c, M->mod);
     _nmod_vec_zero(v[1], M->c); vtAv[1] = 1;  
     for (j = 0; ; j = 1-j)

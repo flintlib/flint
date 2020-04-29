@@ -17,7 +17,7 @@
 /* Compute S_i=(M^j Y)_{0...b-1}^T for i = 0,...,ns-1 */
 static void make_block_sequences(TEMPLATE(T, mat_struct)  *S, slong ns, const TEMPLATE(T, sparse_mat_t)  M, TEMPLATE(T, mat_struct)  Y[2], const TEMPLATE(T, ctx_t) ctx)
 {
-    slong iter, i, j, k, b = Y->c;
+    slong iter, i, b = Y->c;
     TEMPLATE(T, mat_struct)  W[2];
     for (i = 0; i < 2; ++i) TEMPLATE(T, mat_window_init) (&W[i], &Y[i], 0, 0, b, b, ctx);
     for (i = iter = 0; iter < ns; ++iter, i = 1-i) 
@@ -40,11 +40,9 @@ static void make_block_sequences(TEMPLATE(T, mat_struct)  *S, slong ns, const TE
 static void coppersmith_aux_gauss(TEMPLATE(T, mat_t)  M, slong *d, const TEMPLATE(T, ctx_t) ctx) 
 {
     const slong b = M->r/2;
-    slong pr, pc, r, c, k, tmp;
-    slong num_pi;
+    slong pr, pc, r, tmp;
     slong *gamma;
     TEMPLATE(T, t) cinv, cc;
-    TEMPLATE(T, mat_t)  tau;
 
     TEMPLATE(T, init) (cinv, ctx);
     TEMPLATE(T, init) (cc, ctx);
@@ -116,8 +114,8 @@ static int coppersmith_stopping_criterion(slong *d, slong delta, slong b)
 static int find_block_min_poly(TEMPLATE(T, mat_struct)  *S, slong *d, slong n, slong delta, const TEMPLATE(T, ctx_t) ctx) 
 {
     int ret;
-    slong t, sigma, beta, mu;
-    slong i, j, k, r, b = S->r;
+    slong t;
+    slong i, k, r, b = S->r;
     slong f_len;
     TEMPLATE(T, mat_struct)  *F;
     TEMPLATE(T, mat_t)  M, D, tau, tmp;
@@ -195,7 +193,6 @@ static void make_block_sum(TEMPLATE(T, struct) *x, const TEMPLATE(T, mat_struct)
 int TEMPLATE(T, sparse_mat_solve_block_wiedemann) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t)  M, const TEMPLATE(T, struct) *b, slong block_size, flint_rand_t state, const TEMPLATE(T, ctx_t) ctx)
 {
     int good = 0, ret;
-    slong i;
     TEMPLATE (T, struct) *x1;
     TEMPLATE(T, sparse_vec_t)  z;
     TEMPLATE(T, sparse_mat_t)  Mb;
@@ -234,7 +231,6 @@ int TEMPLATE(T, sparse_mat_nullvector_block_wiedemann) (TEMPLATE(T, struct) *x, 
     slong l, ns, k;
     slong *d;
     TEMPLATE(T, struct) *b;
-    TEMPLATE(T, mat_t)  Z;
     TEMPLATE(T, mat_struct)  Y[3], *S;
     if (M->r != M->c) return 0; /* TODO */
 

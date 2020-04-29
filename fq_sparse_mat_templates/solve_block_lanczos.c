@@ -97,7 +97,7 @@ static void kill_columns(TEMPLATE(T, mat_t) M, int *good, const TEMPLATE(T, ctx_
 int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, struct) *b, slong block_size, flint_rand_t state, const TEMPLATE(T, ctx_t) ctx) 
 {
     int ret = 0;
-    slong i, j, prev_i, next_i, iter, cur_dim, total_dim = 0;
+    slong i, prev_i, next_i, iter, cur_dim, total_dim = 0;
     TEMPLATE(T, sparse_mat_t) Mt; /* Transpose of M, we work with A = MtM */
     TEMPLATE(T, mat_struct) V[3]; /* Keep track of current vector and two previous ones */
     TEMPLATE(T, mat_t) MV; /* Application of M to V */
@@ -125,8 +125,8 @@ int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const T
     TEMPLATE(T, mat_init) (VSSt, M->c, block_size, ctx); /* Transpose for computing matrix dot products */
     TEMPLATE(T, mat_init) (T, block_size, M->c, ctx); /* Transpose for computing matrix dot products */
     TEMPLATE(T, mat_init) (VtAV, block_size, block_size, ctx);
-    TEMPLATE(T, mat_init) (AVtAVSSt_VtAV, block_size, block_size, ctx); // (AV)^T(AV) + VtAV
-    TEMPLATE(T, mat_init) (DEF, block_size, block_size, ctx); // Shared by D, E, and F
+    TEMPLATE(T, mat_init) (AVtAVSSt_VtAV, block_size, block_size, ctx); /* (AV)^T(AV) + VtAV */
+    TEMPLATE(T, mat_init) (DEF, block_size, block_size, ctx); /* Shared by D, E, and F */
     TEMPLATE(T, mat_init) (I, block_size, block_size, ctx);
     TEMPLATE(T, mat_init) (tmp, block_size, block_size, ctx);
     Mtb = _TEMPLATE(T, vec_init) (M->c, ctx);
@@ -140,7 +140,7 @@ int TEMPLATE(T, sparse_mat_solve_block_lanczos) (TEMPLATE(T, struct) *x, const T
     TEMPLATE(T, mat_one) (I, ctx);
     TEMPLATE(T, sparse_mat_mul_vec) (Mtb, Mt, b, ctx);
 
-    // Initialize V[0] randomly
+    /* Initialize V[0] randomly */
     for (i = 0; i < V[0].r*V[0].c; ++i)
         TEMPLATE(T, randtest) (&V[0].entries[i], state, ctx);
 

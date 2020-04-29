@@ -18,7 +18,7 @@
 
 int main(void)
 {
-    slong rep, r, c1, c2, i;
+    slong rep, r, c1, c2, nreps = 100;
     mp_limb_t n;
     nmod_t mod;
     nmod_sparse_mat_t A, B, C;
@@ -29,7 +29,7 @@ int main(void)
     fflush(stdout);
 
 
-    for (i = 0; i < 100; i++)
+    for (rep = 0; rep < nreps; rep++)
     {
         r = n_randint(state, 200);
         c1 = n_randint(state, 200);

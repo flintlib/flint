@@ -15,15 +15,15 @@
 #include "flint.h"
 #include "nmod_sparse_vec.h"
 
-void nmod_sparse_vec_randtest(nmod_sparse_vec_t vec, flint_rand_t state, mp_limb_signed_t nnz, mp_limb_signed_t len, nmod_t mod)
+void nmod_sparse_vec_randtest(nmod_sparse_vec_t vec, flint_rand_t state, slong nnz, slong len, nmod_t mod)
 {
+    slong i, j;
+    mp_limb_t v;
     nnz = FLINT_MIN(nnz, len);
     vec->nnz = nnz;
     if (nnz == 0) {vec->entries = NULL; return;}
 
     vec->entries = flint_realloc(vec->entries, nnz*sizeof(*vec->entries));
-    slong i, j;
-    mp_limb_t v;
     for (i = 0; i < nnz; ++i)
     {
         do v = n_randtest(state) % mod.n;

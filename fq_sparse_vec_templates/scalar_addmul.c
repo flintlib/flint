@@ -16,44 +16,37 @@
 void TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T))(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, sparse_vec_t) v, const TEMPLATE(T, t) c, 
                 const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i, nnz, unnz, vnnz;
-    TEMPLATE(T, t) tmp;
+    slong unnz = u->nnz, vnnz = v->nnz, wnnz, k;
     TEMPLATE(T, sparse_entry_struct) *ue, *ve, *we;
-    if (u->nnz == 0) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (w, v, c, ctx);
-    else if (v->nnz == 0 || TEMPLATE(T, is_zero) (c, ctx)) TEMPLATE(T, sparse_vec_set) (w, u, 0, ctx);
-    else 
-    {
-        TEMPLATE(T, init) (tmp, ctx);
-        unnz = u->nnz; vnnz = v->nnz; /* Store in case either equals w (gets resized) */
-        nnz = _TEMPLATE(T, sparse_vec_union_nnz) (u, v, ctx);
-        _TEMPLATE(T, sparse_vec_resize) (w, nnz, ctx);
-        ue = u->entries + unnz - 1, ve = v->entries + vnnz - 1, we = w->entries + w->nnz - 1;
-        while (ue >= u->entries && ve >= v->entries)
-        {
-            we->ind = FLINT_MAX(ue->ind, ve->ind);
-            if (ue->ind == ve->ind) 
-            {
-                TEMPLATE(T, mul) (tmp, (ve--)->val, c, ctx);
-                TEMPLATE(T, add) (we->val, tmp, (ue--)->val, ctx);
-                if (!TEMPLATE(T, is_zero) (we->val, ctx)) we--;
-            }
-            else if (ue->ind == we->ind) TEMPLATE(T, set) ((we--)->val, (ue--)->val, ctx);
-            else if (ve->ind == we->ind) TEMPLATE(T, mul) ((we--)->val, (ve--)->val, c, ctx);
-        }
-        while (ue >= u->entries) we->ind = ue->ind, TEMPLATE(T, set) ((we--)->val, (ue--)->val, ctx);
-        while (ve >= v->entries) we->ind = ve->ind, TEMPLATE(T, mul) ((we--)->val, (ve--)->val, c, ctx);
+    TEMPLATE(T, t) tmp;
 
-        nnz = w->nnz - (we + 1 - w->entries);
-        if (nnz == 0) TEMPLATE(T, sparse_vec_clear) (w, ctx);
-        else if (nnz < w->nnz)
+    /* Check for simpler operations first */
+    if (vnnz == 0 || TEMPLATE(T, is_zero) (c, ctx)) {TEMPLATE(T, sparse_vec_set) (w, u, 0, ctx); return;}
+    if (TEMPLATE(T, is_one) (c, ctx)) {TEMPLATE(T, sparse_vec_add) (w, u, v, ctx); return;}
+    if (unnz == 0) {TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (w, v, c, ctx); return;}
+    TEMPLATE(T, init) (tmp, ctx);
+    TEMPLATE(T, neg) (tmp, c, ctx);
+    if(TEMPLATE(T, is_one) (tmp, ctx)) TEMPLATE(T, sparse_vec_sub) (w, u, v, ctx);
+    else /* Now just do standard addmul */ 
+    {
+        wnnz = _TEMPLATE(T, sparse_vec_union_nnz) (u, v, ctx);
+        _TEMPLATE(T, sparse_vec_resize) (w, wnnz, ctx);
+        ue = u->entries + unnz, ve = v->entries + vnnz, we = w->entries + wnnz;
+        while ((k = _TEMPLATE(T, sparse_vector_merge_descend) (&we, &ue, &ve, u, v)) >= 0)
         {
-            for (i = 0; i < w->nnz - nnz; ++i) TEMPLATE(T, clear) (w->entries[i].val, ctx);
-            memmove(w->entries, we + 1, nnz*sizeof(*w->entries));
-            w->entries = flint_realloc(w->entries, nnz*sizeof(*w->entries));
-            w->nnz = nnz;
+            switch(k)
+            {
+                case 0: TEMPLATE(T, set)(we->val, ue->val, ctx); break;
+                case 1: TEMPLATE(T, mul)(we->val, ve->val, c, ctx); break;
+                default: TEMPLATE(T, mul) (tmp, ve->val, c, ctx);
+                         TEMPLATE(T, add) (we->val, ue->val, tmp, ctx);
+                         if (TEMPLATE(T, is_zero) (we->val, ctx)) we++;
+            }
         }
-        TEMPLATE(T, clear) (tmp, ctx);
+        _TEMPLATE(T, sparse_vector_shift_left) (w, we - w->entries, ctx);
     }
+    
+    TEMPLATE(T, clear) (tmp, ctx);
 }
 #endif
 

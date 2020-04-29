@@ -263,14 +263,14 @@ void TEMPLATE(T, sparse_mat_sub) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T,
 }
 
 FQ_SPARSE_MAT_TEMPLATES_INLINE
-void TEMPLATE(T, sparse_mat_addmul) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
+void TEMPLATE(T, TEMPLATE(sparse_mat_scalar_addmul, T)) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
     for (i = 0; i < O->r; ++i) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T))(&O->rows[i], &M->rows[i], &N->rows[i], c, ctx);
 }
 
 FQ_SPARSE_MAT_TEMPLATES_INLINE
-void TEMPLATE(T, sparse_mat_submul) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
+void TEMPLATE(T, TEMPLATE(sparse_mat_scalar_submul, T)) (TEMPLATE(T, sparse_mat_t) O, const TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(T, sparse_mat_t) N, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
     for (i = 0; i < O->r; ++i) TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T))(&O->rows[i], &M->rows[i], &N->rows[i], c, ctx);

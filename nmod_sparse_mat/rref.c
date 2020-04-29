@@ -18,13 +18,13 @@
 
 slong nmod_sparse_mat_rref(nmod_sparse_mat_t M)
 {
-    if (M->r == 0 || M->c == 0) return 0;
     slong *P;
-    slong i, j, r, c, pr, pc, rank, remr;
+    slong j, r, c, pr, pc, rank, remr;
     nmod_sparse_mat_t Mt;
     nmod_sparse_vec_struct *pcol, *prow, *row, *col;
     mp_limb_t cinv, cc;
 
+    if (M->r == 0 || M->c == 0) return 0;
     nmod_sparse_mat_init(Mt, M->c, M->r, M->mod);
     nmod_sparse_mat_transpose(Mt, M);
     

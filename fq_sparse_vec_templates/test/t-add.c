@@ -65,6 +65,19 @@ main(void)
             flint_printf("FAIL: ((u += v) -= v) != u+v-v\n");
             abort();
         }
+        TEMPLATE(T, sparse_vec_add)(u, v, u, ctx);
+        if (!TEMPLATE(T, sparse_vec_equal)(u, w, 0, ctx))
+        {
+            flint_printf("FAIL: (u += v) != u + v\n");
+            abort();
+        }
+
+        TEMPLATE(T, sparse_vec_sub)(v, w, v, ctx);
+        if (!TEMPLATE(T, sparse_vec_equal)(v, x, 0, ctx))
+        {
+            flint_printf("FAIL: (v = u+v - v) != u+v-v\n");
+            abort();
+        }
         TEMPLATE(T, sparse_vec_clear)(u, ctx);
         TEMPLATE(T, sparse_vec_clear)(v, ctx);
         TEMPLATE(T, sparse_vec_clear)(w, ctx);
