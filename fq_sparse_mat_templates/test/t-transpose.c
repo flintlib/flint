@@ -20,7 +20,7 @@
 int
 main(void)
 {
-    slong rep, r, c, i;
+    slong rep, r, c, nreps = 1000;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, sparse_mat_t) A, B, C;
     FLINT_TEST_INIT(state);
@@ -30,7 +30,7 @@ main(void)
     fflush(stdout);
 
     /* Rectangular transpose, same modulus */
-    for (rep = 0; rep < 1000; rep++)
+    for (rep = 0; rep < nreps; rep++)
     {
         TEMPLATE(T, ctx_randtest) (ctx, state);
         r = n_randint(state, 20);

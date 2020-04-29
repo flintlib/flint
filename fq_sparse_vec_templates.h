@@ -115,7 +115,6 @@ FQ_SPARSE_VEC_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_vec_one)(TEMPLATE(T, sparse_vec_t) vec, slong ind, 
                                     const TEMPLATE(T, ctx_t) ctx) 
 {
-    slong i;
     _TEMPLATE(T, sparse_vec_resize) (vec, 1, ctx);
     vec->entries[0].ind = ind;
     TEMPLATE(T, one) (vec->entries[0].val, ctx);
@@ -139,8 +138,9 @@ FQ_SPARSE_VEC_TEMPLATES_INLINE
 void TEMPLATE(T, sparse_vec_set_entry)(TEMPLATE(T, sparse_vec_t) v, slong ind, const TEMPLATE(T, t) val, 
                                     const TEMPLATE(T, ctx_t) ctx)
 {
+    TEMPLATE(T, t) *oval;
     if (TEMPLATE(T, is_zero) (val, ctx)) return;
-    TEMPLATE(T, t) *oval = TEMPLATE(T, sparse_vec_at) (v, ind, ctx);
+    oval = TEMPLATE(T, sparse_vec_at) (v, ind, ctx);
     if (oval == NULL)
     {
         _TEMPLATE(T, sparse_vec_resize) (v, v->nnz + 1, ctx);
@@ -193,10 +193,11 @@ void TEMPLATE(T, sparse_vec_from_dense)(TEMPLATE(T, sparse_vec_t) dst, TEMPLATE(
                                     const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, nnz = 0;
+    TEMPLATE(T, sparse_entry_struct) *e;
     for (i = 0; i < len; ++i)
         if (!TEMPLATE(T, is_zero) (&src[i], ctx)) ++nnz;
     _TEMPLATE(T, sparse_vec_resize) (dst, nnz, ctx);
-    TEMPLATE(T, sparse_entry_struct) *e = dst->entries;
+    e = dst->entries;
     for (i = 0; i < len; ++i)
         if (!TEMPLATE(T, is_zero) (&src[i], ctx))
             e->ind = i, TEMPLATE(T, set) (e->val, &src[i], ctx), ++e;
@@ -305,6 +306,8 @@ void TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T))(TEMPLATE(T, sparse_vec_t) v
         for (i = 0; i < v->nnz; ++i) TEMPLATE(T, mul)(v->entries[i].val, v->entries[i].val, c, ctx);
 }
 
+/* Utility macros used by binary vector operations */
+/* Compute total number of indices between two sparse vectors */
 FQ_SPARSE_VEC_TEMPLATES_INLINE
 slong _TEMPLATE(T, sparse_vec_union_nnz)(const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, sparse_vec_t) v,
                                     const TEMPLATE(T, ctx_t) ctx)
@@ -319,6 +322,42 @@ slong _TEMPLATE(T, sparse_vec_union_nnz)(const TEMPLATE(T, sparse_vec_t) u, cons
     nnz += u->nnz - i + v->nnz - j;
     return nnz;
 }
+
+/* Iterate through u and v in descending order, assigning sorted indices to w */
+/* Returns -1 if u and v are both exhausted, 
+    2 if we->ind = ue->ind == ve->ind
+    1 if we->ind = ve->ind > ue->ind (or u exhausted), 
+    0 if we->ind = ue->ind > ve->ind (or v exhausted). */
+FQ_SPARSE_VEC_TEMPLATES_INLINE
+slong _TEMPLATE(T, sparse_vector_merge_descend) (TEMPLATE(T, sparse_entry_struct) **we, 
+                                                 TEMPLATE(T, sparse_entry_struct) **ue, 
+                                                 TEMPLATE(T, sparse_entry_struct) **ve, 
+                                                 const TEMPLATE(T, sparse_vec_t) u, 
+                                                 const TEMPLATE(T, sparse_vec_t) v)
+{
+    slong uind = (*ue==u->entries) ? -1 : (*ue-1)->ind;
+    slong vind = (*ve==v->entries) ? -1 : (*ve-1)->ind;
+    if(uind == -1 && vind == -1) return -1;
+    if(uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
+    if(uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
+    --*ue, --*we; (*we)->ind = uind; return 0;
+}
+
+/* Like resize, but removes entries from the front of the vector */
+FQ_SPARSE_VEC_TEMPLATES_INLINE
+void _TEMPLATE(T, sparse_vector_shift_left) (TEMPLATE(T, sparse_vec_t) v, slong amt, const TEMPLATE(T, ctx_t) ctx)
+{
+    slong i;
+    if (amt == v->nnz) TEMPLATE(T, sparse_vec_clear) (v, ctx);
+    else if(amt > 0)
+    {
+        v->nnz -= amt;
+        for (i = 0; i < amt; ++i) TEMPLATE(T, clear) (v->entries[i].val, ctx);
+        memmove(v->entries, v->entries + amt, v->nnz*sizeof(*v->entries));
+        v->entries = flint_realloc(v->entries, v->nnz*sizeof(*v->entries));
+    }
+}
+
 FLINT_DLL 
 void TEMPLATE(T, sparse_vec_add)(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, sparse_vec_t) u, const TEMPLATE(T, sparse_vec_t) v,  
                                     const TEMPLATE(T, ctx_t) ctx);

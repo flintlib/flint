@@ -15,7 +15,7 @@
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 
-// Berlekamp - Massey algorithm
+/* Berlekamp - Massey algorithm */
 static slong find_min_poly(mp_limb_t *s, slong N, nmod_t mod)
 {
     slong L = 0, m, n, i;

@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <gmp.h>
-#include <sys/time.h>
+/* #include <sys/time.h> */
 #include "flint.h"
 #include "nmod_sparse_mat.h"
 #include "ulong_extras.h"
@@ -21,17 +21,16 @@
 int
 main(void)
 {
-    int iter, ret;
     slong rep, nreps = 100, r, c, i;
-    mp_limb_t n, a;
+    mp_limb_t n;
     nmod_t mod;
     nmod_sparse_mat_t A;
     nmod_mat_t X, AX;
     slong rk[6];
-    double elapsed[6] = {0, 0, 0, 0, 0, 0};
+/*     double elapsed[6] = {0, 0, 0, 0, 0, 0}; */
     slong discrep[6] = {0, 0, 0, 0, 0, 0};
     char *names[6] = {"rref", "lu", "Lanczos", "block Lanczos", "Wiedemann", "block Wiedemann"};
-    struct timeval start, end;
+/*     struct timeval start, end; */
     FLINT_TEST_INIT(state);
     
     flint_printf("finding nullspace of A....");
@@ -48,7 +47,7 @@ main(void)
         nmod_sparse_mat_randtest(A, state, c/20, c/10);
         for (i = 0; i < 6; ++i) 
         {
-            gettimeofday(&start, NULL);
+/*             gettimeofday(&start, NULL); */
             switch (i) 
             {
             case 0: rk[0] = nmod_sparse_mat_nullspace_rref(X, A); break;
@@ -58,9 +57,9 @@ main(void)
             case 4: rk[4] = nmod_sparse_mat_nullspace_wiedemann(X, A, state, 2); break;
             case 5: rk[5] = nmod_sparse_mat_nullspace_block_wiedemann(X, A, 8, state, 2); break;
             }
-            //if (i == 0 && rk[0] == UWORD(0) ) { nmod_mat_clear(X); break;}
-            gettimeofday(&end, NULL);
-            elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);
+            /* if (i == 0 && rk[0] == UWORD(0) ) { nmod_mat_clear(X); break;} */
+/*             gettimeofday(&end, NULL);
+            elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec); */
             if(X->c==0) continue;
             nmod_mat_init(AX, A->r, X->c, n);
             nmod_sparse_mat_mul_mat(AX, A, X); 
@@ -86,11 +85,11 @@ main(void)
     flint_printf("PASS\n");
     for(i = 0; i < 6; ++i)
     {
-        flint_printf("Finding nullspace with %s took average time %lf\n",
-                     names[i], elapsed[i]/nreps);
+        flint_printf("Found nullspace with %s\n", names[i]);
+/*         flint_printf("\tAverage time %lf:\n", elapsed[i]/nreps); */
         if(discrep[i] > 0)
             flint_printf("\tFailed to find full nullspace in %wd/%wd trials\n", 
-                         discrep[i], nreps);
+                         discrep[i], nreps);        
     }
     return 0;
 }

@@ -20,7 +20,7 @@
 int nmod_sparse_mat_solve_lu(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b)
 {
     int good = 1;
-    slong rk, *P, *Q, i, j;
+    slong rk, *P, *Q, i;
     nmod_sparse_mat_t L, U;
     mp_ptr bp, y, xp;
     if (_nmod_vec_is_zero(b, M->c))

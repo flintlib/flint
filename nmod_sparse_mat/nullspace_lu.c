@@ -18,7 +18,6 @@
 
 slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M)
 {
-    int good = 1;
     slong rk, *P, *Q, *Qi, i, j;
     nmod_sparse_mat_t L, U;
     nmod_sparse_entry_struct *e;

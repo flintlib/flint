@@ -18,7 +18,7 @@
 
 int main(void)
 {
-    slong rep, r, c1, c2, i;
+    slong rep, r, c1, c2, nreps = 100;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, sparse_mat_t) A, B, C;
     TEMPLATE(T, sparse_mat_t) window1, window2;
@@ -28,7 +28,7 @@ int main(void)
     fflush(stdout);
 
 
-    for (i = 0; i < 100; i++)
+    for (rep = 0; rep < nreps; rep++)
     {
         TEMPLATE(T, ctx_randtest) (ctx, state);
         r = n_randint(state, 20);

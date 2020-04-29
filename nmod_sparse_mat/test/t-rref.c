@@ -21,7 +21,7 @@
 int
 main(void)
 {
-    slong rep, r, c, i;
+    slong rep, r, c;
     mp_limb_t n;
     nmod_t mod;
     nmod_sparse_mat_t A, B;

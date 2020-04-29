@@ -19,6 +19,9 @@ void
 nmod_sparse_mat_transpose(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
 {
     slong r, c, i, j;
+    nmod_sparse_entry_struct *Ae, *Be;
+    nmod_sparse_vec_struct *row;
+
     /* Get number of nnzs in each column of A (thus each row of B) */
     for (c = 0; c < A->c; ++c) 
     {
@@ -36,7 +39,7 @@ nmod_sparse_mat_transpose(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
     /* Allocate space for nnz and reset counters */
     for (c = 0; c < A->c; ++c) 
     {
-        nmod_sparse_vec_struct *row = &B->rows[c];
+        row = &B->rows[c];
         if (row->nnz == 0) nmod_sparse_vec_clear(row);
         else row->entries = flint_realloc(row->entries, row->nnz*sizeof(*row->entries));
         row->nnz = 0;
@@ -46,11 +49,11 @@ nmod_sparse_mat_transpose(nmod_sparse_mat_t B, const nmod_sparse_mat_t A)
     {
         for (i = 0; i < A->rows[r].nnz; ++i) 
         {
-            nmod_sparse_entry_struct *Ae = &A->rows[r].entries[i];
+            Ae = &A->rows[r].entries[i];
             c = Ae->ind;
             if(c >= A->c) break;
             j = B->rows[c].nnz++;
-            nmod_sparse_entry_struct *Be = &B->rows[c].entries[j];
+            Be = &B->rows[c].entries[j];
             Be->ind = r, Be->val = Ae->val;
         }
     }

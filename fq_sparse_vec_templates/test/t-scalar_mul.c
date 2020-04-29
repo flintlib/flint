@@ -47,7 +47,17 @@ main(void)
 
         TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (w, u, v, c, ctx);
         TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (x, v, c, ctx);
-        TEMPLATE(T, sparse_vec_add) (x, x, u, ctx);
+        TEMPLATE(T, sparse_vec_add) (x, u, x, ctx);
+
+        if (!TEMPLATE(T, sparse_vec_equal) (w, x, 0, ctx))
+        {
+            flint_printf("FAIL: u + c*v != u + (c*v)\n");
+            abort();
+        }
+
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T)) (w, u, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (x, v, c, ctx);
+        TEMPLATE(T, sparse_vec_sub) (x, u, x, ctx);
 
         if (!TEMPLATE(T, sparse_vec_equal) (w, x, 0, ctx))
         {
@@ -59,6 +69,33 @@ main(void)
         TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (u, u, v, c, ctx);
 
         if (!TEMPLATE(T, sparse_vec_equal) (u, w, 0, ctx))
+        {
+            flint_printf("FAIL: u + c*v != (u += c*v)\n");
+            abort();
+        }
+
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (w, u, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T)) (v, u, v, c, ctx);
+
+        if (!TEMPLATE(T, sparse_vec_equal) (v, w, 0, ctx))
+        {
+            flint_printf("FAIL: u + c*v != (u += c*v)\n");
+            abort();
+        }
+
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T)) (w, u, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T)) (u, u, v, c, ctx);
+
+        if (!TEMPLATE(T, sparse_vec_equal) (u, w, 0, ctx))
+        {
+            flint_printf("FAIL: u + c*v != (u += c*v)\n");
+            abort();
+        }
+
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T)) (w, u, v, c, ctx);
+        TEMPLATE(T, TEMPLATE(sparse_vec_scalar_submul, T)) (v, u, v, c, ctx);
+
+        if (!TEMPLATE(T, sparse_vec_equal) (v, w, 0, ctx))
         {
             flint_printf("FAIL: u + c*v != (u += c*v)\n");
             abort();

@@ -20,8 +20,8 @@
 int
 main(void)
 {
-    slong rep, r, c, i;
-    mp_limb_t n, a;
+    slong rep, r, c;
+    mp_limb_t n;
     nmod_t mod;
     nmod_sparse_mat_t A, B, C;
     FLINT_TEST_INIT(state);

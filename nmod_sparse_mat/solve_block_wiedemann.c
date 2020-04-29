@@ -18,7 +18,7 @@
 /* Compute S_i=(M^j Y)_{0...b-1}^T for i = 0,...,ns-1 */
 static void make_block_sequences(nmod_mat_struct *S, slong ns, const nmod_sparse_mat_t M, nmod_mat_struct Y[2]) 
 {
-    slong iter, i, j, k, b = Y->c;
+    slong iter, i, b = Y->c;
     nmod_mat_struct W[2];
     for (i = 0; i < 2; ++i) nmod_mat_window_init(&W[i], &Y[i], 0, 0, b, b);
     for (i = iter = 0; iter < ns; ++iter, i = 1-i) 
@@ -41,11 +41,9 @@ static void make_block_sequences(nmod_mat_struct *S, slong ns, const nmod_sparse
 static void coppersmith_aux_gauss(nmod_mat_t M, slong *d) 
 {
     const slong b = M->r/2;
-    slong pr, pc, r, c, k, tmp;
-    slong num_pi;
+    slong pr, pc, r, tmp;
     slong *gamma;
-    mp_limb_t cinv, cc;
-    nmod_mat_t tau;
+    mp_limb_t cinv;
 
     /* Keep track of viable rows */
     gamma = flint_malloc(b*sizeof(*gamma));
@@ -109,8 +107,8 @@ static int coppersmith_stopping_criterion(slong *d, slong delta, slong b)
 static int find_block_min_poly(nmod_mat_struct *S, slong *d, slong n, slong delta) 
 {
     int ret;
-    slong t, sigma, beta, mu;
-    slong i, j, k, r, b = S->r;
+    slong t;
+    slong i, k, r, b = S->r;
     slong f_len;
     nmod_mat_struct *F;
     nmod_mat_t M, D, tau, tmp;
@@ -188,7 +186,6 @@ static void make_block_sum(mp_ptr x, const nmod_mat_struct *S, const slong *d, c
 int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, mp_srcptr b, slong block_size, flint_rand_t state)
 {
     int good = 0, ret;
-    slong i;
     mp_ptr x1;
     nmod_sparse_vec_t z;
     nmod_sparse_mat_t Mb;
@@ -225,7 +222,6 @@ int nmod_sparse_mat_nullvector_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t
     slong l, ns, k;
     slong *d;
     mp_ptr b;
-    nmod_mat_t Z;
     nmod_mat_struct Y[3], *S;
     if (M->r != M->c) return 0; /* TODO */
 

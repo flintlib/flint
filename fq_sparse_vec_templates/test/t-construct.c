@@ -20,7 +20,7 @@
 int
 main(void)
 {
-    slong rep, len, nnz, i, j;
+    slong rep, len, nnz, i;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, sparse_vec_t) u, v;
     slong *inds;

@@ -20,7 +20,7 @@
 int
 main(void)
 {
-    slong rep, r, c, i, j, m, rk, *P, *Q;
+    slong rep, r, c, i, j, rk, *P, *Q;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, t) *val;
     TEMPLATE(T, sparse_mat_t) A, LU, L, U;
@@ -30,16 +30,15 @@ main(void)
     flint_printf("decomposing PAQ=LU....");
     fflush(stdout);
 
-    for (rep = 0; rep < 1000; rep++)
+    for (rep = 0; rep < 200; rep++)
     {
         TEMPLATE(T, ctx_randtest) (ctx, state);
-        if (rep % 50 == 0) {flint_printf("."); fflush(stdout);}
-        r = n_randint(state, 200);
-        c = n_randint(state, 200);
+        if (rep % 20 == 0) {flint_printf("."); fflush(stdout);}
+        r = n_randint(state, 100);
+        c = n_randint(state, 100);
 
         P = flint_malloc(r*sizeof(*P));
         Q = flint_malloc(c*sizeof(*P));
-        m = FLINT_MIN(r, c);
         TEMPLATE(T, sparse_mat_init) (A, r, c, ctx);
         TEMPLATE(T, sparse_mat_init) (LU, r, c, ctx);
         TEMPLATE(T, sparse_mat_init) (L, r, c, ctx);

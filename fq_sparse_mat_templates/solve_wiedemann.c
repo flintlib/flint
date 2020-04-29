@@ -14,7 +14,7 @@
 #include <string.h>
 #include "templates.h"
 
-// Berlekamp - Massey algorithm
+/* Berlekamp - Massey algorithm */
 static slong find_min_poly(TEMPLATE(T, struct) *s, slong N, const TEMPLATE(T, ctx_t) ctx)
 {
     slong L = 0, m, n, i;

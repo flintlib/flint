@@ -20,8 +20,8 @@
 int
 main(void)
 {
-    slong rep, r, c, i, k;
-    mp_limb_t n, a;
+    slong rep, r, c, k;
+    mp_limb_t n;
     nmod_t mod;
     nmod_sparse_mat_t A;
     mp_ptr x, y, y2;

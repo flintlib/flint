@@ -19,7 +19,7 @@
 
 int main(void)
 {
-    slong rep, r1, r2, c, i;
+    slong rep, r1, r2, c, nreps = 100;
     mp_limb_t n;
     nmod_t mod;
     nmod_sparse_mat_t A, B, C;
@@ -30,7 +30,7 @@ int main(void)
     flint_printf("concat_vertical....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (rep = 0; rep < nreps; rep++)
     {
         r1 = n_randint(state, 100);
         r2 = n_randint(state, 100);
