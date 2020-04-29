@@ -41,7 +41,7 @@ main(void)
     
     for (rep = 0; rep < nreps; rep++)
     {
-        if(rep % 5==0) {flint_printf("."); fflush(stdout);}
+        if (rep % 5==0) {flint_printf("."); fflush(stdout);}
         
         c = r = 100 + n_randint(state, 50);
         do n = n_randtest_not_zero(state);
@@ -67,10 +67,10 @@ main(void)
             {
             case 0: ret = nmod_sparse_mat_solve_rref(x2, A, b); break;
             case 1: ret = nmod_sparse_mat_solve_lu(x2, A, b); break;
-            case 2: do ret = nmod_sparse_mat_solve_lanczos(x2, A, b, state); while(ret == 0 && ++iter < 30); break;
-            case 3: do ret = nmod_sparse_mat_solve_block_lanczos(x2, A, b, 8, state); while(ret == 0 && ++iter < 30); break;
+            case 2: do ret = nmod_sparse_mat_solve_lanczos(x2, A, b, state); while (ret == 0 && ++iter < 30); break;
+            case 3: do ret = nmod_sparse_mat_solve_block_lanczos(x2, A, b, 8, state); while (ret == 0 && ++iter < 30); break;
             case 4: ret = nmod_sparse_mat_solve_wiedemann(x2, A, b); break;
-            case 5: do ret = nmod_sparse_mat_solve_block_wiedemann(x2, A, b, 4, state); while(ret == 0 && ++iter < 3); break;
+            case 5: do ret = nmod_sparse_mat_solve_block_wiedemann(x2, A, b, 4, state); while (ret == 0 && ++iter < 3); break;
             }
             /*gettimeofday(&end, NULL);
             elapsed[i] += (end.tv_sec - start.tv_sec) + .000001*(end.tv_usec-start.tv_usec);*/

@@ -239,8 +239,9 @@ NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_mat_permute_cols(nmod_sparse_mat_t M, slong *Q) 
 {
     slong i;
-    for (i = 0; i < M->r; ++i) {
-        if(!M->rows[i].nnz) continue;
+    for (i = 0; i < M->r; ++i) 
+    {
+        if (!M->rows[i].nnz) continue;
         nmod_sparse_vec_permute_inds(&M->rows[i], Q);
         qsort(M->rows[i].entries, M->rows[i].nnz, sizeof(*M->rows[i].entries), nmod_sparse_entry_cmp);
     }
