@@ -96,7 +96,7 @@ NMOD_SPARSE_MAT_INLINE
 void nmod_sparse_mat_set(nmod_sparse_mat_t M, const nmod_sparse_mat_t src) 
 {
     slong i, rmax = FLINT_MIN(M->r, src->r);
-    if(M==src || M->r == 0) return;
+    if (M==src || M->r == 0) return;
     for (i = 0; i < rmax; ++i) nmod_sparse_vec_set(&M->rows[i], &src->rows[i], src->c_off);
 }
 
@@ -194,8 +194,9 @@ NMOD_SPARSE_VEC_INLINE
 void nmod_sparse_mat_permute_cols(nmod_sparse_mat_t M, slong *Q) 
 {
     slong i;
-    for (i = 0; i < M->r; ++i) {
-        if(!M->rows[i].nnz) continue;
+    for (i = 0; i < M->r; ++i) 
+    {
+        if (!M->rows[i].nnz) continue;
         nmod_sparse_vec_permute_inds(&M->rows[i], Q);
         qsort(M->rows[i].entries, M->rows[i].nnz, sizeof(*M->rows[i].entries), nmod_sparse_entry_cmp);
     }

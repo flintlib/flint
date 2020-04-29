@@ -110,8 +110,8 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_set (fmpz_sparse_mat_t N, const fmpz_sparse_mat_t M) 
 {
     slong i, rmax = FLINT_MIN(M->r, M->r);
-    if(M==N) return;
-    for(i=0; i<rmax; ++i) fmpz_sparse_vec_set(&N->rows[i], &M->rows[i], M->c_off);
+    if (M==N) return;
+    for (i = 0; i < rmax; ++i) fmpz_sparse_vec_set(&N->rows[i], &M->rows[i], M->c_off);
 }
 
 FLINT_DLL
@@ -121,7 +121,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_append_col (fmpz_sparse_mat_t M, const fmpz *v) 
 {
     slong i;
-    for(i=0; i<M->r; ++i) fmpz_sparse_vec_set_entry(&M->rows[i], M->c, &v[i]);
+    for (i = 0; i < M->r; ++i) fmpz_sparse_vec_set_entry(&M->rows[i], M->c, &v[i]);
     M->c += 1;
 }
 
@@ -235,7 +235,7 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_split_horizontal (fmpz_sparse_mat_t M1, fmpz_sparse_mat_t M2, const fmpz_sparse_mat_t B, slong c)
 {
     slong i;
-    for(i=0; i<B->r; ++i) fmpz_sparse_vec_split(&M1->rows[i], &M2->rows[i], &B->rows[i], c);
+    for (i = 0; i < B->r; ++i) fmpz_sparse_vec_split(&M1->rows[i], &M2->rows[i], &B->rows[i], c);
 }
 
 /* Split block matix B = [M1^t M1^t]^t into submatrices M1 and M2 */
@@ -244,8 +244,8 @@ void fmpz_sparse_mat_split_vertical (fmpz_sparse_mat_t M1, fmpz_sparse_mat_t M2,
 {
     slong i;
     r = FLINT_MIN(r, B->r);
-    for(i=0; i<r; ++i) fmpz_sparse_vec_set(&M1->rows[i], &B->rows[i], B->c_off);
-    for(i=r; i<B->r; ++i) fmpz_sparse_vec_set(&M2->rows[i-r], &B->rows[i], B->c_off);
+    for (i = 0; i < r; ++i) fmpz_sparse_vec_set(&M1->rows[i], &B->rows[i], B->c_off);
+    for (i = r; i < B->r; ++i) fmpz_sparse_vec_set(&M2->rows[i-r], &B->rows[i], B->c_off);
 }
 
 /* Matrix permutation */
@@ -253,8 +253,9 @@ FMPZ_SPARSE_MAT_INLINE
 void fmpz_sparse_mat_permute_cols(fmpz_sparse_mat_t M, slong *Q) 
 {
     slong i;
-    for (i = 0; i < M->r; ++i) {
-        if(!M->rows[i].nnz) continue;
+    for (i = 0; i < M->r; ++i) 
+    {
+        if (!M->rows[i].nnz) continue;
         fmpz_sparse_vec_permute_inds(&M->rows[i], Q);
         qsort(M->rows[i].entries, M->rows[i].nnz, sizeof(*M->rows[i].entries), fmpz_sparse_entry_cmp);
     }
@@ -414,7 +415,7 @@ FMPZ_SPARSE_MAT_INLINE
 void _fmpz_sparse_mat_with_transpose_clear(fmpz_sparse_mat_with_transpose_t MT)
 {
     slong c;
-    for(c = 0; c < MT->M->c; ++c)
+    for (c = 0; c < MT->M->c; ++c)
         hashmap_clear(&MT->cols[c]);
     flint_free(MT->cols);
     memset(MT, 0, sizeof(*MT));
@@ -493,7 +494,7 @@ int _fmpz_sparse_mat_with_transpose_gauss_elim_ext(fmpz_sparse_mat_with_transpos
 {
     /* If leading entries do not match, or leading entry of pr divides that of r, just a normal elimination */
     fmpz_sparse_entry_struct *pe = &MT->M->rows[pr].entries[0], *e = &MT->M->rows[r].entries[0]; 
-    if(pe->ind != e->ind)
+    if (pe->ind != e->ind)
         return _fmpz_sparse_mat_with_transpose_gauss_elim(MT, pr, r);
     
     MT_FIX(MT, pr, MT_FIX(MT, r, 
@@ -507,7 +508,7 @@ int _fmpz_sparse_mat_with_transpose_gauss_elim_ext_mod(fmpz_sparse_mat_with_tran
 {
     /* If leading entries do not match, or leading entry of pr divides that of r, just a normal elimination */
     fmpz_sparse_entry_struct *pe = &MT->M->rows[pr].entries[0], *e = &MT->M->rows[r].entries[0]; 
-    if(pe->ind != e->ind)
+    if (pe->ind != e->ind)
         return _fmpz_sparse_mat_with_transpose_gauss_elim_mod(MT, pr, r, mod);
     
     MT_FIX(MT, pr, MT_FIX(MT, r, 
@@ -523,7 +524,7 @@ int _fmpz_sparse_mat_with_transpose_gauss_elim_ext_mods(fmpz_sparse_mat_with_tra
 {
     /* If leading entries do not match, or leading entry of pr divides that of r, just a normal elimination */
     fmpz_sparse_entry_struct *pe = &MT->M->rows[pr].entries[0], *e = &MT->M->rows[r].entries[0]; 
-    if(pe->ind != e->ind)
+    if (pe->ind != e->ind)
         return _fmpz_sparse_mat_with_transpose_gauss_elim_mods(MT, pr, r, mod);
     
     MT_FIX(MT, pr, MT_FIX(MT, r,

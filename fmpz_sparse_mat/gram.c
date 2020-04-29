@@ -15,9 +15,9 @@ void fmpz_sparse_mat_gram(fmpz_mat_t B, const fmpz_sparse_mat_t M)
 {
 	slong i, j;
 
-	if(M->r == 0) fmpz_mat_zero(B);	
+	if (M->r == 0) fmpz_mat_zero(B);	
 	else
-		for(i = 0; i < M->r; i++) 
-			for(j = 0; j < M->r; j++) 
+		for (i = 0; i < M->r; i++) 
+			for (j = 0; j < M->r; j++) 
 				fmpz_sparse_vec_dot(&B->rows[i][j], &M->rows[i], &M->rows[j]);
 }

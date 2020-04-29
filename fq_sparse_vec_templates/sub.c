@@ -31,7 +31,7 @@ void TEMPLATE(T, sparse_vec_sub)(TEMPLATE(T, sparse_vec_t) w, const TEMPLATE(T, 
         case 0: TEMPLATE(T, set)(we->val, ue->val, ctx); break;
         case 1: TEMPLATE(T, neg)(we->val, ve->val, ctx); break;
         default: TEMPLATE(T, sub)(we->val, ue->val, ve->val, ctx); 
-                 if(TEMPLATE(T, is_zero) (we->val, ctx)) we++;
+                 if (TEMPLATE(T, is_zero) (we->val, ctx)) we++;
         }
     }
     _TEMPLATE(T, sparse_vector_shift_left) (w, we - w->entries, ctx);

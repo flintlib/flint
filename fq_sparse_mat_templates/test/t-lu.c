@@ -27,7 +27,7 @@ main(void)
     TEMPLATE(T, mat_t) dL, dU, dLU;
     FLINT_TEST_INIT(state);
     
-    flint_printf("decomposing PAQ=LU....");
+    flint_printf("decomposing PAQ = LU....");
     fflush(stdout);
 
     for (rep = 0; rep < 200; rep++)
@@ -50,19 +50,23 @@ main(void)
         TEMPLATE(T, mat_init) (dLU, r, c, ctx);
         
         /* Check that L is lower triangular (with ones on diagonal up to rank) */
-        for (i = 0; i < r; ++i) {
+        for (i = 0; i < r; ++i) 
+        {
             val = TEMPLATE(T, sparse_vec_at) (&L->rows[i], i, ctx);
             if (i < rk && (val == NULL || !TEMPLATE(T, is_one) (*val, ctx)))
             {
                 flint_printf("FAIL: L does not have unit diagonal up to the rank\n");
             }
-            for (j = 0; j<L->rows[i].nnz; ++j) {
+            for (j = 0; j < L->rows[i].nnz; ++j) 
+            {
                 TEMPLATE(T, sparse_entry_struct) *e = &L->rows[i].entries[j];
-                if (e->ind > i) {
+                if (e->ind > i) 
+                {
                     flint_printf("FAIL: L not lower triangular\n");
                     abort();
                 }
-                if (e->ind >= rk) {
+                if (e->ind >= rk) 
+                {
                     flint_printf("FAIL: L not trivial past the rank\n");
                     /*TEMPLATE(T, sparse_mat_print_pretty) (L, ctx);*/
                     abort();
@@ -70,7 +74,8 @@ main(void)
             }
         }
         /* Check that U is upper triangular (with nonzero diagonal up to rank) */
-        for (i = 0; i < r; ++i) {
+        for (i = 0; i < r; ++i) 
+        {
             val = TEMPLATE(T, sparse_vec_at) (&U->rows[i], i, ctx);
             if (i < rk && (val == NULL || TEMPLATE(T, is_zero) (*val, ctx)))
             {
@@ -82,9 +87,11 @@ main(void)
                 flint_printf("FAIL: U not trivial past the rank\n");
                 abort();
             }
-            for (j = 0; j < U->rows[i].nnz; ++j) {
+            for (j = 0; j < U->rows[i].nnz; ++j) 
+            {
                 TEMPLATE(T, sparse_entry_struct) *e = &U->rows[i].entries[j];
-                if (e->ind < i) {
+                if (e->ind < i) 
+                {
                     flint_printf("FAIL: U not upper triangular\n");
                     abort();
                 }
@@ -96,7 +103,8 @@ main(void)
         TEMPLATE(T, sparse_mat_from_dense) (LU, dLU, ctx);
         TEMPLATE(T, sparse_mat_permute_rows) (A, P, ctx);
         TEMPLATE(T, sparse_mat_permute_cols) (A, Q, ctx);
-        if (!TEMPLATE(T, sparse_mat_equal) (A, LU, ctx)) {
+        if (!TEMPLATE(T, sparse_mat_equal) (A, LU, ctx)) 
+        {
             flint_printf("FAIL: PAQ != LU\n");
             flint_printf("PAQ=");
             TEMPLATE(T, sparse_mat_print_pretty) (A, ctx);

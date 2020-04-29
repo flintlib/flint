@@ -46,7 +46,7 @@ fmpz_sparse_mat_hnf_modular(fmpz_sparse_mat_t M, const fmpz_t det)
     for (rank = pc = 0; pc < M->c; ++pc)
     {
         hcol = &MT->cols[pc]; nnz = hcol->num;
-        if(!nnz) continue;
+        if (!nnz) continue;
         irows = flint_realloc(irows, nnz*sizeof(*irows));
         pr = -1, nnp = 0, npp = 0;
 
@@ -66,7 +66,7 @@ fmpz_sparse_mat_hnf_modular(fmpz_sparse_mat_t M, const fmpz_t det)
                 pr = r;
             }
         }
-        if(pr == -1) 
+        if (pr == -1) 
         {
             /* Set pivot col in some non-pivot row to rem_det */
             for (pr = 0; pr < M->r; ++pr)

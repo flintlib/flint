@@ -81,11 +81,11 @@ main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-    for(i = 0; i < 6; ++i)
+    for (i = 0; i < 6; ++i)
     {
         flint_printf("Finding nullspace with %s\n", names[i]);
         /* flint_printf("\tAverage time: %lf\n", elapsed[i]/nreps); */
-        if(discrep[i] > 0)
+        if (discrep[i] > 0)
             flint_printf("\tFailed to find full nullspace in %wd/%wd trials\n", 
                          discrep[i], nreps);
     }

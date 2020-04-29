@@ -61,12 +61,12 @@ fmpz_sparse_mat_fflu(fmpz *D, slong *P, slong *Q, fmpz_sparse_mat_t L, fmpz_spar
 
     /* Initialize permutations */
     remr = M->r, remc = M->c;
-    for (r = 0; r<M->r; ++r) 
+    for (r = 0; r < M->r; ++r) 
     {
         if (!U->rows[r].nnz) P[r] = --remr; 
         else P[r] = -1;
     }
-    for (c = 0; c<M->c; ++c) 
+    for (c = 0; c < M->c; ++c) 
     {
         if (!UT->cols[c].num) Q[c] = --remc; 
         else Q[c] = -1;

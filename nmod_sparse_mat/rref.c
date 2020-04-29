@@ -51,7 +51,7 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t M)
             if (P[r] >= 0) continue;
             if (pr==-1 || (row->nnz < prow->nnz)) pr = r, prow = row;
         }
-        if(pr == -1) continue;
+        if (pr == -1) continue;
         P[pr] = rank; 
 
         cinv = nmod_inv(*nmod_sparse_vec_at(prow, pc), M->mod);
@@ -61,7 +61,7 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t M)
         for (j = 0; j < pcol->nnz; ++j)
         {
             r = pcol->entries[j].ind, row = &M->rows[r];
-            if(r==pr) {pcol->entries[j].val = UWORD(0); continue;}
+            if (r==pr) {pcol->entries[j].val = UWORD(0); continue;}
 
             cc = nmod_neg(*nmod_sparse_vec_at(row, pc), M->mod);
             nmod_sparse_vec_scalar_addmul_nmod(row, row, prow, cc, M->mod);
@@ -72,7 +72,7 @@ slong nmod_sparse_mat_rref(nmod_sparse_mat_t M)
         for (j = 0; j < prow->nnz; ++j)
         {
             c = prow->entries[j].ind, col = &Mt->rows[c];
-            if(c >= M->c || c==pc) continue;
+            if (c >= M->c || c==pc) continue;
             cc = nmod_neg(*nmod_sparse_vec_at(col, pr), M->mod);
             nmod_sparse_vec_scalar_addmul_nmod(col, col, pcol, cc, M->mod);
         }

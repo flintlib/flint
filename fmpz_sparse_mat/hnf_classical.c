@@ -41,7 +41,7 @@ fmpz_sparse_mat_hnf_classical(fmpz_sparse_mat_t M)
     for (rank = pc = 0; pc < M->c; ++pc)
     {
         hcol = &MT->cols[pc]; nnz = hcol->num;
-        if(!nnz) continue;
+        if (!nnz) continue;
         pr = next_pr = -1, next_nnp = nnz, npp = 0;
         
         do
@@ -53,9 +53,9 @@ fmpz_sparse_mat_hnf_classical(fmpz_sparse_mat_t M)
                 r = (pr == -1) ? hcol->keys[i] : irows[i];
                 if (pr >= 0)  /* Reduce row r by row pr */
                 {
-                    if(_fmpz_sparse_mat_with_transpose_gauss_elim(MT, pr, r))
+                    if (_fmpz_sparse_mat_with_transpose_gauss_elim(MT, pr, r))
                     {
-                        if(M->rows[r].nnz == 0) P[r] = --remr;
+                        if (M->rows[r].nnz == 0) P[r] = --remr;
                         continue;
                     }
                 }
@@ -67,7 +67,8 @@ fmpz_sparse_mat_hnf_classical(fmpz_sparse_mat_t M)
 
                 /* Either add r (back) to irows or make it the next pivot row */
 
-                if (next_pr >= 0 && fmpz_cmpabs(LT(M, r).val, LT(M, next_pr).val) >= 0) {
+                if (next_pr >= 0 && fmpz_cmpabs(LT(M, r).val, LT(M, next_pr).val) >= 0) 
+                {
                     irows[next_nnp++] = r; 
                     continue;
                 }

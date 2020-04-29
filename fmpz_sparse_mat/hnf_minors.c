@@ -83,7 +83,7 @@ fmpz_sparse_mat_hnf_minors(fmpz_sparse_mat_t M)
     }
 
     /* Deal with any remaining rows */
-    for(r = 0; r < M->r; ++r)
+    for (r = 0; r < M->r; ++r)
     {
         if (P[r] >= 0) continue;
 

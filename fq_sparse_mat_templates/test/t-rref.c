@@ -44,7 +44,8 @@ main(void)
         TEMPLATE(T, sparse_mat_rref) (A, ctx);
         TEMPLATE(T, mat_rref) (dA, ctx);
         TEMPLATE(T, sparse_mat_from_dense) (B, dA, ctx);
-        if (!TEMPLATE(T, sparse_mat_equal) (A, B, ctx)) {
+        if (!TEMPLATE(T, sparse_mat_equal) (A, B, ctx)) 
+        {
             flint_printf("FAIL!\n");
             abort();
         }

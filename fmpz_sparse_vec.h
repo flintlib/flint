@@ -84,13 +84,13 @@ FMPZ_SPARSE_VEC_INLINE
 void _fmpz_sparse_vec_resize(fmpz_sparse_vec_t vec, slong nnz) 
 {
     slong i;
-    if(nnz == 0) fmpz_sparse_vec_clear(vec);
+    if (nnz == 0) fmpz_sparse_vec_clear(vec);
     else if (nnz != vec->nnz)
     {
-        for(i = nnz; i < vec->nnz; ++i)
+        for (i = nnz; i < vec->nnz; ++i)
             fmpz_clear (vec->entries[i].val);
         vec->entries = flint_realloc(vec->entries, nnz*sizeof(*vec->entries));
-        for(i = vec->nnz; i < nnz; ++i)
+        for (i = vec->nnz; i < nnz; ++i)
             fmpz_init (vec->entries[i].val);
     }
     vec->nnz = nnz;
@@ -140,7 +140,7 @@ FMPZ_SPARSE_VEC_INLINE
 void fmpz_sparse_vec_set_entry(fmpz_sparse_vec_t v, slong ind, const fmpz_t val)
 {
     fmpz_t * oval = fmpz_sparse_vec_at(v, ind);
-    if(oval == NULL)
+    if (oval == NULL)
     {
         _fmpz_sparse_vec_resize(v, v->nnz+1);
         v->entries[v->nnz-1].ind = ind;
@@ -174,7 +174,7 @@ void fmpz_sparse_vec_to_dense(fmpz *vec, const fmpz_sparse_vec_t src, slong len)
     slong i;
     _fmpz_vec_zero(vec, len);
     for (i = 0; i < src->nnz; ++i) 
-        if(src->entries[i].ind < len) 
+        if (src->entries[i].ind < len) 
             fmpz_set(&vec[src->entries[i].ind], src->entries[i].val);
 }
 
@@ -192,7 +192,7 @@ void fmpz_sparse_vec_get_nmod_sparse_vec(nmod_sparse_vec_t dst, const fmpz_spars
         {
             dst->entries[ind].ind = src->entries[i].ind;
             dst->entries[ind].val = fmpz_fdiv_ui(src->entries[i].val, mod.n);
-            if(dst->entries[ind].val != UWORD(0)) ++ind;
+            if (dst->entries[ind].val != UWORD(0)) ++ind;
         }
         if (ind == 0)
         {
@@ -349,9 +349,9 @@ slong _fmpz_sparse_vector_merge_descend(fmpz_sparse_entry_struct **we,
 {
     slong uind = (*ue==u->entries) ? -1 : (*ue-1)->ind;
     slong vind = (*ve==v->entries) ? -1 : (*ve-1)->ind;
-    if(uind == -1 && vind == -1) return -1;
-    if(uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
-    if(uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
+    if (uind == -1 && vind == -1) return -1;
+    if (uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
+    if (uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
     --*ue, --*we; (*we)->ind = uind; return 0;
 }
 
@@ -369,9 +369,9 @@ slong _fmpz_sparse_vector_merge_descend_nmod(fmpz_sparse_entry_struct **we,
 {
     slong uind = (*ue==u->entries) ? -1 : (*ue-1)->ind;
     slong vind = (*ve==v->entries) ? -1 : (*ve-1)->ind;
-    if(uind == -1 && vind == -1) return -1;
-    if(uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
-    if(uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
+    if (uind == -1 && vind == -1) return -1;
+    if (uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
+    if (uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
     --*ue, --*we; (*we)->ind = uind; return 0;
 }
 
@@ -381,7 +381,7 @@ void _fmpz_sparse_vector_shift_left (fmpz_sparse_vec_t v, slong amt)
 {
     slong i;
     if (amt == v->nnz) fmpz_sparse_vec_clear(v);
-    else if(amt > 0)
+    else if (amt > 0)
     {
         for (i = amt; i < v->nnz; ++i)
         {

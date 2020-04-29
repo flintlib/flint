@@ -56,8 +56,8 @@ static void coppersmith_aux_gauss(TEMPLATE(T, mat_t)  M, slong *d, const TEMPLAT
         /* Set the pivot row to be the minimum degree row incident on column pc */
         pr = b + pc;
         for (r = 0; r < b; r++)
-            if(gamma[r] && !TEMPLATE(T, is_zero) (&M->rows[r][pc], ctx) && d[r] < d[pr]) pr = r;
-        if(TEMPLATE(T, is_zero) (&M->rows[pr][pc], ctx)) continue;
+            if (gamma[r] && !TEMPLATE(T, is_zero) (&M->rows[r][pc], ctx) && d[r] < d[pr]) pr = r;
+        if (TEMPLATE(T, is_zero) (&M->rows[pr][pc], ctx)) continue;
 
 
         /* Try to move pivot row to appropriate position (if not already there) */
@@ -74,7 +74,7 @@ static void coppersmith_aux_gauss(TEMPLATE(T, mat_t)  M, slong *d, const TEMPLAT
 
         /* Do Gaussian elimination on first b rows */
         for (r = 0; r < b; ++r)
-            if(gamma[r] && !TEMPLATE(T, is_zero) (&M->rows[r][pc], ctx))
+            if (gamma[r] && !TEMPLATE(T, is_zero) (&M->rows[r][pc], ctx))
             {
                 TEMPLATE(T, mul) (cc, &M->rows[r][pc], cinv, ctx);
                 TEMPLATE(T, neg) (cc, cc, ctx);
@@ -183,7 +183,7 @@ static void make_block_sum(TEMPLATE(T, struct) *x, const TEMPLATE(T, mat_struct)
     _TEMPLATE(T, vec_zero) (x, M->c, ctx);
     for (i = iter = 0; iter <= d[l]; ++iter, i = 1 - i)
     {
-        if(iter > 0) TEMPLATE(T, sparse_mat_mul_mat) (&Z[i], M, &Z[1-i], ctx);
+        if (iter > 0) TEMPLATE(T, sparse_mat_mul_mat) (&Z[i], M, &Z[1-i], ctx);
         TEMPLATE(T, mat_mul_vec) (xi, &Z[i], S[dd + iter].rows[l], ctx);
         _TEMPLATE(T, vec_add) (x, x, xi, M->c, ctx);
     }
@@ -212,7 +212,7 @@ int TEMPLATE(T, sparse_mat_solve_block_wiedemann) (TEMPLATE(T, struct) *x, const
     TEMPLATE(T, sparse_mat_append_row) (Mb, z, ctx);
 
     ret = TEMPLATE(T, sparse_mat_nullvector_block_wiedemann) (x1, Mb, block_size, state, ctx);
-    if(ret && !TEMPLATE(T, is_zero) (&x1[M->c], ctx)) 
+    if (ret && !TEMPLATE(T, is_zero) (&x1[M->c], ctx)) 
     {
         TEMPLATE(T, inv) (&x1[M->c], &x1[M->c], ctx);
         TEMPLATE(T, neg) (&x1[M->c], &x1[M->c], ctx);
@@ -241,7 +241,7 @@ int TEMPLATE(T, sparse_mat_nullvector_block_wiedemann) (TEMPLATE(T, struct) *x, 
     for (k = 0; k < ns; ++k) TEMPLATE(T, mat_init) (&S[k], block_size, block_size, ctx);
     for (l = 0; l < 3; ++l) TEMPLATE(T, mat_init) (&Y[l], M->c, block_size, ctx);
     do TEMPLATE(T, mat_randtest) (&Y[0], state, ctx);
-    while(TEMPLATE(T, mat_is_zero) (&Y[0], ctx));
+    while (TEMPLATE(T, mat_is_zero) (&Y[0], ctx));
 
     TEMPLATE(T, sparse_mat_mul_mat) (&Y[1], M, &Y[0], ctx);
     make_block_sequences(S, ns, M, &Y[1], ctx);

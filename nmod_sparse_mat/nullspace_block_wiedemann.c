@@ -27,10 +27,11 @@ slong nmod_sparse_mat_nullspace_block_wiedemann(nmod_mat_t X, const nmod_sparse_
     xps = NULL;
     for (iter = 0; iter < max_iters; )
     {
-        if(nmod_sparse_mat_nullvector_block_wiedemann(x, M, block_size, state) == 0) {++iter; continue;}
+        if (nmod_sparse_mat_nullvector_block_wiedemann(x, M, block_size, state) == 0) {++iter; continue;}
         
         /* Reduce by existing kernel vectors */
-        for (j = nxs-1; j >= 0; --j) {
+        for (j = nxs-1; j >= 0; --j) 
+        {
             _nmod_vec_scalar_addmul_nmod(x, xs[j], M->c, nmod_neg(x[xps[j]], M->mod), M->mod);
         }
 
@@ -40,7 +41,8 @@ slong nmod_sparse_mat_nullspace_block_wiedemann(nmod_mat_t X, const nmod_sparse_
         _nmod_vec_scalar_mul_nmod(x, x, M->c, nmod_inv(x[i], M->mod), M->mod);
 
         /* Reduce previous vectors by this one */
-        for (j = 0; j < nxs; ++j) {
+        for (j = 0; j < nxs; ++j) 
+        {
             _nmod_vec_scalar_addmul_nmod(xs[j], x, M->c, nmod_neg(xs[j][i], M->mod), M->mod);
         }
 

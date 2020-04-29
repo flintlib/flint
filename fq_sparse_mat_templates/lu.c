@@ -49,10 +49,13 @@ static void heap_down(slong *heap, slong *heap_idx, slong *scores, slong size, s
     heap_idx[c] = pos;
 }
 
-/* static void print_heap(slong *heap, slong *scores, slong size) {
+/* static void print_heap(slong *heap, slong *scores, slong size) 
+{
     slong level, i;
-    for (level = 1; level <= size; level<<=1) {
-        for (i = level; i <= size && i < 2*level; ++i) {
+    for (level = 1; level <= size; level<<=1) 
+    {
+        for (i = level; i <= size && i < 2*level; ++i) 
+        {
             flint_printf("%wd:%wd,%wd\t", i-1, heap[i-1], scores[heap[i-1]]);
         }
         flint_printf("\n");
@@ -85,12 +88,12 @@ slong TEMPLATE(T, sparse_mat_lu)(slong *P, slong *Q,
     
     /* Set up permutations */
     remr = M->r, remc = M->c;
-    for (r = 0; r<M->r; ++r) 
+    for (r = 0; r < M->r; ++r) 
     {
         if (!U->rows[r].nnz) P[r] = --remr; 
         else P[r] = -1;
     }
-    for (c = 0; c<M->c; ++c) 
+    for (c = 0; c < M->c; ++c) 
     {
         if (!Lt->rows[c].nnz) Q[c] = --remc; 
         else Q[c] = -1;
@@ -109,7 +112,7 @@ slong TEMPLATE(T, sparse_mat_lu)(slong *P, slong *Q,
     }
     /* Run elimination */
     rank = 0;
-    for (heap_size=M->c; heap_size > 0; )
+    for (heap_size = M->c; heap_size > 0; )
     {
         /* Get lowest weight column (top of heap) */
         pc = heap[0];

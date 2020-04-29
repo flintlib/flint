@@ -54,8 +54,8 @@ static void coppersmith_aux_gauss(nmod_mat_t M, slong *d)
         /* Set the pivot row to be the minimum degree row incident on column pc */
         pr = b + pc;
         for (r = 0; r < b; r++)
-            if(gamma[r] && M->rows[r][pc] && d[r] < d[pr]) pr = r;
-        if(M->rows[pr][pc] == UWORD(0)) continue;
+            if (gamma[r] && M->rows[r][pc] && d[r] < d[pr]) pr = r;
+        if (M->rows[pr][pc] == UWORD(0)) continue;
 
 
         /* Try to move pivot row to appropriate position (if not already there) */
@@ -72,7 +72,7 @@ static void coppersmith_aux_gauss(nmod_mat_t M, slong *d)
 
         /* Do Gaussian elimination on first b rows */
         for (r = 0; r < b; ++r)
-            if(gamma[r] && M->rows[r][pc])
+            if (gamma[r] && M->rows[r][pc])
                 _nmod_vec_scalar_addmul_nmod(M->rows[r], M->rows[pr], M->c,
                                              nmod_neg(nmod_mul(M->rows[r][pc], cinv, M->mod), M->mod), M->mod);
     }
@@ -176,7 +176,7 @@ static void make_block_sum(mp_ptr x, const nmod_mat_struct *S, const slong *d, c
     _nmod_vec_zero(x, M->c);
     for (i = iter = 0; iter <= d[l]; ++iter, i = 1 - i)
     {
-        if(iter > 0) nmod_sparse_mat_mul_mat(&Z[i], M, &Z[1-i]);
+        if (iter > 0) nmod_sparse_mat_mul_mat(&Z[i], M, &Z[1-i]);
         nmod_mat_mul_vec(xi, &Z[i], S[dd + iter].rows[l]);
         _nmod_vec_add(x, x, xi, M->c, M->mod);
     }
@@ -205,7 +205,7 @@ int nmod_sparse_mat_solve_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t M, m
     nmod_sparse_mat_append_row(Mb, z);
 
     ret = nmod_sparse_mat_nullvector_block_wiedemann(x1, Mb, block_size, state);
-    if(ret && x1[M->c] != UWORD(0)) 
+    if (ret && x1[M->c] != UWORD(0)) 
     {
         _nmod_vec_scalar_mul_nmod(x, x1, M->c, nmod_neg(nmod_inv(x1[M->c], M->mod), M->mod), M->mod);
         good = 1;
@@ -232,7 +232,7 @@ int nmod_sparse_mat_nullvector_block_wiedemann(mp_ptr x, const nmod_sparse_mat_t
     for (k = 0; k < ns; ++k) nmod_mat_init(&S[k], block_size, block_size, M->mod.n);
     for (l = 0; l < 3; ++l) nmod_mat_init(&Y[l], M->c, block_size, M->mod.n);
     do nmod_mat_randfull(&Y[0], state);
-    while(nmod_mat_is_zero(&Y[0]));
+    while (nmod_mat_is_zero(&Y[0]));
 
     nmod_sparse_mat_mul_mat(&Y[1], M, &Y[0]);
     make_block_sequences(S, ns, M, &Y[1]);

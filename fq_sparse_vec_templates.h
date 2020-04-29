@@ -60,7 +60,7 @@ void TEMPLATE(T, sparse_vec_clear)(TEMPLATE(T, sparse_vec_t) vec,
                                     const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
-    for(i = 0; i < vec->nnz; ++i)
+    for (i = 0; i < vec->nnz; ++i)
         TEMPLATE(T, clear) (vec->entries[i].val, ctx);
     flint_free(vec->entries);
     memset(vec, 0, sizeof(*vec));
@@ -71,13 +71,13 @@ void _TEMPLATE(T, sparse_vec_resize)(TEMPLATE(T, sparse_vec_t) vec, slong nnz,
                                     const TEMPLATE(T, ctx_t) ctx) 
 {
     slong i;
-    if(nnz == 0) TEMPLATE(T, sparse_vec_clear) (vec, ctx);
+    if (nnz == 0) TEMPLATE(T, sparse_vec_clear) (vec, ctx);
     else if (nnz != vec->nnz)
     {
-        for(i = nnz; i < vec->nnz; ++i)
+        for (i = nnz; i < vec->nnz; ++i)
             TEMPLATE(T, clear) (vec->entries[i].val, ctx);
         vec->entries = flint_realloc(vec->entries, nnz*sizeof(*vec->entries));
-        for(i = vec->nnz; i < nnz; ++i)
+        for (i = vec->nnz; i < nnz; ++i)
             TEMPLATE(T, init) (vec->entries[i].val, ctx);
     }
     vec->nnz = nnz;
@@ -127,7 +127,7 @@ void TEMPLATE(T, sparse_vec_set)(TEMPLATE(T, sparse_vec_t) dst, const TEMPLATE(T
     slong i;
     if (dst == src) return;
     _TEMPLATE(T, sparse_vec_resize) (dst, src->nnz, ctx);
-    for(i=0; i<dst->nnz; ++i)
+    for (i = 0; i < dst->nnz; ++i)
     {
         dst->entries[i].ind = src->entries[i].ind - ioff;
         TEMPLATE(T, set) (dst->entries[i].val, src->entries[i].val, ctx);
@@ -146,7 +146,7 @@ void TEMPLATE(T, sparse_vec_set_entry)(TEMPLATE(T, sparse_vec_t) v, slong ind, c
         _TEMPLATE(T, sparse_vec_resize) (v, v->nnz + 1, ctx);
         TEMPLATE(T, set) (v->entries[v->nnz-1].val, val, ctx);
         v->entries[v->nnz-1].ind = ind;
-        if(v->nnz >= 2 && ind < v->entries[v->nnz-2].ind)
+        if (v->nnz >= 2 && ind < v->entries[v->nnz-2].ind)
             qsort(v->entries, v->nnz, sizeof(*v->entries), TEMPLATE(T, sparse_entry_cmp));
     }
     else TEMPLATE(T, set) (*oval, val, ctx);
@@ -218,8 +218,8 @@ void TEMPLATE(T, sparse_vec_window_init)(TEMPLATE(T, sparse_vec_t) window, const
                                     const TEMPLATE(T, ctx_t) ctx)
 {
     slong start, end;
-    for (start = 0; start<vec->nnz && vec->entries[start].ind < i1; ++start);
-    for (end=vec->nnz; end > 0 && vec->entries[end-1].ind >= i2; --end);
+    for (start = 0; start < vec->nnz && vec->entries[start].ind < i1; ++start);
+    for (end = vec->nnz; end > 0 && vec->entries[end-1].ind >= i2; --end);
     window->entries = vec->entries + start;
     window->nnz = end - start;
 }
@@ -252,7 +252,7 @@ void TEMPLATE(T, sparse_vec_split)(TEMPLATE(T, sparse_vec_t) res1, TEMPLATE(T, s
 {
     slong i, nnz1;
     TEMPLATE(T, sparse_entry_struct) *e1, *e2, *e;
-    for(nnz1=0; nnz1<vec->nnz; ++nnz1) if(vec->entries[nnz1].ind >= ind) break;
+    for (nnz1 = 0; nnz1 < vec->nnz; ++nnz1) if (vec->entries[nnz1].ind >= ind) break;
 
     _TEMPLATE(T, sparse_vec_resize) (res1, nnz1, ctx);
     _TEMPLATE(T, sparse_vec_resize) (res2, vec->nnz - nnz1, ctx);
@@ -337,9 +337,9 @@ slong _TEMPLATE(T, sparse_vector_merge_descend) (TEMPLATE(T, sparse_entry_struct
 {
     slong uind = (*ue==u->entries) ? -1 : (*ue-1)->ind;
     slong vind = (*ve==v->entries) ? -1 : (*ve-1)->ind;
-    if(uind == -1 && vind == -1) return -1;
-    if(uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
-    if(uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
+    if (uind == -1 && vind == -1) return -1;
+    if (uind == vind) {--*ue, --*ve, --*we; (*we)->ind = uind; return 2;}
+    if (uind < vind) {--*ve, --*we; (*we)->ind = vind; return 1;}
     --*ue, --*we; (*we)->ind = uind; return 0;
 }
 
@@ -349,7 +349,7 @@ void _TEMPLATE(T, sparse_vector_shift_left) (TEMPLATE(T, sparse_vec_t) v, slong 
 {
     slong i;
     if (amt == v->nnz) TEMPLATE(T, sparse_vec_clear) (v, ctx);
-    else if(amt > 0)
+    else if (amt > 0)
     {
         v->nnz -= amt;
         for (i = 0; i < amt; ++i) TEMPLATE(T, clear) (v->entries[i].val, ctx);
@@ -403,7 +403,7 @@ void TEMPLATE(T, sparse_vec_dot_dense)(TEMPLATE(T, t) ret, const TEMPLATE(T, spa
     TEMPLATE(T, t) tmp;
     TEMPLATE(T, init) (tmp, ctx);
     TEMPLATE(T, zero) (ret, ctx);
-    for(i=0; i<u->nnz; ++i) 
+    for (i = 0; i < u->nnz; ++i) 
     {
         TEMPLATE(T, mul) (tmp, u->entries[i].val, &v[u->entries[i].ind],  ctx);
         TEMPLATE(T, add) (ret, ret, tmp, ctx);

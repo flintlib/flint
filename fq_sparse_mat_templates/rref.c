@@ -33,7 +33,7 @@ slong TEMPLATE(T, sparse_mat_rref) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(
     
     /* Set up permutations */
     remr = M->r;
-    for (r = 0; r<M->r; ++r) 
+    for (r = 0; r < M->r; ++r) 
     {
         if (!M->rows[r].nnz || M->rows[r].entries[0].ind >= M->c) P[r] = --remr; 
         else P[r] = -1;
@@ -41,7 +41,7 @@ slong TEMPLATE(T, sparse_mat_rref) (TEMPLATE(T, sparse_mat_t) M, const TEMPLATE(
     
     /* Run elimination */
     rank = 0;
-    for (pc = 0; pc<M->c; ++pc)
+    for (pc = 0; pc < M->c; ++pc)
     {
         pcol = &Mt->rows[pc];
 

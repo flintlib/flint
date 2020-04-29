@@ -32,7 +32,7 @@ main(void)
     
     for (rep = 0; rep < 100; rep++)
     {
-        if(rep % 5==0) {flint_printf("."); fflush(stdout);}
+        if (rep % 5==0) {flint_printf("."); fflush(stdout);}
         do r = n_randint(state, 200), c = n_randint(state, 200);
         while (r==UWORD(0) || c==UWORD(0));
         
@@ -49,7 +49,8 @@ main(void)
         nmod_sparse_mat_inv(Ai, A);
         nmod_sparse_mat_mul_mat(dAiA, Ai, dA);
         nmod_mat_rref(dA);
-        if(!nmod_mat_equal(dAiA, dA)) {
+        if (!nmod_mat_equal(dAiA, dA)) 
+        {
             flint_printf("FAIL!\n");
             flint_printf("A^-1 x A = ");
             nmod_mat_print_pretty(dAiA);

@@ -18,13 +18,13 @@
 static void scale_row(fmpz_sparse_mat_with_transpose_t MT, slong r, const fmpz_t mod)
 {
     fmpz_t g, a, b, n;
-    if(!fmpz_is_one(LT(MT->M, r).val))
+    if (!fmpz_is_one(LT(MT->M, r).val))
     {
         fmpz_init(g);
         fmpz_init(a);
         fmpz_init(b);
         fmpz_xgcd(g, a, b, LT(MT->M, r).val, mod);
-        if(!fmpz_is_one(g)) /* Need to lift a = (M[pr][pc]/g)^-1 mod N/g to a unit modulo N */
+        if (!fmpz_is_one(g)) /* Need to lift a = (M[pr][pc]/g)^-1 mod N/g to a unit modulo N */
         {
             fmpz_divexact(b, mod, g);
             fmpz_init_set(n, mod);
@@ -68,7 +68,7 @@ fmpz_sparse_mat_strong_echelon_form_mod(fmpz_sparse_mat_t M, const fmpz_t mod)
 
     /* Final object must have at least as many rows as columns */
     fmpz_sparse_vec_init(zero_vec);
-    while(M->r < M->c) fmpz_sparse_mat_append_row(M, zero_vec);
+    while (M->r < M->c) fmpz_sparse_mat_append_row(M, zero_vec);
 
     /* Need extra row to deal with final elimination */
     fmpz_sparse_mat_append_row(M, zero_vec);
@@ -99,7 +99,7 @@ fmpz_sparse_mat_strong_echelon_form_mod(fmpz_sparse_mat_t M, const fmpz_t mod)
     for (pc = 0; pc < M->c; ++pc)
     {
         hcol = &MT->cols[pc];
-        if(!hcol->num) continue;
+        if (!hcol->num) continue;
         pr = -1, nnp = 0;
 
         /* Find incident row pr which is not a previous pivot and has minimal leading term */
@@ -116,7 +116,7 @@ fmpz_sparse_mat_strong_echelon_form_mod(fmpz_sparse_mat_t M, const fmpz_t mod)
                 pr = r;
             }
         }
-        if(pr == -1) continue; /* Cannot perform elimination on this column (yet) */
+        if (pr == -1) continue; /* Cannot perform elimination on this column (yet) */
         scale_row(MT, pr, mod);
         Pr[pc] = pr, P[pr] = pc;
 
@@ -154,11 +154,12 @@ fmpz_sparse_mat_strong_echelon_form_mod(fmpz_sparse_mat_t M, const fmpz_t mod)
         fmpz_sparse_vec_scalar_mod_fmpz(&M->rows[r], &M->rows[r], mod);
         );
 
-        while(!fmpz_sparse_vec_is_zero(&M->rows[r]))
+        while (!fmpz_sparse_vec_is_zero(&M->rows[r]))
         {
             c = M->rows[r].entries[0].ind;
             /* If no previous pivot row exists, use this row */
-            if (Pr[c] == -1) {
+            if (Pr[c] == -1) 
+            {
                 scale_row(MT, r, mod);
                 Pr[c] = r; P[r] = c; 
                 break;
@@ -166,7 +167,7 @@ fmpz_sparse_mat_strong_echelon_form_mod(fmpz_sparse_mat_t M, const fmpz_t mod)
 
             /* Otherwise, eliminate c using existing pivot */
             _fmpz_sparse_mat_with_transpose_gauss_elim_ext_mod(MT, Pr[c], r, mod);
-            if(!fmpz_sparse_vec_is_zero(&M->rows[r]) && LT(M, r).ind == c) flint_abort();
+            if (!fmpz_sparse_vec_is_zero(&M->rows[r]) && LT(M, r).ind == c) flint_abort();
         }
         /* If row fully eliminated, add back to empty stock */
 

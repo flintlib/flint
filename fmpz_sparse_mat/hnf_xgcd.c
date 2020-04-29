@@ -44,7 +44,7 @@ slong fmpz_sparse_mat_hnf_xgcd(fmpz_sparse_mat_t M)
     for (rank = pc = 0; pc < M->c; ++pc)
     {
         hcol = &MT->cols[pc]; nnz = hcol->num;
-        if(!nnz) continue;
+        if (!nnz) continue;
         pr = -1, nnp = 0, npp = 0;
 
         for (i = 0; i < nnz; ++i)
@@ -60,14 +60,14 @@ slong fmpz_sparse_mat_hnf_xgcd(fmpz_sparse_mat_t M)
                 pr = r;
             }
         }
-        if(pr == -1) continue;
+        if (pr == -1) continue;
 
         /* Eliminate larger, non-pivot rows */
         for (i = 0; i < nnp; ++i)
         {
             r = irows[i];
             _fmpz_sparse_mat_with_transpose_gauss_elim_ext(MT, pr, r);
-            if(M->rows[r].nnz == 0) P[r] = --remr;
+            if (M->rows[r].nnz == 0) P[r] = --remr;
         }
 
         if (fmpz_sgn(LT(M, pr).val) < 0)

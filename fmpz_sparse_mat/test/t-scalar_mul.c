@@ -29,7 +29,7 @@ main(void)
     for (rep = 0; rep < nreps; rep++)
     {
         do bits = n_randint(state, 200);
-        while(bits < UWORD(2));
+        while (bits < UWORD(2));
         r = n_randint(state, 200);
         c = n_randint(state, 200);
         fmpz_init(a);

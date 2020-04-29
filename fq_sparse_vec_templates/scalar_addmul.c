@@ -26,7 +26,7 @@ void TEMPLATE(T, TEMPLATE(sparse_vec_scalar_addmul, T))(TEMPLATE(T, sparse_vec_t
     if (unnz == 0) {TEMPLATE(T, TEMPLATE(sparse_vec_scalar_mul, T)) (w, v, c, ctx); return;}
     TEMPLATE(T, init) (tmp, ctx);
     TEMPLATE(T, neg) (tmp, c, ctx);
-    if(TEMPLATE(T, is_one) (tmp, ctx)) TEMPLATE(T, sparse_vec_sub) (w, u, v, ctx);
+    if (TEMPLATE(T, is_one) (tmp, ctx)) TEMPLATE(T, sparse_vec_sub) (w, u, v, ctx);
     else /* Now just do standard addmul */ 
     {
         wnnz = _TEMPLATE(T, sparse_vec_union_nnz) (u, v, ctx);

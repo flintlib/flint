@@ -41,13 +41,15 @@ slong nmod_sparse_mat_nullspace_lu(nmod_mat_t X, const nmod_sparse_mat_t M)
 
         /* Mssign unit vectors to non-pivot columns */
         for (i = M->c-1; i >= rk; --i) X->rows[Qi[i]][i-rk] = 1;
-        for (i = rk-1; i >= 0; --i) {
+        for (i = rk-1; i >= 0; --i) 
+        {
             Urow = &U->rows[i];
             Xrow = X->rows[Qi[i]];
-            for (j = 1; j < Urow->nnz; ++j) {
+            for (j = 1; j < Urow->nnz; ++j) 
+            {
                 e = &Urow->entries[j];
                 /* Do in-place row elimination */
-                if(e->ind < rk) _nmod_vec_scalar_addmul_nmod(Xrow, X->rows[Qi[e->ind]], X->c, nmod_neg(e->val, M->mod), M->mod);
+                if (e->ind < rk) _nmod_vec_scalar_addmul_nmod(Xrow, X->rows[Qi[e->ind]], X->c, nmod_neg(e->val, M->mod), M->mod);
                 else Xrow[e->ind-rk] = nmod_sub(Xrow[e->ind-rk], e->val, M->mod);
             }
 

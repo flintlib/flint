@@ -47,7 +47,8 @@ main(void)
         nmod_sparse_mat_rref(A);
         nmod_mat_rref(dA);
         nmod_sparse_mat_from_dense(B, dA);
-        if(!nmod_sparse_mat_equal(A, B)) {
+        if (!nmod_sparse_mat_equal(A, B)) 
+        {
             flint_printf("FAIL!\n");
             abort();
         }

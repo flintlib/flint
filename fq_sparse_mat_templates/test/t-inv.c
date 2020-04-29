@@ -47,7 +47,8 @@ main(void)
         TEMPLATE(T, sparse_mat_inv) (Ai, A, ctx);
         TEMPLATE(T, sparse_mat_mul_mat) (dAiA, Ai, dA, ctx);
         TEMPLATE(T, mat_rref) (dA, ctx);
-        if (!TEMPLATE(T, mat_equal) (dAiA, dA, ctx)) {
+        if (!TEMPLATE(T, mat_equal) (dAiA, dA, ctx)) 
+        {
             flint_printf("FAIL!\n");
             flint_printf("A^-1 x A = ");
             TEMPLATE(T, mat_print_pretty) (dAiA, ctx);

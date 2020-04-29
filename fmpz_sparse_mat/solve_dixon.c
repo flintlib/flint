@@ -126,7 +126,7 @@ int _fmpz_sparse_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod, const fmpz_sparse_mat
     fmpz_init(D);
     fmpz_sparse_mat_solve_bound(N, D, A, B);
     p = find_good_prime_and_invert(Ainv, A, D);
-    if(p == 0)
+    if (p == 0)
     {
         fmpz_clear(N);
         fmpz_clear(D);

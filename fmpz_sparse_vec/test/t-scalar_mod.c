@@ -32,7 +32,7 @@ main(void)
     for (rep = 0; rep < 1000; rep++)
     {
         do bits = n_randint(state, 10);
-        while(bits < UWORD(3));
+        while (bits < UWORD(3));
         len = n_randint(state, 50);
         nnz = n_randint(state, len+1);
 

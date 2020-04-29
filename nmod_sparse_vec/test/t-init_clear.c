@@ -72,7 +72,7 @@ main(void)
                     flint_printf("FAIL: found value %wd (not in (0,%wd))\n", e->val, n);
                     abort();
                 }
-                if (i>0 && e->ind <= e[-1].ind)
+                if (i > 0 && e->ind <= e[-1].ind)
                 {
                     flint_printf("FAIL: found index %wd <= previous index %wd\n", e->ind, e[-1].ind);
                     abort();

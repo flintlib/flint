@@ -50,18 +50,22 @@ main(void)
         rk = fmpz_sparse_mat_fflu(D, P, Q, L, U, M);
 
         /* Check that L is lower triangular (with ones on diagonal up to rank) */
-        for (i = 0; i < r; ++i) {
+        for (i = 0; i < r; ++i) 
+        {
             val = fmpz_sparse_vec_at(&L->rows[i], i);
             if (i < rk && (val == NULL || !fmpz_is_one(*val)))
             {
                 flint_printf("FAIL: L does not have unit diagonal up to the rank\n");
             }
-            for (j = 0; j<L->rows[i].nnz; ++j) {
-                if (L->rows[i].entries[j].ind > i) {
+            for (j = 0; j < L->rows[i].nnz; ++j) 
+            {
+                if (L->rows[i].entries[j].ind > i) 
+                {
                     flint_printf("FAIL: L not lower triangular\n");
                     abort();
                 }
-                if (L->rows[i].entries[j].ind >= rk) {
+                if (L->rows[i].entries[j].ind >= rk) 
+                {
                     flint_printf("FAIL: L not trivial past the rank\n");
                     flint_printf("rank = %wd\n", rk);
                     flint_printf("L = ");
@@ -71,7 +75,8 @@ main(void)
             }
         }
         /* Check that U is upper triangular (with nonzero diagonal up to rank) */
-        for (i = 0; i < r; ++i) {
+        for (i = 0; i < r; ++i) 
+        {
             val = fmpz_sparse_vec_at(&U->rows[i], i);
             if (i < rk && (val == NULL || fmpz_is_zero(*val)))
             {
@@ -83,8 +88,10 @@ main(void)
                 flint_printf("FAIL: U not trivial past the rank\n");
                 abort();
             }
-            for (j = 0; j < U->rows[i].nnz; ++j) {
-                if (U->rows[i].entries[j].ind < i) {
+            for (j = 0; j < U->rows[i].nnz; ++j) 
+            {
+                if (U->rows[i].entries[j].ind < i) 
+                {
                     flint_printf("FAIL: U not upper triangular\n");
                     abort();
                 }
@@ -104,7 +111,8 @@ main(void)
         fmpz_sparse_mat_to_dense(dU, U);
         fmpz_mat_mul(dLU, dL, dU);
         fmpz_sparse_mat_from_dense(LU, dLU);
-        if(!fmpz_sparse_mat_equal(M, LU)) {
+        if (!fmpz_sparse_mat_equal(M, LU)) 
+        {
             flint_printf("FAIL: PDMQ != LU\n");
             flint_printf("PDMQ=");
             fmpz_sparse_mat_print_pretty(M);

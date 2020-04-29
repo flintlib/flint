@@ -16,7 +16,7 @@
 
 slong TEMPLATE(T, sparse_mat_nullspace_block_wiedemann) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, sparse_mat_t) M, slong block_size, flint_rand_t state, slong max_iters, const TEMPLATE(T, ctx_t) ctx)
 {
-    /* Generate random solutions to a random system Mx=b and stop when nullspace filled */
+    /* Generate random solutions to a random system Mx = b and stop when nullspace filled */
     slong i, j, iter, nxs, *xps;
     TEMPLATE(T, t) cc;
     TEMPLATE(T, struct) *x, **xs;
