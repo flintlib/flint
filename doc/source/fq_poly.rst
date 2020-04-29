@@ -309,8 +309,8 @@ Scalar multiplication and division
 
 .. function:: void fq_poly_scalar_mul_fq(fq_poly_t rop, const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
 
-    Sets ``(rop,len)`` to the product of ``(op,len)`` by the
-    scalar ``x``, in the context defined by ``ctx``.
+    Sets ``rop`` to the product of ``op`` by the scalar ``x``, in the context
+    defined by ``ctx``.
 
 .. function:: void _fq_poly_scalar_addmul_fq(fq_struct *rop, const fq_struct *op, slong len, const fq_t x, const fq_ctx_t ctx)
 
@@ -336,6 +336,16 @@ Scalar multiplication and division
     Substracts from ``rop`` the product of ``op`` by the
     scalar ``x``, in the context defined by ``ctx``.
 
+.. function:: void _fq_poly_scalar_div_fq(fq_struct *rop, const fq_struct *op, slong len, const fq_t x, const fq_ctx_t ctx)
+
+    Sets ``(rop,len)`` to the quotient of ``(op,len)`` by the
+    scalar ``x``, in the context defined by ``ctx``. An exception is raised
+    if ``x`` is zero.
+
+.. function:: void fq_poly_scalar_div_fq(fq_poly_t rop, const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)                                                 
+
+    Sets ``rop`` to the quotient of ``op`` by the scalar ``x``, in the context
+    defined by ``ctx``. An exception is raised if ``x`` is zero.
 
 Multiplication
 --------------------------------------------------------------------------------
