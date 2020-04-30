@@ -74,7 +74,7 @@ main(void)
         fmpz_sparse_vec_scalar_mods_fmpz(v, u, mod);
         for (i = j = 0; i < u->nnz; ++i)
         {
-            fmpz_mods(c, u->entries[i].val, mod);
+            fmpz_smod(c, u->entries[i].val, mod);
             if (fmpz_is_zero(c)) continue;
             if (u->entries[i].ind != v->entries[j].ind)
             {
@@ -127,7 +127,7 @@ main(void)
 
         for (i = j = 0; i < u->nnz; ++i)
         {
-            fmpz_mods(c, u->entries[i].val, mod);
+            fmpz_smod(c, u->entries[i].val, mod);
             if (fmpz_is_zero(c)) continue;
             if (u->entries[i].ind != v->entries[j].ind)
             {

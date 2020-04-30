@@ -25,7 +25,7 @@ void fmpz_sparse_vec_scalar_mods_fmpz(fmpz_sparse_vec_t v, const fmpz_sparse_vec
         for (i = ind = 0; i < v->nnz; ++i) 
         {
             v->entries[ind].ind = v->entries[i].ind;
-            fmpz_mods(v->entries[ind].val, v->entries[i].val, mod);
+            fmpz_smod(v->entries[ind].val, v->entries[i].val, mod);
             if (!fmpz_is_zero(v->entries[ind].val)) ++ind;
         }
         _fmpz_sparse_vec_resize(v, ind);

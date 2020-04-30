@@ -44,7 +44,7 @@ void check_heap(heap_t h, slong *vals)
 
 int main(void)
 {
-    slong rep, num, *vals, nreps = 1000, i, j, val, oval;
+    slong rep, num, *vals, nreps = 1000, i, val, oval;
     heap_t h;
     FLINT_TEST_INIT(state);
 
