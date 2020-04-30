@@ -1201,8 +1201,7 @@ int fmpz_mpoly_gcd_brown_threaded(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const fmpz_mpoly_ctx_t ctx)
 {
     int success;
     slong * perm;
@@ -1213,6 +1212,7 @@ int fmpz_mpoly_gcd_brown_threaded(
     fmpz_mpoly_t Al, Bl, Gl, Abarl, Bbarl;
     thread_pool_handle * handles;
     slong num_handles;
+    slong thread_limit = FLINT_MIN(A->length, B->length)/16;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {

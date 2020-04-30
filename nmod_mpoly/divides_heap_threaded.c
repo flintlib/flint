@@ -1935,13 +1935,13 @@ int nmod_mpoly_divides_heap_threaded(
     nmod_mpoly_t Q,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
-    const nmod_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const nmod_mpoly_ctx_t ctx)
 {
     thread_pool_handle * handles;
     slong num_handles;
     int divides;
     slong i;
+    slong thread_limit = A->length/32;
 
     if (B->length < 2 || A->length < 2)
     {
