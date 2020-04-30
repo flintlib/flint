@@ -1,10 +1,10 @@
 Calcium
 ===================================
 
-.. image:: _static/ca2.svg
-    :align: center
+.. only:: html
 
-.. .. math :: \mathbb{Ca}
+    .. image:: _static/ca2.svg
+        :align: center
 
 **Calcium** (pronounced "kalkium") is a C library for exact computation
 with real and complex numbers, presently in early development.
@@ -12,6 +12,8 @@ with real and complex numbers, presently in early development.
 Calcium is free software (LGPL). It depends on
 `GMP <https://gmplib.org/>`_, `MPFR <https://mpfr.org/>`_,
 `FLINT <http://flintlib.org/>`_ and `Arb <http://arblib.org/>`_.
+
+Source code: https://github.com/fredrik-johansson/calcium
 
 Planned features:
 

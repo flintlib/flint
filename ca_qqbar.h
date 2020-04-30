@@ -98,6 +98,16 @@ ca_qqbar_is_neg_one(const ca_qqbar_t x)
     return ca_qqbar_is_integer(x) && fmpz_is_one(CA_QQBAR_POLY(x)->coeffs);
 }
 
+int ca_qqbar_real_sgn(const ca_qqbar_t x);
+
+int ca_qqbar_imag_sgn(const ca_qqbar_t x);
+
+CA_QQBAR_INLINE
+int ca_qqbar_is_real(const ca_qqbar_t x)
+{
+    return ca_qqbar_imag_sgn(x) == 0;
+}
+
 /* Special values */
 
 CA_QQBAR_INLINE void
@@ -112,9 +122,17 @@ ca_qqbar_one(ca_qqbar_t res)
     ca_qqbar_set_ui(res, 1);
 }
 
+void ca_qqbar_i(ca_qqbar_t res);
+
+void ca_qqbar_phi(ca_qqbar_t res);
+
 /* Random generation */
 
 void ca_qqbar_randtest(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits);
+
+void ca_qqbar_randtest_real(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits);
+
+void ca_qqbar_randtest_nonreal(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits);
 
 /* Input and output */
 
@@ -139,6 +157,8 @@ void ca_qqbar_mul(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y);
 void ca_qqbar_div(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y);
 
 void ca_qqbar_inv(ca_qqbar_t res, const ca_qqbar_t x);
+
+void ca_qqbar_pow_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n);
 
 void ca_qqbar_root_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n);
 

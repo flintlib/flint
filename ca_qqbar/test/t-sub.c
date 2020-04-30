@@ -61,7 +61,7 @@ int main()
     }
 
     /* Check subtraction with degree-1 terms, small coefficients */
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100; iter++)
     {
         ca_qqbar_t x, y, z, a, b;
 
@@ -100,7 +100,7 @@ int main()
     }
 
     /* Check subtraction with higher-degree terms */
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100; iter++)
     {
         ca_qqbar_t x, y, z, a, b;
 
@@ -112,6 +112,45 @@ int main()
 
         ca_qqbar_randtest(x, state, 6, 10);
         ca_qqbar_randtest(y, state, 6, 10);
+        ca_qqbar_randtest(z, state, 2, 10);
+
+        /* check (x - y) - z = x - (z + y) */
+        ca_qqbar_sub(a, x, y);
+        ca_qqbar_sub(a, a, z);
+        ca_qqbar_add(b, z, y);
+        ca_qqbar_sub(b, x, b);
+
+        if (!ca_qqbar_equal(a, b))
+        {
+            flint_printf("FAIL!\n");
+            flint_printf("x = "); ca_qqbar_print(x); flint_printf("\n\n");
+            flint_printf("y = "); ca_qqbar_print(y); flint_printf("\n\n");
+            flint_printf("z = "); ca_qqbar_print(z); flint_printf("\n\n");
+            flint_printf("a = "); ca_qqbar_print(a); flint_printf("\n\n");
+            flint_printf("b = "); ca_qqbar_print(b); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        ca_qqbar_clear(x);
+        ca_qqbar_clear(y);
+        ca_qqbar_clear(z);
+        ca_qqbar_clear(a);
+        ca_qqbar_clear(b);
+    }
+
+    /* More iterations, low degree */
+    for (iter = 0; iter < 1000; iter++)
+    {
+        ca_qqbar_t x, y, z, a, b;
+
+        ca_qqbar_init(x);
+        ca_qqbar_init(y);
+        ca_qqbar_init(z);
+        ca_qqbar_init(a);
+        ca_qqbar_init(b);
+
+        ca_qqbar_randtest(x, state, 4, 10);
+        ca_qqbar_randtest(y, state, 3, 10);
         ca_qqbar_randtest(z, state, 2, 10);
 
         /* check (x - y) - z = x - (z + y) */

@@ -31,6 +31,7 @@ ca_qqbar_root_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
         fmpz_poly_t H;
         fmpz_poly_factor_t fac;
         acb_t z, w, t;
+        int pure_real;
 
         d = ca_qqbar_degree(x);
 
@@ -53,11 +54,14 @@ ca_qqbar_root_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
 
         fmpz_poly_factor(fac, H);
         acb_set(z, CA_QQBAR_ENCLOSURE(x));
+        pure_real = ca_qqbar_is_real(x);
 
         for (prec = CA_QQBAR_DEFAULT_PREC / 2; ; prec *= 2)
         {
-            /* todo: should be pretty */
             _ca_qqbar_enclosure_raw(z, CA_QQBAR_POLY(x), z, prec);
+            if (pure_real)
+                arb_zero(acb_imagref(z));
+
             acb_root_ui(w, z, n, prec);
 
             /* Look for potential roots -- we want exactly one */

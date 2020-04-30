@@ -34,6 +34,11 @@ ca_qqbar_mul(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
     {
         ca_qqbar_neg(res, x);
     }
+    else if (ca_qqbar_equal(x, y))
+    {
+        /* This may detect exact square roots and other special cases. */
+        ca_qqbar_pow_ui(res, x, 2);
+    }
     else
     {
         ca_qqbar_binary_op(res, x, y, 2);

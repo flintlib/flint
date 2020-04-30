@@ -78,10 +78,10 @@ fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, 
 }
 
 void
-ca_qqbar_randtest(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits)
+_ca_qqbar_randtest(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits, int real)
 {
     fmpz_poly_t pol;
-    slong prec, i, rdeg;
+    slong prec, i, rdeg, r1, r2;
     acb_ptr roots;
 
     deg = FLINT_MAX(deg, 1);
@@ -104,15 +104,25 @@ ca_qqbar_randtest(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits)
             fmpz_poly_randtest_irreducible1(pol, state, deg + 1, bits);
         else
             fmpz_poly_randtest_irreducible2(pol, state, deg + 1, bits);
+
         rdeg = fmpz_poly_degree(pol);
+        r1 = rdeg;
+        r2 = 0;
+        if (real)
+            fmpz_poly_signature(&r1, &r2, pol);
     }
-    while (rdeg < 1);
+    while (rdeg < 1 || (real == 1 && r1 < 1) || (real == 2 && r2 < 1));
 
     if (fmpz_sgn(pol->coeffs + rdeg) < 0)
         fmpz_poly_neg(pol, pol);
 
     roots = _acb_vec_init(rdeg);
-    i = n_randint(state, rdeg);
+    if (real == 0)
+        i = n_randint(state, rdeg);
+    else if (real == 1)
+        i = n_randint(state, r1);
+    else
+        i = r1 + n_randint(state, 2 * r2);
 
     for (prec = CA_QQBAR_DEFAULT_PREC / 2; ; prec *= 2)
     {
@@ -128,5 +138,29 @@ ca_qqbar_randtest(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits)
 
     _acb_vec_clear(roots, rdeg);
     fmpz_poly_clear(pol);
+}
+
+void
+ca_qqbar_randtest(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits)
+{
+    _ca_qqbar_randtest(res, state, deg, bits, 0);
+}
+
+void
+ca_qqbar_randtest_real(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits)
+{
+    _ca_qqbar_randtest(res, state, deg, bits, 1);
+}
+
+void
+ca_qqbar_randtest_nonreal(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits)
+{
+    if (deg <= 1)
+    {
+        flint_printf("ca_qqbar_randtest_nonreal: must have deg >= 2\n");
+        flint_abort();
+    }
+
+    _ca_qqbar_randtest(res, state, deg, bits, 2);
 }
 

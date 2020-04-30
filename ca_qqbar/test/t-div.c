@@ -65,7 +65,7 @@ int main()
     }
 
     /* Check division with degree-1 terms, small coefficients */
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100; iter++)
     {
         ca_qqbar_t x, y, z, a, b;
 
@@ -108,7 +108,7 @@ int main()
     }
 
     /* Check division with higher-degree terms */
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100; iter++)
     {
         ca_qqbar_t x, y, z, a, b;
 

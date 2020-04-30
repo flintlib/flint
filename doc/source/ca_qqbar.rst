@@ -67,7 +67,7 @@ Assignment
 
     Sets *res* to the value *x*.
 
-Properties
+Properties and comparisons
 -------------------------------------------------------------------------------
 
 .. function:: slong ca_qqbar_degree(const ca_qqbar_t x)
@@ -90,6 +90,18 @@ Properties
 
     Returns whether *x* is the number 1.
 
+.. function:: int ca_qqbar_is_real(const ca_qqbar_t x)
+
+    Returns whether *x* is a real number.
+
+.. function:: int ca_qqbar_real_sgn(const ca_qqbar_t x)
+
+    Returns the sign of the real part of *x* (-1, 0 or +1).
+
+.. function:: int ca_qqbar_imag_sgn(const ca_qqbar_t x)
+
+    Returns the sign of the imaginary part of *x* (-1, 0 or +1).
+
 Special values
 -------------------------------------------------------------------------------
 
@@ -101,6 +113,14 @@ Special values
 
     Sets *res* to the number 1.
 
+.. function:: void ca_qqbar_i(ca_qqbar_t res);
+
+    Sets *res* to the imaginary unit `i`.
+
+.. function:: void ca_qqbar_phi(ca_qqbar_t res)
+
+    Sets *res* to the golden ratio `\varphi = \tfrac{1}{2}(\sqrt{5} + 1)`.
+
 Random generation
 -------------------------------------------------------------------------------
 
@@ -108,6 +128,17 @@ Random generation
 
     Sets *res* to a random algebraic number with degree up to *deg* and
     with height (measured in bits) up to *bits*.
+
+.. function:: void ca_qqbar_randtest_real(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits)
+
+    Sets *res* to a random real algebraic number with degree up to *deg* and
+    with height (measured in bits) up to *bits*.
+
+.. function:: void ca_qqbar_randtest_nonreal(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits)
+
+    Sets *res* to a random nonreal algebraic number with degree up to *deg* and
+    with height (measured in bits) up to *bits*. Since all algebraic numbers
+    of degree 1 are real, *deg* must be at least 2.
 
 Arithmetic
 -------------------------------------------------------------------------------
@@ -144,6 +175,10 @@ Arithmetic
 
     Sets *res* to the reciprocal of the principal square root of *x*.
     Division by zero calls *flint_abort*.
+
+.. function:: void ca_qqbar_pow_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
+
+    Sets *res* to *x* raised to the *n*-th power.
 
 .. function:: void ca_qqbar_root_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
 

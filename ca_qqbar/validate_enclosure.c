@@ -33,9 +33,11 @@ _ca_qqbar_validate_enclosure(acb_t res, const fmpz_poly_t poly, const acb_t z, s
         acb_t z2, zmid, t, u;
         fmpz_poly_t deriv;
         mag_t zmag, eps;
-        int pure_real, ans;
+        int pure_real, pure_imag, ans;
+        /* int attempt; */
 
         pure_real = acb_is_real(z);
+        pure_imag = arb_is_zero(acb_realref(z));
 
         if (prec == 0)
         {
@@ -53,43 +55,53 @@ _ca_qqbar_validate_enclosure(acb_t res, const fmpz_poly_t poly, const acb_t z, s
         mag_init(zmag);
         fmpz_poly_init(deriv);
 
-        /* Slightly inflate enclosure -- needed e.g. in case of complex
-           interval with one very narrow real/imaginary part */
-        acb_get_mag(zmag, z);
-#if 0
-        mag_mul_2exp_si(zmag, zmag, -prec / 2);
-#else
-        mag_mul_2exp_si(zmag, zmag, -3 * prec / 4);
-#endif
+        ans = 0;
 
-        mag_hypot(eps, arb_radref(acb_realref(z)), arb_radref(acb_imagref(z)));
-        mag_mul_2exp_si(eps, eps, -4);
-
-        mag_max(eps, eps, zmag);
-
-        acb_set(z2, z);
-        if (pure_real)
-            arb_add_error_mag(acb_realref(z2), eps);
-        else
-            acb_add_error_mag(z2, eps);
-
-        acb_get_mid(zmid, z2);
-        fmpz_poly_derivative(deriv, poly);
-
-        /* Do one interval Newton step, t = zmid - poly(zmid) / poly'(z2) */
-        arb_fmpz_poly_evaluate_acb(t, poly, zmid, prec);
-        arb_fmpz_poly_evaluate_acb(u, deriv, z2, prec);
-        acb_div(t, t, u, prec);
-        acb_sub(t, zmid, t, prec);
-
-        if (pure_real)
+ /*       for (attempt = 0; attempt < 2 && ans == 0; attempt++) */
         {
-            ans = arb_contains_interior(acb_realref(z2), acb_realref(t));
-            arb_zero(acb_imagref(t));
-        }
-        else
-        {
-            ans = acb_contains_interior(z2, t);
+            acb_get_mag(zmag, z);
+
+            /* Slightly inflate enclosure -- needed e.g. in case of complex
+               interval with one very narrow real/imaginary part */
+            if (1)
+            {
+                mag_mul_2exp_si(zmag, zmag, -3 * prec / 4);
+                mag_hypot(eps, arb_radref(acb_realref(z)), arb_radref(acb_imagref(z)));
+                mag_mul_2exp_si(eps, eps, -4);
+                mag_max(eps, eps, zmag);
+            }
+
+            acb_set(z2, z);
+            if (pure_real)
+                arb_add_error_mag(acb_realref(z2), eps);
+            else if (pure_imag)
+                arb_add_error_mag(acb_imagref(z2), eps);
+            else
+                acb_add_error_mag(z2, eps);
+
+            acb_get_mid(zmid, z2);
+            fmpz_poly_derivative(deriv, poly);
+
+            /* Do one interval Newton step, t = zmid - poly(zmid) / poly'(z2) */
+            arb_fmpz_poly_evaluate_acb(t, poly, zmid, prec);
+            arb_fmpz_poly_evaluate_acb(u, deriv, z2, prec);
+            acb_div(t, t, u, prec);
+            acb_sub(t, zmid, t, prec);
+
+            if (pure_real)
+            {
+                ans = arb_contains_interior(acb_realref(z2), acb_realref(t));
+                arb_zero(acb_imagref(t));
+            }
+            else if (pure_imag)
+            {
+                ans = arb_contains_interior(acb_imagref(z2), acb_imagref(t));
+                arb_zero(acb_realref(t));
+            }
+            else
+            {
+                ans = acb_contains_interior(z2, t);
+            }
         }
 
         if (res != NULL)
