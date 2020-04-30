@@ -152,7 +152,7 @@ static void _splitworker(void * varg)
 
             thread_pool_wait(global_thread_pool, arg->worker_handles[0]);
 
-            success = nmod_mpolyn_gcd_brown_smprime_threaded(
+            success = nmod_mpolyn_gcd_brown_smprime_threaded_pool(
                                   arg->Gp, arg->Abarp, arg->Bbarp,
                    arg->Ap, arg->Bp, ctx->minfo->nvars - 1, arg->pctx, base->I,
                                        arg->worker_handles, arg->num_handles);
@@ -702,7 +702,7 @@ static slong _divide_master_threads(fmpq * v, slong n, slong m)
 }
 
 /* inputs A and B are modified */
-int fmpz_mpolyl_gcd_brown_threaded(
+int fmpz_mpolyl_gcd_brown_threaded_pool(
     fmpz_mpoly_t G,
     fmpz_mpoly_t Abar,
     fmpz_mpoly_t Bbar,
@@ -1192,7 +1192,7 @@ static void _worker_convertu(void * varg)
 {
     _convertl_arg_struct * arg = (_convertl_arg_struct *) varg;
 
-    fmpz_mpoly_to_mpoly_perm_deflate(arg->Pl, arg->lctx, arg->P, arg->ctx,
+    fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(arg->Pl, arg->lctx, arg->P, arg->ctx,
                                          arg->perm, arg->shift, arg->stride,
                                                arg->handles, arg->num_handles);
 }
@@ -1311,21 +1311,21 @@ int fmpz_mpoly_gcd_brown_threaded(
 
         thread_pool_wake(global_thread_pool, handles[m], 0, _worker_convertu, arg);
 
-        fmpz_mpoly_to_mpoly_perm_deflate(Al, lctx, A, ctx,
+        fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Al, lctx, A, ctx,
                                          perm, shift, stride, handles + 0, m);
 
         thread_pool_wait(global_thread_pool, handles[m]);
     }
     else
     {
-        fmpz_mpoly_to_mpoly_perm_deflate(Al, lctx, A, ctx,
+        fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Al, lctx, A, ctx,
                                                  perm, shift, stride, NULL, 0);
-        fmpz_mpoly_to_mpoly_perm_deflate(Bl, lctx, B, ctx,
+        fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Bl, lctx, B, ctx,
                                                  perm, shift, stride, NULL, 0);
     }
 
     /* calculate gcd */
-    success = fmpz_mpolyl_gcd_brown_threaded(Gl, Abarl, Bbarl, Al, Bl,
+    success = fmpz_mpolyl_gcd_brown_threaded_pool(Gl, Abarl, Bbarl, Al, Bl,
                                              lctx, NULL, handles, num_handles);
 
     flint_give_back_threads(handles, num_handles);

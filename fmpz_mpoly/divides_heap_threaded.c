@@ -1985,7 +1985,7 @@ static void worker_loop(void * varg)
 
 
 /* return 1 if quotient is exact */
-int _fmpz_mpoly_divides_heap_threaded(
+int _fmpz_mpoly_divides_heap_threaded_pool(
     fmpz_mpoly_t Q,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
@@ -2238,7 +2238,7 @@ int fmpz_mpoly_divides_heap_threaded(
 
     num_handles = flint_request_threads(&handles, thread_limit);
 
-    divides = _fmpz_mpoly_divides_heap_threaded(Q, A, B, ctx,
+    divides = _fmpz_mpoly_divides_heap_threaded_pool(Q, A, B, ctx,
                                                          handles, num_handles);
 
     flint_give_back_threads(handles, num_handles);

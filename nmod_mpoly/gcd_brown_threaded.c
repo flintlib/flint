@@ -796,7 +796,7 @@ static void _finaljoinworker(void * varg)
         handles[0], ..., handles[num_handles - 1]
     num_handles is allowed to be zero.
 */
-int nmod_mpolyn_gcd_brown_smprime_threaded(
+int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     nmod_mpolyn_t G,
     nmod_mpolyn_t Abar,
     nmod_mpolyn_t Bbar,
@@ -1155,8 +1155,10 @@ compute_split:
     {
         nmod_mpolyn_content_last(t1, G, ctx);
         nmod_mpolyn_divexact_last(G, t1, ctx);
-        success =            nmod_mpolyn_divides_threaded(T1, A, G, ctx, handles, num_handles);
-        success = success && nmod_mpolyn_divides_threaded(T2, B, G, ctx, handles, num_handles);
+        success =            nmod_mpolyn_divides_threaded_pool(T1, A, G,
+                                                    ctx, handles, num_handles);
+        success = success && nmod_mpolyn_divides_threaded_pool(T2, B, G,
+                                                    ctx, handles, num_handles);
         if (success)
         {
             ulong temp;
@@ -1175,8 +1177,10 @@ successful_fix_lc:
     {
         nmod_mpolyn_content_last(t1, Abar, ctx);
         nmod_mpolyn_divexact_last(Abar, t1, ctx);
-        success =            nmod_mpolyn_divides_threaded(T1, A, Abar, ctx, handles, num_handles);
-        success = success && nmod_mpolyn_divides_threaded(T2, B, T1, ctx, handles, num_handles);
+        success =            nmod_mpolyn_divides_threaded_pool(T1, A, Abar,
+                                                    ctx, handles, num_handles);
+        success = success && nmod_mpolyn_divides_threaded_pool(T2, B, T1,
+                                                    ctx, handles, num_handles);
         if (success)
         {
             nmod_mpolyn_swap(T1, G);
@@ -1188,8 +1192,10 @@ successful_fix_lc:
     {
         nmod_mpolyn_content_last(t1, Bbar, ctx);
         nmod_mpolyn_divexact_last(Bbar, t1, ctx);
-        success =            nmod_mpolyn_divides_threaded(T1, B, Bbar, ctx, handles, num_handles);
-        success = success && nmod_mpolyn_divides_threaded(T2, A, T1, ctx, handles, num_handles);
+        success =            nmod_mpolyn_divides_threaded_pool(T1, B, Bbar,
+                                                    ctx, handles, num_handles);
+        success = success && nmod_mpolyn_divides_threaded_pool(T2, A, T1,
+                                                    ctx, handles, num_handles);
         if (success)
         {
             nmod_mpolyn_swap(T1, G);
@@ -1296,7 +1302,7 @@ static void _worker_convertn(void * varg)
 {
     _convertn_arg_struct * arg = (_convertn_arg_struct *) varg;
 
-    nmod_mpoly_to_mpolyn_perm_deflate(arg->Pn, arg->nctx,
+    nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(arg->Pn, arg->nctx,
                     arg->P, arg->ctx, arg->perm, arg->shift, arg->stride,
                                                arg->handles, arg->num_handles);
 }
@@ -1407,21 +1413,21 @@ int nmod_mpoly_gcd_brown_threaded(
 
         thread_pool_wake(global_thread_pool, handles[m], 0, _worker_convertn, arg);
 
-        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(An, nctx, A, ctx,
                                           perm, shift, stride, handles + 0, m);
 
         thread_pool_wait(global_thread_pool, handles[m]);
     }
     else
     {
-        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx,
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(An, nctx,
                                          A, ctx, perm, shift, stride, NULL, 0);
-        nmod_mpoly_to_mpolyn_perm_deflate(Bn, nctx,
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(Bn, nctx,
                                          B, ctx, perm, shift, stride, NULL, 0);
     }
 
     /* calculate gcd */
-    success = nmod_mpolyn_gcd_brown_smprime_threaded(
+    success = nmod_mpolyn_gcd_brown_smprime_threaded_pool(
                           Gn, Abarn, Bbarn, An, Bn, nctx->minfo->nvars - 1,
                                              nctx, NULL, handles, num_handles);
 
@@ -1429,9 +1435,9 @@ int nmod_mpoly_gcd_brown_threaded(
 
     if (!success)
     {
-        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx,
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(An, nctx,
                                          A, ctx, perm, shift, stride, NULL, 0);
-        nmod_mpoly_to_mpolyn_perm_deflate(Bn, nctx,
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(Bn, nctx,
                                          B, ctx, perm, shift, stride, NULL, 0);
         success = nmod_mpolyn_gcd_brown_lgprime(Gn, Abarn, Bbarn,
                                          An, Bn, nctx->minfo->nvars - 1, nctx);

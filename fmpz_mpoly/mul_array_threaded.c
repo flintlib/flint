@@ -363,7 +363,7 @@ void _fmpz_mpoly_mul_array_chunked_threaded_LEX(
 }
 
 
-int _fmpz_mpoly_mul_array_threaded_LEX(
+int _fmpz_mpoly_mul_array_threaded_pool_LEX(
     fmpz_mpoly_t A,
     const fmpz_mpoly_t B, fmpz * maxBfields,
     const fmpz_mpoly_t C, fmpz * maxCfields,
@@ -774,7 +774,7 @@ void _fmpz_mpoly_mul_array_chunked_threaded_DEG(
 }
 
 
-int _fmpz_mpoly_mul_array_threaded_DEG(
+int _fmpz_mpoly_mul_array_threaded_pool_DEG(
     fmpz_mpoly_t A,
     const fmpz_mpoly_t B, fmpz * maxBfields,
     const fmpz_mpoly_t C, fmpz * maxCfields,
@@ -902,14 +902,14 @@ int fmpz_mpoly_mul_array_threaded(
     {
         case ORD_LEX:
         {
-            success = _fmpz_mpoly_mul_array_threaded_LEX(A,
+            success = _fmpz_mpoly_mul_array_threaded_pool_LEX(A,
                       B, maxBfields, C, maxCfields, ctx, handles, num_handles);
             break;
         }
         case ORD_DEGREVLEX:
         case ORD_DEGLEX:
         {
-            success = _fmpz_mpoly_mul_array_threaded_DEG(A,
+            success = _fmpz_mpoly_mul_array_threaded_pool_DEG(A,
                       B, maxBfields, C, maxCfields, ctx, handles, num_handles);
             break;
         }
