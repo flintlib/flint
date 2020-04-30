@@ -2531,8 +2531,7 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const fmpz_mpoly_ctx_t ctx)
 {
     slong i, max_num_handles, num_handles;
     thread_pool_handle * handles;
@@ -2544,6 +2543,7 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     slong * Adegs, * Bdegs, * perm;
     ulong * shift, * stride;
     ulong max_main_degree, max_minor_degree;
+    slong thread_limit = FLINT_MIN(A->length, B->length)/16;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {

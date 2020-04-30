@@ -23,7 +23,7 @@ Types, macros and constants
 
 .. type:: nmod_mpoly_t
 
-    An array of length 1 of ``fmpz_mpoly_struct``.
+    An array of length 1 of ``nmod_mpoly_struct``.
 
 
 Context object
@@ -451,14 +451,14 @@ Multiplication
               void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
     Set ``A`` to ``B`` times ``C`` using Johnson's heap-based method.
-    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
+    The first version always uses one thread.
 
 .. function:: int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
-              int nmod_mpoly_mul_array_threaded(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+              int nmod_mpoly_mul_array_threaded(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
     Try to set ``A`` to ``B`` times ``C`` using arrays.
     If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful, and the return is ``1``.
-    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
+    The first version always uses one thread.
 
 .. function:: int nmod_mpoly_mul_dense(nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 
@@ -541,10 +541,10 @@ The greatest common divisor functions assume that the modulus is prime.
     Do the operation of :func:`nmod_mpoly_gcd` and also compute ``Abar = A/G`` and ``Bbar = B/G`` if successful.
 
 .. function:: int nmod_mpoly_gcd_brown(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
-              int nmod_mpoly_gcd_brown_threaded(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx, slong thread_limit)
+              int nmod_mpoly_gcd_brown_threaded(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
     Try to set ``G`` to the GCD of ``A`` and ``B`` using Brown's algorithm.
-    The threaded version takes an upper limit on the number of threads to use, while the non-threaded version always uses one thread.
+    The first version always uses one thread.
 
 .. function:: int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 

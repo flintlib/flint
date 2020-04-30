@@ -830,13 +830,13 @@ void nmod_mpoly_mul_heap_threaded(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
     const nmod_mpoly_t C,
-    const nmod_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i;
     fmpz * maxBfields, * maxCfields;
     thread_pool_handle * handles;
     slong num_handles;
+    slong thread_limit = FLINT_MIN(B->length, C->length)/16;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)

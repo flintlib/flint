@@ -1305,8 +1305,7 @@ int nmod_mpoly_gcd_brown_threaded(
     nmod_mpoly_t G,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
-    const nmod_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const nmod_mpoly_ctx_t ctx)
 {
     int success;
     slong * perm;
@@ -1317,6 +1316,7 @@ int nmod_mpoly_gcd_brown_threaded(
     nmod_mpolyn_t An, Bn, Gn, Abarn, Bbarn;
     thread_pool_handle * handles;
     slong num_handles;
+    slong thread_limit = FLINT_MIN(A->length, B->length)/16;
 
     if (nmod_mpoly_is_zero(A, ctx))
     {

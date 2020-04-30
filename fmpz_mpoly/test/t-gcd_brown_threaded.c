@@ -22,7 +22,6 @@ void gcd_check(
     fmpz_mpoly_t a,
     fmpz_mpoly_t b,
     fmpz_mpoly_ctx_t ctx,
-    slong thread_limit,
     slong i,
     slong j,
     const char * name)
@@ -34,7 +33,7 @@ void gcd_check(
     fmpz_mpoly_init(cb, ctx);
     fmpz_mpoly_init(cg, ctx);
 
-    res = fmpz_mpoly_gcd_brown_threaded(g, a, b, ctx, thread_limit);
+    res = fmpz_mpoly_gcd_brown_threaded(g, a, b, ctx);
     fmpz_mpoly_assert_canonical(g, ctx);
 
     if (!res)
@@ -75,7 +74,7 @@ void gcd_check(
         flint_abort();
     }
 
-    res = fmpz_mpoly_gcd_brown_threaded(cg, ca, cb, ctx, thread_limit);
+    res = fmpz_mpoly_gcd_brown_threaded(cg, ca, cb, ctx);
     fmpz_mpoly_assert_canonical(cg, ctx);
 
     if (!res)
@@ -133,7 +132,7 @@ main(void)
         fmpz_mpoly_mul(b, b, g, ctx);
         fmpz_mpoly_zero(g, ctx);
 
-        gcd_check(g, a, b, ctx, 100, -1, -1, "example");
+        gcd_check(g, a, b, ctx, -1, -1, "example");
 
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(a, ctx);
@@ -176,7 +175,7 @@ main(void)
             fmpz_mpoly_scalar_mul_ui(b, b, n_randint(state, 10) + 1, ctx);
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, n_randint(state, max_threads + 3), i, j, "random dense");
+            gcd_check(g, a, b, ctx, i, j, "random dense");
         }
 
         flint_set_num_threads(n_randint(state, max_threads) + 1);
