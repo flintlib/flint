@@ -1940,7 +1940,6 @@ int nmod_mpoly_divides_heap_threaded(
     thread_pool_handle * handles;
     slong num_handles;
     int divides;
-    slong i;
     slong thread_limit = A->length/32;
 
     if (B->length < 2 || A->length < 2)
@@ -1966,33 +1965,12 @@ int nmod_mpoly_divides_heap_threaded(
                                "_threaded: Cannot invert leading coefficient");
     }
 
-    handles = NULL;
-    num_handles = 0;
-    if (thread_limit > 1 && global_thread_pool_initialized)
-    {
-        slong max_num_handles;
-        max_num_handles = thread_pool_get_size(global_thread_pool);
-        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-        if (max_num_handles > 0)
-        {
-            handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_handles*sizeof(thread_pool_handle));
-            num_handles = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_handles);
-        }
-    }
+    num_handles = flint_request_threads(&handles, thread_limit);
 
     divides = _nmod_mpoly_divides_heap_threaded(Q, A, B, ctx,
                                                          handles, num_handles);
 
-    for (i = 0; i < num_handles; i++)
-    {
-        thread_pool_give_back(global_thread_pool, handles[i]);
-    }
-    if (handles)
-    {
-        flint_free(handles);
-    }
+    flint_give_back_threads(handles, num_handles);
 
     return divides;
 }
