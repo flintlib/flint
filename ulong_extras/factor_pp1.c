@@ -17,15 +17,8 @@
 #include "ulong_extras.h"
 
 /* bits of n, B1, count */
-static slong n_factor_pp1_table[][3] = { { 0, 0, 0}, { 1, 0, 0},
-        { 2, 0, 0}, { 3, 0, 0}, { 4, 0, 0}, { 5, 0, 0},
-        { 6, 0, 0}, { 7, 0, 0}, { 8, 0, 0}, { 9, 0, 0},
-        {10, 0, 0}, {11, 0, 0}, {12, 0, 0}, {13, 0, 0},
-        {14, 0, 0}, {15, 0, 0}, {16, 0, 0}, {17, 0, 0},
-        {18, 0, 0}, {19, 0, 0}, {20, 0, 0}, {21, 0, 0},
-        {22, 0, 0}, {23, 0, 0}, {24, 0, 0}, {25, 0, 0},
-        {26, 0, 0}, {27, 0, 0}, {28, 0, 0}, {29, 0, 0},
-        {30, 0, 0}, {31, 2784, 5}, {32, 1208, 2}, {33, 2924, 3},
+static slong n_factor_pp1_table[][3] = {
+        {31, 2784, 5}, {32, 1208, 2}, {33, 2924, 3},
         {34, 286, 5}, {35, 58, 5}, {36, 61, 4}, {37, 815, 2},
         {38, 944, 2}, {39, 61, 3}, {40, 0, 0}, {41, 0, 0},
         {42, 0, 0}, {43, 0, 0}, {44, 0, 0}, {45, 0, 0},
@@ -219,10 +212,16 @@ cleanup:
 mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
 {
    slong bits = FLINT_BIT_COUNT(n);
-   ulong B1 = n_factor_pp1_table[bits][1];
-   slong count = n_factor_pp1_table[bits][2];
-   slong i;
+   ulong B1;
+   slong count, i;
    flint_rand_t state;
+
+   /* silently fail if trial factoring would always succeed */
+   if (bits < 31)
+       return 0;
+
+   B1 = n_factor_pp1_table[bits - 31][1];
+   count = n_factor_pp1_table[bits - 31][2];
 
    flint_randinit(state);
 
@@ -241,6 +240,7 @@ mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
    return 0;
 }
 
+/* exists only for tuning/profiling */
 void n_factor_pp1_table_insert(slong bits, slong B1, slong count)
 {
     n_factor_pp1_table[bits][1] = B1;
