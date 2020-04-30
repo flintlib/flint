@@ -2213,13 +2213,13 @@ int fmpz_mpoly_divides_heap_threaded(
     fmpz_mpoly_t Q,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const fmpz_mpoly_ctx_t ctx)
 {
     thread_pool_handle * handles;
     slong num_handles;
     int divides;
     slong i;
+    slong thread_limit = A->length/32;
 
     if (B->length < 2 || A->length < 2)
     {

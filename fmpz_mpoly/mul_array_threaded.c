@@ -862,14 +862,14 @@ int fmpz_mpoly_mul_array_threaded(
     fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
     const fmpz_mpoly_t C,
-    const fmpz_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
     int success;
     fmpz * maxBfields, * maxCfields;
     thread_pool_handle * handles;
     slong num_handles;
+    slong thread_limit = FLINT_MIN(A->length, B->length)/16;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)
