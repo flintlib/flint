@@ -1288,20 +1288,7 @@ int fmpz_mpoly_gcd_brown_threaded(
     fmpz_mpoly_init3(Abarl, 0, ABbits, lctx);
     fmpz_mpoly_init3(Bbarl, 0, ABbits, lctx);
 
-    handles = NULL;
-    num_handles = 0;
-    if (global_thread_pool_initialized)
-    {
-        slong max_num_handles = thread_pool_get_size(global_thread_pool);
-        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-        if (max_num_handles > 0)
-        {
-            handles = (thread_pool_handle *) flint_malloc(
-                               max_num_handles*sizeof(thread_pool_handle));
-            num_handles = thread_pool_request(global_thread_pool,
-                                                 handles, max_num_handles);
-        }
-    }
+    num_handles = flint_request_threads(&handles, thread_limit);
 
     /* convert inputs */
     if (num_handles > 0)
@@ -1341,13 +1328,7 @@ int fmpz_mpoly_gcd_brown_threaded(
     success = fmpz_mpolyl_gcd_brown_threaded(Gl, Abarl, Bbarl, Al, Bl,
                                              lctx, NULL, handles, num_handles);
 
-    for (i = 0; i < num_handles; i++)
-    {
-        thread_pool_give_back(global_thread_pool, handles[i]);
-    }
-
-    if (handles)
-        flint_free(handles);
+    flint_give_back_threads(handles, num_handles);
 
     if (success)
     {
