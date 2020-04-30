@@ -16,7 +16,7 @@ ca_qqbar_set_fmpz(ca_qqbar_t res, const fmpz_t x)
 {
     fmpz_poly_zero(CA_QQBAR_POLY(res));
     fmpz_poly_set_coeff_si(CA_QQBAR_POLY(res), 1, 1);
-    fmpz_neg(CA_QQBAR_POLY(res)->coeffs, x);
+    fmpz_neg(CA_QQBAR_COEFFS(res), x);
     acb_set_round_fmpz(CA_QQBAR_ENCLOSURE(res), x, CA_QQBAR_DEFAULT_PREC);
 }
 

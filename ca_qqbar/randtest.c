@@ -70,6 +70,7 @@ fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, 
         if (FLINT_ABS(fmpz_poly_max_bits(fac->p + i)) <= bits)
         {
             fmpz_poly_set(pol, fac->p + i);
+            fmpz_poly_factor_clear(fac);
             break;
         }
 

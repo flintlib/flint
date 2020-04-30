@@ -34,11 +34,11 @@ ca_qqbar_inv(ca_qqbar_t res, const ca_qqbar_t x)
     if (d == 1)
     {
         fmpz_poly_reverse(CA_QQBAR_POLY(res), CA_QQBAR_POLY(x), d + 1);
-        if (fmpz_sgn(CA_QQBAR_POLY(res)->coeffs + d) < 0)
+        if (fmpz_sgn(CA_QQBAR_COEFFS(res) + d) < 0)
             fmpz_poly_neg(CA_QQBAR_POLY(res), CA_QQBAR_POLY(res));
 
         arb_fmpz_div_fmpz(acb_realref(CA_QQBAR_ENCLOSURE(res)),
-            CA_QQBAR_POLY(res)->coeffs, CA_QQBAR_POLY(res)->coeffs + 1, CA_QQBAR_DEFAULT_PREC);
+            CA_QQBAR_COEFFS(res), CA_QQBAR_COEFFS(res) + 1, CA_QQBAR_DEFAULT_PREC);
         arb_neg(acb_realref(CA_QQBAR_ENCLOSURE(res)), acb_realref(CA_QQBAR_ENCLOSURE(res)));
         arb_zero(acb_imagref(CA_QQBAR_ENCLOSURE(res)));
     }

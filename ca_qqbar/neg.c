@@ -18,7 +18,7 @@ ca_qqbar_neg(ca_qqbar_t res, const ca_qqbar_t x)
     fmpz_poly_set(CA_QQBAR_POLY(res), CA_QQBAR_POLY(x));
 
     for (i = fmpz_poly_degree(CA_QQBAR_POLY(res)) - 1; i >= 0; i -= 2)
-        fmpz_neg(CA_QQBAR_POLY(res)->coeffs + i, CA_QQBAR_POLY(res)->coeffs + i);
+        fmpz_neg(CA_QQBAR_COEFFS(res) + i, CA_QQBAR_COEFFS(res) + i);
 
     acb_neg(CA_QQBAR_ENCLOSURE(res), CA_QQBAR_ENCLOSURE(x));
 }

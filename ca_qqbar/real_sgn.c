@@ -16,7 +16,7 @@ ca_qqbar_real_sgn(const ca_qqbar_t x)
 {
     if (ca_qqbar_degree(x) == 1)
     {
-        return -fmpz_sgn(CA_QQBAR_POLY(x)->coeffs);
+        return -fmpz_sgn(CA_QQBAR_COEFFS(x));
     }
     else if (arb_is_zero(acb_realref(CA_QQBAR_ENCLOSURE(x))))
     {
@@ -39,7 +39,7 @@ ca_qqbar_real_sgn(const ca_qqbar_t x)
 
         maybe_zero = 1;
         for (i = 1; i < d && maybe_zero; i += 2)
-            if (!fmpz_is_zero(CA_QQBAR_POLY(x)->coeffs + i))
+            if (!fmpz_is_zero(CA_QQBAR_COEFFS(x) + i))
                 maybe_zero = 0;
 
         acb_set(t, CA_QQBAR_ENCLOSURE(x));

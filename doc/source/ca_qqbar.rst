@@ -33,6 +33,11 @@ Types, macros and constants
 
     Macro returning a pointer to the minimal polynomial of *x* as an *fmpz_poly_t*.
 
+.. macro:: CA_QQBAR_COEFFS(x)
+
+    Macro returning a pointer to the array of *fmpz* coefficients of the
+    minimal polynomial of *x*.
+
 .. macro:: CA_QQBAR_ENCLOSURE(x)
 
     Macro returning a pointer to the enclosure of *x* as an *acb_t*.
@@ -113,7 +118,7 @@ Special values
 
     Sets *res* to the number 1.
 
-.. function:: void ca_qqbar_i(ca_qqbar_t res);
+.. function:: void ca_qqbar_i(ca_qqbar_t res)
 
     Sets *res* to the imaginary unit `i`.
 
@@ -161,6 +166,12 @@ Arithmetic
 
     Sets *res* to the sum, difference, product or quotient of *x* and *y*.
     Division by zero calls *flint_abort*.
+
+.. function:: void ca_qqbar_affine_transform(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t a, const fmpz_t b, const fmpz_t c)
+
+    Sets *res* to the rational affine transformation `(ax+b)/c`, performed as
+    a single operation. There are no restrictions on *a*, *b* and *c*
+    except that *c* must be nonzero. Division by zero calls *flint_abort*.
 
 .. function:: void ca_qqbar_inv(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
 

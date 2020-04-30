@@ -37,7 +37,7 @@ ca_qqbar_root_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
 
         if (FLINT_BIT_COUNT(n) + FLINT_BIT_COUNT(d) > 30)
         {
-            flint_printf("ca_qqbar_root_ui: ludicrously high degree %wd * %wu", d * n);
+            flint_printf("ca_qqbar_root_ui: ludicrously high degree %wd * %wu", d, n);
             return;
         }
 
@@ -49,7 +49,7 @@ ca_qqbar_root_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
 
         for (i = d; i >= 0; i--)
         {
-            fmpz_poly_set_coeff_fmpz(H, i * n, CA_QQBAR_POLY(x)->coeffs + i);
+            fmpz_poly_set_coeff_fmpz(H, i * n, CA_QQBAR_COEFFS(x) + i);
         }
 
         fmpz_poly_factor(fac, H);

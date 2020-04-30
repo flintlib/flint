@@ -29,8 +29,8 @@ ca_qqbar_pow_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
     {
         fmpq_t t;
         fmpq_init(t);
-        fmpz_neg(fmpq_numref(t), CA_QQBAR_POLY(x)->coeffs);
-        fmpz_set(fmpq_denref(t), CA_QQBAR_POLY(x)->coeffs + 1);
+        fmpz_neg(fmpq_numref(t), CA_QQBAR_COEFFS(x));
+        fmpz_set(fmpq_denref(t), CA_QQBAR_COEFFS(x) + 1);
         fmpz_pow_ui(fmpq_numref(t), fmpq_numref(t), n);
         fmpz_pow_ui(fmpq_denref(t), fmpq_denref(t), n);
         ca_qqbar_set_fmpq(res, t);

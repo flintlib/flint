@@ -23,26 +23,57 @@ ca_qqbar_div(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
     {
         ca_qqbar_zero(res);
     }
-/*
     else if (ca_qqbar_is_one(x))
     {
         ca_qqbar_inv(res, y);
     }
-*/
     else if (ca_qqbar_is_one(y))
     {
         ca_qqbar_set(res, x);
     }
-/*
     else if (ca_qqbar_is_neg_one(x))
     {
         ca_qqbar_inv(res, y);
         ca_qqbar_neg(res, res);
     }
-*/
     else if (ca_qqbar_is_neg_one(y))
     {
         ca_qqbar_neg(res, x);
+    }
+    else if (ca_qqbar_is_rational(y))
+    {
+        fmpz_t a, b, c;
+
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(c);
+
+        fmpz_neg(c, CA_QQBAR_COEFFS(y));
+        fmpz_set(a, CA_QQBAR_COEFFS(y) + 1);
+
+        ca_qqbar_scalar_op(res, x, a, b, c);
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(c);
+    }
+    else if (ca_qqbar_is_rational(x))
+    {
+        fmpz_t a, b, c;
+
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(c);
+
+        fmpz_neg(a, CA_QQBAR_COEFFS(x));
+        fmpz_set(c, CA_QQBAR_COEFFS(x) + 1);
+
+        ca_qqbar_inv(res, y);
+        ca_qqbar_scalar_op(res, res, a, b, c);
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(c);
     }
     else
     {

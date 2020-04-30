@@ -34,6 +34,7 @@ typedef struct
 ca_qqbar_struct;
 
 #define CA_QQBAR_POLY(x) (&((x)->poly))
+#define CA_QQBAR_COEFFS(x) ((&((x)->poly))->coeffs)
 #define CA_QQBAR_ENCLOSURE(x) (&((x)->enclosure))
 
 #define CA_QQBAR_DEFAULT_PREC 128
@@ -77,25 +78,25 @@ ca_qqbar_is_rational(const ca_qqbar_t x)
 CA_QQBAR_INLINE int
 ca_qqbar_is_integer(const ca_qqbar_t x)
 {
-    return ca_qqbar_is_rational(x) && fmpz_is_one(CA_QQBAR_POLY(x)->coeffs + 1);
+    return ca_qqbar_is_rational(x) && fmpz_is_one(CA_QQBAR_COEFFS(x) + 1);
 }
 
 CA_QQBAR_INLINE int
 ca_qqbar_is_zero(const ca_qqbar_t x)
 {
-    return ca_qqbar_is_integer(x) && fmpz_is_zero(CA_QQBAR_POLY(x)->coeffs);
+    return ca_qqbar_is_integer(x) && fmpz_is_zero(CA_QQBAR_COEFFS(x));
 }
 
 CA_QQBAR_INLINE int
 ca_qqbar_is_one(const ca_qqbar_t x)
 {
-    return ca_qqbar_is_integer(x) && (fmpz_equal_si(CA_QQBAR_POLY(x)->coeffs, -1));
+    return ca_qqbar_is_integer(x) && (fmpz_equal_si(CA_QQBAR_COEFFS(x), -1));
 }
 
 CA_QQBAR_INLINE int
 ca_qqbar_is_neg_one(const ca_qqbar_t x)
 {
-    return ca_qqbar_is_integer(x) && fmpz_is_one(CA_QQBAR_POLY(x)->coeffs);
+    return ca_qqbar_is_integer(x) && fmpz_is_one(CA_QQBAR_COEFFS(x));
 }
 
 int ca_qqbar_real_sgn(const ca_qqbar_t x);
@@ -176,6 +177,8 @@ ca_qqbar_rsqrt(ca_qqbar_t res, const ca_qqbar_t x)
 }
 
 /* Internal functions */
+
+void ca_qqbar_scalar_op(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t a, const fmpz_t b, const fmpz_t c);
 
 void ca_qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_poly_t B, int op);
 
