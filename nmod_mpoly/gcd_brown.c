@@ -91,14 +91,18 @@ int nmod_mpoly_gcd_brown(
     nmod_mpolyn_init(Abarn, new_bits, nctx);
     nmod_mpolyn_init(Bbarn, new_bits, nctx);
 
-    nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx, perm, shift, stride, NULL, 0);
-    nmod_mpoly_to_mpolyn_perm_deflate(Bn, nctx, B, ctx, perm, shift, stride, NULL, 0);
+    nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(An, nctx, A, ctx,
+                                                 perm, shift, stride, NULL, 0);
+    nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(Bn, nctx, B, ctx,
+                                                 perm, shift, stride, NULL, 0);
     success = nmod_mpolyn_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn,
                                        nctx->minfo->nvars - 1, nctx, NULL, Sp);
     if (!success)
     {
-        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx, perm, shift, stride, NULL, 0);
-        nmod_mpoly_to_mpolyn_perm_deflate(Bn, nctx, B, ctx, perm, shift, stride, NULL, 0);
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(An, nctx, A, ctx,
+                                                 perm, shift, stride, NULL, 0);
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(Bn, nctx, B, ctx,
+                                                 perm, shift, stride, NULL, 0);
 
         success = nmod_mpolyn_gcd_brown_lgprime(Gn, Abarn, Bbarn, An, Bn,
                                                  nctx->minfo->nvars - 1, nctx);

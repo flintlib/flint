@@ -87,9 +87,9 @@ void bivar_divides_check(
         goto cleanup;
     }
 
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uuctx, A, ctx,
+    fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Auu, uuctx, A, ctx,
                                            perm, shift, stride, NULL, NULL, 0);
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uuctx, B, ctx,
+    fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Buu, uuctx, B, ctx,
                                            perm, shift, stride, NULL, NULL, 0);
 
     uudivides = fmpz_mpolyuu_divides(Quu, Auu, Buu, 2, uuctx);
@@ -195,9 +195,9 @@ void univar_divides_check(
         perm[j] = t1;
     }
 
-    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
+    fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(Au, uctx, A, ctx,
                                            perm, shift, stride, NULL, NULL, 0);
-    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
+    fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(Bu, uctx, B, ctx,
                                            perm, shift, stride, NULL, NULL, 0);
 
     udivides = fmpz_mpolyuu_divides(Qu, Au, Bu, 1, uctx);

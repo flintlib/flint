@@ -780,7 +780,7 @@ void _fmpz_mpoly_mul_heap_threaded(
 
 
 /* maxBfields gets clobbered */
-void _fmpz_mpoly_mul_heap_threaded_maxfields(
+void _fmpz_mpoly_mul_heap_threaded_pool_maxfields(
     fmpz_mpoly_t A,
     const fmpz_mpoly_t B, fmpz * maxBfields,
     const fmpz_mpoly_t C, fmpz * maxCfields,
@@ -918,7 +918,7 @@ void fmpz_mpoly_mul_heap_threaded(
 
     num_handles = flint_request_threads(&handles, thread_limit);
 
-    _fmpz_mpoly_mul_heap_threaded_maxfields(A, B, maxBfields, C, maxCfields,
+    _fmpz_mpoly_mul_heap_threaded_pool_maxfields(A, B, maxBfields, C, maxCfields,
                                                     ctx, handles, num_handles);
 
     flint_give_back_threads(handles, num_handles);
