@@ -1296,7 +1296,7 @@ static void worker_loop(void * varg)
 
 
 /* return 1 if quotient is exact */
-int fmpz_mpolyuu_divides_threaded_pool(
+int fmpz_mpolyuu_divides_threaded(
     fmpz_mpolyu_t Q,
     const fmpz_mpolyu_t A,
     const fmpz_mpolyu_t B,

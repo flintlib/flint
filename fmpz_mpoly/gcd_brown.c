@@ -392,9 +392,9 @@ int fmpz_mpoly_gcd_brown(
     fmpz_mpoly_init3(Abarl, 0, wbits, lctx);
     fmpz_mpoly_init3(Bbarl, 0, wbits, lctx);
 
-    fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Al, lctx, A, ctx,
+    fmpz_mpoly_to_mpoly_perm_deflate(Al, lctx, A, ctx,
                                                  perm, shift, stride, NULL, 0);
-    fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(Bl, lctx, B, ctx,
+    fmpz_mpoly_to_mpoly_perm_deflate(Bl, lctx, B, ctx,
                                                  perm, shift, stride, NULL, 0);
 
     success = fmpz_mpolyl_gcd_brown(Gl, Abarl, Bbarl, Al, Bl, lctx, NULL);

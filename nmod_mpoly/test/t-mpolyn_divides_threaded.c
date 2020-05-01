@@ -29,7 +29,7 @@ void _divides_check(
     slong * perm;
     slong i, j, k;
     thread_pool_handle * handles;
-    slong num_workers;
+    slong num_workers, max_num_workers;
 
     if (   A->bits > FLINT_BITS
         || B->bits > FLINT_BITS
@@ -74,16 +74,34 @@ void _divides_check(
         perm[j] = t1;
     }
 
-    nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(An, nctx, A, ctx,
+    nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
                                            perm, shift, stride, NULL, 0);
-    nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(Bn, nctx, B, ctx,
+    nmod_mpoly_to_mpolyn_perm_deflate(Bn, nctx, B, ctx,
                                            perm, shift, stride, NULL, 0);
 
-    num_workers = flint_request_threads(&handles, 9999);
+    handles = NULL;
+    num_workers = 0;
+    if (global_thread_pool_initialized)
+    {
+        max_num_workers = thread_pool_get_size(global_thread_pool);
+        if (max_num_workers > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                               max_num_workers*sizeof(thread_pool_handle));
+            num_workers = thread_pool_request(global_thread_pool,
+                                                 handles, max_num_workers);
+        }
+    }
 
-    ndivides = nmod_mpolyn_divides_threaded_pool(Qn, An, Bn, nctx, handles, num_workers);
+    ndivides = nmod_mpolyn_divides_threaded(Qn, An, Bn, nctx, handles, num_workers);
 
-    flint_give_back_threads(handles, num_workers);
+    for (i = 0; i < num_workers; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
+    }
+
+    if (handles)
+        flint_free(handles);
 
     divides = nmod_mpoly_divides(Q, A, B, ctx);
 

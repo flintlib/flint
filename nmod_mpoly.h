@@ -869,13 +869,15 @@ FLINT_DLL void nmod_mpoly_mul_johnson(nmod_mpoly_t A,
        const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_mul_heap_threaded(nmod_mpoly_t A,
-       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
 FLINT_DLL int nmod_mpoly_mul_array(nmod_mpoly_t A,
        const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpoly_mul_array_threaded(nmod_mpoly_t A,
-       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
 FLINT_DLL int nmod_mpoly_mul_dense(nmod_mpoly_t A,
        const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
@@ -890,7 +892,7 @@ FLINT_DLL void _nmod_mpoly_mul_johnson_maxfields(nmod_mpoly_t A,
                                  const nmod_mpoly_t C, fmpz * maxCfields,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void _nmod_mpoly_mul_heap_threaded_pool_maxfields(nmod_mpoly_t A,
+FLINT_DLL void _nmod_mpoly_mul_heap_threaded_maxfields(nmod_mpoly_t A,
            const nmod_mpoly_t B, fmpz * maxBfields,
            const nmod_mpoly_t C, fmpz * maxCfields, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
@@ -905,12 +907,12 @@ FLINT_DLL int _nmod_mpoly_mul_array_LEX(nmod_mpoly_t A,
                                  const nmod_mpoly_t C, fmpz * maxCfields,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int _nmod_mpoly_mul_array_threaded_pool_DEG(nmod_mpoly_t A,
+FLINT_DLL int _nmod_mpoly_mul_array_threaded_DEG(nmod_mpoly_t A,
            const nmod_mpoly_t B, fmpz * maxBfields,
            const nmod_mpoly_t C, fmpz * maxCfields, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
-FLINT_DLL int _nmod_mpoly_mul_array_threaded_pool_LEX(nmod_mpoly_t A,
+FLINT_DLL int _nmod_mpoly_mul_array_threaded_LEX(nmod_mpoly_t A,
            const nmod_mpoly_t B, fmpz * maxBfields,
            const nmod_mpoly_t C, fmpz * maxCfields, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
@@ -934,7 +936,7 @@ FLINT_DLL int nmod_mpoly_pow_ui(nmod_mpoly_t A, const nmod_mpoly_t B,
 FLINT_DLL int nmod_mpoly_divides(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int _nmod_mpoly_divides_threaded_pool(nmod_mpoly_t Q,
+FLINT_DLL int _nmod_mpoly_divides(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
@@ -942,9 +944,10 @@ FLINT_DLL int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
-       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
-FLINT_DLL int _nmod_mpoly_divides_heap_threaded_pool(nmod_mpoly_t Q,
+FLINT_DLL int _nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
@@ -1001,7 +1004,7 @@ FLINT_DLL void nmod_mpoly_term_content(nmod_mpoly_t M, const nmod_mpoly_t A,
 FLINT_DLL int nmod_mpoly_gcd(nmod_mpoly_t G,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int _nmod_mpoly_gcd_threaded_pool(nmod_mpoly_t G, flint_bitcnt_t Gbits,
+FLINT_DLL int _nmod_mpoly_gcd(nmod_mpoly_t G, flint_bitcnt_t Gbits,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
@@ -1009,9 +1012,9 @@ FLINT_DLL int nmod_mpoly_gcd_cofactors(nmod_mpoly_t G,
                 nmod_mpoly_t Abar, nmod_mpoly_t Bbar, const nmod_mpoly_t A,
                              const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int _nmod_mpoly_gcd_cofactors_threaded_pool(
-                      nmod_mpoly_t G, flint_bitcnt_t Gbits, nmod_mpoly_t Abar,
-          flint_bitcnt_t Abarbits, nmod_mpoly_t Bbar, flint_bitcnt_t Bbarbits,
+FLINT_DLL int _nmod_mpoly_gcd_cofactors(nmod_mpoly_t G, flint_bitcnt_t Gbits,
+                                   nmod_mpoly_t Abar, flint_bitcnt_t Abarbits,
+                                   nmod_mpoly_t Bbar, flint_bitcnt_t Bbarbits,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
@@ -1314,10 +1317,12 @@ FLINT_DLL int nmod_mpoly_gcd_brown(nmod_mpoly_t G,
                                 const nmod_mpoly_t A, const nmod_mpoly_t B,
                                                    const nmod_mpoly_ctx_t ctx);
 FLINT_DLL int nmod_mpoly_gcd_brown_threaded(nmod_mpoly_t G,
-       const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+                                const nmod_mpoly_t A, const nmod_mpoly_t B,
+                               const nmod_mpoly_ctx_t ctx, slong thread_limit);
 
-FLINT_DLL int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
-                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL int nmod_mpoly_gcd_zippel(nmod_mpoly_t G,
+                                const nmod_mpoly_t A, const nmod_mpoly_t B,
+                                                   const nmod_mpoly_ctx_t ctx);
 
 /* mpolyu ********************************************************************/
 
@@ -1348,8 +1353,8 @@ FLINT_DLL void nmod_mpolyu_shift_right(nmod_mpolyu_t A, ulong s);
 
 FLINT_DLL void nmod_mpolyu_shift_left(nmod_mpolyu_t A, ulong s);
 
-FLINT_DLL int nmod_mpolyu_content_mpoly_threaded_pool(nmod_mpoly_t g,
-                           const nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctx,
+FLINT_DLL int nmod_mpolyu_content_mpoly(nmod_mpoly_t g, const nmod_mpolyu_t A,
+                                                   const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, mp_limb_t c,
@@ -1367,7 +1372,7 @@ FLINT_DLL void nmod_mpolyu_cvtfrom_poly(nmod_mpolyu_t A, nmod_poly_t a,
 FLINT_DLL void nmod_mpolyu_cvtfrom_poly_notmain(nmod_mpolyu_t A, nmod_poly_t a,
                                         slong var, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(
+FLINT_DLL void nmod_mpoly_to_mpolyu_perm_deflate(
                 nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx,
                 const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
                 const slong * perm, const ulong * shift, const ulong * stride,
@@ -1442,9 +1447,6 @@ FLINT_DLL void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B,
 
 FLINT_DLL void nmod_mpolyn_mul_poly(nmod_mpolyn_t A, const nmod_mpolyn_t B, 
                               const nmod_poly_t c, const nmod_mpoly_ctx_t ctx);
-
-FLINT_DLL void nmod_mpoly_cvtto_mpolyn(nmod_mpolyn_t A, nmod_mpoly_t B,
-                                        slong var, const nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE mp_limb_t nmod_mpolyn_leadcoeff(
                                    nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
@@ -1558,36 +1560,64 @@ FLINT_DLL void nmod_mpolyn_divexact_last(nmod_mpolyn_t A, nmod_poly_t b,
 FLINT_DLL void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, nmod_poly_t b,
                                                    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpolyn_divides(nmod_mpolyn_t Q, const nmod_mpolyn_t A,
-                            const nmod_mpolyn_t B, const nmod_mpoly_ctx_t ctx);
+FLINT_DLL int nmod_mpolyn_divides(
+    nmod_mpolyn_t Q,
+    const nmod_mpolyn_t A,
+    const nmod_mpolyn_t B,
+    const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL int nmod_mpolyn_divides_threaded_pool(nmod_mpolyn_t Q,
-    const nmod_mpolyn_t A, const nmod_mpolyn_t B, const nmod_mpoly_ctx_t ctx,
-                        const thread_pool_handle * handles, slong num_handles);
+FLINT_DLL int nmod_mpolyn_divides_threaded(
+    nmod_mpolyn_t Q,
+    const nmod_mpolyn_t A,
+    const nmod_mpolyn_t B,
+    const nmod_mpoly_ctx_t ctx,
+    const thread_pool_handle * handles,
+    slong num_handles);
 
 FLINT_DLL int nmod_mpolyun_divides(nmod_mpolyun_t Q, const nmod_mpolyun_t A,
                            const nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx);
 
-FLINT_DLL void nmod_mpoly_to_mpolyun_perm_deflate_threaded_pool(
-                nmod_mpolyun_t A, const nmod_mpoly_ctx_t uctx,
-                const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
-                const slong * perm, const ulong * shift, const ulong * stride,
-                        const thread_pool_handle * handles, slong num_handles);
+FLINT_DLL void nmod_mpoly_to_mpolyun_perm_deflate(
+    nmod_mpolyun_t A,
+    const nmod_mpoly_ctx_t uctx,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride,
+    const thread_pool_handle * handles,
+    slong num_handles);
 
-FLINT_DLL void nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(nmod_mpolyn_t A,
-  const nmod_mpoly_ctx_t nctx, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
-                 const slong * perm, const ulong * shift, const ulong * stride,
-                        const thread_pool_handle * handles, slong num_handles);
+FLINT_DLL void nmod_mpoly_to_mpolyn_perm_deflate(
+    nmod_mpolyn_t A,
+    const nmod_mpoly_ctx_t nctx,
+    const nmod_mpoly_t B,
+    const nmod_mpoly_ctx_t ctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride,
+    const thread_pool_handle * handles,
+    slong num_handles);
 
-FLINT_DLL void nmod_mpoly_from_mpolyun_perm_inflate(nmod_mpoly_t A,
-     flint_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx, const nmod_mpolyun_t B,
-        const nmod_mpoly_ctx_t uctx, const slong * perm, const ulong * shift,
-                                                        const ulong * stride);
+FLINT_DLL void nmod_mpoly_from_mpolyun_perm_inflate(
+    nmod_mpoly_t A,
+    flint_bitcnt_t Abits,
+    const nmod_mpoly_ctx_t ctx,
+    const nmod_mpolyun_t B,
+    const nmod_mpoly_ctx_t uctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride);
 
-FLINT_DLL void nmod_mpoly_from_mpolyn_perm_inflate(nmod_mpoly_t A,
-                        flint_bitcnt_t Abits, const nmod_mpoly_ctx_t ctx,
-                        const nmod_mpolyn_t B, const nmod_mpoly_ctx_t nctx,
-                const slong * perm, const ulong * shift, const ulong * stride);
+FLINT_DLL void nmod_mpoly_from_mpolyn_perm_inflate(
+    nmod_mpoly_t A,
+    flint_bitcnt_t Abits,
+    const nmod_mpoly_ctx_t ctx,
+    const nmod_mpolyn_t B,
+    const nmod_mpoly_ctx_t nctx,
+    const slong * perm,
+    const ulong * shift,
+    const ulong * stride);
 
 NMOD_MPOLY_INLINE mp_limb_t nmod_mpolyun_leadcoeff(
                                   nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
@@ -1621,7 +1651,7 @@ FLINT_DLL int nmod_mpolyn_gcd_brown_smprime(nmod_mpolyn_t G,
                          const nmod_mpoly_ctx_t ctx, const mpoly_gcd_info_t I,
                                                          nmod_poly_stack_t Sp);
 
-FLINT_DLL int nmod_mpolyn_gcd_brown_smprime_threaded_pool(nmod_mpolyn_t G,
+FLINT_DLL int nmod_mpolyn_gcd_brown_smprime_threaded(nmod_mpolyn_t G,
                                 nmod_mpolyn_t Abar, nmod_mpolyn_t Bbar,
                                nmod_mpolyn_t A, nmod_mpolyn_t B, slong var,
                          const nmod_mpoly_ctx_t ctx, const mpoly_gcd_info_t I,
