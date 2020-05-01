@@ -47,13 +47,11 @@ _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
     fmpz_one(res);
     _fmpz_vec_zero(res + 1, lenf - 2);
     l = z_sizeinbase(lenf - 1, 2) - 2;
-    window = WORD(0);
     window = (WORD(1) << l);
     c = l;
     i = fmpz_sizeinbase(e, 2) - 2;
     if (i <= l)
     {
-      window = WORD(0);
       window = (WORD(1) << i);
       c = i;
       l = i;
