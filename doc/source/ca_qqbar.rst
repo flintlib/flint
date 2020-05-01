@@ -251,20 +251,39 @@ Arithmetic
 
 .. function:: void ca_qqbar_add(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
 
+.. function:: void ca_qqbar_add_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y)
+
+.. function:: void ca_qqbar_add_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y)
+
+.. function:: void ca_qqbar_add_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y)
+
+.. function:: void ca_qqbar_add_si(ca_qqbar_t res, const ca_qqbar_t x, slong y)
+
+    Sets *res* to the sum of *x* and *y*.
+
 .. function:: void ca_qqbar_sub(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
+
+.. function:: void ca_qqbar_sub_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y)
+
+.. function:: void ca_qqbar_sub_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y)
+
+.. function:: void ca_qqbar_sub_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y)
+
+.. function:: void ca_qqbar_sub_si(ca_qqbar_t res, const ca_qqbar_t x, slong y)
+
+    Sets *res* to the difference of *x* and *y*.
 
 .. function:: void ca_qqbar_mul(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
 
-.. function:: void ca_qqbar_div(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
+.. function:: void ca_qqbar_mul_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y)
 
-    Sets *res* to the sum, difference, product or quotient of *x* and *y*.
-    Division by zero calls *flint_abort*.
+.. function:: void ca_qqbar_mul_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y)
 
-.. function:: void ca_qqbar_affine_transform(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t a, const fmpz_t b, const fmpz_t c)
+.. function:: void ca_qqbar_mul_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y)
 
-    Sets *res* to the rational affine transformation `(ax+b)/c`, performed as
-    a single operation. There are no restrictions on *a*, *b* and *c*
-    except that *c* must be nonzero. Division by zero calls *flint_abort*.
+.. function:: void ca_qqbar_mul_si(ca_qqbar_t res, const ca_qqbar_t x, slong y)
+
+    Sets *res* to the product of *x* and *y*.
 
 .. function:: void ca_qqbar_mul_2exp_si(ca_qqbar_t res, const ca_qqbar_t x, slong e)
 
@@ -278,6 +297,33 @@ Arithmetic
 
     Sets *res* to the multiplicative inverse of *y*.
     Division by zero calls *flint_abort*.
+
+.. function:: void ca_qqbar_div(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
+
+.. function:: void ca_qqbar_div_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y)
+
+.. function:: void ca_qqbar_div_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y)
+
+.. function:: void ca_qqbar_div_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y)
+
+.. function:: void ca_qqbar_div_si(ca_qqbar_t res, const ca_qqbar_t x, slong y)
+
+.. function:: void ca_qqbar_fmpq_div(ca_qqbar_t res, const fmpq_t x, const ca_qqbar_t y)
+
+.. function:: void ca_qqbar_fmpz_div(ca_qqbar_t res, const fmpz_t x, const ca_qqbar_t y)
+
+.. function:: void ca_qqbar_ui_div(ca_qqbar_t res, ulong x, const ca_qqbar_t y)
+
+.. function:: void ca_qqbar_si_div(ca_qqbar_t res, slong x, const ca_qqbar_t y)
+
+    Sets *res* to the quotient of *x* and *y*.
+    Division by zero calls *flint_abort*.
+
+.. function:: void ca_qqbar_affine_transform(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t a, const fmpz_t b, const fmpz_t c)
+
+    Sets *res* to the rational affine transformation `(ax+b)/c`, performed as
+    a single operation. There are no restrictions on *a*, *b* and *c*
+    except that *c* must be nonzero. Division by zero calls *flint_abort*.
 
 .. function:: void ca_qqbar_sqrt(ca_qqbar_t res, const ca_qqbar_t x)
 
@@ -297,7 +343,38 @@ Arithmetic
     Sets *res* to the principal *n*-th root of *x*. The order *n*
     must be positive.
 
-Internal polynomial and enclosure functions
+Numerical enclosures
+-------------------------------------------------------------------------------
+
+The following functions guarantee a polished output in which both the real
+and imaginary parts are accurate to *prec* bits and exact when exactly
+representable (that is, when a real or imaginary part is a sufficiently
+small dyadic number).
+
+In some cases, the computations needed to polish the output may be
+expensive. When polish is unnecessary, :func:`ca_qqbar_enclosure_raw`
+can be used instead.
+
+.. function:: void ca_qqbar_get_acb(acb_t res, const ca_qqbar_t x, slong prec)
+
+    Sets *res* to an enclosure of *x* rounded to *prec* bits.
+
+.. function:: void ca_qqbar_get_arb(arb_t res, const ca_qqbar_t x, slong prec)
+
+    Sets *res* to an enclosure of *x* rounded to *prec* bits, assuming that
+    *x* is a real number. If *x* is not real, *res* is set to
+    `[\operatorname{NaN} \pm \infty]`.
+
+.. function:: void ca_qqbar_get_arb_re(arb_t res, const ca_qqbar_t x, slong prec)
+
+    Sets *res* to an enclosure of the real part of *x* rounded to *prec* bits.
+
+.. function:: void ca_qqbar_get_arb_im(arb_t res, const ca_qqbar_t x, slong prec)
+
+    Sets *res* to an enclosure of the imaginary part of *x* rounded to *prec* bits.
+
+
+Internal functions
 -------------------------------------------------------------------------------
 
 .. function:: void ca_qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_poly_t B, int op)

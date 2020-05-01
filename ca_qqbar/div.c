@@ -81,3 +81,83 @@ ca_qqbar_div(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
     }
 }
 
+void
+ca_qqbar_div_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_fmpq(t, y);
+    ca_qqbar_div(res, x, t);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_div_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_fmpz(t, y);
+    ca_qqbar_div(res, x, t);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_div_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_ui(t, y);
+    ca_qqbar_div(res, x, t);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_div_si(ca_qqbar_t res, const ca_qqbar_t x, slong y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_si(t, y);
+    ca_qqbar_div(res, x, t);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_fmpq_div(ca_qqbar_t res, const fmpq_t x, const ca_qqbar_t y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_fmpq(t, x);
+    ca_qqbar_div(res, t, y);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_fmpz_div(ca_qqbar_t res, const fmpz_t x, const ca_qqbar_t y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_fmpz(t, x);
+    ca_qqbar_div(res, t, y);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_ui_div(ca_qqbar_t res, ulong x, const ca_qqbar_t y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_ui(t, x);
+    ca_qqbar_div(res, t, y);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_si_div(ca_qqbar_t res, slong x, const ca_qqbar_t y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_si(t, x);
+    ca_qqbar_div(res, t, y);
+    ca_qqbar_clear(t);
+}
+

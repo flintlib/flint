@@ -188,12 +188,33 @@ void ca_qqbar_ceil(fmpz_t res, const ca_qqbar_t x);
 void ca_qqbar_neg(ca_qqbar_t res, const ca_qqbar_t x);
 
 void ca_qqbar_add(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y);
+void ca_qqbar_add_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y);
+void ca_qqbar_add_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y);
+void ca_qqbar_add_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y);
+void ca_qqbar_add_si(ca_qqbar_t res, const ca_qqbar_t x, slong y);
 
 void ca_qqbar_sub(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y);
+void ca_qqbar_sub_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y);
+void ca_qqbar_sub_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y);
+void ca_qqbar_sub_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y);
+void ca_qqbar_sub_si(ca_qqbar_t res, const ca_qqbar_t x, slong y);
 
 void ca_qqbar_mul(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y);
+void ca_qqbar_mul_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y);
+void ca_qqbar_mul_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y);
+void ca_qqbar_mul_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y);
+void ca_qqbar_mul_si(ca_qqbar_t res, const ca_qqbar_t x, slong y);
 
 void ca_qqbar_div(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y);
+void ca_qqbar_div_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y);
+void ca_qqbar_div_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y);
+void ca_qqbar_div_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y);
+void ca_qqbar_div_si(ca_qqbar_t res, const ca_qqbar_t x, slong y);
+void ca_qqbar_fmpq_div(ca_qqbar_t res, const fmpq_t x, const ca_qqbar_t y);
+void ca_qqbar_fmpz_div(ca_qqbar_t res, const fmpz_t x, const ca_qqbar_t y);
+void ca_qqbar_ui_div(ca_qqbar_t res, ulong x, const ca_qqbar_t y);
+void ca_qqbar_si_div(ca_qqbar_t res, slong x, const ca_qqbar_t y);
+
 
 CA_QQBAR_INLINE void
 ca_qqbar_sqr(ca_qqbar_t res, const ca_qqbar_t x)
@@ -221,6 +242,16 @@ ca_qqbar_rsqrt(ca_qqbar_t res, const ca_qqbar_t x)
     ca_qqbar_sqrt(res, x);
     ca_qqbar_inv(res, res);
 }
+
+/* Numerical enclosure */
+
+void ca_qqbar_get_acb(acb_t res, const ca_qqbar_t x, slong prec);
+
+void ca_qqbar_get_arb(arb_t res, const ca_qqbar_t x, slong prec);
+
+void ca_qqbar_get_arb_re(arb_t res, const ca_qqbar_t x, slong prec);
+
+void ca_qqbar_get_arb_im(arb_t res, const ca_qqbar_t x, slong prec);
 
 /* Internal functions */
 

@@ -64,3 +64,43 @@ ca_qqbar_sub(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
     }
 }
 
+void
+ca_qqbar_sub_fmpq(ca_qqbar_t res, const ca_qqbar_t x, const fmpq_t y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_fmpq(t, y);
+    ca_qqbar_sub(res, x, t);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_sub_fmpz(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_fmpz(t, y);
+    ca_qqbar_sub(res, x, t);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_sub_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_ui(t, y);
+    ca_qqbar_sub(res, x, t);
+    ca_qqbar_clear(t);
+}
+
+void
+ca_qqbar_sub_si(ca_qqbar_t res, const ca_qqbar_t x, slong y)
+{
+    ca_qqbar_t t;
+    ca_qqbar_init(t);
+    ca_qqbar_set_si(t, y);
+    ca_qqbar_sub(res, x, t);
+    ca_qqbar_clear(t);
+}
+
