@@ -35,9 +35,16 @@ int main()
         ca_qqbar_re(y, x);
         ca_qqbar_im(z, x);
 
-        ca_qqbar_i(t);
-        ca_qqbar_mul(t, t, z);
-        ca_qqbar_add(t, t, y);
+        if (n_randint(state, 2))
+        {
+            ca_qqbar_set_re_im(t, y, z);
+        }
+        else
+        {
+            ca_qqbar_i(t);
+            ca_qqbar_mul(t, t, z);
+            ca_qqbar_add(t, t, y);
+        }
 
         if (!ca_qqbar_equal(t, x) || !ca_qqbar_is_real(y) || !ca_qqbar_is_real(z))
         {

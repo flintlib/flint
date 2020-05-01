@@ -61,6 +61,12 @@ void ca_qqbar_set_fmpz(ca_qqbar_t res, const fmpz_t x);
 
 void ca_qqbar_set_fmpq(ca_qqbar_t res, const fmpq_t x);
 
+void ca_qqbar_set_re_im(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y);
+
+int ca_qqbar_set_d(ca_qqbar_t res, double x);
+
+int ca_qqbar_set_re_im_d(ca_qqbar_t res, double x, double y);
+
 /* Properties */
 
 CA_QQBAR_INLINE slong

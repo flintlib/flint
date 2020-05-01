@@ -74,6 +74,19 @@ Assignment
 
     Sets *res* to the value *x*.
 
+.. function:: void ca_qqbar_set_re_im(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
+
+    Sets *res* to the value `x + yi`.
+
+.. function:: int ca_qqbar_set_d(ca_qqbar_t res, double x)
+
+.. function:: int ca_qqbar_set_re_im_d(ca_qqbar_t res, double x, double y)
+
+    Sets *res* to the value *x* or `x + yi` respectively. These functions
+    performs error handling: if *x* and *y* are finite, the conversion succeeds
+    and the return flag is 1. If *x* or *y* is non-finite (infinity or NaN),
+    the conversion fails and the return flag is 0.
+
 Properties
 -------------------------------------------------------------------------------
 
