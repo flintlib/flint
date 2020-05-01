@@ -14,11 +14,11 @@
 void
 ca_qqbar_re(ca_qqbar_t res, const ca_qqbar_t x)
 {
-    if (ca_qqbar_imag_sgn(x) == 0)
+    if (ca_qqbar_sgn_im(x) == 0)
     {
         ca_qqbar_set(res, x);
     }
-    else if (ca_qqbar_real_sgn(x) == 0)
+    else if (ca_qqbar_sgn_re(x) == 0)
     {
         ca_qqbar_zero(res);
     }

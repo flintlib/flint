@@ -63,7 +63,7 @@ ca_qqbar_floor(fmpz_t res, const ca_qqbar_t x)
                 ca_qqbar_set_fmpz(u, res);
                 ca_qqbar_sub(u, x, u);
 
-                if (ca_qqbar_real_sgn(u) < 0)
+                if (ca_qqbar_sgn_re(u) < 0)
                     fmpz_sub_ui(res, res, 1);
 
                 ca_qqbar_clear(u);

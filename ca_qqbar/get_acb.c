@@ -29,8 +29,8 @@ ca_qqbar_get_acb(acb_t res, const ca_qqbar_t x, slong prec)
         slong wp;
         int imag_zero, real_zero;
 
-        imag_zero = (ca_qqbar_imag_sgn(x) == 0);
-        real_zero = (ca_qqbar_real_sgn(x) == 0);
+        imag_zero = (ca_qqbar_sgn_im(x) == 0);
+        real_zero = (ca_qqbar_sgn_re(x) == 0);
 
         acb_set(res, CA_QQBAR_ENCLOSURE(x));
 
@@ -60,7 +60,7 @@ ca_qqbar_get_acb(acb_t res, const ca_qqbar_t x, slong prec)
             ca_qqbar_set_fmpz(u, n);
             ca_qqbar_mul_2exp_si(u, u, wp);
             ca_qqbar_sub(u, x, u);
-            if (ca_qqbar_real_sgn(u) == 0)
+            if (ca_qqbar_sgn_re(u) == 0)
             {
                 arb_set_fmpz(acb_realref(res), n);
                 arb_mul_2exp_si(acb_realref(res), acb_realref(res), wp);
@@ -77,7 +77,7 @@ ca_qqbar_get_acb(acb_t res, const ca_qqbar_t x, slong prec)
             ca_qqbar_mul_fmpz(u, u, n);
             ca_qqbar_mul_2exp_si(u, u, wp);
             ca_qqbar_sub(u, x, u);
-            if (ca_qqbar_imag_sgn(u) == 0)
+            if (ca_qqbar_sgn_im(u) == 0)
             {
                 arb_set_fmpz(acb_imagref(res), n);
                 arb_mul_2exp_si(acb_imagref(res), acb_imagref(res), wp);

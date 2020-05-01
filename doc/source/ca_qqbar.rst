@@ -1,6 +1,6 @@
 .. _ca_qqbar:
 
-**ca_qqbar.h** -- algebraic numbers
+**ca_qqbar.h** -- algebraic numbers represented by minimal polynomials
 ===============================================================================
 
 A :type:`ca_qqbar_t` represents a real or complex algebraic number
@@ -9,15 +9,16 @@ minimal polynomial in `\mathbb{Z}[x]` and an isolating complex interval.
 The precision of isolating intervals is maintained automatically to
 ensure that all operations on :type:`ca_qqbar_t` instances are exact.
 
-This type is useful for representing individual algebraic numbers
-of moderate degree (up to 100, say). An arithmetic operation
-on numbers of degrees *m* and *n* involves computing
-and then factoring an annihilating polynomial of degree *mn*;
-this will generally be the bottleneck.
-In rare cases, numerical root-finding can be the more expensive step.
-For doing lots of arithmetic with algebraic numbers, it is
-often a good idea to work in a fixed number field instead of
-doing repeated operations on :type:`ca_qqbar_t` instances.
+This representation is useful for working with
+individual algebraic numbers of moderate degree (up to 100, say).
+Arithmetic in this representation is expensive: an arithmetic operation
+on numbers of degrees *m* and *n* involves computing and then factoring an
+annihilating polynomial of degree *mn* and potentially also performing
+numerical root-finding. For doing repeated arithmetic, it is generally
+far more efficient to work in a fixed number field.
+The :type:`ca_qqbar_t` type is intended to be used to represent the
+embedding of a number field in `\mathbb{R}` or `\mathbb{C}` in such a setting.
+
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -118,14 +119,6 @@ Properties
 .. function:: int ca_qqbar_is_real(const ca_qqbar_t x)
 
     Returns whether *x* is a real number.
-
-.. function:: int ca_qqbar_real_sgn(const ca_qqbar_t x)
-
-    Returns the sign of the real part of *x* (-1, 0 or +1).
-
-.. function:: int ca_qqbar_imag_sgn(const ca_qqbar_t x)
-
-    Returns the sign of the imaginary part of *x* (-1, 0 or +1).
 
 Special values
 -------------------------------------------------------------------------------
@@ -232,6 +225,14 @@ Complex parts
 
     Sets *res* to the complex sign of *x*, defined as 0 if *x* is zero
     and as `x / |x|` otherwise.
+
+.. function:: int ca_qqbar_sgn_re(const ca_qqbar_t x)
+
+    Returns the sign of the real part of *x* (-1, 0 or +1).
+
+.. function:: int ca_qqbar_sgn_im(const ca_qqbar_t x)
+
+    Returns the sign of the imaginary part of *x* (-1, 0 or +1).
 
 .. function:: int ca_qqbar_csgn(const ca_qqbar_t x)
 

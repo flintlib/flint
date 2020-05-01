@@ -19,10 +19,10 @@ ca_qqbar_cmpabs(const ca_qqbar_t x, const ca_qqbar_t y)
     arb_t z3, z4;
     int res;
 
-    if (ca_qqbar_imag_sgn(x) == 0 && ca_qqbar_imag_sgn(y) == 0)
+    if (ca_qqbar_sgn_im(x) == 0 && ca_qqbar_sgn_im(y) == 0)
         return ca_qqbar_cmpabs_re(x, y);
 
-    if (ca_qqbar_real_sgn(x) == 0 && ca_qqbar_real_sgn(y) == 0)
+    if (ca_qqbar_sgn_re(x) == 0 && ca_qqbar_sgn_re(y) == 0)
         return ca_qqbar_cmpabs_im(x, y);
 
     {

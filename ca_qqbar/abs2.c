@@ -25,7 +25,7 @@ ca_qqbar_abs2(ca_qqbar_t res, const ca_qqbar_t x)
         ca_qqbar_t t;
         ca_qqbar_init(t);
 
-        if (ca_qqbar_real_sgn(x) == 0)
+        if (ca_qqbar_sgn_re(x) == 0)
         {
             ca_qqbar_i(t);
             ca_qqbar_mul(res, x, t);

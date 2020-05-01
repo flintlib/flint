@@ -24,11 +24,11 @@ ca_qqbar_cmp_re(const ca_qqbar_t x, const ca_qqbar_t y)
                        arb_midref(acb_realref(CA_QQBAR_ENCLOSURE(y))));
     }
 
-    if (ca_qqbar_real_sgn(y) == 0)
-        return ca_qqbar_real_sgn(x);
+    if (ca_qqbar_sgn_re(y) == 0)
+        return ca_qqbar_sgn_re(x);
 
-    if (ca_qqbar_real_sgn(x) == 0)
-        return -ca_qqbar_real_sgn(y);
+    if (ca_qqbar_sgn_re(x) == 0)
+        return -ca_qqbar_sgn_re(y);
 
     if (ca_qqbar_degree(x) == 1 && ca_qqbar_degree(y) == 1)
     {
@@ -43,7 +43,7 @@ ca_qqbar_cmp_re(const ca_qqbar_t x, const ca_qqbar_t y)
         ca_qqbar_t t;
         ca_qqbar_init(t);
         ca_qqbar_sub(t, x, y);
-        res = ca_qqbar_real_sgn(t);
+        res = ca_qqbar_sgn_re(t);
         ca_qqbar_clear(t);
     }
     else
@@ -72,7 +72,7 @@ ca_qqbar_cmp_re(const ca_qqbar_t x, const ca_qqbar_t y)
                 ca_qqbar_t t;
                 ca_qqbar_init(t);
                 ca_qqbar_sub(t, x, y);
-                res = ca_qqbar_real_sgn(t);
+                res = ca_qqbar_sgn_re(t);
                 ca_qqbar_clear(t);
                 break;
             }

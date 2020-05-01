@@ -111,14 +111,14 @@ ca_qqbar_is_neg_one(const ca_qqbar_t x)
     return ca_qqbar_is_integer(x) && fmpz_is_one(CA_QQBAR_COEFFS(x));
 }
 
-int ca_qqbar_real_sgn(const ca_qqbar_t x);
+int ca_qqbar_sgn_re(const ca_qqbar_t x);
 
-int ca_qqbar_imag_sgn(const ca_qqbar_t x);
+int ca_qqbar_sgn_im(const ca_qqbar_t x);
 
 CA_QQBAR_INLINE int
 ca_qqbar_is_real(const ca_qqbar_t x)
 {
-    return ca_qqbar_imag_sgn(x) == 0;
+    return ca_qqbar_sgn_im(x) == 0;
 }
 
 /* Special values */

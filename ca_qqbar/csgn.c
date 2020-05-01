@@ -14,10 +14,10 @@
 int
 ca_qqbar_csgn(const ca_qqbar_t x)
 {
-    int re = ca_qqbar_real_sgn(x);
+    int re = ca_qqbar_sgn_re(x);
 
     if (re != 0)
         return re;
 
-    return ca_qqbar_imag_sgn(x);
+    return ca_qqbar_sgn_im(x);
 }

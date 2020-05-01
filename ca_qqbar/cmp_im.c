@@ -24,11 +24,11 @@ ca_qqbar_cmp_im(const ca_qqbar_t x, const ca_qqbar_t y)
                        arb_midref(acb_imagref(CA_QQBAR_ENCLOSURE(y))));
     }
 
-    if (ca_qqbar_imag_sgn(y) == 0)
-        return ca_qqbar_imag_sgn(x);
+    if (ca_qqbar_sgn_im(y) == 0)
+        return ca_qqbar_sgn_im(x);
 
-    if (ca_qqbar_imag_sgn(x) == 0)
-        return -ca_qqbar_imag_sgn(y);
+    if (ca_qqbar_sgn_im(x) == 0)
+        return -ca_qqbar_sgn_im(y);
 
     if (ca_qqbar_equal(x, y))
         return 0;
@@ -58,7 +58,7 @@ ca_qqbar_cmp_im(const ca_qqbar_t x, const ca_qqbar_t y)
                 ca_qqbar_t t;
                 ca_qqbar_init(t);
                 ca_qqbar_sub(t, x, y);
-                res = ca_qqbar_imag_sgn(t);
+                res = ca_qqbar_sgn_im(t);
                 ca_qqbar_clear(t);
                 break;
             }

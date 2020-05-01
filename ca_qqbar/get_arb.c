@@ -14,7 +14,7 @@
 void
 ca_qqbar_get_arb(arb_t res, const ca_qqbar_t x, slong prec)
 {
-    if (ca_qqbar_imag_sgn(x) == 0)
+    if (ca_qqbar_sgn_im(x) == 0)
     {
         acb_t t;
         acb_init(t);

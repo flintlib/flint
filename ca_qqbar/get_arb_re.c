@@ -14,7 +14,7 @@
 void
 ca_qqbar_get_arb_re(arb_t res, const ca_qqbar_t x, slong prec)
 {
-    if (ca_qqbar_real_sgn(x) == 0)
+    if (ca_qqbar_sgn_re(x) == 0)
     {
         arb_zero(res);
     }

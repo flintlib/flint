@@ -16,7 +16,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("real_sgn....");
+    flint_printf("sgn_re....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -34,8 +34,8 @@ int main()
         ca_qqbar_i(y);
         ca_qqbar_mul(y, y, x);
 
-        s1 = ca_qqbar_real_sgn(x);
-        s2 = ca_qqbar_imag_sgn(y);
+        s1 = ca_qqbar_sgn_re(x);
+        s2 = ca_qqbar_sgn_im(y);
 
         if (s1 != s2)
         {
@@ -57,8 +57,8 @@ int main()
         ca_qqbar_i(y);
         ca_qqbar_mul(y, y, x);
 
-        s1 = ca_qqbar_real_sgn(x);
-        s2 = ca_qqbar_imag_sgn(y);
+        s1 = ca_qqbar_sgn_re(x);
+        s2 = ca_qqbar_sgn_im(y);
 
         if (s1 != s2)
         {
@@ -73,15 +73,15 @@ int main()
         ca_qqbar_randtest_real(x, state, 2, 100);
         ca_qqbar_randtest_real(y, state, 2, 100);
 
-        s1 = ca_qqbar_real_sgn(x);
-        s2 = ca_qqbar_real_sgn(y);
+        s1 = ca_qqbar_sgn_re(x);
+        s2 = ca_qqbar_sgn_re(y);
 
         ca_qqbar_i(z);
         ca_qqbar_mul(y, y, z);
         ca_qqbar_add(x, x, y);
 
-        s3 = ca_qqbar_real_sgn(x);
-        s4 = ca_qqbar_imag_sgn(x);
+        s3 = ca_qqbar_sgn_re(x);
+        s4 = ca_qqbar_sgn_im(x);
 
         if (s1 != s3 || s2 != s4)
         {

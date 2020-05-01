@@ -22,8 +22,8 @@ ca_qqbar_cmpabs_im(const ca_qqbar_t x, const ca_qqbar_t y)
                        arb_midref(acb_imagref(CA_QQBAR_ENCLOSURE(y))));
     }
 
-    sx = ca_qqbar_imag_sgn(x);
-    sy = ca_qqbar_imag_sgn(y);
+    sx = ca_qqbar_sgn_im(x);
+    sy = ca_qqbar_sgn_im(y);
 
     if (sx == sy)
         return 0;

@@ -51,7 +51,7 @@ int main()
         ca_qqbar_sub(t, xr, yr);
 
         c1 = ca_qqbar_cmp_re(x, y);
-        c2 = ca_qqbar_real_sgn(t);
+        c2 = ca_qqbar_sgn_re(t);
 
         if (c1 != c2)
         {

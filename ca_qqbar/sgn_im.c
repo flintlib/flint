@@ -12,7 +12,7 @@
 #include "ca_qqbar.h"
 
 int
-ca_qqbar_imag_sgn(const ca_qqbar_t x)
+ca_qqbar_sgn_im(const ca_qqbar_t x)
 {
     if (ca_qqbar_degree(x) == 1)
     {

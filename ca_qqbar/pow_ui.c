@@ -57,8 +57,8 @@ ca_qqbar_pow_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
             arb_fmpz_poly_deflate(H, CA_QQBAR_POLY(x), n);
 
             acb_set(z, CA_QQBAR_ENCLOSURE(x));
-            pure_real = (ca_qqbar_imag_sgn(x) == 0);
-            pure_imag = (ca_qqbar_real_sgn(x) == 0);
+            pure_real = (ca_qqbar_sgn_im(x) == 0);
+            pure_imag = (ca_qqbar_sgn_re(x) == 0);
 
             for (prec = CA_QQBAR_DEFAULT_PREC / 2; ; prec *= 2)
             {

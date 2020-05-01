@@ -16,8 +16,8 @@ ca_qqbar_sgn(ca_qqbar_t res, const ca_qqbar_t x)
 {
     int re, im;
 
-    re = ca_qqbar_real_sgn(x);
-    im = ca_qqbar_imag_sgn(x);
+    re = ca_qqbar_sgn_re(x);
+    im = ca_qqbar_sgn_im(x);
 
     if (im == 0)
     {
