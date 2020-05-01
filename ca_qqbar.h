@@ -82,6 +82,12 @@ ca_qqbar_is_integer(const ca_qqbar_t x)
 }
 
 CA_QQBAR_INLINE int
+ca_qqbar_is_algebraic_integer(const ca_qqbar_t x)
+{
+    return fmpz_is_one(CA_QQBAR_COEFFS(x) + ca_qqbar_degree(x));
+}
+
+CA_QQBAR_INLINE int
 ca_qqbar_is_zero(const ca_qqbar_t x)
 {
     return ca_qqbar_is_integer(x) && fmpz_is_zero(CA_QQBAR_COEFFS(x));
@@ -103,8 +109,8 @@ int ca_qqbar_real_sgn(const ca_qqbar_t x);
 
 int ca_qqbar_imag_sgn(const ca_qqbar_t x);
 
-CA_QQBAR_INLINE
-int ca_qqbar_is_real(const ca_qqbar_t x)
+CA_QQBAR_INLINE int
+ca_qqbar_is_real(const ca_qqbar_t x)
 {
     return ca_qqbar_imag_sgn(x) == 0;
 }
@@ -143,9 +149,41 @@ void ca_qqbar_print(const ca_qqbar_t x);
 
 int ca_qqbar_equal(const ca_qqbar_t x, const ca_qqbar_t y);
 
-/* Arithmetic */
+int ca_qqbar_cmp_re(const ca_qqbar_t x, const ca_qqbar_t y);
+
+int ca_qqbar_cmp_im(const ca_qqbar_t x, const ca_qqbar_t y);
+
+int ca_qqbar_cmpabs_re(const ca_qqbar_t x, const ca_qqbar_t y);
+
+int ca_qqbar_cmpabs_im(const ca_qqbar_t x, const ca_qqbar_t y);
+
+int ca_qqbar_cmpabs(const ca_qqbar_t x, const ca_qqbar_t y);
+
+/* Complex parts */
 
 void ca_qqbar_conj(ca_qqbar_t res, const ca_qqbar_t x);
+
+void ca_qqbar_re(ca_qqbar_t res, const ca_qqbar_t x);
+
+void ca_qqbar_im(ca_qqbar_t res, const ca_qqbar_t x);
+
+void ca_qqbar_re_im(ca_qqbar_t res1, ca_qqbar_t res2, const ca_qqbar_t x);
+
+void ca_qqbar_abs(ca_qqbar_t res, const ca_qqbar_t x);
+
+void ca_qqbar_abs2(ca_qqbar_t res, const ca_qqbar_t x);
+
+void ca_qqbar_sgn(ca_qqbar_t res, const ca_qqbar_t x);
+
+int ca_qqbar_csgn(const ca_qqbar_t x);
+
+/* Integer parts */
+
+void ca_qqbar_floor(fmpz_t res, const ca_qqbar_t x);
+
+void ca_qqbar_ceil(fmpz_t res, const ca_qqbar_t x);
+
+/* Arithmetic */
 
 void ca_qqbar_neg(ca_qqbar_t res, const ca_qqbar_t x);
 
@@ -157,7 +195,15 @@ void ca_qqbar_mul(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y);
 
 void ca_qqbar_div(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y);
 
+CA_QQBAR_INLINE void
+ca_qqbar_sqr(ca_qqbar_t res, const ca_qqbar_t x)
+{
+    ca_qqbar_mul(res, x, x);
+}
+
 void ca_qqbar_inv(ca_qqbar_t res, const ca_qqbar_t x);
+
+void ca_qqbar_mul_2exp_si(ca_qqbar_t res, const ca_qqbar_t x, slong exp);
 
 void ca_qqbar_pow_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n);
 

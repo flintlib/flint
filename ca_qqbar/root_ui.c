@@ -35,6 +35,8 @@ ca_qqbar_root_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
 
         d = ca_qqbar_degree(x);
 
+        /* todo: fast handling of roots of rational numbers */
+
         if (FLINT_BIT_COUNT(n) + FLINT_BIT_COUNT(d) > 30)
         {
             flint_printf("ca_qqbar_root_ui: ludicrously high degree %wd * %wu", d, n);

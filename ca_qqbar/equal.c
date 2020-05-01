@@ -49,7 +49,7 @@ ca_qqbar_equal(const ca_qqbar_t x, const ca_qqbar_t y)
         _ca_qqbar_enclosure_raw(z1, CA_QQBAR_POLY(x), z1, prec);
         _ca_qqbar_enclosure_raw(z2, CA_QQBAR_POLY(y), z2, prec);
 
-        if (!acb_overlaps(CA_QQBAR_ENCLOSURE(x), CA_QQBAR_ENCLOSURE(y)))
+        if (!acb_overlaps(z1, z2))
         {
             res = 0;
             break;

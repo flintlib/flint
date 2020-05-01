@@ -204,6 +204,11 @@ ca_qqbar_binary_op(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y, int o
     acb_init(w);
     acb_init(t);
 
+    /* flint_printf("BEGIN COMPOSED OP %wd %wd %wd %wd\n",
+        fmpz_poly_degree(CA_QQBAR_POLY(x)),
+        fmpz_poly_max_bits(CA_QQBAR_POLY(x)),
+        fmpz_poly_degree(CA_QQBAR_POLY(y)),
+        fmpz_poly_max_bits(CA_QQBAR_POLY(y))); */
     ca_qqbar_fmpz_poly_composed_op(H, CA_QQBAR_POLY(x), CA_QQBAR_POLY(y), op);
     fmpz_poly_factor(fac, H);
     acb_set(z1, CA_QQBAR_ENCLOSURE(x));

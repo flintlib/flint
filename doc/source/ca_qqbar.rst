@@ -6,6 +6,8 @@
 A :type:`ca_qqbar_t` represents a real or complex algebraic number
 (an element of `\overline{\mathbb{Q}}`) by its unique reduced
 minimal polynomial in `\mathbb{Z}[x]` and an isolating complex interval.
+The precision of isolating intervals is maintained automatically to
+ensure that all operations on :type:`ca_qqbar_t` instances are exact.
 
 This type is useful for representing individual algebraic numbers
 of moderate degree (up to 100, say). An arithmetic operation
@@ -72,7 +74,7 @@ Assignment
 
     Sets *res* to the value *x*.
 
-Properties and comparisons
+Properties
 -------------------------------------------------------------------------------
 
 .. function:: slong ca_qqbar_degree(const ca_qqbar_t x)
@@ -85,7 +87,12 @@ Properties and comparisons
 
 .. function:: int ca_qqbar_is_integer(const ca_qqbar_t x)
 
-    Returns whether *x* is an integer.
+    Returns whether *x* is an integer (an element of `\mathbb{Z}`).
+
+.. function:: int ca_qqbar_is_algebraic_integer(const ca_qqbar_t x)
+
+    Returns whether *x* is an algebraic integer, i.e. whether its minimal
+    polynomial has leading coefficient 1.
 
 .. function:: int ca_qqbar_is_zero(const ca_qqbar_t x)
 
@@ -126,6 +133,15 @@ Special values
 
     Sets *res* to the golden ratio `\varphi = \tfrac{1}{2}(\sqrt{5} + 1)`.
 
+Input and output
+-------------------------------------------------------------------------------
+
+.. function:: void ca_qqbar_print(const ca_qqbar_t x)
+
+    Prints *res* to standard output. The output shows the list of coefficients
+    of the minimal polynomial followed by a decimal representation of
+    the enclosing interval. This function is mainly intended for debugging.
+
 Random generation
 -------------------------------------------------------------------------------
 
@@ -145,12 +161,89 @@ Random generation
     with height (measured in bits) up to *bits*. Since all algebraic numbers
     of degree 1 are real, *deg* must be at least 2.
 
-Arithmetic
+Comparisons
+-------------------------------------------------------------------------------
+
+.. function:: int ca_qqbar_equal(const ca_qqbar_t x, const ca_qqbar_t y)
+
+    Returns whether *x* and *y* are equal.
+
+.. function:: int ca_qqbar_cmp_re(const ca_qqbar_t x, const ca_qqbar_t y)
+
+    Compares the real parts of *x* and *y*, returning -1, 0 or +1.
+
+.. function:: int ca_qqbar_cmp_im(const ca_qqbar_t x, const ca_qqbar_t y)
+
+    Compares the imaginary parts of *x* and *y*, returning -1, 0 or +1.
+
+.. function:: int ca_qqbar_cmpabs_re(const ca_qqbar_t x, const ca_qqbar_t y)
+
+    Compares the absolute values of the real parts of *x* and *y*, returning -1, 0 or +1.
+
+.. function:: int ca_qqbar_cmpabs_im(const ca_qqbar_t x, const ca_qqbar_t y)
+
+    Compares the absolute values of the imaginary parts of *x* and *y*, returning -1, 0 or +1.
+
+.. function:: int ca_qqbar_cmpabs(const ca_qqbar_t x, const ca_qqbar_t y)
+
+    Compares the absolute values of *x* and *y*, returning -1, 0 or +1.
+
+Complex parts
 -------------------------------------------------------------------------------
 
 .. function:: void ca_qqbar_conj(ca_qqbar_t res, const ca_qqbar_t x)
 
     Sets *res* to the complex conjugate of *x*.
+
+.. function:: void ca_qqbar_re(ca_qqbar_t res, const ca_qqbar_t x)
+
+    Sets *res* to the real part of *x*.
+
+.. function:: void ca_qqbar_im(ca_qqbar_t res, const ca_qqbar_t x)
+
+    Sets *res* to the imaginary part of *x*.
+
+.. function:: void ca_qqbar_re_im(ca_qqbar_t res1, ca_qqbar_t res2, const ca_qqbar_t x)
+
+    Sets *res1* to the real part of *x* and *res2* to the imaginary part of *x*.
+
+.. function:: void ca_qqbar_abs(ca_qqbar_t res, const ca_qqbar_t x)
+
+    Sets *res* to the absolute value of *x*:
+
+.. function:: void ca_qqbar_abs2(ca_qqbar_t res, const ca_qqbar_t x)
+
+    Sets *res* to the square of the absolute value of *x*.
+
+.. function:: void ca_qqbar_sgn(ca_qqbar_t res, const ca_qqbar_t x)
+
+    Sets *res* to the complex sign of *x*, defined as 0 if *x* is zero
+    and as `x / |x|` otherwise.
+
+.. function:: int ca_qqbar_csgn(const ca_qqbar_t x)
+
+    Returns the extension of the real sign function taking the
+    value 1 for *x* strictly in the right half plane, -1 for *x* strictly
+    in the left half plane, and the sign of the imaginary part when *x* is on
+    the imaginary axis. Equivalently, `\operatorname{csgn}(x) = x / \sqrt{x^2}`
+    except that the value is 0 when *x* is zero.
+
+Integer parts
+-------------------------------------------------------------------------------
+
+.. function:: void ca_qqbar_floor(fmpz_t res, const ca_qqbar_t x)
+
+    Sets *res* to the floor function of *x*. If *x* is not real, the
+    value is defined as the floor function of the real part of *x*.
+
+.. function:: void ca_qqbar_ceil(fmpz_t res, const ca_qqbar_t x)
+
+    Sets *res* to the ceiling function of *x*. If *x* is not real, the
+    value is defined as the ceiling function of the real part of *x*.
+
+
+Arithmetic
+-------------------------------------------------------------------------------
 
 .. function:: void ca_qqbar_neg(ca_qqbar_t res, const ca_qqbar_t x)
 
@@ -172,6 +265,14 @@ Arithmetic
     Sets *res* to the rational affine transformation `(ax+b)/c`, performed as
     a single operation. There are no restrictions on *a*, *b* and *c*
     except that *c* must be nonzero. Division by zero calls *flint_abort*.
+
+.. function:: void ca_qqbar_mul_2exp_si(ca_qqbar_t res, const ca_qqbar_t x, slong e)
+
+    Sets *res* to *x* multiplied by `2^e`.
+
+.. function:: void ca_qqbar_sqr(ca_qqbar_t res, const ca_qqbar_t x)
+
+    Sets *res* to the square of *x*.
 
 .. function:: void ca_qqbar_inv(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y)
 
