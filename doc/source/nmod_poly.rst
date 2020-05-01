@@ -781,6 +781,23 @@ Powering
     modulo ``f``, using binary exponentiation. We require ``e >= 0``.
     We require ``finv`` to be the inverse of the reverse of ``f``.
 
+.. function:: void _nmod_poly_powmod_fmpz_binexp_preinv (mp_ptr res, mp_srcptr poly, fmpz_t e, mp_srcptr f, slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e > 0``.
+    We require ``finv`` to be the inverse of the reverse of ``f``.
+
+    We require ``lenf > 1``. It is assumed that ``poly`` is already
+    reduced modulo ``f`` and zero-padded as necessary to have length
+    exactly ``lenf - 1``. The output ``res`` must have room for
+    ``lenf - 1`` coefficients.
+
+.. function:: void nmod_poly_powmod_fmpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly, fmpz_t e, const nmod_poly_t f, const nmod_poly_t finv)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``, using binary exponentiation. We require ``e >= 0``.
+    We require ``finv`` to be the inverse of the reverse of ``f``.
+
 .. function:: void _nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod)
 
     Sets ``res`` to ``x`` raised to the power ``e`` modulo ``f``,
