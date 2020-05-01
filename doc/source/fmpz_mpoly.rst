@@ -545,17 +545,17 @@ Multiplication
     Set ``A`` to ``B`` times ``C``.
 
 .. function:: void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
-              void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
 
     Set ``A`` to ``B`` times ``C`` using Johnson's heap-based method.
-    The first version always uses one thread.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: int fmpz_mpoly_mul_array(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
               int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
     Try to set ``A`` to ``B`` times ``C`` using arrays.
     If the return is ``0``, the operation was unsuccessful. Otherwise, it was successful and the return is ``1``.
-    The first version always uses one thread.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx)
 
@@ -640,10 +640,10 @@ Greatest Common Divisor
     Do the operation of :func:`fmpz_mpoly_gcd` and also compute ``Abar = A/G`` and ``Bbar = B/G`` if successful.
 
 .. function:: int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
-              int fmpz_mpoly_gcd_brown_threaded(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+              int fmpz_mpoly_gcd_brown_threaded(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
 
     Try to set ``G`` to the GCD of ``A`` and ``B`` using Brown's algorithm.
-    The first version always uses one thread.
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 

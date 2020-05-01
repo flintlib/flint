@@ -194,7 +194,7 @@ cleanup:
     the most significant main variable uses k = 0
     the coefficients of A use variables k = 1 ... m
 */
-void nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(
+void nmod_mpoly_to_mpolyu_perm_deflate(
     nmod_mpolyu_t A,
     const nmod_mpoly_ctx_t uctx,
     const nmod_mpoly_t B,
@@ -808,7 +808,7 @@ void nmod_mpolyu_mul_mpoly_inplace(nmod_mpolyu_t A, nmod_mpoly_t c,
 
 
 
-int nmod_mpolyu_content_mpoly_threaded_pool(
+int nmod_mpolyu_content_mpoly(
     nmod_mpoly_t g,
     const nmod_mpolyu_t A,
     const nmod_mpoly_ctx_t ctx,
@@ -848,8 +848,8 @@ int nmod_mpolyu_content_mpoly_threaded_pool(
     if (j == 0)
         j = 1;
 
-    success = _nmod_mpoly_gcd_threaded_pool(g, bits, A->coeffs + 0,
-                                     A->coeffs + j, ctx, handles, num_handles);
+    success = _nmod_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx,
+                                                        handles, num_handles);
     if (!success)
         return 0;
 
@@ -858,8 +858,8 @@ int nmod_mpolyu_content_mpoly_threaded_pool(
         if (i == j)
             continue;
 
-        success = _nmod_mpoly_gcd_threaded_pool(g, bits, g,
-                                     A->coeffs + i, ctx, handles, num_handles);
+        success = _nmod_mpoly_gcd(g, bits, g, A->coeffs + i, ctx,
+                                                         handles, num_handles);
         FLINT_ASSERT(g->bits == bits);
         if (!success)
             return 0;

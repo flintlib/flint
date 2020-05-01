@@ -44,7 +44,7 @@ int fmpz_mpoly_divides(
     num_handles = flint_request_threads(&handles, thread_limit);
 
     divides = (num_handles > 0)
-            ? _fmpz_mpoly_divides_heap_threaded_pool(Q, A, B, ctx,
+            ? _fmpz_mpoly_divides_heap_threaded(Q, A, B, ctx,
                                                           handles, num_handles)
             : fmpz_mpoly_divides_monagan_pearce(Q, A, B, ctx);
 

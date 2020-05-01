@@ -582,9 +582,9 @@ int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
     nmod_mpoly_init3(Bc, 0, wbits, uctx);
     nmod_mpoly_init3(Gc, 0, wbits, uctx);
 
-    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Au, uctx, A, ctx, zinfo->perm,
+    nmod_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx, zinfo->perm,
                                                        shift, stride, NULL, 0);
-    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Bu, uctx, B, ctx, zinfo->perm,
+    nmod_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx, zinfo->perm,
                                                        shift, stride, NULL, 0);
 
     FLINT_ASSERT(Au->length > 0);
@@ -594,9 +594,8 @@ int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
     nmod_mpolyu_shift_right(Au, amin);
     nmod_mpolyu_shift_right(Bu, bmin);
 
-    success = nmod_mpolyu_content_mpoly_threaded_pool(Ac, Au, uctx, NULL, 0);
-    success = success &&
-              nmod_mpolyu_content_mpoly_threaded_pool(Bc, Bu, uctx, NULL, 0);
+    success = nmod_mpolyu_content_mpoly(Ac, Au, uctx, NULL, 0);
+    success = success && nmod_mpolyu_content_mpoly(Bc, Bu, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 
@@ -609,7 +608,7 @@ int nmod_mpoly_gcd_zippel(nmod_mpoly_t G, const nmod_mpoly_t A,
     if (!success)
         goto cleanup;
 
-    success = _nmod_mpoly_gcd_threaded_pool(Gc, wbits, Ac, Bc, uctx, NULL, 0);
+    success = _nmod_mpoly_gcd(Gc, wbits, Ac, Bc, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 

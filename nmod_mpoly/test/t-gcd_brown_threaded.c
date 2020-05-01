@@ -16,6 +16,7 @@ void gcd_check(
     nmod_mpoly_t a,
     nmod_mpoly_t b,
     nmod_mpoly_ctx_t ctx,
+    slong thread_limit,
     slong i,
     slong j,
     const char * name)
@@ -27,7 +28,7 @@ void gcd_check(
     nmod_mpoly_init(cb, ctx);
     nmod_mpoly_init(cg, ctx);
 
-    res = nmod_mpoly_gcd_brown_threaded(g, a, b, ctx);
+    res = nmod_mpoly_gcd_brown_threaded(g, a, b, ctx, thread_limit);
     nmod_mpoly_assert_canonical(g, ctx);
 
     if (!res)
@@ -68,7 +69,7 @@ void gcd_check(
         flint_abort();
     }
 
-    res = nmod_mpoly_gcd_brown_threaded(cg, ca, cb, ctx);
+    res = nmod_mpoly_gcd_brown_threaded(cg, ca, cb, ctx, thread_limit);
     nmod_mpoly_assert_canonical(cg, ctx);
 
     if (!res)
@@ -125,7 +126,7 @@ main(void)
         nmod_mpoly_mul(a, a, g, ctx);
         nmod_mpoly_mul(b, b, g, ctx);
 
-        gcd_check(g, a, b, ctx, 0, 0, "example");
+        gcd_check(g, a, b, ctx, 0, 0, 0, "example");
 
         nmod_mpoly_clear(a, ctx);
         nmod_mpoly_clear(b, ctx);
@@ -168,7 +169,7 @@ main(void)
             nmod_mpoly_mul(b, b, g, ctx);
             nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "random small");
+            gcd_check(g, a, b, ctx, n_randint(state, max_threads + 3), i, j, "random small");
         }
 
         flint_set_num_threads(n_randint(state, max_threads) + 1);
@@ -214,7 +215,7 @@ main(void)
             nmod_mpoly_mul(b, b, g, ctx);
             nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
 
-            gcd_check(g, a, b, ctx, i, j, "random dense");
+            gcd_check(g, a, b, ctx, n_randint(state, max_threads + 3), i, j, "random dense");
         }
 
         flint_set_num_threads(n_randint(state, max_threads) + 1);

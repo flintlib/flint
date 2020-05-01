@@ -220,7 +220,7 @@ void nmod_mpoly_mul(
     if (ctx->minfo->ord == ORD_LEX)
     {
         success = (num_handles > 0)
-                ? _nmod_mpoly_mul_array_threaded_pool_LEX(
+                ? _nmod_mpoly_mul_array_threaded_LEX(
                                     A, B, maxBfields, C, maxCfields, ctx,
                                                          handles, num_handles)
                 : _nmod_mpoly_mul_array_LEX(
@@ -229,7 +229,7 @@ void nmod_mpoly_mul(
     else if (ctx->minfo->ord == ORD_DEGLEX || ctx->minfo->ord == ORD_DEGREVLEX)
     {
         success = (num_handles > 0)
-                ? _nmod_mpoly_mul_array_threaded_pool_DEG(
+                ? _nmod_mpoly_mul_array_threaded_DEG(
                                     A, B, maxBfields, C, maxCfields, ctx,
                                                          handles, num_handles)
                 : _nmod_mpoly_mul_array_DEG(
@@ -245,7 +245,7 @@ do_heap:
 
     if (num_handles > 0)
     {
-        _nmod_mpoly_mul_heap_threaded_pool_maxfields(A,
+        _nmod_mpoly_mul_heap_threaded_maxfields(A,
                       B, maxBfields, C, maxCfields, ctx, handles, num_handles);
     }
     else

@@ -72,9 +72,9 @@ void univar_divides_check(
         perm[j] = t1;
     }
 
-    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Au, uctx, A, ctx,
+    nmod_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
                                            perm, shift, stride, NULL, 0);
-    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Bu, uctx, B, ctx,
+    nmod_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
                                            perm, shift, stride, NULL, 0);
 
     udivides = nmod_mpolyuu_divides(Qu, Au, Bu, 1, uctx);

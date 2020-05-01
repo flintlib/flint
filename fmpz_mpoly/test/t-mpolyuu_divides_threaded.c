@@ -30,7 +30,7 @@ void bivar_divides_check(
     slong * perm;
     slong i, j, k;
     thread_pool_handle * handles;
-    slong num_workers;
+    slong num_workers, max_num_workers;
 
     if (   A->bits > FLINT_BITS
         || B->bits > FLINT_BITS
@@ -89,16 +89,36 @@ void bivar_divides_check(
         goto cleanup;
     }
 
-    num_workers = flint_request_threads(&handles, 9999);
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uuctx, A, ctx,
+                                           perm, shift, stride, NULL, NULL, 0);
+    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uuctx, B, ctx,
+                                           perm, shift, stride, NULL, NULL, 0);
 
-    fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Auu, uuctx, A, ctx,
-                              perm, shift, stride, NULL, handles, num_workers);
-    fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Buu, uuctx, B, ctx,
-                              perm, shift, stride, NULL, handles, num_workers);
+    /*****************************/
+    handles = NULL;
+    num_workers = 0;
+    if (global_thread_pool_initialized)
+    {
+        max_num_workers = thread_pool_get_size(global_thread_pool);
+        if (max_num_workers > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                               max_num_workers*sizeof(thread_pool_handle));
+            num_workers = thread_pool_request(global_thread_pool,
+                                                 handles, max_num_workers);
+        }
+    }
 
-    uudivides = fmpz_mpolyuu_divides_threaded_pool(Quu, Auu, Buu, 2, uuctx,
-                                                         handles, num_workers);
-    flint_give_back_threads(handles, num_workers);
+    uudivides = fmpz_mpolyuu_divides_threaded(Quu, Auu, Buu, 2, uuctx, handles, num_workers);
+
+    for (i = 0; i < num_workers; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
+    }
+
+    if (handles)
+        flint_free(handles);
+    /*****************************************/
 
     divides = fmpz_mpoly_divides(Q, A, B, ctx);
 
@@ -159,7 +179,7 @@ void univar_divides_check(
     slong * perm;
     slong i, j, k;
     thread_pool_handle * handles;
-    slong num_workers;
+    slong num_workers, max_num_workers;
 
     if (   A->bits > FLINT_BITS
         || B->bits > FLINT_BITS
@@ -204,17 +224,36 @@ void univar_divides_check(
         perm[j] = t1;
     }
 
-    num_workers = flint_request_threads(&handles, 9999);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx,
+                                           perm, shift, stride, NULL, NULL, 0);
+    fmpz_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx,
+                                           perm, shift, stride, NULL, NULL, 0);
 
-    fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(Au, uctx, A, ctx,
-                              perm, shift, stride, NULL, handles, num_workers);
-    fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(Bu, uctx, B, ctx,
-                              perm, shift, stride, NULL, handles, num_workers);
+    /*****************************/
+    handles = NULL;
+    num_workers = 0;
+    if (global_thread_pool_initialized)
+    {
+        max_num_workers = thread_pool_get_size(global_thread_pool);
+        if (max_num_workers > 0)
+        {
+            handles = (thread_pool_handle *) flint_malloc(
+                               max_num_workers*sizeof(thread_pool_handle));
+            num_workers = thread_pool_request(global_thread_pool,
+                                                 handles, max_num_workers);
+        }
+    }
 
-    udivides = fmpz_mpolyuu_divides_threaded_pool(Qu, Au, Bu, 1, uctx,
-                                                         handles, num_workers);
+    udivides = fmpz_mpolyuu_divides_threaded(Qu, Au, Bu, 1, uctx, handles, num_workers);
 
-    flint_give_back_threads(handles, num_workers);
+    for (i = 0; i < num_workers; i++)
+    {
+        thread_pool_give_back(global_thread_pool, handles[i]);
+    }
+
+    if (handles)
+        flint_free(handles);
+    /*****************************************/
 
     divides = fmpz_mpoly_divides(Q, A, B, ctx);
 

@@ -287,7 +287,7 @@ create_new: /* new at position i */
         l = perm[k]
         Aexp[k] = (Bexp[l] - shift[l])/stride[l]
 */
-void fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(
+void fmpz_mpoly_to_mpoly_perm_deflate(
     fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t uctx,
     const fmpz_mpoly_t B,
@@ -520,7 +520,7 @@ void _arrayconvertu_worker(void * varg)
     the coefficients of A use variables k = 1 ... m
     maxexps if it exists is supposed to be a degree bound on B
 */
-void fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(
+void fmpz_mpoly_to_mpolyu_perm_deflate(
     fmpz_mpolyu_t A,
     const fmpz_mpoly_ctx_t uctx,
     const fmpz_mpoly_t B,
@@ -990,7 +990,7 @@ void _arrayconvertuu_worker(void * varg)
     the coefficients of A use variables Aexp[2], ..., Aexp[m + 1]
     maxexps if it exists is supposed to be a degree bound on B
 */
-void fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(
+void fmpz_mpoly_to_mpolyuu_perm_deflate(
     fmpz_mpolyu_t A,
     const fmpz_mpoly_ctx_t uctx,
     const fmpz_mpoly_t B,
@@ -1578,7 +1578,7 @@ void fmpz_mpolyu_content_fmpz(
 }
 
 
-int fmpz_mpolyu_content_mpoly_threaded_pool(
+int fmpz_mpolyu_content_mpoly(
     fmpz_mpoly_t g,
     const fmpz_mpolyu_t A,
     const fmpz_mpoly_ctx_t ctx,
@@ -1619,8 +1619,8 @@ int fmpz_mpolyu_content_mpoly_threaded_pool(
     {
         j = 1;
     }
-    success = _fmpz_mpoly_gcd_threaded_pool(g, bits, A->coeffs + 0,
-                                     A->coeffs + j, ctx, handles, num_handles);
+    success = _fmpz_mpoly_gcd(g, bits, A->coeffs + 0, A->coeffs + j, ctx,
+                                                        handles, num_handles);
     if (!success)
     {
         return 0;
@@ -1632,8 +1632,8 @@ int fmpz_mpolyu_content_mpoly_threaded_pool(
         {
             continue;
         }
-        success = _fmpz_mpoly_gcd_threaded_pool(g, bits, g,
-                                     A->coeffs + i, ctx, handles, num_handles);
+        success = _fmpz_mpoly_gcd(g, bits, g, A->coeffs + i, ctx,
+                                                         handles, num_handles);
         FLINT_ASSERT(g->bits == bits);
         if (!success)
         {

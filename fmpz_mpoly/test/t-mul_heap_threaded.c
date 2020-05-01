@@ -40,9 +40,9 @@ main(void)
         fmpz_mpoly_set_str_pretty(g, "(1+u+t+2*z^2+3*y^3+5*x^5)^5", vars, ctx);
 
         flint_set_num_threads(1);
-        fmpz_mpoly_mul_heap_threaded(h1, f, g, ctx);
+        fmpz_mpoly_mul_heap_threaded(h1, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
         flint_set_num_threads(2);
-        fmpz_mpoly_mul_heap_threaded(h2, f, g, ctx);
+        fmpz_mpoly_mul_heap_threaded(h2, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
 
         if (!fmpz_mpoly_equal(h1, h2, ctx))
         {
@@ -94,7 +94,7 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            fmpz_mpoly_mul_heap_threaded(k, f, g, ctx);
+            fmpz_mpoly_mul_heap_threaded(k, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             fmpz_mpoly_assert_canonical(k, ctx);
             result = fmpz_mpoly_equal(h, k, ctx);
 
@@ -147,7 +147,7 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            fmpz_mpoly_mul_heap_threaded(f, f, g, ctx);
+            fmpz_mpoly_mul_heap_threaded(f, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             fmpz_mpoly_assert_canonical(f, ctx);
             result = fmpz_mpoly_equal(h, f, ctx);
 
@@ -199,7 +199,7 @@ main(void)
 
             fmpz_mpoly_mul_johnson(h, f, g, ctx);
             fmpz_mpoly_assert_canonical(h, ctx);
-            fmpz_mpoly_mul_heap_threaded(g, f, g, ctx);
+            fmpz_mpoly_mul_heap_threaded(g, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             fmpz_mpoly_assert_canonical(g, ctx);
             result = fmpz_mpoly_equal(h, g, ctx);
 

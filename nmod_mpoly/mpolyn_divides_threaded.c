@@ -1723,7 +1723,7 @@ static void worker_loop(void * varg)
 }
 
 /* return 1 if quotient is exact */
-int nmod_mpolyn_divides_threaded_pool(
+int nmod_mpolyn_divides_threaded(
     nmod_mpolyn_t Q,
     const nmod_mpolyn_t A,
     const nmod_mpolyn_t B,

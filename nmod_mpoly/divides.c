@@ -60,7 +60,7 @@ static void _worker_degrees(void * varg)
                                     arg->mctx, arg->handles, arg->num_handles);
 }
 
-int _nmod_mpoly_divides_threaded_pool(
+int _nmod_mpoly_divides(
     nmod_mpoly_t Q,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
@@ -135,7 +135,7 @@ int _nmod_mpoly_divides_threaded_pool(
 
     if (num_handles > 0)
     {
-        divides = _nmod_mpoly_divides_heap_threaded_pool(Q, A, B, ctx,
+        divides = _nmod_mpoly_divides_heap_threaded(Q, A, B, ctx,
                                                          handles, num_handles);
     }
     else
@@ -180,7 +180,7 @@ int nmod_mpoly_divides(
     }
 
     num_handles = flint_request_threads(&handles, thread_limit);
-    divides = _nmod_mpoly_divides_threaded_pool(Q, A, B, ctx, handles, num_handles);
+    divides = _nmod_mpoly_divides(Q, A, B, ctx, handles, num_handles);
     flint_give_back_threads(handles, num_handles);
 
     return divides;

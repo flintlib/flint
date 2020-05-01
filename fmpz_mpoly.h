@@ -732,13 +732,15 @@ FLINT_DLL void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A,
        const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A,
-       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
+       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
 FLINT_DLL int fmpz_mpoly_mul_array(fmpz_mpoly_t A, 
        const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A,
-       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
+       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
 FLINT_DLL int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, 
        const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
@@ -753,7 +755,7 @@ FLINT_DLL void _fmpz_mpoly_mul_johnson_maxfields(fmpz_mpoly_t A,
                                  const fmpz_mpoly_t C, fmpz * maxCfields,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fmpz_mpoly_mul_heap_threaded_pool_maxfields(fmpz_mpoly_t A,
+FLINT_DLL void _fmpz_mpoly_mul_heap_threaded_maxfields(fmpz_mpoly_t A,
            const fmpz_mpoly_t B, fmpz * maxBfields,
            const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
@@ -768,12 +770,12 @@ FLINT_DLL int _fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t A,
                                  const fmpz_mpoly_t C, fmpz * maxCfields,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int _fmpz_mpoly_mul_array_threaded_pool_DEG(fmpz_mpoly_t A,
+FLINT_DLL int _fmpz_mpoly_mul_array_threaded_DEG(fmpz_mpoly_t A,
            const fmpz_mpoly_t B, fmpz * maxBfields,
            const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
-FLINT_DLL int _fmpz_mpoly_mul_array_threaded_pool_LEX(fmpz_mpoly_t A,
+FLINT_DLL int _fmpz_mpoly_mul_array_threaded_LEX(fmpz_mpoly_t A,
            const fmpz_mpoly_t B, fmpz * maxBfields,
            const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
@@ -808,9 +810,10 @@ FLINT_DLL int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t Q,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
-FLINT_DLL int _fmpz_mpoly_divides_heap_threaded_pool(fmpz_mpoly_t Q,
+FLINT_DLL int _fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
@@ -921,7 +924,7 @@ FLINT_DLL void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
 FLINT_DLL int fmpz_mpoly_gcd(fmpz_mpoly_t G,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int _fmpz_mpoly_gcd_threaded_pool(fmpz_mpoly_t G, flint_bitcnt_t Gbits,
+FLINT_DLL int _fmpz_mpoly_gcd(fmpz_mpoly_t G, flint_bitcnt_t Gbits,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
@@ -929,8 +932,7 @@ FLINT_DLL int fmpz_mpoly_gcd_cofactors(fmpz_mpoly_t G,
                 fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, const fmpz_mpoly_t A,
                              const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int _fmpz_mpoly_gcd_cofactors_threaded_pool(
-                                   fmpz_mpoly_t G, flint_bitcnt_t Gbits,
+FLINT_DLL int _fmpz_mpoly_gcd_cofactors(fmpz_mpoly_t G, flint_bitcnt_t Gbits,
                                    fmpz_mpoly_t Abar, flint_bitcnt_t Abarbits,
                                    fmpz_mpoly_t Bbar, flint_bitcnt_t Bbarbits,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
@@ -958,10 +960,12 @@ FLINT_DLL int fmpz_mpoly_gcd_berlekamp_massey(fmpz_mpoly_t G,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL int fmpz_mpoly_gcd_brown_threaded(fmpz_mpoly_t G,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
 FLINT_DLL int fmpz_mpoly_gcd_berlekamp_massey_threaded(fmpz_mpoly_t G,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
+                                                           slong thread_limit);
 
 /******************************************************************************
 
@@ -1117,7 +1121,7 @@ FLINT_DLL void fmpz_mpolyu_one(fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx);
 FLINT_DLL void fmpz_mpolyu_set(fmpz_mpolyu_t A, const fmpz_mpolyu_t B,
                                                   const fmpz_mpoly_ctx_t uctx);
 
-FLINT_DLL void fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(
+FLINT_DLL void fmpz_mpoly_to_mpoly_perm_deflate(
                                 fmpz_mpoly_t A, const fmpz_mpoly_ctx_t lctx,
                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                const slong * perm, const ulong * shift, const ulong * stride,
@@ -1128,7 +1132,7 @@ FLINT_DLL void fmpz_mpoly_from_mpoly_perm_inflate(
                           const fmpz_mpoly_t B,  const fmpz_mpoly_ctx_t lctx,
                 const slong * perm, const ulong * shift, const ulong * stride);
 
-FLINT_DLL void fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(
+FLINT_DLL void fmpz_mpoly_to_mpolyu_perm_deflate(
                                 fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx,
                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                                      const slong * perm, const ulong * shift,
@@ -1140,7 +1144,7 @@ FLINT_DLL void fmpz_mpoly_from_mpolyu_perm_inflate(
                          const fmpz_mpolyu_t B,  const fmpz_mpoly_ctx_t uctx,
                 const slong * perm, const ulong * shift, const ulong * stride);
 
-FLINT_DLL void fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(
+FLINT_DLL void fmpz_mpoly_to_mpolyuu_perm_deflate(
                                 fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t uctx,
                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                                      const slong * perm, const ulong * shift,
@@ -1155,7 +1159,7 @@ FLINT_DLL void fmpz_mpoly_from_mpolyuu_perm_inflate(
 FLINT_DLL int fmpz_mpolyuu_divides(fmpz_mpolyu_t Q, const fmpz_mpolyu_t A,
           const fmpz_mpolyu_t B, slong main_nvars, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpolyuu_divides_threaded_pool(fmpz_mpolyu_t Q, const fmpz_mpolyu_t A,
+FLINT_DLL int fmpz_mpolyuu_divides_threaded(fmpz_mpolyu_t Q, const fmpz_mpolyu_t A,
           const fmpz_mpolyu_t B, slong main_nvars, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
@@ -1187,8 +1191,8 @@ FLINT_DLL void fmpz_mpolyu_shift_left(fmpz_mpolyu_t A, ulong s);
 FLINT_DLL void fmpz_mpolyu_content_fmpz(fmpz_t g, const fmpz_mpolyu_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpolyu_content_mpoly_threaded_pool(fmpz_mpoly_t g,
-                           const fmpz_mpolyu_t A, const fmpz_mpoly_ctx_t ctx,
+FLINT_DLL int fmpz_mpolyu_content_mpoly(fmpz_mpoly_t g, const fmpz_mpolyu_t A,
+                                                   const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void fmpz_mpoly_height(fmpz_t max,
@@ -1201,7 +1205,7 @@ FLINT_DLL int fmpz_mpolyl_gcd_brown(fmpz_mpoly_t G,
         fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, fmpz_mpoly_t A, fmpz_mpoly_t B,
                          const fmpz_mpoly_ctx_t ctx, const mpoly_gcd_info_t I);
 
-FLINT_DLL int fmpz_mpolyl_gcd_brown_threaded_pool(fmpz_mpoly_t G,
+FLINT_DLL int fmpz_mpolyl_gcd_brown_threaded(fmpz_mpoly_t G,
         fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, fmpz_mpoly_t A, fmpz_mpoly_t B,
                          const fmpz_mpoly_ctx_t ctx, const mpoly_gcd_info_t I,
                         const thread_pool_handle * handles, slong num_handles);
@@ -1214,7 +1218,7 @@ FLINT_DLL int fmpz_mpolyuu_gcd_berlekamp_massey(fmpz_mpolyu_t G,
     fmpz_mpolyu_t Abar, fmpz_mpolyu_t Bbar, fmpz_mpolyu_t A, fmpz_mpolyu_t B,
                          const fmpz_mpoly_t Gamma, const fmpz_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpz_mpolyuu_gcd_berlekamp_massey_threaded_pool(fmpz_mpolyu_t G,
+FLINT_DLL int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(fmpz_mpolyu_t G,
     fmpz_mpolyu_t Abar, fmpz_mpolyu_t Bbar, fmpz_mpolyu_t A, fmpz_mpolyu_t B,
                          const fmpz_mpoly_t Gamma, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);

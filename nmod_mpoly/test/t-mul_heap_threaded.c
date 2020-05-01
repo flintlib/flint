@@ -42,7 +42,7 @@ main(void)
 
         nmod_mpoly_mul(h1, f, g, ctx);
         flint_set_num_threads(2);
-        nmod_mpoly_mul_heap_threaded(h2, f, g, ctx);
+        nmod_mpoly_mul_heap_threaded(h2, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
 
         if (!nmod_mpoly_equal(h1, h2, ctx))
         {
@@ -96,7 +96,7 @@ main(void)
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
-            nmod_mpoly_mul_heap_threaded(k, f, g, ctx);
+            nmod_mpoly_mul_heap_threaded(k, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(k, ctx);
             result = nmod_mpoly_equal(h, k, ctx);
 
@@ -153,7 +153,7 @@ main(void)
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
-            nmod_mpoly_mul_heap_threaded(f, f, g, ctx);
+            nmod_mpoly_mul_heap_threaded(f, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(f, ctx);
             result = nmod_mpoly_equal(h, f, ctx);
 
@@ -208,7 +208,7 @@ main(void)
 
             nmod_mpoly_mul_johnson(h, f, g, ctx);
             nmod_mpoly_assert_canonical(h, ctx);
-            nmod_mpoly_mul_heap_threaded(g, f, g, ctx);
+            nmod_mpoly_mul_heap_threaded(g, f, g, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
             nmod_mpoly_assert_canonical(g, ctx);
             result = nmod_mpoly_equal(h, g, ctx);
 
