@@ -334,7 +334,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_LEX(
 }
 
 
-int _nmod_mpoly_mul_array_threaded_LEX(
+int _nmod_mpoly_mul_array_threaded_pool_LEX(
     nmod_mpoly_t A,
     const nmod_mpoly_t B, fmpz * maxBfields,
     const nmod_mpoly_t C, fmpz * maxCfields,
@@ -709,7 +709,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_DEG(
     TMP_END;
 }
 
-int _nmod_mpoly_mul_array_threaded_DEG(
+int _nmod_mpoly_mul_array_threaded_pool_DEG(
     nmod_mpoly_t A,
     const nmod_mpoly_t B, fmpz * maxBfields,
     const nmod_mpoly_t C, fmpz * maxCfields,
@@ -795,14 +795,14 @@ int nmod_mpoly_mul_array_threaded(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
     const nmod_mpoly_t C,
-    const nmod_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i;
     int success;
     fmpz * maxBfields, * maxCfields;
     thread_pool_handle * handles;
     slong num_handles;
+    slong thread_limit = FLINT_MIN(B->length, C->length)/16;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)
@@ -811,9 +811,8 @@ int nmod_mpoly_mul_array_threaded(
         return 1;
     }
 
-    if (  1 != mpoly_words_per_exp(B->bits, ctx->minfo)
-       || 1 != mpoly_words_per_exp(C->bits, ctx->minfo)
-       )
+    if (1 != mpoly_words_per_exp(B->bits, ctx->minfo) ||
+        1 != mpoly_words_per_exp(C->bits, ctx->minfo))
     {
         return 0;
     }
@@ -830,34 +829,20 @@ int nmod_mpoly_mul_array_threaded(
     mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
     mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
 
-    handles = NULL;
-    num_handles = 0;
-    if (global_thread_pool_initialized)
-    {
-        slong max_num_handles;
-        max_num_handles = thread_pool_get_size(global_thread_pool);
-        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-        if (max_num_handles > 0)
-        {
-            handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_handles*sizeof(thread_pool_handle));
-            num_handles = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_handles);
-        }
-    }
+    num_handles = flint_request_threads(&handles, thread_limit);
 
     switch (ctx->minfo->ord)
     {
         case ORD_LEX:
         {
-            success = _nmod_mpoly_mul_array_threaded_LEX(A,
+            success = _nmod_mpoly_mul_array_threaded_pool_LEX(A,
                       B, maxBfields, C, maxCfields, ctx, handles, num_handles);
             break;
         }
         case ORD_DEGREVLEX:
         case ORD_DEGLEX:
         {
-            success = _nmod_mpoly_mul_array_threaded_DEG(A,
+            success = _nmod_mpoly_mul_array_threaded_pool_DEG(A,
                       B, maxBfields, C, maxCfields, ctx, handles, num_handles);
             break;
         }
@@ -868,14 +853,7 @@ int nmod_mpoly_mul_array_threaded(
         }
     }
 
-    for (i = 0; i < num_handles; i++)
-    {
-        thread_pool_give_back(global_thread_pool, handles[i]);
-    }
-    if (handles)
-    {
-        flint_free(handles);
-    }
+    flint_give_back_threads(handles, num_handles);
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
