@@ -628,6 +628,13 @@ FLINT_DLL void nmod_poly_powmod_ui_binexp(nmod_poly_t res,
 FLINT_DLL void _nmod_poly_powmod_ui_binexp(mp_ptr res, mp_srcptr poly, 
                                 ulong e, mp_srcptr f, slong lenf, nmod_t mod);
 
+FLINT_DLL void nmod_poly_powmod_fmpz_binexp(nmod_poly_t res,
+                           const nmod_poly_t poly, fmpz_t e,
+                           const nmod_poly_t f);
+
+FLINT_DLL void _nmod_poly_powmod_fmpz_binexp(mp_ptr res, mp_srcptr poly,
+                                fmpz_t e, mp_srcptr f, slong lenf, nmod_t mod);
+
 FLINT_DLL void _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly, 
                                 mpz_srcptr e, mp_srcptr f,
                                 slong lenf, nmod_t mod);
