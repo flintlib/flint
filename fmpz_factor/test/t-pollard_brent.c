@@ -69,7 +69,7 @@ int main(void)
         }
     }
 
-    if (fails > flint_test_multiplier())
+    if (fails > 2*flint_test_multiplier())
     {
         printf("FAIL : Pollard Rho failed too many times (%d times)\n", fails);
         abort();
