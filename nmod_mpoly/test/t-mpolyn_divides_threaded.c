@@ -9,8 +9,23 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#undef ulong
+
+#include <gmp.h>
+#include <pthread.h>
+
+#define ulong mp_limb_t
+
+#include "flint.h"
 #include "nmod_mpoly.h"
 #include "thread_support.h"
+
 
 void _divides_check(
     const nmod_mpoly_t A,
