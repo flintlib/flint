@@ -57,7 +57,7 @@ ca_qqbar_equal(const ca_qqbar_t x, const ca_qqbar_t y)
 
         acb_union(z3, z1, z2, prec);
 
-        if (_ca_qqbar_validate_enclosure(z3, CA_QQBAR_POLY(x), z3, 2 * prec))
+        if (_ca_qqbar_validate_uniqueness(z3, CA_QQBAR_POLY(x), z3, 2 * prec))
         {
             res = 1;
             break;

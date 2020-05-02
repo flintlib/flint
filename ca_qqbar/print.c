@@ -14,9 +14,17 @@
 void
 ca_qqbar_print(const ca_qqbar_t x)
 {
-    flint_printf("ca_qqbar with poly = {");
-    fmpz_poly_print(CA_QQBAR_POLY(x));
-    flint_printf("} and enclosure = ");
+    slong i, d;
+    d = ca_qqbar_degree(x);
+
+    flint_printf("deg %wd [", ca_qqbar_degree(x));
+    for (i = 0; i <= d; i++)
+    {
+        fmpz_print(CA_QQBAR_COEFFS(x) + i);
+        if (i < d)
+            flint_printf(", ");
+    }
+    flint_printf("] ");
     acb_printn(CA_QQBAR_ENCLOSURE(x), FLINT_MAX(6, FLINT_MIN(acb_rel_accuracy_bits(CA_QQBAR_ENCLOSURE(x)),
         acb_bits(CA_QQBAR_ENCLOSURE(x)))), 0);
 }

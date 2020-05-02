@@ -129,7 +129,7 @@ _ca_qqbar_randtest(ca_qqbar_t res, flint_rand_t state, slong deg, slong bits, in
     {
         arb_fmpz_poly_complex_roots(roots, pol, 0, prec);
 
-        if (_ca_qqbar_validate_enclosure(roots + i, pol, roots + i, 2 * prec))
+        if (_ca_qqbar_validate_uniqueness(roots + i, pol, roots + i, 2 * prec))
         {
             fmpz_poly_set(CA_QQBAR_POLY(res), pol);
             acb_set(CA_QQBAR_ENCLOSURE(res), roots + i);

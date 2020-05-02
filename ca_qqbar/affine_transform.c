@@ -148,7 +148,7 @@ ca_qqbar_scalar_op(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t a, const fmp
                 acb_div_fmpz(w, w, c, prec);
         }
 
-        if (_ca_qqbar_validate_enclosure(t, H, w, 2 * prec))
+        if (_ca_qqbar_validate_uniqueness(t, H, w, 2 * prec))
         {
             fmpz_poly_set(CA_QQBAR_POLY(res), H);
             acb_set(CA_QQBAR_ENCLOSURE(res), t);

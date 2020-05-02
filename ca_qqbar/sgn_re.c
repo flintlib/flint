@@ -59,7 +59,7 @@ ca_qqbar_sgn_re(const ca_qqbar_t x)
             {
                 acb_set(u, t);
                 arb_zero(acb_realref(u));
-                if (_ca_qqbar_validate_enclosure(u, CA_QQBAR_POLY(x), u, prec * 2) && arb_is_zero(acb_realref(u)))
+                if (_ca_qqbar_validate_existence_uniqueness(u, CA_QQBAR_POLY(x), u, prec * 2))
                 {
                     res = 0;
                     break;

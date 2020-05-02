@@ -50,7 +50,7 @@ ca_qqbar_sgn_im(const ca_qqbar_t x)
             acb_conj(u, t);
             acb_union(u, u, t, prec);
 
-            if (_ca_qqbar_validate_enclosure(u, CA_QQBAR_POLY(x), u, 2 * prec))
+            if (_ca_qqbar_validate_uniqueness(u, CA_QQBAR_POLY(x), u, 2 * prec))
                 break;
         }
 

@@ -83,7 +83,7 @@ ca_qqbar_root_ui(ca_qqbar_t res, const ca_qqbar_t x, ulong n)
             /* Check if the enclosure is good enough */
             if (found >= 0)
             {
-                if (_ca_qqbar_validate_enclosure(t, fac->p + found, w, 2 * prec))
+                if (_ca_qqbar_validate_uniqueness(t, fac->p + found, w, 2 * prec))
                 {
                     fmpz_poly_set(CA_QQBAR_POLY(res), fac->p + found);
                     acb_set(CA_QQBAR_ENCLOSURE(res), t);

@@ -62,7 +62,7 @@ ca_qqbar_inv(ca_qqbar_t res, const ca_qqbar_t x)
             _ca_qqbar_enclosure_raw(z, CA_QQBAR_POLY(x), z, prec);
             acb_inv(t, z, prec);
 
-            if (_ca_qqbar_validate_enclosure(t, pol, t, 2 * prec))
+            if (_ca_qqbar_validate_uniqueness(t, pol, t, 2 * prec))
             {
                 fmpz_poly_set(CA_QQBAR_POLY(res), pol);
                 acb_set(CA_QQBAR_ENCLOSURE(res), t);

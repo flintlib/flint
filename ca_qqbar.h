@@ -24,6 +24,8 @@ extern "C" {
 
 #include "flint/fmpz_poly.h"
 #include "flint/fmpq_poly.h"
+#include "flint/fmpz_mat.h"
+#include "flint/fmpq_mat.h"
 #include "acb.h"
 
 typedef struct
@@ -33,19 +35,40 @@ typedef struct
 }
 ca_qqbar_struct;
 
+typedef ca_qqbar_struct ca_qqbar_t[1];
+typedef ca_qqbar_struct * ca_qqbar_ptr;
+typedef const ca_qqbar_struct * ca_qqbar_srcptr;
+
 #define CA_QQBAR_POLY(x) (&((x)->poly))
 #define CA_QQBAR_COEFFS(x) ((&((x)->poly))->coeffs)
 #define CA_QQBAR_ENCLOSURE(x) (&((x)->enclosure))
 
 #define CA_QQBAR_DEFAULT_PREC 128
 
-typedef ca_qqbar_struct ca_qqbar_t[1];
-
 /* Memory management */
 
 void ca_qqbar_init(ca_qqbar_t res);
 
 void ca_qqbar_clear(ca_qqbar_t res);
+
+CA_QQBAR_INLINE ca_qqbar_ptr
+ca_qqbar_vec_init(slong len)
+{
+    slong i;
+    ca_qqbar_ptr vec = flint_malloc(len * sizeof(ca_qqbar_struct));
+    for (i = 0; i < len; i++)
+        ca_qqbar_init(vec + i);
+    return vec;
+}
+
+CA_QQBAR_INLINE void
+ca_qqbar_vec_clear(ca_qqbar_ptr vec, slong len)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        ca_qqbar_clear(vec + i);
+    flint_free(vec);
+}
 
 /* Assignment */
 
@@ -150,6 +173,10 @@ void ca_qqbar_randtest_nonreal(ca_qqbar_t res, flint_rand_t state, slong deg, sl
 /* Input and output */
 
 void ca_qqbar_print(const ca_qqbar_t x);
+
+void ca_qqbar_printn(const ca_qqbar_t x, slong n);
+
+void ca_qqbar_printnd(const ca_qqbar_t x, slong n);
 
 /* Comparisons */
 
@@ -259,6 +286,22 @@ void ca_qqbar_get_arb_re(arb_t res, const ca_qqbar_t x, slong prec);
 
 void ca_qqbar_get_arb_im(arb_t res, const ca_qqbar_t x, slong prec);
 
+/* Conjugates */
+
+void ca_qqbar_conjugates(ca_qqbar_ptr res, const ca_qqbar_t x);
+
+/* Polynomial roots */
+
+#define CA_QQBAR_ROOTS_IRREDUCIBLE 1
+
+void ca_qqbar_roots_fmpz_poly(ca_qqbar_ptr res, const fmpz_poly_t poly, int flags);
+
+void ca_qqbar_roots_fmpq_poly(ca_qqbar_ptr res, const fmpq_poly_t poly, int flags);
+
+void ca_qqbar_eigenvalues_fmpz_mat(ca_qqbar_ptr res, const fmpz_mat_t mat, int flags);
+
+void ca_qqbar_eigenvalues_fmpq_mat(ca_qqbar_ptr res, const fmpq_mat_t mat, int flags);
+
 /* Internal functions */
 
 void ca_qqbar_scalar_op(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t a, const fmpz_t b, const fmpz_t c);
@@ -267,7 +310,9 @@ void ca_qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const 
 
 void ca_qqbar_binary_op(ca_qqbar_t res, const ca_qqbar_t x, const ca_qqbar_t y, int op);
 
-int _ca_qqbar_validate_enclosure(acb_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec);
+int _ca_qqbar_validate_uniqueness(acb_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec);
+
+int _ca_qqbar_validate_existence_uniqueness(acb_t res, const fmpz_poly_t poly, const acb_t z, slong prec);
 
 void _ca_qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong prec);
 

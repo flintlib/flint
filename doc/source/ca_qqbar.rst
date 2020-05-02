@@ -16,7 +16,7 @@ on numbers of degrees *m* and *n* involves computing and then factoring an
 annihilating polynomial of degree *mn* and potentially also performing
 numerical root-finding. For doing repeated arithmetic, it is generally
 far more efficient to work in a fixed number field.
-The :type:`ca_qqbar_t` type is intended to be used to represent the
+The :type:`ca_qqbar_t` type may be used to represent the
 embedding of a number field in `\mathbb{R}` or `\mathbb{C}` in such a setting.
 
 
@@ -31,6 +31,15 @@ Types, macros and constants
     A *ca_qqbar_t* is defined as an array of length one of type
     *ca_qqbar_struct*, permitting a *ca_qqbar_t* to be passed by
     reference.
+
+.. type:: ca_qqbar_ptr
+
+    Alias for ``ca_qqbar_struct *``, used for *ca_qqbar* vectors.
+
+.. type:: ca_qqbar_srcptr
+
+    Alias for ``const ca_qqbar_struct *``, used for *ca_qqbar* vectors
+    when passed as readonly input to functions.
 
 .. macro:: CA_QQBAR_POLY(x)
 
@@ -55,6 +64,15 @@ Memory management
 .. function:: void ca_qqbar_clear(ca_qqbar_t res)
 
     Clears the variable *res*, freeing or recycling its allocated memory.
+
+.. function:: ca_qqbar_ptr ca_qqbar_vec_init(slong len)
+
+    Returns a pointer to an array of *len* initialized *ca_qqbar_struct*:s.
+
+.. function:: void ca_qqbar_vec_clear(ca_qqbar_ptr vec, slong len)
+
+    Clears all *len* entries in the vector *vec* and frees the
+    vector itself.
 
 Assignment
 -------------------------------------------------------------------------------
@@ -144,9 +162,44 @@ Input and output
 
 .. function:: void ca_qqbar_print(const ca_qqbar_t x)
 
-    Prints *res* to standard output. The output shows the list of coefficients
+    Prints *res* to standard output. The output shows the degree
+    and the list of coefficients
     of the minimal polynomial followed by a decimal representation of
     the enclosing interval. This function is mainly intended for debugging.
+
+.. function:: void ca_qqbar_printn(const ca_qqbar_t x, slong n)
+
+    Prints *res* to standard output. The output shows a decimal
+    approximation to *n* digits.
+
+.. function:: void ca_qqbar_printnd(const ca_qqbar_t x, slong n)
+
+    Prints *res* to standard output. The output shows a decimal
+    approximation to *n* digits, followed by the degree of the number.
+
+For example, *print*, *printn* and *printnd* with `n = 6` give
+the following output for the numbers 0, 1, `i`, `\varphi`, `\sqrt{2}-\sqrt{3} i`:
+
+.. code ::
+
+    deg 1 [0, 1] 0
+    deg 1 [-1, 1] 1.00000
+    deg 2 [1, 0, 1] 1.00000*I
+    deg 2 [-1, -1, 1] [1.61803398874989484820458683436563811772 +/- 6.00e-39]
+    deg 4 [25, 0, 2, 0, 1] [1.4142135623730950488016887242096980786 +/- 8.67e-38] + [-1.732050807568877293527446341505872367 +/- 1.10e-37]*I
+
+    0
+    1.00000
+    1.00000*I
+    1.61803
+    1.41421 - 1.73205*I
+
+    0 (deg 1)
+    1.00000 (deg 1)
+    1.00000*I (deg 2)
+    1.61803 (deg 2)
+    1.41421 - 1.73205*I (deg 4)
+
 
 Random generation
 -------------------------------------------------------------------------------
@@ -364,10 +417,9 @@ The following functions guarantee a polished output in which both the real
 and imaginary parts are accurate to *prec* bits and exact when exactly
 representable (that is, when a real or imaginary part is a sufficiently
 small dyadic number).
-
 In some cases, the computations needed to polish the output may be
 expensive. When polish is unnecessary, :func:`ca_qqbar_enclosure_raw`
-can be used instead.
+may be used instead.
 
 .. function:: void ca_qqbar_get_acb(acb_t res, const ca_qqbar_t x, slong prec)
 
@@ -387,6 +439,43 @@ can be used instead.
 
     Sets *res* to an enclosure of the imaginary part of *x* rounded to *prec* bits.
 
+Conjugates
+-------------------------------------------------------------------------------
+
+.. function:: void ca_qqbar_conjugates(ca_qqbar_ptr res, const ca_qqbar_t x)
+
+    Sets the entries of the vector *res* to the *d* algebraic conjugates of
+    *x*, including *x* itself, where *d* is the degree of *x*. The output is
+    not guaranteed to be sorted in any particular order.
+
+Polynomial roots
+-------------------------------------------------------------------------------
+
+.. function:: void ca_qqbar_roots_fmpz_poly(ca_qqbar_ptr res, const fmpz_poly_t poly, int flags)
+
+.. function:: void ca_qqbar_roots_fmpq_poly(ca_qqbar_ptr res, const fmpq_poly_t poly, int flags)
+
+    Sets the entries of the vector *res* to the *d* roots of the polynomial
+    *poly*. Roots with multiplicity appear with repetition in the
+    output array.
+    The output is not guaranteed to be sorted in any particular order,
+    except that all instances of a repeated root always appear
+    consecutively.
+
+    The following *flags* are supported:
+
+    - CA_QQBAR_ROOTS_IRREDUCIBLE - if set, *poly* is assumed to be
+      irreducible (it may still have constant content), and no polynomial
+      factorisation is performed internally.
+
+.. function:: void ca_qqbar_eigenvalues_fmpz_mat(ca_qqbar_ptr res, const fmpz_mat_t mat, int flags)
+
+.. function:: void ca_qqbar_eigenvalues_fmpq_mat(ca_qqbar_ptr res, const fmpz_mat_t mat, int flags)
+
+    Sets the entries of the vector *res* to the eigenvalues of the
+    square matrix *mat*. These functions compute the characteristic polynomial
+    of *mat* and then call :func:`ca_qqbar_roots_fmpz_poly` with the same
+    flags.
 
 Internal functions
 -------------------------------------------------------------------------------
@@ -404,12 +493,29 @@ Internal functions
     Performs a binary operation using a generic algorithm. This does not
     check for special cases.
 
-.. function:: int _ca_qqbar_validate_enclosure(acb_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec)
+.. function:: int _ca_qqbar_validate_uniqueness(acb_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec)
 
     Given *z* known to be an enclosure of at least one root of *poly*,
     certifies that the enclosure contains a unique root, and in that
     case sets *res* to a new (possibly improved) enclosure for the same
     root, returning 1. Returns 0 if uniqueness cannot be certified.
+
+    The enclosure is validated by performing a single step with the
+    interval Newton method. The working precision is determined from the
+    accuracy of *z*, but limited by *max_prec* bits.
+
+    This method slightly inflates the enclosure *z* to improve the chances
+    that the interval Newton step will succeed. Uniqueness on this larger
+    interval implies uniqueness of the original interval, but not
+    existence; when existence has not been ensured a priori,
+    :func:`_ca_qqbar_validate_existence_uniqueness` should be used instead.
+
+.. function:: int _ca_qqbar_validate_existence_uniqueness(acb_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec)
+
+    Given any complex interval *z*, certifies that the enclosure contains a
+    unique root of *poly*, and in that case sets *res* to a new (possibly
+    improved) enclosure for the same root, returning 1. Returns 0 if
+    existence and uniqueness cannot be certified.
 
     The enclosure is validated by performing a single step with the
     interval Newton method. The working precision is determined from the
