@@ -34,6 +34,7 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "fmpz_mod.h"
+#include "thread_support.h"
 
 #ifdef __cplusplus
  extern "C" {

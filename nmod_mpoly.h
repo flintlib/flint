@@ -35,7 +35,7 @@
 #include "fmpz_vec.h"
 #include "mpoly.h"
 #include "fq_nmod_poly.h"
-#include "thread_pool.h"
+#include "thread_support.h"
 
 
 #ifdef __cplusplus
