@@ -302,6 +302,26 @@ void ca_qqbar_eigenvalues_fmpz_mat(ca_qqbar_ptr res, const fmpz_mat_t mat, int f
 
 void ca_qqbar_eigenvalues_fmpq_mat(ca_qqbar_ptr res, const fmpq_mat_t mat, int flags);
 
+/* Roots of unity and trigonometric functions */
+
+ulong ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x);
+
+void ca_qqbar_root_of_unity(ca_qqbar_t res, slong p, ulong q);
+
+void ca_qqbar_exp_pi_i(ca_qqbar_t res, slong p, ulong q);
+
+void ca_qqbar_cos_pi(ca_qqbar_t res, slong p, ulong q);
+
+void ca_qqbar_sin_pi(ca_qqbar_t res, slong p, ulong q);
+
+void ca_qqbar_tan_pi(ca_qqbar_t res, slong p, ulong q);
+
+void ca_qqbar_cot_pi(ca_qqbar_t res, slong p, ulong q);
+
+void ca_qqbar_sec_pi(ca_qqbar_t res, slong p, ulong q);
+
+void ca_qqbar_csc_pi(ca_qqbar_t res, slong p, ulong q);
+
 /* Internal functions */
 
 void ca_qqbar_scalar_op(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t a, const fmpz_t b, const fmpz_t c);

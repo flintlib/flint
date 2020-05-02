@@ -477,6 +477,41 @@ Polynomial roots
     of *mat* and then call :func:`ca_qqbar_roots_fmpz_poly` with the same
     flags.
 
+Roots of unity and trigonometric functions
+-------------------------------------------------------------------------------
+
+.. function:: ulong ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x)
+
+    If *x* is a root of unity,
+    returns the minimal *q* such that `x = e^{2 \pi i p / q}`,
+    and if the pointer to *p* is not NULL, writes the unique
+    index with `0 \le p < q`.
+    Returns 0 if *x* is not a root of unity.
+
+.. function:: void ca_qqbar_root_of_unity(ca_qqbar_t res, slong p, ulong q)
+
+    Sets *res* to the root of unity `e^{2 \pi i p / q}`.
+
+.. function:: void ca_qqbar_exp_pi_i(ca_qqbar_t res, slong p, ulong q)
+
+    Sets *res* to the root of unity `e^{\pi i p / q}`.
+
+.. function:: void ca_qqbar_cos_pi(ca_qqbar_t res, slong p, ulong q)
+
+.. function:: void ca_qqbar_sin_pi(ca_qqbar_t res, slong p, ulong q)
+
+.. function:: void ca_qqbar_tan_pi(ca_qqbar_t res, slong p, ulong q)
+
+.. function:: void ca_qqbar_cot_pi(ca_qqbar_t res, slong p, ulong q)
+
+.. function:: void ca_qqbar_sec_pi(ca_qqbar_t res, slong p, ulong q)
+
+.. function:: void ca_qqbar_csc_pi(ca_qqbar_t res, slong p, ulong q)
+
+    Sets *res* to the trigonometric function `\cos(\pi x)`,
+    `\sin(\pi x)`, etc., with `x = \tfrac{p}{q}`.
+
+
 Internal functions
 -------------------------------------------------------------------------------
 
