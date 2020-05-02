@@ -142,7 +142,8 @@ main(void)
 	if (fmpz_cmp_ui(exp, 32) <= 0)
         {
            nmod_poly_zero(res2);
-           nmod_poly_set_coeff_ui(res2, 0, 1);
+           if (nmod_poly_length(f) > 1)
+	       nmod_poly_set_coeff_ui(res2, 0, 1);
            for (j = 1; j <= fmpz_get_ui(exp); j++)
                nmod_poly_mulmod(res2, res2, a, f);
 	} else

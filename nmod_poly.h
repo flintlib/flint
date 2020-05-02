@@ -673,6 +673,11 @@ FLINT_DLL void nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
                            const nmod_poly_t poly, mpz_srcptr e,
                            const nmod_poly_t f, const nmod_poly_t finv);
 
+FLINT_DLL void _nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,
+                               mp_srcptr finv, slong lenfinv, nmod_t mod);
+
+FLINT_DLL void nmod_poly_powmod_x_fmpz_preinv(nmod_poly_t res, fmpz_t e, const nmod_poly_t f,                             const nmod_poly_t finv);
+
 FLINT_DLL void _nmod_poly_powers_mod_preinv_naive(mp_ptr * res, mp_srcptr f,
 		 slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv,
 		                              slong ginvlen, const nmod_t mod);

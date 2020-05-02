@@ -92,6 +92,12 @@ nmod_poly_powmod_fmpz_binexp(nmod_poly_t res,
         flint_abort();
     }
 
+    if (lenf == 1)
+    {
+        nmod_poly_zero(res);
+        return;
+    }
+
     if (len >= lenf)
     {
         nmod_poly_t t, r;
@@ -121,7 +127,7 @@ nmod_poly_powmod_fmpz_binexp(nmod_poly_t res,
         return;
     }
 
-    if (lenf == 1 || len == 0)
+    if (len == 0)
     {
         nmod_poly_zero(res);
         return;

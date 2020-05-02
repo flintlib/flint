@@ -133,7 +133,8 @@ main(void)
         nmod_poly_powmod_ui_binexp(res1, a, exp, f);
 
         nmod_poly_zero(res2);
-        nmod_poly_set_coeff_ui(res2, 0, 1);
+        if (nmod_poly_length(f) > 1)
+	    nmod_poly_set_coeff_ui(res2, 0, 1);
         for (j = 1; j <= exp; j++)
             nmod_poly_mulmod(res2, res2, a, f);
 

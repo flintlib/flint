@@ -109,6 +109,12 @@ nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
         flint_abort();
     }
 
+    if (lenf == 1)
+    {
+        nmod_poly_zero(res);
+        return;
+    }
+
     if (mpz_sgn(e) < 0)
     {
         flint_printf("Exception (nmod_poly_powmod_mpz_binexp_preinv). Negative exp not implemented.\n");
@@ -149,7 +155,7 @@ nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
         }
     }
 
-    if (lenf == 1 || len == 0)
+    if (len == 0)
     {
         nmod_poly_zero(res);
         return;
