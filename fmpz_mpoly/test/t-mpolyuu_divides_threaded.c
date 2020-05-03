@@ -22,8 +22,8 @@
 
 #define ulong mp_limb_t
 
-#include "flint.h"
 #include "fmpz_mpoly.h"
+#include "flint.h"
 #include "thread_support.h"
 
 static void bivar_divides_check(
