@@ -26,24 +26,6 @@
 #include "fmpz_mpoly.h"
 #include "thread_support.h"
 
-FLINT_DLL void bivar_divides_check(
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx,
-    slong ii,
-    slong jj,
-    const char * name,
-    flint_rand_t randstate);
-
-FLINT_DLL void univar_divides_check(
-    const fmpz_mpoly_t A,
-    const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx,
-    slong ii,
-    slong jj,
-    const char * name,
-    flint_rand_t randstate);
-
 void bivar_divides_check(
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
