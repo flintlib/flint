@@ -11,7 +11,7 @@
 
 #include "fmpz_mpoly.h"
 
-void bivar_divides_check(
+static void bivar_divides_check(
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
     const fmpz_mpoly_ctx_t ctx,
