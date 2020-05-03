@@ -25,7 +25,6 @@
 
 #include "flint.h"
 #include "fmpz_mpoly.h"
-#include "thread_support.h"
 
 static void bivar_divides_check(
     const fmpz_mpoly_t A,
