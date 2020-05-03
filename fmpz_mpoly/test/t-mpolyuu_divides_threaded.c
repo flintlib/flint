@@ -9,7 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-
 #undef ulong
 #define ulong ulongxx/* interferes with system includes */
 
