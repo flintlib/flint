@@ -33,13 +33,17 @@ void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 
     fmpz_poly_init(g);
 
-    if (lenG == 2)
+    if (lenG <= 3)
     {
         fmpz_poly_content(&fac->c, G);
         if (fmpz_sgn(fmpz_poly_lead(G)) < 0)
             fmpz_neg(&fac->c, &fac->c);
         fmpz_poly_scalar_divexact_fmpz(g, G, &fac->c);
-        fmpz_poly_factor_insert(fac, g, 1);
+
+        if (lenG == 2)
+            fmpz_poly_factor_insert(fac, g, 1);
+        else
+            _fmpz_poly_factor_quadratic(fac, g, 1);
     }
     else
     {
