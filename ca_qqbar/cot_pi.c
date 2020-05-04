@@ -14,21 +14,28 @@
 void
 ca_qqbar_cot_pi(ca_qqbar_t res, slong p, ulong q)
 {
-    ca_qqbar_t t, u;
+    slong g;
 
-    ca_qqbar_init(t);
-    ca_qqbar_init(u);
+    g = n_gcd(FLINT_ABS(p), q);
 
-    ca_qqbar_sin_pi(t, p, q);
-    ca_qqbar_cos_pi(u, p, q);
+    if (g != 1)
+    {
+        p /= g;
+        q /= g;
+    }
 
-    /* the monic polynomials have smaller coefficients */
-    ca_qqbar_mul_2exp_si(t, t, 1);
-    ca_qqbar_mul_2exp_si(u, u, 1);
-
-    ca_qqbar_div(res, u, t);
-
-    ca_qqbar_clear(t);
-    ca_qqbar_clear(u);
+    if (q == 1)
+    {
+        flint_printf("ca_qqbar_tan_pi: division by zero\n");
+        flint_abort();
+    }
+    else if (q == 2)
+    {
+        ca_qqbar_zero(res);
+    }
+    else
+    {
+        ca_qqbar_tan_pi(res, p, q);
+        ca_qqbar_inv(res, res);
+    }
 }
-

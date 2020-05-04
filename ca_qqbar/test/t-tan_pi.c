@@ -21,7 +21,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 200; iter++)
+    for (iter = 0; iter < 500; iter++)
     {
         ca_qqbar_t x;
         arb_t z, w;
@@ -35,7 +35,7 @@ int main()
         arb_init(w);
         fmpq_init(t);
 
-        q = 1 + n_randint(state, 20);
+        q = 1 + n_randint(state, 30);
         p = n_randint(state, 1000);
         p -= 500;
         prec = 2 + n_randint(state, 1000);
@@ -55,7 +55,7 @@ int main()
                 flint_printf("FAIL!\n");
                 flint_printf("x = "); ca_qqbar_print(x); flint_printf("\n\n");
                 flint_printf("z = "); arb_printn(z, 200, 0); flint_printf("\n\n");
-                flint_printf("w = "); arb_printn(z, 200, 0); flint_printf("\n\n");
+                flint_printf("w = "); arb_printn(w, 200, 0); flint_printf("\n\n");
                 flint_printf("p, q = %wd %wu\n\n", p, q);
                 flint_abort();
             }
