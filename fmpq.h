@@ -477,6 +477,13 @@ FLINT_DLL void _fmpz_vector_push_back_zero(_fmpz_vector_t v);
 
 FLINT_DLL void _fmpz_vector_append_ui(_fmpz_vector_t v, const ulong * a, slong n);
 
+FMPQ_INLINE void _fmpz_vector_swap(_fmpz_vector_t a, _fmpz_vector_t b)
+{
+    _fmpz_vector_struct t = *a;
+    *a = *b;
+    *b = t;
+}
+
 /*************** ball for closed interval [left, right] **********************/
 
 typedef struct {

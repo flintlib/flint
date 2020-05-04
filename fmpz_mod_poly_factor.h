@@ -127,6 +127,14 @@ FLINT_DLL void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
 
 FLINT_DLL void _fmpz_mod_poly_interval_poly_worker(void * arg_ptr);
 
+/* Roots *********************************************************************/
+
+FLINT_DLL void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r,
+                                       const fmpz_mod_poly_t f, int want_mult);
+
+FLINT_DLL int fmpz_mod_poly_roots_general(fmpz_mod_poly_factor_t r,
+                const fmpz_mod_poly_t f, int want_mult, const fmpz_factor_t n);
+
 #ifdef __cplusplus
 }
 #endif

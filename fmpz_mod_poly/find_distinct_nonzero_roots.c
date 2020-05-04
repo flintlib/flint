@@ -12,49 +12,46 @@
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod.h"
 
+
 /* split f assuming that f has degree(f) distinct nonzero roots in Fp */
-static void _fmpz_mod_poly_rabinsplit(
+void _fmpz_mod_poly_split_rabin(
     fmpz_mod_poly_t a,
     fmpz_mod_poly_t b,
     fmpz_mod_poly_t T,
     const fmpz_mod_poly_t f,
+    const fmpz_t halfp,
     flint_rand_t randstate)
 {
-    fmpz_t delta;
-
-    fmpz_init(delta);
-
     FLINT_ASSERT(fmpz_mod_poly_degree(f) > 1);
 
 try_again:
 
-    fmpz_randm(delta, randstate, &f->p);
+    /* a = random linear */
+    fmpz_mod_poly_fit_length(a, 2);
+    fmpz_one(a->coeffs + 1);
+    fmpz_randm(a->coeffs + 0, randstate, &f->p);
+    a->length = 2;
 
-    fmpz_mod_poly_zero(a);
-    fmpz_mod_poly_set_coeff_ui(a, 1, 1);
-    fmpz_mod_poly_set_coeff_fmpz(a, 0, delta);
-    fmpz_sub_ui(delta, &f->p, 1);
-    fmpz_divexact_ui(delta, delta, 2);
-    fmpz_mod_poly_powmod_fmpz_binexp(T, a, delta, f);
+    fmpz_mod_poly_powmod_fmpz_binexp(T, a, halfp, f);
     fmpz_mod_poly_zero(a);
     fmpz_mod_poly_set_coeff_ui(a, 0, 1);
     fmpz_mod_poly_sub(T, T, a);
     fmpz_mod_poly_gcd(a, T, f);
-    FLINT_ASSERT(!fmpz_mod_poly_is_zero(a));
-    if (0 >= fmpz_mod_poly_degree(a) || fmpz_mod_poly_degree(a) >= fmpz_mod_poly_degree(f))
-    {
-        goto try_again;
-    }
-    fmpz_mod_poly_div_basecase(b, f, a);
-    /* deg a >= deg b */
-    if (fmpz_mod_poly_degree(a) < fmpz_mod_poly_degree(b))
-    {
-        fmpz_mod_poly_swap(a, b);
-    }
 
-    fmpz_clear(delta);
+    FLINT_ASSERT(!fmpz_mod_poly_is_zero(a));
+
+    if (0 >= fmpz_mod_poly_degree(a) || fmpz_mod_poly_degree(a) >= fmpz_mod_poly_degree(f))
+        goto try_again;
+
+    fmpz_mod_poly_div_basecase(b, f, a);
+
+    /* ensure deg a >= deg b */
+    if (fmpz_mod_poly_degree(a) < fmpz_mod_poly_degree(b))
+        fmpz_mod_poly_swap(a, b);
+
     return;
 }
+
 
 /*
     If P has deg(P) distinct nonzero roots of P, fill them in and return 1.
@@ -167,8 +164,11 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
         }
         else
         {
-            _fmpz_mod_poly_rabinsplit(stack + sp + 0, stack + sp + 1, T, f, randstate);
-            FLINT_ASSERT(FLINT_BIT_COUNT(fmpz_mod_poly_degree(stack + sp + 1)) <= FLINT_BITS - sp - 1);
+            _fmpz_mod_poly_split_rabin(stack + sp + 0, stack + sp + 1, T, f,
+                                                             halfp, randstate);
+
+            FLINT_ASSERT(FLINT_BIT_COUNT(fmpz_mod_poly_degree(stack + sp + 1))
+                                                       <= FLINT_BITS - sp - 1);
             sp += 2;
         }
     }

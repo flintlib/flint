@@ -1185,6 +1185,11 @@ FLINT_DLL void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz
 FLINT_DLL int fmpz_mod_poly_find_distinct_nonzero_roots(fmpz * roots,
                                                       const fmpz_mod_poly_t P);
 
+FLINT_DLL void _fmpz_mod_poly_split_rabin(fmpz_mod_poly_t a, fmpz_mod_poly_t b,
+                fmpz_mod_poly_t T, const fmpz_mod_poly_t f, const fmpz_t halfp,
+                                                       flint_rand_t randstate);
+
+
 /* Berlekamp-Massey Algorithm - see fmpz_mod_poly/berlekamp_massey.c for more info ********/
 typedef struct {
     slong npoints;
