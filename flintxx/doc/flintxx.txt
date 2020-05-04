@@ -1211,7 +1211,7 @@ Fmpz_poly_expr div_root(Fmpz_poly_expr, Fmpz_expr)
 Ltuple<bool, fmpz_polyxx>_expr divides(Fmpz_poly_expr A, Fmpz_poly_expr B)
 
     \code{ltupleref(d, Q) = divides(A, B)} sets \code{d} to \code{true}
-    and \code{Q} to \code{B/A} if \code{A} divides \code{B}, and else sets
+    and \code{Q} to \code{A/B} if \code{B} divides \code{A}, and else sets
     \code{d} to \code{false}. See \code{fmpz_poly_divides}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -136,7 +136,8 @@ main(void)
         fmpz_mod_poly_powmod_ui_binexp(res1, a, exp, f);
 
         fmpz_mod_poly_zero(res2);
-        fmpz_mod_poly_set_coeff_ui(res2, 0, 1);
+        if (fmpz_mod_poly_length(f) > 1)
+            fmpz_mod_poly_set_coeff_ui(res2, 0, 1);
         for (j = 1; j <= exp; j++)
             fmpz_mod_poly_mulmod(res2, res2, a, f);
 

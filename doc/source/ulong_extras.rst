@@ -1203,6 +1203,14 @@ Factorisation
     If the algorithm succeeds, it returns the factor, otherwise it
     returns `0` or `1` (the trivial factors modulo `n`).
 
+.. function:: ulong n_factor_pp1_wrapper(ulong n)
+
+    A simple wrapper around ``n_factor_pp1`` which works in the range
+    `31`-`64` bits. Below this point, trial factoring will always succeed.
+    This function mainly exists for ``n_factor`` and is tuned to minimise
+    the time for ``n_factor`` on numbers that reach the ``n_factor_pp1``
+    stage, i.e. after trial factoring and one line factoring.
+
 .. function:: int n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv, mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits, mp_limb_t max_iters)
 
     Pollard Rho algorithm (with Brent modification) for integer factorization. 

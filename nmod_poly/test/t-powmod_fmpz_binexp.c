@@ -1,7 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
     Copyright (C) 2011 Fredrik Johansson
-    Copyright (C) 2013 Martin Lee
 
     This file is part of FLINT.
 
@@ -11,18 +10,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
-
-#include <stdlib.h>
 #include <stdio.h>
-
-#undef ulong
-
+#include <stdlib.h>
 #include <gmp.h>
-
-#define ulong mp_limb_t
-
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -33,24 +23,24 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
 
-    flint_printf("powmod_ui_binexp_preinv....");
+    flint_printf("powmod_fmpz_binexp....");
     fflush(stdout);
 
     /* Aliasing of res and a */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        nmod_poly_t a, res1, t, f, finv;
+        nmod_poly_t a, res1, t, f;
         mp_limb_t n;
-        ulong exp;
+        fmpz_t exp;
+
+        fmpz_init(exp);
 
         n = n_randtest_prime(state, 0);
-        exp = n_randlimb(state) % 32;
+        fmpz_randtest_unsigned(exp, state, n_randint(state, 100) + 1);;
 
         nmod_poly_init(a, n);
         nmod_poly_init(f, n);
-        nmod_poly_init(finv, n);
         nmod_poly_init(res1, n);
         nmod_poly_init(t, n);
 
@@ -59,26 +49,23 @@ main(void)
             nmod_poly_randtest(f, state, n_randint(state, 50));
         } while (nmod_poly_is_zero(f));
 
-        nmod_poly_reverse(finv, f, f->length);
-        nmod_poly_inv_series(finv, finv, f->length);
-
-        nmod_poly_powmod_ui_binexp_preinv(res1, a, exp, f, finv);
-        nmod_poly_powmod_ui_binexp_preinv(a, a, exp, f, finv);
+        nmod_poly_powmod_fmpz_binexp(res1, a, exp, f);
+        nmod_poly_powmod_fmpz_binexp(a, a, exp, f);
 
         result = (nmod_poly_equal(res1, a));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("exp: %wu\n\n", exp);
+            flint_printf("exp: "); fmpz_print(exp); flint_printf("\n\n");
             flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
             flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
             flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
             abort();
         }
 
+        fmpz_clear(exp);
         nmod_poly_clear(a);
         nmod_poly_clear(f);
-        nmod_poly_clear(finv);
         nmod_poly_clear(res1);
         nmod_poly_clear(t);
     }
@@ -86,16 +73,17 @@ main(void)
     /* Aliasing of res and f */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        nmod_poly_t a, res1, t, f, finv;
+        nmod_poly_t a, res1, t, f;
         mp_limb_t n;
-        ulong exp;
+        fmpz_t exp;
+
+        fmpz_init(exp);
 
         n = n_randtest_prime(state, 0);
-        exp = n_randlimb(state) % 32;
+        fmpz_randtest_unsigned(exp, state, n_randint(state, 100) + 1);
 
         nmod_poly_init(a, n);
         nmod_poly_init(f, n);
-        nmod_poly_init(finv, n);
         nmod_poly_init(res1, n);
         nmod_poly_init(t, n);
 
@@ -104,72 +92,23 @@ main(void)
             nmod_poly_randtest(f, state, n_randint(state, 50));
         } while (nmod_poly_is_zero(f));
 
-        nmod_poly_reverse(finv, f, f->length);
-        nmod_poly_inv_series(finv, finv, f->length);
-
-        nmod_poly_powmod_ui_binexp_preinv(res1, a, exp, f, finv);
-        nmod_poly_powmod_ui_binexp_preinv(f, a, exp, f, finv);
+        nmod_poly_powmod_fmpz_binexp(res1, a, exp, f);
+        nmod_poly_powmod_fmpz_binexp(f, a, exp, f);
 
         result = (nmod_poly_equal(res1, f));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("exp: %wu\n\n", exp);
+            flint_printf("exp: "); fmpz_print(exp); flint_printf("\n\n");
             flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
             flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
             flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
             abort();
         }
 
+        fmpz_clear(exp);
         nmod_poly_clear(a);
         nmod_poly_clear(f);
-        nmod_poly_clear(finv);
-        nmod_poly_clear(res1);
-        nmod_poly_clear(t);
-    }
-
-    /* Aliasing of res and finv */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
-    {
-        nmod_poly_t a, res1, t, f, finv;
-        mp_limb_t n;
-        ulong exp;
-
-        n = n_randtest_prime(state, 0);
-        exp = n_randlimb(state) % 32;
-
-        nmod_poly_init(a, n);
-        nmod_poly_init(f, n);
-        nmod_poly_init(finv, n);
-        nmod_poly_init(res1, n);
-        nmod_poly_init(t, n);
-
-        nmod_poly_randtest(a, state, n_randint(state, 50));
-        do {
-            nmod_poly_randtest(f, state, n_randint(state, 50));
-        } while (nmod_poly_is_zero(f));
-
-        nmod_poly_reverse(finv, f, f->length);
-        nmod_poly_inv_series(finv, finv, f->length);
-
-        nmod_poly_powmod_ui_binexp_preinv(res1, a, exp, f, finv);
-        nmod_poly_powmod_ui_binexp_preinv(finv, a, exp, f, finv);
-
-        result = (nmod_poly_equal(res1, finv));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("exp: %wu\n\n", exp);
-            flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
-            flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
-            flint_printf("finv:\n"); nmod_poly_print(finv), flint_printf("\n\n");
-            flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
-            abort();
-        }
-
-        nmod_poly_clear(a);
-        nmod_poly_clear(f);
-        nmod_poly_clear(finv);
         nmod_poly_clear(res1);
         nmod_poly_clear(t);
     }
@@ -177,17 +116,18 @@ main(void)
     /* No aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        nmod_poly_t a, res1, res2, t, f, finv;
+        nmod_poly_t a, res1, res2, t, f;
         mp_limb_t n;
-        ulong exp;
+        fmpz_t exp;
         int j;
 
+        fmpz_init(exp);
+
         n = n_randtest_prime(state, 0);
-        exp = n_randlimb(state) % 32;
+        fmpz_randtest_unsigned(exp, state, n_randint(state, 100) + 1);
 
         nmod_poly_init(a, n);
         nmod_poly_init(f, n);
-        nmod_poly_init(finv, n);
         nmod_poly_init(res1, n);
         nmod_poly_init(res2, n);
         nmod_poly_init(t, n);
@@ -197,22 +137,28 @@ main(void)
             nmod_poly_randtest(f, state, n_randint(state, 50));
         } while (nmod_poly_is_zero(f));
 
-        nmod_poly_reverse(finv, f, f->length);
-        nmod_poly_inv_series(finv, finv, f->length);
+        nmod_poly_powmod_fmpz_binexp(res1, a, exp, f);
 
-        nmod_poly_powmod_ui_binexp_preinv(res1, a, exp, f, finv);
-
-        nmod_poly_zero(res2);
-        if (nmod_poly_length(f) > 1)
-            nmod_poly_set_coeff_ui(res2, 0, 1);
-        for (j = 1; j <= exp; j++)
-            nmod_poly_mulmod(res2, res2, a, f);
+	if (fmpz_cmp_ui(exp, 32) <= 0)
+        {
+           nmod_poly_zero(res2);
+           if (nmod_poly_length(f) > 1)
+	       nmod_poly_set_coeff_ui(res2, 0, 1);
+           for (j = 1; j <= fmpz_get_ui(exp); j++)
+               nmod_poly_mulmod(res2, res2, a, f);
+	} else
+        {
+	   fmpz_sub_ui(exp, exp, 1);
+           nmod_poly_powmod_fmpz_binexp(res2, a, exp, f);
+           nmod_poly_mulmod(res2, res2, a, f);
+	   fmpz_add_ui(exp, exp, 1);
+	}
 
         result = (nmod_poly_equal(res1, res2));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("exp: %wu\n\n", exp);
+            flint_printf("exp: "); fmpz_print(exp); flint_printf("\n\n");
             flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
             flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
             flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
@@ -220,9 +166,9 @@ main(void)
             abort();
         }
 
+        fmpz_clear(exp);
         nmod_poly_clear(a);
         nmod_poly_clear(f);
-        nmod_poly_clear(finv);
         nmod_poly_clear(res1);
         nmod_poly_clear(res2);
         nmod_poly_clear(t);

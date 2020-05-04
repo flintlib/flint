@@ -3,6 +3,7 @@
     Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2013 Martin Lee
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -30,12 +31,12 @@
 #include "long_extras.h"
 
 void
-_nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
+_nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,
                                mp_srcptr finv, slong lenfinv, nmod_t mod)
 {
     mp_ptr T, Q;
     slong lenT, lenQ, window;
-    int i, l, c;
+    slong i, l, c;
 
     lenT = 2 * lenf - 3;
     lenQ = FLINT_MAX(lenT - lenf + 1, 1);
@@ -46,10 +47,10 @@ _nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
     flint_mpn_zero (res, lenf - 1);
     res[0] = WORD(1);
 
-    l = (int) z_sizeinbase (lenf - 1, 2) - 2;
+    l = z_sizeinbase (lenf - 1, 2) - 2;
     window = (WORD(1) << l);
     c = l;
-    i = (int) FLINT_BIT_COUNT(e) - 2;
+    i = fmpz_sizeinbase(e, 2) - 2;
     if (i <= l)
     {
       window = (WORD(1) << i);
@@ -73,11 +74,11 @@ _nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
                                           lenf, finv, lenfinv, mod);
 
         c--;
-        if (e & (UWORD(1) << i))
+        if (fmpz_tstbit(e, i))
         {
             if (window == WORD(0) && i <= l - 1)
                 c = i;
-            if ( c >= 0)
+            if (c >= 0)
               window = window | (WORD(1) << c);
         }
         else if (window == WORD(0))
@@ -98,7 +99,7 @@ _nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
 
 
 void
-nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
+nmod_poly_powmod_x_fmpz_preinv(nmod_poly_t res, fmpz_t e, const nmod_poly_t f,
                              const nmod_poly_t finv)
 {
     slong lenf = f->length;
@@ -107,7 +108,7 @@ nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (nmod_poly_powmod_x_ui_preinv). Divide by zero.\n");
+        flint_printf("Exception (nmod_poly_powmod_x_fmpz_preinv). Divide by zero.\n");
         flint_abort();
     }
 
@@ -125,22 +126,22 @@ nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
         nmod_poly_init2_preinv(poly, res->mod.n, res->mod.ninv, 2);
         nmod_poly_set_coeff_ui (poly, 1, 1);
         nmod_poly_divrem(tmp, r, poly, f);
-        nmod_poly_powmod_ui_binexp_preinv(res, r, e, f, finv);
+        nmod_poly_powmod_fmpz_binexp_preinv(res, r, e, f, finv);
         nmod_poly_clear(tmp);
         nmod_poly_clear(r);
         nmod_poly_clear(poly);
         return;
     }
 
-    if (e <= 2)
+    if (fmpz_cmp_ui(e, 2) <= 0)
     {
-        if (e == UWORD(0))
+        if (fmpz_is_zero(e))
         {
             nmod_poly_fit_length(res, 1);
             res->coeffs[0] = UWORD(1);
             res->length = 1;
         }
-        else if (e == UWORD(1))
+        else if (fmpz_is_one(e))
         {
             nmod_poly_t r;
             nmod_poly_init2_preinv (r, res->mod.n, res->mod.ninv, 2);
@@ -163,7 +164,7 @@ nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
     if ((res == f) || (res == finv))
     {
         nmod_poly_init2(tmp, res->mod.n, trunc);
-        _nmod_poly_powmod_x_ui_preinv(tmp->coeffs, e, f->coeffs, lenf,
+        _nmod_poly_powmod_x_fmpz_preinv(tmp->coeffs, e, f->coeffs, lenf,
                                       finv->coeffs, finv->length, f->mod);
         nmod_poly_swap(res, tmp);
         nmod_poly_clear(tmp);
@@ -171,7 +172,7 @@ nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
     else
     {
         nmod_poly_fit_length(res, trunc);
-        _nmod_poly_powmod_x_ui_preinv(res->coeffs, e, f->coeffs, lenf,
+        _nmod_poly_powmod_x_fmpz_preinv(res->coeffs, e, f->coeffs, lenf,
                                       finv->coeffs, finv->length, f->mod);
     }
 

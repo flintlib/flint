@@ -79,6 +79,12 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
         flint_abort();
     }
 
+    if (lenf == 1)
+    {
+        fmpz_mod_poly_zero(res);
+        return;
+    }
+
     if (fmpz_sgn(e) < 0)
     {
         flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp). negative exp not implemented\n");
@@ -119,7 +125,7 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
         }
     }
 
-    if (lenf == 1 || len == 0)
+    if (len == 0)
     {
         fmpz_mod_poly_zero(res);
         return;

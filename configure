@@ -88,7 +88,7 @@ usage()
    echo "     CC=<name>            Use the C compiler with the given name (default: gcc)"
    echo "     CXX=<name>           Use the C++ compiler with the given name (default: g++)"
    echo "     AR=<name>            Use the AR library builder with the given name (default: ar)"
-   echo "     LDCONFIG=<name>      Use the given dynamic linker"
+   echo "     LDCONFIG=<name>      Use the given ldconfig tool"
    echo "     CFLAGS=<flags>       Pass the given flags to the compiler"
    echo "     CXXFLAGS=<flags>     Pass the given flags to the C++ compiler"
    echo "     ABI=[32|64]          Tell the compiler to use given ABI (default: empty)"

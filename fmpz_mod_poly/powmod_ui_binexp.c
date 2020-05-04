@@ -79,6 +79,12 @@ fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
         flint_abort();
     }
 
+    if (lenf == 1)
+    {
+        fmpz_mod_poly_zero(res);
+        return;
+    }
+
     if (len >= lenf)
     {
         fmpz_mod_poly_t t, r;
@@ -108,7 +114,7 @@ fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
         return;
     }
 
-    if (lenf == 1 || len == 0)
+    if (len == 0)
     {
         fmpz_mod_poly_zero(res);
         return;

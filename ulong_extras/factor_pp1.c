@@ -16,6 +16,18 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+/* bits of n, B1, count */
+static slong n_factor_pp1_table[][3] = {
+        {31, 2784, 5}, {32, 1208, 2}, {33, 2924, 3},
+        {34, 286, 5}, {35, 58, 5}, {36, 61, 4}, {37, 815, 2},
+        {38, 944, 2}, {39, 61, 3}, {40, 0, 0}, {41, 0, 0},
+        {42, 0, 0}, {43, 0, 0}, {44, 0, 0}, {45, 0, 0},
+        {46, 0, 0}, {47, 0, 0}, {47, 0, 0}, {49, 0, 0},
+        {50, 606, 1}, {51, 2403, 1}, {52, 2524, 1}, {53, 2924, 1},
+        {54, 3735, 2}, {55, 669, 2}, {56, 6092, 3}, {57, 2179, 3},
+        {58, 3922, 3}, {59, 6717, 4}, {60, 4119, 4}, {61, 2288, 4},
+        {62, 9004, 3}, {63, 9004, 3}, {64, 9004, 3}};
+
 #define n_pp1_set(x1, y1, x2, y2) \
    do {                           \
       x1 = x2;                    \
@@ -182,7 +194,10 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
             goto cleanup;
       } while (1);
    } else
+   {
+      factor = 0;
       goto cleanup;
+   }
 
    /* factor still 0 */
    factor = n_pp1_find_power(&oldx, &oldy, pr, n, ninv, norm);
@@ -193,3 +208,42 @@ cleanup:
 
    return factor;
 }
+
+mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
+{
+   slong bits = FLINT_BIT_COUNT(n);
+   ulong B1;
+   slong count, i;
+   flint_rand_t state;
+
+   /* silently fail if trial factoring would always succeed */
+   if (bits < 31)
+       return 0;
+
+   B1 = n_factor_pp1_table[bits - 31][1];
+   count = n_factor_pp1_table[bits - 31][2];
+
+   flint_randinit(state);
+
+   for (i = 0; i < count; i++)
+   {
+       ulong factor;
+       factor = n_factor_pp1(n, B1, n_randint(state, n - 3) + 3);
+       if (factor != 0)
+       {
+           flint_randclear(state);
+           return factor;
+       }
+   }
+
+   flint_randclear(state);
+   return 0;
+}
+
+/* exists only for tuning/profiling */
+void n_factor_pp1_table_insert(slong bits, slong B1, slong count)
+{
+    n_factor_pp1_table[bits][1] = B1;
+    n_factor_pp1_table[bits][2] = count;
+}
+
