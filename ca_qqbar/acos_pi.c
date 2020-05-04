@@ -11,9 +11,29 @@
 
 #include "ca_qqbar.h"
 
-void
-ca_qqbar_exp_pi_i(ca_qqbar_t res, slong p, ulong q)
+int
+ca_qqbar_acos_pi(slong * p, ulong * q, const ca_qqbar_t x)
 {
-    ca_qqbar_root_of_unity(res, p, q * 2);
-}
+    if (ca_qqbar_asin_pi(p, q, x))
+    {
+        slong a, b;
+        a = *p;
+        b = *q;
 
+        /* 1/2 - a/b */
+        if (b % 2 == 0)
+        {
+            *p = b / 2 - a;
+            *q = b;
+        }
+        else
+        {
+            *p = b - 2 * a;
+            *q = 2 * b;
+        }
+
+        return 1;
+    }
+
+    return 0;
+}

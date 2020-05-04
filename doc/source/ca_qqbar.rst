@@ -480,6 +480,16 @@ Polynomial roots
 Roots of unity and trigonometric functions
 -------------------------------------------------------------------------------
 
+The following functions use word-size integers *p* and *q*
+instead of *fmpq_t* instances to express rational numbers.
+This is to emphasize that
+the computations are feasible only with small *q* in this representation
+of algebraic numbers since the
+associated minimal polynomials have degree `O(q)`.
+The input *p* and *q* do not need to be reduced *a priori*,
+but should not be close to the word boundaries (they may be added
+and subtracted internally).
+
 .. function:: ulong ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x)
 
     If *x* is a root of unity,
@@ -511,6 +521,26 @@ Roots of unity and trigonometric functions
     Sets *res* to the trigonometric function `\cos(\pi x)`,
     `\sin(\pi x)`, etc., with `x = \tfrac{p}{q}`.
 
+.. function:: int ca_qqbar_atan_pi(slong * p, ulong * q, const ca_qqbar_t x)
+
+    If `y = \operatorname{atan}(x) / \pi` is algebraic, and hence
+    necessarily rational, sets `y = p / q` to the reduced such
+    fraction with `|y| < \tfrac{1}{2}` and returns 1.
+    If *y* is not algebraic, returns 0.
+
+.. function:: int ca_qqbar_asin_pi(slong * p, ulong * q, const ca_qqbar_t x)
+
+    If `y = \operatorname{asin}(x) / \pi` is algebraic, and hence
+    necessarily rational, sets `y = p / q` to the reduced such
+    fraction with `|y| \le \tfrac{1}{2}` and returns 1.
+    If *y* is not algebraic, returns 0.
+
+.. function:: int ca_qqbar_acos_pi(slong * p, ulong * q, const ca_qqbar_t x)
+
+    If `y = \operatorname{acos}(x) / \pi` is algebraic, and hence
+    necessarily rational, sets `y = p / q` to the reduced such
+    fraction with `0 \le y \le 1` and returns 1.
+    If *y* is not algebraic, returns 0.
 
 Internal functions
 -------------------------------------------------------------------------------

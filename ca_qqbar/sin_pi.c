@@ -14,13 +14,6 @@
 void
 ca_qqbar_sin_pi(ca_qqbar_t res, slong p, ulong q)
 {
-    /* we could allow larger unreduced input, but it's a hassle... */
-    if (FLINT_BIT_COUNT(q) > FLINT_BITS - 4 || FLINT_BIT_COUNT(FLINT_ABS(p)) > FLINT_BITS - 4)
-    {
-        flint_printf("ca_qqbar_sin_pi: unexpected large input\n");
-        flint_abort();
-    }
-
     p = p % (2 * (slong) q);
     ca_qqbar_cos_pi(res, (slong) q - 2 * p, 2 * q);
 }
