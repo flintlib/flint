@@ -527,6 +527,21 @@ FLINT_DLL void TEMPLATE(T, poly_pow)(TEMPLATE(T, poly_t) rop,
                       ulong e,
                       const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL void _TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, struct) * res,
+                                   const TEMPLATE(T, struct) * poly,  ulong e,
+			            slong trunc, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, poly_t) res,
+                                     const TEMPLATE(T, poly_t) poly, ulong e,
+                                    slong trunc, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void _TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, struct) * res,
+                                   const TEMPLATE(T, struct) * poly,  ulong e,
+                                    slong trunc, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, poly_t) res,
+                                     const TEMPLATE(T, poly_t) poly, ulong e,                                                 slong trunc, const TEMPLATE(T, ctx_t) ctx);
+
 FLINT_DLL void _TEMPLATE(T, poly_powmod_fmpz_binexp)(TEMPLATE(T, struct) * res,
                                       const TEMPLATE(T, struct) * poly,
                                       const fmpz_t e,

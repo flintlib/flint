@@ -699,6 +699,34 @@ Powering
     ``e >= 0``. We require ``finv`` to be the inverse of the reverse of
     ``f``.
 
+.. function:: void _fq_zech_poly_pow_trunc_binexp(fq_zech_struct * res, const fq_zech_struct * poly, ulong e, slong trunc, const fq_zech_ctx_t ctx)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    (assumed to be zero padded if necessary to length ``trunc``) to                           the power ``e``. This is equivalent to doing a powering followed
+    by a truncation. We require that ``res`` has enough space for
+    ``trunc`` coefficients, that ``trunc > 0`` and that                                       ``e > 1``. Aliasing is not permitted. Uses the binary                                     exponentiation method.                                                                
+
+.. function:: void fq_poly_pow_trunc_binexp(fq_zech_poly_t res, const fq_zech_poly_t poly, ulong e, slong trunc, const fq_zech_ctx_t ctx)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    to the power ``e``. This is equivalent to doing a powering
+    followed by a truncation. Uses the binary exponentiation method.
+
+.. function:: void _fq_zech_poly_pow_trunc(fq_zech_struct * res, const fq_zech_struct * poly, ulong e, slong trunc, const fq_zech_ctx_t mod)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    (assumed to be zero padded if necessary to length ``trunc``) to
+    the power ``e``. This is equivalent to doing a powering followed
+    by a truncation. We require that ``res`` has enough space for
+    ``trunc`` coefficients, that ``trunc > 0`` and that
+    ``e > 1``. Aliasing is not permitted.
+
+.. function:: void fq_zech_poly_pow_trunc(fq_zech_poly_t res, const fq_zech_poly_t poly, ulong e, slong trunc, fq_zech_ctx_t ctx)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    to the power ``e``. This is equivalent to doing a powering
+    followed by a truncation.
+
 
 Shifting
 --------------------------------------------------------------------------------
