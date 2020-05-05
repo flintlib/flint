@@ -14,7 +14,13 @@
 #include "fmpz.h"
 #include "fmpq.h"
 
-/* a = b */
+/* lets not generate solutions lists with bits(length) >= BIT_LIMIT */
+#define BIT_LIMIT 25
+
+/*
+    The modulus of b is divisible by the modulus of a.
+    Map b via the projection.
+*/
 static void map_down(fmpz_mod_poly_t a, const fmpz_mod_poly_t b)
 {
     slong i;
@@ -26,9 +32,16 @@ static void map_down(fmpz_mod_poly_t a, const fmpz_mod_poly_t b)
     _fmpz_mod_poly_normalise(a);
 }
 
-/* push all solutions for x to a*x + b*y = c with 0 <= x < b, assume a >= 0, b > 0 */
-static void dsolve(_fmpz_vector_t v, const fmpz_t a, const fmpz_t b, const fmpz_t c)
+/*
+    Every lifter needs a Diophantine equation solver:
+    Given a, b, c with a >= 0, b > 0, try to push all solutions for x to
+        a*x + b*y = c
+    with 0 <= x < b.
+*/
+static int disolve(_fmpz_vector_t v,
+                                const fmpz_t a, const fmpz_t b, const fmpz_t c)
 {
+    int success = 1;
     fmpz_t d, x, q, r, t, k, bbar;
     FLINT_ASSERT(fmpz_sgn(a) >= 0);
     FLINT_ASSERT(fmpz_sgn(b) > 0);
@@ -40,6 +53,7 @@ static void dsolve(_fmpz_vector_t v, const fmpz_t a, const fmpz_t b, const fmpz_
     fmpz_init(t);
     fmpz_init(k);
     fmpz_init(bbar);
+
     fmpz_gcdinv(d, x, a, b);
     fmpz_fdiv_qr(q, r, c, d);
     if (fmpz_is_zero(r))
@@ -47,16 +61,27 @@ static void dsolve(_fmpz_vector_t v, const fmpz_t a, const fmpz_t b, const fmpz_
         fmpz_divexact(bbar, b, d);
         fmpz_mul(x, x, q);
         fmpz_fdiv_q(r, x, bbar);
-        for (fmpz_zero(k); fmpz_cmp(k, d) < 0; fmpz_add_ui(k, k, 1))
+
+        fmpz_add_si(k, d, v->length);
+        if (fmpz_bits(k) >= BIT_LIMIT)
         {
-            fmpz_sub(q, k, r);
-            fmpz_set(t, x);
-            fmpz_addmul(t, bbar, q);
-            FLINT_ASSERT(fmpz_sgn(t) >= 0);
-            FLINT_ASSERT(fmpz_cmp(t, b) < 0);
-            _fmpz_vector_push_back(v, t);
+            /* too many solutions */
+            success = 0;
+        }
+        else
+        {
+            for (fmpz_zero(k); fmpz_cmp(k, d) < 0; fmpz_add_ui(k, k, 1))
+            {
+                fmpz_sub(q, k, r);
+                fmpz_set(t, x);
+                fmpz_addmul(t, bbar, q);
+                FLINT_ASSERT(fmpz_sgn(t) >= 0);
+                FLINT_ASSERT(fmpz_cmp(t, b) < 0);
+                _fmpz_vector_push_back(v, t);
+            }
         }
     }
+
     fmpz_clear(d);
     fmpz_clear(x);
     fmpz_clear(q);
@@ -64,22 +89,23 @@ static void dsolve(_fmpz_vector_t v, const fmpz_t a, const fmpz_t b, const fmpz_
     fmpz_clear(t);
     fmpz_clear(k);
     fmpz_clear(bbar);
+
+    return success;
 }
 
-
-static int roots_mod_prime_power(
-    _fmpz_vector_t x1,
-    fmpz_mod_poly_t fpk,
-    const fmpz_t p,
-    ulong k)
+/* Fill x1 with the roots of f, where f->p is p^k */
+static int roots_mod_prime_power(_fmpz_vector_t x1, fmpz_mod_poly_t fpk,
+                                                       const fmpz_t p, slong k)
 {
-    ulong e1, e2;
+    int success = 1;
+    slong e1, e2;
     slong i, j, old_length;
     _fmpz_vector_t x2;
     fmpz_mod_poly_t f, dfpk;
     fmpz_t pe1, pe2e1, fprime, mfpe1, t;
 
     FLINT_ASSERT(k >= 1);
+    FLINT_ASSERT(fmpz_is_probabprime(p));
 
     fmpz_mod_poly_init(dfpk, &fpk->p);
     fmpz_mod_poly_derivative(dfpk, fpk);
@@ -95,11 +121,13 @@ static int roots_mod_prime_power(
     fmpz_init(mfpe1);
     fmpz_init(t);
 
+    /* try to fill x1 with solution mod p */
     x1->length = 0;
     if (f->length > 0)
     {
         fmpz_mod_poly_factor_t r;
         fmpz_mod_poly_factor_init(r);
+
         fmpz_mod_poly_roots(r, f, 0);
         _fmpz_vector_fit_length(x1, r->num);
         for (i = 0; i < r->num; i++)
@@ -109,16 +137,24 @@ static int roots_mod_prime_power(
     }
     else
     {
-        FLINT_ASSERT(fmpz_bits(p) < 40);
+        if (fmpz_bits(p) >= BIT_LIMIT)
+        {
+            /* too many solution mod p */
+            success = 0;
+            goto cleanup;
+        }
+
         _fmpz_vector_fit_length(x1, fmpz_get_si(p));
         for (i = 0; i < fmpz_get_si(p); i++)
             fmpz_set_si(x1->array + i, i);
         x1->length = fmpz_get_si(p);
     }
 
+    /* lift roots mod p^e1 to roots mod p^e2 */
     for (e1 = 1; e1 < k; e1 = e2)
     {
         e2 = FLINT_MIN(k, 2*e1);
+
         fmpz_pow_ui(pe1, p, e1);
         fmpz_pow_ui(pe2e1, p, e2 - e1);
         x2->length = 0;
@@ -131,7 +167,12 @@ static int roots_mod_prime_power(
             fmpz_mod_poly_evaluate_fmpz(fprime, dfpk, x1->array + i);
             fmpz_mod(fprime, fprime, pe2e1);
             old_length = x2->length;
-            dsolve(x2, fprime, pe2e1, mfpe1);
+
+            if (!disolve(x2, fprime, pe2e1, mfpe1))
+            {
+                success = 0;
+                goto cleanup;
+            }
             for (j = old_length; j < x2->length; j++)
             {
                 fmpz_mul(t, x2->array + j, pe1);
@@ -140,6 +181,8 @@ static int roots_mod_prime_power(
         }
         _fmpz_vector_swap(x1, x2);
     }
+
+cleanup:
 
     _fmpz_vector_clear(x2);
     fmpz_mod_poly_clear(f);
@@ -151,15 +194,12 @@ static int roots_mod_prime_power(
 
     fmpz_mod_poly_clear(dfpk);
 
-    return 1;
+    return success;
 }
 
 
-int fmpz_mod_poly_roots_general(
-    fmpz_mod_poly_factor_t r,
-    const fmpz_mod_poly_t f,
-    int want_mult,
-    const fmpz_factor_t fac)
+int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t r,
+       const fmpz_mod_poly_t f, int with_multiplicity, const fmpz_factor_t fac)
 {
     int success = 1;
     slong i, j, k;
@@ -169,7 +209,7 @@ int fmpz_mod_poly_roots_general(
 
     if (f->length <= 0)
     {
-        flint_throw(FLINT_ERROR, "Exception in fmpz_mod_poly_roots_general: "
+        flint_throw(FLINT_ERROR, "Exception in fmpz_mod_poly_roots_factored: "
                                                   "input polynomial is zero.");
         return 0;
     }
@@ -188,21 +228,29 @@ int fmpz_mod_poly_roots_general(
     i = 0;
     fmpz_pow_ui(&fpe->p, fac->p + i, fac->exp[i]);
     map_down(fpe, f);
-
-    roots_mod_prime_power(x0, fpe, fac->p + i, fac->exp[i]);
+    if (!roots_mod_prime_power(x0, fpe, fac->p + i, fac->exp[i]))
+        goto almost_failed;
 
     for (i = 1; x0->length > 0 && i < fac->num; i++)
     {
         fmpz_mul(m, m, &fpe->p);
+
         fmpz_pow_ui(&fpe->p, fac->p + i, fac->exp[i]);
         map_down(fpe, f);
-        roots_mod_prime_power(x1, fpe, fac->p + i, fac->exp[i]);
+        if (!roots_mod_prime_power(x1, fpe, fac->p + i, fac->exp[i]))
+            goto almost_failed;
+
+        if (x1->length > 0 && FLINT_BIT_COUNT(x0->length) +
+                              FLINT_BIT_COUNT(x1->length) >= BIT_LIMIT)
+            goto almost_failed;
+
         x2->length = 0;
         _fmpz_vector_fit_length(x2, x0->length*x1->length);
         for (j = 0; j < x0->length; j++)
         for (k = 0; k < x1->length; k++)
         {
-            fmpz_CRT(x2->array + x2->length, x1->array + k, &fpe->p, x0->array + j, m, 0);
+            fmpz_CRT(x2->array + x2->length, x1->array + k, &fpe->p,
+                                             x0->array + j, m, 0);
             x2->length++;
         }
         _fmpz_vector_swap(x0, x2);
@@ -219,7 +267,7 @@ int fmpz_mod_poly_roots_general(
         fmpz_negmod(r->poly[i].coeffs + 0, x0->array + i, &f->p);
         _fmpz_mod_poly_set_length(r->poly + i, 2);
         r->exp[i] = 1;
-        if (want_mult)
+        if (with_multiplicity)
         {
             fmpz_mod_poly_divrem(tf, tr, f, r->poly + i);
             FLINT_ASSERT(fmpz_mod_poly_is_zero(tr));
@@ -232,6 +280,8 @@ int fmpz_mod_poly_roots_general(
         }
     }
     r->num = x0->length;
+
+cleanup:
 
     _fmpz_vector_clear(x0);
     _fmpz_vector_clear(x1);
@@ -246,4 +296,24 @@ int fmpz_mod_poly_roots_general(
     fmpz_mod_poly_clear(tf);
 
     return success;
+
+almost_failed:
+
+    /* if any prime power is lacking roots, we can still succeed */
+
+    for (i++; i < fac->num; i++)
+    {
+        fmpz_pow_ui(&fpe->p, fac->p + i, fac->exp[i]);
+        map_down(fpe, f);
+        if (roots_mod_prime_power(x1, fpe, fac->p + i, fac->exp[i]) &&
+            x1->length == 0)
+        {
+            r->num = 0;
+            goto cleanup;
+        }
+    }
+
+    success = 0;
+
+    goto cleanup;
 }

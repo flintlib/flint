@@ -13,8 +13,12 @@
 #include "fmpz_mod_poly_factor.h"
 #include "fmpz.h"
 
-
-void _fmpz_mod_poly_push_roots(
+/*
+    Helper function for finding roots. The roots of a monic f are written
+    with exponent given in mult to r. Uses Rabin's Las Vegas algorithm
+    via gcd computations with (x + delta)^halfp - 1.
+*/
+static void _fmpz_mod_poly_push_roots(
     fmpz_mod_poly_factor_t r,
     fmpz_mod_poly_t f,              /* clobbered */
     slong mult,                     /* expoenent to write on the roots */
@@ -28,7 +32,7 @@ void _fmpz_mod_poly_push_roots(
 
     FLINT_ASSERT(fmpz_mod_poly_degree(f) >= 1);
     FLINT_ASSERT(fmpz_is_one(f->coeffs + fmpz_mod_poly_degree(f)));
-    FLINT_ASSERT(fmpz_is_prime(&f->p));
+    FLINT_ASSERT(fmpz_is_probabprime(&f->p));
 
     if (fmpz_mod_poly_degree(f) <= 1)
     {
@@ -138,7 +142,7 @@ void _fmpz_mod_poly_push_roots(
 }
 
 void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
-                                                                 int want_mult)
+                                                         int with_multiplicity)
 {
     slong i;
     fmpz_t p2;
@@ -176,7 +180,7 @@ void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
     for (i = 0; i < FLINT_BITS + 2; i++)
         fmpz_mod_poly_init(t + i, &f->p);
 
-    if (want_mult)
+    if (with_multiplicity)
     {
         fmpz_mod_poly_factor_t sqf;
         fmpz_mod_poly_factor_init(sqf);
