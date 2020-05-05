@@ -27,7 +27,7 @@ int _fmpz_poly_divides(fmpz * q, const fmpz * a,
         return 0;
 
     /* heuristic test: see if polys evaluated at 1 divide */
-    if (len1 > 1 || len2 > 1)
+    if (len1 > 1)
     {
         slong i;
         fmpz_t asum, bsum;
