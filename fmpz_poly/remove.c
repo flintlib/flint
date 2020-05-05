@@ -18,8 +18,9 @@ slong
 fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
               const fmpz_poly_t poly2)
 {
-    fmpz_poly_t q, p;
-    slong i = 0;
+    fmpz_poly_t p, q;
+    fmpz_t p1sum, p2sum, qsum;
+    slong i;
 
     if (poly2->length == 0)
     {
@@ -39,21 +40,58 @@ fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
 	return 0;
     }
 
-    fmpz_poly_init(q);
-    fmpz_poly_init(p);
+    fmpz_init(p1sum);
+    fmpz_init(p2sum);
+    fmpz_init(qsum);
 
-    fmpz_poly_set(p, poly1);
-    
-    while (fmpz_poly_divides(q, p, poly2))
+    for (i = 0; i < poly1->length; i++)
+        fmpz_add(p1sum, p1sum, poly1->coeffs + i);
+
+    for (i = 0; i < poly2->length; i++)
+	fmpz_add(p2sum, p2sum, poly2->coeffs + i);
+
+    fmpz_abs(p1sum, p1sum);
+    fmpz_abs(p2sum, p2sum);
+
+    if (fmpz_is_zero(p2sum))
     {
-        fmpz_poly_swap(p, q);
-	i++;
-    }
+	if (!fmpz_is_zero(p1sum))
+        {
+	    fmpz_poly_set(res, poly1);
+	    return 0;
+	} else
+	    i = (poly1->length - 1)/(poly2->length - 1);
+    } else if (fmpz_is_zero(p1sum) || fmpz_is_one(p2sum))
+        i = (poly1->length - 1)/(poly2->length - 1);
+    else
+        i = fmpz_remove(qsum, p1sum, p2sum);
 
-    fmpz_poly_set(res, p);
+    if (i > 0)
+    {
+        fmpz_poly_init(q);
+        fmpz_poly_init(p);
 
-    fmpz_poly_clear(p);
-    fmpz_poly_clear(q);
+        fmpz_poly_pow(p, poly2, i);
+    
+        while (i > 0 && !fmpz_poly_divides(q, poly1, p))
+        {
+	    fmpz_poly_div(p, p, poly2);
+	    i--;
+        }
+
+        if (i == 0)
+	   fmpz_poly_set(res, poly1);
+	else
+	   fmpz_poly_set(res, q);
+
+        fmpz_poly_clear(p);
+	fmpz_poly_clear(q);
+    } else
+	fmpz_poly_set(res, poly1);
+
+    fmpz_clear(qsum);
+    fmpz_clear(p1sum);
+    fmpz_clear(p2sum);
 
     return i;
 }
