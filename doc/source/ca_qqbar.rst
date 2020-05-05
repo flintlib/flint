@@ -138,6 +138,16 @@ Properties
 
     Returns whether *x* is a real number.
 
+.. function:: void ca_qqbar_height(fmpz_t res, const ca_qqbar_t x)
+
+    Sets *res* to the height of *x* (the largest absolute value of the
+    coefficients of the minimal polynomial of *x*).
+
+.. function:: slong ca_qqbar_height_bits(const ca_qqbar_t x)
+
+    Returns the height of *x* (the largest absolute value of the
+    coefficients of the minimal polynomial of *x*) measured in bits.
+
 Special values
 -------------------------------------------------------------------------------
 
@@ -542,6 +552,26 @@ and subtracted internally).
     fraction with `0 \le y \le 1` and returns 1.
     If *y* is not algebraic, returns 0.
 
+Guessing and simplification
+-------------------------------------------------------------------------------
+
+.. function:: int ca_qqbar_guess(ca_qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int flags, slong prec)
+
+    Attempts to find an algebraic number *res* of degree at most *max_deg* and
+    height at most *max_bits* bits matching the numerical enclosure *z*.
+    The return flag indicates success.
+    This is only a heuristic method, and the return flag neither implies a
+    rigorous proof that *res* is the correct result, nor a rigorous proof
+    that no suitable algebraic number with the given *max_deg* and *max_bits*
+    exists. (Proof of nonexistence could in principle be computed,
+    but this is not yet implemented.)
+
+    The working precision *prec* should normally be the same as the precision
+    used to compute *z*. It does not make much sense to run this algorithm
+    with precision smaller than O(*max_deg* · *max_bits*).
+
+
+
 Internal functions
 -------------------------------------------------------------------------------
 
@@ -600,4 +630,30 @@ Internal functions
 
     If the initial enclosure is accurate enough, *res* is set to this value
     without rounding and without further computation.
+
+.. function:: int _ca_qqbar_acb_lindep(fmpz * rel, acb_srcptr vec, slong len, int check, slong prec)
+
+    Attempts to find an integer vector *rel* giving a linear relation between
+    the elements of the real or complex vector *vec*, using the LLL algorithm.
+
+    The working precision is set to the minimum of *prec* and the relative
+    accuracy of *vec* (that is, the difference between the largest magnitude
+    and the largest error magnitude within *vec*). 95% of the bits within the
+    working precision are used for the LLL matrix, and the remaining 5% bits
+    are used to validate the linear relation by evaluating the linear
+    combination and checking that the resulting interval contains zero.
+    This validation does not prove the existence or nonexistence
+    of a linear relation, but it provides a quick heuristic way to eliminate
+    spurious relations.
+
+    If *check* is set, the return value indicates whether the validation
+    was successful; otherwise, the return value simply indicates whether
+    the algorithm was executed normally (failure may occur, for example,
+    if the input vector is non-finite).
+
+    In principle, this method can be used to produce a proof that no linear
+    relation exists with coefficients up to a specified bit size, but this has
+    not yet been implemented.
+
+
 

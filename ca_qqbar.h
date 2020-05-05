@@ -144,6 +144,10 @@ ca_qqbar_is_real(const ca_qqbar_t x)
     return ca_qqbar_sgn_im(x) == 0;
 }
 
+slong ca_qqbar_height_bits(const ca_qqbar_t x);
+
+void ca_qqbar_height(fmpz_t res, const ca_qqbar_t x);
+
 /* Special values */
 
 CA_QQBAR_INLINE void
@@ -328,6 +332,10 @@ int ca_qqbar_asin_pi(slong * p, ulong * q, const ca_qqbar_t x);
 
 int ca_qqbar_acos_pi(slong * p, ulong * q, const ca_qqbar_t x);
 
+/* Guessing */
+
+int ca_qqbar_guess(ca_qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int flags, slong prec);
+
 /* Internal functions */
 
 void ca_qqbar_scalar_op(ca_qqbar_t res, const ca_qqbar_t x, const fmpz_t a, const fmpz_t b, const fmpz_t c);
@@ -343,6 +351,8 @@ int _ca_qqbar_validate_existence_uniqueness(acb_t res, const fmpz_poly_t poly, c
 void _ca_qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong prec);
 
 void ca_qqbar_enclosure_raw(acb_t res, const ca_qqbar_t x, slong prec);
+
+int _ca_qqbar_acb_lindep(fmpz * rel, acb_srcptr vec, slong len, int check, slong prec);
 
 #ifdef __cplusplus
 }
