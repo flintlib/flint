@@ -1127,7 +1127,7 @@ static void _divide_worker(void * varg)
 
     if (arg->num_handles > 0)
     {
-        arg->success = fmpz_mpolyuu_divides_threaded(arg->quo, arg->num,
+        arg->success = fmpz_mpolyuu_divides_threaded_pool(arg->quo, arg->num,
                         arg->den, 2, arg->ctx, arg->handles, arg->num_handles);
     }
     else
@@ -1741,7 +1741,7 @@ done:
 }
 
 
-int fmpz_mpolyuu_gcd_berlekamp_massey_threaded(
+int fmpz_mpolyuu_gcd_berlekamp_massey_threaded_pool(
     fmpz_mpolyu_t G,
     fmpz_mpolyu_t Abar,
     fmpz_mpolyu_t Bbar,
@@ -2277,7 +2277,7 @@ next_zip_image:
         goto pick_zip_prime;
     }
 
-    success = fmpz_mpolyu_content_mpoly(Hcontent, w->H, ctx,
+    success = fmpz_mpolyu_content_mpoly_threaded_pool(Hcontent, w->H, ctx,
                                                          handles, num_handles);
     FLINT_ASSERT(Hcontent->bits == Hbits);
     if (!success)
@@ -2345,7 +2345,7 @@ next_zip_image:
             divide_arg->num_handles = num_handles - (m + 1);
             thread_pool_wake(global_thread_pool, handles[m], 0,
                                                    _divide_worker, divide_arg);
-            success = fmpz_mpolyuu_divides_threaded(w->Abar, A, G, 2,
+            success = fmpz_mpolyuu_divides_threaded_pool(w->Abar, A, G, 2,
                                                           ctx, handles + 0, m);
             thread_pool_wait(global_thread_pool, handles[m]);
         }
@@ -2515,12 +2515,12 @@ static void _worker_convertuu(void * varg)
 {
     _convertuu_arg_struct * arg = (_convertuu_arg_struct *) varg;
 
-    fmpz_mpoly_to_mpolyuu_perm_deflate(arg->Puu, arg->uctx, arg->P, arg->ctx,
+    fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(arg->Puu, arg->uctx, arg->P, arg->ctx,
                              arg->perm, arg->shift, arg->stride, arg->maxexps,
                                                arg->handles, arg->num_handles);
 
-    arg->success = fmpz_mpolyu_content_mpoly(arg->Pcontent, arg->Puu,
-                                                           arg->uctx, NULL, 0);
+    arg->success = fmpz_mpolyu_content_mpoly_threaded_pool(arg->Pcontent,
+                          arg->Puu, arg->uctx, arg->handles, arg->num_handles);
     if (arg->success)
     {
         fmpz_mpolyu_divexact_mpoly_inplace(arg->Puu, arg->Pcontent, arg->uctx);
@@ -2531,10 +2531,9 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
-    const fmpz_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, max_num_handles, num_handles;
+    slong i, num_handles;
     thread_pool_handle * handles;
     flint_bitcnt_t wbits;
     int success = 0;
@@ -2544,6 +2543,7 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     slong * Adegs, * Bdegs, * perm;
     ulong * shift, * stride;
     ulong max_main_degree, max_minor_degree;
+    slong thread_limit = FLINT_MIN(A->length, B->length)/16;
 
     if (fmpz_mpoly_is_zero(A, ctx))
     {
@@ -2595,20 +2595,7 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     FLINT_ASSERT(!fmpz_mpoly_is_zero(B, ctx));
 
     /* get workers */
-    handles = NULL;
-    num_handles = 0;
-    if (global_thread_pool_initialized)
-    {
-        max_num_handles = thread_pool_get_size(global_thread_pool);
-        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-        if (max_num_handles > 0)
-        {
-            handles = (thread_pool_handle *) flint_malloc(
-                               max_num_handles*sizeof(thread_pool_handle));
-            num_handles = thread_pool_request(global_thread_pool,
-                                                 handles, max_num_handles);
-        }
-    }
+    num_handles = flint_request_threads(&handles, thread_limit);
 
     /* collect degree info */
     Adegs = (slong *) flint_malloc(ctx->minfo->nvars*sizeof(slong));
@@ -2688,9 +2675,10 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
 
         thread_pool_wake(global_thread_pool, handles[s], 0, _worker_convertuu, arg);
 
-        fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
+        fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Auu, uctx, A, ctx,
                    perm, shift, stride, (const ulong *) Adegs, handles + 0, s);
-        success = fmpz_mpolyu_content_mpoly(Ac, Auu, uctx, handles + 0, s);
+        success = fmpz_mpolyu_content_mpoly_threaded_pool(Ac, Auu, uctx,
+                                                               handles + 0, s);
         if (success)
         {
             fmpz_mpolyu_divexact_mpoly_inplace(Auu, Ac, uctx);
@@ -2704,14 +2692,15 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
     }
     else
     {
-        fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
+        fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Auu, uctx, A, ctx,
                           perm, shift, stride, (const ulong *) Adegs, NULL, 0);
-        fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
+        fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Buu, uctx, B, ctx,
                           perm, shift, stride, (const ulong *) Bdegs, NULL, 0);
 
         /* remove content from A and B */
-        success = fmpz_mpolyu_content_mpoly(Ac, Auu, uctx, NULL, 0);
-        success = success && fmpz_mpolyu_content_mpoly(Bc, Buu, uctx, NULL, 0);
+        success = fmpz_mpolyu_content_mpoly_threaded_pool(Ac, Auu, uctx, NULL, 0);
+        success = success &&
+                  fmpz_mpolyu_content_mpoly_threaded_pool(Bc, Buu, uctx, NULL, 0);
         if (!success)
             goto cleanup;
 
@@ -2719,17 +2708,18 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
         fmpz_mpolyu_divexact_mpoly_inplace(Buu, Bc, uctx);
     }
 
-    success = _fmpz_mpoly_gcd(Gamma, wbits, Auu->coeffs + 0,
+    success = _fmpz_mpoly_gcd_threaded_pool(Gamma, wbits, Auu->coeffs + 0,
                                   Buu->coeffs + 0, uctx, handles, num_handles);
     if (!success)
         goto cleanup;
 
-    success = fmpz_mpolyuu_gcd_berlekamp_massey_threaded(Guu, Abaruu, Bbaruu,
+    success = fmpz_mpolyuu_gcd_berlekamp_massey_threaded_pool(Guu, Abaruu, Bbaruu,
                                   Auu, Buu, Gamma, uctx, handles, num_handles);
     if (!success)
         goto cleanup;
 
-    success = _fmpz_mpoly_gcd(Gc, wbits, Ac, Bc, uctx, handles, num_handles);
+    success = _fmpz_mpoly_gcd_threaded_pool(Gc, wbits, Ac, Bc, uctx,
+                                                         handles, num_handles);
     if (!success)
         goto cleanup;
 
@@ -2744,11 +2734,7 @@ int fmpz_mpoly_gcd_berlekamp_massey_threaded(
 
 cleanup:
 
-    for (i = 0; i < num_handles; i++)
-        thread_pool_give_back(global_thread_pool, handles[i]);
-
-    if (handles)
-        flint_free(handles);
+    flint_give_back_threads(handles, num_handles);
 
     flint_free(Adegs);
     flint_free(Bdegs);

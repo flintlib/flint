@@ -42,8 +42,6 @@
 
 #define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
 
-#define MPOLY_DEFAULT_THREAD_LIMIT (WORD(9999))
-
 /* choose m so that (m + 1)/(n - m) ~= la/lb, i.e. m = (n*la - lb)/(la + lb) */
 MPOLY_INLINE slong mpoly_divide_threads(slong n, double la, double lb)
 {
