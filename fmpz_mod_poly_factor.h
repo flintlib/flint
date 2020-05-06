@@ -67,6 +67,14 @@ FLINT_DLL void fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, slong
 
 FLINT_DLL void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_factor_t fac);
 
+FMPZ_MOD_POLY_FACTOR_INLINE
+void fmpz_mod_poly_factor_swap(fmpz_mod_poly_factor_t a, fmpz_mod_poly_factor_t b)
+{
+    fmpz_mod_poly_factor_struct t = *a;
+    *a = *b;
+    *b = t;
+}
+
 FLINT_DLL void fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
                                  const fmpz_mod_poly_t poly, slong exp);
 

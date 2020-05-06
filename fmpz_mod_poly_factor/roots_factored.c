@@ -13,12 +13,13 @@
 #include "fmpz_mod_poly_factor.h"
 #include "fmpz.h"
 #include "fmpq.h"
+#include "long_extras.h"
 
 typedef fmpz_poly_t fmpz_list_t;
 
 /* lets not generate solutions lists with length longer than LENGTH_LIMIT */
 #if FLINT64
-#define LENGTH_LIMIT (WORD(1) << 35)
+#define LENGTH_LIMIT (WORD(1) << 32)
 #else
 #define LENGTH_LIMIT (WORD(1) << 25)
 #endif
@@ -98,24 +99,30 @@ static int disolve(fmpz_list_t v,
     return success;
 }
 
-/* Fill x1 with the roots of f, where f->p is p^k */
-static int roots_mod_prime_power(fmpz_list_t x1, fmpz_mod_poly_t fpk,
-                                                       const fmpz_t p, slong k)
+/* Fill x with the roots of fpk, where f->p is p^k */
+static int roots_mod_prime_power(fmpz_mod_poly_factor_t x, fmpz_mod_poly_t fpk,
+                                const fmpz_t p, slong k, int with_multiplicity)
 {
     int success = 1;
     slong e1, e2;
     slong i, j, old_length;
-    fmpz_list_t x2;
-    fmpz_mod_poly_t f, dfpk;
+    fmpz_list_t x1, x2;
+    fmpz_mod_poly_t f, dfpk, tf, tr, tq;
     fmpz_t pe1, pe2e1, fprime, mfpe1, t;
 
     FLINT_ASSERT(k >= 1);
     FLINT_ASSERT(fmpz_is_probabprime(p));
 
+    fmpz_mod_poly_init(tf, &fpk->p);
+    fmpz_mod_poly_init(tr, &fpk->p);
+    fmpz_mod_poly_init(tq, &fpk->p);
+
     fmpz_mod_poly_init(dfpk, &fpk->p);
     fmpz_mod_poly_derivative(dfpk, fpk);
 
+    fmpz_poly_init(x1);
     fmpz_poly_init(x2);
+
     fmpz_mod_poly_init(f, p);
 
     map_down(f, fpk);
@@ -188,8 +195,45 @@ static int roots_mod_prime_power(fmpz_list_t x1, fmpz_mod_poly_t fpk,
         fmpz_poly_swap(x1, x2);
     }
 
+    /* fill in roots and multiplicies if wanted */
+    fmpz_mod_poly_factor_fit_length(x, x1->length);
+    for (i = 0; i < x1->length; i++)
+    {
+        fmpz_mod_poly_fit_length(x->poly + i, 2);
+        fmpz_set(&x->poly[i].p, &fpk->p);
+        fmpz_one(x->poly[i].coeffs + 1);
+        fmpz_negmod(x->poly[i].coeffs + 0, x1->coeffs + i, &fpk->p);
+        _fmpz_mod_poly_set_length(x->poly + i, 2);
+        x->exp[i] = 1;
+        if (with_multiplicity)
+        {
+            if (fpk->length > 0)
+            {
+                fmpz_mod_poly_divrem(tf, tr, fpk, x->poly + i);
+                FLINT_ASSERT(fmpz_mod_poly_is_zero(tr));
+                while (fmpz_mod_poly_divrem(tq, tr, tf, x->poly + i),
+                       fmpz_mod_poly_is_zero(tr))
+                {
+                    FLINT_ASSERT(tf->length >= (x->poly + i)->length);
+                    x->exp[i]++;
+                    fmpz_mod_poly_swap(tq, tf);
+                }
+            }
+            else
+            {
+                x->exp[i] = WORD_MAX;
+            }
+        }
+    }
+    x->num = x1->length;
+
 cleanup:
 
+    fmpz_mod_poly_clear(tf);
+    fmpz_mod_poly_clear(tr);
+    fmpz_mod_poly_clear(tq);
+
+    fmpz_poly_clear(x1);
     fmpz_poly_clear(x2);
     fmpz_mod_poly_clear(f);
     fmpz_clear(pe1);
@@ -204,24 +248,14 @@ cleanup:
 }
 
 
-static int mul_si_checked(slong * a, slong b, slong c)
-{
-	ulong ahi, alo;
-	smul_ppmm(ahi, alo, b, c);
-	*a = alo;
-	return FLINT_SIGN_EXT(alo) != ahi;
-}
-
-
-
-int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t r,
+int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t x0,
        const fmpz_mod_poly_t f, int with_multiplicity, const fmpz_factor_t fac)
 {
     int success = 1;
     slong i, j, k, new_length;
     fmpz_t m;
-    fmpz_list_t x0, x1, x2;
-    fmpz_mod_poly_t fpe, tq, tr, tf;
+    fmpz_mod_poly_factor_t x1, x2;
+    fmpz_mod_poly_t fpe;
 
     if (f->length <= 0)
     {
@@ -231,91 +265,71 @@ int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t r,
     }
 
     fmpz_mod_poly_init(fpe, fac->p + 0);
-    fmpz_mod_poly_init(tq, &f->p);
-    fmpz_mod_poly_init(tr, &f->p);
-    fmpz_mod_poly_init(tf, &f->p);
 
     fmpz_init_set_ui(m, 1);
 
-    fmpz_poly_init(x0);
-    fmpz_poly_init(x1);
-    fmpz_poly_init(x2);
+    fmpz_mod_poly_factor_init(x1);
+    fmpz_mod_poly_factor_init(x2);
 
     i = 0;
     fmpz_pow_ui(&fpe->p, fac->p + i, fac->exp[i]);
     map_down(fpe, f);
-    if (!roots_mod_prime_power(x0, fpe, fac->p + i, fac->exp[i]))
+    if (!roots_mod_prime_power(x0, fpe, fac->p + i, fac->exp[i],
+                                                            with_multiplicity))
     {
         goto almost_failed;
     }
 
-    for (i = 1; x0->length > 0 && i < fac->num; i++)
+    for (i = 1; x0->num > 0 && i < fac->num; i++)
     {
         fmpz_mul(m, m, &fpe->p);
 
         fmpz_pow_ui(&fpe->p, fac->p + i, fac->exp[i]);
         map_down(fpe, f);
-        if (!roots_mod_prime_power(x1, fpe, fac->p + i, fac->exp[i]))
+        if (!roots_mod_prime_power(x1, fpe, fac->p + i, fac->exp[i],
+                                                            with_multiplicity))
         {
             goto almost_failed;
         }
 
-        if (mul_si_checked(&new_length, x0->length, x1->length) ||
+        if (z_mul_checked(&new_length, x0->num, x1->num) ||
             new_length >= LENGTH_LIMIT)
         {
             goto almost_failed;
         }
 
-        x2->length = 0;
-        fmpz_poly_fit_length(x2, new_length);
-        for (j = 0; j < x0->length; j++)
-        for (k = 0; k < x1->length; k++)
+        /* combine roots with CRT, multiplicities with FLINT_MIN */
+        x2->num = 0;
+        fmpz_mod_poly_factor_fit_length(x2, new_length);
+        for (j = 0; j < x0->num; j++)
+        for (k = 0; k < x1->num; k++)
         {
-            fmpz_CRT(x2->coeffs + x2->length, x1->coeffs + k, &fpe->p,
-                                              x0->coeffs + j, m, 0);
-            x2->length++;
-        }
-        fmpz_poly_swap(x0, x2);
-    }
+            fmpz_mod_poly_struct * r = x2->poly + x2->num;
+            fmpz_mod_poly_fit_length(r, 2);
+            fmpz_set(&r->p, &f->p);
+            fmpz_one(r->coeffs + 1);
+            FLINT_ASSERT(x1->poly[k].length == 2);
+            FLINT_ASSERT(x0->poly[j].length == 2);
+            fmpz_CRT(r->coeffs + 0, x1->poly[k].coeffs + 0, &fpe->p,
+                                    x0->poly[j].coeffs + 0, m, 0);
+            _fmpz_mod_poly_set_length(r, 2);
 
-    _fmpz_vec_sort(x0->coeffs, x0->length);
-
-    fmpz_mod_poly_factor_fit_length(r, x0->length);
-    for (i = 0; i < x0->length; i++)
-    {
-        fmpz_mod_poly_fit_length(r->poly + i, 2);
-        fmpz_set(&r->poly[i].p, &f->p);
-        fmpz_one(r->poly[i].coeffs + 1);
-        fmpz_negmod(r->poly[i].coeffs + 0, x0->coeffs + i, &f->p);
-        _fmpz_mod_poly_set_length(r->poly + i, 2);
-        r->exp[i] = 1;
-        if (with_multiplicity)
-        {
-            fmpz_mod_poly_divrem(tf, tr, f, r->poly + i);
-            FLINT_ASSERT(fmpz_mod_poly_is_zero(tr));
-            while (fmpz_mod_poly_divrem(tq, tr, tf, r->poly + i),
-                   fmpz_mod_poly_is_zero(tr))
-            {
-                r->exp[i]++;
-                fmpz_mod_poly_swap(tq, tf);
-            }
+            FLINT_ASSERT(x0->exp[j] >= 1);
+            FLINT_ASSERT(x1->exp[k] >= 1);
+            x2->exp[x2->num] = FLINT_MIN(x0->exp[j], x1->exp[k]);
+            x2->num++;
         }
+        fmpz_mod_poly_factor_swap(x0, x2);
     }
-    r->num = x0->length;
 
 cleanup:
 
-    fmpz_poly_clear(x0);
-    fmpz_poly_clear(x1);
-    fmpz_poly_clear(x2);
+    fmpz_mod_poly_factor_clear(x1);
+    fmpz_mod_poly_factor_clear(x2);
 
     fmpz_clear(m);
 
     fmpz_mod_poly_clear(fpe);
-
-    fmpz_mod_poly_clear(tq);
-    fmpz_mod_poly_clear(tr);
-    fmpz_mod_poly_clear(tf);
 
     return success;
 
@@ -323,19 +337,19 @@ almost_failed:
 
     /* if any prime power is lacking roots, we can still succeed */
 
+    x0->num = 0;
+
     for (i++; i < fac->num; i++)
     {
         fmpz_pow_ui(&fpe->p, fac->p + i, fac->exp[i]);
         map_down(fpe, f);
-        if (roots_mod_prime_power(x1, fpe, fac->p + i, fac->exp[i]) &&
-            x1->length == 0)
+        if (roots_mod_prime_power(x1, fpe, fac->p + i, fac->exp[i], 0) &&
+            x1->num == 0)
         {
-            r->num = 0;
             goto cleanup;
         }
     }
 
     success = 0;
-
     goto cleanup;
 }

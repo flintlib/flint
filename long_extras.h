@@ -20,6 +20,7 @@
 
 #include <gmp.h>
 #include "flint.h"
+#include "longlong.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -28,6 +29,16 @@
 /* Properties ****************************************************************/
 
 FLINT_DLL size_t z_sizeinbase(slong n, int b);
+
+/* Checked arithmetic ********************************************************/
+
+LONG_EXTRAS_INLINE int z_mul_checked(slong * a, slong b, slong c)
+{
+	ulong ahi, alo;
+	smul_ppmm(ahi, alo, b, c);
+	*a = alo;
+	return FLINT_SIGN_EXT(alo) != ahi;
+}
 
 /* Randomisation  ************************************************************/
 
