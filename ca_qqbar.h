@@ -282,6 +282,8 @@ ca_qqbar_rsqrt(ca_qqbar_t res, const ca_qqbar_t x)
 
 /* Numerical enclosure */
 
+void ca_qqbar_cache_enclosure(ca_qqbar_t res, slong prec);
+
 void ca_qqbar_get_acb(acb_t res, const ca_qqbar_t x, slong prec);
 
 void ca_qqbar_get_arb(arb_t res, const ca_qqbar_t x, slong prec);

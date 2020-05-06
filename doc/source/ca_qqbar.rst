@@ -429,7 +429,8 @@ representable (that is, when a real or imaginary part is a sufficiently
 small dyadic number).
 In some cases, the computations needed to polish the output may be
 expensive. When polish is unnecessary, :func:`ca_qqbar_enclosure_raw`
-may be used instead.
+may be used instead. Alternatively, :func:`ca_qqbar_cache_enclosure`
+can be used to avoid recomputations.
 
 .. function:: void ca_qqbar_get_acb(acb_t res, const ca_qqbar_t x, slong prec)
 
@@ -448,6 +449,15 @@ may be used instead.
 .. function:: void ca_qqbar_get_arb_im(arb_t res, const ca_qqbar_t x, slong prec)
 
     Sets *res* to an enclosure of the imaginary part of *x* rounded to *prec* bits.
+
+.. function:: void ca_qqbar_cache_enclosure(ca_qqbar_t res, slong prec)
+
+    Polishes the internal enclosure of *res* to at least *prec* bits
+    of precision in-place. Normally, *ca_qqbar* operations that need
+    high-precision enclosures compute them on the fly without caching the results;
+    if *res* will be used as an invariant operand for many operations,
+    calling this function as a precomputation step can improve performance.
+
 
 Conjugates
 -------------------------------------------------------------------------------
