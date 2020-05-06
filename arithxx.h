@@ -271,10 +271,6 @@ template<> struct outsize<operations::landau_function_vec_op>
 
 ARITHXX_DEFINE_BINOP(dedekind_sum_naive, fmpqxx,
         FMPZXX_COND_S, FMPZXX_COND_S)
-ARITHXX_DEFINE_BINOP(dedekind_sum_coprime_large, fmpqxx,
-        FMPZXX_COND_S, FMPZXX_COND_S)
-ARITHXX_DEFINE_BINOP(dedekind_sum_coprime, fmpqxx,
-        FMPZXX_COND_S, FMPZXX_COND_S)
 ARITHXX_DEFINE_BINOP(dedekind_sum, fmpqxx,
         FMPZXX_COND_S, FMPZXX_COND_S)
 
@@ -311,8 +307,6 @@ inline double bell_number_size(ulong n) {return arith_bell_number_size(n);}
 inline double bernoulli_number_size(ulong n)
     {return arith_bernoulli_number_size(n);}
 inline double euler_number_size(ulong n) {return arith_euler_number_size(n);}
-inline double dedekind_sum_coprime_d(double h, double k)
-    {return arith_dedekind_sum_coprime_d(h, k);}
 
 template<class Fmpz>
 inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, int>::type moebius_mu(
