@@ -39,7 +39,10 @@ main(void)
         TEMPLATE(T, ctx_randtest)(ctx, state);
         d = TEMPLATE(T, ctx_degree)(ctx);
         if (d == 1) 
+        {
+            TEMPLATE(T, ctx_clear)(ctx);
             continue;
+        }
         modulus = TEMPLATE(T, ctx_modulus)(ctx);
 
         TEMPLATE(T, init)(frob, ctx);

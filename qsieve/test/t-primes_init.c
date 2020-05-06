@@ -52,12 +52,12 @@ int main(void)
 
        fmpz_randtest_unsigned(n, state, 130);
 
-       if (fmpz_is_zero(n) || fmpz_is_one(n)) continue;
+       if (fmpz_is_zero(n) || fmpz_is_one(n)) goto cleanup;
 
        qsieve_init(qs_inf, n);
        small_factor = qsieve_knuth_schroeppel(qs_inf);
 
-       if (small_factor) continue;
+       if (small_factor) goto cleanup;
 
        fmpz_mul_ui(qs_inf->kn, qs_inf->n, qs_inf->k);                      /* haven't calculated earlier */
        small_factor = qsieve_primes_init(qs_inf);
@@ -73,7 +73,7 @@ int main(void)
                flint_printf("\n");
                abort();
            }
-           else continue;
+           else goto cleanup;
        }
 
        for (j = 3; j < qs_inf->num_primes; j++)
@@ -120,7 +120,7 @@ int main(void)
                flint_printf("\n");
                abort();
            }
-           else continue;
+           else goto cleanup;
        }
 
        for (j = k; j < qs_inf->num_primes; j++)
@@ -164,7 +164,7 @@ int main(void)
                flint_printf("\n");
                abort();
            }
-           else continue;
+           else goto cleanup;
        }
 
        for (j = k; j < qs_inf->num_primes; j++)
@@ -208,7 +208,7 @@ int main(void)
                flint_printf("\n");
                abort();
            }
-           else continue;
+           else goto cleanup;
        }
 
        for (j = k; j < qs_inf->num_primes; j++)
@@ -239,6 +239,7 @@ int main(void)
            }
        }
 
+cleanup:
        qsieve_clear(qs_inf);
        fmpz_clear(n);
        fmpz_clear(x);

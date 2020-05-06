@@ -56,6 +56,7 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
         {
             if (exact && !fmpz_is_zero(R + lenA - 1))
             {
+                fmpz_clear(r);
                 if (alloc)
                     _fmpz_vec_clear(R, alloc);
 
@@ -71,8 +72,9 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
 
                 if (!fmpz_is_zero(r))
                 {
+                    fmpz_clear(r);
                     if (alloc)
-                    _fmpz_vec_clear(R, alloc);
+                        _fmpz_vec_clear(R, alloc);
 
                     return 0;
                 }

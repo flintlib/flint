@@ -77,6 +77,8 @@ main(void)
         nmod_mpoly_clear(g, ctx);  
         nmod_mpoly_clear(h, ctx);  
         nmod_mpoly_clear(k, ctx);  
+
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing first argument */
@@ -129,6 +131,8 @@ main(void)
         nmod_mpoly_clear(f, ctx);  
         nmod_mpoly_clear(g, ctx);  
         nmod_mpoly_clear(h, ctx);  
+
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     /* Check aliasing second argument */
@@ -181,6 +185,8 @@ main(void)
         nmod_mpoly_clear(f, ctx);  
         nmod_mpoly_clear(g, ctx);  
         nmod_mpoly_clear(h, ctx);  
+
+        nmod_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -45,7 +45,11 @@ main(void)
 
         fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
         if (f->length == WORD(0))
+        {
+            fmpz_mpoly_clear(f, ctx);
+            fmpz_mpoly_ctx_clear(ctx);
             continue;
+        }
 
         for (j = 0; j < 10; j++)
         {

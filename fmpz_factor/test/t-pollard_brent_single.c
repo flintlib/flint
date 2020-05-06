@@ -94,6 +94,10 @@ int main(void)
     fmpz_clear(primeprod);
     fmpz_clear(fac);
     fmpz_clear(modval);
+    fmpz_clear(a);
+    fmpz_clear(y);
+    fmpz_clear(maxa);
+    fmpz_clear(maxy);
 
     flint_printf("PASS\n");
     return 0;

@@ -145,6 +145,7 @@ void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1,
                                                       len_out, t1, t2, s1, tt);
 
     _fmpz_vec_set_fft(output, trunc, ii, pre->limbs, 1); /* write output */
+    flint_free(ii);
 }
 
 void

@@ -43,7 +43,10 @@ main(void)
 
         fmpq_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
         if (fmpq_mpoly_length(f, ctx) == 0)
+        {
+            fmpq_mpoly_clear(f, ctx);
             continue;
+        }
 
         for (j = 0; j < 10; j++)
         {

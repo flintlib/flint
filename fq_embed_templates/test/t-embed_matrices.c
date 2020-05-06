@@ -86,6 +86,7 @@ main(void)
             n = m*j;
             if (m == 1) {
                 i--;
+                TEMPLATE(T, ctx_clear)(ctx1);
                 continue;
             }
             modulus = TEMPLATE(T, ctx_modulus)(ctx1);

@@ -72,6 +72,7 @@ int main(void)
             abort();
         }
 
+        fmpz_clear(n);
         fmpz_mod_poly_clear(cyclo_poly);
         unity_zp_clear(f);
         unity_zp_clear(g);

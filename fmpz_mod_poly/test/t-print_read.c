@@ -101,6 +101,9 @@ int main(void)
                 }
             }
 
+            for (j = 0; j < n; j++)
+                fmpz_mod_poly_clear(a[j]);
+            flint_free(a);
             fclose(out);
             exit(0);
         }
