@@ -294,7 +294,15 @@ void ca_qqbar_get_arb_im(arb_t res, const ca_qqbar_t x, slong prec);
 
 void ca_qqbar_conjugates(ca_qqbar_ptr res, const ca_qqbar_t x);
 
-/* Polynomial roots */
+/* Polynomial operations */
+
+void _ca_qqbar_evaluate_fmpq_poly(ca_qqbar_t res, const fmpz * poly, const fmpz_t den, slong len, const ca_qqbar_t x);
+
+void ca_qqbar_evaluate_fmpq_poly(ca_qqbar_t res, const fmpq_poly_t poly, const ca_qqbar_t x);
+
+void _ca_qqbar_evaluate_fmpz_poly(ca_qqbar_t res, const fmpz * poly, slong len, const ca_qqbar_t x);
+
+void ca_qqbar_evaluate_fmpz_poly(ca_qqbar_t res, const fmpz_poly_t poly, const ca_qqbar_t x);
 
 #define CA_QQBAR_ROOTS_IRREDUCIBLE 1
 
@@ -332,9 +340,11 @@ int ca_qqbar_asin_pi(slong * p, ulong * q, const ca_qqbar_t x);
 
 int ca_qqbar_acos_pi(slong * p, ulong * q, const ca_qqbar_t x);
 
-/* Guessing */
+/* Guessing and simplification */
 
 int ca_qqbar_guess(ca_qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int flags, slong prec);
+
+int ca_qqbar_express_in_field(fmpq_poly_t res, const ca_qqbar_t alpha, const ca_qqbar_t x, slong max_bits, int flags, slong prec);
 
 /* Internal functions */
 

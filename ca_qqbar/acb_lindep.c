@@ -106,6 +106,16 @@ _ca_qqbar_acb_lindep(fmpz * rel, acb_srcptr vec, slong len, int check, slong pre
     for (i = 0; i < len; i++)
         fmpz_set(rel + i, fmpz_mat_entry(A, 0, i));
 
+#if 0
+    flint_printf("rel ");
+    for (i = 0; i < len; i++)
+    {
+        fmpz_print(rel + i);
+        flint_printf(" ");
+    }
+    flint_printf("\n");
+#endif
+
     /* Heuristic check */
     if (check)
     {
