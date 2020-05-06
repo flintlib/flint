@@ -792,7 +792,7 @@ Euclidean division
     of ``poly1`` by ``poly2``.
 
 
-Euclidean division
+Powering
 --------------------------------------------------------------------------------
 
 
@@ -832,6 +832,23 @@ Euclidean division
     This function is only faster if ``A->length <= 2*B->length - 1``.
 
     The output of this function is *not* canonicalised.
+
+
+Divisibility testing
+--------------------------------------------------------------------------------
+
+
+.. function:: int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2)
+
+    Return `1` if ``(poly2, den2, len2)`` divides ``(poly1, den1, len1)`` and
+    set ``(qpoly, qden, len1 - len2 + 1)`` to the quotient. Otherwise return
+    `0`. Requires that ``qpoly`` has space for ``len1 - len2 + 1``
+    coefficients and that ``len1 >= len2 > 0``.
+
+int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+
+    Return `1` if ``poly2`` divides ``poly1`` and set ``q`` to the quotient.
+    Otherwise return `0`.
 
 
 Power series division
