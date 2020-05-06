@@ -15,14 +15,16 @@
 
 #ifdef T
 
+#include <string.h>
 #include "templates.h"
 
 void
 TEMPLATE(T, mat_window_clear) (TEMPLATE(T, mat_t) window,
                                const TEMPLATE(T, ctx_t) ctx)
 {
-    if (window->r != 0)
+    if (window->rows)
         flint_free(window->rows);
+    memset(window, 0, sizeof(*window));
 }
 
 

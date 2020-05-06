@@ -32,9 +32,9 @@ main(void)
 
         slong m, n, k, bits;
 
-        m = n_randint(state, 10);
-        n = n_randint(state, 10);
-        k = n_randint(state, 10);
+        m = n_randint(state, 9) + 1;
+        n = n_randint(state, 9) + 1;
+        k = n_randint(state, 9) + 1;
 
         bits = 1 + n_randint(state, 100);
 

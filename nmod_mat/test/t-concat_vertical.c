@@ -32,7 +32,7 @@ int main(void)
     {
         slong r1, r2, c1, n;
 
-        r1 = n_randint(state, 50);
+        r1 = n_randint(state, 49) + 1;
         r2 = n_randint(state, 50);
         c1 = n_randint(state, 50);
         n = n_randint(state, 50) + 1;

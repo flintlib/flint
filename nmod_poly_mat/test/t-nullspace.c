@@ -34,8 +34,8 @@ main(void)
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);
-        m = n_randint(state, 13);
-        n = n_randint(state, 13);
+        m = n_randint(state, 12) + 1;
+        n = n_randint(state, 12) + 1;
         deg = 1 + n_randint(state, 5);
         density = n_randint(state, 100) * 0.01;
 

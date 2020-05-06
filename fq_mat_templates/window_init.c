@@ -15,6 +15,7 @@
 
 #ifdef T
 
+#include <string.h>
 #include "templates.h"
 
 void
@@ -26,18 +27,21 @@ TEMPLATE(T, mat_window_init) (TEMPLATE(T, mat_t) window,
     slong i;
     window->entries = NULL;
 
-    if (r2 > r1)
+    if (r2 > r1 && c2 > c1)
+    {
         window->rows = (TEMPLATE(T, struct) **) flint_malloc((r2 - r1)
                                               * sizeof(TEMPLATE(T, struct) *));
+        window->r = r2 - r1;
+        window->c = c2 - c1;
 
-    if (mat->c > 0)
-    {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = mat->rows[r1 + i] + c1;
+        if (mat->c > 0)
+        {
+            for (i = 0; i < r2 - r1; i++)
+                window->rows[i] = mat->rows[r1 + i] + c1;
+        }
     }
-
-    window->r = r2 - r1;
-    window->c = c2 - c1;
+    else
+        memset(window, 0, sizeof(*window));
 }
 
 

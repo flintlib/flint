@@ -35,8 +35,8 @@ main(void)
         fmpq_t trab, trba;
         slong m, n;
 
-        m = n_randint(state, 10);
-        n = n_randint(state, 10);
+        m = n_randint(state, 9) + 1;
+        n = n_randint(state, 9) + 1;
 
         fmpq_mat_init(A, m, n);
         fmpq_mat_init(B, n, m);

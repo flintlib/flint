@@ -9,21 +9,24 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "nmod_poly_mat.h"
 
 void
 nmod_poly_mat_window_init(nmod_poly_mat_t window, const nmod_poly_mat_t mat, slong r1,
                      slong c1, slong r2, slong c2)
 {
-    slong i;
-    window->entries = NULL;
-
-    if (r2 - r1)
+    if (r2 > r1 && c2 > c1)
+    {
+        slong i;
+        window->entries = NULL;
         window->rows = flint_malloc((r2 - r1) * sizeof(nmod_poly_t));
+        window->r = r2 - r1;
+        window->c = c2 - c1;
 
-    for (i = 0; i < r2 - r1; i++)
-        window->rows[i] = mat->rows[r1 + i] + c1;
-
-    window->r = r2 - r1;
-    window->c = c2 - c1;
+        for (i = 0; i < r2 - r1; i++)
+            window->rows[i] = mat->rows[r1 + i] + c1;
+    }
+    else
+        memset(window, 0, sizeof(*window));
 }

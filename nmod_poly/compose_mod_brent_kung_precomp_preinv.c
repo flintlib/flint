@@ -72,16 +72,16 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
         flint_abort();
     }
 
-    if (A->r != m || A->c != len)
-    {
-        flint_printf("Exception (nmod_poly_precompute_matrix). Wrong dimensions.\n");
-        flint_abort();
-    }
-
     if (len2 == 1)
     {
         nmod_mat_zero(A);
         return;
+    }
+
+    if (A->r != m || A->c != len)
+    {
+        flint_printf("Exception (nmod_poly_precompute_matrix). Wrong dimensions.\n");
+        flint_abort();
     }
 
     ptr1 = _nmod_vec_init(len);

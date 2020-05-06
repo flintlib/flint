@@ -38,7 +38,7 @@ main(void)
 
         TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        r1 = n_randint(state, 10);
+        r1 = n_randint(state, 9) + 1;
         r2 = n_randint(state, 10);
         c1 = n_randint(state, 10);
 

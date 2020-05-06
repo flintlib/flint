@@ -84,17 +84,17 @@ TEMPLATE(T, poly_precompute_matrix) (TEMPLATE(T, mat_t) A,
         flint_abort();
     }
 
+    if (len2 == 1)
+    {
+        TEMPLATE(T, mat_zero) (A, ctx);
+        return;
+    }
+
     if (A->r != m || A->c != len)
     {
         flint_printf
             ("Exception (nmod_poly_compose_mod_brent_kung). Wrong dimensions.\n");
         flint_abort();
-    }
-
-    if (len2 == 1)
-    {
-        TEMPLATE(T, mat_zero) (A, ctx);
-        return;
     }
 
     ptr1 = _TEMPLATE(T, vec_init) (len, ctx);

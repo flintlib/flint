@@ -31,9 +31,9 @@ int main(void)
     {
         slong m, n, k;
 
-        m = n_randint(state, 50);
-        n = n_randint(state, 50);
-        k = n_randint(state, 50);
+        m = n_randint(state, 49) + 1;
+        n = n_randint(state, 49) + 1;
+        k = n_randint(state, 49) + 1;
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, n, k);
@@ -65,9 +65,9 @@ int main(void)
     {
         slong m, n, k;
 
-        m = n_randint(state, 3);
-        n = n_randint(state, 3);
-        k = n_randint(state, 3);
+        m = n_randint(state, 2) + 1;
+        n = n_randint(state, 2) + 1;
+        k = n_randint(state, 2) + 1;
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, n, k);

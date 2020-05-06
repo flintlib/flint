@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include <string.h>
 
 void
 fmpz_mat_clear(fmpz_mat_t mat)
@@ -20,6 +21,8 @@ fmpz_mat_clear(fmpz_mat_t mat)
         for (i = 0; i < mat->r * mat->c; i++)
             fmpz_clear(mat->entries + i);   /* Clear all coefficients */
         flint_free(mat->entries);     /* Clean up array of entries */
-        flint_free(mat->rows);        /* Clean up row array */
     }
+    if (mat->rows)
+        flint_free(mat->rows);        /* Clean up row array */
+    memset(mat, 0, sizeof(*mat));
 }

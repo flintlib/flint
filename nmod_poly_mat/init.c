@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include <string.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
@@ -17,7 +17,7 @@
 void
 nmod_poly_mat_init(nmod_poly_mat_t A, slong rows, slong cols, mp_limb_t n)
 {
-    if (rows && cols)
+    if (rows > 0 && cols > 0)
     {
         slong i;
 
@@ -29,11 +29,11 @@ nmod_poly_mat_init(nmod_poly_mat_t A, slong rows, slong cols, mp_limb_t n)
 
         for (i = 0; i < rows; i++)
             A->rows[i] = A->entries + i * cols;
+
+        A->r = rows;
+        A->c = cols;
+        A->modulus = n;
     }
     else
-        A->entries = NULL;
-
-    A->modulus = n;
-    A->r = rows;
-    A->c = cols;
+        memset(A, 0, sizeof(*A));
 }

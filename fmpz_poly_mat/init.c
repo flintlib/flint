@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include <string.h>
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
@@ -17,7 +17,7 @@
 void
 fmpz_poly_mat_init(fmpz_poly_mat_t A, slong rows, slong cols)
 {
-    if (rows != 0 && cols != 0)
+    if (rows > 0 && cols > 0)
     {
         slong i;
 
@@ -29,10 +29,10 @@ fmpz_poly_mat_init(fmpz_poly_mat_t A, slong rows, slong cols)
 
         for (i = 0; i < rows; i++)
             A->rows[i] = A->entries + i * cols;
+
+        A->r = rows;
+        A->c = cols;
     }
     else
-        A->entries = NULL;
-
-    A->r = rows;
-    A->c = cols;
+        memset(A, 0, sizeof(*A));
 }

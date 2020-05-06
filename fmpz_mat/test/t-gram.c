@@ -26,8 +26,8 @@ int main(void)
     {
         slong m, n;
 
-        m = n_randint(state, 50);
-        n = n_randint(state, 50);
+        m = n_randint(state, 49) + 1;
+        n = n_randint(state, 49) + 1;
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, n, m);

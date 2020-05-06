@@ -10,11 +10,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpz_poly_mat.h"
 
 void
 fmpz_poly_mat_window_clear(fmpz_poly_mat_t window)
 {
-    if (window->r != 0)
+    if (window->rows)
         flint_free(window->rows);
+    memset(window, 0, sizeof(window));
 }

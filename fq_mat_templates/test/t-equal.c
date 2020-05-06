@@ -41,8 +41,8 @@ main(void)
 
         TEMPLATE(T, init) (x, ctx);
 
-        m = n_randint(state, 20);
-        n = n_randint(state, 20);
+        m = n_randint(state, 19) + 1;
+        n = n_randint(state, 19) + 1;
 
         TEMPLATE(T, mat_init) (A, m, n, ctx);
         TEMPLATE(T, mat_init) (B, m, n, ctx);

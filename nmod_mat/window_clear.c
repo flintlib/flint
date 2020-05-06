@@ -12,7 +12,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include <string.h>
 #include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
@@ -20,6 +20,7 @@
 void
 nmod_mat_window_clear(nmod_mat_t window)
 {
-    if (window->r > 0)
+    if (window->rows)
         flint_free(window->rows);
+    memset(window, 0, sizeof(*window));
 }

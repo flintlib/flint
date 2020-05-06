@@ -33,8 +33,8 @@ main(void)
         fmpz_mat_t A, B, C, D, E;
         slong m, n, j;
 
-        m = n_randint(state, 20);
-        n = n_randint(state, 20);
+        m = n_randint(state, 19) + 1;
+        n = n_randint(state, 19) + 1;
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, m, n);

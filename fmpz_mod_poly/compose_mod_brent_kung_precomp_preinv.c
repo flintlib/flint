@@ -85,18 +85,18 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
         flint_abort();
     }
 
-    if (A->r != m || A->c != len)
-    {
-        flint_printf("Exception (fmpz_mod_poly_precompute_matrix)."
-                     " Wrong dimensions.\n");
-        flint_abort();
-    }
-
     if (len2 == 1)
     {
         fmpz_mat_zero(A);
 
         return;
+    }
+
+    if (A->r != m || A->c != len)
+    {
+        flint_printf("Exception (fmpz_mod_poly_precompute_matrix)."
+                     " Wrong dimensions.\n");
+        flint_abort();
     }
 
     ptr = _fmpz_vec_init(vec_len);

@@ -12,7 +12,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include <string.h>
 #include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
@@ -24,16 +24,20 @@ nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
     slong i;
     window->entries = NULL;
 
-    if (r2 > r1)
-        window->rows = (mp_limb_t **) flint_malloc((r2 - r1) * sizeof(mp_limb_t *));
-
-    if (mat->c > 0)
+    if (r2 > r1 && c2 > c1)
     {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = mat->rows[r1 + i] + c1;
-    }
+        window->rows = (mp_limb_t **) flint_malloc((r2 - r1) * sizeof(mp_limb_t *));
+        window->r = r2 - r1;
+        window->c = c2 - c1;
 
-    window->r = r2 - r1;
-    window->c = c2 - c1;
+        if (mat->c > 0)
+        {
+            for (i = 0; i < r2 - r1; i++)
+                window->rows[i] = mat->rows[r1 + i] + c1;
+        }
+    }
+    else
+        memset(window, 0, sizeof(*window));
+
     window->mod = mat->mod;
 }

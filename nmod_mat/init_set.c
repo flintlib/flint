@@ -10,7 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include <string.h>
 #include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
@@ -21,7 +21,7 @@ nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
     slong rows = src->r;
     slong cols = src->c;
 
-    if ((rows) && (cols))
+    if (rows > 0 && cols > 0)
     {
         slong i;
         mat->entries = flint_malloc(flint_mul_sizes(rows, cols) * sizeof(mp_limb_t));
@@ -32,12 +32,12 @@ nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
             mat->rows[i] = mat->entries + i * cols;
             flint_mpn_copyi(mat->rows[i], src->rows[i], cols);
         }
+
+        mat->r = rows;
+        mat->c = cols;
     }
     else
-        mat->entries = NULL;
-
-    mat->r = rows;
-    mat->c = cols;
+        memset(mat, 0, sizeof(*mat));
 
     mat->mod = src->mod;
 }

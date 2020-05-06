@@ -10,11 +10,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpq_mat.h"
 
 void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
 {
-    if (rows != 0 && cols != 0)
+    if (rows > 0 && cols > 0)
     {
         slong i;
         mat->entries = (fmpq *) flint_calloc(flint_mul_sizes(rows, cols), sizeof(fmpq));
@@ -26,10 +27,10 @@ void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
 
         for (i = 0; i < rows; i++)
             mat->rows[i] = mat->entries + i * cols;
+
+        mat->r = rows;
+        mat->c = cols;
     }
     else
-        mat->entries = NULL;
-
-    mat->r = rows;
-    mat->c = cols;
+        memset(mat, 0, sizeof(*mat));
 }

@@ -12,13 +12,14 @@
 
 #ifdef T
 
+#include <string.h>
 #include "templates.h"
 
 void
 TEMPLATE(T, mat_init) (TEMPLATE(T, mat_t) mat, slong rows, slong cols,
                        const TEMPLATE(T, ctx_t) ctx)
 {
-    if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
+    if (rows > 0 && cols > 0)       /* Allocate space for r*c small entries */
     {
         slong i, j;
         mat->entries = (TEMPLATE(T, struct) *) flint_malloc(flint_mul_sizes(rows, cols)
@@ -34,12 +35,12 @@ TEMPLATE(T, mat_init) (TEMPLATE(T, mat_t) mat, slong rows, slong cols,
                 TEMPLATE(T, init) (mat->rows[i] + j, ctx);
             }
         }
+
+        mat->r = rows;
+        mat->c = cols;
     }
     else
-        mat->entries = NULL;
-
-    mat->r = rows;
-    mat->c = cols;
+        memset(mat, 0, sizeof(*mat));
 }
 
 

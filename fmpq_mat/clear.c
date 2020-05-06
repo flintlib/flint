@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpq_mat.h"
 
 void fmpq_mat_clear(fmpq_mat_t mat)
@@ -21,6 +22,8 @@ void fmpq_mat_clear(fmpq_mat_t mat)
             fmpq_clear(mat->entries + i);
 
         flint_free(mat->entries);
-        flint_free(mat->rows);
     }
+    if (mat->rows)
+        flint_free(mat->rows);
+    memset(mat, 0, sizeof(*mat));
 }

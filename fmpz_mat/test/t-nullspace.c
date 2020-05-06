@@ -33,8 +33,8 @@ main(void)
     /* small dimension */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        m = n_randint(state, 10);
-        n = n_randint(state, 10);
+        m = n_randint(state, 9) + 1;
+        n = n_randint(state, 9) + 1;
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {

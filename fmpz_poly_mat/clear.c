@@ -10,6 +10,7 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
@@ -25,6 +26,8 @@ fmpz_poly_mat_clear(fmpz_poly_mat_t A)
             fmpz_poly_clear(A->entries + i);
 
         flint_free(A->entries);
-        flint_free(A->rows);
     }
+    if (A->rows)
+        flint_free(A->rows);
+    memset(A, 0, sizeof(*A));
 }

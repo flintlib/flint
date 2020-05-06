@@ -10,6 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpz_poly_mat.h"
 
 void
@@ -19,16 +20,15 @@ fmpz_poly_mat_window_init(fmpz_poly_mat_t window, const fmpz_poly_mat_t mat, slo
     slong i;
     window->entries = NULL;
 
-    if (r2 > r1)
+    if (r2 > r1 && c2 > c1)
+    {
         window->rows = (fmpz_poly_struct **) flint_malloc((r2 - r1)
                                                   * sizeof(fmpz_poly_struct *));
-
-    if (c2 > c1)
-    {
         for (i = 0; i < r2 - r1; i++)
             window->rows[i] = mat->rows[r1 + i] + c1;
+        window->r = r2 - r1;
+        window->c = c2 - c1;
     }
-
-    window->r = r2 - r1;
-    window->c = c2 - c1;
+    else
+        memset(window, 0, sizeof(*window));
 }

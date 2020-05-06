@@ -34,8 +34,8 @@ main(void)
         mp_limb_t mod;
         slong m, n, d, r, nullity, nulrank;
 
-        m = n_randint(state, 30);
-        n = n_randint(state, 30);
+        m = n_randint(state, 29) + 1;
+        n = n_randint(state, 29) + 1;
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {

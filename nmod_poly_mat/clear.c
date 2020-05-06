@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
@@ -24,6 +25,8 @@ nmod_poly_mat_clear(nmod_poly_mat_t A)
             nmod_poly_clear(A->entries + i);
 
         flint_free(A->entries);
-        flint_free(A->rows);
     }
+    if (A->rows)
+        flint_free(A->rows);
+    memset(A, 0, sizeof(*A));
 }

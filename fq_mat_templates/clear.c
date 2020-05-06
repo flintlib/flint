@@ -13,6 +13,7 @@
 
 #ifdef T
 
+#include <string.h>
 #include "templates.h"
 
 void
@@ -24,8 +25,10 @@ TEMPLATE(T, mat_clear) (TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx)
         for (i = 0; i < mat->r * mat->c; i++)
             TEMPLATE(T, clear) (mat->entries + i, ctx); /* Clear all coefficients */
         flint_free(mat->entries);   /* Clean up array of entries */
-        flint_free(mat->rows);  /* Clean up row array */
     }
+    if (mat->rows)
+        flint_free(mat->rows);  /* Clean up row array */
+    memset(mat, 0, sizeof(*mat));
 }
 
 

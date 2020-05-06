@@ -34,8 +34,8 @@ main(void)
         slong n, m, bits, deg, rank, nullity;
         float density;
 
-        m = n_randint(state, 13);
-        n = n_randint(state, 13);
+        m = n_randint(state, 12) + 1;
+        n = n_randint(state, 12) + 1;
         deg = 1 + n_randint(state, 5);
         bits = 1 + n_randint(state, 100);
         density = n_randint(state, 100) * 0.01;

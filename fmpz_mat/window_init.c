@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpz_mat.h"
 
 void
@@ -18,15 +19,18 @@ fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
     slong i;
     window->entries = NULL;
 
-    if (r2 > r1)
-        window->rows = (fmpz **) flint_malloc((r2 - r1) * sizeof(fmpz *));
-
-    if (mat->c > 0)
+    if (r2 > r1 && c2 > c1)
     {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = mat->rows[r1 + i] + c1;
-    }
+        window->rows = (fmpz **) flint_malloc((r2 - r1) * sizeof(fmpz *));
+        window->r = r2 - r1;
+        window->c = c2 - c1;
 
-    window->r = r2 - r1;
-    window->c = c2 - c1;
+        if (mat->c > 0)
+        {
+            for (i = 0; i < r2 - r1; i++)
+                window->rows[i] = mat->rows[r1 + i] + c1;
+        }
+    }
+    else
+        memset(window, 0, sizeof(*window));
 }

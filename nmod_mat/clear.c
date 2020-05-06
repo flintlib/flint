@@ -11,6 +11,7 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
@@ -19,8 +20,8 @@ void
 nmod_mat_clear(nmod_mat_t mat)
 {
     if (mat->entries)
-    {
         flint_free(mat->entries);
+    if (mat->rows)
         flint_free(mat->rows);
-    }
+    memset(mat, 0, sizeof(*mat));
 }
