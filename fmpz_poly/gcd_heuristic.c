@@ -206,7 +206,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    qlimbs = limbs1 - limbsg + 1;
    qlen = FLINT_MIN(len1, (qlimbs*FLINT_BITS)/pack_bits + 1);
    qlimbs = (qlen*pack_bits - 1)/FLINT_BITS + 1;
-   q = flint_calloc(qlimbs, sizeof(mp_limb_t));
+   q = flint_calloc(qlimbs + 1, sizeof(mp_limb_t));
    temp = flint_malloc(limbsg*sizeof(mp_limb_t));
    
 	divides = 0;
