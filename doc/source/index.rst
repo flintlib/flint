@@ -30,7 +30,7 @@ Module documentation
 .. toctree::
    :maxdepth: 2
 
-   ca_qqbar.rst
+   qqbar.rst
 
 
 FAQ
