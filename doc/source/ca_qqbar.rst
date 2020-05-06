@@ -531,11 +531,13 @@ and subtracted internally).
 
     Sets *res* to the root of unity `e^{2 \pi i p / q}`.
 
-.. function:: ulong ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x)
+.. function:: int ca_qqbar_is_root_of_unity(slong * p, ulong * q, const ca_qqbar_t x)
 
-    If *x* is a root of unity, returns 1, and if *p* and *q* are not
-    *NULL*, sets *p* and *q* to the minimal integers `x = e^{2 \pi i p / q}`,
-    with `0 \le p < q`. Returns 0 if *x* is not a root of unity.
+    If *x* is not a root of unity, returns 0.
+    If *x* is a root of unity, returns 1.
+    If *p* and *q* are not *NULL* and *x* is a root of unity,
+    this also sets *p* and *q* to the minimal integers with `0 \le p < q`
+    such that `x = e^{2 \pi i p / q}`.
 
 .. function:: void ca_qqbar_exp_pi_i(ca_qqbar_t res, slong p, ulong q)
 
