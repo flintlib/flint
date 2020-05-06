@@ -12,30 +12,20 @@
 #include "ca_qqbar.h"
 
 int
-ca_qqbar_acos_pi(slong * p, ulong * q, const ca_qqbar_t x)
+ca_qqbar_log_pi_i(slong * p, ulong * q, const ca_qqbar_t x)
 {
-    if (ca_qqbar_asin_pi(p, q, x))
+    int ok;
+
+    ok = ca_qqbar_is_root_of_unity(p, q, x);
+
+    if (ok)
     {
-        slong a, b, g;
-        a = *p;
-        b = *q;
-
-        /* 1/2 - a/b */
-        a = b - 2 * a;
-        b = 2 * b;
-
-        g = n_gcd(FLINT_ABS(a), b);
-        if (g != 1)
-        {
-            a /= g;
-            b /= g;
-        }
-
-        *p = a;
-        *q = b;
-
-        return 1;
+        if (*q % 2 == 0)
+            *q /= 2;
+        else
+            *p *= 2;
     }
 
-    return 0;
+    while (*p > (slong) *q)
+        *p -= 2 * (slong) (*q);
 }

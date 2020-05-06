@@ -318,9 +318,9 @@ void ca_qqbar_eigenvalues_fmpq_mat(ca_qqbar_ptr res, const fmpq_mat_t mat, int f
 
 /* Roots of unity and trigonometric functions */
 
-ulong ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x);
-
 void ca_qqbar_root_of_unity(ca_qqbar_t res, slong p, ulong q);
+
+int ca_qqbar_is_root_of_unity(slong * p, ulong * q, const ca_qqbar_t x);
 
 void ca_qqbar_exp_pi_i(ca_qqbar_t res, slong p, ulong q);
 
@@ -336,11 +336,19 @@ void ca_qqbar_sec_pi(ca_qqbar_t res, slong p, ulong q);
 
 void ca_qqbar_csc_pi(ca_qqbar_t res, slong p, ulong q);
 
+int ca_qqbar_log_pi_i(slong * p, ulong * q, const ca_qqbar_t x);
+
 int ca_qqbar_atan_pi(slong * p, ulong * q, const ca_qqbar_t x);
 
 int ca_qqbar_asin_pi(slong * p, ulong * q, const ca_qqbar_t x);
 
 int ca_qqbar_acos_pi(slong * p, ulong * q, const ca_qqbar_t x);
+
+int ca_qqbar_acot_pi(slong * p, ulong * q, const ca_qqbar_t x);
+
+int ca_qqbar_asec_pi(slong * p, ulong * q, const ca_qqbar_t x);
+
+int ca_qqbar_acsc_pi(slong * p, ulong * q, const ca_qqbar_t x);
 
 /* Guessing and simplification */
 

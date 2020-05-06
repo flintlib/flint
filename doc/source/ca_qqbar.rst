@@ -527,17 +527,15 @@ The input *p* and *q* do not need to be reduced *a priori*,
 but should not be close to the word boundaries (they may be added
 and subtracted internally).
 
-.. function:: ulong ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x)
-
-    If *x* is a root of unity,
-    returns the minimal *q* such that `x = e^{2 \pi i p / q}`,
-    and if the pointer to *p* is not NULL, writes the unique
-    index with `0 \le p < q`.
-    Returns 0 if *x* is not a root of unity.
-
 .. function:: void ca_qqbar_root_of_unity(ca_qqbar_t res, slong p, ulong q)
 
     Sets *res* to the root of unity `e^{2 \pi i p / q}`.
+
+.. function:: ulong ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x)
+
+    If *x* is a root of unity, returns 1, and if *p* and *q* are not
+    *NULL*, sets *p* and *q* to the minimal integers `x = e^{2 \pi i p / q}`,
+    with `0 \le p < q`. Returns 0 if *x* is not a root of unity.
 
 .. function:: void ca_qqbar_exp_pi_i(ca_qqbar_t res, slong p, ulong q)
 
@@ -557,6 +555,14 @@ and subtracted internally).
 
     Sets *res* to the trigonometric function `\cos(\pi x)`,
     `\sin(\pi x)`, etc., with `x = \tfrac{p}{q}`.
+    Evaluation at a pole of tan, cot, sec or csc inflicts division by zero.
+
+.. function:: int ca_qqbar_log_pi_i(slong * p, ulong * q, const ca_qqbar_t x)
+
+    If `y = \operatorname{log}(x) / (\pi i)` is algebraic, and hence
+    necessarily rational, sets `y = p / q` to the reduced such
+    fraction with `-1 < y \le 1` and returns 1.
+    If *y* is not algebraic, returns 0.
 
 .. function:: int ca_qqbar_atan_pi(slong * p, ulong * q, const ca_qqbar_t x)
 
@@ -578,6 +584,28 @@ and subtracted internally).
     necessarily rational, sets `y = p / q` to the reduced such
     fraction with `0 \le y \le 1` and returns 1.
     If *y* is not algebraic, returns 0.
+
+.. function:: int ca_qqbar_acot_pi(slong * p, ulong * q, const ca_qqbar_t x)
+
+    If `y = \operatorname{acot}(x) / \pi` is algebraic, and hence
+    necessarily rational, sets `y = p / q` to the reduced such
+    fraction with `-\tfrac{1}{2} < y \le \tfrac{1}{2}` and returns 1.
+    If *y* is not algebraic, returns 0.
+
+.. function:: int ca_qqbar_asec_pi(slong * p, ulong * q, const ca_qqbar_t x)
+
+    If `y = \operatorname{asec}(x) / \pi` is algebraic, and hence
+    necessarily rational, sets `y = p / q` to the reduced such
+    fraction with `0 \le y \le 1` and returns 1.
+    If *y* is not algebraic, returns 0.
+
+.. function:: int ca_qqbar_acsc_pi(slong * p, ulong * q, const ca_qqbar_t x)
+
+    If `y = \operatorname{acsc}(x) / \pi` is algebraic, and hence
+    necessarily rational, sets `y = p / q` to the reduced such
+    fraction with `-\tfrac{1}{2} \le y \le \tfrac{1}{2}` and returns 1.
+    If *y* is not algebraic, returns 0.
+
 
 Guessing and simplification
 -------------------------------------------------------------------------------

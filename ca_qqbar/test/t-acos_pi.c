@@ -41,7 +41,7 @@ int main()
         if (res)
             ca_qqbar_cos_pi(y, p2, q2);
 
-        if (res == 0 || !ca_qqbar_equal(x, y))
+        if (!res || !ca_qqbar_equal(x, y) || n_gcd(FLINT_ABS(p2), q2) != 1 || !(0 <= p2 && p2 <= (slong) q2))
         {
             flint_printf("FAIL!\n");
             flint_printf("x = "); ca_qqbar_print(x); flint_printf("\n\n");

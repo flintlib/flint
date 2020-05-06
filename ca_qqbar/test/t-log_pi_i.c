@@ -16,7 +16,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("root_of_unity....");
+    flint_printf("log_pi_i....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -26,7 +26,7 @@ int main()
         ca_qqbar_t x, y;
         slong p, p2;
         ulong q, q2;
-        int ok;
+        int res;
 
         ca_qqbar_init(x);
         ca_qqbar_init(y);
@@ -35,33 +35,20 @@ int main()
         p = n_randint(state, 1000);
         p -= 500;
 
-        ca_qqbar_root_of_unity(x, p, q);
-        ok = ca_qqbar_is_root_of_unity(&p2, &q2, x);
-        ca_qqbar_root_of_unity(y, p2, q2);
+        ca_qqbar_exp_pi_i(x, p, q);
+        res = ca_qqbar_log_pi_i(&p2, &q2, x);
+        if (res)
+            ca_qqbar_exp_pi_i(y, p2, q2);
 
-        if (!ok || !ca_qqbar_equal(x, y) || n_gcd(FLINT_ABS(p2), q2) != 1 || !(0 <= p2 && p2 < (slong) 2 * q2))
+        if (res == 0 || !ca_qqbar_equal(x, y) || n_gcd(FLINT_ABS(p2), q2) != 1 || p2 > (slong) q2 || p2 <= -(slong) q2)
         {
             flint_printf("FAIL!\n");
             flint_printf("x = "); ca_qqbar_print(x); flint_printf("\n\n");
             flint_printf("y = "); ca_qqbar_print(y); flint_printf("\n\n");
+            flint_printf("res = %d\n\n", res);
             flint_printf("p, p2 = %wd %wd\n\n", p, p2);
             flint_printf("q, q2 = %wu %wu\n\n", q, q2);
             flint_abort();
-        }
-
-        if (q <= 10)
-        {
-            ca_qqbar_pow_ui(y, x, q);
-
-            if (!ca_qqbar_is_one(y))
-            {
-                flint_printf("FAIL!\n");
-                flint_printf("x = "); ca_qqbar_print(x); flint_printf("\n\n");
-                flint_printf("y = "); ca_qqbar_print(y); flint_printf("\n\n");
-                flint_printf("p, p2 = %wd %wd\n\n", p, p2);
-                flint_printf("q, q2 = %wu %wu\n\n", q, q2);
-                flint_abort();
-            }
         }
 
         ca_qqbar_clear(x);

@@ -11,8 +11,8 @@
 
 #include "ca_qqbar.h"
 
-ulong
-ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x)
+int
+ca_qqbar_is_root_of_unity(slong * p, ulong * q, const ca_qqbar_t x)
 {
     ulong n;
 
@@ -20,6 +20,9 @@ ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x)
 
     if (n == 0)
         return 0;
+
+    if (q != NULL)
+        *q = n;
 
     if (n == 1)
     {
@@ -78,7 +81,7 @@ ca_qqbar_is_root_of_unity(slong * p, const ca_qqbar_t x)
         }
     }
 
-    return n;
+    return 1;
 }
 
 void
