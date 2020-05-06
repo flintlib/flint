@@ -459,7 +459,7 @@ fix:
 
 }
 
-static void _lehmer_exact(_fmpz_vector_t s, _fmpz_mat22_t M, int flags,
+static void _lehmer_exact(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int flags,
                                     fmpz_t xa, fmpz_t xb, fmpz_t ya, fmpz_t yb)
 {
     mp_limb_t s_temp[2*FLINT_BITS];
@@ -577,7 +577,7 @@ its_ok:
     yn->_mp_size = yn_len;
     yd->_mp_size = yd_len;
 
-    _fmpz_vector_append_ui(s, s_temp, written);
+    _fmpq_cfrac_list_append_ui(s, s_temp, written);
 
     FLINT_MPZ_PTR_SWAP(xn, yn);
     FLINT_MPZ_PTR_SWAP(xd, yd);
@@ -604,7 +604,7 @@ cleanup:
 }
 
 
-static void _lehmer_inexact(_fmpz_vector_t s, _fmpz_mat22_t M, int needM,
+static void _lehmer_inexact(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int needM,
                                                 _fmpq_ball_t x, _fmpq_ball_t y)
 {
     mp_limb_t s_temp[2*FLINT_BITS];
@@ -765,7 +765,7 @@ again:
         _fmpz_mat22_rmul_ui(M, m);
 
     /* already checked that s will fit new terms */
-    _fmpz_vector_append_ui(s, s_temp, written);
+    _fmpq_cfrac_list_append_ui(s, s_temp, written);
 
     FLINT_MPZ_PTR_SWAP(xln, yln);
     FLINT_MPZ_PTR_SWAP(xld, yld);
@@ -869,7 +869,7 @@ static void _hgcd_step(
     inplace operation, so (M, xa/xb) is the input ball M^-1(a/(b+1), (a+1)/b)
     and output ball M^-1(a'/(b'+1), (a'+1)/b').
 */
-void _fmpq_hgcd(_fmpz_vector_t s, _fmpz_mat22_t M, fmpz_t xa, fmpz_t xb)
+void _fmpq_hgcd(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, fmpz_t xa, fmpz_t xb)
 {
     flint_bitcnt_t k, km, shift;
     fmpz_t ya, yb;
@@ -920,7 +920,7 @@ gauss:
     fmpz_swap(xa, xb);
     fmpz_swap(xb, yb);
 
-    _fmpz_vector_push_back(s, ya);
+    _fmpq_cfrac_list_push_back(s, ya);
     goto again;
 
 lehmer:
@@ -1001,7 +1001,7 @@ static flint_bitcnt_t _fmpz_tail_bits(const fmpz_t a, const fmpz_t b)
 }
 
 /* generate terms valid for every number in the closed ball x > 1 */
-void _fmpq_ball_get_cfrac(_fmpz_vector_t s, _fmpz_mat22_t M, int needM,
+void _fmpq_ball_get_cfrac(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int needM,
                                                                 _fmpq_ball_t x)
 {
     flint_bitcnt_t k;
@@ -1076,7 +1076,7 @@ gauss:
     if (needM)
         _fmpz_mat22_rmul_elem(M, q);
 
-    _fmpz_vector_push_back(s, q);
+    _fmpq_cfrac_list_push_back(s, q);
     goto again;
 
 lehmer:

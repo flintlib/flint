@@ -78,11 +78,11 @@ set_sum:
     }
     else
     {
-        _fmpz_vector_t s;
+        _fmpq_cfrac_list_t s;
         _fmpz_mat22_t M;
         _fmpq_ball_t x;
 
-        _fmpz_vector_init(s);
+        _fmpq_cfrac_list_init(s);
         s->length = -1;
         s->want_alt_sum = 1;
 
@@ -104,7 +104,7 @@ set_sum:
             do {
                 fmpz_fdiv_qr(x->right_num, x->left_num, x->left_num, x->left_den);
                 _fmpz_mat22_rmul_elem(M, x->right_num);
-                _fmpz_vector_push_back(s, x->right_num);
+                _fmpq_cfrac_list_push_back(s, x->right_num);
                 fmpz_swap(x->left_num, x->left_den);
             } while (!fmpz_is_zero(x->left_den));
         }
@@ -127,7 +127,7 @@ set_sum:
         fmpz_addmul(fmpq_numref(sum), s->alt_sum, fmpq_denref(sum));
 
         _fmpq_ball_clear(x);
-        _fmpz_vector_clear(s);
+        _fmpq_cfrac_list_clear(s);
         _fmpz_mat22_clear(M);
     }
 
