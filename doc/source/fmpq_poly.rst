@@ -845,10 +845,16 @@ Divisibility testing
     `0`. Requires that ``qpoly`` has space for ``len1 - len2 + 1``
     coefficients and that ``len1 >= len2 > 0``.
 
-int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+.. function:: int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Return `1` if ``poly2`` divides ``poly1`` and set ``q`` to the quotient.
     Otherwise return `0`.
+
+.. function:: slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+
+    Sets ``q`` to the quotient of ``poly1`` by the highest power of ``poly2``
+    which divides it, and returns the power. The divisor ``poly2`` must not be
+    constant or an exception is raised.
 
 
 Power series division

@@ -58,7 +58,8 @@ fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
 	if (!fmpz_is_zero(p1sum))
         {
 	    fmpz_poly_set(res, poly1);
-	    return 0;
+	    i = 0;
+	    goto cleanup;
 	} else
 	    i = (poly1->length - 1)/(poly2->length - 1);
     } else if (fmpz_is_zero(p1sum) || fmpz_is_one(p2sum))
@@ -88,6 +89,8 @@ fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
 	fmpz_poly_clear(q);
     } else
 	fmpz_poly_set(res, poly1);
+
+cleanup:
 
     fmpz_clear(qsum);
     fmpz_clear(p1sum);

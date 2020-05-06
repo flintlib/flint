@@ -493,6 +493,9 @@ FLINT_DLL int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden,
 FLINT_DLL int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1,
                                                       const fmpq_poly_t poly2);
 
+FLINT_DLL slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
+                                                      const fmpq_poly_t poly2);
+
 /*  Power series division  ***************************************************/
 
 FLINT_DLL void _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden, 
