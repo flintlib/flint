@@ -166,9 +166,7 @@ test_dedekind()
     fmpzxx k = fmpzxx::randtest_unsigned(state, 10);
     tassert(dedekind_sum_naive(h, k) == dedekind_sum(h, k));
     k /= gcd(h, k);
-    tassert(dedekind_sum_coprime_large(h, k) == dedekind_sum(h, k));
-    tassert(dedekind_sum_coprime(h, k) == dedekind_sum(h, k));
-    // untested: dedekind_sum_coprime_d
+    tassert(dedekind_sum_naive(h, k) == dedekind_sum(h, k));
 }
 
 void
