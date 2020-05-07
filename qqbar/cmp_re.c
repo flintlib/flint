@@ -37,6 +37,23 @@ qqbar_cmp_re(const qqbar_t x, const qqbar_t y)
                          QQBAR_COEFFS(x), QQBAR_COEFFS(x) + 1);
     }
 
+    /* Likely complex conjugates */
+    if (fmpz_poly_equal(QQBAR_POLY(x), QQBAR_POLY(y)))
+    {
+        qqbar_t t;
+
+        /* Nonreal quadratics are complex conjugates */
+        if (qqbar_degree(x) == 2)
+            return 0;
+
+        qqbar_init(t);
+        qqbar_conj(t, y);
+        res = qqbar_equal(x, t);
+        qqbar_clear(t);
+        if (res == 1)
+            return 0;
+    }
+
     /* Subtraction is a scalar operation and will be quick */
     if ((qqbar_degree(x) == 1 || qqbar_degree(y) == 1))
     {
@@ -45,42 +62,41 @@ qqbar_cmp_re(const qqbar_t x, const qqbar_t y)
         qqbar_sub(t, x, y);
         res = qqbar_sgn_re(t);
         qqbar_clear(t);
+        return res;
     }
-    else
+
+    acb_init(z1);
+    acb_init(z2);
+
+    acb_set(z1, QQBAR_ENCLOSURE(x));
+    acb_set(z2, QQBAR_ENCLOSURE(y));
+
+    res = 0;
+    for (prec = QQBAR_DEFAULT_PREC; ; prec *= 2)
     {
-        acb_init(z1);
-        acb_init(z2);
+        _qqbar_enclosure_raw(z1, QQBAR_POLY(x), z1, prec);
+        _qqbar_enclosure_raw(z2, QQBAR_POLY(y), z2, prec);
 
-        acb_set(z1, QQBAR_ENCLOSURE(x));
-        acb_set(z2, QQBAR_ENCLOSURE(y));
-
-        res = 0;
-        for (prec = QQBAR_DEFAULT_PREC; ; prec *= 2)
+        if (!arb_overlaps(acb_realref(z1), acb_realref(z2)))
         {
-            _qqbar_enclosure_raw(z1, QQBAR_POLY(x), z1, prec);
-            _qqbar_enclosure_raw(z2, QQBAR_POLY(y), z2, prec);
-
-            if (!arb_overlaps(acb_realref(z1), acb_realref(z2)))
-            {
-                res = arf_cmp(arb_midref(acb_realref(z1)), arb_midref(acb_realref(z2)));
-                break;
-            }
-
-            /* Force an exact computation (may be slow) */
-            if (prec >= 4 * QQBAR_DEFAULT_PREC)
-            {
-                qqbar_t t;
-                qqbar_init(t);
-                qqbar_sub(t, x, y);
-                res = qqbar_sgn_re(t);
-                qqbar_clear(t);
-                break;
-            }
+            res = arf_cmp(arb_midref(acb_realref(z1)), arb_midref(acb_realref(z2)));
+            break;
         }
 
-        acb_clear(z1);
-        acb_clear(z2);
+        /* Force an exact computation (may be slow) */
+        if (prec >= 4 * QQBAR_DEFAULT_PREC)
+        {
+            qqbar_t t;
+            qqbar_init(t);
+            qqbar_sub(t, x, y);
+            res = qqbar_sgn_re(t);
+            qqbar_clear(t);
+            break;
+        }
     }
+
+    acb_clear(z1);
+    acb_clear(z2);
 
     return res;
 }

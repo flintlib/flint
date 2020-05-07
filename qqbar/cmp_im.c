@@ -33,40 +33,38 @@ qqbar_cmp_im(const qqbar_t x, const qqbar_t y)
     if (qqbar_equal(x, y))
         return 0;
 
+    acb_init(z1);
+    acb_init(z2);
+
+    acb_set(z1, QQBAR_ENCLOSURE(x));
+    acb_set(z2, QQBAR_ENCLOSURE(y));
+
+    res = 0;
+    for (prec = QQBAR_DEFAULT_PREC; ; prec *= 2)
     {
-        acb_init(z1);
-        acb_init(z2);
+        _qqbar_enclosure_raw(z1, QQBAR_POLY(x), z1, prec);
+        _qqbar_enclosure_raw(z2, QQBAR_POLY(y), z2, prec);
 
-        acb_set(z1, QQBAR_ENCLOSURE(x));
-        acb_set(z2, QQBAR_ENCLOSURE(y));
-
-        res = 0;
-        for (prec = QQBAR_DEFAULT_PREC; ; prec *= 2)
+        if (!arb_overlaps(acb_imagref(z1), acb_imagref(z2)))
         {
-            _qqbar_enclosure_raw(z1, QQBAR_POLY(x), z1, prec);
-            _qqbar_enclosure_raw(z2, QQBAR_POLY(y), z2, prec);
-
-            if (!arb_overlaps(acb_imagref(z1), acb_imagref(z2)))
-            {
-                res = arf_cmp(arb_midref(acb_imagref(z1)), arb_midref(acb_imagref(z2)));
-                break;
-            }
-
-            /* Force an exact computation (may be slow) */
-            if (prec >= 4 * QQBAR_DEFAULT_PREC)
-            {
-                qqbar_t t;
-                qqbar_init(t);
-                qqbar_sub(t, x, y);
-                res = qqbar_sgn_im(t);
-                qqbar_clear(t);
-                break;
-            }
+            res = arf_cmp(arb_midref(acb_imagref(z1)), arb_midref(acb_imagref(z2)));
+            break;
         }
 
-        acb_clear(z1);
-        acb_clear(z2);
+        /* Force an exact computation (may be slow) */
+        if (prec >= 4 * QQBAR_DEFAULT_PREC)
+        {
+            qqbar_t t;
+            qqbar_init(t);
+            qqbar_sub(t, x, y);
+            res = qqbar_sgn_im(t);
+            qqbar_clear(t);
+            break;
+        }
     }
+
+    acb_clear(z1);
+    acb_clear(z2);
 
     return res;
 }
