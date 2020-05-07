@@ -189,6 +189,12 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
     fmpq_poly_clear(P2drev);
 }
 
+#define TIMING 0
+
+#if TIMING
+#include "flint/profiler.h"
+#endif
+
 void
 qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
 {
@@ -209,8 +215,23 @@ qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
         fmpz_poly_max_bits(QQBAR_POLY(x)),
         fmpz_poly_degree(QQBAR_POLY(y)),
         fmpz_poly_max_bits(QQBAR_POLY(y))); */
+#if TIMING
+    {
+        flint_printf("composed op: ");
+        TIMEIT_ONCE_START
+        qqbar_fmpz_poly_composed_op(H, QQBAR_POLY(x), QQBAR_POLY(y), op);
+        TIMEIT_ONCE_STOP
+
+        flint_printf("factoring: ");
+        TIMEIT_ONCE_START
+        fmpz_poly_factor(fac, H);
+        TIMEIT_ONCE_STOP
+    }
+#else
     qqbar_fmpz_poly_composed_op(H, QQBAR_POLY(x), QQBAR_POLY(y), op);
     fmpz_poly_factor(fac, H);
+#endif
+
     acb_set(z1, QQBAR_ENCLOSURE(x));
     acb_set(z2, QQBAR_ENCLOSURE(y));
 

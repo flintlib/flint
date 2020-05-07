@@ -42,8 +42,9 @@ qqbar_cmp_re(const qqbar_t x, const qqbar_t y)
     {
         qqbar_t t;
 
-        /* Nonreal quadratics are complex conjugates */
-        if (qqbar_degree(x) == 2)
+        /* Complex conjugate quadratics */
+        if (qqbar_degree(x) == 2 &&
+            !arb_overlaps(acb_imagref(QQBAR_ENCLOSURE(x)), acb_imagref(QQBAR_ENCLOSURE(y))))
             return 0;
 
         qqbar_init(t);
