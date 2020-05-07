@@ -73,6 +73,14 @@ FLINT_DLL void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, slong len);
 
 FLINT_DLL void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac);
 
+NMOD_POLY_FACTOR_INLINE
+void nmod_poly_factor_swap(nmod_poly_factor_t a, nmod_poly_factor_t b)
+{
+    nmod_poly_factor_struct t = *a;
+    *a = *b;
+    *b = t;
+}
+
 FLINT_DLL void nmod_poly_factor_insert(nmod_poly_factor_t fac,
                              const nmod_poly_t poly, slong exp);
 
@@ -131,6 +139,14 @@ FLINT_DLL mp_limb_t nmod_poly_factor(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
 FLINT_DLL void _nmod_poly_interval_poly_worker(void* arg_ptr);
+
+/* Roots *********************************************************************/
+
+FLINT_DLL void nmod_poly_roots(nmod_poly_factor_t r,
+                                   const nmod_poly_t f, int with_multiplicity);
+
+FLINT_DLL int nmod_poly_roots_factored(nmod_poly_factor_t r,
+             const nmod_poly_t f, int with_multiplicity, const n_factor_t * n);
 
 #ifdef __cplusplus
     }

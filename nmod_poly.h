@@ -1322,6 +1322,10 @@ FLINT_DLL void nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, 
 FLINT_DLL void _nmod_poly_product_roots_nmod_vec(mp_ptr poly,
     mp_srcptr xs, slong n, nmod_t mod);
 
+
+FLINT_DLL void _nmod_poly_split_rabin(nmod_poly_t a, nmod_poly_t b,
+                   nmod_poly_t T, const nmod_poly_t f, flint_rand_t randstate);
+
 FLINT_DLL int nmod_poly_find_distinct_nonzero_roots(mp_limb_t * roots,
                                                           const nmod_poly_t P);
 

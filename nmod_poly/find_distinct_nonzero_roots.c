@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 
 /* split f assuming that f has degree(f) distinct nonzero roots in Fp */
-static void _nmod_poly_rabinsplit(
+void _nmod_poly_split_rabin(
     nmod_poly_t a,
     nmod_poly_t b,
     nmod_poly_t T,
@@ -145,7 +145,7 @@ int nmod_poly_find_distinct_nonzero_roots(
         }
         else
         {
-            _nmod_poly_rabinsplit(stack + sp + 0, stack + sp + 1, T, f, randstate);
+            _nmod_poly_split_rabin(stack + sp + 0, stack + sp + 1, T, f, randstate);
             FLINT_ASSERT(FLINT_BIT_COUNT(nmod_poly_degree(stack + sp + 1)) <= FLINT_BITS - sp - 1);
             sp += 2;
         }
