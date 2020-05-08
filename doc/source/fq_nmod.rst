@@ -319,6 +319,10 @@ Randomisation
     Generates a random element of `\mathbf{F}_q` which has an
     underlying polynomial with dense coefficients.
 
+.. function:: void fq_nmod_rand(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
+
+    Generates a high quality random element of `\mathbf{F}_q`.
+
 
 Assignments and conversions
 --------------------------------------------------------------------------------

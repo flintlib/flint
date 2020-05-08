@@ -271,6 +271,8 @@ FLINT_DLL void fq_nmod_randtest_dense(fq_nmod_t rop, flint_rand_t state, const f
 
 FLINT_DLL void fq_nmod_randtest_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx);
 
+FLINT_DLL void fq_nmod_rand(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx);
+
 /* Comparison ****************************************************************/
 
 FQ_NMOD_INLINE int fq_nmod_equal(const fq_nmod_t op1, const fq_nmod_t op2,

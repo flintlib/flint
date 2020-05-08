@@ -44,7 +44,7 @@ static void map_down(nmod_poly_t a, const nmod_poly_t b)
         a*x + b*y = c
     with 0 <= x < b.
 */
-static int disolve(n_list_t v, ulong A, ulong B, ulong C)
+static int dio_solve(n_list_t v, ulong A, ulong B, ulong C)
 {
     int success = 1;
     slong k;
@@ -67,7 +67,7 @@ static int disolve(n_list_t v, ulong A, ulong B, ulong C)
         nmod_poly_fit_length(v, k + v->length);
         t = fmpz_get_ui(xstart);
         d = fmpz_get_ui(xstride);
-        for (k--; k >= 0; k--)
+        for (; k > 0; k--)
         {
             v->coeffs[v->length] = t;
             v->length++;
@@ -166,7 +166,7 @@ static int roots_mod_prime_power(nmod_poly_factor_t x, nmod_poly_t fpk,
             fprime = fprime % pe2e1;
 
             old_length = x2->length;
-            if (!disolve(x2, fprime, pe2e1, mfpe1))
+            if (!dio_solve(x2, fprime, pe2e1, mfpe1))
             {
                 success = 0;
                 goto cleanup;
