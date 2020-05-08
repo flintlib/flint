@@ -1113,6 +1113,12 @@ Modular arithmetic
     Computes the Jacobi symbol of `a` modulo `p`, where `p` is a prime
     and `a` is reduced modulo `p`.
 
+.. function:: void fmpz_divides_mod_list(fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)
+
+    Set `xstart`, `xstride`, and `xlength` so that the solution set for x modulo `n` in `a x = b mod n` is exactly `\{xstart + xstride i | 0 \le i < xlength\}`.
+    This function essentially gives a list of possibilities for the fraction `a/b` modulo `n`.
+    The outputs may not be aliased, and `n` should be positive.
+
 
 Bit packing and unpacking
 --------------------------------------------------------------------------------

@@ -187,7 +187,7 @@ main(void)
 
         if ((!fmpz_mod_poly_roots_factored(r, f, 0, n)) || (r->num != 0))
         {
-            flint_printf("FAILED:\ncheck example with no roots %wd\n", r->num);
+            flint_printf("FAILED:\ncheck example with no roots\n");
             flint_abort();
         }
 

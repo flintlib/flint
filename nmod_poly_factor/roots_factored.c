@@ -48,62 +48,44 @@ static int disolve(n_list_t v, ulong A, ulong B, ulong C)
 {
     int success = 1;
     slong k;
-    fmpz_t a, b, c, d, x, q, r, bbar, t;
+    ulong t, d;
+    fmpz_t xstart, xstride, xlength;
+    fmpz_t a, b, c;
 
+    fmpz_init(xstart);
+    fmpz_init(xstride);
+    fmpz_init(xlength);
     fmpz_init_set_ui(a, A);
     fmpz_init_set_ui(b, B);
     fmpz_init_set_ui(c, C);
 
-    FLINT_ASSERT(fmpz_sgn(a) >= 0);
-    FLINT_ASSERT(fmpz_sgn(b) > 0);
+    fmpz_divides_mod_list(xstart, xstride, xlength, c, a, b);
 
-    fmpz_init(d);
-    fmpz_init(x);
-    fmpz_init(q);
-    fmpz_init(r);
-    fmpz_init(bbar);
-    fmpz_init(t);
-
-    fmpz_gcdinv(d, x, a, b);
-    fmpz_fdiv_qr(q, r, c, d);
-    if (fmpz_is_zero(r))
+    k = *xlength;
+    if ((!COEFF_IS_MPZ(k)) && (k + v->length < LENGTH_LIMIT))
     {
-        fmpz_divexact(bbar, b, d);
-        fmpz_mul(x, x, q);
-        fmpz_fdiv_q(r, x, bbar);
-
-        k = *d;
-        if ((!COEFF_IS_MPZ(k)) && (k + v->length < LENGTH_LIMIT))
+        nmod_poly_fit_length(v, k + v->length);
+        t = fmpz_get_ui(xstart);
+        d = fmpz_get_ui(xstride);
+        for (k--; k >= 0; k--)
         {
-            nmod_poly_fit_length(v, k + v->length);
-            for (k--; k >= 0; k--)
-            {
-                fmpz_sub_si(q, r, k);
-                fmpz_set(t, x);
-                fmpz_submul(t, bbar, q);
-                FLINT_ASSERT(fmpz_sgn(t) >= 0);
-                FLINT_ASSERT(fmpz_cmp(t, b) < 0);
-                v->coeffs[v->length] = fmpz_get_ui(t);
-                v->length++;
-            }
-        }
-        else
-        {
-            /* too many solutions */
-            success = 0;
+            v->coeffs[v->length] = t;
+            v->length++;
+            t += d;
         }
     }
+    else
+    {
+        /* too many solutions */
+        success = 0;
+    }
 
+    fmpz_clear(xstart);
+    fmpz_clear(xstride);
+    fmpz_clear(xlength);
     fmpz_clear(a);
     fmpz_clear(b);
     fmpz_clear(c);
-
-    fmpz_clear(d);
-    fmpz_clear(x);
-    fmpz_clear(q);
-    fmpz_clear(r);
-    fmpz_clear(bbar);
-    fmpz_clear(t);
 
     return success;
 }
@@ -135,7 +117,7 @@ static int roots_mod_prime_power(nmod_poly_factor_t x, nmod_poly_t fpk,
     nmod_poly_init(f, p);
     map_down(f, fpk);
 
-    /* try to fill x1 with solution mod p */
+    /* try to fill x1 with solutions mod p */
     x1->length = 0;
     if (f->length > 0)
     {
@@ -154,7 +136,7 @@ static int roots_mod_prime_power(nmod_poly_factor_t x, nmod_poly_t fpk,
     {
         if (p >= LENGTH_LIMIT)
         {
-            /* too many solution mod p */
+            /* too many solutions mod p */
             success = 0;
             goto cleanup;
         }
@@ -205,6 +187,7 @@ static int roots_mod_prime_power(nmod_poly_factor_t x, nmod_poly_t fpk,
         nmod_poly_fit_length(x->p + i, 2);
         x->p[i].mod = fpk->mod;          /* bummer */
         x->p[i].coeffs[1] = 1;
+        FLINT_ASSERT(x1->coeffs[i] < fpk->mod.n);
         x->p[i].coeffs[0] = nmod_neg(x1->coeffs[i], fpk->mod);
         x->p[i].length = 2;
         x->exp[i] = 1;

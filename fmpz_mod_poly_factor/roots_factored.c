@@ -39,79 +39,28 @@ static void map_down(fmpz_mod_poly_t a, const fmpz_mod_poly_t b)
     _fmpz_mod_poly_normalise(a);
 }
 
-/*
-    Every lifter needs a Diophantine equation solver:
-    Given a, b, c with a >= 0, b > 0, try to push all solutions for x to
-        a*x + b*y = c
-    with 0 <= x < b.
-*/
-static int disolve(fmpz_list_t v,
-                                const fmpz_t a, const fmpz_t b, const fmpz_t c)
-{
-    int success = 1;
-    slong k;
-    fmpz_t d, x, q, r, bbar;
-    FLINT_ASSERT(fmpz_sgn(a) >= 0);
-    FLINT_ASSERT(fmpz_sgn(b) > 0);
-
-    fmpz_init(d);
-    fmpz_init(x);
-    fmpz_init(q);
-    fmpz_init(r);
-    fmpz_init(bbar);
-
-    fmpz_gcdinv(d, x, a, b);
-    fmpz_fdiv_qr(q, r, c, d);
-    if (fmpz_is_zero(r))
-    {
-        fmpz_divexact(bbar, b, d);
-        fmpz_mul(x, x, q);
-        fmpz_fdiv_q(r, x, bbar);
-
-        k = *d;
-        if ((!COEFF_IS_MPZ(k)) && (k + v->length < LENGTH_LIMIT))
-        {
-            fmpz_poly_fit_length(v, k + v->length);
-            for (k--; k >= 0; k--)
-            {
-                fmpz * v_back = v->coeffs + v->length;
-                fmpz_sub_si(q, r, k);
-                fmpz_set(v_back, x);
-                fmpz_submul(v_back, bbar, q);
-                FLINT_ASSERT(fmpz_sgn(v_back) >= 0);
-                FLINT_ASSERT(fmpz_cmp(v_back, b) < 0);
-                v->length++;
-            }
-        }
-        else
-        {
-            /* too many solutions */
-            success = 0;
-        }
-    }
-
-    fmpz_clear(d);
-    fmpz_clear(x);
-    fmpz_clear(q);
-    fmpz_clear(r);
-    fmpz_clear(bbar);
-
-    return success;
-}
 
 /* Fill x with the roots of fpk, where f->p is p^k */
 static int roots_mod_prime_power(fmpz_mod_poly_factor_t x, fmpz_mod_poly_t fpk,
                                 const fmpz_t p, slong k, int with_multiplicity)
 {
     int success = 1;
-    slong e1, e2;
-    slong i, j, old_length;
+    slong i, j, e1, e2;
     fmpz_list_t x1, x2;
     fmpz_mod_poly_t f, dfpk, tf, tr, tq;
-    fmpz_t pe1, pe2e1, fprime, mfpe1, t;
+    fmpz_t pe1, pe2e1, fprime, mfpe1;
+    fmpz_t xstart, xstride, xlength;
 
     FLINT_ASSERT(k >= 1);
     FLINT_ASSERT(fmpz_is_probabprime(p));
+
+    fmpz_init(pe1);
+    fmpz_init(pe2e1);
+    fmpz_init(fprime);
+    fmpz_init(mfpe1);
+    fmpz_init(xstart);
+    fmpz_init(xstride);
+    fmpz_init(xlength);
 
     fmpz_mod_poly_init(tf, &fpk->p);
     fmpz_mod_poly_init(tr, &fpk->p);
@@ -126,12 +75,6 @@ static int roots_mod_prime_power(fmpz_mod_poly_factor_t x, fmpz_mod_poly_t fpk,
     fmpz_mod_poly_init(f, p);
 
     map_down(f, fpk);
-
-    fmpz_init(pe1);
-    fmpz_init(pe2e1);
-    fmpz_init(fprime);
-    fmpz_init(mfpe1);
-    fmpz_init(t);
 
     /* try to fill x1 with solution mod p */
     x1->length = 0;
@@ -176,20 +119,30 @@ static int roots_mod_prime_power(fmpz_mod_poly_factor_t x, fmpz_mod_poly_t fpk,
             fmpz_neg(mfpe1, mfpe1);
             FLINT_ASSERT(fmpz_divisible(mfpe1, pe1));
             fmpz_divexact(mfpe1, mfpe1, pe1);
+
             fmpz_mod_poly_evaluate_fmpz(fprime, dfpk, x1->coeffs + i);
             fmpz_mod(fprime, fprime, pe2e1);
 
-            old_length = x2->length;
-            if (!disolve(x2, fprime, pe2e1, mfpe1))
+            fmpz_divides_mod_list(xstart, xstride, xlength, mfpe1, fprime, pe2e1);
+
+            j = *xlength;
+            if ((!COEFF_IS_MPZ(j)) && (j + x2->length < LENGTH_LIMIT))
             {
+                fmpz_poly_fit_length(x2, j + x2->length);
+                for (; j > 0; j--)
+                {
+                    FLINT_ASSERT(x2->length < x2->alloc);
+                    fmpz_set(x2->coeffs + x2->length, x1->coeffs + i);
+                    fmpz_addmul(x2->coeffs + x2->length, xstart, pe1);
+                    fmpz_add(xstart, xstart, xstride);
+                    x2->length++;
+                }
+            }
+            else
+            {
+                /* too many solutions */
                 success = 0;
                 goto cleanup;
-            }
-
-            for (j = old_length; j < x2->length; j++)
-            {
-                fmpz_mul(t, x2->coeffs + j, pe1);
-                fmpz_add(x2->coeffs + j, x1->coeffs + i, t);
             }
         }
         fmpz_poly_swap(x1, x2);
@@ -200,8 +153,9 @@ static int roots_mod_prime_power(fmpz_mod_poly_factor_t x, fmpz_mod_poly_t fpk,
     for (i = 0; i < x1->length; i++)
     {
         fmpz_mod_poly_fit_length(x->poly + i, 2);
-        fmpz_set(&x->poly[i].p, &fpk->p);
+        fmpz_set(&x->poly[i].p, &fpk->p);           /* bummer */
         fmpz_one(x->poly[i].coeffs + 1);
+
         fmpz_negmod(x->poly[i].coeffs + 0, x1->coeffs + i, &fpk->p);
         _fmpz_mod_poly_set_length(x->poly + i, 2);
         x->exp[i] = 1;
@@ -240,7 +194,9 @@ cleanup:
     fmpz_clear(pe2e1);
     fmpz_clear(fprime);
     fmpz_clear(mfpe1);
-    fmpz_clear(t);
+    fmpz_clear(xstart);
+    fmpz_clear(xstride);
+    fmpz_clear(xlength);
 
     fmpz_mod_poly_clear(dfpk);
 
