@@ -1186,8 +1186,8 @@ FLINT_DLL int fmpz_mod_poly_find_distinct_nonzero_roots(fmpz * roots,
                                                       const fmpz_mod_poly_t P);
 
 FLINT_DLL void _fmpz_mod_poly_split_rabin(fmpz_mod_poly_t a, fmpz_mod_poly_t b,
-                fmpz_mod_poly_t T, const fmpz_mod_poly_t f, const fmpz_t halfp,
-                                                       flint_rand_t randstate);
+                                   const fmpz_mod_poly_t f, const fmpz_t halfp,
+                fmpz_mod_poly_t t, fmpz_mod_poly_t t2, flint_rand_t randstate);
 
 
 /* Berlekamp-Massey Algorithm - see fmpz_mod_poly/berlekamp_massey.c for more info ********/

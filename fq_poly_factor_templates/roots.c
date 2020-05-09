@@ -15,48 +15,23 @@
 
 #include "ulong_extras.h"
 
-void TEMPLATE(T, poly_add_one)(
-    TEMPLATE(T, poly_t a),
-    const TEMPLATE(T, poly_t) b,
-    const TEMPLATE(T, ctx_t) ctx)
-{
-    TEMPLATE(T, poly_t) t;
-    TEMPLATE(T, poly_init)(t, ctx);
-    TEMPLATE(T, poly_fit_length)(t, 1, ctx);
-    TEMPLATE(T, one)(t->coeffs + 0, ctx);
-    t->length = 1;
-    TEMPLATE(T, poly_add)(a, b, t, ctx);
-    TEMPLATE(T, poly_clear)(t, ctx);
-}
-
-void TEMPLATE(T, poly_sub_one)(
-    TEMPLATE(T, poly_t a),
-    const TEMPLATE(T, poly_t) b,
-    const TEMPLATE(T, ctx_t) ctx)
-{
-    TEMPLATE(T, poly_t) t;
-    TEMPLATE(T, poly_init)(t, ctx);
-    TEMPLATE(T, poly_fit_length)(t, 1, ctx);
-    TEMPLATE(T, one)(t->coeffs + 0, ctx);
-    t->length = 1;
-    TEMPLATE(T, poly_sub)(a, b, t, ctx);
-    TEMPLATE(T, poly_clear)(t, ctx);
-}
-
-
 /* split f assuming that f has degree(f) distinct nonzero roots in Fq */
 void _TEMPLATE(T, poly_split_rabin)(
     TEMPLATE(T, poly_t) a,
     TEMPLATE(T, poly_t) b,
-    TEMPLATE(T, poly_t) t,
     const TEMPLATE(T, poly_t) f,
-    const fmpz_t halfq,
+    const fmpz_t halfq,         /* (q-1)/2  or 0 in characteristic 2 */
+    TEMPLATE(T, poly_t) t,      /* temp space */
+    TEMPLATE(T, poly_t) t2,     /* temp space */
     flint_rand_t randstate,
     const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
     FLINT_ASSERT(TEMPLATE(T, poly_degree)(f, ctx) > 1);
+
+    TEMPLATE(T, poly_reverse)(t, f, f->length, ctx);
+    TEMPLATE(T, poly_inv_series_newton)(t2, t, t->length, ctx);
 
 try_again:
 
@@ -68,18 +43,20 @@ try_again:
         TEMPLATE(T, one)(a->coeffs + 1, ctx);
     a->length = 2;
 
-    if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) > 0)
+    if (!fmpz_is_zero(halfq))
     {
-        TEMPLATE(T, poly_powmod_fmpz_binexp)(t, a, halfq, f, ctx);
-        TEMPLATE(T, poly_sub_one)(t, t, ctx);
+        FLINT_ASSERT(fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) > 0);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(t, a, halfq, 0, f, t2, ctx);
+        TEMPLATE(T, poly_add_si)(t, t, -1, ctx);
     }
     else
     {
         /* it is important that coeff(a, x^1) is random */
+        FLINT_ASSERT(fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0);
         TEMPLATE(T, poly_set)(t, a, ctx);
         for (i = TEMPLATE(T, ctx_degree)(ctx); i > 1; i--)
         {
-            TEMPLATE(T, poly_powmod_ui_binexp)(a, a, 2, f, ctx);
+            TEMPLATE(T, poly_powmod_ui_binexp_preinv)(a, a, 2, f, t2, ctx);
             TEMPLATE(T, poly_add)(t, t, a, ctx);
         }
     }
@@ -113,8 +90,9 @@ static void _TEMPLATE(T, poly_push_roots)(
     TEMPLATE(T, poly_factor_t) r,
     TEMPLATE(T, poly_t) f,              /* clobbered */
     slong mult,                         /* expoenent to write on the roots */
-    const fmpz_t halfq,                 /* (order - 1)/2 */
+    const fmpz_t halfq,                 /* (q-1)/2  or 0 in characteristic 2 */
     TEMPLATE(T, poly_t) t,              /* temp */
+    TEMPLATE(T, poly_t) t2,             /* more temp */
     TEMPLATE(T, poly_struct) * stack,   /* temp of size FLINT_BITS */
     flint_rand_t randstate,
     const TEMPLATE(T, ctx_t) ctx)
@@ -125,52 +103,66 @@ static void _TEMPLATE(T, poly_push_roots)(
     FLINT_ASSERT(TEMPLATE(T, poly_degree)(f, ctx) >= 1);
     FLINT_ASSERT(TEMPLATE(T, is_one)(f->coeffs + TEMPLATE(T, poly_degree)(f, ctx), ctx));
 
-    if (TEMPLATE(T, poly_degree)(f, ctx) <= 1)
+    /* handle zero roots */
+    if (TEMPLATE(T, is_zero)(f->coeffs + 0, ctx))
     {
         TEMPLATE(T, poly_factor_fit_length)(r, r->num + 1, ctx);
-        TEMPLATE(T, poly_swap)(r->poly + r->num, f, ctx);
+        TEMPLATE(T, poly_fit_length)(r->poly + r->num, 2, ctx);
+        TEMPLATE(T, zero)(r->poly[r->num].coeffs + 0, ctx);
+        TEMPLATE(T, one)(r->poly[r->num].coeffs + 1, ctx);
+        r->poly[r->num].length = 2;
         r->exp[r->num] = mult;
         r->num++;
+
+        i = 1;
+        while (i < f->length && TEMPLATE(T, is_zero)(f->coeffs + i, ctx))
+            i++;
+
+        TEMPLATE(T, poly_shift_right)(f, f, i, ctx);
+    }
+
+    if (TEMPLATE(T, poly_degree)(f, ctx) <= 1)
+    {
+        if (TEMPLATE(T, poly_degree)(f, ctx) == 1)
+        {
+            TEMPLATE(T, poly_factor_fit_length)(r, r->num + 1, ctx);
+            TEMPLATE(T, poly_swap)(r->poly + r->num, f, ctx);
+            r->exp[r->num] = mult;
+            r->num++;
+        }
         return;
     }
+
+    FLINT_ASSERT(!(TEMPLATE(T, is_zero)(f->coeffs + 0, ctx)));
+    TEMPLATE(T, poly_reverse)(t, f, f->length, ctx);
+    TEMPLATE(T, poly_inv_series_newton)(t2, t, t->length, ctx);
 
     a = stack + 0;
     b = stack + 1;
 
     TEMPLATE(T, poly_gen)(a, ctx);
 
-    if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) > 0)
+    if (!fmpz_is_zero(halfq))
     {
-        /* handle zero roots */
-        if (TEMPLATE(T, is_zero)(f->coeffs + 0, ctx))
-        {
-            TEMPLATE(T, poly_factor_fit_length)(r, r->num + 1, ctx);
-            TEMPLATE(T, poly_fit_length)(r->poly + r->num, 2, ctx);
-            TEMPLATE(T, zero)(r->poly[r->num].coeffs + 0, ctx);
-            TEMPLATE(T, one)(r->poly[r->num].coeffs + 1, ctx);
-            r->poly[r->num].length = 2;
-            r->exp[r->num] = mult;
-            r->num++;
-        }
-
-        TEMPLATE(T, poly_powmod_fmpz_binexp)(t, a, halfq, f, ctx);
-
-        TEMPLATE(T, poly_sub_one)(t, t, ctx);
+        FLINT_ASSERT(fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) > 0);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(t, a, halfq, 0, f, t2, ctx);
+        TEMPLATE(T, poly_add_si)(t, t, -1, ctx);
         TEMPLATE(T, poly_gcd)(a, t, f, ctx);
-        TEMPLATE(T, poly_add_one)(t, t, ctx);
+        TEMPLATE(T, poly_add_si)(t, t, 1, ctx);
     }
     else
     {
+        FLINT_ASSERT(fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0);
         TEMPLATE(T, poly_set)(t, a, ctx);
         for (i = TEMPLATE(T, ctx_degree)(ctx); i > 1; i--)
         {
-            TEMPLATE(T, poly_powmod_ui_binexp)(a, a, 2, f, ctx);
+            TEMPLATE(T, poly_powmod_ui_binexp_preinv)(a, a, 2, f, t2, ctx);
             TEMPLATE(T, poly_add)(t, t, a, ctx);
         }
         TEMPLATE(T, poly_gcd)(a, t, f, ctx);
     }
 
-    TEMPLATE(T, poly_add_one)(t, t, ctx);
+    TEMPLATE(T, poly_add_si)(t, t, 1, ctx);
     TEMPLATE(T, poly_gcd)(b, t, f, ctx);
 
     /* ensure deg a >= deg b */
@@ -209,8 +201,8 @@ static void _TEMPLATE(T, poly_push_roots)(
         {
             FLINT_ASSERT(sp + 1 < FLINT_BITS);
 
-            _TEMPLATE(T, poly_split_rabin)(stack + sp + 0, stack + sp + 1, t,
-                                                     f, halfq, randstate, ctx);
+            _TEMPLATE(T, poly_split_rabin)(stack + sp + 0, stack + sp + 1,
+                                              f, halfq, t, t2, randstate, ctx);
 
             FLINT_ASSERT(
                 FLINT_BIT_COUNT(TEMPLATE(T, poly_degree)(stack + sp + 1, ctx))
@@ -234,7 +226,7 @@ void TEMPLATE(T, poly_roots)(
     slong i;
     fmpz_t q2;
     flint_rand_t randstate;
-    TEMPLATE(T, poly_struct) t[FLINT_BITS + 2];
+    TEMPLATE(T, poly_struct) t[FLINT_BITS + 3];
 
     r->num = 0;
 
@@ -259,11 +251,14 @@ void TEMPLATE(T, poly_roots)(
     fmpz_init(q2);
     TEMPLATE(T, ctx_order(q2, ctx));
     fmpz_sub_ui(q2, q2, 1);
-    fmpz_fdiv_q_2exp(q2, q2, 1);
+    if (fmpz_is_even(q2))
+        fmpz_fdiv_q_2exp(q2, q2, 1);
+    else
+        fmpz_zero(q2);
 
     flint_randinit(randstate);
 
-    for (i = 0; i < FLINT_BITS + 2; i++)
+    for (i = 0; i < FLINT_BITS + 3; i++)
         TEMPLATE(T, poly_init)(t + i, ctx);
 
     if (with_multiplicity)
@@ -274,7 +269,7 @@ void TEMPLATE(T, poly_roots)(
         for (i = 0; i < sqf->num; i++)
         {
             _TEMPLATE(T, poly_push_roots)(r, sqf->poly + i, sqf->exp[i],
-                                             q2, t + 1, t + 2, randstate, ctx);
+                                      q2, t + 1, t + 2, t + 3, randstate, ctx);
         }
         TEMPLATE(T, poly_factor_clear)(sqf, ctx);
     }
@@ -282,14 +277,14 @@ void TEMPLATE(T, poly_roots)(
     {
         TEMPLATE(T, poly_make_monic)(t + 0, f, ctx);
         _TEMPLATE(T, poly_push_roots)(r, t + 0, 1,
-                                             q2, t + 1, t + 2, randstate, ctx);
+                                      q2, t + 1, t + 2, t + 3, randstate, ctx);
     }
 
     fmpz_clear(q2);
 
     flint_randclear(randstate);
 
-    for (i = 0; i < FLINT_BITS + 2; i++)
+    for (i = 0; i < FLINT_BITS + 3; i++)
         TEMPLATE(T, poly_clear)(t + i, ctx);
 }
 

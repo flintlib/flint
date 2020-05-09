@@ -17,12 +17,16 @@
 void _fmpz_mod_poly_split_rabin(
     fmpz_mod_poly_t a,
     fmpz_mod_poly_t b,
-    fmpz_mod_poly_t T,
     const fmpz_mod_poly_t f,
     const fmpz_t halfp,
+    fmpz_mod_poly_t t,
+    fmpz_mod_poly_t t2,
     flint_rand_t randstate)
 {
     FLINT_ASSERT(fmpz_mod_poly_degree(f) > 1);
+
+    fmpz_mod_poly_reverse(t, f, f->length);
+    fmpz_mod_poly_inv_series_newton(t2, t, t->length);
 
 try_again:
 
@@ -32,11 +36,11 @@ try_again:
     fmpz_randm(a->coeffs + 0, randstate, &f->p);
     a->length = 2;
 
-    fmpz_mod_poly_powmod_fmpz_binexp(T, a, halfp, f);
+    fmpz_mod_poly_powmod_fmpz_binexp_preinv(t, a, halfp, f, t2);
     fmpz_mod_poly_zero(a);
     fmpz_mod_poly_set_coeff_ui(a, 0, 1);
-    fmpz_mod_poly_sub(T, T, a);
-    fmpz_mod_poly_gcd(a, T, f);
+    fmpz_mod_poly_sub(t, t, a);
+    fmpz_mod_poly_gcd(a, t, f);
 
     FLINT_ASSERT(!fmpz_mod_poly_is_zero(a));
 
@@ -67,22 +71,22 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
     slong i, roots_idx, sp;
     fmpz_t halfp;
     fmpz_mod_poly_struct * a , * b;
-    fmpz_mod_poly_t f, T;
+    fmpz_mod_poly_t f, t, t2;
     fmpz_mod_poly_struct stack[FLINT_BITS + 1];
     flint_rand_t randstate;
-    slong t = fmpz_mod_poly_degree(P);
+    slong d = fmpz_mod_poly_degree(P);
     fmpz_mod_ctx_t fpctx;
 
-    FLINT_ASSERT(t >= 0);
+    FLINT_ASSERT(d >= 0);
 
     fmpz_mod_ctx_init(fpctx, &P->p);
     fmpz_init(a0);
     fmpz_init(a1);
     fmpz_init(halfp);
 
-    if (t < 2)
+    if (d < 2)
     {
-        if (t == 1)
+        if (d == 1)
         {
             fmpz_mod_poly_get_coeff_fmpz(a0, P, 0);
             fmpz_mod_poly_get_coeff_fmpz(a1, P, 1);
@@ -105,36 +109,44 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
         goto cleanup1;
     }
 
+    if (fmpz_is_zero(P->coeffs + 0))
+    {
+        success = 0;
+        goto cleanup1;
+    }
+
     flint_randinit(randstate);
-    fmpz_mod_poly_init(T, &P->p);
+    fmpz_mod_poly_init(t, &P->p);
+    fmpz_mod_poly_init(t2, &P->p);
     fmpz_mod_poly_init(f, &P->p);
     for (i = 0; i <= FLINT_BITS; i++)
-    {
         fmpz_mod_poly_init(stack + i, &P->p);
-    }
 
     roots_idx = 0;
 
     fmpz_mod_poly_make_monic(f, P);
+    fmpz_mod_poly_reverse(t, f, f->length);
+    fmpz_mod_poly_inv_series_newton(t2, t, t->length);
+
 
     a = stack + 0;
     fmpz_mod_poly_zero(a);
     fmpz_mod_poly_set_coeff_ui(a, 1, 1);
     fmpz_sub_ui(halfp, &P->p, 1);
     fmpz_divexact_ui(halfp, halfp, 2);
-    fmpz_mod_poly_powmod_fmpz_binexp(T, a, halfp, f);
+    fmpz_mod_poly_powmod_fmpz_binexp(t, a, halfp, f);
     fmpz_mod_poly_zero(a);
     fmpz_mod_poly_set_coeff_ui(a, 0, 1);
-    fmpz_mod_poly_sub(T, T, a);
-    fmpz_mod_poly_gcd(a, T, f);
+    fmpz_mod_poly_sub(t, t, a);
+    fmpz_mod_poly_gcd(a, t, f);
 
     b = stack + 1;
     fmpz_mod_poly_zero(b);
     fmpz_mod_poly_set_coeff_ui(b, 0, 2);
-    fmpz_mod_poly_add(T, T, b);
-    fmpz_mod_poly_gcd(b, T, f);
+    fmpz_mod_poly_add(t, t, b);
+    fmpz_mod_poly_gcd(b, t, f);
 
-    if (fmpz_mod_poly_degree(b) + fmpz_mod_poly_degree(a) != t)
+    if (fmpz_mod_poly_degree(b) + fmpz_mod_poly_degree(a) != d)
     {
         success = 0;
         goto cleanup;
@@ -164,8 +176,8 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
         }
         else
         {
-            _fmpz_mod_poly_split_rabin(stack + sp + 0, stack + sp + 1, T, f,
-                                                             halfp, randstate);
+            _fmpz_mod_poly_split_rabin(stack + sp + 0, stack + sp + 1, f,
+                                                      halfp, t, t2, randstate);
 
             FLINT_ASSERT(FLINT_BIT_COUNT(fmpz_mod_poly_degree(stack + sp + 1))
                                                        <= FLINT_BITS - sp - 1);
@@ -178,17 +190,13 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
 cleanup:
 
     flint_randclear(randstate);
-    fmpz_mod_poly_clear(T);
+    fmpz_mod_poly_clear(t);
+    fmpz_mod_poly_clear(t2);
     fmpz_mod_poly_clear(f);
     for (i = 0; i <= FLINT_BITS; i++)
-    {
         fmpz_mod_poly_clear(stack + i);
-    }
 
-    if (success)
-    {
-        FLINT_ASSERT(roots_idx == t);
-    }
+    FLINT_ASSERT((!success) || roots_idx == d);
 
 cleanup1:
 

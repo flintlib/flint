@@ -23,26 +23,17 @@ static void _fmpz_mod_poly_push_roots(
     fmpz_mod_poly_t f,              /* clobbered */
     slong mult,                     /* expoenent to write on the roots */
     const fmpz_t halfp,             /* (f->p - 1)/2 */
-    fmpz_mod_poly_t T,              /* temp */
+    fmpz_mod_poly_t t,              /* temp */
+    fmpz_mod_poly_t t2,             /* more temp */
     fmpz_mod_poly_struct * stack,   /* temp of size FLINT_BITS */
     flint_rand_t randstate)
 {
-    slong sp;
+    slong i, sp;
     fmpz_mod_poly_struct * a, * b;
 
     FLINT_ASSERT(fmpz_mod_poly_degree(f) >= 1);
     FLINT_ASSERT(fmpz_is_one(f->coeffs + fmpz_mod_poly_degree(f)));
     FLINT_ASSERT(fmpz_is_probabprime(&f->p));
-
-    if (fmpz_mod_poly_degree(f) <= 1)
-    {
-        fmpz_mod_poly_factor_fit_length(r, r->num + 1);
-        fmpz_set(&r->poly[r->num].p, &f->p);        /* bummer */
-        fmpz_mod_poly_swap(r->poly + r->num, f);
-        r->exp[r->num] = mult;
-        r->num++;
-        return;
-    }
 
     /* handle at least p = 2 */
     if (fmpz_cmp_ui(&f->p, 10) < 0)
@@ -80,22 +71,45 @@ static void _fmpz_mod_poly_push_roots(
         r->poly[r->num].length = 2;
         r->exp[r->num] = mult;
         r->num++;
+
+        i = 1;
+        while (i < f->length && fmpz_is_zero(f->coeffs + i))
+            i++;
+
+        fmpz_mod_poly_shift_right(f, f, i);
     }
+
+    if (fmpz_mod_poly_degree(f) <= 1)
+    {
+        if (fmpz_mod_poly_degree(f) == 1)
+        {
+            fmpz_mod_poly_factor_fit_length(r, r->num + 1);
+            fmpz_set(&r->poly[r->num].p, &f->p);        /* bummer */
+            fmpz_mod_poly_swap(r->poly + r->num, f);
+            r->exp[r->num] = mult;
+            r->num++;
+        }
+        return;
+    }
+
+    FLINT_ASSERT(!fmpz_is_zero(f->coeffs + 0));
+    fmpz_mod_poly_reverse(t, f, f->length);
+    fmpz_mod_poly_inv_series_newton(t2, t, t->length);
 
     a = stack + 0;
     fmpz_mod_poly_zero(a);
     fmpz_mod_poly_set_coeff_ui(a, 1, 1);
-    fmpz_mod_poly_powmod_fmpz_binexp(T, a, halfp, f);
+    fmpz_mod_poly_powmod_fmpz_binexp_preinv(t, a, halfp, f, t2);
     fmpz_mod_poly_zero(a);
     fmpz_mod_poly_set_coeff_ui(a, 0, 1);
-    fmpz_mod_poly_sub(T, T, a);
-    fmpz_mod_poly_gcd(a, T, f);
+    fmpz_mod_poly_sub(t, t, a);
+    fmpz_mod_poly_gcd(a, t, f);
 
     b = stack + 1;
     fmpz_mod_poly_zero(b);
     fmpz_mod_poly_set_coeff_ui(b, 0, 2);
-    fmpz_mod_poly_add(T, T, b);
-    fmpz_mod_poly_gcd(b, T, f);
+    fmpz_mod_poly_add(t, t, b);
+    fmpz_mod_poly_gcd(b, t, f);
 
     /* ensure deg a >= deg b */
     if (fmpz_mod_poly_degree(a) < fmpz_mod_poly_degree(b))
@@ -129,8 +143,8 @@ static void _fmpz_mod_poly_push_roots(
         {
             FLINT_ASSERT(sp + 1 < FLINT_BITS);
 
-            _fmpz_mod_poly_split_rabin(stack + sp + 0, stack + sp + 1, T, f,
-                                                             halfp, randstate);
+            _fmpz_mod_poly_split_rabin(stack + sp + 0, stack + sp + 1, f,
+                                                      halfp, t, t2, randstate);
 
             FLINT_ASSERT(FLINT_BIT_COUNT(fmpz_mod_poly_degree(stack + sp + 1))
                                                      <= FLINT_BITS - (sp + 1));
@@ -147,7 +161,7 @@ void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
     slong i;
     fmpz_t p2;
     flint_rand_t randstate;
-    fmpz_mod_poly_struct t[FLINT_BITS + 2];
+    fmpz_mod_poly_struct t[FLINT_BITS + 3];
 
     FLINT_ASSERT(fmpz_is_probabprime(&f->p));
 
@@ -177,7 +191,7 @@ void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
 
     flint_randinit(randstate);
 
-    for (i = 0; i < FLINT_BITS + 2; i++)
+    for (i = 0; i < FLINT_BITS + 3; i++)
         fmpz_mod_poly_init(t + i, &f->p);
 
     if (with_multiplicity)
@@ -188,21 +202,22 @@ void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
         for (i = 0; i < sqf->num; i++)
         {
             _fmpz_mod_poly_push_roots(r, sqf->poly + i, sqf->exp[i],
-                                               p2, t + 1, t + 2, randstate);
+                                           p2, t + 1, t + 2, t + 3, randstate);
         }
         fmpz_mod_poly_factor_clear(sqf);
     }
     else
     {
         fmpz_mod_poly_make_monic(t + 0, f);
-        _fmpz_mod_poly_push_roots(r, t + 0, 1, p2, t + 1, t + 2, randstate);
+        _fmpz_mod_poly_push_roots(r, t + 0, 1,
+                                           p2, t + 1, t + 2, t + 3, randstate);
     }
 
     fmpz_clear(p2);
 
     flint_randclear(randstate);
 
-    for (i = 0; i < FLINT_BITS + 2; i++)
+    for (i = 0; i < FLINT_BITS + 3; i++)
         fmpz_mod_poly_clear(t + i);
 }
 

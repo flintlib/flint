@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2015 Tommy Hofmann
-    Copyright (C) 2015 William Hart
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -10,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#define NMOD_POLY_INLINES_C
+#include "fq_zech_poly.h"
 
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#ifdef T
+#undef T
+#endif
 
+#define T fq_zech
+#define CAP_T FQ_ZECH
+#include "fq_poly_templates/add_si.c"
+#undef CAP_T
+#undef T

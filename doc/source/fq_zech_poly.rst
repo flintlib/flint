@@ -271,6 +271,10 @@ Addition and subtraction
 
     Sets ``res`` to the sum of ``poly1`` and ``poly2``.
 
+.. function:: void fq_zech_poly_add_si(fq_zech_poly_t res, const fq_zech_poly_t poly1, slong c, const fq_zech_ctx_t ctx)
+
+    Sets ``res`` to the sum of ``poly1`` and ``c``.
+
 .. function:: void fq_zech_poly_add_series(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2, slong n, const fq_ctx_t ctx)
 
     Notionally truncate ``poly1`` and ``poly2`` to length ``n`` and set
