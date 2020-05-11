@@ -79,7 +79,7 @@ mode.
     printed showing the valuation and unit parts separately, 
     e.g. ``12*7^-1``.
 
-.. function:: void padic_ctx_clear(padic_ctx_t ctx);
+.. function:: void padic_ctx_clear(padic_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.
 

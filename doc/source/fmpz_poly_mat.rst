@@ -431,7 +431,7 @@ Solving
     Uses fraction-free LU decomposition followed by fraction-free
     forward and back substitution.
 
-.. function:: int fmpz_poly_mat_solve_fflu(fmpz_poly_mat_t X, fmpz_poly_t den, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B);
+.. function:: int fmpz_poly_mat_solve_fflu(fmpz_poly_mat_t X, fmpz_poly_t den, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}`.
@@ -441,7 +441,7 @@ Solving
     Uses fraction-free LU decomposition followed by fraction-free
     forward and back substitution.
 
-.. function:: void fmpz_poly_mat_solve_fflu_precomp(fmpz_poly_mat_t X, const slong * perm, const fmpz_poly_mat_t FFLU, const fmpz_poly_mat_t B);
+.. function:: void fmpz_poly_mat_solve_fflu_precomp(fmpz_poly_mat_t X, const slong * perm, const fmpz_poly_mat_t FFLU, const fmpz_poly_mat_t B)
 
     Performs fraction-free forward and back substitution given a precomputed
     fraction-free LU decomposition and corresponding permutation.

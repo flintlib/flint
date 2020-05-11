@@ -377,12 +377,12 @@ Comparison
     Returns `1` if ``poly1`` is equal to ``poly2``, 
     otherwise returns~`0`.
 
-.. function:: int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n);
+.. function:: int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 
     Return `1` if ``poly1`` and ``poly2`` notionally truncated to length
     `n` are equal, otherwise returns~`0`.
 
-.. function:: int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
+.. function:: int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
     Return `1` if ``poly1`` and ``poly2`` notionally truncated to length
     `n` are equal, otherwise returns~`0`.
@@ -803,6 +803,7 @@ Euclidean division
     the remainder routine below.
 
 .. function:: void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, fmpq_poly_t poly)
+
     Computes ``2*len - 1`` powers of $x$ modulo the polynomial $B$ of the given length. This is used as a kind of precomputed inverse in the remainder routine below.
 
 .. function:: void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)

@@ -154,7 +154,7 @@ Constants
 
     Set ``A`` to the constant ``c``.
 
-.. function:: void fq_nmod_mpoly_set_fq_nmod_gen(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
+.. function:: void fq_nmod_mpoly_set_fq_nmod_gen(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
     Set ``A`` to the constant given by :func:`fq_nmod_gen`.
 

@@ -544,7 +544,7 @@ Minimal polynomial
     Set ``(coeffs, den)`` to the minimal polynomial of the given
     `n\times n` matrix and return the length of the polynomial.
 
-.. function:: void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
+.. function:: void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat)
 
     Set ``pol`` to the minimal polynomial of the given `n\times n`
     matrix. If ``mat`` is not square, an exception is raised.

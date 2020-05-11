@@ -150,13 +150,10 @@ Constants
     Assuming that ``A`` is a constant, set ``c`` to this constant.
     This function throws if ``A`` is not a constant.
 
-.. function:: void fmpq_mpoly_set_fmpq(fmpq_mpoly_t A, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
-
-.. function:: void fmpq_mpoly_set_fmpz(fmpq_mpoly_t A, const fmpz_t c, const fmpq_mpoly_ctx_t ctx);
-
-.. function:: void fmpq_mpoly_set_ui(fmpq_mpoly_t A, ulong c, const fmpq_mpoly_ctx_t ctx);
-
-.. function:: void fmpq_mpoly_set_si(fmpq_mpoly_t A, slong c, const fmpq_mpoly_ctx_t ctx);
+.. function:: void fmpq_mpoly_set_fmpq(fmpq_mpoly_t A, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_set_fmpz(fmpq_mpoly_t A, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_set_ui(fmpq_mpoly_t A, ulong c, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_set_si(fmpq_mpoly_t A, slong c, const fmpq_mpoly_ctx_t ctx)
 
     Set ``A`` to the constant ``c``.
 

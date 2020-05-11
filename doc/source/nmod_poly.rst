@@ -884,14 +884,14 @@ Division
     Finds `Q` and `R` such that `A = B Q + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
     If `\operatorname{len}(B) = 0` an exception is raised.
 
-.. function:: void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, slong A_len, mp_srcptr B, slong B_len, nmod_t mod);
+.. function:: void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, slong A_len, mp_srcptr B, slong B_len, nmod_t mod)
 
     Notionally finds polynomials `Q` and `R` such that `A = B Q + R` with
     `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
     exception is raised. We require that ``W`` is temporary space of
     ``NMOD_DIV_BC_ITCH(A_len, B_len, mod)`` coefficients.
 
-.. function:: void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
+.. function:: void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 
     Notionally finds polynomials `Q` and `R` such that `A = B Q + R` with
     `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
