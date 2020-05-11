@@ -983,10 +983,8 @@ Division
     Computes the quotient `Q` on polynomial division of `A` and `B`.
 
 .. function:: void _nmod_poly_rem_basecase(mp_ptr R, mp_ptr W, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
-
-.. function:: void nmod_poly_rem_basecase(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
-
-.. function:: void _nmod_poly_rem_q1(mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
+              void nmod_poly_rem_basecase(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
+              void _nmod_poly_rem_q1(mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Notationally, computes `Q` and `R` such that `A = BQ + R` with
     `\operatorname{len}(R) < \operatorname{len}(B)`, where `\operatorname{len}(A) = \operatorname{len}(B) + 1 \geq \operatorname{len}(B) > 0`,
@@ -2571,16 +2569,14 @@ Chinese Remaindering
     Initialize ``CRT`` for chinese remaindering.
 
 .. function:: int nmod_poly_multi_crt_precompute(nmod_poly_multi_crt_t CRT, const nmod_poly_struct * moduli, slong len)
-
-.. function:: int nmod_poly_multi_crt_precompute_p(nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * moduli, slong len)
+              int nmod_poly_multi_crt_precompute_p(nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * moduli, slong len)
 
     Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
     A return of ``0`` indicates that the compilation failed and future calls to :func:`nmod_poly_multi_crt_precomp` will leave the output undefined.
     A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) all of the moduli have positive degree and are pairwise relatively prime.
 
 .. function:: void nmod_poly_multi_crt_precomp(nmod_poly_t output, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * values)
-
-.. function:: void nmod_poly_multi_crt_precomp_p(nmod_poly_t output, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * values)
+              void nmod_poly_multi_crt_precomp_p(nmod_poly_t output, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * values)
 
     Set ``output`` to the polynomial of lowest possible degree that is congruent to ``values + i`` modulo the ``moduli + i`` in :func:`nmod_poly_multi_crt_precompute`.
     The inputs ``values + 0, ..., values + len - 1`` where ``len`` was used in :func:`nmod_poly_multi_crt_precompute` are expected to be valid and have modulus matching the modulus of the moduli used in :func:`nmod_poly_multi_crt_precompute`.
@@ -2599,8 +2595,7 @@ Chinese Remaindering
     Return the required length of the output for :func:`_nmod_poly_multi_crt_run`.
 
 .. function:: void _nmod_poly_multi_crt_run(nmod_poly_struct * outputs, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * inputs)
-
-.. function:: void _nmod_poly_multi_crt_run_p(nmod_poly_struct * outputs, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * inputs)
+              void _nmod_poly_multi_crt_run_p(nmod_poly_struct * outputs, const nmod_poly_multi_crt_t CRT, const nmod_poly_struct * const * inputs)
 
     Perform the same operation as :func:`nmod_poly_multi_crt_precomp` using supplied temporary space.
     The actual output is placed in ``outputs + 0``, and ``outputs`` should contain space for all temporaries and should be at least as long as ``_nmod_poly_multi_crt_local_size(CRT)``.
@@ -2652,10 +2647,8 @@ Berlekamp-Massey Algorithm
     Set the characteristic of the field and empty the stream of points in ``B``.
 
 .. function:: void nmod_berlekamp_massey_add_points(nmod_berlekamp_massey_t B, const mp_limb_t * a, slong count)
-
-.. function:: void nmod_berlekamp_massey_add_zeros(nmod_berlekamp_massey_t B, slong count)
-
-.. function:: void nmod_berlekamp_massey_add_point(nmod_berlekamp_massey_t B, mp_limb_t a)
+              void nmod_berlekamp_massey_add_zeros(nmod_berlekamp_massey_t B, slong count)
+              void nmod_berlekamp_massey_add_point(nmod_berlekamp_massey_t B, mp_limb_t a)
 
     Add point(s) to the stream processed by ``B``. The addition of any number of points will not update the `V` and `R` polynomial.
 

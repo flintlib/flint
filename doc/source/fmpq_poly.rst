@@ -1654,8 +1654,7 @@ Input and output
     returns a non-positive value.
 
 .. function:: int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, slong len, const char * x)
-
-.. function:: int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+              int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of ``poly`` to ``stdout``, using 
     the null-terminated string ``var`` not equal to ``"\0"`` as the 
@@ -1678,8 +1677,7 @@ Input and output
     returns a non-positive value.
 
 .. function:: int _fmpq_poly_fprint_pretty(FILE * file, const fmpz *poly, const fmpz_t den, slong len, const char * x)
-
-.. function:: int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+              int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of ``poly`` to ``stdout``, using 
     the null-terminated string ``var`` not equal to ``"\0"`` as the 

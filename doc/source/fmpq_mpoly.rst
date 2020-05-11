@@ -166,12 +166,9 @@ Constants
     Set ``A`` to the constant ``1``.
 
 .. function:: int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t A, fmpq_t c, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: int fmpq_mpoly_equal_fmpz(const fmpq_mpoly_t A, fmpz_t c, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: int fmpq_mpoly_equal_ui(const fmpq_mpoly_t A, ulong c, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: int fmpq_mpoly_equal_si(const fmpq_mpoly_t A, slong c, const fmpq_mpoly_ctx_t ctx)
+              int fmpq_mpoly_equal_fmpz(const fmpq_mpoly_t A, fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+              int fmpq_mpoly_equal_ui(const fmpq_mpoly_t A, ulong c, const fmpq_mpoly_ctx_t ctx)
+              int fmpq_mpoly_equal_si(const fmpq_mpoly_t A, slong c, const fmpq_mpoly_ctx_t ctx)
 
     Return ``1`` if ``A`` is equal to the constant ``c``, else return ``0``.
 
@@ -193,15 +190,13 @@ Degrees
     Return ``1`` if the degrees of ``A`` with respect to each variable fit into an ``slong``, otherwise return ``0``.
 
 .. function:: void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     Set ``degs`` to the degrees of ``A`` with respect to each variable.
     If ``A`` is zero, all degrees are set to ``-1``.
 
 .. function:: void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: slong fmpq_mpoly_degree_si(const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
+              slong fmpq_mpoly_degree_si(const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx)
 
     Either return or set ``deg`` to the degree of ``A`` with respect to the variable of index ``var``.
     If ``A`` is zero, the degree is defined to be ``-1``.
@@ -211,8 +206,7 @@ Degrees
     Return ``1`` if the total degree of ``A`` fits into an ``slong``, otherwise return ``0``.
 
 .. function:: void fmpq_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+              slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
     Either return or set ``tdeg`` to the total degree of ``A``.
     If ``A`` is zero, the total degree is defined to be ``-1``.
@@ -237,14 +231,12 @@ Coefficients
     This function thows if ``M`` is not a monomial.
 
 .. function:: void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t A, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t A, ulong const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t A, ulong const * exp, const fmpq_mpoly_ctx_t ctx)
 
     Set ``c`` to the coefficient of the monomial with exponent ``exp``.
 
 .. function:: void fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t A, const fmpq_t c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t A, const fmpq_t c, ulong const * exp, fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t A, const fmpq_t c, ulong const * exp, fmpq_mpoly_ctx_t ctx)
 
     Set the coefficient of the monomial with exponent ``exp`` to ``c``.
 
@@ -312,30 +304,25 @@ Container operations
     Set the coefficient of index `i` to `c`.
 
 .. function:: int fmpq_mpoly_term_exp_fits_si(const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: int fmpq_mpoly_term_exp_fits_ui(const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
+              int fmpq_mpoly_term_exp_fits_ui(const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
 
     Return ``1`` if all entries of the exponent vector of the term of index `i`  fit into an ``slong`` (resp. a ``ulong``). Otherwise, return ``0``.
 
 .. function:: void fmpq_mpoly_get_term_exp_fmpz(fmpz ** exps, const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_get_term_exp_ui(ulong * exps, const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_get_term_exp_si(slong * exps, const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_get_term_exp_ui(ulong * exps, const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_get_term_exp_si(slong * exps, const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx)
 
     Set ``exp`` to the exponent vector of the term of index ``i``.
     The ``_ui`` (resp. ``_si``) version throws if any entry does not fit into a ``ulong`` (resp. ``slong``).
 
 .. function:: ulong fmpq_mpoly_get_term_var_exp_ui(const fmpq_mpoly_t A, slong i, slong var, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: slong fmpq_mpoly_get_term_var_exp_si(const fmpq_mpoly_t A, slong i, slong var, const fmpq_mpoly_ctx_t ctx)
+              slong fmpq_mpoly_get_term_var_exp_si(const fmpq_mpoly_t A, slong i, slong var, const fmpq_mpoly_ctx_t ctx)
 
     Return the exponent of the variable ``var`` of the term of index ``i``.
     This function throws if the exponent does not fit into a ``ulong`` (resp. ``slong``).
 
 .. function:: void fmpq_mpoly_set_term_exp_fmpz(fmpq_mpoly_t A, slong i, fmpz * const * exps, const const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_set_term_exp_ui(fmpq_mpoly_t A, slong i, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_set_term_exp_ui(fmpq_mpoly_t A, slong i, const ulong * exps, const fmpq_mpoly_ctx_t ctx)
 
     Set the exponent vector of the term of index ``i`` to ``exp``.
 
@@ -348,20 +335,13 @@ Container operations
     Set ``M`` to the monomial of the term of index ``i`` in ``A``. The coefficient of ``M`` will be one.
 
 .. function:: void fmpq_mpoly_push_term_fmpq_fmpz(fmpq_mpoly_t A, const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_push_term_fmpz_fmpz(fmpq_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_push_term_ui_fmpz(fmpq_mpoly_t A, ulong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_push_term_si_fmpz(fmpq_mpoly_t A, slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_push_term_fmpq_ui(fmpq_mpoly_t A, const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_push_term_fmpz_ui(fmpq_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_push_term_ui_ui(fmpq_mpoly_t A, ulong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: void fmpq_mpoly_push_term_si_ui(fmpq_mpoly_t A, slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_fmpz_fmpz(fmpq_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_ui_fmpz(fmpq_mpoly_t A, ulong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_si_fmpz(fmpq_mpoly_t A, slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_fmpq_ui(fmpq_mpoly_t A, const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_fmpz_ui(fmpq_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_ui_ui(fmpq_mpoly_t A, ulong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_si_ui(fmpq_mpoly_t A, slong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
     Append a term to ``A`` with coefficient ``c`` and exponent vector ``exp``.
     This function should run in constant average time if the terms pushed have bounded denominator.
@@ -573,8 +553,7 @@ Greatest Common Divisor
     If ``A`` is zero, ``M`` will be zero. Otherwise, ``M`` will be a monomial with coefficient one.
 
 .. function:: int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
-
-.. function:: int fmpq_mpoly_gcd_threaded(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit)
+              int fmpq_mpoly_gcd_threaded(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit)
 
     Try to set ``G`` to the monic GCD of ``A`` and ``B``. The GCD of zero and zero is defined to be zero.
     If the return is ``1`` the function was successful. Otherwise the return is  ``0`` and ``G`` is left untouched.

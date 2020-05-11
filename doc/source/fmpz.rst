@@ -1262,8 +1262,7 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     Initialize ``CRT`` for chinese remaindering.
 
 .. function:: int fmpz_multi_crt_precompute(fmpz_multi_crt_t CRT, const fmpz * moduli, slong len)
-
-.. function:: int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT, const fmpz * const * moduli, slong len)
+              int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT, const fmpz * const * moduli, slong len)
 
     Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
     A return of ``0`` indicates that the compilation failed and future
@@ -1271,8 +1270,7 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) no modulus is `0,1,-1` and all moduli are pairwise relatively prime.
 
 .. function:: void fmpz_multi_crt_precomp(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * inputs)
-
-.. function:: void fmpz_multi_crt_precomp_p(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * const * inputs)
+              void fmpz_multi_crt_precomp_p(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * const * inputs)
 
     Set ``output`` to an integer of smallest absolute value that is congruent to ``values + i`` modulo the ``moduli + i`` in :func:`fmpz_crt_precompute`.
 
@@ -1290,8 +1288,7 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     Return the required length of the output for :func:`_nmod_poly_crt_run`.
 
 .. function:: void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * inputs)
-
-.. function:: void _fmpz_multi_crt_run_p(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * const * inputs)
+              void _fmpz_multi_crt_run_p(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * const * inputs)
 
     Perform the same operation as fmpz::fmpz_multi_crt_precomp using supplied temporary space.
     The actual output is placed in ``outputs + 0``, and ``outputs`` should contain space for all temporaries and should be at least as long as ``_fmpz_multi_crt_local_size(CRT)``.
@@ -1548,8 +1545,7 @@ Special functions
     numbers less than or equal to `n`.
 
 .. function:: void fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac)
-
-.. function:: void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
+              void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
 
     Sets ``res`` to the Euler totient function `\phi(n)`, counting the 
     number of positive integers less than or equal to `n` that are coprime 
@@ -1557,8 +1553,7 @@ Special functions
     factorisation of `n`.
 
 .. function:: int fmpz_factor_moebius_mu(const fmpz_factor_t fac)
-
-.. function:: int fmpz_moebius_mu(const fmpz_t n)
+              int fmpz_moebius_mu(const fmpz_t n)
 
     Computes the Moebius function `\mu(n)`, which is defined as `\mu(n) = 0` 
     if `n` has a prime factor of multiplicity greater than `1`, `\mu(n) = -1` 
@@ -1568,8 +1563,7 @@ Special functions
     factorisation of `n`.
 
 .. function:: void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
-
-.. function:: void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+              void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 
     Sets ``res`` to `\sigma_k(n)`, the sum of `k`th powers of all 
     divisors of `n`. The factor version takes a precomputed

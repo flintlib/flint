@@ -149,8 +149,7 @@ Constants
     This function throws if ``A`` is not a constant.
 
 .. function:: void fq_nmod_mpoly_set_fq_nmod(fq_nmod_mpoly_t A, const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: void fq_nmod_mpoly_set_ui(fq_nmod_mpoly_t A, ulong c, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_set_ui(fq_nmod_mpoly_t A, ulong c, const fq_nmod_mpoly_ctx_t ctx)
 
     Set ``A`` to the constant ``c``.
 
@@ -188,15 +187,13 @@ Degrees
     Return ``1`` if the degrees of ``A`` with respect to each variable fit into an ``slong``, otherwise return ``0``.
 
 .. function:: void fq_nmod_mpoly_degrees_fmpz(fmpz ** degs, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: void fq_nmod_mpoly_degrees_si(slong * degs, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_degrees_si(slong * degs, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
     Set ``degs`` to the degrees of ``A`` with respect to each variable.
     If ``A`` is zero, all degrees are set to ``-1``.
 
 .. function:: void fq_nmod_mpoly_degree_fmpz(fmpz_t deg, const fq_nmod_mpoly_t A, slong var, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: slong fq_nmod_mpoly_degree_si(const fq_nmod_mpoly_t A, slong var, const fq_nmod_mpoly_ctx_t ctx)
+              slong fq_nmod_mpoly_degree_si(const fq_nmod_mpoly_t A, slong var, const fq_nmod_mpoly_ctx_t ctx)
 
     Either return or set ``deg`` to the degree of ``A`` with respect to the variable of index ``var``.
     If ``A`` is zero, the degree is defined to be ``-1``.
@@ -206,8 +203,7 @@ Degrees
     Return ``1`` if the total degree of ``A`` fits into an ``slong``, otherwise return ``0``.
 
 .. function:: void fq_nmod_mpoly_total_degree_fmpz(fmpz_t tdeg, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: slong fq_nmod_mpoly_total_degree_si(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+              slong fq_nmod_mpoly_total_degree_si(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
     Either return or set ``tdeg`` to the total degree of ``A``.
     If ``A`` is zero, the total degree is defined to be ``-1``.
@@ -228,14 +224,12 @@ Coefficients
     This function thows if ``M`` is not a monomial.
 
 .. function:: void fq_nmod_mpoly_get_coeff_fq_nmod_fmpz(fq_nmod_t c, const fq_nmod_mpoly_t A, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: void fq_nmod_mpoly_get_coeff_fq_nmod_ui(fq_nmod_t c, const fq_nmod_mpoly_t A, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_get_coeff_fq_nmod_ui(fq_nmod_t c, const fq_nmod_mpoly_t A, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
 
     Set ``c`` to the coefficient of the monomial with exponent vector ``exp``.
 
 .. function:: void fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(fq_nmod_mpoly_t A, const fq_nmod_t c, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: void fq_nmod_mpoly_set_coeff_fq_nmod_ui(fq_nmod_mpoly_t A, const fq_nmod_t c, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_set_coeff_fq_nmod_ui(fq_nmod_mpoly_t A, const fq_nmod_t c, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
 
     Set the coefficient of the monomial with exponent ``exp`` to ``c``.
 
@@ -289,30 +283,25 @@ Container operations
     Set the coefficient of the term of index ``i`` to ``c``.
 
 .. function:: int fq_nmod_mpoly_term_exp_fits_si(const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: int fq_nmod_mpoly_term_exp_fits_ui(const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
+              int fq_nmod_mpoly_term_exp_fits_ui(const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
 
     Return ``1`` if all entries of the exponent vector of the term of index `i` fit into an ``slong`` (resp. a ``ulong). Otherwise, return ``0``.
 
 .. function:: void fq_nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: void fq_nmod_mpoly_get_term_exp_ui(ulong * exp, const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: void fq_nmod_mpoly_get_term_exp_si(slong * exp, const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_get_term_exp_ui(ulong * exp, const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_get_term_exp_si(slong * exp, const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
 
     Set ``exp`` to the exponent vector of the term of index ``i``.
     The ``_ui`` (resp. ``_si``) version throws if any entry does not fit into a ``ulong`` (resp. ``slong``).
 
 .. function:: ulong fq_nmod_mpoly_get_term_var_exp_ui(const fq_nmod_mpoly_t A, slong i, slong var, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: slong fq_nmod_mpoly_get_term_var_exp_si(const fq_nmod_mpoly_t A, slong i, slong var, const fq_nmod_mpoly_ctx_t ctx)
+              slong fq_nmod_mpoly_get_term_var_exp_si(const fq_nmod_mpoly_t A, slong i, slong var, const fq_nmod_mpoly_ctx_t ctx)
 
     Return the exponent of the variable ``var`` of the term of index ``i``.
     This function throws if the exponent does not fit into a ``ulong`` (resp. ``slong``).
 
 .. function:: void fq_nmod_mpoly_set_term_exp_fmpz(fq_nmod_mpoly_t A, slong i, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: void fq_nmod_mpoly_set_term_exp_ui(fq_nmod_mpoly_t A, slong i, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_set_term_exp_ui(fq_nmod_mpoly_t A, slong i, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
 
     Set the exponent of the term of index ``i`` to ``exp``.
 
@@ -325,8 +314,7 @@ Container operations
     Set ``M`` to the monomial of the term of index ``i`` in ``A``. The coefficient of ``M`` will be one.
 
 .. function:: void fq_nmod_mpoly_push_term_fq_nmod_fmpz(fq_nmod_mpoly_t A, const fq_nmod_t c, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: void fq_nmod_mpoly_push_term_fq_nmod_ui(fq_nmod_mpoly_t A, const fq_nmod_t c, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_push_term_fq_nmod_ui(fq_nmod_mpoly_t A, const fq_nmod_t c, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
 
     Append a term to ``A`` with coefficient ``c`` and exponent vector ``exp``.
     This function runs in constant average time.
@@ -548,8 +536,7 @@ Univariate Functions
     Return the exponent of the term of index ``i`` of ``A``.
 
 .. function:: void fq_nmod_mpoly_univar_get_term_coeff(fq_nmod_mpoly_t c, const fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
-
-.. function:: void fq_nmod_mpoly_univar_swap_term_coeff(fq_nmod_mpoly_t c, fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_univar_swap_term_coeff(fq_nmod_mpoly_t c, fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx)
 
     Set (resp. swap) ``c`` to (resp. with) the coefficient of the term of index ``i`` of ``A``.
 

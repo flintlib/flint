@@ -433,8 +433,7 @@ Evaluation
 
 
 .. function:: void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N, const fmpz *poly, slong val, slong len, const fmpz_t a, slong b, const padic_ctx_t ctx)
-
-.. function:: void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly, const padic_t a, const padic_ctx_t ctx)
+              void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly, const padic_t a, const padic_ctx_t ctx)
 
     Sets the `p`-adic number ``y`` to ``poly`` evaluated at `a`, 
     reduced in the given context.

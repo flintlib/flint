@@ -119,10 +119,8 @@ Comparison
     Returns the sign of the rational number `x`.
 
 .. function:: int fmpq_cmp(const fmpq_t x, const fmpq_t y)
-
-.. function:: int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y)
-
-.. function:: int fmpq_cmp_ui(const fmpq_t x, ulong y)
+              int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y)
+              int fmpq_cmp_ui(const fmpq_t x, ulong y)
 
     Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
 
@@ -196,8 +194,7 @@ Conversion
     according to MPFR conventions.
 
 .. function:: char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
-
-.. function:: char * fmpq_get_str(char * str, int b, const fmpq_t x)
+              char * fmpq_get_str(char * str, int b, const fmpq_t x)
 
     Prints the string representation of `x` in base `b \in [2, 36]` 
     to a suitable buffer.
@@ -347,12 +344,9 @@ Arithmetic
 
 
 .. function:: void fmpq_add(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
-
-.. function:: void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
-
-.. function:: void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
-
-.. function:: void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+              void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+              void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+              void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
     Sets ``res`` respectively to ``op1 + op2``, ``op1 - op2``,
     ``op1 * op2``, or ``op1 / op2``. Assumes that the inputs
@@ -361,12 +355,9 @@ Arithmetic
     Aliasing between any combination of the variables is allowed.
 
 .. function:: void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
-
-.. function:: void _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
-
-.. function:: void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
-
-.. function:: void _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+              void _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+              void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+              void _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
 
     Sets ``(rnum, rden)`` to the canonical form of the sum,
     difference, product or quotient respectively of the fractions
@@ -375,39 +366,31 @@ Arithmetic
     whilst no numerator is aliased with a denominator.
 
 .. function:: void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
-
-.. function:: void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
-    
-.. function:: void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
-
-.. function:: void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
+              void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
+              void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
+              void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
 
     Sets ``(rnum, rden)`` to the canonical form of the sum or difference
     respectively of the fractions represented by ``(p, q)`` and
     ``(r, 1)``. Numerators may not be aliased with denominators.
 
 .. function:: void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c)
-
-.. function:: void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c)
-
-.. function:: void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
-
-.. function:: void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
+              void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c)
+              void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
+              void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
 
    Sets ``res`` to the sum or difference respectively, of the fraction 
    ``op1`` and the integer `c`.
 
 .. function:: void fmpq_addmul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
-
-.. function:: void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+              void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
     Sets ``res`` to ``res + op1 * op2`` or ``res - op1 * op2``
     respectively, placing the result in canonical form. Aliasing
     between any combination of the variables is allowed.
 
 .. function:: void _fmpq_addmul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
-
-.. function:: void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+              void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
 
     Sets ``(rnum, rden)`` to the canonical form of the fraction
     ``(rnum, rden)`` + ``(op1num, op1den)`` * ``(op2num, op2den)`` or
@@ -421,8 +404,7 @@ Arithmetic
     form, assuming that ``src`` is already in canonical form.
 
 .. function:: void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, const fmpz_t opnum, const fmpz_t opden, slong e)
-
-.. function:: void fmpq_pow_si(fmpq_t res, const fmpq_t op, slong e)
+              void fmpq_pow_si(fmpq_t res, const fmpq_t op, slong e)
 
     Sets ``res`` to ``op`` raised to the power~`e`, where~`e` 
     is a ``slong``.  If `e` is `0` and ``op`` is `0`, then 
@@ -471,8 +453,7 @@ Modular reduction and rational reconstruction
 
 
 .. function:: int _fmpq_mod_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t mod)
-
-.. function:: int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod)
+              int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod)
 
     Sets the integer ``res`` to the residue `a` of
     `x = n/d` = ``(num, den)`` modulo the positive integer `m` = ``mod``,
@@ -481,8 +462,7 @@ Modular reduction and rational reconstruction
     be returned.
 
 .. function:: int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
-
-.. function:: int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
+              int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 
     Reconstructs a rational number from its residue `a` modulo `m`.
 
@@ -494,8 +474,7 @@ Modular reduction and rational reconstruction
     exists.
 
 .. function:: int _fmpq_reconstruct_fmpz(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m)
-
-.. function:: int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
+              int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
 
     Reconstructs a rational number from its residue `a` modulo `m`,
     returning 1 if successful and 0 if no solution exists.
@@ -508,8 +487,7 @@ Rational enumeration
 
 
 .. function:: void _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den)
-
-.. function:: void fmpq_next_minimal(fmpq_t res, const fmpq_t x)
+              void fmpq_next_minimal(fmpq_t res, const fmpq_t x)
 
     Given `x` which is assumed to be nonnegative and in canonical form, sets
     ``res`` to the next rational number in the sequence obtained by
@@ -526,8 +504,7 @@ Rational enumeration
     compute than the Calkin-Wilf enumeration.
 
 .. function:: void _fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den)
-
-.. function:: void fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x)
+              void fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x)
 
     Given a signed rational number `x` assumed to be in canonical form, sets
     ``res`` to the next element in the minimal-height sequence
@@ -540,8 +517,7 @@ Rational enumeration
     and only once, in order of minimal height.
 
 .. function:: void _fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den)
-
-.. function:: void fmpq_next_calkin_wilf(fmpq_t res, const fmpq_t x)
+              void fmpq_next_calkin_wilf(fmpq_t res, const fmpq_t x)
 
     Given `x` which is assumed to be nonnegative and in canonical form, sets
     ``res`` to the next number in the breadth-first traversal of the

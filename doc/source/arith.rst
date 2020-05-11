@@ -19,8 +19,7 @@ Harmonic numbers
 
 
 .. function:: void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n)
-
-.. function:: void arith_harmonic_number(fmpq_t x, slong n)
+              void arith_harmonic_number(fmpq_t x, slong n)
 
     These are aliases for the functions in the fmpq module.
 
@@ -30,10 +29,8 @@ Stirling numbers
 
 
 .. function:: void arith_stirling_number_1u(fmpz_t s, slong n, slong k)
-
-.. function:: void arith_stirling_number_1(fmpz_t s, slong n, slong k)
-
-.. function:: void arith_stirling_number_2(fmpz_t s, slong n, slong k)
+              void arith_stirling_number_1(fmpz_t s, slong n, slong k)
+              void arith_stirling_number_2(fmpz_t s, slong n, slong k)
 
     Sets `s` to `S(n,k)` where `S(n,k)` denotes an unsigned Stirling
     number of the first kind `|S_1(n, k)|`, a signed Stirling number 
@@ -66,10 +63,8 @@ Stirling numbers
     ``klen = n+1``. It is assumed that ``klen`` is at most `n + 1`.
 
 .. function:: void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
-
-.. function:: void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
-
-.. function:: void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+              void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+              void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
 
     Given the vector ``prev`` containing a row of Stirling numbers
     ``S(n-1,0), S(n-1,1), S(n-1,2), ..., S(n-1,klen-1)``, computes
@@ -393,10 +388,8 @@ Multiplicative functions
 
 
 .. function:: void arith_euler_phi(fmpz_t res, const fmpz_t n)
-
-.. function:: int arith_moebius_mu(const fmpz_t n)
-
-.. function:: void arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+              int arith_moebius_mu(const fmpz_t n)
+              void arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 
     These are aliases for the functions in the fmpz module.
 
@@ -503,14 +496,10 @@ Dedekind sums
 
 
 .. function:: void arith_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-.. function:: double arith_dedekind_sum_coprime_d(double h, double k)
-
-.. function:: void arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-.. function:: void arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-.. function:: void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
+              double arith_dedekind_sum_coprime_d(double h, double k)
+              void arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
+              void arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
+              void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
     These are aliases for the functions in the fmpq module.
 

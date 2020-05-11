@@ -373,10 +373,8 @@ Exponential
     depending on whether `p` is `2` or odd.
 
 .. function:: void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N)
-
-.. function:: void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N)
-
-.. function:: void _padic_exp(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N)
+              void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N)
+              void _padic_exp(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N)
 
     Sets ``rop`` to the `p`-exponential function evaluated at 
     `x = p^v u`, reduced modulo `p^N`.
@@ -443,12 +441,9 @@ Logarithm
     where `f` is ``FLINT_BITS``.
 
 .. function:: void _padic_log(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
-
-.. function:: void _padic_log_rectangular(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
-
-.. function:: void _padic_log_satoh(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
-
-.. function:: void _padic_log_balanced(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
+              void _padic_log_rectangular(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
+              void _padic_log_satoh(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
+              void _padic_log_balanced(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
 
     Computes 
 
@@ -576,8 +571,7 @@ Input and output
     it is also the return value.
 
 .. function:: int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
-
-.. function:: int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
+              int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
 
     Prints the string representation of the `p`-adic number ``op`` 
     to the stream ``file``.
@@ -585,8 +579,7 @@ Input and output
     In the current implementation, always returns `1`.
 
 .. function:: int _padic_print(const fmpz_t u, slong v, const padic_ctx_t ctx)
-
-.. function:: int padic_print(const padic_t op, const padic_ctx_t ctx)
+              int padic_print(const padic_t op, const padic_ctx_t ctx)
 
     Prints the string representation of the `p`-adic number ``op`` 
     to the stream ``stdout``.

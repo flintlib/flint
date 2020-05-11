@@ -206,8 +206,7 @@ Input and output
     In the current implementation, always returns `1`.
 
 .. function:: int padic_mat_print(const padic_mat_t A, const padic_ctx_t ctx)
-
-.. function:: int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
+              int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
 
 
 Random matrix generation
