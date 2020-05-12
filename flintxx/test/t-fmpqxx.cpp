@@ -66,6 +66,7 @@ test_conversion()
     fmpqxx a = fmpqxx::frac(3, 5);
     tassert(a.to_string() == "3/5");
     tassert(a.to_string(5) == "3/10");
+    tassert(0.59 < a.to<double>() && a.to<double>() < 0.61);
 
     std::ostringstream oss;
     oss << a;
@@ -78,12 +79,37 @@ test_conversion()
 void test_order()
 {
     fmpqxx a(0, 1u), b(1, 1u);
+    fmpzxx c(2), d(-2);
+
     tassert(a < b);
     tassert(a <= a);
     tassert(b > a);
     tassert(b >= b);
     tassert(a == a);
     tassert(a != b);
+
+    tassert(c > a);
+    tassert(c >= a + b);
+    tassert(c != a);
+    tassert(c > a);
+    tassert(a <= c);
+    tassert(a + b >= d);
+    tassert(a - b != d);
+    tassert(a - b > d);
+    tassert(d <= b);
+
+    tassert(b < 2u);
+    tassert(a + b < c);
+    tassert(a + b < 2u);
+    tassert(a + b < c.to<ulong>());
+    tassert(a + b < 2);
+    tassert(a + b < c.to<slong>());
+    tassert(1u <= a + b);
+    tassert(1 <= b);
+    tassert(b == 1u);
+    tassert(a + b == 1);
+    tassert(2 != b);
+    tassert(2u != b);
 }
 
 void
@@ -93,8 +119,36 @@ test_arithmetic()
     fmpzxx c(2);
 
     tassert(a + b == fmpqxx::frac(3*7 + 2*5, 35u));
+    tassert(a + c == fmpqxx::frac(13, 5u));
+    tassert(a + c.to<ulong>() == a + c);
+    tassert(a + c.to<slong>() == a + c);
+    tassert(a + 2u            == a + c);
+    tassert(a + 2             == a + c);
+    tassert(c + a             == a + c);
+    tassert(c.to<slong>() + a == a + c);
+    tassert(c.to<ulong>() + a == a + c);
+    tassert(2u + a            == a + c);
+    tassert(2 + a             == a + c);
+
     tassert(a * b == fmpqxx::frac(6, 35u));
+    tassert(a * c             == a + a);
+    tassert(a * c.to<ulong>() == a + a);
+    tassert(a * c.to<slong>() == a + a);
+    tassert(c * a             == a + a);
+    tassert(c.to<ulong>() * a == a + a);
+    tassert(c.to<slong>() * a == a + a);
+    tassert(a * 2u            == a + a);
+    tassert(a * 2             == a + a);
+    tassert(2u * a            == a + a);
+    tassert(2 * a             == a + a);
+
     tassert(a - b == fmpqxx::frac(3*7 - 5*2, 35u));
+    tassert(a - c == fmpqxx::frac(-7, 5u));
+    tassert(a - c.to<ulong>() == a - c);
+    tassert(a - c.to<slong>() == a - c);
+    tassert(a - 2u            == a - c);
+    tassert(a - 2             == a - c);
+
     tassert(a / b == fmpqxx::frac(3*7, 10u));
 
     tassert((a+a) * (c+c) == fmpqxx::frac(24, 5u));

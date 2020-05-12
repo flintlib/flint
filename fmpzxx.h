@@ -424,7 +424,11 @@ FLINT_DEFINE_CBINARY_EXPR_COND2(plus, fmpzxx,
         FMPZXX_COND_S, traits::is_unsigned_integer,
         fmpz_add_ui(to._fmpz(), e1._fmpz(), e2))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(times, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
+FLINT_DEFINE_CBINARY_EXPR_COND2(plus, fmpzxx,
+        FMPZXX_COND_S, traits::is_signed_integer,
+        fmpz_add_si(to._fmpz(), e1._fmpz(), e2))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
         fmpz_mul(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
 FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpzxx,
@@ -441,6 +445,10 @@ FLINT_DEFINE_BINARY_EXPR_COND2(minus, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
 FLINT_DEFINE_BINARY_EXPR_COND2(minus, fmpzxx,
         FMPZXX_COND_S, traits::is_unsigned_integer,
         fmpz_sub_ui(to._fmpz(), e1._fmpz(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(minus, fmpzxx,
+        FMPZXX_COND_S, traits::is_signed_integer,
+        fmpz_sub_si(to._fmpz(), e1._fmpz(), e2))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
         fmpz_fdiv_q(to._fmpz(), e1._fmpz(), e2._fmpz()))
