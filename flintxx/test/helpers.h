@@ -33,7 +33,7 @@
     } \
 } while (0)
 
-// Whether or not the compiler is good enough to compile all of t-mpz.cpp
+// Whether or not the compiler is good enough to compile all of t-fmpzxx.cpp
 // in reasonable time and space.
 #ifndef HAVE_FAST_COMPILER
 #ifdef __clang__
