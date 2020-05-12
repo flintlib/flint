@@ -807,7 +807,7 @@ cleanup:
 static int _split(_fmpz_mat22_t M, fmpz_t A, fmpz_t B, const fmpz_t N)
 {
     int ret;
-    _fmpz_vector_t v;
+    _fmpq_cfrac_list_t v;
     _fmpz_mat22_t H;
     fmpz_t As, Bs, Q, R;
     slong a, b, n = fmpz_size(N);
@@ -818,7 +818,7 @@ static int _split(_fmpz_mat22_t M, fmpz_t A, fmpz_t B, const fmpz_t N)
     fmpz_init(Q);
     fmpz_init(R);
     _fmpz_mat22_init(H);
-    _fmpz_vector_init(v);
+    _fmpq_cfrac_list_init(v);
 
 again:
 
@@ -914,7 +914,7 @@ cleanup:
     fmpz_clear(Q);
     fmpz_clear(R);
     _fmpz_mat22_clear(H);
-    _fmpz_vector_clear(v);
+    _fmpq_cfrac_list_clear(v);
 
     return ret;
 }

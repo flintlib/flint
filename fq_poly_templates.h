@@ -261,6 +261,10 @@ FLINT_DLL void TEMPLATE(T, poly_add)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, 
                       const TEMPLATE(T, poly_t) op2,
                       const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL void TEMPLATE(T, poly_add_si)(TEMPLATE(T, poly_t) rop,
+                                    const TEMPLATE(T, poly_t) op1, slong c,
+                                                 const TEMPLATE(T, ctx_t) ctx);
+
 FLINT_DLL void TEMPLATE(T, poly_add_series)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1,
                       const TEMPLATE(T, poly_t) op2,
                       slong n, const TEMPLATE(T, ctx_t) ctx);

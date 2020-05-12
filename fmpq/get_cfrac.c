@@ -18,7 +18,7 @@ slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
     slong i;
     int cmp, num_sign, den_sign;
     _fmpq_ball_t x;
-    _fmpz_vector_t s;
+    _fmpq_cfrac_list_t s;
     _fmpz_mat22_t M;
 
 #if WANT_ASSERT
@@ -64,7 +64,7 @@ slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
     }
     x->exact = 1;
 
-    _fmpz_vector_init(s);
+    _fmpq_cfrac_list_init(s);
     s->limit = limit;
 
     cmp = fmpz_cmp(x->left_num, x->left_den);
@@ -76,7 +76,7 @@ slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
     else
     {
         /* x <= 1 */
-        _fmpz_vector_push_back_zero(s);
+        _fmpq_cfrac_list_push_back_zero(s);
         if (cmp >= 0 || fmpz_sgn(x->left_num) < 0)
         {
             /* x == 1 or x < 0 */
@@ -94,7 +94,7 @@ slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
 
     while (s->length < s->limit && !fmpz_is_zero(x->left_den))
     {
-        _fmpz_vector_push_back_zero(s);
+        _fmpq_cfrac_list_push_back_zero(s);
         fmpz_fdiv_qr(s->array + s->length - 1, x->left_num,
                                                      x->left_num, x->left_den);
         fmpz_swap(x->left_num, x->left_den);
@@ -114,7 +114,7 @@ slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
 
     _fmpz_mat22_clear(M);
     _fmpq_ball_clear(x);
-    _fmpz_vector_clear(s);
+    _fmpq_cfrac_list_clear(s);
 
     return i;
 }

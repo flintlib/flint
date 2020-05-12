@@ -311,6 +311,8 @@ ulong n_invmod(ulong x, ulong y)
    return r;
 }
 
+FLINT_DLL ulong n_CRT(ulong r1, ulong m1, ulong r2, ulong m2);
+
 FLINT_DLL ulong n_revbin(ulong in, ulong bits);
 
 FLINT_DLL int n_jacobi(slong x, ulong y);

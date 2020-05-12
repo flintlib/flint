@@ -247,6 +247,9 @@ FLINT_DLL void fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ct
 
 FLINT_DLL void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
+FLINT_DLL void fq_rand(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+
+
 /* Comparison ****************************************************************/
 
 FQ_INLINE int fq_equal(const fq_t op1, const fq_t op2, const fq_ctx_t ctx)

@@ -444,6 +444,8 @@ FLINT_DLL void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, slong len1,
 FLINT_DLL void nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1, 
                                                       const nmod_poly_t poly2);
 
+FLINT_DLL void nmod_poly_add_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c);
+
 FLINT_DLL void nmod_poly_add_series(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
 
@@ -455,6 +457,8 @@ FLINT_DLL void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1,
 
 FLINT_DLL void nmod_poly_sub_series(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
+
+FLINT_DLL void nmod_poly_sub_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c);
 
 FLINT_DLL void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
 
@@ -1321,6 +1325,11 @@ FLINT_DLL void nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, 
 
 FLINT_DLL void _nmod_poly_product_roots_nmod_vec(mp_ptr poly,
     mp_srcptr xs, slong n, nmod_t mod);
+
+
+FLINT_DLL void _nmod_poly_split_rabin(nmod_poly_t a, nmod_poly_t b,
+                           const nmod_poly_t f, nmod_poly_t t, nmod_poly_t t2,
+                                                       flint_rand_t randstate);
 
 FLINT_DLL int nmod_poly_find_distinct_nonzero_roots(mp_limb_t * roots,
                                                           const nmod_poly_t P);

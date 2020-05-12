@@ -451,7 +451,7 @@ FLINT_DLL void _fmpz_mat22_rmul_inv_elem(_fmpz_mat22_t M, const fmpz_t q);
 
 FLINT_DLL void _fmpz_mat22_lmul_elem(_fmpz_mat22_t M, const fmpz_t q);
 
-/******************* resizable integer vector ********************************/
+/******** resizable integer vector specific to cfrac functionality ***********/
 
 typedef struct
 {
@@ -461,21 +461,28 @@ typedef struct
     slong limit;
     fmpz_t alt_sum;
     int want_alt_sum;
-} _fmpz_vector_struct;
+} _fmpq_cfrac_list_struct;
 
-typedef _fmpz_vector_struct _fmpz_vector_t[1];
+typedef _fmpq_cfrac_list_struct _fmpq_cfrac_list_t[1];
 
-FLINT_DLL void _fmpz_vector_init(_fmpz_vector_t v);
+FLINT_DLL void _fmpq_cfrac_list_init(_fmpq_cfrac_list_t v);
 
-FLINT_DLL void _fmpz_vector_clear(_fmpz_vector_t v);
+FLINT_DLL void _fmpq_cfrac_list_clear(_fmpq_cfrac_list_t v);
 
-FLINT_DLL void _fmpz_vector_fit_length(_fmpz_vector_t v, slong len);
+FLINT_DLL void _fmpq_cfrac_list_fit_length(_fmpq_cfrac_list_t v, slong len);
 
-FLINT_DLL void _fmpz_vector_push_back(_fmpz_vector_t v, const fmpz_t a);
+FLINT_DLL void _fmpq_cfrac_list_push_back(_fmpq_cfrac_list_t v, const fmpz_t a);
 
-FLINT_DLL void _fmpz_vector_push_back_zero(_fmpz_vector_t v);
+FLINT_DLL void _fmpq_cfrac_list_push_back_zero(_fmpq_cfrac_list_t v);
 
-FLINT_DLL void _fmpz_vector_append_ui(_fmpz_vector_t v, const ulong * a, slong n);
+FLINT_DLL void _fmpq_cfrac_list_append_ui(_fmpq_cfrac_list_t v, const ulong * a, slong n);
+
+FMPQ_INLINE void _fmpq_cfrac_list_swap(_fmpq_cfrac_list_t a, _fmpq_cfrac_list_t b)
+{
+    _fmpq_cfrac_list_struct t = *a;
+    *a = *b;
+    *b = t;
+}
 
 /*************** ball for closed interval [left, right] **********************/
 
@@ -499,10 +506,10 @@ FMPQ_INLINE void _fmpq_ball_swap(_fmpq_ball_t x, _fmpq_ball_t y)
 
 FLINT_DLL int _fmpq_ball_gt_one(const _fmpq_ball_t x);
 
-FLINT_DLL void _fmpq_hgcd(_fmpz_vector_t s, _fmpz_mat22_t M,
+FLINT_DLL void _fmpq_hgcd(_fmpq_cfrac_list_t s, _fmpz_mat22_t M,
                                                    fmpz_t x_num, fmpz_t x_den);
 
-FLINT_DLL void _fmpq_ball_get_cfrac(_fmpz_vector_t s, _fmpz_mat22_t M,
+FLINT_DLL void _fmpq_ball_get_cfrac(_fmpq_cfrac_list_t s, _fmpz_mat22_t M,
                                                     int needM, _fmpq_ball_t x);
 
 #ifdef __cplusplus

@@ -861,6 +861,19 @@ Primality testing
     check up to `2^{64}`, i.e. there are no counterexamples.
 
 
+Chinese remaindering
+--------------------------------------------------------------------------------
+
+.. function:: ulong n_CRT(ulong r1, ulong m1, ulong r2, ulong m2)
+
+    Use the Chinese Remainder Theorem to set return the unique value
+    `0 \le x < M` congruent to `r_1` modulo `m_1` and `r_2` modulo `m_2`,
+    where `M = m_1 \times m_2` is assumed to fit a ulong.
+
+    It is assumed that `m_1` and `m_2` are positive integers greater
+    than `1` and coprime. It is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
+
+
 Square root and perfect power testing
 --------------------------------------------------------------------------------
 

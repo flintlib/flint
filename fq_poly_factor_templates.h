@@ -143,6 +143,10 @@ FLINT_DLL void TEMPLATE(T, poly_factor_split_single)(TEMPLATE(T, poly_t) linfact
                                             const TEMPLATE(T, poly_t) input,
                                             const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL void TEMPLATE(T, poly_roots)(TEMPLATE(T, poly_factor_t) r,
+                          const TEMPLATE(T, poly_t) f, int with_multiplicity,
+                                                 const TEMPLATE(T, ctx_t) ctx);
+
 #ifdef __cplusplus
 }
 #endif
