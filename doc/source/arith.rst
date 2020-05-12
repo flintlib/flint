@@ -504,12 +504,6 @@ Dedekind sums
 
 .. function:: void arith_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-.. function:: double arith_dedekind_sum_coprime_d(double h, double k)
-
-.. function:: void arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-.. function:: void arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
 .. function:: void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
     These are aliases for the functions in the fmpq module.
