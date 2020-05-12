@@ -120,7 +120,54 @@ main(void)
     flint_printf("roots_factored....");
     fflush(stdout);
 
-    for (i = 0; i < 40 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    {
+        nmod_poly_t f;
+        nmod_poly_factor_t roots;
+        mp_limb_t a, n;
+        mp_limb_t * sqrt;
+        n_factor_t nfac;
+
+        n = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
+        n = FLINT_MAX(n, UWORD(2));
+        n_factor_init(&nfac);
+        n_factor(&nfac, n, 0);
+
+        nmod_poly_init(f, n);
+        nmod_poly_factor_init(roots);
+
+        for (j = 0; j < 50; j++)
+        {
+            a = n_randint(state, n);
+
+            nmod_poly_zero(f);
+            nmod_poly_set_coeff_ui(f, 2, n - 1);
+            nmod_poly_set_coeff_ui(f, 0, a);
+
+            if (!nmod_poly_roots_factored(roots, f, 0, &nfac))
+            {
+                flint_printf("FAILED:\ncheck sqrt could be calculated\n");
+                flint_abort();
+            }
+
+            if (roots->num != n_sqrtmodn(&sqrt, a, &nfac))
+            {
+                flint_printf("FAILED:\ncheck root count against n_sqrtmodn\n");
+                flint_abort();
+            }
+
+            if (sqrt)
+                flint_free(sqrt);
+
+            test_poly(roots, f, 0, &nfac);
+            test_poly(roots, f, 1, &nfac);
+        }
+
+        nmod_poly_clear(f);
+        nmod_poly_factor_clear(roots);
+    }
+
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         ulong p;
         nmod_poly_t f;
