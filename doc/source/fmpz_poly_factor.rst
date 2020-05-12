@@ -137,8 +137,15 @@ Factoring algorithms
     The complexity will be exponential in the number of local factors 
     we find for the components of a squarefree factorization of `F`.
 
+.. function:: _fmpz_poly_factor_quadratic(fmpz_poly_factor_t fac, const fmpz_poly_t f, slong exp)
+
+    Inserts the factorisation of the quadratic polynomial *f* into *fac* with
+    multiplicity *exp*. This function requires that the content of *f* has
+    been removed, and does not update the content of *fac*.
+
 .. function:: void fmpz_poly_factor(fmpz_poly_factor_t final_fac, fmpz_poly_t F)
 
     A wrapper of the Zassenhaus and van Hoeij factoring algorithms, which takes
     as input any polynomial `F`, and stores a factorization in
     ``final_fac``.
+
