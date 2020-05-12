@@ -64,25 +64,21 @@ main(void)
         }
         else
         {
-            if (!fmpz_poly_equal(den, det))
+	    if (!fmpz_poly_equal(den, det))
             {
                 fmpz_poly_neg(det, det);
-                if (!fmpz_poly_equal(den, det))
-                {
-                    fmpz_poly_neg(det, det);
-                    flint_printf("FAIL: den != +/- det(A)\n");
-                    flint_printf("den:\n"); fmpz_poly_print_pretty(den, "x");
-                    flint_printf("\n\n");
-                    flint_printf("det:\n"); fmpz_poly_print_pretty(det, "x");
-                    flint_printf("\n\n");
-                    flint_printf("A:\n");
-                    fmpz_poly_mat_print(A, "x");
-                    flint_printf("B:\n");
-                    fmpz_poly_mat_print(B, "x");
-                    flint_printf("X:\n");
-                    fmpz_poly_mat_print(X, "x");
-                    abort();
-                }
+                flint_printf("FAIL: den != +/- det(A)\n");
+                flint_printf("den:\n"); fmpz_poly_print_pretty(den, "x");
+                flint_printf("\n\n");
+                flint_printf("det:\n"); fmpz_poly_print_pretty(det, "x");
+                flint_printf("\n\n");
+                flint_printf("A:\n");
+                fmpz_poly_mat_print(A, "x");
+                flint_printf("B:\n");
+                fmpz_poly_mat_print(B, "x");
+                flint_printf("X:\n");
+                fmpz_poly_mat_print(X, "x");
+                abort();
             }
         }
 
