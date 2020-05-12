@@ -143,6 +143,10 @@ FLINT_DLL void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r,
 FLINT_DLL int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t r,
         const fmpz_mod_poly_t f, int with_multiplicity, const fmpz_factor_t n);
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z, fmpz_mod_poly_factor_t fac, slong i);
+
 #ifdef __cplusplus
 }
 #endif

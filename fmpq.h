@@ -512,6 +512,14 @@ FLINT_DLL void _fmpq_hgcd(_fmpq_cfrac_list_t s, _fmpz_mat22_t M,
 FLINT_DLL void _fmpq_ball_get_cfrac(_fmpq_cfrac_list_t s, _fmpz_mat22_t M,
                                                     int needM, _fmpq_ball_t x);
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpq_numerator(fmpz_t n, const fmpq_t q);
+FLINT_DLL void fmpq_denominator(fmpz_t n, const fmpq_t q);
+FLINT_DLL fmpz * fmpq_numerator_ptr(fmpq_t q);
+FLINT_DLL fmpz * fmpq_denominator_ptr(fmpq_t q);
+FLINT_DLL int fmpq_equal_fmpz(fmpq_t q, fmpz_t n);
+
 #ifdef __cplusplus
 }
 #endif

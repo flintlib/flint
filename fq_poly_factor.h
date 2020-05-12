@@ -12,6 +12,8 @@
 #ifndef FQ_POLY_FACTOR_H
 #define FQ_POLY_FACTOR_H
 
+#include "fq_poly.h"
+
 #ifdef FQ_POLY_FACTOR_INLINES_C
 #define FQ_POLY_FACTOR_TEMPLATES_INLINE FLINT_DLL
 #define FQ_POLY_FACTOR_INLINE FLINT_DLL
@@ -44,5 +46,9 @@ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
 #include "fq_poly_factor_templates.h"
 #undef CAP_T
 #undef T
+
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fq_poly_factor_get_poly(fq_poly_t z, fq_poly_factor_t fac, slong i, fq_ctx_t ctx);
 
 #endif

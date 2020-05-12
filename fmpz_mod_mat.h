@@ -234,6 +234,10 @@ FLINT_DLL slong fmpz_mod_mat_howell_form(fmpz_mod_mat_t mat);
 
 FLINT_DLL void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat);
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j);
+
 #ifdef __cplusplus
 }
 #endif

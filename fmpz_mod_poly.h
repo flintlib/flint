@@ -1265,6 +1265,15 @@ FMPZ_MOD_POLY_INLINE const fmpz_mod_poly_struct * fmpz_mod_berlekamp_massey_R_po
     return B->R1;
 }
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_mod_poly_add_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong c);
+FLINT_DLL void fmpz_mod_poly_sub_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong c);
+FLINT_DLL void fmpz_mod_poly_si_sub(fmpz_mod_poly_t res, slong c, const fmpz_mod_poly_t poly);
+FLINT_DLL void fmpz_mod_poly_add_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, fmpz_t c);
+FLINT_DLL void fmpz_mod_poly_sub_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, fmpz_t c);
+FLINT_DLL void fmpz_mod_poly_fmpz_sub(fmpz_mod_poly_t res, fmpz_t c, const fmpz_mod_poly_t poly);
+
 #ifdef __cplusplus
 }
 #endif

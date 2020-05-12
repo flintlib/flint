@@ -45,4 +45,8 @@ int FQ_NMOD_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_nmod_ctx_t ctx, slong length
 #undef CAP_T
 #undef T
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z, fq_nmod_poly_factor_t fac, slong i, fq_nmod_ctx_t ctx);
+
 #endif

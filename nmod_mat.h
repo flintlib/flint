@@ -378,6 +378,10 @@ FLINT_DLL void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
  */
 #define NMOD_MAT_OPTIMAL_MODULUS_BITS (FLINT_BITS-5)
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x);
+
 #ifdef __cplusplus
 }
 #endif

@@ -148,6 +148,10 @@ FLINT_DLL void nmod_poly_roots(nmod_poly_factor_t r,
 FLINT_DLL int nmod_poly_roots_factored(nmod_poly_factor_t r,
              const nmod_poly_t f, int with_multiplicity, const n_factor_t * n);
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i);
+
 #ifdef __cplusplus
     }
 #endif

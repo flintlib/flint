@@ -87,6 +87,11 @@ FLINT_DLL void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
 FLINT_DLL void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G);
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_poly_factor_get_fmpz_poly(fmpz_poly_t z, const fmpz_poly_factor_t F, slong i);
+FLINT_DLL void fmpz_poly_factor_get_fmpz(fmpz_t z, const fmpz_poly_factor_t F);
+
 #ifdef __cplusplus
 }
 #endif

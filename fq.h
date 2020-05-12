@@ -381,6 +381,10 @@ FLINT_DLL void fq_bit_pack(fmpz_t f, const fq_t op, flint_bitcnt_t bit_size,
 FLINT_DLL void fq_bit_unpack(fq_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
               const fq_ctx_t ctx);
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void __fq_ctx_prime(fmpz_t p, fq_ctx_t ctx);
+
 #ifdef T
 #undef T
 #endif
