@@ -59,7 +59,7 @@ main(int argc, char** argv)
         prof_start();
         for (l = 0; l < loops; l++)
         {
-            fq_poly_mul(h, f, g, ctx);
+            fq_poly_mul_classical(h, f, g, ctx);
         }
         prof_stop();
         t[0] += get_clock(0);

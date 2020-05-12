@@ -66,33 +66,33 @@ int flint_sprintf(char * s, const char * str, ...)
          {
             wu = (ulong) va_arg(ap, ulong);
             if (have_width)
-                ret += sprintf(s + ret, WORD_FMT "x", wu);
-            else
                 ret += sprintf(s + ret, WORD_WIDTH_FMT "x", width, wu);
+            else
+                ret += sprintf(s + ret, WORD_FMT "x", wu);
             ret += sprintf(s + ret, "%s", str2 + 3);
          } else if (str[2] == 'u')
          {
             wu = (ulong) va_arg(ap, ulong);
             if (have_width)
-                ret += sprintf(s + ret, WORD_FMT "u", wu);
-            else
                 ret += sprintf(s + ret, WORD_WIDTH_FMT "u", width, wu);
+            else
+                ret += sprintf(s + ret, WORD_FMT "u", wu);
             ret += sprintf(s + ret, "%s", str2 + 3);
          } else if (str[2] == 'd')
          {
             w = (slong) va_arg(ap, slong);
             if (have_width)
-                ret += sprintf(s + ret, WORD_FMT "d", w);
-            else
                 ret += sprintf(s + ret, WORD_WIDTH_FMT "d", width, w);
+            else
+                ret += sprintf(s + ret, WORD_FMT "d", w);
             ret += sprintf(s + ret, "%s", str2 + 3);
          } else
          {
             w = (slong) va_arg(ap, slong);
             if (have_width)
-                ret += sprintf(s + ret, WORD_FMT "d", w);
-            else
                 ret += sprintf(s + ret, WORD_WIDTH_FMT "d", width, w);
+            else
+                ret += sprintf(s + ret, WORD_FMT "d", w);
             ret += sprintf(s + ret, "%s", str2 + 2);
          }
          break;

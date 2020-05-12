@@ -513,13 +513,15 @@ static int _try_missing_var(
     nmod_mpoly_to_univar(Ax, A, var, ctx);
 
     FLINT_ASSERT(Ax->length > 0);
-    success = _nmod_mpoly_gcd(tG, Gbits, B, Ax->coeffs + 0, ctx, NULL, 0);
+    success = _nmod_mpoly_gcd_threaded_pool(tG, Gbits, B, Ax->coeffs + 0,
+                                                                 ctx, NULL, 0);
     if (!success)
         goto cleanup;
 
     for (i = 1; i < Ax->length; i++)
     {
-        success = _nmod_mpoly_gcd(tG, Gbits, tG, Ax->coeffs + i, ctx, NULL, 0);
+        success = _nmod_mpoly_gcd_threaded_pool(tG, Gbits, tG, Ax->coeffs + i,
+                                                                 ctx, NULL, 0);
         if (!success)
             goto cleanup;
     }
@@ -555,14 +557,16 @@ static int _try_divides(
 
     nmod_mpoly_init(Q, ctx);
 
-    if (try_b && _nmod_mpoly_divides(Q, A, B, ctx, handles, num_handles))
+    if (try_b && _nmod_mpoly_divides_threaded_pool(Q, A, B,
+                                                    ctx, handles, num_handles))
     {
         nmod_mpoly_set(G, B, ctx);
         success = 1;
         goto cleanup;
     }
 
-    if (try_a && _nmod_mpoly_divides(Q, B, A, ctx, handles, num_handles))
+    if (try_a && _nmod_mpoly_divides_threaded_pool(Q, B, A,
+                                                    ctx, handles, num_handles))
     {
         nmod_mpoly_set(G, A, ctx);
         success = 1;
@@ -637,13 +641,14 @@ static int _try_zippel(
     nmod_mpoly_init3(Bc, 0, wbits, uctx);
     nmod_mpoly_init3(Gc, 0, wbits, uctx);
 
-    nmod_mpoly_to_mpolyu_perm_deflate(Au, uctx, A, ctx, zinfo->perm,
+    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Au, uctx, A, ctx, zinfo->perm,
                                              I->Amin_exp, I->Gstride, NULL, 0);
-    nmod_mpoly_to_mpolyu_perm_deflate(Bu, uctx, B, ctx, zinfo->perm,
+    nmod_mpoly_to_mpolyu_perm_deflate_threaded_pool(Bu, uctx, B, ctx, zinfo->perm,
                                              I->Bmin_exp, I->Gstride, NULL, 0);
 
-    success = nmod_mpolyu_content_mpoly(Ac, Au, uctx, NULL, 0);
-    success = success && nmod_mpolyu_content_mpoly(Bc, Bu, uctx, NULL, 0);
+    success = nmod_mpolyu_content_mpoly_threaded_pool(Ac, Au, uctx, NULL, 0);
+    success = success &&
+              nmod_mpolyu_content_mpoly_threaded_pool(Bc, Bu, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 
@@ -656,7 +661,7 @@ static int _try_zippel(
     if (!success)
         goto cleanup;
 
-    success = _nmod_mpoly_gcd(Gc, wbits, Ac, Bc, uctx, NULL, 0);
+    success = _nmod_mpoly_gcd_threaded_pool(Gc, wbits, Ac, Bc, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 
@@ -707,7 +712,7 @@ static void _worker_convertn(void * varg)
 {
     _convertn_arg_struct * arg = (_convertn_arg_struct *) varg;
 
-    nmod_mpoly_to_mpolyn_perm_deflate(arg->Pn, arg->nctx, arg->P, arg->ctx,
+    nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(arg->Pn, arg->nctx, arg->P, arg->ctx,
            arg->perm, arg->shift, arg->stride, arg->handles, arg->num_handles);
 }
 
@@ -766,17 +771,16 @@ static int _try_brown(
 
         thread_pool_wake(global_thread_pool, handles[s], 0, _worker_convertn, arg);
 
-        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
-                                   I->brown_perm, I->Amin_exp, I->Gstride,
-                                                               handles + 0, s);
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(An, nctx, A, ctx,
+                       I->brown_perm, I->Amin_exp, I->Gstride, handles + 0, s);
 
         thread_pool_wait(global_thread_pool, handles[s]);
     }
     else
     {
-        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(An, nctx, A, ctx,
                               I->brown_perm, I->Amin_exp, I->Gstride, NULL, 0);
-        nmod_mpoly_to_mpolyn_perm_deflate(Bn, nctx, B, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(Bn, nctx, B, ctx,
                               I->brown_perm, I->Bmin_exp, I->Gstride, NULL, 0);
     }
 
@@ -786,16 +790,16 @@ static int _try_brown(
     FLINT_ASSERT(Bn->length > 1);
 
     success = (num_handles > 0)
-        ? nmod_mpolyn_gcd_brown_smprime_threaded(Gn, Abarn, Bbarn, An, Bn,
+        ? nmod_mpolyn_gcd_brown_smprime_threaded_pool(Gn, Abarn, Bbarn, An, Bn,
                                           m - 1, nctx, I, handles, num_handles)
         : nmod_mpolyn_gcd_brown_smprime(Gn, Abarn, Bbarn, An, Bn,
                                                            m - 1, nctx, I, Sp);
 
     if (!success)
     {
-        nmod_mpoly_to_mpolyn_perm_deflate(An, nctx, A, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(An, nctx, A, ctx,
                               I->brown_perm, I->Amin_exp, I->Gstride, NULL, 0);
-        nmod_mpoly_to_mpolyn_perm_deflate(Bn, nctx, B, ctx,
+        nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(Bn, nctx, B, ctx,
                               I->brown_perm, I->Bmin_exp, I->Gstride, NULL, 0);
         success = nmod_mpolyn_gcd_brown_lgprime(Gn, Abarn, Bbarn, An, Bn,
                                                                   m - 1, nctx);
@@ -828,7 +832,7 @@ cleanup:
 
     return is 1 for success, 0 for failure.
 */
-int _nmod_mpoly_gcd(
+int _nmod_mpoly_gcd_threaded_pool(
     nmod_mpoly_t G, flint_bitcnt_t Gbits,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
@@ -1141,7 +1145,8 @@ int nmod_mpoly_gcd(
     if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS)
     {
         num_handles = flint_request_threads(&handles, thread_limit);
-        success = _nmod_mpoly_gcd(G, Gbits, A, B, ctx, handles, num_handles);
+        success = _nmod_mpoly_gcd_threaded_pool(G, Gbits, A, B, ctx,
+                                                         handles, num_handles);
         flint_give_back_threads(handles, num_handles);
         return success;
     }
@@ -1195,7 +1200,7 @@ int nmod_mpoly_gcd(
 
         num_handles = flint_request_threads(&handles, thread_limit);
         Gbits = FLINT_MIN(Ause->bits, Buse->bits);
-        success = _nmod_mpoly_gcd(G, Gbits, Ause, Buse, ctx,
+        success = _nmod_mpoly_gcd_threaded_pool(G, Gbits, Ause, Buse, ctx,
                                                          handles, num_handles);
         flint_give_back_threads(handles, num_handles);
 
@@ -1239,10 +1244,9 @@ could_not_repack:
                 goto deflate_cleanup;
         }
 
-
         num_handles = flint_request_threads(&handles, thread_limit);
         Gbits = FLINT_MIN(Anew->bits, Bnew->bits);
-        success = _nmod_mpoly_gcd(G, Gbits, Anew, Bnew, ctx,
+        success = _nmod_mpoly_gcd_threaded_pool(G, Gbits, Anew, Bnew, ctx,
                                                          handles, num_handles);
         flint_give_back_threads(handles, num_handles);
 

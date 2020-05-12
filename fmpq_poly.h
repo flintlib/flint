@@ -484,6 +484,18 @@ FLINT_DLL void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m,
 FLINT_DLL void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, 
                   const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv);
 
+/* Divisibility testing ******************************************************/
+
+FLINT_DLL int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden,
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                            const fmpz * poly2, const fmpz_t den2, slong len2);
+
+FLINT_DLL int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1,
+                                                      const fmpq_poly_t poly2);
+
+FLINT_DLL slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
+                                                      const fmpq_poly_t poly2);
+
 /*  Power series division  ***************************************************/
 
 FLINT_DLL void _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden, 

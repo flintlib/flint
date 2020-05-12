@@ -47,6 +47,22 @@ fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len)
     _fmpz_mod_poly_set_length(f, len);
 }
 
+static void
+fmpz_mod_poly_randtest_monic_sparse(fmpz_mod_poly_t poly, flint_rand_t state,
+                                                      slong len, slong nonzero)
+{
+    slong i;
+
+    fmpz_mod_poly_fit_length(poly, len);
+    _fmpz_vec_zero(poly->coeffs, len);
+    fmpz_randm(poly->coeffs + 0, state, &(poly->p));
+    for (i = 1; i < nonzero; i++)
+       fmpz_randm(poly->coeffs + n_randint(state, len - 1) + 1,
+                                                            state, &(poly->p));
+    fmpz_set_ui(poly->coeffs + len - 1, 1);
+    _fmpz_mod_poly_set_length(poly, len);
+}
+
 void
 fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
                                    flint_rand_t state, slong len)
@@ -90,6 +106,25 @@ fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
     fmpz_mod_poly_randtest(f, state, len);
     while (fmpz_mod_poly_is_zero(f))
         fmpz_mod_poly_randtest(f, state, len);
+}
+
+static void
+fmpz_mod_poly_randtest_monic_irreducible_sparse(fmpz_mod_poly_t poly,
+                                              flint_rand_t state, slong len)
+{
+    slong i = 3, attempts;
+
+    while (i <= len/2)
+    {
+        attempts = 0;
+        while (i == len/2 || attempts < 2*len) {
+            fmpz_mod_poly_randtest_monic_sparse(poly, state, len, i);
+            if (!fmpz_mod_poly_is_zero(poly) && fmpz_mod_poly_is_irreducible(poly))
+               return;
+            attempts++;
+        }
+        i++;
+    }
 }
 
 void
@@ -179,6 +214,6 @@ fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly, flint_rand_t sta
     if (fmpz_mod_poly_randtest_pentomial_irreducible(poly, state, len, 2*len))
         return;
 
-    /* Give up */
-    fmpz_mod_poly_randtest_monic_irreducible(poly, state, len);
+    /* Random monic sparse */
+    fmpz_mod_poly_randtest_monic_irreducible_sparse(poly, state, len);
 }

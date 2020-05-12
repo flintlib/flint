@@ -841,11 +841,11 @@ FLINT_DLL void _fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong 
 FLINT_DLL void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     const fmpz * B, slong Blen, slong n);
 
-FLINT_DLL void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A,
-                                         const fmpz_poly_t B, slong n);
+FLINT_DLL void fmpz_poly_div_series_basecase(fmpz_poly_t Q,
+		    const fmpz_poly_t A, const fmpz_poly_t B, slong n);
 
-FLINT_DLL void fmpz_poly_div_series_divconquer(fmpz_poly_t Q, const fmpz_poly_t A,
-                                         const fmpz_poly_t B, slong n);
+FLINT_DLL void fmpz_poly_div_series_divconquer(fmpz_poly_t Q,
+		    const fmpz_poly_t A, const fmpz_poly_t B, slong n);
 
 FLINT_DLL void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
                                          const fmpz_poly_t B, slong n);
@@ -853,10 +853,13 @@ FLINT_DLL void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
 /*  Divisibility testing  ***************************************************/
 
 FLINT_DLL int _fmpz_poly_divides(fmpz * q, const fmpz * a, 
-                                         slong len1, const fmpz * b, slong len2);
+                                       slong len1, const fmpz * b, slong len2);
 
-FLINT_DLL int fmpz_poly_divides(fmpz_poly_t q, const fmpz_poly_t a, const fmpz_poly_t b);
+FLINT_DLL int fmpz_poly_divides(fmpz_poly_t q,
+		                     const fmpz_poly_t a, const fmpz_poly_t b);
 
+FLINT_DLL slong fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
+		                                      const fmpz_poly_t poly2);
 
 /*  Pseudo division  *********************************************************/
 
