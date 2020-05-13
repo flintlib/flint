@@ -60,8 +60,16 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
 
     if (lenB == 0)
     {
-        flint_printf("Exception (nmod_poly_divrem_newton_n_preinv). Division by zero.\n");
-        flint_abort();
+        if (nmod_poly_modulus(B) == 1)
+        {
+            nmod_poly_set(Q, A);
+            nmod_poly_zero(R);
+            return;
+        } else
+        {
+            flint_printf("Exception (nmod_poly_divrem_newton_n_preinv). Division by zero.\n");
+            flint_abort();
+        }
     }
 
     if (lenA < lenB)

@@ -112,8 +112,15 @@ nmod_poly_div_divconquer(nmod_poly_t Q,
 
     if (Blen == 0)
     {
-        flint_printf("Exception (nmod_poly_div_divconquer). Division by zero.\n");
-        flint_abort();
+        if (nmod_poly_modulus(B) == 1)
+        {
+            nmod_poly_set(Q, A);
+            return;
+        } else
+        {
+            flint_printf("Exception (nmod_poly_div_divconquer). Division by zero.\n");
+            flint_abort();
+        }
     }
 
     Alen = A->length;
