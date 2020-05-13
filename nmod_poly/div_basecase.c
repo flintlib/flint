@@ -219,7 +219,7 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
            return;
         } else
         {
-	   flint_printf("Exception (nmod_poly_div_base). Division by zero.\n");
+	   flint_printf("Exception (nmod_poly_div_basecase). Division by zero.\n");
            flint_abort();
         }
     }
