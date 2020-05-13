@@ -449,7 +449,14 @@ int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t poly1,
     TMP_INIT;
 
     if (poly3->length == 0)
-        flint_throw(FLINT_DIVZERO, "Divide by zero in nmod_mpoly_divides_monagan_pearce");
+    {
+        if (poly2->length == 0 || nmod_mpoly_ctx_modulus(ctx) == 1)
+        {
+            nmod_mpoly_set(poly1, poly2, ctx);
+            return 1;
+        } else
+            flint_throw(FLINT_DIVZERO, "Divide by zero in nmod_mpoly_divides_monagan_pearce");
+    }
 
     if (poly2->length == 0)
     {

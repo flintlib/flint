@@ -1942,14 +1942,19 @@ int nmod_mpoly_divides_heap_threaded(
     int divides;
     slong thread_limit = A->length/32;
 
-    if (B->length < 2 || A->length < 2)
+    if (B->length == 0)
     {
-        if (B->length == 0)
+        if (A->length == 0 || nmod_mpoly_ctx_modulus(ctx) == 1)
         {
+            nmod_mpoly_set(Q, A, ctx);
+            return 1;
+        } else
             flint_throw(FLINT_DIVZERO,
                          "Divide by zero in nmod_mpoly_divides_heap_threaded");
-        }
+    }
 
+    if (B->length < 2 || A->length < 2)
+    {
         if (A->length == 0)
         {
             nmod_mpoly_zero(Q, ctx);

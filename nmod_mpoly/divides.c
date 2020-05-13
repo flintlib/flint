@@ -162,7 +162,12 @@ int nmod_mpoly_divides(
 
     if (B->length == 0)
     {
-        flint_throw(FLINT_DIVZERO, "Exception in nmod_mpoly_divides_threaded: "
+        if (A->length == 0 || nmod_mpoly_ctx_modulus(ctx) == 1)
+        {
+            nmod_mpoly_set(Q, A, ctx);
+	    return 1;
+	} else
+	    flint_throw(FLINT_DIVZERO, "Exception in nmod_mpoly_divides_threaded: "
                                                    "Cannot divide by zero.\n");
     }
 
