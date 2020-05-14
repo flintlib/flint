@@ -57,6 +57,13 @@
 static __inline__
 void flint_mpz_set_si(mpz_ptr r, slong s)
 {
+#if __GNU_MP_RELEASE >= 60200
+   if (r->_mp_alloc == 0)
+   {
+      r->_mp_d = flint_malloc(sizeof(mp_limb_t));
+      r->_mp_alloc = 1;
+   }
+#endif
    if (s < 0) {
       r->_mp_size = -1;
       r->_mp_d[0] = -s;
@@ -69,6 +76,13 @@ void flint_mpz_set_si(mpz_ptr r, slong s)
 static __inline__
 void flint_mpz_set_ui(mpz_ptr r, ulong u)
 {
+#if __GNU_MP_RELEASE >= 60200
+   if (r->_mp_alloc == 0)
+   {
+      r->_mp_d = flint_malloc(sizeof(mp_limb_t));
+      r->_mp_alloc = 1;
+   }
+#endif
    r->_mp_d[0] = u; 
    r->_mp_size = u != 0;
 }
@@ -506,6 +520,14 @@ void flint_mpf_set_si (mpf_ptr dest, slong val)
 
   vl = (mp_limb_t) (val >= 0 ? val : -val);
 
+#if __GNU_MP_RELEASE >= 60200
+   if (dest->_mp_alloc == 0)
+   {
+      dest->_mp_d = flint_malloc(sizeof(mp_limb_t));
+      dest->_mp_alloc = 1;
+   }
+#endif
+
   dest->_mp_d[0] = vl;
   size = vl != 0;
 
@@ -540,6 +562,14 @@ static __inline__
 void flint_mpf_set_ui(mpf_ptr f, ulong val)
 {
   mp_size_t size;
+
+#if __GNU_MP_RELEASE >= 60200
+   if (dest->_mp_alloc == 0)
+   {
+      dest->_mp_d = flint_malloc(sizeof(mp_limb_t));
+      dest->_mp_alloc = 1;
+   }
+#endif
 
   f->_mp_d[0] = val;
   size = val != 0;
