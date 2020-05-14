@@ -244,14 +244,10 @@ Coefficients
     Either return or set ``c`` to the coefficient of the monomial with exponent vector ``exp``.
 
 .. function:: void fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, fmpz_mpoly_ctx_t ctx)
-
-.. function:: void fmpz_mpoly_set_coeff_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
-
-.. function:: void fmpz_mpoly_set_coeff_si_fmpz(fmpz_mpoly_t A, slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
-
-.. function:: void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, ulong const * exp, fmpz_mpoly_ctx_t ctx)
-
-.. function:: void fmpz_mpoly_set_coeff_ui_ui(fmpz_mpoly_t A, ulong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_set_coeff_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_set_coeff_si_fmpz(fmpz_mpoly_t A, slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, ulong const * exp, fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_set_coeff_ui_ui(fmpz_mpoly_t A, ulong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
 
 .. function:: void fmpz_mpoly_set_coeff_si_ui(fmpz_mpoly_t A, slong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
 

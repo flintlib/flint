@@ -385,32 +385,22 @@ Arithmetic
     whilst no numerator is aliased with a denominator.
 
 .. function:: void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
-
-.. function:: void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
-
-.. function:: void _fmpq_add_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)
-
-.. function:: void _fmpq_sub_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)
-
-.. function:: void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
-
-.. function:: void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
+              void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
+              void _fmpq_add_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)
+              void _fmpq_sub_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)
+              void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
+              void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
 
     Sets ``(rnum, rden)`` to the canonical form of the sum or difference
     respectively of the fractions represented by ``(p, q)`` and
     ``(r, 1)``. Numerators may not be aliased with denominators.
 
 .. function:: void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c)
-
-.. function:: void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c)
-
-.. function:: void fmpq_add_ui(fmpq_t res, const fmpq_t op1, ulong c)
-
-.. function:: void fmpq_sub_ui(fmpq_t res, const fmpq_t op1, ulong c)
-                                                                               
-.. function:: void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
-
-.. function:: void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
+              void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c)
+              void fmpq_add_ui(fmpq_t res, const fmpq_t op1, ulong c)
+              void fmpq_sub_ui(fmpq_t res, const fmpq_t op1, ulong c)
+              void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
+              void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
 
    Sets ``res`` to the sum or difference respectively, of the fraction 
    ``op1`` and the integer `c`.
@@ -523,8 +513,7 @@ Modular reduction and rational reconstruction
     be returned.
 
 .. function:: int _fmpq_reconstruct_fmpz_2_naive(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
-
-.. function:: int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
+              int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
               int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 
     Reconstructs a rational number from its residue `a` modulo `m`.
