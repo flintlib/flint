@@ -41,7 +41,7 @@ FLINT_SOLIB=0
 # Every patch that is made that doesn't change the Flint
 # interface updates the patch number.
 
-# However, if backwards compatible changes are made, both
+# However, if backwards incompatible changes are made, both
 # the minor and patch numbers are set to 0. (Hopefully this
 # doesn't happen in practice.)
 
@@ -49,10 +49,11 @@ FLINT_SOLIB=0
 # 2.5.0 => 13.5.0
 # 2.5.1 => 13.5.1
 # 2.5.2 => 13.5.2
+# 2.6.0 => 14.0.0
 
-FLINT_MAJOR=13
-FLINT_MINOR=5
-FLINT_PATCH=2
+FLINT_MAJOR=14
+FLINT_MINOR=0
+FLINT_PATCH=0
 
 usage()
 {
@@ -588,15 +589,20 @@ fi
 if [ -z "$CFLAGS" ]; then
    if [ "$OS" = "MINGW64" ]; then
       CFLAGS="-std=c99 -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+      ANSI_FLAG=""
    elif [ "$OS" = "CYGWIN64" ]; then
       CFLAGS="-O2 -funroll-loops -g -D _WIN64 $POPCNT_FLAG $ABI_FLAG"
+      ANSI_FLAG=""
    elif [ "$MACHINE" = "mips64" ]; then
       CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+      ANSI_FLAG=""
    elif [ "$KERNEL" = FreeBSD ]; then
       CFLAGS="-std=c99 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+      ANSI_FLAG=""
       CXXFLAGS="-std=c++11 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    else
-      CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+      ANSI_FLAG="-ansi"
+      CFLAGS="-pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    fi
 fi
 
@@ -789,7 +795,7 @@ echo "CXX=$CXX" >> Makefile
 echo "AR=$AR" >> Makefile
 echo "LDCONFIG=$LDCONFIG" >> Makefile
 echo "" >> Makefile
-echo "CFLAGS=$CFLAGS" >> Makefile
+echo "CFLAGS=$ANSI_FLAG $CFLAGS" >> Makefile
 echo "CXXFLAGS=$CXXFLAGS" >> Makefile
 echo "ABI_FLAG=$ABI_FLAG" >> Makefile
 echo "PIC_FLAG=$PIC_FLAG" >> Makefile
