@@ -357,7 +357,6 @@ FLINT_DLL slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             const fmpz_mat_t A, int rank_check);
 
 FLINT_DLL slong fmpz_mat_rank_small_inplace(fmpz_mat_t B);
-                 
 FLINT_DLL slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 FLINT_DLL slong fmpz_mat_rref_fflu(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 FLINT_DLL slong fmpz_mat_rref_mul(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);

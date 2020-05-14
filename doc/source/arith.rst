@@ -149,7 +149,7 @@ Bell numbers
     A bound for the number of needed primes is computed using
     ``arith_bell_number_size``.
 
-.. function:: mp_limb_t bell_number_nmod(ulong n, nmod_t mod)
+.. function:: mp_limb_t arith_bell_number_nmod(ulong n, nmod_t mod)
 
     Computes the Bell number `B_n` modulo a prime `p` given by ``mod``
 
@@ -359,7 +359,7 @@ The corresponding Euler polynomials are defined by
     No special treatment is given to odd `n`.
     Accuracy is not guaranteed if `n > 10^{14}`.
 
-.. function:: void euler_polynomial(fmpq_poly_t poly, ulong n)
+.. function:: void arith_euler_polynomial(fmpq_poly_t poly, ulong n)
 
     Sets ``poly`` to the Euler polynomial `E_n(x)`. Uses the formula
 

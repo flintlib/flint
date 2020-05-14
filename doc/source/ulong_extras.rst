@@ -963,7 +963,7 @@ Square root and perfect power testing
     This function returns the integer truncation of the cube root of `n`.
     Uses binary search to get the correct value.
 
-.. function:: ulong n_cbrt_chebyshef_approx(ulong n)
+.. function:: ulong n_cbrt_chebyshev_approx(ulong n)
     
     This function returns the integer truncation of the cube root of `n`.
     The number is first expressed in the form ``x * 2^exp``. This ensures

@@ -261,7 +261,7 @@ Strong echelon form and Howell form
 
     `mat` must have at least as many rows as columns.
 
-.. function:: slong fmpz_mod_mat_howell_form_mod(fmpz_mod_mat_t mat)
+.. function:: slong fmpz_mod_mat_howell_form(fmpz_mod_mat_t mat)
 
     Transforms `mat` into the Howell form of `mat`.  For a definition of the
     Howell form see [StoMul1998]_. The Howell form is computed by first

@@ -265,7 +265,7 @@ PADIC_INLINE int padic_equal(const padic_t op1, const padic_t op2)
 
 /* Arithmetic operations *****************************************************/
 
-slong * _padic_lifts_exps(slong *n, slong N);
+FLINT_DLL slong * _padic_lifts_exps(slong *n, slong N);
 
 FLINT_DLL void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p);
 

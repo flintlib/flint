@@ -125,8 +125,7 @@ FLINT_DLL void nmod_mat_zero(nmod_mat_t mat);
 FLINT_DLL int nmod_mat_is_zero(const nmod_mat_t mat);
 
 NMOD_MAT_INLINE
-int
-nmod_mat_is_zero_row(const nmod_mat_t mat, slong i)
+int nmod_mat_is_zero_row(const nmod_mat_t mat, slong i)
 {
     return _nmod_vec_is_zero(mat->rows[i], mat->c);
 }
@@ -177,6 +176,11 @@ FLINT_DLL void
 _nmod_mat_mul_classical_threaded_pool(nmod_mat_t D, const nmod_mat_t C,
 		            const nmod_mat_t A, const nmod_mat_t B, int op,
 			      thread_pool_handle * threads, slong num_threads);
+
+FLINT_DLL void _nmod_mat_mul_classical_threaded(nmod_mat_t D, const nmod_mat_t C,
+                     const nmod_mat_t A, const nmod_mat_t B, int op,
+                                                slong thread_limit);
+
 FLINT_DLL void nmod_mat_mul_classical_threaded(nmod_mat_t C,
 		   const nmod_mat_t A, const nmod_mat_t B, slong thread_limit);
 FLINT_DLL void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
@@ -332,7 +336,7 @@ FLINT_DLL slong _nmod_mat_rref_classical(nmod_mat_t A, slong * pivots_nonpivots)
 FLINT_DLL slong nmod_mat_rref_storjohann(nmod_mat_t A);
 FLINT_DLL slong _nmod_mat_rref_storjohann(nmod_mat_t A, slong * pivots_nonpivots);
 
-slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m);
+FLINT_DLL slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m);
 
 /* Nullspace */
 

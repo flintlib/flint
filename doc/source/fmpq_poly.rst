@@ -450,7 +450,7 @@ Addition and subtraction
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
 
-.. function:: void _fmpq_poly_series_add(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
+.. function:: void _fmpq_poly_add_series(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den fs1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 
     As per ``_fmpq_poly_add`` but the inputs are first notionally truncated
     to length `n`. If `n` is less than ``len1`` or ``len2`` then the
@@ -1390,7 +1390,7 @@ Composition
     in lowest terms.  Supports aliasing between ``(res, denr, len)`` and 
     ``(poly, den, len)``.
 
-.. function:: void fmpz_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t a)
+.. function:: void fmpq_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t a)
 
     Sets ``res`` to ``poly`` with the indeterminate rescaled by `a`.
 

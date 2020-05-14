@@ -227,7 +227,7 @@ Addition and multiplication
     Sets `f` to `g \cdot g`.
     `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
 
-.. function:: void untiy_zp_mul_inplace(unity_zp f, const unity_zp g, const untiy_zp h, fmpz_t * t)
+.. function:: void unity_zp_mul_inplace(unity_zp f, const unity_zp g, const untiy_zp h, fmpz_t * t)
 
     Sets `f` to `g \cdot h`. If `p^{exp} = 3, 4, 5, 7, 8, 9, 11, 16` special
     multiplication functions are used. The preallocated array `t` of ``fmpz_t`` is

@@ -408,6 +408,11 @@ FLINT_DLL void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len,
 
 FLINT_DLL int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
+FLINT_DLL void _qadic_frobenius_a(fmpz *rop, slong exp, 
+                        const fmpz *a, const slong *j, slong lena, 
+                                  const fmpz_t p, slong N);
+
+
 FLINT_DLL void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
                   const fmpz *a, const slong *j, slong lena, 
                   const fmpz_t p, slong N);
