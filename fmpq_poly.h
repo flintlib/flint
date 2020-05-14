@@ -248,10 +248,13 @@ int fmpq_poly_is_one(const fmpq_poly_t poly)
 }
 
 FMPQ_POLY_INLINE
-int fmpq_poly_is_x(const fmpq_poly_t op)
+int fmpq_poly_is_gen(const fmpq_poly_t op)
 {
     return (op->length) == 2 && (*(op->coeffs + 1) == WORD(1)) && (*(op->coeffs + 0) == WORD(0)) && (*(op->den) == WORD(1));
 }
+
+/* Deprecated */
+#define fmpq_poly_is_x fmpq_poly_is_gen
 
 /*  Inlines, see inlines.c  ************************************************/
 

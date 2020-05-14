@@ -338,7 +338,7 @@ Comparison
     Returns `1` is the polynomial is the constant polynomial `\pm 1`, 
     and `0` otherwise.
 
-.. function:: int fmpz_poly_is_x(const fmpz_poly_t poly)
+.. function:: int fmpz_poly_is_gen(const fmpz_poly_t poly)
 
     Returns `1` if the polynomial is the degree `1` polynomial `x`, and `0` 
     otherwise.

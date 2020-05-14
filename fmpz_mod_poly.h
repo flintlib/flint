@@ -210,10 +210,13 @@ int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly)
 }
 
 FMPZ_MOD_POLY_INLINE
-int fmpz_mod_poly_is_x(const fmpz_mod_poly_t op)
+int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t op)
 {
     return (op->length) == 2 && (*(op->coeffs + 1) == WORD(1)) && (*(op->coeffs + 0) == WORD(0));
 }
+
+/* Deprecated */
+#define fmpz_mod_poly_is_x fmpz_mod_poly_is_gen
 
 /*  Assignment and basic manipulation ****************************************/
 

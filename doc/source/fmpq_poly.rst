@@ -413,6 +413,10 @@ Comparison
 
     Returns `1` if ``poly`` is the zero polynomial, otherwise returns `0`.
 
+.. function:: int fmpq_poly_is_gen(const fmpq_poly_t poly)
+
+    Returns `1` if ``poly`` is the degree `1` polynomial `x`, otherwise returns
+    `0`.
 
 Addition and subtraction
 --------------------------------------------------------------------------------

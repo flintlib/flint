@@ -253,7 +253,7 @@ Comparison
 
     Returns non-zero if the polynomial is the constant `1`.
 
-.. function:: int fmpz_mod_poly_is_x(const fmpz_mod_poly_t poly)
+.. function:: int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t poly)
 
     Returns non-zero if the polynomial is the degree `1` polynomial `x`.
 
