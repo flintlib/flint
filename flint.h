@@ -126,19 +126,23 @@ FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
 #endif
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
+#ifndef FLINT_NO_WORDMAC
 #define UWORD_MAX ULLONG_MAX
 #define UWORD_MIN ULLONG_MIN
 #define WORD_MAX LLONG_MAX
 #define WORD_MIN LLONG_MIN
+#endif
 #else
 #define WORD_FMT "%l"
 #define WORD_WIDTH_FMT "%*l"
 #define WORD(xx) (xx##L)
 #define UWORD(xx) (xx##UL)
+#ifndef FLINT_NO_WORDMAC
 #define UWORD_MAX ULONG_MAX
 #define UWORD_MIN ULONG_MIN
 #define WORD_MAX LONG_MAX
 #define WORD_MIN LONG_MIN
+#endif
 #endif
 
 #if GMP_LIMB_BITS == 64
