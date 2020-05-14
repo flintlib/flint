@@ -511,7 +511,7 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(nmod_mpoly_struct ** q, nmod_mpoly_t
     for (i = 0; i < len; i++)
     {
         len3 = FLINT_MAX(len3, poly3[i]->length);
-        if (poly3[i]->length == 0)
+        if (poly3[i]->length == 0 && nmod_mpoly_ctx_modulus(ctx) != 1)
         {
             flint_throw(FLINT_DIVZERO,
                    "Divide by zero in nmod_mpoly_divrem_ideal_monagan_pearce");

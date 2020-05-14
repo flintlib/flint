@@ -55,7 +55,7 @@ main(void)
         {
            for (k = 0; k < A->c; k++)
            {
-              fmpz_mods(c, A->rows[j] + k, P);
+              fmpz_smod(c, A->rows[j] + k, P);
               
               if (!fmpz_equal(c, B->rows[j] + k))
               {

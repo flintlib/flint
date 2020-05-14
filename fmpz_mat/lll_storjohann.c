@@ -106,13 +106,13 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
                     {
                         fmpz_mul(rhs, rhs, fmpz_mat_entry(T, i - 1, i - 1));
                     }
-                    fmpz_mods(fmpz_mat_entry(T, i, k), fmpz_mat_entry(T, i, k),
+                    fmpz_smod(fmpz_mat_entry(T, i, k), fmpz_mat_entry(T, i, k),
                               rhs);
                 }
             }
             for (j = 0; j < np; j++)
             {
-                fmpz_mods(fmpz_mat_entry(A, k, j), fmpz_mat_entry(A, k, j), M);
+                fmpz_smod(fmpz_mat_entry(A, k, j), fmpz_mat_entry(A, k, j), M);
             }
         }
         fmpq_set_fmpz_frac(max, fmpz_mat_entry(T, k, k),
@@ -163,9 +163,9 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
                 {
                     fmpz_mul(rhs, rhs, fmpz_mat_entry(T, i - 1, i - 1));
                 }
-                fmpz_mods(fmpz_mat_entry(T, i, k - 1),
+                fmpz_smod(fmpz_mat_entry(T, i, k - 1),
                           fmpz_mat_entry(T, i, k - 1), rhs);
-                fmpz_mods(fmpz_mat_entry(T, i, k), fmpz_mat_entry(T, i, k),
+                fmpz_smod(fmpz_mat_entry(T, i, k), fmpz_mat_entry(T, i, k),
                           rhs);
             }
             fmpz_mul(rhs, fmpz_mat_entry(T, k - 1, k - 1), M);
@@ -174,13 +174,13 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
             {
                 fmpz_mul(rhs, rhs, fmpz_mat_entry(T, k - 2, k - 2));
             }
-            fmpz_mods(fmpz_mat_entry(T, k - 1, k), fmpz_mat_entry(T, k - 1, k),
+            fmpz_smod(fmpz_mat_entry(T, k - 1, k), fmpz_mat_entry(T, k - 1, k),
                       rhs);
             for (j = k + 1; j < n; j++)
             {
-                fmpz_mods(fmpz_mat_entry(T, k - 1, j),
+                fmpz_smod(fmpz_mat_entry(T, k - 1, j),
                           fmpz_mat_entry(T, k - 1, j), rhs);
-                fmpz_mods(fmpz_mat_entry(T, k, j), fmpz_mat_entry(T, k, j),
+                fmpz_smod(fmpz_mat_entry(T, k, j), fmpz_mat_entry(T, k, j),
                           lhs);
             }
             if (k > 1)
@@ -216,13 +216,13 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
                             fmpz_mul(rhs, rhs,
                                      fmpz_mat_entry(T, i - 1, i - 1));
                         }
-                        fmpz_mods(fmpz_mat_entry(T, i, k),
+                        fmpz_smod(fmpz_mat_entry(T, i, k),
                                   fmpz_mat_entry(T, i, k), rhs);
                     }
                 }
                 for (i = 0; i < np; i++)
                 {
-                    fmpz_mods(fmpz_mat_entry(A, k, i), fmpz_mat_entry(A, k, i),
+                    fmpz_smod(fmpz_mat_entry(A, k, i), fmpz_mat_entry(A, k, i),
                               M);
                 }
             }

@@ -21,7 +21,7 @@
 
     different combinations of these settings may or may not work
 */
-void _fmpz_vector_init(_fmpz_vector_t v)
+void _fmpq_cfrac_list_init(_fmpq_cfrac_list_t v)
 {
     v->array = NULL;
     v->length = 0;
@@ -32,7 +32,7 @@ void _fmpz_vector_init(_fmpz_vector_t v)
 }
 
 
-void _fmpz_vector_clear(_fmpz_vector_t v)
+void _fmpq_cfrac_list_clear(_fmpq_cfrac_list_t v)
 {
     slong i;
 
@@ -46,7 +46,7 @@ void _fmpz_vector_clear(_fmpz_vector_t v)
 }
 
 
-void _fmpz_vector_fit_length(_fmpz_vector_t v, slong len)
+void _fmpq_cfrac_list_fit_length(_fmpq_cfrac_list_t v, slong len)
 {
     if (len <= v->alloc)
         return;
@@ -68,7 +68,7 @@ void _fmpz_vector_fit_length(_fmpz_vector_t v, slong len)
 }
 
 
-void _fmpz_vector_push_back(_fmpz_vector_t v, const fmpz_t a)
+void _fmpq_cfrac_list_push_back(_fmpq_cfrac_list_t v, const fmpz_t a)
 {
     if (v->want_alt_sum)
     {
@@ -82,28 +82,28 @@ void _fmpz_vector_push_back(_fmpz_vector_t v, const fmpz_t a)
     if (v->length < 0)
         return;
 
-    _fmpz_vector_fit_length(v, v->length + 1);
+    _fmpq_cfrac_list_fit_length(v, v->length + 1);
     fmpz_set(v->array + v->length, a);
     v->length++;
     FLINT_ASSERT(v->length <= v->limit);
 }
 
 
-void _fmpz_vector_push_back_zero(_fmpz_vector_t v)
+void _fmpq_cfrac_list_push_back_zero(_fmpq_cfrac_list_t v)
 {
     v->want_alt_sum *= -1;
 
     if (v->length < 0)
         return;
 
-    _fmpz_vector_fit_length(v, v->length + 1);
+    _fmpq_cfrac_list_fit_length(v, v->length + 1);
     fmpz_zero(v->array + v->length);
     v->length++;
     FLINT_ASSERT(v->length <= v->limit);
 }
 
 
-void _fmpz_vector_append_ui(_fmpz_vector_t v, const ulong * a, slong n)
+void _fmpq_cfrac_list_append_ui(_fmpq_cfrac_list_t v, const ulong * a, slong n)
 {
     slong i;
 
@@ -153,7 +153,7 @@ void _fmpz_vector_append_ui(_fmpz_vector_t v, const ulong * a, slong n)
     if (v->length < 0)
         return;
 
-    _fmpz_vector_fit_length(v, v->length + n);
+    _fmpq_cfrac_list_fit_length(v, v->length + n);
     for (i = 0; i < n; i++)
         fmpz_set_ui(v->array + v->length + i, a[i]);
     v->length += n;

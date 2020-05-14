@@ -71,7 +71,7 @@ d_mat_gso(d_mat_t B, const d_mat_t A)
             flag = 0;
             if (s < t)
             {
-                if (s * D_EPS == 0)
+                if (fabs(s * D_EPS) < 1.0e-308)
                     s = 0;
                 else
                     flag = 1;

@@ -9,6 +9,7 @@
 #ifndef _TIMEVAL_H
 #define _TIMEVAL_H
 
+#include "flint.h"
 #include <winsock2.h>
 
 #define EPOCHFILETIME (116444736000000000LL)
@@ -24,7 +25,7 @@ struct timezone
     int tz_dsttime;     /* type of dst correction */
 };
 
-int gettimeofday(struct timeval *tv, struct timezone *tz);
+FLINT_DLL int gettimeofday(struct timeval *tv, struct timezone *tz);
 
 #if defined(__cplusplus)
 }

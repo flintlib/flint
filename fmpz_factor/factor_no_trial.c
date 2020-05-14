@@ -75,7 +75,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 	    if (exp2)
                 _fmpz_factor_append(fac, root, exp2);
 	    else
-	        qsieve_factor_threaded(fac, n2, FLINT_DEFAULT_THREAD_LIMIT);
+	        qsieve_factor(fac, n2);
 
             for (i = 0; i < fac->num; i++)
             {

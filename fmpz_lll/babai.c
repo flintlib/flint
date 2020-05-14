@@ -413,7 +413,7 @@ FUNC_HEAD
                     {
                         if (d_mat_entry(mu, kappa, j) >= 0) /* in this case, X is 1 */
                         {
-                            fmpz_set_ui(x + j, 1);
+                            fmpz_set_ui(x + j - zeros - 1, 1);
                             for (k = zeros + 1; k < j; k++)
                             {
                                 tmp = ldexp(d_mat_entry(mu, j, k), exponent);
@@ -434,7 +434,7 @@ FUNC_HEAD
                         }
                         else    /* otherwise X is -1 */
                         {
-                            fmpz_set_si(x + j, -WORD(1));
+                            fmpz_set_si(x + j - zeros - 1, -WORD(1));
                             for (k = zeros + 1; k < j; k++)
                             {
                                 tmp = ldexp(d_mat_entry(mu, j, k), exponent);
@@ -474,7 +474,7 @@ FUNC_HEAD
                             }
 
                             xx = (slong) tmp;
-                            fmpz_set_si(x + j, xx);
+                            fmpz_set_si(x + j - zeros - 1, xx);
                             if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_scalar_submul_si(B->rows[kappa],
@@ -503,7 +503,7 @@ FUNC_HEAD
                                 xx = xx << -exponent;
                                 exponent = 0;
 
-                                fmpz_set_si(x + j, xx);
+                                fmpz_set_si(x + j - zeros - 1, xx);
                                 if (fl->rt == Z_BASIS && B != NULL)
                                 {
                                     _fmpz_vec_scalar_submul_si(B->rows
@@ -530,8 +530,8 @@ FUNC_HEAD
                             }
                             else
                             {
-                                fmpz_set_si(x + j, xx);
-                                fmpz_mul_2exp(x + j, x + j, exponent);
+                                fmpz_set_si(x + j - zeros - 1, xx);
+                                fmpz_mul_2exp(x + j - zeros - 1, x + j - zeros - 1, exponent);
                                 if (fl->rt == Z_BASIS && B != NULL)
                                 {
                                     _fmpz_vec_scalar_submul_si_2exp(B->rows
@@ -575,18 +575,18 @@ FUNC_HEAD
 
                 for (j = zeros + 1; j < kappa; j++)
                 {
-                    fmpz_pow_ui(t, x + j, 2);
+                    fmpz_pow_ui(t, x + j - zeros - 1, 2);
                     fmpz_addmul(fmpz_mat_entry(GM, kappa, kappa),
                                 t, fmpz_mat_entry(GM, j, j));
 
-                    fmpz_mul(t, x + j, fmpz_mat_entry(GM, kappa, j));
+                    fmpz_mul(t, x + j - zeros - 1, fmpz_mat_entry(GM, kappa, j));
                     fmpz_mul_2exp(t, t, 1);
                     fmpz_sub(fmpz_mat_entry(GM, kappa, kappa),
                              fmpz_mat_entry(GM, kappa, kappa), t);
 
                     for (i = zeros + 1; i < j; i++)
                     {
-                        fmpz_mul(t, x + i, x + j);
+                        fmpz_mul(t, x + i - zeros - 1, x + j - zeros - 1);
                         fmpz_mul(t, t, fmpz_mat_entry(GM, j, i));
                         fmpz_mul_2exp(t, t, 1);
                         fmpz_add(fmpz_mat_entry(GM, kappa, kappa),
@@ -601,17 +601,17 @@ FUNC_HEAD
                 {
                     for (j = zeros + 1; j <= i; j++)
                         fmpz_submul(fmpz_mat_entry(GM, kappa, i),
-                                    x + j, fmpz_mat_entry(GM, i, j));
+                                    x + j - zeros - 1, fmpz_mat_entry(GM, i, j));
                     for (j = i + 1; j < kappa; j++)
                         fmpz_submul(fmpz_mat_entry(GM, kappa, i),
-                                    x + j, fmpz_mat_entry(GM, j, i));
+                                    x + j - zeros - 1, fmpz_mat_entry(GM, j, i));
                 }
 
                 for (i = kappa + 1; i < GM->r; i++)
                 {
                     for (j = zeros + 1; j < kappa; j++)
                         fmpz_submul(fmpz_mat_entry(GM, i, kappa),
-                                    x + j, fmpz_mat_entry(GM, i, j));
+                                    x + j - zeros - 1, fmpz_mat_entry(GM, i, j));
                 }
             }
 

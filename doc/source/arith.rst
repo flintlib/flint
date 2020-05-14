@@ -501,6 +501,7 @@ Dedekind sums
               void arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
               void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
+
     These are aliases for the functions in the fmpq module.
 
 

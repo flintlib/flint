@@ -131,6 +131,20 @@ fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     fmpz *q, *r;
     fmpz_t invB;
 
+    if (lenB == 0)
+    {
+        if (fmpz_is_one(fmpz_mod_poly_modulus(B)))
+        {
+            fmpz_mod_poly_set(Q, A);
+            fmpz_mod_poly_zero(R);
+            return;
+        } else
+        {
+            flint_printf("Exception (fmpz_mod_poly_div_basecase). Division by zero.\n");
+            flint_abort();
+        }
+    }
+
     if (lenA < lenB)
     {
         fmpz_mod_poly_set(R, A);

@@ -493,6 +493,18 @@ FLINT_DLL void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m,
 FLINT_DLL void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, 
                   const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv);
 
+/* Divisibility testing ******************************************************/
+
+FLINT_DLL int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden,
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                            const fmpz * poly2, const fmpz_t den2, slong len2);
+
+FLINT_DLL int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1,
+                                                      const fmpq_poly_t poly2);
+
+FLINT_DLL slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
+                                                      const fmpq_poly_t poly2);
+
 /*  Power series division  ***************************************************/
 
 FLINT_DLL void _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden, 
@@ -835,6 +847,19 @@ int fmpq_poly_read(fmpq_poly_t poly)
 {
     return fmpq_poly_fread(stdin, poly);
 }
+
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpq_poly_add_si(fmpq_poly_t res, const fmpq_poly_t poly, slong c);
+FLINT_DLL void fmpq_poly_sub_si(fmpq_poly_t res, const fmpq_poly_t poly, slong c);
+FLINT_DLL void fmpq_poly_si_sub(fmpq_poly_t res, slong c, const fmpq_poly_t poly);
+FLINT_DLL void fmpq_poly_add_fmpz(fmpq_poly_t res, const fmpq_poly_t poly, const fmpz_t c);
+FLINT_DLL void fmpq_poly_sub_fmpz(fmpq_poly_t res, const fmpq_poly_t poly, const fmpz_t c);
+FLINT_DLL void fmpq_poly_fmpz_sub(fmpq_poly_t res, const fmpz_t c, const fmpq_poly_t poly);
+FLINT_DLL void fmpq_poly_add_fmpq(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t c);
+FLINT_DLL void fmpq_poly_sub_fmpq(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t c);
+FLINT_DLL void fmpq_poly_fmpq_sub(fmpq_poly_t res, const fmpq_t c, const fmpq_poly_t poly);
+FLINT_DLL void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n);
 
 #ifdef __cplusplus
 }

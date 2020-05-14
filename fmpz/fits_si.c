@@ -42,7 +42,7 @@ flint_mpz_fits_si_p(mpz_srcptr z)
   if (n == 1)
     return limb <= FLINT_SI_MAX;
   if (n == -1)
-    return limb <= - (mp_limb_t) FLINT_SI_MIN;
+    return limb <= (mp_limb_t) FLINT_SI_MIN;
   return 0;
 }
 

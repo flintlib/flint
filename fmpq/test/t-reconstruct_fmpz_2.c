@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -15,26 +16,22 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#include "profiler.h"
 
 int
 main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
 
     flint_printf("reconstruct_fmpz_2....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    /* check successful reconstructions */
+    for (i = 0; i < 1000*flint_test_multiplier(); i++)
     {
-        int result;
-        int modresult;
-        int special_case;
+        int success;
         fmpq_t x, y;
         fmpz_t mod, res, N, D, t;
-        mpz_t tmp;
 
         fmpq_init(x);
         fmpq_init(y);
@@ -43,9 +40,30 @@ main(void)
         fmpz_init(N);
         fmpz_init(D);
         fmpz_init(t);
-        mpz_init(tmp);
 
-        fmpq_randtest(x, state, 100);
+        if (i % 2)
+        {
+            fmpq_randtest(x, state, 1 + n_randint(state, 5000));
+        }
+        else
+        {
+            slong k, bound;
+            fmpz * c1;
+
+            bound = 1 + n_randint(state, 100);
+            c1 = _fmpz_vec_init(bound);
+
+            fmpz_randtest(c1 + 0, state, 2*FLINT_BITS);
+            for (k = 1; k < bound; k++)
+            {
+                fmpz_randtest_unsigned(c1 + k, state, 3*FLINT_BITS);
+                fmpz_add_ui(c1 + k, c1 + k, 1);
+            }
+
+            fmpq_set_cfrac(x, c1, bound);
+
+            _fmpz_vec_clear(c1, bound);
+        }
 
         fmpz_abs(N, fmpq_numref(x));
         fmpz_set(D, fmpq_denref(x));
@@ -53,58 +71,35 @@ main(void)
         /* Randomly generate larger bounds */
         if (n_randint(state, 2))
         {
-            fmpz_randtest_not_zero(t, state, 100);
+            fmpz_randtest_not_zero(t, state, 2000);
             fmpz_abs(t, t);
             fmpz_mul(N, N, t);
         }
         if (n_randint(state, 2))
         {
-            fmpz_randtest_not_zero(t, state, 100);
+            fmpz_randtest_not_zero(t, state, 2000);
             fmpz_abs(t, t);
             fmpz_mul(D, D, t);
         }
 
         fmpz_mul(mod, N, D);
-        fmpz_mul_ui(mod, mod, UWORD(2));
-        /* Next prime greater than or equal */
-        fmpz_get_mpz(tmp, mod);
-        flint_mpz_sub_ui(tmp, tmp, UWORD(1));
-        mpz_nextprime(tmp, tmp);
-        fmpz_set_mpz(mod, tmp);
+        fmpz_mul_ui(mod, mod, 2);
+        do fmpz_add_ui(mod, mod, 1);
+        while (!fmpq_mod_fmpz(res, x, mod));
 
-        modresult = fmpq_mod_fmpz(res, x, mod);
-        result = fmpq_reconstruct_fmpz_2(y, res, mod, N, D);
+        success = fmpq_reconstruct_fmpz_2(y, res, mod, N, D);
 
-        /* Special case: both 1 and -1 have residue 1 mod 2.
-           There's probably no particular reason to disallow this. */
-        special_case = (fmpz_cmp_ui(mod, UWORD(2)) == 0 &&
-                        fmpz_get_si(&x->num) == WORD(-1) &&
-                        fmpz_cmp_ui(&x->den, UWORD(1)) == 0);
-
-        if (special_case)
-        {
-            if (!modresult || !result ||
-                !fmpz_is_one(&y->num) || !fmpz_is_one(&y->den))
-            {
-                flint_printf("FAIL: special case: -1 mod 2\n");
-                abort();
-            }
-        }
-        else if (!modresult || !result || !fmpq_equal(x, y))
+        if (!success || !fmpq_equal(x, y))
         {
             flint_printf("FAIL: reconstruction failed\n");
-            flint_printf("input = ");
-            fmpq_print(x);
-            flint_printf("\nmodulus = ");
-            fmpz_print(mod);
-            flint_printf("\nresidue = ");
-            fmpz_print(res);
-            flint_printf("\nreconstructed = ");
-            fmpq_print(y);
-            flint_printf("\nfmpq_mod_fmpz return value = %d", modresult);
-            flint_printf("\nfmpq_reconstruct_fmpz return value = %d", result);
-            flint_printf("\n");
-            abort();
+            flint_printf("success = %d\n", success);
+            flint_printf("x = "); fmpq_print(x); flint_printf("\n");
+            flint_printf("N = "); fmpz_print(N); flint_printf("\n");
+            flint_printf("D = "); fmpz_print(D); flint_printf("\n");
+            flint_printf("mod = "); fmpz_print(mod); flint_printf("\n");
+            flint_printf("res = "); fmpz_print(res); flint_printf("\n");
+            flint_printf("y = "); fmpq_print(y); flint_printf("\n");
+            flint_abort();
         }
 
         fmpq_clear(x);
@@ -114,12 +109,90 @@ main(void)
         fmpz_clear(N);
         fmpz_clear(D);
         fmpz_clear(t);
-        mpz_clear(tmp);
     }
 
-    
+    /* check random reconstructions */
+    for (i = 0; i < 1000*flint_test_multiplier(); i++)
+    {
+        int success1, success2;
+        fmpq_t x, y;
+        fmpz_t mod, res, N, D, t;
+
+        fmpq_init(x);
+        fmpq_init(y);
+        fmpz_init(mod);
+        fmpz_init(res);
+        fmpz_init(N);
+        fmpz_init(D);
+        fmpz_init(t);
+
+        if (i % 2)
+        {
+            fmpz_randtest_not_zero(mod, state, 5000);
+            fmpz_randtest_not_zero(res, state, 5000);
+        }
+        else
+        {
+            slong k, bound;
+            fmpz * c1;
+
+            bound = 2 + n_randint(state, 100);
+            c1 = _fmpz_vec_init(bound);
+
+            fmpz_zero(c1 + 0);
+            for (k = 1; k < bound; k++)
+            {
+                fmpz_randtest_unsigned(c1 + k, state, 2*FLINT_BITS);
+                fmpz_add_ui(c1 + k, c1 + k, 1);
+            }
+
+            fmpq_set_cfrac(x, c1, bound);
+
+            _fmpz_vec_clear(c1, bound);
+
+            fmpz_swap(res, fmpq_numref(x));
+            fmpz_swap(mod, fmpq_denref(x));
+        }
+
+        if (fmpz_cmp_ui(mod, 3) < 0)
+            fmpz_set_ui(mod, 3);
+
+        fmpz_mod(res, res, mod);
+
+        fmpz_sub_ui(t, mod, 1);
+        fmpz_fdiv_q_ui(t, t, 2);
+
+        fmpz_randtest_mod(N, state, t);
+        fmpz_add_ui(N, N, 1);
+
+        fmpz_fdiv_q(D, t, N);
+        fmpz_randtest_mod(D, state, D);
+        fmpz_add_ui(D, D, 1);
+
+        success1 = _fmpq_reconstruct_fmpz_2(fmpq_numref(x),
+                                               fmpq_denref(x), res, mod, N, D);
+
+        success2 = _fmpq_reconstruct_fmpz_2_naive(fmpq_numref(y),
+                                               fmpq_denref(y), res, mod, N, D);
+
+        if (success1 != success2 || (success1 && !fmpq_equal(x, y)))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("check match with naive: i = %wd\n", i);
+            flint_abort();
+        }
+
+        fmpq_clear(x);
+        fmpq_clear(y);
+        fmpz_clear(mod);
+        fmpz_clear(res);
+        fmpz_clear(N);
+        fmpz_clear(D);
+        fmpz_clear(t);
+    }
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }
+

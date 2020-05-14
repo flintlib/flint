@@ -80,7 +80,7 @@ d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)
             if (s < t)
             {
                 orig = 0;
-                if (s * D_EPS == 0)
+                if (fabs(s * D_EPS) < 1.0e-308)
                     s = 0;
                 else
                     flag = 1;

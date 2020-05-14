@@ -11,7 +11,7 @@
 
 #include "flint.h"
 
-FLINT_DLL int flint_test_multiplier()
+int flint_test_multiplier()
 {
     return 10;
 }

@@ -841,11 +841,11 @@ FLINT_DLL void _fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong 
 FLINT_DLL void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     const fmpz * B, slong Blen, slong n);
 
-FLINT_DLL void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A,
-                                         const fmpz_poly_t B, slong n);
+FLINT_DLL void fmpz_poly_div_series_basecase(fmpz_poly_t Q,
+		    const fmpz_poly_t A, const fmpz_poly_t B, slong n);
 
-FLINT_DLL void fmpz_poly_div_series_divconquer(fmpz_poly_t Q, const fmpz_poly_t A,
-                                         const fmpz_poly_t B, slong n);
+FLINT_DLL void fmpz_poly_div_series_divconquer(fmpz_poly_t Q,
+		    const fmpz_poly_t A, const fmpz_poly_t B, slong n);
 
 FLINT_DLL void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
                                          const fmpz_poly_t B, slong n);
@@ -853,10 +853,13 @@ FLINT_DLL void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
 /*  Divisibility testing  ***************************************************/
 
 FLINT_DLL int _fmpz_poly_divides(fmpz * q, const fmpz * a, 
-                                         slong len1, const fmpz * b, slong len2);
+                                       slong len1, const fmpz * b, slong len2);
 
-FLINT_DLL int fmpz_poly_divides(fmpz_poly_t q, const fmpz_poly_t a, const fmpz_poly_t b);
+FLINT_DLL int fmpz_poly_divides(fmpz_poly_t q,
+		                     const fmpz_poly_t a, const fmpz_poly_t b);
 
+FLINT_DLL slong fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
+		                                      const fmpz_poly_t poly2);
 
 /*  Pseudo division  *********************************************************/
 
@@ -1024,15 +1027,14 @@ FLINT_DLL void _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, s
 FLINT_DLL void fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
     const fmpz_t c);
 
-FLINT_DLL void _fmpz_poly_taylor_shift_multi_mod_threaded(fmpz * poly, const fmpz_t c, slong n, slong thread_limit);
+FLINT_DLL void _fmpz_poly_taylor_shift_multi_mod(fmpz * poly, const fmpz_t c, slong n);
 
 FMPZ_POLY_INLINE
 void fmpz_poly_taylor_shift_multi_mod(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)
 {
     if (f != g)
         fmpz_poly_set(g, f);
-    _fmpz_poly_taylor_shift_multi_mod_threaded(g->coeffs, c,
-		                        g->length, FLINT_DEFAULT_THREAD_LIMIT);
+    _fmpz_poly_taylor_shift_multi_mod(g->coeffs, c, g->length);
 }
 
 FLINT_DLL void _fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, slong n);
@@ -1424,6 +1426,15 @@ FLINT_DLL void fmpz_poly_eta_qexp(fmpz_poly_t f, slong e, slong n);
 FLINT_DLL void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
 
 FLINT_DLL void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
+
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_poly_add_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c);
+FLINT_DLL void fmpz_poly_sub_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c);
+FLINT_DLL void fmpz_poly_si_sub(fmpz_poly_t res, slong c, const fmpz_poly_t poly);
+FLINT_DLL void fmpz_poly_add_fmpz(fmpz_poly_t res, const fmpz_poly_t poly, fmpz_t c);
+FLINT_DLL void fmpz_poly_sub_fmpz(fmpz_poly_t res, const fmpz_poly_t poly, fmpz_t c);
+FLINT_DLL void fmpz_poly_fmpz_sub(fmpz_poly_t res, fmpz_t c, const fmpz_poly_t poly);
 
 #ifdef __cplusplus
 }

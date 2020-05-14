@@ -22,7 +22,7 @@ with op = -1, computes D = C - A*B
 */
 
 static __inline__ void
-_nmod_mat_addmul_basic(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
+_nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
     mp_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
 {
     slong i, j;
@@ -45,7 +45,7 @@ _nmod_mat_addmul_basic(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
 }
 
 static __inline__ void
-_nmod_mat_addmul_transpose(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
+_nmod_mat_addmul_transpose_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
     const mp_ptr * B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
 {
     mp_ptr tmp;
@@ -78,7 +78,7 @@ _nmod_mat_addmul_transpose(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
 
 /* requires nlimbs = 1 */
 void
-_nmod_mat_addmul_packed(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
+_nmod_mat_addmul_packed_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
     const mp_ptr * B, slong M, slong N, slong K, int op, nmod_t mod, int nlimbs)
 {
     slong i, j, k;
@@ -159,7 +159,7 @@ _nmod_mat_addmul_packed(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
 
 
 void
-_nmod_mat_mul_classical(nmod_mat_t D, const nmod_mat_t C,
+_nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B, int op)
 {
     slong m, k, n;
@@ -184,19 +184,19 @@ _nmod_mat_mul_classical(nmod_mat_t D, const nmod_mat_t C,
 
     if (nlimbs == 1 && m > 10 && k > 10 && n > 10)
     {
-        _nmod_mat_addmul_packed(D->rows, (op == 0) ? NULL : C->rows,
+        _nmod_mat_addmul_packed_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, nlimbs);
     }
     else if (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
-        _nmod_mat_addmul_basic(D->rows, (op == 0) ? NULL : C->rows,
+        _nmod_mat_addmul_basic_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, nlimbs);
     }
     else
     {
-        _nmod_mat_addmul_transpose(D->rows, (op == 0) ? NULL : C->rows,
+        _nmod_mat_addmul_transpose_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, nlimbs);
     }
 }
@@ -205,5 +205,5 @@ _nmod_mat_mul_classical(nmod_mat_t D, const nmod_mat_t C,
 void
 nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
-    _nmod_mat_mul_classical(C, NULL, A, B, 0);
+    _nmod_mat_mul_classical_op(C, NULL, A, B, 0);
 }

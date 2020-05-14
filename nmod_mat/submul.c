@@ -32,7 +32,7 @@ nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
 
     if (m < cutoff || n < cutoff || k < cutoff)
     {
-        _nmod_mat_mul_classical(D, C, A, B, -1);
+        _nmod_mat_mul_classical_op(D, C, A, B, -1);
     }
     else
     {

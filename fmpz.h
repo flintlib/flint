@@ -476,6 +476,22 @@ FLINT_DLL void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x);
 
 FLINT_DLL void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x);
 
+FMPZ_INLINE void fmpz_add_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    if (x >= 0)
+        fmpz_add_ui(f, g, (ulong) x);
+    else
+        fmpz_sub_ui(f, g, (ulong) -x);
+}
+
+FMPZ_INLINE void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    if (x >= 0)
+        fmpz_sub_ui(f, g, (ulong) x);
+    else
+        fmpz_add_ui(f, g, (ulong) -x);
+}
+
 FLINT_DLL void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x);
 
 FLINT_DLL void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x);
@@ -538,7 +554,7 @@ FLINT_DLL ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-FLINT_DLL void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h);
+FLINT_DLL void fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FMPZ_INLINE void
 fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)
@@ -563,6 +579,9 @@ FLINT_DLL void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1,
 FLINT_DLL int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FLINT_DLL int fmpz_jacobi(const fmpz_t a, const fmpz_t p);
+
+FLINT_DLL void fmpz_divides_mod_list(fmpz_t xstart, fmpz_t xstride,
+               fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n);
 
 FLINT_DLL slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv);
 
@@ -881,6 +900,24 @@ FMPZ_INLINE mp_limb_t nmod_pow_fmpz(mp_limb_t a, const fmpz_t exp, nmod_t mod)
 {
     return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
 }
+
+/* Inlines *******************************************************************/
+
+FLINT_DLL fmpz * __new_fmpz();
+FLINT_DLL void __free_fmpz(fmpz * f);
+FLINT_DLL void __fmpz_set_si(fmpz_t f, slong val);
+FLINT_DLL void __fmpz_set_ui(fmpz_t f, ulong val);
+FLINT_DLL void __fmpz_init(fmpz_t f);
+FLINT_DLL void __fmpz_init_set_ui(fmpz_t f, ulong g);
+FLINT_DLL void __fmpz_clear(fmpz_t f);
+FLINT_DLL int __fmpz_lt(fmpz_t f, fmpz_t g);
+FLINT_DLL int __fmpz_gt(fmpz_t f, fmpz_t g);
+FLINT_DLL int __fmpz_lte(fmpz_t f, fmpz_t g);
+FLINT_DLL int __fmpz_gte(fmpz_t f, fmpz_t g);
+FLINT_DLL int __fmpz_eq(fmpz_t f, fmpz_t g);
+FLINT_DLL int __fmpz_neq(fmpz_t f, fmpz_t g);
+FLINT_DLL void __fmpz_init_set(fmpz_t f, const fmpz_t g);
+FLINT_DLL void __fmpz_neg(fmpz_t f1, const fmpz_t f2);
 
 #ifdef __cplusplus
 }

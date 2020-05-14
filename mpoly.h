@@ -42,8 +42,6 @@
 
 #define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
 
-#define MPOLY_DEFAULT_THREAD_LIMIT (WORD(9999))
-
 /* choose m so that (m + 1)/(n - m) ~= la/lb, i.e. m = (n*la - lb)/(la + lb) */
 MPOLY_INLINE slong mpoly_divide_threads(slong n, double la, double lb)
 {
@@ -1066,7 +1064,7 @@ FLINT_DLL void mpoly_degrees_si(slong * user_degs, const ulong * poly_exps,
 
 FLINT_DLL void mpoly_degrees_si_threaded(slong * user_degs, const ulong * poly_exps,
                          slong len,  flint_bitcnt_t bits, const mpoly_ctx_t mctx,
-                              thread_pool_handle * handles, slong num_handles);
+                        const thread_pool_handle * handles, slong num_handles);
 
 FLINT_DLL void mpoly_degrees_ffmpz(fmpz * user_degs, const ulong * poly_exps,
                           slong len, flint_bitcnt_t bits, const mpoly_ctx_t mctx);

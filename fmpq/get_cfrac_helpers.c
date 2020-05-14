@@ -13,6 +13,7 @@
 #include "longlong.h"
 #include "fmpq.h"
 #include "fmpz_poly.h"
+#include "mpn_extras.h"
 
 /* enable for debug printing of various types */
 #if 0
@@ -313,7 +314,6 @@ static slong _uiui_hgcd(
     mp_limb_t B1, mp_limb_t B0,
     _ui_mat22_t M)
 {
-    int i;
     slong written = 0;
     mp_limb_t d0, d1;
     mp_limb_t t0, t1, t2, r0, r1;
@@ -336,57 +336,7 @@ static slong _uiui_hgcd(
 
     while (1)
     {
-        FLINT_ASSERT(a1 != 0);
-        FLINT_ASSERT(b1 != 0);
-        FLINT_ASSERT(b1 <= a1);
-        FLINT_ASSERT(b1 < a1 || (b1 == a1 && b0 < a0));
-        q = 1;
-
-        sub_ddmmss(r1,r0, a1,a0, b1,b0);
-
-subtract:
-
-        for (i = 2; i <= 4; i++)
-        {
-            sub_dddmmmsss(t2,t1,t0, 0,r1,r0, 0,b1,b0);
-            if (t2 != 0)
-                goto quotient_found;
-            q += 1;
-            r0 = t0;
-            r1 = t1;
-        }
-
-        if (r1 != 0)
-        {
-            int ncnt, dcnt;
-            mp_limb_t Q = 0;
-
-            count_leading_zeros(ncnt, r1);
-            count_leading_zeros(dcnt, b1);
-            dcnt -= ncnt;
-            if (dcnt <= 0)
-                goto subtract;
-
-            d1 = (b1 << dcnt) | (b0 >> (FLINT_BITS - dcnt));
-            d0 = b0 << dcnt;
-
-            while (dcnt >= 0)
-            {
-                sub_dddmmmsss(t2,t1,t0, 0,r1,r0, 0,d1,d0);
-                Q = 2*Q + 1 + t2;
-                r1 = t2 ? r1 : t1;
-                r0 = t2 ? r0 : t0;
-                d0 = (d1 << (FLINT_BITS - 1)) | (d0 >> 1);
-                d1 = d1 >> 1;
-                dcnt--;
-            }
-
-            q += Q;
-        }
-
-quotient_found:
-
-        FLINT_ASSERT(r1 < b1 || (r1 == b1 && r0 < b0));
+        eudiv_qrrnndd(q, r1, r0, a1, a0, b1, b0, hgcd_);
 
         t1 = m12 + q*m11;
         t2 = m22 + q*m21;
@@ -509,30 +459,12 @@ fix:
 
 }
 
-/* y = a1*x1 - a2*x2 */
-static mp_size_t _msub(mp_ptr y, mp_limb_t a1, mp_ptr x1,
-                                 mp_limb_t a2, mp_ptr x2, mp_size_t n)
-{
-    mp_limb_t h0, h1;
-
-    h0 =    mpn_mul_1(y, x1, n, a1);
-    h1 = mpn_submul_1(y, x2, n, a2);
-
-    if (h1 != h0)
-        return -1;
-
-    while (n > 0 && y[n - 1] == 0)
-        n--;
-
-    return n;
-}
-
-
-static void _lehmer_exact(_fmpz_vector_t s, _fmpz_mat22_t M, int flags,
+static void _lehmer_exact(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int flags,
                                     fmpz_t xa, fmpz_t xb, fmpz_t ya, fmpz_t yb)
 {
     mp_limb_t s_temp[2*FLINT_BITS];
     slong written;
+    unsigned int x_lzcnt;
     mpz_ptr xn, xd, yn, yd;
     mp_size_t xn_len, xd_len, yn_len, yd_len;
     mp_ptr xn_ptr, xd_ptr, yn_ptr, yd_ptr;
@@ -589,22 +521,11 @@ again:
     if (n == xd_len + 1)
         xd_ptr[n - 1] = 0;
 
-    if ((slong)(xn_ptr[n - 1]) < 0)
-    {
-        A1 = xn_ptr[n - 1];
-        A0 = xn_ptr[n - 2];
-        B1 = xd_ptr[n - 1];
-        B0 = xd_ptr[n - 2];
-    }
-    else
-    {
-        int shift;
-        count_leading_zeros(shift, xn_ptr[n - 1]);
-        A1 = FLINT_MPN_EXTRACT_NUMB(shift, xn_ptr[n - 1], xn_ptr[n - 2]);
-        A0 = FLINT_MPN_EXTRACT_NUMB(shift, xn_ptr[n - 2], xn_ptr[n - 3]);
-        B1 = FLINT_MPN_EXTRACT_NUMB(shift, xd_ptr[n - 1], xd_ptr[n - 2]);
-        B0 = FLINT_MPN_EXTRACT_NUMB(shift, xd_ptr[n - 2], xd_ptr[n - 3]);
-    }
+    count_leading_zeros(x_lzcnt, xn_ptr[n - 1]);
+    A1 = MPN_LEFT_SHIFT_HI(xn_ptr[n - 1], xn_ptr[n - 2], x_lzcnt);
+    A0 = MPN_LEFT_SHIFT_HI(xn_ptr[n - 2], xn_ptr[n - 3], x_lzcnt);
+    B1 = MPN_LEFT_SHIFT_HI(xd_ptr[n - 1], xd_ptr[n - 2], x_lzcnt);
+    B0 = MPN_LEFT_SHIFT_HI(xd_ptr[n - 2], xd_ptr[n - 3], x_lzcnt);
 
     written = _uiui_hgcd(s_temp, A1, A0, B1, B0, m);
     if (written <= 0 || s->length + written > s->limit)
@@ -612,21 +533,21 @@ again:
 
     if (m->det == 1)
     {
-        yn_len = _msub(yn_ptr, m->_22, xn_ptr, m->_12, xd_ptr, n);
+        yn_len = flint_mpn_fmms1(yn_ptr, m->_22, xn_ptr, m->_12, xd_ptr, n);
         if (yn_len <= 0)
             goto cleanup;
 
-        yd_len = _msub(yd_ptr, m->_11, xd_ptr, m->_21, xn_ptr, n);
+        yd_len = flint_mpn_fmms1(yd_ptr, m->_11, xd_ptr, m->_21, xn_ptr, n);
         if (yd_len <= 0)
             goto cleanup;
     }
     else
     {
-        yn_len = _msub(yn_ptr, m->_12, xd_ptr, m->_22, xn_ptr, n);
+        yn_len = flint_mpn_fmms1(yn_ptr, m->_12, xd_ptr, m->_22, xn_ptr, n);
         if (yn_len <= 0)
             goto cleanup;
 
-        yd_len = _msub(yd_ptr, m->_21, xn_ptr, m->_11, xd_ptr, n);
+        yd_len = flint_mpn_fmms1(yd_ptr, m->_21, xn_ptr, m->_11, xd_ptr, n);
         if (yd_len <= 0)
             goto cleanup;
     }
@@ -656,7 +577,7 @@ its_ok:
     yn->_mp_size = yn_len;
     yd->_mp_size = yd_len;
 
-    _fmpz_vector_append_ui(s, s_temp, written);
+    _fmpq_cfrac_list_append_ui(s, s_temp, written);
 
     FLINT_MPZ_PTR_SWAP(xn, yn);
     FLINT_MPZ_PTR_SWAP(xd, yd);
@@ -683,11 +604,12 @@ cleanup:
 }
 
 
-static void _lehmer_inexact(_fmpz_vector_t s, _fmpz_mat22_t M, int needM,
+static void _lehmer_inexact(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int needM,
                                                 _fmpq_ball_t x, _fmpq_ball_t y)
 {
     mp_limb_t s_temp[2*FLINT_BITS];
     slong written;
+    unsigned int x_lzcnt;
     mpz_ptr xln, xld, xrn, xrd;
     mpz_ptr yln, yld, yrn, yrd;
     mp_size_t xln_len, xld_len, xrn_len, xrd_len;
@@ -777,23 +699,11 @@ again:
     if (nr == xrd_len + 1)
         xrd_ptr[nr - 1] = 0;
 
-
-    if ((slong)(xln_ptr[nl - 1]) < 0)
-    {
-        A1 = xln_ptr[nl - 1];
-        A0 = xln_ptr[nl - 2];
-        B1 = xld_ptr[nl - 1];
-        B0 = xld_ptr[nl - 2];
-    }
-    else
-    {
-        int shift;
-        count_leading_zeros(shift, xln_ptr[nl - 1]);
-        A1 = FLINT_MPN_EXTRACT_NUMB(shift, xln_ptr[nl - 1], xln_ptr[nl - 2]);
-        A0 = FLINT_MPN_EXTRACT_NUMB(shift, xln_ptr[nl - 2], xln_ptr[nl - 3]);
-        B1 = FLINT_MPN_EXTRACT_NUMB(shift, xld_ptr[nl - 1], xld_ptr[nl - 2]);
-        B0 = FLINT_MPN_EXTRACT_NUMB(shift, xld_ptr[nl - 2], xld_ptr[nl - 3]);
-    }
+    count_leading_zeros(x_lzcnt, xln_ptr[nl - 1]);
+    A1 = MPN_LEFT_SHIFT_HI(xln_ptr[nl - 1], xln_ptr[nl - 2], x_lzcnt);
+    A0 = MPN_LEFT_SHIFT_HI(xln_ptr[nl - 2], xln_ptr[nl - 3], x_lzcnt);
+    B1 = MPN_LEFT_SHIFT_HI(xld_ptr[nl - 1], xld_ptr[nl - 2], x_lzcnt);
+    B0 = MPN_LEFT_SHIFT_HI(xld_ptr[nl - 2], xld_ptr[nl - 3], x_lzcnt);
 
     written = _uiui_hgcd(s_temp, A1, A0, B1, B0, m);
     if (written <= 0 || s->length + written > s->limit)
@@ -801,37 +711,37 @@ again:
 
     if (m->det == 1)
     {
-        yln_len = _msub(yln_ptr, m->_22, xln_ptr, m->_12, xld_ptr, nl);
+        yln_len = flint_mpn_fmms1(yln_ptr, m->_22, xln_ptr, m->_12, xld_ptr, nl);
         if (yln_len <= 0)
             goto cleanup;
 
-        yld_len = _msub(yld_ptr, m->_11, xld_ptr, m->_21, xln_ptr, nl);
+        yld_len = flint_mpn_fmms1(yld_ptr, m->_11, xld_ptr, m->_21, xln_ptr, nl);
         if (yld_len <= 0)
             goto cleanup;
 
-        yrn_len = _msub(yrn_ptr, m->_22, xrn_ptr, m->_12, xrd_ptr, nr);
+        yrn_len = flint_mpn_fmms1(yrn_ptr, m->_22, xrn_ptr, m->_12, xrd_ptr, nr);
         if (yrn_len <= 0)
             goto cleanup;
 
-        yrd_len = _msub(yrd_ptr, m->_11, xrd_ptr, m->_21, xrn_ptr, nr);
+        yrd_len = flint_mpn_fmms1(yrd_ptr, m->_11, xrd_ptr, m->_21, xrn_ptr, nr);
         if (yrd_len <= 0)
             goto cleanup;
     }
     else
     {
-        yrn_len = _msub(yrn_ptr, m->_12, xld_ptr, m->_22, xln_ptr, nl);
+        yrn_len = flint_mpn_fmms1(yrn_ptr, m->_12, xld_ptr, m->_22, xln_ptr, nl);
         if (yrn_len <= 0)
             goto cleanup;
 
-        yrd_len = _msub(yrd_ptr, m->_21, xln_ptr, m->_11, xld_ptr, nl);
+        yrd_len = flint_mpn_fmms1(yrd_ptr, m->_21, xln_ptr, m->_11, xld_ptr, nl);
         if (yrd_len <= 0)
             goto cleanup;
 
-        yln_len = _msub(yln_ptr, m->_12, xrd_ptr, m->_22, xrn_ptr, nr);
+        yln_len = flint_mpn_fmms1(yln_ptr, m->_12, xrd_ptr, m->_22, xrn_ptr, nr);
         if (yln_len <= 0)
             goto cleanup;
 
-        yld_len = _msub(yld_ptr, m->_21, xrn_ptr, m->_11, xrd_ptr, nr);
+        yld_len = flint_mpn_fmms1(yld_ptr, m->_21, xrn_ptr, m->_11, xrd_ptr, nr);
         if (yld_len <= 0)
             goto cleanup;
     }
@@ -855,7 +765,7 @@ again:
         _fmpz_mat22_rmul_ui(M, m);
 
     /* already checked that s will fit new terms */
-    _fmpz_vector_append_ui(s, s_temp, written);
+    _fmpq_cfrac_list_append_ui(s, s_temp, written);
 
     FLINT_MPZ_PTR_SWAP(xln, yln);
     FLINT_MPZ_PTR_SWAP(xld, yld);
@@ -959,7 +869,7 @@ static void _hgcd_step(
     inplace operation, so (M, xa/xb) is the input ball M^-1(a/(b+1), (a+1)/b)
     and output ball M^-1(a'/(b'+1), (a'+1)/b').
 */
-void _fmpq_hgcd(_fmpz_vector_t s, _fmpz_mat22_t M, fmpz_t xa, fmpz_t xb)
+void _fmpq_hgcd(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, fmpz_t xa, fmpz_t xb)
 {
     flint_bitcnt_t k, km, shift;
     fmpz_t ya, yb;
@@ -1010,7 +920,7 @@ gauss:
     fmpz_swap(xa, xb);
     fmpz_swap(xb, yb);
 
-    _fmpz_vector_push_back(s, ya);
+    _fmpq_cfrac_list_push_back(s, ya);
     goto again;
 
 lehmer:
@@ -1091,7 +1001,7 @@ static flint_bitcnt_t _fmpz_tail_bits(const fmpz_t a, const fmpz_t b)
 }
 
 /* generate terms valid for every number in the closed ball x > 1 */
-void _fmpq_ball_get_cfrac(_fmpz_vector_t s, _fmpz_mat22_t M, int needM,
+void _fmpq_ball_get_cfrac(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int needM,
                                                                 _fmpq_ball_t x)
 {
     flint_bitcnt_t k;
@@ -1166,7 +1076,7 @@ gauss:
     if (needM)
         _fmpz_mat22_rmul_elem(M, q);
 
-    _fmpz_vector_push_back(s, q);
+    _fmpq_cfrac_list_push_back(s, q);
     goto again;
 
 lehmer:

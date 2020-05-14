@@ -739,9 +739,6 @@ FLINT_DLL void fmpq_mpoly_term_content(fmpq_mpoly_t M, const fmpq_mpoly_t A,
 FLINT_DLL int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A,
                              const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL int fmpq_mpoly_gcd_threaded(fmpq_mpoly_t G, const fmpq_mpoly_t A,
-         const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit);
-
 
 FLINT_DLL void fmpq_mpoly_inflate(fmpq_mpoly_t A, const fmpq_mpoly_t B,
           const fmpz * shift, const fmpz * stride, const fmpq_mpoly_ctx_t ctx);
@@ -749,10 +746,6 @@ FLINT_DLL void fmpq_mpoly_inflate(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 FLINT_DLL int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
              fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                    const fmpq_mpoly_ctx_t ctx);
-
-FLINT_DLL int fmpq_mpoly_gcd_cofactors_threaded(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
-              fmpq_mpoly_t Bbar, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
-                               const fmpq_mpoly_ctx_t ctx, slong thread_limit);
 
 
 /******************************************************************************

@@ -27,7 +27,7 @@ export
 SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c thread_support.c exception.c hashmap.c inlines.c
 LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h thread_support.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h thread_support.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
@@ -74,7 +74,7 @@ clean:
 	rm -rf build
 
 distclean: clean
-	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
+	rm -f flint-config.h config.log fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
 
 dist:
 	git archive --format tar --prefix flint-2.5.2/ flint-2.5 > ../flint-2.5.2.tar; gzip ../flint-2.5.2.tar
@@ -212,7 +212,7 @@ install: library
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
-	$(AT)if [ "$(OS)" = "Darwin" ]; then \
+	$(AT)if [ "$(OS)" = "Darwin" ] && [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		install_name_tool -id "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
 	fi
 

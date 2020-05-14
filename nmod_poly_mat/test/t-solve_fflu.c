@@ -68,22 +68,18 @@ main(void)
             if (!nmod_poly_equal(den, det))
             {
                 nmod_poly_neg(det, det);
-                if (!nmod_poly_equal(den, det))
-                {
-                    nmod_poly_neg(det, det);
-                    flint_printf("FAIL: den != +/- det(A)\n");
-                    flint_printf("den:\n"); nmod_poly_print(den);
-                    flint_printf("\n\n");
-                    flint_printf("det:\n"); nmod_poly_print(det);
-                    flint_printf("\n\n");
-                    flint_printf("A:\n");
-                    nmod_poly_mat_print(A, "x");
-                    flint_printf("B:\n");
-                    nmod_poly_mat_print(B, "x");
-                    flint_printf("X:\n");
-                    nmod_poly_mat_print(X, "x");
-                    abort();
-                }
+                flint_printf("FAIL: den != +/- det(A)\n");
+                flint_printf("den:\n"); nmod_poly_print(den);
+                flint_printf("\n\n");
+                flint_printf("det:\n"); nmod_poly_print(det);
+                flint_printf("\n\n");
+                flint_printf("A:\n");
+                nmod_poly_mat_print(A, "x");
+                flint_printf("B:\n");
+                nmod_poly_mat_print(B, "x");
+                flint_printf("X:\n");
+                nmod_poly_mat_print(X, "x");
+                abort();
             }
         }
 

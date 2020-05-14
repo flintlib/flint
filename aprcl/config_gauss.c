@@ -12,7 +12,7 @@
 #include "aprcl.h"
 
 static void
-_config_gauss_update(aprcl_config conf)
+_aprcl_config_gauss_update(aprcl_config conf)
 {
     ulong prime = 2;
 
@@ -35,7 +35,7 @@ _config_gauss_update(aprcl_config conf)
 }
 
 void
-config_gauss_init(aprcl_config conf, const fmpz_t n)
+aprcl_config_gauss_init(aprcl_config conf, const fmpz_t n)
 {
     fmpz_t s2;
 
@@ -47,7 +47,7 @@ config_gauss_init(aprcl_config conf, const fmpz_t n)
     while (fmpz_cmp(s2, n) <= 0)
     {
         conf->R += 1;
-        _config_gauss_update(conf);
+        _aprcl_config_gauss_update(conf);
         fmpz_mul(s2, conf->s, conf->s);
     }
     n_factor_init(&conf->rs);
@@ -59,7 +59,7 @@ config_gauss_init(aprcl_config conf, const fmpz_t n)
 }
 
 void
-config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
+aprcl_config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 {
     fmpz_t s2;
 
@@ -71,7 +71,7 @@ config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
     while (fmpz_cmp(s2, n) <= 0)
     {
         conf->R += 1;
-        _config_gauss_update(conf);
+        _aprcl_config_gauss_update(conf);
         fmpz_mul(s2, conf->s, conf->s);
     }
 
@@ -84,7 +84,7 @@ config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 }
 
 void
-config_gauss_clear(aprcl_config conf)
+aprcl_config_gauss_clear(aprcl_config conf)
 {
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);

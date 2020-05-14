@@ -1847,7 +1847,11 @@ Divisibility testing
     This function is currently unoptimised and provided for convenience
     only.
 
+.. function:: slong fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
+    Set ``res`` to ``poly1`` divided by the highest power of ``poly2`` that
+    divides it and return the power. The divisor ``poly2`` must not be zero or
+    `\pm 1`, otherwise an exception is raised.
 
 Division mod p
 --------------------------------------------------------------------------------

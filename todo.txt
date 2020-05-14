@@ -7,8 +7,6 @@ general
 * Write a flint2 memory manager, both reentrant and non-reentrant stack based
   versions
 
-* [maybe] a type mpfr which is an alias for __mpfr_struct and using throughout
-
 
 fmpz
 ----

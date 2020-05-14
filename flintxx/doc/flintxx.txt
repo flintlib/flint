@@ -1211,7 +1211,7 @@ Fmpz_poly_expr div_root(Fmpz_poly_expr, Fmpz_expr)
 Ltuple<bool, fmpz_polyxx>_expr divides(Fmpz_poly_expr A, Fmpz_poly_expr B)
 
     \code{ltupleref(d, Q) = divides(A, B)} sets \code{d} to \code{true}
-    and \code{Q} to \code{B/A} if \code{A} divides \code{B}, and else sets
+    and \code{Q} to \code{A/B} if \code{B} divides \code{A}, and else sets
     \code{d} to \code{false}. See \code{fmpz_poly_divides}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -4734,10 +4734,7 @@ Fmpz_vec_expr landau_function_vec(T:is_unsigned_integer)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Fmpz_expr dedekind_sum_naive(Fmpz_expr, Fmpz_expr)
-Fmpz_expr dedekind_sum_coprime_large(Fmpz_expr, Fmpz_expr)
-Fmpz_expr dedekind_sum_coprime(Fmpz_expr, Fmpz_expr)
 Fmpz_expr dedekind_sum(Fmpz_expr, Fmpz_expr)
-double dedekind_sum_d(double, double)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Number of partitions

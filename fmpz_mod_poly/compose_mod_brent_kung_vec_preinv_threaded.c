@@ -131,9 +131,9 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
 
     /* Set rows of A to powers of last element of polys */
     _fmpz_mod_poly_powers_mod_preinv_threaded_pool(A->mat->rows, g, glen,
-	                   m, poly, len, polyinv, leninv, p, threads, num_threads);
+	               m, poly, len, polyinv, leninv, p, threads, num_threads);
 
-    _fmpz_mod_mat_mul_classical_threaded_pool(C, NULL, B, A, 0,
+    _fmpz_mod_mat_mul_classical_threaded_pool_op(C, NULL, B, A, 0,
                                                          threads, num_threads);
 
     /* Evaluate block composition using the Horner scheme */
@@ -253,8 +253,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
                                             slong len1, slong n,
                                             const fmpz_mod_poly_t g,
                                             const fmpz_mod_poly_t poly,
-                                            const fmpz_mod_poly_t polyinv,
-                                            slong thread_limit)
+                                            const fmpz_mod_poly_t polyinv)
 {
     slong i, len2 = poly->length;
     thread_pool_handle * threads;
@@ -305,7 +304,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
         _fmpz_mod_poly_set_length(res + i, len2 - 1);
     }
 
-    num_threads = flint_request_threads(&threads, thread_limit);
+    num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
     _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(res, polys,
                                                           len1, n,

@@ -14,12 +14,7 @@
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
 {
     fmpz_t y;
-
-    fmpz_init(y);
-    fmpz_one(y);
-
+    *y = 1;
     _fmpq_mul(fmpq_numref(res), fmpq_denref(res),
               fmpq_numref(op), fmpq_denref(op), x, y);
-
-    fmpz_clear(y);
 }

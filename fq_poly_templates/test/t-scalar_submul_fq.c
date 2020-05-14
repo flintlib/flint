@@ -45,6 +45,7 @@ main(void)
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
         TEMPLATE(T, init) (x, ctx);
+        TEMPLATE(T, randtest(x, state, ctx));
 
         TEMPLATE(T, poly_randtest) (a, state, len, ctx);
         TEMPLATE(T, poly_set) (b, a, ctx);

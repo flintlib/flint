@@ -78,7 +78,7 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
             ulong t, b;
 
             /* digit = 2^t * b and b is odd */
-            t = p_power_in_q(*digit, 2);
+            t = aprcl_p_power_in_q(*digit, 2);
             b = *digit / (1 << t);
 
             if (i == e) 

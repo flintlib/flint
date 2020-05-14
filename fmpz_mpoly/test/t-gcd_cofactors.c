@@ -289,6 +289,8 @@ main(void)
 
         gcd_check(g, abar, bbar, a, b, t, ctx, i, 0, "dense examples");
 
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
+
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
         fmpz_mpoly_clear(g, ctx);

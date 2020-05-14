@@ -49,8 +49,15 @@ nmod_poly_div(nmod_poly_t Q,
     
     if (B_len == 0)
     {
-        flint_printf("Exception (nmod_poly_divrem). Division by zero.\n");
-        flint_abort();
+        if (nmod_poly_modulus(B) == 1)
+        {
+            nmod_poly_set(Q, A);
+            return;
+        } else
+        {                                                                                
+            flint_printf("Exception (nmod_poly_divrem). Division by zero.\n");
+            flint_abort();
+        }
     }
 
     A_len = A->length;

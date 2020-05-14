@@ -11,4 +11,4 @@
 
 #include "flint.h"
 
-char version[]=FLINT_VERSION;
+char flint_version[]=FLINT_VERSION;

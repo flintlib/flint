@@ -13,7 +13,7 @@
 #include "fmpz.h"
 
 void
-fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h)
+fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c2 = *h;
 

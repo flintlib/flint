@@ -101,6 +101,10 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     {
         fmpz_poly_factor_insert(final_fac, f, exp);
     }
+    else if (lenF == 3)
+    {
+        _fmpz_poly_factor_quadratic(final_fac, f, exp);
+    }
     else
     {
         slong i;

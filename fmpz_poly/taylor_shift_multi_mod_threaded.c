@@ -66,13 +66,13 @@ _fmpz_vec_multi_mod_ui_worker(void * arg_ptr)
 
 void
 _fmpz_vec_multi_mod_ui_threaded(mp_ptr * residues, fmpz * vec, slong len,
-    mp_srcptr primes, slong num_primes, int crt, slong thread_limit)
+    mp_srcptr primes, slong num_primes, int crt)
 {
     mod_ui_arg_t * args;
     slong i, num_threads;
     thread_pool_handle * threads;
 
-    num_threads = flint_request_threads(&threads, thread_limit);
+    num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
     args = (mod_ui_arg_t *)
                           flint_malloc(sizeof(mod_ui_arg_t)*(num_threads + 1));
@@ -134,13 +134,13 @@ _fmpz_poly_multi_taylor_shift_worker(void * arg_ptr)
 
 void
 _fmpz_poly_multi_taylor_shift_threaded(mp_ptr * residues, slong len,
-        const fmpz_t c, mp_srcptr primes, slong num_primes, slong thread_limit)
+        const fmpz_t c, mp_srcptr primes, slong num_primes)
 {
     taylor_shift_arg_t * args;
     slong i, num_threads;
     thread_pool_handle * threads;
 
-    num_threads = flint_request_threads(&threads, thread_limit);
+    num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
     args = (taylor_shift_arg_t *)
                     flint_malloc(sizeof(taylor_shift_arg_t)*(num_threads + 1));
@@ -171,8 +171,7 @@ _fmpz_poly_multi_taylor_shift_threaded(mp_ptr * residues, slong len,
 }
 
 void
-_fmpz_poly_taylor_shift_multi_mod_threaded(fmpz * poly, const fmpz_t c,
-                                                 slong len, slong thread_limit)
+_fmpz_poly_taylor_shift_multi_mod(fmpz * poly, const fmpz_t c, slong len)
 {
     slong xbits, ybits, num_primes, i;
     mp_ptr primes;
@@ -213,11 +212,11 @@ _fmpz_poly_taylor_shift_multi_mod_threaded(fmpz * poly, const fmpz_t c,
         residues[i] = flint_malloc(sizeof(mp_limb_t) * len);
 
     _fmpz_vec_multi_mod_ui_threaded(residues, poly, len, primes,
-                                                  num_primes, 0, thread_limit);
+                                                                num_primes, 0);
     _fmpz_poly_multi_taylor_shift_threaded(residues, len, c,
-                                             primes, num_primes, thread_limit);
+                                                           primes, num_primes);
     _fmpz_vec_multi_mod_ui_threaded(residues, poly, len, primes,
-                                                  num_primes, 1, thread_limit);
+		                                                num_primes, 1);
 
     for (i = 0; i < num_primes; i++)
         flint_free(residues[i]);

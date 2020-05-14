@@ -187,9 +187,6 @@ FLINT_DLL void arith_landau_function_vec(fmpz * res, slong len);
 /* Dedekind sums *************************************************************/
 
 #define arith_dedekind_sum_naive fmpq_dedekind_sum_naive
-#define arith_dedekind_sum_coprime_d fmpq_dedekind_sum_coprime_d
-#define arith_dedekind_sum_coprime_large fmpq_dedekind_sum_coprime_large
-#define arith_dedekind_sum_coprime fmpq_dedekind_sum_coprime
 #define arith_dedekind_sum fmpq_dedekind_sum
 
 /* Exponential sums **********************************************************/
@@ -218,6 +215,8 @@ void trig_prod_init(trig_prod_t sum)
 FLINT_DLL void arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n);
 
 /* Number of partitions ******************************************************/
+
+FLINT_DLL extern const unsigned int partitions_lookup[128];
 
 FLINT_DLL void arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod);
 FLINT_DLL void arith_number_of_partitions_vec(fmpz * res, slong len);

@@ -23,7 +23,7 @@ main(void)
     int i, result, max_threads = 5;
     FLINT_TEST_INIT(state);
 
-    flint_printf("powers_mod_bsgs_threaded....");
+    flint_printf("powers_mod_bsgs....");
     fflush(stdout);
 
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
@@ -55,8 +55,7 @@ main(void)
             nmod_poly_randtest(g, state, n_randint(state, 50));
         } while (nmod_poly_is_zero(g));
 
-        nmod_poly_powers_mod_bsgs_threaded(res, f, exp, g,
-			                           FLINT_DEFAULT_THREAD_LIMIT);
+        nmod_poly_powers_mod_bsgs(res, f, exp, g);
 
 	result = 1;
         j = 0;

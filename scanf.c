@@ -16,7 +16,7 @@
 #include <stdarg.h>
 #include "flint.h"
 
-int flint_scanf(const char * str, ...)
+FLINT_WARN_UNUSED int flint_scanf(const char * str, ...)
 {
    va_list ap;
    size_t len = strlen(str);

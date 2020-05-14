@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 Vladimir Glazachev
+    Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
 
@@ -9,10 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
+#include "fq_zech_poly.h"
 
-int
-is_prime_aprcl(const fmpz_t n)
-{
-    return is_prime_jacobi(n);
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq_zech
+#define CAP_T FQ_ZECH
+#include "fq_poly_templates/test/t-pow_trunc.c"
+#undef CAP_T
+#undef T

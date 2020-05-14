@@ -73,6 +73,8 @@ FLINT_DLL void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 FLINT_DLL void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, 
                                                           const fmpz_poly_t G);
 
+FLINT_DLL void _fmpz_poly_factor_quadratic(fmpz_poly_factor_t fac,  const fmpz_poly_t f, slong exp);
+
 FLINT_DLL slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
                              fmpz_poly_factor_t lifted_fac, fmpz_t P, ulong k);
 
@@ -84,6 +86,11 @@ FLINT_DLL void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
         const nmod_poly_factor_t fac, const fmpz_poly_t f, slong exp, ulong p);
 
 FLINT_DLL void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G);
+
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_poly_factor_get_fmpz_poly(fmpz_poly_t z, const fmpz_poly_factor_t F, slong i);
+FLINT_DLL void fmpz_poly_factor_get_fmpz(fmpz_t z, const fmpz_poly_factor_t F);
 
 #ifdef __cplusplus
 }

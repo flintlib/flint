@@ -26,7 +26,7 @@ with op = -1, computes D = C - A*B
 */
 
 static __inline__ void
-_nmod_mat_addmul_basic(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
+_nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
     mp_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
 {
     slong i, j;
@@ -123,7 +123,7 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
 }
 
 static __inline__ void
-_nmod_mat_addmul_transpose_threaded_pool(mp_ptr * D, const mp_ptr * C,
+_nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
                             const mp_ptr * A, const mp_ptr * B, slong m,
                           slong k, slong n, int op, nmod_t mod, int nlimbs,
                                thread_pool_handle * threads, slong num_threads)
@@ -295,7 +295,7 @@ _nmod_mat_addmul_packed_worker(void * arg_ptr)
 
 /* requires nlimbs = 1 */
 void
-_nmod_mat_addmul_packed_threaded_pool(mp_ptr * D,
+_nmod_mat_addmul_packed_threaded_pool_op(mp_ptr * D,
       const mp_ptr * C, const mp_ptr * A, const mp_ptr * B,
           slong M, slong N, slong K, int op, nmod_t mod, int nlimbs,
                                thread_pool_handle * threads, slong num_threads)
@@ -388,7 +388,7 @@ _nmod_mat_addmul_packed_threaded_pool(mp_ptr * D,
 }
 
 void
-_nmod_mat_mul_classical_threaded_pool(nmod_mat_t D, const nmod_mat_t C,
+_nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
                             const nmod_mat_t A, const nmod_mat_t B, int op,
                                thread_pool_handle * threads, slong num_threads)
 {
@@ -405,19 +405,19 @@ _nmod_mat_mul_classical_threaded_pool(nmod_mat_t D, const nmod_mat_t C,
 
     if (nlimbs == 1 && m > 10 && k > 10 && n > 10)
     {
-        _nmod_mat_addmul_packed_threaded_pool(D->rows, (op == 0) ? NULL : C->rows,
+        _nmod_mat_addmul_packed_threaded_pool_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, nlimbs, threads, num_threads);
     }
     else
     {
-        _nmod_mat_addmul_transpose_threaded_pool(D->rows, (op == 0) ? NULL : C->rows,
+        _nmod_mat_addmul_transpose_threaded_pool_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, nlimbs, threads, num_threads);
     }
 }
 
 void
-_nmod_mat_mul_classical_threaded(nmod_mat_t D, const nmod_mat_t C,
-            const nmod_mat_t A, const nmod_mat_t B, int op, slong thread_limit)
+_nmod_mat_mul_classical_threaded_op(nmod_mat_t D, const nmod_mat_t C,
+            const nmod_mat_t A, const nmod_mat_t B, int op)
 {
     thread_pool_handle * threads;
     slong num_threads;
@@ -438,22 +438,22 @@ _nmod_mat_mul_classical_threaded(nmod_mat_t D, const nmod_mat_t C,
     {
         slong nlimbs = _nmod_vec_dot_bound_limbs(A->c, D->mod);
 
-        _nmod_mat_addmul_basic(D->rows, (op == 0) ? NULL : C->rows,
+        _nmod_mat_addmul_basic_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, A->r, A->c, B->c, op, D->mod, nlimbs);
 
         return;
     }
 
-    num_threads = flint_request_threads(&threads, thread_limit);
+    num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
-    _nmod_mat_mul_classical_threaded_pool(D, C, A, B, op, threads, num_threads);
+    _nmod_mat_mul_classical_threaded_pool_op(D, C, A, B, op, threads, num_threads);
 
     flint_give_back_threads(threads, num_threads);
 }
 
 void
 nmod_mat_mul_classical_threaded(nmod_mat_t C, const nmod_mat_t A,
-                                        const nmod_mat_t B, slong thread_limit)
+                                                            const nmod_mat_t B)
 {
-    _nmod_mat_mul_classical_threaded(C, NULL, A, B, 0, thread_limit);
+    _nmod_mat_mul_classical_threaded_op(C, NULL, A, B, 0);
 }

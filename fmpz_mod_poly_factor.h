@@ -67,6 +67,14 @@ FLINT_DLL void fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, slong
 
 FLINT_DLL void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_factor_t fac);
 
+FMPZ_MOD_POLY_FACTOR_INLINE
+void fmpz_mod_poly_factor_swap(fmpz_mod_poly_factor_t a, fmpz_mod_poly_factor_t b)
+{
+    fmpz_mod_poly_factor_struct t = *a;
+    *a = *b;
+    *b = t;
+}
+
 FLINT_DLL void fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
                                  const fmpz_mod_poly_t poly, slong exp);
 
@@ -108,7 +116,7 @@ FLINT_DLL void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
                                       const fmpz_mod_poly_t f);
 
 FLINT_DLL void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res,
-         const fmpz_mod_poly_t poly, slong * const * degs, slong thread_limit);
+                             const fmpz_mod_poly_t poly, slong * const * degs);
 
 FLINT_DLL void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
                                       const fmpz_mod_poly_t f);
@@ -126,6 +134,18 @@ FLINT_DLL void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
                                      const fmpz_mod_poly_t f);
 
 FLINT_DLL void _fmpz_mod_poly_interval_poly_worker(void * arg_ptr);
+
+/* Roots *********************************************************************/
+
+FLINT_DLL void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r,
+                               const fmpz_mod_poly_t f, int with_multiplicity);
+
+FLINT_DLL int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t r,
+        const fmpz_mod_poly_t f, int with_multiplicity, const fmpz_factor_t n);
+
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z, fmpz_mod_poly_factor_t fac, slong i);
 
 #ifdef __cplusplus
 }

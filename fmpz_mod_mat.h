@@ -211,7 +211,7 @@ FLINT_DLL void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat
 
 FLINT_DLL void fmpz_mod_mat_mul(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
-FLINT_DLL void _fmpz_mod_mat_mul_classical_threaded_pool(fmpz_mod_mat_t D,
+FLINT_DLL void _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D,
       const fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B,
                       int op, thread_pool_handle * threads, slong num_threads);
 
@@ -220,7 +220,7 @@ FLINT_DLL void _fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t D,
                                                     int op, slong thread_limit);
 
 FLINT_DLL void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C,
-           const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, slong thread_limit);
+                               const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
 FLINT_DLL void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
@@ -237,6 +237,10 @@ FLINT_DLL slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat);
 FLINT_DLL slong fmpz_mod_mat_howell_form(fmpz_mod_mat_t mat);
 
 FLINT_DLL void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat);
+
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j);
 
 #ifdef __cplusplus
 }

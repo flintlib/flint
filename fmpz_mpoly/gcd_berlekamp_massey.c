@@ -1395,7 +1395,7 @@ void fmpz_mpolyu_symmetrize_coeffs(
         Ac = A->coeffs + i;
         for (j = 0; j < Ac->length; j++)
         {
-            fmpz_mods(Ac->coeffs + j, Ac->coeffs + j,
+            fmpz_smod(Ac->coeffs + j, Ac->coeffs + j,
                                                   fmpz_mod_ctx_modulus(fpctx));
         }
     }
@@ -3544,7 +3544,7 @@ next_zip_image:
         goto pick_zip_prime;
     }
 
-    success = fmpz_mpolyu_content_mpoly(Hcontent, H, ctx, NULL, 0);
+    success = fmpz_mpolyu_content_mpoly_threaded_pool(Hcontent, H, ctx, NULL, 0);
     FLINT_ASSERT(Hcontent->bits == Hbits);
     if (!success)
     {
@@ -3777,20 +3777,21 @@ int fmpz_mpoly_gcd_berlekamp_massey(
         goto cleanup;
     }
 
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Auu, uctx, A, ctx,
+    fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Auu, uctx, A, ctx,
                                            perm, shift, stride, NULL, NULL, 0);
-    fmpz_mpoly_to_mpolyuu_perm_deflate(Buu, uctx, B, ctx,
+    fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(Buu, uctx, B, ctx,
                                            perm, shift, stride, NULL, NULL, 0);
 
-    success = fmpz_mpolyu_content_mpoly(Ac, Auu, uctx, NULL, 0);
-    success = success && fmpz_mpolyu_content_mpoly(Bc, Buu, uctx, NULL, 0);
+    success = fmpz_mpolyu_content_mpoly_threaded_pool(Ac, Auu, uctx, NULL, 0);
+    success = success &&
+              fmpz_mpolyu_content_mpoly_threaded_pool(Bc, Buu, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 
     fmpz_mpolyu_divexact_mpoly_inplace(Auu, Ac, uctx);
     fmpz_mpolyu_divexact_mpoly_inplace(Buu, Bc, uctx);
 
-    success = _fmpz_mpoly_gcd(Gamma, wbits, Auu->coeffs + 0,
+    success = _fmpz_mpoly_gcd_threaded_pool(Gamma, wbits, Auu->coeffs + 0,
                                             Buu->coeffs + 0, uctx, NULL, 0);
     if (!success)
         goto cleanup;
@@ -3800,7 +3801,7 @@ int fmpz_mpoly_gcd_berlekamp_massey(
     if (!success)
         goto cleanup;
 
-    success = _fmpz_mpoly_gcd(Gc, wbits, Ac, Bc, uctx, NULL, 0);
+    success = _fmpz_mpoly_gcd_threaded_pool(Gc, wbits, Ac, Bc, uctx, NULL, 0);
     if (!success)
         goto cleanup;
 

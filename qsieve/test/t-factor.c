@@ -74,7 +74,7 @@ int main(void)
     
       fmpz_factor_init(factors);
 
-      qsieve_factor_threaded(factors, n, FLINT_DEFAULT_THREAD_LIMIT);
+      qsieve_factor(factors, n);
 
       if (factors->num < 5)
       {
@@ -103,7 +103,7 @@ int main(void)
 
       flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-      qsieve_factor_threaded(factors, n, FLINT_DEFAULT_THREAD_LIMIT);
+      qsieve_factor(factors, n);
 
       if (factors->num < 2)
       {
@@ -134,7 +134,7 @@ int main(void)
 
       flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-      qsieve_factor_threaded(factors, n, FLINT_DEFAULT_THREAD_LIMIT);
+      qsieve_factor(factors, n);
 
       if (factors->num < 3)
       {
@@ -163,7 +163,7 @@ int main(void)
 
       flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-      qsieve_factor_threaded(factors, n, FLINT_DEFAULT_THREAD_LIMIT);
+      qsieve_factor(factors, n);
 
       if (factors->num < 3)
       {

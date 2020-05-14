@@ -20,13 +20,20 @@ endif()
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build with NTL or not" off)
 
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure" CONFIGURE_CONTENTS)
+string(REGEX MATCH "FLINT_MAJOR=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+set(FLINT_MAJOR ${CMAKE_MATCH_1})
+string(REGEX MATCH "FLINT_MINOR=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+set(FLINT_MINOR ${CMAKE_MATCH_1})
+string(REGEX MATCH "FLINT_PATCH=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+set(FLINT_PATCH ${CMAKE_MATCH_1})
+
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()
 find_package(PythonInterp REQUIRED)
-
 
 if(MSVC)
     find_package(PThreads REQUIRED)
@@ -65,12 +72,16 @@ set(SOURCES
     hashmap.c inlines.c fmpz/fmpz.c
 )
 
+if (MSVC)
+    list(APPEND SOURCES gettimeofday.c)
+endif()
+
 if (WITH_NTL)
     list(APPEND SOURCES interfaces/NTL-interface.cpp)
 endif()
 
 set(HEADERS
-    NTL-interface.h flint.h longlong.h config.h gmpcompat.h fft_tuning.h
+    NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
     fmpz-conversions.h profiler.h templates.h exception.h hashmap.h
 )
 
@@ -110,7 +121,7 @@ else()
     set(HAVE_DOUBLE_IEEE_BIG_ENDIAN ON)
 endif()
 
-# setup for config.h
+# setup for flint-config.h
 check_include_files(alloca.h HAVE_ALLOCA_H)
 check_include_files(dlfcn.h HAVE_DLFCN_H)
 check_include_files(fcntl.h HAVE_FCNTL_H)
@@ -170,7 +181,7 @@ endif()
 
 configure_file(
     config.h.in
-    config.h
+    flint-config.h
 )
 
 configure_file(
@@ -239,6 +250,28 @@ if (HAS_FLAG_MPOPCNT)
 endif()
 if (HAS_FLAG_UNROLL_LOOPS)
     target_compile_options(flint PUBLIC "-funroll-loops")
+endif()
+
+# Versioning
+
+set_target_properties(flint PROPERTIES
+    VERSION ${FLINT_MAJOR}.${FLINT_MINOR}.${FLINT_PATCH}
+    SOVERSION ${FLINT_MAJOR}
+)
+
+# Following versioning parts are optional
+# Match versioning scheme in configure based build system.
+if (APPLE)
+    if(${CMAKE_VERSION} VERSION_LESS "3.17.0")
+        message(WARNING "To match the versioning scheme of configure based build system, switch to cmake 3.17.0")
+    else ()
+        set_target_properties(flint PROPERTIES
+            MACHO_COMPATIBILITY_VERSION ${FLINT_MAJOR}.${FLINT_MINOR}
+            MACHO_CURRENT_VERSION ${FLINT_MAJOR}.${FLINT_MINOR}.${FLINT_PATCH}
+        )
+    endif()
+elseif (WIN32)
+    set_target_properties(flint PROPERTIES RUNTIME_OUTPUT_NAME "flint-${FLINT_MAJOR}")
 endif()
 
 if(NOT DEFINED IPO_SUPPORTED)

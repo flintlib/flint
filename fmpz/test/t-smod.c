@@ -23,7 +23,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("mods....");
+    flint_printf("smod....");
     fflush(stdout);
 
 
@@ -41,7 +41,7 @@ main(void)
         fmpz_randtest(a, state, 200);
         fmpz_randtest_not_zero(b, state, 200);
 
-        fmpz_mods(c, a, b);
+        fmpz_smod(c, a, b);
         fmpz_sub(d, a, c);
         fmpz_mod(d, d, b);
         fmpz_abs(e, b);
@@ -89,8 +89,8 @@ main(void)
         fmpz_randtest_not_zero(a, state, 200);
         fmpz_set(b, a);
 
-        fmpz_mods(c, a, a);
-        fmpz_mods(d, a, b);
+        fmpz_smod(c, a, a);
+        fmpz_smod(d, a, b);
 
         result = (fmpz_cmp(c, d) == 0);
         if (!result)
@@ -131,8 +131,8 @@ main(void)
         fmpz_randtest_not_zero(b, state, 200);
         fmpz_set(c, a);
 
-        fmpz_mods(a, a, b);
-        fmpz_mods(d, c, b);
+        fmpz_smod(a, a, b);
+        fmpz_smod(d, c, b);
 
         result = (fmpz_cmp(a, d) == 0);
 
@@ -174,8 +174,8 @@ main(void)
         fmpz_randtest_not_zero(b, state, 200);
         fmpz_set(c, b);
 
-        fmpz_mods(b, a, b);
-        fmpz_mods(d, a, c);
+        fmpz_smod(b, a, b);
+        fmpz_smod(d, a, c);
 
         result = (fmpz_cmp(b, d) == 0);
 

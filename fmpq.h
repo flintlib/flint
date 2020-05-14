@@ -134,6 +134,10 @@ FLINT_DLL int _fmpq_cmp_ui(const fmpz_t p, const fmpz_t q, ulong c);
 
 FLINT_DLL int fmpq_cmp_ui(const fmpq_t x, ulong c);
 
+FLINT_DLL int _fmpq_cmp_si(const fmpz_t p, const fmpz_t q, slong c);
+
+FLINT_DLL int fmpq_cmp_si(const fmpq_t x, slong c);
+
 FLINT_DLL void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
 
 FLINT_DLL void fmpq_canonicalise(fmpq_t res);
@@ -142,11 +146,23 @@ FLINT_DLL int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den);
 
 FLINT_DLL int fmpq_is_canonical(const fmpq_t x);
 
+FLINT_DLL void _fmpq_set_ui(fmpz_t rnum, fmpz_t rden, ulong p, ulong q);
+
+FLINT_DLL void fmpq_set_ui(fmpq_t res, ulong p, ulong q);
 
 FLINT_DLL void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q);
 
 FLINT_DLL void fmpq_set_si(fmpq_t res, slong p, ulong q);
 
+FMPQ_INLINE int fmpq_equal_ui(fmpq_t q, slong n)
+{
+    return fmpz_equal_ui(fmpq_numref(q), n) && q->den == WORD(1);
+}
+
+FMPQ_INLINE int fmpq_equal_si(fmpq_t q, slong n)
+{
+    return fmpz_equal_si(fmpq_numref(q), n) && q->den == WORD(1);
+}
 
 FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 
@@ -208,6 +224,10 @@ FLINT_DLL void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, flint_
 
 FLINT_DLL void fmpq_randbits(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits);
 
+FLINT_DLL void _fmpq_add_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2);
+
+FLINT_DLL void _fmpq_mul_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2);
+
 FLINT_DLL void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
 
@@ -217,6 +237,11 @@ FLINT_DLL void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
                                                       const fmpz_t q, slong r);
 
 FLINT_DLL void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c);
+
+FLINT_DLL void _fmpq_add_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
+		                                      const fmpz_t q, ulong r);
+
+FLINT_DLL void fmpq_add_ui(fmpq_t res, const fmpq_t op1, ulong c);
 
 FLINT_DLL void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
                                                const fmpz_t q, const fmpz_t r);
@@ -233,10 +258,25 @@ FLINT_DLL void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
 
 FLINT_DLL void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c);
 
+FLINT_DLL void _fmpq_sub_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
+		                                      const fmpz_t q, ulong r);
+
+FLINT_DLL void fmpq_sub_ui(fmpq_t res, const fmpq_t op1, ulong c);
+
 FLINT_DLL void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
                                                const fmpz_t q, const fmpz_t r);
 
 FLINT_DLL void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
+
+FLINT_DLL void _fmpq_mul_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
+                                                      const fmpz_t q, slong r);
+
+FLINT_DLL void fmpq_mul_si(fmpq_t res, const fmpq_t op1, slong c);
+
+FLINT_DLL void _fmpq_mul_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
+                                                      const fmpz_t q, ulong r);
+
+FLINT_DLL void fmpq_mul_ui(fmpq_t res, const fmpq_t op1, ulong c);
 
 FLINT_DLL void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
@@ -309,11 +349,14 @@ FLINT_DLL int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a, con
 
 FLINT_DLL int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m);
 
-FLINT_DLL int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
-    const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D);
+FLINT_DLL int _fmpq_reconstruct_fmpz_2_naive(fmpz_t n, fmpz_t d,
+               const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D);
 
-FLINT_DLL int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m,
-                                        const fmpz_t N, const fmpz_t D);
+FLINT_DLL int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
+               const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D);
+
+FLINT_DLL int fmpq_reconstruct_fmpz_2(fmpq_t res,
+               const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D);
 
 FLINT_DLL flint_bitcnt_t fmpq_height_bits(const fmpq_t x);
 
@@ -410,7 +453,7 @@ FLINT_DLL void _fmpz_mat22_rmul_inv_elem(_fmpz_mat22_t M, const fmpz_t q);
 
 FLINT_DLL void _fmpz_mat22_lmul_elem(_fmpz_mat22_t M, const fmpz_t q);
 
-/******************* resizable integer vector ********************************/
+/******** resizable integer vector specific to cfrac functionality ***********/
 
 typedef struct
 {
@@ -420,21 +463,28 @@ typedef struct
     slong limit;
     fmpz_t alt_sum;
     int want_alt_sum;
-} _fmpz_vector_struct;
+} _fmpq_cfrac_list_struct;
 
-typedef _fmpz_vector_struct _fmpz_vector_t[1];
+typedef _fmpq_cfrac_list_struct _fmpq_cfrac_list_t[1];
 
-FLINT_DLL void _fmpz_vector_init(_fmpz_vector_t v);
+FLINT_DLL void _fmpq_cfrac_list_init(_fmpq_cfrac_list_t v);
 
-FLINT_DLL void _fmpz_vector_clear(_fmpz_vector_t v);
+FLINT_DLL void _fmpq_cfrac_list_clear(_fmpq_cfrac_list_t v);
 
-FLINT_DLL void _fmpz_vector_fit_length(_fmpz_vector_t v, slong len);
+FLINT_DLL void _fmpq_cfrac_list_fit_length(_fmpq_cfrac_list_t v, slong len);
 
-FLINT_DLL void _fmpz_vector_push_back(_fmpz_vector_t v, const fmpz_t a);
+FLINT_DLL void _fmpq_cfrac_list_push_back(_fmpq_cfrac_list_t v, const fmpz_t a);
 
-FLINT_DLL void _fmpz_vector_push_back_zero(_fmpz_vector_t v);
+FLINT_DLL void _fmpq_cfrac_list_push_back_zero(_fmpq_cfrac_list_t v);
 
-FLINT_DLL void _fmpz_vector_append_ui(_fmpz_vector_t v, const ulong * a, slong n);
+FLINT_DLL void _fmpq_cfrac_list_append_ui(_fmpq_cfrac_list_t v, const ulong * a, slong n);
+
+FMPQ_INLINE void _fmpq_cfrac_list_swap(_fmpq_cfrac_list_t a, _fmpq_cfrac_list_t b)
+{
+    _fmpq_cfrac_list_struct t = *a;
+    *a = *b;
+    *b = t;
+}
 
 /*************** ball for closed interval [left, right] **********************/
 
@@ -458,11 +508,19 @@ FMPQ_INLINE void _fmpq_ball_swap(_fmpq_ball_t x, _fmpq_ball_t y)
 
 FLINT_DLL int _fmpq_ball_gt_one(const _fmpq_ball_t x);
 
-FLINT_DLL void _fmpq_hgcd(_fmpz_vector_t s, _fmpz_mat22_t M,
+FLINT_DLL void _fmpq_hgcd(_fmpq_cfrac_list_t s, _fmpz_mat22_t M,
                                                    fmpz_t x_num, fmpz_t x_den);
 
-FLINT_DLL void _fmpq_ball_get_cfrac(_fmpz_vector_t s, _fmpz_mat22_t M,
+FLINT_DLL void _fmpq_ball_get_cfrac(_fmpq_cfrac_list_t s, _fmpz_mat22_t M,
                                                     int needM, _fmpq_ball_t x);
+
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpq_numerator(fmpz_t n, const fmpq_t q);
+FLINT_DLL void fmpq_denominator(fmpz_t n, const fmpq_t q);
+FLINT_DLL fmpz * fmpq_numerator_ptr(fmpq_t q);
+FLINT_DLL fmpz * fmpq_denominator_ptr(fmpq_t q);
+FLINT_DLL int fmpq_equal_fmpz(fmpq_t q, fmpz_t n);
 
 #ifdef __cplusplus
 }

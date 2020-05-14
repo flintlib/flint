@@ -151,6 +151,33 @@ main(void)
             abort();
         }
 
+        for (j = 0; j < fac->num; j++)
+        {
+            for (k = j + 1; k < fac->num; k++)
+            {
+                if (fmpz_poly_equal(fac->p + j, fac->p + k))
+                {
+                    flint_printf("FAIL (repeated factor):\n");
+                    flint_printf("facs1 = %wd, facs2 = %wd\n", facs1, facs2);
+                    flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n\n");
+                    flint_printf("h = "), fmpz_poly_print(h), flint_printf("\n\n");
+                    flint_printf("fac = "), fmpz_poly_factor_print(fac), flint_printf("\n\n");
+                    abort();
+                }
+            }
+
+            fmpz_poly_content(c, fac->p + j);
+            if (!fmpz_is_one(c) || fmpz_sgn((fac->p + j)->coeffs + fmpz_poly_degree(fac->p + j)) < 0)
+            {
+                flint_printf("FAIL (factor not reduced):\n");
+                flint_printf("facs1 = %wd, facs2 = %wd\n", facs1, facs2);
+                flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n\n");
+                flint_printf("h = "), fmpz_poly_print(h), flint_printf("\n\n");
+                flint_printf("fac = "), fmpz_poly_factor_print(fac), flint_printf("\n\n");
+                abort();
+            }
+        }
+
         fmpz_clear(c);
         fmpz_poly_clear(f);
         fmpz_poly_clear(g);

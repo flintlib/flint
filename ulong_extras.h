@@ -311,6 +311,8 @@ ulong n_invmod(ulong x, ulong y)
    return r;
 }
 
+FLINT_DLL ulong n_CRT(ulong r1, ulong m1, ulong r2, ulong m2);
+
 FLINT_DLL ulong n_revbin(ulong in, ulong bits);
 
 FLINT_DLL int n_jacobi(slong x, ulong y);
@@ -408,6 +410,10 @@ FLINT_DLL ulong n_factor_SQUFOF(ulong n, ulong iters);
 FLINT_DLL void n_factor(n_factor_t * factors, ulong n, int proved);
 
 FLINT_DLL ulong n_factor_pp1(ulong n, ulong B1, ulong c);
+
+FLINT_DLL ulong n_factor_pp1_wrapper(ulong n);
+
+FLINT_DLL void n_factor_pp1_table_insert(slong bits, slong B1, slong count);
 
 FLINT_DLL int n_factor_pollard_brent_single(ulong *factor, ulong n, 
                                             ulong ninv, ulong ai, 

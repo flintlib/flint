@@ -124,6 +124,18 @@ Comparison
 
     Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
 
+.. function:: int fmpq_cmp_si(const fmpq_t x, slong y)
+
+     Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
+
+.. function:: int fmpq_equal_ui(const fmpq_t x, ulong y)
+
+    Returns `1` if `x = y`, otherwise returns `0`.
+
+.. function:: int fmpq_equal_si(const fmpq_t x, slong y)
+
+    Returns `1` if `x = y`, otherwise returns `0`.
+
 .. function:: void fmpq_height(fmpz_t height, const fmpq_t x)
 
     Sets ``height`` to the height of `x`, defined as the larger of
@@ -154,6 +166,15 @@ Conversion
     Sets ``res`` to the canonical form of the fraction ``p / q``.
 
 .. function:: void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q)
+
+    Sets ``(rnum, rden)`` to the canonical form of the fraction
+    ``p / q``. ``rnum`` and ``rden`` may not be aliased.
+
+.. function:: void fmpq_set_ui(fmpq_t res, ulong p, ulong q)
+
+    Sets ``res`` to the canonical form of the fraction ``p / q``.
+
+.. function:: void _fmpq_set_ui(fmpz_t rnum, fmpz_t rden, ulong p, ulong q)
 
     Sets ``(rnum, rden)`` to the canonical form of the fraction
     ``p / q``. ``rnum`` and ``rden`` may not be aliased.
@@ -341,8 +362,6 @@ Random number generation
 Arithmetic
 --------------------------------------------------------------------------------
 
-
-
 .. function:: void fmpq_add(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
               void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
               void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
@@ -366,21 +385,51 @@ Arithmetic
     whilst no numerator is aliased with a denominator.
 
 .. function:: void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
-              void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
-              void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
-              void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
+
+.. function:: void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
+
+.. function:: void _fmpq_add_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)
+
+.. function:: void _fmpq_sub_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)
+
+.. function:: void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
+
+.. function:: void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
 
     Sets ``(rnum, rden)`` to the canonical form of the sum or difference
     respectively of the fractions represented by ``(p, q)`` and
     ``(r, 1)``. Numerators may not be aliased with denominators.
 
 .. function:: void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c)
-              void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c)
-              void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
-              void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
+
+.. function:: void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c)
+
+.. function:: void fmpq_add_ui(fmpq_t res, const fmpq_t op1, ulong c)
+
+.. function:: void fmpq_sub_ui(fmpq_t res, const fmpq_t op1, ulong c)
+                                                                               
+.. function:: void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
+
+.. function:: void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
 
    Sets ``res`` to the sum or difference respectively, of the fraction 
    ``op1`` and the integer `c`.
+
+.. function:: void _fmpq_mul_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
+
+   Sets ``(rnum, rden)`` to the product of ``(p, q)`` and the integer `r`.
+
+.. function:: void fmpq_mul_si(fmpq_t res, const fmpq_t op1, slong c)
+
+   Sets ``res`` to the product of ``op1`` and the integer `c`.
+
+.. function:: void _fmpq_mul_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)                                                            
+
+   Sets ``(rnum, rden)`` to the product of ``(p, q)`` and the integer `r`.     
+
+.. function:: void fmpq_mul_ui(fmpq_t res, const fmpq_t op1, ulong c)
+
+   Sets ``res`` to the product of ``op1`` and the integer `c`.
 
 .. function:: void fmpq_addmul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
               void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
@@ -447,6 +496,18 @@ Arithmetic
     Set ``res`` to the gcd of ``op1`` and ``op2``. See the low
     level function ``_fmpq_gcd`` for our definition of gcd.
 
+.. function:: void _fmpq_add_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2)
+
+    Sets ``(rnum, rden)`` to the sum of ``(p1, q1)`` and ``(p2, q2)``.
+    Assumes that ``(p1, q1)`` and ``(p2, q2)`` are in canonical form
+    and that all inputs are between ``COEFF_MIN`` and ``COEFF_MAX``.
+
+.. function:: void _fmpq_mul_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2)
+
+    Sets ``(rnum, rden)`` to the product of ``(p1, q1)`` and ``(p2, q2)``.
+    Assumes that ``(p1, q1)`` and ``(p2, q2)`` are in canonical form
+    and that all inputs are between ``COEFF_MIN`` and ``COEFF_MAX``.
+
 
 Modular reduction and rational reconstruction
 --------------------------------------------------------------------------------
@@ -461,12 +522,14 @@ Modular reduction and rational reconstruction
     If such an `a` exists, 1 will be returned, otherwise 0 will
     be returned.
 
+.. function:: int _fmpq_reconstruct_fmpz_2_naive(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
+
 .. function:: int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
               int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 
     Reconstructs a rational number from its residue `a` modulo `m`.
 
-    Given a modulus `m > 1`, a residue `0 \le a < m`, and positive `N, D`
+    Given a modulus `m > 2`, a residue `0 \le a < m`, and positive `N, D`
     satisfying `2ND < m`, this function attempts to find a fraction `n/d` with
     `0 \le |n| \le N` and `0 < d \le D` such that `\gcd(n,d) = 1` and
     `n \equiv ad \pmod m`. If a solution exists, then it is also unique.
@@ -478,8 +541,7 @@ Modular reduction and rational reconstruction
 
     Reconstructs a rational number from its residue `a` modulo `m`,
     returning 1 if successful and 0 if no solution exists.
-    Uses the balanced bounds `N = D = \lfloor\sqrt{m/2}\rfloor`.
-
+    Uses the balanced bounds `N = D = \lfloor\sqrt{\frac{m-1}{2}}\rfloor`.
 
 
 Rational enumeration

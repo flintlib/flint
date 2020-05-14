@@ -56,12 +56,18 @@ aprcl_R_value(const fmpz_t n)
     if (bits <= 9977) return 367567200;
     if (bits <= 12713) return 1396755360;
 
+#if FLINT64
     /* 2^5 * 3^3 * 5^2 * 7 * 11 * 13 * 17 * 19 */
     return UWORD(6983776800);
+#else
+    flint_printf("APRCL not supported for huge numbers on 32 bits\n");
+    flint_abort();
+    return 0;
+#endif
 }
 
 static void
-_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
+_aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 {
     ulong i, j, q;
     double * w;
@@ -136,7 +142,7 @@ _config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 }
 
 static void
-_config_jacobi_update(aprcl_config conf)
+_aprcl_config_jacobi_update(aprcl_config conf)
 {
     ulong prime = 2;
 
@@ -145,16 +151,16 @@ _config_jacobi_update(aprcl_config conf)
     fmpz_factor_init(conf->qs);
     conf->qs->sign = 1;
 
-    _fmpz_factor_append_ui(conf->qs, prime, p_power_in_q(conf->R, prime) + 2);
-    fmpz_mul_ui(conf->s, conf->s, n_pow(prime, p_power_in_q(conf->R, prime) + 2));
+    _fmpz_factor_append_ui(conf->qs, prime, aprcl_p_power_in_q(conf->R, prime) + 2);
+    fmpz_mul_ui(conf->s, conf->s, n_pow(prime, aprcl_p_power_in_q(conf->R, prime) + 2));
 
     prime = 3;
     while (2 * (prime - 1) <= conf->R)
     {
         if ((conf->R % (prime - 1)) == 0)
         {
-            _fmpz_factor_append_ui(conf->qs, prime, p_power_in_q(conf->R, prime) + 1);
-            fmpz_mul_ui(conf->s, conf->s, n_pow(prime, p_power_in_q(conf->R, prime) + 1));
+            _fmpz_factor_append_ui(conf->qs, prime, aprcl_p_power_in_q(conf->R, prime) + 1);
+            fmpz_mul_ui(conf->s, conf->s, n_pow(prime, aprcl_p_power_in_q(conf->R, prime) + 1));
         }
         prime++;
         while (n_is_prime(prime) == 0)
@@ -170,22 +176,22 @@ _config_jacobi_update(aprcl_config conf)
 
 /* Computes s = \prod q^(k + 1) ; q - prime, q - 1 | R; q^k | R and q^(k + 1) not | R */
 void
-config_jacobi_init(aprcl_config conf, const fmpz_t n)
+aprcl_config_jacobi_init(aprcl_config conf, const fmpz_t n)
 {
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
     conf->R = aprcl_R_value(n);
-    _config_jacobi_update(conf);
+    _aprcl_config_jacobi_update(conf);
 
     n_factor_init(&conf->rs);
     n_factor(&conf->rs, conf->R, 1);
 
     conf->qs_used = (int *) flint_malloc(sizeof(int) * conf->qs->num);
-    _config_jacobi_reduce_s2(conf, n);
+    _aprcl_config_jacobi_reduce_s2(conf, n);
 }
 
 void
-config_jacobi_clear(aprcl_config conf)
+aprcl_config_jacobi_clear(aprcl_config conf)
 {
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);

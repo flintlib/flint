@@ -271,6 +271,10 @@ Addition and subtraction
 
     Sets ``res`` to the sum of ``poly1`` and ``poly2``.
 
+.. function:: void fq_zech_poly_add_si(fq_zech_poly_t res, const fq_zech_poly_t poly1, slong c, const fq_zech_ctx_t ctx)
+
+    Sets ``res`` to the sum of ``poly1`` and ``c``.
+
 .. function:: void fq_zech_poly_add_series(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2, slong n, const fq_ctx_t ctx)
 
     Notionally truncate ``poly1`` and ``poly2`` to length ``n`` and set
@@ -310,8 +314,8 @@ Scalar multiplication and division
 
 .. function:: void fq_zech_poly_scalar_mul_fq_zech(fq_zech_poly_t rop, const fq_zech_poly_t op, const fq_zech_t x, const fq_zech_ctx_t ctx)
 
-    Sets ``(rop,len)`` to the product of ``(op,len)`` by the
-    scalar ``x``, in the context defined by ``ctx``.
+    Sets ``rop`` to the product of ``op`` by the scalar ``x``, in the context
+    defined by ``ctx``.
 
 .. function:: void _fq_zech_poly_scalar_addmul_fq_zech(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
 
@@ -337,6 +341,16 @@ Scalar multiplication and division
     Substracts from ``rop`` the product of ``op`` by the
     scalar ``x``, in the context defined by ``ctx``.
 
+.. function:: void _fq_zech_poly_scalar_div_fq(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
+
+    Sets ``(rop,len)`` to the quotient of ``(op,len)`` by the
+    scalar ``x``, in the context defined by ``ctx``. An exception is raised
+    if ``x`` is zero.
+
+.. function:: void fq_zech_poly_scalar_div_fq(fq_zech_poly_t rop, const fq_zech_poly_t op, const fq_zech_t x, const fq_zech_ctx_t ctx)
+
+    Sets ``rop`` to the quotient of ``op`` by the scalar ``x``, in the context
+    defined by ``ctx``. An exception is raised if ``x`` is zero.
 
 Multiplication
 --------------------------------------------------------------------------------
@@ -688,6 +702,34 @@ Powering
     modulo ``f``, using sliding window exponentiation. We require
     ``e >= 0``. We require ``finv`` to be the inverse of the reverse of
     ``f``.
+
+.. function:: void _fq_zech_poly_pow_trunc_binexp(fq_zech_struct * res, const fq_zech_struct * poly, ulong e, slong trunc, const fq_zech_ctx_t ctx)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    (assumed to be zero padded if necessary to length ``trunc``) to                           the power ``e``. This is equivalent to doing a powering followed
+    by a truncation. We require that ``res`` has enough space for
+    ``trunc`` coefficients, that ``trunc > 0`` and that                                       ``e > 1``. Aliasing is not permitted. Uses the binary                                     exponentiation method.                                                                
+
+.. function:: void fq_poly_pow_trunc_binexp(fq_zech_poly_t res, const fq_zech_poly_t poly, ulong e, slong trunc, const fq_zech_ctx_t ctx)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    to the power ``e``. This is equivalent to doing a powering
+    followed by a truncation. Uses the binary exponentiation method.
+
+.. function:: void _fq_zech_poly_pow_trunc(fq_zech_struct * res, const fq_zech_struct * poly, ulong e, slong trunc, const fq_zech_ctx_t mod)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    (assumed to be zero padded if necessary to length ``trunc``) to
+    the power ``e``. This is equivalent to doing a powering followed
+    by a truncation. We require that ``res`` has enough space for
+    ``trunc`` coefficients, that ``trunc > 0`` and that
+    ``e > 1``. Aliasing is not permitted.
+
+.. function:: void fq_zech_poly_pow_trunc(fq_zech_poly_t res, const fq_zech_poly_t poly, ulong e, slong trunc, fq_zech_ctx_t ctx)
+
+    Sets ``res`` to the low ``trunc`` coefficients of ``poly``
+    to the power ``e``. This is equivalent to doing a powering
+    followed by a truncation.
 
 
 Shifting

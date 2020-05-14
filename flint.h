@@ -31,7 +31,7 @@
 #endif
 #include "limits.h"
 #include "longlong.h"
-#include "config.h"
+#include "flint-config.h"
 #undef ulong
 
 #ifdef FLINT_INLINES_C
@@ -55,9 +55,9 @@
 /* flint version number */
 
 #define __FLINT_VERSION 2
-#define __FLINT_VERSION_MINOR 5
-#define __FLINT_VERSION_PATCHLEVEL 3
-#define FLINT_VERSION "2.5.3"
+#define __FLINT_VERSION_MINOR 6
+#define __FLINT_VERSION_PATCHLEVEL 0
+#define FLINT_VERSION "2.6.0"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
@@ -82,7 +82,7 @@
     #define __inline__  inline
 #endif
 
-extern char version[];
+extern char flint_version[];
 
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
@@ -261,7 +261,7 @@ void flint_rand_free(flint_rand_s * state)
 /*
   We define this here as there is no mpfr.h
  */
-typedef __mpfr_struct mpfr;
+typedef __mpfr_struct flint_mpfr;
 
 #if WANT_ASSERT
 #define FLINT_ASSERT(param) assert(param)
@@ -272,9 +272,16 @@ typedef __mpfr_struct mpfr;
 #if defined(__GNUC__)
 #define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
 #define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
+#if __GNUC__ >= 4
+#define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 #else
+#define FLINT_WARN_UNUSED
+#endif
+#else
+#define __attribute__(x)
 #define FLINT_UNUSED(x) x
 #define FLINT_SET_BUT_UNUSED(x) x
+#define FLINT_WARN_UNUSED
 #endif
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))

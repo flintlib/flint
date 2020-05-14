@@ -44,6 +44,9 @@ main(void)
 
         e = z_randint(state, 20);
 
+	if (fmpq_is_zero(b) && e < 0)
+	   e = -e;
+
         fmpq_pow_si(c, b, e);
         fmpq_pow_si(b, b, e);
 
@@ -76,6 +79,9 @@ main(void)
         fmpq_randtest(a, state, 50);
 
         e = z_randint(state, 20);
+
+	if (fmpq_is_zero(a) &&  e < 0)
+	   e = -e;
 
         fmpq_pow_si(b, a, e);
 

@@ -31,7 +31,7 @@ main(void)
     /* Check aliasing of a and b */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpfr *a;
+        flint_mpfr *a;
         slong len = n_randint(state, 100);
 
         a = _mpfr_vec_init(len, 200);
@@ -52,7 +52,7 @@ main(void)
     /* Compare copied vectors */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpfr *a, *b;
+        flint_mpfr *a, *b;
         slong len = n_randint(state, 100);
 
         a = _mpfr_vec_init(len, 200);
@@ -75,7 +75,7 @@ main(void)
     /* Compare unequal vectors */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpfr *a, *b;
+        flint_mpfr *a, *b;
         slong len = n_randint(state, 100) + 1;
         slong coeff;
 

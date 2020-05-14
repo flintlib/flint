@@ -46,7 +46,7 @@ install:
   - if [%COMPILER%]==[cl] if [%ARCH%]==[64] call "%VCVARSALL%" x64
   - if [%COMPILER%]==[cl] if [%ARCH%]==[32] call "%VCVARSALL%" x86
   - if [%COMPILER%]==[cl] conda config --add channels conda-forge --force
-  - if [%COMPILER%]==[cl] conda install --yes --quiet mpir=2.7.2 mpfr=4.* pthreads-win32 ninja
+  - if [%COMPILER%]==[cl] conda install --yes --quiet mpir=3.0.0 mpfr=4.* pthreads-win32 ninja
   - if [%COMPILER%]==[cl] set "CFLAGS=/wd4146 /wd4018 /wd4267 /wd4244"
   - echo int flint_test_multiplier(){return 1;} > test_helpers.c
   - cat test_helpers.c
@@ -62,15 +62,7 @@ build_script:
   - cmake --build . -- -j2
 
 test_script:
-  - set "SKIP_TESTS=dummy_appveyor$"
-  # Following is known to hang
-  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] set "SKIP_TESTS=%SKIP_TESTS%|fmpz_poly_factor-test-t-factor$"
-  # Known failures (https://github.com/wbhart/flint2/issues/517#issuecomment-465005690)
-  - if [%COMPILER%]==[gcc] if [%ARCH%]==[64] set "SKIP_TESTS=%SKIP_TESTS%|fmpq-test-t-cmp_ui$"
-  - if [%COMPILER%]==[cl] if [%ARCH%]==[32] set "SKIP_TESTS=%SKIP_TESTS%|fmpz-test-t-is_perfect_power$"
-  - if [%COMPILER%]==[cl] set "SKIP_TESTS=%SKIP_TESTS%|fmpz_mpoly-test-t-divides_array$"
-  - if [%COMPILER%]==[cl] if [%ARCH%]==[64] set "SKIP_TESTS=%SKIP_TESTS%|fmpz_mpoly-test-t-divrem_array$|fmpz_mpoly-test-t-divrem_ideal_monagan_pearce|nmod_poly_mat-test-t-concat_vertical$"
-  - ctest -j3 -E "%SKIP_TESTS%" --output-on-failure
+  - ctest -j3 --output-on-failure --timeout 600
 
 #on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

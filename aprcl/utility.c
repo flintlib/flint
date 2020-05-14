@@ -15,7 +15,7 @@
     Returns the index of divisor p on R factors list.
 */
 int
-_p_ind(const aprcl_config conf, ulong p)
+_aprcl_p_ind(const aprcl_config conf, ulong p)
 {
     int i;
     for (i = 0; i < conf->rs.num; i++)
@@ -28,7 +28,7 @@ _p_ind(const aprcl_config conf, ulong p)
     Returns k such that p^k | q and p^{k + 1} not | q
 */
 ulong
-p_power_in_q(ulong q, ulong p)
+aprcl_p_power_in_q(ulong q, ulong p)
 {
     ulong k, q_temp;
     k = 0;

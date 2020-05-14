@@ -173,6 +173,9 @@ finished generating random numbers, one should call
     give a uniform distribution over the set of primes with that
     many bits.
 
+    Random number generation is performed using the standard Flint
+    random number generator, which is not suitable for cryptographic use.
+
     If ``proved`` is nonzero, then the integer returned is
     guaranteed to actually be prime.
 
@@ -636,6 +639,10 @@ Basic arithmetic
 
     Sets `f` to `g + x` where `x` is an ``ulong``.
 
+.. function:: void fmpz_add_si(fmpz_t f, const fmpz_t g, slong x)
+
+    Sets `f` to `g + x` where `x` is an ``slong``.
+
 .. function:: void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to `g - h`.
@@ -643,6 +650,10 @@ Basic arithmetic
 .. function:: void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets `f` to `g - x` where `x` is an ``ulong``.
+
+.. function:: void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
+
+    Sets `f` to `g - x` where `x` is an ``slong``.
 
 .. function:: void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -848,7 +859,7 @@ Basic arithmetic
     Sets `f` to `g` reduced modulo `x` where `x` is an 
     ``ulong``.  If `x` is `0` an exception will result.
 
-.. function:: void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h)
+.. function:: void fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the signed remainder `y \equiv g \bmod h` satisfying
     `-\lvert h \rvert/2 < y \leq \lvert h\rvert/2`.
@@ -1086,6 +1097,12 @@ Modular arithmetic
 
     Computes the Jacobi symbol of `a` modulo `p`, where `p` is a prime
     and `a` is reduced modulo `p`.
+
+.. function:: void fmpz_divides_mod_list(fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)
+
+    Set `xstart`, `xstride`, and `xlength` so that the solution set for x modulo `n` in `a x = b mod n` is exactly `\{xstart + xstride i | 0 \le i < xlength\}`.
+    This function essentially gives a list of possibilities for the fraction `a/b` modulo `n`.
+    The outputs may not be aliased, and `n` should be positive.
 
 
 Bit packing and unpacking
@@ -1531,10 +1548,12 @@ Primality testing
     Finds the next prime number larger than `n`.
 
     If ``proved`` is nonzero, then the integer returned is
-    guaranteed to actually be prime.
-
-
-
+    guaranteed to actually be prime. Otherwise if `n` fits in
+    ``FLINT_BITS - 3`` bits ``n_nextprime`` is called, and if not then
+    the GMP ``mpz_nextprime`` function is called. Up to an including
+    GMP 6.1.2 this used Miller-Rabin iterations, and thereafter uses
+    a BPSW test.
+    
 Special functions
 --------------------------------------------------------------------------------
 

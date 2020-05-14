@@ -63,7 +63,9 @@ Comparison of elements against each other or against zero can be accomplished wi
 
 .. function:: void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
 
-    Set `a` to `b^{-1}` modulo `n`. This function throws if and only if `\gcd(b, n) \ne 1`.
+    Set `a` to `b^{-1}` modulo `n`.
+    This function expects that `b` is invertible modulo `n` and throws if this not the case.
+    Invertibility maybe tested with func:`fmpz_mod_pow_fmpz` or func:`fmpz_mod_divides`.
 
 .. function:: int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 
@@ -72,7 +74,12 @@ Comparison of elements against each other or against zero can be accomplished wi
 .. function:: void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong e, const fmpz_mod_ctx_t ctx)
               void fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e, const fmpz_mod_ctx_t ctx)
 
-    Set `a` to `b^e` modulo `n` where `e \ge 0`.
+    Set `a` to `b^e` modulo `n`.
+
+.. function:: int fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e, const fmpz_mod_ctx_t ctx)
+
+    Try to set `a` to `b^e` modulo `n`.
+    If `e < 0` and `b` is not invertible modulo `n`, the return is `0`. Otherwise, the return is `1`.
 
 
 Discrete Logarithms via Pohlig-Hellman

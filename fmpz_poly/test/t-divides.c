@@ -24,8 +24,6 @@ main(void)
     flint_printf("divides....");
     fflush(stdout);
 
-    
-
     /* Check that b divides a*b and that the quotient is a */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {

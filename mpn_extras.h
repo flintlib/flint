@@ -47,6 +47,19 @@
 
 #define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
+/*
+    return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.
+    Note: if GMP_NAIL_BITS != 0, the rest of flint is already broken anyways.
+*/
+#define MPN_LEFT_SHIFT_HI(hi, lo, n)                                \
+    ((n) > 0 ? (((hi) << (n)) | ((lo) >> (GMP_LIMB_BITS - (n))))    \
+             : (hi))
+
+#define MPN_RIGHT_SHIFT_LOW(hi, lo, n)                                \
+    ((n) > 0 ? (((lo) >> (n)) | ((hi) << (GMP_LIMB_BITS - (n))))    \
+             : (lo))
+
+
 /* Not defined in gmp.h
 mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
                                  mp_limb_t divisor);
@@ -100,6 +113,9 @@ FLINT_DLL int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize,
 
 FLINT_DLL int flint_mpn_factor_trial_tree(slong * factors,
                             mp_srcptr x, mp_size_t xsize, slong num_primes);
+
+FLINT_DLL mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1,
+                                      mp_limb_t a2, mp_srcptr x2, mp_size_t n);
 
 FLINT_DLL int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
          mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
@@ -163,6 +179,119 @@ void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
   str._mp_size = (n + FLINT_BITS - 1)/FLINT_BITS;
   mpz_rrandomb(&str,state,n);
 }
+
+
+/******************************************************************************
+    Divisions where the quotient is expected to be small. All function do:
+        input: n > d > 0
+        output: q = n/d, r = n%d
+    for various small sizes of n and d.
+    Not in a function because compiler refuses to inline eudiv_qrrnndd.
+    Each macro takes a prefix t for its local vars.
+******************************************************************************/
+
+#define eudiv_qrnd(q, r, n, d, t)           \
+do {                                        \
+    mp_limb_t t##q, t##a = n, t##b = d;     \
+                                            \
+    FLINT_ASSERT(t##a > t##b);              \
+    FLINT_ASSERT(t##b > 0);                 \
+                                            \
+    t##a -= t##b;                           \
+    for (t##q = 1; t##q < 5; t##q++)        \
+    {                                       \
+        if (t##a < t##b)                    \
+            goto t##quotient_found;         \
+        t##a -= t##b;                       \
+    }                                       \
+    t##q += t##a / t##b;                    \
+    t##a = t##a % t##b;                     \
+                                            \
+t##quotient_found:                          \
+                                            \
+    q = t##q;                               \
+    r = t##a;                               \
+} while (0)
+
+
+#define eudiv_qqrnnd(q1, q0, r0, n1, n0, d0, t)         \
+do {                                                    \
+    mp_limb_t t##a1 = n1, t##a0 = n0, t##b0 = d0;       \
+    mp_limb_t t##q1, t##q0, t##r0, t##u;                \
+                                                        \
+    FLINT_ASSERT(t##a1 > 0 || t##a0 > t##b0);           \
+                                                        \
+    udiv_qrnnd(t##q1, t##u, 0, t##a1, t##b0);           \
+    udiv_qrnnd(t##q0, t##r0, t##u, t##a0, t##b0);       \
+                                                        \
+    q1 = t##q1;                                         \
+    q0 = t##q0;                                         \
+    r0 = t##r0;                                         \
+} while (0)
+
+/* d must be normalized, i.e. d1 != 0 */
+#define eudiv_qrrnndd(q0, r1, r0, n1, n0, d1, d0, t)                        \
+do {                                                                        \
+    int t##i;                                                               \
+    mp_limb_t t##a1 = n1, t##a0 = n0, t##b1 = d1, t##b0 = d0;               \
+    mp_limb_t t##r1, t##r0, t##u2, t##u1, t##u0, t##q, t##v1, t##v0;        \
+                                                                            \
+    FLINT_ASSERT(t##a1 != 0);                                               \
+    FLINT_ASSERT(t##b1 != 0);                                               \
+    FLINT_ASSERT(t##b1 < t##a1 || (t##b1 == t##a1 && t##b0 < t##a0));       \
+                                                                            \
+    t##q = 1;                                                               \
+                                                                            \
+    sub_ddmmss(t##r1,t##r0, t##a1,t##a0, t##b1,t##b0);                      \
+                                                                            \
+t##subtract:                                                                \
+                                                                            \
+    for (t##i = 2; t##i <= 4; t##i++)                                       \
+    {                                                                       \
+        sub_dddmmmsss(t##u2,t##u1,t##u0, 0,t##r1,t##r0, 0,t##b1,t##b0);     \
+        if (t##u2 != 0)                                                     \
+            goto t##quotient_found;                                         \
+        t##q += 1;                                                          \
+        t##r0 = t##u0;                                                      \
+        t##r1 = t##u1;                                                      \
+    }                                                                       \
+                                                                            \
+    if (t##r1 != 0)                                                         \
+    {                                                                       \
+        int t##ncnt, t##dcnt;                                               \
+        mp_limb_t t##qq = 0;                                                \
+                                                                            \
+        count_leading_zeros(t##ncnt, t##r1);                                \
+        count_leading_zeros(t##dcnt, t##b1);                                \
+        t##dcnt -= t##ncnt;                                                 \
+        if (t##dcnt <= 0)                                                   \
+            goto t##subtract;                                               \
+                                                                            \
+        t##v1 = (t##b1 << t##dcnt) | (t##b0 >> (FLINT_BITS - t##dcnt));     \
+        t##v0 = t##b0 << t##dcnt;                                           \
+                                                                            \
+        do {                                                                \
+            sub_dddmmmsss(t##u2,t##u1,t##u0, 0,t##r1,t##r0, 0,t##v1,t##v0); \
+            t##qq = 2*t##qq + 1 + t##u2;                                    \
+            t##r1 = t##u2 ? t##r1 : t##u1;                                  \
+            t##r0 = t##u2 ? t##r0 : t##u0;                                  \
+            t##v0 = (t##v1 << (FLINT_BITS - 1)) | (t##v0 >> 1);             \
+            t##v1 = t##v1 >> 1;                                             \
+            t##dcnt--;                                                      \
+        } while (t##dcnt >= 0);                                             \
+                                                                            \
+        t##q += t##qq;                                                      \
+    }                                                                       \
+                                                                            \
+t##quotient_found:                                                          \
+                                                                            \
+    FLINT_ASSERT(t##r1 < t##b1 || (t##r1 == t##b1 && t##r0 < t##b0));       \
+                                                                            \
+    q0 = t##q;                                                              \
+    r0 = t##r0;                                                             \
+    r1 = t##r1;                                                             \
+} while (0)
+
 
 #ifdef __cplusplus
 }

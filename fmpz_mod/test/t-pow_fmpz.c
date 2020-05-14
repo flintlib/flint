@@ -52,14 +52,17 @@ main(void)
 
             fmpz_randtest_mod(a, state, p);
             fmpz_randtest_mod(b, state, p);
-            fmpz_randtest_unsigned(e, state, max_exp_bits);
-            fmpz_randtest_unsigned(f, state, max_exp_bits);
+            fmpz_randtest(e, state, max_exp_bits);
+            fmpz_randtest(f, state, max_exp_bits);
 
             /* check a^(e + f) =  a^e * a^f */
-            fmpz_mod_pow_fmpz(u, a, e, fpctx);
-            fmpz_mod_pow_fmpz(v, a, f, fpctx);
+            if (!fmpz_mod_pow_fmpz(u, a, e, fpctx))
+                goto skip1;
+            if (!fmpz_mod_pow_fmpz(v, a, f, fpctx))
+                goto skip1;
             fmpz_add(t, e, f);
-            fmpz_mod_pow_fmpz(w, a, t, fpctx);
+            if (!fmpz_mod_pow_fmpz(w, a, t, fpctx))
+                goto skip1;
             fmpz_mod_mul(x, u, v, fpctx);
             if (!fmpz_equal(w, x))
             {
@@ -68,12 +71,16 @@ main(void)
                                             "i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
+    skip1:
 
             /* check a^(e + f) =  a^e * a^f with aliasing */
-            fmpz_mod_pow_fmpz(u, a, e, fpctx);
-            fmpz_mod_pow_fmpz(v, a, f, fpctx);
+            if (!fmpz_mod_pow_fmpz(u, a, e, fpctx))
+                goto skip2;
+            if (!fmpz_mod_pow_fmpz(v, a, f, fpctx))
+                goto skip2;
             fmpz_add(t, e, f);
-            fmpz_mod_pow_fmpz(a, a, t, fpctx);
+            if (!fmpz_mod_pow_fmpz(a, a, t, fpctx))
+                goto skip2;
             fmpz_mod_mul(x, u, v, fpctx);
             if (!fmpz_equal(a, x))
             {
@@ -82,6 +89,7 @@ main(void)
                                             "i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
+    skip2:
 
             /* check 0^0 = 1 */
             fmpz_zero(a);
@@ -97,9 +105,12 @@ main(void)
 
             /* check (a*b)^e =  a^e * b^e with aliasing */
             fmpz_mod_mul(u, a, b, fpctx);
-            fmpz_mod_pow_fmpz(a, a, e, fpctx);
-            fmpz_mod_pow_fmpz(b, b, e, fpctx);
-            fmpz_mod_pow_fmpz(u, u, e, fpctx);
+            if (!fmpz_mod_pow_fmpz(a, a, e, fpctx))
+                goto skip3;
+            if (!fmpz_mod_pow_fmpz(b, b, e, fpctx))
+                goto skip3;
+            if (!fmpz_mod_pow_fmpz(u, u, e, fpctx))
+                goto skip3;
             fmpz_mod_mul(a, a, b, fpctx);
             if (!fmpz_equal(a, u))
             {
@@ -108,7 +119,8 @@ main(void)
                                             "i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
-
+    skip3:
+            (void)NULL;
         }
 
         fmpz_clear(p);

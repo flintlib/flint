@@ -16,6 +16,35 @@
 
 #define TRACE 0
 
+static void
+_fmpz_poly_product(fmpz_poly_t res, const fmpz_poly_factor_t lifted_fac, slong *sub_arr, slong len)
+{
+    if (len == 1)
+    {
+        fmpz_poly_set(res, lifted_fac->p + sub_arr[0]);
+    }
+    else if (len == 2)
+    {
+        fmpz_poly_mul(res, lifted_fac->p + sub_arr[0], lifted_fac->p + sub_arr[1]);
+    }
+    else if (len == 3)
+    {
+        fmpz_poly_mul(res, lifted_fac->p + sub_arr[0], lifted_fac->p + sub_arr[1]);
+        fmpz_poly_mul(res, res, lifted_fac->p + sub_arr[2]);
+    }
+    else
+    {
+        fmpz_poly_t t, u;
+        fmpz_poly_init(t);
+        fmpz_poly_init(u);
+        _fmpz_poly_product(t, lifted_fac, sub_arr, len / 2);
+        _fmpz_poly_product(u, lifted_fac, sub_arr + len / 2, len - len / 2);
+        fmpz_poly_mul(res, t, u);
+        fmpz_poly_clear(t);
+        fmpz_poly_clear(u);
+    }
+}
+
 void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
 	const fmpz_poly_factor_t lifted_fac, 
     const fmpz_poly_t F, const fmpz_t P, slong exp)
@@ -68,10 +97,10 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
              /* Need to involve leadF, perhaps set coeff 0 to leadF and do 
                 leadF * rest and check if under M_bits... here I'm using a 
                 trial division... */
-                fmpz_poly_set_fmpz(tryme, leadF);
 
-                for(l = 0; l < k; l++)
-                    fmpz_poly_mul(tryme, tryme, lifted_fac->p + (sub_arr[l]));
+
+                _fmpz_poly_product(tryme, lifted_fac, sub_arr, k);
+                fmpz_poly_scalar_mul_fmpz(tryme, tryme, leadF);
 
                 fmpz_poly_scalar_smod_fmpz(tryme, tryme, P);
                 fmpz_poly_primitive_part(tryme, tryme);

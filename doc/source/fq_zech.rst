@@ -339,6 +339,10 @@ Randomisation
     Generates a random element of `\mathbf{F}_q` which has an
     underlying polynomial with dense coefficients.
 
+.. function:: void fq_zech_rand(fq_zech_t rop, flint_rand_t state, const fq_zech_ctx_t ctx)
+
+    Generates a high quality random element of `\mathbf{F}_q`.
+
 
 Assignments and conversions
 --------------------------------------------------------------------------------

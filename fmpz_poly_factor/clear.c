@@ -26,11 +26,12 @@ void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
             fmpz_poly_clear(fac->p + i);
         }
 
-        fmpz_clear(&(fac->c));
         flint_free(fac->p);
         flint_free(fac->exp);
         fac->p   = NULL;
         fac->exp = NULL;
     }
+
+    fmpz_clear(&(fac->c));
 }
 

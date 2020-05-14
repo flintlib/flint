@@ -16,6 +16,14 @@ Properties
     Assumes that `b \geq 2`.
 
 
+Checked Arithmetic
+--------------------------------------------------------------------------------
+
+.. function:: int z_mul_checked(slong * a, slong b, slong c)
+
+    Set `*a` to `b` times `c` and return `1` if the product overflowed. Otherwise, return `0`.
+
+
 Random functions 
 --------------------------------------------------------------------------------
 

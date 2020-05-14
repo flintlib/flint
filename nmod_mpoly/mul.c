@@ -14,6 +14,7 @@
 static int _try_dense(int try_array, slong * Bdegs, slong * Cdegs,
                                            slong Blen, slong Clen, slong nvars)
 {
+    const int max_bit_size = FLINT_MIN(FLINT_BITS/3 + 16, FLINT_BITS - 3);
     slong i, product_count, dense_size;
     ulong hi;
 
@@ -29,7 +30,7 @@ static int _try_dense(int try_array, slong * Bdegs, slong * Cdegs,
             return 0;
     }
 
-    if (dense_size > WORD(5000000))
+    if (dense_size >= WORD(1) << max_bit_size)
         return 0;
 
     umul_ppmm(hi, product_count, Blen, Clen);
@@ -70,8 +71,8 @@ static int _try_array_LEX(slong * Bdegs, slong * Cdegs,
             return 0;
     }
 
-    return dense_size <= WORD(50000000)
-            && dense_size/Blen/Clen < WORD(10);
+    return dense_size <= WORD(50000000) &&
+           dense_size/Blen/Clen < WORD(10);
 }
 
 
@@ -101,17 +102,16 @@ static int _try_array_DEG(slong Btotaldeg, slong Ctotaldeg,
         dense_size /= i + 1;
     }
 
-    return dense_size <= WORD(5000000)
-            && dense_size/Blen/Clen < WORD(10);
+    return dense_size <= WORD(5000000) &&
+           dense_size/Blen/Clen < WORD(10);
 }
 
 
-void nmod_mpoly_mul_threaded(
+void nmod_mpoly_mul(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
     const nmod_mpoly_t C,
-    const nmod_mpoly_ctx_t ctx,
-    slong thread_limit)
+    const nmod_mpoly_ctx_t ctx)
 {
     slong i;
     slong nvars = ctx->minfo->nvars;
@@ -120,6 +120,8 @@ void nmod_mpoly_mul_threaded(
     fmpz * maxBfields, * maxCfields;
     thread_pool_handle * handles;
     slong num_handles;
+    slong min_length, max_length;
+    slong thread_limit;
     TMP_INIT;
 
     if (B->length == 0 || C->length == 0)
@@ -144,33 +146,18 @@ void nmod_mpoly_mul_threaded(
     mpoly_max_fields_fmpz(maxBfields, B->exps, B->length, B->bits, ctx->minfo);
     mpoly_max_fields_fmpz(maxCfields, C->exps, C->length, C->bits, ctx->minfo);
 
-    handles = NULL;
-    num_handles = 0;
-    if (global_thread_pool_initialized)
-    {
-        slong max_num_handles;
-        max_num_handles = thread_pool_get_size(global_thread_pool);
-        max_num_handles = FLINT_MIN(thread_limit - 1, max_num_handles);
-        if (max_num_handles > 0)
-        {
-            handles = (thread_pool_handle *) flint_malloc(
-                                   max_num_handles*sizeof(thread_pool_handle));
-            num_handles = thread_pool_request(global_thread_pool,
-                                                     handles, max_num_handles);
-        }
-    }
+    min_length = FLINT_MIN(B->length, C->length);
+    max_length = FLINT_MAX(B->length, C->length);
+    thread_limit = min_length/512;
 
     /*
         If one polynomial is tiny or if both polynomials are small,
         heap method with operational complexity O(B->length*C->length) is fine.
     */
-    if (   B->length < 20
-        || C->length < 20
-        || (B->length < 50 && C->length < 50)
-       )
+    if (min_length < 20 || max_length < 50)
     {
         _nmod_mpoly_mul_johnson_maxfields(A, B, maxBfields, C, maxCfields, ctx);
-        goto done;
+        goto cleanup;
     }
 
     /*
@@ -178,6 +165,7 @@ void nmod_mpoly_mul_threaded(
     */
     if (B->bits > FLINT_BITS || C->bits > FLINT_BITS)
     {
+        num_handles = flint_request_threads(&handles, thread_limit);
         goto do_heap;
     }
 
@@ -195,11 +183,10 @@ void nmod_mpoly_mul_threaded(
         If so, it should be about 4x faster than heap.
     */
     try_array = 0;
-    if (   nvars > WORD(1)
-        && nvars < WORD(8)
-        && 1 == mpoly_words_per_exp(B->bits, ctx->minfo)
-        && 1 == mpoly_words_per_exp(C->bits, ctx->minfo)
-       )
+    if (nvars > WORD(1) &&
+        nvars < WORD(8) &&
+        1 == mpoly_words_per_exp(B->bits, ctx->minfo) &&
+        1 == mpoly_words_per_exp(C->bits, ctx->minfo))
     {
         if (ctx->minfo->ord == ORD_LEX)
         {
@@ -219,9 +206,11 @@ void nmod_mpoly_mul_threaded(
         success = _nmod_mpoly_mul_dense(A, B, maxBfields, C, maxCfields, ctx);
         if (success)
         {
-            goto done;
+            goto cleanup;
         }
     }
+
+    num_handles = flint_request_threads(&handles, thread_limit);
 
     if (!try_array)
     {
@@ -231,7 +220,7 @@ void nmod_mpoly_mul_threaded(
     if (ctx->minfo->ord == ORD_LEX)
     {
         success = (num_handles > 0)
-                ? _nmod_mpoly_mul_array_threaded_LEX(
+                ? _nmod_mpoly_mul_array_threaded_pool_LEX(
                                     A, B, maxBfields, C, maxCfields, ctx,
                                                          handles, num_handles)
                 : _nmod_mpoly_mul_array_LEX(
@@ -240,7 +229,7 @@ void nmod_mpoly_mul_threaded(
     else if (ctx->minfo->ord == ORD_DEGLEX || ctx->minfo->ord == ORD_DEGREVLEX)
     {
         success = (num_handles > 0)
-                ? _nmod_mpoly_mul_array_threaded_DEG(
+                ? _nmod_mpoly_mul_array_threaded_pool_DEG(
                                     A, B, maxBfields, C, maxCfields, ctx,
                                                          handles, num_handles)
                 : _nmod_mpoly_mul_array_DEG(
@@ -249,14 +238,14 @@ void nmod_mpoly_mul_threaded(
 
     if (success)
     {
-        goto done;
+        goto cleanup_threads;
     }
 
 do_heap:
 
     if (num_handles > 0)
     {
-        _nmod_mpoly_mul_heap_threaded_maxfields(A,
+        _nmod_mpoly_mul_heap_threaded_pool_maxfields(A,
                       B, maxBfields, C, maxCfields, ctx, handles, num_handles);
     }
     else
@@ -264,16 +253,11 @@ do_heap:
         _nmod_mpoly_mul_johnson_maxfields(A, B, maxBfields, C, maxCfields, ctx);
     }
 
-done:
+cleanup_threads:
 
-    for (i = 0; i < num_handles; i++)
-    {
-        thread_pool_give_back(global_thread_pool, handles[i]);
-    }
-    if (handles)
-    {
-        flint_free(handles);
-    }
+    flint_give_back_threads(handles, num_handles);
+
+cleanup:
 
     for (i = 0; i < ctx->minfo->nfields; i++)
     {
@@ -284,12 +268,3 @@ done:
     TMP_END;
 }
 
-
-void nmod_mpoly_mul(
-    nmod_mpoly_t A,
-    const nmod_mpoly_t B,
-    const nmod_mpoly_t C,
-    const nmod_mpoly_ctx_t ctx)
-{
-    nmod_mpoly_mul_threaded(A, B, C, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
-}

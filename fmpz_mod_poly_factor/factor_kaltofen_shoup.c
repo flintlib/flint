@@ -54,8 +54,7 @@ fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
             ((sq_free->poly + i)->length > (1024*flint_get_num_threads())/4))
             fmpz_mod_poly_factor_distinct_deg_threaded(dist_deg,
                                                    sq_free->poly + i,
-                                                   &degs,
-                                                   FLINT_DEFAULT_THREAD_LIMIT);
+                                                   &degs);
         else
             fmpz_mod_poly_factor_distinct_deg(dist_deg, sq_free->poly + i,
                                               &degs);

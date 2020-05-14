@@ -179,7 +179,7 @@ slong _fq_nmod_mpoly_divrem_ideal_monagan_pearce(fq_nmod_mpoly_struct ** polyq,
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add(exp_list[exp_next], exp3[x->p] + x->i*N,
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[x->p] + x->i*N,
                                                 polyq[x->p]->exps + x->j*N, N);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);

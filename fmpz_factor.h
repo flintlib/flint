@@ -169,6 +169,10 @@ FLINT_DLL int fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2,
 FLINT_DLL int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1,
                         mp_limb_t B2, flint_rand_t state, const fmpz_t n_in);
 
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_factor_get_fmpz(fmpz_t z, const fmpz_factor_t factor, slong i);
+
 #ifdef __cplusplus
 }
 #endif

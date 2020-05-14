@@ -209,15 +209,15 @@ Matrix multiplication
     Set ``C`` to ``A\times B``. The number of rows of ``B`` must match the
     number of columns of ``A``.
 
-.. function:: void _fmpz_mod_mat_mul_classical_threaded_pool(fmpz_mod_mat_t D, const fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op, thread_pool_handle * threads, slong num_threads)
+.. function:: void _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op, thread_pool_handle * threads, slong num_threads)
 
     Set ``D`` to ``A\times B + op*C`` where ``op`` is ``+1``, ``-1`` or ``0``.
 
-.. function:: void _fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t D, const fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op, slong thread_limit)
+.. function:: void _fmpz_mod_mat_mul_classical_threaded_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op)
 
     Set ``D`` to ``A\times B + op*C`` where ``op`` is ``+1``, ``-1`` or ``0``.
 
-.. function:: void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, slong thread_limit)
+.. function:: void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B)
 
     Set ``C`` to ``A\times B``. The number of rows of ``B`` must match the
     number of columns of ``A``.

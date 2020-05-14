@@ -43,7 +43,7 @@ void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f,
 
       fmpz_mul(res + k, tf->coeffs + i + len_g - 1, cinv); 
 
-      fmpz_mods(res + k, res + k, p);
+      fmpz_smod(res + k, res + k, p);
 
       _fmpz_vec_scalar_submul_fmpz(tf->coeffs + i + start,
                                     g->coeffs + start, len_g - start, res + k);

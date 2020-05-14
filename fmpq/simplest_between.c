@@ -17,7 +17,7 @@ void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den,
                                         const fmpz_t r_num, const fmpz_t r_den)
 {
     fmpz_t q, r;
-    _fmpz_vector_t s;
+    _fmpq_cfrac_list_t s;
     _fmpz_mat22_t M;
     _fmpq_ball_t x;
 
@@ -28,7 +28,7 @@ void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den,
     fmpz_init(q);
     fmpz_init(r);
 
-    _fmpz_vector_init(s);
+    _fmpq_cfrac_list_init(s);
     s->length = -1; /* no write */
 
     _fmpz_mat22_init(M);
@@ -91,7 +91,7 @@ void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den,
 
     fmpz_clear(q);
     fmpz_clear(r);
-    _fmpz_vector_clear(s);
+    _fmpq_cfrac_list_clear(s);
     _fmpq_ball_clear(x);
     _fmpz_mat22_clear(M);
 

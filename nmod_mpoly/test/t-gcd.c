@@ -188,6 +188,8 @@ main(void)
 
         gcd_check(g, a, b, ctx, i, 0, "dense examples");
 
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
+
         nmod_mpoly_clear(a, ctx);
         nmod_mpoly_clear(b, ctx);
         nmod_mpoly_clear(g, ctx);

@@ -149,7 +149,7 @@ FLINT_DLL int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c,
 FLINT_DLL void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong pow,
                                                      const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL void fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t pow,
+FLINT_DLL int fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t pow,
                                                      const fmpz_mod_ctx_t ctx);
 
 /* discrete logs a la Pohlig - Hellman ***************************************/

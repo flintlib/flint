@@ -159,31 +159,19 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
 }
 
 void
-_fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res, const fmpz * f,
-                 slong flen, slong n, const fmpz * g, slong glen,
-            const fmpz * ginv, slong ginvlen, const fmpz_t p, slong thread_limit)
-{
-    thread_pool_handle * threads;
-    slong num_threads = flint_request_threads(&threads, thread_limit);
-
-   _fmpz_mod_poly_powers_mod_preinv_threaded_pool(res, f, flen, n,
-                             g, glen, ginv, ginvlen, p, threads, num_threads);
-
-    flint_give_back_threads(threads, num_threads);
-}
-
-void
-fmpz_mod_poly_powers_mod_bsgs_threaded(fmpz_mod_poly_struct * res, const fmpz_mod_poly_t f,
-               slong n, const fmpz_mod_poly_t g, slong thread_limit)
+fmpz_mod_poly_powers_mod_bsgs(fmpz_mod_poly_struct * res,
+		     const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g)
 {
     slong i;
 
     fmpz_mod_poly_t ginv;
     fmpz ** res_arr;
-    
+    thread_pool_handle * threads;
+    slong num_threads;
+
     if (fmpz_mod_poly_length(g) == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_powers_mod_naive). Divide by zero.\n");
+        flint_printf("Exception (fmpz_mod_poly_powers_mod_bsgs). Divide by zero.\n");
         flint_abort();
     }
 
@@ -227,8 +215,13 @@ fmpz_mod_poly_powers_mod_bsgs_threaded(fmpz_mod_poly_struct * res, const fmpz_mo
     fmpz_mod_poly_reverse(ginv, g, fmpz_mod_poly_length(g));
     fmpz_mod_poly_inv_series(ginv, ginv, fmpz_mod_poly_length(g));
 
-    _fmpz_mod_poly_powers_mod_preinv_threaded(res_arr, f->coeffs, f->length, n,
-       g->coeffs, g->length, ginv->coeffs, ginv->length, &g->p, thread_limit);
+    num_threads = flint_request_threads(&threads, flint_get_num_threads());
+
+    _fmpz_mod_poly_powers_mod_preinv_threaded_pool(res_arr, f->coeffs,
+		       f->length, n, g->coeffs, g->length, ginv->coeffs,
+		                    ginv->length, &g->p, threads, num_threads);
+
+    flint_give_back_threads(threads, num_threads);
 
     for (i = 0; i < n; i++)
        _fmpz_mod_poly_normalise(res + i);

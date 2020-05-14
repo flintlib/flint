@@ -138,12 +138,11 @@
     reading all the relations, removes singleton. Then merge all the possible partial
     to obtain full relations.
 
-.. function:: void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n, slong thread_limit)
+.. function:: void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
     Factor `n` using the quadratic sieve method. It is required that `n` is not a
     prime and not a perfect power. There is no guarantee that the factors found will
-    be prime, or distinct. ``thread_limit`` is an upper limit on the number of
-    threads to use.
+    be prime, or distinct.
 
 
  

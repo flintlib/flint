@@ -499,13 +499,8 @@ FLINT_DLL void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res,
                           const fmpz * ginv, slong ginvlen, const fmpz_t p,
 	                      thread_pool_handle * threads, slong num_threads);
 
-FLINT_DLL void _fmpz_mod_poly_powers_mod_preinv_threaded(fmpz ** res,
-          const fmpz * f, slong flen, slong n, const fmpz * g, slong glen,
-         const fmpz * ginv, slong ginvlen, const fmpz_t p, slong thread_limit);
- 
-FLINT_DLL void fmpz_mod_poly_powers_mod_bsgs_threaded(fmpz_mod_poly_struct * res,
-                            const fmpz_mod_poly_t f, slong n,
-                                  const fmpz_mod_poly_t g, slong thread_limit);
+FLINT_DLL void fmpz_mod_poly_powers_mod_bsgs(fmpz_mod_poly_struct * res,
+                    const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g);
 
 FLINT_DLL void fmpz_mod_poly_frobenius_powers_2exp_precomp(fmpz_mod_poly_frobenius_powers_2exp_t pow, 
                  const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m);
@@ -1114,7 +1109,7 @@ FLINT_DLL void
 fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res,
                     const fmpz_mod_poly_struct * polys, slong len1, slong n,
                     const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly,
-                            const fmpz_mod_poly_t polyinv, slong thread_limit);
+                                                const fmpz_mod_poly_t polyinv);
  
 /*  Radix conversion *********************************************************/
 
@@ -1190,6 +1185,11 @@ FLINT_DLL void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz
 FLINT_DLL int fmpz_mod_poly_find_distinct_nonzero_roots(fmpz * roots,
                                                       const fmpz_mod_poly_t P);
 
+FLINT_DLL void _fmpz_mod_poly_split_rabin(fmpz_mod_poly_t a, fmpz_mod_poly_t b,
+                                   const fmpz_mod_poly_t f, const fmpz_t halfp,
+                fmpz_mod_poly_t t, fmpz_mod_poly_t t2, flint_rand_t randstate);
+
+
 /* Berlekamp-Massey Algorithm - see fmpz_mod_poly/berlekamp_massey.c for more info ********/
 typedef struct {
     slong npoints;
@@ -1264,6 +1264,15 @@ FMPZ_MOD_POLY_INLINE const fmpz_mod_poly_struct * fmpz_mod_berlekamp_massey_R_po
 {
     return B->R1;
 }
+
+/* Inlines *******************************************************************/
+
+FLINT_DLL void fmpz_mod_poly_add_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong c);
+FLINT_DLL void fmpz_mod_poly_sub_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong c);
+FLINT_DLL void fmpz_mod_poly_si_sub(fmpz_mod_poly_t res, slong c, const fmpz_mod_poly_t poly);
+FLINT_DLL void fmpz_mod_poly_add_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, fmpz_t c);
+FLINT_DLL void fmpz_mod_poly_sub_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, fmpz_t c);
+FLINT_DLL void fmpz_mod_poly_fmpz_sub(fmpz_mod_poly_t res, fmpz_t c, const fmpz_mod_poly_t poly);
 
 #ifdef __cplusplus
 }

@@ -282,21 +282,94 @@ FLINT_DEFINE_DOIT_COND2(assignment, FMPQXX_COND_T, traits::fits_into_slong,
 // TODO mpq, mpfr?
 
 FLINTXX_DEFINE_TO_STR(fmpqxx, fmpq_get_str(0,  base, from._fmpq()))
+
 FLINTXX_DEFINE_CMP(fmpqxx, fmpq_cmp(e1._fmpq(), e2._fmpq()))
+
+template<class T, class U>
+struct cmp<T, U,
+    typename mp::enable_if<mp::and_<
+        FMPQXX_COND_S<T>, FMPZXX_COND_S<U> > >::type>
+{
+    static int get(const T& v, const U& t)
+    {
+        return fmpq_cmp_fmpz(v._fmpq(), t._fmpz());
+    }
+};
+
+template<class T, class U>
+struct cmp<T, U,
+    typename mp::enable_if<mp::and_<
+        FMPQXX_COND_S<T>, traits::is_unsigned_integer<U> > >::type>
+{
+    static int get(const T& v, const U& t)
+    {
+        return fmpq_cmp_ui(v._fmpq(), t);
+    }
+};
+
+template<class T, class U>
+struct cmp<T, U,
+    typename mp::enable_if<mp::and_<
+        FMPQXX_COND_S<T>, traits::is_signed_integer<U> > >::type>
+{
+    static int get(const T& v, const U& t)
+    {
+        return fmpq_cmp_si(v._fmpq(), t);
+    }
+};
+
 FLINTXX_DEFINE_SWAP(fmpqxx, fmpq_swap(e1._fmpq(), e2._fmpq()))
 
 FLINT_DEFINE_PRINT_COND(FMPQXX_COND_S, (fmpq_fprint(to, from._fmpq()), 1))
 
+FLINT_DEFINE_GET_COND(conversion, double, FMPQXX_COND_S,
+        fmpq_get_d(from._fmpq()))
+
 FLINT_DEFINE_CBINARY_EXPR_COND2(plus, fmpqxx, FMPQXX_COND_S, FMPQXX_COND_S,
         fmpq_add(to._fmpq(), e1._fmpq(), e2._fmpq()))
-FLINT_DEFINE_CBINARY_EXPR_COND2(minus, fmpqxx, FMPQXX_COND_S, FMPQXX_COND_S,
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(plus, fmpqxx, FMPQXX_COND_S, FMPZXX_COND_S,
+        fmpq_add_fmpz(to._fmpq(), e1._fmpq(), e2._fmpz()))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(plus, fmpqxx,
+        FMPQXX_COND_S, traits::is_unsigned_integer,
+        fmpq_add_ui(to._fmpq(), e1._fmpq(), e2))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(plus, fmpqxx,
+        FMPQXX_COND_S, traits::is_signed_integer,
+        fmpq_add_si(to._fmpq(), e1._fmpq(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(minus, fmpqxx, FMPQXX_COND_S, FMPQXX_COND_S,
         fmpq_sub(to._fmpq(), e1._fmpq(), e2._fmpq()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(minus, fmpqxx, FMPQXX_COND_S, FMPZXX_COND_S,
+        fmpq_sub_fmpz(to._fmpq(), e1._fmpq(), e2._fmpz()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(minus, fmpqxx,
+        FMPQXX_COND_S, traits::is_unsigned_integer,
+        fmpq_sub_ui(to._fmpq(), e1._fmpq(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(minus, fmpqxx,
+        FMPQXX_COND_S, traits::is_signed_integer,
+        fmpq_sub_si(to._fmpq(), e1._fmpq(), e2))
+
 FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpqxx, FMPQXX_COND_S, FMPQXX_COND_S,
         fmpq_mul(to._fmpq(), e1._fmpq(), e2._fmpq()))
-FLINT_DEFINE_CBINARY_EXPR_COND2(divided_by, fmpqxx, FMPQXX_COND_S,
-        FMPQXX_COND_S, fmpq_div(to._fmpq(), e1._fmpq(), e2._fmpq()))
+
 FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpqxx, FMPQXX_COND_S, FMPZXX_COND_S,
         fmpq_mul_fmpz(to._fmpq(), e1._fmpq(), e2._fmpz()))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpqxx,
+        FMPQXX_COND_S, traits::is_unsigned_integer,
+        fmpq_mul_ui(to._fmpq(), e1._fmpq(), e2))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpqxx,
+        FMPQXX_COND_S, traits::is_signed_integer,
+        fmpq_mul_si(to._fmpq(), e1._fmpq(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, fmpqxx, FMPQXX_COND_S,
+        FMPQXX_COND_S, fmpq_div(to._fmpq(), e1._fmpq(), e2._fmpq()))
+
 FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, fmpqxx, FMPQXX_COND_S, FMPZXX_COND_S,
         fmpq_div_fmpz(to._fmpq(), e1._fmpq(), e2._fmpz()))
 

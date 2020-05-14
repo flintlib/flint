@@ -46,6 +46,7 @@ main(void)
         TEMPLATE(T, init) (x, ctx);
 
         TEMPLATE(T, poly_randtest) (a, state, len, ctx);
+        TEMPLATE(T, randtest(x, state, ctx));
 
         TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (b, a, x, ctx);
         TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (a, a, x, ctx);

@@ -12,13 +12,12 @@
 #include "fmpq_mpoly.h"
 
 
-int fmpq_mpoly_gcd_threaded(fmpq_mpoly_t G, const fmpq_mpoly_t A,
-         const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx, slong thread_limit)
+int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A, const fmpq_mpoly_t B,
+                                                    const fmpq_mpoly_ctx_t ctx)
 {
     int success;
 
-    success = fmpz_mpoly_gcd_threaded(G->zpoly, A->zpoly, B->zpoly,
-                                                      ctx->zctx, thread_limit);
+    success = fmpz_mpoly_gcd(G->zpoly, A->zpoly, B->zpoly, ctx->zctx);
     if (!success)
         return 0;
 
@@ -35,8 +34,3 @@ int fmpq_mpoly_gcd_threaded(fmpq_mpoly_t G, const fmpq_mpoly_t A,
     return 1;
 }
 
-int fmpq_mpoly_gcd(fmpq_mpoly_t G, const fmpq_mpoly_t A,
-                              const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
-{
-    return fmpq_mpoly_gcd_threaded(G, A, B, ctx, MPOLY_DEFAULT_THREAD_LIMIT);
-}

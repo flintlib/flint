@@ -57,7 +57,7 @@ main(void)
         fmpz_mod_mat_randtest(B, state);
         fmpz_mod_mat_randtest(C, state);  /* make sure noise in the output is ok */
 
-        fmpz_mod_mat_mul_classical_threaded(C, A, B, FLINT_DEFAULT_THREAD_LIMIT);
+        fmpz_mod_mat_mul_classical_threaded(C, A, B);
         fmpz_mod_mat_mul(D, A, B);
 
         if (!fmpz_mod_mat_equal(C, D))

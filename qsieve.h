@@ -310,8 +310,7 @@ FLINT_DLL mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
 
 FLINT_DLL void qsieve_clear(qs_t qs_inf);
 
-FLINT_DLL void qsieve_factor_threaded(fmpz_factor_t factors, const fmpz_t n,
-                                                           slong thread_limit);
+FLINT_DLL void qsieve_factor(fmpz_factor_t factors, const fmpz_t n);
 
 FLINT_DLL prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
                                                              slong num_primes);

@@ -35,7 +35,7 @@ int main(void)
         q = n_randprime(state, len, 1);
         g = n_primitive_root_prime(q);
         p = q - 2;
-        table = f_table(q);
+        table = aprcl_f_table(q);
 
         for (j = 1; j <= p; j++)
         {

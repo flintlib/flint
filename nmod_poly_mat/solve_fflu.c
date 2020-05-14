@@ -34,8 +34,16 @@ nmod_poly_mat_solve_fflu(nmod_poly_mat_t X, nmod_poly_t den,
     result = (nmod_poly_mat_fflu(LU, den, perm, LU, 1) == dim);
 
     if (result)
+    {
         nmod_poly_mat_solve_fflu_precomp(X, perm, LU, B);
-    else
+
+        if (_perm_parity(perm, dim))
+        {
+            nmod_poly_neg(den, den);
+
+	    nmod_poly_mat_neg(X, X);
+        }
+    } else
         nmod_poly_zero(den);
 
     _perm_clear(perm);

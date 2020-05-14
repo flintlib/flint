@@ -140,7 +140,12 @@ test_arithmetic()
     TA(fmpzxx(7), 3u);
     TAC(UWORD(7), fmpzxx(3));
 
-    // test signed builtins (only div and mul)
+    // test signed builtins
+    tassert(-7 + fmpzxx(3) == -fmpzxx(4));
+    tassert(fmpzxx(3) + 7 == fmpzxx(10));
+    tassert(7 + fmpzxx(3) == fmpzxx(10));
+    tassert(fmpzxx(3) + (-7) == -fmpzxx(4));
+    tassert(fmpzxx(3) - 7 == -4);
     tassert(-7 * fmpzxx(3) == -21);
     tassert(fmpzxx(7) * (WORD(-3)) == -21);
     tassert(fmpzxx(21) / -3 == -7);

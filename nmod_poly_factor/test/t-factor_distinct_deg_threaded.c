@@ -93,7 +93,7 @@ main(void)
         degs = (slong *) flint_malloc((poly1->length - 1) * sizeof(slong));
 	
         nmod_poly_factor_init(res);
-        nmod_poly_factor_distinct_deg_threaded(res, poly1, &degs, FLINT_DEFAULT_THREAD_LIMIT);
+        nmod_poly_factor_distinct_deg_threaded(res, poly1, &degs);
 
         nmod_poly_init_preinv(product, poly1->mod.n, poly1->mod.ninv);
         nmod_poly_set_coeff_ui(product, 0, 1);
