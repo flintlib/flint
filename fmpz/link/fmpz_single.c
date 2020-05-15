@@ -17,6 +17,10 @@
 #include <windows.h> /* GetSytemInfo */
 #endif
 
+#if defined(_MSC_VER) && HAVE_PTHREAD
+#include <atomic.h>
+#endif
+
 #include <stdlib.h>
 
 #include <gmp.h>
@@ -137,7 +141,14 @@ void _fmpz_clear_mpz(fmpz f)
     {
         mpz_clear(ptr);
 
-        if (++header_ptr->count == flint_mpz_structs_per_block)
+#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && HAVE_PTHREAD
+       __atomic_fetch_add(&(ptr->count), 1, __ATOMIC_SEQ_CST);
+#elif defined(_MSC_VER) && HAVE_PTHREAD
+       atomic_fetch_add(&(ptr->count), 1);
+#else
+       header_ptr->count++;
+#endif
+        if (header_ptr->count == flint_mpz_structs_per_block)
             flint_free(header_ptr);
     } else
     {
@@ -169,7 +180,14 @@ void _fmpz_cleanup_mpz_content(void)
 
        ptr = (fmpz_block_header_s *) ptr->address;
 
-       if (++ptr->count == flint_mpz_structs_per_block)
+#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && HAVE_PTHREAD
+       __atomic_fetch_add(&(ptr->count), 1, __ATOMIC_SEQ_CST);
+#elif defined(_MSC_VER) && HAVE_PTHREAD
+       atomic_fetch_add(&(ptr->count), 1);
+#else /* may be a very small leak with pthreads */
+       ptr->count++;
+#endif
+       if (ptr->count == flint_mpz_structs_per_block)
           flint_free(ptr);
     }
 
