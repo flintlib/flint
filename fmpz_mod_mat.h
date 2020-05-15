@@ -215,10 +215,6 @@ FLINT_DLL void _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D,
       const fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B,
                       int op, thread_pool_handle * threads, slong num_threads);
 
-FLINT_DLL void _fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t D,
-      const fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B,
-                                                    int op, slong thread_limit);
-
 FLINT_DLL void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C,
                                const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 

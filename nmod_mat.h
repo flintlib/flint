@@ -177,10 +177,6 @@ _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
 		            const nmod_mat_t A, const nmod_mat_t B, int op,
 			      thread_pool_handle * threads, slong num_threads);
 
-FLINT_DLL void _nmod_mat_mul_classical_threaded(nmod_mat_t D, const nmod_mat_t C,
-                     const nmod_mat_t A, const nmod_mat_t B, int op,
-                                                slong thread_limit);
-
 FLINT_DLL void nmod_mat_mul_classical_threaded(nmod_mat_t C,
 		                       const nmod_mat_t A, const nmod_mat_t B);
 FLINT_DLL void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
