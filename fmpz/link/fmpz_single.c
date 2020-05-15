@@ -142,9 +142,9 @@ void _fmpz_clear_mpz(fmpz f)
         mpz_clear(ptr);
 
 #if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && HAVE_PTHREAD
-       __atomic_fetch_add(&(ptr->count), 1, __ATOMIC_SEQ_CST);
+       __atomic_fetch_add(&(header_ptr->count), 1, __ATOMIC_SEQ_CST);
 #elif defined(_MSC_VER) && HAVE_PTHREAD
-       atomic_fetch_add(&(ptr->count), 1);
+       atomic_fetch_add(&(header_ptr->count), 1);
 #else
        header_ptr->count++;
 #endif
