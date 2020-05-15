@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly.h"
 
 int
 main(void)
@@ -19,57 +19,56 @@ main(void)
     slong i, j, k;
     FLINT_TEST_INIT(state);
 
-    flint_printf("push_term_fmpz_ui....");
+    flint_printf("push_term_ui_ui....");
     fflush(stdout);
 
-    /* Check pushback matches add */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f1, f2, m;
-        flint_bitcnt_t coeff_bits, exp_bits;
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t f1, f2, m;
+        flint_bitcnt_t exp_bits;
         ulong * exp, * exp2;
         slong len, nvars;
-        fmpz_t c, c2;
+        mp_limb_t c, c2;
+        mp_limb_t modulus;
 
-        fmpz_mpoly_ctx_init_rand(ctx, state, 10);
-        fmpz_mpoly_init(f1, ctx);
-        fmpz_mpoly_init(f2, ctx);
-        fmpz_mpoly_init(m, ctx);
-        fmpz_init(c);
-        fmpz_init(c2);
+        modulus = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
+        nmod_mpoly_ctx_init_rand(ctx, state, 10, modulus);
 
-        nvars = fmpz_mpoly_ctx_nvars(ctx);
+        nmod_mpoly_init(f1, ctx);
+        nmod_mpoly_init(f2, ctx);
+        nmod_mpoly_init(m, ctx);
+
+        nvars = nmod_mpoly_ctx_nvars(ctx);
 
         exp = (ulong *) flint_malloc(nvars*sizeof(ulong));
         exp2 = (ulong *) flint_malloc(nvars*sizeof(ulong));
 
         len = n_randint(state, 20);
-        coeff_bits = n_randint(state, 100) + 1;
-        exp_bits = n_randint(state, FLINT_BITS + 1);
+        exp_bits = n_randint(state, FLINT_BITS) + 1;
 
-        fmpz_mpoly_zero(f1, ctx);
-        fmpz_mpoly_zero(f2, ctx);
+        nmod_mpoly_zero(f1, ctx);
+        nmod_mpoly_zero(f2, ctx);
 
         for (j = 0; j < len; j++)
         {
             /* get random term */
-            fmpz_randtest(c, state, coeff_bits);
+            c = n_randlimb(state);
             for (k = 0; k < nvars; k++)
                 exp[k] = n_randtest_bits(state, n_randint(state, exp_bits) + 1);
 
             /* add it to f1 */
-            fmpz_mpoly_zero(m, ctx);
-            fmpz_mpoly_set_coeff_fmpz_ui(m, c, exp, ctx);
-            fmpz_mpoly_add(f1, f1, m, ctx);
+            nmod_mpoly_zero(m, ctx);
+            nmod_mpoly_set_coeff_ui_ui(m, c, exp, ctx);
+            nmod_mpoly_add(f1, f1, m, ctx);
 
             /* push it back on f2 */
-            fmpz_mpoly_push_term_fmpz_ui(f2, c, exp, ctx);
+            nmod_mpoly_push_term_ui_ui(f2, c, exp, ctx);
 
             /* make sure last term matches */
-            fmpz_mpoly_get_term_coeff_fmpz(c2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
-            fmpz_mpoly_get_term_exp_ui(exp2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
-            if (!fmpz_equal(c, c2))
+            c2 = nmod_mpoly_get_term_coeff_ui(f2, nmod_mpoly_length(f2, ctx) - 1, ctx);
+            nmod_mpoly_get_term_exp_ui(exp2, f2, nmod_mpoly_length(f2, ctx) - 1, ctx);
+            if ((c % modulus) != c2)
             {
                 printf("FAIL\n");
                 flint_printf("Check pushed coefficient matches\ni=%wd, j=%wd\n", i, j);
@@ -81,35 +80,33 @@ main(void)
                 {
                     printf("FAIL\n");
                     flint_printf("Check pushed exponent matches\ni=%wd, j=%wd\n", i, j);
-                    flint_abort();                    
+                    flint_abort();
                 }
             }
         }
 
-        fmpz_mpoly_sort_terms(f2, ctx);
-        fmpz_mpoly_combine_like_terms(f2, ctx);
-        fmpz_mpoly_assert_canonical(f2, ctx);
+        nmod_mpoly_sort_terms(f2, ctx);
+        nmod_mpoly_combine_like_terms(f2, ctx);
+        nmod_mpoly_assert_canonical(f2, ctx);
 
-        if (!fmpz_mpoly_equal(f1, f2, ctx))
+        if (!nmod_mpoly_equal(f1, f2, ctx))
         {
             printf("FAIL\n");
             flint_printf("Check pushback matches add\ni=%wd\n",i);
             flint_abort();
         }
 
-        fmpz_clear(c2);
-        fmpz_clear(c);
-        fmpz_mpoly_clear(f1, ctx);
-        fmpz_mpoly_clear(f2, ctx);
-        fmpz_mpoly_clear(m, ctx);
-        fmpz_mpoly_ctx_clear(ctx);
+        nmod_mpoly_clear(f1, ctx);
+        nmod_mpoly_clear(f2, ctx);
+        nmod_mpoly_clear(m, ctx);
+        nmod_mpoly_ctx_clear(ctx);
 
         flint_free(exp2);
         flint_free(exp);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }
