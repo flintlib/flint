@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -19,37 +19,37 @@ main(void)
     slong i, j, k;
     FLINT_TEST_INIT(state);
 
-    flint_printf("push_term_fmpz_ui....");
+    flint_printf("resize....");
     fflush(stdout);
 
-    /* Check pushback matches add */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f1, f2, m;
+        fmpz_mpoly_t f1, f2, f3, m;
         flint_bitcnt_t coeff_bits, exp_bits;
         ulong * exp, * exp2;
         slong len, nvars;
-        fmpz_t c, c2;
+        fmpz_t c;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
         fmpz_mpoly_init(f1, ctx);
         fmpz_mpoly_init(f2, ctx);
+        fmpz_mpoly_init(f3, ctx);
         fmpz_mpoly_init(m, ctx);
         fmpz_init(c);
-        fmpz_init(c2);
 
         nvars = fmpz_mpoly_ctx_nvars(ctx);
 
         exp = (ulong *) flint_malloc(nvars*sizeof(ulong));
         exp2 = (ulong *) flint_malloc(nvars*sizeof(ulong));
 
-        len = n_randint(state, 20);
+        len = n_randint(state, 200);
         coeff_bits = n_randint(state, 100) + 1;
-        exp_bits = n_randint(state, FLINT_BITS + 1);
+        exp_bits = n_randint(state, FLINT_BITS) + 1;
 
         fmpz_mpoly_zero(f1, ctx);
         fmpz_mpoly_zero(f2, ctx);
+        fmpz_mpoly_zero(f3, ctx);
 
         for (j = 0; j < len; j++)
         {
@@ -66,29 +66,19 @@ main(void)
             /* push it back on f2 */
             fmpz_mpoly_push_term_fmpz_ui(f2, c, exp, ctx);
 
-            /* make sure last term matches */
-            fmpz_mpoly_get_term_coeff_fmpz(c2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
-            fmpz_mpoly_get_term_exp_ui(exp2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
-            if (!fmpz_equal(c, c2))
-            {
-                printf("FAIL\n");
-                flint_printf("Check pushed coefficient matches\ni=%wd, j=%wd\n", i, j);
-                flint_abort();
-            }
-            for (k = 0; k < nvars; k++)
-            {
-                if (exp[k] != exp2[k])
-                {
-                    printf("FAIL\n");
-                    flint_printf("Check pushed exponent matches\ni=%wd, j=%wd\n", i, j);
-                    flint_abort();                    
-                }
-            }
+            /* manually push it on f3 */
+            fmpz_mpoly_resize(f3, j + 1 + n_randint(state, 10), ctx);
+            fmpz_mpoly_set_term_coeff_fmpz(f3, j, c, ctx);
+            fmpz_mpoly_set_term_exp_ui(f3, j, exp, ctx);
         }
 
         fmpz_mpoly_sort_terms(f2, ctx);
         fmpz_mpoly_combine_like_terms(f2, ctx);
         fmpz_mpoly_assert_canonical(f2, ctx);
+
+        fmpz_mpoly_sort_terms(f3, ctx);
+        fmpz_mpoly_combine_like_terms(f3, ctx);
+        fmpz_mpoly_assert_canonical(f3, ctx);
 
         if (!fmpz_mpoly_equal(f1, f2, ctx))
         {
@@ -97,10 +87,17 @@ main(void)
             flint_abort();
         }
 
-        fmpz_clear(c2);
+        if (!fmpz_mpoly_equal(f1, f3, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check resize+setterm matches add\ni=%wd\n",i);
+            flint_abort();
+        }
+
         fmpz_clear(c);
         fmpz_mpoly_clear(f1, ctx);
         fmpz_mpoly_clear(f2, ctx);
+        fmpz_mpoly_clear(f3, ctx);
         fmpz_mpoly_clear(m, ctx);
         fmpz_mpoly_ctx_clear(ctx);
 
@@ -109,7 +106,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }
