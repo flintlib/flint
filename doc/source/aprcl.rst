@@ -174,15 +174,13 @@ Coefficient management
 ................................................................................
 
 .. function:: void unity_zp_coeff_set_fmpz(unity_zp f, ulong ind, const fmpz_t x)
-
-.. function:: void unity_zp_coeff_set_ui(unity_zp f, ulong ind, ulong x)
+              void unity_zp_coeff_set_ui(unity_zp f, ulong ind, ulong x)
 
     Sets the coefficient of `\zeta^{ind}` to `x`.
     `ind` must be less than `p^{exp}`.
 
 .. function:: void unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x)
-
-.. function:: void unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x)
+              void unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x)
 
     Adds `x` to the coefficient of `\zeta^{ind}`.
     `x` must be less than `n`.
@@ -229,7 +227,7 @@ Addition and multiplication
     Sets `f` to `g \cdot g`.
     `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
 
-.. function:: void untiy_zp_mul_inplace(unity_zp f, const unity_zp g, const untiy_zp h, fmpz_t * t)
+.. function:: void unity_zp_mul_inplace(unity_zp f, const unity_zp g, const untiy_zp h, fmpz_t * t)
 
     Sets `f` to `g \cdot h`. If `p^{exp} = 3, 4, 5, 7, 8, 9, 11, 16` special
     multiplication functions are used. The preallocated array `t` of ``fmpz_t`` is
@@ -281,8 +279,7 @@ Cyclotomic reduction
 ................................................................................
 
 .. function:: void _unity_zp_reduce_cyclotomic_divmod(unity_zp f)
-
-.. function:: void _unity_zp_reduce_cyclotomic(unity_zp f)
+              void _unity_zp_reduce_cyclotomic(unity_zp f)
 
     Sets `f = f \bmod \Phi_{p^{exp}}`. `\Phi_{p^{exp}}` is the `p^{exp}`-th
     cyclotomic polynomial. `g` must be reduced by `x^{p^{exp}}-1` poly.

@@ -72,6 +72,7 @@ Comparison of elements against each other or against zero can be accomplished wi
     If `a*c = b \mod n` has a solution for `a` return `1` and set `a` to such a solution. Otherwise return `0` and leave `a` undefined.
 
 .. function:: void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong e, const fmpz_mod_ctx_t ctx)
+              void fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e, const fmpz_mod_ctx_t ctx)
 
     Set `a` to `b^e` modulo `n`.
 

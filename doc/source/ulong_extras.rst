@@ -976,7 +976,7 @@ Square root and perfect power testing
     This function returns the integer truncation of the cube root of `n`.
     Uses binary search to get the correct value.
 
-.. function:: ulong n_cbrt_chebyshef_approx(ulong n)
+.. function:: ulong n_cbrt_chebyshev_approx(ulong n)
     
     This function returns the integer truncation of the cube root of `n`.
     The number is first expressed in the form ``x * 2^exp``. This ensures
@@ -1349,7 +1349,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 --------------------------------------------------------------------------------
 
 
-.. function:: void n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf);
+.. function:: void n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf)
 
     Sets the point `(x : z)` to two times `(x_0 : z_0)` modulo `n` according
     to the formula
@@ -1362,7 +1362,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
     Montgomery projective coordinates.
 
 .. function:: void n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1, mp_limb_t x2, mp_limb_t z2, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf)
- fs
+              
     Sets the point `(x : z)` to the sum of `(x_1 : z_1)` and `(x_2 : z_2)`
     modulo `n`, given the difference `(x_0 : z_0)` according to the formula
 

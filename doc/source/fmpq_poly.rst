@@ -377,12 +377,12 @@ Comparison
     Returns `1` if ``poly1`` is equal to ``poly2``, 
     otherwise returns~`0`.
 
-.. function:: int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n);
+.. function:: int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 
     Return `1` if ``poly1`` and ``poly2`` notionally truncated to length
     `n` are equal, otherwise returns~`0`.
 
-.. function:: int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
+.. function:: int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
     Return `1` if ``poly1`` and ``poly2`` notionally truncated to length
     `n` are equal, otherwise returns~`0`.
@@ -454,7 +454,7 @@ Addition and subtraction
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
 
-.. function:: void _fmpq_poly_series_add(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
+.. function:: void _fmpq_poly_add_series(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den fs1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 
     As per ``_fmpq_poly_add`` but the inputs are first notionally truncated
     to length `n`. If `n` is less than ``len1`` or ``len2`` then the
@@ -807,6 +807,7 @@ Powering
     the remainder routine below.
 
 .. function:: void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, fmpq_poly_t poly)
+
     Computes ``2*len - 1`` powers of $x$ modulo the polynomial $B$ of the given length. This is used as a kind of precomputed inverse in the remainder routine below.
 
 .. function:: void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)
@@ -1416,7 +1417,7 @@ Composition
     in lowest terms.  Supports aliasing between ``(res, denr, len)`` and 
     ``(poly, den, len)``.
 
-.. function:: void fmpz_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t a)
+.. function:: void fmpq_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t a)
 
     Sets ``res`` to ``poly`` with the indeterminate rescaled by `a`.
 
@@ -1680,8 +1681,7 @@ Input and output
     returns a non-positive value.
 
 .. function:: int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, slong len, const char * x)
-
-.. function:: int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+              int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of ``poly`` to ``stdout``, using 
     the null-terminated string ``var`` not equal to ``"\0"`` as the 
@@ -1704,8 +1704,7 @@ Input and output
     returns a non-positive value.
 
 .. function:: int _fmpq_poly_fprint_pretty(FILE * file, const fmpz *poly, const fmpz_t den, slong len, const char * x)
-
-.. function:: int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+              int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of ``poly`` to ``stdout``, using 
     the null-terminated string ``var`` not equal to ``"\0"`` as the 

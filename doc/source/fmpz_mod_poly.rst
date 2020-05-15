@@ -691,7 +691,7 @@ Powering
 
     Requires precomputed inverse of `f`, i.e. newton inverse.
 
-.. function:: void fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow);
+.. function:: void fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow)
 
     Clear resources used by the ``fmpz_mod_poly_frobenius_powers_t``
     struct.
@@ -1469,7 +1469,9 @@ Resultant
 
     Asumes that the modulus is prime.
 
-.. function:: void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g) Computes the resultant of $f$ and $g$.
+.. function:: void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
+
+    Computes the resultant of $f$ and $g$.
 
     For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
     `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant

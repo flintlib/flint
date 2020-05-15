@@ -992,6 +992,9 @@ FLINT_DLL double _fmpz_poly_evaluate_horner_d_2exp(slong * exp,
 FLINT_DLL double fmpz_poly_evaluate_horner_d_2exp(slong * exp, 
                                              const fmpz_poly_t poly, double d);
 
+FLINT_DLL double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly,
+                                      slong n, double d, slong dexp, ulong prec_in);
+
 FLINT_DLL double fmpz_poly_evaluate_horner_d_2exp2(slong * exp,
 		     const fmpz_poly_t poly, double d, slong dexp, ulong prec);
 
@@ -1135,6 +1138,7 @@ FLINT_DLL void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, s
 FLINT_DLL void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly);
 
 /*  Input and output  ********************************************************/
+FLINT_DLL int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len);
 
 FLINT_DLL int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
 
@@ -1143,6 +1147,18 @@ FLINT_DLL int _fmpz_poly_fprint_pretty(FILE * file,
 
 FLINT_DLL int fmpz_poly_fprint_pretty(FILE * file, 
                                        const fmpz_poly_t poly, const char * x);
+
+FMPZ_POLY_INLINE
+int _fmpz_poly_print_pretty(const fmpz * poly, slong len, const char * x)
+{
+  return _fmpz_poly_fprint_pretty(stdout, poly, len, x);
+}
+
+FMPZ_POLY_INLINE
+int _fmpz_poly_print(const fmpz * poly, slong n)
+{
+  return _fmpz_poly_fprint(stdout, poly, n);
+}
 
 FMPZ_POLY_INLINE
 int fmpz_poly_print(const fmpz_poly_t poly)

@@ -415,12 +415,9 @@ Nonsingular solving
 
 
 .. function:: int fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
-
-.. function:: int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
-
-.. function:: int fmpq_mat_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
-
-.. function:: int fmpq_mat_solve(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
+              int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
+              int fmpq_mat_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
+              int fmpq_mat_solve(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 
     Solves ``AX = B`` for nonsingular ``A``.
     Returns nonzero if ``A`` is nonsingular or if the right hand side
@@ -436,12 +433,9 @@ Nonsingular solving
     The default method chooses an algorithm automatically.
 
 .. function:: int fmpq_mat_solve_fmpz_mat_fraction_free(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
-
-.. function:: int fmpq_mat_solve_fmpz_mat_dixon(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
-
-.. function:: int fmpq_mat_solve_fmpz_mat_multi_mod(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
-
-.. function:: int fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
+              int fmpq_mat_solve_fmpz_mat_dixon(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
+              int fmpq_mat_solve_fmpz_mat_multi_mod(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
+              int fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Solves ``AX = B`` for nonsingular ``A``, where *A* and *B* are integer
     matrices. Returns nonzero if ``A`` is nonsingular or if the right hand side
@@ -544,7 +538,7 @@ Minimal polynomial
     Set ``(coeffs, den)`` to the minimal polynomial of the given
     `n\times n` matrix and return the length of the polynomial.
 
-.. function:: void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
+.. function:: void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat)
 
     Set ``pol`` to the minimal polynomial of the given `n\times n`
     matrix. If ``mat`` is not square, an exception is raised.

@@ -618,8 +618,8 @@ void _fmpz_mod_poly_rem(fmpz *R,
     _fmpz_vec_clear(Q, lenA - lenB + 1);
 }
 
-FMPZ_MOD_POLY_INLINE 
-void fmpz_mod_poly_rem(fmpz_mod_poly_t R, 
+FMPZ_MOD_POLY_INLINE
+void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
                        const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
     fmpz_mod_poly_t Q;
@@ -629,8 +629,8 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
     fmpz_mod_poly_clear(Q);
 }
 
-FMPZ_MOD_POLY_INLINE 
-void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R, 
+FMPZ_MOD_POLY_INLINE
+void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R,
                        const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
     fmpz_mod_poly_t Q;

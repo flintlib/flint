@@ -194,6 +194,8 @@ FLINT_DLL void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
 
 FLINT_DLL void fmpq_clear_readonly(fmpq_t f);
 
+FLINT_DLL void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t num, const mpz_t den);
+
 FLINT_DLL char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
 
 FLINT_DLL char * fmpq_get_str(char * str, int b, const fmpq_t x);

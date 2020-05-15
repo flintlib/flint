@@ -499,8 +499,7 @@ FLINT_DLL int n_factor_ecm(ulong *f, ulong curves, ulong B1,
 
 FLINT_DLL mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p);
 
-static __inline__
-mp_limb_t
+ULONG_EXTRAS_INLINE mp_limb_t
 n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
 {
    mp_limb_t q, r, p_hi, p_lo;

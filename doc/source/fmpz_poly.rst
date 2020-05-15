@@ -3157,8 +3157,7 @@ Roots
 
 
 .. function:: void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len)
-
-.. function:: void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
+              void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
 
     Computes a nonnegative integer ``bound`` that bounds the absolute
     value of all complex roots of ``poly``. Uses Fujiwara's bound
@@ -3265,16 +3264,14 @@ Minimal polynomials
     and compute `\Phi_q(x)`. Then `\Phi_n(x) = \Phi_q(x^s)`.
 
 .. function:: ulong _fmpz_poly_is_cyclotomic(const fmpz * poly, slong len)
-
-.. function:: ulong fmpz_poly_is_cyclotomic(fmpz_poly_t poly)
+              ulong fmpz_poly_is_cyclotomic(fmpz_poly_t poly)
 
     If ``poly`` is a cyclotomic polynomial, returns the index `n` of this
     cyclotomic polynomial. If ``poly`` is not a cyclotomic polynomial,
     returns 0.
 
 .. function:: void _fmpz_poly_cos_minpoly(fmpz * coeffs, ulong n)
-
-.. function:: void fmpz_poly_cos_minpoly(fmpz_poly_t poly, ulong n)
+              void fmpz_poly_cos_minpoly(fmpz_poly_t poly, ulong n)
 
     Sets ``poly`` to the minimal polynomial of `2 \cos(2 \pi / n)`.
     For suitable choice of `n`, this gives the minimal polynomial
@@ -3290,9 +3287,8 @@ Minimal polynomials
     the output to be the constant polynomial 1.
 
 .. function:: void _fmpz_poly_swinnerton_dyer(fmpz * coeffs, ulong n)
-
-.. function:: void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n)
-
+              void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n)
+             
     Sets ``poly`` to the Swinnerton-Dyer polynomial `S_n`, defined as
     the integer polynomial
     `S_n = \prod (x \pm \sqrt{2} \pm \sqrt{3} \pm \sqrt{5} \pm \ldots \pm \sqrt{p_n})`
@@ -3306,16 +3302,14 @@ Orthogonal polynomials
 --------------------------------------------------------------------------------
 
 .. function:: void _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n)
-
-.. function:: void fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n)
+              void fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n)
 
     Sets ``poly`` to the Chebyshev polynomial of the first kind `T_n(x)`,
     defined by `T_n(x) = \cos(n \cos^{-1}(x))`, for `n\ge0`. The coefficients are
     calculated using a hypergeometric recurrence.
 
 .. function:: void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n)
-
-.. function:: void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
+              void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
 
     Sets ``poly`` to the Chebyshev polynomial of the first kind `U_n(x)`,
     defined by `(n+1) U_n(x) = T'_{n+1}(x)`, for `n\ge0`.
@@ -3384,8 +3378,7 @@ Modular forms and q-series
 
 
 .. function:: void _fmpz_poly_eta_qexp(fmpz * f, slong r, slong len)
-
-.. function:: void fmpz_poly_eta_qexp(fmpz_poly_t f, slong r, slong n)
+              void fmpz_poly_eta_qexp(fmpz_poly_t f, slong r, slong n)
 
     Sets `f` to the `q`-expansion to length `n` of the
     Dedekind eta function (without the leading factor
@@ -3402,8 +3395,7 @@ Modular forms and q-series
     and otherwise reduces to one of those cases using power series arithmetic.
 
 .. function:: void _fmpz_poly_theta_qexp(fmpz * f, slong r, slong len)
-
-.. function:: void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n)
+              void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n)
 
     Sets `f` to the `q`-expansion to length `n` of the
     Jacobi theta function raised to the power `r`, i.e. `\vartheta(q)^r`

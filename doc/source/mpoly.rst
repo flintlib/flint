@@ -15,6 +15,7 @@
     coefficient `9`.
 
 
+
 Orderings
 --------------------------------------------------------------------------------
 .. type:: ordering_t
@@ -115,7 +116,7 @@ Monomial arithemtic
 
     Swap the words in ``(exp2, N)`` and ``(exp3, N)``.
 
-.. function:: void mpoly_monomial_mul_si(ulong * exp2, const ulong * exp3, slong N, slong c)
+.. function:: void mpoly_monomial_mul_ui(ulong * exp2, const ulong * exp3, slong N, ulong c)
 
     Set the words of ``(exp2, N)`` to the words of ``(exp3, N)``
     multiplied by ``c``.
@@ -193,12 +194,17 @@ Basic manipulation
     Returns the number of bits required to store ``user_exp`` in packed
     format. The returned number of bits includes space for a zeroed signed bit.
 
-.. function:: flint_bitcnt_t mpoly_exp_bits_required_fmpz(const fmpz * user_exp, const mpoly_ctx_t mctx)
+.. function:: flint_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp, const mpoly_ctx_t mctx)
 
     Returns the number of bits required to store ``user_exp`` in packed
     format. The returned number of bits includes space for a zeroed signed bit.
 
-.. function:: void mpoly_max_fields_ui(ulong * max_fields, const ulong * poly_exps, slong len, slong bits, const mpoly_ctx_t mctx)
+.. function:: flint_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp, const mpoly_ctx_t mctx)
+
+    Returns the number of bits required to store ``user_exp`` in packed
+    format. The returned number of bits includes space for a zeroed signed bit.
+    
+.. function:: void mpoly_max_fields_ui_sp(ulong * max_fields, const ulong * poly_exps, slong len, slong bits, const mpoly_ctx_t mctx)
 
     Compute the field-wise maximum of packed exponents from ``poly_exps``
     of length ``len`` and unpack the result into ``max_fields``.
@@ -247,12 +253,12 @@ Setting and getting monomials
 --------------------------------------------------------------------------------
 
 
-.. function:: int mpoly_termexp_fits_ui(ulong * exps, slong bits, slong n, const mpoly_ctx_t mctx)
+.. function:: int mpoly_term_exp_fits_ui(ulong * exps, slong bits, slong n, const mpoly_ctx_t mctx)
 
     Return whether every entry of the exponent vector of index `n` in
     ``exps`` fits into a ``ulong``.
 
-.. function:: int mpoly_termexp_fits_si(ulong * exps, slong bits, slong n, const mpoly_ctx_t mctx)
+.. function:: int mpoly_term_exp_fits_si(ulong * exps, slong bits, slong n, const mpoly_ctx_t mctx)
 
     Return whether every entry of the exponent vector of index `n` in
     ``exps`` fits into a ``slong``.

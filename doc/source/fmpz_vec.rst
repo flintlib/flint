@@ -216,7 +216,7 @@ Comparison
 
     Sets ``vec1`` to the pointwise maximum of ``vec2`` and ``vec3``.
 
-.. function:: void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len);
+.. function:: void _fmpz_vec_max_inplace(fmpz * vec1, const fmpz * vec2, slong len)
 
     Sets ``vec1`` to the pointwise maximum of ``vec1`` and ``vec2``.
 

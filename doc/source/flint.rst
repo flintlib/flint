@@ -46,6 +46,15 @@ Random Numbers
    
     Frees a random state object as allocated using :func:`flint_rand_alloc`.
 
+
+.. function:: void flint_randinit(flint_rand_t state)
+
+    Initialize a :type:`flint_rand_t`.
+
+.. function:: void flint_randclear(flint_rand_t state)
+
+    Free all memory allocated by :func:`flint_rand_init`.
+
 Thread functions
 -----------------------
 

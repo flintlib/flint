@@ -505,8 +505,7 @@ Special functions
     Raises an exception if the valuation of ``op`` is negative.
 
 .. function:: void _qadic_trace(fmpz_t rop, const fmpz *op, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t pN)
-
-.. function:: void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+              void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     Sets ``rop`` to the trace of ``op``.
 

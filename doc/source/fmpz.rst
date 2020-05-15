@@ -113,36 +113,7 @@ Memory management
 
     Initialises `f` and sets it to the value of `g`.
 
-
-Memory management
---------------------------------------------------------------------------------
-
-.. function:: void fmpz_init(fmpz_t f)
-
-    A small ``fmpz_t`` is initialised, i.e.\ just a ``slong``.  
-    The value is set to zero.
-
-.. function:: void fmpz_init2(fmpz_t f, ulong limbs)
-
-    Initialises the given ``fmpz_t`` to have space for the given 
-    number of limbs.
-
-    If ``limbs`` is zero then a small ``fmpz_t`` is allocated, 
-    i.e.\ just a ``slong``.  The value is also set to zero.  It is 
-    not necessary to call this function except to save time.  A call 
-    to ``fmpz_init`` will do just fine.
-
-.. function:: void fmpz_clear(fmpz_t f)
-
-    Clears the given ``fmpz_t``, releasing any memory associated
-    with it, either back to the stack or the OS, depending on
-    whether the reentrant or non-reentrant version of FLINT is built.
-
-.. function:: void fmpz_init_set(fmpz_t f, const fmpz_t g)
-
-    Initialises `f` and sets it to the value of `g`.
-
-.. function:: void fmpz_init_set_ui(fmpz_t f, ulong g)
+.. function:: void fmpz_init_set_si(fmpz_t f, slong g)
 
     Initialises `f` and sets it to the value of `g`.
 
@@ -153,9 +124,9 @@ Random generation
 For thread-safety, the randomisation methods take as one of their 
 parameters an object of type ``flint_rand_t``.  Before calling 
 any of the randomisation functions such an object first has to be 
-initialised with a call to ``flint_randinit()``.  When one is 
+initialised with a call to :func:`flint_randinit`.  When one is 
 finished generating random numbers, one should call 
-``flint_randclear()`` to clean up.
+:func:`flint_randclear` to clean up.
 
 .. function:: void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
@@ -223,6 +194,12 @@ Conversion
 
     Returns `f` as an ``ulong``.  The result is undefined
     if `f` does not fit into an ``ulong`` or is negative.
+
+.. function:: fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
+
+    If ``f`` consists of two limbs, then `*hi` and `*low` are set to the high
+    and low limbs, otherwise `*low` is set to the low limb and `*hi` is set
+    to 0.
 
 .. function:: void fmpz_set_d(fmpz_t f, double c)
 
@@ -356,7 +333,7 @@ Conversion
     the lifetime of `z`.
 
     The integer `z` has to be cleared by a call to 
-    ``flint_mpz_clear_readonly()``.
+    :func:`flint_mpz_clear_readonly`.
 
     The suggested use of the two functions is as follows::
 
@@ -398,7 +375,7 @@ Conversion
     throughout the lifetime of `f`.
 
     The ``fmpz_t`` `f` has to be cleared by calling the 
-    function ``fmpz_clear_readonly()``.
+    function :func:`fmpz_clear_readonly`.
 
     The suggested use of the two functions is as follows::
 
@@ -450,7 +427,7 @@ Input and output
 .. function:: size_t fmpz_inp_raw( fmpz_t x, FILE *fin )
 
     Reads a multiprecision integer from the stream ``file``.  The
-    format is raw binary format write by ``fmpz_out_raw``. 
+    format is raw binary format write by :func:`fmpz_out_raw`. 
     
     In case of success, return a posivitive number, indicating number of bytes read.
     In case of failure 0.
@@ -744,7 +721,12 @@ Basic arithmetic
     Sets `f` to the quotient of `g` by `h`, rounding up towards
     infinity.  If `h` is `0` an exception is raised.
 
-.. function:: void fmpz_cdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+.. function:: void fmpz_cdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
+
+    Sets `f` to the quotient of `g` by ``2^exp``, rounding up towards
+    infinity. 
+
+.. function:: void fmpz_cdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets `f` to the remainder of `g` upon division by ``2^exp``, 
     where the remainder is non-positive.
@@ -819,7 +801,7 @@ Basic arithmetic
     Set `f` to the quotient of `g` by `h`, rounding down towards
     zero.  If `h` is `0` an exception is raised.
 
-.. function:: void fmpz_tdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+.. function:: void fmpz_tdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets `f` to the remainder of `g` upon division by ``2^exp``,
     where the remainder has the same sign as `g`.
@@ -890,14 +872,14 @@ Basic arithmetic
 .. function:: void fmpz_preinvn_clear(fmpz_preinvn_t inv)
 
     Clean up the resources used by a precomputed inverse created with the
-    ``fmpz_preinvn_init`` function.
+    :func:`fmpz_preinvn_init` function.
 
 .. function:: void fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t hinv)
 
-    As per ``fmpz_fdiv_qr``, but takes a precomputed inverse ``hinv``
-    of `h` constructed using ``fmpz_preinvn``.
+    As per :func:`fmpz_fdiv_qr`, but takes a precomputed inverse ``hinv``
+    of `h` constructed using :func:`fmpz_preinvn`.
 
-    This function will be faster than ``fmpz_fdiv_qr_preinvn`` when the
+    This function will be faster than :func:`fmpz_fdiv_qr_preinvn` when the
     number of limbs of `h` is at least ``PREINVN_CUTOFF``.
 
 .. function:: void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
@@ -923,8 +905,7 @@ Basic arithmetic
     Assumes that `m \neq 0`, raises an ``abort`` signal otherwise.
 
 .. function:: slong fmpz_clog(const fmpz_t x, const fmpz_t b)
-
-.. function:: slong fmpz_clog_ui(const fmpz_t x, ulong b)
+              slong fmpz_clog_ui(const fmpz_t x, ulong b)
 
     Returns `\lceil\log_b x\rceil`.
 
@@ -932,8 +913,7 @@ Basic arithmetic
     the return value fits into a signed ``slong``.
 
 .. function:: slong fmpz_flog(const fmpz_t x, const fmpz_t b)
-
-.. function:: slong fmpz_flog_ui(const fmpz_t x, ulong b)
+              slong fmpz_flog_ui(const fmpz_t x, ulong b)
 
     Returns `\lfloor\log_b x\rfloor`.
 
@@ -1001,6 +981,11 @@ Basic arithmetic
 .. function:: void fmpz_bin_uiui(fmpz_t f, ulong n, ulong k)
 
     Sets `f` to the binomial coefficient `{n \choose k}`.
+
+.. function:: void fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong k)
+
+    Sets `r` to the rising factorial `(x+a) (x+a+1) (x+a+2) \cdots (x+b-1)`.
+    Assumes `b > a`.
 
 .. function:: void fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong k)
 
@@ -1108,7 +1093,7 @@ Modular arithmetic
 
     Sets `f` to `-g \pmod{h}`, assuming `g` is reduced modulo `h`.
 
-.. function:: int fmpz_jacobi(const fmpz_t a, const fmpz_t p);
+.. function:: int fmpz_jacobi(const fmpz_t a, const fmpz_t p)
 
     Computes the Jacobi symbol of `a` modulo `p`, where `p` is a prime
     and `a` is reduced modulo `p`.
@@ -1204,15 +1189,15 @@ Chinese remaindering
 
 The following functions can be used to reconstruct an integer from its
 residues modulo a set of small (word-size) prime numbers. The first two
-functions, ``fmpz_CRT_ui`` and ``fmpz_CRT``, are easy
+functions, :func:`fmpz_CRT_ui` and :func:`fmpz_CRT`, are easy
 to use and allow building the result one residue at a time, which is
 useful when the number of needed primes is not known in advance.
 The remaining functions support performing the modular reductions and
 reconstruction using balanced subdivision. This greatly improves
 efficiency for large integers but assumes that the basis of primes is
 known in advance. The user must precompute a ``comb``
-structure and temporary working space with ``fmpz_comb_init`` and
-``fmpz_comb_temp_init``, and free this data afterwards.
+structure and temporary working space with :func:`fmpz_comb_init` and
+:func:`fmpz_comb_temp_init`, and free this data afterwards.
 For simple demonstration programs showing how to use the CRT functions,
 see ``crt.c`` and ``multi_crt.c`` in the ``examples``
 directory.
@@ -1249,8 +1234,8 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     Reduces the multiprecision integer ``in`` modulo each of the primes 
     stored in the ``comb`` structure. The array ``out`` will be filled 
     with the residues modulo these primes. The structure ``temp`` is
-    temporary space which must be provided by ``fmpz_comb_temp_init`` and
-    cleared by ``fmpz_comb_temp_clear``.
+    temporary space which must be provided by :func:`fmpz_comb_temp_init` and
+    cleared by :func:`fmpz_comb_temp_clear`.
 
 .. function:: void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues, const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)
 
@@ -1262,8 +1247,8 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     If `N` is the product of all the primes then ``out`` is normalised to
     be in the range `[0, N)` if sign = 0 and the range `[-(N-1)/2, N/2]`
     if sign = 1. The array ``temp`` is temporary 
-    space which must be provided by ``fmpz_comb_temp_init`` and 
-    cleared by ``fmpz_comb_temp_clear``.
+    space which must be provided by :func:`fmpz_comb_temp_init` and 
+    cleared by :func:`fmpz_comb_temp_clear`.
 
 .. function:: void fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes)
 
@@ -1294,8 +1279,7 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     Initialize ``CRT`` for chinese remaindering.
 
 .. function:: int fmpz_multi_crt_precompute(fmpz_multi_crt_t CRT, const fmpz * moduli, slong len)
-
-.. function:: int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT, const fmpz * const * moduli, slong len)
+              int fmpz_multi_crt_precompute_p(fmpz_multi_crt_t CRT, const fmpz * const * moduli, slong len)
 
     Configure ``CRT`` for repeated chinese remaindering of ``moduli``. The number of moduli, ``len``, should be positive.
     A return of ``0`` indicates that the compilation failed and future
@@ -1303,12 +1287,11 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     A return of ``1`` indicates that the compilation was successful, which occurs if and only if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) no modulus is `0,1,-1` and all moduli are pairwise relatively prime.
 
 .. function:: void fmpz_multi_crt_precomp(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * inputs)
-
-.. function:: void fmpz_multi_crt_precomp_p(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * const * inputs)
+              void fmpz_multi_crt_precomp_p(fmpz_t output, const fmpz_multi_crt_t P, const fmpz * const * inputs)
 
     Set ``output`` to an integer of smallest absolute value that is congruent to ``values + i`` modulo the ``moduli + i`` in :func:`fmpz_crt_precompute`.
 
-.. function:: int fmpz_multi_crt(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len);
+.. function:: int fmpz_multi_crt(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len)
 
     Perform the same operation as :func:`fmpz_multi_crt_precomp` while internally constructing and destroying the precomputed data.
     All of the remarks in :func:`fmpz_multi_crt_precompute` apply.
@@ -1322,8 +1305,7 @@ The ``fmpz_multi_crt`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     Return the required length of the output for :func:`_nmod_poly_crt_run`.
 
 .. function:: void _fmpz_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * inputs)
-
-.. function:: void _fmpz_multi_crt_run_p(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * const * inputs)
+              void _fmpz_multi_crt_run_p(fmpz * outputs, const fmpz_multi_crt_t CRT, const fmpz * const * inputs)
 
     Perform the same operation as fmpz::fmpz_multi_crt_precomp using supplied temporary space.
     The actual output is placed in ``outputs + 0``, and ``outputs`` should contain space for all temporaries and should be at least as long as ``_fmpz_multi_crt_local_size(CRT)``.
@@ -1582,8 +1564,7 @@ Special functions
     numbers less than or equal to `n`.
 
 .. function:: void fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac)
-
-.. function:: void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
+              void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
 
     Sets ``res`` to the Euler totient function `\phi(n)`, counting the 
     number of positive integers less than or equal to `n` that are coprime 
@@ -1591,8 +1572,7 @@ Special functions
     factorisation of `n`.
 
 .. function:: int fmpz_factor_moebius_mu(const fmpz_factor_t fac)
-
-.. function:: int fmpz_moebius_mu(const fmpz_t n)
+              int fmpz_moebius_mu(const fmpz_t n)
 
     Computes the Moebius function `\mu(n)`, which is defined as `\mu(n) = 0` 
     if `n` has a prime factor of multiplicity greater than `1`, `\mu(n) = -1` 
@@ -1602,8 +1582,7 @@ Special functions
     factorisation of `n`.
 
 .. function:: void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
-
-.. function:: void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+              void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 
     Sets ``res`` to `\sigma_k(n)`, the sum of `k`th powers of all 
     divisors of `n`. The factor version takes a precomputed
