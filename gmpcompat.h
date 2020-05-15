@@ -520,14 +520,6 @@ void flint_mpf_set_si (mpf_ptr dest, slong val)
 
   vl = (mp_limb_t) (val >= 0 ? val : -val);
 
-#if __GNU_MP_RELEASE >= 60200
-   if (dest->_mp_alloc == 0)
-   {
-      dest->_mp_d = flint_malloc(sizeof(mp_limb_t));
-      dest->_mp_alloc = 1;
-   }
-#endif
-
   dest->_mp_d[0] = vl;
   size = vl != 0;
 
@@ -562,14 +554,6 @@ static __inline__
 void flint_mpf_set_ui(mpf_ptr f, ulong val)
 {
   mp_size_t size;
-
-#if __GNU_MP_RELEASE >= 60200
-   if (dest->_mp_alloc == 0)
-   {
-      dest->_mp_d = flint_malloc(sizeof(mp_limb_t));
-      dest->_mp_alloc = 1;
-   }
-#endif
 
   f->_mp_d[0] = val;
   size = val != 0;
