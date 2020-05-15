@@ -170,7 +170,7 @@ check_library_exists(${PThreads_LIBRARIES} pthread_getaffinity_np "" HAVE_CPU_SE
 
 set(HAVE_TLS ON CACHE BOOL "Use thread local storage.")
 
-set(MEMORY_MANAGER "single" CACHE STRING "The FLINT memory manager.")
+set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
 set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
 
 if(MEMORY_MANAGER STREQUAL "reentrant")
