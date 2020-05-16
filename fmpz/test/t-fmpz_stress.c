@@ -78,8 +78,7 @@ void worker3(void * varg)
 int
 main(void)
 {
-    slong k;
-    slong iter, j;
+    slong i, j, k;
     slong max_num_threads = 5;
     thread_pool_handle * handles;
     slong num_handles;
@@ -93,7 +92,7 @@ main(void)
                                                     sizeof(worker_arg_struct));
 
     /* checking parallel clearing of fmpz's allocated from the same thread */
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong n;
         fmpz * v;
