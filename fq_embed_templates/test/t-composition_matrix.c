@@ -36,10 +36,11 @@ main(void)
         TEMPLATE(B, mat_t) mat_frob, mat_a, mat_aq, res;
         slong d;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        d = TEMPLATE(T, ctx_degree)(ctx);
-        if (d == 1) 
-            continue;
+        do {
+            TEMPLATE(T, ctx_randtest)(ctx, state);
+            d = TEMPLATE(T, ctx_degree)(ctx);
+        } while (d == 1); 
+            
         modulus = TEMPLATE(T, ctx_modulus)(ctx);
 
         TEMPLATE(T, init)(frob, ctx);

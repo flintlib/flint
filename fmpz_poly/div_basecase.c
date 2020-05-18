@@ -25,6 +25,7 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
     slong B1, iQ = lenA - lenB;
     slong alloc;
     fmpz_t r;
+    int res = 1;
 
     while (lenA >= lenB && fmpz_cmpabs(A + lenA - 1, leadB) < 0)
     {
@@ -56,10 +57,8 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
         {
             if (exact && !fmpz_is_zero(R + lenA - 1))
             {
-                if (alloc)
-                    _fmpz_vec_clear(R, alloc);
-
-                return 0;
+                res = 0;
+                goto cleanup;
             }
 
             fmpz_zero(Q + iQ);
@@ -71,10 +70,8 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
 
                 if (!fmpz_is_zero(r))
                 {
-                    if (alloc)
-                    _fmpz_vec_clear(R, alloc);
-
-                    return 0;
+                    res = 0;
+                    goto cleanup;
                 }
             } else
                 fmpz_fdiv_q(Q + iQ, R + lenA - 1, leadB);
@@ -92,13 +89,15 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
         iQ--;
     }
 
+cleanup:
+        
     if (exact)
         fmpz_clear(r);
 
     if (alloc)
         _fmpz_vec_clear(R, alloc);
 
-    return 1;
+    return res;
 }
 
 void

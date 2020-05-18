@@ -80,6 +80,7 @@ main(void)
         fmpz_poly_clear(Q);
         fmpz_poly_clear(tmp);
         _fmpz_vec_clear(x, n);
+        fmpz_clear(mod);
     }
 
     FLINT_TEST_CLEANUP(state);

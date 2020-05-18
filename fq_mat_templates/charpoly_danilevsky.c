@@ -189,6 +189,8 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
  
 cleanup:
   
+   TEMPLATE(T, clear) (c, ctx);
+   TEMPLATE(T, clear) (h, ctx);
    TEMPLATE(T, poly_clear) (b, ctx);
    _TEMPLATE(T, vec_clear) (T, A->r, ctx);
    _TEMPLATE(T, vec_clear) (V, A->r, ctx);

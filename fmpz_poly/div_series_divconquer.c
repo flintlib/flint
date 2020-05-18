@@ -27,7 +27,7 @@ _fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong Alen,
     if (!_fmpz_poly_div(Q, Arev, 2*n - 1, Brev, n, 1))
     {
         _fmpz_vec_clear(Arev, 2*n - 1);
-        _fmpz_vec_clear(Brev, n - 1);
+        _fmpz_vec_clear(Brev, n);
 
         flint_printf("Not an exact division\n");
         flint_abort();
@@ -36,7 +36,7 @@ _fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong Alen,
     _fmpz_poly_reverse(Q, Q, n, n);
 
     _fmpz_vec_clear(Arev, 2*n - 1);
-    _fmpz_vec_clear(Brev, n - 1);
+    _fmpz_vec_clear(Brev, n);
 }
 
 void fmpz_poly_div_series_divconquer(fmpz_poly_t Q, const fmpz_poly_t A,

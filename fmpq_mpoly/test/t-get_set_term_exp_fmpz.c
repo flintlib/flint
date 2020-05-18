@@ -37,13 +37,13 @@ main(void)
 
         nvars = fmpq_mpoly_ctx_nvars(ctx);
 
-        len = n_randint(state, 50);
-        exp_bits = n_randint(state, 100) + 1;
-        coeff_bits = n_randint(state, 100);
+        do {
+            len = n_randint(state, 50);
+            exp_bits = n_randint(state, 100) + 1;
+            coeff_bits = n_randint(state, 100);
 
-        fmpq_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
-        if (fmpq_mpoly_length(f, ctx) == 0)
-            continue;
+            fmpq_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        } while (fmpq_mpoly_length(f, ctx) == 0);
 
         for (j = 0; j < 10; j++)
         {

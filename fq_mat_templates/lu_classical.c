@@ -76,7 +76,10 @@ TEMPLATE(T, mat_lu_classical) (slong * P,
         if (TEMPLATE(T, mat_pivot) (A, P, row, col, ctx) == 0)
         {
             if (rank_check)
-                return 0;
+            {
+                rank = 0;
+                goto cleanup;
+            }
             col++;
             continue;
         }
@@ -105,6 +108,7 @@ TEMPLATE(T, mat_lu_classical) (slong * P,
         col++;
     }
 
+cleanup:
     TEMPLATE(T, clear) (d, ctx);
     TEMPLATE(T, clear) (e, ctx);
     TEMPLATE(T, clear) (neg_e, ctx);

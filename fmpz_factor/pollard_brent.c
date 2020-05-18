@@ -143,6 +143,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     fmpz_clear(fa);
     fmpz_clear(fy);
     fmpz_clear(maxa);
+    fmpz_clear(maxy);
 
     TMP_END;
     

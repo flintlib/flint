@@ -87,6 +87,8 @@ main(void)
             abort();
         }
 
+        fmpz_mat_clear(UA);
+        fmpz_mat_clear(U);
         fmpz_mat_clear(H2);
         fmpz_mat_clear(H);
         fmpz_mat_clear(A);
