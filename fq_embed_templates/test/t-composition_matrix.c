@@ -39,7 +39,7 @@ main(void)
         do {
             TEMPLATE(T, ctx_randtest)(ctx, state);
             d = TEMPLATE(T, ctx_degree)(ctx);
-        while (d == 1); 
+        } while (d == 1); 
             
         modulus = TEMPLATE(T, ctx_modulus)(ctx);
 
