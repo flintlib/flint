@@ -13,6 +13,8 @@
 #include <string.h>
 #include "fmpq_mpoly.h"
 
+#define ALLOC_PER_VAR ((FLINT_BITS+4)/3)
+
 char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
                                   const char ** x_in, const fmpq_mpoly_ctx_t qctx)
 {
@@ -21,7 +23,7 @@ char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
     fmpz * exponents;
     const fmpz_mpoly_struct * poly = A->zpoly;
     const mpoly_ctx_struct * mctx = qctx->zctx->minfo;
-    char ** x = (char **) x_in;
+    char ** x = (char **) x_in, *xtmp;
     slong len = A->zpoly->length;
     flint_bitcnt_t bits = A->zpoly->bits;
     char * str;
@@ -41,10 +43,11 @@ char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
 
     if (x == NULL)
     {
+        xtmp = (char *) TMP_ALLOC(mctx->nvars * ALLOC_PER_VAR * sizeof(char));
         x = (char **) TMP_ALLOC(mctx->nvars*sizeof(char *));
         for (i = 0; i < mctx->nvars; i++)
         {
-            x[i] = (char *) TMP_ALLOC(22*sizeof(char));
+            x[i] = xtmp + i * ALLOC_PER_VAR;
             flint_sprintf(x[i], "x%wd", i + 1);
         }
     }
