@@ -73,12 +73,6 @@ int main(void)
        /* normalise */
        while (size_d && r2->_mp_d[size_d - 1] == 0) size_d--;
        r2->_mp_size = size_d;
-       r2->_mp_alloc = size_d;
-       if (size_d == 0)
-       {
-          flint_free(r2->_mp_d);
-          r2->_mp_d = NULL;
-       }
 
        mpz_div_2exp(r2, r2, norm);
        mpz_div_2exp(a, a, norm);
