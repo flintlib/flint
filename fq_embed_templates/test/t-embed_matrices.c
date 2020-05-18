@@ -81,14 +81,12 @@ main(void)
             TEMPLATE(B, mat_t) embed, project, comp, one;
             slong m, n;
 
-            TEMPLATE(T, ctx_randtest)(ctx1, state);
-            m = TEMPLATE(T, ctx_degree)(ctx1);
+            do {
+                TEMPLATE(T, ctx_randtest)(ctx1, state);
+                m = TEMPLATE(T, ctx_degree)(ctx1);
+            } while (m == 1);
             n = m*j;
-            if (m == 1) {
-                i--;
-                TEMPLATE(T, ctx_clear)(ctx1);
-                continue;
-            }
+
             modulus = TEMPLATE(T, ctx_modulus)(ctx1);
 
             TEMPLATE(B, poly_init)(modulus2, TEMPLATE(B, poly_modulus)(modulus));
