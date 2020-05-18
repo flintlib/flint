@@ -39,17 +39,13 @@ main(void)
 
         nvars = fmpz_mpoly_ctx_nvars(ctx);
 
-        len = n_randint(state, 50);
-        exp_bits = n_randint(state, 100) + 1;
-        coeff_bits = n_randint(state, 100);
+        do {
+            len = n_randint(state, 50);
+            exp_bits = n_randint(state, 100) + 1;
+            coeff_bits = n_randint(state, 100);
 
-        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
-        if (f->length == WORD(0))
-        {
-            fmpz_mpoly_clear(f, ctx);
-            fmpz_mpoly_ctx_clear(ctx);
-            continue;
-        }
+            fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        } while (f->length == 0);
 
         for (j = 0; j < 10; j++)
         {
