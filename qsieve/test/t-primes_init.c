@@ -52,7 +52,7 @@ int main(void)
 
        fmpz_randtest_unsigned(n, state, 130);
 
-       if (fmpz_is_zero(n) || fmpz_is_one(n)) goto cleanup;
+       if (fmpz_is_zero(n) || fmpz_is_one(n)) goto cleanup0;
 
        qsieve_init(qs_inf, n);
        small_factor = qsieve_knuth_schroeppel(qs_inf);
@@ -244,6 +244,7 @@ cleanup2:
        qsieve_primes_clear(qs_inf);
 cleanup1:
        qsieve_clear(qs_inf);
+cleanup0:
        fmpz_clear(n);
        fmpz_clear(x);
        fmpz_clear(y);
