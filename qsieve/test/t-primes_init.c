@@ -57,23 +57,24 @@ int main(void)
        qsieve_init(qs_inf, n);
        small_factor = qsieve_knuth_schroeppel(qs_inf);
 
-       if (small_factor) goto cleanup;
+       if (small_factor) goto cleanup1;
 
        fmpz_mul_ui(qs_inf->kn, qs_inf->n, qs_inf->k);                      /* haven't calculated earlier */
        small_factor = qsieve_primes_init(qs_inf);
 
-       if (small_factor)
+       if (small_factor != 0)
        {
            /* check if factor, if returned by factor base function
               is actually a factor of n */
-           if (fmpz_fdiv_ui(n, small_factor))
+           if (fmpz_fdiv_ui(n, small_factor) != 0)
            {
                flint_printf("%wd is not a factor of ", small_factor);
                fmpz_print(qs_inf->n);
                flint_printf("\n");
                abort();
            }
-           else goto cleanup;
+           else
+               goto cleanup2;
        }
 
        for (j = 3; j < qs_inf->num_primes; j++)
@@ -93,7 +94,7 @@ int main(void)
                abort();
            }
 
-           /* check if inverse of factor base primes are correct*/
+           /* check if inverse of factor base primes are correct */
            fmpz_randtest_unsigned(x, state, FLINT_BITS);
            fmpz_mod_ui(y, x, qs_inf->factor_base[j].p);
            pmod = n_mod2_preinv(fmpz_get_ui(x),
@@ -111,16 +112,16 @@ int main(void)
        k = qs_inf->num_primes;
        small_factor = qsieve_primes_increment(qs_inf, 50);
 
-       if (small_factor)
+       if (small_factor != 0)
        {
-           if (fmpz_fdiv_ui(qs_inf->n, small_factor))
+           if (fmpz_fdiv_ui(qs_inf->n, small_factor) != 0)
            {
                flint_printf("%wd is not a factor of ", small_factor);
                fmpz_print(qs_inf->n);
                flint_printf("\n");
                abort();
            }
-           else goto cleanup;
+           else goto cleanup2;
        }
 
        for (j = k; j < qs_inf->num_primes; j++)
@@ -155,16 +156,16 @@ int main(void)
        k = qs_inf->num_primes;
        small_factor = qsieve_primes_increment(qs_inf, 30);
 
-       if (small_factor)
+       if (small_factor != 0)
        {
-           if (fmpz_fdiv_ui(qs_inf->n, small_factor))
+           if (fmpz_fdiv_ui(qs_inf->n, small_factor) != 0)
            {
                flint_printf("%wd is not a factor of ", small_factor);
                fmpz_print(n);
                flint_printf("\n");
                abort();
            }
-           else goto cleanup;
+           else goto cleanup2;
        }
 
        for (j = k; j < qs_inf->num_primes; j++)
@@ -199,16 +200,16 @@ int main(void)
        k = qs_inf->num_primes;
        small_factor = qsieve_primes_increment(qs_inf, 10);
 
-       if (small_factor)
+       if (small_factor != 0)
        {
-           if (fmpz_fdiv_ui(qs_inf->n, small_factor))
+           if (fmpz_fdiv_ui(qs_inf->n, small_factor) != 0)
            {
                flint_printf("%wd is not a factor of ", small_factor);
                fmpz_print(n);
                flint_printf("\n");
                abort();
            }
-           else goto cleanup;
+           else goto cleanup2;
        }
 
        for (j = k; j < qs_inf->num_primes; j++)
@@ -239,7 +240,9 @@ int main(void)
            }
        }
 
-cleanup:
+cleanup2:
+       qsieve_primes_clear(qs_inf);
+cleanup1:
        qsieve_clear(qs_inf);
        fmpz_clear(n);
        fmpz_clear(x);
