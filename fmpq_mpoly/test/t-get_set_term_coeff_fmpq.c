@@ -35,18 +35,13 @@ main(void)
         fmpq_mpoly_ctx_init_rand(ctx, state, 20);
         fmpq_mpoly_init(f, ctx);
 
-        len = n_randint(state, 100);
-        exp_bits = n_randint(state, 200) + 1;
-        coeff_bits = n_randint(state, 200);
+        do {
+            len = n_randint(state, 100);
+            exp_bits = n_randint(state, 200) + 1;
+            coeff_bits = n_randint(state, 200);
 
-        fmpq_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
-        if (fmpq_mpoly_length(f, ctx) == WORD(0))
-        {
-            fmpq_mpoly_clear(f, ctx);
-            fmpq_clear(c);
-            fmpq_clear(d);
-            continue;
-        }
+            fmpq_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
+        } while (fmpq_mpoly_length(f, ctx) == 0);
 
         for (j = 0; j < 10; j++)
         {
