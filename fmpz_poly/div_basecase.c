@@ -73,7 +73,7 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
                     res = 0;
                     goto cleanup;
                 }
-                
+            } else
                 fmpz_fdiv_q(Q + iQ, R + lenA - 1, leadB);
 
             _fmpz_vec_scalar_submul_fmpz(R + lenA - B1 - 1, B, B1, Q + iQ);
