@@ -13,12 +13,14 @@
 #include <string.h>
 #include "fq_nmod_mpoly.h"
 
+#define ALLOC_PER_VAR ((FLINT_BITS+4)/3)
+
 char *
 _fq_nmod_mpoly_get_str_pretty(const fq_nmod_struct * coeff, const ulong * exp,
                                   slong len, const char ** x_in, slong bits,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
-    char * str, ** x = (char **) x_in;
+    char * str, ** x = (char **) x_in, *xtmp;
     slong i, j, N, bound, off;
     fmpz * exponents;
     int first;
@@ -39,10 +41,11 @@ _fq_nmod_mpoly_get_str_pretty(const fq_nmod_struct * coeff, const ulong * exp,
 
     if (x == NULL)
     {
+        xtmp = (char *) TMP_ALLOC(ctx->minfo->nvars * ALLOC_PER_VAR * sizeof(char));
         x = (char **) TMP_ALLOC(ctx->minfo->nvars*sizeof(char *));
         for (i = 0; i < ctx->minfo->nvars; i++)
         {
-            x[i] = (char *) TMP_ALLOC(((FLINT_BITS+4)/3)*sizeof(char));
+            x[i] = xtmp + i * ALLOC_PER_VAR;
             flint_sprintf(x[i], "x%wd", i + 1);
         }
     }
