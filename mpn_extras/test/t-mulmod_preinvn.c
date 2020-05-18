@@ -92,7 +92,7 @@ int main(void)
           abort();
        }
 
-       if (r2->_mp_d != NULL)
+       if (r2->_mp_alloc)
           flint_free(r2->_mp_d);
        flint_free(dinv);
     }
