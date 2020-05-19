@@ -14,7 +14,7 @@
 char *
 fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
-    slong numchars = op->value == 0 ? 1 : n_clog(op->value + 1, 10);
+    slong num_chars = op->value == 0 ? 1 : n_clog(op->value + 1, 10);
     char *s = flint_malloc((num_chars + 1)* sizeof(char));
     flint_sprintf(s, "%wd", op->value);
     return s;
