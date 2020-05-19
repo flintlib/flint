@@ -25,7 +25,8 @@ TEMPLATE(T, mat_clear) (TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx)
             TEMPLATE(T, clear) (mat->entries + i, ctx); /* Clear all coefficients */
         flint_free(mat->entries);   /* Clean up array of entries */
         flint_free(mat->rows);  /* Clean up row array */
-    }
+    } else if (mat->rows != 0)
+        flint_free(mat->rows);
 }
 
 

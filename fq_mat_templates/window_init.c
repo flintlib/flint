@@ -29,11 +29,17 @@ TEMPLATE(T, mat_window_init) (TEMPLATE(T, mat_t) window,
     if (r2 > r1)
         window->rows = (TEMPLATE(T, struct) **) flint_malloc((r2 - r1)
                                               * sizeof(TEMPLATE(T, struct) *));
+    else
+        window->rows = NULL;
 
     if (mat->c > 0)
     {
         for (i = 0; i < r2 - r1; i++)
             window->rows[i] = mat->rows[r1 + i] + c1;
+    } else
+    {
+        for (i = 0; i < r2 - r1; i++)
+            window->rows[i] = NULL;
     }
 
     window->r = r2 - r1;
