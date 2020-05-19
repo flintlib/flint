@@ -22,5 +22,6 @@ nmod_mat_clear(nmod_mat_t mat)
     {
         flint_free(mat->entries);
         flint_free(mat->rows);
-    }
+    } else if (mat->r != 0)
+        flint_free(mat->rows);
 }
