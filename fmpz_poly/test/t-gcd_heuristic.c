@@ -38,8 +38,6 @@ main(void)
     flint_printf("gcd_heuristic....");
     fflush(stdout);
 
-    
-
     /* Check aliasing of a and b */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -298,6 +296,18 @@ main(void)
        fmpz_poly_clear(a);
        fmpz_poly_clear(b);
        fmpz_poly_clear(d);
+    }
+
+    /* Daniel's test case */
+  {
+        fmpz_poly_t a, b, g;                                                                     fmpz_poly_init(a);                                                                       fmpz_poly_init(b);
+        fmpz_poly_init(g);
+        fmpz_poly_set_str(a, "40  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -7609399 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 44");
+        fmpz_poly_set_str(b, "40  0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 54909036 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -59769402");
+        fmpz_poly_gcd(g, a, b);
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(g);
     }
 
     FLINT_TEST_CLEANUP(state);
