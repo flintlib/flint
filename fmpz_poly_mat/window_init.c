@@ -22,11 +22,17 @@ fmpz_poly_mat_window_init(fmpz_poly_mat_t window, const fmpz_poly_mat_t mat, slo
     if (r2 > r1)
         window->rows = (fmpz_poly_struct **) flint_malloc((r2 - r1)
                                                   * sizeof(fmpz_poly_struct *));
+    else
+        window->rows = NULL;
 
-    if (c2 > c1)
+    if (mat->c > 0)
     {
         for (i = 0; i < r2 - r1; i++)
             window->rows[i] = mat->rows[r1 + i] + c1;
+    } else
+    {
+        for (i = 0; i < r2 - r1; i++)
+            window->rows[i] = NULL;
     }
 
     window->r = r2 - r1;
