@@ -71,6 +71,7 @@ int main(void)
        flint_mpn_mulmod_preinvn(r2->_mp_d, a->_mp_d, b->_mp_d, size_d, d->_mp_d, dinv, norm); 
 
        /* normalise */
+       r2->_mp_alloc = size_d;
        while (size_d && r2->_mp_d[size_d - 1] == 0) size_d--;
        r2->_mp_size = size_d;
 
