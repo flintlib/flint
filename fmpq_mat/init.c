@@ -14,11 +14,16 @@
 
 void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
 {
+    slong i;
+
+    if (rows != 0)
+       mat->rows = (fmpq **) flint_malloc(rows * sizeof(fmpq *));
+    else
+       mat->rows = NULL;
+
     if (rows != 0 && cols != 0)
     {
-        slong i;
         mat->entries = (fmpq *) flint_calloc(flint_mul_sizes(rows, cols), sizeof(fmpq));
-        mat->rows = (fmpq **) flint_malloc(rows * sizeof(fmpq *));
 
         /* Set denominators */
         for (i = 0; i < rows * cols; i++)
@@ -28,7 +33,14 @@ void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
             mat->rows[i] = mat->entries + i * cols;
     }
     else
-        mat->entries = NULL;
+    {
+       mat->entries = NULL;
+       if (rows != 0)
+       {
+          for (i = 0; i < rows; i++)
+             mat->rows[i] = NULL;
+       }
+    }
 
     mat->r = rows;
     mat->c = cols;

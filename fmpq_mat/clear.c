@@ -22,5 +22,6 @@ void fmpq_mat_clear(fmpq_mat_t mat)
 
         flint_free(mat->entries);
         flint_free(mat->rows);
-    }
+    } else if (mat->rows != 0)
+        flint_free(mat->rows);
 }
