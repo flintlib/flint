@@ -14,19 +14,8 @@
 char *
 fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
-    slong value = (slong)op->value;
-    size_t len;
-    char *s;
-
-    if (value == 0)
-        len = 2U;
-    else if (value < LONG_MAX)
-        len = n_clog(op->value + 1, 10) + 1U;
-    else if (-value == value)
-        len = n_clog(op->value, 10) + 2U;
-    else
-        len = n_clog(-value + 1, 10) + 2U;
-    s = flint_malloc(len * sizeof(char));
+    slong numchars = op->value == 0 ? 1 : n_clog(op->value + 1, 10);
+    char *s = flint_malloc((num_chars + 1)* sizeof(char));
     flint_sprintf(s, "%wd", op->value);
     return s;
 }
