@@ -26,6 +26,6 @@ fmpz_poly_mat_clear(fmpz_poly_mat_t A)
 
         flint_free(A->entries);
         flint_free(A->rows);
-    } else if (A->rows != 0)
+    } else if (A->r != 0)
         flint_free(A->rows);
 }

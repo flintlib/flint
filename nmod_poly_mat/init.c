@@ -17,7 +17,7 @@
 void
 nmod_poly_mat_init(nmod_poly_mat_t A, slong rows, slong cols, mp_limb_t n)
 {
-    if (rows && cols)
+    if (rows > 0 && cols > 0)
     {
         slong i;
 

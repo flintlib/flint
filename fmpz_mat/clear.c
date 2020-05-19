@@ -21,6 +21,6 @@ fmpz_mat_clear(fmpz_mat_t mat)
             fmpz_clear(mat->entries + i);   /* Clear all coefficients */
         flint_free(mat->entries);     /* Clean up array of entries */
         flint_free(mat->rows);        /* Clean up row array */
-    } else if (mat->rows != 0)
+    } else if (mat->r != 0)
         flint_free(mat->rows);
 }
