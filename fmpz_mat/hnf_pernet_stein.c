@@ -497,7 +497,7 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
 
         fmpz_mat_init(c, 1, r - 1);
         fmpz_mat_init(d, 1, r - 1);
-        fmpz_mat_init(B, r - 2, r - 1);
+        fmpz_mat_init(B, FLINT_MAX(r - 2, 0), r - 1);
         fmpz_mat_init(C, r - 1, r - 1);
 
         for (i = 0; i < r - 2; i++)
