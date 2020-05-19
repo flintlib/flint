@@ -20,11 +20,17 @@ fmpq_mat_window_init(fmpq_mat_t window, const fmpq_mat_t mat, slong r1,
 
     if (r2 > r1)
         window->rows = (fmpq **) flint_malloc((r2 - r1) * sizeof(fmpq *));
+    else
+        window->rows = NULL;
 
     if (mat->c > 0)
     {
         for (i = 0; i < r2 - r1; i++)
             window->rows[i] = mat->rows[r1 + i] + c1;
+    } else
+    {
+        for (i = 0; i < r2 - r1; i++)
+            window->rows[i] = NULL;
     }
 
     window->r = r2 - r1;
