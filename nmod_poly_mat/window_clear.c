@@ -15,8 +15,5 @@ void
 nmod_poly_mat_window_clear(nmod_poly_mat_t window)
 {
     if (window->r != 0)
-    {
         flint_free(window->rows);
-    }
-
 }
