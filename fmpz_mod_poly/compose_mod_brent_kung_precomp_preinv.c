@@ -73,9 +73,9 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
     slong len2 = poly2->length;
     slong len = len2 - 1;
     slong vec_len = FLINT_MAX(len2 - 1, len1);
-    slong m= n_sqrt(len) + 1;
+    slong m = n_sqrt(len) + 1;
 
-    fmpz* ptr;
+    fmpz * ptr;
     fmpz_t inv2;
 
     if (len2 == 0)

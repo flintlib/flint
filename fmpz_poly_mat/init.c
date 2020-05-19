@@ -17,12 +17,16 @@
 void
 fmpz_poly_mat_init(fmpz_poly_mat_t A, slong rows, slong cols)
 {
+    slong i;
+
+    if (rows != 0)
+        A->rows = (fmpz_poly_struct **) flint_malloc(rows * sizeof(fmpz_poly_struct *));
+    else
+        A->rows = NULL;
+
     if (rows != 0 && cols != 0)
     {
-        slong i;
-
         A->entries = (fmpz_poly_struct *) flint_malloc(flint_mul_sizes(rows, cols) * sizeof(fmpz_poly_struct));
-        A->rows = (fmpz_poly_struct **) flint_malloc(rows * sizeof(fmpz_poly_struct *));
 
         for (i = 0; i < rows * cols; i++)
             fmpz_poly_init(A->entries + i);
@@ -31,7 +35,14 @@ fmpz_poly_mat_init(fmpz_poly_mat_t A, slong rows, slong cols)
             A->rows[i] = A->entries + i * cols;
     }
     else
+    {
         A->entries = NULL;
+        if (rows != 0)
+        {
+            for (i = 0; i < rows; i++)
+                A->rows[i] = NULL;
+        }
+    }
 
     A->r = rows;
     A->c = cols;
