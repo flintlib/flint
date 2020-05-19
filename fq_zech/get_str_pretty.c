@@ -16,7 +16,7 @@ char *
 fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     slong num_chars = op->value == 0 ? 1 : n_clog(op->value + 1, 10);
-    s = flint_malloc((num_chars + strlen(ctx->fq_nmod_ctx->var) + 2) * sizeof(char));
+    char * s = flint_malloc((num_chars + strlen(ctx->fq_nmod_ctx->var) + 2) * sizeof(char));
     flint_sprintf(s, "%s^%wd", ctx->fq_nmod_ctx->var, op->value);
     return s;
 }
