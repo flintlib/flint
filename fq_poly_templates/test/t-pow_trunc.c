@@ -66,9 +66,10 @@ main(void)
         }
 
         TEMPLATE(T, clear) (d, ctx);
-	TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
         TEMPLATE(T, poly_clear) (b, ctx);
         TEMPLATE(T, poly_clear) (c, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check aliasing */
@@ -107,6 +108,7 @@ main(void)
         TEMPLATE(T, poly_clear) (a, ctx);
         TEMPLATE(T, poly_clear) (b, ctx);
         TEMPLATE(T, poly_clear) (c, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

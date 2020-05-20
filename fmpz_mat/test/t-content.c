@@ -53,7 +53,7 @@ int main()
 		{
 			if (fmpz_is_zero(gcd_mat))
 			{
-				continue;
+				goto cleanup;
 			}
 			else
 			{
@@ -75,6 +75,8 @@ int main()
 			flint_printf("FAIL!\n");
 			abort();
 		}
+
+cleanup:
 
 		fmpz_mat_clear(A);
 		fmpz_mat_clear(B);
