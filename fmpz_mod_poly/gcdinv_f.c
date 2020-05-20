@@ -102,7 +102,7 @@ void fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S,
         }
 
         lenG = _fmpz_mod_poly_gcdinv_f(f, g, s, 
-            A->coeffs, lenA, B->coeffs, lenB, &A->p);
+                                      A->coeffs, lenA, B->coeffs, lenB, &A->p);
 
         if (G == A || G == B)
         {
