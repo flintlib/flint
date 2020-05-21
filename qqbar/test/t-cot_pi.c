@@ -55,7 +55,7 @@ int main()
                 flint_printf("FAIL!\n");
                 flint_printf("x = "); qqbar_print(x); flint_printf("\n\n");
                 flint_printf("z = "); arb_printn(z, 200, 0); flint_printf("\n\n");
-                flint_printf("w = "); arb_printn(z, 200, 0); flint_printf("\n\n");
+                flint_printf("w = "); arb_printn(w, 200, 0); flint_printf("\n\n");
                 flint_printf("p, q = %wd %wu\n\n", p, q);
                 flint_abort();
             }
