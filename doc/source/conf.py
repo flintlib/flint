@@ -133,16 +133,14 @@ htmlhelp_basename = 'calciumdoc'
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
+    'papersize': 'a4paper',
 
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
 
     # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
+    'preamble': '\\usepackage{lmodern}\n\\setcounter{tocdepth}{2}\n\\urlstyle{tt}',
 
     # Latex figure (float) alignment
     #
@@ -157,6 +155,14 @@ latex_documents = [
      u'Fredrik Johansson', 'manual'),
 ]
 
+
+latex_logo = "_static/ca2.pdf"
+
+latex_preamble = r"""
+\usepackage{amsmath,amssymb}
+\usepackage{breakurl}
+\setcounter{tocdepth}{2}
+"""
 
 # -- Options for manual page output ------------------------------------------
 
