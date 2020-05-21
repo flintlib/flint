@@ -43,7 +43,7 @@ Types, macros and constants
 
 .. macro:: QQBAR_POLY(x)
 
-    Macro returning a pointer to the minimal polynomial of *x* as an *fmpz_poly_t*.
+    Macro returning a pointer to the minimal polynomial of *x* which can be used as an *fmpz_poly_t*.
 
 .. macro:: QQBAR_COEFFS(x)
 
@@ -52,7 +52,7 @@ Types, macros and constants
 
 .. macro:: QQBAR_ENCLOSURE(x)
 
-    Macro returning a pointer to the enclosure of *x* as an *acb_t*.
+    Macro returning a pointer to the enclosure of *x* which can be used as an *acb_t*.
 
 Memory management
 -------------------------------------------------------------------------------

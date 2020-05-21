@@ -30,6 +30,7 @@ Module documentation
 .. toctree::
    :maxdepth: 2
 
+   fmpz_mpoly_q.rst
    qqbar.rst
 
 
