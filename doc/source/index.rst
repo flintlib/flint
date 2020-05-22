@@ -141,6 +141,14 @@ Floating-point support code
    mpfr_vec.rst
    mpfr_mat.rst
 
+C++ Interface
+
+.. toctree::
+   :maxdpth 1
+
+   flintxx.rst
+   flintxx_functions.rst
+
 References
 ----------------
 
