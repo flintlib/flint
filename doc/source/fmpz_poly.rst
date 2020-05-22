@@ -2350,6 +2350,15 @@ Composition
     sets `f(t) = g(h(t))`.
 
 
+.. function:: int _fmpz_poly_decompose(fmpz * g, slong r, fmpz * h, slong s, const fmpz * f);
+
+.. function:: int fmpz_poly_decompose(fmpz_poly_t g, slong r, fmpz_poly_t h, slong s, const fmpz_poly_t f);
+
+    Try to decompose `f` into the composition of `g` of degree `r>1` and `h` of degree `s>1`.
+    If successful, `h` will be primitive, have positive leading cofficient, and have constant coefficient zero.
+    A decomposition with the specified degrees exists over `\mathbb{Z}` if and only if it exists over `\mathbb{Q}`, which in turn exists if and only if it exists over `\mathbb{Z}` with the specified restrictions on `h`.
+    Thus, :func:`fmpq_poly_dcompose` offers no substantial improvement in functionality.
+
 Inflation and deflation
 --------------------------------------------------------------------------------
 

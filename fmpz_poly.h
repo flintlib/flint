@@ -1018,6 +1018,13 @@ FLINT_DLL void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
 FLINT_DLL void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
+FLINT_DLL int _fmpz_poly_decompose(fmpz * g, slong r, fmpz * h, slong s,
+                                                               const fmpz * f);
+
+FLINT_DLL int fmpz_poly_decompose(fmpz_poly_t g, slong r, fmpz_poly_t h,
+                                                 slong s, const fmpz_poly_t f);
+
+
 /*  Taylor shift  ************************************************************/
 
 FLINT_DLL void _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, slong n);
