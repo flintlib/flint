@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 #include "flint/fmpz_mpoly.h"
+#include "flint/fmpq.h"
 
 typedef struct
 {
@@ -47,6 +48,12 @@ void fmpz_mpoly_q_clear(fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx);
 void fmpz_mpoly_q_swap(fmpz_mpoly_q_t x, fmpz_mpoly_q_t y, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_q_set(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_set_fmpq(fmpz_mpoly_q_t res, const fmpq_t x, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_set_fmpz(fmpz_mpoly_q_t res, const fmpz_t x, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_set_si(fmpz_mpoly_q_t res, slong x, const fmpz_mpoly_ctx_t ctx);
 
 /* Canonicalisation */
 
@@ -139,7 +146,93 @@ _fmpz_mpoly_q_div(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
             const fmpz_mpoly_t y_num, const fmpz_mpoly_t y_den,
             const fmpz_mpoly_ctx_t ctx);
 
+void
+_fmpz_mpoly_q_add_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
+            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
+            const fmpz_t y_num, const fmpz_t y_den,
+            const fmpz_mpoly_ctx_t ctx);
+
+void
+_fmpz_mpoly_q_sub_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
+            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
+            const fmpz_t y_num, const fmpz_t y_den,
+            const fmpz_mpoly_ctx_t ctx);
+
+void
+_fmpz_mpoly_q_mul_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
+            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
+            const fmpz_t y_num, const fmpz_t y_den,
+            const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_add_fmpz(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_t y, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_add_fmpq(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpq_t y, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_sub_fmpz(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_t y, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_sub_fmpq(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpq_t y, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_mul_fmpz(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_t y, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_mul_fmpq(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpq_t y, const fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mpoly_q_div_fmpz(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_t y, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_div_fmpq(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpq_t y, const fmpz_mpoly_ctx_t ctx);
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_add_si(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_si(t, c);
+    fmpz_mpoly_q_add_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+}
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_sub_si(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_si(t, c);
+    fmpz_mpoly_q_sub_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+}
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_mul_si(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_si(t, c);
+    fmpz_mpoly_q_mul_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+}
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_div_si(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_si(t, c);
+    fmpz_mpoly_q_div_fmpz(res, x, t, ctx);
+    fmpz_clear(t);
+}
+
 /* Polynomial helper functions */
+
+FMPZ_MPOLY_Q_INLINE void
+_fmpz_vec_content2(fmpz_t res, const fmpz * vec, slong len, const fmpz_t inp)
+{
+    if (fmpz_is_pm1(inp))
+    {
+        fmpz_one(res);
+    }
+    else
+    {
+        slong i;
+        fmpz_abs(res, inp);
+        for (i = len - 1; i >= 0; i--)
+        {
+            fmpz_gcd(res, res, vec + i);
+            if (fmpz_is_one(res))
+                break;
+        }
+    }
+}
 
 FMPZ_MPOLY_Q_INLINE void
 fmpz_mpoly_gcd_assert_successful(fmpz_mpoly_t res, const fmpz_mpoly_t x, const fmpz_mpoly_t y, const fmpz_mpoly_ctx_t ctx)

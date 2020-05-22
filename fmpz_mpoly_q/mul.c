@@ -37,16 +37,25 @@ _fmpz_mpoly_q_mul(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
     {
         fmpz_mpoly_t t, u;
         fmpz_mpoly_init(t, ctx);
-        fmpz_mpoly_init(u, ctx);
 
         fmpz_mpoly_gcd_assert_successful(t, x_num, y_den, ctx);
-        fmpz_mpoly_divexact(u, x_num, t, ctx);
-        fmpz_mpoly_mul(res_num, u, y_num, ctx);
-        fmpz_mpoly_divexact(u, y_den, t, ctx);
-        fmpz_mpoly_mul(res_den, x_den, u, ctx);
+
+        if (fmpz_mpoly_is_one(t, ctx))
+        {
+            fmpz_mpoly_mul(res_num, x_num, y_num, ctx);
+            fmpz_mpoly_mul(res_den, x_den, y_den, ctx);
+        }
+        else
+        {
+            fmpz_mpoly_init(u, ctx);
+            fmpz_mpoly_divexact(u, x_num, t, ctx);
+            fmpz_mpoly_mul(res_num, u, y_num, ctx);
+            fmpz_mpoly_divexact(u, y_den, t, ctx);
+            fmpz_mpoly_mul(res_den, x_den, u, ctx);
+            fmpz_mpoly_clear(u, ctx);
+        }
 
         fmpz_mpoly_clear(t, ctx);
-        fmpz_mpoly_clear(u, ctx);
         return;
     }
 
@@ -54,16 +63,25 @@ _fmpz_mpoly_q_mul(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
     {
         fmpz_mpoly_t t, u;
         fmpz_mpoly_init(t, ctx);
-        fmpz_mpoly_init(u, ctx);
 
         fmpz_mpoly_gcd_assert_successful(t, y_num, x_den, ctx);
-        fmpz_mpoly_divexact(u, y_num, t, ctx);
-        fmpz_mpoly_mul(res_num, u, x_num, ctx);
-        fmpz_mpoly_divexact(u, x_den, t, ctx);
-        fmpz_mpoly_mul(res_den, y_den, u, ctx);
+
+        if (fmpz_mpoly_is_one(t, ctx))
+        {
+            fmpz_mpoly_mul(res_num, x_num, y_num, ctx);
+            fmpz_mpoly_mul(res_den, x_den, y_den, ctx);
+        }
+        else
+        {
+            fmpz_mpoly_init(u, ctx);
+            fmpz_mpoly_divexact(u, y_num, t, ctx);
+            fmpz_mpoly_mul(res_num, u, x_num, ctx);
+            fmpz_mpoly_divexact(u, x_den, t, ctx);
+            fmpz_mpoly_mul(res_den, y_den, u, ctx);
+            fmpz_mpoly_clear(u, ctx);
+        }
 
         fmpz_mpoly_clear(t, ctx);
-        fmpz_mpoly_clear(u, ctx);
         return;
     }
 
