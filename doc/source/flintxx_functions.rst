@@ -3601,7 +3601,7 @@ Exponential
 .. function:: Padic_expr exp_rectangular(Padic_expr)
 .. function:: Padic_expr exp_balanced(Padic_expr)
 
-    Compute the exponential function. These may raise ``flint_exception``s if the
+    Compute the exponential function. These may raise ``flint_exception`` if the
     series do not converge.
 
 Logarithm
@@ -3612,7 +3612,7 @@ Logarithm
 .. function:: Padic_expr log_balanced(Padic_expr)
 .. function:: Padic_expr log_satoh(Padic_expr)
 
-    Compute the logarithm function. These may raise ``flint_exception``s if the
+    Compute the logarithm function. These may raise ``flint_exception`` if the
     series do not converge.
 
 Special functions
@@ -3743,9 +3743,9 @@ Getting and setting coefficients
 .. function:: void Padic_poly_target::set_coeff(slong i, Padic_expr)
 
 Comparison
-
-    The overloaded ``operator==`` can be used for comparison.
 -------------------------------------------------------------------------------
+
+The overloaded ``operator==`` can be used for comparison.
 
 .. function:: bool Padic_poly_expr::is_zero() const
 .. function:: bool Padic_poly_expr::is_one() const
@@ -4057,7 +4057,7 @@ Exponential
 .. function:: Qadic_expr exp_rectangular(Qadic_expr)
 .. function:: Qadic_expr exp_balanced(Qadic_expr)
 
-    Compute the exponential function. These may raise ``flint_exception``s
+    Compute the exponential function. These may raise ``flint_exception``
     if the series do not converge.
 
 Logarithm
@@ -4066,7 +4066,7 @@ Logarithm
 .. function:: Qadic_expr log(Qadic_expr)
 .. function:: Qadic_expr log_balanced(Qadic_expr)
 
-    Compute the logarithm function. These may raise ``flint_exception``s
+    Compute the logarithm function. These may raise ``flint_exception``
     if the series do not converge.
 
 Special functions

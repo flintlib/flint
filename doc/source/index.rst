@@ -144,7 +144,7 @@ Floating-point support code
 C++ Interface
 
 .. toctree::
-   :maxdpth 1
+   :maxdepth: 1
 
    flintxx.rst
    flintxx_functions.rst

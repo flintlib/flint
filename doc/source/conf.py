@@ -148,7 +148,7 @@ htmlhelp_basename = 'Flintdoc'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
-    # 'papersize': 'letterpaper',
+    'papersize': 'a4paper',
 
     # The font size ('10pt', '11pt' or '12pt').
     #
@@ -157,6 +157,7 @@ latex_elements = {
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
+    'preamble': '\\usepackage{lmodern}\n\\setcounter{tocdepth}{2}\n\\urlstyle{tt}',
 
     # Latex figure (float) alignment
     #
