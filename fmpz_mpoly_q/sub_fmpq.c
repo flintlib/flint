@@ -32,7 +32,7 @@ _fmpz_mpoly_q_sub_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
         return;
     }
 
-    /* todo: special-case integer denominators */
+    /* todo: special-case integer x_den */
 
     if (fmpz_mpoly_equal_fmpz(x_den, y_den, ctx))
     {
@@ -116,20 +116,19 @@ _fmpz_mpoly_q_sub_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
         }
         else
         {
-            fmpz_mpoly_t a, t, u;
+            fmpz_mpoly_t t, u;
             fmpz_t b, c;
 
-            fmpz_mpoly_init(a, ctx);
             fmpz_init(b);
             fmpz_init(c);
             fmpz_mpoly_init(t, ctx);
             fmpz_mpoly_init(u, ctx);
 
-            fmpz_mpoly_scalar_divexact_fmpz(a, x_den, g, ctx);
+            fmpz_mpoly_scalar_divexact_fmpz(u, x_den, g, ctx);
             fmpz_divexact(b, y_den, g);
 
             fmpz_mpoly_scalar_mul_fmpz(t, x_num, b, ctx);
-            fmpz_mpoly_scalar_mul_fmpz(u, a, y_num, ctx);
+            fmpz_mpoly_scalar_mul_fmpz(u, u, y_num, ctx);
             fmpz_mpoly_sub(res_num, t, u, ctx);
 
             _fmpz_vec_content2(c, res_num->coeffs, res_num->length, g);
@@ -145,7 +144,6 @@ _fmpz_mpoly_q_sub_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
                 fmpz_mpoly_scalar_mul_fmpz(res_den, res_den, b, ctx);
             }
 
-            fmpz_mpoly_clear(a, ctx);
             fmpz_clear(b);
             fmpz_clear(c);
             fmpz_mpoly_clear(t, ctx);

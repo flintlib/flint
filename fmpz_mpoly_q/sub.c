@@ -11,6 +11,162 @@
 
 #include "fmpz_mpoly_q.h"
 
+static void
+_fmpz_mpoly_q_sub_fmpz_mpoly_den(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
+            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
+            const fmpz_mpoly_t y_num, const fmpz_t y_den,
+            const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t g;
+    fmpz_init(g);
+
+    if (fmpz_mpoly_is_fmpz(y_num, ctx))
+    {
+        if (res_num == x_num || res_num == y_num)
+        {
+            fmpz_t t, u;
+            fmpz_init_set(t, y_num->coeffs);
+            fmpz_init_set(u, y_den);
+            _fmpz_mpoly_q_sub_fmpq(res_num, res_den, x_num, x_den, t, u, ctx);
+            fmpz_clear(t);
+            fmpz_clear(u);
+        }
+        else
+        {
+            _fmpz_mpoly_q_sub_fmpq(res_num, res_den, x_num, x_den, y_num->coeffs, y_den, ctx);
+        }
+        return;
+    }
+
+    if (fmpz_mpoly_is_fmpz(x_den, ctx))
+    {
+        fmpz_gcd(g, x_den->coeffs, y_den);
+
+        if (fmpz_is_one(g))
+        {
+            fmpz_mpoly_t t, u;
+
+            fmpz_mpoly_init(t, ctx);
+            fmpz_mpoly_init(u, ctx);
+
+            /* todo: avoid one alloc? not helpful right now because
+               fmpz_mpoly_sub does not work inplace */
+            fmpz_mpoly_scalar_mul_fmpz(t, y_num, x_den->coeffs, ctx);
+            fmpz_mpoly_scalar_mul_fmpz(u, x_num, y_den, ctx);
+            fmpz_mpoly_sub(res_num, u, t, ctx);
+            fmpz_mul(g, x_den->coeffs, y_den);
+            fmpz_mpoly_set_fmpz(res_den, g, ctx);
+
+            fmpz_mpoly_clear(t, ctx);
+            fmpz_mpoly_clear(u, ctx);
+        }
+        else
+        {
+            fmpz_t a, b;
+            fmpz_mpoly_t t, u;
+
+            fmpz_init(a);
+            fmpz_init(b);
+            fmpz_mpoly_init(t, ctx);
+            fmpz_mpoly_init(u, ctx);
+
+            fmpz_divexact(a, y_den, g);
+            fmpz_divexact(b, x_den->coeffs, g);
+
+            fmpz_mpoly_scalar_mul_fmpz(t, y_num, b, ctx);
+            fmpz_mpoly_scalar_mul_fmpz(u, x_num, a, ctx);
+            fmpz_mpoly_sub(res_num, u, t, ctx);
+
+            if (fmpz_mpoly_is_zero(res_num, ctx))
+                fmpz_one(a);
+            else
+                _fmpz_vec_content2(a, res_num->coeffs, res_num->length, g);
+
+            if (fmpz_is_one(a))
+            {
+                fmpz_mul(g, b, y_den);
+                fmpz_mpoly_set_fmpz(res_den, g, ctx);
+            }
+            else
+            {
+                fmpz_mpoly_scalar_divexact_fmpz(res_num, res_num, a, ctx);
+                fmpz_divexact(g, y_den, a);
+                fmpz_mul(g, g, b);
+                fmpz_mpoly_set_fmpz(res_den, g, ctx);
+            }
+
+            fmpz_clear(a);
+            fmpz_clear(b);
+            fmpz_mpoly_clear(t, ctx);
+            fmpz_mpoly_clear(u, ctx);
+        }
+    }
+    else
+    {
+        _fmpz_vec_content2(g, x_den->coeffs, x_den->length, y_den);
+
+        if (fmpz_is_one(g))
+        {
+            fmpz_mpoly_t t, u;
+
+            fmpz_mpoly_init(t, ctx);
+            fmpz_mpoly_init(u, ctx);
+
+            /* todo: avoid one alloc? not helpful right now because
+               fmpz_mpoly_sub does not work inplace */
+            fmpz_mpoly_mul(t, y_num, x_den, ctx);
+            fmpz_mpoly_scalar_mul_fmpz(u, x_num, y_den, ctx);
+            fmpz_mpoly_sub(res_num, u, t, ctx);
+            fmpz_set(g, y_den);
+            fmpz_mpoly_scalar_mul_fmpz(res_den, x_den, g, ctx);
+
+            fmpz_mpoly_clear(t, ctx);
+            fmpz_mpoly_clear(u, ctx);
+        }
+        else
+        {
+            fmpz_t a;
+            fmpz_mpoly_t b, t, u;
+
+            fmpz_init(a);
+            fmpz_mpoly_init(b, ctx);
+            fmpz_mpoly_init(t, ctx);
+            fmpz_mpoly_init(u, ctx);
+
+            fmpz_divexact(a, y_den, g);
+            fmpz_mpoly_scalar_divexact_fmpz(b, x_den, g, ctx);
+
+            fmpz_mpoly_mul(t, y_num, b, ctx);
+            fmpz_mpoly_scalar_mul_fmpz(u, x_num, a, ctx);
+            fmpz_mpoly_sub(res_num, u, t, ctx);
+
+            if (fmpz_mpoly_is_zero(res_num, ctx))
+                fmpz_one(a);
+            else
+                _fmpz_vec_content2(a, res_num->coeffs, res_num->length, g);
+
+            if (fmpz_is_one(a))
+            {
+                fmpz_set(g, y_den);
+                fmpz_mpoly_scalar_mul_fmpz(res_den, b, g, ctx);
+            }
+            else
+            {
+                fmpz_mpoly_scalar_divexact_fmpz(res_num, res_num, a, ctx);
+                fmpz_divexact(g, y_den, a);
+                fmpz_mpoly_scalar_mul_fmpz(res_den, b, g, ctx);
+            }
+
+            fmpz_clear(a);
+            fmpz_mpoly_clear(b, ctx);
+            fmpz_mpoly_clear(t, ctx);
+            fmpz_mpoly_clear(u, ctx);
+        }
+    }
+
+    fmpz_clear(g);
+}
+
 void
 _fmpz_mpoly_q_sub(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
             const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
@@ -31,15 +187,32 @@ _fmpz_mpoly_q_sub(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
         return;
     }
 
-    /* todo: special-case integer denominators; scalar addition */
-
     if (fmpz_mpoly_equal(x_den, y_den, ctx))
     {
         fmpz_mpoly_sub(res_num, x_num, y_num, ctx);
 
-        if (fmpz_mpoly_is_one(x_den, ctx))
+        if (fmpz_mpoly_is_one(x_den, ctx) || fmpz_mpoly_is_zero(res_num, ctx))
         {
             fmpz_mpoly_one(res_den, ctx);
+        }
+        else if (fmpz_mpoly_is_fmpz(x_den, ctx))
+        {
+            fmpz_t t;
+            fmpz_init(t);
+
+            _fmpz_vec_content2(t, res_num->coeffs, res_num->length, x_den->coeffs);
+
+            if (fmpz_is_one(t))
+            {
+                fmpz_mpoly_set(res_den, x_den, ctx);
+            }
+            else
+            {
+                fmpz_mpoly_scalar_divexact_fmpz(res_num, res_num, t, ctx);
+                fmpz_mpoly_scalar_divexact_fmpz(res_den, x_den, t, ctx);
+            }
+
+            fmpz_clear(t);
         }
         else
         {
@@ -63,7 +236,6 @@ _fmpz_mpoly_q_sub(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
 
         return;
     }
-
 
     if (fmpz_mpoly_is_one(x_den, ctx))
     {
@@ -103,6 +275,19 @@ _fmpz_mpoly_q_sub(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
         return;
     }
 
+    if (fmpz_mpoly_is_fmpz(y_den, ctx))
+    {
+        _fmpz_mpoly_q_sub_fmpz_mpoly_den(res_num, res_den, x_num, x_den, y_num, y_den->coeffs, ctx);
+        return;
+    }
+
+    if (fmpz_mpoly_is_fmpz(x_den, ctx))
+    {
+        _fmpz_mpoly_q_sub_fmpz_mpoly_den(res_num, res_den, y_num, y_den, x_num, x_den->coeffs, ctx);
+        fmpz_mpoly_neg(res_num, res_num, ctx);
+        return;
+    }
+
     {
         fmpz_mpoly_t g;
         fmpz_mpoly_init(g, ctx);
@@ -116,7 +301,9 @@ _fmpz_mpoly_q_sub(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
             fmpz_mpoly_init(t, ctx);
             fmpz_mpoly_init(u, ctx);
 
-            fmpz_mpoly_mul(t, x_num, y_den, ctx);  /* todo: avoid one alloc? */
+            /* todo: avoid one alloc? not helpful right now because
+               fmpz_mpoly_sub does not work inplace */
+            fmpz_mpoly_mul(t, x_num, y_den, ctx);
             fmpz_mpoly_mul(u, y_num, x_den, ctx);
             fmpz_mpoly_sub(res_num, t, u, ctx);
             fmpz_mpoly_mul(res_den, x_den, y_den, ctx);

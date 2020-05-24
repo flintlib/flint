@@ -21,7 +21,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000; iter++)
+    for (iter = 0; iter < 100000; iter++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_q_t A, B, C, D;
@@ -36,8 +36,8 @@ int main()
         fmpz_mpoly_init(t, ctx);
         fmpz_mpoly_init(u, ctx);
 
-        fmpz_mpoly_q_randtest(A, state, 10, 2 + n_randint(state, 100), 5, ctx);
-        fmpz_mpoly_q_randtest(B, state, 10, 2 + n_randint(state, 100), 5, ctx);
+        fmpz_mpoly_q_randtest(A, state, 5, 2 + n_randint(state, 100), 5, ctx);
+        fmpz_mpoly_q_randtest(B, state, 5, 2 + n_randint(state, 100), 5, ctx);
 
         fmpz_mpoly_q_add(C, A, B, ctx);
 
