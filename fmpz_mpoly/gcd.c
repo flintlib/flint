@@ -1443,15 +1443,27 @@ int fmpz_mpoly_gcd(
         }
     }
 
-    Gbits = FLINT_MIN(A->bits, B->bits);
-
-    if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS)
+    if (fmpz_mpoly_is_fmpz(A, ctx))
     {
-        num_handles = flint_request_threads(&handles, thread_limit);
-        success = _fmpz_mpoly_gcd_threaded_pool(G, Gbits, A, B, ctx, handles, num_handles);
-        flint_give_back_threads(handles, num_handles);
-        return success;
+        fmpz_t t;
+        fmpz_init_set(t, A->coeffs);
+        _fmpz_vec_content_chained(t, B->coeffs, B->length);
+        fmpz_mpoly_set_fmpz(G, t, ctx);
+        fmpz_clear(t);
+        return 1;
     }
+
+    if (fmpz_mpoly_is_fmpz(B, ctx))
+    {
+        fmpz_t t;
+        fmpz_init_set(t, B->coeffs);
+        _fmpz_vec_content_chained(t, A->coeffs, A->length);
+        fmpz_mpoly_set_fmpz(G, t, ctx);
+        fmpz_clear(t);
+        return 1;
+    }
+
+    Gbits = FLINT_MIN(A->bits, B->bits);
 
     if (A->length == 1)
     {
@@ -1461,7 +1473,16 @@ int fmpz_mpoly_gcd(
     {
         return _try_monomial_gcd(G, Gbits, A, B, ctx);
     }
-    else if (_try_monomial_cofactors(G, Gbits, A, B, ctx))
+
+    if (A->bits <= FLINT_BITS && B->bits <= FLINT_BITS)
+    {
+        num_handles = flint_request_threads(&handles, thread_limit);
+        success = _fmpz_mpoly_gcd_threaded_pool(G, Gbits, A, B, ctx, handles, num_handles);
+        flint_give_back_threads(handles, num_handles);
+        return success;
+    }
+
+    if (_try_monomial_cofactors(G, Gbits, A, B, ctx))
     {
         return 1;
     }
