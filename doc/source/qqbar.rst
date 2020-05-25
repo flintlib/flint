@@ -20,7 +20,7 @@ The :type:`qqbar_t` type may be used to represent the
 embedding of a number field in `\mathbb{R}` or `\mathbb{C}` in such a setting.
 
 
-Types, macros and constants
+Types and macros
 -------------------------------------------------------------------------------
 
 .. type:: qqbar_struct

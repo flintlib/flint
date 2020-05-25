@@ -11,8 +11,9 @@
 
 #include "calcium.h"
 
+/*
 void
 ca_ctx_clear(ca_ctx_t ctx)
 {
 }
-
+*/

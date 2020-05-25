@@ -28,6 +28,8 @@ extern "C" {
 #include "flint/fmpq_mat.h"
 #include "acb.h"
 
+#include "calcium.h"
+
 typedef struct
 {
     fmpz_poly_struct poly;

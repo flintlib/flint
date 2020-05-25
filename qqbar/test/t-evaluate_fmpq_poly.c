@@ -21,7 +21,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
     {
         fmpq_poly_t f, g, h;
         qqbar_t x, fx, gx, hx, y;

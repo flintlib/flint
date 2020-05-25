@@ -49,7 +49,7 @@ qqbar_sgn_re(const qqbar_t x)
         {
             _qqbar_enclosure_raw(t, QQBAR_POLY(x), t, prec);
 
-            if (!arb_contains_zero(acb_realref(t)))
+            if (!arb_contains_zero(acb_realref(t)) || arb_is_zero(acb_realref(t)))
             {
                 res = arf_sgn(arb_midref(acb_realref(t)));
                 break;

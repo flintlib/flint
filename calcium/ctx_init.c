@@ -11,7 +11,9 @@
 
 #include "calcium.h"
 
+/*
 void
 ca_ctx_init(ca_ctx_t ctx)
 {
 }
+*/

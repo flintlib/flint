@@ -25,17 +25,31 @@
 extern "C" {
 #endif
 
-typedef struct
-{
-    slong dummy;
-}
-ca_ctx_struct;
+extern const char * calcium_version;
 
-typedef ca_ctx_struct ca_ctx_t[1];
+double calcium_test_multiplier(void);
 
-void ca_ctx_init(ca_ctx_t ctx);
+/* todo: IDs for builtin mathematical functions and constants */
 
-void ca_ctx_clear(ca_ctx_t ctx);
+#define CA_Neg   10
+#define CA_Add   11
+#define CA_Sub   12
+#define CA_Mul   13
+#define CA_Div   14
+#define CA_Sqrt  15
+#define CA_Root  16
+
+#define CA_Pi    50
+
+#define CA_Exp   100
+#define CA_Log   101
+#define CA_Pow   102
+#define CA_Cos   103
+#define CA_Sin   104
+#define CA_Tan   105
+#define CA_Atan  106
+#define CA_Acos  107
+#define CA_Asin  108
 
 #ifdef __cplusplus
 }

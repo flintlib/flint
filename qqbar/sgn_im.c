@@ -41,7 +41,7 @@ qqbar_sgn_im(const qqbar_t x)
         {
             _qqbar_enclosure_raw(t, QQBAR_POLY(x), t, prec);
 
-            if (!arb_contains_zero(acb_imagref(t)))
+            if (!arb_contains_zero(acb_imagref(t)) || arb_is_zero(acb_imagref(t)))
             {
                 res = arf_sgn(arb_midref(acb_imagref(t)));
                 break;

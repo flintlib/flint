@@ -4,7 +4,7 @@
 ===============================================================================
 
 An :type:`fmpz_mpoly_q_t` represents an element of 
-`\mathbb{Q}(x_1,\ldots,x_n)` for fixed *n* as a pair of FLINT 
+`\mathbb{Q}(x_1,\ldots,x_n)` for fixed *n* as a pair of Flint 
 multivariate polynomials (:type:`fmpz_mpoly_t`).
 Instances are always kept in canonical form by ensuring that the GCD
 of numerator and denominator is 1 and that the coefficient
@@ -15,7 +15,7 @@ The user must create a multivariate polynomial context
 the monomial ordering.
 
 
-Types, macros and constants
+Types and macros
 -------------------------------------------------------------------------------
 
 .. type:: fmpz_mpoly_q_struct

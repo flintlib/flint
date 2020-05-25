@@ -9,24 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "calcium.h"
+#include "ca.h"
 
-int main()
+void
+ca_extension_clear(ca_extension_t ext)
 {
-    flint_rand_t state;
-    ca_ctx_t ctx;
-
-    flint_printf("ctx_init_clear....");
-    fflush(stdout);
-
-    flint_randinit(state);
-
-    ca_ctx_init(ctx);
-    ca_ctx_clear(ctx);
-
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    if (ext->type == CA_EXT_QQBAR)
+    {
+        qqbar_clear(&ext->data.qqbar.x);
+        nf_clear(&ext->data.qqbar.nf);
+    }
 }
-

@@ -25,6 +25,8 @@ extern "C" {
 #include "flint/fmpz_mpoly.h"
 #include "flint/fmpq.h"
 
+#include "calcium.h"
+
 typedef struct
 {
     fmpz_mpoly_struct num;

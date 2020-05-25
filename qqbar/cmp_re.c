@@ -61,7 +61,9 @@ qqbar_cmp_re(const qqbar_t x, const qqbar_t y)
         qqbar_t t;
         qqbar_init(t);
         qqbar_sub(t, x, y);
+
         res = qqbar_sgn_re(t);
+
         qqbar_clear(t);
         return res;
     }

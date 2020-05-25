@@ -5,7 +5,7 @@
 # (C) 2012, William Hart, Jean-Pierre Flori, Thomas DuBuisson
 # (C) 2012, Jan Engelhardt
 
-# ./configure --disable-static --with-flint=/home/fredrik/src/flint2 --with-arb=/home/fredrik/src/arb
+# ./configure --disable-static --with-flint=/home/fredrik/src/flint2 --with-arb=/home/fredrik/src/arb --with-antic=/home/fredrik/src/antic
 
 # soname version
 #
@@ -19,6 +19,8 @@ PREFIX="/usr/local"
 GMP_DIR="/usr/local"
 MPFR_DIR="/usr/local"
 FLINT_DIR="/usr/local"
+ARB_DIR="/usr/local"
+ANTIC_DIR="/usr/local"
 NTL_DIR="/usr/local"
 GC_DIR="/usr/local"
 BLAS_DIR="/usr/local"
@@ -45,6 +47,7 @@ usage()
    echo "     --with-mpfr=<path>   Specify location of MPFR (default: /usr/local)"
    echo "     --with-flint=<path>  Specify location of FLINT (default: /usr/local)"
    echo "     --with-arb=<path>    Specify location of ARB (default: /usr/local)"
+   echo "     --with-antic=<path>  Specify location of ANTIC (default: /usr/local)"
    echo "     --build=arch-os      Specify architecture/OS combination rather than use values from uname -m/-s"
    echo "     --enable-shared      Build a shared library (default)"
    echo "     --disable-shared     Do not build a shared library"
@@ -101,6 +104,9 @@ while [ "$1" != "" ]; do
          ;;
       --with-arb)
          ARB_DIR=$(absolute_path "$VALUE")
+         ;;
+      --with-antic)
+         ANTIC_DIR=$(absolute_path "$VALUE")
          ;;
       --build)
          BUILD="$VALUE"
@@ -266,6 +272,30 @@ LIB_DIRS="${LIB_DIRS} ${ARB_LIB_DIR}"
 INC_DIRS="${INC_DIRS} ${ARB_INC_DIR}"
 LIBS="${LIBS} arb"
 
+
+if [ -d "${ANTIC_DIR}/lib" ]; then
+   ANTIC_LIB_DIR="${ANTIC_DIR}/lib"
+   ANTIC_INC_DIR="${ANTIC_DIR}/include"
+elif [ -d "${ANTIC_DIR}/lib64" ]; then
+   ANTIC_LIB_DIR="${ANTIC_DIR}/lib64"
+   ANTIC_INC_DIR="${ANTIC_DIR}/include"
+elif [ -d "${ANTIC_DIR}/.libs" ]; then
+   ANTIC_LIB_DIR="${ANTIC_DIR}/.libs"
+   ANTIC_INC_DIR="${ANTIC_DIR}"
+elif [ -d "${ANTIC_DIR}" ]; then
+   ANTIC_LIB_DIR="${ANTIC_DIR}"
+   ANTIC_INC_DIR="${ANTIC_DIR}"
+else
+   echo "Invalid ANTIC directory"
+   exit 1
+fi
+
+echo "ANTIC_LIB_DIR set to ${ANTIC_LIB_DIR}"
+echo "ANTIC_INC_DIR set to ${ANTIC_INC_DIR}"
+
+LIB_DIRS="${LIB_DIRS} ${ANTIC_LIB_DIR}"
+INC_DIRS="${INC_DIRS} ${ANTIC_INC_DIR}"
+LIBS="${LIBS} antic"
 
 
 # defaults for CC, CXX and AR
