@@ -20,7 +20,7 @@ ca_field_print(const ca_field_t K)
     flint_printf("QQ");
     if (len > 0)
     {
-        flint_printf("{");
+        flint_printf("(");
         for (i = 0; i < len; i++)
         {
             flint_printf("x%wd", i + 1);
