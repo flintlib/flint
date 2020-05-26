@@ -1,6 +1,6 @@
 .. _macros:
 
-**macros** -- Flint
+**Macros** -- Flint
 ===============================================================================
 
 Flint Macros
@@ -35,8 +35,8 @@ The function ``FLINT_BIT_COUNT(x)`` returns the number of binary bits
 required to represent an ``ulong x``.  If `x` is zero, returns `0`.
 
 Derived from this there are the two macros ``FLINT_FLOG2(x)`` and
-``FLINT_CLOG2(x)`` which, for any `x \geq 1`, compute `\floor{\log_2{x}}`
-and `\ceil{\log_2{x}}`.
+``FLINT_CLOG2(x)`` which, for any `x \geq 1`, compute `\lfloor \log_2 x  \rfloor`
+and `\lceil \log_2 x \rceil`.
 
 To determine the current FLINT version a number of macros are available.
 For example, if the current FLINT version is ``2.4.0`` then

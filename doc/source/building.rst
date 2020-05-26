@@ -1,6 +1,6 @@
 .. _building:
 
-**configuring and building** -- Flint
+**Configuring and building** -- Flint
 ===============================================================================
 
 Configuring Flint
@@ -167,6 +167,7 @@ The FLINT custom make system responds to the standard commands
 If your system supports parallel builds, FLINT will build in parallel, e.g:
 
 .. code-block:: bash
+
     make -j4 check
 
 On some systems, parallel builds appear to be available but buggy.
@@ -222,7 +223,7 @@ Building FLINT2 with Microsoft Visual Studio requires Visual Studio 2019 and:
 
 - an installed version of Python 3
 - an installed version of Python Tools for Visual Studio
-  [http://pytools.codeplex.com/](http://pytools.codeplex.com/)
+  http://pytools.codeplex.com/
 
 Obtain FLINT2 from Dr. Gladman's Git repository at
 [git@github.com:BrianGladman/flint2.git](git@github.com:BrianGladman/flint2.git)

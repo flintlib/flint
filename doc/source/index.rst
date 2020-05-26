@@ -158,6 +158,7 @@ Floating-point support code
    mpfr_mat.rst
 
 C++ Interface
+-----------------------------------
 
 .. toctree::
    :maxdepth: 1
