@@ -1162,6 +1162,7 @@ v 2.5.2 -- 13 Aug 2015
 
 v 2.6.0 -- 29 May 2020
 
+  * multivariate polynomials over most standard rings (sparse distributed)
   * APR-CL primality proving
   * elliptic curve integer factoring
   * minpoly and charpoly
