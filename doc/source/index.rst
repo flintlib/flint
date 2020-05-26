@@ -16,6 +16,22 @@ maintained by William Hart and Fredrik Johansson.
 FLINT is free software distributed under the
 GNU Lesser General Public License (LGPL), version 2.1 or later.
 
+Introduction
+------------
+
+.. toctree::
+   :maxdepth: 1
+
+   introduction.rst
+   building.rst
+   bug_reporting.rst
+   contributors.rst
+   examples.rst
+   macros.rst
+   memory.rst
+   portability.rst
+   threading.rst
+
 General utilities
 -----------------
 
