@@ -1,6 +1,6 @@
 .. _bug_reporting:
 
-**bug reporting** -- Flint
+**Bug reporting** -- Flint
 ===============================================================================
 
 Reporting bugs
@@ -8,7 +8,7 @@ Reporting bugs
 
 The maintainer wishes to be made aware of any and all bugs.  Please send an
 email with your bug report to the FLINT devel list
-[https://groups.google.com/group/flint-devel](https://groups.google.com/group/flint-devel).
+https://groups.google.com/group/flint-devel.
 
 If possible please include details of your system, the version of GCC, the
 versions of GMP/MPIR and MPFR as well as precise details of how to replicate

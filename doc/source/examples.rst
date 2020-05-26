@@ -1,6 +1,6 @@
 .. _examples:
 
-**examples** -- Flint
+**Examples** -- Flint
 ===============================================================================
 
 Example programs
