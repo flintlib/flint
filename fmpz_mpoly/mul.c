@@ -131,6 +131,38 @@ void fmpz_mpoly_mul(
         return;
     }
 
+    if (fmpz_mpoly_is_fmpz(B, ctx))
+    {
+        if (A == B || C == B)
+        {
+            fmpz_t t;
+            fmpz_init_set(t, B->coeffs);
+            fmpz_mpoly_scalar_mul_fmpz(A, C, t, ctx);
+            fmpz_clear(t);
+        }
+        else
+        {
+            fmpz_mpoly_scalar_mul_fmpz(A, C, B->coeffs, ctx);
+        }
+        return;
+    }
+
+    if (fmpz_mpoly_is_fmpz(C, ctx))
+    {
+        if (A == C || B == C)
+        {
+            fmpz_t t;
+            fmpz_init_set(t, C->coeffs);
+            fmpz_mpoly_scalar_mul_fmpz(A, B, t, ctx);
+            fmpz_clear(t);
+        }
+        else
+        {
+            fmpz_mpoly_scalar_mul_fmpz(A, B, C->coeffs, ctx);
+        }
+        return;
+    }
+
     TMP_START;
 
     /*
