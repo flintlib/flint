@@ -115,7 +115,7 @@ typedef struct
     ca_field_type_t type;
     ca_extension_struct ** ext;
     slong len;
-    fmpz_mpoly_struct ** ideal;
+    fmpz_mpoly_struct * ideal;
     slong ideal_len;
 }
 ca_field_struct;
@@ -144,6 +144,27 @@ void ca_init(ca_t x, ca_ctx_t ctx);
 
 void ca_clear(ca_t x, ca_ctx_t ctx);
 
+/* Extension and field methods */
+
+void ca_extension_init_qqbar(ca_extension_t ext, const qqbar_t x);
+
+void ca_extension_init_const(ca_extension_t ext, ulong func);
+
+void ca_extension_init_fx(ca_extension_t ext, ulong func, const ca_t x);
+
+void ca_extension_clear(ca_extension_t ext);
+
+void ca_extension_print(const ca_extension_t ext);
+
+void ca_field_init_qq(ca_field_t K);
+
+void ca_field_init_mpoly_q(ca_field_t K, slong len);
+
+void ca_field_clear(ca_field_t K);
+
+void ca_field_set_ext(ca_field_t K, slong i, ca_extension_struct * ext);
+
+void ca_field_print(const ca_field_t K);
 
 #ifdef __cplusplus
 }

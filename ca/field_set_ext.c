@@ -29,7 +29,7 @@ fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol,
         ulong * exp;
 
         len = pol->length;
-        exp = flint_malloc(fmpz_mpoly_ctx_nvars(ctx) * sizeof(ulong));
+        exp = flint_malloc(fmpz_mpoly_ctx_nvars(ctx) * sizeof(ulong)); /* TMP_ALLOC? */
 
         for (i = 0; i < fmpz_mpoly_ctx_nvars(ctx); i++)
             exp[i] = 0;
@@ -55,6 +55,8 @@ fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol,
         }
 
         _fmpz_mpoly_set_length(res, num, ctx);
+
+        flint_free(exp);
     }
 }
 
@@ -65,13 +67,15 @@ ca_field_set_ext(ca_field_t K, slong i, ca_extension_struct * ext)
 
     if (ext->type == CA_EXT_QQBAR)
     {
-        if (K->ideal[i] == NULL)
-        {
-            K->ideal[i] = flint_malloc(sizeof(fmpz_mpoly_struct));
-            fmpz_mpoly_init(K->ideal[i], &K->mctx);
-        }
+        if (K->ideal_len == 0)
+            K->ideal = flint_malloc(sizeof(fmpz_mpoly_struct));
+        else
+            K->ideal = flint_realloc(K->ideal, (K->ideal_len + 1) * sizeof(fmpz_mpoly_struct));
 
-        fmpz_mpoly_set_gen_fmpz_poly(K->ideal[i], i, QQBAR_POLY(&ext->data.qqbar.x), &K->mctx);
+        fmpz_mpoly_init(K->ideal + K->ideal_len, &K->mctx);
+        fmpz_mpoly_set_gen_fmpz_poly(K->ideal + K->ideal_len, i, QQBAR_POLY(&ext->data.qqbar.x), CA_FIELD_MCTX(K));
+
+        K->ideal_len++;
     }
 }
 

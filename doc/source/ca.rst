@@ -5,7 +5,7 @@
 
 A :type:`ca_t` represents a real or complex number in a form suitable
 for exact field arithmetic or comparison.
-Exceptionally, a :type:`ca_t` may also hold a special nonnumerical value,
+Exceptionally, a :type:`ca_t` may represent a special nonnumerical value,
 such as an infinity.
 
 Introduction: numbers
@@ -105,19 +105,19 @@ For all types, a *type_t* is defined as an array of length one of type
 .. macro:: CA_FMPQ_DENREF(x)
 
     Assuming that *x* holds an element of the trivial field `\mathbb{Q}`,
-    returns a pointer to this field which can be used as an :type:`fmpq_t`,
+    this macro returns a pointer which can be used as an :type:`fmpq_t`,
     or respectively to the numerator or denominator as an :type:`fmpz_t`.
 
 .. macro:: CA_MPOLY_Q(x)
 
     Assuming that *x* holds a generic field element as data,
-    this macro returns a pointer to this data which can be used as
+    this macro returns a pointer which can be used as
     an :type:`fmpz_mpoly_q_t`.
 
 .. macro:: CA_NF_ELEM(x)
 
     Assuming that *x* holds an Antic number field element as data,
-    this macro returns a pointer to this data which can be used as
+    this macro returns a pointer which can be used as
     an :type:`nf_elem_t`.
 
 .. function:: ca_init(ca_t x, ca_ctx_t ctx)
@@ -142,12 +142,10 @@ Context objects
     a shallow reference to the object defining the field *K* within the
     context object, so creating many elements of the same field is cheap.
 
-    Using a :type:`ca_t` as an argument to an operation that creates a new
-    field extension causes an immutable copy of that value to be placed in
-    the context object.
-    Since context objects are mutable, they must not be accessed
-    simultaneously by different threads: in multithreaded environments, the
-    user must use a separate context object for each thread.
+    Since context objects are mutable (and may be mutated even when
+    performing read-only operations on :type:`ca_t` instances), they must not
+    be accessed simultaneously by different threads: in multithreaded
+    environments, the user must use a separate context object for each thread.
 
 .. function:: ca_ctx_init(ca_ctx_t ctx)
 

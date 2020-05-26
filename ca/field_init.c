@@ -33,5 +33,8 @@ ca_field_init_qq(ca_field_t K)
 {
     K->len = 0;
     K->type = CA_FIELD_QQ;
+    K->ext = NULL;
+    K->ideal = NULL;
+    K->ideal_len = 0;
 }
 
