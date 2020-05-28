@@ -663,6 +663,9 @@ MSG="Testing fenv..."
 printf "%s" "$MSG"
 printf "%s" "$MSG" >> config.log
 echo "#include <fenv.h>" > build/test-fenv.h
+echo "#ifndef FE_DOWNWARD" >> build/test-fenv.h
+echo "#error FE_DOWNWARD not available" >> build/test-fenv.h
+echo "#endif" >> build/test-fenv.h
 if ($CC -E build/test-fenv.h > /dev/null 2>&1) then
     printf "%s\n" "yes"
     echo "yes" >> config.log
