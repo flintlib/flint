@@ -1160,7 +1160,7 @@ v 2.5.2 -- 13 Aug 2015
   * Fix further issues with soname versioning and ldconfig
   * Fix a bug when using GMP instead of MPIR.
 
-v 2.6.0 -- 29 May 2020
+v 2.6.0 -- 1 Jun 2020
 
   * multivariate polynomials over most standard rings (sparse distributed)
   * APR-CL primality proving
