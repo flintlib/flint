@@ -1,6 +1,6 @@
 .. _memory:
 
-**Memory management** -- Flint
+**Memory management**
 ===============================================================================
 
 Memory management in FLINT

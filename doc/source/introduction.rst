@@ -1,6 +1,6 @@
 .. _introduction:
 
-**Introduction** -- Flint
+**Introduction**
 ===============================================================================
 
 What is Flint?
