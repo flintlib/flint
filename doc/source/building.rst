@@ -227,10 +227,7 @@ Visual Studio 2015 Community (or higher version) and:
 - an installed version of Python Tools for Visual Studio
   http://pytools.codeplex.com/
 
-Obtain FLINT2 by obtaining the zip file version of the FLINT release
-directly from the FLINT website
-http://flintlib.org/downloads.html
-or by cloning it using GIT from:
+Obtain FLINT2 by cloning it using GIT from Dr. Brian Gladman's repository:
 
   ``git@github.com:BrianGladman/flint.git``
 
@@ -281,20 +278,12 @@ following build projects:
 
     ``run_tests``     - a Python program for running the FLINT2 tests (after they have been built)
 
-The first step in building FLINT2 is to generate the Visual Studio
-build files for the version of Visual Studio being used. These 
-files are placed in in a sub-directory within the FLINT2 directory 
-such as:
-
-   ``flint\build.vs<NN>``
-   
-where ``<NN>`` is the last two digits of the Visual Studio version
-selected for building FLINT2 by running the Python application
-``flint_config.py``.  This program can be run either from within 
-Visual Studio or from the command line and has a single input 
-parameter which is the last two digits of the Visual Studio
-version for which build files are to be generated. If no 
-parameter is given a default of 19 is used.
+The first step in building FLINT2 is to generate the Visual Studio build
+files for the version of Visual Studio being used. This is done by
+running the Python application ``flint_config.py``, either from within
+Visual Studio or on the command line. It is run with a single input
+parameter which is the last two digits of the Visual Studio version
+selected for building FLINT2 (the default is 19 if no input is given).
 
 Ths creates a build directory in the Flint root directory, for 
 example:
