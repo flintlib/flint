@@ -1160,3 +1160,64 @@ v 2.5.2 -- 13 Aug 2015
   * Fix further issues with soname versioning and ldconfig
   * Fix a bug when using GMP instead of MPIR.
 
+v 2.6.0 -- 29 May 2020
+
+  * multivariate polynomials over most standard rings (sparse distributed)
+  * APR-CL primality proving
+  * elliptic curve integer factoring
+  * minpoly and charpoly
+  * improved quadratic sieve for integer factoring
+  * embeddings of finite fields
+  * pollard rho integer factoring
+  * p+1 integer factoring
+  * best of breed smooth integer factoring routine
+  * best of breed general integer factoring routine
+  * howell and strong echelon form
+  * large speedups for solve and hence inverse over Z and Q
+  * randprime and nextprime functions
+  * pernet-stein HNF improvements
+  * moller-granlund precomputed inverses
+  * resultant_modular_div
+  * fibonacci polynomials
+  * exception mechanism/flint_abort
+  * sqrt of series and polynomials
+  * division of series over Z
+  * power sums
+  * improved base cases of various power series functions
+  * ability to switch memory allocators
+  * fast recurrence for Hermite polys
+  * shifted Legendre polynomials
+  * Laguerre polynomials
+  * Gegenbauer polys
+  * sphinx documentation
+  * van hoeij with gradual feeding implementation of polynomial factoring over Z
+  * perfect power detection
+  * divisibility testing for polynomials
+  * fast block based memory manager for bundling fmpz allocations
+  * uniform random generation
+  * CMake build system
+  * linear algebra speedups when everything can be kept in longs
+  * nmod module for integers mod (small) n
+  * fmpz_mod_mat module for matrices over integers mod multiprecision n
+  * kronecker product (tensor product)
+  * random primitive polys (for finite fields)
+  * thread pool implementation
+  * threading of FFT for integer and polynomial multiplication over Z
+  * threading of quadratic sieve for integer factoring
+  * improved threading of factoring of polynomials mod p
+  * threading for multivariate polynomial multiplication, division and GCD
+  * threaded multiplication of matrices mod p
+  * Berlekamp-Massey (nmod)
+  * fmpz_mod module for integers mod multiprecision n
+  * Pohlig-Hellman (discrete log)
+  * farey_neighbours
+  * remove openMP option
+  * additional integer division variants
+  * speed up mpn_mulmod_preinv
+  * fft precaching
+  * cyclotomic polynomial detection
+  * polynomial root finding over finite fields
+  * GMP 6.2 support
+  * MPIR 3.0.0 support
+  * many small speedups and additional convenience functions added
+
