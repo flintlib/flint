@@ -229,15 +229,17 @@ Visual Studio 2015 Community (or higher version) and:
 
 Obtain FLINT2 by obtaining the zip file version of the FLINT release
 directly from the FLINT website
-[http://flintlib.org/downloads.html](http://flintlib.org/downloads.html)
+http://flintlib.org/downloads.html
 or by cloning it using GIT from:
 
-  [git@github.com:BrianGladman/flint.git](git@github.com:BrianGladman/flint.git)
+  ``git@github.com:BrianGladman/flint.git``
 
 FLINT2 depends on the MPIR, MPFR and PTHREADS libraries that have
 to be installed and built using Visual Studio before FLINT2 can
 be built.  The application directories are assumed to be in the
 same root directory with the names and layouts:
+
+.. code ::
 
     mpir
        lib
@@ -255,12 +257,15 @@ same root directory with the names and layouts:
    
 Here the ``lib`` and ``dll`` sub-directories for each application hold
 the  static and dynamic link library outputs which will be used when 
- Flint is built.  They each contain up to four sub-directories for 
+Flint is built.  They each contain up to four sub-directories for
 the normal configurations for building on Windows:
 
     ``Win32\Release``
+
     ``Win32\Debug``
+
     ``x64\Release``
+
     ``x642\Debug``
     
 To build FLINT2 for a particular configuration requires that each of the 
@@ -270,12 +275,11 @@ for the same configuration.
 Opening the solution file ``flint\build.vc\flint.sln`` provides the
 following build projects:
 
-    flint_config  - a Python program for creating the Visual 
-                    Studio build files
-    build_tests   - a Python program for building the FLINT2
-                    tests (after they have been created)
-    run_tests     - a Python program for running the FLINT2
-                    tests (after they have been built)
+    ``flint_config``  - a Python program for creating the Visual Studio build files
+
+    ``build_tests``   - a Python program for building the FLINT2 tests (after they have been created)
+
+    ``run_tests``     - a Python program for running the FLINT2 tests (after they have been built)
 
 The first step in building FLINT2 is to generate the Visual Studio
 build files for the version of Visual Studio being used. These 
