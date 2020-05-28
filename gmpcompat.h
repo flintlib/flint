@@ -60,7 +60,7 @@ void flint_mpz_set_si(mpz_ptr r, slong s)
 #if __GNU_MP_RELEASE >= 60200
    if (r->_mp_alloc == 0)
    {
-      r->_mp_d = flint_malloc(sizeof(mp_limb_t));
+      r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
       r->_mp_alloc = 1;
    }
 #endif
@@ -79,7 +79,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
 #if __GNU_MP_RELEASE >= 60200
    if (r->_mp_alloc == 0)
    {
-      r->_mp_d = flint_malloc(sizeof(mp_limb_t));
+      r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
       r->_mp_alloc = 1;
    }
 #endif
