@@ -227,10 +227,7 @@ Visual Studio 2015 Community (or higher version) and:
 - an installed version of Python Tools for Visual Studio
   ([http://pytools.codeplex.com/](http://pytools.codeplex.com/))
 
-Obtain FLINT2 by obtaining the zip file version of the FLINT release
-directly from the FLINT website
-http://flintlib.org/downloads.html
-or by cloning it using GIT from:
+Obtain FLINT2 by cloning it using GIT from Dr. Brian Gladman's repository:
 
   ``git@github.com:BrianGladman/flint.git``
 
