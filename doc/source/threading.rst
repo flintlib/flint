@@ -1,6 +1,6 @@
 .. _threading:
 
-**Threading** -- Flint
+**Threading**
 ===============================================================================
 
 Multithreaded FLINT

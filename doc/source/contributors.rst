@@ -1,6 +1,6 @@
 .. _contributors:
 
-**Contributors** -- Flint
+**Contributors**
 ===============================================================================
 
 Contributors

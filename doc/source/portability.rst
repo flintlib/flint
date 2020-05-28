@@ -1,6 +1,6 @@
 .. _portability:
 
-**Portability** -- Flint
+**Portability**
 ===============================================================================
 
 Portable FLINT types
