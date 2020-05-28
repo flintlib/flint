@@ -1,6 +1,6 @@
 .. _building:
 
-**Configuring and building** -- Flint
+**Configuring and building**
 ===============================================================================
 
 Configuring Flint

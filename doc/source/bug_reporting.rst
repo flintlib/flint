@@ -1,6 +1,6 @@
 .. _bug_reporting:
 
-**Bug reporting** -- Flint
+**Bug reporting**
 ===============================================================================
 
 Reporting bugs
