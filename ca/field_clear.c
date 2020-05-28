@@ -16,14 +16,20 @@ ca_field_clear(ca_field_t K)
 {
     slong i;
 
-    if (K->len != 0)
+    if (K->type == CA_FIELD_QQ || K->type == CA_FIELD_NF)
+        return;
+
+    if (K->type == CA_FIELD_MPOLY_Q)
     {
-        flint_free(K->ext);
+        if (K->len != 0)
+        {
+            flint_free(K->ext);
 
-        for (i = 0; i < K->ideal_len; i++)
-            fmpz_mpoly_clear(K->ideal + i, CA_FIELD_MCTX(K));
+            for (i = 0; i < K->ideal_len; i++)
+                fmpz_mpoly_clear(K->ideal + i, CA_FIELD_MCTX(K));
 
-        flint_free(K->ideal);
+            flint_free(K->ideal);
+        }
     }
 }
 

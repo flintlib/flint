@@ -14,5 +14,24 @@
 void
 ca_ctx_init(ca_ctx_t ctx)
 {
+    qqbar_t onei;
+
+    /* Always create QQ, QQ(i) */
+
+    ctx->fields = (ca_field_struct *) flint_malloc(2 * sizeof(ca_field_struct));
+    ctx->fields_len = 2;
+    ctx->fields_alloc = 2;
+
+    ctx->extensions = (ca_extension_struct *) flint_malloc(1 * sizeof(ca_extension_struct));
+    ctx->extensions_len = 1;
+    ctx->extensions_alloc = 1;
+
+    qqbar_init(onei);
+    qqbar_i(onei);
+    ca_extension_init_qqbar(ctx->extensions, onei);
+    qqbar_clear(onei);
+
+    ca_field_init_qq(ctx->fields);
+    ca_field_init_nf(ctx->fields + 1, ctx->extensions);
 }
 

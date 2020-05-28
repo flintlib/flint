@@ -29,6 +29,16 @@ ca_field_init_mpoly_q(ca_field_t K, slong len)
 }
 
 void
+ca_field_init_nf(ca_field_t K, ca_extension_struct * ext)
+{
+    K->len = 1;
+    K->type = CA_FIELD_NF;
+    K->nf_ext = ext;
+    K->ideal = NULL;
+    K->ideal_len = 0;
+}
+
+void
 ca_field_init_qq(ca_field_t K)
 {
     K->len = 0;

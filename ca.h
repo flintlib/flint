@@ -55,6 +55,10 @@ typedef ca_struct ca_t[1];
 #define CA_FMPQ_NUMREF(x)  (fmpq_numref(CA_FMPQ(x)))
 #define CA_FMPQ_DENREF(x)  (fmpq_denref(CA_FMPQ(x)))
 
+/* We always allocate QQ and QQ(i), with field index 0 and 1 */
+#define CA_FIELD_ID_QQ       0
+#define CA_FIELD_ID_QQ_I     1
+
 /* Extension object **********************************************************/
 
 /* There are currently two kinds of extension elements: algebraic numbers,
@@ -109,10 +113,12 @@ typedef enum
 }
 ca_field_type_t;
 
+/* todo: make a union */
 typedef struct
 {
     fmpz_mpoly_ctx_struct mctx;  /* todo: should perhaps be a reference to a fixed table of precomputed contexts */
     ca_field_type_t type;
+    ca_extension_struct * nf_ext;
     ca_extension_struct ** ext;
     slong len;
     fmpz_mpoly_struct * ideal;
@@ -128,7 +134,13 @@ typedef ca_field_struct ca_field_t[1];
 
 typedef struct
 {
-    slong dummy;
+    ca_field_struct * fields;
+    slong fields_len;
+    slong fields_alloc;
+
+    ca_extension_struct * extensions;
+    slong extensions_len;
+    slong extensions_alloc;
 }
 ca_ctx_struct;
 
@@ -157,6 +169,8 @@ void ca_extension_clear(ca_extension_t ext);
 void ca_extension_print(const ca_extension_t ext);
 
 void ca_field_init_qq(ca_field_t K);
+
+void ca_field_init_nf(ca_field_t K, ca_extension_struct * ext);
 
 void ca_field_init_mpoly_q(ca_field_t K, slong len);
 
