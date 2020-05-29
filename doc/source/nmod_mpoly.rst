@@ -233,7 +233,7 @@ Coefficients
 
     Set the coefficient of the monomial with exponent ``exp`` to `c`.
 
-.. function:: void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A, slong * vars, ulong * exps, slong length, const nmod_mpoly_ctx_t ctx)
+.. function:: void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A, const slong * vars, const ulong * exps, slong length, const nmod_mpoly_ctx_t ctx)
 
     Set ``C`` to the coefficient of ``A`` with respect to the variables in ``vars`` with powers in the corresponding array ``exps``.
     Both ``vars`` and ``exps`` point to array of length ``length``. It is assumed that ``0 < length \le nvars(A)`` and that the variables in ``vars`` are distinct. 

@@ -463,8 +463,8 @@ FLINT_DLL void fmpz_mpoly_set_coeff_si_ui(fmpz_mpoly_t A,
                  const slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
 FLINT_DLL void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C,
-             const fmpz_mpoly_t A,  slong * vars, ulong * exps, slong length,
-                                                   const fmpz_mpoly_ctx_t ctx);
+             const fmpz_mpoly_t A, const slong * vars, const ulong * exps,
+                                     slong length, const fmpz_mpoly_ctx_t ctx);
 
 /* comparison ****************************************************************/
 

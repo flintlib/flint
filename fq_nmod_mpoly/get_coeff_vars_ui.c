@@ -12,7 +12,7 @@
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_get_coeff_vars_ui(fq_nmod_mpoly_t C, const fq_nmod_mpoly_t A,
-                                   slong * vars, ulong * exps, slong length,
+                         const slong * vars, const ulong * exps, slong length,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, j, N;
