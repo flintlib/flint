@@ -32,7 +32,9 @@
 int
 main(void)
 {
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     int i;
+#endif
     FLINT_TEST_INIT(state);
     
     flint_printf("compose_mod_brent_kung_precomp_preinv_threaded....");

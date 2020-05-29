@@ -287,7 +287,9 @@ typedef divides_heap_chunk_struct divides_heap_chunk_t[1];
 */
 typedef struct
 {
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     divides_heap_chunk_struct * head;
     divides_heap_chunk_struct * tail;
     divides_heap_chunk_struct * volatile cur;
@@ -1695,20 +1697,30 @@ static void worker_loop(void * varg)
         }
         while (L != NULL)
         {
+#if HAVE_PTHREAD
             pthread_mutex_lock(&H->mutex);
+#endif
             if (L->lock != -1)
             {
                 L->lock = -1;
+#if HAVE_PTHREAD
                 pthread_mutex_unlock(&H->mutex);
+#endif
                 trychunk(W, L);
+#if HAVE_PTHREAD
                 pthread_mutex_lock(&H->mutex);
+#endif
                 L->lock = 0;
+#if HAVE_PTHREAD
                 pthread_mutex_unlock(&H->mutex);
+#endif
                 break;
             }
             else
             {
+#if HAVE_PTHREAD
                 pthread_mutex_unlock(&H->mutex);
+#endif
             }
 
             L = L->next;
@@ -1862,7 +1874,9 @@ int nmod_mpolyn_divides_threaded_pool(
 
     /* start the workers */
 
+#if HAVE_PTHREAD
     pthread_mutex_init(&H->mutex, NULL);
+#endif
 
     worker_args = (worker_arg_struct *) flint_malloc((num_handles + 1)
                                                         *sizeof(worker_arg_t));
@@ -1882,7 +1896,9 @@ int nmod_mpolyn_divides_threaded_pool(
 
     flint_free(worker_args);
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&H->mutex);
+#endif
 
     divides = divides_heap_base_clear(Q, H);
 

@@ -198,8 +198,10 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     sieve = flint_malloc((qs_inf->sieve_size + sizeof(ulong)
                + (qs_inf->num_handles > 0 ? 64 : 0))*(qs_inf->num_handles + 1));
 
+#if HAVE_PTHREAD
     pthread_mutex_init(&qs_inf->mutex, NULL);
-
+#endif
+    
 #if defined (__WIN32) && !defined(__CYGWIN__)
     srand((int) GetCurrentProcessId());
 #else
@@ -436,7 +438,9 @@ cleanup:
     flint_printf("\nCleanup\n");
 #endif
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&qs_inf->mutex);
+#endif
 
     flint_give_back_threads(qs_inf->handles, qs_inf->num_handles);
 

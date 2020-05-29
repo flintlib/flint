@@ -388,7 +388,9 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc
 typedef struct
 {
     volatile int idx;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     slong nthreads;
     slong ndivs;
     fmpz * Acoeff;
@@ -428,8 +430,10 @@ typedef struct
     slong time;
     _base_struct * base;
     _div_struct * divs;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
     pthread_cond_t cond;
+#endif
     slong * t1, * t2, * t3, * t4;
     ulong * exp;
 }
@@ -492,10 +496,14 @@ static void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
     /* get index to start working on */
     if (arg->idx + 1 < base->nthreads)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(&base->mutex);
+#endif
         i = base->idx - 1;
         base->idx = i;
+#if HAVE_PTHREAD
         pthread_mutex_unlock(&base->mutex);
+#endif
     }
     else
     {
@@ -578,10 +586,14 @@ static void _fmpz_mpoly_mul_heap_threaded_worker(void * varg)
         }
 
         /* get next index to work on */
+#if HAVE_PTHREAD
         pthread_mutex_lock(&base->mutex);
-        i = base->idx - 1;
+#endif
+	i = base->idx - 1;
         base->idx = i;
-        pthread_mutex_unlock(&base->mutex);
+#if HAVE_PTHREAD
+	pthread_mutex_unlock(&base->mutex);
+#endif
     }
 
     flint_free(S->big_mem);
@@ -707,7 +719,9 @@ void _fmpz_mpoly_mul_heap_threaded(
     }
 
     /* compute each chunk in parallel */
+#if HAVE_PTHREAD
     pthread_mutex_init(&base->mutex, NULL);
+#endif
     for (i = 0; i < num_handles; i++)
     {
         args[i].idx = i;
@@ -757,7 +771,9 @@ void _fmpz_mpoly_mul_heap_threaded(
         thread_pool_wait(global_thread_pool, handles[i]);
     }
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&base->mutex);
+#endif
 
     flint_free(args);
     flint_free(divs);

@@ -49,7 +49,9 @@ typedef struct
     volatile slong index;
     volatile int zip_find_coeffs_no_match, zip_find_coeffs_non_invertible;
     volatile int changed, failed;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
 
     slong num_threads;
     flint_bitcnt_t bits;
@@ -409,10 +411,14 @@ static void _bound_worker(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= w->ctx->minfo->nvars)
         goto cleanup;
@@ -439,10 +445,14 @@ static void _worker_skel_sp(void * varg_)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= Alength + Blength)
         goto cleanup;
@@ -484,10 +494,14 @@ static void _worker_skel_mp(void * varg_)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= Alength + Blength)
         goto cleanup;
@@ -768,10 +782,14 @@ static void _worker_check_eval_sp(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= Alength + Blength + Hlength)
         goto cleanup;
@@ -820,10 +838,14 @@ static void _worker_check_eval_mp(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= Alength + Blength + Hlength)
         goto cleanup;
@@ -871,10 +893,14 @@ static void _worker_reduce_sp(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= length)
         goto cleanup;
@@ -903,10 +929,14 @@ static void _worker_reduce_mp(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= length)
         goto cleanup;
@@ -940,10 +970,14 @@ static void _worker_get_mpoly_sp(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= length)
         goto cleanup;
@@ -983,10 +1017,14 @@ static void _worker_get_mpoly_mp(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= length)
         goto cleanup;
@@ -1025,10 +1063,14 @@ static void _worker_find_zip_coeffs(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= w->Z->length)
         goto cleanup;
@@ -1072,10 +1114,14 @@ static void _worker_crt_zip_coeffs(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&w->mutex);
+#endif
     i = w->index;
     w->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&w->mutex);
+#endif
 
     if (i >= w->H->length)
         goto cleanup;
@@ -1797,7 +1843,9 @@ int fmpz_mpolyuu_gcd_berlekamp_massey_threaded_pool(
 
     mpoly_bma_interpolate_ctx_init(w->Ictx, ctx->minfo->nvars);
 
+#if HAVE_PTHREAD
     pthread_mutex_init(&w->mutex, NULL);
+#endif
 
     w->num_threads = num_handles + 1;
 
@@ -2374,7 +2422,9 @@ cleanup:
     flint_free(w->Bdegs);
     flint_free(w->Gammadegs);
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&w->mutex);
+#endif
 
     /* the zippler */
     nmod_zip_mpolyu_clear(w->Z);

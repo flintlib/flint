@@ -18,13 +18,17 @@ void thread_pool_wait(thread_pool_t T, thread_pool_handle i)
 
     D = T->tdata;
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&D[i].mutex);
+#endif
 
     /* should not be trying to wait on a available thread */
     FLINT_ASSERT(D[i].available == 0);
 
+#if HAVE_PTHREAD
     while (D[i].working != 0)
         pthread_cond_wait(&D[i].sleep2, &D[i].mutex);
 
     pthread_mutex_unlock(&D[i].mutex);
+#endif
 }

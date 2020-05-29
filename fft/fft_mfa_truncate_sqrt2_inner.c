@@ -29,7 +29,9 @@ typedef struct
     mp_limb_t ** t1;
     mp_limb_t ** t2;
     mp_limb_t * tt;
+#if HAVE_PTHREAD
     pthread_mutex_t * mutex;
+#endif
 }
 fft_inner_arg_t;
 
@@ -53,10 +55,14 @@ _fft_inner1_worker(void * arg_ptr)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(arg.mutex);
+#endif
         s = *arg.i;
         end = *arg.i = FLINT_MIN(s + 16, trunc);
+#if HAVE_PTHREAD
         pthread_mutex_unlock(arg.mutex);
+#endif
 
         if (s >= trunc)
             return;
@@ -98,10 +104,14 @@ _fft_inner2_worker(void * arg_ptr)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(arg.mutex);
+#endif
         i = *arg.i;
         end = *arg.i = FLINT_MIN(i + 16, n2);
+#if HAVE_PTHREAD
         pthread_mutex_unlock(arg.mutex);
+#endif
 
         if (i >= n2)
             return;
@@ -133,14 +143,18 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
     mp_size_t trunc2 = (trunc - 2*n)/n1;
     mp_size_t limbs = (n*w)/FLINT_BITS;
     flint_bitcnt_t depth = 0;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     slong num_threads;
     thread_pool_handle * threads;
     fft_inner_arg_t * args;
 
     while ((UWORD(1)<<depth) < n2) depth++;
 
+#if HAVE_PTHREAD
     pthread_mutex_init(&mutex, NULL);
+#endif
 
     ii += 2*n;
     jj += 2*n;
@@ -168,7 +182,9 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
        args[i].t1 = t1 + i;
        args[i].t2 = t2 + i;
        args[i].tt = tt[i];
+#if HAVE_PTHREAD
        args[i].mutex = &mutex;       
+#endif
     }
 
     for (i = 0; i < num_threads; i++)
@@ -206,6 +222,8 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
 
     flint_free(args);
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&mutex);
+#endif
 }
 

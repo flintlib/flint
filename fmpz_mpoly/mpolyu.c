@@ -354,7 +354,9 @@ void fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(
 typedef struct
 {
     volatile slong index;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     slong length;
     fmpz_mpoly_struct * coeffs;
     const fmpz_mpoly_ctx_struct * ctx;
@@ -371,10 +373,14 @@ static void _worker_sort(void * varg)
 
 get_next_index:
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&arg->mutex);
+#endif
     i = arg->index;
     arg->index++;
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&arg->mutex);
+#endif
 
     if (i >= arg->length)
         goto cleanup;
@@ -651,8 +657,10 @@ void fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(
         {
             _sort_arg_t arg;
 
+#if HAVE_PTHREAD
             pthread_mutex_init(&arg->mutex, NULL);
-            arg->index = 0;
+#endif
+	    arg->index = 0;
             arg->coeffs = A->coeffs;
             arg->length = A->length;
             arg->ctx = uctx;
@@ -667,8 +675,10 @@ void fmpz_mpoly_to_mpolyu_perm_deflate_threaded_pool(
                 thread_pool_wait(global_thread_pool, handles[i]);
             }
 
+#if HAVE_PTHREAD
             pthread_mutex_destroy(&arg->mutex);
-        }
+#endif
+	}
         else
         {
             for (i = 0; i < A->length; i++)
@@ -1129,7 +1139,9 @@ void fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(
         {
             _sort_arg_t arg;
 
+#if HAVE_PTHREAD
             pthread_mutex_init(&arg->mutex, NULL);
+#endif
             arg->index = 0;
             arg->coeffs = A->coeffs;
             arg->length = A->length;
@@ -1145,8 +1157,10 @@ void fmpz_mpoly_to_mpolyuu_perm_deflate_threaded_pool(
                 thread_pool_wait(global_thread_pool, handles[i]);
             }
 
+#if HAVE_PTHREAD
             pthread_mutex_destroy(&arg->mutex);
-        }
+#endif
+	}
         else
         {
             for (i = 0; i < A->length; i++)

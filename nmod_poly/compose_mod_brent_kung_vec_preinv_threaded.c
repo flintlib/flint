@@ -12,7 +12,9 @@
 */
 
 #include <gmp.h>
+#if HAVE_PTHREAD
 #include <pthread.h>
+#endif
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -35,7 +37,9 @@ typedef struct
     slong len;
     slong leninv;
     slong len2;
+#if HAVE_PTHREAD
     pthread_mutex_t * mutex;
+#endif
 } compose_vec_arg_t;
 
 void
@@ -54,10 +58,14 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(arg.mutex);
+#endif
         j = *arg.j;
         *arg.j = j + 1;
+#if HAVE_PTHREAD
         pthread_mutex_unlock(arg.mutex);
+#endif
 
         if (j >= arg.len2)
             return;
@@ -100,7 +108,9 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
     slong i, j, n, m, k, len2 = l, len1, shared_j = 0;
     mp_ptr h;
     compose_vec_arg_t * args;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
 
     n = len - 1;
 
@@ -163,10 +173,14 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
         args[i].leninv  = leninv;
         args[i].p       = mod;
         args[i].len2    = len2;
-        args[i].mutex   = &mutex;
+#if HAVE_PTHREAD
+	args[i].mutex   = &mutex;
+#endif
     }
 
+#if HAVE_PTHREAD
     pthread_mutex_init(&mutex, NULL);
+#endif
 
     for (i = 0; i < num_threads; i++)
     {
@@ -181,7 +195,9 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * re
         thread_pool_wait(global_thread_pool, threads[i]);
     }
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&mutex);
+#endif
 
     for (i = 0; i < num_threads + 1; i++)
        _nmod_vec_clear(args[i].t);
