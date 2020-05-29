@@ -17,10 +17,13 @@ _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
     slong old_index;
     ca_field_type_t old_type, new_type;
 
-    old_index = x->field;
+    old_index = x->field & ~CA_SPECIAL;
 
     if (old_index == new_index)
+    {
+        x->field = old_index;  /* unset special status */
         return;
+    }
 
     if (new_index < 0 || new_index >= ctx->fields_len)
     {

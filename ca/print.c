@@ -16,7 +16,37 @@ ca_print(ca_t x, ca_ctx_t ctx)
 {
     slong field;
 
-    field = x->field;
+    if (CA_IS_SPECIAL(x))
+    {
+        if (x->field & CA_UNDEFINED)
+        {
+            flint_printf("Undefined");
+        }
+        else if (x->field & CA_UNKNOWN)
+        {
+            flint_printf("Unknown");
+        }
+        else if (x->field & CA_UNSIGNED_INF)
+        {
+            flint_printf("UnsignedInfinity");
+        }
+        else  if (x->field & CA_SIGNED_INF)
+        {
+            ca_t sgn;
+            sgn->field = x->field & ~CA_SPECIAL;
+            sgn->elem = x->elem;
+
+            flint_printf("(");
+            ca_print(sgn, ctx);
+            flint_printf(") * Infinity");
+        }
+
+        return;
+    }
+    else
+    {
+        field = x->field;
+    }
 
     if (field == CA_FIELD_ID_QQ)
     {

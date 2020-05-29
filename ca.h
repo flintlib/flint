@@ -59,6 +59,15 @@ typedef ca_struct ca_t[1];
 #define CA_FIELD_ID_QQ       0
 #define CA_FIELD_ID_QQ_I     1
 
+/* Bits added to the top of field_id to encode nonnumbers */
+#define CA_UNKNOWN        (UWORD(1) << (FLINT_BITS - 1))
+#define CA_UNDEFINED      (UWORD(1) << (FLINT_BITS - 2))
+#define CA_UNSIGNED_INF   (UWORD(1) << (FLINT_BITS - 3))
+#define CA_SIGNED_INF     (UWORD(1) << (FLINT_BITS - 4))
+#define CA_SPECIAL        (CA_UNKNOWN | CA_UNDEFINED | CA_UNSIGNED_INF | CA_SIGNED_INF)
+
+#define CA_IS_SPECIAL(x)  ((x)->field & CA_SPECIAL)
+
 /* Extension object **********************************************************/
 
 /* There are currently two kinds of extension elements: algebraic numbers,
@@ -202,6 +211,16 @@ void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx);
 void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx);
 
 void ca_i(ca_t x, ca_ctx_t ctx);
+
+void ca_unknown(ca_t x, ca_ctx_t ctx);
+
+void ca_undefined(ca_t x, ca_ctx_t ctx);
+void ca_uinf(ca_t x, ca_ctx_t ctx);
+void ca_pos_inf(ca_t x, ca_ctx_t ctx);
+void ca_neg_inf(ca_t x, ca_ctx_t ctx);
+void ca_pos_i_inf(ca_t x, ca_ctx_t ctx);
+void ca_neg_i_inf(ca_t x, ca_ctx_t ctx);
+
 
 void ca_print(ca_t x, ca_ctx_t ctx);
 

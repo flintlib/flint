@@ -259,6 +259,28 @@ Assignment and specific values
     representation of `i` as the generator of the algebraic number field
     `\mathbb{Q}(i)`.
 
+.. function:: void ca_unknown(ca_t x, ca_ctx_t ctx)
+
+    Sets *x* to the meta-value *Unknown*.
+
+.. function:: void ca_undefined(ca_t x, ca_ctx_t ctx)
+
+    Sets *x* to *Undefined*.
+
+.. function:: void ca_uinf(ca_t x, ca_ctx_t ctx)
+
+    Sets *x* to unsigned infinity `{\tilde \infty}`.
+
+.. function:: void ca_pos_inf(ca_t x, ca_ctx_t ctx)
+
+.. function:: void ca_neg_inf(ca_t x, ca_ctx_t ctx)
+
+.. function:: void ca_pos_i_inf(ca_t x, ca_ctx_t ctx)
+
+.. function:: void ca_neg_i_inf(ca_t x, ca_ctx_t ctx)
+
+    Sets *x* to the signed infinity `+\infty`, `-\infty`, `+i \infty` or `-i \infty`.
+
 Input and output
 -------------------------------------------------------------------------------
 

@@ -16,7 +16,7 @@ ca_clear(ca_t x, ca_ctx_t ctx)
 {
     slong index;
 
-    index = x->field;
+    index = x->field & ~CA_SPECIAL;
 
     if (index == CA_FIELD_ID_QQ)
     {
