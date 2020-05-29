@@ -50,7 +50,7 @@ ca_struct;
 typedef ca_struct ca_t[1];
 
 #define CA_FMPQ(x)         (&((x)->elem.q))
-#define CA_MPOLY_Q(x)      (((x)->elem->mpoly_q))
+#define CA_MPOLY_Q(x)      (&(((x)->elem.mpoly_q)[0]))
 #define CA_NF_ELEM(x)      (&((x)->elem.nf))
 #define CA_FMPQ_NUMREF(x)  (fmpq_numref(CA_FMPQ(x)))
 #define CA_FMPQ_DENREF(x)  (fmpq_denref(CA_FMPQ(x)))
@@ -107,9 +107,9 @@ typedef ca_extension_struct ca_extension_t[1];
 
 typedef enum
 {
-    CA_FIELD_QQ,       /* field elements are represented as fmpq_t */
-    CA_FIELD_NF,       /* field elements are represented as nf_elem_t */
-    CA_FIELD_MPOLY_Q   /* field elements are represented as fmpz_mpoly_q_t */
+    CA_FIELD_TYPE_QQ,       /* field elements are represented as fmpq_t */
+    CA_FIELD_TYPE_NF,       /* field elements are represented as nf_elem_t */
+    CA_FIELD_TYPE_MPOLY_Q   /* field elements are represented as fmpz_mpoly_q_t */
 }
 ca_field_type_t;
 
@@ -146,15 +146,13 @@ ca_ctx_struct;
 
 typedef ca_ctx_struct ca_ctx_t[1];
 
-/* Memory management */
+/* Context management */
 
 void ca_ctx_init(ca_ctx_t ctx);
 
 void ca_ctx_clear(ca_ctx_t ctx);
 
-void ca_init(ca_t x, ca_ctx_t ctx);
-
-void ca_clear(ca_t x, ca_ctx_t ctx);
+void ca_ctx_print(const ca_ctx_t ctx);
 
 /* Extension and field methods */
 
@@ -179,6 +177,34 @@ void ca_field_clear(ca_field_t K);
 void ca_field_set_ext(ca_field_t K, slong i, ca_extension_struct * ext);
 
 void ca_field_print(const ca_field_t K);
+
+/* Numbers */
+
+void ca_init(ca_t x, ca_ctx_t ctx);
+
+void ca_clear(ca_t x, ca_ctx_t ctx);
+
+void _ca_make_field_element(ca_t x, slong i, ca_ctx_t ctx);
+
+CA_INLINE void
+_ca_make_fmpq(ca_t x, ca_ctx_t ctx)
+{
+    if (x->field != CA_FIELD_ID_QQ)
+        _ca_make_field_element(x, CA_FIELD_ID_QQ, ctx);
+}
+
+void ca_zero(ca_t x, ca_ctx_t ctx);
+void ca_one(ca_t x, ca_ctx_t ctx);
+
+void ca_set_si(ca_t x, slong v, ca_ctx_t ctx);
+void ca_set_ui(ca_t x, ulong v, ca_ctx_t ctx);
+void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx);
+void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx);
+
+void ca_i(ca_t x, ca_ctx_t ctx);
+
+void ca_print(ca_t x, ca_ctx_t ctx);
+
 
 #ifdef __cplusplus
 }

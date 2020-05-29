@@ -31,7 +31,10 @@ ca_field_print(const ca_field_t K)
         for (i = 0; i < len; i++)
         {
             flint_printf("x%wd = ", i + 1);
-            ca_extension_print(K->ext[i]);
+            if (K->type == CA_FIELD_TYPE_NF)
+                ca_extension_print(K->nf_ext);
+            else
+                ca_extension_print(K->ext[i]);
             if (i < len - 1)
                 flint_printf(", ");
         }

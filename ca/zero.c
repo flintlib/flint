@@ -12,24 +12,9 @@
 #include "ca.h"
 
 void
-ca_field_clear(ca_field_t K)
+ca_zero(ca_t x, ca_ctx_t ctx)
 {
-    slong i;
-
-    if (K->type == CA_FIELD_TYPE_QQ || K->type == CA_FIELD_TYPE_NF)
-        return;
-
-    if (K->type == CA_FIELD_TYPE_MPOLY_Q)
-    {
-        if (K->len != 0)
-        {
-            flint_free(K->ext);
-
-            for (i = 0; i < K->ideal_len; i++)
-                fmpz_mpoly_clear(K->ideal + i, CA_FIELD_MCTX(K));
-
-            flint_free(K->ideal);
-        }
-    }
+    _ca_make_fmpq(x, ctx);
+    fmpq_zero(CA_FMPQ(x));
 }
 

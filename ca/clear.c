@@ -14,14 +14,22 @@
 void
 ca_clear(ca_t x, ca_ctx_t ctx)
 {
-    if (x->field == 0)  /* QQ */
+    slong index;
+
+    index = x->field;
+
+    if (index == CA_FIELD_ID_QQ)
     {
         fmpz_clear(CA_FMPQ_NUMREF(x));
         fmpz_clear(CA_FMPQ_DENREF(x));
     }
-    else
+    else if (ctx->fields[index].type == CA_FIELD_TYPE_NF)
     {
-        flint_abort(); /* not implemented */
+        nf_elem_clear(CA_NF_ELEM(x), &(ctx->fields[index].nf_ext->data.qqbar.nf));
+    }
+    else if (ctx->fields[index].type == CA_FIELD_TYPE_MPOLY_Q)
+    {
+        fmpz_mpoly_q_clear(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + index));
     }
 }
 

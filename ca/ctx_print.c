@@ -12,24 +12,17 @@
 #include "ca.h"
 
 void
-ca_field_clear(ca_field_t K)
+ca_ctx_print(const ca_ctx_t ctx)
 {
     slong i;
 
-    if (K->type == CA_FIELD_TYPE_QQ || K->type == CA_FIELD_TYPE_NF)
-        return;
-
-    if (K->type == CA_FIELD_TYPE_MPOLY_Q)
+    flint_printf("Calcium context with %wd cached fields:\n", ctx->fields_len);
+    for (i = 0; i < ctx->fields_len; i++)
     {
-        if (K->len != 0)
-        {
-            flint_free(K->ext);
-
-            for (i = 0; i < K->ideal_len; i++)
-                fmpz_mpoly_clear(K->ideal + i, CA_FIELD_MCTX(K));
-
-            flint_free(K->ideal);
-        }
+        flint_printf("%wd   ", i);
+        ca_field_print(ctx->fields + i);
+        flint_printf("\n");
     }
+    flint_printf("\n");
 }
 

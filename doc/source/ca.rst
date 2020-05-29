@@ -98,6 +98,9 @@ For all types, a *type_t* is defined as an array of length one of type
     an element of a generic field `\mathbb{Q}(a_1,\ldots,a_n)`.
     Special values are encoded using magic bits in the field index.
 
+Access to the internal representation
+...............................................................................
+
 .. macro:: CA_FMPQ(x)
 
 .. macro:: CA_FMPQ_NUMREF(x)
@@ -120,14 +123,17 @@ For all types, a *type_t* is defined as an array of length one of type
     this macro returns a pointer which can be used as
     an :type:`nf_elem_t`.
 
-.. function:: ca_init(ca_t x, ca_ctx_t ctx)
 
-    Initializes the variable *x* for use, associating it with the
-    context object *ctx*. The value of *x* is set to the rational number 0.
+.. function:: void _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
 
-.. function:: ca_clear(ca_t x, ca_ctx_t ctx)
+    Changes the internal representation of *x* to that of an element
+    of the field with index *new_index* in the context object *ctx*.
+    This may destroy the value of *x*.
 
-    Clears the variable *x*.
+.. function:: void _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
+
+    Changes the internal representation of *x* to that of an element of
+    the trivial field `\mathbb{Q}`. This may destroy the value of *x*.
 
 Context objects
 -------------------------------------------------------------------------------
@@ -212,4 +218,65 @@ Extension and field objects
 .. function:: void ca_field_clear(ca_field_t K)
 
     Clears the field *K*.
+
+Memory management for numbers
+-------------------------------------------------------------------------------
+
+.. function:: ca_init(ca_t x, ca_ctx_t ctx)
+
+    Initializes the variable *x* for use, associating it with the
+    context object *ctx*. The value of *x* is set to the rational number 0.
+
+.. function:: ca_clear(ca_t x, ca_ctx_t ctx)
+
+    Clears the variable *x*.
+
+Assignment and specific values
+-------------------------------------------------------------------------------
+
+.. function:: void ca_zero(ca_t x, ca_ctx_t ctx)
+
+.. function:: void ca_one(ca_t x, ca_ctx_t ctx)
+
+    Sets *x* to the integer 0 or 1. This creates a canonical representation
+    of this number as an element of the trivial field `\mathbb{Q}`.
+
+.. function:: void ca_set_si(ca_t x, slong v, ca_ctx_t ctx)
+
+.. function:: void ca_set_ui(ca_t x, ulong v, ca_ctx_t ctx)
+
+.. function:: void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx)
+
+.. function:: void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx)
+
+    Sets *x* to the integer or rational number *v*. This creates a canonical
+    representation of this number as an element of the trivial field
+    `\mathbb{Q}`.
+
+.. function:: void ca_i(ca_t x, ca_ctx_t ctx)
+
+    Sets *x* to the imaginary unit `i = \sqrt{-1}`. This creates a canonical
+    representation of `i` as the generator of the algebraic number field
+    `\mathbb{Q}(i)`.
+
+Input and output
+-------------------------------------------------------------------------------
+
+.. function:: void ca_extension_print(const ca_extension_t ext)
+
+    Prints a description of the extension *ext* to standard output.
+
+.. function:: void ca_field_print(const ca_field_t K)
+
+    Prints a description of the field *K* to standard output.
+
+.. function:: void ca_ctx_print(const ca_ctx_t ctx)
+
+    Prints a description of the context *ctx* to standard output.
+    This will give a complete listing of the cached fields in *ctx*.
+
+.. function:: void ca_print(ca_t x, ca_ctx_t ctx)
+
+    Prints a description of *x* to standard output.
+
 

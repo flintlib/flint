@@ -17,7 +17,7 @@ ca_field_init_mpoly_q(ca_field_t K, slong len)
     slong i;
     K->len = len;
 
-    K->type = CA_FIELD_MPOLY_Q;
+    K->type = CA_FIELD_TYPE_MPOLY_Q;
     fmpz_mpoly_ctx_init(&K->mctx, len, ORD_LEX);
     K->ext = flint_malloc(len * sizeof(ca_extension_struct *));
 
@@ -32,7 +32,7 @@ void
 ca_field_init_nf(ca_field_t K, ca_extension_struct * ext)
 {
     K->len = 1;
-    K->type = CA_FIELD_NF;
+    K->type = CA_FIELD_TYPE_NF;
     K->nf_ext = ext;
     K->ideal = NULL;
     K->ideal_len = 0;
@@ -42,7 +42,7 @@ void
 ca_field_init_qq(ca_field_t K)
 {
     K->len = 0;
-    K->type = CA_FIELD_QQ;
+    K->type = CA_FIELD_TYPE_QQ;
     K->ext = NULL;
     K->ideal = NULL;
     K->ideal_len = 0;
