@@ -201,7 +201,7 @@ Conversion
 
 .. function:: double fmpq_get_d(const fmpq_t f)
 
-    Returns `f` as a ``double``, rounding towards zero if ``f`` cannot be represented exactly. The return is undefined if ``f`` is too large or too small to fit in a ``double``.
+    Returns `f` as a ``double``, rounding towards zero if ``f`` cannot be represented exactly. The return is system dependent if ``f`` is too large or too small to fit in a ``double``.
 
 .. function:: void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
@@ -595,17 +595,17 @@ Rational enumeration
     Starting with zero, this generates every rational number once
     and only once, but not in order of minimal height.
 
-.. function:: void fmpq_farey_neighbors(fmpq_t left, fmpq_t right, const fmpq_t mid, const fmpz_t Q)
+.. function:: void fmpq_farey_neighbors(fmpq_t l, fmpq_t r, const fmpq_t x, const fmpz_t Q)
 
-    Set `left` and `right` to the fractions directly below and above `mid` in the Farey sequence of order `Q`.
-    This function will throw if `mid` is not canonical or `Q` is less than the denominator of `mid`.
+    Set `l` and `r` to the fractions directly below and above `x` in the Farey sequence of order `Q`.
+    This function will throw if `x` is not canonical or `Q` is less than the denominator of `x`.
 
-.. function:: void fmpq_simplest_between(fmpq_t mid, const fmpq_t l, const fmpq_t r)
-              void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den, const fmpz_t l_num, const fmpz_t l_den, const fmpz_t r_num, const fmpz_t r_den)
+.. function:: void fmpq_simplest_between(fmpq_t x, const fmpq_t l, const fmpq_t r)
+              void _fmpq_simplest_between(fmpz_t x_num, fmpz_t x_den, const fmpz_t l_num, const fmpz_t l_den, const fmpz_t r_num, const fmpz_t r_den)
 
-    Set ``mid`` to the simplest fraction in the closed interval `[l, r]`. The underscore version makes the additional assumption that `l \le r`.
+    Set `x` to the simplest fraction in the closed interval `[l, r]`. The underscore version makes the additional assumption that `l \le r`.
     The endpoints `l` and `r` do not need to be reduced, but their denominators do need to be positive.
-    ``mid`` will be always be returned in canonical form. A canonical fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1<b_2` or `b_1=b_2` and `a_1<a_2`.
+    `x` will be always be returned in canonical form. A canonical fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1<b_2` or `b_1=b_2` and `a_1<a_2`.
 
 
 Continued fractions
@@ -729,5 +729,5 @@ Writing `s(h,k) = p/q`, some useful properties employed are
 .. function:: void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
               void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    Computes `s(h,k)` for arbitrary `h` and `k`. The naive version using a straightforward
+    Computes `s(h,k)` for arbitrary `h` and `k`. The naive version uses a straightforward
     implementation of the defining sum using ``fmpz`` arithmetic and is slow for large `k`.

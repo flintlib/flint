@@ -13,7 +13,7 @@
 
 
 void fmpq_mpoly_get_coeff_vars_ui(fmpq_mpoly_t C, const fmpq_mpoly_t A,
-                                   slong * vars, ulong * exps, slong length,
+                         const slong * vars, const ulong * exps, slong length,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_get_coeff_vars_ui(C->zpoly, A->zpoly, vars, exps, length, ctx->zctx);

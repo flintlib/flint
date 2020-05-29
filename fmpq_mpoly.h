@@ -413,9 +413,9 @@ FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t A,
 FLINT_DLL void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t A,
                                 const ulong * exp, const fmpq_mpoly_ctx_t ctx);
 
-FLINT_DLL void fmpq_mpoly_get_coeff_vars_ui(fmpq_mpoly_t C, const fmpq_mpoly_t A,
-                                   slong * vars, ulong * exps, slong length,
-                                                   const fmpq_mpoly_ctx_t ctx);
+FLINT_DLL void fmpq_mpoly_get_coeff_vars_ui(fmpq_mpoly_t C,
+                 const fmpq_mpoly_t A, const slong * vars, const ulong * exps,
+                                     slong length, const fmpq_mpoly_ctx_t ctx);
 
 /* comparison ****************************************************************/
 
