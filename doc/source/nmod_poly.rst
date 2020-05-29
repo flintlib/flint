@@ -1645,7 +1645,7 @@ Modular composition
     of the reverse of ``h``. No aliasing of ``res`` and ``polys`` is allowed.
     The algorithm used is the Brent-Kung matrix algorithm.
 
-.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong lenpolys, slong l, const mp_srcptr g, slong glen, mp_srcptr poly, slong len, mp_srcptr polyinv, slong leninv, nmod_t mod, thread_pool_handle * threads, slong num_threads)
+.. function:: void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong lenpolys, slong l, mp_srcptr g, slong glen, mp_srcptr poly, slong len, mp_srcptr polyinv, slong leninv, nmod_t mod, thread_pool_handle * threads, slong num_threads)
 
     Multithreaded version of
     :func:`_nmod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the

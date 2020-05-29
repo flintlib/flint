@@ -18,7 +18,7 @@
 /* TODO: Add a divconquer method */
 
 void
-_nmod_poly_evaluate_fmpz(fmpz_t rop, const mp_srcptr poly, const slong len, const fmpz_t c)
+_nmod_poly_evaluate_fmpz(fmpz_t rop, mp_srcptr poly, const slong len, const fmpz_t c)
 {
     fmpz_t t;
     slong m;
