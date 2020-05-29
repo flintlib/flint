@@ -20,11 +20,11 @@
 #include <sched.h>
 #endif
 
+#include "flint.h"
+
 #if HAVE_PTHREAD
 #include <pthread.h>
 #endif
-
-#include "flint.h"
 
 #ifdef __cplusplus
  extern "C" {
