@@ -20,7 +20,9 @@
 int
 main(void)
 {
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     int i;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("taylor_shift_multi_mod....");

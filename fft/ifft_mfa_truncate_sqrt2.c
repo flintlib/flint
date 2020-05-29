@@ -261,7 +261,9 @@ typedef struct
     mp_limb_t ** t1;
     mp_limb_t ** t2;
     mp_limb_t * temp;
+#if HAVE_PTHREAD
     pthread_mutex_t * mutex;
+#endif
 }
 ifft_outer_arg_t;
 
@@ -280,10 +282,14 @@ _ifft_outer1_worker(void * arg_ptr)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(arg.mutex);
+#endif
         i = *arg.i;
         end = *arg.i = FLINT_MIN(i + 16, n1);
+#if HAVE_PTHREAD
         pthread_mutex_unlock(arg.mutex);
+#endif
 
         if (i >= n1)
             return;
@@ -326,10 +332,14 @@ _ifft_outer2_worker(void * arg_ptr)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(arg.mutex);
-        i = *arg.i;
+#endif
+	i = *arg.i;
         end = *arg.i = FLINT_MIN(i + 16, n1);
+#if HAVE_PTHREAD
         pthread_mutex_unlock(arg.mutex);
+#endif
 
         if (i >= n1)
             return;
@@ -414,7 +424,9 @@ void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t 
     flint_bitcnt_t depth = 0;
     flint_bitcnt_t depth2 = 0;
     flint_bitcnt_t limbs = (w*n)/FLINT_BITS;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     slong num_threads;
     thread_pool_handle * threads;
     ifft_outer_arg_t * args;
@@ -422,7 +434,9 @@ void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t 
     while ((UWORD(1)<<depth) < n2) depth++;
     while ((UWORD(1)<<depth2) < n1) depth2++;
 
+#if HAVE_PTHREAD
     pthread_mutex_init(&mutex, NULL);
+#endif
 
    /* first half mfa IFFT : n2 rows, n1 cols */
    
@@ -450,7 +464,9 @@ void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t 
        args[i].t1 = t1 + i;
        args[i].t2 = t2 + i;
        args[i].temp = temp[i];
+#if HAVE_PTHREAD
        args[i].mutex = &mutex;       
+#endif
     }
 
     for (i = 0; i < num_threads; i++)
@@ -487,5 +503,7 @@ void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t 
 
     flint_free(args);
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&mutex);
+#endif
 }

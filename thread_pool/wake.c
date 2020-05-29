@@ -17,13 +17,17 @@ void thread_pool_wake(thread_pool_t T, thread_pool_handle i,
 {
     thread_pool_entry_struct * D;
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&T->mutex);
+#endif
 
     FLINT_ASSERT(i < T->length);
 
     D = T->tdata;
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&D[i].mutex);
+#endif
 
     /* should not be trying to wake an available thread */
     FLINT_ASSERT(D[i].available == 0);
@@ -32,9 +36,11 @@ void thread_pool_wake(thread_pool_t T, thread_pool_handle i,
     D[i].working = 1;
     D[i].fxn = f;
     D[i].fxnarg = a;
+#if HAVE_PTHREAD
     pthread_cond_signal(&D[i].sleep1);
 
     pthread_mutex_unlock(&D[i].mutex);
 
     pthread_mutex_unlock(&T->mutex);
+#endif
 }

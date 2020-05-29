@@ -16,9 +16,10 @@
 #include "fmpz_poly.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
-#include <pthread.h>
 
 #if FLINT_REENTRANT && !HAVE_TLS
+#include <pthread.h>
+
 static pthread_once_t _factor_trial_initialised = PTHREAD_ONCE_INIT;
 pthread_mutex_t _factor_trial_lock;
 #endif

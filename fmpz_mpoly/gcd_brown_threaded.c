@@ -18,7 +18,9 @@ typedef struct
 {
     volatile int gcd_is_one;
     volatile mp_limb_t p;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     fmpz_t gamma;
     const fmpz_mpoly_ctx_struct * ctx;
     fmpz_mpoly_struct * A, * B;
@@ -114,16 +116,22 @@ static void _splitworker(void * varg)
     while (arg->image_count < arg->required_images)
     {
         /* get prime */
+#if HAVE_PTHREAD
         pthread_mutex_lock(&base->mutex);
-        p = base->p;
+#endif
+	p = base->p;
         if (p >= UWORD_MAX_PRIME)
         {
+#if HAVE_PTHREAD
             pthread_mutex_unlock(&base->mutex);
+#endif
             break;
         }
         p = n_nextprime(base->p, 1);
         base->p = p;
+#if HAVE_PTHREAD
         pthread_mutex_unlock(&base->mutex);
+#endif
 
         /* make sure reduction does not kill both lc(A) and lc(B) */
         gammared = fmpz_fdiv_ui(base->gamma, p);
@@ -497,7 +505,9 @@ static slong _fmpz_mpoly_crt(
 typedef struct
 {
     volatile int idx;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     const fmpz_mpoly_ctx_struct * ctx;
     fmpz_multi_crt_t CRT;
     fmpz_mpoly_struct ** gptrs, ** abarptrs, ** bbarptrs;
@@ -536,10 +546,14 @@ static void _joinworker(void * varg)
     while (1)
     {
         /* get exponent of either G, Abar, or Bbar to start working on */
+#if HAVE_PTHREAD
         pthread_mutex_lock(&base->mutex);
-        i = base->idx;
+#endif
+	i = base->idx;
         base->idx = i + 1;
+#if HAVE_PTHREAD
         pthread_mutex_unlock(&base->mutex);
+#endif
 
         if (i >= base->chunks_length)
         {
@@ -795,7 +809,9 @@ int fmpz_mpolyl_gcd_brown_threaded_pool(
     splitbase->p = UWORD(1) << (FLINT_BITS - 2);
     splitbase->I = I;
 
+#if HAVE_PTHREAD
     pthread_mutex_init(&splitbase->mutex, NULL);
+#endif
 
     /* initial bound on target modulus */
     fmpz_mpoly_height(bound, A, ctx);
@@ -954,7 +970,9 @@ compute_split:
     joinbase->Abar = Abar;
     joinbase->Bbar = Bbar;
     joinbase->ctx = ctx;
+#if HAVE_PTHREAD
     pthread_mutex_init(&joinbase->mutex, NULL);
+#endif
 
     joinargs = (_njoinworker_arg_struct *) flint_malloc(
                                   num_threads*sizeof(_njoinworker_arg_struct));
@@ -1077,8 +1095,10 @@ compute_split:
     FLINT_ASSERT(fmpz_mpoly_is_canonical(Abar, ctx));
     FLINT_ASSERT(fmpz_mpoly_is_canonical(Bbar, ctx));
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&joinbase->mutex);
-
+#endif
+    
     /* free join data */
     fmpz_multi_crt_clear(joinbase->CRT);
     for (i = 0; i < joinbase->chunks_length; i++)
@@ -1132,7 +1152,9 @@ successful_put_content:
 
 cleanup_split:
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&splitbase->mutex);
+#endif
     fmpz_clear(splitbase->gamma);
 
     for (i = 0; i < num_threads; i++)

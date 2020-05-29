@@ -31,14 +31,15 @@
 int
 main(void)
 {
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     int i;
+#endif
     FLINT_TEST_INIT(state);
     
     flint_printf("interval_threaded....");
     fflush(stdout);
 
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
-
     /* no aliasing */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {

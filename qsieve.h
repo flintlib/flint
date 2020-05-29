@@ -91,7 +91,9 @@ typedef qs_poly_s qs_poly_t[1];
 typedef struct qs_s
 {
    volatile slong index_j;
+#if HAVE_PTHREAD
    pthread_mutex_t mutex;
+#endif
    thread_pool_handle * handles;
    slong num_handles;
 

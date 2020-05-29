@@ -24,6 +24,9 @@ int flint_get_num_threads()
 
 void flint_set_num_threads(int num_threads)
 {
+#if !HAVE_PTHREAD
+    num_threads = 1;
+#endif
     _flint_num_workers = num_threads - 1;
     if (global_thread_pool_initialized)
     {
@@ -47,7 +50,13 @@ void _flint_set_num_workers(int num_workers)
 
 int flint_set_num_workers(int num_workers)
 {
-    int old_num_workers = _flint_num_workers;
+    int old_num_workers;
+
+#if !HAVE_PTHREAD
+    num_workers = 0;
+#endif
+
+    old_num_workers = _flint_num_workers;
     
     _flint_num_workers = FLINT_MIN(_flint_num_workers, num_workers);
 

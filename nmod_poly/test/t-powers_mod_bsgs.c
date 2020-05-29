@@ -20,7 +20,9 @@
 int
 main(void)
 {
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     int i, result, max_threads = 5;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("powers_mod_bsgs....");
