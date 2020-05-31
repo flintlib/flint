@@ -153,13 +153,13 @@ Context objects
     be accessed simultaneously by different threads: in multithreaded
     environments, the user must use a separate context object for each thread.
 
-.. function:: ca_ctx_init(ca_ctx_t ctx)
+.. function:: void ca_ctx_init(ca_ctx_t ctx)
 
     Initializes the context object *ctx* for use.
     Any evaluation options stored in the context object
     are set to default values.
 
-.. function:: ca_ctx_clear(ca_ctx_t ctx)
+.. function:: void ca_ctx_clear(ca_ctx_t ctx)
 
     Clears the context object *ctx*, freeing any memory allocated internally.
     This function should only be called after all :type:`ca_t` instances
@@ -204,10 +204,16 @@ Extension and field objects
 
     Initializes *K* to represent the trivial field `\mathbb{Q}`.
 
+.. function:: void ca_field_init_nf(ca_field_t K, ca_extension_struct * ext)
+
+    Initializes *K* to represent the algebraic number field `\mathbb{Q}(a)`
+    where *a* is defined by *ext*.
+
 .. function:: void ca_field_init_mpoly_q(ca_field_t K, slong n)
 
     Initializes *K* to represent a field `\mathbb{Q}(a_1, \ldots, a_n)` in *n*
-    extension elements.
+    extension elements. The extension elements must subsequently be
+    assigned one by one using :func:`ca_field_set_ext`.
 
 .. function:: void ca_field_set_ext(ca_field_t K, slong i, ca_extension_struct * ext)
 
@@ -222,14 +228,34 @@ Extension and field objects
 Memory management for numbers
 -------------------------------------------------------------------------------
 
-.. function:: ca_init(ca_t x, ca_ctx_t ctx)
+.. function:: void ca_init(ca_t x, ca_ctx_t ctx)
 
     Initializes the variable *x* for use, associating it with the
     context object *ctx*. The value of *x* is set to the rational number 0.
 
-.. function:: ca_clear(ca_t x, ca_ctx_t ctx)
+.. function:: void ca_clear(ca_t x, ca_ctx_t ctx)
 
     Clears the variable *x*.
+
+Input and output
+-------------------------------------------------------------------------------
+
+.. function:: void ca_extension_print(const ca_extension_t ext)
+
+    Prints a description of the extension *ext* to standard output.
+
+.. function:: void ca_field_print(const ca_field_t K)
+
+    Prints a description of the field *K* to standard output.
+
+.. function:: void ca_ctx_print(const ca_ctx_t ctx)
+
+    Prints a description of the context *ctx* to standard output.
+    This will give a complete listing of the cached fields in *ctx*.
+
+.. function:: void ca_print(ca_t x, ca_ctx_t ctx)
+
+    Prints a description of *x* to standard output.
 
 Assignment and specific values
 -------------------------------------------------------------------------------
@@ -281,24 +307,115 @@ Assignment and specific values
 
     Sets *x* to the signed infinity `+\infty`, `-\infty`, `+i \infty` or `-i \infty`.
 
-Input and output
+Representation properties
 -------------------------------------------------------------------------------
 
-.. function:: void ca_extension_print(const ca_extension_t ext)
+The following predicates deal with the representation of a :type:`ca_t` and
+hence can always be decided quickly. The return value is 0 for false
+and 1 for true.
 
-    Prints a description of the extension *ext* to standard output.
+.. function:: int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
 
-.. function:: void ca_field_print(const ca_field_t K)
+    Returns 1 if *x* is Unknown, and 0 otherwise.
 
-    Prints a description of the field *K* to standard output.
+Value predicates
+-------------------------------------------------------------------------------
 
-.. function:: void ca_ctx_print(const ca_ctx_t ctx)
+The following predicates check a mathematical property which might
+not be effectively decidable. The result is a :type:`truth_t` to allow
+representing an unknown outcome.
 
-    Prints a description of the context *ctx* to standard output.
-    This will give a complete listing of the cached fields in *ctx*.
+.. function:: truth_t ca_check_is_number(const ca_t x, ca_ctx_t ctx)
 
-.. function:: void ca_print(ca_t x, ca_ctx_t ctx)
+    Tests if *x* is a number. The result is ``T_TRUE`` is *x* is
+    a field element (and hence a complex number), ``T_FALSE`` if *x* is
+    an infinity or *Undefined*, and ``T_UNKNOWN`` if *x* is *Unknown*.
 
-    Prints a description of *x* to standard output.
+.. function:: truth_t ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
 
+.. function:: truth_t ca_check_is_one(const ca_t x, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_is_neg_one(const ca_t x, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_is_i(const ca_t x, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_is_neg_i(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is equal to the number `0`, `1`, `-1`, `i`, or `-i`.
+
+.. function:: truth_t ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_is_rational(const ca_t x, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_is_integer(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is respectively an algebraic number, a rational number,
+    or an integer.
+
+.. function:: truth_t ca_check_is_real(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is a real number. Warning: this returns ``T_FALSE`` if *x* is an
+    infinity with real sign.
+
+.. function:: truth_t ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is an imaginary number. Warning: this returns ``T_FALSE`` if
+    *x* is an infinity with imaginary sign.
+
+.. function:: truth_t ca_check_is_nonreal(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is a nonreal complex number.
+
+.. function:: truth_t ca_check_is_undefined(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is the special value *Undefined*.
+
+.. function:: truth_t ca_check_is_infinity(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is any infinity (unsigned or signed).
+
+.. function:: truth_t ca_check_is_uinf(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is unsigned infinity `{\tilde \infty}`.
+
+.. function:: truth_t ca_check_is_signed_inf(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is any signed infinity.
+
+.. function:: truth_t ca_check_is_pos_inf(const ca_t x, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_is_neg_inf(const ca_t x, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_is_pos_i_inf(const ca_t x, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_is_neg_i_inf(const ca_t x, ca_ctx_t ctx)
+
+    Tests if *x* is equal to the signed infinity `+\infty`, `-\infty`,
+    `+i \infty`, `-i \infty`, respectively.
+
+Comparisons
+-------------------------------------------------------------------------------
+
+.. function:: truth_t ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+    Tests `x = y`.
+    The result is ``T_UNKNOWN`` if either operand is *Unknown*.
+    The result may also be ``T_UNKNOWN`` if *x* and *y* are numerically
+    indistinguishable and cannot be proved equal or unequal by
+    an exact computation.
+
+.. function:: truth_t ca_check_lt(const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_le(const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_gt(const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+.. function:: truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+    Compares *x* and *y*, implementing the respective operations
+    `x < y`, `x \le y`, `x > y`, `x \ge y`.
+    Only real numbers and `-\infty` and `+\infty` are considered comparable.
+    The result is ``T_FALSE`` (not ``T_UNKNOWN``) if either operand is not
+    comparable (being a nonreal complex number, unsigned infinity, or
+    undefined).
 

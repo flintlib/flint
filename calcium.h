@@ -25,9 +25,27 @@
 extern "C" {
 #endif
 
-extern const char * calcium_version;
+/* Global library definitions */
+
+const char * calcium_version(void);
 
 double calcium_test_multiplier(void);
+
+/* Triple-valued logic */
+
+typedef enum
+{
+    T_TRUE,
+    T_FALSE,
+    T_UNKNOWN
+} truth_t;
+
+CALCIUM_INLINE void truth_print(truth_t t)
+{
+    if (t == T_TRUE) flint_printf("T_TRUE");
+    if (t == T_FALSE) flint_printf("T_FALSE");
+    if (t == T_UNKNOWN) flint_printf("T_UNKNOWN");
+}
 
 /* todo: IDs for builtin mathematical functions and constants */
 

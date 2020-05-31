@@ -224,6 +224,41 @@ void ca_neg_i_inf(ca_t x, ca_ctx_t ctx);
 
 void ca_print(ca_t x, ca_ctx_t ctx);
 
+/* Representation properties */
+
+CA_INLINE int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
+{
+    return x->field == CA_UNKNOWN;
+}
+
+/* Value predicates and comparisons */
+
+truth_t ca_check_is_number(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_zero(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_one(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_neg_one(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_i(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_neg_i(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_rational(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_integer(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_real(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_nonreal(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_undefined(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_infinity(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_uinf(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_signed_inf(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_pos_inf(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_neg_inf(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_pos_i_inf(const ca_t x, ca_ctx_t ctx);
+truth_t ca_check_is_neg_i_inf(const ca_t x, ca_ctx_t ctx);
+
+truth_t ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx);
+truth_t ca_check_lt(const ca_t x, const ca_t y, ca_ctx_t ctx);
+truth_t ca_check_le(const ca_t x, const ca_t y, ca_ctx_t ctx);
+truth_t ca_check_gt(const ca_t x, const ca_t y, ca_ctx_t ctx);
+truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }

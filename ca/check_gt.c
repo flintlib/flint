@@ -9,11 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "calcium.h"
+#include "ca.h"
 
-/*
-void
-ca_ctx_clear(ca_ctx_t ctx)
+truth_t
+ca_check_gt(const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
+    return T_UNKNOWN;
 }
-*/
+

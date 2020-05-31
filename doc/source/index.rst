@@ -23,6 +23,7 @@ Module documentation
 .. toctree::
    :maxdepth: 2
 
+   calcium.rst
    ca.rst
    fmpz_mpoly_q.rst
    qqbar.rst

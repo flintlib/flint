@@ -11,4 +11,10 @@
 
 #include "calcium.h"
 
-const char * calcium_version = "0.0.0";
+const char * __calcium_version_string = "0.0.0";
+
+const char * calcium_version(void)
+{
+    return __calcium_version_string;
+}
+

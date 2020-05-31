@@ -9,11 +9,21 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "calcium.h"
+#include "ca.h"
 
-/*
-void
-ca_ctx_init(ca_ctx_t ctx)
+truth_t
+ca_check_is_undefined(const ca_t x, ca_ctx_t ctx)
 {
+    if (CA_IS_SPECIAL(x))
+    {
+        if (ca_is_unknown(x, ctx))
+            return T_UNKNOWN;
+
+        if (x->field & CA_UNDEFINED)
+            return T_TRUE;
+
+        return T_FALSE;
+    }
+
+    return T_FALSE;
 }
-*/
