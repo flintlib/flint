@@ -596,9 +596,9 @@ if [ -z "$CFLAGS" ]; then
       CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
       ANSI_FLAG=""
    elif test "$KERNEL" = "FreeBSD" -o "$OS" = "OpenBSD"; then
-      CFLAGS="-std=c99 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG -I/usr/local/include"
+      CFLAGS="-std=c99 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
       ANSI_FLAG=""
-      CXXFLAGS="-std=c++11 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG -I/usr/local/include"
+      CXXFLAGS="-std=c++11 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    else
       ANSI_FLAG="-ansi"
       CFLAGS="-pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
