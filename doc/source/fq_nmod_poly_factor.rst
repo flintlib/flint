@@ -193,7 +193,7 @@ Factorisation
     performs a square-free factorisation, and finally runs Berlekamp
     on all the individual square-free factors.
 
-.. function:: void fq_nmod_poly_factor_with_cantor_zassenhaus(fq_nmod_poly_factor_t res, fq_nmod_t leading_coeff const fq_nmod_poly_t f, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_poly_factor_with_cantor_zassenhaus(fq_nmod_poly_factor_t res, fq_nmod_t leading_coeff, const fq_nmod_poly_t f, const fq_nmod_ctx_t ctx)
 
     Factorises a general polynomial ``f`` into monic irreducible
     factors and sets ``leading_coeff`` to the leading coefficient

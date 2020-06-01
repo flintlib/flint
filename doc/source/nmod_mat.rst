@@ -207,23 +207,23 @@ Transpose
     Sets `B` to the transpose of `A`. Dimensions must be compatible.
     `B` and `A` may be the same object if and only if the matrix is square.
 
-.. function:: void nmod_mat_swap_rows(nmod_mat_t, slong * perm, slong r, slong r)
+.. function:: void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
     
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
-.. function:: void nmod_mat_swap_cols(nmod_mat_t, slong * perm, slong r, slong r)
+.. function:: void nmod_mat_swap_cols(nmod_mat_t mat, slong * perm, slong r, slong s)
     
     Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
-.. function:: void nmod_mat_invert_rows(nmod_mat_t, slong * perm)
+.. function:: void nmod_mat_invert_rows(nmod_mat_t mat, slong * perm)
     
     Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
     ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
-.. function:: void nmod_mat_invert_cols(nmod_mat_t, slong * perm)
+.. function:: void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
     
     Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the

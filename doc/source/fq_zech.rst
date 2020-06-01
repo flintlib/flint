@@ -73,7 +73,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx nmod_poly_t modulus, const char *var)
+.. function:: void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, nmod_poly_t modulus, const char *var)
 
     Initialises the context for given ``modulus`` with name
     ``var`` for the generator.

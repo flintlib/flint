@@ -137,7 +137,7 @@ Factoring algorithms
     The complexity will be exponential in the number of local factors 
     we find for the components of a squarefree factorization of `F`.
 
-.. function:: _fmpz_poly_factor_quadratic(fmpz_poly_factor_t fac, const fmpz_poly_t f, slong exp)
+.. function:: void _fmpz_poly_factor_quadratic(fmpz_poly_factor_t fac, const fmpz_poly_t f, slong exp)
 
     Inserts the factorisation of the quadratic polynomial *f* into *fac* with
     multiplicity *exp*. This function requires that the content of *f* has

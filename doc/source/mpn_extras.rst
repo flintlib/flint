@@ -7,12 +7,12 @@ Macros
 --------------------------------------------------------------------------------
 
 
-.. function:: MACRO MPN_NORM(a, an)
+.. macro:: MPN_NORM(a, an)
 
     Normalise ``(a, an)`` so that either ``an`` is zero or 
     ``a[an - 1]`` is nonzero.
 
-.. function:: MACRO MPN_SWAP(a, an, b, bn)
+.. macro:: MPN_SWAP(a, an, b, bn)
 
     Swap ``(a, an)`` and ``(b, bn)``, i.e. swap pointers and sizes.
 
@@ -46,7 +46,7 @@ Divisibility
 --------------------------------------------------------------------------------
 
 
-.. function:: int flint_mpn_divisible_1_p(x, xsize, d) (macro)
+.. function:: int flint_mpn_divisible_1_p(x, xsize, d)
 
     Expression determining whether ``(x, xsize)`` is divisible by the
     ``mp_limb_t d`` which is assumed to be odd-valued and at least~`3`.

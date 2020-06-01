@@ -71,23 +71,23 @@ Basic properties and manipulation
 
     Sets all entries of ``mat`` to 0.
 
-.. function:: void fq_nmod_mat_swap_rows(fq_nmod_mat_t, slong * perm, slong r, slong r)
+.. function:: void fq_nmod_mat_swap_rows(fq_nmod_mat_t mat, slong * perm, slong r, slong s)
     
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
-.. function:: void fq_nmod_mat_swap_cols(fq_nmod_mat_t, slong * perm, slong r, slong r)
+.. function:: void fq_nmod_mat_swap_cols(fq_nmod_mat_t mat, slong * perm, slong r, slong s)
     
     Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
-.. function:: void fq_nmod_mat_invert_rows(fq_nmod_mat_t, slong * perm)
+.. function:: void fq_nmod_mat_invert_rows(fq_nmod_mat_t mat, slong * perm)
     
     Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
     ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
-.. function:: void fq_nmod_mat_invert_cols(fq_nmod_mat_t, slong * perm)
+.. function:: void fq_nmod_mat_invert_cols(fq_nmod_mat_t mat, slong * perm)
     
     Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
@@ -202,7 +202,7 @@ Random matrix generation
     otherwise it will have random nonzero entries on the main
     diagonal.
 
-.. function:: void fq_nmod_mat_randtriu(fq_nmod_mat_t mat, flint_rand_t state, int unit, x      const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_mat_randtriu(fq_nmod_mat_t mat, flint_rand_t state, int unit, const fq_nmod_ctx_t ctx)
 
     Sets ``mat`` to a random upper triangular matrix. If
     ``unit`` is 1, it will have ones on the main diagonal,

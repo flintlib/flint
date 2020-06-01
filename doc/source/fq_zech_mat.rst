@@ -180,7 +180,7 @@ Random matrix generation
     otherwise it will have random nonzero entries on the main
     diagonal.
 
-.. function:: void fq_zech_mat_randtriu(fq_zech_mat_t mat, flint_rand_t state, int unit, x      const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_mat_randtriu(fq_zech_mat_t mat, flint_rand_t state, int unit, const fq_zech_ctx_t ctx)
 
     Sets ``mat`` to a random upper triangular matrix. If
     ``unit`` is 1, it will have ones on the main diagonal,

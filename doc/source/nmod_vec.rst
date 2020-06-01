@@ -26,33 +26,33 @@ Modular reduction and arithmetic
     Initialises the given ``nmod_t`` structure for reduction modulo `n`
     with a precomputed inverse.
 
-.. function:: NMOD_RED2(r, a_hi, a_lo, mod)
+.. macro:: NMOD_RED2(r, a_hi, a_lo, mod)
 
     Macro to set `r` to `a` reduced modulo ``mod.n``, where `a` 
     consists of two limbs ``(a_hi, a_lo)``. The ``mod`` parameter 
     must be a valid ``nmod_t`` structure. It is assumed that ``a_hi`` 
     is already reduced modulo ``mod.n``.
 
-.. function:: NMOD_RED(r, a, mod)
+.. macro:: NMOD_RED(r, a, mod)
 
     Macro to set `r` to `a` reduced modulo ``mod.n``. The ``mod`` 
     parameter must be a valid ``nmod_t`` structure.
 
-.. function:: NMOD2_RED2(r, a_hi, a_lo, mod)
+.. macro:: NMOD2_RED2(r, a_hi, a_lo, mod)
 
     Macro to set `r` to `a` reduced modulo ``mod.n``, where `a` 
     consists of two limbs ``(a_hi, a_lo)``. The ``mod`` parameter 
     must be a valid ``nmod_t`` structure. No assumptions are made 
     about ``a_hi``.
 
-.. function:: NMOD_RED3(r, a_hi, a_me, a_lo, mod)
+.. macro:: NMOD_RED3(r, a_hi, a_me, a_lo, mod)
 
     Macro to set `r` to `a` reduced modulo ``mod.n``, where `a` 
     consists of three limbs ``(a_hi, a_me, a_lo)``. The ``mod`` 
     parameter must be a valid ``nmod_t`` structure. It is assumed 
     that ``a_hi`` is already reduced modulo ``mod.n``.
 
-.. function:: NMOD_ADDMUL(r, a, b, mod)
+.. macro:: NMOD_ADDMUL(r, a, b, mod)
 
     Macro to set `r` to `r + ab` reduced modulo ``mod.n``. The 
     ``mod`` parameter must be a valid ``nmod_t`` structure. It is 

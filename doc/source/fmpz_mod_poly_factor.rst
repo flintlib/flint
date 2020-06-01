@@ -83,10 +83,10 @@ Factorisation
     Returns 1 if the polynomial ``f`` is irreducible, otherwise returns 0.
     Uses Rabin irreducibility test.
 
-.. function:: int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t f, const fmpz_mod_poly_t f)
+.. function:: int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t r, const fmpz_mod_poly_t f)
 
-    Either sets `f` to `1` and return 1 if the polynomial ``f`` is 
-    irreducible or `0` otherwise, or set `f` to a nontrivial factor of
+    Either sets `r` to `1` and return 1 if the polynomial ``f`` is 
+    irreducible or `0` otherwise, or set `r` to a nontrivial factor of
     `p`.
 
     This algorithm correctly determines whether `f` to is irreducible over 

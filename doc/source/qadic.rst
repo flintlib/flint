@@ -88,7 +88,7 @@ elements.
 
     Returns the extension degree.
 
-.. function:: static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
+.. function:: void qadic_ctx_print(const qadic_ctx_t ctx)
 
     Prints the data from the given context.
 
