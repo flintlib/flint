@@ -21,27 +21,33 @@ int main()
     flint_randinit(state);
 
     {
+        ca_ctx_t ctx;
         ca_field_t K;
-        ca_extension_t I, Pi;
+        ca_field_t I, Pi;
         qqbar_t t;
 
         qqbar_init(t);
         qqbar_i(t);
 
-        ca_extension_init_qqbar(I, t);
-        ca_extension_init_const(Pi, CA_Pi);
+        ca_ctx_init(ctx);
+        ca_field_init_nf(I, t);
+        ca_field_init_const(Pi, CA_Pi);
 
-        ca_field_init_mpoly_q(K, 2);
+        ca_field_init_multi(K, 2);
+
+/*
         ca_field_set_ext(K, 0, I);
         ca_field_set_ext(K, 1, Pi);
-
         flint_printf("\n");
         ca_field_print(K);
         flint_printf("\n");
+*/
 
-        ca_extension_clear(I);
-        ca_extension_clear(Pi);
+        ca_field_clear(I);
+        ca_field_clear(Pi);
         ca_field_clear(K);
+
+        ca_ctx_clear(ctx);
         qqbar_clear(t);
     }
 

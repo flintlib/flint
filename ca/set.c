@@ -35,9 +35,13 @@ ca_set(ca_t res, const ca_t x, ca_ctx_t ctx)
         {
             nf_elem_set(CA_NF_ELEM(res), CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + field_index));
         }
-        else if (type == CA_FIELD_TYPE_MPOLY_Q)
+        else if (type == CA_FIELD_TYPE_FUNC)
         {
-            fmpz_mpoly_q_set(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + field_index));
+            fmpz_mpoly_q_set(CA_MPOLY_Q(res), CA_MPOLY_Q(x), ctx->mctx + 0);
+        }
+        else if (type == CA_FIELD_TYPE_MULTI)
+        {
+            fmpz_mpoly_q_set(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + field_index, ctx));
         }
     }
 }

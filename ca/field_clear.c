@@ -16,20 +16,30 @@ ca_field_clear(ca_field_t K)
 {
     slong i;
 
-    if (K->type == CA_FIELD_TYPE_QQ || K->type == CA_FIELD_TYPE_NF)
+    if (K->type == CA_FIELD_TYPE_QQ)
         return;
 
-    if (K->type == CA_FIELD_TYPE_MPOLY_Q)
+    if (K->type == CA_FIELD_TYPE_NF)
     {
-        if (K->len != 0)
+        qqbar_clear(&K->data.nf.x);
+        nf_clear(&K->data.nf.nf);
+    }
+
+    if (K->type == CA_FIELD_TYPE_MULTI)
+    {
+        flint_free(K->data.multi.ext);
+
+        if (K->data.multi.ideal_len != 0)
         {
-            flint_free(K->ext);
+            /* todo: retrieve cached mctx from ctx! */
+            fmpz_mpoly_ctx_t mctx;
+            fmpz_mpoly_ctx_init(mctx, K->data.multi.len, CA_MPOLY_ORD);
 
-            for (i = 0; i < K->ideal_len; i++)
-                fmpz_mpoly_clear(K->ideal + i, CA_FIELD_MCTX(K));
-
-            flint_free(K->ideal);
+            for (i = 0; i < K->data.multi.ideal_len; i++)
+                fmpz_mpoly_clear(K->data.multi.ideal + i, mctx);
         }
+
+        flint_free(K->data.multi.ideal);
     }
 }
 

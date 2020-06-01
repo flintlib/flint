@@ -12,39 +12,57 @@
 #include "ca.h"
 
 void
-ca_field_init_mpoly_q(ca_field_t K, slong len)
-{
-    slong i;
-    K->len = len;
-
-    K->type = CA_FIELD_TYPE_MPOLY_Q;
-    fmpz_mpoly_ctx_init(&K->mctx, len, ORD_LEX);
-    K->ext = flint_malloc(len * sizeof(ca_extension_struct *));
-
-    for (i = 0; i < len; i++)
-        K->ext[i] = NULL;
-
-    K->ideal = NULL;
-    K->ideal_len = 0;
-}
-
-void
-ca_field_init_nf(ca_field_t K, ca_extension_struct * ext)
-{
-    K->len = 1;
-    K->type = CA_FIELD_TYPE_NF;
-    K->nf_ext = ext;
-    K->ideal = NULL;
-    K->ideal_len = 0;
-}
-
-void
 ca_field_init_qq(ca_field_t K)
 {
-    K->len = 0;
     K->type = CA_FIELD_TYPE_QQ;
-    K->ext = NULL;
-    K->ideal = NULL;
-    K->ideal_len = 0;
+}
+
+void
+ca_field_init_nf(ca_field_t K, const qqbar_t x)
+{
+    fmpq_poly_t t;
+
+    K->type = CA_FIELD_TYPE_NF;
+
+    qqbar_init(&K->data.nf.x);
+    qqbar_set(&K->data.nf.x, x);
+
+    /* nf_init wants an fmpq_poly_t, so mock up one */
+    t->coeffs = QQBAR_POLY(x)->coeffs;
+    t->den[0] = 1;
+    t->length = QQBAR_POLY(x)->length;
+    t->alloc = QQBAR_POLY(x)->alloc;
+
+    nf_init(&K->data.nf.nf, t);
+}
+
+void
+ca_field_init_const(ca_field_t K, ulong func)
+{
+    K->type = CA_FIELD_TYPE_FUNC;
+    K->data.func.func = func;
+    K->data.func.args_len = 0;
+    K->data.func.args = NULL;
+    acb_init(&K->data.func.enclosure);
+
+    if (func == CA_Pi)
+        acb_const_pi(&K->data.func.enclosure, 128);
+    else
+        flint_abort();
+}
+
+void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x)
+{
+    flint_abort();
+}
+
+void
+ca_field_init_multi(ca_field_t K, slong len)
+{
+    K->type = CA_FIELD_TYPE_MULTI;
+    K->data.multi.len = len;
+    K->data.multi.ext = flint_malloc(len * sizeof(slong));
+    K->data.multi.ideal = NULL;
+    K->data.multi.ideal_len = 0;
 }
 

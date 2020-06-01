@@ -68,93 +68,92 @@ typedef ca_struct ca_t[1];
 
 #define CA_IS_SPECIAL(x)  ((x)->field & CA_SPECIAL)
 
-/* Extension object **********************************************************/
-
-/* There are currently two kinds of extension elements: algebraic numbers,
-   and symbolic functions. */
-typedef enum
-{
-    CA_EXT_QQBAR,
-    CA_EXT_FUNCTION
-}
-ca_extension_type;
-
-typedef struct
-{
-    qqbar_struct x;     /* qqbar element */
-    nf_struct nf;       /* antic number field for fast arithmetic */
-}
-ca_extension_data_qqbar;
-
-typedef struct
-{
-    ulong func;             /* f = F_Pi, F_Exp, ... */
-    slong num_args;         /* n */
-    ca_struct * args;       /* x1, ..., xn */
-    acb_struct enclosure;   /* Numerical enclosure of f(x1,...,xn) */
-}
-ca_extension_data_function;
-
-typedef union
-{
-    ca_extension_data_qqbar qqbar;
-    ca_extension_data_function function;
-}
-ca_extension_data_struct;
-
-typedef struct
-{
-    ca_extension_type type;
-    char * string;
-    ca_extension_data_struct data;
-}
-ca_extension_struct;
-
-typedef ca_extension_struct ca_extension_t[1];
-
 /* Field object **************************************************************/
 
 typedef enum
 {
-    CA_FIELD_TYPE_QQ,       /* field elements are represented as fmpq_t */
-    CA_FIELD_TYPE_NF,       /* field elements are represented as nf_elem_t */
-    CA_FIELD_TYPE_MPOLY_Q   /* field elements are represented as fmpz_mpoly_q_t */
+    /* The rational field QQ.
+       Field elements are represented as fmpq_t */
+    CA_FIELD_TYPE_QQ,
+
+    /* Algebraic number field QQ(a), a = qqbar_t.
+       Field elements are represented as nf_elem_t. */
+    CA_FIELD_TYPE_NF,
+
+    /* Transcendental(?) number field QQ(x) with generating element
+       x = func(c1,...,cn) where func is a symbolic function, c_i are ca_t.
+       Field elements are represented as fmpz_mpoly_q_t (could be fmpz_poly_q_t ...). */
+    CA_FIELD_TYPE_FUNC,
+
+    /* Generic multivariate field QQ(x1,...,xn), x1,...,xn defined by
+       reference to other fields of univariate type;
+       field elements are represented as fmpz_mpoly_q_t. */
+    CA_FIELD_TYPE_MULTI
 }
 ca_field_type_t;
 
-/* todo: make a union */
 typedef struct
 {
-    fmpz_mpoly_ctx_struct mctx;  /* todo: should perhaps be a reference to a fixed table of precomputed contexts */
+    qqbar_struct x;     /* qqbar_t element */
+    nf_struct nf;       /* antic number field for fast arithmetic */
+}
+ca_field_description_nf;
+
+typedef struct
+{
+    ulong func;             /* f = F_Pi, F_Exp, ... */
+    ca_struct * args;       /* Function arguments x1, ..., xn. */
+    slong args_len;         /* Number of function arguments n. */
+    acb_struct enclosure;   /* Numerical enclosure of f(x1,...,xn) */
+}
+ca_field_description_func;
+
+typedef struct
+{
+    slong len;                  /* Number of generators */
+    slong * ext;                /* Indices to generators in the context object */
+    fmpz_mpoly_struct * ideal;  /* Algebraic relations for reduction */
+    slong ideal_len;            /* Number of relations for reduction */
+}
+ca_field_description_multi;
+
+typedef union
+{
+    ca_field_description_nf nf;
+    ca_field_description_func func;
+    ca_field_description_multi multi;
+}
+ca_field_description_struct;
+
+typedef struct
+{
     ca_field_type_t type;
-    ca_extension_struct * nf_ext;
-    ca_extension_struct ** ext;
-    slong len;
-    fmpz_mpoly_struct * ideal;
-    slong ideal_len;
+    ca_field_description_struct data;
 }
 ca_field_struct;
 
 typedef ca_field_struct ca_field_t[1];
 
-#define CA_FIELD_MCTX(K) (&((K)->mctx))
-#define CA_FIELD_NF(K) (&((K)->nf_ext->data.qqbar.nf))
-#define CA_FIELD_NF_QQBAR(K) (&((K)->nf_ext->data.qqbar.x))
+#define CA_FIELD_NF(K) (&((K)->data.nf.nf))
+#define CA_FIELD_NF_QQBAR(K) (&((K)->data.nf.x))
+
+#define CA_FIELD_MCTX(K, ctx) (&((ctx)->mctx[(K)->data.multi.len - 1]))
 
 /* Context object ************************************************************/
 
-/* todo: needs to be **extensions */
-/* todo: merge field and extension objects? */
+/* Create mpoly contexts with up to this many variables. Should be dynamic... */
+#define CA_NVARS_MAX 16
+/* Could also be configurable. */
+#define CA_MPOLY_ORD ORD_LEX
 
 typedef struct
 {
-    ca_field_struct * fields;
+    ca_field_struct * fields;     /* Cached extension fields */
     slong fields_len;
     slong fields_alloc;
 
-    ca_extension_struct * extensions;
-    slong extensions_len;
-    slong extensions_alloc;
+    fmpz_mpoly_ctx_struct * mctx;  /* Cached contexts for multivariate polys */
+    slong mctx_len;
 }
 ca_ctx_struct;
 
@@ -163,43 +162,26 @@ typedef ca_ctx_struct ca_ctx_t[1];
 /* Context management */
 
 void ca_ctx_init(ca_ctx_t ctx);
-
 void ca_ctx_clear(ca_ctx_t ctx);
-
 void ca_ctx_print(const ca_ctx_t ctx);
 
-/* Extension and field methods */
-
-void ca_extension_init_qqbar(ca_extension_t ext, const qqbar_t x);
-
-void ca_extension_init_const(ca_extension_t ext, ulong func);
-
-void ca_extension_init_fx(ca_extension_t ext, ulong func, const ca_t x);
-
-void ca_extension_clear(ca_extension_t ext);
-
-void ca_extension_print(const ca_extension_t ext);
+/* Field methods */
 
 void ca_field_init_qq(ca_field_t K);
-
-void ca_field_init_nf(ca_field_t K, ca_extension_struct * ext);
-
-void ca_field_init_mpoly_q(ca_field_t K, slong len);
-
+void ca_field_init_nf(ca_field_t K, const qqbar_t x);
+void ca_field_init_const(ca_field_t K, ulong func);
+void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x);
+void ca_field_init_multi(ca_field_t K, slong len);
 void ca_field_clear(ca_field_t K);
 
-void ca_field_set_ext(ca_field_t K, slong i, ca_extension_struct * ext);
-
+void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx);
 void ca_field_print(const ca_field_t K);
 
 /* Numbers */
 
 void ca_init(ca_t x, ca_ctx_t ctx);
-
 void ca_clear(ca_t x, ca_ctx_t ctx);
-
 void ca_swap(ca_t x, ca_t y, ca_ctx_t ctx);
-
 void _ca_make_field_element(ca_t x, slong i, ca_ctx_t ctx);
 
 CA_INLINE void

@@ -21,9 +21,6 @@ ca_ctx_clear(ca_ctx_t ctx)
 
     flint_free(ctx->fields);
 
-    for (i = 0; i < ctx->extensions_len; i++)
-        ca_extension_clear(ctx->extensions + i);
-
-    flint_free(ctx->extensions);
+    flint_free(ctx->mctx);
 }
 

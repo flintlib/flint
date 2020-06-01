@@ -14,7 +14,13 @@
 void
 ca_ctx_init(ca_ctx_t ctx)
 {
+    slong i;
     qqbar_t onei;
+
+    ctx->mctx = flint_malloc(CA_NVARS_MAX * sizeof(fmpz_mpoly_ctx_struct));
+    for (i = 0; i < CA_NVARS_MAX; i++)
+        fmpz_mpoly_ctx_init(ctx->mctx + i, i + 1, ORD_LEX);
+    ctx->mctx_len = CA_NVARS_MAX;
 
     /* Always create QQ, QQ(i) */
 
@@ -22,16 +28,11 @@ ca_ctx_init(ca_ctx_t ctx)
     ctx->fields_len = 2;
     ctx->fields_alloc = 2;
 
-    ctx->extensions = (ca_extension_struct *) flint_malloc(1 * sizeof(ca_extension_struct));
-    ctx->extensions_len = 1;
-    ctx->extensions_alloc = 1;
+    ca_field_init_qq(ctx->fields);
 
     qqbar_init(onei);
     qqbar_i(onei);
-    ca_extension_init_qqbar(ctx->extensions, onei);
+    ca_field_init_nf(ctx->fields + 1, onei);
     qqbar_clear(onei);
-
-    ca_field_init_qq(ctx->fields);
-    ca_field_init_nf(ctx->fields + 1, ctx->extensions);
 }
 

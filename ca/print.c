@@ -54,11 +54,11 @@ ca_print(ca_t x, ca_ctx_t ctx)
     }
     else if (ctx->fields[field].type == CA_FIELD_TYPE_NF)
     {
-        nf_elem_print_pretty(CA_NF_ELEM(x), &(ctx->fields[field].nf_ext->data.qqbar.nf), "x1");
+        nf_elem_print_pretty(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + field), "x1");
     }
     else
     {
-        fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), NULL, CA_FIELD_MCTX(ctx->fields + field));
+        fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), NULL, CA_FIELD_MCTX(ctx->fields + field, ctx));
     }
 
     flint_printf("  in  ");

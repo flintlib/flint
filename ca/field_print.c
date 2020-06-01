@@ -15,12 +15,38 @@ void
 ca_field_print(const ca_field_t K)
 {
     slong i, len;
-    len = K->len;
 
     flint_printf("QQ");
-    if (len > 0)
+
+    if (K->type == CA_FIELD_TYPE_QQ)
+        return;
+
+    if (K->type == CA_FIELD_TYPE_NF)
     {
-        flint_printf("(");
+        flint_printf("(x) where {x = Algebraic number ");
+        qqbar_printnd(&K->data.nf.x, 10);
+        flint_printf("}");
+        return;
+    }
+
+    if (K->type == CA_FIELD_TYPE_FUNC)
+    {
+        flint_printf("(x) where {x = ");
+        switch (K->data.func.func)
+        {
+            case CA_Pi:
+                flint_printf("Pi");
+                break;
+            default:
+                flint_printf("<unknown>");
+        }
+        flint_printf("}");
+    }
+
+    if (K->type == CA_FIELD_TYPE_MULTI)
+    {
+        len = K->data.multi.len;
+
         for (i = 0; i < len; i++)
         {
             flint_printf("x%wd", i + 1);
@@ -31,22 +57,26 @@ ca_field_print(const ca_field_t K)
         for (i = 0; i < len; i++)
         {
             flint_printf("x%wd = ", i + 1);
-            if (K->type == CA_FIELD_TYPE_NF)
-                ca_extension_print(K->nf_ext);
-            else
-                ca_extension_print(K->ext[i]);
+
+            /* todo: print from context... */
+            flint_printf("[%wd]", K->data.multi.ext[i]);
+
             if (i < len - 1)
                 flint_printf(", ");
         }
         flint_printf("}");
 
-        if (K->ideal_len > 0)
+        if (K->data.multi.ideal_len > 0)
         {
+            /* todo: could use cached mctx in ctx... */
+            fmpz_mpoly_ctx_t mctx;
+            fmpz_mpoly_ctx_init(mctx, K->data.multi.len, CA_MPOLY_ORD);
+
             flint_printf(" with ideal {");
-            for (i = 0; i < K->ideal_len; i++)
+            for (i = 0; i < K->data.multi.ideal_len; i++)
             {
-                fmpz_mpoly_print_pretty(K->ideal + i, NULL, CA_FIELD_MCTX(K));
-                if (i < K->ideal_len - 1)
+                fmpz_mpoly_print_pretty(K->data.multi.ideal + i, NULL, mctx);
+                if (i < K->data.multi.ideal_len - 1)
                     flint_printf(", ");
             }
             flint_printf("}");

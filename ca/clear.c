@@ -25,11 +25,12 @@ ca_clear(ca_t x, ca_ctx_t ctx)
     }
     else if (ctx->fields[index].type == CA_FIELD_TYPE_NF)
     {
-        nf_elem_clear(CA_NF_ELEM(x), &(ctx->fields[index].nf_ext->data.qqbar.nf));
+        nf_elem_clear(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + index));
     }
-    else if (ctx->fields[index].type == CA_FIELD_TYPE_MPOLY_Q)
+    else if (ctx->fields[index].type == CA_FIELD_TYPE_MULTI ||
+             ctx->fields[index].type == CA_FIELD_TYPE_FUNC)
     {
-        fmpz_mpoly_q_clear(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + index));
+        fmpz_mpoly_q_clear(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + index, ctx));
     }
 }
 

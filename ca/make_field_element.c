@@ -47,9 +47,13 @@ _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
     {
         nf_elem_init(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + new_index));
     }
-    else if (new_type == CA_FIELD_TYPE_MPOLY_Q)
+    else if (new_type == CA_FIELD_TYPE_FUNC)
     {
-        fmpz_mpoly_q_init(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + new_index));
+        fmpz_mpoly_q_init(CA_MPOLY_Q(x), ctx->mctx + 0);
+    }
+    else if (new_type == CA_FIELD_TYPE_MULTI)
+    {
+        fmpz_mpoly_q_init(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + new_index, ctx));
     }
 
     x->field = new_index;

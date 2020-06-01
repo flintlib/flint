@@ -51,12 +51,12 @@ _fmpz_factor_square_root(fmpz_t A, fmpz_t B, const fmpz_t n, slong smooth_bound)
     fmpz_clear(t);
 }
 
-/* Find if sqrt(A) is cached; otherwise create new extension */
+/* Find if sqrt(A) is cached; otherwise create new field */
 /* Todo: fast search table */
 slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 {
     qqbar_t T;
-    slong i, j;
+    slong i;
 
     printf("foof: "); fmpz_print(A); printf("\n");
 
@@ -106,11 +106,7 @@ slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
         }
     }
 
-    /* todo: here we assume that field not found => extension cannot be found */
-    /* this is necessarily not going to be true...? */
-
     i = ctx->fields_len;
-    j = ctx->extensions_len;
 
     if (i >= ctx->fields_alloc)
     {
@@ -118,21 +114,13 @@ slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
         ctx->fields_alloc = 2 * ctx->fields_alloc;
     }
 
-    if (j >= ctx->extensions_alloc)
-    {
-        ctx->extensions = (ca_extension_struct *) flint_realloc(ctx->extensions, sizeof(ca_extension_struct) * 2 * ctx->extensions_alloc);
-        ctx->extensions_alloc = 2 * ctx->extensions_alloc;
-    }
-
     ctx->fields_len = i + 1;
-    ctx->extensions_len = j + 1;
 
     qqbar_init(T);
     qqbar_set_fmpz(T, A);
     qqbar_sqrt(T, T);
 
-    ca_extension_init_qqbar(ctx->extensions + j, T);
-    ca_field_init_nf(ctx->fields + i, ctx->extensions + j);
+    ca_field_init_nf(ctx->fields + i, T);
 
     qqbar_clear(T);
 
