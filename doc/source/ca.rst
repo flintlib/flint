@@ -188,7 +188,7 @@ Extension field objects
     `\mathbb{Q}(x)` where *x* is a builtin constant defined by
     *func* (example: *func* = *CA_Pi* for `x = \pi`).
 
-.. function:: void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x)
+.. function:: void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
 
     Initializes *K* to represent the field
     `\mathbb{Q}(a)` where `a = f(x)`, given a number *x* and a builtin

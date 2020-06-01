@@ -170,7 +170,7 @@ void ca_ctx_print(const ca_ctx_t ctx);
 void ca_field_init_qq(ca_field_t K);
 void ca_field_init_nf(ca_field_t K, const qqbar_t x);
 void ca_field_init_const(ca_field_t K, ulong func);
-void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x);
+void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx);
 void ca_field_init_multi(ca_field_t K, slong len);
 void ca_field_clear(ca_field_t K);
 

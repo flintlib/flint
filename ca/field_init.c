@@ -51,7 +51,7 @@ ca_field_init_const(ca_field_t K, ulong func)
         flint_abort();
 }
 
-void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x)
+void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
 {
     flint_abort();
 }
