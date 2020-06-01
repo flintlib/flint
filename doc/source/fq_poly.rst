@@ -183,11 +183,11 @@ Assignment and basic manipulation
 
     Sets ``poly`` to the zero polynomial.
 
-.. function:: void void fq_poly_one(fq_poly_t poly, const fq_ctx_t ctx)
+.. function:: void fq_poly_one(fq_poly_t poly, const fq_ctx_t ctx)
 
     Sets ``poly`` to the constant polynomial `1`.
 
-.. function:: void void fq_poly_gen(fq_poly_t poly, const fq_ctx_t ctx)
+.. function:: void fq_poly_gen(fq_poly_t poly, const fq_ctx_t ctx)
 
     Sets ``poly`` to the polynomial `x`.
 
@@ -1464,7 +1464,7 @@ Composition
     be the inverse of the reverse of ``g``.
 
 
-.. function:: void _fq_poly_compose_mod_brent_kung_precomp_preinv(fq_struct* res, const fq_struct* f, slong lenf, const fq_mat_t A, const fq_struct* h, slong h, const fq_struct* hinv, slong lenhinv, const fq_ctx_t ctx)
+.. function:: void _fq_poly_compose_mod_brent_kung_precomp_preinv(fq_struct* res, const fq_struct* f, slong lenf, const fq_mat_t A, const fq_struct* h, slong lenh, const fq_struct* hinv, slong lenhinv, const fq_ctx_t ctx)
 
     Sets ``res`` to the composition `f(g)` modulo `h`. We require
     that `h` is nonzero. We require that the ith row of `A` contains

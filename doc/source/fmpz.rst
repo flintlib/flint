@@ -195,17 +195,11 @@ Conversion
     Returns `f` as an ``ulong``.  The result is undefined
     if `f` does not fit into an ``ulong`` or is negative.
 
-.. function:: fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
+.. function:: void fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
 
     If ``f`` consists of two limbs, then `*hi` and `*low` are set to the high
     and low limbs, otherwise `*low` is set to the low limb and `*hi` is set
     to 0.
-
-.. function:: void fmpz_set_d(fmpz_t f, double c)
-
-    Sets `f` to the ``double`` `c`, rounding down towards zero if
-    the value of `c` is fractional. The outcome is undefined if `c` is
-    infinite, not-a-number, or subnormal.
 
 .. function:: double fmpz_get_d(const fmpz_t f)
 
@@ -260,9 +254,11 @@ Conversion
 
     Sets `f` to the given ``ulong`` value.
 
-.. function:: void fmpz_set_d(fmpz_t f, double d)
+.. function:: void fmpz_set_d(fmpz_t f, double c)
 
-    Sets `f` to the integer nearest to the given double.
+    Sets `f` to the ``double`` `c`, rounding down towards zero if
+    the value of `c` is fractional. The outcome is undefined if `c` is
+    infinite, not-a-number, or subnormal.
 
 .. function:: void fmpz_set_d_2exp(fmpz_t f, double d, slong exp)
 
@@ -982,7 +978,7 @@ Basic arithmetic
 
     Sets `f` to the binomial coefficient `{n \choose k}`.
 
-.. function:: void fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong k)
+.. function:: void _fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong a, ulong b)
 
     Sets `r` to the rising factorial `(x+a) (x+a+1) (x+a+2) \cdots (x+b-1)`.
     Assumes `b > a`.

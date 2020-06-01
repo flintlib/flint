@@ -91,14 +91,6 @@ Monomial arithemtic
     ``exp2`` has any of the nonzero bits in ``mask`` set. Assumes that
     ``bits <= FLINT_BITS``.
 
-.. function:: int mpoly_monomial_overflows(ulong * exp2, slong N, ulong mask)
-
-    Return true if any of the fields of the given monomial ``(exp2, N)`` has
-    overflowed (or is negative). The ``mask`` is a word with the high bit of
-    each field set to 1. In other words, the function returns 1 if any word of
-    ``exp2`` has any of the nonzero bits in ``mask`` set. Assumes that
-    ``bits <= FLINT_BITS``.
-
 .. function:: int mpoly_monomial_overflows_mp(ulong * exp_ptr, slong N, flint_bitcnt_t bits)
 
     Return true if any of the fields of the given monomial ``(exp_ptr, N)``

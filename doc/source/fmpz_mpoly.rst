@@ -419,7 +419,7 @@ Scalar operations
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mpoly_neg(fmpz_mpoly_t A, const fmpz_mpoly_t B const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_neg(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
     
     Set ``A`` to ``-B``.
 
@@ -544,12 +544,6 @@ Division
 .. function:: int fmpz_mpoly_divides(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     If ``A`` is divisible by ``B``, set ``Q`` to the exact quotient and return ``1``. Otherwise, set ``Q`` to zero and return ``0``.
-
-.. function:: int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
-              int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
-
-    Perform the operation of func::fmpz_mpoly_divides using the algorithm of Michael Monagan and Roman Pearce.
-    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: void fmpz_mpoly_divrem(fmpz_mpoly_t Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
@@ -719,12 +713,15 @@ Internal Functions
 
 .. function:: int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
+.. function:: int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+
     Set ``poly1`` to ``poly2`` divided by ``poly3`` and return 1 if
     the quotient is exact. Otherwise return 0. The function uses the algorithm
     of Michael Monagan and Roman Pearce. Note that the function
     ``fmpz_mpoly_div_monagan_pearce`` below may be much faster if the
     quotient is known to be exact.
 
+    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
 .. function:: slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq, ulong ** expq, slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N)
 

@@ -54,7 +54,7 @@ Primality test functions
     ``PRIME``, ``COMPOSITE`` and ``PROBABPRIME``
     (if we cannot prove primality).
 
-.. function:: aprcl_is_prime_gauss_min_R(const fmpz_t n, ulong R)
+.. function:: void aprcl_is_prime_gauss_min_R(const fmpz_t n, ulong R)
 
     Same as :func:`aprcl_is_prime_gauss` with fixed minimum value of `R`.
 

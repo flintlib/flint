@@ -143,7 +143,7 @@ Constants
 
     Return ``1`` if ``A`` is a constant, else return ``0``.
 
-.. function:: void fq_nmod_mpoly_get_fq_nmod(fq_nmod_t c, const fq_nmod_mpoly_t A const fq_nmod_mpoly_ctx_t ctx)
+.. function:: void fq_nmod_mpoly_get_fq_nmod(fq_nmod_t c, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 
     Assuming that ``A`` is a constant, set ``c`` to this constant.
     This function throws if ``A`` is not a constant.

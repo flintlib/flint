@@ -472,7 +472,7 @@ Arithmetic
 
     Sets ``res`` to ``x`` divided by ``2^exp``.
 
-.. function:: _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
+.. function:: void _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
 
     Set ``(rnum, rden)`` to the gcd of ``(p, q)`` and ``(r, s)``
     which we define to be the canonicalisation of gcd`(ps, qr)/(qs)`. (This is
@@ -481,7 +481,7 @@ Arithmetic
     Note that it does not agree with gcd as defined in ``fmpq_poly``.)
     This definition agrees with the result as output by Sage and Pari/GP.
 
-.. function:: fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+.. function:: void fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
     Set ``res`` to the gcd of ``op1`` and ``op2``. See the low
     level function ``_fmpq_gcd`` for our definition of gcd.
