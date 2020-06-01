@@ -27,7 +27,9 @@ typedef struct
    const fmpz * ginv;
    fmpz ** res;
    const fmpz * p;
+#if HAVE_PTHREAD
    pthread_mutex_t * mutex;
+#endif
 } fmpz_powers_preinv_arg_t;
 
 void
@@ -42,10 +44,14 @@ _fmpz_mod_poly_powers_mod_preinv_worker(void * arg_ptr)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(arg.mutex);
-        j = *arg.j + k;
+#endif
+	j = *arg.j + k;
         *arg.j = j;
+#if HAVE_PTHREAD
         pthread_mutex_unlock(arg.mutex);
+#endif
 
         if (j >= n)
             return;
@@ -81,8 +87,10 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
 {
     slong i, k, shared_j = 0;
     fmpz_powers_preinv_arg_t * args;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
-    
+#endif
+
     if (n == 0)
         return;
     
@@ -139,10 +147,14 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
         args[i].ginv    = ginv;
         args[i].res     = res;
         args[i].p       = p;
+#if HAVE_PTHREAD
         args[i].mutex   = &mutex;
+#endif
     }
 
+#if HAVE_PTHREAD
     pthread_mutex_init(&mutex, NULL);
+#endif
 
     for (i = 0; i < num_threads; i++)
         thread_pool_wake(global_thread_pool, threads[i], 0,
@@ -153,7 +165,9 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
     for (i = 0; i < num_threads; i++)
         thread_pool_wait(global_thread_pool, threads[i]);
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&mutex);
+#endif
 
     flint_free(args);
 }

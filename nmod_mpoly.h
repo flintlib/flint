@@ -609,8 +609,8 @@ FLINT_DLL void nmod_mpoly_set_coeff_ui_ui(nmod_mpoly_t A,
                        ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C,
-             const nmod_mpoly_t A,  slong * vars, ulong * exps, slong length,
-                                                   const nmod_mpoly_ctx_t ctx);
+                 const nmod_mpoly_t A, const slong * vars, const ulong * exps,
+                                     slong length, const nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE mp_limb_t nmod_mpoly_leadcoeff(
                                     nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)

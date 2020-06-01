@@ -504,8 +504,8 @@ FLINT_DLL void fq_nmod_mpoly_set_coeff_fq_nmod_ui(fq_nmod_mpoly_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_mpoly_get_coeff_vars_ui(fq_nmod_mpoly_t C,
-           const fq_nmod_mpoly_t A, slong * vars, ulong * exps, slong length,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+              const fq_nmod_mpoly_t A, const slong * vars, const ulong * exps,
+                                  slong length, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE fq_nmod_struct * fq_nmod_mpoly_leadcoeff(
                         const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)

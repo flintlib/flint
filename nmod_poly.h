@@ -855,7 +855,7 @@ FLINT_DLL void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
 /* Evaluation  ***************************************************************/
 
 FLINT_DLL void _nmod_poly_evaluate_fmpz(fmpz_t rop,
-                        const mp_srcptr poly, const slong len, const fmpz_t c);
+                             mp_srcptr poly, const slong len, const fmpz_t c);
 
 FLINT_DLL void nmod_poly_evaluate_fmpz(fmpz_t rop,
                                        const nmod_poly_t poly, const fmpz_t c);
@@ -1036,7 +1036,9 @@ FLINT_DLL void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * re
                     const nmod_poly_struct * polys, slong len1, slong n,
                     const nmod_poly_t g, const nmod_poly_t poly,
 		    const nmod_poly_t polyinv);
+
 FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr);
+
 FLINT_DLL void
 nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
            const nmod_poly_struct * polys, slong len1, slong n,
@@ -1046,7 +1048,7 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res
 
 FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
                  nmod_poly_struct * res, const nmod_poly_struct * polys,
-                 slong lenpolys, slong l, const mp_srcptr g, slong glen,
+                 slong lenpolys, slong l, mp_srcptr g, slong glen,
                  mp_srcptr poly, slong len, mp_srcptr polyinv, slong leninv,
                  nmod_t mod, thread_pool_handle * threads, slong num_threads);
 

@@ -22,7 +22,9 @@ typedef struct
     mp_size_t output_limbs;
     mp_srcptr limbs;
     mp_limb_t ** poly;
+#if HAVE_PTHREAD
     pthread_mutex_t * mutex;
+#endif
 }
 split_limbs_arg_t;
 
@@ -40,10 +42,14 @@ _split_limbs_worker(void * arg_ptr)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(arg.mutex);
-        i = *arg.i;
+#endif
+	i = *arg.i;
         end = *arg.i = FLINT_MIN(i + 16, num);
+#if HAVE_PTHREAD
         pthread_mutex_unlock(arg.mutex);
+#endif
 
         if (i >= num)
             return;
@@ -63,12 +69,16 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
 {
     mp_size_t i, shared_i = 0, skip, length = (total_limbs - 1)/coeff_limbs + 1;
     mp_size_t num = total_limbs/coeff_limbs;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     slong num_threads;
     thread_pool_handle * threads;
     split_limbs_arg_t * args;
     
+#if HAVE_PTHREAD
     pthread_mutex_init(&mutex, NULL);
+#endif
 
     num_threads = flint_request_threads(&threads,
                             FLINT_MIN(flint_get_num_threads(), (num + 15)/16));
@@ -84,7 +94,9 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
        args[i].output_limbs = output_limbs;
        args[i].limbs = limbs;
        args[i].poly = poly;
+#if HAVE_PTHREAD
        args[i].mutex = &mutex;       
+#endif
     }
 
     for (i = 0; i < num_threads; i++)
@@ -100,7 +112,9 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
 
     flint_free(args);
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&mutex);
+#endif
 
     i = num;
     skip = i*coeff_limbs;
@@ -124,7 +138,9 @@ typedef struct
     flint_bitcnt_t top_bits;
     mp_limb_t mask;
     mp_limb_t ** poly;
+#if HAVE_PTHREAD
     pthread_mutex_t * mutex;
+#endif
 }
 split_bits_arg_t;
 
@@ -145,10 +161,14 @@ _split_bits_worker(void * arg_ptr)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(arg.mutex);
-        i = *arg.i;
+#endif
+	i = *arg.i;
         end = *arg.i = FLINT_MIN(i + 16, length - 1);
+#if HAVE_PTHREAD
         pthread_mutex_unlock(arg.mutex);
+#endif
 
         if (i >= length - 1)
             return;
@@ -194,7 +214,9 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
     flint_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);
     mp_srcptr limb_ptr;
     mp_limb_t mask;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     slong num_threads;
     thread_pool_handle * threads;
     split_bits_arg_t * args;
@@ -207,7 +229,9 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
     shift_bits = WORD(0);
     limb_ptr = limbs;                      
     
+#if HAVE_PTHREAD
     pthread_mutex_init(&mutex, NULL);
+#endif
 
     num_threads = flint_request_threads(&threads,
                      FLINT_MIN(flint_get_num_threads(), (length - 1 + 15)/16));
@@ -225,7 +249,9 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
        args[i].top_bits = top_bits;
        args[i].mask = mask;
        args[i].poly = poly;
+#if HAVE_PTHREAD
        args[i].mutex = &mutex;       
+#endif
     }
 
     for (i = 0; i < num_threads; i++)
@@ -241,21 +267,23 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
 
     flint_free(args);
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&mutex);
-   
-   i = length - 1;
-   limb_ptr = limbs + i*(coeff_limbs - 1) + (i*top_bits)/FLINT_BITS;
-   shift_bits = (i*top_bits) % FLINT_BITS;
+#endif
 
-   flint_mpn_zero(poly[i], output_limbs + 1);
+    i = length - 1;
+    limb_ptr = limbs + i*(coeff_limbs - 1) + (i*top_bits)/FLINT_BITS;
+    shift_bits = (i*top_bits) % FLINT_BITS;
+
+    flint_mpn_zero(poly[i], output_limbs + 1);
    
-   limbs_left = total_limbs - (limb_ptr - limbs);
+    limbs_left = total_limbs - (limb_ptr - limbs);
    
-   if (!shift_bits)
-      flint_mpn_copyi(poly[i], limb_ptr, limbs_left);
-   else
-      mpn_rshift(poly[i], limb_ptr, limbs_left, shift_bits);                   
+    if (!shift_bits)
+        flint_mpn_copyi(poly[i], limb_ptr, limbs_left);
+    else
+        mpn_rshift(poly[i], limb_ptr, limbs_left, shift_bits);                   
      
-   return length;
+    return length;
 }
 

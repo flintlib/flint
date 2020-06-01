@@ -24,14 +24,15 @@
 
 int main(void)
 {
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     int iter;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("factor_distinct_deg_threaded....");
     fflush(stdout);
 
 #if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
-
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         fmpz_mod_poly_t poly1, poly, q, r, product;

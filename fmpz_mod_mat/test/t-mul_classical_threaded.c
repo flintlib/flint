@@ -22,7 +22,9 @@
 int
 main(void)
 {
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
     slong i, max_threads = 5;
+#endif
     FLINT_TEST_INIT(state);
 
     flint_printf("mul_classical_threaded....");

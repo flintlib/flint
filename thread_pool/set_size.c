@@ -19,7 +19,9 @@ int thread_pool_set_size(thread_pool_t T, slong new_size)
 
     new_size = FLINT_MAX(new_size, WORD(0));
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&T->mutex);
+#endif
     D = T->tdata;
     old_size = T->length;
 
@@ -28,7 +30,9 @@ int thread_pool_set_size(thread_pool_t T, slong new_size)
     {
         if (D[i].available != 1)
         {
+#if HAVE_PTHREAD
             pthread_mutex_unlock(&T->mutex);
+#endif
             return 0;
         }
     }
@@ -36,14 +40,18 @@ int thread_pool_set_size(thread_pool_t T, slong new_size)
     /* destroy all old data */
     for (i = 0; i < old_size; i++)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(&D[i].mutex);
+#endif
         D[i].exit = 1;
-        pthread_cond_signal(&D[i].sleep1);
+#if HAVE_PTHREAD
+	pthread_cond_signal(&D[i].sleep1);
         pthread_mutex_unlock(&D[i].mutex);
         pthread_join(D[i].pth, NULL);
         pthread_cond_destroy(&D[i].sleep2);
         pthread_cond_destroy(&D[i].sleep1);
         pthread_mutex_destroy(&D[i].mutex);
+#endif
     }
     if (D != NULL)
     {
@@ -60,25 +68,31 @@ int thread_pool_set_size(thread_pool_t T, slong new_size)
 
         for (i = 0; i < new_size; i++)
         {
+#if HAVE_PTHREAD
             pthread_mutex_init(&D[i].mutex, NULL);
             pthread_cond_init(&D[i].sleep1, NULL);
             pthread_cond_init(&D[i].sleep2, NULL);
+#endif
             D[i].idx = i;
             D[i].available = 1;
             D[i].fxn = NULL;
             D[i].fxnarg = NULL;
             D[i].working = -1;
             D[i].exit = 0;
+#if HAVE_PTHREAD
             pthread_mutex_lock(&D[i].mutex);
             pthread_create(&D[i].pth, NULL, thread_pool_idle_loop, &D[i]);
             while (D[i].working != 0)
                 pthread_cond_wait(&D[i].sleep2, &D[i].mutex);
             pthread_mutex_unlock(&D[i].mutex);
-        }
+#endif
+	}
     }
 
     T->length = new_size;
 
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&T->mutex);
+#endif
     return 1;
 }

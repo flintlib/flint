@@ -6,9 +6,11 @@
 Configuring Flint
 -------------------------------------------------------------------------------
 
-There are two ways to build Flint. One way is through a standard set of CMake
-files provided in the distribution. The other way is with a custom build
-system based on a configuration script and Makefiles.
+There are three ways to build Flint. One way is through a standard set of CMake
+files provided in the distribution. A second way is with a custom build
+system based on a configuration script and Makefiles also provided in the
+distribution. A third way using MSVC solution files is documented in a section
+further down.
 
 The easiest way to use FLINT is to build a shared library. Simply download
 the FLINT tarball and untar it on your system.
@@ -227,7 +229,7 @@ Visual Studio 2015 Community (or higher version) and:
 - an installed version of Python Tools for Visual Studio
   http://pytools.codeplex.com/
 
-Obtain FLINT2 by cloning it using GIT from Dr. Brian Gladman's repository:
+Obtain FLINT2 by cloning it using GIT from Brian Gladman's repository:
 
   ``git@github.com:BrianGladman/flint.git``
 

@@ -65,7 +65,9 @@ typedef struct
     fmpz ** D;
     fmpz * tmp;
     fmpz * p;
+#if HAVE_PTHREAD
     pthread_mutex_t * mutex;
+#endif
     int op;
 } fmpz_mod_mat_transpose_arg_t;
 
@@ -90,8 +92,10 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(arg.mutex);
-        i = *arg.i;
+#endif
+	i = *arg.i;
         j = *arg.j;
         if (j >= n)
         {
@@ -100,7 +104,9 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
             j = 0;
         }
         *arg.j = j + block;
+#if HAVE_PTHREAD
         pthread_mutex_unlock(arg.mutex);
+#endif
 
         if (i >= m)
         {
@@ -139,7 +145,9 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
     slong i, j, block, nlimbs;
     slong shared_i = 0, shared_j = 0;
     fmpz_mod_mat_transpose_arg_t * args;
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
 
     tmp = _fmpz_vec_init(k*n);
 	    
@@ -171,11 +179,15 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
         args[i].D       = D;
         args[i].tmp     = tmp;
         args[i].p       = p;
+#if HAVE_PTHREAD
         args[i].mutex   = &mutex;
-        args[i].op      = op;
+#endif
+	args[i].op      = op;
     }
 
+#if HAVE_PTHREAD
     pthread_mutex_init(&mutex, NULL);
+#endif
 
     for (i = 0; i < num_threads; i++)
     {
@@ -190,7 +202,9 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
         thread_pool_wait(global_thread_pool, threads[i]);
     }
 
+#if HAVE_PTHREAD
     pthread_mutex_destroy(&mutex);
+#endif
 
     flint_free(args);
 

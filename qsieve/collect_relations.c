@@ -369,13 +369,16 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 
          poly->num_factors = num_factors;
 
+#if HAVE_PTHREAD
          pthread_mutex_lock(&qs_inf->mutex);
-         {
-            qsieve_write_to_file(qs_inf, 1, Y, poly);
+#endif
+	 qsieve_write_to_file(qs_inf, 1, Y, poly);
          
-            qs_inf->full_relation++;
-         }
+         qs_inf->full_relation++;
+
+#if HAVE_PTHREAD
          pthread_mutex_unlock(&qs_inf->mutex);
+#endif
          relations++;
       } else /* not a relation, perhaps a partial? */
       {
@@ -410,17 +413,20 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 
                   poly->num_factors = num_factors;
 
+#if HAVE_PTHREAD
                   pthread_mutex_lock(&qs_inf->mutex);
-                  {
-                     /* store this partial in file */
+#endif
+                  /* store this partial in file */
 
-                     qsieve_write_to_file(qs_inf, prime, Y, poly);
+                  qsieve_write_to_file(qs_inf, prime, Y, poly);
 
-                     qs_inf->edges++;
+                  qs_inf->edges++;
 
-                     qsieve_add_to_hashtable(qs_inf, prime);
-                  }
+                  qsieve_add_to_hashtable(qs_inf, prime);
+
+#if HAVE_PTHREAD
                   pthread_mutex_unlock(&qs_inf->mutex);
+#endif
 
               }
           }
@@ -503,7 +509,9 @@ static void qsieve_collect_relations_worker(void * varg)
 
     while (1)
     {
+#if HAVE_PTHREAD
         pthread_mutex_lock(&qs_inf->mutex);
+#endif
         j = qs_inf->index_j;
         qs_inf->index_j = j + 1;
         if (j < iterations)
@@ -513,7 +521,9 @@ static void qsieve_collect_relations_worker(void * varg)
                 qsieve_init_poly_next(qs_inf, j);
             qsieve_poly_copy(thread_poly, qs_inf);
         }
+#if HAVE_PTHREAD
         pthread_mutex_unlock(&qs_inf->mutex);
+#endif
 
         if (j >= iterations)
             return;

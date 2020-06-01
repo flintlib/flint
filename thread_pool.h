@@ -20,9 +20,11 @@
 #include <sched.h>
 #endif
 
-#include <pthread.h>
-
 #include "flint.h"
+
+#if HAVE_PTHREAD
+#include <pthread.h>
+#endif
 
 #ifdef __cplusplus
  extern "C" {
@@ -30,10 +32,12 @@
 
 typedef struct
 {
+#if HAVE_PTHREAD
     pthread_t pth;
     pthread_mutex_t mutex;
     pthread_cond_t sleep1;
     pthread_cond_t sleep2;
+#endif
     volatile int idx;
     volatile int available;
     volatile int max_workers;
@@ -47,10 +51,12 @@ typedef thread_pool_entry_struct thread_pool_entry_t[1];
 
 typedef struct
 {
-#if HAVE_CPU_SET_T
+#if HAVE_CPU_SET_T && HAVE_PTHREAD
     cpu_set_t original_affinity;
 #endif
+#if HAVE_PTHREAD
     pthread_mutex_t mutex;
+#endif
     thread_pool_entry_struct * tdata;
     slong length;
 } thread_pool_struct;
