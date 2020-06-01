@@ -61,7 +61,7 @@ Random functions
     As for :func:`n_randtest`, but does not return `0`.
     This function is intended for use in test code. 
 
-.. function:: ulong n_randprime(flint_rand_t state, unsigned slong bits, int proved)
+.. function:: ulong n_randprime(flint_rand_t state, ulong bits, int proved)
 
     Returns a random prime number ``(proved = 1)`` or probable prime
     ``(proved = 0)``

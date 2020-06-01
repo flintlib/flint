@@ -72,7 +72,6 @@ Comparison of elements against each other or against zero can be accomplished wi
     If `a*c = b \mod n` has a solution for `a` return `1` and set `a` to such a solution. Otherwise return `0` and leave `a` undefined.
 
 .. function:: void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong e, const fmpz_mod_ctx_t ctx)
-              void fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e, const fmpz_mod_ctx_t ctx)
 
     Set `a` to `b^e` modulo `n`.
 
@@ -102,7 +101,7 @@ Discrete Logarithms via Pohlig-Hellman
 
     Return the internally stored base.
 
-.. function:: fmpz_mod_discrete_log_pohlig_hellman_run(fmpz_t x, const fmpz_mod_discrete_log_pohlig_hellman_t L, const fmpz_t y)
+.. function:: void fmpz_mod_discrete_log_pohlig_hellman_run(fmpz_t x, const fmpz_mod_discrete_log_pohlig_hellman_t L, const fmpz_t y)
 
     Set ``x`` to the logarithm of ``y`` with repect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
     The function is undefined if the logarithm does not exist.

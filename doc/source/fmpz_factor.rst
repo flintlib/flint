@@ -202,7 +202,7 @@ Factoring of ``fmpz`` integers using ECM
 
     Used for arithmetic operations in ``fmpz_factor_ecm``.
 
-.. function:: void fmpz_factor_ecm_addmod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
+.. function:: void fmpz_factor_ecm_submod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
 
     Sets `x` to `(a - b)` ``%`` `n`. This is not a normal subtract mod
     function, it assumes `n` is normalized (highest bit set)

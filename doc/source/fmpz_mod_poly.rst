@@ -474,7 +474,7 @@ Products
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n fmpz_t f)
+.. function:: void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n, fmpz_t f)
 
     Sets ``(poly, n + 1)`` to the monic polynomial which is the product
     of `(x - x_0)(x - x_1) \cdots (x - x_{n-1})`, the roots `x_i` being
@@ -493,7 +493,7 @@ Products
     It is required that ``poly`` is reduced modulo ``f``.
 
 
-.. function:: void int fmpz_mod_poly_find_distinct_nonzero_roots(fmpz * roots, const fmpz_mod_poly_t A)
+.. function:: int fmpz_mod_poly_find_distinct_nonzero_roots(fmpz * roots, const fmpz_mod_poly_t A)
 
     If ``A`` has `\deg(A)` distinct nonzero roots in `\mathbb{F}_p`, write these roots out to ``roots[0]`` to ``roots[deg(A) - 1]`` and return ``1``.
     Otherwise, return ``0``. It is assumed that ``A`` is nonzero and that the modulus of ``A`` is prime.
@@ -1253,7 +1253,7 @@ Greatest common divisor
 
     In the case that `A = 0 \pmod{B}`, returns `G = S = 0`.
 
-.. function:: void fmpz_mod_poly_gcdinv_f(fmpz_t fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+.. function:: void fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     If `f` returns with value `1` then the function operates as per
     :func:`fmpz_mod_poly_gcdinv`, otherwise `f` will be set to a nontrivial

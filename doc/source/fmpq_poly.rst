@@ -454,7 +454,7 @@ Addition and subtraction
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
 
-.. function:: void _fmpq_poly_add_series(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den fs1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
+.. function:: void _fmpq_poly_add_series(fmpz * rpoly, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 
     As per ``_fmpq_poly_add`` but the inputs are first notionally truncated
     to length `n`. If `n` is less than ``len1`` or ``len2`` then the
@@ -1385,7 +1385,7 @@ Interpolation
     interpolation, clearing denominators to avoid working with fractions.
     It is currently not designed to be efficient for large `n`.
 
-.. function:: fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+.. function:: void fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
 
     Sets ``poly`` to the unique interpolating polynomial of degree
     at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i`
@@ -1681,7 +1681,8 @@ Input and output
     returns a non-positive value.
 
 .. function:: int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, slong len, const char * x)
-              int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+
+.. function:: int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of ``poly`` to ``stdout``, using 
     the null-terminated string ``var`` not equal to ``"\0"`` as the 
@@ -1704,7 +1705,8 @@ Input and output
     returns a non-positive value.
 
 .. function:: int _fmpq_poly_fprint_pretty(FILE * file, const fmpz *poly, const fmpz_t den, slong len, const char * x)
-              int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+
+.. function:: int fmpq_poly_fprint_pretty(FILT * file, const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of ``poly`` to ``stdout``, using 
     the null-terminated string ``var`` not equal to ``"\0"`` as the 

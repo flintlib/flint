@@ -29,8 +29,10 @@ Stirling numbers
 
 
 .. function:: void arith_stirling_number_1u(fmpz_t s, slong n, slong k)
-              void arith_stirling_number_1(fmpz_t s, slong n, slong k)
-              void arith_stirling_number_2(fmpz_t s, slong n, slong k)
+
+.. function:: void arith_stirling_number_1(fmpz_t s, slong n, slong k)
+
+.. function:: void arith_stirling_number_2(fmpz_t s, slong n, slong k)
 
     Sets `s` to `S(n,k)` where `S(n,k)` denotes an unsigned Stirling
     number of the first kind `|S_1(n, k)|`, a signed Stirling number 
@@ -54,7 +56,11 @@ Stirling numbers
     numbers efficiently. To compute a range of numbers, the vector or 
     matrix versions should generally be used.
 
-.. function:: void arith_stirling_number_1u_vec(fmpz * row, slong n, slong klen) void arith_stirling_number_1_vec(fmpz * row, slong n, slong klen) void arith_stirling_number_2_vec(fmpz * row, slong n, slong klen)
+.. function:: void arith_stirling_number_1u_vec(fmpz * row, slong n, slong klen)
+
+.. function:: void arith_stirling_number_1_vec(fmpz * row, slong n, slong klen)
+
+.. function:: void arith_stirling_number_2_vec(fmpz * row, slong n, slong klen)
 
     Computes the row of Stirling numbers
     ``S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)``.
@@ -63,8 +69,10 @@ Stirling numbers
     ``klen = n+1``. It is assumed that ``klen`` is at most `n + 1`.
 
 .. function:: void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
-              void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
-              void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+
+.. function:: void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+
+.. function:: void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
 
     Given the vector ``prev`` containing a row of Stirling numbers
     ``S(n-1,0), S(n-1,1), S(n-1,2), ..., S(n-1,klen-1)``, computes
@@ -79,7 +87,11 @@ Stirling numbers
     The ``row`` and ``prev`` arguments are permitted to be the 
     same, meaning that the row will be updated in-place.
 
-.. function:: void arith_stirling_matrix_1u(fmpz_mat_t mat) void arith_stirling_matrix_1(fmpz_mat_t mat) void arith_stirling_matrix_2(fmpz_mat_t mat)
+.. function:: void arith_stirling_matrix_1u(fmpz_mat_t mat)
+
+.. function:: void arith_stirling_matrix_1(fmpz_mat_t mat)
+
+.. function:: void arith_stirling_matrix_2(fmpz_mat_t mat)
 
     For an arbitrary `m`-by-`n` matrix, writes the truncation of the
     infinite Stirling number matrix::

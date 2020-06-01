@@ -1637,7 +1637,7 @@ Euclidean division
     For ordinary use set the flag ``exact`` to `0`. In this case, no checks
     or early aborts occur and the function always returns `1`.
 
-.. function:: fmpz_poly_div_divconquer(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
+.. function:: void fmpz_poly_div_divconquer(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes the quotient `Q` of `A` divided by `B`.
 
@@ -1922,15 +1922,7 @@ Power series division
 
 .. function:: void _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
 
-    Divides ``(A, Alen)`` by ``(B, Blen)`` as power series over `\mathbb{Z}`,
-    assuming `B` has constant term `\pm 1` and `n \geq 1`.
-    Aliasing is not supported.
-
 .. function:: void _fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
-
-    Divides ``(A, Alen)`` by ``(B, Blen)`` as power series over `\mathbb{Z}`,
-    assuming `B` has constant term `\pm 1` and `n \geq 1`.
-    Aliasing is not supported.
 
 .. function:: void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
 
@@ -1940,17 +1932,7 @@ Power series division
 
 .. function:: void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
 
-    Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function 
-    considers the polynomials `A` and `B` as power series of length `n` 
-    starting with the constant terms.  The function assumes that `B` has 
-    constant term `\pm 1` and `n \geq 1`.
-
-.. function:: void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
-
-    Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function
-    considers the polynomials `A` and `B` as power series of length `n`
-    starting with the constant terms.  The function assumes that `B` has
-    constant term `\pm 1` and `n \geq 1`.
+.. function:: void fmpz_poly_div_series_divconquer(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
 
 .. function:: void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
 
@@ -1985,7 +1967,7 @@ Pseudo division
     that `\ell^d A = Q B + R`.  This function is used for simulating division 
     over `\mathbb{Q}`.
 
-.. function:: void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, slong lenB, const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
+.. function:: void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that 
     `\ell^d A = B Q + R`, only setting the bottom `\operatorname{len}(B) - 1` coefficients 
@@ -2359,7 +2341,7 @@ Inflation and deflation
     Sets ``result`` to the inflated polynomial `p(x^n)` where
     `p` is given by ``input`` and `n` is given by ``inflation``.
 
-.. function:: fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input, ulong deflation)
+.. function:: void fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input, ulong deflation)
 
     Sets ``result`` to the deflated polynomial `p(x^{1/n})` where
     `p` is given by ``input`` and `n` is given by ``deflation``.
@@ -3132,24 +3114,6 @@ Products
     Sets ``poly`` to the polynomial which is the product
     of `(q_0 x - p_0)(q_1 x - p_1) \cdots (q_{n-1} x - p_{n-1})`, the roots
     `p_i/q_i` being given by ``xs``.
-
-
-
-Newton basis conversion
---------------------------------------------------------------------------------
-
-
-.. function:: void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, slong n)
-
-    Converts the polynomial in-place from its coefficients in the
-    monomial basis to the Newton basis `1, (x-r_0), (x-r_0)(x-r_1), \ldots`.
-    Uses Horner's rule, requiring `O(n^2)` operations.
-
-.. function:: void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, slong n)
-
-    Converts the polynomial in-place from its coefficients in the
-    Newton basis `1, (x-r_0), (x-r_0)(x-r_1), \ldots` to the monomial
-    basis. Uses repeated polynomial division, requiring `O(n^2)` operations.
 
 
 Roots
