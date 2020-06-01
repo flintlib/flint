@@ -14,7 +14,7 @@ flint-config.h
 config.log
 fft_tuning.h
 fmpz-conversions.h
-Makefile
+/Makefile
 doc/build
 doc/latex/flint-manual.*
 !doc/latex/flint-manual.tex
