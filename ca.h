@@ -139,8 +139,12 @@ typedef ca_field_struct ca_field_t[1];
 
 #define CA_FIELD_MCTX(K) (&((K)->mctx))
 #define CA_FIELD_NF(K) (&((K)->nf_ext->data.qqbar.nf))
+#define CA_FIELD_NF_QQBAR(K) (&((K)->nf_ext->data.qqbar.x))
 
 /* Context object ************************************************************/
+
+/* todo: needs to be **extensions */
+/* todo: merge field and extension objects? */
 
 typedef struct
 {
@@ -226,6 +230,7 @@ void ca_neg_inf(ca_t x, ca_ctx_t ctx);
 void ca_pos_i_inf(ca_t x, ca_ctx_t ctx);
 void ca_neg_i_inf(ca_t x, ca_ctx_t ctx);
 
+void ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx);
 
 void ca_print(ca_t x, ca_ctx_t ctx);
 
