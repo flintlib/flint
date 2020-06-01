@@ -237,6 +237,10 @@ Memory management for numbers
 
     Clears the variable *x*.
 
+.. function:: void ca_swap(ca_t x, ca_t y, ca_ctx_t ctx)
+
+    Efficiently swaps the variables *x* and *y*.
+
 Input and output
 -------------------------------------------------------------------------------
 
@@ -259,6 +263,10 @@ Input and output
 
 Assignment and specific values
 -------------------------------------------------------------------------------
+
+.. function:: void ca_set(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to a copy of *x*.
 
 .. function:: void ca_zero(ca_t x, ca_ctx_t ctx)
 
@@ -418,4 +426,13 @@ Comparisons
     The result is ``T_FALSE`` (not ``T_UNKNOWN``) if either operand is not
     comparable (being a nonreal complex number, unsigned infinity, or
     undefined).
+
+Arithmetic
+-------------------------------------------------------------------------------
+
+.. function:: void ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the negation of *x*.
+
+
 

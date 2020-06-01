@@ -45,7 +45,7 @@ _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
     }
     else if (new_type == CA_FIELD_TYPE_NF)
     {
-        nf_elem_init(CA_NF_ELEM(x), &(ctx->fields[new_index].nf_ext->data.qqbar.nf));
+        nf_elem_init(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + new_index));
     }
     else if (new_type == CA_FIELD_TYPE_MPOLY_Q)
     {

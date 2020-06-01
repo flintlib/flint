@@ -138,6 +138,7 @@ ca_field_struct;
 typedef ca_field_struct ca_field_t[1];
 
 #define CA_FIELD_MCTX(K) (&((K)->mctx))
+#define CA_FIELD_NF(K) (&((K)->nf_ext->data.qqbar.nf))
 
 /* Context object ************************************************************/
 
@@ -193,6 +194,8 @@ void ca_init(ca_t x, ca_ctx_t ctx);
 
 void ca_clear(ca_t x, ca_ctx_t ctx);
 
+void ca_swap(ca_t x, ca_t y, ca_ctx_t ctx);
+
 void _ca_make_field_element(ca_t x, slong i, ca_ctx_t ctx);
 
 CA_INLINE void
@@ -201,6 +204,8 @@ _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
     if (x->field != CA_FIELD_ID_QQ)
         _ca_make_field_element(x, CA_FIELD_ID_QQ, ctx);
 }
+
+void ca_set(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 void ca_zero(ca_t x, ca_ctx_t ctx);
 void ca_one(ca_t x, ca_ctx_t ctx);
@@ -259,6 +264,10 @@ truth_t ca_check_lt(const ca_t x, const ca_t y, ca_ctx_t ctx);
 truth_t ca_check_le(const ca_t x, const ca_t y, ca_ctx_t ctx);
 truth_t ca_check_gt(const ca_t x, const ca_t y, ca_ctx_t ctx);
 truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+/* Arithmetic */
+
+void ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }

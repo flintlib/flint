@@ -15,7 +15,7 @@ void
 ca_neg_i_inf(ca_t x, ca_ctx_t ctx)
 {
     ca_i(x, ctx);
-    nf_elem_neg(CA_NF_ELEM(x), CA_NF_ELEM(x), &(ctx->fields[CA_FIELD_ID_QQ_I].nf_ext->data.qqbar.nf));
+    nf_elem_neg(CA_NF_ELEM(x), CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + CA_FIELD_ID_QQ_I));
     x->field |= CA_SIGNED_INF;
 }
 

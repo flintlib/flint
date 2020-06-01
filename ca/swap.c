@@ -12,9 +12,11 @@
 #include "ca.h"
 
 void
-ca_i(ca_t x, ca_ctx_t ctx)
+ca_swap(ca_t x, ca_t y, ca_ctx_t ctx)
 {
-    _ca_make_field_element(x, CA_FIELD_ID_QQ_I, ctx);
-    nf_elem_gen(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + CA_FIELD_ID_QQ_I));
+    ca_t tmp;
+    *tmp = *x;
+    *x = *y;
+    *y = *tmp;
 }
 
