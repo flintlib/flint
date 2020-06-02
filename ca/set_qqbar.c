@@ -58,14 +58,8 @@ slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
     qqbar_t T;
     slong i;
 
-    printf("foof: "); fmpz_print(A); printf("\n");
-
     for (i = 0; i < ctx->fields_len; i++)
     {
-        printf("trying in %ld, %ld\n", i, ctx->fields_len);
-
-        ca_field_print(ctx->fields + i); printf("\n\n");
-
         if (ctx->fields[i].type == CA_FIELD_TYPE_NF)
         {
             const qqbar_struct * v;
@@ -79,27 +73,15 @@ slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
                     (fmpz_cmpabs(QQBAR_COEFFS(v), A) == 0) &&
                     !fmpz_equal(QQBAR_COEFFS(v), A))
                 {
-                    if (fmpz_sgn(A) < 0)  /* fast detection of conjugate using imag sign */
+                    if (fmpz_sgn(A) < 0)
                     {
                         if (qqbar_sgn_im(v) > 0)
                             return i;
                     }
-                    else  /* todo: could do a fast numerical check instead of computing a qqbar element */
+                    else
                     {
-                        qqbar_t T;
-                        qqbar_init(T);
-                        qqbar_set_fmpz(T, A);
-                        qqbar_sqrt(T, T);
-
-                        if (qqbar_equal(T, v))
-                        {
-                            qqbar_clear(T);
+                        if (qqbar_sgn_re(v) >= 0)
                             return i;
-                        }
-                        else
-                        {
-                            qqbar_clear(T);
-                        }
                     }
                 }
             }
@@ -133,8 +115,6 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
     slong d;
 
     d = qqbar_degree(x);
-
-    ca_ctx_print(ctx); printf("\n\n");
 
     if (d == 1)
     {
@@ -207,19 +187,9 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
             if (fmpz_sgn(D) < 0)
                 fmpz_neg(A, A);
 
-            printf("making field...\n");
             field_id = ca_ctx_get_quadratic_field(ctx, A);
-            printf("made...\n");
 
-/*
-            printf("field id = %ld, ctx = \n", field_id);
-            ca_ctx_print(ctx);
-            printf("\n\n");
-*/
-
-            printf("making field element...\n");
             _ca_make_field_element(res, field_id, ctx);
-            printf("made field element...\n");
 
             res_num = QNF_ELEM_NUMREF(CA_NF_ELEM(res));
             res_den = QNF_ELEM_DENREF(CA_NF_ELEM(res));
@@ -234,6 +204,13 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
                 if (fmpz_sgn(D) < 0)
                 {
                     if (qqbar_sgn_im(x) > 0)
+                        fmpz_set(res_num + 1, B);
+                    else
+                        fmpz_neg(res_num + 1, B);
+                }
+                else if (fmpz_is_zero(b))
+                {
+                    if (qqbar_sgn_re(x) > 0)
                         fmpz_set(res_num + 1, B);
                     else
                         fmpz_neg(res_num + 1, B);
@@ -281,16 +258,12 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
             fmpz_gcd(D, res_num, res_num + 1);
             fmpz_gcd(D, D, res_den);
 
-            printf("uh %ld  %ld %ld %ld %ld\n", A[0], res_num[0], res_num[1], res_den[0], D[0]);
-
             if (!fmpz_is_one(D))
             {
                 fmpz_divexact(res_num, res_num, D);
                 fmpz_divexact(res_num + 1, res_num + 1, D);
                 fmpz_divexact(res_den, res_den, D);
             }
-
-            printf("eh %ld  %ld %ld %ld\n", A[0], res_num[0], res_num[1], res_den[0]);
 
             fmpz_clear(A);
             fmpz_clear(B);
