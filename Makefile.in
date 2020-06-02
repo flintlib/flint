@@ -61,6 +61,7 @@ all: library
 quiet: library
 
 verbose:
+	$(eval VERBOSE := 1)
 	$(MAKE) AT= QUIET_CC= QUIET_CXX= QUIET_AR=
 
 clean:

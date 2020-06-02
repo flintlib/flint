@@ -1,5 +1,10 @@
-QUIET_CC  = @echo '   ' CC  ' ' $@;
-QUIET_CXX = @echo '   ' CXX ' ' $@;
+ifeq ($(strip $(VERBOSE)),)
+	QUIET_CC  = @echo '   ' CC  ' ' $@;
+	QUIET_CXX = @echo '   ' CXX ' ' $@;
+else
+	QUIET_CC  =
+	QUIET_CXX =
+endif
 
 AT=@
 comma=,
