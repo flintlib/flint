@@ -232,7 +232,7 @@ else
 fi
 
 if [ -d "${FLINT_INC_DIR}/flint" ]; then
-   FLINT_INC_DIR="${FLINT_INC_DIR}"
+   FLINT_INC_DIR="${FLINT_INC_DIR}/flint"
 elif [ -f "${FLINT_INC_DIR}/flint.h" ]; then
    mkdir -p build/include
    ln -sf ${FLINT_INC_DIR} build/include/flint
@@ -288,6 +288,14 @@ elif [ -d "${ANTIC_DIR}" ]; then
 else
    echo "Invalid ANTIC directory"
    exit 1
+fi
+
+if [ -d "${ANTIC_INC_DIR}/antic" ]; then
+   ANTIC_INC_DIR="${ANTIC_INC_DIR}/antic"
+elif [ -f "${ANTIC_INC_DIR}/antic.h" ]; then
+   mkdir -p build/include
+   ln -sf ${ANTIC_INC_DIR} build/include/antic
+   ANTIC_INC_DIR="${PWD}/build/include"
 fi
 
 echo "ANTIC_LIB_DIR set to ${ANTIC_LIB_DIR}"
