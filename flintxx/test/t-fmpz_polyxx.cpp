@@ -320,13 +320,13 @@ test_functions()
     f *= 2;
     ulong d = 0;
     ltupleref(r, s, d) = pseudo_divrem(g, f);
-    tassert(r*f + s == g*pow(2, d));
+    tassert(r*f + s == g*fmpzxx(pow(2, d)));
     r = 0; r = 0; d = 0;
     ltupleref(r, s, d) = pseudo_divrem_basecase(g, f);
-    tassert(r*f + s == g*pow(2, d));
+    tassert(r*f + s == g*fmpzxx(pow(2, d)));
     r = 0; r = 0; d = 0;
     ltupleref(r, s, d) = pseudo_divrem_divconquer(g, f);
-    tassert(r*f + s == g*pow(2, d));
+    tassert(r*f + s == g*fmpzxx(pow(2, d)));
 
     tassert(pseudo_div(g, f).get<0>() == r);
     tassert(pseudo_rem(g, f).get<0>() == s);
