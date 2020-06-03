@@ -290,6 +290,14 @@ else
    exit 1
 fi
 
+if [ -d "${ANTIC_INC_DIR}/antic" ]; then
+   ANTIC_INC_DIR="${ANTIC_INC_DIR}"
+elif [ -f "${ANTIC_INC_DIR}/nf.h" ]; then
+   mkdir -p build/include
+   ln -sf ${ANTIC_INC_DIR} build/include/antic
+   ANTIC_INC_DIR="${PWD}/build/include"
+fi
+
 echo "ANTIC_LIB_DIR set to ${ANTIC_LIB_DIR}"
 echo "ANTIC_INC_DIR set to ${ANTIC_INC_DIR}"
 

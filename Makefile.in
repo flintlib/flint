@@ -88,7 +88,7 @@ examples: library $(EXMP_SOURCES)
 $(CALCIUM_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir); BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) shared || exit $$?;))
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) shared || exit $$?;)
-	$(CC) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(CALCIUM_LIB) $(LDFLAGS) $(LIBS2); \
+	$(CC) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(CALCIUM_LIB) $(LDFLAGS) $(LIBS2); 
 	-$(AT)if [ "$(CALCIUM_SOLIB)" -eq "1" ]; then \
 		$(LDCONFIG) -n "$(CURDIR)"; \
 	fi
