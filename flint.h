@@ -312,9 +312,9 @@ FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 #endif
 
 static __inline__
-unsigned int FLINT_BIT_COUNT(mp_limb_t x)
+mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 {
-   unsigned int zeros = FLINT_BITS;
+   mp_limb_t zeros = FLINT_BITS;
    if (x) count_leading_zeros(zeros, x);
    return FLINT_BITS - zeros;
 }
