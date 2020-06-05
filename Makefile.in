@@ -78,8 +78,8 @@ distclean: clean
 	rm -f flint-config.h config.log fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
 
 dist:
-	git archive --format tar --prefix flint-2.6.0/ origin/flint-2.6 > ../flint-2.6.0.tar; gzip ../flint-2.6.0.tar
-	git archive --format zip --prefix flint-2.6.0/ origin/flint-2.6 > ../flint-2.6.0.zip 
+	git archive --format tar --prefix flint-2.6.0/ v2.6.0 > ../flint-2.6.0.tar; gzip ../flint-2.6.0.tar
+	git archive --format zip --prefix flint-2.6.0/ v2.6.0 > ../flint-2.6.0.zip 
 
 profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) build/profiler.o
 	mkdir -p build/profile
