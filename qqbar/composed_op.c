@@ -196,7 +196,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
 #endif
 
 void
-qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
+qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
 {
     slong i, prec, found;
     fmpz_poly_t H;
@@ -295,5 +295,70 @@ qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
     acb_clear(z2);
     acb_clear(w);
     acb_clear(t);
+}
+
+void
+qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
+{
+    slong dx, dy;
+
+    dx = qqbar_degree(x);
+    dy = qqbar_degree(y);
+
+    /* Guess and verify rational result; this could be generalized to
+       higher degree results. */
+    if (dx >= 4 && dy >= 4 && dx == dy)
+    {
+        qqbar_t t, u;
+        acb_t z;
+        slong prec;
+        int found;
+
+        found = 0;
+        prec = QQBAR_DEFAULT_PREC;  /* Could be set dynamically (with recomputation...) */
+        qqbar_init(t);
+        qqbar_init(u);
+        acb_init(z);
+
+        if (op == 0)
+            acb_add(z, QQBAR_ENCLOSURE(x), QQBAR_ENCLOSURE(y), prec);
+        else if (op == 1)
+            acb_sub(z, QQBAR_ENCLOSURE(x), QQBAR_ENCLOSURE(y), prec);
+        else if (op == 2)
+            acb_mul(z, QQBAR_ENCLOSURE(x), QQBAR_ENCLOSURE(y), prec);
+        else if (op == 3)
+            acb_div(z, QQBAR_ENCLOSURE(x), QQBAR_ENCLOSURE(y), prec);
+
+        if (qqbar_guess(t, z, 1, prec, 0, prec))
+        {
+            /* x + y = t  <=>  x = t - y */
+            /* x - y = t  <=>  x = t + y */
+            /* x * y = t  <=>  x = t / y */
+            /* x / y = t  <=>  x = t * y */
+            if (op == 0)
+                qqbar_sub(u, t, y);
+            else if (op == 1)
+                qqbar_add(u, t, y);
+            else if (op == 2)
+                qqbar_div(u, t, y);
+            else if (op == 3)
+                qqbar_mul(u, t, y);
+
+            if (qqbar_equal(x, u))
+            {
+                qqbar_swap(res, t);
+                found = 1;
+            }
+        }
+
+        qqbar_clear(t);
+        qqbar_clear(u);
+        acb_clear(z);
+
+        if (found)
+            return;
+    }
+
+    qqbar_binary_op_without_guess(res, x, y, op);
 }
 

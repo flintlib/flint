@@ -98,6 +98,7 @@ qqbar_guess(qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int flags
                         qqbar_get_acb(z2, roots + j, prec);
                         if (acb_overlaps(z, z2))
                         {
+                            qqbar_swap(res, roots + j);
                             found = 1;
                             break;
                         }
