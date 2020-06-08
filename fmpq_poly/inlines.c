@@ -154,6 +154,8 @@ void fmpq_poly_add_fmpq(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t c)
         return;
     }
 
+    fmpq_poly_set(res, poly);
+
     if (poly -> length == 1)
     {
         _fmpq_add(res->coeffs, res->den, poly->coeffs, poly->den, fmpq_numref(c), fmpq_denref(c));
@@ -161,8 +163,6 @@ void fmpq_poly_add_fmpq(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t c)
           res->length = 0;
         return;
     }
-
-    fmpq_poly_set(res, poly);
 
     if (fmpz_equal(res->den, fmpq_denref(c)))
     {
