@@ -82,14 +82,10 @@ Assignment
     Swaps the values of *x* and *y* efficiently.
 
 .. function:: void qqbar_set(qqbar_t res, const qqbar_t x)
-
-.. function:: void qqbar_set_si(qqbar_t res, slong x)
-
-.. function:: void qqbar_set_ui(qqbar_t res, ulong x)
-
-.. function:: void qqbar_set_fmpz(qqbar_t res, const fmpz_t x)
-
-.. function:: void qqbar_set_fmpq(qqbar_t res, const fmpq_t x)
+              void qqbar_set_si(qqbar_t res, slong x)
+              void qqbar_set_ui(qqbar_t res, ulong x)
+              void qqbar_set_fmpz(qqbar_t res, const fmpz_t x)
+              void qqbar_set_fmpq(qqbar_t res, const fmpq_t x)
 
     Sets *res* to the value *x*.
 
@@ -98,8 +94,7 @@ Assignment
     Sets *res* to the value `x + yi`.
 
 .. function:: int qqbar_set_d(qqbar_t res, double x)
-
-.. function:: int qqbar_set_re_im_d(qqbar_t res, double x, double y)
+              int qqbar_set_re_im_d(qqbar_t res, double x, double y)
 
     Sets *res* to the value *x* or `x + yi` respectively. These functions
     performs error handling: if *x* and *y* are finite, the conversion succeeds
@@ -327,38 +322,26 @@ Arithmetic
     Sets *res* to the negation of *x*.
 
 .. function:: void qqbar_add(qqbar_t res, const qqbar_t x, const qqbar_t y)
-
-.. function:: void qqbar_add_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
-
-.. function:: void qqbar_add_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y)
-
-.. function:: void qqbar_add_ui(qqbar_t res, const qqbar_t x, ulong y)
-
-.. function:: void qqbar_add_si(qqbar_t res, const qqbar_t x, slong y)
+              void qqbar_add_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
+              void qqbar_add_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y)
+              void qqbar_add_ui(qqbar_t res, const qqbar_t x, ulong y)
+              void qqbar_add_si(qqbar_t res, const qqbar_t x, slong y)
 
     Sets *res* to the sum of *x* and *y*.
 
 .. function:: void qqbar_sub(qqbar_t res, const qqbar_t x, const qqbar_t y)
-
-.. function:: void qqbar_sub_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
-
-.. function:: void qqbar_sub_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y)
-
-.. function:: void qqbar_sub_ui(qqbar_t res, const qqbar_t x, ulong y)
-
-.. function:: void qqbar_sub_si(qqbar_t res, const qqbar_t x, slong y)
+              void qqbar_sub_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
+              void qqbar_sub_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y)
+              void qqbar_sub_ui(qqbar_t res, const qqbar_t x, ulong y)
+              void qqbar_sub_si(qqbar_t res, const qqbar_t x, slong y)
 
     Sets *res* to the difference of *x* and *y*.
 
 .. function:: void qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y)
-
-.. function:: void qqbar_mul_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
-
-.. function:: void qqbar_mul_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y)
-
-.. function:: void qqbar_mul_ui(qqbar_t res, const qqbar_t x, ulong y)
-
-.. function:: void qqbar_mul_si(qqbar_t res, const qqbar_t x, slong y)
+              void qqbar_mul_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
+              void qqbar_mul_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y)
+              void qqbar_mul_ui(qqbar_t res, const qqbar_t x, ulong y)
+              void qqbar_mul_si(qqbar_t res, const qqbar_t x, slong y)
 
     Sets *res* to the product of *x* and *y*.
 
@@ -376,22 +359,14 @@ Arithmetic
     Division by zero calls *flint_abort*.
 
 .. function:: void qqbar_div(qqbar_t res, const qqbar_t x, const qqbar_t y)
-
-.. function:: void qqbar_div_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
-
-.. function:: void qqbar_div_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y)
-
-.. function:: void qqbar_div_ui(qqbar_t res, const qqbar_t x, ulong y)
-
-.. function:: void qqbar_div_si(qqbar_t res, const qqbar_t x, slong y)
-
-.. function:: void qqbar_fmpq_div(qqbar_t res, const fmpq_t x, const qqbar_t y)
-
-.. function:: void qqbar_fmpz_div(qqbar_t res, const fmpz_t x, const qqbar_t y)
-
-.. function:: void qqbar_ui_div(qqbar_t res, ulong x, const qqbar_t y)
-
-.. function:: void qqbar_si_div(qqbar_t res, slong x, const qqbar_t y)
+              void qqbar_div_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
+              void qqbar_div_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y)
+              void qqbar_div_ui(qqbar_t res, const qqbar_t x, ulong y)
+              void qqbar_div_si(qqbar_t res, const qqbar_t x, slong y)
+              void qqbar_fmpq_div(qqbar_t res, const fmpq_t x, const qqbar_t y)
+              void qqbar_fmpz_div(qqbar_t res, const fmpz_t x, const qqbar_t y)
+              void qqbar_ui_div(qqbar_t res, ulong x, const qqbar_t y)
+              void qqbar_si_div(qqbar_t res, slong x, const qqbar_t y)
 
     Sets *res* to the quotient of *x* and *y*.
     Division by zero calls *flint_abort*.
@@ -472,12 +447,9 @@ Polynomial evaluation
 -------------------------------------------------------------------------------
 
 .. function:: void _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den, slong len, const qqbar_t x)
-
-.. function:: void qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpq_poly_t poly, const qqbar_t x)
-
-.. function:: void _qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz * poly, slong len, const qqbar_t x)
-
-.. function:: void qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz_poly_t poly, const qqbar_t x)
+              void qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpq_poly_t poly, const qqbar_t x)
+              void _qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz * poly, slong len, const qqbar_t x)
+              void qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz_poly_t poly, const qqbar_t x)
 
     Sets *res* to the value of the given polynomial *poly* evaluated at
     the algebraic number *x*. These methods detect simple special cases and
@@ -489,8 +461,7 @@ Polynomial roots
 -------------------------------------------------------------------------------
 
 .. function:: void qqbar_roots_fmpz_poly(qqbar_ptr res, const fmpz_poly_t poly, int flags)
-
-.. function:: void qqbar_roots_fmpq_poly(qqbar_ptr res, const fmpq_poly_t poly, int flags)
+              void qqbar_roots_fmpq_poly(qqbar_ptr res, const fmpq_poly_t poly, int flags)
 
     Sets the entries of the vector *res* to the *d* roots of the polynomial
     *poly*. Roots with multiplicity appear with repetition in the
@@ -506,8 +477,7 @@ Polynomial roots
       factorisation is performed internally.
 
 .. function:: void qqbar_eigenvalues_fmpz_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags)
-
-.. function:: void qqbar_eigenvalues_fmpq_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags)
+              void qqbar_eigenvalues_fmpq_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags)
 
     Sets the entries of the vector *res* to the eigenvalues of the
     square matrix *mat*. These functions compute the characteristic polynomial
@@ -544,16 +514,11 @@ and subtracted internally).
     Sets *res* to the root of unity `e^{\pi i p / q}`.
 
 .. function:: void qqbar_cos_pi(qqbar_t res, slong p, ulong q)
-
-.. function:: void qqbar_sin_pi(qqbar_t res, slong p, ulong q)
-
-.. function:: void qqbar_tan_pi(qqbar_t res, slong p, ulong q)
-
-.. function:: void qqbar_cot_pi(qqbar_t res, slong p, ulong q)
-
-.. function:: void qqbar_sec_pi(qqbar_t res, slong p, ulong q)
-
-.. function:: void qqbar_csc_pi(qqbar_t res, slong p, ulong q)
+              void qqbar_sin_pi(qqbar_t res, slong p, ulong q)
+              void qqbar_tan_pi(qqbar_t res, slong p, ulong q)
+              void qqbar_cot_pi(qqbar_t res, slong p, ulong q)
+              void qqbar_sec_pi(qqbar_t res, slong p, ulong q)
+              void qqbar_csc_pi(qqbar_t res, slong p, ulong q)
 
     Sets *res* to the trigonometric function `\cos(\pi x)`,
     `\sin(\pi x)`, etc., with `x = \tfrac{p}{q}`.
@@ -703,8 +668,7 @@ Internal functions
     accuracy of *z*, but limited by *max_prec* bits.
 
 .. function:: void _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t z, slong prec)
-
-.. function:: void qqbar_enclosure_raw(acb_t res, const qqbar_t x, slong prec)
+              void qqbar_enclosure_raw(acb_t res, const qqbar_t x, slong prec)
 
     Sets *res* to an enclosure of *x* accurate to about *prec* bits
     (the actual accuracy can be slightly lower, or higher).
@@ -740,6 +704,5 @@ Internal functions
     In principle, this method can be used to produce a proof that no linear
     relation exists with coefficients up to a specified bit size, but this has
     not yet been implemented.
-
 
 

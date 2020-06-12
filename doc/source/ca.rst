@@ -98,43 +98,6 @@ For all types, a *type_t* is defined as an array of length one of type
     an element of a generic field `\mathbb{Q}(a_1,\ldots,a_n)`.
     Special values are encoded using magic bits in the field index.
 
-Access to the internal representation
-...............................................................................
-
-.. macro:: CA_FMPQ(x)
-
-.. macro:: CA_FMPQ_NUMREF(x)
-
-.. macro:: CA_FMPQ_DENREF(x)
-
-    Assuming that *x* holds an element of the trivial field `\mathbb{Q}`,
-    this macro returns a pointer which can be used as an :type:`fmpq_t`,
-    or respectively to the numerator or denominator as an :type:`fmpz_t`.
-
-.. macro:: CA_MPOLY_Q(x)
-
-    Assuming that *x* holds a generic field element as data,
-    this macro returns a pointer which can be used as
-    an :type:`fmpz_mpoly_q_t`.
-
-.. macro:: CA_NF_ELEM(x)
-
-    Assuming that *x* holds an Antic number field element as data,
-    this macro returns a pointer which can be used as
-    an :type:`nf_elem_t`.
-
-
-.. function:: void _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
-
-    Changes the internal representation of *x* to that of an element
-    of the field with index *new_index* in the context object *ctx*.
-    This may destroy the value of *x*.
-
-.. function:: void _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
-
-    Changes the internal representation of *x* to that of an element of
-    the trivial field `\mathbb{Q}`. This may destroy the value of *x*.
-
 Context objects
 -------------------------------------------------------------------------------
 
@@ -165,56 +128,6 @@ Context objects
     This function should only be called after all :type:`ca_t` instances
     referring to this context have been cleared.
 
-Extension field objects
--------------------------------------------------------------------------------
-
-.. type:: ca_field_struct
-
-.. type:: ca_field_t
-
-    Represents a formal field.
-
-.. function:: void ca_field_init_qq(ca_field_t K)
-
-    Initializes *K* to represent the trivial field `\mathbb{Q}`.
-
-.. function:: void ca_field_init_nf(ca_field_t K, const qqbar_t x)
-
-    Initializes *K* to represent the algebraic number field `\mathbb{Q}(x)`.
-
-.. function:: void ca_field_init_const(ca_field_t K, ulong func)
-
-    Initializes *K* to represent the field
-    `\mathbb{Q}(x)` where *x* is a builtin constant defined by
-    *func* (example: *func* = *CA_Pi* for `x = \pi`).
-
-.. function:: void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
-
-    Initializes *K* to represent the field
-    `\mathbb{Q}(a)` where `a = f(x)`, given a number *x* and a builtin
-    univariate function *func* (example: *func* = *CA_Exp* for `e^x`).
-
-.. function:: void ca_field_init_multi(ca_field_t K, slong len)
-
-    Initializes *K* to represent a multivariate field
-    `\mathbb{Q}(a_1, \ldots, a_n)` in *n*
-    extension elements. The extension elements must subsequently be
-    assigned one by one using :func:`ca_field_set_ext`.
-
-.. function:: void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx)
-
-    Sets the extension element at position *i* (here indexed from 0) of *K*
-    to the generator of the field with index *x_index* in *ctx*.
-    (It is assumed that the generating field is a univariate field.)
-
-    This only inserts a shallow reference: the field at index *x_index* must
-    be kept alive until *K* has been cleared.
-
-.. function:: void ca_field_clear(ca_field_t K)
-
-    Clears the field *K*.
-
-
 Memory management for numbers
 -------------------------------------------------------------------------------
 
@@ -234,10 +147,6 @@ Memory management for numbers
 Input and output
 -------------------------------------------------------------------------------
 
-.. function:: void ca_field_print(const ca_field_t K)
-
-    Prints a description of the field *K* to standard output.
-
 .. function:: void ca_ctx_print(const ca_ctx_t ctx)
 
     Prints a description of the context *ctx* to standard output.
@@ -255,19 +164,15 @@ Assignment and specific values
     Sets *res* to a copy of *x*.
 
 .. function:: void ca_zero(ca_t x, ca_ctx_t ctx)
-
-.. function:: void ca_one(ca_t x, ca_ctx_t ctx)
+              void ca_one(ca_t x, ca_ctx_t ctx)
 
     Sets *x* to the integer 0 or 1. This creates a canonical representation
     of this number as an element of the trivial field `\mathbb{Q}`.
 
 .. function:: void ca_set_si(ca_t x, slong v, ca_ctx_t ctx)
-
-.. function:: void ca_set_ui(ca_t x, ulong v, ca_ctx_t ctx)
-
-.. function:: void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx)
-
-.. function:: void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx)
+              void ca_set_ui(ca_t x, ulong v, ca_ctx_t ctx)
+              void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx)
+              void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx)
 
     Sets *x* to the integer or rational number *v*. This creates a canonical
     representation of this number as an element of the trivial field
@@ -292,12 +197,9 @@ Assignment and specific values
     Sets *x* to unsigned infinity `{\tilde \infty}`.
 
 .. function:: void ca_pos_inf(ca_t x, ca_ctx_t ctx)
-
-.. function:: void ca_neg_inf(ca_t x, ca_ctx_t ctx)
-
-.. function:: void ca_pos_i_inf(ca_t x, ca_ctx_t ctx)
-
-.. function:: void ca_neg_i_inf(ca_t x, ca_ctx_t ctx)
+              void ca_neg_inf(ca_t x, ca_ctx_t ctx)
+              void ca_pos_i_inf(ca_t x, ca_ctx_t ctx)
+              void ca_neg_i_inf(ca_t x, ca_ctx_t ctx)
 
     Sets *x* to the signed infinity `+\infty`, `-\infty`, `+i \infty` or `-i \infty`.
 
@@ -350,22 +252,16 @@ representing an unknown outcome.
     an infinity or *Undefined*, and ``T_UNKNOWN`` if *x* is *Unknown*.
 
 .. function:: truth_t ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_is_one(const ca_t x, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_is_neg_one(const ca_t x, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_is_i(const ca_t x, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_is_neg_i(const ca_t x, ca_ctx_t ctx)
+              truth_t ca_check_is_one(const ca_t x, ca_ctx_t ctx)
+              truth_t ca_check_is_neg_one(const ca_t x, ca_ctx_t ctx)
+              truth_t ca_check_is_i(const ca_t x, ca_ctx_t ctx)
+              truth_t ca_check_is_neg_i(const ca_t x, ca_ctx_t ctx)
 
     Tests if *x* is equal to the number `0`, `1`, `-1`, `i`, or `-i`.
 
 .. function:: truth_t ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_is_rational(const ca_t x, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_is_integer(const ca_t x, ca_ctx_t ctx)
+              truth_t ca_check_is_rational(const ca_t x, ca_ctx_t ctx)
+              truth_t ca_check_is_integer(const ca_t x, ca_ctx_t ctx)
 
     Tests if *x* is respectively an algebraic number, a rational number,
     or an integer.
@@ -401,12 +297,9 @@ representing an unknown outcome.
     Tests if *x* is any signed infinity.
 
 .. function:: truth_t ca_check_is_pos_inf(const ca_t x, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_is_neg_inf(const ca_t x, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_is_pos_i_inf(const ca_t x, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_is_neg_i_inf(const ca_t x, ca_ctx_t ctx)
+              truth_t ca_check_is_neg_inf(const ca_t x, ca_ctx_t ctx)
+              truth_t ca_check_is_pos_i_inf(const ca_t x, ca_ctx_t ctx)
+              truth_t ca_check_is_neg_i_inf(const ca_t x, ca_ctx_t ctx)
 
     Tests if *x* is equal to the signed infinity `+\infty`, `-\infty`,
     `+i \infty`, `-i \infty`, respectively.
@@ -423,12 +316,9 @@ Comparisons
     an exact computation.
 
 .. function:: truth_t ca_check_lt(const ca_t x, const ca_t y, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_le(const ca_t x, const ca_t y, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_gt(const ca_t x, const ca_t y, ca_ctx_t ctx)
-
-.. function:: truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx)
+              truth_t ca_check_le(const ca_t x, const ca_t y, ca_ctx_t ctx)
+              truth_t ca_check_gt(const ca_t x, const ca_t y, ca_ctx_t ctx)
+              truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     Compares *x* and *y*, implementing the respective operations
     `x < y`, `x \le y`, `x > y`, `x \ge y`.
@@ -513,4 +403,98 @@ Arithmetic
 
     In any other case, or if the correct case cannot be distinguished,
     the result is *Unknown*.
+
+Internal representation
+-------------------------------------------------------------------------------
+
+.. macro:: CA_FMPQ(x)
+
+.. macro:: CA_FMPQ_NUMREF(x)
+
+.. macro:: CA_FMPQ_DENREF(x)
+
+    Assuming that *x* holds an element of the trivial field `\mathbb{Q}`,
+    this macro returns a pointer which can be used as an :type:`fmpq_t`,
+    or respectively to the numerator or denominator as an :type:`fmpz_t`.
+
+.. macro:: CA_MPOLY_Q(x)
+
+    Assuming that *x* holds a generic field element as data,
+    this macro returns a pointer which can be used as
+    an :type:`fmpz_mpoly_q_t`.
+
+.. macro:: CA_NF_ELEM(x)
+
+    Assuming that *x* holds an Antic number field element as data,
+    this macro returns a pointer which can be used as
+    an :type:`nf_elem_t`.
+
+
+.. function:: void _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
+
+    Changes the internal representation of *x* to that of an element
+    of the field with index *new_index* in the context object *ctx*.
+    This may destroy the value of *x*.
+
+.. function:: void _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
+
+    Changes the internal representation of *x* to that of an element of
+    the trivial field `\mathbb{Q}`. This may destroy the value of *x*.
+
+Extension field objects
+-------------------------------------------------------------------------------
+
+The following methods are intended for internal use.
+The user should normally only manipulate :type:`ca_t` instances,
+leaving the construction of field objects to the context object.
+
+.. type:: ca_field_struct
+
+.. type:: ca_field_t
+
+    Represents a formal field.
+
+.. function:: void ca_field_init_qq(ca_field_t K)
+
+    Initializes *K* to represent the trivial field `\mathbb{Q}`.
+
+.. function:: void ca_field_init_nf(ca_field_t K, const qqbar_t x)
+
+    Initializes *K* to represent the algebraic number field `\mathbb{Q}(x)`.
+
+.. function:: void ca_field_init_const(ca_field_t K, ulong func)
+
+    Initializes *K* to represent the field
+    `\mathbb{Q}(x)` where *x* is a builtin constant defined by
+    *func* (example: *func* = *CA_Pi* for `x = \pi`).
+
+.. function:: void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
+
+    Initializes *K* to represent the field
+    `\mathbb{Q}(a)` where `a = f(x)`, given a number *x* and a builtin
+    univariate function *func* (example: *func* = *CA_Exp* for `e^x`).
+
+.. function:: void ca_field_init_multi(ca_field_t K, slong len)
+
+    Initializes *K* to represent a multivariate field
+    `\mathbb{Q}(a_1, \ldots, a_n)` in *n*
+    extension elements. The extension elements must subsequently be
+    assigned one by one using :func:`ca_field_set_ext`.
+
+.. function:: void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx)
+
+    Sets the extension element at position *i* (here indexed from 0) of *K*
+    to the generator of the field with index *x_index* in *ctx*.
+    (It is assumed that the generating field is a univariate field.)
+
+    This only inserts a shallow reference: the field at index *x_index* must
+    be kept alive until *K* has been cleared.
+
+.. function:: void ca_field_clear(ca_field_t K)
+
+    Clears the field *K*.
+
+.. function:: void ca_field_print(const ca_field_t K)
+
+    Prints a description of the field *K* to standard output.
 
