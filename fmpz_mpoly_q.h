@@ -78,6 +78,20 @@ fmpz_mpoly_q_is_one(const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx)
            fmpz_mpoly_is_one(fmpz_mpoly_q_denref(x), ctx);
 }
 
+FMPZ_MPOLY_Q_INLINE int
+fmpz_mpoly_q_is_fmpz(const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx)
+{
+    return fmpz_mpoly_is_fmpz(fmpz_mpoly_q_numref(x), ctx) &&
+           fmpz_mpoly_is_one(fmpz_mpoly_q_denref(x), ctx);
+}
+
+FMPZ_MPOLY_Q_INLINE int
+fmpz_mpoly_q_is_fmpq(const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx)
+{
+    return fmpz_mpoly_is_fmpz(fmpz_mpoly_q_numref(x), ctx) &&
+           fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(x), ctx);
+}
+
 /* Special values */
 
 FMPZ_MPOLY_Q_INLINE void

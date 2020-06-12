@@ -252,9 +252,31 @@ truth_t ca_check_le(const ca_t x, const ca_t y, ca_ctx_t ctx);
 truth_t ca_check_gt(const ca_t x, const ca_t y, ca_ctx_t ctx);
 truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
+/* Field structure operations */
+
+void ca_condense_field(ca_t res, ca_ctx_t ctx);
+
 /* Arithmetic */
 
 void ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx);
+
+void ca_add_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx);
+void ca_add_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
+void ca_add_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
+void ca_add_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
+void ca_add(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+void ca_sub_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx);
+void ca_sub_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
+void ca_sub_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
+void ca_sub_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
+void ca_sub(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+void ca_mul_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx);
+void ca_mul_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
+void ca_mul_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
+void ca_mul_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
+void ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }
