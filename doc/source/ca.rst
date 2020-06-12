@@ -465,17 +465,17 @@ Arithmetic
     Sets *res* to the sum of *x* and *y*. For special values, the following
     rules apply (`c \infty` denotes a signed infinity, `|c| = 1`):
 
-        * `c \infty + d \infty = c \infty` if `c = d`
+    * `c \infty + d \infty = c \infty` if `c = d`
 
-        * `c \infty + d \infty = \text{Undefined}` if `c \ne d`
+    * `c \infty + d \infty = \text{Undefined}` if `c \ne d`
 
-        * `\tilde \infty + c \infty = \tilde \infty + \tilde \infty = \text{Undefined}`
+    * `\tilde \infty + c \infty = \tilde \infty + \tilde \infty = \text{Undefined}`
 
-        * `c \infty + z = c \infty` if `z \in \mathbb{C}`
+    * `c \infty + z = c \infty` if `z \in \mathbb{C}`
 
-        * `\tilde \infty + z = \tilde \infty` if `z \in \mathbb{C}`
+    * `\tilde \infty + z = \tilde \infty` if `z \in \mathbb{C}`
 
-        * `z + \text{Undefined} = \text{Undefined}` for any value *z* (including *Unknown*)
+    * `z + \text{Undefined} = \text{Undefined}` for any value *z* (including *Unknown*)
 
     In any other case, or if the correct case cannot be distinguished,
     the result is *Unknown*.
@@ -497,19 +497,19 @@ Arithmetic
     Sets *res* to the product of *x* and *y*. For special values, the following
     rules apply (`c \infty` denotes a signed infinity, `|c| = 1`):
 
-        * `c \infty \cdot d \infty = c d \infty`
+    * `c \infty \cdot d \infty = c d \infty`
 
-        * `c \infty \cdot \tilde \infty = \tilde \infty`
+    * `c \infty \cdot \tilde \infty = \tilde \infty`
 
-        * `\tilde \infty \cdot \tilde \infty = \tilde \infty`
+    * `\tilde \infty \cdot \tilde \infty = \tilde \infty`
 
-        * `c \infty \cdot z = \operatorname{sgn}(z) c \infty` if `z \in \mathbb{C} \setminus \{0\}`
+    * `c \infty \cdot z = \operatorname{sgn}(z) c \infty` if `z \in \mathbb{C} \setminus \{0\}`
 
-        * `c \infty \cdot 0 = \text{Undefined}`
+    * `c \infty \cdot 0 = \text{Undefined}`
 
-        * `\tilde \infty \cdot 0 = \text{Undefined}`
+    * `\tilde \infty \cdot 0 = \text{Undefined}`
 
-        * `z \cdot  \text{Undefined} = \text{Undefined}` for any value *z* (including *Unknown*)
+    * `z \cdot  \text{Undefined} = \text{Undefined}` for any value *z* (including *Unknown*)
 
     In any other case, or if the correct case cannot be distinguished,
     the result is *Unknown*.
