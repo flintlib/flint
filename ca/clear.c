@@ -31,6 +31,7 @@ ca_clear(ca_t x, ca_ctx_t ctx)
              ctx->fields[index].type == CA_FIELD_TYPE_FUNC)
     {
         fmpz_mpoly_q_clear(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + index, ctx));
+        flint_free(x->elem.mpoly_q);
     }
 }
 

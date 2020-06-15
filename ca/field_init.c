@@ -57,12 +57,21 @@ void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
 }
 
 void
-ca_field_init_multi(ca_field_t K, slong len)
+ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx)
 {
     K->type = CA_FIELD_TYPE_MULTI;
     K->data.multi.len = len;
     K->data.multi.ext = flint_malloc(len * sizeof(slong));
     K->data.multi.ideal = NULL;
     K->data.multi.ideal_len = 0;
+
+    while (ctx->mctx_len < len)
+    {
+        slong i;
+        ctx->mctx = flint_realloc(ctx->mctx, 2 * ctx->mctx_len * sizeof(fmpz_mpoly_ctx_struct));
+        for (i = ctx->mctx_len; i < 2 * ctx->mctx_len; i++)
+            fmpz_mpoly_ctx_init(ctx->mctx + i, i + 1, ORD_LEX);
+        ctx->mctx_len *= 2;
+    }
 }
 

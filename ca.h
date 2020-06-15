@@ -141,10 +141,14 @@ typedef ca_field_struct ca_field_t[1];
 
 /* Context object ************************************************************/
 
-/* Create mpoly contexts with up to this many variables. Should be dynamic... */
-#define CA_NVARS_MAX 16
 /* Could also be configurable. */
 #define CA_MPOLY_ORD ORD_LEX
+
+enum
+{
+    CA_OPT_VERBOSE,
+    CA_OPT_NUM_OPTIONS
+};
 
 typedef struct
 {
@@ -154,6 +158,8 @@ typedef struct
 
     fmpz_mpoly_ctx_struct * mctx;  /* Cached contexts for multivariate polys */
     slong mctx_len;
+
+    slong * options;
 }
 ca_ctx_struct;
 
@@ -171,11 +177,12 @@ void ca_field_init_qq(ca_field_t K);
 void ca_field_init_nf(ca_field_t K, const qqbar_t x);
 void ca_field_init_const(ca_field_t K, ulong func);
 void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx);
-void ca_field_init_multi(ca_field_t K, slong len);
+void ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx);
 void ca_field_clear(ca_field_t K);
 
 void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx);
 void ca_field_print(const ca_field_t K);
+int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx);
 
 /* Numbers */
 
@@ -214,7 +221,7 @@ void ca_neg_i_inf(ca_t x, ca_ctx_t ctx);
 
 void ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx);
 
-void ca_print(ca_t x, ca_ctx_t ctx);
+void ca_print(const ca_t x, ca_ctx_t ctx);
 
 /* Representation properties */
 
@@ -254,6 +261,7 @@ truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 /* Field structure operations */
 
+void ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx);
 void ca_condense_field(ca_t res, ca_ctx_t ctx);
 
 /* Arithmetic */

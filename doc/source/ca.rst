@@ -152,7 +152,7 @@ Input and output
     Prints a description of the context *ctx* to standard output.
     This will give a complete listing of the cached fields in *ctx*.
 
-.. function:: void ca_print(ca_t x, ca_ctx_t ctx)
+.. function:: void ca_print(const ca_t x, ca_ctx_t ctx)
 
     Prints a description of *x* to standard output.
 
@@ -330,11 +330,20 @@ Comparisons
 Field structure operations
 -------------------------------------------------------------------------------
 
+.. function:: void ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+    Sets *resx* and *resy* to copies of *x* and *y* coerced to a common field.
+    Both *x* and *y* must be field elements (not special values).
+
+    In the present implementation, this simply merges the lists of generators,
+    avoiding duplication. In the future, it will be able to eliminate
+    generators satisfying algebraic relations.
+
 .. function:: void ca_condense_field(ca_t res, ca_ctx_t ctx)
 
     Attempts to demote the value of *res* to a trivial subfield of its
-    current field. In particular, this demotes any obviously rational
-    value to the trivial field `\mathbb{Q}`.
+    current field by removing unused generators. In particular, this demotes
+    any obviously rational value to the trivial field `\mathbb{Q}`.
 
     This function is applied automatically in most operations
     (arithmetic operations, etc.).
@@ -497,4 +506,14 @@ leaving the construction of field objects to the context object.
 .. function:: void ca_field_print(const ca_field_t K)
 
     Prints a description of the field *K* to standard output.
+
+.. function:: int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx)
+
+    Compares the field objects *K1* and *K2* in a canonical sort order,
+    returning -1, 0 or 1. This only performs a lexicographic comparison
+    of the representations of *K1* and *K2*; the return value does not say
+    anything meaningful about the relative structures of *K1* and *K2*
+    as mathematical fields.
+
+
 

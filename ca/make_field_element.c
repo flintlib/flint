@@ -49,10 +49,12 @@ _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
     }
     else if (new_type == CA_FIELD_TYPE_FUNC)
     {
+        x->elem.mpoly_q = (fmpz_mpoly_q_struct *) flint_malloc(sizeof(fmpz_mpoly_q_struct));
         fmpz_mpoly_q_init(CA_MPOLY_Q(x), ctx->mctx + 0);
     }
     else if (new_type == CA_FIELD_TYPE_MULTI)
     {
+        x->elem.mpoly_q = (fmpz_mpoly_q_struct *) flint_malloc(sizeof(fmpz_mpoly_q_struct));
         fmpz_mpoly_q_init(CA_MPOLY_Q(x), CA_FIELD_MCTX(ctx->fields + new_index, ctx));
     }
 

@@ -22,5 +22,7 @@ ca_ctx_clear(ca_ctx_t ctx)
     flint_free(ctx->fields);
 
     flint_free(ctx->mctx);
+
+    flint_free(ctx->options);
 }
 

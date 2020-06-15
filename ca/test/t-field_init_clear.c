@@ -33,7 +33,7 @@ int main()
         ca_field_init_nf(I, t);
         ca_field_init_const(Pi, CA_Pi);
 
-        ca_field_init_multi(K, 2);
+        ca_field_init_multi(K, 2, ctx);
 
 /*
         ca_field_set_ext(K, 0, I);

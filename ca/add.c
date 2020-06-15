@@ -102,13 +102,35 @@ ca_add(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     if (yfield == CA_FIELD_ID_QQ)
     {
-        ca_add_fmpq(res, x, CA_FMPQ(y), ctx);
+        if (res == y)
+        {
+            fmpq_t t;
+            fmpq_init(t);
+            fmpq_set(t, CA_FMPQ(y));
+            ca_add_fmpq(res, x, t, ctx);
+            fmpq_clear(t);
+        }
+        else
+        {
+            ca_add_fmpq(res, x, CA_FMPQ(y), ctx);
+        }
         return;
     }
 
     if (xfield == CA_FIELD_ID_QQ)
     {
-        ca_add_fmpq(res, y, CA_FMPQ(x), ctx);
+        if (res == x)
+        {
+            fmpq_t t;
+            fmpq_init(t);
+            fmpq_set(t, CA_FMPQ(x));
+            ca_add_fmpq(res, y, t, ctx);
+            fmpq_clear(t);
+        }
+        else
+        {
+            ca_add_fmpq(res, y, CA_FMPQ(x), ctx);
+        }
         return;
     }
 
@@ -176,10 +198,37 @@ ca_add(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         return;
     }
 
-    /* todo: subfields, merge fields */
+    {
+        ca_t t, u;
 
-    ca_unknown(res, ctx);
-    return;
+        ca_init(t, ctx);
+        ca_init(u, ctx);
+
+        ca_merge_fields(t, u, x, y, ctx);
+
+/*
+        printf("merged\n");
+        ca_print(t, ctx); printf("\n");
+        ca_print(u, ctx); printf("\n\n");
+*/
+
+        ca_add(res, t, u, ctx);
+
+/*
+        printf("added\n");
+        ca_print(res, ctx); printf("\n");
+*/
+
+        ca_condense_field(res, ctx);
+
+/*
+        printf("condensed\n");
+        ca_print(res, ctx); printf("\n");
+*/
+
+        ca_clear(t, ctx);
+        ca_clear(u, ctx);
+    }
 }
 
 void

@@ -11,16 +11,18 @@
 
 #include "ca.h"
 
+#define CA_NVARS_DEFAULT 8
+
 void
 ca_ctx_init(ca_ctx_t ctx)
 {
     slong i;
     qqbar_t onei;
 
-    ctx->mctx = flint_malloc(CA_NVARS_MAX * sizeof(fmpz_mpoly_ctx_struct));
-    for (i = 0; i < CA_NVARS_MAX; i++)
+    ctx->mctx = flint_malloc(CA_NVARS_DEFAULT * sizeof(fmpz_mpoly_ctx_struct));
+    for (i = 0; i < CA_NVARS_DEFAULT; i++)
         fmpz_mpoly_ctx_init(ctx->mctx + i, i + 1, ORD_LEX);
-    ctx->mctx_len = CA_NVARS_MAX;
+    ctx->mctx_len = CA_NVARS_DEFAULT;
 
     /* Always create QQ, QQ(i) */
 
@@ -34,5 +36,7 @@ ca_ctx_init(ca_ctx_t ctx)
     qqbar_i(onei);
     ca_field_init_nf(ctx->fields + 1, onei);
     qqbar_clear(onei);
+
+    ctx->options = flint_calloc(CA_OPT_NUM_OPTIONS, sizeof(slong));
 }
 

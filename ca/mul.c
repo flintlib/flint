@@ -128,13 +128,35 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     if (yfield == CA_FIELD_ID_QQ)
     {
-        ca_mul_fmpq(res, x, CA_FMPQ(y), ctx);
+        if (res == y)
+        {
+            fmpq_t t;
+            fmpq_init(t);
+            fmpq_set(t, CA_FMPQ(y));
+            ca_mul_fmpq(res, x, t, ctx);
+            fmpq_clear(t);
+        }
+        else
+        {
+            ca_mul_fmpq(res, x, CA_FMPQ(y), ctx);
+        }
         return;
     }
 
     if (xfield == CA_FIELD_ID_QQ)
     {
-        ca_mul_fmpq(res, y, CA_FMPQ(x), ctx);
+        if (res == x)
+        {
+            fmpq_t t;
+            fmpq_init(t);
+            fmpq_set(t, CA_FMPQ(x));
+            ca_mul_fmpq(res, y, t, ctx);
+            fmpq_clear(t);
+        }
+        else
+        {
+            ca_mul_fmpq(res, y, CA_FMPQ(x), ctx);
+        }
         return;
     }
 

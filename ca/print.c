@@ -12,7 +12,7 @@
 #include "ca.h"
 
 void
-ca_print(ca_t x, ca_ctx_t ctx)
+ca_print(const ca_t x, ca_ctx_t ctx)
 {
     slong field;
 
