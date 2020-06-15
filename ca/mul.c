@@ -242,7 +242,51 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         }
         else if (type == CA_FIELD_TYPE_MULTI)
         {
+            slong i, n;
+
             fmpz_mpoly_q_mul(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_MPOLY_Q(y), CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+
+            /* todo: improve, deduplicate this code */
+
+            n = ctx->fields[zfield].data.multi.ideal_len;
+
+            if (n != 0)
+            {
+                fmpz_mpoly_struct ** I;
+                fmpz_mpoly_struct ** Q;
+                fmpq_t scale;
+
+                I = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
+                for (i = 0; i < n; i++)
+                    I[i] = &ctx->fields[zfield].data.multi.ideal[i];
+
+                Q = flint_malloc(sizeof(fmpz_mpoly_struct *) * n);
+                for (i = 0; i < n; i++)
+                {
+                    Q[i] = flint_malloc(sizeof(fmpz_mpoly_struct));
+                    fmpz_mpoly_init(Q[i], CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+                }
+
+                fmpq_init(scale);
+
+                fmpz_mpoly_quasidivrem_ideal(fmpq_denref(scale), Q, fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), I, n, CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+                fmpz_mpoly_quasidivrem_ideal(fmpq_numref(scale), Q, fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), I, n, CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+
+                fmpq_canonicalise(scale);
+                fmpz_mpoly_q_canonicalise(CA_MPOLY_Q(res), CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+                fmpz_mpoly_q_mul_fmpq(CA_MPOLY_Q(res), CA_MPOLY_Q(res), scale, CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+
+                for (i = 0; i < n; i++)
+                {
+                    fmpz_mpoly_clear(Q[i], CA_FIELD_MCTX(ctx->fields + zfield, ctx));
+                    flint_free(Q[i]);
+                }
+
+                flint_free(Q);
+                flint_free(I);
+
+                fmpq_clear(scale);
+            }
         }
         else
         {
@@ -255,9 +299,36 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
         return;
     }
 
-    /* todo: subfields, merge fields */
+    {
+        ca_t t, u;
 
-    ca_unknown(res, ctx);
-    return;
+        ca_init(t, ctx);
+        ca_init(u, ctx);
+
+        ca_merge_fields(t, u, x, y, ctx);
+
+/*
+        printf("merged\n");
+        ca_print(t, ctx); printf("\n");
+        ca_print(u, ctx); printf("\n\n");
+*/
+
+        ca_mul(res, t, u, ctx);
+
+/*
+        printf("added\n");
+        ca_print(res, ctx); printf("\n");
+*/
+
+        ca_condense_field(res, ctx);
+
+/*
+        printf("condensed\n");
+        ca_print(res, ctx); printf("\n");
+*/
+
+        ca_clear(t, ctx);
+        ca_clear(u, ctx);
+    }
 }
 

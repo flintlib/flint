@@ -14,6 +14,11 @@
 truth_t
 ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
+    if (x->field == CA_FIELD_ID_QQ && y->field == CA_FIELD_ID_QQ)
+    {
+        return fmpq_equal(CA_FMPQ(x), CA_FMPQ(y)) ? T_TRUE : T_FALSE;
+    }
+
     return T_UNKNOWN;
 }
 
