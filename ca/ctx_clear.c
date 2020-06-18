@@ -16,6 +16,8 @@ ca_ctx_clear(ca_ctx_t ctx)
 {
     slong i;
 
+    CA_INFO(ctx, ("%wd fields cached at time of destruction\n", ctx->fields_len));
+
     for (i = 0; i < ctx->fields_len; i++)
         ca_field_clear(ctx->fields + i);
 

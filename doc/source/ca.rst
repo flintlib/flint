@@ -354,6 +354,10 @@ Arithmetic
 .. function:: void ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     Sets *res* to the negation of *x*.
+    For numbers, this operation amounts to a direct negation within the
+    formal field.
+    For a signed infinity `c \infty`, negation gives `(-c) \infty`; all other
+    special values are unchanged.
 
 .. function:: void ca_add_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
               void ca_add_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
@@ -376,8 +380,8 @@ Arithmetic
 
     * `z + \text{Undefined} = \text{Undefined}` for any value *z* (including *Unknown*)
 
-    In any other case, or if the correct case cannot be distinguished,
-    the result is *Unknown*.
+    In any other case involving special values, or if the specific case cannot
+    be distinguished, the result is *Unknown*.
 
 .. function:: void ca_sub_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
               void ca_sub_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
@@ -386,6 +390,7 @@ Arithmetic
               void ca_sub(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     Sets *res* to the difference of *x* and *y*.
+    This is equivalent to computing `x + (-y)`.
 
 .. function:: void ca_mul_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
               void ca_mul_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
@@ -410,8 +415,102 @@ Arithmetic
 
     * `z \cdot  \text{Undefined} = \text{Undefined}` for any value *z* (including *Unknown*)
 
-    In any other case, or if the correct case cannot be distinguished,
+    In any other case involving special values, or if the specific case cannot
+    be distinguished, the result is *Unknown*.
+
+.. function:: void ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the multiplicative inverse of *x*. In a univariate algebraic
+    number field, this always produces a rational denominator, but the
+    denominator might not be rationalized in a multivariate
+    field.
+    For special values
+    and zero, the following rules apply:
+
+    * `1 / (c \infty) = 1 / \tilde \infty = 0`
+
+    * `1 / 0 = \tilde \infty`
+
+    * `1 / \text{Undefined} = \text{Undefined}`
+
+    * `1 / \text{Unknown} = \text{Unknown}`
+
+    If it cannot be determined whether *x* is zero or nonzero,
     the result is *Unknown*.
+
+.. function:: void ca_fmpq_div(ca_t res, const fmpq_t x, const ca_t y, ca_ctx_t ctx)
+              void ca_fmpz_div(ca_t res, const fmpz_t x, const ca_t y, ca_ctx_t ctx)
+              void ca_ui_div(ca_t res, ulong x, const ca_t y, ca_ctx_t ctx)
+              void ca_si_div(ca_t res, slong x, const ca_t y, ca_ctx_t ctx)
+              void ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
+              void ca_div_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
+              void ca_div_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx)
+              void ca_div_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx)
+              void ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+    Sets *res* to the quotient of *x* and *y*. This is equivalent
+    to computing `x \cdot (1 / y)`. For special values and division
+    by zero, this implies the following rules
+    (`c \infty` denotes a signed infinity, `|c| = 1`):
+
+    * `(c \infty) / (d \infty) = (c \infty) / \tilde \infty = \tilde \infty / (c \infty) = \tilde \infty / \tilde \infty = \text{Undefined}`
+
+    * `c \infty / z = (c / \operatorname{sgn}(z)) \infty` if `z \in \mathbb{C} \setminus \{0\}`
+
+    * `c \infty / 0 = \tilde \infty / 0 = \tilde \infty`
+
+    * `z / (c \infty) = z / \tilde \infty = 0` if `z \in \mathbb{C}`
+
+    * `z / 0 = \tilde \infty` if `z \in \mathbb{C} \setminus \{0\}`
+
+    * `0 / 0 = \text{Undefined}`
+
+    * `z / \text{Undefined} = \text{Undefined}` for any value *z* (including *Unknown*)
+
+    * `\text{Undefined} / z = \text{Undefined}` for any value *z* (including *Unknown*)
+
+    In any other case involving special values, or if the specific case cannot
+    be distinguished, the result is *Unknown*.
+
+
+Numerical evaluation
+-------------------------------------------------------------------------------
+
+.. function:: void ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
+
+    Sets *res* to an enclosure of the numerical value of *x*.
+    A working precision of *prec* bits is used internally for the evaluation,
+    without adaptive refinement.
+    If *x* is any special value, *res* is set to *acb_indeterminate*.
+
+
+Context options
+-------------------------------------------------------------------------------
+
+The *options* member of a :type:`ca_ctx_t` object is an array of *slong*
+values controlling simplification behavior and various other settings.
+The values of the array at the following indices can be changed by the user
+(example: ``ctx->options[CA_OPT_PREC_LIMIT] = 65536``).
+
+.. macro:: CA_OPT_VERBOSE
+
+    Whether to print debug information. Default value: 0.
+
+.. macro:: CA_OPT_PREC_LIMIT
+
+    Maximum precision to use internally for numerical evaluation with Arb.
+    This parameter affects the possibility to prove inequalities
+    and find simplifications between related extension elements.
+    This is not a strict limit; some calculations may use higher precision
+    when there is a good reason to do so.
+    Default value: 4096.
+
+.. macro:: CA_OPT_QQBAR_DEG_LIMIT
+
+    Maximum degree of :type:`qqbar_t` elements allowed internally during
+    simplification of algebraic numbers. This limit may be exceeded
+    when the user provides explicit :type:`qqbar_t` input of higher degree.
+    Default value: 60.
 
 Internal representation
 -------------------------------------------------------------------------------
@@ -514,6 +613,4 @@ leaving the construction of field objects to the context object.
     of the representations of *K1* and *K2*; the return value does not say
     anything meaningful about the relative structures of *K1* and *K2*
     as mathematical fields.
-
-
 

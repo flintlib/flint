@@ -38,5 +38,8 @@ ca_ctx_init(ca_ctx_t ctx)
     qqbar_clear(onei);
 
     ctx->options = flint_calloc(CA_OPT_NUM_OPTIONS, sizeof(slong));
+
+    ctx->options[CA_OPT_PREC_LIMIT] = 4096;
+    ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = 60;
 }
 

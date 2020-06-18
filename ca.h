@@ -30,6 +30,10 @@
 extern "C" {
 #endif
 
+#define CA_INFO(ctx, args) do { if (ctx->options[CA_OPT_VERBOSE]) \
+    do { flint_printf("%s:%d:  ", __FILE__, __LINE__); flint_printf args; } \
+    while (0); } while (0);
+
 /* Number object *************************************************************/
 
 typedef union
@@ -147,6 +151,8 @@ typedef ca_field_struct ca_field_t[1];
 enum
 {
     CA_OPT_VERBOSE,
+    CA_OPT_PREC_LIMIT,
+    CA_OPT_QQBAR_DEG_LIMIT,
     CA_OPT_NUM_OPTIONS
 };
 
@@ -285,6 +291,23 @@ void ca_mul_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
 void ca_mul_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
 void ca_mul_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
 void ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+void ca_inv(ca_t res, const ca_t x, ca_ctx_t ctx);
+
+void ca_fmpq_div(ca_t res, const fmpq_t x, const ca_t y, ca_ctx_t ctx);
+void ca_fmpz_div(ca_t res, const fmpz_t x, const ca_t y, ca_ctx_t ctx);
+void ca_ui_div(ca_t res, ulong x, const ca_t y, ca_ctx_t ctx);
+void ca_si_div(ca_t res, slong x, const ca_t y, ca_ctx_t ctx);
+
+void ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx);
+void ca_div_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
+void ca_div_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
+void ca_div_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
+void ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+/* Numerical evaluation */
+
+void ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }

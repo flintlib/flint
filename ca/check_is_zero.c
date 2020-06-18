@@ -14,6 +14,10 @@
 truth_t
 ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
 {
+    acb_t v;
+    truth_t res;
+    slong prec;
+
     if (CA_IS_SPECIAL(x))
     {
         if (ca_is_unknown(x, ctx))
@@ -42,6 +46,32 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
         return T_FALSE;
     }
 
-    return T_UNKNOWN;
+    if ((ctx->fields + x->field)->type == CA_FIELD_TYPE_NF)
+    {
+        if (nf_elem_is_zero(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + x->field)))
+            return T_TRUE;
+        else
+            return T_FALSE;
+    }
+
+    res = T_UNKNOWN;
+
+    acb_init(v);
+
+    for (prec = 64; (prec <= ctx->options[CA_OPT_PREC_LIMIT]) && (res == T_UNKNOWN); prec *= 2)
+    {
+        ca_get_acb_raw(v, x, prec, ctx);
+
+        if (!acb_contains_zero(v))
+        {
+            res = T_FALSE;
+        }
+    }
+
+    /* todo: try exact simplifications (e.g. in qqbar) */
+
+    acb_clear(v);
+
+    return res;
 }
 

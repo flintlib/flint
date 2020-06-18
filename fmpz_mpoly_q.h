@@ -24,6 +24,7 @@ extern "C" {
 
 #include "flint/fmpz_mpoly.h"
 #include "flint/fmpq.h"
+#include "acb.h"
 
 #include "calcium.h"
 
@@ -268,6 +269,10 @@ fmpz_mpoly_divexact(fmpz_mpoly_t res, const fmpz_mpoly_t x, const fmpz_mpoly_t y
     else
         fmpz_mpoly_div(res, x, y, ctx);
 }
+
+/* Evaluation */
+
+void fmpz_mpoly_q_evaluate_acb(acb_t res, const fmpz_mpoly_q_t f, acb_srcptr x, slong prec, const fmpz_mpoly_ctx_t ctx);
 
 #ifdef __cplusplus
 }
