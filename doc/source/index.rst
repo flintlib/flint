@@ -76,10 +76,16 @@ Initially, the goal of Calcium will be to implement high-performance
 basic data structures in C; this will enable future experimentation with algorithms
 in both C and in high-level languages using wrappers.
 
+Credits and references
+======================
+
+.. toctree::
+   :maxdepth: 2
+
+   bibliography.rst
+
 Indices and tables
 ==================
 
 * :ref:`genindex`
-
-
 
