@@ -59,4 +59,3 @@ All referenced works: [BBK2014]_, [BF2020]_, [Cho1999]_, [Coh1996]_, [Coh2000]_,
 
 .. [Zip1985] \R. Zippel. "Simplification of expressions involving radicals". Journal of Symbolic Computation (1985) 1, 189-210
 
-

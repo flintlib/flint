@@ -11,18 +11,14 @@
 
 #include "ca.h"
 
-void
-ca_ctx_print(const ca_ctx_t ctx)
+ca_ptr
+ca_vec_init(slong n, ca_ctx_t ctx)
 {
     slong i;
+    ca_ptr v = (ca_ptr) flint_malloc(sizeof(ca_struct) * n);
 
-    flint_printf("Calcium context with %wd cached fields:\n", ctx->fields_len);
-    for (i = 0; i < ctx->fields_len; i++)
-    {
-        flint_printf("%wd   ", i);
-        ca_field_print(ctx->fields + i, ctx);
-        flint_printf("\n");
-    }
-    flint_printf("\n");
+    for (i = 0; i < n; i++)
+        ca_init(v + i, ctx);
+
+    return v;
 }
-

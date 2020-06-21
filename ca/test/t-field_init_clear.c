@@ -43,9 +43,9 @@ int main()
         flint_printf("\n");
 */
 
-        ca_field_clear(I);
-        ca_field_clear(Pi);
-        ca_field_clear(K);
+        ca_field_clear(I, ctx);
+        ca_field_clear(Pi, ctx);
+        ca_field_clear(K, ctx);
 
         ca_ctx_clear(ctx);
         qqbar_clear(t);

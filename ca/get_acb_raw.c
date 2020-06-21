@@ -19,12 +19,24 @@ todo: use cached enclosure  &K->data.func.enclosure
 void
 ca_field_func_get_acb_raw(acb_t res, ca_field_t K, slong prec, ca_ctx_t ctx)
 {
+    /* todo: verify args_len for functions... */
+
     switch (K->data.func.func)
     {
         case CA_Pi:
             acb_const_pi(res, prec);
             break;
+        case CA_Exp:
+            ca_get_acb_raw(res, K->data.func.args, prec, ctx);
+            acb_exp(res, res, prec);
+            break;
+        case CA_Log:
+            ca_get_acb_raw(res, K->data.func.args, prec, ctx);
+            acb_log(res, res, prec);
+            break;
+
         default:
+            flint_printf("ca_field_func_get_acb_raw: unknown function\n");
             flint_abort();
     }
 }

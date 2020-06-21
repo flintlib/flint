@@ -43,17 +43,41 @@ ca_field_init_const(ca_field_t K, ulong func)
     K->data.func.func = func;
     K->data.func.args_len = 0;
     K->data.func.args = NULL;
-    acb_init(&K->data.func.enclosure);
 
+    acb_init(&K->data.func.enclosure);
+    acb_indeterminate(&K->data.func.enclosure);
+
+/*
     if (func == CA_Pi)
         acb_const_pi(&K->data.func.enclosure, 128);
     else
         flint_abort();
+*/
 }
 
 void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
 {
-    flint_abort();
+    K->type = CA_FIELD_TYPE_FUNC;
+    K->data.func.func = func;
+    K->data.func.args_len = 1;
+    K->data.func.args = ca_vec_init(1, ctx);
+    ca_set(K->data.func.args, x, ctx);
+
+    acb_init(&K->data.func.enclosure);
+    acb_indeterminate(&K->data.func.enclosure);
+}
+
+void ca_field_init_fxy(ca_field_t K, ulong func, const ca_t x, const ca_t y, ca_ctx_t ctx)
+{
+    K->type = CA_FIELD_TYPE_FUNC;
+    K->data.func.func = func;
+    K->data.func.args_len = 2;
+    K->data.func.args = ca_vec_init(2, ctx);
+    ca_set(K->data.func.args, x, ctx);
+    ca_set(K->data.func.args + 1, y, ctx);
+
+    acb_init(&K->data.func.enclosure);
+    acb_indeterminate(&K->data.func.enclosure);
 }
 
 void

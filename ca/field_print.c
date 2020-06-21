@@ -12,7 +12,7 @@
 #include "ca.h"
 
 void
-ca_field_print(const ca_field_t K)
+ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
 {
     slong i, len;
 
@@ -37,6 +37,16 @@ ca_field_print(const ca_field_t K)
             case CA_Pi:
                 flint_printf("Pi");
                 break;
+            case CA_Exp:
+                flint_printf("Exp(");
+                ca_print(K->data.func.args, ctx);
+                flint_printf(")");
+                break;
+            case CA_Log:
+                flint_printf("Log(");
+                ca_print(K->data.func.args, ctx);
+                flint_printf(")");
+                break;
             default:
                 flint_printf("<unknown>");
         }
@@ -57,10 +67,11 @@ ca_field_print(const ca_field_t K)
         flint_printf(") where {");
         for (i = 0; i < len; i++)
         {
-            flint_printf("x%wd = ", i + 1);
+            flint_printf("x%wd = [", i + 1);
 
-            /* todo: print from context... */
-            flint_printf("[%wd]", K->data.multi.ext[i]);
+            ca_field_print(ctx->fields + K->data.multi.ext[i], ctx);
+
+            flint_printf("]");
 
             if (i < len - 1)
                 flint_printf(", ");

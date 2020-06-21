@@ -6,6 +6,8 @@ div.body {
     max-width: 100%;
 }
 
+li p { margin: 0.2em; }
+
 .citation dd {
     margin-left: 6em;
 }

@@ -12,7 +12,7 @@
 #include "ca.h"
 
 void
-ca_field_clear(ca_field_t K)
+ca_field_clear(ca_field_t K, ca_ctx_t ctx)
 {
     slong i;
 
@@ -23,6 +23,14 @@ ca_field_clear(ca_field_t K)
     {
         qqbar_clear(&K->data.nf.x);
         nf_clear(&K->data.nf.nf);
+    }
+
+    if (K->type == CA_FIELD_TYPE_FUNC)
+    {
+        if (K->data.func.args != NULL)
+            ca_vec_clear(K->data.func.args, K->data.func.args_len, ctx);
+
+        acb_clear(&K->data.func.enclosure);
     }
 
     if (K->type == CA_FIELD_TYPE_MULTI)

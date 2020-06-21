@@ -12,7 +12,7 @@
 #include "ca.h"
 
 void
-ca_print(const ca_t x, ca_ctx_t ctx)
+ca_print(const ca_t x, const ca_ctx_t ctx)
 {
     slong field;
 
@@ -56,12 +56,16 @@ ca_print(const ca_t x, ca_ctx_t ctx)
     {
         nf_elem_print_pretty(CA_NF_ELEM(x), CA_FIELD_NF(ctx->fields + field), "x1");
     }
+    else if (ctx->fields[field].type == CA_FIELD_TYPE_FUNC)
+    {
+        fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), NULL, ctx->mctx + 0);
+    }
     else
     {
         fmpz_mpoly_q_print_pretty(CA_MPOLY_Q(x), NULL, CA_FIELD_MCTX(ctx->fields + field, ctx));
     }
 
     flint_printf("  in  ");
-    ca_field_print(ctx->fields + field);
+    ca_field_print(ctx->fields + field, ctx);
 }
 

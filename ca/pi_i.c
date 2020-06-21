@@ -12,17 +12,13 @@
 #include "ca.h"
 
 void
-ca_ctx_print(const ca_ctx_t ctx)
+ca_pi_i(ca_t res, ca_ctx_t ctx)
 {
-    slong i;
-
-    flint_printf("Calcium context with %wd cached fields:\n", ctx->fields_len);
-    for (i = 0; i < ctx->fields_len; i++)
-    {
-        flint_printf("%wd   ", i);
-        ca_field_print(ctx->fields + i, ctx);
-        flint_printf("\n");
-    }
-    flint_printf("\n");
+    ca_t t;
+    ca_init(t, ctx);
+    ca_pi(res, ctx);
+    ca_i(t, ctx);
+    ca_mul(res, res, t, ctx);
+    ca_clear(t, ctx);
 }
 

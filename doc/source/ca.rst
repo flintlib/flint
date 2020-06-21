@@ -98,6 +98,16 @@ For all types, a *type_t* is defined as an array of length one of type
     an element of a generic field `\mathbb{Q}(a_1,\ldots,a_n)`.
     Special values are encoded using magic bits in the field index.
 
+.. type:: ca_ptr
+
+   Alias for ``ca_struct *``, used for vectors of numbers.
+
+.. type:: ca_srcptr
+
+   Alias for ``const ca_struct *``, used for vectors of numbers
+   when passed as constant input to functions.
+
+
 Context objects
 -------------------------------------------------------------------------------
 
@@ -144,6 +154,16 @@ Memory management for numbers
 
     Efficiently swaps the variables *x* and *y*.
 
+.. function:: ca_ptr ca_vec_init(slong n, ca_ctx_t ctx)
+
+    Returns a pointer to a heap-allocated array of *n* initialized
+    :type:`ca_struct` entries.
+
+.. function:: void ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx)
+
+    Clears an array of *n* initialized :type:`ca_struct` entries.
+    This also frees the array *v*.
+
 Input and output
 -------------------------------------------------------------------------------
 
@@ -152,7 +172,7 @@ Input and output
     Prints a description of the context *ctx* to standard output.
     This will give a complete listing of the cached fields in *ctx*.
 
-.. function:: void ca_print(const ca_t x, ca_ctx_t ctx)
+.. function:: void ca_print(const ca_t x, const ca_ctx_t ctx)
 
     Prints a description of *x* to standard output.
 
@@ -163,45 +183,57 @@ Assignment and specific values
 
     Sets *res* to a copy of *x*.
 
-.. function:: void ca_zero(ca_t x, ca_ctx_t ctx)
-              void ca_one(ca_t x, ca_ctx_t ctx)
+.. function:: void ca_zero(ca_t res, ca_ctx_t ctx)
+              void ca_one(ca_t res, ca_ctx_t ctx)
 
-    Sets *x* to the integer 0 or 1. This creates a canonical representation
+    Sets *res* to the integer 0 or 1. This creates a canonical representation
     of this number as an element of the trivial field `\mathbb{Q}`.
 
-.. function:: void ca_set_si(ca_t x, slong v, ca_ctx_t ctx)
-              void ca_set_ui(ca_t x, ulong v, ca_ctx_t ctx)
-              void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx)
-              void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx)
+.. function:: void ca_set_si(ca_t res, slong v, ca_ctx_t ctx)
+              void ca_set_ui(ca_t res, ulong v, ca_ctx_t ctx)
+              void ca_set_fmpz(ca_t res, const fmpz_t v, ca_ctx_t ctx)
+              void ca_set_fmpq(ca_t res, const fmpq_t v, ca_ctx_t ctx)
 
-    Sets *x* to the integer or rational number *v*. This creates a canonical
+    Sets *res* to the integer or rational number *v*. This creates a canonical
     representation of this number as an element of the trivial field
     `\mathbb{Q}`.
 
-.. function:: void ca_i(ca_t x, ca_ctx_t ctx)
+.. function:: void ca_i(ca_t res, ca_ctx_t ctx)
 
-    Sets *x* to the imaginary unit `i = \sqrt{-1}`. This creates a canonical
+    Sets *res* to the imaginary unit `i = \sqrt{-1}`. This creates a canonical
     representation of `i` as the generator of the algebraic number field
     `\mathbb{Q}(i)`.
 
-.. function:: void ca_unknown(ca_t x, ca_ctx_t ctx)
+.. function:: void ca_pi(ca_t res, ca_ctx_t ctx)
 
-    Sets *x* to the meta-value *Unknown*.
+    Sets *res* to the constant `\pi`. This creates an element
+    of the transcendental number field `\mathbb{Q}(\pi)`.
 
-.. function:: void ca_undefined(ca_t x, ca_ctx_t ctx)
+.. function:: void ca_pi_i(ca_t res, ca_ctx_t ctx)
 
-    Sets *x* to *Undefined*.
+    Sets *res* to the constant `\pi i`. This creates an element of the
+    composite field `\mathbb{Q}(i,\pi)` rather than representing `\pi i`
+    (or even `2 \pi i`, which for some purposes would be more elegant)
+    as an atomic quantity.
 
-.. function:: void ca_uinf(ca_t x, ca_ctx_t ctx)
+.. function:: void ca_unknown(ca_t res, ca_ctx_t ctx)
 
-    Sets *x* to unsigned infinity `{\tilde \infty}`.
+    Sets *res* to the meta-value *Unknown*.
 
-.. function:: void ca_pos_inf(ca_t x, ca_ctx_t ctx)
-              void ca_neg_inf(ca_t x, ca_ctx_t ctx)
-              void ca_pos_i_inf(ca_t x, ca_ctx_t ctx)
-              void ca_neg_i_inf(ca_t x, ca_ctx_t ctx)
+.. function:: void ca_undefined(ca_t res, ca_ctx_t ctx)
 
-    Sets *x* to the signed infinity `+\infty`, `-\infty`, `+i \infty` or `-i \infty`.
+    Sets *res* to *Undefined*.
+
+.. function:: void ca_uinf(ca_t res, ca_ctx_t ctx)
+
+    Sets *res* to unsigned infinity `{\tilde \infty}`.
+
+.. function:: void ca_pos_inf(ca_t res, ca_ctx_t ctx)
+              void ca_neg_inf(ca_t res, ca_ctx_t ctx)
+              void ca_pos_i_inf(ca_t res, ca_ctx_t ctx)
+              void ca_neg_i_inf(ca_t res, ca_ctx_t ctx)
+
+    Sets *res* to the signed infinity `+\infty`, `-\infty`, `+i \infty` or `-i \infty`.
 
 Assignment of algebraic numbers
 -------------------------------------------------------------------------------
@@ -226,17 +258,62 @@ Assignment of algebraic numbers
 
     * TODO: if possible, coerce *x* to a low-degree cyclotomic field.
 
+Random generation
+-------------------------------------------------------------------------------
+
+.. function:: void ca_randtest_rational(ca_t res, flint_rand_t state, slong bits, ca_ctx_t ctx)
+
+    Sets *res* to a random rational number with numerator and denominator
+    up to *bits* bits in size.
+
+.. function:: void ca_randtest(ca_t res, flint_rand_t state, slong depth, slong bits, ca_ctx_t ctx)
+
+    Sets *res* to a random number generated by evaluating a random expression.
+    The algorithm randomly selects between generating a "simple" number
+    (a random rational number or quadratic field element with coefficients
+    up to *bits* in size, or a random builtin constant),
+    or if *depth* is nonzero, applying a random arithmetic operation or
+    function to operands produced through recursive calls with
+    *depth* - 1. The output is guaranteed to be a number, not a special value.
+
+.. function:: void ca_randtest_special(ca_t res, flint_rand_t state, slong depth, slong bits, ca_ctx_t ctx)
+
+    Randomly generates either a special value or a number.
 
 Representation properties
 -------------------------------------------------------------------------------
 
-The following predicates deal with the representation of a :type:`ca_t` and
-hence can always be decided quickly. The return value is 0 for false
-and 1 for true.
+The following functions deal with the representation of a :type:`ca_t` and
+hence can always be decided quickly and unambiguously. The return value
+for predicates is 0 for false and 1 for true.
 
 .. function:: int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
 
     Returns 1 if *x* is Unknown, and 0 otherwise.
+
+.. function:: int ca_equal_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+    Returns whether *x* and *y* have identical representation. For field
+    elements, this checks if *x* and *y* belong to the same formal field
+    (with generators having identical representation) and are represented by
+    the same rational function within that field.
+
+    For special values, this tests
+    equality of the special values, with *Unknown* handled as if it were
+    a value rather than a meta-value: that is, *Unknown* = *Unknown* gives 1,
+    and *Unknown* = *y* gives 0 for any other kind of value *y*.
+    If neither *x* nor *y* is *Unknown*, then representation equality
+    implies that *x* and *y* describe to the same mathematical value, but if
+    either operand is *Unknown*, the result is meaningless for
+    mathematical comparison.
+
+.. function:: int ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+    Compares the representations of *x* and *y* in a canonical sort order,
+    returning -1, 0 or 1. This only performs a lexicographic comparison
+    of the representations of *x* and *y*; the return value does not say
+    anything meaningful about the values of *x* and *y*.
+
 
 Value predicates
 -------------------------------------------------------------------------------
@@ -309,7 +386,7 @@ Comparisons
 
 .. function:: truth_t ca_check_equal(const ca_t x, const ca_t y, ca_ctx_t ctx)
 
-    Tests `x = y`.
+    Tests `x = y` as a mathematical equality.
     The result is ``T_UNKNOWN`` if either operand is *Unknown*.
     The result may also be ``T_UNKNOWN`` if *x* and *y* are numerically
     indistinguishable and cannot be proved equal or unequal by
@@ -472,6 +549,46 @@ Arithmetic
     In any other case involving special values, or if the specific case cannot
     be distinguished, the result is *Unknown*.
 
+Elementary functions
+-------------------------------------------------------------------------------
+
+.. function:: void ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the exponential function of *x*.
+
+    For special values, the following definitions apply:
+
+    * `e^{+\infty} = +\infty`
+
+    * `e^{c \infty} = \tilde \infty` if `0 < \operatorname{Re}(c) < 1`.
+
+    * `e^{c \infty} = 0` if `\operatorname{Re}(c) < 0`.
+
+    * `e^{c \infty} = \text{Undefined}` if `\operatorname{Re}(c) = 0`.
+
+    * `e^{\tilde \infty} = \text{Undefined}`.
+
+    * Both *Undefined* and *Unknown* map to themselves.
+
+    In the generic case, this function outputs an element of the formal
+    field `\mathbb{Q}(e^x)`.
+    Presently, no simplifications are performed apart from `e^0 = 1`.
+
+.. function:: void ca_log(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the natural logarithm of *x*.
+
+    For special values and at the origin, the following definitions apply:
+
+    * For any infinity, `\log(c\infty) = \log(\tilde \infty) = +\infty`.
+
+    * `\log(0) = -\infty`. The result is *Unknown* if deciding `x = 0` fails.
+
+    * Both *Undefined* and *Unknown* map to themselves.
+
+    In the generic case, this function outputs an element of the formal
+    field `\mathbb{Q}(\log(x))`.
+    Presently, no simplifications are performed apart from `\log(1) = 0`.
 
 Numerical evaluation
 -------------------------------------------------------------------------------
@@ -602,7 +719,7 @@ leaving the construction of field objects to the context object.
 
     Clears the field *K*.
 
-.. function:: void ca_field_print(const ca_field_t K)
+.. function:: void ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
 
     Prints a description of the field *K* to standard output.
 

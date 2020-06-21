@@ -52,6 +52,8 @@ typedef struct
 ca_struct;
 
 typedef ca_struct ca_t[1];
+typedef ca_struct * ca_ptr;
+typedef const ca_struct * ca_srcptr;
 
 #define CA_FMPQ(x)         (&((x)->elem.q))
 #define CA_MPOLY_Q(x)      (&(((x)->elem.mpoly_q)[0]))
@@ -179,16 +181,20 @@ void ca_ctx_print(const ca_ctx_t ctx);
 
 /* Field methods */
 
+/* todo: all take ctx; update and check docs */
 void ca_field_init_qq(ca_field_t K);
 void ca_field_init_nf(ca_field_t K, const qqbar_t x);
 void ca_field_init_const(ca_field_t K, ulong func);
 void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx);
 void ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx);
-void ca_field_clear(ca_field_t K);
+void ca_field_clear(ca_field_t K, ca_ctx_t ctx);
 
 void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx);
-void ca_field_print(const ca_field_t K);
+void ca_field_print(const ca_field_t K, const ca_ctx_t ctx);
 int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx);
+
+slong _ca_ctx_get_field_const(ca_ctx_t ctx, ulong func);
+slong _ca_ctx_get_field_fx(ca_ctx_t ctx, ulong func, const ca_t x);
 
 /* Numbers */
 
@@ -196,6 +202,10 @@ void ca_init(ca_t x, ca_ctx_t ctx);
 void ca_clear(ca_t x, ca_ctx_t ctx);
 void ca_swap(ca_t x, ca_t y, ca_ctx_t ctx);
 void _ca_make_field_element(ca_t x, slong i, ca_ctx_t ctx);
+
+ca_ptr ca_vec_init(slong n, ca_ctx_t ctx);
+void ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx);
+
 
 CA_INLINE void
 _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
@@ -215,6 +225,8 @@ void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx);
 void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx);
 
 void ca_i(ca_t x, ca_ctx_t ctx);
+void ca_pi(ca_t res, ca_ctx_t ctx);
+void ca_pi_i(ca_t res, ca_ctx_t ctx);
 
 void ca_unknown(ca_t x, ca_ctx_t ctx);
 
@@ -227,7 +239,13 @@ void ca_neg_i_inf(ca_t x, ca_ctx_t ctx);
 
 void ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx);
 
-void ca_print(const ca_t x, ca_ctx_t ctx);
+void ca_print(const ca_t x, const ca_ctx_t ctx);
+
+/* Random generation */
+
+void ca_randtest_rational(ca_t res, flint_rand_t state, slong bits, ca_ctx_t ctx);
+void ca_randtest(ca_t res, flint_rand_t state, slong depth, slong bits, ca_ctx_t ctx);
+void ca_randtest_special(ca_t res, flint_rand_t state, slong depth, slong bits, ca_ctx_t ctx);
 
 /* Representation properties */
 
@@ -264,6 +282,8 @@ truth_t ca_check_lt(const ca_t x, const ca_t y, ca_ctx_t ctx);
 truth_t ca_check_le(const ca_t x, const ca_t y, ca_ctx_t ctx);
 truth_t ca_check_gt(const ca_t x, const ca_t y, ca_ctx_t ctx);
 truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+int ca_equal_repr(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 /* Field structure operations */
 
@@ -304,6 +324,11 @@ void ca_div_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
 void ca_div_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
 void ca_div_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
 void ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+/* Elementary functions */
+
+void ca_exp(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_log(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 /* Numerical evaluation */
 
