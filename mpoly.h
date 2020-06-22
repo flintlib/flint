@@ -392,8 +392,20 @@ ulong mpoly_overflow_mask_sp(flint_bitcnt_t bits)
 }
 
 MPOLY_INLINE
+ulong mpoly_monomial_max1(ulong exp2, ulong exp3,
+                                               flint_bitcnt_t bits, ulong mask)
+{
+    ulong s, m, exp1;
+    s = mask + exp2 - exp3;
+    m = mask & s;
+    m = m - (m >> (bits - 1));
+    exp1 = exp3 + (s & m);
+    return exp1;
+}
+
+MPOLY_INLINE
 void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
-                                               slong bits, slong N, ulong mask)
+                                      flint_bitcnt_t bits, slong N, ulong mask)
 {
     ulong i, s, m;
     for (i = 0; i < N; i++)
@@ -406,8 +418,20 @@ void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
 }
 
 MPOLY_INLINE
+ulong mpoly_monomial_min1(ulong exp2, ulong exp3,
+                                               flint_bitcnt_t bits, ulong mask)
+{
+    ulong s, m, exp1;
+    s = mask + exp2 - exp3;
+    m = mask & s;
+    m = m - (m >> (bits - 1));
+    exp1 = exp2 - (s & m);
+    return exp1;
+}
+
+MPOLY_INLINE
 void mpoly_monomial_min(ulong * exp1, const ulong * exp2, const ulong * exp3,
-                                               slong bits, slong N, ulong mask)
+                                      flint_bitcnt_t bits, slong N, ulong mask)
 {
     ulong i, s, m;
     for (i = 0; i < N; i++)
@@ -421,7 +445,7 @@ void mpoly_monomial_min(ulong * exp1, const ulong * exp2, const ulong * exp3,
 
 MPOLY_INLINE
 void mpoly_monomial_max_mp(ulong * exp1, const ulong * exp2, const ulong * exp3,
-                                                     flint_bitcnt_t bits, slong N)
+                                                  flint_bitcnt_t bits, slong N)
 {
     slong i, j;
     for (i = 0; i < N; i += bits/FLINT_BITS)
@@ -921,6 +945,10 @@ FLINT_DLL void mpoly_get_cmpmask(ulong * cmpmask, slong N, flint_bitcnt_t bits,
 
 FLINT_DLL void mpoly_get_ovfmask(ulong * ovfmask, slong N, flint_bitcnt_t bits,
                                                        const mpoly_ctx_t mctx);
+
+FLINT_DLL int mpoly_monomials_cmp(const ulong * Aexps, flint_bitcnt_t Abits,
+                                  const ulong * Bexps, flint_bitcnt_t Bbits,
+                                         slong length, const mpoly_ctx_t mctx);
 
 FLINT_DLL flint_bitcnt_t mpoly_exp_bits_required_ui(const ulong * user_exp,
                                                        const mpoly_ctx_t mctx);

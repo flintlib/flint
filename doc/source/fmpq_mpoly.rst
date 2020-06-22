@@ -251,8 +251,8 @@ Comparison
 
 .. function:: int fmpq_mpoly_cmp(const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 
-    Return ``1`` (resp. ``-1``, or ``0``) if the monomial of ``A`` is greater than (resp. less than, same as) the monomial of ``B``.
-    ``A`` and ``B`` should both have length one with coefficient one. This function will throw otherwise.
+    Return ``1`` (resp. ``-1``, or ``0``) if ``A`` is after (resp. before, same as) ``B`` in some arbitrary but fixed total ordering of the polynomials.
+    This ordering agrees with the usual ordering of monomials when ``A`` and ``B`` are both monomials.
 
 
 Container operations

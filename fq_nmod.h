@@ -291,6 +291,10 @@ FQ_NMOD_INLINE int fq_nmod_is_one(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
     return nmod_poly_is_one(op);
 }
 
+FLINT_DLL int fq_nmod_cmp(const fq_nmod_t a, const fq_nmod_t b,
+                                                      const fq_nmod_ctx_t ctx);
+
+
 /* Assignments and conversions ***********************************************/
 
 FQ_NMOD_INLINE void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op,
