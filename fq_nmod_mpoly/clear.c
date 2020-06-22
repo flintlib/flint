@@ -14,8 +14,13 @@
 void fq_nmod_mpoly_clear(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    for (i = 0; i < A->alloc; i++)
-        fq_nmod_clear(A->coeffs + i, ctx->fqctx);
-    flint_free(A->coeffs);
-    flint_free(A->exps);
+
+    if (A->alloc > 0)
+    {
+        for (i = 0; i < A->alloc; i++)
+            fq_nmod_clear(A->coeffs + i, ctx->fqctx);
+
+        flint_free(A->coeffs);
+        flint_free(A->exps);
+    }
 }
