@@ -32,7 +32,9 @@ static int _mpoly_monomials_cmp_repack_bits(
 
     TMP_START;
 
-    cmpmask = (ulong *) TMP_ALLOC((max_limit + 1)*NB*sizeof(ulong));
+    /* repack first monomial, then the next two, then the next four, ... */
+
+    cmpmask = (ulong *) TMP_ALLOC(NB*sizeof(ulong));
     newAexps = (ulong *) TMP_ALLOC(max_limit*NB*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, NB, Bbits, mctx);
 
