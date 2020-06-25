@@ -32,23 +32,18 @@ ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
     if (K->type == CA_FIELD_TYPE_FUNC)
     {
         flint_printf("(x) where {x = ");
-        switch (K->data.func.func)
+        flint_printf("%s", calcium_func_name(K->data.func.func));
+        if (K->data.func.args_len != 0)
         {
-            case CA_Pi:
-                flint_printf("Pi");
-                break;
-            case CA_Exp:
-                flint_printf("Exp(");
-                ca_print(K->data.func.args, ctx);
-                flint_printf(")");
-                break;
-            case CA_Log:
-                flint_printf("Log(");
-                ca_print(K->data.func.args, ctx);
-                flint_printf(")");
-                break;
-            default:
-                flint_printf("<unknown>");
+            slong i;
+            flint_printf("(");
+            for (i = 0; i < K->data.func.args_len; i++)
+            {
+                ca_print(K->data.func.args + i, ctx);
+                if (i < K->data.func.args_len - 1)
+                    flint_printf(", ");
+            }
+            flint_printf(")");
         }
         flint_printf("}");
     }

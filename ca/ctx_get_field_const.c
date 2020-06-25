@@ -12,7 +12,7 @@
 #include "ca.h"
 
 slong
-_ca_ctx_get_field_const(ca_ctx_t ctx, ulong func)
+_ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func)
 {
     slong i;
 

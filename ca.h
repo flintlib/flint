@@ -61,10 +61,6 @@ typedef const ca_struct * ca_srcptr;
 #define CA_FMPQ_NUMREF(x)  (fmpq_numref(CA_FMPQ(x)))
 #define CA_FMPQ_DENREF(x)  (fmpq_denref(CA_FMPQ(x)))
 
-/* We always allocate QQ and QQ(i), with field index 0 and 1 */
-#define CA_FIELD_ID_QQ       0
-#define CA_FIELD_ID_QQ_I     1
-
 /* Bits added to the top of field_id to encode nonnumbers */
 #define CA_UNKNOWN        (UWORD(1) << (FLINT_BITS - 1))
 #define CA_UNDEFINED      (UWORD(1) << (FLINT_BITS - 2))
@@ -73,6 +69,16 @@ typedef const ca_struct * ca_srcptr;
 #define CA_SPECIAL        (CA_UNKNOWN | CA_UNDEFINED | CA_UNSIGNED_INF | CA_SIGNED_INF)
 
 #define CA_IS_SPECIAL(x)  ((x)->field & CA_SPECIAL)
+
+/* We always allocate QQ and QQ(i), with field index 0 and 1 */
+#define CA_FIELD_ID_QQ       0
+#define CA_FIELD_ID_QQ_I     1
+
+#define CA_FIELD_IS_QQ(x, ctx) ((x)->field == CA_FIELD_ID_QQ)
+#define CA_FIELD_IS_QQ_I(x, ctx) ((x)->field == CA_FIELD_ID_QQ_I)
+
+#define CA_FIELD(x, ctx) ((ctx)->fields + (x)->field)
+#define CA_FIELD_MULTI_GEN(x, i, ctx) ((ctx)->fields + CA_FIELD(x, ctx)->data.multi.ext[i])
 
 /* Field object **************************************************************/
 
@@ -155,6 +161,7 @@ enum
     CA_OPT_VERBOSE,
     CA_OPT_PREC_LIMIT,
     CA_OPT_QQBAR_DEG_LIMIT,
+    CA_OPT_LOW_PREC,
     CA_OPT_NUM_OPTIONS
 };
 
@@ -184,8 +191,9 @@ void ca_ctx_print(const ca_ctx_t ctx);
 /* todo: all take ctx; update and check docs */
 void ca_field_init_qq(ca_field_t K);
 void ca_field_init_nf(ca_field_t K, const qqbar_t x);
-void ca_field_init_const(ca_field_t K, ulong func);
-void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx);
+void ca_field_init_const(ca_field_t K, calcium_func_code func);
+void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx_t ctx);
+void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx);
 void ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx);
 void ca_field_clear(ca_field_t K, ca_ctx_t ctx);
 
@@ -193,8 +201,9 @@ void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx);
 void ca_field_print(const ca_field_t K, const ca_ctx_t ctx);
 int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx);
 
-slong _ca_ctx_get_field_const(ca_ctx_t ctx, ulong func);
-slong _ca_ctx_get_field_fx(ca_ctx_t ctx, ulong func, const ca_t x);
+slong _ca_ctx_get_field_const(ca_ctx_t ctx, calcium_func_code func);
+slong _ca_ctx_get_field_fx(ca_ctx_t ctx, calcium_func_code func, const ca_t x);
+slong _ca_ctx_get_field_fxy(ca_ctx_t ctx, calcium_func_code func, const ca_t x, const ca_t y);
 
 /* Numbers */
 
@@ -206,7 +215,6 @@ void _ca_make_field_element(ca_t x, slong i, ca_ctx_t ctx);
 ca_ptr ca_vec_init(slong n, ca_ctx_t ctx);
 void ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx);
 
-
 CA_INLINE void
 _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
 {
@@ -214,10 +222,25 @@ _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
         _ca_make_field_element(x, CA_FIELD_ID_QQ, ctx);
 }
 
+CA_INLINE void
+_ca_function_fx(ca_t res, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
+{
+    _ca_make_field_element(res, _ca_ctx_get_field_fx(ctx, func, x), ctx);
+    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, ctx->mctx + 0);
+}
+
+CA_INLINE void
+_ca_function_fxy(ca_t res, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx)
+{
+    _ca_make_field_element(res, _ca_ctx_get_field_fxy(ctx, func, x, y), ctx);
+    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, ctx->mctx + 0);
+}
+
 void ca_set(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 void ca_zero(ca_t x, ca_ctx_t ctx);
 void ca_one(ca_t x, ca_ctx_t ctx);
+void ca_neg_one(ca_t x, ca_ctx_t ctx);
 
 void ca_set_si(ca_t x, slong v, ca_ctx_t ctx);
 void ca_set_ui(ca_t x, ulong v, ca_ctx_t ctx);
@@ -225,8 +248,10 @@ void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx);
 void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx);
 
 void ca_i(ca_t x, ca_ctx_t ctx);
+void ca_neg_i(ca_t x, ca_ctx_t ctx);
 void ca_pi(ca_t res, ca_ctx_t ctx);
 void ca_pi_i(ca_t res, ca_ctx_t ctx);
+void ca_euler(ca_t res, ca_ctx_t ctx);
 
 void ca_unknown(ca_t x, ca_ctx_t ctx);
 
@@ -238,6 +263,9 @@ void ca_pos_i_inf(ca_t x, ca_ctx_t ctx);
 void ca_neg_i_inf(ca_t x, ca_ctx_t ctx);
 
 void ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx);
+int ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx);
+int ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx);
+int ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx);
 
 void ca_print(const ca_t x, const ca_ctx_t ctx);
 
@@ -324,6 +352,15 @@ void ca_div_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
 void ca_div_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
 void ca_div_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
 void ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+/* Roots */
+
+void ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx);
+
+/* Complex parts */
+
+void ca_abs(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_sgn(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 /* Elementary functions */
 

@@ -37,7 +37,7 @@ ca_field_init_nf(ca_field_t K, const qqbar_t x)
 }
 
 void
-ca_field_init_const(ca_field_t K, ulong func)
+ca_field_init_const(ca_field_t K, calcium_func_code func)
 {
     K->type = CA_FIELD_TYPE_FUNC;
     K->data.func.func = func;
@@ -46,16 +46,9 @@ ca_field_init_const(ca_field_t K, ulong func)
 
     acb_init(&K->data.func.enclosure);
     acb_indeterminate(&K->data.func.enclosure);
-
-/*
-    if (func == CA_Pi)
-        acb_const_pi(&K->data.func.enclosure, 128);
-    else
-        flint_abort();
-*/
 }
 
-void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
+void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
 {
     K->type = CA_FIELD_TYPE_FUNC;
     K->data.func.func = func;
@@ -67,7 +60,7 @@ void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
     acb_indeterminate(&K->data.func.enclosure);
 }
 
-void ca_field_init_fxy(ca_field_t K, ulong func, const ca_t x, const ca_t y, ca_ctx_t ctx)
+void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
     K->type = CA_FIELD_TYPE_FUNC;
     K->data.func.func = func;

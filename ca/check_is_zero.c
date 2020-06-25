@@ -11,12 +11,132 @@
 
 #include "ca.h"
 
+/* stupid algorithm, just to have something working... */
+int
+fmpz_mpoly_evaluate_qqbar(qqbar_t res, const fmpz_mpoly_t pol, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx)
+{
+    slong i, j, len, nvars;
+    qqbar_t s, t, u;
+    ulong * exp;
+    int success;
+
+    len = fmpz_mpoly_length(pol, ctx);
+
+    if (len == 0)
+    {
+        qqbar_zero(res);
+        return 1;
+    }
+
+    if (len == 1 && fmpz_mpoly_is_fmpz(pol, ctx))
+    {
+        qqbar_set_fmpz(res, pol->coeffs);
+        return 1;
+    }
+
+    success = 0;
+
+    nvars = ctx->minfo->nvars;
+    exp = flint_malloc(sizeof(ulong) * nvars);
+
+    qqbar_init(s);
+    qqbar_init(t);
+    qqbar_init(u);
+
+    for (i = 0; i < len; i++)
+    {
+        fmpz_mpoly_get_term_exp_ui(exp, pol, i, ctx);
+
+        qqbar_one(t);
+
+        for (j = 0; j < nvars; j++)
+        {
+            if (exp[j] == 1)
+            {
+                if ((double) qqbar_degree(t) * (double) qqbar_degree(x + j) > (double) deg_limit ||
+                    (double) qqbar_height_bits(t) + (double) qqbar_height_bits(x + j) > (double) bits_limit)
+                    goto cleanup;
+
+                qqbar_mul(t, t, x + j);
+            }
+            else if (exp[j] >= 2)
+            {
+                if ((double) qqbar_height_bits(x + j) * (double) exp[j] > bits_limit)
+                    goto cleanup;
+
+                qqbar_pow_ui(u, x + j, exp[j]);
+
+                if ((double) qqbar_degree(t) * (double) qqbar_degree(u) > (double) deg_limit ||
+                    (double) qqbar_height_bits(t) + (double) qqbar_height_bits(u) > (double) bits_limit)
+                    goto cleanup;
+
+                qqbar_mul(t, t, u);
+            }
+        }
+
+        qqbar_mul_fmpz(t, t, pol->coeffs + i);
+
+        if ((double) qqbar_degree(s) * (double) qqbar_degree(t) > (double) deg_limit ||
+            (double) qqbar_height_bits(s) + (double) qqbar_height_bits(t) > (double) bits_limit)
+            goto cleanup;
+
+        qqbar_add(s, s, t);
+    }
+
+    success = 1;
+    qqbar_swap(res, s);
+
+cleanup:
+    qqbar_clear(s);
+    qqbar_clear(t);
+    qqbar_clear(u);
+
+    return success;
+}
+
+truth_t
+_ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
+{
+    slong i, len, deg_limit, bits_limit;
+    qqbar_ptr xs;
+    qqbar_t y;
+    truth_t res;
+
+    deg_limit = ctx->options[CA_OPT_QQBAR_DEG_LIMIT];
+    bits_limit = 10 * ctx->options[CA_OPT_PREC_LIMIT]; /* xxx */
+
+    len = ctx->fields[x->field].data.multi.len;
+
+    for (i = 0; i < len; i++)
+    {
+        if (ctx->fields[ctx->fields[x->field].data.multi.ext[i]].type != CA_FIELD_TYPE_NF)
+            return T_UNKNOWN;
+    }
+
+    res = T_UNKNOWN;
+    xs = (qqbar_struct *) flint_malloc(sizeof(qqbar_struct) * len);
+    qqbar_init(y);
+
+    for (i = 0; i < len; i++)
+        xs[i] = *CA_FIELD_NF_QQBAR(ctx->fields + ctx->fields[x->field].data.multi.ext[i]);
+
+    if (fmpz_mpoly_evaluate_qqbar(y, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), xs, deg_limit, bits_limit, CA_FIELD_MCTX(ctx->fields + x->field, ctx)))
+    {
+        res = qqbar_is_zero(y) ? T_TRUE : T_FALSE;
+    }
+
+    flint_free(xs);
+    qqbar_clear(y);
+
+    return res;
+}
+
 truth_t
 ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
 {
     acb_t v;
     truth_t res;
-    slong prec;
+    slong prec, prec_limit;
 
     if (CA_IS_SPECIAL(x))
     {
@@ -56,9 +176,14 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
 
     res = T_UNKNOWN;
 
+    /* todo: in the following, we should extract the numerator; the denominator is irrelevant */
+
     acb_init(v);
 
-    for (prec = 64; (prec <= ctx->options[CA_OPT_PREC_LIMIT]) && (res == T_UNKNOWN); prec *= 2)
+    prec_limit = ctx->options[CA_OPT_PREC_LIMIT];
+    prec_limit = FLINT_MAX(prec_limit, 64);
+
+    for (prec = 64; (prec <= prec_limit) && (res == T_UNKNOWN); prec *= 2)
     {
         ca_get_acb_raw(v, x, prec, ctx);
 
@@ -66,9 +191,14 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
         {
             res = T_FALSE;
         }
-    }
 
-    /* todo: try exact simplifications (e.g. in qqbar) */
+        /* try qqbar computation */
+        /* todo: precision to do this should depend on complexity of the polynomials, degree of the elements... */
+        if (prec == 64 && (ctx->fields + x->field)->type == CA_FIELD_TYPE_MULTI)
+        {
+            res = _ca_check_is_zero_qqbar(x, ctx);
+        }
+    }
 
     acb_clear(v);
 

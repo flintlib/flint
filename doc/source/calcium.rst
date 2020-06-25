@@ -50,3 +50,8 @@ This library uses two kinds of predicate functions:
     etc. depending on whether the unknown case should be included
     or excluded.
 
+
+.. raw:: latex
+
+    \newpage
+

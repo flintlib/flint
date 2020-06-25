@@ -21,16 +21,14 @@ ca_check_is_neg_one(const ca_t x, ca_ctx_t ctx)
 
         return T_FALSE;
     }
-
-    if (x->field == CA_FIELD_ID_QQ)
+    else if (x->field == CA_FIELD_ID_QQ)
     {
         if (fmpz_is_one(fmpq_denref(CA_FMPQ(x))) && fmpz_equal_si(fmpq_numref(CA_FMPQ(x)), -1))
             return T_TRUE;
         else
             return T_FALSE;
     }
-
-    if (x->field == CA_FIELD_ID_QQ_I)
+    else if (x->field == CA_FIELD_ID_QQ_I)
     {
         const fmpz *n, *d;
 
@@ -42,7 +40,15 @@ ca_check_is_neg_one(const ca_t x, ca_ctx_t ctx)
 
         return T_FALSE;
     }
-
-    return T_UNKNOWN;
+    else
+    {
+        truth_t res;
+        ca_t t;
+        ca_init(t, ctx);
+        ca_set_si(t, -1, ctx);
+        res = ca_check_equal(x, t, ctx);
+        ca_clear(t, ctx);
+        return res;
+    }
 }
 

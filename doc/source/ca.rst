@@ -185,8 +185,9 @@ Assignment and specific values
 
 .. function:: void ca_zero(ca_t res, ca_ctx_t ctx)
               void ca_one(ca_t res, ca_ctx_t ctx)
+              void ca_neg_one(ca_t res, ca_ctx_t ctx)
 
-    Sets *res* to the integer 0 or 1. This creates a canonical representation
+    Sets *res* to the integer 0, 1 or -1. This creates a canonical representation
     of this number as an element of the trivial field `\mathbb{Q}`.
 
 .. function:: void ca_set_si(ca_t res, slong v, ca_ctx_t ctx)
@@ -199,10 +200,11 @@ Assignment and specific values
     `\mathbb{Q}`.
 
 .. function:: void ca_i(ca_t res, ca_ctx_t ctx)
+              void ca_neg_i(ca_t res, ca_ctx_t ctx)
 
-    Sets *res* to the imaginary unit `i = \sqrt{-1}`. This creates a canonical
-    representation of `i` as the generator of the algebraic number field
-    `\mathbb{Q}(i)`.
+    Sets *res* to the imaginary unit `i = \sqrt{-1}`, or its negation `-i`.
+    This creates a canonical representation of `i` as the generator of the
+    algebraic number field `\mathbb{Q}(i)`.
 
 .. function:: void ca_pi(ca_t res, ca_ctx_t ctx)
 
@@ -215,6 +217,11 @@ Assignment and specific values
     composite field `\mathbb{Q}(i,\pi)` rather than representing `\pi i`
     (or even `2 \pi i`, which for some purposes would be more elegant)
     as an atomic quantity.
+
+.. function:: void ca_euler(ca_t res, ca_ctx_t ctx)
+
+    Sets *res* to Euler's constant `\gamma`. This creates an element
+    of the (transcendental?) number field `\mathbb{Q}(\gamma)`.
 
 .. function:: void ca_unknown(ca_t res, ca_ctx_t ctx)
 
@@ -235,7 +242,7 @@ Assignment and specific values
 
     Sets *res* to the signed infinity `+\infty`, `-\infty`, `+i \infty` or `-i \infty`.
 
-Assignment of algebraic numbers
+Conversion of algebraic numbers
 -------------------------------------------------------------------------------
 
 .. function:: void ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
@@ -257,6 +264,28 @@ Assignment of algebraic numbers
       (obtained by performing a smooth factorisation of the discriminant).
 
     * TODO: if possible, coerce *x* to a low-degree cyclotomic field.
+
+.. function:: int ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx)
+              int ca_get_fmpq(fmpz_t res, const ca_t x, ca_ctx_t ctx)
+              int ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
+
+    Attempts to evaluate *x* to an explicit integer, rational or
+    algebraic number. If successful, sets *res* to this number and
+    returns 1. If unsuccessful, returns 0.
+
+    The conversion certainly fails if *x* does not represent an integer,
+    rational or algebraic number (respectively), but can also fail if *x*
+    is too expensive to compute under
+    the current evaluation limits.
+    In particular, the evaluation will be aborted if an intermediate
+    algebraic number (or more precisely, the resultant polynomial prior
+    to factorization) exceeds ``CA_OPT_QQBAR_DEG_LIMIT``
+    or the coefficients exceed some multiple of ``CA_OPT_PREC_LIMIT``.
+    Note that evaluation may hit those limits even if the minimal polynomial
+    for *x* itself is small. The conversion can also fail if no algorithm
+    has been implemented for the functions appearing in the construction
+    of *x*.
+
 
 Random generation
 -------------------------------------------------------------------------------
@@ -312,7 +341,7 @@ for predicates is 0 for false and 1 for true.
     Compares the representations of *x* and *y* in a canonical sort order,
     returning -1, 0 or 1. This only performs a lexicographic comparison
     of the representations of *x* and *y*; the return value does not say
-    anything meaningful about the values of *x* and *y*.
+    anything meaningful about the numbers represented by *x* and *y*.
 
 
 Value predicates
@@ -549,6 +578,71 @@ Arithmetic
     In any other case involving special values, or if the specific case cannot
     be distinguished, the result is *Unknown*.
 
+Roots
+-------------------------------------------------------------------------------
+
+.. function:: void ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the square root of *x*.
+
+    For special values, the following definitions apply:
+
+    * `\sqrt{c \infty} = \sqrt{c} \infty`
+
+    * `\sqrt{\tilde \infty} = \tilde \infty`.
+
+    * Both *Undefined* and *Unknown* map to themselves.
+
+    This function will attempt to simplify its argument through an exact
+    computation. It may in particular attempt to simplify `\sqrt{x}` to
+    a single element in `\overline{\mathbb{Q}}`.
+
+    In the generic case, this function outputs an element of the formal
+    field `\mathbb{Q}(\sqrt{x})`.
+
+Complex parts
+-------------------------------------------------------------------------------
+
+.. function:: void ca_abs(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the absolute value of *x*.
+
+    For special values, the following definitions apply:
+
+    * `|c \infty| = |\tilde \infty| = +\infty`.
+
+    * Both *Undefined* and *Unknown* map to themselves.
+
+    This function will attempt to simplify its argument through an exact
+    computation. It may in particular attempt to simplify `|x|` to
+    a single element in `\overline{\mathbb{Q}}`.
+
+    In the generic case, this function outputs an element of the formal
+    field `\mathbb{Q}(|x|)`.
+
+.. function:: void ca_sgn(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+    Sets *res* to the sign of *x*, defined by
+
+    .. math ::
+
+        \operatorname{sgn}(x) = \begin{cases} 0 & x = 0 \\ \frac{x}{|x|} & x \ne 0 \end{cases}
+
+    for numbers. For special values, the following definitions apply:
+
+    * `\operatorname{sgn}(c \infty) = c`.
+
+    * `\operatorname{sgn}(\tilde \infty) = \operatorname{Undefined}`.
+
+    * Both *Undefined* and *Unknown* map to themselves.
+
+    This function will attempt to simplify its argument through an exact
+    computation. It may in particular attempt to simplify `\operatorname{sgn}(x)` to
+    a single element in `\overline{\mathbb{Q}}`.
+
+    In the generic case, this function outputs an element of the formal
+    field `\mathbb{Q}(\operatorname{sgn}(x))`.
+
 Elementary functions
 -------------------------------------------------------------------------------
 
@@ -627,7 +721,12 @@ The values of the array at the following indices can be changed by the user
     Maximum degree of :type:`qqbar_t` elements allowed internally during
     simplification of algebraic numbers. This limit may be exceeded
     when the user provides explicit :type:`qqbar_t` input of higher degree.
-    Default value: 60.
+    Default value: 120.
+
+.. macro:: CA_OPT_LOW_PREC
+
+    Numerical precision to use for fast checks (typically, before attempting
+    more expensive operations). Default value: 64.
 
 Internal representation
 -------------------------------------------------------------------------------
@@ -730,4 +829,9 @@ leaving the construction of field objects to the context object.
     of the representations of *K1* and *K2*; the return value does not say
     anything meaningful about the relative structures of *K1* and *K2*
     as mathematical fields.
+
+
+.. raw:: latex
+
+    \newpage
 

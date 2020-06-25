@@ -206,19 +206,39 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
             return;
         }
 
-        if ((xfield & CA_SIGNED_INF) && (yfield & CA_SIGNED_INF))
+        if ((xfield & CA_SIGNED_INF) || (yfield & CA_SIGNED_INF))
         {
-            /* ca_sign + mul */
-        }
+            ca_t t, u;
+            truth_t xzero, yzero;
 
-        if ((xfield & CA_SIGNED_INF) && !CA_IS_SPECIAL(y))
-        {
-            /* ca_sign + mul */
-        }
+            xzero = ca_check_is_zero(x, ctx);
+            yzero = ca_check_is_zero(y, ctx);
 
-        if ((yfield & CA_SIGNED_INF) && !CA_IS_SPECIAL(x))
-        {
-            /* ca_sign + mul */
+            if (xzero == T_TRUE || yzero == T_TRUE)
+            {
+                ca_undefined(res, ctx);
+                return;
+            }
+
+            if (xzero == T_UNKNOWN || yzero == T_UNKNOWN)
+            {
+                ca_unknown(res, ctx);
+                return;
+            }
+
+            ca_init(t, ctx);
+            ca_init(u, ctx);
+            ca_sgn(t, x, ctx);
+            ca_sgn(u, y, ctx);
+
+            ca_mul(res, t, u, ctx);
+            if (ca_check_is_number(res, ctx) == T_TRUE)
+                res->field |= CA_SIGNED_INF;
+
+            ca_clear(t, ctx);
+            ca_clear(u, ctx);
+
+            return;
         }
 
         ca_unknown(res, ctx);

@@ -179,3 +179,8 @@ Arithmetic
     Sets *res* to the inverse of *x*. Division by zero
     calls *flint_abort*.
 
+
+.. raw:: latex
+
+    \newpage
+

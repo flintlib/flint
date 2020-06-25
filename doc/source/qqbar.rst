@@ -143,6 +143,23 @@ Properties
     Returns the height of *x* (the largest absolute value of the
     coefficients of the minimal polynomial of *x*) measured in bits.
 
+.. function:: int qqbar_within_limits(const qqbar_t x, slong deg_limit, slong bits_limit)
+
+    Checks if *x* has degree bounded by *deg_limit* and height
+    bounded by *bits_limit* bits, returning 0 (false) or 1 (true).
+    If *deg_limit* is set to 0, the degree check is skipped,
+    and similarly for *bits_limit*.
+
+.. function:: int qqbar_binop_within_limits(const qqbar_t x, const qqbar_t y, slong deg_limit, slong bits_limit)
+
+    Checks if `x + y`, `x - y`, `x \cdot y` and `x / y` certainly have
+    degree bounded by *deg_limit* (by multiplying the degrees for *x* and *y*
+    to obtain a trivial bound). For *bits_limits*, the sum of the bit heights
+    of *x* and *y* is checked against the bound (this is only a heuristic).
+    If *deg_limit* is set to 0, the degree check is skipped,
+    and similarly for *bits_limit*.
+
+
 Special values
 -------------------------------------------------------------------------------
 
@@ -705,4 +722,8 @@ Internal functions
     relation exists with coefficients up to a specified bit size, but this has
     not yet been implemented.
 
+
+.. raw:: latex
+
+    \newpage
 

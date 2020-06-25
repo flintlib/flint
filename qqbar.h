@@ -150,6 +150,20 @@ slong qqbar_height_bits(const qqbar_t x);
 
 void qqbar_height(fmpz_t res, const qqbar_t x);
 
+QQBAR_INLINE int
+qqbar_within_limits(const qqbar_t x, slong deg_limit, slong bits_limit)
+{
+    return (deg_limit == 0 || (qqbar_degree(x) <= deg_limit)) &&
+           (bits_limit == 0 || (qqbar_height_bits(x) <= bits_limit));
+}
+
+QQBAR_INLINE int
+qqbar_binop_within_limits(const qqbar_t x, const qqbar_t y, slong deg_limit, slong bits_limit)
+{
+    return (deg_limit == 0 || (qqbar_degree(x) * qqbar_degree(y) <= deg_limit)) &&
+           (bits_limit == 0 || (qqbar_height_bits(x) + qqbar_height_bits(y) <= bits_limit));
+}
+
 /* Special values */
 
 QQBAR_INLINE void

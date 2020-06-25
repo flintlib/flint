@@ -16,6 +16,45 @@
 todo: use cached enclosure  &K->data.func.enclosure
 */
 
+#define ARB_CONST(f) \
+    f(acb_realref(res), prec); \
+    arb_zero(acb_imagref(res)); \
+    break;
+
+#define ACB_UNARY(f) \
+    ca_get_acb_raw(res, K->data.func.args, prec, ctx); \
+    f(res, res, prec); \
+    break;
+
+#define ACB_UNARY_NOPREC(f) \
+    ca_get_acb_raw(res, K->data.func.args, prec, ctx); \
+    f(res, res); \
+    break;
+
+#define ACB_UNARY_REAL(f) \
+    ca_get_acb_raw(res, K->data.func.args, prec, ctx); \
+    f(acb_realref(res), res, prec); \
+    arb_zero(acb_imagref(res)); \
+    break;
+
+#define ACB_UNARY_REAL_NOPREC(f) \
+    ca_get_acb_raw(res, K->data.func.args, prec, ctx); \
+    f(acb_realref(res), res); \
+    arb_zero(acb_imagref(res)); \
+    break;
+
+#define ACB_BINARY(f) \
+    { \
+        acb_t _t; \
+        acb_init(_t); \
+        ca_get_acb_raw(res, K->data.func.args, prec, ctx); \
+        ca_get_acb_raw(_t, K->data.func.args + 1, prec, ctx); \
+        f(res, res, _t, prec); \
+        acb_clear(_t); \
+    } \
+    break;
+
+
 void
 ca_field_func_get_acb_raw(acb_t res, ca_field_t K, slong prec, ca_ctx_t ctx)
 {
@@ -23,18 +62,49 @@ ca_field_func_get_acb_raw(acb_t res, ca_field_t K, slong prec, ca_ctx_t ctx)
 
     switch (K->data.func.func)
     {
-        case CA_Pi:
-            acb_const_pi(res, prec);
-            break;
-        case CA_Exp:
-            ca_get_acb_raw(res, K->data.func.args, prec, ctx);
-            acb_exp(res, res, prec);
-            break;
-        case CA_Log:
-            ca_get_acb_raw(res, K->data.func.args, prec, ctx);
-            acb_log(res, res, prec);
-            break;
-
+        /* Arithmetic */
+        case CA_Neg: ACB_UNARY_NOPREC(acb_neg)
+        case CA_Add: ACB_BINARY(acb_add)
+        case CA_Sub: ACB_BINARY(acb_sub)
+        case CA_Mul: ACB_BINARY(acb_mul)
+        case CA_Div: ACB_BINARY(acb_div)
+        /* Roots */
+        case CA_Sqrt: ACB_UNARY(acb_sqrt)
+        /* CA_Cbrt,  not implemented */
+        /* CA_Root,  not implemented */
+        /* Complex parts */
+        case CA_Abs:  ACB_UNARY_REAL(acb_abs)
+        case CA_Sign: ACB_UNARY(acb_sgn)
+        case CA_Re:   ACB_UNARY_REAL_NOPREC(acb_get_real)
+        case CA_Im:   ACB_UNARY_REAL_NOPREC(acb_get_imag)
+        case CA_Arg:  ACB_UNARY_REAL(acb_arg)
+        case CA_Conjugate:  ACB_UNARY_NOPREC(acb_conj)
+        /* Elementary constants */
+        case CA_Pi:   ARB_CONST(arb_const_pi)
+        /* Elementary functions */
+        case CA_Exp:   ACB_UNARY(acb_exp)
+        case CA_Log:   ACB_UNARY(acb_log)
+        case CA_Pow:   ACB_BINARY(acb_pow)
+        case CA_Cos:   ACB_UNARY(acb_cos)
+        case CA_Sin:   ACB_UNARY(acb_sin)
+        case CA_Tan:   ACB_UNARY(acb_tan)
+        case CA_Cosh:  ACB_UNARY(acb_cosh)
+        case CA_Sinh:  ACB_UNARY(acb_sinh)
+        case CA_Tanh:  ACB_UNARY(acb_tanh)
+        case CA_Atan:   ACB_UNARY(acb_atan)
+        case CA_Acos:   ACB_UNARY(acb_acos)
+        case CA_Asin:   ACB_UNARY(acb_asin)
+        case CA_Atanh:  ACB_UNARY(acb_atanh)
+        case CA_Acosh:  ACB_UNARY(acb_acosh)
+        case CA_Asinh:  ACB_UNARY(acb_asinh)
+        /* Euler's constant */
+        case CA_Euler: ARB_CONST(arb_const_euler)
+        /* Gamma and related functions */
+        case CA_Gamma:        ACB_UNARY(acb_gamma)
+        case CA_LogGamma:     ACB_UNARY(acb_lgamma)
+        case CA_Psi:          ACB_UNARY(acb_digamma)
+        case CA_RiemannZeta:  ACB_UNARY(acb_zeta)
+        case CA_HurwitzZeta:  ACB_BINARY(acb_hurwitz_zeta)
         default:
             flint_printf("ca_field_func_get_acb_raw: unknown function\n");
             flint_abort();

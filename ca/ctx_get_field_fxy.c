@@ -12,14 +12,15 @@
 #include "ca.h"
 
 slong
-_ca_ctx_get_field_fx(ca_ctx_t ctx, calcium_func_code func, const ca_t x)
+_ca_ctx_get_field_fxy(ca_ctx_t ctx, calcium_func_code func, const ca_t x, const ca_t y)
 {
     slong i;
 
     for (i = 0; i < ctx->fields_len; i++)
     {
-        if (((ctx->fields + i)->type == CA_FIELD_TYPE_FUNC) && ((ctx->fields + i)->data.func.func == func) && ((ctx->fields + i)->data.func.args_len == 1) &&
-            ca_equal_repr(x, (ctx->fields + i)->data.func.args, ctx))
+        if (((ctx->fields + i)->type == CA_FIELD_TYPE_FUNC) && ((ctx->fields + i)->data.func.func == func) && ((ctx->fields + i)->data.func.args_len == 2) &&
+            ca_equal_repr(x, (ctx->fields + i)->data.func.args, ctx) &&
+            ca_equal_repr(y, (ctx->fields + i)->data.func.args + 1, ctx))
         {
             break;
         }
@@ -34,7 +35,7 @@ _ca_ctx_get_field_fx(ca_ctx_t ctx, calcium_func_code func, const ca_t x)
         }
 
         ctx->fields_len = i + 1;
-        ca_field_init_fx(ctx->fields + i, func, x, ctx);
+        ca_field_init_fxy(ctx->fields + i, func, x, y, ctx);
     }
 
     return i;

@@ -47,27 +47,56 @@ CALCIUM_INLINE void truth_print(truth_t t)
     if (t == T_UNKNOWN) flint_printf("T_UNKNOWN");
 }
 
-/* todo: IDs for builtin mathematical functions and constants */
+/* IDs for builtin mathematical functions and constants */
+typedef enum
+{
+    /* Arithmetic */
+    CA_Neg,
+    CA_Add,
+    CA_Sub,
+    CA_Mul,
+    CA_Div,
+    /* Roots */
+    CA_Sqrt,
+    CA_Cbrt,
+    CA_Root,
+    /* Complex parts */
+    CA_Abs,
+    CA_Sign,
+    CA_Re,
+    CA_Im,
+    CA_Arg,
+    CA_Conjugate,
+    /* Elementary constants */
+    CA_Pi,
+    /* Elementary functions */
+    CA_Exp,
+    CA_Log,
+    CA_Pow,
+    CA_Cos,
+    CA_Sin,
+    CA_Tan,
+    CA_Cosh,
+    CA_Sinh,
+    CA_Tanh,
+    CA_Atan,
+    CA_Acos,
+    CA_Asin,
+    CA_Atanh,
+    CA_Acosh,
+    CA_Asinh,
+    /* Euler's constant */
+    CA_Euler,
+    /* Gamma and related functions */
+    CA_Gamma,
+    CA_LogGamma,
+    CA_Psi,
+    CA_RiemannZeta,
+    CA_HurwitzZeta,
+    CA_FUNC_CODE_LENGTH
+} calcium_func_code;
 
-#define CA_Neg   10
-#define CA_Add   11
-#define CA_Sub   12
-#define CA_Mul   13
-#define CA_Div   14
-#define CA_Sqrt  15
-#define CA_Root  16
-
-#define CA_Pi    50
-
-#define CA_Exp   100
-#define CA_Log   101
-#define CA_Pow   102
-#define CA_Cos   103
-#define CA_Sin   104
-#define CA_Tan   105
-#define CA_Atan  106
-#define CA_Acos  107
-#define CA_Asin  108
+const char * calcium_func_name(calcium_func_code func);
 
 #ifdef __cplusplus
 }

@@ -11,6 +11,15 @@
 
 #include "ca.h"
 
+static truth_t
+ca_field_is_algebraic(const ca_field_t K, ca_ctx_t ctx)
+{
+    if (K->type == CA_FIELD_TYPE_NF)
+        return T_TRUE;
+
+    return T_UNKNOWN;
+}
+
 truth_t
 ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
 {
@@ -25,6 +34,24 @@ ca_check_is_algebraic(const ca_t x, ca_ctx_t ctx)
     if (x->field == CA_FIELD_ID_QQ ||
         ctx->fields[x->field].type == CA_FIELD_TYPE_NF)
         return T_TRUE;
+
+    if (ctx->fields[x->field].type == CA_FIELD_TYPE_MULTI)
+    {
+        slong len, i;
+
+        len = ctx->fields[x->field].data.multi.len;
+
+        /* todo: handle simple transcendental numbers, e.g. Q(i,pi) */
+        /* need to verify that some the generator is used in the poly */
+        /* for Q(a,b,pi) we don't know, because a, b could cancel out pi */
+        for (i = 0; len; i++)
+        {
+            if (ca_field_is_algebraic(ctx->fields + ctx->fields[x->field].data.multi.ext[i], ctx) != T_TRUE)
+                return T_UNKNOWN;
+        }
+
+        return T_TRUE;
+    }
 
     return T_UNKNOWN;
 }

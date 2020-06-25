@@ -21,16 +21,14 @@ ca_check_is_integer(const ca_t x, ca_ctx_t ctx)
 
         return T_FALSE;
     }
-
-    if (x->field == CA_FIELD_ID_QQ)
+    else if (x->field == CA_FIELD_ID_QQ)
     {
         if (fmpz_is_one(fmpq_denref(CA_FMPQ(x))))
             return T_TRUE;
         else
             return T_FALSE;
     }
-
-    if (x->field == CA_FIELD_ID_QQ_I)
+    else if (x->field == CA_FIELD_ID_QQ_I)
     {
         const fmpz *n, *d;
 
@@ -42,7 +40,14 @@ ca_check_is_integer(const ca_t x, ca_ctx_t ctx)
 
         return T_FALSE;
     }
+    else
+    {
+        /*
+        slong prec;
+        ...
+        */
 
-    return T_UNKNOWN;
+        return T_UNKNOWN;
+    }
 }
 
