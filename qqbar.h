@@ -136,6 +136,22 @@ qqbar_is_neg_one(const qqbar_t x)
     return qqbar_is_integer(x) && fmpz_is_one(QQBAR_COEFFS(x));
 }
 
+QQBAR_INLINE int
+qqbar_is_i(const qqbar_t x)
+{
+    return (qqbar_degree(x) == 2) && fmpz_is_one(QQBAR_COEFFS(x)) &&
+        fmpz_is_zero(QQBAR_COEFFS(x) + 1) && fmpz_is_one(QQBAR_COEFFS(x) + 2) &&
+            arf_sgn(arb_midref(acb_imagref(QQBAR_ENCLOSURE(x)))) > 0;
+}
+
+QQBAR_INLINE int
+qqbar_is_neg_i(const qqbar_t x)
+{
+    return (qqbar_degree(x) == 2) && fmpz_is_one(QQBAR_COEFFS(x)) &&
+        fmpz_is_zero(QQBAR_COEFFS(x) + 1) && fmpz_is_one(QQBAR_COEFFS(x) + 2) &&
+            arf_sgn(arb_midref(acb_imagref(QQBAR_ENCLOSURE(x)))) < 0;
+}
+
 int qqbar_sgn_re(const qqbar_t x);
 
 int qqbar_sgn_im(const qqbar_t x);

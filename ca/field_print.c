@@ -12,26 +12,17 @@
 #include "ca.h"
 
 void
-ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
+ca_field_print_gen(const ca_field_t K, const ca_ctx_t ctx)
 {
-    slong i, len;
-
-    flint_printf("QQ");
-
-    if (K->type == CA_FIELD_TYPE_QQ)
-        return;
-
     if (K->type == CA_FIELD_TYPE_NF)
     {
-        flint_printf("(x) where {x = Algebraic number ");
-        qqbar_printnd(&K->data.nf.x, 10);
-        flint_printf("}");
-        return;
+        if (qqbar_is_i(&K->data.nf.x))
+            flint_printf("I");
+        else
+            qqbar_printnd(&K->data.nf.x, 10);
     }
-
-    if (K->type == CA_FIELD_TYPE_FUNC)
+    else if (K->type == CA_FIELD_TYPE_FUNC)
     {
-        flint_printf("(x) where {x = ");
         flint_printf("%s", calcium_func_name(K->data.func.func));
         if (K->data.func.args_len != 0)
         {
@@ -45,6 +36,31 @@ ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
             }
             flint_printf(")");
         }
+    }
+}
+
+void
+ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
+{
+    slong i, len;
+
+    flint_printf("QQ");
+
+    if (K->type == CA_FIELD_TYPE_QQ)
+        return;
+
+    if (K->type == CA_FIELD_TYPE_NF)
+    {
+        flint_printf("(x) where {x = Algebraic number ");
+        ca_field_print_gen(K, ctx);
+        flint_printf("}");
+        return;
+    }
+
+    if (K->type == CA_FIELD_TYPE_FUNC)
+    {
+        flint_printf("(x) where {x = ");
+        ca_field_print_gen(K, ctx);
         flint_printf("}");
     }
 
@@ -62,11 +78,11 @@ ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
         flint_printf(") where {");
         for (i = 0; i < len; i++)
         {
-            flint_printf("x%wd = [", i + 1);
+            flint_printf("x%wd = ", i + 1);
 
-            ca_field_print(ctx->fields + K->data.multi.ext[i], ctx);
+            ca_field_print_gen(ctx->fields + K->data.multi.ext[i], ctx);
 
-            flint_printf("]");
+            flint_printf("");
 
             if (i < len - 1)
                 flint_printf(", ");

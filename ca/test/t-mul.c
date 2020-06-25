@@ -21,6 +21,72 @@ int main()
 
     flint_randinit(state);
 
+    /* check special values */
+    {
+        ca_ctx_t ctx;
+        ca_t x, y, z;
+
+        ca_ctx_init(ctx);
+        ca_init(x, ctx);
+        ca_init(y, ctx);
+        ca_init(z, ctx);
+
+        ca_set_si(x, 2, ctx);
+        ca_uinf(y, ctx);
+        ca_mul(z, x, y, ctx);
+
+        if (ca_check_is_uinf(z, ctx) != T_TRUE)
+        {
+            flint_printf("FAIL: 2 * uinf\n");
+            flint_abort();
+        }
+
+        ca_zero(x, ctx);
+        ca_uinf(y, ctx);
+        ca_mul(z, x, y, ctx);
+
+        if (ca_check_is_undefined(z, ctx) != T_TRUE)
+        {
+            flint_printf("FAIL: 0 * uinf\n");
+            flint_abort();
+        }
+
+        ca_zero(x, ctx);
+        ca_pos_inf(y, ctx);
+        ca_mul(z, x, y, ctx);
+
+        if (ca_check_is_undefined(z, ctx) != T_TRUE)
+        {
+            flint_printf("FAIL: 0 * +inf\n");
+            flint_abort();
+        }
+
+        ca_set_si(x, -2, ctx);
+        ca_pos_inf(y, ctx);
+        ca_mul(z, x, y, ctx);
+
+        if (ca_check_is_neg_inf(z, ctx) != T_TRUE)
+        {
+            flint_printf("FAIL: -2 * +inf\n");
+            flint_abort();
+        }
+
+        ca_pos_inf(x, ctx);
+        ca_uinf(y, ctx);
+        ca_mul(z, x, y, ctx);
+
+        if (ca_check_is_uinf(z, ctx) != T_TRUE)
+        {
+            flint_printf("FAIL: +inf * uinf\n");
+            flint_abort();
+        }
+
+        ca_clear(x, ctx);
+        ca_clear(y, ctx);
+        ca_clear(z, ctx);
+        ca_ctx_clear(ctx);
+    }
+
     for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
     {
         ca_ctx_t ctx;

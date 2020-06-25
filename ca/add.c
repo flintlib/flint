@@ -142,6 +142,12 @@ ca_add(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
             return;
         }
 
+        if ((xfield & CA_UNKNOWN) || (yfield & CA_UNKNOWN))
+        {
+            ca_unknown(res, ctx);
+            return;
+        }
+
         if (!CA_IS_SPECIAL(y))
         {
             ca_set(res, x, ctx);
@@ -154,6 +160,18 @@ ca_add(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
             return;
         }
 
+        if ((xfield & CA_UNSIGNED_INF) && ((yfield & CA_SIGNED_INF) || (yfield & CA_UNSIGNED_INF)))
+        {
+            ca_undefined(res, ctx);
+            return;
+        }
+
+        if ((yfield & CA_UNSIGNED_INF) && (xfield & CA_SIGNED_INF))
+        {
+            ca_undefined(res, ctx);
+            return;
+        }
+
         if ((xfield & CA_SIGNED_INF) && (yfield & CA_SIGNED_INF))
         {
             truth_t eq = ca_check_equal(x, y, ctx);
@@ -162,6 +180,9 @@ ca_add(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                 ca_set(res, x, ctx);
             else if (eq == T_FALSE)   /* sum of infs with different sign */
                 ca_undefined(res, ctx);
+            else
+                ca_unknown(res, ctx);
+            return;
         }
 
         ca_unknown(res, ctx);

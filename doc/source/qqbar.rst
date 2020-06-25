@@ -129,6 +129,11 @@ Properties
 
     Returns whether *x* is the number 1.
 
+.. function:: int qqbar_is_i(const qqbar_t x)
+              int qqbar_is_neg_i(const qqbar_t x)
+
+    Returns whether *x* is the imaginary unit `i` (respectively `-i`).
+
 .. function:: int qqbar_is_real(const qqbar_t x)
 
     Returns whether *x* is a real number.

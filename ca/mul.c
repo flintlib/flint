@@ -168,6 +168,12 @@ ca_mul(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
             return;
         }
 
+        if ((xfield & CA_UNKNOWN) || (yfield & CA_UNKNOWN))
+        {
+            ca_unknown(res, ctx);
+            return;
+        }
+
         if ((xfield & CA_UNSIGNED_INF) && ((yfield & CA_UNSIGNED_INF) || (yfield & CA_SIGNED_INF)))
         {
             ca_uinf(res, ctx);
