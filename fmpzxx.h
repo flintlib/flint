@@ -327,6 +327,12 @@ struct fmpz_data
         fmpz_set_si(inner, t);
     }
 
+    void init(double d)
+    {
+        fmpz_init(inner);
+        fmpz_set_d(inner, d);
+    }
+
     void init(const char* str)
     {
         fmpz_init(inner);
