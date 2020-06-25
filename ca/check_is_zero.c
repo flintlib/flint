@@ -87,6 +87,8 @@ fmpz_mpoly_evaluate_qqbar(qqbar_t res, const fmpz_mpoly_t pol, qqbar_srcptr x, s
     qqbar_swap(res, s);
 
 cleanup:
+    flint_free(exp);
+
     qqbar_clear(s);
     qqbar_clear(t);
     qqbar_clear(u);

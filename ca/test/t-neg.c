@@ -130,6 +130,7 @@ int main()
 
         ca_clear(x, ctx);
         ca_clear(y, ctx);
+        ca_clear(z, ctx);
         ca_ctx_clear(ctx);
     }
 

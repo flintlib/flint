@@ -64,6 +64,7 @@ fmpz_mpoly_evaluate_acb(acb_t res, const fmpz_mpoly_t pol, acb_srcptr x, slong p
 
     acb_swap(res, s);
 
+    flint_free(exp);
     acb_clear(s);
     acb_clear(t);
     acb_clear(u);
