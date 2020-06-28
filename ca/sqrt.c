@@ -21,7 +21,7 @@ ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
             ca_sgn(res, x, ctx);
             ca_sqrt(res, res, ctx);
             if (!ca_is_unknown(res, ctx))
-                res->field &= CA_SIGNED_INF;
+                res->field |= CA_SIGNED_INF;
         }
         else
         {
