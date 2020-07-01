@@ -496,7 +496,7 @@ Polynomial roots
 
     - QQBAR_ROOTS_IRREDUCIBLE - if set, *poly* is assumed to be
       irreducible (it may still have constant content), and no polynomial
-      factorisation is performed internally.
+      factorization is performed internally.
 
 .. function:: void qqbar_eigenvalues_fmpz_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags)
               void qqbar_eigenvalues_fmpq_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags)

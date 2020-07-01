@@ -12,7 +12,21 @@
 #include "ca.h"
 
 void
-ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
+ca_sqrt_inert(ca_t res, const ca_t x, ca_ctx_t ctx)
+{
+    if (CA_IS_SPECIAL(x))
+    {
+        /* todo: could compute inert sign + sqrt for signed inf */
+        ca_sqrt(res, x, ctx);
+    }
+    else
+    {
+        _ca_function_fx(res, CA_Sqrt, x, ctx);
+    }
+}
+
+void
+ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     if (CA_IS_SPECIAL(x))
     {
@@ -49,5 +63,11 @@ ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
 
         qqbar_clear(t);
     }
+}
+
+void
+ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
+{
+    ca_sqrt_nofactor(res, x, ctx);
 }
 

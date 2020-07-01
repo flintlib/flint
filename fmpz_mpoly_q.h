@@ -270,6 +270,29 @@ fmpz_mpoly_divexact(fmpz_mpoly_t res, const fmpz_mpoly_t x, const fmpz_mpoly_t y
         fmpz_mpoly_div(res, x, y, ctx);
 }
 
+/* Content */
+
+FMPZ_MPOLY_Q_INLINE void
+_fmpz_mpoly_q_content(fmpz_t num, fmpz_t den, const fmpz_mpoly_t xnum, const fmpz_mpoly_t xden, const fmpz_mpoly_ctx_t ctx)
+{
+    if (fmpz_mpoly_is_zero(xnum, ctx))
+    {
+        fmpz_one(num);
+        fmpz_one(den);
+    }
+    else
+    {
+        _fmpz_vec_content(den, xden->coeffs, xden->length);
+        _fmpz_vec_content(num, xnum->coeffs, xnum->length);
+    }
+}
+
+FMPZ_MPOLY_Q_INLINE void
+fmpz_mpoly_q_content(fmpq_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx)
+{
+    _fmpz_mpoly_q_content(fmpq_numref(res), fmpq_denref(res), fmpz_mpoly_q_numref(x), fmpz_mpoly_q_denref(x), ctx);
+}
+
 /* Evaluation */
 
 void fmpz_mpoly_q_evaluate_acb(acb_t res, const fmpz_mpoly_q_t f, acb_srcptr x, slong prec, const fmpz_mpoly_ctx_t ctx);

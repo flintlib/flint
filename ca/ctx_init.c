@@ -42,5 +42,6 @@ ca_ctx_init(ca_ctx_t ctx)
     ctx->options[CA_OPT_PREC_LIMIT] = 4096;
     ctx->options[CA_OPT_QQBAR_DEG_LIMIT] = 120;
     ctx->options[CA_OPT_LOW_PREC] = 64;
+    ctx->options[CA_OPT_SMOOTH_LIMIT] = 32;
 }
 

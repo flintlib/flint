@@ -174,7 +174,15 @@ Input and output
 
 .. function:: void ca_print(const ca_t x, const ca_ctx_t ctx)
 
-    Prints a description of *x* to standard output.
+    Prints a symbolic description of *x* to standard output.
+
+.. function:: void ca_printn(const ca_t x, slong n, ulong flags, const ca_ctx_t ctx)
+
+    Prints an *n*-digit numerical representation of *x* to standard output.
+    This is equivalent to calling :func:`ca_get_acb` followed by
+    *acb_printn*; the *flags* are forwarded. In particular, *flags*
+    may be set to some combination of ``ARB_STR_NO_RADIUS``,
+    ``ARB_STR_MORE``, ``ARB_STR_CONDENSE`` (multiplied by some integer).
 
 Assignment and specific values
 -------------------------------------------------------------------------------
@@ -261,7 +269,7 @@ Conversion of algebraic numbers
 
     * If *x* is quadratic, it will be expressed as an element of
       `\mathbb{Q}(\sqrt{N})` where *N* has no small repeated factors
-      (obtained by performing a smooth factorisation of the discriminant).
+      (obtained by performing a smooth factorization of the discriminant).
 
     * TODO: if possible, coerce *x* to a low-degree cyclotomic field.
 
@@ -578,12 +586,27 @@ Arithmetic
     In any other case involving special values, or if the specific case cannot
     be distinguished, the result is *Unknown*.
 
-Roots
+Powers and roots
 -------------------------------------------------------------------------------
+
+.. function:: void ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx)
+              void ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
+              void ca_pow_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx)
+              void ca_pow_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx)
+              void ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
+
+    Sets *res* to *x* raised to the power *y*.
+    Handling of special values is not yet implemented.
+
+.. function:: void ca_sqrt_inert(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+.. function:: void ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
+
+.. function:: void ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 
 .. function:: void ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
 
-    Sets *res* to the square root of *x*.
+    Sets *res* to the principal square root of *x*.
 
     For special values, the following definitions apply:
 
@@ -593,12 +616,21 @@ Roots
 
     * Both *Undefined* and *Unknown* map to themselves.
 
-    This function will attempt to simplify its argument through an exact
-    computation. It may in particular attempt to simplify `\sqrt{x}` to
-    a single element in `\overline{\mathbb{Q}}`.
+    The *inert* version outputs the generator in the formal field
+    `\mathbb{Q}(\sqrt{x})` without simplifying.
 
-    In the generic case, this function outputs an element of the formal
-    field `\mathbb{Q}(\sqrt{x})`.
+    The *factor* version writes `x = A^2 B` in `K` where `K` is
+    the field of *x*, and outputs `A \sqrt{B}` or
+    `-A \sqrt{B}` (whichever gives the correct sign) as an element of
+    `K(\sqrt{B})` or some subfield thereof.
+    This factorization is only a heuristic and is not guaranteed
+    to make `B` minimal.
+    Factorization options can be passed through to *flags*: see
+    :func:`ca_factor` for details.
+
+    The *nofactor* version will not perform a general factorization, but
+    may still perform other simplifications. It may in particular attempt to
+    simplify `\sqrt{x}` to a single element in `\overline{\mathbb{Q}}`.
 
 Complex parts
 -------------------------------------------------------------------------------
@@ -694,6 +726,119 @@ Numerical evaluation
     without adaptive refinement.
     If *x* is any special value, *res* is set to *acb_indeterminate*.
 
+.. function:: void ca_get_acb(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
+
+.. function:: void ca_get_acb_accurate_parts(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
+
+    Sets *res* to an enclosure of the numerical value of *x*.
+    The working precision is increased adaptively to try to ensure *prec*
+    accurate bits in the output. The *accurate_parts* version tries to ensure
+    *prec* accurate bits for both the real and imaginary part separately.
+
+    The refinement is stopped if the working precision exceeds
+    ``CA_OPT_PREC_LIMIT`` (or twice the initial precision, if this is larger).
+    The user may call *acb_rel_accuracy_bits* to check is the calculation
+    was successful.
+
+    The output is not rounded down to *prec* bits (to avoid unnecessary
+    double rounding); the user may call *acb_set_round* when rounding
+    is desired.
+
+Factorization
+-------------------------------------------------------------------------------
+
+.. type:: ca_factor_struct
+
+.. type:: ca_factor_t
+
+    Represents a real or complex number in factored form
+    `b_1^{e_1} b_2^{e_2} \cdots b_n^{e_n}` where `b_i` and `e_i`
+    are :type:`ca_t` numbers (the exponents need not be integers).
+
+.. function:: void ca_factor_init(ca_factor_t fac, ca_ctx_t ctx)
+
+    Initializes *fac* and sets it to the empty factorization
+    (equivalent to the number 1).
+
+.. function:: void ca_factor_clear(ca_factor_t fac, ca_ctx_t ctx)
+
+    Cleares the factorization structure *fac*.
+
+.. function:: void ca_factor_one(ca_factor_t fac, ca_ctx_t ctx)
+
+    Sets *fac* to the empty factorization (equivalent to the number 1).
+
+.. function:: void ca_factor_print(const ca_factor_t fac, ca_ctx_t ctx)
+
+    Prints a description of *fac* to standard output.
+
+.. function:: void ca_factor_insert(ca_factor_t fac, const ca_t base, const ca_t exp, ca_ctx_t ctx)
+
+    Inserts `b^e` into *fac* where *b* is given by *base* and *e*
+    is given by *exp*. If a base element structurally identical to *base*
+    already exists in *fac*, the corresponding exponent is incremented by *exp*;
+    otherwise, this factor is appended.
+
+.. function:: void ca_factor_get_ca(ca_t res, const ca_factor_t fac, ca_ctx_t ctx)
+
+    Expands *fac* back to a single :type:`ca_t` by evaluating the powers
+    and multiplying out the result.
+
+.. function:: void ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
+
+    Sets *res* to a factorization of *x*
+    of the form `x = b_1^{e_1} b_2^{e_2} \cdots b_n^{e_n}`.
+    Requires that *x* is not a special value.
+    The type of factorization is controlled by *flags*, which can be set
+    to a combination of constants in the following section.
+
+Factorization options
+................................................................................
+
+The following flags select the structural polynomial factorization to
+perform over formal fields `\mathbb{Q}(a_1,\ldots,a_n)`.
+Each flag in the list strictly encompasses the factorization power of
+the preceding flag, so it is unnecessary to pass more than one flag.
+
+.. macro:: CA_FACTOR_POLY_NONE
+
+    No polynomial factorization at all.
+
+.. macro:: CA_FACTOR_POLY_CONTENT
+
+    Only extract the rational content.
+
+.. macro:: CA_FACTOR_POLY_SQF
+
+    Perform a squarefree factorization in addition to extracting
+    the rational content.
+
+.. macro:: CA_FACTOR_POLY_FULL
+
+    Perform a full multivariate polynomial factorization.
+
+The following flags select the factorization to perform over `\mathbb{Z}`.
+Integer factorization is applied if *x* is an element of `\mathbb{Q}`, and to
+the extracted rational content of polynomials.
+Each flag in the list strictly encompasses the factorization power of
+the preceding flag, so it is unnecessary to pass more than one flag.
+
+.. macro:: CA_FACTOR_ZZ_NONE
+
+    No integer factorization at all.
+
+.. macro:: CA_FACTOR_ZZ_SMOOTH
+
+    Perform a smooth factorization to extract small prime factors
+    (heuristically up to ``CA_OPT_SMOOTH_LIMIT`` bits) in addition to
+    identifying perfect powers.
+
+.. macro:: CA_FACTOR_ZZ_FULL
+
+    Perform a complete integer factorization into prime numbers.
+    This is prohibitively slow for general integers exceeding 70-80 digits.
+
+    
 
 Context options
 -------------------------------------------------------------------------------
@@ -727,6 +872,10 @@ The values of the array at the following indices can be changed by the user
 
     Numerical precision to use for fast checks (typically, before attempting
     more expensive operations). Default value: 64.
+
+.. macro:: CA_OPT_SMOOTH_LIMIT
+
+    Size in bits for factors in smooth integer factorization. Default value: 32.
 
 Internal representation
 -------------------------------------------------------------------------------

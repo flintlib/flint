@@ -162,6 +162,7 @@ enum
     CA_OPT_PREC_LIMIT,
     CA_OPT_QQBAR_DEG_LIMIT,
     CA_OPT_LOW_PREC,
+    CA_OPT_SMOOTH_LIMIT,
     CA_OPT_NUM_OPTIONS
 };
 
@@ -268,6 +269,7 @@ int ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx);
 int ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx);
 
 void ca_print(const ca_t x, const ca_ctx_t ctx);
+void ca_printn(const ca_t x, slong n, ulong flags, ca_ctx_t ctx);
 
 /* Random generation */
 
@@ -353,8 +355,17 @@ void ca_div_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
 void ca_div_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
 void ca_div(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
 
-/* Roots */
+/* Powers and roots */
 
+void ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t y, ca_ctx_t ctx);
+void ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx);
+void ca_pow_ui(ca_t res, const ca_t x, ulong y, ca_ctx_t ctx);
+void ca_pow_si(ca_t res, const ca_t x, slong y, ca_ctx_t ctx);
+void ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx);
+
+void ca_sqrt_inert(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx);
+void ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx);
 void ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 /* Complex parts */
@@ -370,6 +381,38 @@ void ca_log(ca_t res, const ca_t x, ca_ctx_t ctx);
 /* Numerical evaluation */
 
 void ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);
+void ca_get_acb(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);
+void ca_get_acb_accurate_parts(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);
+
+/* Factorisation */
+
+#define CA_FACTOR_ZZ_NONE        0
+#define CA_FACTOR_ZZ_SMOOTH      2
+#define CA_FACTOR_ZZ_FULL        4
+#define CA_FACTOR_POLY_NONE      0
+#define CA_FACTOR_POLY_CONTENT   64
+#define CA_FACTOR_POLY_SQF       128
+#define CA_FACTOR_POLY_FULL      256
+
+typedef struct
+{
+    ca_ptr base;
+    ca_ptr exp;
+    slong length;
+    slong alloc;
+}
+ca_factor_struct;
+
+typedef ca_factor_struct ca_factor_t[1];
+
+void ca_factor_init(ca_factor_t fac, ca_ctx_t ctx);
+void ca_factor_clear(ca_factor_t fac, ca_ctx_t ctx);
+void ca_factor_one(ca_factor_t fac, ca_ctx_t ctx);
+void ca_factor_print(const ca_factor_t fac, ca_ctx_t ctx);
+void ca_factor_insert(ca_factor_t fac, const ca_t base, const ca_t exp, ca_ctx_t ctx);
+void ca_factor_get_ca(ca_t res, const ca_factor_t fac, ca_ctx_t ctx);
+
+void ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx);
 
 #ifdef __cplusplus
 }

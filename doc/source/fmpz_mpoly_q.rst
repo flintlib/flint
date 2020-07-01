@@ -179,6 +179,15 @@ Arithmetic
     Sets *res* to the inverse of *x*. Division by zero
     calls *flint_abort*.
 
+Content
+-------------------------------------------------------------------------------
+
+.. function:: void _fmpz_mpoly_q_content(fmpz_t num, fmpz_t den, const fmpz_mpoly_t xnum, const fmpz_mpoly_t xden, const fmpz_mpoly_ctx_t ctx)
+
+.. function:: void fmpz_mpoly_q_content(fmpq_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx)
+
+    Sets *res* to the content of the coefficients of *x*.
+
 
 .. raw:: latex
 
