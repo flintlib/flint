@@ -358,6 +358,12 @@ FQ_NMOD_INLINE void fq_nmod_gen(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
     }
 }
 
+FLINT_DLL void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b,
+                                                      const fq_nmod_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
+                                                      const fq_nmod_ctx_t ctx);
+
 /* Output ********************************************************************/
 
 FQ_NMOD_INLINE 

@@ -327,6 +327,16 @@ FQ_INLINE void fq_gen(fq_t rop, const fq_ctx_t ctx)
     }
 }
 
+FLINT_DLL void fq_get_fmpz_poly(fmpz_poly_t a, const fq_t b, const fq_ctx_t ctx);
+
+FLINT_DLL void fq_set_fmpz_poly(fq_t a, const fmpz_poly_t b, const fq_ctx_t ctx);
+
+FLINT_DLL void fq_get_fmpz_mod_poly(fmpz_mod_poly_t a, const fq_t b,
+                                                           const fq_ctx_t ctx);
+
+FLINT_DLL void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b,
+                                                           const fq_ctx_t ctx);
+
 /* Output ********************************************************************/
 
 FQ_INLINE

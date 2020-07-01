@@ -365,14 +365,21 @@ Assignments and conversions
     There is no guarantee this is a multiplicative generator of
     the finite field.
 
+.. function:: void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx);
+
+    Set ``a`` to a representative of ``b`` in ``ctx``.
+
+.. function:: void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t ctx);
+
+    Set ``a`` to the element in ``ctx`` with representative ``b``.
+
 .. function:: void fq_nmod_get_nmod_mat(nmod_mat_t col, const fq_nmod_t a, const fq_nmod_ctx_t ctx)
 
     Convert ``a`` to a column vector of length ``degree(ctx)``.
 
 .. function:: void fq_nmod_set_nmod_mat(fq_nmod_t a, const nmod_mat_t col, const fq_nmod_ctx_t ctx)
 
-    Convert a column vector ``col`` of length ``degree(ctx)`` to
-    an element of ``ctx``.
+    Convert a column vector ``col`` of length ``degree(ctx)`` to an element of ``ctx``.
 
 
 Comparison
