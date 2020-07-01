@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Daniel Schultz
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,18 +9,20 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly.h"
+#include "fq_nmod.h"
 
-void fq_nmod_mpoly_clear(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+int fq_nmod_cmp(const fq_nmod_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
 {
     slong i;
 
-    if (A->alloc > 0)
-    {
-        for (i = 0; i < A->alloc; i++)
-            fq_nmod_clear(A->coeffs + i, ctx->fqctx);
+    if (a->length != b->length)
+        return a->length < b->length ? -1 : 1;
 
-        flint_free(A->coeffs);
-        flint_free(A->exps);
+    for (i = 0; i < a->length; i++)
+    {
+        if (a->coeffs[i] != b->coeffs[i])
+            return a->coeffs[i] < b->coeffs[i] ? -1 : 1;
     }
+
+    return 0;
 }

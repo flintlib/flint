@@ -400,6 +400,10 @@ Comparison
     Returns whether ``op`` is an invertible element.  If it is not,
     then ``f`` is set of a factor of the modulus.
 
+.. function:: int fq_nmod_cmp(const fq_nmod_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
+
+    Return ``1`` (resp. ``-1``, or ``0``) if ``a`` is after (resp. before, same as) ``b`` in some arbitrary but fixed total ordering of the elements.
+
 
 Special functions
 --------------------------------------------------------------------------------

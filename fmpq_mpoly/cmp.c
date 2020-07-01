@@ -14,13 +14,38 @@
 int fmpq_mpoly_cmp(const fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-    if (A->zpoly->length != 1 || B->zpoly->length != 1
-        || !fmpq_is_one(A->content) || !fmpq_is_one(B->content))
+    int cmp;
+    slong i;
+    slong length = A->zpoly->length;
+    fmpz * Acoeffs = A->zpoly->coeffs;
+    fmpz * Bcoeffs = B->zpoly->coeffs;
+
+    if (A->zpoly->length != B->zpoly->length)
+        return A->zpoly->length < B->zpoly->length ? -1 : 1;
+
+    if (length <= 0)
+        return 0;
+
+    cmp = mpoly_monomials_cmp(A->zpoly->exps, A->zpoly->bits,
+                              B->zpoly->exps, B->zpoly->bits,
+                                                     length, ctx->zctx->minfo);
+    if (cmp != 0)
+        return cmp;
+
+    cmp = fmpz_cmp(fmpq_denref(A->content), fmpq_denref(B->content));
+    if (cmp != 0)
+        return cmp;
+
+    cmp = fmpz_cmp(fmpq_numref(A->content), fmpq_numref(B->content));
+    if (cmp != 0)
+        return cmp;
+
+    for (i = 0; i < length; i++)
     {
-        flint_throw(FLINT_ERROR, "Inputs to cmp are not both monomials");
+        cmp = fmpz_cmp(Acoeffs + i, Bcoeffs + i);
+        if (cmp != 0)
+            return cmp;
     }
 
-    return mpoly_monomial_cmp_general(A->zpoly->exps, A->zpoly->bits,
-                                      B->zpoly->exps, B->zpoly->bits,
-                                                             ctx->zctx->minfo);
+    return 0;
 }
