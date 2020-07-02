@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -13,21 +13,22 @@
 
 #include "fq_zech.h"
 
-void
-fq_zech_set_nmod_poly(fq_zech_t rop, const nmod_poly_t op,
+void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b,
                                                        const fq_zech_ctx_t ctx)
 {
+    slong blen = b->length;
+    const mp_limb_t * bcoeffs = b->coeffs;
+    mp_limb_t qm1 = ctx->qm1;
     mp_limb_t i;
     fq_zech_t t;
-    fq_zech_zero(rop, ctx);
-    for (i = 0; i < op->length; i++)
+    fq_zech_zero(a, ctx);
+
+    for (i = 0; i < blen; i++)
     {
-        if (op->coeffs[i] == 0)
-        {
+        if (bcoeffs[i] == 0)
             continue;
-        }
-        t->value = i;
-        fq_zech_mul_ui(t, t, op->coeffs[i], ctx);
-        fq_zech_add(rop, rop, t, ctx);
+        t->value = (blen <= qm1) ? i : (i % qm1);
+        fq_zech_mul_ui(t, t, bcoeffs[i], ctx);
+        fq_zech_add(a, a, t, ctx);
     }
 }

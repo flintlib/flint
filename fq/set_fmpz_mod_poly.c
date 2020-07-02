@@ -17,12 +17,25 @@ void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b, const fq_ctx_t ctx)
 
     FLINT_ASSERT(fmpz_equal(&b->p, &ctx->p));
 
-    fmpz_poly_fit_length(a, len);
+    if (len <= 2*(ctx->modulus->length - 1))
+    {
+        fmpz_poly_fit_length(a, len);
 
-    for (i = 0; i < len; i++)
-        fmpz_set(a->coeffs + i, b->coeffs + i);
+        for (i = 0; i < len; i++)
+            fmpz_set(a->coeffs + i, b->coeffs + i);
 
-    _fmpz_poly_set_length(a, len);
+        _fmpz_poly_set_length(a, len);
 
-    fq_reduce(a, ctx);
+        fq_reduce(a, ctx);
+    }
+    else
+    {
+        fmpz_mod_poly_t q, r;
+        fmpz_mod_poly_init(q, fq_ctx_prime(ctx));
+        fmpz_mod_poly_init(r, fq_ctx_prime(ctx));
+        fmpz_mod_poly_divrem(q, r, b, fq_ctx_modulus(ctx));
+        fmpz_mod_poly_get_fmpz_poly(a, r);
+        fmpz_mod_poly_clear(q);
+        fmpz_mod_poly_clear(r);
+    }
 }

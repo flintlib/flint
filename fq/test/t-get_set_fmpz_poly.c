@@ -20,22 +20,28 @@ main(void)
     flint_printf("get/set_fmpz_poly... ");
     fflush(stdout);
 
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_t x, y;
-        fmpz_poly_t z;
+        fmpz_poly_t z, t1, t2;
 
         fq_ctx_randtest(ctx, state);
         fq_init(x, ctx);
         fq_init(y, ctx);
         fmpz_poly_init(z);
+        fmpz_poly_init(t1);
+        fmpz_poly_init(t2);
 
-        for (j = 0; j < 100; j++)
+        for (j = 0; j < 20; j++)
         {
             fq_rand(x, state, ctx);
             fq_rand(y, state, ctx);
             fq_get_fmpz_poly(z, x, ctx);
+            fmpz_poly_randtest(t1, state, 20, 200);
+            fmpz_mod_poly_get_fmpz_poly(t2, ctx->modulus);
+            fmpz_poly_mul(t1, t1, t2);
+            fmpz_poly_add(z, z, t1);
             fq_set_fmpz_poly(y, z, ctx);
 
             if (!fq_equal(y, x, ctx))
@@ -46,6 +52,8 @@ main(void)
             }
         }
 
+        fmpz_poly_clear(t2);
+        fmpz_poly_clear(t1);
         fmpz_poly_clear(z);
         fq_clear(y, ctx);
         fq_clear(x, ctx);

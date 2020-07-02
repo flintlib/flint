@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 

@@ -13,6 +13,22 @@
 
 void fq_set_fmpz_poly(fq_t a, const fmpz_poly_t b, const fq_ctx_t ctx)
 {
-    fmpz_poly_set(a, b);
-    fq_reduce(a, ctx);
+    if (b->length <= 2*(ctx->modulus->length - 1))
+    {
+        fmpz_poly_set(a, b);
+        fq_reduce(a, ctx);
+    }
+    else
+    {
+        fmpz_mod_poly_t bp, q, r;
+        fmpz_mod_poly_init(bp, fq_ctx_prime(ctx));
+        fmpz_mod_poly_init(q, fq_ctx_prime(ctx));
+        fmpz_mod_poly_init(r, fq_ctx_prime(ctx));
+        fmpz_mod_poly_set_fmpz_poly(bp, b);
+        fmpz_mod_poly_divrem(q, r, bp, ctx->modulus);
+        fmpz_mod_poly_get_fmpz_poly(a, r);
+        fmpz_mod_poly_clear(bp);
+        fmpz_mod_poly_clear(q);
+        fmpz_mod_poly_clear(r);
+    }
 }

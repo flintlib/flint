@@ -16,6 +16,14 @@ void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
 {
     FLINT_ASSERT(a->mod.n == b->mod.n);
     FLINT_ASSERT(a->mod.n == ctx->modulus->mod.n);
-    nmod_poly_set(a, b);
-    fq_nmod_reduce(a, ctx);
+
+    if (b->length <= 2*(ctx->modulus->length - 1))
+    {
+        nmod_poly_set(a, b);
+        fq_nmod_reduce(a, ctx);
+    }
+    else
+    {
+        nmod_poly_rem(a, b, ctx->modulus);
+    }
 }

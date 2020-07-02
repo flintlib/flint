@@ -33,14 +33,18 @@ main(void)
         for (i = 0; i < 100; i++)
         {
             fq_nmod_t a, b;
-            nmod_poly_t c;
+            nmod_poly_t c, t;
 
             fq_nmod_init(a, ctx);
             fq_nmod_init(b, ctx);
             nmod_poly_init(c, 1); /* modulus don't care */
+            nmod_poly_init_mod(t, ctx->modulus->mod);
 
             fq_nmod_randtest(a, state, ctx);
             fq_nmod_get_nmod_poly(c, a, ctx);
+            nmod_poly_randtest(t, state, 20);
+            nmod_poly_mul(t, t, ctx->modulus);
+            nmod_poly_add(c, c, t);
             fq_nmod_set_nmod_poly(b, c, ctx);
 
             if (!fq_nmod_equal(a, b, ctx))
@@ -57,6 +61,7 @@ main(void)
             fq_nmod_clear(a, ctx);
             fq_nmod_clear(b, ctx);
             nmod_poly_clear(c);
+            nmod_poly_clear(t);
         }
 
         fq_nmod_ctx_clear(ctx);
