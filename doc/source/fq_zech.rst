@@ -396,12 +396,12 @@ Assignments and conversions
 .. function:: void fq_zech_get_nmod_poly(nmod_poly_t a, const fq_zech_t b, const fq_zech_ctx_t ctx)
 
     Set ``a`` to a representative of ``b`` in ``ctx``.
-    The representatives are taken in `\mathbb{F}_p[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
+    The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
 
 .. function:: void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b, const fq_zech_ctx_t ctx);
 
     Set ``a`` to the element in ``ctx`` with representative ``b``.
-    The representatives are taken in `\mathbb{F}_p[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
+    The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
 
 .. function:: void fq_zech_get_nmod_mat(nmod_mat_t col, const fq_zech_t a, const fq_zech_ctx_t ctx)
 

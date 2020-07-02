@@ -377,14 +377,14 @@ Assignments and conversions
 .. function:: void fq_get_fmpz_mod_poly(fmpz_mod_poly_t a, const fq_t b, const fq_ctx_t ctx)
 
     Set ``a`` to a representative of ``b`` in ``ctx``.
-    The representatives are taken in `\mathbb{F}_p[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
+    The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
 
 .. function:: void fq_set_fmpz_poly(fq_t a, const fmpz_poly_t b, const fq_ctx_t ctx)
 
 .. function:: void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b, const fq_ctx_t ctx)
 
     Set ``a`` to the element in ``ctx`` with representative ``b``.
-    The representatives are taken in `\mathbb{F}_p[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
+    The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
 
 .. function:: void fq_get_fmpz_mod_mat(fmpz_mod_mat_t col, const fq_t a, const fq_ctx_t ctx)
 
