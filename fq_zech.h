@@ -269,9 +269,17 @@ fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t ctx)
     rop->value = 1;
 }
 
-FLINT_DLL void fq_zech_set_fq_nmod(fq_zech_t rop, const fq_nmod_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_set_fq_nmod(fq_zech_t rop, const fq_nmod_t op,
+                                                      const fq_zech_ctx_t ctx);
 
-FLINT_DLL void fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op,
+                                                      const fq_zech_ctx_t ctx);
+
+FLINT_DLL void fq_zech_get_nmod_poly(nmod_poly_t a, const fq_zech_t b,
+                                                      const fq_zech_ctx_t ctx);
+
+FLINT_DLL void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b,
+                                                      const fq_zech_ctx_t ctx);
 
 
 /* Output ********************************************************************/

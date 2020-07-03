@@ -172,25 +172,21 @@ FQ_NMOD_INLINE void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 FQ_NMOD_INLINE 
 void _fq_nmod_sparse_reduce(mp_limb_t *R, slong lenR, const fq_nmod_ctx_t ctx)
 {
+    slong i, k;
     const slong d = ctx->j[ctx->len - 1];
 
     NMOD_VEC_NORM(R, lenR);
 
-    if (lenR > d)
+    for (i = lenR - 1; i >= d; i--)
     {
-        slong i, k;
-
-        for (i = lenR - 1; i >= d; i--)
+        for (k = ctx->len - 2; k >= 0; k--)
         {
-            for (k = ctx->len - 2; k >= 0; k--)
-            {
-                
-                R[ctx->j[k] + i - d] = n_submod(R[ctx->j[k] + i - d],
-                                                n_mulmod2_preinv(R[i], ctx->a[k], ctx->mod.n, ctx->mod.ninv),
-                                                ctx->mod.n);
-            }
-            R[i] = UWORD(0);
+            /* TODO clean this mess up */
+            R[ctx->j[k] + i - d] = n_submod(R[ctx->j[k] + i - d],
+                                            n_mulmod2_preinv(R[i], ctx->a[k], ctx->mod.n, ctx->mod.ninv),
+                                            ctx->mod.n);
         }
+        R[i] = UWORD(0);
     }
 }
 
@@ -203,7 +199,7 @@ FQ_NMOD_INLINE void _fq_nmod_dense_reduce(mp_limb_t* R, slong lenR, const fq_nmo
         _nmod_vec_reduce(R, R, lenR, ctx->mod);
         return;
     }
-    
+
     q = _nmod_vec_init(lenR - ctx->modulus->length + 1);
     r = _nmod_vec_init(ctx->modulus->length - 1);
 
@@ -228,6 +224,7 @@ FQ_NMOD_INLINE void _fq_nmod_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_
 
 FQ_NMOD_INLINE void fq_nmod_reduce(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 {
+    FLINT_ASSERT(rop->length <= 2*(ctx->modulus->length - 1));
     _fq_nmod_reduce(rop->coeffs, rop->length, ctx);
     rop->length = FLINT_MIN(rop->length, ctx->modulus->length - 1);
     _nmod_poly_normalise(rop);
@@ -361,6 +358,12 @@ FQ_NMOD_INLINE void fq_nmod_gen(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
         nmod_poly_set_coeff_ui(rop, 1, 1);
     }
 }
+
+FLINT_DLL void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b,
+                                                      const fq_nmod_ctx_t ctx);
+
+FLINT_DLL void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
+                                                      const fq_nmod_ctx_t ctx);
 
 /* Output ********************************************************************/
 
