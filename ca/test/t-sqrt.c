@@ -37,11 +37,11 @@ int main()
         ca_init(d, ctx);
 
         /* test sqrt(x)^2 = x */
-        ca_randtest_special(x, state, 5, 5, ctx);
-        ca_randtest_special(y, state, 5, 5, ctx);
-        ca_randtest_special(z, state, 5, 5, ctx);
-        ca_randtest_special(a, state, 5, 5, ctx);
-        ca_randtest_special(b, state, 5, 5, ctx);
+        ca_randtest(x, state, 5, 5, ctx);
+        ca_randtest(y, state, 5, 5, ctx);
+        ca_randtest(z, state, 5, 5, ctx);
+        ca_randtest(a, state, 5, 5, ctx);
+        ca_randtest(b, state, 5, 5, ctx);
 
         ca_mul(x, x, x, ctx);
         ca_mul(x, x, z, ctx);

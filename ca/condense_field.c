@@ -73,6 +73,65 @@ ca_condense_field(ca_t res, ca_ctx_t ctx)
             fmpq_swap(CA_FMPQ(res), t);
             fmpq_clear(t);
         }
+        else if (0)
+        {
+            /* todo: deflation? */
+
+            /* Sqrt(x): simplify to an element wrt x if all exponents are even */
+            if (ctx->fields[field].data.func.func == CA_Sqrt)
+            {
+                fmpz_t num_shift, num_stride, den_shift, den_stride;
+
+                fmpz_init(num_shift);
+                fmpz_init(num_stride);
+                fmpz_init(den_shift);
+                fmpz_init(den_stride);
+
+                fmpz_mpoly_deflation(num_shift, num_stride, fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), ctx->mctx + 0);
+                fmpz_mpoly_deflation(den_shift, den_stride, fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), ctx->mctx + 0);
+
+                if (fmpz_is_even(num_shift) && fmpz_is_even(num_stride) && fmpz_is_even(den_shift) && fmpz_is_even(den_stride))
+                {
+                    fmpz_mpoly_t a, b;
+
+                    fmpz_mpoly_init(a, ctx->mctx + 0);
+                    fmpz_mpoly_init(b, ctx->mctx + 0);
+
+                    fmpz_zero(num_shift);
+                    fmpz_set_ui(num_stride, 2);
+
+                    /* todo: could be in-place in many cases */
+
+                    fmpz_mpoly_deflate(a, fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), num_shift, num_stride, ctx->mctx + 0);
+                    fmpz_mpoly_deflate(b, fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), num_shift, num_stride, ctx->mctx + 0);
+
+                    if (ctx->fields[field].data.func.args->field == CA_FIELD_ID_QQ)
+                    {
+                    }
+                    else if ((ctx->fields + ctx->fields[field].data.func.args->field)->type == CA_FIELD_TYPE_NF)
+                    {
+                    }
+                    else
+                    {
+                        _ca_make_field_element(res, ctx->fields[field].data.func.args->field, ctx);
+
+  /*                      fmpz_mpoly_q_compose(CA_MPOLY_Q(res), ab,  ... */
+
+                        fmpz_mpoly_swap(fmpz_mpoly_q_numref(CA_MPOLY_Q(res)), a, ctx->mctx + 0);
+                        fmpz_mpoly_swap(fmpz_mpoly_q_denref(CA_MPOLY_Q(res)), b, ctx->mctx + 0);
+                    }
+
+                    fmpz_mpoly_clear(a, ctx->mctx + 0);
+                    fmpz_mpoly_clear(b, ctx->mctx + 0);
+
+                }
+
+                fmpz_clear(num_shift);
+                fmpz_clear(num_stride);
+                fmpz_clear(den_shift);
+                fmpz_clear(den_stride);
+            }
+        }
     }
     else if (type == CA_FIELD_TYPE_MULTI)
     {

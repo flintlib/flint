@@ -14,13 +14,40 @@
 void
 ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
+    truth_t xzero;
+
     if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))
     {
         ca_unknown(res, ctx);
+        return;
     }
-    else if (ca_check_is_zero(x, ctx) != T_FALSE)
+
+    xzero = ca_check_is_zero(x, ctx);
+
+    if (xzero != T_FALSE)
     {
-        /* todo */
+        if (xzero == T_TRUE)
+        {
+            if (CA_FIELD_IS_QQ(y, ctx))
+            {
+                if (fmpq_is_zero(CA_FMPQ(y)))
+                {
+                    ca_one(res, ctx);
+                    return;
+                }
+                else if (fmpq_sgn(CA_FMPQ(y)) > 0)
+                {
+                    ca_zero(res, ctx);
+                    return;
+                }
+                else
+                {
+                    ca_uinf(res, ctx);
+                    return;
+                }
+            }
+        }
+
         ca_unknown(res, ctx);
     }
     else
@@ -56,7 +83,7 @@ ca_pow(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
                 if (fmpz_equal_si(CA_FMPQ_NUMREF(y), -2))
                 {
                     ca_inv(res, x, ctx);
-                    ca_mul(res, x, x, ctx);
+                    ca_mul(res, res, res, ctx);
                     return;
                 }
 

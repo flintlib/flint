@@ -762,7 +762,7 @@ Factorization
 
 .. function:: void ca_factor_clear(ca_factor_t fac, ca_ctx_t ctx)
 
-    Cleares the factorization structure *fac*.
+    Clears the factorization structure *fac*.
 
 .. function:: void ca_factor_one(ca_factor_t fac, ca_ctx_t ctx)
 

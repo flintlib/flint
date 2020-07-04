@@ -70,6 +70,13 @@ ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
             }
         }
 
+/*
+        printf("factors:\n");
+        ca_factor_print(fac, ctx); printf("\n");
+        ca_print(A, ctx); printf("\n");
+        ca_print(B, ctx); printf("\n");
+*/
+
         ca_sqrt_nofactor(B, B, ctx);
         ca_mul(A, A, B, ctx);
 

@@ -21,7 +21,7 @@ ca_ctx_init(ca_ctx_t ctx)
 
     ctx->mctx = flint_malloc(CA_NVARS_DEFAULT * sizeof(fmpz_mpoly_ctx_struct));
     for (i = 0; i < CA_NVARS_DEFAULT; i++)
-        fmpz_mpoly_ctx_init(ctx->mctx + i, i + 1, ORD_LEX);
+        fmpz_mpoly_ctx_init(ctx->mctx + i, i + 1, CA_MPOLY_ORD);
     ctx->mctx_len = CA_NVARS_DEFAULT;
 
     /* Always create QQ, QQ(i) */

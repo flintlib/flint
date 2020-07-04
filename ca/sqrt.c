@@ -26,6 +26,20 @@ ca_sqrt_inert(ca_t res, const ca_t x, ca_ctx_t ctx)
 }
 
 void
+_ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
+{
+    ca_t y, tmp;
+    ca_init(y, ctx);
+    ca_init(tmp, ctx);
+
+    _ca_function_fx(y, CA_Sqrt, x, ctx);
+    ca_merge_fields(tmp, res, x, y, ctx);
+
+    ca_clear(y, ctx);
+    ca_clear(tmp, ctx);
+}
+
+void
 ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     if (CA_IS_SPECIAL(x))
@@ -54,11 +68,11 @@ ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
             if (qqbar_within_limits(t, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], 0))
                 ca_set_qqbar(res, t, ctx);
             else
-                _ca_function_fx(res, CA_Sqrt, x, ctx);
+                _ca_sqrt_nofactor(res, x, ctx);
         }
         else
         {
-            _ca_function_fx(res, CA_Sqrt, x, ctx);
+            _ca_sqrt_nofactor(res, x, ctx);
         }
 
         qqbar_clear(t);

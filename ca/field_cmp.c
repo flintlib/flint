@@ -154,16 +154,75 @@ ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
     return 0;
 }
 
+slong
+ca_field_depth(const ca_field_t K, ca_ctx_t ctx);
+
+slong
+ca_depth(const ca_t x, ca_ctx_t ctx)
+{
+    if (CA_IS_SPECIAL(x))
+        flint_abort();
+
+    return ca_field_depth(ctx->fields + x->field, ctx);
+}
+
+slong
+ca_field_depth(const ca_field_t K, ca_ctx_t ctx)
+{
+    if (K->type == CA_FIELD_TYPE_FUNC)
+    {
+        slong i, depth, depth_i;
+
+        depth = 0;
+
+        for (i = 0; i < K->data.func.args_len; i++)
+        {
+            depth_i = ca_depth(K->data.func.args + i, ctx);
+            depth = FLINT_MAX(depth, depth_i);
+        }
+
+        return depth + 1;
+    }
+
+    if (K->type == CA_FIELD_TYPE_MULTI)
+    {
+        slong i, depth, depth_i;
+
+        depth = 0;
+
+        for (i = 0; i < K->data.multi.len; i++)
+        {
+            depth_i = ca_field_depth(ctx->fields + K->data.multi.ext[i], ctx);
+            depth = FLINT_MAX(depth, depth_i);
+        }
+
+        return depth + 1;
+    }
+
+    return 0;
+}
+
 int
 ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx)
 {
     ca_field_type_t type1, type2;
+    slong depth1, depth2;
 
     if (K1 == K2)
         return 0;
 
     type1 = K1->type;
     type2 = K2->type;
+
+    /* Depth comparison: this is a hack to sort f(x) before x, so that
+       lex ordering can give an elimination order. */
+    depth1 = ca_field_depth(K1, ctx);
+    depth2 = ca_field_depth(K2, ctx);
+
+    if (depth1 < depth2)
+        return -1;
+    if (depth1 > depth2)
+        return 1;
 
     if (type1 != type2)
         return (type1 < type2) ? -1 : 1;

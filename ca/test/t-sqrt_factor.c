@@ -49,8 +49,16 @@ int main()
         /* todo: random flags */
         ca_sqrt_factor(y, x, CA_FACTOR_ZZ_SMOOTH | CA_FACTOR_POLY_FULL, ctx);
         ca_mul(z, y, y, ctx);
+        ca_sub(b, x, z, ctx);
 
         equal = ca_check_equal(x, z, ctx);
+
+/*
+        flint_printf("x = "); ca_print(x, ctx); flint_printf(" ~= "); ca_printn(x, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+        flint_printf("y = "); ca_print(y, ctx); flint_printf(" ~= "); ca_printn(y, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+        flint_printf("z = "); ca_print(z, ctx); flint_printf(" ~= "); ca_printn(z, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n");
+        flint_printf("_ = "); ca_print(b, ctx); flint_printf(" ~= "); ca_printn(b, 10, ARB_STR_NO_RADIUS, ctx); flint_printf("\n\n\n\n");
+*/
 
         if (equal == T_FALSE)
         {
