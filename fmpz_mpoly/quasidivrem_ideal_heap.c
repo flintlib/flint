@@ -678,7 +678,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
@@ -755,7 +755,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
 
         exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
         N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-        cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+        cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
         exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
@@ -807,6 +807,8 @@ cleanup3:
         if (free3[i])
             flint_free(exp3[i]);
     }
+
+    flint_free(cmpmask);
 
     TMP_END;
 }
