@@ -61,9 +61,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                nmod_mpoly_randtest_bounds(t, state, len, degbounds, ctx);
-            } while (t->length == 0);
+            nmod_mpoly_randtest_bounds(t, state, len, degbounds, ctx);
+            if (nmod_mpoly_is_zero(t, ctx))
+                nmod_mpoly_one(t, ctx);
             nmod_mpoly_randtest_bounds(a, state, len1, degbounds1, ctx);
             nmod_mpoly_randtest_bounds(b, state, len2, degbounds2, ctx);
 

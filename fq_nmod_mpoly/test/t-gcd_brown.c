@@ -150,9 +150,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                fq_nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
-            } while (g->length == 0);
+            fq_nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
+            if (fq_nmod_mpoly_is_zero(g, ctx))
+                fq_nmod_mpoly_one(g, ctx);
             fq_nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
             fq_nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
             fq_nmod_mpoly_mul(a, a, g, ctx);

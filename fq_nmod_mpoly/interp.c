@@ -214,7 +214,7 @@ int nmod_mpolyn_interp_crt_lg_poly(
                 changed = 1;
                 fq_nmod_mul(u, v, inv_m_eval, fqctx);
                 nmod_poly_mul(w, u, modulus);
-                nmod_poly_sub(Tcoeffs + 0, Fcoeffs + 0, w);
+                nmod_poly_sub(Tcoeffs + Ti, Fcoeffs + Fi, w);
             }
             else
             {

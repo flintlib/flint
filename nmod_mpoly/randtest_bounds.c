@@ -14,6 +14,7 @@
 void nmod_mpoly_randtest_bounds(nmod_mpoly_t A, flint_rand_t state,
                   slong length, ulong * exp_bounds, const nmod_mpoly_ctx_t ctx)
 {
+    mp_limb_t p = ctx->ffinfo->mod.n;
     slong i, j, nvars = ctx->minfo->nvars;
     ulong * exp;
     TMP_INIT;
@@ -26,9 +27,8 @@ void nmod_mpoly_randtest_bounds(nmod_mpoly_t A, flint_rand_t state,
     {
         for (j = 0; j < nvars; j++)
             exp[j] = n_randint(state, exp_bounds[j]);
-
         _nmod_mpoly_push_exp_ui(A, exp, ctx);
-        A->coeffs[A->length - 1] = n_randint(state, ctx->ffinfo->mod.n);
+        A->coeffs[A->length - 1] = p > 1 ? 1 + n_randint(state, p - 1) : 0;
     }
     nmod_mpoly_sort_terms(A, ctx);
     nmod_mpoly_combine_like_terms(A, ctx);
