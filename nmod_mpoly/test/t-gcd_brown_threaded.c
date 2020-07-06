@@ -159,9 +159,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
             nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
             nmod_mpoly_mul(a, a, g, ctx);
@@ -205,9 +205,9 @@ main(void)
 
         for (j = 0; j < 4; j++)
         {
-            do {
-                nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(g, state, len, degbound, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
             nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
             nmod_mpoly_mul(a, a, g, ctx);
