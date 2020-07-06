@@ -16,14 +16,15 @@
 int
 main(void)
 {
-    int i, j, result;
+    int result;
+    slong i, j, tmul = 10;
     FLINT_TEST_INIT(state);
 
     flint_printf("divrem_monagan_pearce....");
     fflush(stdout);
 
     /* Check f*g/g = f */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5 * tmul * flint_test_multiplier(); i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, k, r;
@@ -49,9 +50,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fq_nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bits2, ctx);
-            } while (g->length == 0);
+            fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bits2, ctx);
+            if (fq_nmod_mpoly_is_zero(g, ctx))
+                fq_nmod_mpoly_one(g, ctx);
             fq_nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
             fq_nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
             fq_nmod_mpoly_randtest_bits(r, state, len, exp_bits, ctx);
@@ -82,7 +83,7 @@ main(void)
     }
 
     /* Check f = g*q + r for random polys */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5 * tmul * flint_test_multiplier(); i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, k, r;
@@ -107,9 +108,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fq_nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
-            do {
-                fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
-            } while (g->length == 0);
+            fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
+            if (fq_nmod_mpoly_is_zero(g, ctx))
+                fq_nmod_mpoly_one(g, ctx);
             fq_nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
             fq_nmod_mpoly_randtest_bound(k, state, len, exp_bound, ctx);
 
@@ -141,7 +142,7 @@ main(void)
     }
 
     /* Check aliasing of quotient with first argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, r1, r2;
@@ -166,9 +167,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fq_nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
-            do {
-                fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
-            } while (g->length == 0);
+            fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
+            if (fq_nmod_mpoly_is_zero(g, ctx))
+                fq_nmod_mpoly_one(g, ctx);
             fq_nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
             fq_nmod_mpoly_randtest_bound(r1, state, len, exp_bound, ctx);
             fq_nmod_mpoly_randtest_bound(r2, state, len, exp_bound, ctx);
@@ -202,7 +203,7 @@ main(void)
     }
 
     /* Check aliasing of quotient with second argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, r1, r2;
@@ -227,9 +228,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fq_nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
-            do {
-                fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
-            } while (g->length == 0);
+            fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
+            if (fq_nmod_mpoly_is_zero(g, ctx))
+                fq_nmod_mpoly_one(g, ctx);
             fq_nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
             fq_nmod_mpoly_randtest_bound(r1, state, len, exp_bound, ctx);
             fq_nmod_mpoly_randtest_bound(r2, state, len, exp_bound, ctx);
@@ -262,7 +263,7 @@ main(void)
     }
 	
     /* Check aliasing of remainder with first argument */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t f, g, h, k, r1;
@@ -287,9 +288,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fq_nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
-            do {
-                fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
-            } while (g->length == 0);
+            fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
+            if (fq_nmod_mpoly_is_zero(g, ctx))
+                fq_nmod_mpoly_one(g, ctx);
             fq_nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
             fq_nmod_mpoly_randtest_bound(k, state, len, exp_bound, ctx);
             fq_nmod_mpoly_randtest_bound(r1, state, len, exp_bound, ctx);
@@ -351,9 +352,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fq_nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
-            do {
-                fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
-            } while (g->length == 0);
+            fq_nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
+            if (fq_nmod_mpoly_is_zero(g, ctx))
+                fq_nmod_mpoly_one(g, ctx);
             fq_nmod_mpoly_randtest_bound(h, state, len, exp_bound, ctx);
             fq_nmod_mpoly_randtest_bound(k, state, len, exp_bound, ctx);
             fq_nmod_mpoly_randtest_bound(r1, state, len, exp_bound, ctx);

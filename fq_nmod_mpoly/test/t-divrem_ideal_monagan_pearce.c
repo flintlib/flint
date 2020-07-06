@@ -51,9 +51,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             fq_nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                fq_nmod_mpoly_randtest_bits(g, state, len2, exp_bits2 + 1, ctx);
-            } while (g->length == 0);
+            fq_nmod_mpoly_randtest_bits(g, state, len2, exp_bits2 + 1, ctx);
+            if (fq_nmod_mpoly_is_zero(g, ctx))
+                fq_nmod_mpoly_one(g, ctx);
             fq_nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
             fq_nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
             fq_nmod_mpoly_randtest_bits(r, state, len, exp_bits, ctx);
@@ -128,9 +128,9 @@ main(void)
             fq_nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
             for (w = 0; w < num; w++)
             {
-                do {
-                    fq_nmod_mpoly_randtest_bound(darr[w], state, len2, exp_bound2 + 1, ctx);
-                } while (darr[w]->length == 0);
+                fq_nmod_mpoly_randtest_bound(darr[w], state, len2, exp_bound2 + 1, ctx);
+                if (fq_nmod_mpoly_is_zero(darr[w], ctx))
+                    fq_nmod_mpoly_one(darr[w], ctx);
                 fq_nmod_mpoly_randtest_bound(qarr[w], state, len, exp_bound, ctx);
             }
             fq_nmod_mpoly_randtest_bound(k1, state, len, exp_bound, ctx);
@@ -218,9 +218,9 @@ main(void)
             fq_nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
             for (w = 0; w < num; w++)
             {
-                do {
-                    fq_nmod_mpoly_randtest_bound(darr[w], state, len2, exp_bound2 + 1, ctx);
-                } while (darr[w]->length == 0);
+                fq_nmod_mpoly_randtest_bound(darr[w], state, len2, exp_bound2 + 1, ctx);
+                if (fq_nmod_mpoly_is_zero(darr[w], ctx))
+                    fq_nmod_mpoly_one(darr[w], ctx);
                 fq_nmod_mpoly_randtest_bound(qarr[w], state, len, exp_bound, ctx);
             }
             fq_nmod_mpoly_randtest_bound(k1, state, len, exp_bound, ctx);

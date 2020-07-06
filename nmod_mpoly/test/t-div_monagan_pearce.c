@@ -53,9 +53,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
-            do {
-                nmod_mpoly_randtest_bound(g, state, len2, exp_bits2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(g, state, len2, exp_bits2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bits(h, state, len, exp_bits, ctx);
             nmod_mpoly_randtest_bits(k, state, len, exp_bits, ctx);
             nmod_mpoly_randtest_bits(l, state, len, exp_bits, ctx);
@@ -133,9 +133,9 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             nmod_mpoly_randtest_bound(f, state, len1, exp_bound1, ctx);
-            do {
-                nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
-            } while (g->length == 0);
+            nmod_mpoly_randtest_bound(g, state, len2, exp_bound2, ctx);
+            if (nmod_mpoly_is_zero(g, ctx))
+                nmod_mpoly_one(g, ctx);
             nmod_mpoly_randtest_bound(q, state, len, exp_bound, ctx);
             nmod_mpoly_randtest_bound(k, state, len, exp_bound, ctx);
 

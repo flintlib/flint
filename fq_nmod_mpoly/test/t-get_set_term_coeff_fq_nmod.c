@@ -38,9 +38,9 @@ main(void)
 
         len = n_randint(state, 100) + 1;
         exp_bits = n_randint(state, 200) + 1;
-        do {
-            fq_nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
-        } while (fq_nmod_mpoly_length(f, ctx) == 0);
+        fq_nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);
+        if (fq_nmod_mpoly_is_zero(f, ctx))
+            fq_nmod_mpoly_one(f, ctx);
 
         for (j = 0; j < 10; j++)
         {

@@ -247,7 +247,6 @@ void fq_nmod_mpoly_div_monagan_pearce(fq_nmod_mpoly_t q,
     int free2 = 0, free3 = 0;
     fq_nmod_mpoly_t temp1;
     fq_nmod_mpoly_struct * tq;
-    TMP_INIT;
 
     if (poly3->length == 0)
     {
@@ -261,13 +260,11 @@ void fq_nmod_mpoly_div_monagan_pearce(fq_nmod_mpoly_t q,
         return;
     }
 
-    TMP_START;
-
     exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
@@ -323,7 +320,7 @@ void fq_nmod_mpoly_div_monagan_pearce(fq_nmod_mpoly_t q,
         exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
 
         N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-        cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+        cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
 
@@ -364,5 +361,5 @@ cleanup3:
     if (free3)
         flint_free(exp3);
 
-    TMP_END;
+    flint_free(cmpmask);
 }

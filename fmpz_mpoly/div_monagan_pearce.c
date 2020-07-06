@@ -712,7 +712,6 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
     int free2 = 0, free3 = 0;
     fmpz_mpoly_t temp1;
     fmpz_mpoly_struct * tq;
-    TMP_INIT;
 
    /* check divisor is nonzero */
    if (poly3->length == 0)
@@ -725,13 +724,11 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
       return;
    }
 
-   TMP_START;
-
    /* maximum bits in quotient exps and inputs is max for poly2 and poly3 */
    exp_bits = FLINT_MAX(poly2->bits, poly3->bits);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
    /* ensure input exponents packed to same size as output exponents */
@@ -785,7 +782,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
       exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
 
       N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-      cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+      cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
       mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
@@ -825,5 +822,5 @@ cleanup3:
    if (free3)
       flint_free(exp3);
 
-    TMP_END;
+   flint_free(cmpmask);
 }

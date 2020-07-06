@@ -715,11 +715,9 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
       return;
    }
 
-
    TMP_START;
 
    free3 = (int *) TMP_ALLOC(len*sizeof(int));
-
    exp3 = (ulong **) TMP_ALLOC(len*sizeof(ulong *));
 
    /* compute maximum degrees that can occur in any input or output polys */
@@ -730,7 +728,7 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
     N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
    /* ensure input exponents packed to same size as output exponents */
@@ -808,7 +806,7 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
 
       exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
       N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-      cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
+      cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
       mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
 
       exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
@@ -861,6 +859,8 @@ cleanup3:
       if (free3[i])
          flint_free(exp3[i]);
    }
+
+   flint_free(cmpmask);
 
    TMP_END;
 }
