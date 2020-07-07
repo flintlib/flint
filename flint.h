@@ -311,12 +311,13 @@ typedef __mpfr_struct flint_mpfr;
 FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 #endif
 
+/* Beware when using the unsigned return value in signed arithmetic */
 static __inline__
-slong FLINT_BIT_COUNT(mp_limb_t x)
+mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 {
    mp_limb_t zeros = FLINT_BITS;
    if (x) count_leading_zeros(zeros, x);
-   return (slong) (FLINT_BITS - zeros);
+   return FLINT_BITS - zeros;
 }
 
 #define FLINT_FLOG2(k)  (FLINT_BIT_COUNT(k) - 1)

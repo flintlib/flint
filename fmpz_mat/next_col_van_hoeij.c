@@ -84,7 +84,7 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
    k = fmpz_bits(P) - bit_r - bit_r/2;
    
    /* check if LLL justified */
-   if (k < exp + FLINT_BIT_COUNT(r + 1))
+   if (k < exp + (slong) FLINT_BIT_COUNT(r + 1))
       return 0;
 
    fmpz_init(P_trunc);
