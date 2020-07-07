@@ -68,6 +68,12 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
             _fmpz_vec_swap(S, Q, lenQ);
 		    _fmpz_vec_neg(S, S, lenQ);
 
+            for (i = 0; i < lenQ; i++)
+            {
+                if (fmpz_sgn(S + i) < 0)
+                    fmpz_add(S + i, S + i, p);
+            }
+
             for (i = 0; i < 2*lenB; i++)
 		        fmpz_clear(Q + i);
 
@@ -128,6 +134,12 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
 
             _fmpz_vec_swap(G, D, lenD);
             _fmpz_vec_swap(S, U1, lenU1);
+
+            for (i = 0; i < lenU1; i++)
+            {
+                if (fmpz_sgn(S + i) < 0)
+                    fmpz_add(S + i, S + i, p);
+            }
 
             for (i = 0; i < 3*lenB + 2*lenA; i++)
 			   fmpz_clear(W + i);
