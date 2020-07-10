@@ -29,6 +29,36 @@ TEMPLATE(T, mat_rref) (TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
     TEMPLATE(T, struct) * e;
     TEMPLATE(T, mat_t) U, V;
 
+    if (TEMPLATE(T, mat_is_zero)(A, ctx))
+        return 0;
+
+    if (A->r == 1)
+    {
+        TEMPLATE(T, struct) * c;
+        slong i, j;
+        slong r = 0;
+
+        for (i = 0; i < A->c; i++)
+        {
+            c = TEMPLATE(T, mat_entry)(A, 0, i);
+            if (!TEMPLATE(T, is_zero)(c, ctx))
+            {
+                r = 1;
+                if (TEMPLATE(T, is_one)(c, ctx))
+                    break;
+
+                TEMPLATE(T, inv)(c, c, ctx);
+                for (j = i + 1;j < A->c; j++)
+                {
+                    TEMPLATE(T, mul)(TEMPLATE(T, mat_entry)(A, 0, j), TEMPLATE(T, mat_entry)(A, 0, j), c, ctx);
+                }
+                TEMPLATE(T, one)(c, ctx);
+                break;
+            }
+        }
+        return r;
+    }
+
     n = A->c;
 
     P = _perm_init(TEMPLATE(T, mat_nrows) (A, ctx));

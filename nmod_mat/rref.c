@@ -109,6 +109,37 @@ slong
 nmod_mat_rref(nmod_mat_t A)
 {
     slong rank, * pivots_nonpivots, * P;
+
+    if (nmod_mat_is_empty(A))
+        return 0;
+
+    if (A->r == 1)
+    {
+        mp_limb_t c, cinv;
+        slong i, j;
+        slong r = 0;
+
+        for (i = 0; i < A->c; i++)
+        {
+            c = nmod_mat_entry(A, 0, i);
+            if (c != 0)
+            {
+                r = 1;
+                if (c == 1)
+                    break;
+
+                cinv = nmod_inv(c, A->mod);
+                nmod_mat_set_entry(A, 0, i, 1);
+                for (j = i + 1;j < A->c; j++)
+                {
+                    nmod_mat_set_entry(A, 0, j, nmod_mul(nmod_mat_get_entry(A, 0, j), cinv, A->mod));
+                }
+                break;
+            }
+        }
+        return r;
+    }
+
     pivots_nonpivots = flint_malloc(sizeof(slong) * A->c);
     P = _perm_init(nmod_mat_nrows(A));
 
