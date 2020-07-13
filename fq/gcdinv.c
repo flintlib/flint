@@ -67,6 +67,7 @@ fq_gcdinv(fq_t rop, fq_t inv, const fq_t op, const fq_ctx_t ctx)
 
     if (!fmpz_is_one(f))
     {
+        _fmpz_poly_set_length(inv, 0);
         fq_zero(rop, ctx);
         goto cleanup;
     }
