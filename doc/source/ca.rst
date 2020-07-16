@@ -13,30 +13,64 @@ Introduction: numbers
 
 A *Calcium number* is a real or complex number
 represented as an element of a formal field `K = \mathbb{Q}(a_1, \ldots, a_n)`
-where the symbols `a_k` denote fixed algebraic or transcendental numbers.
+where the symbols `a_k` denote fixed algebraic or transcendental numbers
+called *extension numbers*.
 For example, `e^{-2 \pi} - 3 i` may be represented as
 `(1 - 3 a_2^2 a_1) / a_2^2` in the field `\mathbb{Q}(a_1,a_2)` with
-`a_1 = i, a_2 = e^{\pi}`.
-Extension elements `a_k` can be algebraic numbers represented
-in canonical form by :type:`qqbar_t` instances (example: `i`),
-symbolic constants (example: `\pi`),
-or symbolic functions applied to :type:`ca_t` arguments
-(example: `e^{\pi} = \exp(x)`, where `x = 1 \cdot \pi`
-is a :type:`ca_t` representing an element of `\mathbb{Q}(\pi)`).
+`a_1 = i, a_2 = e^{\pi}`. Extension numbers `a_k` can have the following
+form:
+
+* Algebraic numbers represented
+  in canonical form by :type:`qqbar_t` instances (example: `i`).
+* Symbolic constants (example: `\pi`),
+  or symbolic functions applied to :type:`ca_t` arguments
+  (example: `e^{\pi} = \exp(x)`, where `x = 1 \cdot \pi`
+  is a :type:`ca_t` representing an element of `\mathbb{Q}(\pi)`).
+  Constants and functions use the same internal representation;
+  a constant is just a function with zero-length argument list.
+* (Not implemented): user-defined constants and functions defined by suppling
+  function pointers for Arb numerical evaluation to specified precision.
+
 The user does not need to construct formal fields explicitly:
 operations on Calcium numbers generate and cache fields automatically as needed
 to express the results.
 
-This representation is not canonical (in general). There can be
-many representations for the same number, depending on
+This representation is not canonical (in general). A given complex number
+can be represented in different ways depending on
 the choice of formal field *K*. Even within a fixed field *K*,
-a number can have many representations if there are algebraic
-relations between the extension elements.
+a number can have different representations if there are algebraic
+relations between the extension numbers.
 Two numbers *x* and *y* can be tested for inequality using numerical
 evaluation; to test for equality, it may be necessary to
-eliminate redundant extension elements.
+eliminate dependencies between extension numbers.
 One of the central goals of Calcium will be to
 implement heuristics for such elimination.
+
+Together with each formal field *K*, Calcium stores a
+*reduction ideal* `I = \{g_1,\ldots,g_m\}`
+with `g_i \in \mathbb{Z}[a_1,\ldots,a_n]`, defining a set of algebraic relations
+`g_i(a_1,\ldots,a_n) = 0`.
+Relations can be absolute, say `g_i = a_j^2 + 1`, or relative,
+say `g_i = 2 a_j - 4 a_k - a_l a_m`.
+The reduction ideal effectively partitions `K` into
+equivalence classes of
+complex numbers
+(e.g. `i^2 = -1` or `2 \log(\pi i) = 4 \log(\sqrt{\pi}) + \pi i`),
+enabling simplifications and equality proving.
+
+Extension numbers are always sorted `a_1 \succ a_2 \succ \ldots \succ a_n`
+where `\succ` denotes a structural ordering (see :func:`ca_cmp_repr`).
+If the reduction ideal is triangular and the multivariate polynomial
+arithmetic uses lexicographic ordering, reduction by *I*
+eliminates elements `a_i` with higher complexity in the sense of `\succ`.
+
+The reduction ideal is an imperfect computational crutch: it is not guaranteed
+to capture *all* algebraic relations, and reduction is not guaranteed
+to produce uniquely defined representatives.
+However, in the specific case of an absolute number field `K = \mathbb{Q}(a)`
+where *a* is a :type:`qqbar_t` extension, the reduction ideal (consisting
+of a single minimal polynomial) is canonical and field
+elements of *K* can be chosen canonically.
 
 Introduction: special values
 -------------------------------------------------------------------------------
@@ -72,12 +106,11 @@ any of the following special values besides ordinary numbers:
 The distinction between *Calcium numbers* (which must represent
 elements of `\mathbb{C}`) and the different kinds of nonnumerical values
 (infinities, Undefined or Unknown) is essential. Nonnumerical values may
-not be used as field extension elements `a_k`, and the denominator of
+not be used as field extension numbers `a_k`, and the denominator of
 a formal field element must always represent a nonzero complex number.
 Accordingly, for any given Calcium value *x* that is not *Unknown*,
 it is exactly known whether *x* represents A) a number, B) unsigned infinity,
 C) a signed infinity, or D) Undefined.
-
 
 Number objects
 -------------------------------------------------------------------------------
@@ -116,7 +149,7 @@ Context objects
 .. type:: ca_ctx_t
 
     A :type:`ca_ctx_t` context object holds a cache of fields *K* and
-    constituent extension elements `a_k`.
+    constituent extension numbers `a_k`.
     The field index in an individual :type:`ca_t` instance represents
     a shallow reference to the object defining the field *K* within the
     context object, so creating many elements of the same field is cheap.
@@ -350,7 +383,6 @@ for predicates is 0 for false and 1 for true.
     returning -1, 0 or 1. This only performs a lexicographic comparison
     of the representations of *x* and *y*; the return value does not say
     anything meaningful about the numbers represented by *x* and *y*.
-
 
 Value predicates
 -------------------------------------------------------------------------------
@@ -856,7 +888,7 @@ The values of the array at the following indices can be changed by the user
 
     Maximum precision to use internally for numerical evaluation with Arb.
     This parameter affects the possibility to prove inequalities
-    and find simplifications between related extension elements.
+    and find simplifications between related extension numbers.
     This is not a strict limit; some calculations may use higher precision
     when there is a good reason to do so.
     Default value: 4096.
@@ -951,12 +983,12 @@ leaving the construction of field objects to the context object.
 
     Initializes *K* to represent a multivariate field
     `\mathbb{Q}(a_1, \ldots, a_n)` in *n*
-    extension elements. The extension elements must subsequently be
+    extension numbers. The extension numbers must subsequently be
     assigned one by one using :func:`ca_field_set_ext`.
 
 .. function:: void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx)
 
-    Sets the extension element at position *i* (here indexed from 0) of *K*
+    Sets the extension number at position *i* (here indexed from 0) of *K*
     to the generator of the field with index *x_index* in *ctx*.
     (It is assumed that the generating field is a univariate field.)
 
