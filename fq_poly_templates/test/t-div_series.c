@@ -52,7 +52,7 @@ main(void)
         result = (TEMPLATE(T, poly_equal_trunc) (a, d, n, ctx));
         if (!result)
         {
-            flint_printf("FAIL:\n",i);
+            flint_printf("FAIL:\n");
             flint_printf("a = "), TEMPLATE(T, poly_print) (a, ctx),
                 flint_printf("\n\n");
             flint_printf("b = "), TEMPLATE(T, poly_print) (b, ctx),
