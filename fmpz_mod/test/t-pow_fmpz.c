@@ -119,8 +119,7 @@ main(void)
                                             "i = %wd, j = %wd\n", i, j);
                 flint_abort();
             }
-    skip3:
-            (void)NULL;
+    skip3:;
         }
 
         fmpz_clear(p);

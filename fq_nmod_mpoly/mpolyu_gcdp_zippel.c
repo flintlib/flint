@@ -1019,8 +1019,7 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(
             fq_nmod_poly_mul(modulus, modulus, tempmod, ctx->fqctx);
         }
 
-outer_continue:
-        NULL;
+outer_continue:;
     }
 
     success = 0;
@@ -1365,13 +1364,11 @@ FLINT_ASSERT(0);
                 goto outer_continue;
             }
 
-inner_continue:
-            NULL;
+inner_continue:;
         }
         FLINT_ASSERT(0 && "not reachable");
 
-outer_continue:
-        NULL;
+outer_continue:;
     }
     FLINT_ASSERT(0 && "not reachable");
 
