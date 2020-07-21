@@ -39,7 +39,7 @@ int main(void)
 
     for (i = 5; i < 36 && i <= FLINT_BITS; i += 5)
     {
-	    mp_limb_t maxiter = UWORD(1) << FLINT_MIN(i, FLINT_BITS - 1);
+	  mp_limb_t maxiter = UWORD(1) << FLINT_MIN(i, FLINT_BITS - 1);
 
         for (j = 0; j < 10 * flint_test_multiplier(); j++)
         {
