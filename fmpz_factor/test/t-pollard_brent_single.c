@@ -37,11 +37,12 @@ int main(void)
     flint_printf("pollard_brent_single....");
     fflush(stdout);
 
-    for (i = 5; i < 36; i += 5)
+    for (i = 5; i <= FLINT_BITS; i += 5)
     {
+	mp_limb_t maxiter = UWORD(1) << FLINT_MIN(i, FLINT_BITS - 1);
+
         for (j = 0; j < 10 * flint_test_multiplier(); j++)
         {
-
             fmpz_set_ui(prime1, n_randprime(state, i, 1));
             fmpz_set_ui(prime2, n_randprime(state, i, 1));
             fmpz_set_ui(prime3, n_randprime(state, i, 1));
@@ -59,7 +60,7 @@ int main(void)
             fmpz_randm(y, state, primeprod);
             fmpz_add_ui(y, y, 1);               /* 1 <= y <= n - 1 */
 
-            k = fmpz_factor_pollard_brent_single(fac, primeprod, y, a, UWORD(1) << i);
+            k = fmpz_factor_pollard_brent_single(fac, primeprod, y, a, maxiter);
 
             if (k == 0)
                 fails += 1;
