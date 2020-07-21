@@ -1085,7 +1085,7 @@ get_next_index:
             w->zip_find_coeffs_non_invertible = 1; /* safe - only goes from 0 to 1 */
             break;
         default:
-            NULL;
+            break;
     }
 
     goto get_next_index;
@@ -2156,7 +2156,7 @@ pick_bma_prime:
             success = 1;
             goto cleanup;
         case bma_loop_good:
-            NULL;
+            break;
     }
 
     /* Hmodulus was supposed to be set by bma_loop */

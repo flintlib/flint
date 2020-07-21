@@ -388,7 +388,7 @@ choose_prime_inner:
         case nmod_gcds_eval_gcd_deg_too_high:
             goto choose_prime_inner;
         case nmod_gcds_success:
-            NULL;
+            break;
     }
 
     if (fq_nmod_is_zero(fq_nmod_mpolyu_leadcoeff(Geval, ectx), ectx->fqctx))

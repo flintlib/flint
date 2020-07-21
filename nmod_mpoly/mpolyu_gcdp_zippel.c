@@ -836,8 +836,7 @@ int nmod_mpolyu_gcdp_zippel_bivar(
             nmod_poly_mul(modulus, modulus, tempmod);
         }
 
-outer_continue:
-        NULL;
+outer_continue:;
     }
 
 finished:
@@ -1166,13 +1165,11 @@ int nmod_mpolyu_gcdp_zippel(
                 goto outer_continue;
             }
 
-inner_continue:
-            NULL;
+inner_continue:;
         }
         FLINT_ASSERT(0 && "not reachable");
 
-outer_continue:
-        NULL;
+outer_continue:;
     }
     FLINT_ASSERT(0 && "not reachable");
 

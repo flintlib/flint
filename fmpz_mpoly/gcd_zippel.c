@@ -240,7 +240,7 @@ choose_prime_inner:
         case nmod_gcds_eval_gcd_deg_too_high:
             goto choose_prime_inner;
         case nmod_gcds_success:
-            NULL;
+            break;
     }
 
     if (nmod_mpolyu_leadcoeff(Gp, ctxp) == UWORD(0))
