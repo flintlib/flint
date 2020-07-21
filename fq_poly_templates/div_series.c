@@ -37,15 +37,13 @@ _TEMPLATE(T, poly_div_series) (TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct
         if (TEMPLATE(T, is_one)(B + 0, ctx))
             _TEMPLATE(T, vec_set)(Q, A, Alen, ctx);
         else
-        {
            _TEMPLATE3(T, poly_scalar_mul, T)(Q, A, Alen, u, ctx);
-           _TEMPLATE(T, vec_zero)(Q + Alen, n - Alen, ctx);
-        }      
+
+       _TEMPLATE(T, vec_zero)(Q + Alen, n - Alen, ctx);
     }
     else if (n < 16 || Blen < 10)
     {
         slong i, j;
-
         TEMPLATE(T, t) temp;
 
         TEMPLATE(T, init)(temp, ctx);

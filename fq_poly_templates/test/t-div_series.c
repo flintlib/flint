@@ -25,7 +25,7 @@ main(void)
     fflush(stdout);
 
     /* Check A*B^{-1} * B is congruent A mod t^n */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, d;
@@ -38,6 +38,9 @@ main(void)
         TEMPLATE(T, poly_init) (c, ctx);
         TEMPLATE(T, poly_init) (d, ctx);
 
+        TEMPLATE(T, poly_randtest) (c, state, n_randint(state, 80) + 2, ctx);
+        TEMPLATE(T, poly_randtest) (d, state, n_randint(state, 80) + 2, ctx);
+
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 80) + 1, ctx);
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 80) + 1, ctx);
@@ -49,7 +52,7 @@ main(void)
         result = (TEMPLATE(T, poly_equal_trunc) (a, d, n, ctx));
         if (!result)
         {
-            flint_printf("FAIL:\n");
+            flint_printf("FAIL:\n",i);
             flint_printf("a = "), TEMPLATE(T, poly_print) (a, ctx),
                 flint_printf("\n\n");
             flint_printf("b = "), TEMPLATE(T, poly_print) (b, ctx),
