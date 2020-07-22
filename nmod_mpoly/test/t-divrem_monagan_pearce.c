@@ -118,8 +118,8 @@ main(void)
         len2 = n_randint(state, 10) + 1;
 
         exp_bound = n_randint(state, 50/nvars) + 1;
-        exp_bound1 = n_randbits(state, 50/nvars) + 1;
-        exp_bound2 = n_randbits(state, 50/nvars) + 1;
+        exp_bound1 = n_randint(state, 50/nvars) + 1;
+        exp_bound2 = n_randint(state, 50/nvars) + 1;
 
         for (j = 0; j < 4; j++)
         {
@@ -185,8 +185,8 @@ main(void)
         len2 = n_randint(state, 10) + 1;
 
         exp_bound = n_randint(state, 50/nvars) + 1;
-        exp_bound1 = n_randbits(state, 50/nvars) + 1;
-        exp_bound2 = n_randbits(state, 50/nvars) + 1;
+        exp_bound1 = n_randint(state, 50/nvars) + 1;
+        exp_bound2 = n_randint(state, 50/nvars) + 1;
 
         for (j = 0; j < 4; j++)
         {
@@ -253,8 +253,8 @@ main(void)
         len2 = n_randint(state, 10) + 1;
 
         exp_bound = n_randint(state, 50/nvars) + 1;
-        exp_bound1 = n_randbits(state, 50/nvars) + 1;
-        exp_bound2 = n_randbits(state, 50/nvars) + 1;
+        exp_bound1 = n_randint(state, 50/nvars) + 1;
+        exp_bound2 = n_randint(state, 50/nvars) + 1;
 
         for (j = 0; j < 4; j++)
         {
@@ -320,8 +320,8 @@ main(void)
         len2 = n_randint(state, 10) + 1;
 
         exp_bound = n_randint(state, 50/nvars) + 1;
-        exp_bound1 = n_randbits(state, 50/nvars) + 1;
-        exp_bound2 = n_randbits(state, 50/nvars) + 1;
+        exp_bound1 = n_randint(state, 50/nvars) + 1;
+        exp_bound2 = n_randint(state, 50/nvars) + 1;
 
         for (j = 0; j < 4; j++)
         {
@@ -391,8 +391,8 @@ main(void)
         len2 = n_randint(state, 10) + 1;
 
         exp_bound = n_randint(state, 50/nvars) + 1;
-        exp_bound1 = n_randbits(state, 50/nvars) + 1;
-        exp_bound2 = n_randbits(state, 50/nvars) + 1;
+        exp_bound1 = n_randint(state, 50/nvars) + 1;
+        exp_bound2 = n_randint(state, 50/nvars) + 1;
 
         for (j = 0; j < 4; j++)
         {
