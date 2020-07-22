@@ -332,6 +332,7 @@ void mpoly_monomial_msub_mp(ulong * exp1, const ulong * exp2, ulong scalar,
     slong i;
     for (i = 0; i < N; i++)
         exp1[i] = exp2[i];
+    FLINT_ASSERT(N > 0);
     mpn_submul_1(exp1, exp3, N, scalar);
 }
 
@@ -345,7 +346,10 @@ void mpoly_monomial_msub_ui_array(ulong * exp1, const ulong * exp2,
         exp1[i] = exp2[i];
     FLINT_ASSERT(scalar_limbs <= N);
     for (i = 0; i < scalar_limbs; i++)
+    {
+        FLINT_ASSERT(N > i);
         mpn_submul_1(exp1 + i, exp3, N - i, scalar[i]);
+    }
 }
 
 MPOLY_INLINE
@@ -650,6 +654,7 @@ void mpoly_monomial_mul_ui(ulong * exp2, const ulong * exp3, slong N, ulong c)
 MPOLY_INLINE
 void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c)
 {
+    FLINT_ASSERT(N > 0);
     mpn_mul_1(exp2, exp3, N, c);
 }
 

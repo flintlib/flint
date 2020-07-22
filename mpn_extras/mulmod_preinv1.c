@@ -28,6 +28,8 @@ void flint_mpn_mulmod_preinv1(mp_ptr r,
    mp_ptr t;
    slong i;
 
+   FLINT_ASSERT(n > 0);
+
    if (n <= 30)
       t = ts;
    else

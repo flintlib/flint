@@ -37,6 +37,7 @@ void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R,
 
         if (FLINT_BITS + 2 <= 2 * mod.norm)
         {
+            FLINT_ASSERT(lenB > 1);
             mpn_mul_1(R, B, lenB - 1, Q[0]);
             if (lenB > 2) 
                 mpn_addmul_1(R + 1, B, lenB - 2, Q[1]);
