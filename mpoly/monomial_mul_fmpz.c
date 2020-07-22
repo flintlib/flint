@@ -16,6 +16,7 @@ void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,
 
     if (!COEFF_IS_MPZ(*c))
     {
+        FLINT_ASSERT(N > 0);
         mpn_mul_1(exp2, exp3, N, *c);
     }
     else
@@ -30,9 +31,13 @@ void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,
 
         if (exp2 != exp3)
         {
+            FLINT_ASSERT(N > 0);
             mpn_mul_1(exp2, exp3, N, cp[0]);
             for (i = 1; i < cn; i++)
+            {
+                FLINT_ASSERT(N > i);
                 mpn_addmul_1(exp2 + i, exp3, N - i, cp[i]);
+            }
         }
         else
         {
@@ -41,9 +46,13 @@ void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,
             TMP_START;
             t = TMP_ALLOC(N*sizeof(ulong));
 
+            FLINT_ASSERT(N > 0);
             mpn_mul_1(t, exp3, N, cp[0]);
             for (i = 1; i < cn; i++)
+            {
+                FLINT_ASSERT(N > i);
                 mpn_addmul_1(t + i, exp3, N - i, cp[i]);
+            }
 
             for (i = 0; i < N; i++)
                 exp2[i] = t[i];

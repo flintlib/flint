@@ -148,6 +148,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
             Msize = 1;
             for (i = 1; i < num_primes; i++)
             {
+                FLINT_ASSERT(Msize > 0);
                 M[Msize] = cy = mpn_mul_1(M, M, Msize, primes[i]);
                 Msize += (cy != 0);
             }
@@ -168,6 +169,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
                 mpn_divrem_1(Ns + i * Nsize, 0, M, Msize, primes[i]);
                 ri = mpn_mod_1(Ns + i * Nsize, Msize, primes[i]);
                 ri = n_invmod(ri, primes[i]);
+                FLINT_ASSERT(Msize > 0);
                 Ns[i * Nsize + Msize] = mpn_mul_1(Ns + i * Nsize, Ns + i * Nsize, Msize, ri);
             }
 
@@ -176,6 +178,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
                 for (j = 0; j < C->c; j++)
                 {
                     ri = nmod_mat_entry(mod_C[0], i, j);
+                    FLINT_ASSERT(Nsize > 1);
                     T[Nsize - 1] = mpn_mul_1(T, Ns, Nsize - 1, ri);
 
                     for (k = 1; k < num_primes; k++)
