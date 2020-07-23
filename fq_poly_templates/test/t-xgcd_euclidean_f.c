@@ -117,6 +117,8 @@ main(void)
         TEMPLATE(T, poly_init) (t, ctx);
         TEMPLATE(T, poly_init) (v, ctx);
         TEMPLATE(T, poly_init) (w, ctx);
+        TEMPLATE(T, poly_randtest) (s, state, n_randint(state, 10), ctx);
+        TEMPLATE(T, poly_randtest) (t, state, n_randint(state, 10), ctx);
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 10), ctx);
         TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 10), ctx);
         TEMPLATE(T, poly_randtest) (f, state, n_randint(state, 5), ctx);
