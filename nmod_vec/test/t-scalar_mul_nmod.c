@@ -26,6 +26,12 @@ main(void)
     flint_printf("scalar_mul_nmod....");
     fflush(stdout);
 
+    {
+        nmod_t mod;
+        nmod_init(&mod, 2);
+        _nmod_vec_scalar_mul_nmod(NULL, NULL, 0, 1, mod);
+    }
+
     /* Check (a + b)*c == a*c + b*c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

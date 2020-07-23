@@ -25,6 +25,7 @@ mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1,
 {
     mp_limb_t h0, h1;
 
+    FLINT_ASSERT(n > 0);
     h0 =    mpn_mul_1(y, x1, n, a1);
     h1 = mpn_submul_1(y, x2, n, a2);
 
