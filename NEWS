@@ -1221,3 +1221,8 @@ v 2.6.0 -- 5 Jun 2020
   * MPIR 3.0.0 support
   * many small speedups and additional convenience functions added
 
+v 2.6.1 -- 23 Jul 2020
+
+ * Fix issues on Debian major architectures
+ * Fix numerous reported bugs (mpoly, fq_poly, mpn_mul_1, mod 2 code, etc.)
+
