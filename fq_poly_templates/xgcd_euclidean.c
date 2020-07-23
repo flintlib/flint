@@ -161,6 +161,13 @@ TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, poly_t) G,
             TEMPLATE(T, poly_zero) (T, ctx);
             TEMPLATE3(T, poly_set, T) (S, inv, ctx);
         }
+        else if (lenB == 1)  /* lenA >= lenB = 1 */
+        {
+            TEMPLATE(T, inv)(inv, B->coeffs + 0, ctx);
+            TEMPLATE3(T, poly_set, T) (T, inv, ctx);
+            TEMPLATE(T, poly_one)(G, ctx);
+            TEMPLATE(T, poly_zero)(S, ctx);
+        }
         else                    /* lenA >= lenB >= 2 */
         {
             TEMPLATE(T, struct) * g, *s, *t;
