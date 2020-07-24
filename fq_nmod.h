@@ -232,33 +232,49 @@ FQ_NMOD_INLINE void fq_nmod_reduce(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 
 /* Basic arithmetic **********************************************************/
 
-FLINT_DLL void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1,
+                                 const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_sub(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_sub(fq_nmod_t rop, const fq_nmod_t op1,
+                                 const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_sub_one(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_sub_one(fq_nmod_t rop,
+                                 const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_neg(fq_nmod_t rop,
+                                 const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mul(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_mul(fq_nmod_t rop,
+            const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mul_fmpz(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t x, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_mul_fmpz(fq_nmod_t rop,
+                  const fq_nmod_t op, const fmpz_t x, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mul_si(fq_nmod_t rop, const fq_nmod_t op, slong x, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_mul_si(fq_nmod_t rop,
+                         const fq_nmod_t op, slong x, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_mul_ui(fq_nmod_t rop,
+                         const fq_nmod_t op, ulong x, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_sqr(fq_nmod_t rop,
+                                  const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_inv(fq_nmod_t rop,
+                                 const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e, const fq_nmod_ctx_t ctx);
+FLINT_DLL void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op,
+                           slong len, const fmpz_t e, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op1, const fmpz_t e, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op1,
+                                      const fmpz_t e, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_pow_ui(fq_nmod_t rop, const fq_nmod_t op1, const ulong e, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_pow_ui(fq_nmod_t rop,
+                  const fq_nmod_t op1, const ulong e, const fq_nmod_ctx_t ctx);
 
-FLINT_DLL void fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_pth_root(fq_nmod_t rop,
+                                 const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
+
+FLINT_DLL int fq_nmod_is_square(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
