@@ -275,6 +275,10 @@ Basic arithmetic
 Roots
 --------------------------------------------------------------------------------
 
+.. function:: void fq_zech_sqrt(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx)
+
+    Sets ``rop`` to the square root of ``op1``. Assumes ``op1`` is a perfect
+    square, otherwise an exception is raised.
 
 .. function:: void fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx)
 
