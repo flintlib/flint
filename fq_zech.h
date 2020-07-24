@@ -189,6 +189,8 @@ FLINT_DLL void fq_zech_sqrt(fq_zech_t rop, const fq_zech_t op1,
 FLINT_DLL void fq_zech_pth_root(fq_zech_t rop,
 		                 const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
+FLINT_DLL int fq_zech_is_square(const fq_zech_t op1, const fq_zech_ctx_t ctx);
+
 /* Randomisation *************************************************************/
 
 FLINT_DLL void fq_zech_randtest(fq_zech_t rop, flint_rand_t state,

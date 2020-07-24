@@ -286,6 +286,9 @@ Roots
     this computes the root by raising ``op1`` to `p^{d-1}` where
     `d` is the degree of the extension.
 
+.. function:: int fq_zech_is_square(const fq_zech_t op, const fq_zech_ctx_t ctx)
+
+    Return ``1`` if ``op`` is a quadratic residue, i.e. a square. 
 
 Output
 --------------------------------------------------------------------------------
