@@ -318,6 +318,7 @@ FQ_INLINE void fq_gen(fq_t rop, const fq_ctx_t ctx)
         fmpz_neg(rop->coeffs, rop->coeffs);
         fmpz_mul(rop->coeffs, rop->coeffs, ctx->modulus->coeffs);
         fmpz_mod(rop->coeffs, rop->coeffs, fq_ctx_prime(ctx));
+	_fmpz_poly_set_length(rop, 1);
     }
     else
     {
