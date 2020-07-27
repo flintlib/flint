@@ -107,16 +107,20 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     }
     else
     {
-        slong i;
+        slong i, j;
         slong r = lenF;
         mp_limb_t p = 2;
         nmod_poly_t d, g, t;
         nmod_poly_factor_t fac;
+        zassenhaus_prune_t Z;
 
+        zassenhaus_prune_init(Z);
         nmod_poly_factor_init(fac);
         nmod_poly_init_preinv(t, 1, 0);
         nmod_poly_init_preinv(d, 1, 0);
         nmod_poly_init_preinv(g, 1, 0);
+
+        zassenhaus_prune_set_degree(Z, lenF - 1);
 
         for (i = 0; i < 3; i++)
         {
@@ -141,6 +145,12 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 
                         nmod_poly_factor_init(temp_fac);
                         nmod_poly_factor(temp_fac, t);
+
+                        zassenhaus_prune_start_add_factors(Z);
+                        for (j = 0; j < temp_fac->num; j++)
+                            zassenhaus_prune_add_factor(Z,
+                                  temp_fac->p[j].length - 1, temp_fac->exp[j]);
+                        zassenhaus_prune_end_add_factors(Z);
 
                         if (temp_fac->num <= r)
                         {
@@ -194,13 +204,15 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 
             fmpz_set_ui(T, p);
             fmpz_pow_ui(T, T, a);
-            fmpz_poly_factor_zassenhaus_recombination(final_fac, lifted_fac,
-                                                                    f, T, exp);
+            fmpz_poly_factor_zassenhaus_recombination_with_prune(
+                                          final_fac, lifted_fac, f, T, exp, Z);
 
             fmpz_poly_factor_clear(lifted_fac);
             fmpz_clear(T);
         }
+
         nmod_poly_factor_clear(fac);
+        zassenhaus_prune_clear(Z);
     }
 }
 
