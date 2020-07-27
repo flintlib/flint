@@ -40,6 +40,7 @@ typedef struct
     fmpz p;
 
     int sparse_modulus;
+    int is_conway; /* whether field was initialized with the Flint Conway tables  (assures primitivity) */
 
     fmpz *a;
     slong *j;

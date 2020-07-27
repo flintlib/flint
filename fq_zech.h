@@ -48,6 +48,7 @@ typedef struct
 
     fq_nmod_ctx_struct *fq_nmod_ctx;
     int owns_fq_nmod_ctx;
+    int is_conway; /* whether field was generated using Flint Conway tables (assures primitivity) */
 
 } fq_zech_ctx_struct;
 

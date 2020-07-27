@@ -40,6 +40,7 @@ typedef struct
     nmod_t mod;
 
     int sparse_modulus;
+    int is_conway; /* whether field was generated using Flint Conway table (assures primitivity */
 
     mp_limb_t *a;
     slong *j;
