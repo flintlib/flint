@@ -164,32 +164,23 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
         {
             fmpz_poly_factor_insert(final_fac, f, exp);
         }
-        else if (r > cutoff)
+        else if (r > cutoff && use_van_hoeij)
         {
-            if (use_van_hoeij)
-               fmpz_poly_factor_van_hoeij(final_fac, fac, f, exp, p);
-            else
-            {
-               flint_printf("Exception (fmpz_poly_factor_zassenhaus). r > cutoff.\n");
-               nmod_poly_factor_clear(fac);
-               flint_abort();
-            }
+           fmpz_poly_factor_van_hoeij(final_fac, fac, f, exp, p);
         }
         else
         {
             slong a;
+            fmpz_t T;
             fmpz_poly_factor_t lifted_fac;
-            fmpz_poly_factor_init(lifted_fac);
 
-            {
-                fmpz_t B;
-                fmpz_init(B);
-                fmpz_poly_factor_mignotte(B, f);
-                fmpz_mul_ui(B, B, 2);
-                fmpz_add_ui(B, B, 1);
-                a = fmpz_clog_ui(B, p);
-                fmpz_clear(B);
-            }
+            fmpz_poly_factor_init(lifted_fac);
+            fmpz_init(T);
+
+            fmpz_poly_factor_mignotte(T, f);
+            fmpz_mul_ui(T, T, 2);
+            fmpz_add_ui(T, T, 1);
+            a = fmpz_clog_ui(T, p);
 
             fmpz_poly_hensel_lift_once(lifted_fac, f, fac, a);
 
@@ -201,19 +192,13 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
             fmpz_poly_factor_print(lifted_fac);
             #endif
 
-            /* Recombination */
-            {
-                fmpz_t P;
-                fmpz_init(P);
-                fmpz_set_ui(P, p);
-                fmpz_pow_ui(P, P, a);
-
-                fmpz_poly_factor_zassenhaus_recombination(final_fac, lifted_fac, f, P, exp);
-
-                fmpz_clear(P);
-            }
+            fmpz_set_ui(T, p);
+            fmpz_pow_ui(T, T, a);
+            fmpz_poly_factor_zassenhaus_recombination(final_fac, lifted_fac,
+                                                                    f, T, exp);
 
             fmpz_poly_factor_clear(lifted_fac);
+            fmpz_clear(T);
         }
         nmod_poly_factor_clear(fac);
     }
@@ -274,7 +259,10 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 
         /* Factor each square-free part */
         for (j = 0; j < sq_fr_fac->num; j++)
-            _fmpz_poly_factor_zassenhaus(fac, sq_fr_fac->exp[j], sq_fr_fac->p + j, 10, 0);
+        {
+            _fmpz_poly_factor_zassenhaus(fac, sq_fr_fac->exp[j],
+                                                sq_fr_fac->p + j, WORD_MAX, 0);
+        }
 
         fmpz_poly_factor_clear(sq_fr_fac);
     }
