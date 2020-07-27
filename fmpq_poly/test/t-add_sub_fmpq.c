@@ -31,9 +31,11 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
 
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+
+    flint_printf("add_sub_fmpq.c....");
+    fflush(stdout);
 
     /* test b + c - c = b */
     for (i = 0; i < 100; i++)
@@ -99,7 +101,9 @@ main(void)
         fmpq_clear(c);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
 
     return 0;
 }
