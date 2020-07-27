@@ -92,6 +92,14 @@ FLINT_DLL void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G);
 FLINT_DLL void fmpz_poly_factor_get_fmpz_poly(fmpz_poly_t z, const fmpz_poly_factor_t F, slong i);
 FLINT_DLL void fmpz_poly_factor_get_fmpz(fmpz_t z, const fmpz_poly_factor_t F);
 
+/* zassenhaus ****************************************************************/
+
+FLINT_DLL void zassenhaus_subset_first(slong * s, slong r, slong m);
+
+FLINT_DLL int zassenhaus_subset_next(slong * s, slong r);
+
+FLINT_DLL slong zassenhaus_subset_next_disjoint(slong * s, slong r);
+
 #ifdef __cplusplus
 }
 #endif
