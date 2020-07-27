@@ -257,6 +257,11 @@ Roots
 --------------------------------------------------------------------------------
 
 
+.. function:: void fq_sqrt(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
+
+    Sets ``rop`` to the square root of ``op1``. Assumes ``op1`` is a perfect
+        square, otherwise an exception is raised.
+
 .. function:: void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
 
     Sets ``rop`` to a `p^{th}` root root of ``op1``.  Currently,

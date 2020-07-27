@@ -246,6 +246,10 @@ FLINT_DLL void fq_pow(fq_t rop, const fq_t op1,
 FLINT_DLL void fq_pow_ui(fq_t rop, const fq_t op,
 		                            const ulong e, const fq_ctx_t ctx);
 
+/* Roots *********************************************************************/
+
+FLINT_DLL void fq_sqrt(fq_t rop, const fq_t op, const fq_ctx_t ctx);
+
 FLINT_DLL void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
 FLINT_DLL int fq_is_square(const fq_t op, const fq_ctx_t ctx);

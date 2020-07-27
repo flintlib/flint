@@ -9,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech.h"
+#include "fq.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq_zech
-#define CAP_T FQ_ZECH
+#define T fq
+#define CAP_T FQ
 #include "fq_templates/test/t-sqrt.c"
 #undef CAP_T
 #undef T

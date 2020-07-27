@@ -272,6 +272,11 @@ FLINT_DLL void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op1,
 FLINT_DLL void fq_nmod_pow_ui(fq_nmod_t rop,
                   const fq_nmod_t op1, const ulong e, const fq_nmod_ctx_t ctx);
 
+/* Roots ********************************************************************/
+
+FLINT_DLL void fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op,
+                                                      const fq_nmod_ctx_t ctx);
+
 FLINT_DLL void fq_nmod_pth_root(fq_nmod_t rop,
                                  const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
