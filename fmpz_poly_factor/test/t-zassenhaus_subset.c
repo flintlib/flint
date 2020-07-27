@@ -128,6 +128,21 @@ main(void)
                     flint_printf("res1: %d  res2: %d\n", res1, res2);
                     flint_abort();
                 }
+
+                k = 0;
+                for (j = 0; j < r; j++)
+                {
+                    if (s[j] < 0)
+                    {
+                        if (s1[k] != s[j] && s1[k] != -s[j] - 1)
+                        {
+                            flint_printf("FAIL\ncheck next disjoint is disjoint\n");
+                            flint_abort();
+                        }
+                        k++;
+                    }
+                }
+
                 if (res1)
                 {
                     for (j = 0; j < r - i; j++)

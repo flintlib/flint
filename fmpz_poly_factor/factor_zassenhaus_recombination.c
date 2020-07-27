@@ -21,17 +21,60 @@ static void _fmpz_poly_product(
     const fmpz_poly_struct * lifted_fac,
     const slong * subset,
     slong len,
-    const fmpz_t P)
+    const fmpz_t P,
+    const fmpz_t leadf,
+    fmpz_poly_struct ** stack,
+    fmpz_poly_struct * tmp)
 {
-    slong i;
-    fmpz_poly_one(res);
+    slong i, j, k;
+    fmpz_poly_struct * t;
+
+    k = 0;
     for (i = 0; i < len; i++)
     {
-        if (subset[i] >= 0)
+        if (subset[i] < 0)
+            continue;
+
+        stack[k] = (fmpz_poly_struct *) lifted_fac + subset[i];
+        k++;
+
+        for (j = k - 1; j > 0 && stack[j - 1]->length < stack[j]->length; j--)
         {
-            fmpz_poly_mul(res, res, lifted_fac + subset[i]);
-            fmpz_poly_scalar_smod_fmpz(res, res, P);
+            t = stack[j - 1];
+            stack[j - 1] = stack[j];
+            stack[j] = t;
         }
+    }
+
+    while (k > 1)
+    {
+        for (j = 1; j < k; j++)
+            FLINT_ASSERT(stack[j - 1]->length >= stack[j]->length);
+
+        fmpz_poly_mul(res, stack[k - 2], stack[k - 1]);
+        fmpz_poly_scalar_smod_fmpz(res, res, P);
+
+        k--;
+        stack[k - 1] = tmp + k - 1; /* make sure stack[k - 1] is writeable */
+        fmpz_poly_swap(res, stack[k - 1]);
+
+        for (j = k - 1; j > 0 && stack[j - 1]->length < stack[j]->length; j--)
+        {
+            t = stack[j - 1];
+            stack[j - 1] = stack[j];
+            stack[j] = t;
+        }
+    }
+
+    if (k == 1)
+    {
+        fmpz_poly_scalar_mul_fmpz(res, stack[0], leadf);
+        fmpz_poly_scalar_smod_fmpz(res, res, P);
+    }
+    else
+    {
+        FLINT_ASSERT(0);
+        fmpz_poly_one(res);
     }
 }
 
@@ -43,33 +86,43 @@ void fmpz_poly_factor_zassenhaus_recombination(
     const fmpz_t P,
     slong exp)
 {
+    const slong r = lifted_fac->num;
     slong * subset;
     slong k, len;
-    fmpz_poly_t f, Q, tryme;
+    fmpz_poly_t Fcopy, Q, tryme;
+    fmpz_poly_struct * tmp;
+    fmpz_poly_struct ** stack;
+    fmpz_poly_struct * f;
 
-    len = lifted_fac->num;
-    subset = (slong *) flint_malloc(len*sizeof(slong));
-    for (k = 0; k < len; k++)
+    subset = (slong *) flint_malloc(r*sizeof(slong));
+    for (k = 0; k < r; k++)
         subset[k] = k;
 
-    fmpz_poly_init(f);
+    stack = (fmpz_poly_struct **) flint_malloc(r*sizeof(fmpz_poly_struct *));
+
+    tmp = (fmpz_poly_struct *) flint_malloc(r*sizeof(fmpz_poly_struct));
+    for (k = 0; k < r; k++)
+        fmpz_poly_init(tmp + k);
+
     fmpz_poly_init(Q);
     fmpz_poly_init(tryme);
+    fmpz_poly_init(Fcopy);
 
-    fmpz_poly_set(f, F);
+    f = (fmpz_poly_struct *) F;
 
+    len = r;
     for (k = 1; k <= len/2; k++)
     {
         zassenhaus_subset_first(subset, len, k);
         while (1)
         {
-            _fmpz_poly_product(tryme, lifted_fac->p, subset, len, P);
-            fmpz_poly_scalar_mul_fmpz(tryme, tryme, fmpz_poly_lead(f));
-            fmpz_poly_scalar_smod_fmpz(tryme, tryme, P);
+            _fmpz_poly_product(tryme, lifted_fac->p, subset, len, P,
+                                                fmpz_poly_lead(f), stack, tmp);
             fmpz_poly_primitive_part(tryme, tryme);
             if (fmpz_poly_divides(Q, f, tryme))
             {
                 fmpz_poly_factor_insert(final_fac, tryme, exp);
+                f = Fcopy;  /* make sure f is writeable */
                 fmpz_poly_swap(f, Q);
                 len -= k;
                 if (!zassenhaus_subset_next_disjoint(subset, len + k))
@@ -92,9 +145,16 @@ void fmpz_poly_factor_zassenhaus_recombination(
         FLINT_ASSERT(fmpz_poly_is_one(f));
     }
 
-    fmpz_poly_clear(f);
+    fmpz_poly_clear(Fcopy);
     fmpz_poly_clear(tryme);
     fmpz_poly_clear(Q);
+
+    flint_free(stack);
+
+    for (k = 0; k < r; k++)
+        fmpz_poly_clear(tmp + k);
+    flint_free(tmp);
+
     flint_free(subset);
 }
 

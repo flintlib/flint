@@ -76,13 +76,13 @@ slong zassenhaus_subset_next_disjoint(slong * s, slong r)
         }
     }
 
-    if (r - total < total || total < 1 || last == r - 1)
-        return 0;
-
     j = 0;
     for (i = 0; i < r; i++)
         if (s[i] < 0)
             s[j++] = s[i];
+
+    if (r - total < total || total < 1 || last == r - 1)
+        return 0;
 
     min = FLINT_MIN(total - 1, last - total + 1);
 

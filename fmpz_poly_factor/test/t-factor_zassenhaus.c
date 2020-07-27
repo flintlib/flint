@@ -23,12 +23,12 @@ main(void)
     flint_printf("zassenhaus....");
     fflush(stdout);
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_t c;
         fmpz_poly_t f, g, h, t;
         fmpz_poly_factor_t fac;
-        slong j, k, n = n_randint(state, 6) + 1;
+        slong j, k, n = n_randint(state, 7) + 1;
         slong facs1 = 0, facs2 = 0;
 
         fmpz_init(c);
@@ -44,7 +44,7 @@ main(void)
         for (j = 0; j < n; j++)
         {
             do {
-               fmpz_poly_randtest(g, state, n_randint(state, 25/n) + 2,
+               fmpz_poly_randtest(g, state, n_randint(state, 35/n) + 2,
                                                         n_randint(state, 100));
             } while (g->length == 0);
             k = 0;
@@ -75,7 +75,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("facs1 = %wd, facs2 = %wd\n", facs1, facs2);
-            flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n\n");
+            flint_printf("f = "), fmpz_poly_print_pretty(f, "x"), flint_printf("\n\n");
             flint_printf("h = "), fmpz_poly_print(h), flint_printf("\n\n");
             flint_printf("fac = "), fmpz_poly_factor_print(fac), flint_printf("\n\n");
             flint_abort();
