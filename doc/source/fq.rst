@@ -257,10 +257,10 @@ Roots
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_sqrt(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
+.. function:: int fq_sqrt(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
 
-    Sets ``rop`` to the square root of ``op1``. Assumes ``op1`` is a perfect
-        square, otherwise an exception is raised.
+    Sets ``rop`` to the square root of ``op1`` if it is a square, and return
+    `1`, otherwise return `0`.
 
 .. function:: void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
 
@@ -270,7 +270,7 @@ Roots
 
 .. function:: int fq_is_square(const fq_t op, const fq_ctx_t ctx)
 
-    Return ``1`` if ``op`` is a quadratic residue, i.e. a square.
+    Return ``1`` if ``op`` is a square.
 
 Output
 --------------------------------------------------------------------------------

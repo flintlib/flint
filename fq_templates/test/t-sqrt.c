@@ -62,32 +62,53 @@ main(void)
             TEMPLATE(T, clear)(c, ctx);
         }
 
-        /* Check sqrt(a^2) = a */
+        /* Check sqrt(a^2) = a and that x*a^2 is not a square */
         for (i = 0; i < 200; i++)
         {
-            TEMPLATE(T, t) a, b, c, d;
+            int r;
+	    TEMPLATE(T, t) a, b, c, d, x;
 
             TEMPLATE(T, init)(a, ctx);
             TEMPLATE(T, init)(b, ctx);
             TEMPLATE(T, init)(c, ctx);
             TEMPLATE(T, init)(d, ctx);
+	    TEMPLATE(T, init)(x, ctx);
 
             TEMPLATE(T, randtest)(a, state, ctx);
 
             TEMPLATE(T, sqr)(b, a, ctx);
 
-            TEMPLATE(T, sqrt)(c, b, ctx);
+            r = TEMPLATE(T, sqrt)(c, b, ctx);
             TEMPLATE(T, sqr)(d, c, ctx);
 
-            result = (TEMPLATE(T, equal)(d, b, ctx));
+            result = (r && TEMPLATE(T, equal)(d, b, ctx));
             if (!result)
             {
                 flint_printf("FAIL (sqrt(a^2) == a):\n\n");
-                flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
+                flint_printf("r = %d\n", r);
+		flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
                 flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
                 flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
                 flint_printf("d = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
                 abort();
+            }
+
+            if (ctx->is_conway && fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0 &&
+			          !TEMPLATE(T, is_zero)(b, ctx))
+	    {
+                TEMPLATE(T, gen)(x, ctx);
+		TEMPLATE(T, mul)(b, b, x, ctx);
+
+                r = TEMPLATE(T, sqrt)(c, b, ctx);
+
+                result = !r; /* check b is not a square */
+                if (!result)
+                {
+                    flint_printf("FAIL (a^2*x is nonsquare):\n\n");
+                    flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
+                    flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
+                    abort();
+                }
             }
 
             TEMPLATE(T, clear)(a, ctx);

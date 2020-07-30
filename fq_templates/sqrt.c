@@ -13,9 +13,11 @@
 
 #include "templates.h"
 
-void TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
+int TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
                                                   const TEMPLATE(T, ctx_t) ctx)
 {
+    int res = 1;
+
     if (TEMPLATE(T, is_zero)(op, ctx) || TEMPLATE(T, is_one)(op, ctx))
         TEMPLATE(T, set)(rop, op, ctx);
     else if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
@@ -85,13 +87,8 @@ void TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
 
             if (i == M)
             {
-                flint_throw(FLINT_ERROR,
-#if T == fq
-                    "Not a square (fq_sqrt)\n"
-#else
-                    "Not a square (fq_nmod_sqrt\n"
-#endif
-                );
+                res = 0;
+		break;
             }
 
             TEMPLATE(T, set)(b, c, ctx);
@@ -115,6 +112,8 @@ void TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
         TEMPLATE(T, clear)(c, ctx);
         TEMPLATE(T, clear)(z, ctx);
     }
+
+    return res;
 }
 
 #endif

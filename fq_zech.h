@@ -184,7 +184,7 @@ FLINT_DLL void fq_zech_pow_ui(fq_zech_t rop, const fq_zech_t op1, const ulong e,
 
 /* Roots *********************************************************************/
 
-FLINT_DLL void fq_zech_sqrt(fq_zech_t rop, const fq_zech_t op1,
+FLINT_DLL int fq_zech_sqrt(fq_zech_t rop, const fq_zech_t op1,
 		                                      const fq_zech_ctx_t ctx);
 
 FLINT_DLL void fq_zech_pth_root(fq_zech_t rop,
