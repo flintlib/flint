@@ -221,6 +221,103 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
             ca_field_set_ext(ctx->fields + field, i, fields[i], ctx);
         }
 
+        /* Find log relations. Todo: this needs to be done before building
+           the final field, because we may be introducing extra elements
+           (pi, i). */
+        if (0)
+        {
+            slong * logs;
+            slong num_logs;
+
+            num_logs = 0;
+            logs = flint_malloc(sizeof(slong) * fields_len);
+
+            /* todo: find linear combinations of logarithms */
+            for (i = 0; i < fields_len; i++)
+            {
+                if ((ctx->fields + fields[i])->type == CA_FIELD_TYPE_FUNC &&
+                    (ctx->fields + fields[i])->data.func.func == CA_Log)
+                {
+                    logs[num_logs] = i;
+                    num_logs++;
+                }
+            }
+
+            if (num_logs >= 2)
+            {
+                acb_ptr z;
+                slong j;
+                fmpz * rel;
+
+                z = _acb_vec_init(num_logs + 1);
+                rel = _fmpz_vec_init(num_logs + 1);
+                /* todo: pi * i */
+
+                for (j = 0; j < num_logs; j++)
+                {
+                    ca_get_acb(z + j, (ctx->fields + fields[logs[j]])->data.func.args, 256, ctx);
+                    acb_log(z + j, z + j, 256);
+                }
+
+                if (_qqbar_acb_lindep(rel, z, num_logs, 1, 256))
+                {
+                    ca_t prod, upow;
+
+                    ca_init(prod, ctx);
+                    ca_init(upow, ctx);
+
+                    ca_one(prod, ctx);
+
+                    for (j = 0; j < num_logs; j++)
+                    {
+                        if (!fmpz_is_zero(rel + j))
+                        {
+                            ca_pow_fmpz(upow, (ctx->fields + fields[logs[j]])->data.func.args, rel + j, ctx);
+
+/*
+                            ca_print((ctx->fields + fields[logs[j]])->data.func.args, ctx); printf(" ^ "); fmpz_print(rel + j); printf(" = "); ca_print(upow, ctx); printf("\n");
+*/
+
+                            ca_mul(prod, prod, upow, ctx);
+                        }
+                    }
+
+                    if (ca_check_is_one(prod, ctx) == T_TRUE)
+                    {
+                        printf("proved log relation!\n");
+
+/*
+                        for (j = 0; j < num_logs; j++)
+                        {
+                            acb_printn(z + j, 10, 0); printf("   ");
+                        }
+                        printf("\n");
+*/
+
+                        for (j = 0; j < num_logs; j++)
+                        {
+                            if (!fmpz_is_zero(rel + j) || 1)
+                            {
+                                fmpz_print(rel + j);
+                                flint_printf(" * log(");
+                                ca_print((ctx->fields + fields[logs[j]])->data.func.args, ctx);
+                                flint_printf(")    ");
+                            }
+                        }
+                        flint_printf("\n");
+                    }
+
+                    ca_clear(prod, ctx);
+                    ca_clear(upow, ctx);
+                }
+
+                _acb_vec_clear(z, num_logs + 1);
+                _fmpz_vec_clear(rel, num_logs + 1);
+            }
+
+            flint_free(logs);
+        }
+
         /* add relative extensions to ideal */
         for (i = 0; i < fields_len; i++)
         {

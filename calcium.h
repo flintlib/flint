@@ -50,6 +50,8 @@ CALCIUM_INLINE void truth_print(truth_t t)
 /* IDs for builtin mathematical functions and constants */
 typedef enum
 {
+    /* Special case for representing qqbar instances */
+    CA_QQBar,
     /* Arithmetic */
     CA_Neg,
     CA_Add,

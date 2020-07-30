@@ -80,6 +80,47 @@ typedef const ca_struct * ca_srcptr;
 #define CA_FIELD(x, ctx) ((ctx)->fields + (x)->field)
 #define CA_FIELD_MULTI_GEN(x, i, ctx) ((ctx)->fields + CA_FIELD(x, ctx)->data.multi.ext[i])
 
+/* Extension object **********************************************************/
+
+typedef struct
+{
+    qqbar_struct x;        /* qqbar_t element */
+    nf_struct * nf;        /* antic number field for fast arithmetic */
+}
+ca_ext_qqbar;
+
+typedef struct
+{
+    ca_struct * args;       /* Function arguments x1, ..., xn. */
+    slong nargs;            /* Number of function arguments n. */
+    acb_struct enclosure;   /* Cached numerical enclosure of f(x1,...,xn) */
+    slong prec;             /* Working precision of cached enclosure */
+}
+ca_ext_func_data;
+
+typedef struct
+{
+    calcium_func_code head;   /* f = F_Pi, F_Exp, ... */
+    union {
+        ca_ext_qqbar qqbar;
+        ca_ext_func_data func_data;
+    } data;
+} ca_ext_struct;
+
+typedef ca_ext_struct ca_ext_t[1];
+typedef ca_ext_struct * ca_ext_ptr;
+typedef const ca_ext_struct * ca_ext_srcptr;
+
+#define CA_EXT_HEAD(x) ((x)->head)
+
+#define CA_EXT_QQBAR(_x) (&((_x)->data.qqbar.x))
+#define CA_EXT_QQBAR_NF(_x) ((_x)->data.qqbar.nf)
+
+#define CA_EXT_FUNC_ARGS(x) ((x)->data.func_data.args)
+#define CA_EXT_FUNC_NARGS(x) ((x)->data.func_data.nargs)
+#define CA_EXT_FUNC_ENCLOSURE(x) (&((x)->data.func_data.enclosure))
+#define CA_EXT_FUNC_PREC(x) ((x)->data.func_data.prec)
+
 /* Field object **************************************************************/
 
 typedef enum
@@ -216,6 +257,9 @@ void _ca_make_field_element(ca_t x, slong i, ca_ctx_t ctx);
 ca_ptr ca_vec_init(slong n, ca_ctx_t ctx);
 void ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx);
 
+/* todo: document */
+void ca_vec_set(ca_ptr res, ca_srcptr src, slong len, ca_ctx_t ctx);
+
 CA_INLINE void
 _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
 {
@@ -314,6 +358,7 @@ truth_t ca_check_gt(const ca_t x, const ca_t y, ca_ctx_t ctx);
 truth_t ca_check_ge(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 int ca_equal_repr(const ca_t x, const ca_t y, ca_ctx_t ctx);
+int ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 /* Field structure operations */
 
