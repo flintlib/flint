@@ -78,4 +78,6 @@ void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const c
         fmpz_print(p), flint_printf(",%wd) is not present in the database.\n", d);
         flint_abort();
     }
+
+    ctx->is_conway = 1;
 }

@@ -257,12 +257,20 @@ Roots
 --------------------------------------------------------------------------------
 
 
+.. function:: int fq_sqrt(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
+
+    Sets ``rop`` to the square root of ``op1`` if it is a square, and return
+    `1`, otherwise return `0`.
+
 .. function:: void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
 
     Sets ``rop`` to a `p^{th}` root root of ``op1``.  Currently,
     this computes the root by raising ``op1`` to `p^{d-1}` where
     `d` is the degree of the extension.
 
+.. function:: int fq_is_square(const fq_t op, const fq_ctx_t ctx)
+
+    Return ``1`` if ``op`` is a square.
 
 Output
 --------------------------------------------------------------------------------

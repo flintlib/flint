@@ -48,6 +48,7 @@ typedef struct
 
     fq_nmod_ctx_struct *fq_nmod_ctx;
     int owns_fq_nmod_ctx;
+    int is_conway; /* whether field was generated using Flint Conway tables (assures primitivity) */
 
 } fq_zech_ctx_struct;
 
@@ -181,7 +182,15 @@ FLINT_DLL void fq_zech_pow(fq_zech_t rop, const fq_zech_t op1, const fmpz_t e,
 FLINT_DLL void fq_zech_pow_ui(fq_zech_t rop, const fq_zech_t op1, const ulong e,
                     const fq_zech_ctx_t ctx);
 
-FLINT_DLL void fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
+/* Roots *********************************************************************/
+
+FLINT_DLL int fq_zech_sqrt(fq_zech_t rop, const fq_zech_t op1,
+		                                      const fq_zech_ctx_t ctx);
+
+FLINT_DLL void fq_zech_pth_root(fq_zech_t rop,
+		                 const fq_zech_t op1, const fq_zech_ctx_t ctx);
+
+FLINT_DLL int fq_zech_is_square(const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 

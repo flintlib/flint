@@ -75,4 +75,6 @@ fq_ctx_init_modulus(fq_ctx_t ctx, fmpz_mod_poly_t modulus, const char *var)
     fmpz_mod_poly_init(ctx->inv, fq_ctx_prime(ctx));
     fmpz_mod_poly_reverse(ctx->inv, ctx->modulus, ctx->modulus->length);
     fmpz_mod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->modulus->length);
+
+    ctx->is_conway = 0;
 }

@@ -23,8 +23,10 @@ fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 
     if (_fq_ctx_init_conway(ctx, p, d, var))
     {
-        return;
-    }
+        ctx->is_conway = 1;
+	return;
+    } else
+	ctx->is_conway = 0;
 
     flint_randinit(state);
 

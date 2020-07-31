@@ -74,4 +74,7 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
     nmod_poly_init(ctx->inv, ctx->mod.n);
     nmod_poly_reverse(ctx->inv, ctx->modulus, ctx->modulus->length);
     nmod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->modulus->length);
+
+    ctx->is_conway = 0;
 }
+
