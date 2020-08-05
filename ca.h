@@ -101,6 +101,7 @@ ca_ext_func_data;
 typedef struct
 {
     calcium_func_code head;   /* f = F_Pi, F_Exp, ... */
+    ulong hash;
     union {
         ca_ext_qqbar qqbar;
         ca_ext_func_data func_data;
@@ -112,6 +113,7 @@ typedef ca_ext_struct * ca_ext_ptr;
 typedef const ca_ext_struct * ca_ext_srcptr;
 
 #define CA_EXT_HEAD(x) ((x)->head)
+#define CA_EXT_HASH(x) ((x)->hash)
 
 #define CA_EXT_QQBAR(_x) (&((_x)->data.qqbar.x))
 #define CA_EXT_QQBAR_NF(_x) ((_x)->data.qqbar.nf)

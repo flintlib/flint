@@ -44,7 +44,8 @@ For all types, a *type_t* is defined as an array of length one of type
 
 .. type:: ca_ext_t
 
-    An extension number object contains a header, data (a :type:`qqbar_t`
+    An extension number object contains a header, a hash value,
+    data (a :type:`qqbar_t`
     instance and an Antic :type:`nf_t` in the case of algebraic numbers, and
     a pointer to arguments
     in the case of a symbolic function), and a cached :type:`acb_t` enclosure
@@ -57,6 +58,10 @@ For all types, a *type_t* is defined as an array of length one of type
     This is *CA_QQBar* if *x* represents an algebraic constant in
     canonical form, and *CA_Exp*, *CA_Pi*, etc. for symbolic functions
     and constants.
+
+.. macro:: CA_EXT_HASH(x)
+
+    Accesses the hash value of *x*.
 
 .. macro:: CA_EXT_QQBAR(x)
 
@@ -116,6 +121,10 @@ Memory management
     `f(x_1, \ldots, x_n)` where *f* is defined by *func* and *n* is
     given by *nargs*.
 
+.. function:: void ca_ext_init_set(ca_ext_t res, const ca_ext_t x, ca_ctx_t ctx)
+
+    Initializes *res* and sets it to a copy of *x*.
+
 .. function:: void ca_ext_clear(ca_ext_t res, ca_ctx_t ctx)
 
     Clears *res*.
@@ -134,8 +143,13 @@ Structure
     Sets *res* to argument *i* (indexed from zero) of *x*.
     This calls *flint_abort* if *i* is out of range.
 
-Ordering
--------------------------------------------------------------------------------
+.. function:: ulong ca_ext_hash(const ca_ext_t x, ca_ctx_t ctx)
+
+    Returns a hash of the structural representation of *x*.
+
+.. function:: int ca_ext_equal_repr(const ca_ext_t x, const ca_ext_t y, ca_ctx_t ctx)
+
+    Tests *x* and *y* for structural equality, returning 0 (false) or 1 (true).
 
 .. function:: int ca_ext_cmp_repr(const ca_ext_t x, const ca_ext_t y, ca_ctx_t ctx)
 
@@ -159,6 +173,33 @@ Numerical evaluation
     Sets *res* to an enclosure of the numerical value of *x*.
     A working precision of *prec* bits is used for the evaluation,
     without adaptive refinement.
+
+Cache
+-------------------------------------------------------------------------------
+
+.. type:: ca_ext_cache_struct
+
+.. type:: ca_ext_cache_t
+
+    Represents a set of structurally distinct :type:`ca_ext_t` instances.
+    This object contains an array of pointers to individual heap-allocated
+    :type:`ca_ext_struct` objects as well as a hash table for quick
+    lookup.
+
+.. function:: void ca_ext_cache_init(ca_ext_cache_t cache, ca_ctx_t ctx)
+
+    Initializes *cache* for use.
+
+.. function:: void ca_ext_cache_clear(ca_ext_cache_t cache, ca_ctx_t ctx)
+
+    Clears *cache*, freeing the memory allocated internally.
+
+.. function:: ca_ext_ptr ca_ext_cache_insert(ca_ext_cache_t cache, const ca_ext_t x, ca_ctx_t ctx)
+
+    Adds *x* to *cache* without duplication. If a structurally identical
+    instance already exists in *cache*, a pointer to that instance is returned.
+    Otherwise, a copy of *x* is inserted into *cache* and a pointer to that new
+    instance is returned.
 
 
 .. raw:: latex
